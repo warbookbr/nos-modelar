@@ -39,14 +39,14 @@ function triangulosDasFaces(frentes, vertices, V, olho) {
   for (const f of frentes) {
     if (f.ids) { juntar(f.ids.map((i) => vertices[i]), f.n ?? null); continue; }
     const furos = f.furos && f.furos.length > 0 ? f.furos : f.furo ? [f.furo] : [];
-    if (furos.length === 0 && f.pts.length === 3) { juntar(f.pts); continue; }
+    if (furos.length === 0 && f.pts.length === 3) { juntar(f.pts, f.n ?? null); continue; }
     const aneis = [f.pts, ...furos];
     const todos = aneis.flat();
     const buracos = [];
     let n = f.pts.length;
     for (const fu of furos) { buracos.push(n); n += fu.length; }
     const idx = earcut(todos.flatMap((p) => V.p(p)), buracos, 2);
-    for (let k = 0; k + 2 < idx.length; k += 3) juntar([todos[idx[k]], todos[idx[k + 1]], todos[idx[k + 2]]]);
+    for (let k = 0; k + 2 < idx.length; k += 3) juntar([todos[idx[k]], todos[idx[k + 1]], todos[idx[k + 2]]], f.n ?? null);
   }
   return saida;
 }

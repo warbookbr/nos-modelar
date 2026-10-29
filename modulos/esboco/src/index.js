@@ -1970,8 +1970,15 @@ export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquad
         destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts, ...(r.prisma.naoConvexo ? { linhas: doLado } : {}) });
       }
 
-      if (para === 'fora' && j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
+      if (j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
         for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w0)) {
+          arcos.push(arc);
+        }
+      }
+      /* a ponta do fim que não olha para o observador (de costas ou de perfil) também tem a borda onde a lateral de frente acaba: sem
+         ela a caixa vista de lado, com as duas pontas de perfil, saía sem a aresta de cima */
+      if (j === fatias - 1 && olho && dot(eixoN(1), olho) <= 0) {
+        for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w1)) {
           arcos.push(arc);
         }
       }
@@ -2835,10 +2842,13 @@ function linhasDoGrupo(g, V, olho) {
    escala, legendas, linhas de centro, superfícies de corte e linhas de explosão ficam no SVG, por cima da camada.
    `perfilDosTracos: false` (com `camada`) entrega a camada sem o perfil das fitas (`inclinacoes`), para quem mede só a área das
    faces; o resto da camada sai igual.
+   `tracosVisiveis: true` (com `camada`) refaz os traços das formas opacas pelo que se vê (a emenda de formas encostadas no mesmo plano
+   sai, o cruzamento de uma forma com a outra entra, e o que as faces escondem sai exatamente), ver `tracos-da-camada.js`: a camada
+   leva `visiveis` nessas formas e o desenhista pinta os traços sem teste de profundidade. O SVG não muda.
    `soCamada: true` (com `camada`) entrega só a camada, sem montar o SVG: `svg` e `svgSobreCamada` saem vazios, e o título, as legendas,
    os rótulos, as linhas de centro, a barra de escala e o traço de cada forma não são calculados. A camada sai a mesma, e quem mede a
    silhueta (`esboco-silhueta.mjs`) só lê dela; o tamanho do quadro (`largura`, `altura`, `escala`) também. */
-export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTracos = true, soCamada = false } = {}) {
+export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTracos = true, soCamada = false, tracosVisiveis = false } = {}) {
   const { vista, opcoes, previa, enquadrar } = validarEsboco(esboco);
   const V = VISTAS_TODAS[vista];
   let enquadreAchou = false;
@@ -2941,7 +2951,7 @@ export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTr
   projetadas.forEach((p, k) => {
     const ehLista = p.modo === 'lista';
     const { x0, tela } = geometria(p, k, escala);
-    if (querCamada) formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa, perfilDosTracos, tinta: (r, n) => cor(hexDe(r.forma.cor), 0.55 + 0.5 * Math.max(0, dot(n, LUZ))) }));
+    if (querCamada) formasDaCamada.push(...formasDoPainel(p.itens, { tela: (q) => tela(V.p(q)), olho, previa, perfilDosTracos, tracosVisiveis, tinta: (r, n) => cor(hexDe(r.forma.cor), 0.55 + 0.5 * Math.max(0, dot(n, LUZ))) }));
     if (querCamada && soCamada) return;
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     if (!p.ocultosOpcao.has('titulo')) partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(`${p.opcao.titulo ?? `Opção ${k + 1}`}${previa ? ' (prévia)' : ''}`)}</text>`);

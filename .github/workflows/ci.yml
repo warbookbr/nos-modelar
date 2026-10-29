@@ -296,6 +296,13 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run calibracao:check
 
+      # A medida do desenho de linhas: os casos montados à mão provam a medida (zero no desenho certo, acusa o traço plantado e o tirado), e
+      # as quarenta e oito vistas do conjunto de calibração ficam dentro do registro das causas. Sem este passo o desenhista poderia
+      # voltar a traçar a emenda entre partes, o cruzamento sem linha e a aresta atrás de outra peça sem que ninguém medisse.
+      - name: Desenho de linhas medido contra a referência de profundidade e normal
+        if: ${{ !cancelled() }}
+        run: npm run desenho:check
+
   juntar:
     name: Juntar à main
     needs: [ rapidos, lentos, bancada, acervo ]

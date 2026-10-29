@@ -46,6 +46,7 @@ export const LE_O_GATE = {
   'exportar:check': CODIGO,
   'arquitetura:motor:check': CODIGO,
   'calibracao:check': [],
+  'desenho:check': [],
 };
 
 /* Os gates que rodam um programa sobre o código declaram as ENTRADAS dele, e leem o fecho dos imports estáticos delas, mais o que
@@ -66,6 +67,12 @@ export const ENTRADAS_DO_GATE = {
     entradas: ['tools/modelar/calibracao-do-critico.mjs'],
     tambem: [/^docs\/modelar\/banco-de-provas\/(calibracao-do-critico|rodada-2026-10-08)\//, /^\.claude\/agents\//, /^procedural\/(pecas|familias)\//,
       /(^|\/)fixtures?\//, /^package(-lock)?\.json$/, /^\.npmrc$/],
+  },
+  /* O código da medida e do desenhista (o fecho dos imports dele), as imagens e fontes da calibração de que parte, o registro das causas,
+     o Three.js que a referência carrega pelo caminho e as famílias que as fontes chamam. */
+  'desenho:check': {
+    entradas: ['tools/modelar/medida-do-desenho.mjs', 'tools/modelar/medida-do-desenho-conferir.mjs'],
+    tambem: [/^docs\/modelar\/banco-de-provas\/(calibracao-do-critico|desenho-das-linhas|rodada-2026-10-08)\//, /^procedural\/(pecas|familias)\//, /(^|\/)fixtures?\//, /^package(-lock)?\.json$/, /^\.npmrc$/],
   },
   'mcp:visual:check': {
     entradas: ['src/bancada/entrada.js', 'tools/mcp/mcp.test.mjs', 'tools/mcp/procedural.test.mjs', 'tools/mcp/perfis/autoria-execucao.test.mjs',

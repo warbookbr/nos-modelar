@@ -124,6 +124,10 @@ export const GATES = [
      e a medida reprovando, sem o crítico, o que o conjunto diz ser dela. Mudar o crítico, o desenhista ou a geometria de uma
      fonte exige gerar e medir de novo. */
   'calibracao:check',
+  /* A medida do desenho de linhas: prova a medida em casos montados à mão e mede as quarenta e oito vistas do conjunto de calibração
+     do crítico contra a referência de profundidade e normal por pixel; reprova o traço sem aresta e a aresta sem traço que o registro
+     das causas não declara. Abre o Chromium: fica para o CI. */
+  'desenho:check',
 ];
 
 /* OS GATES RODAM EM PARALELO, E O RELATÓRIO CONTINUA EM ORDEM.
@@ -220,7 +224,7 @@ export const GATES_CURTOS = [
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check', 'ferramentas:check',
-  'banco-de-provas:check', 'calibracao:check',
+  'banco-de-provas:check', 'calibracao:check', 'desenho:check',
 ];
 
 export function escolherBateria(alterados) {
@@ -297,7 +301,7 @@ function lerDuracoesDosGates(raiz = RAIZ) {
  * verde. A pessoa decidiu no mesmo dia: a bateria local roda as conferências baratas e os testes rápidos ligados à mudança, e
  * os gates abaixo, quando algo do que leem mudou, ficam para o CI, ditos no relatório. `--com-pesados` e `--completo` os rodam
  * aqui. */
-export const PESADOS_PARA_O_CI = ['test:lentos', 'mcp:visual:check', 'bancada:guardas', 'guarda:acervo', 'guarda:referencial', 'familias:check'];
+export const PESADOS_PARA_O_CI = ['test:lentos', 'mcp:visual:check', 'bancada:guardas', 'guarda:acervo', 'guarda:referencial', 'familias:check', 'desenho:check'];
 
 /* Quem lê `dist/` só pode começar depois de quem escreve. */
 export const DEPENDE_DE = Object.fromEntries(

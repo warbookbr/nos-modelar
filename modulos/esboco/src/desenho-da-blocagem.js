@@ -14,30 +14,26 @@
    ligado), e a tinta é a mesma (`tintaDaFace`), de modo que a mesma geometria cai nos mesmos pixels. Não há legenda, linha de
    centro, corte, explosão, zoom nem prévia: ficam no desenho das formas.
 
-   Os traços são as arestas da malha que o desenho das formas também traça: o vinco (duas faces vizinhas a mais de 30 graus uma
-   da outra) e a silhueta (uma face de frente e outra de costas para o olho) de cada volume, só onde alguma das duas faces olha
-   para o observador. A face de costas não é desenhada (o volume é fechado e a de frente a cobre), e a face de perfil não cobre
-   pixel. O que o próprio volume esconde de si (a parede do furo de um anel, vista de fora) sai pela conta que o desenho das
-   formas usa nas formas côncavas, `semOQueOVolumeEsconde` de `oclusao-das-linhas.js`. A oclusão entre volumes é a da camada: o teste de profundidade por pixel, com o viés por índice de volume que desempata
-   faces no mesmo plano em favor do volume que vem depois na lista. */
+   Os traços são decididos com todos os volumes juntos, e não por volume. As candidatas são as arestas da malha (soldadas pelas coordenadas, e
+   divididas nos vértices que caem no meio delas), com as paredes que se encostam entre dois volumes tiradas da conta, e os cruzamentos de
+   um volume com a superfície do outro, que nenhuma malha tem (`intersecao-de-volumes.js`): a aresta é o vinco (duas faces a mais de 30 graus uma
+   da outra) ou a silhueta (uma face de frente e outra de costas), só onde alguma das faces olha para o observador. O que as faces de frente
+   de todos os volumes opacos escondem sai em vetor e exatamente (`oclusaoExata`, de `oclusao-das-linhas.js`), e o que sobra só vale onde a
+   superfície que se vê de um lado da linha difere da do outro lado (`vizinhanca-na-tela.js`): a emenda de duas partes no mesmo plano e o
+   contorno de uma peça embutida à altura da face da vizinha não são aresta. A camada entrega esses traços já visíveis, e o desenhista os
+   pinta sem teste de profundidade; só o volume translúcido segue o que sempre fez (o que o próprio volume esconde, pela conta que o desenho
+   das formas usa nas formas côncavas, `semOQueOVolumeEsconde`, e o teste de profundidade por pixel da camada). A face de costas não é
+   desenhada (o volume é fechado e a de frente a cobre), e a face de perfil não cobre pixel. */
 import { barraDeEscala, ErroDeEsboco, escalaDoQuadro, QUADRO, tintaDaFace, textoDoDesenho, VISTAS } from './index.js';
 import { formasDoPainel, montarCamada } from './camada.js';
+import { COSSENO_DO_VINCO, DEGRAU_DE_PROFUNDIDADE, ESPACO_DAS_AMOSTRAS, FOLGA_DO_VINCO } from './limites-do-desenho.js';
 import { cruzamentosEntreVolumes } from './intersecao-de-volumes.js';
 import { oclusaoExata, semOQueOVolumeEsconde } from './oclusao-das-linhas.js';
 import { arestasPelaVizinhanca } from './vizinhanca-na-tela.js';
 
 const { f1, esc, quebrar } = textoDoDesenho;
 
-/* o cosseno de 30 graus: duas faces vizinhas com normais mais afastadas que isso formam um vinco */
-export const COSSENO_DO_VINCO = Math.cos(Math.PI / 6);
-/* O vinco é acima de 30 graus, e o ângulo de exatamente 30 não é: o polígono de doze lados tem 30 graus entre faces vizinhas, e o
-   arredondamento da conta decidia ao acaso quais das doze arestas do furo ou do tubo saíam traçadas (riscos curtos num lado e nada no
-   outro). A folga, de 0,02 grau, põe o empate do lado de não traçar, e a ferramenta que mede o desenho a usa na referência. */
-export const FOLGA_DO_VINCO = 2e-4;
-/* Uma superfície só vale como outra, e a linha entre elas como aresta, quando a profundidade dos dois planos no ponto da linha difere de
-   mais que isto (mm ao longo do olho): é o degrau da oclusão. Abaixo dele a emenda de duas peças no mesmo plano não aparece, e o degrau de
-   uma peça embutida a um décimo de milímetro, sim. A medida do desenho usa o mesmo número. */
-export const DEGRAU_DE_PROFUNDIDADE = 0.05;
+export { COSSENO_DO_VINCO, DEGRAU_DE_PROFUNDIDADE, FOLGA_DO_VINCO };
 /* a face cuja normal tem menos que isto de componente no olho está de perfil */
 const PERFIL = 1e-6;
 const AREA_MINIMA = 1e-9;
@@ -214,7 +210,7 @@ function projetar(painel, V, olho) {
     for (const v of new Set(tris.flat(2))) { const q = V.p(vertices[v]); lo = [Math.min(lo[0], q[0]), Math.min(lo[1], q[1])]; hi = [Math.max(hi[0], q[0]), Math.max(hi[1], q[1])]; }
     extensao = Math.max(hi[0] - lo[0], hi[1] - lo[1], 1e-9);
   }
-  const vizinhanca = { delta: 1e-4 * extensao, passo: extensao / 60, cosseno: COSSENO_DO_VINCO - FOLGA_DO_VINCO, degrau: DEGRAU_DE_PROFUNDIDADE };
+  const vizinhanca = { delta: ESPACO_DAS_AMOSTRAS * extensao, passo: extensao / 60, cosseno: COSSENO_DO_VINCO - FOLGA_DO_VINCO, degrau: DEGRAU_DE_PROFUNDIDADE };
   const itens = [];
   let min = [Infinity, Infinity];
   let max = [-Infinity, -Infinity];

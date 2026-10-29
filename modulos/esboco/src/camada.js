@@ -25,6 +25,8 @@
    vetor e exatamente (`oclusaoExata`), e entrega a forma com `visiveis`. Os traços dela já são o que se vê, e o desenhista os pinta
    por cima das faces sem teste de profundidade, sem o perfil: a fita de 2 px não é cortada pelo que passa à frente dela em um pixel
    nem passa à frente do que a esconde. */
+import { refazerTracosPeloQueSeVe } from './tracos-da-camada.js';
+
 export const LARGURA_DO_TRACO = 2;
 export const COR_DO_TRACO = '#111111';
 /* inclinação máxima de uma face, em milímetro de profundidade por milímetro de tela: só evita que a conta exploda numa face quase de perfil */
@@ -67,7 +69,7 @@ export function inclinacaoDaFace(pts, maxima) {
    `perfilDosTracos: false` pula `inclinarTracos` e deixa as formas sem `inclinacoes`. As faces, os traços e a profundidade de
    cada vértice saem iguais, e só o perfil da fita some; quem pinta o traço no WebGL precisa dele, e quem só mede a área que as
    faces cobrem (a silhueta de `esboco-silhueta.mjs`) não, e o perfil é a maior parte do custo da camada de um esboço grande. */
-export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfilDosTracos = true }) {
+export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfilDosTracos = true, tracosVisiveis = false }) {
   const passo = passoDeDesempate(itens.length);
   /* pixels do quadro por milímetro (a projeção é ortogonal: um vetor perpendicular ao olho mantém o comprimento) */
   const apoio = Math.abs(olho[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
@@ -76,9 +78,11 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfi
   const t0 = tela([0, 0, 0]);
   const t1 = tela(perp.map((x) => x / norma));
   const pxPorMm = Math.hypot(t1[0] - t0[0], t1[1] - t0[1]) || 1;
-  const formas = itens.map((it, rank) => {
+  /* as formas com os pontos de `comPonto(vies)`: os da camada (x e y arredondados a centésimo de pixel, profundidade a micrômetro, com o
+     viés de desempate da forma) ou, para refazer os traços, os exatos, sem viés */
+  const montar = (comPonto) => itens.map((it, rank) => {
     const vies = rank * passo;
-    const p3 = (p) => { const [x, y] = tela(p); return [arred2(x), arred2(y), arred3(p[0] * olho[0] + p[1] * olho[1] + p[2] * olho[2] + vies)]; };
+    const p3 = comPonto(vies);
     const faces = [];
     const tracos = [];
     const anel = (pts, fechado) => { const q = pts.map(p3); if (fechado) q.push(q[0]); tracos.push(q); };
@@ -102,8 +106,13 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfi
         if (!(it.r.prisma?.naoConvexo || it.r.subtrai)) for (const l of ch.linhas) tracos.push(l.map(p3));
       }
     }
-    return { id: it.r.id, rank, opacidade: it.r.opacidade !== undefined && it.r.opacidade < 1 ? it.r.opacidade : 1, prof: it.prof, faces, tracos, ...(it.visiveis === true ? { visiveis: true } : {}) };
+    return { id: it.r.id, rank, vies, opacidade: it.r.opacidade !== undefined && it.r.opacidade < 1 ? it.r.opacidade : 1, prof: it.prof, faces, tracos, ...(it.visiveis === true ? { visiveis: true } : {}) };
   });
+  const formas = montar((vies) => (p) => { const [x, y] = tela(p); return [arred2(x), arred2(y), arred3(p[0] * olho[0] + p[1] * olho[1] + p[2] * olho[2] + vies)]; });
+  /* `tracosVisiveis` (o desenho das formas): os traços das formas opacas refeitos pelo que se vê, ver `tracos-da-camada.js`. A conta
+     parte dos pontos sem arredondar, porque o plano de uma face comprida, estendido a um ponto longe dos vértices, amplia o arredondamento
+     deles para além do degrau de profundidade que separa uma superfície da outra. */
+  if (tracosVisiveis && !previa) refazerTracosPeloQueSeVe(formas, montar(() => (p) => { const [x, y] = tela(p); return [x, y, p[0] * olho[0] + p[1] * olho[1] + p[2] * olho[2]]; }), { pxPorMm });
   /* o traço já visível não precisa do perfil: o desenhista o pinta sem teste de profundidade */
   if (perfilDosTracos && formas.some((f) => f.visiveis !== true)) inclinarTracos(formas, { maxima: INCLINACAO_MAXIMA / pxPorMm, maximaDaPonta: INCLINACAO_DA_PONTA / pxPorMm, maximaExterior: INCLINACAO_EXTERIOR / pxPorMm, meia: LARGURA_DO_TRACO / 2 });
   return formas;
@@ -167,6 +176,7 @@ function inclinarTracos(formas, { maxima, maximaDaPonta, maximaExterior, meia })
   });
   const zDe = (d, x, y) => d.z[2] + d.g[0] * (x - d.z[0]) + d.g[1] * (y - d.z[1]);
   formas.forEach((forma, k) => {
+    if (forma.visiveis === true) return;
     const porVertice = porForma[k];
     forma.inclinacoes = forma.tracos.map((t) => {
       const segs = [];

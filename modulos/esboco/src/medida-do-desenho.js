@@ -4,7 +4,7 @@
    arestas é conferir o desenhista com ele mesmo. A referência é outra: a mesma malha, com a mesma projeção, a mesma escala e o mesmo
    enquadramento, renderizada com profundidade e normal por pixel (a ferramenta usa o Three.js num WebGL do Chromium, com supersampling),
    e as arestas são tiradas no espaço da tela, onde só existe o que se vê: a descontinuidade de profundidade (silhueta e oclusão) e a
-   mudança de normal acima de 30 graus (o vinco, `COSSENO_DO_VINCO`). Ela não olha a topologia da malha, a divisão em partes nem a
+   mudança de normal acima de 30 graus (o vinco, `COSSENO_DO_VINCO`, e o degrau, `DEGRAU_DE_PROFUNDIDADE`, os mesmos que o desenho usa em `limites-do-desenho.js`: o desenho e a referência discordam só na conta, no pixel contra o vetor). Ela não olha a topologia da malha, a divisão em partes nem a
    lista de arestas do desenho.
 
    Este módulo só prepara dados e compara máscaras, sem navegador: os triângulos da referência (`triangulosDaReferencia`), o que é traço
@@ -13,6 +13,7 @@
    qualquer traço do desenho. Os dois saem em grupos (componentes de oito vizinhos), com a caixa e o centro de cada um. */
 import { COR_DO_TRACO } from './camada.js';
 import { ErroDeEsboco } from './index.js';
+import { DEGRAU_DE_PROFUNDIDADE } from './limites-do-desenho.js';
 
 /* a tolerância, em pixels do PNG, entre um traço e a aresta que ele deve cobrir (a fita tem 2 px de largura) */
 export const TOLERANCIA_DO_DESENHO = 2;
@@ -35,7 +36,7 @@ export const AMOSTRAS_FORTES_DA_REFERENCIA = 3;
    isolados, que nenhum desenho de linhas traça, e um traço de verdade, de um milímetro de comprimento, já passa de dez pixels. */
 export const PIXELS_MINIMOS_DE_UM_GRUPO_DA_REFERENCIA = 4;
 /* a profundidade só conta como degrau, em mm ao longo do olho, acima desta folga somada à que a inclinação da superfície explica */
-export const DEGRAU_MINIMO_DA_REFERENCIA = 0.05;
+export const DEGRAU_MINIMO_DA_REFERENCIA = DEGRAU_DE_PROFUNDIDADE;
 
 const unitario = (v) => { const m = Math.hypot(...v) || 1; return v.map((c) => c / m); };
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -156,12 +157,34 @@ export function gruposDaMascara(m, largura, altura, origem = [0, 0]) {
         }
       }
     }
-    grupos.push({ pixels: n, caixa: [x0 + origem[0], y0 + origem[1], x1 + origem[0], y1 + origem[1]], centro: [Math.round((sx / n + origem[0]) * 10) / 10, Math.round((sy / n + origem[1]) * 10) / 10] });
+    grupos.push({ pixels: n, caixa: [x0 + origem[0], y0 + origem[1], x1 + origem[0], y1 + origem[1]], centro: [Math.round((sx / n + origem[0]) * 10) / 10, Math.round((sy / n + origem[1]) * 10) / 10], lista: [...fila] });
   }
   return grupos.sort((a, b) => b.pixels - a.pixels || a.centro[1] - b.centro[1] || a.centro[0] - b.centro[0]);
 }
 
 const contar = (m) => { let n = 0; for (const x of m) n += x; return n; };
+
+/* A distância (pixels) do pixel de `grupo` mais longe da máscara `outra`, procurada até `ate` pixels (devolve `ate` se passa disso): o quanto o
+   grupo está fora da tolerância, para quem lê o relato saber se é uma linha em outro lugar (dezenas de pixels) ou uma ponta a meio pixel. */
+function afastamentoDoGrupo(lista, outra, largura, altura, ate = 12) {
+  let pior = 0;
+  const passo = Math.max(1, Math.ceil(lista.length / 400));
+  for (let k = 0; k < lista.length; k += passo) {
+    const p = lista[k];
+    const x = p % largura; const y = (p - x) / largura;
+    let melhor = ate;
+    for (let dy = -ate; dy <= ate; dy++) {
+      for (let dx = -ate; dx <= ate; dx++) {
+        const xx = x + dx; const yy = y + dy;
+        if (xx < 0 || xx >= largura || yy < 0 || yy >= altura || !outra[yy * largura + xx]) continue;
+        const d = Math.hypot(dx, dy);
+        if (d < melhor) melhor = d;
+      }
+    }
+    if (melhor > pior) pior = melhor;
+  }
+  return Math.round(pior * 10) / 10;
+}
 
 /* Compara os traços do desenho com as arestas da referência (duas máscaras do mesmo tamanho). Devolve `{ vazamento, falha }`, cada
    um com `pixels`, `grupos` e a `mascara`. */
@@ -175,8 +198,12 @@ export function compararComAReferencia({ tracos, referencia, largura, altura, to
     if (tracos[i] && !pertoDaReferencia[i]) vaza[i] = 1;
     if (referencia[i] && !pertoDoTraco[i]) falta[i] = 1;
   }
-  const resumo = (mascara) => ({ pixels: contar(mascara), grupos: gruposDaMascara(mascara, largura, altura, origem), mascara });
-  return { vazamento: resumo(vaza), falha: resumo(falta), tracos: contar(tracos), arestas: contar(referencia) };
+  const resumo = (mascara, outra) => ({
+    pixels: contar(mascara),
+    grupos: gruposDaMascara(mascara, largura, altura, origem).map(({ lista, ...g }) => ({ ...g, afastamento: afastamentoDoGrupo(lista, outra, largura, altura) })),
+    mascara,
+  });
+  return { vazamento: resumo(vaza, referencia), falha: resumo(falta, tracos), tracos: contar(tracos), arestas: contar(referencia) };
 }
 
 /* A histerese da aresta: `contagem` (as amostras com aresta de cada pixel), forte a partir de `fortes`, fraca a partir de uma. Devolve a

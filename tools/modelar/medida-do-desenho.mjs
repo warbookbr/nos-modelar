@@ -243,6 +243,9 @@ export function triangulosDaCamada(r, vista) {
   let zMin = Infinity; let zMax = -Infinity;
   const anel = (q) => { const c = q.slice(); if (c.length > 1 && c[0][0] === c[c.length - 1][0] && c[0][1] === c[c.length - 1][1]) c.pop(); return c; };
   for (const f of r.camada.formas) {
+    /* a camada soma à profundidade de cada forma um viés de desempate (até alguns décimos de milímetro, pelo índice da forma): a geometria é a
+       sem ele */
+    const vies = f.vies ?? 0;
     for (const face of f.faces) {
       const c = anel(face.c);
       const furos = (face.h ?? []).map(anel);
@@ -252,7 +255,7 @@ export function triangulosDaCamada(r, vista) {
       const idx = earcut(todos.flatMap((p) => [p[0], p[1]]), buracos, 2);
       for (let k = 0; k + 2 < idx.length; k += 3) {
         const [a, b, d] = [idx[k], idx[k + 1], idx[k + 2]].map((i) => todos[i]);
-        const mm = (p) => [p[0] * mmPorPixel, p[1] * mmPorPixel, p[2]];
+        const mm = (p) => [p[0] * mmPorPixel, p[1] * mmPorPixel, p[2] - vies];
         const A = mm(a); const B = mm(b); const D = mm(d);
         const u = [B[0] - A[0], B[1] - A[1], B[2] - A[2]]; const w = [D[0] - A[0], D[1] - A[1], D[2] - A[2]];
         let nv = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
@@ -262,7 +265,7 @@ export function triangulosDaCamada(r, vista) {
         /* a normal da tela tem z para o olho: x e y da tela são a direita e para baixo, e a conta acima os leva ao mesmo sistema */
         if (nv[2] < 0) nv = nv.map((x) => -x);
         if (!(nv[2] > 1e-6)) continue;
-        for (const p of [a, b, d]) { pos.push(p[0], p[1], p[2]); nor.push(...nv); if (p[2] < zMin) zMin = p[2]; if (p[2] > zMax) zMax = p[2]; }
+        for (const p of [a, b, d]) { pos.push(p[0], p[1], p[2] - vies); nor.push(...nv); if (p[2] - vies < zMin) zMin = p[2] - vies; if (p[2] - vies > zMax) zMax = p[2] - vies; }
       }
     }
   }
@@ -358,11 +361,11 @@ export function vistasDaImagem(imagem, conjunto, raiz = RAIZ) {
   });
 }
 
-const resumoDosGrupos = (g) => g.map((x) => `${x.pixels}px em (${x.centro[0]}, ${x.centro[1]})`);
+const resumoDosGrupos = (g) => g.map((x) => `${x.pixels}px em (${x.centro[0]}, ${x.centro[1]}), a ${x.afastamento} px`);
 
 /** O relato de uma vista, sem as máscaras, para tabela e JSON. */
 export function relatoDaVista(id, vista, m) {
-  const tipo = (t) => ({ pixels: t.pixels, grupos: t.grupos.length, onde: t.grupos.map((g) => ({ pixels: g.pixels, centro: g.centro, caixa: g.caixa })) });
+  const tipo = (t) => ({ pixels: t.pixels, grupos: t.grupos.length, onde: t.grupos.map((g) => ({ pixels: g.pixels, centro: g.centro, caixa: g.caixa, afastamento: g.afastamento })) });
   return { id, vista, tracos: m.tracos, arestas: m.arestas, vazamento: tipo(m.vazamento), falha: tipo(m.falha) };
 }
 
