@@ -29,7 +29,7 @@ import { PNG } from 'pngjs';
 import { QUADRO, VISTAS } from '../../modulos/esboco/src/index.js';
 import { COSSENO_DO_VINCO, desenharBlocagem, FOLGA_DO_VINCO, geometria } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import {
-  DEGRAU_MINIMO_DA_REFERENCIA, SUPERAMOSTRAGEM_DA_REFERENCIA, TOLERANCIA_DO_DESENHO, baseDaVista, compararComAReferencia, mascaraDosTracos,
+  arestaPorHisterese, DEGRAU_MINIMO_DA_REFERENCIA, SUPERAMOSTRAGEM_DA_REFERENCIA, TOLERANCIA_DO_DESENHO, baseDaVista, compararComAReferencia, mascaraDosTracos,
   triangulosDaReferencia,
 } from '../../modulos/esboco/src/medida-do-desenho.js';
 import { LARGURA_DAS_VISTAS, VISTAS_DO_CONJUNTO } from '../../src/autoria/calibracao-do-critico.js';
@@ -141,7 +141,7 @@ const RENDERIZAR_REFERENCIA = async (texto) => {
       void main() {
         ivec2 sz = textureSize(uTex, 0);
         ivec2 o = ivec2(gl_FragCoord.xy);
-        int prof = 0; int vinco = 0; int cob = 0;
+        int prof = 0; int vinco = 0; int ambos = 0; int cob = 0;
         for (int sy = 0; sy < 16; sy++) {
           if (sy >= uSS) break;
           for (int sx = 0; sx < 16; sx++) {
@@ -149,16 +149,19 @@ const RENDERIZAR_REFERENCIA = async (texto) => {
             ivec2 c = ivec2(o.x * uSS + sx, (o.y + uMargem) * uSS + sy);
             vec4 p = texelFetch(uTex, c, 0);
             if (p.z > 0.0) cob = 1;
+            int rp = 0; int rv = 0;
             for (int k = 0; k < 4; k++) {
               ivec2 dq = k == 0 ? ivec2(1, 0) : k == 1 ? ivec2(-1, 0) : k == 2 ? ivec2(0, 1) : ivec2(0, -1);
               ivec2 cq = c + dq;
               if (cq.x < 0 || cq.y < 0 || cq.x >= sz.x || cq.y >= sz.y) continue;
               int r = par(p, texelFetch(uTex, cq, 0), vec2(float(dq.x) * uPasso.x, float(dq.y) * uPasso.y));
-              if (r == 1) prof = 1; else if (r == 2) vinco = 1;
+              if (r == 1) rp = 1; else if (r == 2) rv = 1;
             }
+            prof += rp; vinco += rv; if (rp + rv > 0) ambos += 1;
           }
         }
-        saida = vec4(float(prof | vinco), float(prof), float(vinco), float(cob));
+        /* quantas amostras do pixel têm aresta, em dezesseis avos de 255 (um byte por contagem) */
+        saida = vec4(float(ambos) / 255.0, float(prof) / 255.0, float(vinco) / 255.0, float(cob));
       }`,
   });
   const cenaArestas = new T.Scene();
@@ -207,12 +210,13 @@ export async function renderizarReferencia({ triangulos, quadro, W, H, linhas, e
   const base64 = await pagina.evaluate(RENDERIZAR_REFERENCIA, JSON.stringify(pedido));
   const bytes = Buffer.from(base64, 'base64');
   const n = W * (linhas[1] - linhas[0]);
-  const aresta = new Uint8Array(n); const profundidade = new Uint8Array(n); const vinco = new Uint8Array(n); const cobertura = new Uint8Array(n);
-  for (let i = 0; i < n; i++) {
-    aresta[i] = bytes[4 * i] > 127 ? 1 : 0; profundidade[i] = bytes[4 * i + 1] > 127 ? 1 : 0;
-    vinco[i] = bytes[4 * i + 2] > 127 ? 1 : 0; cobertura[i] = bytes[4 * i + 3] > 127 ? 1 : 0;
-  }
-  return { largura: W, altura: linhas[1] - linhas[0], aresta, profundidade, vinco, cobertura };
+  const contagem = new Uint8Array(n); const cobertura = new Uint8Array(n);
+  for (let i = 0; i < n; i++) { contagem[i] = bytes[4 * i]; cobertura[i] = bytes[4 * i + 3] > 127 ? 1 : 0; }
+  const altura = linhas[1] - linhas[0];
+  const aresta = arestaPorHisterese(contagem, W, altura);
+  const profundidade = new Uint8Array(n); const vinco = new Uint8Array(n);
+  for (let i = 0; i < n; i++) { if (aresta[i]) { profundidade[i] = bytes[4 * i + 1] >= bytes[4 * i + 2] ? 1 : 0; vinco[i] = 1 - profundidade[i]; } }
+  return { largura: W, altura, aresta, profundidade, vinco, cobertura };
 }
 
 /* ---------- as fontes dos triângulos ---------- */

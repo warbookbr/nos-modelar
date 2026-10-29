@@ -31,13 +31,13 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
    a caixa na tela. O triângulo da malha sai como veio; o polígono é repartido por earcut nas coordenadas da tela. */
 function triangulosDasFaces(frentes, vertices, V, olho) {
   const saida = [];
-  const juntar = (p3) => {
+  const juntar = (p3, n = null) => {
     const q = p3.map((p) => V.p(p));
     const z = p3.map((p) => dot(p, olho));
-    saida.push({ q, z, caixa: [Math.min(...q.map((a) => a[0])), Math.min(...q.map((a) => a[1])), Math.max(...q.map((a) => a[0])), Math.max(...q.map((a) => a[1]))] });
+    saida.push({ q, z, n, caixa: [Math.min(...q.map((a) => a[0])), Math.min(...q.map((a) => a[1])), Math.max(...q.map((a) => a[0])), Math.max(...q.map((a) => a[1]))] });
   };
   for (const f of frentes) {
-    if (f.ids) { juntar(f.ids.map((i) => vertices[i])); continue; }
+    if (f.ids) { juntar(f.ids.map((i) => vertices[i]), f.n ?? null); continue; }
     const furos = f.furos && f.furos.length > 0 ? f.furos : f.furo ? [f.furo] : [];
     if (furos.length === 0 && f.pts.length === 3) { juntar(f.pts); continue; }
     const aneis = [f.pts, ...furos];
@@ -126,18 +126,25 @@ export function semOQueOVolumeEsconde(linhas, frentes, V, olho, { vertices = nul
 
    Serve a qualquer conjunto de faces de frente, de um volume ou de todos: o triângulo de outro volume esconde a linha como o do próprio,
    e a linha que corre sobre a face de outro volume na mesma profundidade (a aresta da divisão, o contato) não some, porque a folga a
-   deixa. Devolve os segmentos visíveis, na ordem de entrada. É determinística. */
+   deixa. Devolve os segmentos visíveis, na ordem de entrada. É determinística.
+
+   A mesma grade responde também qual superfície se vê num ponto da tela (`superficieEm`): o triângulo de frente mais perto do olho que
+   cobre o ponto, com a normal dele e o plano, para quem decide o que cada lado de uma linha mostra (`vizinhanca-na-tela.js`). */
 const COMPRIMENTO_MINIMO_DO_TRECHO = 1e-3;
 const EMENDA_DO_ESCONDIDO = 1e-5;
+const TOLERANCIA_BARICENTRICA = 1e-9;
 
 export function visiveisContraAsFaces(linhas, frentes, V, olho, opcoes = {}) {
-  return oclusaoExata(frentes, V, olho, opcoes)(linhas);
+  return oclusaoExata(frentes, V, olho, opcoes).visiveis(linhas);
 }
 
-/* A mesma conta com a grade das faces montada uma vez: devolve a função que tira de um conjunto de linhas o que as faces escondem. */
+/* A grade das faces montada uma vez. Devolve `{ visiveis(linhas), superficieEm(x, y) }`: a primeira tira de um conjunto de linhas o que as
+   faces escondem; a segunda dá, no ponto `[x, y]` do plano da vista, `{ z, n, plano }` do triângulo mais perto que o cobre (`plano(x, y)`
+   é a profundidade do plano dele em qualquer ponto), ou null onde nenhuma face cobre. */
 export function oclusaoExata(frentes, V, olho, { vertices = null, folga: folgaPedida = null } = {}) {
   const tris = frentes.length === 0 ? [] : triangulosDasFaces(frentes, vertices, V, olho);
-  if (tris.length === 0) return (linhas) => linhas;
+  const vazio = { visiveis: (linhas) => linhas, superficieEm: () => null };
+  if (tris.length === 0) return vazio;
   const x0 = Math.min(...tris.map((t) => t.caixa[0])); const y0 = Math.min(...tris.map((t) => t.caixa[1]));
   const x1 = Math.max(...tris.map((t) => t.caixa[2])); const y1 = Math.max(...tris.map((t) => t.caixa[3]));
   const G = Math.max(1, Math.min(CELULAS_DA_GRADE, Math.round(Math.sqrt(tris.length))));
@@ -160,66 +167,90 @@ export function oclusaoExata(frentes, V, olho, { vertices = null, folga: folgaPe
   });
   const extensao = Math.max(x1 - x0, y1 - y0);
   const folga = folgaPedida ?? FOLGA_DA_OCLUSAO + 1e-5 * extensao;
-  const BARI = 1e-9;
-  return (linhas) => {
-  const saida = [];
-  for (const [a, b] of linhas) {
-    const pa = V.p(a); const pb = V.p(b);
-    const za = dot(a, olho); const zb = dot(b, olho);
-    const dx = pb[0] - pa[0]; const dy = pb[1] - pa[1];
-    const comprimento = Math.hypot(dx, dy);
-    if (!(comprimento > 1e-12)) { saida.push([a, b]); continue; }
-    /* os triângulos das células que a caixa da linha toca, sem repetir */
-    const vistos = new Set(); const candidatos = [];
-    for (let cx = celula(Math.min(pa[0], pb[0]), x0); cx <= celula(Math.max(pa[0], pb[0]), x0); cx++) {
-      for (let cy = celula(Math.min(pa[1], pb[1]), y0); cy <= celula(Math.max(pa[1], pb[1]), y0); cy++) {
-        for (const t of grade.get(cy * G + cx) ?? []) if (!vistos.has(t.k)) { vistos.add(t.k); candidatos.push(t); }
+
+  const visiveis = (linhas) => {
+    const saida = [];
+    for (const [a, b] of linhas) {
+      const pa = V.p(a); const pb = V.p(b);
+      const za = dot(a, olho); const zb = dot(b, olho);
+      const dx = pb[0] - pa[0]; const dy = pb[1] - pa[1];
+      const comprimento = Math.hypot(dx, dy);
+      if (!(comprimento > 1e-12)) { saida.push([a, b]); continue; }
+      /* os triângulos das células que a caixa da linha toca, sem repetir */
+      const vistos = new Set(); const candidatos = [];
+      for (let cx = celula(Math.min(pa[0], pb[0]), x0); cx <= celula(Math.max(pa[0], pb[0]), x0); cx++) {
+        for (let cy = celula(Math.min(pa[1], pb[1]), y0); cy <= celula(Math.max(pa[1], pb[1]), y0); cy++) {
+          for (const t of grade.get(cy * G + cx) ?? []) if (!vistos.has(t.k)) { vistos.add(t.k); candidatos.push(t); }
+        }
       }
-    }
-    const escondidos = [];
-    for (const t of candidatos) {
-      const [qa, qb, qc] = t.q;
-      /* as baricêntricas (u para qa, v para qb, w para qc) de P(t) = pa + t (pb - pa): alfa + beta t */
-      const ux = (qb[1] - qc[1]); const uy = (qc[0] - qb[0]);
-      const vx = (qc[1] - qa[1]); const vy = (qa[0] - qc[0]);
-      const al = [(ux * (pa[0] - qc[0]) + uy * (pa[1] - qc[1])) / t.d, (vx * (pa[0] - qc[0]) + vy * (pa[1] - qc[1])) / t.d];
-      const be = [(ux * dx + uy * dy) / t.d, (vx * dx + vy * dy) / t.d];
-      al.push(1 - al[0] - al[1]); be.push(-be[0] - be[1]);
-      let lo = 0; let hi = 1; let vazio = false;
-      for (let m = 0; m < 3 && !vazio; m++) {
-        /* al + be t >= -BARI */
-        if (Math.abs(be[m]) < 1e-14) { if (al[m] < -BARI) vazio = true; continue; }
-        const r = (-BARI - al[m]) / be[m];
-        if (be[m] > 0) lo = Math.max(lo, r); else hi = Math.min(hi, r);
+      const escondidos = [];
+      for (const t of candidatos) {
+        const [qa, qb, qc] = t.q;
+        /* as baricêntricas (u para qa, v para qb, w para qc) de P(t) = pa + t (pb - pa): alfa + beta t */
+        const ux = qb[1] - qc[1]; const uy = qc[0] - qb[0];
+        const vx = qc[1] - qa[1]; const vy = qa[0] - qc[0];
+        const al = [(ux * (pa[0] - qc[0]) + uy * (pa[1] - qc[1])) / t.d, (vx * (pa[0] - qc[0]) + vy * (pa[1] - qc[1])) / t.d];
+        const be = [(ux * dx + uy * dy) / t.d, (vx * dx + vy * dy) / t.d];
+        al.push(1 - al[0] - al[1]); be.push(-be[0] - be[1]);
+        let lo = 0; let hi = 1; let fora = false;
+        for (let m = 0; m < 3 && !fora; m++) {
+          /* al + be t >= -tolerância */
+          if (Math.abs(be[m]) < 1e-14) { if (al[m] < -TOLERANCIA_BARICENTRICA) fora = true; continue; }
+          const r = (-TOLERANCIA_BARICENTRICA - al[m]) / be[m];
+          if (be[m] > 0) lo = Math.max(lo, r); else hi = Math.min(hi, r);
+        }
+        if (fora || !(hi > lo)) continue;
+        /* a profundidade do plano do triângulo menos a da linha: C + D t, e escondida quando passa de `folga` */
+        const A = al[0] * t.z[0] + al[1] * t.z[1] + al[2] * t.z[2];
+        const B = be[0] * t.z[0] + be[1] * t.z[1] + be[2] * t.z[2];
+        const C = A - za; const D = B - (zb - za);
+        if (Math.abs(D) < 1e-14) { if (!(C > folga)) continue; } else {
+          const r = (folga - C) / D;
+          if (D > 0) lo = Math.max(lo, r); else hi = Math.min(hi, r);
+        }
+        if (hi > lo) escondidos.push([lo, hi]);
       }
-      if (vazio || !(hi > lo)) continue;
-      /* a profundidade do plano do triângulo menos a da linha: C + D t, e escondida quando passa de `folga` */
-      const A = al[0] * t.z[0] + al[1] * t.z[1] + al[2] * t.z[2];
-      const B = be[0] * t.z[0] + be[1] * t.z[1] + be[2] * t.z[2];
-      const C = A - za; const D = B - (zb - za);
-      if (Math.abs(D) < 1e-14) { if (!(C > folga)) continue; } else {
-        const r = (folga - C) / D;
-        if (D > 0) lo = Math.max(lo, r); else hi = Math.min(hi, r);
+      if (escondidos.length === 0) { saida.push([a, b]); continue; }
+      escondidos.sort((p, q) => p[0] - q[0]);
+      const emenda = EMENDA_DO_ESCONDIDO / comprimento;
+      const unidos = [];
+      for (const iv of escondidos) {
+        const ultimo = unidos[unidos.length - 1];
+        if (ultimo && iv[0] <= ultimo[1] + emenda) ultimo[1] = Math.max(ultimo[1], iv[1]); else unidos.push([...iv]);
       }
-      if (hi > lo) escondidos.push([lo, hi]);
+      const em = (t) => a.map((c, e) => c + t * (b[e] - c));
+      const minimo = COMPRIMENTO_MINIMO_DO_TRECHO / comprimento;
+      let cursor = 0;
+      for (const [h0, h1] of unidos) {
+        if (h0 - cursor > minimo) saida.push([em(cursor), em(h0)]);
+        cursor = Math.max(cursor, h1);
+      }
+      if (1 - cursor > minimo) saida.push([em(cursor), em(1)]);
     }
-    if (escondidos.length === 0) { saida.push([a, b]); continue; }
-    escondidos.sort((p, q) => p[0] - q[0]);
-    const emenda = EMENDA_DO_ESCONDIDO / comprimento;
-    const unidos = [];
-    for (const iv of escondidos) {
-      const ultimo = unidos[unidos.length - 1];
-      if (ultimo && iv[0] <= ultimo[1] + emenda) ultimo[1] = Math.max(ultimo[1], iv[1]); else unidos.push([...iv]);
-    }
-    const em = (t) => a.map((c, e) => c + t * (b[e] - c));
-    const minimo = COMPRIMENTO_MINIMO_DO_TRECHO / comprimento;
-    let cursor = 0;
-    for (const [h0, h1] of unidos) {
-      if (h0 - cursor > minimo) saida.push([em(cursor), em(h0)]);
-      cursor = Math.max(cursor, h1);
-    }
-    if (1 - cursor > minimo) saida.push([em(cursor), em(1)]);
-  }
-  return saida;
+    return saida;
   };
+
+  const superficieEm = (x, y) => {
+    let melhor = null;
+    for (const t of grade.get(celula(y, y0) * G + celula(x, x0)) ?? []) {
+      const [a, b, c] = t.q;
+      const u = ((b[1] - c[1]) * (x - c[0]) + (c[0] - b[0]) * (y - c[1])) / t.d;
+      const v = ((c[1] - a[1]) * (x - c[0]) + (a[0] - c[0]) * (y - c[1])) / t.d;
+      const w = 1 - u - v;
+      if (u < -TOLERANCIA_BARICENTRICA || v < -TOLERANCIA_BARICENTRICA || w < -TOLERANCIA_BARICENTRICA) continue;
+      const z = u * t.z[0] + v * t.z[1] + w * t.z[2];
+      if (melhor === null || z > melhor.z) melhor = { z, n: t.n, t };
+    }
+    if (melhor === null) return null;
+    const { t } = melhor;
+    const [a, b, c] = t.q;
+    /* o plano do triângulo em qualquer ponto do plano da vista: a mesma conta, sem recortar nos lados */
+    const plano = (px, py) => {
+      const u = ((b[1] - c[1]) * (px - c[0]) + (c[0] - b[0]) * (py - c[1])) / t.d;
+      const v = ((c[1] - a[1]) * (px - c[0]) + (a[0] - c[0]) * (py - c[1])) / t.d;
+      return u * t.z[0] + v * t.z[1] + (1 - u - v) * t.z[2];
+    };
+    return { z: melhor.z, n: melhor.n, plano };
+  };
+  return { visiveis, superficieEm };
 }

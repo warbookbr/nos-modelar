@@ -24,6 +24,16 @@ export const FOLGA_DO_PIXEL = 0.25;
 export const SUPERAMOSTRAGEM_DA_REFERENCIA = 4;
 /* a fração da fita que um pixel precisa ter para ser traço */
 export const LIMIAR_DO_TRACO = 0.5;
+/* A aresta da referência passa por histerese. Um pixel do PNG tem aresta forte quando `AMOSTRAS_FORTES_DA_REFERENCIA` das dezesseis amostras
+   dele (quatro por lado) têm: a aresta de verdade cruza várias. O que tem de uma a duas amostras só entra quando encosta (oito vizinhos,
+   em cadeia) num pixel forte, que é como a ponta da aresta, que cruza só o canto do último pixel, continua aresta. A amostra isolada, que é
+   um degrau de um décimo de milímetro que a conta de ponto flutuante põe de um lado ou do outro do limite e deixa em pontos regulares de
+   um círculo, é ruído da referência e não da imagem. */
+export const AMOSTRAS_FORTES_DA_REFERENCIA = 3;
+/* O grupo de aresta da referência com menos pixels que isto é faísca: uma amostra que enxerga por uma fresta de um décimo de milímetro na
+   malha (a emenda de dois discos de malhas diferentes, que deixa a ponta de um triângulo sem cobrir) dá dois ou três pixels de aresta
+   isolados, que nenhum desenho de linhas traça, e um traço de verdade, de um milímetro de comprimento, já passa de dez pixels. */
+export const PIXELS_MINIMOS_DE_UM_GRUPO_DA_REFERENCIA = 4;
 /* a profundidade só conta como degrau, em mm ao longo do olho, acima desta folga somada à que a inclinação da superfície explica */
 export const DEGRAU_MINIMO_DA_REFERENCIA = 0.05;
 
@@ -167,4 +177,49 @@ export function compararComAReferencia({ tracos, referencia, largura, altura, to
   }
   const resumo = (mascara) => ({ pixels: contar(mascara), grupos: gruposDaMascara(mascara, largura, altura, origem), mascara });
   return { vazamento: resumo(vaza), falha: resumo(falta), tracos: contar(tracos), arestas: contar(referencia) };
+}
+
+/* A histerese da aresta: `contagem` (as amostras com aresta de cada pixel), forte a partir de `fortes`, fraca a partir de uma. Devolve a
+   máscara com os fortes e os fracos ligados a eles. */
+export function arestaPorHisterese(contagem, largura, altura, fortes = AMOSTRAS_FORTES_DA_REFERENCIA) {
+  const m = new Uint8Array(contagem.length);
+  const fila = [];
+  for (let i = 0; i < contagem.length; i++) if (contagem[i] >= fortes) { m[i] = 1; fila.push(i); }
+  for (let k = 0; k < fila.length; k++) {
+    const p = fila[k];
+    const x = p % largura; const y = (p - x) / largura;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const xx = x + dx; const yy = y + dy;
+        if (xx < 0 || xx >= largura || yy < 0 || yy >= altura) continue;
+        const q = yy * largura + xx;
+        if (!m[q] && contagem[q] >= 1) { m[q] = 1; fila.push(q); }
+      }
+    }
+  }
+  return tirarFaiscas(m, largura, altura);
+}
+
+/* A máscara sem os grupos (oito vizinhos) com menos de `minimo` pixels. */
+export function tirarFaiscas(m, largura, altura, minimo = PIXELS_MINIMOS_DE_UM_GRUPO_DA_REFERENCIA) {
+  const saida = new Uint8Array(m);
+  const visto = new Uint8Array(m.length);
+  for (let s = 0; s < m.length; s++) {
+    if (!m[s] || visto[s]) continue;
+    const fila = [s]; visto[s] = 1;
+    for (let k = 0; k < fila.length; k++) {
+      const p = fila[k];
+      const x = p % largura; const y = (p - x) / largura;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const xx = x + dx; const yy = y + dy;
+          if (xx < 0 || xx >= largura || yy < 0 || yy >= altura) continue;
+          const q = yy * largura + xx;
+          if (m[q] && !visto[q]) { visto[q] = 1; fila.push(q); }
+        }
+      }
+    }
+    if (fila.length < minimo) for (const p of fila) saida[p] = 0;
+  }
+  return saida;
 }

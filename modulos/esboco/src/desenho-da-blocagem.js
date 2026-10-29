@@ -24,6 +24,7 @@ import { barraDeEscala, ErroDeEsboco, escalaDoQuadro, QUADRO, tintaDaFace, texto
 import { formasDoPainel, montarCamada } from './camada.js';
 import { cruzamentosEntreVolumes } from './intersecao-de-volumes.js';
 import { oclusaoExata, semOQueOVolumeEsconde } from './oclusao-das-linhas.js';
+import { arestasPelaVizinhanca } from './vizinhanca-na-tela.js';
 
 const { f1, esc, quebrar } = textoDoDesenho;
 
@@ -33,6 +34,10 @@ export const COSSENO_DO_VINCO = Math.cos(Math.PI / 6);
    arredondamento da conta decidia ao acaso quais das doze arestas do furo ou do tubo saíam traçadas (riscos curtos num lado e nada no
    outro). A folga, de 0,02 grau, põe o empate do lado de não traçar, e a ferramenta que mede o desenho a usa na referência. */
 export const FOLGA_DO_VINCO = 2e-4;
+/* Uma superfície só vale como outra, e a linha entre elas como aresta, quando a profundidade dos dois planos no ponto da linha difere de
+   mais que isto (mm ao longo do olho): é o degrau da oclusão. Abaixo dele a emenda de duas peças no mesmo plano não aparece, e o degrau de
+   uma peça embutida a um décimo de milímetro, sim. A medida do desenho usa o mesmo número. */
+export const DEGRAU_DE_PROFUNDIDADE = 0.05;
 /* a face cuja normal tem menos que isto de componente no olho está de perfil */
 const PERFIL = 1e-6;
 const AREA_MINIMA = 1e-9;
@@ -201,7 +206,15 @@ function projetar(painel, V, olho) {
   const frentesDoVolume = painel.volumes.map(() => []);
   for (const f of todas) if (f.frente) frentesDoVolume[f.volume].push({ ids: f.ids, n: f.n });
   const frentesOpacas = frentesDoVolume.flatMap((l, i) => (opacos[i] ? l : []));
-  const visiveis = oclusaoExata(frentesOpacas, V, olho, { vertices });
+  const { visiveis, superficieEm } = oclusaoExata(frentesOpacas, V, olho, { vertices });
+  /* o plano da vista, em milímetro: a caixa de todos os vértices, que dá a escala das amostras de cada linha */
+  let extensao = 0;
+  {
+    let lo = [Infinity, Infinity]; let hi = [-Infinity, -Infinity];
+    for (const v of new Set(tris.flat(2))) { const q = V.p(vertices[v]); lo = [Math.min(lo[0], q[0]), Math.min(lo[1], q[1])]; hi = [Math.max(hi[0], q[0]), Math.max(hi[1], q[1])]; }
+    extensao = Math.max(hi[0] - lo[0], hi[1] - lo[1], 1e-9);
+  }
+  const vizinhanca = { delta: 1e-4 * extensao, passo: extensao / 60, cosseno: COSSENO_DO_VINCO - FOLGA_DO_VINCO, degrau: DEGRAU_DE_PROFUNDIDADE };
   const itens = [];
   let min = [Infinity, Infinity];
   let max = [-Infinity, -Infinity];
@@ -209,7 +222,7 @@ function projetar(painel, V, olho) {
     if (tris[i].length === 0) return;
     const usados = new Set(tris[i].flat());
     const linhasBrutas = tracos.filter((t) => t.volume === i).map((t) => t.linha);
-    const linhas = opacos[i] ? visiveis(linhasBrutas) : semOQueOVolumeEsconde(linhasBrutas, frentesDoVolume[i], V, olho, { vertices });
+    const linhas = opacos[i] ? arestasPelaVizinhanca(visiveis(linhasBrutas), V, superficieEm, vizinhanca) : semOQueOVolumeEsconde(linhasBrutas, frentesDoVolume[i], V, olho, { vertices });
     const lados = frentesDoVolume[i].map((f) => ({ pts: f.ids.map((k) => vertices[k]), n: f.n }));
     let centro = [0, 0, 0];
     for (const idx of usados) {
