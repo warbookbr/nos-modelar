@@ -370,12 +370,12 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:1e758b147a57f382d060e1a4894a46ec38d5f0015e5faf709a58da1f1e410023"
+        "hash": "sha256:7e12f9c59e2a05f6d6360f3a33c85c1dadd5dfb0ca689e5174a881051d2fc6c5"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c04/isometrica.png",
-          "sha256": "sha256:e41120ce754b0687f0c30a2c77745a5222deeeb6ce5beb57831f1d0c38ed0517"
+          "sha256": "sha256:bb10cd5a092b54de48b967f4a197596d032674107cd52446f75f3b1fe86055d2"
         },
         "frontal": {
           "arquivo": "imagens/c04/frontal.png",
@@ -387,7 +387,7 @@
         },
         "superior": {
           "arquivo": "imagens/c04/superior.png",
-          "sha256": "sha256:030362ac169ac00c1a76a3ef2f0053d12c43397b143a2a97e9f8da77d499c0ee"
+          "sha256": "sha256:f195ed2d0453cbaa3fa81351799d5238c40b4e452d40389da79de478d507ce8f"
         }
       }
     },
@@ -487,24 +487,24 @@
         }
       ],
       "desenho": {
-        "hash": "sha256:8ed1b1a7d40b4207c4a376c14e0b22f07f9f6f94cbcc81174c7f7f2ecaf147ee"
+        "hash": "sha256:b50f3d6574799d5773d6018f3843522ff713b4df1879c0918cd7b7b42cbeba5d"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c06/isometrica.png",
-          "sha256": "sha256:05ad2f87fa50d56569e6880ad45984d5fe1bff1bb32c4da2ff93ae9cbdd6a303"
+          "sha256": "sha256:66471bef11bc3f4c26469c581ff90b3778205fa506542454d55ac1174853ada5"
         },
         "frontal": {
           "arquivo": "imagens/c06/frontal.png",
-          "sha256": "sha256:78a57448b53454ede07d29edfa9e2cb3078b6d52170afd42bb550079e68f69f7"
+          "sha256": "sha256:c4f97a360e3ad385e6a10bb74b144b01599a12dcc7f09915809c648f47b857d8"
         },
         "lateral": {
           "arquivo": "imagens/c06/lateral.png",
-          "sha256": "sha256:bfb27de2ebd0e030e6eadac49e321c221c4aa6eceb0e941b1d40d0d792a5782e"
+          "sha256": "sha256:d5740a2f802d7bb9ca16347c5f733b392f35ca9e9f1b7fb729c44850cc226a8a"
         },
         "superior": {
           "arquivo": "imagens/c06/superior.png",
-          "sha256": "sha256:087bffcf3b9466e356385c430fa8ca1f133b6a9cb933c0875082b9172900beed"
+          "sha256": "sha256:e7ae91e7bc47c260fca7c0f83e3314a3afe3f8c92a9ba7a0f93ab83c5142c29b"
         }
       }
     },
@@ -661,12 +661,12 @@
       },
       "defeitos": [],
       "desenho": {
-        "hash": "sha256:65166a9e515e86fd712395c9970b7224fcc0cc90fd5171a68c8b4c58ed3c925f"
+        "hash": "sha256:d5bc6adf906bc24580e9dd1f0978ae2ad1107e55d2ab9f4dc43a92ae35fbcc87"
       },
       "vistas": {
         "isometrica": {
           "arquivo": "imagens/c09/isometrica.png",
-          "sha256": "sha256:1b10f59e636f3c85087298542cc06766838c29bf6b1b9e0b4b3041e45606cab7"
+          "sha256": "sha256:d988fad5916679a8164ec3b2ef24745f50d58d10359c21cca2997f44f910f040"
         },
         "frontal": {
           "arquivo": "imagens/c09/frontal.png",
@@ -1582,6 +1582,6 @@
   ],
   "prancha": {
     "arquivo": "prancha.png",
-    "sha256": "sha256:8403f4888a40cf81417072f68ab4021930e16f1a184a8f80ce84092d2e8358e5"
+    "sha256": "sha256:a146472600d324cecb7d5bcf8622a9ee89bdfa42e05021468687b4222eaaeb45"
   }
 }

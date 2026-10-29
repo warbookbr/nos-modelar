@@ -27,13 +27,14 @@ describe('arestasPelaVizinhanca', () => {
     expect(arestasPelaVizinhanca(emenda, V, dois({ zB: 5.02 }), opcoes)).toEqual([]);
   });
 
-  it('o vinco passa a ser aresta acima de 30 graus, e o de exatamente 30 não é', () => {
+  it('o vinco passa a ser aresta a partir de 30 graus, o de exatamente 30 incluso', () => {
     const inclinada = (graus) => { const t = (graus * Math.PI) / 180; return [Math.sin(t), 0, Math.cos(t)]; };
     /* a face da direita inclinada em torno do eixo y, sem degrau no encontro (a profundidade em x = 50 é a mesma) */
     const com = (graus) => dois({ nB: inclinada(graus) });
     expect(arestasPelaVizinhanca(emenda, V, com(40), opcoes)).toHaveLength(1);
     expect(arestasPelaVizinhanca(emenda, V, com(20), opcoes)).toEqual([]);
-    expect(arestasPelaVizinhanca(emenda, V, com(30), opcoes)).toEqual([]);
+    expect(arestasPelaVizinhanca(emenda, V, com(30), opcoes)).toHaveLength(1);
+    expect(arestasPelaVizinhanca(emenda, V, com(29.9), opcoes)).toEqual([]);
   });
 
   it('a silhueta contra o fundo é aresta, e a linha solta no vazio não', () => {

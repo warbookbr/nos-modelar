@@ -40,7 +40,7 @@ import {
   ErroDaFonte, RAIZ, PASTA_DO_CONJUNTO, chamadaDaFonte, esbocoDaFonte, executarChamada, lerConjuntoDoDisco, painelDoNeutro,
 } from './calibracao-do-critico.mjs';
 
-/* o vinco a partir do qual duas faces vizinhas formam aresta: acima de 30 graus, e o empate do ângulo exato (12 lados) é o da regra do
+/* o vinco a partir do qual duas faces vizinhas formam aresta: 30 graus ou mais, e o empate do ângulo exato (12 lados) é o da regra do
    desenho (`FOLGA_DO_VINCO`), que o arredondamento de uma conta e de outra decidiria ao acaso */
 const COSSENO_DA_REFERENCIA = COSSENO_DO_VINCO - FOLGA_DO_VINCO;
 /* a inclinação da superfície acima da qual o degrau de profundidade não é mais medido contra a inclinação (a face quase de perfil) */
