@@ -54,7 +54,7 @@ function normalDoTriangulo(vertices, [i, j, k]) {
 /* os vértices a menos de 1e-5 mm um do outro são o mesmo ponto para decidir as arestas: duas peças que se tocam, cada uma com os
    vértices dela, dividem a aresta onde as coordenadas coincidem */
 const GRADE_DA_SOLDA = 1e5;
-export function soldar(vertices) {
+function soldar(vertices) {
   const primeiro = new Map();
   return vertices.map((p, i) => {
     const k = `${Math.round(p[0] * GRADE_DA_SOLDA)},${Math.round(p[1] * GRADE_DA_SOLDA)},${Math.round(p[2] * GRADE_DA_SOLDA)}`;
@@ -116,7 +116,7 @@ function dividirNosVertices(vertices, solda, arestas) {
    volumes: as paredes que se encostam, com a mesma face de um lado e de outro e normais opostas, são interiores e saem da conta, e o que
    resta decide como decide dentro de um volume: uma face só é borda, duas faces com mais de 30 graus entre si são vinco, e uma de
    frente e outra de costas são silhueta. Só conta a aresta onde alguma das faces que sobram olha para o observador. */
-export function arestasDeTodos(vertices, solda, tris, olho, opacos) {
+function arestasDeTodos(vertices, solda, tris, olho, opacos) {
   const faces = [];
   const arestas = new Map();
   tris.forEach((lista, volume) => {

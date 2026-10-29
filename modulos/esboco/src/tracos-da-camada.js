@@ -41,8 +41,8 @@ function normalDe(pts) {
   return n[2] < 0 ? n.map((x) => -x) : n;
 }
 
-/* Refaz os traços das formas opacas de `formas` (o que `formasDoPainel` devolve), no lugar. `exatas`: as mesmas formas com os pontos sem arredondar e sem viés (o que `formasDoPainel` monta para isto); `pxPorMm`: pixels do quadro
-   por milímetro. */
+/* Refaz os traços das formas opacas de `formas` (o que `formasDoPainel` devolve), no lugar. `exatas`: as mesmas formas com os pontos sem
+   arredondar e sem viés (o que `formasDoPainel` monta para isto); `pxPorMm`: pixels do quadro por milímetro. */
 export function refazerTracosPeloQueSeVe(formas, exatas, { pxPorMm }) {
   const indices = formas.map((f, i) => i).filter((i) => formas[i].opacidade >= 1 && formas[i].visiveis !== true);
   if (indices.length === 0) return;

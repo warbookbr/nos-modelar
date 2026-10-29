@@ -1927,6 +1927,7 @@ export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquad
     const dentro = [];
     const linhas = [];
     const arcos = [];
+    const arcosDaCamada = [];
 
     const procLateral = (anel, para, destino) => {
       const N = anel.length;
@@ -1970,17 +1971,20 @@ export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquad
         destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts, ...(r.prisma.naoConvexo ? { linhas: doLado } : {}) });
       }
 
-      if (j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
+      if (para === 'fora' && j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
         for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w0)) {
           arcos.push(arc);
         }
       }
-      /* a ponta do fim que não olha para o observador (de costas ou de perfil) também tem a borda onde a lateral de frente acaba: sem
-         ela a caixa vista de lado, com as duas pontas de perfil, saía sem a aresta de cima */
-      if (j === fatias - 1 && olho && dot(eixoN(1), olho) <= 0) {
-        for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w1)) {
-          arcos.push(arc);
-        }
+      /* O resto das bordas onde uma lateral de frente acaba numa ponta que não olha para o observador (de costas ou de perfil): a do
+         fim, e as das paredes dos furos. Sem elas a caixa vista de lado, com as duas pontas de perfil, saía sem a aresta de cima, e o furo
+         visto de lado sem a borda de dentro. Vão só para a camada (`arcosDaCamada`, que o PNG usa): o SVG do pintor segue o mesmo de sempre,
+         byte a byte, porque testes e arquivos gravados o conferem pelo hash. */
+      if (olho && j === 0 && para === 'dentro' && dot(eixoN(-1), olho) <= 0) {
+        for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w0)) arcosDaCamada.push(arc);
+      }
+      if (olho && j === fatias - 1 && dot(eixoN(1), olho) <= 0) {
+        for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w1)) arcosDaCamada.push(arc);
       }
     };
 
@@ -2011,7 +2015,7 @@ export function fatiarForma(r, olho, { semFatias = false, maxFatias = 36, esquad
       }
     }
 
-    chunks.push({ r, prof, lados, dentro, linhas, arcos, tampas: [] });
+    chunks.push({ r, prof, lados, dentro, linhas, arcos, ...(arcosDaCamada.length > 0 ? { arcosDaCamada } : {}), tampas: [] });
 
     if (j === fatias - 1) {
       const n = eixoN(1);

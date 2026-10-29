@@ -1,4 +1,19 @@
 {
   "formato": "mecanifica.desenho-das-linhas@1",
-  "causas": []
+  "causas": [
+    {
+      "imagem": "c03",
+      "vista": "isometrica",
+      "tipo": "falha",
+      "maximoPixels": 5,
+      "causa": "dois grupos de 4 e 1 px da aresta em que o anel do arco de roda cruza a carroceria, a 3,2 e a 2,8 px do traço mais perto: o traço está lá, a mais de dois pixels de fita e menos de três da aresta da referência, na ponta onde o vetor e o pixel se separam (medido por `npm run desenho:medir -- --so=c03 --vista=isometrica`)"
+    },
+    {
+      "imagem": "c03",
+      "vista": "lateral",
+      "tipo": "vazamento",
+      "maximoPixels": 1,
+      "causa": "um pixel no canto da fita onde duas linhas de um pixel de diferença se juntam, a 2,8 px da aresta da referência, quando a tolerância (2 px, mais um quarto de pixel de folga) vai a 2,25: a ponta de uma linha sobre a outra, e não uma linha a mais (medido por `npm run desenho:medir -- --so=c03 --vista=lateral`)"
+    }
+  ]
 }

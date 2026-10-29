@@ -83,6 +83,7 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfi
   const montar = (comPonto) => itens.map((it, rank) => {
     const vies = rank * passo;
     const p3 = comPonto(vies);
+    const opaca = !(it.r.opacidade !== undefined && it.r.opacidade < 1);
     const faces = [];
     const tracos = [];
     const anel = (pts, fechado) => { const q = pts.map(p3); if (fechado) q.push(q[0]); tracos.push(q); };
@@ -102,7 +103,8 @@ export function formasDoPainel(itens, { tela, olho, tinta, previa = false, perfi
         for (const fu of furos) anel(fu, true);
       }
       if (!previa) {
-        for (const arc of ch.arcos ?? []) if (arc.length >= 2) anel(arc, false);
+        /* as bordas a mais da camada (`arcosDaCamada`) só nas formas opacas: a vizinha translúcida e clara de uma vista da unidade não ganha linha */
+        for (const arc of [...(ch.arcos ?? []), ...(opaca ? ch.arcosDaCamada ?? [] : [])]) if (arc.length >= 2) anel(arc, false);
         if (!(it.r.prisma?.naoConvexo || it.r.subtrai)) for (const l of ch.linhas) tracos.push(l.map(p3));
       }
     }

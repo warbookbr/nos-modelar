@@ -32,6 +32,7 @@ import {
   arestaPorHisterese, DEGRAU_MINIMO_DA_REFERENCIA, SUPERAMOSTRAGEM_DA_REFERENCIA, TOLERANCIA_DO_DESENHO, baseDaVista, compararComAReferencia, mascaraDosTracos,
   triangulosDaReferencia,
 } from '../../modulos/esboco/src/medida-do-desenho.js';
+import { passoDeDesempate } from '../../modulos/esboco/src/camada.js';
 import { LARGURA_DAS_VISTAS, VISTAS_DO_CONJUNTO } from '../../src/autoria/calibracao-do-critico.js';
 import { desenhoParaBuffer, paginaDaCamada } from './esboco.mjs';
 import { desenhosDoObjeto } from './esboco.mjs';
@@ -245,7 +246,7 @@ export function triangulosDaCamada(r, vista) {
   for (const f of r.camada.formas) {
     /* a camada soma à profundidade de cada forma um viés de desempate (até alguns décimos de milímetro, pelo índice da forma): a geometria é a
        sem ele */
-    const vies = f.vies ?? 0;
+    const vies = f.vies ?? f.rank * passoDeDesempate(r.camada.formas.length);
     for (const face of f.faces) {
       const c = anel(face.c);
       const furos = (face.h ?? []).map(anel);
