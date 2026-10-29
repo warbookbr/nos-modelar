@@ -45,6 +45,7 @@ export const FRASES = {
   importar: 'Os importadores de OpenSCAD, STEP e STL saíram do repositório; onde está o desenho deles para recriá-los.',
   materiais: 'O material de cada forma e o bloco `materiais` da raiz, guardados sem interpretar: tipo, cor, desgaste e o nome que a forma usa.',
   desenhos: 'O SVG é o desenho puro, e o PNG acrescenta a camada das formas.',
+  medida: 'A medida do desenho de linhas contra uma referência exata (`desenho:medir` e o gate `desenho:check`): vazamento, falha e o registro das causas.',
   legendas: 'Legendas numeradas por colunas ou em lista.',
   modo: 'O modo `lista`, que tira as legendas do desenho e as põe ao lado.',
   linhas: 'Linhas de centro, ligadas ou não por opção.',

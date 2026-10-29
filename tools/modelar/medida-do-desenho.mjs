@@ -8,7 +8,7 @@
  * medida não olha essa escolha: renderiza a mesma malha, com a mesma projeção, a mesma escala e o mesmo enquadramento, em WebGL no
  * Chromium com o Three.js de `node_modules`, guardando por pixel a profundidade e a normal da face, com supersampling (4 amostras por
  * lado do pixel do PNG), e tira as arestas no espaço da tela: o degrau de profundidade (a silhueta e a oclusão) e a mudança de
- * normal acima de 30 graus (o vinco). A malha não tem topologia nem divisão em partes aqui. O resultado, reduzido ao tamanho do PNG
+ * normal de 30 graus ou mais (o vinco). A malha não tem topologia nem divisão em partes aqui. O resultado, reduzido ao tamanho do PNG
  * do desenho (um pixel tem aresta quando alguma amostra dele tem), é comparado só na área dos painéis, sem título, nota nem barra de
  * escala: vazamento é pixel de traço do desenho a mais de `tolerancia` pixels de qualquer aresta da referência, falha é pixel de
  * aresta da referência a mais de `tolerancia` pixels de qualquer traço. O relato diz, por imagem e vista, os pixels e os grupos de

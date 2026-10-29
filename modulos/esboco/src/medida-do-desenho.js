@@ -4,7 +4,7 @@
    arestas é conferir o desenhista com ele mesmo. A referência é outra: a mesma malha, com a mesma projeção, a mesma escala e o mesmo
    enquadramento, renderizada com profundidade e normal por pixel (a ferramenta usa o Three.js num WebGL do Chromium, com supersampling),
    e as arestas são tiradas no espaço da tela, onde só existe o que se vê: a descontinuidade de profundidade (silhueta e oclusão) e a
-   mudança de normal acima de 30 graus (o vinco, `COSSENO_DO_VINCO`, e o degrau, `DEGRAU_DE_PROFUNDIDADE`, os mesmos que o desenho usa em `limites-do-desenho.js`: o desenho e a referência discordam só na conta, no pixel contra o vetor). Ela não olha a topologia da malha, a divisão em partes nem a
+   mudança de normal de 30 graus ou mais (o vinco, `COSSENO_DO_VINCO`, e o degrau, `DEGRAU_DE_PROFUNDIDADE`, os mesmos que o desenho usa em `limites-do-desenho.js`: o desenho e a referência discordam só na conta, no pixel contra o vetor). Ela não olha a topologia da malha, a divisão em partes nem a
    lista de arestas do desenho.
 
    Este módulo só prepara dados e compara máscaras, sem navegador: os triângulos da referência (`triangulosDaReferencia`), o que é traço
