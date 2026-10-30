@@ -19,6 +19,7 @@ import {
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 import { conferirVaosDaPeca, formatarVaos } from '../../src/autoria/molduras-do-vao.js';
+import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import {
   conferirPartesContraPlano, normalizarPlanoDeModelagem,
 } from '../../src/autoria/plano-de-modelagem.js';
@@ -351,6 +352,7 @@ export async function descreverPecaReutilizavel({
   let molduras = null;
   let formas = null;
   let plano = null;
+  let avisoDaLataria = null;
   let refinamento = null;
   let formaDoEsboco = null;
   let g01 = null;
@@ -369,6 +371,13 @@ export async function descreverPecaReutilizavel({
       plano = normalizarPlanoDeModelagem(entrada.PLANO ?? receita.PLANO);
     } catch (erro) {
       return falha(`PLANO DE MODELAGEM INVÁLIDO\n  ${erro.message}`);
+    }
+    /* A DISPENSA DAS VISTAS DE SUPERFÍCIE APARECE. `PLANO.lataria: { dispensa }` tira a peça da luz rasante e da curvatura da
+       lataria no pacote do crítico; sem aparecer aqui, ficava só na receita, onde ninguém a relê. É aviso e não reprova. */
+    avisoDaLataria = avisoDaDispensa(plano);
+    if (avisoDaLataria) {
+      stdout += `\nLATARIA DISPENSADA\n  ${avisoDaLataria}\n`;
+      stderr += `\nAVISO: ${avisoDaLataria}\n`;
     }
     if (plano) {
       const nomes = new Set();
@@ -635,6 +644,7 @@ export async function descreverPecaReutilizavel({
       molduras,
       formas,
       plano,
+      avisoDaLataria,
       refinamento,
       formaDoEsboco,
       g01,

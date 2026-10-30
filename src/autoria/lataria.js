@@ -60,6 +60,18 @@ export function normalizarLataria(valor, nomesDasPartes, { quem = 'PLANO' } = {}
   return { partes: [...limpas].sort() };
 }
 
+/**
+ * O aviso da peça que dispensa as vistas de superfície, com o motivo, ou null. A dispensa tira a peça da obrigação da luz rasante e
+ * da curvatura da lataria, e quem a lê no `descrever` e no laço de modelagem precisa vê-la toda vez, para que uma chapa não saia
+ * da obrigação por uma declaração que ninguém mais relê. `plano` é o `PLANO` normalizado (ou null).
+ */
+export function avisoDaDispensa(plano) {
+  const motivo = plano?.lataria?.dispensa;
+  if (!motivo) return null;
+  return `PLANO.lataria dispensa a luz rasante e a curvatura da lataria no pacote do crítico: ${motivo}. `
+    + 'Se a superfície for chapa, tire a dispensa; a peça com passo subdivisao é de lataria por padrão.';
+}
+
 /* O nome da operação de um passo, na forma de lista (`['subdivisao', {...}]`) ou de objeto (`{ op: 'subdivisao' }`). */
 function operacaoDoPasso(passo) {
   if (Array.isArray(passo)) return typeof passo[0] === 'string' ? passo[0] : null;

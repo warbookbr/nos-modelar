@@ -6,21 +6,35 @@
    pedido ganha a seção da superfície e o `pacote.json` diz a versão da receita e as imagens; o registro da rodada recusa o veredito do
    crítico de peça de lataria sem esse pacote, ou com o de outra versão, e grava as imagens quando ele está certo; e a ação do laço não
    dá por fechada a peça de lataria cuja última rodada não as tem. Com MODELAR_BLENDER, as duas vistas da peça de prova saem de verdade,
-   com a nervura em cinza na curvatura porque só a chapa nasceu de subdivisão. */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+   com a nervura em cinza na curvatura porque só a chapa nasceu de subdivisão.
+
+   A faixa dos vincos (decisão da pessoa em 2026-10-30): na chapa dobrada num vinco vivo declarado, com um amassado raso ao lado
+   (`tools/fixtures/lataria-com-vinco/`), os vincos saem da receita onde a malha os pôs, as vistas obrigatórias os passam à curvatura
+   por padrão, e o amassado sai com cor de defeito com a faixa fora da escala e quase branco com ela dentro, medido sem o Blender pela
+   conta de `superficie.py` sobre a malha da peça e, com o Blender, no PNG. A dispensa de `PLANO.lataria` aparece como aviso, com o
+   motivo, no `descrever` e no resumo do laço. */
+import { spawnSync } from 'node:child_process';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, onTestFinished } from 'vitest';
 import { doAmbiente } from '../ambiente.mjs';
-import { acaoDaPeca, gravarRodada, lerRodadas, medirReceita, registrarMedida } from './rodada-de-modelagem.mjs';
+import { acaoDaPeca, gravarRodada, lerRodadas, medirReceita, registrarMedida, resumoDoLaco } from './rodada-de-modelagem.mjs';
 import {
-  MANIFESTO_DO_PACOTE, comandoDoPacote, gravarManifesto, impressaoDoTexto, superficieDoPacote, vistasDeSuperficie,
+  MANIFESTO_DO_PACOTE, comandoDoPacote, gravarManifesto, impressaoDoTexto, superficieDoPacote, vincosDaMalha, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
-import { prefixoDaPeca, vistasParaCritica } from './vistas-para-critica.mjs';
+import { montarPedido, prefixoDaPeca, vistasParaCritica } from './vistas-para-critica.mjs';
+import { descreverPecaReutilizavel } from './descrever-peca.mjs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { altura, linhaDaNervura, pontos } from '../../procedural/nucleo/fixtures/friso-prova.js';
+import provaDoVinco, * as VINCO from '../fixtures/lataria-com-vinco/receita.js';
+import provaDeLataria from '../fixtures/lataria-de-prova/receita.js';
 
 const PECA = 'tools/fixtures/lataria-de-prova/receita.js';
+const COM_VINCO = 'tools/fixtures/lataria-com-vinco/receita.js';
+const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const NAO_LATARIA = 'tools/fixtures/forma-do-esboco/ok/receita.js';
 const BLENDER = doAmbiente('BLENDER');
 const area = mkdtempSync(join(tmpdir(), 'vistas-superficie-'));
@@ -180,6 +194,176 @@ describe('a rodada de forma da peça de lataria', () => {
   });
 });
 
+/* ---------- a faixa dos vincos, sem o Blender ---------- */
+
+/* A malha da peça em triângulos, com os vincos declarados, para a conta de `superficie.py` no python3 do sistema. */
+function malhaDaPeca(receita) {
+  const executada = executarReceita(receita);
+  const ids = [...executada.neutro.V.keys()];
+  const indice = new Map(ids.map((id, k) => [id, k]));
+  const F = [];
+  for (const face of executada.neutro.F.values()) {
+    const v = face.vs.map((id) => indice.get(id));
+    for (let k = 1; k + 1 < v.length; k++) F.push([v[0], v[k], v[k + 1]]);
+  }
+  return { V: ids.map((id) => executada.neutro.V.get(id)), F, vincos: vincosDaMalha(receita, executada) };
+}
+
+/* O executável do Blender trocado por um que grava o que os dois scripts gravariam, e guarda os argumentos de cada chamada. */
+function blenderFalso() {
+  const chamadas = [];
+  const executar = (_blender, argv) => {
+    const script = argv[3].split('/').pop();
+    const args = argv.slice(5);
+    const opcao = (nome) => { const i = args.indexOf(nome); return i < 0 ? null : args[i + 1]; };
+    chamadas.push({ script, args });
+    const prefixo = opcao('--saida');
+    const gravar = (nome) => { writeFileSync(`${prefixo}${nome}`, nome); return `${prefixo}${nome}`; };
+    if (script === 'luz-rasante.py') {
+      writeFileSync(`${prefixo}rasante.json`, JSON.stringify({ imagens: [{ vista: 'topo', azimute: 30, arquivos: { malha: gravar('topo-rasante-az30.png') } }] }));
+    } else {
+      const vincos = opcao('--vincos') ? JSON.parse(readFileSync(opcao('--vincos'), 'utf8')).vincos : null;
+      writeFileSync(`${prefixo}curvatura.json`, JSON.stringify({
+        escala_1_m: 0.45, imagens: [{ vista: 'topo', legenda: gravar('topo-curvatura-legenda.png') }],
+        faixa_dos_vincos: vincos ? { largura_mm: Number(opcao('--faixa-mm') ?? 40), vincos: vincos.map((v) => v.nome), vertices: 1, escala_com_a_faixa_1_m: 8.5 } : null,
+      }));
+    }
+    return { status: 0, stdout: '', stderr: '' };
+  };
+  return { executar, chamadas };
+}
+
+describe('a faixa dos vincos na curvatura da lataria, sem o Blender', () => {
+  it('os vincos declarados saem da receita onde a malha os pôs, com o nome, e a peça sem vinco não tem nenhum', () => {
+    const vincos = vincosDaMalha(provaDoVinco);
+    expect(vincos.map(({ passo, nome, viva }) => ({ passo, nome, viva }))).toEqual([{ passo: 0, nome: 'quina', viva: true }]);
+    /* oito faces da gaiola ao longo do vinco, em quatro níveis: 8 × 16 arestas, todas sobre a linha z = 200 mm, y = 0, de x = 0 a 800 mm */
+    const { segmentos } = vincos[0];
+    expect(segmentos).toHaveLength((VINCO.NX - 1) * 16);
+    const pontosDoVinco = segmentos.flat();
+    for (const [, y, z] of pontosDoVinco) {
+      expect(Math.abs(y)).toBeLessThan(1e-12);
+      expect(Math.abs(z - VINCO.PASSO * VINCO.J_DO_VINCO)).toBeLessThan(1e-12);
+    }
+    const comprimento = segmentos.reduce((s, [p, q]) => s + Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]), 0);
+    expect(comprimento).toBeCloseTo(VINCO.PASSO * (VINCO.NX - 1), 9);
+    expect(vincosDaMalha(provaDeLataria)).toEqual([]);
+  });
+
+  it('as vistas obrigatórias passam os vincos à curvatura por padrão, e sem a opção a escala volta a ser a da lataria inteira', async () => {
+    const base = mkdtempSync(join(area, 'faixa-falsa-'));
+    const ligada = blenderFalso();
+    const feitas = await vistasDeSuperficie(COM_VINCO, { pasta: join(base, 'ligada'), blender: '/blender/de/ensaio', executar: ligada.executar });
+    const curvatura = ligada.chamadas.find((c) => c.script === 'curvatura-da-lataria.py').args;
+    const arquivo = curvatura[curvatura.indexOf('--vincos') + 1];
+    expect(JSON.parse(readFileSync(arquivo, 'utf8')).vincos.map((v) => v.nome)).toEqual(['quina']);
+    expect(curvatura).not.toContain('--faixa-mm');
+    expect(feitas.faixa).toEqual({ larguraMm: 40, vincos: ['quina'], escala: 0.45, escalaComAFaixa: 8.5 });
+    /* a luz rasante não muda com a faixa */
+    expect(ligada.chamadas.find((c) => c.script === 'luz-rasante.py').args).not.toContain('--vincos');
+
+    const larga = blenderFalso();
+    expect((await vistasDeSuperficie(COM_VINCO, { pasta: join(base, 'larga'), blender: '/b', faixaMm: 60, executar: larga.executar })).faixa.larguraMm).toBe(60);
+    expect(larga.chamadas[1].args.slice(-2)).toEqual(['--faixa-mm', '60']);
+
+    const desligada = blenderFalso();
+    const sem = await vistasDeSuperficie(COM_VINCO, { pasta: join(base, 'desligada'), blender: '/b', faixaDosVincos: false, executar: desligada.executar });
+    expect(desligada.chamadas[1].args).not.toContain('--vincos');
+    expect(sem.faixa).toBeNull();
+    /* a peça sem vinco declarado não leva --vincos nem com a opção ligada */
+    const semVinco = blenderFalso();
+    expect((await vistasDeSuperficie(PECA, { pasta: join(base, 'sem-vinco'), blender: '/b', executar: semVinco.executar })).faixa).toBeNull();
+    expect(semVinco.chamadas[1].args).not.toContain('--vincos');
+  }, 60_000);
+
+  it('na malha da peça, o amassado sai com cor de defeito com a faixa fora da escala, e quase branco com ela dentro', () => {
+    const arquivo = join(mkdtempSync(join(area, 'faixa-py-')), 'malha.json');
+    writeFileSync(arquivo, JSON.stringify(malhaDaPeca(provaDoVinco)));
+    const codigo = `
+import json, sys
+sys.path.insert(0, ${JSON.stringify(join(REPO, 'tools/blender'))})
+import numpy as np, superficie as S
+d = json.load(open(${JSON.stringify(arquivo)}))
+V, F = np.array(d['V']), np.array(d['F'])
+seg = np.array([s for v in d['vincos'] for s in v['segmentos']], float).reshape(-1, 2, 3)
+H, ok = S.curvatura_media(V, F, 0.02)
+faixa = S.faixa_dos_vincos(V, seg, 0.04)
+fora, dentro = S.escala_da_curvatura(H, 99, 0.1, fora=faixa), S.escala_da_curvatura(H, 99, 0.1)
+c = int(np.argmin(((V[:, [0, 2]] - [${VINCO.PASSO * VINCO.AMASSADO.i}, ${VINCO.PASSO * VINCO.AMASSADO.j}]) ** 2).sum(1)))
+croma = lambda e: float(np.ptp(S.cor_divergente(H[c:c + 1], e)[0]) * 255)
+print(json.dumps({'H': float(H[c]), 'fora': fora, 'dentro': dentro, 'croma_fora': croma(fora), 'croma_dentro': croma(dentro),
+  'na_faixa': int(faixa.sum()), 'maior_na_faixa': float(np.nanmax(np.abs(H[faixa]))), 'maior_fora_dela': float(np.nanmax(np.abs(H[~faixa]))),
+  'faixa_longe': float(np.abs(V[faixa, 2] - ${VINCO.PASSO * VINCO.J_DO_VINCO}).max())}))`;
+    const r = spawnSync('python3', ['-I', '-c', codigo], { encoding: 'utf8', maxBuffer: 64 << 20 });
+    expect(r.status, r.stderr).toBe(0);
+    const m = JSON.parse(r.stdout);
+    /* o amassado afunda: cerca de -0,67 1/m no centro, e a dobra do vinco chega a 8,7 1/m depois da média */
+    expect(m.H).toBeLessThan(-0.5);
+    expect(m.H).toBeGreaterThan(-1);
+    expect(m.maior_na_faixa).toBeGreaterThan(8);
+    expect(m.maior_fora_dela).toBeLessThan(1);
+    /* a faixa é a lataria a até 40 mm do vinco, e só ela */
+    expect(m.na_faixa).toBeGreaterThan(1000);
+    expect(m.faixa_longe).toBeLessThan(0.04);
+    /* com a faixa dentro, o vinco leva a escala a 8,5 1/m e o amassado sai quase branco; fora, a escala é a do amassado e ele satura */
+    expect(m.dentro).toBeGreaterThan(8);
+    expect(m.fora).toBeLessThan(1);
+    expect(m.croma_dentro).toBeLessThan(20);
+    expect(m.croma_fora).toBeGreaterThan(150);
+  }, 120_000);
+
+  it('o pedido do crítico diz que a faixa em ocre fica fora da escala e não é defeito, e sem faixa não diz', () => {
+    const superficie = {
+      rasante: [{ arquivo: '/x/peca-topo-rasante-az30.png', vista: 'topo', azimute: 30 }],
+      curvatura: [{ arquivo: '/x/peca-topo-curvatura-legenda.png', vista: 'topo' }],
+    };
+    const com = montarPedido({ peca: 'p', superficie: { ...superficie, faixa: { larguraMm: 40, vincos: ['linhaDeCintura', 'ombro'] } } });
+    expect(com).toContain('Em ocre, a faixa de 40 mm de cada lado dos vincos que a forma desenha (linhaDeCintura, ombro): é a dobra pedida, '
+      + 'fica fora da escala e não é defeito; a escala é a do resto da chapa.');
+    expect(montarPedido({ peca: 'p', superficie })).not.toContain('ocre');
+  });
+});
+
+/* ---------- a dispensa de PLANO.lataria ---------- */
+
+describe('a dispensa de PLANO.lataria', () => {
+  const MOTIVO = 'é um estofado de espuma, e não chapa de lataria';
+  const dispensada = { ...provaDeLataria, PLANO: { ...provaDeLataria.PLANO, lataria: { dispensa: MOTIVO } } };
+  const AVISO = `PLANO.lataria dispensa a luz rasante e a curvatura da lataria no pacote do crítico: ${MOTIVO}.`;
+
+  it('aparece como aviso, com o motivo, no descrever, que não reprova por ela', async () => {
+    const r = await descreverPecaReutilizavel({ peca: 'lataria-dispensada', modulo: dispensada });
+    const antes = await descreverPecaReutilizavel({ peca: 'lataria-de-prova', modulo: provaDeLataria });
+    expect(r.stderr).toContain(`AVISO: ${AVISO}`);
+    expect(r.stdout).toContain(`LATARIA DISPENSADA\n  ${AVISO}`);
+    expect(r.resultado.avisoDaLataria).toContain(MOTIVO);
+    expect(r.codigo).toBe(antes.codigo);
+    expect(antes.stderr).not.toContain('PLANO.lataria dispensa');
+    expect(antes.resultado.avisoDaLataria).toBeNull();
+  }, 60_000);
+
+  it('aparece como aviso, com o motivo, no resumo do laço de modelagem', async () => {
+    /* dentro do repositório (em tmp/, fora do commit), porque o confinamento de caminhos recusa receita fora da árvore */
+    mkdirSync(join(REPO, 'tmp'), { recursive: true });
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'teste-lataria-dispensada-'));
+    onTestFinished(() => rmSync(pasta, { recursive: true, force: true }));
+    cpSync(join(REPO, 'tools/fixtures/lataria-de-prova/referencias'), join(pasta, 'referencias'), { recursive: true });
+    const receita = join(pasta, 'receita.js');
+    writeFileSync(receita, `import base from ${JSON.stringify(pathToFileURL(join(REPO, PECA)).href)};\n`
+      + `export default { ...base, PLANO: { ...base.PLANO, lataria: { dispensa: ${JSON.stringify(MOTIVO)} } } };\n`);
+    const medicao = await medirReceita(receita);
+    expect(medicao.lataria).toEqual({ lataria: false, porque: `PLANO.lataria dispensa: ${MOTIVO}` });
+    expect(medicao.avisos).toEqual([expect.stringContaining(AVISO)]);
+    const decisao = await acaoDaPeca('lataria-dispensada', { rodadas: [], limite: 6, medir: async () => medicao });
+    const resumo = resumoDoLaco('lataria-dispensada', { rodadas: [], decisao });
+    expect(resumo).toMatch(new RegExp(`medição da receita atual \\(sha256:[0-9a-f]{8}\\): (passou|reprovou)\\naviso: ${AVISO.replace(/[.()]/g, '\\$&')}`));
+    /* a peça sem dispensa não tem aviso no resumo */
+    const semDispensa = await medirReceita(PECA);
+    expect(semDispensa.avisos).toEqual([]);
+    expect(resumoDoLaco('lataria-de-prova', { rodadas: [], decisao: { acao: 'modelar', motivo: 'm', medicao: semDispensa } })).not.toContain('aviso:');
+  }, 120_000);
+});
+
 /* ---------- com o Blender ---------- */
 
 function pixel(cam, p) {
@@ -206,5 +390,39 @@ describe.skipIf(!BLENDER)('as duas vistas da peça de prova, no Blender', () => 
     const [, , z] = pontos()[linhaDaNervura()[3]];
     expect(croma(png, pixel(cam, [0.4, altura(0.4, z) + 0.004, z]))).toBeLessThanOrEqual(1);
     expect(croma(png, pixel(cam, [0.15, altura(0.15, 0.15), 0.15]))).toBeGreaterThan(10);
+  });
+});
+
+describe.skipIf(!BLENDER)('a faixa dos vincos na curvatura, no Blender', () => {
+  it('na chapa dobrada, o amassado sai azul com a faixa fora da escala e quase branco sem ela, e a faixa sai em ocre com a legenda', { timeout: 600_000 }, async () => {
+    const pasta = mkdtempSync(join(area, 'blender-vinco-'));
+    const feitas = await vistasDeSuperficie(COM_VINCO, { pasta, blender: BLENDER });
+    expect(feitas.faixa).toMatchObject({ larguraMm: 40, vincos: ['quina'] });
+    expect(feitas.faixa.escala).toBeLessThan(1);
+    expect(feitas.faixa.escalaComAFaixa).toBeGreaterThan(8);
+    /* a mesma malha, sem --vincos: a escala da lataria inteira */
+    const sem = join(pasta, 'sem-faixa-');
+    const r = spawnSync(BLENDER, ['-b', '--factory-startup', '--python', join(REPO, 'tools/blender/curvatura-da-lataria.py'), '--',
+      '--malha', feitas.obj, '--saida', sem, '--vista', 'topo', '--lataria', 'chapa'], { encoding: 'utf8', maxBuffer: 256 << 20 });
+    expect(r.status, r.stderr.slice(-2000)).toBe(0);
+    const resumoSem = JSON.parse(readFileSync(`${sem}curvatura.json`, 'utf8'));
+    expect(resumoSem.faixa_dos_vincos).toBeNull();
+    expect(resumoSem.escala_1_m).toBeCloseTo(feitas.faixa.escalaComAFaixa, 3);
+
+    const cam = JSON.parse(readFileSync(join(pasta, 'superficie', 'peca-curvatura.json'), 'utf8')).camera.topo;
+    const com = PNG.sync.read(readFileSync(join(pasta, 'superficie', 'peca-topo-curvatura.png')));
+    const semPng = PNG.sync.read(readFileSync(`${sem}topo-curvatura.png`));
+    const amassado = pixel(cam, [VINCO.PASSO * VINCO.AMASSADO.i, VINCO.altura(VINCO.PASSO * VINCO.AMASSADO.j), VINCO.PASSO * VINCO.AMASSADO.j]);
+    expect(croma(com, amassado)).toBeGreaterThan(100);
+    expect(croma(semPng, amassado)).toBeLessThan(20);
+    /* sobre o vinco: ocre com a faixa (vermelho e verde acima do azul, sem saturar), vermelho sem ela */
+    const noVinco = pixel(cam, [0.4, 0, VINCO.PASSO * VINCO.J_DO_VINCO]);
+    const rgb = (png, [x, y]) => { const i = (y * png.width + x) * 4; return [png.data[i], png.data[i + 1], png.data[i + 2]]; };
+    const [vr, vg, vb] = rgb(com, noVinco);
+    expect(vr - vb).toBeGreaterThan(50);
+    expect(vg - vb).toBeGreaterThan(40);
+    const [sr, sg] = rgb(semPng, noVinco);
+    expect(sr - sg).toBeGreaterThan(80);
+    expect(feitas.curvatura.every((i) => existsSync(i.arquivo))).toBe(true);
   });
 });

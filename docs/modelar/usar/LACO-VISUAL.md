@@ -44,7 +44,10 @@ Na peça de lataria, a luz rasante e a curvatura média só da lataria
 obrigatórias desde 2026-10-30. A peça é de lataria quando a receita tem passo
 `subdivisao` (a chapa de superfície livre) ou declara `PLANO.lataria: { partes:
 [...] }`, com as partes que são a chapa; a peça de subdivisão que não é chapa
-declara `PLANO.lataria: { dispensa: '<motivo>' }`. `npm run vistas:critica` gera
+declara `PLANO.lataria: { dispensa: '<motivo>' }`, que o `descrever` e o resumo
+de `rodada-de-modelagem --acao` mostram como aviso, com o motivo, a cada chamada.
+Na curvatura, a faixa de 40 mm junto dos vincos declarados sai em ocre e fora
+da escala, para a dobra pedida não apagar o amassado. `npm run vistas:critica` gera
 as duas vistas com o resto do pacote do crítico e põe a seção "Superfície" no
 pedido, e sem `MODELAR_BLENDER` apontando o Blender recusa o pacote da peça de
 lataria com o comando; `rodada-de-modelagem --registrar` recusa o veredito do

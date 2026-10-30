@@ -49,7 +49,7 @@ import { conferirPontos, formatarPontos } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
-import { latariaDaReceita } from '../../src/autoria/lataria.js';
+import { avisoDaDispensa, latariaDaReceita } from '../../src/autoria/lataria.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { comandoDoPacote, pastaDaRodada, superficieDoPacote } from './vistas-de-superficie.mjs';
 
@@ -172,9 +172,10 @@ const indentar = (texto) => texto.trim().split('\n').map((l) => `  ${l}`).join('
 /**
  * A medição da receita atual da peça, feita pela ferramenta: o veredito de `descrever` (partes, refinamento, contatos, formas e a
  * forma contra a referência), a guarda do acervo e a do referencial sobre a peça, e os `PONTOS` quando ela os declara. Devolve
- * `{ passou, relatorio, sha256, texto, lataria }`: `sha256` é a impressão do texto da receita que foi medida (a mesma que a rodada grava),
- * `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois, e `lataria` diz se a peça é de lataria
- * (`latariaDaReceita`). Peça sem receita resolvível lança.
+ * `{ passou, relatorio, sha256, texto, lataria, avisos }`: `sha256` é a impressão do texto da receita que foi medida (a mesma que a rodada
+ * grava), `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois, `lataria` diz se a peça é de
+ * lataria (`latariaDaReceita`) e `avisos` o que o resumo do laço mostra sem reprovar (a dispensa de `PLANO.lataria`, com o motivo).
+ * Peça sem receita resolvível lança.
  */
 export async function medirReceita(peca) {
   const caminho = resolverCaminhoReceita(peca);
@@ -198,7 +199,8 @@ export async function medirReceita(peca) {
   let plano = null;
   try { plano = normalizarPlanoDeModelagem(receita?.PLANO); } catch { plano = null; }
   const { lataria, porque } = latariaDaReceita(receita, plano);
-  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque } };
+  const avisos = [avisoDaDispensa(plano)].filter(Boolean);
+  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, avisos };
 }
 
 /**
@@ -234,6 +236,9 @@ export async function impressaoDaForma(caminho) {
 }
 
 const curto = (sha256) => sha256.replace(/^sha256:/, '').slice(0, 8);
+
+/** As linhas de aviso da medição no resumo do laço (a dispensa de `PLANO.lataria`, com o motivo), uma por aviso. */
+export const linhasDeAviso = (medicao) => (medicao?.avisos ?? []).map((a) => `aviso: ${a}\n`).join('');
 
 /**
  * A ação seguinte do laço da peça, dada a receita que existe agora. `medir` devolve a medição (`medirReceita` por padrão); peça cuja
@@ -455,22 +460,29 @@ async function comoCLI(argv) {
       codigo: 0,
       texto: `rodada ${rodada.numero} gravada em ${arquivo.replace(`${REPO}/`, '')}\n`
         + `medição da receita (sha256:${curto(medicao.sha256)}): ${medicao.passou ? 'passou' : 'reprovou'}\n`
+        + linhasDeAviso(medicao)
         + `próxima ação: ${decisao.acao} — ${decisao.motivo}`,
     };
   }
 
   const rodadas = lerRodadas(peca);
   const decisao = await acaoDaPeca(peca, { rodadas });
+  return { codigo: 0, texto: resumoDoLaco(peca, { rodadas, decisao }) };
+}
+
+/**
+ * O resumo do laço que `--acao` imprime: as rodadas, a medição da receita atual, os avisos dela (a dispensa de `PLANO.lataria`, com o
+ * motivo), a próxima ação e os defeitos em aberto. `decisao` é o que `acaoDaPeca` devolve.
+ */
+export function resumoDoLaco(peca, { rodadas, decisao }) {
   const abertos = defeitosAbertos(rodadas);
-  return {
-    codigo: 0,
-    texto: `${rodadas.length} rodada(s) registrada(s) para '${peca}'.\n`
-      + (decisao.medicao ? `medição da receita atual (sha256:${curto(decisao.medicao.sha256)}): ${decisao.medicao.passou ? 'passou' : 'reprovou'}\n` : 'sem receita para medir ainda.\n')
-      + `próxima ação: ${decisao.acao} — ${decisao.motivo}\n`
-      + (abertos.length
-        ? `defeitos em aberto:\n${abertos.map((d) => `  ${d.parte}: ${d.tipo} ${d.sentido} em ${d.onde}`).join('\n')}`
-        : 'defeitos em aberto: nenhum.'),
-  };
+  return `${rodadas.length} rodada(s) registrada(s) para '${peca}'.\n`
+    + (decisao.medicao ? `medição da receita atual (sha256:${curto(decisao.medicao.sha256)}): ${decisao.medicao.passou ? 'passou' : 'reprovou'}\n` : 'sem receita para medir ainda.\n')
+    + linhasDeAviso(decisao.medicao)
+    + `próxima ação: ${decisao.acao} — ${decisao.motivo}\n`
+    + (abertos.length
+      ? `defeitos em aberto:\n${abertos.map((d) => `  ${d.parte}: ${d.tipo} ${d.sentido} em ${d.onde}`).join('\n')}`
+      : 'defeitos em aberto: nenhum.');
 }
 
 if (process.argv[1] && process.argv[1].endsWith('rodada-de-modelagem.mjs')) {
