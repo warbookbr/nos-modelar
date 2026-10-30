@@ -67,3 +67,36 @@ export function passos({ niveis = 2, extra = {} } = {}) {
 }
 
 export const CONTATOS = ['voltaDoVao', 'nervura', 'aba'].map((friso) => ({ par: ['chapa', friso], motivo: `o friso ${friso} entra na chapa pela base do perfil, menos que a espessura` }));
+
+/* A MOLDURA DE LARGURA VARIÁVEL. A mesma volta do vão (de (2, 2) a (6, 2), (6, 6), (2, 6) e de volta, com os quatro cantos
+   vivos de 90 graus), agora como moldura plana de seção retangular que é mais larga nas travessas (os trechos ao longo de x,
+   14 mm) que nos montantes (os trechos ao longo de z, 7 mm). A largura muda em degrau nos quatro cantos, e a junta de cada
+   canto é a meia-esquadria de duas faixas de larguras diferentes. O perfil de referência tem 10 mm de largura; a largura de
+   cada ponto o escala em u. */
+export const MOLDURA = { travessa: 0.014, montante: 0.007, referencia: 0.01, profundidade: 0.005, centro: 0.001 };
+
+/** variacaoDaMoldura(): a largura por ponto, com o degrau nos quatro cantos da volta do vão. */
+export function variacaoDaMoldura({ travessa = MOLDURA.travessa, montante = MOLDURA.montante } = {}) {
+  const [a, b] = [VAO.i[0] - 1, VAO.i[1] + 1];
+  /* a volta segue a travessa de baixo (ao longo de x), o montante de b, a travessa de cima e o montante de a */
+  return {
+    largura: [
+      { ponto: nome(a, a), antes: montante, depois: travessa },
+      { ponto: nome(b, a), antes: travessa, depois: montante },
+      { ponto: nome(b, b), antes: montante, depois: travessa },
+      { ponto: nome(a, b), antes: travessa, depois: montante },
+    ],
+  };
+}
+
+export const CONTATOS_DA_MOLDURA = [{ par: ['chapa', 'moldura'], motivo: 'a moldura entra na chapa pela base do perfil, menos que a espessura' }];
+
+/** passosDaMoldura({ niveis, extra }): a chapa e a moldura de largura variável, com as duas partes. `extra` substitui campos do friso. */
+export function passosDaMoldura({ niveis = 2, extra = {} } = {}) {
+  return [
+    ['subdivisao', { origemId: 1, ...gaiola(), niveis }],
+    ['friso', { origemId: 2, superficie: { op: 'subdivisao', id: 1 }, linha: { nome: 'molduraDoVao', pontos: voltaDoVao() }, perfil: { retangulo: { largura: MOLDURA.referencia, profundidade: MOLDURA.profundidade, centro: [0, MOLDURA.centro] } }, variacao: variacaoDaMoldura(), ...extra }],
+    ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
+    ['parte', { nome: 'moldura', sel: { origem: { op: 'friso', id: 2 } } }],
+  ];
+}

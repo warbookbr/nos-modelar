@@ -17,8 +17,17 @@
    segue em perna reta; as faces saem lisas a 30 graus e as tampas das pontas abertas são quadriláteros.
    Na chapa SEM espessura a aba sai como PELE: uma superfície aberta, sem tampas, que continua a borda do vão com a mesma
    orientação das faces da chapa, dobra num arco de raio `raio` (o da própria pele, e não o da face de dentro) e segue em
-   perna reta de `largura`. A receita que quer a aba sólida declara a espessura na chapa; a aba não ganha espessura própria. */
-import { ErroDoFriso, cadeiaRefinada, ladoDaBorda, perfilDaAba, perfilDaPeleDaAba, tampaDaAba, varrerPerfil } from '../friso.js';
+   perna reta de `largura`. A receita que quer a aba sólida declara a espessura na chapa; a aba não ganha espessura própria.
+
+   A VARIAÇÃO. `variacao: { largura: [...], angulo: [...] }` faz a largura do perfil (e o ângulo da aba) uma função da
+   posição ao longo da linha, por pontos nomeados dela: cada item é `{ ponto, valor }` ou, num canto vivo da linha,
+   `{ ponto, antes, depois }`, o degrau de um trecho ao seguinte. Entre dois pontos citados o valor anda em linha reta pelo
+   comprimento de arco, antes do primeiro e depois do último (na linha aberta) fica o do ponto, e na volta fechada a
+   função dá a volta. Com `perfil`, `largura` é a extensão em u do perfil (a de `perfil` é só a forma, e a escala em u é
+   largura / extensão); com `aba`, `largura` é a perna reta e `angulo` o giro da dobra, que mudam por rampa. No degrau as duas
+   faixas se cortam no plano que passa pelo ponto da linha, pela normal e pelo encontro das duas bordas de fora (a meia-esquadria
+   de faixas de larguras diferentes), e a junta é um anel só, soldado às duas. */
+import { ANGULO_MAXIMO_DA_ABA, ErroDoFriso, TRECHO_MAXIMO_EM_ARESTAS, cadeiaRefinada, ladoDaBorda, menorArestaDoPerfil, passosDoArcoDaAba, perfilDaAba, perfilDaPeleDaAba, posicoesDaLinha, tampaDaAba, varrerPerfil } from '../friso.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 import { espelharGaiolaEmX } from '../subdivisao.js';
 import { formaParaContorno, ErroDePerfil, SEGMENTOS_ARCO_PADRAO } from '../perfil2d.js';
@@ -28,6 +37,7 @@ import { ehSimples } from '../contorno.js';
 const LISO_DA_ABA = valorDoLiso(30);
 const EXEMPLO_DE_ABA = "aba: { largura: 0.02, angulo: 90, raio: 0.003 }";
 const EXEMPLO_DE_LINHA = "{ nome: 'frisoDaPorta', pontos: ['a', 'b', 'c'] }";
+const EXEMPLO_DE_VARIACAO = "variacao: { largura: [{ ponto: 'a', valor: 0.02 }, { ponto: 'b', antes: 0.02, depois: 0.01 }] }";
 const citar = (nome) => `'${nome}'`;
 const iguais = (p, q) => (typeof p === 'string' || typeof q === 'string' ? p === q : Array.isArray(p) && Array.isArray(q) && p.length === q.length && p.every((x, k) => x === q[k]));
 
@@ -134,7 +144,14 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
           return { erro: ['linha', `a aba segue a borda livre da chapa, e na linha ${citar(a.linha.nome)}, perto de ${nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}: ${e.motivo}; cite os pontos da borda de um vão ou do contorno (bordaDoVao dá a de um vão)`] };
         }
       }
-      lista.push({ pontos, normais, fechada: c.fechada, espelhada: c.espelhada, lado, nomeDoIndice });
+      /* o nome declarado de cada ponto da cadeia (sem o primeiro repetido no fim da volta): o vértice espelhado leva o nome
+         do original e anda a linha ao contrário, e o ponto no plano de simetria não tem um lado só */
+      const nomes = c.cadeia.map((v) => ({
+        nome: v < declarados.length ? declarados[v] : declarados[imagem.indexOf(v)],
+        inverte: v >= declarados.length,
+        noPlano: imagem !== null && v < declarados.length && imagem[v] === v,
+      }));
+      lista.push({ pontos, normais, fechada: c.fechada, espelhada: c.espelhada, lado, nomeDoIndice, nomes: c.fechada ? nomes.slice(0, -1) : nomes, passo: passoDaCadeia });
     }
     let espessura = null;
     if (args.espessura != null) espessura = st.num(args.espessura);
@@ -155,6 +172,86 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       try { lida[campo] = st.num(aba[campo]); } catch (e) { return { erro: ['aba', `${campo} da aba: ${e.message}`] }; }
     }
     return lida;
+  }
+
+  /* A variação declarada: por campo (largura, angulo), os itens { nome, antes, depois } já lidos e conferidos contra a linha. */
+  function lerVariacao(st, a, linha, fechada, comAba) {
+    const v = a.variacao;
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return { erro: `variacao precisa ser as medidas por ponto, como ${EXEMPLO_DE_VARIACAO}` };
+    const extra = Object.keys(v).filter((k) => k !== 'largura' && k !== 'angulo');
+    if (extra.length) return { erro: `a variacao tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são largura e angulo` };
+    if (v.largura == null && v.angulo == null) return { erro: `variacao precisa de largura ou de angulo, como ${EXEMPLO_DE_VARIACAO}` };
+    if (!comAba && v.angulo != null) return { erro: 'variacao.angulo só vale com aba: o ângulo é o da dobra da aba, e o perfil desenhado não tem ângulo' };
+    const n = linha.pontos.length;
+    const lida = {};
+    for (const campo of ['largura', 'angulo']) {
+      if (v[campo] == null) continue;
+      const rotulo = `variacao.${campo}`;
+      if (!Array.isArray(v[campo]) || !v[campo].length) return { erro: `${rotulo} precisa ser a lista dos pontos com o valor de cada um, como ${EXEMPLO_DE_VARIACAO}` };
+      const entradas = [];
+      for (const [k, item] of v[campo].entries()) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) return { erro: `${rotulo}[${k}] precisa ser { ponto, valor } ou { ponto, antes, depois }` };
+        const outro = Object.keys(item).filter((x) => !['ponto', 'valor', 'antes', 'depois'].includes(x));
+        if (outro.length) return { erro: `${rotulo}[${k}] tem campo desconhecido ${outro.map(citar).join(', ')}; os campos são ponto, valor, antes e depois` };
+        if (typeof item.ponto !== 'string' || !item.ponto) return { erro: `${rotulo}[${k}] precisa citar o ponto da linha pelo nome, em ponto` };
+        const onde = linha.pontos.map((p, j) => (p === item.ponto ? j : -1)).filter((j) => j >= 0 && !(fechada && j === n - 1));
+        if (!onde.length) return { erro: `${rotulo} cita o ponto ${citar(item.ponto)}, que não está na linha ${citar(linha.nome)}` };
+        if (onde.length > 1) return { erro: `${rotulo} cita o ponto ${citar(item.ponto)}, que aparece ${onde.length} vezes na linha ${citar(linha.nome)}: a medida por ponto precisa de um ponto que passa uma vez` };
+        if (entradas.some((e) => e.nome === item.ponto)) return { erro: `${rotulo} cita o ponto ${citar(item.ponto)} duas vezes` };
+        const degrau = item.antes != null || item.depois != null;
+        if (degrau && item.valor != null) return { erro: `${rotulo}[${k}] (${citar(item.ponto)}) tem valor e também antes e depois: escolha valor, ou antes e depois` };
+        if (degrau ? (item.antes == null || item.depois == null) : item.valor == null) return { erro: `${rotulo}[${k}] (${citar(item.ponto)}) precisa de valor, ou de antes e depois juntos` };
+        let antes; let depois;
+        try {
+          antes = st.num(degrau ? item.antes : item.valor); depois = degrau ? st.num(item.depois) : antes;
+        } catch (e) { return { erro: `${rotulo} no ponto ${citar(item.ponto)}: ${e.message}` }; }
+        for (const x of [antes, depois]) {
+          if (!Number.isFinite(x) || x <= 0) return { erro: `${rotulo} no ponto ${citar(item.ponto)} precisa ser maior que zero, e veio ${x}` };
+          if (campo === 'angulo' && !(x < ANGULO_MAXIMO_DA_ABA)) return { erro: `${rotulo} no ponto ${citar(item.ponto)} precisa ficar entre 0 e ${ANGULO_MAXIMO_DA_ABA} graus, e veio ${x}` };
+        }
+        if (antes !== depois) {
+          if (comAba) return { erro: `${rotulo} no ponto ${citar(item.ponto)} muda em degrau, e na aba a largura e o ângulo mudam por rampa (a perna e a dobra de dois trechos não se soldam numa junta só): ponha valor, ou os mesmos antes e depois` };
+          if (!fechada && (onde[0] === 0 || onde[0] === n - 1)) return { erro: `${rotulo} no ponto ${citar(item.ponto)} muda em degrau na ponta da linha aberta, que não tem canto: ponha valor` };
+        }
+        entradas.push({ nome: item.ponto, antes, depois });
+      }
+      lida[campo] = entradas;
+    }
+    return lida;
+  }
+
+  /* A medida de um campo como função (s, entrada, lado) -> número, numa cadeia: os itens que a cadeia tem, na posição de
+     cada um, e a reta entre dois vizinhos pelo comprimento de arco. Devolve { funcao, valores } ou { erro }. */
+  function funcaoDaMedida(c, entradas, rotulo) {
+    const { acumulado, total } = posicoesDaLinha(c.pontos, c.fechada);
+    const lista = [];
+    for (const [e, no] of c.nomes.entries()) {
+      const item = entradas.find((x) => x.nome === no.nome);
+      if (!item) continue;
+      if (item.antes !== item.depois && no.noPlano) return { erro: `${rotulo} no ponto ${citar(item.nome)} muda em degrau, e o ponto fica no plano de simetria, onde a linha segue pela imagem espelhada: ponha valor` };
+      const idx = e * c.passo;
+      lista.push({ idx, pos: acumulado[idx], antes: no.inverte ? item.depois : item.antes, depois: no.inverte ? item.antes : item.depois });
+    }
+    if (!lista.length) return { erro: `${rotulo} não cita nenhum ponto desta linha` };
+    lista.sort((p, q) => p.pos - q.pos);
+    const porIndice = new Map(lista.map((x) => [x.idx, x]));
+    const nL = lista.length;
+    const funcao = (s, entrada, lado) => {
+      if (entrada != null && porIndice.has(entrada)) return porIndice.get(entrada)[lado];
+      let i = -1;
+      for (let k = 0; k < nL; k++) if (lista[k].pos <= s) i = k;
+      let de; let ate; let p0; let p1;
+      if (i === -1) {
+        if (!c.fechada) return lista[0].antes;
+        de = lista[nL - 1]; ate = lista[0]; p0 = de.pos - total; p1 = ate.pos;
+      } else if (i === nL - 1) {
+        if (!c.fechada) return lista[nL - 1].depois;
+        de = lista[nL - 1]; ate = lista[0]; p0 = de.pos; p1 = ate.pos + total;
+      } else { de = lista[i]; ate = lista[i + 1]; p0 = de.pos; p1 = ate.pos; }
+      const t = (s - p0) / (p1 - p0);
+      return de.depois + (ate.antes - de.depois) * t;
+    };
+    return { funcao, valores: lista.flatMap((x) => [x.antes, x.depois]) };
   }
 
   return {
@@ -206,12 +303,20 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       if (!(vMax > 0)) return grita(st, i, 'friso', 'perfil', `o perfil fica todo abaixo da linha (v de ${vMin} a ${vMax}); o friso sai pela normal, com v > 0`);
     }
 
-    let cadeias;
+    let variacao = null;
+    if (a.variacao != null) {
+      const lida = lerVariacao(st, a, linha, fechada, comAba);
+      if (lida.erro) return grita(st, i, 'friso', 'variacao', lida.erro);
+      variacao = lida;
+    }
+
+    let cadeias; let espessuraDaChapa = null;
     if (a.superficie != null) {
       if (a.normal != null) return grita(st, i, 'friso', 'normal', 'normal só vale na polilinha; sobre a superfície o friso segue a normal da chapa');
       let r;
       try { r = linhaNaSuperficie(st, a, linha.pontos, fechada); } catch (e) { return grita(st, i, 'friso', 'superficie', String(e.message)); }
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
+      espessuraDaChapa = r.espessura;
       if (comAba) {
         daPele = r.espessura === null;
         try {
@@ -238,14 +343,54 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         pontos = (fechada ? linha.pontos.slice(0, -1) : linha.pontos).map((p) => st.vec(p));
       } catch (e) { return grita(st, i, 'friso', 'linha', String(e.message)); }
       const nome = (j) => (typeof linha.pontos[j] === 'string' ? citar(linha.pontos[j]) : `o ponto ${j} [${linha.pontos[j]}]`);
-      cadeias = [{ pontos, normais: pontos.map(() => normal), fechada, espelhada: false, nomeDoIndice: nome }];
+      cadeias = [{ pontos, normais: pontos.map(() => normal), fechada, espelhada: false, nomeDoIndice: nome, nomes: (fechada ? linha.pontos.slice(0, -1) : linha.pontos).map((p) => ({ nome: p, inverte: false, noPlano: false })), passo: 1 }];
+    }
+
+    /* a variação numa cadeia: o perfil de referência (o do primeiro ponto), a função que dá o perfil de cada estação e o
+       comprimento máximo de trecho pela menor aresta que o perfil chega a ter */
+    function variacaoDaCadeia(c) {
+      const larg = variacao.largura ? funcaoDaMedida(c, variacao.largura, 'variacao.largura') : null;
+      if (larg?.erro) return { erro: larg.erro };
+      const ang = variacao.angulo ? funcaoDaMedida(c, variacao.angulo, 'variacao.angulo') : null;
+      if (ang?.erro) return { erro: ang.erro };
+      if (!comAba) {
+        const us = perfil.map((p) => p[0]);
+        const extensao = Math.max(...us) - Math.min(...us);
+        const menor = menorArestaDoPerfil(perfil) * Math.min(1, Math.min(...larg.valores) / extensao);
+        return { referencia: perfil, funcao: (s, k, lado) => ({ escalaU: larg.funcao(s, k, lado) / extensao, perfil: null }), trechoMaximo: TRECHO_MAXIMO_EM_ARESTAS * menor };
+      }
+      const largura = larg ? larg.funcao : () => medidasDaAba.largura;
+      const angulo = ang ? ang.funcao : () => medidasDaAba.angulo;
+      /* o mesmo número de segmentos do arco em toda a linha, o do maior ângulo, para as estações terem os mesmos pontos */
+      const passosDoArco = passosDoArcoDaAba(ang ? Math.max(...ang.valores) : medidasDaAba.angulo, segmentosArco);
+      const montar = (largura_, angulo_) => (daPele
+        ? perfilDaPeleDaAba({ raio: medidasDaAba.raio, largura: largura_, angulo: angulo_, segmentosPorQuarto: segmentosArco, passosDoArco })
+        : perfilDaAba({ raio: medidasDaAba.raio, espessura: espessuraDaChapa, largura: largura_, angulo: angulo_, segmentosPorQuarto: segmentosArco, passosDoArco }));
+      const doLado = (p) => p.map(([w, v]) => [c.lado * w, v]);
+      const funcao = (s, k, lado) => {
+        const largura_ = largura(s, k, lado); const angulo_ = angulo(s, k, lado);
+        const p = montar(largura_, angulo_);
+        if (!daPele && !ehSimples(p)) throw new ErroDoFriso(`o perfil da aba se cruza: com raio ${medidasDaAba.raio}, espessura ${espessuraDaChapa}, largura ${Number(largura_.toPrecision(4))} e ${Number(angulo_.toPrecision(4))} graus a perna atravessa a dobra; reduza o ângulo ou a largura`);
+        return { escalaU: 1, perfil: doLado(p) };
+      };
+      let menor = Infinity;
+      for (const l of larg ? larg.valores : [medidasDaAba.largura]) for (const g of ang ? ang.valores : [medidasDaAba.angulo]) {
+        try { menor = Math.min(menor, menorArestaDoPerfil(montar(l, g), daPele)); } catch (e) { if (!(e instanceof ErroDoFriso)) throw e; }
+      }
+      return { referencia: funcao(0, 0, 'depois').perfil, funcao, trechoMaximo: Number.isFinite(menor) ? TRECHO_MAXIMO_EM_ARESTAS * menor : null };
     }
 
     const vertices = []; const faces = []; const lateral = []; const tampas = [];
     for (const c of cadeias) {
       let s;
       try {
-        s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil: comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil, fechada: c.fechada, pontas, fechamento, tampa: comAba && !daPele ? tampaDaAba(perfil) : null, aberto: daPele });
+        let doPerfil = comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil; let aVariacao = null; let trechoMaximo = null;
+        if (variacao) {
+          const v = variacaoDaCadeia(c);
+          if (v.erro) return grita(st, i, 'friso', 'variacao', v.erro);
+          doPerfil = v.referencia; aVariacao = v.funcao; trechoMaximo = v.trechoMaximo;
+        }
+        s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil: doPerfil, fechada: c.fechada, pontas, fechamento, trechoMaximo, tampa: comAba && !daPele ? tampaDaAba(doPerfil) : null, aberto: daPele, variacao: aVariacao });
       } catch (e) {
         if (!(e instanceof ErroDoFriso)) return grita(st, i, 'friso', 'linha', String(e.message));
         return grita(st, i, 'friso', 'linha', `na linha ${citar(linha.nome)}${e.indice != null ? `, perto de ${c.nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}` : ''}: ${e.motivo}`);

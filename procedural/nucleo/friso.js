@@ -30,6 +30,10 @@ export const PASSOS_DA_PONTA_FECHADA = 6;
  *  face lateral comprida e estreita vira lasca para o `conferir-malha` (área / maior aresta² abaixo de 0,003). */
 export const TRECHO_MAXIMO_EM_ARESTAS = 100;
 
+/** Giro mínimo da linha, em graus, para a largura do perfil poder mudar em degrau num ponto: um canto vivo. */
+export const GIRO_MINIMO_DO_DEGRAU = 10;
+const SENO_MINIMO_DO_DEGRAU = Math.sin((GIRO_MINIMO_DO_DEGRAU * Math.PI) / 360);
+
 export class ErroDoFriso extends TypeError {
   /** indice: o ponto da linha de entrada mais perto do defeito, para quem chama citar o nome dele. */
   constructor(motivo, indice = null) { super(`friso: ${motivo}`); this.motivo = motivo; this.indice = indice; }
@@ -40,6 +44,31 @@ export function areaDoPerfil(perfil) {
   let s = 0;
   for (let k = 0; k < perfil.length; k++) { const [u0, v0] = perfil[k]; const [u1, v1] = perfil[(k + 1) % perfil.length]; s += u0 * v1 - u1 * v0; }
   return s / 2;
+}
+
+/** Dois perfis com os mesmos pontos, a 1e-12 (ou a identidade de referência). */
+export function perfisIguais(p, q) {
+  return p === q || (p.length === q.length && p.every((a, k) => Math.abs(a[0] - q[k][0]) <= 1e-12 && Math.abs(a[1] - q[k][1]) <= 1e-12));
+}
+
+/**
+ * posicoesDaLinha(pontos, fechada) -> { acumulado, total }
+ *   A posição s de cada ponto da linha, em comprimento de arco a partir do primeiro: `acumulado[k]` é a distância do
+ *   ponto 0 ao ponto k (e, na volta fechada, `acumulado[n]` fecha a volta), `total` o comprimento da linha. É a mesma
+ *   conta de `varrerPerfil`, e por isso a posição que a `variacao` recebe de cada ponto de entrada.
+ */
+export function posicoesDaLinha(pontos, fechada = false) {
+  const n = pontos.length; const nTrechos = fechada ? n : n - 1;
+  const acumulado = [0];
+  for (let k = 0; k < nTrechos; k++) acumulado.push(acumulado[k] + comprimento(sub(pontos[(k + 1) % n], pontos[k])));
+  return { acumulado, total: acumulado[nTrechos] };
+}
+
+/** A menor aresta de um perfil [u, v], aberto ou fechado. */
+export function menorArestaDoPerfil(perfil, aberto = false) {
+  let menor = Infinity; const np = perfil.length;
+  for (let k = 0; k < (aberto ? np - 1 : np); k++) menor = Math.min(menor, Math.hypot(perfil[(k + 1) % np][0] - perfil[k][0], perfil[(k + 1) % np][1] - perfil[k][1]));
+  return menor;
 }
 
 /* Arestas de uma lista de faces, na ordem em que aparecem varrendo as faces: a mesma de `subdivisao.js`. */
@@ -88,14 +117,18 @@ export function cadeiaRefinada(faces, nVertices, niveis, cadeia) {
  */
 export const ANGULO_MAXIMO_DA_ABA = 180;
 const PASSOS_DO_QUARTO_DA_ABA = 4;
-export function perfilDaAba({ espessura, raio, largura, angulo, segmentosPorQuarto = PASSOS_DO_QUARTO_DA_ABA }) {
+/** Segmentos do arco de uma aba de `angulo` graus: `segmentosPorQuarto` a cada 90 graus, pelo menos um. */
+export function passosDoArcoDaAba(angulo, segmentosPorQuarto = PASSOS_DO_QUARTO_DA_ABA) {
+  return Math.max(1, Math.ceil((segmentosPorQuarto * ((angulo * Math.PI) / 180)) / (Math.PI / 2) - 1e-9));
+}
+export function perfilDaAba({ espessura, raio, largura, angulo, segmentosPorQuarto = PASSOS_DO_QUARTO_DA_ABA, passosDoArco = null }) {
   const finito = (x) => typeof x === 'number' && Number.isFinite(x);
   if (!finito(espessura) || !(espessura > 0)) throw new ErroDoFriso(`a espessura da chapa precisa ser maior que zero, e veio ${espessura}`);
   if (!finito(raio) || !(raio > 0)) throw new ErroDoFriso(`o raio da dobra precisa ser maior que zero, e veio ${raio}`);
   if (!finito(largura) || !(largura > 0)) throw new ErroDoFriso(`a largura da aba precisa ser maior que zero, e veio ${largura}`);
   if (!finito(angulo) || !(angulo > 0) || !(angulo < ANGULO_MAXIMO_DA_ABA)) throw new ErroDoFriso(`o ângulo da aba precisa ficar entre 0 e ${ANGULO_MAXIMO_DA_ABA} graus, e veio ${angulo}`);
   const ri = raio; const ro = raio + espessura; const alfa = (angulo * Math.PI) / 180;
-  const n = Math.max(1, Math.ceil((segmentosPorQuarto * alfa) / (Math.PI / 2) - 1e-9));
+  const n = passosDoArco ?? passosDoArcoDaAba(angulo, segmentosPorQuarto);
   const arco = (r, k) => { const t = (alfa * k) / n; return [r * Math.sin(t), -ro + r * Math.cos(t)]; };
   const perna = [largura * Math.cos(alfa), -largura * Math.sin(alfa)];
   const fora = Array.from({ length: n + 1 }, (_, k) => arco(ro, k));
@@ -117,13 +150,13 @@ export function perfilDaAba({ espessura, raio, largura, angulo, segmentosPorQuar
  *   `segmentosPorQuarto` segmentos a cada 90 graus, como `perfilDaAba`. Grita com ErroDoFriso no valor inválido e na aba
  *   que volta por baixo da chapa (w < 0).
  */
-export function perfilDaPeleDaAba({ raio, largura, angulo, segmentosPorQuarto = PASSOS_DO_QUARTO_DA_ABA }) {
+export function perfilDaPeleDaAba({ raio, largura, angulo, segmentosPorQuarto = PASSOS_DO_QUARTO_DA_ABA, passosDoArco = null }) {
   const finito = (x) => typeof x === 'number' && Number.isFinite(x);
   if (!finito(raio) || !(raio > 0)) throw new ErroDoFriso(`o raio da dobra precisa ser maior que zero, e veio ${raio}`);
   if (!finito(largura) || !(largura > 0)) throw new ErroDoFriso(`a largura da aba precisa ser maior que zero, e veio ${largura}`);
   if (!finito(angulo) || !(angulo > 0) || !(angulo < ANGULO_MAXIMO_DA_ABA)) throw new ErroDoFriso(`o ângulo da aba precisa ficar entre 0 e ${ANGULO_MAXIMO_DA_ABA} graus, e veio ${angulo}`);
   const alfa = (angulo * Math.PI) / 180;
-  const n = Math.max(1, Math.ceil((segmentosPorQuarto * alfa) / (Math.PI / 2) - 1e-9));
+  const n = passosDoArco ?? passosDoArcoDaAba(angulo, segmentosPorQuarto);
   const arco = Array.from({ length: n + 1 }, (_, k) => { const t = (alfa * k) / n; return [raio * Math.sin(t), -raio + raio * Math.cos(t)]; });
   arco[0] = [0, 0];
   const fim = arco[n];
@@ -216,14 +249,14 @@ function estacoesDaLinha({ pontos, normais, fechada, pontas, fechamento, trechoM
   const estacoes = [];
   let e = 0;
   for (let k = 0; k < n; k++) {
-    estacoes.push({ p: [...pontos[k]], normal: [...normais[k]], s: acumulado[k], origem: k, escala: escala(acumulado[k]) });
+    estacoes.push({ p: [...pontos[k]], normal: [...normais[k]], s: acumulado[k], origem: k, entrada: k, escala: escala(acumulado[k]) });
     if (k === nTrechos) break;
     const a = pontos[k], b = pontos[(k + 1) % n], na = normais[k], nb = normais[(k + 1) % n];
     while (e < extras.length && extras[e] <= acumulado[k]) e++;
     for (; e < extras.length && extras[e] < acumulado[k + 1]; e++) {
       const t = (extras[e] - acumulado[k]) / comprimentos[k];
       if (!(t > 1e-6 && t < 1 - 1e-6)) continue;
-      estacoes.push({ p: soma(a, mult(sub(b, a), t)), normal: soma(mult(na, 1 - t), mult(nb, t)), s: extras[e], origem: t < 0.5 ? k : (k + 1) % n, escala: escala(extras[e]) });
+      estacoes.push({ p: soma(a, mult(sub(b, a), t)), normal: soma(mult(na, 1 - t), mult(nb, t)), s: extras[e], origem: t < 0.5 ? k : (k + 1) % n, entrada: null, escala: escala(extras[e]) });
     }
   }
   return estacoes;
@@ -240,10 +273,21 @@ function estacoesDaLinha({ pontos, normais, fechada, pontas, fechamento, trechoM
  *   aberto: o perfil é uma polilinha aberta, e o resultado é uma pele sem espessura, só com as faces laterais (sem tampas
  *   e com `pontas` sem efeito de tampa). A normal da pele no começo do perfil é a normal N da linha, qualquer que seja o
  *   sentido de u em que o perfil anda, e então a pele continua a chapa que a linha acompanha com a mesma orientação.
- *   Grita com ErroDoFriso, com o índice do ponto, no trecho nulo, na normal paralela à linha, na volta para trás e no
- *   recuo da esquadria que não cabe no trecho.
+ *   variacao: (s, entrada, lado) -> { escalaU, perfil }, o perfil como função da posição s (comprimento de arco ao longo da
+ *   linha). `escalaU` multiplica o u do perfil de entrada (1 é o perfil como veio) e `perfil`, se não for nulo, o troca
+ *   por outro com o mesmo número de pontos e a mesma orientação. `entrada` é o índice do ponto de entrada quando a estação
+ *   é um deles (e nulo nas estações que a varredura acrescenta), e `lado` ('antes' ou 'depois') diz de que trecho se
+ *   fala; nas estações acrescentadas o valor é um só. Duas escalas diferentes dos dois lados de um ponto de entrada são um
+ *   DEGRAU de largura, e a junta é a meia-esquadria de duas faixas de larguras diferentes: as duas faixas se cortam num
+ *   mesmo plano, o que passa pelo ponto da linha, pela normal e pelo encontro das duas bordas de fora, e os pontos do
+ *   perfil de cada faixa caem nesse plano nos mesmos lugares, de modo que a junta tem um anel só, soldado, sem entalhe
+ *   nem furo (com larguras iguais esse plano é o bissetor). O degrau só vale num canto vivo da linha (a partir de
+ *   GIRO_MINIMO_DO_DEGRAU graus de giro) e só entre perfis iguais com escalas diferentes. Sem `variacao` a malha é a mesma de
+ *   sempre, bit a bit.
+ *   Grita com ErroDoFriso, com o índice do ponto, no trecho nulo, na normal paralela à linha, na volta para trás, no
+ *   recuo da esquadria que não cabe no trecho e no degrau fora de um canto vivo.
  */
-export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas = ['aberta', 'aberta'], fechamento = null, trechoMaximo = null, tampa = null, aberto = false }) {
+export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas = ['aberta', 'aberta'], fechamento = null, trechoMaximo = null, tampa = null, aberto = false, variacao = null }) {
   if (!Array.isArray(pontos) || pontos.length < (fechada ? 3 : 2)) throw new ErroDoFriso(`a linha ${fechada ? 'fechada' : 'aberta'} precisa de ${fechada ? 3 : 2} pontos distintos ou mais`);
   if (!Array.isArray(normais) || normais.length !== pontos.length) throw new ErroDoFriso('é preciso uma normal por ponto da linha');
   if (!Array.isArray(perfil) || perfil.length < 3) throw new ErroDoFriso('o perfil precisa de 3 pontos [u, v] ou mais');
@@ -263,13 +307,13 @@ export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas 
     const seguinte = fechada || j < m - 1 ? estacoes[(j + 1) % m] : null;
     const tA = anterior ? mult(sub(e.p, anterior.p), 1 / comprimento(sub(e.p, anterior.p))) : null;
     const tS = seguinte ? mult(sub(seguinte.p, e.p), 1 / comprimento(sub(seguinte.p, e.p))) : null;
-    let T; let K = null; let estica = 1; let tanMeio = 0;
+    let T; let K = null; let estica = 1; let tanMeio = 0; let sen = 0;
     if (tA && tS) {
       const b = soma(tA, tS); const lb = comprimento(b);
       if (!(lb > 1e-6)) throw new ErroDoFriso('a linha volta para trás sobre si', e.origem);
       T = mult(b, 1 / lb);
       const d = sub(tS, tA); const ld = comprimento(d);
-      if (ld > 1e-12) { K = mult(d, 1 / ld); const c = lb / 2; estica = 1 / c; tanMeio = (ld / 2) / c; }
+      if (ld > 1e-12) { K = mult(d, 1 / ld); const c = lb / 2; estica = 1 / c; tanMeio = (ld / 2) / c; sen = ld / 2; }
     } else T = tA ?? tS;
     const nn = e.normal; const ln = comprimento(nn);
     if (!(ln > 0)) throw new ErroDoFriso('a normal no ponto é nula', e.origem);
@@ -278,11 +322,45 @@ export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas 
     if (!(lN > 1e-6)) throw new ErroDoFriso('a normal no ponto é paralela à linha, e o perfil não tem lado', e.origem);
     const N = mult(N0, 1 / lN);
     const B = cruz(N, T);
-    return { T, N, B, K, estica, tanMeio, tA, tS };
+    return { T, N, B, K, estica, tanMeio, tA, tS, sen, eps: K && dot(B, K) < 0 ? -1 : 1 };
   });
+  /* a variação do perfil ao longo da linha: por estação, a escala de u dos dois lados (antes e depois) e o perfil */
+  const orientar = (p) => (area > 0 ? p.map((q) => [...q]) : [...p].reverse().map((q) => [...q]));
+  const porEstacao = variacao ? estacoes.map((e, j) => {
+    const consulta = (lado) => {
+      try { return variacao(e.s, e.entrada, lado); } catch (erro) { if (erro instanceof ErroDoFriso && erro.indice == null) erro.indice = e.origem; throw erro; }
+    };
+    const temAntes = fechada || j > 0; const temDepois = fechada || j < m - 1;
+    const antes = temAntes ? consulta(e.entrada == null ? 'depois' : 'antes') : null;
+    const depois = temDepois ? (e.entrada == null && antes ? antes : consulta('depois')) : null;
+    const va = antes ?? depois; const vd = depois ?? antes;
+    if (va.perfil !== vd.perfil && !(va.perfil && vd.perfil && perfisIguais(va.perfil, vd.perfil))) throw new ErroDoFriso('o perfil muda em degrau neste ponto: só a largura de um perfil de forma fixa pode ter degrau, e a aba muda por rampa', e.origem);
+    const P = vd.perfil ? orientar(vd.perfil) : P2;
+    if (P.length !== np) throw new ErroDoFriso(`o perfil precisa ter os mesmos ${np} pontos em toda a linha, e aqui tem ${P.length}`, e.origem);
+    if (!(va.escalaU > 0) || !(vd.escalaU > 0)) throw new ErroDoFriso(`a escala de u do perfil precisa ser maior que zero, e veio ${va.escalaU} e ${vd.escalaU}`, e.origem);
+    const degrau = Math.abs(va.escalaU - vd.escalaU) > 1e-12 * Math.max(va.escalaU, vd.escalaU);
+    const q = quadros[j];
+    if (degrau && !(q.K && q.sen >= SENO_MINIMO_DO_DEGRAU)) {
+      const giro = q.K ? Number(((2 * Math.asin(q.sen) * 180) / Math.PI).toPrecision(3)) : 0;
+      throw new ErroDoFriso(`a largura muda em degrau neste ponto, e a linha ${giro > 0 ? `só vira ${giro} graus` : 'segue reta'}: o degrau vale num canto vivo, a partir de ${GIRO_MINIMO_DO_DEGRAU} graus de giro; fora dele a largura muda por rampa`, e.origem);
+    }
+    return { sa: va.escalaU, sd: vd.escalaU, degrau, P };
+  }) : null;
   /* o deslocamento de cada ponto do perfil em cada estação, antes da esquadria (para o recuo) e depois */
   const deslocamentos = estacoes.map((e, j) => {
     const q = quadros[j];
+    if (porEstacao) {
+      /* a escala de u é a média das dos dois lados, e o degrau desloca o anel ao longo da tangente bissetora o quanto
+         leva o encontro das duas bordas de fora (ver a nota de `variacao`) */
+      const { sa, sd, degrau, P } = porEstacao[j];
+      const deslocT = degrau ? (q.eps * (sa - sd)) / (2 * q.sen) : 0;
+      return P.map(([u, v]) => {
+        let d = soma(mult(q.B, u * e.escala * ((sa + sd) / 2)), mult(q.N, v * e.escala));
+        if (q.K) d = soma(d, mult(q.K, dot(d, q.K) * (q.estica - 1)));
+        if (degrau) d = soma(d, mult(q.T, deslocT * u * e.escala));
+        return d;
+      });
+    }
     return P2.map(([u, v]) => {
       let d = soma(mult(q.B, u * e.escala), mult(q.N, v * e.escala));
       if (q.K) d = soma(d, mult(q.K, dot(d, q.K) * (q.estica - 1)));
