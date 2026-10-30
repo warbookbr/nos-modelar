@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [visões de conferência na bancada](2026-10-30-visoes-de-conferencia-na-bancada.md) (2026-10-30-visoes-de-conferencia-na-bancada.md), ativado em 2026-10-30.
 
 [Glossário e entrada para pessoas](encerrados/2026-10-30-glossario-e-entrada-para-pessoas.md) fechou em 2026-10-30, com a página de entrada para pessoas aprovada e sem glossário separado.
 
