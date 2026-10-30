@@ -7,6 +7,7 @@
 
 import * as THREE from 'three';
 import { criarGizmoDeSetas } from './controles/gizmo-de-setas.js';
+import { idDeOrigem } from '../autoria/adaptar-three.js';
 
 const MODOS = new Set(['vertice', 'aresta', 'face']);
 /* O vértice desenhado, em pixels na tela. Dois e meio era o valor inicial e o
@@ -15,6 +16,13 @@ const MODOS = new Set(['vertice', 'aresta', 'face']);
    no mundo — um punho que encolhe com a distância deixa de ser clicável
    justamente quando a pessoa se afasta para ver a peça toda. */
 export const TAMANHO_PONTO_EM_EDICAO = 7;
+
+/* O id da face neutra que o raio acertou, como texto, ou null quando o raio
+   não acertou triângulo de malha da cena. */
+export function faceDoAcerto(hit) {
+  if (!hit || hit.faceIndex == null) return null;
+  return String(idDeOrigem(hit.object.geometry.getAttribute('origemFace'), hit.faceIndex * 3));
+}
 
 function chaveDaAresta(a, b) {
   return a < b ? `${a}:${b}` : `${b}:${a}`;
@@ -398,7 +406,7 @@ export function criarCamadaEdicaoDeMalha({
       const posicao = objeto.geometry?.getAttribute('position');
       if (!origem || !posicao) return;
       for (let i = 0; i < posicao.count; i++) {
-        const ponto = posicoes.get(String(origem.getX(i)));
+        const ponto = posicoes.get(String(idDeOrigem(origem, i)));
         if (ponto) posicao.setXYZ(i, ponto[0], ponto[1], ponto[2]);
       }
       posicao.needsUpdate = true;
@@ -628,9 +636,7 @@ export function criarCamadaEdicaoDeMalha({
     raiz.traverse((objeto) => {
       if (objeto.isMesh && objeto.geometry?.getAttribute('origemFace')) alvos.push(objeto);
     });
-    const hit = raycaster.intersectObjects(alvos, false)[0];
-    if (!hit || hit.faceIndex == null) return null;
-    return String(hit.object.geometry.getAttribute('origemFace').getX(hit.faceIndex * 3));
+    return faceDoAcerto(raycaster.intersectObjects(alvos, false)[0]);
   }
 
   /* ESCOLHA POR DISTÂNCIA NA TELA, e não por distância ao raio no espaço.

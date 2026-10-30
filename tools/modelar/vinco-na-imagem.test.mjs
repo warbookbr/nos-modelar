@@ -59,9 +59,9 @@ function arestasDaDobra(internas) {
     .map((e) => ({ ...e, y: e.meio[1] }));
 }
 
-/** A normal que a cena dá a cada canto (face, vértice do núcleo). Os atributos `origemFace` e `origemVertice` são Float32
-    e perdem os ids grandes do passo, então o canto se acha pela ordem: cada malha lista as faces na ordem em que foram
-    trianguladas, cada face de n cantos vira n − 2 triângulos, e o vértice do canto é o da face na mesma posição. */
+/** A normal que a cena dá a cada canto (face, vértice do núcleo). O canto se acha pela ordem, sem ler `origemFace` nem
+    `origemVertice`: cada malha lista as faces na ordem em que foram trianguladas, cada face de n cantos vira n − 2
+    triângulos, e o vértice do canto é o da face mais perto da posição. Assim a medida não depende do atributo da cena. */
 function normaisDaCena(neutro) {
   const { raiz } = adaptarThree(neutro);
   const porCanto = new Map();

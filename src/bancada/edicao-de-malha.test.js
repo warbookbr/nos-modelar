@@ -1,7 +1,12 @@
 /* edicao-de-malha.test.js — topologia, conversão de seleção entre vértice,
    aresta e face, e o movimento aplicado à malha neutra. */
 import { describe, expect, it } from 'vitest';
-import { criarEstadoEdicaoDeMalha, moverSelecaoDaMalha, TAMANHO_PONTO_EM_EDICAO, topologiaDaMalhaNeutra } from './edicao-de-malha.js';
+import * as THREE from 'three';
+import { criarEstadoEdicaoDeMalha, faceDoAcerto, moverSelecaoDaMalha, TAMANHO_PONTO_EM_EDICAO, topologiaDaMalhaNeutra } from './edicao-de-malha.js';
+import { adaptarThree } from '../autoria/adaptar-three.js';
+import { executarReceita } from '../autoria/executar-receita.js';
+import { BASE_ESTENDIDA } from '../../procedural/nucleo/entrada.js';
+import carenagem from '../../procedural/pecas/carenagem-de-prova/receita.js';
 
 const TOPOLOGIA = {
   vertices: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
@@ -108,5 +113,44 @@ describe('estado de edição de malha', () => {
     expect(movido.V.get('d')).toEqual([3, 0, 0]);
     expect(neutro.V.get('a')).toEqual([0, 0, 0]);
     expect(movido.F).toBe(neutro.F);
+  });
+});
+
+/* A face que o raio acerta numa peça real, depois da milésima face de um passo.
+   Ali o núcleo numera na faixa estendida (`idDoPasso`, acima de 2^40), e o id
+   precisa chegar inteiro ao modo de edição: a carenagem de prova tem quase
+   trinta mil faces num passo só, e é nela que um atributo sem a precisão do id
+   juntava faces diferentes no mesmo valor. */
+describe('face sob o raio na carenagem de prova', () => {
+  const { neutro } = executarReceita(carenagem);
+  const { raiz } = adaptarThree(neutro);
+  raiz.updateMatrixWorld(true);
+  const malhas = [];
+  raiz.traverse((objeto) => { if (objeto.isMesh) malhas.push(objeto); });
+
+  function acertar(face) {
+    const [a, b, c] = face.vs.slice(0, 3).map((id) => new THREE.Vector3(...neutro.V.get(id)));
+    const centro = a.clone().add(b).add(c).divideScalar(3);
+    const normal = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
+    const lado = Math.min(a.distanceTo(b), b.distanceTo(c), c.distanceTo(a));
+    const raio = new THREE.Raycaster(centro.clone().addScaledVector(normal, lado * 0.05), normal.clone().negate());
+    return faceDoAcerto(raio.intersectObjects(malhas, false)[0]);
+  }
+
+  it('devolve o id exato de faces além da milésima do passo', () => {
+    const altas = [...neutro.F.keys()].filter((id) => id >= BASE_ESTENDIDA).sort((x, y) => x - y);
+    expect(altas.length).toBeGreaterThan(20000);
+    for (const id of [altas[0], altas[1], altas[777], altas.at(-2), altas.at(-1)]) {
+      expect(acertar(neutro.F.get(id))).toBe(String(id));
+    }
+  });
+
+  it('cada face da peça tem um id próprio na malha da cena', () => {
+    const distintas = new Set();
+    for (const malha of malhas) {
+      const atributo = malha.geometry.getAttribute('origemFace');
+      for (let i = 0; i < atributo.count; i += 3) distintas.add(faceDoAcerto({ object: malha, faceIndex: i / 3 }));
+    }
+    expect(distintas.size).toBe(neutro.F.size);
   });
 });

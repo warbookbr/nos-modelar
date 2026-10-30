@@ -1,7 +1,7 @@
 /* adaptar-three.test.js — a malha da cena carrega de qual vértice neutro cada
    posição veio, que é o que permite a edição devolver o movimento à malha. */
 import { describe, expect, it } from 'vitest';
-import { adaptarThree } from './adaptar-three.js';
+import { adaptarThree, idsDeOrigem } from './adaptar-three.js';
 
 describe('adaptarThree — identidade transitória de face', () => {
   it('carrega em cada triângulo o id da face neutra que o originou', () => {
@@ -20,9 +20,9 @@ describe('adaptarThree — identidade transitória de face', () => {
     const vertices = malha.geometry.getAttribute('origemVertice');
 
     expect(origem).toBeDefined();
-    expect([...origem.array]).toEqual([42, 42, 42, 42, 42, 42]);
+    expect(idsDeOrigem(origem)).toEqual([42, 42, 42, 42, 42, 42]);
     expect(vertices.count).toBe(6);
-    expect(new Set(vertices.array)).toEqual(new Set([10, 11, 12, 13]));
+    expect(new Set(idsDeOrigem(vertices))).toEqual(new Set([10, 11, 12, 13]));
     expect(malha.userData.faces).toEqual([42]);
   });
 });
@@ -46,8 +46,8 @@ describe('adaptarThree — liso com ângulo limite', () => {
   }
   const normaisNaAresta = (neutro) => {
     const malha = adaptarThree(neutro).partes.get('p').children[0];
-    const vertices = malha.geometry.getAttribute('origemVertice').array;
-    const faces = malha.geometry.getAttribute('origemFace').array;
+    const vertices = idsDeOrigem(malha.geometry.getAttribute('origemVertice'));
+    const faces = idsDeOrigem(malha.geometry.getAttribute('origemFace'));
     const normais = malha.geometry.getAttribute('normal').array;
     const saida = [];
     for (let i = 0; i < vertices.length; i++) {
