@@ -1,4 +1,4 @@
-# Glossário e entrada para pessoas — os termos próprios do Modelar definidos num lugar só, e uma página que explica o projeto a quem chega de fora
+# Glossário e entrada para pessoas — uma página que explica o projeto a quem chega de fora, com os termos que ela usa definidos nela
 
 **Estado:** ativo
 
@@ -12,45 +12,46 @@ Uma análise externa do repositório, feita em 2026-10-30 a partir do README e d
 
 ## Resultado
 
-Um glossário consultável sob demanda, com cada termo próprio definido em uma ou duas frases literais e apontando onde ele mora no código ou na documentação, e uma página de entrada para pessoas, ligada pelo README, que explica o que o Modelar é, para quem é, como uma peça nasce e é aprovada e como começar; um leitor sem contexto responde às perguntas de prova só com ela e o glossário.
+Uma página de entrada para pessoas, ligada pelo README, que explica o que o Modelar é, para quem é, como uma peça nasce e é aprovada e como começar, com uma seção curta que define em uma frase cada termo próprio que ela usa e liga ao documento onde o termo é definido de verdade; um leitor sem contexto responde às perguntas de prova só com ela.
 
 ## Filtro Agent-First
 
-USAR DIRETO o `comecar` e a leitura por roteiro: o glossário entra como leitura sob demanda (`sobDemanda`) dos roteiros, e não como leitura obrigatória, para não pesar no orçamento. ENVOLVER nada. REFATORAR nada no código. ADIAR a reescrita dos documentos existentes para trocar jargão por texto literal: o glossário resolve o termo onde ele aparece, e a reescrita, se a medida pedir, é plano próprio.
+USAR DIRETO os documentos que já definem cada termo: a página liga a eles e não copia a definição deles. ENVOLVER nada. REFATORAR nada no código. ADIAR a reescrita dos documentos existentes para trocar jargão por texto literal, que, se a medida pedir, é plano próprio.
 
 ## Incluído
 
-o GLOSSARIO.md, criado em `docs/modelar/`, com os termos levantados por frequência nos documentos de uso, nas skills, no `CLAUDE.md` e nas mensagens das ferramentas, cada um com a definição e o caminho de onde ele é definido; o ponteiro para ele nos roteiros do `comecar` como leitura sob demanda; a página de entrada para pessoas, o COMECE-AQUI.md criado em `docs/`, ligada pelo README e pelo índice da documentação, escrita em português literal, sem termo interno sem o link do glossário; a prova com um leitor cego.
+A página de entrada para pessoas, o COMECE-AQUI.md criado em `docs/`, ligada pelo README e pelo índice da documentação, escrita em português literal, com a seção dos termos que ela usa; o levantamento dos termos próprios por frequência, feito uma vez para escolher essa lista e registrado no andamento; a prova com um leitor cego.
 
 ## Excluído
 
-Reescrever os documentos de uso, as skills ou as mensagens das ferramentas; traduzir para outra língua; site, vídeo ou interface nova; mudar o escopo do projeto, que continua sendo a oficina para agentes.
+Um glossário separado, que repetiria as definições dos documentos num segundo lugar e envelheceria com eles; reescrever os documentos de uso, as skills ou as mensagens das ferramentas; traduzir para outra língua; site, vídeo ou interface nova; mudar o escopo do projeto, que continua sendo a oficina para agentes.
 
 ## Invariantes
 
-A leitura obrigatória de cada roteiro não cresce (`npm run leitura:obrigatoria` dentro dos orçamentos atuais). Nenhum caminho citado no glossário ou na página fica quebrado (`docs:citacoes:check`, `docs:links:check`). Nenhum nome de terceiro, marca ou termo proibido entra (`termos-proibidos`).
+A leitura obrigatória de cada roteiro não cresce (`npm run leitura:obrigatoria` dentro dos orçamentos atuais). Nenhum caminho citado na página fica quebrado (`docs:citacoes:check`, `docs:links:check`). Nenhum nome de terceiro, marca ou termo proibido entra (`termos-proibidos`).
 
 ## Gate de saída
 
-1. O glossário cobre todo termo próprio que aparece cinco vezes ou mais nos documentos de uso e nas skills, pela lista do levantamento, e cada definição cita um caminho que existe.
-2. A página de entrada não usa termo do glossário sem o link para ele, e cabe em leitura de poucos minutos.
-3. Um subagente sem contexto, com só a página e o glossário, responde corretamente às perguntas de prova: o que é o Modelar e para quem; como uma peça nasce e quem a aprova; o que o crítico cego faz; como rodar a bancada; onde estão as regras do projeto; o que é um plano ativo.
+1. A seção de termos da página define em uma frase cada termo próprio que a página usa, com o link para o documento que o define, e nenhum termo próprio aparece na página fora dela sem esse link.
+2. A página cabe em leitura de poucos minutos.
+3. Um subagente sem contexto, com só a página e os documentos que ela liga, responde corretamente às perguntas de prova: o que é o Modelar e para quem; como uma peça nasce e quem a aprova; o que o crítico cego faz; como rodar a bancada; onde estão as regras do projeto; o que é um plano ativo.
 4. `npm run gates` verde e a pessoa aprova a página de entrada.
 
 ## Fatias
 
-1. **Levantamento e glossário.** O levantamento dos termos por frequência, guardado no banco de provas com o comando que o refaz, e o glossário com o ponteiro sob demanda nos roteiros.
-2. **Página de entrada.** Em paralelo com a fatia 1, a página para pessoas, depois ligada aos termos do glossário.
-3. **Prova com leitor cego.** As perguntas do gate a um subagente sem contexto; o que ele errar volta para a página ou para o glossário.
+1. **Levantamento dos termos.** A contagem dos termos próprios por frequência, para escolher os que a página define, com o documento que define cada um.
+2. **Página de entrada.** A página para pessoas, com a seção dos termos.
+3. **Prova com leitor cego.** As perguntas do gate a um subagente sem contexto; o que ele errar volta para a página.
 4. **Fechamento.** README e índice apontando a página, backlog, bateria e o plano movido para `encerrados/`.
 
 ## Decisões que dependem da pessoa
 
 1. **Plano criado e ativado pela pessoa.** Aprovada em 2026-10-30: a pessoa pediu o glossário e a página de entrada para pessoas agora, num plano ativo, com subagentes.
+2. **Sem glossário separado.** Aprovada em 2026-10-30, pela recomendação: o glossário repetiria as definições que já moram nos documentos e envelheceria com eles, e para os agentes os roteiros do `comecar` já levam ao documento que define o termo; os termos que a página usa ficam definidos numa seção dela, ligados ao documento de origem.
 
 ## Riscos e parada
 
-O risco é o glossário virar segundo documento de uso, longo e com regra: ele só define e aponta, e a regra continua no lugar dela. Para e volta à pessoa se a leitura obrigatória precisar crescer ou se a página pedir mudar o escopo do projeto.
+O risco é a página virar segundo documento de uso, longa e com regra: ela só explica e aponta, e a regra continua no lugar dela. Para e volta à pessoa se a leitura obrigatória precisar crescer ou se a página pedir mudar o escopo do projeto.
 
 ## Andamento
 
