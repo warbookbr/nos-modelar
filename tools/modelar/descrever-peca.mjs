@@ -18,6 +18,7 @@ import {
 } from './configuracao-composicoes.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import { conferirVaosDaPeca, formatarVaos } from '../../src/autoria/molduras-do-vao.js';
 import {
   conferirPartesContraPlano, normalizarPlanoDeModelagem,
 } from '../../src/autoria/plano-de-modelagem.js';
@@ -347,6 +348,7 @@ export async function descreverPecaReutilizavel({
      estado sair no código de saída, que filtro nenhum descarta.
      Roda por padrão: ver a nota sobre `semVeredito` na assinatura. */
   let contatos = null;
+  let molduras = null;
   let formas = null;
   let plano = null;
   let refinamento = null;
@@ -449,6 +451,23 @@ export async function descreverPecaReutilizavel({
       const texto = `\n${ilhas.problemas.length} PARTE(S) OU GRUPO(S) SOLTO(S)${ilhasReprovam ? '' : ' (aviso; a guarda do acervo reprova)'}\n${ilhas.problemas.map((t) => `  ${t}`).join('\n')}\n`;
       if (ilhasReprovam) { stderr += texto; falhou = true; } else stdout += texto;
     }
+    /* MOLDURA EM VOLTA DO VÃO. Os frisos que contornam um vão declarado em `vaos` da receita precisam cobrir a borda inteira, e as emendas entre
+       eles levam o mesmo perfil: o trecho sem moldura, o degrau na emenda e o entalhe no canto reprovam, e a aba parcial de propósito passa só
+       com `parcial: { motivo }`. Sem `vaos` na receita nada roda e a saída continua a mesma. A medida é sobre a pegada dos frisos na chapa,
+       em `src/autoria/molduras-do-vao.js`. */
+    try {
+      molduras = conferirVaosDaPeca(neutro, receita);
+    } catch (erro) {
+      return falha(`NÃO CONSEGUI CONFERIR OS VÃOS\n  ${erro.message}`);
+    }
+    if (molduras.declarados) {
+      stdout += formatarVaos(molduras);
+      if (!molduras.ok) {
+        stderr += `\n${molduras.problemas.length} PROBLEMA(S) NA MOLDURA EM VOLTA DO VÃO\n${molduras.problemas.map((t) => `  ${t}`).join('\n')}\n`;
+        falhou = true;
+      }
+    }
+
     /* FORMA PROMETIDA CONTRA ENTREGUE. Existe porque contato não basta: se o
        pneu sai maciço e aro, cubo e raios não chegam a ser modelados, não há
        segunda parte para acusar contato — a peça é um disco sólido e passa
@@ -611,6 +630,7 @@ export async function descreverPecaReutilizavel({
       intencao: entrada.INTENCAO ?? null,
       avisos,
       contatos,
+      molduras,
       formas,
       plano,
       refinamento,

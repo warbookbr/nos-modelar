@@ -3568,6 +3568,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   Object.defineProperty(saida, 'facesDasPortas', { value: facesDasPortas, enumerable: false });
   /* avisos: o que um passo fez de diferente do pedido sem falhar (o raio que o `arredondarCostura` reduziu com `raioMinimo`). Fora da enumeração, como `facesDasPortas`: não entra na forma canônica. */
   Object.defineProperty(saida, 'avisos', { value: st.avisos, enumerable: false });
+  /* frisos: a pegada e as pontas de cada friso varrido, para a conferência da moldura em volta de um vão. Fora da enumeração, como `avisos`. */
+  Object.defineProperty(saida, 'frisos', { value: st.frisos ?? [], enumerable: false });
   return saida;
 }
 
