@@ -18,6 +18,30 @@ Uma peça nova `furgao-realista`, partida de uma cópia do `furgao`, aprovada pe
 
 USAR DIRETO o que o projeto já oferece: a skill `alinhar-modelagem` e a `esbocar-opcoes` para fechar o PLANO da receita com a pessoa, a `desenhar-prancha` para a prancha ortográfica cotada, a gaiola por estações ou a rede de curvas (`gaiolaPorRede`) para a chapa, o `friso` com `variacao` para molduras e calhas, a declaração `vaos` com a conferência das molduras, a família `roda-pneu` para as rodas, as vistas de luz rasante e de curvatura obrigatórias da lataria, o `laco-de-modelagem` com o crítico cego, a `auditar-peca` e a `auditar-montagem`. ENVOLVER nada de antemão. REFATORAR só o que bloquear o resultado: o atrito que impede a peça de passar vira correção na ferramenta geral, no gate ou na instrução, nunca no arquivo da peça, com teste que falhava antes. ADIAR o resto, que volta ao backlog com o caso que o mostrou.
 
+## Ferramentas do fluxo
+
+A pessoa pediu o fluxo com tudo o que o projeto oferece e serve a este objeto. Cada ferramenta abaixo entra ou fica de fora pelo motivo dito, e a que entra é usada na fatia indicada; ferramenta nova que o fluxo pedir vira atrito.
+
+| Ferramenta | Entra? | Onde e por quê |
+|---|---|---|
+| `alinhar-modelagem` e `esbocar-opcoes` | sim | fatia 1: o PLANO da receita e as escolhas de forma em imagem |
+| `medidas-da-fonte.mjs` e `comparar-silhueta.mjs` sobre a fonte do `furgao` | sim | fatia 2: a cópia confere com a fonte antes de mudar, e as proporções de partida saem dela |
+| `desenhar-prancha` | sim | fatia 3: o furgão realista sai das proporções da fonte, então o alvo medido passa a ser a prancha cotada com as medidas de classe; sem medida independente ela fica bloqueada, como a skill exige |
+| `comparar-silhueta` e a comparação por número da prancha | sim | fatias 4 a 6: a silhueta contra a prancha, na tolerância do alinhamento |
+| gaiola por estações ou `gaiolaPorRede`, `friso` com `variacao`, `vaos` | sim | fatia 4: a chapa contínua e as molduras conferidas, com toda abertura declarada |
+| `npm run ondulacao`, `npm run alisar`, vincos da rede e das linhas | sim | fatia 4: ondulação, alisamento e vincos medidos antes do crítico |
+| cortes ampliados do pacote cego do Blender e `ler-perfil` | sim | fatias 4 e 5: o perfil das molduras, calhas e lábios lido no corte |
+| `vistas:critica` e `vistas:superficie` | sim | fatias 4 a 6: o pacote do crítico, com luz rasante e curvatura obrigatórias da lataria |
+| `laco-de-modelagem`, `critico-visual` e `rodada-de-modelagem` | sim | fatias 4 a 6: as rodadas registradas e a regra de três rodadas |
+| família `roda-pneu` | sim | fatia 5: as rodas na proporção real |
+| `conferir-malha`, `descrever-peca`, `guarda:acervo`, `auditar-peca` e `auditar-montagem` | sim | fatia 6: malha, contatos, vãos e montagem antes da aprovação |
+| `folha-comparativa` | sim | fatia 6: o `furgao` e o realista lado a lado, na mesma câmera e escala, para a pessoa |
+| `retrato:acervo` | sim | toda fatia: o acervo, o `furgao` incluso, sai igual |
+| `absorver` (`absorver-ajuste-da-bancada`) | se a pessoa ajustar | quando a pessoa mexer na peça na bancada, o ajuste volta para a receita |
+| `contorno-da-imagem` e `prancha-dos-contornos` | só com imagem | entram se a pessoa trouxer imagem de caráter e quiser o mapa de partes dela; a imagem não vira medida |
+| `conferir:referencia` | não | mede contra foto, e foto de furgão real traz marca e não entra no repositório |
+| esboço detalhado (`laco-do-esboco`) | não | é para objeto sem forma de referência, e aqui a referência existe |
+
 ## Incluído
 
 A cópia `procedural/pecas/furgao-realista/` com receita, `referencias/alvo.md`, a prancha cotada e as medidas; o PLANO da receita fechado no alinhamento; a lataria, os vidros, as rodas, os para-choques, a grade, os faróis, as lanternas, os retrovisores, as maçanetas e as linhas de porta que o alinhamento listar; o registro de atritos do fluxo, num ATRITOS.md que a fatia 2 cria na pasta do furgão realista em `docs/modelar/banco-de-provas/`, com cada atrito classificado em corrigido no plano, gate ou instrução nova, ou devolvido ao backlog; as correções gerais que um atrito bloqueante pedir, cada uma com teste e nota em `docs/modelar/UPSTREAM-NOS.md`.
