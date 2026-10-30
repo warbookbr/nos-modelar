@@ -42,6 +42,35 @@ export function criarPreferenciasBancada({ armazenamento = globalThis.localStora
 }
 
 const CHAVE_VISAO = 'mecanifica.bancada.visao';
+const CHAVE_TEMA = 'mecanifica.bancada.tema';
+
+/* Uma escolha entre opções conhecidas, guardada numa chave própria: o que foi
+   guardado e deixou de valer volta ao padrão, em vez de prender a bancada numa
+   opção que ela não sabe mais desenhar. */
+function criarPreferenciaDeEscolha({ chave, armazenamento, conhecidas, padrao }) {
+  const validas = new Set(conhecidas);
+  const normalizar = (valor) => (typeof valor === 'string' && validas.has(valor) ? valor : padrao);
+
+  function ler() {
+    try {
+      return normalizar(JSON.parse(armazenamento?.getItem(chave) ?? 'null'));
+    } catch {
+      return padrao;
+    }
+  }
+
+  function salvar(valor) {
+    const proxima = normalizar(valor);
+    try {
+      armazenamento?.setItem(chave, JSON.stringify(proxima));
+    } catch {
+      /* fica só nesta página */
+    }
+    return proxima;
+  }
+
+  return { ler, salvar };
+}
 
 /* A VISÃO ESCOLHIDA (sólida, arame, raio X...) volta na próxima vez que a
    bancada abrir. Fica numa chave própria, e não junto da grade e do chão,
@@ -53,26 +82,15 @@ export function criarPreferenciaDeVisao({
   conhecidas = [],
   padrao = 'solida',
 } = {}) {
-  const validas = new Set(conhecidas);
-  const normalizar = (valor) => (typeof valor === 'string' && validas.has(valor) ? valor : padrao);
+  return criarPreferenciaDeEscolha({ chave: CHAVE_VISAO, armazenamento, conhecidas, padrao });
+}
 
-  function ler() {
-    try {
-      return normalizar(JSON.parse(armazenamento?.getItem(CHAVE_VISAO) ?? 'null'));
-    } catch {
-      return padrao;
-    }
-  }
-
-  function salvar(visao) {
-    const proxima = normalizar(visao);
-    try {
-      armazenamento?.setItem(CHAVE_VISAO, JSON.stringify(proxima));
-    } catch {
-      /* fica só nesta página */
-    }
-    return proxima;
-  }
-
-  return { ler, salvar };
+/* O TEMA ESCOLHIDO (Foco, Bancada ou Revisão) também volta entre sessões, pela
+   mesma regra: quem diz quais temas existem é `temas/temas.js`. */
+export function criarPreferenciaDeTema({
+  armazenamento = globalThis.localStorage,
+  conhecidos = [],
+  padrao = 'foco',
+} = {}) {
+  return criarPreferenciaDeEscolha({ chave: CHAVE_TEMA, armazenamento, conhecidas: conhecidos, padrao });
 }

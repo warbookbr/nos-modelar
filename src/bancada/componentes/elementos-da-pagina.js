@@ -13,6 +13,19 @@ export function lerElementosDaPagina(documento = globalThis.document) {
   return {
     canvas: id('cenaBancada'),
     corpo: documento.body,
+    tema: {
+      raiz: documento.documentElement,
+      escolha: id('escolhaTema'),
+      moveis: [...documento.querySelectorAll('[data-movel]')],
+      lugares: [...documento.querySelectorAll('[data-lugar]')],
+      rotulaveis: [...documento.querySelectorAll('[data-rotulo]')],
+    },
+    buscaDeComandos: {
+      caixa: id('buscaComandos'),
+      entrada: id('entradaBusca'),
+      resultados: id('resultadosBusca'),
+      gatilhos: [...documento.querySelectorAll('[data-abrir-busca]')],
+    },
     avisos: { aviso: id('aviso'), erro: id('erro') },
     barraSuperior: {
       /* A ordem é a dos botões na barra, e é a ordem em que as janelas fecham. */
@@ -43,6 +56,7 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       lista: id('listaPartes'),
       filtro: id('filtroPartes'),
       resumoFiltro: id('resumoFiltro'),
+      resumoSelecao: id('resumoSelecao'),
       fixtureAtual: id('fixtureAtual'),
       contagem: id('contagemPartes'),
       btnLimpar: id('btnLimpar'),
@@ -95,6 +109,41 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       btnDemonstracao: id('btnCarregarExemplo'),
       catalogoVazio: id('estadoCatalogoVazio'),
     },
+    paineisDoTema: {
+      paineis: {
+        partes: documento.querySelector('.painel[data-painel="partes"]'),
+        inspecao: documento.querySelector('.painel[data-painel="inspecao"]'),
+      },
+      abridores: [...documento.querySelectorAll('[data-abrir-painel]')],
+      fechadores: [...documento.querySelectorAll('[data-fechar-painel]')],
+    },
+    cartaoDaSelecao: {
+      cartao: id('cartaoSelecao'),
+      titulo: id('tituloCartao'),
+      medidasTexto: id('medidasCartao'),
+      botoes: Object.fromEntries([...documento.querySelectorAll('[data-cartao]')].map((botao) => [botao.dataset.cartao, botao])),
+      opacidade: id('opacidadeCartao'),
+      valorOpacidade: id('valorOpacidadeCartao'),
+    },
+    cuboDeOrientacao: { corpo: id('corpoCubo') },
+    barraDeEdicao: {
+      barra: id('barraEdicao'),
+      btnJuntas: id('btnModoJuntas'),
+      btnMalha: id('btnModoMalha'),
+      btnDesfazer: id('btnDesfazerEdicao'),
+      btnDescartar: id('btnDescartarEdicao'),
+    },
+    barraDeEstado: {
+      barra: id('barraEstado'),
+      dica: id('dicaEstado'),
+      selecao: id('selecaoEstado'),
+      peca: id('pecaEstado'),
+      btnGrade: id('btnGradeEstado'),
+      btnChao: id('btnChaoEstado'),
+      btnAtalhos: id('btnAtalhosEstado'),
+    },
+    nomeDaPeca: { nome: id('nomePecaFoco'), sessao: id('estadoSessaoFoco') },
+    popoverDaCena: { botao: id('btnCena'), caixa: id('popoverCena') },
     referenciaMetrica: {
       eixos: id('eixosReferencia'),
       barra: id('barraReferencia'),

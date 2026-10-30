@@ -122,6 +122,12 @@ class ElementoFalso extends Ouvintes {
     if (nome === 'value') this.value = String(valor);
   }
 
+  removeAttribute(nome) {
+    this.atributos.delete(nome);
+    if (nome === 'hidden') this.hidden = false;
+    if (nome === 'disabled') this.disabled = false;
+  }
+
   getAttribute(nome) { return this.atributos.has(nome) ? this.atributos.get(nome) : null; }
   hasAttribute(nome) { return this.atributos.has(nome); }
 
@@ -155,6 +161,14 @@ class ElementoFalso extends Ouvintes {
   }
 
   appendChild(no) { this.append(no); return no; }
+
+  insertBefore(no, referencia) {
+    if (!referencia) return this.appendChild(no);
+    no.parentNode?.childNodes?.splice(no.parentNode.childNodes.indexOf(no), 1);
+    no.parentNode = this;
+    this.childNodes.splice(this.childNodes.indexOf(referencia), 0, no);
+    return no;
+  }
 
   replaceChildren(...nos) {
     for (const no of this.childNodes) no.parentNode = null;
@@ -207,11 +221,14 @@ export function criarPagina(marcacao = '') {
   const documento = {
     activeElement: null,
     createElement: (etiqueta) => new ElementoFalso(documento, etiqueta),
+    createComment: (texto) => ({ nodeType: 8, textContent: '', dado: texto, parentNode: null }),
     getElementById: (id) => [...documento.body.descendentes()].find((el) => el.id === id) ?? null,
     querySelector: (seletor) => documento.body.querySelector(seletor),
     querySelectorAll: (seletor) => documento.body.querySelectorAll(seletor),
   };
+  documento.documentElement = new ElementoFalso(documento, 'html');
   documento.body = new ElementoFalso(documento, 'body');
+  documento.documentElement.append(documento.body);
   documento.body.innerHTML = marcacao;
 
   const porEtiqueta = (etiqueta) => ({ [Symbol.hasInstance]: (valor) => valor?.tagName === etiqueta });

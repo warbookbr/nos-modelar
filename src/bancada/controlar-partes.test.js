@@ -46,6 +46,45 @@ describe('controlador de partes', () => {
   });
 });
 
+describe('ocultar pela árvore e a tinta da seleção', () => {
+  function montar() {
+    const raiz = new THREE.Group();
+    const partes = new Map(['a', 'b'].map((nome) => {
+      const grupo = new THREE.Group();
+      grupo.userData.identidadeParte = nome;
+      grupo.add(new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ color: '#4a4d52' })));
+      raiz.add(grupo);
+      return [nome, grupo];
+    }));
+    return { partes, controlador: criarControladorPartes({ raiz, partes }) };
+  }
+
+  it('esconde as partes ocultas em qualquer modo, ignora nome que não é parte, e as mostra de volta', () => {
+    const { partes, controlador } = montar();
+    expect(controlador.definirOcultas(['b', 'nenhuma'])).toEqual(['b']);
+    expect([partes.get('a').visible, partes.get('b').visible]).toEqual([true, false]);
+    controlador.selecionar('b');
+    controlador.definirModo('isolar');
+    expect(partes.get('b').visible).toBe(false);
+    expect(controlador.gruposSelecionadosVisiveis()).toEqual([]);
+    controlador.definirOcultas([]);
+    expect(partes.get('b').visible).toBe(true);
+    expect(controlador.estado()).not.toHaveProperty('ocultas');
+  });
+
+  it('sem a tinta, a seleção não tinge, e o contorno fica com o tema', () => {
+    const { partes, controlador } = montar();
+    const material = partes.get('a').children[0].material;
+    controlador.selecionar('a');
+    expect(material.emissive.getHex()).not.toBe(0);
+    controlador.definirTintaDaSelecao(false);
+    expect(material.emissive.getHex()).toBe(0);
+    expect(`#${material.color.getHexString()}`).toBe('#4a4d52');
+    controlador.definirTintaDaSelecao(true);
+    expect(material.emissive.getHex()).not.toBe(0);
+  });
+});
+
 describe('arame opaco', () => {
   it('liga linhas por cima do sólido, sem deixar o material transparente, e desliga limpo', () => {
     const raiz = new THREE.Group();

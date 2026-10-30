@@ -65,7 +65,7 @@ export function criarEstadoCentral(inicial = {}) {
  * As chaves do estado da bancada e o valor de cada uma na subida da página. `null` quer dizer "ainda não escrito": o
  * painel que lê a chave não desenha nada até a primeira escrita, e a página fica como o HTML a trouxe.
  */
-export function estadoInicialDaBancada({ pecaPedida = null, visao }) {
+export function estadoInicialDaBancada({ pecaPedida = null, visao, tema = 'foco' }) {
   return {
     /* verdadeiro até a câmera ser restaurada da URL; enquanto isso a URL não é reescrita */
     inicializando: true,
@@ -87,10 +87,18 @@ export function estadoInicialDaBancada({ pecaPedida = null, visao }) {
     diagnostico: null,
     portas: null,
     visao,
+    /* o tema da tela (`temas/temas.js`), que só decide a aparência e onde cada componente fica */
+    tema,
     menuVisoesAberto: false,
     preferenciasCena: null,
     atalhos: null,
     juntas: { modo: false, quantas: 0, mudou: false, rodapeVisivel: false },
+    /* a camada de edição de malha ligada (Tab), que a barra do modo de edição mostra */
+    malhaEmEdicao: false,
+    /* as partes escondidas uma a uma pela árvore */
+    ocultas: [],
+    /* os painéis do tema que estão abertos, por nome (`partes`, `inspecao`) */
+    paineis: {},
     ofertaDaSessao: null,
     anotacoes: null,
   };

@@ -1,0 +1,89 @@
+/* sistema-visual.css — as definições do sistema visual da bancada: espaço, texto, cor e forma, num lugar só.
+ *
+ * A folha de estilo da bancada (`styles.css`) não escreve cor, tamanho de fonte nem espaçamento: ela usa estas variáveis,
+ * e `src/bancada/estilo/sistema-visual.test.js` reprova o que escapar delas. Há dois conjuntos com os mesmos nomes, o
+ * claro (dos temas Foco e Revisão, tirado da proposta B) e o escuro (do tema Bancada, tirado da proposta A); o tema em
+ * vigor escolhe o conjunto pelo atributo `data-cores` da raiz da página (`src/bancada/temas/temas.js`). Sem o atributo
+ * vale o escuro, que é o mais perto da bancada de antes dos temas.
+ *
+ * Espaço numa grade de 4 e 8 pixels, mais o meio passo de 2 para o vão entre botões colados. Texto numa família só, com
+ * três tamanhos, e os números em algarismos de largura fixa (`--numeros`). Cor em cinzas neutros e um destaque; `--erro`
+ * e `--ok` só para o estado de uma mensagem. */
+
+:root,
+:root[data-cores="escuro"] {
+  color-scheme: dark;
+  --e-meio: 2px;
+  --e1: 4px;
+  --e2: 8px;
+  --e3: 12px;
+  --e4: 16px;
+  --e6: 24px;
+  --e8: 32px;
+  --e10: 40px;
+  --e12: 48px;
+
+  --fonte: "IBM Plex Sans", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fonte-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --numeros: var(--fonte-mono);
+  --t-p: 11px;
+  --t-m: 12px;
+  --t-g: 14px;
+
+  --cena: #1d2024;
+  --cena-2: #30353b;
+  --superficie: #1a1d21;
+  --superficie-2: #22262b;
+  --base: #141619;
+  --linha: #2e3338;
+  --linha-forte: #41474e;
+  --texto: #e3e5e8;
+  --texto-2: #a3a9b0;
+  --texto-3: #6c737b;
+  --destaque: #f08a24;
+  --destaque-fraco: rgba(240, 138, 36, 0.14);
+  --sobre-destaque: #141619;
+  --erro: #f07a6a;
+  --ok: #7fc79a;
+  --veu: rgba(20, 22, 25, 0.6);
+  --sombra: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --sombra-forte: 0 12px 32px rgba(0, 0, 0, 0.45);
+
+  --raio: 2px;
+  --raio-p: 2px;
+  --traco: 1px solid var(--linha);
+  --controle: 24px;
+}
+
+:root[data-cores="claro"] {
+  color-scheme: light;
+  --fonte: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fonte-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --numeros: var(--fonte);
+  --t-p: 12px;
+  --t-m: 13px;
+  --t-g: 15px;
+
+  --cena: #f2f4f3;
+  --cena-2: #e6eae8;
+  --superficie: #ffffff;
+  --superficie-2: #f6f7f6;
+  --base: #f2f4f3;
+  --linha: #dde1df;
+  --linha-forte: #c3c9c6;
+  --texto: #1c2220;
+  --texto-2: #5f6864;
+  --texto-3: #9aa29e;
+  --destaque: #c2531b;
+  --destaque-fraco: #f7e9e1;
+  --sobre-destaque: #ffffff;
+  --erro: #b42318;
+  --ok: #2f7a4d;
+  --veu: rgba(242, 244, 243, 0.6);
+  --sombra: 0 1px 2px rgba(28, 34, 32, 0.06);
+  --sombra-forte: 0 12px 32px rgba(28, 34, 32, 0.14);
+
+  --raio: 6px;
+  --raio-p: 4px;
+  --controle: 32px;
+}

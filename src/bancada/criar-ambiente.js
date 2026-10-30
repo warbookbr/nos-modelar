@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VISTAS_BANCADA } from './estado-bancada.js';
 import { caixaDoVisivel } from './caixa-do-visivel.js';
+import { criarCenarioDoTema } from './cena/cenario-do-tema.js';
+import { criarContornoDaSelecao } from './cena/contorno-da-selecao.js';
 
 export { caixaDoVisivel };
 
@@ -148,6 +150,17 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   recorte.position.set(-2.5, 5.8, -5);
   scene.add(recorte);
 
+  /* O CENÁRIO DO TEMA: a grade que some nas bordas, a sombra suave no chão e o
+     contorno da seleção (`cena/cenario-do-tema.js`, `cena/contorno-da-selecao.js`).
+     Os objetos nascem invisíveis e só aparecem quando o tema em vigor os pede;
+     sem tema que os peça, e sempre na auditoria, a cena é a de antes. */
+  const cenario = criarCenarioDoTema();
+  scene.add(cenario.sombra);
+  scene.add(cenario.grade);
+  const contorno = criarContornoDaSelecao(renderer);
+  let cenaDoTema = null;
+  let contornoDoTema = null;
+
   const perspectiva = new THREE.PerspectiveCamera(38, 1, 0.025, 100);
   const ortografica = new THREE.OrthographicCamera(-3, 3, 3, -3, 0.025, 100);
   let camera = perspectiva;
@@ -189,10 +202,15 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   function aplicarVisibilidadeDoCenario() {
     const podeExibir = !auditoria && vistaAtual !== 'inferior' && explosaoAtual < 0.4;
     const fatorExplosao = Math.max(0, 1 - explosaoAtual * 2.5);
+    const esmaecida = Boolean(cenaDoTema?.gradeEsmaecida);
     piso.visible = Boolean(preferenciasCena.chao && podeExibir);
-    grade.visible = Boolean(preferenciasCena.grade && podeExibir);
+    grade.visible = Boolean(preferenciasCena.grade && podeExibir && !esmaecida);
     piso.material.opacity = fatorExplosao;
     grade.material.opacity = 0.34 * fatorExplosao;
+    cenario.grade.visible = Boolean(preferenciasCena.grade && podeExibir && esmaecida);
+    /* Com o chão ligado é ele que recebe a sombra, e o plano da sombra sairia por cima dele. */
+    cenario.sombra.visible = Boolean(cenaDoTema?.sombraSuave && podeExibir && !preferenciasCena.chao);
+    cenario.pintar({ corDaGrade: cenaDoTema?.grade, fatorExplosao });
   }
 
   function ajustarOrtografica() {
@@ -366,8 +384,18 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     renderer.shadowMap.enabled = !auditoria;
     principal.castShadow = !auditoria;
     aplicarVisibilidadeDoCenario();
-    scene.background = new THREE.Color(auditoria ? '#f2f4f3' : COR_FUNDO);
+    scene.background = new THREE.Color(auditoria ? '#f2f4f3' : (cenaDoTema?.fundo ?? COR_FUNDO));
     return auditoria;
+  }
+
+  /* A cena que o tema pede: o fundo, a grade esmaecida e a sombra suave, com as
+     cores já lidas das variáveis do sistema visual. `null` volta à cena de antes.
+     A auditoria continua mandando no fundo enquanto está ligada. */
+  function definirCenaDoTema(cena) {
+    cenaDoTema = cena ?? null;
+    if (!auditoria) scene.background = new THREE.Color(cenaDoTema?.fundo ?? COR_FUNDO);
+    principal.shadow.radius = cenaDoTema?.sombraSuave ? 5 : 1;
+    aplicarVisibilidadeDoCenario();
   }
 
   function redimensionar() {
@@ -542,6 +570,9 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     }
     controls.update();
     renderer.render(scene, camera);
+    if (contornoDoTema && !auditoria) {
+      contorno.desenhar({ scene, camera, grupos: contornoDoTema.grupos(), cor: contornoDoTema.cor });
+    }
     requestAnimationFrame(quadro);
   }
   requestAnimationFrame(quadro);
@@ -576,6 +607,9 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     },
     preferenciasCena: () => ({ ...preferenciasCena }),
     definirAuditoria,
+    definirCenaDoTema,
+    /** O contorno da seleção por cima do quadro: `{ cor, grupos }`, com `grupos()` lido a cada quadro, ou `null`. */
+    definirContorno(pedido) { contornoDoTema = pedido ?? null; },
     redimensionar,
     get auditoria() { return auditoria; },
     definirObjeto(objeto) {
@@ -586,6 +620,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       ativo = false;
       observador.disconnect();
       controls.dispose();
+      contorno.destruir();
       renderer.dispose();
     },
   };

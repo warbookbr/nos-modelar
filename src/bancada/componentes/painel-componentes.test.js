@@ -1,4 +1,4 @@
-/* painel-componentes.test.js — a lista das partes nasce do estado, marca a seleção, filtra, e o painel recolhe com a seta certa. */
+/* painel-componentes.test.js — a árvore das partes nasce do estado, sem contagem interna, marca a seleção, isola e oculta por linha, filtra, e o painel recolhe com a seta certa. */
 import { describe, expect, it, vi } from 'vitest';
 import { criarEstadoCentral, estadoInicialDaBancada } from '../estado/estado-central.js';
 import { criarPagina } from './dom-de-teste.js';
@@ -9,7 +9,8 @@ const MARCACAO = `
   <aside class="painel painel-partes" data-painel="partes">
     <button class="recolher" type="button" data-recolher="partes" aria-expanded="true"><span aria-hidden="true">‹</span></button>
     <input id="filtroPartes" type="search" />
-    <span id="resumoFiltro">0 componentes</span>
+    <span id="resumoFiltro">0 partes</span>
+    <span id="resumoSelecao"></span>
     <strong id="fixtureAtual">Aguardando modelo…</strong>
     <div id="listaPartes"></div>
     <button id="btnLimpar" type="button">Limpar</button>
@@ -18,7 +19,7 @@ const MARCACAO = `
 function montar() {
   const pagina = criarPagina(MARCACAO);
   const estado = criarEstadoCentral(estadoInicialDaBancada({ visao: 'solida' }));
-  const acoes = { selecionar: vi.fn(), limpar: vi.fn(), aoRecolher: vi.fn() };
+  const acoes = { selecionar: vi.fn(), limpar: vi.fn(), isolar: vi.fn(), alternarOculta: vi.fn(), aoRecolher: vi.fn() };
   montarPainelComponentes({
     elementos: lerElementosDaPagina(pagina.documento).painelComponentes, estado, janela: pagina.janela, ...acoes,
   });
@@ -31,15 +32,33 @@ const PARTES = [
 ];
 
 describe('painel de componentes', () => {
-  it('desenha uma linha por parte, com o nome formatado, o pai e as faces, sem marca', () => {
+  it('desenha uma linha por parte, com o nome formatado e o pai, sem as faces e sem marca', () => {
     const { $, estado } = montar();
     estado.definir({ partes: PARTES });
     const linhas = $('listaPartes').querySelectorAll('.parte-linha');
     expect(linhas.map((l) => l.dataset.parte)).toEqual(['caixaRodaFrente', 'aroFrenteDir']);
-    expect(linhas[1].querySelector('.nome').textContent).toBe('Aro Frente Dir de Roda Frente Dir');
-    expect(linhas[1].querySelector('.faces').textContent).toBe('120F');
-    expect(linhas.every((l) => l.getAttribute('aria-pressed') === 'false')).toBe(true);
-    expect($('resumoFiltro').textContent).toBe('2 componentes');
+    expect(linhas[1].querySelector('.parte-nome').textContent).toBe('Aro Frente Dir de Roda Frente Dir');
+    expect(linhas[1].textContent).not.toMatch(/120/);
+    expect(linhas.map((l) => l.querySelectorAll('.acao-linha').map((b) => b.dataset.acao))).toEqual([['isolar', 'ocultar'], ['isolar', 'ocultar']]);
+    expect(linhas.every((l) => l.querySelector('.parte-nome').getAttribute('aria-pressed') === 'false')).toBe(true);
+    expect($('resumoFiltro').textContent).toBe('2 partes');
+  });
+
+  it('isola e oculta pela linha, e marca a linha oculta e a isolada', () => {
+    const { $, estado, acoes } = montar();
+    estado.definir({ partes: PARTES });
+    const [primeira, segunda] = $('listaPartes').querySelectorAll('.parte-linha');
+    primeira.querySelector('[data-acao="isolar"]').click();
+    segunda.querySelector('[data-acao="ocultar"]').click();
+    expect(acoes.isolar).toHaveBeenCalledWith('caixaRodaFrente');
+    expect(acoes.alternarOculta).toHaveBeenCalledWith('aroFrenteDir');
+    expect(acoes.selecionar).not.toHaveBeenCalled();
+    estado.definir({ selecao: { selecionadas: ['caixaRodaFrente'], modo: 'isolar' }, ocultas: ['aroFrenteDir'] });
+    expect(primeira.querySelector('[data-acao="isolar"]').getAttribute('aria-pressed')).toBe('true');
+    expect(segunda.classList.contains('oculta')).toBe(true);
+    expect(segunda.querySelector('[data-acao="ocultar"]').getAttribute('aria-pressed')).toBe('true');
+    expect(segunda.querySelector('[data-acao="ocultar"]').title).toBe('Mostrar');
+    expect($('resumoSelecao').textContent).toBe('1 selecionada');
   });
 
   it('marca a seleção que o estado traz e manda o clique para a peça', () => {
@@ -48,10 +67,9 @@ describe('painel de componentes', () => {
     estado.definir({ selecao: { selecionadas: ['aroFrenteDir'] } });
     const [primeira, segunda] = $('listaPartes').querySelectorAll('.parte-linha');
     expect(segunda.classList.contains('ativa')).toBe(true);
-    expect(segunda.getAttribute('aria-pressed')).toBe('true');
-    expect(segunda.querySelector('.check').textContent).toBe('✓');
-    expect(primeira.querySelector('.check').textContent).toBe('');
-    primeira.click();
+    expect(segunda.querySelector('.parte-nome').getAttribute('aria-pressed')).toBe('true');
+    expect(primeira.querySelector('.parte-nome').getAttribute('aria-pressed')).toBe('false');
+    primeira.querySelector('.parte-nome').click();
     expect(acoes.selecionar).toHaveBeenCalledWith('caixaRodaFrente');
     $('btnLimpar').click();
     expect(acoes.limpar).toHaveBeenCalled();
@@ -63,10 +81,10 @@ describe('painel de componentes', () => {
     $('filtroPartes').value = 'caixa';
     $('filtroPartes').dispatchEvent({ type: 'input' });
     expect($('listaPartes').querySelectorAll('.parte-linha').map((l) => l.hidden)).toEqual([false, true]);
-    expect($('resumoFiltro').textContent).toBe('1 de 2 componentes');
+    expect($('resumoFiltro').textContent).toBe('1 de 2 partes');
     estado.definir({ partes: [...PARTES] });
     expect($('filtroPartes').value).toBe('');
-    expect($('resumoFiltro').textContent).toBe('2 componentes');
+    expect($('resumoFiltro').textContent).toBe('2 partes');
   });
 
   it('escreve o nome da peça e só escreve a espera quando a sessão não trouxe peça', () => {

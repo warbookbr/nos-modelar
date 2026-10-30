@@ -137,6 +137,18 @@ exemplo `npm run ativar:bancada -- furgao` (o nome é o da pasta da peça em
 com a peça. O procedimento completo está em
 [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](modelar/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md).
 
+A bancada abre no tema Foco: a peça ocupa a tela inteira, e os controles ficam
+em grupos flutuantes no alto. À esquerda estão a árvore das partes, o nome da
+peça, Abrir e Editar; no meio, a projeção, a visão, o enquadrar e a caixa da
+cena com a grade, o chão e a explosão; à direita, a busca de comandos e as
+janelas. `Ctrl+K` abre a busca, que acha qualquer comando, visão ou parte pelo
+nome. Clicar numa parte mostra ao lado dela um cartão com as medidas e as
+ações, e "Detalhes" abre o painel da direita. O cubo no canto gira com a
+câmera e leva à vista de cada face. Editar liga o modo de edição, com a barra
+de juntas e malha embaixo e a moldura laranja na tela. Os outros temas,
+Bancada (escura, com painéis fixos) e Revisão, ficam na busca de comandos e na
+janela Controles, e a escolha volta na próxima vez que a página abre.
+
 ## Onde estão as regras
 
 As regras que valem para todo trabalho estão no

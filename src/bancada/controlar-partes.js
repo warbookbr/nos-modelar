@@ -220,6 +220,13 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
   let auditoria = false;
   let wireframeSelecao = false;
   let opacidadeSelecao = 1;
+  /* As partes que a pessoa escondeu uma a uma pela árvore. Ficam fora da cena em
+     qualquer modo, e a seleção, o isolar e o fantasma valem para as outras. */
+  let ocultas = new Set();
+  /* A tinta verde da seleção. O tema que marca a seleção pelo contorno na borda
+     da peça a desliga, porque as duas marcas juntas tingiriam o que o contorno
+     já diz. */
+  let tintaDaSelecao = true;
   const permitidos = new Set(nomes);
   /* A seleção entende a árvore declarada, mas os grupos Three continuam irmãos.
      Isso impede que escolher uma subárvore mude transformações, explosão ou a
@@ -278,14 +285,14 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
     for (const nome of nomes) {
       const grupo = partes.get(nome);
       const visual = estados[nome];
-      grupo.visible = visual !== 'oculto';
+      grupo.visible = visual !== 'oculto' && !ocultas.has(nome);
       const selecionada = selecionadas.includes(nome);
       const arameDaParte = arameDe(selecionada);
       sincronizarArame(grupo, arameDaParte && arameDaParte !== 'raio-x');
       const cor = coresPorParte ? corDeAuditoria(nomes.indexOf(nome)) : null;
       const apresentacaoSelecao = selecionada ? { opacidade: opacidadeSelecao } : null;
       for (const material of materiaisDoGrupo(grupo)) {
-        aplicarEstadoMaterial(material, visual, cor, arameDaParte, apresentacaoSelecao, auditoria);
+        aplicarEstadoMaterial(material, visual, cor, arameDaParte, apresentacaoSelecao, auditoria || !tintaDaSelecao);
       }
     }
     aoMudar?.(estado());
@@ -388,6 +395,18 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       aplicarVisual();
       return auditoria;
     },
+    /** Esconde as partes de `nomes`, uma a uma, e mostra as outras; nome que não é parte é ignorado. */
+    get ocultas() { return [...ocultas]; },
+    definirOcultas(nomesOcultos) {
+      ocultas = new Set((nomesOcultos ?? []).filter((nome) => permitidos.has(nome)));
+      aplicarVisual();
+      return [...ocultas];
+    },
+    definirTintaDaSelecao(ligada) {
+      tintaDaSelecao = Boolean(ligada);
+      aplicarVisual();
+      return tintaDaSelecao;
+    },
     definirArame(ligado) {
       arame = ligado === 'raio-x' ? 'raio-x' : Boolean(ligado);
       aplicarVisual();
@@ -424,6 +443,10 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
     },
     gruposVisiveis() {
       return nomes.map((nome) => partes.get(nome)).filter((grupo) => grupo?.visible);
+    },
+    /** As partes selecionadas que estão à vista: é delas que sai o contorno da seleção. */
+    gruposSelecionadosVisiveis() {
+      return selecionadas.map((nome) => partes.get(nome)).filter((grupo) => grupo?.visible);
     },
     estado,
     /* Reaplica a seleção, o fantasma e o arame em vigor nos materiais que as

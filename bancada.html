@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- bancada.html — estúdio de inspeção multivista para autoria e validação de montagens. -->
-<html lang="pt-BR">
+<html lang="pt-BR" data-tema="foco" data-cores="claro" data-arrumacao="foco">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -8,26 +8,172 @@
       name="description"
       content="Bancada Modelar para inspecionar peças, montagens e identidades semânticas."
     />
-    <meta name="theme-color" content="#111815" />
+    <meta name="theme-color" content="#f2f4f3" />
     <title>Bancada de inspeção — Modelar</title>
   </head>
   <body>
+    <!-- Os ícones da bancada, um traço fino da cor do texto. Cada um é usado por <use href="#i-…">. -->
+    <svg class="sprite-icones" width="0" height="0" aria-hidden="true">
+      <defs>
+        <symbol id="i-gaveta" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5" /><path d="M9.5 4.5v15M6 8h1.5M6 11h1.5" /></symbol>
+        <symbol id="i-painel" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5" /><path d="M14.5 4.5v15M17 8h1M17 11h1" /></symbol>
+        <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" /><path d="M15.5 15.5 20 20" /></symbol>
+        <symbol id="i-abrir" viewBox="0 0 24 24"><path d="M3.5 7.5v10a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-8l-2-2.5h-5a1 1 0 0 0-1 1z" /></symbol>
+        <symbol id="i-editar" viewBox="0 0 24 24"><path d="M4.5 19.5 5.5 15 15.5 5a1.8 1.8 0 0 1 2.5 0l1 1a1.8 1.8 0 0 1 0 2.5l-10 10z" /><path d="M13.5 7l3.5 3.5" /></symbol>
+        <symbol id="i-teclado" viewBox="0 0 24 24"><rect x="3" y="6.5" width="18" height="11" rx="1.5" /><path d="M6.5 10h1M10 10h1M13.5 10h1M17 10h.5M7.5 14h9" /></symbol>
+        <symbol id="i-estado" viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6" /></symbol>
+        <symbol id="i-perspectiva" viewBox="0 0 24 24"><path d="M4 6.5 20 4v16L4 17.5z" /><path d="M4 12h16" opacity=".5" /></symbol>
+        <symbol id="i-visao" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M8.5 18.5a8 8 0 0 0 10-10" /></symbol>
+        <symbol id="i-enquadrar" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /><rect x="9" y="9" width="6" height="6" rx=".5" /></symbol>
+        <symbol id="i-cena" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" /><circle cx="15" cy="7" r="2" /><circle cx="9" cy="17" r="2" /></symbol>
+        <symbol id="i-olho" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" /><circle cx="12" cy="12" r="2.8" /></symbol>
+        <symbol id="i-olho-fechado" viewBox="0 0 24 24"><path d="M3.5 9.5C6 13 9 14.5 12 14.5s6-1.5 8.5-5" /><path d="M6 12.8 4.5 15M12 14.5V17M18 12.8l1.5 2.2" /></symbol>
+        <symbol id="i-isolar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke-dasharray="2 2.6" /><circle cx="12" cy="12" r="3.5" /></symbol>
+        <symbol id="i-fantasma" viewBox="0 0 24 24"><rect x="4" y="4" width="11" height="11" rx="1" stroke-dasharray="2 2" /><rect x="9" y="9" width="11" height="11" rx="1" /></symbol>
+        <symbol id="i-focar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" /><path d="M12 3v3M12 18v3M3 12h3M18 12h3" /><circle cx="12" cy="12" r="1" /></symbol>
+        <symbol id="i-arame" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><ellipse cx="12" cy="12" rx="3.5" ry="8" /><path d="M4 12h16M5.5 8h13M5.5 16h13" /></symbol>
+        <symbol id="i-conjunto" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1" /><rect x="13" y="13" width="7" height="7" rx="1" /><path d="M7.5 11v5.5H13" /></symbol>
+        <symbol id="i-juntas" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2" /><path d="M12 10V4M10.3 13 5 17M13.7 13 19 17" /></symbol>
+        <symbol id="i-malha" viewBox="0 0 24 24"><path d="M12 4 20 19H4z" /><path d="M8 11.5h8M12 4v15" /></symbol>
+        <symbol id="i-desfazer" viewBox="0 0 24 24"><path d="M9 7 5 11l4 4" /><path d="M5 11h9a5 5 0 0 1 0 10h-2" /></symbol>
+        <symbol id="i-fechar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></symbol>
+        <symbol id="i-seta" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" /></symbol>
+        <symbol id="i-casa" viewBox="0 0 24 24"><path d="M4.5 11 12 4.5l7.5 6.5M6.5 9.5v9h11v-9" /></symbol>
+        <symbol id="i-grade" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M9 4v16M15 4v16" /></symbol>
+        <symbol id="i-chao" viewBox="0 0 24 24"><path d="M3 17h18M6 13.5h12M9 10h6" /></symbol>
+      </defs>
+    </svg>
     <div id="bancadaApp">
       <canvas id="cenaBancada" aria-label="Bancada tridimensional de inspeção"></canvas>
       <section id="estadoCatalogoVazio" class="estado-catalogo-vazio" hidden>
         <span class="rotulo">SESSÃO ATIVA</span>
         <h1>Bancada de Co-Modelagem</h1>
         <p>Aguardando envio do modelo pela IA ou carregamento de arquivo de sessão.</p>
-        <div style="margin-top: 14px;">
+        <div>
           <button id="btnCarregarExemplo" class="botao primaria" type="button">Carregar Modelo de Demonstração</button>
         </div>
       </section>
 
       <div class="barra-controles">
-        <button id="btnMenuAbrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Abrir</button>
-        <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
-        <button id="btnMenuEstado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Estado<span id="selo-estado" class="selo-estado" hidden></span></button>
+        <button id="btnMenuAbrir" data-movel="abrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false"><svg class="icone" aria-hidden="true"><use href="#i-abrir"></use></svg><span class="texto-botao">Abrir</span></button>
+        <button id="btnMenuAtalhos" data-movel="controles" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false" title="Controles e atalhos"><svg class="icone" aria-hidden="true"><use href="#i-teclado"></use></svg><span class="texto-botao">Controles</span></button>
+        <button id="btnMenuEstado" data-movel="estado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false" title="Estado da sessão e eventos"><svg class="icone" aria-hidden="true"><use href="#i-estado"></use></svg><span class="texto-botao">Estado</span><span id="selo-estado" class="selo-estado" hidden></span></button>
       </div>
+
+      <!-- O ALTO DO FOCO: três grupos flutuantes. À esquerda a peça (a árvore das
+           partes, o nome, a sessão, abrir e editar); no meio a barra única da cena
+           (projeção, visão, enquadrar e a cena); à direita a busca de comandos e as
+           janelas. Os controles que já existem na arrumação clássica vêm para cá
+           pelos lugares do tema (`data-lugar`), e não são repetidos. -->
+      <header class="topo-foco" data-arrumacoes="foco">
+        <div class="grupo-flutuante grupo-peca">
+          <button class="botao-icone" type="button" data-abrir-painel="partes" aria-expanded="false" title="Partes">
+            <svg class="icone" aria-hidden="true"><use href="#i-gaveta"></use></svg><span class="sr">Partes</span>
+          </button>
+          <div class="nome-peca">
+            <b id="nomePecaFoco">Aguardando peça…</b>
+            <span id="estadoSessaoFoco" class="estado-sessao"><i aria-hidden="true"></i><span>Sessão local</span></span>
+          </div>
+          <span class="divisor" aria-hidden="true"></span>
+          <div class="lugar" data-lugar="topo-peca"></div>
+        </div>
+        <div class="grupo-flutuante barra-cena">
+          <div class="lugar" data-lugar="barra-cena"></div>
+          <span class="divisor" aria-hidden="true"></span>
+          <div class="popover-ancora">
+            <button id="btnCena" class="botao-icone" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="popoverCena" title="Cena: grade, chão e explosão">
+              <svg class="icone" aria-hidden="true"><use href="#i-cena"></use></svg><span class="sr">Cena</span>
+            </button>
+            <div id="popoverCena" class="popover" role="dialog" aria-label="Cena" hidden>
+              <div class="lugar" data-lugar="popover-cena"></div>
+            </div>
+          </div>
+        </div>
+        <div class="grupo-flutuante grupo-direita">
+          <button class="busca-gatilho" type="button" data-abrir-busca aria-haspopup="dialog" aria-expanded="false" aria-controls="buscaComandos">
+            <svg class="icone" aria-hidden="true"><use href="#i-busca"></use></svg><span class="texto-largo">Buscar comando</span><kbd>Ctrl K</kbd>
+          </button>
+          <div class="lugar" data-lugar="topo-direita"></div>
+          <button class="botao-icone" type="button" data-abrir-painel="inspecao" aria-expanded="false" title="Detalhes da seleção">
+            <svg class="icone" aria-hidden="true"><use href="#i-painel"></use></svg><span class="sr">Detalhes</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- O cubo de orientação gira com a câmera e cada face leva à vista dela; as
+           faces têm `data-vista`, então a barra das vistas as liga como liga os
+           botões da fileira. -->
+      <div class="cubo-orientacao" data-arrumacoes="foco">
+        <div class="palco-cubo">
+          <div id="corpoCubo" class="corpo-cubo">
+            <button type="button" class="face-cubo face-frente" data-vista="frontal" title="Frente (1)">Frente</button>
+            <button type="button" class="face-cubo face-tras" data-vista="traseira" title="Trás (⇧1)">Trás</button>
+            <button type="button" class="face-cubo face-direita" data-vista="direita" title="Direita (3)">Dir.</button>
+            <button type="button" class="face-cubo face-esquerda" data-vista="esquerda" title="Esquerda (⇧3)">Esq.</button>
+            <button type="button" class="face-cubo face-cima" data-vista="superior" title="Cima (7)">Cima</button>
+            <button type="button" class="face-cubo face-baixo" data-vista="inferior" title="Baixo (⇧7)">Baixo</button>
+          </div>
+        </div>
+        <button type="button" class="botao-iso" data-vista="isometrica" title="Isométrica (0)">
+          <svg class="icone" aria-hidden="true"><use href="#i-casa"></use></svg><span>Iso</span>
+        </button>
+      </div>
+
+      <!-- O cartão da seleção fica perto da parte escolhida, com as medidas dela e
+           as ações de uma parte; "Detalhes" abre o painel da direita. -->
+      <section id="cartaoSelecao" class="cartao-selecao" data-arrumacoes="foco" aria-labelledby="tituloCartao" hidden>
+        <header class="cabeca-cartao">
+          <div>
+            <h2 id="tituloCartao"></h2>
+            <p id="medidasCartao" class="medidas-cartao num"></p>
+          </div>
+          <button class="botao-icone pequeno" type="button" data-cartao="fechar" title="Limpar seleção (Esc)">
+            <svg class="icone" aria-hidden="true"><use href="#i-fechar"></use></svg><span class="sr">Limpar seleção</span>
+          </button>
+        </header>
+        <div class="acoes-cartao">
+          <button type="button" data-cartao="focar"><svg class="icone" aria-hidden="true"><use href="#i-focar"></use></svg>Focar</button>
+          <button type="button" data-cartao="isolar" aria-pressed="false"><svg class="icone" aria-hidden="true"><use href="#i-isolar"></use></svg>Isolar</button>
+          <button type="button" data-cartao="fantasma" aria-pressed="false"><svg class="icone" aria-hidden="true"><use href="#i-fantasma"></use></svg>Fantasma</button>
+          <button type="button" data-cartao="arame" aria-pressed="false"><svg class="icone" aria-hidden="true"><use href="#i-arame"></use></svg>Arame</button>
+          <button type="button" data-cartao="ocultar"><svg class="icone" aria-hidden="true"><use href="#i-olho-fechado"></use></svg>Ocultar</button>
+        </div>
+        <label class="deslize-cartao">
+          <span>Opacidade</span>
+          <input id="opacidadeCartao" type="range" min="5" max="100" step="5" value="100" />
+          <output id="valorOpacidadeCartao" for="opacidadeCartao">100%</output>
+        </label>
+        <footer class="pe-cartao">
+          <button type="button" data-cartao="conjunto"><svg class="icone" aria-hidden="true"><use href="#i-conjunto"></use></svg>Selecionar conjunto</button>
+          <button type="button" data-cartao="detalhes">Detalhes<svg class="icone" aria-hidden="true"><use href="#i-seta"></use></svg></button>
+        </footer>
+      </section>
+
+      <!-- O MODO DE EDIÇÃO é explícito: a barra aparece com ele, escolhe juntas ou
+           malha, e leva o desfazer, o descartar e o rodapé do ajuste (o resumo e o
+           salvar), que o tema traz para cá. -->
+      <div id="barraEdicao" class="barra-edicao" data-arrumacoes="foco" hidden>
+        <div class="segmento" role="group" aria-label="O que editar">
+          <button id="btnModoJuntas" type="button" aria-pressed="false"><svg class="icone" aria-hidden="true"><use href="#i-juntas"></use></svg>Juntas</button>
+          <button id="btnModoMalha" type="button" aria-pressed="false" title="Tab"><svg class="icone" aria-hidden="true"><use href="#i-malha"></use></svg>Malha</button>
+        </div>
+        <button id="btnDesfazerEdicao" class="botao-icone" type="button" title="Desfazer (Ctrl Z)"><svg class="icone" aria-hidden="true"><use href="#i-desfazer"></use></svg><span class="sr">Desfazer</span></button>
+        <button id="btnDescartarEdicao" class="botao texto" type="button">Descartar</button>
+        <div class="lugar" data-lugar="barra-edicao"></div>
+      </div>
+
+      <!-- A barra de estado: a dica do que o ponteiro faz agora, a seleção, a escala
+           e a unidade, a peça, e os interruptores da grade e do chão. -->
+      <footer id="barraEstado" class="barra-estado" data-arrumacoes="foco">
+        <span id="dicaEstado" class="dica-estado"></span>
+        <span id="selecaoEstado" class="num"></span>
+        <div class="lugar" data-lugar="barra-estado"></div>
+        <span class="unidade-estado">Unidade <b class="num">m</b></span>
+        <span id="pecaEstado" class="num"></span>
+        <button id="btnGradeEstado" class="alternar" type="button" aria-pressed="true" title="Grade (H)"><svg class="icone" aria-hidden="true"><use href="#i-grade"></use></svg>Grade</button>
+        <button id="btnChaoEstado" class="alternar" type="button" aria-pressed="false" title="Chão"><svg class="icone" aria-hidden="true"><use href="#i-chao"></use></svg>Chão</button>
+        <button id="btnAtalhosEstado" class="alternar" type="button" title="Controles e atalhos"><svg class="icone" aria-hidden="true"><use href="#i-teclado"></use></svg>Atalhos</button>
+      </footer>
 
       <!-- Aviso de estado: aparece SÓ quando algo está ruim. Indicador que diz
            "está tudo bem" o tempo todo ocupa campo de visão permanente para não
@@ -39,7 +185,7 @@
            cena, e não dentro de uma aba, porque o modo vale para a peça inteira
            e some junto com ele. O que sai daqui é a peça como ficou, para a
            rodada de absorção reescrever a receita. -->
-      <footer class="rodape-juntas" id="rodapeJuntas" hidden>
+      <footer class="rodape-juntas" id="rodapeJuntas" data-movel="rodape-juntas" hidden>
         <span id="resumoJuntas">nenhuma junta movida</span>
         <button id="btnSalvarAjusteDeJunta" class="botao primaria" type="button" disabled>Salvar ajuste</button>
       </footer>
@@ -66,6 +212,8 @@
             <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
           </header>
           <div class="modal-corpo">
+            <h4 class="secao-modal">Tema</h4>
+            <div id="escolhaTema" class="escolha-tema" role="radiogroup" aria-label="Tema da bancada"></div>
             <p class="modal-descricao">Clique num comando para trocar a tecla.</p>
             <div id="listaAtalhos"></div>
             <h4 class="secao-modal">Ponteiro</h4>
@@ -91,15 +239,15 @@
         <button type="button" data-vista="superior"><span>Cima</span><kbd>7</kbd></button>
         <button type="button" data-vista="inferior"><span>Baixo</span><kbd>⇧7</kbd></button>
         <button type="button" data-vista="isometrica" class="ativa"><span>Iso</span><kbd>0</kbd></button>
-        <button id="btnProjecao" type="button"><span>Perspectiva</span><kbd>5</kbd></button>
-        <button id="btnEnquadrar" type="button" title="Enquadrar tudo"><span>Enquadrar</span><kbd>F</kbd></button>
+        <button id="btnProjecao" data-movel="projecao" type="button" title="Projeção (5)"><svg class="icone" aria-hidden="true"><use href="#i-perspectiva"></use></svg><span>Perspectiva</span><kbd>5</kbd></button>
+        <button id="btnEnquadrar" data-movel="enquadrar" type="button" title="Enquadrar tudo (F)"><svg class="icone" aria-hidden="true"><use href="#i-enquadrar"></use></svg><span>Enquadrar</span><kbd>F</kbd></button>
         <!-- A visão muda como a peça é desenhada, e não de onde ela é olhada, por
              isso é um controle só, ao fim da fileira, que abre a lista das visões
              com as teclas de cada uma. A lista sai do registro de visões
              (`src/bancada/visoes/registro-de-visoes.js`), e não daqui. -->
-        <div class="seletor-visao">
+        <div class="seletor-visao" data-movel="seletor-visao">
           <button id="btnVisao" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menuVisoes">
-            <span>Visão</span><b id="nomeVisao">Sólida</b><span class="seta" aria-hidden="true">▾</span>
+            <svg class="icone" aria-hidden="true"><use href="#i-visao"></use></svg><span class="rotulo-visao">Visão</span><b id="nomeVisao">Sólida</b><span class="seta" aria-hidden="true">▾</span>
           </button>
           <div id="menuVisoes" class="menu-visoes" role="menu" aria-label="Visão da peça" hidden></div>
         </div>
@@ -109,29 +257,38 @@
         <button class="recolher" type="button" data-recolher="partes" aria-expanded="true" title="Recolher Componentes"><span aria-hidden="true">‹</span><span class="sr">Componentes</span></button>
         <div class="painel-cabecalho">
           <div>
-            <h1 id="tituloPartes">Componentes</h1>
+            <h1 id="tituloPartes" data-rotulo="titulo-partes">Componentes</h1>
           </div>
+          <button class="botao-icone fechar-painel" type="button" data-fechar-painel="partes" title="Fechar">
+            <svg class="icone" aria-hidden="true"><use href="#i-fechar"></use></svg><span class="sr">Fechar</span>
+          </button>
         </div>
         <p class="dica">Marque uma ou mais peças. Shift, Ctrl ou ⌘ também adicionam pela cena.</p>
         <div class="partes-controles">
           <label class="campo-busca" for="filtroPartes">
-            <span aria-hidden="true">⌕</span>
-            <input id="filtroPartes" type="search" placeholder="Filtrar componentes" autocomplete="off" />
+            <svg class="icone" aria-hidden="true"><use href="#i-busca"></use></svg>
+            <input id="filtroPartes" type="search" placeholder="Filtrar partes" autocomplete="off" />
             <kbd>/</kbd>
           </label>
-          <span id="resumoFiltro" class="resumo-filtro" aria-live="polite">0 componentes</span>
+          <span class="resumo-lista"><span id="resumoFiltro" class="resumo-filtro" aria-live="polite">0 partes</span><span class="dica-lista">Shift soma à seleção</span></span>
           <span class="fixture-atual">de <strong id="fixtureAtual">Aguardando modelo…</strong></span>
         </div>
         <div id="listaPartes" class="lista-partes"></div>
-        <button id="btnLimpar" class="botao texto" type="button">Limpar seleção <kbd>Esc</kbd></button>
+        <footer class="pe-partes">
+          <span id="resumoSelecao" class="resumo-selecao">0 selecionadas</span>
+          <button id="btnLimpar" class="botao texto" type="button">Limpar <kbd>Esc</kbd></button>
+        </footer>
       </aside>
 
       <aside class="painel painel-inspecao" data-painel="inspecao" aria-labelledby="tituloInspecao">
         <button class="recolher" type="button" data-recolher="inspecao" aria-expanded="true" title="Recolher Inspeção"><span aria-hidden="true">›</span><span class="sr">Inspeção</span></button>
         <nav class="abas-painel" role="tablist">
-          <button type="button" class="aba-btn ativa" data-aba="inspecao" role="tab" aria-selected="true">Inspeção</button>
-          <button type="button" class="aba-btn" data-aba="referencias" role="tab" aria-selected="false">Imagem REF</button>
-          <button type="button" class="aba-btn" data-aba="anotacoes" role="tab" aria-selected="false">Anotações</button>
+          <button type="button" class="aba-btn ativa" data-aba="inspecao" role="tab" aria-selected="true"><span data-rotulo="aba-inspecao">Inspeção</span></button>
+          <button type="button" class="aba-btn" data-aba="referencias" role="tab" aria-selected="false"><span data-rotulo="aba-referencias">Imagem REF</span></button>
+          <button type="button" class="aba-btn" data-aba="anotacoes" role="tab" aria-selected="false"><span data-rotulo="aba-anotacoes">Anotações</span></button>
+          <button class="botao-icone fechar-painel" type="button" data-fechar-painel="inspecao" title="Fechar">
+            <svg class="icone" aria-hidden="true"><use href="#i-fechar"></use></svg><span class="sr">Fechar</span>
+          </button>
         </nav>
 
         <!-- ABA 1: INSPEÇÃO -->
@@ -141,7 +298,7 @@
           <!-- Grade e chão moravam num modal de Configurações com duas linhas
                dentro. Eles pertencem a quem está olhando a peça, que é esta
                aba; o modal virava um clique a mais para chegar a um interruptor. -->
-          <div class="linhas cena-preferencias">
+          <div class="linhas cena-preferencias" data-movel="preferencias-cena">
             <label class="linha"><span>Grade</span><input id="prefGrade" type="checkbox" checked /></label>
             <label class="linha"><span>Chão</span><input id="prefChao" type="checkbox" /></label>
           </div>
@@ -171,7 +328,7 @@
             <input id="opacidadeSelecao" type="range" min="5" max="100" value="100" step="5" disabled />
           </label>
 
-          <label class="controle-explosao" for="explosao">
+          <label class="controle-explosao" for="explosao" data-movel="explosao">
             <span>
               <b>Explosão da montagem</b>
               <output id="valorExplosao" for="explosao">0%</output>
@@ -193,8 +350,8 @@
                próprio para não se confundir com os botões de uma vez só. -->
           <div class="acoes-inspecao acoes-editar">
             <span class="rotulo">EDITAR A PEÇA</span>
-            <button id="btnJuntas" class="botao" type="button" aria-pressed="false"
-              title="Arrastar os cantos onde as partes se encontram">Juntas</button>
+            <button id="btnJuntas" data-movel="juntas" class="botao" type="button" aria-pressed="false"
+              title="Arrastar os cantos onde as partes se encontram"><span data-rotulo="juntas">Juntas</span></button>
           </div>
 
           <div id="diagnostico" class="diagnostico">
@@ -245,9 +402,23 @@
         </div>
       </div>
 
-      <div class="referencia-metrica" aria-label="Referência espacial da vista">
+      <div class="referencia-metrica" data-movel="regua-metrica" aria-label="Referência espacial da vista">
         <span id="eixosReferencia">Eixos X / Y / Z</span>
         <span class="regua-metrica"><i id="barraReferencia"></i><output id="valorReferencia">Escala</output></span>
+      </div>
+
+      <!-- A busca de comandos (Ctrl+K): as ações da tela, os comandos de teclado e as partes da peça num campo só. -->
+      <div id="buscaComandos" class="busca-comandos" role="dialog" aria-modal="true" aria-label="Buscar comando" hidden>
+        <div class="veu-busca" data-fechar-busca></div>
+        <div class="caixa-busca">
+          <label class="entrada-busca">
+            <svg class="icone" aria-hidden="true"><use href="#i-busca" /></svg>
+            <input id="entradaBusca" type="search" placeholder="Buscar comando ou parte" autocomplete="off" aria-controls="resultadosBusca" />
+            <kbd>Esc</kbd>
+          </label>
+          <div id="resultadosBusca" class="resultados-busca" role="listbox"></div>
+          <footer class="pe-busca"><span><kbd>↑</kbd><kbd>↓</kbd> escolher</span><span><kbd>Enter</kbd> executar</span><span>Partes e visões também aparecem na busca</span></footer>
+        </div>
       </div>
 
       <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
