@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1557 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1562 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1062,6 +1062,8 @@
 - `medidas-com-peso.test.mjs` — medidas-com-peso.test.mjs — a medida com peso da subdivisão (fatia 11 do plano de carroceria por subdivisão).
 - `memoria-de-pura.js` — memoria-de-pura.js — guarda o resultado das últimas chamadas de uma função pura, para a mesma chamada não ser refeita.
 - `memoria-de-pura.test.mjs` — memoria-de-pura.test.mjs — a memória das últimas chamadas de uma função pura devolve o que a função devolveria, sem refazer a conta.
+- `moldura-do-vao.js` — moldura-do-vao.js — a conferência geral da moldura em volta de um vão de uma chapa.
+- `moldura-do-vao.test.mjs` — moldura-do-vao.test.mjs — a conferência geral da moldura em volta de um vão, sobre faixas desenhadas à mão no plano.
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `operador-das-medidas.test.mjs` — operador-das-medidas.test.mjs — a gaiola ajustada pelas medidas vista como transformação linear da declarada.
@@ -1100,6 +1102,7 @@
 - `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
 - `gaiola-por-rede-prova.js` — gaiola-por-rede-prova.js — a chapa lateral desenhada por código para a prova da gaiola por rede de curvas
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
+- `moldura-prova.js` — moldura-prova.js — a chapa curva com vão de `friso-prova.js` e as molduras em volta da borda dele, desenhadas por código para a conferência da moldura (`mold…
 
 ## procedural/nucleo/operacoes/
 
@@ -1720,6 +1723,8 @@
 - `medidas-na-blocagem.js` — Medidas do `plano.medidas` do esboço lidas na blocagem do nível zero. O esboço mede cada medida declarada sobre as próprias formas (a caixa que envolve as fo…
 - `medidas-na-blocagem.test.js` — As medidas do plano lidas na blocagem do nível zero, sobre formas resolvidas escritas à mão (sem o módulo do esboço): a caixa de um eixo e a distância entre …
 - `medir-blocagem-nivel-zero.js` — Medida sobre a blocagem N2 de um andaime: compila com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por volume, o volum…
+- `molduras-do-vao.js` — molduras-do-vao.js — a moldura em volta de cada vão que a receita declara, medida sobre a malha.
+- `molduras-do-vao.test.mjs` — molduras-do-vao.test.mjs — a moldura em volta do vão, medida sobre a malha varrida de verdade (fatia 12 do plano de ajustes no núcleo).
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
 - `origem-de-parametro.test.js` — origem-de-parametro.test.js — a regra que impede a rodada de absorção de inventar número para fechar a conta.
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.

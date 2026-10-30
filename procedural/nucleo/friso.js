@@ -435,5 +435,9 @@ export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas 
     }
   }
   const total = estacoes[m - 1].s + (fechada ? comprimento(sub(estacoes[0].p, estacoes[m - 1].p)) : 0);
-  return { vertices, faces, partes: { lateral, pontas: tampas }, estacoes: m, comprimento: total };
+  /* as seções da varredura, para quem confere a moldura em volta de um vão: por estação, a posição na linha, o lado u (B, para a esquerda de quem
+     segue a linha) e o índice do primeiro vértice do anel dela (nulo no ponto em que o perfil afinou até nada); cada anel tem `perfil.length`
+     vértices na ordem do perfil. Só leitura, não muda a malha. */
+  const secoes = estacoes.map((e, j) => ({ s: e.s, p: [...e.p], B: [...quadros[j].B], N: [...quadros[j].N], anel: e.escala === 0 ? null : anel[j] }));
+  return { vertices, faces, partes: { lateral, pontas: tampas }, estacoes: m, comprimento: total, secoes, pontosPorAnel: np };
 }

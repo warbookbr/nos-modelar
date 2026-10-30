@@ -66,6 +66,31 @@ function cadeiasDaSimetria(cadeia, fechada, imagem) {
   return [{ cadeia, fechada, espelhada: false }, { cadeia, fechada, espelhada: true }];
 }
 
+/* O que a conferência da moldura lê de um friso depois de varrido, em posições da peça (a cópia espelhada já espelhada): por seção,
+   a posição na linha e os dois pontos do anel que ficam mais para a esquerda e para a direita da linha (a pegada do friso na chapa),
+   e o anel inteiro das pontas abertas. Só leitura; nada disto entra na malha nem na forma canônica. */
+function registroDaVarredura({ passo, origemId, nome, aba, superficie, gaiola, cadeia, pontas, varredura, vertices }) {
+  const { secoes, pontosPorAnel: np } = varredura;
+  const espelha = (v) => (cadeia.espelhada ? [-v[0], v[1], v[2]] : v);
+  const lidas = secoes.map((sec) => {
+    const p = espelha(sec.p); const B = espelha(sec.B); const N = espelha(sec.N);
+    if (sec.anel === null) return { s: sec.s, p, e: p, d: p, anel: [p] };
+    const anel = vertices.slice(sec.anel, sec.anel + np);
+    /* os extremos em u, levados ao plano da chapa no ponto da linha (a pegada não tem altura) */
+    const aoPlano = (q) => { const h = (q[0] - p[0]) * N[0] + (q[1] - p[1]) * N[1] + (q[2] - p[2]) * N[2]; return [q[0] - N[0] * h, q[1] - N[1] * h, q[2] - N[2] * h]; };
+    let e = anel[0]; let d = anel[0]; let ue = -Infinity; let ud = Infinity;
+    for (const q of anel) { const u = (q[0] - p[0]) * B[0] + (q[1] - p[1]) * B[1] + (q[2] - p[2]) * B[2]; if (u > ue) { ue = u; e = q; } if (u < ud) { ud = u; d = q; } }
+    return { s: sec.s, p, e: aoPlano(e), d: aoPlano(d), anel };
+  });
+  const fechada = cadeia.fechada;
+  return {
+    passo, origemId, nome, aba, superficie, gaiola, fechada, espelhada: cadeia.espelhada,
+    pontas: fechada ? null : [pontas[0], pontas[1]],
+    secoes: lidas.map(({ s, p, e, d }) => ({ s, p, e, d })),
+    extremos: fechada ? null : [lidas[0].anel, lidas[lidas.length - 1].anel],
+  };
+}
+
 export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem }) {
   /* A superfície: o passo `subdivisao` que a origem cita, já executado. Devolve { passo, args } ou { erro }. */
   function passoDaSuperficie(st, origem) {
@@ -98,6 +123,9 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       faces = espelhada.faces; imagem = espelhada.imagem; nVertices = espelhada.vertices.length;
     }
     const niveis = Math.trunc(st.num(args.niveis ?? 2));
+    /* a gaiola que a conferência da moldura relê: os nomes, as faces por índice, os níveis e a imagem da simetria (uma vez por passo) */
+    const gaiolaDaChapa = (st.superficiesDosFrisos ??= new Map()).get(passo) ?? { passo, indiceDoNome, faces, nVertices, niveis, simetria: args.simetria ?? null, imagem };
+    st.superficiesDosFrisos.set(passo, gaiolaDaChapa);
     const cadeia = nomes.map((p) => indiceDoNome.get(p));
     const nomeDoPonto = (k) => {
       if (k < declarados.length) return citar(declarados[k]);
@@ -155,7 +183,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     }
     let espessura = null;
     if (args.espessura != null) espessura = st.num(args.espessura);
-    return { cadeias: lista, espessura };
+    return { cadeias: lista, espessura, passo, gaiola: gaiolaDaChapa };
   }
 
   /* A aba declarada: largura (da perna reta), angulo (de quanto a chapa gira na dobra, em graus) e raio (da face de
@@ -310,13 +338,13 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       variacao = lida;
     }
 
-    let cadeias; let espessuraDaChapa = null;
+    let cadeias; let espessuraDaChapa = null; let passoDaChapa = null; let gaiolaDaChapa = null;
     if (a.superficie != null) {
       if (a.normal != null) return grita(st, i, 'friso', 'normal', 'normal só vale na polilinha; sobre a superfície o friso segue a normal da chapa');
       let r;
       try { r = linhaNaSuperficie(st, a, linha.pontos, fechada); } catch (e) { return grita(st, i, 'friso', 'superficie', String(e.message)); }
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
-      espessuraDaChapa = r.espessura;
+      espessuraDaChapa = r.espessura; passoDaChapa = r.passo; gaiolaDaChapa = r.gaiola;
       if (comAba) {
         daPele = r.espessura === null;
         try {
@@ -397,6 +425,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       }
       const base = vertices.length;
       for (const p of s.vertices) vertices.push(c.espelhada ? [-p[0], p[1], p[2]] : p);
+      (st.frisos ??= []).push(registroDaVarredura({ passo: i, origemId: a.origemId ?? null, nome: linha.nome, aba: comAba, superficie: passoDaChapa, gaiola: gaiolaDaChapa, cadeia: c, pontas, varredura: s, vertices: vertices.slice(base) }));
       const inicio = faces.length;
       for (const f of s.faces) faces.push((c.espelhada ? [...f].reverse() : f).map((k) => base + k));
       for (const k of s.partes.lateral) lateral.push(inicio + k);
