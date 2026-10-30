@@ -10,12 +10,16 @@
  * `passoDaAmostra`, e o trecho descoberto é a sequência de pontos sem cobertura, com o comprimento, a posição e a distância a que a
  * faixa mais perto passa do meio dele (a moldura que fica a 3 mm da borda não a cobre).
  *
- * A EMENDA. As pontas abertas de dois frisos que se encontram (os centros das pontas a até 2 × `tolerancia`) são uma emenda. Se a
- * linha segue reta (o giro menor que GIRO_DO_CANTO), os dois anéis das pontas precisam ser o mesmo perfil, e a distância de
- * Hausdorff entre eles acima de `tolerancia` é o degrau, com as duas larguras. Se a linha vira, as duas pontas são cortes retos e
- * deixam o quadrante de fora do canto sem material (a meia-esquadria de um friso só, `variacao` do `friso`, não deixa ponta ali):
- * a conferência põe pontos num leque de raio igual à menor extensão de fora das duas pontas e mede a distância de cada um à
- * faixa, e o entalhe é a maior delas quando passa da tolerância. Um terceiro friso que preenche o canto o fecha.
+ * A EMENDA. As pontas abertas de dois frisos que se encontram (os centros das pontas a até 2 × `tolerancia`) são uma emenda. O giro
+ * é o da linha no plano da chapa: as direções das duas pontas sem a componente da normal, que é a curvatura da própria chapa e não
+ * abre nada na pegada. Se a linha segue quase reta (o giro menor que GIRO_DO_CANTO), os dois anéis precisam ser o mesmo perfil, e o
+ * degrau é a distância de Hausdorff entre eles, cada um escrito no seu próprio plano de corte (u pela largura, v pela normal), com as
+ * duas larguras: comparar os anéis no espaço somaria ao degrau o giro de um corte em relação ao outro, que numa linha curva dá
+ * meia largura × giro com dois perfis iguais. Em toda emenda as duas pontas são cortes retos, cada um perpendicular à sua linha, e
+ * deixam sem material a cunha de fora da curva (a meia-esquadria de um friso só, `variacao` do `friso`, não deixa ponta ali): a
+ * conferência põe pontos num leque de raio igual à menor extensão de fora das duas pontas e mede a distância de cada um à faixa, e o
+ * entalhe é a maior delas quando passa da tolerância. Na emenda reta a cunha é estreita e o entalhe, pequeno; no canto, o quadrante
+ * de fora inteiro. Um terceiro friso que preenche o canto o fecha.
  *
  * O que sai é dado: nada aqui decide a forma, e o motivo declarado de uma aba parcial é assunto de quem chama. */
 
@@ -34,6 +38,7 @@ const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const tam = (a) => Math.hypot(a[0], a[1], a[2]);
 const unit = (a) => { const t = tam(a); return t > 0 ? mult(a, 1 / t) : [0, 0, 0]; };
 const dist = (a, b) => tam(sub(a, b));
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 
 /* Distância de um ponto a um triângulo no espaço (Ericson, Real-Time Collision Detection, 5.1.5). */
 function distanciaAoTriangulo(p, a, b, c) {
@@ -142,7 +147,8 @@ export function conferirMoldura({ borda, fechada = false, frisos, tolerancia = T
     return {
       de: d.de, ate: d.ate, comprimento: Math.min(comprimento, d.ate - d.de + passoDaAmostra),
       entre: [nomeAntes(d.primeira.de), nomeDepois(d.ultima.de + 1)],
-      posicao: meio.p, distanciaDaFaixa: meio.distancia,
+      /* o meio de um trecho longo fica além do alcance da busca: aí a distância se mede sem limite, só para esse ponto */
+      posicao: meio.p, distanciaDaFaixa: Number.isFinite(meio.distancia) ? meio.distancia : mede(meio.p).distancia,
     };
   });
 
@@ -154,38 +160,51 @@ export function conferirMoldura({ borda, fechada = false, frisos, tolerancia = T
     for (const lado of [0, 1]) {
       const anel = f.extremos[lado];
       if (!anel || anel.length < 2) continue;
-      const aqui = f.secoes[lado === 0 ? 0 : n - 1].p; const dentro = f.secoes[lado === 0 ? 1 : n - 2].p;
-      pontas.push({ friso: f.nome, lado, p: aqui, sentido: unit(sub(dentro, aqui)), anel, largura: dist(f.secoes[lado === 0 ? 0 : n - 1].e, f.secoes[lado === 0 ? 0 : n - 1].d) });
+      const secao = f.secoes[lado === 0 ? 0 : n - 1];
+      const aqui = secao.p; const dentro = f.secoes[lado === 0 ? 1 : n - 2].p;
+      /* o eixo u do corte: a pegada da ponta, da direita para a esquerda, que já está no plano da chapa */
+      pontas.push({ friso: f.nome, lado, p: aqui, sentido: unit(sub(dentro, aqui)), u: unit(sub(secao.e, secao.d)), anel, largura: dist(secao.e, secao.d) });
     }
   }
   const emendas = [];
   for (let i = 0; i < pontas.length; i++) for (let j = i + 1; j < pontas.length; j++) {
     const A = pontas[i]; const B = pontas[j];
     if (dist(A.p, B.p) > 2 * tolerancia) continue;
-    const cosGiro = Math.max(-1, Math.min(1, -dot(A.sentido, B.sentido)));
+    /* a normal da chapa em cada corte (u × sentido, no mesmo sentido nas duas pontas) e a média delas na emenda; as direções das
+       pontas sem a normal da emenda são o giro no plano da chapa */
+    const normalA = unit(cross(A.u, A.sentido));
+    const normalB = (() => { const n = unit(cross(B.u, B.sentido)); return dot(n, normalA) < 0 ? mult(n, -1) : n; })();
+    const normal = unit(soma(normalA, normalB));
+    const noPlano = (v) => (tam(normal) > 0 ? unit(sub(v, mult(normal, dot(v, normal)))) : v);
+    const tA = noPlano(A.sentido); const tB = noPlano(B.sentido);
+    const cosGiro = Math.max(-1, Math.min(1, -dot(tA, tB)));
     const giro = (Math.acos(cosGiro) * 180) / Math.PI;
     const larguras = [A.largura, B.largura];
     const registro = { frisos: [A.friso, B.friso], posicao: A.p, giro, larguras, degrau: null, entalhe: null };
-    if (giro < GIRO_DO_CANTO) {
-      const h = hausdorff(A.anel, B.anel);
-      registro.tipo = 'reta'; registro.degrau = h; registro.ok = h <= tolerancia;
-    } else {
-      /* o leque do quadrante de fora do canto: raio igual à menor extensão de fora das duas pontas */
-      const nA = unit(sub(B.sentido, mult(A.sentido, dot(A.sentido, B.sentido)))); // de A para o lado de B (dentro do canto)
-      const nB = unit(sub(A.sentido, mult(B.sentido, dot(A.sentido, B.sentido))));
-      const fora = (anel, n) => Math.max(0, ...anel.map((q) => -dot(sub(q, A.p), n)));
-      const raio = Math.min(fora(A.anel, nA), fora(B.anel, nB));
-      let pior = 0;
-      if (raio > 2 * tolerancia) {
-        const u1 = mult(nA, -1); const u2 = mult(nB, -1); // as normais de fora de A e de B
-        const teta = Math.acos(Math.max(-1, Math.min(1, dot(u1, u2))));
-        for (let k = 1; k < PASSOS_DO_LEQUE; k++) {
-          const f = k / PASSOS_DO_LEQUE;
-          const dir = teta < 1e-9 ? u1 : mult(soma(mult(u1, Math.sin((1 - f) * teta)), mult(u2, Math.sin(f * teta))), 1 / Math.sin(teta));
-          pior = Math.max(pior, mede(soma(A.p, mult(dir, raio)), tolerancia * 4 + raio).distancia);
-        }
+    /* o leque da cunha de fora: raio igual à menor extensão de fora das duas pontas, entre as normais de fora dos dois cortes */
+    const nA = unit(sub(tB, mult(tA, dot(tA, tB)))); // de A para o lado de B (dentro da curva)
+    const nB = unit(sub(tA, mult(tB, dot(tA, tB))));
+    const fora = (P, anel, n) => Math.max(0, ...anel.map((q) => -dot(sub(q, P.p), n)));
+    const raio = Math.min(fora(A, A.anel, nA), fora(B, B.anel, nB));
+    let entalhe = 0;
+    if (raio > 2 * tolerancia) {
+      const u1 = mult(nA, -1); const u2 = mult(nB, -1); // as normais de fora de A e de B
+      const teta = Math.acos(Math.max(-1, Math.min(1, dot(u1, u2))));
+      for (let k = 1; k < PASSOS_DO_LEQUE; k++) {
+        const f = k / PASSOS_DO_LEQUE;
+        const dir = teta < 1e-9 ? u1 : mult(soma(mult(u1, Math.sin((1 - f) * teta)), mult(u2, Math.sin(f * teta))), 1 / Math.sin(teta));
+        entalhe = Math.max(entalhe, mede(soma(A.p, mult(dir, raio)), tolerancia * 4 + raio).distancia);
       }
-      registro.tipo = 'canto'; registro.entalhe = pior; registro.raioDeFora = raio; registro.ok = pior <= tolerancia;
+    }
+    registro.entalhe = entalhe; registro.raioDeFora = raio;
+    if (giro < GIRO_DO_CANTO) {
+      /* cada anel no seu plano de corte: u pela pegada da ponta (o de B no mesmo sentido do de A) e v pela normal da chapa ali */
+      const sinal = dot(A.u, B.u) < 0 ? -1 : 1;
+      const noCorte = (P, s, n) => P.anel.map((q) => { const d = sub(q, P.p); return [s * dot(d, P.u), dot(d, n), 0]; });
+      const h = hausdorff(noCorte(A, 1, normalA), noCorte(B, sinal, normalB));
+      registro.tipo = 'reta'; registro.degrau = h; registro.ok = h <= tolerancia && entalhe <= tolerancia;
+    } else {
+      registro.tipo = 'canto'; registro.ok = entalhe <= tolerancia;
     }
     emendas.push(registro);
   }

@@ -145,6 +145,44 @@ describe('conferirMoldura — emendas', () => {
     expect(r.emendas.find((e) => e.tipo === 'canto').ok).toBe(true);
   });
 
+  it('duas faixas iguais que se encontram numa quebra de 6 graus não têm degrau: o corte girado não é perfil diferente', () => {
+    /* antes, os anéis se comparavam no espaço e davam 2 × 5 mm × sen(3°) = 0,52 mm de degrau entre dois perfis iguais */
+    const giro = (6 * Math.PI) / 180;
+    const fim = [0.05 + 0.05 * Math.cos(giro), 0.05 * Math.sin(giro), 0];
+    const borda = [{ nome: 'a', p: [0, 0, 0] }, { nome: 'm', p: [0.05, 0, 0] }, { nome: 'b', p: fim }];
+    const r = conferirMoldura({ borda, frisos: [faixa('A', [0, 0, 0], [0.05, 0, 0]), faixa('B', [0.05, 0, 0], fim)] });
+    const e = r.emendas[0];
+    expect(e.tipo).toBe('reta');
+    expect(e.giro).toBeCloseTo(6, 6);
+    expect(e.degrau).toBeLessThan(1e-9);
+    /* a cunha de fora da quebra: o ponto do meio do leque de 5 mm fica a 5 mm × sen(3°) das duas faixas */
+    expect(e.entalhe).toBeCloseTo(0.005 * Math.sin(giro / 2), 5);
+    expect(e.ok).toBe(true);
+  });
+
+  it('a dobra da chapa sob a emenda (a linha que atravessa um vinco) não é giro: a emenda é reta, sem degrau nem entalhe', () => {
+    /* duas faixas com 3 mm de altura pela normal da chapa, a segunda numa chapa dobrada 15 graus para longe da normal; antes, o giro
+       contava a dobra, a emenda virava canto e o leque, medido acima da chapa, dava entalhe de milímetros */
+    const dobra = (15 * Math.PI) / 180;
+    const comAltura = (nome, de, t, n) => {
+      const esq = [n[1] * t[2] - n[2] * t[1], n[2] * t[0] - n[0] * t[2], n[0] * t[1] - n[1] * t[0]];
+      const secoes = [0, 0.025, 0.05].map((s) => { const p = de.map((x, i) => x + t[i] * s); return { s, p, e: p.map((x, i) => x + esq[i] * 0.005), d: p.map((x, i) => x - esq[i] * 0.005) }; });
+      const anel = (S) => [S.d, S.e, S.e.map((x, i) => x + n[i] * 0.003), S.d.map((x, i) => x + n[i] * 0.003)];
+      return { nome, fechada: false, secoes, extremos: [anel(secoes[0]), anel(secoes[2])] };
+    };
+    const m = [0.05, 0, 0]; const tB = [Math.cos(dobra), 0, -Math.sin(dobra)]; const nB = [Math.sin(dobra), 0, Math.cos(dobra)];
+    const A = comAltura('A', [0, 0, 0], [1, 0, 0], [0, 0, 1]); const B = comAltura('B', m, tB, nB);
+    const borda = [{ nome: 'a', p: [0, 0, 0] }, { nome: 'm', p: m }, { nome: 'b', p: m.map((x, i) => x + tB[i] * 0.05) }];
+    const r = conferirMoldura({ borda, frisos: [A, B] });
+    expect(r.descobertos).toEqual([]);
+    const e = r.emendas[0];
+    expect(e.tipo).toBe('reta');
+    expect(e.giro).toBeLessThan(1e-6);
+    expect(e.degrau).toBeLessThan(1e-9);
+    expect(e.entalhe).toBeLessThan(1e-9);
+    expect(e.ok).toBe(true);
+  });
+
   it('o giro do canto começa em dez graus: uma quebra de 5 graus entre as pontas ainda é reta', () => {
     expect(GIRO_DO_CANTO).toBe(10);
     const r = conferirMoldura({ borda: reta, frisos: [faixa('A', [0, 0, 0], [0.05, 0, 0]), faixa('B', [0.05, 0, 0], [0.1, 0.00436, 0])] });
