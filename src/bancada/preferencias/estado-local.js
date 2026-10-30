@@ -25,10 +25,53 @@ export function criarPreferenciasBancada({ armazenamento = globalThis.localStora
     }
   }
 
+  /* A escrita também é protegida: numa janela privada ou com o armazenamento
+     cheio o `setItem` lança, e a preferência vale para a página aberta mesmo
+     sem ficar guardada. */
   function salvar(parcial) {
     const proximo = normalizar({ ...ler(), ...parcial });
-    armazenamento?.setItem(CHAVE_PREFERENCIAS, JSON.stringify(proximo));
+    try {
+      armazenamento?.setItem(CHAVE_PREFERENCIAS, JSON.stringify(proximo));
+    } catch {
+      /* fica só nesta página */
+    }
     return proximo;
+  }
+
+  return { ler, salvar };
+}
+
+const CHAVE_VISAO = 'mecanifica.bancada.visao';
+
+/* A VISÃO ESCOLHIDA (sólida, arame, raio X...) volta na próxima vez que a
+   bancada abrir. Fica numa chave própria, e não junto da grade e do chão,
+   porque quem decide se uma visão existe é o registro de visões: `conhecidas`
+   diz quais valem, e um nome guardado que deixou de valer volta ao padrão em
+   vez de prender a bancada numa visão que ela não sabe desenhar. */
+export function criarPreferenciaDeVisao({
+  armazenamento = globalThis.localStorage,
+  conhecidas = [],
+  padrao = 'solida',
+} = {}) {
+  const validas = new Set(conhecidas);
+  const normalizar = (valor) => (typeof valor === 'string' && validas.has(valor) ? valor : padrao);
+
+  function ler() {
+    try {
+      return normalizar(JSON.parse(armazenamento?.getItem(CHAVE_VISAO) ?? 'null'));
+    } catch {
+      return padrao;
+    }
+  }
+
+  function salvar(visao) {
+    const proxima = normalizar(visao);
+    try {
+      armazenamento?.setItem(CHAVE_VISAO, JSON.stringify(proxima));
+    } catch {
+      /* fica só nesta página */
+    }
+    return proxima;
   }
 
   return { ler, salvar };

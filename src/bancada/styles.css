@@ -1264,32 +1264,91 @@ body.modal-aberto {
   /* Encostada na barra de comandos: o cabeçalho que ocupava esta faixa saiu, e
      manter o afastamento dele deixava um vão vazio no alto da cena. */
   top: 38px;
-  /* Os painéis laterais medem no máximo 360 e ficam a 16 da borda; deixar 700
-     de folga mantém a fileira inteira visível sem encostar neles, e ela mede
-     874 com os onze botões. */
-  max-width: calc(100vw - 700px);
+  /* A fileira ocupa o vão entre os dois painéis laterais, que ficam a 22 px da
+     borda e medem `clamp(300px, 19vw, 360px)`, com 12 px de folga para cada
+     um: em 1400 px de janela o vão é de 732 px, e a fileira mede 724. */
+  max-width: calc(100vw - 2 * (22px + clamp(300px, 19vw, 360px) + 12px));
   /* Sem isto a caixa encolhe até um pouco menos que o conteúdo e corta o último
      botão, porque o afastamento entre os grupos não entra na largura mínima
      calculada pelo navegador. */
   width: max-content;
   padding: 6px;
   border-radius: 13px;
+  /* QUEBRA EM VEZ DE ROLAR. A fileira rolava de lado com a barra de rolagem
+     escondida: em 1400 px de janela "Perspectiva" saía cortado e "Enquadrar"
+     ficava fora, sem nada dizer que havia mais botões. Os rótulos ficaram
+     curtos para a fileira caber inteira em 1400 px; abaixo disso ela desce
+     para uma segunda linha, centrada, e nenhum botão fica escondido. A lista
+     das visões abre para baixo do botão e não pode ser recortada pela caixa. */
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 2px;
+  overflow: visible;
 }
 
 .vistas button {
-  gap: 8px;
+  gap: 4px;
   border-radius: 9px;
-  padding: 9px 11px;
+  padding: 8px 6px;
   font-size: 11px;
 }
 
+.vistas kbd { padding: 1px 3px; }
+
 .vistas button:nth-child(7),
-.vistas button:nth-child(8) { margin-left: 8px; }
+.vistas button:nth-child(8) { margin-left: 4px; }
 .vistas button:nth-child(7) {
   border-left: 1px solid rgba(31, 47, 40, 0.16);
   border-radius: 0 9px 9px 0;
-  padding-left: 16px;
+  padding-left: 9px;
 }
+
+/* ---------- seletor de visão ----------
+   Um botão só no fim da fileira, separado das vistas como o Iso é separado das
+   seis direções: ele muda o desenho da peça, e não de onde ela é olhada. */
+.seletor-visao {
+  position: relative;
+  display: flex;
+  margin-left: 4px;
+  padding-left: 4px;
+  border-left: 1px solid rgba(31, 47, 40, 0.16);
+}
+
+.seletor-visao > button b { font-weight: 650; }
+.seletor-visao > button .seta { opacity: 0.6; font-size: 9px; }
+.vistas .seletor-visao > button.ativa { background: #18241f; color: white; }
+
+.menu-visoes {
+  position: absolute;
+  z-index: 8;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid rgba(31, 47, 40, 0.14);
+  border-radius: 12px;
+  background: rgba(245, 248, 246, 0.97);
+  box-shadow: 0 14px 40px rgba(20, 33, 27, 0.18);
+}
+
+.menu-visoes[hidden] { display: none; }
+
+.vistas .menu-visoes .item-visao {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.vistas .menu-visoes .item-visao[aria-checked="true"] { background: #18241f; color: white; }
+.vistas .menu-visoes .item-visao[aria-disabled="true"] { color: #8a968f; cursor: help; }
+.vistas .menu-visoes .item-visao[aria-disabled="true"]:hover { background: transparent; }
+.menu-visoes .item-visao small { font: 600 9px/1 var(--fonte-mono); opacity: 0.8; }
+.menu-visoes .item-visao kbd { grid-column: 3; }
 
 kbd { padding: 2px 5px; font: 650 9px/1.35 var(--fonte-mono); }
 

@@ -70,3 +70,17 @@ export function criarAlinhamentoInicial({ caixa, larguraImagem, alturaImagem, la
     lado: ladoSeguro,
   };
 }
+
+/* A IMAGEM DE REFERÊNCIA É DA PEÇA. A chave em que a bancada guarda a imagem e
+   o alinhamento dela era o `id` do alvo da sessão, e toda peça aberta pela
+   janela `Abrir` chega com o mesmo alvo, `sessao-ativa`: a imagem guardada de
+   uma peça voltava sobre a seguinte, no lugar medido para a outra caixa, e a
+   prancha da peça de prova aparecia atravessando o furgão. A chave agora é o
+   nome da peça, e o alvo só vale quando a peça não tem nome; trocar de chave
+   tira da cena a imagem da peça anterior, para a imagem da nova (a guardada ou
+   a declarada na receita) entrar no lugar dela. */
+export function imagemAoTrocarDePeca({ chaveAnterior = null, peca = null, alvo = null, imagemNaCena = false } = {}) {
+  const texto = (valor) => (typeof valor === 'string' && valor.trim() ? valor.trim() : null);
+  const chave = texto(peca) ?? texto(alvo) ?? chaveAnterior ?? null;
+  return { chave, tirarDaCena: Boolean(imagemNaCena) && chave !== chaveAnterior };
+}

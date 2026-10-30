@@ -88,11 +88,21 @@
         <button type="button" data-vista="traseira"><span>Trás</span><kbd>⇧1</kbd></button>
         <button type="button" data-vista="direita"><span>Direita</span><kbd>3</kbd></button>
         <button type="button" data-vista="esquerda"><span>Esquerda</span><kbd>⇧3</kbd></button>
-        <button type="button" data-vista="superior"><span>Superior</span><kbd>7</kbd></button>
-        <button type="button" data-vista="inferior"><span>Inferior</span><kbd>⇧7</kbd></button>
+        <button type="button" data-vista="superior"><span>Cima</span><kbd>7</kbd></button>
+        <button type="button" data-vista="inferior"><span>Baixo</span><kbd>⇧7</kbd></button>
         <button type="button" data-vista="isometrica" class="ativa"><span>Iso</span><kbd>0</kbd></button>
         <button id="btnProjecao" type="button"><span>Perspectiva</span><kbd>5</kbd></button>
-        <button id="btnEnquadrar" type="button"><span>Enquadrar tudo</span><kbd>F</kbd></button>
+        <button id="btnEnquadrar" type="button" title="Enquadrar tudo"><span>Enquadrar</span><kbd>F</kbd></button>
+        <!-- A visão muda como a peça é desenhada, e não de onde ela é olhada, por
+             isso é um controle só, ao fim da fileira, que abre a lista das visões
+             com as teclas de cada uma. A lista sai do registro de visões
+             (`src/bancada/visoes/registro-de-visoes.js`), e não daqui. -->
+        <div class="seletor-visao">
+          <button id="btnVisao" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menuVisoes">
+            <span>Visão</span><b id="nomeVisao">Sólida</b><span class="seta" aria-hidden="true">▾</span>
+          </button>
+          <div id="menuVisoes" class="menu-visoes" role="menu" aria-label="Visão da peça" hidden></div>
+        </div>
       </nav>
 
       <aside class="painel painel-partes" data-painel="partes" aria-labelledby="tituloPartes">

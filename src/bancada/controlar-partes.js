@@ -71,6 +71,47 @@ function restaurarMaterial(material) {
 
 const NOME_DA_CAMADA_DE_ARAME = '__arame_opaco__';
 
+/* AS ARESTAS LEEM AS POSIÇÕES DA PRÓPRIA MALHA. A camada de linhas era uma
+   `WireframeGeometry`, que copia as posições no instante em que nasce; mover
+   vértices na edição de malha escreve na posição da malha sem refazer o modelo,
+   e o arame ficava parado onde a malha estava antes do gesto. Aqui a geometria
+   das linhas usa o MESMO atributo de posição da malha, e só o índice das arestas
+   é dela, então o arame acompanha cada quadro do movimento.
+   As arestas são as mesmas da `WireframeGeometry`, na mesma ordem e com a mesma
+   regra de repetição (a aresta de mesmas pontas, nos dois sentidos, entra uma
+   vez), para a imagem do arame sair igual à de antes. */
+export function geometriaDasArestas(geometria) {
+  const posicao = geometria.getAttribute('position');
+  const indices = geometria.index;
+  const vistas = new Set();
+  const arestas = [];
+  const ponto = (i) => `${posicao.getX(i)},${posicao.getY(i)},${posicao.getZ(i)}`;
+  const acrescentar = (a, b) => {
+    const ida = `${ponto(a)}-${ponto(b)}`;
+    const volta = `${ponto(b)}-${ponto(a)}`;
+    if (vistas.has(ida) || vistas.has(volta)) return;
+    vistas.add(ida);
+    vistas.add(volta);
+    arestas.push(a, b);
+  };
+  if (indices) {
+    const grupos = geometria.groups.length ? geometria.groups : [{ start: 0, count: indices.count }];
+    for (const { start, count } of grupos) {
+      for (let i = start; i < start + count; i += 3) {
+        for (let j = 0; j < 3; j++) acrescentar(indices.getX(i + j), indices.getX(i + ((j + 1) % 3)));
+      }
+    }
+  } else {
+    for (let i = 0; i < posicao.count / 3; i++) {
+      for (let j = 0; j < 3; j++) acrescentar(3 * i + j, 3 * i + ((j + 1) % 3));
+    }
+  }
+  const linhas = new THREE.BufferGeometry();
+  linhas.setAttribute('position', posicao);
+  linhas.setIndex(arestas);
+  return linhas;
+}
+
 /* Liga ou desliga, em cada malha do grupo, a camada de linhas do arame. As
    linhas são as arestas dos triângulos, desenhadas por cima do sólido; o teste
    de profundidade contra o sólido esconde as que ficam atrás. */
@@ -78,14 +119,27 @@ export function sincronizarArame(grupo, ligado) {
   grupo.traverse((objeto) => {
     if (!objeto.isMesh || objeto.name === NOME_DA_CAMADA_DE_ARAME) return;
     const existente = objeto.children.find((filho) => filho.name === NOME_DA_CAMADA_DE_ARAME);
-    if (!ligado) { if (existente) { objeto.remove(existente); existente.geometry.dispose(); existente.material.dispose(); } return; }
+    if (!ligado) {
+      if (existente) {
+        objeto.remove(existente);
+        /* A posição é da malha: descartá-la junto com as linhas apagaria do
+           desenho o buffer que a malha continua usando. Sai só o índice. */
+        existente.geometry.deleteAttribute('position');
+        existente.geometry.dispose();
+        existente.material.dispose();
+      }
+      return;
+    }
     if (existente) return;
     const linhas = new THREE.LineSegments(
-      new THREE.WireframeGeometry(objeto.geometry),
+      geometriaDasArestas(objeto.geometry),
       new THREE.LineBasicMaterial({ color: '#2f3b36' }),
     );
     linhas.name = NOME_DA_CAMADA_DE_ARAME;
     linhas.raycast = () => {};
+    /* A esfera de corte das linhas seria calculada uma vez e não acompanharia o
+       movimento dos vértices; a malha-mãe já decide se a peça está na tela. */
+    linhas.frustumCulled = false;
     objeto.add(linhas);
   });
 }
@@ -136,7 +190,6 @@ function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = fals
     material.emissiveIntensity = 0;
   }
   if (apresentacaoSelecao) {
-    if (apresentacaoSelecao.wireframe) material.wireframe = true;
     if (apresentacaoSelecao.opacidade < 1) {
       material.transparent = true;
       material.opacity = apresentacaoSelecao.opacidade;
@@ -195,19 +248,30 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
     };
   }
 
+  /* O ARAME DE CADA PARTE sai de um lugar só. O arame da peça inteira é o que
+     a visão escolhida pede (`definirArame`), e o "Wireframe" da Inspeção é o
+     raio X restrito à seleção: a parte selecionada passa a mostrar as arestas
+     de trás também, e as outras continuam na visão da peça. Antes os dois eram
+     caminhos separados, e com o arame da peça ligado a seleção recebia o
+     `wireframe` do material por cima da camada de linhas, dois desenhos de
+     aresta somados. */
+  function arameDe(selecionada) {
+    return selecionada && wireframeSelecao ? 'raio-x' : arame;
+  }
+
   function aplicarVisual() {
     const estados = estadoVisualDasPartes(nomes, selecionadas, modo);
     for (const nome of nomes) {
       const grupo = partes.get(nome);
       const visual = estados[nome];
       grupo.visible = visual !== 'oculto';
-      sincronizarArame(grupo, arame && arame !== 'raio-x');
+      const selecionada = selecionadas.includes(nome);
+      const arameDaParte = arameDe(selecionada);
+      sincronizarArame(grupo, arameDaParte && arameDaParte !== 'raio-x');
       const cor = coresPorParte ? corDeAuditoria(nomes.indexOf(nome)) : null;
-      const apresentacaoSelecao = selecionadas.includes(nome)
-        ? { wireframe: wireframeSelecao, opacidade: opacidadeSelecao }
-        : null;
+      const apresentacaoSelecao = selecionada ? { opacidade: opacidadeSelecao } : null;
       for (const material of materiaisDoGrupo(grupo)) {
-        aplicarEstadoMaterial(material, visual, cor, arame, apresentacaoSelecao, auditoria);
+        aplicarEstadoMaterial(material, visual, cor, arameDaParte, apresentacaoSelecao, auditoria);
       }
     }
     aoMudar?.(estado());
