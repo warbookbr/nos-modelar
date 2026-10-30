@@ -4,7 +4,7 @@
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [interface da bancada](2026-10-30-interface-da-bancada.md), que vem antes deste na ordem escolhida pela pessoa
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [visões de conferência e interface da bancada](2026-10-30-visoes-de-conferencia-na-bancada.md), que vem antes deste na ordem escolhida pela pessoa
 
 ## Problema observado
 

@@ -14,7 +14,7 @@
 receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16, com as oito peças no núcleo, a montagem
 auditada e o avião aprovado pela pessoa; a picape, o braço robótico, o carrinho de mão e a empilhadeira vêm em seguida, na ordem
 que a pessoa escolher. [As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14, e o código delas saiu em 2026-10-25.
-Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) a [interface da bancada](2026-10-30-interface-da-bancada.md), que vem depois do plano ativo, e o [furgão realista](2026-10-30-furgao-realista.md), que vem depois dela, na ordem escolhida pela pessoa em 2026-10-30.
+Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) o [furgão realista](2026-10-30-furgao-realista.md), que vem depois do plano ativo, na ordem escolhida pela pessoa em 2026-10-30.
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
 

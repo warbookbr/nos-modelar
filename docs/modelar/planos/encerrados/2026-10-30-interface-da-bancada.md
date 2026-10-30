@@ -1,10 +1,10 @@
 # Interface da bancada — a tela organizada em torno da peça, sobre um sistema visual único, com a forma escolhida pela pessoa por imagem
 
-**Estado:** rascunho
+**Estado:** cancelado
 
 **Responsável:** Claude, com a pessoa escolhendo a proposta de tela e aprovando cada parte por imagem
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [visões de conferência na bancada](2026-10-30-visoes-de-conferencia-na-bancada.md); o [furgão realista](2026-10-30-furgao-realista.md) vem depois deste
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [visões de conferência na bancada](../2026-10-30-visoes-de-conferencia-na-bancada.md); o [furgão realista](../2026-10-30-furgao-realista.md) vem depois deste
 
 ## Problema observado
 
@@ -58,3 +58,5 @@ O risco maior é a reestruturação mudar o que a captura automática vê e o cr
 ## Andamento
 
 Rascunho escrito em 2026-10-30, a pedido da pessoa; ativa quando o plano das visões fechar.
+
+Absorvido em 2026-10-30 pelo plano ativo das [visões de conferência e interface da bancada](../2026-10-30-visoes-de-conferencia-na-bancada.md), a pedido da pessoa, que quis a interface começando já.
