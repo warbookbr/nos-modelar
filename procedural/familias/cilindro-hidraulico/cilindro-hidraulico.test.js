@@ -270,6 +270,68 @@ describe('cada olhal sai de um pescoço unido à peça, e não só encostado nel
     }
   });
 
+  /* Os pontos de uma parte (os vértices e, em cada aresta das faces, sete pontos entre as pontas) que caem sobre o disco
+     do anel de um olhal (a menos do raio externo do centro do pino, no plano xy) e passam da face plana do anel em z, com
+     quanto passam, em mm. O raio do disco é o circunscrito do polígono do anel, o maior, para a conta não deixar passar
+     nada por arredondamento. */
+  const foraDasFacesDoAnel = (neutro, parte, { centro, raioDoOlhal, meiaLargura }) => {
+    const pontos = [];
+    for (const face of neutro.F.values()) if (face.parte === parte) {
+      const vs = face.vs.map((v) => neutro.V.get(v).map((c) => c * 1000));
+      vs.forEach((a, i) => {
+        const b = vs[(i + 1) % vs.length];
+        for (let k = 0; k < 8; k += 1) pontos.push(a.map((c, eixo) => c + ((b[eixo] - c) * k) / 8));
+      });
+    }
+    return pontos
+      .filter((ponto) => Math.hypot(ponto[0] - centro, ponto[1]) < raioDoOlhal && Math.abs(ponto[2]) > meiaLargura + 1e-6)
+      .map((ponto) => Math.abs(ponto[2]) - meiaLargura);
+  };
+
+  it.each([
+    ['mínimo', { embolo: 32, haste: 18, curso: 50, parede: 3, comprimentoRecolhido: 135 }],
+    ['padrão', {}],
+    ['médio', { embolo: 80, haste: 45, curso: 500, parede: 8, comprimentoRecolhido: 700 }],
+    ['máximo', { embolo: 200, haste: 140, curso: 1500, parede: 25, comprimentoRecolhido: 2300 }],
+    ['haste no limite de cima', { embolo: 80, haste: 60, curso: 500, parede: 8, comprimentoRecolhido: 700 }],
+  ])('ponto %s: nenhum ponto do terminal nem do pescoço traseiro sobre o anel passa das faces dele, nas quatro fixações', (_, parametros) => {
+    const { embolo, comprimentoRecolhido } = { embolo: 63, comprimentoRecolhido: 470, ...parametros };
+    const anel = (centro) => ({ centro, raioDoOlhal: 0.55 * embolo / Math.cos(Math.PI / 32), meiaLargura: 0.25 * embolo });
+    for (const fixacaoTraseira of [0, 1]) for (const fixacaoDianteira of [0, 1]) {
+      const n = rodar({ ...parametros, fixacaoTraseira, fixacaoDianteira });
+      const rotulo = `fixações ${fixacaoTraseira}${fixacaoDianteira}`;
+      expect(foraDasFacesDoAnel(n, 'terminal', anel(comprimentoRecolhido)), `terminal, ${rotulo}`).toEqual([]);
+      expect(foraDasFacesDoAnel(n, 'pescoco-traseiro', anel(0)), `pescoço traseiro, ${rotulo}`).toEqual([]);
+      /* o pescoço é o cilindro de 0,225 êmbolo da ponta dentro do anel (0,4 êmbolo do pino) até fora dele (0,6), e só
+         dali a peça engrossa: o colar do terminal tem 0,1 êmbolo e o cone 0,15 */
+      for (const distancia of [0.4, 0.6]) {
+        expect(raioEm(n, 'terminal', comprimentoRecolhido - distancia * embolo)).toBeCloseTo(0.225 * embolo, 6);
+        expect(raioEm(n, 'pescoco-traseiro', distancia * embolo)).toBeCloseTo(0.225 * embolo, 6);
+      }
+      expect(raioEm(n, 'terminal', comprimentoRecolhido - 0.75 * embolo)).toBeCloseTo(raioEm(n, 'terminal', comprimentoRecolhido - 0.85 * embolo), 6);
+    }
+  });
+
+  it('o terminal de antes, com o cone até a ponta dentro do anel, é acusado pela mesma conta', () => {
+    /* o cone de 0,25 êmbolo que ia do colar (29,25 mm no médio) direto à ponta de 0,225 êmbolo, a 0,4 do pino: sobre o
+       disco do anel ele chegava a 24,75 mm de raio, 4,75 mm além da face de 20 mm */
+    const embolo = 80;
+    const colar = 29.25;
+    const pontos = [];
+    for (let k = 0; k <= 40; k += 1) {
+      const x = -0.65 * embolo + (0.25 * embolo * k) / 40;
+      const raio = colar + ((0.225 * embolo - colar) * k) / 40;
+      for (let lado = 0; lado < 32; lado += 1) pontos.push([x, raio * Math.cos((2 * Math.PI * lado) / 32), raio * Math.sin((2 * Math.PI * lado) / 32)]);
+    }
+    const neutro = {
+      V: new Map(pontos.map((ponto, i) => [i, ponto.map((c) => c / 1000)])),
+      F: new Map(pontos.map((_, i) => [i, { parte: 'terminal', vs: [i] }])),
+    };
+    const fora = foraDasFacesDoAnel(neutro, 'terminal', { centro: 0, raioDoOlhal: 0.55 * embolo / Math.cos(Math.PI / 32), meiaLargura: 0.25 * embolo });
+    expect(fora.length).toBeGreaterThan(0);
+    expect(Math.max(...fora)).toBeCloseTo(4.75, 1);
+  });
+
   it('o pescoço e o terminal atravessam o anel: vértices deles ficam entre o furo e o raio externo, entre as faces do anel', () => {
     const n = rodar({ fixacaoTraseira: 1, fixacaoDianteira: 1 });
     for (const [parte, centro] of [['pescoco-traseiro', 0], ['terminal', 470]]) {

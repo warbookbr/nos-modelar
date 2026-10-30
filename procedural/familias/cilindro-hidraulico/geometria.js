@@ -7,19 +7,22 @@
    cabeça estendido, de modo que o curso declarado é exatamente a folga que sobra entre os dois.
 
    Cada olhal é um anel inteiro (disco furado, com o furo do pino no eixo z) preso por um pescoço de revolução em torno
-   do eixo x, que entra no anel e na peça vizinha. Atrás, o fundo da camisa é prolongado num tronco de cone que parte da
-   parede da camisa e afina até o pescoço do olhal (a tampa traseira prolongada). Na frente, a ponta da haste é
-   rosqueada num terminal: um colar cilíndrico, mais grosso que a haste, que afina num cone até o pescoço do olhal. A
-   rosca fica dentro do colar e não é modelada. Os dois pescoços entram no anel pelo lado do furo, onde o anel tem massa
-   (entre o furo e o raio externo), e a ponta menor deles não passa da largura do anel. Com rótula, o furo do olhal é o
-   alojamento (maior) e uma bucha esférica truncada, saliente dos dois lados do anel, fecha o furo do pino. A bucha
-   aparece como uma cúpula mais larga que o olhal.
+   do eixo x, que entra no anel e na peça vizinha. O pescoço é um cilindro de raio menor que a meia largura do anel, que
+   vai de dentro da massa do anel (entre o furo e o raio externo) até um pouco fora do raio externo dele; só fora do
+   anel a peça engrossa. Atrás, o fundo da camisa é prolongado num tronco de cone que parte da parede da camisa e afina
+   até o pescoço (a tampa traseira prolongada). Na frente, a ponta da haste é rosqueada num terminal: um colar
+   cilíndrico, mais grosso que a haste, que afina num cone até o pescoço. A rosca fica dentro do colar e não é modelada.
+   Assim nenhum ponto do pescoço, do cone ou do colar que esteja sobre o disco do anel passa das faces planas dele: o
+   anel e a peça vizinha se unem pela face cilíndrica externa do anel, sem que uma atravesse as faces da outra. Com
+   rótula, o furo do olhal é o alojamento (maior) e uma bucha esférica truncada, saliente dos dois lados do anel, fecha
+   o furo do pino. A bucha aparece como uma cúpula mais larga que o olhal.
 
    Contra a ISO 6020-2 só o diâmetro do pino (cerca de metade do êmbolo) está fixado de memória, a conferir contra a
    norma, que o repositório não traz. Tudo o mais é escolha desta família e está aqui, num lugar só, em `PROPORCOES`: o
    raio externo do olhal (0,55 do êmbolo, parede de 0,3 êmbolo em torno do pino liso e de 0,25 em torno do alojamento),
-   a largura do olhal (meio êmbolo), o pescoço (0,9 da meia largura), as distâncias do pino ao fundo (0,75) e ao fim da
-   haste (0,85 do êmbolo), o colar do terminal (0,65 da haste, no mínimo 0,3 do êmbolo), a bucha (esfera de meio êmbolo,
+   a largura do olhal (meio êmbolo), o pescoço (0,9 da meia largura, de 0,4 a 0,6 do êmbolo do pino), as distâncias do
+   pino ao fundo (0,75) e ao fim da haste (0,85 do êmbolo), o colar do terminal (0,65 da haste, no mínimo 0,3 do êmbolo,
+   com um décimo de êmbolo de comprimento antes do cone de 0,15 do êmbolo), a bucha (esfera de meio êmbolo,
    truncada a 0,38 do êmbolo de cada lado), o êmbolo de um quarto e a cabeça de três décimos do diâmetro. Nada aqui tem
    Date.now nem Math.random: os mesmos parâmetros dão as mesmas medidas. */
 
@@ -40,14 +43,17 @@ export const PROPORCOES = Object.freeze({
   /* a bucha esférica: raio da esfera e meia largura da bucha, em êmbolo */
   esfera: 0.5,
   meiaLarguraDaBucha: 0.38,
-  /* o pescoço: raio da ponta menor, em êmbolo (0,9 da meia largura do olhal), e onde ela começa, contado do pino */
+  /* o pescoço: raio do cilindro, em êmbolo (0,9 da meia largura do olhal), onde ele começa dentro do anel e onde sai
+     dele, contados do pino; a saída fica além do raio do olhal (0,55), e só dali para fora a peça engrossa */
   pescoco: 0.225,
   inicioDoPescoco: 0.4,
+  saidaDoPescoco: 0.6,
   /* do centro do pino ao fundo da camisa e ao fim do corpo da haste (a face do colar), em êmbolo */
   distanciaTraseira: 0.75,
   distanciaDianteira: 0.85,
-  /* o cone do terminal, em êmbolo, e o colar em haste (com o piso em êmbolo) */
-  coneDoTerminal: 0.25,
+  /* o cone do terminal, em êmbolo, e o colar em haste (com o piso em êmbolo); o colar tem o que sobra entre a face dele
+     e o cone, 0,85 - 0,6 - 0,15 = 0,1 do êmbolo */
+  coneDoTerminal: 0.15,
   colar: 0.65,
   colarMinimo: 0.3,
   embolo: 0.25,
@@ -83,8 +89,9 @@ function olhal(embolo, fixacao, centro) {
     larguraDaBucha: 2 * meiaLarguraDaBucha,
     cupula,
     raioDoPescoco: PROPORCOES.pescoco * embolo,
-    /* a ponta menor do pescoço, contada do centro do pino em direção à peça vizinha */
+    /* a ponta do pescoço dentro do anel e o fim dele fora do anel, contados do centro do pino em direção à peça vizinha */
     distanciaDoPescoco: PROPORCOES.inicioDoPescoco * embolo,
+    saidaDoPescoco: PROPORCOES.saidaDoPescoco * embolo,
   };
 }
 
@@ -113,8 +120,8 @@ export function geometriaDoCilindro(parametros) {
   const raioDoColar = Math.max(PROPORCOES.colar * haste, PROPORCOES.colarMinimo * embolo);
   const comprimentoDoCone = PROPORCOES.coneDoTerminal * embolo;
   const comprimentoDoTerminal = PROPORCOES.distanciaDianteira * embolo - dianteiro.distanciaDoPescoco;
-  /* o tronco de cone traseiro vai da ponta menor (junto do pino) até SOBREPOSICAO dentro do fundo da camisa; a base fica
-     no meio da parede, para ficar dentro da face externa do tubo */
+  /* o pescoço traseiro é o cilindro da ponta menor (junto do pino) até a saída do anel e, dali, o tronco de cone até
+     SOBREPOSICAO dentro do fundo da camisa; a base fica no meio da parede, para ficar dentro da face externa do tubo */
   const raioDaBaseDoPescoco = embolo / 2 + parede / 2;
   return {
     lados: LADOS,
@@ -138,6 +145,7 @@ export function geometriaDoCilindro(parametros) {
       pescoco: {
         inicio: traseiro.distanciaDoPescoco,
         comprimento: inicioDaCamisa + SOBREPOSICAO - traseiro.distanciaDoPescoco,
+        comprimentoDoCilindro: traseiro.saidaDoPescoco - traseiro.distanciaDoPescoco,
         raioMenor: traseiro.raioDoPescoco,
         raioMaior: raioDaBaseDoPescoco,
       },
@@ -154,7 +162,9 @@ export function geometriaDoCilindro(parametros) {
         inicio: inicioDoColar,
         comprimento: comprimentoDoTerminal,
         raioDoColar,
-        comprimentoDoColar: comprimentoDoTerminal - comprimentoDoCone,
+        comprimentoDoColar: PROPORCOES.distanciaDianteira * embolo - dianteiro.saidaDoPescoco - comprimentoDoCone,
+        /* do começo do terminal ao começo do cilindro do pescoço, que vai até a ponta dentro do anel */
+        comprimentoAteOPescoco: PROPORCOES.distanciaDianteira * embolo - dianteiro.saidaDoPescoco,
         raioDoPescoco: dianteiro.raioDoPescoco,
       },
       olhal: dianteiro,

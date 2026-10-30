@@ -4,7 +4,8 @@
    (a guia da haste) fecha o furo na frente e o pescoço traseiro (a tampa prolongada) sai do fundo até o olhal traseiro. A
    haste junta o êmbolo, o corpo e o terminal rosqueado, que leva o olhal dianteiro. Cada peça do conjunto é um corpo
    fechado com a sua parte, e os corpos de uma peça se unem entrando uns nos outros: 0,2 mm nas juntas planas e, no
-   pescoço, até o meio da massa do anel do olhal. Os olhais com rótula levam uma bucha esférica a mais, mais larga que o
+   pescoço, até o meio da massa do anel do olhal. O pescoço é cilíndrico e mais fino que a largura do anel enquanto está
+   sobre o disco dele, e só engrossa (no cone até a camisa ou até o colar do terminal) fora do anel. Os olhais com rótula levam uma bucha esférica a mais, mais larga que o
    olhal, no furo do pino. O conjunto é a camisa e a haste lado a lado, na pose recolhida, numa peça só, com a declaração da articulação, e é o que `chamar` devolve; a montagem v5 da
    família usa a camisa e a haste separadas.
 
@@ -134,7 +135,10 @@ function nosDaCamisa({ rotula }) {
       operacao: 'lathe',
       argumentos: {
         origemId: 6,
-        perfil: [[0, 0], [p('pescocoRaioMenor'), 0], [p('pescocoRaioMaior'), p('pescocoComprimento')], [0, p('pescocoComprimento')]],
+        perfil: [
+          [0, 0], [p('pescocoRaioMenor'), 0], [p('pescocoRaioMenor'), p('pescocoComprimentoDoCilindro')],
+          [p('pescocoRaioMaior'), p('pescocoComprimento')], [0, p('pescocoComprimento')],
+        ],
         lados: p('lados'),
         eixo: 'x',
         em: [p('pescocoInicio'), 0, 0],
@@ -197,6 +201,7 @@ function nosDaHaste({ rotula }) {
         origemId: 15,
         perfil: [
           [0, 0], [p('terminalRaioDoColar'), 0], [p('terminalRaioDoColar'), p('terminalComprimentoDoColar')],
+          [p('terminalRaioDoPescoco'), p('terminalComprimentoAteOPescoco')],
           [p('terminalRaioDoPescoco'), p('terminalComprimento')], [0, p('terminalComprimento')],
         ],
         lados: p('lados'),
@@ -256,6 +261,7 @@ const PARAMETROS_DA_CAMISA = (rotula) => ({
   comprimentoDaCabeca: numero,
   pescocoInicio: numero,
   pescocoComprimento: numero,
+  pescocoComprimentoDoCilindro: numero,
   pescocoRaioMenor: numero,
   pescocoRaioMaior: numero,
   ...PARAMETROS_DO_OLHAL('traseiro'),
@@ -277,6 +283,7 @@ const PARAMETROS_DA_HASTE = (rotula) => ({
   terminalInicio: numero,
   terminalComprimento: numero,
   terminalComprimentoDoColar: numero,
+  terminalComprimentoAteOPescoco: numero,
   terminalRaioDoColar: numero,
   terminalRaioDoPescoco: numero,
   ...PARAMETROS_DO_OLHAL('dianteiro'),
