@@ -101,6 +101,7 @@ As decisões 1 a 4 foram aprovadas em 2026-10-28, na forma recomendada, ao ativa
 
 5. **Peças de borda e análise de superfície.** Aprovada em 2026-10-27: as fatias 11 a 13 entram neste plano, e as duas vistas de análise de superfície são promovidas a uso.
 6. **Os achados da calibração de 2026-10-29 e o achado da bancada.** Aprovada em 2026-10-30: a pessoa pediu para resolver neste plano, em agentes paralelos, a união da haste com o olhal do cilindro, a escala igual nas vistas e o sentido lateral no vocabulário, depois de ler a análise de cada um, e liberou mudar a lista de sentidos no arquivo do agente crítico só nesse ponto; as três saíram do backlog e viraram as fatias 16 a 18, com a 15 (os ids da bancada) e a 19 (a calibração julgada de novo) antes do fechamento.
+7. **Pendências do fechamento e vistas de superfície.** Aprovada em 2026-10-30: a pessoa pediu para concluir no fechamento, em agentes paralelos, a prova da conferência das molduras no trecho de carroceria feito pela rede de curvas e no painel lateral da perua recriada do pacote CC0, o vão que toca o plano de simetria e a exigência de declarar os vãos da peça que contorna abertura; e decidiu, pela recomendação, que as vistas de luz rasante e de curvatura passam a ser obrigatórias só para as peças de lataria.
 
 ## Riscos e parada
 
