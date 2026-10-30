@@ -117,6 +117,11 @@ procedimento está em
 
 ## Como abrir a bancada
 
+A forma mais rápida é a bancada publicada, em
+[warbookbr.github.io/nos-modelar/bancada.html](https://warbookbr.github.io/nos-modelar/bancada.html),
+que abre no navegador com as peças do acervo. Para ver a peça em que um agente
+está trabalhando e salvar um ajuste de juntas, use a bancada local.
+
 A bancada roda no próprio computador, com o Node instalado:
 
 ```bash

@@ -7,8 +7,11 @@ que o Modelar é, para quem é e como uma peça nasce e é aprovada.
 Oficina procedural para IA criar, organizar, inspecionar, medir e corrigir
 objetos 3D mecânicos: núcleo geométrico, receitas determinísticas, bancada de
 inspeção e ferramentas de validação.
-A bancada, a única aplicação, roda localmente (`npm run dev`, abaixo); a
-publicação no GitHub Pages saiu em 2026-10-27. O repositório é público.
+A bancada, a única aplicação, fica publicada em
+[warbookbr.github.io/nos-modelar/bancada.html](https://warbookbr.github.io/nos-modelar/bancada.html),
+com as peças do acervo, e roda também localmente (`npm run dev`, abaixo), que é
+onde a sessão ativa de um agente e o ajuste de juntas funcionam. O repositório é
+público.
 
 ## Como se trabalha
 
