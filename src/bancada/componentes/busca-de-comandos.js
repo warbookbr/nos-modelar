@@ -50,6 +50,14 @@ export function montarBuscaDeComandos({ elementos, fontes, janela = globalThis }
           interruptor.setAttribute('role', 'switch');
           botao.append(interruptor);
         }
+        if (item.escolhido !== null) {
+          const marca = documento.createElement('span');
+          marca.className = 'marca-escolha';
+          marca.setAttribute('role', 'radio');
+          marca.setAttribute('aria-checked', String(item.escolhido));
+          marca.textContent = item.escolhido ? '✓' : '';
+          botao.append(marca);
+        }
         if (item.tecla) {
           const tecla = documento.createElement('kbd');
           tecla.textContent = formatarTecla(item.tecla);

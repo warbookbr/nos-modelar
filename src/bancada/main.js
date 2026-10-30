@@ -41,6 +41,13 @@ import { montarReferenciaMetrica } from './componentes/referencia-metrica.js';
 import { montarCaixaDaVisao } from './componentes/caixa-da-visao.js';
 import { montarTema } from './componentes/tema.js';
 import { montarBuscaDeComandos } from './componentes/busca-de-comandos.js';
+import { montarPaineisDoTema } from './componentes/paineis-do-tema.js';
+import { montarCartaoDaSelecao, MARGENS_DO_CARTAO } from './componentes/cartao-da-selecao.js';
+import { montarCuboDeOrientacao } from './componentes/cubo-de-orientacao.js';
+import { montarBarraDeEdicao } from './componentes/barra-de-edicao.js';
+import { montarBarraDeEstado } from './componentes/barra-de-estado.js';
+import { montarNomeDaPeca } from './componentes/nome-da-peca.js';
+import { montarPopoverDaCena } from './componentes/popover-da-cena.js';
 import { criarPonteDaCaptura, publicarPonte } from './componentes/ponte-da-captura.js';
 
 /* `sessaoPorUrl` deixa a URL escolher o arquivo de sessão (`?sessao=<caminho>`), em vez do `sessao-ativa.json` compartilhado: só o
@@ -121,6 +128,18 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     estado,
     selecionar: (nome) => cena.controlador.selecionar(nome, { aditiva: true }),
     limpar: () => cena.controlador?.limpar(),
+    /* Isolar pela linha é escolher só aquela parte e isolá-la; de novo na mesma linha volta à montagem. */
+    isolar(nome) {
+      const controlador = cena.controlador;
+      if (!controlador) return;
+      if (controlador.modo === 'isolar' && controlador.selecionadas.length === 1 && controlador.selecionadas[0] === nome) {
+        controlador.definirModo('todas');
+        return;
+      }
+      controlador.selecionarMuitas([nome]);
+      controlador.definirModo('isolar');
+    },
+    alternarOculta: (nome) => cena.alternarOculta(nome),
     aoRecolher: redimensionar,
   });
 
@@ -162,6 +181,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     ambiente, estado, cena, seletorDeVisao, preferenciasBancada, avisar, parametros: params,
   });
 
+  let paineisDoTema = null;
   /* As ações sobre a peça olhada, as mesmas para o painel da direita, a busca de comandos e o cartão da seleção. */
   const acoesDaPeca = {
     focarSelecao: () => cena.focarSelecao(),
@@ -187,6 +207,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     estado,
     aoRecolher: redimensionar,
     acoes: acoesDaPeca,
+    aoEscolherAba: () => paineisDoTema?.abrir('inspecao'),
   });
   montarAbaAnotacoes({
     elementos: elementos.painelInspecao.anotacoes,
@@ -255,12 +276,68 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
       valor: () => `${Math.round((estado.obter('selecao')?.explosao ?? 0) * 100)}%`,
       executar: () => acoesDaPeca.definirExplosao((estado.obter('selecao')?.explosao ?? 0) > 0 ? 0 : 0.5),
     },
+    { id: 'painel-partes', grupo: 'Painéis', rotulo: 'Partes', ligado: () => Boolean(estado.obter('paineis').partes), executar: () => paineisDoTema.alternar('partes') },
+    { id: 'painel-detalhes', grupo: 'Painéis', rotulo: 'Detalhes da seleção', ligado: () => Boolean(estado.obter('paineis').inspecao), executar: () => paineisDoTema.abrir('inspecao', { aba: 'inspecao' }) },
+    { id: 'painel-referencia', grupo: 'Painéis', rotulo: 'Imagem de referência', executar: () => abrirAbaDoPainel('referencias') },
+    { id: 'painel-notas', grupo: 'Painéis', rotulo: 'Anotações', valor: () => String(estado.obter('anotacoes')?.length ?? 0), executar: () => abrirAbaDoPainel('anotacoes') },
     { id: 'estado', grupo: 'Painéis', rotulo: 'Estado da sessão e eventos', executar: () => barraSuperior.abrirJanela('estado') },
     { id: 'controles', grupo: 'Painéis', rotulo: 'Controles e atalhos', executar: () => barraSuperior.abrirJanela('controles') },
     ...TEMAS.map((cada) => ({
-      id: `tema-${cada.id}`, grupo: 'Tema', rotulo: cada.rotulo, ligado: () => estado.obter('tema') === cada.id, executar: () => tema.escolher(cada.id),
+      id: `tema-${cada.id}`, grupo: 'Tema', rotulo: cada.rotulo, escolhido: () => estado.obter('tema') === cada.id, executar: () => tema.escolher(cada.id),
     })),
   ];
+  /* Abrir uma aba do painel da direita abre o painel no tema que o deixa fechado. */
+  function abrirAbaDoPainel(aba) {
+    paineisDoTema.abrir('inspecao');
+    painelInspecao.abrirAba(aba);
+  }
+  paineisDoTema = montarPaineisDoTema({
+    elementos: elementos.paineisDoTema, estado, abrirAba: (aba) => painelInspecao.abrirAba(aba),
+  });
+  montarNomeDaPeca({ elementos: elementos.nomeDaPeca, estado });
+  montarPopoverDaCena({ elementos: elementos.popoverDaCena });
+  montarCuboDeOrientacao({ elementos: elementos.cuboDeOrientacao, orientacao: () => ambiente.camera.matrixWorldInverse.elements });
+  montarCartaoDaSelecao({
+    elementos: elementos.cartaoDaSelecao,
+    estado,
+    acoes: {
+      ...acoesDaPeca,
+      limpar: () => cena.controlador?.limpar(),
+      ocultarSelecao() {
+        const selecionadas = cena.controlador?.selecionadas ?? [];
+        cena.definirOcultas([...new Set([...estado.obter('ocultas'), ...selecionadas])]);
+        cena.controlador?.limpar();
+      },
+      abrirDetalhes: () => paineisDoTema.abrir('inspecao', { aba: 'inspecao' }),
+    },
+    caixaNaTela: () => cena.caixaDaSelecaoNaTela(),
+    medidas: () => cena.medidasDaSelecao(),
+    /* O cartão não cobre a árvore das partes quando ela está aberta. */
+    margens: () => ({
+      ...MARGENS_DO_CARTAO,
+      esquerda: MARGENS_DO_CARTAO.esquerda + (estado.obter('paineis').partes ? 240 + 16 : 0),
+    }),
+  });
+  montarBarraDeEdicao({
+    elementos: elementos.barraDeEdicao,
+    estado,
+    corpo: elementos.corpo,
+    acoes: {
+      alternarModoJuntas: () => temPeca() && edicao.alternarModoJuntas(),
+      alternarEdicaoDeMalha: () => temPeca() && edicao.alternarEdicaoDeMalha(),
+      desfazer: () => edicao.desfazerDesenho() || avisar('Nada para desfazer nesta sessão.'),
+      descartar: () => edicao.descartarDesenho(),
+    },
+  });
+  montarBarraDeEstado({
+    elementos: elementos.barraDeEstado,
+    estado,
+    medidasDaPeca: () => cena.medidasDaPeca(),
+    acoes: {
+      alternarPreferenciaCena: (qual) => vista.alternarPreferenciaCena(qual),
+      abrirControles: () => barraSuperior.abrirJanela('controles'),
+    },
+  });
   montarBuscaDeComandos({
     elementos: elementos.buscaDeComandos,
     fontes: () => ({

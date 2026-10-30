@@ -8,12 +8,13 @@ import { formatarNome } from '../formatar.js';
 
 /** O texto em minúsculas e sem acento, para "visao" achar "Visão". */
 export function normalizarBusca(texto) {
-  return String(texto ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase('pt-BR').trim();
+  return String(texto ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
 }
 
 /**
  * Os grupos da busca para `termo`, cada um `{ grupo, itens }`, sem grupo vazio. Cada item tem `id`, `rotulo`, `grupo`,
- * `tecla` (a combinação, ou nada), `ligado` (para o que liga e desliga), `valor` (um texto curto à direita) e `executar`.
+ * `tecla` (a combinação, ou nada), `ligado` (para o que liga e desliga), `escolhido` (para uma opção entre várias, como o
+ * tema), `valor` (um texto curto à direita) e `executar`.
  */
 export function itensDaBusca({ termo = '', extras = [], comandos = [], teclas = {}, partes = [], selecionar = () => {} }) {
   const procurado = normalizarBusca(termo);
@@ -27,6 +28,7 @@ export function itensDaBusca({ termo = '', extras = [], comandos = [], teclas = 
     grupo: extra.grupo,
     tecla: extra.tecla ?? null,
     ligado: typeof extra.ligado === 'function' ? Boolean(extra.ligado()) : null,
+    escolhido: typeof extra.escolhido === 'function' ? Boolean(extra.escolhido()) : null,
     valor: typeof extra.valor === 'function' ? extra.valor() : null,
     executar: extra.executar,
   }));
@@ -36,6 +38,7 @@ export function itensDaBusca({ termo = '', extras = [], comandos = [], teclas = 
     grupo: comando.grupo,
     tecla: teclas[comando.id] ?? comando.padrao ?? null,
     ligado: null,
+    escolhido: null,
     valor: null,
     executar: comando.executar,
   })) : [];
@@ -45,6 +48,7 @@ export function itensDaBusca({ termo = '', extras = [], comandos = [], teclas = 
     grupo: 'Partes',
     tecla: null,
     ligado: null,
+    escolhido: null,
     valor: null,
     executar: () => selecionar(nome),
   })) : [];

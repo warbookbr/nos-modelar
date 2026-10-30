@@ -93,6 +93,12 @@ export function estadoInicialDaBancada({ pecaPedida = null, visao, tema = 'foco'
     preferenciasCena: null,
     atalhos: null,
     juntas: { modo: false, quantas: 0, mudou: false, rodapeVisivel: false },
+    /* a camada de edição de malha ligada (Tab), que a barra do modo de edição mostra */
+    malhaEmEdicao: false,
+    /* as partes escondidas uma a uma pela árvore */
+    ocultas: [],
+    /* os painéis do tema que estão abertos, por nome (`partes`, `inspecao`) */
+    paineis: {},
     ofertaDaSessao: null,
     anotacoes: null,
   };

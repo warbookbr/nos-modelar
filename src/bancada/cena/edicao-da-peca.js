@@ -454,6 +454,7 @@ export function criarEdicaoDaPeca({
     if (edicaoDeMalha?.estado?.().ativo) {
       edicaoDeMalha.alternar();
       ambiente.controls.mouseButtons = { ...BOTOES_DE_CAMERA_PADRAO };
+      estado.definir({ malhaEmEdicao: false });
       return;
     }
     const controlador = cena.controlador;
@@ -466,6 +467,7 @@ export function criarEdicaoDaPeca({
       MIDDLE: THREE.MOUSE.ROTATE,
       RIGHT: THREE.MOUSE.PAN,
     };
+    estado.definir({ malhaEmEdicao: true });
     avisar(selecionadas.length
       ? `Editando ${selecionadas.join(', ')}. Botão do meio gira, direito arrasta.`
       : 'Editando a peça inteira. Selecione uma parte antes do Tab para limitar.');
@@ -489,9 +491,17 @@ export function criarEdicaoDaPeca({
       punhosDeJunta.atualizarEscala();
       edicaoDeMalha?.acompanharCamera?.();
     },
+    /** Desfaz tudo o que esta sessão desenhou, até a peça voltar ao que veio do arquivo. */
+    descartarDesenho() {
+      let passos = 0;
+      while (passos < 10000 && desfazerDesenho()) passos += 1;
+      avisar(passos ? 'Descartado: a peça voltou ao que veio do arquivo.' : 'Nada para descartar nesta sessão.');
+      return passos;
+    },
     /** Peça nova vai entrar: a camada da anterior sai junto com ela. */
     antesDeTrocarDeModelo() {
       if (edicaoDeMalha) edicaoDeMalha.destruir();
+      estado.definir({ malhaEmEdicao: false });
     },
     /** A peça que veio do arquivo vira a base do ajuste e do desfazer. */
     receberPecaDoArquivo(convertido) {

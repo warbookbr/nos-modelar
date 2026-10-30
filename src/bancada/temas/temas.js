@@ -36,7 +36,9 @@ export const TEMAS = Object.freeze([
       'regua-metrica': 'barra-estado',
       'rodape-juntas': 'barra-edicao',
     }),
-    rotulos: Object.freeze({ juntas: 'Editar', 'aba-inspecao': 'Seleção', 'aba-referencias': 'Referência', 'aba-anotacoes': 'Notas' }),
+    rotulos: Object.freeze({
+      juntas: 'Editar', 'titulo-partes': 'Partes', 'aba-inspecao': 'Seleção', 'aba-referencias': 'Referência', 'aba-anotacoes': 'Notas',
+    }),
     paineis: Object.freeze({
       partes: Object.freeze({ abertoAoNascer: false, largura: 240 }),
       inspecao: Object.freeze({ abertoAoNascer: false, largura: 272 }),

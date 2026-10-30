@@ -40,6 +40,49 @@ export function criarPecaEmCena({
   let parInspecionado = null;
   let modeloAtual = null;
   const marcadoresDoPar = [];
+  /* Valem para a peça, e não para o controlador, que é refeito a cada junta
+     arrastada: as partes escondidas pela árvore e a tinta da seleção, que o
+     tema desliga quando marca a seleção pelo contorno. */
+  let ocultas = [];
+  let tintaDaSelecao = true;
+
+  /** O tamanho e as faces de `grupos`, nas unidades da peça (metros), sem a escala que a pôs no estúdio. */
+  function medidasDe(grupos) {
+    if (!modeloAtual || !grupos.length) return null;
+    const caixa = caixaDoVisivel(grupos);
+    if (caixa.isEmpty()) return null;
+    const escala = modeloAtual.raiz.getWorldScale(new THREE.Vector3()).x || 1;
+    const tamanho = caixa.getSize(new THREE.Vector3()).divideScalar(escala);
+    const faces = grupos.reduce((soma, grupo) => soma + (grupo.userData?.faces?.length ?? 0), 0);
+    return { tamanho: tamanho.toArray(), faces };
+  }
+
+  /* A caixa da seleção vista pela câmera, em coordenadas normalizadas da tela
+     (de -1 a 1, y para cima), para o cartão da seleção ficar ao lado da parte.
+     Nula sem seleção à vista ou com a caixa atrás da câmera. */
+  function caixaDaSelecaoNaTela() {
+    if (!controlador || !modeloAtual) return null;
+    const grupos = controlador.gruposSelecionadosVisiveis();
+    if (!grupos.length) return null;
+    const caixa = caixaDoVisivel(grupos);
+    if (caixa.isEmpty()) return null;
+    const minimo = new THREE.Vector2(Infinity, Infinity);
+    const maximo = new THREE.Vector2(-Infinity, -Infinity);
+    const canto = new THREE.Vector3();
+    for (let i = 0; i < 8; i += 1) {
+      canto.set(i & 1 ? caixa.max.x : caixa.min.x, i & 2 ? caixa.max.y : caixa.min.y, i & 4 ? caixa.max.z : caixa.min.z);
+      canto.project(ambiente.camera);
+      if (canto.z > 1) return null;
+      minimo.min(canto);
+      maximo.max(canto);
+    }
+    return { esquerda: minimo.x, direita: maximo.x, base: minimo.y, topo: maximo.y };
+  }
+
+  function definirOcultas(nomes) {
+    ocultas = controlador ? controlador.definirOcultas(nomes) : [];
+    estado.definir({ ocultas });
+  }
 
   function limparMarcadoresDoPar() {
     for (const marcador of marcadoresDoPar.splice(0)) {
@@ -302,6 +345,11 @@ export function criarPecaEmCena({
     });
 
     edicao()?.criarCamadaDoModelo(convertido, { deAjuste });
+    /* Peça nova volta com todas as partes à vista; a reconstrução pelo ajuste mantém as escondidas. */
+    if (!deAjuste) ocultas = [];
+    if (ocultas.length) ocultas = controlador.definirOcultas(ocultas);
+    if (!tintaDaSelecao) controlador.definirTintaDaSelecao(false);
+    estado.definir({ ocultas });
 
     estado.definir({ temHierarquia: controlador.temHierarquia() });
 
@@ -371,6 +419,18 @@ export function criarPecaEmCena({
     salvarEstadoNaUrl,
     focarSelecao,
     focarContato,
+    definirOcultas,
+    alternarOculta(nome) {
+      definirOcultas(ocultas.includes(nome) ? ocultas.filter((outra) => outra !== nome) : [...ocultas, nome]);
+    },
+    definirTintaDaSelecao(ligada) {
+      tintaDaSelecao = Boolean(ligada);
+      controlador?.definirTintaDaSelecao(tintaDaSelecao);
+    },
+    caixaDaSelecaoNaTela,
+    medidasDaSelecao: () => (controlador ? medidasDe(controlador.gruposSelecionados()) : null),
+    medidasDaPeca: () => (controlador ? medidasDe(controlador.nomes.map((nome) => controlador.grupoDe(nome)).filter(Boolean)) : null),
+    gruposDoContorno: () => controlador?.gruposSelecionadosVisiveis() ?? [],
     inspecionarPar,
     enquadrarMontagem,
     caixaDoVisivel: () => (modeloAtual ? caixaDoVisivel([modeloAtual.raiz]) : null),

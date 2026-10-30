@@ -726,6 +726,7 @@ body.modal-aberto { overflow: hidden; }
 .item-busca[aria-selected="true"] { background: var(--superficie-2); box-shadow: inset 2px 0 0 var(--destaque); }
 .item-busca .nome-item { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-busca .valor-item { color: var(--texto-2); font: 400 var(--t-p) var(--numeros); }
+.marca-escolha { flex: none; width: 16px; color: var(--destaque); font-weight: 600; text-align: center; }
 .vazio-busca { margin: var(--e3); color: var(--texto-2); font-size: var(--t-p); }
 .pe-busca {
   display: flex;
@@ -1010,6 +1011,378 @@ body.modal-aberto { overflow: hidden; }
 }
 
 /* ========================================================================== */
+/* Arrumação do Foco: a peça na tela inteira e os controles flutuando         */
+/* ========================================================================== */
+
+/* O que só existe numa arrumação some nas outras. */
+:root:not([data-arrumacao="foco"]) [data-arrumacoes~="foco"] { display: none !important; }
+:root[data-arrumacao="foco"] .barra-controles,
+:root[data-arrumacao="foco"] .vistas,
+:root[data-arrumacao="foco"] .recolher,
+:root[data-arrumacao="foco"] .painel > .dica,
+:root[data-arrumacao="foco"] .fixture-atual,
+:root[data-arrumacao="foco"] #tituloInspecao,
+:root[data-arrumacao="foco"] .acoes-editar:not(:has(button)),
+:root[data-arrumacao="foco"] #eixosReferencia { display: none; }
+:root:not([data-arrumacao="foco"]) .fechar-painel,
+:root:not([data-arrumacao="foco"]) .dica-lista,
+:root:not([data-arrumacao="foco"]) [data-movel] > .icone,
+:root:not([data-arrumacao="foco"]) .seletor-visao .icone { display: none; }
+
+.lugar { display: contents; }
+.sprite-icones { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.botao-icone {
+  display: inline-grid;
+  place-items: center;
+  width: var(--controle);
+  height: var(--controle);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto);
+  cursor: pointer;
+}
+.botao-icone:hover { background: var(--superficie-2); }
+.botao-icone[aria-expanded="true"],
+.botao-icone[aria-pressed="true"] { background: var(--destaque-fraco); color: var(--destaque); }
+.botao-icone.pequeno { width: 24px; height: 24px; color: var(--texto-2); }
+.divisor { align-self: stretch; width: 1px; margin: var(--e1); background: var(--linha); }
+
+/* ----- o alto: três grupos flutuantes ----- */
+.topo-foco {
+  position: fixed;
+  z-index: 10;
+  top: var(--e4);
+  right: var(--e4);
+  left: var(--e4);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--e3);
+  pointer-events: none;
+}
+.grupo-flutuante {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--e-meio);
+  padding: var(--e1);
+  border: var(--traco);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+  pointer-events: auto;
+}
+.topo-foco .grupo-flutuante > button,
+.topo-foco .lugar > button,
+.topo-foco .seletor-visao > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e2);
+  min-width: var(--controle);
+  height: var(--controle);
+  padding: 0 var(--e2);
+  border: 1px solid transparent;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto);
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.topo-foco .grupo-flutuante > button:hover,
+.topo-foco .lugar > button:hover,
+.topo-foco .seletor-visao > button:hover { background: var(--superficie-2); }
+.topo-foco .lugar > button.ativa,
+.topo-foco .lugar > button.ativo,
+.topo-foco .lugar > button[aria-pressed="true"],
+.topo-foco .lugar > button[aria-expanded="true"],
+.topo-foco .seletor-visao > button.ativa,
+.topo-foco .seletor-visao > button[aria-expanded="true"] { background: var(--destaque-fraco); color: var(--destaque); }
+.topo-foco .grupo-flutuante > .botao-icone { padding: 0; }
+.topo-foco kbd { margin-left: var(--e1); }
+.barra-cena kbd,
+.grupo-peca kbd,
+.seletor-visao .rotulo-visao { display: none; }
+.seletor-visao .seta { color: var(--texto-3); }
+.topo-foco .selo-estado { margin-left: 0; }
+
+.nome-peca { display: flex; align-items: center; gap: var(--e2); min-width: 0; padding: 0 var(--e2); }
+.nome-peca b { overflow: hidden; font-size: var(--t-g); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.estado-sessao { display: inline-flex; align-items: center; gap: var(--e1); color: var(--texto-2); font-size: var(--t-p); white-space: nowrap; }
+.estado-sessao i { width: 6px; height: 6px; border-radius: 50%; background: var(--texto-3); }
+.estado-sessao[data-sessao="conectado"] i { background: var(--ok); }
+.estado-sessao[data-sessao="sincronizando"] i { background: var(--destaque); }
+.estado-sessao[data-sessao="erro"] { color: var(--erro); }
+.estado-sessao[data-sessao="erro"] i { background: var(--erro); }
+
+.busca-gatilho { padding: 0 var(--e2) 0 var(--e3); color: var(--texto-2); }
+.topo-foco .busca-gatilho { color: var(--texto-2); }
+
+/* ----- a caixa da cena (grade, chão e explosão) ----- */
+.popover-ancora { position: relative; display: flex; }
+.popover {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e3);
+  width: 260px;
+  padding: var(--e3);
+  border: var(--traco);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  box-shadow: var(--sombra-forte);
+}
+
+/* ----- o cubo de orientação ----- */
+.cubo-orientacao {
+  position: fixed;
+  z-index: 8;
+  top: 80px;
+  right: var(--e4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e2);
+  width: 112px;
+}
+.palco-cubo { display: grid; place-items: center; width: 112px; height: 112px; }
+.corpo-cubo { position: relative; width: 64px; height: 64px; transform-style: preserve-3d; }
+.face-cubo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--linha-forte);
+  background: var(--superficie);
+  color: var(--texto-2);
+  font-size: var(--t-p);
+  backface-visibility: hidden;
+  cursor: pointer;
+}
+.face-cubo:hover { background: var(--destaque-fraco); color: var(--destaque); }
+.face-cubo.ativa { color: var(--destaque); }
+.face-frente { transform: translateZ(32px); }
+.face-tras { transform: rotateY(180deg) translateZ(32px); }
+.face-direita { transform: rotateY(90deg) translateZ(32px); }
+.face-esquerda { transform: rotateY(-90deg) translateZ(32px); }
+.face-cima { transform: rotateX(90deg) translateZ(32px); }
+.face-baixo { transform: rotateX(-90deg) translateZ(32px); }
+.botao-iso {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e1);
+  height: 24px;
+  padding: 0 var(--e2);
+  border: 0;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto-2);
+  font-size: var(--t-p);
+  cursor: pointer;
+}
+.botao-iso:hover { background: var(--superficie-2); color: var(--texto); }
+.botao-iso.ativa { color: var(--destaque); }
+.botao-iso .icone { width: 14px; height: 14px; }
+/* Com o painel da direita aberto o cubo fica ao lado dele, e não por baixo. */
+:root[data-arrumacao="foco"] body:has(.painel-inspecao[data-aberto="true"]) .cubo-orientacao { right: calc(272px + 2 * var(--e4)); }
+
+/* ----- os painéis flutuantes: a árvore à esquerda, os detalhes à direita ----- */
+:root[data-arrumacao="foco"] .painel {
+  position: fixed;
+  z-index: 9;
+  top: 72px;
+  bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--traco);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+}
+:root[data-arrumacao="foco"] .painel[data-aberto="false"] { display: none; }
+:root[data-arrumacao="foco"] .painel-partes { left: var(--e4); width: 240px; }
+:root[data-arrumacao="foco"] .painel-inspecao { right: var(--e4); width: 272px; }
+:root[data-arrumacao="foco"] .painel-cabecalho {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--e10);
+  padding: 0 var(--e1) 0 var(--e3);
+  border-bottom: var(--traco);
+}
+:root[data-arrumacao="foco"] .painel-cabecalho h1 { font-size: var(--t-m); }
+:root[data-arrumacao="foco"] .partes-controles { flex: none; padding: var(--e2); border-bottom: var(--traco); }
+.partes-controles > * { min-width: 0; }
+.resumo-lista { display: flex; justify-content: space-between; gap: var(--e2); color: var(--texto-2); font-size: var(--t-p); white-space: nowrap; }
+.resumo-lista > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.resumo-selecao { white-space: nowrap; }
+:root[data-arrumacao="foco"] .lista-partes { padding: var(--e1); }
+.pe-partes {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e2);
+  color: var(--texto-2);
+  font-size: var(--t-p);
+}
+:root[data-arrumacao="foco"] .pe-partes { padding: var(--e1) var(--e1) var(--e1) var(--e3); border-top: var(--traco); }
+:root[data-arrumacao="foco"] .painel-inspecao > .abas-painel { flex: none; align-items: center; padding: var(--e1); border-bottom: var(--traco); }
+:root[data-arrumacao="foco"] .painel-inspecao > .aba-conteudo:not([hidden]) { flex: 1 1 auto; min-height: 0; padding: var(--e3); overflow-y: auto; }
+:root[data-arrumacao="foco"] .painel-inspecao > .aba-conteudo:not([hidden]) > * { flex-shrink: 0; }
+
+/* ----- o cartão da seleção ----- */
+.cartao-selecao {
+  position: fixed;
+  z-index: 12;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e3);
+  width: 304px;
+  padding: var(--e3);
+  border: var(--traco);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  box-shadow: var(--sombra-forte);
+  will-change: transform;
+}
+.cabeca-cartao { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--e2); }
+.cabeca-cartao h2 { font-size: var(--t-m); }
+.medidas-cartao { margin: var(--e-meio) 0 0; color: var(--texto-2); font-size: var(--t-p); }
+.acoes-cartao { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--e-meio); margin: 0 calc(-1 * var(--e1)); }
+.acoes-cartao button,
+.pe-cartao button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e1);
+  padding: 0 var(--e1);
+  border: 0;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto-2);
+  font-size: var(--t-p);
+  cursor: pointer;
+}
+.acoes-cartao button { flex-direction: column; height: var(--e12); }
+.acoes-cartao button:hover,
+.pe-cartao button:hover:not(:disabled) { background: var(--superficie-2); color: var(--texto); }
+.acoes-cartao button[aria-pressed="true"] { background: var(--destaque-fraco); color: var(--destaque); }
+.acoes-cartao button:disabled,
+.pe-cartao button:disabled { color: var(--texto-3); cursor: default; }
+.deslize-cartao { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--e3); font-size: var(--t-p); }
+.deslize-cartao output { min-width: 36px; color: var(--texto-2); text-align: right; }
+.pe-cartao { display: flex; justify-content: space-between; margin: 0 calc(-1 * var(--e1)) calc(-1 * var(--e1)); padding-top: var(--e2); border-top: var(--traco); }
+.pe-cartao button { height: 28px; }
+
+/* ----- o modo de edição ----- */
+.barra-edicao {
+  position: fixed;
+  z-index: 12;
+  bottom: 48px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  padding: var(--e1);
+  transform: translateX(-50%);
+  border: var(--traco);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  box-shadow: var(--sombra-forte);
+  white-space: nowrap;
+}
+.segmento { display: flex; gap: var(--e-meio); padding: var(--e-meio); border-radius: var(--raio-p); background: var(--superficie-2); }
+.segmento button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e1);
+  height: 28px;
+  padding: 0 var(--e2);
+  border: 0;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto-2);
+  cursor: pointer;
+}
+.segmento button[aria-pressed="true"] { background: var(--superficie); color: var(--texto); font-weight: 500; box-shadow: var(--sombra); }
+.barra-edicao .rodape-juntas { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.barra-edicao .rodape-juntas #resumoJuntas { padding: 0 var(--e2); }
+:root[data-arrumacao="foco"] body.editando::after {
+  position: fixed;
+  z-index: 11;
+  inset: 0;
+  box-shadow: inset 0 0 0 2px var(--destaque);
+  content: '';
+  pointer-events: none;
+}
+
+/* ----- a barra de estado ----- */
+.barra-estado {
+  position: fixed;
+  z-index: 7;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: stretch;
+  height: 28px;
+  border-top: var(--traco);
+  background: var(--superficie);
+  color: var(--texto-2);
+  font-size: var(--t-p);
+}
+.barra-estado > * {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  padding: 0 var(--e3);
+  border-left: var(--traco);
+  white-space: nowrap;
+}
+.barra-estado > :first-child { border-left: 0; }
+.barra-estado > .lugar { display: contents; }
+.barra-estado .referencia-metrica { display: flex; align-items: center; padding: 0 var(--e3); border-left: var(--traco); }
+.barra-estado .regua-metrica i { width: 48px; }
+.barra-estado b { color: var(--texto); font-weight: 500; }
+.dica-estado { flex: 1 1 auto; min-width: 0; overflow: hidden; color: var(--texto-3); text-overflow: ellipsis; }
+.alternar { border-top: 0; border-right: 0; border-bottom: 0; background: none; color: var(--texto-3); cursor: pointer; }
+.alternar:hover { color: var(--texto); }
+.alternar[aria-pressed="true"] { color: var(--destaque); }
+.alternar .icone { width: 14px; height: 14px; }
+
+/* Os avisos sobem para cima da barra do modo de edição. */
+:root[data-arrumacao="foco"] .aviso,
+:root[data-arrumacao="foco"] #erro { bottom: 104px; }
+
+/* ----- janela estreita: os rótulos longos saem, os ícones ficam ----- */
+@media (max-width: 1240px) {
+  .topo-foco .texto-largo,
+  .topo-foco .texto-botao,
+  .topo-foco #btnProjecao > span,
+  .topo-foco #btnEnquadrar > span,
+  .topo-foco .estado-sessao span,
+  .unidade-estado,
+  #pecaEstado { display: none; }
+  .topo-foco .grupo-flutuante > button,
+  .topo-foco .lugar > button { padding: 0 var(--e1); }
+  :root[data-arrumacao="foco"] .painel-partes { width: 224px; }
+  :root[data-arrumacao="foco"] .painel-inspecao { width: 256px; }
+}
+
+/* ========================================================================== */
 /* Auditoria: a imagem para ler a peça, sem nada da interface                 */
 /* ========================================================================== */
 
@@ -1017,7 +1390,8 @@ body.modal-aberto { overflow: hidden; }
    tela sem peça), que a imagem de auditoria sempre mostrou. */
 body.auditoria #bancadaApp > :not(#cenaBancada, #erro, .aviso-estado, .aviso-sessao-nova, .rodape-juntas, .estado-catalogo-vazio),
 body.auditoria .painel-visao,
-body.auditoria .aviso { display: none !important; }
+body.auditoria .aviso,
+body.auditoria.editando::after { display: none !important; }
 body.auditoria #cenaBancada {
   position: fixed !important;
   inset: 0 !important;

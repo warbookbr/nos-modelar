@@ -19,7 +19,7 @@ function montar() {
   const extras = [
     { id: 'abrir', grupo: 'Peça', rotulo: 'Abrir peça do acervo', executar: () => executados.push('abrir') },
     { id: 'grade', grupo: 'Cena', rotulo: 'Grade', tecla: 'h', ligado: () => true, executar: () => executados.push('grade') },
-    { id: 'tema-foco', grupo: 'Tema', rotulo: 'Foco', ligado: () => false, executar: () => executados.push('foco') },
+    { id: 'tema-foco', grupo: 'Tema', rotulo: 'Foco', escolhido: () => true, executar: () => executados.push('foco') },
   ];
   const comandos = [{ id: 'visao-curvatura', grupo: 'Visão', rotulo: 'Curvatura', padrao: 'k', executar: () => executados.push('curvatura') }];
   const ouvinteDaCena = vi.fn();
@@ -77,6 +77,7 @@ describe('busca de comandos', () => {
     const grade = documento.querySelector('[data-item="grade"]');
     expect(grade.querySelector('.interruptor').getAttribute('aria-checked')).toBe('true');
     expect(grade.querySelector('kbd').textContent).toBe('H');
+    expect(documento.querySelector('[data-item="tema-foco"]').querySelector('.marca-escolha').getAttribute('aria-checked')).toBe('true');
   });
 
   it('filtra pelo termo, anda com as setas e executa com Enter, fechando antes', () => {

@@ -122,6 +122,12 @@ class ElementoFalso extends Ouvintes {
     if (nome === 'value') this.value = String(valor);
   }
 
+  removeAttribute(nome) {
+    this.atributos.delete(nome);
+    if (nome === 'hidden') this.hidden = false;
+    if (nome === 'disabled') this.disabled = false;
+  }
+
   getAttribute(nome) { return this.atributos.has(nome) ? this.atributos.get(nome) : null; }
   hasAttribute(nome) { return this.atributos.has(nome); }
 

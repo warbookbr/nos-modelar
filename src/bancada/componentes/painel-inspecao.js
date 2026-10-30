@@ -13,7 +13,7 @@ export const TITULO_DO_WIREFRAME = Object.freeze({
   outras: 'Raio X só nas peças selecionadas.',
 });
 
-export function montarPainelInspecao({ elementos, estado, acoes, aoRecolher }) {
+export function montarPainelInspecao({ elementos, estado, acoes, aoRecolher, aoEscolherAba = () => {} }) {
   const {
     abas, conteudosDasAbas, prefGrade, prefChao, resumo, botoesModo, btnWireframeSelecao, opacidadeSelecao,
     valorOpacidadeSelecao, explosao, valorExplosao, btnSelecionarConjunto, btnFocarSelecao, btnCopiarEstado,
@@ -21,20 +21,22 @@ export function montarPainelInspecao({ elementos, estado, acoes, aoRecolher }) {
   } = elementos;
 
   // Navegação de Abas do Painel Direito
-  abas.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const abaAlvo = btn.dataset.aba;
-      abas.forEach((b) => {
-        const ativa = b.dataset.aba === abaAlvo;
-        b.classList.toggle('ativa', ativa);
-        b.setAttribute('aria-selected', String(ativa));
-      });
-      Object.entries(conteudosDasAbas).forEach(([nome, el]) => {
-        if (!el) return;
-        el.hidden = nome !== abaAlvo;
-        el.classList.toggle('ativa', nome === abaAlvo);
-      });
+  function abrirAba(abaAlvo) {
+    abas.forEach((b) => {
+      const ativa = b.dataset.aba === abaAlvo;
+      b.classList.toggle('ativa', ativa);
+      b.setAttribute('aria-selected', String(ativa));
     });
+    Object.entries(conteudosDasAbas).forEach(([nome, el]) => {
+      if (!el) return;
+      el.hidden = nome !== abaAlvo;
+      el.classList.toggle('ativa', nome === abaAlvo);
+    });
+    /* No tema de painéis flutuantes a aba escolhida também abre o painel. */
+    aoEscolherAba(abaAlvo);
+  }
+  abas.forEach((btn) => {
+    btn.addEventListener('click', () => abrirAba(btn.dataset.aba));
   });
 
   function refletirSelecao(selecao, visao) {
@@ -132,5 +134,5 @@ export function montarPainelInspecao({ elementos, estado, acoes, aoRecolher }) {
 
   /* A visão em vigor chega pela barra das vistas, que a reflete junto com o
      seletor: na troca de visão e quando a lista das visões é desenhada. */
-  return { refletirVisao: (visao) => refletirVisao(visao, estado.obter('selecao')) };
+  return { refletirVisao: (visao) => refletirVisao(visao, estado.obter('selecao')), abrirAba };
 }
