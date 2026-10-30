@@ -6,7 +6,7 @@
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { amostrasDaVista, direcaoDaLuz, escolherAzimutes } from './azimute-da-luz.js';
+import { ELEVACOES_DA_LUZ, amostrasDaVista, direcaoDaLuz, escolherAzimutes, escolherLuz, legibilidadeDaLuz } from './azimute-da-luz.js';
 
 const BLENDER = fileURLToPath(new URL('../../../tools/blender/', import.meta.url));
 const temNumpy = spawnSync('python3', ['-c', 'import numpy'], { encoding: 'utf8' }).status === 0;
@@ -52,14 +52,7 @@ e = json.load(sys.stdin)
 v = {'x_cam': e['x'], 'y_cam': e['y'], 'z_cam': e['z']}
 az, est = S.escolher_azimutes(e['N'], v, e['rasante'])
 d = S.direcao_da_luz(v, e['rasante'], e['azimute'])
-teto = S.math.sin(S.math.radians(S.RASA_ATE_GRAUS))
-N = S.np.asarray(e['N'], float).reshape(-1, 3)
-N = S.np.where((N @ S.np.asarray(e['z'], float))[:, None] < 0, -N, N)
-fracoes = {}
-for a in range(0, 360, 10):
-    c = S.luz_nas_amostras(N, v, e['rasante'], float(a))
-    fracoes[str(a)] = {'rasante': round(float(((c > 0) & (c <= teto)).mean()), 4), 'iluminada': round(float((c > 0).mean()), 4)}
-print(json.dumps({'azimutes': az, 'estimativa': {str(k): v for k, v in est.items()}, 'direcao': [float(x) for x in d], 'fracoes': fracoes}))
+print(json.dumps({'azimutes': az, 'estimativa': {str(k): v for k, v in est.items()}, 'direcao': [float(x) for x in d]}))
 `;
   const r = spawnSync('python3', ['-c', programa], {
     input: JSON.stringify({ N: normais, x: vista.xCam, y: vista.yCam, z: vista.zCam, rasante, azimute }),
@@ -97,18 +90,66 @@ describe('azimute da luz rasante', () => {
         expect(js.azimutes, `${nome}, semente ${semente}`).toEqual(py.azimutes);
         for (const a of js.azimutes) expect(js.estimativa[a]).toEqual(py.estimativa[a.toFixed(1)]); /* o Python escreve a chave em float */
         direcaoDaLuz(vista, 10, 35).forEach((c, k) => expect(c).toBeCloseTo(py.direcao[k], 12));
-        /* a luz só da bancada lê as mesmas frações de cada azimute */
-        const unico = escolherAzimutes(normais, vista, 10, { unico: true });
-        expect(unico.fracoes).toEqual(py.fracoes);
-        const [a] = unico.azimutes;
-        const melhor = Math.max(...Object.values(py.fracoes).map((f) => f.rasante));
-        expect(py.fracoes[a].rasante).toBeGreaterThanOrEqual(melhor - 0.05);
-        for (const f of Object.values(py.fracoes)) if (f.rasante >= melhor - 0.05) expect(py.fracoes[a].iluminada).toBeGreaterThanOrEqual(f.iluminada);
       }
     }
   });
 
   it('sem amostra, fica o azimute preferido', () => {
     expect(escolherAzimutes([], VISTAS.topo).azimutes).toEqual([30, 120]);
+    expect(escolherLuz([], VISTAS.topo)).toMatchObject({ azimute: 30, elevacao: 10 });
+  });
+});
+
+describe('a luz única da bancada', () => {
+  const seno = (g) => Math.sin((g * Math.PI) / 180);
+
+  it('a legibilidade é 1 até a superfície a 10 graus da luz, cai com a luz de frente e é 0 na sombra e no branco', () => {
+    for (const g of [1, 5, 10]) expect(legibilidadeDaLuz(seno(g))).toBe(1);
+    expect(legibilidadeDaLuz(seno(20))).toBeCloseTo(0.64, 2);
+    expect(legibilidadeDaLuz(seno(45))).toBeCloseTo(0.32, 2);
+    expect(legibilidadeDaLuz(seno(60))).toBeCloseTo(0.2, 2);
+    /* o brilho 0,2 * sin(g) / sin(10°) passa de 1 a 60,3 graus */
+    expect(legibilidadeDaLuz(seno(61))).toBe(0);
+    expect(legibilidadeDaLuz(1)).toBe(0);
+    expect(legibilidadeDaLuz(0)).toBe(0);
+    expect(legibilidadeDaLuz(-0.5)).toBe(0);
+  });
+
+  it('na chapa vista de cima com uma parte caída 30 graus, a luz fica a 10 graus e corre ao longo da dobra', () => {
+    /* a peça de prova com vinco: plana até o vinco e caindo 30 graus depois dele, com o dobro da área caída. A conta de antes
+       (a fração rasante até 30 graus) via a parte caída igual a 0 e a 30 graus de azimute e ficava no preferido, 30, que a pega a
+       23 graus da luz; a 0 grau ela fica a 9 graus, com o triplo do contraste do amassado na bancada e no Blender. */
+    const k = Math.sqrt(3) / 2;
+    const normais = [0, 1, 0, 0, k, 0.5, 0, k, 0.5];
+    expect(escolherAzimutes(normais, VISTAS.topo, 10).azimutes[0]).toBe(30);
+    expect(escolherLuz(normais, VISTAS.topo)).toEqual({ azimute: 0, elevacao: 10, nota: 1, legivel: 1, estourada: 0, sombra: 0 });
+  });
+
+  it('na quina de uma caixa vista de três quartos, a luz sobe do plano da imagem e deixa ler as três faces', () => {
+    const normais = [0, 1, 0, 1, 0, 0, 0, 0, 1];
+    const aDez = escolherLuz(normais, VISTAS.tresquartos, { elevacoes: [10] });
+    const luz = escolherLuz(normais, VISTAS.tresquartos);
+    /* a 10 graus a melhor luz deixa uma face na sombra; a de agora alcança as três, sem estourar nenhuma */
+    expect(aDez.sombra).toBeCloseTo(1 / 3, 3);
+    expect(luz.elevacao).toBeGreaterThan(10);
+    expect(luz).toMatchObject({ estourada: 0, sombra: 0 });
+    expect(luz.legivel).toBeGreaterThan(aDez.legivel + 0.1);
+  });
+
+  it('o estouro desconta: a luz que lê mais e estoura uma face perde para a que lê um pouco menos sem estourar', () => {
+    const unit = (v) => { const l = Math.hypot(...v); return v.map((c) => c / l); };
+    const normais = [...unit([0, 1, -1]), ...unit([-1, 1, 0]), ...unit([1, 1, 1])];
+    /* só pela legibilidade, a melhor luz é a 30 graus de elevação e 30 de azimute, com a face (1, 1, 1) no branco */
+    let soLegivel = null;
+    for (const elevacao of ELEVACOES_DA_LUZ) {
+      for (let azimute = 0; azimute < 360; azimute += 10) {
+        const d = direcaoDaLuz(VISTAS.topo, elevacao, azimute);
+        const c = [0, 1, 2].map((i) => -(normais[3 * i] * d[0] + normais[3 * i + 1] * d[1] + normais[3 * i + 2] * d[2]));
+        const legivel = c.reduce((s, x) => s + legibilidadeDaLuz(x), 0) / 3;
+        if (!soLegivel || legivel > soLegivel.legivel + 1e-9) soLegivel = { elevacao, azimute, legivel, estourada: c.filter((x) => (0.2 * x) / seno(10) >= 1).length / 3 };
+      }
+    }
+    expect(soLegivel).toMatchObject({ elevacao: 30, azimute: 30, estourada: 1 / 3 });
+    expect(escolherLuz(normais, VISTAS.topo)).toEqual({ azimute: 50, elevacao: 40, nota: 0.5976, legivel: 0.5976, estourada: 0, sombra: 0 });
   });
 });

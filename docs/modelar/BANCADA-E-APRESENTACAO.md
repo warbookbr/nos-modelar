@@ -119,16 +119,21 @@ vistas do Blender: elas andam quando a câmera gira, saem lisas e contínuas na
 chapa boa e se entortam no amassado e na quina que ondula. A caixa da zebra
 ajusta a largura das listras, que parte de 4,5 graus, a do Blender.
 
-A luz rasante apaga a luz do estúdio e acende um sol a 10 graus do plano da
+A luz rasante apaga a luz do estúdio e acende um sol baixo sobre o plano da
 imagem, com sombra, sobre a peça em material fosco, com o brilho das imagens de
-luz rasante do Blender. A luz acompanha a câmera, então girar a peça deixa a luz
-rasante para o lado que se vê. A direção começa pela que deixa iluminada a maior
-parte do que a câmera vê ainda rasante para ela (a conta de
-`escolher_azimutes` de `tools/blender/superficie.py`, feita para uma luz só, em
-`visoes/azimute-da-luz.js`), e a caixa da luz rasante a muda ou a escolhe de novo
-para a vista do momento. Num amassado raso a direção importa: no da peça de
-prova com vinco vista de cima, a luz vinda de lado dá três vezes o contraste da
-direção de partida, e a vinda de trás da chapa a deixa escura.
+luz rasante do Blender: a superfície a 10 graus da luz sai com 0,2 de brilho
+linear. A luz acompanha a câmera, então girar a peça deixa a luz rasante para o
+lado que se vê. A direção e a altura começam pelas que deixam ler melhor uma
+inclinação pequena no que a câmera vê, sem contar o que fica na sombra e
+descontando o que estoura no branco (`escolherLuz`, em
+`visoes/azimute-da-luz.js`). A altura é a de 10 graus do Blender quando a peça
+encara a câmera, como a chapa vista de cima, e sobe quando ela se inclina para
+longe do plano da imagem, como na vista de três quartos, em que a 10 graus a luz
+chegava de frente à lateral da carenagem de prova e a estourava. A caixa da luz
+rasante muda a direção, mantendo a altura, ou escolhe as duas de novo para a
+vista do momento. No amassado da peça de prova com vinco vista de cima, a luz
+escolhida corre ao longo da dobra e dá o contraste da melhor imagem do Blender
+naquela região, três vezes o da direção que a bancada escolhia antes.
 
 A captura automática não herda a visão da pessoa: a ponte da captura suspende o
 seletor durante a auditoria, e as imagens das guardas e do pacote do crítico

@@ -506,7 +506,15 @@ export function criarEdicaoDaPeca({
       juntasDaPeca = null;
       ajustesDeJunta.clear();
       arrastoDeJunta = null;
+      /* O RODAPÉ FALA DA PEÇA QUE ENTROU. Só o modo de juntas ligado refletia
+         a peça nova; desligado, o estado `juntas` ficava com a contagem e o
+         "mudou" da anterior, e depois de editar a malha da carenagem de prova o
+         furgão abria com "malha editada" e o salvar ligado. */
       if (modoJuntas) definirModoJuntas(Boolean(neutroDoArquivo));
+      else {
+        const mudou = malhaMudouDesdeOArquivo(neutroDoArquivo, convertido.neutro);
+        estado.definir({ juntas: { modo: false, quantas: 0, mudou, rodapeVisivel: mudou } });
+      }
     },
     /** A camada de edição de uma peça que acabou de entrar na cena. */
     criarCamadaDoModelo(convertido, { deAjuste }) {

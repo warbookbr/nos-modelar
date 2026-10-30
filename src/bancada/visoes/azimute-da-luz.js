@@ -1,23 +1,49 @@
-/* azimute-da-luz.js — a direção da luz rasante no quadro da câmera e a escolha do azimute dela pelo que a câmera vê, as mesmas
- * contas de `direcao_da_luz` e `escolher_azimutes` de `tools/blender/superficie.py`, portadas sem Three e sem DOM.
+/* azimute-da-luz.js — a direção da luz rasante no quadro da câmera e a escolha dela pelo que a câmera vê: as contas de
+ * `direcao_da_luz` e `escolher_azimutes` de `tools/blender/superficie.py`, portadas sem Three e sem DOM, e a escolha da luz única
+ * da bancada (`escolherLuz`).
  *
  * A luz rasante da bancada e a das vistas obrigatórias do Blender usam a mesma definição: a câmera olha ao longo de -z_cam, e a
- * luz viaja com `sin(rasante)` ao longo do olhar e `cos(rasante)` dentro do plano da imagem, na direção `azimute` medida de x_cam
- * para y_cam. Por isso a luz da bancada acompanha a câmera quando a peça gira: ela fica sempre a `rasante` graus do plano da
- * imagem, como em cada vista do Blender.
+ * luz viaja com `sin(elevação)` ao longo do olhar e `cos(elevação)` dentro do plano da imagem, na direção `azimute` medida de
+ * x_cam para y_cam. Por isso a luz da bancada acompanha a câmera quando a peça gira: ela fica sempre à mesma elevação sobre o
+ * plano da imagem, como em cada vista do Blender, que a põe a 10 graus.
  *
  * O que muda é a amostra e o número de luzes. O Blender escolhe pelos pixels que a câmera vê, com a sombra de cada um, e escolhe um
- * par de azimutes, um por imagem; a bancada passa as normais dos triângulos voltados para a câmera, pesadas pela área projetada,
- * sem oclusão e sem sombra (`amostrasDaVista`), e escolhe um azimute só (`unico`). A conta da fração de cada azimute é a mesma, e o
- * teste a compara com a do Python sobre as mesmas normais. */
+ * par de azimutes, um por imagem, sempre a 10 graus; a conta dele está aqui, e o teste a compara com a do Python sobre as mesmas
+ * normais. A bancada tem uma luz só e passa as normais dos triângulos voltados para a câmera, pesadas pela área projetada, sem
+ * oclusão e sem sombra (`amostrasDaVista`); ela escolhe o azimute e a elevação em que a luz deixa ler melhor uma inclinação
+ * pequena (`legibilidadeDaLuz`), começando pelos 10 graus do Blender e subindo só quando a peça vista se inclina para longe do
+ * plano da imagem. */
 
 export const RASANTE_GRAUS = 10;
 export const RASA_ATE_GRAUS = 30;
 export const AZIMUTE_PREFERIDO = 30;
 
+/** O brilho linear de uma superfície a `RASANTE_GRAUS` da luz, o `ALVO_LINEAR` de `tools/blender/luz-rasante.py`. */
+export const BRILHO_RASANTE = 0.2;
+/** As elevações sobre o plano da imagem que a luz única da bancada experimenta, da do Blender para cima. */
+export const ELEVACOES_DA_LUZ = [10, 20, 30, 40, 50, 60, 70, 80];
+
 const RAD = Math.PI / 180;
 const modulo360 = (a) => ((a % 360) + 360) % 360;
 const arredondar4 = (x) => Math.round(x * 1e4) / 1e4;
+
+/* A derivada do valor sRGB da tela em relação ao brilho linear. */
+const derivadaSrgb = (L) => (L <= 0.0031308 ? 12.92 : (1.055 / 2.4) * L ** (1 / 2.4 - 1));
+
+/**
+ * Quanto a luz deixa ler uma inclinação pequena numa amostra cujo cosseno com o lado de onde a luz vem é `cosseno`: a variação do
+ * valor sRGB da tela por grau de inclinação da superfície, dividida pela da superfície a `rasanteGraus` da luz, e no máximo 1. O
+ * brilho é o da luz rasante, linear `alvo * cosseno / sin(rasanteGraus)` sem mapeamento de tons, como no Blender, em que a
+ * superfície a 10 graus da luz sai com 0,2. Vale 1 dali até a luz tangente, cai à medida que a luz chega de frente (0,64 a 20 graus
+ * da superfície, 0,32 a 45 e 0,2 a 60) e é 0 na sombra e onde o brilho passa do branco, que não mostra relevo nenhum.
+ */
+export function legibilidadeDaLuz(cosseno, rasanteGraus = RASANTE_GRAUS, alvo = BRILHO_RASANTE) {
+  if (!(cosseno > 0)) return 0;
+  const brilho = (alvo * cosseno) / Math.sin(rasanteGraus * RAD);
+  if (brilho >= 1) return 0;
+  const variacao = derivadaSrgb(brilho) * Math.sqrt(Math.max(0, 1 - cosseno * cosseno));
+  return Math.min(1, variacao / (derivadaSrgb(alvo) * Math.cos(rasanteGraus * RAD)));
+}
 
 /**
  * O vetor unitário pelo qual a luz viaja, no quadro do mundo, para a câmera de eixos `xCam`, `yCam` e `zCam` (a câmera olha ao
@@ -50,26 +76,14 @@ function luzNasAmostras(N, vista, rasanteGraus, azimuteGraus) {
  * números por amostra; as viradas para longe da câmera entram viradas para ela. `pesos` (opcional) dá a área de cada amostra;
  * sem ele, cada uma pesa o mesmo, como os pixels do Blender. Devolve `{ azimutes: [a, b], estimativa }`, com a fração rasante e
  * a alcançada de cada um, arredondadas a quatro casas como no Python.
- *
- * Com `unico`, a escolha é para uma luz só, a da bancada: a mesma fração rasante de cada azimute, e entre os que ficam a até
- * `folga` da melhor, o que alcança a maior fração da peça vista (no empate, o mais perto de `preferido`). O par do Blender existe
- * porque ele faz duas imagens por vista; com uma luz, o primeiro do par podia deixar escuro metade do que a câmera vê (na
- * carenagem de prova em três quartos, 350 graus alcançava 40 % da peça vista, e 240 graus, com quase a mesma fração rasante,
- * 91 %). Devolve `{ azimutes: [a], estimativa, fracoes }`, com as frações de todos os azimutes.
  */
 export function escolherAzimutes(normais, vista, rasanteGraus = RASANTE_GRAUS, {
-  pesos = null, passo = 10, separacao = 90, preferido = AZIMUTE_PREFERIDO, folga = 0.05, rasaAte = RASA_ATE_GRAUS, unico = false,
+  pesos = null, passo = 10, separacao = 90, preferido = AZIMUTE_PREFERIDO, folga = 0.05, rasaAte = RASA_ATE_GRAUS,
 } = {}) {
   if (separacao % passo || 360 % passo) throw new RangeError(`passo ${passo} precisa dividir 360 e a separação ${separacao}`);
   const n = Math.floor(normais.length / 3);
   if (!n) return { azimutes: [preferido, modulo360(preferido + separacao)], estimativa: {} };
-  const z = vista.zCam;
-  const N = new Float64Array(3 * n);
-  for (let i = 0; i < n; i++) {
-    const x = normais[3 * i]; const y = normais[3 * i + 1]; const w = normais[3 * i + 2];
-    const s = x * z[0] + y * z[1] + w * z[2] < 0 ? -1 : 1;
-    N[3 * i] = s * x; N[3 * i + 1] = s * y; N[3 * i + 2] = s * w;
-  }
+  const N = voltadasParaACamera(normais, vista.zCam);
   let total = 0;
   for (let i = 0; i < n; i++) total += pesos ? pesos[i] : 1;
   const media = (f) => {
@@ -81,19 +95,6 @@ export function escolherAzimutes(normais, vista, rasanteGraus = RASANTE_GRAUS, {
   const candidatos = Array.from({ length: Math.round(360 / passo) }, (_, k) => k * passo);
   const luz = new Map(candidatos.map((a) => [a, luzNasAmostras(N, vista, rasanteGraus, a)]));
   const rasa = new Map(candidatos.map((a) => [a, media((i) => luz.get(a)[i] > 0 && luz.get(a)[i] <= teto)]));
-  if (unico) {
-    /* uma luz só: entre os azimutes a até `folga` da melhor fração rasante, o que alcança mais da peça, e no empate o mais perto
-       do preferido */
-    const alcancada = new Map(candidatos.map((a) => [a, media((i) => luz.get(a)[i] > 0)]));
-    const melhorRasa = Math.max(...rasa.values());
-    const distancia = (a) => Math.abs(modulo360(a - preferido + 180) - 180);
-    const [a] = candidatos
-      .filter((c) => rasa.get(c) >= melhorRasa - folga)
-      .sort((p, q) => alcancada.get(q) - alcancada.get(p) || distancia(p) - distancia(q) || p - q);
-    const fracoes = {};
-    for (const c of candidatos) fracoes[c] = { rasante: arredondar4(rasa.get(c)), iluminada: arredondar4(alcancada.get(c)) };
-    return { azimutes: [a], estimativa: { [a]: fracoes[a] }, fracoes };
-  }
   const pares = candidatos.map((a) => [a, modulo360(a + separacao)]);
   const nota = (p) => Math.min(rasa.get(p[0]), rasa.get(p[1]));
   const melhor = Math.max(...pares.map(nota));
@@ -104,6 +105,71 @@ export function escolherAzimutes(normais, vista, rasanteGraus = RASANTE_GRAUS, {
   const estimativa = {};
   for (const k of [a, b]) estimativa[k] = { rasante: arredondar4(rasa.get(k)), iluminada: arredondar4(media((i) => luz.get(k)[i] > 0)) };
   return { azimutes: [a, b], estimativa };
+}
+
+/* As normais (3 números por amostra) viradas para o lado da câmera. */
+function voltadasParaACamera(normais, z) {
+  const n = Math.floor(normais.length / 3);
+  const N = new Float64Array(3 * n);
+  for (let i = 0; i < n; i++) {
+    const x = normais[3 * i]; const y = normais[3 * i + 1]; const w = normais[3 * i + 2];
+    const s = x * z[0] + y * z[1] + w * z[2] < 0 ? -1 : 1;
+    N[3 * i] = s * x; N[3 * i + 1] = s * y; N[3 * i + 2] = s * w;
+  }
+  return N;
+}
+
+/**
+ * A luz única da bancada para uma vista: o azimute (de `passo` em `passo` graus) e a elevação sobre o plano da imagem (entre
+ * `elevacoes`) de maior nota, que é a legibilidade média das amostras (`legibilidadeDaLuz`, com o brilho da luz rasante, em que a
+ * superfície a `rasanteGraus` da luz sai com `alvo`) menos a fração delas que estoura no branco, pesadas por `pesos` ou iguais sem
+ * eles. O estouro desconta, e a sombra só não soma: a sombra do lado de lá de uma curva é a luz rasante funcionando, e a face
+ * branca esconde o relevo e se lê como defeito da vista. No empate a quatro casas fica a elevação mais baixa, e nela o azimute
+ * mais perto de `preferido`. Devolve `{ azimute, elevacao, nota, legivel, estourada, sombra }`, com a fração das amostras que passa
+ * do branco e a que fica de costas para a luz.
+ *
+ * O Blender fixa a luz a 10 graus do plano da imagem e conta como rasante a amostra a até 30 graus da luz. A versão dessa conta
+ * para uma luz só, que a bancada usava (a fração rasante, com o desempate pela fração alcançada), contava igual a amostra a 9 e a
+ * 29 graus da luz e preferia a luz que alcança mais, que é a mais de frente. Medido em 2026-10-30: na carenagem de prova em três
+ * quartos, a peça vista se inclina de 50 a 63 graus para longe do plano da imagem, e a 10 graus dele a luz escolhida chegava quase
+ * de frente à lateral, que estourava no branco (legibilidade média de 0,50; a 50 graus de elevação, 0,89); e na peça de prova com
+ * vinco vista de cima ela ficava em 30 graus de azimute, com a chapa caída a 23 graus da luz e um terço do contraste do amassado
+ * que a luz de 0 grau, que a pega a 9 graus, dá. Sem o desconto do estouro, o furgão do acervo na vista em que abre ficava a 50
+ * graus com 28 % da peça vista no branco, e com ele fica a 60 graus com 0,2 %.
+ */
+export function escolherLuz(normais, vista, {
+  pesos = null, passo = 10, elevacoes = ELEVACOES_DA_LUZ, preferido = AZIMUTE_PREFERIDO, rasanteGraus = RASANTE_GRAUS, alvo = BRILHO_RASANTE,
+} = {}) {
+  if (360 % passo) throw new RangeError(`passo ${passo} precisa dividir 360`);
+  const n = Math.floor(normais.length / 3);
+  const N = voltadasParaACamera(normais, vista.zCam);
+  let total = 0;
+  for (let i = 0; i < n; i++) total += pesos ? pesos[i] : 1;
+  const saturacao = Math.sin(rasanteGraus * RAD) / alvo;
+  /* a legibilidade em tabela pelo cosseno, que a conta passa por dezenas de milhares de amostras em cada uma das centenas de luzes */
+  const PONTOS = 2048;
+  const tabela = Float64Array.from({ length: PONTOS }, (_, k) => legibilidadeDaLuz(Math.max(k, 0.5) / (PONTOS - 1), rasanteGraus, alvo));
+  const fracao = (x) => (total > 0 ? arredondar4(x / total) : 0);
+  const distancia = (a) => Math.abs(modulo360(a - preferido + 180) - 180);
+  let melhor = null;
+  for (const elevacao of elevacoes) {
+    for (let azimute = 0; azimute < 360; azimute += passo) {
+      const d = direcaoDaLuz(vista, elevacao, azimute);
+      let legivel = 0; let estourada = 0; let sombra = 0;
+      for (let i = 0; i < n; i++) {
+        const c = -(N[3 * i] * d[0] + N[3 * i + 1] * d[1] + N[3 * i + 2] * d[2]);
+        const p = pesos ? pesos[i] : 1;
+        if (c <= 0) sombra += p;
+        else if (c >= saturacao) estourada += p;
+        else legivel += p * tabela[Math.min(PONTOS - 1, Math.round(c * (PONTOS - 1)))];
+      }
+      const luz = { azimute, elevacao, nota: fracao(legivel - estourada), legivel: fracao(legivel), estourada: fracao(estourada), sombra: fracao(sombra) };
+      /* as elevações vêm na ordem da preferência: só uma nota maior troca de elevação, e na mesma, o azimute mais perto */
+      if (!melhor || luz.nota > melhor.nota
+        || (luz.nota === melhor.nota && elevacao === melhor.elevacao && distancia(azimute) < distancia(melhor.azimute))) melhor = luz;
+    }
+  }
+  return melhor ?? { azimute: preferido, elevacao: elevacoes[0], nota: 0, legivel: 0, estourada: 0, sombra: 0 };
 }
 
 /**
