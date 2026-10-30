@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1670 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1672 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1879,6 +1879,7 @@
 - `historico-parametros.test.js` — historico-parametros.test.js — desfazer da sessão.
 - `itens-da-busca.js` — itens-da-busca.js — o que a busca de comandos lista para um termo: as ações da tela, os comandos de teclado e as partes da peça, em grupos; contas puras, sem…
 - `punhos-de-junta.js` — punhos-de-junta.js — o punho no canto onde as partes se encontram.
+- `punhos-de-junta.test.js` — punhos-de-junta.test.js — o punho de junta tem diâmetro constante em pixels na tela, em qualquer altura de janela, distância e projeção, e o alvo do clique é…
 
 ## src/bancada/estado/
 
@@ -1900,6 +1901,7 @@
 - `armazenamento-imagem.js` — armazenamento-imagem.js — persistência local de uma imagem de referência por alvo.
 - `armazenamento-imagem.test.js` — armazenamento-imagem.test.js — isolamento de referências locais por alvo.
 - `imagem-na-cena.js` — imagem-na-cena.js — a imagem de referência da peça posta na cena: o plano, o alinhamento que o painel e o punho escrevem, a imagem que a pasta da peça declar…
+- `imagem-na-cena.test.js` — imagem-na-cena.test.js — a imagem que a peça declara fica oferecida na aba e não entra na cena sozinha; ligada, o plano nasce fora da caixa da peça e atrás d…
 - `imagem-referencia.js` — imagem-referencia.js — forma validada e alinhamento lateral de referência visual.
 - `imagem-referencia.test.js` — imagem-referencia.test.js — contrato do descritor e alinhamento lateral.
 - `imagens-da-peca.js` — imagens-da-peca.js — as imagens que moram na pasta da peça, servidas pelo Vite.

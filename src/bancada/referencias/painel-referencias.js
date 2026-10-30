@@ -8,9 +8,11 @@ export function criarPainelReferencias({
   aoGerarPlano = async () => null,
   aoAtualizarAlinhamento = () => {},
   aoRemoverImagem = async () => {},
-  /* O que está carregado agora, para o painel desenhar a miniatura. Uma lista,
-     e não um descritor: hoje a bancada guarda uma imagem por peça, e a lista
-     deixa o painel pronto para mais de uma sem trocar a forma da chamada. */
+  /* A chave "Na cena" de cada miniatura: ligar põe a imagem na cena, desligar a tira e guarda o ajuste. */
+  aoMostrarNaCena = async () => null,
+  /* As imagens da peça, para o painel desenhar as miniaturas: a que a receita
+     declara e a que a pessoa trouxe, cada uma com `naCena`. No máximo uma está
+     na cena. */
   imagensCarregadas = () => [],
 }) {
   if (!container) return null;
@@ -91,7 +93,7 @@ export function criarPainelReferencias({
     titulo.textContent = 'Imagem de referência';
     const ajuda = document.createElement('p');
     ajuda.className = 'resumo-ia';
-    ajuda.textContent = 'Escolha um arquivo local ou informe uma URL. A imagem fica atrás do modelo até ser apagada.';
+    ajuda.textContent = 'A imagem da peça aparece na lista e entra na cena quando "Na cena" é marcada. Um arquivo local ou uma URL entra na cena na hora, atrás da peça.';
     const arquivo = document.createElement('input');
     arquivo.type = 'file'; arquivo.accept = 'image/*';
     arquivo.addEventListener('change', () => {
@@ -136,7 +138,30 @@ export function criarPainelReferencias({
         figura.alt = imagem.rotulo ?? 'Imagem de referência';
         const nome = document.createElement('span');
         nome.className = 'nome-referencia';
-        nome.textContent = imagem.rotulo ?? 'Imagem de referência';
+        /* Só o nome do arquivo: o caminho inteiro da pasta da peça não cabia ao
+           lado da chave e saía cortado no começo, que é igual em todas. */
+        nome.textContent = String(imagem.rotulo ?? 'Imagem de referência').split('/').pop();
+        nome.title = imagem.rotulo ?? '';
+        /* A CHAVE "NA CENA". A imagem que a peça declara chega aqui sem entrar na
+           cena: entrava sozinha, e a folha de vistas do furgão cobria a lateral
+           dele na vista em que a bancada abre. */
+        const mostrar = document.createElement('label');
+        mostrar.className = 'mostrar-referencia';
+        const chave = document.createElement('input');
+        chave.type = 'checkbox';
+        chave.checked = Boolean(imagem.naCena);
+        chave.setAttribute('aria-label', `Mostrar ${imagem.rotulo ?? 'a imagem'} na cena`);
+        chave.addEventListener('change', async () => {
+          const ligada = chave.checked;
+          const descritor = await aoMostrarNaCena(imagem, ligada);
+          if (ligada && !descritor) status.textContent = 'Não foi possível pôr esta imagem na cena.';
+          else if (ligada) { alinhamento = { ...descritor.alinhamento }; refletirControles(); status.textContent = 'Imagem na cena, atrás da peça.'; }
+          else status.textContent = 'Imagem fora da cena.';
+          desenharMiniaturas();
+        });
+        const textoMostrar = document.createElement('span');
+        textoMostrar.textContent = 'Na cena';
+        mostrar.append(chave, textoMostrar);
         const apagarEsta = document.createElement('button');
         apagarEsta.type = 'button';
         apagarEsta.className = 'botao apagar-referencia';
@@ -149,7 +174,7 @@ export function criarPainelReferencias({
           status.textContent = 'Imagem de referência removida.';
           desenharMiniaturas();
         });
-        item.append(figura, nome, apagarEsta);
+        item.append(figura, nome, mostrar, apagarEsta);
         lista.append(item);
       }
     }
@@ -315,6 +340,11 @@ export function criarPainelReferencias({
        mostra um número e a foto está noutro lugar. */
     refletirAlinhamento(novo) {
       alinhamento = { ...alinhamento, ...novo };
+      refletirControles();
+    },
+    /* A lista de imagens mudou fora do painel: a peça ofereceu a dela, ou uma
+       imagem guardada voltou. */
+    refletirImagens() {
       refletirControles();
     },
   };

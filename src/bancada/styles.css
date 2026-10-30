@@ -499,6 +499,7 @@ body.modal-aberto { overflow: hidden; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.mostrar-referencia { display: flex; flex: 0 0 auto; align-items: center; gap: var(--e1); font-size: var(--t-p); cursor: pointer; }
 .apagar-referencia { flex: 0 0 auto; width: var(--controle); padding: 0; }
 .lista-criterios,
 .lista-toggles-prancha { display: flex; flex-direction: column; gap: var(--e1); margin: 0; padding: 0; list-style: none; }

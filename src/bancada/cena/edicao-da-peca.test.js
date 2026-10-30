@@ -51,7 +51,7 @@ describe('rodapé das juntas na troca de peça', () => {
 
   /* A edição com a peça em cena como `peca-em-cena.js` a monta: os três ganchos de `aplicarModelo`, na mesma ordem, e o
      rodapé de verdade lendo o estado central. */
-  function bancada() {
+  function bancada({ avisar = () => {} } = {}) {
     const { documento, $ } = criarPagina(`
       <footer id="rodapeJuntas" hidden>
         <span id="resumoJuntas">nenhuma junta movida</span>
@@ -78,13 +78,13 @@ describe('rodapé das juntas na troca de peça', () => {
         edicao.criarCamadaDoModelo(convertido, { deAjuste });
       },
     };
-    edicao = criarEdicaoDaPeca({ ambiente, canvas, estado, registroDeEventos: { registrar() {} }, cena, avisar: () => {} });
+    edicao = criarEdicaoDaPeca({ ambiente, canvas, estado, registroDeEventos: { registrar() {} }, cena, avisar });
     const abrir = (nome) => {
       const neutro = executarReceita(receitaDeProva).neutro;
       cena.aplicarModelo({ nome, rotulo: nome, neutro, ...adaptarThree(neutro, { nome }) });
     };
     const rodape = () => ({ oculto: $('rodapeJuntas').hidden, texto: $('resumoJuntas').textContent, salvar: !$('btnSalvarAjusteDeJunta').disabled });
-    return { edicao, abrir, rodape };
+    return { edicao, abrir, rodape, cena };
   }
 
   it('a malha editada de uma peça não fica no rodapé da peça aberta em seguida', () => {
@@ -113,5 +113,23 @@ describe('rodapé das juntas na troca de peça', () => {
     expect(rodape()).toEqual({ oculto: false, texto: 'malha editada', salvar: true });
     abrir('furgao');
     expect(rodape()).toEqual({ oculto: false, texto: 'nenhuma junta movida', salvar: false });
+  });
+
+  /* Escolher uma parte prepara a camada de mover a parte inteira, que é a mesma camada da edição de malha sem os vértices
+     na frente. O aviso da camada não distinguia as duas, e só selecionar a parte, com a edição desligada, dizia
+     "Edição de malha: vertice. N selecionado(s)". */
+  it('selecionar uma parte com a edição desligada não fala de edição de malha; o modo de edição fala', () => {
+    const avisos = [];
+    const { edicao, abrir, cena } = bancada({ avisar: (texto) => avisos.push(texto) });
+    abrir('carenagem');
+    const parte = [...cena.modelo.neutro.F.values()][0].parte;
+    edicao.prepararMoverParte([parte]);
+    expect(edicao.camada.estado().ativo).toBe(true);
+    expect(avisos.filter((texto) => texto.startsWith('Edição de malha'))).toEqual([]);
+
+    edicao.alternarEdicaoDeMalha();
+    avisos.length = 0;
+    edicao.camada.selecionarTudo();
+    expect(avisos.some((texto) => /^Edição de malha: vertice\. \d+ selecionado\(s\)\.$/.test(texto))).toBe(true);
   });
 });

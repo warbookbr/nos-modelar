@@ -200,6 +200,21 @@ A captura automática não herda a visão da pessoa: a ponte da captura suspende
 seletor durante a auditoria, e as imagens das guardas e do pacote do crítico
 saem na sólida.
 
+## A imagem de referência
+
+A imagem que a receita declara em `PLANO.referencias` aparece na aba
+Referência, com a miniatura, a chave "Na cena" e o apagar, e não entra na cena
+sozinha: a folha de quatro vistas do furgão entrava como plano encostado na
+lateral, entre a câmera e a peça, e cobria o furgão na vista isométrica em que a
+bancada abre. A pessoa liga a chave quando vai alinhar a peça pela imagem, e a
+imagem que ela mesma escolhe, por arquivo ou URL, entra na cena na hora. Na
+cena, o plano nasce fora da caixa da peça, do lado oposto ao da câmera da vista
+direita e da isométrica, que olham a peça de +X, e a peça fica à frente dele
+(`criarAlinhamentoInicial`, em `referencias/imagem-referencia.js`). A chave e o
+ajuste ficam guardados no navegador por peça, e a imagem volta à cena na
+abertura seguinte só se estava nela; abrir outra peça tira da cena e da aba a
+imagem da anterior. A captura automática não abre a aba e sai sem imagem.
+
 ## O laço: desenhar, salvar, ler, absorver
 
 A pessoa seleciona uma parte e aperta `G` para movê-la como corpo, ou `Tab` para
@@ -207,6 +222,11 @@ entrar no modo de edição, onde `1`, `2` e `3` trocam entre vértice, aresta e
 face, `L` pega a ilha sob o ponteiro, o gizmo move pelo arrasto, `Ctrl` gruda no
 vértice mais próximo, e `E`, `Shift+D`, `X`, `F`, `R` e `S` mudam a malha.
 `Ctrl+Z` desfaz um gesto por vez e para no estado que veio do arquivo.
+Escolher a parte só arma o gizmo de mover, e o aviso "Edição de malha", com o
+modo e a contagem da seleção, aparece só no modo de edição. No modo de juntas,
+cada canto tem um punho de 12 pixels de diâmetro na tela, em qualquer janela,
+zoom e projeção, e o clique o pega a até 12 pixels do centro, um alvo de 24
+pixels; com alvos sobrepostos vence o centro mais perto do ponteiro.
 
 Quando a malha deixa de ser igual à do arquivo, o botão de salvar aparece e baixa
 um `ajuste-<peça>.json`. Ele guarda, por parte, os dois cantos da caixa, a nuvem

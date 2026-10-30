@@ -317,8 +317,11 @@ export function criarEdicaoDaPeca({
       neutro: modelo.neutro,
       partes,
       desenharMalha,
+      /* O aviso é do modo de edição de malha, e só dele. A camada sem malha desenhada é a de mover a parte inteira, que
+         se arma sozinha quando a pessoa escolhe uma parte, e ela também fica ativa com tudo selecionado: avisar por
+         `ativo` dizia "Edição de malha: vertice. 36 selecionado(s)" a quem só tinha clicado na parte. */
       aoMudar(estadoEdicao) {
-        if (estadoEdicao.ativo) {
+        if (estadoEdicao.ativo && desenharMalha) {
           avisar(`Edição de malha: ${estadoEdicao.modo}. ${estadoEdicao.selecionados.length} selecionado(s).`);
         }
       },
