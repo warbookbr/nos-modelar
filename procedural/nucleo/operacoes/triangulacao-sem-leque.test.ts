@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo herdado em JavaScript.
 import { nucleo } from '../entrada.js';
 // @ts-expect-error — adaptador JavaScript.
-import { adaptarThree } from '../../../src/autoria/adaptar-three.js';
+import { adaptarThree, idDeOrigem } from '../../../src/autoria/adaptar-three.js';
 import { conferirMalha } from '../../../tools/oficina/conferir-malha';
 // @ts-expect-error — módulo JavaScript.
 import { triangularFace, triangularConvexa } from '../triangulacao-face.js';
@@ -24,13 +24,13 @@ const medir = (passos: any[]) => {
     if (o.userData?.tipo !== 'superficie') return;
     const g = o.geometry, pos = g.getAttribute('position'), fa = g.getAttribute('origemFace'), vt = g.getAttribute('origemVertice');
     for (let t = 0; t < pos.count / 3; t++) {
-      const fid = fa.getX(3 * t);
+      const fid = idDeOrigem(fa, 3 * t);
       let d = porFace.get(fid);
       if (!d) { d = { graus: new Map(), minAng: Infinity, tris: 0 }; porFace.set(fid, d); }
       d.tris++;
       const p = [0, 1, 2].map((k) => [pos.getX(3 * t + k), pos.getY(3 * t + k), pos.getZ(3 * t + k)]);
       for (let k = 0; k < 3; k++) {
-        const v = vt.getX(3 * t + k);
+        const v = idDeOrigem(vt, 3 * t + k);
         d.graus.set(v, (d.graus.get(v) ?? 0) + 1);
         const u = [0, 1, 2].map((c) => p[(k + 1) % 3][c] - p[k][c]), w = [0, 1, 2].map((c) => p[(k + 2) % 3][c] - p[k][c]);
         const cs = (u[0] * w[0] + u[1] * w[1] + u[2] * w[2]) / (Math.hypot(...u) * Math.hypot(...w));

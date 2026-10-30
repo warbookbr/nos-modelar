@@ -5,6 +5,39 @@ import { triangularConvexa } from '../../procedural/nucleo/triangulacao-face.js'
 
 const COR_PADRAO = '#77817d';
 
+/* IDS DE ORIGEM EM DUAS PALAVRAS DE 32 BITS. O id que o núcleo dá a vértice e
+   face passa de 2^40 na faixa estendida de um passo (`idDoPasso`), e Float32 só
+   guarda inteiro exato até 2^24: na carenagem de prova, as faces além da
+   milésima do passo caíam todas no mesmo valor e o modo de edição não sabia
+   qual delas o raio tinha acertado. Uint32 cabe na GPU, mas não cabe 2^40, e
+   Float64 o three.js recusa enviar. Cada canto guarda então [alta, baixa], com
+   id = alta·2^32 + baixa, exato até 2^53. A ordem é de propósito: quem ler
+   só `getX` acha zero em todo id comum e erra alto, e não só nos ids grandes.
+   Leia sempre por `idDeOrigem` ou `idsDeOrigem`. */
+const PALAVRA = 2 ** 32;
+
+function atributoDeIds(ids, nome) {
+  const palavras = new Uint32Array(ids.length * 2);
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i];
+    if (!Number.isSafeInteger(id) || id < 0) throw new Error(`adaptarThree: ${nome} ${id} não é inteiro não negativo seguro`);
+    const alta = Math.floor(id / PALAVRA);
+    palavras[2 * i] = alta;
+    palavras[2 * i + 1] = id - alta * PALAVRA;
+  }
+  return new THREE.Uint32BufferAttribute(palavras, 2);
+}
+
+/** O id de origem (`origemFace` ou `origemVertice`) do canto `indice`. */
+export function idDeOrigem(atributo, indice) {
+  return atributo.getX(indice) * PALAVRA + atributo.getY(indice);
+}
+
+/** Todos os ids de origem do atributo, um por canto, na ordem dos cantos. */
+export function idsDeOrigem(atributo) {
+  return Array.from({ length: atributo.count }, (_, i) => idDeOrigem(atributo, i));
+}
+
 function materialDaFace(face, materiais) {
   const definicao = face.material ? materiais[face.material] ?? {} : {};
   const cor = definicao.cor ?? face.cor ?? COR_PADRAO;
@@ -329,11 +362,11 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
        geometria não indexada devolve sempre a normal chapada do triângulo, e era
        ela que jogava fora todo `liso` da peça. */
     geometria.setAttribute('normal', new THREE.Float32BufferAttribute(lote.normais, 3));
-    geometria.setAttribute('origemFace', new THREE.Float32BufferAttribute(lote.origens, 1));
+    geometria.setAttribute('origemFace', atributoDeIds(lote.origens, 'face'));
     /* Como a face, a origem do vértice só acompanha esta geometria de cena.
        Uma mesma coordenada pode ocorrer em diversos triângulos não indexados;
        este elo permite atualizá-los todos durante a prévia de edição. */
-    geometria.setAttribute('origemVertice', new THREE.Float32BufferAttribute(lote.vertices, 1));
+    geometria.setAttribute('origemVertice', atributoDeIds(lote.vertices, 'vértice'));
     geometria.computeBoundingBox();
     geometria.computeBoundingSphere();
 
