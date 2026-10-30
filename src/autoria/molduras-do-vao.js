@@ -74,7 +74,7 @@ export function lerVaosDeclarados(receita, registros, quem = 'vãos da peça') {
 }
 
 /* A borda do vão na malha: a cadeia refinada pela gaiola da chapa, cada ponto com a posição da malha e, nos nomes declarados, o nome. */
-function bordaNaMalha(gaiola, nomes, neutro, onde, espelhada) {
+export function bordaNaMalha(gaiola, nomes, neutro, onde, espelhada) {
   const fechada = nomes.length > 2 && nomes[0] === nomes[nomes.length - 1];
   const indices = [];
   for (const n of nomes) {
