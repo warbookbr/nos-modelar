@@ -783,8 +783,10 @@ mesmo num teste. Uma feição desenhada mais estreita que três espaçamentos da
 gaiola sai acusada mesmo com a superfície sobre a forma; alargue a feição ou
 adense as colunas ao redor dela. Na carenagem de prova, colunas a 175 mm longe do
 vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora da
-forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra continua para a
-pessoa e o crítico conferirem.
+forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra serve ao reflexo
+(a continuidade entre painéis), e não ao defeito; para o amassado largo e raso use
+a luz rasante e a curvatura da lataria (`tools/blender/luz-rasante.py` e
+`curvatura-da-lataria.py`, em `docs/modelar/modelar-carroceria.md`).
 
 Para a falha de mais de três espaçamentos, rode `npm run alisar --
 <receita.js>` (`tools/modelar/alisar-a-superficie.mjs`) em vez de rodadas de
