@@ -41,7 +41,7 @@ As imagens das guardas da bancada e da `vistas:critica` saem iguais às de antes
 3. Na zebra e na luz rasante, o amassado da peça de prova aparece: o contraste na região dele passa de um limiar medido contra a mesma região sem o amassado.
 4. A pessoa escolheu uma das propostas de tela por imagem antes do código da interface, e aprovou por imagem cada parte entregue.
 5. A folha de estilo usa só as definições do sistema visual: nenhuma cor, tamanho de fonte ou espaçamento fora delas, conferido por um gate.
-6. Numa janela de 1400 por 900 a cena ocupa ao menos 70% da largura com os painéis abertos, e nada transborda em 1100 pixels.
+6. Numa janela de 1400 por 900 a cena ocupa ao menos 70% da largura com os painéis do tema abertos (no Revisão, contando a referência ao lado), e nada transborda em 1100 pixels, nos três temas.
 7. `main.js` sem acesso direto à página fora dos componentes, e cada componente com teste de imagem.
 8. As guardas da bancada e o `npm run gates -- --completo` passam, e a pessoa aprova o seletor e cada visão por imagem.
 
@@ -52,7 +52,7 @@ As imagens das guardas da bancada e da `vistas:critica` saem iguais às de antes
 3. **Zebra e luz rasante.** O material das listras e a luz rasante com sombra e controle de direção.
 4. **Propostas de tela.** Em paralelo com as fatias 1 a 3, três propostas de tela desenhadas, na mesma peça e no mesmo tamanho de janela, para a pessoa escolher.
 5. **Sistema visual e estado central.** As definições, o gate que as cobra e o estado da bancada num lugar só, sem mudar a aparência ainda.
-6. **Estrutura da tela.** Barra superior, árvore das partes, cena com a barra flutuante, o seletor de visão e o cubo de orientação, painel contextual e barra de estado, na proposta escolhida, um componente de cada vez.
+6. **Estrutura da tela e temas.** Barra superior, árvore das partes, cena com a barra flutuante, o seletor de visão e o cubo de orientação, painel ou cartão da seleção, referência lado a lado e barra de estado, um componente de cada vez, e os três temas (Foco, Bancada e Revisão) como arrumações desses componentes, com o seletor de tema e um teste de imagem por tema.
 7. **Cena e acabamento.** Fundo, luz, sombra, contorno da seleção e os estados dos controles.
 8. **Prova e fechamento.** As capturas de cada visão e da tela para a pessoa, as guardas, a documentação da bancada e o plano movido para `encerrados/`.
 
@@ -61,7 +61,7 @@ As imagens das guardas da bancada e da `vistas:critica` saem iguais às de antes
 1. **Plano e ordem.** Aprovada em 2026-10-30: a pessoa pediu o plano e o pôs antes do furgão realista.
 2. **Lugar e conteúdo do seletor.** Aprovada em 2026-10-30, na forma recomendada: o controle "Visão" na barra de baixo, ao lado das vistas de câmera, com as seis visões, um atalho para cada e a luz rasante com um controle de direção que aparece só quando ela está ligada.
 3. **Interface no mesmo plano.** Aprovada em 2026-10-30: a pessoa pediu para fazer a reestruturação da interface neste plano, começando já, com agentes em Opus.
-4. **Proposta de tela.** A pessoa escolhe na fatia 4.
+4. **Proposta de tela.** Aprovada em 2026-10-30, depois de ver as três propostas desenhadas: as três viram temas que a pessoa escolhe na bancada, com a escolha lembrada entre sessões; Bancada é a proposta A (escura, painéis fixos), Foco é a proposta B (clara, a peça na tela inteira, painéis flutuantes) e Revisão é a proposta C (a peça e a referência lado a lado com a mesma câmera, e a opção de sobrepor com transparência). O Foco é o tema padrão. Os três temas usam os mesmos componentes e o mesmo estado, e um tema só decide a aparência e onde cada componente fica. O Revisão não tem a faixa de decisão da proposta C (veredito do crítico, medidas e botões de aceite), porque a pessoa recebe o veredito e decide conversando com o agente, e repetir isso na bancada seria uma segunda fonte. O agrupamento da árvore das partes que as propostas A e C desenham não existe nas receitas, que listam as partes sem grupo; a árvore fica plana, e os grupos ficam para decidir depois.
 
 ## Riscos e parada
 
