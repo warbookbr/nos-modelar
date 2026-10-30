@@ -7,6 +7,7 @@
  * imagem e quem responde primeiro a uma tecla. */
 import './sistema-visual.css';
 import './styles.css';
+import './temas/revisao.css';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../autoria/catalogo-pecas.js';
 import { listarParaBancada } from './acervo-receitas.js';
 import { criarAmbienteBancada } from './criar-ambiente.js';
@@ -20,6 +21,7 @@ import { criarRegistroAtalhos } from './controles/atalhos.js';
 import { criarComandos } from './controles/comandos.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
 import { criarImagemNaCena } from './referencias/imagem-na-cena.js';
+import { criarReferenciaAoLado } from './referencias/referencia-ao-lado.js';
 import { criarEstadoCentral, estadoInicialDaBancada } from './estado/estado-central.js';
 import { criarPecaEmCena } from './cena/peca-em-cena.js';
 import { criarEdicaoDaPeca } from './cena/edicao-da-peca.js';
@@ -48,6 +50,7 @@ import { montarBarraDeEdicao } from './componentes/barra-de-edicao.js';
 import { montarBarraDeEstado } from './componentes/barra-de-estado.js';
 import { montarNomeDaPeca } from './componentes/nome-da-peca.js';
 import { montarPopoverDaCena } from './componentes/popover-da-cena.js';
+import { montarMesaDeRevisao } from './componentes/mesa-de-revisao.js';
 import { criarPonteDaCaptura, publicarPonte } from './componentes/ponte-da-captura.js';
 
 /* `sessaoPorUrl` deixa a URL escolher o arquivo de sessão (`?sessao=<caminho>`), em vez do `sessao-ativa.json` compartilhado: só o
@@ -102,8 +105,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
      sequência de eventos desde que a página abriu. */
   const registroDeEventos = criarRegistroDeEventos();
 
-  /* O ambiente avisa a cena da troca de vista, e a cena nasce depois dele. */
+  /* O ambiente avisa a cena e a referência da mesa da troca de vista, e as duas nascem depois dele. */
   let cena = null;
+  let referenciaAoLado = null;
   const salvarUrlForaDaSubida = () => {
     if (!estado.obter('inicializando') && cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
   };
@@ -111,6 +115,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     aoMudarVista(vista) {
       estado.definir({ vista });
       salvarUrlForaDaSubida();
+      referenciaAoLado?.aoMudarVista(vista);
     },
     aoMudarCameraLivre: salvarUrlForaDaSubida,
   });
@@ -174,6 +179,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   aCadaQuadro(() => {
     edicao.acompanharCamera();
     imagemNaCena.punho.acompanharCamera();
+    referenciaAoLado?.acompanhar();
   });
 
   let sessao = null;
@@ -190,6 +196,10 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   const preferenciasBancada = criarPreferenciasBancada();
   const vista = criarVistaDaCena({
     ambiente, estado, cena, seletorDeVisao, preferenciasBancada, avisar, parametros: params,
+  });
+  /* A referência da mesa do Revisão: a imagem da aba, as vistas dela e a câmera da peça na da vista escolhida. */
+  referenciaAoLado = criarReferenciaAoLado({
+    ambiente, cena, imagemNaCena, estado, alternarProjecao: vista.alternarProjecao, carregarJson: arquivos.carregarJson,
   });
 
   let paineisDoTema = null;
@@ -307,6 +317,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   });
   montarNomeDaPeca({ elementos: elementos.nomeDaPeca, estado });
   montarPopoverDaCena({ elementos: elementos.popoverDaCena });
+  montarMesaDeRevisao({
+    elementos: elementos.mesaDeRevisao, estado, acoes: { abrirNotas: () => abrirAbaDoPainel('anotacoes') },
+  });
   montarCuboDeOrientacao({ elementos: elementos.cuboDeOrientacao, orientacao: () => ambiente.camera.matrixWorldInverse.elements });
   montarCartaoDaSelecao({
     elementos: elementos.cartaoDaSelecao,

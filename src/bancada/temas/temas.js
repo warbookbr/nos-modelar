@@ -56,16 +56,42 @@ export const TEMAS = Object.freeze([
     paineis: null,
     cena: null,
   }),
+  /* O Revisão é a proposta C sem a faixa de decisão: a cena dividida entre a peça e a referência, cada uma com um
+     cabeçalho fino, a árvore plana encostada à esquerda e o painel da direita encostado do outro lado quando abre. A
+     mesa da comparação (`componentes/mesa-de-revisao.js`) só existe onde o tema lhe dá lugar, e é este o tema que dá;
+     os outros componentes são os do Foco, noutros lugares. A barra da cena desce para o pé da mesa, com focar e copiar
+     a vista ao lado de enquadrar. */
   Object.freeze({
     id: 'revisao',
     rotulo: 'Revisão',
-    descricao: 'Clara, para conferir a peça contra a referência.',
+    descricao: 'Clara, a peça e a referência lado a lado, com a mesma câmera.',
     cores: 'claro',
-    arrumacao: 'classica',
-    lugares: Object.freeze({}),
-    rotulos: Object.freeze({}),
-    paineis: null,
-    cena: null,
+    arrumacao: 'revisao',
+    lugares: Object.freeze({
+      'mesa-comparacao': 'mesa',
+      abrir: 'topo-peca',
+      juntas: 'topo-peca',
+      controles: 'topo-direita',
+      estado: 'topo-direita',
+      projecao: 'barra-cena',
+      'seletor-visao': 'barra-cena',
+      enquadrar: 'barra-cena',
+      focar: 'barra-cena',
+      'copiar-vista': 'barra-cena',
+      'preferencias-cena': 'popover-cena',
+      explosao: 'popover-cena',
+      'regua-metrica': 'barra-estado',
+      'rodape-juntas': 'barra-edicao',
+    }),
+    rotulos: Object.freeze({
+      juntas: 'Editar', 'titulo-partes': 'Partes', 'aba-inspecao': 'Seleção', 'aba-referencias': 'Referência', 'aba-anotacoes': 'Notas',
+      focar: 'Focar', 'copiar-vista': 'Copiar vista',
+    }),
+    paineis: Object.freeze({
+      partes: Object.freeze({ abertoAoNascer: true, largura: 240 }),
+      inspecao: Object.freeze({ abertoAoNascer: false, largura: 272 }),
+    }),
+    cena: Object.freeze({ fundo: '--cena', grade: '--linha-forte', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '--destaque' }),
   }),
 ]);
 

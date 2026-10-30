@@ -22,6 +22,7 @@ const SEM_ACESSO_A_PAGINA = [
   'controles/comandos.js',
   'sessao/sessao-da-bancada.js',
   'referencias/imagem-na-cena.js',
+  'referencias/referencia-ao-lado.js',
   'visoes/registro-de-visoes.js',
   'visoes/materiais-da-visao.js',
   'visoes/calculo-da-curvatura.js',

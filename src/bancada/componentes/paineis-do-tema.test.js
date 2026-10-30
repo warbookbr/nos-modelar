@@ -72,7 +72,8 @@ describe('painéis do tema', () => {
     expect(documento.querySelector('.painel').hasAttribute('data-aberto')).toBe(false);
     estado.definir({ tema: 'foco' });
     expect(documento.querySelector('.painel').dataset.aberto).toBe('false');
+    /* O Revisão encosta a árvore aberta ao nascer. */
     estado.definir({ tema: 'revisao' });
-    expect(documento.querySelector('.painel').hasAttribute('data-aberto')).toBe(false);
+    expect(documento.querySelector('.painel').dataset.aberto).toBe('true');
   });
 });
