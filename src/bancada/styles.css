@@ -1367,8 +1367,8 @@ body.modal-aberto { overflow: hidden; }
 :root[data-arrumacao="foco"] .aviso,
 :root[data-arrumacao="foco"] #erro { bottom: 104px; }
 
-/* ----- janela estreita: os rótulos longos saem, os ícones ficam ----- */
-@media (max-width: 1240px) {
+/* ----- janela estreita: os rótulos longos saem, os ícones ficam; com eles os três grupos do alto medem 1264 pixels ----- */
+@media (max-width: 1320px) {
   .topo-foco .texto-largo,
   .topo-foco .texto-botao,
   .topo-foco #btnProjecao > span,

@@ -112,6 +112,9 @@ try {
      dizendo qual imagem sumiria, e a posição da foto só se ajustava por três
      barras num canto da tela — procurar o encaixe olhando o número em vez da
      cena. Os dois são de tela, então nenhum teste de unidade os enxerga. */
+  /* No tema Foco, o padrão, o painel da direita nasce fechado: a pessoa o abre
+     pelo botão de detalhes antes de escolher a aba, e a guarda faz o mesmo. */
+  if (!(await pagina.isVisible('.aba-btn[data-aba="referencias"]'))) await pagina.click('[data-abrir-painel="inspecao"]');
   await pagina.click('.aba-btn[data-aba="referencias"]');
   await pagina.waitForTimeout(700);
   const painel = await pagina.evaluate(() => {
