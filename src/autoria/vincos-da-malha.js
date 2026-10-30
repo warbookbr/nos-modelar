@@ -30,8 +30,12 @@ function distanciaAoSegmento(p, a, b) {
  * junto; a aresta cujo vértice um passo posterior tirou fica de fora. Cada aresta leva o nome do vinco declarado cujo trecho da
  * gaiola fica mais perto do meio dela (na simetria em x, a imagem espelhada leva o mesmo nome). É a feição que a forma pede, e a
  * curvatura da lataria a tira da escala dela (`curvatura-da-lataria.py --vincos`).
+ *
+ * Com `comIds`, cada item leva também `ids: [[a, b], ...]`, os ids dos vértices do estado neutro nas pontas de cada segmento, na
+ * ordem de `segmentos`: a bancada refaz a curvatura depois de cada edição, que move os vértices sem mudar os ids, e com eles tira
+ * os segmentos da malha editada sem subdividir a gaiola de novo.
  */
-export function vincosDaMalha(receita, executada = executarReceita(receita)) {
+export function vincosDaMalha(receita, executada = executarReceita(receita), { comIds = false } = {}) {
   const { entrada, neutro } = executada;
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
   const { num } = criarResolverNumerico(dict);
@@ -72,10 +76,11 @@ export function vincosDaMalha(receita, executada = executarReceita(receita)) {
         const d = distanciaAoSegmento(meio, t.a, t.b);
         if (d < perto) { perto = d; nome = t.nome; }
       }
-      if (!porNome.has(nome)) porNome.set(nome, { passo: i, nome, viva: true, segmentos: [] });
+      if (!porNome.has(nome)) porNome.set(nome, { passo: i, nome, viva: true, segmentos: [], ...(comIds ? { ids: [] } : {}) });
       const item = porNome.get(nome);
       item.viva &&= Boolean(viva);
       item.segmentos.push([[...p], [...q]]);
+      if (comIds) item.ids.push([idDoPasso(i, a), idDoPasso(i, b)]);
     }
     saida.push(...[...porNome.values()].sort((x, y) => (x.nome < y.nome ? -1 : x.nome > y.nome ? 1 : 0)));
   });

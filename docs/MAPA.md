@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1632 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1644 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1816,6 +1816,8 @@
 - `barra-das-vistas.test.js` — barra-das-vistas.test.js — a vista ativa, a projeção e o seletor de visão seguem o estado, e a lista das visões abre, fecha e escolhe pela mesma porta do ata…
 - `barra-superior.js` — barra-superior.js — a barra de cima da bancada: os botões Abrir, Controles e Estado, cada um com a sua janela, o selo e o aviso que aparecem só quando algo e…
 - `barra-superior.test.js` — barra-superior.test.js — as janelas Abrir, Controles e Estado abrem uma de cada vez e fecham por Esc, o acervo e os atalhos se desenham, a captura de tecla r…
+- `caixa-da-visao.js` — caixa-da-visao.js — a caixa pequena sobre a cena com o que a visão ligada pede (a legenda da curvatura, a largura das listras da zebra, a direção da luz rasa…
+- `caixa-da-visao.test.js` — caixa-da-visao.test.js — a caixa das visões de superfície: aparece com a visão, mostra o controle que ela pede e some ao voltar para a sólida; o deslizante m…
 - `ciclo-da-pagina.js` — ciclo-da-pagina.js — o relógio de quadros da bancada e a saída da página: o que acompanha a câmera a cada quadro e o que se desmonta quando a página sai.
 - `ciclo-da-pagina.test.js` — ciclo-da-pagina.test.js — o relógio roda a função já na montagem e de novo a cada quadro até parar, e a saída da página roda uma vez só.
 - `dom-de-teste.js` — dom-de-teste.js — uma página falsa, mínima, para os testes dos componentes da bancada rodarem no Node sem navegador.
@@ -1890,8 +1892,18 @@
 
 ## src/bancada/visoes/
 
+- `azimute-da-luz.js` — azimute-da-luz.js — a direção da luz rasante no quadro da câmera e a escolha do azimute dela pelo que a câmera vê, as mesmas contas de `direcao_da_luz` e `es…
+- `azimute-da-luz.test.js` — azimute-da-luz.test.js — a direção e a escolha do azimute da luz rasante da bancada contra as de `tools/blender/superficie.py`.
+- `calculo-da-curvatura.js` — calculo-da-curvatura.js — a conta da curvatura da lataria da peça na bancada, como a das vistas obrigatórias do pacote do crítico, fora do quadro da cena.
+- `curvatura.worker.js` — curvatura.worker.js — o trabalhador que calcula a curvatura da peça fora do quadro da cena (`calculo-da-curvatura.js`).
+- `fonte-da-curvatura.js` — fonte-da-curvatura.js — o que a curvatura da peça na bancada precisa da receita, tirado uma vez por receita, no quadro da cena: as partes de lataria e os vin…
+- `materiais-da-visao.js` — materiais-da-visao.js — a troca dos materiais da peça pelos de uma visão de conferência, e a volta deles.
 - `registro-de-visoes.js` — registro-de-visoes.js — as visões de conferência da bancada e o seletor que as alterna sobre a peça carregada.
 - `registro-de-visoes.test.js` — registro-de-visoes.test.js — o seletor de visão sobre o controlador das partes.
+- `visao-curvatura.js` — visao-curvatura.js — a visão Curvatura da bancada: a curvatura média pintada nos vértices da peça, com a escala, as cores e a faixa ocre dos vincos das vista…
+- `visao-luz-rasante.js` — visao-luz-rasante.js — a visão Luz rasante da bancada: uma luz de sol a 10 graus do plano da imagem, com sombra, sobre a peça em material fosco, com o resto …
+- `visao-zebra.js` — visao-zebra.js — a visão Zebra da bancada: listras pelo vetor refletido, como a zebra das vistas do Blender (`_material` de `tools/blender/comum.py`, tipo 'z…
+- `visoes-de-superficie.test.js` — visoes-de-superficie.test.js — a curvatura, a zebra e a luz rasante da bancada sobre a peça na cena, sem navegador.
 
 ## tools/
 

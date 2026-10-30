@@ -1350,6 +1350,77 @@ body.modal-aberto {
 .menu-visoes .item-visao small { font: 600 9px/1 var(--fonte-mono); opacity: 0.8; }
 .menu-visoes .item-visao kbd { grid-column: 3; }
 
+/* ---------- caixa da visão ----------
+   A legenda da curvatura e os controles da zebra e da luz rasante, sobre a
+   cena e acima da régua, no vão entre os dois painéis: embaixo, e não sob a
+   fileira das vistas, porque a fileira quebra em duas linhas conforme o nome
+   da visão e a lista das visões abre para baixo dela. Ela
+   existe só com a visão ligada, e a visão a cria e a tira
+   (`src/bancada/visoes/painel-da-visao.js`). Mesmo fundo claro e mesma borda da
+   lista das visões, para ler como parte do seletor. */
+.painel-visao {
+  position: absolute;
+  z-index: 6;
+  bottom: 96px;
+  left: 50%;
+  width: min(340px, calc(100vw - 2 * (22px + clamp(300px, 19vw, 360px) + 12px)));
+  min-width: 240px;
+  transform: translateX(-50%);
+  padding: 8px 10px;
+  border: 1px solid rgba(31, 47, 40, 0.14);
+  border-radius: 12px;
+  background: rgba(245, 248, 246, 0.94);
+  box-shadow: 0 10px 28px rgba(20, 33, 27, 0.14);
+  color: #18241f;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.painel-visao h2 {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.painel-visao p { margin: 4px 0 0; color: #3c4b44; }
+.painel-visao .estado-visao { color: #6a7a72; font: 600 9px/1.4 var(--fonte-mono); }
+
+.painel-visao .barra-curvatura {
+  height: 8px;
+  border: 1px solid rgba(31, 47, 40, 0.2);
+  border-radius: 4px;
+}
+
+.painel-visao .marcas-curvatura {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  font: 600 9px/1.3 var(--fonte-mono);
+}
+
+.painel-visao .amostra {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+  border: 1px solid rgba(31, 47, 40, 0.25);
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+
+.painel-visao .controle-visao {
+  display: grid;
+  grid-template-columns: auto 1fr 40px;
+  align-items: center;
+  gap: 8px;
+}
+
+.painel-visao .controle-visao input { width: 100%; accent-color: #18241f; }
+.painel-visao .controle-visao output { font: 600 10px/1 var(--fonte-mono); text-align: right; }
+.painel-visao .botao.texto { margin-top: 6px; padding: 4px 8px; color: #18241f; font-size: 11px; }
+
+body.auditoria .painel-visao { display: none; }
+
 kbd { padding: 2px 5px; font: 650 9px/1.35 var(--fonte-mono); }
 
 .painel {

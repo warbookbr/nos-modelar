@@ -13,6 +13,7 @@ function pecaDeUmaParte() {
   const grupo = new THREE.Group();
   grupo.userData.identidadeParte = 'a';
   const malha = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial());
+  malha.userData.tipo = 'superficie';
   grupo.add(malha);
   raiz.add(grupo);
   const controlador = criarControladorPartes({ raiz, partes: new Map([['a', grupo]]) });
@@ -28,9 +29,8 @@ describe('registro de visões', () => {
     expect(new Set(teclas).size).toBe(teclas.length);
   });
 
-  it('sólida, arame e raio X funcionam; curvatura, zebra e luz rasante esperam a etapa delas com a dica', () => {
-    expect(VISOES.filter(visaoDisponivel).map((v) => v.id)).toEqual(['solida', 'arame', 'raio-x']);
-    for (const visao of VISOES.filter((v) => !visaoDisponivel(v))) expect(visao.dica).toMatch(/próxima etapa/);
+  it('as seis funcionam, cada uma com o que aplica e o que desfaz', () => {
+    expect(VISOES.filter(visaoDisponivel).map((v) => v.id)).toEqual(VISOES.map((v) => v.id));
   });
 });
 
@@ -54,10 +54,13 @@ describe('seletor de visão', () => {
     expect(camadaDeLinhas(malha)).toHaveLength(0);
   });
 
+  /* Uma visão sem as duas funções, como as de superfície eram antes da etapa delas. */
+  const comUmaEmBreve = [...VISOES.slice(0, 3), { id: 'curvatura', rotulo: 'Curvatura', atalho: 'k', dica: 'A curvatura chega numa próxima etapa da bancada.' }];
+
   it('recusa a visão que ainda não existe, devolve a dica e não muda a escolhida', () => {
     const { contexto } = pecaDeUmaParte();
     const mudancas = [];
-    const seletor = criarSeletorDeVisao({ aoMudar: (v) => mudancas.push(v) });
+    const seletor = criarSeletorDeVisao({ visoes: comUmaEmBreve, aoMudar: (v) => mudancas.push(v) });
     seletor.prender(contexto);
     seletor.escolher('arame');
     const r = seletor.escolher('curvatura');
@@ -94,7 +97,8 @@ describe('seletor de visão', () => {
 
   it('começa na visão guardada e cai na sólida quando a guardada não funciona', () => {
     expect(criarSeletorDeVisao({ inicial: 'raio-x' }).atual).toBe('raio-x');
-    expect(criarSeletorDeVisao({ inicial: 'zebra' }).atual).toBe(VISAO_PADRAO);
+    expect(criarSeletorDeVisao({ inicial: 'zebra' }).atual).toBe('zebra');
+    expect(criarSeletorDeVisao({ visoes: comUmaEmBreve, inicial: 'curvatura' }).atual).toBe(VISAO_PADRAO);
     expect(criarSeletorDeVisao({ inicial: 'qualquer' }).atual).toBe(VISAO_PADRAO);
   });
 

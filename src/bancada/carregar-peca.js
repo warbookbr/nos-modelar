@@ -44,6 +44,10 @@ export async function carregarPeca(nome, { catalogo = CATALOGO_HOMOLOGADO } = {}
        juntas são achadas nos vértices da peça, e a malha deformada é construída
        a partir daqui, sem passar pela receita. */
     neutro,
+    /* A receita segue como na peça da sessão (`processarReceitaSessao`): a
+       visão de curvatura lê dela as partes de lataria e os vincos declarados,
+       como as vistas obrigatórias do crítico. */
+    receita: peca,
     materiais,
     ...adaptarThree(neutro, { nome: peca.meta?.nome ?? nome, materiais }),
   };

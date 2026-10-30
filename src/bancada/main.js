@@ -36,6 +36,7 @@ import { montarBarraSuperior } from './componentes/barra-superior.js';
 import { montarTeclado } from './componentes/teclado.js';
 import { montarSessaoAtiva } from './componentes/sessao-ativa.js';
 import { montarReferenciaMetrica } from './componentes/referencia-metrica.js';
+import { montarCaixaDaVisao } from './componentes/caixa-da-visao.js';
 import { criarPonteDaCaptura, publicarPonte } from './componentes/ponte-da-captura.js';
 
 /* `sessaoPorUrl` deixa a URL escolher o arquivo de sessão (`?sessao=<caminho>`), em vez do `sessao-ativa.json` compartilhado: só o
@@ -61,6 +62,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   });
   const seletorDeVisao = criarSeletorDeVisao({
     inicial: preferenciaDeVisao.ler(),
+    /* a caixa sobre a cena e os ganchos da página das visões de superfície */
+    pagina: montarCaixaDaVisao({ canvas }),
     aoMudar(visao) {
       preferenciaDeVisao.salvar(visao);
       estado.definir({ visao });

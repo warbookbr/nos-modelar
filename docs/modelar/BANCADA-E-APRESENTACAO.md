@@ -61,8 +61,8 @@ componentes (`painel-componentes.js`), o painel de inspeção com as abas
 (`painel-inspecao.js` e `aba-anotacoes.js`), o rodapé das juntas
 (`rodape-juntas.js`), a oferta da sessão ativa (`sessao-ativa.js`), a régua de
 escala (`referencia-metrica.js`), o teclado (`teclado.js`), o endereço da página
-(`endereco.js`), os avisos (`avisos.js`) e a ponte da captura automática
-(`ponte-da-captura.js`). `elementos-da-pagina.js` é o único lugar que procura
+(`endereco.js`), os avisos (`avisos.js`), a caixa da visão sobre a cena
+(`caixa-da-visao.js`) e a ponte da captura automática (`ponte-da-captura.js`). `elementos-da-pagina.js` é o único lugar que procura
 elementos, e entrega a cada componente só o grupo dele. A ponte
 `window.__mecanificaBancada` é um contrato fixo: as chaves dela estão listadas
 em `CHAVES_DA_PONTE`, e o teste do componente cobra que nenhuma suma.
@@ -82,6 +82,57 @@ ouvintes se registram decide a imagem e quem responde primeiro a uma tecla.
 módulos sem tela não procuram elemento, não ouvem a janela, não leem o endereço
 e não pedem quadro ao navegador. Os componentes são testados sobre uma página
 falsa, `componentes/dom-de-teste.js`, sem navegador.
+
+## As visões de conferência
+
+O controle "Visão", no fim da fileira das vistas, troca o jeito de desenhar a
+mesma peça, com uma tecla para cada visão, que o menu Controles deixa trocar: a
+sólida (`O`), o arame que esconde o que fica atrás (`M`), o raio X (`Shift+M`), a
+curvatura (`K`), a zebra (`B`) e a luz rasante (`J`). A escolha volta na próxima
+vez que a página abre, vale depois de trocar de peça, de arrastar uma junta e de
+operar a malha, e convive com a seleção, o contexto, o isolamento e a explosão:
+a parte escolhida não ganha o verde do destaque nessas três últimas visões,
+porque ele pintaria por cima da cor que elas medem, e a seleção se lê pelo
+fantasma das outras partes. As visões moram em `src/bancada/visoes/`, uma por
+arquivo, e não tocam a página: a caixa pequena que aparece sobre a cena com a
+legenda ou o controle de cada uma é o componente `caixa-da-visao.js`, que também
+lhes dá a soltura do ponteiro e o relógio de quadros. Voltar para a sólida
+devolve os materiais, as luzes e a sombra da cena como estavam.
+
+A curvatura pinta em cada vértice a curvatura média que o crítico recebe nas
+vistas obrigatórias da lataria, com a mesma conta, a mesma escala, as mesmas
+cores e a mesma faixa ocre junto dos vincos declarados
+(`src/autoria/curvatura-da-lataria.js`, sobre os triângulos do estado neutro, e
+não sobre os da cena): vermelho é abaulado, azul é afundado, e as duas saturam
+na escala que a legenda escreve; o ocre marca a lataria a até 40 mm dos vincos
+que a forma desenha, fora da escala, onde a cor não mede defeito; o cinza claro
+é peça de borda e o cinza escuro é lataria sem dado, junto da borda livre e das
+dobras vivas. A peça que não declara lataria tem a curvatura da peça inteira, e
+a legenda diz isso. A conta corre fora do quadro da cena e se refaz quando o
+ponteiro solta depois de um arrasto de junta, de um movimento de vértice ou de
+uma operação de malha; durante o arrasto a peça fica com a cor da conta anterior.
+Na carenagem de prova, de 34 mil vértices, ela leva cerca de 0,3 s a cada edição
+e ocupa a cena por menos de 0,06 s.
+
+A zebra desenha listras pelo reflexo do olhar na superfície, como a zebra das
+vistas do Blender: elas andam quando a câmera gira, saem lisas e contínuas na
+chapa boa e se entortam no amassado e na quina que ondula. A caixa da zebra
+ajusta a largura das listras, que parte de 4,5 graus, a do Blender.
+
+A luz rasante apaga a luz do estúdio e acende um sol a 10 graus do plano da
+imagem, com sombra, sobre a peça em material fosco, com o brilho das imagens de
+luz rasante do Blender. A luz acompanha a câmera, então girar a peça deixa a luz
+rasante para o lado que se vê. A direção começa pela que deixa iluminada a maior
+parte do que a câmera vê ainda rasante para ela (a conta de
+`escolher_azimutes` de `tools/blender/superficie.py`, feita para uma luz só, em
+`visoes/azimute-da-luz.js`), e a caixa da luz rasante a muda ou a escolhe de novo
+para a vista do momento. Num amassado raso a direção importa: no da peça de
+prova com vinco vista de cima, a luz vinda de lado dá três vezes o contraste da
+direção de partida, e a vinda de trás da chapa a deixa escura.
+
+A captura automática não herda a visão da pessoa: a ponte da captura suspende o
+seletor durante a auditoria, e as imagens das guardas e do pacote do crítico
+saem na sólida.
 
 ## O laço: desenhar, salvar, ler, absorver
 

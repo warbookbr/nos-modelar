@@ -22,6 +22,14 @@ const SEM_ACESSO_A_PAGINA = [
   'controles/comandos.js',
   'sessao/sessao-da-bancada.js',
   'referencias/imagem-na-cena.js',
+  'visoes/registro-de-visoes.js',
+  'visoes/materiais-da-visao.js',
+  'visoes/calculo-da-curvatura.js',
+  'visoes/fonte-da-curvatura.js',
+  'visoes/azimute-da-luz.js',
+  'visoes/visao-curvatura.js',
+  'visoes/visao-zebra.js',
+  'visoes/visao-luz-rasante.js',
 ];
 
 const ACESSO = /\b(?:document|window|location|history|navigator|globalThis)\b|\b(?:addEventListener|removeEventListener|requestAnimationFrame|cancelAnimationFrame|prompt)\s*\(|\bnew\s+Image\s*\(/g;

@@ -13,7 +13,12 @@
  * continua valendo depois de cada uma. A peça velha sai da cena levando o que a visão fez nela, sem passar pelo `desfazer`;
  * o que uma visão fizer fora da peça, na luz do estúdio, precisa aceitar ser aplicado de novo sem ter sido desfeito.
  *
- * O módulo não conhece o DOM nem o Three: guarda qual visão está escolhida e chama as funções do registro na ordem certa. */
+ * O seletor não conhece o DOM nem o Three: guarda qual visão está escolhida e chama as funções do registro na ordem certa. As
+ * visões de superfície moram cada uma no seu arquivo, com o material, a luz e a caixa pequena sobre a cena que precisam
+ * (`visao-curvatura.js`, `visao-zebra.js`, `visao-luz-rasante.js`). */
+import { aplicarCurvatura, desfazerCurvatura } from './visao-curvatura.js';
+import { aplicarLuzRasante, desfazerLuzRasante } from './visao-luz-rasante.js';
+import { aplicarZebra, desfazerZebra } from './visao-zebra.js';
 
 export const VISAO_PADRAO = 'solida';
 
@@ -44,9 +49,30 @@ export const VISOES = Object.freeze([
     aplicar: ({ controlador }) => controlador?.definirArame('raio-x'),
     desfazer: ({ controlador }) => controlador?.definirArame(false),
   },
-  { id: 'curvatura', rotulo: 'Curvatura', atalho: 'k', dica: 'A curvatura chega numa próxima etapa da bancada.' },
-  { id: 'zebra', rotulo: 'Zebra', atalho: 'b', dica: 'A zebra chega numa próxima etapa da bancada.' },
-  { id: 'luz-rasante', rotulo: 'Luz rasante', atalho: 'j', dica: 'A luz rasante chega numa próxima etapa da bancada.' },
+  {
+    id: 'curvatura',
+    rotulo: 'Curvatura',
+    atalho: 'k',
+    /* A curvatura média nos vértices, com a escala, as cores e a faixa ocre dos vincos das vistas obrigatórias do crítico. */
+    aplicar: aplicarCurvatura,
+    desfazer: desfazerCurvatura,
+  },
+  {
+    id: 'zebra',
+    rotulo: 'Zebra',
+    atalho: 'b',
+    /* Listras pelo vetor refletido, que andam com a câmera, com a largura no controle da visão. */
+    aplicar: aplicarZebra,
+    desfazer: desfazerZebra,
+  },
+  {
+    id: 'luz-rasante',
+    rotulo: 'Luz rasante',
+    atalho: 'j',
+    /* Um sol a 10 graus do plano da imagem, com sombra e o resto da luz apagado, com a direção no controle da visão. */
+    aplicar: aplicarLuzRasante,
+    desfazer: desfazerLuzRasante,
+  },
 ]);
 
 export function visaoDisponivel(visao) {
@@ -57,8 +83,12 @@ export function visaoDisponivel(visao) {
  *
  * `prender(contexto)` aplica a visão escolhida numa peça que acabou de entrar na cena. `escolher(id)` troca a visão: desfaz a atual e aplica a nova no contexto preso. `suspender()` e `retomar()` existem
  * para a captura automática: ela escolhe o arame por conta própria, pela ponte da bancada, e não pode herdar a visão que a
- * pessoa deixou escolhida; enquanto a captura dura, o seletor não aplica nada, nem numa peça nova que chegue. */
-export function criarSeletorDeVisao({ visoes = VISOES, inicial = VISAO_PADRAO, aoMudar } = {}) {
+ * pessoa deixou escolhida; enquanto a captura dura, o seletor não aplica nada, nem numa peça nova que chegue.
+ *
+ * `pagina` é o que as visões de superfície usam da página sem tocá-la (`componentes/caixa-da-visao.js`): a caixa sobre a cena, a
+ * soltura do ponteiro e o relógio de quadros. O seletor a junta ao contexto de cada peça; sem ela (nos testes), as visões
+ * funcionam sem caixa e refazem a conta só quando a peça é refeita. */
+export function criarSeletorDeVisao({ visoes = VISOES, inicial = VISAO_PADRAO, aoMudar, pagina = null } = {}) {
   const porId = new Map(visoes.map((visao) => [visao.id, visao]));
   const valida = (id) => visaoDisponivel(porId.get(id));
   let atual = valida(inicial) ? inicial : VISAO_PADRAO;
@@ -97,7 +127,7 @@ export function criarSeletorDeVisao({ visoes = VISOES, inicial = VISAO_PADRAO, a
       return { ok: true, visao: atual };
     },
     prender(novo) {
-      contexto = novo ?? null;
+      contexto = novo ? { ...novo, ...(pagina ? { pagina } : {}) } : null;
       aplicada = null;
       aplicar();
     },

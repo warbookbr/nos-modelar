@@ -57,13 +57,13 @@ describe('barra das vistas', () => {
     expect(acoes.definirVista).toHaveBeenCalledWith('frontal');
   });
 
-  it('a lista das visões sai do registro com a tecla de cada uma, marca a escolhida e as que ainda não funcionam', () => {
+  it('a lista das visões sai do registro com a tecla de cada uma, marca a escolhida, e as seis funcionam', () => {
     const { $, estado, acoes } = montar();
     estado.definir({ atalhos: TECLAS });
     const itens = $('menuVisoes').querySelectorAll('[data-visao]');
     expect(itens.map((i) => i.dataset.visao)).toEqual(VISOES.map((v) => v.id));
     expect(itens.find((i) => i.dataset.visao === 'raio-x').querySelector('kbd').textContent).toBe('⇧M');
-    expect(itens.find((i) => i.dataset.visao === 'curvatura').getAttribute('aria-disabled')).toBe('true');
+    expect(itens.filter((i) => i.getAttribute('aria-disabled') === 'true')).toHaveLength(0);
     expect(itens.find((i) => i.dataset.visao === 'solida').getAttribute('aria-checked')).toBe('true');
     expect(acoes.aoRefletirVisao).toHaveBeenLastCalledWith('solida');
 

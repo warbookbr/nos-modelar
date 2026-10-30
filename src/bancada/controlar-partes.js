@@ -54,6 +54,19 @@ function guardarMaterial(material) {
   };
 }
 
+/* O MATERIAL DE UMA VISÃO DE CONFERÊNCIA (curvatura, zebra, luz rasante) entra
+   no lugar do material do autor enquanto a visão dura, e o controlador continua
+   aplicando nele a seleção, o fantasma e o isolamento. Preparado aqui, ele
+   guarda o estado de partida como os do autor, para cada aplicação partir dele
+   em vez de acumular a anterior, e fica fora da cor de auditoria e da tinta
+   verde do destaque: as duas pintariam por cima da cor que a visão mede, e a
+   seleção continua legível pelo fantasma das outras partes. */
+export function prepararMaterialDeVisao(material) {
+  material.userData.visaoDeConferencia = true;
+  guardarMaterial(material);
+  return material;
+}
+
 function restaurarMaterial(material) {
   const base = material.userData.estadoBancada;
   if (!base) return;
@@ -162,7 +175,8 @@ function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = fals
   /* A cor de auditoria entra ANTES dos estados de seleção, para que destaque e
      fantasma continuem funcionando por cima dela. Se entrasse depois, isolar uma
      peça deixaria de marcá-la e o modo viraria duas coisas que brigam. */
-  if (corDaParte && material.color) {
+  const daVisao = Boolean(material.userData.visaoDeConferencia);
+  if (corDaParte && material.color && !daVisao) {
     material.color.copy(corDaParte);
     material.emissive?.setRGB(0, 0, 0);
     material.emissiveIntensity = 0;
@@ -177,7 +191,7 @@ function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = fals
        pelo fantasma das outras. */
     /* Em auditoria a peça também não tinge: a imagem vai para o crítico julgar
        cor e forma, e o verde clareava o topo do anel escuro. */
-    if (!corDaParte && !semTinta) {
+    if (!corDaParte && !semTinta && !daVisao) {
       material.emissive?.copy(VERDE_DESTAQUE);
       material.emissiveIntensity = 0.55;
       material.color?.lerp(VERDE_DESTAQUE, 0.46);
@@ -412,6 +426,10 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       return nomes.map((nome) => partes.get(nome)).filter((grupo) => grupo?.visible);
     },
     estado,
+    /* Reaplica a seleção, o fantasma e o arame em vigor nos materiais que as
+       malhas têm agora: a visão de conferência troca os materiais e, ao
+       desfazer, devolve os do autor, que precisam receber o estado de hoje. */
+    reaplicar() { aplicarVisual(); },
     destruir() {
       cancelAnimationFrame(animacaoExplosao);
       for (const nome of nomes) {
