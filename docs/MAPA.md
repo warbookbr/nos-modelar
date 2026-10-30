@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1583 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1585 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1831,6 +1831,11 @@
 - `registro-de-eventos.test.js` — registro-de-eventos.test.js — prova que a memória curta da bancada guarda a sequência certa, junta repetição consecutiva e descarta o antigo, não o recente, …
 - `sessao.test.js` — sessao.test.js — testes do motor de sessão ativa e sincronização em tempo real.
 - `sincronizador.js` — sincronizador.js — gerenciador de sincronização em tempo real para a Sessão Ativa.
+
+## src/bancada/visoes/
+
+- `registro-de-visoes.js` — registro-de-visoes.js — as visões de conferência da bancada e o seletor que as alterna sobre a peça carregada.
+- `registro-de-visoes.test.js` — registro-de-visoes.test.js — o seletor de visão sobre o controlador das partes.
 
 ## tools/
 

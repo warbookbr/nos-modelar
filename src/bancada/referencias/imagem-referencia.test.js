@@ -1,6 +1,27 @@
 /* imagem-referencia.test.js — contrato do descritor e alinhamento lateral. */
 import { describe, expect, it } from 'vitest';
-import { criarAlinhamentoInicial, normalizarImagemReferencia } from './imagem-referencia.js';
+import { criarAlinhamentoInicial, imagemAoTrocarDePeca, normalizarImagemReferencia } from './imagem-referencia.js';
+
+/* O caso guardado é o do furgão: toda peça aberta pela janela `Abrir` chegava com
+   o alvo `sessao-ativa`, a imagem guardada de uma peça voltava sobre a seguinte no
+   lugar medido para a outra, e a prancha atravessava o furgão. */
+describe('imagem de referência ao trocar de peça', () => {
+  it('guarda a imagem pelo nome da peça, e não pelo alvo comum da sessão', () => {
+    expect(imagemAoTrocarDePeca({ peca: 'furgao', alvo: 'sessao-ativa' }).chave).toBe('furgao');
+    expect(imagemAoTrocarDePeca({ peca: 'peca-de-prova', alvo: 'sessao-ativa' }).chave).toBe('peca-de-prova');
+    expect(imagemAoTrocarDePeca({ peca: '', alvo: 'alvo-da-ia' }).chave).toBe('alvo-da-ia');
+  });
+
+  it('tira da cena a imagem da peça anterior e mantém a da mesma peça recarregada', () => {
+    expect(imagemAoTrocarDePeca({
+      chaveAnterior: 'peca-de-prova', peca: 'furgao', alvo: 'sessao-ativa', imagemNaCena: true,
+    })).toEqual({ chave: 'furgao', tirarDaCena: true });
+    expect(imagemAoTrocarDePeca({
+      chaveAnterior: 'furgao', peca: 'furgao', alvo: 'sessao-ativa', imagemNaCena: true,
+    })).toEqual({ chave: 'furgao', tirarDaCena: false });
+    expect(imagemAoTrocarDePeca({ chaveAnterior: 'peca-de-prova', peca: 'furgao' }).tirarDaCena).toBe(false);
+  });
+});
 
 describe('imagem de referência', () => {
   it('calcula o plano YZ no centro da peça, com proporção e lado solicitados', () => {

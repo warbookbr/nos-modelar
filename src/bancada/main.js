@@ -21,9 +21,10 @@ import { criarPainelReferencias } from './referencias/painel-referencias.js';
 import { criarPunhoDaImagem } from './referencias/punho-da-imagem.js';
 import { apagar, criarFace, duplicar, escalar, extrudar, rotacionar } from '../autoria/topologia-da-malha.js';
 import { criarArmazenamentoImagem } from './referencias/armazenamento-imagem.js';
-import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
+import { criarAlinhamentoInicial, imagemAoTrocarDePeca, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
 import { urlDaReferencia } from './referencias/imagens-da-peca.js';
-import { criarPreferenciasBancada } from './preferencias/estado-local.js';
+import { criarPreferenciaDeVisao, criarPreferenciasBancada } from './preferencias/estado-local.js';
+import { VISOES, VISAO_PADRAO, criarSeletorDeVisao, visaoDisponivel } from './visoes/registro-de-visoes.js';
 import { criarRegistroAtalhos, normalizarCombinacao } from './controles/atalhos.js';
 import { criarHistoricoParametros } from './controles/historico-parametros.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
@@ -97,6 +98,22 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   let parInspecionado = null;
   let modeloAtual = null;
   let nomePecaAtual = pecaPedida ?? 'sessao-ativa';
+
+  /* A VISÃO DA PEÇA (sólida, arame, raio X...) vive no seletor, e não no
+     controlador das partes, porque o controlador é refeito a cada peça, junta
+     arrastada ou operação de malha, e a visão escolhida tem de sobreviver a
+     todos eles. `aplicarModelo` prende a visão em cada controlador novo. */
+  const preferenciaDeVisao = criarPreferenciaDeVisao({
+    conhecidas: VISOES.filter(visaoDisponivel).map((visao) => visao.id),
+    padrao: VISAO_PADRAO,
+  });
+  const seletorDeVisao = criarSeletorDeVisao({
+    inicial: preferenciaDeVisao.ler(),
+    aoMudar(visao) {
+      preferenciaDeVisao.salvar(visao);
+      refletirVisao();
+    },
+  });
 
   /* O que a barra de Estado responde. Estas três coisas eram indicadores fixos
      no alto da tela, dizendo "tudo bem" durante todo o tempo em que nada
@@ -809,7 +826,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     botoesModo.contexto.disabled = !temSelecao;
     botoesModo.isolar.disabled = !temSelecao;
     btnFocar.disabled = !temSelecao;
-    btnWireframeSelecao.disabled = !temSelecao;
+    btnWireframeSelecao.disabled = !temSelecao || seletorDeVisao.atual === 'raio-x';
     opacidadeSelecao.disabled = !temSelecao;
     btnWireframeSelecao.classList.toggle('ativa', estado.wireframeSelecao);
     btnSelecionarConjunto.disabled = !temSelecao || !controlador.temDescendentesNaSelecao();
@@ -1333,6 +1350,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
       },
     });
 
+    seletorDeVisao.prender({ grupo: convertido.raiz, controlador, ambiente, modelo: convertido });
     refletirEstado(controlador.estado());
   }
 
@@ -1392,7 +1410,13 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     { id: 'alternar-grade', rotulo: 'Grade', grupo: 'Vista', padrao: 'h', executar: () => alternarPreferenciaCena('grade') },
     { id: 'isolar', rotulo: 'Isolar', grupo: 'Seleção', padrao: 'i', executar: () => controlador?.selecionadas.length && controlador.definirModo('isolar') },
     { id: 'contexto', rotulo: 'Contexto fantasma', grupo: 'Seleção', padrao: 'g', executar: () => controlador?.selecionadas.length && controlador.definirModo('contexto') },
-    { id: 'wireframe-selecao', rotulo: 'Wireframe', grupo: 'Seleção', padrao: 'w', executar: () => controlador?.selecionadas.length && controlador.definirWireframeSelecao(!controlador.estado().wireframeSelecao) },
+    { id: 'wireframe-selecao', rotulo: 'Wireframe', grupo: 'Seleção', padrao: 'w', executar: () => controlador?.selecionadas.length && seletorDeVisao.atual !== 'raio-x' && controlador.definirWireframeSelecao(!controlador.estado().wireframeSelecao) },
+    /* Uma linha por visão do registro, inclusive as que ainda não funcionam:
+       a tecla delas já existe e responde com a dica, para a pessoa não achar
+       que a tecla está morta. */
+    ...VISOES.map((visao) => ({
+      id: `visao-${visao.id}`, rotulo: visao.rotulo, grupo: 'Visão', padrao: visao.atalho, executar: () => escolherVisao(visao.id),
+    })),
   ];
   const porComando = new Map(COMANDOS.map((c) => [c.id, c]));
   const registroAtalhos = criarRegistroAtalhos({
@@ -1602,6 +1626,98 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   const avisoAtalho = document.getElementById('avisoAtalho');
   const listaAtalhos = document.getElementById('listaAtalhos');
 
+  /* ---------- seletor de visão ----------
+     Um botão na fileira das vistas, com o nome da visão em vigor, que abre a
+     lista das visões do registro com a tecla de cada uma. As que ainda não
+     funcionam ficam na lista, marcadas e com a dica, e escolhê-las só mostra a
+     dica: a lista diz o que a bancada vai ter sem fingir que já tem. */
+  const btnVisao = document.getElementById('btnVisao');
+  const nomeVisao = document.getElementById('nomeVisao');
+  const menuVisoes = document.getElementById('menuVisoes');
+
+  /* 'Shift+m' vira '⇧M', como as teclas que a fileira das vistas já mostra. */
+  function formatarTecla(combinacao) {
+    if (!combinacao) return '';
+    const [shift, tecla] = combinacao.startsWith('Shift+') ? ['⇧', combinacao.slice(6)] : ['', combinacao];
+    return `${shift}${tecla.length === 1 ? tecla.toUpperCase() : tecla}`;
+  }
+
+  function desenharMenuVisoes() {
+    if (!menuVisoes) return;
+    const teclas = registroAtalhos.obter();
+    menuVisoes.replaceChildren(...VISOES.map((visao) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'item-visao';
+      item.dataset.visao = visao.id;
+      item.setAttribute('role', 'menuitemradio');
+      const rotulo = document.createElement('span');
+      rotulo.textContent = visao.rotulo;
+      item.append(rotulo);
+      if (!visaoDisponivel(visao)) {
+        /* `aria-disabled`, e não `disabled`: o botão desabilitado de verdade
+           não recebe clique nem mostra a dica ao passar o ponteiro. */
+        item.setAttribute('aria-disabled', 'true');
+        item.title = visao.dica ?? '';
+        const breve = document.createElement('small');
+        breve.textContent = 'em breve';
+        item.append(breve);
+      }
+      const tecla = document.createElement('kbd');
+      tecla.textContent = formatarTecla(teclas[`visao-${visao.id}`]);
+      item.append(tecla);
+      item.addEventListener('click', () => escolherVisao(visao.id));
+      return item;
+    }));
+    refletirVisao();
+  }
+
+  function refletirVisao() {
+    const atual = VISOES.find((visao) => visao.id === seletorDeVisao.atual);
+    if (nomeVisao) nomeVisao.textContent = atual?.rotulo ?? '';
+    for (const item of menuVisoes?.querySelectorAll('[data-visao]') ?? []) {
+      item.setAttribute('aria-checked', String(item.dataset.visao === seletorDeVisao.atual));
+    }
+    btnVisao?.classList.toggle('ativa', seletorDeVisao.atual !== VISAO_PADRAO);
+    if (controlador) {
+      btnWireframeSelecao.disabled = !controlador.selecionadas.length || seletorDeVisao.atual === 'raio-x';
+    }
+    /* O "Wireframe" da Inspeção é o raio X só da seleção; com a peça inteira
+       em raio X ele não tem o que acrescentar, e o título diz por quê. */
+    btnWireframeSelecao.title = seletorDeVisao.atual === 'raio-x'
+      ? 'A visão Raio X já mostra a peça inteira assim.'
+      : 'Raio X só nas peças selecionadas.';
+  }
+
+  function abrirMenuVisoes(abrir) {
+    if (!menuVisoes || !btnVisao) return;
+    menuVisoes.hidden = !abrir;
+    btnVisao.setAttribute('aria-expanded', String(abrir));
+  }
+
+  function escolherVisao(id) {
+    const resultado = seletorDeVisao.escolher(id);
+    if (resultado.ok) {
+      abrirMenuVisoes(false);
+      return true;
+    }
+    if (resultado.dica) mostrarAviso(resultado.dica);
+    return false;
+  }
+
+  btnVisao?.addEventListener('click', () => abrirMenuVisoes(menuVisoes?.hidden ?? false));
+  /* Fecha ao clicar fora e por Esc. O Esc é ouvido na captura para fechar a
+     lista sem também limpar a seleção da peça, que é o que ele faz na cena. */
+  addEventListener('pointerdown', (evento) => {
+    if (menuVisoes && !menuVisoes.hidden && !evento.target?.closest?.('.seletor-visao')) abrirMenuVisoes(false);
+  });
+  addEventListener('keydown', (evento) => {
+    if (evento.key !== 'Escape' || !menuVisoes || menuVisoes.hidden) return;
+    evento.stopImmediatePropagation();
+    abrirMenuVisoes(false);
+    btnVisao?.focus();
+  }, true);
+
   function aplicarPreferenciasCena(parcial) {
     const proximo = preferenciasBancada.salvar(parcial);
     ambiente.definirPreferenciasCena(proximo);
@@ -1662,6 +1778,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
       }));
       return [titulo, caixa];
     }));
+    /* A lista das visões mostra as mesmas teclas do menu Controles, então
+       trocar ou restaurar uma tecla redesenha as duas. */
+    desenharMenuVisoes();
   }
 
   /* Captura escuta UMA vez. Enquanto ela está aberta o registro manda ignorar
@@ -1846,7 +1965,21 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   /* O corpo da entrega saiu do retorno de chamada para poder ser executado
      também quando a pessoa aceita uma entrega que ficou em espera. */
   async function aplicarEntregaDaSessao(estado, novoModelo, fonte) {
-      alvoReferenciaAtual = estado.alvo?.id ?? alvoReferenciaAtual;
+      if (novoModelo) {
+        const troca = imagemAoTrocarDePeca({
+          chaveAnterior: alvoReferenciaAtual,
+          peca: novoModelo.nome,
+          alvo: estado.alvo?.id,
+          imagemNaCena: Boolean(gerenciadorReferencias3D.obterImagemReferencia()),
+        });
+        if (troca.tirarDaCena) {
+          gerenciadorReferencias3D.removerImagemReferencia();
+          punhoDaImagem.refletir();
+        }
+        alvoReferenciaAtual = troca.chave;
+      } else {
+        alvoReferenciaAtual = alvoReferenciaAtual ?? estado.alvo?.id ?? null;
+      }
       if (novoModelo) {
         /* Preservar a câmera existe para não arrancar o enquadramento de quem
            está editando ao vivo. Na PRIMEIRA entrega da sessão não há câmera a
@@ -2044,6 +2177,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
       document.body.classList.add('auditoria');
       ambiente.definirAuditoria(true);
       const legenda = controlador?.definirCoresPorParte(cores) ?? [];
+      /* A captura escolhe o arame por conta própria e não herda a visão que a
+         pessoa deixou escolhida: o seletor fica suspenso até `semAuditoria`. */
+      seletorDeVisao.suspender();
       controlador?.definirArame?.(arame);
       controlador?.definirAuditoria?.(true);
       ambiente.redimensionar?.();
@@ -2055,6 +2191,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
       controlador?.definirCoresPorParte(false);
       controlador?.definirArame?.(false);
       controlador?.definirAuditoria?.(false);
+      seletorDeVisao.retomar();
       ambiente.redimensionar?.();
       return { auditoria: false };
     },
