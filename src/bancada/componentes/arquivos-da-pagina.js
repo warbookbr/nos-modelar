@@ -1,6 +1,8 @@
-/* arquivos-da-pagina.js — o que entra e sai da bancada como arquivo pelo navegador: o texto baixado para a pasta da pessoa e a imagem lida de um endereço. */
+/* arquivos-da-pagina.js — o que entra e sai da bancada como arquivo pelo navegador: o texto baixado para a pasta da pessoa, a imagem e o JSON lidos de um endereço. */
 
-export function criarArquivosDaPagina({ documento = globalThis.document, ImagemDaPagina = globalThis.Image } = {}) {
+export function criarArquivosDaPagina({
+  documento = globalThis.document, ImagemDaPagina = globalThis.Image, buscar = (url) => globalThis.fetch(url),
+} = {}) {
   return {
     /** Baixa `texto` como `nome`, em JSON, pelo clique num link temporário. */
     baixar(nome, texto) {
@@ -19,6 +21,12 @@ export function criarArquivosDaPagina({ documento = globalThis.document, ImagemD
         elemento.onerror = rejeitar;
         elemento.src = url;
       });
+    },
+    /** O JSON do endereço; a promessa rejeita quando ele não chega. */
+    async carregarJson(url) {
+      const resposta = await buscar(url);
+      if (!resposta.ok) throw new Error(`arquivo ${url}: ${resposta.status}`);
+      return resposta.json();
     },
   };
 }
