@@ -7,7 +7,7 @@
  * Origem: recriado em primitivas do núcleo a partir do modelo "van" do pacote A, de autor A (pacote A, endereço omitido,
  * endereço da página: endereço omitido), licença livre sem exigência de crédito (declarada no License.txt do pacote). A
  * malha de origem NÃO está no repositório: ela fica em importados/veiculos-livres/pacote-a/van.glb, que o git ignora. O que entra aqui
- * são as medidas tiradas dela (referencias/fonte-partes.json, em metro, escala 1,765) e as vistas (referencias/fonte-vistas.png).
+ * são as medidas tiradas dela (as do `furgao`, em procedural/pecas/furgao/referencias/fonte-partes.json, em metro, escala 1,765) e as vistas (referencias/fonte-vistas.png).
  * O que não ficou igual à referência está em referencias/alvo.md.
  *
  * Referencial do acervo: Y para cima, o chão em y = 0, a frente do furgão em +z, x para a direita de quem olha de frente, centrado
@@ -489,7 +489,7 @@ const receita = {
   TOPO: { origem: 'chão, no meio do furgão em x e em z; y para cima e a frente do furgão em +z' },
   PLANO: {
     objeto: 'furgão estilizado de 4854 mm de comprimento, 2648 mm de largura com os espelhos e 2383 mm de altura, azul, volume único alto com capô curto, cabine que afunila, chassi cinza mais largo, para-lamas e rodas grandes',
-    referencias: ['referencias/fonte-vistas.png', 'referencias/fonte-partes.json', 'referencias/alvo.md'],
+    referencias: ['referencias/fonte-vistas.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total do furgão, de z -2427 a 2427, com as placas', milimetros: 4854 },
     familia: 'veiculo',
     partes: [

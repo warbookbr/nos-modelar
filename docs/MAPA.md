@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1674 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1675 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -326,6 +326,7 @@
 ## docs/modelar/banco-de-provas/furgao-realista-2026-10-30/
 
 - `ALINHAMENTO.md` — Furgão realista: alinhamento
+- `ATRITOS.md` — Furgão realista: atritos
 
 ## docs/modelar/banco-de-provas/importar-objeto-2026-10-15/
 

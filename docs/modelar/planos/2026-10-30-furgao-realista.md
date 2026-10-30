@@ -89,4 +89,4 @@ Rascunho escrito em 2026-10-30, a pedido da pessoa, como sucessor do plano dos a
 
 Alinhamento começado em 2026-10-30, adiantado pela exceção que a pessoa abriu no plano ativo; o que vai sendo decidido fica no [registro do alinhamento](../banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md). A pessoa aprovou o alinhamento em 2026-10-30, com a modelagem em sete etapas que ela aceita uma a uma por imagem, depois do crítico cego.
 
-Cópia feita em 2026-10-30: `procedural/pecas/furgao-realista/` com a receita e as referências do `furgao`, o nome e a origem trocados e a forma igual; o retrato do acervo dá as 54 peças de antes iguais, o `furgao` incluso, e a cópia como peça nova.
+Cópia feita em 2026-10-30: `procedural/pecas/furgao-realista/` com a receita e as referências do `furgao`, o nome e a origem trocados e a forma igual; o retrato do acervo dá as 54 peças de antes iguais, o `furgao` incluso, e a cópia como peça nova. A tabela de medidas da fonte ficou só no `furgao`, pelo primeiro atrito do [registro de atritos](../banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md).

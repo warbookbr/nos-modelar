@@ -8,7 +8,7 @@
 - Licença: licença livre sem exigência de crédito, declarada no `License.txt` do pacote.
 - Página: endereço omitido
 - A malha não está no repositório (`importados/veiculos-livres/pacote-a/van.glb`, ignorado pelo git).
-- Referências versionadas: `fonte-vistas.png` (quatro vistas com a cor original) e `fonte-partes.json` (caixas e silhuetas em fatias de superfície, em metro, escala 1,765, comprimento de 4,854 m). Frente em +z, conferida na vista lateral (frente à esquerda) e pelas rodas.
+- Referências versionadas: `fonte-vistas.png` (quatro vistas com a cor original); as medidas da fonte ficam só no `furgao`, em `procedural/pecas/furgao/referencias/fonte-partes.json` (caixas e silhuetas em fatias de superfície, em metro, escala 1,765, comprimento de 4,854 m). Frente em +z, conferida na vista lateral (frente à esquerda) e pelas rodas.
 
 ## Medidas contra a fonte
 
