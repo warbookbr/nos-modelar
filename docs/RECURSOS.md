@@ -7,6 +7,8 @@ removidos e aparecem somente no histórico.
 
 ## Comece aqui
 
+- [`docs/COMECE-AQUI.md`](COMECE-AQUI.md): o projeto explicado a quem chega de
+  fora.
 - [`docs/modelar/INDEX.md`](./modelar/INDEX.md): estado, fontes de verdade,
   comandos e gates.
 - [`package.json`](../package.json): scripts disponíveis.
