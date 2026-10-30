@@ -1,5 +1,5 @@
 name: Preparar
-description: Node 22, as dependências do npm e o navegador das provas visuais.
+description: Node 22, as dependências do npm, o navegador das provas visuais e o numpy e o Pillow do Python.
 runs:
   using: composite
   steps:
@@ -17,4 +17,15 @@ runs:
     # promoção de autoria só aprova uma proposta depois de capturar duas vistas reais. Toda máquina o instala, porque a
     # falta dele numa só vira falso defeito de autoria.
     - run: npx playwright install --with-deps chromium chromium-headless-shell
+      shell: bash
+
+    # As contas de superfície das vistas de análise (`tools/blender/superficie.py`) e a leitura das imagens rodam no python3
+    # do sistema, fora do Blender, e os testes delas rodam em toda máquina, com ou sem Blender; sem o numpy e o Pillow eles
+    # falham por módulo ausente, e não por defeito.
+    # O python3 do Ubuntu recusa o pip no ambiente do sistema; o do setup-python aceita e fica primeiro no PATH.
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - run: python3 -m pip install --quiet numpy pillow
       shell: bash
