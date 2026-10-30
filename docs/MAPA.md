@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1585 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1632 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1789,20 +1789,73 @@
 - `edicao-de-malha.test.js` — edicao-de-malha.test.js — topologia, conversão de seleção entre vértice, aresta e face, e o movimento aplicado à malha neutra.
 - `entrada.js` — entrada.js — única entrada publicada da bancada; a aplicação não escolhe peça padrão e usa o catálogo homologado explícito, que hoje está vazio. /
 - `estado-bancada.js` — estado-bancada.js — estado headless e determinístico da bancada de inspeção.
-- `main.js` — main.js — bancada interativa de co-modelagem (Humano + IA): 3D, referências, parâmetros e feedback.
+- `formatar.js` — formatar.js — como a bancada escreve nomes de parte e teclas de atalho na tela; contas puras, sem DOM.
+- `main.js` — main.js — bancada interativa de co-modelagem (Humano + IA): monta o estado central, a cena e os componentes da tela, e não toca a página.
 
 ## src/bancada/anotacoes/
 
 - `pinos-anotacoes.js` — pinos-anotacoes.js — marcadores 3D interativos sobre a malha e lista de notas para feedback com a IA.
 
+## src/bancada/cena/
+
+- `edicao-da-peca.js` — edicao-da-peca.js — o que a pessoa desenha na peça da bancada: o ajuste por junta, a edição de malha, o desfazer e o alvo que sai para a rodada de absorção.
+- `edicao-da-peca.test.js` — edicao-da-peca.test.js — a base do ajuste é uma cópia da malha do arquivo, e a malha só conta como mudada por vértice movido ou por vértice ou face a mais ou…
+- `peca-em-cena.js` — peca-em-cena.js — a peça que está na cena da bancada: o modelo, o controlador das partes, a seleção por raycast, os enquadramentos e o estado escrito na URL.
+- `vista-da-cena.js` — vista-da-cena.js — como a peça é olhada: a projeção, a grade e o chão, a visão escolhida e a câmera restaurada da URL na subida.
+- `vista-da-cena.test.js` — vista-da-cena.test.js — a projeção alterna e vai para a URL, as preferências da cena vão para o ambiente e para o estado, a visão indisponível responde com a…
+
+## src/bancada/componentes/
+
+- `aba-anotacoes.js` — aba-anotacoes.js — a aba Anotações do painel da direita: a lista das anotações da sessão, com editar e excluir, e os dois jeitos de anotar, geral e no ponto …
+- `aba-anotacoes.test.js` — aba-anotacoes.test.js — a lista das anotações se redesenha a cada entrega, edita e exclui pelo sincronizador, e os dois jeitos de anotar chegam à sessão e à …
+- `arquivos-da-pagina.js` — arquivos-da-pagina.js — o que entra e sai da bancada como arquivo pelo navegador: o texto baixado para a pasta da pessoa e a imagem lida de um endereço.
+- `arquivos-da-pagina.test.js` — arquivos-da-pagina.test.js — baixar põe o texto num link com o nome do arquivo, e a imagem lida resolve ou rejeita.
+- `avisos.js` — avisos.js — o aviso passageiro de baixo da cena e a faixa de erro da bancada.
+- `avisos.test.js` — avisos.test.js — o aviso aparece, some sozinho e reinicia a contagem com aviso novo; o erro mostra a pilha quando há.
+- `barra-das-vistas.js` — barra-das-vistas.js — a fileira das vistas da câmera, a projeção, o enquadrar e o seletor de visão.
+- `barra-das-vistas.test.js` — barra-das-vistas.test.js — a vista ativa, a projeção e o seletor de visão seguem o estado, e a lista das visões abre, fecha e escolhe pela mesma porta do ata…
+- `barra-superior.js` — barra-superior.js — a barra de cima da bancada: os botões Abrir, Controles e Estado, cada um com a sua janela, o selo e o aviso que aparecem só quando algo e…
+- `barra-superior.test.js` — barra-superior.test.js — as janelas Abrir, Controles e Estado abrem uma de cada vez e fecham por Esc, o acervo e os atalhos se desenham, a captura de tecla r…
+- `ciclo-da-pagina.js` — ciclo-da-pagina.js — o relógio de quadros da bancada e a saída da página: o que acompanha a câmera a cada quadro e o que se desmonta quando a página sai.
+- `ciclo-da-pagina.test.js` — ciclo-da-pagina.test.js — o relógio roda a função já na montagem e de novo a cada quadro até parar, e a saída da página roda uma vez só.
+- `dom-de-teste.js` — dom-de-teste.js — uma página falsa, mínima, para os testes dos componentes da bancada rodarem no Node sem navegador.
+- `elementos-da-pagina.js` — elementos-da-pagina.js — o único lugar que procura os elementos da bancada na página, entregues agrupados pelo componente que os usa.
+- `endereco.js` — endereco.js — o endereço da página como estado reproduzível da bancada: os parâmetros lidos na subida, a escrita do estado na URL sem recarregar e a cópia do…
+- `endereco.test.js` — endereco.test.js — o endereço lê os parâmetros da subida, reescreve a URL só quando a consulta muda e copia o endereço.
+- `fronteira-da-pagina.test.js` — fronteira-da-pagina.test.js — só os componentes tocam a página: `main.js` e os módulos de estado, cena e sessão não procuram elemento, não ouvem a janela nem…
+- `menu-abrir.js` — menu-abrir.js — a janela Abrir da barra superior: a lista das receitas do acervo em trabalho, com as de ensaio marcadas.
+- `menu-controles.js` — menu-controles.js — a janela Controles da barra superior: os comandos de teclado agrupados por assunto, a troca de tecla de cada um e a volta aos padrões.
+- `menu-estado.js` — menu-estado.js — a janela Estado da barra superior: o resumo do que está carregado e da ligação com a sessão, e a sequência de eventos desde que a página abriu.
+- `painel-componentes.js` — painel-componentes.js — o painel da esquerda: a lista das partes da peça com a marca da seleção, o filtro, o nome da peça e o recolher.
+- `painel-componentes.test.js` — painel-componentes.test.js — a lista das partes nasce do estado, marca a seleção, filtra, e o painel recolhe com a seta certa.
+- `painel-inspecao.js` — painel-inspecao.js — o painel da direita: as abas, a aba Inspeção com os modos, a opacidade, a explosão, as ações, o botão das juntas, o diagnóstico e as por…
+- `painel-inspecao.test.js` — painel-inspecao.test.js — as abas trocam de conteúdo, a seleção habilita os controles, o raio X desliga o Wireframe e o diagnóstico, as portas e as juntas se…
+- `ponte-da-captura.js` — ponte-da-captura.js — `window.__mecanificaBancada`, o contrato fixo pelo qual a captura automática, as guardas e a revisão headless leem e dirigem a bancada.
+- `ponte-da-captura.test.js` — ponte-da-captura.test.js — a ponte da captura mantém a superfície que os consumidores chamam, lê o estado vivo e liga e desliga a auditoria.
+- `referencia-metrica.js` — referencia-metrica.js — a régua de baixo da cena: os eixos da vista e um traço de comprimento redondo com a escala em pixels por metro, atualizados a cada qu…
+- `referencia-metrica.test.js` — referencia-metrica.test.js — a régua escolhe o comprimento redondo mais perto de 88 pixels e só começa a medir no fim da subida.
+- `rodape-juntas.js` — rodape-juntas.js — o rodapé sobre a cena com o resumo do que a pessoa mexeu na peça e o botão que salva o ajuste como arquivo.
+- `rodape-juntas.test.js` — rodape-juntas.test.js — o rodapé aparece quando há o que salvar ou o modo está ligado, conta as juntas, e salvar passa o baixar à edição.
+- `sessao-ativa.js` — sessao-ativa.js — o que a tela mostra da sessão ativa: a oferta da entrega que chegou enquanto a pessoa olhava outra peça, a tela de espera sem peça e o botã…
+- `sessao-ativa.test.js` — sessao-ativa.test.js — a oferta da entrega em espera aparece com o nome da peça e carrega no clique, e a tela de espera segue o estado.
+- `teclado.js` — teclado.js — o teclado da bancada sobre a cena: o Ctrl+Z, as teclas da edição de malha à moda do Blender, o Esc e os comandos remapeáveis da tabela.
+- `teclado.test.js` — teclado.test.js — Ctrl+Z desfaz o desenho, G move a parte, Tab entra na edição, as teclas da malha vão para a camada, Esc cancela antes de limpar e o resto p…
+
 ## src/bancada/controles/
 
 - `atalhos.js` — atalhos.js — catálogo de comandos de teclado da bancada, com persistência local e recusa de colisão.
 - `atalhos.test.js` — atalhos.test.js — registro de atalhos de teclado da bancada.
+- `comandos.js` — comandos.js — a tabela dos comandos de teclado da bancada: nome, assunto, tecla de fábrica e o que cada um faz.
+- `comandos.test.js` — comandos.test.js — a tabela dos comandos tem uma tecla por comando, uma linha por visão, e os comandos de seleção não agem sem seleção nem contra o raio X.
 - `gizmo-de-setas.js` — gizmo-de-setas.js — as três setas por eixo, desenhadas e clicáveis.
 - `historico-parametros.js` — historico-parametros.js — o desfazer da sessão, limitado ao que a pessoa mexeu depois de abrir a peça.
 - `historico-parametros.test.js` — historico-parametros.test.js — desfazer da sessão.
 - `punhos-de-junta.js` — punhos-de-junta.js — o punho no canto onde as partes se encontram.
+
+## src/bancada/estado/
+
+- `estado-central.js` — estado-central.js — o estado da bancada num lugar só, que os painéis leem e escrevem e cuja mudança eles assinam.
+- `estado-central.test.js` — estado-central.test.js — o estado da bancada avisa quem assina a chave que mudou, só quando muda, e recusa chave que não existe.
 
 ## src/bancada/preferencias/
 
@@ -1813,6 +1866,7 @@
 
 - `armazenamento-imagem.js` — armazenamento-imagem.js — persistência local de uma imagem de referência por alvo.
 - `armazenamento-imagem.test.js` — armazenamento-imagem.test.js — isolamento de referências locais por alvo.
+- `imagem-na-cena.js` — imagem-na-cena.js — a imagem de referência da peça posta na cena: o plano, o alinhamento que o painel e o punho escrevem, a imagem que a pasta da peça declar…
 - `imagem-referencia.js` — imagem-referencia.js — forma validada e alinhamento lateral de referência visual.
 - `imagem-referencia.test.js` — imagem-referencia.test.js — contrato do descritor e alinhamento lateral.
 - `imagens-da-peca.js` — imagens-da-peca.js — as imagens que moram na pasta da peça, servidas pelo Vite.
@@ -1829,6 +1883,8 @@
 - `estado-sessao.js` — estado-sessao.js — modelo canônico do estado de trabalho compartilhado entre IA e operador.
 - `registro-de-eventos.js` — registro-de-eventos.js — a memória curta da bancada.
 - `registro-de-eventos.test.js` — registro-de-eventos.test.js — prova que a memória curta da bancada guarda a sequência certa, junta repetição consecutiva e descarta o antigo, não o recente, …
+- `sessao-da-bancada.js` — sessao-da-bancada.js — de onde vem a peça da bancada: a sessão ativa que a IA envia, a peça aberta do acervo, a do catálogo e a entrega que espera quando a p…
+- `sessao-da-bancada.test.js` — sessao-da-bancada.test.js — a peça escolhida à mão não é trocada pela sessão: a entrega espera como oferta e só carrega quando aceita; sem peça, a bancada es…
 - `sessao.test.js` — sessao.test.js — testes do motor de sessão ativa e sincronização em tempo real.
 - `sincronizador.js` — sincronizador.js — gerenciador de sincronização em tempo real para a Sessão Ativa.
 
