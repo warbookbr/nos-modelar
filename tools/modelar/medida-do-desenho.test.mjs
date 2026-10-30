@@ -6,10 +6,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { RAIZ } from './calibracao-do-critico.mjs';
+import { RAIZ, lerConjuntoDoDisco } from './calibracao-do-critico.mjs';
 import { falhasDosRelatos, lerCausas, ARQUIVO_DAS_CAUSAS, FORMATO_DAS_CAUSAS } from './medida-do-desenho-conferir.mjs';
 import { casosDaMedida, desenharCaso, provarAMedida } from './medida-do-desenho-casos.mjs';
-import { imagemDeDiagnostico, medirConjunto, medirDesenho, relatoDaVista, tabelaDosRelatos } from './medida-do-desenho.mjs';
+import { QUADRO } from '../../modulos/esboco/src/index.js';
+import { imagemDeDiagnostico, medirConjunto, medirDesenho, relatoDaVista, tabelaDosRelatos, vistasDaImagem } from './medida-do-desenho.mjs';
 
 let navegador;
 let pasta;
@@ -69,6 +70,26 @@ describe('o conjunto de calibração do crítico', () => {
     expect(relatos).toHaveLength(8);
     expect(relatos.map((r) => [r.id, r.vista, r.vazamento.pixels, r.falha.pixels]).filter((x) => x[2] + x[3] > 0)).toEqual([]);
   }, 240000);
+
+  it('as quatro vistas do cilindro hidráulico (c05) saem na mesma escala, e a referência de cada uma cabe no painel do desenho', () => {
+    const conjunto = lerConjuntoDoDisco({ exigirGerados: false });
+    const vistas = vistasDaImagem(conjunto.imagens.find((i) => i.id === 'c05'), conjunto);
+    expect(vistas.map((v) => v.vista)).toEqual(['isometrica', 'frontal', 'lateral', 'superior']);
+    expect(new Set(vistas.map((v) => v.r.escala)).size).toBe(1);
+    const barras = vistas.map((v) => /<line x1="20" y1="[\d.]+" x2="([\d.]+)"[^>]*stroke-width="3"\/><text [^>]*>100 mm</.exec(v.r.svg)?.[1]);
+    expect(barras[0]).toBeDefined();
+    expect(barras).toEqual(vistas.map(() => barras[0]));
+    /* os triângulos da referência estão no quadro do desenho (x, y em pixels), na escala dele: nenhum sai do painel */
+    for (const { triangulos } of vistas) {
+      let fora = 0;
+      for (let i = 0; i < triangulos.pos.length; i += 3) {
+        const [x, y] = [triangulos.pos[i], triangulos.pos[i + 1]];
+        if (x < 0 || x > QUADRO.painelL || y < QUADRO.topo || y > QUADRO.topo + QUADRO.painelA) fora++;
+      }
+      expect(triangulos.pos.length).toBeGreaterThan(0);
+      expect(fora).toBe(0);
+    }
+  });
 
   it('rejeita a imagem e a vista que o conjunto não tem', async () => {
     await expect(medirConjunto({ so: 'c99', navegador })).rejects.toThrow(/c99/);

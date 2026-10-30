@@ -37,7 +37,7 @@ import { LARGURA_DAS_VISTAS, VISTAS_DO_CONJUNTO } from '../../src/autoria/calibr
 import { desenhoParaBuffer, paginaDaCamada } from './esboco.mjs';
 import { desenhosDoObjeto } from './esboco.mjs';
 import {
-  ErroDaFonte, RAIZ, PASTA_DO_CONJUNTO, chamadaDaFonte, esbocoDaFonte, executarChamada, lerConjuntoDoDisco, painelDoNeutro,
+  ErroDaFonte, RAIZ, PASTA_DO_CONJUNTO, chamadaDaFonte, entradasDoNeutro, esbocoDaFonte, executarChamada, lerConjuntoDoDisco,
 } from './calibracao-do-critico.mjs';
 
 /* o vinco a partir do qual duas faces vizinhas formam aresta: 30 graus ou mais, e o empate do ângulo exato (12 lados) é o da regra do
@@ -354,11 +354,11 @@ export function vistasDaImagem(imagem, conjunto, raiz = RAIZ) {
     return desenhosDoObjeto(bruto).map(({ vista, r }) => ({ vista, r, triangulos: triangulosDaCamada(r, vista) }));
   }
   const { familia, chamada } = chamadaDaFonte(fonte);
-  const painel = painelDoNeutro(executarChamada(familia, chamada), imagem.objeto);
-  return VISTAS_DO_CONJUNTO.map((vista) => {
-    const entrada = { vista, paineis: [painel] };
-    const r = desenharBlocagem(entrada, { camada: true });
-    return { vista, r, triangulos: triangulosDaBlocagem(entrada, r) };
+  /* as quatro vistas na escala comum, como o crítico as recebe; a referência sai na escala e no enquadramento de cada desenho */
+  const { entradas, escala } = entradasDoNeutro(executarChamada(familia, chamada), imagem.objeto);
+  return entradas.map((entrada) => {
+    const r = desenharBlocagem(entrada, { camada: true, escala });
+    return { vista: entrada.vista, r, triangulos: triangulosDaBlocagem(entrada, r) };
   });
 }
 

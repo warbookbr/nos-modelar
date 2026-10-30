@@ -16,7 +16,7 @@ import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
 import { formasResolvidas } from '../../modulos/esboco/src/formas-resolvidas.js';
 import { planoDeDetalhe, unidadePorNome } from '../../modulos/esboco/src/condutor.js';
 import { COR_DO_VIZINHO, OPACIDADE_DO_VIZINHO, detalharUnidade, formasVizinhas } from '../../modulos/esboco/src/detalhe.js';
-import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
+import { desenharBlocagem, escalaComumDaBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { ErroDoTradutor, traduzirFormasParaAndaime } from '../../src/autoria/tradutor-nivel-zero.js';
 import { compilarAndaime } from '../../src/autoria/medir-blocagem-nivel-zero.js';
 import { furosAbertos } from './esboco-blocagem-furo.mjs';
@@ -204,7 +204,12 @@ export function blocagemDoEsboco(bruto, estado = null, { unidade = null, vizinho
   return { paineis, unidade: u, vizinhos: idsVizinhos, opcoes, texto, hash };
 }
 
-/* A vista `vista` da blocagem, no formato de `desenharEsboco` (com a camada quando `camada`). */
-export function desenharVistaDaBlocagem(blocagem, vista, { camada = true } = {}) {
-  return desenharBlocagem({ vista, paineis: blocagem.paineis }, { camada });
+/* A vista `vista` da blocagem, no formato de `desenharEsboco` (com a camada quando `camada`, e na escala `escala` quando dada). */
+export function desenharVistaDaBlocagem(blocagem, vista, { camada = true, escala = null } = {}) {
+  return desenharBlocagem({ vista, paineis: blocagem.paineis }, { camada, escala });
+}
+
+/* A escala comum das vistas `vistas` da blocagem: a maior com que ela cabe em todas (ver `escalaComumDaBlocagem`). */
+export function escalaComumDasVistasDaBlocagem(blocagem, vistas) {
+  return escalaComumDaBlocagem(vistas.map((vista) => ({ vista, paineis: blocagem.paineis })));
 }

@@ -1,14 +1,16 @@
 /* esboco-composta.test.mjs — o `--composta` do esboço: uma imagem só com as quatro vistas sem legenda em grade 2x2, 1100 px
-   de largura no total, cada quadrante igual ao desenho por pixel de `desenhoParaBuffer`, e a mesma saída para a mesma entrada. */
+   de largura no total, cada quadrante igual ao desenho por pixel de `desenhoParaBuffer`, e a mesma saída para a mesma entrada. As
+   quatro vistas que vão ao crítico (a composta, as do brief do objeto e as `--vista`) saem na escala comum, com a barra de 100 mm do
+   mesmo comprimento em todas. */
 import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { afterAll, describe, expect, it } from 'vitest';
-import { desenharEsboco } from '../../modulos/esboco/src/index.js';
+import { desenharEsboco, escalaComumDasVistas } from '../../modulos/esboco/src/index.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
-import { compostaArquivo, desenhoParaBuffer, LARGURA_DA_COMPOSTA, OPCOES_DA_CAMADA, variante, VISTAS_DA_ANALISE } from './esboco.mjs';
+import { compostaArquivo, desenhoParaBuffer, desenhosDoObjeto, LARGURA_DA_COMPOSTA, OPCOES_DA_CAMADA, variante, vistasArquivo, VISTAS_DA_ANALISE } from './esboco.mjs';
 
 const PASTA = mkdtempSync(join(tmpdir(), 'esboco-composta-'));
 afterAll(() => rmSync(PASTA, { recursive: true, force: true }));
@@ -45,8 +47,11 @@ describe('--composta', () => {
       const posicoes = [[0, 0], [1, 0], [0, 1], [1, 1]];
       let alturas = [0, 0];
       const vistas = [];
-      for (const v of VISTAS_DA_ANALISE) {
-        const d = desenharEsboco(variante({ ...expandido, ladosPorEscala: expandido.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
+      const desenhos = VISTAS_DA_ANALISE.map((v) => variante({ ...expandido, ladosPorEscala: expandido.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }));
+      /* as quatro na escala comum, a maior com que a mesa cabe em todas */
+      expect(r.escala).toBe(escalaComumDasVistas(desenhos));
+      for (const desenho of desenhos) {
+        const d = desenharEsboco(desenho, { ...OPCOES_DA_CAMADA, escala: r.escala });
         const { png } = await desenhoParaBuffer(d, r.celula, navegador);
         vistas.push(PNG.sync.read(png));
       }
@@ -89,5 +94,36 @@ describe('--composta', () => {
     const r = await compostaArquivo(ARQUIVO, { largura: 800, saida: pasta });
     const grade = PNG.sync.read(readFileSync(r.destino));
     expect([grade.width, r.celula]).toEqual([800, 400]);
+  }, 90_000);
+});
+
+/* Um cilindro longo (800 mm por 60 de diâmetro): sozinha, a vista de ponta enchia o painel com o círculo e a barra de 100 mm saía oito
+   vezes mais comprida que nas outras. */
+const LONGO = join(PASTA, 'haste.esboco.json');
+writeFileSync(LONGO, `${JSON.stringify({
+  opcoes: [{ titulo: 'Haste', formas: [{ id: 'haste', tipo: 'cilindro', diametro: 60, comprimento: 800, eixo: 'x', centro: [0, 0, 0], cor: 'cinza' }] }],
+}, null, 2)}\n`);
+const barraDe = (svg) => {
+  const m = /<line x1="20" y1="([\d.]+)" x2="([\d.]+)" y2="\1" stroke="#111111" stroke-width="3"\/><text [^>]*>([^<]+)<\/text>/.exec(svg);
+  return m ? `${(Number(m[2]) - 20).toFixed(1)} px, ${m[3]}` : null;
+};
+
+describe('a mesma escala nas vistas que vão ao crítico', () => {
+  it('as quatro vistas do brief do objeto têm a barra de 100 mm do mesmo comprimento numa peça alongada', () => {
+    const desenhos = desenhosDoObjeto(JSON.parse(readFileSync(LONGO, 'utf8')));
+    const barras = desenhos.map(({ r }) => barraDe(r.svg));
+    expect(barras[0]).toMatch(/ px, 100 mm$/);
+    expect(barras).toEqual(VISTAS_DA_ANALISE.map(() => barras[0]));
+  });
+
+  it('a vista pedida sozinha (`--vista`) sai na escala das quatro, e a composta também', async () => {
+    const [frontal] = desenhosDoObjeto(JSON.parse(readFileSync(LONGO, 'utf8'))).filter((d) => d.vista === 'frontal');
+    const pasta = join(PASTA, 'longo');
+    mkdirSync(pasta);
+    const so = await vistasArquivo(LONGO, { vista: 'lateral', saida: pasta, forcar: true });
+    expect(so.destinos).toHaveLength(1);
+    expect(barraDe(so.svgs[0])).toBe(barraDe(frontal.r.svg));
+    const composta = await compostaArquivo(LONGO, { saida: pasta });
+    expect(composta.escala).toBe(frontal.r.escala);
   }, 90_000);
 });
