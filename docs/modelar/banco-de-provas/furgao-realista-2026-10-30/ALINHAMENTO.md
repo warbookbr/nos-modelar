@@ -20,6 +20,14 @@ No `furgao` ele é feito de três blocos (`chassiFrente`, `chassiCentro`, `chass
 
 A pessoa escolheu, pela recomendação, a frente de bico curto: capô curto e inclinado, quase emendado num para-brisa grande e também inclinado, com as quinas arredondadas, que é a evolução do capô curto do `furgao`. A cabine deixa de ser o bloco facetado que afunila para o teto.
 
+## Os para-choques
+
+A pessoa escolheu, pela recomendação, os para-choques no mesmo plástico escuro da faixa de baixo, envolvendo as quinas e emendando com ela, de modo que a parte de baixo vira uma cinta escura contínua; o dianteiro acompanha o bico curto, com a entrada de ar embaixo e o lugar da placa, e o traseiro tem em cima o degrau plano de carga e o lugar da placa.
+
+## As rodas e os pneus
+
+A pessoa escolheu, pela recomendação, as rodas pela família `roda-pneu`, com o pneu 225/65 aro 16 (cerca de 710 mm de diâmetro e 225 mm de largura, pneumático com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos. A família ganha duas melhorias gerais, que valem para qualquer veículo: os sulcos ao longo da volta da banda, como num pneu de estrada (hoje ela só faz relevo transversal), e a volta de furos de ventilação na chapa da roda.
+
 ## Em aberto
 
-O recorte (furgão estático, com as linhas das portas como vincos e frestas, ou com portas que abrem; a recomendação é o estático), os faróis, os para-choques, as partes, os contatos, a referência visual e os critérios de reprovação.
+O recorte (furgão estático, com as linhas das portas como vincos e frestas, ou com portas que abrem; a recomendação é o estático), os faróis, a lataria, as partes, os contatos, a referência visual e os critérios de reprovação.
