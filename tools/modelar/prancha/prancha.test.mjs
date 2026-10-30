@@ -135,6 +135,23 @@ describe('métrica', () => {
     expect(relatorio.alertas).toHaveLength(0);
     expect(relatorio.porCamada.teto.inversoes).toBe(0);
   });
+
+  /* O trecho reto de `poli` só tem as duas pontas; medido contra os vértices, o
+     landmark no meio da soleira do furgão realista saía 1.164 mm "fora" dela. */
+  it('mede o landmark contra o trecho, e não só contra os vértices', () => {
+    const espec = base([
+      { vista: 'lateral', contorno: true, nome: 'caixa', tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] },
+    ]);
+    espec.landmarks = [
+      { id: 'meioDaBase', vista: 'lateral', em: [0, 0], sobre: 'caixa' },
+      { id: 'foraDaBase', vista: 'lateral', em: [0, 10], sobre: 'caixa' },
+    ];
+    const { relatorio } = prancha(espec);
+    expect(relatorio.porLandmark.meioDaBase.desvio).toBe(0);
+    expect(relatorio.porLandmark.foraDaBase.desvio).toBe(10);
+    expect(relatorio.alertas.join(' ')).toMatch(/landmark foraDaBase: 10 mm fora de "caixa"/);
+    expect(relatorio.alertas.join(' ')).not.toMatch(/meioDaBase/);
+  });
 });
 
 describe('curvatura medida por janela de arco', () => {

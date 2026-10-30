@@ -280,14 +280,15 @@ function medir(spec, camadas) {
 
   /* Landmark declarado "sobre" uma camada precisa cair nela. É o que pega o
      desvio introduzido pelo filete, que corta o canto e afasta a linha do
-     vértice declarado. */
+     vértice declarado. A distância é ao traçado, trecho por trecho, e não aos
+     vértices amostrados: o trecho reto de `filete` e `poli` só tem as duas
+     pontas, e um landmark no meio da soleira saía 1.164 mm "fora" dela. */
   const porLandmark = {};
   for (const l of spec.landmarks ?? []) {
     if (!l.sobre) continue;
     const alvo = camadas.find((c) => c.nome === l.sobre && c.vista === l.vista);
     if (!alvo) { alertas.push(`landmark ${l.id}: camada "${l.sobre}" não existe na vista ${l.vista}`); continue; }
-    let d = Infinity;
-    for (const p of alvo.pl) d = Math.min(d, Math.hypot(p[0] - l.em[0], p[1] - l.em[1]));
+    const d = alvo.pl.length === 1 ? Math.hypot(alvo.pl[0][0] - l.em[0], alvo.pl[0][1] - l.em[1]) : distPontoPoli(l.em, alvo.pl);
     porLandmark[l.id] = { sobre: l.sobre, desvio: n(d) };
     const limite = l.tolerancia ?? spec.toleranciaLandmark ?? 6;
     if (d > limite) alertas.push(`landmark ${l.id}: ${n(d)} mm fora de "${l.sobre}", tolerância ${limite} mm`);
