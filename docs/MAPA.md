@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1567 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1573 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1714,6 +1714,8 @@
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações mecânicas e deriva poses sem Three.js, hierarquia ou solver. É o contrato mínimo …
 - `laco-de-modelagem.js` — laco-de-modelagem.js — quem decide se a modelagem continua, e por quê.
 - `laco-de-modelagem.test.js` — laco-de-modelagem.test.js — a decisão de parar sai dos números, não de quem modelou.
+- `lataria.js` — lataria.js — se uma peça é de lataria, e quais partes dela são a chapa.
+- `lataria.test.js` — lataria.test.js — quando uma peça é de lataria, e quais partes dela são a chapa.
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1 a v5.
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
 - `ler-peca-resolvida.test.js` — ler-peca-resolvida.test.js — o que o leitor devolve de cada face.
@@ -2003,6 +2005,14 @@
 ## tools/fixtures/forma-do-esboco/viga-reta/
 
 - `receita.js` — A viga sem a inclinação de 30 graus do esboço.
+
+## tools/fixtures/lataria-de-prova/
+
+- `receita.js` — lataria-de-prova — a peça de ensaio da obrigação das vistas de superfície: uma chapa de superfície livre por subdivisão, com uma nervura como peça de borda à…
+
+## tools/fixtures/lataria-de-prova/referencias/
+
+- `alvo.md` — Alvo da lataria de prova
 
 ## tools/fixtures/nivel-zero/
 
@@ -2414,6 +2424,8 @@
 - `vistas-da-receita.mjs` — vistas-da-receita.mjs — a folha de seis vistas de uma receita `.js` do acervo, cada parte com uma cor, para olhar a forma e a divisão em partes.
 - `vistas-da-receita.test.mjs` — Testes de vistas-da-receita.mjs: os polígonos da receita em milímetro com as partes na ordem de aparição e a folha de seis vistas pela linha de comando.
 - `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram.
+- `vistas-de-superficie.mjs` — vistas-de-superficie.mjs — a luz rasante e a curvatura da lataria de uma peça, e a conferência de que o pacote do crítico as trouxe.
+- `vistas-de-superficie.test.mjs` — vistas-de-superficie.test.mjs — a peça de lataria não fecha a rodada de forma sem a luz rasante e a curvatura da lataria no pacote do crítico (decisão da pes…
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote que a crítica visual precisa receber: as imagens e o pedido pronto.
 - `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
 - `vistas-texturizadas.mjs` — vistas-texturizadas.mjs — três vistas de uma peça do acervo COM a textura que a exportação OBJ gera, para quem precisa julgar o acabamento (eletrodoméstico, …

@@ -24,8 +24,14 @@
  * cada arquivo (texto puro, ou a transcrição JSONL que o harness grava para um agente em segundo plano): o do crítico entra como
  * `veredito`, sem mudar nada, e o do modelador traz `partes`, `atrito` e `notaDePassagem`. As validações são as de sempre.
  *
+ * A PEÇA DE LATARIA NÃO FECHA SEM A LUZ RASANTE E A CURVATURA DA LATARIA. Por decisão da pessoa em 2026-10-30, o pacote do crítico
+ * da peça de chapa de superfície livre (`src/autoria/lataria.js`) leva as duas vistas, que mostram o amassado largo e raso que as
+ * medidas e a vista comum não mostram. `--registrar` recusa o veredito do crítico de peça de lataria quando o `pacote.json` da pasta da
+ * rodada (a de `vistas:critica`, ou a de `--pacote <pasta>`) não traz as duas vistas da versão medida, com o comando que as gera, e a
+ * rodada gravada guarda as imagens em `superficie`; `--acao` não dá por fechada a peça de lataria cuja última rodada não as tem.
+ *
  * Uso:
- *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"]...
+ *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>]...
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
@@ -43,6 +49,9 @@ import { conferirPontos, formatarPontos } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
+import { latariaDaReceita } from '../../src/autoria/lataria.js';
+import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
+import { comandoDoPacote, pastaDaRodada, superficieDoPacote } from './vistas-de-superficie.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -103,7 +112,7 @@ const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).
 
 export function gravarRodada(
   peca,
-  { veredito = null, medidas, partes, atrito = [], notaDePassagem },
+  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie },
   { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca) } = {},
 ) {
   exigirNome(peca);
@@ -122,7 +131,7 @@ export function gravarRodada(
     };
   }
   const rodada = registrarRodada({
-    peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita,
+    peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita, superficie,
   });
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
@@ -163,8 +172,9 @@ const indentar = (texto) => texto.trim().split('\n').map((l) => `  ${l}`).join('
 /**
  * A medição da receita atual da peça, feita pela ferramenta: o veredito de `descrever` (partes, refinamento, contatos, formas e a
  * forma contra a referência), a guarda do acervo e a do referencial sobre a peça, e os `PONTOS` quando ela os declara. Devolve
- * `{ passou, relatorio, sha256, texto }`: `sha256` é a impressão do texto da receita que foi medida (a mesma que a rodada grava) e
- * `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois. Peça sem receita resolvível lança.
+ * `{ passou, relatorio, sha256, texto, lataria }`: `sha256` é a impressão do texto da receita que foi medida (a mesma que a rodada grava),
+ * `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois, e `lataria` diz se a peça é de lataria
+ * (`latariaDaReceita`). Peça sem receita resolvível lança.
  */
 export async function medirReceita(peca) {
   const caminho = resolverCaminhoReceita(peca);
@@ -184,7 +194,11 @@ export async function medirReceita(peca) {
     if (!pontos.ok) falhas.push(indentar(formatarPontos(pontos)));
   }
   const passou = falhas.length === 0;
-  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')) };
+  /* o PLANO inválido já reprova no `descrever`; aqui ele só não declara a lataria, que então sai dos PASSOS */
+  let plano = null;
+  try { plano = normalizarPlanoDeModelagem(receita?.PLANO); } catch { plano = null; }
+  const { lataria, porque } = latariaDaReceita(receita, plano);
+  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque } };
 }
 
 /**
@@ -241,7 +255,17 @@ export async function acaoDaPeca(peca, {
     const [atual, julgada] = await Promise.all([impressaoDaForma(medicao.caminho), impressaoDaForma(copiaDaReceita(pasta, ultima.numero))]);
     if (atual !== null && atual === julgada) mesmaFormaDaRodada = ultima.numero;
   }
-  return { ...acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite }), medicao };
+  const decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite });
+  /* a peça de lataria só fecha com a luz rasante e a curvatura da lataria no pacote que o crítico julgou */
+  if (decisao.acao === 'parar-fechou' && medicao.lataria?.lataria && !ultima?.superficie) {
+    return {
+      acao: 'revisar',
+      motivo: `a rodada ${ultima.numero} fechou sem a luz rasante e a curvatura da lataria no pacote do crítico, e a peça é de lataria `
+        + `(${medicao.lataria.porque}): gere o pacote com \`${comandoDoPacote(peca)}\` e despache o crítico de novo.`,
+      medicao,
+    };
+  }
+  return { ...decisao, medicao };
 }
 
 /**
@@ -249,7 +273,7 @@ export async function acaoDaPeca(peca, {
  * o veredito do crítico quando a medição da receita atual reprovou, e `medidas` declaradas que contradizem a medição. A receita
  * gravada na rodada é a que foi medida.
  */
-export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), ...opcoes } = {}) {
+export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), pacote = null, ...opcoes } = {}) {
   let medicao;
   try { medicao = await medir(); } catch (erro) {
     throw new Error(`não consegui medir a receita de '${peca}' (${erro.message}): sem medição a rodada não se registra, e o veredito do crítico muito menos.`);
@@ -263,9 +287,22 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
     throw new Error(`o veredito do crítico não se registra: a medição da receita atual (sha256:${curto(medicao.sha256)}) reprovou.\n${indentar(medicao.relatorio)}\n`
       + 'O crítico só julga receita que passa nas medidas. Grave a rodada sem veredito (a ferramenta guarda o relatório da falha) e volte ao modelador.');
   }
-  const { medidas: _declaradas, ...resto } = entrada;
-  void _declaradas;
-  const gravada = gravarRodada(peca, { ...resto, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
+  /* a peça de lataria: o veredito só se registra se o pacote que o crítico julgou trouxe as duas vistas da versão medida */
+  let superficie;
+  if (entrada.veredito && medicao.lataria?.lataria) {
+    const pasta = pacote ?? pastaDaRodada(peca);
+    const conferido = superficieDoPacote(peca, { pasta, sha256: medicao.sha256 });
+    if (!conferido.ok) {
+      throw new Error(`o veredito do crítico não se registra: '${peca}' é peça de lataria (${medicao.lataria.porque}), e ${conferido.motivo}. `
+        + `O pacote do crítico de peça de lataria leva a luz rasante e a curvatura da lataria: gere-o com \`${comandoDoPacote(peca)}\` `
+        + '(com --saida, passe a mesma pasta em --pacote), despache o crítico com o pedido.md novo e registre o veredito dele.');
+    }
+    superficie = { lataria: medicao.lataria.porque, imagens: conferido.imagens };
+  }
+  /* `medidas` e `superficie` são da ferramenta, e o que a entrada declara deles sai */
+  const { medidas: _declaradas, superficie: _declarada, ...resto } = entrada;
+  void _declaradas; void _declarada;
+  const gravada = gravarRodada(peca, { ...resto, superficie, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
   return { ...gravada, medicao };
 }
 
@@ -375,7 +412,7 @@ export function entradaDosArquivos({ modelador, critico = null, atrito = [] }) {
   return entrada;
 }
 
-const OPCOES_COM_VALOR = ['--registrar', '--modelador', '--critico', '--atrito'];
+const OPCOES_COM_VALOR = ['--registrar', '--modelador', '--critico', '--atrito', '--pacote'];
 
 /* Separa a peça, as opções e os valores. `--atrito` repete; `--registrar` aceita valor (o JSON montado) ou nenhum (a forma nova). */
 export function lerArgumentos(argv) {
@@ -412,7 +449,7 @@ async function comoCLI(argv) {
     const entrada = doArquivo
       ? JSON.parse(readFileSync(opcoes.registrar, 'utf8'))
       : entradaDosArquivos({ modelador: opcoes.modelador, critico: opcoes.critico, atrito: opcoes.atrito });
-    const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada);
+    const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada, { pacote: opcoes.pacote ?? null });
     const decisao = await acaoDaPeca(peca, { medir: async () => medicao });
     return {
       codigo: 0,

@@ -38,10 +38,20 @@ da tela, e a sombra no chão já foi lida como geometria mais de uma vez.
 Para achar amassado em carroceria e em qualquer lataria, a zebra não basta e as
 medidas não bastam: a zebra serve ao reflexo (a continuidade de uma curva entre
 painéis), e um amassado de um ou dois milímetros em alguns decímetros passa por
-distância, mapa de distância, curvatura de raio curto e ondulação. Use a luz
-rasante e a curvatura média só da lataria (`tools/blender/luz-rasante.py` e
-`tools/blender/curvatura-da-lataria.py`, com o uso no cabeçalho de cada um), e abra
-cada imagem em tamanho nativo como as demais.
+distância, mapa de distância, curvatura de raio curto, ondulação e vista comum.
+Na peça de lataria, a luz rasante e a curvatura média só da lataria
+(`tools/blender/luz-rasante.py` e `tools/blender/curvatura-da-lataria.py`) são
+obrigatórias desde 2026-10-30. A peça é de lataria quando a receita tem passo
+`subdivisao` (a chapa de superfície livre) ou declara `PLANO.lataria: { partes:
+[...] }`, com as partes que são a chapa; a peça de subdivisão que não é chapa
+declara `PLANO.lataria: { dispensa: '<motivo>' }`. `npm run vistas:critica` gera
+as duas vistas com o resto do pacote do crítico e põe a seção "Superfície" no
+pedido, e sem `MODELAR_BLENDER` apontando o Blender recusa o pacote da peça de
+lataria com o comando; `rodada-de-modelagem --registrar` recusa o veredito do
+crítico de peça de lataria cujo pacote não trouxe as duas vistas da versão medida,
+e `--acao` não a dá por fechada sem elas. Para olhar antes do crítico, as duas
+saem sozinhas de `MODELAR_BLENDER=<blender> npm run vistas:superficie -- <peça>`.
+Abra cada imagem em tamanho nativo como as demais.
 
 ## 2. Antes de qualquer julgamento: abra o alvo e sobreponha
 

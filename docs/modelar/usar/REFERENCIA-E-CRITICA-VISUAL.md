@@ -25,7 +25,9 @@ que descrição, medidas e gates estão limpos. Ele recebe o pedido que
 `npm run vistas:critica` monta na pasta da rodada: as vistas da peça e de cada
 parte em arquivos separados, o alvo ou a referência quando existem, as partes
 que o plano promete com a forma e a técnica, os critérios de reprovação e as
-perguntas. Ele não recebe receita, código, passos, medidas, o raciocínio de quem
+perguntas, e, na peça de lataria (passo `subdivisao` ou `PLANO.lataria`), a luz
+rasante e a curvatura da lataria, sem as quais a rodada dela não fecha (ver
+[`LACO-VISUAL.md`](LACO-VISUAL.md)). Ele não recebe receita, código, passos, medidas, o raciocínio de quem
 modelou nem o histórico da construção. Sempre que a forma vai à pessoa, a
 legibilidade cega (só a imagem e "o que é isto?") roda antes.
 
