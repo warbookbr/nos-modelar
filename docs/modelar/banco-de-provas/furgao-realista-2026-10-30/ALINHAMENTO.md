@@ -32,6 +32,10 @@ A pessoa escolheu, pela recomendação, as rodas pela família `roda-pneu`, com 
 
 A pessoa escolheu, pela recomendação, o furgão de carga estático: as portas existem como frestas finas na lataria, sem se mover (as duas dianteiras da cabine, a lateral de correr do lado direito e as duas traseiras de abrir); vidros no para-brisa, nas portas da cabine e nas portas traseiras, com o compartimento de carga fechado nas laterais; lataria lisa com um vinco de cintura discreto ao longo da lateral, nervuras longitudinais no teto alto e uma aba leve nos arcos das rodas; e, como peças à parte, os retrovisores, as maçanetas, o trilho da porta de correr e as lanternas traseiras verticais nas colunas de trás.
 
+## Os detalhes que dão verdade
+
+A pessoa aceitou as recomendações: faróis grandes nas quinas, embutidos e dobrando um pouco para a lateral, com a grade entre eles, sem marca nem logotipo; vidro escurecido com um interior simples atrás (os bancos da cabine como volumes, o painel e a divisória entre a cabine e a carga); a borracha escura em volta de cada vidro, feita como moldura de vão; os limpadores do para-brisa, as setas laterais, a luz de freio alta sobre as portas traseiras e um fundo escuro por baixo do furgão; o forro escuro e justo ao pneu por dentro dos arcos das rodas; a cor azul do `furgao`, com o plástico escuro embaixo; a referência nas vistas do `furgao` e na prancha cotada; os critérios de reprovação propostos no fim do alinhamento, para a pessoa aprovar.
+
 ## Em aberto
 
-Os faróis, as partes, os contatos, a referência visual e os critérios de reprovação.
+As etapas da modelagem e como a pessoa julga cada uma, as partes com os nomes, os contatos e os critérios de reprovação.
