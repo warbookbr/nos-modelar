@@ -101,6 +101,93 @@ print(__import__('json').dumps({'norma': float(np.linalg.norm(d)), 'z': float(d[
     expect(Math.atan2(m.plano[1], m.plano[0]) * (180 / Math.PI)).toBeCloseTo(30, 9);
   });
 
+  /* a câmera de três quartos de vistas_padrao (comum.py), que vê as faces +x, +y e +z de uma caixa */
+  const tresQuartos = `
+d = np.array([-0.55, -0.45, -0.70]); z = -d / np.linalg.norm(d)
+x = np.cross([0, 1, 0], z); x /= np.linalg.norm(x); y = np.cross(z, x)
+v = {'x_cam': x.tolist(), 'y_cam': y.tolist(), 'z_cam': z.tolist()}
+N = np.array([[1, 0, 0]] * 50 + [[0, 1, 0]] * 30 + [[0, 0, 1]] * 20, float)
+`;
+
+  it('na três quartos de uma caixa, a luz de 30 graus só alcança a frente, e os azimutes escolhidos pela vista caem rasantes no lado e no teto', () => {
+    const m = roda(`${tresQuartos}
+luz30 = S.luz_nas_amostras(N, v, 10, 30)
+az, est = S.escolher_azimutes(N, v, 10)
+luz = [S.luz_nas_amostras(N, v, 10, a) for a in az]
+print(__import__('json').dumps({'acesa30': [float((luz30[k:k+n] > 0).mean()) for k, n in ((0, 50), (50, 30), (80, 20))], 'frente30': float(luz30[80]),
+  'az': az, 'est': {f'{k:g}': e for k, e in est.items()}, 'acesa': [float((l > 0).mean()) for l in luz],
+  'seno_no_lado': [float(l[0]) for l in luz], 'seno_no_teto': [float(l[50]) for l in luz]}))`);
+    /* o que a vista fazia: 30 graus em toda vista deixa o lado e o teto no escuro, e bate quase de frente na face da frente */
+    expect(m.acesa30).toEqual([0, 0, 1]);
+    expect(m.frente30).toBeGreaterThan(0.8);
+    /* os dois azimutes escolhidos estão a 90 graus um do outro, longe de 30, e cada um alcança a maior parte do que a câmera vê */
+    expect((m.az[1] - m.az[0] + 360) % 360).toBe(90);
+    expect(m.az).not.toContain(30);
+    for (const f of m.acesa) expect(f).toBeGreaterThanOrEqual(0.5);
+    /* e a luz no lado, que é a maior face vista, chega rasante (a até 30 graus da superfície) em pelo menos um dos dois */
+    expect(Math.min(...m.seno_no_lado.filter((s) => s > 0))).toBeLessThanOrEqual(0.5);
+    expect(Object.keys(m.est)).toEqual(m.az.map(String));
+    for (const a of m.az) expect(m.est[a].iluminada).toBeCloseTo(m.acesa[m.az.indexOf(a)], 9);
+  });
+
+  it('na vista que enfrenta a chapa, os azimutes de sempre ficam; a sombra dada tira o azimute cuja luz ela bloqueia', () => {
+    const m = roda(`
+v = {'x_cam': [1, 0, 0], 'y_cam': [0, 1, 0], 'z_cam': [0, 0, 1]}
+N = np.tile([0.0, 0.0, 1.0], (100, 1))
+az, est = S.escolher_azimutes(N, v, 10)
+# a sombra de um muro do lado de -x: a luz que viaja para +x fica toda bloqueada
+sombra = lambda d, quais: np.full(len(quais), d[0] > 0)
+az_s, est_s = S.escolher_azimutes(N, v, 10, sombra)
+print(__import__('json').dumps({'az': az, 'est': {f'{k:g}': e for k, e in est.items()}, 'az_s': az_s,
+  'dx': [float(S.direcao_da_luz(v, 10, a)[0]) for a in az_s], 'acesa_s': [float((S.luz_nas_amostras(N, v, 10, a, sombra) > 0).mean()) for a in az_s]}))`);
+    expect(m.az).toEqual([30, 120]);
+    expect(m.est['30']).toEqual({ rasante: 1, iluminada: 1 });
+    for (const dx of m.dx) expect(dx).toBeLessThanOrEqual(1e-9);
+    expect(m.acesa_s).toEqual([1, 1]);
+  });
+
+  it('a fração iluminada conta só os pixels da peça, pelo alfa, e deles os que passam do limiar', () => {
+    const m = roda(`
+H, W = 60, 80
+alfa = np.zeros((H, W)); alfa[10:50, 10:70] = 1.0          # a peça: 40 x 60 = 2400 pixels
+rgb = np.zeros((H, W, 3))
+rgb[10:50, 10:40] = 0.5                                   # metade dela iluminada
+rgb[10:50, 40:42] = 4 / 255                               # duas colunas abaixo do limiar de 8/255: escuras
+rgb[0:5, :] = 1.0                                         # o fundo claro não conta, porque o alfa é zero
+print(__import__('json').dumps({'f': S.fracao_iluminada(rgb, alfa), 'vazia': S.fracao_iluminada(rgb, np.zeros((H, W)))}))`);
+    expect(m.f).toEqual({ pixels_da_peca: 2400, pixels_iluminados: 1200, fracao: 0.5 });
+    expect(m.vazia).toEqual({ pixels_da_peca: 0, pixels_iluminados: 0, fracao: 0 });
+  });
+
+  it('o imagens.py mede a fração iluminada no PNG transparente e o regrava em RGB sobre fundo preto', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'iluminacao-'));
+    try {
+      const W = 40;
+      const H = 20;
+      const png = new PNG({ width: W, height: H });
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const i = (y * W + x) * 4;
+        const peca = x >= 10 && x < 30;
+        const acesa = peca && x < 15;
+        png.data[i] = png.data[i + 1] = png.data[i + 2] = acesa ? 200 : (peca ? 0 : 255);
+        png.data[i + 3] = peca ? 255 : 0;
+      }
+      const arquivo = join(dir, 'escura.png');
+      writeFileSync(arquivo, PNG.sync.write(png));
+      writeFileSync(join(dir, 'pedido.json'), JSON.stringify({ itens: [{ chave: 'escura', arquivo }] }));
+      const r = spawnSync('python3', ['-I', join(AQUI, 'imagens.py'), 'iluminacao', join(dir, 'pedido.json'), join(dir, 'saida.json')], { encoding: 'utf8' });
+      expect(r.status, r.stderr).toBe(0);
+      expect(JSON.parse(readFileSync(join(dir, 'saida.json'), 'utf8')).escura).toEqual({ pixels_da_peca: 400, pixels_iluminados: 100, fracao: 0.25 });
+      const plana = PNG.sync.read(readFileSync(arquivo));
+      const em = (x, y) => [...plana.data.subarray((y * W + x) * 4, (y * W + x) * 4 + 4)];
+      expect(em(0, 0)).toEqual([0, 0, 0, 255]);
+      expect(em(12, 5)).toEqual([200, 200, 200, 255]);
+      expect(em(20, 5)).toEqual([0, 0, 0, 255]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('a curvatura média de uma esfera de raio 0,5 m é 2 1/m com sinal positivo, e troca de sinal com o enrolamento', () => {
     const m = roda(`${esfera}
 H, ok = S.curvatura_media(V, F, 0.06)
@@ -263,6 +350,11 @@ describe.skipIf(!BLENDER)('as vistas de superfície no Blender', () => {
     // a luz é mesmo rasante e o fundo é preto: sem luz de ambiente, o canto da imagem não recebe nada
     expect(j.rasante_graus).toBe(10);
     expect(malha.data[0]).toBe(0);
+    /* `--azimutes` fixa a luz em vez de a escolher pela vista, e a chapa de frente para a câmera sai quase toda iluminada */
+    expect(j.azimutes).toEqual({ frente: [30] });
+    expect(j.escolha_dos_azimutes).toBe('fixos');
+    expect(j.imagens[0].iluminacao.fracao).toBeGreaterThan(0.9);
+    expect(j.imagens[0].iluminacao_referencia.fracao).toBeGreaterThan(0.9);
   });
 
   it('a curvatura da lataria mostra o amassado e não a chapa lisa, com a peça de borda e a borda da chapa sem cor', { timeout: 300000 }, () => {

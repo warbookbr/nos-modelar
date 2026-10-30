@@ -23,7 +23,7 @@ import { afterAll, beforeEach, describe, expect, it, onTestFinished } from 'vite
 import { doAmbiente } from '../ambiente.mjs';
 import { acaoDaPeca, gravarRodada, lerRodadas, medirReceita, registrarMedida, resumoDoLaco } from './rodada-de-modelagem.mjs';
 import {
-  MANIFESTO_DO_PACOTE, comandoDoPacote, gravarManifesto, impressaoDoTexto, superficieDoPacote, vincosDaMalha, vistasDeSuperficie,
+  LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, comandoDoPacote, gravarManifesto, impressaoDoTexto, superficieDoPacote, vincosDaMalha, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 import { montarPedido, prefixoDaPeca, vistasParaCritica } from './vistas-para-critica.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
@@ -59,7 +59,7 @@ function bancadaFalsa(pasta, peca) {
 }
 
 /* As duas vistas trocadas por arquivos com o nome que os scripts do Blender dão. */
-function superficieFalsa() {
+function superficieFalsa({ iluminada = () => 0.6 } = {}) {
   const chamadas = [];
   const gerar = async (peca, { pasta, lataria }) => {
     chamadas.push({ peca, pasta, lataria });
@@ -68,7 +68,7 @@ function superficieFalsa() {
     const gravar = (nome) => { const a = join(destino, nome); writeFileSync(a, nome); return a; };
     return {
       partes: ['chapa'],
-      rasante: ['frente', 'lado'].flatMap((vista) => [30, 120].map((azimute) => ({ arquivo: gravar(`peca-${vista}-rasante-az${azimute}.png`), vista, azimute }))),
+      rasante: ['frente', 'lado'].flatMap((vista) => [30, 120].map((azimute) => ({ arquivo: gravar(`peca-${vista}-rasante-az${azimute}.png`), vista, azimute, iluminada: iluminada(vista, azimute) }))),
       curvatura: ['frente', 'lado'].map((vista) => ({ arquivo: gravar(`peca-${vista}-curvatura-legenda.png`), vista })),
     };
   };
@@ -127,6 +127,27 @@ describe('o pacote do crítico de peça de lataria', () => {
     expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).not.toContain('## Superfície');
     expect(JSON.parse(readFileSync(join(pasta, MANIFESTO_DO_PACOTE), 'utf8'))).toMatchObject({ peca: NAO_LATARIA, lataria: null, superficie: null });
   }, 60_000);
+
+  it('recusa a luz rasante quase toda escura, dizendo a imagem, a fração medida e o limiar, e não escreve o pedido', async () => {
+    /* a vista de três quartos da carenagem de prova, com a luz de 30 graus, saía com 0,5 % da peça iluminada */
+    const base = mkdtempSync(join(area, 'escura-'));
+    const pasta = join(base, 'rodada');
+    const superficie = superficieFalsa({ iluminada: (vista, azimute) => (vista === 'lado' && azimute === 30 ? 0.005 : 0.6) });
+    const gerar = () => vistasParaCritica(PECA, {
+      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar },
+    });
+    await expect(gerar()).rejects.toThrow(`a luz rasante de '${PECA}' saiu quase toda escura em uma imagem, e o pacote do crítico não leva imagem de superfície `
+      + `em que a luz não alcança a peça: ${join(pasta, 'superficie', 'peca-lado-rasante-az30.png')} (vista lado, luz a 30 graus) tem 0,5 % da peça iluminada, `
+      + 'abaixo do limiar de 25,0 %.');
+    expect(existsSync(join(pasta, 'pedido.md'))).toBe(false);
+    expect(existsSync(join(pasta, MANIFESTO_DO_PACOTE))).toBe(false);
+    /* a imagem sem a medida também não passa: o limiar não se confere sem ela */
+    const semMedida = superficieFalsa({ iluminada: () => null });
+    await expect(vistasParaCritica(PECA, {
+      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/b', vistasDeSuperficie: semMedida.gerar },
+    })).rejects.toThrow(/saiu quase toda escura em 4 imagens.*peca-frente-rasante-az30\.png \(vista frente, luz a 30 graus\) não traz a fração iluminada medida, e o limiar é de 25,0 %/);
+    expect(LIMIAR_DA_LUZ_RASANTE).toBe(0.25);
+  }, 60_000);
 });
 
 describe('a rodada de forma da peça de lataria', () => {
@@ -140,11 +161,11 @@ describe('a rodada de forma da peça de lataria', () => {
   const medir = () => medirReceita(PECA);
   const veredito = { alvo: 'referencias/alvo.md', nota: 9, defeitos: [], observacao: 'a chapa e a nervura leem como prometido' };
   const entrada = (extra = {}) => ({ partes: [{ nome: 'chapa', confere: true }, { nome: 'nervura', confere: true }], notaDePassagem: 'a chapa segue a gaiola medida', ...extra });
-  const pacoteCom = (sha256, { superficie = true } = {}) => {
+  const pacoteCom = (sha256, { superficie = true, iluminada = 0.6 } = {}) => {
     const imagens = ['peca-lado-rasante-az30.png', 'peca-lado-curvatura-legenda.png'].map((nome) => { const a = join(pastas.pacote, nome); writeFileSync(a, nome); return a; });
     gravarManifesto(pastas.pacote, {
       peca: NOME, receita: sha256, lataria: { lataria: true, porque: 'subdivisão' },
-      superficie: superficie ? { partes: ['chapa'], rasante: [{ arquivo: imagens[0] }], curvatura: [{ arquivo: imagens[1] }] } : null,
+      superficie: superficie ? { partes: ['chapa'], rasante: [{ arquivo: imagens[0], vista: 'lado', azimute: 30, iluminada }], curvatura: [{ arquivo: imagens[1] }] } : null,
     });
   };
 
@@ -170,6 +191,22 @@ describe('a rodada de forma da peça de lataria', () => {
     pacoteCom(`sha256:${'0'.repeat(64)}`);
     await expect(registrarMedida(NOME, entrada({ veredito, superficie: { lataria: 'à mão', imagens: ['x.png'] } }), { medir, pasta: pastas.rodadas, pacote: pastas.pacote }))
       .rejects.toThrow(/mostra outra versão da receita \(00000000\) que a medida agora/);
+    expect(lerRodadas(NOME, { pasta: pastas.rodadas })).toEqual([]);
+  });
+
+  it('recusa o pacote cuja luz rasante saiu quase toda escura, e o de antes da medida, que não traz a fração', async () => {
+    const { sha256 } = await medir();
+    pacoteCom(sha256, { iluminada: 0.005 });
+    await expect(registrarMedida(NOME, entrada({ veredito }), { medir, pasta: pastas.rodadas, pacote: pastas.pacote }))
+      .rejects.toThrow(`tem luz rasante quase toda escura: peca-lado-rasante-az30.png (vista lado, luz a 30 graus) tem 0,5 % da peça iluminada, abaixo do limiar de 25,0 %`);
+    /* o manifesto gravado antes da medida não traz a fração */
+    const arquivo = join(pastas.pacote, MANIFESTO_DO_PACOTE);
+    const antigo = JSON.parse(readFileSync(arquivo, 'utf8'));
+    delete antigo.superficie.luzRasante;
+    writeFileSync(arquivo, JSON.stringify(antigo));
+    expect(superficieDoPacote(NOME, { pasta: pastas.pacote, sha256 })).toEqual({
+      ok: false, motivo: `o pacote de ${pastas.pacote} tem luz rasante quase toda escura: peca-lado-rasante-az30.png não traz a fração iluminada medida, e o limiar é de 25,0 %`,
+    });
     expect(lerRodadas(NOME, { pasta: pastas.rodadas })).toEqual([]);
   });
 
@@ -220,7 +257,7 @@ function blenderFalso() {
     const prefixo = opcao('--saida');
     const gravar = (nome) => { writeFileSync(`${prefixo}${nome}`, nome); return `${prefixo}${nome}`; };
     if (script === 'luz-rasante.py') {
-      writeFileSync(`${prefixo}rasante.json`, JSON.stringify({ imagens: [{ vista: 'topo', azimute: 30, arquivos: { malha: gravar('topo-rasante-az30.png') } }] }));
+      writeFileSync(`${prefixo}rasante.json`, JSON.stringify({ imagens: [{ vista: 'topo', azimute: 30, arquivos: { malha: gravar('topo-rasante-az30.png') }, iluminacao: { pixels_da_peca: 1000, pixels_iluminados: 420, fracao: 0.42 } }] }));
     } else {
       const vincos = opcao('--vincos') ? JSON.parse(readFileSync(opcao('--vincos'), 'utf8')).vincos : null;
       writeFileSync(`${prefixo}curvatura.json`, JSON.stringify({
@@ -259,6 +296,8 @@ describe('a faixa dos vincos na curvatura da lataria, sem o Blender', () => {
     expect(JSON.parse(readFileSync(arquivo, 'utf8')).vincos.map((v) => v.nome)).toEqual(['quina']);
     expect(curvatura).not.toContain('--faixa-mm');
     expect(feitas.faixa).toEqual({ larguraMm: 40, vincos: ['quina'], escala: 0.45, escalaComAFaixa: 8.5 });
+    /* a fração iluminada que o script mediu chega a cada imagem da luz rasante */
+    expect(feitas.rasante).toEqual([{ arquivo: expect.stringMatching(/topo-rasante-az30\.png$/), vista: 'topo', azimute: 30, iluminada: 0.42 }]);
     /* a luz rasante não muda com a faixa */
     expect(ligada.chamadas.find((c) => c.script === 'luz-rasante.py').args).not.toContain('--vincos');
 
@@ -376,12 +415,41 @@ const croma = (png, [x, y]) => {
   return Math.max(png.data[i], png.data[i + 1], png.data[i + 2]) - Math.min(png.data[i], png.data[i + 1], png.data[i + 2]);
 };
 
+/* A fração da peça iluminada em cada imagem da luz rasante, medida aqui por uma conta independente da do script: a peça é o que a
+   curvatura da mesma vista (mesma câmera, fundo preto) pinta, e iluminado é o pixel da luz rasante acima de 8/255. */
+function fracaoIluminadaIndependente(pasta, { vista, arquivo }) {
+  const lum = (png, k) => (0.2126 * png.data[k] + 0.7152 * png.data[k + 1] + 0.0722 * png.data[k + 2]) / 255;
+  const mascara = PNG.sync.read(readFileSync(join(pasta, 'superficie', `peca-${vista}-curvatura.png`)));
+  const luz = PNG.sync.read(readFileSync(arquivo));
+  let peca = 0;
+  let acesos = 0;
+  for (let k = 0; k < luz.data.length; k += 4) {
+    if (lum(mascara, k) <= 10 / 255) continue;
+    peca++;
+    if (lum(luz, k) > 8 / 255) acesos++;
+  }
+  return acesos / peca;
+}
+
+/* Cada imagem da luz rasante fica acima do limiar, pelo script e pela conta daqui, que concordam, e os dois azimutes de cada vista
+   ficam a 90 graus um do outro. */
+function conferirLuz(pasta, feitas) {
+  expect(feitas.rasante.map((i) => i.vista)).toEqual(['frente', 'frente', 'lado', 'lado', 'topo', 'topo', 'tresquartos', 'tresquartos']);
+  for (let k = 0; k < feitas.rasante.length; k += 2) expect((feitas.rasante[k + 1].azimute - feitas.rasante[k].azimute + 360) % 360).toBe(90);
+  const medidas = feitas.rasante.map((i) => ({ imagem: `${i.vista}-az${i.azimute}`, script: i.iluminada, aqui: fracaoIluminadaIndependente(pasta, i) }));
+  if (doAmbiente('BLENDER_GUARDAR')) console.log(JSON.stringify(medidas));
+  for (const m of medidas) {
+    expect(m.script, m.imagem).toBeGreaterThanOrEqual(LIMIAR_DA_LUZ_RASANTE);
+    expect(Math.abs(m.script - m.aqui), m.imagem).toBeLessThan(0.02);
+  }
+}
+
 describe.skipIf(!BLENDER)('as duas vistas da peça de prova, no Blender', () => {
   it('saem a luz rasante nas quatro vistas e dois azimutes e a curvatura nas quatro, com a nervura em cinza e a chapa em cor', { timeout: 600_000 }, async () => {
     const pasta = mkdtempSync(join(area, 'blender-'));
     const feitas = await vistasDeSuperficie(PECA, { pasta, blender: BLENDER });
     expect(feitas.partes).toEqual(['chapa']);
-    expect(feitas.rasante.map((i) => `${i.vista}-${i.azimute}`)).toEqual(['frente-30', 'frente-120', 'lado-30', 'lado-120', 'topo-30', 'topo-120', 'tresquartos-30', 'tresquartos-120']);
+    conferirLuz(pasta, feitas);
     expect(feitas.curvatura.map((i) => i.vista)).toEqual(['frente', 'lado', 'topo', 'tresquartos']);
     for (const { arquivo } of [...feitas.rasante, ...feitas.curvatura]) expect(existsSync(arquivo)).toBe(true);
     /* na curvatura de cima, o meio da nervura é cinza (peça de borda) e a chapa ao lado dela tem cor */
@@ -390,6 +458,16 @@ describe.skipIf(!BLENDER)('as duas vistas da peça de prova, no Blender', () => 
     const [, , z] = pontos()[linhaDaNervura()[3]];
     expect(croma(png, pixel(cam, [0.4, altura(0.4, z) + 0.004, z]))).toBeLessThanOrEqual(1);
     expect(croma(png, pixel(cam, [0.15, altura(0.15, 0.15), 0.15]))).toBeGreaterThan(10);
+  });
+});
+
+describe.skipIf(!BLENDER)('a luz rasante da carenagem de prova, no Blender', () => {
+  it('cai no lado que a câmera vê em todas as vistas: a três quartos não sai mais preta com a luz de 30 graus', { timeout: 600_000 }, async () => {
+    /* com 30 e 120 graus em toda vista, a de três quartos a 30 graus saía com 0,5 % da peça iluminada */
+    const pasta = mkdtempSync(join(area, 'blender-carenagem-'));
+    const feitas = await vistasDeSuperficie('carenagem-de-prova', { pasta, blender: BLENDER });
+    conferirLuz(pasta, feitas);
+    expect(feitas.rasante.filter((i) => i.vista === 'tresquartos').map((i) => i.azimute)).not.toContain(30);
   });
 });
 

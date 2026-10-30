@@ -33,6 +33,10 @@
 #   python3 -I imagens.py contraste <pedido.json> <saida.json>
 #       Mede o contraste de uma região em cada imagem de pedido.json ({itens: [{chave, arquivo, retangulo: [x0, y0, x1, y1]}]},
 #       o retângulo em pixels) com superficie.contraste_na_regiao, e grava {chave: medida} em saida.json.
+#   python3 -I imagens.py iluminacao <pedido.json> <saida.json>
+#       Mede, em cada imagem RGBA de pedido.json ({itens: [{chave, arquivo}]}, renderizada com fundo transparente), a fração da
+#       peça (alfa acima de meio) que a luz alcança, com superficie.fracao_iluminada, grava {chave: medida} em saida.json e regrava
+#       a imagem em RGB sobre fundo preto, que é como a luz rasante sai para quem olha.
 #   python3 -I imagens.py perfis <perfis.json> <pasta>
 #       Desenha, de cada corte de perfis.json, os perfis sobrepostos em milímetro: <pasta>/corte-<nome>.png com o corte inteiro
 #       e <pasta>/corte-<nome>-ampliado.png em grade de 10 mm em volta do trecho declarado ou do de maior diferença, com a
@@ -530,6 +534,16 @@ def contraste(arq_pedido, arq_saida):
     json.dump(out, open(arq_saida, 'w'), indent=1)
 
 
+def iluminacao(arq_pedido, arq_saida):
+    out = {}
+    for it in json.load(open(arq_pedido))['itens']:
+        px = np.asarray(Image.open(it['arquivo']).convert('RGBA')).astype(float) / 255.0
+        rgb, alfa = px[..., :3], px[..., 3]
+        out[it['chave']] = superficie.fracao_iluminada(rgb, alfa)
+        Image.fromarray(np.round(rgb * alfa[..., None] * 255).astype(np.uint8), 'RGB').save(it['arquivo'])
+    json.dump(out, open(arq_saida, 'w'), indent=1)
+
+
 def vista(arq_json):
     d = json.load(open(arq_json))
     imgs = [Image.open(p['arquivo']).convert('RGB') for p in d['paineis']]
@@ -706,7 +720,9 @@ if __name__ == '__main__':
         lado_a_lado(sys.argv[2])
     elif len(sys.argv) >= 4 and sys.argv[1] == 'contraste':
         contraste(sys.argv[2], sys.argv[3])
+    elif len(sys.argv) >= 4 and sys.argv[1] == 'iluminacao':
+        iluminacao(sys.argv[2], sys.argv[3])
     elif len(sys.argv) >= 4 and sys.argv[1] == 'perfis':
         perfis(sys.argv[2], sys.argv[3])
     else:
-        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | linhas <linhas.json> <saida.png> | cortes <cortes.json> <pasta> [<quadro.json>] | folha <pasta> <metricas.json> <vistas> | vista <vista.json> | lado_a_lado <lado.json> | contraste <pedido.json> <saida.json> | perfis <perfis.json> <pasta>')
+        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | linhas <linhas.json> <saida.png> | cortes <cortes.json> <pasta> [<quadro.json>] | folha <pasta> <metricas.json> <vistas> | vista <vista.json> | lado_a_lado <lado.json> | contraste <pedido.json> <saida.json> | iluminacao <pedido.json> <saida.json> | perfis <perfis.json> <pasta>')
