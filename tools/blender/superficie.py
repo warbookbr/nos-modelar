@@ -1,6 +1,6 @@
 # superficie.py — as contas das duas vistas de análise de superfície (luz-rasante.py e curvatura-da-lataria.py), só com numpy e
-# sem o Blender: a direção da luz rasante, a curvatura média de uma malha, a escala e a cor dela, e o contraste de uma região de
-# imagem. imagens.py (Python do sistema) e os scripts que rodam no Blender o importam; o teste o roda no python3 do sistema.
+# sem o Blender: a direção da luz rasante e a escolha dos azimutes dela pelo que a câmera vê, a fração iluminada da peça numa
+# imagem, a curvatura média de uma malha, a escala e a cor dela, e o contraste de uma região de imagem. imagens.py (Python do sistema) e os scripts que rodam no Blender o importam; o teste o roda no python3 do sistema.
 import math
 import numpy as np
 
@@ -22,6 +22,65 @@ def direcao_da_luz(vista, rasante_graus, azimute_graus):
     no_plano = math.cos(az) * x + math.sin(az) * y
     d = math.cos(g) * no_plano - math.sin(g) * z       # -z_cam é o sentido do olhar, para dentro da cena
     return d / np.linalg.norm(d)
+
+
+RASA_ATE_GRAUS = 30.0   # a luz que chega a uma amostra a até tantos graus da superfície dela ainda é rasante para ela
+
+
+def luz_nas_amostras(normais, vista, rasante_graus, azimute_graus, sombra=None):
+    """Como a luz de `direcao_da_luz(vista, rasante_graus, azimute_graus)` chega a cada amostra da superfície vista: o seno do
+    ângulo entre o raio e a superfície (o cosseno entre a normal, virada para a câmera, que é o lado que responde à luz no material
+    de uma face vista por dentro, e o sentido de onde a luz vem), com 0 onde a amostra está de costas para a luz ou, com
+    `sombra(d, quais)`, na sombra de outra parte da malha."""
+    d = direcao_da_luz(vista, rasante_graus, azimute_graus)
+    c = np.asarray(normais, float).reshape(-1, 3) @ -d
+    acesa = c > 0
+    if sombra is not None and acesa.any():
+        acesa &= ~np.asarray(sombra(d, acesa), bool)
+    return np.where(acesa, c, 0.0)
+
+
+def escolher_azimutes(normais, vista, rasante_graus, sombra=None, passo=10.0, separacao=90.0, preferido=30.0, folga=0.05,
+                      rasa_ate_graus=RASA_ATE_GRAUS):
+    """Os dois azimutes da luz rasante de uma vista, escolhidos pelo que a câmera dela vê. `normais` (N, 3) são as normais da
+    superfície nas amostras que a câmera vê (uma por pixel de uma grade, de modo que cada uma pesa a área projetada que cobre).
+    Cada azimute da grade de `passo` graus vale a fração das amostras que a luz alcança, fora da sombra, a até `rasa_ate_graus`
+    da superfície (`luz_nas_amostras`): a luz cai no lado que a câmera vê e continua rasante para ele, sem bater de frente num
+    painel oblíquo, que sairia branco e liso. O par (a, a + separacao) vale a menor das duas frações, e entre os pares a até
+    `folga` do melhor fica o de primeiro azimute mais perto de `preferido`, de modo que a vista em que a luz de sempre já serve a
+    mantém. A elevação da luz sobre o plano da imagem continua `rasante_graus`; só o lado de onde ela vem muda. Devolve
+    ([a, b], {azimute: {rasante, iluminada}}), com a fração rasante e a fração alcançada de cada um dos dois."""
+    N = np.asarray(normais, float).reshape(-1, 3)
+    z = np.asarray(vista['z_cam'], float)
+    N = np.where((N @ z)[:, None] < 0, -N, N)
+    if separacao % passo or 360 % passo:
+        raise ValueError(f'passo {passo} precisa dividir 360 e a separação {separacao}')
+    candidatos = [float(k * passo) for k in range(int(round(360 / passo)))]
+    if not len(N):
+        return [preferido, (preferido + separacao) % 360], {}
+    teto = math.sin(math.radians(rasa_ate_graus))
+    luz = {a: luz_nas_amostras(N, vista, rasante_graus, a, sombra) for a in candidatos}
+    rasa = {a: float(((c > 0) & (c <= teto)).mean()) for a, c in luz.items()}
+    pares = [(a, (a + separacao) % 360) for a in candidatos]
+    nota = {p: min(rasa[p[0]], rasa[p[1]]) for p in pares}
+    melhor = max(nota.values())
+    distancia = lambda a: abs((a - preferido + 180) % 360 - 180)
+    a, b = min((p for p in pares if nota[p] >= melhor - folga), key=lambda p: (distancia(p[0]), p[0]))
+    return [a, b], {k: {'rasante': round(rasa[k], 4), 'iluminada': round(float((luz[k] > 0).mean()), 4)} for k in (a, b)}
+
+
+LIMIAR_DE_PIXEL_ACESO = 8 / 255   # a luminância (0 a 1, no PNG) acima da qual o pixel da peça conta como iluminado; sem luz de ambiente, o que a luz não alcança sai 0
+
+
+def fracao_iluminada(imagem, alfa, limiar=LIMIAR_DE_PIXEL_ACESO, cobertura=0.5):
+    """A fração dos pixels da peça (cobertura `alfa` acima de `cobertura`) cuja luminância passa de `limiar`, numa imagem (H, W, 3
+    ou H, W, em 0 a 1) renderizada sem luz de ambiente: a parte da peça que a luz alcança, contra a que ficou na sombra ou de costas
+    para ela. Devolve {pixels_da_peca, pixels_iluminados, fracao}."""
+    L = np.asarray(imagem, float)
+    L = luminancia(L) if L.ndim == 3 else L
+    peca = np.asarray(alfa, float) > cobertura
+    n, acesos = int(peca.sum()), int((peca & (L > limiar)).sum())
+    return {'pixels_da_peca': n, 'pixels_iluminados': acesos, 'fracao': round(acesos / n, 4) if n else 0.0}
 
 
 def luminancia(rgb):

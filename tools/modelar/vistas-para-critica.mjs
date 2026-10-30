@@ -35,7 +35,9 @@
  *  - a luz rasante e a curvatura da lataria, quando a peça é de lataria (`src/autoria/lataria.js`): o amassado largo e raso e a quina
  *    que ondula passam por todas as medidas e pela vista comum, e por decisão da pessoa em 2026-10-30 a peça de lataria não fecha a
  *    rodada de forma sem as duas no pacote. Elas saem do Blender (`vistas-de-superficie.mjs`), e sem `MODELAR_BLENDER` o pacote de
- *    peça de lataria é recusado antes de qualquer captura, com o comando.
+ *    peça de lataria é recusado antes de qualquer captura, com o comando. A imagem de luz rasante com menos de 25 % da peça iluminada
+ *    (`LIMIAR_DA_LUZ_RASANTE`) também o recusa, dizendo a imagem e a fração: a luz que vinha de um lado que a câmera não via já chegou
+ *    ao crítico como uma imagem preta com traços de borda.
  *
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
@@ -61,7 +63,7 @@ import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
-  LADO_DA_VISTA_DE_SUPERFICIE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, gravarManifesto, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
+  LADO_DA_VISTA_DE_SUPERFICIE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, exigirLuzNaSuperficie, gravarManifesto, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
   vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
@@ -220,7 +222,7 @@ function olhoDaReferencia(caminho, orientacao) {
  * `{ imagem, unidade }` quando a receita refina um esboço (e null sem); `referencias` as imagens `{ caminho }`; `modelo` as imagens
  * do conjunto `{ arquivo, vista }` e `arame` as da malha `{ arquivo, vista, tipo }`; `montado` é `{ instancia, imagens: [{ arquivo,
  * vista }] }` ou null; `sobreposicao` é `{ arquivos, notas }` ou null; `partes` são `{ nome, imagens: [{ arquivo, vista }] }` na ordem do
- * plano; `perguntas` as perguntas específicas da peça; `superficie` é `{ rasante: [{ arquivo, vista, azimute }], curvatura: [{ arquivo,
+ * plano; `perguntas` as perguntas específicas da peça; `superficie` é `{ rasante: [{ arquivo, vista, azimute, iluminada }], curvatura: [{ arquivo,
  * vista }] }` na peça de lataria, ou null.
  */
 export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null }) {
@@ -342,7 +344,8 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
     + 'painel que devia ser liso e a quina que não corre por igual. Diga onde a chapa afunda, abaula ou ondula sem que a forma peça. As vistas '
     + 'desta seção olham destes lados, no quadro da peça:', '',
     ...lista(vistas.map((v) => `${v}: ${LADO_DA_VISTA_DE_SUPERFICIE[v]}`)), '',
-    'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol a poucos graus do plano da imagem, de duas direções. O painel '
+    'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol a poucos graus do plano da imagem, de duas direções, '
+    + 'escolhidas em cada vista para a luz cair no lado da peça que a câmera vê. O painel '
     + 'liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. '
     + 'A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.', '',
     ...lista(rasante.map(({ arquivo, vista, azimute }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima): ${arquivo}`)), '',
@@ -542,6 +545,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
 
   const sobreposicao = declarado ? await dep.sobreposicaoDeCortes({ peca, saida: pasta }) : null;
   const superficie = lataria.lataria ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
+  /* a imagem de luz rasante quase toda escura não chega ao crítico: a luz que não alcança a chapa não mostra relevo nenhum */
+  if (superficie) exigirLuzNaSuperficie(peca, superficie);
 
   const orientacao = bruto ? lerPlano(bruto.plano)?.orientacao ?? null : null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);

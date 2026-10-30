@@ -19,6 +19,14 @@
  * 2026-10-30, as vistas obrigatórias passam os vincos à curvatura (`--vincos`), que pinta de ocre a lataria junto deles e a tira da
  * escala, com a faixa escrita na legenda; `--sem-faixa-dos-vincos` volta à escala da lataria inteira.
  *
+ * A LUZ QUE ALCANÇA A CHAPA. Com a luz de 30 e 120 graus em todas as vistas, a de três quartos da carenagem de prova a 30 graus saía com
+ * 0,5 % da peça iluminada: a luz vinha de um lado que a câmera não via, e o crítico recebia uma imagem preta com traços de borda (a chapa
+ * de `tools/fixtures/lataria-de-prova/` saía assim em seis das oito imagens). Por
+ * decisão da pessoa em 2026-10-30, o `luz-rasante.py` escolhe os dois azimutes de cada vista pelo que a câmera dela vê, ainda a 10 graus
+ * do plano da imagem, e mede em cada PNG a fração da peça iluminada; o pacote do crítico recusa a imagem abaixo de
+ * `LIMIAR_DA_LUZ_RASANTE`, com a imagem, a fração e o limiar (`exigirLuzNaSuperficie`), e o registro da rodada recusa o pacote cujo
+ * manifesto não traz a fração de cada imagem ou traz uma abaixo dele.
+ *
  * Uso: MODELAR_BLENDER=<blender> node tools/modelar/vistas-de-superficie.mjs <peça> [--saida=<pasta>] [--faixa-mm=<mm> | --sem-faixa-dos-vincos] */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -47,7 +55,8 @@ export function pastaDaRodada(peca, base = SAIDA_PADRAO) {
 }
 
 /* As vistas de `vistas_padrao` (tools/blender/comum.py) que vão ao crítico, com o lado de onde olham: a de trás fica fora porque a
-   lataria de uma carroceria simétrica se repete nela, e a luz rasante só é rasante para o painel que a câmera enfrenta. */
+   lataria de uma carroceria simétrica se repete nela. Os dois azimutes da luz rasante de cada vista o `luz-rasante.py` escolhe pelo
+   que a câmera dela vê. */
 export const VISTAS_DE_SUPERFICIE = Object.freeze(['frente', 'lado', 'topo', 'tresquartos']);
 export const LADO_DA_VISTA_DE_SUPERFICIE = Object.freeze({
   frente: 'olha de +z para -z, com +y para cima',
@@ -75,6 +84,45 @@ export async function latariaDaPeca(peca) {
   const receita = receitaDoModulo(await importarReceita(caminho));
   const plano = normalizarPlanoDeModelagem(receita?.PLANO);
   return { ...latariaDaReceita(receita, plano), caminho };
+}
+
+/* ---------- a luz rasante quase toda escura ---------- */
+
+/**
+ * A fração da peça que a luz alcança (`superficie.fracao_iluminada`, medida pelo `luz-rasante.py` em cada PNG) abaixo da qual a imagem
+ * de luz rasante é recusada no pacote do crítico. Com os azimutes de 30 e 120 graus em todas as vistas, a carenagem de prova saía
+ * com 0,005 na de três quartos a 30 graus (só traços de borda) e de 0,35 a 0,87 nas outras, e a chapa de `tools/fixtures/lataria-de-prova/`
+ * saía escura em seis das oito, de 0,014 a 0,155 (a de frente a 30 graus, com 0,155, mostra só a borda e um canto). Com os azimutes
+ * escolhidos pela vista, a menor imagem das duas peças é a de frente da carenagem, com 0,349, em que a câmera vê a casca de quina e a
+ * luz de um lado alcança uma parede só. 0,25 é o meio entre a pior imagem escura medida (0,155) e a menor boa (0,349).
+ */
+export const LIMIAR_DA_LUZ_RASANTE = 0.25;
+
+const porcento = (f) => `${(100 * f).toFixed(1).replace('.', ',')} %`;
+
+/** As imagens de luz rasante (`[{ arquivo, vista, azimute, iluminada }]`) sem a fração iluminada medida ou com ela abaixo do limiar. */
+export function imagensEscuras(rasante, limiar = LIMIAR_DA_LUZ_RASANTE) {
+  return rasante.filter((i) => !(typeof i.iluminada === 'number' && i.iluminada >= limiar));
+}
+
+function textoDaEscura(i, limiar) {
+  const onde = i.vista != null ? ` (vista ${i.vista}, luz a ${String(i.azimute).replace('.', ',')} graus)` : '';
+  return typeof i.iluminada === 'number'
+    ? `${i.arquivo}${onde} tem ${porcento(i.iluminada)} da peça iluminada, abaixo do limiar de ${porcento(limiar)}`
+    : `${i.arquivo}${onde} não traz a fração iluminada medida, e o limiar é de ${porcento(limiar)}`;
+}
+
+/**
+ * Recusa o pacote do crítico cuja luz rasante saiu quase toda escura: a imagem em que a luz vem de um lado que a câmera não vê
+ * mostra só traços de borda, e o crítico a julgaria sem ver a chapa. A mensagem diz cada imagem, a fração medida e o limiar.
+ */
+export function exigirLuzNaSuperficie(peca, superficie, limiar = LIMIAR_DA_LUZ_RASANTE) {
+  const escuras = imagensEscuras(superficie?.rasante ?? [], limiar);
+  if (!escuras.length) return;
+  throw new Error(`a luz rasante de '${peca}' saiu quase toda escura em ${escuras.length === 1 ? 'uma imagem' : `${escuras.length} imagens`}, e o pacote do crítico não leva `
+    + `imagem de superfície em que a luz não alcança a peça: ${escuras.map((i) => textoDaEscura(i, limiar)).join('; ')}. Os azimutes da luz são escolhidos pelo que `
+    + 'a câmera de cada vista vê (`tools/blender/luz-rasante.py`); a imagem escura com eles diz que a vista não enxerga a chapa, e o '
+    + `\`rasante.json\` da pasta traz a estimativa de cada azimute. Gere de novo com \`${comandoDasVistas(peca)}\` para olhar as imagens.`);
 }
 
 /** A recusa de gerar as vistas sem Blender, com o comando. */
@@ -169,8 +217,9 @@ function rodarBlender(blender, script, args, executar) {
 
 /**
  * Gera as duas vistas da peça em `<pasta>/superficie/`: exporta o OBJ, roda a luz rasante e a curvatura da lataria e devolve
- * `{ obj, partes, rasante: [{ arquivo, vista, azimute }], curvatura: [{ arquivo, vista }] }`, com a curvatura na imagem com a legenda
- * da escala. `partes` são as partes de lataria passadas à curvatura: as de `lataria.partes`, ou as que a malha diz que nasceram de
+ * `{ obj, partes, rasante: [{ arquivo, vista, azimute, iluminada }], curvatura: [{ arquivo, vista }] }`, com a curvatura na imagem com a
+ * legenda da escala e, em `iluminada`, a fração da peça que a luz rasante alcança naquela imagem (`exigirLuzNaSuperficie` a confere no
+ * pacote do crítico; aqui ela só é devolvida, para quem modela poder olhar a imagem escura). `partes` são as partes de lataria passadas à curvatura: as de `lataria.partes`, ou as que a malha diz que nasceram de
  * subdivisão, ou nenhuma (a malha inteira é lataria). Com `faixaDosVincos` (o padrão das vistas do pacote do crítico), os vincos
  * declarados dos passos `subdivisao` (`vincosDaMalha`) vão à curvatura em `--vincos`, e a lataria junto deles sai em ocre e fora
  * da escala (`faixaMm`, ou o padrão do script, o dobro do raio da média); `faixa` devolve `{ larguraMm, vincos, escala, escalaComAFaixa }`,
@@ -211,7 +260,7 @@ export async function vistasDeSuperficie(peca, {
     '--malha', obj, '--saida', prefixo, ...vistas, ...(partes.length ? ['--lataria', partes.join(',')] : []), ...argsDaFaixa,
   ], executar);
   const rasante = JSON.parse(readFileSync(`${prefixo}rasante.json`, 'utf8')).imagens
-    .map((i) => ({ arquivo: i.arquivos.malha, vista: i.vista, azimute: i.azimute }));
+    .map((i) => ({ arquivo: i.arquivos.malha, vista: i.vista, azimute: i.azimute, iluminada: i.iluminacao?.fracao ?? null }));
   const resumo = JSON.parse(readFileSync(`${prefixo}curvatura.json`, 'utf8'));
   const curvatura = resumo.imagens.map((i) => ({ arquivo: i.legenda, vista: i.vista }));
   const f = resumo.faixa_dos_vincos ?? null;
@@ -238,6 +287,7 @@ export function gravarManifesto(pasta, { peca, receita, lataria = null, superfic
     lataria: lataria?.lataria ? { porque: lataria.porque, partes: superficie?.partes ?? lataria.partes ?? null } : null,
     superficie: superficie ? {
       rasante: superficie.rasante.map((i) => i.arquivo), curvatura: superficie.curvatura.map((i) => i.arquivo), faixaDosVincos: superficie.faixa ?? null,
+      luzRasante: superficie.rasante.map(({ arquivo, vista, azimute, iluminada = null }) => ({ arquivo, vista, azimute, iluminada })),
     } : null,
   };
   const arquivo = join(pasta, MANIFESTO_DO_PACOTE);
@@ -263,6 +313,11 @@ export function superficieDoPacote(peca, { pasta, sha256 }) {
   if (!rasante.length || !curvatura.length) return { ok: false, motivo: `o pacote de ${pasta} não trouxe a luz rasante e a curvatura da lataria` };
   const faltam = [...rasante, ...curvatura].filter((a) => !existsSync(a));
   if (faltam.length) return { ok: false, motivo: `o pacote de ${pasta} cita imagens de superfície que não existem mais (${faltam.map((a) => basename(a)).join(', ')})` };
+  const medidas = new Map((dado.superficie.luzRasante ?? []).map((i) => [i.arquivo, i]));
+  const escuras = imagensEscuras(rasante.map((arquivo) => ({ ...medidas.get(arquivo), arquivo: basename(arquivo) })));
+  if (escuras.length) {
+    return { ok: false, motivo: `o pacote de ${pasta} tem luz rasante quase toda escura: ${escuras.map((i) => textoDaEscura(i, LIMIAR_DA_LUZ_RASANTE)).join('; ')}` };
+  }
   return { ok: true, imagens: [...rasante, ...curvatura].map((a) => basename(a)) };
 }
 
@@ -291,7 +346,8 @@ async function principal(argv) {
     faixa
       ? `faixa dos vincos fora da escala: ${faixa.larguraMm} mm de ${faixa.vincos.join(', ')}; escala ${faixa.escala} 1/m (com a faixa seria ${faixa.escalaComAFaixa} 1/m)`
       : `faixa dos vincos: ${faixaDosVincos ? 'nenhuma (a peça não declara vinco)' : 'desligada (--sem-faixa-dos-vincos)'}`,
-    '', 'LUZ RASANTE:', ...feitas.rasante.map((i) => `  ${i.arquivo}`),
+    '', `LUZ RASANTE (fração da peça iluminada; o pacote do crítico recusa abaixo de ${porcento(LIMIAR_DA_LUZ_RASANTE)}):`,
+    ...feitas.rasante.map((i) => `  ${i.arquivo} (${i.iluminada == null ? 'sem medida' : porcento(i.iluminada)}${imagensEscuras([i]).length ? ', QUASE TODA ESCURA' : ''})`),
     '', 'CURVATURA DA LATARIA:', ...feitas.curvatura.map((i) => `  ${i.arquivo}`),
   ];
   process.stdout.write(`${linhas.join('\n')}\n`);

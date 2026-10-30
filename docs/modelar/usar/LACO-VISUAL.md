@@ -47,7 +47,10 @@ obrigatórias desde 2026-10-30. A peça é de lataria quando a receita tem passo
 declara `PLANO.lataria: { dispensa: '<motivo>' }`, que o `descrever` e o resumo
 de `rodada-de-modelagem --acao` mostram como aviso, com o motivo, a cada chamada.
 Na curvatura, a faixa de 40 mm junto dos vincos declarados sai em ocre e fora
-da escala, para a dobra pedida não apagar o amassado. `npm run vistas:critica` gera
+da escala, para a dobra pedida não apagar o amassado. Na luz rasante, os dois
+azimutes de cada vista são escolhidos pelo que a câmera dela vê, para a luz cair
+no lado da peça que a imagem mostra, e o pacote recusa a imagem com menos de 25 %
+da peça iluminada, dizendo qual é e a fração medida. `npm run vistas:critica` gera
 as duas vistas com o resto do pacote do crítico e põe a seção "Superfície" no
 pedido, e sem `MODELAR_BLENDER` apontando o Blender recusa o pacote da peça de
 lataria com o comando; `rodada-de-modelagem --registrar` recusa o veredito do
