@@ -6,6 +6,8 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main em `8f33c169` (o retrato de antes é tirado dessa base)
 
+**Plano sucessor:** [furgão realista](2026-10-30-furgao-realista.md), escolhido pela pessoa em 2026-10-30
+
 ## Problema observado
 
 O plano [veículos de referência livre](encerrados/2026-10-20-veiculos-de-referencia-livre.md#ajustes-no-núcleo) fechou com onze achados do núcleo e das ferramentas, todos contornados dentro das receitas: perfis com pontos deslocados 1 mm em zigue-zague, seis cópias de um limpador de contorno, encaixe de 1 mm nos vidros, arcos de roda recortados à mão. A regra do `CLAUDE.md` manda a correção para a ferramenta, o gate ou a instrução geral. Cada achado foi reproduzido em 2026-10-20 com receita curta em `tmp/repro/` (fora do git), e a reprodução mudou o diagnóstico de vários deles. A tabela abaixo é o ponto de partida deste plano, e cada linha diz o que foi medido, onde está a causa e se o processo teria pego o defeito sozinho.
