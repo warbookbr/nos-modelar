@@ -6,10 +6,18 @@
  * vai para o lugar (`data-lugar`) que o tema lhe dá, na ordem em que o tema os cita, e volta para onde a página o pôs
  * quando o tema seguinte não o cita: um marcador guarda a casa dele. Mover não refaz o componente, então os ouvintes,
  * o texto e o estado de cada controle seguem com ele. Os rótulos (`data-rotulo`) trocam de texto e voltam ao da página.
+ * Um rótulo pode ter um texto por caso da tela (`casoDaTela`: a peça sem nada escolhido, uma parte escolhida ou o modo de
+ * edição ligado), e então este componente também lê `selecao`, `juntas` e `malhaEmEdicao` e o troca quando o caso muda.
  *
  * A cena 3D não é página: `aoMudarCena` recebe o que o tema declara para ela, com as cores já lidas das variáveis do
  * sistema visual, para a cor do fundo e do contorno sair do mesmo lugar que a cor dos painéis. */
 import { TEMAS, temaPorId } from '../temas/temas.js';
+
+/** O caso da tela que escolhe o texto de um rótulo com um texto por caso: `edicao`, `parte` ou `peca`. */
+export function casoDaTela({ selecao, juntas, malhaEmEdicao }) {
+  if (juntas?.modo || malhaEmEdicao) return 'edicao';
+  return selecao?.selecionadas?.length ? 'parte' : 'peca';
+}
 
 export function montarTema({
   elementos, estado, preferencia, aoMudarCena = () => {}, lerVariavel = null, janela = globalThis,
@@ -44,8 +52,12 @@ export function montarTema({
   }
 
   function rotular(tema) {
+    const caso = casoDaTela(estado.ler());
     for (const elemento of rotulaveis) {
-      elemento.textContent = tema.rotulos[elemento.dataset.rotulo] ?? textosDaPagina.get(elemento);
+      const rotulo = tema.rotulos[elemento.dataset.rotulo];
+      const texto = (typeof rotulo === 'object' && rotulo !== null ? rotulo[caso] : rotulo) ?? textosDaPagina.get(elemento);
+      /* A seleção é um objeto novo a cada mudança; o texto só é escrito quando muda. */
+      if (elemento.textContent !== texto) elemento.textContent = texto;
     }
   }
 
@@ -94,6 +106,7 @@ export function montarTema({
   }
 
   estado.assinar(['tema'], ({ tema }) => aplicar(tema));
+  estado.assinar(['selecao', 'juntas', 'malhaEmEdicao'], ({ tema }) => rotular(temaPorId(tema)));
   aplicar(estado.obter('tema'));
 
   return { escolher, get atual() { return temaPorId(estado.obter('tema')); } };

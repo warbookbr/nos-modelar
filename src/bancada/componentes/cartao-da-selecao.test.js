@@ -48,6 +48,13 @@ describe('contas do cartão', () => {
     expect(posicaoDoCartao({ caixa: { esquerda: 0.6, direita: 0.9, base: 0.8, topo: 1.2 }, tela, cartao })).toEqual({ x: 792, y: 72 });
     expect(posicaoDoCartao({ caixa: { esquerda: -1, direita: 0.95, base: -1.5, topo: -1.2 }, tela, cartao })).toEqual({ x: 16, y: 652 });
   });
+
+  it('conta a caixa da parte sobre a cena, que na Bancada começa depois da árvore e abaixo da barra do alto', () => {
+    const tela = { largura: 1100, altura: 800 };
+    const cena = { esquerda: 196, topo: 36, largura: 904, altura: 740 };
+    const cartao = { largura: 304, altura: 200 };
+    expect(posicaoDoCartao({ caixa: { esquerda: -0.2, direita: 0, base: -0.4, topo: -0.2 }, tela, cena, cartao })).toEqual({ x: 672, y: 417 });
+  });
 });
 
 describe('cartão da seleção', () => {

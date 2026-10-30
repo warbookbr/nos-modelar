@@ -5,8 +5,10 @@
  * As ações são as mesmas do painel da direita (`acoes`), e não uma segunda cópia: focar, isolar, fantasma (o contexto),
  * arame só da seleção, ocultar, opacidade e selecionar o conjunto.
  *
- * A posição sai de `caixaNaTela()`, a caixa da seleção em coordenadas normalizadas da tela, a cada quadro enquanto o
- * cartão está à vista: a câmera gira e o cartão acompanha a parte. A conta é `posicaoDoCartao`, pura. */
+ * A posição sai de `caixaNaTela()`, a caixa da seleção em coordenadas normalizadas da cena, a cada quadro enquanto o
+ * cartão está à vista: a câmera gira e o cartão acompanha a parte. A conta é `posicaoDoCartao`, pura. A cena é o retângulo
+ * do canvas (`cena`), que no tema Bancada fica entre os painéis fixos e não começa na borda da janela; sem ele vale a
+ * janela inteira. */
 import { formatarNome } from '../formatar.js';
 
 /** As margens da tela que o cartão não cobre: a barra do alto, a barra de estado e os lados. */
@@ -17,9 +19,9 @@ const AFASTAMENTO = 24;
  * Onde o canto de cima e da esquerda do cartão fica, em pixels: à direita da caixa da parte, na altura do meio dela, ou
  * à esquerda quando à direita não cabe, e sempre dentro das margens.
  */
-export function posicaoDoCartao({ caixa, tela, cartao, margens = MARGENS_DO_CARTAO }) {
-  const paraX = (ndc) => ((ndc + 1) / 2) * tela.largura;
-  const paraY = (ndc) => ((1 - ndc) / 2) * tela.altura;
+export function posicaoDoCartao({ caixa, tela, cartao, cena = tela, margens = MARGENS_DO_CARTAO }) {
+  const paraX = (ndc) => (cena.esquerda ?? 0) + ((ndc + 1) / 2) * cena.largura;
+  const paraY = (ndc) => (cena.topo ?? 0) + ((1 - ndc) / 2) * cena.altura;
   const esquerda = paraX(caixa.esquerda);
   const direita = paraX(caixa.direita);
   const meio = (paraY(caixa.topo) + paraY(caixa.base)) / 2;
@@ -44,7 +46,7 @@ export function textoDasMedidas(medidas) {
 export function montarCartaoDaSelecao({
   elementos, estado, acoes, caixaNaTela, medidas, margens = () => MARGENS_DO_CARTAO, janela = globalThis,
 }) {
-  const { cartao, titulo, medidasTexto, botoes, opacidade, valorOpacidade } = elementos;
+  const { cartao, titulo, medidasTexto, botoes, opacidade, valorOpacidade, cena } = elementos;
   if (!cartao) return { posicionar() {} };
   let quadro = 0;
 
@@ -58,9 +60,14 @@ export function montarCartaoDaSelecao({
       cartao.style.visibility = 'hidden';
       return;
     }
+    const tela = { largura: janela.innerWidth ?? 1400, altura: janela.innerHeight ?? 900 };
+    const retangulo = cena?.getBoundingClientRect?.();
     const { x, y } = posicaoDoCartao({
       caixa,
-      tela: { largura: janela.innerWidth ?? 1400, altura: janela.innerHeight ?? 900 },
+      tela,
+      cena: retangulo?.width
+        ? { esquerda: retangulo.left, topo: retangulo.top, largura: retangulo.width, altura: retangulo.height }
+        : tela,
       cartao: { largura: cartao.offsetWidth || 304, altura: cartao.offsetHeight || 200 },
       margens: margens(),
     });

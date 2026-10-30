@@ -7,7 +7,11 @@
  * A regra é a do gate 6 do plano: a cena fica com ao menos 70% da largura da janela. Abrir um painel que, somado aos
  * abertos, passaria disso recolhe os outros; na largura de hoje do Foco (240 e 272 pixels, mais as margens) os dois só
  * cabem juntos a partir de 1920 pixels, e abaixo disso abrir um recolhe o outro. Encolher a janela aplica a mesma regra,
- * e fica aberto o último que a pessoa abriu. */
+ * e fica aberto o último que a pessoa abriu.
+ *
+ * Um painel fixo, que não flutua sobre a cena e sim a empurra (o tema Bancada), declara `margem: 0`; sem `margem` vale a
+ * do painel flutuante. Os painéis que o tema abre ao nascer, na subida e na troca de tema, passam pela mesma regra: ficam
+ * abertos, na ordem da declaração, os que cabem, e o resto nasce recolhido. */
 import { temaPorId } from '../temas/temas.js';
 
 /** A margem de cada lado de um painel flutuante, em pixels (`--e4`). */
@@ -18,7 +22,21 @@ export const FRACAO_MINIMA_DA_CENA = 0.7;
 export function larguraOcupada(abertos, paineis) {
   return Object.entries(abertos)
     .filter(([nome, aberto]) => aberto && paineis[nome])
-    .reduce((soma, [nome]) => soma + paineis[nome].largura + 2 * MARGEM_DO_PAINEL, 0);
+    .reduce((soma, [nome]) => soma + paineis[nome].largura + 2 * (paineis[nome].margem ?? MARGEM_DO_PAINEL), 0);
+}
+
+/**
+ * Os painéis `abertos` que ficam abertos numa janela de `larguraDaJanela`: na ordem da declaração do tema, cada um fica
+ * se a cena ainda tem a fração mínima da largura com ele e com os que já ficaram.
+ */
+export function paineisQueCabem({ abertos, paineis, larguraDaJanela, fracaoMinima = FRACAO_MINIMA_DA_CENA }) {
+  const ficam = Object.fromEntries(Object.keys(abertos).map((nome) => [nome, false]));
+  for (const nome of Object.keys(paineis)) {
+    if (!abertos[nome]) continue;
+    const comEle = { ...ficam, [nome]: true };
+    if (larguraDaJanela - larguraOcupada(comEle, paineis) >= fracaoMinima * larguraDaJanela) ficam[nome] = true;
+  }
+  return ficam;
 }
 
 /**
@@ -37,6 +55,14 @@ export function montarPaineisDoTema({ elementos, estado, abrirAba = () => {}, ja
   let ultimoAberto = null;
 
   const declarados = () => temaPorId(estado.obter('tema')).paineis;
+  const larguraDaJanela = () => janela.innerWidth ?? 1400;
+
+  /** Os painéis que o tema abre ao nascer e que cabem na janela de agora. */
+  function paineisAoNascer(paineis) {
+    if (!paineis) return {};
+    const abertos = Object.fromEntries(Object.entries(paineis).map(([nome, painel]) => [nome, painel.abertoAoNascer]));
+    return paineisQueCabem({ abertos, paineis, larguraDaJanela: larguraDaJanela() });
+  }
 
   function refletir({ tema, paineis: abertos }) {
     const doTema = temaPorId(tema).paineis;
@@ -55,7 +81,7 @@ export function montarPaineisDoTema({ elementos, estado, abrirAba = () => {}, ja
     if (!paineis?.[nome]) return false;
     ultimoAberto = nome;
     estado.definir({
-      paineis: paineisAoAbrir({ abertos: estado.obter('paineis'), abrir: nome, paineis, larguraDaJanela: janela.innerWidth ?? 1400 }),
+      paineis: paineisAoAbrir({ abertos: estado.obter('paineis'), abrir: nome, paineis, larguraDaJanela: larguraDaJanela() }),
     });
     if (aba) abrirAba(aba);
     return true;
@@ -73,8 +99,7 @@ export function montarPaineisDoTema({ elementos, estado, abrirAba = () => {}, ja
   estado.assinar(['tema', 'paineis'], (valores, mudadas) => {
     if (mudadas.includes('tema')) {
       /* Trocar de tema devolve os painéis ao que o tema novo declara ao nascer. */
-      const paineis = temaPorId(valores.tema).paineis ?? {};
-      const iniciais = Object.fromEntries(Object.entries(paineis).map(([nome, painel]) => [nome, painel.abertoAoNascer]));
+      const iniciais = paineisAoNascer(temaPorId(valores.tema).paineis);
       if (JSON.stringify(iniciais) !== JSON.stringify(valores.paineis)) {
         estado.definir({ paineis: iniciais });
         return;
@@ -90,14 +115,17 @@ export function montarPaineisDoTema({ elementos, estado, abrirAba = () => {}, ja
     const paineis = declarados();
     if (!paineis) return;
     const abertos = estado.obter('paineis');
-    const largura = janela.innerWidth ?? 1400;
+    const largura = larguraDaJanela();
     if (largura - larguraOcupada(abertos, paineis) >= FRACAO_MINIMA_DA_CENA * largura) return;
-    const fica = abertos[ultimoAberto] ? ultimoAberto : null;
-    estado.definir({ paineis: Object.fromEntries(Object.keys(abertos).map((nome) => [nome, nome === fica])) });
+    /* Fica o último que a pessoa abriu; se ela não abriu nenhum, ficam os que o tema abriu ao nascer e ainda cabem. */
+    if (abertos[ultimoAberto]) {
+      estado.definir({ paineis: Object.fromEntries(Object.keys(abertos).map((nome) => [nome, nome === ultimoAberto])) });
+      return;
+    }
+    estado.definir({ paineis: paineisQueCabem({ abertos, paineis, larguraDaJanela: largura }) });
   });
 
-  const iniciais = Object.fromEntries(Object.entries(declarados() ?? {}).map(([nome, painel]) => [nome, painel.abertoAoNascer]));
-  estado.definir({ paineis: iniciais });
+  estado.definir({ paineis: paineisAoNascer(declarados()) });
   refletir(estado.ler());
 
   return { abrir, fechar, alternar };
