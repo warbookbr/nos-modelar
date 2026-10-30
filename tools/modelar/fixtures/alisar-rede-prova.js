@@ -68,6 +68,9 @@ export function receitaSobre(TABELA, opcoes = {}) {
       const { passo } = derivar(this.PARAMS, opcoes);
       return [['subdivisao', { origemId: 1, ...passo, niveis: 2 }], ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }]];
     },
+    get vaos() {
+      return [{ nome: 'janela', borda: derivar(this.PARAMS, opcoes).linha('janela'), semMoldura: { motivo: 'a chapa de prova testa o alisamento da rede, e a janela fica nua' } }];
+    },
   };
 }
 

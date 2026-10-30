@@ -50,6 +50,7 @@ export function receitaComChaves({ vincosNaGaiola = [], cantosNaGaiola = [], vao
       ['subdivisao', { origemId: 1, ...g.passo, borda: 'cantos', niveis: 2 }],
       ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
     ],
+    ...(vao ? { vaos: [{ nome: 'abertura', borda: g.bordaDoVao('abertura'), semMoldura: { motivo: 'a chapa de prova testa os vincos das linhas, e a abertura fica nua' } }] } : {}),
   };
 }
 
