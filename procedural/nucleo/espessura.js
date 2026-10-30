@@ -24,6 +24,15 @@
  * raio de curvatura; no vinco vivo convexo ele é a largura da primeira faixa de faces dividida por tan(θ/2), e cai pela
  * metade a cada nível de subdivisão, porque a malha interna tem um vértice por vértice externo e não consome a faixa.
  *
+ * A DOBRA DA SUPERFÍCIE. Quando a própria superfície se dobra sobre si, com uma face virada contra as vizinhas, a média
+ * das normais não tem lado: a normal do vértice fica contra a face virada (ou contra as outras, se a virada pesa mais), e
+ * o vértice interno sai à frente da face externa. Num trecho plano a face virada é invisível, e a média ainda dá o fator
+ * 1 de esquadria, de modo que o vértice interno sai do outro lado da chapa a uma espessura inteira; a distância dele à
+ * superfície externa fica certa e não acusa nada. Por isso cada vértice confere, face a face, que a normal dele fica a
+ * menos de acos(COSSENO_MINIMO_DA_ESQUADRIA) de toda face em volta, e a função grita com todos os vértices que não ficam,
+ * pelo ângulo, sem devolver sólido. O caso conhecido é a subdivisão com o canto declarado em que a borda faz ângulo
+ * côncavo e uma face da gaiola tem ângulo quase raso nesse canto: a superfície subdividida vira uma face ali.
+ *
  * O QUE ELA NÃO CONFERE. A proximidade entre partes distantes da superfície (duas paredes a menos de t uma da outra, ou
  * a chapa que volta sobre si) não é curvatura local e fica fora desta conta.
  *
@@ -33,10 +42,12 @@
 export const COSSENO_MINIMO_DA_ESQUADRIA = 0.05;
 
 export class ErroDaEspessura extends TypeError {
-  /** lugares: [{ vertices: [a, b], raio, ponto }] do pior para o melhor; raio: o menor raio local medido. */
-  constructor(motivo, lugares = [], raio = null) {
+  /** lugares: [{ vertices: [a, b], raio, ponto }] do pior para o melhor; raio: o menor raio local medido; tipo: 'raio'
+   *  quando a espessura passa do raio local, 'dobra' quando a própria superfície se dobra sobre si e nenhuma espessura a
+   *  acompanha (cada lugar traz então o vértice e o `angulo`, em graus, da face em volta mais longe da normal dele). */
+  constructor(motivo, lugares = [], raio = null, tipo = 'raio') {
     super(`espessura: ${motivo}`);
-    this.motivo = motivo; this.lugares = lugares; this.raio = raio;
+    this.motivo = motivo; this.lugares = lugares; this.raio = raio; this.tipo = tipo;
   }
 }
 
@@ -105,16 +116,26 @@ export function espessarSuperficie({ vertices, faces, espessura, lado = 'contraN
     soma[v][0] += angulo * nf[0]; soma[v][1] += angulo * nf[1]; soma[v][2] += angulo * nf[2];
     cantos[v].push([angulo, fi]);
   }));
+  /* o lado de cada vértice: a normal média tem de ficar do lado de toda face em volta, ou o vértice interno sai à frente
+     da face externa dela; o vértice em que alguma face não tem o cosseno mínimo é dobra da superfície */
+  const dobrados = [];
   const desloc = soma.map((m, v) => {
     if (!cantos[v].length) throw new TypeError(`espessura: o vértice ${v} não pertence a nenhuma face`);
     const l = Math.hypot(m[0], m[1], m[2]);
     const nv = l > 0 ? [m[0] / l, m[1] / l, m[2] / l] : [0, 0, 0];
-    let peso = 0, cos = 0;
-    for (const [angulo, fi] of cantos[v]) { peso += angulo; cos += angulo * dot(nv, normalDaFace[fi]); }
+    let peso = 0, cos = 0, pior = Infinity;
+    for (const [angulo, fi] of cantos[v]) { const c = dot(nv, normalDaFace[fi]); peso += angulo; cos += angulo * c; pior = Math.min(pior, c); }
     cos = peso > 0 ? cos / peso : 0;
-    if (!(cos >= COSSENO_MINIMO_DA_ESQUADRIA)) throw new ErroDaEspessura('a superfície se dobra sobre si no vértice, e a normal dele não tem lado', [{ vertices: [v, v], raio: 0, ponto: [...vertices[v]] }], 0);
+    if (!(cos >= COSSENO_MINIMO_DA_ESQUADRIA) || !(pior >= COSSENO_MINIMO_DA_ESQUADRIA)) {
+      dobrados.push({ vertices: [v, v], raio: 0, ponto: [...vertices[v]], angulo: (Math.acos(Math.max(-1, Math.min(1, Math.min(pior, cos)))) * 180) / Math.PI });
+      return [0, 0, 0];
+    }
     return [nv[0] / cos, nv[1] / cos, nv[2] / cos];
   });
+  if (dobrados.length) {
+    const lugares = dobrados.sort((p, q) => q.angulo - p.angulo || p.vertices[0] - q.vertices[0]);
+    throw new ErroDaEspessura(`a superfície se dobra sobre si: em ${lugares.length} vértice(s) uma face em volta fica a ${Number(lugares[0].angulo.toPrecision(3))} graus da normal do vértice, e a face interna sairia à frente da externa`, lugares, 0, 'dobra');
+  }
   const internos = vertices.map((p, v) => [p[0] + s * t * desloc[v][0], p[1] + s * t * desloc[v][1], p[2] + s * t * desloc[v][2]]);
 
   /* raio local em todo par de cantos de cada face, e as faces internas que se invertem */

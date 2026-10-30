@@ -89,7 +89,7 @@ const arredondar = (x) => Number(x.toPrecision(3));
 /* Os lugares em que a espessura passa do raio local, com o nome do ponto da gaiola mais perto de cada um. Os vértices
    da malha de índice menor que o número de pontos da gaiola são os pontos da gaiola refinados (o refino mantém o índice),
    e a imagem espelhada de um ponto declarado sai com o nome dele e a marca de espelhada. */
-function lugaresDaEspessura(lugares, malha, gaiola, declarados) {
+function lugaresDaEspessura(lugares, malha, gaiola, declarados, tipo = 'raio') {
   const nG = gaiola.vertices.length;
   const origem = gaiola.vertices.map((_, k) => k);
   const espelhado = new Set();
@@ -111,7 +111,8 @@ function lugaresDaEspessura(lugares, malha, gaiola, declarados) {
     porPonto.get(j)[espelhado.has(melhor) ? 'imagem' : 'direto'] = true;
   }
   if (!porPonto.size) return '';
-  const textos = [...porPonto].map(([j, { l, direto, imagem }]) => `${nome(j)}${imagem ? (direto ? ' e a imagem espelhada' : ' espelhado') : ''} (raio ${arredondar(l.raio)} em [${l.ponto.map(arredondar).join(', ')}])`);
+  const textos = [...porPonto].map(([j, { l, direto, imagem }]) => `${nome(j)}${imagem ? (direto ? ' e a imagem espelhada' : ' espelhado') : ''} (${tipo === 'dobra' ? '' : `raio ${arredondar(l.raio)} `}em [${l.ponto.map(arredondar).join(', ')}])`);
+  if (tipo === 'dobra') return `, perto de ${textos.join(', ')} (${lugares.length} vértice(s) da malha ao todo); a superfície sem espessura já tem face virada ali, e nenhuma espessura a corrige: no canto declarado em que a borda faz ângulo côncavo, a face da gaiola com ângulo quase raso no canto se dobra na subdivisão, e um ponto novo da gaiola que parta essa face a desfaz; \`npm run ondulacao\` mostra a face virada`;
   return `, perto de ${textos.join(', ')} (${lugares.length} par(es) de vértices da malha ao todo); reduza a espessura abaixo do raio, abra a curva ali ou troque o lado; no vinco vivo o raio local é a largura da faixa de faces ao lado dele e cai pela metade a cada nível`;
 }
 
@@ -279,7 +280,7 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
         r = s; partes = s.partes;
       } catch (e) {
         if (!(e instanceof ErroDaEspessura)) return grita(st, i, 'subdivisao', 'espessura', String(e.message));
-        return grita(st, i, 'subdivisao', 'espessura', `${e.motivo}${lugaresDaEspessura(e.lugares, r.vertices, gaiola, declarados)}`);
+        return grita(st, i, 'subdivisao', 'espessura', `${e.motivo}${lugaresDaEspessura(e.lugares, r.vertices, gaiola, declarados, e.tipo)}`);
       }
     }
     const limite = BLOCO + FAIXA_ESTENDIDA;
