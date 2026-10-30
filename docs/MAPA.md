@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1579 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1582 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1688,6 +1688,8 @@
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.
 - `cor-de-auditoria.js` — cor-de-auditoria.js — a paleta da auditoria visual, e a conferência dela.
 - `cor-de-auditoria.test.mjs` — A paleta da auditoria e a conferência dela.
+- `curvatura-da-lataria.js` — curvatura-da-lataria.js — a curvatura média da lataria por vértice, a escala e a cor dela, e a faixa junto dos vincos declarados, sobre uma malha de triângul…
+- `curvatura-da-lataria.test.mjs` — curvatura-da-lataria.test.mjs — a curvatura média da lataria em JavaScript (curvatura-da-lataria.js) contra a do Blender.
 - `derivar-catalogo-montagens.js` — derivar-catalogo-montagens.js — índice determinístico limitado às raízes dadas.
 - `derivar-impacto-montagem.js` — derivar-impacto-montagem.js — deriva dependências locais sem executar revalidação.
 - `derivar-mapa-dependencias.js` — derivar-mapa-dependencias.js — mapa global derivado de um snapshot estável.
@@ -1768,6 +1770,7 @@
 - `varrer-parametros.js` — varrer-parametros.js — mede o que cada parâmetro faz, em vez de adivinhar.
 - `veredito-de-forma.js` — veredito-de-forma.js — a saída do revisor, em vocabulário fechado.
 - `veredito-de-forma.test.js` — veredito-de-forma.test.js — o veredito que não deixa a correção para o chute.
+- `vincos-da-malha.js` — vincos-da-malha.js — os vincos nomeados que os passos `subdivisao` declaram, onde eles ficaram na malha entregue.
 - `vinculos-de-medida.js` — vinculos-de-medida.js — o grafo de "esta medida vem daquela porta" dentro de uma montagem, e a ordem de construção que ele impõe.
 
 ## src/bancada/
