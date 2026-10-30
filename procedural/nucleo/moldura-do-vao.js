@@ -17,6 +17,14 @@
  * a conferência põe pontos num leque de raio igual à menor extensão de fora das duas pontas e mede a distância de cada um à
  * faixa, e o entalhe é a maior delas quando passa da tolerância. Um terceiro friso que preenche o canto o fecha.
  *
+ * A ABERTURA. `aberturasDaGaiola` acha, pela geometria da gaiola de uma chapa e sem saber de que objeto ela é, as voltas de borda
+ * livre que são abertura: a volta é percorrida no sentido em que as faces a percorrem (a chapa à esquerda de quem anda, vista de
+ * fora), e a normal de Newell dela aponta para o mesmo lado da chapa em volta no contorno de fora e para o lado contrário no furo,
+ * porque o furo anda ao contrário. A normal da chapa em volta é a soma dos vetores de área das faces a até dois anéis da volta. O
+ * cosseno entre as duas vai de +1 (contorno) a −1 (furo); na ponta de um tubo as faces em volta olham para todos os lados e a soma
+ * delas se anula, e a coerência (o tamanho da soma sobre a soma das áreas) diz isso. A volta fechada com o cosseno abaixo de
+ * COSSENO_DA_ABERTURA e a coerência acima de COERENCIA_MINIMA é abertura.
+ *
  * O que sai é dado: nada aqui decide a forma, e o motivo declarado de uma aba parcial é assunto de quem chama. */
 
 export const TOLERANCIA_DA_MOLDURA = 5e-4;
@@ -26,6 +34,14 @@ export const GIRO_DO_CANTO = 10;
 const PASSOS_DO_LEQUE = 12;
 /** Até onde se procura a faixa mais perto de um ponto descoberto, para dizer a que distância ela passa. */
 const ALCANCE_DA_BUSCA = 0.05;
+/** Cosseno entre a normal da volta de borda livre e a da chapa em volta dela abaixo do qual a volta é uma abertura (furo) e não o
+ *  contorno de fora: −0,5 é a volta cuja normal fica a mais de 120 graus da normal da chapa em volta. */
+export const COSSENO_DA_ABERTURA = -0.5;
+/** Fração mínima entre a soma das áreas das faces em volta da volta, como vetores, e a soma delas como números, para a normal da chapa
+ *  ali valer: na ponta de um tubo as faces em volta olham para todos os lados, a soma das normais se anula e a volta não é abertura. */
+export const COERENCIA_MINIMA = 0.2;
+/** Anéis de faces em volta da volta de borda livre que entram na normal da chapa ali. */
+export const ANEIS_DA_VIZINHANCA = 2;
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -190,4 +206,92 @@ export function conferirMoldura({ borda, fechada = false, frisos, tolerancia = T
     emendas.push(registro);
   }
   return { comprimento, amostras: amostras.length, cobertas, descobertos: trechos, emendas, tolerancia };
+}
+
+/** A chave de uma aresta sem sentido, pelos dois índices. */
+export const chaveDaAresta = (a, b) => (a < b ? `${a}:${b}` : `${b}:${a}`);
+
+/* Normal de Newell de uma lista de posições, com o comprimento igual ao dobro da área. */
+function newell(pontos) {
+  const n = [0, 0, 0];
+  for (let k = 0; k < pontos.length; k++) {
+    const a = pontos[k]; const b = pontos[(k + 1) % pontos.length];
+    n[0] += (a[1] - b[1]) * (a[2] + b[2]); n[1] += (a[2] - b[2]) * (a[0] + b[0]); n[2] += (a[0] - b[0]) * (a[1] + b[1]);
+  }
+  return n;
+}
+
+/**
+ * bordasLivresDaGaiola({ faces }) -> [{ fechada, arestas: [{ a, b, face }] }]: as voltas de arestas que só uma face tem, cada uma no
+ * sentido em que a face a percorre, na ordem das faces. A volta que não fecha (malha com orientação trocada ou borda em leque) sai com
+ * `fechada: false`.
+ */
+export function bordasLivresDaGaiola({ faces }) {
+  const usos = new Map();
+  for (const f of faces) for (let k = 0; k < f.length; k++) { const c = chaveDaAresta(f[k], f[(k + 1) % f.length]); usos.set(c, (usos.get(c) ?? 0) + 1); }
+  const saindo = new Map(); const ordem = [];
+  faces.forEach((f, face) => {
+    for (let k = 0; k < f.length; k++) {
+      const a = f[k]; const b = f[(k + 1) % f.length];
+      if (usos.get(chaveDaAresta(a, b)) !== 1) continue;
+      const e = { a, b, face };
+      if (!saindo.has(a)) saindo.set(a, []);
+      saindo.get(a).push(e); ordem.push(e);
+    }
+  });
+  const usadas = new Set(); const voltas = [];
+  for (const inicio of ordem) {
+    if (usadas.has(inicio)) continue;
+    const arestas = []; let atual = inicio;
+    for (;;) {
+      usadas.add(atual); arestas.push(atual);
+      if (atual.b === inicio.a) break;
+      const proxima = (saindo.get(atual.b) ?? []).find((e) => !usadas.has(e));
+      if (!proxima) break;
+      atual = proxima;
+    }
+    voltas.push({ fechada: arestas[arestas.length - 1].b === inicio.a, arestas });
+  }
+  return voltas;
+}
+
+/**
+ * aberturasDaGaiola({ vertices, faces }, { aneis }) -> [{ indices, arestas: [chave], fechada, cosseno, coerencia, comprimento, centro,
+ * abertura }]: cada volta de borda livre da gaiola, com o cosseno entre a normal de Newell dela (no sentido das faces) e a normal da chapa
+ * em volta dela, e `abertura` quando a volta fecha, o cosseno fica abaixo de COSSENO_DA_ABERTURA e a coerência passa de COERENCIA_MINIMA.
+ * A normal da chapa em volta é a soma dos vetores de área das faces que tocam a volta e das vizinhas delas, `aneis` anéis de faces
+ * (ANEIS_DA_VIZINHANCA): um relevo que sobe e desce em volta do furo, como a moldura em anel da gaiola, se cancela na soma, e só a
+ * inclinação de conjunto da chapa conta. A coerência é o tamanho dessa soma sobre a soma das áreas: perto de 1 na chapa que olha para um
+ * lado só em volta da volta, e perto de 0 na ponta de um tubo. `indices` são os pontos da volta em sequência, sem repetir o primeiro;
+ * `arestas` as chaves (`chaveDaAresta`) dela.
+ */
+export function aberturasDaGaiola({ vertices, faces }, { aneis = ANEIS_DA_VIZINHANCA } = {}) {
+  const facesDoPonto = new Map();
+  faces.forEach((f, fi) => { for (const k of f) { if (!facesDoPonto.has(k)) facesDoPonto.set(k, []); facesDoPonto.get(k).push(fi); } });
+  const areaDaFace = new Map();
+  const vetorDeArea = (fi) => { if (!areaDaFace.has(fi)) areaDaFace.set(fi, mult(newell(faces[fi].map((k) => vertices[k])), 0.5)); return areaDaFace.get(fi); };
+  return bordasLivresDaGaiola({ faces }).map(({ fechada, arestas }) => {
+    const indices = arestas.map((e) => e.a);
+    const pontos = indices.map((k) => vertices[k]);
+    const N = unit(newell(pontos));
+    /* as faces em volta: as que tocam os pontos da volta e, a cada anel, as que tocam os pontos delas */
+    const vistas = new Set(); let frente = new Set(indices);
+    for (let anel = 0; anel < aneis; anel++) {
+      const novos = new Set();
+      for (const k of frente) for (const fi of facesDoPonto.get(k) ?? []) {
+        if (vistas.has(fi)) continue;
+        vistas.add(fi);
+        for (const q of faces[fi]) if (!frente.has(q)) novos.add(q);
+      }
+      frente = novos;
+    }
+    let vetor = [0, 0, 0]; let area = 0;
+    for (const fi of [...vistas].sort((a, b) => a - b)) { const A = vetorDeArea(fi); vetor = soma(vetor, A); area += tam(A); }
+    let comprimento = 0;
+    for (const e of arestas) comprimento += dist(vertices[e.a], vertices[e.b]);
+    const coerencia = area > 0 ? tam(vetor) / area : 0;
+    const cosseno = tam(N) > 0 && tam(vetor) > 0 ? dot(N, unit(vetor)) : 0;
+    const centro = mult(pontos.reduce(soma, [0, 0, 0]), 1 / pontos.length);
+    return { indices, arestas: arestas.map((e) => chaveDaAresta(e.a, e.b)), fechada, cosseno, coerencia, comprimento, centro, abertura: fechada && cosseno < COSSENO_DA_ABERTURA && coerencia >= COERENCIA_MINIMA };
+  });
 }

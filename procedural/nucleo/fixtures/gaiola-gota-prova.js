@@ -85,6 +85,7 @@ export function receita(opcoes = {}, niveis = 2) {
       ['subdivisao', { origemId: 1, ...g.passo, borda: 'cantos', niveis }],
       ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
     ],
+    vaos: [{ nome: 'gota', borda: g.bordaDoVao('gota'), semMoldura: { motivo: 'a chapa de prova testa o anel em volta da gota, que é a própria chapa, sem friso' } }],
   };
 }
 

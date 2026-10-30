@@ -7,7 +7,7 @@
  * larguras diferentes tem o degrau da diferença, e o canto de dois cortes retos tem entalhe até que uma peça o preencha. A prova sobre a
  * malha varrida de verdade, com a gaiola e os frisos da chapa curva, está em `src/autoria/molduras-do-vao.test.mjs`. */
 import { describe, expect, it } from 'vitest';
-import { GIRO_DO_CANTO, TOLERANCIA_DA_MOLDURA, conferirMoldura } from './moldura-do-vao.js';
+import { COERENCIA_MINIMA, COSSENO_DA_ABERTURA, GIRO_DO_CANTO, TOLERANCIA_DA_MOLDURA, aberturasDaGaiola, bordasLivresDaGaiola, conferirMoldura } from './moldura-do-vao.js';
 
 const L = 0.1;
 const quadrado = [{ nome: 'a', p: [0, 0, 0] }, { nome: 'b', p: [L, 0, 0] }, { nome: 'c', p: [L, L, 0] }, { nome: 'd', p: [0, L, 0] }];
@@ -150,5 +150,102 @@ describe('conferirMoldura — emendas', () => {
     const r = conferirMoldura({ borda: reta, frisos: [faixa('A', [0, 0, 0], [0.05, 0, 0]), faixa('B', [0.05, 0, 0], [0.1, 0.00436, 0])] });
     expect(r.emendas[0].tipo).toBe('reta');
     expect(r.emendas[0].giro).toBeCloseTo(5, 1);
+  });
+});
+
+/* A ABERTURA PELA GEOMETRIA. As gaiolas abaixo são desenhadas por código, sem nome de objeto: a placa com furo, o tubo aberto nas pontas
+   com uma janela na parede e a placa com o furo cercado por um relevo que sobe e desce. O furo anda ao contrário da chapa em volta e é
+   abertura; o contorno de fora anda com ela, e a ponta do tubo fica de lado para as faces em volta, que se anulam na soma. */
+describe('a abertura da chapa, achada pela borda livre da gaiola', () => {
+  /* grade de n × n pontos a cada 100 mm no plano y = altura(x, z), faces anti-horárias vistas de cima, sem as faces de `tira` */
+  function placa({ n = 7, tira = [[3, 3]], altura = () => 0 } = {}) {
+    const vertices = []; const idx = (i, j) => i * n + j;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) vertices.push([0.1 * i, altura(i, j), 0.1 * j]);
+    const faces = [];
+    for (let i = 0; i + 1 < n; i++) for (let j = 0; j + 1 < n; j++) {
+      if (tira.some(([a, b]) => a === i && b === j)) continue;
+      faces.push([idx(i, j), idx(i, j + 1), idx(i + 1, j + 1), idx(i + 1, j)]);
+    }
+    return { vertices, faces };
+  }
+
+  it('a placa com furo tem duas voltas: o contorno anda com a chapa (cosseno +1) e o furo ao contrário (cosseno −1)', () => {
+    const voltas = aberturasDaGaiola(placa());
+    expect(voltas).toHaveLength(2);
+    const [fora, furo] = [...voltas].sort((a, b) => b.comprimento - a.comprimento);
+    expect(fora.cosseno).toBeCloseTo(1, 6);
+    expect(fora.abertura).toBe(false);
+    expect(furo.cosseno).toBeCloseTo(-1, 6);
+    expect(furo.abertura).toBe(true);
+    expect(furo.indices).toHaveLength(4);
+    expect(furo.comprimento).toBeCloseTo(0.4, 9);
+    expect(furo.centro.map((x) => Math.round(x * 1000))).toEqual([350, 0, 350]);
+  });
+
+  it('a placa sem furo não tem abertura, e a gaiola sem borda livre não tem volta nenhuma', () => {
+    expect(aberturasDaGaiola(placa({ tira: [] })).map((v) => v.abertura)).toEqual([false]);
+    const cubo = { vertices: [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]], faces: [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]] };
+    expect(bordasLivresDaGaiola(cubo)).toEqual([]);
+  });
+
+  it('o tubo aberto nas pontas com uma janela: as pontas não são abertura (coerência perto de 0), a janela é', () => {
+    const lados = 12; const estacoes = 6; const r = 0.2;
+    const vertices = []; const idx = (a, s) => s * lados + (a % lados);
+    for (let s = 0; s < estacoes; s++) for (let a = 0; a < lados; a++) vertices.push([r * Math.cos((2 * Math.PI * a) / lados), r * Math.sin((2 * Math.PI * a) / lados), 0.1 * s]);
+    const faces = [];
+    for (let s = 0; s + 1 < estacoes; s++) for (let a = 0; a < lados; a++) {
+      if (s === 2 && a === 0) continue; // a janela
+      faces.push([idx(a, s), idx(a + 1, s), idx(a + 1, s + 1), idx(a, s + 1)]);
+    }
+    const voltas = aberturasDaGaiola({ vertices, faces });
+    expect(voltas).toHaveLength(3);
+    const pontas = voltas.filter((v) => v.indices.length === lados);
+    expect(pontas).toHaveLength(2);
+    for (const v of pontas) {
+      expect(v.abertura).toBe(false);
+      expect(v.coerencia).toBeLessThan(1e-9);
+    }
+    const janela = voltas.find((v) => v.indices.length === 4);
+    expect(janela.abertura).toBe(true);
+    expect(janela.cosseno).toBeLessThan(-0.99);
+    expect(janela.coerencia).toBeGreaterThan(COERENCIA_MINIMA);
+  });
+
+  it('o relevo que sobe e desce em volta do furo não esconde a abertura: a soma das faces em volta se anula no relevo', () => {
+    /* o anel de pontos a uma passada do furo sobe 80 mm, numa grade de 100 mm: as faces do relevo ficam a 39 graus */
+    const anel = (i, j) => Math.max(Math.abs(i - 3.5), Math.abs(j - 3.5)) === 1.5;
+    const voltas = aberturasDaGaiola(placa({ n: 8, altura: (i, j) => (anel(i, j) ? 0.08 : 0) }));
+    const furo = voltas.find((v) => v.indices.length === 4);
+    expect(furo.abertura).toBe(true);
+    expect(furo.cosseno).toBeLessThan(COSSENO_DA_ABERTURA);
+  });
+
+  it('o limite da detecção: a ponta estreita de um funil de parede inclinada conta como abertura a partir de uns 12 graus do eixo', () => {
+    /* o tronco de cone de 12 lados, do raio 0,2 em z = 0 ao raio 0,2 − 0,4 tan(inclinação) em z = 0,4 */
+    const funil = (graus) => {
+      const lados = 12; const estacoes = 5; const vertices = []; const idx = (a, s) => s * lados + (a % lados);
+      for (let s = 0; s < estacoes; s++) {
+        const z = 0.1 * s; const r = 0.2 - z * Math.tan((graus * Math.PI) / 180);
+        for (let a = 0; a < lados; a++) vertices.push([r * Math.cos((2 * Math.PI * a) / lados), r * Math.sin((2 * Math.PI * a) / lados), z]);
+      }
+      const faces = [];
+      for (let s = 0; s + 1 < estacoes; s++) for (let a = 0; a < lados; a++) faces.push([idx(a, s), idx(a + 1, s), idx(a + 1, s + 1), idx(a, s + 1)]);
+      const [larga, estreita] = aberturasDaGaiola({ vertices, faces }).sort((p, q) => q.comprimento - p.comprimento);
+      return { larga, estreita };
+    };
+    for (const graus of [5, 10]) {
+      const { larga, estreita } = funil(graus);
+      expect(larga.abertura, `${graus} graus`).toBe(false);
+      expect(estreita.abertura, `${graus} graus`).toBe(false);
+    }
+    for (const graus of [15, 25]) {
+      const { larga, estreita } = funil(graus);
+      expect(larga.abertura, `${graus} graus`).toBe(false);
+      expect(estreita.abertura, `${graus} graus`).toBe(true);
+    }
+  });
+
+  it('o resultado é o mesmo em duas chamadas', () => {
+    expect(JSON.stringify(aberturasDaGaiola(placa()))).toBe(JSON.stringify(aberturasDaGaiola(placa())));
   });
 });

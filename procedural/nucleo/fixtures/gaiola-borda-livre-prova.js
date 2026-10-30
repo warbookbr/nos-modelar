@@ -46,5 +46,7 @@ export function receita(opcoes = {}, niveis = 2) {
       ['subdivisao', { origemId: 1, ...g.passo, borda: 'cantos', niveis }],
       ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
     ],
+    /* a borda do vidro toca o plano de simetria nas duas pontas e se fecha com a imagem espelhada numa volta só */
+    vaos: [{ nome: 'vidro', borda: g.bordaDoVao('vidro'), semMoldura: { motivo: 'a chapa de prova testa a abertura pelas colunas que terminam e começam, sem vidro nem friso' } }],
   };
 }

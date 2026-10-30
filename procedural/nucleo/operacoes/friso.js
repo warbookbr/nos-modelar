@@ -52,8 +52,9 @@ function newell(pontos) {
 }
 
 /* As cadeias de pontos da gaiola cheia que o friso percorre: a linha declarada e, na simetria em x, a imagem dela,
-   emendada à linha pela ponta que fica no plano x = 0. Cada cadeia diz se é volta e se é a cópia espelhada. */
-function cadeiasDaSimetria(cadeia, fechada, imagem) {
+   emendada à linha pela ponta que fica no plano x = 0. Cada cadeia diz se é volta e se é a cópia espelhada. A conferência
+   dos vãos (`src/autoria/molduras-do-vao.js`) estende a borda declarada de um vão pela mesma regra. */
+export function cadeiasDaSimetria(cadeia, fechada, imagem) {
   if (!imagem) return [{ cadeia, fechada, espelhada: false }];
   const noPlano = (k) => imagem[k] === k;
   if (cadeia.every(noPlano)) return [{ cadeia, fechada, espelhada: false }];
