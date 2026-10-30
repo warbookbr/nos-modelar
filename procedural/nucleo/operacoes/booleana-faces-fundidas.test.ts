@@ -1,4 +1,4 @@
-/* booleana-faces-fundidas.test.ts — fatia 10 do plano "Ajustes no núcleo dos veículos" (docs/modelar/planos/2026-10-21-ajustes-no-
+/* booleana-faces-fundidas.test.ts — fatia 10 do plano "Ajustes no núcleo dos veículos" (docs/modelar/planos/encerrados/2026-10-21-ajustes-no-
    nucleo-dos-veiculos.md, decisão 4). A booleana comum funde, por último, os pedaços coplanares de uma mesma face de entrada num
    polígono convexo e plano, com o canto colinear mantido. Antes, a faceta de um prisma subtraído, que a Manifold devolve virada
    para dentro do buraco, ficava em dois triângulos (a fusão media a convexidade contra a normal da face de entrada), e o

@@ -43,7 +43,7 @@ O processo não teria pego sozinho nenhum destes três defeitos (seção constan
 
 ## Lacunas do núcleo e das ferramentas
 
-A análise inicial listou doze lacunas. As seis primeiras eram ferramentas pequenas, que não tocam o núcleo, e foram fechadas antes da leva de Sonnet. As seis últimas tinham contorno testado e ficaram como instrução; os achados de núcleo entre elas estão registrados em 'Ajustes no núcleo' do plano encerrado e são tratados no plano [ajustes no núcleo dos veículos](../planos/2026-10-21-ajustes-no-nucleo-dos-veiculos.md), que os reproduziu e corrigiu o diagnóstico de vários deles; até cada fatia fechar, valem os contornos abaixo. As mudanças gerais que possam voltar ao NÓS vão registradas em `docs/modelar/UPSTREAM-NOS.md`.
+A análise inicial listou doze lacunas. As seis primeiras eram ferramentas pequenas, que não tocam o núcleo, e foram fechadas antes da leva de Sonnet. As seis últimas tinham contorno testado e ficaram como instrução; os achados de núcleo entre elas estão registrados em 'Ajustes no núcleo' do plano encerrado e são tratados no plano [ajustes no núcleo dos veículos](../planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md), que os reproduziu e corrigiu o diagnóstico de vários deles; até cada fatia fechar, valem os contornos abaixo. As mudanças gerais que possam voltar ao NÓS vão registradas em `docs/modelar/UPSTREAM-NOS.md`.
 
 | Lacuna | Sintoma nas nove peças | Estado |
 |---|---|---|

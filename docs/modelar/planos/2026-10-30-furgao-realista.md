@@ -4,7 +4,7 @@
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [ajustes no núcleo dos veículos](2026-10-21-ajustes-no-nucleo-dos-veiculos.md), de que este é o sucessor
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [ajustes no núcleo dos veículos](encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md), de que este é o sucessor
 
 ## Problema observado
 

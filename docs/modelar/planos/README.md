@@ -2,7 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** [ajustes no núcleo dos veículos](2026-10-21-ajustes-no-nucleo-dos-veiculos.md) (2026-10-21-ajustes-no-nucleo-dos-veiculos.md), ativado em 2026-10-28 com o fechamento da [renomeação para Modelar](encerrados/2026-10-25-renomear-para-modelar.md).
+**Plano ativo:** nenhum.
+
+[Ajustes no núcleo dos veículos](encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) fechou em 2026-10-30, com os onze achados das 27 receitas na ferramenta geral, a calibração do crítico julgada de novo e o acervo de 54 peças igual ao de antes; o sucessor escolhido pela pessoa é o [furgão realista](2026-10-30-furgao-realista.md), em rascunho.
 
 [Leitura por demanda e limpeza](encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md) fechou em 2026-10-27, com a entrada por perguntas e o repositório sem as áreas que ninguém usava; o gate de 60% menos leitura não passou (19% na correção, 49% na modelagem).
 

@@ -488,7 +488,6 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-modelar.md` — Validação integrada do Modelar — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -610,6 +609,7 @@
 - `2026-10-19-objetos-externos-como-familias.md` — Objetos externos como famílias do Mecanifica — da receita traduzida ao perfil aprovado
 - `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo da pessoa e geração de textura em Node
 - `2026-10-20-veiculos-de-referencia-livre.md` — Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
+- `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
 - `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
 - `2026-10-22-leitura-por-demanda-e-limpeza.md` — Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
 - `2026-10-23-gaiola-que-segue-as-feicoes.md` — Gaiola que segue as feições — anéis de gaiola em volta de vãos e arcos para a carroceria ter moldura, calha e lábio
@@ -1122,7 +1122,7 @@
 - `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `aviso-de-degrau.test.ts` — aviso-de-degrau.test.ts — o arredondamento que termina em degrau não passa mais calado.
 - `booleana-casca-raspada.test.ts` — booleana-casca-raspada.test.ts — o canto solto que a booleana deixava quando o corte cruza a casca de um loft (achado na rodada das asas do avião, em 2026-10…
-- `booleana-faces-fundidas.test.ts` — booleana-faces-fundidas.test.ts — fatia 10 do plano "Ajustes no núcleo dos veículos" (docs/modelar/planos/2026-10-21-ajustes-no- nucleo-dos-veiculos.md, deci…
+- `booleana-faces-fundidas.test.ts` — booleana-faces-fundidas.test.ts — fatia 10 do plano "Ajustes no núcleo dos veículos" (docs/modelar/planos/encerrados/2026-10-21-ajustes-no- nucleo-dos-veicul…
 - `booleanas-carga.test.ts` — booleanas-carga.test.ts — fatia 5 do plano "União de sólidos". O núcleo carrega a Manifold sozinho, por await no topo de `manifold.js`: quem só importa a fac…
 - `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
