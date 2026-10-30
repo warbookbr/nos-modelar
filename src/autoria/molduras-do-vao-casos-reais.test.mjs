@@ -35,7 +35,9 @@ describe('caso 1: a janela em gota da chapa feita pela rede de curvas', () => {
     ];
     const neutro = nucleo(passos, g.pontos);
     expect(neutro.orfaos).toEqual([]);
-    return conferirVaosDaPeca(neutro, { vaos: [{ nome: 'janela', borda, frisos: frisos.map(([nome]) => nome) }] });
+    /* toda abertura da chapa é declarada: quando o vão medido não é a janela, ela entra sem moldura */
+    const outra = borda === janela ? [] : [{ nome: 'janelaSemMoldura', borda: janela, semMoldura: { motivo: 'o caso mede só a borda da frente ou o arco de roda' } }];
+    return conferirVaosDaPeca(neutro, { vaos: [{ nome: 'janela', borda, frisos: frisos.map(([nome]) => nome) }, ...outra] });
   };
 
   it('a moldura da prova, um friso só pela curva da janela, cobre a borda inteira nos dois refinos', () => {
