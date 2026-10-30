@@ -5,6 +5,7 @@
  * mudança assinam. A peça em cena, a edição dela, a imagem de referência e a sessão são módulos sem DOM. A ordem da
  * montagem é a da subida antiga, porque a ordem em que os objetos entram na cena e os ouvintes se registram decide a
  * imagem e quem responde primeiro a uma tecla. */
+import './sistema-visual.css';
 import './styles.css';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../autoria/catalogo-pecas.js';
 import { listarParaBancada } from './acervo-receitas.js';
