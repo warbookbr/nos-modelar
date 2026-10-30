@@ -40,11 +40,12 @@ um agente, dentro de um plano que a pessoa aprovou.
 O [acervo](#palavras-do-projeto), em `procedural/pecas/`, tem 54 peças:
 27 veículos (carros, picapes, caminhões, ônibus, tratores, furgão, ambulância e
 jipe), 8 móveis (balcões, uma mesa e poltronas), 5 eletrodomésticos (geladeira,
-freezer, lava-louças, lavadora e secadora, micro-ondas), o avião em 8 partes, o
-braço robótico em 4 partes e duas peças de prova, uma carenagem de chapa e um
-suporte de tubo. Os 27 veículos e o avião foram aprovados pela pessoa. Nenhuma
-peça é base de produto: cada uma existe para provar uma capacidade do núcleo e
-pode mudar ou sair sem aviso.
+freezer, lava-louças, lavadora e secadora, micro-ondas), as 8 peças que montam
+o avião, as 4 que montam o braço robótico e duas peças de prova, uma carenagem de chapa e um
+suporte de tubo. Os 27 veículos e o avião foram aprovados pela pessoa, e as outras peças
+passaram pelas verificações automáticas. Nenhuma peça é um modelo final para uso
+fora do projeto: cada uma existe para provar uma capacidade do núcleo e pode
+mudar ou sair sem aviso.
 
 Há 7 [famílias](modelar/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
 gera objetos parecidos a partir de poucos números: roda com pneu, dobradiça,
@@ -65,8 +66,8 @@ Antes de qualquer geometria vem o
 o objeto faz, quais são as partes, em que ordem ele se monta, qual medida real
 dá a escala, quais imagens servem de referência e o que reprovaria o resultado.
 Quando há escolha de forma, ele desenha as opções lado a lado com a foto e
-pergunta qual se parece mais. O que fica decidido é escrito na pasta da peça, e
-o resto do trabalho é cobrado contra esse registro.
+pergunta qual se parece mais. O que fica decidido é escrito na pasta da peça, em
+`procedural/pecas/<nome>/`, e o resto do trabalho é cobrado contra esse registro.
 
 Depois o agente escreve a receita, parte por parte, na ordem em que o objeto se
 monta. Cada versão é medida por comandos: as partes se tocam onde deviam e só
@@ -79,12 +80,13 @@ separado que recebe só as imagens da peça e da referência, sem a receita, o
 código ou a história da construção. Ele devolve uma nota de 0 a 10 e a lista de
 defeitos que vê, como uma parte mais alta que a referência ou uma superfície
 facetada. O agente que modelou corrige e chama o crítico de novo, numa nova
-[rodada](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico). A rodada fecha com nota 8 ou mais e
-nenhum defeito, e o laço de uma peça para em 6 rodadas; passar disso é decisão
-da pessoa. O crítico aponta defeito e nunca aprova.
+[rodada](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico). A peça passa pelo crítico quando uma
+rodada dá nota 8 ou mais sem nenhum defeito; se isso não acontece em 6 rodadas,
+o agente para e a pessoa decide se continua. O crítico aponta defeito e nunca aprova.
 
-Quem aprova a forma é a pessoa. O agente mostra as vistas da peça montada sobre
-as partes já prontas, as medidas e o veredito do crítico, e a parte só fica fixa
+Quem aprova a forma é a pessoa. Um objeto de várias partes, como o avião, é
+modelado uma parte por vez, e cada parte vira uma peça. O agente mostra as vistas
+da parte montada sobre as já prontas, as medidas e o veredito do crítico, e a parte só fica fixa
 quando a pessoa diz que aceita. Se ela aceita com defeito em aberto, o aceite
 fica gravado com o nome dela, a data e os defeitos. Só a pessoa reabre uma parte
 já aceita. O caminho inteiro, da imagem à montagem, está em
@@ -97,7 +99,7 @@ corrigir uma peça que está errada, explicar o que uma peça tem, ou mudar uma
 ferramenta do projeto. O agente começa por `npm run comecar`, que pergunta qual é
 a tarefa e diz o que ele precisa ler e qual
 [skill](#palavras-do-projeto) seguir. Cada tipo de tarefa tem um
-[roteiro](modelar/roteiros/ROTEIROS.md) de leitura, e a lista deles está em
+[roteiro](modelar/roteiros/ROTEIROS.md), que diz o que ler e indica a skill, e a lista deles está em
 [`ROTEIROS.md`](modelar/roteiros/ROTEIROS.md).
 
 O agente devolve imagens da peça, as medidas que conferiu, o veredito do crítico
@@ -107,8 +109,8 @@ perguntas e escolhe entre as opções de forma; ao fim de cada parte, quando
 aceita ou pede correção; quando o laço do crítico chega ao limite; e quando uma
 mudança no projeto pede um plano novo.
 
-A pessoa também pode mexer na peça com a mão. Na bancada ela arrasta as juntas
-onde as partes se encontram e salva o ajuste num arquivo; o agente lê esse
+A pessoa também pode mexer na peça com a mão. Na bancada ela arrasta as juntas, os pontos
+onde as partes se encontram, e salva o ajuste num arquivo; o agente lê esse
 arquivo, reescreve a receita para chegar ao mesmo lugar e mede se chegou. O
 procedimento está em
 [`AJUSTE-DA-BANCADA.md`](modelar/usar/AJUSTE-DA-BANCADA.md).
@@ -125,7 +127,8 @@ npm run dev
 Abra o endereço que o `npm run dev` mostra, em geral
 `http://localhost:5173/nos-modelar/bancada.html`. Para carregar uma peça do
 acervo, rode noutro terminal `npm run ativar:bancada -- <nome-da-peca>`, por
-exemplo `npm run ativar:bancada -- furgao`; a página aberta recarrega sozinha
+exemplo `npm run ativar:bancada -- furgao` (o nome é o da pasta da peça em
+`procedural/pecas/`); a página aberta recarrega sozinha
 com a peça. O procedimento completo está em
 [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](modelar/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md).
 
@@ -162,8 +165,9 @@ O Modelar não é um jogo, um editor 3D para modelar à mão nem uma biblioteca 
 modelos prontos para produto. A bancada é a única aplicação, e a
 interface de jogo, a oficina para uso humano e o som saíram do repositório. Não
 há material físico completo (o PBR), que, como paleta nova, só entra por plano.
-A colisão de uma peça que se move é conferida em posições amostradas do curso, e
-a que começa e termina entre duas amostras não é vista.
+A colisão de uma peça que se move, como a porta de um armário na dobradiça, é
+conferida em posições amostradas do movimento, e a que começa e termina entre
+duas amostras não é vista.
 O núcleo não sabe o que é um veículo nem qualquer outro tipo de objeto: o que é
 próprio de uma família fica na família. Imagem de referência com marca,
 logotipo ou nome de fabricante não entra no repositório, e imagem gerada por IA
@@ -194,7 +198,7 @@ serve para mostrar o caráter da forma e nunca como fonte de medida.
 - Receita: o arquivo de código que descreve, com as medidas, como a peça se
   constrói ([a receita](modelar/usar/AUTORIA-DE-PECA.md#a-receita-da-tabela-à-malha)).
 - Rodada: uma volta de correção da peça seguida de um novo julgamento do
-  crítico ([o laço do crítico](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico)).
+  crítico; o laço é a sequência de rodadas de uma peça ([o laço do crítico](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico)).
 - Roteiro: o que o agente lê para um tipo de tarefa, entregue por
   `npm run comecar` ([roteiros](modelar/roteiros/ROTEIROS.md)).
 - Skill: um procedimento escrito que o agente segue para uma tarefa, guardado
