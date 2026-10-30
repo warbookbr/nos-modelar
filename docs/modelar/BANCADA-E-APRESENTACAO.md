@@ -42,6 +42,47 @@ módulo de `src/bancada/` for preciso dos dois lados, a saída não é abrir exc
 é tirá-lo de lá, como já aconteceu com o catálogo de peças e as cores de
 auditoria.
 
+## Como a bancada se monta
+
+O estado da tela mora num lugar só, `src/bancada/estado/estado-central.js`. É um
+objeto de chaves de primeiro nível (a vista em vigor, a peça em cena, a
+fotografia da seleção, o status da sessão, o modo das juntas, a visão
+escolhida e as outras), e quem muda uma coisa escreve só a chave que mudou. O
+painel que desenha uma coisa assina as chaves que lê e é avisado, na hora e na
+ordem das assinaturas, quando o valor delas muda. Escrever o mesmo valor não
+avisa ninguém; a seleção é um objeto novo a cada mudança do controlador das
+partes, e por isso redesenha toda vez.
+
+Cada área da tela é um componente em `src/bancada/componentes/`: a barra
+superior com as janelas Abrir, Controles e Estado (`barra-superior.js`, com
+`menu-abrir.js`, `menu-controles.js` e `menu-estado.js`), a fileira das vistas
+com a projeção e o seletor de visão (`barra-das-vistas.js`), o painel de
+componentes (`painel-componentes.js`), o painel de inspeção com as abas
+(`painel-inspecao.js` e `aba-anotacoes.js`), o rodapé das juntas
+(`rodape-juntas.js`), a oferta da sessão ativa (`sessao-ativa.js`), a régua de
+escala (`referencia-metrica.js`), o teclado (`teclado.js`), o endereço da página
+(`endereco.js`), os avisos (`avisos.js`) e a ponte da captura automática
+(`ponte-da-captura.js`). `elementos-da-pagina.js` é o único lugar que procura
+elementos, e entrega a cada componente só o grupo dele. A ponte
+`window.__mecanificaBancada` é um contrato fixo: as chaves dela estão listadas
+em `CHAVES_DA_PONTE`, e o teste do componente cobra que nenhuma suma.
+
+O que não é tela fica em módulos que não tocam a página. A peça em cena, com o
+controlador das partes, a seleção por clique, os enquadramentos e o estado
+escrito na URL, mora em `cena/peca-em-cena.js`; o ajuste por junta, a edição de
+malha, o desfazer e o alvo do ajuste, em `cena/edicao-da-peca.js`; a projeção,
+a grade, a visão e a câmera restaurada da URL, em `cena/vista-da-cena.js`; a
+imagem de referência na cena, em `referencias/imagem-na-cena.js`; e de onde vem
+a peça (a sessão ativa, o acervo, o catálogo e a entrega em espera), em
+`sessao/sessao-da-bancada.js`. O `main.js` só monta essas peças, na mesma ordem
+da subida de antes, porque a ordem em que os objetos entram na cena e os
+ouvintes se registram decide a imagem e quem responde primeiro a uma tecla.
+
+`componentes/fronteira-da-pagina.test.js` cobra a fronteira: `main.js` e os
+módulos sem tela não procuram elemento, não ouvem a janela, não leem o endereço
+e não pedem quadro ao navegador. Os componentes são testados sobre uma página
+falsa, `componentes/dom-de-teste.js`, sem navegador.
+
 ## O laço: desenhar, salvar, ler, absorver
 
 A pessoa seleciona uma parte e aperta `G` para movê-la como corpo, ou `Tab` para
