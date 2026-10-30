@@ -123,6 +123,17 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   });
   const redimensionar = () => ambiente.redimensionar?.();
 
+  /* A cena do tema: o fundo, a grade e a sombra vão para o ambiente, e o contorno
+     da seleção toma o lugar da tinta verde quando o tema o pede. */
+  aplicarCenaDoTema = (cenaNova) => {
+    ambiente.definirCenaDoTema(cenaNova);
+    ambiente.definirContorno(cenaNova?.contornoDaSelecao
+      ? { cor: cenaNova.contornoDaSelecao, grupos: () => cena.gruposDoContorno() }
+      : null);
+    cena.definirTintaDaSelecao(!cenaNova?.contornoDaSelecao);
+  };
+  aplicarCenaDoTema(cenaDoTema);
+
   montarPainelComponentes({
     elementos: elementos.painelComponentes,
     estado,
