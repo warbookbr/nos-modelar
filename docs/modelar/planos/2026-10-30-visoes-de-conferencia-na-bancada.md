@@ -47,7 +47,7 @@ As imagens das guardas da bancada e da `vistas:critica` saem iguais às de antes
 ## Decisões que dependem da pessoa
 
 1. **Plano e ordem.** Aprovada em 2026-10-30: a pessoa pediu o plano e o pôs antes do furgão realista.
-2. **Lugar e conteúdo do seletor.** Recomendo o controle "Visão" na barra de baixo, ao lado das vistas de câmera, com as seis visões, um atalho para cada e a luz rasante com um controle de direção que aparece só quando ela está ligada.
+2. **Lugar e conteúdo do seletor.** Aprovada em 2026-10-30, na forma recomendada: o controle "Visão" na barra de baixo, ao lado das vistas de câmera, com as seis visões, um atalho para cada e a luz rasante com um controle de direção que aparece só quando ela está ligada.
 
 ## Riscos e parada
 
@@ -56,3 +56,5 @@ O risco é a curvatura da bancada divergir da do Blender e a pessoa aprovar por 
 ## Andamento
 
 Ativado em 2026-10-30, a pedido da pessoa, depois do fechamento do plano da entrada para pessoas e antes do furgão realista.
+
+Na conferência da bancada publicada, em 2026-10-30, apareceram dois pontos que a fatia 1 considera: o painel de Inspeção já oferece "Wireframe" só para a seleção, e o seletor parte dele em vez de criar um segundo caminho; e, ao carregar o furgão, a prancha da aba "Imagem REF" aparece dentro da cena atravessando a peça, o que atrapalha as visões e fica como achado a resolver ou a devolver ao backlog com o caso.
