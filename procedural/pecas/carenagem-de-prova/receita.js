@@ -199,7 +199,8 @@ function estacoesDaForma(T) {
  * derivar(T) -> a gaiola em metro e as cotas que as medidas conferem.
  *   pontos: os pontos nomeados da gaiola, em metro, que entram em TOPO;
  *   passo: os campos do passo `subdivisao` (vertices, faces, vincos, cantos, medidas, simetria), só com nomes;
- *   cotas: { nome do ponto medido: [x, y, z] em milímetro, tirado da TABELA }.
+ *   cotas: { nome do ponto medido: [x, y, z] em milímetro, tirado da TABELA };
+ *   bordaDaClaraboia: os nomes dos pontos da borda do vão do teto, em volta fechada, que a receita declara em `vaos`.
  */
 export function derivar(T) {
   const f = forma(T);
@@ -241,7 +242,7 @@ export function derivar(T) {
     tras_centro: [0, tetoNaPonta, 0],
     frente_centro: [0, tetoNaPonta, T.comprimento],
   };
-  return { pontos: gaiola.pontos, passo: gaiola.passo, cotas, cinturaX };
+  return { pontos: gaiola.pontos, passo: gaiola.passo, cotas, cinturaX, bordaDaClaraboia: gaiola.bordaDoVao('claraboia') };
 }
 
 const CARENAGEM = { origem: { op: 'subdivisao', id: 1 } };
@@ -298,6 +299,10 @@ const receita = {
     ],
   },
   contatos: CONTATOS,
+  /* A claraboia é a abertura da chapa (a imagem espelhada dela também), e fica sem moldura: a peça de prova não tem friso. */
+  get vaos() {
+    return [{ nome: 'claraboia', borda: derivar(this.PARAMS).bordaDaClaraboia, semMoldura: { motivo: 'a carenagem de prova testa a superfície por subdivisão, e o vão do teto fica aberto, sem vidro nem moldura' } }];
+  },
   PONTOS,
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };

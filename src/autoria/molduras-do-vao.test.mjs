@@ -22,13 +22,15 @@ describe('a moldura fechada aceita', () => {
   it('a moldura da fatia 11, a volta de largura variável ao redor do vão, cobre a volta que ela segue e não tem emenda', () => {
     const neutro = nucleo(prova.passosDaMoldura(), P);
     expect(neutro.orfaos).toEqual([]);
-    const r = conferirVaosDaPeca(neutro, { vaos: [{ nome: 'volta', borda: prova.voltaDoVao(), frisos: ['molduraDoVao'] }] });
+    const r = conferirVaosDaPeca(neutro, { vaos: [{ nome: 'volta', borda: prova.voltaDoVao(), frisos: ['molduraDoVao'] }, ...prova.VAOS] });
     expect(r.problemas).toEqual([]);
     expect(r.ok).toBe(true);
     const v = r.vaos[0];
     expect(v.cobertas).toBe(v.amostras);
     expect(v.descobertos).toEqual([]);
     expect(v.emendas).toEqual([]);
+    /* a borda do vão fica nua, e a chapa a declara sem moldura */
+    expect(r.aberturas.map((a) => a.vao)).toEqual(['vao']);
     /* a volta de 400 mm de lado, quatro lados de 400 mm medidos sobre a chapa curva */
     expect(mm(v.comprimento)).toBeGreaterThan(1600);
     expect(mm(v.comprimento)).toBeLessThan(1630);
@@ -196,9 +198,28 @@ describe('a declaração em vaos é validada', () => {
   const base = c.vaos[0];
   const lido = (v) => lerVaosDeclarados({ vaos: v }, neutro.frisos);
 
-  it('sem vaos nada roda', () => {
-    expect(conferirVaosDaPeca(neutro, {})).toEqual({ declarados: 0, vaos: [], problemas: [], ok: true });
-    expect(formatarVaos(conferirVaosDaPeca(neutro, {}))).toBe('');
+  it('sem vaos, a chapa com abertura reprova, com os pontos da borda e as duas saídas', () => {
+    const r = conferirVaosDaPeca(neutro, {});
+    expect(r.declarados).toBe(0);
+    expect(r.ok).toBe(false);
+    expect(r.aberturas).toHaveLength(1);
+    expect(r.aberturas[0].vao).toBeNull();
+    expect(r.aberturas[0].pontos).toHaveLength(8);
+    expect(new Set(r.aberturas[0].pontos)).toEqual(new Set(molduras.bordaDoVao()));
+    expect(r.problemas).toHaveLength(1);
+    expect(r.problemas[0]).toMatch(/^a chapa subdivisao:1 tem uma abertura sem declaração em `vaos`: a volta de borda livre de 8 pontos da gaiola e 80\d,\d mm, centrada em \(400,0, [\d,]+, 400,0 mm\), pelos pontos 'p\d_\d'/);
+    expect(r.problemas[0]).toMatch(/bordaDoVao/);
+    expect(r.problemas[0]).toMatch(/semMoldura: \{ motivo/);
+    expect(formatarVaos(r)).toMatch(/0 vão\(s\) declarado\(s\); 1 abertura\(s\) nas chapas, 1 sem declaração/);
+  });
+
+  it('a chapa sem abertura e sem vaos não ganha seção', () => {
+    const pontos = {}; const vertices = []; const faces = [];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { pontos[`q${i}_${j}`] = [0.1 * i, 0, 0.1 * j]; vertices.push(`q${i}_${j}`); }
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) faces.push([`q${i}_${j}`, `q${i}_${j + 1}`, `q${i + 1}_${j + 1}`, `q${i + 1}_${j}`]);
+    const r = conferirVaosDaPeca(nucleo([['subdivisao', { origemId: 1, vertices, faces, niveis: 1 }]], pontos), {});
+    expect(r).toEqual({ declarados: 0, vaos: [], aberturas: [], problemas: [], ok: true });
+    expect(formatarVaos(r)).toBe('');
   });
 
   it('lista os frisos que existem quando a declaração cita um que não existe', () => {
@@ -209,7 +230,7 @@ describe('a declaração em vaos é validada', () => {
     expect(() => lido([{ ...base, cor: 1 }])).toThrow(/campo desconhecido 'cor'/);
     expect(() => lido([base, base])).toThrow(/já foi declarado/);
     expect(() => lido([{ ...base, borda: ['p3_3', 'p4_3'] }])).toThrow(/três ou mais/);
-    expect(() => lido([{ ...base, frisos: [] }])).toThrow(/'frisos' precisa ser a lista/);
+    expect(() => lido([{ ...base, frisos: [] }])).toThrow(/'frisos' precisa ser a lista.*semMoldura: \{ motivo/);
     expect(() => lido([{ ...base, tolerancia: 0.01 }])).toThrow(/'tolerancia' precisa ser um número em metro de 0.00001 a 0.005/);
     expect(() => lido([{ ...base, tolerancia: 0 }])).toThrow(/'tolerancia'/);
     expect(() => lido({})).toThrow(/'vaos' precisa ser lista/);
@@ -248,11 +269,106 @@ describe('a chapa com simetria em x', () => {
     expect(r.problemas[1]).toMatch(/\(na cópia espelhada\)/);
   });
 
-  it('a borda que toca o plano de simetria fica inconclusiva e não passa calada', () => {
+  it('a linha que toca o plano numa ponta continua pela imagem espelhada, e a borda dela também: passa, sem caso inconclusivo', () => {
     const r = roda(['c0_1', 'c1_1', 'c2_1'], ['c0_1', 'c1_1', 'c2_1']);
+    expect(r.problemas).toEqual([]);
+    expect('inconclusivo' in r.vaos[0]).toBe(false);
+    /* de c2_1 espelhado a c2_1, pelas duas metades */
+    expect(r.vaos[0].comprimento).toBeGreaterThan(4 * 0.099);
+  });
+
+  it('nenhuma forma de borda que toca o plano fica sem medida: uma ponta, as duas pontas, a volta que toca e a linha no plano', () => {
+    const casos = {
+      'uma ponta no plano': ['c0_1', 'c1_1', 'c2_1'],
+      'as duas pontas no plano': ['c0_1', 'c1_1', 'c1_2', 'c0_2'],
+      'a volta fechada que toca o plano': ['c0_1', 'c1_1', 'c1_2', 'c0_2', 'c0_1'],
+      'a linha no plano': ['c0_1', 'c0_2', 'c0_3'],
+    };
+    for (const [caso, linha] of Object.entries(casos)) {
+      const r = roda(linha, linha);
+      expect(r.problemas, caso).toEqual([]);
+      expect(r.vaos[0].amostras, caso).toBeGreaterThan(0);
+      expect(r.vaos[0].cobertas, caso).toBe(r.vaos[0].amostras);
+    }
+  });
+});
+
+/* O VÃO CENTRADO NO PLANO DE SIMETRIA. A metade x >= 0 de uma chapa curva, 4 × 5 pontos a cada 100 mm, sem as duas faces junto do plano
+   entre z = 100 e 300 mm: com a imagem espelhada, o furo de 200 × 200 mm fica centrado em x = 0, como o para-brisa ou a janela de trás de
+   uma carroceria em simetria. A borda declarada é a da metade, de c0_1 a c0_3 pelos pontos de fora; ela toca o plano nas duas pontas e se
+   fecha com a imagem numa volta só, conferida contra os frisos das duas metades juntos. */
+describe('o vão centrado no plano de simetria', () => {
+  const pontos = {}; const vertices = []; const faces = [];
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 5; j++) {
+    if (i === 0 && j === 2) continue; // o ponto do plano dentro do vão fica sem face
+    const x = 0.1 * i, z = 0.1 * j; pontos[`c${i}_${j}`] = [x, 0.2 - x * x - (z - 0.2) ** 2, z]; vertices.push(`c${i}_${j}`);
+  }
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 4; j++) if (!(i === 0 && (j === 1 || j === 2))) faces.push([`c${i}_${j}`, `c${i}_${j + 1}`, `c${i + 1}_${j + 1}`, `c${i + 1}_${j}`]);
+  const borda = ['c0_1', 'c1_1', 'c1_2', 'c1_3', 'c0_3'];
+  const chapa = ['subdivisao', { origemId: 1, vertices, faces, simetria: 'x', medidas: [...vertices], cantos: ['c1_1', 'c1_3'], espessura: 0.002, niveis: 2 }];
+  const friso = (id, nome, pts, largura = 0.01) => ['friso', { origemId: id, superficie: { op: 'subdivisao', id: 1 }, linha: { nome, pontos: pts }, perfil: { retangulo: { largura, profundidade: 0.004, centro: [0, 0.001] } } }];
+  const executa = (frisos) => { const n = nucleo([chapa, ...frisos], pontos); expect(n.orfaos).toEqual([]); return n; };
+  const roda = (frisos, nomes = frisos.map((f) => f[1].linha.nome)) => conferirVaosDaPeca(executa(frisos), { vaos: [{ nome: 'centro', borda, frisos: nomes }] });
+
+  it('a chapa tem uma abertura só, a volta inteira pelas duas metades, e a borda declarada da metade a cobre', () => {
+    const r = roda([friso(2, 'moldura', borda)]);
+    expect(r.aberturas).toHaveLength(1);
+    expect(r.aberturas[0].vao).toBe('centro');
+    expect(r.aberturas[0].pontos).toEqual(expect.arrayContaining(['c0_1', 'c1_3', 'c1_1 espelhado', 'c1_3 espelhado']));
+    expect(r.aberturas[0].pontos).toHaveLength(8);
+  });
+
+  it('passa com a moldura inteira: o friso que toca o plano nas duas pontas vira a volta, e cobre a borda inteira', () => {
+    const r = roda([friso(2, 'moldura', borda)]);
+    expect(r.problemas).toEqual([]);
+    const v = r.vaos[0];
+    expect(v.cobertas).toBe(v.amostras);
+    expect(v.emendas).toEqual([]);
+    /* a volta de 200 × 200 mm sobre a chapa curva, os cantos de c1_1 e c1_3 vivos */
+    expect(v.comprimento * 1000).toBeGreaterThan(790);
+    expect(v.comprimento * 1000).toBeLessThan(830);
+  });
+
+  it('reprova nomeando o trecho que cruza o plano quando a moldura para antes dele numa metade', () => {
+    /* o friso de c0_1 a c1_3 continua pela imagem a partir de c0_1: cobre embaixo e os dois lados, e falta em cima, de c1_3 a c1_3 espelhado */
+    const r = roda([friso(2, 'moldura', borda.slice(0, 4))]);
     expect(r.ok).toBe(false);
-    expect(r.vaos[0].inconclusivo).toMatch(/toca o plano de simetria/);
-    expect(r.problemas[0]).toMatch(/inconclusivo: a borda toca o plano de simetria/);
+    const d = r.vaos[0].descobertos;
+    expect(d).toHaveLength(1);
+    expect(new Set(d[0].entre)).toEqual(new Set(['c1_3', 'c1_3 espelhado']));
+    expect(Math.abs(d[0].posicao[0])).toBeLessThan(0.002);
+    expect(Math.round(d[0].posicao[2] * 1000)).toBe(300);
+    /* os 200 mm de cima menos meia faixa em cada ponta */
+    expect(d[0].comprimento * 1000).toBeGreaterThan(185);
+    expect(d[0].comprimento * 1000).toBeLessThan(200);
+    expect(r.problemas).toHaveLength(1);
+    expect(r.problemas[0]).toMatch(/^'centro': trecho da borda sem moldura, \d+,\d mm entre 'c1_3( espelhado)?' e 'c1_3( espelhado)?' perto de \(-?0,\d, /);
+  });
+
+  it('reprova os dois lados quando a moldura cobre só embaixo e em cima, e diz a cópia espelhada pelo nome', () => {
+    const r = roda([friso(2, 'baixo', ['c0_1', 'c1_1']), friso(3, 'cima', ['c1_3', 'c0_3'])]);
+    expect(r.ok).toBe(false);
+    const entre = r.vaos[0].descobertos.map((t) => [...t.entre].sort().join(' e ')).sort();
+    expect(entre).toEqual(['c1_1 e c1_3', 'c1_1 espelhado e c1_3 espelhado']);
+  });
+
+  it('as emendas de dois frisos que cruzam o plano são contadas uma vez, nas duas metades, e o degrau é dito', () => {
+    const iguais = roda([friso(2, 'a', borda.slice(0, 3)), friso(3, 'b', borda.slice(2))]);
+    expect(iguais.problemas).toEqual([]);
+    expect(iguais.vaos[0].emendas).toHaveLength(2);
+    expect(iguais.vaos[0].emendas.map((e) => Math.sign(e.posicao[0])).sort()).toEqual([-1, 1]);
+    const degrau = roda([friso(2, 'a', borda.slice(0, 3), 0.01), friso(3, 'b', borda.slice(2), 0.014)]);
+    expect(degrau.ok).toBe(false);
+    expect(degrau.problemas.filter((t) => /degrau na emenda de 'a' com 'b'/.test(t))).toHaveLength(2);
+  });
+
+  it('a abertura centrada sem moldura passa declarada semMoldura, e a borda da metade basta', () => {
+    const n = executa([]);
+    const motivo = 'o vão do teto fica aberto de propósito, para ventilar a peça de prova';
+    expect(conferirVaosDaPeca(n, {}).problemas[0]).toMatch(/tem uma abertura sem declaração/);
+    const r = conferirVaosDaPeca(n, { vaos: [{ nome: 'centro', borda, semMoldura: { motivo } }] });
+    expect(r.problemas).toEqual([]);
+    expect(formatarVaos(r)).toMatch(/centro: sem moldura declarada \(o vão do teto/);
   });
 });
 
@@ -287,10 +403,90 @@ describe('o descrever da peça', () => {
     expect(r.stderr).toMatch(/a peça não tem friso de linha 'nenhum'/);
   });
 
-  it('sem vaos na receita a saída não ganha seção nem campo de problema', async () => {
+  it('a peça que contorna a abertura e esquece vaos sai com código 1 e a abertura no stderr', async () => {
     const c = molduras.fechada();
     const r = await descreve(receita(c, ['moldura'], { vaos: undefined }));
-    expect(r.stdout).not.toMatch(/MOLDURA EM VOLTA/);
+    expect(r.codigo).toBe(1);
+    expect(r.stdout).toMatch(/MOLDURA EM VOLTA DO VÃO — 0 vão\(s\) declarado\(s\); 1 abertura\(s\) nas chapas, 1 sem declaração/);
+    expect(r.stderr).toMatch(/1 PROBLEMA\(S\) NA MOLDURA EM VOLTA DO VÃO/);
+    expect(r.stderr).toMatch(/a chapa subdivisao:1 tem uma abertura sem declaração em `vaos`/);
     expect(r.resultado.molduras.declarados).toBe(0);
   });
+});
+
+describe('a abertura sem moldura de propósito, declarada com semMoldura e o motivo', () => {
+  const motivo = 'a borda do vão de prova fica nua, sem friso, de propósito';
+  const neutro = nucleo(prova.passos(), P);
+  const vao = (extra = {}) => ({ nome: 'vao', borda: molduras.bordaDoVao(), semMoldura: { motivo }, ...extra });
+
+  it('passa e o texto diz o motivo', () => {
+    const r = conferirVaosDaPeca(neutro, { vaos: [vao()] });
+    expect(r.problemas).toEqual([]);
+    expect(r.aberturas.map((a) => a.vao)).toEqual(['vao']);
+    expect(formatarVaos(r)).toMatch(/vao: sem moldura declarada \(a borda do vão de prova fica nua/);
+  });
+
+  it('o motivo curto, o campo desconhecido, a mistura com a moldura e a superficie malformada gritam', () => {
+    const lido = (v) => conferirVaosDaPeca(neutro, { vaos: [v] });
+    expect(() => lido(vao({ semMoldura: { motivo: 'curto' } }))).toThrow(/'semMoldura\.motivo' precisa dizer POR QUE a abertura fica sem moldura, com pelo menos 15 caracteres/);
+    expect(() => lido(vao({ semMoldura: { motivo, vidro: true } }))).toThrow(/'semMoldura' tem campo desconhecido 'vidro'/);
+    expect(() => lido(vao({ semMoldura: true }))).toThrow(/'semMoldura' precisa ser \{ motivo \}/);
+    expect(() => lido(vao({ frisos: ['voltaDoVao'] }))).toThrow(/'semMoldura' declara a abertura sem moldura, e 'frisos' é da moldura/);
+    expect(() => lido(vao({ superficie: { op: 'friso', id: 1 } }))).toThrow(/'superficie' precisa ser a origem da chapa, \{ op: 'subdivisao', id \}/);
+    expect(() => lido(vao({ superficie: { op: 'subdivisao', id: 9 } }))).toThrow(/subdivisao:9, que não é chapa da peça\. Chapas: subdivisao:1/);
+    expect(() => lido(vao({ borda: ['p3_3', 'p4_3', 'zz'] }))).toThrow(/'zz' não é ponto de nenhuma\. Chapas: subdivisao:1/);
+  });
+
+  it('a superficie declarada acha a chapa, e a que não é a dos frisos grita', () => {
+    expect(conferirVaosDaPeca(neutro, { vaos: [vao({ superficie: { op: 'subdivisao', id: 1 } })] }).problemas).toEqual([]);
+    const c = molduras.fechada();
+    expect(() => conferirVaosDaPeca(executa(c), { vaos: [{ ...c.vaos[0], superficie: { op: 'subdivisao', id: 2 } }] })).toThrow(/'superficie' diz subdivisao:2, e os frisos 'moldura' seguem a chapa subdivisao:1/);
+  });
+
+  it('a declaração que não é verdadeira reprova: a borda que não é a volta de uma abertura, e a abertura que um friso cobre', () => {
+    const naoE = conferirVaosDaPeca(neutro, { vaos: [vao({ borda: prova.voltaDoVao() })] });
+    expect(naoE.ok).toBe(false);
+    expect(naoE.problemas[0]).toMatch(/^'vao': declarado sem moldura .* e a borda não é a volta inteira de uma abertura da chapa/);
+    /* e a abertura de verdade continua sem declaração */
+    expect(naoE.problemas[1]).toMatch(/tem uma abertura sem declaração/);
+    const coberta = conferirVaosDaPeca(executa(molduras.fechada()), { vaos: [vao()] });
+    expect(coberta.ok).toBe(false);
+    expect(coberta.problemas[0]).toMatch(/declarado sem moldura .* e 100,0% da borda fica sob a faixa de um friso da chapa \('moldura'\): declare os frisos do vão em `frisos`/);
+  });
+});
+
+/* O ACERVO DE PROVA DECLARA AS ABERTURAS. As receitas das fixtures do núcleo e a carenagem de prova contornam abertura; cada uma declara
+   o vão (com o friso que o contorna ou sem moldura, com o motivo) e passa, e sem a declaração reprova nomeando a abertura. */
+describe('as receitas de prova que contornam abertura a declaram', async () => {
+  const aneis = await import('../../procedural/nucleo/fixtures/gaiola-aneis-prova.js');
+  const bordaLivre = await import('../../procedural/nucleo/fixtures/gaiola-borda-livre-prova.js');
+  const gota = await import('../../procedural/nucleo/fixtures/gaiola-gota-prova.js');
+  const rede = await import('../../procedural/nucleo/fixtures/gaiola-por-rede-prova.js');
+  const aba = await import('../../procedural/nucleo/fixtures/aba-prova.js');
+  const carenagem = (await import('../../procedural/pecas/carenagem-de-prova/receita.js')).default;
+  const { executarReceita } = await import('./executar-receita.js');
+  const comAba = aba.passos();
+  const receitas = {
+    'gaiola-aneis-prova': [aneis.default, 1],
+    'gaiola-borda-livre-prova': [bordaLivre.receita(), 1],
+    'gaiola-gota-prova': [gota.default, 1],
+    'gaiola-por-rede-prova': [rede.default, 1],
+    'gaiola-por-rede-prova com moldura': [rede.receitaComMoldura(), 1],
+    'friso-prova': [{ PASSOS: prova.passos(), PARAMS: P, vaos: prova.VAOS }, 1],
+    'aba-prova': [{ PASSOS: comAba.passos, PARAMS: comAba.pontos, vaos: aba.vaos() }, 1],
+    'carenagem-de-prova (o vão do teto e a imagem espelhada dele)': [carenagem, 2],
+  };
+  for (const [nome, [receita, quantas]] of Object.entries(receitas)) {
+    it(nome, () => {
+      const { neutro } = executarReceita(receita);
+      expect(neutro.orfaos).toEqual([]);
+      const r = conferirVaosDaPeca(neutro, receita);
+      expect(r.problemas).toEqual([]);
+      expect(r.aberturas).toHaveLength(quantas);
+      expect(r.aberturas.every((a) => a.vao !== null)).toBe(true);
+      const sem = conferirVaosDaPeca(neutro, { ...receita, vaos: undefined });
+      expect(sem.problemas).toHaveLength(quantas);
+      for (const t of sem.problemas) expect(t).toMatch(/tem uma abertura sem declaração em `vaos`/);
+    });
+  }
 });

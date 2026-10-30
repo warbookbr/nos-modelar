@@ -55,4 +55,7 @@ export function passos({ niveis = 2, aba = ABA, extra = {}, espessura = ESPESSUR
   };
 }
 
+/** O vão como a receita o declara em `vaos`: a aba dobra a borda inteira da janela. */
+export const vaos = () => [{ nome: 'janela', borda: montagem().bordaDoVao('janela'), frisos: ['abaDaJanela'] }];
+
 export const CONTATOS = [{ par: ['chapa', 'aba'], motivo: 'a aba nasce na parede da borda do vão e continua a chapa dobrada; as malhas se cruzam por menos de 0,1 mm na costura' }];

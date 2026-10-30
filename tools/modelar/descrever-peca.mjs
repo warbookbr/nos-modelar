@@ -451,16 +451,18 @@ export async function descreverPecaReutilizavel({
       const texto = `\n${ilhas.problemas.length} PARTE(S) OU GRUPO(S) SOLTO(S)${ilhasReprovam ? '' : ' (aviso; a guarda do acervo reprova)'}\n${ilhas.problemas.map((t) => `  ${t}`).join('\n')}\n`;
       if (ilhasReprovam) { stderr += texto; falhou = true; } else stdout += texto;
     }
-    /* MOLDURA EM VOLTA DO VÃO. Os frisos que contornam um vão declarado em `vaos` da receita precisam cobrir a borda inteira, e as emendas entre
-       eles levam o mesmo perfil: o trecho sem moldura, o degrau na emenda e o entalhe no canto reprovam, e a aba parcial de propósito passa só
-       com `parcial: { motivo }`. Sem `vaos` na receita nada roda e a saída continua a mesma. A medida é sobre a pegada dos frisos na chapa,
-       em `src/autoria/molduras-do-vao.js`. */
+    /* MOLDURA EM VOLTA DO VÃO. Toda abertura de uma chapa (a volta de borda livre que anda ao contrário da chapa em volta, achada pela
+       geometria da gaiola) precisa estar declarada em `vaos` da receita, com os frisos que a contornam ou com `semMoldura: { motivo }`, e a
+       peça que esquece a declaração reprova. Os frisos de um vão precisam cobrir a borda inteira, e as emendas entre eles levam o mesmo
+       perfil: o trecho sem moldura, o degrau na emenda e o entalhe no canto reprovam, e a aba parcial de propósito passa só com
+       `parcial: { motivo }`. Peça sem chapa e sem `vaos` não ganha seção. A medida é sobre a pegada dos frisos na chapa, em
+       `src/autoria/molduras-do-vao.js`, e roda no `descrever` e por ele na `guarda:acervo`. */
     try {
       molduras = conferirVaosDaPeca(neutro, receita);
     } catch (erro) {
       return falha(`NÃO CONSEGUI CONFERIR OS VÃOS\n  ${erro.message}`);
     }
-    if (molduras.declarados) {
+    if (molduras.declarados || molduras.aberturas.length) {
       stdout += formatarVaos(molduras);
       if (!molduras.ok) {
         stderr += `\n${molduras.problemas.length} PROBLEMA(S) NA MOLDURA EM VOLTA DO VÃO\n${molduras.problemas.map((t) => `  ${t}`).join('\n')}\n`;

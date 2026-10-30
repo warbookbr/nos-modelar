@@ -304,6 +304,16 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       const grupos = partes ? Object.fromEntries(Object.entries(partes).map(([nome, lista]) => [nome, lista.map((k) => facesSaida[k])])) : {};
       registraOrigem(st, i, 'subdivisao', a.origemId, { faces: facesSaida, espessura: partes !== null, ...grupos });
     }
+    /* A gaiola da chapa, para a conferência dos vãos (`src/autoria/molduras-do-vao.js`) achar as aberturas pela borda livre dela:
+       os nomes, as faces por índice da gaiola cheia (a simetria aplicada), as posições, os níveis e a imagem espelhada. Só leitura;
+       nada disto entra na malha nem na forma canônica. */
+    const indiceDoNome = new Map();
+    declarados.forEach((v, k) => { if (typeof v === 'string') indiceDoNome.set(v, k); });
+    (st.chapas ??= []).push({
+      passo: i, origemId: a.origemId ?? null, declarados: declarados.map((v) => (typeof v === 'string' ? v : null)), indiceDoNome,
+      faces: gaiola.faces.map((f) => [...f]), vertices: gaiola.vertices.map((p) => [...p]), nVertices: gaiola.vertices.length,
+      niveis: Math.trunc(st.num(a.niveis ?? 2)), simetria: a.simetria ?? null, imagem: gaiola.imagem ?? null,
+    });
   },
   };
 }

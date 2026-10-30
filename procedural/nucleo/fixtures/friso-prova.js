@@ -49,6 +49,19 @@ export function voltaDoVao() {
   lista.push(nome(a, a));
   return lista;
 }
+/** A borda do vão, a volta fechada de p3_3 por p5_3, p5_5 e p3_5 e de volta. */
+export function bordaDoVao() {
+  const [a, b] = VAO.i;
+  const lista = [];
+  for (let i = a; i < b; i++) lista.push(nome(i, a));
+  for (let j = a; j < b; j++) lista.push(nome(b, j));
+  for (let i = b; i > a; i--) lista.push(nome(i, b));
+  for (let j = b; j > a; j--) lista.push(nome(a, j));
+  lista.push(nome(a, a));
+  return lista;
+}
+/** O vão da chapa como a receita o declara em `vaos`: os frisos de prova correm uma passada fora da borda, e ela fica sem moldura. */
+export const VAOS = [{ nome: 'vao', borda: bordaDoVao(), semMoldura: { motivo: 'a chapa de prova testa o friso ao redor do vão, e a borda do vão fica nua' } }];
 export const linhaDaNervura = () => [1, 2, 3, 4, 5, 6, 7].map((i) => nome(i, 7));
 export const linhaDaAba = () => [1, 2, 3, 4, 5].map((j) => nome(7, j));
 

@@ -74,6 +74,8 @@ export function receita(opcoes = {}) {
       ['subdivisao', { origemId: 1, ...g.passo, borda: 'cantos', niveis: 2 }],
       ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
     ],
+    /* a janela é a abertura da chapa (o arco se abre na borda e é recorte do contorno); a moldura em relevo é a própria chapa */
+    ...(opcoes.janela === false ? {} : { vaos: [{ nome: 'janela', borda: g.bordaDoVao('janela'), semMoldura: { motivo: 'a chapa de prova testa o anel em volta da janela, que é a própria chapa, sem friso' } }] }),
   };
 }
 

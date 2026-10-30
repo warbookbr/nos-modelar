@@ -43,6 +43,7 @@ import { lerFamilia } from '../../src/autoria/familia.js';
 import { resolverPortasDeMontagem } from '../../src/autoria/interfaces-montagem.js';
 import { receitaComParametros } from '../../src/autoria/parametros-vivos.js';
 import { conferirPortasNaForma } from '../../src/autoria/porta-confere-forma.js';
+import { conferirVaosDaPeca } from '../../src/autoria/molduras-do-vao.js';
 import { execucaoDe, invariantesDe } from '../../src/autoria/varrer-parametros.js';
 import { conferirMontagemDaFamilia } from './montagem-da-familia.mjs';
 
@@ -304,7 +305,7 @@ function executar(familia, parametros, { medir }) {
   const { passos } = expandirChamadasDeComposicao(execucao.registroComposicoes, receita.CHAMADAS_COMPOSICOES);
   receita.MATERIAIS = Object.fromEntries(passos.filter(([operacao, args]) => operacao === 'material' && typeof args?.usa === 'string').map(([, args]) => [args.usa, MATERIAL_NEUTRO]));
   const { neutro } = executarReceita(receita, execucao);
-  return { neutro, medidas: coletor };
+  return { neutro, medidas: coletor, receita };
 }
 
 /**
@@ -346,6 +347,13 @@ export function medirPonto(familia, parametros, rotulo = 'ponto', { montagem = '
   if (hash !== hashDe(repetido.neutro)) problemas.push(problema('nao-deterministico', 'duas execuções com os mesmos parâmetros deram geometrias diferentes'));
   const portas = conferirPortas(familia.contrato, neutro);
   problemas.push(...portas.achados);
+  /* a abertura de chapa sem declaração reprova o ponto, como no `descrever` da peça: a receita da família não leva `vaos`, de modo que a
+     família que gerar chapa com abertura precisa primeiro de um jeito de declarar o vão */
+  try {
+    for (const t of conferirVaosDaPeca(neutro, medido.receita).problemas) problemas.push(problema('moldura-do-vao', t));
+  } catch (erro) {
+    problemas.push(problema('moldura-do-vao', erro.message));
+  }
   problemas.push(...conferirMedidas(medido.medidas));
   const daMontagem = typeof familia.montar === 'function' && montagem !== 'nenhuma'
     ? conferirMontagemDaFamilia(familia, parametros, ambienteDaExecucao(familia, { medir: false }).execucao, { conferirCurso: montagem === 'completa' })

@@ -140,6 +140,7 @@ export function receita(opcoes = {}, niveis = 2) {
       ['subdivisao', { origemId: 1, ...g.passo, niveis }],
       ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
     ],
+    vaos: [{ nome: 'janela', borda: g.linha('janela'), semMoldura: { motivo: 'a chapa de prova testa a volta fechada interna da rede, sem moldura; receitaComMoldura a contorna' } }],
   };
 }
 
@@ -159,6 +160,7 @@ export function receitaComMoldura(opcoes = {}, niveis = 2) {
       ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
       ['parte', { nome: 'moldura', sel: { origem: { op: 'friso', id: 2 } } }],
     ],
+    vaos: [{ nome: 'janela', borda: g.linha('janela'), frisos: ['molduraDaJanela'] }],
   };
 }
 export const CONTATOS = [{ par: ['chapa', 'moldura'], motivo: 'a moldura entra 0,5 mm na chapa pela base do perfil, menos que a espessura' }];

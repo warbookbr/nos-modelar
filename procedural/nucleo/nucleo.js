@@ -3570,6 +3570,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   Object.defineProperty(saida, 'avisos', { value: st.avisos, enumerable: false });
   /* frisos: a pegada e as pontas de cada friso varrido, para a conferência da moldura em volta de um vão. Fora da enumeração, como `avisos`. */
   Object.defineProperty(saida, 'frisos', { value: st.frisos ?? [], enumerable: false });
+  /* chapas: a gaiola de cada passo `subdivisao`, para a conferência dos vãos achar as aberturas pela borda livre. Fora da enumeração, como `frisos`. */
+  Object.defineProperty(saida, 'chapas', { value: st.chapas ?? [], enumerable: false });
   return saida;
 }
 
