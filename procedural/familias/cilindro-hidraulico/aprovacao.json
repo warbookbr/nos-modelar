@@ -3,7 +3,7 @@
   "familia": "cilindro-hidraulico",
   "versao": "1.0.0",
   "mecanica": {
-    "data": "2026-10-11",
+    "data": "2026-10-30",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -15,7 +15,7 @@
           "haste": 18,
           "parede": 3
         },
-        "hash": "sha256:72650b64fe9e4d75fdbeccc2ff09722102f8ebbd439cfc863234890a6eac42ec",
+        "hash": "sha256:4db9610c27a5d68966a43b11976fdd7e1f07987413e3ef76231945bb9ecd7a66",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -38,7 +38,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:c342c5c78e8a90c929a7966eb88e85ce0a1d99edb7dfd5da397735e7df3f0f3e",
+          "hash": "sha256:cc7ca9287df4331c5fee945b275cc3b84a1195dcccab8da6be1585a100c84f1b",
           "pecas": [
             "cilindro-hidraulico.camisa",
             "cilindro-hidraulico.haste"
@@ -83,7 +83,7 @@
           "haste": 45,
           "parede": 8
         },
-        "hash": "sha256:3759c714e46b941dff051ac7c13d94f151a21a06ab08f600df4883fcf132bfdb",
+        "hash": "sha256:5f59c3696d375c6b3dee0e6a7b48f50659aa2226ee3f440b044575507d08cb3e",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -106,7 +106,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:2d088683fc048a80cb991e7d156ea246c15d3db5dc034a3be6098da13967d84c",
+          "hash": "sha256:de9cb777e8d354c06529db768076bda3dd7e1956de5a64de8fbf93c848782580",
           "pecas": [
             "cilindro-hidraulico.camisa",
             "cilindro-hidraulico.haste"
@@ -151,7 +151,7 @@
           "haste": 140,
           "parede": 25
         },
-        "hash": "sha256:411cf8637171391051f79f9c453e1e8b2936b497bb31f4f3dc13ff1980b365af",
+        "hash": "sha256:736d09bd16c73f99ee8ff825e8ee0cefd3b6995d4b6000f5d3eac272f42d2940",
         "medidas": [
           {
             "ferramenta": "casca",
@@ -174,7 +174,7 @@
           }
         ],
         "montagem": {
-          "hash": "sha256:a52bffa8ca717d87d4a7368ec019a6861b035617b8b33017c66cab9bafa78f03",
+          "hash": "sha256:7388ec0bd9ef3f2589f46a02c7f97d109d7a9ea63399eac2c5a4436f530e2685",
           "pecas": [
             "cilindro-hidraulico.camisa",
             "cilindro-hidraulico.haste"
@@ -262,58 +262,22 @@
       "olhal-traseiro"
     ]
   },
-  "critico": {
-    "data": "2026-10-11",
-    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/cilindro-prancha.png",
-    "julgamentos": 2,
-    "regra": "menor nota de dois críticos cegos independentes, por ponto",
-    "rodadas": [
-      {
-        "rodada": 1,
-        "pontos": {
-          "minimo": 7,
-          "medio": 7,
-          "maximo": 7
-        },
-        "motivo": "olhais presos só por linha tangente, sem pescoço; fixação com rótula indistinguível"
-      }
-    ],
-    "pontos": {
-      "minimo": {
-        "nota": 8,
-        "hash": "sha256:72650b64fe9e4d75fdbeccc2ff09722102f8ebbd439cfc863234890a6eac42ec"
-      },
-      "medio": {
-        "nota": 9,
-        "hash": "sha256:3759c714e46b941dff051ac7c13d94f151a21a06ab08f600df4883fcf132bfdb"
-      },
-      "maximo": {
-        "nota": 8,
-        "hash": "sha256:411cf8637171391051f79f9c453e1e8b2936b497bb31f4f3dc13ff1980b365af"
-      }
-    },
-    "achados": [
-      "olhais volumosos na proporção do mínimo",
-      "camisa facetada na isométrica",
-      "camisa quase do tamanho do curso no médio e no máximo, pouco trecho interno da haste estendida",
-      "rótula dianteira do máximo não confirmada na resolução"
-    ]
-  },
+  "critico": null,
   "pessoa": {
-    "data": "2026-10-11",
+    "data": "2026-10-30",
     "aprovou": true,
     "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/cilindro-prancha.png",
     "pontos": {
       "minimo": {
-        "hash": "sha256:72650b64fe9e4d75fdbeccc2ff09722102f8ebbd439cfc863234890a6eac42ec"
+        "hash": "sha256:4db9610c27a5d68966a43b11976fdd7e1f07987413e3ef76231945bb9ecd7a66"
       },
       "medio": {
-        "hash": "sha256:3759c714e46b941dff051ac7c13d94f151a21a06ab08f600df4883fcf132bfdb"
+        "hash": "sha256:5f59c3696d375c6b3dee0e6a7b48f50659aa2226ee3f440b044575507d08cb3e"
       },
       "maximo": {
-        "hash": "sha256:411cf8637171391051f79f9c453e1e8b2936b497bb31f4f3dc13ff1980b365af"
+        "hash": "sha256:736d09bd16c73f99ee8ff825e8ee0cefd3b6995d4b6000f5d3eac272f42d2940"
       }
     },
-    "observacao": "aprovada como está, com os olhais do mínimo e a camisa do médio e do máximo nas proporções atuais"
+    "observacao": "reassinada em 2026-10-30 com o terminal da haste e o pescoço traseiro unidos ao olhal sem atravessar as faces do anel (fatia 16 do plano dos ajustes no núcleo dos veículos): a pessoa aprovou vendo a ponta da haste, o olhal traseiro e a peça inteira antes e depois; a camada do crítico fica vazia até a calibração julgar o controle de novo"
   }
 }
