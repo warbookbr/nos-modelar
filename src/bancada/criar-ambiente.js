@@ -171,6 +171,9 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   let alvosAtuais = [];
   /* Caixa que substitui a dos alvos no enquadramento; null = comportamento normal. */
   let caixaFixada = null;
+  /* O quadro de uma câmera de referência (`olharComoReferencia`), em meia altura e meia largura de cena: enquanto vale,
+     a ortográfica o faz caber inteiro no canvas, como a imagem dele cabe no lado da referência; null = comportamento normal. */
+  let quadroFixo = null;
   let centroAtual = new THREE.Vector3(0, 0.9, 0);
   let raioAtual = 2;
   let transicao = null;
@@ -222,15 +225,17 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     /* EM ORTOGRÁFICA O ZOOM VEM DA CAIXA, e não de `raioAtual` — mexer no raio
        aqui não muda nada, e foi por isso que a primeira tentativa de enquadrar
        um contato saiu idêntica à imagem sem foco, sem erro nenhum. Quando há
-       caixa fixada, é ela que manda; `enquadrar(objetos)` a limpa. */
+       caixa fixada, é ela que manda; `enquadrar(objetos)` a limpa. Com o quadro
+       de uma referência, manda o quadro, inteiro dentro do canvas. */
     const envelope = envelopeProjetado(caixaFixada ?? caixaValida(alvosAtuais), vistaAtual);
-    const meiaAltura = envelope
+    let meiaAltura = envelope
       ? meiaAlturaParaVista({
         larguraProjetada: envelope.largura,
         alturaProjetada: envelope.altura,
         aspecto,
       })
       : Math.max(0.2, raioAtual * 1.32);
+    if (quadroFixo) meiaAltura = Math.max(quadroFixo.meiaAltura, quadroFixo.meiaLargura / aspecto);
     ortografica.left = -meiaAltura * aspecto;
     ortografica.right = meiaAltura * aspecto;
     ortografica.top = meiaAltura;
@@ -275,6 +280,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   function definirVista(vista, { instantaneo = false } = {}) {
     if (!VISTAS_BANCADA[vista]) return;
     publicarCameraLivreAoEstabilizar = false;
+    quadroFixo = null;
     vistaAtual = vista;
     ajustarOrtografica();
     const direcao = VISTAS_BANCADA[vista].direcao;
@@ -284,6 +290,26 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       : new THREE.Vector3(0, 1, 0);
     aplicarVisibilidadeDoCenario();
     iniciarTransicao(posicaoDaVista(vista), up, instantaneo);
+    aoMudarVista?.(vistaAtual);
+  }
+
+  /* A CÂMERA DE UMA REFERÊNCIA: ortográfica, olhando para `centro` de `direcao`, com o quadro de meia altura e meia
+     largura dado cabendo inteiro no canvas. É como a peça fica na mesma escala e no mesmo lugar da imagem de uma câmera
+     conhecida (o quadro da folha de vistas da fonte), para as duas se compararem lado a lado ou uma sobre a outra. A
+     projeção é de quem chama; o quadro vale até a próxima vista, enquadramento ou câmera restaurada. `vista` é o nome
+     da vista da bancada quando a direção é a dela, e `livre` quando não é. */
+  function olharComoReferencia({ centro, direcao, acima, meiaAltura, meiaLargura, vista = 'livre', instantaneo = false }) {
+    publicarCameraLivreAoEstabilizar = false;
+    quadroFixo = { meiaAltura, meiaLargura };
+    centroAtual = new THREE.Vector3(...centro);
+    vistaDoFoco = null;
+    vistaAtual = VISTAS_BANCADA[vista] ? vista : 'livre';
+    camera.zoom = 1;
+    camera.updateProjectionMatrix();
+    ajustarOrtografica();
+    aplicarVisibilidadeDoCenario();
+    const destino = centroAtual.clone().addScaledVector(new THREE.Vector3(...direcao).normalize(), distanciaPerspectiva());
+    iniciarTransicao(destino, new THREE.Vector3(...acima).normalize(), instantaneo);
     aoMudarVista?.(vistaAtual);
   }
 
@@ -361,6 +387,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
 
   function restaurarCameraLivre(estado) {
     transicao = null;
+    quadroFixo = null;
     controls.enabled = true;
     camera.position.fromArray(estado.posicao);
     camera.up.fromArray(estado.acima).normalize();
@@ -599,6 +626,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     get vista() { return vistaAtual; },
     get projecao() { return projecaoAtual; },
     definirVista,
+    olharComoReferencia,
     definirProjecao,
     cameraLivre,
     restaurarCameraLivre,

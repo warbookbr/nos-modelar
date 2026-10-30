@@ -91,13 +91,14 @@ describe('painéis do tema', () => {
     expect(estreito.estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
   });
 
-  it('na arrumação clássica não abre nem marca nada, e trocar de tema volta ao que o tema declara', () => {
+  it('o Revisão encosta a árvore aberta ao nascer, e trocar de tema volta ao que o tema declara', () => {
     const { paineis, documento, estado } = montar({ tema: 'revisao' });
-    expect(paineis.abrir('partes')).toBe(false);
-    expect(documento.querySelector('.painel').hasAttribute('data-aberto')).toBe(false);
+    expect(documento.querySelector('.painel').dataset.aberto).toBe('true');
+    expect(paineis.abrir('inspecao')).toBe(true);
+    expect(estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
     estado.definir({ tema: 'foco' });
     expect(documento.querySelector('.painel').dataset.aberto).toBe('false');
     estado.definir({ tema: 'revisao' });
-    expect(documento.querySelector('.painel').hasAttribute('data-aberto')).toBe(false);
+    expect(documento.querySelector('.painel').dataset.aberto).toBe('true');
   });
 });

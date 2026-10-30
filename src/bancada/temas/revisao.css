@@ -1,0 +1,318 @@
+/* revisao.css — a arrumação do tema Revisão: a peça e a referência lado a lado numa mesa, com a árvore encostada à esquerda, a barra do alto inteira e a barra da cena no pé da mesa.
+ *
+ * Todas as regras ficam sob `:root[data-arrumacao="revisao"]`. Os componentes são os do Foco (`styles.css` os desenha);
+ * aqui eles mudam de lugar, e a arrumação clássica, que vale para toda arrumação que não é a do Foco, é desfeita onde
+ * atrapalha. Os componentes que a folha esconde fora do Foco com `!important` voltam com `!important`, sempre sem o
+ * atributo `hidden`, para o cartão e a barra de edição continuarem sumindo quando o componente os esconde.
+ *
+ * A mesa é a faixa entre a árvore (`--rv-esquerda`) e o painel da direita (`--rv-direita`), abaixo da barra do alto e
+ * acima da barra de estado. A peça fica com a metade dela quando a referência está ao lado e com ela toda nos outros
+ * modos (`data-comparacao` na mesa, de `componentes/mesa-de-revisao.js`); o canvas e o quadro da referência têm o mesmo
+ * tamanho, e a imagem cabe inteira no quadro como a câmera faz o quadro dela caber inteiro no canvas. */
+
+:root[data-arrumacao="revisao"] {
+  --rv-topo: 48px;
+  --rv-pe: 28px;
+  --rv-cabeca: 36px;
+  --rv-esquerda: 0px;
+  --rv-direita: 0px;
+  --rv-mesa: calc(100vw - var(--rv-esquerda) - var(--rv-direita));
+  --rv-peca: var(--rv-mesa);
+  --rv-altura: calc(100vh - var(--rv-topo) - var(--rv-cabeca) - var(--rv-pe));
+}
+:root[data-arrumacao="revisao"]:has(.painel-partes[data-aberto="true"]) { --rv-esquerda: 240px; }
+:root[data-arrumacao="revisao"]:has(.painel-inspecao[data-aberto="true"]) { --rv-direita: 272px; }
+:root[data-arrumacao="revisao"]:has(.mesa-comparacao[data-comparacao="ao-lado"]) { --rv-peca: calc(var(--rv-mesa) / 2); }
+
+/* ----- o que a arrumação clássica põe e o Revisão não usa, e o que ela esconde e o Revisão usa ----- */
+:root[data-arrumacao="revisao"] .barra-controles,
+:root[data-arrumacao="revisao"] .vistas,
+:root[data-arrumacao="revisao"] .recolher,
+:root[data-arrumacao="revisao"] .painel > .dica,
+:root[data-arrumacao="revisao"] .fixture-atual,
+:root[data-arrumacao="revisao"] #tituloInspecao,
+:root[data-arrumacao="revisao"] .acoes-editar:not(:has(button)),
+:root[data-arrumacao="revisao"] #eixosReferencia { display: none; }
+:root[data-arrumacao="revisao"] .fechar-painel { display: inline-grid; }
+:root[data-arrumacao="revisao"] .dica-lista { display: inline; }
+:root[data-arrumacao="revisao"] [data-movel] > .icone,
+:root[data-arrumacao="revisao"] .seletor-visao .icone { display: inline-block; }
+:root[data-arrumacao="revisao"] .topo-foco,
+:root[data-arrumacao="revisao"] .cubo-orientacao,
+:root[data-arrumacao="revisao"] .cartao-selecao:not([hidden]),
+:root[data-arrumacao="revisao"] .barra-edicao:not([hidden]),
+:root[data-arrumacao="revisao"] .barra-estado { display: flex !important; }
+
+/* A régua e o rodapé do ajuste moram na barra de estado e na barra de edição, e não flutuam como na clássica. */
+:root[data-arrumacao="revisao"] .referencia-metrica,
+:root[data-arrumacao="revisao"] .rodape-juntas { position: static; min-width: 0; transform: none; }
+
+/* ----- a cena: o lado da peça ----- */
+:root[data-arrumacao="revisao"] #cenaBancada {
+  inset: auto;
+  top: calc(var(--rv-topo) + var(--rv-cabeca));
+  left: var(--rv-esquerda);
+  width: var(--rv-peca);
+  height: var(--rv-altura);
+}
+:root[data-arrumacao="revisao"] body.editando #cenaBancada { outline: 2px solid var(--destaque); outline-offset: -2px; }
+
+/* ----- a barra do alto, inteira ----- */
+:root[data-arrumacao="revisao"] .topo-foco {
+  top: 0;
+  right: 0;
+  left: 0;
+  align-items: center;
+  height: var(--rv-topo);
+  padding: 0 var(--e2);
+  border-bottom: var(--traco);
+  background: var(--superficie);
+  pointer-events: auto;
+}
+:root[data-arrumacao="revisao"] .topo-foco > .grupo-peca,
+:root[data-arrumacao="revisao"] .topo-foco > .grupo-direita {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ----- a barra da cena, no pé da mesa; a caixa da cena e a lista das visões abrem para cima ----- */
+:root[data-arrumacao="revisao"] .topo-foco > .barra-cena {
+  position: fixed;
+  z-index: 10;
+  bottom: calc(var(--rv-pe) + 16px);
+  left: calc(var(--rv-esquerda) + var(--rv-mesa) / 2);
+  transform: translateX(-50%);
+}
+:root[data-arrumacao="revisao"] .barra-cena .popover,
+:root[data-arrumacao="revisao"] .barra-cena .menu-visoes { top: auto; bottom: calc(100% + 8px); }
+:root[data-arrumacao="revisao"] .barra-cena .botao { min-height: var(--controle); }
+:root[data-arrumacao="revisao"] .barra-cena .lugar > button:disabled { border-color: transparent; background: transparent; color: var(--texto-3); cursor: default; }
+
+/* ----- a árvore e o painel da direita, encostados ----- */
+:root[data-arrumacao="revisao"] .painel {
+  position: fixed;
+  z-index: 9;
+  top: var(--rv-topo);
+  bottom: var(--rv-pe);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: var(--superficie);
+  box-shadow: none;
+}
+:root[data-arrumacao="revisao"] .painel[data-aberto="false"] { display: none; }
+:root[data-arrumacao="revisao"] .painel-partes { left: 0; width: 240px; border-right: var(--traco); }
+:root[data-arrumacao="revisao"] .painel-inspecao { right: 0; width: 272px; border-left: var(--traco); }
+:root[data-arrumacao="revisao"] .painel-cabecalho {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--rv-cabeca);
+  padding: 0 var(--e1) 0 var(--e3);
+  border-bottom: var(--traco);
+}
+:root[data-arrumacao="revisao"] .painel-cabecalho h1 { font-size: var(--t-m); }
+:root[data-arrumacao="revisao"] .partes-controles { flex: none; padding: var(--e2); border-bottom: var(--traco); }
+:root[data-arrumacao="revisao"] .lista-partes { padding: var(--e1); }
+:root[data-arrumacao="revisao"] .pe-partes { padding: var(--e1) var(--e1) var(--e1) var(--e3); border-top: var(--traco); }
+:root[data-arrumacao="revisao"] .painel-inspecao > .abas-painel { flex: none; align-items: center; padding: var(--e1); border-bottom: var(--traco); }
+:root[data-arrumacao="revisao"] .painel-inspecao > .aba-conteudo:not([hidden]) { flex: 1 1 auto; min-height: 0; padding: var(--e3); overflow-y: auto; }
+:root[data-arrumacao="revisao"] .painel-inspecao > .aba-conteudo:not([hidden]) > * { flex-shrink: 0; }
+
+/* ----- o cubo no canto da peça, a barra de edição sobre a barra da cena, os avisos no meio da mesa ----- */
+:root[data-arrumacao="revisao"] .cubo-orientacao {
+  top: calc(var(--rv-topo) + var(--rv-cabeca) + var(--e2));
+  right: auto;
+  left: calc(var(--rv-esquerda) + var(--e2));
+}
+:root[data-arrumacao="revisao"] .barra-edicao {
+  bottom: calc(var(--rv-pe) + 16px + var(--controle) + 18px);
+  left: calc(var(--rv-esquerda) + var(--rv-mesa) / 2);
+}
+:root[data-arrumacao="revisao"] .aviso,
+:root[data-arrumacao="revisao"] #erro {
+  bottom: calc(var(--rv-pe) + 16px + 2 * var(--controle) + 44px);
+  left: calc(var(--rv-esquerda) + var(--rv-mesa) / 2);
+  width: min(520px, calc(var(--rv-mesa) - 32px));
+}
+:root[data-arrumacao="revisao"] .aviso-estado,
+:root[data-arrumacao="revisao"] .aviso-sessao-nova {
+  top: calc(var(--rv-topo) + var(--rv-cabeca) + var(--e2));
+  left: calc(var(--rv-esquerda) + var(--rv-mesa) / 2);
+}
+
+/* ----- a mesa: o cabeçalho da peça e o lado da referência ----- */
+:root[data-arrumacao="revisao"] .cabeca-peca,
+:root[data-arrumacao="revisao"] .cabeca-referencia {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  min-width: 0;
+  height: var(--rv-cabeca);
+  padding: 0 var(--e2) 0 var(--e3);
+  color: var(--texto-2);
+  font-size: var(--t-p);
+  white-space: nowrap;
+}
+:root[data-arrumacao="revisao"] .cabeca-peca b,
+:root[data-arrumacao="revisao"] .cabeca-referencia b { color: var(--texto); font-size: var(--t-m); font-weight: 600; }
+:root[data-arrumacao="revisao"] .cabeca-peca {
+  position: fixed;
+  z-index: 8;
+  top: var(--rv-topo);
+  left: var(--rv-esquerda);
+  width: var(--rv-peca);
+  border-bottom: var(--traco);
+  background: var(--superficie);
+}
+:root[data-arrumacao="revisao"] .vista-da-peca { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+:root[data-arrumacao="revisao"] .chip-edicao,
+:root[data-arrumacao="revisao"] .chip-notas {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--e2);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
+  background: var(--superficie);
+  color: var(--texto-2);
+  font-size: var(--t-p);
+}
+:root[data-arrumacao="revisao"] .chip-edicao { border-color: var(--destaque); color: var(--destaque); }
+:root[data-arrumacao="revisao"] .chip-notas { cursor: pointer; }
+:root[data-arrumacao="revisao"] .chip-notas:hover { color: var(--texto); }
+:root[data-arrumacao="revisao"] .mostrar-referencia {
+  display: none;
+  align-items: center;
+  gap: var(--e1);
+  height: 26px;
+  margin-left: auto;
+  padding: 0 var(--e2);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-p);
+  background: var(--superficie);
+  color: var(--texto);
+  font-size: var(--t-p);
+  cursor: pointer;
+}
+:root[data-arrumacao="revisao"] .mesa-comparacao[data-comparacao="escondida"] .mostrar-referencia { display: inline-flex; }
+
+:root[data-arrumacao="revisao"] .lado-referencia {
+  position: fixed;
+  z-index: 8;
+  top: var(--rv-topo);
+  right: var(--rv-direita);
+  display: grid;
+  grid-template-rows: var(--rv-cabeca) minmax(0, 1fr);
+  width: calc(var(--rv-mesa) - var(--rv-peca));
+  height: calc(100vh - var(--rv-topo) - var(--rv-pe));
+  background: var(--cena);
+  box-shadow: inset 1px 0 0 var(--linha);
+}
+:root[data-arrumacao="revisao"] .cabeca-referencia { border-bottom: var(--traco); background: var(--superficie); box-shadow: inset 1px 0 0 var(--linha); }
+:root[data-arrumacao="revisao"] .controles-referencia { display: flex; align-items: center; gap: var(--e1); margin-left: auto; }
+:root[data-arrumacao="revisao"] .controles-referencia .segmento button { height: 24px; padding: 0 var(--e1); }
+:root[data-arrumacao="revisao"] .controles-referencia .botao-icone { width: 28px; height: 28px; }
+:root[data-arrumacao="revisao"] .controles-referencia .botao-icone:disabled { color: var(--texto-3); background: transparent; cursor: not-allowed; }
+:root[data-arrumacao="revisao"] .sem-referencia { display: none; color: var(--texto-3); }
+:root[data-arrumacao="revisao"] .opacidade-referencia { display: none; align-items: center; gap: var(--e1); }
+:root[data-arrumacao="revisao"] .opacidade-referencia input { width: 88px; }
+:root[data-arrumacao="revisao"] .opacidade-referencia output { min-width: 32px; color: var(--texto-2); text-align: right; }
+
+:root[data-arrumacao="revisao"] .escolha-vista-referencia { position: relative; display: flex; }
+:root[data-arrumacao="revisao"] #btnVistaReferencia {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e1);
+  height: 26px;
+  padding: 0 var(--e2);
+  border: 1px solid transparent;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto);
+  font-size: var(--t-m);
+  cursor: pointer;
+}
+:root[data-arrumacao="revisao"] #btnVistaReferencia:hover:not(:disabled),
+:root[data-arrumacao="revisao"] #btnVistaReferencia[aria-expanded="true"] { background: var(--superficie-2); }
+:root[data-arrumacao="revisao"] #btnVistaReferencia:disabled { cursor: default; }
+:root[data-arrumacao="revisao"] #btnVistaReferencia:disabled .seta { display: none; }
+:root[data-arrumacao="revisao"] #btnVistaReferencia .seta { color: var(--texto-3); }
+:root[data-arrumacao="revisao"] .menu-vistas-referencia {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  display: grid;
+  min-width: 168px;
+  padding: var(--e1);
+  border: var(--traco);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  box-shadow: var(--sombra-forte);
+}
+:root[data-arrumacao="revisao"] .menu-vistas-referencia[hidden] { display: none; }
+:root[data-arrumacao="revisao"] .item-vista-referencia {
+  height: 28px;
+  padding: 0 var(--e2);
+  border: 0;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+:root[data-arrumacao="revisao"] .item-vista-referencia:hover { background: var(--superficie-2); }
+:root[data-arrumacao="revisao"] .item-vista-referencia[aria-checked="true"] { background: var(--destaque-fraco); color: var(--destaque); }
+
+/* O quadro da referência e a sobreposta: a imagem cabe inteira na caixa, com a proporção dela, e um quadro da folha é a
+   imagem aumentada duas vezes com o canto dele à mostra. */
+:root[data-arrumacao="revisao"] .quadro-referencia,
+:root[data-arrumacao="revisao"] .sobreposicao-referencia {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  overflow: hidden;
+  container-type: size;
+}
+:root[data-arrumacao="revisao"] .imagem-referencia {
+  width: min(100cqw, calc(100cqh * var(--aspecto, 1.3333)));
+  aspect-ratio: var(--aspecto, 1.3333);
+  background-repeat: no-repeat;
+}
+:root[data-arrumacao="revisao"] .quadro-referencia .imagem-referencia { outline: 1px solid var(--linha); outline-offset: -1px; }
+:root[data-arrumacao="revisao"] .sobreposicao-referencia {
+  position: fixed;
+  z-index: 1;
+  top: calc(var(--rv-topo) + var(--rv-cabeca));
+  left: var(--rv-esquerda);
+  display: none;
+  width: var(--rv-peca);
+  height: var(--rv-altura);
+  pointer-events: none;
+}
+
+/* Sobreposta e sem referência, a peça fica com a mesa inteira, e o cabeçalho da referência ocupa a ponta direita do da
+   peça; escondida, ele sai e o da peça oferece mostrar de novo. */
+:root[data-arrumacao="revisao"] .mesa-comparacao:is([data-comparacao="sobreposta"], [data-comparacao="sem-referencia"]) .lado-referencia {
+  width: auto;
+  height: var(--rv-cabeca);
+  grid-template-rows: var(--rv-cabeca);
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-arrumacao="revisao"] .mesa-comparacao:is([data-comparacao="sobreposta"], [data-comparacao="sem-referencia"]) .cabeca-referencia { border-bottom: 0; background: transparent; }
+:root[data-arrumacao="revisao"] .mesa-comparacao:is([data-comparacao="sobreposta"], [data-comparacao="sem-referencia"]) .quadro-referencia { display: none; }
+:root[data-arrumacao="revisao"] .mesa-comparacao[data-comparacao="sobreposta"] .sobreposicao-referencia { display: grid; }
+:root[data-arrumacao="revisao"] .mesa-comparacao[data-comparacao="sobreposta"] .opacidade-referencia { display: flex; }
+:root[data-arrumacao="revisao"] .mesa-comparacao[data-comparacao="sem-referencia"] .sem-referencia { display: inline; }
+:root[data-arrumacao="revisao"] .mesa-comparacao[data-comparacao="sem-referencia"] :is(.escolha-vista-referencia, .controles-referencia) { display: none; }
+:root[data-arrumacao="revisao"] .mesa-comparacao[data-comparacao="escondida"] .lado-referencia { display: none; }

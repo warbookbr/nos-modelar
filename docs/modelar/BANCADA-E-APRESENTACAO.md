@@ -64,7 +64,8 @@ escala (`referencia-metrica.js`), o teclado (`teclado.js`), o endereço da pági
 (`endereco.js`), os avisos (`avisos.js`), a caixa da visão sobre a cena
 (`caixa-da-visao.js`), a ponte da captura automática (`ponte-da-captura.js`), o
 tema (`tema.js`), a busca de comandos (`busca-de-comandos.js`), os painéis do
-tema (`paineis-do-tema.js`) e os componentes do tema Foco descritos abaixo. `elementos-da-pagina.js` é o único lugar que procura
+tema (`paineis-do-tema.js`), os componentes do tema Foco e a mesa do tema
+Revisão (`mesa-de-revisao.js`), descritos abaixo. `elementos-da-pagina.js` é o único lugar que procura
 elementos, e entrega a cada componente só o grupo dele. A ponte
 `window.__mecanificaBancada` é um contrato fixo: as chaves dela estão listadas
 em `CHAVES_DA_PONTE`, e o teste do componente cobra que nenhuma suma.
@@ -74,7 +75,9 @@ controlador das partes, a seleção por clique, os enquadramentos e o estado
 escrito na URL, mora em `cena/peca-em-cena.js`; o ajuste por junta, a edição de
 malha, o desfazer e o alvo do ajuste, em `cena/edicao-da-peca.js`; a projeção,
 a grade, a visão e a câmera restaurada da URL, em `cena/vista-da-cena.js`; a
-imagem de referência na cena, em `referencias/imagem-na-cena.js`; e de onde vem
+imagem de referência na cena, em `referencias/imagem-na-cena.js`; a referência
+da mesa do Revisão, com as vistas dela e a câmera da peça posta na câmera da
+vista, em `referencias/referencia-ao-lado.js`; e de onde vem
 a peça (a sessão ativa, o acervo, o catálogo e a entrega em espera), em
 `sessao/sessao-da-bancada.js`. O `main.js` só monta essas peças, na mesma ordem
 da subida de antes, porque a ordem em que os objetos entram na cena e os
@@ -94,14 +97,15 @@ números), de cor (cinzas neutros, um destaque, e o erro e o acerto só para
 mensagens) e de forma (raio, traço, sombra e altura de controle). Há dois
 conjuntos com os mesmos nomes: o claro, tirado da proposta B e usado pelos
 temas Foco e Revisão, e o escuro, tirado da proposta A e usado pelo tema
-Bancada. A folha de estilo, `styles.css`, não escreve cor, tamanho de fonte nem
-espaçamento: `src/bancada/estilo/sistema-visual.test.js` lê cada folha da
-bancada e reprova a declaração que escapar das variáveis, e roda com os outros
-testes da bancada.
+Bancada. A folha de estilo, `styles.css`, e a de cada arrumação própria de um
+tema, em `src/bancada/temas/` (hoje `revisao.css`), não escrevem cor, tamanho de
+fonte nem espaçamento: `src/bancada/estilo/sistema-visual.test.js` lê cada folha
+da bancada e reprova a declaração que escapar das variáveis, e roda com os
+outros testes da bancada.
 
 Um tema é uma declaração em `src/bancada/temas/temas.js`, e não código. Ele diz
 o conjunto de cores (`cores`), a arrumação da folha de estilo (`arrumacao`, hoje
-`foco`, `bancada` ou `classica`), o lugar de cada componente móvel (`lugares`, do
+`foco`, `bancada`, `revisao` ou `classica`), o lugar de cada componente móvel (`lugares`, do
 nome em `data-movel` na página para o nome em `data-lugar`), o texto dos
 controles que mudam de nome (`rotulos`, pelo `data-rotulo`, com um texto só ou
 um texto por caso da tela: a peça, uma parte escolhida ou a edição), os painéis
@@ -136,9 +140,7 @@ um painel que deixaria a cena com menos de 70% da largura recolhe o outro, e
 com as larguras do Foco os dois só cabem juntos a partir de 1920 pixels. A cena
 do Foco tem o fundo claro do sistema visual, a grade que some antes da borda, a
 sombra suave no chão e o contorno da seleção na borda da peça no lugar da tinta
-verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`). O Revisão usa
-por enquanto a arrumação de antes dos temas, com as cores do conjunto dele, e a
-cena de antes.
+verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`).
 
 A Bancada é a estação de CAD escura da proposta A, sobre os mesmos componentes.
 A barra do alto, fina, leva à esquerda o botão da árvore, Abrir, o nome e o
@@ -163,6 +165,48 @@ sombra suave e o contorno da seleção no destaque laranja, e a borda da cena fi
 no destaque enquanto a edição está ligada. As regras da arrumação ficam sob
 `:root[data-arrumacao="bancada"]` em `styles.css` e desfazem as da arrumação
 clássica, que valem para toda arrumação que não é o Foco.
+
+O Revisão é a proposta C sem a faixa de decisão, que a decisão 4 do plano tirou:
+o veredito e o aceite ficam na conversa com o agente, e a árvore fica plana,
+sem estado de aceite por parte. Ele usa o conjunto claro, a cena do Foco e os
+componentes do Foco noutros lugares, e a arrumação `revisao`
+(`temas/revisao.css`): a barra do alto inteira, a árvore encostada à esquerda e
+aberta ao nascer, o painel da direita encostado do outro lado quando abre (os
+dois sem margem na regra dos 70%, como na Bancada), o cubo no canto da peça e a barra da cena no pé da mesa, com focar e copiar a vista
+ao lado de enquadrar. A mesa é a faixa entre os painéis, dividida entre a peça e
+a referência, cada uma com um cabeçalho fino. A mesa só existe no tema que lhe
+dá lugar (`lugares['mesa-comparacao']`); nos outros ela fica numa casa escondida
+da página. O cabeçalho da peça diz a vista e a projeção, e o modo de edição
+quando ele está ligado. O da referência escolhe a vista da referência, troca
+entre lado a lado e sobreposta (a sobreposta com a transparência sobre a peça),
+liga a mesma câmera e esconde a referência, que devolve a largura toda à peça;
+quando a peça não tem imagem, o lado dela diz isso e a peça fica com a mesa.
+
+A referência é a imagem que a aba de imagem de referência mostra, lida a cada
+quadro: a que está na cena quando a chave "Na cena" está ligada e, com ela
+desligada, a que a peça declara e a aba oferece. A mesa não põe imagem na cena,
+e enquanto ela está na tela a imagem e as pranchas da cena 3D ficam escondidas
+mesmo com a chave ligada, porque o plano atrás da peça apareceria por trás dela
+nas vistas da folha.
+Quando a imagem é a folha de vistas da fonte (`fonte-vistas.png`, com o
+`fonte-partes.json` da mesma peça), as quatro vistas dela têm a câmera que
+`tools/modelar/modelo-de-referencia.mjs` usou, num módulo comum aos dois,
+`src/autoria/quadro-da-fonte.js`. A mesa mostra um quadro de cada vez, e com a
+mesma câmera ligada a peça vai para a câmera dele (`olharComoReferencia` do
+ambiente): ortográfica, no centro da caixa da fonte levado à cena e com o quadro
+cabendo inteiro no canvas, do mesmo jeito que a imagem cabe inteira no lado da
+referência. As duas metades têm o mesmo tamanho, então a peça e o quadro saem na
+mesma escala e no mesmo lugar, e na sobreposta um cai sobre o outro. A lateral,
+a frontal e a de cima são as vistas da bancada; a isométrica da folha olha de um
+ponto um pouco diferente da isométrica da bancada. O vínculo vale nos dois
+sentidos: escolher a vista da referência leva a peça, e escolher na peça outra
+vista que a folha tem troca o quadro. Enquadrar, focar, girar ou pedir de novo a
+vista em vigor mexem só na peça, e o cabeçalho deixa de dizer que ela está na
+vista da referência. Imagem sem câmera conhecida aparece inteira, e a mesma
+câmera fica desligada. No furgão, em 1400 por 900 com a árvore aberta, a peça e
+a referência têm 580 pixels cada e a mesa tem 1160 (83% da janela), e a caixa
+da silhueta da peça e a do quadro coincidem a menos de um pixel nas quatro
+vistas.
 
 A captura automática não herda o tema: a auditoria esconde tudo o que não é a
 cena, e a cena volta ao fundo, à luz e à falta de grade, chão, sombra e contorno

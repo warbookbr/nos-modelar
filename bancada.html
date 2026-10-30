@@ -41,6 +41,10 @@
         <symbol id="i-casa" viewBox="0 0 24 24"><path d="M4.5 11 12 4.5l7.5 6.5M6.5 9.5v9h11v-9" /></symbol>
         <symbol id="i-grade" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M9 4v16M15 4v16" /></symbol>
         <symbol id="i-chao" viewBox="0 0 24 24"><path d="M3 17h18M6 13.5h12M9 10h6" /></symbol>
+        <symbol id="i-lado-a-lado" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="1.5" /><path d="M12 5v14" /></symbol>
+        <symbol id="i-sobreposta" viewBox="0 0 24 24"><rect x="3.5" y="8" width="12" height="11" rx="1.5" /><rect x="8.5" y="4.5" width="12" height="11" rx="1.5" stroke-dasharray="2.4 2" /></symbol>
+        <symbol id="i-vinculo" viewBox="0 0 24 24"><path d="m9.5 14.5 5-5M10.5 6.5l1.5-1.5a3.8 3.8 0 0 1 5.4 5.4L16 11.9M13.5 17.5 12 19a3.8 3.8 0 0 1-5.4-5.4L8 12.1" /></symbol>
+        <symbol id="i-imagem" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5" /><circle cx="8.5" cy="9.5" r="1.6" /><path d="m3.5 17 5-5 4 4 3-3 5 5" /></symbol>
         <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="12" rx="1.5" /><path d="M8.5 7l1.5-2.5h4L15.5 7" /><circle cx="12" cy="13" r="3" /></symbol>
         <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="1" /><path d="M15.5 8.5v-3a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3" /></symbol>
       </defs>
@@ -112,6 +116,52 @@
           </button>
         </div>
       </header>
+
+      <!-- A MESA DO REVISÃO: o cabeçalho da peça, o lado da referência com o
+           cabeçalho dela e a referência sobreposta à peça. Mora numa casa
+           escondida, e só o tema que lhe dá lugar (`mesa`) a põe na tela; o
+           componente é `componentes/mesa-de-revisao.js`. -->
+      <div class="lugar" data-lugar="mesa"></div>
+      <div class="casa-escondida" hidden>
+        <section id="mesaComparacao" class="mesa-comparacao" data-movel="mesa-comparacao" data-comparacao="sem-referencia" aria-label="Peça e referência">
+          <header class="cabeca-peca">
+            <b>Peça</b>
+            <span id="vistaDaPeca" class="vista-da-peca"></span>
+            <span id="edicaoDaPeca" class="chip-edicao" hidden></span>
+            <button id="notasDaPeca" class="chip-notas" type="button" title="Anotações" hidden></button>
+            <button id="btnMostrarReferencia" class="mostrar-referencia" type="button" title="Mostrar a referência ao lado">
+              <svg class="icone" aria-hidden="true"><use href="#i-imagem"></use></svg>Referência
+            </button>
+          </header>
+          <section class="lado-referencia" aria-label="Referência">
+            <header class="cabeca-referencia">
+              <b>Referência</b>
+              <span class="sem-referencia">esta peça não tem imagem de referência</span>
+              <div class="escolha-vista-referencia">
+                <button id="btnVistaReferencia" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menuVistasReferencia" title="Vista da referência">
+                  <span id="nomeVistaReferencia">Imagem inteira</span><span class="seta" aria-hidden="true">▾</span>
+                </button>
+                <div id="menuVistasReferencia" class="menu-vistas-referencia" role="menu" aria-label="Vista da referência" hidden></div>
+              </div>
+              <div class="controles-referencia">
+                <label class="opacidade-referencia" title="Transparência da referência sobre a peça">
+                  <input id="opacidadeReferencia" type="range" min="10" max="90" step="5" value="50" aria-label="Transparência da referência" />
+                  <output id="valorOpacidadeReferencia" for="opacidadeReferencia">50%</output>
+                </label>
+                <div class="segmento" role="group" aria-label="Comparação">
+                  <button type="button" data-comparar="ao-lado" aria-pressed="true" title="Lado a lado"><svg class="icone" aria-hidden="true"><use href="#i-lado-a-lado"></use></svg><span class="sr">Lado a lado</span></button>
+                  <button type="button" data-comparar="sobreposta" aria-pressed="false" title="Sobreposta, com transparência"><svg class="icone" aria-hidden="true"><use href="#i-sobreposta"></use></svg><span class="sr">Sobreposta</span></button>
+                </div>
+                <button id="btnMesmaCamera" class="botao-icone" type="button" aria-pressed="true" title="Mesma câmera: ligada"><svg class="icone" aria-hidden="true"><use href="#i-vinculo"></use></svg><span class="sr">Mesma câmera</span></button>
+                <button id="btnEsconderReferencia" class="botao-icone" type="button" title="Esconder a referência"><svg class="icone" aria-hidden="true"><use href="#i-olho"></use></svg><span class="sr">Esconder a referência</span></button>
+              </div>
+            </header>
+            <div class="quadro-referencia"><div id="imagemReferenciaAoLado" class="imagem-referencia" role="img" aria-label="Imagem de referência"></div></div>
+          </section>
+          <div class="sobreposicao-referencia" aria-hidden="true"><div id="imagemReferenciaSobreposta" class="imagem-referencia"></div></div>
+          <img id="cargaReferencia" class="carga-referencia" alt="" hidden />
+        </section>
+      </div>
 
       <!-- O cubo de orientação gira com a câmera e cada face leva à vista dela; as
            faces têm `data-vista`, então a barra das vistas as liga como liga os
@@ -351,8 +401,8 @@
 
           <div class="acoes-inspecao">
             <button id="btnSelecionarConjunto" class="botao" type="button" disabled>Selecionar conjunto</button>
-            <button id="btnFocarSelecao" data-movel="focar" class="botao primaria" type="button" disabled title="Focar seleção"><svg class="icone" data-arrumacoes="bancada" aria-hidden="true"><use href="#i-focar"></use></svg><span>Focar seleção</span></button>
-            <button id="btnCopiarEstado" data-movel="copiar-vista" class="botao" type="button" title="Copiar vista"><svg class="icone" data-arrumacoes="bancada" aria-hidden="true"><use href="#i-copiar"></use></svg><span>Copiar vista</span></button>
+            <button id="btnFocarSelecao" data-movel="focar" class="botao primaria" type="button" disabled title="Focar seleção"><svg class="icone" data-arrumacoes="bancada" aria-hidden="true"><use href="#i-focar"></use></svg><span data-rotulo="focar">Focar seleção</span></button>
+            <button id="btnCopiarEstado" data-movel="copiar-vista" class="botao" type="button" title="Copiar vista"><svg class="icone" data-arrumacoes="bancada" aria-hidden="true"><use href="#i-copiar"></use></svg><span data-rotulo="copiar-vista">Copiar vista</span></button>
           </div>
 
           <!-- Juntas morava na barra de botões, ao lado de Abrir, Controles e

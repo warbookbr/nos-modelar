@@ -1,11 +1,14 @@
 /* styles.css — a aparência e a arrumação da bancada, sobre as definições de `sistema-visual.css`.
  *
  * Nenhuma cor, tamanho de fonte ou espaçamento é escrito aqui: tudo sai das variáveis do sistema visual, e
- * `estilo/sistema-visual.test.js` reprova o que escapar delas. A folha tem três partes. A primeira desenha os controles
- * e os componentes, que são os mesmos em todos os temas. A segunda é a arrumação clássica, a da bancada de antes dos
- * temas, com os painéis fixos dos lados e a fileira das vistas no alto, que os temas Bancada e Revisão usam por
- * enquanto. A terceira é a arrumação do Foco, com a peça na tela inteira e os controles em painéis flutuantes. O tema
- * escolhe a arrumação pelo atributo `data-arrumacao` da raiz da página (`temas/temas.js`). */
+ * `estilo/sistema-visual.test.js` reprova o que escapar delas. A folha tem quatro partes. A primeira desenha os
+ * controles e os componentes, que são os mesmos em todos os temas. A segunda é a arrumação clássica, a da bancada de
+ * antes dos temas, com os painéis fixos dos lados e a fileira das vistas no alto; nenhum tema a pede mais, mas as regras
+ * dela valem para toda arrumação que não é a do Foco, e as do Bancada e do Revisão as desfazem onde atrapalham. A
+ * terceira é a arrumação do Foco, com a peça na tela inteira e os controles em painéis flutuantes, e a quarta a do tema
+ * Bancada, com os painéis fixos dos lados. A arrumação do Revisão, com a peça e a referência lado a lado, mora na folha
+ * dela, `temas/revisao.css`. O tema escolhe a arrumação pelo atributo `data-arrumacao` da raiz da página
+ * (`temas/temas.js`). */
 
 /* ========================================================================== */
 /* Base                                                                       */

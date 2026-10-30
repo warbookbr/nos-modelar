@@ -55,6 +55,15 @@ describe('contas do cartão', () => {
     const cartao = { largura: 304, altura: 200 };
     expect(posicaoDoCartao({ caixa: { esquerda: -0.2, direita: 0, base: -0.4, topo: -0.2 }, tela, cena, cartao })).toEqual({ x: 672, y: 417 });
   });
+
+  it('no Revisão segue a parte no lado da peça e não sobe acima do alto dele', () => {
+    const tela = { largura: 1400, altura: 900 };
+    const cartao = { largura: 304, altura: 200 };
+    /* O lado da peça no Revisão: 580 por 788 pixels, a partir de (240, 84). */
+    const cena = { esquerda: 240, topo: 84, largura: 580, altura: 788 };
+    expect(posicaoDoCartao({ caixa: { esquerda: -0.2, direita: 0, base: -0.4, topo: -0.2 }, tela, cartao, cena })).toEqual({ x: 554, y: 496 });
+    expect(posicaoDoCartao({ caixa: { esquerda: 0.6, direita: 0.9, base: 0.8, topo: 1.2 }, tela, cartao, cena })).toEqual({ x: 815, y: 92 });
+  });
 });
 
 describe('cartão da seleção', () => {

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1676 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1681 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1766,6 +1766,7 @@
 - `posicao-por-porta.js` — posicao-por-porta.js — a pose de uma instância derivada do encaixe de uma porta dela numa porta de outra instância já construída.
 - `primitivas-forma-global.js` — Primitivas do nível zero na forma global N2: cone (com tronco), esfera, anel, revolução de perfil, extrusão de perfil côncavo e tubo por pontos com raio de c…
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
+- `quadro-da-fonte.js` — quadro-da-fonte.js — as quatro câmeras da folha de vistas de uma fonte (`fonte-vistas.png`), num lugar só para a ferramenta que a desenha e a bancada que a m…
 - `razoes-da-peca.js` — razoes-da-peca.js — as razões que a receita declara, medidas na malha da peça executada.
 - `razoes-da-peca.test.js` — razoes-da-peca.test.js — as razões que a receita declara, medidas na malha da peça executada: a picape de altura 0,29 do comprimento fora da faixa [0,30, 0,4…
 - `refinamento-global.js` — refinamento-global.js — a receita detalhada refina um andaime da forma global N2.
@@ -1825,7 +1826,7 @@
 
 - `aba-anotacoes.js` — aba-anotacoes.js — a aba Anotações do painel da direita: a lista das anotações da sessão, com editar e excluir, e os dois jeitos de anotar, geral e no ponto …
 - `aba-anotacoes.test.js` — aba-anotacoes.test.js — a lista das anotações se redesenha a cada entrega, edita e exclui pelo sincronizador, e os dois jeitos de anotar chegam à sessão e à …
-- `arquivos-da-pagina.js` — arquivos-da-pagina.js — o que entra e sai da bancada como arquivo pelo navegador: o texto baixado para a pasta da pessoa e a imagem lida de um endereço.
+- `arquivos-da-pagina.js` — arquivos-da-pagina.js — o que entra e sai da bancada como arquivo pelo navegador: o texto baixado para a pasta da pessoa, a imagem e o JSON lidos de um ender…
 - `arquivos-da-pagina.test.js` — arquivos-da-pagina.test.js — baixar põe o texto num link com o nome do arquivo, e a imagem lida resolve ou rejeita.
 - `avisos.js` — avisos.js — o aviso passageiro de baixo da cena e a faixa de erro da bancada.
 - `avisos.test.js` — avisos.test.js — o aviso aparece, some sozinho e reinicia a contagem com aviso novo; o erro mostra a pilha quando há.
@@ -1855,6 +1856,8 @@
 - `menu-abrir.js` — menu-abrir.js — a janela Abrir da barra superior: a lista das receitas do acervo em trabalho, com as de ensaio marcadas.
 - `menu-controles.js` — menu-controles.js — a janela Controles da barra superior: os comandos de teclado agrupados por assunto, a troca de tecla de cada um e a volta aos padrões.
 - `menu-estado.js` — menu-estado.js — a janela Estado da barra superior: o resumo do que está carregado e da ligação com a sessão, e a sequência de eventos desde que a página abriu.
+- `mesa-de-revisao.js` — mesa-de-revisao.js — a mesa do tema Revisão: o cabeçalho da peça, o lado da referência com o cabeçalho dela (a vista, ao lado ou sobreposta, a transparência,…
+- `mesa-de-revisao.test.js` — mesa-de-revisao.test.js — a mesa do Revisão marca o modo, nomeia a vista da peça, lista as vistas da referência, recorta o quadro escolhido e escreve a compa…
 - `nome-da-peca.js` — nome-da-peca.js — o nome da peça e o estado da sessão no grupo do alto à esquerda do tema Foco.
 - `nome-da-peca.test.js` — nome-da-peca.test.js — o grupo do alto escreve o nome da peça e o estado da sessão com o mesmo texto da janela Estado.
 - `paineis-do-tema.js` — paineis-do-tema.js — os painéis que o tema deixa abrir sobre a cena (a árvore das partes e o painel da direita), quem os abre e fecha, e a regra que recolhe …
@@ -1921,6 +1924,8 @@
 - `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
 - `prancha-overlay.test.js` — prancha-overlay.test.js — plano de foto é apresentação, não modelo procedural.
 - `punho-da-imagem.js` — punho-da-imagem.js — arrastar a imagem de referência na cena.
+- `referencia-ao-lado.js` — referencia-ao-lado.js — a referência da mesa do tema Revisão: a imagem que a aba de referência tem, as vistas dela e a câmera da peça posta na câmera da vist…
+- `referencia-ao-lado.test.js` — referencia-ao-lado.test.js — a câmera de um quadro da folha posta na cena projeta a peça onde a câmera da fonte a projetou, as vistas da folha seguem as da b…
 
 ## src/bancada/sessao/
 

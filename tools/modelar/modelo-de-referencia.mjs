@@ -16,18 +16,13 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decidirFrente } from './frente-da-fonte.mjs';
+import { QUADRO_DA_FONTE, VISTAS_DA_FONTE, enquadramentoDaFonte } from '../../src/autoria/quadro-da-fonte.js';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
-/** As quatro câmeras de `vistas.png`: posição relativa ao centro (a câmera olha para o centro) e vetor para cima. A folha comparativa renderiza a receita com as mesmas. */
-export const VISTAS_DA_FONTE = [['isométrica frente-direita', [1, 0.7, 1.2], [0, 1, 0]], ['lateral direita (frente à esquerda)', [1, 0, 0], [0, 1, 0]], ['frontal (de frente)', [0, 0, 1], [0, 1, 0]], ['de cima (frente embaixo)', [0, 1, 0], [0, 0, -1]]];
-/** O quadro de cada vista em `vistas.png`, em pixel: 640 por 480, no canto (coluna, linha) da folha de 1280 por 960. */
-export const QUADRO_DA_FONTE = { W: 640, H: 480, folga: 1.1 };
-/** O centro da caixa e o raio (metade da diagonal) com que as câmeras ortográficas da fonte enquadram: a meia altura visível é `raio * folga`. Entrada: o campo `total` do `partes.json`, em metro. */
-export function enquadramentoDaFonte(total) {
-  const t = total.tamanho;
-  return { centro: [0, 1, 2].map((i) => (total.minimo[i] + total.maximo[i]) / 2), raio: Math.hypot(...t) / 2 };
-}
+/* As quatro câmeras de `vistas.png`, o quadro e o enquadramento moram em `src/autoria/quadro-da-fonte.js`, que a bancada também lê para pôr a
+   câmera da peça na de um quadro da folha; daqui saem como antes para a folha comparativa e os testes. */
+export { QUADRO_DA_FONTE, VISTAS_DA_FONTE, enquadramentoDaFonte };
 
 const PAGINA = `<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#f4f2ee;font-family:sans-serif">
 <script type="importmap">{"imports":{"three":"/three/build/three.module.js","three/addons/":"/three/examples/jsm/"}}</script>

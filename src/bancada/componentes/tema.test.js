@@ -57,17 +57,21 @@ describe('componente do tema', () => {
     expect($('btnJuntas').textContent).toBe('Editar');
   });
 
-  it('trocar para o Revisão devolve cada móvel para a casa dele e o rótulo da página', () => {
+  it('o Revisão tem arrumação própria, leva os móveis para os lugares dele e pede a cena do Foco', () => {
     const { documento, $, tema, guardado, aoMudarCena } = montar('foco');
     tema.escolher('revisao');
     const raiz = documento.documentElement;
-    expect([raiz.dataset.tema, raiz.dataset.cores, raiz.dataset.arrumacao]).toEqual(['revisao', 'claro', 'classica']);
-    const nav = documento.querySelector('.vistas');
-    expect(nav.children.map((filho) => filho.id || filho.dataset.vista)).toEqual(['frontal', 'btnProjecao', 'btnEnquadrar']);
-    expect($('btnJuntas').parentNode.classList.contains('painel')).toBe(true);
-    expect($('btnJuntas').textContent).toBe('Juntas');
+    expect([raiz.dataset.tema, raiz.dataset.cores, raiz.dataset.arrumacao]).toEqual(['revisao', 'claro', 'revisao']);
+    const barraCena = documento.querySelector('[data-lugar="barra-cena"]');
+    expect(barraCena.children.map((filho) => filho.id)).toEqual(['btnProjecao', 'btnEnquadrar']);
+    expect(documento.querySelector('.vistas').children.map((filho) => filho.dataset.vista)).toEqual(['frontal']);
+    expect($('btnJuntas').parentNode.dataset.lugar).toBe('topo-peca');
+    expect($('btnJuntas').textContent).toBe('Editar');
     expect(guardado).toEqual(['revisao']);
-    expect(aoMudarCena).toHaveBeenLastCalledWith(null, expect.objectContaining({ id: 'revisao' }));
+    expect(aoMudarCena).toHaveBeenLastCalledWith(
+      { fundo: '#f2f4f3', grade: '#c3c9c6', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '#c2531b' },
+      expect.objectContaining({ id: 'revisao' }),
+    );
   });
 
   it('a Bancada tem arrumação própria, leva as juntas para o alto como Editar e pede a cena em degradê', () => {
@@ -95,7 +99,7 @@ describe('componente do tema', () => {
     tema.escolher('foco');
     expect($('abaInspecao').textContent).toBe('Seleção');
     tema.escolher('revisao');
-    expect($('abaInspecao').textContent).toBe('Inspeção');
+    expect($('abaInspecao').textContent).toBe('Seleção');
   });
 
   it('o caso da tela é a edição com um modo ligado, a parte com algo escolhido e a peça sem nada', () => {

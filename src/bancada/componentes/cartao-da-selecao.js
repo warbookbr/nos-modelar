@@ -7,8 +7,8 @@
  *
  * A posição sai de `caixaNaTela()`, a caixa da seleção em coordenadas normalizadas da cena, a cada quadro enquanto o
  * cartão está à vista: a câmera gira e o cartão acompanha a parte. A conta é `posicaoDoCartao`, pura. A cena é o retângulo
- * do canvas (`cena`), que no tema Bancada fica entre os painéis fixos e não começa na borda da janela; sem ele vale a
- * janela inteira. */
+ * do canvas (`cena`), que no tema Bancada fica entre os painéis fixos e no Revisão é só o lado da peça, e não começa na
+ * borda da janela; sem ele vale a janela inteira. */
 import { formatarNome } from '../formatar.js';
 
 /** As margens da tela que o cartão não cobre: a barra do alto, a barra de estado e os lados. */
@@ -29,7 +29,9 @@ export function posicaoDoCartao({ caixa, tela, cartao, cena = tela, margens = MA
   let x = direita + AFASTAMENTO;
   if (x > limiteDireito) x = esquerda - AFASTAMENTO - cartao.largura;
   x = Math.min(Math.max(x, margens.esquerda), Math.max(margens.esquerda, limiteDireito));
-  const y = Math.min(Math.max(meio - cartao.altura / 2, margens.topo), Math.max(margens.topo, tela.altura - margens.base - cartao.altura));
+  /* O cartão não sobe acima do alto da cena, que no Revisão começa abaixo do cabeçalho da peça. */
+  const topo = Math.max(margens.topo, (cena.topo ?? 0) + AFASTAMENTO / 3);
+  const y = Math.min(Math.max(meio - cartao.altura / 2, topo), Math.max(topo, tela.altura - margens.base - cartao.altura));
   return { x: Math.round(x), y: Math.round(y) };
 }
 
