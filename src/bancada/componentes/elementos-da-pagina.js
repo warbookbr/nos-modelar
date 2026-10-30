@@ -124,6 +124,7 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       botoes: Object.fromEntries([...documento.querySelectorAll('[data-cartao]')].map((botao) => [botao.dataset.cartao, botao])),
       opacidade: id('opacidadeCartao'),
       valorOpacidade: id('valorOpacidadeCartao'),
+      cena: id('cenaBancada'),
     },
     cuboDeOrientacao: { corpo: id('corpoCubo') },
     barraDeEdicao: {
@@ -132,6 +133,7 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       btnMalha: id('btnModoMalha'),
       btnDesfazer: id('btnDesfazerEdicao'),
       btnDescartar: id('btnDescartarEdicao'),
+      btnInspecionar: id('btnInspecionar'),
     },
     barraDeEstado: {
       barra: id('barraEstado'),
@@ -144,6 +146,7 @@ export function lerElementosDaPagina(documento = globalThis.document) {
     },
     nomeDaPeca: { nome: id('nomePecaFoco'), sessao: id('estadoSessaoFoco') },
     popoverDaCena: { botao: id('btnCena'), caixa: id('popoverCena') },
+    popoverDaCamera: { botao: id('btnCamera'), caixa: id('popoverCamera') },
     referenciaMetrica: {
       eixos: id('eixosReferencia'),
       barra: id('barraReferencia'),

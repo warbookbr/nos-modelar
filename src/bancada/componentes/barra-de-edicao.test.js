@@ -9,7 +9,8 @@ const MARCACAO = `
   <div id="barraEdicao" hidden>
     <button id="btnModoJuntas" aria-pressed="false"></button><button id="btnModoMalha" aria-pressed="false"></button>
     <button id="btnDesfazerEdicao"></button><button id="btnDescartarEdicao"></button>
-  </div>`;
+  </div>
+  <button id="btnInspecionar" aria-pressed="true"></button>`;
 
 function montar() {
   const pagina = criarPagina(MARCACAO);
@@ -48,5 +49,20 @@ describe('barra do modo de edição', () => {
     const { $, acoes } = montar();
     for (const id of ['btnModoJuntas', 'btnModoMalha', 'btnDesfazerEdicao', 'btnDescartarEdicao']) $(id).click();
     expect(Object.values(acoes).map((acao) => acao.mock.calls.length)).toEqual([1, 1, 1, 1]);
+  });
+
+  it('Inspecionar fica marcado sem modo ligado e, clicado, desliga o modo que estiver ligado', () => {
+    const { $, estado, acoes } = montar();
+    $('btnInspecionar').click();
+    expect(acoes.alternarModoJuntas).not.toHaveBeenCalled();
+    estado.definir({ juntas: { ...JUNTAS, modo: true } });
+    expect($('btnInspecionar').getAttribute('aria-pressed')).toBe('false');
+    $('btnInspecionar').click();
+    expect(acoes.alternarModoJuntas).toHaveBeenCalledTimes(1);
+    estado.definir({ juntas: JUNTAS, malhaEmEdicao: true });
+    $('btnInspecionar').click();
+    expect(acoes.alternarEdicaoDeMalha).toHaveBeenCalledTimes(1);
+    estado.definir({ malhaEmEdicao: false });
+    expect($('btnInspecionar').getAttribute('aria-pressed')).toBe('true');
   });
 });
