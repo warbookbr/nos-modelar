@@ -17,7 +17,7 @@ import { criarControladorPartes } from '../controlar-partes.js';
 import { empacotarNeutro, desempacotarNeutro, impressaoDoNeutro } from './calculo-da-curvatura.js';
 import { criarSeletorDeVisao } from './registro-de-visoes.js';
 import { estadoDaCurvatura, legendaDaCurvatura } from './visao-curvatura.js';
-import { azimuteDaLuzRasante, INTENSIDADE_DA_LUZ } from './visao-luz-rasante.js';
+import { azimuteDaLuzRasante, elevacaoDaLuzRasante, INTENSIDADE_DA_LUZ } from './visao-luz-rasante.js';
 import { superficiesDe } from './materiais-da-visao.js';
 
 function pecaNaCena(receita, { nome, neutro = executarReceita(receita).neutro, comReceita = true } = {}) {
@@ -196,13 +196,20 @@ describe('zebra e luz rasante na bancada', () => {
     const fosco = superficiesDe(peca.modelo.raiz)[0].material;
     expect(fosco.isMeshLambertMaterial).toBe(true);
     expect(fosco.toneMapped).toBe(false);
-    /* a chapa vista de cima: a direção sai da escolha pela vista, e fica com a peça refeita */
+    /* a chapa vista de cima: a luz sai da escolha pela vista, a 10 graus do plano da imagem e ao longo da dobra (x, a até 10
+       graus), que a parte caída recebe perto de 9 graus; e fica com a peça refeita */
     const azimute = azimuteDaLuzRasante(ambiente);
-    expect(Number.isFinite(azimute)).toBe(true);
+    expect(Math.abs(Math.sin((azimute * Math.PI) / 180))).toBeLessThan(Math.sin((10.5 * Math.PI) / 180));
+    expect(elevacaoDaLuzRasante(ambiente)).toBe(10);
+    const [sol] = sois();
+    const viaja = sol.target.position.clone().sub(sol.position).normalize();
+    expect(viaja.y).toBeCloseTo(-Math.sin((10 * Math.PI) / 180), 6);
+    expect(Math.abs(viaja.x)).toBeGreaterThan(Math.cos((10 * Math.PI) / 180) * Math.cos((10.5 * Math.PI) / 180));
     const refeita = pecaNaCena(receitaComVinco, { nome: 'lataria-com-vinco', neutro: peca.modelo.neutro, comReceita: false });
     seletor.prender(refeita.contexto(ambiente));
     expect(sois()).toHaveLength(1);
     expect(azimuteDaLuzRasante(ambiente)).toBe(azimute);
+    expect(elevacaoDaLuzRasante(ambiente)).toBe(10);
     expect(ambiente.luzes.map((l) => l.visible)).toEqual([false, false, false]);
 
     seletor.escolher('solida');

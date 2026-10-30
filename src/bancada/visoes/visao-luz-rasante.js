@@ -1,14 +1,22 @@
-/* visao-luz-rasante.js — a visão Luz rasante da bancada: uma luz de sol a 10 graus do plano da imagem, com sombra, sobre a peça
+/* visao-luz-rasante.js — a visão Luz rasante da bancada: uma luz de sol baixa sobre o plano da imagem, com sombra, sobre a peça
  * em material fosco, com o resto da iluminação do estúdio apagado, como `tools/blender/luz-rasante.py`.
  *
- * A LUZ ACOMPANHA A CÂMERA. A elevação de 10 graus é medida do plano da imagem, como no Blender (`direcaoDaLuz`, de
- * `azimute-da-luz.js`), por isso a cada quadro a luz é reposta pelo quadro da câmera: girar a peça deixa a luz rasante para o que
- * se vê, e o lado visto não escurece. O azimute, a direção dentro do plano da imagem, começa pela conta de `escolher_azimutes` para
- * a vista em que a peça abre, feita para uma luz só (`escolherAzimutes` com `unico`, sobre as normais dos triângulos voltados para a
- * câmera), e muda no controle que aparece só com a visão ligada, que também o escolhe de novo para a vista do momento.
+ * A LUZ ACOMPANHA A CÂMERA. A elevação é medida do plano da imagem, como no Blender (`direcaoDaLuz`, de `azimute-da-luz.js`), por
+ * isso a cada quadro a luz é reposta pelo quadro da câmera: girar a peça deixa a luz rasante para o que se vê, e o lado visto não
+ * escurece. O azimute, a direção dentro do plano da imagem, e a elevação começam pela conta de `escolherLuz` para a vista em que a
+ * peça abre, sobre as normais dos triângulos voltados para a câmera: a luz que deixa ler melhor uma inclinação pequena na peça
+ * vista, sem contar o que fica na sombra e descontando o que estoura no branco. A elevação é a de 10 graus do Blender sempre que
+ * a peça vista encara a câmera (a vista de cima de uma chapa, a de lado de uma lateral) e sobe quando ela se inclina para longe
+ * do plano da imagem, como numa vista de três quartos, em que a 10 graus a luz chega de frente às faces voltadas para ela. O
+ * azimute muda no controle que aparece só com a visão ligada, mantendo a elevação, e o botão escolhe os dois de novo para a vista
+ * do momento.
  *
- * O BRILHO é o do Blender: o fosco tem albedo 0,8 e nenhuma luz de ambiente, e a luz tem a força que leva a superfície voltada
- * para a câmera a 0,2 de radiância linear (`ALVO_LINEAR` e `sol.energy` de `luz-rasante.py`), sem o mapeamento de tons da cena.
+ * O BRILHO é o do Blender: o fosco tem albedo 0,8 e nenhuma luz de ambiente, e a luz tem a força que leva a superfície a 10 graus
+ * dela a 0,2 de radiância linear (`ALVO_LINEAR` e `sol.energy` de `luz-rasante.py`, em que essa superfície é a voltada para a
+ * câmera), sem o mapeamento de tons da cena. Medido em 2026-10-30 na peça de prova com vinco vista de cima: o contraste da região
+ * do amassado em cada azimute, a 10 graus, é o da imagem do Blender com os mesmos azimutes (0,0233 contra 0,0234 a 0 grau, 0,0078
+ * contra 0,0080 a 30). O que estourava a lateral da carenagem de prova era a direção, e não o brilho, a intensidade, o espaço de
+ * cor ou a falta de luz de ambiente, que o Blender também não tem.
  *
  * DESFAZER NÃO DEIXA RESTO: a luz e o mapa de sombra dela saem da cena e são descartados, as luzes do estúdio voltam a como
  * estavam, e os materiais do autor voltam à peça. Uma peça nova que chega com a visão ligada (`aplicar` sem `desfazer`) reaproveita
@@ -17,13 +25,13 @@
  * A visão não toca a página: o relógio de quadros e o controle da direção vêm da caixa da visão (`contexto.pagina`,
  * `componentes/caixa-da-visao.js`). */
 import * as THREE from 'three';
-import { AZIMUTE_PREFERIDO, RASANTE_GRAUS, amostrasDaVista, direcaoDaLuz, escolherAzimutes } from './azimute-da-luz.js';
+import { AZIMUTE_PREFERIDO, BRILHO_RASANTE, RASANTE_GRAUS, amostrasDaVista, direcaoDaLuz, escolherLuz } from './azimute-da-luz.js';
 import { restaurarMateriais, superficiesDe, trocarMateriais } from './materiais-da-visao.js';
 
 const ID = 'luz-rasante';
 export const ALBEDO_FOSCO = 0.8;
-export const ALVO_LINEAR = 0.2;
-/** A força da luz (lux, no Three; a irradiância do sol, no Blender) que leva a face voltada para a câmera a `ALVO_LINEAR`. */
+export const ALVO_LINEAR = BRILHO_RASANTE;
+/** A força da luz (lux, no Three; a irradiância do sol, no Blender) que leva a superfície a `RASANTE_GRAUS` dela a `ALVO_LINEAR`. */
 export const INTENSIDADE_DA_LUZ = (Math.PI * ALVO_LINEAR) / (ALBEDO_FOSCO * Math.sin((RASANTE_GRAUS * Math.PI) / 180));
 const NOME_DA_LUZ = '__luz_rasante__';
 
@@ -31,7 +39,7 @@ const estados = new WeakMap();
 const SEM_AMBIENTE = {};
 function estadoDe(ambiente) {
   const chave = ambiente ?? SEM_AMBIENTE;
-  if (!estados.has(chave)) estados.set(chave, { ativa: false, luz: null, apagadas: [], pararQuadro: null, contexto: null, azimute: null, peca: undefined });
+  if (!estados.has(chave)) estados.set(chave, { ativa: false, luz: null, apagadas: [], pararQuadro: null, contexto: null, azimute: null, elevacao: null, peca: undefined });
   return estados.get(chave);
 }
 
@@ -51,8 +59,9 @@ function eixosDaCamera(camera) {
   return { xCam: unit(e[0], e[1], e[2]), yCam: unit(e[4], e[5], e[6]), zCam: unit(e[8], e[9], e[10]) };
 }
 
-/** O azimute de partida para a vista da `camera`: o que `escolherAzimutes` dá a uma luz só, sobre as normais da peça que ela vê. */
-export function azimuteDaVista(grupo, camera) {
+/** A luz de partida para a vista da `camera`, `{ azimute, elevacao, nota, legivel, estourada, sombra }`: a que `escolherLuz` dá sobre
+ * as normais da peça que ela vê, com as `opcoes` dela por cima das da visão. */
+export function luzDaVista(grupo, camera, opcoes = {}) {
   const vista = eixosDaCamera(camera);
   const triangulos = [];
   const p = new THREE.Vector3();
@@ -70,7 +79,7 @@ export function azimuteDaVista(grupo, camera) {
     }
   }
   const { normais, pesos } = amostrasDaVista(triangulos, vista.zCam);
-  return escolherAzimutes(normais, vista, RASANTE_GRAUS, { pesos, unico: true }).azimutes[0];
+  return escolherLuz(normais, vista, { pesos, rasanteGraus: RASANTE_GRAUS, alvo: ALVO_LINEAR, ...opcoes });
 }
 
 const caixa = new THREE.Box3();
@@ -85,7 +94,7 @@ function reporLuz(e) {
   if (caixa.isEmpty()) return;
   caixa.getBoundingSphere(esfera);
   const r = Math.max(esfera.radius, 1e-3);
-  const d = direcaoDaLuz(eixosDaCamera(camera), RASANTE_GRAUS, e.azimute ?? AZIMUTE_PREFERIDO);
+  const d = direcaoDaLuz(eixosDaCamera(camera), e.elevacao ?? RASANTE_GRAUS, e.azimute ?? AZIMUTE_PREFERIDO);
   luz.target.position.copy(esfera.center);
   luz.position.set(esfera.center.x - d[0] * 2 * r, esfera.center.y - d[1] * 2 * r, esfera.center.z - d[2] * 2 * r);
   luz.target.updateMatrixWorld();
@@ -137,6 +146,7 @@ function apagarLuz(e) {
 
 function desenharControle(e) {
   const azimute = e.azimute ?? AZIMUTE_PREFERIDO;
+  const elevacao = e.elevacao ?? RASANTE_GRAUS;
   e.contexto?.pagina?.mostrar(ID, {
     titulo: 'Luz rasante',
     controle: {
@@ -151,18 +161,20 @@ function desenharControle(e) {
     },
     botao: {
       rotulo: 'Escolher pela vista',
-      titulo: 'O azimute em que a luz alcança mais do lado que a câmera vê, ainda rasante para ele.',
+      titulo: 'A direção e a altura em que a luz deixa ler melhor o relevo do que a câmera vê, sem estourar nem deixar na sombra.',
       aoClicar: () => escolherPelaVista(e),
     },
-    linhas: [{ texto: `Sol a ${RASANTE_GRAUS}° do plano da imagem, com sombra; o resto da luz apagado. A direção conta a partir da direita da tela, no sentido de quem sobe.` }],
-    dados: { azimute },
+    linhas: [{ texto: `Sol a ${elevacao}° do plano da imagem, com sombra; o resto da luz apagado. A direção conta a partir da direita da tela, no sentido de quem sobe.` }],
+    dados: { azimute, elevacao },
   });
 }
 
 function escolherPelaVista(e) {
   const camera = e.contexto?.ambiente?.camera;
   if (!camera || !e.contexto?.grupo) return e.azimute;
-  e.azimute = azimuteDaVista(e.contexto.grupo, camera);
+  const luz = luzDaVista(e.contexto.grupo, camera);
+  e.azimute = luz.azimute;
+  e.elevacao = luz.elevacao;
   desenharControle(e);
   reporLuz(e);
   return e.azimute;
@@ -178,7 +190,7 @@ export function aplicarLuzRasante(contexto) {
     if (cena) acenderLuz(e, cena);
     acompanhar(e);
   }
-  /* a peça refeita por uma junta ou por uma operação de malha guarda a direção; outra peça a escolhe pela vista */
+  /* a peça refeita por uma junta ou por uma operação de malha guarda a luz; outra peça a escolhe pela vista */
   const peca = contexto.modelo?.nome ?? null;
   if (e.peca !== peca || e.azimute === null) {
     e.peca = peca;
@@ -199,11 +211,14 @@ export function desfazerLuzRasante(contexto) {
   e.contexto = null;
 }
 
-/** A direção em vigor na cena do `ambiente` (graus), e a troca dela sem o controle, para os testes e as provas. */
+/** A direção e a elevação em vigor na cena do `ambiente` (graus), e a troca delas sem o controle, para os testes e as provas;
+ * sem `elevacao`, a troca mantém a que estava. */
 export const azimuteDaLuzRasante = (ambiente) => estadoDe(ambiente).azimute;
-export function definirAzimuteDaLuzRasante(ambiente, azimute) {
+export const elevacaoDaLuzRasante = (ambiente) => estadoDe(ambiente).elevacao;
+export function definirAzimuteDaLuzRasante(ambiente, azimute, elevacao = undefined) {
   const e = estadoDe(ambiente);
   e.azimute = ((Number(azimute) % 360) + 360) % 360;
+  if (elevacao !== undefined) e.elevacao = Math.min(90, Math.max(0, Number(elevacao)));
   if (e.ativa) { desenharControle(e); reporLuz(e); }
   return e.azimute;
 }
