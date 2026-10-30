@@ -21,6 +21,16 @@ describe('gate da fatia 13: o contato declarado do friso com a chapa', () => {
     expect(c.cobertura.completa).toBe(true);
   }, 120_000);
 
+  it('a moldura de largura variável em volta do vão interpenetra a chapa, com o contato declarado, e nada mais se toca', () => {
+    const neutro = nucleo(prova.passosDaMoldura(), prova.pontos());
+    expect(neutro.orfaos).toEqual([]);
+    const c = contatosDaPeca(neutro, { contatos: prova.CONTATOS_DA_MOLDURA });
+    expect(c.paresEmContato.map(({ par, estado, declarado }) => [par, estado, declarado])).toEqual([[['chapa', 'moldura'], 'interpenetram', true]]);
+    expect(c.naoDeclarados).toEqual([]);
+    expect(c.declaradosSemContato).toEqual([]);
+    expect(c.cobertura.completa).toBe(true);
+  }, 120_000);
+
   it('a aba da borda do vão encosta na chapa com o contato declarado, e nada mais se toca', () => {
     const { pontos, passos } = provaDaAba.passos();
     const neutro = nucleo(passos, pontos);
