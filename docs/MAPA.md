@@ -490,7 +490,6 @@
 - `2026-08-20-validacao-integrada-modelar.md` — Validação integrada do Modelar — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
-- `2026-10-30-glossario-e-entrada-para-pessoas.md` — Glossário e entrada para pessoas — uma página que explica o projeto a quem chega de fora, com os termos que ela usa definidos nela
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -618,6 +617,7 @@
 - `2026-10-24-carroceria-por-rede-de-curvas.md` — Carroceria por rede de curvas — a superfície preenchida entre curvas de feição nomeadas, com o detalhe lido em cortes ampliados
 - `2026-10-25-renomear-para-modelar.md` — Renomear para Modelar — o projeto e o repositório passam a ter um nome só
 - `2026-10-27-bateria-rapida-e-retorno-cedo.md` — Bateria rápida e retorno cedo — a bateria local abaixo de um minuto e a completa abaixo de cinco no CI
+- `2026-10-30-glossario-e-entrada-para-pessoas.md` — Glossário e entrada para pessoas — uma página que explica o projeto a quem chega de fora, com os termos que ela usa definidos nela
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

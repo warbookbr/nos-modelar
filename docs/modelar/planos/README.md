@@ -2,7 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** [glossário e entrada para pessoas](2026-10-30-glossario-e-entrada-para-pessoas.md) (2026-10-30-glossario-e-entrada-para-pessoas.md), ativado em 2026-10-30.
+**Plano ativo:** nenhum.
+
+[Glossário e entrada para pessoas](encerrados/2026-10-30-glossario-e-entrada-para-pessoas.md) fechou em 2026-10-30, com a página de entrada para pessoas aprovada e sem glossário separado.
 
 [Ajustes no núcleo dos veículos](encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) fechou em 2026-10-30, com os onze achados das 27 receitas na ferramenta geral, a calibração do crítico julgada de novo e o acervo de 54 peças igual ao de antes; o sucessor escolhido pela pessoa é o [furgão realista](2026-10-30-furgao-realista.md), em rascunho.
 

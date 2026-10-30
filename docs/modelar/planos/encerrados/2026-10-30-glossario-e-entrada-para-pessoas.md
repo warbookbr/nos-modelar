@@ -1,10 +1,10 @@
 # Glossário e entrada para pessoas — uma página que explica o projeto a quem chega de fora, com os termos que ela usa definidos nela
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com a pessoa aprovando a página de entrada
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [ajustes no núcleo dos veículos](encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md); o [furgão realista](2026-10-30-furgao-realista.md) continua sucessor e ativa depois deste
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [ajustes no núcleo dos veículos](./2026-10-21-ajustes-no-nucleo-dos-veiculos.md); o [furgão realista](../2026-10-30-furgao-realista.md) continua sucessor e ativa depois deste
 
 ## Problema observado
 
@@ -58,3 +58,5 @@ O risco é a página virar segundo documento de uso, longa e com regra: ela só 
 Ativado em 2026-10-30, a pedido da pessoa, logo depois do fechamento do plano dos veículos e antes do furgão realista.
 
 Fatias 1 a 3 feitas em 2026-10-30. O levantamento contou os termos próprios nos documentos de uso, nas skills, no `CLAUDE.md`, nos guias de modelagem e nas mensagens das ferramentas: 82 com cinco ocorrências ou mais, de peça (709) a legibilidade cega (5); o glossário separado saiu do plano pela decisão 2, e o levantamento serviu para escolher os termos da página e achar onde cada um é definido. Acervo, gate, skill, fatia e brief não têm definição em documento, só no código e no uso, e porta, neutro e contrato têm mais de um sentido sem documento que os reúna. A página `docs/COMECE-AQUI.md` explica o projeto em cerca de 1.800 palavras, com cada termo próprio ligado ao documento que o define e a seção Palavras do projeto resumindo os catorze termos; ela é ligada pelo README e pelo `docs/RECURSOS.md`, que o índice da documentação alcança, sem aumentar a leitura obrigatória de nenhum roteiro. Um leitor sem contexto respondeu certo às seis perguntas do gate lendo só a página, em cerca de seis minutos, e o que o confundiu foi corrigido: as partes do avião contadas como peças, a diferença entre rodada e laço, a palavra produto, as juntas da bancada, os nomes das peças, a relação entre roteiro e skill e a colisão em movimento sem exemplo. A frase que dizia não haver encaixe entre peças nem verificação de colisão em movimento estava errada e foi trocada pelo limite real da conferência da articulação.
+
+Fechado em 2026-10-30, com a página de entrada aprovada pela pessoa e ligada pelo README; o glossário separado ficou fora pela decisão 2.
