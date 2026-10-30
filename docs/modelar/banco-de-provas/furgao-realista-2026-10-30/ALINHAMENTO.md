@@ -28,6 +28,10 @@ A pessoa escolheu, pela recomendação, os para-choques no mesmo plástico escur
 
 A pessoa escolheu, pela recomendação, as rodas pela família `roda-pneu`, com o pneu 225/65 aro 16 (cerca de 710 mm de diâmetro e 225 mm de largura, pneumático com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos. A família ganha duas melhorias gerais, que valem para qualquer veículo: os sulcos ao longo da volta da banda, como num pneu de estrada (hoje ela só faz relevo transversal), e a volta de furos de ventilação na chapa da roda.
 
+## A lataria e o recorte
+
+A pessoa escolheu, pela recomendação, o furgão de carga estático: as portas existem como frestas finas na lataria, sem se mover (as duas dianteiras da cabine, a lateral de correr do lado direito e as duas traseiras de abrir); vidros no para-brisa, nas portas da cabine e nas portas traseiras, com o compartimento de carga fechado nas laterais; lataria lisa com um vinco de cintura discreto ao longo da lateral, nervuras longitudinais no teto alto e uma aba leve nos arcos das rodas; e, como peças à parte, os retrovisores, as maçanetas, o trilho da porta de correr e as lanternas traseiras verticais nas colunas de trás.
+
 ## Em aberto
 
-O recorte (furgão estático, com as linhas das portas como vincos e frestas, ou com portas que abrem; a recomendação é o estático), os faróis, a lataria, as partes, os contatos, a referência visual e os critérios de reprovação.
+Os faróis, as partes, os contatos, a referência visual e os critérios de reprovação.
