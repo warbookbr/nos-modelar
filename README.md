@@ -1,5 +1,9 @@
 # Modelar
 
+Quem chega sem conhecer o projeto começa por
+[`docs/COMECE-AQUI.md`](docs/COMECE-AQUI.md), que explica em poucos minutos o
+que o Modelar é, para quem é e como uma peça nasce e é aprovada.
+
 Oficina procedural para IA criar, organizar, inspecionar, medir e corrigir
 objetos 3D mecânicos: núcleo geométrico, receitas determinísticas, bancada de
 inspeção e ferramentas de validação.
