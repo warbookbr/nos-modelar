@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1672 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1674 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1502,6 +1502,14 @@
 ## procedural/pecas/furgao/
 
 - `receita.js` — furgao — furgão (van) estilizado, azul, de volume único alto e longo, capô curto inclinado, para-brisa grande, cabine que afunila para o teto, painel de teto…
+
+## procedural/pecas/furgao-realista/
+
+- `receita.js` — furgao-realista — cópia do `furgao` do acervo, ponto de partida do furgão realista (plano docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no b…
+
+## procedural/pecas/furgao-realista/referencias/
+
+- `alvo.md` — Alvo: furgao
 
 ## procedural/pecas/furgao/referencias/
 
