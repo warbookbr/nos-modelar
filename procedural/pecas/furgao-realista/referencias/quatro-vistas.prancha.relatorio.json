@@ -79,19 +79,19 @@
       },
       "capoEParaBrisa": {
         "vista": "lateral",
-        "comprimento": 816.32,
-        "retidao": 0.894,
-        "concentracao": 0.075,
+        "comprimento": 816.51,
+        "retidao": 0.899,
+        "concentracao": 0.07,
         "inversoes": 0,
-        "raioMin": 100
+        "raioMin": 90
       },
       "colunaA": {
         "vista": "lateral",
-        "comprimento": 770.26,
-        "retidao": 0.91,
-        "concentracao": 0.065,
+        "comprimento": 769.82,
+        "retidao": 0.844,
+        "concentracao": 0.121,
         "inversoes": 0,
-        "raioMin": 150
+        "raioMin": 300
       },
       "teto": {
         "vista": "lateral",
@@ -159,15 +159,15 @@
       },
       "vidroDaCabine": {
         "vista": "lateral",
-        "comprimento": 3196.56,
-        "retidao": 0.784,
-        "concentracao": 0.131,
+        "comprimento": 3698.62,
+        "retidao": 0.789,
+        "concentracao": 0.121,
         "inversoes": 0,
         "raioMin": 30
       },
       "paraBrisa": {
         "vista": "frontal",
-        "comprimento": 4524.01,
+        "comprimento": 4504.05,
         "retidao": 0.769,
         "concentracao": 0.141,
         "inversoes": 0,
@@ -175,9 +175,9 @@
       },
       "paraBrisaDeCima": {
         "vista": "planta",
-        "comprimento": 4298.71,
-        "retidao": 0.759,
-        "concentracao": 0.141,
+        "comprimento": 4281.91,
+        "retidao": 0.764,
+        "concentracao": 0.146,
         "inversoes": 0,
         "raioMin": 60
       },
@@ -199,9 +199,9 @@
       },
       "portaDaCabine": {
         "vista": "lateral",
-        "comprimento": 5082.49,
-        "retidao": 0.678,
-        "concentracao": 0.191,
+        "comprimento": 6029.79,
+        "retidao": 0.714,
+        "concentracao": 0.166,
         "inversoes": 2,
         "raioMin": 40
       },
@@ -231,11 +231,75 @@
       },
       "bordaDoTeto": {
         "vista": "planta",
-        "comprimento": 10165.37,
+        "comprimento": 10166.18,
         "retidao": 0.829,
         "concentracao": 0.106,
         "inversoes": 0,
         "raioMin": 40
+      },
+      "capoDeCima": {
+        "vista": "planta",
+        "comprimento": 4502.14,
+        "retidao": 0.759,
+        "concentracao": 0.146,
+        "inversoes": 0,
+        "raioMin": 40
+      },
+      "capo": {
+        "vista": "frontal",
+        "comprimento": 3726.02,
+        "retidao": 0.819,
+        "concentracao": 0.121,
+        "inversoes": 0,
+        "raioMin": 30
+      },
+      "parachoqueDianteiro": {
+        "vista": "frontal",
+        "comprimento": 4713.84,
+        "retidao": 0.804,
+        "concentracao": 0.116,
+        "inversoes": 0,
+        "raioMin": 40
+      },
+      "entradaDeAr": {
+        "vista": "frontal",
+        "comprimento": 2808.3,
+        "retidao": 0.809,
+        "concentracao": 0.116,
+        "inversoes": 0,
+        "raioMin": 30
+      },
+      "placaDianteira": {
+        "vista": "frontal",
+        "comprimento": 1042.77,
+        "retidao": 0.819,
+        "concentracao": 0.116,
+        "inversoes": 0,
+        "raioMin": 10
+      },
+      "farolEsq": {
+        "vista": "frontal",
+        "comprimento": 1263.84,
+        "retidao": 0.623,
+        "concentracao": 0.251,
+        "inversoes": 0,
+        "raioMin": 40
+      },
+      "farolDir": {
+        "vista": "frontal",
+        "comprimento": 1263.84,
+        "retidao": 0.623,
+        "concentracao": 0.251,
+        "inversoes": 0,
+        "raioMin": 40
+      },
+      "grade": {
+        "vista": "frontal",
+        "comprimento": 2428.3,
+        "retidao": 0.799,
+        "concentracao": 0.126,
+        "inversoes": 0,
+        "raioMin": 30
       },
       "pneuDianteiro": {
         "vista": "lateral",
@@ -345,11 +409,11 @@
       },
       "baseVidro": {
         "sobre": "capoEParaBrisa",
-        "desvio": 4.73
+        "desvio": 4.26
       },
       "topoVidro": {
         "sobre": "colunaA",
-        "desvio": 2.02
+        "desvio": 4.03
       },
       "teto": {
         "sobre": "teto",
