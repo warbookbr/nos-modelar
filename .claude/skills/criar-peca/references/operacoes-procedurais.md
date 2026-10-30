@@ -786,7 +786,11 @@ vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora d
 forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra serve ao reflexo
 (a continuidade entre painéis), e não ao defeito; para o amassado largo e raso use
 a luz rasante e a curvatura da lataria (`tools/blender/luz-rasante.py` e
-`curvatura-da-lataria.py`, em `docs/modelar/modelar-carroceria.md`).
+`curvatura-da-lataria.py`, em `docs/modelar/modelar-carroceria.md`). A peça com
+passo `subdivisao` é de lataria, e o pacote do crítico dela leva as duas vistas
+(`npm run vistas:critica` com `MODELAR_BLENDER`); a peça de subdivisão que não é
+chapa declara `PLANO.lataria: { dispensa: '<motivo>' }`, e a carroceria de outra
+técnica declara `PLANO.lataria: { partes: [...] }`.
 
 Para a falha de mais de três espaçamentos, rode `npm run alisar --
 <receita.js>` (`tools/modelar/alisar-a-superficie.mjs`) em vez de rodadas de

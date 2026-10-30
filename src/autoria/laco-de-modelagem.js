@@ -36,7 +36,7 @@ function falhar(mensagem) { throw new TypeError(`laço de modelagem: ${mensagem}
  * vem antes do veredito de propósito: peça que nem cumpre o plano não merece
  * olho humano nem de agente.
  */
-export function registrarRodada({ peca, numero, veredito, medidas, partes, atrito = [], notaDePassagem, receita }) {
+export function registrarRodada({ peca, numero, veredito, medidas, partes, atrito = [], notaDePassagem, receita, superficie }) {
   if (typeof peca !== 'string' || peca.trim() === '') falhar('a rodada precisa dizer de que peça é.');
   if (!Number.isInteger(numero) || numero < 1) falhar('o número da rodada começa em 1.');
   if (!medidas || typeof medidas !== 'object') falhar("a rodada precisa trazer 'medidas'.");
@@ -85,7 +85,21 @@ export function registrarRodada({ peca, numero, veredito, medidas, partes, atrit
     /* O QUE ESTA RODADA MUDOU NA RECEITA, gerado pela ferramenta ao gravar:
        a impressão do texto julgado e a diferença para a rodada anterior. */
     ...(receita ? { receita: normalizarReceita(receita) } : {}),
+    /* AS VISTAS DE SUPERFÍCIE QUE O CRÍTICO RECEBEU, na peça de lataria: por que ela é de lataria e os nomes das imagens da luz
+       rasante e da curvatura da lataria do pacote que ele julgou. A ferramenta grava o campo ao conferir o pacote; sem ele, a peça
+       de lataria não fecha (decisão da pessoa em 2026-10-30). */
+    ...(superficie !== undefined && superficie !== null ? { superficie: normalizarSuperficie(superficie, veredito) } : {}),
   };
+}
+
+function normalizarSuperficie(valor, veredito) {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) falhar("'superficie' precisa ser objeto gerado pela ferramenta.");
+  if (!veredito) falhar("'superficie' diz o que o crítico recebeu, e a rodada não traz veredito.");
+  if (typeof valor.lataria !== 'string' || valor.lataria.trim() === '') falhar("'superficie.lataria' precisa dizer por que a peça é de lataria.");
+  if (!Array.isArray(valor.imagens) || valor.imagens.length === 0 || valor.imagens.some((i) => typeof i !== 'string' || i.trim() === '')) {
+    falhar("'superficie.imagens' precisa listar as imagens da luz rasante e da curvatura da lataria.");
+  }
+  return { lataria: valor.lataria.trim(), imagens: valor.imagens.map((i) => i.trim()) };
 }
 
 const LIMITE_NOTA_DE_PASSAGEM = 600;

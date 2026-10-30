@@ -24,6 +24,7 @@
  * um retrato de execução. */
 
 import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../procedural/criterios/index.js';
+import { normalizarLataria } from './lataria.js';
 
 export const FORMATO_PLANO_DE_MODELAGEM = 'mecanifica.plano-de-modelagem';
 export const VERSAO_PLANO_DE_MODELAGEM = 1;
@@ -33,8 +34,10 @@ export const CAMPOS_PLANO = Object.freeze([
 ]);
 /* Campos que o plano pode declarar ou não. `familia` escolhe o arquivo de critérios por família de objeto (assento, veículo, móvel de
    caixa) de `procedural/criterios/`, e `familiaProcedural` é a família de `procedural/familias/` que gerou a peça, de onde o brief do
-   crítico lê as `perguntas` por componente. Plano sem eles produz a mesma forma canônica de antes. */
-export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural']);
+   crítico lê as `perguntas` por componente. `lataria` diz se a peça é de chapa de superfície livre e quais partes são a chapa, ou a
+   dispensa com o motivo (`lataria.js`): o pacote do crítico de peça de lataria leva a luz rasante e a curvatura da lataria. Plano sem
+   eles produz a mesma forma canônica de antes. */
+export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria']);
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
 
@@ -143,6 +146,7 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     criteriosDeReprovacao: listaDeTextos(valor.criteriosDeReprovacao, quem, 'criteriosDeReprovacao', MINIMO_DO_CRITERIO),
     ...(valor.familia === undefined ? {} : { familia: valor.familia }),
     ...(valor.familiaProcedural === undefined ? {} : { familiaProcedural: valor.familiaProcedural }),
+    ...(valor.lataria === undefined ? {} : { lataria: normalizarLataria(valor.lataria, nomes, { quem }) }),
   };
 }
 

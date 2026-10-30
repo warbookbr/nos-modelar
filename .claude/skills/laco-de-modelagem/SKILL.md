@@ -109,6 +109,13 @@ de novo), com o caminho de todas as imagens e o lado de onde cada vista olha. As
 declara `familia` ou `familiaProcedural`, e, quando a receita declara `REFINA.esboco`, a de onde o alvo difere da referência real:
 o para-brisa saliente do avião veio do esboço, passou por dois críticos e só a pessoa o viu.
 
+Na peça de lataria (a receita tem passo `subdivisao` ou declara `PLANO.lataria`), o pacote leva também a luz rasante e a curvatura
+da lataria, que mostram o amassado largo e raso que nenhuma medida e nenhuma vista comum mostram, e elas saem do Blender: rode
+`MODELAR_BLENDER=<caminho do Blender> npm run vistas:critica -- <peça>`. Sem o Blender o comando recusa o pacote, e o `--registrar`
+recusa o veredito do crítico de peça de lataria cujo pacote (o `pacote.json` da pasta da rodada, ou a de `--pacote <pasta>` quando
+você usou `--saida`) não trouxe as duas vistas da versão medida. Não contorne a recusa com a dispensa: `PLANO.lataria.dispensa` é da
+pessoa, para a superfície que não é chapa, e não para a falta do Blender.
+
 Quando a receita declara `REFINA.esboco`, o alvo é a composta da unidade do esboço, gerada pela ferramenta do esboço no momento,
 sobre uma cópia do esboço declarado, e nunca a imagem guardada, que pode ser de uma versão anterior do esboço; a pasta traz também a
 sobreposição dos cortes do modelo com os do sólido do esboço, e o relatório do comando diz o desvio máximo de cada corte. A

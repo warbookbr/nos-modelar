@@ -31,7 +31,14 @@
  *  - as vistas montadas, quando a peça é uma instância de `<objeto>/montagem.json`: as etapas já construídas juntas, com o quadro na
  *    caixa da peça. Duas vezes o crítico errou por ver a peça pequena demais no conjunto: leu um degrau na junta do capô, e a deriva
  *    mais grossa do que é;
- *  - a sobreposição dos cortes do modelo com os do sólido do esboço (`sobreposicao-de-cortes.mjs`), que foi o que desfez esses dois erros.
+ *  - a sobreposição dos cortes do modelo com os do sólido do esboço (`sobreposicao-de-cortes.mjs`), que foi o que desfez esses dois erros;
+ *  - a luz rasante e a curvatura da lataria, quando a peça é de lataria (`src/autoria/lataria.js`): o amassado largo e raso e a quina
+ *    que ondula passam por todas as medidas e pela vista comum, e por decisão da pessoa em 2026-10-30 a peça de lataria não fecha a
+ *    rodada de forma sem as duas no pacote. Elas saem do Blender (`vistas-de-superficie.mjs`), e sem `MODELAR_BLENDER` o pacote de
+ *    peça de lataria é recusado antes de qualquer captura, com o comando.
+ *
+ * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
+ * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
  *
  * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] */
 import { createHash } from 'node:crypto';
@@ -39,6 +46,8 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync,
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { linhaDaVista } from '../../modulos/esboco/src/lados.js';
+import { latariaDaReceita } from '../../src/autoria/lataria.js';
+import { doAmbiente } from '../ambiente.mjs';
 import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { lerPlano } from '../../modulos/esboco/src/plano.js';
 import { vistaDoMesmoOlho } from '../../modulos/esboco/src/referencia.js';
@@ -51,9 +60,12 @@ import { abrirCapturaCompartilhada, olharBancada } from './olhar-bancada.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import {
+  LADO_DA_VISTA_DE_SUPERFICIE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, gravarManifesto, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
+  vistasDeSuperficie,
+} from './vistas-de-superficie.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const SAIDA_PADRAO = join(REPO, 'tools/bancadas/out');
 
 /* Quadro alto por padrão. Peça de máquina costuma ser mais alta que larga, e
    num quadro 16 por 9 a silhueta vertical sai cortada ou minúscula — a própria
@@ -109,17 +121,18 @@ function apagarImagensAntigas(peca, pasta) {
   }
 }
 
-/** A pasta da rodada de uma peça: `critica-<peça>` ao lado das capturas da bancada. */
-export function pastaDaRodada(peca, base = SAIDA_PADRAO) {
-  return join(base, `critica-${peca.replace(/[^A-Za-z0-9._-]+/g, '-')}`);
-}
+/* A pasta da rodada de uma peça (`critica-<peça>` ao lado das capturas da bancada) mora em `vistas-de-superficie.mjs`, que o registro
+   da rodada lê sem carregar a captura. */
+export { pastaDaRodada };
 
 /* Só o que esta ferramenta grava na pasta da rodada sai antes de cada pacote, e nunca a pasta inteira: `--saida` pode ser uma pasta
    que tem mais coisa. Imagem velha ali é imagem julgada sem ninguém perceber que é mais velha que a receita. */
 function limparPastaDaRodada(pasta) {
   if (!existsSync(pasta)) return;
   rmSync(join(pasta, 'pedido.md'), { force: true });
+  rmSync(join(pasta, MANIFESTO_DO_PACOTE), { force: true });
   rmSync(join(pasta, 'alvo'), { recursive: true, force: true });
+  rmSync(join(pasta, PASTA_DA_SUPERFICIE), { recursive: true, force: true });
   for (const nome of readdirSync(pasta)) {
     if (/^(etapas|sobreposicao)-.*\.png$/.test(nome)) rmSync(join(pasta, nome));
   }
@@ -207,9 +220,10 @@ function olhoDaReferencia(caminho, orientacao) {
  * `{ imagem, unidade }` quando a receita refina um esboço (e null sem); `referencias` as imagens `{ caminho }`; `modelo` as imagens
  * do conjunto `{ arquivo, vista }` e `arame` as da malha `{ arquivo, vista, tipo }`; `montado` é `{ instancia, imagens: [{ arquivo,
  * vista }] }` ou null; `sobreposicao` é `{ arquivos, notas }` ou null; `partes` são `{ nome, imagens: [{ arquivo, vista }] }` na ordem do
- * plano; `perguntas` as perguntas específicas da peça.
+ * plano; `perguntas` as perguntas específicas da peça; `superficie` é `{ rasante: [{ arquivo, vista, azimute }], curvatura: [{ arquivo,
+ * vista }] }` na peça de lataria, ou null.
  */
-export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [] }) {
+export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null }) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -269,6 +283,8 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
     ...lista(arame.map(imagem)), '',
   );
 
+  if (superficie) L.push(...secaoDaSuperficie(superficie));
+
   if (montado) {
     L.push(
       '## Montado', '',
@@ -307,6 +323,28 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
 
   L.push('## Veredito', '', `No veredito em JSON, \`onde\`, \`evidencia\` e \`observacao\` têm até ${LIMITE_DO_VEREDITO} caracteres cada, porque o registro recusa o mais longo; o detalhe vai no texto da resposta.`, '');
   return `${L.join('\n')}`;
+}
+
+/* A seção da superfície da peça de lataria. As vistas do Blender têm nomes e lados próprios (`vistas_padrao` de `tools/blender/comum.py`),
+   ditos aqui pelos eixos, e não pelos da bancada. */
+function secaoDaSuperficie({ rasante, curvatura }) {
+  const vistas = Object.keys(LADO_DA_VISTA_DE_SUPERFICIE).filter((v) => [...rasante, ...curvatura].some((i) => i.vista === v));
+  const grau = (n) => `${String(n).replace('.', ',')} graus`;
+  return [
+    '## Superfície', '',
+    'A peça é de chapa, e estas duas vistas mostram o que a sombra das vistas de Modelo esconde: o amassado largo e raso, a ondulação de um '
+    + 'painel que devia ser liso e a quina que não corre por igual. Diga onde a chapa afunda, abaula ou ondula sem que a forma peça. As vistas '
+    + 'desta seção olham destes lados, no quadro da peça:', '',
+    ...lista(vistas.map((v) => `${v}: ${LADO_DA_VISTA_DE_SUPERFICIE[v]}`)), '',
+    'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol a poucos graus do plano da imagem, de duas direções. O painel '
+    + 'liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. '
+    + 'A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.', '',
+    ...lista(rasante.map(({ arquivo, vista, azimute }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima): ${arquivo}`)), '',
+    'A curvatura média da chapa: branco onde ela é plana, vermelho onde abaula para fora e azul onde afunda, na escala escrita em cada '
+    + 'imagem; cinza claro são as peças que não são a chapa, e cinza escuro a faixa junto da borda e das dobras vivas, sem dado. Uma mancha '
+    + 'azul cercada de vermelho num painel que devia ser liso é um afundamento.', '',
+    ...lista(curvatura.map(({ arquivo, vista }) => `${vista}: ${arquivo}`)), '',
+  ];
 }
 
 /* ---------- o alvo, a vista montada e a sobreposição ---------- */
@@ -378,9 +416,13 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     formasDoEsboco: async (bruto, opcao) => (await import('./esboco-solido.mjs')).formasDoEsboco(bruto, opcao),
     olharEtapas: async (arquivo, opcoes) => (await import('./etapas-da-montagem.mjs')).olharEtapas(arquivo, opcoes),
     sobreposicaoDeCortes: async (opcoes) => (await import('./sobreposicao-de-cortes.mjs')).sobreposicaoDeCortes(opcoes),
+    vistasDeSuperficie,
     ...dependencias,
   };
+  const blender = Object.hasOwn(dependencias, 'blender') ? dependencias.blender : doAmbiente('BLENDER');
   const caminho = resolverCaminhoReceita(peca);
+  /* a impressão do texto que o pacote mostra, a mesma que a medição da rodada grava */
+  const impressao = impressaoDoTexto(readFileSync(caminho, 'utf8'));
   const receita = receitaDoModulo(await importarReceita(caminho));
   const partes = partesDoPlano(receita);
   /* o que se confere antes de gastar minutos em captura: o plano, as imagens de referência e o esboço que a receita refina */
@@ -389,6 +431,9 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   if (referencias.ausentes.length) {
     throw new Error(mensagemDeReferenciasAusentes(referencias.ausentes));
   }
+  /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem do Blender: sem ele, recusa antes de gastar captura */
+  const lataria = latariaDaReceita(receita, plano);
+  if (lataria.lataria && !blender) throw new Error(mensagemSemBlender(peca, lataria));
   const declarado = await dep.esbocoDeclarado(peca);
   let bruto = null;
   if (declarado) {
@@ -490,6 +535,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   }
 
   const sobreposicao = declarado ? await dep.sobreposicaoDeCortes({ peca, saida: pasta }) : null;
+  const superficie = lataria.lataria ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
 
   const orientacao = bruto ? lerPlano(bruto.plano)?.orientacao ?? null : null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);
@@ -509,11 +555,15 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     sobreposicao: sobreposicao ? { arquivos: sobreposicao.arquivos, notas: sobreposicao.notas } : null,
     partes: porParte.map(({ parte, resultado }) => ({ nome: parte, imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
     perguntas: [...(perguntas.todas ?? []), ...(declarado ? [lerPergunta(PERGUNTA_DO_ALVO, 'a pergunta do alvo')] : [])],
+    superficie,
   });
   const arquivoDoPedido = join(pasta, 'pedido.md');
   writeFileSync(arquivoDoPedido, pedido, 'utf8');
+  const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie });
 
-  return { peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, pasta, pedido: arquivoDoPedido, alvo, montada, sobreposicao, referencias, avisos };
+  return {
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, avisos,
+  };
 }
 
 /* Captura que não produziu arquivo recusa alto. A bancada devolve `ok:false` e
@@ -601,6 +651,12 @@ export function imprimir(resultado) {
       linhas.push(`  ${p.eixo} = ${String(p.valor).replace('.', ',')} mm: ${p.desvioMaximoMm === null ? 'sem corte em um dos lados' : `desvio máximo entre as linhas ${p.desvioMaximoMm.toFixed(1).replace('.', ',')} mm`}`);
     }
     for (const nota of resultado.sobreposicao.notas) linhas.push(`  nota: ${nota}`);
+  }
+  if (resultado.superficie) {
+    const { superficie } = resultado;
+    linhas.push('', `SUPERFÍCIE (peça de lataria: ${resultado.lataria.porque}; chapa na curvatura: ${superficie.partes?.length ? superficie.partes.join(', ') : 'a malha inteira'}):`);
+    for (const { arquivo } of superficie.rasante) linhas.push(`  ${arquivo} (luz rasante)`);
+    for (const { arquivo } of superficie.curvatura) linhas.push(`  ${arquivo} (curvatura da lataria)`);
   }
   if (resultado.referencias?.ignoradas?.length) linhas.push('', `REFERÊNCIAS fora do pedido, porque não são imagem: ${resultado.referencias.ignoradas.join(', ')}`);
   for (const aviso of resultado.avisos ?? []) linhas.push('', `AVISO: ${aviso}`);
