@@ -734,7 +734,13 @@ local do lado do material grita com os pontos nomeados da gaiola mais perto,
 porque ali a face interna se dobraria sobre si; no vinco vivo esse raio é a
 largura da faixa de faces ao lado dele dividida pela tangente do meio ângulo
 da dobra, e cai pela metade a cada nível (na forma de prova, 6,1 cm no nível 1,
-3 cm no 2 e 1,5 cm no 3). Partes distantes da chapa a menos de uma espessura
+3 cm no 2 e 1,5 cm no 3). A superfície que já se dobra sobre si, com face
+virada contra as vizinhas, também grita com os pontos mais perto, porque a
+face interna sairia à frente da externa; o caso conhecido é o canto declarado
+em que a borda faz ângulo côncavo e uma face da gaiola tem ângulo quase raso
+nele, e um ponto novo da gaiola que parta essa face desfaz a dobra (no canto
+do capô com a rampa do painel da perua, a face de 174 graus no canto virava em
+nível 2). Partes distantes da chapa a menos de uma espessura
 uma da outra não são conferidas. `origem` publica as faces sem sub-endereço
 por posição, porque a ordem de saída não é identidade; com espessura,
 `parte: 'externa'`, `'interna'` ou `'borda'` cita cada grupo, como na casca.

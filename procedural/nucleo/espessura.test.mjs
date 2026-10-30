@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { espessarSuperficie, ErroDaEspessura } from './espessura.js';
 import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
+import { subdividirCatmullClark } from './subdivisao.js';
 import { definicaoAdensada } from './fixtures/gaiola-por-estacoes-prova.js';
 import { area, cruzamentos, distancias, triangulos, volume } from './fixtures/medidas-de-malha.js';
 import { neutroCanonico, nucleo } from './entrada.js';
@@ -32,6 +33,14 @@ const tubo = (r = 0.1, lados = 24) => {
 const malhaDoNeutro = (neutro) => {
   const ids = [...neutro.V.keys()]; const indice = new Map(ids.map((id, k) => [id, k]));
   return { vertices: ids.map((id) => neutro.V.get(id)), faces: [...neutro.F.values()].map((f) => f.vs.map((v) => indice.get(v))) };
+};
+/* O canto côncavo do painel da perua em x = 0, em metros: o capô (0 a 3, com o canto 2 entre a frente do capô e a rampa)
+   e a rampa (1, 4, 5, 2). `partida` parte a face do capô com os pontos 6 (na borda do capô, a 300 mm do canto) e 7. */
+const cantoConcavo = (partida = false) => {
+  const P = (z, y) => [0, y / 1000, z / 1000];
+  const vertices = [P(1100, 980), P(1100, 1110), P(1180, 1110), P(2342, 980), P(979, 1190), P(1059, 1190)];
+  if (!partida) return { vertices, faces: [[0, 1, 2, 3], [1, 4, 5, 2]] };
+  return { vertices: [...vertices, P(1480, 1076.4), P(1480, 980)], faces: [[0, 1, 2, 7], [7, 2, 6], [7, 6, 3], [1, 4, 5, 2]] };
 };
 const codigos = (topologia) => topologia.achados.map((a) => a.codigo);
 const grito = (fn) => { try { fn(); } catch (e) { return e; } throw new Error('não gritou'); };
@@ -81,6 +90,39 @@ describe('espessarSuperficie', () => {
     expect(cruzamentos(ok.vertices, ok.faces)).toEqual([]);
     // por fora, o tubo não curva para o lado do material, e nenhuma espessura dobra a face
     expect(espessarSuperficie({ ...tubo(), espessura: 0.15, lado: 'normal' }).raioMinimo).toBe(Infinity);
+  });
+
+  it('grita quando a superfície plana se dobra sobre si no canto côncavo, onde a face interna saía 3,3 mm à frente da externa', () => {
+    /* duas faces planas em x = 0 com o canto côncavo do painel da perua (o capô encontra a rampa do para-brisa em z 1180,
+       y 1110, mm), a face do capô com 174 graus no canto; em nível 2 a subdivisão vira uma face junto do canto */
+    const { vertices, faces } = subdividirCatmullClark({ ...cantoConcavo(), niveis: 2, borda: 'cantos', cantos: [0, 1, 2, 3, 4, 5] });
+    const lado = (f, V = vertices) => Math.sign(f.reduce((s, i, k) => { const a = V[i], b = V[f[(k + 1) % f.length]]; return s + (a[1] - b[1]) * (a[2] + b[2]); }, 0));
+    expect(faces.filter((f) => lado(f) !== lado(faces[0]))).toHaveLength(1);
+    const e = grito(() => espessarSuperficie({ vertices, faces, espessura: 0.0015 }));
+    expect(e).toBeInstanceOf(ErroDaEspessura);
+    expect(e.tipo).toBe('dobra');
+    expect(e.message).toMatch(/^espessura: a superfície se dobra sobre si: em 4 vértice\(s\) uma face em volta fica a 180 graus da normal do vértice/);
+    // o canto da gaiola (o índice 2 fica no refino) é um dos lugares, e todos ficam a menos de 60 mm dele
+    expect(e.lugares.map((l) => l.vertices[0])).toContain(2);
+    for (const l of e.lugares) expect(Math.hypot(l.ponto[1] - 1.11, l.ponto[2] - 1.18)).toBeLessThan(0.06);
+    // a mesma chapa com a face do capô partida por um ponto da gaiola não vira, e toda a face interna fica no plano x = -t
+    const partida = subdividirCatmullClark({ ...cantoConcavo(true), niveis: 2, borda: 'cantos', cantos: [0, 1, 2, 3, 4, 5, 6, 7] });
+    const ok = espessarSuperficie({ ...partida, espessura: 0.0015 });
+    const internos = ok.vertices.slice(partida.vertices.length);
+    expect(Math.max(...internos.map((p) => Math.abs(p[0] * lado(partida.faces[0], partida.vertices) + 0.0015)))).toBeLessThan(1e-12);
+  });
+
+  it('nenhum vértice interno fica à frente de uma face externa em volta, na placa, na caixa aberta e no tubo', () => {
+    for (const malha of [quadrado, caixaAberta, tubo()]) {
+      const r = espessarSuperficie({ ...malha, espessura: 0.05 });
+      const n = malha.vertices.length;
+      malha.faces.forEach((f) => {
+        const [a, b, c] = f.map((i) => malha.vertices[i]);
+        const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], w = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+        const nf = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
+        for (const i of f) { const p = r.vertices[n + i]; expect((p[0] - a[0]) * nf[0] + (p[1] - a[1]) * nf[1] + (p[2] - a[2]) * nf[2]).toBeLessThan(0); }
+      });
+    }
   });
 
   it('recusa superfície que não é variedade orientada, espessura inválida e lado desconhecido', () => {
@@ -146,6 +188,21 @@ describe('subdivisao com espessura', () => {
     expect(neutro.orfaos).toHaveLength(1);
     expect(neutro.orfaos[0].ref).toBe('espessura');
     expect(neutro.orfaos[0].motivo).toMatch(/^a espessura 0\.2 passa do raio de curvatura local, que chega a 0\.0\d+, perto de '(baixo|meio|alto)_p\d' \(raio /);
+  });
+
+  it('grita com o nome do canto côncavo quando a superfície se dobra sobre si, e não gera malha', () => {
+    const nomes = ['capoTras', 'cinturaTras', 'cantoDoCapo', 'capoFrente', 'rampaTras', 'rampaFrente'];
+    const { vertices } = cantoConcavo();
+    const pontos = Object.fromEntries(nomes.map((n, k) => [n, vertices[k]]));
+    const passo = { vertices: nomes, faces: [['capoTras', 'cinturaTras', 'cantoDoCapo', 'capoFrente'], ['cinturaTras', 'rampaTras', 'rampaFrente', 'cantoDoCapo']], cantos: nomes, borda: 'cantos', niveis: 2 };
+    expect(nucleo([['subdivisao', { origemId: 1, ...passo }]], pontos).orfaos).toEqual([]);
+    const neutro = nucleo([['subdivisao', { origemId: 1, ...passo, espessura: 0.0015 }]], pontos);
+    expect(neutro.V.size).toBe(0);
+    expect(neutro.orfaos).toHaveLength(1);
+    expect(neutro.orfaos[0].ref).toBe('espessura');
+    expect(neutro.orfaos[0].motivo).toMatch(/^a superfície se dobra sobre si: .*, perto de 'cantoDoCapo' \(em \[0, 1\.11, 1\.18\]\)/);
+    expect(neutro.orfaos[0].motivo).toMatch(/um ponto novo da gaiola que parta essa face a desfaz/);
+    expect(neutro.orfaos[0].motivo).not.toMatch(/raio/);
   });
 
   it('lado sem espessura, espessura zero, lado desconhecido e parte sem espessura gritam', () => {
