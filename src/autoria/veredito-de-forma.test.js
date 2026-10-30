@@ -58,6 +58,10 @@ describe('veredito de forma', () => {
     expect(() => comDefeito({ tipo: 'posicao', sentido: 'menor' }))
       .toThrow(/para tipo 'posicao'/);
     expect(comDefeito({ tipo: 'posicao', sentido: 'adiantada' }).defeitos[0].tipo).toBe('posicao');
+    /* o sentido para o lado, que faltava: as dobradiças por fora da lateral de um armário */
+    expect(comDefeito({ tipo: 'posicao', sentido: 'externa' }).defeitos[0].sentido).toBe('externa');
+    expect(comDefeito({ tipo: 'posicao', sentido: 'interna' }).defeitos[0].sentido).toBe('interna');
+    expect(() => comDefeito({ tipo: 'uniao', sentido: 'externa' })).toThrow();
   });
 
   it('RECUSA tipo fora do vocabulário, em vez de aceitar um nome novo calado', () => {

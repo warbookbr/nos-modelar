@@ -92,7 +92,8 @@ lado:
 - **comprimento** — o trecho termina em lugar errado, na mesma direção:
   `maior`, `menor`;
 - **posicao** — a extremidade está deslocada, mantendo direção e comprimento:
-  `adiantada`, `atrasada`, `alta`, `baixa`;
+  `adiantada`, `atrasada`, `alta`, `baixa`, e para o lado, `externa` (para fora
+  do corpo) e `interna` (para dentro dele);
 - **espessura** — a seção está errada, o caminho não: `maior`, `menor`;
 - **ausencia** — a parte não existe: `faltando`;
 - **uniao** — duas partes que deveriam se encontrar não se encontram:

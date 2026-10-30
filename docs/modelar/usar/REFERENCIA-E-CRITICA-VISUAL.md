@@ -39,7 +39,7 @@ Ele responde com o veredito `mecanifica.veredito-de-forma` em bloco JSON:
 `alvo`, `nota` de 0 a 10, `observacao` de até 240 caracteres e `defeitos`, cada
 um com `parte`, `tipo`, `onde`, `sentido` e `evidencia` (de 15 a 240
 caracteres). Os tipos e sentidos são fechados: `angulo` e `comprimento` (maior,
-menor), `posicao` (adiantada, atrasada, alta, baixa), `espessura` (maior,
+menor), `posicao` (adiantada, atrasada, alta, baixa, e para o lado externa e interna), `espessura` (maior,
 menor), `ausencia` (faltando), `uniao` (afastado, atravessando), `superficie`
 (anguloso, segmentado, facetado) e `cota` (faltando, mal_posta, sobreposta), e
 `src/autoria/veredito-de-forma.js` recusa o que sair disso. O veredito é achado,

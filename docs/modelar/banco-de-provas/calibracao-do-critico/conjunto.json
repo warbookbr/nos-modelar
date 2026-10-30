@@ -533,7 +533,7 @@
         {
           "parte": "dobradicas",
           "tipo": "posicao",
-          "sentido": "adiantada",
+          "sentido": "externa",
           "onde": "borda lateral externa de cada porta, fora da face lateral do corpo",
           "decide": "critico",
           "tiposAceitos": [

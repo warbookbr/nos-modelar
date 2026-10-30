@@ -23,7 +23,10 @@ export const VERSAO_VEREDITO = 1;
 export const TIPOS_DE_DEFEITO = Object.freeze({
   angulo: ['maior', 'menor'],
   comprimento: ['maior', 'menor'],
-  posicao: ['adiantada', 'atrasada', 'alta', 'baixa'],
+  /* O SENTIDO PARA O LADO entrou pelo mesmo caminho, na calibração do crítico de 2026-10-29: as dobradiças presas por fora
+     da lateral de um armário estão deslocadas para o lado, e o crítico e a própria calibração tinham de dizer `adiantada`.
+     `externa` é a extremidade deslocada para fora do corpo, para o lado; `interna`, para dentro dele. */
+  posicao: ['adiantada', 'atrasada', 'alta', 'baixa', 'externa', 'interna'],
   espessura: ['maior', 'menor'],
   ausencia: ['faltando'],
   uniao: ['afastado', 'atravessando'],
