@@ -50,6 +50,13 @@ export function normalizarImagemReferencia(entrada) {
   };
 }
 
+/* O PLANO NASCE ATRÁS DA PEÇA, fora da caixa dela. O `lado` é a vista lateral
+   que a imagem mostra, e a câmera dessa vista olha a peça do mesmo lado: a
+   vista direita vem de +X, e a isométrica também. O plano ficava em +X, entre
+   essas duas câmeras e a lateral, e cobria a peça na vista em que a bancada
+   abre. Agora ele fica do lado oposto ao da câmera da vista que a imagem
+   mostra, encostado na caixa por uma folga, e a peça fica à frente dele, que é
+   o lugar de um plano de fundo. */
 export function criarAlinhamentoInicial({ caixa, larguraImagem, alturaImagem, lado = 'direita' }) {
   const altura = Math.max(0.001, numero(caixa?.max?.y, 0) - numero(caixa?.min?.y, 0));
   const proporcao = Math.max(0.001, numero(larguraImagem, 1) / Math.max(1, numero(alturaImagem, 1)));
@@ -59,7 +66,7 @@ export function criarAlinhamentoInicial({ caixa, larguraImagem, alturaImagem, la
   const maxX = numero(caixa?.max?.x, 0);
   const margem = Math.max(0.02, (maxX - minX) * 0.05);
   return {
-    x: ladoSeguro === 'esquerda' ? minX - margem : maxX + margem,
+    x: ladoSeguro === 'esquerda' ? maxX + margem : minX - margem,
     y: (numero(caixa?.min?.y, 0) + numero(caixa?.max?.y, 0)) / 2,
     z: (numero(caixa?.min?.z, 0) + numero(caixa?.max?.z, 0)) / 2,
     largura,

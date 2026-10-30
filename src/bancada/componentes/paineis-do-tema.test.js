@@ -4,9 +4,10 @@ import { criarEstadoCentral, estadoInicialDaBancada } from '../estado/estado-cen
 import { temaPorId } from '../temas/temas.js';
 import { criarPagina } from './dom-de-teste.js';
 import { lerElementosDaPagina } from './elementos-da-pagina.js';
-import { larguraOcupada, montarPaineisDoTema, paineisAoAbrir } from './paineis-do-tema.js';
+import { FRACAO_MINIMA_DA_CENA, larguraOcupada, montarPaineisDoTema, paineisAoAbrir, paineisQueCabem } from './paineis-do-tema.js';
 
 const PAINEIS = temaPorId('foco').paineis;
+const PAINEIS_DA_BANCADA = temaPorId('bancada').paineis;
 
 const MARCACAO = `
   <button data-abrir-painel="partes" aria-expanded="false">Partes</button>
@@ -40,6 +41,18 @@ describe('regra dos painéis', () => {
     expect(paineisAoAbrir({ abertos: { partes: true, inspecao: false }, abrir: 'inspecao', paineis: PAINEIS, larguraDaJanela: 1920 }))
       .toEqual({ partes: true, inspecao: true });
   });
+
+  it('na Bancada os painéis são fixos, sem margem, e os dois cabem com a cena em 70% a partir de 1374 pixels', () => {
+    const ambos = { partes: true, inspecao: true };
+    expect(larguraOcupada(ambos, PAINEIS_DA_BANCADA)).toBe(412);
+    expect(1400 - larguraOcupada(ambos, PAINEIS_DA_BANCADA)).toBeGreaterThanOrEqual(FRACAO_MINIMA_DA_CENA * 1400);
+    expect(paineisQueCabem({ abertos: ambos, paineis: PAINEIS_DA_BANCADA, larguraDaJanela: 1374 })).toEqual(ambos);
+    for (const larguraDaJanela of [1100, 1373]) {
+      expect(paineisQueCabem({ abertos: ambos, paineis: PAINEIS_DA_BANCADA, larguraDaJanela })).toEqual({ partes: true, inspecao: false });
+    }
+    expect(paineisQueCabem({ abertos: { partes: false, inspecao: true }, paineis: PAINEIS_DA_BANCADA, larguraDaJanela: 1100 }))
+      .toEqual({ partes: false, inspecao: true });
+  });
 });
 
 describe('painéis do tema', () => {
@@ -66,13 +79,25 @@ describe('painéis do tema', () => {
     expect(estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
   });
 
-  it('na arrumação clássica não abre nem marca nada, e trocar de tema volta ao que o tema declara', () => {
-    const { paineis, documento, estado } = montar({ tema: 'bancada' });
-    expect(paineis.abrir('partes')).toBe(false);
-    expect(documento.querySelector('.painel').hasAttribute('data-aberto')).toBe(false);
+  it('na Bancada nascem abertos os dois em 1400, só a árvore em 1100, e encolher a janela sem escolha deixa a árvore', () => {
+    const largo = montar({ tema: 'bancada', largura: 1400 });
+    expect([largo.aberto('partes'), largo.aberto('inspecao')]).toEqual(['true', 'true']);
+    largo.janela.innerWidth = 1100;
+    largo.janela.disparar({ type: 'resize' }, { captura: false });
+    expect(largo.estado.obter('paineis')).toEqual({ partes: true, inspecao: false });
+    const estreito = montar({ tema: 'bancada', largura: 1100 });
+    expect([estreito.aberto('partes'), estreito.aberto('inspecao')]).toEqual(['true', 'false']);
+    estreito.paineis.abrir('inspecao');
+    expect(estreito.estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
+  });
+
+  it('o Revisão encosta a árvore aberta ao nascer, e trocar de tema volta ao que o tema declara', () => {
+    const { paineis, documento, estado } = montar({ tema: 'revisao' });
+    expect(documento.querySelector('.painel').dataset.aberto).toBe('true');
+    expect(paineis.abrir('inspecao')).toBe(true);
+    expect(estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
     estado.definir({ tema: 'foco' });
     expect(documento.querySelector('.painel').dataset.aberto).toBe('false');
-    /* O Revisão encosta a árvore aberta ao nascer. */
     estado.definir({ tema: 'revisao' });
     expect(documento.querySelector('.painel').dataset.aberto).toBe('true');
   });

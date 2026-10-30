@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VISTAS_BANCADA } from './estado-bancada.js';
 import { caixaDoVisivel } from './caixa-do-visivel.js';
-import { criarCenarioDoTema } from './cena/cenario-do-tema.js';
+import { criarCenarioDoTema, criarFundoEmDegrade } from './cena/cenario-do-tema.js';
 import { criarContornoDaSelecao } from './cena/contorno-da-selecao.js';
 
 export { caixaDoVisivel };
@@ -159,6 +159,8 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   scene.add(cenario.grade);
   const contorno = criarContornoDaSelecao(renderer);
   let cenaDoTema = null;
+  /* a textura do fundo em degradê do tema em vigor, com o par de cores que a fez */
+  let degrade = null;
   let contornoDoTema = null;
 
   const perspectiva = new THREE.PerspectiveCamera(38, 1, 0.025, 100);
@@ -411,8 +413,20 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     renderer.shadowMap.enabled = !auditoria;
     principal.castShadow = !auditoria;
     aplicarVisibilidadeDoCenario();
-    scene.background = new THREE.Color(auditoria ? '#f2f4f3' : (cenaDoTema?.fundo ?? COR_FUNDO));
+    scene.background = auditoria ? new THREE.Color('#f2f4f3') : fundoDoTema();
     return auditoria;
+  }
+
+  /* O fundo fora da auditoria: a cor do tema, o degradê dele quando ele declara `degrade`, ou a cor de antes. A textura
+     do degradê é feita uma vez por par de cores e descartada quando o tema troca. */
+  function fundoDoTema() {
+    if (!cenaDoTema?.degrade || !cenaDoTema?.fundo) return new THREE.Color(cenaDoTema?.fundo ?? COR_FUNDO);
+    const chave = `${cenaDoTema.degrade}|${cenaDoTema.fundo}`;
+    if (degrade?.chave !== chave) {
+      degrade?.textura.dispose();
+      degrade = { chave, textura: criarFundoEmDegrade({ centro: cenaDoTema.degrade, borda: cenaDoTema.fundo }) };
+    }
+    return degrade.textura;
   }
 
   /* A cena que o tema pede: o fundo, a grade esmaecida e a sombra suave, com as
@@ -420,7 +434,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
      A auditoria continua mandando no fundo enquanto está ligada. */
   function definirCenaDoTema(cena) {
     cenaDoTema = cena ?? null;
-    if (!auditoria) scene.background = new THREE.Color(cenaDoTema?.fundo ?? COR_FUNDO);
+    if (!auditoria) scene.background = fundoDoTema();
     principal.shadow.radius = cenaDoTema?.sombraSuave ? 5 : 1;
     aplicarVisibilidadeDoCenario();
   }
@@ -649,6 +663,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       observador.disconnect();
       controls.dispose();
       contorno.destruir();
+      degrade?.textura.dispose();
       renderer.dispose();
     },
   };

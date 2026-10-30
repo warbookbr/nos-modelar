@@ -89,34 +89,68 @@ try {
   await pagina.locator(`#listaAcervo [data-receita="${PECA}"]`).click({ timeout: 10000 });
   await pagina.waitForTimeout(4000);
 
-  const sobreposicao = imagens.find((i) => /prova/i.test(i.pathname));
-  const naCena = await pagina.evaluate(() => window.__mecanificaBancada?.imagemReferencia ?? null);
+  /* A IMAGEM DA PEÇA NÃO ENTRA NA CENA SOZINHA. Ao abrir, ela fica oferecida
+     na aba da referência; entrava como plano encostado na lateral, entre a
+     câmera e a peça, e cobria a peça na vista em que a bancada abre. */
+  const aoAbrir = await pagina.evaluate(() => window.__mecanificaBancada?.imagemReferencia ?? null);
   ok('a página não emitiu erro', errosDaPagina.length === 0, errosDaPagina[0] ?? '');
-  ok('a bancada pediu a sobreposição da peça', Boolean(sobreposicao), sobreposicao?.pathname ?? 'nenhuma imagem de peça foi pedida');
-  ok('a sobreposição foi servida pelo pacote construído', sobreposicao?.status === 200, `status ${sobreposicao?.status ?? '—'}`);
-  /* A REQUISIÇÃO NÃO É A PROVA. Pedir o arquivo e receber 200 diz que o pacote
-     publicou a imagem; não diz que ela virou plano na cena. Textura recusada,
-     alinhamento inválido ou malha não adicionada deixariam a requisição verde e
-     a tela sem referência nenhuma. */
-  ok('a imagem virou plano na cena', naCena?.naCena === true, JSON.stringify(naCena));
-  ok('o plano carrega a textura', naCena?.comTextura === true);
-  ok('o plano tem tamanho', (naCena?.largura ?? 0) > 0 && (naCena?.altura ?? 0) > 0,
-    `${naCena?.largura} x ${naCena?.altura}`);
-  ok('a referência na cena é a declarada pela peça', /prova/i.test(naCena?.rotulo ?? ''),
-    naCena?.rotulo ?? '—');
-  ok('nenhuma imagem da peça faltou', imagens.every((i) => i.status === 200),
-    imagens.filter((i) => i.status !== 200).map((i) => `${i.status} ${i.pathname}`).join(', '));
-  /* `public/referencias/` não existe mais, e a prova falha se alguém a
-     recriar: cópia em `public/` é o estado que esta mudança desfez. */
-  /* A MINIATURA E O PUNHO. O painel tinha um botão solto de apagar e nada
-     dizendo qual imagem sumiria, e a posição da foto só se ajustava por três
-     barras num canto da tela — procurar o encaixe olhando o número em vez da
-     cena. Os dois são de tela, então nenhum teste de unidade os enxerga. */
+  ok('a imagem da peça fica oferecida e não entra na cena sozinha',
+    aoAbrir?.naCena === false && /prova/i.test(aoAbrir?.rotulo ?? ''), JSON.stringify(aoAbrir));
+  ok('nenhum plano de imagem na cena ao abrir', await pagina.evaluate(() => (
+    !window.__mecanificaBancada.ambiente().scene.getObjectByName('__imagem_referencia__'))));
+
+  /* A MINIATURA, A CHAVE E O PUNHO. O painel tinha um botão solto de apagar e
+     nada dizendo qual imagem sumiria, e a posição da foto só se ajustava por
+     três barras num canto da tela — procurar o encaixe olhando o número em vez
+     da cena. São de tela, então nenhum teste de unidade os enxerga. */
   /* No tema Foco, o padrão, o painel da direita nasce fechado: a pessoa o abre
      pelo botão de detalhes antes de escolher a aba, e a guarda faz o mesmo. */
   if (!(await pagina.isVisible('.aba-btn[data-aba="referencias"]'))) await pagina.click('[data-abrir-painel="inspecao"]');
   await pagina.click('.aba-btn[data-aba="referencias"]');
   await pagina.waitForTimeout(700);
+  await pagina.locator('.item-referencia .mostrar-referencia input[type="checkbox"]').first().check();
+  await pagina.waitForTimeout(1500);
+
+  const sobreposicao = imagens.find((i) => /prova/i.test(i.pathname));
+  const naCena = await pagina.evaluate(() => window.__mecanificaBancada?.imagemReferencia ?? null);
+  ok('a bancada pediu a imagem da peça', Boolean(sobreposicao), sobreposicao?.pathname ?? 'nenhuma imagem de peça foi pedida');
+  ok('a imagem foi servida pelo pacote construído', sobreposicao?.status === 200, `status ${sobreposicao?.status ?? '—'}`);
+  /* A REQUISIÇÃO NÃO É A PROVA. Pedir o arquivo e receber 200 diz que o pacote
+     publicou a imagem; não diz que ela virou plano na cena. Textura recusada,
+     alinhamento inválido ou malha não adicionada deixariam a requisição verde e
+     a tela sem referência nenhuma. */
+  ok('com a chave ligada, a imagem virou plano na cena', naCena?.naCena === true, JSON.stringify(naCena));
+  ok('o plano carrega a textura', naCena?.comTextura === true);
+  ok('o plano tem tamanho', (naCena?.largura ?? 0) > 0 && (naCena?.altura ?? 0) > 0,
+    `${naCena?.largura} x ${naCena?.altura}`);
+  ok('a referência na cena é a declarada pela peça', /prova/i.test(naCena?.rotulo ?? ''),
+    naCena?.rotulo ?? '—');
+  /* O plano nasce fora da caixa da peça, do lado oposto ao da câmera da vista
+     isométrica e da direita, que olham de +X. */
+  const caixas = await pagina.evaluate(() => {
+    const cena = window.__mecanificaBancada.ambiente().scene;
+    const caixaDe = (objeto) => {
+      const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
+      objeto.updateMatrixWorld(true);
+      objeto.traverseVisible((filho) => {
+        if (!filho.isMesh) return;
+        const pos = filho.geometry.getAttribute('position');
+        for (let i = 0; i < pos.count; i += 1) {
+          const p = filho.localToWorld(filho.position.clone().set(pos.getX(i), pos.getY(i), pos.getZ(i)));
+          ['x', 'y', 'z'].forEach((eixo, k) => { min[k] = Math.min(min[k], p[eixo]); max[k] = Math.max(max[k], p[eixo]); });
+        }
+      });
+      return { min, max };
+    };
+    const peca = cena.children.find((c) => c.isGroup && c.name && !c.name.startsWith('__'));
+    const plano = cena.getObjectByName('__imagem_referencia__');
+    return peca && plano ? { peca: caixaDe(peca), plano: caixaDe(plano) } : null;
+  });
+  ok('o plano fica fora da caixa da peça, atrás dela vista da direita',
+    Boolean(caixas) && caixas.plano.max[0] < caixas.peca.min[0],
+    caixas ? `plano em x ${caixas.plano.max[0].toFixed(3)}, peça a partir de x ${caixas.peca.min[0].toFixed(3)}` : 'sem caixas');
+  ok('nenhuma imagem da peça faltou', imagens.every((i) => i.status === 200),
+    imagens.filter((i) => i.status !== 200).map((i) => `${i.status} ${i.pathname}`).join(', '));
   const painel = await pagina.evaluate(() => {
     const itens = [...document.querySelectorAll('.item-referencia')];
     const ambiente = window.__mecanificaBancada.ambiente();
@@ -128,6 +162,7 @@ try {
         return Boolean(img?.src) && img.naturalWidth > 0;
       }).length,
       comApagar: itens.filter((i) => i.querySelector('.apagar-referencia')).length,
+      chaveLigada: itens.filter((i) => i.querySelector('.mostrar-referencia input')?.checked).length,
       botaoSolto: [...document.querySelectorAll('button')]
         .some((b) => b.textContent.trim() === 'Deletar imagem referência'),
       punhoVisivel: Boolean(punho?.visible),
@@ -139,11 +174,14 @@ try {
     painel.quantos === 1 && painel.comMiniatura === 1,
     `${painel.quantos} item(ns), ${painel.comMiniatura} com imagem visível`);
   ok('cada miniatura leva o apagar dela', painel.comApagar === painel.quantos);
+  ok('a chave "Na cena" da miniatura está ligada', painel.chaveLigada === 1, `${painel.chaveLigada} ligada(s)`);
   ok('o botão solto de deletar não existe mais', painel.botaoSolto === false);
   ok('a imagem tem punho na cena, com as três setas',
     painel.punhoVisivel && painel.setasDoPunho === 3,
     `visível ${painel.punhoVisivel}, ${painel.setasDoPunho} setas`);
 
+  /* `public/referencias/` não existe mais, e a prova falha se alguém a
+     recriar: cópia em `public/` é o estado que esta mudança desfez. */
   ok('não há cópia de referência em `public/`', !existsSync(join(REPO, 'public/referencias')));
 
   /* O GIRO CHEGA À CENA, e não só ao descritor. Mexer o controle deslizante e

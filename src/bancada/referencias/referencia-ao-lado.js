@@ -1,7 +1,8 @@
 /* referencia-ao-lado.js — a referência da mesa do tema Revisão: a imagem que a aba de referência tem, as vistas dela e a câmera da peça posta na câmera da vista escolhida.
  *
- * A imagem é a que a aba de imagem de referência mostra (`imagem-na-cena.js`, a declarada pela peça ou a que a pessoa
- * pôs), lida a cada quadro do gerenciador das referências; este módulo não escolhe imagem nenhuma. Quando ela é a folha
+ * A imagem é a que a aba de imagem de referência mostra (`imagem-na-cena.js`): a que está na cena quando a chave "Na
+ * cena" está ligada, e, com ela desligada, a que a peça declara e a aba oferece, lida a cada quadro por
+ * `descreverNaCena`. Este módulo não escolhe imagem nenhuma e não põe imagem na cena. Quando ela é a folha
  * de vistas da fonte (`referencias/fonte-vistas.png`, com o `fonte-partes.json` da mesma pasta), as quatro vistas da
  * folha têm câmera conhecida (`autoria/quadro-da-fonte.js`): a mesa mostra um quadro de cada vez, e com a mesma câmera
  * ligada a peça vai para a câmera daquele quadro, ortográfica, no mesmo centro e na mesma escala. Lado a lado as duas
@@ -10,8 +11,8 @@
  *
  * O vínculo vale nos dois sentidos: escolher a vista da referência leva a peça para ela, e escolher na peça uma vista
  * que a folha tem (pelo cubo, pela tecla ou pela busca) troca o quadro da referência. Girar a peça à mão não muda a
- * referência. Enquanto a mesa está na tela, a imagem e as pranchas na cena 3D ficam escondidas: a referência mora no
- * lado dela, e a prancha posta ao lado da peça cobriria a peça na vista lateral.
+ * referência. Enquanto a mesa está na tela, a imagem e as pranchas na cena 3D ficam escondidas mesmo com a chave ligada:
+ * a referência mora no lado dela, e o plano atrás da peça apareceria por trás dela nas vistas da folha.
  *
  * Escreve `imagemDaReferencia` e `comparacao` no estado central e não toca a página; a mesa (`componentes/mesa-de-revisao.js`)
  * desenha. */
@@ -181,7 +182,7 @@ export function criarReferenciaAoLado({ ambiente, cena, imagemNaCena, estado, al
   return {
     /** A cada quadro: a imagem que a aba tem agora, e a referência na cena escondida enquanto a mesa está na tela. */
     acompanhar() {
-      const descritor = imagemNaCena.gerenciador.obterImagemReferencia();
+      const descritor = imagemNaCena.descreverNaCena();
       const nova = descritor ? `${descritor.id}|${descritor.url ?? ''}` : null;
       if (nova !== chave) {
         chave = nova;

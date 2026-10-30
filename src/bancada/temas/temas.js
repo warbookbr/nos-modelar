@@ -4,7 +4,8 @@
  * (decisão 4 do plano das visões e da interface). Por isso um tema é uma declaração, e não código:
  *
  *   `cores`      o conjunto de cores de `sistema-visual.css` (`claro` ou `escuro`), escrito em `data-cores` na raiz;
- *   `arrumacao`  a arrumação da folha de estilo (`foco` ou `classica`), escrita em `data-arrumacao` na raiz;
+ *   `arrumacao`  a arrumação da folha de estilo (`foco`, `bancada` ou `revisao`; `classica` é a de antes dos temas, que
+ *                nenhum tema pede mais), escrita em `data-arrumacao` na raiz;
  *   `lugares`    para cada componente móvel (`data-movel` na página), o lugar (`data-lugar`) para onde ele vai; o que o
  *                tema não cita fica onde a página o pôs;
  *   `rotulos`    o texto de um controle que muda de nome no tema (`data-rotulo` na página);
@@ -45,16 +46,46 @@ export const TEMAS = Object.freeze([
     }),
     cena: Object.freeze({ fundo: '--cena', grade: '--linha-forte', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '--destaque' }),
   }),
+  /* A Bancada é a proposta A: uma estação de CAD escura, com a barra fina no alto, a árvore e o painel da direita fixos
+     dos lados da cena (`margem` 0, porque não flutuam), a barra flutuante da cena com a câmera, a projeção, a visão,
+     enquadrar, focar e copiar vista, e a barra de estado embaixo. A primeira aba do painel da direita muda de nome com o
+     caso (um rótulo por caso: `peca`, `parte` e `edicao`), e o fundo da cena é um degradê de `degrade` no meio até
+     `fundo` nas bordas. Os dois painéis cabem com a cena em 70% a partir de 1374 pixels; abaixo disso nasce aberta só a
+     árvore, a primeira declarada, e o cartão da seleção faz as vezes do painel da direita. */
   Object.freeze({
     id: 'bancada',
     rotulo: 'Bancada',
     descricao: 'Escura, com os painéis fixos dos lados.',
     cores: 'escuro',
-    arrumacao: 'classica',
-    lugares: Object.freeze({}),
-    rotulos: Object.freeze({}),
-    paineis: null,
-    cena: null,
+    arrumacao: 'bancada',
+    lugares: Object.freeze({
+      abrir: 'topo-peca',
+      juntas: 'topo-direita',
+      controles: 'topo-direita',
+      estado: 'topo-direita',
+      vistas: 'popover-camera',
+      projecao: 'barra-cena',
+      'seletor-visao': 'barra-cena',
+      enquadrar: 'barra-cena',
+      focar: 'barra-cena',
+      'copiar-vista': 'barra-cena',
+      'regua-metrica': 'barra-estado',
+      'rodape-juntas': 'barra-edicao',
+    }),
+    rotulos: Object.freeze({
+      juntas: 'Editar',
+      'titulo-partes': 'Partes',
+      'aba-inspecao': Object.freeze({ peca: 'Peça', parte: 'Parte', edicao: 'Edição' }),
+      'aba-referencias': 'Referência',
+      'aba-anotacoes': 'Anotações',
+    }),
+    paineis: Object.freeze({
+      partes: Object.freeze({ abertoAoNascer: true, largura: 196, margem: 0 }),
+      inspecao: Object.freeze({ abertoAoNascer: true, largura: 216, margem: 0 }),
+    }),
+    cena: Object.freeze({
+      fundo: '--cena', degrade: '--cena-2', grade: '--linha-forte', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '--destaque',
+    }),
   }),
   /* O Revisão é a proposta C sem a faixa de decisão: a cena dividida entre a peça e a referência, cada uma com um
      cabeçalho fino, a árvore plana encostada à esquerda e o painel da direita encostado do outro lado quando abre. A
@@ -88,8 +119,8 @@ export const TEMAS = Object.freeze([
       focar: 'Focar', 'copiar-vista': 'Copiar vista',
     }),
     paineis: Object.freeze({
-      partes: Object.freeze({ abertoAoNascer: true, largura: 240 }),
-      inspecao: Object.freeze({ abertoAoNascer: false, largura: 272 }),
+      partes: Object.freeze({ abertoAoNascer: true, largura: 240, margem: 0 }),
+      inspecao: Object.freeze({ abertoAoNascer: false, largura: 272, margem: 0 }),
     }),
     cena: Object.freeze({ fundo: '--cena', grade: '--linha-forte', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '--destaque' }),
   }),

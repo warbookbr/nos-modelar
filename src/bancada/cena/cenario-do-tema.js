@@ -6,7 +6,11 @@
  *
  * A grade é a de sempre desenhada por outro material: a opacidade cai com a distância ao centro, de cheia até `raioCheio`
  * a nada em `raioFim`, para a grade não terminar numa borda reta no meio do fundo. A sombra é um plano que só recebe
- * sombra (`ShadowMaterial`), sem cor própria: o chão continua sendo o fundo, e a peça ganha a mancha que a assenta. */
+ * sombra (`ShadowMaterial`), sem cor própria: o chão continua sendo o fundo, e a peça ganha a mancha que a assenta.
+ *
+ * O fundo em degradê (do tema que declara `degrade`) é uma textura pequena com o claro no meio e o escuro nas bordas,
+ * esticada pela cena: a elipse acompanha a proporção do canvas, como o `radial-gradient` da proposta. As cores são as das
+ * variáveis do sistema visual, e a conta é pura (`pixelsDoDegrade`), sem sorteio, para a mesma cena dar o mesmo fundo. */
 import * as THREE from 'three';
 
 export const TAMANHO_DA_GRADE = 12;
@@ -83,4 +87,45 @@ export function criarCenarioDoTema() {
       sombra.material.opacity = 0.2 * fatorExplosao;
     },
   };
+}
+
+/** O lado da textura do fundo em degradê, em pixels; a filtragem linear da placa de vídeo alisa o resto. */
+export const LADO_DO_DEGRADE = 128;
+/** O meio do degradê, em fração da largura e da altura a partir do canto de cima e da esquerda, e o raio da elipse. */
+const MEIO_DO_DEGRADE = Object.freeze({ x: 0.5, y: 0.46, raio: 0.7 });
+
+/**
+ * Os pixels RGBA do fundo em degradê, linha a linha de baixo para cima (a ordem da textura): `centro` no meio, `borda` a
+ * partir do raio. As cores são `[r, g, b]` de 0 a 255.
+ */
+export function pixelsDoDegrade({ centro, borda, lado = LADO_DO_DEGRADE }) {
+  const pixels = new Uint8Array(lado * lado * 4);
+  for (let linha = 0; linha < lado; linha++) {
+    const y = 1 - (linha + 0.5) / lado;
+    for (let coluna = 0; coluna < lado; coluna++) {
+      const x = (coluna + 0.5) / lado;
+      const t = Math.min(1, Math.hypot(x - MEIO_DO_DEGRADE.x, y - MEIO_DO_DEGRADE.y) / MEIO_DO_DEGRADE.raio);
+      const indice = (linha * lado + coluna) * 4;
+      for (let canal = 0; canal < 3; canal++) {
+        pixels[indice + canal] = Math.round(centro[canal] + (borda[canal] - centro[canal]) * t);
+      }
+      pixels[indice + 3] = 255;
+    }
+  }
+  return pixels;
+}
+
+/** A textura do fundo em degradê entre duas cores escritas como o CSS as escreve (`#1d2024`). */
+export function criarFundoEmDegrade({ centro, borda }) {
+  /* O degradê é feito em sRGB, como o do navegador: `getHex` devolve a cor nele, e a textura avisa que está nele. */
+  const sRGB = (cor) => {
+    const hex = new THREE.Color(cor).getHex();
+    return [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
+  };
+  const textura = new THREE.DataTexture(pixelsDoDegrade({ centro: sRGB(centro), borda: sRGB(borda) }), LADO_DO_DEGRADE, LADO_DO_DEGRADE);
+  textura.colorSpace = THREE.SRGBColorSpace;
+  textura.magFilter = THREE.LinearFilter;
+  textura.minFilter = THREE.LinearFilter;
+  textura.needsUpdate = true;
+  return textura;
 }

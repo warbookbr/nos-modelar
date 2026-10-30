@@ -38,6 +38,17 @@ describe('imagem de referência', () => {
     expect(alinhamento.lado).toBe('esquerda');
   });
 
+  /* A câmera da vista direita, e a da isométrica em que a bancada abre, olham a peça de +X. O plano nascia em +X, entre
+     elas e a lateral, e cobria o furgão; agora nasce do lado de lá da caixa, sem tocar nela. */
+  it('nasce fora da caixa, atrás da peça vista do lado que a imagem mostra', () => {
+    const caixa = { min: { x: -0.93, y: 0.08, z: -1.7 }, max: { x: 0.93, y: 1.75, z: 1.7 } };
+    const direita = criarAlinhamentoInicial({ caixa, larguraImagem: 1400, alturaImagem: 1050, lado: 'direita' });
+    const esquerda = criarAlinhamentoInicial({ caixa, larguraImagem: 1400, alturaImagem: 1050, lado: 'esquerda' });
+    expect(direita.x).toBeLessThan(caixa.min.x);
+    expect(esquerda.x).toBeGreaterThan(caixa.max.x);
+    expect(criarAlinhamentoInicial({ caixa, larguraImagem: 1, alturaImagem: 1 }).x).toBe(direita.x);
+  });
+
   it('recusa fonte ausente e limita opacidade a um intervalo visível', () => {
     expect(normalizarImagemReferencia({ fonte: 'url', url: '  ' })).toBeNull();
     expect(normalizarImagemReferencia({ fonte: 'url', url: 'https://exemplo.test/bike.jpg', opacidade: 2 }))

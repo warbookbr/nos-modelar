@@ -105,12 +105,14 @@ outros testes da bancada.
 
 Um tema é uma declaração em `src/bancada/temas/temas.js`, e não código. Ele diz
 o conjunto de cores (`cores`), a arrumação da folha de estilo (`arrumacao`, hoje
-`foco`, `revisao` ou `classica`), o lugar de cada componente móvel (`lugares`, do nome em
-`data-movel` na página para o nome em `data-lugar`), o texto dos controles que
-mudam de nome (`rotulos`, pelo `data-rotulo`), os painéis que abrem sobre a cena
-com a largura de cada um (`paineis`) e a cena 3D que ele pede (`cena`: o fundo, a
-cor da grade, a grade esmaecida, a sombra suave e a cor do contorno da seleção,
-com as cores escritas como o nome da variável do sistema visual). O componente
+`foco`, `bancada`, `revisao` ou `classica`), o lugar de cada componente móvel (`lugares`, do
+nome em `data-movel` na página para o nome em `data-lugar`), o texto dos
+controles que mudam de nome (`rotulos`, pelo `data-rotulo`, com um texto só ou
+um texto por caso da tela: a peça, uma parte escolhida ou a edição), os painéis
+que o tema deixa abrir com a largura de cada um e a margem, que é zero no painel
+fixo (`paineis`), e a cena 3D que ele pede (`cena`: o fundo, o meio do degradê
+quando há, a cor da grade, a grade esmaecida, a sombra suave e a cor do contorno
+da seleção, com as cores escritas como o nome da variável do sistema visual). O componente
 `componentes/tema.js` lê a declaração e escreve `data-tema`, `data-cores` e
 `data-arrumacao` na raiz da página, leva cada componente para o lugar do tema e
 o devolve para casa quando o tema seguinte não o cita, troca os rótulos e
@@ -138,17 +140,39 @@ um painel que deixaria a cena com menos de 70% da largura recolhe o outro, e
 com as larguras do Foco os dois só cabem juntos a partir de 1920 pixels. A cena
 do Foco tem o fundo claro do sistema visual, a grade que some antes da borda, a
 sombra suave no chão e o contorno da seleção na borda da peça no lugar da tinta
-verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`). O tema
-Bancada usa por enquanto a arrumação de antes dos temas, com as cores do
-conjunto dele, e a cena de antes.
+verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`).
+
+A Bancada é a estação de CAD escura da proposta A, sobre os mesmos componentes.
+A barra do alto, fina, leva à esquerda o botão da árvore, Abrir, o nome e o
+estado da sessão; no meio a busca de comandos; e à direita a troca entre
+Inspecionar e Editar, as janelas Controles e Estado e o botão do painel da
+direita. Editar é o botão das juntas, e Inspecionar desliga o modo de edição que
+estiver ligado, pela barra do modo de edição. A árvore das partes, com 196
+pixels, e o painel da direita, com 216, ficam fixos dos lados, e a cena fica
+entre eles: o canvas encolhe com os painéis abertos, e a regra dos 70% conta os
+dois sem margem. Numa janela de 1400 pixels a cena tem 988 de largura, 70,6%; os
+dois painéis só cabem juntos a partir de 1374 pixels, e abaixo disso a página
+nasce só com a árvore, a primeira declarada, e o cartão da seleção aparece no
+lugar do painel da direita, contando a posição sobre o canvas. A primeira aba do
+painel da direita se chama Peça, Parte ou Edição conforme o caso, e no modo de
+edição começa pela ajuda de editar. Sobre a cena ficam a barra flutuante (a
+caixa das vistas da câmera, a projeção, o seletor de visão, enquadrar, focar e
+copiar vista), o cubo de orientação no canto de cima e a barra do modo de edição
+embaixo, no meio da cena; a barra de estado fecha a tela. A cena tem o fundo em
+degradê do conjunto escuro, do `--cena-2` no meio ao `--cena` nas bordas, numa
+textura feita por conta pura em `cena/cenario-do-tema.js`, a grade esmaecida, a
+sombra suave e o contorno da seleção no destaque laranja, e a borda da cena fica
+no destaque enquanto a edição está ligada. As regras da arrumação ficam sob
+`:root[data-arrumacao="bancada"]` em `styles.css` e desfazem as da arrumação
+clássica, que valem para toda arrumação que não é o Foco.
 
 O Revisão é a proposta C sem a faixa de decisão, que a decisão 4 do plano tirou:
 o veredito e o aceite ficam na conversa com o agente, e a árvore fica plana,
 sem estado de aceite por parte. Ele usa o conjunto claro, a cena do Foco e os
 componentes do Foco noutros lugares, e a arrumação `revisao`
 (`temas/revisao.css`): a barra do alto inteira, a árvore encostada à esquerda e
-aberta ao nascer, o painel da direita encostado do outro lado quando abre, o
-cubo no canto da peça e a barra da cena no pé da mesa, com focar e copiar a vista
+aberta ao nascer, o painel da direita encostado do outro lado quando abre (os
+dois sem margem na regra dos 70%, como na Bancada), o cubo no canto da peça e a barra da cena no pé da mesa, com focar e copiar a vista
 ao lado de enquadrar. A mesa é a faixa entre os painéis, dividida entre a peça e
 a referência, cada uma com um cabeçalho fino. A mesa só existe no tema que lhe
 dá lugar (`lugares['mesa-comparacao']`); nos outros ela fica numa casa escondida
@@ -158,9 +182,12 @@ entre lado a lado e sobreposta (a sobreposta com a transparência sobre a peça)
 liga a mesma câmera e esconde a referência, que devolve a largura toda à peça;
 quando a peça não tem imagem, o lado dela diz isso e a peça fica com a mesa.
 
-A referência é a imagem que a aba de imagem de referência tem, lida a cada
-quadro, e enquanto a mesa está na tela a imagem e as pranchas da cena 3D ficam
-escondidas, porque a prancha posta ao lado da peça a cobriria na vista lateral.
+A referência é a imagem que a aba de imagem de referência mostra, lida a cada
+quadro: a que está na cena quando a chave "Na cena" está ligada e, com ela
+desligada, a que a peça declara e a aba oferece. A mesa não põe imagem na cena,
+e enquanto ela está na tela a imagem e as pranchas da cena 3D ficam escondidas
+mesmo com a chave ligada, porque o plano atrás da peça apareceria por trás dela
+nas vistas da folha.
 Quando a imagem é a folha de vistas da fonte (`fonte-vistas.png`, com o
 `fonte-partes.json` da mesma peça), as quatro vistas dela têm a câmera que
 `tools/modelar/modelo-de-referencia.mjs` usou, num módulo comum aos dois,
@@ -243,6 +270,21 @@ A captura automática não herda a visão da pessoa: a ponte da captura suspende
 seletor durante a auditoria, e as imagens das guardas e do pacote do crítico
 saem na sólida.
 
+## A imagem de referência
+
+A imagem que a receita declara em `PLANO.referencias` aparece na aba
+Referência, com a miniatura, a chave "Na cena" e o apagar, e não entra na cena
+sozinha: a folha de quatro vistas do furgão entrava como plano encostado na
+lateral, entre a câmera e a peça, e cobria o furgão na vista isométrica em que a
+bancada abre. A pessoa liga a chave quando vai alinhar a peça pela imagem, e a
+imagem que ela mesma escolhe, por arquivo ou URL, entra na cena na hora. Na
+cena, o plano nasce fora da caixa da peça, do lado oposto ao da câmera da vista
+direita e da isométrica, que olham a peça de +X, e a peça fica à frente dele
+(`criarAlinhamentoInicial`, em `referencias/imagem-referencia.js`). A chave e o
+ajuste ficam guardados no navegador por peça, e a imagem volta à cena na
+abertura seguinte só se estava nela; abrir outra peça tira da cena e da aba a
+imagem da anterior. A captura automática não abre a aba e sai sem imagem.
+
 ## O laço: desenhar, salvar, ler, absorver
 
 A pessoa seleciona uma parte e aperta `G` para movê-la como corpo, ou `Tab` para
@@ -250,6 +292,11 @@ entrar no modo de edição, onde `1`, `2` e `3` trocam entre vértice, aresta e
 face, `L` pega a ilha sob o ponteiro, o gizmo move pelo arrasto, `Ctrl` gruda no
 vértice mais próximo, e `E`, `Shift+D`, `X`, `F`, `R` e `S` mudam a malha.
 `Ctrl+Z` desfaz um gesto por vez e para no estado que veio do arquivo.
+Escolher a parte só arma o gizmo de mover, e o aviso "Edição de malha", com o
+modo e a contagem da seleção, aparece só no modo de edição. No modo de juntas,
+cada canto tem um punho de 12 pixels de diâmetro na tela, em qualquer janela,
+zoom e projeção, e o clique o pega a até 12 pixels do centro, um alvo de 24
+pixels; com alvos sobrepostos vence o centro mais perto do ponteiro.
 
 Quando a malha deixa de ser igual à do arquivo, o botão de salvar aparece e baixa
 um `ajuste-<peça>.json`. Ele guarda, por parte, os dois cantos da caixa, a nuvem

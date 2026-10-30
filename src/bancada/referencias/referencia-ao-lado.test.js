@@ -95,10 +95,12 @@ function montar({ tema = 'revisao', descritor = { id: 'furgao:referencias/fonte-
     scene: { getObjectByName: () => gizmo },
   };
   const gizmo = { visible: true };
-  const gerenciador = { grupo: { visible: true }, obterImagemReferencia: () => descritor };
+  /* Com a chave "Na cena" desligada, a imagem só está na aba: o gerenciador não tem imagem, e `descreverNaCena` devolve
+     a oferecida, fora da cena. */
+  const gerenciador = { grupo: { visible: true }, obterImagemReferencia: () => null };
   const alternarProjecao = vi.fn(() => { ambiente.projecao = 'ortografica'; });
   const referencia = criarReferenciaAoLado({
-    ambiente, cena: { modelo: { raiz } }, imagemNaCena: { gerenciador }, estado, alternarProjecao,
+    ambiente, cena: { modelo: { raiz } }, imagemNaCena: { gerenciador, descreverNaCena: () => (descritor ? { ...descritor, naCena: false } : null) }, estado, alternarProjecao,
     carregarJson: async () => ({ total: TOTAL }),
   });
   return { estado, ambiente, gerenciador, gizmo, alternarProjecao, referencia };

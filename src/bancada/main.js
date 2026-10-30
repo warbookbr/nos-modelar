@@ -15,7 +15,7 @@ import { arquivoDaSessaoNaUrl } from './sessao/sincronizador.js';
 import { criarSessaoDaBancada } from './sessao/sessao-da-bancada.js';
 import { criarRegistroDeEventos } from './sessao/registro-de-eventos.js';
 import { criarPreferenciaDeTema, criarPreferenciaDeVisao, criarPreferenciasBancada } from './preferencias/estado-local.js';
-import { TEMAS, TEMA_PADRAO } from './temas/temas.js';
+import { TEMAS, TEMA_PADRAO, temaPorId } from './temas/temas.js';
 import { VISOES, VISAO_PADRAO, criarSeletorDeVisao, visaoDisponivel } from './visoes/registro-de-visoes.js';
 import { criarRegistroAtalhos } from './controles/atalhos.js';
 import { criarComandos } from './controles/comandos.js';
@@ -43,7 +43,7 @@ import { montarReferenciaMetrica } from './componentes/referencia-metrica.js';
 import { montarCaixaDaVisao } from './componentes/caixa-da-visao.js';
 import { montarTema } from './componentes/tema.js';
 import { montarBuscaDeComandos } from './componentes/busca-de-comandos.js';
-import { montarPaineisDoTema } from './componentes/paineis-do-tema.js';
+import { MARGEM_DO_PAINEL, montarPaineisDoTema } from './componentes/paineis-do-tema.js';
 import { montarCartaoDaSelecao, MARGENS_DO_CARTAO } from './componentes/cartao-da-selecao.js';
 import { montarCuboDeOrientacao } from './componentes/cubo-de-orientacao.js';
 import { montarBarraDeEdicao } from './componentes/barra-de-edicao.js';
@@ -317,6 +317,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   });
   montarNomeDaPeca({ elementos: elementos.nomeDaPeca, estado });
   montarPopoverDaCena({ elementos: elementos.popoverDaCena });
+  /* A caixa da câmera do tema Bancada, com as vistas, é a mesma caixa da cena com outro conteúdo. */
+  montarPopoverDaCena({ elementos: elementos.popoverDaCamera });
   montarMesaDeRevisao({
     elementos: elementos.mesaDeRevisao, estado, acoes: { abrirNotas: () => abrirAbaDoPainel('anotacoes') },
   });
@@ -336,11 +338,15 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     },
     caixaNaTela: () => cena.caixaDaSelecaoNaTela(),
     medidas: () => cena.medidasDaSelecao(),
-    /* O cartão não cobre a árvore das partes quando ela está aberta. */
-    margens: () => ({
-      ...MARGENS_DO_CARTAO,
-      esquerda: MARGENS_DO_CARTAO.esquerda + (estado.obter('paineis').partes ? 240 + 16 : 0),
-    }),
+    /* O cartão não cobre a árvore das partes quando ela está aberta, na largura que o tema declara para ela. */
+    margens: () => {
+      const partes = temaPorId(estado.obter('tema')).paineis?.partes;
+      const aberta = partes && estado.obter('paineis').partes;
+      return {
+        ...MARGENS_DO_CARTAO,
+        esquerda: MARGENS_DO_CARTAO.esquerda + (aberta ? partes.largura + (partes.margem ?? MARGEM_DO_PAINEL) : 0),
+      };
+    },
   });
   montarBarraDeEdicao({
     elementos: elementos.barraDeEdicao,

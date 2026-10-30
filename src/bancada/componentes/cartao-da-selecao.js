@@ -5,8 +5,10 @@
  * As ações são as mesmas do painel da direita (`acoes`), e não uma segunda cópia: focar, isolar, fantasma (o contexto),
  * arame só da seleção, ocultar, opacidade e selecionar o conjunto.
  *
- * A posição sai de `caixaNaTela()`, a caixa da seleção em coordenadas normalizadas da tela, a cada quadro enquanto o
- * cartão está à vista: a câmera gira e o cartão acompanha a parte. A conta é `posicaoDoCartao`, pura. */
+ * A posição sai de `caixaNaTela()`, a caixa da seleção em coordenadas normalizadas da cena, a cada quadro enquanto o
+ * cartão está à vista: a câmera gira e o cartão acompanha a parte. A conta é `posicaoDoCartao`, pura. A cena é o retângulo
+ * do canvas (`cena`), que no tema Bancada fica entre os painéis fixos e no Revisão é só o lado da peça, e não começa na
+ * borda da janela; sem ele vale a janela inteira. */
 import { formatarNome } from '../formatar.js';
 
 /** As margens da tela que o cartão não cobre: a barra do alto, a barra de estado e os lados. */
@@ -15,13 +17,11 @@ const AFASTAMENTO = 24;
 
 /**
  * Onde o canto de cima e da esquerda do cartão fica, em pixels: à direita da caixa da parte, na altura do meio dela, ou
- * à esquerda quando à direita não cabe, e sempre dentro das margens. A caixa vem em coordenadas normalizadas da cena, e
- * `cena` é o retângulo da cena na tela (`x`, `y`, `largura`, `altura`), que é a tela inteira quando a cena a ocupa toda;
- * no tema Revisão a cena é só a metade da peça, e o cartão segue a parte dentro dela.
+ * à esquerda quando à direita não cabe, e sempre dentro das margens.
  */
-export function posicaoDoCartao({ caixa, tela, cartao, margens = MARGENS_DO_CARTAO, cena = { x: 0, y: 0, ...tela } }) {
-  const paraX = (ndc) => cena.x + ((ndc + 1) / 2) * cena.largura;
-  const paraY = (ndc) => cena.y + ((1 - ndc) / 2) * cena.altura;
+export function posicaoDoCartao({ caixa, tela, cartao, cena = tela, margens = MARGENS_DO_CARTAO }) {
+  const paraX = (ndc) => (cena.esquerda ?? 0) + ((ndc + 1) / 2) * cena.largura;
+  const paraY = (ndc) => (cena.topo ?? 0) + ((1 - ndc) / 2) * cena.altura;
   const esquerda = paraX(caixa.esquerda);
   const direita = paraX(caixa.direita);
   const meio = (paraY(caixa.topo) + paraY(caixa.base)) / 2;
@@ -30,7 +30,7 @@ export function posicaoDoCartao({ caixa, tela, cartao, margens = MARGENS_DO_CART
   if (x > limiteDireito) x = esquerda - AFASTAMENTO - cartao.largura;
   x = Math.min(Math.max(x, margens.esquerda), Math.max(margens.esquerda, limiteDireito));
   /* O cartão não sobe acima do alto da cena, que no Revisão começa abaixo do cabeçalho da peça. */
-  const topo = Math.max(margens.topo, cena.y + AFASTAMENTO / 3);
+  const topo = Math.max(margens.topo, (cena.topo ?? 0) + AFASTAMENTO / 3);
   const y = Math.min(Math.max(meio - cartao.altura / 2, topo), Math.max(topo, tela.altura - margens.base - cartao.altura));
   return { x: Math.round(x), y: Math.round(y) };
 }
@@ -48,7 +48,7 @@ export function textoDasMedidas(medidas) {
 export function montarCartaoDaSelecao({
   elementos, estado, acoes, caixaNaTela, medidas, margens = () => MARGENS_DO_CARTAO, janela = globalThis,
 }) {
-  const { cartao, cena: canvas = null, titulo, medidasTexto, botoes, opacidade, valorOpacidade } = elementos;
+  const { cartao, titulo, medidasTexto, botoes, opacidade, valorOpacidade, cena } = elementos;
   if (!cartao) return { posicionar() {} };
   let quadro = 0;
 
@@ -63,11 +63,13 @@ export function montarCartaoDaSelecao({
       return;
     }
     const tela = { largura: janela.innerWidth ?? 1400, altura: janela.innerHeight ?? 900 };
-    const retangulo = canvas?.getBoundingClientRect?.();
+    const retangulo = cena?.getBoundingClientRect?.();
     const { x, y } = posicaoDoCartao({
       caixa,
       tela,
-      cena: retangulo ? { x: retangulo.left, y: retangulo.top, largura: retangulo.width, altura: retangulo.height } : undefined,
+      cena: retangulo?.width
+        ? { esquerda: retangulo.left, topo: retangulo.top, largura: retangulo.width, altura: retangulo.height }
+        : tela,
       cartao: { largura: cartao.offsetWidth || 304, altura: cartao.offsetHeight || 200 },
       margens: margens(),
     });

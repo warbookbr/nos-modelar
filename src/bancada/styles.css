@@ -1,11 +1,14 @@
 /* styles.css — a aparência e a arrumação da bancada, sobre as definições de `sistema-visual.css`.
  *
  * Nenhuma cor, tamanho de fonte ou espaçamento é escrito aqui: tudo sai das variáveis do sistema visual, e
- * `estilo/sistema-visual.test.js` reprova o que escapar delas. A folha tem três partes. A primeira desenha os controles
- * e os componentes, que são os mesmos em todos os temas. A segunda é a arrumação clássica, a da bancada de antes dos
- * temas, com os painéis fixos dos lados e a fileira das vistas no alto, que os temas Bancada e Revisão usam por
- * enquanto. A terceira é a arrumação do Foco, com a peça na tela inteira e os controles em painéis flutuantes. O tema
- * escolhe a arrumação pelo atributo `data-arrumacao` da raiz da página (`temas/temas.js`). */
+ * `estilo/sistema-visual.test.js` reprova o que escapar delas. A folha tem quatro partes. A primeira desenha os
+ * controles e os componentes, que são os mesmos em todos os temas. A segunda é a arrumação clássica, a da bancada de
+ * antes dos temas, com os painéis fixos dos lados e a fileira das vistas no alto; nenhum tema a pede mais, mas as regras
+ * dela valem para toda arrumação que não é a do Foco, e as do Bancada e do Revisão as desfazem onde atrapalham. A
+ * terceira é a arrumação do Foco, com a peça na tela inteira e os controles em painéis flutuantes, e a quarta a do tema
+ * Bancada, com os painéis fixos dos lados. A arrumação do Revisão, com a peça e a referência lado a lado, mora na folha
+ * dela, `temas/revisao.css`. O tema escolhe a arrumação pelo atributo `data-arrumacao` da raiz da página
+ * (`temas/temas.js`). */
 
 /* ========================================================================== */
 /* Base                                                                       */
@@ -499,6 +502,7 @@ body.modal-aberto { overflow: hidden; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.mostrar-referencia { display: flex; flex: 0 0 auto; align-items: center; gap: var(--e1); font-size: var(--t-p); cursor: pointer; }
 .apagar-referencia { flex: 0 0 auto; width: var(--controle); padding: 0; }
 .lista-criterios,
 .lista-toggles-prancha { display: flex; flex-direction: column; gap: var(--e1); margin: 0; padding: 0; list-style: none; }
@@ -1381,6 +1385,213 @@ body.modal-aberto { overflow: hidden; }
   :root[data-arrumacao="foco"] .painel-partes { width: 224px; }
   :root[data-arrumacao="foco"] .painel-inspecao { width: 256px; }
 }
+
+/* ========================================================================== */
+/* Arrumação da Bancada: estação de CAD, com os painéis fixos dos lados       */
+/* ========================================================================== */
+
+/* A barra do alto mede 36 pixels, a de estado 24, a árvore 196 e o painel da direita 216, as larguras que o tema declara
+   em `temas/temas.js` para a regra dos 70% da cena. A cena 3D fica entre eles, e não por baixo: o canvas encolhe com os
+   painéis abertos, e a peça se enquadra no meio do que se vê. A Bancada usa os componentes do Foco (a barra do alto, o
+   cubo, a barra de estado, a barra de edição e o cartão) em outro lugar, e desfaz aqui as regras da arrumação clássica,
+   que valem para toda arrumação que não é o Foco. */
+
+/* O que só existe na Bancada some nas outras arrumações; o que ela divide com o Foco aparece. */
+:root:not([data-arrumacao="bancada"]) [data-arrumacoes~="bancada"] { display: none !important; }
+:root[data-arrumacao="bancada"] .topo-foco,
+:root[data-arrumacao="bancada"] .cubo-orientacao,
+:root[data-arrumacao="bancada"] .barra-estado,
+:root[data-arrumacao="bancada"] .barra-edicao:not([hidden]),
+:root[data-arrumacao="bancada"] .cartao-selecao:not([hidden]) { display: flex !important; }
+:root[data-arrumacao="bancada"] .barra-controles,
+:root[data-arrumacao="bancada"] .recolher,
+:root[data-arrumacao="bancada"] .painel > .dica,
+:root[data-arrumacao="bancada"] .fixture-atual,
+:root[data-arrumacao="bancada"] #tituloInspecao,
+:root[data-arrumacao="bancada"] .cena-preferencias,
+:root[data-arrumacao="bancada"] #eixosReferencia,
+:root[data-arrumacao="bancada"] .grupo-peca > .divisor,
+:root[data-arrumacao="bancada"] .barra-cena > .divisor,
+:root[data-arrumacao="bancada"] .barra-cena > .popover-ancora:has(#btnCena),
+:root[data-arrumacao="bancada"] #btnMenuAtalhos > .texto-botao,
+:root[data-arrumacao="bancada"] #btnMenuEstado > .texto-botao,
+:root[data-arrumacao="bancada"] .barra-cena #btnFocarSelecao > span,
+:root[data-arrumacao="bancada"] .barra-cena #btnCopiarEstado > span { display: none; }
+:root[data-arrumacao="bancada"] [data-movel] > .icone,
+:root[data-arrumacao="bancada"] .seletor-visao .icone { display: block; }
+
+/* ----- a cena entre os painéis ----- */
+:root[data-arrumacao="bancada"] #cenaBancada { top: 36px; left: 0; width: 100vw; height: calc(100vh - 60px); }
+:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]) #cenaBancada { left: 196px; width: calc(100vw - 196px); }
+:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"]) #cenaBancada { width: calc(100vw - 216px); }
+:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]):has(.painel-inspecao[data-aberto="true"]) #cenaBancada { width: calc(100vw - 412px); }
+/* O modo de edição se vê na borda da cena. */
+:root[data-arrumacao="bancada"] body.editando:not(.auditoria) #cenaBancada { outline: 2px solid var(--destaque); outline-offset: -2px; }
+
+/* ----- a barra do alto: a peça à esquerda, a busca no meio, o modo e as janelas à direita ----- */
+:root[data-arrumacao="bancada"] .topo-foco {
+  top: 0;
+  right: 0;
+  left: 0;
+  align-items: center;
+  gap: var(--e2);
+  height: 36px;
+  padding: 0 var(--e2);
+  border-bottom: var(--traco);
+  background: var(--base);
+  pointer-events: auto;
+}
+:root[data-arrumacao="bancada"] .topo-foco .grupo-flutuante:not(.barra-cena) {
+  gap: var(--e1);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-arrumacao="bancada"] .grupo-peca { flex: 1 1 0; }
+:root[data-arrumacao="bancada"] .grupo-direita { flex: 1 1 0; justify-content: flex-end; }
+:root[data-arrumacao="bancada"] .grupo-peca #btnMenuAbrir { order: 1; border-color: var(--linha-forte); }
+:root[data-arrumacao="bancada"] .grupo-peca > .nome-peca { order: 2; }
+:root[data-arrumacao="bancada"] .nome-peca b { font-size: var(--t-m); }
+:root[data-arrumacao="bancada"] .estado-sessao {
+  height: 20px;
+  padding: 0 var(--e2);
+  border: var(--traco);
+  border-radius: var(--raio-p);
+}
+:root[data-arrumacao="bancada"] .topo-foco .busca-gatilho {
+  position: absolute;
+  left: 50%;
+  justify-content: flex-start;
+  width: 280px;
+  transform: translateX(-50%);
+  border-color: var(--linha);
+  background: var(--superficie);
+  color: var(--texto-3);
+}
+:root[data-arrumacao="bancada"] .topo-foco .busca-gatilho .texto-largo { display: inline; flex: 1; text-align: left; }
+:root[data-arrumacao="bancada"] .topo-foco .busca-gatilho:hover { border-color: var(--linha-forte); background: var(--superficie); }
+/* Inspecionar e Editar são uma troca só, colada. */
+:root[data-arrumacao="bancada"] .topo-foco #btnInspecionar,
+:root[data-arrumacao="bancada"] .topo-foco #btnJuntas { border-color: var(--linha-forte); color: var(--texto-2); }
+:root[data-arrumacao="bancada"] .topo-foco #btnInspecionar { border-radius: var(--raio-p) 0 0 var(--raio-p); }
+:root[data-arrumacao="bancada"] .topo-foco #btnJuntas {
+  margin: 0 var(--e2) 0 calc(-1 * var(--e1));
+  border-left-color: transparent;
+  border-radius: 0 var(--raio-p) var(--raio-p) 0;
+}
+:root[data-arrumacao="bancada"] .topo-foco #btnInspecionar[aria-pressed="true"],
+:root[data-arrumacao="bancada"] .topo-foco #btnJuntas[aria-pressed="true"] { background: var(--destaque-fraco); color: var(--destaque); }
+
+/* ----- a barra flutuante da cena: câmera, projeção, visão, enquadrar, focar e copiar vista ----- */
+:root[data-arrumacao="bancada"] .barra-cena { position: fixed; top: calc(36px + var(--e2)); left: var(--e2); border-color: var(--linha-forte); }
+:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]) .barra-cena { left: calc(196px + var(--e2)); }
+:root[data-arrumacao="bancada"] .barra-cena .lugar > button:disabled { border-color: transparent; background: transparent; color: var(--texto-3); cursor: default; }
+:root[data-arrumacao="bancada"] .barra-cena .lugar > button:hover:not(:disabled) { border-color: transparent; background: var(--superficie-2); }
+:root[data-arrumacao="bancada"] .barra-cena .lugar > .seletor-visao,
+:root[data-arrumacao="bancada"] .barra-cena .lugar > #btnEnquadrar { margin-left: var(--e1); padding-left: var(--e1); border-left: var(--traco); border-radius: 0; }
+:root[data-arrumacao="bancada"] .botao-camera {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  height: var(--controle);
+  padding: 0 var(--e2);
+  border: 1px solid transparent;
+  border-radius: var(--raio-p);
+  background: transparent;
+  color: var(--texto);
+  white-space: nowrap;
+  cursor: pointer;
+}
+:root[data-arrumacao="bancada"] .botao-camera:hover { background: var(--superficie-2); }
+:root[data-arrumacao="bancada"] .botao-camera[aria-expanded="true"] { background: var(--destaque-fraco); color: var(--destaque); }
+:root[data-arrumacao="bancada"] .botao-camera .seta { color: var(--texto-3); }
+:root[data-arrumacao="bancada"] .popover-camera { right: auto; left: 0; width: 176px; padding: var(--e1); }
+:root[data-arrumacao="bancada"] .popover-camera .vistas {
+  position: static;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: stretch;
+  gap: var(--e-meio);
+  width: auto;
+  max-width: none;
+  padding: 0;
+  transform: none;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+:root[data-arrumacao="bancada"] .popover-camera .vistas > button { justify-content: space-between; }
+:root[data-arrumacao="bancada"] .popover-camera kbd { display: inline-block; }
+
+/* ----- o cubo no canto de cima da cena ----- */
+:root[data-arrumacao="bancada"] .cubo-orientacao { top: calc(36px + var(--e2)); right: var(--e2); }
+:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"]) .cubo-orientacao { right: calc(216px + var(--e2)); }
+
+/* ----- os painéis fixos ----- */
+:root[data-arrumacao="bancada"] .painel {
+  position: fixed;
+  z-index: 6;
+  top: 36px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: var(--superficie);
+  box-shadow: none;
+}
+:root[data-arrumacao="bancada"] .painel[data-aberto="false"] { display: none; }
+:root[data-arrumacao="bancada"] .painel-partes { left: 0; width: 196px; border-right: var(--traco); }
+:root[data-arrumacao="bancada"] .painel-inspecao { right: 0; width: 216px; border-left: var(--traco); }
+:root[data-arrumacao="bancada"] .painel-cabecalho {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding: 0 var(--e1) 0 var(--e3);
+  border-bottom: var(--traco);
+}
+:root[data-arrumacao="bancada"] .painel-cabecalho h1 { font-size: var(--t-m); }
+:root[data-arrumacao="bancada"] .partes-controles { flex: none; padding: var(--e2); border-bottom: var(--traco); }
+:root[data-arrumacao="bancada"] .lista-partes { padding: var(--e1) 0; }
+:root[data-arrumacao="bancada"] .parte-linha { min-height: var(--controle); padding: 0 var(--e1) 0 0; border-radius: 0; }
+:root[data-arrumacao="bancada"] .parte-linha .parte-nome { min-height: var(--controle); padding: 0 var(--e1) 0 var(--e3); }
+:root[data-arrumacao="bancada"] .parte-linha.ativa { box-shadow: inset 2px 0 0 var(--destaque); }
+:root[data-arrumacao="bancada"] .parte-linha .acao-linha { width: 20px; height: 20px; visibility: visible; }
+:root[data-arrumacao="bancada"] .pe-partes { padding: var(--e1) var(--e1) var(--e1) var(--e3); border-top: var(--traco); }
+
+/* O painel da direita: abas sublinhadas, e a primeira com o nome do caso (Peça, Parte ou Edição). */
+:root[data-arrumacao="bancada"] .painel-inspecao > .abas-painel { flex: none; gap: 0; height: 32px; padding: 0 var(--e1); border-bottom: var(--traco); }
+:root[data-arrumacao="bancada"] .aba-btn { flex: none; min-height: 0; padding: 0 var(--e2); border-radius: 0; }
+:root[data-arrumacao="bancada"] .aba-btn.ativa { background: transparent; color: var(--texto); box-shadow: inset 0 -2px 0 var(--destaque); }
+:root[data-arrumacao="bancada"] .painel-inspecao > .aba-conteudo:not([hidden]) { gap: var(--e4); padding: var(--e3); }
+:root[data-arrumacao="bancada"] .modos { grid-template-columns: 1fr 1fr; }
+:root[data-arrumacao="bancada"] .modos .botao { display: flex; justify-content: center; padding: 0 var(--e2); }
+:root[data-arrumacao="bancada"] .modos small { display: none; }
+:root[data-arrumacao="bancada"] .acoes-inspecao { grid-template-columns: 1fr; }
+:root[data-arrumacao="bancada"] body:not(.editando) .acoes-editar { display: none; }
+:root[data-arrumacao="bancada"] body.editando .acoes-editar { order: -1; gap: var(--e1); }
+
+/* ----- embaixo: a barra de estado, a barra de edição no meio da cena e os avisos ----- */
+:root[data-arrumacao="bancada"] .barra-estado { height: 24px; background: var(--base); }
+:root[data-arrumacao="bancada"] .referencia-metrica { position: static; min-width: 0; transform: none; }
+:root[data-arrumacao="bancada"] .rodape-juntas { position: static; transform: none; }
+:root[data-arrumacao="bancada"] .barra-edicao { bottom: calc(24px + var(--e3)); border-color: var(--linha-forte); }
+:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]) .barra-edicao { left: calc(50vw + 98px); }
+:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"]) .barra-edicao { left: calc(50vw - 108px); }
+:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]):has(.painel-inspecao[data-aberto="true"]) .barra-edicao { left: calc(50vw - 10px); }
+:root[data-arrumacao="bancada"] .aviso,
+:root[data-arrumacao="bancada"] #erro { bottom: 88px; }
+:root[data-arrumacao="bancada"] .aviso-estado,
+:root[data-arrumacao="bancada"] .aviso-sessao-nova { top: 92px; }
 
 /* ========================================================================== */
 /* Auditoria: a imagem para ler a peça, sem nada da interface                 */

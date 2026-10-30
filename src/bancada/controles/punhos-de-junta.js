@@ -13,15 +13,41 @@
  * distância em qualquer direção, e é o que a pessoa vê. Para mexer na dimensão
  * que ficou de fora, ela gira a câmera e arrasta de novo.
  *
- * A bola tem tamanho constante na tela, pela mesma conta das setas: fração da
- * distância até a câmera. Sem isso o punho some quando a peça está longe e
- * engole a peça quando está perto. */
+ * TAMANHO EM PIXELS. A bola tem diâmetro constante na tela, medido em pixels, e
+ * o alvo do clique é um círculo maior em volta do centro dela, também em pixels.
+ * Antes o raio era uma fração da distância até a câmera, a mesma conta das
+ * setas, e isso não é tamanho na tela: ele crescia com a altura da janela e com
+ * o campo de visão, e na projeção ortográfica não acompanhava o zoom. Em
+ * 1400×900 cada punho tinha 29 pixels de diâmetro, e os 256 do furgão viravam
+ * manchas que cobriam a peça. Agora o desenho tem 12 pixels e o alvo tem 24, o
+ * mínimo de alvo clicável das diretrizes de acessibilidade (WCAG 2.5.8): o
+ * desenho fica pequeno para não esconder a forma, e o alvo continua do tamanho
+ * que o mouse acerta sem mirar. Com os alvos sobrepostos, vence o centro
+ * mais perto do ponteiro, a mesma escolha por distância na tela que a edição de
+ * malha usa para o vértice. */
 
 import * as THREE from 'three';
 
-const FRACAO_DA_DISTANCIA = 1 / 90;
+/** O punho desenhado, em pixels de diâmetro na tela. */
+export const DIAMETRO_DO_PUNHO_EM_PIXELS = 12;
+/** O alvo do clique, em pixels de raio em volta do centro do punho: 24 pixels de diâmetro. */
+export const ALCANCE_DO_PUNHO_EM_PIXELS = 12;
 const COR = 0xffb347;
 const COR_REALCE = 0xffffff;
+
+/**
+ * Quanto mede um pixel da tela, em unidades do mundo, no ponto dado. Na
+ * perspectiva depende da profundidade do ponto diante da câmera; na ortográfica
+ * só da altura do quadro e do zoom.
+ */
+export function mundoPorPixel(camera, ponto, alturaEmPixels) {
+  if (!(alturaEmPixels > 0)) return 0;
+  const zoom = camera.zoom || 1;
+  if (camera.isOrthographicCamera) return (camera.top - camera.bottom) / zoom / alturaEmPixels;
+  camera.updateMatrixWorld();
+  const profundidade = Math.max(-ponto.clone().applyMatrix4(camera.matrixWorldInverse).z, 1e-6);
+  return (2 * profundidade * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)) / zoom / alturaEmPixels;
+}
 
 export function criarPunhosDeJunta({
   cena, canvas, cameraAtual,
@@ -98,9 +124,10 @@ export function criarPunhosDeJunta({
   function atualizarEscala() {
     if (!raiz.visible) return;
     const camera = cameraAtual();
+    const altura = canvas.getBoundingClientRect().height;
     for (const punho of punhos.values()) {
-      const distancia = camera.position.distanceTo(punho.malha.position);
-      punho.malha.scale.setScalar(Math.max(distancia * FRACAO_DA_DISTANCIA, 1e-4));
+      const raio = (DIAMETRO_DO_PUNHO_EM_PIXELS / 2) * mundoPorPixel(camera, punho.malha.position, altura);
+      punho.malha.scale.setScalar(Math.max(raio, 1e-4));
     }
   }
 
@@ -111,17 +138,23 @@ export function criarPunhosDeJunta({
     }
   }
 
+  /* O punho cujo centro, projetado na tela, fica mais perto do ponteiro, dentro
+     do alcance. O raio contra a esfera desenhada daria um alvo do tamanho do
+     desenho, e com o desenho pequeno o alvo ficaria pequeno junto. */
   function punhoSobOPonteiro(evento) {
     if (!raiz.visible) return null;
     const { x, y, rect } = emPixels(evento);
-    ponteiro.x = (x / rect.width) * 2 - 1;
-    ponteiro.y = -(y / rect.height) * 2 + 1;
-    raycaster.setFromCamera(ponteiro, cameraAtual());
-    for (const item of raycaster.intersectObject(raiz, true)) {
-      const nome = item.object.userData.junta;
-      if (nome) return punhos.get(nome);
+    const camera = cameraAtual();
+    camera.updateMatrixWorld();
+    let melhor = null;
+    let menor = ALCANCE_DO_PUNHO_EM_PIXELS;
+    for (const punho of punhos.values()) {
+      const p = punho.malha.position.clone().project(camera);
+      if (p.z > 1) continue;
+      const distancia = Math.hypot(((p.x + 1) / 2) * rect.width - x, ((1 - p.y) / 2) * rect.height - y);
+      if (distancia <= menor) { menor = distancia; melhor = punho; }
     }
-    return null;
+    return melhor;
   }
 
   /* Onde o ponteiro encosta no plano que passa pelo canto e encara a câmera. */
@@ -189,6 +222,8 @@ export function criarPunhosDeJunta({
     mostrar,
     esconder,
     atualizarEscala,
+    /** O nome da junta cujo punho o ponteiro pega, ou null. */
+    juntaSobOPonteiro: (evento) => punhoSobOPonteiro(evento)?.nome ?? null,
     get arrastando() { return Boolean(arrasto); },
     get visivel() { return raiz.visible; },
     destruir() {

@@ -36,6 +36,22 @@ A pessoa escolheu, pela recomendação, o furgão de carga estático: as portas 
 
 A pessoa aceitou as recomendações: faróis grandes nas quinas, embutidos e dobrando um pouco para a lateral, com a grade entre eles, sem marca nem logotipo; vidro escurecido com um interior simples atrás (os bancos da cabine como volumes, o painel e a divisória entre a cabine e a carga); a borracha escura em volta de cada vidro, feita como moldura de vão; os limpadores do para-brisa, as setas laterais, a luz de freio alta sobre as portas traseiras e um fundo escuro por baixo do furgão; o forro escuro e justo ao pneu por dentro dos arcos das rodas; a cor azul do `furgao`, com o plástico escuro embaixo; a referência nas vistas do `furgao` e na prancha cotada; os critérios de reprovação propostos no fim do alinhamento, para a pessoa aprovar.
 
-## Em aberto
+## As etapas e quem julga
 
-As etapas da modelagem e como a pessoa julga cada uma, as partes com os nomes, os contatos e os critérios de reprovação.
+A pessoa escolheu modelar em etapas, na ordem em que um furgão se monta, e julgar cada uma: (1) a lataria base, com as proporções da classe, a cabine de bico curto, as laterais verticais e o teto alto; (2) a lataria detalhada, com as frestas das portas, o vinco de cintura, as nervuras do teto e as abas dos arcos; (3) o corpo de baixo e os para-choques; (4) as rodas e o forro dos arcos, com as duas melhorias da família; (5) os vidros, as borrachas e o interior; (6) as luzes e a grade; (7) o acabamento. Antes da etapa 1 vêm a cópia do `furgao` e a prancha cotada. Em cada etapa o agente modela, roda as medidas e o crítico cego, e só então leva as imagens à pessoa (sólidas, com luz de cima, em três quartos, de lado, de frente e de trás, e, nas etapas de lataria, a curvatura e a luz rasante); a pessoa aceita ou pede correção, o aceite fica registrado, e a etapa seguinte só começa depois dele.
+
+## As partes
+
+A carroceria inteira como uma chapa só (cabine, carga e teto), com as frestas, o vinco e as nervuras desenhados nela; a faixa de proteção lateral dos dois lados e os para-choques dianteiro e traseiro; as quatro rodas da família, cada uma com pneu e roda, e o forro dentro de cada arco; o para-brisa, os vidros das duas portas da cabine e os das duas portas traseiras, cada um com a sua borracha; os dois bancos, o painel e a divisória; os dois faróis, a grade, as duas lanternas, as duas setas e a luz de freio alta; os dois retrovisores, as maçanetas, os dois limpadores, o trilho da porta de correr e o fundo. Os nomes de passo de cada uma saem na etapa que a modela.
+
+## Os contatos
+
+Os vidros rentes à lataria, com a borracha cobrindo a junta; a faixa de baixo e os para-choques encostados na lataria e emendados entre si, sem degrau para fora; os pneus apoiados no chão; o forro do arco a 20 a 30 mm do pneu, sem tocar; os faróis e as lanternas embutidos e rentes à lataria; os retrovisores presos nas portas da cabine, as maçanetas nas portas e o trilho na lateral; o interior inteiro dentro da lataria, sem atravessar nada.
+
+## Os critérios de reprovação
+
+A etapa reprova se: a silhueta lateral, frontal ou de cima se afastar da prancha mais de 15 mm em média ou 40 mm em algum ponto; alguma peça ficar solta no ar ou atravessar outra sem motivo; um pneu não tocar o chão, tocar o forro do arco ou atravessar o arco; uma fresta de porta não fechar a volta ou mudar de largura ao longo dela; o interior oco aparecer por algum vidro; a luz rasante ou a curvatura mostrarem amassado ou ondulação que a forma não pede; a faixa de baixo ou os para-choques sobrarem para fora da lataria; o lado esquerdo e o direito diferirem fora da porta de correr; aparecer marca, logotipo ou nome de fabricante.
+
+## Fechamento
+
+A pessoa aprovou o alinhamento em 2026-10-30. O `PLANO` da receita passa a descrever cada parte na etapa que a modela, porque o normalizador do plano cobra que toda parte prometida exista na receita; até lá, a cópia leva o `PLANO` do `furgao` com o objeto e a origem trocados.

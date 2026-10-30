@@ -49,11 +49,18 @@ describe('contas do cartão', () => {
     expect(posicaoDoCartao({ caixa: { esquerda: -1, direita: 0.95, base: -1.5, topo: -1.2 }, tela, cartao })).toEqual({ x: 16, y: 652 });
   });
 
-  it('com a cena numa parte da tela, segue a parte dentro dela e não sobe acima do alto dela', () => {
+  it('conta a caixa da parte sobre a cena, que na Bancada começa depois da árvore e abaixo da barra do alto', () => {
+    const tela = { largura: 1100, altura: 800 };
+    const cena = { esquerda: 196, topo: 36, largura: 904, altura: 740 };
+    const cartao = { largura: 304, altura: 200 };
+    expect(posicaoDoCartao({ caixa: { esquerda: -0.2, direita: 0, base: -0.4, topo: -0.2 }, tela, cena, cartao })).toEqual({ x: 672, y: 417 });
+  });
+
+  it('no Revisão segue a parte no lado da peça e não sobe acima do alto dele', () => {
     const tela = { largura: 1400, altura: 900 };
     const cartao = { largura: 304, altura: 200 };
     /* O lado da peça no Revisão: 580 por 788 pixels, a partir de (240, 84). */
-    const cena = { x: 240, y: 84, largura: 580, altura: 788 };
+    const cena = { esquerda: 240, topo: 84, largura: 580, altura: 788 };
     expect(posicaoDoCartao({ caixa: { esquerda: -0.2, direita: 0, base: -0.4, topo: -0.2 }, tela, cartao, cena })).toEqual({ x: 554, y: 496 });
     expect(posicaoDoCartao({ caixa: { esquerda: 0.6, direita: 0.9, base: 0.8, topo: 1.2 }, tela, cartao, cena })).toEqual({ x: 815, y: 92 });
   });
