@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1644 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1669 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1798,6 +1798,9 @@
 
 ## src/bancada/cena/
 
+- `cenario-do-tema.js` — cenario-do-tema.js — o cenário que um tema pode pedir à cena 3D: a grade que some nas bordas e a sombra suave no chão.
+- `cenario-do-tema.test.js` — cenario-do-tema.test.js — a grade do tema some nas bordas, a sombra só recebe sombra, os dois nascem invisíveis, e o contorno procura a máscara em volta do p…
+- `contorno-da-selecao.js` — contorno-da-selecao.js — o contorno da seleção na borda da peça: uma linha da cor de destaque em volta da silhueta das partes escolhidas, desenhada por cima …
 - `edicao-da-peca.js` — edicao-da-peca.js — o que a pessoa desenha na peça da bancada: o ajuste por junta, a edição de malha, o desfazer e o alvo que sai para a rodada de absorção.
 - `edicao-da-peca.test.js` — edicao-da-peca.test.js — a base do ajuste é uma cópia da malha do arquivo, e a malha só conta como mudada por vértice movido ou por vértice ou face a mais ou…
 - `peca-em-cena.js` — peca-em-cena.js — a peça que está na cena da bancada: o modelo, o controlador das partes, a seleção por raycast, os enquadramentos e o estado escrito na URL.
@@ -1814,12 +1817,22 @@
 - `avisos.test.js` — avisos.test.js — o aviso aparece, some sozinho e reinicia a contagem com aviso novo; o erro mostra a pilha quando há.
 - `barra-das-vistas.js` — barra-das-vistas.js — a fileira das vistas da câmera, a projeção, o enquadrar e o seletor de visão.
 - `barra-das-vistas.test.js` — barra-das-vistas.test.js — a vista ativa, a projeção e o seletor de visão seguem o estado, e a lista das visões abre, fecha e escolhe pela mesma porta do ata…
+- `barra-de-edicao.js` — barra-de-edicao.js — a barra do modo de edição no tema Foco: escolher entre juntas e malha, desfazer e descartar, com o rodapé do ajuste (o resumo e o salvar…
+- `barra-de-edicao.test.js` — barra-de-edicao.test.js — a barra do modo de edição aparece com o modo e com o ajuste por salvar, marca juntas ou malha, põe a moldura na página e chama as a…
+- `barra-de-estado.js` — barra-de-estado.js — a barra de estado de baixo no tema Foco: a dica do que o ponteiro faz agora, a seleção, a peça em números e os interruptores da grade e …
+- `barra-de-estado.test.js` — barra-de-estado.test.js — a barra de estado diz o que o gesto faz em cada modo, conta a seleção, resume a peça e liga a grade e o chão.
 - `barra-superior.js` — barra-superior.js — a barra de cima da bancada: os botões Abrir, Controles e Estado, cada um com a sua janela, o selo e o aviso que aparecem só quando algo e…
 - `barra-superior.test.js` — barra-superior.test.js — as janelas Abrir, Controles e Estado abrem uma de cada vez e fecham por Esc, o acervo e os atalhos se desenham, a captura de tecla r…
+- `busca-de-comandos.js` — busca-de-comandos.js — a busca de comandos da bancada: abre com Ctrl+K (ou ⌘K) e pelo campo da barra, filtra as ações, os comandos de teclado e as partes pel…
+- `busca-de-comandos.test.js` — busca-de-comandos.test.js — a busca abre com Ctrl+K sem deixar a tecla chegar à cena, filtra sem acento, anda com as setas, executa com Enter e fecha com Esc…
 - `caixa-da-visao.js` — caixa-da-visao.js — a caixa pequena sobre a cena com o que a visão ligada pede (a legenda da curvatura, a largura das listras da zebra, a direção da luz rasa…
 - `caixa-da-visao.test.js` — caixa-da-visao.test.js — a caixa das visões de superfície: aparece com a visão, mostra o controle que ela pede e some ao voltar para a sólida; o deslizante m…
+- `cartao-da-selecao.js` — cartao-da-selecao.js — o cartão da seleção no tema Foco: o nome e as medidas da parte escolhida, as ações de uma parte e o caminho para os detalhes, ancorado…
+- `cartao-da-selecao.test.js` — cartao-da-selecao.test.js — o cartão aparece com a seleção e some na edição e com os detalhes abertos, mostra nome e medidas, marca os modos, chama as ações …
 - `ciclo-da-pagina.js` — ciclo-da-pagina.js — o relógio de quadros da bancada e a saída da página: o que acompanha a câmera a cada quadro e o que se desmonta quando a página sai.
 - `ciclo-da-pagina.test.js` — ciclo-da-pagina.test.js — o relógio roda a função já na montagem e de novo a cada quadro até parar, e a saída da página roda uma vez só.
+- `cubo-de-orientacao.js` — cubo-de-orientacao.js — o cubo de orientação do tema Foco, no lugar das nove vistas em botão: gira com a câmera e cada face leva à vista dela.
+- `cubo-de-orientacao.test.js` — cubo-de-orientacao.test.js — o giro do cubo é o da câmera com o y da página trocado, a face que a câmera olha fica de frente para quem vê, e o cubo gira a ca…
 - `dom-de-teste.js` — dom-de-teste.js — uma página falsa, mínima, para os testes dos componentes da bancada rodarem no Node sem navegador.
 - `elementos-da-pagina.js` — elementos-da-pagina.js — o único lugar que procura os elementos da bancada na página, entregues agrupados pelo componente que os usa.
 - `endereco.js` — endereco.js — o endereço da página como estado reproduzível da bancada: os parâmetros lidos na subida, a escrita do estado na URL sem recarregar e a cópia do…
@@ -1828,12 +1841,18 @@
 - `menu-abrir.js` — menu-abrir.js — a janela Abrir da barra superior: a lista das receitas do acervo em trabalho, com as de ensaio marcadas.
 - `menu-controles.js` — menu-controles.js — a janela Controles da barra superior: os comandos de teclado agrupados por assunto, a troca de tecla de cada um e a volta aos padrões.
 - `menu-estado.js` — menu-estado.js — a janela Estado da barra superior: o resumo do que está carregado e da ligação com a sessão, e a sequência de eventos desde que a página abriu.
-- `painel-componentes.js` — painel-componentes.js — o painel da esquerda: a lista das partes da peça com a marca da seleção, o filtro, o nome da peça e o recolher.
-- `painel-componentes.test.js` — painel-componentes.test.js — a lista das partes nasce do estado, marca a seleção, filtra, e o painel recolhe com a seta certa.
+- `nome-da-peca.js` — nome-da-peca.js — o nome da peça e o estado da sessão no grupo do alto à esquerda do tema Foco.
+- `nome-da-peca.test.js` — nome-da-peca.test.js — o grupo do alto escreve o nome da peça e o estado da sessão com o mesmo texto da janela Estado.
+- `paineis-do-tema.js` — paineis-do-tema.js — os painéis que o tema deixa abrir sobre a cena (a árvore das partes e o painel da direita), quem os abre e fecha, e a regra que recolhe …
+- `paineis-do-tema.test.js` — paineis-do-tema.test.js — a regra dos 70% da cena recolhe um painel quando o outro abre, e o componente abre, fecha e marca os painéis só no tema que os decl…
+- `painel-componentes.js` — painel-componentes.js — o painel da esquerda: a árvore das partes da peça com a marca da seleção, o isolar e o ocultar de cada linha, o filtro, o nome da peç…
+- `painel-componentes.test.js` — painel-componentes.test.js — a árvore das partes nasce do estado, sem contagem interna, marca a seleção, isola e oculta por linha, filtra, e o painel recolhe…
 - `painel-inspecao.js` — painel-inspecao.js — o painel da direita: as abas, a aba Inspeção com os modos, a opacidade, a explosão, as ações, o botão das juntas, o diagnóstico e as por…
 - `painel-inspecao.test.js` — painel-inspecao.test.js — as abas trocam de conteúdo, a seleção habilita os controles, o raio X desliga o Wireframe e o diagnóstico, as portas e as juntas se…
 - `ponte-da-captura.js` — ponte-da-captura.js — `window.__mecanificaBancada`, o contrato fixo pelo qual a captura automática, as guardas e a revisão headless leem e dirigem a bancada.
 - `ponte-da-captura.test.js` — ponte-da-captura.test.js — a ponte da captura mantém a superfície que os consumidores chamam, lê o estado vivo e liga e desliga a auditoria.
+- `popover-da-cena.js` — popover-da-cena.js — o botão da cena na barra flutuante do tema Foco e a caixa que ele abre, com a grade, o chão e a explosão da montagem.
+- `popover-da-cena.test.js` — popover-da-cena.test.js — o botão da cena abre e fecha a caixa, que também fecha por clique fora e por Esc sem o Esc chegar à cena.
 - `referencia-metrica.js` — referencia-metrica.js — a régua de baixo da cena: os eixos da vista e um traço de comprimento redondo com a escala em pixels por metro, atualizados a cada qu…
 - `referencia-metrica.test.js` — referencia-metrica.test.js — a régua escolhe o comprimento redondo mais perto de 88 pixels e só começa a medir no fim da subida.
 - `rodape-juntas.js` — rodape-juntas.js — o rodapé sobre a cena com o resumo do que a pessoa mexeu na peça e o botão que salva o ajuste como arquivo.
@@ -1842,6 +1861,8 @@
 - `sessao-ativa.test.js` — sessao-ativa.test.js — a oferta da entrega em espera aparece com o nome da peça e carrega no clique, e a tela de espera segue o estado.
 - `teclado.js` — teclado.js — o teclado da bancada sobre a cena: o Ctrl+Z, as teclas da edição de malha à moda do Blender, o Esc e os comandos remapeáveis da tabela.
 - `teclado.test.js` — teclado.test.js — Ctrl+Z desfaz o desenho, G move a parte, Tab entra na edição, as teclas da malha vão para a camada, Esc cancela antes de limpar e o resto p…
+- `tema.js` — tema.js — o tema da bancada na página: os atributos da raiz que a folha de estilo usa, os componentes levados para os lugares do tema, os rótulos que mudam d…
+- `tema.test.js` — tema.test.js — o tema escreve os atributos da raiz, leva os componentes para os lugares dele e os devolve para casa, troca os rótulos, guarda a escolha e ent…
 
 ## src/bancada/controles/
 
@@ -1852,12 +1873,18 @@
 - `gizmo-de-setas.js` — gizmo-de-setas.js — as três setas por eixo, desenhadas e clicáveis.
 - `historico-parametros.js` — historico-parametros.js — o desfazer da sessão, limitado ao que a pessoa mexeu depois de abrir a peça.
 - `historico-parametros.test.js` — historico-parametros.test.js — desfazer da sessão.
+- `itens-da-busca.js` — itens-da-busca.js — o que a busca de comandos lista para um termo: as ações da tela, os comandos de teclado e as partes da peça, em grupos; contas puras, sem…
 - `punhos-de-junta.js` — punhos-de-junta.js — o punho no canto onde as partes se encontram.
 
 ## src/bancada/estado/
 
 - `estado-central.js` — estado-central.js — o estado da bancada num lugar só, que os painéis leem e escrevem e cuja mudança eles assinam.
 - `estado-central.test.js` — estado-central.test.js — o estado da bancada avisa quem assina a chave que mudou, só quando muda, e recusa chave que não existe.
+
+## src/bancada/estilo/
+
+- `regua-do-estilo.js` — regua-do-estilo.js — a régua do gate 5 do plano das visões e da interface: a folha de estilo da bancada usa só as definições do sistema visual.
+- `sistema-visual.test.js` — sistema-visual.test.js — o gate 5 do plano das visões e da interface: a folha de estilo da bancada não escreve cor, tamanho de fonte nem espaçamento fora das…
 
 ## src/bancada/preferencias/
 
@@ -1889,6 +1916,10 @@
 - `sessao-da-bancada.test.js` — sessao-da-bancada.test.js — a peça escolhida à mão não é trocada pela sessão: a entrega espera como oferta e só carrega quando aceita; sem peça, a bancada es…
 - `sessao.test.js` — sessao.test.js — testes do motor de sessão ativa e sincronização em tempo real.
 - `sincronizador.js` — sincronizador.js — gerenciador de sincronização em tempo real para a Sessão Ativa.
+
+## src/bancada/temas/
+
+- `temas.js` — temas.js — os temas da bancada: Foco, Bancada e Revisão, cada um declarado como dados.
 
 ## src/bancada/visoes/
 

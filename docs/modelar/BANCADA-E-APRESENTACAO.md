@@ -62,7 +62,9 @@ componentes (`painel-componentes.js`), o painel de inspeção com as abas
 (`rodape-juntas.js`), a oferta da sessão ativa (`sessao-ativa.js`), a régua de
 escala (`referencia-metrica.js`), o teclado (`teclado.js`), o endereço da página
 (`endereco.js`), os avisos (`avisos.js`), a caixa da visão sobre a cena
-(`caixa-da-visao.js`) e a ponte da captura automática (`ponte-da-captura.js`). `elementos-da-pagina.js` é o único lugar que procura
+(`caixa-da-visao.js`), a ponte da captura automática (`ponte-da-captura.js`), o
+tema (`tema.js`), a busca de comandos (`busca-de-comandos.js`), os painéis do
+tema (`paineis-do-tema.js`) e os componentes do tema Foco descritos abaixo. `elementos-da-pagina.js` é o único lugar que procura
 elementos, e entrega a cada componente só o grupo dele. A ponte
 `window.__mecanificaBancada` é um contrato fixo: as chaves dela estão listadas
 em `CHAVES_DA_PONTE`, e o teste do componente cobra que nenhuma suma.
@@ -83,9 +85,68 @@ módulos sem tela não procuram elemento, não ouvem a janela, não leem o ender
 e não pedem quadro ao navegador. Os componentes são testados sobre uma página
 falsa, `componentes/dom-de-teste.js`, sem navegador.
 
+## O sistema visual e os temas
+
+A aparência da bancada sai de um arquivo só, `src/bancada/sistema-visual.css`,
+com as variáveis de espaço (uma grade de 4 e 8 pixels, mais o meio passo de 2),
+de texto (uma família, três tamanhos e algarismos de largura fixa para os
+números), de cor (cinzas neutros, um destaque, e o erro e o acerto só para
+mensagens) e de forma (raio, traço, sombra e altura de controle). Há dois
+conjuntos com os mesmos nomes: o claro, tirado da proposta B e usado pelos
+temas Foco e Revisão, e o escuro, tirado da proposta A e usado pelo tema
+Bancada. A folha de estilo, `styles.css`, não escreve cor, tamanho de fonte nem
+espaçamento: `src/bancada/estilo/sistema-visual.test.js` lê cada folha da
+bancada e reprova a declaração que escapar das variáveis, e roda com os outros
+testes da bancada.
+
+Um tema é uma declaração em `src/bancada/temas/temas.js`, e não código. Ele diz
+o conjunto de cores (`cores`), a arrumação da folha de estilo (`arrumacao`, hoje
+`foco` ou `classica`), o lugar de cada componente móvel (`lugares`, do nome em
+`data-movel` na página para o nome em `data-lugar`), o texto dos controles que
+mudam de nome (`rotulos`, pelo `data-rotulo`), os painéis que abrem sobre a cena
+com a largura de cada um (`paineis`) e a cena 3D que ele pede (`cena`: o fundo, a
+cor da grade, a grade esmaecida, a sombra suave e a cor do contorno da seleção,
+com as cores escritas como o nome da variável do sistema visual). O componente
+`componentes/tema.js` lê a declaração e escreve `data-tema`, `data-cores` e
+`data-arrumacao` na raiz da página, leva cada componente para o lugar do tema e
+o devolve para casa quando o tema seguinte não o cita, troca os rótulos e
+entrega a cena ao ambiente. A escolha fica no estado central (`tema`), guardada
+como preferência local, e a pessoa a faz na janela Controles e na busca de
+comandos. Tema novo declara esses campos; precisa de CSS só se pedir uma
+arrumação nova, e então escreve as regras dela sob
+`:root[data-arrumacao="<nome>"]`.
+
+O Foco é o tema padrão. A cena ocupa a tela inteira, e os controles flutuam:
+no alto, o grupo da peça (a árvore, o nome e a sessão, Abrir e Editar), a barra
+da cena (projeção, visão, enquadrar e a caixa da cena com a grade, o chão e a
+explosão) e o grupo da direita (a busca de comandos e as janelas Controles e
+Estado, e o botão dos detalhes); o cubo de orientação (`cubo-de-orientacao.js`)
+no lugar das nove vistas em botão, com faces que levam à vista; a árvore das
+partes como gaveta à esquerda, com isolar e ocultar por linha e sem contagem de
+faces; o cartão da seleção (`cartao-da-selecao.js`) ao lado da parte, com as
+medidas, as ações e "Detalhes", que abre o painel da direita (Seleção,
+Referência e Notas); a barra do modo de edição (`barra-de-edicao.js`), com
+juntas e malha, desfazer, descartar e o rodapé do ajuste; e a barra de estado
+(`barra-de-estado.js`), com a dica do gesto, a seleção, a escala, a unidade e a
+peça. A busca de comandos (`busca-de-comandos.js`) abre com `Ctrl+K` em
+qualquer tema. Os painéis abertos são do componente `paineis-do-tema.js`: abrir
+um painel que deixaria a cena com menos de 70% da largura recolhe o outro, e
+com as larguras do Foco os dois só cabem juntos a partir de 1920 pixels. A cena
+do Foco tem o fundo claro do sistema visual, a grade que some antes da borda, a
+sombra suave no chão e o contorno da seleção na borda da peça no lugar da tinta
+verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`). Os temas
+Bancada e Revisão usam por enquanto a arrumação de antes dos temas, com as cores
+do conjunto deles, e a cena de antes.
+
+A captura automática não herda o tema: a auditoria esconde tudo o que não é a
+cena, e a cena volta ao fundo, à luz e à falta de grade, chão, sombra e contorno
+da auditoria, então as imagens das guardas e do pacote do crítico saem iguais
+em qualquer tema.
+
 ## As visões de conferência
 
-O controle "Visão", no fim da fileira das vistas, troca o jeito de desenhar a
+O controle "Visão", na barra da cena do Foco e no fim da fileira das vistas na
+arrumação clássica, troca o jeito de desenhar a
 mesma peça, com uma tecla para cada visão, que o menu Controles deixa trocar: a
 sólida (`O`), o arame que esconde o que fica atrás (`M`), o raio X (`Shift+M`), a
 curvatura (`K`), a zebra (`B`) e a luz rasante (`J`). A escolha volta na próxima
