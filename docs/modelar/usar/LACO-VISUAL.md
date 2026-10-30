@@ -35,6 +35,14 @@ de uma parte, porque partes do mesmo material leem como um borrão só e a junç
 entre elas fica invisível. Sem a bandeira, a peça sai numa tira estreita no meio
 da tela, e a sombra no chão já foi lida como geometria mais de uma vez.
 
+Para achar amassado em carroceria e em qualquer lataria, a zebra não basta e as
+medidas não bastam: a zebra serve ao reflexo (a continuidade de uma curva entre
+painéis), e um amassado de um ou dois milímetros em alguns decímetros passa por
+distância, mapa de distância, curvatura de raio curto e ondulação. Use a luz
+rasante e a curvatura média só da lataria, de `tools/blender/` (veja
+[`modelar-carroceria.md`](../modelar-carroceria.md#amassado-largo-e-raso)), e abra
+cada imagem em tamanho nativo como as demais.
+
 ## 2. Antes de qualquer julgamento: abra o alvo e sobreponha
 
 Não é opcional e não é passo final. Uma prova inteira do chassi foi feita sem

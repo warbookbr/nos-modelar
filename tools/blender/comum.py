@@ -15,6 +15,7 @@ if AQUI not in sys.path:
     sys.path.insert(0, AQUI)
 import limiares
 from ambiente import do_ambiente  # noqa: E402  (fica fora deste arquivo para rodar sem o Blender)
+ALBEDO_FOSCO = 0.8  # a reflectância do material fosco da luz rasante, que o brilho da luz de sol leva em conta
 DESLOCAMENTO = 2e-4  # o raio de visibilidade sai 0,2 mm fora da face para não bater nela mesma
 TOL_PLANO = 1e-6
 
@@ -165,6 +166,20 @@ def _ler_obj(caminho, objeto):
     if objeto is not None and not F:
         erro(f'{caminho}: nenhum objeto ou grupo "{objeto}" com faces')
     return np.array(V, float).reshape(-1, 3), np.array(F, int).reshape(-1, 3), np.array(P, int)
+
+
+def nomes_dos_poligonos(caminho):
+    """Só OBJ: o nome do objeto ou grupo (`o` ou `g`) de cada polígono, na ordem em que ler_malha numera os polígonos (o P que
+    ela devolve), ou None se o arquivo não é OBJ. É como a peça exportada por `exportar:obj` diz qual parte é qual."""
+    if os.path.splitext(caminho)[1].lower() != '.obj':
+        return None
+    nomes, atual = [], ''
+    for linha in open(caminho, encoding='utf8', errors='replace'):
+        if linha.startswith('o ') or linha.startswith('g '):
+            atual = linha[2:].strip()
+        elif linha.startswith('f '):
+            nomes.append(atual)
+    return nomes
 
 
 def _malhas_de_objetos(objs, z_cima):
@@ -805,10 +820,19 @@ def limpar_cena(amostras=4):
     return sc
 
 
+def fundo_escuro(cor=0.0):
+    """O fundo da imagem num cinza neutro (0 a 1) e o mundo sem luz: nenhum brilho de ambiente chega à malha, só a luz que o
+    script puser na cena."""
+    bg = bpy.context.scene.world.node_tree.nodes.get('Background')
+    bg.inputs[0].default_value = (cor, cor, cor, 1)
+    bg.inputs[1].default_value = 0.0 if cor == 0.0 else 1.0
+
+
 def _material(nome, tipo, avesso, cor=(0.75, 0.75, 0.78), luz=(0.45, 0.7, 0.55), freq=40.0):
     """Emissão sem luz de cena, determinística. cinza: sombreamento por |n . luz|; zebra: listras do vetor refletido num
     ambiente de faixas horizontais; cor: o atributo 'cor' do vértice. Nas duas primeiras o avesso sai multiplicado pela cor
-    de avesso, para que a face vista por trás não se confunda com a superfície."""
+    de avesso, para que a face vista por trás não se confunda com a superfície. fosco é a exceção: difuso puro de albedo
+    ALBEDO_FOSCO, que só responde à luz de sol que o script pôs na cena (luz-rasante.py)."""
     m = bpy.data.materials.get(nome)
     if m:
         return m
@@ -821,6 +845,13 @@ def _material(nome, tipo, avesso, cor=(0.75, 0.75, 0.78), luz=(0.45, 0.7, 0.55),
     out = N.new('ShaderNodeOutputMaterial')
     em = N.new('ShaderNodeEmission')
     L.new(em.outputs[0], out.inputs[0])
+    if tipo == 'fosco':
+        # a luz rasante: difuso puro, sem brilho, que só responde à luz de sol da cena (o mundo é preto)
+        N.remove(em)
+        df = N.new('ShaderNodeBsdfDiffuse')
+        df.inputs['Color'].default_value = (ALBEDO_FOSCO, ALBEDO_FOSCO, ALBEDO_FOSCO, 1)
+        L.new(df.outputs[0], out.inputs[0])
+        return m
     geo = N.new('ShaderNodeNewGeometry')
     if tipo == 'cor':
         at = N.new('ShaderNodeAttribute')
@@ -915,6 +946,25 @@ def vistas_padrao(cfg):
         {'nome': 'topo', 'direcao': [0, -1, 0], 'cima': [0, 0, -1]},
         {'nome': 'tresquartos', 'direcao': [-0.55, -0.45, -0.70], 'cima': [0, 1, 0], 'meia': bool(cfg['simetria_x'])},
     ]
+
+
+def vistas_da_linha(a, cfg, regiao):
+    """As vistas pedidas na linha de comando, completas (completar_vistas): `--vista frente,lado` entre as de vistas_padrao
+    (todas, sem a opção) ou `--direcao x,y,z [--cima x,y,z]` para uma só, de nome `livre`, olhando ao longo da direção dada."""
+    if 'direcao' in a:
+        d = [float(s) for s in str(a['direcao']).split(',')]
+        cima = [float(s) for s in str(a.get('cima', '0,1,0')).split(',')]
+        if len(d) != 3 or len(cima) != 3 or abs(np.dot(np.array(d) / np.linalg.norm(d), np.array(cima) / np.linalg.norm(cima))) > 0.999:
+            erro('--direcao e --cima pedem três números cada, e o cima não pode ser paralelo ao olhar')
+        cfg['vistas'] = [{'nome': 'livre', 'direcao': d, 'cima': cima}]
+    else:
+        padrao = {v['nome']: v for v in vistas_padrao(cfg)}
+        nomes = [s for s in str(a.get('vista', ','.join(padrao))).split(',') if s]
+        faltam = [n for n in nomes if n not in padrao]
+        if faltam:
+            erro(f'vista {faltam}: as que existem são {sorted(padrao)}; para outra direção use --direcao')
+        cfg['vistas'] = [padrao[n] for n in nomes]
+    return completar_vistas(cfg, regiao)
 
 
 def eixos_da_camera(direcao, cima):
