@@ -26,6 +26,13 @@
 #       (legenda_zero troca o branco do meio). Um painel com `desenhos` ([{linhas: [[[x, y], ...]], cor, largura?, rotulo?,
 #       rotulo_em?}], em pixels da imagem do painel antes do recorte) leva esses traços por cima, como as caixas das zonas da
 #       conferência do refino.
+#   python3 -I imagens.py lado_a_lado <lado.json>
+#       Compõe a imagem de duas ou mais vistas sob a mesma câmera ({saida, px_por_mm, fundo, paineis: [{arquivo, titulo,
+#       subtitulo?}]}): os painéis lado a lado, recortados pelo mesmo retângulo ao conteúdo de todos (o que difere do `fundo`, 0
+#       a 255, que é preto na luz rasante e na curvatura), cada um com título, subtítulo e barra de escala em milímetro.
+#   python3 -I imagens.py contraste <pedido.json> <saida.json>
+#       Mede o contraste de uma região em cada imagem de pedido.json ({itens: [{chave, arquivo, retangulo: [x0, y0, x1, y1]}]},
+#       o retângulo em pixels) com superficie.contraste_na_regiao, e grava {chave: medida} em saida.json.
 #   python3 -I imagens.py perfis <perfis.json> <pasta>
 #       Desenha, de cada corte de perfis.json, os perfis sobrepostos em milímetro: <pasta>/corte-<nome>.png com o corte inteiro
 #       e <pasta>/corte-<nome>-ampliado.png em grade de 10 mm em volta do trecho declarado ou do de maior diferença, com a
@@ -36,6 +43,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from janela import cortar_na_janela  # noqa: E402
+import superficie  # noqa: E402
 
 FONTE = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 EIXO = {0: 'x', 1: 'y', 2: 'z'}
@@ -474,6 +482,54 @@ def _desenhos(img, desenhos, x0, y0):
             dr.text((x, y - tb[1]), ds['rotulo'], fill=cor, font=f)
 
 
+def lado_a_lado(arq_json):
+    d = json.load(open(arq_json))
+    fundo = int(d.get('fundo', 255))
+    imgs = [Image.open(p['arquivo']).convert('RGB') for p in d['paineis']]
+    W, H = imgs[0].size
+    caixas = []
+    for im in imgs:
+        m = (np.abs(np.asarray(im).astype(int) - fundo) > 2).any(2)
+        if m.any():
+            ys, xs = np.nonzero(m)
+            caixas.append((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+    folga = 18
+    if caixas:
+        x0, y0 = max(0, min(c[0] for c in caixas) - folga), max(0, min(c[1] for c in caixas) - folga)
+        x1, y1 = min(W, max(c[2] for c in caixas) + folga), min(H, max(c[3] for c in caixas) + folga)
+    else:
+        x0, y0, x1, y1 = 0, 0, W, H
+    cw, ch = x1 - x0, y1 - y0
+    TH, GAP, BH = 84, 14, 44
+    clara = (230, 230, 230) if fundo < 128 else (0, 0, 0)
+    out = Image.new('RGB', (len(imgs) * cw + (len(imgs) - 1) * GAP, TH + ch + BH), (fundo,) * 3)
+    dr = ImageDraw.Draw(out)
+    ft, fs = fonte(22), fonte(16)
+    for i, (im, p) in enumerate(zip(imgs, d['paineis'])):
+        ox = i * (cw + GAP)
+        out.paste(im.crop((x0, y0, x1, y1)), (ox, TH))
+        dr.text((ox + 8, 6), p['titulo'], fill=clara, font=ft)
+        if p.get('subtitulo'):
+            dr.text((ox + 8, 36), p['subtitulo'], fill=(150, 150, 150), font=fs)
+        if d.get('px_por_mm'):
+            mm = passo_redondo(120 / d['px_por_mm'])
+            L = mm * d['px_por_mm']
+            y = TH + ch + BH - 24
+            dr.rectangle([ox + 10, y, ox + 10 + L, y + 8], fill=clara)
+            dr.text((ox + 10, y + 10), f'{mm:g} mm', fill=clara, font=fs)
+        if i:
+            dr.line([(ox - GAP // 2, 0), (ox - GAP // 2, TH + ch + BH)], fill=(120, 120, 120))
+    out.save(d['saida'])
+
+
+def contraste(arq_pedido, arq_saida):
+    out = {}
+    for it in json.load(open(arq_pedido))['itens']:
+        im = np.asarray(Image.open(it['arquivo']).convert('RGB')).astype(float) / 255.0
+        out[it['chave']] = superficie.contraste_na_regiao(im, tuple(it['retangulo'])) | {'retangulo_px': it['retangulo']}
+    json.dump(out, open(arq_saida, 'w'), indent=1)
+
+
 def vista(arq_json):
     d = json.load(open(arq_json))
     imgs = [Image.open(p['arquivo']).convert('RGB') for p in d['paineis']]
@@ -646,7 +702,11 @@ if __name__ == '__main__':
         folha(sys.argv[2], sys.argv[3], sys.argv[4])
     elif len(sys.argv) >= 3 and sys.argv[1] == 'vista':
         vista(sys.argv[2])
+    elif len(sys.argv) >= 3 and sys.argv[1] == 'lado_a_lado':
+        lado_a_lado(sys.argv[2])
+    elif len(sys.argv) >= 4 and sys.argv[1] == 'contraste':
+        contraste(sys.argv[2], sys.argv[3])
     elif len(sys.argv) >= 4 and sys.argv[1] == 'perfis':
         perfis(sys.argv[2], sys.argv[3])
     else:
-        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | linhas <linhas.json> <saida.png> | cortes <cortes.json> <pasta> [<quadro.json>] | folha <pasta> <metricas.json> <vistas> | vista <vista.json> | perfis <perfis.json> <pasta>')
+        sys.exit('uso: imagens.py grade <camera.json> <prefixo> | linhas <linhas.json> <saida.png> | cortes <cortes.json> <pasta> [<quadro.json>] | folha <pasta> <metricas.json> <vistas> | vista <vista.json> | lado_a_lado <lado.json> | contraste <pedido.json> <saida.json> | perfis <perfis.json> <pasta>')
