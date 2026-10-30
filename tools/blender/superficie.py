@@ -8,6 +8,7 @@ CINZA_DA_BORDA = 0.45     # peça de borda (friso, calha, aba): sem cor e mais e
 CINZA_SEM_DADO = 0.25     # a lataria perto da própria borda e das dobras vivas, onde a curvatura não se mede
 COR_CONVEXA = np.array([0.85, 0.10, 0.10])     # curvatura média positiva: a superfície abaulada para o lado de fora
 COR_CONCAVA = np.array([0.10, 0.25, 0.85])     # curvatura média negativa: o afundamento
+COR_DA_FAIXA = np.array([0.80, 0.68, 0.30])    # a faixa junto dos vincos que a forma declara, fora da escala: ocre, que não é cor da escala
 
 
 def direcao_da_luz(vista, rasante_graus, azimute_graus):
@@ -180,9 +181,30 @@ def _distancia_minima(P, Q, alcance):
     return out
 
 
-def escala_da_curvatura(H, percentil=99.0, piso=0.1):
+def faixa_dos_vincos(V, segmentos, largura):
+    """Os vértices de V a menos de `largura` (m) de algum dos segmentos [[p, q], ...] (m): a faixa junto de um vinco que a forma
+    declara. Num vinco a curvatura é a da dobra pedida, e a média em `raio` a espalha até `raio` mais uma aresta de cada lado; é
+    dezenas de vezes a de um amassado raso, e no percentil da escala ela estica a cor até apagá-lo. Cada segmento é amostrado a
+    um décimo da largura e a distância é a do ponto amostrado mais perto, que na borda da faixa erra para mais em menos de 0,2 %
+    da largura."""
+    V = np.asarray(V, float)
+    seg = np.asarray(segmentos, float).reshape(-1, 2, 3)
+    if not len(seg) or largura <= 0 or not len(V):
+        return np.zeros(len(V), bool)
+    passo = largura / 10
+    n = np.maximum(1, np.ceil(np.linalg.norm(seg[:, 1] - seg[:, 0], axis=1) / passo).astype(int))
+    dono = np.repeat(np.arange(len(seg)), n + 1)
+    t = np.concatenate([np.arange(k + 1) / k for k in n])
+    Q = seg[dono, 0] + t[:, None] * (seg[dono, 1] - seg[dono, 0])
+    return _distancia_minima(V, Q, largura) < largura
+
+
+def escala_da_curvatura(H, percentil=99.0, piso=0.1, fora=None):
     """A curvatura (1/m) que satura a cor: o percentil de |H| dos vértices com valor, nunca abaixo do `piso`, para que uma
-    lataria lisa não tenha o ruído dela esticado até a cor cheia."""
+    lataria lisa não tenha o ruído dela esticado até a cor cheia. `fora` (máscara) tira vértices da conta: a faixa dos vincos."""
+    H = np.asarray(H, float)
+    if fora is not None:
+        H = H[~np.asarray(fora, bool)]
     h = np.abs(H[np.isfinite(H)])
     if not len(h):
         return piso

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1574 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1576 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2006,6 +2006,14 @@
 ## tools/fixtures/forma-do-esboco/viga-reta/
 
 - `receita.js` — A viga sem a inclinação de 30 graus do esboço.
+
+## tools/fixtures/lataria-com-vinco/
+
+- `receita.js` — lataria-com-vinco — a peça de ensaio da faixa dos vincos na curvatura da lataria: uma chapa de superfície livre por subdivisão, dobrada num vinco vivo declar…
+
+## tools/fixtures/lataria-com-vinco/referencias/
+
+- `alvo.md` — Alvo da lataria com vinco
 
 ## tools/fixtures/lataria-de-prova/
 

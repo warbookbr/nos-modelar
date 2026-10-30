@@ -327,9 +327,15 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
 
 /* A seção da superfície da peça de lataria. As vistas do Blender têm nomes e lados próprios (`vistas_padrao` de `tools/blender/comum.py`),
    ditos aqui pelos eixos, e não pelos da bancada. */
-function secaoDaSuperficie({ rasante, curvatura }) {
+function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
   const vistas = Object.keys(LADO_DA_VISTA_DE_SUPERFICIE).filter((v) => [...rasante, ...curvatura].some((i) => i.vista === v));
   const grau = (n) => `${String(n).replace('.', ',')} graus`;
+  /* a faixa dos vincos que a forma desenha sai em ocre e fora da escala (`curvatura-da-lataria.py --vincos`): o crítico precisa saber
+     que ali a cor não mede defeito, e que a dobra pedida não entra na escala */
+  const textoDaFaixa = faixa
+    ? ` Em ocre, a faixa de ${String(faixa.larguraMm).replace('.', ',')} mm de cada lado dos vincos que a forma desenha (${faixa.vincos.join(', ')}): `
+      + 'é a dobra pedida, fica fora da escala e não é defeito; a escala é a do resto da chapa.'
+    : '';
   return [
     '## Superfície', '',
     'A peça é de chapa, e estas duas vistas mostram o que a sombra das vistas de Modelo esconde: o amassado largo e raso, a ondulação de um '
@@ -342,7 +348,7 @@ function secaoDaSuperficie({ rasante, curvatura }) {
     ...lista(rasante.map(({ arquivo, vista, azimute }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima): ${arquivo}`)), '',
     'A curvatura média da chapa: branco onde ela é plana, vermelho onde abaula para fora e azul onde afunda, na escala escrita em cada '
     + 'imagem; cinza claro são as peças que não são a chapa, e cinza escuro a faixa junto da borda e das dobras vivas, sem dado. Uma mancha '
-    + 'azul cercada de vermelho num painel que devia ser liso é um afundamento.', '',
+    + `azul cercada de vermelho num painel que devia ser liso é um afundamento.${textoDaFaixa}`, '',
     ...lista(curvatura.map(({ arquivo, vista }) => `${vista}: ${arquivo}`)), '',
   ];
 }

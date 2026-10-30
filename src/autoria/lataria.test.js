@@ -5,7 +5,7 @@
  * de lataria pela procedência da malha executada. */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from './executar-receita.js';
-import { latariaDaReceita, normalizarLataria, partesDaLataria } from './lataria.js';
+import { avisoDaDispensa, latariaDaReceita, normalizarLataria, partesDaLataria } from './lataria.js';
 import { normalizarPlanoDeModelagem } from './plano-de-modelagem.js';
 import provaDeLataria from '../../tools/fixtures/lataria-de-prova/receita.js';
 
@@ -37,6 +37,11 @@ describe('o reconhecimento da peça de lataria', () => {
     expect(latariaDaReceita({ PASSOS: CUBO }, declarada)).toEqual({ lataria: true, porque: 'PLANO.lataria declara as partes chapa', partes: ['chapa'] });
     const dispensada = normalizarPlanoDeModelagem({ ...PLANO, lataria: { dispensa: 'é um estofado de espuma, e não chapa' } });
     expect(latariaDaReceita(provaDeLataria, dispensada)).toMatchObject({ lataria: false, porque: 'PLANO.lataria dispensa: é um estofado de espuma, e não chapa' });
+    /* a dispensa vira aviso com o motivo, que o descrever e o resumo do laço mostram; a declaração de partes e o plano sem ela não */
+    expect(avisoDaDispensa(dispensada)).toBe('PLANO.lataria dispensa a luz rasante e a curvatura da lataria no pacote do crítico: '
+      + 'é um estofado de espuma, e não chapa. Se a superfície for chapa, tire a dispensa; a peça com passo subdivisao é de lataria por padrão.');
+    expect(avisoDaDispensa(declarada)).toBeNull();
+    expect(avisoDaDispensa(null)).toBeNull();
     /* plano sem a opção sai como antes, sem o campo */
     expect(normalizarPlanoDeModelagem(PLANO)).not.toHaveProperty('lataria');
   });

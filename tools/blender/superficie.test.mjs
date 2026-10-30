@@ -2,8 +2,8 @@
    (curvatura-da-lataria.py), sobre a chapa de prova com um amassado largo e raso plantado (chapa-com-amassado-de-prova.mjs).
 
    O que não precisa do Blender roda sempre: a chapa de prova (o amassado é só ele, o friso é objeto à parte) e as contas de
-   superficie.py no python3 do sistema (a direção da luz, a curvatura de uma esfera nos dois enrolamentos, a borda sem dado, o
-   contraste de uma região). O que precisa roda com MODELAR_BLENDER apontando o executável e se ignora sem ele: as duas vistas
+   superficie.py no python3 do sistema (a direção da luz, a curvatura de uma esfera nos dois enrolamentos, a borda sem dado, a faixa
+   dos vincos e a escala sem ela, o contraste de uma região). O que precisa roda com MODELAR_BLENDER apontando o executável e se ignora sem ele: as duas vistas
    da chapa com o amassado e da chapa lisa, com o contraste da região do amassado medido nos PNG por uma conta independente da
    do script (aqui, em JavaScript), e a prova de que a curvatura só da lataria depende de dizer qual é a peça de borda. */
 import { spawnSync } from 'node:child_process';
@@ -130,6 +130,34 @@ print(__import__('json').dumps({'sem_dado_dentro': int((~ok[dist > 0.05 + 1e-9])
     expect(m.com_dado_na_borda).toBe(0);
     expect(m.maximo).toBeLessThan(1e-9);
     expect(m.cor_do_zero).toEqual([1, 1, 1]);
+  });
+
+  it('a faixa dos vincos é a lataria a menos da largura de um segmento, e a escala sem ela não vê a dobra', () => {
+    const m = roda(`
+n = 81; x = np.linspace(0, 0.4, n)
+V = np.array([[xi, 0.0, zi] for zi in x for xi in x])
+seg = [[[0.05, 0, 0.2], [0.35, 0, 0.2]], [[0.35, 0, 0.2], [0.35, 0, 0.3]]]
+faixa = S.faixa_dos_vincos(V, seg, 0.03)
+def dist(p):
+    d = []
+    for a, b in np.array(seg):
+        t = np.clip(np.dot(p - a, b - a) / np.dot(b - a, b - a), 0, 1)
+        d.append(np.linalg.norm(p - a - t * (b - a)))
+    return min(d)
+exata = np.array([dist(p) for p in V])
+erradas = faixa != (exata < 0.03)
+H = np.where(faixa, 9.0, 0.5) + 0.01 * np.arange(len(V)) / len(V)
+H[:5] = np.nan
+print(__import__('json').dumps({'na_faixa': int(faixa.sum()), 'erradas': int(erradas.sum()), 'perto_da_borda': float(np.abs(exata[erradas] - 0.03).max()) if erradas.any() else 0.0,
+  'com': S.escala_da_curvatura(H, 99, 0.1), 'sem': S.escala_da_curvatura(H, 99, 0.1, fora=faixa),
+  'vazia': int(S.faixa_dos_vincos(V, np.zeros((0, 2, 3)), 0.03).sum())}))`);
+    expect(m.na_faixa).toBeGreaterThan(500);
+    // o segmento é amostrado a um décimo da largura: só erra junto da borda da faixa, por menos de 0,2 % dela
+    expect(m.perto_da_borda).toBeLessThan(0.03 * 0.002);
+    expect(m.com).toBeGreaterThan(9);
+    expect(m.sem).toBeLessThan(0.52);
+    expect(m.sem).toBeGreaterThan(0.5);
+    expect(m.vazia).toBe(0);
   });
 
   it('o contraste tira o plano: um degradê liso dá zero, e uma mancha rasa dá o desvio dela sobre a média', () => {
