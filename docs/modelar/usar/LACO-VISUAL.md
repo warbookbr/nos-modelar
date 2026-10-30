@@ -39,8 +39,8 @@ Para achar amassado em carroceria e em qualquer lataria, a zebra não basta e as
 medidas não bastam: a zebra serve ao reflexo (a continuidade de uma curva entre
 painéis), e um amassado de um ou dois milímetros em alguns decímetros passa por
 distância, mapa de distância, curvatura de raio curto e ondulação. Use a luz
-rasante e a curvatura média só da lataria, de `tools/blender/` (veja
-[`modelar-carroceria.md`](../modelar-carroceria.md#amassado-largo-e-raso)), e abra
+rasante e a curvatura média só da lataria (`tools/blender/luz-rasante.py` e
+`tools/blender/curvatura-da-lataria.py`, com o uso no cabeçalho de cada um), e abra
 cada imagem em tamanho nativo como as demais.
 
 ## 2. Antes de qualquer julgamento: abra o alvo e sobreponha
