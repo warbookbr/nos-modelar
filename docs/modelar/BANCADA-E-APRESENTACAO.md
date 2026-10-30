@@ -222,6 +222,11 @@ entrar no modo de edição, onde `1`, `2` e `3` trocam entre vértice, aresta e
 face, `L` pega a ilha sob o ponteiro, o gizmo move pelo arrasto, `Ctrl` gruda no
 vértice mais próximo, e `E`, `Shift+D`, `X`, `F`, `R` e `S` mudam a malha.
 `Ctrl+Z` desfaz um gesto por vez e para no estado que veio do arquivo.
+Escolher a parte só arma o gizmo de mover, e o aviso "Edição de malha", com o
+modo e a contagem da seleção, aparece só no modo de edição. No modo de juntas,
+cada canto tem um punho de 12 pixels de diâmetro na tela, em qualquer janela,
+zoom e projeção, e o clique o pega a até 12 pixels do centro, um alvo de 24
+pixels; com alvos sobrepostos vence o centro mais perto do ponteiro.
 
 Quando a malha deixa de ser igual à do arquivo, o botão de salvar aparece e baixa
 um `ajuste-<peça>.json`. Ele guarda, por parte, os dois cantos da caixa, a nuvem
