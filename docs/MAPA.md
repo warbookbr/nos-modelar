@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1579 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1580 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -490,6 +490,7 @@
 - `2026-08-20-validacao-integrada-modelar.md` — Validação integrada do Modelar — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
+- `2026-10-30-interface-da-bancada.md` — Interface da bancada — a tela organizada em torno da peça, sobre um sistema visual único, com a forma escolhida pela pessoa por imagem
 - `2026-10-30-visoes-de-conferencia-na-bancada.md` — Visões de conferência na bancada — arame, raio X, curvatura, zebra e luz rasante em tempo real, num seletor que a pessoa usa
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
