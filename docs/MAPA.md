@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1556 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1557 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1027,6 +1027,7 @@
 - `friso-aba-pele.test.mjs` — friso-aba-pele.test.mjs — a aba numa chapa sem espessura (fatia 3 do plano da gaiola que segue as feições). O pacote cego entrega só a pele externa da carroc…
 - `friso-aba.test.mjs` — friso-aba.test.mjs — a aba que dobra a borda livre de um vão (fatia 25, item 6 do plano da carroceria por subdivisão). A chapa de referência dobra uns 90 gra…
 - `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão (e o da aba da fatia 25): na chapa curva com vão de `f…
+- `friso-largura-variavel.test.mjs` — friso-largura-variavel.test.mjs — o friso com a largura (e o ângulo da aba) como função da posição ao longo da linha, por pontos nomeados, e o canto vivo em …
 - `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
 - `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
 - `gaiola-aneis-gota.test.mjs` — gaiola-aneis-gota.test.mjs — os anéis de gaiola no vão real de uma carroceria: a gota estreita, o recuo por lado e a abertura que é a própria borda

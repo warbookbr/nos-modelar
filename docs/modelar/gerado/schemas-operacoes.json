@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:1baeded98be2c0d3c631e915204019afd1f20e698ad747b71d3b3503081d4716",
+  "assinatura": "sha256:20a31b74050200ab91602cebcf288be7800a2e427e4b25e96f08869f7f78d383",
   "total": 39,
   "operacoes": [
     {
@@ -1907,6 +1907,10 @@
                 }
               ],
               "description": "Segmentos por quarto de volta no círculo e nos cantos arredondados do perfil (padrão 4)."
+            },
+            "variacao": {
+              "type": "object",
+              "description": "A largura (e o ângulo da aba) como função da posição ao longo da linha, por pontos nomeados dela: {largura: [{ponto, valor}, {ponto, antes, depois}], angulo: [...]}, em metros e graus. Entre dois pontos citados o valor anda em reta pelo comprimento de arco; antes do primeiro e depois do último fica o do ponto, e na volta fechada a função dá a volta. Com perfil, largura é a extensão em u do perfil, que escala em u; com aba, largura é a perna reta e angulo o giro da dobra, e os dois mudam por rampa. antes e depois (o degrau de largura entre dois trechos) só valem num canto vivo da linha, a partir de 10 graus de giro, e só com perfil: as duas faixas se cortam no plano que passa pelo ponto, pela normal e pelo encontro das duas bordas de fora (a meia-esquadria), e a junta é um anel só, soldado, sem entalhe nem furo. Sem variacao a malha é a mesma de sempre."
             }
           }
         },
@@ -2049,6 +2053,7 @@
           "Sobre a superfície, a linha segue só arestas da gaiola, e cada trecho entre dois vértices da malha é corda da chapa: com medidas, os vértices estão na superfície limite e a corda se afasta dela cerca de passo² / (8 × raio).",
           "Na chapa com espessura, o perfil sem parte abaixo de v = 0 e o que entra mais que a espessura gritam; a folga entre a base reta do perfil e a chapa que curva de lado (cerca de curvatura × (largura/2)² / 2) não é conferida pelo passo, e o perfil precisa entrar mais que ela.",
           "Cada junta põe o perfil no plano bissetor e o estica pela esquadria; a curva fechada demais para a largura do perfil grita com o ponto da gaiola mais perto. Partes distantes do friso que se cruzam não são conferidas.",
+          "A variacao com degrau de largura num canto vivo corta as duas faixas pelo mesmo plano e solda a junta num anel só; o degrau fora de um canto (giro abaixo de 10 graus, ponta da linha aberta, ponto no plano de simetria) e o degrau na aba gritam, e a largura muda por rampa nesses casos. Na aba, o número de segmentos do arco é o do maior ângulo da linha.",
           "Na simetria em x da superfície, a linha que toca o plano x = 0 numa ponta continua na imagem espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia espelhada; o perfil assimétrico emendado pela costura não fica espelhado.",
           "A aba da chapa com espessura é sólido próprio que encosta na parede da borda da chapa, sem fusão: a receita nomeia as partes e declara o contato. Na chapa sem espessura a aba é pele aberta, que continua a borda do vão com as faces orientadas como as da chapa. Ela sai da linha pela normal média das faces da borda, e não pela tangente exata da superfície limite.",
           "A aba que volta por baixo da chapa (ângulo grande com perna longa) e a que atravessa a própria dobra gritam; nas quinas de um vão o perfil estica pela esquadria.",
