@@ -203,7 +203,17 @@ consecutivos repetidos, trecho desconhecido e `segmentosArco` ou `segmentosSplin
 que não é inteiro >= 1. Um contorno que se cruza é recusado pelo `montarPerfil`
 como polígono não simples, com o índice do ponto repetido ou das arestas que se
 cruzam; `limparContorno(pontos, { colineares, repetidos, tolerancia })`, de
-`procedural/nucleo/contorno.js`, tira o repetido quando a receita quer, e o núcleo nunca a chama. O
+`procedural/nucleo/contorno.js`, tira o repetido quando a receita quer, e o núcleo nunca a chama. Para
+recortar um arco (de roda, de passagem) na borda de baixo de um perfil antes de
+extrudar, use `recortarArcoNoPerfil(perfil, { centro, raio, lados, base,
+fundirAbaixoDe })`, de `procedural/nucleo/curva2d.js`, em vez de copiar um
+auxiliar entre receitas: ela recorta na aresta horizontal de `base` o polígono
+de `lados` lados com a face plana em cima, devolve o contorno anti-horário e
+funde com o vizinho o corte que cairia a menos de `fundirAbaixoDe` dele, que
+sem a fusão vira lateral de lasca na extrusão (um corte a 0,5 mm de um vértice
+reprova por `face-fina`, e com `fundirAbaixoDe` de 1 mm passa). O arco que não
+cruza a base, o corte fora de aresta de base e o resultado que não é polígono
+simples são recusados com a medida. O
 lathe ainda lê `perfil` como lista de pontos
 `[raio, y]` (com a concordância própria do terceiro número); o `{contorno}` vale
 nos `furos` dele. A polilinha que não toca o eixo nas duas pontas nem volta ao
@@ -262,6 +272,23 @@ que passou do ponto.
 **O que ela não é:** contato por extensão na direção declarada. Não descobre o
 que encosta em quê, não resolve interpenetração lateral, não é encaixe nem
 colisão. Para medir de verdade, continue medindo.
+
+O contato declarado em `contatos` da receita mede com tolerância global de 1e-9
+m. O perfil 2D arredonda os pontos para uma grade de 1e-8 m, e por isso a placa
+encostada numa face inclinada pode ficar a poucos nanômetros do plano e o
+contato não acontecer; a mensagem diz quando ele fecharia com 1e-7. A saída é um
+encaixe declarado ou `toleranciaNumerica` no próprio contato, de 1e-9 a 1e-7 e
+com o `motivo`, que vale só para aquele par e que o `descrever` lista:
+`{ par: ['parabrisa', 'cabine'], motivo: '...', toleranciaNumerica: 2e-8 }`.
+Valor acima de 1e-7 é recusado, porque deixa de ser precisão.
+
+Para conferir faces finas e o acervo inteiro, há duas ferramentas de linha de
+comando. `npm run malha:lascas -- <receita.js>` lista cada face fina com a parte,
+a razão, os cantos em mm e o passo e a operação que a criou, e sai com 1 quando
+acha alguma. `npm run retrato:acervo -- --comparar
+tools/modelar/fixtures/retrato-do-acervo/antes.json` mede de novo as peças do
+acervo e sai com 1 quando caixa, volume, área ou partes de alguma mudam; quem
+muda o núcleo ou uma ferramenta geral o roda antes de entregar.
 
 ## Nome de cópia no `arranja`
 
@@ -795,8 +822,14 @@ a luz rasante e a curvatura da lataria (`tools/blender/luz-rasante.py` e
 `curvatura-da-lataria.py`, em `docs/modelar/modelar-carroceria.md`). A peça com
 passo `subdivisao` é de lataria, e o pacote do crítico dela leva as duas vistas
 (`npm run vistas:critica` com `MODELAR_BLENDER`); a peça de subdivisão que não é
-chapa declara `PLANO.lataria: { dispensa: '<motivo>' }`, e a carroceria de outra
-técnica declara `PLANO.lataria: { partes: [...] }`.
+chapa declara `PLANO.lataria: { dispensa: '<motivo>' }`, que o `descrever` mostra
+como aviso, e a carroceria de outra técnica declara `PLANO.lataria: { partes:
+[...] }`. Para olhar as duas vistas antes do crítico, rode `MODELAR_BLENDER=<blender>
+npm run vistas:superficie -- <peça>`. Na curvatura, a lataria a até 40 mm dos
+vincos nomeados dos passos `subdivisao` sai em ocre e fora da escala (`--faixa-mm=`
+muda a faixa, `--sem-faixa-dos-vincos` volta à escala da lataria inteira), porque
+a dobra pedida esticava a escala e apagava o amassado: na carenagem de prova a
+escala cai de 11,1 para 1,11 1/m. O ocre é a feição declarada, e não defeito.
 
 Para a falha de mais de três espaçamentos, rode `npm run alisar --
 <receita.js>` (`tools/modelar/alisar-a-superficie.mjs`) em vez de rodadas de
@@ -1100,6 +1133,16 @@ antes das do canto ao longo da espessura: o remate de uma segunda aresta sobre u
 canto cuja tampa é um leque recusa com `é uma tampa partida: o remate do canto
 pede uma face só ali`. A prova está em
 `procedural/nucleo/operacoes/arredondar-chapa-furada.test.ts`.
+
+`arredondarAresta` confere, antes de escrever, a planaridade das faces que
+altera (as duas da aresta e a face de cada ponta simples) e grita no campo
+`aresta` com a face, o canto e o desvio quando uma delas sairia torta, sem mudar
+a malha. O caso típico é a forma facetada: no prisma de oito lados, a aresta de
+cima de uma lateral deixava as laterais vizinhas a 2,15e-2 do próprio plano e
+agora é recusada, e a saída é arredondar no perfil 2D com `concordancia`. A face
+de canto do `chamferBox` e os caminhos de tampa partida e de cadeia não passam
+por essa conferência. A prova está em
+`procedural/nucleo/operacoes/arredondar-facetado.test.ts`.
 
 O degrau não passa calado. Quando um arredondamento (ou chanfro) termina em
 degrau, o resultado da execução traz um aviso em `neutro.avisos` (o canal que já
