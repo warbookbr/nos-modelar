@@ -16,6 +16,10 @@ O que fazia o `furgao` parecer estreito, conferido em 2026-10-30, não era a lar
 
 No `furgao` ele é feito de três blocos (`chassiFrente`, `chassiCentro`, `chassiTras`), separados pelos vãos das rodas, cada um com uma soleira larga embaixo e uma saia inclinada em cima; o bloco do meio é uma laje inteira de lado a lado, e a lataria azul termina em cima dele, a 883 mm. A pessoa escolheu, pela recomendação, a faixa de proteção em plástico escuro rente à lataria, como num furgão de trabalho: o corpo de baixo continua separado e de outra cor, sem o degrau que sobra para fora, e o piso fica por dentro, escondido. A pessoa confere o resultado nas imagens do modelo.
 
+## A frente e a cabine
+
+A pessoa escolheu, pela recomendação, a frente de bico curto: capô curto e inclinado, quase emendado num para-brisa grande e também inclinado, com as quinas arredondadas, que é a evolução do capô curto do `furgao`. A cabine deixa de ser o bloco facetado que afunila para o teto.
+
 ## Em aberto
 
-O recorte (furgão estático, com as linhas das portas como vincos e frestas, ou com portas que abrem; a recomendação é o estático), a forma da frente e da cabine, os faróis, as partes, os contatos, a referência visual e os critérios de reprovação.
+O recorte (furgão estático, com as linhas das portas como vincos e frestas, ou com portas que abrem; a recomendação é o estático), os faróis, os para-choques, as partes, os contatos, a referência visual e os critérios de reprovação.
