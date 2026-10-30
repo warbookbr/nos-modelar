@@ -86,3 +86,5 @@ O risco maior é a lataria inteira de um veículo passar do que o nível oficial
 ## Andamento
 
 Rascunho escrito em 2026-10-30, a pedido da pessoa, como sucessor do plano dos ajustes no núcleo dos veículos. Ativa quando esse plano fechar e a pessoa responder às decisões acima.
+
+Alinhamento começado em 2026-10-30, adiantado pela exceção que a pessoa abriu no plano ativo; o que vai sendo decidido fica no [registro do alinhamento](../banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md). As decisões 2 (classe média de teto alto) e a do corpo de baixo já estão lá.

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1644 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1645 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -322,6 +322,10 @@
 ## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/
 
 - `NOTAS.md` — A carcaça da descrição pela família de desenho
+
+## docs/modelar/banco-de-provas/furgao-realista-2026-10-30/
+
+- `ALINHAMENTO.md` — Furgão realista: alinhamento
 
 ## docs/modelar/banco-de-provas/importar-objeto-2026-10-15/
 
