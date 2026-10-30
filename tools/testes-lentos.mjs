@@ -58,6 +58,7 @@ export const TESTES_LENTOS = [
   'tools/blender/limiar-de-dobra.test.mjs',
   'tools/blender/linhas-pelos-cortes.test.mjs',
   'tools/blender/regua-sinal-curvatura-cortes.test.mjs',
+  'tools/blender/superficie.test.mjs',
   'tools/mcp/catalogo-montagens.test.mjs',
   'tools/mcp/ensaio-ponta-a-ponta.test.mjs',
   'tools/mcp/mcp.test.mjs',
@@ -92,6 +93,7 @@ export const TESTES_LENTOS = [
   'tools/modelar/vinco-na-imagem.test.mjs',
   'tools/modelar/vincos-da-rede.test.mjs',
   'tools/modelar/vincos-das-linhas.test.mjs',
+  'tools/modelar/vistas-de-superficie.test.mjs',
   'tools/oficina/oficina.test.ts',
 ];
 
