@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
-import { desenharEsboco, ErroDeEsboco, resolverOpcao, VISTAS, VISTAS_EXTRAS, VISTAS_TODAS } from '../../modulos/esboco/src/index.js';
+import { desenharEsboco, ErroDeEsboco, escalaComumDasVistas, resolverOpcao, VISTAS, VISTAS_EXTRAS, VISTAS_TODAS } from '../../modulos/esboco/src/index.js';
 import { ladosDasVistas, linhaDaVista } from '../../modulos/esboco/src/lados.js';
 import { descreverAchado, descreverAtravessamento, descreverPorta, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { descreverGrupoDaProjecao, FATORES_DA_SUGESTAO, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
@@ -30,7 +30,7 @@ import { registrarUso } from './uso.mjs';
 import { envelopeDaReceitaArquivo, nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
 import { andaimeDoArquivo, descreverTraducao } from './esboco-para-andaime.mjs';
 import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
-import { blocagemDoEsboco, desenharVistaDaBlocagem } from './esboco-blocagem.mjs';
+import { blocagemDoEsboco, desenharVistaDaBlocagem, escalaComumDasVistasDaBlocagem } from './esboco-blocagem.mjs';
 import { FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, orientacaoDoEsboco, referenciaDoBrief, vistasDaReferencia, vistasDaUnidade } from './esboco-brief.mjs';
 import { aplicarPose, nomeDaPose, numeroDoCurso, posesDoBrief } from '../../modulos/esboco/src/curso.js';
 import { cursosDaUnidade, formatarCurso, quadroDoCurso, varrerCurso } from '../../modulos/esboco/src/curso-varredura.js';
@@ -848,7 +848,8 @@ export function esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes = {}) {
 
 /* As vistas isoladas de uma unidade (`unidade`) ou do esboço inteiro (`unidade` nulo): grava `<nome-do-arquivo>[-unidade-<nome>]
    [-<opções>]-<vista>.png` ao lado do esboço (ou em `saida`), nas quatro vistas ou só na pedida, sem legenda nem linha de
-   centro. As opções de desenho são `corte`. Devolve { destinos, unidade, texto }. */
+   centro. As opções de desenho são `corte`. Todas saem na escala comum das quatro vistas e das pedidas, mesmo quando se pede uma
+   só, para a barra de 100 mm ter o mesmo comprimento em todas. Devolve { destinos, unidade, texto }. */
 export async function vistasArquivo(arquivo, { unidade = null, vista = null, vistas = null, largura: larguraPedida = null, saida = null, corte = null, explosao = null, previa = false, zoomForma = null, forcar = false, vizinhos = true, nivelZero = false } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
@@ -872,19 +873,26 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, vis
   const notas = [];
   const reaproveitadas = [];
   const explosoes = explosao && isolado ? isolado.opcoes.map(() => explosao) : undefined;
+  /* A escala é a comum das quatro vistas e das pedidas, também quando se pede uma só: a vista que vai ao crítico sai com a barra de
+     100 mm do tamanho que tem nas outras. Ela só é calculada quando alguma vista precisa ser desenhada. */
+  const vistasDaEscala = [...new Set([...VISTAS_DA_ANALISE, ...pedidas])];
+  const desenhoDaVista = (v) => variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false, explosoes });
+  let escalaComum = null;
+  const escalaDasVistas = () => (escalaComum ??= pelaBlocagem ? escalaComumDasVistasDaBlocagem(pelaBlocagem, vistasDaEscala) : escalaComumDasVistas(vistasDaEscala.map(desenhoDaVista)));
   let navegador = null;
   try {
     for (const v of pedidas) {
       const destino = `${base}${nome === null ? '' : `-unidade-${nome}`}${sufixoDasOpcoes(opcoes)}-${v}.png`;
       destinos.push(destino);
       /* a vista cujo conteúdo não mudou desde a última gravação fica como está */
-      const hash = pelaBlocagem ? hashDaBlocagem(pelaBlocagem, v, { largura: larguraPedida }) : hashDaVista(isolado, v, { largura: larguraPedida, corte, explosao, previa, zoomForma });
+      const hash = pelaBlocagem ? hashDaBlocagem(pelaBlocagem, v, { largura: larguraPedida, vistasDaEscala }) : hashDaVista(isolado, v, { largura: larguraPedida, corte, explosao, previa, zoomForma, vistasDaEscala });
       let gravado = null;
       try { gravado = readFileSync(`${destino}.hash`, 'utf8').trim(); } catch { /* sem hash gravado */ }
       if (!forcar && gravado === hash && existsSync(destino)) { reaproveitadas.push(true); svgs.push(null); continue; }
       reaproveitadas.push(false);
       navegador ??= await (await import('playwright')).default.chromium.launch();
-      const r = pelaBlocagem ? desenharVistaDaBlocagem(pelaBlocagem, v, OPCOES_DA_CAMADA) : desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false, explosoes }), OPCOES_DA_CAMADA);
+      const opcoesDoDesenho = { ...OPCOES_DA_CAMADA, escala: escalaDasVistas() };
+      const r = pelaBlocagem ? desenharVistaDaBlocagem(pelaBlocagem, v, opcoesDoDesenho) : desenharEsboco(desenhoDaVista(v), opcoesDoDesenho);
       const { svg } = await desenhoParaPng(r, larguraPedida, destino, navegador);
       writeFileSync(`${destino}.hash`, `${hash}\n`);
       svgs.push(svg);
@@ -905,7 +913,8 @@ export function unidadeArquivo(arquivo, unidade, opcoes = {}) {
 }
 
 /* `--composta`: as quatro vistas sem legenda nem linha de centro numa imagem só, em grade 2x2 (isométrica e frontal em cima,
-   lateral e superior embaixo), com `largura` px no total (1100 por padrão, metade para cada vista). Cada vista sai de
+   lateral e superior embaixo), com `largura` px no total (1100 por padrão, metade para cada vista), as quatro na mesma escala (a
+   maior com que a peça cabe em todas, devolvida em `escala`, px por mm do quadro). Cada vista sai de
    `desenhoParaBuffer`, o mesmo desenho por pixel de `desenhoParaPng`, e é composta sobre branco. Com `unidade`, é a unidade
    isolada com os vizinhos em contorno claro, como em `--unidade`. Grava `<nome>[-unidade-<nome>]-composta.png` ao lado do
    esboço (ou em `saida`) e devolve { destino, largura, altura, celula, texto }. */
@@ -925,11 +934,14 @@ export async function compostaArquivo(arquivo, { unidade = null, largura = null,
     const proprias = visiveisDoEsboco(isolado).flat().map((r) => r.id).filter((id) => !idsVizinhos.includes(id));
     isolado = { ...isolado, enquadrar: { formas: proprias, aviso: false, pontos: quadro } };
   }
+  /* as quatro vistas na mesma escala, a maior com que a unidade cabe em todas */
+  const desenhoDaVista = (v) => variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false });
+  const escala = pelaBlocagem ? escalaComumDasVistasDaBlocagem(pelaBlocagem, VISTAS_DA_ANALISE) : escalaComumDasVistas(VISTAS_DA_ANALISE.map(desenhoDaVista));
   const navegador = await (await import('playwright')).default.chromium.launch();
   const imagens = [];
   try {
     for (const v of VISTAS_DA_ANALISE) {
-      const r = pelaBlocagem ? desenharVistaDaBlocagem(pelaBlocagem, v, OPCOES_DA_CAMADA) : desenharEsboco(variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
+      const r = pelaBlocagem ? desenharVistaDaBlocagem(pelaBlocagem, v, { ...OPCOES_DA_CAMADA, escala }) : desenharEsboco(desenhoDaVista(v), { ...OPCOES_DA_CAMADA, escala });
       imagens.push(PNG.sync.read((await desenhoParaBuffer(r, celula, navegador)).png));
     }
   } finally {
@@ -942,7 +954,7 @@ export async function compostaArquivo(arquivo, { unidade = null, largura = null,
   writeFileSync(destino, PNG.sync.write(grade));
   const alvo = unidade === null ? 'esboço inteiro' : `unidade ${unidade} isolada`;
   const notaVizinhos = idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro (--sem-vizinhos desliga)` : '';
-  return { destino, largura: grade.width, altura: grade.height, celula, texto: `composta de ${alvo}, sem legenda, ${grade.width}x${grade.height} px (${celula} px cada vista; isométrica e frontal em cima, lateral e superior embaixo)${pelaBlocagem ? `, ${pelaBlocagem.texto}` : ''}${notaVizinhos}\n  ${destino}\n` };
+  return { destino, largura: grade.width, altura: grade.height, celula, escala, texto: `composta de ${alvo}, sem legenda, ${grade.width}x${grade.height} px (${celula} px cada vista; isométrica e frontal em cima, lateral e superior embaixo)${pelaBlocagem ? `, ${pelaBlocagem.texto}` : ''}${notaVizinhos}\n  ${destino}\n` };
 }
 
 /* A grade 2x2 das vistas (na ordem de `VISTAS_DA_ANALISE`), cada uma centrada na sua linha e composta sobre branco. */
@@ -1117,15 +1129,13 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   const pasta = resolverCaminho(saida ?? `${caminho.replace(/(\.esboco)?\.json$/i, '')}-critico-marco-${limiar}`);
   mkdirSync(pasta, { recursive: true });
   const base = join(pasta, basename(caminho.replace(/(\.esboco)?\.json$/i, '')));
-  const geral = expandirEsboco(bruto);
   const gerais = [];
-  /* as vistas que olham do mesmo lado que cada referência (a lateral-oposta, a frontal-oposta) vêm depois das quatro */
+  /* as vistas que olham do mesmo lado que cada referência (a lateral-oposta, a frontal-oposta) vêm depois das quatro, todas na mesma escala */
   const daReferencia = vistasDaReferencia(bruto);
   const geraisDaReferencia = [];
   const navegador = await (await import('playwright')).default.chromium.launch();
   try {
-    for (const v of [...VISTAS_DA_ANALISE, ...daReferencia]) {
-      const r = desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false }), OPCOES_DA_CAMADA);
+    for (const { vista: v, r } of desenhosDoObjeto(bruto, daReferencia)) {
       const destino = `${base}-marco-${limiar}-${v}.png`;
       await desenhoParaPng(r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
       (VISTAS_DA_ANALISE.includes(v) ? gerais : geraisDaReferencia).push(destino);
@@ -1190,10 +1200,11 @@ export const PERGUNTAS_DO_OBJETO = [
    crítico confere o desenho por aqui. */
 export function desenhosDoObjeto(bruto, vistasAMais = []) {
   const geral = expandirEsboco(bruto);
-  return [...VISTAS_DA_ANALISE, ...vistasAMais].map((vista) => ({
-    vista,
-    r: desenharEsboco(variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista, legendas: false, centros: false }), OPCOES_DA_CAMADA),
-  }));
+  const vistas = [...VISTAS_DA_ANALISE, ...vistasAMais];
+  const desenhos = vistas.map((vista) => variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista, legendas: false, centros: false }));
+  /* todas na mesma escala, a maior com que o objeto cabe em todas: a barra de 100 mm tem o mesmo comprimento nas quatro */
+  const escala = escalaComumDasVistas(desenhos);
+  return vistas.map((vista, k) => ({ vista, r: desenharEsboco(desenhos[k], { ...OPCOES_DA_CAMADA, escala }) }));
 }
 
 /* O objeto do brief: o título e a nota da primeira opção do esboço. */

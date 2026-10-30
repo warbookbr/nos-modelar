@@ -11,7 +11,7 @@
    `camada` e o `svgSobreCamada`), de modo que a ferramenta desenha, compõe e grava como já faz. O quadro é o do desenho das formas
    (painel de `QUADRO.painelL` por `QUADRO.painelA`, título, nota e barra de escala), a escala é a mesma conta, `escalaDoQuadro` (a maior
    caixa projetada entre as opções cabe no painel, com a folga das colunas de legenda, ou a da chave em lista quando `lista` está
-   ligado), e a tinta é a mesma (`tintaDaFace`), de modo que a mesma geometria cai nos mesmos pixels. Não há legenda, linha de
+   ligado) quando a vista vai sozinha, e a escala comum das vistas (`escalaComumDaBlocagem`) quando elas vão juntas ao crítico, e a tinta é a mesma (`tintaDaFace`), de modo que a mesma geometria cai nos mesmos pixels. Não há legenda, linha de
    centro, corte, explosão, zoom nem prévia: ficam no desenho das formas.
 
    Os traços são decididos com todos os volumes juntos, e não por volume. As candidatas são as arestas da malha (soldadas pelas coordenadas, e
@@ -234,6 +234,63 @@ function projetar(painel, V, olho) {
   return { itens, min, max };
 }
 
+/* A escala dos painéis de uma vista: a maior opção cabe no painel, com a folga das colunas de legenda ou, em lista, da margem da chave.
+   `paineis` traz, de cada um, a caixa projetada (`min`, `max`, em mm do plano da vista) e `lista`. */
+function escalaDosPaineis(paineis) {
+  const larg = Math.max(...paineis.map((p) => p.max[0] - p.min[0]));
+  const alt = Math.max(...paineis.map((p) => p.max[1] - p.min[1]));
+  const escalaColunas = escalaDoQuadro(larg, alt);
+  const escalaLista = escalaDoQuadro(larg, alt, { lista: true });
+  const temLista = paineis.some((p) => p.lista === true);
+  const temColunas = paineis.some((p) => p.lista !== true);
+  return temLista ? (temColunas ? Math.min(escalaLista, escalaColunas) : escalaLista) : escalaColunas;
+}
+
+function lerEntrada(entrada) {
+  exigir(entrada && typeof entrada === 'object', 'desenharBlocagem: a entrada precisa ser { vista, paineis }');
+  const vista = entrada.vista ?? 'isometrica';
+  exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
+  exigir(Array.isArray(entrada.paineis) && entrada.paineis.length > 0, 'desenharBlocagem: "paineis" precisa de ao menos uma opção');
+  return { vista, V: VISTAS[vista] };
+}
+
+/* A caixa projetada de um painel na vista: a dos vértices das faces dos volumes que ele desenha, a mesma que `projetar` tira. */
+function caixaDoPainel(painel, V) {
+  const { vertices, faces } = painel.malha;
+  const desenhados = new Set(painel.volumes.map((v) => v.id));
+  let min = [Infinity, Infinity];
+  let max = [-Infinity, -Infinity];
+  for (const f of faces) {
+    if (!desenhados.has(f.volume)) continue;
+    for (const i of f.vertices) {
+      const q = V.p(vertices[i]);
+      min = [Math.min(min[0], q[0]), Math.min(min[1], q[1])];
+      max = [Math.max(max[0], q[0]), Math.max(max[1], q[1])];
+    }
+  }
+  return { min, max };
+}
+
+/** A escala (px por mm) que o desenho da blocagem `entrada` ({ vista, paineis }) teria sozinho, sem projetar as arestas: a conta de
+ *  `desenharBlocagem` sobre a caixa projetada de cada painel. */
+export function escalaDaBlocagem(entrada) {
+  const { V } = lerEntrada(entrada);
+  const paineis = entrada.paineis.map((p, k) => {
+    const lido = lerPainel(p, k);
+    return { lista: lido.lista, ...caixaDoPainel(lido, V) };
+  });
+  exigir(paineis.every((p) => p.min[0] <= p.max[0]), `nenhum dos volumes pedidos tem face na malha (${entrada.paineis.flatMap((p) => p.volumes).slice(0, 6).map((v) => v.id).join(', ')})`);
+  return escalaDosPaineis(paineis);
+}
+
+/** A escala comum das vistas da blocagem que vão juntas ao crítico (`entradas`, uma { vista, paineis } por vista): a maior escala com
+ *  que a peça cabe em todas, que é a menor das escalas que cada vista teria sozinha. Com ela a barra de 100 mm tem o mesmo comprimento
+ *  em todas. */
+export function escalaComumDaBlocagem(entradas) {
+  exigir(Array.isArray(entradas) && entradas.length > 0, 'escalaComumDaBlocagem: precisa de ao menos uma vista');
+  return Math.min(...entradas.map(escalaDaBlocagem));
+}
+
 /* Um painel de cada vez no quadro: a posição e a conversão do plano da vista (mm) para o pixel. */
 export function geometria(p, k, escala) {
   const x0 = k * QUADRO.painelL;
@@ -246,27 +303,19 @@ const caminho = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')
 
 /* `entrada`: { vista, paineis } (ver o topo do arquivo). `camada: true` junta a camada e o `svgSobreCamada`; `perfilDosTracos: false` a entrega sem o perfil das fitas
    (ver `formasDoPainel`), para quem mede só a área das faces. `soCamada: true` (com `camada`) não monta o SVG: `svg` e `svgSobreCamada`
-   saem vazios e a camada, o quadro e `paineis` saem os mesmos (ver `desenharEsboco`). */
-export function desenharBlocagem(entrada, { camada: querCamada = false, perfilDosTracos = true, soCamada = false } = {}) {
-  exigir(entrada && typeof entrada === 'object', 'desenharBlocagem: a entrada precisa ser { vista, paineis }');
-  const vista = entrada.vista ?? 'isometrica';
-  exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
-  exigir(Array.isArray(entrada.paineis) && entrada.paineis.length > 0, 'desenharBlocagem: "paineis" precisa de ao menos uma opção');
-  const V = VISTAS[vista];
+   saem vazios e a camada, o quadro e `paineis` saem os mesmos (ver `desenharEsboco`). `escala` (px por mm) fixa a escala no lugar da
+   que a vista calcula sozinha: as vistas que vão juntas ao crítico saem na escala comum (`escalaComumDaBlocagem`). */
+export function desenharBlocagem(entrada, { camada: querCamada = false, perfilDosTracos = true, soCamada = false, escala: escalaPedida = null } = {}) {
+  const { vista, V } = lerEntrada(entrada);
+  exigir(escalaPedida === null || (typeof escalaPedida === 'number' && Number.isFinite(escalaPedida) && escalaPedida > 0), `desenharBlocagem: "escala" deve ser um número positivo (px por mm), e veio ${JSON.stringify(escalaPedida)}`);
   const olho = unitario(V.olho);
   const paineis = entrada.paineis.map((p, k) => {
     const lido = lerPainel(p, k);
     return { ...lido, ...projetar(lido, V, olho) };
   });
 
-  /* a mesma escala para todos: a maior opção cabe no painel, com a folga das colunas de legenda ou, em lista, da margem da chave */
-  const larg = Math.max(...paineis.map((p) => p.max[0] - p.min[0]));
-  const alt = Math.max(...paineis.map((p) => p.max[1] - p.min[1]));
-  const escalaColunas = escalaDoQuadro(larg, alt);
-  const escalaLista = escalaDoQuadro(larg, alt, { lista: true });
-  const temLista = paineis.some((p) => p.lista === true);
-  const temColunas = paineis.some((p) => p.lista !== true);
-  const escala = temLista ? (temColunas ? Math.min(escalaLista, escalaColunas) : escalaLista) : escalaColunas;
+  /* a mesma escala para todos os painéis, ou a escala comum das vistas que vão juntas, quando quem desenha a dá */
+  const escala = escalaPedida ?? escalaDosPaineis(paineis);
 
   const largura = QUADRO.painelL * paineis.length;
   const altura = QUADRO.topo + QUADRO.painelA + QUADRO.rodape;

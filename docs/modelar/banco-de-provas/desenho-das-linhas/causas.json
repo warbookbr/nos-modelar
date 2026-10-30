@@ -10,10 +10,10 @@
     },
     {
       "imagem": "c03",
-      "vista": "lateral",
-      "tipo": "vazamento",
-      "maximoPixels": 1,
-      "causa": "um pixel no canto da fita onde duas linhas de um pixel de diferença se juntam, a 2,8 px da aresta da referência, quando a tolerância (2 px, mais um quarto de pixel de folga) vai a 2,25: a ponta de uma linha sobre a outra, e não uma linha a mais (medido por `npm run desenho:medir -- --so=c03 --vista=lateral`)"
+      "vista": "superior",
+      "tipo": "falha",
+      "maximoPixels": 2,
+      "causa": "dois pixels isolados, um em cada arco de roda dianteiro, a 3 px dos traços das bordas, na crista do anel de 32 lados visto de cima, onde as faces vizinhas ficam a 11,25 graus uma da outra, abaixo do vinco de 30: com as quatro vistas na escala comum (0,0485 px por mm do quadro, a da isométrica), as amostras da referência ficam a 2,9 mm uma da outra, e o teste de degrau dela, que prevê a profundidade pela inclinação de cada lado e só soma meia inclinação vezes o passo de folga, lê a mudança de inclinação da crista como degrau quando as amostras passam de cerca de 1 mm; a superfície é lisa ali e o desenho não traça linha, como deve (medido por `npm run desenho:medir -- --so=c03 --vista=superior`)"
     }
   ]
 }

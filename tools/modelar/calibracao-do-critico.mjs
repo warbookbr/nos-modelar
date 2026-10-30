@@ -34,7 +34,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { desenharBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
+import { desenharBlocagem, escalaComumDaBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
 import { medirEsboco } from '../../modulos/esboco/src/descrever.js';
 import { expandirChamadasDeComposicao } from '../../procedural/nucleo/entrada.js';
 import { triangularFace } from '../../procedural/nucleo/triangulacao-face.js';
@@ -303,9 +303,17 @@ export function painelDoNeutro(neutro, { titulo, nota }) {
   };
 }
 
-export function desenhosDoNeutro(neutro, objeto) {
+/** As entradas do desenhista da blocagem das quatro vistas da peça executada e a escala comum delas (a maior com que a peça cabe em
+ *  todas): as quatro saem na mesma escala, com a barra de 100 mm do mesmo comprimento. */
+export function entradasDoNeutro(neutro, objeto) {
   const painel = painelDoNeutro(neutro, objeto);
-  return VISTAS_DO_CONJUNTO.map((vista) => ({ vista, r: desenharBlocagem({ vista, paineis: [painel] }, { camada: true }) }));
+  const entradas = VISTAS_DO_CONJUNTO.map((vista) => ({ vista, paineis: [painel] }));
+  return { entradas, escala: escalaComumDaBlocagem(entradas) };
+}
+
+export function desenhosDoNeutro(neutro, objeto) {
+  const { entradas, escala } = entradasDoNeutro(neutro, objeto);
+  return entradas.map((entrada) => ({ vista: entrada.vista, r: desenharBlocagem(entrada, { camada: true, escala }) }));
 }
 
 /** A impressão do que a fonte desenha: o SVG e a camada de cada vista, a largura do brief e o motor. */

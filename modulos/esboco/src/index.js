@@ -2851,13 +2851,35 @@ function linhasDoGrupo(g, V, olho) {
    leva `visiveis` nessas formas e o desenhista pinta os traços sem teste de profundidade. O SVG não muda.
    `soCamada: true` (com `camada`) entrega só a camada, sem montar o SVG: `svg` e `svgSobreCamada` saem vazios, e o título, as legendas,
    os rótulos, as linhas de centro, a barra de escala e o traço de cada forma não são calculados. A camada sai a mesma, e quem mede a
-   silhueta (`esboco-silhueta.mjs`) só lê dela; o tamanho do quadro (`largura`, `altura`, `escala`) também. */
-export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTracos = true, soCamada = false, tracosVisiveis = false } = {}) {
+   silhueta (`esboco-silhueta.mjs`) só lê dela; o tamanho do quadro (`largura`, `altura`, `escala`) também.
+   `escala` (px por mm do quadro) fixa a escala no lugar da que a vista calcula sozinha: as vistas de um mesmo objeto que vão juntas
+   ao crítico saem todas na escala comum (`escalaComumDasVistas`), com a barra de 100 mm do mesmo tamanho em todas. Sem ela, a vista
+   enche o painel sozinha, como a imagem de um achado ou o desenho do esboço na vista que ele declara. */
+export function desenharEsboco(esboco, opcoesDoDesenho = {}) {
+  return desenharOuMedir(esboco, opcoesDoDesenho, false);
+}
+
+/* A escala (px por mm) que o desenho da vista do esboço teria sozinho, sem montar o desenho: a mesma conta de `desenharEsboco`, que
+   para logo depois da projeção das formas. */
+export function escalaDoEsboco(esboco) {
+  return desenharOuMedir(esboco, {}, true).escala;
+}
+
+/* A escala comum de várias vistas do mesmo objeto (a lista de esboços já com a vista de cada uma): a maior escala com que a peça cabe
+   no painel em todas, que é a menor das escalas que cada vista teria sozinha. É a que as vistas que vão juntas ao crítico usam, para a
+   barra de 100 mm ter o mesmo comprimento em todas e a mesma medida dar o mesmo tamanho na tela. */
+export function escalaComumDasVistas(esbocos) {
+  exigir(Array.isArray(esbocos) && esbocos.length > 0, 'escalaComumDasVistas: precisa de ao menos uma vista');
+  return Math.min(...esbocos.map(escalaDoEsboco));
+}
+
+function desenharOuMedir(esboco, { camada: querCamada = false, perfilDosTracos = true, soCamada = false, tracosVisiveis = false, escala: escalaPedida = null } = {}, soEscala = false) {
+  exigir(escalaPedida === null || (typeof escalaPedida === 'number' && Number.isFinite(escalaPedida) && escalaPedida > 0), `desenharEsboco: "escala" deve ser um número positivo (px por mm), e veio ${JSON.stringify(escalaPedida)}`);
   const { vista, opcoes, previa, enquadrar } = validarEsboco(esboco);
   const V = VISTAS_TODAS[vista];
   let enquadreAchou = false;
   const olho = normalizar(V.olho);
-  const mmPorPixel = opcoes.some((o) => o.formas.some((r) => r.subtrai)) ? 1 / escalaEstimada(opcoes, V, enquadrar) : 0;
+  const mmPorPixel = opcoes.some((o) => o.formas.some((r) => r.subtrai)) ? 1 / (escalaPedida ?? escalaEstimada(opcoes, V, enquadrar)) : 0;
   const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao, modo, corte, camadas }) => {
     /* corte: o lado que fica, e se a superfície de corte está voltada para o observador (senão ela fica atrás do sólido) */
     const lado = corte ? ladoDoCorte(corte, olho) : null;
@@ -2909,6 +2931,13 @@ export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTr
   /* Modo lista: sem colunas laterais o desenho usa a largura toda; a chave ganha uma faixa
      própria abaixo do desenho, e o quadro cresce em altura o que a chave ocupa. */
   let escala = escalaColunas;
+  if (temLista) {
+    escala = escalaDoQuadro(larg, alt, { lista: true });
+    if (temColunas) escala = Math.min(escala, escalaColunas);
+  }
+  if (soEscala) return { escala };
+  /* a escala comum das vistas que vão juntas, quando quem desenha a dá */
+  if (escalaPedida !== null) escala = escalaPedida;
   const planos = new Map();
   let extra = 0;
   const geometria = (p, k, esc) => {
@@ -2918,8 +2947,6 @@ export function desenharEsboco(esboco, { camada: querCamada = false, perfilDosTr
     return { x0, cx, cy, tela: (q) => [cx + q[0] * esc, cy + q[1] * esc] };
   };
   if (temLista) {
-    escala = escalaDoQuadro(larg, alt, { lista: true });
-    if (temColunas) escala = Math.min(escala, escalaColunas);
     projetadas.forEach((p, k) => {
       if (p.modo !== 'lista') return;
       const entradas = entradasDaLista(p);
