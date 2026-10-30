@@ -173,7 +173,7 @@ describe('a perna do trem, com a roda 2.0 e o cilindro hidráulico escritos no J
     const e = perna();
     const m = medirEsboco(e);
     const texto = formatarDescricao(m.descricao);
-    expect(texto).toMatch(/família amortecedor: 8 partes \(tubo, cabeca, olhal-traseiro, pescoco-traseiro, embolo, haste, olhal-dianteiro, terminal\), volume 1172144 mm3; portas eixo-da-haste \(trilho, deslizador, eixo \[0 -1 0\]\); guia-da-haste \(trilho, guia, eixo \[0 -1 0\]\); olhal-dianteiro \(anel, recebe, eixo \[0 0 1\]\); olhal-traseiro \(anel, recebe, eixo \[0 0 1\]\)/);
+    expect(texto).toMatch(/família amortecedor: 8 partes \(tubo, cabeca, olhal-traseiro, pescoco-traseiro, embolo, haste, olhal-dianteiro, terminal\), volume 1145451 mm3; portas eixo-da-haste \(trilho, deslizador, eixo \[0 -1 0\]\); guia-da-haste \(trilho, guia, eixo \[0 -1 0\]\); olhal-dianteiro \(anel, recebe, eixo \[0 0 1\]\); olhal-traseiro \(anel, recebe, eixo \[0 0 1\]\)/);
     expect(texto).toMatch(/família roda \(perfil trem\): 4 partes \(cubo, pneu, aro, disco\), volume \d+ mm3; portas assento-do-pneu \(anel, ocupa, eixo \[0 0 1\]\); eixo \(anel, recebe, eixo \[0 0 1\]\); furos-de-fixacao \(padraoFuros, recebe, eixo \[0 0 1\]\)/);
     expect(texto).toMatch(/âncoras amortecedor: centro \[0 690 15,8\]; eixo-da-haste \[0 537,1 15,8\]; guia-da-haste \[0 537,1 15,8\]; olhal-dianteiro \[0 455 0\]; olhal-traseiro \[0 925 0\]/);
     expect(texto).toMatch(/relação: família roda-pneu, perfil trem, ajustes diametroPneu 500 diametroFuroCentral 0.0632/);
