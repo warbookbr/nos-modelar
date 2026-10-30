@@ -2873,6 +2873,24 @@ export function escalaComumDasVistas(esbocos) {
   return Math.min(...esbocos.map(escalaDoEsboco));
 }
 
+/* A vista ampliada. Na escala comum, a vista de ponta de uma peça alongada fica minúscula (no cilindro hidráulico da calibração, o
+   olhal virou um círculo de poucos pixels, com 12% do que a vista ocuparia sozinha). Quando uma das vistas fica, na escala comum, com
+   menos de `FRACAO_MINIMA_NA_ESCALA_COMUM` do que ocuparia sozinha (a razão entre a escala comum e a própria dela, que é a fração do
+   lado útil do painel que a maior dimensão projetada ocupa na direção que limita), o conjunto ganha essa vista outra vez, desenhada na
+   escala própria, com o título que diz que é ampliada e a barra de 100 mm dela. As quatro seguem na escala comum. O limite de 25%: nas
+   doze imagens da calibração do crítico a razão é de 11% a 18% na vista de ponta dos cinco cilindros e de 33% para cima em todas as
+   outras vistas; e 25% do lado útil, de cerca de 500 px na imagem de 1100 px, deixa a peça com uns 125 px no maior lado e um detalhe
+   de um décimo dela com 12 px, pouco mais que três larguras de traço. */
+export const FRACAO_MINIMA_NA_ESCALA_COMUM = 0.25;
+const NOMES_DAS_VISTAS = { isometrica: 'Isométrica', frontal: 'Frontal', lateral: 'Lateral', superior: 'Superior', 'frontal-oposta': 'Frontal oposta', 'lateral-oposta': 'Lateral oposta', inferior: 'Inferior' };
+/* O título da vista ampliada, no lugar do título de cada opção. */
+export const tituloDaAmpliada = (vista) => `${NOMES_DAS_VISTAS[vista] ?? vista}, ampliada em escala própria`;
+/* As vistas que, na escala `comum`, ficam pequenas demais: de `proprias` ([{ vista, escala }], a escala que cada uma teria sozinha),
+   as que têm a razão entre a comum e a própria abaixo de `fracao`, na ordem dada, com a razão em `fracao`. */
+export function vistasAmpliadas(proprias, comum, fracao = FRACAO_MINIMA_NA_ESCALA_COMUM) {
+  return proprias.filter((p) => comum / p.escala < fracao).map((p) => ({ vista: p.vista, escala: p.escala, fracao: comum / p.escala }));
+}
+
 function desenharOuMedir(esboco, { camada: querCamada = false, perfilDosTracos = true, soCamada = false, tracosVisiveis = false, escala: escalaPedida = null } = {}, soEscala = false) {
   exigir(escalaPedida === null || (typeof escalaPedida === 'number' && Number.isFinite(escalaPedida) && escalaPedida > 0), `desenharEsboco: "escala" deve ser um número positivo (px por mm), e veio ${JSON.stringify(escalaPedida)}`);
   const { vista, opcoes, previa, enquadrar } = validarEsboco(esboco);

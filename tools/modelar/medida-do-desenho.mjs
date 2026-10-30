@@ -15,7 +15,7 @@
  * cada tipo, com a posição, e grava uma imagem de diagnóstico: os vazamentos em vermelho e as falhas em azul sobre o desenho.
  *
  * `conferir` é o gate: prova a medida em casos montados à mão (ela dá zero no desenho certo e acusa o traço plantado e o traço
- * tirado) e mede as quarenta e oito vistas do conjunto de calibração do crítico, e reprova com qualquer pixel de vazamento ou de
+ * tirado) e mede as vistas do conjunto de calibração do crítico (as quatro de cada imagem e a ampliada, quando há), e reprova com qualquer pixel de vazamento ou de
  * falha que o registro das causas (`desenho-das-linhas/causas.json`, vazio quando o desenho zera) não declare.
  *
  * A imagem de um esboço (as de fonte `esboco` do conjunto) é desenhada pelo desenhista das formas, que não tem malha: a referência
@@ -33,9 +33,9 @@ import {
   triangulosDaReferencia,
 } from '../../modulos/esboco/src/medida-do-desenho.js';
 import { passoDeDesempate } from '../../modulos/esboco/src/camada.js';
-import { LARGURA_DAS_VISTAS, VISTAS_DO_CONJUNTO } from '../../src/autoria/calibracao-do-critico.js';
+import { LARGURA_DAS_VISTAS, VISTAS_AMPLIADAS_DO_CONJUNTO, VISTAS_DO_CONJUNTO, nomeDaAmpliada } from '../../src/autoria/calibracao-do-critico.js';
 import { desenhoParaBuffer, paginaDaCamada } from './esboco.mjs';
-import { desenhosDoObjeto } from './esboco.mjs';
+import { desenhosDoObjeto, nomeDoDesenho } from './esboco.mjs';
 import {
   ErroDaFonte, RAIZ, PASTA_DO_CONJUNTO, chamadaDaFonte, entradasDoNeutro, esbocoDaFonte, executarChamada, lerConjuntoDoDisco,
 } from './calibracao-do-critico.mjs';
@@ -349,16 +349,17 @@ export function imagemDaReferencia(medida) {
 /* O que cada vista da imagem do conjunto precisa para ser medida: o resultado do desenho e os triângulos da referência. */
 export function vistasDaImagem(imagem, conjunto, raiz = RAIZ) {
   const { fonte } = imagem;
+  /* as quatro vistas na escala comum, como o crítico as recebe, e a ampliada em escala própria quando há (com o nome
+     `<vista>-ampliada`); a referência sai na escala e no enquadramento de cada desenho */
   if (fonte.tipo === 'esboco') {
     const { bruto } = esbocoDaFonte(fonte, raiz);
-    return desenhosDoObjeto(bruto).map(({ vista, r }) => ({ vista, r, triangulos: triangulosDaCamada(r, vista) }));
+    return desenhosDoObjeto(bruto).map((d) => ({ vista: nomeDoDesenho(d), r: d.r, triangulos: triangulosDaCamada(d.r, d.vista) }));
   }
   const { familia, chamada } = chamadaDaFonte(fonte);
-  /* as quatro vistas na escala comum, como o crítico as recebe; a referência sai na escala e no enquadramento de cada desenho */
-  const { entradas, escala } = entradasDoNeutro(executarChamada(familia, chamada), imagem.objeto);
-  return entradas.map((entrada) => {
-    const r = desenharBlocagem(entrada, { camada: true, escala });
-    return { vista: entrada.vista, r, triangulos: triangulosDaBlocagem(entrada, r) };
+  const { entradas, escala, ampliadas } = entradasDoNeutro(executarChamada(familia, chamada), imagem.objeto);
+  return [...entradas.map((e) => [e, escala, e.vista]), ...ampliadas.map((e) => [e, null, nomeDaAmpliada(e.vista)])].map(([entrada, esc, nome]) => {
+    const r = desenharBlocagem(entrada, { camada: true, escala: esc });
+    return { vista: nome, r, triangulos: triangulosDaBlocagem(entrada, r) };
   });
 }
 
@@ -374,7 +375,7 @@ export async function medirConjunto({ raiz = RAIZ, so = null, vista = null, tole
   const conjunto = lerConjuntoDoDisco({ raiz, exigirGerados: false });
   const ids = so ? so.split(',').map((x) => x.trim()).filter(Boolean) : null;
   if (ids) for (const id of ids) if (!conjunto.imagens.some((i) => i.id === id)) throw new ErroDaFonte(`--so: a imagem '${id}' não está no conjunto (${conjunto.imagens.map((i) => i.id).join(', ')})`);
-  if (vista && !VISTAS_DO_CONJUNTO.includes(vista)) throw new ErroDaFonte(`--vista: '${vista}' não é uma das vistas do conjunto (${VISTAS_DO_CONJUNTO.join(', ')})`);
+  if (vista && ![...VISTAS_DO_CONJUNTO, ...VISTAS_AMPLIADAS_DO_CONJUNTO].includes(vista)) throw new ErroDaFonte(`--vista: '${vista}' não é uma das vistas do conjunto (${[...VISTAS_DO_CONJUNTO, ...VISTAS_AMPLIADAS_DO_CONJUNTO].join(', ')})`);
   const relatos = [];
   for (const imagem of conjunto.imagens) {
     if (ids && !ids.includes(imagem.id)) continue;

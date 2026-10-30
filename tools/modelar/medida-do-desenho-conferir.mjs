@@ -2,8 +2,8 @@
  *
  * Duas coisas, nesta ordem. A primeira prova a medida: os casos montados à mão de `medida-do-desenho-casos.mjs` (uma caixa, uma caixa com
  * furo, duas caixas encostadas, um cilindro fino) dão zero no desenho certo e acusam, com grupo e posição, o traço plantado e o traço
- * tirado; sem isto, um zero das quarenta e oito vistas não diria nada. A segunda mede as quarenta e oito vistas do conjunto de calibração
- * do crítico (doze imagens, quatro vistas) e reprova com todo pixel de vazamento ou de falha que o registro das causas não declare.
+ * tirado; sem isto, um zero das vistas do conjunto não diria nada. A segunda mede as vistas do conjunto de calibração do crítico (doze
+ * imagens, quatro vistas na escala comum e a ampliada em escala própria, quando há) e reprova com todo pixel de vazamento ou de falha que o registro das causas não declare.
  *
  * O registro (`docs/modelar/banco-de-provas/desenho-das-linhas/causas.json`, formato `mecanifica.desenho-das-linhas@1`) lista, por imagem,
  * vista e tipo, o máximo de pixels que o desenho ainda deixa e a causa provada: um resto que o desenho não consegue tirar (a ponta de um
@@ -12,7 +12,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { TOLERANCIA_DO_DESENHO } from '../../modulos/esboco/src/medida-do-desenho.js';
-import { VISTAS_DO_CONJUNTO } from '../../src/autoria/calibracao-do-critico.js';
+import { VISTAS_AMPLIADAS_DO_CONJUNTO, VISTAS_DO_CONJUNTO } from '../../src/autoria/calibracao-do-critico.js';
 import { PASTA_DO_CONJUNTO, RAIZ, lerConjuntoDoDisco } from './calibracao-do-critico.mjs';
 import { medirConjunto, detalheDosRelatos, tabelaDosRelatos } from './medida-do-desenho.mjs';
 import { provarAMedida } from './medida-do-desenho-casos.mjs';
@@ -34,7 +34,7 @@ export function lerCausas(raiz = RAIZ, imagens = null) {
   dados.causas.forEach((c, i) => {
     const onde = `${ARQUIVO_DAS_CAUSAS}, causa ${i + 1}`;
     if (imagens && !imagens.includes(c.imagem)) throw new ErroDasCausas(`${onde}: '${c.imagem}' não é uma imagem do conjunto (${imagens.join(', ')})`);
-    if (!VISTAS_DO_CONJUNTO.includes(c.vista)) throw new ErroDasCausas(`${onde}: '${c.vista}' não é uma vista do conjunto (${VISTAS_DO_CONJUNTO.join(', ')})`);
+    if (![...VISTAS_DO_CONJUNTO, ...VISTAS_AMPLIADAS_DO_CONJUNTO].includes(c.vista)) throw new ErroDasCausas(`${onde}: '${c.vista}' não é uma vista do conjunto (${[...VISTAS_DO_CONJUNTO, ...VISTAS_AMPLIADAS_DO_CONJUNTO].join(', ')})`);
     if (!TIPOS.includes(c.tipo)) throw new ErroDasCausas(`${onde}: o tipo é 'vazamento' ou 'falha', e veio '${c.tipo}'`);
     if (!Number.isInteger(c.maximoPixels) || c.maximoPixels < 1) throw new ErroDasCausas(`${onde}: "maximoPixels" precisa ser um inteiro de 1 em diante`);
     if (typeof c.causa !== 'string' || c.causa.trim().length < 20) throw new ErroDasCausas(`${onde}: "causa" precisa dizer a causa provada, em uma frase`);

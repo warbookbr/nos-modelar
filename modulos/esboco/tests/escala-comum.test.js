@@ -3,7 +3,7 @@
    barra de 100 mm mudava de tamanho de uma vista para a outra. Na escala comum a barra tem o mesmo comprimento em pixels nas quatro e
    nenhuma vista corta a peça. */
 import { describe, expect, it } from 'vitest';
-import { desenharEsboco, escalaComumDasVistas, escalaDoEsboco, QUADRO, VISTAS } from '../src/index.js';
+import { barraDeEscala, desenharEsboco, escalaComumDasVistas, escalaDoEsboco, FRACAO_MINIMA_NA_ESCALA_COMUM, QUADRO, tituloDaAmpliada, VISTAS, vistasAmpliadas } from '../src/index.js';
 import { desenharBlocagem, escalaComumDaBlocagem, escalaDaBlocagem } from '../src/desenho-da-blocagem.js';
 
 const QUATRO = Object.keys(VISTAS);
@@ -91,5 +91,40 @@ describe('a escala comum das quatro vistas de uma peça alongada', () => {
   it('recusa a escala que não é um número positivo', () => {
     expect(() => desenharEsboco({ ...CILINDRO, vista: 'frontal' }, { escala: 0 })).toThrow(/"escala" deve ser um número positivo/);
     expect(() => desenharBlocagem({ vista: 'frontal', paineis: [PAINEL] }, { escala: Number.NaN })).toThrow(/"escala" deve ser um número positivo/);
+  });
+});
+
+/* Uma peça compacta: a caixa de 300 por 200 por 250 mm, que nenhuma vista deixa pequena demais na escala comum. */
+const CAIXA = { opcoes: [{ titulo: 'Caixa', formas: [{ id: 'caixa', tipo: 'caixa', largura: 300, altura: 200, profundidade: 250, centro: [0, 0, 0], cor: 'cinza' }] }] };
+
+describe('a vista ampliada em escala própria', () => {
+  const proprias = (base) => QUATRO.map((vista) => ({ vista, escala: escalaDoEsboco({ ...base, vista }) }));
+
+  it('no cilindro longo, só a vista de ponta fica abaixo do limite e é ampliada', () => {
+    const p = proprias(CILINDRO);
+    const comum = Math.min(...p.map((x) => x.escala));
+    const ampliadas = vistasAmpliadas(p, comum);
+    expect(ampliadas.map((a) => a.vista)).toEqual(['lateral']);
+    expect(ampliadas[0].fracao).toBeLessThan(FRACAO_MINIMA_NA_ESCALA_COMUM);
+    /* desenhada sozinha, na escala própria e com o título que o diz, ela enche o painel e tem a barra dela */
+    const r = desenharEsboco({ ...CILINDRO, vista: 'lateral', opcoes: CILINDRO.opcoes.map((o) => ({ ...o, titulo: tituloDaAmpliada('lateral') })) }, { camada: true });
+    expect(r.svg).toContain('>Lateral, ampliada em escala própria</text>');
+    expect(r.escala).toBe(ampliadas[0].escala);
+    expect(r.escala / comum).toBeGreaterThan(1 / FRACAO_MINIMA_NA_ESCALA_COMUM);
+    const b = barraDeEscala(r.escala);
+    expect(barra(r.svg)).toEqual({ px: Number(b.px.toFixed(1)), rotulo: b.rotulo });
+    expect(foraDoPainel(r)).toEqual([]);
+  });
+
+  it('na peça compacta nenhuma vista é ampliada', () => {
+    const p = proprias(CAIXA);
+    expect(vistasAmpliadas(p, Math.min(...p.map((x) => x.escala)))).toEqual([]);
+  });
+
+  it('o mesmo vale no desenho da blocagem', () => {
+    const p = QUATRO.map((vista) => ({ vista, escala: escalaDaBlocagem({ vista, paineis: [PAINEL] }) }));
+    expect(vistasAmpliadas(p, Math.min(...p.map((x) => x.escala))).map((a) => a.vista)).toEqual(['lateral']);
+    const r = desenharBlocagem({ vista: 'lateral', paineis: [{ ...PAINEL, titulo: tituloDaAmpliada('lateral') }] });
+    expect(r.svg).toContain('>Lateral, ampliada em escala própria</text>');
   });
 });

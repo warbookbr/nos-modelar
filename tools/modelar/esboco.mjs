@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
-import { desenharEsboco, ErroDeEsboco, escalaComumDasVistas, resolverOpcao, VISTAS, VISTAS_EXTRAS, VISTAS_TODAS } from '../../modulos/esboco/src/index.js';
+import { desenharEsboco, ErroDeEsboco, escalaComumDasVistas, escalaDoEsboco, resolverOpcao, tituloDaAmpliada, VISTAS, VISTAS_EXTRAS, VISTAS_TODAS, vistasAmpliadas } from '../../modulos/esboco/src/index.js';
 import { ladosDasVistas, linhaDaVista } from '../../modulos/esboco/src/lados.js';
 import { descreverAchado, descreverAtravessamento, descreverPorta, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { descreverGrupoDaProjecao, FATORES_DA_SUGESTAO, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
@@ -30,7 +30,7 @@ import { registrarUso } from './uso.mjs';
 import { envelopeDaReceitaArquivo, nivelZeroDoEsboco } from './esboco-nivel-zero.mjs';
 import { andaimeDoArquivo, descreverTraducao } from './esboco-para-andaime.mjs';
 import { dica, textoDaRecusa, topicoDaRecusa, topicoDoContato, topicoDoPortao } from './esboco-recusa.mjs';
-import { blocagemDoEsboco, desenharVistaDaBlocagem, escalaComumDasVistasDaBlocagem } from './esboco-blocagem.mjs';
+import { blocagemDoEsboco, desenharVistaDaBlocagem, escalasDasVistasDaBlocagem } from './esboco-blocagem.mjs';
 import { FIM_DO_BRIEF, gravarBrief, MARCA_DO_BRIEF, orientacaoDoEsboco, referenciaDoBrief, vistasDaReferencia, vistasDaUnidade } from './esboco-brief.mjs';
 import { aplicarPose, nomeDaPose, numeroDoCurso, posesDoBrief } from '../../modulos/esboco/src/curso.js';
 import { cursosDaUnidade, formatarCurso, quadroDoCurso, varrerCurso } from '../../modulos/esboco/src/curso-varredura.js';
@@ -849,8 +849,10 @@ export function esbocoIsolado(bruto, estado, unidade, vizinhos, opcoes = {}) {
 /* As vistas isoladas de uma unidade (`unidade`) ou do esboço inteiro (`unidade` nulo): grava `<nome-do-arquivo>[-unidade-<nome>]
    [-<opções>]-<vista>.png` ao lado do esboço (ou em `saida`), nas quatro vistas ou só na pedida, sem legenda nem linha de
    centro. As opções de desenho são `corte`. Todas saem na escala comum das quatro vistas e das pedidas, mesmo quando se pede uma
-   só, para a barra de 100 mm ter o mesmo comprimento em todas. Devolve { destinos, unidade, texto }. */
-export async function vistasArquivo(arquivo, { unidade = null, vista = null, vistas = null, largura: larguraPedida = null, saida = null, corte = null, explosao = null, previa = false, zoomForma = null, forcar = false, vizinhos = true, nivelZero = false } = {}) {
+   só, para a barra de 100 mm ter o mesmo comprimento em todas. Com `ampliadas` (o brief da unidade), cada uma das quatro que na
+   escala comum fica pequena demais (`vistasAmpliadas`) sai também na escala própria, em `<...>-<vista>-ampliada.png`, com o título
+   que o diz; os caminhos vão em `ampliadas`. Devolve { destinos, ampliadas, unidade, texto }. */
+export async function vistasArquivo(arquivo, { unidade = null, vista = null, vistas = null, largura: larguraPedida = null, saida = null, corte = null, explosao = null, previa = false, zoomForma = null, forcar = false, vizinhos = true, nivelZero = false, ampliadas: comAmpliadas = false } = {}) {
   const caminho = resolverCaminho(arquivo);
   const bruto = JSON.parse(readFileSync(caminho, 'utf8'));
   let estado = null;
@@ -877,24 +879,37 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, vis
      100 mm do tamanho que tem nas outras. Ela só é calculada quando alguma vista precisa ser desenhada. */
   const vistasDaEscala = [...new Set([...VISTAS_DA_ANALISE, ...pedidas])];
   const desenhoDaVista = (v) => variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false, explosoes });
-  let escalaComum = null;
-  const escalaDasVistas = () => (escalaComum ??= pelaBlocagem ? escalaComumDasVistasDaBlocagem(pelaBlocagem, vistasDaEscala) : escalaComumDasVistas(vistasDaEscala.map(desenhoDaVista)));
+  let escalas = null;
+  const escalasDasVistas = () => {
+    if (escalas) return escalas;
+    if (pelaBlocagem) return (escalas = escalasDasVistasDaBlocagem(pelaBlocagem, vistasDaEscala));
+    const proprias = vistasDaEscala.map((v) => ({ vista: v, escala: escalaDoEsboco(desenhoDaVista(v)) }));
+    return (escalas = { comum: Math.min(...proprias.map((p) => p.escala)), proprias });
+  };
+  /* as ampliadas saem das quatro de sempre; a vista de outro lado é o espelho de uma delas */
+  const ampliadas = comAmpliadas ? vistasAmpliadas(escalasDasVistas().proprias.filter((p) => VISTAS_DA_ANALISE.includes(p.vista)), escalasDasVistas().comum).map((a) => a.vista) : [];
+  const destinosAmpliados = [];
   let navegador = null;
   try {
-    for (const v of pedidas) {
-      const destino = `${base}${nome === null ? '' : `-unidade-${nome}`}${sufixoDasOpcoes(opcoes)}-${v}.png`;
-      destinos.push(destino);
+    for (const [v, ampliada] of [...pedidas.map((x) => [x, false]), ...ampliadas.map((x) => [x, true])]) {
+      const destino = `${base}${nome === null ? '' : `-unidade-${nome}`}${sufixoDasOpcoes(opcoes)}-${v}${ampliada ? SUFIXO_DA_AMPLIADA : ''}.png`;
+      (ampliada ? destinosAmpliados : destinos).push(destino);
       /* a vista cujo conteúdo não mudou desde a última gravação fica como está */
-      const hash = pelaBlocagem ? hashDaBlocagem(pelaBlocagem, v, { largura: larguraPedida, vistasDaEscala }) : hashDaVista(isolado, v, { largura: larguraPedida, corte, explosao, previa, zoomForma, vistasDaEscala });
+      const extras = ampliada ? { largura: larguraPedida, ampliada } : { largura: larguraPedida, vistasDaEscala };
+      const hash = pelaBlocagem ? hashDaBlocagem(pelaBlocagem, v, extras) : hashDaVista(isolado, v, { ...extras, corte, explosao, previa, zoomForma });
       let gravado = null;
       try { gravado = readFileSync(`${destino}.hash`, 'utf8').trim(); } catch { /* sem hash gravado */ }
-      if (!forcar && gravado === hash && existsSync(destino)) { reaproveitadas.push(true); svgs.push(null); continue; }
-      reaproveitadas.push(false);
+      if (!forcar && gravado === hash && existsSync(destino)) { if (!ampliada) { reaproveitadas.push(true); svgs.push(null); } continue; }
+      if (!ampliada) reaproveitadas.push(false);
       navegador ??= await (await import('playwright')).default.chromium.launch();
-      const opcoesDoDesenho = { ...OPCOES_DA_CAMADA, escala: escalaDasVistas() };
-      const r = pelaBlocagem ? desenharVistaDaBlocagem(pelaBlocagem, v, opcoesDoDesenho) : desenharEsboco(desenhoDaVista(v), opcoesDoDesenho);
+      /* a ampliada na escala própria (o desenho sem escala dada) e com o título que o diz; as outras na escala comum */
+      const opcoesDoDesenho = ampliada ? OPCOES_DA_CAMADA : { ...OPCOES_DA_CAMADA, escala: escalasDasVistas().comum };
+      const r = pelaBlocagem
+        ? desenharVistaDaBlocagem(pelaBlocagem, v, { ...opcoesDoDesenho, ...(ampliada ? { titulo: tituloDaAmpliada(v) } : {}) })
+        : desenharEsboco(ampliada ? comTituloDaAmpliada(desenhoDaVista(v), v) : desenhoDaVista(v), opcoesDoDesenho);
       const { svg } = await desenhoParaPng(r, larguraPedida, destino, navegador);
       writeFileSync(`${destino}.hash`, `${hash}\n`);
+      if (ampliada) continue;
       svgs.push(svg);
       const e = r.explosao?.find(Boolean);
       if (e) notas.push(`  ${v}: explodida em ${e.eixo}, passo ${String(Math.round(e.passo * 100) / 100).replace('.', ',')} mm, ${e.movidas} de ${e.total} formas deslocadas${!svg.includes('class="explosao-liga"') ? `; nenhuma forma saiu do lugar na tela da vista ${v} (${eixoNaTela(v, e.eixo) ? `as formas estão todas na mesma camada em ${e.eixo}` : `${e.eixo} é o eixo do olho, e deslocar por ele só muda a profundidade`}): tente --eixo com outro eixo, ou a vista isometrica` : ''}`);
@@ -904,7 +919,7 @@ export async function vistasArquivo(arquivo, { unidade = null, vista = null, vis
   }
   const vistasTexto = `${destinos.length} ${destinos.length === 1 ? 'vista' : 'vistas'}`;
   const cabecalho = `${u === null ? `esboço inteiro, sem legenda, em ${vistasTexto}` : `unidade ${u.id} (${u.membros.length} ${u.membros.length === 1 ? 'forma' : 'formas'}) isolada, sem legenda, em ${vistasTexto}`}${pelaBlocagem ? `, ${pelaBlocagem.texto}` : ''}`;
-  return { destinos, svgs, reaproveitadas, unidade: u, vizinhos: idsVizinhos, vizinhosDescritos: idsVizinhos.length > 0 ? descricaoDasVizinhas(bruto, estado, unidade) : [], texto: `${cabecalho}${idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro: ${idsVizinhos.slice(0, 8).join(', ')}${idsVizinhos.length > 8 ? ', ...' : ''} (--sem-vizinhos desliga)` : ''}${previa ? ' (prévia: facetas reduzidas e sem arestas finas, rotulada no título; confirme com a imagem completa antes de dar por bom)' : ''}:\n${destinos.map((d, i) => `  ${d}${reaproveitadas[i] ? ' (reaproveitada: o conteúdo não mudou desde a última gravação; --forçar redesenha)' : ''}`).join('\n')}\n${notas.length > 0 ? `${notas.join('\n')}\n` : ''}` };
+  return { destinos, ampliadas: destinosAmpliados, svgs, reaproveitadas, unidade: u, vizinhos: idsVizinhos, vizinhosDescritos: idsVizinhos.length > 0 ? descricaoDasVizinhas(bruto, estado, unidade) : [], texto: `${cabecalho}${idsVizinhos.length > 0 ? `, com ${idsVizinhos.length} ${idsVizinhos.length === 1 ? 'forma' : 'formas'} de outra unidade em contorno claro: ${idsVizinhos.slice(0, 8).join(', ')}${idsVizinhos.length > 8 ? ', ...' : ''} (--sem-vizinhos desliga)` : ''}${previa ? ' (prévia: facetas reduzidas e sem arestas finas, rotulada no título; confirme com a imagem completa antes de dar por bom)' : ''}:\n${destinos.map((d, i) => `  ${d}${reaproveitadas[i] ? ' (reaproveitada: o conteúdo não mudou desde a última gravação; --forçar redesenha)' : ''}`).join('\n')}\n${destinosAmpliados.map((d) => `  ${d} (ampliada em escala própria: na escala comum a peça fica pequena nesta vista)\n`).join('')}${notas.length > 0 ? `${notas.join('\n')}\n` : ''}` };
 }
 
 /* `--unidade <nome> [--vista <vista>]`: o mesmo para uma unidade, é a imagem limpa para o crítico visual cego por unidade. */
@@ -936,7 +951,7 @@ export async function compostaArquivo(arquivo, { unidade = null, largura = null,
   }
   /* as quatro vistas na mesma escala, a maior com que a unidade cabe em todas */
   const desenhoDaVista = (v) => variante({ ...isolado, ladosPorEscala: isolado.ladosPorEscala ?? true }, { vista: v, legendas: false, centros: false });
-  const escala = pelaBlocagem ? escalaComumDasVistasDaBlocagem(pelaBlocagem, VISTAS_DA_ANALISE) : escalaComumDasVistas(VISTAS_DA_ANALISE.map(desenhoDaVista));
+  const escala = pelaBlocagem ? escalasDasVistasDaBlocagem(pelaBlocagem, VISTAS_DA_ANALISE).comum : escalaComumDasVistas(VISTAS_DA_ANALISE.map(desenhoDaVista));
   const navegador = await (await import('playwright')).default.chromium.launch();
   const imagens = [];
   try {
@@ -1067,7 +1082,7 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
   const extras = vistasDaUnidade(bruto, idDaUnidade(bruto, estado, unidade));
   /* a vista que olha do mesmo lado que cada referência (a lateral-oposta, a frontal-oposta) entra mesmo quando a unidade não a pede */
   const daReferencia = vistasDaReferencia(bruto).filter((v) => !extras.includes(v));
-  const r = await unidadeArquivo(arquivo, unidade, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, forcar, vizinhos, vistas: [...VISTAS_DA_ANALISE, ...extras, ...daReferencia] });
+  const r = await unidadeArquivo(arquivo, unidade, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, forcar, vizinhos, vistas: [...VISTAS_DA_ANALISE, ...extras, ...daReferencia], ampliadas: true });
   const quatro = r.destinos.slice(0, VISTAS_DA_ANALISE.length);
   const aMais = r.destinos.slice(VISTAS_DA_ANALISE.length, VISTAS_DA_ANALISE.length + extras.length);
   const paraReferencia = r.destinos.slice(VISTAS_DA_ANALISE.length + extras.length);
@@ -1080,8 +1095,9 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
   L.push(MARCA_DO_BRIEF);
   L.push(`Função da unidade: ${funcao ?? '(não declarada)'}`);
   L.push(...linhasDoAnterior(vereditoAnterior(arquivo, r.unidade.id), ''));
-  L.push(`Imagens (as quatro vistas da unidade isolada, sem legenda${r.vizinhos.length > 0 ? '; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue' : ''}):`);
+  L.push(`Imagens (as quatro vistas da unidade isolada, sem legenda, ${TEXTO_DA_ESCALA_COMUM}${r.vizinhos.length > 0 ? '; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue' : ''}):`);
   for (const d of quatro) L.push(`  ${d}`);
+  L.push(...linhasDasAmpliadas(r.ampliadas));
   if (aMais.length > 0) {
     L.push('Imagens a mais, de lados que as quatro não olham (a unidade as pede em "vistas"; as quatro de cima seguem como estão):');
     aMais.forEach((d, k) => L.push(`  ${extras[k]}: ${d}`));
@@ -1104,7 +1120,7 @@ export async function briefDoCritico(arquivo, unidade, { largura = null, saida =
   L.push(...linhasDasPerguntas(PERGUNTAS_DO_CRITICO, perguntasDoEsboco(bruto, { formas: new Set(r.unidade.membros) }).todas));
   L.push(FIM_DO_BRIEF);
   const arquivoDoBrief = gravarBrief(pastaAbs, L);
-  return { texto: `${L.join('\n')}\n`, destinos: r.destinos, pasta, funcao, brief: arquivoDoBrief, referencia: referencia.arquivos, poses: poses.arquivos };
+  return { texto: `${L.join('\n')}\n`, destinos: r.destinos, ampliadas: r.ampliadas, pasta, funcao, brief: arquivoDoBrief, referencia: referencia.arquivos, poses: poses.arquivos };
 }
 
 /* As perguntas fixas do crítico cego do Marco: o objeto inteiro nas quatro vistas gerais, e o relato por unidade. */
@@ -1133,12 +1149,13 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   /* as vistas que olham do mesmo lado que cada referência (a lateral-oposta, a frontal-oposta) vêm depois das quatro, todas na mesma escala */
   const daReferencia = vistasDaReferencia(bruto);
   const geraisDaReferencia = [];
+  const ampliadas = [];
   const navegador = await (await import('playwright')).default.chromium.launch();
   try {
-    for (const { vista: v, r } of desenhosDoObjeto(bruto, daReferencia)) {
-      const destino = `${base}-marco-${limiar}-${v}.png`;
-      await desenhoParaPng(r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
-      (VISTAS_DA_ANALISE.includes(v) ? gerais : geraisDaReferencia).push(destino);
+    for (const d of desenhosDoObjeto(bruto, daReferencia)) {
+      const destino = `${base}-marco-${limiar}-${nomeDoDesenho(d)}.png`;
+      await desenhoParaPng(d.r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
+      (d.ampliada ? ampliadas : VISTAS_DA_ANALISE.includes(d.vista) ? gerais : geraisDaReferencia).push(destino);
     }
   } finally {
     await navegador.close();
@@ -1150,8 +1167,9 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   L.push(`O texto entre as marcas também fica em ${join(pasta, 'brief.md')}; --brief marco-${limiar} o imprime e o regrava.`);
   L.push(MARCA_DO_BRIEF);
   L.push(...linhasDoAnterior(vereditoAnterior(arquivo, `marco-${limiar}`), ''));
-  L.push('Imagens gerais do objeto (as quatro vistas, sem legenda):');
+  L.push(`Imagens gerais do objeto (as quatro vistas, sem legenda, ${TEXTO_DA_ESCALA_COMUM}):`);
   for (const d of gerais) L.push(`  ${d}`);
+  L.push(...linhasDasAmpliadas(ampliadas));
   if (geraisDaReferencia.length > 0) {
     L.push('Imagens gerais a mais para a referência (as vistas que olham do mesmo lado que a imagem da referência, e cada linha da referência diz com qual comparar):');
     geraisDaReferencia.forEach((d, k) => L.push(`  ${daReferencia[k]}: ${d}`));
@@ -1161,11 +1179,12 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   const unidades = [];
   for (const id of novas) {
     const extras = vistasDaUnidade(bruto, id);
-    const r = await unidadeArquivo(arquivo, id, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, vistas: [...VISTAS_DA_ANALISE, ...extras] });
+    const r = await unidadeArquivo(arquivo, id, { largura: largura ?? LARGURA_DO_CRITICO, saida: pasta, vistas: [...VISTAS_DA_ANALISE, ...extras], ampliadas: true });
     const funcao = funcaoDaUnidade(bruto, r.unidade.id);
-    unidades.push({ id: r.unidade.id, destinos: r.destinos, funcao });
+    unidades.push({ id: r.unidade.id, destinos: r.destinos, ampliadas: r.ampliadas, funcao });
     L.push(`Unidade ${r.unidade.id} (${r.unidade.membros.length} ${r.unidade.membros.length === 1 ? 'forma' : 'formas'}). Função da unidade: ${funcao ?? '(não declarada)'}`);
     for (const d of r.destinos.slice(0, VISTAS_DA_ANALISE.length)) L.push(`  ${d}`);
+    L.push(...linhasDasAmpliadas(r.ampliadas, '  '));
     if (extras.length > 0) {
       L.push('  Imagens a mais desta unidade, de lados que as quatro não olham:');
       r.destinos.slice(VISTAS_DA_ANALISE.length).forEach((d, k) => { L.push(`    ${d}`); L.push(`      ${linhaDaVista(extras[k], orientacao)}`); });
@@ -1183,7 +1202,7 @@ export async function briefDoMarco(arquivo, limiar, { largura = null, saida = nu
   L.push(...linhasDasPerguntas(PERGUNTAS_DO_MARCO, perguntasDoEsboco(bruto).todas));
   L.push(FIM_DO_BRIEF);
   const arquivoDoBrief = gravarBrief(pasta, L);
-  return { texto: `${L.join('\n')}\n`, gerais, geraisDaReferencia, unidades, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
+  return { texto: `${L.join('\n')}\n`, gerais, geraisDaReferencia, ampliadas, unidades, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
 }
 
 /* As perguntas do crítico do objeto inteiro, no nível sem Detalhe por unidade: as da unidade, ditas do objeto. */
@@ -1195,16 +1214,39 @@ export const PERGUNTAS_DO_OBJETO = [
   PERGUNTA_DA_NOTA('o objeto'),
 ];
 
+/* O esboço já na vista, com o título de cada opção trocado pelo da vista ampliada em escala própria. */
+function comTituloDaAmpliada(esboco, vista) {
+  return { ...esboco, opcoes: esboco.opcoes.map((o) => ({ ...o, titulo: tituloDaAmpliada(vista) })) };
+}
+
+/* O nome de arquivo (e de vista, no conjunto de calibração) da vista ampliada: `<vista>-ampliada`. */
+export const SUFIXO_DA_AMPLIADA = '-ampliada';
+/* O que o brief diz das quatro vistas, desde que elas saem na escala comum. */
+export const TEXTO_DA_ESCALA_COMUM = 'na mesma escala, com a barra de 100 mm do mesmo comprimento nas quatro';
+export const nomeDoDesenho = (d) => (d.ampliada ? `${d.vista}${SUFIXO_DA_AMPLIADA}` : d.vista);
+
 /* As quatro vistas do objeto inteiro como o brief do objeto as desenha (sem legenda nem linha de centro, com a camada quando o
-   motor é o `webgl`), ainda sem navegador: [{ vista, r }], `r` o resultado de `desenharEsboco`. O conjunto de calibração do
-   crítico confere o desenho por aqui. */
+   motor é o `webgl`), ainda sem navegador: [{ vista, r }], `r` o resultado de `desenharEsboco`. Todas na escala comum (a maior com
+   que o objeto cabe em todas), e depois delas, com `ampliada: true`, cada uma das quatro que nela fica pequena demais
+   (`vistasAmpliadas`), desenhada na escala própria e com o título que o diz. O conjunto de calibração do crítico confere o desenho
+   por aqui. */
 export function desenhosDoObjeto(bruto, vistasAMais = []) {
   const geral = expandirEsboco(bruto);
   const vistas = [...VISTAS_DA_ANALISE, ...vistasAMais];
   const desenhos = vistas.map((vista) => variante({ ...geral, ladosPorEscala: geral.ladosPorEscala ?? true }, { vista, legendas: false, centros: false }));
-  /* todas na mesma escala, a maior com que o objeto cabe em todas: a barra de 100 mm tem o mesmo comprimento nas quatro */
-  const escala = escalaComumDasVistas(desenhos);
-  return vistas.map((vista, k) => ({ vista, r: desenharEsboco(desenhos[k], { ...OPCOES_DA_CAMADA, escala }) }));
+  const proprias = desenhos.map(escalaDoEsboco);
+  const escala = Math.min(...proprias);
+  const ampliadas = vistasAmpliadas(VISTAS_DA_ANALISE.map((vista, k) => ({ vista, escala: proprias[k] })), escala);
+  return [
+    ...vistas.map((vista, k) => ({ vista, r: desenharEsboco(desenhos[k], { ...OPCOES_DA_CAMADA, escala }) })),
+    ...ampliadas.map(({ vista }) => ({ vista, ampliada: true, r: desenharEsboco(comTituloDaAmpliada(desenhos[vistas.indexOf(vista)], vista), OPCOES_DA_CAMADA) })),
+  ];
+}
+
+/* As linhas do brief que listam as vistas ampliadas (`ampliadas`, os caminhos), vazias quando não há. */
+export function linhasDasAmpliadas(ampliadas, recuo = '') {
+  if (ampliadas.length === 0) return [];
+  return [`${recuo}Vista ampliada em escala própria (na escala comum a peça fica pequena nela; a barra de 100 mm desta imagem tem outro comprimento, e as proporções entre vistas se comparam pelas quatro de cima):`, ...ampliadas.map((d) => `${recuo}  ${d}`)];
 }
 
 /* O objeto do brief: o título e a nota da primeira opção do esboço. */
@@ -1214,18 +1256,20 @@ export function objetoDoEsboco(bruto) {
 }
 
 /* O texto do brief do crítico do objeto, sem desenhar nada: `objeto` (título e nota), `anterior` (as linhas do veredito
-   anterior), `imagens` (os caminhos das quatro vistas) e `perguntas` de forma além das cinco fixas. `imagensAMais` (as vistas de mesmo olho que a referência, "<vista>: <caminho>") entram depois delas, `referencia` (as linhas da
+   anterior), `imagens` (os caminhos das quatro vistas, na escala comum), `ampliadas` (os das vistas ampliadas em escala própria,
+   logo depois delas, quando há) e `perguntas` de forma além das cinco fixas. `imagensAMais` (as vistas de mesmo olho que a referência, "<vista>: <caminho>") entram depois delas, `referencia` (as linhas da
    referência) e `lados` (de que lado cada vista olha) entram depois das imagens, e `gravadoEm` diz onde o texto também fica
    gravado; sem eles o brief é o de antes, byte a byte (o conjunto de calibração do crítico o monta assim). */
-export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, imagensAMais = [], perguntas = [], referencia = [], lados = [], gravadoEm = null }) {
+export function linhasDoBriefDoObjeto({ objeto, anterior = [], imagens, ampliadas = [], imagensAMais = [], perguntas = [], referencia = [], lados = [], gravadoEm = null }) {
   const L = ['crítico do objeto: o nível deste esboço não tem Detalhe por unidade, e a conclusão espera o veredito do crítico sobre o objeto inteiro.'];
   L.push(`Despache o agente critico-visual (Sonnet) com o brief abaixo e as imagens, sem o JSON, o plano nem o histórico; depois registre o veredito: --condutor --veredito ${UNIDADE_DO_OBJETO} --nota <0-10> --motivo <o que ele apontou> e rode --proximo de novo.`);
   if (gravadoEm) L.push(`O texto entre as marcas também fica em ${gravadoEm}; --brief ${UNIDADE_DO_OBJETO} o imprime e o regrava.`);
   L.push(MARCA_DO_BRIEF);
   L.push(`Objeto: ${objeto || '(sem título no esboço)'}`);
   L.push(...anterior);
-  L.push('Imagens do objeto (as quatro vistas, sem legenda):');
+  L.push(`Imagens do objeto (as quatro vistas, sem legenda, ${TEXTO_DA_ESCALA_COMUM}):`);
   for (const d of imagens) L.push(`  ${d}`);
+  L.push(...linhasDasAmpliadas(ampliadas));
   if (imagensAMais.length > 0) L.push('Imagens a mais para a referência (as vistas que olham do mesmo lado que a imagem da referência, e cada linha da referência diz com qual comparar):', ...imagensAMais.map((d) => `  ${d}`));
   L.push(...referencia);
   L.push(...lados);
@@ -1247,24 +1291,25 @@ export async function briefDoObjeto(arquivo, { largura = null, saida = null } = 
   const gerais = [];
   const daReferencia = vistasDaReferencia(bruto);
   const geraisDaReferencia = [];
+  const ampliadas = [];
   const navegador = await (await import('playwright')).default.chromium.launch();
   try {
-    for (const { vista, r } of desenhosDoObjeto(bruto, daReferencia)) {
-      const destino = `${base}-objeto-${vista}.png`;
-      await desenhoParaPng(r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
-      (VISTAS_DA_ANALISE.includes(vista) ? gerais : geraisDaReferencia).push(destino);
+    for (const d of desenhosDoObjeto(bruto, daReferencia)) {
+      const destino = `${base}-objeto-${nomeDoDesenho(d)}.png`;
+      await desenhoParaPng(d.r, largura ?? LARGURA_DO_CRITICO, destino, navegador);
+      (d.ampliada ? ampliadas : VISTAS_DA_ANALISE.includes(d.vista) ? gerais : geraisDaReferencia).push(destino);
     }
   } finally {
     await navegador.close();
   }
   const referencia = referenciaDoBrief({ bruto, base: dirname(caminho), pasta });
   const L = linhasDoBriefDoObjeto({
-    objeto: objetoDoEsboco(bruto), anterior: linhasDoAnterior(vereditoAnterior(arquivo, UNIDADE_DO_OBJETO), ''), imagens: gerais, perguntas: perguntasDoEsboco(bruto).todas,
+    objeto: objetoDoEsboco(bruto), anterior: linhasDoAnterior(vereditoAnterior(arquivo, UNIDADE_DO_OBJETO), ''), imagens: gerais, ampliadas, perguntas: perguntasDoEsboco(bruto).todas,
     imagensAMais: geraisDaReferencia.map((d, k) => `${daReferencia[k]}: ${d}`),
     referencia: referencia.linhas, lados: ladosDasVistas({ orientacao: orientacaoDoEsboco(bruto), extras: daReferencia }), gravadoEm: join(pasta, 'brief.md'),
   });
   const arquivoDoBrief = gravarBrief(pasta, L);
-  return { texto: `${L.join('\n')}\n`, gerais, geraisDaReferencia, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
+  return { texto: `${L.join('\n')}\n`, gerais, geraisDaReferencia, ampliadas, pasta, brief: arquivoDoBrief, referencia: referencia.arquivos };
 }
 
 /* `--brief <unidade|marco-N|objeto>`: reimprime e regrava (`brief.md` na pasta das imagens, as imagens pelo hash) o brief do
