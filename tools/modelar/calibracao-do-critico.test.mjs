@@ -7,7 +7,7 @@ import { medirEsboco } from '../../modulos/esboco/src/descrever.js';
 import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
 import { conferirRazoesDaPeca, normalizarRazoesDaPeca } from '../../src/autoria/razoes-da-peca.js';
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
-import { medidasEsperadas } from '../../src/autoria/calibracao-do-critico.js';
+import { medidasEsperadas, vistasGravadas } from '../../src/autoria/calibracao-do-critico.js';
 import {
   RAIZ, ErroDaFonte, brief, briefDaImagem, caminhoDoConjunto, chamadaDaFonte, conferir, conferirConjunto, descreverFonte, esbocoDaFonte, executarChamada,
   faltaNoAgente, hashDaImagem, hashDoAgente, hashDoBrief, hashDoDesenho, idsDaMedidaDaPeca, lerConjuntoDoDisco, linhaDoEstado, migrarImagemDosJulgamentos, modeloDoBrief, prepararImagem,
@@ -261,14 +261,18 @@ const defeitoDito = (parte, tipo) => ({ parte, tipo, onde: 'extremidade da peça
 describe('o brief exato que o crítico cego recebe', () => {
   const c = lerConjuntoDoDisco();
 
-  it('traz o objeto, as perguntas, os quatro caminhos absolutos com o id neutro e a escala da nota, e nada do que conta o defeito', () => {
+  it('traz o objeto, as perguntas, os quatro caminhos absolutos com o id neutro, a ampliada quando há, e a escala da nota, e nada do que conta o defeito', () => {
     for (const img of c.imagens) {
       const b = briefDaImagem(img);
-      expect(b.imagens, img.id).toHaveLength(4);
-      for (const [i, vista] of ['isometrica', 'frontal', 'lateral', 'superior'].entries()) {
+      const nomes = vistasGravadas(img);
+      expect(nomes.slice(0, 4)).toEqual(['isometrica', 'frontal', 'lateral', 'superior']);
+      expect(b.imagens, img.id).toHaveLength(nomes.length);
+      for (const [i, vista] of nomes.entries()) {
         expect(b.imagens[i]).toBe(`${RAIZ}/${PASTA}/imagens/${img.id}/${vista}.png`);
         expect(b.texto).toContain(b.imagens[i]);
       }
+      /* a ampliada vem depois das quatro, com a linha que diz que a escala dela é própria */
+      expect(b.texto.includes('Vista ampliada em escala própria'), img.id).toBe(nomes.length > 4);
       expect(b.texto, img.id).toContain('Escala: 10: nenhum achado. 8 e 9:');
       expect(b.texto).not.toContain('--- brief');
       expect(b.texto).not.toContain('Despache');

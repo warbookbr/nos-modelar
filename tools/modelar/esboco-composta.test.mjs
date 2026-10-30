@@ -10,7 +10,7 @@ import { PNG } from 'pngjs';
 import { afterAll, describe, expect, it } from 'vitest';
 import { desenharEsboco, escalaComumDasVistas } from '../../modulos/esboco/src/index.js';
 import { expandirEsboco } from '../../modulos/esboco/src/expandir.js';
-import { compostaArquivo, desenhoParaBuffer, desenhosDoObjeto, LARGURA_DA_COMPOSTA, OPCOES_DA_CAMADA, variante, vistasArquivo, VISTAS_DA_ANALISE } from './esboco.mjs';
+import { briefDoObjeto, compostaArquivo, desenhoParaBuffer, desenhosDoObjeto, LARGURA_DA_COMPOSTA, OPCOES_DA_CAMADA, variante, vistasArquivo, VISTAS_DA_ANALISE } from './esboco.mjs';
 
 const PASTA = mkdtempSync(join(tmpdir(), 'esboco-composta-'));
 afterAll(() => rmSync(PASTA, { recursive: true, force: true }));
@@ -110,7 +110,7 @@ const barraDe = (svg) => {
 
 describe('a mesma escala nas vistas que vão ao crítico', () => {
   it('as quatro vistas do brief do objeto têm a barra de 100 mm do mesmo comprimento numa peça alongada', () => {
-    const desenhos = desenhosDoObjeto(JSON.parse(readFileSync(LONGO, 'utf8')));
+    const desenhos = desenhosDoObjeto(JSON.parse(readFileSync(LONGO, 'utf8'))).filter((d) => !d.ampliada);
     const barras = desenhos.map(({ r }) => barraDe(r.svg));
     expect(barras[0]).toMatch(/ px, 100 mm$/);
     expect(barras).toEqual(VISTAS_DA_ANALISE.map(() => barras[0]));
@@ -126,4 +126,35 @@ describe('a mesma escala nas vistas que vão ao crítico', () => {
     const composta = await compostaArquivo(LONGO, { saida: pasta });
     expect(composta.escala).toBe(frontal.r.escala);
   }, 90_000);
+});
+
+describe('a vista ampliada em escala própria', () => {
+  it('a peça alongada ganha a quinta imagem, a vista de ponta na escala própria e rotulada; a mesa compacta não ganha', () => {
+    const longo = desenhosDoObjeto(JSON.parse(readFileSync(LONGO, 'utf8')));
+    expect(longo.map((d) => [d.vista, Boolean(d.ampliada)])).toEqual([...VISTAS_DA_ANALISE.map((v) => [v, false]), ['lateral', true]]);
+    const [ampliada] = longo.filter((d) => d.ampliada);
+    expect(ampliada.r.svg).toContain('>Lateral, ampliada em escala própria</text>');
+    expect(ampliada.r.escala).toBeGreaterThan(4 * longo[0].r.escala);
+    expect(barraDe(ampliada.r.svg)).not.toBe(barraDe(longo[0].r.svg));
+    expect(desenhosDoObjeto(JSON.parse(readFileSync(ARQUIVO, 'utf8'))).some((d) => d.ampliada)).toBe(false);
+  });
+
+  it('o brief do objeto e as vistas da unidade gravam a ampliada e o brief a lista depois das quatro, dizendo que a escala é própria', async () => {
+    const pasta = join(PASTA, 'brief-longo');
+    const b = await briefDoObjeto(LONGO, { saida: pasta });
+    expect(b.gerais).toHaveLength(4);
+    expect(b.ampliadas).toEqual([join(pasta, 'haste-objeto-lateral-ampliada.png')]);
+    expect(PNG.sync.read(readFileSync(b.ampliadas[0])).width).toBe(1100);
+    const linhas = b.texto.split('\n');
+    const quatro = linhas.indexOf(`  ${b.gerais[3]}`);
+    expect(linhas[quatro + 1]).toMatch(/^Vista ampliada em escala própria .*barra de 100 mm desta imagem tem outro comprimento/);
+    expect(linhas[quatro + 2]).toBe(`  ${b.ampliadas[0]}`);
+    expect(b.texto).toContain('as quatro vistas, sem legenda, na mesma escala, com a barra de 100 mm do mesmo comprimento nas quatro');
+    const mesa = await briefDoObjeto(ARQUIVO, { saida: join(PASTA, 'brief-mesa') });
+    expect(mesa.ampliadas).toEqual([]);
+    expect(mesa.texto).not.toContain('ampliada');
+    const v = await vistasArquivo(LONGO, { saida: join(PASTA, 'vistas-longo'), ampliadas: true, forcar: true });
+    expect(v.destinos).toHaveLength(4);
+    expect(v.ampliadas).toEqual([join(PASTA, 'vistas-longo', 'haste-lateral-ampliada.png')]);
+  }, 120_000);
 });

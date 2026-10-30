@@ -31,10 +31,11 @@
  * quantos faltam por imagem e passa; com todos, reprova se o conjunto não acerta. O gate também reprova o brief que conta o defeito
  * ou a mutação e o julgamento dado a um brief ou a vistas que já não são os da imagem (`imagemSha256`, a impressão das quatro vistas). */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { desenharBlocagem, escalaComumDaBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
+import { desenharBlocagem, escalaDaBlocagem } from '../../modulos/esboco/src/desenho-da-blocagem.js';
+import { tituloDaAmpliada, vistasAmpliadas } from '../../modulos/esboco/src/index.js';
 import { medirEsboco } from '../../modulos/esboco/src/descrever.js';
 import { expandirChamadasDeComposicao } from '../../procedural/nucleo/entrada.js';
 import { triangularFace } from '../../procedural/nucleo/triangulacao-face.js';
@@ -45,15 +46,15 @@ import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { conferirRazoesDaPeca, normalizarRazoesDaPeca } from '../../src/autoria/razoes-da-peca.js';
 import { TIPOS_DE_DEFEITO } from '../../src/autoria/veredito-de-forma.js';
 import {
-  ErroDeCalibracao, FORMATO_CALIBRACAO, LARGURA_DAS_VISTAS, VISTAS_DO_CONJUNTO, dobrar, extrairVeredito, lerConjunto, medidasEsperadas, pontuarConjunto,
-  resumoDoConjunto,
+  ErroDeCalibracao, FORMATO_CALIBRACAO, LARGURA_DAS_VISTAS, VISTAS_AMPLIADAS_DO_CONJUNTO, VISTAS_DO_CONJUNTO, dobrar, extrairVeredito, lerConjunto, medidasEsperadas,
+  nomeDaAmpliada, pontuarConjunto, resumoDoConjunto, vistasGravadas,
 } from '../../src/autoria/calibracao-do-critico.js';
 import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
 import './esboco-familias.mjs';
 import { juntarPerguntas } from '../../src/autoria/perguntas-do-critico.js';
 import { ambienteDaExecucao, hashDe, MATERIAL_NEUTRO, pontosDaFamilia, pontosDosPerfis } from './aprovacao-da-familia.mjs';
 import {
-  ESCALA_DA_NOTA, MOTOR_DO_PNG, VISTAS_DA_ANALISE, desenhoParaPng, desenhosDoObjeto, linhasDoBriefDoObjeto, objetoDoEsboco,
+  ESCALA_DA_NOTA, MOTOR_DO_PNG, VISTAS_DA_ANALISE, desenhoParaPng, desenhosDoObjeto, linhasDoBriefDoObjeto, nomeDoDesenho, objetoDoEsboco,
 } from './esboco.mjs';
 import { blocoDasPerguntas } from './perguntas-da-peca.mjs';
 
@@ -109,6 +110,8 @@ export function modeloDoBrief() {
   return {
     objeto: linhasDoBriefDoObjeto({ objeto: '<título>: <nota>', anterior: [], imagens, perguntas: [] }),
     comPerguntas: linhasDoBriefDoObjeto({ objeto: '<título>: <nota>', anterior: [], imagens, perguntas }),
+    /* o texto que diz que a vista ampliada tem escala própria também é fixo */
+    comAmpliada: linhasDoBriefDoObjeto({ objeto: '<título>: <nota>', anterior: [], imagens, ampliadas: [`<pasta>/${nomeDaAmpliada('lateral')}.png`], perguntas: [] }),
     bloco: blocoDasPerguntas(perguntas),
     escala: ESCALA_DA_NOTA,
   };
@@ -119,7 +122,7 @@ export const hashDoBrief = () => sha256(JSON.stringify(modeloDoBrief()));
  * A impressão das quatro vistas que o crítico vê de uma imagem, na ordem do brief: o `sha256` gravado de cada PNG. Um julgamento
  * guarda essa impressão em `imagemSha256`; trocar a fonte de uma imagem sem mudar o texto do brief muda esta e não a do brief.
  */
-export const hashDaImagem = (imagem) => sha256(VISTAS_DO_CONJUNTO.map((vista) => imagem.vistas[vista].sha256).join('\n'));
+export const hashDaImagem = (imagem) => sha256(vistasGravadas(imagem).map((vista) => imagem.vistas[vista].sha256).join('\n'));
 
 /* ---------- o brief exato de uma imagem ---------- */
 
@@ -151,10 +154,11 @@ export function briefDaImagem(imagem, { raiz = RAIZ } = {}) {
     objeto = `${imagem.objeto.titulo}: ${imagem.objeto.nota}`;
     perguntas = juntarPerguntas(...Object.values(familia.contrato.perguntas ?? {}));
   }
-  const imagens = VISTAS_DO_CONJUNTO.map((vista) => resolve(raiz, PASTA_DO_CONJUNTO, imagem.vistas?.[vista]?.arquivo ?? `imagens/${imagem.id}/${vista}.png`));
-  const linhas = linhasDoBriefDoObjeto({ objeto, anterior: [], imagens, perguntas });
+  const caminhos = vistasGravadas(imagem).map((vista) => `imagens/${imagem.id}/${vista}.png`);
+  const imagens = caminhos.map((c, k) => resolve(raiz, PASTA_DO_CONJUNTO, imagem.vistas?.[vistasGravadas(imagem)[k]]?.arquivo ?? c));
+  /* as quatro na escala comum e, depois, a ampliada em escala própria, quando a imagem tem */
+  const linhas = linhasDoBriefDoObjeto({ objeto, anterior: [], imagens: imagens.slice(0, VISTAS_DO_CONJUNTO.length), ampliadas: imagens.slice(VISTAS_DO_CONJUNTO.length), perguntas });
   const texto = `${linhas.slice(linhas.indexOf(ABRE_O_BRIEF) + 1, linhas.indexOf(FECHA_O_BRIEF)).join('\n')}\n`;
-  const caminhos = VISTAS_DO_CONJUNTO.map((vista) => `imagens/${imagem.id}/${vista}.png`);
   return { texto, sha256: impressaoDoBrief(texto, raiz), imagens, perguntas, objeto, variavel: [objeto, ...perguntas, ...caminhos].join('\n') };
 }
 
@@ -304,23 +308,31 @@ export function painelDoNeutro(neutro, { titulo, nota }) {
 }
 
 /** As entradas do desenhista da blocagem das quatro vistas da peça executada e a escala comum delas (a maior com que a peça cabe em
- *  todas): as quatro saem na mesma escala, com a barra de 100 mm do mesmo comprimento. */
+ *  todas): as quatro saem na mesma escala, com a barra de 100 mm do mesmo comprimento. `ampliadas` traz, das quatro, as que nela
+ *  ficam pequenas demais (`vistasAmpliadas`), com a entrada de título trocado, para desenhar na escala própria. */
 export function entradasDoNeutro(neutro, objeto) {
   const painel = painelDoNeutro(neutro, objeto);
   const entradas = VISTAS_DO_CONJUNTO.map((vista) => ({ vista, paineis: [painel] }));
-  return { entradas, escala: escalaComumDaBlocagem(entradas) };
+  const proprias = entradas.map((e) => ({ vista: e.vista, escala: escalaDaBlocagem(e) }));
+  const escala = Math.min(...proprias.map((p) => p.escala));
+  const ampliadas = vistasAmpliadas(proprias, escala).map(({ vista }) => ({ vista, paineis: [{ ...painel, titulo: tituloDaAmpliada(vista) }] }));
+  return { entradas, escala, ampliadas };
 }
 
+/** As quatro vistas na escala comum e, depois delas, com `ampliada: true`, as ampliadas na escala própria. */
 export function desenhosDoNeutro(neutro, objeto) {
-  const { entradas, escala } = entradasDoNeutro(neutro, objeto);
-  return entradas.map((entrada) => ({ vista: entrada.vista, r: desenharBlocagem(entrada, { camada: true, escala }) }));
+  const { entradas, escala, ampliadas } = entradasDoNeutro(neutro, objeto);
+  return [
+    ...entradas.map((entrada) => ({ vista: entrada.vista, r: desenharBlocagem(entrada, { camada: true, escala }) })),
+    ...ampliadas.map((entrada) => ({ vista: entrada.vista, ampliada: true, r: desenharBlocagem(entrada, { camada: true }) })),
+  ];
 }
 
 /** A impressão do que a fonte desenha: o SVG e a camada de cada vista, a largura do brief e o motor. */
 export function hashDoDesenho(desenhos) {
   const h = createHash('sha256');
-  h.update(JSON.stringify({ largura: LARGURA_DAS_VISTAS, motor: 'webgl', vistas: desenhos.map((d) => d.vista) }));
-  for (const { vista, r } of desenhos) h.update(JSON.stringify({ vista, largura: r.largura, altura: r.altura, svg: r.svg, camada: r.camada ?? null }));
+  h.update(JSON.stringify({ largura: LARGURA_DAS_VISTAS, motor: 'webgl', vistas: desenhos.map(nomeDoDesenho) }));
+  for (const d of desenhos) h.update(JSON.stringify({ vista: nomeDoDesenho(d), largura: d.r.largura, altura: d.r.altura, svg: d.r.svg, camada: d.r.camada ?? null }));
   return `sha256:${h.digest('hex')}`;
 }
 
@@ -491,7 +503,7 @@ export function conferirConjunto({ raiz = RAIZ, conjunto = null, so = null } = {
     if (p.fonteSha256 !== gravada) {
       reprovar(quem, imagem.fonte.tipo === 'esboco' ? 'esboco-mudou' : 'geometria-mudou', `${imagem.fonte.tipo === 'esboco' ? 'o arquivo do esboço' : 'a geometria da chamada'} mudou desde a geração (gravado ${gravada.slice(0, 19)}, agora ${p.fonteSha256.slice(0, 19)})`);
     }
-    for (const vista of conj.vistas.ordem) {
+    for (const vista of vistasGravadas(imagem)) {
       const { arquivo, sha256: esperado } = imagem.vistas[vista];
       const caminho = join(raiz, PASTA_DO_CONJUNTO, arquivo);
       if (!existsSync(caminho)) { reprovar(quem, 'imagem-ausente', `${arquivo} não existe`); continue; }
@@ -703,7 +715,7 @@ function decisoresDaImagem(imagem) {
 /** A prancha das doze imagens: em cada célula as quatro vistas em grade e a legenda com o id, o nome, a classe, a faixa e quem decide. */
 export function htmlDaPrancha(conjunto, raiz = RAIZ, { colunas = 3, vista = 270 } = {}) {
   const celulas = conjunto.imagens.map((imagem) => {
-    const vistas = conjunto.vistas.ordem.map((v) => {
+    const vistas = vistasGravadas(imagem).map((v) => {
       const dados = readFileSync(join(raiz, PASTA_DO_CONJUNTO, imagem.vistas[v].arquivo)).toString('base64');
       return `<img src="data:image/png;base64,${dados}" width="${vista}">`;
     }).join('');
@@ -720,7 +732,7 @@ export function htmlDaPrancha(conjunto, raiz = RAIZ, { colunas = 3, vista = 270 
     .grade { display: flex; flex-wrap: wrap; } .grade img { display: block; }
     .legenda { padding: 6px 2px 2px; } .mut { color: ${PALETA_DA_PRANCHA.suave}; }
   </style><h1>Conjunto de calibração do crítico: as doze imagens</h1>
-  <p>Cada célula mostra as quatro vistas que o brief do crítico recebe (isométrica, frontal, lateral e superior). A legenda é para quem confere o conjunto: o crítico recebe só as vistas, sem título de célula nem legenda.</p>
+  <p>Cada célula mostra as quatro vistas que o brief do crítico recebe (isométrica, frontal, lateral e superior), na mesma escala, e depois delas a vista ampliada em escala própria, quando a imagem tem. A legenda é para quem confere o conjunto: o crítico recebe só as vistas, sem título de célula nem legenda.</p>
   <div class="prancha">${celulas}</div>`;
 }
 
@@ -737,15 +749,18 @@ export async function gerar({ raiz = RAIZ, so = null, prancha = true } = {}, sai
       const p = prepararImagem(imagem, conj, raiz);
       mkdirSync(join(raiz, PASTA_DO_CONJUNTO, 'imagens', imagem.id), { recursive: true });
       const vistas = {};
-      for (const { vista, r } of p.desenhos) {
+      for (const d of p.desenhos) {
+        const vista = nomeDoDesenho(d);
         const arquivo = `imagens/${imagem.id}/${vista}.png`;
-        await desenhoParaPng(r, LARGURA_DAS_VISTAS, join(raiz, PASTA_DO_CONJUNTO, arquivo), navegador);
+        await desenhoParaPng(d.r, LARGURA_DAS_VISTAS, join(raiz, PASTA_DO_CONJUNTO, arquivo), navegador);
         vistas[vista] = { arquivo, sha256: sha256(readFileSync(join(raiz, PASTA_DO_CONJUNTO, arquivo))) };
       }
+      /* a ampliada que a imagem deixou de ter não fica na pasta */
+      for (const nome of VISTAS_AMPLIADAS_DO_CONJUNTO) if (!vistas[nome]) rmSync(join(raiz, PASTA_DO_CONJUNTO, 'imagens', imagem.id, `${nome}.png`), { force: true });
       if (imagem.fonte.tipo === 'esboco') imagem.fonte.arquivoSha256 = p.fonteSha256; else imagem.fonte.geometria = p.fonteSha256;
       imagem.desenho = { hash: p.desenho };
       imagem.vistas = vistas;
-      saida.log(`${imagem.id} ${imagem.nome}: quatro vistas em ${PASTA_DO_CONJUNTO}/imagens/${imagem.id}/`);
+      saida.log(`${imagem.id} ${imagem.nome}: quatro vistas${Object.keys(vistas).length > VISTAS_DO_CONJUNTO.length ? ` e ${Object.keys(vistas).slice(VISTAS_DO_CONJUNTO.length).join(', ')}` : ''} em ${PASTA_DO_CONJUNTO}/imagens/${imagem.id}/`);
     }
     conj.critico.agente.sha256 = hashDoAgente(conj.critico.agente.arquivo, raiz);
     conj.critico.brief.sha256 = hashDoBrief();

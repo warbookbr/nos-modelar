@@ -65,20 +65,25 @@ describe('a medida, provada nos casos montados à mão', () => {
 });
 
 describe('o conjunto de calibração do crítico', () => {
-  it('as imagens que o desenho da blocagem faz de uma família têm zero pixel de vazamento e de falha nas quatro vistas', async () => {
+  it('as imagens que o desenho da blocagem faz de uma família têm zero pixel de vazamento e de falha nas quatro vistas e na ampliada', async () => {
     const relatos = await medirConjunto({ so: 'c09,c05', navegador });
-    expect(relatos).toHaveLength(8);
+    /* a dobradiça compacta tem as quatro; o cilindro, também a vista de ponta ampliada em escala própria */
+    expect(relatos.map((r) => `${r.id} ${r.vista}`)).toEqual([...['isometrica', 'frontal', 'lateral', 'superior', 'lateral-ampliada'].map((v) => `c05 ${v}`), ...['isometrica', 'frontal', 'lateral', 'superior'].map((v) => `c09 ${v}`)]);
     expect(relatos.map((r) => [r.id, r.vista, r.vazamento.pixels, r.falha.pixels]).filter((x) => x[2] + x[3] > 0)).toEqual([]);
   }, 240000);
 
-  it('as quatro vistas do cilindro hidráulico (c05) saem na mesma escala, e a referência de cada uma cabe no painel do desenho', () => {
+  it('as quatro vistas do cilindro hidráulico (c05) saem na mesma escala, a de ponta também ampliada, e a referência de cada uma cabe no painel do desenho', () => {
     const conjunto = lerConjuntoDoDisco({ exigirGerados: false });
     const vistas = vistasDaImagem(conjunto.imagens.find((i) => i.id === 'c05'), conjunto);
-    expect(vistas.map((v) => v.vista)).toEqual(['isometrica', 'frontal', 'lateral', 'superior']);
-    expect(new Set(vistas.map((v) => v.r.escala)).size).toBe(1);
-    const barras = vistas.map((v) => /<line x1="20" y1="[\d.]+" x2="([\d.]+)"[^>]*stroke-width="3"\/><text [^>]*>100 mm</.exec(v.r.svg)?.[1]);
+    expect(vistas.map((v) => v.vista)).toEqual(['isometrica', 'frontal', 'lateral', 'superior', 'lateral-ampliada']);
+    const quatro = vistas.slice(0, 4);
+    expect(new Set(quatro.map((v) => v.r.escala)).size).toBe(1);
+    const barras = quatro.map((v) => /<line x1="20" y1="[\d.]+" x2="([\d.]+)"[^>]*stroke-width="3"\/><text [^>]*>100 mm</.exec(v.r.svg)?.[1]);
     expect(barras[0]).toBeDefined();
-    expect(barras).toEqual(vistas.map(() => barras[0]));
+    expect(barras).toEqual(quatro.map(() => barras[0]));
+    /* a ampliada, na escala própria, é a vista de ponta com o título que o diz */
+    expect(vistas[4].r.escala).toBeGreaterThan(4 * quatro[0].r.escala);
+    expect(vistas[4].r.svg).toContain('>Lateral, ampliada em escala própria</text>');
     /* os triângulos da referência estão no quadro do desenho (x, y em pixels), na escala dele: nenhum sai do painel */
     for (const { triangulos } of vistas) {
       let fora = 0;

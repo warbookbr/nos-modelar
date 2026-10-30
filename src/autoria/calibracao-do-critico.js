@@ -31,6 +31,12 @@ export const JULGAMENTOS_DA_CHAVE = 5;
 export const JULGAMENTOS_DAS_OUTRAS = 3;
 export const DECISORES = Object.freeze(['medida', 'critico']);
 export const VISTAS_DO_CONJUNTO = Object.freeze(['isometrica', 'frontal', 'lateral', 'superior']);
+/* A vista ampliada: quando, na escala comum das quatro, a peça fica pequena demais numa delas, o brief traz essa vista outra vez, na
+   escala própria, gravada como `<vista>-ampliada` (ver `vistasAmpliadas` no módulo do esboço). */
+export const nomeDaAmpliada = (vista) => `${vista}-ampliada`;
+export const VISTAS_AMPLIADAS_DO_CONJUNTO = Object.freeze(VISTAS_DO_CONJUNTO.map(nomeDaAmpliada));
+/** As vistas gravadas de uma imagem, na ordem do brief: as quatro e depois as ampliadas que ela tem. */
+export const vistasGravadas = (imagem) => [...VISTAS_DO_CONJUNTO, ...VISTAS_AMPLIADAS_DO_CONJUNTO.filter((nome) => imagem.vistas?.[nome] !== undefined)];
 export const LARGURA_DAS_VISTAS = 1100;
 export const PONTOS_DA_FAMILIA = Object.freeze(['minimo', 'medio', 'maximo']);
 /** O valor de `aprovacao` do controle que parte de um perfil: a geometria aprovada em `mecanica.perfis.<perfil>`. */
@@ -278,8 +284,8 @@ export function lerConjunto(bruto, { exigirGerados = true } = {}) {
     } else if (exigirGerados) recusar(`${onde}.desenho`, undefined, 'a impressão do que a fonte desenha, gravada pelo gerador');
     if (imagem.vistas !== undefined) {
       if (!plano(imagem.vistas)) recusar(`${onde}.vistas`, imagem.vistas, 'objeto com as quatro vistas');
-      chaves(imagem.vistas, VISTAS_DO_CONJUNTO, `${onde}.vistas`);
-      for (const nome of VISTAS_DO_CONJUNTO) {
+      chaves(imagem.vistas, [...VISTAS_DO_CONJUNTO, ...VISTAS_AMPLIADAS_DO_CONJUNTO], `${onde}.vistas`);
+      for (const nome of vistasGravadas(imagem)) {
         const vista = imagem.vistas[nome];
         const quando = `${onde}.vistas.${nome}`;
         if (!plano(vista)) recusar(quando, vista, 'objeto { arquivo, sha256 }');

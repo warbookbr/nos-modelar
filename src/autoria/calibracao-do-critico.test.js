@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   APROVACAO_DO_PERFIL, CLASSES, ErroDeCalibracao, FAIXAS_DA_NOTA, TIPOS_DO_CONJUNTO, citaDefeito, defeitosDaMedida, defeitosDoCritico, extrairVeredito, lerConjunto, medidasEsperadas,
-  pontuarConjunto, pontuarImagem, resumoDoConjunto,
+  pontuarConjunto, pontuarImagem, resumoDoConjunto, vistasGravadas,
 } from './calibracao-do-critico.js';
 import { TIPOS_DE_DEFEITO } from './veredito-de-forma.js';
 
@@ -40,11 +40,12 @@ describe('o conjunto versionado', () => {
     expect(conjunto.regra.passa).toEqual({ minimo: 11, de: 12, obrigatorias: ['dobradicas-por-fora', 'picape-baixa'] });
   });
 
-  it('o nome dos arquivos que o crítico lê é neutro: o id não diz o defeito, e as vistas são as quatro do brief', () => {
+  it('o nome dos arquivos que o crítico lê é neutro: o id não diz o defeito, e as vistas são as quatro do brief e a ampliada, quando há', () => {
     for (const i of conjunto.imagens) {
       expect(i.id).toMatch(/^c\d{2}$/);
-      expect(Object.keys(i.vistas)).toEqual(['isometrica', 'frontal', 'lateral', 'superior']);
-      for (const v of Object.values(i.vistas)) expect(v.arquivo).toMatch(/^imagens\/c\d{2}\/[a-z]+\.png$/);
+      expect(Object.keys(i.vistas).slice(0, 4)).toEqual(['isometrica', 'frontal', 'lateral', 'superior']);
+      for (const nome of Object.keys(i.vistas).slice(4)) expect(nome).toMatch(/^(isometrica|frontal|lateral|superior)-ampliada$/);
+      for (const v of Object.values(i.vistas)) expect(v.arquivo).toMatch(/^imagens\/c\d{2}\/[a-z]+(-ampliada)?\.png$/);
     }
   });
 
@@ -179,6 +180,15 @@ describe('o que o formato recusa', () => {
     expect(() => lerConjunto(semGerados, { exigirGerados: false })).not.toThrow();
     recusa((c) => { imagem(c, 'picape-baixa').desenho.hash = 'abc'; }, /sha256/);
     recusa((c) => { imagem(c, 'picape-baixa').vistas.frontal.arquivo = 'imagens/c03/outra.png'; }, /imagens\/c03\/frontal\.png/);
+    /* a vista ampliada em escala própria entra depois das quatro, com o nome `<vista>-ampliada` e o arquivo dela */
+    const comAmpliada = lido();
+    const controle = imagem(comAmpliada, 'controle-cilindro');
+    controle.vistas['lateral-ampliada'] = { arquivo: `imagens/${controle.id}/lateral-ampliada.png`, sha256: SHA };
+    expect(vistasGravadas(lerConjunto(comAmpliada).imagens.find((i) => i.nome === 'controle-cilindro'))).toEqual(['isometrica', 'frontal', 'lateral', 'superior', 'lateral-ampliada']);
+    delete controle.vistas['lateral-ampliada'];
+    expect(vistasGravadas(lerConjunto(comAmpliada).imagens.find((i) => i.nome === 'controle-cilindro'))).toEqual(['isometrica', 'frontal', 'lateral', 'superior']);
+    recusa((c) => { const i = imagem(c, 'controle-cilindro'); i.vistas['lateral-ampliada'] = { arquivo: `imagens/${i.id}/lateral.png`, sha256: SHA }; }, /lateral-ampliada\.png/);
+    recusa((c) => { const i = imagem(c, 'controle-cilindro'); i.vistas['traseira-ampliada'] = { arquivo: `imagens/${i.id}/traseira-ampliada.png`, sha256: SHA }; }, /traseira-ampliada/);
     recusa((c) => { c.critico.agente.sha256 = 'sha256:curto'; }, /sha256/);
   });
 
