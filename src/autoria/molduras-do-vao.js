@@ -150,7 +150,8 @@ function problemasDoVao(v) {
   for (const e of v.emendas) {
     if (e.ok) continue;
     if (e.tipo === 'reta') {
-      problemas.push(`degrau na emenda de ${citar(e.frisos[0])} com ${citar(e.frisos[1])}${lado(e)} perto de ${ponto(e.posicao)}: os perfis das duas pontas diferem em ${mm(e.degrau)} mm (larguras de ${mm(e.larguras[0])} e ${mm(e.larguras[1])} mm). A emenda de dois frisos leva o mesmo perfil nas duas pontas; para mudar a largura use um friso só com \`variacao\`.`);
+      if (e.degrau > v.tolerancia) problemas.push(`degrau na emenda de ${citar(e.frisos[0])} com ${citar(e.frisos[1])}${lado(e)} perto de ${ponto(e.posicao)}: os perfis das duas pontas diferem em ${mm(e.degrau)} mm (larguras de ${mm(e.larguras[0])} e ${mm(e.larguras[1])} mm). A emenda de dois frisos leva o mesmo perfil nas duas pontas; para mudar a largura use um friso só com \`variacao\`.`);
+      if (e.entalhe > v.tolerancia) problemas.push(`entalhe na emenda de ${citar(e.frisos[0])} com ${citar(e.frisos[1])}${lado(e)} perto de ${ponto(e.posicao)}: a linha vira ${e.giro.toFixed(1).replace('.', ',')} graus ali, cada ponta é cortada reta na sua direção, e a cunha de fora da curva fica sem material até ${mm(e.entalhe)} mm da faixa. Emende onde a linha é reta, ou faça a volta com um friso só.`);
     } else {
       problemas.push(`entalhe no canto entre ${citar(e.frisos[0])} e ${citar(e.frisos[1])}${lado(e)} em ${ponto(e.posicao)}: as duas pontas se encontram a ${e.giro.toFixed(0)} graus em corte reto, e o quadrante de fora do canto fica sem material até ${mm(e.entalhe)} mm da faixa. O canto se faz com um friso só pela volta, com \`variacao\` nos cantos vivos.`);
     }
