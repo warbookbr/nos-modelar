@@ -33,10 +33,11 @@
  * texto. Sai 1 se qualquer afirmação falhar ou se a página emitir erro.
  *
  * AS TRÊS LINHAS QUE PUBLICAM. A bancada publica as portas em três lugares:
- * a carga (`carregar-peca.js`) e as duas reconstruções de `main.js`, a que vem
- * depois de arrastar uma junta (`reconstruirComAjuste`) e a que vem depois de
- * editar a malha (`reconstruirMalhaEditada`). Trocar qualquer uma das duas de
- * `main.js` por `portas: []` passava verde nas dez guardas, porque só a carga
+ * a carga (`carregar-peca.js`) e as duas reconstruções de `cena/edicao-da-peca.js`
+ * (que moravam em `main.js`), a que vem depois de arrastar uma junta
+ * (`reconstruirComAjuste`) e a que vem depois de editar a malha
+ * (`reconstruirMalhaEditada`). Trocar qualquer uma das duas por `portas: []`
+ * passava verde nas dez guardas, porque só a carga
  * era conferida. A terceira parte desta guarda abre `fixture-portas-junta`, lê o
  * painel, arrasta uma junta, lê o painel de novo, gira a parte pela edição de
  * malha e lê o painel uma terceira vez; cada leitura é nomeada pelo estado em

@@ -200,8 +200,8 @@ class ElementoFalso extends Ouvintes {
 
 /**
  * A página falsa: `documento` com os elementos de `marcacao` dentro do corpo e `janela` com os ouvintes da janela.
- * `janela.teclar(campos)` dispara um keydown com a fase de captura antes da de borbulha, como o navegador faz; o alvo é
- * o corpo, a menos que `campos.target` diga outro.
+ * `janela.teclar(campos)` dispara um keydown com a fase de captura antes da de borbulha, como o navegador faz, e quem
+ * para a propagação na captura tira a borbulha da janela; o alvo é o corpo, a menos que `campos.target` diga outro.
  */
 export function criarPagina(marcacao = '') {
   const documento = {
@@ -235,13 +235,13 @@ export function criarPagina(marcacao = '') {
     teclar(campos) {
       const evento = criarEvento('keydown', { target: documento.body, ctrlKey: false, metaKey: false, shiftKey: false, altKey: false, ...campos });
       janela.disparar(evento, { captura: true });
-      if (!evento.parado) janela.disparar(evento, { captura: false });
+      if (!evento.parado && !evento.propagacaoParada) janela.disparar(evento, { captura: false });
       return evento;
     },
     apontar(alvo) {
       const evento = criarEvento('pointerdown', { target: alvo });
       janela.disparar(evento, { captura: true });
-      if (!evento.parado) janela.disparar(evento, { captura: false });
+      if (!evento.parado && !evento.propagacaoParada) janela.disparar(evento, { captura: false });
       return evento;
     },
   });
