@@ -609,7 +609,11 @@ export function examinarDesenho(desenho) {
   for (const t of T) {
     if (t.tipo === 'marcador') continue;
     for (const l of desenho.linhas) {
-      if (l.tipo !== 'contorno' && l.dono === t.dono) continue;
+      /* A linha da própria cota também não pode passar pelo número dela: com
+         `numero` o texto sai do meio da linha, e na vista de cima do furgão
+         realista a linha da bitola atravessava o "bitola 1.700". */
+      const propria = l.dono === t.dono && !(t.tipo === 'cota' && l.tipo === 'cota');
+      if (l.tipo !== 'contorno' && propria) continue;
       const f = t.tipo === 'cota' && l.tipo === 'contorno' ? D.FOLGA_DO_NUMERO : 0;
       const caixa = [t.caixa[0] - f, t.caixa[1] - f, t.caixa[2] + f, t.caixa[3] + f];
       if (l.pts.some((p, k) => k > 0 && segmentoCruzaCaixa(l.pts[k - 1], p, caixa))) {

@@ -3,7 +3,7 @@
    desenho pare de abaular sozinho e que o defeito seja pego por número. */
 import { describe, expect, it } from 'vitest';
 import * as G from './prancha-geometria.mjs';
-import { criarAncoras, imprimirRelatorio, prancha } from './prancha.mjs';
+import { colisoesDoDesenho, criarAncoras, imprimirRelatorio, prancha } from './prancha.mjs';
 
 const RAMPA = [[0, 0], [1000, 600, 300], [3000, 400]];
 
@@ -151,6 +151,22 @@ describe('métrica', () => {
     expect(relatorio.porLandmark.foraDaBase.desvio).toBe(10);
     expect(relatorio.alertas.join(' ')).toMatch(/landmark foraDaBase: 10 mm fora de "caixa"/);
     expect(relatorio.alertas.join(' ')).not.toMatch(/meioDaBase/);
+  });
+
+  /* Com `numero` o texto sai do meio da linha; na vista de cima do furgão
+     realista a linha vertical da bitola atravessava o próprio "bitola 1.700". */
+  it('acusa a linha da cota que passa pelo próprio número', () => {
+    const espec = base([
+      { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] },
+    ]);
+    espec.escala = 1;
+    espec.tela = { largura: 400, altura: 300 };
+    const vertical = { vista: 'lateral', de: [0, 10], ate: [0, 70], texto: 'bitola 1.700' };
+    espec.cotas = [{ ...vertical, numero: [4, -10] }];
+    const propria = (c) => c.tipo === 'linha sobre número' && c.b === 'cota de cota 0';
+    expect(colisoesDoDesenho(prancha(espec).desenho).some(propria)).toBe(true);
+    espec.cotas = [{ ...vertical, numero: [60, 0] }];
+    expect(colisoesDoDesenho(prancha(espec).desenho).some(propria)).toBe(false);
   });
 });
 
