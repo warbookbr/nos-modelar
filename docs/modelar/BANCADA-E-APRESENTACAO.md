@@ -101,12 +101,14 @@ testes da bancada.
 
 Um tema é uma declaração em `src/bancada/temas/temas.js`, e não código. Ele diz
 o conjunto de cores (`cores`), a arrumação da folha de estilo (`arrumacao`, hoje
-`foco` ou `classica`), o lugar de cada componente móvel (`lugares`, do nome em
-`data-movel` na página para o nome em `data-lugar`), o texto dos controles que
-mudam de nome (`rotulos`, pelo `data-rotulo`), os painéis que abrem sobre a cena
-com a largura de cada um (`paineis`) e a cena 3D que ele pede (`cena`: o fundo, a
-cor da grade, a grade esmaecida, a sombra suave e a cor do contorno da seleção,
-com as cores escritas como o nome da variável do sistema visual). O componente
+`foco`, `bancada` ou `classica`), o lugar de cada componente móvel (`lugares`, do
+nome em `data-movel` na página para o nome em `data-lugar`), o texto dos
+controles que mudam de nome (`rotulos`, pelo `data-rotulo`, com um texto só ou
+um texto por caso da tela: a peça, uma parte escolhida ou a edição), os painéis
+que o tema deixa abrir com a largura de cada um e a margem, que é zero no painel
+fixo (`paineis`), e a cena 3D que ele pede (`cena`: o fundo, o meio do degradê
+quando há, a cor da grade, a grade esmaecida, a sombra suave e a cor do contorno
+da seleção, com as cores escritas como o nome da variável do sistema visual). O componente
 `componentes/tema.js` lê a declaração e escreve `data-tema`, `data-cores` e
 `data-arrumacao` na raiz da página, leva cada componente para o lugar do tema e
 o devolve para casa quando o tema seguinte não o cita, troca os rótulos e
@@ -134,9 +136,33 @@ um painel que deixaria a cena com menos de 70% da largura recolhe o outro, e
 com as larguras do Foco os dois só cabem juntos a partir de 1920 pixels. A cena
 do Foco tem o fundo claro do sistema visual, a grade que some antes da borda, a
 sombra suave no chão e o contorno da seleção na borda da peça no lugar da tinta
-verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`). Os temas
-Bancada e Revisão usam por enquanto a arrumação de antes dos temas, com as cores
-do conjunto deles, e a cena de antes.
+verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`). O Revisão usa
+por enquanto a arrumação de antes dos temas, com as cores do conjunto dele, e a
+cena de antes.
+
+A Bancada é a estação de CAD escura da proposta A, sobre os mesmos componentes.
+A barra do alto, fina, leva à esquerda o botão da árvore, Abrir, o nome e o
+estado da sessão; no meio a busca de comandos; e à direita a troca entre
+Inspecionar e Editar, as janelas Controles e Estado e o botão do painel da
+direita. Editar é o botão das juntas, e Inspecionar desliga o modo de edição que
+estiver ligado, pela barra do modo de edição. A árvore das partes, com 196
+pixels, e o painel da direita, com 216, ficam fixos dos lados, e a cena fica
+entre eles: o canvas encolhe com os painéis abertos, e a regra dos 70% conta os
+dois sem margem. Numa janela de 1400 pixels a cena tem 988 de largura, 70,6%; os
+dois painéis só cabem juntos a partir de 1374 pixels, e abaixo disso a página
+nasce só com a árvore, a primeira declarada, e o cartão da seleção aparece no
+lugar do painel da direita, contando a posição sobre o canvas. A primeira aba do
+painel da direita se chama Peça, Parte ou Edição conforme o caso, e no modo de
+edição começa pela ajuda de editar. Sobre a cena ficam a barra flutuante (a
+caixa das vistas da câmera, a projeção, o seletor de visão, enquadrar, focar e
+copiar vista), o cubo de orientação no canto de cima e a barra do modo de edição
+embaixo, no meio da cena; a barra de estado fecha a tela. A cena tem o fundo em
+degradê do conjunto escuro, do `--cena-2` no meio ao `--cena` nas bordas, numa
+textura feita por conta pura em `cena/cenario-do-tema.js`, a grade esmaecida, a
+sombra suave e o contorno da seleção no destaque laranja, e a borda da cena fica
+no destaque enquanto a edição está ligada. As regras da arrumação ficam sob
+`:root[data-arrumacao="bancada"]` em `styles.css` e desfazem as da arrumação
+clássica, que valem para toda arrumação que não é o Foco.
 
 A captura automática não herda o tema: a auditoria esconde tudo o que não é a
 cena, e a cena volta ao fundo, à luz e à falta de grade, chão, sombra e contorno

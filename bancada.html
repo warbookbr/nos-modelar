@@ -41,6 +41,8 @@
         <symbol id="i-casa" viewBox="0 0 24 24"><path d="M4.5 11 12 4.5l7.5 6.5M6.5 9.5v9h11v-9" /></symbol>
         <symbol id="i-grade" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M9 4v16M15 4v16" /></symbol>
         <symbol id="i-chao" viewBox="0 0 24 24"><path d="M3 17h18M6 13.5h12M9 10h6" /></symbol>
+        <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="12" rx="1.5" /><path d="M8.5 7l1.5-2.5h4L15.5 7" /><circle cx="12" cy="13" r="3" /></symbol>
+        <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="1" /><path d="M15.5 8.5v-3a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3" /></symbol>
       </defs>
     </svg>
     <div id="bancadaApp">
@@ -78,6 +80,15 @@
           <div class="lugar" data-lugar="topo-peca"></div>
         </div>
         <div class="grupo-flutuante barra-cena">
+          <!-- A câmera do tema Bancada: a caixa com as vistas, que o tema traz da fileira. -->
+          <div class="popover-ancora" data-arrumacoes="bancada">
+            <button id="btnCamera" class="botao-camera" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="popoverCamera" title="Vistas da câmera">
+              <svg class="icone" aria-hidden="true"><use href="#i-camera"></use></svg><span>Vistas</span><span class="seta" aria-hidden="true">▾</span>
+            </button>
+            <div id="popoverCamera" class="popover popover-camera" role="dialog" aria-label="Vistas da câmera" hidden>
+              <div class="lugar" data-lugar="popover-camera"></div>
+            </div>
+          </div>
           <div class="lugar" data-lugar="barra-cena"></div>
           <span class="divisor" aria-hidden="true"></span>
           <div class="popover-ancora">
@@ -93,6 +104,8 @@
           <button class="busca-gatilho" type="button" data-abrir-busca aria-haspopup="dialog" aria-expanded="false" aria-controls="buscaComandos">
             <svg class="icone" aria-hidden="true"><use href="#i-busca"></use></svg><span class="texto-largo">Buscar comando</span><kbd>Ctrl K</kbd>
           </button>
+          <!-- Inspecionar e Editar (as juntas, que o tema traz) são a troca de modo do tema Bancada. -->
+          <button id="btnInspecionar" class="botao-modo" data-arrumacoes="bancada" type="button" aria-pressed="true" title="Olhar e medir a peça, sem editar">Inspecionar</button>
           <div class="lugar" data-lugar="topo-direita"></div>
           <button class="botao-icone" type="button" data-abrir-painel="inspecao" aria-expanded="false" title="Detalhes da seleção">
             <svg class="icone" aria-hidden="true"><use href="#i-painel"></use></svg><span class="sr">Detalhes</span>
@@ -231,7 +244,7 @@
       </div>
 
 
-      <nav class="vistas" aria-label="Vistas da câmera">
+      <nav class="vistas" data-movel="vistas" aria-label="Vistas da câmera">
         <button type="button" data-vista="frontal"><span>Frente</span><kbd>1</kbd></button>
         <button type="button" data-vista="traseira"><span>Trás</span><kbd>⇧1</kbd></button>
         <button type="button" data-vista="direita"><span>Direita</span><kbd>3</kbd></button>
@@ -338,8 +351,8 @@
 
           <div class="acoes-inspecao">
             <button id="btnSelecionarConjunto" class="botao" type="button" disabled>Selecionar conjunto</button>
-            <button id="btnFocarSelecao" class="botao primaria" type="button" disabled>Focar seleção</button>
-            <button id="btnCopiarEstado" class="botao" type="button">Copiar vista</button>
+            <button id="btnFocarSelecao" data-movel="focar" class="botao primaria" type="button" disabled title="Focar seleção"><svg class="icone" data-arrumacoes="bancada" aria-hidden="true"><use href="#i-focar"></use></svg><span>Focar seleção</span></button>
+            <button id="btnCopiarEstado" data-movel="copiar-vista" class="botao" type="button" title="Copiar vista"><svg class="icone" data-arrumacoes="bancada" aria-hidden="true"><use href="#i-copiar"></use></svg><span>Copiar vista</span></button>
           </div>
 
           <!-- Juntas morava na barra de botões, ao lado de Abrir, Controles e
@@ -350,6 +363,7 @@
                próprio para não se confundir com os botões de uma vez só. -->
           <div class="acoes-inspecao acoes-editar">
             <span class="rotulo">EDITAR A PEÇA</span>
+            <p class="dica dica-edicao" data-arrumacoes="bancada">Arraste um punho na cena para mover a junta, e Tab liga a malha. Salvar ajuste grava a peça como está na tela para a receita absorver.</p>
             <button id="btnJuntas" data-movel="juntas" class="botao" type="button" aria-pressed="false"
               title="Arrastar os cantos onde as partes se encontram"><span data-rotulo="juntas">Juntas</span></button>
           </div>
