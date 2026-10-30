@@ -50,6 +50,7 @@ export const TESTES_LENTOS = [
   'procedural/nucleo/operacoes/arredondar-costura-convexa.test.ts',
   'procedural/nucleo/operacoes/booleana-casca-raspada.test.ts',
   'procedural/pecas/carenagem-de-prova/receita.test.mjs',
+  'src/autoria/curvatura-da-lataria.test.mjs',
   'tools/blender/blender.test.mjs',
   'tools/blender/comparar-vincos.test.mjs',
   'tools/blender/conferir-refino.test.mjs',
