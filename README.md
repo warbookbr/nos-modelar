@@ -4,7 +4,7 @@ Oficina procedural para IA criar, organizar, inspecionar, medir e corrigir
 objetos 3D mecânicos: núcleo geométrico, receitas determinísticas, bancada de
 inspeção e ferramentas de validação.
 A bancada, a única aplicação, roda localmente (`npm run dev`, abaixo); a
-publicação no GitHub Pages saiu em 2026-10-27, porque o repositório é privado.
+publicação no GitHub Pages saiu em 2026-10-27. O repositório é público.
 
 ## Como se trabalha
 
