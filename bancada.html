@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- bancada.html — estúdio de inspeção multivista para autoria e validação de montagens. -->
-<html lang="pt-BR">
+<html lang="pt-BR" data-tema="foco" data-cores="claro" data-arrumacao="foco">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -8,7 +8,7 @@
       name="description"
       content="Bancada Modelar para inspecionar peças, montagens e identidades semânticas."
     />
-    <meta name="theme-color" content="#111815" />
+    <meta name="theme-color" content="#f2f4f3" />
     <title>Bancada de inspeção — Modelar</title>
   </head>
   <body>
@@ -24,9 +24,9 @@
       </section>
 
       <div class="barra-controles">
-        <button id="btnMenuAbrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Abrir</button>
-        <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
-        <button id="btnMenuEstado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Estado<span id="selo-estado" class="selo-estado" hidden></span></button>
+        <button id="btnMenuAbrir" data-movel="abrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Abrir</button>
+        <button id="btnMenuAtalhos" data-movel="controles" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
+        <button id="btnMenuEstado" data-movel="estado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Estado<span id="selo-estado" class="selo-estado" hidden></span></button>
       </div>
 
       <!-- Aviso de estado: aparece SÓ quando algo está ruim. Indicador que diz
@@ -39,7 +39,7 @@
            cena, e não dentro de uma aba, porque o modo vale para a peça inteira
            e some junto com ele. O que sai daqui é a peça como ficou, para a
            rodada de absorção reescrever a receita. -->
-      <footer class="rodape-juntas" id="rodapeJuntas" hidden>
+      <footer class="rodape-juntas" id="rodapeJuntas" data-movel="rodape-juntas" hidden>
         <span id="resumoJuntas">nenhuma junta movida</span>
         <button id="btnSalvarAjusteDeJunta" class="botao primaria" type="button" disabled>Salvar ajuste</button>
       </footer>
@@ -66,6 +66,8 @@
             <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
           </header>
           <div class="modal-corpo">
+            <h4 class="secao-modal">Tema</h4>
+            <div id="escolhaTema" class="escolha-tema" role="radiogroup" aria-label="Tema da bancada"></div>
             <p class="modal-descricao">Clique num comando para trocar a tecla.</p>
             <div id="listaAtalhos"></div>
             <h4 class="secao-modal">Ponteiro</h4>
@@ -91,13 +93,13 @@
         <button type="button" data-vista="superior"><span>Cima</span><kbd>7</kbd></button>
         <button type="button" data-vista="inferior"><span>Baixo</span><kbd>⇧7</kbd></button>
         <button type="button" data-vista="isometrica" class="ativa"><span>Iso</span><kbd>0</kbd></button>
-        <button id="btnProjecao" type="button"><span>Perspectiva</span><kbd>5</kbd></button>
-        <button id="btnEnquadrar" type="button" title="Enquadrar tudo"><span>Enquadrar</span><kbd>F</kbd></button>
+        <button id="btnProjecao" data-movel="projecao" type="button"><span>Perspectiva</span><kbd>5</kbd></button>
+        <button id="btnEnquadrar" data-movel="enquadrar" type="button" title="Enquadrar tudo"><span>Enquadrar</span><kbd>F</kbd></button>
         <!-- A visão muda como a peça é desenhada, e não de onde ela é olhada, por
              isso é um controle só, ao fim da fileira, que abre a lista das visões
              com as teclas de cada uma. A lista sai do registro de visões
              (`src/bancada/visoes/registro-de-visoes.js`), e não daqui. -->
-        <div class="seletor-visao">
+        <div class="seletor-visao" data-movel="seletor-visao">
           <button id="btnVisao" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menuVisoes">
             <span>Visão</span><b id="nomeVisao">Sólida</b><span class="seta" aria-hidden="true">▾</span>
           </button>
@@ -129,9 +131,9 @@
       <aside class="painel painel-inspecao" data-painel="inspecao" aria-labelledby="tituloInspecao">
         <button class="recolher" type="button" data-recolher="inspecao" aria-expanded="true" title="Recolher Inspeção"><span aria-hidden="true">›</span><span class="sr">Inspeção</span></button>
         <nav class="abas-painel" role="tablist">
-          <button type="button" class="aba-btn ativa" data-aba="inspecao" role="tab" aria-selected="true">Inspeção</button>
-          <button type="button" class="aba-btn" data-aba="referencias" role="tab" aria-selected="false">Imagem REF</button>
-          <button type="button" class="aba-btn" data-aba="anotacoes" role="tab" aria-selected="false">Anotações</button>
+          <button type="button" class="aba-btn ativa" data-aba="inspecao" role="tab" aria-selected="true"><span data-rotulo="aba-inspecao">Inspeção</span></button>
+          <button type="button" class="aba-btn" data-aba="referencias" role="tab" aria-selected="false"><span data-rotulo="aba-referencias">Imagem REF</span></button>
+          <button type="button" class="aba-btn" data-aba="anotacoes" role="tab" aria-selected="false"><span data-rotulo="aba-anotacoes">Anotações</span></button>
         </nav>
 
         <!-- ABA 1: INSPEÇÃO -->
@@ -141,7 +143,7 @@
           <!-- Grade e chão moravam num modal de Configurações com duas linhas
                dentro. Eles pertencem a quem está olhando a peça, que é esta
                aba; o modal virava um clique a mais para chegar a um interruptor. -->
-          <div class="linhas cena-preferencias">
+          <div class="linhas cena-preferencias" data-movel="preferencias-cena">
             <label class="linha"><span>Grade</span><input id="prefGrade" type="checkbox" checked /></label>
             <label class="linha"><span>Chão</span><input id="prefChao" type="checkbox" /></label>
           </div>
@@ -171,7 +173,7 @@
             <input id="opacidadeSelecao" type="range" min="5" max="100" value="100" step="5" disabled />
           </label>
 
-          <label class="controle-explosao" for="explosao">
+          <label class="controle-explosao" for="explosao" data-movel="explosao">
             <span>
               <b>Explosão da montagem</b>
               <output id="valorExplosao" for="explosao">0%</output>
@@ -193,8 +195,8 @@
                próprio para não se confundir com os botões de uma vez só. -->
           <div class="acoes-inspecao acoes-editar">
             <span class="rotulo">EDITAR A PEÇA</span>
-            <button id="btnJuntas" class="botao" type="button" aria-pressed="false"
-              title="Arrastar os cantos onde as partes se encontram">Juntas</button>
+            <button id="btnJuntas" data-movel="juntas" class="botao" type="button" aria-pressed="false"
+              title="Arrastar os cantos onde as partes se encontram"><span data-rotulo="juntas">Juntas</span></button>
           </div>
 
           <div id="diagnostico" class="diagnostico">
@@ -245,9 +247,23 @@
         </div>
       </div>
 
-      <div class="referencia-metrica" aria-label="Referência espacial da vista">
+      <div class="referencia-metrica" data-movel="regua-metrica" aria-label="Referência espacial da vista">
         <span id="eixosReferencia">Eixos X / Y / Z</span>
         <span class="regua-metrica"><i id="barraReferencia"></i><output id="valorReferencia">Escala</output></span>
+      </div>
+
+      <!-- A busca de comandos (Ctrl+K): as ações da tela, os comandos de teclado e as partes da peça num campo só. -->
+      <div id="buscaComandos" class="busca-comandos" role="dialog" aria-modal="true" aria-label="Buscar comando" hidden>
+        <div class="veu-busca" data-fechar-busca></div>
+        <div class="caixa-busca">
+          <label class="entrada-busca">
+            <svg class="icone" aria-hidden="true"><use href="#i-busca" /></svg>
+            <input id="entradaBusca" type="search" placeholder="Buscar comando ou parte" autocomplete="off" aria-controls="resultadosBusca" />
+            <kbd>Esc</kbd>
+          </label>
+          <div id="resultadosBusca" class="resultados-busca" role="listbox"></div>
+          <footer class="pe-busca"><span><kbd>↑</kbd><kbd>↓</kbd> escolher</span><span><kbd>Enter</kbd> executar</span><span>Partes e visões também aparecem na busca</span></footer>
+        </div>
       </div>
 
       <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>

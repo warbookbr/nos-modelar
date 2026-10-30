@@ -94,5 +94,11 @@ export function montarBarraSuperior({
     if (selo) selo.hidden = problemas.length === 0;
   });
 
-  return { fecharJanelas };
+  /* A busca de comandos abre as janelas pela mesma porta dos botões. */
+  function abrirJanela(chave) {
+    const entrada = janelas.find((candidata) => candidata.chave === chave);
+    if (entrada && entrada.janela.hidden) alternarJanela(entrada);
+  }
+
+  return { fecharJanelas, abrirJanela };
 }

@@ -13,7 +13,8 @@ import { criarAmbienteBancada } from './criar-ambiente.js';
 import { arquivoDaSessaoNaUrl } from './sessao/sincronizador.js';
 import { criarSessaoDaBancada } from './sessao/sessao-da-bancada.js';
 import { criarRegistroDeEventos } from './sessao/registro-de-eventos.js';
-import { criarPreferenciaDeVisao, criarPreferenciasBancada } from './preferencias/estado-local.js';
+import { criarPreferenciaDeTema, criarPreferenciaDeVisao, criarPreferenciasBancada } from './preferencias/estado-local.js';
+import { TEMAS, TEMA_PADRAO } from './temas/temas.js';
 import { VISOES, VISAO_PADRAO, criarSeletorDeVisao, visaoDisponivel } from './visoes/registro-de-visoes.js';
 import { criarRegistroAtalhos } from './controles/atalhos.js';
 import { criarComandos } from './controles/comandos.js';
@@ -38,6 +39,8 @@ import { montarTeclado } from './componentes/teclado.js';
 import { montarSessaoAtiva } from './componentes/sessao-ativa.js';
 import { montarReferenciaMetrica } from './componentes/referencia-metrica.js';
 import { montarCaixaDaVisao } from './componentes/caixa-da-visao.js';
+import { montarTema } from './componentes/tema.js';
+import { montarBuscaDeComandos } from './componentes/busca-de-comandos.js';
 import { criarPonteDaCaptura, publicarPonte } from './componentes/ponte-da-captura.js';
 
 /* `sessaoPorUrl` deixa a URL escolher o arquivo de sessão (`?sessao=<caminho>`), em vez do `sessao-ativa.json` compartilhado: só o
@@ -70,7 +73,23 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
       estado.definir({ visao });
     },
   });
-  const estado = criarEstadoCentral(estadoInicialDaBancada({ pecaPedida, visao: seletorDeVisao.atual }));
+  const preferenciaDeTema = criarPreferenciaDeTema({ conhecidos: TEMAS.map((tema) => tema.id), padrao: TEMA_PADRAO });
+  const estado = criarEstadoCentral(estadoInicialDaBancada({
+    pecaPedida, visao: seletorDeVisao.atual, tema: preferenciaDeTema.ler(),
+  }));
+  /* O tema vem antes de tudo o que desenha, para a página nascer arrumada; a cena dele chega ao ambiente quando o
+     ambiente existe. */
+  let cenaDoTema = null;
+  let aplicarCenaDoTema = () => {};
+  const tema = montarTema({
+    elementos: elementos.tema,
+    estado,
+    preferencia: preferenciaDeTema,
+    aoMudarCena(cenaNova) {
+      cenaDoTema = cenaNova;
+      aplicarCenaDoTema(cenaNova);
+    },
+  });
 
   /* O que a barra de Estado responde: a sessão, as faces sem identidade e a
      sequência de eventos desde que a página abriu. */
@@ -143,29 +162,31 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     ambiente, estado, cena, seletorDeVisao, preferenciasBancada, avisar, parametros: params,
   });
 
+  /* As ações sobre a peça olhada, as mesmas para o painel da direita, a busca de comandos e o cartão da seleção. */
+  const acoesDaPeca = {
+    focarSelecao: () => cena.focarSelecao(),
+    selecionarConjunto: () => cena.controlador?.selecionarSubarvores(),
+    definirModo: (modo) => cena.controlador?.definirModo(modo),
+    definirExplosao: (valor) => cena.controlador?.definirExplosao(valor),
+    alternarWireframeSelecao: () => cena.controlador?.definirWireframeSelecao(!cena.controlador.estado().wireframeSelecao),
+    definirOpacidadeSelecao: (valor) => cena.controlador?.definirOpacidadeSelecao(valor),
+    async copiarVista() {
+      if (cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
+      try {
+        await endereco.copiar();
+        avisar('Vista copiada. Outra pessoa ou IA abrirá exatamente o mesmo estado.');
+      } catch {
+        avisar('A vista já está registrada na URL do navegador.');
+      }
+    },
+    alternarModoJuntas: () => edicao.alternarModoJuntas(),
+    aplicarPreferenciasCena: (parcial) => vista.aplicarPreferenciasCena(parcial),
+  };
   const painelInspecao = montarPainelInspecao({
     elementos: elementos.painelInspecao,
     estado,
     aoRecolher: redimensionar,
-    acoes: {
-      focarSelecao: () => cena.focarSelecao(),
-      selecionarConjunto: () => cena.controlador?.selecionarSubarvores(),
-      definirModo: (modo) => cena.controlador?.definirModo(modo),
-      definirExplosao: (valor) => cena.controlador?.definirExplosao(valor),
-      alternarWireframeSelecao: () => cena.controlador?.definirWireframeSelecao(!cena.controlador.estado().wireframeSelecao),
-      definirOpacidadeSelecao: (valor) => cena.controlador?.definirOpacidadeSelecao(valor),
-      async copiarVista() {
-        if (cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
-        try {
-          await endereco.copiar();
-          avisar('Vista copiada. Outra pessoa ou IA abrirá exatamente o mesmo estado.');
-        } catch {
-          avisar('A vista já está registrada na URL do navegador.');
-        }
-      },
-      alternarModoJuntas: () => edicao.alternarModoJuntas(),
-      aplicarPreferenciasCena: (parcial) => vista.aplicarPreferenciasCena(parcial),
-    },
+    acoes: acoesDaPeca,
   });
   montarAbaAnotacoes({
     elementos: elementos.painelInspecao.anotacoes,
@@ -209,7 +230,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   });
 
   vista.aplicarPreferenciasCena({});
-  montarBarraSuperior({
+  const barraSuperior = montarBarraSuperior({
     elementos: elementos.barraSuperior,
     corpo: elementos.corpo,
     estado,
@@ -218,6 +239,37 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     comandos,
     entradasDoAcervo: listarParaBancada(),
     abrirDoAcervo: (entrada) => sessao.abrirDoAcervo(entrada),
+  });
+
+  /* A busca de comandos lista, além dos comandos de teclado e das partes, as ações da tela que não têm tecla própria. */
+  const temPeca = () => Boolean(cena.modelo);
+  const extrasDaBusca = [
+    { id: 'abrir', grupo: 'Peça', rotulo: 'Abrir peça do acervo', executar: () => barraSuperior.abrirJanela('abrir') },
+    { id: 'copiar-vista', grupo: 'Peça', rotulo: 'Copiar vista', executar: () => acoesDaPeca.copiarVista() },
+    { id: 'editar-juntas', grupo: 'Peça', rotulo: 'Editar juntas', ligado: () => estado.obter('juntas').modo, executar: () => temPeca() && edicao.alternarModoJuntas() },
+    { id: 'editar-malha', grupo: 'Peça', rotulo: 'Editar malha', tecla: 'Tab', executar: () => temPeca() && edicao.alternarEdicaoDeMalha() },
+    { id: 'grade', grupo: 'Cena', rotulo: 'Grade', tecla: 'h', ligado: () => preferenciasBancada.ler().grade, executar: () => vista.alternarPreferenciaCena('grade') },
+    { id: 'chao', grupo: 'Cena', rotulo: 'Chão', ligado: () => preferenciasBancada.ler().chao, executar: () => vista.alternarPreferenciaCena('chao') },
+    {
+      id: 'explosao', grupo: 'Cena', rotulo: 'Explosão da montagem',
+      valor: () => `${Math.round((estado.obter('selecao')?.explosao ?? 0) * 100)}%`,
+      executar: () => acoesDaPeca.definirExplosao((estado.obter('selecao')?.explosao ?? 0) > 0 ? 0 : 0.5),
+    },
+    { id: 'estado', grupo: 'Painéis', rotulo: 'Estado da sessão e eventos', executar: () => barraSuperior.abrirJanela('estado') },
+    { id: 'controles', grupo: 'Painéis', rotulo: 'Controles e atalhos', executar: () => barraSuperior.abrirJanela('controles') },
+    ...TEMAS.map((cada) => ({
+      id: `tema-${cada.id}`, grupo: 'Tema', rotulo: cada.rotulo, ligado: () => estado.obter('tema') === cada.id, executar: () => tema.escolher(cada.id),
+    })),
+  ];
+  montarBuscaDeComandos({
+    elementos: elementos.buscaDeComandos,
+    fontes: () => ({
+      extras: extrasDaBusca,
+      comandos,
+      teclas: registroAtalhos.obter(),
+      partes: estado.obter('partes') ?? [],
+      selecionar: (nome) => cena.controlador?.selecionar(nome),
+    }),
   });
 
   sessao = criarSessaoDaBancada({

@@ -13,6 +13,19 @@ export function lerElementosDaPagina(documento = globalThis.document) {
   return {
     canvas: id('cenaBancada'),
     corpo: documento.body,
+    tema: {
+      raiz: documento.documentElement,
+      escolha: id('escolhaTema'),
+      moveis: [...documento.querySelectorAll('[data-movel]')],
+      lugares: [...documento.querySelectorAll('[data-lugar]')],
+      rotulaveis: [...documento.querySelectorAll('[data-rotulo]')],
+    },
+    buscaDeComandos: {
+      caixa: id('buscaComandos'),
+      entrada: id('entradaBusca'),
+      resultados: id('resultadosBusca'),
+      gatilhos: [...documento.querySelectorAll('[data-abrir-busca]')],
+    },
     avisos: { aviso: id('aviso'), erro: id('erro') },
     barraSuperior: {
       /* A ordem é a dos botões na barra, e é a ordem em que as janelas fecham. */
