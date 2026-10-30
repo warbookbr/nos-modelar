@@ -1,16 +1,12 @@
 name: Deploy Modelar no Pages
 
+# A MAIN AVANÇA PELO PRÓPRIO CI. O passo `juntar` do CI move a main com a credencial do Actions, e o GitHub não dispara
+# outro fluxo a partir de um envio feito com ela; com o gatilho de `push` na main esta publicação nunca rodava. Por isso ela
+# roda quando o CI termina verde num envio, que é quando a main acabou de andar, e publica a main.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "bancada.html"
-      - "src/**"
-      - "procedural/**"
-      - "package.json"
-      - "package-lock.json"
-      - "vite.config.js"
-      - ".github/workflows/pages.yml"
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -28,10 +24,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
