@@ -2,9 +2,10 @@
 
 Esta página explica o Modelar a quem nunca o viu: o que ele é, para quem é, o
 que já existe nele, como uma peça nasce e é aprovada e como se trabalha com ele
-no dia a dia. Ela se lê em poucos minutos. Os termos próprios do projeto levam a
-um link para o [glossário](modelar/GLOSSARIO.md), onde cada um tem uma
-definição curta.
+no dia a dia. Ela se lê em poucos minutos. Os termos próprios do projeto levam ao
+documento onde cada um é definido, e a seção
+[Palavras do projeto](#palavras-do-projeto), no fim, resume cada um em uma
+frase.
 
 ## O que é o Modelar
 
@@ -13,13 +14,13 @@ corrigem objetos 3D mecânicos, como veículos, eletrodomésticos, móveis e
 máquinas. Procedural quer dizer que cada objeto é gerado por código: um arquivo
 descreve, passo a passo e com as medidas em milímetro, como a geometria se
 constrói, e rodar o mesmo arquivo dá sempre o mesmo resultado. Esse arquivo é a
-[receita](modelar/GLOSSARIO.md#receita), e o que ela gera é a
-[peça](modelar/GLOSSARIO.md#peça). Um objeto de várias peças encaixadas é uma
-[montagem](modelar/GLOSSARIO.md#montagem).
+[receita](modelar/usar/AUTORIA-DE-PECA.md#a-receita-da-tabela-à-malha), e o que ela gera é a
+[peça](modelar/usar/AUTORIA-DE-PECA.md#peça). Um objeto de várias peças encaixadas é uma
+[montagem](modelar/usar/AUTORIA-DE-PECA.md#montagem).
 
 O repositório reúne o núcleo geométrico, que executa as operações de construção
 sem saber que objeto está construindo, as receitas do acervo, a
-[bancada](modelar/GLOSSARIO.md#bancada), que é a página 3D onde a peça é
+[bancada](modelar/BANCADA-E-APRESENTACAO.md), que é a página 3D onde a peça é
 inspecionada, e as ferramentas que medem e validam o resultado. Os agentes
 escrevem as receitas e conferem o que saiu com números e imagens. A pessoa
 decide o que modelar, escolhe entre opções de forma e aprova a forma olhando as
@@ -36,7 +37,7 @@ um agente, dentro de um plano que a pessoa aprovou.
 
 ## O que já existe
 
-O [acervo](modelar/GLOSSARIO.md#acervo), em `procedural/pecas/`, tem 54 peças:
+O [acervo](#palavras-do-projeto), em `procedural/pecas/`, tem 54 peças:
 27 veículos (carros, picapes, caminhões, ônibus, tratores, furgão, ambulância e
 jipe), 8 móveis (balcões, uma mesa e poltronas), 5 eletrodomésticos (geladeira,
 freezer, lava-louças, lavadora e secadora, micro-ondas), o avião em 8 partes, o
@@ -45,7 +46,7 @@ suporte de tubo. Os 27 veículos e o avião foram aprovados pela pessoa. Nenhuma
 peça é base de produto: cada uma existe para provar uma capacidade do núcleo e
 pode mudar ou sair sem aviso.
 
-Há 7 [famílias](modelar/GLOSSARIO.md#família) registradas, cada uma um código que
+Há 7 [famílias](modelar/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
 gera objetos parecidos a partir de poucos números: roda com pneu, dobradiça,
 cilindro hidráulico, móvel de caixa, superfície aerodinâmica, aparelho de caixa
 e cadeira. A família de aparelho de caixa, por exemplo, gera o forno elétrico,
@@ -60,7 +61,7 @@ liso) é uma imagem gerada por código, escolhida peça a peça na receita.
 ## Como uma peça nasce e é aprovada
 
 Antes de qualquer geometria vem o
-[alinhamento](modelar/GLOSSARIO.md#alinhamento): o agente pergunta à pessoa o que
+[alinhamento](modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md): o agente pergunta à pessoa o que
 o objeto faz, quais são as partes, em que ordem ele se monta, qual medida real
 dá a escala, quais imagens servem de referência e o que reprovaria o resultado.
 Quando há escolha de forma, ele desenha as opções lado a lado com a foto e
@@ -73,12 +74,12 @@ ali, as folgas e encaixes ficam dentro do especificado, nenhuma parte ficou
 solta e a malha pode ser exportada. Os comandos imprimem números e recusam o
 que está fora, e a forma só vai adiante quando as medidas estão limpas.
 
-Então entra o [crítico cego](modelar/GLOSSARIO.md#crítico-cego), um agente
+Então entra o [crítico cego](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico), um agente
 separado que recebe só as imagens da peça e da referência, sem a receita, o
 código ou a história da construção. Ele devolve uma nota de 0 a 10 e a lista de
 defeitos que vê, como uma parte mais alta que a referência ou uma superfície
 facetada. O agente que modelou corrige e chama o crítico de novo, numa nova
-[rodada](modelar/GLOSSARIO.md#rodada). A rodada fecha com nota 8 ou mais e
+[rodada](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico). A rodada fecha com nota 8 ou mais e
 nenhum defeito, e o laço de uma peça para em 6 rodadas; passar disso é decisão
 da pessoa. O crítico aponta defeito e nunca aprova.
 
@@ -95,8 +96,8 @@ A pessoa pede em linguagem comum: modelar um objeto novo a partir de uma foto,
 corrigir uma peça que está errada, explicar o que uma peça tem, ou mudar uma
 ferramenta do projeto. O agente começa por `npm run comecar`, que pergunta qual é
 a tarefa e diz o que ele precisa ler e qual
-[skill](modelar/GLOSSARIO.md#skill) seguir. Cada tipo de tarefa tem um
-[roteiro](modelar/GLOSSARIO.md#roteiro) de leitura, e a lista deles está em
+[skill](#palavras-do-projeto) seguir. Cada tipo de tarefa tem um
+[roteiro](modelar/roteiros/ROTEIROS.md) de leitura, e a lista deles está em
 [`ROTEIROS.md`](modelar/roteiros/ROTEIROS.md).
 
 O agente devolve imagens da peça, as medidas que conferiu, o veredito do crítico
@@ -135,7 +136,7 @@ As regras que valem para todo trabalho estão no
 que forma só a pessoa aprova, o que pode e o que não pode entrar no repositório
 e como se envia uma mudança. O [`AGENTS.md`](../AGENTS.md) aponta o mesmo
 contrato para outros agentes. O resto das regras é conferido por verificações
-automáticas, os [gates](modelar/GLOSSARIO.md#gate), que rodam juntos com
+automáticas, os [gates](modelar/INDEX.md#gates-completos), que rodam juntos com
 `npm run gates` e recusam a mudança que fere uma regra, dizendo o motivo.
 
 ## Planos e backlog
@@ -143,14 +144,14 @@ automáticas, os [gates](modelar/GLOSSARIO.md#gate), que rodam juntos com
 Mudança no projeto segue um plano: um documento curto com o problema, o
 resultado esperado, o que entra e o que fica fora, as condições que não podem
 mudar e a prova de que terminou. Só existe um
-[plano ativo](modelar/GLOSSARIO.md#plano-ativo) por vez, e a pessoa decide
+[plano ativo](modelar/planos/README.md) por vez, e a pessoa decide
 qual plano entra e quando. Os planos ficam em
 [`docs/modelar/planos/`](modelar/planos/README.md), cujo índice diz qual está
 ativo e qual vem depois; os fechados vão para a pasta `encerrados/` e ficam como
 registro, sem mandar em trabalho novo. Uma correção pontual, que devolve o que o
 código e a documentação já prometem, dispensa plano.
 
-O [backlog](modelar/GLOSSARIO.md#backlog), em
+O [backlog](modelar/planos/BACKLOG.md), em
 [`BACKLOG.md`](modelar/planos/BACKLOG.md), lista ideias candidatas. Nenhum item
 dele autoriza implementação: uma ideia só vira trabalho quando entra num plano
 ativo.
@@ -160,12 +161,44 @@ ativo.
 O Modelar não é um jogo, um editor 3D para modelar à mão nem uma biblioteca de
 modelos prontos para produto. A bancada é a única aplicação, e a
 interface de jogo, a oficina para uso humano e o som saíram do repositório. Não
-há hoje encaixe automático entre peças, verificação de colisão em movimento nem
-material físico completo (o PBR), e PBR e paleta nova só entram por plano.
+há material físico completo (o PBR), que, como paleta nova, só entra por plano.
+A colisão de uma peça que se move é conferida em posições amostradas do curso, e
+a que começa e termina entre duas amostras não é vista.
 O núcleo não sabe o que é um veículo nem qualquer outro tipo de objeto: o que é
 próprio de uma família fica na família. Imagem de referência com marca,
 logotipo ou nome de fabricante não entra no repositório, e imagem gerada por IA
 serve para mostrar o caráter da forma e nunca como fonte de medida.
+
+## Palavras do projeto
+
+- Acervo: o conjunto das peças versionadas em `procedural/pecas/`, que as
+  verificações regeneram e comparam a cada mudança.
+- Alinhamento: a conversa antes de modelar em que a pessoa decide objeto,
+  partes, escala, referências e o que reprova ([exemplo](modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md)).
+- Backlog: a lista de ideias candidatas em
+  [`BACKLOG.md`](modelar/planos/BACKLOG.md), que não autoriza trabalho sozinha.
+- Bancada: a página 3D onde a peça é inspecionada, medida e ajustada à mão
+  ([arquitetura](modelar/BANCADA-E-APRESENTACAO.md)).
+- Crítico cego: o agente que recebe só as imagens da peça e da referência e
+  devolve nota e defeitos ([o laço do crítico](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico)).
+- Família: um código que gera objetos parecidos a partir de poucos números
+  ([famílias de objetos](modelar/FAMILIAS-DE-OBJETOS.md)).
+- Gate: uma verificação automática que recusa a mudança que fere uma regra,
+  rodada por `npm run gates` ([lista](modelar/INDEX.md#gates-completos)).
+- Montagem: o objeto feito de várias peças encaixadas
+  ([peça e montagem](modelar/usar/AUTORIA-DE-PECA.md#montagem)).
+- Peça: o objeto geométrico que uma receita gera, com as partes nomeadas
+  ([peça](modelar/usar/AUTORIA-DE-PECA.md#peça)).
+- Plano ativo: o único plano em execução, que autoriza a mudança no projeto
+  ([planos](modelar/planos/README.md)).
+- Receita: o arquivo de código que descreve, com as medidas, como a peça se
+  constrói ([a receita](modelar/usar/AUTORIA-DE-PECA.md#a-receita-da-tabela-à-malha)).
+- Rodada: uma volta de correção da peça seguida de um novo julgamento do
+  crítico ([o laço do crítico](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico)).
+- Roteiro: o que o agente lê para um tipo de tarefa, entregue por
+  `npm run comecar` ([roteiros](modelar/roteiros/ROTEIROS.md)).
+- Skill: um procedimento escrito que o agente segue para uma tarefa, guardado
+  em `.claude/skills/`.
 
 Para seguir adiante, quem vai mudar o projeto lê
 [`docs/modelar/INDEX.md`](modelar/INDEX.md), e o inventário de todos os arquivos
