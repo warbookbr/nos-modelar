@@ -124,7 +124,7 @@ describe('brief.md: o brief gravado ao lado das imagens', () => {
     const m = await briefArquivo(arquivo, `marco-${limiar}`, { saida });
     const gravado = readFileSync(join(saida, 'brief.md'), 'utf8');
     expect(gravado.startsWith(MARCA_DO_BRIEF)).toBe(true);
-    expect(gravado).toContain('Imagens gerais do objeto (as quatro vistas, sem legenda):');
+    expect(gravado).toContain('Imagens gerais do objeto (as quatro vistas, sem legenda, na mesma escala, com a barra de 100 mm do mesmo comprimento nas quatro):');
     expect(gravado).toContain('De que lado cada vista olha');
     expect(gravado).toMatch(/Responda, olhando só as imagens:/);
     expect(m.texto).toContain(`--brief marco-${limiar} o imprime e o regrava`);
@@ -171,7 +171,7 @@ describe('o brief diz de que lado cada vista olha', () => {
     /* o bloco novo: o título, as quatro vistas e o que elas não olham */
     expect(j - i).toBe(6);
     const resto = [...linhas.slice(0, i), ...linhas.slice(j)].join('\n');
-    expect(resto).toContain('Imagens (as quatro vistas da unidade isolada, sem legenda; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue):');
+    expect(resto).toContain('Imagens (as quatro vistas da unidade isolada, sem legenda, na mesma escala, com a barra de 100 mm do mesmo comprimento nas quatro; as peças em contorno claro são de outras unidades e só mostram onde esta se prende, não as julgue):');
     expect(resto).toContain('Peças em cinza (de outras unidades, só mostram onde esta se prende; as imagens seguem sem legenda):');
     expect(resto).toContain(`Responda, olhando só as imagens:\n${linhasDasPerguntas(PERGUNTAS_DO_CRITICO, []).join('\n')}\n${FIM_DO_BRIEF}\n`);
   }, 120000);
