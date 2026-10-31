@@ -159,9 +159,9 @@
       },
       "vidroDaCabine": {
         "vista": "lateral",
-        "comprimento": 3248.82,
-        "retidao": 0.784,
-        "concentracao": 0.131,
+        "comprimento": 2648.82,
+        "retidao": 0.764,
+        "concentracao": 0.141,
         "inversoes": 0,
         "raioMin": 30
       },
@@ -199,9 +199,9 @@
       },
       "portaDaCabine": {
         "vista": "lateral",
-        "comprimento": 5551,
-        "retidao": 0.658,
-        "concentracao": 0.236,
+        "comprimento": 4951,
+        "retidao": 0.638,
+        "concentracao": 0.251,
         "inversoes": 1,
         "raioMin": 40
       },

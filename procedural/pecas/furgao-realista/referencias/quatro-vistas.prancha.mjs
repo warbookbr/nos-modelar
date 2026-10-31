@@ -115,13 +115,15 @@ const naColuna = (recuo, y) => {
 };
 /* Porta dianteira de furgão de bico curto: a fresta da frente sobe a coluna do para-brisa, 30 mm atrás dela, desde o
    teto da cabine (1955) até a base da coluna, desce vertical dali até perto do arco e contorna o arco por trás, a 55 mm
-   dele, até a soleira logo atrás (z ≈ 1246). Sem degrau nem prolongamento na cintura. A traseira fica em z 250, e a base
-   tem perto de 1000. O vidro fica 70 mm para dentro da moldura, com a borda da frente seguindo a coluna. */
+   dele, até a soleira logo atrás (z ≈ 1246). Sem degrau nem prolongamento na cintura. A traseira fica em z 550, na
+   coluna do meio, 1170 mm atrás do eixo dianteiro: a porta tem cerca de 1185 na cintura e 700 na base, mais estreita
+   embaixo por causa do arco. A coluna do meio tem 110 até a porta de correr, que tem 1300 e fica à frente do arco
+   traseiro com folga. O vidro fica 70 mm para dentro da moldura, com a borda da frente seguindo a coluna. */
 const MOLDURA = 70;
 const FOLGA_ARCO = 55;
 const raioPorta = M.arcoRaio + FOLGA_ARCO;
 const fendaColuna = (y) => naColuna(30, y)[0];
-const portaCabine = { tras: 250, base: 380, topo: 1955 };
+const portaCabine = { tras: 550, base: 380, topo: 1955 };
 portaCabine.pe = [peVidro[0] + normalTras[0] * 30, peVidro[1] + normalTras[1] * 30]; // pé da fresta da coluna
 const zArestaPorta = portaCabine.pe[0];
 portaCabine.frente = zD - Math.sqrt(raioPorta ** 2 - (portaCabine.base - R) ** 2);
@@ -139,9 +141,14 @@ function arcoDaPorta() {
   return pts;
 }
 const vidroCabine = { tras: portaCabine.tras + MOLDURA, base: portaCabine.pe[1] + MOLDURA, topo: portaCabine.topo - 75 };
-const portaCorrer = { frente: 200, tras: 200 - 1300, base: 380, topo: 2200 };
-const basePorta = portaCabine.frente - portaCabine.tras;
-if (Math.abs(basePorta - 1000) > 30) throw new Error(`base da porta da cabine com ${basePorta} mm, longe de 1000`);
+const COLUNA_DO_MEIO = 110;
+const portaCorrer = { frente: portaCabine.tras - COLUNA_DO_MEIO, base: 380, topo: 2200 };
+portaCorrer.tras = portaCorrer.frente - 1300;
+const FOLGA_ARCO_TRASEIRO = 150;
+const portaNaCintura = zArestaPorta - portaCabine.tras;
+if (portaNaCintura < 1100 || portaNaCintura > 1250) throw new Error(`porta da cabine com ${portaNaCintura} mm na cintura, fora de 1100 a 1250`);
+const colunaDoMeio = portaCabine.tras - portaCorrer.frente;
+if (colunaDoMeio < 90 || colunaDoMeio > 150) throw new Error(`coluna do meio com ${colunaDoMeio} mm, fora de 90 a 150`);
 for (const [z, y] of arcoDaPorta()) {
   if (Math.hypot(z - zD, y - R) - M.arcoRaio < 50 - 1e-6) throw new Error('a aresta da porta passa a menos de 50 mm do arco');
 }
@@ -149,7 +156,7 @@ if (zArestaPorta - zD < 0 || yArcoNaAresta <= R) throw new Error('a aresta da po
 if (vidroCabine.base - portaCabine.pe[1] < MOLDURA - 1 || vidroCabine.tras - portaCabine.tras < MOLDURA - 1
   || portaCabine.topo - vidroCabine.topo < MOLDURA - 1) throw new Error('o vidro sai da moldura da porta');
 if (fendaColuna(vidroCabine.base) - naColuna(30 + MOLDURA, vidroCabine.base)[0] < MOLDURA - 1) throw new Error('o vidro passa da coluna');
-if (portaCorrer.tras <= zT + M.arcoRaio) throw new Error('a porta de correr invade o arco traseiro');
+if (portaCorrer.tras - (zT + M.arcoRaio) < FOLGA_ARCO_TRASEIRO) throw new Error('a porta de correr fica a menos de 150 mm do arco traseiro');
 
 /* ------------------------------------------------------------ seção frontal e traseira */
 /* Projeção ao longo de z: a caixa de carga é a parte mais larga e mais alta, então frontal e traseira têm o mesmo
@@ -341,6 +348,7 @@ export const ESPEC = {
     { vista: 'lateral', de: [P.topoVidro[0], 0], ate: P.topoVidro, desloca: [(zFrente - P.topoVidro[0]) * ESCALA + 76, 0], extensao: true, texto: mil(P.topoVidro[1]) },
     { vista: 'lateral', de: P.baseVidro, ate: [zFrente, P.baseVidro[1]], desloca: [0, -56], extensao: true, texto: mil(zFrente - P.baseVidro[0]) },
     { vista: 'lateral', de: [-200, 0], ate: [-200, M.soleira], texto: mil(M.soleira) },
+    { vista: 'lateral', dono: 'portaDaCabine', de: [portaCabine.tras, portaCabine.pe[1] - 60], ate: [zArestaPorta, portaCabine.pe[1] - 60], texto: mil(portaNaCintura) },
     { vista: 'lateral', dono: 'portaDeCorrer', de: [portaCorrer.tras, 1700], ate: [portaCorrer.frente, 1700], texto: mil(portaCorrer.frente - portaCorrer.tras) },
     /* frontal: altura à esquerda, largura no teto, bitola e pneu no chão */
     { vista: 'frontal', de: [-xMax, 0], ate: [-xMax, M.altura], desloca: [-40, 0], extensao: true, texto: mil(M.altura) },
