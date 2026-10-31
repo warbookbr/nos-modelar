@@ -1,7 +1,8 @@
 /* furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano
  * docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no banco de provas furgao-realista-2026-10-30): a lataria
  * detalhada, refeita pela prancha ajustada de 2026-10-31 (a frente mais alta, o para-brisa que envolve as quinas, a curva do teto
- * de dois raios e os raios maiores nas quinas do teto; ver "O ajuste da prancha" em referencias/alvo.md). Sobre a chapa contínua da
+ * de dois raios e os raios maiores nas quinas do teto, e o ajuste de largura de 2026-10-31, com as laterais fechando 3,9 graus acima do vinco de
+ * cintura; ver "O ajuste da prancha" e "O ajuste de caráter da largura" em referencias/alvo.md). Sobre a chapa contínua da
  * etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png, aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as
  * duas traseiras de abrir), o vinco de cintura discreto ao longo da lateral, as nervuras longitudinais do teto alto e a aba leve dos
  * quatro arcos das rodas, e abre na chapa os vãos do para-brisa, dos vidros das portas da cabine e dos das portas traseiras, cada um
@@ -43,12 +44,12 @@ export const TABELA = {
   altura: 2500,
   soleira_y: 300,
 
-  // rodas e arcos: entre-eixos e balanço dianteiro (o traseiro sai da diferença), bitola, pneu 225/65 aro 16, arco com 65 mm de folga
+  // rodas e arcos: entre-eixos e balanço dianteiro (o traseiro sai da diferença), bitola, pneu 235/65 aro 16, arco com 65 mm de folga
   entre_eixos: 3300,
   balanco_dianteiro: 980,
-  bitola: 1700,
+  bitola: 1730, // a face de fora do pneu fica em x 982,5, 17,5 mm para dentro da lateral
   pneu_diametro: 710,
-  pneu_largura: 225,
+  pneu_largura: 235,
   arco_raio: 420,
 
   // perfil da frente, em [z, y]: nariz vertical até o topo do para-choque, degrau dele, boca do capô, capô curto, para-brisa e a curva
@@ -77,10 +78,11 @@ export const TABELA = {
   raio_traseira_base: 40,
   raio_quina_traseira: 180,
 
-  // seção frontal, em [x, y]: lateral vertical até 1450 e quase vertical até o teto, quina do teto com raio
-  lateral_reta_ate_y: 1450,
-  meia_largura_no_teto: 982,
-  raio_lateral: 600,
+  // seção frontal, em [x, y]: lateral vertical em x 1000 até o vinco de cintura e fechando daí até o teto (3,9 graus), com a passagem
+  // no vinco em raio 3000 e sem quina; o prolongamento chega ao teto em x 910 (1820 de largura), e a quina do teto tem raio 300
+  lateral_reta_ate_y: 1190,
+  meia_largura_no_teto: 910,
+  raio_lateral: 3000,
   raio_ombro: 300,
 
   // planta: raio das quinas verticais na frente (do para-choque à coluna do para-brisa) e atrás, e na borda do teto plano
@@ -105,7 +107,7 @@ export const TABELA = {
   passo_anel: 150,
   passo_lado: 130,
   margem_coluna: 35,
-  colunas_do_capo_y: 900, // do anel de baixo do capô (acima dos arcos) em diante, três colunas da lateral andam junto com o fim da quina
+  colunas_do_capo_y: 720, // do anel do topo do para-choque em diante, três colunas da lateral andam junto com o fim da quina
   colunas_do_capo: 3,
   colunas_do_capo_passo: 60,
   passo_arco_graus: 3,
@@ -148,6 +150,7 @@ export const TABELA = {
   vidro_traseiro_topo_y: 2200,
   vidro_traseiro_x_dentro: 80,
   vidro_traseiro_x_fora: 820,
+  vidro_traseiro_folga_fora: 45, // a borda de fora da janela corre 45 mm para dentro da borda de fora da porta, que acompanha a lateral
   // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o
   // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda
   vao_canto_degraus: 2,
@@ -173,8 +176,8 @@ export const TABELA = {
 
   // nervuras do teto: dois sulcos de cada lado, com o centro em x, a meia largura, a profundidade, o recuo das bordas do teto, a
   // rampa das pontas e a nitidez das dobras
-  nervura_1_x: 210,
-  nervura_2_x: 450,
+  nervura_1_x: 190,
+  nervura_2_x: 420,
   nervura_meia_largura: 45,
   nervura_profundidade: 8,
   nervura_recuo: 150,
@@ -364,6 +367,12 @@ export function forma(T) {
   const xTetoLado = lateralDensa.find((p) => p[1] >= T.altura - 1e-9)[0];
   const perfilLado = lateralDensa.slice(0, lateralDensa.findIndex((p) => p[1] >= T.altura - 1e-9) + 1);
 
+  /* A borda de fora das portas traseiras, que é o começo da quina de trás: 900 até o vinco de cintura, e daí a lateral prolongada
+     (reta do vinco ao teto, sem o raio de 3000 que tira menos de 2 mm dela) menos o raio da quina de trás vista de cima, sempre
+     100 mm para dentro dela. */
+  const xLinhaDaLateral = (y) => (y <= T.lateral_reta_ate_y ? xMax : xMax - ((xMax - T.meia_largura_no_teto) * (y - T.lateral_reta_ate_y)) / (T.altura - T.lateral_reta_ate_y));
+  const xBordaTraseira = (y) => xLinhaDaLateral(y) - T.raio_planta_tras;
+
   /* raio da quina da frente na planta, por altura: o do para-choque até a boca, fechando até a coluna do para-brisa */
   const raioFrente = (y) => {
     if (y <= boca[1]) return T.raio_planta_frente;
@@ -383,7 +392,7 @@ export function forma(T) {
   const zFrestaFrente = (y) => (y <= pePorta[1] ? pePorta[0] : zLinhaVidro(y) - T.porta_fresta_coluna / Math.sin(pb));
   return {
     zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, anguloCapo,
-    perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente, zFrestaFrente,
+    perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente, zFrestaFrente, xBordaTraseira,
     zF: (y) => uNaAltura(perfilFrente, y),
     zR: (y) => uNaAltura(perfilTras, y),
     xs: (y) => uNaAltura(perfilLado, y),
@@ -460,7 +469,7 @@ function aneisHorizontais(T, f) {
 
 /* A seção de um anel horizontal: a frente, a lateral e a traseira na mesma altura, e os raios das quinas. */
 function secaoHorizontal(T, f, y) {
-  return { yF: y, zF: f.zF(y), xS: f.xs(y), yS: y, yR: y, zR: f.zR(y), rF: f.raioFrente(y), rB: T.raio_planta_tras };
+  return { yF: y, zF: f.zF(y), xS: f.xs(y), yS: y, yR: y, zR: f.zR(y), rF: f.raioFrente(y), rB: f.xs(y) - f.xBordaTraseira(y) };
 }
 
 /* Os anéis do ombro: cada trecho (frente, lateral e traseira) sobe o seu raio, da altura do ombro ao teto plano. A frente e a
@@ -481,10 +490,9 @@ function aneisDoOmbro(T, f) {
   })();
   if (!(dTopo > 0 && f.zR(T.ombro_y) - f.zR(T.porta_traseira_topo_y) < 12)) throw new Error('furgao-realista: o topo das portas traseiras precisa ficar acima do ombro e a menos de 12 mm da traseira vertical');
   const rF0 = f.raioFrente(T.ombro_y);
-  /* até o anel do topo das portas traseiras, o começo da quina de trás segue a inclinação reta da lateral, para a fresta de fora
-     das portas traseiras não entortar no alto; dali ao teto o raio fecha até o da borda do teto */
-  const inclinacao = (f.xs(T.ombro_y) - f.xs(T.ombro_y - 100)) / 100;
-  const xTrasReta = (y) => f.xs(T.ombro_y) + inclinacao * (y - T.ombro_y) - T.raio_planta_tras;
+  /* até o anel do topo das portas traseiras, o começo da quina de trás segue a lateral prolongada, para a fresta de fora das portas
+     traseiras não entortar no alto; dali ao teto o raio fecha até o da borda do teto */
+  const xTrasReta = (y) => f.xBordaTraseira(y);
   const aneis = [];
   let rBTopo = T.raio_planta_tras;
   for (let k = 1; k <= n; k += 1) {
@@ -595,13 +603,18 @@ export function derivar(T) {
   const colunasTras = (an) => {
     const s = an.sec; const xTras = s.xS - s.rB;
     const pt = T.vao_canto_passo_traseiro; const kk = T.vao_canto_degraus;
-    const dentro = T.vidro_traseiro_x_dentro; const fora = T.vidro_traseiro_x_fora;
-    const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);
-    const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);
-    const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (9 - 2 * kk) + 1e-6);
-    const corpo = (xt) => [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, ...entre(fora, xt, (xt - fora) / 3 + 1e-6), xt];
-    if (an.horizontal) return corpo(xTras);
-    const base = corpo(horizontais.at(-1).sec.xS - T.raio_planta_tras).map((x, k, l) => x / l.at(-1));
+    const dentro = T.vidro_traseiro_x_dentro;
+    /* a borda de fora do vidro fica 45 mm dentro da borda de fora da porta, que acompanha a lateral, e não passa de 820 */
+    const corpo = (xt, y) => {
+      const fora = Math.min(T.vidro_traseiro_x_fora, f.xBordaTraseira(y) - T.vidro_traseiro_folga_fora);
+      const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);
+      const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);
+      const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (10 - 2 * kk) + 1e-6);
+      return [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, ...entre(fora, xt, (xt - fora) / 2 + 1e-6), xt];
+    };
+    if (an.horizontal) return corpo(xTras, an.y);
+    const ref = horizontais.at(-1);
+    const base = corpo(ref.sec.xS - ref.sec.rB, ref.y).map((x, k, l) => x / l.at(-1));
     return base.map((u, k) => lerp(u, RT[k] / xTrasTeto, an.t) * xTras);
   };
   if (colunasTras(horizontais[0]).length !== nR + 1) throw new Error('furgao-realista: a traseira e o teto pedem o mesmo número de colunas');
@@ -866,7 +879,7 @@ export function derivar(T) {
     return cols;
   };
   const aneisEntre = (yb, yt) => listas.filter((x) => x.horizontal && x.y >= yb - 1e-6 && x.y <= yt + 1e-6);
-  const iForaTraseiro = colunasTras(horizontais.find((x) => Math.abs(x.y - T.vidro_traseiro_base_y) < 1e-6)).findIndex((x) => Math.abs(x - T.vidro_traseiro_x_fora) < 1e-6);
+  const iForaTraseiro = 2 + 2 * T.vao_canto_degraus + (9 - 2 * T.vao_canto_degraus); // r0, a borda de dentro, os cantos, o miolo e os cantos de fora
   const meioDoVidroTraseiro = `r${Math.ceil((1 + iForaTraseiro) / 2)}`;
   const meioDoVidroDaCabine = (() => {
     const rs = aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y);
@@ -1406,14 +1419,14 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto, etapa 2 pela prancha ajustada: lataria de 5400 por 2000 por 2500 mm, capô a 23,8 graus, para-brisa envolvente, teto de dois raios, frestas das cinco portas, vãos de cantos redondos e rodas provisórias',
+    objeto: 'furgão médio de teto alto, etapa 2 pela prancha ajustada: lataria de 5400 por 2000 por 2500 mm de laterais fechando para o teto, capô a 23,8 graus, para-brisa envolvente, frestas das cinco portas, vãos de cantos redondos e rodas provisórias',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
     partes: [
       {
         nome: 'carroceria',
-        forma: 'chapa de 2 mm: capô de 1100 a 1480, para-brisa até 2110 com vão em arco dobrando pela quina de 160, teto de raios 1290 e 405, quinas do teto de 300 e 180, frestas de 6 mm, vinco em 1190, sulcos no teto, vãos de cantos redondos',
+        forma: 'chapa de 2 mm: lateral vertical até o vinco em 1190 e fechando 3,9 graus até o teto de ±630; capô de 1100 a 1480, para-brisa até 2110 envolvente, teto de raios 1290 e 405, frestas de 6 mm, sulcos, vãos de cantos redondos',
         tecnica: 'subdivisao de gaiola de anéis, ombro e cobertura com colunas nas portas e arco de 475; porta dividida meia fresta por lado, borda dobrada 4 mm; frente em dois arcos tangentes com coroa em y; cantos dos vãos em diagonal de duas células',
       },
       ...ABAS_DOS_VAOS.map((nome) => ({
@@ -1428,7 +1441,7 @@ const receita = {
       })),
       ...RODAS.map((nome) => ({
         nome,
-        forma: `roda provisória da etapa 1: cilindro de 710 mm de diâmetro e 225 de largura, na bitola de 1700 e no ${nome.includes('Dianteira') ? 'eixo dianteiro' : 'eixo traseiro'}, apoiado no chão; sai na etapa 4`,
+        forma: `roda provisória da etapa 1: cilindro de 710 mm de diâmetro e 235 de largura, na bitola de 1730 e no ${nome.includes('Dianteira') ? 'eixo dianteiro' : 'eixo traseiro'}, apoiado no chão; sai na etapa 4`,
         tecnica: 'lathe em torno de x de um retângulo, com 48 lados e sombreamento liso',
       })),
     ],
@@ -1442,6 +1455,7 @@ const receita = {
       'um vão de vidro não fica aberto, ou a aba dele não cobre a borda inteira',
       'o vinco de cintura ou as nervuras do teto não aparecem na luz rasante, ou aparecem fortes como degrau',
       'a aba de um arco sobra solta da lateral ou não acompanha o arco inteiro',
+      'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou o vão traseiro não acompanha a lateral 100 mm para dentro dela acima do vinco, ou um sulco do teto não cabe no teto de ±630',
       'a luz rasante ou a curvatura mostram amassado, ondulação ou serrilhado que a forma não pede, fora das frestas, dos vãos e dos vincos, nem na fresta da porta da cabine junto ao arco dianteiro',
       'um pneu não toca o chão, ou toca ou atravessa o arco da roda ou a lateral',
       'alguma peça fica solta no ar ou atravessa outra sem motivo',
