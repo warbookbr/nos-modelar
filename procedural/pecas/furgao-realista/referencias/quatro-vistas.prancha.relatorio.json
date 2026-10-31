@@ -175,7 +175,7 @@
       },
       "vidroTraseiroEsq": {
         "vista": "traseira",
-        "comprimento": 2385.22,
+        "comprimento": 2352.86,
         "retidao": 0.729,
         "concentracao": 0.171,
         "inversoes": 0,
@@ -183,7 +183,7 @@
       },
       "vidroTraseiroDir": {
         "vista": "traseira",
-        "comprimento": 2385.22,
+        "comprimento": 2352.86,
         "retidao": 0.729,
         "concentracao": 0.171,
         "inversoes": 0,
@@ -207,17 +207,17 @@
       },
       "portaTraseiraEsq": {
         "vista": "traseira",
-        "comprimento": 5294.76,
-        "retidao": 0.824,
-        "concentracao": 0.111,
+        "comprimento": 5221.52,
+        "retidao": 0.759,
+        "concentracao": 0.116,
         "inversoes": 0,
         "raioMin": 20
       },
       "portaTraseiraDir": {
         "vista": "traseira",
-        "comprimento": 5294.76,
-        "retidao": 0.824,
-        "concentracao": 0.111,
+        "comprimento": 5221.52,
+        "retidao": 0.759,
+        "concentracao": 0.116,
         "inversoes": 0,
         "raioMin": 20
       },

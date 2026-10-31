@@ -211,8 +211,22 @@ const xPneuFora = M.bitola / 2 + M.pneuLargura / 2; // 982,5
 /* De frente e de trás só se vê o pneu abaixo da soleira: a carroceria cobre o resto, e o pneu inteiro cruzava as portas
    traseiras. O diâmetro fica cotado na lateral. */
 const pneuDeFrente = (s) => [[s * xPneuDentro, M.soleira], [s * xPneuDentro, 0, 50], [s * xPneuFora, 0, 50], [s * xPneuFora, M.soleira]];
-const portaTraseira = (s) => [[s * 6, 590, 20], [s * 900, 590, 40], [s * 900, 2380, 90], [s * 6, 2380, 20]];
-const vidroTraseiro = (s) => [[s * 80, 1700, 50], [s * 820, 1700, 50], [s * 820, 2200, 70], [s * 80, 2200, 50]];
+/* Portas traseiras: o vão tem 1800 até o vinco e, acima dele, a borda de fora acompanha a lateral, sempre 100 mm para
+   dentro dela, a folga da quina traseira de raio 100 vista de cima; no topo das portas (2380) o vão fica com cerca de
+   1636. Escolha da pessoa em 2026-10-31. A fresta do meio não muda. */
+const FOLGA_QUINA_TRASEIRA = 100;
+const TOPO_PORTA_TRASEIRA = 2380;
+const bordaDaPortaTraseira = (y) => Math.min(900, meiaLarguraEm(y) - FOLGA_QUINA_TRASEIRA);
+const xPortaTraseiraTopo = bordaDaPortaTraseira(TOPO_PORTA_TRASEIRA);
+const portaTraseira = (s) => [[s * 6, 590, 20], [s * 900, 590, 40], [s * 900, Y_VINCO, RAIO_NO_VINCO], [s * xPortaTraseiraTopo, TOPO_PORTA_TRASEIRA, 90], [s * 6, TOPO_PORTA_TRASEIRA, 20]];
+/* As janelas ficam onde estavam, 740 na base; só o canto de cima de fora entra, para a borda de fora correr paralela à
+   da porta com a mesma folga que ela tem na base da janela (45 mm). */
+const JANELA_TRASEIRA = { dentro: 80, fora: 820, base: 1700, topo: 2200 };
+const folgaDaJanela = bordaDaPortaTraseira(JANELA_TRASEIRA.base) - JANELA_TRASEIRA.fora;
+const xJanelaTraseiraTopo = bordaDaPortaTraseira(JANELA_TRASEIRA.topo) - folgaDaJanela;
+const larguraDaJanelaEm = (y) => JANELA_TRASEIRA.fora + ((xJanelaTraseiraTopo - JANELA_TRASEIRA.fora) * (y - JANELA_TRASEIRA.base)) / (JANELA_TRASEIRA.topo - JANELA_TRASEIRA.base) - JANELA_TRASEIRA.dentro;
+const vidroTraseiro = (s) => [[s * JANELA_TRASEIRA.dentro, JANELA_TRASEIRA.base, 50], [s * JANELA_TRASEIRA.fora, JANELA_TRASEIRA.base, 50], [s * xJanelaTraseiraTopo, JANELA_TRASEIRA.topo, 70], [s * JANELA_TRASEIRA.dentro, JANELA_TRASEIRA.topo, 50]];
+if (folgaDaJanela < 40) throw new Error(`a janela traseira fica a ${folgaDaJanela} mm da borda da porta`);
 /* O para-choque traseiro que a lateral mostra, de trás: da soleira (300) ao degrau de carga (570), no plástico escuro,
    envolvendo as quinas, com o lugar da placa (400 × 130); entre o degrau e a base das portas (590) fica a faixa de
    20 mm da traseira. */
@@ -320,7 +334,7 @@ const LANDMARKS = [
   { id: 'cabineF', vista: 'lateral', em: [zD - Math.sqrt(raioPorta ** 2 - (500 - R) ** 2), 500], sobre: 'portaDaCabine', rotuloEm: [980, 327] },
   { id: 'largura', vista: 'frontal', em: [xMax, 900], sobre: 'silhuetaFrontal', rotuloEm: [1060, 900] },
   { id: 'vinco', vista: 'frontal', em: [xMax, Y_VINCO], sobre: 'silhuetaFrontal', rotuloEm: [1060, Y_VINCO + 60] },
-  { id: 'vaoTraseiro', vista: 'traseira', em: [900, 1500], sobre: 'portaTraseiraEsq', rotuloEm: [1060, 1500], rotuloAncora: 'end' },
+  { id: 'vaoTraseiro', vista: 'traseira', em: [900, 900], sobre: 'portaTraseiraEsq', rotuloEm: [1060, 700], rotuloAncora: 'end' },
 ];
 const mil = (v) => Math.round(v).toLocaleString('pt-BR');
 const num = (v) => String(v).replace('.', ',');
@@ -471,9 +485,10 @@ export const ESPEC = {
     { vista: 'frontal', de: [-M.bitola / 2, 0], ate: [M.bitola / 2, 0], desloca: [0, 36], extensao: true, texto: `bitola ${mil(M.bitola)}` },
     { vista: 'frontal', de: [xPneuDentro, 0], ate: [xPneuFora, 0], desloca: [0, 16], extensao: true, numero: [34, 3], texto: mil(M.pneuLargura) },
     /* traseira: vão das duas portas acima do teto e largura de um vidro dentro dele */
-    { vista: 'traseira', de: [900, 2380], ate: [-900, 2380], desloca: [0, -31], extensao: true, texto: `vão das portas ${mil(1800)}` },
+    { vista: 'traseira', de: [xPortaTraseiraTopo, TOPO_PORTA_TRASEIRA], ate: [-xPortaTraseiraTopo, TOPO_PORTA_TRASEIRA], desloca: [0, -31], extensao: true, texto: `vão no alto ${mil(2 * xPortaTraseiraTopo)}` },
+    { vista: 'traseira', de: [900, 1000], ate: [-900, 1000], numero: [-75, -12], texto: `vão ${mil(1800)}` },
     { vista: 'traseira', de: [xMax, M.soleira], ate: [-xMax, M.soleira], desloca: [0, M.soleira * ESCALA + 20], extensao: true, texto: mil(M.largura) },
-    { vista: 'traseira', dono: 'vidroTraseiroEsq', de: [80, 1950], ate: [820, 1950], texto: mil(740) },
+    { vista: 'traseira', dono: 'vidroTraseiroEsq', de: [JANELA_TRASEIRA.dentro, 1950], ate: [JANELA_TRASEIRA.dentro + larguraDaJanelaEm(1950), 1950], texto: mil(larguraDaJanelaEm(1950)) },
     { vista: 'frontal', dono: 'paraBrisa', de: [-pontaDoVidro(Y_COTA_VIDRO), Y_COTA_VIDRO], ate: [pontaDoVidro(Y_COTA_VIDRO), Y_COTA_VIDRO], texto: mil(2 * pontaDoVidro(Y_COTA_VIDRO)) },
     /* de cima, a profundidade do vidro entre a borda de baixo e a de cima, a mesma que a lateral dá a 55 graus */
     { vista: 'planta', dono: 'paraBrisaDeCima', de: [zVidroTopo, 500], ate: [zVidroBase, 500], texto: mil(zVidroBase - zVidroTopo) },
@@ -499,6 +514,7 @@ export const ESPEC = {
       `Teto na lateral: curva contínua de raio ${RAIO_TOPO_VIDRO} saindo do topo do para-brisa e ${RAIO_TESTA} até o teto, que começa em z ${Math.round(zTetoPlano)}.`,
       `Teto: raio ${RAIO_QUINA_TRASEIRA} na quina traseira (lateral) e ${RAIO_QUINA_TETO} nas quinas com a lateral (frontal e traseira).`,
       `Laterais: verticais em ${mil(M.largura)} até o vinco (${mil(Y_VINCO)}), fechando ${(INCLINACAO_LATERAL).toFixed(1).replace('.', ',')} graus até o teto (${mil(LARGURA_NO_TETO)} no prolongamento, teto plano com ${mil(2 * xTetoPlano)}).`,
+      `Vão traseiro: ${mil(1800)} até o vinco e ${mil(2 * xPortaTraseiraTopo)} no topo das portas, sempre ${FOLGA_QUINA_TRASEIRA} mm dentro da lateral; janelas com 740 na base e ${mil(larguraDaJanelaEm(JANELA_TRASEIRA.topo))} no topo.`,
       `Para-brisa: flecha ${FLECHA_TOPO} em cima e ${Math.round(flechaBase)} embaixo na frontal; coluna em x ±${Math.round(xPontaBase)} na base e ±${Math.round(xPontaTopo)} no topo; de cima, pontas ${Math.round(recuoDaPonta)} mm atrás do centro, dobrando na quina de raio ${QUINA_VIDRO}.`,
       `De cima, o vidro vai de z ${Math.round(zVidroBase)} a ${Math.round(zVidroTopo)}: as bordas dele a ${vidroBaseY} e ${vidroTopoY} de altura, 20 e 25 mm dentro do pé e do topo do para-brisa da lateral.`,
       ...linhasDeLandmarks(),
