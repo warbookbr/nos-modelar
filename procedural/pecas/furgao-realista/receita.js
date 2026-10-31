@@ -105,7 +105,11 @@ export const TABELA = {
   passo_anel: 150,
   passo_lado: 130,
   margem_coluna: 35,
+  colunas_do_capo_y: 900, // do anel de baixo do capô (acima dos arcos) em diante, três colunas da lateral andam junto com o fim da quina
+  colunas_do_capo: 3,
+  colunas_do_capo_passo: 60,
   passo_arco_graus: 3,
+  tampas_aneis: 2, // quantos anéis acima do ponto do arco a tampa dele sobe antes de a coluna acabar, para o leque dos anéis ficar longe da fresta
   ombro_y: 2280,
   aneis_do_ombro: 6,
 
@@ -750,7 +754,7 @@ export function derivar(T) {
     const zonas = [];
     if (an.horizontal) {
       const iH = horizontais.indexOf(an);
-      const yAntes = iH > 0 ? horizontais[iH - 1].y : -Infinity;
+      const yAntes = iH > T.tampas_aneis - 1 ? horizontais[iH - T.tampas_aneis].y : -Infinity;
       for (const arco of arcos) {
         const pts = arco.pontos;
         if (an.y <= yBase + 1e-9) {
@@ -782,6 +786,18 @@ export function derivar(T) {
       const zS0 = itens.find((it) => it.col === 'S0')?.z ?? sec.zF - sec.rF;
       for (let j = 1; j <= T.vao_canto_degraus; j += 1) {
         itens.push({ col: `S${j}`, z: zS0 - j * T.vao_canto_passo_cabine, y: sec.yS }, { col: `T${j}`, z: zVidroCabTras + j * T.vao_canto_passo_cabine, y: sec.yS });
+      }
+    }
+    /* No capô e no para-lama, onde a quina acaba mais para trás a cada anel, as colunas de enchimento da lateral ficam em z fixo e a
+       primeira delas ao lado do fim da quina (E) se afasta e some a cada poucos anéis: a face ao lado de E oscila de 40 a 150 mm e a
+       luz rasante mostra a beira do capô em degraus. Colunas_do_capo colunas sobem junto com E, a colunas_do_capo_passo uma da outra, e as de z fixo
+       que cairiam perto delas saem (são estruturais). */
+    if (an.horizontal && an.y >= T.colunas_do_capo_y && itens.length > 0) {
+      const zE = sec.zF - sec.rF;
+      const zProximo = Math.max(...itens.map((it) => it.z));
+      for (let j = 1; j <= T.colunas_do_capo; j += 1) {
+        const z = zE - j * T.colunas_do_capo_passo;
+        if (z > zProximo + T.margem_coluna + 5) itens.push({ col: `F${j}`, z, y: sec.yS });
       }
     }
     const estruturais = [...itens];
@@ -865,15 +881,18 @@ export function derivar(T) {
     { rs: aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y), cMeio: meioDoVidroTraseiro, cantos: ['r1', `r${iForaTraseiro}`] },
   ];
   const diagonaisDosCantos = [];
+  const arcosDosCantos = [];
   for (const { rs, cMeio, cantos } of cantosDosVaos) {
     const k = T.vao_canto_degraus;
     for (const cF of cantos) {
       for (const sub2 of [rs.slice(0, k + 1), rs.slice(rs.length - k - 1).reverse()]) {
         const cols = colunasDoCanto(sub2, cF, cMeio);
-        for (let j = 0; j < k; j += 1) {
-          const nome = (r, c) => r.lista.find((q) => q.col === c).nome;
-          diagonaisDosCantos.push([nome(sub2[j], cols[j]), nome(sub2[j + 1], cols[j + 1])]);
-        }
+        const nome = (r, c) => r.lista.find((q) => q.col === c).nome;
+        for (let j = 0; j < k; j += 1) diagonaisDosCantos.push([nome(sub2[j], cols[j]), nome(sub2[j + 1], cols[j + 1])]);
+        arcosDosCantos.push({
+          p00: nome(sub2[0], cols[0]), p10: nome(sub2[0], cols[k]), p01: nome(sub2[k], cols[0]), p11: nome(sub2[k], cols[k]),
+          cadeia: Array.from({ length: k - 1 }, (_, j) => nome(sub2[j + 1], cols[j + 1])),
+        });
       }
     }
   }
@@ -918,6 +937,19 @@ export function derivar(T) {
     }
   }
 
+  /* Os nós de dentro da diagonal de cada canto saem da diagonal e vão para o arco: o bloco de k por k células do canto vira um
+     remendo bilinear, com a quina do vão (a coluna de fora no anel da borda) em (1, 0) e o fim da diagonal em (1, 1), e o arco de
+     raio 1 tangente à borda no começo da diagonal e à coluna de fora no fim dela passa por esses nós, em (sen a, 1 - cos a), a
+     = 90 graus vezes j sobre k. Com a diagonal reta o canto saía em chanfro, de dois cantos de 45 graus. */
+  for (const { p00, p10, p01, p11, cadeia } of arcosDosCantos) {
+    const k = cadeia.length + 1;
+    const [a, b, c, d] = [p00, p10, p01, p11].map((n) => P.get(n));
+    cadeia.forEach((n, j) => {
+      const ang = (Math.PI / 2) * ((j + 1) / k);
+      const u = Math.sin(ang); const w = 1 - Math.cos(ang);
+      P.set(n, [0, 1, 2].map((e) => (1 - u) * (1 - w) * a[e] + u * (1 - w) * b[e] + (1 - u) * w * c[e] + u * w * d[e]));
+    });
+  }
   /* a partição das células das diagonais dos cantos dos vãos */
   for (const [p, q] of diagonaisDosCantos) {
     const i = facesE.findIndex((fc) => fc.includes(p) && fc.includes(q));
