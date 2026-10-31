@@ -1506,7 +1506,7 @@
 
 ## procedural/pecas/furgao-realista/
 
-- `receita.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 1 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
+- `receita.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 
 ## procedural/pecas/furgao-realista/referencias/
 
