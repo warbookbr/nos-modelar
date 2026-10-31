@@ -1506,11 +1506,11 @@
 
 ## procedural/pecas/furgao-realista/
 
-- `receita.js` — furgao-realista — cópia do `furgao` do acervo, ponto de partida do furgão realista (plano docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no b…
+- `receita.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 1 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 
 ## procedural/pecas/furgao-realista/referencias/
 
-- `alvo.md` — Alvo: furgao
+- `alvo.md` — Alvo: furgao-realista
 - `quatro-vistas.prancha.mjs` — quatro-vistas.prancha.mjs — a prancha ortográfica cotada do furgao-realista, alvo de medida das etapas de modelagem (skill desenhar-prancha, contrato docs/mo…
 
 ## procedural/pecas/furgao/referencias/

@@ -1,553 +1,618 @@
-/* furgao-realista — cópia do `furgao` do acervo, ponto de partida do furgão realista (plano
- * docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no banco de provas furgao-realista-2026-10-30). Até a
- * etapa 1 da modelagem a forma é a do `furgao`, igual em cada medida: furgão (van) estilizado, azul, de volume único alto e longo, capô curto inclinado, para-brisa grande, cabine que afunila
- * para o teto, painel de teto, janela lateral só na frente, vidro traseiro, faixa cinza de chassi mais larga que a carroceria,
- * para-lamas em cápsula em volta das rodas, faróis amarelos, grade cinza, para-choques e placas claras.
+/* furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 1 de 7 da modelagem (plano
+ * docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no banco de provas furgao-realista-2026-10-30): a lataria base,
+ * uma chapa contínua só (cabine, carga e teto) com a silhueta lateral, frontal, traseira e de cima da prancha cotada
+ * (referencias/quatro-vistas.prancha.png), os arcos das quatro rodas recortados e as quinas arredondadas, e quatro rodas
+ * provisórias em cilindro para a pessoa julgar a proporção. A chapa ainda não tem vãos de janela, frestas de porta, vinco nem
+ * nervuras (etapa 2); o corpo de baixo, os para-choques, as rodas da família, os vidros, as luzes e o acabamento vêm nas etapas 3 a 7.
  *
- * Origem: recriado em primitivas do núcleo a partir do modelo "van" do pacote A, de autor A (pacote A, endereço omitido,
- * endereço da página: endereço omitido), licença livre sem exigência de crédito (declarada no License.txt do pacote). A
- * malha de origem NÃO está no repositório: ela fica em importados/veiculos-livres/pacote-a/van.glb, que o git ignora. O que entra aqui
- * são as medidas tiradas dela (as do `furgao`, em procedural/pecas/furgao/referencias/fonte-partes.json, em metro, escala 1,765) e as vistas (referencias/fonte-vistas.png).
- * O que não ficou igual à referência está em referencias/alvo.md.
+ * Origem: a peça nasceu como cópia do `furgao` do acervo, recriado em primitivas do núcleo a partir do modelo "van" do pacote A, de
+ * autor A (pacote A, endereço omitido, endereço da página: endereço omitido), licença livre sem exigência de crédito (declarada no
+ * License.txt do pacote). A malha de origem NÃO está no repositório. Da cópia não sobra forma: as medidas agora são as de classe do
+ * alinhamento, desenhadas na prancha, e o `furgao` fica só como referência de caráter (referencias/fonte-vistas.png).
  *
- * Referencial do acervo: Y para cima, o chão em y = 0, a frente do furgão em +z, x para a direita de quem olha de frente, centrado
- * em x e z. A TABELA é em milímetro e é a única fonte das medidas; `derivar` calcula as formas e `gerarPassos` escreve, por parte,
- * a forma, a `parte` e o `material`. A conversão para metro está em `m`, num lugar só. Nenhuma posição é digitada no passo.
+ * Referencial do acervo: Y para cima, o chão em y = 0, a frente do furgão em +z, x para a direita de quem olha o furgão de frente
+ * (o lado direito do furgão é o -x), centrado em x e em z no comprimento total. A TABELA é em milímetro e é a única fonte das
+ * medidas; `derivar` calcula a gaiola e as rodas e `gerarPassos` escreve, por parte, a forma, a `parte` e o `material`. A conversão
+ * para metro está em `m`, num lugar só. Nenhuma posição é digitada no passo.
  *
- * Como a forma é feita (estrutura do carro-taxi, que vem do carro-sedan-compacto): a carroceria é uma extrusão em x do perfil
- * lateral, com os arcos das rodas recortados no próprio perfil. A cabine, o painel de teto, o chassi e os vidros são a INTERSEÇÃO
- * de duas extrusões, o perfil lateral (z, y) em x e a seção frontal (x, y) em z, e por isso afunilam e têm a saia inclinada sem
- * nenhum vértice calculado em 3D; os vidros usam o mesmo plano da face que cobrem, e o contato fecha exato. Uma extrusão com
- * `eixo: 'x'` leva o perfil [u, v] a y = -u e z = v; com `eixo: 'z'`, a x = u e y = -v. As rodas são revoluções em torno de x
- * (`lathe`), o pneu com o chanfro e o aro faceado com ele. A caixa de roda é o próprio arco do perfil, fechado e extrudado entre
- * as faces de dentro dos dois pneus.
+ * Como a chapa é feita. A carroceria é uma superfície por subdivisão (`subdivisao`) de uma gaiola de quadriláteros escrita aqui,
+ * na metade x >= 0 com `simetria: 'x'`, e fechada numa chapa pela espessura. A gaiola tem duas grades costuradas: a das paredes,
+ * em anéis horizontais que dão a volta na planta (da frente no plano de simetria, pela quina da frente, pela lateral, pela quina
+ * de trás, até a traseira no plano de simetria), e a da cobertura, o teto plano entre o último anel e a costura. Cada anel é a
+ * fatia da carroceria naquela altura: a frente segue o perfil lateral (nariz, degrau do para-choque, boca, capô, para-brisa,
+ * testa), a traseira o perfil de trás, a lateral a seção frontal e as quinas o raio da planta. Perto do teto os anéis deixam de
+ * ser horizontais e seguem os raios do ombro (lateral, testa e quina de trás) pela fração do arco de cada um. As alturas dos
+ * anéis saem dos perfis, mais densas onde eles viram, e o passo entre anéis é graduado. A borda de baixo da lateral contorna os
+ * dois arcos de roda, e a faixa da lateral entre a soleira e a altura em que ela deixa de ser vertical é plana: o miolo dela
+ * sai da grade de Winslow, que leva as colunas em volta dos arcos sem dobrar a face junto da ponta deles. A superfície não
+ * tem medidas: com todos os pontos medidos o ajuste das medidas, denso, levava minutos, e onde a chapa é plana a superfície
+ * limite passa pelos pontos de qualquer jeito; nos raios ela fica para dentro da gaiola alguns milímetros, que a medida da
+ * silhueta contra a prancha confere.
+ * Os pontos da gaiola são derivados da TABELA e moram em `TOPO`, por um getter que lê `this.PARAMS`.
  */
 
 export const TABELA = {
-  lados: 24, // contagem de lados dos pneus e dos arcos (a mesma, para os arcos coincidirem com a caixa de roda)
-  prisma_meia_largura: 1500, // os prismas de corte passam do furgão em x e em z; só a interseção com o outro prisma vira parte
-  prisma_meia_profundidade: 2530,
+  // envelope da classe (prancha): 5400 de comprimento, 2000 de largura sem retrovisores, 2500 de altura, soleira em 300
+  comprimento: 5400,
+  meia_largura: 1000,
+  altura: 2500,
+  soleira_y: 300,
 
-  // carroceria azul: perfil lateral de y 883 (sobre o chassi) à cintura; nariz vertical, capô inclinado, traseira vertical
-  carroceria_meia_largura: 971,
-  topo_chassi_y: 883,
-  cintura_y: 1412,
-  nariz_z: 2250,
-  nariz_topo_y: 1145,
-  capo_z: 2162,
-  capo_y: 1258,
-  capo_fim_z: 1544,
-  traseira_z: -2339,
+  // rodas e arcos: entre-eixos e balanço dianteiro (o traseiro sai da diferença), bitola, pneu 225/65 aro 16, arco com 65 mm de folga
+  entre_eixos: 3300,
+  balanco_dianteiro: 980,
+  bitola: 1700,
+  pneu_diametro: 710,
+  pneu_largura: 225,
+  arco_raio: 420,
 
-  // chassi cinza: a soleira (mais larga, de y 353 a 530) e a saia inclinada de 853 a 971 de meia largura, de y 530 a 883
-  chassi_meia_largura: 1147,
-  chassi_base_y: 353,
-  soleira_topo_y: 530,
-  saia_x_base: 853,
-  chassi_frente_z: 2162,
-  chassi_tras_z: -2162,
-  chanfro_frente_z: 2191, // pé do chanfro de baixo do nariz, sobre o para-choque
-  chanfro_tras_z: -2222, // pé do chanfro de baixo da traseira, sobre o para-choque
+  // perfil da frente, em [z, y]: nariz vertical até o topo do para-choque, degrau dele, boca do capô, capô curto, para-brisa e testa
+  raio_nariz_base: 50,
+  parachoque_topo_y: 720,
+  raio_parachoque_topo: 30,
+  degrau_frente_recuo: 40,
+  degrau_frente_y: 760,
+  raio_degrau_frente: 10,
+  capo_comprimento: 860, // em z, da boca ao pé do para-brisa
+  capo_angulo: 22.5,
+  raio_boca: 20,
+  base_vidro_recuo: 940, // do nariz ao pé do para-brisa, em z
+  base_vidro_y: 1310,
+  raio_base_vidro: 90,
+  para_brisa_angulo: 55,
+  topo_vidro_y: 1990,
+  raio_topo_vidro: 300,
+  testa_recuo: 200, // do topo do para-brisa ao canto da testa no teto, em z
+  raio_testa: 200, // a prancha cota 300, mas o filete dela fica limitado à metade do trecho de antes e sai com 200
 
-  // cabine: afunila de 971 de meia largura na cintura a 794 no teto; o para-brisa e o vidro de trás são as faces inclinadas
-  cabine_meia_largura_topo: 794,
-  teto_y: 2295,
-  pilar_topo_z: 1191,
-  teto_tras_z: -1986,
+  // perfil de trás: traseira vertical recuada sobre o degrau do para-choque, quina do teto com raio
+  traseira_recuo: 30,
+  degrau_tras_y: 570,
+  degrau_tras_rampa: 20, // o degrau horizontal da prancha vira uma rampa curta, porque cada anel é uma fatia horizontal
+  raio_traseira_base: 40,
+  raio_quina_traseira: 120,
 
-  // painel de teto: faixa mais escura sobre o teto, com as pontas inclinadas
-  painel_meia_largura: 529,
-  painel_topo_y: 2383,
-  painel_frente_base_z: 926,
-  painel_frente_topo_z: 859,
-  painel_tras_topo_z: -1655,
-  painel_tras_base_z: -1721,
+  // seção frontal, em [x, y]: lateral vertical até 1450 e quase vertical até o teto, quina do teto com raio
+  lateral_reta_ate_y: 1450,
+  meia_largura_no_teto: 982,
+  raio_lateral: 600,
+  raio_ombro: 170,
 
-  // vidros azul claros: placas sobre as faces da cabine
-  vidro_espessura: 10,
-  parabrisa_y1: 2131,
-  parabrisa_meia_largura_y0: 791,
-  parabrisa_meia_largura_y1: 648,
-  vidro_traseiro_y0: 1576,
-  vidro_traseiro_y1: 2131,
-  vidro_traseiro_meia_largura_y0: 758,
-  vidro_traseiro_meia_largura_y1: 648,
-  vidro_lateral_espessura: 12,
-  vidro_lateral_frente_z: 1354,
-  vidro_lateral_topo_frente_z: 1070,
-  vidro_lateral_tras_z: 391,
-  vidro_lateral_topo_y: 2121,
+  // planta: raio das quinas verticais na frente (do para-choque à coluna do para-brisa) e atrás, e na borda do teto plano
+  raio_planta_frente: 280,
+  raio_coluna_base: 160,
+  raio_coluna_topo: 120,
+  raio_teto_frente: 100,
+  raio_planta_tras: 100,
+  raio_teto_tras: 40,
 
-  // rodas: pneu de 1060 mm de diâmetro e 618 de largura, com chanfro; o aro cinza é faceado com a face de fora do pneu
-  roda_raio: 530,
-  roda_x_dentro: 441,
-  roda_x_fora: 1059,
-  roda_z_frente: 1386,
-  roda_z_tras: -1297,
-  pneu_face_raio: 450,
-  pneu_chanfro: 177,
-  aro_raio: 321,
-  aro_espessura: 120, // o aro enche um bolsão de 120 mm na face de fora do pneu
-  cubo_raio: 213,
-  cubo_fundo_raio: 160,
-  cubo_fundo_prof: 88,
+  // chapa: espessura e níveis da subdivisão (com 2 níveis a chapa passa de 250 mil faces, que o adaptador da cena não carrega)
+  espessura: 2,
+  niveis: 1,
+  nitidez_dobra_frente: 0.9, // o topo do para-choque e a boca do capô, de raio curto na prancha
 
-  // arcos: o do perfil (a caixa de roda enche o mesmo arco) e a cápsula do para-lama em volta dele
-  arco_raio: 575,
-  para_lama_raio: 688,
-
-  // para-choques: de y 353 a 706, com a planta de quinas cortadas em duas retas; placas octogonais saindo deles
-  para_choque_y1: 706,
-  planta_x0: 1147,
-  planta_x1: 1096,
-  planta_z1: 2286,
-  planta_x2: 971,
-  planta_z2: 2338,
-  placa_x0: 309,
-  placa_x1: 221,
-  placa_y0: 265,
-  placa_y1: 353,
-  placa_y2: 485,
-  placa_y3: 574,
-  placa_z_frente: 2427,
-  placa_z_tras: -2427,
-
-  // frente: grade cinza entre os faróis, faróis em casca sobre o nariz e o capô
-  grade_meia_largura: 376,
-  grade_y1: 1059,
-  grade_prof: 12,
-  farol_x0: 607,
-  farol_y0: 1059,
-  farol_prof: 12,
-
-  // traseira, retrovisores
-  lanterna_x0: 485,
-  lanterna_y0: 1059,
-  lanterna_y1: 1236,
-  lanterna_espessura: 12,
-  retrovisor_x1: 1324,
-  retrovisor_y0: 1236,
-  retrovisor_y1: 1590,
-  retrovisor_z0: 966,
-  retrovisor_z1: 1143,
+  // gaiola: passo dos anéis ao longo dos perfis e giro máximo entre dois anéis; folga mínima entre anéis; passo das colunas;
+  // a altura onde os anéis deixam de ser horizontais e quantos anéis sobem os raios do ombro; as iterações da grade da faixa dos arcos
+  passo_perfil: 140,
+  giro_max: 30,
+  folga_entre_aneis: 8,
+  passo_anel: 150,
+  passo_frente: 120,
+  passo_lado: 160,
+  passo_arco: 130,
+  colunas_quina_frente: 4,
+  colunas_quina_tras: 4,
+  ombro_y: 2280,
+  aneis_do_ombro: 6,
+  iteracoes_da_faixa: 400,
 };
 
 const m = (mm) => mm / 1000;
+const grau = Math.PI / 180;
+const lerp = (a, b, t) => a + (b - a) * t;
+const suave = (t) => { const u = Math.min(1, Math.max(0, t)); return u * u * (3 - 2 * u); };
 
-/* ---------- geometria 2D em milímetro ---------- */
+/* ---------- curvas 2D em milímetro ---------- */
 
-const area = (l) => l.reduce((s, [a, b], i) => { const [c, d] = l[(i + 1) % l.length]; return s + (a * d - c * b); }, 0) / 2;
-const antihorario = (l) => (area(l) < 0 ? [...l].reverse() : l);
-/* o núcleo gira a extrusão em x de y para x: [u, v] vai a y = -u, z = v. Entra [z, y]. */
-const perfilLateral = (zy) => antihorario(zy.map(([z, y]) => [-y, z]));
-/* a extrusão em z leva [u, v] a x = u, y = -v. Entra [x, y]. */
-const secaoFrontal = (xy) => antihorario(xy.map(([x, y]) => [x, -y]));
-
-/* O polígono de `n` lados de uma roda, em [z, y], percorrido no sentido horário a partir da esquerda (z menor). */
-function circuloHorario(zc, yc, r, n) {
-  return Array.from({ length: n }, (_, k) => {
-    const a = Math.PI - (2 * Math.PI * k) / n;
-    return [Math.round((zc + r * Math.cos(a)) * 1e6) / 1e6, Math.round((yc + r * Math.sin(a)) * 1e6) / 1e6]; // arredonda o ruído de ponto flutuante: sen(180°) deixa de ser 1e-16
-  });
-}
-
-/* Insere no anel os pontos em que as arestas cruzam o nível y; os pontos inseridos têm o y exato do nível. */
-function comNivel(anel, y) {
-  const saida = [];
-  anel.forEach((a, i) => {
-    const b = anel[(i + 1) % anel.length];
-    saida.push(a);
-    if ((a[1] - y) * (b[1] - y) < 0) { const t = (y - a[1]) / (b[1] - a[1]); saida.push([a[0] + t * (b[0] - a[0]), y]); }
-  });
-  return saida;
-}
-const anelCortado = (zc, yc, r, n, niveis) => niveis.reduce((anel, y) => comNivel(anel, y), circuloHorario(zc, yc, r, n));
-
-/* O trecho do anel que vai do ponto `de` ao ponto `ate`, no sentido horário. */
-function percorrer(anel, de, ate) {
-  const saida = [];
-  for (let i = de; ; i = (i + 1) % anel.length) { saida.push(anel[i]); if (i === ate) break; }
-  return saida;
-}
-
-/* A parte do arco acima do nível y: da esquerda, por cima, até a direita, em ordem crescente de z, cortada em y. */
-function capaAcima(zc, yc, r, n, y) {
-  const anel = anelCortado(zc, yc, r, n, [y]);
-  return percorrer(anel, anel.findIndex((p) => p[1] === y && p[0] < zc), anel.findIndex((p) => p[1] === y && p[0] > zc));
-}
-
-/* O trecho de um lado do arco entre os níveis yBaixo e yAlto: no lado direito vai de cima para baixo; no esquerdo, de baixo para cima. */
-function trechoDoArco(zc, yc, r, n, lado, yBaixo, yAlto) {
-  const anel = anelCortado(zc, yc, r, n, [yBaixo, yAlto]);
-  const no = (y) => anel.findIndex((p) => p[1] === y && (lado > 0 ? p[0] > zc : p[0] < zc));
-  return lado > 0 ? percorrer(anel, no(yAlto), no(yBaixo)) : percorrer(anel, no(yBaixo), no(yAlto));
-}
-
-/* x (ou z) ao longo de y pela reta que passa por (y0, x0) e (y1, x1), válida também fora do intervalo. */
-const reta = (y0, x0, y1, x1) => (y) => x0 + ((x1 - x0) * (y - y0)) / (y1 - y0);
-/* O paralelogramo da aresta P-Q da cabine deslocado `e` para fora, na direção da normal `n`; a face de dentro usa os mesmos vértices da cabine. */
-function placaSobre(P, Q, e, n) {
-  const k = e / Math.hypot(...n);
-  return [P, Q, [Q[0] + n[0] * k, Q[1] + n[1] * k], [P[0] + n[0] * k, P[1] + n[1] * k]];
-}
-const espelho = (pts) => [...pts, ...[...pts].reverse().map(([x, z]) => [-x, z])];
-
-/* ---------- derivar ---------- */
-
-/* Cada forma tem `nome`, `forma` (vistas, lateral, planta, secaoZ, cubo ou lathe), `material` e as medidas da forma, em milímetro. */
-export function derivar(T) {
-  const M = T.carroceria_meia_largura;
-  const C = T.chassi_meia_largura;
-  const yR = T.roda_raio;
-  const zF = T.roda_z_frente;
-  const zT = T.roda_z_tras;
-  const y0 = T.chassi_base_y;
-  const y1 = T.topo_chassi_y;
-  const rodas = [];
-  for (const s of [1, -1]) {
-    for (const [ponta, zc] of [['Frente', zF], ['Tras', zT]]) rodas.push({ s, lado: s > 0 ? 'Dir' : 'Esq', ponta, zc });
+/* A poligonal com o raio de cada canto ([u, v, raio?]) virada em polilinha densa: cada canto com raio vira arco tangente aos dois
+   trechos, amostrado a cada grau. O canto sem raio fica vivo. */
+function contornoComRaios(pts) {
+  const saida = [[pts[0][0], pts[0][1]]];
+  for (let i = 1; i < pts.length - 1; i += 1) {
+    const [px, py, r = 0] = pts[i];
+    const a = pts[i - 1]; const b = pts[i + 1];
+    const d1 = [px - a[0], py - a[1]]; const l1 = Math.hypot(...d1);
+    const d2 = [b[0] - px, b[1] - py]; const l2 = Math.hypot(...d2);
+    const u1 = [d1[0] / l1, d1[1] / l1]; const u2 = [d2[0] / l2, d2[1] / l2];
+    const giro = Math.atan2(u1[0] * u2[1] - u1[1] * u2[0], u1[0] * u2[0] + u1[1] * u2[1]);
+    if (!r || Math.abs(giro) < 1e-9) { saida.push([px, py]); continue; }
+    const t = r * Math.tan(Math.abs(giro) / 2);
+    if (t > l1 / 2 + 1e-6 || t > l2 / 2 + 1e-6) throw new Error(`furgao-realista: o raio ${r} no canto [${px}, ${py}] não cabe entre os vizinhos`);
+    const t1 = [px - u1[0] * t, py - u1[1] * t];
+    const sinal = Math.sign(giro);
+    const n = [-u1[1] * sinal, u1[0] * sinal];
+    const c = [t1[0] + n[0] * r, t1[1] + n[1] * r];
+    const a0 = Math.atan2(t1[1] - c[1], t1[0] - c[0]);
+    const passos = Math.max(2, Math.ceil(Math.abs(giro) / grau));
+    for (let k = 0; k <= passos; k += 1) {
+      const ang = a0 + (giro * k) / passos;
+      saida.push([c[0] + r * Math.cos(ang), c[1] + r * Math.sin(ang)]);
+    }
   }
-  const arco = (zc, y) => capaAcima(zc, yR, T.arco_raio, T.lados, y);
-  const xCabine = reta(T.cintura_y, M, T.teto_y, T.cabine_meia_largura_topo);
-  const trapezio = (xDe, ya, yb) => [[-xDe(ya), ya], [xDe(ya), ya], [xDe(yb), yb], [-xDe(yb), yb]];
-  const zPilarFrente = reta(T.cintura_y, T.capo_fim_z, T.teto_y, T.pilar_topo_z);
-  const zPilarTras = reta(T.cintura_y, T.traseira_z, T.teto_y, T.teto_tras_z);
-  const formas = [];
+  saida.push([pts.at(-1)[0], pts.at(-1)[1]]);
+  return saida;
+}
 
-  /* carroceria: extrusão em x do perfil lateral, com os arcos das rodas no perfil (de trás para a frente na borda de baixo) */
-  formas.push({
-    nome: 'carroceria', forma: 'lateral', material: 'azul', x0: -M, largura: 2 * M,
-    lado: [
-      [T.nariz_z, y1], [T.nariz_z, T.nariz_topo_y], [T.capo_z, T.capo_y], [T.capo_fim_z, T.cintura_y], [T.traseira_z, T.cintura_y],
-      [T.traseira_z, y1], ...arco(zT, y1), ...arco(zF, y1),
-    ],
-  });
+/* O comprimento acumulado de uma polilinha. */
+function acumulado(pl) {
+  const s = [0];
+  for (let i = 1; i < pl.length; i += 1) s.push(s[i - 1] + Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][1] - pl[i - 1][1]));
+  return s;
+}
 
-  /* chassi em três trechos (frente, centro e trás), separados pelos arcos: o perfil lateral de y 353 a 883, e a seção frontal em
-   * degrau (soleira de 1147 de meia largura até y 530, saia inclinada de 853 a 971 até y 883) */
-  const xS = T.saia_x_base;
-  const degrau = [[-C, y0 - 50], [C, y0 - 50], [C, T.soleira_topo_y], [xS, T.soleira_topo_y], [M, y1], [M, y1 + 70],
-    [-M, y1 + 70], [-M, y1], [-xS, T.soleira_topo_y], [-C, T.soleira_topo_y]];
-  const arcoDir = (zc) => trechoDoArco(zc, yR, T.arco_raio, T.lados, 1, y0, y1);
-  const arcoEsq = (zc) => trechoDoArco(zc, yR, T.arco_raio, T.lados, -1, y0, y1);
-  formas.push({
-    nome: 'chassiFrente', forma: 'vistas', material: 'cinza', frontal: degrau,
-    lado: [...arcoDir(zF), [T.chassi_frente_z, y0], [T.chassi_frente_z, T.para_choque_y1], [T.chanfro_frente_z, T.para_choque_y1], [T.nariz_z, y1]],
-  });
-  formas.push({ nome: 'chassiCentro', forma: 'vistas', material: 'cinza', frontal: degrau, lado: [...arcoDir(zT), ...arcoEsq(zF)] });
-  formas.push({
-    nome: 'chassiTras', forma: 'vistas', material: 'cinza', frontal: degrau,
-    lado: [[T.chassi_tras_z, y0], ...arcoEsq(zT), [T.traseira_z, y1], [T.chanfro_tras_z, T.para_choque_y1], [T.chassi_tras_z, T.para_choque_y1]],
-  });
+/* O ponto da polilinha à distância `d` do começo. */
+function pontoNaDistancia(pl, s, d) {
+  let i = 1;
+  while (i < pl.length - 1 && s[i] < d) i += 1;
+  const t = s[i] === s[i - 1] ? 0 : Math.min(1, Math.max(0, (d - s[i - 1]) / (s[i] - s[i - 1])));
+  return [lerp(pl[i - 1][0], pl[i][0], t), lerp(pl[i - 1][1], pl[i][1], t)];
+}
 
-  /* cabine: o perfil lateral de pilar a pilar sobre a cintura, e a seção frontal que afunila da largura da carroceria ao teto */
-  formas.push({
-    nome: 'cabine', forma: 'vistas', material: 'azul',
-    lado: [[T.capo_fim_z, T.cintura_y], [T.pilar_topo_z, T.teto_y], [T.teto_tras_z, T.teto_y], [T.traseira_z, T.cintura_y]],
-    frontal: trapezio(xCabine, T.cintura_y - 110, T.teto_y + 105),
-  });
+/* O u da polilinha na altura v, pelo primeiro trecho que a atravessa (a polilinha sobe em v). */
+function uNaAltura(pl, v) {
+  for (let i = 1; i < pl.length; i += 1) {
+    const [u0, v0] = pl[i - 1]; const [u1, v1] = pl[i];
+    if ((v - v0) * (v - v1) <= 0 && v1 !== v0) return lerp(u0, u1, (v - v0) / (v1 - v0));
+  }
+  throw new Error(`furgao-realista: o perfil não chega à altura ${v}`);
+}
 
-  /* painel de teto: faixa de 1058 mm de largura, de y 2295 a 2383, com as duas pontas inclinadas */
-  const P = T.painel_meia_largura;
-  formas.push({
-    nome: 'painelTeto', forma: 'vistas', material: 'azulPainel',
-    lado: [[T.painel_frente_base_z, T.teto_y], [T.painel_frente_topo_z, T.painel_topo_y], [T.painel_tras_topo_z, T.painel_topo_y], [T.painel_tras_base_z, T.teto_y]],
-    frontal: [[-P, T.teto_y - 100], [P, T.teto_y - 100], [P, T.painel_topo_y + 50], [-P, T.painel_topo_y + 50]],
-  });
+/* O trecho da polilinha entre as alturas v0 e v1 (sobe em v), cortado nelas. */
+function trechoEntre(pl, v0, v1) {
+  const saida = [[uNaAltura(pl, v0), v0]];
+  for (const p of pl) if (p[1] > v0 + 1e-9 && p[1] < v1 - 1e-9) saida.push(p);
+  return saida;
+}
 
-  /* para-brisa e vidro traseiro: placas sobre as arestas inclinadas da cabine, com o trapézio frontal mais estreito que a cabine */
-  const yB0 = T.cintura_y;
-  const xParabrisa = reta(yB0, T.parabrisa_meia_largura_y0, T.parabrisa_y1, T.parabrisa_meia_largura_y1);
-  formas.push({
-    nome: 'parabrisa', forma: 'vistas', material: 'vidro',
-    lado: placaSobre([zPilarFrente(yB0), yB0], [zPilarFrente(T.parabrisa_y1), T.parabrisa_y1], T.vidro_espessura, [T.teto_y - T.cintura_y, T.capo_fim_z - T.pilar_topo_z]),
-    frontal: trapezio(xParabrisa, yB0, T.parabrisa_y1),
-  });
-  const xTraseiro = reta(T.vidro_traseiro_y0, T.vidro_traseiro_meia_largura_y0, T.vidro_traseiro_y1, T.vidro_traseiro_meia_largura_y1);
-  formas.push({
-    nome: 'vidroTraseiro', forma: 'vistas', material: 'vidro',
-    lado: placaSobre([zPilarTras(T.vidro_traseiro_y0), T.vidro_traseiro_y0], [zPilarTras(T.vidro_traseiro_y1), T.vidro_traseiro_y1],
-      T.vidro_espessura, [-(T.teto_y - T.cintura_y), T.teto_tras_z - T.traseira_z]),
-    frontal: trapezio(xTraseiro, T.vidro_traseiro_y0, T.vidro_traseiro_y1),
-  });
+/* O trecho da polilinha a partir do primeiro ponto em que ela atinge a altura v (o resto, até o fim). */
+function aPartirDe(pl, v) {
+  const s = acumulado(pl);
+  for (let i = 1; i < pl.length; i += 1) {
+    const [u0, v0] = pl[i - 1]; const [u1, v1] = pl[i];
+    if ((v - v0) * (v - v1) <= 0 && v1 !== v0) {
+      const p = [lerp(u0, u1, (v - v0) / (v1 - v0)), v];
+      return { pl: [p, ...pl.slice(i)], s0: s[i - 1] + Math.hypot(p[0] - u0, p[1] - v0) };
+    }
+  }
+  throw new Error(`furgao-realista: o perfil não chega à altura ${v}`);
+}
 
-  /* vidros laterais: a janela da frente em cada lado, uma casca de 12 mm sobre a face inclinada da cabine, com o recorte do retrovisor */
-  const janela = [
-    [T.vidro_lateral_tras_z, T.cintura_y], [T.retrovisor_z0, T.cintura_y], [T.retrovisor_z0, T.retrovisor_y1], [T.retrovisor_z1, T.retrovisor_y1],
-    [T.retrovisor_z1, T.cintura_y], [T.vidro_lateral_frente_z, T.cintura_y], [T.vidro_lateral_topo_frente_z, T.vidro_lateral_topo_y],
-    [T.vidro_lateral_tras_z, T.vidro_lateral_topo_y],
+/* As alturas em que o perfil pede anel: a cada `passo` de arco ou a cada `giroMax` graus de giro, o que vier antes. */
+function alturasDoPerfil(polilinha, passo, giroMax) {
+  /* os trechos retos longos (o capô, o para-brisa) se dividem antes, para o passo de arco valer dentro deles */
+  const pl = [polilinha[0]];
+  for (let i = 1; i < polilinha.length; i += 1) {
+    const [a, b] = [polilinha[i - 1], polilinha[i]];
+    const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / (passo / 8)));
+    for (let k = 1; k <= n; k += 1) pl.push([lerp(a[0], b[0], k / n), lerp(a[1], b[1], k / n)]);
+  }
+  const alturas = [pl[0][1]];
+  let arco = 0; let giro = 0;
+  for (let i = 1; i < pl.length; i += 1) {
+    arco += Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][1] - pl[i - 1][1]);
+    if (i + 1 < pl.length) {
+      const a = Math.atan2(pl[i][1] - pl[i - 1][1], pl[i][0] - pl[i - 1][0]);
+      const b = Math.atan2(pl[i + 1][1] - pl[i][1], pl[i + 1][0] - pl[i][0]);
+      let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+      giro += Math.abs(d) / grau;
+    }
+    if (arco >= passo || giro >= giroMax) { alturas.push(pl[i][1]); arco = 0; giro = 0; }
+  }
+  return alturas;
+}
+
+/* ---------- a forma, em milímetro ---------- */
+
+/** Os perfis, as funções de fatia e as medidas derivadas, tudo da TABELA. */
+export function forma(T) {
+  const zFrente = T.comprimento / 2;
+  const zTras = -T.comprimento / 2;
+  const xMax = T.meia_largura;
+  const ys = T.soleira_y;
+  const zD = zFrente - T.balanco_dianteiro;
+  const zT = zD - T.entre_eixos;
+  const rPneu = T.pneu_diametro / 2;
+
+  /* perfil da frente, [z, y], do pé do nariz ao teto */
+  const baseVidro = [zFrente - T.base_vidro_recuo, T.base_vidro_y];
+  const boca = [baseVidro[0] + T.capo_comprimento, baseVidro[1] - T.capo_comprimento * Math.tan(T.capo_angulo * grau)];
+  const topoVidro = [baseVidro[0] - (T.topo_vidro_y - baseVidro[1]) / Math.tan(T.para_brisa_angulo * grau), T.topo_vidro_y];
+  const testa = [topoVidro[0] - T.testa_recuo, T.altura];
+  const frenteDensa = contornoComRaios([
+    [zFrente - 4 * T.raio_nariz_base, ys], [zFrente, ys, T.raio_nariz_base], [zFrente, T.parachoque_topo_y, T.raio_parachoque_topo],
+    [zFrente - T.degrau_frente_recuo, T.degrau_frente_y, T.raio_degrau_frente], [...boca, T.raio_boca], [...baseVidro, T.raio_base_vidro],
+    [...topoVidro, T.raio_topo_vidro], [...testa, T.raio_testa], [testa[0] - 4 * T.raio_testa, T.altura],
+  ]);
+  /* o perfil começa no pé do raio do nariz (o trecho reto da soleira fica de fora) e acaba no fim do raio da testa, onde o teto é plano */
+  const frente = frenteDensa.slice(frenteDensa.findIndex((p) => p[0] > zFrente - T.raio_nariz_base - 1e-6));
+  const zTetoFrente = frente.find((p) => p[1] >= T.altura - 1e-9)[0];
+  const perfilFrente = frente.slice(0, frente.findIndex((p) => p[1] >= T.altura - 1e-9) + 1);
+
+  /* perfil de trás, [z, y], do pé da traseira ao teto */
+  const zTraseira = zTras + T.traseira_recuo;
+  const trasDensa = contornoComRaios([
+    [zTras + 4 * T.raio_traseira_base, ys], [zTras, ys, T.raio_traseira_base], [zTras, T.degrau_tras_y - T.degrau_tras_rampa / 2],
+    [zTraseira, T.degrau_tras_y + T.degrau_tras_rampa / 2], [zTraseira, T.altura, T.raio_quina_traseira],
+    [zTraseira + 4 * T.raio_quina_traseira, T.altura],
+  ]);
+  const tras = trasDensa.slice(trasDensa.findIndex((p) => p[0] < zTras + T.raio_traseira_base + 1e-6));
+  const zTetoTras = tras.find((p) => p[1] >= T.altura - 1e-9)[0];
+  const perfilTras = tras.slice(0, tras.findIndex((p) => p[1] >= T.altura - 1e-9) + 1);
+
+  /* seção frontal, [x, y], da soleira ao teto */
+  const lateralDensa = contornoComRaios([
+    [xMax, ys], [xMax, T.lateral_reta_ate_y, T.raio_lateral], [T.meia_largura_no_teto, T.altura, T.raio_ombro], [0, T.altura],
+  ]);
+  const xTetoLado = lateralDensa.find((p) => p[1] >= T.altura - 1e-9)[0];
+  const perfilLado = lateralDensa.slice(0, lateralDensa.findIndex((p) => p[1] >= T.altura - 1e-9) + 1);
+
+  /* raio da quina da frente na planta, por altura: o do para-choque até a boca, fechando até a coluna do para-brisa */
+  const raioFrente = (y) => {
+    if (y <= boca[1]) return T.raio_planta_frente;
+    if (y <= baseVidro[1]) return lerp(T.raio_planta_frente, T.raio_coluna_base, (y - boca[1]) / (baseVidro[1] - boca[1]));
+    if (y <= topoVidro[1]) return lerp(T.raio_coluna_base, T.raio_coluna_topo, (y - baseVidro[1]) / (topoVidro[1] - baseVidro[1]));
+    return lerp(T.raio_coluna_topo, T.raio_teto_frente, Math.min(1, (y - topoVidro[1]) / (T.altura - topoVidro[1])));
+  };
+
+  /* os arcos das rodas cortam a soleira onde o círculo de raio arco_raio, no centro da roda, cruza y = soleira */
+  const dzArco = Math.sqrt(T.arco_raio ** 2 - (ys - rPneu) ** 2);
+  return {
+    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa,
+    perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente,
+    zF: (y) => uNaAltura(perfilFrente, y),
+    zR: (y) => uNaAltura(perfilTras, y),
+    xs: (y) => uNaAltura(perfilLado, y),
+  };
+}
+
+/* ---------- a gaiola ---------- */
+
+/* As alturas dos anéis horizontais, com o nome de cada um: as alturas-chave com nome, as dos perfis e a grade de passo_anel,
+   fundidas a menos de folga_entre_aneis e graduadas para nenhum intervalo passar do dobro de um vizinho. */
+function aneisHorizontais(T, f) {
+  const chaves = [
+    ['soleira', f.ys], ['parachoque', T.parachoque_topo_y], ['degrauFrente', T.degrau_frente_y], ['degrauTras', T.degrau_tras_y - T.degrau_tras_rampa / 2], ['degrauTrasTopo', T.degrau_tras_y + T.degrau_tras_rampa / 2],
+    ['boca', f.boca[1]], ['baseVidro', f.baseVidro[1]], ['retaLateral', T.lateral_reta_ate_y], ['topoVidro', f.topoVidro[1]], ['ombro', T.ombro_y],
   ];
-  const yA = T.cintura_y - 110;
-  const yB = T.teto_y + 105;
-  const e = T.vidro_lateral_espessura;
-  for (const s of [1, -1]) {
-    formas.push({
-      nome: `vidroLateral${s > 0 ? 'Dir' : 'Esq'}`, forma: 'vistas', material: 'vidro', lado: janela,
-      frontal: [[s * xCabine(yA), yA], [s * (xCabine(yA) + e), yA], [s * (xCabine(yB) + e), yB], [s * xCabine(yB), yB]],
-    });
+  const nomeDe = new Map(chaves.map(([n, y]) => [y, n]));
+  const candidatos = [
+    ...alturasDoPerfil(trechoEntre(f.perfilFrente, f.ys, T.ombro_y), T.passo_perfil, T.giro_max),
+    ...alturasDoPerfil(trechoEntre(f.perfilTras, f.ys, T.ombro_y), T.passo_perfil, T.giro_max),
+  ];
+  const fixas = [...nomeDe.keys()].sort((a, b) => a - b);
+  const alturas = [...fixas];
+  for (const y of candidatos.filter((v) => v > f.ys && v < T.ombro_y).sort((a, b) => a - b)) {
+    if (alturas.every((h) => Math.abs(h - y) >= T.folga_entre_aneis)) alturas.push(y);
   }
-
-  /* para-choques: de y 353 a 706, com as quinas da planta cortadas em duas retas; placas octogonais saindo da face de fora */
-  const bordaF = [[T.planta_x0, T.chassi_frente_z], [T.planta_x1, T.planta_z1], [T.planta_x2, T.planta_z2]];
-  const bordaT = [[T.planta_x0, T.chassi_tras_z], [T.planta_x1, -T.planta_z1], [T.planta_x2, -T.planta_z2]];
-  const altPC = T.para_choque_y1 - y0;
-  formas.push({ nome: 'paraChoqueFrente', forma: 'planta', material: 'cinza', y0, altura: altPC, planta: espelho(bordaF) });
-  formas.push({ nome: 'paraChoqueTras', forma: 'planta', material: 'cinza', y0, altura: altPC, planta: espelho(bordaT) });
-  const octogono = [[-T.placa_x1, T.placa_y0], [T.placa_x1, T.placa_y0], [T.placa_x0, T.placa_y1], [T.placa_x0, T.placa_y2],
-    [T.placa_x1, T.placa_y3], [-T.placa_x1, T.placa_y3], [-T.placa_x0, T.placa_y2], [-T.placa_x0, T.placa_y1]];
-  formas.push({ nome: 'placaFrente', forma: 'secaoZ', material: 'cinzaClaro', z0: T.planta_z2, z1: T.placa_z_frente, secao: octogono });
-  formas.push({ nome: 'placaTras', forma: 'secaoZ', material: 'cinzaClaro', z0: T.placa_z_tras, z1: -T.planta_z2, secao: octogono });
-
-  /* grade cinza entre os faróis, na face da frente do nariz, sobre o para-choque */
-  formas.push({
-    nome: 'grade', forma: 'cubo', material: 'grade', larg: 2 * T.grade_meia_largura, alt: T.grade_y1 - T.para_choque_y1, prof: T.grade_prof,
-    em: [0, T.para_choque_y1, T.nariz_z + T.grade_prof / 2],
+  alturas.sort((a, b) => a - b);
+  /* onde os perfis não pedem anel (a lateral e a traseira retas), o intervalo se divide em partes iguais de até passo_anel */
+  for (let k = alturas.length - 2; k >= 0; k -= 1) {
+    const n = Math.ceil((alturas[k + 1] - alturas[k]) / T.passo_anel - 1e-9);
+    for (let i = n - 1; i >= 1; i -= 1) alturas.splice(k + 1, 0, lerp(alturas[k], alturas[k + 1], i / n));
+  }
+  for (let dividiu = true; dividiu;) {
+    dividiu = false;
+    for (let k = 0; k + 1 < alturas.length && !dividiu; k += 1) {
+      const vizinhos = [k > 0 ? alturas[k] - alturas[k - 1] : Infinity, k + 2 < alturas.length ? alturas[k + 2] - alturas[k + 1] : Infinity];
+      if (alturas[k + 1] - alturas[k] > 2 * Math.min(...vizinhos) + 1e-9) { alturas.splice(k + 1, 0, (alturas[k] + alturas[k + 1]) / 2); dividiu = true; }
+    }
+  }
+  let ultima = 'soleira'; let ordem = 0;
+  return alturas.map((y) => {
+    if (nomeDe.has(y)) { ultima = nomeDe.get(y); ordem = 0; return { nome: ultima, y }; }
+    ordem += 1;
+    return { nome: `${ultima}${ordem}`, y };
   });
+}
 
-  for (const s of [1, -1]) {
-    const lado = s > 0 ? 'Dir' : 'Esq';
-    /* farol: casca amarela sobre a quina do nariz, com a mesma inclinação do capô; a face de dentro usa os vértices do perfil da carroceria */
-    const f = T.farol_prof;
-    formas.push({
-      nome: `farol${lado}`, forma: 'lateral', material: 'amarelo', x0: s > 0 ? T.farol_x0 : -M, largura: M - T.farol_x0,
-      lado: [[T.nariz_z, T.farol_y0], [T.nariz_z + f, T.farol_y0], [T.nariz_z + f, T.nariz_topo_y], [T.capo_z + f, T.capo_y], [T.capo_z, T.capo_y], [T.nariz_z, T.nariz_topo_y]],
-    });
-    formas.push({
-      nome: `lanterna${lado}`, forma: 'cubo', material: 'lanterna', larg: M - T.lanterna_x0, alt: T.lanterna_y1 - T.lanterna_y0,
-      prof: T.lanterna_espessura, em: [(s * (T.lanterna_x0 + M)) / 2, T.lanterna_y0, T.traseira_z - T.lanterna_espessura / 2],
-    });
-    const larg = T.retrovisor_x1 - M;
-    formas.push({
-      nome: `retrovisor${lado}`, forma: 'cubo', material: 'azul', larg, alt: T.retrovisor_y1 - T.retrovisor_y0, prof: T.retrovisor_z1 - T.retrovisor_z0,
-      em: [s * (M + larg / 2), T.retrovisor_y0, (T.retrovisor_z0 + T.retrovisor_z1) / 2],
+/* Os trechos da borda de baixo da lateral, da frente para trás: soleira, arco dianteiro, soleira do meio, arco traseiro, soleira de
+   trás. Cada trecho dá pontos [z, y] e o número de divisões sai do passo. */
+function trechosDaSoleira(T, f, zIni, zFim) {
+  const arco = (zc) => (t) => {
+    const a0 = Math.atan2(f.ys - f.rPneu, f.dzArco); // -7,5 graus: o arco passa um pouco abaixo do centro da roda
+    const ang = lerp(a0, Math.PI - a0, t);
+    return [zc + T.arco_raio * Math.cos(ang), f.rPneu + T.arco_raio * Math.sin(ang)];
+  };
+  const reta = (z0, z1) => (t) => [lerp(z0, z1, t), f.ys];
+  const compArco = T.arco_raio * (Math.PI - 2 * Math.atan2(f.ys - f.rPneu, f.dzArco));
+  return [
+    { nome: 'soleiraFrente', ponto: reta(zIni, f.zD + f.dzArco), n: Math.max(1, Math.round((zIni - f.zD - f.dzArco) / T.passo_lado)) },
+    { nome: 'arcoDianteiro', ponto: arco(f.zD), n: Math.round(compArco / T.passo_arco) },
+    { nome: 'soleiraMeio', ponto: reta(f.zD - f.dzArco, f.zT + f.dzArco), n: Math.round((f.zD - f.zT - 2 * f.dzArco) / T.passo_lado) },
+    { nome: 'arcoTraseiro', ponto: arco(f.zT), n: Math.round(compArco / T.passo_arco) },
+    { nome: 'soleiraTras', ponto: reta(f.zT - f.dzArco, zFim), n: Math.max(1, Math.round((f.zT - f.dzArco - zFim) / T.passo_lado)) },
+  ];
+}
+
+/**
+ * derivar(T) -> a gaiola da chapa e as rodas provisórias, em milímetro e em metro.
+ *   pontos: os pontos nomeados da gaiola, em metro, que entram em TOPO;
+ *   passo: os campos do passo `subdivisao` (vertices, faces, cantos, medidas, simetria), só com nomes;
+ *   aneis, colunas: os nomes, para o teste e para a etapa seguinte citarem a gaiola por nome;
+ *   rodas: as quatro rodas provisórias, com o perfil do cilindro e a posição.
+ */
+export function derivar(T) {
+  const f = forma(T);
+  const nF = Math.max(2, Math.ceil((f.xMax - T.raio_planta_frente) / T.passo_frente));
+  const nCF = T.colunas_quina_frente;
+  const nCB = T.colunas_quina_tras;
+  if (nCF % 2 || nCB % 2) throw new Error('furgao-realista: as colunas das quinas precisam ser em número par, porque a cobertura do teto toma metade de cada quina');
+  const bc = nF + nCF / 2; // colunas da cobertura entre a costura e a lateral
+  const nB = bc - nCB / 2;
+  if (nB < 2) throw new Error('furgao-realista: a traseira ficou com menos de duas colunas; aumente as da frente ou diminua as da quina de trás');
+
+  /* a borda de baixo da lateral e as colunas dela */
+  const zIniLado = f.zF(f.ys) - f.raioFrente(f.ys);
+  const zFimLado = f.zR(f.ys) + T.raio_planta_tras;
+  const trechos = trechosDaSoleira(T, f, zIniLado, zFimLado);
+  const colunasLado = [];
+  const bordaDeBaixo = [];
+  trechos.forEach((tr, k) => {
+    const ate = k === trechos.length - 1 ? tr.n : tr.n - 1;
+    for (let i = 0; i <= ate; i += 1) { colunasLado.push(`${tr.nome}${i}`); bordaDeBaixo.push(tr.ponto(i / tr.n)); }
+  });
+  const nS = colunasLado.length - 1;
+
+  const colunas = [
+    ...Array.from({ length: nF + 1 }, (_, k) => `frente${k}`),
+    ...Array.from({ length: nCF - 1 }, (_, k) => `quinaFrente${k + 1}`),
+    ...colunasLado,
+    ...Array.from({ length: nCB - 1 }, (_, k) => `quinaTras${k + 1}`),
+    ...Array.from({ length: nB + 1 }, (_, k) => `tras${nB - k}`),
+  ];
+  const M = colunas.length - 1;
+
+  /* Um anel: as alturas e recuos de cada trecho, e o anel em [x, y, z] na ordem das colunas. `lado`, quando vem, dá os pontos
+     [z, y] da lateral, que a grade da faixa dos arcos calcula; sem ele a lateral é a fatia regular da altura yS. */
+  const anel = ({ yF, zF, yS, xS, yR, zR, rF, rB, lado = null }) => {
+    const pts = [];
+    const xFim = xS - rF;
+    for (let k = 0; k <= nF; k += 1) pts.push([(xFim * k) / nF, yF, zF]);
+    for (let k = 1; k < nCF; k += 1) {
+      const a = (k / nCF) * 90 * grau;
+      pts.push([xFim + rF * Math.sin(a), lerp(yF, yS, suave(k / nCF)), zF - rF + rF * Math.cos(a)]);
+    }
+    for (let j = 0; j <= nS; j += 1) {
+      if (lado) { const [z, y] = lado[j]; pts.push([f.xs(y), y, z]); } else pts.push([xS, yS, lerp(zF - rF, zR + rB, j / nS)]);
+    }
+    const xTras = xS - rB;
+    for (let k = 1; k < nCB; k += 1) {
+      const a = (k / nCB) * 90 * grau;
+      pts.push([xTras + rB * Math.cos(a), lerp(yS, yR, suave(k / nCB)), zR + rB - rB * Math.sin(a)]);
+    }
+    for (let k = nB; k >= 0; k -= 1) pts.push([(xTras * k) / nB, yR, zR]);
+    return pts;
+  };
+
+  /* A faixa dos arcos: a lateral da soleira até a altura em que ela deixa de ser vertical, onde é plana. A borda de baixo contorna
+     os arcos, a de cima é a fatia regular, e as pontas são as junções com as quinas em cada altura. O miolo sai da grade harmônica
+     (cada ponto na média dos quatro vizinhos, por iterações de Gauss-Seidel em ordem fixa), que leva as colunas em leque em volta
+     dos arcos sem dobrar a face junto da ponta do arco, onde a borda sobe quase na vertical. */
+  const horizontais = aneisHorizontais(T, f);
+  const ia = horizontais.findIndex((a) => a.y === T.lateral_reta_ate_y);
+  const regular = (y, j) => [lerp(f.zF(y) - f.raioFrente(y), f.zR(y) + T.raio_planta_tras, j / nS), y];
+  const faixa = horizontais.slice(0, ia + 1).map(({ y }, i) => Array.from({ length: nS + 1 }, (_, j) => {
+    if (i === 0) return bordaDeBaixo[j];
+    const reg = regular(y, j);
+    const peso = 1 - (y - f.ys) / (T.lateral_reta_ate_y - f.ys);
+    const reg0 = regular(f.ys, j);
+    return [reg[0] + peso * (bordaDeBaixo[j][0] - reg0[0]), reg[1] + peso * (bordaDeBaixo[j][1] - reg0[1])];
+  }));
+  /* A grade da faixa pelas equações de Winslow (as coordenadas de índice são funções harmônicas da posição, e não o contrário):
+     a grade harmônica direta dobrava junto da subida do arco, que deixa o domínio côncavo, e a de Winslow não dobra. Gauss-Seidel
+     em ordem fixa, de modo que a gaiola sai igual a cada execução. */
+  for (let it = 0; it < T.iteracoes_da_faixa; it += 1) {
+    for (let i = 1; i < ia; i += 1) {
+      for (let j = 1; j < nS; j += 1) {
+        const [n, s, l, o] = [faixa[i + 1][j], faixa[i - 1][j], faixa[i][j + 1], faixa[i][j - 1]];
+        const xi = [(l[0] - o[0]) / 2, (l[1] - o[1]) / 2];
+        const eta = [(n[0] - s[0]) / 2, (n[1] - s[1]) / 2];
+        const alfa = eta[0] ** 2 + eta[1] ** 2; const gama = xi[0] ** 2 + xi[1] ** 2; const beta = xi[0] * eta[0] + xi[1] * eta[1];
+        const [ne, no, se, so] = [faixa[i + 1][j + 1], faixa[i + 1][j - 1], faixa[i - 1][j + 1], faixa[i - 1][j - 1]];
+        for (const k of [0, 1]) {
+          const cruzado = (ne[k] - no[k] - se[k] + so[k]) / 4;
+          faixa[i][j][k] = (alfa * (l[k] + o[k]) + gama * (n[k] + s[k]) - 2 * beta * cruzado) / (2 * (alfa + gama));
+        }
+      }
+    }
+  }
+
+  /* anéis horizontais, da soleira à altura do ombro */
+  const aneis = horizontais.map(({ nome, y }, i) => ({
+    nome,
+    pts: anel({ yF: y, zF: f.zF(y), yS: y, xS: f.xs(y), yR: y, zR: f.zR(y), rF: f.raioFrente(y), rB: T.raio_planta_tras, lado: i <= ia ? faixa[i] : null }),
+  }));
+
+  /* anéis do ombro: cada trecho sobe o seu raio pela fração do arco, da altura do ombro ao teto plano */
+  const trechoDoOmbro = (perfil) => { const { pl } = aPartirDe(perfil, T.ombro_y); const s = acumulado(pl); return (t) => pontoNaDistancia(pl, s, t * s.at(-1)); };
+  const frenteOmbro = trechoDoOmbro(f.perfilFrente);
+  const trasOmbro = trechoDoOmbro(f.perfilTras);
+  const ladoOmbro = trechoDoOmbro(f.perfilLado);
+  const rF0 = f.raioFrente(T.ombro_y);
+  for (let k = 1; k <= T.aneis_do_ombro; k += 1) {
+    const t = k / T.aneis_do_ombro;
+    const [zF, yF] = frenteOmbro(t); const [zR, yR] = trasOmbro(t); const [xS, yS] = ladoOmbro(t);
+    aneis.push({
+      nome: k === T.aneis_do_ombro ? 'teto' : `ombro${k}`,
+      pts: anel({ yF, zF, yS, xS, yR, zR, rF: lerp(rF0, T.raio_teto_frente, t), rB: lerp(T.raio_planta_tras, T.raio_teto_tras, t) }),
     });
   }
 
-  /* para-lamas: anel de 575 a 688 de raio sobre a soleira, de x 971 a 1147 */
-  for (const r of rodas) {
-    const ext = capaAcima(r.zc, yR, T.para_lama_raio, T.lados, T.soleira_topo_y);
-    const int = capaAcima(r.zc, yR, T.arco_raio, T.lados, T.soleira_topo_y);
-    formas.push({
-      nome: `paraLama${r.ponta}${r.lado}`, forma: 'lateral', material: 'cinza', x0: r.s > 0 ? M : -C, largura: C - M, lado: [...ext, ...[...int].reverse()],
-    });
+  /* os pontos e as faces das paredes */
+  const pontosMm = new Map();
+  const nomeDe = (anelNome, coluna) => `${anelNome}_${coluna}`;
+  for (const a of aneis) a.pts.forEach((p, j) => pontosMm.set(nomeDe(a.nome, colunas[j]), p));
+  const faces = [];
+  for (let i = 0; i + 1 < aneis.length; i += 1) {
+    for (let j = 0; j < M; j += 1) {
+      faces.push([nomeDe(aneis[i].nome, colunas[j]), nomeDe(aneis[i].nome, colunas[j + 1]),
+        nomeDe(aneis[i + 1].nome, colunas[j + 1]), nomeDe(aneis[i + 1].nome, colunas[j])]);
+    }
   }
 
-  /* caixas de roda: o arco do perfil, fechado em y 353, entre as faces de dentro dos dois pneus */
-  for (const [ponta, zc] of [['Frente', zF], ['Tras', zT]]) {
-    formas.push({
-      nome: `caixaRoda${ponta}`, forma: 'lateral', material: 'caixaRoda', x0: -T.roda_x_dentro, largura: 2 * T.roda_x_dentro,
-      lado: capaAcima(zc, yR, T.arco_raio, T.lados, y0),
-    });
+  /* a cobertura do teto plano: grade de Coons entre o último anel (frente, lateral e traseira) e a costura, toda em y = altura */
+  const teto = aneis.at(-1);
+  const A = M - 2 * bc;
+  const nomeTeto = (a, b) => {
+    if (a === 0) return nomeDe(teto.nome, colunas[b]);
+    if (a === A) return nomeDe(teto.nome, colunas[M - b]);
+    if (b === bc) return nomeDe(teto.nome, colunas[bc + a]);
+    return `cobertura${a}_${b}`;
+  };
+  const F = (b) => teto.pts[b]; const R = (b) => teto.pts[M - b]; const O = (a) => teto.pts[bc + a];
+  const zC0 = F(0)[2]; const zC1 = R(0)[2];
+  const S = (a) => [0, T.altura, zC0 + ((O(a)[2] - O(0)[2]) / (O(A)[2] - O(0)[2])) * (zC1 - zC0)];
+  for (let a = 1; a < A; a += 1) {
+    for (let b = 0; b < bc; b += 1) {
+      const u = b / bc; const v = a / A;
+      const p = [0, 1, 2].map((k) => (1 - u) * S(a)[k] + u * O(a)[k] + (1 - v) * F(b)[k] + v * R(b)[k]
+        - ((1 - u) * (1 - v) * F(0)[k] + u * (1 - v) * F(bc)[k] + (1 - u) * v * R(0)[k] + u * v * R(bc)[k]));
+      p[0] = b === 0 ? 0 : p[0];
+      p[1] = T.altura;
+      pontosMm.set(nomeTeto(a, b), p);
+    }
+  }
+  for (let a = 0; a < A; a += 1) {
+    for (let b = 0; b < bc; b += 1) faces.push([nomeTeto(a, b), nomeTeto(a, b + 1), nomeTeto(a + 1, b + 1), nomeTeto(a + 1, b)]);
   }
 
-  /* rodas: pneu com chanfro e bolsão na face de fora, e o aro que enche o bolsão faceado com o pneu; revoluções em torno de x (perfil
-   * [raio, posição ao longo de x]); o lado esquerdo é o espelho do direito */
-  const R = T.roda_raio;
-  const L = T.roda_x_fora - T.roda_x_dentro;
-  const B = T.aro_espessura;
-  const pneuDir = [[0, 0], [T.pneu_face_raio, 0], [R, T.pneu_chanfro], [R, L - T.pneu_chanfro], [T.pneu_face_raio, L], [T.aro_raio, L],
-    [T.aro_raio, L - B], [0, L - B]];
-  const aroDir = [[0, 0], [T.aro_raio, 0], [T.aro_raio, B], [T.cubo_raio, B], [T.cubo_fundo_raio, B - T.cubo_fundo_prof], [0, B - T.cubo_fundo_prof]];
-  const espelharEixo = (perfil, comprimento) => perfil.map(([r, a]) => [r, comprimento - a]);
-  for (const r of rodas) {
-    const dir = r.s > 0;
-    formas.push({
-      nome: `roda${r.ponta}${r.lado}`, forma: 'lathe', material: 'pneu', liso: true, lados: T.lados,
-      perfil: dir ? pneuDir : espelharEixo(pneuDir, L), em: [dir ? T.roda_x_dentro : -T.roda_x_fora, yR, r.zc],
-    });
-    formas.push({
-      nome: `aro${r.ponta}${r.lado}`, forma: 'lathe', material: 'aro', liso: true, lados: T.lados,
-      perfil: dir ? aroDir : espelharEixo(aroDir, B), em: [dir ? T.roda_x_fora - B : -T.roda_x_fora, yR, r.zc],
-    });
+  const vertices = [...pontosMm.keys()];
+  const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
+  const cantos = ['arcoDianteiro0', 'soleiraMeio0', 'arcoTraseiro0', 'soleiraTras0'].map((c) => nomeDe('soleira', c));
+  /* As dobras de raio curto da prancha viram vincos, porque a gaiola não tem anéis para o raio delas: o topo do para-choque e a
+     boca do capô (raios de 30 e 20 mm, nitidez fracionária) e o degrau do para-choque na frente e atrás (vivos, como a prancha
+     os desenha). Cada vinco segue o anel pela frente (ou pela traseira) e pela quina, e acaba no começo da lateral, que é plana. */
+  const daFrente = colunas.slice(0, nF + nCF + 1);
+  const deTras = colunas.slice(M - nB - nCB);
+  const vincos = [
+    ['parachoque', daFrente, T.nitidez_dobra_frente], ['boca', daFrente, T.nitidez_dobra_frente], ['degrauFrente', daFrente, 'viva'],
+    ['degrauTras', deTras, 'viva'], ['degrauTrasTopo', deTras, 'viva'],
+  ].map(([anelNome, cols, nitidez]) => ({ nome: `dobra_${anelNome}`, pontos: cols.map((c) => nomeDe(anelNome, c)), nitidez }));
+
+  /* as rodas provisórias: cilindros no pneu da prancha, na bitola e no entre-eixos, apoiados no chão */
+  const xDentro = T.bitola / 2 - T.pneu_largura / 2;
+  const xFora = T.bitola / 2 + T.pneu_largura / 2;
+  const rodas = [];
+  for (const [eixo, zc] of [['Dianteira', f.zD], ['Traseira', f.zT]]) {
+    for (const [lado, s] of [['Esquerda', 1], ['Direita', -1]]) {
+      rodas.push({ nome: `rodaProvisoria${eixo}${lado}`, s, zc, xDentro, xFora, raio: f.rPneu });
+    }
   }
-  return formas;
+  return {
+    forma: f, aneis: aneis.map((a) => a.nome), colunas, pontos, pontosMm,
+    passo: { vertices, faces, vincos, cantos, simetria: 'x' },
+    rodas,
+  };
 }
 
 /* ---------- passos ---------- */
 
-const emMetro = (v) => v.map(m);
-const perfilM = (pontos) => pontos.map(([u, v]) => [m(u), m(v)]);
+const CHAPA = { origem: { op: 'subdivisao', id: 1 } };
 
-/* Os passos de uma forma, com os ids do bloco `base`: a forma leva base + 1 (e base + 2 na segunda extrusão) e a interseção, base + 10. */
-function passosDaForma(f, base, T) {
-  const passos = [];
-  let sel;
-  if (f.forma === 'vistas') {
-    const L = T.prisma_meia_largura;
-    const Cz = T.prisma_meia_profundidade;
-    passos.push(['extrusao', { origemId: base + 1, eixo: 'x', altura: m(2 * L), em: [m(-L), 0, 0], perfil: perfilM(perfilLateral(f.lado)) }]);
-    passos.push(['extrusao', { origemId: base + 2, eixo: 'z', altura: m(2 * Cz), em: [0, 0, m(-Cz)], perfil: perfilM(secaoFrontal(f.frontal)) }]);
-    passos.push(['intersectar', {
-      origemId: base + 10,
-      solidos: [{ origem: { op: 'extrusao', id: base + 1 } }, { origem: { op: 'extrusao', id: base + 2 } }],
+/** Os PASSOS: a chapa subdividida com espessura, e as quatro rodas provisórias, cada uma com a parte e o material. */
+export function gerarPassos(T) {
+  const { passo, rodas } = derivar(T);
+  const passos = [
+    ['subdivisao', { origemId: 1, ...passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
+    ['parte', { nome: 'carroceria', sel: CHAPA }],
+    ['material', { sel: CHAPA, usa: 'azul' }],
+  ];
+  rodas.forEach((r, k) => {
+    const sel = { origem: { op: 'lathe', id: 10 + k } };
+    passos.push(['lathe', {
+      origemId: 10 + k, eixo: 'x', lados: 48,
+      perfil: [[0, 0], [m(r.raio), 0], [m(r.raio), m(r.xFora - r.xDentro)], [0, m(r.xFora - r.xDentro)]],
+      em: [m(r.s > 0 ? r.xDentro : -r.xFora), m(r.raio), m(r.zc)],
     }]);
-    sel = { origem: { op: 'intersectar', id: base + 10 } };
-  } else if (f.forma === 'lateral') {
-    passos.push(['extrusao', { origemId: base + 1, eixo: 'x', altura: m(f.largura), em: [m(f.x0), 0, 0], perfil: perfilM(perfilLateral(f.lado)) }]);
-    sel = { origem: { op: 'extrusao', id: base + 1 } };
-  } else if (f.forma === 'secaoZ') {
-    passos.push(['extrusao', { origemId: base + 1, eixo: 'z', altura: m(f.z1 - f.z0), em: [0, 0, m(f.z0)], perfil: perfilM(secaoFrontal(f.secao)) }]);
-    sel = { origem: { op: 'extrusao', id: base + 1 } };
-  } else if (f.forma === 'cubo') {
-    passos.push(['cubo', { origemId: base + 1, larg: m(f.larg), alt: m(f.alt), prof: m(f.prof), em: emMetro(f.em) }]);
-    sel = { origem: { op: 'cubo', id: base + 1 } };
-  } else if (f.forma === 'planta') {
-    passos.push(['extrusao', { origemId: base + 1, eixo: 'y', altura: m(f.altura), em: [0, m(f.y0), 0], perfil: perfilM(antihorario(f.planta)) }]);
-    sel = { origem: { op: 'extrusao', id: base + 1 } };
-  } else {
-    passos.push(['lathe', { origemId: base + 1, eixo: 'x', perfil: perfilM(f.perfil), lados: f.lados, em: emMetro(f.em) }]);
-    sel = { origem: { op: 'lathe', id: base + 1 } };
-  }
-  passos.push(['parte', { nome: f.nome, sel }]);
-  passos.push(['material', { sel, usa: f.material }]);
-  if (f.liso) passos.push(['liso', { angulo: 30, sel }]);
+    passos.push(['parte', { nome: r.nome, sel }]);
+    passos.push(['material', { sel, usa: 'pneu' }]);
+    passos.push(['liso', { angulo: 30, sel }]);
+  });
   return passos;
 }
 
-/** Os PASSOS: cada forma, a `parte` e o `material` logo depois. */
-export function gerarPassos(T) {
-  return derivar(T).flatMap((f, k) => passosDaForma(f, 100 * (k + 1), T));
-}
+/* ---------- contatos, ilhas e pontos ---------- */
 
-/* ---------- contatos ---------- */
+/* A chapa e as rodas não se tocam: o arco tem 65 mm de folga sobre o pneu e a face de fora do pneu fica 37,5 mm para dentro da lateral. */
+export const CONTATOS = [];
 
-const PONTAS = ['Frente', 'Tras'];
-const LADOS = ['Dir', 'Esq'];
-const chassiDe = { Frente: ['chassiFrente', 'chassiCentro'], Tras: ['chassiTras', 'chassiCentro'] };
-
-export const CONTATOS = [
-  ...['chassiFrente', 'chassiCentro', 'chassiTras'].map((c) => ({
-    par: ['carroceria', c], motivo: 'a face de baixo da carroceria, em y 883, assenta na face de cima do chassi, de x -971 a 971',
-  })),
-  { par: ['carroceria', 'cabine'], motivo: 'a face de baixo da cabine, em y 1412, assenta no tampo da carroceria, de z -2339 a 1544' },
-  { par: ['cabine', 'painelTeto'], motivo: 'a face de baixo do painel, em y 2295, assenta no teto plano da cabine' },
-  { par: ['cabine', 'parabrisa'], motivo: 'a face de trás do para-brisa é o mesmo plano da face inclinada da frente da cabine' },
-  { par: ['carroceria', 'parabrisa'], motivo: 'a aresta de baixo do para-brisa assenta sobre o capô, na linha da cintura em y 1412' },
-  { par: ['cabine', 'vidroTraseiro'], motivo: 'a face da frente do vidro traseiro é o mesmo plano da face inclinada de trás da cabine' },
-  { par: ['cabine', 'vidroLateralDir'], motivo: 'a face de dentro do vidro lateral direito é o mesmo plano da lateral inclinada da cabine' },
-  { par: ['cabine', 'vidroLateralEsq'], motivo: 'a face de dentro do vidro lateral esquerdo é o mesmo plano da lateral inclinada da cabine' },
-  { par: ['chassiFrente', 'paraChoqueFrente'], motivo: 'a face de trás do para-choque encosta na face da frente do chassi, em z 2162' },
-  { par: ['paraChoqueFrente', 'placaFrente'], motivo: 'a face de trás da placa encosta na face da frente do para-choque, em z 2338' },
-  { par: ['chassiTras', 'paraChoqueTras'], motivo: 'a face da frente do para-choque de trás encosta na face de trás do chassi, em z -2162' },
-  { par: ['paraChoqueTras', 'placaTras'], motivo: 'a face da frente da placa de trás encosta na face de trás do para-choque, em z -2338' },
-  { par: ['paraChoqueFrente', 'grade'], motivo: 'a face de baixo da grade assenta na face de cima do para-choque da frente, em y 706' },
-  { par: ['chassiFrente', 'grade'], motivo: 'o canto de cima da frente do chassi, em y 883 e z 2250, toca a face de trás da grade, só pela aresta' },
-  { par: ['carroceria', 'grade'], motivo: 'a face de trás da grade encosta na face da frente do nariz, em z 2250' },
-  ...LADOS.flatMap((l) => [
-    { par: ['carroceria', `farol${l}`], motivo: 'a face de dentro do farol encosta na face da frente do nariz e na face inclinada do capô' },
-    { par: ['cabine', `retrovisor${l}`], motivo: 'o canto de baixo da cabine, em x 971 e y 1412, toca a face de dentro do retrovisor, só pela aresta' },
-    { par: ['carroceria', `vidroLateral${l}`], motivo: 'a face de baixo da casca do vidro, em y 1412, toca o canto de cima da lateral da carroceria, só pela aresta' },
-    { par: ['carroceria', `lanterna${l}`], motivo: 'a face da frente da lanterna encosta na face de trás da carroceria, em z -2339' },
-    { par: ['carroceria', `retrovisor${l}`], motivo: 'a face de dentro do retrovisor encosta na lateral da carroceria, em x 971 ou -971' },
-    { par: [`retrovisor${l}`, `vidroLateral${l}`], motivo: 'o retrovisor encaixa no recorte da janela e encosta nas faces do recorte, em z 966 e 1143' },
-  ]),
-  ...PONTAS.flatMap((p) => [
-    { par: [`caixaRoda${p}`, 'carroceria'], motivo: 'a caixa de roda enche o arco do perfil e encosta nas faces do arco da carroceria' },
-    ...chassiDe[p].map((c) => ({ par: [`caixaRoda${p}`, c], motivo: 'a caixa de roda enche o arco do perfil e encosta nas faces do arco do chassi' })),
-    ...LADOS.flatMap((l) => [
-      { par: [`caixaRoda${p}`, `roda${p}${l}`], motivo: 'a face de dentro do pneu, em x 441 ou -441, encosta na face da caixa de roda' },
-      { par: [`aro${p}${l}`, `roda${p}${l}`], motivo: 'o aro enche o bolsão da face de fora do pneu e encosta nas faces do bolsão, no raio de 321 mm e no fundo' },
-      { par: [`paraLama${p}${l}`, 'carroceria'], motivo: 'a face de dentro do para-lama encosta na lateral da carroceria, em x 971 ou -971' },
-      ...chassiDe[p].map((c) => ({ par: [`paraLama${p}${l}`, c], motivo: 'a base do para-lama assenta na soleira do chassi, em y 530' })),
-    ]),
-  ]),
-];
-
-/* ---------- pontos declarados ---------- */
+const RODAS = ['rodaProvisoriaDianteiraEsquerda', 'rodaProvisoriaDianteiraDireita', 'rodaProvisoriaTraseiraEsquerda', 'rodaProvisoriaTraseiraDireita'];
+export const ILHAS = RODAS.map((contem) => ({
+  contem,
+  motivo: 'roda provisória da etapa 1, apoiada no chão sob o arco e sem tocar a chapa; o cubo, o forro do arco e as rodas da família vêm na etapa 4',
+}));
 
 export function pontosDeclarados(T = TABELA) {
   const tol = 1;
+  const f = forma(T);
+  const xDentro = T.bitola / 2 - T.pneu_largura / 2;
+  const xFora = T.bitola / 2 + T.pneu_largura / 2;
+  const r = T.pneu_diametro / 2;
   return [
-    { nome: 'canto de trás, embaixo, da placa de trás', parte: 'placaTras', medida: 'minimo', em: [-T.placa_x0, T.placa_y0, T.placa_z_tras], toleranciaMm: tol },
-    { nome: 'canto da frente, em cima, da placa da frente', parte: 'placaFrente', medida: 'maximo', em: [T.placa_x0, T.placa_y3, T.placa_z_frente], toleranciaMm: tol },
-    { nome: 'canto da frente, em cima, do para-choque da frente', parte: 'paraChoqueFrente', medida: 'maximo', em: [T.planta_x0, T.para_choque_y1, T.planta_z2], toleranciaMm: tol },
-    { nome: 'topo do painel de teto, na frente', parte: 'painelTeto', medida: 'maximo', em: [T.painel_meia_largura, T.painel_topo_y, T.painel_frente_base_z], toleranciaMm: tol },
-    { nome: 'canto da frente da cabine, na cintura, e teto', parte: 'cabine', medida: 'maximo', em: [T.carroceria_meia_largura, T.teto_y, T.capo_fim_z], toleranciaMm: tol },
-    { nome: 'ponta do retrovisor direito', parte: 'retrovisorDir', medida: 'maximo', em: [T.retrovisor_x1, T.retrovisor_y1, T.retrovisor_z1], toleranciaMm: tol },
-    { nome: 'pneu de trás, à esquerda, embaixo', parte: 'rodaTrasEsq', medida: 'minimo', em: [-T.roda_x_fora, 0, T.roda_z_tras - T.roda_raio], toleranciaMm: tol },
-    { nome: 'pneu da frente, à direita, na frente e em cima', parte: 'rodaFrenteDir', medida: 'maximo', em: [T.roda_x_fora, 2 * T.roda_raio, T.roda_z_frente + T.roda_raio], toleranciaMm: tol },
-    { nome: 'cume do para-lama da frente à direita', parte: 'paraLamaFrenteDir', medida: 'maximo', em: [T.chassi_meia_largura, T.roda_raio + T.para_lama_raio, T.roda_z_frente + T.para_lama_raio], toleranciaMm: tol },
+    { nome: 'canto de cima da caixa da carroceria: a lateral, o teto e o nariz', parte: 'carroceria', medida: 'maximo', em: [f.xMax, T.altura, f.zFrente], toleranciaMm: tol },
+    { nome: 'canto de baixo da caixa da carroceria: a lateral direita, a soleira e o para-choque de trás', parte: 'carroceria', medida: 'minimo', em: [-f.xMax, T.soleira_y, f.zTras], toleranciaMm: tol },
+    { nome: 'pneu dianteiro esquerdo, embaixo, por dentro e atrás', parte: 'rodaProvisoriaDianteiraEsquerda', medida: 'minimo', em: [xDentro, 0, f.zD - r], toleranciaMm: tol },
+    { nome: 'pneu traseiro direito, em cima, por dentro e na frente', parte: 'rodaProvisoriaTraseiraDireita', medida: 'maximo', em: [-xDentro, 2 * r, f.zT + r], toleranciaMm: tol },
+    { nome: 'pneu traseiro direito, embaixo, por fora e atrás', parte: 'rodaProvisoriaTraseiraDireita', medida: 'minimo', em: [-xFora, 0, f.zT - r], toleranciaMm: tol },
   ];
 }
 
 const receita = {
-  meta: { nome: 'furgao-realista', desc: 'cópia do furgão estilizado, ponto de partida do furgão realista: azul, de volume único alto, cabine que afunila com painel de teto, vidros azuis, chassi cinza mais largo, para-lamas, grade e rodas com aro' },
+  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 1: a lataria base em chapa contínua, com os arcos das rodas e as quinas arredondadas, e quatro rodas provisórias' },
   PARAMS: TABELA,
   MATERIAIS: {
     azul: { tipo: 'liso', cor: '#5d75c9' },
-    azulPainel: { tipo: 'liso', cor: '#5573c3' },
-    cinza: { tipo: 'liso', cor: '#6a6b80' },
-    caixaRoda: { tipo: 'liso', cor: '#39393f' },
-    vidro: { tipo: 'liso', cor: '#d4ecff' },
-    grade: { tipo: 'liso', cor: '#7a7c92' },
-    cinzaClaro: { tipo: 'liso', cor: '#c1c1d8' },
-    amarelo: { tipo: 'liso', cor: '#ffd22e' },
-    lanterna: { tipo: 'liso', cor: '#d3363d' },
     pneu: { tipo: 'liso', cor: '#26262b' },
-    aro: { tipo: 'metal', cor: '#868ba3', acabamento: 'escovado' },
   },
-  TOPO: { origem: 'chão, no meio do furgão em x e em z; y para cima e a frente do furgão em +z' },
+  /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
+  get TOPO() {
+    return {
+      origem: 'chão, no meio do furgão em x e em z; y para cima e a frente do furgão em +z',
+      ...derivar(this.PARAMS).pontos,
+    };
+  },
   PLANO: {
-    objeto: 'furgão estilizado de 4854 mm de comprimento, 2648 mm de largura com os espelhos e 2383 mm de altura, azul, volume único alto com capô curto, cabine que afunila, chassi cinza mais largo, para-lamas e rodas grandes',
-    referencias: ['referencias/fonte-vistas.png', 'referencias/alvo.md'],
-    escala: { medida: 'comprimento total do furgão, de z -2427 a 2427, com as placas', milimetros: 4854 },
+    objeto: 'furgão médio de teto alto, etapa 1: lataria base de 5400 por 2000 por 2500 mm em chapa contínua, cabine de bico curto, laterais verticais, teto alto, arcos das rodas, e rodas provisórias',
+    referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
+    escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
     partes: [
-      { nome: 'carroceria', forma: 'corpo azul de 1942 mm de largura, de y 883 a 1412, com nariz vertical em z 2250, capô inclinado até y 1258 e depois até a cintura em z 1544, traseira vertical em z -2339 e os arcos das quatro rodas no perfil', tecnica: 'extrusao com eixo x do perfil lateral, com os arcos recortados no perfil' },
-      { nome: 'chassiFrente', forma: 'trecho do chassi cinza à frente do arco dianteiro, de y 353 a 883, com soleira de 2294 mm de largura até y 530, saia inclinada acima e chanfro sob o nariz', tecnica: 'intersecao do perfil lateral extrudado em x com a seção frontal em degrau extrudada em z' },
-      { nome: 'chassiCentro', forma: 'trecho do chassi cinza entre os arcos, de y 353 a 883, com soleira de 2294 mm e saia inclinada de 1706 a 1942 mm de largura', tecnica: 'intersecao do perfil lateral extrudado em x com a seção frontal em degrau extrudada em z' },
-      { nome: 'chassiTras', forma: 'trecho do chassi cinza atrás do arco traseiro, de y 353 a 883, com soleira de 2294 mm, saia inclinada e chanfro sob a traseira', tecnica: 'intersecao do perfil lateral extrudado em x com a seção frontal em degrau extrudada em z' },
-      { nome: 'cabine', forma: 'cabine azul de y 1412 a 2295, de z -2339 a 1544 na base, com o para-brisa e a traseira inclinados e a largura afunilando de 1942 na cintura a 1588 no teto', tecnica: 'intersecao do perfil lateral extrudado em x com a seção frontal trapezoidal extrudada em z' },
-      { nome: 'painelTeto', forma: 'faixa azul mais escura sobre o teto, de 1058 mm de largura, de y 2295 a 2383 e z -1721 a 926, com as pontas inclinadas', tecnica: 'intersecao do trapézio lateral extrudado em x com o retângulo frontal extrudado em z' },
-      { nome: 'parabrisa', forma: 'placa de vidro azul clara de 20 mm sobre a face inclinada da frente da cabine, de y 1412 a 2131, de 1582 mm de largura embaixo e 1296 em cima', tecnica: 'intersecao da faixa lateral paralela à face extrudada em x com o trapézio frontal extrudado em z' },
-      { nome: 'vidroTraseiro', forma: 'placa de vidro azul clara de 20 mm sobre a face inclinada de trás da cabine, de y 1576 a 2131', tecnica: 'intersecao da faixa lateral paralela à face extrudada em x com o trapézio frontal extrudado em z' },
-      { nome: 'vidroLateralDir', forma: 'janela da frente em casca de vidro de 12 mm sobre a lateral inclinada direita da cabine, de z 391 a 1354 na base, com o recorte do retrovisor', tecnica: 'intersecao do polígono lateral extrudado em x com a casca frontal inclinada extrudada em z' },
-      { nome: 'vidroLateralEsq', forma: 'janela da frente em casca de vidro de 12 mm sobre a lateral inclinada esquerda da cabine, de z 391 a 1354 na base, com o recorte do retrovisor', tecnica: 'intersecao do polígono lateral extrudado em x com a casca frontal inclinada extrudada em z' },
-      { nome: 'paraChoqueFrente', forma: 'caixa cinza de 2294 por 353 por 176 mm, de y 353 a 706 e z 2162 a 2338, com as quinas da planta cortadas até 971 de meia largura', tecnica: 'extrusao com eixo y da planta de quinas cortadas, encostada na face da frente do chassi' },
-      { nome: 'paraChoqueTras', forma: 'caixa cinza de 2294 por 353 por 176 mm, de y 353 a 706 e z -2338 a -2162, com as quinas da planta cortadas até 971 de meia largura', tecnica: 'extrusao com eixo y da planta de quinas cortadas, encostada na face de trás do chassi' },
-      { nome: 'placaFrente', forma: 'placa clara octogonal de 618 mm de largura, de y 265 a 574, saindo do para-choque da frente até z 2427', tecnica: 'extrusao com eixo z do octógono, encostada na face da frente do para-choque' },
-      { nome: 'placaTras', forma: 'placa clara octogonal de 618 mm de largura, de y 265 a 574, saindo do para-choque de trás até z -2427', tecnica: 'extrusao com eixo z do octógono, encostada na face de trás do para-choque' },
-      { nome: 'grade', forma: 'placa cinza azulada de 752 por 353 mm, de y 706 a 1059, entre os faróis, saindo 12 mm do nariz', tecnica: 'cubo assentado no para-choque e encostado no nariz' },
-      { nome: 'farolDir', forma: 'casca amarela de 12 mm sobre a quina do nariz à direita, de x 607 a 971 e y 1059 a 1258, com o capô inclinado', tecnica: 'extrusao com eixo x de um polígono encostado no nariz e no capô' },
-      { nome: 'farolEsq', forma: 'casca amarela de 12 mm sobre a quina do nariz à esquerda, de x -971 a -607 e y 1059 a 1258, com o capô inclinado', tecnica: 'extrusao com eixo x de um polígono encostado no nariz e no capô' },
-      { nome: 'lanternaDir', forma: 'placa vermelha de 486 por 177 por 12 mm na face de trás à direita, de x 485 a 971 e y 1059 a 1236', tecnica: 'cubo encostado na face de trás da carroceria' },
-      { nome: 'lanternaEsq', forma: 'placa vermelha de 486 por 177 por 12 mm na face de trás à esquerda, de x -971 a -485 e y 1059 a 1236', tecnica: 'cubo encostado na face de trás da carroceria' },
-      { nome: 'retrovisorDir', forma: 'caixa azul de 353 por 352 por 177 mm, da lateral da carroceria a x 1324, de y 1236 a 1588 e z 966 a 1143', tecnica: 'cubo encostado na lateral da carroceria, no recorte da janela' },
-      { nome: 'retrovisorEsq', forma: 'caixa azul de 353 por 352 por 177 mm, da lateral da carroceria a x -1324, de y 1236 a 1588 e z 966 a 1143', tecnica: 'cubo encostado na lateral da carroceria, no recorte da janela' },
-      ...PONTAS.flatMap((p) => LADOS.map((l) => ({
-        nome: `paraLama${p}${l}`,
-        forma: `cápsula de 176 mm de espessura sobre a roda ${p === 'Frente' ? 'da frente' : 'de trás'} ${l === 'Dir' ? 'à direita' : 'à esquerda'}, anel de 575 a 688 mm de raio sobre a soleira, de x 971 a 1147`,
-        tecnica: 'extrusao com eixo x de um anel em arco, cortado na face de cima da soleira',
-      }))),
-      ...PONTAS.map((p) => ({
-        nome: `caixaRoda${p}`,
-        forma: `caixa escura do arco ${p === 'Frente' ? 'dianteiro' : 'traseiro'}, de 882 mm de largura entre as faces de dentro dos pneus, com 575 mm de raio, fechada em y 353`,
-        tecnica: 'extrusao com eixo x do próprio arco do perfil, fechado na base',
+      {
+        nome: 'carroceria',
+        forma: 'chapa contínua de 2 mm, cabine, carga e teto numa peça: nariz, capô curto a 22,5 graus, para-brisa a 55, teto plano a 2500, laterais verticais, traseira reta, arcos de raio 420 e quinas arredondadas, sem vãos nem frestas',
+        tecnica: 'subdivisao de uma gaiola de anéis horizontais e da cobertura do teto, com simetria em x, todos os pontos medidos e espessura',
+      },
+      ...RODAS.map((nome) => ({
+        nome,
+        forma: `roda provisória da etapa 1: cilindro de 710 mm de diâmetro e 225 de largura, na bitola de 1700 e no ${nome.includes('Dianteira') ? 'eixo dianteiro' : 'eixo traseiro'}, apoiado no chão; sai na etapa 4`,
+        tecnica: 'lathe em torno de x de um retângulo, com 48 lados e sombreamento liso',
       })),
-      ...PONTAS.flatMap((p) => LADOS.map((l) => ({
-        nome: `roda${p}${l}`,
-        forma: `pneu escuro de 1060 mm de diâmetro e 618 mm de largura, com chanfro de 177 mm, centro em y 530 e z ${p === 'Frente' ? '1386' : '-1297'}, ${l === 'Dir' ? 'à direita' : 'à esquerda'}`,
-        tecnica: 'lathe em torno de x, com o chanfro e o bolsão de 321 mm de raio no perfil',
-      }))),
-      ...PONTAS.flatMap((p) => LADOS.map((l) => ({
-        nome: `aro${p}${l}`,
-        forma: `aro cinza de 642 mm de diâmetro e 120 mm de espessura, faceado com a face de fora do pneu ${p === 'Frente' ? 'da frente' : 'de trás'} ${l === 'Dir' ? 'à direita' : 'à esquerda'}, com o cubo rebaixado 88 mm`,
-        tecnica: 'lathe em torno de x, com o rebaixo do cubo no perfil',
-      }))),
     ],
     criteriosDeReprovacao: [
-      'a caixa total não fica em x -1324 a 1324, y 0 a 2383 e z -2427 a 2427, ou alguma roda não toca o chão',
-      'um lado do furgão difere do outro em medida ou posição de peça simétrica',
-      'o furgão não é um volume único alto: o capô não é curto e inclinado, ou a traseira não é vertical',
-      'a cabine tem largura constante, e não afunila de 1942 mm na cintura a 1588 mm no teto',
-      'o chassi não é mais largo que a carroceria, ou as rodas ficam escondidas, sem arco recortado e sem caixa de roda',
-      'o painel de teto não assenta no teto plano da cabine, ou não é mais estreito que ele',
-      'um para-lama não é saliente em volta da roda, ou fica colado no pneu',
-      'a lateral tem janela atrás da porta da frente, ou falta o vidro traseiro',
-      'a silhueta lateral, frontal ou de cima difere da referência, vista na folha comparativa, em mais de dois por cento do comprimento',
+      'a silhueta lateral, frontal ou de cima se afasta da prancha cotada mais de 15 mm em média ou 40 mm em algum ponto',
+      'a cabine não é de bico curto: o capô não emenda quase direto no para-brisa grande e inclinado, ou a coluna do para-brisa não fica sobre a roda dianteira',
+      'as laterais não são verticais, ou o teto alto não é plano de ponta a ponta',
+      'a chapa tem quina viva onde a prancha arredonda, furo, dobra sobre si ou face virada, ou mostra vão, fresta ou vinco que são da etapa 2',
+      'a luz rasante ou a curvatura mostram amassado ou ondulação que a forma não pede',
+      'um pneu não toca o chão, ou toca ou atravessa o arco da roda ou a lateral',
+      'alguma peça fica solta no ar ou atravessa outra sem motivo',
+      'o lado esquerdo e o direito diferem',
+      'aparece marca, logotipo ou nome de fabricante',
     ],
+    lataria: { partes: ['carroceria'] },
   },
   contatos: CONTATOS,
+  ilhas: ILHAS,
   PONTOS: pontosDeclarados(TABELA),
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };

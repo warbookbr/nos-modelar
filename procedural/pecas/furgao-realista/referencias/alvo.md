@@ -1,39 +1,20 @@
-# Alvo: furgao
+# Alvo: furgao-realista
 
-## Origem
+## O alvo de medida
 
-- Modelo: "van" do pacote A, de autor A.
-- Autor: autor A.
-- Pacote: pacote A, com o arquivo `van.glb` (cinco malhas: carroceria e quatro rodas). A tabela `docs/modelar/veiculos-referencias.json` confirma o pacote `pacote-a`.
-- Licença: licença livre sem exigência de crédito, declarada no `License.txt` do pacote.
-- Página: endereço omitido
-- A malha não está no repositório (`importados/veiculos-livres/pacote-a/van.glb`, ignorado pelo git).
-- Referências versionadas: `fonte-vistas.png` (quatro vistas com a cor original); as medidas da fonte ficam só no `furgao`, em `procedural/pecas/furgao/referencias/fonte-partes.json` (caixas e silhuetas em fatias de superfície, em metro, escala 1,765, comprimento de 4,854 m). Frente em +z, conferida na vista lateral (frente à esquerda) e pelas rodas.
+O alvo é a prancha ortográfica cotada `quatro-vistas.prancha.png`, aprovada pela pessoa em 2026-10-31, com a especificação em `quatro-vistas.prancha.mjs` e o relatório do motor em `quatro-vistas.prancha.relatorio.json`. Ela é derivada das medidas de classe do [alinhamento](../../../../docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md): furgão médio de teto alto com 5.400 mm de comprimento, 2.000 mm de largura sem os retrovisores, 2.500 mm de altura, 3.300 mm entre os eixos, balanços de 980 mm na frente e 1.120 mm atrás, bitola de 1.700 mm, pneu 225/65 aro 16 com 710 mm de diâmetro e 225 mm de largura, arcos de raio 420 mm no centro da roda e soleira em 300 mm. Quando a prancha e o alinhamento divergem, o alinhamento e a `TABELA` da receita mandam. A silhueta lateral, frontal e de cima da peça se mede contra a da prancha, com 15 mm em média e 40 mm no pior ponto, pelo critério do alinhamento.
 
-## Medidas contra a fonte
+## A referência de caráter
 
-- Caixa total: x -1324 a 1324, y 0 a 2383 e z -2427 a 2427 mm, iguais à fonte.
-- `comparar-silhueta --rigoroso --cabine auto`: fatias em z com média de 1 mm e máxima de 28 mm; fatias em y com média de 4 mm e máxima de 12 mm; zero fatias fora de 97 mm.
-- Folha comparativa (mesma câmera e escala): interseção sobre união de 0,996 na isométrica, 0,997 na lateral, 0,993 na frontal e 0,993 na vista de cima.
-- Rodas: diâmetro de 1060 mm, largura de 618 mm, centros em x ±750, z 1386 (frente) e -1297 (trás).
+O `fonte-vistas.png` são as vistas do `furgao` do acervo, de que esta peça nasceu como cópia. Valem só como caráter da forma, porque as medidas do `furgao` (rodas de 1.060 mm numa carroceria de 4.854 mm, cabine que afunila para o teto) deixaram de valer pelo alinhamento. A origem do `furgao` é o modelo "van" do pacote A, de autor A, com licença livre sem exigência de crédito; a malha não está no repositório, e as medidas tiradas dela ficam só no `furgao`, em `procedural/pecas/furgao/referencias/fonte-partes.json`.
 
-## O que não ficou igual
+## Na etapa 1
 
-- Faróis: cascas de 12 mm sobre a quina do nariz e o capô; na fonte o amarelo está na própria superfície e dá a volta até a lateral (x 971, z 2073 a 2250).
-- Retrovisor: caixa azul inteira; na fonte a face de trás é clara (vidro do espelho), o que só se vê por trás.
-- Pneu e aro: pneu de 24 lados com chanfro; o aro é um disco faceado com a face de fora, com o cubo rebaixado 88 mm. A fonte tem um anel de aro e um cubo menor.
-- Arco da roda: polígono de 24 lados com raio de 575 mm (45 mm de folga sobre o pneu); na fonte o forro do arco é escuro e justo ao pneu (529 mm). Na receita o interior do arco sai da cor dos próprios prismas, e só a caixa de roda entre os pneus é escura.
-- Painel de teto: faixa de topo plano; a fonte tem o topo levemente abaulado no sombreamento. A cor é aproximada.
-- Cores aproximadas, tiradas da textura `colormap` do pacote: carroceria `#5d75c9`, chassi `#6a6b80`, vidro `#d4ecff`, farol `#ffd22e`, lanterna `#d3363d`.
-- Lanternas traseiras: placas vermelhas medidas na malha (x 485 a 971, y 1059 a 1236); a fonte não tem imagem da traseira, então a posição vem dos vértices.
+A receita entrega a lataria base, uma chapa contínua só com a silhueta da prancha, os arcos das quatro rodas e as quinas arredondadas, e quatro rodas provisórias em cilindro no tamanho do pneu da prancha. Ficam de fora, para as etapas seguintes, os vãos de janela, as frestas das portas, o vinco de cintura, as nervuras do teto e as abas dos arcos (etapa 2), o corpo de baixo e os para-choques (etapa 3), as rodas da família e o forro dos arcos (etapa 4), os vidros e o interior (etapa 5), as luzes e a grade (etapa 6) e o acabamento (etapa 7).
 
-## Diferenças por vista (folha aberta)
+## O que não ficou igual à prancha
 
-- Isométrica: mesma massa, capô, para-brisa, janela lateral com recorte do retrovisor, para-lamas em cápsula e painel de teto. Difere o amarelo do farol (casca, sem a volta na lateral) e o interior escuro dos arcos.
-- Lateral: perfil do nariz, do capô, do para-brisa, do teto e da traseira inclinada coincidem; a saia inclinada entre as rodas e a soleira aparecem como na fonte. O raio do arco é 45 mm maior que o da fonte.
-- Frontal: a cabine afunila de 971 a 794 mm de meia largura como na fonte; grade cinza, para-choque e placa octogonal no mesmo lugar.
-- De cima: planta, quinas cortadas dos para-choques, painel de teto, vidro traseiro e retrovisores coincidem; o painel é um pouco mais saturado que o da fonte.
-
-## Duvidoso
-
-- O ruído de ponto flutuante do polígono dos arcos é arredondado a 1e-6 mm em `circuloHorario`, porque o arco centrado em y 530 coincide com o nível da soleira (y 530).
+- O degrau do para-choque traseiro, que a prancha desenha horizontal em 570 mm, virou uma rampa de 20 mm de altura, porque cada anel da gaiola é uma fatia horizontal da carroceria.
+- O raio da testa, cotado em 300 mm na especificação, sai com cerca de 200 mm no desenho, porque o filete da prancha fica limitado à metade do trecho antes dele; a receita segue o desenho.
+- A chapa não passa exatamente pelos pontos da gaiola nos raios: onde ela é plana a superfície fica no plano desenhado, e nos raios fica alguns milímetros para dentro. A silhueta medida contra a prancha em 2026-10-31 dá, em média e no pior ponto, 1,0 e 7,2 mm na lateral, 0,2 e 11,3 mm na frontal e 0,4 e 7,2 mm de cima.
+- O raio das quinas verticais da frente na planta só é cotado na prancha no nível do para-choque (280 mm) e na borda do teto (100 mm); entre os dois, na coluna do para-brisa, a receita fecha de 280 mm na boca do capô para 160 mm no pé do para-brisa e 120 mm no topo dele, por escolha desta etapa.
