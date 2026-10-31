@@ -347,6 +347,7 @@ function linhasDeLandmarks() {
 
 /* ------------------------------------------------------------ especificação */
 const ESCALA = 0.16;
+const Y_LARGURA_MAXIMA = 1100;
 const V = {
   lateral: { x: 70, y: 150, leitura: 'projecao', rotuloEm: [70, 96], rotulo: 'LATERAL DIREITA (LADO -X), FRENTE À DIREITA' },
   frontal: { x: 1090, y: 150, leitura: 'projecao', rotuloEm: [1090, 96], rotulo: 'FRONTAL' },
@@ -421,6 +422,8 @@ export const ESPEC = {
 
     /* 3. linhas de porta e borda do teto */
     { vista: 'lateral', classe: 'painel', nome: 'portaDaCabine', tipo: 'filete', fechado: true, pts: [...arcoDaPorta().reverse(), [...portaCabine.pe, 60], [...naColuna(30, portaCabine.topo), 60], [portaCabine.tras, portaCabine.topo, 60], [portaCabine.tras, portaCabine.base, 40]] },
+    /* o vinco de cintura em 1190, ao longo da lateral, da traseira até a quina da frente sobre o capô */
+    { vista: 'lateral', classe: 'painel', nome: 'vincoDeCintura', tipo: 'poli', pts: [[P.quinaTraseira[0] + 70, Y_VINCO], [boca[0] - ((Y_VINCO - boca[1]) / (peVidro[1] - boca[1])) * (boca[0] - peVidro[0]) - 70, Y_VINCO]] },
     { vista: 'lateral', classe: 'painel', nome: 'portaDeCorrer', tipo: 'filete', fechado: true, pts: [[portaCorrer.frente, portaCorrer.base, 50], [portaCorrer.frente, portaCorrer.topo, 60], [portaCorrer.tras, portaCorrer.topo, 60], [portaCorrer.tras, portaCorrer.base, 50]] },
     { vista: 'traseira', classe: 'painel', nome: 'portaTraseiraEsq', tipo: 'filete', fechado: true, pts: portaTraseira(1) },
     { vista: 'traseira', classe: 'painel', nome: 'portaTraseiraDir', tipo: 'filete', fechado: true, pts: portaTraseira(-1) },
@@ -462,6 +465,10 @@ export const ESPEC = {
   ],
   landmarks: LANDMARKS,
   anotacoes: [
+    /* a cota de 410 de cima é entre as bordas do vidro, e não entre o pé e o topo do para-brisa (441 a 55 graus) */
+    { vista: 'planta', em: [1870, 350], texto: 'bordas do vidro:' },
+    { vista: 'planta', em: [1870, 450], texto: `${mil(vidroBaseY)} a ${mil(vidroTopoY)}` },
+    { vista: 'planta', em: [1870, 550], texto: '(não pé a topo)' },
     { vista: 'lateral', em: [1500, 2200], texto: `para-brisa a ${Math.round((Math.atan2(P.topoVidro[1] - P.baseVidro[1], P.baseVidro[0] - P.topoVidro[0]) * 180) / Math.PI)}° da horizontal` },
   ],
   cotas: [
@@ -481,7 +488,8 @@ export const ESPEC = {
     { vista: 'lateral', dono: 'portaDeCorrer', de: [portaCorrer.tras, 1700], ate: [portaCorrer.frente, 1700], texto: mil(portaCorrer.frente - portaCorrer.tras) },
     /* frontal: altura à esquerda, largura no teto, bitola e pneu no chão */
     { vista: 'frontal', de: [-xMax, 0], ate: [-xMax, M.altura], desloca: [-40, 0], extensao: true, texto: mil(M.altura) },
-    { vista: 'frontal', de: [-xMax, M.altura], ate: [xMax, M.altura], desloca: [0, -45], extensao: true, texto: mil(M.largura) },
+    /* a largura máxima é medida abaixo do vinco, onde a lateral ainda está em 2000; as linhas de extensão sobem dali */
+    { vista: 'frontal', de: [-xMax, Y_LARGURA_MAXIMA], ate: [xMax, Y_LARGURA_MAXIMA], desloca: [0, -(M.altura - Y_LARGURA_MAXIMA) * ESCALA - 45], extensao: true, texto: mil(M.largura) },
     { vista: 'frontal', de: [-M.bitola / 2, 0], ate: [M.bitola / 2, 0], desloca: [0, 36], extensao: true, texto: `bitola ${mil(M.bitola)}` },
     { vista: 'frontal', de: [xPneuDentro, 0], ate: [xPneuFora, 0], desloca: [0, 16], extensao: true, numero: [34, 3], texto: mil(M.pneuLargura) },
     /* traseira: vão das duas portas acima do teto e largura de um vidro dentro dele */

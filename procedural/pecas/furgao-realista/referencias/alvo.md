@@ -18,7 +18,7 @@ As bordas do vidro de cima ficam onde a lateral as põe: z 1.746 na base e 1.337
 
 A traseira desenha o para-choque que a lateral mostra: da soleira (300 mm) ao degrau de carga (570 mm), envolvendo as quinas, com o lugar da placa (400 × 130). Entre o degrau e a base das portas, em 590 mm, fica a faixa de 20 mm da traseira.
 
-O vinco de cintura, que estava em 1.050 mm, subiu na proporção do pé do para-brisa (1.480 sobre 1.310) para 1.190 mm, valor que a receita adotou. A prancha não desenha o vinco.
+O vinco de cintura, que estava em 1.050 mm, subiu na proporção do pé do para-brisa (1.480 sobre 1.310) para 1.190 mm, valor que a receita adotou. A prancha desenha o vinco na lateral, de z -2.600 até a quina da frente sobre o capô (z 2.346), e a frontal marca o ponto dele na lateral.
 
 ## O ajuste de caráter da largura, de 2026-10-31
 

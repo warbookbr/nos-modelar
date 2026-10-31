@@ -197,6 +197,14 @@
         "inversoes": 1,
         "raioMin": 40
       },
+      "vincoDeCintura": {
+        "vista": "lateral",
+        "comprimento": 4946.32,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
       "portaDeCorrer": {
         "vista": "lateral",
         "comprimento": 6145.22,
