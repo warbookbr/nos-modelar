@@ -71,35 +71,27 @@
     "porCamada": {
       "nariz": {
         "vista": "lateral",
-        "comprimento": 1678.93,
-        "retidao": 0.784,
-        "concentracao": 0.136,
+        "comprimento": 1827.7,
+        "retidao": 0.794,
+        "concentracao": 0.131,
         "inversoes": 2,
         "raioMin": 20
       },
       "capoEParaBrisa": {
         "vista": "lateral",
-        "comprimento": 879.07,
-        "retidao": 0.91,
+        "comprimento": 853.4,
+        "retidao": 0.915,
         "concentracao": 0.065,
         "inversoes": 0,
         "raioMin": 90
       },
-      "colunaA": {
-        "vista": "lateral",
-        "comprimento": 688.63,
-        "retidao": 0.879,
-        "concentracao": 0.101,
-        "inversoes": 0,
-        "raioMin": 300
-      },
       "teto": {
         "vista": "lateral",
-        "comprimento": 4907.41,
-        "retidao": 0.839,
-        "concentracao": 0.101,
-        "inversoes": 0,
-        "raioMin": 120
+        "comprimento": 5454.44,
+        "retidao": 0.764,
+        "concentracao": 0.146,
+        "inversoes": 1,
+        "raioMin": 180
       },
       "traseira": {
         "vista": "lateral",
@@ -135,17 +127,17 @@
       },
       "silhuetaFrontal": {
         "vista": "frontal",
-        "comprimento": 8197.73,
-        "retidao": 0.749,
-        "concentracao": 0.131,
+        "comprimento": 8090.11,
+        "retidao": 0.693,
+        "concentracao": 0.166,
         "inversoes": 0,
         "raioMin": 30
       },
       "silhuetaTraseira": {
         "vista": "traseira",
-        "comprimento": 8197.73,
-        "retidao": 0.749,
-        "concentracao": 0.131,
+        "comprimento": 8090.11,
+        "retidao": 0.693,
+        "concentracao": 0.166,
         "inversoes": 0,
         "raioMin": 30
       },
@@ -159,7 +151,7 @@
       },
       "vidroDaCabine": {
         "vista": "lateral",
-        "comprimento": 2648.82,
+        "comprimento": 2726.99,
         "retidao": 0.764,
         "concentracao": 0.141,
         "inversoes": 0,
@@ -167,19 +159,19 @@
       },
       "paraBrisa": {
         "vista": "frontal",
-        "comprimento": 4364.35,
-        "retidao": 0.764,
-        "concentracao": 0.141,
-        "inversoes": 0,
-        "raioMin": 60
+        "comprimento": 4939.7,
+        "retidao": 0.487,
+        "concentracao": 0.121,
+        "inversoes": 2,
+        "raioMin": 30
       },
       "paraBrisaDeCima": {
         "vista": "planta",
-        "comprimento": 3984.74,
-        "retidao": 0.759,
-        "concentracao": 0.151,
-        "inversoes": 0,
-        "raioMin": 60
+        "comprimento": 4531.65,
+        "retidao": 0.824,
+        "concentracao": 0.106,
+        "inversoes": 2,
+        "raioMin": 80
       },
       "vidroTraseiroEsq": {
         "vista": "traseira",
@@ -199,9 +191,9 @@
       },
       "portaDaCabine": {
         "vista": "lateral",
-        "comprimento": 4951,
-        "retidao": 0.638,
-        "concentracao": 0.251,
+        "comprimento": 5214.97,
+        "retidao": 0.653,
+        "concentracao": 0.241,
         "inversoes": 1,
         "raioMin": 40
       },
@@ -231,7 +223,7 @@
       },
       "bordaDoTeto": {
         "vista": "planta",
-        "comprimento": 9973.9,
+        "comprimento": 9411.69,
         "retidao": 0.824,
         "concentracao": 0.111,
         "inversoes": 0,
@@ -239,17 +231,17 @@
       },
       "capoDeCima": {
         "vista": "planta",
-        "comprimento": 4982.14,
-        "retidao": 0.769,
-        "concentracao": 0.141,
+        "comprimento": 5178.14,
+        "retidao": 0.799,
+        "concentracao": 0.131,
         "inversoes": 0,
-        "raioMin": 40
+        "raioMin": 5
       },
       "capo": {
         "vista": "frontal",
-        "comprimento": 4101.82,
-        "retidao": 0.809,
-        "concentracao": 0.116,
+        "comprimento": 4277.5,
+        "retidao": 0.608,
+        "concentracao": 0.121,
         "inversoes": 0,
         "raioMin": 30
       },
@@ -279,25 +271,25 @@
       },
       "farolEsq": {
         "vista": "frontal",
-        "comprimento": 1080.01,
-        "retidao": 0.608,
-        "concentracao": 0.261,
+        "comprimento": 1242.45,
+        "retidao": 0.643,
+        "concentracao": 0.231,
         "inversoes": 0,
         "raioMin": 40
       },
       "farolDir": {
         "vista": "frontal",
-        "comprimento": 1080.01,
-        "retidao": 0.608,
-        "concentracao": 0.261,
+        "comprimento": 1242.45,
+        "retidao": 0.643,
+        "concentracao": 0.231,
         "inversoes": 0,
         "raioMin": 40
       },
       "grade": {
         "vista": "frontal",
-        "comprimento": 2235.85,
-        "retidao": 0.789,
-        "concentracao": 0.126,
+        "comprimento": 2528.3,
+        "retidao": 0.799,
+        "concentracao": 0.121,
         "inversoes": 0,
         "raioMin": 30
       },
@@ -405,15 +397,15 @@
       },
       "boca": {
         "sobre": "nariz",
-        "desvio": 2.63
+        "desvio": 3.03
       },
       "baseVidro": {
         "sobre": "capoEParaBrisa",
-        "desvio": 3.75
+        "desvio": 3.43
       },
       "topoVidro": {
-        "sobre": "colunaA",
-        "desvio": 2.12
+        "sobre": "teto",
+        "desvio": 1.41
       },
       "teto": {
         "sobre": "teto",
@@ -551,7 +543,8 @@
       "bloqueada": false,
       "procedencias": [
         "classe",
-        "proporcao"
+        "proporcao",
+        "ajuste"
       ],
       "incertezas": [
         "balancos",
