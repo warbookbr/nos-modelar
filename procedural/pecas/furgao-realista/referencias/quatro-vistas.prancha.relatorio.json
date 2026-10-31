@@ -87,9 +87,9 @@
       },
       "teto": {
         "vista": "lateral",
-        "comprimento": 5392.95,
-        "retidao": 0.729,
-        "concentracao": 0.191,
+        "comprimento": 5409.41,
+        "retidao": 0.749,
+        "concentracao": 0.161,
         "inversoes": 0,
         "raioMin": 180
       },
@@ -239,7 +239,7 @@
       },
       "bordaDoTeto": {
         "vista": "planta",
-        "comprimento": 8877.09,
+        "comprimento": 9147.43,
         "retidao": 0.819,
         "concentracao": 0.111,
         "inversoes": 0,

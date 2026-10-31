@@ -87,13 +87,13 @@ const P = {
 };
 const meio = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 /* A frente do teto na lateral é uma curva contínua e aberta, sem trecho reto, sem bico e sem barriga: sai tangente ao
-   para-brisa no topo do vidro (1319, 2110) com raio 950 e passa, também tangente, a um raio de 650 até chegar ao teto
-   em 2500. Os dois arcos somam os 55 graus entre o para-brisa e o teto, e o ângulo do primeiro sai da subida de 390 mm.
+   para-brisa no topo do vidro (1319, 2110) com raio 1290 e passa, também tangente, a um raio de 405 até chegar ao teto
+   em 2500, em z 770 (a variante B, escolhida pela pessoa em 2026-10-31). Os dois arcos somam os 55 graus entre o para-brisa e o teto, e o ângulo do primeiro sai da subida de 390 mm.
    O filete do motor fica limitado à metade do trecho vizinho e não desenha dois raios emendados, então os arcos entram
    como pontos calculados aqui. A quina com a traseira tem raio 180, que deixa a traseira vertical até 2320 e o topo das
    portas traseiras (2380) 10 mm para dentro, no começo da curva. */
-const RAIO_TOPO_VIDRO = 950;
-const RAIO_TESTA = 650;
+const RAIO_TOPO_VIDRO = 1290;
+const RAIO_TESTA = 405;
 const RAIO_QUINA_TRASEIRA = 180;
 const dirVidro = Math.PI - ANGULO_PARA_BRISA * grau; // 125 graus, subindo para trás
 /* Subida de um arco que gira de a até b para a esquerda: r (cos a − cos b); avanço em z: r (sen b − sen a). */
