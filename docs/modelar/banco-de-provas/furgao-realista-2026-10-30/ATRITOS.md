@@ -61,3 +61,7 @@ O crítico cego tomou a roda do outro lado, vista pelo vão do vidro da cabine, 
 ## 12. O crítico da prancha repete decisões já aprovadas, e a prancha não emenda dois raios
 
 No ajuste da prancha, o crítico cego apontou duas vezes a porta da cabine contornando o arco e o teto alto acima dela, decisões aprovadas antes, porque não as conhece. O motor da prancha limita cada filete à metade do trecho vizinho e não desenha dois raios emendados, e a especificação passou a calcular os pontos dos dois arcos à mão. O processo não teria pego nenhum dos dois. Destino: o pedido ao crítico da prancha traz as decisões travadas do alinhamento, e o motor ganha curva contínua de mais de um raio, decidido no fechamento.
+
+## 13. A convergência conta rodadas de etapas diferentes como se fossem uma
+
+Depois da rodada 3, a ferramenta da rodada mandou parar sem convergência, porque os defeitos não caíram em três rodadas julgadas (4, 4 e 8). As três são de etapas diferentes, as duas primeiras aceitas pela pessoa, e os quatro defeitos das rodas provisórias, adiados por decisão escrita para as etapas 3 e 4, voltam em toda rodada. O processo pegou o número e não o sentido. Destino: a rodada declara a etapa e os defeitos adiados, e a convergência conta só dentro da etapa, decidido no fechamento.
