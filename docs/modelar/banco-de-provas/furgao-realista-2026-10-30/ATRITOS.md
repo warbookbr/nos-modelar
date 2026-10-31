@@ -41,3 +41,19 @@ A cota vertical que parte do chão desenha a linha de extensão ao longo do solo
 ## 7. A correção da prancha desfez uma decisão do alinhamento
 
 Na segunda rodada, para fazer a porta da cabine descer reta como o crítico pediu, o agente recuou o pé do para-brisa 660 mm, e o capô passou a 1.270 mm, contra o bico curto que a pessoa aprovou. O relatório do motor e o crítico cego não conhecem o alinhamento, e só a leitura da imagem por quem conduz pegou. A terceira rodada voltou o bico curto com a porta em L. O processo não teria pego sozinho. Destino: a prancha passa a declarar os landmarks que o alinhamento fixa como travados, e o motor acusa quando um deles se move, decidido no fechamento.
+
+## 8. A gaiola das frestas foi escrita à mão
+
+Na etapa 2, `gaiolaPorEstacoes` e `gaiolaPorRede` não fazem frestas nem colunas que nascem e morrem no meio da lateral, e o modelador escreveu na receita a gaiola inteira, os anéis por coluna e a divisão dos pontos de cada volta de porta. A costura de anéis que começam no mesmo ponto fez triângulo degenerado no arco, e só a espessura o acusou. O processo pegou o triângulo tarde e não pegou a falta da ferramenta. Destino: operação de fresta sobre a gaiola, decidido no fechamento.
+
+## 9. A fresta plana não aparece nas vistas
+
+A fresta de 6 mm sem dobra só se via onde o fundo aparecia através dela, e a porta de correr sumia das imagens. O modelador dobrou a borda 4 mm para dentro. A luz rasante e a curvatura olham só o lado +x, e a porta de correr, que fica no −x, aparece só na vista esquerda da bancada. O processo não teria pego. Destino: a luz rasante e a curvatura passam a olhar os dois lados quando a peça não é simétrica, decidido no fechamento.
+
+## 10. A ondulação mede o espaçamento pela aresta mais longa
+
+Faces compridas na lateral plana davam 27 mm falsos de ondulação junto do arco, porque o espaçamento local se estima pela aresta mais longa da face. O processo deu o alarme, mas falso. Destino: estimar pela aresta mais curta ou pela área, decidido no fechamento.
+
+## 11. O crítico não sabe o que se vê através dos vãos
+
+O crítico cego tomou a roda do outro lado, vista pelo vão do vidro da cabine, por um objeto solto, e a luz rasante de lado mostrou de lado a aba do vidro oposto através das duas janelas alinhadas. A dúvida só saiu com a vista isolada da carroceria. O processo não teria pego. Destino: o pacote do crítico avisa quando há vão aberto sem vidro e traz a vista da chapa isolada ao lado, decidido no fechamento.
