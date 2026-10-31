@@ -64,17 +64,19 @@ if (zD - M.arcoRaio <= 0 || zD + M.arcoRaio >= zFrente || zT - M.arcoRaio <= zTr
 
 /* ------------------------------------------------------------ perfil lateral */
 /* Pontos de caráter do perfil, em [z, y]. Bico curto, como a pessoa aprovou: para-choque em 2700 com o degrau, boca do
-   capô em 2620 a 954 de altura, capô curto (860 mm em vista lateral) a 22,5 graus, quase emendado no para-brisa; o pé do
-   para-brisa fica sobre a roda dianteira, à frente do eixo (1760, 1310), e o para-brisa sobe a 55 graus até o topo
-   (1284, 1990); painel do teto alto de 510 mm na inclinação de antes até 2500, ligado ao para-brisa por filete de 300;
-   teto reto até a traseira vertical em -2670 e o degrau do para-choque traseiro em 570. */
-const ANGULO_CAPO = 22.5;
+   capô em (2620, 1100), capô curto (860 mm em vista lateral) a cerca de 24 graus, quase emendado no para-brisa; o pé do
+   para-brisa fica sobre a roda dianteira, à frente do eixo, em (1760, 1480), e o para-brisa sobe a 55 graus até o topo
+   em y 2110; a faixa de 390 mm acima dele vai ao teto num raio grande; teto reto até a traseira vertical em -2670 e o
+   degrau do para-choque traseiro em 570. As alturas da boca, do pé e do topo do para-brisa são escolha da pessoa no
+   ajuste de 2026-10-31 (eram 954, 1310 e 1990); as posições em z ficaram. */
 const ANGULO_PARA_BRISA = 55;
 const grau = Math.PI / 180;
-const peVidro = [1760, 1310];
-const topoVidro = [peVidro[0] - (1990 - peVidro[1]) / Math.tan(ANGULO_PARA_BRISA * grau), 1990];
-const comprimentoCapo = 860;
-const boca = [peVidro[0] + comprimentoCapo, peVidro[1] - comprimentoCapo * Math.tan(ANGULO_CAPO * grau)];
+const peVidro = [1760, 1480];
+const Y_TOPO_VIDRO = 2110;
+const topoVidro = [peVidro[0] - (Y_TOPO_VIDRO - peVidro[1]) / Math.tan(ANGULO_PARA_BRISA * grau), Y_TOPO_VIDRO];
+const boca = [2620, 1100];
+const comprimentoCapo = boca[0] - peVidro[0];
+const ANGULO_CAPO = Math.atan2(peVidro[1] - boca[1], comprimentoCapo) / grau;
 const P = {
   parachoqueTopo: [zFrente, 720],
   boca,
@@ -85,6 +87,12 @@ const P = {
   degrau: [-2670, 570],
 };
 const meio = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+/* Raios do teto na lateral: no topo do para-brisa 600, na testa do teto alto 355 (o maior que cabe na metade da faixa
+   de 438 mm entre os dois) e na quina com a traseira 180, que deixa a traseira vertical até 2320 e o topo das portas
+   traseiras (2380) 10 mm para dentro, no começo da curva. */
+const RAIO_TOPO_VIDRO = 600;
+const RAIO_TESTA = 355;
+const RAIO_QUINA_TRASEIRA = 180;
 
 /* Onde o arco corta a soleira: a abertura da roda interrompe a linha de baixo. */
 const dzArco = Math.sqrt(M.arcoRaio ** 2 - (M.soleira - R) ** 2);
@@ -114,7 +122,7 @@ const naColuna = (recuo, y) => {
   return [b[0] + (coluna[0] / coluna[1]) * (y - b[1]), y];
 };
 /* Porta dianteira de furgão de bico curto: a fresta da frente sobe a coluna do para-brisa, 30 mm atrás dela, desde o
-   teto da cabine (1955) até a base da coluna, desce vertical dali até perto do arco e contorna o arco por trás, a 55 mm
+   teto da cabine (2075, 35 abaixo do topo do para-brisa) até a base da coluna, desce vertical dali até perto do arco e contorna o arco por trás, a 55 mm
    dele, até a soleira logo atrás (z ≈ 1246). Sem degrau nem prolongamento na cintura. A traseira fica em z 550, na
    coluna do meio, 1170 mm atrás do eixo dianteiro: a porta tem cerca de 1185 na cintura e 700 na base, mais estreita
    embaixo por causa do arco. A coluna do meio tem 110 até a porta de correr, que tem 1300 e fica à frente do arco
@@ -123,7 +131,7 @@ const MOLDURA = 70;
 const FOLGA_ARCO = 55;
 const raioPorta = M.arcoRaio + FOLGA_ARCO;
 const fendaColuna = (y) => naColuna(30, y)[0];
-const portaCabine = { tras: 550, base: 380, topo: 1955 };
+const portaCabine = { tras: 550, base: 380, topo: Y_TOPO_VIDRO - 35 };
 portaCabine.pe = [peVidro[0] + normalTras[0] * 30, peVidro[1] + normalTras[1] * 30]; // pé da fresta da coluna
 const zArestaPorta = portaCabine.pe[0];
 portaCabine.frente = zD - Math.sqrt(raioPorta ** 2 - (portaCabine.base - R) ** 2);
@@ -140,7 +148,8 @@ function arcoDaPorta() {
   }
   return pts;
 }
-const vidroCabine = { tras: portaCabine.tras + MOLDURA, base: portaCabine.pe[1] + MOLDURA, topo: portaCabine.topo - 75 };
+/* A base do vidro da porta fica na altura do pé do para-brisa, como a pessoa pediu no ajuste de 2026-10-31. */
+const vidroCabine = { tras: portaCabine.tras + MOLDURA, base: peVidro[1], topo: portaCabine.topo - 75 };
 const COLUNA_DO_MEIO = 110;
 const portaCorrer = { frente: portaCabine.tras - COLUNA_DO_MEIO, base: 380, topo: 2200 };
 portaCorrer.tras = portaCorrer.frente - 1300;
@@ -153,7 +162,9 @@ for (const [z, y] of arcoDaPorta()) {
   if (Math.hypot(z - zD, y - R) - M.arcoRaio < 50 - 1e-6) throw new Error('a aresta da porta passa a menos de 50 mm do arco');
 }
 if (zArestaPorta - zD < 0 || yArcoNaAresta <= R) throw new Error('a aresta da porta não desce sobre o arco');
-if (vidroCabine.base - portaCabine.pe[1] < MOLDURA - 1 || vidroCabine.tras - portaCabine.tras < MOLDURA - 1
+const cantoDoVidro = naColuna(30 + MOLDURA, vidroCabine.base);
+if (vidroCabine.base < portaCabine.pe[1] || Math.hypot(cantoDoVidro[0] - portaCabine.pe[0], cantoDoVidro[1] - portaCabine.pe[1]) < MOLDURA - 1
+  || vidroCabine.tras - portaCabine.tras < MOLDURA - 1
   || portaCabine.topo - vidroCabine.topo < MOLDURA - 1) throw new Error('o vidro sai da moldura da porta');
 if (fendaColuna(vidroCabine.base) - naColuna(30 + MOLDURA, vidroCabine.base)[0] < MOLDURA - 1) throw new Error('o vidro passa da coluna');
 if (portaCorrer.tras - (zT + M.arcoRaio) < FOLGA_ARCO_TRASEIRO) throw new Error('a porta de correr fica a menos de 150 mm do arco traseiro');
@@ -162,7 +173,11 @@ if (portaCorrer.tras - (zT + M.arcoRaio) < FOLGA_ARCO_TRASEIRO) throw new Error(
 /* Projeção ao longo de z: a caixa de carga é a parte mais larga e mais alta, então frontal e traseira têm o mesmo
    contorno, quase retangular, com a lateral quase vertical (1000 até 1450 de altura, 982 no teto) e a quina do teto
    com raio de 170. */
-const silhuetaFrontal = [[-xMax, M.soleira, 30], [xMax, M.soleira, 30], [xMax, 1450, 600], [982, M.altura, 170], [-982, M.altura, 170], [-xMax, 1450, 600]];
+/* Quina do teto com a lateral, vista de frente e de trás, com raio de 300 (era 170). */
+const RAIO_QUINA_TETO = 300;
+const silhuetaFrontal = [[-xMax, M.soleira, 30], [xMax, M.soleira, 30], [xMax, 1450, 600], [982, M.altura, RAIO_QUINA_TETO], [-982, M.altura, RAIO_QUINA_TETO], [-xMax, 1450, 600]];
+/* Meia largura da cabine na altura y: a lateral quase vertical da frontal, 1000 até 1450 e 982 no teto. */
+const meiaLarguraEm = (y) => (y <= 1450 ? xMax : xMax - ((xMax - 982) * (y - 1450)) / (M.altura - 1450));
 const xPneuDentro = M.bitola / 2 - M.pneuLargura / 2; // 737,5
 const xPneuFora = M.bitola / 2 + M.pneuLargura / 2; // 962,5
 /* De frente e de trás só se vê o pneu abaixo da soleira: a carroceria cobre o resto, e o pneu inteiro cruzava as portas
@@ -170,15 +185,44 @@ const xPneuFora = M.bitola / 2 + M.pneuLargura / 2; // 962,5
 const pneuDeFrente = (s) => [[s * xPneuDentro, M.soleira], [s * xPneuDentro, 0, 50], [s * xPneuFora, 0, 50], [s * xPneuFora, M.soleira]];
 const portaTraseira = (s) => [[s * 6, 590, 20], [s * 900, 590, 40], [s * 900, 2380, 90], [s * 6, 2380, 20]];
 const vidroTraseiro = (s) => [[s * 80, 1700, 50], [s * 820, 1700, 50], [s * 820, 2200, 70], [s * 80, 2200, 50]];
-const vidroDeFrente = [[-820, peVidro[1] + 20, 60], [820, peVidro[1] + 20, 60], [790, 1965, 90], [-790, 1965, 90]];
+/* O para-brisa envolve as quinas. De cima, a base e o topo curvam em planta (flecha de 12 mm até o começo da quina) e
+   as pontas dobram para a lateral numa quina de raio 80, até 40 graus; elas ficam 31 mm atrás do centro, dentro da
+   fresta da porta da cabine na lateral (30 mm na perpendicular à coluna, 37 na horizontal), e por isso a porta não muda.
+   De frente, o vidro vai quase até a lateral, com coluna fina na quina, e as duas bordas são arcos: a de cima abaulada
+   para cima, com flecha de 50, e a de baixo acompanhando o capô, com flecha de 27. */
+const QUINA_VIDRO = 80;
+const Y_COTA_VIDRO = 1790;
+const DOBRA_VIDRO = 40 * grau;
+const FLECHA_PLANTA = 12;
+const FLECHA_TOPO = 50;
+const COROA_CAPO = 40;
+const vidroBaseY = peVidro[1] + 20;
+const vidroTopoY = Y_TOPO_VIDRO - 25;
+const recuoDaPonta = FLECHA_PLANTA + QUINA_VIDRO * (1 - Math.cos(DOBRA_VIDRO));
+const pontaDoVidro = (y) => meiaLarguraEm(y) - QUINA_VIDRO + QUINA_VIDRO * Math.sin(DOBRA_VIDRO);
+const xPontaBase = pontaDoVidro(vidroBaseY);
+const xPontaTopo = pontaDoVidro(vidroTopoY);
+/* Na frontal, a borda de baixo desce com a coroa do capô e sobe com o recuo da ponta pela inclinação do capô. */
+const flechaBase = COROA_CAPO - recuoDaPonta * Math.tan(ANGULO_CAPO * grau);
+const arcoFrontal = (xPonta, yCentro, flecha, n = 16) => Array.from({ length: n + 1 }, (_, i) => {
+  const x = -xPonta + (2 * xPonta * i) / n;
+  return [x, yCentro - flecha * (x / xPonta) ** 2];
+});
+const vidroDeFrente = [
+  ...arcoFrontal(xPontaBase, vidroBaseY, flechaBase).map(([x, y], i, a) => (i === 0 || i === a.length - 1 ? [x, y, 30] : [x, y])),
+  ...arcoFrontal(xPontaTopo, vidroTopoY, FLECHA_TOPO).reverse().map(([x, y], i, a) => (i === 0 || i === a.length - 1 ? [x, y, 30] : [x, y])),
+];
+if (xPontaBase > xMax - 20 || xPontaTopo > meiaLarguraEm(vidroTopoY) - 20) throw new Error('a ponta do para-brisa passa da quina');
+if (recuoDaPonta > 30 / Math.sin(ANGULO_PARA_BRISA * grau)) throw new Error('a ponta do para-brisa recua além da fresta da porta da cabine');
 /* A frente abaixo do para-brisa, só em contornos de posição: o capô entre a boca (954) e o pé do para-brisa (1310); o
    para-choque no plástico escuro, envolvendo as quinas até a soleira, com a entrada de ar embaixo e o lugar da placa
    (400 × 130); entre ele e a boca, os faróis grandes nas quinas e a grade entre eles. */
-const capoDeFrente = [[-880, boca[1] + 10, 50], [880, boca[1] + 10, 50], [860, peVidro[1], 30], [-860, peVidro[1], 30]];
+const capoDeFrente = [[-880, boca[1] + 10, 50], [880, boca[1] + 10, 50],
+  ...arcoFrontal(xPontaBase - 20, peVidro[1], COROA_CAPO).reverse().map(([x, y], i, a) => (i === 0 || i === a.length - 1 ? [x, y, 30] : [x, y]))];
 const parachoqueDeFrente = [[-985, 310, 40], [985, 310, 40], [985, 740, 60], [-985, 740, 60]];
 const entradaDeAr = [[-650, 350, 30], [650, 350, 30], [650, 480, 30], [-650, 480, 30]];
 const placa = [[-200, 520, 10], [200, 520, 10], [200, 650, 10], [-200, 650, 10]];
-const farol = (s) => [[s * 560, 765, 40], [s * 960, 765, 40], [s * 960, boca[1] - 10, 50], [s * 560, boca[1] - 10, 50]];
+const farol = (s) => [[s * 560, 830, 40], [s * 960, 830, 40], [s * 960, boca[1] - 10, 50], [s * 560, boca[1] - 10, 50]];
 const grade = [[-500, 785, 30], [500, 785, 30], [500, boca[1] - 25, 30], [-500, boca[1] - 25, 30]];
 
 /* ------------------------------------------------------------ planta */
@@ -187,13 +231,32 @@ const grade = [[-500, 785, 30], [500, 785, 30], [500, boca[1] - 25, 30], [-500, 
 const planta = [[zFrente, -xMax, 280], [zFrente, xMax, 280], [zTras, xMax, 100], [zTras, -xMax, 100]];
 const zVidroBase = naColuna(0, peVidro[1] + 20)[0];
 const zVidroTopo = naColuna(0, 1965)[0];
-const vidroDeCima = [[zVidroBase, -820, 60], [zVidroBase, 820, 60], [zVidroTopo, 790, 90], [zVidroTopo, -790, 90]];
+/* Borda do vidro em planta, [z, x]: flecha até o começo da quina e a quina dobrando para trás até a ponta. */
+function bordaEmPlanta(zCentro, meiaLargura, n = 12) {
+  const xq = meiaLargura - QUINA_VIDRO;
+  const meio = Array.from({ length: n + 1 }, (_, i) => {
+    const x = -xq + (2 * xq * i) / n;
+    return [zCentro - FLECHA_PLANTA * (x / xq) ** 2, x];
+  });
+  const quina = (sinal) => Array.from({ length: 5 }, (_, k) => {
+    const f = ((k + 1) / 5) * DOBRA_VIDRO;
+    return [zCentro - FLECHA_PLANTA - QUINA_VIDRO * (1 - Math.cos(f)), sinal * (xq + QUINA_VIDRO * Math.sin(f))];
+  });
+  return [...quina(-1).reverse(), ...meio, ...quina(1)];
+}
+const vidroDeCima = [
+  ...bordaEmPlanta(zVidroBase, meiaLarguraEm(vidroBaseY)),
+  ...bordaEmPlanta(zVidroTopo, meiaLarguraEm(vidroTopoY)).reverse(),
+];
 /* Tangente do filete de 300 da testa com o teto, e do de 120 da quina traseira. */
 const giroTesta = Math.PI - Math.atan2(P.testa[1] - P.topoVidro[1], P.testa[0] - P.topoVidro[0]);
-const zTetoPlano = P.testa[0] - 300 * Math.tan(giroTesta / 2);
-const bordaDoTeto = [[zTetoPlano, -809, 100], [zTetoPlano, 809, 100], [-2550, 809, 40], [-2550, -809, 40]];
+const zTetoPlano = P.testa[0] - RAIO_TESTA * Math.tan(giroTesta / 2);
+const zTetoPlanoTras = P.quinaTraseira[0] + RAIO_QUINA_TRASEIRA;
+const xTetoPlano = 982 - RAIO_QUINA_TETO * Math.tan((Math.PI - Math.atan2(M.altura - 1450, 982 - xMax)) / 2);
+const bordaDoTeto = [[zTetoPlano, -xTetoPlano, 100], [zTetoPlano, xTetoPlano, 100], [zTetoPlanoTras, xTetoPlano, 40], [zTetoPlanoTras, -xTetoPlano, 40]];
 /* O capô de cima, da boca ao pé do para-brisa (z 1360), que é a linha onde ele encontra o vidro. */
-const capoDeCima = [[P.baseVidro[0], -860, 40], [2600, -860, 120], [2600, 860, 120], [P.baseVidro[0], 860, 40]];
+const capoDeCima = [[2600, -860, 120], [2600, 860, 120],
+  ...bordaEmPlanta(P.baseVidro[0], meiaLarguraEm(peVidro[1]) - 10).slice(4, -4).reverse().map(([z, x], i, a) => (i === 0 || i === a.length - 1 ? [z, x, 30] : [z, x]))];
 const pneuDeCima = (zc, s) => [[zc - R, s * xPneuDentro, 40], [zc + R, s * xPneuDentro, 40], [zc + R, s * xPneuFora, 40], [zc - R, s * xPneuFora, 40]];
 
 /* ------------------------------------------------------------ landmarks */
@@ -202,9 +265,9 @@ const LANDMARKS = [
   { id: 'eixoD', vista: 'lateral', em: [zD, R], rotuloEm: [zD - 84, R - 90] },
   { id: 'eixoT', vista: 'lateral', em: [zT, R], rotuloEm: [zT - 84, R - 90] },
   { id: 'frente', vista: 'lateral', em: [zFrente, 500], sobre: 'nariz', rotuloEm: [2350, 120] },
-  { id: 'boca', vista: 'lateral', em: P.boca, sobre: 'nariz', rotuloEm: [2500, 1117] },
-  { id: 'baseVidro', vista: 'lateral', em: P.baseVidro, sobre: 'capoEParaBrisa', rotuloEm: [2080, 1450] },
-  { id: 'topoVidro', vista: 'lateral', em: P.topoVidro, sobre: 'colunaA', rotuloEm: [1250, 2640] },
+  { id: 'boca', vista: 'lateral', em: P.boca, sobre: 'nariz', rotuloEm: [2480, 1230] },
+  { id: 'baseVidro', vista: 'lateral', em: P.baseVidro, sobre: 'capoEParaBrisa', rotuloEm: [2080, 1560] },
+  { id: 'topoVidro', vista: 'lateral', em: P.topoVidro, sobre: 'teto', rotuloEm: [1250, 2640] },
   { id: 'teto', vista: 'lateral', em: [0, M.altura], sobre: 'teto', rotuloEm: [-450, 2640] },
   { id: 'degrau', vista: 'lateral', em: P.degrau, sobre: 'traseira', rotuloEm: [-2760, 600], rotuloAncora: 'end' },
   { id: 'traseira', vista: 'lateral', em: [zTras, 430], sobre: 'traseira', rotuloEm: [-2760, 380], rotuloAncora: 'end' },
@@ -264,6 +327,11 @@ export const ESPEC = {
         tipo: 'briefing-ficcional',
         evidencia: 'balanços, bitola, soleira, arcos, perfil da cabine, linhas de porta e vidros estimados nesta especificação dentro das proporções da classe e das decisões de forma do alinhamento (bico curto, laterais quase verticais, porta de correr à direita, duas portas traseiras)',
       },
+      {
+        id: 'ajuste',
+        tipo: 'medidas-declaradas',
+        evidencia: 'ajuste da pessoa em 2026-10-31: boca do capô em y 1100, pé do para-brisa em y 1480 e topo dele em y 2110, com as posições em z mantidas; raios maiores no teto e para-brisa que envolve as quinas',
+      },
     ],
     incertezas: [
       { id: 'balancos', sobre: 'divisão dos 2100 mm de balanço em 980 na frente e 1120 atrás', fonte: 'proporcao', efeito: 'diagnostico', motivo: 'a classe fixa comprimento e entre-eixos; a divisão varia uns 100 mm entre furgões da classe' },
@@ -277,8 +345,10 @@ export const ESPEC = {
     /* 1. silhuetas */
     { vista: 'lateral', contorno: true, nome: 'nariz', tipo: 'filete', pts: [[zD + dzArco, M.soleira], [zFrente, M.soleira, 50], [...P.parachoqueTopo, 30], [2660, 760], [...P.boca, 20], meio(P.boca, P.baseVidro)] },
     { vista: 'lateral', contorno: true, nome: 'capoEParaBrisa', tipo: 'filete', pts: [meio(P.boca, P.baseVidro), [...P.baseVidro, 90], meio(P.baseVidro, P.topoVidro)], esperado: { inversoesMax: 0, raioMinMin: 80 } },
-    { vista: 'lateral', contorno: true, nome: 'colunaA', tipo: 'filete', pts: [meio(P.baseVidro, P.topoVidro), [...P.topoVidro, 300], meio(P.topoVidro, P.testa)], esperado: { inversoesMax: 0 } },
-    { vista: 'lateral', contorno: true, nome: 'teto', tipo: 'filete', pts: [meio(P.topoVidro, P.testa), [...P.testa, 300], [...P.quinaTraseira, 120], meio(P.quinaTraseira, P.degrau)], esperado: { inversoesMax: 0, concentracaoMax: 0.25, raioMinMin: 110 } },
+    /* Do meio do para-brisa ao meio da traseira num trecho só: o filete fica limitado à metade do trecho vizinho, e com
+       o corte no meio da testa o raio de 300 pedido saía com 200. A única inversão é a do topo do para-brisa, onde o
+       vidro a 55 graus passa à testa mais em pé: são as duas inclinações da frente do teto, mantidas de propósito. */
+    { vista: 'lateral', contorno: true, nome: 'teto', tipo: 'filete', pts: [meio(P.baseVidro, P.topoVidro), [...P.topoVidro, RAIO_TOPO_VIDRO], [...P.testa, RAIO_TESTA], [...P.quinaTraseira, RAIO_QUINA_TRASEIRA], meio(P.quinaTraseira, P.degrau)], esperado: { inversoesMax: 1, concentracaoMax: 0.25, raioMinMin: 170 } },
     { vista: 'lateral', contorno: true, nome: 'traseira', tipo: 'filete', pts: [meio(P.quinaTraseira, P.degrau), P.degrau, [zTras, 570], [zTras, M.soleira, 40], [zT - dzArco, M.soleira]] },
     { vista: 'lateral', contorno: true, nome: 'arcoTraseiro', tipo: 'poli', pts: arco(zT) },
     { vista: 'lateral', contorno: true, nome: 'soleira', tipo: 'poli', pts: [[zT + dzArco, M.soleira], [zD - dzArco, M.soleira]], esperado: { inversoesMax: 0 } },
@@ -325,7 +395,9 @@ export const ESPEC = {
     { vista: 'planta', classe: 'roda', nome: 'pneuDeCimaTD', tipo: 'filete', fechado: true, pts: pneuDeCima(zT, -1) },
 
     /* eixos de simetria e de roda */
-    { vista: 'frontal', classe: 'eixo', tipo: 'poli', pts: [[0, -60], [0, 2560]] },
+    /* interrompido no número da largura do para-brisa */
+    { vista: 'frontal', classe: 'eixo', tipo: 'poli', pts: [[0, -60], [0, Y_COTA_VIDRO - 15]] },
+    { vista: 'frontal', classe: 'eixo', tipo: 'poli', pts: [[0, Y_COTA_VIDRO + 130], [0, 2560]] },
     { vista: 'traseira', classe: 'eixo', tipo: 'poli', pts: [[0, 0], [0, 2560]] },
     { vista: 'planta', classe: 'eixo', tipo: 'poli', pts: [[zTras - 60, 0], [zFrente + 60, 0]] },
     /* o chão, onde as cotas de altura começam */
@@ -333,7 +405,7 @@ export const ESPEC = {
   ],
   landmarks: LANDMARKS,
   anotacoes: [
-    { vista: 'lateral', em: [1500, 2150], texto: `para-brisa a ${Math.round((Math.atan2(P.topoVidro[1] - P.baseVidro[1], P.baseVidro[0] - P.topoVidro[0]) * 180) / Math.PI)}° da horizontal` },
+    { vista: 'lateral', em: [1500, 2200], texto: `para-brisa a ${Math.round((Math.atan2(P.topoVidro[1] - P.baseVidro[1], P.baseVidro[0] - P.topoVidro[0]) * 180) / Math.PI)}° da horizontal` },
   ],
   cotas: [
     /* lateral: entre-eixos e balanços no chão, comprimento abaixo deles; diâmetro do pneu no centro da roda dianteira;
@@ -348,7 +420,7 @@ export const ESPEC = {
     { vista: 'lateral', de: [P.topoVidro[0], 0], ate: P.topoVidro, desloca: [(zFrente - P.topoVidro[0]) * ESCALA + 76, 0], extensao: true, texto: mil(P.topoVidro[1]) },
     { vista: 'lateral', de: P.baseVidro, ate: [zFrente, P.baseVidro[1]], desloca: [0, -56], extensao: true, texto: mil(zFrente - P.baseVidro[0]) },
     { vista: 'lateral', de: [-200, 0], ate: [-200, M.soleira], texto: mil(M.soleira) },
-    { vista: 'lateral', dono: 'portaDaCabine', de: [portaCabine.tras, portaCabine.pe[1] - 60], ate: [zArestaPorta, portaCabine.pe[1] - 60], texto: mil(portaNaCintura) },
+    { vista: 'lateral', dono: 'portaDaCabine', de: [portaCabine.tras, portaCabine.pe[1] - 110], ate: [zArestaPorta, portaCabine.pe[1] - 110], texto: mil(portaNaCintura) },
     { vista: 'lateral', dono: 'portaDeCorrer', de: [portaCorrer.tras, 1700], ate: [portaCorrer.frente, 1700], texto: mil(portaCorrer.frente - portaCorrer.tras) },
     /* frontal: altura à esquerda, largura no teto, bitola e pneu no chão */
     { vista: 'frontal', de: [-xMax, 0], ate: [-xMax, M.altura], desloca: [-40, 0], extensao: true, texto: mil(M.altura) },
@@ -359,6 +431,7 @@ export const ESPEC = {
     { vista: 'traseira', de: [900, 2380], ate: [-900, 2380], desloca: [0, -31], extensao: true, texto: `vão das portas ${mil(1800)}` },
     { vista: 'traseira', de: [xMax, M.soleira], ate: [-xMax, M.soleira], desloca: [0, M.soleira * ESCALA + 20], extensao: true, texto: mil(M.largura) },
     { vista: 'traseira', dono: 'vidroTraseiroEsq', de: [80, 1950], ate: [820, 1950], texto: mil(740) },
+    { vista: 'frontal', dono: 'paraBrisa', de: [-pontaDoVidro(Y_COTA_VIDRO), Y_COTA_VIDRO], ate: [pontaDoVidro(Y_COTA_VIDRO), Y_COTA_VIDRO], texto: mil(2 * pontaDoVidro(Y_COTA_VIDRO)) },
     /* planta: largura à esquerda */
     { vista: 'planta', de: [zTras, -xMax], ate: [zTras, xMax], desloca: [-25, 0], extensao: true, texto: mil(M.largura) },
   ],
@@ -378,6 +451,8 @@ export const ESPEC = {
       `Arcos das rodas com raio ${M.arcoRaio} no centro da roda (${M.arcoRaio - R} mm sobre o pneu); soleira em ${M.soleira}; largura sem retrovisores.`,
       'A lateral mostra o lado direito (-x), com a porta de correr; o lado esquerdo é o espelho dele sem ela.',
       'Medidas rígidas da classe; cabine, portas, vidros, bitola e balanços estimados na proporção (ver autoria).',
+      `Teto: raio ${RAIO_TOPO_VIDRO} no topo do para-brisa, ${RAIO_TESTA} na testa e ${RAIO_QUINA_TRASEIRA} na quina traseira (lateral); ${RAIO_QUINA_TETO} nas quinas com a lateral (frontal e traseira).`,
+      `Para-brisa: flecha ${FLECHA_TOPO} em cima e ${Math.round(flechaBase)} embaixo na frontal; coluna em x ±${Math.round(xPontaBase)} na base e ±${Math.round(xPontaTopo)} no topo; de cima, pontas ${Math.round(recuoDaPonta)} mm atrás do centro, dobrando na quina de raio ${QUINA_VIDRO}.`,
       ...linhasDeLandmarks(),
     ],
   },
