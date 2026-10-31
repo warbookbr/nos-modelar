@@ -1,0 +1,353 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "borda traseira e inferior do vão da janela da porta da cabine",
+        "sentido": "segmentado",
+        "evidencia": "luz rasante do lado az30 e az120: contorno do vão com pontos claros e escuros alternados em x 330-560, y 345-470; os outros vãos saem limpos"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro e ponta do lábio do arco",
+        "sentido": "segmentado",
+        "evidencia": "curvatura do tresquartos: espinhos ocre em x 430-495, y 785-815; curvatura do lado: ruído em x 235-260, y 440-500; rasante do lado: entalhe em x 225-245, y 690-720"
+      }
+    ],
+    "observacao": "A forma e as medidas batem com a prancha, e só o serrilhado na janela da cabine e na fresta junto ao arco dianteiro afasta o modelo; faróis e grade da prancha estão fora da etapa 2."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a faixa ocre da curvatura mostra dentes junto ao arco: vêm dos leques de triângulos da gaiola do lado da porta, sem desvio de geometria",
+    "colunas de z fixo na lateral entram e saem ao lado do fim da quina e desenham degraus na rasante; nenhuma medida avisa",
+    "o friso refina a cadeia só pelo nível da superfície, então o canto do vão só sai redondo se o nó do canto já estiver no arco",
+    "descrever, --acao e guarda:acervo levam uns 6 minutos cada; quatro rodadas por sessão é o que cabe",
+    "passo_arco_graus abaixo de 6 recusava por colunas cruzadas nos anéis abaixo da soleira, por 1 mm de folga",
+    "o script de silhueta conta vãos e frestas como borda; tapei o para-brisa com o polígono da meia volta e fechei as frestas",
+    "a borda de trás da janela da cabine, na rasante, mostra a aba do vão do outro lado vista através da janela aberta; o crítico a lê como serrilhado deste vão"
+  ],
+  "notaDePassagem": "Colunas do capô andam com a quina para não oscilar a face ao lado dela; nós do canto do vão no arco, pois diagonal reta dava chanfro; tampas do arco sobem 2 anéis.",
+  "receita": {
+    "sha256": "sha256:77886247ebbeb293af6f3d6f87db2a34861319c48bc6427d9713e9d988b4c176",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 5,
+      "acrescentadas": 37,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  colunas_do_capo_y: 900, // do anel de baixo do capô (acima dos arcos) em diante, três colunas da lateral andam junto com o fim da quina"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  colunas_do_capo: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  colunas_do_capo_passo: 60,"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  tampas_aneis: 2, // quantos anéis acima do ponto do arco a tampa dele sobe antes de a coluna acabar, para o leque dos anéis ficar longe da fresta"
+        },
+        {
+          "tipo": "-",
+          "linha": 753,
+          "texto": "      const yAntes = iH > 0 ? horizontais[iH - 1].y : -Infinity;"
+        },
+        {
+          "tipo": "+",
+          "linha": 757,
+          "texto": "      const yAntes = iH > T.tampas_aneis - 1 ? horizontais[iH - T.tampas_aneis].y : -Infinity;"
+        },
+        {
+          "tipo": "+",
+          "linha": 791,
+          "texto": "    /* No capô e no para-lama, onde a quina acaba mais para trás a cada anel, as colunas de enchimento da lateral ficam em z fixo e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 792,
+          "texto": "       primeira delas ao lado do fim da quina (E) se afasta e some a cada poucos anéis: a face ao lado de E oscila de 40 a 150 mm e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 793,
+          "texto": "       luz rasante mostra a beira do capô em degraus. Colunas_do_capo colunas sobem junto com E, a colunas_do_capo_passo uma da outra, e as de z fixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 794,
+          "texto": "       que cairiam perto delas saem (são estruturais). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 795,
+          "texto": "    if (an.horizontal && an.y >= T.colunas_do_capo_y && itens.length > 0) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 796,
+          "texto": "      const zE = sec.zF - sec.rF;"
+        },
+        {
+          "tipo": "+",
+          "linha": 797,
+          "texto": "      const zProximo = Math.max(...itens.map((it) => it.z));"
+        },
+        {
+          "tipo": "+",
+          "linha": 798,
+          "texto": "      for (let j = 1; j <= T.colunas_do_capo; j += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 799,
+          "texto": "        const z = zE - j * T.colunas_do_capo_passo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 800,
+          "texto": "        if (z > zProximo + T.margem_coluna + 5) itens.push({ col: `F${j}`, z, y: sec.yS });"
+        },
+        {
+          "tipo": "+",
+          "linha": 801,
+          "texto": "      }"
+        },
+        {
+          "tipo": "+",
+          "linha": 802,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 884,
+          "texto": "  const arcosDosCantos = [];"
+        },
+        {
+          "tipo": "-",
+          "linha": 873,
+          "texto": "        for (let j = 0; j < k; j += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 874,
+          "texto": "          const nome = (r, c) => r.lista.find((q) => q.col === c).nome;"
+        },
+        {
+          "tipo": "-",
+          "linha": 875,
+          "texto": "          diagonaisDosCantos.push([nome(sub2[j], cols[j]), nome(sub2[j + 1], cols[j + 1])]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 876,
+          "texto": "        }"
+        },
+        {
+          "tipo": "+",
+          "linha": 890,
+          "texto": "        const nome = (r, c) => r.lista.find((q) => q.col === c).nome;"
+        },
+        {
+          "tipo": "+",
+          "linha": 891,
+          "texto": "        for (let j = 0; j < k; j += 1) diagonaisDosCantos.push([nome(sub2[j], cols[j]), nome(sub2[j + 1], cols[j + 1])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 892,
+          "texto": "        arcosDosCantos.push({"
+        },
+        {
+          "tipo": "+",
+          "linha": 893,
+          "texto": "          p00: nome(sub2[0], cols[0]), p10: nome(sub2[0], cols[k]), p01: nome(sub2[k], cols[0]), p11: nome(sub2[k], cols[k]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 894,
+          "texto": "          cadeia: Array.from({ length: k - 1 }, (_, j) => nome(sub2[j + 1], cols[j + 1])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 895,
+          "texto": "        });"
+        },
+        {
+          "tipo": "+",
+          "linha": 940,
+          "texto": "  /* Os nós de dentro da diagonal de cada canto saem da diagonal e vão para o arco: o bloco de k por k células do canto vira um"
+        },
+        {
+          "tipo": "+",
+          "linha": 941,
+          "texto": "     remendo bilinear, com a quina do vão (a coluna de fora no anel da borda) em (1, 0) e o fim da diagonal em (1, 1), e o arco de"
+        },
+        {
+          "tipo": "+",
+          "linha": 942,
+          "texto": "     raio 1 tangente à borda no começo da diagonal e à coluna de fora no fim dela passa por esses nós, em (sen a, 1 - cos a), a"
+        },
+        {
+          "tipo": "+",
+          "linha": 943,
+          "texto": "     = 90 graus vezes j sobre k. Com a diagonal reta o canto saía em chanfro, de dois cantos de 45 graus. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 944,
+          "texto": "  for (const { p00, p10, p01, p11, cadeia } of arcosDosCantos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 945,
+          "texto": "    const k = cadeia.length + 1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 946,
+          "texto": "    const [a, b, c, d] = [p00, p10, p01, p11].map((n) => P.get(n));"
+        },
+        {
+          "tipo": "+",
+          "linha": 947,
+          "texto": "    cadeia.forEach((n, j) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 948,
+          "texto": "      const ang = (Math.PI / 2) * ((j + 1) / k);"
+        },
+        {
+          "tipo": "+",
+          "linha": 949,
+          "texto": "      const u = Math.sin(ang); const w = 1 - Math.cos(ang);"
+        },
+        {
+          "tipo": "+",
+          "linha": 950,
+          "texto": "      P.set(n, [0, 1, 2].map((e) => (1 - u) * (1 - w) * a[e] + u * (1 - w) * b[e] + (1 - u) * w * c[e] + u * w * d[e]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 951,
+          "texto": "    });"
+        },
+        {
+          "tipo": "+",
+          "linha": 952,
+          "texto": "  }"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az10.png",
+      "peca-frente-rasante-az100.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
