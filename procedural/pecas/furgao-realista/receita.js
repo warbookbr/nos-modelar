@@ -1,10 +1,11 @@
 /* furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano
  * docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no banco de provas furgao-realista-2026-10-30): a lataria
- * detalhada. Sobre a chapa contínua da etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png,
- * aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as
+ * detalhada, refeita pela prancha ajustada de 2026-10-31 (a frente mais alta, o para-brisa que envolve as quinas, a curva do teto
+ * de dois raios e os raios maiores nas quinas do teto; ver "O ajuste da prancha" em referencias/alvo.md). Sobre a chapa contínua da
+ * etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png, aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as
  * duas traseiras de abrir), o vinco de cintura discreto ao longo da lateral, as nervuras longitudinais do teto alto e a aba leve dos
  * quatro arcos das rodas, e abre na chapa os vãos do para-brisa, dos vidros das portas da cabine e dos das portas traseiras, cada um
- * com a aba dobrada para dentro conferida como moldura. As quatro rodas provisórias da etapa 1 ficam. O corpo de baixo, os
+ * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. As quatro rodas provisórias da etapa 1 ficam. O corpo de baixo, os
  * para-choques, as rodas da família, os vidros e borrachas, as luzes e o acabamento vêm nas etapas 3 a 7.
  *
  * Origem: a peça nasceu como cópia do `furgao` do acervo, recriado em primitivas do núcleo a partir do modelo "van" do pacote A, de
@@ -50,42 +51,42 @@ export const TABELA = {
   pneu_largura: 225,
   arco_raio: 420,
 
-  // perfil da frente, em [z, y]: nariz vertical até o topo do para-choque, degrau dele, boca do capô, capô curto, para-brisa e testa
+  // perfil da frente, em [z, y]: nariz vertical até o topo do para-choque, degrau dele, boca do capô, capô curto, para-brisa e a curva
+  // do teto (dois arcos tangentes, o de 1290 saindo do vidro e o de 405 chegando ao teto plano)
   raio_nariz_base: 50,
   parachoque_topo_y: 720,
   raio_parachoque_topo: 30,
   degrau_frente_recuo: 40,
   degrau_frente_y: 760,
   raio_degrau_frente: 10,
-  capo_comprimento: 860, // em z, da boca ao pé do para-brisa
-  capo_angulo: 22.5,
+  capo_comprimento: 860, // em z, da boca ao pé do para-brisa; com a boca em 1100 e o pé em 1480 o capô fica a 23,8 graus
+  boca_y: 1100,
   raio_boca: 20,
   base_vidro_recuo: 940, // do nariz ao pé do para-brisa, em z
-  base_vidro_y: 1310,
+  base_vidro_y: 1480,
   raio_base_vidro: 90,
   para_brisa_angulo: 55,
-  topo_vidro_y: 1990,
-  raio_topo_vidro: 300,
-  testa_recuo: 200, // do topo do para-brisa ao canto da testa no teto, em z
-  raio_testa: 200, // a prancha cota 300, mas o filete dela fica limitado à metade do trecho de antes e sai com 200
+  topo_vidro_y: 2110,
+  raio_arco_vidro: 1290, // da curva do teto, o arco que sai tangente ao para-brisa no topo do vidro
+  raio_arco_testa: 405, // e o que chega ao teto plano (em z 770), tangente ao primeiro
 
   // perfil de trás: traseira vertical recuada sobre o degrau do para-choque, quina do teto com raio
   traseira_recuo: 30,
   degrau_tras_y: 570,
   degrau_tras_rampa: 20, // o degrau horizontal da prancha vira uma rampa curta, porque cada anel é uma fatia horizontal
   raio_traseira_base: 40,
-  raio_quina_traseira: 120,
+  raio_quina_traseira: 180,
 
   // seção frontal, em [x, y]: lateral vertical até 1450 e quase vertical até o teto, quina do teto com raio
   lateral_reta_ate_y: 1450,
   meia_largura_no_teto: 982,
   raio_lateral: 600,
-  raio_ombro: 170,
+  raio_ombro: 300,
 
   // planta: raio das quinas verticais na frente (do para-choque à coluna do para-brisa) e atrás, e na borda do teto plano
   raio_planta_frente: 280,
   raio_coluna_base: 160,
-  raio_coluna_topo: 120,
+  raio_coluna_topo: 160, // a prancha dobra o para-brisa pela quina de raio 160 no pé e no topo
   raio_teto_frente: 100,
   raio_planta_tras: 100,
   raio_teto_tras: 40,
@@ -104,8 +105,7 @@ export const TABELA = {
   passo_anel: 150,
   passo_lado: 130,
   margem_coluna: 35,
-  passo_arco_graus: 6,
-  colunas_frente_transicao: 320, // abaixo da base do para-brisa, a altura em que as colunas da frente passam das partes iguais para a borda do vão
+  passo_arco_graus: 3,
   ombro_y: 2280,
   aneis_do_ombro: 6,
 
@@ -119,13 +119,13 @@ export const TABELA = {
   porta_base_y: 380,
   porta_folga_arco: 55,
   porta_cabine_tras_z: 550,
-  porta_cabine_topo_y: 1955,
+  porta_cabine_topo_y: 2075,
   porta_fresta_coluna: 30,
   coluna_do_meio: 110,
   porta_correr_largura: 1300,
   porta_correr_topo_y: 2200,
   porta_traseira_base_y: 600, // a prancha desenha 590; sobe 10 mm para a tira da fresta não encostar no degrau do para-choque em 580
-  porta_traseira_topo_y: 2376,
+  porta_traseira_topo_y: 2380, // no anel do ombro que cai no começo da quina de trás (2320), 10 mm para dentro da traseira vertical
   anel_porta_traseira: 2,
 
   // a coluna da fresta da frente na quina: quanto a quina fica para a frente dela e o mínimo da faixa de trás dela até a lateral
@@ -133,33 +133,44 @@ export const TABELA = {
   alcance_coluna_porta: 90,
   inicio_colunas_porta: 150,
 
-  // vãos dos vidros (prancha): para-brisa (a base, e a borda de lado na base e no topo, que é o da porta da cabine), vidro da porta da
-  // cabine (base, topo e moldura de trás; a frente é a quina da coluna), vidros das portas traseiras; e a aba dobrada de cada vão
-  para_brisa_base_y: 1330,
-  para_brisa_x_base: 820,
-  para_brisa_x_topo: 790,
-  vidro_cabine_base_y: 1363,
-  vidro_cabine_topo_y: 1880,
+  // vãos dos vidros (prancha): para-brisa (a base, 20 mm acima do pé; o topo é o anel do topo da porta da cabine; de lado ele acaba na
+  // coluna q3 da quina, onde a prancha põe a ponta do vidro, a 100 mm da lateral), vidro da porta da cabine (base na altura do pé do
+  // para-brisa, topo e moldura de trás; a frente é a quina da coluna), vidros das portas traseiras; e a aba dobrada de cada vão
+  para_brisa_base_y: 1490, // a prancha desenha 1500 para o para-brisa e 1480 para o vidro da porta; com dois anéis a 20 mm um do outro a gaiola enche de anéis a 10 mm, que a aba do vão não dobra, e os dois ficam num anel só
+  vidro_cabine_base_y: 1490,
+  vidro_cabine_topo_y: 2000,
   moldura_vidro_cabine: 70,
   vidro_traseiro_base_y: 1700,
   vidro_traseiro_topo_y: 2200,
   vidro_traseiro_x_dentro: 80,
   vidro_traseiro_x_fora: 820,
+  // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o
+  // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda
+  vao_canto_degraus: 2,
+  vao_canto_passo_cabine: 28,
+  vao_canto_passo_traseiro: 25,
   aba_vao_largura: 20,
   aba_vao_raio: 3,
   aba_vao_angulo: 90,
 
-  // vinco de cintura: altura, meia largura da dobra, profundidade, recuo das quinas e rampa das pontas
-  cintura_y: 1050,
+  // vinco de cintura: altura (sobe com o pé do para-brisa, 1480 sobre 1310), meia largura da dobra, profundidade, recuo das quinas e
+  // rampa das pontas
+  cintura_y: 1190,
   cintura_meia_largura: 40,
   cintura_profundidade: 2,
   cintura_recuo: 40,
   cintura_rampa: 150,
 
+  // coroa da frente: o capô e o para-brisa abaulam em x, com a borda mais alta no meio. A flecha é quanto a ponta do vidro (a coluna q3
+  // da quina) fica abaixo do meio, em y; ela cresce do zero na boca do capô até a flecha da base do vão, passa à da borda de cima do
+  // vão e some até o teto plano. O abaulamento acaba na coluna D da fresta da porta, que fica na altura do anel.
+  flecha_capo_base: 28,
+  flecha_vidro_topo: 50,
+
   // nervuras do teto: dois sulcos de cada lado, com o centro em x, a meia largura, a profundidade, o recuo das bordas do teto, a
   // rampa das pontas e a nitidez das dobras
-  nervura_1_x: 230,
-  nervura_2_x: 530,
+  nervura_1_x: 210,
+  nervura_2_x: 450,
   nervura_meia_largura: 45,
   nervura_profundidade: 8,
   nervura_recuo: 150,
@@ -297,18 +308,39 @@ export function forma(T) {
 
   /* perfil da frente, [z, y], do pé do nariz ao teto */
   const baseVidro = [zFrente - T.base_vidro_recuo, T.base_vidro_y];
-  const boca = [baseVidro[0] + T.capo_comprimento, baseVidro[1] - T.capo_comprimento * Math.tan(T.capo_angulo * grau)];
+  const boca = [baseVidro[0] + T.capo_comprimento, T.boca_y];
   const topoVidro = [baseVidro[0] - (T.topo_vidro_y - baseVidro[1]) / Math.tan(T.para_brisa_angulo * grau), T.topo_vidro_y];
-  const testa = [topoVidro[0] - T.testa_recuo, T.altura];
+  const anguloCapo = Math.atan2(baseVidro[1] - boca[1], boca[0] - baseVidro[0]) / grau;
   const frenteDensa = contornoComRaios([
     [zFrente - 4 * T.raio_nariz_base, ys], [zFrente, ys, T.raio_nariz_base], [zFrente, T.parachoque_topo_y, T.raio_parachoque_topo],
     [zFrente - T.degrau_frente_recuo, T.degrau_frente_y, T.raio_degrau_frente], [...boca, T.raio_boca], [...baseVidro, T.raio_base_vidro],
-    [...topoVidro, T.raio_topo_vidro], [...testa, T.raio_testa], [testa[0] - 4 * T.raio_testa, T.altura],
+    [...topoVidro],
   ]);
-  /* o perfil começa no pé do raio do nariz (o trecho reto da soleira fica de fora) e acaba no fim do raio da testa, onde o teto é plano */
-  const frente = frenteDensa.slice(frenteDensa.findIndex((p) => p[0] > zFrente - T.raio_nariz_base - 1e-6));
-  const zTetoFrente = frente.find((p) => p[1] >= T.altura - 1e-9)[0];
-  const perfilFrente = frente.slice(0, frente.findIndex((p) => p[1] >= T.altura - 1e-9) + 1);
+  /* o perfil começa no pé do raio do nariz (o trecho reto da soleira fica de fora) */
+  const frenteAteVidro = frenteDensa.slice(frenteDensa.findIndex((p) => p[0] > zFrente - T.raio_nariz_base - 1e-6));
+  /* A curva do teto sobre o para-brisa: dois arcos tangentes, o de raio_arco_vidro saindo do para-brisa no topo do vidro e o de
+     raio_arco_testa chegando ao teto plano, que somam os 55 graus do para-brisa. O filete não desenha dois raios emendados, então os
+     arcos são calculados aqui: o ângulo da emenda sai da subida que falta até o teto. Uma direção é o ângulo do trecho, de 0 (para a
+     frente) a 180 graus (para trás); no para-brisa ela é 180 menos o ângulo do vidro. */
+  const dirVidro = Math.PI - T.para_brisa_angulo * grau;
+  const cosEmenda = ((T.altura - T.topo_vidro_y) - T.raio_arco_testa - T.raio_arco_vidro * Math.cos(dirVidro)) / (T.raio_arco_testa - T.raio_arco_vidro);
+  if (!(Math.abs(cosEmenda) <= 1)) throw new Error('furgao-realista: os dois raios da curva do teto não fecham a subida até o teto');
+  const dirEmenda = Math.acos(cosEmenda);
+  if (dirEmenda <= dirVidro || dirEmenda >= Math.PI) throw new Error('furgao-realista: a emenda dos dois raios da curva do teto sai fora da curva');
+  const arcoTangente = (inicio, r, a, b) => {
+    const n = Math.max(2, Math.ceil(Math.abs(b - a) / grau));
+    return Array.from({ length: n }, (_, k) => {
+      const t = a + ((b - a) * (k + 1)) / n;
+      return [inicio[0] + r * (Math.sin(t) - Math.sin(a)), inicio[1] + r * (Math.cos(a) - Math.cos(t))];
+    });
+  };
+  const arcoVidro = arcoTangente(topoVidro, T.raio_arco_vidro, dirVidro, dirEmenda);
+  const arcoTesta = arcoTangente(arcoVidro.at(-1), T.raio_arco_testa, dirEmenda, Math.PI);
+  const testa = arcoTesta.at(-1);
+  if (Math.abs(testa[1] - T.altura) > 0.5) throw new Error(`furgao-realista: a curva do teto chega em ${testa[1].toFixed(1)}, e não no teto`);
+  testa[1] = T.altura;
+  const perfilFrente = [...frenteAteVidro, ...arcoVidro, ...arcoTesta.slice(0, -1), testa];
+  const zTetoFrente = testa[0];
 
   /* perfil de trás, [z, y], do pé da traseira ao teto */
   const zTraseira = zTras + T.traseira_recuo;
@@ -346,7 +378,7 @@ export function forma(T) {
   const pePorta = [baseVidro[0] - T.porta_fresta_coluna * Math.sin(pb), baseVidro[1] - T.porta_fresta_coluna * Math.cos(pb)];
   const zFrestaFrente = (y) => (y <= pePorta[1] ? pePorta[0] : zLinhaVidro(y) - T.porta_fresta_coluna / Math.sin(pb));
   return {
-    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta,
+    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, anguloCapo,
     perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente, zFrestaFrente,
     zF: (y) => uNaAltura(perfilFrente, y),
     zR: (y) => uNaAltura(perfilTras, y),
@@ -366,7 +398,7 @@ function aneisHorizontais(T, f) {
     ['degrauTrasTopo', T.degrau_tras_y + T.degrau_tras_rampa / 2], ['portaTraseiraBase', T.porta_traseira_base_y],
     ['parachoque', T.parachoque_topo_y], ['degrauFrente', T.degrau_frente_y], ['boca', f.boca[1]],
     ['cinturaBaixo', c - h], ['cintura', c], ['cinturaCima', c + h],
-    ['baseVidro', f.baseVidro[1]], ['paraBrisaBase', T.para_brisa_base_y], ['vidroCabineBase', T.vidro_cabine_base_y],
+    ['paraBrisaBase', T.para_brisa_base_y], ['vidroCabineBase', T.vidro_cabine_base_y],
     ['retaLateral', T.lateral_reta_ate_y], ['vidroTraseiroBase', T.vidro_traseiro_base_y], ['vidroCabineTopo', T.vidro_cabine_topo_y],
     ['portaCabineTopo', T.porta_cabine_topo_y], ['topoVidro', f.topoVidro[1]], ['portaCorrerTopo', T.porta_correr_topo_y],
     ['ombro', T.ombro_y],
@@ -434,8 +466,16 @@ function aneisDoOmbro(T, f) {
   const trecho = (perfil) => { const { pl } = aPartirDe(perfil, T.ombro_y); const s = acumulado(pl); return { at: (d) => pontoNaDistancia(pl, s, d), L: s.at(-1) }; };
   const fr = trecho(f.perfilFrente); const tr = trecho(f.perfilTras); const la = trecho(f.perfilLado);
   const n = T.aneis_do_ombro; const kT = T.anel_porta_traseira;
-  const dTopo = T.porta_traseira_topo_y - T.ombro_y;
-  if (!(dTopo > 0 && f.zR(T.porta_traseira_topo_y + 2) === f.zR(T.ombro_y))) throw new Error('furgao-realista: o topo das portas traseiras precisa ficar na traseira vertical, acima do ombro');
+  /* o topo das portas traseiras fica no começo da quina de trás, no máximo 12 mm para dentro da traseira vertical; a distância do
+     anel do ombro até ele é medida ao longo do perfil */
+  const dTopo = (() => {
+    const { pl } = aPartirDe(f.perfilTras, T.ombro_y); const s = acumulado(pl);
+    const k = pl.findIndex((p) => p[1] >= T.porta_traseira_topo_y);
+    if (k < 1) throw new Error('furgao-realista: o perfil de trás não chega ao topo das portas traseiras');
+    const t = (T.porta_traseira_topo_y - pl[k - 1][1]) / (pl[k][1] - pl[k - 1][1]);
+    return lerp(s[k - 1], s[k], t);
+  })();
+  if (!(dTopo > 0 && f.zR(T.ombro_y) - f.zR(T.porta_traseira_topo_y) < 12)) throw new Error('furgao-realista: o topo das portas traseiras precisa ficar acima do ombro e a menos de 12 mm da traseira vertical');
   const rF0 = f.raioFrente(T.ombro_y);
   /* até o anel do topo das portas traseiras, o começo da quina de trás segue a inclinação reta da lateral, para a fresta de fora
      das portas traseiras não entortar no alto; dali ao teto o raio fecha até o da borda do teto */
@@ -521,8 +561,9 @@ export function derivar(T) {
     if (Math.abs(a.y - yTopoArco) < 5) throw new Error(`furgao-realista: o anel ${a.nome} fica a menos de 5 mm do alto do arco da porta (${yTopoArco})`);
   }
 
-  /* as colunas da frente: x por anel. Abaixo do capô, em partes iguais; no para-brisa, a borda do vão; no ombro e no teto, as linhas
-     das nervuras, iguais às da traseira, para as linhas da cobertura saírem retas. */
+  /* as colunas da frente: x por anel. Do para-choque até o topo da porta da cabine, em partes iguais entre o meio e o começo da quina
+     (o vão do para-brisa sai pela coluna q3 da quina, e não por uma coluna da frente); acima do topo da porta, as partes iguais passam
+     às linhas das nervuras, iguais às da traseira, para as linhas da cobertura saírem retas. */
   const w = T.nervura_meia_largura;
   const nervuras = [T.nervura_1_x, T.nervura_2_x];
   const linhasDoTeto = [0, (nervuras[0] - w) / 2, nervuras[0] - w, nervuras[0], nervuras[0] + w, (nervuras[0] + w + nervuras[1] - w) / 2, nervuras[1] - w, nervuras[1], nervuras[1] + w];
@@ -533,33 +574,28 @@ export function derivar(T) {
   const nF = XT.length - 1;
   const RT = [...linhasDoTeto, ...entre(linhasDoTeto.at(-1), xTrasTeto, (xTrasTeto - linhasDoTeto.at(-1)) / 5 + 1e-6), xTrasTeto];
   const nR = RT.length - 1;
-  const xBordaParaBrisa = (y) => lerp(T.para_brisa_x_base, T.para_brisa_x_topo, (y - T.para_brisa_base_y) / (1965 - T.para_brisa_base_y));
-  const fracParaBrisa = (y, xFim) => { const xo = xBordaParaBrisa(y); return [...Array.from({ length: nF }, (_, k) => (xo * k) / (nF - 1) / xFim), 1]; };
   const fracUniforme = Array.from({ length: nF + 1 }, (_, k) => k / nF);
   const fracTeto = XT.map((x) => x / xFimTeto);
-  const yCapoPlano = T.para_brisa_base_y - T.colunas_frente_transicao;
   const colunasFrente = (an) => {
     const s = an.sec; const xFim = s.xS - s.rF;
     let fr;
     if (!an.horizontal) fr = fracTeto;
-    else if (an.y <= yCapoPlano) fr = fracUniforme;
-    else if (an.y < T.para_brisa_base_y) {
-      const pb = fracParaBrisa(T.para_brisa_base_y, f.xs(T.para_brisa_base_y) - f.raioFrente(T.para_brisa_base_y));
-      const t = suave((an.y - yCapoPlano) / (T.para_brisa_base_y - yCapoPlano));
-      fr = fracUniforme.map((u, k) => lerp(u, pb[k], t));
-    } else if (an.y <= T.porta_cabine_topo_y) fr = fracParaBrisa(an.y, xFim);
+    else if (an.y <= T.porta_cabine_topo_y) fr = fracUniforme;
     else {
-      const pb = fracParaBrisa(T.porta_cabine_topo_y, f.xs(T.porta_cabine_topo_y) - f.raioFrente(T.porta_cabine_topo_y));
       const t = suave((an.y - T.porta_cabine_topo_y) / (T.ombro_y - T.porta_cabine_topo_y));
-      fr = pb.map((u, k) => lerp(u, fracTeto[k], t));
+      fr = fracUniforme.map((u, k) => lerp(u, fracTeto[k], t));
     }
     return fr.map((u) => u * xFim);
   };
   /* as colunas da traseira: no corpo, a borda de dentro e a de fora dos vidros traseiros; no ombro e no teto, as das nervuras */
   const colunasTras = (an) => {
     const s = an.sec; const xTras = s.xS - s.rB;
-    const corpo = (xt) => [0, T.vidro_traseiro_x_dentro, ...entre(T.vidro_traseiro_x_dentro, T.vidro_traseiro_x_fora, (T.vidro_traseiro_x_fora - T.vidro_traseiro_x_dentro) / 9 + 1e-6),
-      T.vidro_traseiro_x_fora, ...entre(T.vidro_traseiro_x_fora, xt, (xt - T.vidro_traseiro_x_fora) / 3 + 1e-6), xt];
+    const pt = T.vao_canto_passo_traseiro; const kk = T.vao_canto_degraus;
+    const dentro = T.vidro_traseiro_x_dentro; const fora = T.vidro_traseiro_x_fora;
+    const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);
+    const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);
+    const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (9 - 2 * kk) + 1e-6);
+    const corpo = (xt) => [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, ...entre(fora, xt, (xt - fora) / 3 + 1e-6), xt];
     if (an.horizontal) return corpo(xTras);
     const base = corpo(horizontais.at(-1).sec.xS - T.raio_planta_tras).map((x, k, l) => x / l.at(-1));
     return base.map((u, k) => lerp(u, RT[k] / xTrasTeto, an.t) * xTras);
@@ -675,18 +711,38 @@ export function derivar(T) {
     colunasLado.sort((a, b) => b.z - a.z);
   }
 
+  /* A coroa da frente: a flecha, por altura, é quanto a coluna q3 da quina (a ponta do vão do para-brisa) fica abaixo do meio da
+     frente. Do zero na boca do capô ela cresce até a da base do vão (a coroa do capô), passa à da borda de cima do vão e some até o
+     teto plano. Em cada anel, um ponto da frente ou da quina desce a flecha vezes (x / x de q3)², e dali até a coluna D da fresta a
+     descida some, de modo que a porta, a lateral e o teto plano ficam onde estavam. Só o y muda: na quina, que é parede vertical, o
+     ponto escorrega pela parede; no capô e no para-brisa ele afunda um pouco, e a borda do vão sai em arco, mais baixa nas pontas. */
+  const flechaEm = (y) => {
+    if (y <= f.boca[1]) return 0;
+    if (y <= T.para_brisa_base_y) return T.flecha_capo_base * suave((y - f.boca[1]) / (T.para_brisa_base_y - f.boca[1]));
+    if (y <= T.porta_cabine_topo_y) return lerp(T.flecha_capo_base, T.flecha_vidro_topo, (y - T.para_brisa_base_y) / (T.porta_cabine_topo_y - T.para_brisa_base_y));
+    return T.flecha_vidro_topo * (1 - suave((y - T.porta_cabine_topo_y) / (T.altura - T.porta_cabine_topo_y)));
+  };
   const listas = [];
   aneis.forEach((an) => {
     const sec = an.sec; const lista = [];
     const add = (col, p, nome = null) => { const n = nome ?? nomePonto(an.nome, col); registrar(n, p, sec); lista.push({ col, nome: n }); return n; };
     /* frente */
-    colunasFrente(an).forEach((x, k) => add(`f${k}`, pontoFrente(sec, x)));
+    const grupo = grupoQuina(an);
+    const xDoCaminho = (s) => pontoNoCaminho(sec, s)[0];
+    const xQ3 = xDoCaminho(grupo.find((g) => g.col === 'q3').s);
+    const gD = grupo.find((g) => g.col === 'D');
+    const xFimDaCoroa = Math.max(xQ3 + 1, gD ? xDoCaminho(gD.s) : sec.xS);
+    const coroa = (p) => {
+      const x = Math.abs(p[0]);
+      const g = x <= xQ3 ? (x / xQ3) ** 2 : 1 - suave((x - xQ3) / (xFimDaCoroa - xQ3));
+      return [p[0], p[1] - flechaEm(p[1]) * g, p[2]];
+    };
+    colunasFrente(an).forEach((x, k) => add(`f${k}`, coroa(pontoFrente(sec, x))));
     /* quina da frente e grupo da coluna D */
     const sq = sQuina(sec);
-    const grupo = grupoQuina(an);
     const naQuina = grupo.filter((g) => g.s <= sq + 1e-9);
     const naLateral = grupo.filter((g) => g.s > sq + 1e-9);
-    naQuina.forEach((g) => add(g.col, pontoNoCaminho(sec, g.s)));
+    naQuina.forEach((g) => add(g.col, coroa(pontoNoCaminho(sec, g.s))));
     const zComeco = comecoDe(an);
     const zFim = sec.zR + sec.rB;
     /* lateral: pontos estruturais (as linhas das portas, os arcos, as tampas dos arcos) e as colunas de enchimento */
@@ -703,7 +759,10 @@ export function derivar(T) {
           if (Math.abs(an.y - yBase) < 1e-9) pts.forEach((p) => itens.push({ col: p.col, z: p.z, y: p.y, nome: nomeE(p.nome), sec: secArco }));
           else {
             itens.push({ col: pts[0].col, z: arco.zc + r * Math.cos(thj), y: an.y });
-            pts.slice(1, -1).forEach((p) => itens.push({ col: p.col, z: arco.zc + r * Math.cos(p.th), y: f.rPneu + r * Math.sin(p.th) }));
+            /* abaixo do eixo (thj < 0) o primeiro ponto do anel fica em -thj, e os pontos do arco que vêm antes dele em ângulo sairiam
+               do outro lado dele em z; eles ficam de fora desses anéis */
+            const dentroDoAngulo = (p) => thj >= 0 || (p.th >= -thj && p.th <= Math.PI + thj);
+            pts.slice(1, -1).filter(dentroDoAngulo).forEach((p) => itens.push({ col: p.col, z: arco.zc + r * Math.cos(p.th), y: f.rPneu + r * Math.sin(p.th) }));
             itens.push({ col: pts.at(-1).col, z: arco.zc - r * Math.cos(thj), y: an.y });
           }
           zonas.push([arco.zc - r * Math.cos(thj) - margem, arco.zc + r * Math.cos(thj) + margem]);
@@ -715,6 +774,14 @@ export function derivar(T) {
         /* as tampas: o ponto do arco que não é de anel nem da coluna D ganha uma coluna até o primeiro anel acima dele */
         pts.filter((p) => p.tipo === 'fill' && p.y > yAntes && p.y <= an.y && Math.hypot(p.z - arco.zc, an.y - f.rPneu) - rArcoPorta >= tiraDaFresta)
           .forEach((p) => itens.push({ col: p.col, z: p.z, y: an.y }));
+      }
+    }
+    /* nos anéis do vidro da porta da cabine, as colunas dos cantos do vão, a vao_canto_passo_cabine uma da outra a partir de cada
+       borda lateral dele (S1 e S2 na frente, T1 e T2 atrás) */
+    if (an.horizontal && an.y >= T.vidro_cabine_base_y - 1e-6 && an.y <= T.vidro_cabine_topo_y + 1e-6) {
+      const zS0 = itens.find((it) => it.col === 'S0')?.z ?? sec.zF - sec.rF;
+      for (let j = 1; j <= T.vao_canto_degraus; j += 1) {
+        itens.push({ col: `S${j}`, z: zS0 - j * T.vao_canto_passo_cabine, y: sec.yS }, { col: `T${j}`, z: zVidroCabTras + j * T.vao_canto_passo_cabine, y: sec.yS });
       }
     }
     const estruturais = [...itens];
@@ -761,6 +828,56 @@ export function derivar(T) {
     if (topoColunas(listas[i]) !== topoColunas(listas[iOmbro])) throw new Error(`furgao-realista: o anel ${listas[i].nome} não tem as colunas do anel do ombro`);
   }
 
+  /* ---- os cantos dos vãos em diagonal ----
+     A volta de um vão que anda pela gaiola dá um canto de 90 graus em cada quina do retângulo, e a subdivisão o arredonda com o raio
+     das faces dali, pequeno; cortado em degraus ele ficaria com degraus visíveis. Cada canto é cortado em diagonal: a volta segue, por
+     vao_canto_degraus células, a diagonal que liga a coluna de dentro do canto, no anel da borda, à coluna da borda, no anel
+     vao_canto_degraus acima, e cada célula dessa diagonal é partida em dois triângulos, um de cada lado dela. A diagonal fica de
+     fora do vão e a célula vizinha dela fica na chapa. A partição das células vem logo depois de montadas as faces. */
+  const colunasDoCanto = (rs, cF, cMeio) => {
+    const lista = rs[0].lista.map((q) => q.col);
+    const iF = lista.indexOf(cF); const iM = lista.indexOf(cMeio);
+    if (iF < 0 || iM < 0) throw new Error(`furgao-realista: o anel ${rs[0].nome} não tem a coluna ${cF} ou ${cMeio}`);
+    const passo = iM > iF ? 1 : -1;
+    const cols = [cF];
+    for (let j = 1; j <= T.vao_canto_degraus; j += 1) cols.unshift(lista[iF + passo * j]);
+    for (let j = 0; j < T.vao_canto_degraus; j += 1) {
+      for (const r of [rs[j], rs[j + 1]]) {
+        const l = r.lista.map((q) => q.col);
+        if (Math.abs(l.indexOf(cols[j]) - l.indexOf(cols[j + 1])) !== 1) throw new Error(`furgao-realista: as colunas ${cols[j]} e ${cols[j + 1]} do canto do vão não são vizinhas no anel ${r.nome}`);
+      }
+    }
+    return cols;
+  };
+  const aneisEntre = (yb, yt) => listas.filter((x) => x.horizontal && x.y >= yb - 1e-6 && x.y <= yt + 1e-6);
+  const iForaTraseiro = colunasTras(horizontais.find((x) => Math.abs(x.y - T.vidro_traseiro_base_y) < 1e-6)).findIndex((x) => Math.abs(x - T.vidro_traseiro_x_fora) < 1e-6);
+  const meioDoVidroTraseiro = `r${Math.ceil((1 + iForaTraseiro) / 2)}`;
+  const meioDoVidroDaCabine = (() => {
+    const rs = aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y);
+    const colunasBaixo = rs[0].lista.map((q) => q.col);
+    const [k0, k1] = [colunasBaixo.indexOf('vidroCabineTras'), colunasBaixo.indexOf('S0')].sort((a, b) => a - b);
+    const comuns = colunasBaixo.slice(k0 + 1, k1).filter((c) => rs.at(-1).lista.some((q) => q.col === c) && /^l-?\d+$/.test(c));
+    return comuns[Math.floor(comuns.length / 2)];
+  })();
+  const cantosDosVaos = [
+    { rs: aneisEntre(T.para_brisa_base_y, T.porta_cabine_topo_y), cMeio: 'f0', cantos: ['q3'] },
+    { rs: aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y), cMeio: meioDoVidroDaCabine, cantos: ['S0', 'vidroCabineTras'] },
+    { rs: aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y), cMeio: meioDoVidroTraseiro, cantos: ['r1', `r${iForaTraseiro}`] },
+  ];
+  const diagonaisDosCantos = [];
+  for (const { rs, cMeio, cantos } of cantosDosVaos) {
+    const k = T.vao_canto_degraus;
+    for (const cF of cantos) {
+      for (const sub2 of [rs.slice(0, k + 1), rs.slice(rs.length - k - 1).reverse()]) {
+        const cols = colunasDoCanto(sub2, cF, cMeio);
+        for (let j = 0; j < k; j += 1) {
+          const nome = (r, c) => r.lista.find((q) => q.col === c).nome;
+          diagonaisDosCantos.push([nome(sub2[j], cols[j]), nome(sub2[j + 1], cols[j + 1])]);
+        }
+      }
+    }
+  }
+
   /* ---- as faces entre anéis vizinhos, pelas colunas que os dois têm ---- */
   /* Entre duas colunas comuns, o trecho de baixo e o de cima viram quadriláteros quando têm o mesmo número de pontos, e, onde não
      têm (só na lateral, que é plana), são costurados em quadriláteros e triângulos pela ordem em z: uma face só com muitos lados
@@ -799,6 +916,17 @@ export function derivar(T) {
         if (new Set(limpo).size >= 3) facesE.push(limpo);
       });
     }
+  }
+
+  /* a partição das células das diagonais dos cantos dos vãos */
+  for (const [p, q] of diagonaisDosCantos) {
+    const i = facesE.findIndex((fc) => fc.includes(p) && fc.includes(q));
+    if (i < 0) throw new Error(`furgao-realista: nenhuma face tem a diagonal ${p} -> ${q}`);
+    const fc = facesE[i];
+    const ip = fc.indexOf(p); const iq = fc.indexOf(q);
+    if (fc.length !== 4 || (ip - iq + 4) % 4 !== 2) throw new Error(`furgao-realista: a face da diagonal ${p} -> ${q} não é um quadrilátero com os dois pontos opostos`);
+    const r = [...fc.slice(ip), ...fc.slice(0, ip)];
+    facesE.splice(i, 1, [r[0], r[1], r[2]], [r[2], r[3], r[0]]);
   }
 
   /* ---- a cobertura do teto plano: grade de Coons entre o anel do teto e a costura, com as linhas das nervuras retas ---- */
@@ -862,7 +990,6 @@ export function derivar(T) {
     return sobe ? c : c.reverse();
   };
   const fechar = (pts) => pts.filter((n, k) => n !== pts[(k + 1) % pts.length]);
-  const aCosturaFrente = (l) => trecho(l, 'f0', `f${nF - 1}`, 'e');
   const R380 = anelEm(yBase);
   const portas = [];
   for (const s of ['e', 'd']) {
@@ -889,29 +1016,39 @@ export function derivar(T) {
     volta: fechar([...trecho(R380, 'portaCorrerFrente', 'portaCorrerTras', 'd'), ...coluna('portaCorrerTras', yBase, T.porta_correr_topo_y, 'd'),
       ...trecho(anelEm(T.porta_correr_topo_y), 'portaCorrerTras', 'portaCorrerFrente', 'd'), ...coluna('portaCorrerFrente', T.porta_correr_topo_y, yBase, 'd')]),
   });
+  /* Os cantos dos vãos. A volta de um vão que anda pela gaiola dá um canto de 90 graus em cada quina do retângulo, e a subdivisão o
+     arredonda com o raio das faces dali, pequeno. Cada canto é cortado em diagonal: a volta segue, por vao_canto_degraus células, a
+     diagonal que liga a coluna de dentro do canto, no anel da borda, à coluna da borda, no anel vao_canto_degraus acima, e cada
+     célula dessa diagonal é partida em dois triângulos, um de cada lado dela (a gaiola foi partida acima, antes da volta ser
+     conferida pelas arestas). */
+  /* de (rs[0], cMeio0) a (rs.at(-1), cMeio1) pelo lado da coluna de fora cF, com os dois cantos cortados em diagonal */
+  const meiaVolta = (rs, cMeio0, cMeio1, cF, s) => {
+    const k = T.vao_canto_degraus;
+    const rsB = rs.slice(0, k + 1); const rsT = rs.slice(rs.length - k - 1).reverse();
+    const colsB = colunasDoCanto(rsB, cF, cMeio0); const colsT = colunasDoCanto(rsT, cF, cMeio1);
+    const cadeiaB = rsB.map((r, j) => ponto(r, colsB[j], s)); const cadeiaT = rsT.map((r, j) => ponto(r, colsT[j], s));
+    return [
+      ...trecho(rsB[0], cMeio0, colsB[0], s), ...cadeiaB.slice(1), ...coluna(cF, rsB[k].y, rsT[k].y, s).slice(1),
+      ...[...cadeiaT].reverse().slice(1), ...trecho(rsT[0], colsT[0], cMeio1, s).slice(1),
+    ];
+  };
   const vidros = [];
   {
-    const base = anelEm(T.para_brisa_base_y); const topo = anelEm(T.porta_cabine_topo_y);
-    const b = aCosturaFrente(base); const t = aCosturaFrente(topo);
-    vidros.push({
-      nome: 'paraBrisa', linha: 'abaVaoParaBrisa',
-      volta: fechar([...b.slice(1).reverse().map(espelho), ...b, ...coluna(`f${nF - 1}`, T.para_brisa_base_y, T.porta_cabine_topo_y, 'e'),
-        ...t.slice(0).reverse(), ...t.slice(1).map(espelho), ...coluna(`f${nF - 1}`, T.porta_cabine_topo_y, T.para_brisa_base_y, 'd')]),
-    });
+    const rs = aneisEntre(T.para_brisa_base_y, T.porta_cabine_topo_y);
+    const metade = meiaVolta(rs, 'f0', 'f0', 'q3', 'e');
+    vidros.push({ nome: 'paraBrisa', linha: 'abaVaoParaBrisa', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });
   }
   for (const s of ['e', 'd']) {
     const sufixo = s === 'e' ? 'Esquerda' : 'Direita';
-    const yb = T.vidro_cabine_base_y; const yt = T.vidro_cabine_topo_y;
-    vidros.push({
-      nome: `vidroPortaCabine${sufixo}`, linha: `abaVaoPortaCabine${sufixo}`,
-      volta: fechar([...coluna('S0', yb, yt, s), ...trecho(anelEm(yt), 'S0', 'vidroCabineTras', s), ...coluna('vidroCabineTras', yt, yb, s), ...trecho(anelEm(yb), 'vidroCabineTras', 'S0', s)]),
-    });
-    const yb2 = T.vidro_traseiro_base_y; const yt2 = T.vidro_traseiro_topo_y;
-    const iFora = colunasTras(anelEm(yb2)).findIndex((x) => Math.abs(x - T.vidro_traseiro_x_fora) < 1e-6);
-    vidros.push({
-      nome: `vidroPortaTraseira${sufixo}`, linha: `abaVaoPortaTraseira${sufixo}`,
-      volta: fechar([...coluna('r1', yb2, yt2, s), ...trecho(anelEm(yt2), 'r1', `r${iFora}`, s), ...coluna(`r${iFora}`, yt2, yb2, s), ...trecho(anelEm(yb2), `r${iFora}`, 'r1', s)]),
-    });
+    const rs = aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y);
+    const meio = meioDoVidroDaCabine;
+    const frente = meiaVolta(rs, meio, meio, 'S0', s);
+    const tras = meiaVolta(rs, meio, meio, 'vidroCabineTras', s);
+    vidros.push({ nome: `vidroPortaCabine${sufixo}`, linha: `abaVaoPortaCabine${sufixo}`, volta: fechar([...frente, ...[...tras].reverse()]) });
+    const rt = aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y);
+    const dentroT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, 'r1', s);
+    const foraT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, `r${iForaTraseiro}`, s);
+    vidros.push({ nome: `vidroPortaTraseira${sufixo}`, linha: `abaVaoPortaTraseira${sufixo}`, volta: fechar([...foraT, ...[...dentroT].reverse()]) });
   }
   for (const v of [...portas, ...vidros]) {
     v.volta.forEach((n, k) => { if (!arestas.has(chave(n, v.volta[(k + 1) % v.volta.length]))) throw new Error(`furgao-realista: a volta ${v.nome} passa fora das arestas entre ${n} e ${v.volta[(k + 1) % v.volta.length]}`); });
@@ -1223,7 +1360,7 @@ export function pontosDeclarados(T = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 2: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos e os vãos dos vidros abertos, e quatro rodas provisórias' },
+  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 2 pela prancha ajustada: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos de cantos arredondados, e quatro rodas provisórias' },
   PARAMS: TABELA,
   MATERIAIS: {
     azul: { tipo: 'liso', cor: '#5d75c9' },
@@ -1237,19 +1374,19 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto, etapa 2: lataria de 5400 por 2000 por 2500 mm em chapa contínua com as frestas das cinco portas, o vinco de cintura, as nervuras do teto, as abas dos arcos e os vãos dos vidros, e rodas provisórias',
+    objeto: 'furgão médio de teto alto, etapa 2 pela prancha ajustada: lataria de 5400 por 2000 por 2500 mm, capô a 23,8 graus, para-brisa envolvente, teto de dois raios, frestas das cinco portas, vãos de cantos redondos e rodas provisórias',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
     partes: [
       {
         nome: 'carroceria',
-        forma: 'chapa de 2 mm da etapa 1 com frestas de 6 mm em volta fechada nas portas da cabine, na de correr à direita e nas traseiras; vinco de cintura raso em y 1050; dois sulcos no teto de cada lado; vãos abertos no para-brisa e nos vidros',
-        tecnica: 'subdivisao sem simetria de anéis, ombro e cobertura, com colunas nas linhas das portas e arco de 475 nas rodas; volta de porta dividida meia fresta para cada lado, com a borda dobrada 4 mm numa tira de 5; vincos nas dobras',
+        forma: 'chapa de 2 mm: capô de 1100 a 1480, para-brisa até 2110 com vão em arco dobrando pela quina de 160, teto de raios 1290 e 405, quinas do teto de 300 e 180, frestas de 6 mm, vinco em 1190, sulcos no teto, vãos de cantos redondos',
+        tecnica: 'subdivisao de gaiola de anéis, ombro e cobertura com colunas nas portas e arco de 475; porta dividida meia fresta por lado, borda dobrada 4 mm; frente em dois arcos tangentes com coroa em y; cantos dos vãos em diagonal de duas células',
       },
       ...ABAS_DOS_VAOS.map((nome) => ({
         nome,
-        forma: `aba da borda do vão ${nome.replace('abaVao', '')}, dobrada para dentro a 90 graus com raio de 3 mm e perna de 20 mm, em volta do vão inteiro`,
+        forma: `aba da borda do vão ${nome.replace('abaVao', '')}, dobrada para dentro a 90 graus com raio de 3 mm e perna de 20 mm, em volta do vão inteiro, cantos arredondados incluídos`,
         tecnica: 'friso com aba sobre a borda do vão, pelos nomes da gaiola',
       })),
       ...ABAS_DOS_ARCOS.map((nome) => ({
@@ -1264,13 +1401,16 @@ const receita = {
       })),
     ],
     criteriosDeReprovacao: [
-      'a silhueta lateral, frontal ou de cima se afasta da prancha cotada mais de 15 mm em média ou 40 mm em algum ponto',
+      'a silhueta lateral, frontal ou de cima se afasta da prancha cotada mais de 15 mm em média ou 40 mm em algum ponto, medida com os vãos do para-brisa tampados (o vidro entra na etapa 5)',
+      'a frente não segue a prancha ajustada: boca do capô fora de 1100, pé do para-brisa fora de 1480, topo fora de 2110, ou a curva do teto sem os dois raios tangentes (1290 e 405) chegando ao teto plano em z 770',
+      'o para-brisa não envolve as quinas: borda de cima ou de baixo reta na frontal, ou coluna de chapa diferente de cerca de 100 mm por lado, ou a ponta que não dobra pela quina',
+      'um canto de vão de vidro aparece vivo na luz rasante, em degrau ou em aresta, em vez de arredondado',
       'uma fresta de porta não fecha a volta, muda de largura ao longo dela ou sai da linha da prancha',
       'falta uma das cinco portas, ou a de correr aparece também do lado esquerdo',
       'um vão de vidro não fica aberto, ou a aba dele não cobre a borda inteira',
       'o vinco de cintura ou as nervuras do teto não aparecem na luz rasante, ou aparecem fortes como degrau',
       'a aba de um arco sobra solta da lateral ou não acompanha o arco inteiro',
-      'a luz rasante ou a curvatura mostram amassado ou ondulação que a forma não pede, fora das frestas, dos vãos e dos vincos',
+      'a luz rasante ou a curvatura mostram amassado, ondulação ou serrilhado que a forma não pede, fora das frestas, dos vãos e dos vincos, nem na fresta da porta da cabine junto ao arco dianteiro',
       'um pneu não toca o chão, ou toca ou atravessa o arco da roda ou a lateral',
       'alguma peça fica solta no ar ou atravessa outra sem motivo',
       'o lado esquerdo e o direito diferem fora da porta de correr',
