@@ -57,3 +57,7 @@ Faces compridas na lateral plana davam 27 mm falsos de ondulação junto do arco
 ## 11. O crítico não sabe o que se vê através dos vãos
 
 O crítico cego tomou a roda do outro lado, vista pelo vão do vidro da cabine, por um objeto solto, e a luz rasante de lado mostrou de lado a aba do vidro oposto através das duas janelas alinhadas. A dúvida só saiu com a vista isolada da carroceria. O processo não teria pego. Destino: o pacote do crítico avisa quando há vão aberto sem vidro e traz a vista da chapa isolada ao lado, decidido no fechamento.
+
+## 12. O crítico da prancha repete decisões já aprovadas, e a prancha não emenda dois raios
+
+No ajuste da prancha, o crítico cego apontou duas vezes a porta da cabine contornando o arco e o teto alto acima dela, decisões aprovadas antes, porque não as conhece. O motor da prancha limita cada filete à metade do trecho vizinho e não desenha dois raios emendados, e a especificação passou a calcular os pontos dos dois arcos à mão. O processo não teria pego nenhum dos dois. Destino: o pedido ao crítico da prancha traz as decisões travadas do alinhamento, e o motor ganha curva contínua de mais de um raio, decidido no fechamento.
