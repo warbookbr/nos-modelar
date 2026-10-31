@@ -82,17 +82,36 @@ const P = {
   boca,
   baseVidro: peVidro,
   topoVidro,
-  testa: [topoVidro[0] - 200, M.altura],
   quinaTraseira: [-2670, M.altura],
   degrau: [-2670, 570],
 };
 const meio = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-/* Raios do teto na lateral: no topo do para-brisa 600, na testa do teto alto 355 (o maior que cabe na metade da faixa
-   de 438 mm entre os dois) e na quina com a traseira 180, que deixa a traseira vertical até 2320 e o topo das portas
-   traseiras (2380) 10 mm para dentro, no começo da curva. */
-const RAIO_TOPO_VIDRO = 600;
-const RAIO_TESTA = 355;
+/* A frente do teto na lateral é uma curva contínua e aberta, sem trecho reto, sem bico e sem barriga: sai tangente ao
+   para-brisa no topo do vidro (1319, 2110) com raio 950 e passa, também tangente, a um raio de 650 até chegar ao teto
+   em 2500. Os dois arcos somam os 55 graus entre o para-brisa e o teto, e o ângulo do primeiro sai da subida de 390 mm.
+   O filete do motor fica limitado à metade do trecho vizinho e não desenha dois raios emendados, então os arcos entram
+   como pontos calculados aqui. A quina com a traseira tem raio 180, que deixa a traseira vertical até 2320 e o topo das
+   portas traseiras (2380) 10 mm para dentro, no começo da curva. */
+const RAIO_TOPO_VIDRO = 950;
+const RAIO_TESTA = 650;
 const RAIO_QUINA_TRASEIRA = 180;
+const dirVidro = Math.PI - ANGULO_PARA_BRISA * grau; // 125 graus, subindo para trás
+/* Subida de um arco que gira de a até b para a esquerda: r (cos a − cos b); avanço em z: r (sen b − sen a). */
+const cosEntreArcos = ((M.altura - Y_TOPO_VIDRO) - RAIO_TESTA - RAIO_TOPO_VIDRO * Math.cos(dirVidro)) / (RAIO_TESTA - RAIO_TOPO_VIDRO);
+if (!(Math.abs(cosEntreArcos) <= 1)) throw new Error('os dois raios da frente do teto não fecham a subida de 390 mm');
+const dirEntreArcos = Math.acos(cosEntreArcos);
+if (dirEntreArcos <= dirVidro || dirEntreArcos >= Math.PI) throw new Error('a emenda dos dois raios da frente do teto sai fora da curva');
+function arcoTangente(inicio, r, a, b, n) {
+  return Array.from({ length: n }, (_, k) => {
+    const t = a + ((b - a) * (k + 1)) / n;
+    return [inicio[0] + r * (Math.sin(t) - Math.sin(a)), inicio[1] + r * (Math.cos(a) - Math.cos(t))];
+  });
+}
+const arcoDoVidro = arcoTangente(topoVidro, RAIO_TOPO_VIDRO, dirVidro, dirEntreArcos, 16);
+const arcoDaTesta = arcoTangente(arcoDoVidro[arcoDoVidro.length - 1], RAIO_TESTA, dirEntreArcos, Math.PI, 10);
+const inicioDoTeto = arcoDaTesta[arcoDaTesta.length - 1];
+if (Math.abs(inicioDoTeto[1] - M.altura) > 0.5) throw new Error(`a curva da frente do teto chega em ${inicioDoTeto[1]}, e não no teto`);
+inicioDoTeto[1] = M.altura;
 
 /* Onde o arco corta a soleira: a abertura da roda interrompe a linha de baixo. */
 const dzArco = Math.sqrt(M.arcoRaio ** 2 - (M.soleira - R) ** 2);
@@ -263,8 +282,7 @@ const vidroDeCima = [
 const recuoLateral = (y) => P.baseVidro[0] - naColuna(0, y)[0];
 if (Math.abs((zVidroBase - zVidroTopo) - (recuoLateral(vidroTopoY) - recuoLateral(vidroBaseY))) > 1) throw new Error('o vidro de cima discorda da lateral');
 /* Tangente do filete de 300 da testa com o teto, e do de 120 da quina traseira. */
-const giroTesta = Math.PI - Math.atan2(P.testa[1] - P.topoVidro[1], P.testa[0] - P.topoVidro[0]);
-const zTetoPlano = P.testa[0] - RAIO_TESTA * Math.tan(giroTesta / 2);
+const zTetoPlano = inicioDoTeto[0];
 const zTetoPlanoTras = P.quinaTraseira[0] + RAIO_QUINA_TRASEIRA;
 const xTetoPlano = 982 - RAIO_QUINA_TETO * Math.tan((Math.PI - Math.atan2(M.altura - 1450, 982 - xMax)) / 2);
 const bordaDoTeto = [[zTetoPlano, -xTetoPlano, 100], [zTetoPlano, xTetoPlano, 100], [zTetoPlanoTras, xTetoPlano, 40], [zTetoPlanoTras, -xTetoPlano, 40]];
@@ -359,10 +377,9 @@ export const ESPEC = {
     /* 1. silhuetas */
     { vista: 'lateral', contorno: true, nome: 'nariz', tipo: 'filete', pts: [[zD + dzArco, M.soleira], [zFrente, M.soleira, 50], [...P.parachoqueTopo, 30], [2660, 760], [...P.boca, 20], meio(P.boca, P.baseVidro)] },
     { vista: 'lateral', contorno: true, nome: 'capoEParaBrisa', tipo: 'filete', pts: [meio(P.boca, P.baseVidro), [...P.baseVidro, 90], meio(P.baseVidro, P.topoVidro)], esperado: { inversoesMax: 0, raioMinMin: 80 } },
-    /* Do meio do para-brisa ao meio da traseira num trecho só: o filete fica limitado à metade do trecho vizinho, e com
-       o corte no meio da testa o raio de 300 pedido saía com 200. A única inversão é a do topo do para-brisa, onde o
-       vidro a 55 graus passa à testa mais em pé: são as duas inclinações da frente do teto, mantidas de propósito. */
-    { vista: 'lateral', contorno: true, nome: 'teto', tipo: 'filete', pts: [meio(P.baseVidro, P.topoVidro), [...P.topoVidro, RAIO_TOPO_VIDRO], [...P.testa, RAIO_TESTA], [...P.quinaTraseira, RAIO_QUINA_TRASEIRA], meio(P.quinaTraseira, P.degrau)], esperado: { inversoesMax: 1, concentracaoMax: 0.25, raioMinMin: 170 } },
+    /* Do meio do para-brisa ao meio da traseira num trecho só: o vidro reto até o topo, a curva da frente do teto em
+       pontos e a quina traseira em filete. */
+    { vista: 'lateral', contorno: true, nome: 'teto', tipo: 'filete', pts: [meio(P.baseVidro, P.topoVidro), P.topoVidro, ...arcoDoVidro, ...arcoDaTesta.slice(0, -1), inicioDoTeto, [...P.quinaTraseira, RAIO_QUINA_TRASEIRA], meio(P.quinaTraseira, P.degrau)], esperado: { inversoesMax: 0, concentracaoMax: 0.3, raioMinMin: 170 } },
     { vista: 'lateral', contorno: true, nome: 'traseira', tipo: 'filete', pts: [meio(P.quinaTraseira, P.degrau), P.degrau, [zTras, 570], [zTras, M.soleira, 40], [zT - dzArco, M.soleira]] },
     { vista: 'lateral', contorno: true, nome: 'arcoTraseiro', tipo: 'poli', pts: arco(zT) },
     { vista: 'lateral', contorno: true, nome: 'soleira', tipo: 'poli', pts: [[zT + dzArco, M.soleira], [zD - dzArco, M.soleira]], esperado: { inversoesMax: 0 } },
@@ -469,7 +486,8 @@ export const ESPEC = {
       `Arcos das rodas com raio ${M.arcoRaio} no centro da roda (${M.arcoRaio - R} mm sobre o pneu); soleira em ${M.soleira}; largura sem retrovisores.`,
       'A lateral mostra o lado direito (-x), com a porta de correr; o lado esquerdo é o espelho dele sem ela.',
       'Medidas rígidas da classe; cabine, portas, vidros, bitola e balanços estimados na proporção (ver autoria).',
-      `Teto: raio ${RAIO_TOPO_VIDRO} no topo do para-brisa, ${RAIO_TESTA} na testa e ${RAIO_QUINA_TRASEIRA} na quina traseira (lateral); ${RAIO_QUINA_TETO} nas quinas com a lateral (frontal e traseira).`,
+      `Teto na lateral: curva contínua de raio ${RAIO_TOPO_VIDRO} saindo do topo do para-brisa e ${RAIO_TESTA} até o teto, que começa em z ${Math.round(zTetoPlano)}.`,
+      `Teto: raio ${RAIO_QUINA_TRASEIRA} na quina traseira (lateral) e ${RAIO_QUINA_TETO} nas quinas com a lateral (frontal e traseira).`,
       `Para-brisa: flecha ${FLECHA_TOPO} em cima e ${Math.round(flechaBase)} embaixo na frontal; coluna em x ±${Math.round(xPontaBase)} na base e ±${Math.round(xPontaTopo)} no topo; de cima, pontas ${Math.round(recuoDaPonta)} mm atrás do centro, dobrando na quina de raio ${QUINA_VIDRO}.`,
       `De cima, o vidro vai de z ${Math.round(zVidroBase)} a ${Math.round(zVidroTopo)}: as bordas dele a ${vidroBaseY} e ${vidroTopoY} de altura, 20 e 25 mm dentro do pé e do topo do para-brisa da lateral.`,
       ...linhasDeLandmarks(),

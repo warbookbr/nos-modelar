@@ -87,10 +87,10 @@
       },
       "teto": {
         "vista": "lateral",
-        "comprimento": 5454.44,
-        "retidao": 0.764,
-        "concentracao": 0.146,
-        "inversoes": 1,
+        "comprimento": 5392.95,
+        "retidao": 0.729,
+        "concentracao": 0.191,
+        "inversoes": 0,
         "raioMin": 180
       },
       "traseira": {
@@ -239,8 +239,8 @@
       },
       "bordaDoTeto": {
         "vista": "planta",
-        "comprimento": 9411.69,
-        "retidao": 0.824,
+        "comprimento": 8877.09,
+        "retidao": 0.819,
         "concentracao": 0.111,
         "inversoes": 0,
         "raioMin": 40
@@ -421,7 +421,7 @@
       },
       "topoVidro": {
         "sobre": "teto",
-        "desvio": 1.41
+        "desvio": 0
       },
       "teto": {
         "sobre": "teto",
