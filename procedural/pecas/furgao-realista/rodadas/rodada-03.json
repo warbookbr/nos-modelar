@@ -1,0 +1,1185 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "abaVaoParaBrisa",
+        "tipo": "superficie",
+        "onde": "quatro cantos do anel da aba",
+        "sentido": "facetado",
+        "evidencia": "Isométrica isolada: cantos (x245,y465) e (x325,y295) lidos como chanfro de poucos segmentos, e não raio liso; menos claro que nas abas das portas."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "cantos de cima e de trás do vão da janela da porta da cabine",
+        "sentido": "segmentado",
+        "evidencia": "Rasante de lado az30 e az120 (x415-560,y345-470): borda com franja branca irregular, canto em degrau e não arredondado liso."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "capô, lateral junto à quina do para-brisa e ao arco dianteiro",
+        "sentido": "segmentado",
+        "evidencia": "Rasante de lado az120 (x100-290,y520-650) e de frente az100 (x980-1080,y580-730): transição claro/escuro em degraus de escada; mais fraco no az30. Fora de vão, fresta e vinco."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro, canto inferior da frente",
+        "sentido": "segmentado",
+        "evidencia": "Curvatura de lado (x240-360,y485-525) e de tresquartos (x440-500,y800-830): faixa da fresta com contorno festonado, enquanto as outras frestas saem retas."
+      },
+      {
+        "parte": "rodaProvisoriaDianteiraDireita",
+        "tipo": "uniao",
+        "onde": "eixo e topo da roda em relação ao arco e ao corpo",
+        "sentido": "afastado",
+        "evidencia": "Esquerda e frontal do conjunto: mesma folga em volta da roda, nenhuma peça liga a roda à carroceria."
+      },
+      {
+        "parte": "rodaProvisoriaDianteiraEsquerda",
+        "tipo": "uniao",
+        "onde": "eixo e topo da roda em relação ao arco e ao corpo",
+        "sentido": "afastado",
+        "evidencia": "Isométrica e direita do conjunto: roda dentro do arco com folga branca, sem eixo ou quadro; o corpo a 300 mm do chão não se apoia nela."
+      },
+      {
+        "parte": "rodaProvisoriaTraseiraDireita",
+        "tipo": "uniao",
+        "onde": "eixo e topo da roda em relação ao arco e ao corpo",
+        "sentido": "afastado",
+        "evidencia": "Esquerda e traseira do conjunto: roda solta dentro do arco traseiro, sem ligação à carroceria."
+      },
+      {
+        "parte": "rodaProvisoriaTraseiraEsquerda",
+        "tipo": "uniao",
+        "onde": "eixo e topo da roda em relação ao arco e ao corpo",
+        "sentido": "afastado",
+        "evidencia": "Direita e isométrica do conjunto: roda solta dentro do arco traseiro, sem eixo ou quadro."
+      }
+    ],
+    "observacao": "Silhueta e cotas seguem a prancha de perto; o que pesa é serrilhado em capô, canto de janela e fresta na luz rasante, e rodas sem ligação à carroceria."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o script de silhueta aponta para outro worktree e conta vãos e frestas como borda; o do para-brisa tapei com o polígono da meia volta",
+    "descrever e rodada --acao levam uns 6 minutos cada, e a guarda:acervo outros 6, o que limita as rodadas por sessão",
+    "dois anéis a 20 mm (1480 e 1500) enchem a gaiola de anéis a 10 mm e a aba do vão recusa o canto; a graduação não avisa",
+    "passo_arco_graus abaixo de 6 recusava por cruzar colunas nos anéis abaixo da soleira, por 1 mm de folga",
+    "a faixa ocre da curvatura mostra dentes junto ao arco sem desvio de geometria; fica a dúvida de se o crítico lê como serrilhado",
+    "não achei ferramenta de raio de canto para vão de vidro, só a diagonal de células da gaiola",
+    "a coroa do para-brisa desce pontos só em y, e a prancha pede o arco na frontal sem dizer como na gaiola"
+  ],
+  "notaDePassagem": "Cantos dos vãos em diagonal de 2 células porque degrau saía visível; coroa só em y para não mexer nas colunas; base do vão e do vidro da porta no mesmo anel (1490); arco da porta a 3 graus.",
+  "receita": {
+    "sha256": "sha256:95e45000685125826858779e0801fc39dc6a5a2606abc8bcdd77f7a65927103e",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 85,
+      "acrescentadas": 225,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 3,
+          "texto": " * detalhada. Sobre a chapa contínua da etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png,"
+        },
+        {
+          "tipo": "-",
+          "linha": 4,
+          "texto": " * aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * detalhada, refeita pela prancha ajustada de 2026-10-31 (a frente mais alta, o para-brisa que envolve as quinas, a curva do teto"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * de dois raios e os raios maiores nas quinas do teto; ver \"O ajuste da prancha\" em referencias/alvo.md). Sobre a chapa contínua da"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png, aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as"
+        },
+        {
+          "tipo": "-",
+          "linha": 7,
+          "texto": " * com a aba dobrada para dentro conferida como moldura. As quatro rodas provisórias da etapa 1 ficam. O corpo de baixo, os"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. As quatro rodas provisórias da etapa 1 ficam. O corpo de baixo, os"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "  // perfil da frente, em [z, y]: nariz vertical até o topo do para-choque, degrau dele, boca do capô, capô curto, para-brisa e testa"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  // perfil da frente, em [z, y]: nariz vertical até o topo do para-choque, degrau dele, boca do capô, capô curto, para-brisa e a curva"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  // do teto (dois arcos tangentes, o de 1290 saindo do vidro e o de 405 chegando ao teto plano)"
+        },
+        {
+          "tipo": "-",
+          "linha": 60,
+          "texto": "  capo_comprimento: 860, // em z, da boca ao pé do para-brisa"
+        },
+        {
+          "tipo": "-",
+          "linha": 61,
+          "texto": "  capo_angulo: 22.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  capo_comprimento: 860, // em z, da boca ao pé do para-brisa; com a boca em 1100 e o pé em 1480 o capô fica a 23,8 graus"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  boca_y: 1100,"
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "  base_vidro_y: 1310,"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  base_vidro_y: 1480,"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "  topo_vidro_y: 1990,"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "  raio_topo_vidro: 300,"
+        },
+        {
+          "tipo": "-",
+          "linha": 69,
+          "texto": "  testa_recuo: 200, // do topo do para-brisa ao canto da testa no teto, em z"
+        },
+        {
+          "tipo": "-",
+          "linha": 70,
+          "texto": "  raio_testa: 200, // a prancha cota 300, mas o filete dela fica limitado à metade do trecho de antes e sai com 200"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  topo_vidro_y: 2110,"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  raio_arco_vidro: 1290, // da curva do teto, o arco que sai tangente ao para-brisa no topo do vidro"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  raio_arco_testa: 405, // e o que chega ao teto plano (em z 770), tangente ao primeiro"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "  raio_quina_traseira: 120,"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  raio_quina_traseira: 180,"
+        },
+        {
+          "tipo": "-",
+          "linha": 83,
+          "texto": "  raio_ombro: 170,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  raio_ombro: 300,"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "  raio_coluna_topo: 120,"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  raio_coluna_topo: 160, // a prancha dobra o para-brisa pela quina de raio 160 no pé e no topo"
+        },
+        {
+          "tipo": "-",
+          "linha": 107,
+          "texto": "  passo_arco_graus: 6,"
+        },
+        {
+          "tipo": "-",
+          "linha": 108,
+          "texto": "  colunas_frente_transicao: 320, // abaixo da base do para-brisa, a altura em que as colunas da frente passam das partes iguais para a borda do vão"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  passo_arco_graus: 3,"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "  porta_cabine_topo_y: 1955,"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  porta_cabine_topo_y: 2075,"
+        },
+        {
+          "tipo": "-",
+          "linha": 128,
+          "texto": "  porta_traseira_topo_y: 2376,"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  porta_traseira_topo_y: 2380, // no anel do ombro que cai no começo da quina de trás (2320), 10 mm para dentro da traseira vertical"
+        },
+        {
+          "tipo": "-",
+          "linha": 136,
+          "texto": "  // vãos dos vidros (prancha): para-brisa (a base, e a borda de lado na base e no topo, que é o da porta da cabine), vidro da porta da"
+        },
+        {
+          "tipo": "-",
+          "linha": 137,
+          "texto": "  // cabine (base, topo e moldura de trás; a frente é a quina da coluna), vidros das portas traseiras; e a aba dobrada de cada vão"
+        },
+        {
+          "tipo": "-",
+          "linha": 138,
+          "texto": "  para_brisa_base_y: 1330,"
+        },
+        {
+          "tipo": "-",
+          "linha": 139,
+          "texto": "  para_brisa_x_base: 820,"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "  para_brisa_x_topo: 790,"
+        },
+        {
+          "tipo": "-",
+          "linha": 141,
+          "texto": "  vidro_cabine_base_y: 1363,"
+        },
+        {
+          "tipo": "-",
+          "linha": 142,
+          "texto": "  vidro_cabine_topo_y: 1880,"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  // vãos dos vidros (prancha): para-brisa (a base, 20 mm acima do pé; o topo é o anel do topo da porta da cabine; de lado ele acaba na"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  // coluna q3 da quina, onde a prancha põe a ponta do vidro, a 100 mm da lateral), vidro da porta da cabine (base na altura do pé do"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  // para-brisa, topo e moldura de trás; a frente é a quina da coluna), vidros das portas traseiras; e a aba dobrada de cada vão"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  para_brisa_base_y: 1490, // a prancha desenha 1500 para o para-brisa e 1480 para o vidro da porta; com dois anéis a 20 mm um do outro a gaiola enche de anéis a 10 mm, que a aba do vão não dobra, e os dois ficam num anel só"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  vidro_cabine_base_y: 1490,"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  vidro_cabine_topo_y: 2000,"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  vao_canto_degraus: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  vao_canto_passo_cabine: 28,"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  vao_canto_passo_traseiro: 25,"
+        },
+        {
+          "tipo": "-",
+          "linha": 152,
+          "texto": "  // vinco de cintura: altura, meia largura da dobra, profundidade, recuo das quinas e rampa das pontas"
+        },
+        {
+          "tipo": "-",
+          "linha": 153,
+          "texto": "  cintura_y: 1050,"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  // vinco de cintura: altura (sobe com o pé do para-brisa, 1480 sobre 1310), meia largura da dobra, profundidade, recuo das quinas e"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  // rampa das pontas"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  cintura_y: 1190,"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  // coroa da frente: o capô e o para-brisa abaulam em x, com a borda mais alta no meio. A flecha é quanto a ponta do vidro (a coluna q3"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  // da quina) fica abaixo do meio, em y; ela cresce do zero na boca do capô até a flecha da base do vão, passa à da borda de cima do"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  // vão e some até o teto plano. O abaulamento acaba na coluna D da fresta da porta, que fica na altura do anel."
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  flecha_capo_base: 28,"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  flecha_vidro_topo: 50,"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 161,
+          "texto": "  nervura_1_x: 230,"
+        },
+        {
+          "tipo": "-",
+          "linha": 162,
+          "texto": "  nervura_2_x: 530,"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  nervura_1_x: 210,"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  nervura_2_x: 450,"
+        },
+        {
+          "tipo": "-",
+          "linha": 300,
+          "texto": "  const boca = [baseVidro[0] + T.capo_comprimento, baseVidro[1] - T.capo_comprimento * Math.tan(T.capo_angulo * grau)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 311,
+          "texto": "  const boca = [baseVidro[0] + T.capo_comprimento, T.boca_y];"
+        },
+        {
+          "tipo": "-",
+          "linha": 302,
+          "texto": "  const testa = [topoVidro[0] - T.testa_recuo, T.altura];"
+        },
+        {
+          "tipo": "+",
+          "linha": 313,
+          "texto": "  const anguloCapo = Math.atan2(baseVidro[1] - boca[1], boca[0] - baseVidro[0]) / grau;"
+        },
+        {
+          "tipo": "-",
+          "linha": 306,
+          "texto": "    [...topoVidro, T.raio_topo_vidro], [...testa, T.raio_testa], [testa[0] - 4 * T.raio_testa, T.altura],"
+        },
+        {
+          "tipo": "+",
+          "linha": 317,
+          "texto": "    [...topoVidro],"
+        },
+        {
+          "tipo": "-",
+          "linha": 308,
+          "texto": "  /* o perfil começa no pé do raio do nariz (o trecho reto da soleira fica de fora) e acaba no fim do raio da testa, onde o teto é plano */"
+        },
+        {
+          "tipo": "-",
+          "linha": 309,
+          "texto": "  const frente = frenteDensa.slice(frenteDensa.findIndex((p) => p[0] > zFrente - T.raio_nariz_base - 1e-6));"
+        },
+        {
+          "tipo": "-",
+          "linha": 310,
+          "texto": "  const zTetoFrente = frente.find((p) => p[1] >= T.altura - 1e-9)[0];"
+        },
+        {
+          "tipo": "-",
+          "linha": 311,
+          "texto": "  const perfilFrente = frente.slice(0, frente.findIndex((p) => p[1] >= T.altura - 1e-9) + 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 319,
+          "texto": "  /* o perfil começa no pé do raio do nariz (o trecho reto da soleira fica de fora) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 320,
+          "texto": "  const frenteAteVidro = frenteDensa.slice(frenteDensa.findIndex((p) => p[0] > zFrente - T.raio_nariz_base - 1e-6));"
+        },
+        {
+          "tipo": "+",
+          "linha": 321,
+          "texto": "  /* A curva do teto sobre o para-brisa: dois arcos tangentes, o de raio_arco_vidro saindo do para-brisa no topo do vidro e o de"
+        },
+        {
+          "tipo": "+",
+          "linha": 322,
+          "texto": "     raio_arco_testa chegando ao teto plano, que somam os 55 graus do para-brisa. O filete não desenha dois raios emendados, então os"
+        },
+        {
+          "tipo": "+",
+          "linha": 323,
+          "texto": "     arcos são calculados aqui: o ângulo da emenda sai da subida que falta até o teto. Uma direção é o ângulo do trecho, de 0 (para a"
+        },
+        {
+          "tipo": "+",
+          "linha": 324,
+          "texto": "     frente) a 180 graus (para trás); no para-brisa ela é 180 menos o ângulo do vidro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 325,
+          "texto": "  const dirVidro = Math.PI - T.para_brisa_angulo * grau;"
+        },
+        {
+          "tipo": "+",
+          "linha": 326,
+          "texto": "  const cosEmenda = ((T.altura - T.topo_vidro_y) - T.raio_arco_testa - T.raio_arco_vidro * Math.cos(dirVidro)) / (T.raio_arco_testa - T.raio_arco_vidro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 327,
+          "texto": "  if (!(Math.abs(cosEmenda) <= 1)) throw new Error('furgao-realista: os dois raios da curva do teto não fecham a subida até o teto');"
+        },
+        {
+          "tipo": "+",
+          "linha": 328,
+          "texto": "  const dirEmenda = Math.acos(cosEmenda);"
+        },
+        {
+          "tipo": "+",
+          "linha": 329,
+          "texto": "  if (dirEmenda <= dirVidro || dirEmenda >= Math.PI) throw new Error('furgao-realista: a emenda dos dois raios da curva do teto sai fora da curva');"
+        },
+        {
+          "tipo": "+",
+          "linha": 330,
+          "texto": "  const arcoTangente = (inicio, r, a, b) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 331,
+          "texto": "    const n = Math.max(2, Math.ceil(Math.abs(b - a) / grau));"
+        },
+        {
+          "tipo": "+",
+          "linha": 332,
+          "texto": "    return Array.from({ length: n }, (_, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 333,
+          "texto": "      const t = a + ((b - a) * (k + 1)) / n;"
+        },
+        {
+          "tipo": "+",
+          "linha": 334,
+          "texto": "      return [inicio[0] + r * (Math.sin(t) - Math.sin(a)), inicio[1] + r * (Math.cos(a) - Math.cos(t))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 335,
+          "texto": "    });"
+        },
+        {
+          "tipo": "+",
+          "linha": 336,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 337,
+          "texto": "  const arcoVidro = arcoTangente(topoVidro, T.raio_arco_vidro, dirVidro, dirEmenda);"
+        },
+        {
+          "tipo": "+",
+          "linha": 338,
+          "texto": "  const arcoTesta = arcoTangente(arcoVidro.at(-1), T.raio_arco_testa, dirEmenda, Math.PI);"
+        },
+        {
+          "tipo": "+",
+          "linha": 339,
+          "texto": "  const testa = arcoTesta.at(-1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 340,
+          "texto": "  if (Math.abs(testa[1] - T.altura) > 0.5) throw new Error(`furgao-realista: a curva do teto chega em ${testa[1].toFixed(1)}, e não no teto`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 341,
+          "texto": "  testa[1] = T.altura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 342,
+          "texto": "  const perfilFrente = [...frenteAteVidro, ...arcoVidro, ...arcoTesta.slice(0, -1), testa];"
+        },
+        {
+          "tipo": "+",
+          "linha": 343,
+          "texto": "  const zTetoFrente = testa[0];"
+        },
+        {
+          "tipo": "-",
+          "linha": 349,
+          "texto": "    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta,"
+        },
+        {
+          "tipo": "+",
+          "linha": 381,
+          "texto": "    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, anguloCapo,"
+        },
+        {
+          "tipo": "-",
+          "linha": 369,
+          "texto": "    ['baseVidro', f.baseVidro[1]], ['paraBrisaBase', T.para_brisa_base_y], ['vidroCabineBase', T.vidro_cabine_base_y],"
+        },
+        {
+          "tipo": "+",
+          "linha": 401,
+          "texto": "    ['paraBrisaBase', T.para_brisa_base_y], ['vidroCabineBase', T.vidro_cabine_base_y],"
+        },
+        {
+          "tipo": "-",
+          "linha": 437,
+          "texto": "  const dTopo = T.porta_traseira_topo_y - T.ombro_y;"
+        },
+        {
+          "tipo": "-",
+          "linha": 438,
+          "texto": "  if (!(dTopo > 0 && f.zR(T.porta_traseira_topo_y + 2) === f.zR(T.ombro_y))) throw new Error('furgao-realista: o topo das portas traseiras precisa ficar na traseira vertical, acima do ombro');"
+        },
+        {
+          "tipo": "+",
+          "linha": 469,
+          "texto": "  /* o topo das portas traseiras fica no começo da quina de trás, no máximo 12 mm para dentro da traseira vertical; a distância do"
+        },
+        {
+          "tipo": "+",
+          "linha": 470,
+          "texto": "     anel do ombro até ele é medida ao longo do perfil */"
+        },
+        {
+          "tipo": "+",
+          "linha": 471,
+          "texto": "  const dTopo = (() => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 472,
+          "texto": "    const { pl } = aPartirDe(f.perfilTras, T.ombro_y); const s = acumulado(pl);"
+        },
+        {
+          "tipo": "+",
+          "linha": 473,
+          "texto": "    const k = pl.findIndex((p) => p[1] >= T.porta_traseira_topo_y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 474,
+          "texto": "    if (k < 1) throw new Error('furgao-realista: o perfil de trás não chega ao topo das portas traseiras');"
+        },
+        {
+          "tipo": "+",
+          "linha": 475,
+          "texto": "    const t = (T.porta_traseira_topo_y - pl[k - 1][1]) / (pl[k][1] - pl[k - 1][1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 476,
+          "texto": "    return lerp(s[k - 1], s[k], t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 477,
+          "texto": "  })();"
+        },
+        {
+          "tipo": "+",
+          "linha": 478,
+          "texto": "  if (!(dTopo > 0 && f.zR(T.ombro_y) - f.zR(T.porta_traseira_topo_y) < 12)) throw new Error('furgao-realista: o topo das portas traseiras precisa ficar acima do ombro e a menos de 12 mm da traseira vertical');"
+        },
+        {
+          "tipo": "-",
+          "linha": 524,
+          "texto": "  /* as colunas da frente: x por anel. Abaixo do capô, em partes iguais; no para-brisa, a borda do vão; no ombro e no teto, as linhas"
+        },
+        {
+          "tipo": "-",
+          "linha": 525,
+          "texto": "     das nervuras, iguais às da traseira, para as linhas da cobertura saírem retas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 564,
+          "texto": "  /* as colunas da frente: x por anel. Do para-choque até o topo da porta da cabine, em partes iguais entre o meio e o começo da quina"
+        },
+        {
+          "tipo": "+",
+          "linha": 565,
+          "texto": "     (o vão do para-brisa sai pela coluna q3 da quina, e não por uma coluna da frente); acima do topo da porta, as partes iguais passam"
+        },
+        {
+          "tipo": "+",
+          "linha": 566,
+          "texto": "     às linhas das nervuras, iguais às da traseira, para as linhas da cobertura saírem retas. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 536,
+          "texto": "  const xBordaParaBrisa = (y) => lerp(T.para_brisa_x_base, T.para_brisa_x_topo, (y - T.para_brisa_base_y) / (1965 - T.para_brisa_base_y));"
+        },
+        {
+          "tipo": "-",
+          "linha": 537,
+          "texto": "  const fracParaBrisa = (y, xFim) => { const xo = xBordaParaBrisa(y); return [...Array.from({ length: nF }, (_, k) => (xo * k) / (nF - 1) / xFim), 1]; };"
+        },
+        {
+          "tipo": "-",
+          "linha": 540,
+          "texto": "  const yCapoPlano = T.para_brisa_base_y - T.colunas_frente_transicao;"
+        },
+        {
+          "tipo": "-",
+          "linha": 545,
+          "texto": "    else if (an.y <= yCapoPlano) fr = fracUniforme;"
+        },
+        {
+          "tipo": "-",
+          "linha": 546,
+          "texto": "    else if (an.y < T.para_brisa_base_y) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 547,
+          "texto": "      const pb = fracParaBrisa(T.para_brisa_base_y, f.xs(T.para_brisa_base_y) - f.raioFrente(T.para_brisa_base_y));"
+        },
+        {
+          "tipo": "-",
+          "linha": 548,
+          "texto": "      const t = suave((an.y - yCapoPlano) / (T.para_brisa_base_y - yCapoPlano));"
+        },
+        {
+          "tipo": "-",
+          "linha": 549,
+          "texto": "      fr = fracUniforme.map((u, k) => lerp(u, pb[k], t));"
+        },
+        {
+          "tipo": "-",
+          "linha": 550,
+          "texto": "    } else if (an.y <= T.porta_cabine_topo_y) fr = fracParaBrisa(an.y, xFim);"
+        },
+        {
+          "tipo": "+",
+          "linha": 583,
+          "texto": "    else if (an.y <= T.porta_cabine_topo_y) fr = fracUniforme;"
+        },
+        {
+          "tipo": "-",
+          "linha": 552,
+          "texto": "      const pb = fracParaBrisa(T.porta_cabine_topo_y, f.xs(T.porta_cabine_topo_y) - f.raioFrente(T.porta_cabine_topo_y));"
+        },
+        {
+          "tipo": "-",
+          "linha": 554,
+          "texto": "      fr = pb.map((u, k) => lerp(u, fracTeto[k], t));"
+        },
+        {
+          "tipo": "+",
+          "linha": 586,
+          "texto": "      fr = fracUniforme.map((u, k) => lerp(u, fracTeto[k], t));"
+        },
+        {
+          "tipo": "-",
+          "linha": 561,
+          "texto": "    const corpo = (xt) => [0, T.vidro_traseiro_x_dentro, ...entre(T.vidro_traseiro_x_dentro, T.vidro_traseiro_x_fora, (T.vidro_traseiro_x_fora - T.vidro_traseiro_x_dentro) / 9 + 1e-6),"
+        },
+        {
+          "tipo": "-",
+          "linha": 562,
+          "texto": "      T.vidro_traseiro_x_fora, ...entre(T.vidro_traseiro_x_fora, xt, (xt - T.vidro_traseiro_x_fora) / 3 + 1e-6), xt];"
+        },
+        {
+          "tipo": "+",
+          "linha": 593,
+          "texto": "    const pt = T.vao_canto_passo_traseiro; const kk = T.vao_canto_degraus;"
+        },
+        {
+          "tipo": "+",
+          "linha": 594,
+          "texto": "    const dentro = T.vidro_traseiro_x_dentro; const fora = T.vidro_traseiro_x_fora;"
+        },
+        {
+          "tipo": "+",
+          "linha": 595,
+          "texto": "    const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);"
+        },
+        {
+          "tipo": "+",
+          "linha": 596,
+          "texto": "    const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);"
+        },
+        {
+          "tipo": "+",
+          "linha": 597,
+          "texto": "    const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (9 - 2 * kk) + 1e-6);"
+        },
+        {
+          "tipo": "+",
+          "linha": 598,
+          "texto": "    const corpo = (xt) => [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, ...entre(fora, xt, (xt - fora) / 3 + 1e-6), xt];"
+        },
+        {
+          "tipo": "+",
+          "linha": 714,
+          "texto": "  /* A coroa da frente: a flecha, por altura, é quanto a coluna q3 da quina (a ponta do vão do para-brisa) fica abaixo do meio da"
+        },
+        {
+          "tipo": "+",
+          "linha": 715,
+          "texto": "     frente. Do zero na boca do capô ela cresce até a da base do vão (a coroa do capô), passa à da borda de cima do vão e some até o"
+        },
+        {
+          "tipo": "+",
+          "linha": 716,
+          "texto": "     teto plano. Em cada anel, um ponto da frente ou da quina desce a flecha vezes (x / x de q3)², e dali até a coluna D da fresta a"
+        },
+        {
+          "tipo": "+",
+          "linha": 717,
+          "texto": "     descida some, de modo que a porta, a lateral e o teto plano ficam onde estavam. Só o y muda: na quina, que é parede vertical, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 718,
+          "texto": "     ponto escorrega pela parede; no capô e no para-brisa ele afunda um pouco, e a borda do vão sai em arco, mais baixa nas pontas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 719,
+          "texto": "  const flechaEm = (y) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 720,
+          "texto": "    if (y <= f.boca[1]) return 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 721,
+          "texto": "    if (y <= T.para_brisa_base_y) return T.flecha_capo_base * suave((y - f.boca[1]) / (T.para_brisa_base_y - f.boca[1]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 722,
+          "texto": "    if (y <= T.porta_cabine_topo_y) return lerp(T.flecha_capo_base, T.flecha_vidro_topo, (y - T.para_brisa_base_y) / (T.porta_cabine_topo_y - T.para_brisa_base_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 723,
+          "texto": "    return T.flecha_vidro_topo * (1 - suave((y - T.porta_cabine_topo_y) / (T.altura - T.porta_cabine_topo_y)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 724,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 683,
+          "texto": "    colunasFrente(an).forEach((x, k) => add(`f${k}`, pontoFrente(sec, x)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 730,
+          "texto": "    const grupo = grupoQuina(an);"
+        },
+        {
+          "tipo": "+",
+          "linha": 731,
+          "texto": "    const xDoCaminho = (s) => pontoNoCaminho(sec, s)[0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 732,
+          "texto": "    const xQ3 = xDoCaminho(grupo.find((g) => g.col === 'q3').s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 733,
+          "texto": "    const gD = grupo.find((g) => g.col === 'D');"
+        },
+        {
+          "tipo": "+",
+          "linha": 734,
+          "texto": "    const xFimDaCoroa = Math.max(xQ3 + 1, gD ? xDoCaminho(gD.s) : sec.xS);"
+        },
+        {
+          "tipo": "+",
+          "linha": 735,
+          "texto": "    const coroa = (p) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 736,
+          "texto": "      const x = Math.abs(p[0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 737,
+          "texto": "      const g = x <= xQ3 ? (x / xQ3) ** 2 : 1 - suave((x - xQ3) / (xFimDaCoroa - xQ3));"
+        },
+        {
+          "tipo": "+",
+          "linha": 738,
+          "texto": "      return [p[0], p[1] - flechaEm(p[1]) * g, p[2]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 739,
+          "texto": "    };"
+        },
+        {
+          "tipo": "+",
+          "linha": 740,
+          "texto": "    colunasFrente(an).forEach((x, k) => add(`f${k}`, coroa(pontoFrente(sec, x))));"
+        },
+        {
+          "tipo": "-",
+          "linha": 686,
+          "texto": "    const grupo = grupoQuina(an);"
+        },
+        {
+          "tipo": "-",
+          "linha": 689,
+          "texto": "    naQuina.forEach((g) => add(g.col, pontoNoCaminho(sec, g.s)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 745,
+          "texto": "    naQuina.forEach((g) => add(g.col, coroa(pontoNoCaminho(sec, g.s))));"
+        },
+        {
+          "tipo": "-",
+          "linha": 706,
+          "texto": "            pts.slice(1, -1).forEach((p) => itens.push({ col: p.col, z: arco.zc + r * Math.cos(p.th), y: f.rPneu + r * Math.sin(p.th) }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 762,
+          "texto": "            /* abaixo do eixo (thj < 0) o primeiro ponto do anel fica em -thj, e os pontos do arco que vêm antes dele em ângulo sairiam"
+        },
+        {
+          "tipo": "+",
+          "linha": 763,
+          "texto": "               do outro lado dele em z; eles ficam de fora desses anéis */"
+        },
+        {
+          "tipo": "+",
+          "linha": 764,
+          "texto": "            const dentroDoAngulo = (p) => thj >= 0 || (p.th >= -thj && p.th <= Math.PI + thj);"
+        },
+        {
+          "tipo": "+",
+          "linha": 765,
+          "texto": "            pts.slice(1, -1).filter(dentroDoAngulo).forEach((p) => itens.push({ col: p.col, z: arco.zc + r * Math.cos(p.th), y: f.rPneu + r * Math.sin(p.th) }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 779,
+          "texto": "    /* nos anéis do vidro da porta da cabine, as colunas dos cantos do vão, a vao_canto_passo_cabine uma da outra a partir de cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 780,
+          "texto": "       borda lateral dele (S1 e S2 na frente, T1 e T2 atrás) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 781,
+          "texto": "    if (an.horizontal && an.y >= T.vidro_cabine_base_y - 1e-6 && an.y <= T.vidro_cabine_topo_y + 1e-6) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 782,
+          "texto": "      const zS0 = itens.find((it) => it.col === 'S0')?.z ?? sec.zF - sec.rF;"
+        },
+        {
+          "tipo": "+",
+          "linha": 783,
+          "texto": "      for (let j = 1; j <= T.vao_canto_degraus; j += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 784,
+          "texto": "        itens.push({ col: `S${j}`, z: zS0 - j * T.vao_canto_passo_cabine, y: sec.yS }, { col: `T${j}`, z: zVidroCabTras + j * T.vao_canto_passo_cabine, y: sec.yS });"
+        },
+        {
+          "tipo": "+",
+          "linha": 785,
+          "texto": "      }"
+        },
+        {
+          "tipo": "+",
+          "linha": 786,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 831,
+          "texto": "  /* ---- os cantos dos vãos em diagonal ----"
+        },
+        {
+          "tipo": "+",
+          "linha": 832,
+          "texto": "     A volta de um vão que anda pela gaiola dá um canto de 90 graus em cada quina do retângulo, e a subdivisão o arredonda com o raio"
+        },
+        {
+          "tipo": "+",
+          "linha": 833,
+          "texto": "     das faces dali, pequeno; cortado em degraus ele ficaria com degraus visíveis. Cada canto é cortado em diagonal: a volta segue, por"
+        },
+        {
+          "tipo": "+",
+          "linha": 834,
+          "texto": "     vao_canto_degraus células, a diagonal que liga a coluna de dentro do canto, no anel da borda, à coluna da borda, no anel"
+        },
+        {
+          "tipo": "+",
+          "linha": 835,
+          "texto": "     vao_canto_degraus acima, e cada célula dessa diagonal é partida em dois triângulos, um de cada lado dela. A diagonal fica de"
+        },
+        {
+          "tipo": "+",
+          "linha": 836,
+          "texto": "     fora do vão e a célula vizinha dela fica na chapa. A partição das células vem logo depois de montadas as faces. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 837,
+          "texto": "  const colunasDoCanto = (rs, cF, cMeio) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 838,
+          "texto": "    const lista = rs[0].lista.map((q) => q.col);"
+        },
+        {
+          "tipo": "+",
+          "linha": 839,
+          "texto": "    const iF = lista.indexOf(cF); const iM = lista.indexOf(cMeio);"
+        },
+        {
+          "tipo": "+",
+          "linha": 840,
+          "texto": "    if (iF < 0 || iM < 0) throw new Error(`furgao-realista: o anel ${rs[0].nome} não tem a coluna ${cF} ou ${cMeio}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 841,
+          "texto": "    const passo = iM > iF ? 1 : -1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 842,
+          "texto": "    const cols = [cF];"
+        },
+        {
+          "tipo": "+",
+          "linha": 843,
+          "texto": "    for (let j = 1; j <= T.vao_canto_degraus; j += 1) cols.unshift(lista[iF + passo * j]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 844,
+          "texto": "    for (let j = 0; j < T.vao_canto_degraus; j += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 845,
+          "texto": "      for (const r of [rs[j], rs[j + 1]]) {"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az10.png",
+      "peca-frente-rasante-az100.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
