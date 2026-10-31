@@ -1,0 +1,505 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 5,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "ausencia",
+        "onde": "frente do capô e traseira: caixas de farol, grade e placa da prancha",
+        "sentido": "faltando",
+        "evidencia": "frontal e traseira: a prancha desenha caixas de farol, grade e placa; o modelo mostra frente e traseira lisas, só com o degrau do para-choque"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "borda do vão do vidro da porta da cabine, diagonal da frente e vertical de trás",
+        "sentido": "segmentado",
+        "evidencia": "lado rasante az30 e az120: borda do vão do vidro da cabine com serrilhado claro e escuro, a que o painel liso ao redor não dá motivo"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro, canto inferior da frente",
+        "sentido": "segmentado",
+        "evidencia": "curvatura do lado e de tresquartos: franja de dentes ocres e azuis na fresta junto ao arco dianteiro; o critério de reprovação cita este ponto"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "quina direita do capô, lado +x, na altura da boca ao para-lama",
+        "sentido": "segmentado",
+        "evidencia": "frente rasante az100: sombra em degraus no canto direito do capô, em x 980 a 1075 e y 590 a 730; não separei malha de sombra"
+      }
+    ],
+    "observacao": "Silhueta, balanços, vãos, frestas, abas e rodas conferem com a prancha; sobram o serrilhado na borda do vão da cabine e na fresta do arco dianteiro e a falta de farol, grade e placa."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a prancha dá o vão traseiro a 100 mm da lateral prolongada, que passa 50 mm por fora da quina de raio 300 do teto; a porta fica no canto traseiro e só a coluna de fora segue a reta",
+    "a contagem de colunas da traseira, ligada à da frente e à do teto por bc igual a nF mais 5, trava qualquer coluna nova nos vidros traseiros; compensei tirando uma de enchimento",
+    "um comentário editado depois da medição muda o sha256 da receita e a medição precisa ser refeita, o que custa uns 7 minutos",
+    "o terminador da luz rasante mostra escada no nariz mesmo com a geometria lisa; nada separa isso de defeito de forma",
+    "o script de silhueta conta vãos e frestas como borda; tapei o para-brisa com o polígono da meia volta e fechei as frestas"
+  ],
+  "notaDePassagem": "Borda traseira e janela seguem a lateral prolongada por uma só função (xBordaTraseira), para ficar reta; sulcos do teto em 190 e 420 por caberem em ±630; colunas do capô desde 720.",
+  "receita": {
+    "sha256": "sha256:ba664da12d1ecd5c6cd469d3b9777180320efc52b97bb7e3e5911061e43d1ba1",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 28,
+      "acrescentadas": 42,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 4,
+          "texto": " * de dois raios e os raios maiores nas quinas do teto; ver \"O ajuste da prancha\" em referencias/alvo.md). Sobre a chapa contínua da"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * de dois raios e os raios maiores nas quinas do teto, e o ajuste de largura de 2026-10-31, com as laterais fechando 3,9 graus acima do vinco de"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * cintura; ver \"O ajuste da prancha\" e \"O ajuste de caráter da largura\" em referencias/alvo.md). Sobre a chapa contínua da"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "  // rodas e arcos: entre-eixos e balanço dianteiro (o traseiro sai da diferença), bitola, pneu 225/65 aro 16, arco com 65 mm de folga"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  // rodas e arcos: entre-eixos e balanço dianteiro (o traseiro sai da diferença), bitola, pneu 235/65 aro 16, arco com 65 mm de folga"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "  bitola: 1700,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  bitola: 1730, // a face de fora do pneu fica em x 982,5, 17,5 mm para dentro da lateral"
+        },
+        {
+          "tipo": "-",
+          "linha": 51,
+          "texto": "  pneu_largura: 225,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  pneu_largura: 235,"
+        },
+        {
+          "tipo": "-",
+          "linha": 80,
+          "texto": "  // seção frontal, em [x, y]: lateral vertical até 1450 e quase vertical até o teto, quina do teto com raio"
+        },
+        {
+          "tipo": "-",
+          "linha": 81,
+          "texto": "  lateral_reta_ate_y: 1450,"
+        },
+        {
+          "tipo": "-",
+          "linha": 82,
+          "texto": "  meia_largura_no_teto: 982,"
+        },
+        {
+          "tipo": "-",
+          "linha": 83,
+          "texto": "  raio_lateral: 600,"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  // seção frontal, em [x, y]: lateral vertical em x 1000 até o vinco de cintura e fechando daí até o teto (3,9 graus), com a passagem"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  // no vinco em raio 3000 e sem quina; o prolongamento chega ao teto em x 910 (1820 de largura), e a quina do teto tem raio 300"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  lateral_reta_ate_y: 1190,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  meia_largura_no_teto: 910,"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  raio_lateral: 3000,"
+        },
+        {
+          "tipo": "-",
+          "linha": 108,
+          "texto": "  colunas_do_capo_y: 900, // do anel de baixo do capô (acima dos arcos) em diante, três colunas da lateral andam junto com o fim da quina"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  colunas_do_capo_y: 720, // do anel do topo do para-choque em diante, três colunas da lateral andam junto com o fim da quina"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  vidro_traseiro_folga_fora: 45, // a borda de fora da janela corre 45 mm para dentro da borda de fora da porta, que acompanha a lateral"
+        },
+        {
+          "tipo": "-",
+          "linha": 176,
+          "texto": "  nervura_1_x: 210,"
+        },
+        {
+          "tipo": "-",
+          "linha": 177,
+          "texto": "  nervura_2_x: 450,"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  nervura_1_x: 190,"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "  nervura_2_x: 420,"
+        },
+        {
+          "tipo": "+",
+          "linha": 370,
+          "texto": "  /* A borda de fora das portas traseiras, que é o começo da quina de trás: 900 até o vinco de cintura, e daí a lateral prolongada"
+        },
+        {
+          "tipo": "+",
+          "linha": 371,
+          "texto": "     (reta do vinco ao teto, sem o raio de 3000 que tira menos de 2 mm dela) menos o raio da quina de trás vista de cima, sempre"
+        },
+        {
+          "tipo": "+",
+          "linha": 372,
+          "texto": "     100 mm para dentro dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 373,
+          "texto": "  const xLinhaDaLateral = (y) => (y <= T.lateral_reta_ate_y ? xMax : xMax - ((xMax - T.meia_largura_no_teto) * (y - T.lateral_reta_ate_y)) / (T.altura - T.lateral_reta_ate_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 374,
+          "texto": "  const xBordaTraseira = (y) => xLinhaDaLateral(y) - T.raio_planta_tras;"
+        },
+        {
+          "tipo": "+",
+          "linha": 375,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 386,
+          "texto": "    perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente, zFrestaFrente,"
+        },
+        {
+          "tipo": "+",
+          "linha": 395,
+          "texto": "    perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente, zFrestaFrente, xBordaTraseira,"
+        },
+        {
+          "tipo": "-",
+          "linha": 463,
+          "texto": "  return { yF: y, zF: f.zF(y), xS: f.xs(y), yS: y, yR: y, zR: f.zR(y), rF: f.raioFrente(y), rB: T.raio_planta_tras };"
+        },
+        {
+          "tipo": "+",
+          "linha": 472,
+          "texto": "  return { yF: y, zF: f.zF(y), xS: f.xs(y), yS: y, yR: y, zR: f.zR(y), rF: f.raioFrente(y), rB: f.xs(y) - f.xBordaTraseira(y) };"
+        },
+        {
+          "tipo": "-",
+          "linha": 484,
+          "texto": "  /* até o anel do topo das portas traseiras, o começo da quina de trás segue a inclinação reta da lateral, para a fresta de fora"
+        },
+        {
+          "tipo": "-",
+          "linha": 485,
+          "texto": "     das portas traseiras não entortar no alto; dali ao teto o raio fecha até o da borda do teto */"
+        },
+        {
+          "tipo": "-",
+          "linha": 486,
+          "texto": "  const inclinacao = (f.xs(T.ombro_y) - f.xs(T.ombro_y - 100)) / 100;"
+        },
+        {
+          "tipo": "-",
+          "linha": 487,
+          "texto": "  const xTrasReta = (y) => f.xs(T.ombro_y) + inclinacao * (y - T.ombro_y) - T.raio_planta_tras;"
+        },
+        {
+          "tipo": "+",
+          "linha": 493,
+          "texto": "  /* até o anel do topo das portas traseiras, o começo da quina de trás segue a lateral prolongada, para a fresta de fora das portas"
+        },
+        {
+          "tipo": "+",
+          "linha": 494,
+          "texto": "     traseiras não entortar no alto; dali ao teto o raio fecha até o da borda do teto */"
+        },
+        {
+          "tipo": "+",
+          "linha": 495,
+          "texto": "  const xTrasReta = (y) => f.xBordaTraseira(y);"
+        },
+        {
+          "tipo": "-",
+          "linha": 598,
+          "texto": "    const dentro = T.vidro_traseiro_x_dentro; const fora = T.vidro_traseiro_x_fora;"
+        },
+        {
+          "tipo": "-",
+          "linha": 599,
+          "texto": "    const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);"
+        },
+        {
+          "tipo": "-",
+          "linha": 600,
+          "texto": "    const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);"
+        },
+        {
+          "tipo": "-",
+          "linha": 601,
+          "texto": "    const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (9 - 2 * kk) + 1e-6);"
+        },
+        {
+          "tipo": "-",
+          "linha": 602,
+          "texto": "    const corpo = (xt) => [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, ...entre(fora, xt, (xt - fora) / 3 + 1e-6), xt];"
+        },
+        {
+          "tipo": "-",
+          "linha": 603,
+          "texto": "    if (an.horizontal) return corpo(xTras);"
+        },
+        {
+          "tipo": "-",
+          "linha": 604,
+          "texto": "    const base = corpo(horizontais.at(-1).sec.xS - T.raio_planta_tras).map((x, k, l) => x / l.at(-1));"
+        },
+        {
+          "tipo": "+",
+          "linha": 606,
+          "texto": "    const dentro = T.vidro_traseiro_x_dentro;"
+        },
+        {
+          "tipo": "+",
+          "linha": 607,
+          "texto": "    /* a borda de fora do vidro fica 45 mm dentro da borda de fora da porta, que acompanha a lateral, e não passa de 820 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 608,
+          "texto": "    const corpo = (xt, y) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 609,
+          "texto": "      const fora = Math.min(T.vidro_traseiro_x_fora, f.xBordaTraseira(y) - T.vidro_traseiro_folga_fora);"
+        },
+        {
+          "tipo": "+",
+          "linha": 610,
+          "texto": "      const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);"
+        },
+        {
+          "tipo": "+",
+          "linha": 611,
+          "texto": "      const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);"
+        },
+        {
+          "tipo": "+",
+          "linha": 612,
+          "texto": "      const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (10 - 2 * kk) + 1e-6);"
+        },
+        {
+          "tipo": "+",
+          "linha": 613,
+          "texto": "      return [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, ...entre(fora, xt, (xt - fora) / 2 + 1e-6), xt];"
+        },
+        {
+          "tipo": "+",
+          "linha": 614,
+          "texto": "    };"
+        },
+        {
+          "tipo": "+",
+          "linha": 615,
+          "texto": "    if (an.horizontal) return corpo(xTras, an.y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 616,
+          "texto": "    const ref = horizontais.at(-1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 617,
+          "texto": "    const base = corpo(ref.sec.xS - ref.sec.rB, ref.y).map((x, k, l) => x / l.at(-1));"
+        },
+        {
+          "tipo": "-",
+          "linha": 869,
+          "texto": "  const iForaTraseiro = colunasTras(horizontais.find((x) => Math.abs(x.y - T.vidro_traseiro_base_y) < 1e-6)).findIndex((x) => Math.abs(x - T.vidro_traseiro_x_fora) < 1e-6);"
+        },
+        {
+          "tipo": "+",
+          "linha": 882,
+          "texto": "  const iForaTraseiro = 2 + 2 * T.vao_canto_degraus + (9 - 2 * T.vao_canto_degraus); // r0, a borda de dentro, os cantos, o miolo e os cantos de fora"
+        },
+        {
+          "tipo": "-",
+          "linha": 1409,
+          "texto": "    objeto: 'furgão médio de teto alto, etapa 2 pela prancha ajustada: lataria de 5400 por 2000 por 2500 mm, capô a 23,8 graus, para-brisa envolvente, teto de dois raios, frestas das cinco portas, vãos de cantos redondos e rodas provisórias',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1422,
+          "texto": "    objeto: 'furgão médio de teto alto, etapa 2 pela prancha ajustada: lataria de 5400 por 2000 por 2500 mm de laterais fechando para o teto, capô a 23,8 graus, para-brisa envolvente, frestas das cinco portas, vãos de cantos redondos e rodas provisórias',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1416,
+          "texto": "        forma: 'chapa de 2 mm: capô de 1100 a 1480, para-brisa até 2110 com vão em arco dobrando pela quina de 160, teto de raios 1290 e 405, quinas do teto de 300 e 180, frestas de 6 mm, vinco em 1190, sulcos no teto, vãos de cantos redondos',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1429,
+          "texto": "        forma: 'chapa de 2 mm: lateral vertical até o vinco em 1190 e fechando 3,9 graus até o teto de ±630; capô de 1100 a 1480, para-brisa até 2110 envolvente, teto de raios 1290 e 405, frestas de 6 mm, sulcos, vãos de cantos redondos',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1431,
+          "texto": "        forma: `roda provisória da etapa 1: cilindro de 710 mm de diâmetro e 225 de largura, na bitola de 1700 e no ${nome.includes('Dianteira') ? 'eixo dianteiro' : 'eixo traseiro'}, apoiado no chão; sai na etapa 4`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 1444,
+          "texto": "        forma: `roda provisória da etapa 1: cilindro de 710 mm de diâmetro e 235 de largura, na bitola de 1730 e no ${nome.includes('Dianteira') ? 'eixo dianteiro' : 'eixo traseiro'}, apoiado no chão; sai na etapa 4`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 1458,
+          "texto": "      'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou o vão traseiro não acompanha a lateral 100 mm para dentro dela acima do vinco, ou um sulco do teto não cabe no teto de ±630',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az10.png",
+      "peca-frente-rasante-az100.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
