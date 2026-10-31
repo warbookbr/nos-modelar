@@ -16,8 +16,10 @@
  * Calibração, escrita antes do traçado (skill, passo 1):
  *   comprimento 5400 = balanço dianteiro 980 + entre-eixos 3300 + balanço traseiro 1120;
  *   eixo dianteiro em z = 2700 - 980 = 1720 e traseiro em z = -2700 + 1120 = -1580;
- *   pneu 225/65 aro 16: diâmetro 710 (o do alinhamento), largura 225, centro da roda em y = 355;
- *   bitola 1700: meia bitola 850 + meia largura do pneu 112,5 = 962,5 < meia largura 1000 (sobram 37,5 mm por lado);
+ *   pneu 235/65 aro 16 (era 225, mudado pela pessoa em 2026-10-31): diâmetro 710 (o do alinhamento), largura 235,
+ *   centro da roda em y = 355;
+ *   bitola 1730 (era 1700, mudada pela pessoa em 2026-10-31): meia bitola 865 + meia largura do pneu 117,5 = 982,5 <
+ *   meia largura 1000 (a face de fora do pneu fica 17,5 mm para dentro da lateral);
  *   arco da roda com raio 420 no centro da roda: 65 mm de folga sobre o pneu, e o arco dianteiro (z 1300 a 2140) fica
  *   dentro do balanço e atrás do para-choque (2700), o traseiro (z -2000 a -1160) à frente do para-choque (-2700);
  *   soleira em y = 300, altura 2500 no teto, largura 2000 sem retrovisores.
@@ -38,9 +40,9 @@ const M = {
   entreEixos: 3300,
   balancoDianteiro: 980,
   balancoTraseiro: 1120,
-  bitola: 1700,
+  bitola: 1730,
   pneuDiametro: 710,
-  pneuLargura: 225,
+  pneuLargura: 235,
   aroDiametro: 406, // aro 16 polegadas
   arcoRaio: 420,
   soleira: 300,
@@ -190,15 +192,22 @@ if (portaCorrer.tras - (zT + M.arcoRaio) < FOLGA_ARCO_TRASEIRO) throw new Error(
 
 /* ------------------------------------------------------------ seção frontal e traseira */
 /* Projeção ao longo de z: a caixa de carga é a parte mais larga e mais alta, então frontal e traseira têm o mesmo
-   contorno, quase retangular, com a lateral quase vertical (1000 até 1450 de altura, 982 no teto) e a quina do teto
-   com raio de 170. */
-/* Quina do teto com a lateral, vista de frente e de trás, com raio de 300 (era 170). */
+   contorno. A lateral é vertical em 2000 de largura até o vinco de cintura (1190) e dali se inclina para dentro até o
+   teto, onde o prolongamento dela chega com 1820 de largura (90 mm a menos de cada lado), como a pessoa escolheu em
+   2026-10-31 para o furgão não parecer estreito; a passagem no vinco é um raio de 3000, sem quina. A quina do teto
+   com a lateral tem raio de 300. */
 const RAIO_QUINA_TETO = 300;
-const silhuetaFrontal = [[-xMax, M.soleira, 30], [xMax, M.soleira, 30], [xMax, 1450, 600], [982, M.altura, RAIO_QUINA_TETO], [-982, M.altura, RAIO_QUINA_TETO], [-xMax, 1450, 600]];
-/* Meia largura da cabine na altura y: a lateral quase vertical da frontal, 1000 até 1450 e 982 no teto. */
-const meiaLarguraEm = (y) => (y <= 1450 ? xMax : xMax - ((xMax - 982) * (y - 1450)) / (M.altura - 1450));
-const xPneuDentro = M.bitola / 2 - M.pneuLargura / 2; // 737,5
-const xPneuFora = M.bitola / 2 + M.pneuLargura / 2; // 962,5
+const Y_VINCO = 1190;
+const LARGURA_NO_TETO = 1820;
+const RAIO_NO_VINCO = 3000;
+const xLateralNoTeto = LARGURA_NO_TETO / 2;
+const silhuetaFrontal = [[-xMax, M.soleira, 30], [xMax, M.soleira, 30], [xMax, Y_VINCO, RAIO_NO_VINCO], [xLateralNoTeto, M.altura, RAIO_QUINA_TETO], [-xLateralNoTeto, M.altura, RAIO_QUINA_TETO], [-xMax, Y_VINCO, RAIO_NO_VINCO]];
+const INCLINACAO_LATERAL = Math.atan2(xMax - xLateralNoTeto, M.altura - Y_VINCO) / grau;
+/* Meia largura da cabine na altura y: vertical até o vinco e fechando em reta até o teto (o raio no vinco tira menos de
+   2 mm dela). */
+const meiaLarguraEm = (y) => (y <= Y_VINCO ? xMax : xMax - ((xMax - xLateralNoTeto) * (y - Y_VINCO)) / (M.altura - Y_VINCO));
+const xPneuDentro = M.bitola / 2 - M.pneuLargura / 2; // 747,5
+const xPneuFora = M.bitola / 2 + M.pneuLargura / 2; // 982,5
 /* De frente e de trás só se vê o pneu abaixo da soleira: a carroceria cobre o resto, e o pneu inteiro cruzava as portas
    traseiras. O diâmetro fica cotado na lateral. */
 const pneuDeFrente = (s) => [[s * xPneuDentro, M.soleira], [s * xPneuDentro, 0, 50], [s * xPneuFora, 0, 50], [s * xPneuFora, M.soleira]];
@@ -284,7 +293,7 @@ if (Math.abs((zVidroBase - zVidroTopo) - (recuoLateral(vidroTopoY) - recuoLatera
 /* Tangente do filete de 300 da testa com o teto, e do de 120 da quina traseira. */
 const zTetoPlano = inicioDoTeto[0];
 const zTetoPlanoTras = P.quinaTraseira[0] + RAIO_QUINA_TRASEIRA;
-const xTetoPlano = 982 - RAIO_QUINA_TETO * Math.tan((Math.PI - Math.atan2(M.altura - 1450, 982 - xMax)) / 2);
+const xTetoPlano = xLateralNoTeto - RAIO_QUINA_TETO * Math.tan((Math.PI - Math.atan2(M.altura - Y_VINCO, xLateralNoTeto - xMax)) / 2);
 const bordaDoTeto = [[zTetoPlano, -xTetoPlano, 100], [zTetoPlano, xTetoPlano, 100], [zTetoPlanoTras, xTetoPlano, 40], [zTetoPlanoTras, -xTetoPlano, 40]];
 /* O capô de cima, da boca ao pé do para-brisa (z 1360), que é a linha onde ele encontra o vidro. */
 const capoDeCima = [[2600, -860, 120], [2600, 860, 120],
@@ -310,6 +319,7 @@ const LANDMARKS = [
   { id: 'correrT', vista: 'lateral', em: [portaCorrer.tras, 2100], sobre: 'portaDeCorrer', rotuloEm: [-1220, 2640] },
   { id: 'cabineF', vista: 'lateral', em: [zD - Math.sqrt(raioPorta ** 2 - (500 - R) ** 2), 500], sobre: 'portaDaCabine', rotuloEm: [980, 327] },
   { id: 'largura', vista: 'frontal', em: [xMax, 900], sobre: 'silhuetaFrontal', rotuloEm: [1060, 900] },
+  { id: 'vinco', vista: 'frontal', em: [xMax, Y_VINCO], sobre: 'silhuetaFrontal', rotuloEm: [1060, Y_VINCO + 60] },
   { id: 'vaoTraseiro', vista: 'traseira', em: [900, 1500], sobre: 'portaTraseiraEsq', rotuloEm: [1060, 1500], rotuloAncora: 'end' },
 ];
 const mil = (v) => Math.round(v).toLocaleString('pt-BR');
@@ -352,7 +362,7 @@ export const ESPEC = {
       {
         id: 'classe',
         tipo: 'medidas-declaradas',
-        evidencia: 'ALINHAMENTO.md do furgão realista (2026-10-30): comprimento 5400, largura 2000 sem retrovisores, altura 2500, entre-eixos 3300, pneu 225/65 aro 16 com 710 de diâmetro e 225 de largura; medidas de classe de fichas públicas de furgões médios de teto alto, sem marca nem modelo',
+        evidencia: 'ALINHAMENTO.md do furgão realista (2026-10-30): comprimento 5400, largura 2000 sem retrovisores, altura 2500, entre-eixos 3300, pneu 225/65 aro 16 com 710 de diâmetro e 225 de largura (a pessoa passou a 235 de largura e bitola 1730 em 2026-10-31); medidas de classe de fichas públicas de furgões médios de teto alto, sem marca nem modelo',
       },
       {
         id: 'proporcao',
@@ -367,8 +377,8 @@ export const ESPEC = {
     ],
     incertezas: [
       { id: 'balancos', sobre: 'divisão dos 2100 mm de balanço em 980 na frente e 1120 atrás', fonte: 'proporcao', efeito: 'diagnostico', motivo: 'a classe fixa comprimento e entre-eixos; a divisão varia uns 100 mm entre furgões da classe' },
-      { id: 'bitola', sobre: 'bitola de 1700 igual nos dois eixos', fonte: 'proporcao', efeito: 'diagnostico', motivo: 'valor típico da classe, não declarado no alinhamento; a folga de 37,5 mm por lado confere só que o pneu cabe' },
-      { id: 'pneu', sobre: 'diâmetro do pneu', fonte: 'classe', efeito: 'diagnostico', motivo: 'o alinhamento diz cerca de 710; a conta nominal do 225/65 aro 16 dá 699' },
+      { id: 'bitola', sobre: 'bitola de 1730 igual nos dois eixos', fonte: 'ajuste', efeito: 'diagnostico', motivo: 'escolhida pela pessoa em 2026-10-31 para a face de fora do pneu ficar 17,5 mm para dentro da lateral; não vem de ficha' },
+      { id: 'pneu', sobre: 'diâmetro do pneu', fonte: 'classe', efeito: 'diagnostico', motivo: 'o alinhamento diz cerca de 710; a conta nominal do 235/65 aro 16 dá 712' },
       { id: 'cabine', sobre: 'boca do capô, base e topo do para-brisa e testa do teto alto', fonte: 'proporcao', efeito: 'diagnostico', motivo: 'posições estimadas para o bico curto; nenhuma ficha de classe as traz, e a pessoa aprova a forma' },
       { id: 'portas', sobre: 'linhas das portas, vidros e arcos', fonte: 'proporcao', efeito: 'diagnostico', motivo: 'posição e tamanho estimados (porta de correr de 1300, vão traseiro de 1800, arco de raio 420); valem como alvo até a pessoa pedir outro' },
     ],
@@ -477,7 +487,7 @@ export const ESPEC = {
       ['#12233b', 'silhueta (projeção de cada vista)'],
       ['#2f4562', 'linhas de porta e borda do teto plano'],
       ['#3d6b86', 'vidros: para-brisa, portas da cabine, portas traseiras'],
-      ['#8a94a2', 'pneu 225/65 aro 16 (⌀ 710 × 225) e aro de 16 polegadas'],
+      ['#8a94a2', `pneu ${M.pneuLargura}/65 aro 16 (⌀ ${M.pneuDiametro} × ${M.pneuLargura}) e aro de 16 polegadas`],
       ['#b3593d', 'cotas em mm'],
       ['#1f6f5c', 'landmarks, em [z, y] na lateral, [x, y] na frontal e traseira, [z, x] de cima'],
     ],
@@ -488,6 +498,7 @@ export const ESPEC = {
       'Medidas rígidas da classe; cabine, portas, vidros, bitola e balanços estimados na proporção (ver autoria).',
       `Teto na lateral: curva contínua de raio ${RAIO_TOPO_VIDRO} saindo do topo do para-brisa e ${RAIO_TESTA} até o teto, que começa em z ${Math.round(zTetoPlano)}.`,
       `Teto: raio ${RAIO_QUINA_TRASEIRA} na quina traseira (lateral) e ${RAIO_QUINA_TETO} nas quinas com a lateral (frontal e traseira).`,
+      `Laterais: verticais em ${mil(M.largura)} até o vinco (${mil(Y_VINCO)}), fechando ${(INCLINACAO_LATERAL).toFixed(1).replace('.', ',')} graus até o teto (${mil(LARGURA_NO_TETO)} no prolongamento, teto plano com ${mil(2 * xTetoPlano)}).`,
       `Para-brisa: flecha ${FLECHA_TOPO} em cima e ${Math.round(flechaBase)} embaixo na frontal; coluna em x ±${Math.round(xPontaBase)} na base e ±${Math.round(xPontaTopo)} no topo; de cima, pontas ${Math.round(recuoDaPonta)} mm atrás do centro, dobrando na quina de raio ${QUINA_VIDRO}.`,
       `De cima, o vidro vai de z ${Math.round(zVidroBase)} a ${Math.round(zVidroTopo)}: as bordas dele a ${vidroBaseY} e ${vidroTopoY} de altura, 20 e 25 mm dentro do pé e do topo do para-brisa da lateral.`,
       ...linhasDeLandmarks(),

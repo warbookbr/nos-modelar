@@ -20,6 +20,18 @@ A traseira desenha o para-choque que a lateral mostra: da soleira (300 mm) ao de
 
 O vinco de cintura, que estava em 1.050 mm, subiu na proporção do pé do para-brisa (1.480 sobre 1.310) para 1.190 mm, valor que a receita adotou. A prancha não desenha o vinco.
 
+## O ajuste de caráter da largura, de 2026-10-31
+
+Depois de aceitar a lataria, a pessoa achou o furgão estreito na impressão, embora não nos números. Ela escolheu manter os 2.000 mm de largura máxima e mudar o caráter. Até a receita ser refeita, a lataria segue a prancha anterior.
+
+Abaixo do vinco de cintura, em 1.190 mm, a lateral continua vertical em 2.000 mm. Acima dele, ela se inclina para dentro, 3,9 graus da vertical, até a quina do teto. O prolongamento da lateral chega ao teto com 1.820 mm, 90 mm a menos de cada lado. A passagem no vinco é um raio de 3.000 mm, sem quina, e a quina do teto continua com raio de 300. Com isso, o teto plano fica com 1.260 mm de largura (x ±630, era ±687), o que também se vê de cima. A frontal e a traseira têm o mesmo contorno.
+
+Na frontal, o para-brisa acompanha a lateral, com a coluna mantida em cerca de 100 mm por lado. O vidro vai de x ±879 na base (1.757 mm de largura) a ±839 no topo (1.677 mm), e mede 1.718 mm a 1.790 de altura. De cima, as pontas continuam 27 mm atrás do centro.
+
+As rodas ficam mais largas e mais para fora, por escolha da pessoa: pneu 235 em vez de 225 e bitola 1.730 em vez de 1.700. A face de fora do pneu fica em x 982,5, 17,5 mm para dentro da lateral, e a de dentro em 747,5. O diâmetro continua 710, e o arco de raio 420 mantém os 65 mm de folga sobre o pneu. A largura nova fica abaixo do vinco, onde a lateral continua em 2.000.
+
+As portas traseiras continuam com o vão de 1.800 mm, x ±900 de 590 a 2.380, e cabem no contorno afinado da traseira. A sobra, porém, encolhe no alto: no topo das portas, a lateral fica em x 870 (era 927), e o canto de cima delas fica 14 mm dentro do contorno. De cima, a quina traseira tem raio de 100. Se ela continuar assim no alto, a face plana da traseira acaba em x ±816 a 2.290 mm de altura e ±770 a 2.380, e o vão de 1.800 não cabe nela acima do vinco. Há duas saídas. Na primeira, o vão fica com 1.800 até o topo e a quina traseira em planta afina para cerca de 15 a 30 mm no alto. Na segunda, o vão segue a lateral acima do vinco e chega ao topo com cerca de 1.600 a 1.630 mm. O vão é decisão travada e espera a escolha da pessoa.
+
 ## A referência de caráter
 
 O `fonte-vistas.png` são as vistas do `furgao` do acervo, de que esta peça nasceu como cópia. Valem só como caráter da forma, porque as medidas do `furgao` (rodas de 1.060 mm numa carroceria de 4.854 mm, cabine que afunila para o teto) deixaram de valer pelo alinhamento. A origem do `furgao` é o modelo "van" do pacote A, de autor A, com licença livre sem exigência de crédito; a malha não está no repositório, e as medidas tiradas dela ficam só no `furgao`, em `procedural/pecas/furgao/referencias/fonte-partes.json`.

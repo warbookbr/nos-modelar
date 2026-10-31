@@ -6,9 +6,9 @@
     "entreEixos": 3300,
     "balancoDianteiro": 980,
     "balancoTraseiro": 1120,
-    "bitola": 1700,
+    "bitola": 1730,
     "pneuDiametro": 710,
-    "pneuLargura": 225,
+    "pneuLargura": 235,
     "aroDiametro": 406,
     "arcoRaio": 420,
     "soleira": 300
@@ -127,17 +127,17 @@
       },
       "silhuetaFrontal": {
         "vista": "frontal",
-        "comprimento": 8090.11,
-        "retidao": 0.693,
-        "concentracao": 0.166,
+        "comprimento": 7980.25,
+        "retidao": 0.643,
+        "concentracao": 0.176,
         "inversoes": 0,
         "raioMin": 30
       },
       "silhuetaTraseira": {
         "vista": "traseira",
-        "comprimento": 8090.11,
-        "retidao": 0.693,
-        "concentracao": 0.166,
+        "comprimento": 7980.25,
+        "retidao": 0.643,
+        "concentracao": 0.176,
         "inversoes": 0,
         "raioMin": 30
       },
@@ -159,17 +159,17 @@
       },
       "paraBrisa": {
         "vista": "frontal",
-        "comprimento": 4657.9,
-        "retidao": 0.417,
-        "concentracao": 0.121,
+        "comprimento": 4517.33,
+        "retidao": 0.412,
+        "concentracao": 0.126,
         "inversoes": 2,
         "raioMin": 30
       },
       "paraBrisaDeCima": {
         "vista": "planta",
-        "comprimento": 4402.64,
-        "retidao": 0.829,
-        "concentracao": 0.095,
+        "comprimento": 4264.27,
+        "retidao": 0.819,
+        "concentracao": 0.101,
         "inversoes": 2,
         "raioMin": 160
       },
@@ -239,7 +239,7 @@
       },
       "bordaDoTeto": {
         "vista": "planta",
-        "comprimento": 9147.43,
+        "comprimento": 8918.64,
         "retidao": 0.819,
         "concentracao": 0.111,
         "inversoes": 0,
@@ -247,17 +247,17 @@
       },
       "capoDeCima": {
         "vista": "planta",
-        "comprimento": 5154.03,
-        "retidao": 0.789,
+        "comprimento": 5109.12,
+        "retidao": 0.779,
         "concentracao": 0.136,
         "inversoes": 2,
         "raioMin": 5
       },
       "capo": {
         "vista": "frontal",
-        "comprimento": 4159.8,
+        "comprimento": 4115.41,
         "retidao": 0.432,
-        "concentracao": 0.121,
+        "concentracao": 0.126,
         "inversoes": 0,
         "raioMin": 30
       },
@@ -343,39 +343,39 @@
       },
       "pneuFrontalDir": {
         "vista": "frontal",
-        "comprimento": 781.92,
+        "comprimento": 791.92,
         "retidao": 0.729,
-        "concentracao": 0.196,
+        "concentracao": 0.191,
         "inversoes": 0,
         "raioMin": 50
       },
       "pneuFrontalEsq": {
         "vista": "frontal",
-        "comprimento": 781.92,
+        "comprimento": 791.92,
         "retidao": 0.729,
-        "concentracao": 0.196,
+        "concentracao": 0.191,
         "inversoes": 0,
         "raioMin": 50
       },
       "pneuTraseiroVistoEsq": {
         "vista": "traseira",
-        "comprimento": 781.92,
+        "comprimento": 791.92,
         "retidao": 0.729,
-        "concentracao": 0.196,
+        "concentracao": 0.191,
         "inversoes": 0,
         "raioMin": 50
       },
       "pneuTraseiroVistoDir": {
         "vista": "traseira",
-        "comprimento": 781.92,
+        "comprimento": 791.92,
         "retidao": 0.729,
-        "concentracao": 0.196,
+        "concentracao": 0.191,
         "inversoes": 0,
         "raioMin": 50
       },
       "pneuDeCimaDE": {
         "vista": "planta",
-        "comprimento": 1801.07,
+        "comprimento": 1821.07,
         "retidao": 0.739,
         "concentracao": 0.166,
         "inversoes": 0,
@@ -383,7 +383,7 @@
       },
       "pneuDeCimaDD": {
         "vista": "planta",
-        "comprimento": 1801.07,
+        "comprimento": 1821.07,
         "retidao": 0.739,
         "concentracao": 0.166,
         "inversoes": 0,
@@ -391,7 +391,7 @@
       },
       "pneuDeCimaTE": {
         "vista": "planta",
-        "comprimento": 1801.07,
+        "comprimento": 1821.07,
         "retidao": 0.739,
         "concentracao": 0.166,
         "inversoes": 0,
@@ -399,7 +399,7 @@
       },
       "pneuDeCimaTD": {
         "vista": "planta",
-        "comprimento": 1801.07,
+        "comprimento": 1821.07,
         "retidao": 0.739,
         "concentracao": 0.166,
         "inversoes": 0,
@@ -462,6 +462,10 @@
       "largura": {
         "sobre": "silhuetaFrontal",
         "desvio": 0
+      },
+      "vinco": {
+        "sobre": "silhuetaFrontal",
+        "desvio": 1.77
       },
       "vaoTraseiro": {
         "sobre": "portaTraseiraEsq",
