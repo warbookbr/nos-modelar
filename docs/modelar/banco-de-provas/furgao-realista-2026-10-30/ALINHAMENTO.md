@@ -14,7 +14,7 @@ O que fazia o `furgao` parecer estreito, conferido em 2026-10-30, não era a lar
 
 ## O corpo de baixo
 
-No `furgao` ele é feito de três blocos (`chassiFrente`, `chassiCentro`, `chassiTras`), separados pelos vãos das rodas, cada um com uma soleira larga embaixo e uma saia inclinada em cima; o bloco do meio é uma laje inteira de lado a lado, e a lataria azul termina em cima dele, a 883 mm. A pessoa escolheu, pela recomendação, a faixa de proteção em plástico escuro rente à lataria, como num furgão de trabalho: o corpo de baixo continua separado e de outra cor, sem o degrau que sobra para fora, e o piso fica por dentro, escondido. A pessoa confere o resultado nas imagens do modelo.
+No `furgao` ele é feito de três blocos (`chassiFrente`, `chassiCentro`, `chassiTras`), separados pelos vãos das rodas, cada um com uma soleira larga embaixo e uma saia inclinada em cima; o bloco do meio é uma laje inteira de lado a lado, e a lataria azul termina em cima dele, a 883 mm. A pessoa escolheu, pela recomendação, a faixa de proteção em plástico escuro rente à lataria, como num furgão de trabalho: o corpo de baixo continua separado e de outra cor, sem o degrau que sobra para fora, e o piso fica por dentro, escondido. A pessoa confere o resultado nas imagens do modelo. Em 2026-11-01, ao ver a etapa 3, a pessoa achou a faixa rente simples demais e escolheu, pela recomendação e entre três opções de seção desenhadas, a saia de plástico como peça própria sobre a chapa: sai 20 mm, com a borda de cima redonda e a parte de baixo dobrando para dentro, e a mesma seção continua como moldura de cerca de 50 mm em volta de cada arco, emendando com a saia e com os para-choques. A chapa da lataria aceita fica como está, e o plástico se soma por fora dela.
 
 ## A frente e a cabine
 
@@ -22,7 +22,7 @@ A pessoa escolheu, pela recomendação, a frente de bico curto: capô curto e in
 
 ## Os para-choques
 
-A pessoa escolheu, pela recomendação, os para-choques no mesmo plástico escuro da faixa de baixo, envolvendo as quinas e emendando com ela, de modo que a parte de baixo vira uma cinta escura contínua; o dianteiro acompanha o bico curto, com a entrada de ar embaixo e o lugar da placa, e o traseiro tem em cima o degrau plano de carga e o lugar da placa.
+A pessoa escolheu, pela recomendação, os para-choques no mesmo plástico escuro da faixa de baixo, envolvendo as quinas e emendando com ela, de modo que a parte de baixo vira uma cinta escura contínua; o dianteiro acompanha o bico curto, com a entrada de ar embaixo e o lugar da placa, e o traseiro tem em cima o degrau plano de carga e o lugar da placa. Na mesma escolha de 2026-11-01, entre três opções de seção, a pessoa ficou com a do meio para os dois: o dianteiro sai 50 mm da chapa, em duas alturas, com o alto acompanhando o nariz, a faixa da entrada de ar recuada 20 mm de uma quina à outra e um lábio embaixo que recua por baixo; o traseiro sai 110 mm atrás das portas, com o degrau plano de carga de cerca de 95 mm em cima. Os dois dobram nas quinas até a moldura do arco.
 
 ## As rodas e os pneus
 
@@ -46,7 +46,7 @@ A carroceria inteira como uma chapa só (cabine, carga e teto), com as frestas, 
 
 ## Os contatos
 
-Os vidros rentes à lataria, com a borracha cobrindo a junta; a faixa de baixo e os para-choques encostados na lataria e emendados entre si, sem degrau para fora; os pneus apoiados no chão; o forro do arco a 20 a 30 mm do pneu, sem tocar; os faróis e as lanternas embutidos e rentes à lataria; os retrovisores presos nas portas da cabine, as maçanetas nas portas e o trilho na lateral; o interior inteiro dentro da lataria, sem atravessar nada.
+Os vidros rentes à lataria, com a borracha cobrindo a junta; a saia, as molduras dos arcos e os para-choques assentados na lataria, com fresta fina e sem vão, saindo dela só o que a seção escolhida em 2026-11-01 diz, e emendados entre si; os pneus apoiados no chão; o forro do arco a 20 a 30 mm do pneu, sem tocar; os faróis e as lanternas embutidos e rentes à lataria; os retrovisores presos nas portas da cabine, as maçanetas nas portas e o trilho na lateral; o interior inteiro dentro da lataria, sem atravessar nada.
 
 ## Os critérios de reprovação
 
