@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm test*)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git *)",
+      "Bash(python3 *)",
+      "Bash(/root/ferramentas/blender-4.2.3-linux-x64/blender *)",
+      "Bash(MODELAR_BLENDER=/root/ferramentas/blender-4.2.3-linux-x64/blender npm run *)",
+      "Bash(cp -al *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(sed -n *)",
+      "Bash(wc *)",
+      "Bash(mkdir *)",
+      "Bash(kill *)",
+      "Bash(curl -s http://localhost*)",
+      "Bash(curl -s http://127.0.0.1*)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(pkill *)",
+      "Bash(killall *)"
+    ]
+  }
+}
