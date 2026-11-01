@@ -362,7 +362,15 @@
       },
       "planoA": {
         "vista": "lateral",
-        "comprimento": 153,
+        "comprimento": 165,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoE": {
+        "vista": "lateral",
+        "comprimento": 165,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
@@ -370,7 +378,7 @@
       },
       "planoB": {
         "vista": "lateral",
-        "comprimento": 43,
+        "comprimento": 118,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
@@ -392,9 +400,121 @@
         "inversoes": 0,
         "raioMin": null
       },
+      "planoADeCima": {
+        "vista": "planta",
+        "comprimento": 75,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoEDeCima": {
+        "vista": "planta",
+        "comprimento": 75,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoBDeCima": {
+        "vista": "planta",
+        "comprimento": 75,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoCDeCima": {
+        "vista": "planta",
+        "comprimento": 135,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoDDeCima": {
+        "vista": "planta",
+        "comprimento": 155,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "faixaSaiaTopo": {
+        "vista": "planta",
+        "comprimento": 5269.95,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "faixaSaiaBase": {
+        "vista": "planta",
+        "comprimento": 5269.95,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "faixaMolduraTraseira": {
+        "vista": "planta",
+        "comprimento": 424.82,
+        "retidao": 0.638,
+        "concentracao": 0.302,
+        "inversoes": 0,
+        "raioMin": 1023
+      },
+      "faixaArcoTraseiro": {
+        "vista": "planta",
+        "comprimento": 425.91,
+        "retidao": 0.633,
+        "concentracao": 0.307,
+        "inversoes": 0,
+        "raioMin": 924
+      },
+      "faixaMolduraDianteira": {
+        "vista": "planta",
+        "comprimento": 424.82,
+        "retidao": 0.638,
+        "concentracao": 0.302,
+        "inversoes": 0,
+        "raioMin": 1023
+      },
+      "faixaArcoDianteiro": {
+        "vista": "planta",
+        "comprimento": 425.91,
+        "retidao": 0.633,
+        "concentracao": 0.307,
+        "inversoes": 0,
+        "raioMin": 924
+      },
+      "faixaPortaDeCorrer": {
+        "vista": "planta",
+        "comprimento": 3344,
+        "retidao": 0.92,
+        "concentracao": 0.055,
+        "inversoes": 0,
+        "raioMin": 1435
+      },
+      "faixaPortaDaCabine": {
+        "vista": "planta",
+        "comprimento": 1989.09,
+        "retidao": 0.834,
+        "concentracao": 0.06,
+        "inversoes": 1,
+        "raioMin": 774
+      },
+      "escalaGrafica": {
+        "vista": "lateral",
+        "comprimento": 1100,
+        "retidao": 0.92,
+        "concentracao": 0.055,
+        "inversoes": 0,
+        "raioMin": 501
+      },
       "saia": {
         "vista": "lateral",
-        "comprimento": 2394.02,
+        "comprimento": 2395.43,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
@@ -402,7 +522,7 @@
       },
       "molduraArcoDianteiro": {
         "vista": "lateral",
-        "comprimento": 935.12,
+        "comprimento": 932.03,
         "retidao": 0.01,
         "concentracao": 0.879,
         "inversoes": 0,
@@ -410,7 +530,7 @@
       },
       "molduraArcoTraseiro": {
         "vista": "lateral",
-        "comprimento": 1124.46,
+        "comprimento": 1121.38,
         "retidao": 0.01,
         "concentracao": 0.879,
         "inversoes": 0,
@@ -514,19 +634,11 @@
       },
       "entradaDeAr": {
         "vista": "frontal",
-        "comprimento": 1980,
-        "retidao": 1,
-        "concentracao": 0,
+        "comprimento": 4088,
+        "retidao": 0.899,
+        "concentracao": 0.07,
         "inversoes": 0,
-        "raioMin": null
-      },
-      "entradaDeArTopo": {
-        "vista": "frontal",
-        "comprimento": 1980,
-        "retidao": 1,
-        "concentracao": 0,
-        "inversoes": 0,
-        "raioMin": null
+        "raioMin": 976
       },
       "placaDianteira": {
         "vista": "frontal",
@@ -680,6 +792,22 @@
         "inversoes": 0,
         "raioMin": 97
       },
+      "corteSaiaNaPorta": {
+        "vista": "planta",
+        "comprimento": 537.45,
+        "retidao": 0.849,
+        "concentracao": 0.095,
+        "inversoes": 0,
+        "raioMin": 106
+      },
+      "corteSaiaNaPorta2": {
+        "vista": "planta",
+        "comprimento": 550.94,
+        "retidao": 0.799,
+        "concentracao": 0.121,
+        "inversoes": 0,
+        "raioMin": 97
+      },
       "corteMoldura": {
         "vista": "planta",
         "comprimento": 320.41,
@@ -770,7 +898,7 @@
         "sobre": "chapaDeCima",
         "desvio": 0
       },
-      "plastico": {
+      "plástico": {
         "sobre": "silhuetaDeCima",
         "desvio": 0
       },
@@ -891,5 +1019,12 @@
     }
   },
   "colisoes": [],
-  "avisos": []
+  "avisos": [
+    {
+      "tipo": "chamada atravessa parte",
+      "a": "chamada de paraBrisaDeCima",
+      "b": "chapaDeCima, capoDeCima",
+      "motivo": "paraBrisaDeCima não tem saída horizontal livre para nenhum dos lados"
+    }
+  ]
 }
