@@ -1,4 +1,4 @@
-/* furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano
+/* furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano
  * docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no banco de provas furgao-realista-2026-10-30): a lataria
  * detalhada, refeita pela prancha ajustada de 2026-10-31 (a frente mais alta, o para-brisa que envolve as quinas, a curva do teto
  * de dois raios e os raios maiores nas quinas do teto, e o ajuste de largura de 2026-10-31, com as laterais fechando 3,9 graus acima do vinco de
@@ -6,8 +6,19 @@
  * etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png, aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as
  * duas traseiras de abrir), o vinco de cintura discreto ao longo da lateral, as nervuras longitudinais do teto alto e a aba leve dos
  * quatro arcos das rodas, e abre na chapa os vãos do para-brisa, dos vidros das portas da cabine e dos das portas traseiras, cada um
- * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. As quatro rodas provisórias da etapa 1 ficam. O corpo de baixo, os
- * para-choques, as rodas da família, os vidros e borrachas, as luzes e o acabamento vêm nas etapas 3 a 7.
+ * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. As quatro rodas provisórias da etapa 1 ficam. As rodas da
+ * família, os vidros e borrachas, as luzes e o acabamento vêm nas etapas 4 a 7.
+ *
+ * Etapa 3, o corpo de baixo: a faixa de proteção lateral dos dois lados e os para-choques dianteiro e traseiro, em plástico escuro. A
+ * chapa não cresce para dar lugar a eles: ela cede as faces da gaiola do corpo de baixo (`separarCorpoDeBaixo`), e cada peça de
+ * plástico é uma subdivisão dessas mesmas faces, mais grossa que a chapa. A superfície de fora do plástico é a que a chapa tinha, e
+ * por isso a lataria da etapa 2 fica onde estava, a silhueta não muda e não há degrau que sobre para fora; a emenda entre as peças e
+ * a chapa é uma aresta de faces das duas. Onde a chapa cede: na frente, da soleira ao topo do nariz (720) e da quina de raio 280
+ * para a frente; atrás, da soleira ao alto do degrau de carga (580) e da quina de raio 100 para trás; na lateral, a fiada de baixo,
+ * da soleira à base das portas (380), entre os dois arcos e daí até as quinas, de modo que a parte de baixo vira uma cinta
+ * escura contínua, interrompida só pelos arcos. Ficam na chapa as faces em volta dos arcos, que a aba do arco usa, e as das frestas.
+ * A entrada de ar (embaixo) e o lugar da placa da frente, e o lugar da placa de trás, são bolsos nas faces da parede de cada
+ * para-choque, com paredes vivas. O piso fica por dentro, escondido: o fundo vem na etapa 7.
  *
  * Origem: a peça nasceu como cópia do `furgao` do acervo, recriado em primitivas do núcleo a partir do modelo "van" do pacote A, de
  * autor A (pacote A, endereço omitido, endereço da página: endereço omitido), licença livre sem exigência de crédito (declarada no
@@ -189,6 +200,24 @@ export const TABELA = {
   aba_arco_largura_ponta: 16,
   aba_arco_altura: 4,
   aba_arco_fechamento: 60,
+
+  // corpo de baixo (etapa 3): plástico escuro rente à lataria, feito das próprias faces da gaiola (a chapa cede o lugar delas, e a
+  // superfície de fora do plástico é a que a chapa tinha). A faixa lateral vai da soleira à base das portas, e os para-choques da
+  // soleira ao topo do nariz (dianteiro) e ao degrau de carga (traseiro, no alto da rampa dele). O plástico é mais grosso que a chapa.
+  plastico_espessura: 3,
+  faixa_topo_y: 380,
+  folga_selecao: 0.5, // tolerância, em mm, nas comparações de posição que escolhem as faces de cada peça
+  // entrada de ar embaixo na frontal (prancha: x ±650, y 350 a 480) e lugares da placa (400 por 130), como bolsos no plástico, cada um
+  // escolhido pelas faces da gaiola que o centro cai dentro do retângulo; o fundo do bolso recua da superfície
+  entrada_ar_meia_largura: 650,
+  entrada_ar_y0: 350,
+  entrada_ar_y1: 480,
+  entrada_ar_fundo: 25,
+  placa_meia_largura: 200,
+  placa_dianteira_y0: 520,
+  placa_traseira_y0: 380,
+  placa_altura: 130,
+  placa_fundo: 8,
 };
 
 const m = (mm) => mm / 1000;
@@ -537,9 +566,142 @@ function projetarNaSecao(sec, p) {
   return { p: [sx * melhor.q[0], p[1], melhor.q[1]], n: [sx * melhor.n[0], 0, melhor.n[1]] };
 }
 
+/* ---------- o corpo de baixo ---------- */
+
+/* As voltas de borda livre de uma lista de faces, no sentido em que as faces as percorrem: a aresta dirigida cuja volta não está em
+   nenhuma face. */
+function voltasLivres(faces) {
+  const dirigidas = new Set();
+  faces.forEach((fc) => fc.forEach((n, k) => dirigidas.add(`${n}>${fc[(k + 1) % fc.length]}`)));
+  const proximo = new Map();
+  faces.forEach((fc) => fc.forEach((n, k) => { const o = fc[(k + 1) % fc.length]; if (!dirigidas.has(`${o}>${n}`)) proximo.set(n, o); }));
+  const voltas = []; const usados = new Set();
+  for (const ini of [...proximo.keys()].sort()) {
+    if (usados.has(ini)) continue;
+    const v = []; let n = ini;
+    while (!usados.has(n)) { usados.add(n); v.push(n); n = proximo.get(n); }
+    voltas.push(v);
+  }
+  return voltas;
+}
+
+export const PARTES_DE_BAIXO = ['faixaLateralEsquerda', 'faixaLateralDireita', 'parachoqueDianteiro', 'parachoqueTraseiro'];
+
+/**
+ * separarCorpoDeBaixo(T, f, { faces, vincos, cantos, posicoes, abasDosArcos }) -> { chapa, baixo, bolsos }
+ *   A chapa da etapa 2 cede ao plástico as faces da gaiola que ficam no corpo de baixo, e cada peça de plástico é uma superfície por
+ *   subdivisão feita dessas mesmas faces: a superfície de fora do plástico é a que a chapa tinha, sem degrau e sem sobreposição, e a
+ *   emenda entre as peças e a chapa é uma borda de faces que as duas têm. Cada peça escolhe as faces por posição, em milímetro: o
+ *   para-choque dianteiro, as da frente e da quina até o topo do nariz, mais a faixa baixa da lateral até o arco; o traseiro, as da
+ *   traseira e da quina até o topo do degrau de carga, mais a faixa baixa até o arco; a faixa lateral de cada lado, as faces entre os
+ *   arcos e as que prolongam a faixa até os para-choques. Ficam na chapa as faces em volta dos arcos (a aba do arco assenta nelas) e as
+ *   das frestas das portas. A entrada de ar e os lugares da placa viram bolsos nas faces da parede de cada para-choque.
+ */
+function separarCorpoDeBaixo(T, f, { faces, vincos, cantos, posicoes, abasDosArcos }) {
+  const tol = T.folga_selecao;
+  const chv = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  const arestasDaAba = new Set();
+  abasDosArcos.forEach((a) => a.pontos.forEach((n, k) => { if (k + 1 < a.pontos.length) arestasDaAba.add(chv(n, a.pontos[k + 1])); }));
+  /* a face em volta de um arco: tem um ponto de arco que não é o canto onde o arco encontra a soleira */
+  const dosArcos = (fc) => fc.some((n) => /arco[DT]_(?!(f|t)(_|$))/.test(n));
+  /* a tira da fresta de uma porta: tem o ponto da borda e o de dentro do mesmo ponto da gaiola */
+  const dasFrestas = (fc) => fc.some((n) => fc.includes(`${n}_corpo`));
+  const noArco = (fc) => dosArcos(fc) || dasFrestas(fc) || fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));
+  const P = (n) => posicoes.get(n);
+  const zArcoD = f.zD + f.dzArco; const zArcoDtras = f.zD - f.dzArco;
+  const zArcoT = f.zT + f.dzArco; const zArcoTtras = f.zT - f.dzArco;
+  const topoFrente = T.parachoque_topo_y;
+  const topoTras = T.degrau_tras_y + T.degrau_tras_rampa / 2;
+  /* da quina da frente para a frente e da quina de trás para trás, na altura de cada ponto */
+  const naFrente = (p) => p[2] >= f.zF(p[1]) - f.raioFrente(p[1]) - tol;
+  const naTraseira = (p) => p[2] <= f.zR(p[1]) + T.raio_planta_tras + tol;
+  const classe = (fc) => {
+    if (noArco(fc)) return 'chapa';
+    const ps = fc.map(P);
+    const ymax = Math.max(...ps.map((p) => p[1]));
+    const zmin = Math.min(...ps.map((p) => p[2])); const zmax = Math.max(...ps.map((p) => p[2]));
+    const xc = ps.reduce((s, p) => s + p[0], 0) / ps.length;
+    if (ymax <= topoFrente + tol && ps.every(naFrente)) return 'parachoqueDianteiro';
+    if (ymax <= topoTras + tol && ps.every(naTraseira)) return 'parachoqueTraseiro';
+    if (ymax > T.faixa_topo_y + tol) return 'chapa';
+    const faixa = `faixaLateral${xc > 0 ? 'Esquerda' : 'Direita'}`;
+    if (zmin >= zArcoD - tol) return faixa; // entre a quina da frente e o arco dianteiro
+    if (zmax <= zArcoDtras + tol && zmin >= zArcoT - tol) return faixa; // entre os arcos
+    if (zmax <= zArcoTtras + tol) return faixa; // entre o arco traseiro e a quina de trás
+    return 'chapa';
+  };
+  const grupos = new Map([['chapa', []], ...PARTES_DE_BAIXO.map((n) => [n, []])]);
+  faces.forEach((fc) => grupos.get(classe(fc)).push(fc));
+
+  /* os bolsos: nas faces da parede plana de cada para-choque cujo centro cai no retângulo; o fundo recua da parede */
+  const bolsos = [
+    { nome: 'entradaDeAr', parte: 'parachoqueDianteiro', meiaL: T.entrada_ar_meia_largura, y0: T.entrada_ar_y0, y1: T.entrada_ar_y1, fundo: T.entrada_ar_fundo, sentido: -1 },
+    { nome: 'placaDianteira', parte: 'parachoqueDianteiro', meiaL: T.placa_meia_largura, y0: T.placa_dianteira_y0, y1: T.placa_dianteira_y0 + T.placa_altura, fundo: T.placa_fundo, sentido: -1 },
+    { nome: 'placaTraseira', parte: 'parachoqueTraseiro', meiaL: T.placa_meia_largura, y0: T.placa_traseira_y0, y1: T.placa_traseira_y0 + T.placa_altura, fundo: T.placa_fundo, sentido: 1 },
+  ];
+  const novosVincos = new Map(PARTES_DE_BAIXO.map((n) => [n, []]));
+  const relatorioDosBolsos = [];
+  for (const b of bolsos) {
+    const lista = grupos.get(b.parte);
+    const zParede = b.sentido < 0 ? f.zFrente : f.zTras;
+    const naParede = (n) => Math.abs(P(n)[2] - zParede) <= 1;
+    const dentro = (fc) => {
+      const ps = fc.map(P); const xc = ps.reduce((s, p) => s + p[0], 0) / ps.length; const yc = ps.reduce((s, p) => s + p[1], 0) / ps.length;
+      return fc.every(naParede) && Math.abs(xc) <= b.meiaL && yc >= b.y0 && yc <= b.y1;
+    };
+    const Fin = lista.filter(dentro);
+    if (!Fin.length) throw new Error(`furgao-realista: o bolso ${b.nome} não pegou nenhuma face`);
+    const emFin = new Set(Fin); const resto = lista.filter((fc) => !emFin.has(fc));
+    /* a borda do bolso: as arestas de Fin que as outras faces do plástico também têm, no sentido de Fin */
+    const arestasDoResto = new Set(); resto.forEach((fc) => fc.forEach((n, k) => arestasDoResto.add(chv(n, fc[(k + 1) % fc.length]))));
+    const borda = [];
+    Fin.forEach((fc) => fc.forEach((n, k) => { const o = fc[(k + 1) % fc.length]; if (arestasDoResto.has(chv(n, o))) borda.push([n, o]); }));
+    const fundoDe = (n) => `${n}_${b.nome}`;
+    new Set(Fin.flat()).forEach((n) => { const p = P(n); posicoes.set(fundoDe(n), [p[0], p[1], p[2] + b.sentido * b.fundo]); });
+    const paredes = borda.map(([a, c]) => [a, c, fundoDe(c), fundoDe(a)]);
+    grupos.set(b.parte, [...resto, ...Fin.map((fc) => fc.map(fundoDe)), ...paredes]);
+    /* as voltas do bolso, vivas: a da superfície e a do fundo */
+    const proximo = new Map(borda); const usadas = new Set();
+    let k = 0;
+    for (const [a] of borda) {
+      if (usadas.has(a)) continue;
+      const pts = []; let n = a;
+      while (!usadas.has(n)) { usadas.add(n); pts.push(n); n = proximo.get(n); }
+      pts.push(pts[0]);
+      novosVincos.get(b.parte).push({ nome: `${b.nome}Borda${k}`, pontos: pts, nitidez: 'viva' }, { nome: `${b.nome}Fundo${k}`, pontos: pts.map(fundoDe), nitidez: 'viva' });
+      k += 1;
+    }
+    const vs = [...new Set(Fin.flat())].map(P);
+    relatorioDosBolsos.push({ nome: b.nome, faces: Fin.length, x: [Math.min(...vs.map((p) => p[0])), Math.max(...vs.map((p) => p[0]))], y: [Math.min(...vs.map((p) => p[1])), Math.max(...vs.map((p) => p[1]))] });
+  }
+
+  /* o passo de subdivisão de cada grupo: os vértices, as faces, os vincos de aresta com duas faces no grupo e os cantos que ficaram */
+  const passoDe = (lista, extras = []) => {
+    const arestas = new Map();
+    lista.forEach((fc) => fc.forEach((n, i) => { const c = chv(n, fc[(i + 1) % fc.length]); arestas.set(c, (arestas.get(c) ?? 0) + 1); }));
+    const vertices = [...new Set(lista.flat())].sort();
+    const vivos = [];
+    for (const v of [...vincos, ...extras]) {
+      let corrida = [v.pontos[0]]; let k = 0;
+      const fechar = () => { if (corrida.length > 1) { vivos.push({ nome: `${v.nome}_${k}`, pontos: corrida, nitidez: v.nitidez }); k += 1; } };
+      for (let i = 0; i + 1 < v.pontos.length; i += 1) {
+        if (arestas.get(chv(v.pontos[i], v.pontos[i + 1])) === 2) corrida.push(v.pontos[i + 1]); else { fechar(); corrida = [v.pontos[i + 1]]; }
+      }
+      fechar();
+    }
+    const dentro = new Set(vertices);
+    return { vertices, faces: lista, vincos: vivos, cantos: cantos.filter((n) => dentro.has(n)) };
+  };
+  return {
+    chapa: passoDe(grupos.get('chapa')),
+    baixo: PARTES_DE_BAIXO.map((nome) => ({ nome, passo: passoDe(grupos.get(nome), novosVincos.get(nome)) })),
+    bolsos: relatorioDosBolsos,
+  };
+}
+
 /* ---------- a gaiola ---------- */
 
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const sub =(a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const esc = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -1271,8 +1433,9 @@ export function derivar(T) {
     return { arco: a.id, lado: s, pontos: s === 'e' ? pts : pts.reverse() };
   }));
 
-  const usados = new Set(faces.flat());
-  const vertices = [...usados].sort();
+  /* o corpo de baixo sai da chapa: a faixa lateral dos dois lados e os dois para-choques, em plástico, das mesmas faces */
+  const { chapa, baixo, bolsos } = separarCorpoDeBaixo(T, f, { faces, vincos, cantos, posicoes, abasDosArcos });
+  const vertices = [...new Set([chapa, ...baixo.map((b) => b.passo)].flatMap((p) => p.vertices))].sort();
   const pontos = Object.fromEntries(vertices.map((n) => [n, posicoes.get(n).map(m)]));
   const pontosMm = new Map(vertices.map((n) => [n, posicoes.get(n)]));
 
@@ -1287,11 +1450,11 @@ export function derivar(T) {
   }
   return {
     forma: f, aneis: listas.map((l) => ({ nome: l.nome, y: l.y, colunas: l.lista.map((p) => p.col) })), pontos, pontosMm,
-    passo: { vertices, faces, vincos, cantos },
+    passo: chapa, baixo, bolsos,
     portas: portas.map((v) => ({ nome: v.nome, volta: v.volta })),
     vidros: vidros.map((v) => ({ nome: v.nome, linha: v.linha, volta: v.volta })),
     abasDosArcos, rodas,
-    bordaDeBaixo: [...sol.lista.map((p) => p.nome), ...sol.lista.slice(1, -1).reverse().map((p) => espelho(p.nome))],
+    bordaDeBaixo: voltasLivres(chapa.faces).find((v) => v.some((n) => n.startsWith('soleira_arco'))),
   };
 }
 
@@ -1302,12 +1465,19 @@ const nomeDaAbaDoArco = (a) => `abaArco${a.arco === 'arcoD' ? 'Dianteiro' : 'Tra
 
 /** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros, as abas dos arcos e as quatro rodas provisórias. */
 export function gerarPassos(T) {
-  const { passo, rodas, vidros, abasDosArcos } = derivar(T);
+  const { passo, baixo, rodas, vidros, abasDosArcos } = derivar(T);
   const passos = [
     ['subdivisao', { origemId: 1, ...passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
     ['parte', { nome: 'carroceria', sel: CHAPA }],
     ['material', { sel: CHAPA, usa: 'azul' }],
   ];
+  /* o corpo de baixo: cada peça de plástico é uma subdivisão das faces que a chapa cedeu, mais grossa que a chapa */
+  baixo.forEach((b, k) => {
+    const sel = { origem: { op: 'subdivisao', id: 50 + k } };
+    passos.push(['subdivisao', { origemId: 50 + k, ...b.passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.plastico_espessura) }]);
+    passos.push(['parte', { nome: b.nome, sel }]);
+    passos.push(['material', { sel, usa: 'plastico' }]);
+  });
   vidros.forEach((v, k) => {
     const sel = { origem: { op: 'friso', id: 20 + k } };
     passos.push(['friso', {
@@ -1356,6 +1526,15 @@ const ABAS_DOS_ARCOS = ['abaArcoDianteiroEsquerdo', 'abaArcoDianteiroDireito', '
 export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
   ...ABAS_DOS_ARCOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba do arco assenta na lateral em volta do arco da roda e entra meia espessura na chapa, que é o contato dela' })),
+  ...['Esquerda', 'Direita'].flatMap((lado) => [
+    { par: ['carroceria', `faixaLateral${lado}`], motivo: 'a faixa é feita das faces da gaiola que a chapa cedeu e tem com ela uma aresta de faces em comum, na base das portas e nos lados da fiada: a chapa termina onde a faixa começa, sem degrau' },
+    { par: [`faixaLateral${lado}`, 'parachoqueDianteiro'], motivo: 'a faixa continua pela lateral até a quina da frente, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 380, e o corpo de baixo fica uma cinta só' },
+    { par: [`faixaLateral${lado}`, 'parachoqueTraseiro'], motivo: 'a faixa continua pela lateral até a quina de trás, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 380' },
+  ]),
+  ...['Dianteiro', 'Traseiro'].map((eixo) => ({ par: ['carroceria', `parachoque${eixo}`], motivo: 'o para-choque é feito das faces da gaiola que a chapa cedeu e tem com ela a aresta de faces do topo (o nariz em 720, o degrau de carga em 580) e a das quinas, sem degrau para fora' })),
+  ...[['abaArcoDianteiroEsquerdo', 'Esquerda'], ['abaArcoDianteiroDireito', 'Direita'], ['abaArcoTraseiroEsquerdo', 'Esquerda'], ['abaArcoTraseiroDireito', 'Direita']].map(([aba, lado]) => ({
+    par: [aba, `faixaLateral${lado}`], motivo: 'a ponta da aba do arco acaba na soleira, no canto onde o arco encontra a fiada de baixo, e esse canto é um ponto da faixa também',
+  })),
 ];
 
 export const ILHAS = RODAS.map((contem) => ({
@@ -1384,7 +1563,7 @@ export function vaosDeclarados(T) {
   vaos.push({ nome: 'portasTraseiras', borda: [...a, ...b.slice(1, -1), a[0]], semMoldura: { motivo: 'é o vão das duas portas traseiras na carroceria; as portas o ocupam, com a fresta de largura constante em volta e entre elas' } });
   vaos.push({
     nome: 'baixo', borda: [...bordaDeBaixo, bordaDeBaixo[0]], frisos: ABAS_DOS_ARCOS,
-    parcial: { motivo: 'é a borda de baixo da carroceria, aberta por baixo como a caixa de um furgão: as abas dos arcos cobrem só os quatro arcos, e a soleira, a frente e a traseira ficam para a faixa de baixo, os para-choques e o fundo da etapa 3' },
+    parcial: { motivo: 'é a borda de baixo da carroceria, que a chapa divide com a faixa lateral e os para-choques de plástico: as abas dos arcos cobrem só os quatro arcos, e no resto dela a chapa encontra o plástico pela mesma aresta de faces, sem moldura; o fundo fica para a etapa 7' },
   });
   return vaos;
 }
@@ -1396,8 +1575,10 @@ export function pontosDeclarados(T = TABELA) {
   const xFora = T.bitola / 2 + T.pneu_largura / 2;
   const r = T.pneu_diametro / 2;
   return [
-    { nome: 'canto de cima da caixa da carroceria: a lateral, o teto e o nariz', parte: 'carroceria', medida: 'maximo', em: [f.xMax, T.altura, f.zFrente], toleranciaMm: tol },
-    { nome: 'canto de baixo da caixa da carroceria: a lateral direita, a soleira e o para-choque de trás', parte: 'carroceria', medida: 'minimo', em: [-f.xMax, T.soleira_y, f.zTras], toleranciaMm: tol },
+    { nome: 'canto de cima da caixa da carroceria: a lateral, o teto e o alto do nariz, onde ela encontra o para-choque', parte: 'carroceria', medida: 'maximo', em: [f.xMax, T.altura, f.zF(T.parachoque_topo_y)], toleranciaMm: tol },
+    { nome: 'canto de baixo da caixa da carroceria: a lateral direita, a soleira nos arcos e a traseira no alto do para-choque', parte: 'carroceria', medida: 'minimo', em: [-f.xMax, T.soleira_y, f.zR(T.degrau_tras_y + T.degrau_tras_rampa / 2)], toleranciaMm: tol },
+    { nome: 'canto de cima do para-choque dianteiro: a lateral esquerda, o topo do nariz e a frente', parte: 'parachoqueDianteiro', medida: 'maximo', em: [f.xMax, T.parachoque_topo_y, f.zFrente], toleranciaMm: tol },
+    { nome: 'canto de baixo do para-choque traseiro: a lateral direita, a soleira e a traseira', parte: 'parachoqueTraseiro', medida: 'minimo', em: [-f.xMax, T.soleira_y, f.zTras], toleranciaMm: tol },
     { nome: 'pneu dianteiro esquerdo, embaixo, por dentro e atrás', parte: 'rodaProvisoriaDianteiraEsquerda', medida: 'minimo', em: [xDentro, 0, f.zD - r], toleranciaMm: tol },
     { nome: 'pneu traseiro direito, em cima, por dentro e na frente', parte: 'rodaProvisoriaTraseiraDireita', medida: 'maximo', em: [-xDentro, 2 * r, f.zT + r], toleranciaMm: tol },
     { nome: 'pneu traseiro direito, embaixo, por fora e atrás', parte: 'rodaProvisoriaTraseiraDireita', medida: 'minimo', em: [-xFora, 0, f.zT - r], toleranciaMm: tol },
@@ -1405,11 +1586,12 @@ export function pontosDeclarados(T = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 2 pela prancha ajustada: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos de cantos arredondados, e quatro rodas provisórias' },
+  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 3: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, o corpo de baixo em plástico escuro (faixa lateral e para-choques com entrada de ar e lugares da placa) e quatro rodas provisórias' },
   PARAMS: TABELA,
   MATERIAIS: {
     azul: { tipo: 'liso', cor: '#5d75c9' },
     pneu: { tipo: 'liso', cor: '#26262b' },
+    plastico: { tipo: 'liso', cor: '#39393f' },
   },
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
   get TOPO() {
@@ -1419,14 +1601,14 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto, etapa 2 pela prancha ajustada: lataria de 5400 por 2000 por 2500 mm de laterais fechando para o teto, capô a 23,8 graus, para-brisa envolvente, frestas das cinco portas, vãos de cantos redondos e rodas provisórias',
+    objeto: 'furgão médio de teto alto, etapa 3: lataria de 5400 por 2000 por 2500 mm com frestas das cinco portas e vãos de cantos redondos, corpo de baixo em plástico escuro (faixa lateral e para-choques) e rodas provisórias',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
     partes: [
       {
         nome: 'carroceria',
-        forma: 'chapa de 2 mm: lateral vertical até o vinco em 1190 e fechando 3,9 graus até o teto de ±630; capô de 1100 a 1480, para-brisa até 2110 envolvente, teto de raios 1290 e 405, frestas de 6 mm, sulcos, vãos de cantos redondos',
+        forma: 'chapa de 2 mm: lateral vertical até o vinco em 1190 e fechando 3,9 graus até o teto de ±630; capô de 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405, frestas de 6 mm, sulcos, vãos redondos; sem o corpo de baixo (do plástico)',
         tecnica: 'subdivisao de gaiola de anéis, ombro e cobertura com colunas nas portas e arco de 475; porta dividida meia fresta por lado, borda dobrada 4 mm; frente em dois arcos tangentes com coroa em y; cantos dos vãos em diagonal de duas células',
       },
       ...ABAS_DOS_VAOS.map((nome) => ({
@@ -1439,6 +1621,21 @@ const receita = {
         forma: `aba leve em volta do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}: lábio de 4 mm de altura sobre a lateral, 32 mm de largura no alto do arco e 16 nas pontas, afinando até sumir na soleira`,
         tecnica: 'friso de perfil desenhado sobre a borda do arco, com variacao da largura e pontas fechadas',
       })),
+      ...['Esquerda', 'Direita'].map((lado) => ({
+        nome: `faixaLateral${lado}`,
+        forma: `faixa lateral ${lado.toLowerCase()} em plástico escuro de 3 mm, rente à lataria, de 80 mm (da soleira em 300 à base das portas em 380), entre os arcos e até cada para-choque`,
+        tecnica: 'subdivisao das faces da gaiola que a chapa cedeu, com a superfície de fora que ela tinha, em plástico mais grosso',
+      })),
+      {
+        nome: 'parachoqueDianteiro',
+        forma: 'para-choque dianteiro em plástico escuro de 3 mm, da soleira a 720, envolvendo as quinas e emendando com a faixa; entrada de ar embaixo (bolso de 1296 por 118, fundo 25) e lugar da placa acima (432 por 132, fundo 8)',
+        tecnica: 'subdivisao das faces da frente e das quinas que a chapa cedeu, com bolsos de paredes vivas',
+      },
+      {
+        nome: 'parachoqueTraseiro',
+        forma: 'para-choque traseiro em plástico escuro de 3 mm, da soleira ao degrau de carga em 580 (rampa de 20 por 30), envolvendo as quinas e emendando com a faixa; lugar da placa (bolso de 473 por 135, fundo 8)',
+        tecnica: 'subdivisao das faces da traseira e das quinas que a chapa cedeu, com bolso de paredes vivas',
+      },
       ...RODAS.map((nome) => ({
         nome,
         forma: `roda provisória da etapa 1: cilindro de 710 mm de diâmetro e 235 de largura, na bitola de 1730 e no ${nome.includes('Dianteira') ? 'eixo dianteiro' : 'eixo traseiro'}, apoiado no chão; sai na etapa 4`,
@@ -1461,6 +1658,10 @@ const receita = {
       'alguma peça fica solta no ar ou atravessa outra sem motivo',
       'o lado esquerdo e o direito diferem fora da porta de correr',
       'aparece marca, logotipo ou nome de fabricante',
+      'a faixa lateral ou um para-choque sobra para fora da lataria (degrau na emenda com a chapa, ou a silhueta passa da prancha), ou não é do plástico escuro',
+      'o corpo de baixo não vira uma cinta escura contínua: a faixa não emenda com o para-choque na lateral, ou deixa pedaço de chapa azul entre eles abaixo da base das portas',
+      'falta a entrada de ar ou o lugar da placa no para-choque dianteiro, ou o lugar da placa no traseiro, ou o para-choque não envolve as quinas',
+      'a faixa ou um para-choque toca ou atravessa o arco da roda, a aba do arco ou o pneu',
     ],
     lataria: { partes: ['carroceria'] },
   },
