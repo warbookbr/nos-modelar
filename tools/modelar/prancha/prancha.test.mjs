@@ -101,6 +101,16 @@ describe('métrica', () => {
     expect(relatorio.alertas.join(' ')).toMatch(/auto-intersecta/);
   });
 
+  it('desenha a linha escondida tracejada e continua a conferir que ela fica dentro do contorno', () => {
+    const caixa = { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] };
+    const dentro = prancha(base([caixa, { vista: 'lateral', classe: 'oculta', tipo: 'poli', pts: [[-50, 40], [50, 40]] }]));
+    expect(dentro.svg).toMatch(/\.oculta\{[^}]*stroke-dasharray/);
+    expect(dentro.svg).toMatch(/<path class="oculta"/);
+    expect(dentro.relatorio.alertas).toHaveLength(0);
+    const fora = prancha(base([caixa, { vista: 'lateral', classe: 'oculta', tipo: 'poli', pts: [[-140, 40], [140, 40]] }]));
+    expect(fora.relatorio.alertas.join(' ')).toMatch(/fora do contorno/);
+  });
+
   it('acusa detalhe que escapou do contorno', () => {
     const { relatorio } = prancha(base([
       { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] },

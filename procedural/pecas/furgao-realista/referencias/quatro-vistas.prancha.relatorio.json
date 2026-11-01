@@ -360,6 +360,38 @@
         "inversoes": 1,
         "raioMin": 40
       },
+      "planoA": {
+        "vista": "lateral",
+        "comprimento": 153,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoB": {
+        "vista": "lateral",
+        "comprimento": 43,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoC": {
+        "vista": "frontal",
+        "comprimento": 415,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "planoD": {
+        "vista": "traseira",
+        "comprimento": 271,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
       "saia": {
         "vista": "lateral",
         "comprimento": 2394.02,
@@ -576,6 +608,22 @@
         "inversoes": 0,
         "raioMin": 50
       },
+      "pneuFrontalOcultoEsq": {
+        "vista": "frontal",
+        "comprimento": 1007.92,
+        "retidao": 0.769,
+        "concentracao": 0.156,
+        "inversoes": 0,
+        "raioMin": 50
+      },
+      "pneuFrontalOcultoDir": {
+        "vista": "frontal",
+        "comprimento": 1007.92,
+        "retidao": 0.769,
+        "concentracao": 0.156,
+        "inversoes": 0,
+        "raioMin": 50
+      },
       "pneuTraseiroVistoEsq": {
         "vista": "traseira",
         "comprimento": 791.92,
@@ -632,6 +680,14 @@
         "inversoes": 0,
         "raioMin": 97
       },
+      "corteMoldura": {
+        "vista": "planta",
+        "comprimento": 320.41,
+        "retidao": 0.764,
+        "concentracao": 0.156,
+        "inversoes": 0,
+        "raioMin": 72
+      },
       "corteParachoqueDianteiro": {
         "vista": "planta",
         "comprimento": 2480.08,
@@ -686,6 +742,10 @@
         "sobre": "arcoDianteiro",
         "desvio": 0
       },
+      "arcoT": {
+        "sobre": "arcoTraseiro",
+        "desvio": 0
+      },
       "cabineT": {
         "sobre": "portaDaCabine",
         "desvio": 0
@@ -701,6 +761,18 @@
       "cabineF": {
         "sobre": "portaDaCabine",
         "desvio": 0.31
+      },
+      "bordaTeto": {
+        "sobre": "bordaDoTeto",
+        "desvio": 0
+      },
+      "chapa": {
+        "sobre": "chapaDeCima",
+        "desvio": 0
+      },
+      "plastico": {
+        "sobre": "silhuetaDeCima",
+        "desvio": 0
       },
       "largura": {
         "sobre": "silhuetaFrontal",

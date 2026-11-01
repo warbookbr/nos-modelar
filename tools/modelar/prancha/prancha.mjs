@@ -30,6 +30,8 @@ export function criarAncoras({ entreEixos, altura, meiaLargura }) {
   };
 }
 
+/* `oculta` é a linha escondida do desenho técnico, tracejada: o pneu de cima, embaixo do corpo, cruzava o vidro do
+   para-brisa em traço cheio na prancha do furgão realista. Ela continua sendo conferida contra o contorno. */
 const ESTILOS = `
   .contorno{fill:none;stroke:#12233b;stroke-width:2.1;stroke-linejoin:round;stroke-linecap:round}
   .painel{fill:none;stroke:#2f4562;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
@@ -37,6 +39,7 @@ const ESTILOS = `
   .cromo{fill:none;stroke:#8a94a2;stroke-width:1.4;stroke-linejoin:round}
   .roda{fill:none;stroke:#8a94a2;stroke-width:1.6}
   .aro{fill:none;stroke:#c0c6cf;stroke-width:1.1}
+  .oculta{fill:none;stroke:#8a94a2;stroke-width:1.1;stroke-dasharray:5 3}
   .eixo{fill:none;stroke:#c8ccd2;stroke-width:1;stroke-dasharray:9 4 2 4}
   .carater{fill:none;stroke:#b3593d;stroke-width:1.7;stroke-dasharray:6 3}
   .cota{stroke:#b3593d;stroke-width:1;fill:none}

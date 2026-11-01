@@ -50,7 +50,24 @@ A pessoa escolheu a saia, as molduras dos arcos e os para-choques como peças pr
 
 A saia vai de 299 a 463 e sai 20 mm da lateral. A borda de cima é redonda, com cerca de 10 mm de raio, e a de baixo dobra para dentro. De lado, o topo dela fica em 460, entre as molduras dos arcos.
 
-A moldura de cada arco tem a mesma seção e fica do arco para fora, sem diminuir a boca dele. Ela tem 45 mm de largura, e não 50, para acabar 10 mm antes da fresta da porta da cabine, que contorna o arco dianteiro a 55 mm dele. A especificação confere essa folga e a de pelo menos 100 mm da moldura traseira até a porta de correr.
+A moldura de cada arco fica do arco para fora, sem diminuir a boca dele. Ela tem 45 mm de largura, que a pessoa aceitou, e acaba a 10 mm da fresta da porta da cabine (`FOLGA_MOLDURA_FRESTA`), que contorna o arco dianteiro a 55 mm dele. A seção dela, `SECAO_MOLDURA`, é dada como [para fora, distância do arco]: sai 20 mm; a borda do lado do arco dobra para dentro, como a de baixo da saia, e a de fora é redonda, como a de cima. A especificação confere a folga da fresta e a de pelo menos 100 mm da moldura traseira até a porta de correr.
+
+As portas descem até 380 e a saia vai de 299 a 463, então a saia passa sobre os 80 mm de baixo de cada porta. A pessoa escolheu, em 2026-11-01, manter a base das portas em 380 e cortar a saia pelas frestas. Cada porta leva o seu trecho de saia, de 380 a 463, que abre com ela: as duas portas da cabine e a de correr, esta só no lado -x. Ficam presos à carroceria a parte de 299 a 380 sob as portas e os trechos entre as portas e os arcos. Entre os arcos, no lado -x, os trechos são cinco:
+- de -1.127 a -860, preso;
+- de -860 a 440, na porta de correr;
+- de 440 a 550, preso;
+- de 550 a 1.257, na porta da cabine;
+- de 1.257 a 1.268, preso, a folga até a moldura.
+
+A especificação os guarda em `TRECHOS_DA_SAIA` e para quando uma porta não leva exatamente um trecho com as pontas nas frestas dela, ou quando um trecho preso fica sobre uma porta. A lateral desenha as frestas atravessando a saia até a base das portas, em 380, e uma nota diz como ela é cortada.
+
+Os quatro cortes do detalhe 5:1 têm o plano marcado nas vistas, em tracejado laranja com a letra:
+- A: a saia, num trecho preso atrás da porta de correr, na lateral;
+- B: a moldura, radial, no arco traseiro, na lateral;
+- C: o para-choque dianteiro, na frontal;
+- D: o traseiro, na traseira.
+
+Cada corte tem cotadas a saída e a altura, ou a largura na moldura: a saia sai 20 e tem 164, a moldura sai 20 e tem 45, o dianteiro sai 50 e tem 424, o traseiro sai 110 e tem 280.
 
 O para-choque dianteiro sai 50 mm da frente da chapa, de 300 a 724, em duas alturas. Embaixo há um lábio que recua por baixo, até 388; a faixa da entrada de ar fica recuada 20 mm de uma quina à outra, de 388 a 482; o alto, de 482 a 724, acompanha o nariz. De frente, a prancha desenha o contorno dele e as duas linhas da faixa recuada, que substituem o retângulo da entrada de ar.
 
@@ -58,7 +75,7 @@ O para-choque traseiro sai 110 mm atrás da chapa dele (z -2.700), de 300 a 580.
 
 Os dois para-choques dobram nas quinas até a moldura do arco. De lado, o dianteiro vai da moldura dianteira até a frente, com o topo em 724, e o traseiro da moldura traseira até a traseira, com o topo em 580; a saia fica só entre as molduras.
 
-Com o plástico, o comprimento total passa de 5.400 para 5.560, de z -2.810 a 2.750, e a largura na saia para 2.040. A carroceria não se move, e a chapa continua com 5.400 × 2.000. O envelope da prancha passa a ser o de fora, com o plástico, e as cotas dizem qual é qual: 5.400 na chapa e 5.560 com o plástico na lateral, 2.000 na chapa de cima e 2.040 na saia na traseira. De cima, a silhueta tem o para-choque dianteiro em 2.750, com quina de raio 300 até a saia em ±1.020, e o traseiro em -2.810, com quina de 210; a chapa fica desenhada por dentro. Os landmarks `frente`, `traseira` e `degrau` passaram para o plástico: [2.750, 585], [-2.810, 450] e [-2.750, 580].
+Com o plástico, o comprimento total passa de 5.400 para 5.560, de z -2.810 a 2.750, e a largura na saia para 2.040. A carroceria não se move, e a chapa continua com 5.400 × 2.000. O envelope da prancha passa a ser o de fora, com o plástico, e as cotas dizem qual é qual: 5.400 na chapa e 5.560 com o plástico na lateral, 2.000 na chapa de cima e 2.040 na saia na traseira. De cima, a silhueta tem o para-choque dianteiro em 2.750, com quina de raio 300 até a saia em ±1.020, e o traseiro em -2.810, com quina de 210; a chapa fica desenhada por dentro. Os landmarks `frente`, `traseira` e `degrau` passaram para o plástico: [2.750, 650], [-2.810, 450] e [-2.750, 580]. Entraram o landmark `arcoT` no alto do arco traseiro e, de cima, `plastico`, `chapa` e `bordaTeto`, que dão nome às três linhas aninhadas da vista de cima. O pneu de cima e o resto do pneu atrás do corpo na frontal ficam em linha escondida, tracejada (classe `oculta`, nova no motor), e o vinco de cintura passou a linha de caráter, tracejada, com rótulo.
 
 ## A referência de caráter
 
