@@ -1361,7 +1361,8 @@ body.modal-aberto { overflow: hidden; }
 .barra-estado .referencia-metrica { display: flex; align-items: center; padding: 0 var(--e3); border-left: var(--traco); }
 .barra-estado .regua-metrica i { width: 48px; }
 .barra-estado b { color: var(--texto); font-weight: 500; }
-.dica-estado { flex: 1 1 auto; min-width: 0; overflow: hidden; color: var(--texto-3); text-overflow: ellipsis; }
+/* A dica corta com reticências quando falta largura: o `text-overflow` só vale num bloco, e não no flex dos outros itens. */
+.barra-estado > .dica-estado { display: block; flex: 1 1 auto; align-self: center; min-width: 0; padding-right: var(--e1); overflow: hidden; color: var(--texto-3); text-overflow: ellipsis; }
 .alternar { border-top: 0; border-right: 0; border-bottom: 0; background: none; color: var(--texto-3); cursor: pointer; }
 .alternar:hover { color: var(--texto); }
 .alternar[aria-pressed="true"] { color: var(--destaque); }

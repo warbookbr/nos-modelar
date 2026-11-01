@@ -42,6 +42,7 @@ export const GUARDAS = [
   { nome: 'guarda:portas', script: 'tools/modelar/guardas/guarda-portas-bancada.mjs', usa: 'vite' },
   { nome: 'guarda:par', script: 'tools/modelar/guardas/guarda-inspecao-par.mjs', usa: 'vite' },
   { nome: 'guarda:camera', script: 'tools/modelar/guardas/guarda-camera-livre.mjs', usa: 'vite' },
+  { nome: 'guarda:temas', script: 'tools/modelar/guardas/guarda-temas-e-visoes.mjs', usa: 'vite' },
   { nome: 'porteiro', script: 'tools/bancadas/porteiro.mjs', usa: 'vite' },
   { nome: 'guarda:gesto', script: 'tools/modelar/guardas/guarda-gesto.mjs', usa: 'pacote' },
   { nome: 'guarda:referencia', script: 'tools/modelar/guardas/guarda-referencia-da-peca.mjs', usa: 'pacote' },

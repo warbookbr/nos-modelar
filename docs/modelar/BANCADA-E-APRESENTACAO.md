@@ -64,8 +64,12 @@ escala (`referencia-metrica.js`), o teclado (`teclado.js`), o endereço da pági
 (`endereco.js`), os avisos (`avisos.js`), a caixa da visão sobre a cena
 (`caixa-da-visao.js`), a ponte da captura automática (`ponte-da-captura.js`), o
 tema (`tema.js`), a busca de comandos (`busca-de-comandos.js`), os painéis do
-tema (`paineis-do-tema.js`), os componentes do tema Foco e a mesa do tema
-Revisão (`mesa-de-revisao.js`), descritos abaixo. `elementos-da-pagina.js` é o único lugar que procura
+tema (`paineis-do-tema.js`), o nome da peça e o estado da sessão no alto (`nome-da-peca.js`), a caixa
+da cena com a grade, o chão e a explosão e a da câmera do tema Bancada
+(`popover-da-cena.js`), os arquivos que entram e saem pelo navegador
+(`arquivos-da-pagina.js`), o relógio de quadros (`ciclo-da-pagina.js`),
+os componentes do tema Foco e a mesa do tema Revisão (`mesa-de-revisao.js`),
+descritos abaixo. `elementos-da-pagina.js` é o único lugar que procura
 elementos, e entrega a cada componente só o grupo dele. A ponte
 `window.__mecanificaBancada` é um contrato fixo: as chaves dela estão listadas
 em `CHAVES_DA_PONTE`, e o teste do componente cobra que nenhuma suma.
@@ -215,9 +219,9 @@ em qualquer tema.
 
 ## As visões de conferência
 
-O controle "Visão", na barra da cena do Foco e no fim da fileira das vistas na
-arrumação clássica, troca o jeito de desenhar a
-mesma peça, com uma tecla para cada visão, que o menu Controles deixa trocar: a
+O controle "Visão" fica na barra da cena dos três temas (Foco, Bancada e
+Revisão) e troca o jeito de desenhar a mesma peça, com uma tecla para cada
+visão, que o menu Controles deixa trocar: a
 sólida (`O`), o arame que esconde o que fica atrás (`M`), o raio X (`Shift+M`), a
 curvatura (`K`), a zebra (`B`) e a luz rasante (`J`). A escolha volta na próxima
 vez que a página abre, vale depois de trocar de peça, de arrastar uma junta e de
@@ -269,6 +273,16 @@ naquela região, três vezes o da direção que a bancada escolhia antes.
 A captura automática não herda a visão da pessoa: a ponte da captura suspende o
 seletor durante a auditoria, e as imagens das guardas e do pacote do crítico
 saem na sólida.
+
+`npm run guarda:temas` (`tools/modelar/guardas/guarda-temas-e-visoes.mjs`, uma
+das guardas de `bancada:guardas`) mede num navegador de verdade o que os testes
+sobre a página falsa não alcançam. Na `carenagem-de-prova`, cada visão ligada
+pela tecla muda a região da peça em mais de 5% dos pixels em relação à sólida, o
+controle mostra o nome dela, a zebra e a luz rasante mudam a imagem quando a
+câmera gira, e voltar à sólida devolve a imagem de antes pixel a pixel. Nos três
+temas, em 1400 e em 1100 pixels de largura, a cena ocupa ao menos 70% da
+largura (no Revisão, a peça mais a referência ao lado) e a página não
+transborda para os lados.
 
 ## A imagem de referência
 

@@ -216,7 +216,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run build
 
-      # As dez guardas que abrem a bancada num navegador de verdade rodam num
+      # As onze guardas que abrem a bancada num navegador de verdade rodam num
       # Chromium e num servidor do Vite só, em `tools/modelar/guardas/rodar-guardas.mjs`,
       # e o relatório diz o nome e o veredito de cada uma; a falha de uma não
       # esconde as outras. Cada uma continua sendo um script que roda sozinho.
@@ -228,6 +228,9 @@ jobs:
       #                        verde nos outros gates;
       #   guarda:camera        a câmera livre é estado de autoria, e só a bancada
       #                        real comprova a órbita e a recarga;
+      #   guarda:temas         as seis visões mudam a imagem e voltam à sólida, e os
+      #                        três temas deixam a cena com 70% da largura sem
+      #                        transbordar, que a página falsa dos testes não mede;
       #   guarda:par           a inspeção de par mede pixels visíveis com depth
       #                        buffer e a escolha e a recarga da URL;
       #   guarda:referencia    a imagem da peça sai do pacote construído, e não
@@ -240,7 +243,7 @@ jobs:
       #                        vértices da cena, que teste de unidade não alcança;
       #   guarda:gesto         o caminho do desenho até a leitura: editar na tela,
       #                        salvar, e o comando de leitura entender o arquivo.
-      - name: A bancada, no navegador, em dez guardas
+      - name: A bancada, no navegador, em onze guardas
         if: ${{ !cancelled() }}
         run: npm run bancada:guardas
 
