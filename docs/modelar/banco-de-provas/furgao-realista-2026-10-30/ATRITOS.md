@@ -65,3 +65,11 @@ No ajuste da prancha, o crítico cego apontou duas vezes a porta da cabine conto
 ## 13. A convergência conta rodadas de etapas diferentes como se fossem uma
 
 Depois da rodada 3, a ferramenta da rodada mandou parar sem convergência, porque os defeitos não caíram em três rodadas julgadas (4, 4 e 8). As três são de etapas diferentes, as duas primeiras aceitas pela pessoa, e os quatro defeitos das rodas provisórias, adiados por decisão escrita para as etapas 3 e 4, voltam em toda rodada. O processo pegou o número e não o sentido. Destino: a rodada declara a etapa e os defeitos adiados, e a convergência conta só dentro da etapa, decidido no fechamento.
+
+## 14. A saia que passa sobre as portas não tinha conferência
+
+Na prancha do plástico de baixo, a saia de 299 a 463 passava sobre a base das portas em 380, e nada dizia que ela é cortada pelas frestas. O modelador poderia fazer uma peça fixa sobre as portas. Quem viu foi a pessoa, ao perguntar se as portas continuavam funcionais, e o crítico cego apontou a mesma ambiguidade na primeira rodada. O processo não teria pego sozinho. Destino: a especificação da prancha ganhou a conferência `TRECHOS_DA_SAIA`, que para a geração quando uma porta não leva exatamente o seu trecho ou quando um trecho preso fica sobre uma porta; levar a regra para a família de veículo fica para o fechamento.
+
+## 15. A prancha não confere que uma cadeia de cotas soma o total
+
+Na quarta rodada da prancha, a faixa F cotava 268, 1.300, 110 e 707, que somam 2.385, com o total de 2.395, porque o trecho de 10 mm junto à moldura só estava em texto. A legenda também dava a escala do desenho, e não a da imagem exportada em dobro. Quem achou foi o crítico cego; o motor da prancha não confere nenhum dos dois. Destino: o motor confere a cadeia de cotas contra o total e escreve a escala da imagem exportada, decidido no fechamento.
