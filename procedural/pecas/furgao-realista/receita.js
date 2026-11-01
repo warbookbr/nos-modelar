@@ -139,6 +139,8 @@ export const TABELA = {
   porta_cabine_topo_y: 2035,
   porta_fresta_coluna: 122,
   quina_fresta_ref: 30, // a linha que ordena as colunas da quina da frente, onde a fresta da porta corria antes de recuar (o para-brisa não mudou)
+  p_inicio_y: 1330, // a partir daqui, e até o ombro, a quina ganha colunas entre E e D: p1 onde a D antiga ficava e as outras a passo_p
+  passo_p: 30, // distância entre as colunas p
   para_brisa_topo_y: 2075, // o anel do topo do vão do para-brisa, que era o do topo da porta antes de ela descer
   coluna_do_meio: 110,
   porta_correr_largura: 1300,
@@ -608,12 +610,9 @@ function separarCorpoDeBaixo(T, f, { faces, vincos, cantos, posicoes, abasDosArc
   const chv = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const arestasDaAba = new Set();
   abasDosArcos.forEach((a) => a.pontos.forEach((n, k) => { if (k + 1 < a.pontos.length) arestasDaAba.add(chv(n, a.pontos[k + 1])); }));
-  /* a face em volta de um arco: tem um ponto de arco que não é o canto onde o arco encontra a soleira */
-  const dosArcos = (fc) => fc.some((n) => /arco[DT]_(?!(f|t)(_|$))/.test(n));
-  const noArco = (fc) => dosArcos(fc) || fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));
+  /* a fiada de faces junto à aba de um arco: tem uma aresta da linha da aba, que assenta nela e fica na chapa; o plástico vai até essa fiada */
+  const noArco = (fc) => fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));
   const P = (n) => posicoes.get(n);
-  const zArcoD = f.zD + f.dzArco; const zArcoDtras = f.zD - f.dzArco;
-  const zArcoT = f.zT + f.dzArco; const zArcoTtras = f.zT - f.dzArco;
   const topoFrente = T.parachoque_topo_y;
   const topoTras = T.degrau_tras_y + T.degrau_tras_rampa / 2;
   /* da quina da frente para a frente e da quina de trás para trás, na altura de cada ponto */
@@ -623,16 +622,12 @@ function separarCorpoDeBaixo(T, f, { faces, vincos, cantos, posicoes, abasDosArc
     if (noArco(fc)) return 'chapa';
     const ps = fc.map(P);
     const ymax = Math.max(...ps.map((p) => p[1]));
-    const zmin = Math.min(...ps.map((p) => p[2])); const zmax = Math.max(...ps.map((p) => p[2]));
     const xc = ps.reduce((s, p) => s + p[0], 0) / ps.length;
     if (ymax <= topoFrente + tol && ps.every(naFrente)) return 'parachoqueDianteiro';
     if (ymax <= topoTras + tol && ps.every(naTraseira)) return 'parachoqueTraseiro';
     if (ymax > T.faixa_topo_y + tol) return 'chapa';
-    const faixa = `faixaLateral${xc > 0 ? 'Esquerda' : 'Direita'}`;
-    if (zmin >= zArcoD - tol) return faixa; // entre a quina da frente e o arco dianteiro
-    if (zmax <= zArcoDtras + tol && zmin >= zArcoT - tol) return faixa; // entre os arcos
-    if (zmax <= zArcoTtras + tol) return faixa; // entre o arco traseiro e a quina de trás
-    return 'chapa';
+    /* o que sobra abaixo do topo da faixa, fora dos para-choques, é a faixa: entre as quinas, dos dois lados dos arcos (dentro de cada arco não há face) */
+    return `faixaLateral${xc > 0 ? 'Esquerda' : 'Direita'}`;
   };
   const grupos = new Map([['chapa', []], ...PARTES_DE_BAIXO.map((n) => [n, []])]);
   faces.forEach((fc) => grupos.get(classe(fc)).push(fc));
@@ -803,9 +798,9 @@ export function derivar(T) {
   const caminhoD = (an) => {
     if (an.horizontal && an.y <= T.porta_cabine_topo_y) return caminhoDeZ(an.sec, f.zFrestaFrente(an.y));
     /* Acima do topo da porta a coluna D não tem mais a fresta a seguir. Com a fresta a 122 mm do perfil ela fica quase no fim da quina,
-       e deixaria sem coluna a volta da quina entre E e D (uma face de 160 mm numa quina de raio 160 sai com 20 mm de barriga a menos): ela
-       volta, até o topo do vidro, para a posição que tinha com a fresta a quina_fresta_ref, a mesma do teto da etapa 2. */
-    const t = suave((an.y - T.porta_cabine_topo_y) / (f.topoVidro[1] - T.porta_cabine_topo_y));
+       longe de E: ela volta, até o topo do vão do para-brisa, para a posição que tinha com a fresta a quina_fresta_ref, a mesma do teto da
+       etapa 2; com ela parada em 2035 a curva do teto saía com calombo de 2,9 mm no ombro. */
+    const t = suave((an.y - T.porta_cabine_topo_y) / (T.para_brisa_topo_y - T.porta_cabine_topo_y));
     return lerp(an.sec.rF * aTopoPorta, caminhoQuina(an), t);
   };
 
@@ -875,6 +870,18 @@ export function derivar(T) {
     const sE = an.y >= yDQuina - 1e-9 ? Math.min(sq, caminhoQuina(an) - T.recuo_quina_porta) : sq;
     const g = [1, 2, 3].map((k) => ({ col: `q${k}`, s: (k / 4) * sE }));
     g.push({ col: 'E', s: sE });
+    /* Entre E e D a quina fica sem coluna quando a fresta recua (a face vira corda de um arco de raio 160 e sai com barriga a menos, uma
+       mancha afundada na curvatura). A coluna p1 fica onde a D da etapa 2 ficava (a fresta a quina_fresta_ref), de modo que o encontro do teto
+       com a coluna do para-brisa tem a mesma malha de antes, e p2 em diante dividem o resto até a D nova, a passo_p uma da outra. Isso vale de
+       p_inicio_y até o ombro, que tem as mesmas colunas do teto, cuja cobertura conta as que vêm antes de D. */
+    if (temD && an.horizontal && an.y >= T.p_inicio_y && an.y < T.ombro_y) {
+      const sR = caminhoQuina(an);
+      if (sR > sE + 1 && sR < sD - 1) {
+        g.push({ col: 'p1', s: sR });
+        const n = Math.floor((sD - sR) / T.passo_p);
+        for (let k = 1; k < n; k += 1) g.push({ col: `p${k + 1}`, s: sR + ((sD - sR) * k) / n });
+      }
+    }
     if (temD) g.push({ col: 'D', s: sD });
     if (temB) {
       const L = Math.max(sq - sD, T.alcance_coluna_porta);
@@ -921,8 +928,8 @@ export function derivar(T) {
     const grupo = grupoQuina(an);
     const xDoCaminho = (s) => pontoNoCaminho(sec, s)[0];
     const xQ3 = xDoCaminho(grupo.find((g) => g.col === 'q3').s);
-    const gD = grupo.find((g) => g.col === 'D');
-    const xFimDaCoroa = Math.max(xQ3 + 1, gD ? xDoCaminho(gD.s) : sec.xS);
+    /* o abaulamento acaba onde a coluna D acabava com a fresta a quina_fresta_ref (a fresta da porta recuou, e o abaulamento do para-brisa não) */
+    const xFimDaCoroa = Math.max(xQ3 + 1, an.y >= yDQuina - 1e-9 ? xDoCaminho(caminhoQuina(an)) : sec.xS);
     const coroa = (p) => {
       const x = Math.abs(p[0]);
       const g = x <= xQ3 ? (x / xQ3) ** 2 : 1 - suave((x - xQ3) / (xFimDaCoroa - xQ3));
