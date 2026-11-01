@@ -13,12 +13,159 @@
     "arcoRaio": 420,
     "soleira": 300
   },
+  "comPlastico": {
+    "comprimento": 5560,
+    "larguraNaSaia": 2040,
+    "zFrente": 2750,
+    "zTras": -2810,
+    "molduraArco": 45
+  },
+  "secoes": {
+    "saia": [
+      [
+        0,
+        299
+      ],
+      [
+        10,
+        303
+      ],
+      [
+        17,
+        312
+      ],
+      [
+        20,
+        326
+      ],
+      [
+        20,
+        440
+      ],
+      [
+        18,
+        450
+      ],
+      [
+        13,
+        457
+      ],
+      [
+        6,
+        461
+      ],
+      [
+        0,
+        463
+      ]
+    ],
+    "parachoqueDianteiro": [
+      [
+        0,
+        300
+      ],
+      [
+        15,
+        302
+      ],
+      [
+        30,
+        320
+      ],
+      [
+        42,
+        350
+      ],
+      [
+        46,
+        375
+      ],
+      [
+        44,
+        382
+      ],
+      [
+        30,
+        388
+      ],
+      [
+        30,
+        482
+      ],
+      [
+        44,
+        488
+      ],
+      [
+        50,
+        500
+      ],
+      [
+        50,
+        670
+      ],
+      [
+        47,
+        695
+      ],
+      [
+        38,
+        712
+      ],
+      [
+        22,
+        720
+      ],
+      [
+        0,
+        724
+      ]
+    ],
+    "parachoqueTraseiro": [
+      [
+        0,
+        300
+      ],
+      [
+        60,
+        302
+      ],
+      [
+        95,
+        312
+      ],
+      [
+        108,
+        330
+      ],
+      [
+        110,
+        350
+      ],
+      [
+        110,
+        560
+      ],
+      [
+        108,
+        570
+      ],
+      [
+        102,
+        577
+      ],
+      [
+        92,
+        580
+      ]
+    ]
+  },
   "relatorio": {
     "porVista": {
       "lateral": {
         "caixa": {
-          "xMin": -2700,
-          "xMax": 2700,
+          "xMin": -2810,
+          "xMax": 2750,
           "yMin": 300,
           "yMax": 2500
         },
@@ -30,9 +177,9 @@
       },
       "frontal": {
         "caixa": {
-          "xMin": -1000,
-          "xMax": 1000,
-          "yMin": 300,
+          "xMin": -1020,
+          "xMax": 1020,
+          "yMin": 299,
           "yMax": 2500
         },
         "contornoFechado": true,
@@ -43,9 +190,9 @@
       },
       "traseira": {
         "caixa": {
-          "xMin": -1000,
-          "xMax": 1000,
-          "yMin": 300,
+          "xMin": -1020,
+          "xMax": 1020,
+          "yMin": 299,
           "yMax": 2500
         },
         "contornoFechado": true,
@@ -56,10 +203,10 @@
       },
       "planta": {
         "caixa": {
-          "xMin": -2700,
-          "xMax": 2700,
-          "yMin": -1000,
-          "yMax": 1000
+          "xMin": -2810,
+          "xMax": 2750,
+          "yMin": -1020,
+          "yMax": 1020
         },
         "contornoFechado": true,
         "trechosSoltos": 0,
@@ -71,11 +218,11 @@
     "porCamada": {
       "nariz": {
         "vista": "lateral",
-        "comprimento": 1827.7,
-        "retidao": 0.794,
-        "concentracao": 0.131,
-        "inversoes": 2,
-        "raioMin": 20
+        "comprimento": 1923.8,
+        "retidao": 0.688,
+        "concentracao": 0.211,
+        "inversoes": 4,
+        "raioMin": 13
       },
       "capoEParaBrisa": {
         "vista": "lateral",
@@ -95,11 +242,11 @@
       },
       "traseira": {
         "vista": "lateral",
-        "comprimento": 1951.38,
-        "retidao": 0.874,
-        "concentracao": 0.08,
+        "comprimento": 2159.21,
+        "retidao": 0.804,
+        "concentracao": 0.101,
         "inversoes": 1,
-        "raioMin": 40
+        "raioMin": 17
       },
       "arcoTraseiro": {
         "vista": "lateral",
@@ -127,21 +274,29 @@
       },
       "silhuetaFrontal": {
         "vista": "frontal",
-        "comprimento": 7980.25,
-        "retidao": 0.643,
-        "concentracao": 0.176,
-        "inversoes": 0,
-        "raioMin": 30
+        "comprimento": 8047.46,
+        "retidao": 0.623,
+        "concentracao": 0.186,
+        "inversoes": 2,
+        "raioMin": 19
       },
       "silhuetaTraseira": {
         "vista": "traseira",
-        "comprimento": 7980.25,
-        "retidao": 0.643,
-        "concentracao": 0.176,
-        "inversoes": 0,
-        "raioMin": 30
+        "comprimento": 8047.46,
+        "retidao": 0.623,
+        "concentracao": 0.186,
+        "inversoes": 2,
+        "raioMin": 19
       },
       "silhuetaDeCima": {
+        "vista": "planta",
+        "comprimento": 14760.57,
+        "retidao": 0.769,
+        "concentracao": 0.146,
+        "inversoes": 0,
+        "raioMin": 210
+      },
+      "chapaDeCima": {
         "vista": "planta",
         "comprimento": 14472.58,
         "retidao": 0.789,
@@ -205,29 +360,45 @@
         "inversoes": 1,
         "raioMin": 40
       },
-      "faixaLateral": {
+      "saia": {
         "vista": "lateral",
-        "comprimento": 2476.67,
+        "comprimento": 2394.02,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
         "raioMin": null
       },
+      "molduraArcoDianteiro": {
+        "vista": "lateral",
+        "comprimento": 935.12,
+        "retidao": 0.01,
+        "concentracao": 0.879,
+        "inversoes": 0,
+        "raioMin": 465
+      },
+      "molduraArcoTraseiro": {
+        "vista": "lateral",
+        "comprimento": 1124.46,
+        "retidao": 0.01,
+        "concentracao": 0.879,
+        "inversoes": 0,
+        "raioMin": 465
+      },
       "parachoqueDianteiroDeLado": {
         "vista": "lateral",
-        "comprimento": 675,
-        "retidao": 0.96,
-        "concentracao": 0.03,
+        "comprimento": 686.9,
+        "retidao": 1,
+        "concentracao": 0,
         "inversoes": 0,
-        "raioMin": 244
+        "raioMin": null
       },
       "parachoqueTraseiroDeLado": {
         "vista": "lateral",
-        "comprimento": 335,
-        "retidao": 0.96,
-        "concentracao": 0.03,
+        "comprimento": 685.87,
+        "retidao": 1,
+        "concentracao": 0,
         "inversoes": 0,
-        "raioMin": 135
+        "raioMin": null
       },
       "vincoDeCintura": {
         "vista": "lateral",
@@ -263,7 +434,7 @@
       },
       "parachoqueTraseiro": {
         "vista": "traseira",
-        "comprimento": 4399.69,
+        "comprimento": 4449.69,
         "retidao": 0.819,
         "concentracao": 0.111,
         "inversoes": 0,
@@ -303,19 +474,27 @@
       },
       "parachoqueDianteiro": {
         "vista": "frontal",
-        "comprimento": 4713.84,
-        "retidao": 0.804,
-        "concentracao": 0.116,
+        "comprimento": 4729.07,
+        "retidao": 0.819,
+        "concentracao": 0.111,
         "inversoes": 0,
         "raioMin": 40
       },
       "entradaDeAr": {
         "vista": "frontal",
-        "comprimento": 2808.3,
-        "retidao": 0.809,
-        "concentracao": 0.116,
+        "comprimento": 1980,
+        "retidao": 1,
+        "concentracao": 0,
         "inversoes": 0,
-        "raioMin": 30
+        "raioMin": null
+      },
+      "entradaDeArTopo": {
+        "vista": "frontal",
+        "comprimento": 1980,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
       },
       "placaDianteira": {
         "vista": "frontal",
@@ -444,6 +623,30 @@
         "concentracao": 0.166,
         "inversoes": 0,
         "raioMin": 40
+      },
+      "corteSaia": {
+        "vista": "planta",
+        "comprimento": 918.39,
+        "retidao": 0.729,
+        "concentracao": 0.186,
+        "inversoes": 0,
+        "raioMin": 97
+      },
+      "corteParachoqueDianteiro": {
+        "vista": "planta",
+        "comprimento": 2480.08,
+        "retidao": 0.548,
+        "concentracao": 0.281,
+        "inversoes": 2,
+        "raioMin": 66
+      },
+      "corteParachoqueTraseiro": {
+        "vista": "planta",
+        "comprimento": 1892.98,
+        "retidao": 0.749,
+        "concentracao": 0.156,
+        "inversoes": 0,
+        "raioMin": 87
       }
     },
     "porLandmark": {
@@ -515,23 +718,23 @@
     "coerencia": {
       "porEixo": {
         "z": {
-          "min": -2700,
-          "max": 2700,
+          "min": -2810,
+          "max": 2750,
           "vistas": {
             "lateral": {
-              "min": -2700,
-              "max": 2700,
+              "min": -2810,
+              "max": 2750,
               "leitura": "projecao"
             },
             "planta": {
-              "min": -2700,
-              "max": 2700,
+              "min": -2810,
+              "max": 2750,
               "leitura": "projecao"
             }
           }
         },
         "y": {
-          "min": 300,
+          "min": 299,
           "max": 2500,
           "vistas": {
             "lateral": {
@@ -540,34 +743,34 @@
               "leitura": "projecao"
             },
             "frontal": {
-              "min": 300,
+              "min": 299,
               "max": 2500,
               "leitura": "projecao"
             },
             "traseira": {
-              "min": 300,
+              "min": 299,
               "max": 2500,
               "leitura": "projecao"
             }
           }
         },
         "x": {
-          "min": -1000,
-          "max": 1000,
+          "min": -1020,
+          "max": 1020,
           "vistas": {
             "frontal": {
-              "min": -1000,
-              "max": 1000,
+              "min": -1020,
+              "max": 1020,
               "leitura": "projecao"
             },
             "traseira": {
-              "min": -1000,
-              "max": 1000,
+              "min": -1020,
+              "max": 1020,
               "leitura": "projecao"
             },
             "planta": {
-              "min": -1000,
-              "max": 1000,
+              "min": -1020,
+              "max": 1020,
               "leitura": "projecao"
             }
           }
@@ -575,13 +778,13 @@
       },
       "envelope": {
         "comprimento": {
-          "medido": 5400,
-          "declarado": 5400,
+          "medido": 5560,
+          "declarado": 5560,
           "desvio": 0
         },
         "largura": {
-          "medido": 2000,
-          "declarado": 2000,
+          "medido": 2040,
+          "declarado": 2040,
           "desvio": 0
         },
         "altura": {

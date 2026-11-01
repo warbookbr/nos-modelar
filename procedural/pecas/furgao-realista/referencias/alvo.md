@@ -44,6 +44,22 @@ A regra da especificação que pedia a aresta da porta à frente do eixo (z ≥ 
 
 A faixa lateral de plástico vai de 300 a 460 mm do chão, sobre a parte de baixo das portas, como a pessoa escolheu. Antes ela ia até 380, a base das portas. As frestas das portas a atravessam até a base delas (380), e cada porta leva o seu trecho; as portas não mudam de tamanho. A prancha desenha o topo da faixa na lateral, interrompido nos arcos, e as emendas com os para-choques: a do dianteiro na quina de raio 280 (z 2.420) e a do traseiro na quina de raio 100 (z -2.600). A cota de 460 fica no chão, entre as rodas.
 
+## O plástico de baixo como peça própria, de 2026-11-01
+
+A pessoa escolheu a saia, as molduras dos arcos e os para-choques como peças próprias, com a seção do meio entre três opções desenhadas (ALINHAMENTO.md, "O corpo de baixo" e "Os para-choques"). A lataria aceita fica igual, e o plástico se soma por fora dela. A especificação guarda as três seções como coordenadas em `SECAO_SAIA`, `SECAO_PARACHOQUE_DIANTEIRO` e `SECAO_PARACHOQUE_TRASEIRO`, cada uma como [para fora da chapa, altura] em mm. O relatório repete as seções, e a prancha as desenha num corte em escala 5:1, abaixo da vista de cima, com a chapa tracejada.
+
+A saia vai de 299 a 463 e sai 20 mm da lateral. A borda de cima é redonda, com cerca de 10 mm de raio, e a de baixo dobra para dentro. De lado, o topo dela fica em 460, entre as molduras dos arcos.
+
+A moldura de cada arco tem a mesma seção e fica do arco para fora, sem diminuir a boca dele. Ela tem 45 mm de largura, e não 50, para acabar 10 mm antes da fresta da porta da cabine, que contorna o arco dianteiro a 55 mm dele. A especificação confere essa folga e a de pelo menos 100 mm da moldura traseira até a porta de correr.
+
+O para-choque dianteiro sai 50 mm da frente da chapa, de 300 a 724, em duas alturas. Embaixo há um lábio que recua por baixo, até 388; a faixa da entrada de ar fica recuada 20 mm de uma quina à outra, de 388 a 482; o alto, de 482 a 724, acompanha o nariz. De frente, a prancha desenha o contorno dele e as duas linhas da faixa recuada, que substituem o retângulo da entrada de ar.
+
+O para-choque traseiro sai 110 mm atrás da chapa dele (z -2.700), de 300 a 580. Em cima fica o degrau plano de carga, em 580, com 92 mm de piso a partir da chapa.
+
+Os dois para-choques dobram nas quinas até a moldura do arco. De lado, o dianteiro vai da moldura dianteira até a frente, com o topo em 724, e o traseiro da moldura traseira até a traseira, com o topo em 580; a saia fica só entre as molduras.
+
+Com o plástico, o comprimento total passa de 5.400 para 5.560, de z -2.810 a 2.750, e a largura na saia para 2.040. A carroceria não se move, e a chapa continua com 5.400 × 2.000. O envelope da prancha passa a ser o de fora, com o plástico, e as cotas dizem qual é qual: 5.400 na chapa e 5.560 com o plástico na lateral, 2.000 na chapa de cima e 2.040 na saia na traseira. De cima, a silhueta tem o para-choque dianteiro em 2.750, com quina de raio 300 até a saia em ±1.020, e o traseiro em -2.810, com quina de 210; a chapa fica desenhada por dentro. Os landmarks `frente`, `traseira` e `degrau` passaram para o plástico: [2.750, 585], [-2.810, 450] e [-2.750, 580].
+
 ## A referência de caráter
 
 O `fonte-vistas.png` são as vistas do `furgao` do acervo, de que esta peça nasceu como cópia. Valem só como caráter da forma, porque as medidas do `furgao` (rodas de 1.060 mm numa carroceria de 4.854 mm, cabine que afunila para o teto) deixaram de valer pelo alinhamento. A origem do `furgao` é o modelo "van" do pacote A, de autor A, com licença livre sem exigência de crédito; a malha não está no repositório, e as medidas tiradas dela ficam só no `furgao`, em `procedural/pecas/furgao/referencias/fonte-partes.json`.
