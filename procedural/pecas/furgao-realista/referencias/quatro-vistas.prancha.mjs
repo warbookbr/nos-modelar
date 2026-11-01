@@ -101,13 +101,23 @@ const topoDe = (secao) => Math.max(...secao.map(([, y]) => y));
 const TOPO_FAIXA = topoDe(SECAO_SAIA); // 463, o mesmo do corte A e da legenda
 const DEGRAU_DE_CARGA = topoDe(SECAO_PARACHOQUE_TRASEIRO); // 580
 const PISO_DO_DEGRAU = 92;
-/* A moldura do arco tem o caráter da seção da saia em volta de cada arco, do arco para fora; a boca do arco não muda.
-   Ela tem 45 mm de largura, aceitos pela pessoa em 2026-11-01, e acaba com FOLGA_MOLDURA_FRESTA = 10 mm antes da fresta
-   da porta da cabine, que contorna o arco dianteiro a 55 mm dele. A seção dela é [para fora, distância do arco]: a borda
-   do lado do arco dobra para dentro como a de baixo da saia, a de fora é redonda como a de cima, e ela sai 20 mm. */
+/* A moldura de cada arco é um alargamento na cor da lataria, escolha da pessoa em 2026-11-01 (ALINHAMENTO.md, fim de
+   "O corpo de baixo"): encosta na boca do arco, sem diminuí-la, e a borda do lado do arco dobra para dentro dele, por
+   trás da face da chapa, cobrindo a aba de chapa do arco (ABA_DO_ARCO, 4 mm de altura). Ela tem 45 mm de largura, para
+   acabar com FOLGA_MOLDURA_FRESTA = 10 mm antes da fresta da porta da cabine, que contorna o arco dianteiro a 55 mm dele,
+   e sai 20 mm, com a seção arredondada como a borda rolada de um para-lama. A seção é [para fora da chapa, distância da
+   boca do arco]; os pontos com "para fora" negativo são a dobra, na própria boca. A saia e os para-choques escuros
+   terminam nela. */
 const MOLDURA_ARCO = 45;
 const FOLGA_MOLDURA_FRESTA = 10;
-export const SECAO_MOLDURA = [[0, 0], [10, 4], [17, 13], [20, 27], [18, 31], [13, 37], [6, 42], [0, 45]];
+const DOBRA_DA_MOLDURA = 10;
+const ABA_DO_ARCO = { altura: 4, largura: 32 };
+const ESPESSURA_DA_MOLDURA = 2;
+export const SECAO_MOLDURA = [[-DOBRA_DA_MOLDURA, 0], [0, 0], [8, 2], [14, 5], [18, 10], [20, 17], [20, 25], [18, 32], [13, 38], [6, 43], [0, MOLDURA_ARCO]];
+if (Math.min(...SECAO_MOLDURA.map(([, d]) => d)) < 0) throw new Error('a moldura entra na boca do arco');
+if (Math.max(...SECAO_MOLDURA.map(([, d]) => d)) !== MOLDURA_ARCO || Math.max(...SECAO_MOLDURA.map(([u]) => u)) !== 20) throw new Error('a moldura não tem 45 de largura e 20 de saída');
+if (SECAO_MOLDURA.some(([u, d]) => d > 0 && d <= ABA_DO_ARCO.largura && u < ABA_DO_ARCO.altura + ESPESSURA_DA_MOLDURA)) throw new Error('a moldura não cobre a aba de chapa do arco');
+if (!SECAO_MOLDURA.some(([u, d]) => d === 0 && u < 0)) throw new Error('a borda da moldura não dobra para dentro do arco');
 /* As portas descem até 380 e a saia vai de 299 a 463: a saia é cortada pelas frestas, e cada porta leva o seu trecho,
    de 380 a 463, que abre com ela (as duas da cabine e a de correr, no lado -x). Ficam presos à carroceria a parte de
    299 a 380 sob as portas e os trechos entre as portas e os arcos. Escolha da pessoa em 2026-11-01. */
@@ -140,7 +150,7 @@ const GRAUS_B_DA_VERTICAL = Math.round(ANGULO_PLANO_B / grau - 90);
 const DETALHES = [
   { nome: 'Saia', titulo: 'A: saia presa (5:1)', linhas: [`z ${PLANO_A}, lado -x`, 'trecho todo preso,', 'entre arco e porta'], eixo: 'x fora', secao: SECAO_SAIA, z0: -2560, alto: 'altura' },
   { nome: 'SaiaNaPorta', titulo: 'E: saia na porta (5:1)', linhas: [`z ${PLANO_E}, lado -x`, 'porta acima da fresta', `de ${BASE_DAS_PORTAS}, preso abaixo`], eixo: 'x fora', secao: SECAO_SAIA, pecas: saiaNaPorta, z0: -1622, alto: 'altura' },
-  { nome: 'Moldura', titulo: 'B: moldura (5:1)', linhas: ['radial, arco traseiro,', `${GRAUS_B_DA_VERTICAL}° da vertical, atrás`], eixo: 'x fora', secao: SECAO_MOLDURA.map(([u, d]) => [u, 300 + d]), z0: -685, alto: 'largura' },
+  { nome: 'Moldura', titulo: 'B: moldura (5:1)', linhas: ['cor da lataria, dobra', 'na boca; radial, arco', `tras., ${GRAUS_B_DA_VERTICAL}° da vertical`], eixo: 'x fora', secao: SECAO_MOLDURA.map(([u, d]) => [u, 300 + d]), z0: -685, alto: 'largura' },
   { nome: 'ParachoqueDianteiro', titulo: 'C: para-choque diant.', linhas: [`x ${PLANO_C} (lado -x), 5:1`, `fundo a ${SECAO_PARACHOQUE_DIANTEIRO[0][1]} do chão`], eixo: 'z frente', secao: SECAO_PARACHOQUE_DIANTEIRO, z0: 252, alto: 'altura', afasta: 30 },
   { nome: 'ParachoqueTraseiro', titulo: 'D: para-choque tras.', linhas: [`x +${PLANO_D} (lado +x), 5:1`, `fundo a ${SECAO_PARACHOQUE_TRASEIRO[0][1]} do chão`], eixo: 'z trás', secao: SECAO_PARACHOQUE_TRASEIRO, z0: 1502, alto: 'altura' },
 ];
@@ -327,7 +337,16 @@ const RAIO_NO_VINCO = 3000;
 const xLateralNoTeto = LARGURA_NO_TETO / 2;
 /* Com a saia: de frente e de trás ela sai 20 mm de cada lado, de 299 a 463, e a largura nela é 2040. */
 const saiaDeFrente = (s) => SECAO_SAIA.map(([u, y]) => [s * (xMax + u), y]);
-const silhuetaFrontal = [...saiaDeFrente(-1).reverse(), ...saiaDeFrente(1), [xMax, Y_VINCO, RAIO_NO_VINCO], [xLateralNoTeto, M.altura, RAIO_QUINA_TETO], [-xLateralNoTeto, M.altura, RAIO_QUINA_TETO], [-xMax, Y_VINCO, RAIO_NO_VINCO]];
+/* De frente e de trás a moldura dos arcos aparece por fora da saia: ela sai 20 mm até o alto do arco, em y 800, e a
+   borda redonda de fora fecha na chapa em 820. A saia entra até onde chega aos 20 mm; acima disso vale a moldura. */
+const iSaiaCheia = SECAO_SAIA.findIndex(([u]) => u === saida(SECAO_SAIA));
+const iMolduraCheia = SECAO_MOLDURA.map(([u]) => u).lastIndexOf(saida(SECAO_MOLDURA));
+const ladoDeBaixo = (sx) => [
+  ...SECAO_SAIA.slice(0, iSaiaCheia + 1).map(([u, y]) => [sx * (xMax + u), y]),
+  ...SECAO_MOLDURA.slice(iMolduraCheia).map(([u, d]) => [sx * (xMax + u), R + M.arcoRaio + d]),
+];
+const Y_TOPO_DA_MOLDURA = R + M.arcoRaio + MOLDURA_ARCO;
+const silhuetaFrontal = [...ladoDeBaixo(-1).reverse(), ...ladoDeBaixo(1), [xMax, Y_VINCO, RAIO_NO_VINCO], [xLateralNoTeto, M.altura, RAIO_QUINA_TETO], [-xLateralNoTeto, M.altura, RAIO_QUINA_TETO], [-xMax, Y_VINCO, RAIO_NO_VINCO]];
 const INCLINACAO_LATERAL = Math.atan2(xMax - xLateralNoTeto, M.altura - Y_VINCO) / grau;
 /* Meia largura da cabine na altura y: vertical até o vinco e fechando em reta até o teto (o raio no vinco tira menos de
    2 mm dela). */
@@ -659,6 +678,8 @@ export const ESPEC = {
       { vista: 'planta', classe: 'eixo', tipo: 'poli', pts: [noDetalhe(z0, 0, 280), noDetalhe(z0, 0, topoDe(secao) + 2)] },
     ]),
 
+    /* a aba de chapa do arco, coberta pela moldura, no corte B */
+    { vista: 'planta', classe: 'oculta', nome: 'abaDoArco', tipo: 'poli', pts: [[0, 0], [ABA_DO_ARCO.altura, 0], [ABA_DO_ARCO.altura, 14], [0, ABA_DO_ARCO.largura]].map(([u, d]) => noDetalhe(DETALHES.find((x) => x.nome === 'Moldura').z0, u, 300 + d)), foraDoContorno: true, motivoForaDoContorno: 'aba de chapa sob a moldura no detalhe de corte B' },
     /* eixos de simetria e de roda */
     { vista: 'frontal', classe: 'eixo', tipo: 'poli', pts: [[0, -60], [0, 295]] },
     { vista: 'frontal', classe: 'eixo', tipo: 'poli', pts: [[0, 735], [0, 2560]] },
@@ -771,6 +792,11 @@ export const ESPEC = {
         { vista: 'planta', de: noDetalhe(z0, 0, yb), ate: noDetalhe(z0, 0, yt), desloca: [u * DETALHE.escala * ESCALA + 24 + afasta, 0], extensao: true, texto: mil(yt - yb) },
       ];
     }),
+    /* a dobra da moldura para dentro do arco, no corte B */
+    (() => {
+      const z0 = DETALHES.find((d) => d.nome === 'Moldura').z0;
+      return { vista: 'planta', de: noDetalhe(z0, -DOBRA_DA_MOLDURA, 300), ate: noDetalhe(z0, 0, 300), desloca: [0, 14], extensao: true, numero: [-34, 6], texto: `dobra ${DOBRA_DA_MOLDURA}` };
+    })(),
     /* os dois recuos do para-choque dianteiro no corte C: o lábio de baixo, que recua por baixo até a chapa, e a faixa
        da entrada de ar, 20 mm para dentro da face de cima; as alturas numa coluna só, à direita */
     ...(() => {
@@ -811,7 +837,7 @@ export const ESPEC = {
     y: 740,
     itens: [
       ['#12233b', 'silhueta (projeção de cada vista)'],
-      ['#2f4562', 'linhas de porta e borda do teto plano'],
+      ['#2f4562', 'linhas de porta e borda do teto plano; molduras dos arcos, na cor da lataria'],
       ['#3d6b86', 'vidros: para-brisa, portas da cabine, portas traseiras'],
       ['#8a94a2', `pneu ${M.pneuLargura}/65 aro 16 (⌀ ${M.pneuDiametro} × ${M.pneuLargura}) e aro de 16 polegadas`],
       ['#b3593d', 'cotas em mm'],
@@ -827,7 +853,8 @@ export const ESPEC = {
       `Arcos das rodas com raio ${M.arcoRaio} no centro da roda (${M.arcoRaio - R} mm sobre o pneu); soleira em ${M.soleira}; largura sem retrovisores.`,
       'A lateral mostra o lado direito (-x), com a porta de correr; o lado esquerdo é o espelho dele sem ela.',
       'Medidas rígidas da classe; cabine, portas, vidros, bitola e balanços estimados na proporção (ver autoria).',
-      `Plástico por fora da chapa: saia de 299 a 463 saindo ${saida(SECAO_SAIA)} (${mil(LARGURA_NA_SAIA)} na saia), moldura de ${MOLDURA_ARCO} nos arcos, para-choques saindo ${saida(SECAO_PARACHOQUE_DIANTEIRO)} na frente e ${saida(SECAO_PARACHOQUE_TRASEIRO)} atrás (${mil(COMPRIMENTO_COM_PLASTICO)} com o plástico).`,
+      `Plástico por fora da chapa: saia de 299 a 463 saindo ${saida(SECAO_SAIA)} (${mil(LARGURA_NA_SAIA)} na saia), para-choques saindo ${saida(SECAO_PARACHOQUE_DIANTEIRO)} na frente e ${saida(SECAO_PARACHOQUE_TRASEIRO)} atrás (${mil(COMPRIMENTO_COM_PLASTICO)} com o plástico).`,
+      `Molduras dos arcos na cor da lataria: alargamento de ${MOLDURA_ARCO} encostado na boca, saindo ${saida(SECAO_MOLDURA)} até y ${Y_TOPO_DA_MOLDURA - MOLDURA_ARCO + SECAO_MOLDURA[iMolduraCheia][1]} de frente, com a borda dobrada ${DOBRA_DA_MOLDURA} para dentro do arco sobre a aba de ${ABA_DO_ARCO.altura}.`,
       'As seções estão em SECAO_* na especificação; os cinco cortes 5:1 (A, E, B, C, D) ficam abaixo da vista de cima, com a chapa em traço-ponto.',
       `Detalhes F e G: a faixa de baixo de arco a arco nos lados -x e +x, 2,2 vezes a lateral. De cima, o contorno à frente do para-brisa é o capô.`,
       `Faixa ${FAIXA_TETO_PORTA}: a chapa acima da porta da cabine, do topo da porta ao nível do topo do para-brisa (${mil(Y_TOPO_VIDRO)}).`,
@@ -851,6 +878,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   for (const c of exame.colisoes) console.log(`  COLISÃO ${c.tipo}: ${c.a} × ${c.b}`);
   for (const a of exame.avisos) console.log(`  AVISO ${a.tipo}: ${a.a} × ${a.b} (${a.motivo})`);
   writeFileSync(`${BASE}.svg`, svg);
-  writeFileSync(`${BASE}.relatorio.json`, `${JSON.stringify({ medidas: M, comPlastico: { comprimento: COMPRIMENTO_COM_PLASTICO, larguraNaSaia: LARGURA_NA_SAIA, zFrente: Z_FRENTE_PLASTICO, zTras: Z_TRAS_PLASTICO, molduraArco: MOLDURA_ARCO }, secoes: { saia: SECAO_SAIA, parachoqueDianteiro: SECAO_PARACHOQUE_DIANTEIRO, parachoqueTraseiro: SECAO_PARACHOQUE_TRASEIRO }, relatorio, colisoes: exame.colisoes, avisos: exame.avisos }, null, 2)}\n`);
+  writeFileSync(`${BASE}.relatorio.json`, `${JSON.stringify({ medidas: M, comPlastico: { comprimento: COMPRIMENTO_COM_PLASTICO, larguraNaSaia: LARGURA_NA_SAIA, zFrente: Z_FRENTE_PLASTICO, zTras: Z_TRAS_PLASTICO, molduraArco: MOLDURA_ARCO }, secoes: { saia: SECAO_SAIA, moldura: SECAO_MOLDURA, parachoqueDianteiro: SECAO_PARACHOQUE_DIANTEIRO, parachoqueTraseiro: SECAO_PARACHOQUE_TRASEIRO }, relatorio, colisoes: exame.colisoes, avisos: exame.avisos }, null, 2)}\n`);
   if (relatorio.alertas.length || exame.colisoes.length) process.exitCode = 1;
 }

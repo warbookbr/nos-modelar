@@ -46,11 +46,21 @@ A faixa lateral de plástico vai de 300 a 460 mm do chão, sobre a parte de baix
 
 ## O plástico de baixo como peça própria, de 2026-11-01
 
-A pessoa escolheu a saia, as molduras dos arcos e os para-choques como peças próprias, com a seção do meio entre três opções desenhadas (ALINHAMENTO.md, "O corpo de baixo" e "Os para-choques"). A lataria aceita fica igual, e o plástico se soma por fora dela. A especificação guarda as três seções como coordenadas em `SECAO_SAIA`, `SECAO_PARACHOQUE_DIANTEIRO` e `SECAO_PARACHOQUE_TRASEIRO`, cada uma como [para fora da chapa, altura] em mm. O relatório repete as seções, e a prancha as desenha num corte em escala 5:1, abaixo da vista de cima, com a chapa tracejada.
+A pessoa escolheu a saia, as molduras dos arcos e os para-choques como peças próprias, com a seção do meio entre três opções desenhadas (ALINHAMENTO.md, "O corpo de baixo" e "Os para-choques"). A lataria aceita fica igual, e o plástico se soma por fora dela; as molduras passaram depois à cor da lataria, como diz o parágrafo da moldura. A especificação guarda as três seções como coordenadas em `SECAO_SAIA`, `SECAO_PARACHOQUE_DIANTEIRO` e `SECAO_PARACHOQUE_TRASEIRO`, cada uma como [para fora da chapa, altura] em mm. O relatório repete as seções, e a prancha as desenha num corte em escala 5:1, abaixo da vista de cima, com a chapa tracejada.
 
 A saia vai de 299 a 463 e sai 20 mm da lateral. A borda de cima é redonda, com cerca de 10 mm de raio, e a de baixo dobra para dentro. De lado, o topo dela fica em 463, entre as molduras dos arcos, a mesma medida da seção.
 
-A moldura de cada arco fica do arco para fora, sem diminuir a boca dele. Ela tem 45 mm de largura, que a pessoa aceitou, e acaba a 10 mm da fresta da porta da cabine (`FOLGA_MOLDURA_FRESTA`), que contorna o arco dianteiro a 55 mm dele. A seção dela, `SECAO_MOLDURA`, é dada como [para fora, distância do arco]: sai 20 mm; a borda do lado do arco dobra para dentro, como a de baixo da saia, e a de fora é redonda, como a de cima. A especificação confere a folga da fresta e a de pelo menos 100 mm da moldura traseira até a porta de correr.
+A moldura de cada arco é um alargamento na cor da lataria, escolha da pessoa ao ver a etapa 3 pronta (ALINHAMENTO.md, fim de "O corpo de baixo"). Ela deixou de ser plástico escuro afastado 5 mm da boca. Agora encosta na boca do arco sem diminuí-la, e a borda do lado do arco dobra 10 mm para dentro dele, por trás da face da chapa, cobrindo a aba de chapa de 4 mm. Tem 45 mm de largura, para acabar a 10 mm da fresta da porta da cabine (`FOLGA_MOLDURA_FRESTA`), que contorna o arco dianteiro a 55 mm dele, e sai 20 mm, com a seção arredondada de uma borda rolada de para-lama. A saia e os para-choques escuros terminam nela. A seção, `SECAO_MOLDURA`, é dada como [para fora da chapa, distância da boca do arco]: [-10, 0], [0, 0], [8, 2], [14, 5], [18, 10], [20, 17], [20, 25], [18, 32], [13, 38], [6, 43], [0, 45]. Os pontos com "para fora" negativo são a dobra.
+
+A especificação confere:
+- que nenhum ponto entra na boca;
+- a largura de 45 e a saída de 20;
+- que a moldura passa pelo menos 2 mm acima da aba nos 32 mm dela;
+- que a borda dobra para dentro;
+- a folga da fresta;
+- os 100 mm, pelo menos, da moldura traseira até a porta de correr.
+
+O corte B cota a dobra e desenha a aba em linha escondida. De frente e de trás, a silhueta passou a mostrar a moldura saindo 20 mm por fora da saia até o alto dos arcos, em y 800, fechando na chapa em 820; antes ela ia de 463 para dentro e dava 20 mm de desvio contra o modelo. De cima a silhueta já ficava em ±1.020 ao longo de todo o comprimento, e nada mudou.
 
 As portas descem até 380 e a saia vai de 299 a 463, então a saia passa sobre os 80 mm de baixo de cada porta. A pessoa escolheu, em 2026-11-01, manter a base das portas em 380 e cortar a saia pelas frestas. Cada porta leva o seu trecho de saia, de 380 a 463, que abre com ela: as duas portas da cabine e a de correr, esta só no lado -x. Ficam presos à carroceria a parte de 299 a 380 sob as portas e os trechos entre as portas e os arcos. Entre os arcos, no lado -x, os trechos são cinco:
 - de -1.127 a -860, preso;

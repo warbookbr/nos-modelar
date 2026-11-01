@@ -59,6 +59,52 @@
         463
       ]
     ],
+    "moldura": [
+      [
+        -10,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        14,
+        5
+      ],
+      [
+        18,
+        10
+      ],
+      [
+        20,
+        17
+      ],
+      [
+        20,
+        25
+      ],
+      [
+        18,
+        32
+      ],
+      [
+        13,
+        38
+      ],
+      [
+        6,
+        43
+      ],
+      [
+        0,
+        45
+      ]
+    ],
     "parachoqueDianteiro": [
       [
         0,
@@ -274,19 +320,19 @@
       },
       "silhuetaFrontal": {
         "vista": "frontal",
-        "comprimento": 8047.46,
-        "retidao": 0.623,
-        "concentracao": 0.186,
+        "comprimento": 8047.12,
+        "retidao": 0.573,
+        "concentracao": 0.216,
         "inversoes": 2,
-        "raioMin": 19
+        "raioMin": 18
       },
       "silhuetaTraseira": {
         "vista": "traseira",
-        "comprimento": 8047.46,
-        "retidao": 0.623,
-        "concentracao": 0.186,
+        "comprimento": 8047.12,
+        "retidao": 0.573,
+        "concentracao": 0.216,
         "inversoes": 2,
-        "raioMin": 19
+        "raioMin": 18
       },
       "silhuetaDeCima": {
         "vista": "planta",
@@ -890,11 +936,11 @@
       },
       "corteMoldura": {
         "vista": "planta",
-        "comprimento": 320.41,
-        "retidao": 0.764,
-        "concentracao": 0.156,
+        "comprimento": 383.27,
+        "retidao": 0.648,
+        "concentracao": 0.246,
         "inversoes": 0,
-        "raioMin": 72
+        "raioMin": 76
       },
       "corteParachoqueDianteiro": {
         "vista": "planta",
@@ -911,6 +957,14 @@
         "concentracao": 0.156,
         "inversoes": 0,
         "raioMin": 87
+      },
+      "abaDoArco": {
+        "vista": "planta",
+        "comprimento": 182.2,
+        "retidao": 0.92,
+        "concentracao": 0.04,
+        "inversoes": 0,
+        "raioMin": 36
       }
     },
     "porLandmark": {
