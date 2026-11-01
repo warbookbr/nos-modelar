@@ -149,11 +149,19 @@
         "inversoes": 0,
         "raioMin": 100
       },
+      "pontaDoParaBrisa": {
+        "vista": "lateral",
+        "comprimento": 687.56,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
       "vidroDaCabine": {
         "vista": "lateral",
-        "comprimento": 2726.99,
-        "retidao": 0.764,
-        "concentracao": 0.141,
+        "comprimento": 2441.55,
+        "retidao": 0.754,
+        "concentracao": 0.151,
         "inversoes": 0,
         "raioMin": 30
       },
@@ -191,11 +199,35 @@
       },
       "portaDaCabine": {
         "vista": "lateral",
-        "comprimento": 5214.97,
-        "retidao": 0.653,
-        "concentracao": 0.241,
+        "comprimento": 4981.57,
+        "retidao": 0.648,
+        "concentracao": 0.236,
         "inversoes": 1,
         "raioMin": 40
+      },
+      "faixaLateral": {
+        "vista": "lateral",
+        "comprimento": 2476.67,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "parachoqueDianteiroDeLado": {
+        "vista": "lateral",
+        "comprimento": 675,
+        "retidao": 0.96,
+        "concentracao": 0.03,
+        "inversoes": 0,
+        "raioMin": 244
+      },
+      "parachoqueTraseiroDeLado": {
+        "vista": "lateral",
+        "comprimento": 335,
+        "retidao": 0.96,
+        "concentracao": 0.03,
+        "inversoes": 0,
+        "raioMin": 135
       },
       "vincoDeCintura": {
         "vista": "lateral",
@@ -465,7 +497,7 @@
       },
       "cabineF": {
         "sobre": "portaDaCabine",
-        "desvio": 0.02
+        "desvio": 0.31
       },
       "largura": {
         "sobre": "silhuetaFrontal",
