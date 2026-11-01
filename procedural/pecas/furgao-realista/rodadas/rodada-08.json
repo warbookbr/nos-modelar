@@ -1,0 +1,370 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 8,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "ausencia",
+        "onde": "frente do capô, faróis e grade",
+        "sentido": "faltando",
+        "evidencia": "prancha frontal desenha três retângulos (faróis e painel) abaixo do para-brisa; na frontal e na frente az10 o capô é liso. Pode ser etapa posterior."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "borda inferior da janela da cabine e pé do para-brisa com o capô",
+        "sentido": "segmentado",
+        "evidencia": "lado az30 e az120: borda de baixo da janela da cabine ondulada (cerca de 350-550, 465); pé do para-brisa com o capô irregular (260-310, 480-500)."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro",
+        "sentido": "segmentado",
+        "evidencia": "lado az30 e az120, perto de x 260-370, y 485-580: borda em degraus. Curvatura lado e tresquartos: ocre em estrela irregular na mesma região."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "quina direita do capô, abaixo do para-brisa",
+        "sentido": "segmentado",
+        "evidencia": "frente az100, perto de x 985-1075, y 585-700: contorno em escada na luz rasante; padrão de losangos na curvatura frente."
+      }
+    ],
+    "observacao": "Proporção, silhueta, portas, faixa e para-choques conferem com a prancha, e o que resta é serrilhado local e a frente lisa."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "faixaLateralEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "faixaLateralDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueTraseiro",
+      "confere": false,
+      "observacao": "o alinhamento pede degrau plano de carga em cima; o alto é a rampa de 20 por 30 mm da chapa aceita, que a gaiola de anéis horizontais não faz plana"
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a coluna D da gaiola serve à fresta da porta, ao abaulamento do para-brisa e à ordem das colunas da quina ao mesmo tempo; recuar a fresta deslocou tudo e foi preciso separar por parâmetro (quina_fresta_ref, para_brisa_topo_y, p)",
+    "o crítico dá afundamento e dente em imagem, e a ferramenta não diz de onde vem: foi preciso escrever cortes e silhuetas por z à mão para achar a causa",
+    "o descrever e o vistas:critica levam 8 e 10 minutos e não ajudam a comparar duas variantes da gaiola; só a execução (12 s) e a ondulação (4 min) servem de laço curto",
+    "uma coluna criada ao lado de outra a 2 mm (l552) só aparece como órfão de subdivisão depois de montar a peça, sem apontar a causa",
+    "o modo automático negou um pkill por nome e comandos encadeados; segui por TaskStop, PID e comandos simples"
+  ],
+  "notaDePassagem": "A faixa leva tudo abaixo de 460 que não tem aresta da aba do arco. O recuo da fresta não moveu o para-brisa: a quina e o abaulamento seguem a linha antiga, e p1 fica onde a D antiga ficava.",
+  "receita": {
+    "sha256": "sha256:36c53db6a273bd9ef02ce7da5f6128faecc536b57b91833e43fb36bfd04f0d26",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 16,
+      "acrescentadas": 23,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  p_inicio_y: 1330, // a partir daqui, e até o ombro, a quina ganha colunas entre E e D: p1 onde a D antiga ficava e as outras a passo_p"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  passo_p: 30, // distância entre as colunas p"
+        },
+        {
+          "tipo": "-",
+          "linha": 611,
+          "texto": "  /* a face em volta de um arco: tem um ponto de arco que não é o canto onde o arco encontra a soleira */"
+        },
+        {
+          "tipo": "-",
+          "linha": 612,
+          "texto": "  const dosArcos = (fc) => fc.some((n) => /arco[DT]_(?!(f|t)(_|$))/.test(n));"
+        },
+        {
+          "tipo": "-",
+          "linha": 613,
+          "texto": "  const noArco = (fc) => dosArcos(fc) || fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));"
+        },
+        {
+          "tipo": "+",
+          "linha": 613,
+          "texto": "  /* a fiada de faces junto à aba de um arco: tem uma aresta da linha da aba, que assenta nela e fica na chapa; o plástico vai até essa fiada */"
+        },
+        {
+          "tipo": "+",
+          "linha": 614,
+          "texto": "  const noArco = (fc) => fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));"
+        },
+        {
+          "tipo": "-",
+          "linha": 615,
+          "texto": "  const zArcoD = f.zD + f.dzArco; const zArcoDtras = f.zD - f.dzArco;"
+        },
+        {
+          "tipo": "-",
+          "linha": 616,
+          "texto": "  const zArcoT = f.zT + f.dzArco; const zArcoTtras = f.zT - f.dzArco;"
+        },
+        {
+          "tipo": "-",
+          "linha": 626,
+          "texto": "    const zmin = Math.min(...ps.map((p) => p[2])); const zmax = Math.max(...ps.map((p) => p[2]));"
+        },
+        {
+          "tipo": "-",
+          "linha": 631,
+          "texto": "    const faixa = `faixaLateral${xc > 0 ? 'Esquerda' : 'Direita'}`;"
+        },
+        {
+          "tipo": "-",
+          "linha": 632,
+          "texto": "    if (zmin >= zArcoD - tol) return faixa; // entre a quina da frente e o arco dianteiro"
+        },
+        {
+          "tipo": "-",
+          "linha": 633,
+          "texto": "    if (zmax <= zArcoDtras + tol && zmin >= zArcoT - tol) return faixa; // entre os arcos"
+        },
+        {
+          "tipo": "-",
+          "linha": 634,
+          "texto": "    if (zmax <= zArcoTtras + tol) return faixa; // entre o arco traseiro e a quina de trás"
+        },
+        {
+          "tipo": "-",
+          "linha": 635,
+          "texto": "    return 'chapa';"
+        },
+        {
+          "tipo": "+",
+          "linha": 629,
+          "texto": "    /* o que sobra abaixo do topo da faixa, fora dos para-choques, é a faixa: entre as quinas, dos dois lados dos arcos (dentro de cada arco não há face) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 630,
+          "texto": "    return `faixaLateral${xc > 0 ? 'Esquerda' : 'Direita'}`;"
+        },
+        {
+          "tipo": "-",
+          "linha": 806,
+          "texto": "       e deixaria sem coluna a volta da quina entre E e D (uma face de 160 mm numa quina de raio 160 sai com 20 mm de barriga a menos): ela"
+        },
+        {
+          "tipo": "-",
+          "linha": 807,
+          "texto": "       volta, até o topo do vidro, para a posição que tinha com a fresta a quina_fresta_ref, a mesma do teto da etapa 2. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 808,
+          "texto": "    const t = suave((an.y - T.porta_cabine_topo_y) / (f.topoVidro[1] - T.porta_cabine_topo_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 801,
+          "texto": "       longe de E: ela volta, até o topo do vão do para-brisa, para a posição que tinha com a fresta a quina_fresta_ref, a mesma do teto da"
+        },
+        {
+          "tipo": "+",
+          "linha": 802,
+          "texto": "       etapa 2; com ela parada em 2035 a curva do teto saía com calombo de 2,9 mm no ombro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 803,
+          "texto": "    const t = suave((an.y - T.porta_cabine_topo_y) / (T.para_brisa_topo_y - T.porta_cabine_topo_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 873,
+          "texto": "    /* Entre E e D a quina fica sem coluna quando a fresta recua (a face vira corda de um arco de raio 160 e sai com barriga a menos, uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 874,
+          "texto": "       mancha afundada na curvatura). A coluna p1 fica onde a D da etapa 2 ficava (a fresta a quina_fresta_ref), de modo que o encontro do teto"
+        },
+        {
+          "tipo": "+",
+          "linha": 875,
+          "texto": "       com a coluna do para-brisa tem a mesma malha de antes, e p2 em diante dividem o resto até a D nova, a passo_p uma da outra. Isso vale de"
+        },
+        {
+          "tipo": "+",
+          "linha": 876,
+          "texto": "       p_inicio_y até o ombro, que tem as mesmas colunas do teto, cuja cobertura conta as que vêm antes de D. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 877,
+          "texto": "    if (temD && an.horizontal && an.y >= T.p_inicio_y && an.y < T.ombro_y) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 878,
+          "texto": "      const sR = caminhoQuina(an);"
+        },
+        {
+          "tipo": "+",
+          "linha": 879,
+          "texto": "      if (sR > sE + 1 && sR < sD - 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 880,
+          "texto": "        g.push({ col: 'p1', s: sR });"
+        },
+        {
+          "tipo": "+",
+          "linha": 881,
+          "texto": "        const n = Math.floor((sD - sR) / T.passo_p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 882,
+          "texto": "        for (let k = 1; k < n; k += 1) g.push({ col: `p${k + 1}`, s: sR + ((sD - sR) * k) / n });"
+        },
+        {
+          "tipo": "+",
+          "linha": 883,
+          "texto": "      }"
+        },
+        {
+          "tipo": "+",
+          "linha": 884,
+          "texto": "    }"
+        },
+        {
+          "tipo": "-",
+          "linha": 924,
+          "texto": "    const gD = grupo.find((g) => g.col === 'D');"
+        },
+        {
+          "tipo": "-",
+          "linha": 925,
+          "texto": "    const xFimDaCoroa = Math.max(xQ3 + 1, gD ? xDoCaminho(gD.s) : sec.xS);"
+        },
+        {
+          "tipo": "+",
+          "linha": 931,
+          "texto": "    /* o abaulamento acaba onde a coluna D acabava com a fresta a quina_fresta_ref (a fresta da porta recuou, e o abaulamento do para-brisa não) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 932,
+          "texto": "    const xFimDaCoroa = Math.max(xQ3 + 1, an.y >= yDQuina - 1e-9 ? xDoCaminho(caminhoQuina(an)) : sec.xS);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az10.png",
+      "peca-frente-rasante-az100.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
