@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1687 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1688 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2639,6 +2639,7 @@
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
 - `guarda-referencial.mjs` — guarda-referencial.mjs — confere que toda peça do acervo usa o MESMO referencial e está apoiada acima do chão.
+- `guarda-temas-e-visoes.mjs` — guarda-temas-e-visoes.mjs — a prova num navegador de verdade dos gates 1 e 6 do plano das visões de conferência e da interface.
 - `rodar-guardas.mjs` — rodar-guardas.mjs — o gate `bancada:guardas`: as guardas que abrem a bancada num navegador só e, quando precisam, num servidor só.
 - `rodar-guardas.test.mjs` — rodar-guardas.test.mjs — o gate `bancada:guardas` roda cada guarda no processo dela, diz o nome e o veredito de cada uma, e a falha de uma não esconde as out…
 

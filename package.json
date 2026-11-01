@@ -113,6 +113,7 @@
     "descrever:gesto": "node tools/modelar/descrever-gesto.mjs",
     "guarda:gesto": "node tools/modelar/guardas/guarda-gesto.mjs",
     "guarda:edicao": "node tools/modelar/guardas/guarda-edicao-de-malha.mjs",
+    "guarda:temas": "node tools/modelar/guardas/guarda-temas-e-visoes.mjs",
     "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs",
     "nome:check": "node tools/arquitetura/nome-antigo.mjs",
     "contorno": "node tools/modelar/contorno-da-imagem.mjs",
