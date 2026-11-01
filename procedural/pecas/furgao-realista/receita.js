@@ -15,7 +15,7 @@
  * por isso a lataria da etapa 2 fica onde estava, a silhueta não muda e não há degrau que sobre para fora; a emenda entre as peças e
  * a chapa é uma aresta de faces das duas. Onde a chapa cede: na frente, da soleira ao topo do nariz (720) e da quina de raio 280
  * para a frente; atrás, da soleira ao alto do degrau de carga (580) e da quina de raio 100 para trás; na lateral, a fiada de baixo,
- * da soleira à base das portas (380), entre os dois arcos e daí até as quinas, de modo que a parte de baixo vira uma cinta
+ * da soleira (300) a 460, sobre a parte de baixo das portas, entre os dois arcos e daí até as quinas, de modo que a parte de baixo vira uma cinta
  * escura contínua, interrompida só pelos arcos. Ficam na chapa as faces em volta dos arcos, que a aba do arco usa, e as das frestas.
  * A entrada de ar (embaixo) e o lugar da placa da frente, e o lugar da placa de trás, são bolsos nas faces da parede de cada
  * para-choque, com paredes vivas. O piso fica por dentro, escondido: o fundo vem na etapa 7.
@@ -45,7 +45,7 @@
  * faces entre os dois: a porta vira um pedaço solto da mesma chapa, a fresta fica com a largura constante e a volta fechada, a borda
  * de cada lado dobra para dentro como numa porta de verdade, e a espessura fecha as duas bordas como as paredes da fresta. Sem a
  * dobra, a fresta plana só aparecia nas vistas onde o fundo se via por ela. A porta da cabine sobe a coluna do para-brisa sobre a
- * quina (a coluna `D`, que segue a linha da prancha a 30 mm do para-brisa), desce vertical até o arco e contorna o arco por trás.
+ * quina (a coluna `D`, que segue a linha da prancha a 122 mm do perfil do para-brisa, 100 mm atrás da ponta dobrada do vidro), desce vertical até o arco e contorna o arco por trás.
  */
 
 export const TABELA = {
@@ -127,7 +127,7 @@ export const TABELA = {
   aneis_do_ombro: 6,
 
   // frestas das portas (prancha): largura da fresta; base das portas laterais; o arco da porta da cabine 55 mm fora do arco da roda;
-  // a traseira da porta da cabine, o topo dela e a fresta da frente a 30 mm do para-brisa, medida na perpendicular à coluna; a coluna
+  // a traseira da porta da cabine, o topo dela e a fresta da frente a 122 mm do perfil do para-brisa (100 mm atrás da ponta do vidro), medida na perpendicular à coluna; a coluna
   // do meio e a porta de correr; a base das portas traseiras e o topo delas, no anel do ombro que fica no fim da traseira vertical
   fresta: 6,
   fresta_borda_largura: 5, // a tira de cada lado da fresta, em que a borda dobra para dentro
@@ -136,8 +136,10 @@ export const TABELA = {
   porta_base_y: 380,
   porta_folga_arco: 55,
   porta_cabine_tras_z: 550,
-  porta_cabine_topo_y: 2075,
-  porta_fresta_coluna: 30,
+  porta_cabine_topo_y: 2035,
+  porta_fresta_coluna: 122,
+  quina_fresta_ref: 30, // a linha que ordena as colunas da quina da frente, onde a fresta da porta corria antes de recuar (o para-brisa não mudou)
+  para_brisa_topo_y: 2075, // o anel do topo do vão do para-brisa, que era o do topo da porta antes de ela descer
   coluna_do_meio: 110,
   porta_correr_largura: 1300,
   porta_correr_topo_y: 2200,
@@ -155,7 +157,7 @@ export const TABELA = {
   // para-brisa, topo e moldura de trás; a frente é a quina da coluna), vidros das portas traseiras; e a aba dobrada de cada vão
   para_brisa_base_y: 1490, // a prancha desenha 1500 para o para-brisa e 1480 para o vidro da porta; com dois anéis a 20 mm um do outro a gaiola enche de anéis a 10 mm, que a aba do vão não dobra, e os dois ficam num anel só
   vidro_cabine_base_y: 1490,
-  vidro_cabine_topo_y: 2000,
+  vidro_cabine_topo_y: 1960,
   moldura_vidro_cabine: 70,
   vidro_traseiro_base_y: 1700,
   vidro_traseiro_topo_y: 2200,
@@ -205,7 +207,8 @@ export const TABELA = {
   // superfície de fora do plástico é a que a chapa tinha). A faixa lateral vai da soleira à base das portas, e os para-choques da
   // soleira ao topo do nariz (dianteiro) e ao degrau de carga (traseiro, no alto da rampa dele). O plástico é mais grosso que a chapa.
   plastico_espessura: 3,
-  faixa_topo_y: 380,
+  faixa_topo_y: 460,
+  folga_faixa_topo: 25, // nenhum anel de enchimento a menos disto do anel do topo da faixa, para as fiadas de cima dela não ficarem a 10 mm
   folga_selecao: 0.5, // tolerância, em mm, nas comparações de posição que escolhem as faces de cada peça
   // entrada de ar embaixo na frontal (prancha: x ±650, y 350 a 480) e lugares da placa (400 por 130), como bolsos no plástico, cada um
   // escolhido pelas faces da gaiola que o centro cai dentro do retângulo; o fundo do bolso recua da superfície
@@ -419,8 +422,11 @@ export function forma(T) {
   const zLinhaVidro = (y) => baseVidro[0] - (y - baseVidro[1]) / Math.tan(pb);
   const pePorta = [baseVidro[0] - T.porta_fresta_coluna * Math.sin(pb), baseVidro[1] - T.porta_fresta_coluna * Math.cos(pb)];
   const zFrestaFrente = (y) => (y <= pePorta[1] ? pePorta[0] : zLinhaVidro(y) - T.porta_fresta_coluna / Math.sin(pb));
+  /* A mesma linha a quina_fresta_ref atrás do perfil, que ordena as colunas q1 a q3 e E da quina da frente (e com elas as pontas do vão do para-brisa): ela ficou onde a fresta da porta corria na etapa 2, e a fresta da porta recuou sem levar o para-brisa. */
+  const pePortaQuina = [baseVidro[0] - T.quina_fresta_ref * Math.sin(pb), baseVidro[1] - T.quina_fresta_ref * Math.cos(pb)];
+  const zFrestaQuina = (y) => (y <= pePortaQuina[1] ? pePortaQuina[0] : zLinhaVidro(y) - T.quina_fresta_ref / Math.sin(pb));
   return {
-    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, anguloCapo,
+    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, pePortaQuina, zFrestaQuina, anguloCapo,
     perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente, zFrestaFrente, xBordaTraseira,
     zF: (y) => uNaAltura(perfilFrente, y),
     zR: (y) => uNaAltura(perfilTras, y),
@@ -436,13 +442,13 @@ export function forma(T) {
 function aneisHorizontais(T, f) {
   const c = T.cintura_y; const h = T.cintura_meia_largura;
   const chaves = [
-    ['soleira', f.ys], ['portaBase', T.porta_base_y], ['degrauTras', T.degrau_tras_y - T.degrau_tras_rampa / 2],
+    ['soleira', f.ys], ['portaBase', T.porta_base_y], ['faixaTopo', T.faixa_topo_y], ['degrauTras', T.degrau_tras_y - T.degrau_tras_rampa / 2],
     ['degrauTrasTopo', T.degrau_tras_y + T.degrau_tras_rampa / 2], ['portaTraseiraBase', T.porta_traseira_base_y],
     ['parachoque', T.parachoque_topo_y], ['degrauFrente', T.degrau_frente_y], ['boca', f.boca[1]],
     ['cinturaBaixo', c - h], ['cintura', c], ['cinturaCima', c + h],
     ['paraBrisaBase', T.para_brisa_base_y], ['vidroCabineBase', T.vidro_cabine_base_y],
     ['retaLateral', T.lateral_reta_ate_y], ['vidroTraseiroBase', T.vidro_traseiro_base_y], ['vidroCabineTopo', T.vidro_cabine_topo_y],
-    ['portaCabineTopo', T.porta_cabine_topo_y], ['topoVidro', f.topoVidro[1]], ['portaCorrerTopo', T.porta_correr_topo_y],
+    ['portaCabineTopo', T.porta_cabine_topo_y], ['paraBrisaTopo', T.para_brisa_topo_y], ['topoVidro', f.topoVidro[1]], ['portaCorrerTopo', T.porta_correr_topo_y],
     ['ombro', T.ombro_y],
   ];
   const nomeDe = new Map();
@@ -468,7 +474,7 @@ function aneisHorizontais(T, f) {
   }
   const foraDasFaixas = (y) => { for (const [a, b] of faixas) if (y > a && y < b) return y - a < b - y ? a : b; return y; };
   const alturas = [...fixas];
-  const aceitar = (y) => { const v = foraDasFaixas(y); if (alturas.every((a) => Math.abs(a - v) >= T.folga_entre_aneis)) alturas.push(v); };
+  const aceitar = (y) => { const v = foraDasFaixas(y); if (alturas.every((a) => Math.abs(a - v) >= T.folga_entre_aneis) && Math.abs(v - T.faixa_topo_y) >= T.folga_faixa_topo) alturas.push(v); };
   for (const y of candidatos.filter((v) => v > f.ys && v < T.ombro_y).sort((a, b) => a - b)) aceitar(y);
   alturas.sort((a, b) => a - b);
   for (let k = alturas.length - 2; k >= 0; k -= 1) {
@@ -604,9 +610,7 @@ function separarCorpoDeBaixo(T, f, { faces, vincos, cantos, posicoes, abasDosArc
   abasDosArcos.forEach((a) => a.pontos.forEach((n, k) => { if (k + 1 < a.pontos.length) arestasDaAba.add(chv(n, a.pontos[k + 1])); }));
   /* a face em volta de um arco: tem um ponto de arco que não é o canto onde o arco encontra a soleira */
   const dosArcos = (fc) => fc.some((n) => /arco[DT]_(?!(f|t)(_|$))/.test(n));
-  /* a tira da fresta de uma porta: tem o ponto da borda e o de dentro do mesmo ponto da gaiola */
-  const dasFrestas = (fc) => fc.some((n) => fc.includes(`${n}_corpo`));
-  const noArco = (fc) => dosArcos(fc) || dasFrestas(fc) || fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));
+  const noArco = (fc) => dosArcos(fc) || fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));
   const P = (n) => posicoes.get(n);
   const zArcoD = f.zD + f.dzArco; const zArcoDtras = f.zD - f.dzArco;
   const zArcoT = f.zT + f.dzArco; const zArcoTtras = f.zT - f.dzArco;
@@ -754,9 +758,9 @@ export function derivar(T) {
     const s = an.sec; const xFim = s.xS - s.rF;
     let fr;
     if (!an.horizontal) fr = fracTeto;
-    else if (an.y <= T.porta_cabine_topo_y) fr = fracUniforme;
+    else if (an.y <= T.para_brisa_topo_y) fr = fracUniforme;
     else {
-      const t = suave((an.y - T.porta_cabine_topo_y) / (T.ombro_y - T.porta_cabine_topo_y));
+      const t = suave((an.y - T.para_brisa_topo_y) / (T.ombro_y - T.para_brisa_topo_y));
       fr = fracUniforme.map((u, k) => lerp(u, fracTeto[k], t));
     }
     return fr.map((u) => u * xFim);
@@ -792,9 +796,17 @@ export function derivar(T) {
   const secTopoPorta = secaoHorizontal(T, f, T.porta_cabine_topo_y);
   const aTopoPorta = caminhoDeZ(secTopoPorta, f.zFrestaFrente(T.porta_cabine_topo_y)) / secTopoPorta.rF;
   const yD = f.rPneu + Math.sqrt(rArcoPorta ** 2 - (f.pePorta[0] - f.zD) ** 2);
+  const yDQuina = f.rPneu + Math.sqrt(rArcoPorta ** 2 - (f.pePortaQuina[0] - f.zD) ** 2);
+  const secTopoQuina = secaoHorizontal(T, f, T.para_brisa_topo_y);
+  const aTopoQuina = caminhoDeZ(secTopoQuina, f.zFrestaQuina(T.para_brisa_topo_y)) / secTopoQuina.rF;
+  const caminhoQuina = (an) => (an.horizontal && an.y <= T.para_brisa_topo_y ? caminhoDeZ(an.sec, f.zFrestaQuina(an.y)) : an.sec.rF * aTopoQuina);
   const caminhoD = (an) => {
     if (an.horizontal && an.y <= T.porta_cabine_topo_y) return caminhoDeZ(an.sec, f.zFrestaFrente(an.y));
-    return an.sec.rF * aTopoPorta;
+    /* Acima do topo da porta a coluna D não tem mais a fresta a seguir. Com a fresta a 122 mm do perfil ela fica quase no fim da quina,
+       e deixaria sem coluna a volta da quina entre E e D (uma face de 160 mm numa quina de raio 160 sai com 20 mm de barriga a menos): ela
+       volta, até o topo do vidro, para a posição que tinha com a fresta a quina_fresta_ref, a mesma do teto da etapa 2. */
+    const t = suave((an.y - T.porta_cabine_topo_y) / (f.topoVidro[1] - T.porta_cabine_topo_y));
+    return lerp(an.sec.rF * aTopoPorta, caminhoQuina(an), t);
   };
 
   /* os arcos: os ângulos dos pontos do arco da porta (raio rArcoPorta), comuns a todos os anéis que o cortam */
@@ -836,7 +848,7 @@ export function derivar(T) {
     { col: 'portaCorrerTras', z: zCorrerTras }, { col: 'portaCorrerFrente', z: zCorrerFrente }, { col: 'portaCabineTras', z: zCabTras },
     { col: 'vidroCabineTras', z: zVidroCabTras },
   ];
-  const quebras = [zFimLado, zCorrerTras, zCorrerFrente, zCabTras, zVidroCabTras, f.pePorta[0], zComecoLado];
+  const quebras = [zFimLado, zCorrerTras, zCorrerFrente, zCabTras, zVidroCabTras, f.pePortaQuina[0], zComecoLado];
   const enchimento = [];
   for (let k = 0; k + 1 < quebras.length; k += 1) entre(quebras[k], quebras[k + 1], T.passo_lado).forEach((z) => enchimento.push({ col: `l${Math.round(z)}`, z }));
   const colunasLado = [...ancoras, ...enchimento].sort((a, b) => b.z - a.z);
@@ -860,7 +872,7 @@ export function derivar(T) {
     const temD = an.y >= yD - 1e-9;
     const sD = temD ? caminhoD(an) : null;
     const temB = temD && (sD - sq) <= T.inicio_colunas_porta;
-    const sE = temD ? Math.min(sq, sD - T.recuo_quina_porta) : sq;
+    const sE = an.y >= yDQuina - 1e-9 ? Math.min(sq, caminhoQuina(an) - T.recuo_quina_porta) : sq;
     const g = [1, 2, 3].map((k) => ({ col: `q${k}`, s: (k / 4) * sE }));
     g.push({ col: 'E', s: sE });
     if (temD) g.push({ col: 'D', s: sD });
@@ -898,8 +910,8 @@ export function derivar(T) {
   const flechaEm = (y) => {
     if (y <= f.boca[1]) return 0;
     if (y <= T.para_brisa_base_y) return T.flecha_capo_base * suave((y - f.boca[1]) / (T.para_brisa_base_y - f.boca[1]));
-    if (y <= T.porta_cabine_topo_y) return lerp(T.flecha_capo_base, T.flecha_vidro_topo, (y - T.para_brisa_base_y) / (T.porta_cabine_topo_y - T.para_brisa_base_y));
-    return T.flecha_vidro_topo * (1 - suave((y - T.porta_cabine_topo_y) / (T.altura - T.porta_cabine_topo_y)));
+    if (y <= T.para_brisa_topo_y) return lerp(T.flecha_capo_base, T.flecha_vidro_topo, (y - T.para_brisa_base_y) / (T.para_brisa_topo_y - T.para_brisa_base_y));
+    return T.flecha_vidro_topo * (1 - suave((y - T.para_brisa_topo_y) / (T.altura - T.para_brisa_topo_y)));
   };
   const listas = [];
   aneis.forEach((an) => {
@@ -1051,7 +1063,7 @@ export function derivar(T) {
     return comuns[Math.floor(comuns.length / 2)];
   })();
   const cantosDosVaos = [
-    { rs: aneisEntre(T.para_brisa_base_y, T.porta_cabine_topo_y), cMeio: 'f0', cantos: ['q3'] },
+    { rs: aneisEntre(T.para_brisa_base_y, T.para_brisa_topo_y), cMeio: 'f0', cantos: ['q3'] },
     { rs: aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y), cMeio: meioDoVidroDaCabine, cantos: ['S0', 'vidroCabineTras'] },
     { rs: aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y), cMeio: meioDoVidroTraseiro, cantos: ['r1', `r${iForaTraseiro}`] },
   ];
@@ -1241,7 +1253,7 @@ export function derivar(T) {
   };
   const vidros = [];
   {
-    const rs = aneisEntre(T.para_brisa_base_y, T.porta_cabine_topo_y);
+    const rs = aneisEntre(T.para_brisa_base_y, T.para_brisa_topo_y);
     const metade = meiaVolta(rs, 'f0', 'f0', 'q3', 'e');
     vidros.push({ nome: 'paraBrisa', linha: 'abaVaoParaBrisa', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });
   }
@@ -1527,9 +1539,9 @@ export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
   ...ABAS_DOS_ARCOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba do arco assenta na lateral em volta do arco da roda e entra meia espessura na chapa, que é o contato dela' })),
   ...['Esquerda', 'Direita'].flatMap((lado) => [
-    { par: ['carroceria', `faixaLateral${lado}`], motivo: 'a faixa é feita das faces da gaiola que a chapa cedeu e tem com ela uma aresta de faces em comum, na base das portas e nos lados da fiada: a chapa termina onde a faixa começa, sem degrau' },
-    { par: [`faixaLateral${lado}`, 'parachoqueDianteiro'], motivo: 'a faixa continua pela lateral até a quina da frente, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 380, e o corpo de baixo fica uma cinta só' },
-    { par: [`faixaLateral${lado}`, 'parachoqueTraseiro'], motivo: 'a faixa continua pela lateral até a quina de trás, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 380' },
+    { par: ['carroceria', `faixaLateral${lado}`], motivo: 'a faixa é feita das faces da gaiola que a chapa cedeu e tem com ela uma aresta de faces em comum, no topo dela em 460 e nos lados das frestas das portas: a chapa termina onde a faixa começa, sem degrau' },
+    { par: [`faixaLateral${lado}`, 'parachoqueDianteiro'], motivo: 'a faixa continua pela lateral até a quina da frente, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 460, e o corpo de baixo fica uma cinta só' },
+    { par: [`faixaLateral${lado}`, 'parachoqueTraseiro'], motivo: 'a faixa continua pela lateral até a quina de trás, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 460' },
   ]),
   ...['Dianteiro', 'Traseiro'].map((eixo) => ({ par: ['carroceria', `parachoque${eixo}`], motivo: 'o para-choque é feito das faces da gaiola que a chapa cedeu e tem com ela a aresta de faces do topo (o nariz em 720, o degrau de carga em 580) e a das quinas, sem degrau para fora' })),
   ...[['abaArcoDianteiroEsquerdo', 'Esquerda'], ['abaArcoDianteiroDireito', 'Direita'], ['abaArcoTraseiroEsquerdo', 'Esquerda'], ['abaArcoTraseiroDireito', 'Direita']].map(([aba, lado]) => ({
@@ -1544,10 +1556,13 @@ export const ILHAS = RODAS.map((contem) => ({
 
 /* Os vãos da chapa: os dos vidros com a aba dobrada como moldura, e os das portas, que a própria porta ocupa com a fresta em volta. */
 export function vaosDeclarados(T) {
-  const { vidros, portas, bordaDeBaixo } = derivar(T);
+  const { vidros, portas, bordaDeBaixo, passo } = derivar(T);
+  const naChapa = new Set(passo.vertices);
   const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] }));
   for (const p of portas) {
     if (p.nome.startsWith('portaTraseira')) continue;
+    /* a faixa lateral leva a parte de baixo das portas da lateral, e o vão delas deixa de ser uma volta fechada da chapa: ele se junta à borda de baixo */
+    if (!p.volta.every((n) => naChapa.has(n))) continue;
     vaos.push({ nome: p.nome, borda: [...p.volta, p.volta[0]], semMoldura: { motivo: 'é o vão da porta na carroceria; a própria porta o ocupa, com a fresta de largura constante em volta, e não leva moldura' } });
   }
   /* as duas portas traseiras ocupam um vão só, cuja borda é a volta das duas sem a fresta do meio */
@@ -1623,17 +1638,17 @@ const receita = {
       })),
       ...['Esquerda', 'Direita'].map((lado) => ({
         nome: `faixaLateral${lado}`,
-        forma: `faixa lateral ${lado.toLowerCase()} em plástico escuro de 3 mm, rente à lataria, de 80 mm (da soleira em 300 à base das portas em 380), entre os arcos e até cada para-choque`,
+        forma: `faixa lateral ${lado.toLowerCase()} em plástico escuro de 3 mm, rente à lataria, de 160 mm (de 300 a 460, sobre a base das portas, que a fresta atravessa até 380), entre os arcos e até cada para-choque`,
         tecnica: 'subdivisao das faces da gaiola que a chapa cedeu, com a superfície de fora que ela tinha, em plástico mais grosso',
       })),
       {
         nome: 'parachoqueDianteiro',
-        forma: 'para-choque dianteiro em plástico escuro de 3 mm, da soleira a 720, envolvendo as quinas e emendando com a faixa; entrada de ar embaixo (bolso de 1296 por 118, fundo 25) e lugar da placa acima (432 por 132, fundo 8)',
+        forma: 'para-choque dianteiro em plástico escuro de 3 mm, da soleira a 720, envolvendo as quinas e emendando com a faixa; entrada de ar embaixo (bolso de 1296 por 110, fundo 25) e lugar da placa acima (432 por 137, fundo 8)',
         tecnica: 'subdivisao das faces da frente e das quinas que a chapa cedeu, com bolsos de paredes vivas',
       },
       {
         nome: 'parachoqueTraseiro',
-        forma: 'para-choque traseiro em plástico escuro de 3 mm, da soleira ao degrau de carga em 580 (rampa de 20 por 30), envolvendo as quinas e emendando com a faixa; lugar da placa (bolso de 473 por 135, fundo 8)',
+        forma: 'para-choque traseiro em plástico escuro de 3 mm, da soleira ao degrau de carga em 580 (rampa de 20 por 30), envolvendo as quinas e emendando com a faixa; lugar da placa (bolso de 473 por 130, fundo 8)',
         tecnica: 'subdivisao das faces da traseira e das quinas que a chapa cedeu, com bolso de paredes vivas',
       },
       ...RODAS.map((nome) => ({
@@ -1659,7 +1674,8 @@ const receita = {
       'o lado esquerdo e o direito diferem fora da porta de correr',
       'aparece marca, logotipo ou nome de fabricante',
       'a faixa lateral ou um para-choque sobra para fora da lataria (degrau na emenda com a chapa, ou a silhueta passa da prancha), ou não é do plástico escuro',
-      'o corpo de baixo não vira uma cinta escura contínua: a faixa não emenda com o para-choque na lateral, ou deixa pedaço de chapa azul entre eles abaixo da base das portas',
+      'o corpo de baixo não vira uma cinta escura contínua: a faixa não emenda com o para-choque na lateral, ou deixa pedaço de chapa azul entre eles abaixo de 460, ou a faixa não atravessa as portas até 460 (cada porta com o seu trecho)',
+      'a fresta da frente da porta da cabine não corre 122 mm atrás do perfil do para-brisa (100 atrás da ponta do vidro), ou o topo dela não deixa 75 mm de faixa de teto acima, em 2035',
       'falta a entrada de ar ou o lugar da placa no para-choque dianteiro, ou o lugar da placa no traseiro, ou o para-choque não envolve as quinas',
       'a faixa ou um para-choque toca ou atravessa o arco da roda, a aba do arco ou o pneu',
     ],
