@@ -1,0 +1,586 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 7,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "abaVaoParaBrisa",
+        "tipo": "uniao",
+        "onde": "canto superior, em z≈1320 e y≈2110",
+        "sentido": "atravessando",
+        "evidencia": "direita e esquerda orto: dente fora da silhueta do teto; peça isolada com aba subindo cerca de 100 mm; ponta no lado az30 não confirmada"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "borda do vão da janela da cabine, soleira e lado traseiro",
+        "sentido": "segmentado",
+        "evidencia": "lado az30 e az120, cerca de 350-560 x 355-470: borda ondulada e serrilhada em vez de canto contínuo"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "encontro do teto com a coluna A, cantos de cima do para-brisa",
+        "sentido": "segmentado",
+        "evidencia": "curvatura frente cerca de 60-95 x 170-260 e 705-735 x 170-250: mancha azul entre vermelhos, dos dois lados (afundamento)"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro",
+        "sentido": "segmentado",
+        "evidencia": "curvatura lado cerca de 345-375 x 520-590 e tresquartos cerca de 460-500 x 765-800: ocre dentado em estrela"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "quina do capô com a coluna, lado +x",
+        "sentido": "segmentado",
+        "evidencia": "frente az100, cerca de 1015-1080 x 590-720: borda em degraus de escada"
+      },
+      {
+        "parte": "faixaLateralDireita",
+        "tipo": "comprimento",
+        "onde": "pontas junto aos arcos, abaixo de 460",
+        "sentido": "menor",
+        "evidencia": "esquerda-orto, mesmos pedaços azuis ao lado dos arcos; faixa isolada em trechos que não chegam à borda do arco"
+      },
+      {
+        "parte": "faixaLateralEsquerda",
+        "tipo": "comprimento",
+        "onde": "pontas junto aos arcos, abaixo de 460",
+        "sentido": "menor",
+        "evidencia": "direita-orto, cerca de 331-345 x 803-815 e 646-662: sobra chapa azul entre faixa e arco; base da carroceria com dentes"
+      }
+    ],
+    "observacao": "Forma geral e medidas muito próximas da prancha; faltam acabamento de borda e a emenda da faixa com os arcos, e as pontas rasantes acima do teto não foram confirmadas na ortográfica."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "faixaLateralEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "faixaLateralDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueTraseiro",
+      "confere": false,
+      "observacao": "o alinhamento pede degrau plano de carga em cima; o alto é a rampa de 20 por 30 mm da chapa aceita, que a gaiola de anéis horizontais não faz plana"
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a receita liga quina da frente, topo do vão do para-brisa e fresta da porta numa linha só: recuar a fresta moveu a ponta do vidro, e foi preciso separá-las por parâmetro novo",
+    "a gaiola não tem operação de dividir a chapa e o plástico por faces; ao subir a faixa a 460 foi preciso refazer a seleção, os vãos e as bordas à mão na receita",
+    "um anel de enchimento a 9 mm do novo anel de 460 gerou uma fiada de 10 mm; precisou do parâmetro folga_faixa_topo",
+    "o descrever leva uns 8 minutos por rodada e o pacote de vistas, mais uns 10; os dois falham só no fim quando o PLANO passa de 240 caracteres",
+    "o modo automático negou um pkill por nome e um node encadeado por considerá-los fora do worktree; segui por PID e comandos simples"
+  ],
+  "notaDePassagem": "A coluna D acima do vidro volta à posição antiga, senão a quina fica sem coluna entre E e D. Quina e topo do para-brisa têm parâmetros próprios para o vidro não mudar. A faixa a 460 inclui a tira da fresta.",
+  "receita": {
+    "sha256": "sha256:7dff348cbecd2276cb524763006d1747c0d29c4afa5b8a5f1479277099579a76",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 31,
+      "acrescentadas": 47,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 18,
+          "texto": " * da soleira à base das portas (380), entre os dois arcos e daí até as quinas, de modo que a parte de baixo vira uma cinta"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * da soleira (300) a 460, sobre a parte de baixo das portas, entre os dois arcos e daí até as quinas, de modo que a parte de baixo vira uma cinta"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": " * quina (a coluna `D`, que segue a linha da prancha a 30 mm do para-brisa), desce vertical até o arco e contorna o arco por trás."
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": " * quina (a coluna `D`, que segue a linha da prancha a 122 mm do perfil do para-brisa, 100 mm atrás da ponta dobrada do vidro), desce vertical até o arco e contorna o arco por trás."
+        },
+        {
+          "tipo": "-",
+          "linha": 130,
+          "texto": "  // a traseira da porta da cabine, o topo dela e a fresta da frente a 30 mm do para-brisa, medida na perpendicular à coluna; a coluna"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  // a traseira da porta da cabine, o topo dela e a fresta da frente a 122 mm do perfil do para-brisa (100 mm atrás da ponta do vidro), medida na perpendicular à coluna; a coluna"
+        },
+        {
+          "tipo": "-",
+          "linha": 139,
+          "texto": "  porta_cabine_topo_y: 2075,"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "  porta_fresta_coluna: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  porta_cabine_topo_y: 2035,"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  porta_fresta_coluna: 122,"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  quina_fresta_ref: 30, // a linha que ordena as colunas da quina da frente, onde a fresta da porta corria antes de recuar (o para-brisa não mudou)"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  para_brisa_topo_y: 2075, // o anel do topo do vão do para-brisa, que era o do topo da porta antes de ela descer"
+        },
+        {
+          "tipo": "-",
+          "linha": 158,
+          "texto": "  vidro_cabine_topo_y: 2000,"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  vidro_cabine_topo_y: 1960,"
+        },
+        {
+          "tipo": "-",
+          "linha": 208,
+          "texto": "  faixa_topo_y: 380,"
+        },
+        {
+          "tipo": "+",
+          "linha": 210,
+          "texto": "  faixa_topo_y: 460,"
+        },
+        {
+          "tipo": "+",
+          "linha": 211,
+          "texto": "  folga_faixa_topo: 25, // nenhum anel de enchimento a menos disto do anel do topo da faixa, para as fiadas de cima dela não ficarem a 10 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 425,
+          "texto": "  /* A mesma linha a quina_fresta_ref atrás do perfil, que ordena as colunas q1 a q3 e E da quina da frente (e com elas as pontas do vão do para-brisa): ela ficou onde a fresta da porta corria na etapa 2, e a fresta da porta recuou sem levar o para-brisa. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 426,
+          "texto": "  const pePortaQuina = [baseVidro[0] - T.quina_fresta_ref * Math.sin(pb), baseVidro[1] - T.quina_fresta_ref * Math.cos(pb)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 427,
+          "texto": "  const zFrestaQuina = (y) => (y <= pePortaQuina[1] ? pePortaQuina[0] : zLinhaVidro(y) - T.quina_fresta_ref / Math.sin(pb));"
+        },
+        {
+          "tipo": "-",
+          "linha": 423,
+          "texto": "    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, anguloCapo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 429,
+          "texto": "    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, pePortaQuina, zFrestaQuina, anguloCapo,"
+        },
+        {
+          "tipo": "-",
+          "linha": 439,
+          "texto": "    ['soleira', f.ys], ['portaBase', T.porta_base_y], ['degrauTras', T.degrau_tras_y - T.degrau_tras_rampa / 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 445,
+          "texto": "    ['soleira', f.ys], ['portaBase', T.porta_base_y], ['faixaTopo', T.faixa_topo_y], ['degrauTras', T.degrau_tras_y - T.degrau_tras_rampa / 2],"
+        },
+        {
+          "tipo": "-",
+          "linha": 445,
+          "texto": "    ['portaCabineTopo', T.porta_cabine_topo_y], ['topoVidro', f.topoVidro[1]], ['portaCorrerTopo', T.porta_correr_topo_y],"
+        },
+        {
+          "tipo": "+",
+          "linha": 451,
+          "texto": "    ['portaCabineTopo', T.porta_cabine_topo_y], ['paraBrisaTopo', T.para_brisa_topo_y], ['topoVidro', f.topoVidro[1]], ['portaCorrerTopo', T.porta_correr_topo_y],"
+        },
+        {
+          "tipo": "-",
+          "linha": 471,
+          "texto": "  const aceitar = (y) => { const v = foraDasFaixas(y); if (alturas.every((a) => Math.abs(a - v) >= T.folga_entre_aneis)) alturas.push(v); };"
+        },
+        {
+          "tipo": "+",
+          "linha": 477,
+          "texto": "  const aceitar = (y) => { const v = foraDasFaixas(y); if (alturas.every((a) => Math.abs(a - v) >= T.folga_entre_aneis) && Math.abs(v - T.faixa_topo_y) >= T.folga_faixa_topo) alturas.push(v); };"
+        },
+        {
+          "tipo": "-",
+          "linha": 607,
+          "texto": "  /* a tira da fresta de uma porta: tem o ponto da borda e o de dentro do mesmo ponto da gaiola */"
+        },
+        {
+          "tipo": "-",
+          "linha": 608,
+          "texto": "  const dasFrestas = (fc) => fc.some((n) => fc.includes(`${n}_corpo`));"
+        },
+        {
+          "tipo": "-",
+          "linha": 609,
+          "texto": "  const noArco = (fc) => dosArcos(fc) || dasFrestas(fc) || fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));"
+        },
+        {
+          "tipo": "+",
+          "linha": 613,
+          "texto": "  const noArco = (fc) => dosArcos(fc) || fc.some((n, k) => arestasDaAba.has(chv(n, fc[(k + 1) % fc.length])));"
+        },
+        {
+          "tipo": "-",
+          "linha": 757,
+          "texto": "    else if (an.y <= T.porta_cabine_topo_y) fr = fracUniforme;"
+        },
+        {
+          "tipo": "+",
+          "linha": 761,
+          "texto": "    else if (an.y <= T.para_brisa_topo_y) fr = fracUniforme;"
+        },
+        {
+          "tipo": "-",
+          "linha": 759,
+          "texto": "      const t = suave((an.y - T.porta_cabine_topo_y) / (T.ombro_y - T.porta_cabine_topo_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 763,
+          "texto": "      const t = suave((an.y - T.para_brisa_topo_y) / (T.ombro_y - T.para_brisa_topo_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 799,
+          "texto": "  const yDQuina = f.rPneu + Math.sqrt(rArcoPorta ** 2 - (f.pePortaQuina[0] - f.zD) ** 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 800,
+          "texto": "  const secTopoQuina = secaoHorizontal(T, f, T.para_brisa_topo_y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 801,
+          "texto": "  const aTopoQuina = caminhoDeZ(secTopoQuina, f.zFrestaQuina(T.para_brisa_topo_y)) / secTopoQuina.rF;"
+        },
+        {
+          "tipo": "+",
+          "linha": 802,
+          "texto": "  const caminhoQuina = (an) => (an.horizontal && an.y <= T.para_brisa_topo_y ? caminhoDeZ(an.sec, f.zFrestaQuina(an.y)) : an.sec.rF * aTopoQuina);"
+        },
+        {
+          "tipo": "-",
+          "linha": 797,
+          "texto": "    return an.sec.rF * aTopoPorta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 805,
+          "texto": "    /* Acima do topo da porta a coluna D não tem mais a fresta a seguir. Com a fresta a 122 mm do perfil ela fica quase no fim da quina,"
+        },
+        {
+          "tipo": "+",
+          "linha": 806,
+          "texto": "       e deixaria sem coluna a volta da quina entre E e D (uma face de 160 mm numa quina de raio 160 sai com 20 mm de barriga a menos): ela"
+        },
+        {
+          "tipo": "+",
+          "linha": 807,
+          "texto": "       volta, até o topo do vidro, para a posição que tinha com a fresta a quina_fresta_ref, a mesma do teto da etapa 2. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 808,
+          "texto": "    const t = suave((an.y - T.porta_cabine_topo_y) / (f.topoVidro[1] - T.porta_cabine_topo_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 809,
+          "texto": "    return lerp(an.sec.rF * aTopoPorta, caminhoQuina(an), t);"
+        },
+        {
+          "tipo": "-",
+          "linha": 839,
+          "texto": "  const quebras = [zFimLado, zCorrerTras, zCorrerFrente, zCabTras, zVidroCabTras, f.pePorta[0], zComecoLado];"
+        },
+        {
+          "tipo": "+",
+          "linha": 851,
+          "texto": "  const quebras = [zFimLado, zCorrerTras, zCorrerFrente, zCabTras, zVidroCabTras, f.pePortaQuina[0], zComecoLado];"
+        },
+        {
+          "tipo": "-",
+          "linha": 863,
+          "texto": "    const sE = temD ? Math.min(sq, sD - T.recuo_quina_porta) : sq;"
+        },
+        {
+          "tipo": "+",
+          "linha": 875,
+          "texto": "    const sE = an.y >= yDQuina - 1e-9 ? Math.min(sq, caminhoQuina(an) - T.recuo_quina_porta) : sq;"
+        },
+        {
+          "tipo": "-",
+          "linha": 901,
+          "texto": "    if (y <= T.porta_cabine_topo_y) return lerp(T.flecha_capo_base, T.flecha_vidro_topo, (y - T.para_brisa_base_y) / (T.porta_cabine_topo_y - T.para_brisa_base_y));"
+        },
+        {
+          "tipo": "-",
+          "linha": 902,
+          "texto": "    return T.flecha_vidro_topo * (1 - suave((y - T.porta_cabine_topo_y) / (T.altura - T.porta_cabine_topo_y)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 913,
+          "texto": "    if (y <= T.para_brisa_topo_y) return lerp(T.flecha_capo_base, T.flecha_vidro_topo, (y - T.para_brisa_base_y) / (T.para_brisa_topo_y - T.para_brisa_base_y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 914,
+          "texto": "    return T.flecha_vidro_topo * (1 - suave((y - T.para_brisa_topo_y) / (T.altura - T.para_brisa_topo_y)));"
+        },
+        {
+          "tipo": "-",
+          "linha": 1054,
+          "texto": "    { rs: aneisEntre(T.para_brisa_base_y, T.porta_cabine_topo_y), cMeio: 'f0', cantos: ['q3'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1066,
+          "texto": "    { rs: aneisEntre(T.para_brisa_base_y, T.para_brisa_topo_y), cMeio: 'f0', cantos: ['q3'] },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1244,
+          "texto": "    const rs = aneisEntre(T.para_brisa_base_y, T.porta_cabine_topo_y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1256,
+          "texto": "    const rs = aneisEntre(T.para_brisa_base_y, T.para_brisa_topo_y);"
+        },
+        {
+          "tipo": "-",
+          "linha": 1530,
+          "texto": "    { par: ['carroceria', `faixaLateral${lado}`], motivo: 'a faixa é feita das faces da gaiola que a chapa cedeu e tem com ela uma aresta de faces em comum, na base das portas e nos lados da fiada: a chapa termina onde a faixa começa, sem degrau' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1531,
+          "texto": "    { par: [`faixaLateral${lado}`, 'parachoqueDianteiro'], motivo: 'a faixa continua pela lateral até a quina da frente, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 380, e o corpo de baixo fica uma cinta só' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1532,
+          "texto": "    { par: [`faixaLateral${lado}`, 'parachoqueTraseiro'], motivo: 'a faixa continua pela lateral até a quina de trás, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 380' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1542,
+          "texto": "    { par: ['carroceria', `faixaLateral${lado}`], motivo: 'a faixa é feita das faces da gaiola que a chapa cedeu e tem com ela uma aresta de faces em comum, no topo dela em 460 e nos lados das frestas das portas: a chapa termina onde a faixa começa, sem degrau' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1543,
+          "texto": "    { par: [`faixaLateral${lado}`, 'parachoqueDianteiro'], motivo: 'a faixa continua pela lateral até a quina da frente, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 460, e o corpo de baixo fica uma cinta só' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1544,
+          "texto": "    { par: [`faixaLateral${lado}`, 'parachoqueTraseiro'], motivo: 'a faixa continua pela lateral até a quina de trás, onde o para-choque envolve a quina: as duas peças dividem a aresta de faces da quina, de 300 a 460' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1547,
+          "texto": "  const { vidros, portas, bordaDeBaixo } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1559,
+          "texto": "  const { vidros, portas, bordaDeBaixo, passo } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1560,
+          "texto": "  const naChapa = new Set(passo.vertices);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1564,
+          "texto": "    /* a faixa lateral leva a parte de baixo das portas da lateral, e o vão delas deixa de ser uma volta fechada da chapa: ele se junta à borda de baixo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1565,
+          "texto": "    if (!p.volta.every((n) => naChapa.has(n))) continue;"
+        },
+        {
+          "tipo": "-",
+          "linha": 1626,
+          "texto": "        forma: `faixa lateral ${lado.toLowerCase()} em plástico escuro de 3 mm, rente à lataria, de 80 mm (da soleira em 300 à base das portas em 380), entre os arcos e até cada para-choque`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 1641,
+          "texto": "        forma: `faixa lateral ${lado.toLowerCase()} em plástico escuro de 3 mm, rente à lataria, de 160 mm (de 300 a 460, sobre a base das portas, que a fresta atravessa até 380), entre os arcos e até cada para-choque`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 1631,
+          "texto": "        forma: 'para-choque dianteiro em plástico escuro de 3 mm, da soleira a 720, envolvendo as quinas e emendando com a faixa; entrada de ar embaixo (bolso de 1296 por 118, fundo 25) e lugar da placa acima (432 por 132, fundo 8)',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1646,
+          "texto": "        forma: 'para-choque dianteiro em plástico escuro de 3 mm, da soleira a 720, envolvendo as quinas e emendando com a faixa; entrada de ar embaixo (bolso de 1296 por 110, fundo 25) e lugar da placa acima (432 por 137, fundo 8)',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1636,
+          "texto": "        forma: 'para-choque traseiro em plástico escuro de 3 mm, da soleira ao degrau de carga em 580 (rampa de 20 por 30), envolvendo as quinas e emendando com a faixa; lugar da placa (bolso de 473 por 135, fundo 8)',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1651,
+          "texto": "        forma: 'para-choque traseiro em plástico escuro de 3 mm, da soleira ao degrau de carga em 580 (rampa de 20 por 30), envolvendo as quinas e emendando com a faixa; lugar da placa (bolso de 473 por 130, fundo 8)',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1662,
+          "texto": "      'o corpo de baixo não vira uma cinta escura contínua: a faixa não emenda com o para-choque na lateral, ou deixa pedaço de chapa azul entre eles abaixo da base das portas',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1677,
+          "texto": "      'o corpo de baixo não vira uma cinta escura contínua: a faixa não emenda com o para-choque na lateral, ou deixa pedaço de chapa azul entre eles abaixo de 460, ou a faixa não atravessa as portas até 460 (cada porta com o seu trecho)',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1678,
+          "texto": "      'a fresta da frente da porta da cabine não corre 122 mm atrás do perfil do para-brisa (100 atrás da ponta do vidro), ou o topo dela não deixa 75 mm de faixa de teto acima, em 2035',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az10.png",
+      "peca-frente-rasante-az100.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
