@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 1780" width="1900" height="1780" font-family="ui-sans-serif, system-ui, sans-serif">
-<rect width="1900" height="1780" fill="#fbfbfa"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 1960" width="1900" height="1960" font-family="ui-sans-serif, system-ui, sans-serif">
+<rect width="1900" height="1960" fill="#fbfbfa"/>
 <style>
   .contorno{fill:none;stroke:#12233b;stroke-width:2.1;stroke-linejoin:round;stroke-linecap:round}
   .painel{fill:none;stroke:#2f4562;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
@@ -10,6 +10,8 @@
   .oculta{fill:none;stroke:#8a94a2;stroke-width:1.1;stroke-dasharray:5 3}
   .eixo{fill:none;stroke:#c8ccd2;stroke-width:1;stroke-dasharray:9 4 2 4}
   .carater{fill:none;stroke:#b3593d;stroke-width:1.7;stroke-dasharray:6 3}
+  .corte{fill:none;stroke:#6a4c93;stroke-width:1.9;stroke-dasharray:12 3 2 3}
+  .cortet{fill:#6a4c93;font-size:11px;font-weight:700}
   .cota{stroke:#b3593d;stroke-width:1;fill:none}
   .ext{stroke:#b3593d;stroke-width:0.7;fill:none}
   .cotat{fill:#b3593d;font-size:11px}
@@ -43,16 +45,16 @@
 <path class="vidro" d="M 1650.4 270 L 1650.3 271.25 L 1650.01 272.47 L 1649.53 273.63 L 1648.87 274.7 L 1648.06 275.66 L 1647.1 276.47 L 1646.03 277.13 L 1644.87 277.61 L 1643.65 277.9 L 1642.4 278 L 1540.57 278 L 1539.26 277.89 L 1537.99 277.57 L 1536.79 277.05 L 1535.69 276.34 L 1534.72 275.46 L 1533.91 274.43 L 1533.27 273.29 L 1532.84 272.05 L 1532.6 270.76 L 1532.59 269.45 L 1536.78 208.43 L 1537.02 206.77 L 1537.51 205.16 L 1538.23 203.64 L 1539.17 202.25 L 1540.31 201.01 L 1541.62 199.96 L 1543.07 199.12 L 1544.64 198.5 L 1546.28 198.13 L 1547.95 198 L 1642.4 198 L 1643.65 198.1 L 1644.87 198.39 L 1646.03 198.87 L 1647.1 199.53 L 1648.06 200.34 L 1648.87 201.3 L 1649.53 202.37 L 1650.01 203.53 L 1650.3 204.75 L 1650.4 206 L 1650.4 270"/>
 <path class="vidro" d="M 1676 270 L 1676.1 271.25 L 1676.39 272.47 L 1676.87 273.63 L 1677.53 274.7 L 1678.34 275.66 L 1679.3 276.47 L 1680.37 277.13 L 1681.53 277.61 L 1682.75 277.9 L 1684 278 L 1785.83 278 L 1787.14 277.89 L 1788.41 277.57 L 1789.61 277.05 L 1790.71 276.34 L 1791.68 275.46 L 1792.49 274.43 L 1793.13 273.29 L 1793.56 272.05 L 1793.8 270.76 L 1793.81 269.45 L 1789.62 208.43 L 1789.38 206.77 L 1788.89 205.16 L 1788.17 203.64 L 1787.23 202.25 L 1786.09 201.01 L 1784.78 199.96 L 1783.33 199.12 L 1781.76 198.5 L 1780.12 198.13 L 1778.45 198 L 1684 198 L 1682.75 198.1 L 1681.53 198.39 L 1680.37 198.87 L 1679.3 199.53 L 1678.34 200.34 L 1677.53 201.3 L 1676.87 202.37 L 1676.39 203.53 L 1676.1 204.75 L 1676 206 L 1676 270"/>
 <path class="painel" d="M 718.91 489.2 L 719.44 483.35 L 720.43 477.56 L 721.86 471.86 L 723.72 466.29 L 726.01 460.88 L 728.72 455.67 L 731.81 450.67 L 735.28 445.94 L 739.11 441.48 L 743.27 437.33 L 747.74 433.52 L 752.49 430.07 L 757.49 426.99 L 762.72 424.3 L 768.14 422.03 L 773.71 420.18 L 779.42 418.77 L 785.21 417.81 L 785.21 327.42 L 785.19 326.84 L 785.14 326.25 L 785.05 325.67 L 784.92 325.1 L 784.77 324.54 L 784.57 323.98 L 784.35 323.44 L 784.09 322.92 L 783.8 322.41 L 783.47 321.92 L 718.06 228.49 L 717.49 227.77 L 716.86 227.09 L 716.17 226.49 L 715.42 225.95 L 714.63 225.48 L 713.79 225.1 L 712.92 224.8 L 712.03 224.58 L 711.11 224.44 L 710.19 224.4 L 617.2 224.4 L 615.7 224.52 L 614.23 224.87 L 612.84 225.45 L 611.56 226.23 L 610.41 227.21 L 609.43 228.36 L 608.65 229.64 L 608.07 231.03 L 607.72 232.5 L 607.6 234 L 607.6 482.8 L 607.68 483.8 L 607.91 484.78 L 608.3 485.71 L 608.82 486.56 L 609.47 487.33 L 610.24 487.98 L 611.09 488.5 L 612.02 488.89 L 613 489.12 L 614 489.2 L 718.91 489.2"/>
-<path class="carater" d="M 362.8 501.2 L 362.8 474.8"/>
-<path class="carater" d="M 487.6 501.2 L 487.6 474.8"/>
-<path class="carater" d="M 219.06 445.46 L 205.71 432.11"/>
-<path class="carater" d="M 1141.2 501.2 L 1141.2 434.8"/>
-<path class="carater" d="M 1551.2 501.2 L 1551.2 457.84"/>
-<path class="carater" d="M 362.8 715.2 L 362.8 727.2"/>
-<path class="carater" d="M 487.6 715.2 L 487.6 727.2"/>
-<path class="carater" d="M 216.45 715.2 L 216.45 727.2"/>
-<path class="carater" d="M 942 771.2 L 963.6 771.2"/>
-<path class="carater" d="M 66 995.2 L 90.8 995.2"/>
+<path class="corte" d="M 362.8 501.2 L 362.8 463.6"/>
+<path class="corte" d="M 487.6 501.2 L 487.6 463.6"/>
+<path class="corte" d="M 219.06 445.46 L 205.71 432.11"/>
+<path class="corte" d="M 1141.2 501.2 L 1141.2 434.8"/>
+<path class="corte" d="M 1551.2 501.2 L 1551.2 457.84"/>
+<path class="corte" d="M 362.8 715.2 L 362.8 727.2"/>
+<path class="corte" d="M 487.6 715.2 L 487.6 727.2"/>
+<path class="corte" d="M 216.45 715.2 L 216.45 727.2"/>
+<path class="corte" d="M 942 771.2 L 963.6 771.2"/>
+<path class="corte" d="M 66 995.2 L 90.8 995.2"/>
 <path class="painel" d="M 100.24 1642.62 L 943.44 1642.62"/>
 <path class="contorno" d="M 100.24 1700.35 L 943.44 1700.35"/>
 <path class="painel" d="M 103.53 1700.35 L 104.11 1694.75 L 104.5 1689.15 L 104.69 1683.54 L 104.7 1677.94 L 104.51 1672.34 L 104.13 1666.74 L 103.55 1661.13 L 102.78 1655.53 L 101.81 1649.93 L 100.64 1644.33 L 99.26 1638.72 L 97.67 1633.12"/>
@@ -61,6 +63,16 @@
 <path class="contorno" d="M 956.12 1700.35 L 955.47 1694.75 L 955.04 1689.15 L 954.83 1683.54 L 954.82 1677.94 L 955.03 1672.34 L 955.46 1666.74 L 956.09 1661.13 L 956.95 1655.53 L 958.03 1649.93 L 959.33 1644.33 L 960.87 1638.72 L 962.65 1633.12"/>
 <path class="painel" d="M 194.48 1633.12 L 194.48 1671.84 L 652.08 1671.84 L 652.08 1633.12"/>
 <path class="painel" d="M 690.8 1633.12 L 690.8 1671.84 L 936.02 1666.74 L 936.58 1661.13 L 937.34 1655.53 L 938.28 1649.93 L 939.43 1644.33 L 940.78 1638.72 L 942.34 1633.12"/>
+<path class="corte" d="M 152.24 1700.35 L 152.24 1629.6"/>
+<path class="corte" d="M 426.8 1700.35 L 426.8 1629.6"/>
+<path class="painel" d="M 100.24 1810.62 L 943.44 1810.62"/>
+<path class="contorno" d="M 100.24 1868.35 L 943.44 1868.35"/>
+<path class="painel" d="M 103.53 1868.35 L 104.11 1862.75 L 104.5 1857.15 L 104.69 1851.54 L 104.7 1845.94 L 104.51 1840.34 L 104.13 1834.74 L 103.55 1829.13 L 102.78 1823.53 L 101.81 1817.93 L 100.64 1812.33 L 99.26 1806.72 L 97.67 1801.12"/>
+<path class="contorno" d="M 87.56 1868.35 L 88.21 1862.75 L 88.64 1857.15 L 88.85 1851.54 L 88.86 1845.94 L 88.65 1840.34 L 88.22 1834.74 L 87.59 1829.13 L 86.73 1823.53 L 85.65 1817.93 L 84.35 1812.33 L 82.81 1806.72 L 81.03 1801.12"/>
+<path class="painel" d="M 940.15 1868.35 L 939.57 1862.75 L 939.18 1857.15 L 938.99 1851.54 L 938.98 1845.94 L 939.17 1840.34 L 939.55 1834.74 L 940.13 1829.13 L 940.9 1823.53 L 941.87 1817.93 L 943.04 1812.33 L 944.42 1806.72 L 946.01 1801.12"/>
+<path class="contorno" d="M 956.12 1868.35 L 955.47 1862.75 L 955.04 1857.15 L 954.83 1851.54 L 954.82 1845.94 L 955.03 1840.34 L 955.46 1834.74 L 956.09 1829.13 L 956.95 1823.53 L 958.03 1817.93 L 959.33 1812.33 L 960.87 1806.72 L 962.65 1801.12"/>
+<path class="painel" d="M 690.8 1801.12 L 690.8 1839.84 L 936.02 1834.74 L 936.58 1829.13 L 937.34 1823.53 L 938.28 1817.93 L 939.43 1812.33 L 940.78 1806.72 L 942.34 1801.12"/>
+<path class="carater" d="M 332.77 508.4 L 728.83 508.4 L 728.83 466 L 332.77 466 L 332.77 508.4"/>
 <path class="painel" d="M 87.6 652.4 L 87.6 660.4 L 247.6 660.4 L 247.6 652.4"/>
 <path class="painel" d="M 339.17 475.92 L 722.43 475.92"/>
 <path class="painel" d="M 722.43 475.92 L 723.39 472.32 L 724.53 468.77 L 725.84 465.28 L 727.32 461.86 L 728.98 458.52 L 730.8 455.26 L 732.78 452.1 L 734.92 449.05 L 737.2 446.1 L 739.63 443.28 L 742.2 440.58 L 744.91 438.01 L 747.73 435.58 L 750.68 433.29 L 753.74 431.16 L 756.9 429.18 L 760.15 427.36 L 763.49 425.71 L 766.91 424.22 L 770.4 422.91 L 773.95 421.78 L 777.56 420.83 L 781.2 420.05 L 784.89 419.46 L 788.59 419.06 L 792.31 418.84 L 796.04 418.81 L 799.77 418.97 L 803.48 419.31 L 807.17 419.84 L 810.83 420.55 L 814.45 421.44 L 818.02 422.52 L 821.53 423.77 L 824.98 425.19 L 828.34 426.79 L 831.63 428.55 L 834.82 430.48 L 837.91 432.56 L 840.9 434.8"/>
@@ -147,21 +159,21 @@
 <text x="1027.6" y="381.2" class="cotat" text-anchor="middle" transform="rotate(-90 1027.6 381.2)">2.110</text>
 <path class="cota" d="M 801.2 257.2 L 951.6 257.2"/>
 <path class="ext" d="M 801.2 313.2 L 801.2 254.2"/>
-<path class="ext" d="M 951.6 313.2 L 951.6 254.2"/>
+<path class="ext" d="M 951.6 434.16 L 951.6 254.2"/>
 <text x="876.4" y="251.2" class="cotat" text-anchor="middle">940</text>
 <path class="cota" d="M 447.6 550 L 447.6 502"/>
 <text x="441.6" y="526" class="cotat" text-anchor="middle" transform="rotate(-90 441.6 526)">300</text>
-<path class="cota" d="M 346.8 550 L 346.8 475.92"/>
-<text x="390.8" y="538.96" class="cotat" text-anchor="middle">saia 463</text>
-<path class="cota" stroke-dasharray="2 2" d="M 346.8 512.96 L 365.28 530.16"/>
+<path class="cota" d="M 598.8 550 L 598.8 475.92"/>
+<text x="654.8" y="542.96" class="cotat" text-anchor="middle">saia 463, ver F</text>
+<path class="cota" stroke-dasharray="2 2" d="M 598.8 512.96 L 606.95 534.16"/>
 <path class="cota" d="M 70 445.2 L 201.34 445.2"/>
 <path class="ext" d="M 70 457.2 L 70 442.2"/>
 <path class="ext" d="M 201.34 457.2 L 201.34 442.2"/>
 <text x="135.67" y="439.2" class="cotat" text-anchor="middle">821</text>
-<path class="cota" d="M 840.9 422.16 L 959.6 422.16"/>
-<path class="ext" d="M 840.9 434.16 L 840.9 419.16"/>
-<path class="ext" d="M 959.6 434.16 L 959.6 419.16"/>
-<text x="900.25" y="416.16" class="cotat" text-anchor="middle">742</text>
+<path class="cota" d="M 840.9 422.8 L 959.6 422.8"/>
+<path class="ext" d="M 840.9 434.8 L 840.9 419.8"/>
+<path class="ext" d="M 959.6 442.8 L 959.6 419.8"/>
+<text x="900.25" y="416.8" class="cotat" text-anchor="middle">742</text>
 <path class="cota" d="M 762.49 264.01 L 749.36 273.2"/>
 <text x="817.92" y="223.6" class="cotat" text-anchor="middle">coluna 100</text>
 <path class="cota" stroke-dasharray="2 2" d="M 755.92 268.6 L 786.02 225.8"/>
@@ -187,12 +199,16 @@
 <path class="cota" d="M 1372.8 566 L 1410.4 566"/>
 <path class="ext" d="M 1372.8 550 L 1372.8 569"/>
 <path class="ext" d="M 1410.4 550 L 1410.4 569"/>
-<text x="1425.6" y="569" class="cotat" text-anchor="middle">235</text>
-<path class="cota" stroke-dasharray="2 2" d="M 1391.6 566 L 1416.03 566"/>
+<text x="1353.6" y="569" class="cotat" text-anchor="middle">235</text>
+<path class="cota" stroke-dasharray="2 2" d="M 1391.6 566 L 1363.17 566"/>
 <path class="cota" d="M 1438.4 550 L 1438.4 436.4"/>
 <path class="ext" d="M 1410.4 550 L 1441.4 550"/>
 <path class="ext" d="M 1410.4 436.4 L 1441.4 436.4"/>
 <text x="1432.4" y="493.2" class="cotat" text-anchor="middle" transform="rotate(-90 1432.4 493.2)">⌀ 710</text>
+<path class="cota" d="M 1090 606 L 1416.4 606"/>
+<path class="ext" d="M 1090 489.2 L 1090 609"/>
+<path class="ext" d="M 1416.4 489.2 L 1416.4 609"/>
+<text x="1253.2" y="600" class="cotat" text-anchor="middle">2.040 na saia</text>
 <path class="cota" d="M 1532.28 138.2 L 1794.12 138.2"/>
 <path class="ext" d="M 1532.28 169.2 L 1532.28 135.2"/>
 <path class="ext" d="M 1794.12 169.2 L 1794.12 135.2"/>
@@ -217,11 +233,11 @@
 <path class="cota" d="M 1623.2 278 L 1623.2 198"/>
 <text x="1617.2" y="238" class="cotat" text-anchor="middle" transform="rotate(-90 1617.2 238)">500</text>
 <path class="cota" d="M 1112.61 314.51 L 1393.79 314.51"/>
-<text x="1313.2" y="284.51" class="cotat" text-anchor="middle">1.757 na base</text>
-<path class="cota" stroke-dasharray="2 2" d="M 1253.2 314.51 L 1271.73 286.71"/>
+<text x="1333.2" y="264.51" class="cotat" text-anchor="middle">1.757 na base</text>
+<path class="cota" stroke-dasharray="2 2" d="M 1253.2 314.51 L 1291.73 266.71"/>
 <path class="cota" d="M 1119.04 224.4 L 1387.36 224.4"/>
-<text x="1313.2" y="254.4" class="cotat" text-anchor="middle">1.677 no topo</text>
-<path class="cota" stroke-dasharray="2 2" d="M 1253.2 224.4 L 1271.73 245.6"/>
+<text x="1333.2" y="182.4" class="cotat" text-anchor="middle">1.677 no topo</text>
+<path class="cota" stroke-dasharray="2 2" d="M 1253.2 224.4 L 1291.73 184.6"/>
 <path class="cota" d="M 110 1337.6 L 126 1337.6"/>
 <path class="ext" d="M 110 1349.6 L 110 1334.6"/>
 <path class="ext" d="M 126 1349.6 L 126 1334.6"/>
@@ -250,10 +266,10 @@
 <path class="ext" d="M 559.92 1140.8 L 559.92 1125.8"/>
 <path class="ext" d="M 599.92 1140.8 L 599.92 1125.8"/>
 <text x="579.92" y="1122.8" class="cotat" text-anchor="middle">50</text>
-<path class="cota" d="M 623.92 1480 L 623.92 1140.8"/>
-<path class="ext" d="M 559.92 1480 L 626.92 1480"/>
-<path class="ext" d="M 559.92 1140.8 L 626.92 1140.8"/>
-<text x="617.92" y="1310.4" class="cotat" text-anchor="middle" transform="rotate(-90 617.92 1310.4)">424</text>
+<path class="cota" d="M 653.92 1480 L 653.92 1140.8"/>
+<path class="ext" d="M 559.92 1480 L 656.92 1480"/>
+<path class="ext" d="M 559.92 1140.8 L 656.92 1140.8"/>
+<text x="647.92" y="1310.4" class="cotat" text-anchor="middle" transform="rotate(-90 647.92 1310.4)">424</text>
 <path class="cota" d="M 759.92 1244 L 847.92 1244"/>
 <path class="ext" d="M 759.92 1256 L 759.92 1241"/>
 <path class="ext" d="M 847.92 1256 L 847.92 1241"/>
@@ -262,6 +278,21 @@
 <path class="ext" d="M 759.92 1480 L 874.92 1480"/>
 <path class="ext" d="M 759.92 1256 L 874.92 1256"/>
 <text x="865.92" y="1368" class="cotat" text-anchor="middle" transform="rotate(-90 865.92 1368)">280</text>
+<path class="cota" d="M 619.92 1480 L 619.92 1420"/>
+<path class="ext" d="M 596.72 1480 L 622.92 1480"/>
+<path class="ext" d="M 596.72 1420 L 622.92 1420"/>
+<text x="613.92" y="1450" class="cotat" text-anchor="middle" transform="rotate(-90 613.92 1450)">75</text>
+<path class="cota" d="M 619.92 1409.6 L 619.92 1334.4"/>
+<path class="ext" d="M 583.92 1409.6 L 622.92 1409.6"/>
+<path class="ext" d="M 583.92 1334.4 L 622.92 1334.4"/>
+<text x="613.92" y="1372" class="cotat" text-anchor="middle" transform="rotate(-90 613.92 1372)">94</text>
+<path class="cota" d="M 583.92 1372 L 599.92 1372"/>
+<text x="569.92" y="1376" class="cotat" text-anchor="middle">20</text>
+<path class="cota" stroke-dasharray="2 2" d="M 591.92 1372 L 576.3 1372"/>
+<path class="cota" d="M 559.92 1502 L 596.72 1502"/>
+<path class="ext" d="M 559.92 1480 L 559.92 1505"/>
+<path class="ext" d="M 596.72 1420 L 596.72 1505"/>
+<text x="578.32" y="1496" class="cotat" text-anchor="middle">46</text>
 <path class="cota" d="M 733.42 931.2 L 798.96 931.2"/>
 <text x="836.19" y="931.2" class="cotat" text-anchor="middle">410</text>
 <path class="cota" stroke-dasharray="2 2" d="M 766.19 931.2 L 826.62 931.2"/>
@@ -281,43 +312,78 @@
 <path class="ext" d="M 690.8 1700.35 L 690.8 1723.35"/>
 <path class="ext" d="M 939.82 1700.35 L 939.82 1723.35"/>
 <text x="815.31" y="1714.35" class="cotat" text-anchor="middle">707</text>
-<path class="cota" d="M 983.44 1700.35 L 983.44 1671.84"/>
-<path class="ext" d="M 943.44 1700.35 L 986.44 1700.35"/>
-<path class="ext" d="M 943.44 1671.84 L 986.44 1671.84"/>
-<text x="977.44" y="1686.1" class="cotat" text-anchor="middle" transform="rotate(-90 977.44 1686.1)">81</text>
-<path class="cota" d="M 983.44 1671.84 L 983.44 1642.62"/>
-<path class="ext" d="M 943.44 1671.84 L 986.44 1671.84"/>
-<path class="ext" d="M 943.44 1642.62 L 986.44 1642.62"/>
-<text x="977.44" y="1657.23" class="cotat" text-anchor="middle" transform="rotate(-90 977.44 1657.23)">83</text>
+<path class="cota" d="M 1013.44 1700.35 L 1013.44 1671.84"/>
+<path class="ext" d="M 943.44 1700.35 L 1016.44 1700.35"/>
+<path class="ext" d="M 943.44 1671.84 L 1016.44 1671.84"/>
+<text x="1007.44" y="1686.1" class="cotat" text-anchor="middle" transform="rotate(-90 1007.44 1686.1)">81</text>
+<path class="cota" d="M 1013.44 1671.84 L 1013.44 1642.62"/>
+<path class="ext" d="M 943.44 1671.84 L 1016.44 1671.84"/>
+<path class="ext" d="M 943.44 1642.62 L 1016.44 1642.62"/>
+<text x="1007.44" y="1657.23" class="cotat" text-anchor="middle" transform="rotate(-90 1007.44 1657.23)">83</text>
+<path class="cota" d="M 1013.44 1868.35 L 1013.44 1839.84"/>
+<path class="ext" d="M 943.44 1868.35 L 1016.44 1868.35"/>
+<path class="ext" d="M 943.44 1839.84 L 1016.44 1839.84"/>
+<text x="1007.44" y="1854.1" class="cotat" text-anchor="middle" transform="rotate(-90 1007.44 1854.1)">81</text>
+<path class="cota" d="M 1013.44 1839.84 L 1013.44 1810.62"/>
+<path class="ext" d="M 943.44 1839.84 L 1016.44 1839.84"/>
+<path class="ext" d="M 943.44 1810.62 L 1016.44 1810.62"/>
+<text x="1007.44" y="1825.23" class="cotat" text-anchor="middle" transform="rotate(-90 1007.44 1825.23)">83</text>
+<path class="cota" d="M 100.24 1744.35 L 943.44 1744.35"/>
+<path class="ext" d="M 100.24 1700.35 L 100.24 1747.35"/>
+<path class="ext" d="M 943.44 1700.35 L 943.44 1747.35"/>
+<text x="521.84" y="1738.35" class="cotat" text-anchor="middle">2.395 entre as molduras, de z -1.128 a 1.268</text>
+<path class="cota" d="M 100.24 1888.35 L 690.8 1888.35"/>
+<path class="ext" d="M 100.24 1868.35 L 100.24 1891.35"/>
+<path class="ext" d="M 690.8 1868.35 L 690.8 1891.35"/>
+<text x="395.52" y="1882.35" class="cotat" text-anchor="middle">1.678</text>
+<path class="cota" d="M 690.8 1888.35 L 939.82 1888.35"/>
+<path class="ext" d="M 690.8 1868.35 L 690.8 1891.35"/>
+<path class="ext" d="M 939.82 1868.35 L 939.82 1891.35"/>
+<text x="815.31" y="1882.35" class="cotat" text-anchor="middle">707</text>
 <path class="cota" d="M 52.6 723.2 L 52.6 1043.2"/>
-<path class="ext" d="M 87.6 723.2 L 49.6 723.2"/>
-<path class="ext" d="M 87.6 1043.2 L 49.6 1043.2"/>
+<path class="ext" d="M 103.6 723.2 L 49.6 723.2"/>
+<path class="ext" d="M 103.6 1043.2 L 49.6 1043.2"/>
 <text x="46.6" y="883.2" class="cotat" text-anchor="middle" transform="rotate(-90 46.6 883.2)">2.000 na chapa</text>
 <text x="100.4" y="1072" class="cotat" font-style="italic">A: saia presa (5:1)</text>
 <text x="100.4" y="1088" class="cotat" font-style="italic">z -980, lado -x</text>
+<text x="100.4" y="1104" class="cotat" font-style="italic">trecho todo preso,</text>
+<text x="100.4" y="1120" class="cotat" font-style="italic">entre arco e porta</text>
 <text x="100.4" y="1516" class="cotat" font-style="italic">x fora, altura</text>
+<text x="95.6" y="1418.4" class="cortet">A</text>
 <text x="250.48" y="1072" class="cotat" font-style="italic">E: saia na porta (5:1)</text>
-<text x="250.48" y="1088" class="cotat" font-style="italic">z -200, fresta em 380</text>
+<text x="250.48" y="1088" class="cotat" font-style="italic">z -200, lado -x</text>
+<text x="250.48" y="1104" class="cotat" font-style="italic">porta acima da fresta</text>
+<text x="250.48" y="1120" class="cotat" font-style="italic">de 380, preso abaixo</text>
 <text x="250.48" y="1516" class="cotat" font-style="italic">x fora, altura</text>
+<text x="245.68" y="1418.4" class="cortet">E</text>
 <text x="400.4" y="1072" class="cotat" font-style="italic">B: moldura (5:1)</text>
-<text x="400.4" y="1088" class="cotat" font-style="italic">radial, arco traseiro</text>
+<text x="400.4" y="1088" class="cotat" font-style="italic">radial, arco traseiro,</text>
+<text x="400.4" y="1104" class="cotat" font-style="italic">45° da vertical, atrás</text>
 <text x="400.4" y="1516" class="cotat" font-style="italic">x fora, do arco</text>
+<text x="395.6" y="1465.2" class="cortet">B</text>
 <text x="550.32" y="1072" class="cotat" font-style="italic">C: para-choque diant.</text>
 <text x="550.32" y="1088" class="cotat" font-style="italic">x -700 (lado -x), 5:1</text>
+<text x="550.32" y="1104" class="cotat" font-style="italic">fundo a 300 do chão</text>
 <text x="550.32" y="1516" class="cotat" font-style="italic">z frente, altura</text>
+<text x="545.52" y="1313.6" class="cortet">C</text>
 <text x="750.32" y="1072" class="cotat" font-style="italic">D: para-choque tras.</text>
 <text x="750.32" y="1088" class="cotat" font-style="italic">x +700 (lado +x), 5:1</text>
+<text x="750.32" y="1104" class="cotat" font-style="italic">fundo a 300 do chão</text>
 <text x="750.32" y="1516" class="cotat" font-style="italic">z trás, altura</text>
-<text x="366" y="472.4" class="cotat" font-style="italic">A</text>
-<text x="490.8" y="472.4" class="cotat" font-style="italic">E</text>
-<text x="198.55" y="428.15" class="cotat" font-style="italic">B</text>
-<text x="1122" y="430.8" class="cotat" font-style="italic">C</text>
-<text x="1532" y="497.2" class="cotat" font-style="italic">D</text>
-<text x="366" y="705.6" class="cotat" font-style="italic">A</text>
-<text x="490.8" y="705.6" class="cotat" font-style="italic">E</text>
-<text x="219.65" y="705.6" class="cotat" font-style="italic">B</text>
-<text x="966" y="774.4" class="cotat" font-style="italic">C</text>
-<text x="76.4" y="1064" class="cotat" font-style="italic">D</text>
+<text x="745.52" y="1371.2" class="cortet">D</text>
+<text x="312.88" y="1382.4" class="cotat" font-style="italic">porta</text>
+<text x="312.88" y="1456" class="cotat" font-style="italic">preso</text>
+<text x="366" y="461.2" class="cortet">A</text>
+<text x="490.8" y="461.2" class="cortet">E</text>
+<text x="198.55" y="428.15" class="cortet">B</text>
+<text x="1122" y="430.8" class="cortet">C</text>
+<text x="1532" y="497.2" class="cortet">D</text>
+<text x="366" y="705.6" class="cortet">A</text>
+<text x="490.8" y="705.6" class="cortet">E</text>
+<text x="219.65" y="705.6" class="cortet">B</text>
+<text x="966" y="774.4" class="cortet">C</text>
+<text x="76.4" y="1064" class="cortet">D</text>
+<text x="343.17" y="498.8" class="cotat" font-style="italic">F</text>
 <text x="97.2" y="484.4" class="cotat" font-style="italic">para-choque</text>
 <text x="870" y="484.4" class="cotat" font-style="italic">para-choque</text>
 <text x="1176.4" y="482.8" class="cotat" font-style="italic">entrada de ar recuada 20</text>
@@ -325,11 +391,18 @@
 <text x="100.24" y="1608.48" class="cotat" font-style="italic">F: faixa de baixo no lado -x, de arco a arco (2,2 vezes a lateral); cada porta leva a saia de 380 a 463</text>
 <text x="229.68" y="1663.04" class="cotat" font-style="italic">porta de correr leva 380 a 463</text>
 <text x="704.88" y="1663.04" class="cotat" font-style="italic">porta da cabine leva 380 a 463</text>
-<text x="110.8" y="1663.04" class="cotat" font-style="italic">preso</text>
+<text x="104.47" y="1663.04" class="cotat" font-style="italic">preso</text>
 <text x="654.9" y="1663.04" class="cotat" font-style="italic">preso</text>
-<text x="229.68" y="1692.96" class="cotat" font-style="italic">preso: 299 a 380, sob as portas; frestas de 6 mm</text>
-<text x="100.24" y="1745.06" class="cotat" font-style="italic">lado +x: sem porta de correr, a saia fica presa de -1.128 a 550; a porta da cabine leva o trecho dela igual. Preso também: 10 mm até a moldura dianteira</text>
+<text x="440.88" y="1692.96" class="cotat" font-style="italic">preso: 299 a 380, sob as portas; frestas de 6 mm</text>
+<text x="156.46" y="1627.84" class="cortet">A</text>
+<text x="431.02" y="1627.84" class="cortet">E</text>
+<text x="100.24" y="1776.48" class="cotat" font-style="italic">G: a mesma faixa no lado +x, na escala e com a frente à direita como em F; sem porta de correr</text>
+<text x="250.8" y="1831.04" class="cotat" font-style="italic">preso</text>
+<text x="704.88" y="1831.04" class="cotat" font-style="italic">porta da cabine leva 380 a 463</text>
+<text x="250.8" y="1860.96" class="cotat" font-style="italic">preso: 299 a 380, sob a porta; fresta de 6 mm</text>
+<text x="100.24" y="1913.06" class="cotat" font-style="italic">Nos dois lados fica preso também o trecho de 10 mm entre a porta da cabine e a moldura dianteira.</text>
 <text x="111.6" y="355.6" class="cotat" font-style="italic">vinco 1.190</text>
+<text x="858.8" y="793.6" class="cotat" font-style="italic">capô</text>
 <text x="818.8" y="955.2" class="cotat" font-style="italic">bordas do vidro,</text>
 <text x="818.8" y="971.2" class="cotat" font-style="italic">1.500 a 2.085</text>
 <text x="759.6" y="198" class="cotat" font-style="italic">para-brisa a 55° da horizontal</text>
@@ -369,12 +442,12 @@
 <circle class="lm" cx="266.8" cy="426" r="2.6"/>
 <text class="lmt" x="270" y="406">arcoT</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 266.8 426 L 270 407.9"/>
-<circle class="lm" cx="607.6" cy="278" r="2.6"/>
-<text class="lmt" x="599.6" y="127.6">cabineT</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 607.6 278 L 607.6 129.5"/>
+<circle class="lm" cx="607.6" cy="246" r="2.6"/>
+<text class="lmt" x="596.4" y="127.6" text-anchor="end">cabineT</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 607.6 246 L 596.4 129.5"/>
 <circle class="lm" cx="590" cy="214" r="2.6"/>
-<text class="lmt" x="535.6" y="127.6">correrF</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 590 214 L 574.17 129.5"/>
+<text class="lmt" x="498.8" y="127.6">correrF</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 590 214 L 537.37 129.5"/>
 <circle class="lm" cx="382" cy="214" r="2.6"/>
 <text class="lmt" x="324.4" y="127.6">correrT</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 382 214 L 362.97 129.5"/>
@@ -412,29 +485,33 @@
 <text x="1030" y="842" class="sub">cotas em mm</text>
 <line x1="1000" y1="858" x2="1022" y2="858" stroke="#1f6f5c" stroke-width="2.2"/>
 <text x="1030" y="862" class="sub">landmarks, em [z, y] na lateral, [x, y] na frontal e traseira, [z, x] de cima</text>
-<line x1="1000" y1="878" x2="1022" y2="878" stroke="#b3593d" stroke-width="2.2"/>
-<text x="1030" y="882" class="sub">tracejado laranja: vinco de cintura e planos dos cortes A a E</text>
-<line x1="1000" y1="898" x2="1022" y2="898" stroke="#c0c6cf" stroke-width="2.2"/>
-<text x="1030" y="902" class="sub">tracejado cinza: pneu escondido sob o corpo; traço-ponto: eixos e a chapa nos cortes</text>
-<line x1="1000" y1="918" x2="1022" y2="918" stroke="#b3593d" stroke-width="2.2"/>
-<text x="1030" y="922" class="sub">cortes: A e E na saia (z -980 presa, z -200 na porta), B na moldura (radial)</text>
+<line x1="1000" y1="878" x2="1022" y2="878" stroke="#6a4c93" stroke-width="2.2"/>
+<text x="1030" y="882" class="sub">traço-ponto roxo: planos dos cortes A a E, com a letra junto</text>
+<line x1="1000" y1="898" x2="1022" y2="898" stroke="#b3593d" stroke-width="2.2"/>
+<text x="1030" y="902" class="sub">tracejado laranja: vinco de cintura e a marca do detalhe F na lateral</text>
+<line x1="1000" y1="918" x2="1022" y2="918" stroke="#c0c6cf" stroke-width="2.2"/>
+<text x="1030" y="922" class="sub">tracejado cinza: pneu escondido sob o corpo; traço-ponto: eixos e a chapa nos cortes</text>
 <line x1="1000" y1="938" x2="1022" y2="938" stroke="#b3593d" stroke-width="2.2"/>
-<text x="1030" y="942" class="sub">C em x -700 (lado -x, à esquerda na frontal), D em x +700 (lado +x, à esquerda na traseira)</text>
-<text x="1000" y="980" class="sub">Calibração: balanços 980 + entre-eixos 3300 + 1120 = 5400; meia bitola 865 + meio pneu 117,5 = 982,5 < meia largura 1000.</text>
-<text x="1000" y="998" class="sub">Arcos das rodas com raio 420 no centro da roda (65 mm sobre o pneu); soleira em 300; largura sem retrovisores.</text>
-<text x="1000" y="1016" class="sub">A lateral mostra o lado direito (-x), com a porta de correr; o lado esquerdo é o espelho dele sem ela.</text>
-<text x="1000" y="1034" class="sub">Medidas rígidas da classe; cabine, portas, vidros, bitola e balanços estimados na proporção (ver autoria).</text>
-<text x="1000" y="1052" class="sub">Plástico por fora da chapa: saia de 299 a 463 saindo 20 (2.040 na saia), moldura de 45 nos arcos, para-choques saindo 50 na frente e 110 atrás (5.560 com o plástico).</text>
-<text x="1000" y="1070" class="sub">As três seções estão em SECAO_* na especificação e no corte 5:1 abaixo da vista de cima; o tracejado é a chapa.</text>
-<text x="1000" y="1088" class="sub">Teto na lateral: curva contínua de raio 1290 saindo do topo do para-brisa e 405 até o teto, que começa em z 770.</text>
-<text x="1000" y="1106" class="sub">Teto: raio 180 na quina traseira (lateral) e 300 nas quinas com a lateral (frontal e traseira).</text>
-<text x="1000" y="1124" class="sub">Laterais: verticais em 2.000 até o vinco (1.190), fechando 3,9 graus até o teto (1.820 no prolongamento, teto plano com 1.260).</text>
-<text x="1000" y="1142" class="sub">Vão traseiro: 1.800 até o vinco e 1.636 no topo das portas, sempre 100 mm dentro da lateral; janelas com 740 na base e 706 no topo.</text>
-<text x="1000" y="1160" class="sub">Para-brisa: flecha 50 em cima e 28 embaixo na frontal; coluna em x ±879 na base e ±839 no topo; de cima, pontas 27 mm atrás do centro, dobrando na quina de raio 160.</text>
-<text x="1000" y="1178" class="sub">De cima, o vidro vai de z 1746 a 1336: as bordas dele a 1500 e 2085 de altura, 20 e 25 mm dentro do pé e do topo do para-brisa da lateral.</text>
-<text x="1000" y="1196" class="sub">eixoD [1720, 355]   eixoT [-1580, 355]   frente [2750, 650]   boca [2620, 1100]   baseVidro [1760, 1480]</text>
-<text x="1000" y="1214" class="sub">topoVidro [1319, 2110]   teto [0, 2500]   degrau [-2750, 580]   traseira [-2810, 450]   soleira [0, 300]</text>
-<text x="1000" y="1232" class="sub">arcoD [1720, 775]   arcoT [-1580, 775]   cabineT [550, 1700]   correrF [440, 2100]   correrT [-860, 2100]</text>
-<text x="1000" y="1250" class="sub">cabineF [1268, 500]   bordaTeto [770, -300]   chapa [-2700, 300]   plástico [2750, -500]   largura [1000, 900]</text>
-<text x="1000" y="1268" class="sub">vinco [1000, 1190]   vaoTraseiro [900, 900]</text>
+<text x="1030" y="942" class="sub">cortes: A e E na saia (z -980 presa, z -200 na porta), B na moldura (radial, 45° da vertical)</text>
+<line x1="1000" y1="958" x2="1022" y2="958" stroke="#b3593d" stroke-width="2.2"/>
+<text x="1030" y="962" class="sub">C em x -700 (lado -x, à esquerda na frontal), D em x +700 (lado +x, à esquerda na traseira)</text>
+<text x="1000" y="1000" class="sub">Calibração: balanços 980 + entre-eixos 3300 + 1120 = 5400; meia bitola 865 + meio pneu 117,5 = 982,5 < meia largura 1000.</text>
+<text x="1000" y="1018" class="sub">Arcos das rodas com raio 420 no centro da roda (65 mm sobre o pneu); soleira em 300; largura sem retrovisores.</text>
+<text x="1000" y="1036" class="sub">A lateral mostra o lado direito (-x), com a porta de correr; o lado esquerdo é o espelho dele sem ela.</text>
+<text x="1000" y="1054" class="sub">Medidas rígidas da classe; cabine, portas, vidros, bitola e balanços estimados na proporção (ver autoria).</text>
+<text x="1000" y="1072" class="sub">Plástico por fora da chapa: saia de 299 a 463 saindo 20 (2.040 na saia), moldura de 45 nos arcos, para-choques saindo 50 na frente e 110 atrás (5.560 com o plástico).</text>
+<text x="1000" y="1090" class="sub">As seções estão em SECAO_* na especificação; os cinco cortes 5:1 (A, E, B, C, D) ficam abaixo da vista de cima, com a chapa em traço-ponto.</text>
+<text x="1000" y="1108" class="sub">Detalhes F e G: a faixa de baixo de arco a arco nos lados -x e +x, 2,2 vezes a lateral. De cima, o contorno à frente do para-brisa é o capô.</text>
+<text x="1000" y="1126" class="sub">Faixa 75: a chapa acima da porta da cabine, do topo da porta ao nível do topo do para-brisa (2.110).</text>
+<text x="1000" y="1144" class="sub">Teto na lateral: curva contínua de raio 1290 saindo do topo do para-brisa e 405 até o teto, que começa em z 770.</text>
+<text x="1000" y="1162" class="sub">Teto: raio 180 na quina traseira (lateral) e 300 nas quinas com a lateral (frontal e traseira).</text>
+<text x="1000" y="1180" class="sub">Laterais: verticais em 2.000 até o vinco (1.190), fechando 3,9 graus até o teto (1.820 no prolongamento, teto plano com 1.260).</text>
+<text x="1000" y="1198" class="sub">Vão traseiro: 1.800 até o vinco e 1.636 no topo das portas, sempre 100 mm dentro da lateral; janelas com 740 na base e 706 no topo.</text>
+<text x="1000" y="1216" class="sub">Para-brisa: flecha 50 em cima e 28 embaixo na frontal; coluna em x ±879 na base e ±839 no topo; de cima, pontas 27 mm atrás do centro, dobrando na quina de raio 160.</text>
+<text x="1000" y="1234" class="sub">De cima, o vidro vai de z 1746 a 1336: as bordas dele a 1500 e 2085 de altura, 20 e 25 mm dentro do pé e do topo do para-brisa da lateral.</text>
+<text x="1000" y="1252" class="sub">eixoD [1720, 355]   eixoT [-1580, 355]   frente [2750, 650]   boca [2620, 1100]   baseVidro [1760, 1480]</text>
+<text x="1000" y="1270" class="sub">topoVidro [1319, 2110]   teto [0, 2500]   degrau [-2750, 580]   traseira [-2810, 450]   soleira [0, 300]</text>
+<text x="1000" y="1288" class="sub">arcoD [1720, 775]   arcoT [-1580, 775]   cabineT [550, 1900]   correrF [440, 2100]   correrT [-860, 2100]</text>
+<text x="1000" y="1306" class="sub">cabineF [1268, 500]   bordaTeto [770, -300]   chapa [-2700, 300]   plástico [2750, -500]   largura [1000, 900]</text>
+<text x="1000" y="1324" class="sub">vinco [1000, 1190]   vaoTraseiro [900, 900]</text>
 </svg>

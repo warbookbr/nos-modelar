@@ -82,6 +82,20 @@ Com o plástico, o comprimento total passa de 5.400 para 5.560, de z -2.810 a 2.
 
 A rodada seguinte da crítica pediu leitura, sem mudar forma. A frontal desenha a faixa recuada da entrada de ar como um laço fechado, de ±975 e de 388 a 482, com rótulo. A cota de 75 da lateral passou a dizer "faixa 75", medida de uma linha de referência em 2.110 até o teto plano da porta, fora das outras linhas. A cota de 410 da vista de cima saiu do contorno, e a nota das bordas do vidro ficou só com as alturas, 1.500 a 2.085. Os rótulos `chapa` e `plástico` ficaram em pontos separados. A lateral ganhou uma barra de escala de 1 m, e as duas janelas traseiras têm a altura de 500 cotada.
 
+A quarta rodada de leitura, autorizada pela pessoa sem mudar forma nem medida, trouxe o seguinte:
+- Cada perfil de corte tem a letra junto dele, e os planos e as letras ganharam uma cor própria, roxa e em traço-ponto (classe `corte` do motor), para não se confundirem com as cotas.
+- Os subtítulos separam A, que é um trecho todo preso entre o arco e a porta, de E, onde a porta fica acima da fresta de 380 e o preso abaixo. O corte E escreve "porta" e "preso" ao lado de cada peça.
+- B diz que é radial a 45 graus da vertical, para trás.
+- O corte C cota os dois recuos. O lábio de baixo tem 75 de altura e recua 46 até a chapa; a faixa da entrada de ar tem 94 de altura e fica 20 para dentro. C e D dizem que o fundo fica a 300 do chão.
+- A lateral marca a extensão de F com um retângulo tracejado e a letra. A cota da saia passou para a coluna entre as portas e remete a F.
+- F mostra os planos A e E. A cota total, 2.395 entre as molduras, de z -1.128 a 1.268, inclui o trecho preso de 10 mm junto à moldura dianteira, que a corrente de cotas não mostra. As cotas 81 e 83 saíram para fora do arco.
+- O detalhe G desenha o lado +x na mesma escala: um trecho preso de 1.678 e o da porta da cabine, de 707.
+- A cota de 940 ganhou uma extensão que sobe da quina do para-choque com a chapa, em z 2.700. A de 742 vai da ponta da moldura até a face do para-choque.
+- A chamada de `cabineT` saiu de cima da linha da porta.
+- A frontal tem 2.040 na saia, e os números do para-brisa ficaram longe das linhas.
+- De cima, o capô tem nome, e a cota de 2.000 na chapa passou a ser tomada na parte reta da lateral, fora da quina de raio 100.
+- A legenda diz cinco cortes e explica a faixa 75.
+
 ## A referência de caráter
 
 O `fonte-vistas.png` são as vistas do `furgao` do acervo, de que esta peça nasceu como cópia. Valem só como caráter da forma, porque as medidas do `furgao` (rodas de 1.060 mm numa carroceria de 4.854 mm, cabine que afunila para o teto) deixaram de valer pelo alinhamento. A origem do `furgao` é o modelo "van" do pacote A, de autor A, com licença livre sem exigência de crédito; a malha não está no repositório, e as medidas tiradas dela ficam só no `furgao`, em `procedural/pecas/furgao/referencias/fonte-partes.json`.

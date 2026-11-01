@@ -362,7 +362,7 @@
       },
       "planoA": {
         "vista": "lateral",
-        "comprimento": 165,
+        "comprimento": 235,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
@@ -370,7 +370,7 @@
       },
       "planoE": {
         "vista": "lateral",
-        "comprimento": 165,
+        "comprimento": 235,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
@@ -503,6 +503,86 @@
         "concentracao": 0.06,
         "inversoes": 1,
         "raioMin": 774
+      },
+      "faixaPlanoA": {
+        "vista": "planta",
+        "comprimento": 442.2,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "faixaPlanoE": {
+        "vista": "planta",
+        "comprimento": 442.2,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "faixaGSaiaTopo": {
+        "vista": "planta",
+        "comprimento": 5269.95,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "faixaGSaiaBase": {
+        "vista": "planta",
+        "comprimento": 5269.95,
+        "retidao": 1,
+        "concentracao": 0,
+        "inversoes": 0,
+        "raioMin": null
+      },
+      "faixaGMolduraTraseira": {
+        "vista": "planta",
+        "comprimento": 424.82,
+        "retidao": 0.638,
+        "concentracao": 0.302,
+        "inversoes": 0,
+        "raioMin": 1023
+      },
+      "faixaGArcoTraseiro": {
+        "vista": "planta",
+        "comprimento": 425.91,
+        "retidao": 0.633,
+        "concentracao": 0.307,
+        "inversoes": 0,
+        "raioMin": 924
+      },
+      "faixaGMolduraDianteira": {
+        "vista": "planta",
+        "comprimento": 424.82,
+        "retidao": 0.638,
+        "concentracao": 0.302,
+        "inversoes": 0,
+        "raioMin": 1023
+      },
+      "faixaGArcoDianteiro": {
+        "vista": "planta",
+        "comprimento": 425.91,
+        "retidao": 0.633,
+        "concentracao": 0.307,
+        "inversoes": 0,
+        "raioMin": 924
+      },
+      "faixaGPortaDaCabine": {
+        "vista": "planta",
+        "comprimento": 1989.09,
+        "retidao": 0.834,
+        "concentracao": 0.06,
+        "inversoes": 1,
+        "raioMin": 774
+      },
+      "marcaDoDetalheF": {
+        "vista": "lateral",
+        "comprimento": 5480.86,
+        "retidao": 0.884,
+        "concentracao": 0.08,
+        "inversoes": 0,
+        "raioMin": 1245
       },
       "escalaGrafica": {
         "vista": "lateral",

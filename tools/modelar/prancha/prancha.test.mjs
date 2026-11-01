@@ -111,6 +111,32 @@ describe('métrica', () => {
     expect(fora.relatorio.alertas.join(' ')).toMatch(/fora do contorno/);
   });
 
+  it('desenha o plano de corte e a letra dele numa cor que não é a das cotas', () => {
+    const caixa = { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] };
+    const { svg, relatorio } = prancha({
+      ...base([caixa, { vista: 'lateral', classe: 'corte', tipo: 'poli', pts: [[0, 10], [0, 70]] }]),
+      anotacoes: [{ vista: 'lateral', em: [10, 60], texto: 'A', classe: 'cortet' }],
+    });
+    const cor = (cls) => svg.match(new RegExp(`\\.${cls}\\{[^}]*(?:stroke|fill):(#[0-9a-f]{6})`))[1];
+    expect(svg).toMatch(/<path class="corte"/);
+    expect(svg).toMatch(/<text [^>]*class="cortet">A</);
+    expect(cor('corte')).not.toBe(cor('cota'));
+    expect(cor('cortet')).toBe(cor('corte'));
+    expect(relatorio.alertas).toHaveLength(0);
+  });
+
+  it('começa a linha de extensão na feição dada em `pe`, e não na ponta da medida no ar', () => {
+    const caixa = { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] };
+    const cota = { vista: 'lateral', de: [-100, 80], ate: [100, 80], desloca: [0, -20], extensao: true, texto: '200' };
+    const sem = prancha({ ...base([caixa]), cotas: [cota] });
+    const com = prancha({ ...base([caixa]), cotas: [{ ...cota, pe: [null, [100, 20]] }] });
+    const ext = (r) => r.desenho.linhas.filter((l) => l.tipo === 'extensao');
+    expect(ext(com)[0].pts).toEqual(ext(sem)[0].pts);
+    expect(ext(com)[1].pts[0][1]).toBeGreaterThan(ext(sem)[1].pts[0][1]);
+    expect(ext(com)[1].pts[0][0]).toBeCloseTo(ext(sem)[1].pts[0][0], 6);
+    expect(ext(com)[1].pts[1]).toEqual(ext(sem)[1].pts[1]);
+  });
+
   it('acusa detalhe que escapou do contorno', () => {
     const { relatorio } = prancha(base([
       { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] },

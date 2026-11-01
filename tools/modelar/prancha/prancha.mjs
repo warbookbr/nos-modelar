@@ -31,7 +31,9 @@ export function criarAncoras({ entreEixos, altura, meiaLargura }) {
 }
 
 /* `oculta` é a linha escondida do desenho técnico, tracejada: o pneu de cima, embaixo do corpo, cruzava o vidro do
-   para-brisa em traço cheio na prancha do furgão realista. Ela continua sendo conferida contra o contorno. */
+   para-brisa em traço cheio na prancha do furgão realista. Ela continua sendo conferida contra o contorno.
+   `corte` é a linha do plano de corte, em traço-ponto grosso e cor própria, e `cortet` a letra dele: na prancha do
+   furgão realista os planos e as cotas tinham a mesma cor e se confundiam. */
 const ESTILOS = `
   .contorno{fill:none;stroke:#12233b;stroke-width:2.1;stroke-linejoin:round;stroke-linecap:round}
   .painel{fill:none;stroke:#2f4562;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
@@ -42,6 +44,8 @@ const ESTILOS = `
   .oculta{fill:none;stroke:#8a94a2;stroke-width:1.1;stroke-dasharray:5 3}
   .eixo{fill:none;stroke:#c8ccd2;stroke-width:1;stroke-dasharray:9 4 2 4}
   .carater{fill:none;stroke:#b3593d;stroke-width:1.7;stroke-dasharray:6 3}
+  .corte{fill:none;stroke:#6a4c93;stroke-width:1.9;stroke-dasharray:12 3 2 3}
+  .cortet{fill:#6a4c93;font-size:11px;font-weight:700}
   .cota{stroke:#b3593d;stroke-width:1;fill:none}
   .ext{stroke:#b3593d;stroke-width:0.7;fill:none}
   .cotat{fill:#b3593d;font-size:11px}
@@ -404,14 +408,19 @@ export function prancha(spec) {
        linhas de extensão descem de cada ponta da medida, na parte, até ela, como
        no desenho técnico. Sem elas, o número solto ao lado da parte se lia como
        medida de outra parte (2606, 989 e 8028 na lateral do avião). Cada linha
-       passa EXTENSAO_ALEM px da linha da cota. */
+       passa EXTENSAO_ALEM px da linha da cota. `pe: [deMundo, ateMundo]` faz
+       uma linha de extensão começar numa feição desenhada, na mesma reta da
+       ponta da medida, quando a ponta cai no ar: a 940 do furgão realista media
+       até a frente da chapa, que fica 650 mm abaixo da cota, e a extensão
+       saía do nada. */
     if (c.extensao && (dx || dy)) {
       const L = Math.hypot(dx, dy);
       const alem = [dx / L * EXTENSAO_ALEM, dy / L * EXTENSAO_ALEM];
-      for (const [x, y] of [[ax, ay], [bx, by]]) {
+      for (const [k, [x, y]] of [[ax, ay], [bx, by]].entries()) {
         const fim = [x + dx + alem[0], y + dy + alem[1]];
-        put(`<path class="ext" d="M ${n(x)} ${n(y)} L ${n(fim[0])} ${n(fim[1])}"/>`);
-        linha(dono, 'extensao', [[x, y], fim]);
+        const ini = c.pe?.[k] ? p(c.pe[k]) : [x, y];
+        put(`<path class="ext" d="M ${n(ini[0])} ${n(ini[1])} L ${n(fim[0])} ${n(fim[1])}"/>`);
+        linha(dono, 'extensao', [ini, fim]);
       }
     }
     const mx = (ax + bx) / 2 + dx; const my = (ay + by) / 2 + dy;
@@ -436,10 +445,13 @@ export function prancha(spec) {
   }
 
   /* Anotação é texto solto na vista, como a nota que diz por que uma medida
-     não se tira da imagem. */
+     não se tira da imagem. `classe: 'cortet'` a escreve como letra de plano de
+     corte, na cor da linha `corte`. */
   for (const [i, a] of (spec.anotacoes ?? []).entries()) {
     const [x, y] = proj[a.vista](a.em);
-    put(`<text x="${n(x)}" y="${n(y)}" class="cotat" font-style="italic">${a.texto}</text>`);
+    put(a.classe === 'cortet'
+      ? `<text x="${n(x)}" y="${n(y)}" class="cortet">${a.texto}</text>`
+      : `<text x="${n(x)}" y="${n(y)}" class="cotat" font-style="italic">${a.texto}</text>`);
     desenho.textos.push({ dono: a.dono ?? `anotação ${i}`, tipo: 'nota', texto: a.texto, caixa: caixaTexto(x, y, a.texto, 11) });
   }
 
