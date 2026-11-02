@@ -73,3 +73,7 @@ Na prancha do plástico de baixo, a saia de 299 a 463 passava sobre a base das p
 ## 15. A prancha não confere que uma cadeia de cotas soma o total
 
 Na quarta rodada da prancha, a faixa F cotava 268, 1.300, 110 e 707, que somam 2.385, com o total de 2.395, porque o trecho de 10 mm junto à moldura só estava em texto. A legenda também dava a escala do desenho, e não a da imagem exportada em dobro. Quem achou foi o crítico cego; o motor da prancha não confere nenhum dos dois. Destino: o motor confere a cadeia de cotas contra o total e escreve a escala da imagem exportada, decidido no fechamento.
+
+## 16. O caráter de uma foto com marca não chega ao crítico, e as pontas da moldura não têm conferência
+
+A pessoa mostrou uma foto de furgão real como caráter do arco. Ela tem marca e não entra no repositório nem no pacote do crítico. A moldura saiu como um aro fino com linha na borda de fora, e as pontas desceram abaixo da saia. O crítico cego deu nota 7 sem apontar nenhum dos dois, e quem viu foi a sessão principal, comparando as imagens com a foto. O processo não teria pego sozinho. Destino: o caráter da foto vira uma frase literal no `alvo.md`, que o pedido do crítico leva, e a especificação da prancha ganha a conferência das pontas da moldura sobre a saia e os para-choques; levar à skill de alinhamento a regra de traduzir em texto o caráter de toda referência que não pode entrar fica para o fechamento.

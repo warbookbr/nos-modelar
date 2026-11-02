@@ -1,0 +1,371 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 10,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "ausencia",
+        "onde": "face da frente acima do para-choque: faróis e grade central",
+        "sentido": "faltando",
+        "evidencia": "prancha frontal desenha três contornos arredondados acima do para-choque; frontal-orto e frente-rasante az290 e az20 mostram a face lisa"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "borda traseira e borda de baixo do vão da janela da cabine, lado +x",
+        "sentido": "segmentado",
+        "evidencia": "lado-rasante az30 e az120, região x 540-560 y 370-470: borda rasgada em degraus; também em tresquartos-rasante az90"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro",
+        "sentido": "segmentado",
+        "evidencia": "tresquartos-curvatura perto de x 470 y 780 e lado-curvatura x 260-370 y 400-540: mancha ocre e cinza ruidosa na curva da fresta"
+      }
+    ],
+    "observacao": "Proporção, silhueta e rodas seguem a prancha. Os achados são o serrilhado em vão e fresta, a ausência de faróis e grade e o bolso da placa traseira não visível nas vistas sombreadas."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCorrer",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "A parede da moldura na boca (0 a 3 mm do arco) cruza a raiz da aba, porque a seção sai quase vertical em d 0 a 2 e a espessura vai para o lado da aba; ficou declarado como contato.",
+    "O pé da moldura é cortado reto em 299 com 20 mm de saída, e a prancha frontal desenha ali o fundo redondo da saia: 10 mm de desvio frontal, só nesse canto.",
+    "pgrep -f na linha do próprio monitor de espera nunca terminava; esperei por PID."
+  ],
+  "notaDePassagem": "Moldura com moldura_inicio 0 e borda dobrada para dentro do arco, no material da lataria. A parede da boca toca a raiz da aba e isso está declarado. Saia e para-choques ficam escuros e terminam 2 mm sobre a borda de fora.",
+  "receita": {
+    "sha256": "sha256:04d2ab6953e1d8f3bcbc87af8a1805b085de3519c585e63e40d130aab25a8f6e",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 15,
+      "acrescentadas": 19,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 18,
+          "texto": " * os trechos entre as portas e os arcos e o de junto à moldura dianteira. A moldura começa a 5 mm do arco, acima da aba do arco, e a saia e"
+        },
+        {
+          "tipo": "-",
+          "linha": 19,
+          "texto": " * os para-choques passam 2 mm sobre a borda de fora dela para a emenda. As frestas, os arcos e o para-brisa são os da chapa aceita."
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * os trechos entre as portas e os arcos e o de junto à moldura dianteira. A moldura de cada arco é um alargamento na cor da lataria (escolha"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * da pessoa em 2026-11-01): encosta na boca do arco, sem diminuí-la, com a borda dobrada 10 mm para dentro do arco por trás da face da chapa,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * e cobre a aba do arco passando 2 mm ou mais acima dela. A saia e os para-choques, escuros, passam 2 mm sobre a borda de fora dela para a emenda. As frestas, os arcos e o para-brisa são os da chapa aceita."
+        },
+        {
+          "tipo": "-",
+          "linha": 213,
+          "texto": "  // (a moldura, [para fora, distância do arco]). A saia sai 20 mm da lateral, a moldura de cada arco 20, o dianteiro 50 e o traseiro 110."
+        },
+        {
+          "tipo": "+",
+          "linha": 214,
+          "texto": "  // (a moldura, [para fora, distância da boca do arco]). A saia sai 20 mm da lateral, a moldura de cada arco 20, o dianteiro 50 e o traseiro 110."
+        },
+        {
+          "tipo": "-",
+          "linha": 215,
+          "texto": "  secao_moldura: [[0, 0], [10, 4], [17, 13], [20, 27], [18, 31], [13, 37], [6, 42], [0, 45]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 216,
+          "texto": "  secao_moldura: [[-10, 0], [0, 0], [8, 2], [14, 5], [18, 10], [20, 17], [20, 25], [18, 32], [13, 38], [6, 43], [0, 45]], // o ponto de \"para fora\" negativo é a borda dobrada para dentro do arco"
+        },
+        {
+          "tipo": "-",
+          "linha": 225,
+          "texto": "  moldura_inicio: 5, // a moldura começa a esta distância do arco, acima da aba do arco (4 mm de altura nos primeiros 14 mm)"
+        },
+        {
+          "tipo": "+",
+          "linha": 226,
+          "texto": "  moldura_inicio: 0, // a moldura começa a esta distância da boca do arco; em 0 ela encosta na boca e cobre a aba do arco (4 mm de altura), passando 2 mm ou mais acima dela"
+        },
+        {
+          "tipo": "+",
+          "linha": 765,
+          "texto": "    if (k < 0) return sec.filter(([, d]) => d >= d0).map(([u, d]) => tocaChapa({ u, d }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 1634,
+          "texto": "    passos.push(['material', { sel, usa: 'plastico' }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1636,
+          "texto": "    passos.push(['material', { sel, usa: MOLDURAS.includes(pl.nome) ? 'azul' : 'plastico' }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 1681,
+          "texto": "/* O plástico de baixo se soma por fora da chapa. A saia, a moldura e os para-choques têm a borda que encosta na chapa entrando 1 mm nela;"
+        },
+        {
+          "tipo": "-",
+          "linha": 1682,
+          "texto": "   a moldura começa a 5 mm do arco para ficar acima da aba (4 mm de altura), e nenhuma peça de plástico toca a aba nem o pneu. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1683,
+          "texto": "/* O plástico de baixo e as molduras se somam por fora da chapa. A saia, a moldura e os para-choques têm a borda que encosta na chapa entrando 1 mm nela."
+        },
+        {
+          "tipo": "+",
+          "linha": 1684,
+          "texto": "   A moldura encosta na boca do arco e cobre a aba (4 mm de altura), passando 2 mm ou mais acima dela; só a parede dela na boca, de 0 a 3 mm do arco,"
+        },
+        {
+          "tipo": "+",
+          "linha": 1685,
+          "texto": "   encosta na raiz da aba. Nenhuma peça toca o pneu. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1698,
+          "texto": "    { par: [`abaArco${eixo}${lad}`, `molduraArco${eixo}${lad}`], motivo: 'a moldura cobre a aba do arco, passando 2 mm ou mais acima dela; a parede da moldura na boca encosta na raiz da aba' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1749,
+          "texto": "  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 3: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia, as molduras dos arcos e os para-choques em plástico escuro por fora da chapa, e quatro rodas provisórias' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1753,
+          "texto": "  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 3: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia e os para-choques em plástico escuro e as molduras dos arcos na cor da lataria, por fora da chapa, e quatro rodas provisórias' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1764,
+          "texto": "    objeto: 'furgão médio de teto alto, etapa 3: chapa de 5400 por 2000 por 2500 mm com frestas das cinco portas, mais saia, molduras dos arcos e para-choques de plástico escuro por fora (5560 por 2040), e rodas provisórias',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1768,
+          "texto": "    objeto: 'furgão médio de teto alto, etapa 3: chapa de 5400 por 2000 por 2500 mm com frestas das cinco portas, mais saia e para-choques de plástico escuro e molduras dos arcos na cor da lataria, por fora (5560 por 2040), e rodas provisórias',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1796,
+          "texto": "        forma: `moldura do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}: 45 mm do arco para fora, saindo 20 mm da lateral, sobre a aba do arco, sem tocá-la nem diminuir a boca, emendando com a saia e com o para-choque`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 1797,
+          "texto": "        tecnica: 'subdivisao da pele da seção da moldura varrida em torno do eixo da roda, de uma ponta à outra do arco, engrossada para dentro 2 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1800,
+          "texto": "        forma: `moldura do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}, na cor da lataria: alargamento de 45 mm encostado na boca, saindo 20 mm, borda dobrada 10 mm para dentro do arco, cobrindo a aba 2 mm acima`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 1801,
+          "texto": "        tecnica: 'subdivisao da pele da seção da moldura varrida em torno do eixo da roda, de uma ponta à outra do arco, engrossada para dentro 2 mm, material da lataria',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1831,
+          "texto": "      'a saia, a moldura ou um para-choque não é plástico escuro por fora da chapa com a seção da prancha: saia de 299 a 463 saindo 20, moldura de 45 saindo 20, dianteiro saindo 50 em duas alturas, traseiro saindo 110 com o degrau plano em 580',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1835,
+          "texto": "      'a saia ou um para-choque não é plástico escuro por fora da chapa com a seção da prancha (saia de 299 a 463 saindo 20, dianteiro saindo 50 em duas alturas, traseiro saindo 110 com o degrau plano em 580), ou uma moldura não tem a seção dela',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1833,
+          "texto": "      'a moldura diminui a boca do arco, toca a aba do arco ou não emenda com a saia e com os para-choques; um para-choque não dobra na quina até a moldura, ou a saída dele na lateral não cai para 20',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1837,
+          "texto": "      'a moldura não é da cor da lataria, não encosta na boca do arco, diminui a boca, não dobra 10 mm para dentro do arco, não passa 2 mm acima da aba ou não emenda com a saia; um para-choque não dobra na quina até ela',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1836,
+          "texto": "      'o plástico toca ou atravessa o pneu ou a aba do arco, ou a silhueta com ele passa de 5560 por 2040 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1840,
+          "texto": "      'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2040 mm',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az290.png",
+      "peca-frente-rasante-az20.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
