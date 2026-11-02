@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1693 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1694 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1526,6 +1526,7 @@
 - `receita-09.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 - `receita-10.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 - `receita-11.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
+- `receita-12.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 
 ## procedural/pecas/furgao/referencias/
 

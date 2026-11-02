@@ -349,6 +349,16 @@ export function prancha(spec) {
   if (autoria.bloqueada) {
     relatorio.alertas.push('autoria bloqueada: referência insuficiente não pode orientar modelagem precisa');
   }
+  /* `divisoes` declara as linhas que dividem a superfície (frestas, emendas de peça e de cor) de uma vista e a
+     distância mínima entre duas delas, em mm. No furgão realista a fresta da porta, o trecho preso de 10 mm e a emenda
+     do alargamento ficaram a 10 mm uns dos outros e se liam como linhas grudadas, e nada media isso. */
+  for (const regra of spec.divisoes ?? []) {
+    const r = afastamentoDasDivisoes(regra, camadas);
+    (relatorio.divisoes ??= []).push(r);
+    for (const par of r.pares) {
+      if (par.distancia < regra.minimo) relatorio.alertas.push(`divisões (${regra.vista}): ${par.a} e ${par.b} ficam a ${n(par.distancia)} mm, menos que ${regra.minimo}`);
+    }
+  }
 
   const O = [];
   const put = (x) => O.push(x);
@@ -543,6 +553,40 @@ const distPontoSeg = ([px, py], [ax, ay], [bx, by]) => {
   return Math.hypot(px - ax - t * dx, py - ay - t * dy);
 };
 const distPontoPoli = (p, pts) => { let d = Infinity; for (let k = 1; k < pts.length; k += 1) d = Math.min(d, distPontoSeg(p, pts[k - 1], pts[k])); return d; };
+/* A menor distância, em mm de mundo, entre cada par das camadas de divisão de uma vista, fora da vizinhança dos pontos
+   em que as duas se cruzam ou se encontram (`raioDoEncontro`, o dobro do mínimo se não for dado): ali a distância cai
+   a zero por construção e não é linha grudada. Devolve os pares do mais próximo ao mais afastado. */
+export function afastamentoDasDivisoes({ vista, minimo, camadas: nomes, raioDoEncontro = 2 * minimo, passo = 4 }, camadas) {
+  const linhas = nomes.map((nome) => {
+    const c = camadas.find((x) => x.nome === nome && x.vista === vista);
+    if (!c) throw new Error(`divisões: a camada ${nome} não existe na vista ${vista}`);
+    const pl = c.fechado && c.pl.length > 1 ? [...c.pl, c.pl[0]] : c.pl;
+    return { nome, pl, amostras: amostrarLinha(pl, passo).map(({ p }) => p) };
+  });
+  const pares = [];
+  for (let i = 0; i < linhas.length; i += 1) {
+    for (let j = i + 1; j < linhas.length; j += 1) {
+      const [A, B] = [linhas[i], linhas[j]];
+      const encontros = [
+        ...A.amostras.filter((p) => distPontoPoli(p, B.pl) < passo),
+        ...B.amostras.filter((p) => distPontoPoli(p, A.pl) < passo),
+      ];
+      const longe = (p) => encontros.every((q) => Math.hypot(p[0] - q[0], p[1] - q[1]) > raioDoEncontro);
+      let melhor = { distancia: Infinity, em: null };
+      for (const [P, Q] of [[A, B], [B, A]]) {
+        for (const p of P.amostras) {
+          if (!longe(p)) continue;
+          const d = distPontoPoli(p, Q.pl);
+          if (d < melhor.distancia) melhor = { distancia: d, em: p };
+        }
+      }
+      if (Number.isFinite(melhor.distancia)) pares.push({ a: A.nome, b: B.nome, distancia: n(melhor.distancia), em: melhor.em.map(n) });
+    }
+  }
+  pares.sort((x, y) => x.distancia - y.distancia);
+  return { vista, minimo, pares };
+}
+
 /* Pontos da polilinha a cada `passo` px, com o comprimento que cada um representa. */
 function amostrarLinha(pts, passo = 1) {
   const saida = [];
@@ -777,6 +821,10 @@ export function imprimirRelatorio(r) {
   if (lms.length) {
     const pior = lms.sort((a, b) => b[1].desvio - a[1].desvio)[0];
     L.push(`  landmarks verificados: ${lms.length}, pior desvio ${pior[1].desvio} mm (${pior[0]})`);
+  }
+  for (const d of r.divisoes ?? []) {
+    const menores = d.pares.slice(0, 3).map((p) => `${p.a} × ${p.b} ${p.distancia} mm`).join('; ');
+    L.push(`  divisões ${d.vista} (mínimo ${d.minimo} mm): ${menores || 'nenhum par'}`);
   }
   if (r.alertas.length === 0) L.push('  sem alertas');
   else for (const a of r.alertas) L.push(`  ALERTA ${a}`);

@@ -36,7 +36,7 @@ O vão das portas traseiras acompanha a lateral, como a pessoa escolheu em 2026-
 
 A pessoa achou a coluna do para-brisa fina demais vista de lado. A fresta da porta da cabine corria 30 mm atrás do perfil do para-brisa, e a ponta dobrada do vidro fica 22 mm atrás dele; de lado, restava uma lasca de chapa entre o vidro e a porta. Agora a fresta corre 122 mm atrás do perfil, na perpendicular. Com isso, a coluna aparece de lado como uma faixa de chapa de 100 mm, paralela à borda do para-brisa, entre a ponta do vidro e a fresta. A prancha desenha a ponta do vidro na lateral. O topo da porta desceu de 2.075 para 2.035, e acima dela fica uma faixa de 75 mm até o topo do para-brisa (2.110), onde começa a curva do teto.
 
-Com a fresta recuada, o pé dela fica em (1.660, 1.410). A aresta vertical da frente da porta passa a z 1.660, 60 mm atrás do eixo dianteiro, e dali contorna o arco por trás até a base da porta; desde 2026-11-02 o contorno é o círculo de raio 580, e a base fica em z 1.141. A porta tem 1.110 mm na cintura (era 1.185), dentro da faixa de 1.100 a 1.250, e 591 na base (eram cerca de 700 com a fresta a 55 mm do arco). A borda de trás continua em z 550, a coluna do meio em 110 e a porta de correr em 1.300, de z 440 a -860.
+Com a fresta recuada, o pé dela fica em (1.660, 1.410). A aresta vertical da frente da porta passa a z 1.660, 60 mm atrás do eixo dianteiro, e dali contorna o arco por trás até a base da porta; desde 2026-11-02 o contorno é a borda de fora do alargamento, o círculo de raio 570, e a base fica em z 1.151. A porta tem 1.110 mm na cintura (era 1.185), dentro da faixa de 1.100 a 1.250, e 601 na base (eram cerca de 700 com a fresta a 55 mm do arco). A borda de trás continua em z 550, a coluna do meio em 110 e a porta de correr em 1.300, de z 440 a -860.
 
 O vidro da porta mantém a moldura de 70 mm. A borda da frente dele segue a coluna, 192 mm atrás do perfil, e o vidro vai de 1.480 a 1.960 de altura. Na base ele vai de z 620 a 1.526 (906 mm) e no topo de 620 a 1.190 (570 mm).
 
@@ -64,9 +64,9 @@ A curva continua no plástico. Acima da linha da saia e dos para-choques, o alar
 
 A moldura da cor da lataria acaba nessa altura, e nenhum ponto dela fica abaixo. Daí para baixo, o mesmo alargamento, com a mesma largura e a mesma saída de 30 em relação à chapa, é da peça escura e segue até o fundo dela, em 299. O contorno em volta da roda fica inteiro e muda só de cor.
 
-Longe do arco, a saia e os para-choques mantêm a seção deles, saindo 20 de lado. Junto do arco, sobem até a saída do alargamento. A linha em que o alargamento sai da peça escura fica onde a saída dele cai a 20, a 76 mm da boca. O perfil do alargamento no plástico, `SECAO_NO_PLASTICO`, é o mesmo até ali e segue a 20 dali para fora: [-10, 0], [0, 0], [12, 2], [21, 6], [27, 12], [30, 20], [30, 30], [29.4, 40], [27.8, 50], [25.3, 60], [22.2, 70], [20, 76.4], [20, 150].
+Longe do arco, a saia e os para-choques mantêm a seção deles, saindo 20 de lado. Junto do arco, sobem até a saída do alargamento. A continuação escura do alargamento é parte da própria saia e dos para-choques vizinhos, sem emenda com eles: a superfície da saia acompanha o alargamento onde a saída dele passa dos 20, até 76 mm da boca, e onde há porta a única divisão ali é a fresta dela. O perfil do alargamento no plástico, `SECAO_NO_PLASTICO`, é o mesmo até ali e segue a 20 dali para fora: [-10, 0], [0, 0], [12, 2], [21, 6], [27, 12], [30, 20], [30, 30], [29.4, 40], [27.8, 50], [25.3, 60], [22.2, 70], [20, 76.4], [20, 150].
 
-A fresta da porta da cabine passou a contornar o arco dianteiro a 160 mm da boca, 10 mm fora do alargamento: é o círculo de raio 580 em volta do eixo, que antes tinha 475. A aresta vertical da frente da porta continua em z 1.660 e desce até esse círculo, que ela encontra em y 932. A porta fica menor só embaixo: na base, em 380, ela vai de z 550 a 1.141 e tem 591 mm, contra 696 antes. O vidro da porta e o resto da lataria não mudam.
+A fresta da porta da cabine contorna o arco dianteiro exatamente na borda de fora do alargamento, 150 mm da boca: é o círculo de raio 570 em volta do eixo (475 antes do alargamento, e 580 por um dia, a 10 mm dele, o que deixava duas linhas quase grudadas). A porta começa onde o alargamento termina, numa linha só, e como a descida do alargamento chega tangente à chapa, a fresta fica onde ele já é chapa. A aresta vertical da frente da porta continua em z 1.660 e desce até esse círculo, que ela encontra em y 922. A porta fica menor só embaixo: na base, em 380, ela vai de z 550 a 1.151 e tem 601 mm, contra 696 com a fresta a 55 mm do arco. O trecho preso de 10 mm entre a porta e o alargamento sumiu: a saia da porta da cabine vai até a borda do alargamento. O vidro da porta e o resto da lataria não mudam.
 
 A especificação confere no perfil:
 - que nenhum ponto entra na boca;
@@ -81,11 +81,11 @@ Confere também:
 - que a moldura da cor da lataria não desce abaixo da emenda do seu lado e acaba nela;
 - que o alargamento inteiro, contando o trecho no plástico, chega ao fundo da peça escura com o mesmo raio de fora, de 570;
 - que no plástico ele sai 30 da chapa e encontra a saída de 20 da saia;
-- a folga de 10 mm entre o alargamento inteiro e a fresta da porta da cabine, medida contra o contorno dela em volta do arco e na aresta;
-- que o raio da fresta é a largura do alargamento mais essa folga;
+- que a fresta da porta da cabine corre na borda de fora do alargamento: o raio dela é o de fora dele, o contorno da porta em volta do arco fica nesse círculo, o alargamento inteiro fica do lado do arco e ali ele já chegou à chapa;
+- que, na lateral, as linhas que dividem a superfície (as frestas das portas, o vidro da porta, o topo da saia e dos para-choques, que é também a emenda de cor, a borda de fora das molduras e a boca dos arcos) ficam a 30 mm ou mais umas das outras, fora de 60 mm em volta dos pontos em que se cruzam ou se encontram. A medida é a `divisoes` do motor da prancha, e as menores distâncias ficam todas junto desses encontros: 37,5 mm entre o topo do para-choque dianteiro e a boca do arco, 47,6 entre ele e a borda da moldura, 57,4 entre o degrau do para-choque traseiro e a boca, e cerca de 60 entre o topo da saia e as molduras, a porta da cabine e a moldura e a porta da cabine e a saia. Entre linhas paralelas a menor é a da base das portas (380) ao topo da saia (463), 83 mm;
 - a folga até a porta de correr, contra o alargamento inteiro: são 150 mm, e o mínimo é 100.
 
-Na prancha, a lateral desenha a borda de fora da moldura e, abaixo da emenda, a linha em que o alargamento sai da peça escura. O topo da saia e dos para-choques é desenhado desde a boca e é também a emenda de cor. A cota de 591 na base da porta da cabine está na lateral.
+Na prancha, a lateral desenha a borda de fora da moldura, que no arco dianteiro, atrás dele, é a própria fresta da porta. O topo da saia e dos para-choques é desenhado desde a boca e é também a emenda de cor. Abaixo dele, junto do arco, não há linha: a continuação escura do alargamento é a própria saia ou o para-choque. A cota de 601 na base da porta da cabine está na lateral.
 
 O corte B mostra o perfil na cor da lataria, radial a 45 graus da vertical no arco traseiro, com a dobra cotada e a aba em linha escondida. O corte I mostra o alargamento no plástico, radial na altura do eixo, à frente do arco traseiro. Os detalhes F e G desenham, junto dos arcos, o alargamento no plástico abaixo da emenda.
 
@@ -95,8 +95,7 @@ As portas descem até 380 e a saia vai de 299 a 463, então a saia passa sobre o
 - de -1.020 a -860, preso;
 - de -860 a 440, na porta de correr;
 - de 440 a 550, preso;
-- de 550 a 1.150, na porta da cabine;
-- de 1.150 a 1.160, preso, a folga até a moldura.
+- de 550 a 1.160, na porta da cabine, até a borda do alargamento.
 
 A especificação os guarda em `TRECHOS_DA_SAIA` e para quando uma porta não leva exatamente um trecho com as pontas nas frestas dela, ou quando um trecho preso fica sobre uma porta. A lateral desenha as frestas atravessando a saia até a base das portas, em 380, e uma nota diz como ela é cortada.
 
@@ -110,7 +109,7 @@ Os seis cortes do detalhe 5:1 têm o plano marcado nas vistas e também na vista
 
 Cada corte tem cotadas a saída e a altura, ou a largura na moldura: a saia sai 20 e tem 164, o alargamento sai 30 e tem 150 em B e em I, o dianteiro sai 50 e tem 424, o traseiro sai 110 e tem 280.
 
-Abaixo dos cortes, o detalhe F amplia 2,2 vezes a faixa de baixo do lado -x, de arco a arco. Ele desenha os trechos da saia com as frestas, a base das portas em 380 e os presos, com o comprimento de cada trecho em z (160, 1.300, 110 e 600) e as alturas 81 e 83. No lado +x, sem porta de correr, a saia fica presa de -1.020 a 550 e a porta da cabine leva o trecho dela igual; o detalhe G o desenha. As frestas aparecem como uma linha, e a largura de 6 mm fica na nota.
+Abaixo dos cortes, o detalhe F amplia 2,2 vezes a faixa de baixo do lado -x, de arco a arco. Ele desenha os trechos da saia com as frestas, a base das portas em 380 e os presos, com o comprimento de cada trecho em z (160, 1.300, 110 e 610) e as alturas 81 e 83. No lado +x, sem porta de correr, a saia fica presa de -1.020 a 550 e a porta da cabine leva o trecho dela igual; o detalhe G o desenha. As frestas aparecem como uma linha, e a largura de 6 mm fica na nota.
 
 O para-choque dianteiro sai 50 mm da frente da chapa, de 300 a 724, em duas alturas. Embaixo há um lábio que recua por baixo, até 388; a faixa da entrada de ar fica recuada 20 mm de uma quina à outra, de 388 a 482; o alto, de 482 a 724, acompanha o nariz. De frente, a prancha desenha o contorno dele e as duas linhas da faixa recuada, que substituem o retângulo da entrada de ar.
 
@@ -128,8 +127,8 @@ A quarta rodada de leitura, autorizada pela pessoa sem mudar forma nem medida, t
 - B diz que é radial a 45 graus da vertical, para trás.
 - O corte C cota os dois recuos. O lábio de baixo tem 75 de altura e recua 46 até a chapa; a faixa da entrada de ar tem 94 de altura e fica 20 para dentro. C e D dizem que o fundo fica a 300 do chão.
 - A lateral marca a extensão de F com um retângulo tracejado e a letra. A cota da saia passou para a coluna entre as portas e remete a F.
-- F mostra os planos A e E. A cota total, hoje 2.181 entre as molduras, de z -1.020 a 1.160, inclui o trecho preso de 10 mm junto à moldura dianteira, que a corrente de cotas não mostra. As cotas 81 e 83 saíram para fora do arco.
-- O detalhe G desenha o lado +x na mesma escala: hoje um trecho preso de 1.570 e o da porta da cabine, de 600.
+- F mostra os planos A e E. A cota total, hoje 2.181 entre as molduras, de z -1.020 a 1.160, fecha com a corrente de cotas, porque o trecho preso de 10 mm junto à moldura dianteira sumiu. As cotas 81 e 83 saíram para fora do arco.
+- O detalhe G desenha o lado +x na mesma escala: hoje um trecho preso de 1.570 e o da porta da cabine, de 610.
 - A cota de 940 ganhou uma extensão que sobe da quina do para-choque com a chapa, em z 2.700. A de 742 vai da ponta da moldura até a face do para-choque.
 - A chamada de `cabineT` saiu de cima da linha da porta.
 - A frontal tem 2.040 na saia, e os números do para-brisa ficaram longe das linhas.

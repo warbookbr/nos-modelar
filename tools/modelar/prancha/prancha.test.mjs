@@ -137,6 +137,21 @@ describe('métrica', () => {
     expect(ext(com)[1].pts[1]).toEqual(ext(sem)[1].pts[1]);
   });
 
+  it('mede a distância entre linhas de divisão e acusa as grudadas, sem contar onde elas se cruzam', () => {
+    const caixa = { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] };
+    const linha = (nome, pts) => ({ vista: 'lateral', classe: 'painel', nome, tipo: 'poli', pts });
+    const divisoes = [{ vista: 'lateral', minimo: 15, camadas: ['a', 'b', 'c'] }];
+    /* a e b paralelas a 10; c cruza as duas em pé */
+    const grudadas = prancha({ ...base([caixa, linha('a', [[-90, 40], [90, 40]]), linha('b', [[-90, 50], [90, 50]]), linha('c', [[0, 5], [0, 75]])]), divisoes });
+    const par = (r, a, b) => r.relatorio.divisoes[0].pares.find((p) => p.a === a && p.b === b);
+    expect(par(grudadas, 'a', 'b').distancia).toBeCloseTo(10, 6);
+    expect(grudadas.relatorio.alertas.join(' ')).toMatch(/divisões \(lateral\): a e b ficam a 10 mm, menos que 15/);
+    expect(grudadas.relatorio.alertas.join(' ')).not.toMatch(/a e c|b e c/);
+    const afastadas = prancha({ ...base([caixa, linha('a', [[-90, 20], [90, 20]]), linha('b', [[-90, 60], [90, 60]]), linha('c', [[0, 5], [0, 75]])]), divisoes });
+    expect(par(afastadas, 'a', 'b').distancia).toBeCloseTo(40, 6);
+    expect(afastadas.relatorio.alertas).toHaveLength(0);
+  });
+
   it('acusa detalhe que escapou do contorno', () => {
     const { relatorio } = prancha(base([
       { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] },
