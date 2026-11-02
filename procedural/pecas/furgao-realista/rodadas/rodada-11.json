@@ -1,0 +1,900 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 11,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "borda de baixo e de trás do vão da janela da porta da cabine",
+        "sentido": "segmentado",
+        "evidencia": "Lado az30 e az120 (350-550,400-470): borda irregular em degraus, enquanto nas vistas sem luz rasante a borda parece lisa."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "borda de cima e de baixo do vão do para-brisa",
+        "sentido": "segmentado",
+        "evidencia": "Frente az290 (450-980,205-222) dentes e traços soltos na borda superior; topo az40 e az130 (590-810,770-775) igual na borda inferior."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro, com a aresta de proa da porta",
+        "sentido": "segmentado",
+        "evidencia": "Curvatura lado (330-370,500-560) dente de serra ocre e mancha cinza em (255-275,380-480); tresquartos (440-500,770-810) estrela de pontos; critério de reprovação."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "quatro nervuras longitudinais do teto",
+        "sentido": "anguloso",
+        "evidencia": "Tresquartos az0: fendas pretas largas com borda clara; em topo az40/az130 saem suaves. Confirmar a profundidade, pode estar forte como degrau."
+      }
+    ],
+    "observacao": "Forma, proporção e partes batem com a prancha; os achados são de superfície sob luz rasante, e o bolso da placa traseira não aparece nas vistas."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCorrer",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaDianteiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rodaProvisoriaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "Com as linhas de seção originais, a aresta de ponta da saia e dos para-choques virava corda do círculo da boca e entrava até 15 mm no arco; foi preciso adensar a seção a cada 40 mm de altura.",
+    "A subdivisão deixa as pontas das molduras a 0,4 mm abaixo da altura da ponta (462,6) e a boca a 418,3 mm; as duas folgas de arredondamento vêm da superfície limite.",
+    "A moldura dianteira tem um calombo de 1,73 mm na passagem de 90 para 45 mm, onde as células ficam inclinadas pela largura que varia.",
+    "A aba do arco cruza a saia e os para-choques na raiz, perto da soleira, e só deu para declarar como contato interpenetra.",
+    "A primeira geração das vistas com Blender estourou os 30 minutos em segundo plano com outros jobs rodando; refiz sozinha e com 2 h."
+  ],
+  "notaDePassagem": "A moldura é varrida por linha da seção: cada linha vai do ângulo em que cruza a altura da ponta da frente ao da de trás, e assim a ponta sai horizontal. Saia e para-choques foram à boca; a seção foi adensada para a ponta seguir o círculo.",
+  "receita": {
+    "sha256": "sha256:ddbccbea7116b20c1afddd2895a5552f8737c91e1848720850323d42a329ba94",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 42,
+      "acrescentadas": 96,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 13,
+          "texto": " * molduras de 45 mm em volta dos arcos e os para-choques, que saem 50 mm na frente e 110 atrás e dobram nas quinas até a moldura. A chapa"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * molduras de 90 mm em volta dos arcos (45 atrás do arco dianteiro) e os para-choques, que saem 50 mm na frente e 110 atrás e dobram nas quinas até a boca do arco. A chapa"
+        },
+        {
+          "tipo": "-",
+          "linha": 18,
+          "texto": " * os trechos entre as portas e os arcos e o de junto à moldura dianteira. A moldura de cada arco é um alargamento na cor da lataria (escolha"
+        },
+        {
+          "tipo": "-",
+          "linha": 19,
+          "texto": " * da pessoa em 2026-11-01): encosta na boca do arco, sem diminuí-la, com a borda dobrada 10 mm para dentro do arco por trás da face da chapa,"
+        },
+        {
+          "tipo": "-",
+          "linha": 20,
+          "texto": " * e cobre a aba do arco passando 2 mm ou mais acima dela. A saia e os para-choques, escuros, passam 2 mm sobre a borda de fora dela para a emenda. As frestas, os arcos e o para-brisa são os da chapa aceita."
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * os trechos entre as portas e os arcos e o de junto ao arco dianteiro. A moldura de cada arco é um alargamento na cor da lataria (escolha"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * da pessoa em 2026-11-01) que se funde ao painel, sem linha na borda de fora e com o ressalto maior junto à boca: encosta na boca do arco, sem"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * diminuí-la, com a borda dobrada 10 mm para dentro do arco por trás da face da chapa, cobre a aba do arco passando 2 mm ou mais acima dela e"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * desce numa curva que chega tangente à chapa. A largura é 90 e, atrás do arco dianteiro, onde a fresta da porta da cabine passa perto, 45, com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * passagem suave em 25 graus. Cada moldura acaba, de cada lado, numa ponta horizontal da boca à borda de fora, no topo da peça escura vizinha"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * (463 da saia, 580 do traseiro, 724 do dianteiro); abaixo dela a saia e os para-choques vão até a boca. As frestas, os arcos e o para-brisa são os da chapa aceita."
+        },
+        {
+          "tipo": "-",
+          "linha": 214,
+          "texto": "  // (a moldura, [para fora, distância da boca do arco]). A saia sai 20 mm da lateral, a moldura de cada arco 20, o dianteiro 50 e o traseiro 110."
+        },
+        {
+          "tipo": "+",
+          "linha": 217,
+          "texto": "  // A saia sai 20 mm da lateral, a moldura de cada arco 20, o dianteiro 50 e o traseiro 110."
+        },
+        {
+          "tipo": "-",
+          "linha": 216,
+          "texto": "  secao_moldura: [[-10, 0], [0, 0], [8, 2], [14, 5], [18, 10], [20, 17], [20, 25], [18, 32], [13, 38], [6, 43], [0, 45]], // o ponto de \"para fora\" negativo é a borda dobrada para dentro do arco"
+        },
+        {
+          "tipo": "+",
+          "linha": 219,
+          "texto": "  // A moldura é um alargamento na cor da lataria que se funde ao painel. O perfil de largura W é a subida [para fora, distância da boca do arco]"
+        },
+        {
+          "tipo": "+",
+          "linha": 220,
+          "texto": "  // (o ponto de \"para fora\" negativo é a borda dobrada para dentro do arco, e o ressalto cheio fica a 20 mm até 20 mm da boca) e uma descida em curva"
+        },
+        {
+          "tipo": "+",
+          "linha": 221,
+          "texto": "  // u = saida (1 − 3p² + 2p³), de p = 0 no ressalto a p = 1 na chapa, com a distância da boca indo de 20 a W e a tangente horizontal nas duas pontas."
+        },
+        {
+          "tipo": "+",
+          "linha": 222,
+          "texto": "  secao_moldura_subida: [[-10, 0], [0, 0], [8, 2], [14, 5], [18, 10], [20, 17], [20, 20]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 223,
+          "texto": "  moldura_saida: 20,"
+        },
+        {
+          "tipo": "+",
+          "linha": 224,
+          "texto": "  moldura_descida_passos: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 225,
+          "texto": "  moldura_largura: 90, // onde há espaço: o arco traseiro inteiro e o dianteiro do alto para a frente"
+        },
+        {
+          "tipo": "+",
+          "linha": 226,
+          "texto": "  moldura_largura_estreita: 45, // atrás do arco dianteiro, onde a fresta da porta da cabine passa a 55 mm da boca"
+        },
+        {
+          "tipo": "+",
+          "linha": 227,
+          "texto": "  moldura_transicao_graus: 25, // a passagem de uma largura à outra, a partir de onde a fresta da porta encontra o arco"
+        },
+        {
+          "tipo": "+",
+          "linha": 228,
+          "texto": "  // As pontas de baixo não têm número próprio: cada moldura acaba, de cada lado do arco, na altura do topo da peça escura vizinha (o da saia, o do"
+        },
+        {
+          "tipo": "+",
+          "linha": 229,
+          "texto": "  // para-choque dianteiro à frente do arco dianteiro e o do traseiro atrás do arco traseiro), numa ponta horizontal da boca à borda de fora."
+        },
+        {
+          "tipo": "-",
+          "linha": 223,
+          "texto": "  plastico_sobreposicao: 2, // quanto a saia e o para-choque passam sobre a borda de fora da moldura, para a emenda"
+        },
+        {
+          "tipo": "-",
+          "linha": 224,
+          "texto": "  plastico_base_y: 299, // o fundo da saia e da moldura"
+        },
+        {
+          "tipo": "-",
+          "linha": 225,
+          "texto": "  moldura_largura: 45, // do arco para fora, sem diminuir a boca dele"
+        },
+        {
+          "tipo": "-",
+          "linha": 226,
+          "texto": "  moldura_inicio: 0, // a moldura começa a esta distância da boca do arco; em 0 ela encosta na boca e cobre a aba do arco (4 mm de altura), passando 2 mm ou mais acima dela"
+        },
+        {
+          "tipo": "+",
+          "linha": 236,
+          "texto": "  plastico_passo_y: 40, // a distância máxima, em altura, entre as linhas da seção da saia e dos para-choques, para a ponta acompanhar o círculo da boca"
+        },
+        {
+          "tipo": "+",
+          "linha": 237,
+          "texto": "  plastico_base_y: 299, // o fundo da saia"
+        },
+        {
+          "tipo": "+",
+          "linha": 615,
+          "texto": "/* Reparte os trechos da seção [[u, y]] mais longos que `passo` em altura, na reta entre os vizinhos, sem mudar a forma. A saia e os"
+        },
+        {
+          "tipo": "+",
+          "linha": 616,
+          "texto": "   para-choques acabam na boca do arco, que é um círculo: com poucas linhas a aresta de ponta vira uma corda e entra na boca. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 617,
+          "texto": "function adensar(secao, passo) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 618,
+          "texto": "  const s = [secao[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 619,
+          "texto": "  for (let i = 1; i < secao.length; i += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 620,
+          "texto": "    const [u0, y0] = secao[i - 1]; const [u1, y1] = secao[i];"
+        },
+        {
+          "tipo": "+",
+          "linha": 621,
+          "texto": "    const n = Math.ceil(Math.abs(y1 - y0) / passo - 1e-9);"
+        },
+        {
+          "tipo": "+",
+          "linha": 622,
+          "texto": "    for (let k = 1; k < n; k += 1) s.push([lerp(u0, u1, k / n), lerp(y0, y1, k / n)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 623,
+          "texto": "    s.push(secao[i]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 624,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 625,
+          "texto": "  return s;"
+        },
+        {
+          "tipo": "+",
+          "linha": 626,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 627,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 700,
+          "texto": " *   parte de 299 a 380 sob as portas, os trechos entre as portas e os arcos e o trecho junto à moldura dianteira ficam presos. A moldura"
+        },
+        {
+          "tipo": "-",
+          "linha": 701,
+          "texto": " *   de cada arco sai 20 mm, do arco para fora. Os para-choques saem 50 mm na frente e 110 atrás e dobram nas quinas até a moldura,"
+        },
+        {
+          "tipo": "-",
+          "linha": 702,
+          "texto": " *   reduzindo a saída para a da saia na lateral. Cada peça é a pele de fora da seção da prancha, varrida pelo trilho, e a espessura"
+        },
+        {
+          "tipo": "-",
+          "linha": 703,
+          "texto": " *   do passo a engrossa para dentro, para a chapa."
+        },
+        {
+          "tipo": "+",
+          "linha": 724,
+          "texto": " *   parte de 299 a 380 sob as portas, os trechos entre as portas e os arcos e o trecho junto ao arco dianteiro ficam presos, e vão até a boca"
+        },
+        {
+          "tipo": "+",
+          "linha": 725,
+          "texto": " *   dos arcos. A moldura de cada arco sai 20 mm, da boca para fora, com a largura que varia pelo ângulo, e acaba em pontas horizontais no topo"
+        },
+        {
+          "tipo": "+",
+          "linha": 726,
+          "texto": " *   das peças escuras vizinhas. Os para-choques saem 50 mm na frente e 110 atrás e dobram nas quinas até a boca do arco, reduzindo a saída para"
+        },
+        {
+          "tipo": "+",
+          "linha": 727,
+          "texto": " *   a da saia na lateral. Cada peça é a pele de fora da seção da prancha, varrida pelo trilho, e a espessura do passo a engrossa para dentro,"
+        },
+        {
+          "tipo": "+",
+          "linha": 728,
+          "texto": " *   para a chapa."
+        },
+        {
+          "tipo": "-",
+          "linha": 708,
+          "texto": "  const raioMoldura = T.arco_raio + T.moldura_largura;"
+        },
+        {
+          "tipo": "-",
+          "linha": 714,
+          "texto": "  const dzMoldura = dzDe(raioMoldura - T.plastico_sobreposicao);"
+        },
+        {
+          "tipo": "+",
+          "linha": 738,
+          "texto": "  const dzBoca = dzDe(T.arco_raio); // a saia e os para-choques vão até a boca do arco"
+        },
+        {
+          "tipo": "-",
+          "linha": 729,
+          "texto": "  const secaoSaia = comAlturas(T.secao_saia, [baixoPortas, cimaPortas]).map(([u, y]) => tocaChapa({ u, y }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 753,
+          "texto": "  const secaoSaia = adensar(comAlturas(T.secao_saia, [baixoPortas, cimaPortas]), T.plastico_passo_y).map(([u, y]) => tocaChapa({ u, y }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 737,
+          "texto": "      ? [[(y) => zT + dzMoldura(y), 'preso'], [fixo(correrTras - meia), 'porta'], [fixo(correrFrente + meia), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso'], [(y) => zD - dzMoldura(y), null]]"
+        },
+        {
+          "tipo": "-",
+          "linha": 738,
+          "texto": "      : [[(y) => zT + dzMoldura(y), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso'], [(y) => zD - dzMoldura(y), null]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 761,
+          "texto": "      ? [[(y) => zT + dzBoca(y), 'preso'], [fixo(correrTras - meia), 'porta'], [fixo(correrFrente + meia), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso'], [(y) => zD - dzBoca(y), null]]"
+        },
+        {
+          "tipo": "+",
+          "linha": 762,
+          "texto": "      : [[(y) => zT + dzBoca(y), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso'], [(y) => zD - dzBoca(y), null]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 760,
+          "texto": "  /* ---- a moldura dos arcos: do arco para fora, sobre a parede, em torno do eixo da roda ---- */"
+        },
+        {
+          "tipo": "-",
+          "linha": 761,
+          "texto": "  const secaoMoldura = (() => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 762,
+          "texto": "    const d0 = T.moldura_inicio;"
+        },
+        {
+          "tipo": "-",
+          "linha": 763,
+          "texto": "    const sec = T.secao_moldura;"
+        },
+        {
+          "tipo": "-",
+          "linha": 764,
+          "texto": "    const k = sec.findIndex((p, i) => i + 1 < sec.length && d0 > p[1] && d0 < sec[i + 1][1]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 765,
+          "texto": "    if (k < 0) return sec.filter(([, d]) => d >= d0).map(([u, d]) => tocaChapa({ u, d }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 766,
+          "texto": "    const [u0, dA] = sec[k]; const [u1, dB] = sec[k + 1];"
+        },
+        {
+          "tipo": "-",
+          "linha": 767,
+          "texto": "    return [[lerp(u0, u1, (d0 - dA) / (dB - dA)), d0], ...sec.slice(k + 1)].map(([u, d]) => tocaChapa({ u, d }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 768,
+          "texto": "  })();"
+        },
+        {
+          "tipo": "+",
+          "linha": 784,
+          "texto": "  /* ---- a moldura dos arcos: um alargamento que se funde ao painel, em torno do eixo da roda ---- */"
+        },
+        {
+          "tipo": "+",
+          "linha": 785,
+          "texto": "  const topo = (sec) => Math.max(...sec.map(([, y]) => y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 786,
+          "texto": "  const topoSaia = topo(T.secao_saia); const topoDiant = topo(T.secao_parachoque_dianteiro); const topoTras = topo(T.secao_parachoque_traseiro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 787,
+          "texto": "  /* a largura pelo ângulo a partir de +z (0 na frente, 90 graus no alto, 180 atrás): a larga em toda a volta do arco traseiro e no dianteiro do alto"
+        },
+        {
+          "tipo": "+",
+          "linha": 788,
+          "texto": "     para a frente; a estreita atrás do arco dianteiro, a partir de onde a fresta da porta da cabine o encontra, com a passagem suave pelo ângulo dado */"
+        },
+        {
+          "tipo": "+",
+          "linha": 789,
+          "texto": "  const dzFresta = f.pePorta[0] - zD;"
+        },
+        {
+          "tipo": "+",
+          "linha": 790,
+          "texto": "  const aFresta = Math.atan2(Math.sqrt(raioPorta ** 2 - dzFresta ** 2), dzFresta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 791,
+          "texto": "  const transicao = (T.moldura_transicao_graus * Math.PI) / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 792,
+          "texto": "  const larguraEm = (zc, a) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 793,
+          "texto": "    if (zc !== zD || a <= aFresta - transicao) return T.moldura_largura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 794,
+          "texto": "    if (a >= aFresta) return T.moldura_largura_estreita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 795,
+          "texto": "    const t = (aFresta - a) / transicao;"
+        },
+        {
+          "tipo": "+",
+          "linha": 796,
+          "texto": "    return T.moldura_largura_estreita + (T.moldura_largura - T.moldura_largura_estreita) * t * t * (3 - 2 * t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 797,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 798,
+          "texto": "  const ressalto = T.secao_moldura_subida.at(-1)[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 799,
+          "texto": "  const linhasMoldura = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 800,
+          "texto": "    ...T.secao_moldura_subida.map(([u, d]) => ({ u, d: () => d })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 801,
+          "texto": "    ...Array.from({ length: T.moldura_descida_passos }, (_, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 802,
+          "texto": "      const q = (i + 1) / T.moldura_descida_passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 803,
+          "texto": "      return { u: T.moldura_saida * (1 - 3 * q ** 2 + 2 * q ** 3), d: (zc, a) => ressalto + q * (larguraEm(zc, a) - ressalto) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 804,
+          "texto": "    }),"
+        },
+        {
+          "tipo": "+",
+          "linha": 805,
+          "texto": "  ].map(tocaChapa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 806,
+          "texto": "  /* o ângulo em que a linha da seção cruza a altura y, à frente (lado +1) ou atrás (lado -1) do alto do arco */"
+        },
+        {
+          "tipo": "+",
+          "linha": 807,
+          "texto": "  const anguloNaAltura = (zc, l, y, lado) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 808,
+          "texto": "    let [lo, hi] = lado > 0 ? [0, Math.PI / 2] : [Math.PI / 2, Math.PI];"
+        },
+        {
+          "tipo": "+",
+          "linha": 809,
+          "texto": "    for (let k = 0; k < 60; k += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 810,
+          "texto": "      const m = (lo + hi) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 811,
+          "texto": "      const sobe = yc + (T.arco_raio + l.d(zc, m)) * Math.sin(m) < y;"
+        },
+        {
+          "tipo": "+",
+          "linha": 812,
+          "texto": "      if ((lado > 0) === sobe) lo = m; else hi = m;"
+        },
+        {
+          "tipo": "+",
+          "linha": 813,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 814,
+          "texto": "    return (lo + hi) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 815,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 816,
+          "texto": "  /* cada moldura acaba, de cada lado, numa ponta horizontal no topo da peça escura vizinha, da boca à borda de fora: cada linha da seção vai do ângulo em que"
+        },
+        {
+          "tipo": "+",
+          "linha": 817,
+          "texto": "     cruza a altura da ponta da frente ao em que cruza a de trás */"
+        },
+        {
+          "tipo": "+",
+          "linha": 818,
+          "texto": "  const pontas = { [zT]: { tras: topoTras, frente: topoSaia }, [zD]: { tras: topoSaia, frente: topoDiant } };"
+        },
+        {
+          "tipo": "-",
+          "linha": 772,
+          "texto": "      const n = Math.ceil(180 / T.moldura_passo_graus);"
+        },
+        {
+          "tipo": "+",
+          "linha": 822,
+          "texto": "      const linhas = linhasMoldura.map((l) => ({ ...l, aF: anguloNaAltura(zc, l, pontas[zc].frente, 1), aB: anguloNaAltura(zc, l, pontas[zc].tras, -1) }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 823,
+          "texto": "      const n = Math.ceil((linhas[0].aB - linhas[0].aF) / ((T.moldura_passo_graus * Math.PI) / 180));"
+        },
+        {
+          "tipo": "-",
+          "linha": 775,
+          "texto": "        nome, estacoes: ests, linhas: secaoMoldura, dica: dicaX(s),"
+        },
+        {
+          "tipo": "+",
+          "linha": 826,
+          "texto": "        nome, estacoes: ests, linhas, dica: dicaX(s),"
+        },
+        {
+          "tipo": "-",
+          "linha": 777,
+          "texto": "          const r = T.arco_raio + l.d; const a0 = Math.asin((yc - T.plastico_base_y) / r); const a = lerp(-a0, Math.PI + a0, t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 828,
+          "texto": "          const a = lerp(l.aF, l.aB, t); const r = T.arco_raio + l.d(zc, a);"
+        },
+        {
+          "tipo": "-",
+          "linha": 787,
+          "texto": "    const sec = comAlturas(T.secao_parachoque_dianteiro, [T.placa_dianteira_y0, T.placa_dianteira_y0 + T.placa_altura]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 838,
+          "texto": "    const sec = adensar(comAlturas(T.secao_parachoque_dianteiro, [T.placa_dianteira_y0, T.placa_dianteira_y0 + T.placa_altura]), T.plastico_passo_y);"
+        },
+        {
+          "tipo": "-",
+          "linha": 791,
+          "texto": "    const zFimLado = (y) => zD + dzMoldura(y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 842,
+          "texto": "    const zFimLado = (y) => zD + dzBoca(y);"
+        },
+        {
+          "tipo": "-",
+          "linha": 812,
+          "texto": "    const sec = comAlturas(T.secao_parachoque_traseiro, [T.placa_traseira_y0, T.placa_traseira_y0 + T.placa_altura]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 863,
+          "texto": "    const sec = adensar(comAlturas(T.secao_parachoque_traseiro, [T.placa_traseira_y0, T.placa_traseira_y0 + T.placa_altura]), T.plastico_passo_y);"
+        },
+        {
+          "tipo": "-",
+          "linha": 817,
+          "texto": "    const zFimLado = (y) => zT - dzMoldura(y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 868,
+          "texto": "    const zFimLado = (y) => zT - dzBoca(y);"
+        },
+        {
+          "tipo": "-",
+          "linha": 1685,
+          "texto": "   encosta na raiz da aba. Nenhuma peça toca o pneu. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1736,
+          "texto": "   encosta na raiz da aba. A saia e os para-choques vão até a boca e cobrem a aba por baixo das pontas da moldura. Nenhuma peça toca o pneu. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 1696,
+          "texto": "    { par: [`saiaPresa${lado}`, `molduraArco${eixo}${lad}`], motivo: 'a saia acaba sobre a borda de fora da moldura, 2 mm dentro dela, e a emenda segue o círculo dela' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1697,
+          "texto": "    { par: [`parachoque${eixo}`, `molduraArco${eixo}${lad}`], motivo: 'o para-choque dobra na quina e segue pela lateral até a borda de fora da moldura, 2 mm dentro dela' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1747,
+          "texto": "    { par: [`saiaPresa${lado}`, `molduraArco${eixo}${lad}`], motivo: 'a ponta horizontal da moldura assenta no topo da saia, da boca do arco à borda de fora, e a medida a dá por menos de 1 mm de sobreposição' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1748,
+          "texto": "    { par: [`parachoque${eixo}`, `molduraArco${eixo}${lad}`], motivo: 'a ponta horizontal da moldura assenta no topo do para-choque (580 atrás, 724 na frente), da boca do arco à borda de fora, e a medida a dá por menos de 1 mm de sobreposição' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1750,
+          "texto": "    { par: [`abaArco${eixo}${lad}`, `saiaPresa${lado}`], motivo: 'a saia vai até a boca do arco e cobre a aba por baixo da ponta da moldura; as caixas se cruzam na raiz da aba, perto da soleira, onde a seção da saia desce a 299' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 1751,
+          "texto": "    { par: [`abaArco${eixo}${lad}`, `parachoque${eixo}`], motivo: 'o para-choque vai pela lateral até a boca do arco e cobre a aba por baixo da ponta da moldura; as caixas se cruzam na raiz da aba, perto da soleira' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 1800,
+          "texto": "        forma: `moldura do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}, na cor da lataria: alargamento de 45 mm encostado na boca, saindo 20 mm, borda dobrada 10 mm para dentro do arco, cobrindo a aba 2 mm acima`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 1801,
+          "texto": "        tecnica: 'subdivisao da pele da seção da moldura varrida em torno do eixo da roda, de uma ponta à outra do arco, engrossada para dentro 2 mm, material da lataria',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1853,
+          "texto": "        forma: `moldura do arco ${nome.includes('Dianteiro') ? 'dianteiro, de 90 mm e 45 atrás' : 'traseiro, de 90 mm'}, na cor da lataria: alargamento que se funde ao painel, saindo 20 e descendo tangente à chapa; dobra de 10 mm para dentro do arco; pontas horizontais no topo da peça vizinha`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 1854,
+          "texto": "        tecnica: 'subdivisao da pele da seção varrida em torno do eixo da roda, com a largura variando pelo ângulo e as pontas em altura fixa, engrossada para dentro 2 mm, material da lataria',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1835,
+          "texto": "      'a saia ou um para-choque não é plástico escuro por fora da chapa com a seção da prancha (saia de 299 a 463 saindo 20, dianteiro saindo 50 em duas alturas, traseiro saindo 110 com o degrau plano em 580), ou uma moldura não tem a seção dela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1888,
+          "texto": "      'a saia ou um para-choque não é plástico escuro por fora da chapa com a seção da prancha: saia de 299 a 463 saindo 20, dianteiro saindo 50 em duas alturas, traseiro saindo 110 com o degrau plano em 580',"
+        },
+        {
+          "tipo": "-",
+          "linha": 1837,
+          "texto": "      'a moldura não é da cor da lataria, não encosta na boca do arco, diminui a boca, não dobra 10 mm para dentro do arco, não passa 2 mm acima da aba ou não emenda com a saia; um para-choque não dobra na quina até ela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1890,
+          "texto": "      'a moldura não é da cor da lataria, marca linha na borda de fora (volta à chapa de repente), diminui a boca, não dobra 10 mm para dentro do arco, passa menos de 2 mm acima da aba, ou desce abaixo da ponta vizinha',"
+        },
+        {
+          "tipo": "+",
+          "linha": 1891,
+          "texto": "      'a largura da moldura não é 90 (45 atrás do arco dianteiro, com a passagem suave), ou a saia e os para-choques não vão até a boca do arco abaixo das pontas',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az290.png",
+      "peca-frente-rasante-az20.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
