@@ -19,9 +19,12 @@
     "zFrente": 2750,
     "zTras": -2810,
     "molduraArco": {
-      "largura": 90,
-      "estreita": 45,
-      "folgaPortaDeCorrer": 221.5664537774369
+      "largura": 150,
+      "saida": 30,
+      "larguraNosArcos": 2060,
+      "raioDaFrestaDaCabine": 580,
+      "portaDaCabineNaBase": 590.5390435930994,
+      "folgaPortaDeCorrer": 150.000870508106
     }
   },
   "secoes": {
@@ -73,59 +76,75 @@
         0
       ],
       [
-        8,
+        12,
         2
       ],
       [
-        14,
-        5
+        21,
+        6
       ],
       [
-        18,
-        10
+        27,
+        12
       ],
       [
-        20,
-        17
-      ],
-      [
-        20,
+        30,
         20
       ],
       [
-        19.1,
-        28.8
+        30,
+        30
       ],
       [
-        16.9,
-        37.5
+        29.4,
+        40
       ],
       [
-        13.7,
-        46.3
+        27.8,
+        50
       ],
       [
-        10,
-        55
+        25.3,
+        60
       ],
       [
-        6.3,
-        63.8
+        22.2,
+        70
       ],
       [
-        3.1,
-        72.5
+        18.7,
+        80
       ],
       [
-        0.9,
-        81.3
+        15,
+        90
+      ],
+      [
+        11.3,
+        100
+      ],
+      [
+        7.8,
+        110
+      ],
+      [
+        4.7,
+        120
+      ],
+      [
+        2.2,
+        130
+      ],
+      [
+        0.6,
+        140
       ],
       [
         0,
-        90
+        150
       ]
     ],
-    "molduraEstreita": [
+    "alargamentoNoPlastico": [
       [
         -10,
         0
@@ -135,56 +154,48 @@
         0
       ],
       [
-        8,
+        12,
         2
       ],
       [
-        14,
-        5
+        21,
+        6
       ],
       [
-        18,
-        10
+        27,
+        12
       ],
       [
-        20,
-        17
-      ],
-      [
-        20,
+        30,
         20
       ],
       [
-        19.1,
-        23.1
+        30,
+        30
       ],
       [
-        16.9,
-        26.3
+        29.4,
+        40
       ],
       [
-        13.7,
-        29.4
+        27.8,
+        50
       ],
       [
-        10,
-        32.5
+        25.3,
+        60
       ],
       [
-        6.3,
-        35.6
+        22.2,
+        70
       ],
       [
-        3.1,
-        38.8
+        20,
+        76.4
       ],
       [
-        0.9,
-        41.9
-      ],
-      [
-        0,
-        45
+        20,
+        150
       ]
     ],
     "parachoqueDianteiro": [
@@ -305,8 +316,8 @@
       },
       "frontal": {
         "caixa": {
-          "xMin": -1020,
-          "xMax": 1020,
+          "xMin": -1030,
+          "xMax": 1030,
           "yMin": 299,
           "yMax": 2500
         },
@@ -318,8 +329,8 @@
       },
       "traseira": {
         "caixa": {
-          "xMin": -1020,
-          "xMax": 1020,
+          "xMin": -1030,
+          "xMax": 1030,
           "yMin": 299,
           "yMax": 2500
         },
@@ -333,8 +344,8 @@
         "caixa": {
           "xMin": -2810,
           "xMax": 2750,
-          "yMin": -1020,
-          "yMax": 1020
+          "yMin": -1030,
+          "yMax": 1030
         },
         "contornoFechado": true,
         "trechosSoltos": 0,
@@ -402,27 +413,27 @@
       },
       "silhuetaFrontal": {
         "vista": "frontal",
-        "comprimento": 8033.62,
-        "retidao": 0.568,
-        "concentracao": 0.216,
+        "comprimento": 8050.94,
+        "retidao": 0.558,
+        "concentracao": 0.226,
         "inversoes": 2,
-        "raioMin": 21
+        "raioMin": 26
       },
       "silhuetaTraseira": {
         "vista": "traseira",
-        "comprimento": 8033.62,
-        "retidao": 0.568,
-        "concentracao": 0.216,
+        "comprimento": 8050.94,
+        "retidao": 0.558,
+        "concentracao": 0.226,
         "inversoes": 2,
-        "raioMin": 21
+        "raioMin": 26
       },
       "silhuetaDeCima": {
         "vista": "planta",
-        "comprimento": 14760.57,
-        "retidao": 0.769,
-        "concentracao": 0.146,
-        "inversoes": 0,
-        "raioMin": 210
+        "comprimento": 14770.26,
+        "retidao": 0.503,
+        "concentracao": 0.176,
+        "inversoes": 10,
+        "raioMin": 46
       },
       "chapaDeCima": {
         "vista": "planta",
@@ -482,9 +493,9 @@
       },
       "portaDaCabine": {
         "vista": "lateral",
-        "comprimento": 4981.57,
-        "retidao": 0.648,
-        "concentracao": 0.236,
+        "comprimento": 4935.7,
+        "retidao": 0.613,
+        "concentracao": 0.256,
         "inversoes": 1,
         "raioMin": 40
       },
@@ -506,15 +517,15 @@
       },
       "planoB": {
         "vista": "lateral",
-        "comprimento": 118,
+        "comprimento": 178,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
         "raioMin": null
       },
-      "planoH": {
+      "planoI": {
         "vista": "lateral",
-        "comprimento": 118,
+        "comprimento": 138,
         "retidao": 1,
         "concentracao": 0,
         "inversoes": 0,
@@ -560,7 +571,7 @@
         "inversoes": 0,
         "raioMin": null
       },
-      "planoHDeCima": {
+      "planoIDeCima": {
         "vista": "planta",
         "comprimento": 75,
         "retidao": 1,
@@ -602,11 +613,27 @@
       },
       "faixaMolduraTraseira": {
         "vista": "planta",
-        "comprimento": 61.17,
-        "retidao": 0.945,
+        "comprimento": 60.8,
+        "retidao": 0.965,
         "concentracao": 0.141,
         "inversoes": 0,
-        "raioMin": 1122
+        "raioMin": 1254
+      },
+      "faixaAlargamentoTraseiro": {
+        "vista": "planta",
+        "comprimento": 362.98,
+        "retidao": 0.523,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 1092
+      },
+      "faixaAlargamentoDianteiro": {
+        "vista": "planta",
+        "comprimento": 362.98,
+        "retidao": 0.523,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 1092
       },
       "faixaArcoTraseiro": {
         "vista": "planta",
@@ -618,11 +645,11 @@
       },
       "faixaMolduraDianteira": {
         "vista": "planta",
-        "comprimento": 61.55,
-        "retidao": 0.935,
+        "comprimento": 60.8,
+        "retidao": 0.965,
         "concentracao": 0.141,
         "inversoes": 0,
-        "raioMin": 1023
+        "raioMin": 1254
       },
       "faixaArcoDianteiro": {
         "vista": "planta",
@@ -642,11 +669,11 @@
       },
       "faixaPortaDaCabine": {
         "vista": "planta",
-        "comprimento": 1989.09,
-        "retidao": 0.834,
+        "comprimento": 1756.13,
+        "retidao": 0.819,
         "concentracao": 0.06,
         "inversoes": 1,
-        "raioMin": 774
+        "raioMin": 656
       },
       "faixaPlanoA": {
         "vista": "planta",
@@ -682,11 +709,27 @@
       },
       "faixaGMolduraTraseira": {
         "vista": "planta",
-        "comprimento": 61.17,
-        "retidao": 0.945,
+        "comprimento": 60.8,
+        "retidao": 0.965,
         "concentracao": 0.141,
         "inversoes": 0,
-        "raioMin": 1122
+        "raioMin": 1254
+      },
+      "faixaGAlargamentoTraseiro": {
+        "vista": "planta",
+        "comprimento": 362.98,
+        "retidao": 0.523,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 1092
+      },
+      "faixaGAlargamentoDianteiro": {
+        "vista": "planta",
+        "comprimento": 362.98,
+        "retidao": 0.523,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 1092
       },
       "faixaGArcoTraseiro": {
         "vista": "planta",
@@ -698,11 +741,11 @@
       },
       "faixaGMolduraDianteira": {
         "vista": "planta",
-        "comprimento": 61.55,
-        "retidao": 0.935,
+        "comprimento": 60.8,
+        "retidao": 0.965,
         "concentracao": 0.141,
         "inversoes": 0,
-        "raioMin": 1023
+        "raioMin": 1254
       },
       "faixaGArcoDianteiro": {
         "vista": "planta",
@@ -714,19 +757,19 @@
       },
       "faixaGPortaDaCabine": {
         "vista": "planta",
-        "comprimento": 1989.09,
-        "retidao": 0.834,
+        "comprimento": 1756.13,
+        "retidao": 0.819,
         "concentracao": 0.06,
         "inversoes": 1,
-        "raioMin": 774
+        "raioMin": 656
       },
       "marcaDoDetalheF": {
         "vista": "lateral",
-        "comprimento": 5388.56,
+        "comprimento": 5544.47,
         "retidao": 0.884,
         "concentracao": 0.08,
         "inversoes": 0,
-        "raioMin": 1222
+        "raioMin": 1261
       },
       "escalaGrafica": {
         "vista": "lateral",
@@ -746,19 +789,51 @@
       },
       "molduraArcoDianteiro": {
         "vista": "lateral",
-        "comprimento": 1011.42,
-        "retidao": 0.015,
-        "concentracao": 0.829,
-        "inversoes": 2,
-        "raioMin": 158
-      },
-      "molduraArcoTraseiro": {
-        "vista": "lateral",
-        "comprimento": 1260.3,
+        "comprimento": 1280.65,
         "retidao": 0,
         "concentracao": 0.884,
         "inversoes": 0,
-        "raioMin": 510
+        "raioMin": 570
+      },
+      "molduraArcoTraseiro": {
+        "vista": "lateral",
+        "comprimento": 1450.68,
+        "retidao": 0,
+        "concentracao": 0.884,
+        "inversoes": 0,
+        "raioMin": 570
+      },
+      "alargamentoTraseiroAtras": {
+        "vista": "lateral",
+        "comprimento": 283.59,
+        "retidao": 0.337,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 496
+      },
+      "alargamentoTraseiroFrente": {
+        "vista": "lateral",
+        "comprimento": 158.95,
+        "retidao": 0.538,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 496
+      },
+      "alargamentoDianteiroAtras": {
+        "vista": "lateral",
+        "comprimento": 158.95,
+        "retidao": 0.538,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 496
+      },
+      "alargamentoDianteiroFrente": {
+        "vista": "lateral",
+        "comprimento": 466.06,
+        "retidao": 0.226,
+        "concentracao": 0.633,
+        "inversoes": 0,
+        "raioMin": 496
       },
       "parachoqueDianteiroDeLado": {
         "vista": "lateral",
@@ -1034,19 +1109,19 @@
       },
       "corteMoldura": {
         "vista": "planta",
-        "comprimento": 574.54,
-        "retidao": 0.553,
-        "concentracao": 0.291,
+        "comprimento": 917.02,
+        "retidao": 0.432,
+        "concentracao": 0.337,
         "inversoes": 1,
-        "raioMin": 76
+        "raioMin": 101
       },
-      "corteMolduraEstreita": {
+      "corteAlargamentoNoPlastico": {
         "vista": "planta",
-        "comprimento": 372.07,
-        "retidao": 0.548,
-        "concentracao": 0.307,
+        "comprimento": 901.67,
+        "retidao": 0.583,
+        "concentracao": 0.251,
         "inversoes": 1,
-        "raioMin": 53
+        "raioMin": 101
       },
       "corteParachoqueDianteiro": {
         "vista": "planta",
@@ -1128,7 +1203,7 @@
       },
       "cabineF": {
         "sobre": "portaDaCabine",
-        "desvio": 0.31
+        "desvio": 0.41
       },
       "bordaTeto": {
         "sobre": "bordaDoTeto",
@@ -1140,7 +1215,7 @@
       },
       "plástico": {
         "sobre": "silhuetaDeCima",
-        "desvio": 0
+        "desvio": 2.12
       },
       "largura": {
         "sobre": "silhuetaFrontal",
@@ -1195,22 +1270,22 @@
           }
         },
         "x": {
-          "min": -1020,
-          "max": 1020,
+          "min": -1030,
+          "max": 1030,
           "vistas": {
             "frontal": {
-              "min": -1020,
-              "max": 1020,
+              "min": -1030,
+              "max": 1030,
               "leitura": "projecao"
             },
             "traseira": {
-              "min": -1020,
-              "max": 1020,
+              "min": -1030,
+              "max": 1030,
               "leitura": "projecao"
             },
             "planta": {
-              "min": -1020,
-              "max": 1020,
+              "min": -1030,
+              "max": 1030,
               "leitura": "projecao"
             }
           }
@@ -1223,8 +1298,8 @@
           "desvio": 0
         },
         "largura": {
-          "medido": 2040,
-          "declarado": 2040,
+          "medido": 2060,
+          "declarado": 2060,
           "desvio": 0
         },
         "altura": {
