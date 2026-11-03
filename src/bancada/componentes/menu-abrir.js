@@ -6,8 +6,11 @@
  * recarregar a página e sem desligar a sessão ativa, que continua chegando
  * pela IA e sobrescreve quando chegar. */
 
-export function montarMenuAbrir({ listaAcervo, entradas, aoEscolher }) {
+export function montarMenuAbrir({ listaAcervo, entradas: todas, aoEscolher }) {
   if (!listaAcervo) return;
+  /* A parte de um objeto de várias partes não é entrada: a entrada é o objeto, que abre a montagem inteira, e a árvore
+     de objetos já serve para ver uma parte sozinha. A parte continua abrindo pelo nome no endereço. */
+  const entradas = todas.filter((entrada) => !entrada.parteDe);
   const documento = listaAcervo.ownerDocument;
   if (!entradas.length) {
     const vazio = documento.createElement('div');

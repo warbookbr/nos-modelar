@@ -22,6 +22,12 @@ const MODULOS = import.meta.glob('../../procedural/pecas/**/*.js');
    Elas vêm marcadas, para quem listar poder separar ensaio de acervo. */
 const ENSAIOS = import.meta.glob('../../tools/fixtures/acervo/**/*.js');
 
+/* O OBJETO DE VÁRIAS PARTES TAMBÉM TEM A MONTAGEM EM DADOS: `<objeto>/montagem.json`
+   (formato `mecanifica.montagem`), que a ferramenta de auditoria já lê. A bancada
+   a lista como uma entrada só, e quem a abre lê o JSON pelo leitor da autoria
+   (`sessao/montagem-em-dados.js`), sem um segundo leitor. */
+const MONTAGENS_EM_DADOS = import.meta.glob('../../procedural/pecas/*/montagem.json', { import: 'default' });
+
 /* Três formas convivem no acervo: peça de arquivo único, `quadro.js`, peça em
    pasta, `peca-de-prova/receita.js`, e montagem em pasta,
    `prensa/montagem.js`. Nos três casos o nome que a pessoa reconhece é o mesmo
@@ -71,8 +77,34 @@ function pastasComEntrada(caminhos) {
    de fixture como parâmetro de peça. Quem precisa dos dois é só a bancada, que
    tem de poder abrir a peça de prova, e por isso quem junta é
    `listarParaBancada`. */
-export function listarParaBancada(modulos = MODULOS, ensaios = ENSAIOS) {
-  return ordenar([...listarAcervo(modulos), ...listarAcervo(ensaios, { ensaio: true })]);
+export function listarParaBancada(modulos = MODULOS, ensaios = ENSAIOS, montagens = MONTAGENS_EM_DADOS) {
+  const emDados = listarMontagensEmDados(montagens);
+  const objetos = new Set(emDados.map((entrada) => entrada.id));
+  /* A parte de um objeto que tem montagem em dados continua abrindo pelo nome
+     (`?peca=aviao/asas`, de que as ferramentas dependem), mas a janela Abrir não
+     a lista: a entrada é o objeto, e a árvore dele já serve para ver uma parte
+     sozinha. `parteDe` é o que a janela lê para deixá-la de fora. */
+  const receitas = listarAcervo(modulos).map((entrada) => {
+    const objeto = entrada.id.split('/')[0];
+    return entrada.id.includes('/') && objetos.has(objeto) ? { ...entrada, parteDe: objeto } : entrada;
+  });
+  return ordenar([...receitas, ...listarAcervo(ensaios, { ensaio: true }), ...emDados]);
+}
+
+/* Uma entrada por `<objeto>/montagem.json`, com o nome da pasta. `carregar` devolve o dado cru, e `emDados` diz à sessão
+   que não é receita. */
+export function listarMontagensEmDados(montagens = MONTAGENS_EM_DADOS) {
+  return Object.entries(montagens ?? {}).map(([caminho, importar]) => {
+    const partes = caminho.split('/');
+    return {
+      id: partes[partes.length - 2],
+      montagem: true,
+      emDados: true,
+      ensaio: false,
+      caminho,
+      carregar: () => Promise.resolve(importar()),
+    };
+  });
 }
 
 function ordenar(entradas) {

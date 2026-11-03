@@ -272,6 +272,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   });
 
   vista.aplicarPreferenciasCena({});
+  const acervoDaBancada = listarParaBancada();
   const barraSuperior = montarBarraSuperior({
     elementos: elementos.barraSuperior,
     corpo: elementos.corpo,
@@ -279,7 +280,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     registroDeEventos,
     registroAtalhos,
     comandos,
-    entradasDoAcervo: listarParaBancada(),
+    entradasDoAcervo: acervoDaBancada,
     abrirDoAcervo: (entrada) => sessao.abrirDoAcervo(entrada),
   });
 
@@ -381,6 +382,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
 
   sessao = criarSessaoDaBancada({
     estado, cena, edicao, imagemNaCena, anotacoes3D, registroDeEventos, avisar, mostrarErro, arquivoDaSessao,
+    acervo: () => acervoDaBancada,
   });
   montarSessaoAtiva({
     elementos: elementos.sessaoAtiva,
@@ -392,7 +394,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     elementos: elementos.referenciaMetrica, estado, referenciaMetrica: () => ambiente.referenciaMetrica(),
   });
 
-  await sessao.abrirInicial({ pecaPedida, catalogo, acervo: pecaPedida ? listarParaBancada() : [] });
+  await sessao.abrirInicial({ pecaPedida, catalogo, acervo: pecaPedida ? acervoDaBancada : [] });
   vista.restaurarCameraDaUrl();
 
   // API unificada da Bancada para testes e automações

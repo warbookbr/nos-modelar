@@ -68,7 +68,9 @@ export function criarSincronizadorSessao({
     }
   }
 
-  function aplicarPayload(payload, { fonte = 'manual' } = {}) {
+  /* `modelo` é o modelo já pronto de um payload que o processamento síncrono daqui não sabe montar (a montagem em dados, que
+     se resolve com `await`): o payload segue como o registro do que foi aberto, e o modelo entra no lugar do processamento. */
+  function aplicarPayload(payload, { fonte = 'manual', modelo = null } = {}) {
     try {
       validarPacoteSessao(payload);
       const hashAtual = calcularHash(payload);
@@ -81,7 +83,7 @@ export function criarSincronizadorSessao({
       aoMudarStatus(estado.status);
 
       // Processa a geometria procedural
-      const novoModelo = processarPayloadSessao(payload);
+      const novoModelo = modelo ?? processarPayloadSessao(payload);
 
       // Atualiza o estado
       estado = {
@@ -226,7 +228,7 @@ export function criarSincronizadorSessao({
   const api = {
     obterEstado: () => ({ ...estado }),
     obterModelo: () => modeloAtual,
-    definirPayload: (payload) => aplicarPayload(payload, { fonte: 'api' }),
+    definirPayload: (payload, { modelo = null } = {}) => aplicarPayload(payload, { fonte: 'api', modelo }),
     atualizarParametro,
     enviarAnotacao,
     editarAnotacao,

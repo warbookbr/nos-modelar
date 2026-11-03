@@ -7,6 +7,7 @@ import { carregarPeca } from '../carregar-peca.js';
 import { formatarNome } from '../formatar.js';
 import { ROTULOS_DE_SESSAO } from '../componentes/menu-estado.js';
 import { criarSincronizadorSessao } from './sincronizador.js';
+import { abrirMontagemDoAcervo } from './montagem-em-dados.js';
 
 export const DEMO_RECEITA = {
   meta: { nome: 'Engrenagem Cônica de Demonstração' },
@@ -61,6 +62,8 @@ export const PAYLOAD_DE_DEMONSTRACAO = {
 export function criarSessaoDaBancada({
   estado, cena, edicao, imagemNaCena, anotacoes3D, registroDeEventos, avisar, mostrarErro, arquivoDaSessao,
   criarSincronizador = criarSincronizadorSessao,
+  /* A lista do acervo, de onde a montagem em dados tira as receitas das peças que cita. */
+  acervo = () => [],
 }) {
   /* Quem escolheu a peça manda. A bancada relê `sessao-ativa.json` a cada
      segundo e meio, e até aqui qualquer leitura trocava o modelo em cena. Quem
@@ -128,7 +131,11 @@ export function criarSessaoDaBancada({
   async function abrirDoAcervo(entrada) {
     try {
       avisar(`Abrindo ${entrada.id}…`);
-      const receita = await entrada.carregar();
+      const carregado = await entrada.carregar();
+      /* A montagem em dados (`<objeto>/montagem.json`) não é receita: resolve-se pelo leitor da autoria, com as peças nas
+         posições da montagem, e entra pela mesma porta com o modelo pronto. */
+      const receita = entrada.emDados ? null : carregado;
+      const modeloDaMontagem = entrada.emDados ? await abrirMontagemDoAcervo(carregado, acervo()) : null;
       /* O mesmo caminho da sessão ativa, e não um segundo: assim a peça aberta
          à mão e a peça enviada pela IA chegam à cena pela mesma porta, com a
          mesma medição e o mesmo tratamento de erro. */
@@ -140,9 +147,15 @@ export function criarSessaoDaBancada({
       cena.esquecerColocacao();
       entregaDaSessaoEmEspera = null;
       oferecerEntregaDaSessao('');
-      sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
+      if (modeloDaMontagem?.semGeometria.length) {
+        const nomes = modeloDaMontagem.semGeometria.map((item) => item.caminho).join(', ');
+        registroDeEventos.registrar('alerta', `${entrada.id} abriu sem ${nomes}`, modeloDaMontagem.semGeometria.map((item) => `${item.caminho}: ${item.motivo}`).join(' | '));
+        avisar(`${entrada.id} abriu sem: ${nomes}. A janela Estado traz o motivo.`);
+      }
+      if (modeloDaMontagem) sincronizador.definirPayload({ alvo: { nome: entrada.id, tipo: 'montagem' }, montagem: carregado }, { modelo: modeloDaMontagem });
+      else sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
-      await imagemNaCena.oferecerSobreposicaoDaPeca(entrada.id, receita);
+      if (receita) await imagemNaCena.oferecerSobreposicaoDaPeca(entrada.id, receita);
     } catch (erro) {
       mostrarErro(erro);
     }
