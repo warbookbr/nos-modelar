@@ -13,8 +13,8 @@ removidos e aparecem somente no histórico.
   comandos e gates.
 - [`package.json`](../package.json): scripts disponíveis.
 - [`docs/MAPA.md`](MAPA.md): mapa gerado dos documentos e recursos.
-- [`docs/modelar/planos/README.md`](./modelar/planos/README.md): plano ativo
-  (nenhum), contrato e concluídos.
+- [`docs/modelar/planos/README.md`](./modelar/planos/README.md): planos ativos,
+  território, contrato e concluídos.
 
 ## Comandos atuais
 

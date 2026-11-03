@@ -5,7 +5,7 @@
  * ou com o nome de um grupo (`modelar`, `modelar/peca`), o comando faz a pergunta do grupo e lista os ramos, e a resposta é o
  * argumento da chamada seguinte. Com uma folha (ou só o último nome, quando é único), devolve a leitura antes de começar, com
  * as seções `arquivo#âncora` entregues ali mesmo, o que abrir só quando a condição aparecer, a skill, os comandos, a lista
- * gerada na hora (famílias, peças do acervo ou operações) e o passo seguinte lido do estado: o plano ativo e a tarefa de
+ * gerada na hora (famílias, peças do acervo ou operações) e o passo seguinte lido do estado: os planos ativos e a tarefa de
  * `comunicacao.md` para quem muda o projeto, e a situação do Condutor para o esboço com `--arquivo`. Um nome que não é nó
  * busca o tópico nos títulos dos documentos de uso, das skills e de `docs/modelar/`, e `arquivo#âncora` entrega a seção.
  *
@@ -17,19 +17,25 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ancoraDe, carregarRoteiros, filhosDoNo, medirRoteiro, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
+import { ativosDoIndice } from '../mapa/planos.mjs';
 import { lerTopicos, README_DO_ESBOCO } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
 import { COMPONENTES } from '../../modulos/esboco/componentes/index.js';
 
 const milhar = (n) => n.toLocaleString('pt-BR');
 
-/* O plano ativo de `docs/modelar/planos/` (o arquivo com `**Estado:** ativo`) e a primeira fatia que não diz "Feita". */
-export function planoAtivo(raiz = RAIZ) {
+/* Os planos ativos de `docs/modelar/planos/` (os arquivos com `**Estado:** ativo`), cada um com o território e a primeira
+   fatia que não diz "Feita". A ordem é a da lista "Planos ativos" do índice de planos (a prioridade); o que o índice não
+   lista vem depois, pelo nome. */
+export function planosAtivos(raiz = RAIZ) {
   const pasta = join(raiz, 'docs/modelar/planos');
+  const prioridade = existsSync(join(pasta, 'README.md')) ? (ativosDoIndice(readFileSync(join(pasta, 'README.md'), 'utf8')) ?? []) : [];
+  const ativos = [];
   for (const nome of readdirSync(pasta).filter((n) => n.endsWith('.md')).sort()) {
     const texto = readFileSync(join(pasta, nome), 'utf8');
     if (!/^\*\*Estado:\*\* ativo\s*$/m.test(texto)) continue;
-    const titulo = /^# (.+)$/m.exec(texto)?.[1] ?? nome;
+    const titulo = (/^# (.+)$/m.exec(texto)?.[1] ?? nome).split(' — ')[0];
+    const territorio = /^\*\*Território:\*\*\s*(.+?)\s*$/m.exec(texto)?.[1] ?? 'não declarado';
     const secao = /^## Fatias\s*$([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(texto)?.[1] ?? '';
     const fatias = [];
     for (const linha of secao.split('\n')) {
@@ -38,9 +44,10 @@ export function planoAtivo(raiz = RAIZ) {
       else if (fatias.length > 0 && /^\s+\S/.test(linha)) fatias[fatias.length - 1].texto += ` ${linha.trim()}`;
     }
     const aberta = fatias.find((f) => !/\bFeita\b/.test(f.texto)) ?? null;
-    return { arquivo: `docs/modelar/planos/${nome}`, titulo, fatiaAberta: aberta && { numero: aberta.numero, texto: aberta.texto.split(/(?<=\.) /)[0] } };
+    ativos.push({ nome, arquivo: `docs/modelar/planos/${nome}`, titulo, territorio, fatiaAberta: aberta && { numero: aberta.numero, texto: aberta.texto.replace(/\*\*/g, '').split(/(?<=\.) /)[0] } });
   }
-  return null;
+  const posicao = (a) => { const i = prioridade.indexOf(a.nome); return i < 0 ? prioridade.length : i; };
+  return ativos.sort((x, y) => posicao(x) - posicao(y)).map(({ nome, ...resto }) => resto);
 }
 
 /* As tarefas da seção "Tarefas" de `comunicacao.md`: [{ id, titulo, status }]. */
@@ -123,23 +130,24 @@ function disponivel(roteiro, raiz) {
 
 /* O estado do trabalho que vale para a lista e para o roteiro `mudar/plano`. */
 function estadoGeral(raiz) {
-  const plano = planoAtivo(raiz);
+  const planos = planosAtivos(raiz);
   const tarefas = tarefasAbertas(raiz);
   const linhas = [];
-  linhas.push(plano
-    ? `plano ativo "${plano.titulo}" (${plano.arquivo})${plano.fatiaAberta ? `, fatia ${plano.fatiaAberta.numero} em aberto: ${plano.fatiaAberta.texto}` : ', sem fatia em aberto'}`
-    : 'nenhum plano ativo: o backlog não autoriza implementação');
+  if (planos.length === 0) linhas.push('nenhum plano ativo: o backlog não autoriza implementação');
+  else {
+    linhas.push(`${planos.length} ${planos.length === 1 ? 'plano ativo' : 'planos ativos'}, em ordem de prioridade:`);
+    planos.forEach((p, i) => linhas.push(`${i + 1}. "${p.titulo}" (${p.arquivo}); território: ${p.territorio}; ${p.fatiaAberta ? `fatia ${p.fatiaAberta.numero} em aberto: ${p.fatiaAberta.texto}` : 'sem fatia em aberto'}`));
+  }
   linhas.push(tarefas.length > 0
     ? `tarefas em comunicacao.md: ${tarefas.map((t) => `${t.id} (${t.status})`).join(', ')}`
     : 'nenhuma tarefa em comunicacao.md');
-  return { plano, tarefas, linhas };
+  return { planos, tarefas, linhas };
 }
 
 function passoDeMudar(estado, roteiro) {
   if (estado.tarefas.length > 0) return passoDaTarefa(estado.tarefas[0]);
-  if (!estado.plano) return 'Sem plano ativo, proponha um plano em docs/modelar/planos/ antes de implementar.';
-  if (!estado.plano.fatiaAberta) return `O plano "${estado.plano.titulo}" não tem fatia em aberto: confira o gate de saída e escreva o fechamento.`;
-  return `Trabalhe na fatia ${estado.plano.fatiaAberta.numero} de ${estado.plano.arquivo}.`;
+  if (estado.planos.length === 0) return 'Sem plano ativo, proponha um plano em docs/modelar/planos/ antes de implementar.';
+  return 'Escolha um dos planos ativos, o que cobre a mudança pelo território; o território do plano é o que ele pode mudar, e a fatia em aberto é onde trabalhar. Se nenhum cobrir, proponha um plano ou peça à pessoa que mude um território.';
 }
 
 /* Resolve a consulta: { roteiro }, { grupo: id, filhos } quando é um nó da árvore, ou { desconhecido: true }. */

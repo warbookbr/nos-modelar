@@ -1,8 +1,8 @@
 # Ajustes da bancada — o objeto abre inteiro e a tela perde o que a pessoa não usa
 
-**Estado:** pronto
+**Estado:** ativo
 
-**Execução:** em paralelo ao plano ativo, autorizada pela pessoa em 2026-11-03.
+**Território:** `src/bancada/`, `bancada.html`, `src/autoria/adaptar-montagem-three.js`
 
 **Responsável:** a definir
 

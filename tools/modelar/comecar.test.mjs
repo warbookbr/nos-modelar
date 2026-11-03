@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { carregarRoteiros, CAMINHO_JSON, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
-import { buscarTopico, comecar, listaDeFamilias, listaDePecas, planoAtivo, resolverRoteiro, situacaoDoCondutor, tarefasAbertas } from './comecar.mjs';
+import { buscarTopico, comecar, listaDeFamilias, listaDePecas, planosAtivos, resolverRoteiro, situacaoDoCondutor, tarefasAbertas } from './comecar.mjs';
 import { comecarEntrada, criarFerramentasComecar } from '../mcp/perfis/comecar.mjs';
 
 const CLI = fileURLToPath(new URL('./comecar.mjs', import.meta.url));
@@ -19,13 +19,14 @@ const { roteiros, perguntas } = carregarRoteiros();
 const PLANO_DE_TESTE = ['docs', 'modelar', 'planos', '2026-01-01-teste.md'].join('/');
 
 /* Um repositório mínimo com os roteiros de verdade, um plano ativo e um comunicacao.md, para o estado ser o do teste. */
-function repositorio({ plano = null, tarefas = '_Nenhuma tarefa aberta._' } = {}) {
+function repositorio({ plano = null, planos = {}, indice = '# Planos\n', tarefas = '_Nenhuma tarefa aberta._' } = {}) {
   const raiz = mkdtempSync(join(tmpdir(), 'comecar-'));
   const gravar = (relativo, texto) => { mkdirSync(dirname(join(raiz, relativo)), { recursive: true }); writeFileSync(join(raiz, relativo), texto); };
   mkdirSync(join(raiz, 'docs/modelar/roteiros'), { recursive: true });
   copyFileSync(join(RAIZ, CAMINHO_JSON), join(raiz, CAMINHO_JSON));
-  gravar('docs/modelar/planos/README.md', '# Planos\n');
+  gravar('docs/modelar/planos/README.md', indice);
   if (plano) gravar(PLANO_DE_TESTE, plano);
+  for (const [nome, texto] of Object.entries(planos)) gravar(`docs/modelar/planos/${nome}`, texto);
   gravar('comunicacao.md', `# Comunicação\n\n## Tarefas\n\n${tarefas}\n`);
   return raiz;
 }
@@ -33,6 +34,8 @@ function repositorio({ plano = null, tarefas = '_Nenhuma tarefa aberta._' } = {}
 const PLANO = `# O plano de teste
 
 **Estado:** ativo
+
+**Território:** \`src/teste/\`
 
 ## Fatias
 
@@ -51,7 +54,7 @@ describe('comecar sem roteiro', () => {
     expect(r.resultado.roteiros.map((x) => x.id)).toEqual(['mudar', 'documentar', 'pesquisar', 'modelar']);
     expect(r.texto).toContain(`${perguntas.mudar} (npm run comecar -- mudar)`);
     expect(r.texto).toContain(`${perguntas.modelar} (npm run comecar -- modelar)`);
-    expect(r.texto).toMatch(/Estado:\n {2}(plano ativo|nenhum plano ativo)/);
+    expect(r.texto).toMatch(/Estado:\n {2}(\d+ planos? ativos?|nenhum plano ativo)/);
     expect(r.resultado.passo).toContain('npm run comecar -- <ramo>');
   });
 });
@@ -118,10 +121,30 @@ describe('comecar <roteiro>', () => {
 });
 
 describe('o passo seguinte lido do estado', () => {
-  it('mudar aponta a primeira fatia que não está feita do plano ativo', () => {
+  it('mudar lista o plano ativo com território e fatia em aberto e pede que se escolha um', () => {
     const raiz = repositorio({ plano: PLANO });
-    expect(planoAtivo(raiz)).toEqual({ arquivo: PLANO_DE_TESTE, titulo: 'O plano de teste', fatiaAberta: { numero: 2, texto: 'Cortar o README em tópicos.' } });
-    expect(comecar({ roteiro: 'mudar/plano', raiz }).resultado.passo).toBe(`Trabalhe na fatia 2 de ${PLANO_DE_TESTE}.`);
+    expect(planosAtivos(raiz)).toEqual([{ arquivo: PLANO_DE_TESTE, titulo: 'O plano de teste', territorio: '`src/teste/`', fatiaAberta: { numero: 2, texto: 'Cortar o README em tópicos.' } }]);
+    const r = comecar({ roteiro: 'mudar/plano', raiz });
+    expect(r.resultado.passo).toContain('Escolha um dos planos ativos');
+    expect(r.texto).toContain(`1. "O plano de teste" (${PLANO_DE_TESTE}); território: \`src/teste/\`; fatia 2 em aberto: Cortar o README em tópicos.`);
+  });
+
+  it('mudar lista vários planos ativos na ordem de prioridade do índice, e os fora do índice depois', () => {
+    const plano = (titulo, territorio) => `# ${titulo}\n\n**Estado:** ativo\n\n**Território:** ${territorio}\n\n## Fatias\n\n1. Única.\n`;
+    const raiz = repositorio({
+      indice: '# Planos\n\n**Planos ativos:**\n\n1. [B](2026-01-02-b.md), território.\n2. [C](2026-01-03-c.md), território.\n',
+      planos: {
+        '2026-01-01-a.md': plano('Plano A', 'nenhum (aguarda aprovação)'),
+        '2026-01-02-b.md': plano('Plano B', '`src/b/`'),
+        '2026-01-03-c.md': plano('Plano C', '`src/c.js`'),
+        '2026-01-04-d.md': '# D\n\n**Estado:** pronto\n',
+      },
+    });
+    expect(planosAtivos(raiz).map((p) => p.titulo)).toEqual(['Plano B', 'Plano C', 'Plano A']);
+    const r = comecar({ roteiro: 'mudar/plano', raiz });
+    expect(r.texto).toContain('3 planos ativos, em ordem de prioridade:');
+    expect(r.texto).toContain('território: nenhum (aguarda aprovação); fatia 1 em aberto: Única.');
+    expect(r.resultado.estado[0]).toBe('3 planos ativos, em ordem de prioridade:');
   });
 
   it('mudar pergunta entre o plano e o defeito, e o defeito não manda ler os índices nem o estado do plano', () => {

@@ -2,6 +2,8 @@
 
 **Estado:** ativo
 
+**Território:** nenhum (aguarda aprovação)
+
 **Responsável:** Claude, com a pessoa aprovando o seletor e cada visão por imagem
 
 **Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [glossário e entrada para pessoas](encerrados/2026-10-30-glossario-e-entrada-para-pessoas.md); absorveu em 2026-10-30 o rascunho da [interface da bancada](encerrados/2026-10-30-interface-da-bancada.md), e o [furgão realista](2026-10-30-furgao-realista.md) ativa depois deste
