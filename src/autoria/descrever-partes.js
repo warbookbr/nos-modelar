@@ -80,7 +80,7 @@
    uma origem, a mesma de `sel:{origem}` e de `origemId`. */
 
 import { sha256Hex } from './assinatura-geometria.js';
-import { auditarParDeSolidos, prepararSolido } from './contato-de-solidos.js';
+import { auditarParDeSolidos, exigirMemoriaDoNeutro, prepararSolido, solidoEmMemoria } from './contato-de-solidos.js';
 
 /** Vão abaixo do qual duas caixas são consideradas encostadas (erro de ponto flutuante). */
 export const TOLERANCIA_CONTATO = 1e-9;
@@ -526,7 +526,7 @@ function relacaoEntrePartes(a, b, tolerancia) {
 /* Os sólidos das partes, preparados sob demanda: uma parte só vira sólido quando um par dela tem caixas que se sobrepõem. Cada parte leva as faces dela
    e os vértices que essas faces usam, a mesma decomposição de `solidosPorParte` (contatos-da-peca.js). Malha que o preparo recusa vira `null`: a relação
    fica como a das caixas, nunca como folga inventada. */
-function solidosSobDemanda(neutro) {
+function solidosSobDemanda(neutro, memoria = null) {
   const facesPorParte = new Map();
   for (const face of neutro.F.values()) {
     if (typeof face.parte !== 'string' || face.parte === '') continue;
@@ -544,7 +544,7 @@ function solidosSobDemanda(neutro) {
           F.set(face.id, face);
           for (const id of face.vs ?? []) if (!V.has(id)) V.set(id, neutro.V.get(id));
         }
-        solido = prepararSolido({ V, F }, undefined, nome);
+        solido = solidoEmMemoria(memoria, neutro, nome, () => prepararSolido({ V, F }, undefined, nome));
       } catch { solido = null; }
       prontos.set(nome, solido);
     }
@@ -553,7 +553,7 @@ function solidosSobDemanda(neutro) {
 }
 
 /* A relação da caixa, corrigida pelo sólido quando a caixa diz `interpenetra`. */
-function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia) {
+function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia, memoria = null) {
   const { tipo, distancia, eixo, porEixo } = relacao;
   const caixa = { tipo, distancia, eixo };
   if (tipo !== 'interpenetra') return { ...relacao, caixa };
@@ -561,7 +561,7 @@ function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia) {
   const sb = solidoDe(relacao.b);
   let estado = 'inconclusivo';
   if (sa && sb) {
-    try { estado = auditarParDeSolidos(sa, sb, tolerancia).estado; } catch { estado = 'inconclusivo'; }
+    try { estado = auditarParDeSolidos(sa, sb, tolerancia, { memoria }).estado; } catch { estado = 'inconclusivo'; }
   }
   if (estado === 'encostam') return { ...relacao, tipo: 'encosta', distancia: 0, caixa, solido: estado };
   if (estado === 'separadas') return { ...relacao, tipo: 'folga', distancia: null, porEixo, caixa, solido: estado };
@@ -692,19 +692,20 @@ function aparenciaSemantica(neutro, nomes, quem) {
  * `partes` filtra o relatório por nome; nome desconhecido, repetido ou vazio
  * falha com diagnóstico.
  */
-export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_CONTATO } = {}) {
+export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_CONTATO, memoria = null } = {}) {
   const quem = 'descreverPeca';
   exigirTolerancia(tolerancia, quem);
+  exigirMemoriaDoNeutro(memoria, neutro, quem);
   const medido = medirPartes(neutro, quem);
   const nomes = selecionarNomes(medido.partes, partes, quem);
   const escolhidas = nomes.map((nome) => medido.partes.get(nome));
   const hierarquia = hierarquiaDasPartes(neutro, [...medido.partes.keys()], quem);
 
   const relacoes = [];
-  const solidoDe = solidosSobDemanda(neutro);
+  const solidoDe = solidosSobDemanda(neutro, memoria);
   for (let i = 0; i < escolhidas.length; i++) {
     for (let j = i + 1; j < escolhidas.length; j++) {
-      relacoes.push(relacaoConfirmadaPorSolido(relacaoEntrePartes(escolhidas[i], escolhidas[j], tolerancia), solidoDe, tolerancia));
+      relacoes.push(relacaoConfirmadaPorSolido(relacaoEntrePartes(escolhidas[i], escolhidas[j], tolerancia), solidoDe, tolerancia, memoria));
     }
   }
 

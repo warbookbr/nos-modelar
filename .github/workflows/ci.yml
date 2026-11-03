@@ -279,6 +279,12 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run guarda:acervo
 
+      # O `descrever` do furgão realista levou 862 s (90,5% numa função só) sem que nenhum gate reprovasse: o veredito saía
+      # certo, só devagar. Esta guarda mede o tempo da peça mais pesada e reprova com o número e o orçamento.
+      - name: O descrever da peça mais pesada cabe no orçamento de tempo
+        if: ${{ !cancelled() }}
+        run: npm run guarda:tempo
+
       # Um braço robótico passou em tudo deitado no chão: os pontos declarados
       # ficaram a 2 mm do alvo e a peça estava virada noventa graus, porque
       # cada régua compara a peça contra a declaração dela mesma. Só a

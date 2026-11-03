@@ -1,4 +1,5 @@
 import earcut from 'earcut';
+import { construirArvore, visitarPorCaixa, visitarPorRaio } from './arvore-de-caixas.js';
 
 /* contato-de-solidos — o núcleo geométrico que decide se dois sólidos se
  * separam, se encostam ou se invadem. Serviço neutro, sem Three.js.
@@ -281,23 +282,9 @@ function raioAtravessaTriangulo(origem, triangulo, tolerancia) {
    é o triângulo alargado de uma tolerância por lado e uma no plano, e num
    vértice de ângulo θ ela passa do vértice por `tolerância / sen(θ/2)`. Malha
    aberta não usa o atalho, para o veredito dela seguir idêntico. */
-const folgasDeCaixa = new WeakMap();
-
 function folgaDaCaixa(malha, tolerancia) {
-  const guardada = folgasDeCaixa.get(malha);
-  if (guardada?.tolerancia === tolerancia) return guardada.folga;
-  let menorSenoDaMetade = 1;
-  for (const [a, b, c] of malha.triangulos) {
-    for (const [p, q, r] of [[a, b, c], [b, c, a], [c, a, b]]) {
-      const u = sub(q, p); const v = sub(r, p);
-      const tamanhos = Math.sqrt(comprimento2(u) * comprimento2(v));
-      const seno = tamanhos > 0 ? Math.sqrt(Math.max(0, (1 - dot(u, v) / tamanhos) / 2)) : 0;
-      if (seno < menorSenoDaMetade) menorSenoDaMetade = seno;
-    }
-  }
-  const folga = menorSenoDaMetade > 0 ? tolerancia * (1 + 1 / menorSenoDaMetade) : Infinity;
-  folgasDeCaixa.set(malha, { tolerancia, folga });
-  return folga;
+  const { menorSenoDaMetade } = indiceDaMalha(malha);
+  return menorSenoDaMetade > 0 ? tolerancia * (1 + 1 / menorSenoDaMetade) : Infinity;
 }
 
 /* OS DADOS DE CADA TRIÂNGULO SAEM UMA VEZ POR MALHA. A contenção de um ponto percorre todos os triângulos da outra malha, e a
@@ -348,36 +335,167 @@ function ladoDoPonto(d, base, deslocamentoAresta, tamanhoDaAresta, px, py, pz, o
   return (c0 * d[base + 15] + c1 * d[base + 16] + c2 * d[base + 17]) / (d[base + 18] * tamanhoDaAresta);
 }
 
-export function pontoDentroMalha(ponto, malha, tolerancia) {
-  if (malha.fechada && malha.caixa) {
-    const folga = folgaDaCaixa(malha, tolerancia);
-    if ([0, 1, 2].some((eixo) => ponto[eixo] < malha.caixa.min[eixo] - folga || ponto[eixo] > malha.caixa.max[eixo] + folga)) return false;
+/* A ÁRVORE DE CAIXAS É A FASE AMPLA, E A CONTA É A MESMA. Percorrer todos os triângulos da outra malha para cada ponto
+   amostrado custava 90,5% do `descrever` do furgão realista (780 de 862 s, 160 mil faces em 25 partes, medido em
+   2026-11-03). A malha ganha, uma vez e guardada junto dela, uma árvore de caixas (`arvore-de-caixas.js`); cada ponto
+   consulta só os triângulos cuja caixa, alargada pela margem abaixo, o raio do ponto toca, e cada candidato passa pela MESMA
+   conta exata de antes (`classificarTriangulo`, a aritmética do laço original, na mesma ordem de operações). A árvore nunca
+   decide: só descarta o triângulo que a conta não aceitaria de qualquer jeito. A resposta não depende da ordem dos
+   candidatos, porque "algum triângulo tem o ponto na superfície" e a paridade da contagem de cruzamentos não dependem dela.
+
+   A MARGEM COBRE TUDO O QUE A CONTA ACEITA. A conta aceita um triângulo de dois jeitos: o ponto está na superfície dele, que é
+   o triângulo alargado de uma tolerância por lado e no plano (o canto vai a `tolerância / sen(θ/2)`, a mesma folga do atalho
+   da caixa), ou o raio o atravessa, com as coordenadas baricêntricas toleradas em `-tolerância` e `1 + tolerância`, o que
+   alarga o triângulo em até `tolerância × (|aresta1| + |aresta2|)` por lado (três vezes isso, com folga). A margem é o maior
+   dos dois, mais uma folga de arredondamento de 1e-9 do tamanho da malha. Casos em que a margem não vale ficam FORA da
+   árvore e passam sempre pela conta: malha com ângulo nulo (a margem é infinita) e o triângulo quase paralelo ao raio, onde
+   o determinante pequeno amplifica o erro de arredondamento das coordenadas baricêntricas. */
+export const LIMITE_PARA_ARVORE = 32;
+const FOLGA_DE_ARREDONDAMENTO = 1e-9;
+const FOLGA_RELATIVA_DE_PARES = 1e-5;
+const PARALELO_RELATIVO_PARA_ARVORE = 1e-6;
+const indicesDasMalhas = new WeakMap();
+
+function quantidadeDeEixosProprios([a, b, c]) {
+  const aresta0 = sub(b, a); const aresta1 = sub(c, b); const aresta2 = sub(a, c); const ac = sub(c, a);
+  const normal = cross(aresta0, ac);
+  let quantidade = 0;
+  const registrar = (u, v) => {
+    if (comprimento2(cross(u, v)) > 1e-18 * comprimento2(u) * comprimento2(v)) quantidade += 1;
+  };
+  registrar(aresta0, ac);
+  if (comprimento2(normal) > 0) { registrar(normal, aresta0); registrar(normal, aresta1); registrar(normal, aresta2); }
+  return quantidade;
+}
+
+/* O que se mede uma vez por malha e fica guardado junto da lista de triângulos dela: o menor seno da metade dos ângulos, as
+   caixas dos triângulos, a árvore (só acima de `LIMITE_PARA_ARVORE`), os triângulos que a árvore não cobre e a folga de
+   arredondamento. */
+function indiceDaMalha(malha) {
+  const triangulos = malha.triangulos;
+  const guardado = indicesDasMalhas.get(triangulos);
+  if (guardado && guardado.quantidade === triangulos.length) return guardado;
+  const quantidade = triangulos.length;
+  const caixas = new Float64Array(quantidade * 6);
+  const ehSempre = new Uint8Array(quantidade);
+  const ehPobre = new Uint8Array(quantidade);
+  const sempre = []; const pobres = [];
+  let menorSenoDaMetade = 1; let maiorSoma = 0; let maiorCoordenada = 0;
+  const minimo = [Infinity, Infinity, Infinity]; const maximo = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < quantidade; i += 1) {
+    const [a, b, c] = triangulos[i];
+    for (const [p, q, r] of [[a, b, c], [b, c, a], [c, a, b]]) {
+      const u = sub(q, p); const v = sub(r, p);
+      const tamanhos = Math.sqrt(comprimento2(u) * comprimento2(v));
+      const seno = tamanhos > 0 ? Math.sqrt(Math.max(0, (1 - dot(u, v) / tamanhos) / 2)) : 0;
+      if (seno < menorSenoDaMetade) menorSenoDaMetade = seno;
+    }
+    for (let e = 0; e < 3; e += 1) {
+      const baixo = Math.min(a[e], b[e], c[e]); const alto = Math.max(a[e], b[e], c[e]);
+      caixas[i * 6 + e] = baixo; caixas[i * 6 + 3 + e] = alto;
+      if (baixo < minimo[e]) minimo[e] = baixo;
+      if (alto > maximo[e]) maximo[e] = alto;
+      maiorCoordenada = Math.max(maiorCoordenada, Math.abs(baixo), Math.abs(alto));
+    }
+    const aresta1 = sub(b, a); const aresta2 = sub(c, a);
+    maiorSoma = Math.max(maiorSoma, Math.sqrt(comprimento2(aresta1)) + Math.sqrt(comprimento2(aresta2)));
+    const h = cross(DIRECAO_RAIO, aresta2);
+    const quaseParalelo = !(Math.abs(dot(aresta1, h)) > PARALELO_RELATIVO_PARA_ARVORE * Math.sqrt(comprimento2(aresta1) * comprimento2(h)));
+    if (quaseParalelo) { ehSempre[i] = 1; sempre.push(i); }
+    if (quantidadeDeEixosProprios(triangulos[i]) < 4) { ehPobre[i] = 1; pobres.push(i); }
   }
+  const escala = quantidade > 0 ? Math.hypot(...[0, 1, 2].map((e) => maximo[e] - minimo[e])) : 0;
+  const indice = {
+    quantidade,
+    menorSenoDaMetade,
+    maiorSoma,
+    caixas,
+    caixa: { min: minimo, max: maximo },
+    escala,
+    folgaDeArredondamento: FOLGA_DE_ARREDONDAMENTO * (escala + maiorCoordenada),
+    ehSempre,
+    sempre,
+    ehPobre,
+    pobres,
+    arvore: quantidade > LIMITE_PARA_ARVORE ? construirArvore(caixas, quantidade) : null,
+  };
+  indicesDasMalhas.set(triangulos, indice);
+  return indice;
+}
+
+/* A conta exata de UM triângulo contra o ponto: -1 se o ponto está na superfície dele, 1 se o raio o atravessa (e conta um
+   cruzamento), 0 se nada. É o corpo do laço original de `pontoDentroMalha`, operação por operação. */
+function classificarTriangulo(d, base, px, py, pz, tolerancia) {
+  const ax = d[base]; const ay = d[base + 1]; const az = d[base + 2];
+  const s0 = px - ax; const s1 = py - ay; const s2 = pz - az;
+  const distancia = Math.abs(d[base + 15] * s0 + d[base + 16] * s1 + d[base + 17] * s2) / d[base + 18];
+  if (!(distancia > tolerancia)
+    && ladoDoPonto(d, base, 9, d[base + 30], px, py, pz, ax, ay, az) >= -tolerancia
+    && ladoDoPonto(d, base, 24, d[base + 31], px, py, pz, d[base + 3], d[base + 4], d[base + 5]) >= -tolerancia
+    && ladoDoPonto(d, base, 27, d[base + 32], px, py, pz, d[base + 6], d[base + 7], d[base + 8]) >= -tolerancia) return -1;
+  if (d[base + 22] === 1) return 0;
+  const inverso = d[base + 23];
+  const u = inverso * (s0 * d[base + 19] + s1 * d[base + 20] + s2 * d[base + 21]);
+  if (u < -tolerancia || u > 1 + tolerancia) return 0;
+  const e0 = d[base + 9]; const e1 = d[base + 10]; const e2 = d[base + 11];
+  const q0 = s1 * e2 - s2 * e1; const q1 = s2 * e0 - s0 * e2; const q2 = s0 * e1 - s1 * e0;
+  const v = inverso * (DIRECAO_RAIO[0] * q0 + DIRECAO_RAIO[1] * q1 + DIRECAO_RAIO[2] * q2);
+  if (v < -tolerancia || u + v > 1 + tolerancia) return 0;
+  const t = inverso * (d[base + 12] * q0 + d[base + 13] * q1 + d[base + 14] * q2);
+  return t > tolerancia ? 1 : 0;
+}
+
+/* O atalho da caixa de uma malha FECHADA, que não mudou: fora da caixa alargada pela folga do pior ângulo o ponto não está
+   dentro nem na superfície. Devolve `false` quando o atalho responde, e `undefined` quando é preciso percorrer a malha. */
+function foraDaCaixaDaMalha(ponto, malha, tolerancia) {
+  if (!(malha.fechada && malha.caixa)) return undefined;
+  const folga = folgaDaCaixa(malha, tolerancia);
+  return [0, 1, 2].some((eixo) => ponto[eixo] < malha.caixa.min[eixo] - folga || ponto[eixo] > malha.caixa.max[eixo] + folga) ? false : undefined;
+}
+
+function percorrerTodosOsTriangulos(ponto, malha, tolerancia) {
   const d = dadosDaMalha(malha);
   const quantidade = malha.triangulos.length;
   const px = ponto[0]; const py = ponto[1]; const pz = ponto[2];
-  const dir0 = DIRECAO_RAIO[0]; const dir1 = DIRECAO_RAIO[1]; const dir2 = DIRECAO_RAIO[2];
   let contagem = 0;
   for (let indice = 0; indice < quantidade; indice += 1) {
-    const base = indice * CAMPOS;
-    const ax = d[base]; const ay = d[base + 1]; const az = d[base + 2];
-    const s0 = px - ax; const s1 = py - ay; const s2 = pz - az;
-    const distancia = Math.abs(d[base + 15] * s0 + d[base + 16] * s1 + d[base + 17] * s2) / d[base + 18];
-    if (!(distancia > tolerancia)
-      && ladoDoPonto(d, base, 9, d[base + 30], px, py, pz, ax, ay, az) >= -tolerancia
-      && ladoDoPonto(d, base, 24, d[base + 31], px, py, pz, d[base + 3], d[base + 4], d[base + 5]) >= -tolerancia
-      && ladoDoPonto(d, base, 27, d[base + 32], px, py, pz, d[base + 6], d[base + 7], d[base + 8]) >= -tolerancia) return null;
-    if (d[base + 22] === 1) continue;
-    const inverso = d[base + 23];
-    const u = inverso * (s0 * d[base + 19] + s1 * d[base + 20] + s2 * d[base + 21]);
-    if (u < -tolerancia || u > 1 + tolerancia) continue;
-    const e0 = d[base + 9]; const e1 = d[base + 10]; const e2 = d[base + 11];
-    const q0 = s1 * e2 - s2 * e1; const q1 = s2 * e0 - s0 * e2; const q2 = s0 * e1 - s1 * e0;
-    const v = inverso * (dir0 * q0 + dir1 * q1 + dir2 * q2);
-    if (v < -tolerancia || u + v > 1 + tolerancia) continue;
-    const t = inverso * (d[base + 12] * q0 + d[base + 13] * q1 + d[base + 14] * q2);
-    if (t > tolerancia) contagem += 1;
+    const r = classificarTriangulo(d, indice * CAMPOS, px, py, pz, tolerancia);
+    if (r < 0) return null;
+    contagem += r;
   }
+  return contagem % 2 === 1;
+}
+
+/* Percorre TODOS os triângulos, sem fase ampla (o atalho da caixa fica, porque ele é da definição da resposta). É a
+   referência do teste de equivalência; `pontoDentroMalha` só cai aqui quando a margem da árvore não vale (ângulo nulo). */
+export function pontoDentroMalhaPorForcaBruta(ponto, malha, tolerancia) {
+  return foraDaCaixaDaMalha(ponto, malha, tolerancia) ?? percorrerTodosOsTriangulos(ponto, malha, tolerancia);
+}
+
+export function pontoDentroMalha(ponto, malha, tolerancia) {
+  const atalho = foraDaCaixaDaMalha(ponto, malha, tolerancia);
+  if (atalho !== undefined) return atalho;
+  const indice = indiceDaMalha(malha);
+  if (indice.arvore === null) return percorrerTodosOsTriangulos(ponto, malha, tolerancia);
+  const folgaDoPlano = indice.menorSenoDaMetade > 0 ? tolerancia * (1 + 1 / indice.menorSenoDaMetade) : Infinity;
+  const margem = Math.max(folgaDoPlano, 3 * tolerancia * indice.maiorSoma) + indice.folgaDeArredondamento;
+  if (!Number.isFinite(margem)) return percorrerTodosOsTriangulos(ponto, malha, tolerancia);
+  const d = dadosDaMalha(malha);
+  const px = ponto[0]; const py = ponto[1]; const pz = ponto[2];
+  let contagem = 0;
+  for (const i of indice.sempre) {
+    const r = classificarTriangulo(d, i * CAMPOS, px, py, pz, tolerancia);
+    if (r < 0) return null;
+    contagem += r;
+  }
+  const naSuperficie = visitarPorRaio(indice.arvore, px, py, pz, DIRECAO_RAIO[0], DIRECAO_RAIO[1], DIRECAO_RAIO[2], margem, (i) => {
+    if (indice.ehSempre[i] === 1) return false;
+    const r = classificarTriangulo(d, i * CAMPOS, px, py, pz, tolerancia);
+    if (r < 0) return true;
+    contagem += r;
+    return false;
+  });
+  if (naSuperficie) return null;
   return contagem % 2 === 1;
 }
 
@@ -405,12 +523,21 @@ function eixosDoTriangulo([a, b, c]) {
   });
 }
 
-function eixosDaMalha(malha) {
+/* os eixos de um triângulo, calculados na primeira vez que alguém os pede e guardados por malha */
+function eixosDoTrianguloDaMalha(malha, i) {
   const triangulos = malha.triangulos;
-  const guardado = eixosDasMalhas.get(triangulos);
-  if (guardado && guardado.quantidade === triangulos.length) return guardado.eixos;
-  const eixos = triangulos.map(eixosDoTriangulo);
-  eixosDasMalhas.set(triangulos, { quantidade: triangulos.length, eixos });
+  let guardado = eixosDasMalhas.get(triangulos);
+  if (!guardado || guardado.quantidade !== triangulos.length) {
+    guardado = { quantidade: triangulos.length, eixos: new Array(triangulos.length) };
+    eixosDasMalhas.set(triangulos, guardado);
+  }
+  if (guardado.eixos[i] === undefined) guardado.eixos[i] = eixosDoTriangulo(triangulos[i]);
+  return guardado.eixos[i];
+}
+
+function eixosDaMalha(malha) {
+  const eixos = [];
+  for (let i = 0; i < malha.triangulos.length; i += 1) eixos.push(eixosDoTrianguloDaMalha(malha, i));
   return eixos;
 }
 
@@ -424,7 +551,9 @@ function separadoPor(eixos, [p, q, r], tolerancia) {
   return false;
 }
 
-export function malhasSeInterseccionam(a, b, tolerancia) {
+/* Todos os pares de triângulos, sem fase ampla: a referência do teste de equivalência, e a resposta quando a malha de
+   consulta é pequena demais para valer uma árvore. */
+export function malhasSeInterseccionamPorForcaBruta(a, b, tolerancia) {
   const eixosA = eixosDaMalha(a); const eixosB = eixosDaMalha(b);
   for (let i = 0; i < a.triangulos.length; i += 1) {
     const trianguloA = a.triangulos[i];
@@ -435,6 +564,76 @@ export function malhasSeInterseccionam(a, b, tolerancia) {
     }
   }
   return false;
+}
+
+/* A FASE AMPLA DOS PARES. Cada triângulo de `a` consulta a árvore de `b` com a caixa dele alargada por `tolerância` e por
+   `FOLGA_RELATIVA_DE_PARES` do tamanho das malhas. A tolerância sozinha não bastaria, porque a separação testada vale por
+   eixo de triângulo e não é a distância entre eles: dois triângulos agudos podem passar por "se cruzam" com as caixas um pouco
+   afastadas. A folga relativa (1e-5 do tamanho, ordens de grandeza acima da tolerância de 1e-9) cobre esse caso, e o teste de
+   equivalência o sorteia com triângulos agudos. O triângulo que tem menos de quatro eixos próprios (quase colinear) não
+   separa por distância nenhuma, e fica sempre candidato, nos dois lados. */
+export function malhasSeInterseccionam(a, b, tolerancia) {
+  const indiceA = indiceDaMalha(a); const indiceB = indiceDaMalha(b);
+  if (indiceB.arvore === null || indiceA.quantidade === 0) return malhasSeInterseccionamPorForcaBruta(a, b, tolerancia);
+  const margem = tolerancia + FOLGA_RELATIVA_DE_PARES * Math.max(indiceA.escala, indiceB.escala) + indiceB.folgaDeArredondamento + indiceA.folgaDeArredondamento;
+  if (!Number.isFinite(margem)) return malhasSeInterseccionamPorForcaBruta(a, b, tolerancia);
+  if (indiceA.pobres.length === 0 && indiceB.pobres.length === 0
+    && [0, 1, 2].some((e) => indiceA.caixa.max[e] < indiceB.caixa.min[e] - margem || indiceB.caixa.max[e] < indiceA.caixa.min[e] - margem)) return false;
+  const testar = (i, j) => {
+    const trianguloA = a.triangulos[i]; const trianguloB = b.triangulos[j];
+    if (separadoPor(eixosDoTrianguloDaMalha(a, i), trianguloB, tolerancia) || separadoPor(eixosDoTrianguloDaMalha(b, j), trianguloA, tolerancia)) return false;
+    return sobreposicaoTriangulo(trianguloA, trianguloB, tolerancia);
+  };
+  let atual = 0;
+  const visitar = (j) => testar(atual, j);
+  const caixas = indiceA.caixas;
+  for (let i = 0; i < indiceA.quantidade; i += 1) {
+    if (indiceA.ehPobre[i] === 1) {
+      for (let j = 0; j < indiceB.quantidade; j += 1) if (testar(i, j)) return true;
+      continue;
+    }
+    atual = i;
+    const k = i * 6;
+    if (visitarPorCaixa(indiceB.arvore, caixas[k] - margem, caixas[k + 1] - margem, caixas[k + 2] - margem,
+      caixas[k + 3] + margem, caixas[k + 4] + margem, caixas[k + 5] + margem, visitar)) return true;
+    for (const j of indiceB.pobres) if (testar(i, j)) return true;
+  }
+  return false;
+}
+
+/* MEMÓRIA DE UMA EXECUÇÃO. O `descrever` audita os mesmos pares de partes duas vezes, uma em `descreverPeca` (a relação de
+   cada par que as caixas dizem invadir) e outra em `contatosDaPeca` (o contato de cada par), cada uma preparando os sólidos
+   do zero. `criarMemoriaDeAuditoria(neutro)` guarda, para ESTE `neutro` e esta execução, o sólido pronto de cada parte e o
+   resultado de cada par e tolerância; as duas passagens passam a ser uma. Ela vive na memória do processo e morre com a
+   execução: nenhum arquivo, nenhuma variável do módulo. Um par é resolvido por uma função pura dos triângulos e da
+   tolerância, então quem audita primeiro não muda a resposta de quem audita depois. */
+export function criarMemoriaDeAuditoria(neutro) {
+  const identidades = new WeakMap();
+  let proxima = 0;
+  return {
+    neutro,
+    solidos: new Map(),
+    pares: new Map(),
+    identidade(triangulos) {
+      if (!identidades.has(triangulos)) { identidades.set(triangulos, proxima); proxima += 1; }
+      return identidades.get(triangulos);
+    },
+  };
+}
+
+export function exigirMemoriaDoNeutro(memoria, neutro, quem) {
+  if (memoria !== null && memoria !== undefined && memoria.neutro !== neutro) {
+    throw new Error(`${quem}: a memória de auditoria foi criada para outro neutro; crie uma por execução.`);
+  }
+}
+
+/* O sólido preparado da parte `nome`, uma vez por memória. `preparar` só roda na primeira; sem memória, roda sempre. Memória
+   de outro `neutro` é recusada: uma resposta guardada para outra geometria seria a resposta errada. */
+export function solidoEmMemoria(memoria, neutro, nome, preparar) {
+  if (!memoria) return preparar();
+  if (memoria.neutro !== neutro) throw new Error('memória de auditoria criada para outro neutro: crie uma por execução.');
+  if (!memoria.solidos.has(nome)) memoria.solidos.set(nome, preparar());
+  return memoria.solidos.get(nome);
 }
 
 /**
@@ -489,7 +688,18 @@ const maiorDosDois = (x, y) => (x === null ? y : y === null ? x : Math.max(x, y)
    mesmo sentido de `profundidadeDeInterpenetracao` (um piso, porque só amostra
    pontos; `null` quando nenhum ponto cai dentro e as malhas só se cruzam por
    arestas), reaproveitando a contenção que o estado já mediu. */
-export function auditarParDeSolidos(a, b, tolerancia, { profundidade = false } = {}) {
+export function auditarParDeSolidos(a, b, tolerancia, { profundidade = false, memoria = null } = {}) {
+  /* Com memória, o par já auditado nesta execução, com os MESMOS triângulos e a mesma tolerância, devolve a resposta guardada.
+     A profundidade não é guardada: quem a pede mede de novo. */
+  const lembrar = memoria !== null && !profundidade && !a.inconclusivo && !b.inconclusivo && a.triangulos && b.triangulos;
+  if (!lembrar) return auditarParSemMemoria(a, b, tolerancia, { profundidade });
+  const chave = `${memoria.identidade(a.triangulos)} ${memoria.identidade(b.triangulos)} ${tolerancia}`;
+  if (!memoria.pares.has(chave)) memoria.pares.set(chave, auditarParSemMemoria(a, b, tolerancia, { profundidade }));
+  const guardado = memoria.pares.get(chave);
+  return { ...guardado, ...(guardado.diagnosticos ? { diagnosticos: [...guardado.diagnosticos] } : {}) };
+}
+
+function auditarParSemMemoria(a, b, tolerancia, { profundidade }) {
   if (a.inconclusivo || b.inconclusivo) return { estado: 'inconclusivo', diagnosticos: [a.inconclusivo, b.inconclusivo].filter(Boolean) };
   if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return { estado: 'separadas', metodo: 'caixa-mundo' };
   const pontosA = pontosDeAmostragem(a);

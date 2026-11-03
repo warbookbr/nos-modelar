@@ -58,6 +58,7 @@
     "guarda:referencia": "node tools/modelar/guardas/guarda-referencia-da-peca.mjs",
     "guarda:escolha": "node tools/modelar/guardas/guarda-escolha-da-peca.mjs",
     "guarda:acervo": "node tools/modelar/guardas/guarda-acervo.mjs",
+    "guarda:tempo": "node tools/modelar/guardas/guarda-tempo-do-descrever.mjs",
     "vistas:critica": "node tools/modelar/vistas-para-critica.mjs",
     "vistas:superficie": "node tools/modelar/vistas-de-superficie.mjs",
     "guarda:referencial": "node tools/modelar/guardas/guarda-referencial.mjs",
