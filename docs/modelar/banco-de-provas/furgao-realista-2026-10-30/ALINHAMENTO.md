@@ -26,7 +26,7 @@ A pessoa escolheu, pela recomendação, os para-choques no mesmo plástico escur
 
 ## As rodas e os pneus
 
-A pessoa escolheu, pela recomendação, as rodas pela família `roda-pneu`, com o pneu 225/65 aro 16 (cerca de 710 mm de diâmetro e 225 mm de largura, pneumático com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos. A família ganha duas melhorias gerais, que valem para qualquer veículo: os sulcos ao longo da volta da banda, como num pneu de estrada (hoje ela só faz relevo transversal), e a volta de furos de ventilação na chapa da roda.
+A pessoa escolheu, pela recomendação, as rodas pela família `roda-pneu`, com o pneu 225/65 aro 16 (cerca de 710 mm de diâmetro e 225 mm de largura, pneumático com bojo e ombro), que a prancha aprovada alargou para 235/65 (235 mm, no commit `d8743392`, "rodas mais largas"), a medida que a receita usa numa roda de chapa de aço de 16 polegadas com 5 parafusos. A família ganha duas melhorias gerais, que valem para qualquer veículo: os sulcos ao longo da volta da banda, como num pneu de estrada (hoje ela só faz relevo transversal), e a volta de furos de ventilação na chapa da roda.
 
 ## A lataria e o recorte
 

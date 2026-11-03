@@ -24,6 +24,16 @@
    aro (x = 0). Com `cruzamento` c, o nó do aro fica c passos angulares adiante do nó do cubo nos raios pares e c passos atrás
    nos ímpares, o que faz cada raio cruzar c raios do sentido oposto; por isso o número de raios é par quando há cruzamento.
 
+   O SULCO AO LONGO DA VOLTA. Nas bandas pneumáticas (0 e 3), `sulcosCirculares` maiores que zero cortam anéis retangulares na
+   banda. A área plana da banda (entre o talude do friso, ou o ombro, e o ombro do outro lado) é dividida em `sulcosCirculares`
+   passos iguais; o sulco de cada passo tem `larguraDoSulcoCircular` do passo, é centrado nele (as bordas ficam com meio passo
+   de banda inteira, como as nervuras do ombro de um pneu de estrada) e tem `profundidadeDoSulcoCircular` do flanco. Convive com o
+   relevo transversal da banda 3: os dois cortes saem da mesma subtração.
+
+   A VENTILAÇÃO. Na roda de disco (`tipo` 0), `furosDeVentilacao` maiores que zero furam a chapa numa volta de raio
+   `diametroCirculoDeVentilacao / 2`, com o primeiro furo a meio passo de +y (entre dois parafusos, quando as duas contagens
+   são iguais). Os dois parâmetros opcionais valem zero por padrão, e com zero a composição é a de antes deles.
+
    Puro e determinístico: nenhuma leitura de relógio, de sorteio ou de arquivo. */
 import { escalaresDaRoda, idDaRoda, nomeDoNoDoAro, nomeDoNoDoCubo } from './composicoes.js';
 
@@ -44,6 +54,8 @@ export function derivar({
   diametroPneu, larguraPneu, diametroAro, larguraAro, paredeDoAro, banda, tipo, espessuraDisco, larguraCubo, diametroCubo,
   diametroFlange, diametroFuroCentral, furosDeFixacao, diametroCirculoFuros, diametroFuro, desvio, raios, diametroRaio,
   paredeDoRaio, cruzamento, alturaDoFriso, sulcos, profundidadeDoSulco, larguraDoSulco,
+  sulcosCirculares = 0, larguraDoSulcoCircular = 0, profundidadeDoSulcoCircular = 0,
+  furosDeVentilacao = 0, diametroCirculoDeVentilacao = 0, diametroFuroDeVentilacao = 0,
 }) {
   const D = diametroPneu;
   const alturaDoFrisoMm = alturaDoFriso * D;
@@ -81,6 +93,8 @@ export function derivar({
   const mm = (valor) => valor * MM;
 
   const sulcada = banda === 3;
+  const circular = (banda === 0 || banda === 3) && sulcosCirculares > 0;
+  const ventilada = tipo === 0 && furosDeVentilacao > 0;
   const todos = {
     raioDoPneu: mm(raioDoPneu),
     raioDoOmbro: mm(raioDoPneu - chanfro),
@@ -130,11 +144,38 @@ export function derivar({
       passoDoSulco: 360 / sulcos,
     });
   }
-  const argumentos = Object.fromEntries(escalaresDaRoda({ tipo, sulcada }).map((nome) => [nome, todos[nome]]));
+  if (circular) {
+    const inicioDaArea = comFriso ? fimDoTalude : inicioDaBandaEsquerda;
+    const passoCircular = (meiaLargura - chanfro - inicioDaArea) / sulcosCirculares;
+    const larguraCircular = larguraDoSulcoCircular * passoCircular;
+    const inicioCircular = inicioDaArea + (passoCircular - larguraCircular) / 2;
+    Object.assign(todos, {
+      raioDoFundoDoSulcoCircular: mm(raioDoPneu - profundidadeDoSulcoCircular * flanco),
+      raioDoTopoDoSulcoCircular: mm(raioDoPneu * (1 + FOLGA_DO_PRISMA_DO_SULCO)),
+      inicioDoPrimeiroSulcoCircular: mm(inicioCircular),
+      fimDoPrimeiroSulcoCircular: mm(inicioCircular + larguraCircular),
+      passoDosSulcosCirculares: mm(passoCircular),
+    });
+  }
+  if (ventilada) {
+    const raioDaVolta = (diametroCirculoDeVentilacao * D) / 2;
+    const angulo = (Math.PI / furosDeVentilacao);
+    Object.assign(todos, {
+      yDoFuroDeVentilacao: arredondar(mm(raioDaVolta * Math.cos(angulo))),
+      zDoFuroDeVentilacao: arredondar(mm(raioDaVolta * Math.sin(angulo))),
+      raioDoFuroDeVentilacao: mm((diametroFuroDeVentilacao * D) / 2),
+      inicioDaFerramentaDeVentilacao: mm(centroDoCubo - espessura * 0.75),
+      fimDaFerramentaDeVentilacao: mm(centroDoCubo + espessura * 0.75),
+      passoAngularDaVentilacao: 360 / furosDeVentilacao,
+    });
+  }
+  const argumentos = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada }).map((nome) => [nome, todos[nome]]));
   argumentos.furos = furosDeFixacao;
   argumentos.materialDoPneu = banda === 2 ? 'aco' : 'borracha';
   if (sulcada) argumentos.sulcos = sulcos;
-  if (tipo === 0) return { composicao: idDaRoda({ tipo, sulcada }), argumentos };
+  if (circular) argumentos.sulcosCirculares = sulcosCirculares;
+  if (ventilada) argumentos.furosDeVentilacao = furosDeVentilacao;
+  if (tipo === 0) return { composicao: idDaRoda({ tipo, sulcada, circular, ventilada }), argumentos };
 
   /* os raios */
   const maciço = paredeDoRaio === 0;
@@ -152,5 +193,5 @@ export function derivar({
     argumentos[nomeDoNoDoCubo(k)] = noEm(xDoCubo, raioDoNoDoCubo, k * passo);
     argumentos[nomeDoNoDoAro(k)] = noEm(xDoAro, raioDoNoDoAro, k * passo + sentido * cruzamento * passo);
   }
-  return { composicao: idDaRoda({ tipo, raios, maciço, sulcada }), argumentos };
+  return { composicao: idDaRoda({ tipo, raios, maciço, sulcada, circular }), argumentos };
 }

@@ -1,7 +1,7 @@
 /* roda-pneu.test.js — a família `roda-pneu` medida na malha. As quatro partes (pneu, aro, cubo, disco) e o volume de cada uma
    contra a fórmula; a banda (pneumática, maciça, sem pneu com friso, com relevo); o cubo de disco, os raios de um plano e os
    raios de duas flanges, com o corte de cada barra contra a conta à mão; a escala (a malha cresce na proporção do diâmetro); as
-   três portas; cada restrição do contrato; os sete perfis chamados só pelo nome; e a conferência com o componente `roda` do
+   três portas; cada restrição do contrato; os oito perfis chamados só pelo nome; e a conferência com o componente `roda` do
    esboço. A camada mecânica da aprovação, que mede os pontos, os perfis e a escala deles, roda uma vez no fim. */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
@@ -32,7 +32,7 @@ const rodar = (parametros = {}) => executarReceita({
 }, registro);
 const P = RODA_PNEU.contrato.parametros;
 const PERFIS = RODA_PNEU.contrato.perfis;
-const NOMES_DOS_PERFIS = ['bicicleta', 'carrinho-de-mao', 'carro', 'carroca', 'rodizio', 'trator', 'trem'];
+const NOMES_DOS_PERFIS = ['bicicleta', 'carrinho-de-mao', 'carro', 'carroca', 'furgao-235-65-r16', 'rodizio', 'trator', 'trem'];
 const ponto = (nome) => Object.fromEntries(Object.entries(P).map(([chave, def]) => [chave, def[nome]]));
 const hash = (neutro) => sha256Hex(JSON.stringify(neutroCanonico(neutro)));
 /* os valores completos de uma chamada: o padrão, o perfil e o que o chamador escreve, nessa ordem */
@@ -322,6 +322,113 @@ function estruturaDosRaios(parametros, extra = {}) {
   });
 }
 
+describe('as duas melhorias gerais: os sulcos ao longo da volta da banda e a volta de furos de ventilação da chapa', () => {
+  const DESLIGADAS = { sulcosCirculares: 0, furosDeVentilacao: 0 };
+  const LIGADAS = {
+    larguraDoSulcoCircular: 0.35, profundidadeDoSulcoCircular: 0.12, diametroCirculoDeVentilacao: 0.42, diametroFuroDeVentilacao: 0.05,
+  };
+
+  it('desligadas (a contagem em zero) dão a malha de antes, com qualquer valor dos parâmetros que elas trazem', () => {
+    for (const nome of ['carro', 'trator', 'trem', 'rodizio', 'carroca', 'bicicleta']) {
+      const base = hash(rodar({ perfil: nome }).neutro);
+      expect(chamar(RODA_PNEU, 'roda', { perfil: nome }).composicao).not.toMatch(/-circ|-vent/);
+      expect(hash(rodar({ perfil: nome, ...DESLIGADAS, ...LIGADAS }).neutro), nome).toBe(base);
+    }
+  });
+
+  it('os sulcos ao longo da volta só valem nas bandas pneumáticas, e a ventilação só na roda de disco', () => {
+    for (const banda of [1, 2]) {
+      const base = hash(rodar({ perfil: 'rodizio', banda }).neutro);
+      expect(hash(rodar({ perfil: 'rodizio', banda, sulcosCirculares: 3 }).neutro)).toBe(base);
+    }
+    const raiada = hash(rodar({ perfil: 'carroca' }).neutro);
+    expect(hash(rodar({ perfil: 'carroca', furosDeVentilacao: 6 }).neutro)).toBe(raiada);
+    expect(chamar(RODA_PNEU, 'roda', { perfil: 'carro', sulcosCirculares: 3 }).composicao).toBe('roda-pneu.disco-lisa-circ');
+    expect(chamar(RODA_PNEU, 'roda', { perfil: 'carro', furosDeVentilacao: 6, diametroFuroDeVentilacao: 0.05 }).composicao).toBe('roda-pneu.disco-lisa-vent');
+    expect(chamar(RODA_PNEU, 'roda', { perfil: 'trator', sulcosCirculares: 3 }).composicao).toBe('roda-pneu.disco-sulcada-circ');
+    expect(chamar(RODA_PNEU, 'roda', { perfil: 'bicicleta', banda: 0, sulcosCirculares: 2 }).composicao).toBe('roda-pneu.flanges-macico-32-lisa-circ');
+  });
+
+  it('n sulcos circulares tiram da banda n anéis do fundo ao raio, igualmente espaçados e centrados no passo, e a banda continua um corpo só', () => {
+    for (const sulcosCirculares of [2, 3, 6]) {
+      const parametros = { perfil: 'furgao-235-65-r16', furosDeVentilacao: 0, sulcosCirculares };
+      const v = completo(parametros);
+      const lisa = rodar({ ...parametros, sulcosCirculares: 0 }).neutro;
+      const { neutro } = rodar(parametros);
+      expect(neutro.orfaos ?? []).toEqual([]);
+      const { caixas, facesSemParte } = caixasPorParte(neutro);
+      expect(facesSemParte).toEqual([]);
+      expect(caixas.get('pneu').corpos).toBe(1);
+      const { R, flanco, xm, ch } = medidasDoPneu(v);
+      const fundo = R - v.profundidadeDoSulcoCircular * flanco;
+      const passo = (2 * xm - 2 * ch) / sulcosCirculares;
+      const largura = v.larguraDoSulcoCircular * passo;
+      const esperados = [];
+      for (let i = 0; i < sulcosCirculares; i++) {
+        const inicio = -xm + ch + i * passo + (passo - largura) / 2;
+        esperados.push(inicio, inicio + largura);
+      }
+      const xs = [...new Set(verticesDaParte(neutro, 'pneu').filter((q) => Math.abs(raioDe(q) - fundo) < 1e-6).map(([x]) => Math.round(x * 1e6) / 1e6))].sort((a, b) => a - b);
+      expect(xs).toHaveLength(2 * sulcosCirculares);
+      xs.forEach((x, k) => expect(x).toBeCloseTo(esperados[k], 5));
+      /* o volume tirado é o de n anéis do fundo ao raio, com as facetas da própria banda */
+      const tirado = sulcosCirculares * largura * (areaRegular(LADOS_DA_RODA, R) - areaRegular(LADOS_DA_RODA, fundo));
+      expect((volumeDaParte(lisa, 'pneu') - volumeDaParte(neutro, 'pneu')) / tirado).toBeCloseTo(1, 6);
+      expect(Math.min(...verticesDaParte(neutro, 'pneu').map(raioDe))).toBeCloseTo(medidasDoPneu(v).rA, 6);
+    }
+  });
+
+  it('os sulcos circulares convivem com o relevo transversal: os dois cortes saem da banda e ela segue um corpo só', () => {
+    const base = { perfil: 'trator', sulcosCirculares: 3, larguraDoSulcoCircular: 0.2 };
+    const so = rodar({ perfil: 'trator' }).neutro;
+    const ambos = rodar(base).neutro;
+    expect(chamar(RODA_PNEU, 'roda', base).composicao).toBe('roda-pneu.disco-sulcada-circ');
+    expect(ambos.orfaos ?? []).toEqual([]);
+    expect(caixasPorParte(ambos).caixas.get('pneu').corpos).toBe(1);
+    expect(volumeDaParte(ambos, 'pneu')).toBeLessThan(volumeDaParte(so, 'pneu'));
+  });
+
+  it('n furos de ventilação furam a chapa, no raio da volta, com o diâmetro pedido, e não mexem no cubo, no aro nem no pneu', () => {
+    for (const furosDeVentilacao of [3, 5, 8]) {
+      const parametros = { perfil: 'furgao-235-65-r16', sulcosCirculares: 0, furosDeVentilacao };
+      const v = completo(parametros);
+      const sem = rodar({ ...parametros, furosDeVentilacao: 0 }).neutro;
+      const { neutro } = rodar(parametros);
+      expect(neutro.orfaos ?? []).toEqual([]);
+      const { caixas, facesSemParte } = caixasPorParte(neutro);
+      expect(facesSemParte).toEqual([]);
+      for (const parte of ['pneu', 'aro', 'cubo']) expect(volumeDaParte(neutro, parte)).toBeCloseTo(volumeDaParte(sem, parte), 3);
+      expect(caixas.get('disco').corpos).toBe(1);
+      const D = v.diametroPneu;
+      const volta = (v.diametroCirculoDeVentilacao * D) / 2;
+      const raioDoFuro = (v.diametroFuroDeVentilacao * D) / 2;
+      const centros = Array.from({ length: furosDeVentilacao }, (_, k) => {
+        const angulo = Math.PI / furosDeVentilacao + (2 * Math.PI * k) / furosDeVentilacao;
+        return [volta * Math.cos(angulo), volta * Math.sin(angulo)];
+      });
+      const naParede = verticesDaParte(neutro, 'disco').filter(([, y, z]) => Math.min(...centros.map(([cy, cz]) => Math.abs(Math.hypot(y - cy, z - cz) - raioDoFuro))) < 1e-5);
+      expect(naParede).toHaveLength(furosDeVentilacao * LADOS_DO_FURO * 2);
+      const tirado = furosDeVentilacao * areaRegular(LADOS_DO_FURO, raioDoFuro) * v.espessuraDisco * D;
+      expect((volumeDaParte(sem, 'disco') - volumeDaParte(neutro, 'disco')) / tirado).toBeCloseTo(1, 6);
+      /* a volta fica entre o cubo e o aro, e longe do círculo dos furos de fixação */
+      const noFuro = verticesDaParte(neutro, 'disco').filter(([, y, z]) => centros.some(([cy, cz]) => Math.abs(Math.hypot(y - cy, z - cz) - raioDoFuro) < 1e-5));
+      expect(Math.min(...noFuro.map(raioDe))).toBeGreaterThan((v.diametroCubo * D) / 2);
+      expect(Math.max(...noFuro.map(raioDe))).toBeLessThan((v.diametroAro * D) / 2 - v.paredeDoAro * D);
+      expect(Math.min(...noFuro.map(raioDe))).toBeGreaterThan(((v.diametroCirculoFuros + v.diametroFuro) * D) / 2);
+    }
+  });
+
+  it('o perfil do furgão liga as duas, 235/65 R16, e a malha fecha com a aprovação inteira', () => {
+    const v = completo({ perfil: 'furgao-235-65-r16' });
+    expect(v.diametroPneu).toBeCloseTo(2 * 0.65 * 235 + 16 * 25.4, 0);
+    expect(v.larguraPneu * v.diametroPneu).toBeCloseTo(235, 0);
+    expect(v.diametroAro * v.diametroPneu).toBeCloseTo(16 * 25.4, 0);
+    expect(v).toMatchObject({ tipo: 0, banda: 0, furosDeFixacao: 5, sulcosCirculares: 4, furosDeVentilacao: 5 });
+    const { neutro } = rodar({ perfil: 'furgao-235-65-r16' });
+    expect(portasPublicadas(neutro).find(({ id }) => id === 'furos-de-fixacao').interface.centros).toHaveLength(5);
+  });
+});
+
 describe('os raios: o tipo escolhe a composição e o número de raios cabe nos 64 nós da extensão', () => {
   it('o tipo 0 é a roda de disco, o 1 a raiada de um plano e o 2 a de duas flanges, com o perfil do raio: tubo com parede, maciço sem ela', () => {
     expect(chamar(RODA_PNEU, 'roda', {}).composicao).toBe('roda-pneu.disco-lisa');
@@ -496,7 +603,8 @@ describe('a escala: a mesma chamada em outro diâmetro é a mesma roda em outro 
           /* o chanfro do ombro não passa de 9 mm (a conferência da porta do assento), de modo que o pneu cresce um pouco menos que o cubo */
           expect(Math.abs(medidas[parte].volume / (base[parte].volume * fator ** 3) - 1), parte).toBeLessThan(parte === 'pneu' ? 0.02 : 0.002);
         }
-        expect(Math.max(...verticesDaParte(outro, 'pneu').map(raioDe))).toBeCloseTo((D * fator) / 2, 6);
+        /* a soldagem dos vértices das subtrações move um vértice por nanômetros: 5 casas decimais de milímetro são 10 nm */
+        expect(Math.max(...verticesDaParte(outro, 'pneu').map(raioDe))).toBeCloseTo((D * fator) / 2, 5);
       }
     });
   }
@@ -596,6 +704,15 @@ describe('o contrato recusa combinação impossível', () => {
     'raio-sai-da-flange-para-fora': { perfil: 'bicicleta', raios: 4, cruzamento: 1 },
     'sulcos-so-com-relevo': { perfil: 'trator', sulcos: 0 },
     'sulco-minimo': { perfil: 'trator', diametroPneu: 50, sulcos: 60, larguraDoSulco: 0.15 },
+    'sulco-circular-minimo': { perfil: 'furgao-235-65-r16', diametroPneu: 50, sulcosCirculares: 8, larguraDoSulcoCircular: 0.1 },
+    'sulcos-circulares-ao-menos-dois': { perfil: 'furgao-235-65-r16', sulcosCirculares: 1 },
+    'sulco-circular-fundo': { perfil: 'furgao-235-65-r16', diametroPneu: 50, diametroAro: 0.93, profundidadeDoSulcoCircular: 0.05 },
+    'ventilacao-so-com-tres': { perfil: 'furgao-235-65-r16', furosDeVentilacao: 2 },
+    'ventilacao-furo-minimo': { perfil: 'furgao-235-65-r16', diametroPneu: 50, diametroFuroDeVentilacao: 0.01 },
+    'ventilacao-fora-do-cubo': { perfil: 'furgao-235-65-r16', diametroCirculoDeVentilacao: 0.32 },
+    'ventilacao-afastada-dos-furos-de-fixacao': { perfil: 'furgao-235-65-r16', diametroCirculoDeVentilacao: 0.3 },
+    'ventilacao-dentro-da-borda': { perfil: 'furgao-235-65-r16', diametroCirculoDeVentilacao: 0.5 },
+    'ventilacao-furos-vizinhos-separados': { perfil: 'furgao-235-65-r16', furosDeVentilacao: 12 },
   };
   it('há um caso para cada restrição do contrato', () => {
     expect(Object.keys(CASOS).sort()).toEqual(RODA_PNEU.contrato.restricoes.map(({ id }) => id).sort());
@@ -614,16 +731,17 @@ describe('o contrato recusa combinação impossível', () => {
     expect(() => rodar({ furosDeFixacao: 13 })).toThrow(/parametros\.furosDeFixacao/);
     expect(() => rodar({ furosDeFixacao: 4.5 })).toThrow(/parametros\.furosDeFixacao/);
     expect(() => rodar({ banda: 4 })).toThrow(/parametros\.banda/);
-    expect(() => rodar({ perfil: 'moto' })).toThrow(/parametros\.perfil.*bicicleta, carrinho-de-mao, carro, carroca, rodizio, trator, trem/);
+    expect(() => rodar({ perfil: 'moto' })).toThrow(/parametros\.perfil.*bicicleta, carrinho-de-mao, carro, carroca, furgao-235-65-r16, rodizio, trator, trem/);
   });
 });
 
 describe('os perfis: o nome e o diâmetro bastam, e o chamador sobrescreve só o que quiser', () => {
-  it('a família declara os sete perfis, e cada um é uma chamada que ela aceita, com a composição que o objeto pede', () => {
+  it('a família declara os oito perfis, e cada um é uma chamada que ela aceita, com a composição que o objeto pede', () => {
     expect(Object.keys(PERFIS).sort()).toEqual(NOMES_DOS_PERFIS);
     const esperadas = {
       carro: 'roda-pneu.disco-lisa', bicicleta: 'roda-pneu.flanges-macico-32-lisa', 'carrinho-de-mao': 'roda-pneu.disco-lisa', rodizio: 'roda-pneu.disco-lisa',
       trator: 'roda-pneu.disco-sulcada', trem: 'roda-pneu.disco-lisa', carroca: 'roda-pneu.raiada-macico-12-lisa',
+      'furgao-235-65-r16': 'roda-pneu.disco-lisa-circ-vent',
     };
     for (const nome of NOMES_DOS_PERFIS) {
       expect(chamar(RODA_PNEU, 'roda', { perfil: nome }).composicao).toBe(esperadas[nome]);
@@ -670,7 +788,7 @@ describe('a camada mecânica da aprovação e a conferência com o esboço', () 
     }
   }, 180_000);
 
-  it('a conferência com o componente roda passa nos três pontos e nos sete perfis, com as quatro partes e a porta do assento no lugar', () => {
+  it('a conferência com o componente roda passa nos três pontos e nos oito perfis, com as quatro partes e a porta do assento no lugar', () => {
     const conferencia = conferirFamiliaNosTresPontos({ familia: RODA_PNEU, registro, materiais: MATERIAIS });
     expect(conferencia.estado).toBe('conferida');
     expect(conferencia.pontos.map(({ ponto: nome }) => nome)).toEqual(['minimo', 'medio', 'maximo']);
@@ -691,7 +809,7 @@ describe('a camada mecânica da aprovação e a conferência com o esboço', () 
     }
   }, 180_000);
 
-  it('a aprovação mecânica passa nos três pontos, nos sete perfis, na varredura e na escala dos perfis', () => {
+  it('a aprovação mecânica passa nos três pontos, nos oito perfis, na varredura e na escala dos perfis', () => {
     const resultado = aprovarFamilia(RODA_PNEU, { gravar: false });
     expect(resultado.problemas).toEqual([]);
     expect(resultado.aprovada).toBe(true);
