@@ -51,7 +51,8 @@ describe('rodarGuardas', () => {
     const saida = [];
     const { resultados } = await rodarGuardas({
       guardas: [guarda('guarda:presa', 'presa.mjs'), guarda('guarda:depois', 'depois.mjs')],
-      repo, escrever: (t) => saida.push(t), tempo: 400,
+      /* 2 s: com a máquina carregada, só subir o node para a guarda `depois` já passou de 400 ms e ela vencia junto */
+      repo, escrever: (t) => saida.push(t), tempo: 2000,
     });
     expect(resultados.find((r) => r.nome === 'guarda:presa')).toMatchObject({ vencido: true, codigo: 124 });
     expect(resultados.find((r) => r.nome === 'guarda:depois').codigo).toBe(0);
@@ -107,8 +108,8 @@ describe('a lista de guardas', () => {
     const scriptsDeGuarda = Object.entries(pacote.scripts)
       .filter(([, comando]) => /node tools\/(modelar\/guardas\/guarda-|bancadas\/porteiro)/.test(comando))
       .map(([nome]) => nome);
-    /* `guarda:acervo` e `guarda:referencial` não abrem navegador e têm gate próprio. */
-    const semNavegador = ['guarda:acervo', 'guarda:referencial'];
+    /* `guarda:acervo`, `guarda:referencial` e `guarda:tempo` não abrem navegador e têm gate próprio. */
+    const semNavegador = ['guarda:acervo', 'guarda:referencial', 'guarda:tempo'];
     const faltando = scriptsDeGuarda.filter((n) => !semNavegador.includes(n) && !GUARDAS.some((g) => g.nome === n));
     expect(faltando, `guarda fora do bancada:guardas: ${faltando.join(', ')}`).toEqual([]);
   });
