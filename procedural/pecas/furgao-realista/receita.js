@@ -6,8 +6,13 @@
  * etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png, aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as
  * duas traseiras de abrir), o vinco de cintura discreto ao longo da lateral, as nervuras longitudinais do teto alto e a aba leve dos
  * quatro arcos das rodas, e abre na chapa os vãos do para-brisa, dos vidros das portas da cabine e dos das portas traseiras, cada um
- * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. As quatro rodas provisórias da etapa 1 ficam. As rodas da
- * família, os vidros e borrachas, as luzes e o acabamento vêm nas etapas 4 a 7.
+ * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. Os vidros e borrachas, as luzes e o
+ * acabamento vêm nas etapas 5 a 7.
+ *
+ * Etapa 4, as rodas e o forro dos arcos: as quatro rodas saem da família `roda-pneu` (pneu 235/65 aro 16 com bojo e ombro, roda de chapa de aço com 5
+ * parafusos), na bitola e nos eixos da prancha e apoiadas no chão, e cada arco ganha um forro escuro por dentro da chapa, a 25 mm do pneu, que fecha o oco
+ * atrás da roda. A receita expande a chamada da família dentro de `gerarPassos`, soma uma base aos ids locais dela e põe o sufixo da roda nos nomes das
+ * partes (pneu, aro, cubo, disco), como a hélice do avião faz com a pá; o forro é a mesma seção varrida em arco que a moldura.
  *
  * Etapa 3, o plástico de baixo, peça própria por fora da chapa (prancha de 2026-11-01): a saia de 299 a 463, que sai 20 mm da lateral, as
  * alargamento de 150 mm que sai 30 mm em volta dos quatro arcos (2026-11-02) e os para-choques, que saem 50 mm na frente e 110 atrás e dobram nas quinas. A chapa
@@ -54,6 +59,8 @@
  */
 
 import { gaiolaVarrida } from '../../nucleo/gaiola-varrida.js';
+import { chamar, criarRegistroDeFamilias } from '../../familias/index.js';
+import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
 
 export const TABELA = {
   // envelope da classe (prancha): 5400 de comprimento, 2000 de largura sem retrovisores, 2500 de altura, soleira em 300
@@ -69,6 +76,27 @@ export const TABELA = {
   pneu_diametro: 710,
   pneu_largura: 235,
   arco_raio: 420,
+  // a roda da família `roda-pneu`, no pneu 235/65 aro 16 com bojo e ombro: assento do aro (16 polegadas), largura do aro (fração do pneu), parede do aro, chapa,
+  // cubo, furo central e os 5 furos de fixação (círculo de 130, furo de 16), e o desvio (fração da folga do aro, para fora)
+  roda_assento: 406.4,
+  roda_largura_aro: 0.75,
+  roda_parede_aro: 4,
+  roda_chapa: 6,
+  roda_largura_cubo: 36,
+  roda_diametro_cubo: 185,
+  roda_furo_central: 75,
+  roda_furos_fixacao: 5,
+  roda_circulo_furos: 130,
+  roda_diametro_furo: 16,
+  roda_desvio: 0.52,
+  // as duas melhorias que a família ganha em paralelo (sulcos ao longo da volta da banda e furos de ventilação na chapa): 0 é desligado; a receita ainda
+  // não as passa à família, e o par de linhas em `chamadaDaRoda` marca onde ligá-las
+  roda_sulcos_circunferenciais: 0,
+  roda_furos_ventilacao: 0,
+  // o forro dos arcos: a folga até o pneu, quanto ele passa da boca do arco para encostar na chapa, e o raio onde a parede de dentro acaba
+  forro_folga: 25,
+  forro_sobra: 8,
+  forro_raio_fundo: 130,
 
   // perfil da frente, em [z, y]: nariz vertical até o topo do para-choque, degrau dele, boca do capô, capô curto, para-brisa e a curva
   // do teto (dois arcos tangentes, o de 1290 saindo do vidro e o de 405 chegando ao teto plano)
@@ -864,6 +892,37 @@ export function derivarPlastico(T, f) {
     }
   }
 
+  /* ---- o forro dos arcos: por dentro da chapa, fecha o oco atrás de cada roda ----
+     Um balde aberto para fora, em torno do eixo da roda, só na metade de cima: uma aba assentada na face de dentro da chapa em volta da boca (passa 8 mm
+     dela para encostar), o túnel a `forro_folga` do pneu e a parede de dentro, a essa mesma folga da face de dentro do pneu. O trilho é o círculo do túnel,
+     e a seção sai radial (v) e pela largura (u, para dentro). As pontas acabam onde a borda da aba cruza a soleira. */
+  const rForro = T.pneu_diametro / 2 + T.forro_folga;
+  const rBordaForro = T.arco_raio + T.forro_sobra;
+  const angForro = Math.asin((yc - T.soleira_y) / rBordaForro);
+  const fundoForro = f.xMax - (T.bitola / 2 - T.pneu_largura / 2) + T.forro_folga;
+  const tuneis = Math.ceil((fundoForro - pen) / 70);
+  const secaoForro = [
+    { u: -pen, v: rBordaForro - rForro, nome: 'borda' },
+    { u: -pen, v: 0, nome: 'canto' },
+    ...Array.from({ length: tuneis - 1 }, (_, i) => ({ u: -pen - ((i + 1) * (fundoForro - pen)) / tuneis, v: 0 })),
+    { u: -fundoForro, v: 0, nome: 'canto2' },
+    { u: -fundoForro, v: -(rForro - T.forro_raio_fundo) / 2 },
+    { u: -fundoForro, v: T.forro_raio_fundo - rForro },
+  ];
+  for (const [zc, rotulo] of [[zD, 'Dianteiro'], [zT, 'Traseiro']]) {
+    for (const [lado, s] of lados) {
+      const nome = `forroArco${rotulo}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;
+      const g = gaiolaVarrida({
+        nome,
+        trilho: [{ arco: { centro: [s * f.xMax, yc, zc], eixo: EIXO_X, de: [s * f.xMax, yc - rForro * Math.sin(angForro), zc + rForro * Math.cos(angForro)], graus: -(180 + 2 * (angForro / grau)) } }],
+        quadro: s > 0 ? { u: [s, 0, 0], virar: true } : { u: [s, 0, 0] }, secao: secaoForro, fora: [s, 0, 0],
+        vincos: [{ linha: 'canto', nitidez: 'viva' }, { linha: 'canto2', nitidez: 'viva' }],
+        estacoes: [{ fracao: 0 }, { passo: rForro * ((T.moldura_passo_graus * Math.PI) / 180), linha: 'canto' }, { fracao: 1 }],
+      });
+      partes.push(daVarredura(g));
+    }
+  }
+
   /* ---- o para-choque dianteiro ---- */
   {
     const sec = adensar(comAlturas(T.secao_parachoque_dianteiro, [T.placa_dianteira_y0, T.placa_dianteira_y0 + T.placa_altura]), T.plastico_passo_y);
@@ -934,13 +993,13 @@ const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[
 const unit = (a) => { const l = Math.hypot(...a); return l > 1e-12 ? esc(a, 1 / l) : a; };
 
 /**
- * derivar(T) -> a gaiola da chapa e as rodas provisórias, em milímetro e em metro.
+ * derivar(T) -> a gaiola da chapa, o plástico, o forro e as chamadas das rodas, em milímetro e em metro.
  *   pontos: os pontos nomeados da gaiola, em metro, que entram em TOPO;
  *   passo: os campos do passo `subdivisao` (vertices, faces, vincos, cantos), só com nomes;
  *   aneis: os anéis, com a lista de pontos de cada um por coluna, para o teste e a etapa seguinte citarem a gaiola por nome;
  *   portas, vidros: as voltas de cada porta (nos nomes da carroceria) e de cada vão de vidro;
  *   abasDosArcos: a linha de cada arco de roda, para a aba;
- *   rodas: as quatro rodas provisórias, com o perfil do cilindro e a posição.
+ *   rodas: as quatro rodas, com o sufixo, o centro e a chamada da família roda-pneu.
  */
 export function derivar(T) {
   const f = forma(T);
@@ -1685,13 +1744,11 @@ export function derivar(T) {
   const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
 
-  /* as rodas provisórias: cilindros no pneu da prancha, na bitola e no entre-eixos, apoiados no chão */
-  const xDentro = T.bitola / 2 - T.pneu_largura / 2;
-  const xFora = T.bitola / 2 + T.pneu_largura / 2;
+  /* as quatro rodas da família `roda-pneu`, no pneu da prancha, na bitola e no entre-eixos, apoiadas no chão: a chamada da família e o centro de cada uma */
   const rodas = [];
-  for (const [eixo, zc] of [['Dianteira', f.zD], ['Traseira', f.zT]]) {
-    for (const [ladoNome, s] of [['Esquerda', 1], ['Direita', -1]]) {
-      rodas.push({ nome: `rodaProvisoria${eixo}${ladoNome}`, s, zc, xDentro, xFora, raio: f.rPneu });
+  for (const [eixo, zc] of [['Dianteiro', f.zD], ['Traseiro', f.zT]]) {
+    for (const [ladoNome, s] of [['Esquerdo', 1], ['Direito', -1]]) {
+      rodas.push({ sufixo: `${eixo}${ladoNome}`, s, centro: [s * T.bitola / 2, f.rPneu, zc], chamada: chamadaDaRoda(T, `roda-${eixo.toLowerCase()}-${ladoNome.toLowerCase()}`) });
     }
   }
   return {
@@ -1704,12 +1761,42 @@ export function derivar(T) {
   };
 }
 
+/* ---------- a roda da família ---------- */
+
+let registroDeFamilias = null;
+const familias = () => { registroDeFamilias ??= criarRegistroDeFamilias(); return registroDeFamilias; };
+
+/** A chamada da família `roda-pneu` para o pneu da tabela. As medidas da família são proporções do diâmetro do pneu; a tabela as dá em milímetro.
+ *  A banda 0 é o pneumático com bojo e ombro, e o tipo 0 a roda de chapa. `roda_sulcos_circunferenciais` e `roda_furos_ventilacao` ficam na tabela, em 0,
+ *  para quando a família passar a aceitá-los: é aqui, ao lado de `sulcos`, que eles entram na chamada. */
+function chamadaDaRoda(T, id) {
+  const D = T.pneu_diametro;
+  return chamar(familias().obter('roda-pneu'), id, {
+    diametroPneu: D, larguraPneu: T.pneu_largura / D, diametroAro: T.roda_assento / D, larguraAro: T.roda_largura_aro, paredeDoAro: T.roda_parede_aro / D,
+    banda: 0, tipo: 0, espessuraDisco: T.roda_chapa / D, larguraCubo: T.roda_largura_cubo / D, diametroCubo: T.roda_diametro_cubo / D,
+    diametroFuroCentral: T.roda_furo_central / D, furosDeFixacao: T.roda_furos_fixacao, diametroCirculoFuros: T.roda_circulo_furos / D,
+    diametroFuro: T.roda_diametro_furo / D, desvio: T.roda_desvio,
+  });
+}
+
+/* Os ids da família são locais (de 1 a 11) e os nomes das partes são os dela (pneu, aro, cubo, disco): cada roda soma `base` aos ids e põe o sufixo da roda nos
+   nomes, para as quatro não colidirem entre si nem com os passos desta receita. */
+const comBase = (v, base) => {
+  if (Array.isArray(v)) return v.map((x) => comBase(x, base));
+  if (v && typeof v === 'object') {
+    return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === 'origemId' || (k === 'id' && typeof v.op === 'string') ? x + base : comBase(x, base)]));
+  }
+  return v;
+};
+const PARTES_DA_RODA = ['pneu', 'aro', 'cubo', 'disco'];
+const BASE_DAS_RODAS = 200;
+
 /* ---------- passos ---------- */
 
 const CHAPA = { origem: { op: 'subdivisao', id: 1 } };
 const nomeDaAbaDoArco = (a) => `abaArco${a.arco === 'arcoD' ? 'Dianteiro' : 'Traseiro'}${a.lado === 'e' ? 'Esquerdo' : 'Direito'}`;
 
-/** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros, as abas dos arcos e as quatro rodas provisórias. */
+/** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros,  as abas dos arcos, as quatro rodas da família e o forro dos arcos (que vem com o plástico). */
 export function gerarPassos(T) {
   const { passo, plastico, rodas, vidros, abasDosArcos } = derivar(T);
   const passos = [
@@ -1722,7 +1809,7 @@ export function gerarPassos(T) {
     const sel = { origem: { op: 'subdivisao', id: 50 + k } };
     passos.push(['subdivisao', { origemId: 50 + k, vertices: pl.vertices, faces: pl.faces, vincos: pl.vincos, cantos: pl.cantos, borda: 'cantos', niveis: T.niveis, espessura: m(T.plastico_espessura) }]);
     passos.push(['parte', { nome: pl.nome, sel }]);
-    passos.push(['material', { sel, usa: MOLDURAS.includes(pl.nome) ? 'azul' : 'plastico' }]);
+    passos.push(['material', { sel, usa: MOLDURAS.includes(pl.nome) ? 'azul' : FORROS.includes(pl.nome) ? 'forro' : 'plastico' }]);
   });
   vidros.forEach((v, k) => {
     const sel = { origem: { op: 'friso', id: 20 + k } };
@@ -1746,23 +1833,31 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: linha.nome, sel }]);
     passos.push(['material', { sel, usa: 'azul' }]);
   });
+  /* as rodas: a expansão da família, na origem e com o lado de fora em +x, sem as portas; a do lado direito gira meia volta em y, e todas vão ao centro */
   rodas.forEach((r, k) => {
-    const sel = { origem: { op: 'lathe', id: 10 + k } };
-    passos.push(['lathe', {
-      origemId: 10 + k, eixo: 'x', lados: 48,
-      perfil: [[0, 0], [m(r.raio), 0], [m(r.raio), m(r.xFora - r.xDentro)], [0, m(r.xFora - r.xDentro)]],
-      em: [m(r.s > 0 ? r.xDentro : -r.xFora), m(r.raio), m(r.zc)],
-    }]);
-    passos.push(['parte', { nome: r.nome, sel }]);
-    passos.push(['material', { sel, usa: 'pneu' }]);
-    passos.push(['liso', { angulo: 30, sel }]);
+    const base = BASE_DAS_RODAS + 20 * k;
+    const { passos: daFamilia } = expandirChamadasDeComposicao(familias().registroComposicoes, [r.chamada]);
+    const nomeadas = [];
+    for (const passo of daFamilia) {
+      const [operacao, argumentos] = comBase(passo, base);
+      if (operacao === 'publicarPorta') continue;
+      if (operacao === 'parte') { nomeadas.push(argumentos.sel); passos.push([operacao, { ...argumentos, nome: `${argumentos.nome}${r.sufixo}` }]); continue; }
+      passos.push([operacao, argumentos]);
+    }
+    for (const sel of nomeadas) {
+      if (r.s < 0) passos.push(['rotaciona', { eixo: 'y', graus: 180, pivo: [0, 0, 0], sel }]);
+      passos.push(['transladar', { d: r.centro.map(m), sel }]);
+      passos.push(['liso', { angulo: 30, sel }]);
+    }
   });
   return passos;
 }
 
 /* ---------- contatos, vãos, ilhas e pontos ---------- */
 
-const RODAS = ['rodaProvisoriaDianteiraEsquerda', 'rodaProvisoriaDianteiraDireita', 'rodaProvisoriaTraseiraEsquerda', 'rodaProvisoriaTraseiraDireita'];
+const SUFIXOS_DAS_RODAS = ['DianteiroEsquerdo', 'DianteiroDireito', 'TraseiroEsquerdo', 'TraseiroDireito'];
+const RODAS = SUFIXOS_DAS_RODAS.map((sufixo) => PARTES_DA_RODA.map((parte) => `${parte}${sufixo}`));
+const FORROS = SUFIXOS_DAS_RODAS.map((sufixo) => `forroArco${sufixo}`);
 const ABAS_DOS_VAOS = ['abaVaoParaBrisa', 'abaVaoPortaCabineEsquerda', 'abaVaoPortaCabineDireita', 'abaVaoPortaTraseiraEsquerda', 'abaVaoPortaTraseiraDireita'];
 const ABAS_DOS_ARCOS = ['abaArcoDianteiroEsquerdo', 'abaArcoDianteiroDireito', 'abaArcoTraseiroEsquerdo', 'abaArcoTraseiroDireito'];
 
@@ -1788,12 +1883,23 @@ export const CONTATOS = [
     { par: [`abaArco${eixo}${lad}`, `molduraArco${eixo}${lad}`], motivo: 'a moldura cobre a aba do arco, passando 2 mm ou mais acima dela; a parede da moldura na boca encosta na raiz da aba' },
     { par: [`abaArco${eixo}${lad}`, `saiaPresa${lado}`], motivo: 'a saia vai até a boca do arco e sobe no alargamento, cobrindo a aba por baixo da ponta da moldura; as caixas se cruzam na raiz da aba' },
     { par: [`abaArco${eixo}${lad}`, `parachoque${eixo}`], motivo: 'o para-choque vai pela lateral até a boca do arco e sobe no alargamento, cobrindo a aba por baixo da ponta da moldura; as caixas se cruzam na raiz da aba' },
+    { par: [`abaArco${eixo}${lad}`, `forroArco${eixo}${lad}`], motivo: 'o forro assenta por dentro da chapa em volta da boca, onde a aba assenta por fora; elas só se encostam na raiz da aba, na espessura da chapa' },
+    { par: [`molduraArco${eixo}${lad}`, `forroArco${eixo}${lad}`], motivo: 'a moldura dobra 10 mm para dentro do arco na boca, atravessa a chapa e chega à aba do forro, que passa 8 mm da boca por dentro' },
+    { par: [`saiaPresa${lado}`, `forroArco${eixo}${lad}`], motivo: 'a saia vai até a boca do arco e dobra para dentro dela, e essa dobra chega à aba do forro, que passa 8 mm da boca por dentro' },
+    { par: [`parachoque${eixo}`, `forroArco${eixo}${lad}`], motivo: 'o para-choque vai até a boca do arco e dobra para dentro dela, e essa dobra chega à aba do forro, que passa 8 mm da boca por dentro' },
+  ]),
+  ...FORROS.map((forro) => ({ par: ['carroceria', forro], motivo: 'a aba do forro assenta na face de dentro da chapa em volta do arco, passando 8 mm da boca, e entra 1 mm na parede' })),
+  ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
+    { par: [`pneu${sufixo}`, `aro${sufixo}`], motivo: 'o assento do pneu abraça o barril do aro: a borda de dentro da banda é o raio do assento do aro' },
+    { par: [`aro${sufixo}`, `disco${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do aro' },
+    { par: [`disco${sufixo}`, `cubo${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do cubo' },
   ]),
 ];
 
-export const ILHAS = RODAS.map((contem) => ({
-  contem,
-  motivo: 'roda provisória da etapa 1, apoiada no chão sob o arco e sem tocar a chapa; o cubo, o forro do arco e as rodas da família vêm na etapa 4',
+/* Cada roda é um grupo de quatro partes ligadas entre si, apoiado no chão sob o arco e sem tocar a chapa nem o forro: 25 mm de folga em volta do pneu. */
+export const ILHAS = RODAS.map(([pneu]) => ({
+  contem: pneu,
+  motivo: 'a roda da família roda-pneu, apoiada no chão sob o arco e sem tocar a chapa nem o forro do arco; o eixo e a suspensão não são modelados',
 }));
 
 /* Os vãos da chapa: os dos vidros com a aba dobrada como moldura, e os das portas, que a própria porta ocupa com a fresta em volta. */
@@ -1835,19 +1941,23 @@ export function pontosDeclarados(T = TABELA) {
     { nome: 'canto de baixo da caixa da carroceria: a lateral direita, a soleira e a traseira', parte: 'carroceria', medida: 'minimo', em: [-f.xMax, T.soleira_y, f.zTras], toleranciaMm: tol },
     { nome: 'frente do para-choque dianteiro, no alto da faixa de baixo: a ponta mais à frente, 50 mm além da chapa, e o lado mais largo, no alargamento do arco, 30 mm além da lateral', parte: 'parachoqueDianteiro', medida: 'maximo', em: [f.xMax + 30, 724, f.zFrente + 50], toleranciaMm: 4 },
     { nome: 'traseira do para-choque traseiro: o lado direito, no alargamento do arco, 30 mm além da lateral, o fundo e a ponta mais atrás, 110 mm além da chapa', parte: 'parachoqueTraseiro', medida: 'minimo', em: [-(f.xMax + 30), 300, f.zTras - 110], toleranciaMm: 4 },
-    { nome: 'pneu dianteiro esquerdo, embaixo, por dentro e atrás', parte: 'rodaProvisoriaDianteiraEsquerda', medida: 'minimo', em: [xDentro, 0, f.zD - r], toleranciaMm: tol },
-    { nome: 'pneu traseiro direito, em cima, por dentro e na frente', parte: 'rodaProvisoriaTraseiraDireita', medida: 'maximo', em: [-xDentro, 2 * r, f.zT + r], toleranciaMm: tol },
-    { nome: 'pneu traseiro direito, embaixo, por fora e atrás', parte: 'rodaProvisoriaTraseiraDireita', medida: 'minimo', em: [-xFora, 0, f.zT - r], toleranciaMm: tol },
+    { nome: 'pneu dianteiro esquerdo, embaixo, por dentro e atrás', parte: 'pneuDianteiroEsquerdo', medida: 'minimo', em: [xDentro, 0, f.zD - r], toleranciaMm: tol },
+    { nome: 'pneu traseiro direito, em cima, por dentro e na frente', parte: 'pneuTraseiroDireito', medida: 'maximo', em: [-xDentro, 2 * r, f.zT + r], toleranciaMm: tol },
+    { nome: 'pneu traseiro direito, embaixo, por fora e atrás', parte: 'pneuTraseiroDireito', medida: 'minimo', em: [-xFora, 0, f.zT - r], toleranciaMm: tol },
+    { nome: 'forro do arco dianteiro esquerdo, embaixo e atrás: a parede de dentro 25 mm além da face de dentro do pneu mais os 2 mm da espessura, as pontas na soleira e a borda da aba 8 mm além da boca', parte: 'forroArcoDianteiroEsquerdo', medida: 'minimo', em: [xDentro - T.forro_folga - T.plastico_espessura, T.soleira_y, f.zD - T.arco_raio - T.forro_sobra], toleranciaMm: 1 },
+    { nome: 'forro do arco traseiro direito, em cima e na frente: a aba na face de dentro da chapa, o alto da borda 8 mm acima da boca e a parede de dentro 25 mm além do pneu mais os 2 mm da espessura', parte: 'forroArcoTraseiroDireito', medida: 'maximo', em: [-(xDentro - T.forro_folga - T.plastico_espessura), f.rPneu + T.arco_raio + T.forro_sobra, f.zT + T.arco_raio + T.forro_sobra], toleranciaMm: 1 },
   ];
 }
 
 const receita = {
-  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 3: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia e os para-choques em plástico escuro e o alargamento dos arcos (da cor da lataria em cima, escuro embaixo), por fora da chapa, e quatro rodas provisórias' },
+  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 4: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia e os para-choques em plástico escuro e o alargamento dos arcos (da cor da lataria em cima, escuro embaixo), por fora da chapa, o forro escuro dos arcos por dentro e as quatro rodas da família roda-pneu (pneu 235/65 aro 16)' },
   PARAMS: TABELA,
   MATERIAIS: {
     azul: { tipo: 'liso', cor: '#5d75c9' },
-    pneu: { tipo: 'liso', cor: '#26262b' },
+    borracha: { tipo: 'liso', cor: '#26262b' },
+    aco: { tipo: 'metal', cor: '#a9adb3', acabamento: 'escovado' },
     plastico: { tipo: 'liso', cor: '#39393f' },
+    forro: { tipo: 'liso', cor: '#1b1c1f' },
   },
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
   get TOPO() {
@@ -1857,7 +1967,7 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto, etapa 3: chapa de 5400 por 2000 por 2500 mm com frestas das cinco portas, mais saia, para-choques e alargamento dos arcos por fora (5560 por 2060), e rodas provisórias',
+    objeto: 'furgão médio de teto alto, etapa 4: chapa de 5400 por 2000 por 2500 mm com frestas das cinco portas, mais saia, para-choques e alargamento dos arcos por fora (5560 por 2060), forro dos arcos e rodas roda-pneu 235/65 aro 16',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
@@ -1902,11 +2012,21 @@ const receita = {
         forma: 'para-choque traseiro de plástico escuro, de 300 a 580: sai 110 mm atrás das portas, com o degrau plano de carga em 580 e o lugar da placa de 400 por 130; dobra nas quinas e sobe no alargamento até a boca',
         tecnica: 'subdivisao da pele da seção varrida pela planta (reta, quina de raio 210, lateral e faixa do alargamento), vinco na borda do degrau, bolso de paredes vivas para a placa',
       },
-      ...RODAS.map((nome) => ({
+      ...FORROS.map((nome) => ({
         nome,
-        forma: `roda provisória da etapa 1: cilindro de 710 mm de diâmetro e 235 de largura, na bitola de 1730 e no ${nome.includes('Dianteira') ? 'eixo dianteiro' : 'eixo traseiro'}, apoiado no chão; sai na etapa 4`,
-        tecnica: 'lathe em torno de x de um retângulo, com 48 lados e sombreamento liso',
+        forma: `forro escuro do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}, por dentro da chapa: aba em volta da boca (passa 8 mm), túnel a 25 mm do pneu e parede de dentro a 25 mm dele, fechando o oco`,
+        tecnica: 'subdivisao da pele da seção varrida em arco em torno do eixo da roda, com vinco vivo nas duas dobras, engrossada 2 mm para dentro, plástico escuro',
       })),
+      ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
+        {
+          nome: `pneu${sufixo}`,
+          forma: `pneu 235/65 aro 16 da roda ${sufixo.replace(/([A-Z])/g, ' $1').toLowerCase().trim()}: 710 mm de diâmetro e 235 de largura, pneumático com bojo no flanco e ombro chanfrado, na bitola de 1730 e no eixo ${sufixo.startsWith('Dianteiro') ? 'dianteiro' : 'traseiro'}, apoiado no chão`,
+          tecnica: 'família roda-pneu: lathe em torno de x da seção do pneu, banda 0 (pneumático), 96 lados, sombreamento liso',
+        },
+        { nome: `aro${sufixo}`, forma: 'barril de aço do aro de 16 polegadas, de 4 mm de parede e 75% da largura do pneu, que a banda abraça', tecnica: 'família roda-pneu: lathe em torno de x de um tubo' },
+        { nome: `cubo${sufixo}`, forma: 'cubo da roda de chapa, com o furo central de 75 mm e a volta de 5 furos de fixação de 16 mm no círculo de 130', tecnica: 'família roda-pneu: lathe do anel menos o furo central e os cinco furos repetidos em volta do eixo' },
+        { nome: `disco${sufixo}`, forma: 'chapa de aço da roda de 16 polegadas, de 6 mm, do cubo ao aro, deslocada para fora', tecnica: 'família roda-pneu: lathe em torno de x de um anel, tipo 0 (roda de disco)' },
+      ]),
     ],
     criteriosDeReprovacao: [
       'a silhueta lateral, frontal ou de cima se afasta da prancha cotada mais de 15 mm em média ou 40 mm em algum ponto, medida com os vãos do para-brisa tampados (o vidro entra na etapa 5)',
@@ -1920,7 +2040,10 @@ const receita = {
       'a aba de um arco sobra solta da lateral ou não acompanha o arco inteiro',
       'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou o vão traseiro não acompanha a lateral 100 mm para dentro dela acima do vinco, ou um sulco do teto não cabe no teto de ±630',
       'a luz rasante ou a curvatura mostram amassado, ondulação ou serrilhado que a forma não pede, fora das frestas, dos vãos e dos vincos, nem na fresta da porta da cabine junto ao arco dianteiro',
-      'um pneu não toca o chão, ou toca ou atravessa o arco da roda ou a lateral',
+      'um pneu não toca o chão, ou toca ou atravessa o arco da roda, a lateral ou o forro do arco',
+      'a roda não é a da família roda-pneu no pneu 235/65 aro 16 (710 mm de diâmetro, 235 de largura, com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos, ou não fica na bitola de 1730 e nos eixos da prancha',
+      'o forro de um arco falta, deixa ver o oco do carro pelo arco, não é escuro, fica a menos de 20 mm ou a mais de 30 mm do pneu em algum ponto, ou não encosta na chapa em volta da boca',
+      'o alargamento de um arco não cobre o pneu com folga visível, na vista de cima ou na frontal, ou o forro passa para fora da boca do arco',
       'alguma peça fica solta no ar ou atravessa outra sem motivo',
       'o lado esquerdo e o direito diferem fora da porta de correr',
       'aparece marca, logotipo ou nome de fabricante',
