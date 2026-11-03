@@ -1,4 +1,4 @@
-/* painel-inspecao.test.js — as abas trocam de conteúdo, a seleção habilita os controles, o raio X desliga o Wireframe e o diagnóstico, as portas e as juntas seguem o estado. */
+/* painel-inspecao.test.js — as abas trocam de conteúdo, a seleção habilita os controles, o raio X desliga o Wireframe e as juntas seguem o estado. */
 import { describe, expect, it, vi } from 'vitest';
 import { criarEstadoCentral, estadoInicialDaBancada } from '../estado/estado-central.js';
 import { criarPagina } from './dom-de-teste.js';
@@ -19,8 +19,6 @@ const MARCACAO = `
       <output id="valorExplosao"></output><input id="explosao" type="range" />
       <button id="btnSelecionarConjunto" disabled></button><button id="btnFocarSelecao" disabled></button>
       <button id="btnCopiarEstado"></button><button id="btnJuntas" aria-pressed="false"></button>
-      <div id="diagnostico" class="diagnostico"><p>Preparando relatório da peça…</p></div>
-      <details id="portasPublicadas" hidden><span id="resumoPortas"></span><ul id="listaPortas"></ul></details>
     </div>
     <div id="abaConteudoAnotacoes" class="aba-conteudo" hidden></div>
   </aside>`;
@@ -78,19 +76,8 @@ describe('painel de inspeção', () => {
     expect($('btnWireframeSelecao').title).toBe(TITULO_DO_WIREFRAME.outras);
   });
 
-  it('diagnóstico, portas, hierarquia, juntas e preferências seguem o estado', () => {
+  it('hierarquia, juntas e preferências seguem o estado', () => {
     const { $, estado } = montar();
-    estado.definir({ diagnostico: { semParte: 3, componentes: 5 } });
-    expect($('diagnostico').classList.contains('alerta')).toBe(true);
-    expect($('diagnostico').querySelector('p').textContent).toBe('3 faces não pertencem a uma parte semântica.');
-    estado.definir({ diagnostico: { semParte: 0, componentes: 5 } });
-    expect($('diagnostico').querySelector('p').textContent).toBe('5 componentes: nenhuma superfície sem identidade.');
-
-    estado.definir({ portas: [{ rotulo: 'Eixo', id: 'eixo', origem: 'cilindro#20' }] });
-    expect($('portasPublicadas').hidden).toBe(false);
-    expect($('resumoPortas').textContent).toBe('1 publicada');
-    expect($('listaPortas').querySelector('small').textContent).toBe('eixo · cilindro#20');
-
     estado.definir({ temHierarquia: false });
     expect($('btnSelecionarConjunto').hidden).toBe(true);
     estado.definir({ juntas: { ...estado.obter('juntas'), modo: true } });

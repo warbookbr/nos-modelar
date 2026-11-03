@@ -52,6 +52,7 @@ describe('acervo de receitas da bancada', () => {
     const lista = listarParaBancada(
       { '../../procedural/pecas/quadro.js': async () => ({}) },
       { '../../tools/fixtures/acervo/peca-de-prova/receita.js': async () => ({}) },
+      {},
     );
     expect(lista.map((e) => e.id)).toEqual(['peca-de-prova', 'quadro']);
     expect(lista.find((e) => e.id === 'peca-de-prova').ensaio).toBe(true);
@@ -65,7 +66,7 @@ describe('acervo de receitas da bancada', () => {
        menos uma faz este caso morrer no dia em que o acervo fica legitimamente
        sem peça. O que ele afirma é que a bancada mostra o acervo inteiro e nem
        uma peça a mais. */
-    expect(lista.filter((e) => !e.ensaio).length).toBe(pecasDoAcervo().length);
+    expect(lista.filter((e) => !e.ensaio && !e.emDados).length).toBe(pecasDoAcervo().length);
     expect(lista.map((e) => e.id)).toContain('peca-de-prova');
     const prova = await lista.find((e) => e.id === 'peca-de-prova').carregar();
     expect(Array.isArray(prova.PASSOS)).toBe(true);
@@ -81,5 +82,35 @@ describe('objeto de várias partes na bancada', () => {
       '../../procedural/pecas/solta/receita.js': importar,
     });
     expect(lista.map((e) => e.id)).toEqual(['objeto/base', 'solta']);
+  });
+});
+
+describe('montagem em dados na janela Abrir', () => {
+  const importar = () => Promise.resolve({ default: {} });
+  const dado = { formato: 'mecanifica.montagem' };
+  const lista = () => listarParaBancada(
+    {
+      '../../procedural/pecas/objeto/partes/base/receita.js': importar,
+      '../../procedural/pecas/objeto/partes/topo/receita.js': importar,
+      '../../procedural/pecas/solta/receita.js': importar,
+    },
+    {},
+    { '../../procedural/pecas/objeto/montagem.json': async () => dado },
+  );
+
+  it('o objeto entra como uma entrada de montagem, com o nome da pasta, e carrega o dado cru', async () => {
+    const entrada = lista().find((e) => e.id === 'objeto');
+    expect(entrada).toMatchObject({ montagem: true, emDados: true, ensaio: false });
+    expect(await entrada.carregar()).toBe(dado);
+  });
+
+  it('as partes do objeto saem da janela mas continuam abrindo pelo nome; a peça solta fica', () => {
+    const entradas = lista();
+    expect(entradas.map((e) => e.id)).toEqual(['objeto', 'objeto/base', 'objeto/topo', 'solta']);
+    expect(entradas.filter((e) => e.parteDe).map((e) => e.id)).toEqual(['objeto/base', 'objeto/topo']);
+  });
+
+  it('o acervo das ferramentas não ganha a montagem em dados', () => {
+    expect(listarAcervo({ '../../procedural/pecas/solta/receita.js': importar }).map((e) => e.id)).toEqual(['solta']);
   });
 });

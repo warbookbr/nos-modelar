@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * guarda-temas-e-visoes.mjs — a prova num navegador de verdade dos gates 1 e 6 do plano das visões de conferência e da interface.
+ * guarda-temas-e-visoes.mjs — a prova num navegador de verdade dos gates 1 e 6 do plano das visões de conferência e da interface, no arranjo único da bancada.
  *
  * Os testes de unidade da bancada rodam sobre uma página falsa e provam cada componente; aqui a bancada sobe inteira, com a peça
  * `carenagem-de-prova`, e a afirmação é a medida na tela:
@@ -9,8 +9,11 @@
  *      diferentes na região da peça passa de um limiar), a escolha aparece no controle, e voltar à sólida devolve a imagem de
  *      antes; a zebra e a luz rasante acompanham a rotação da câmera (a imagem muda depois de uma órbita e a visão continua a
  *      mesma); a curvatura termina a conta e a legenda diz que está pronta;
- *   2. nos três temas, em 1400 por 900, a cena (no Revisão, a mesa da peça e da referência) ocupa ao menos 70% da largura, e
- *      em 1100 pixels nada transborda para os lados.
+ *   2. em 1400 por 900 a cena ocupa ao menos 70% da largura, e em 1100 pixels nada transborda para os lados;
+ *   3. a legenda da curvatura e a da luz rasante não cobrem a peça (a caixa da legenda não cruza a caixa da peça na tela).
+ *
+ * Desde 2026-11-03 a bancada tem um só arranjo: os temas Foco e Revisão saíram, e com eles saíram daqui o laço pelos três
+ * temas, a medida da mesa da peça com a referência (que só o Revisão tinha) e a gravação do tema escolhido.
  *
  *   npm run guarda:temas
  *
@@ -30,7 +33,8 @@ const FRACAO_MINIMA_DA_CENA = 0.7;
 const LIMIAR_DE_MUDANCA = 0.05;
 /* O que a sólida pode variar entre duas fotos da mesma cena (o contorno da seleção e as animações da página ficam fora). */
 const RUIDO_MAXIMO = 0.002;
-const REGIAO_DA_PECA = { x: 300, y: 130, width: 800, height: 380 };
+/* A região da peça no arranjo da bancada: entre a árvore (196 px) e o painel da direita (216 px), abaixo da barra do alto. */
+const REGIAO_DA_PECA = { x: 300, y: 130, width: 700, height: 380 };
 const VISOES = [
   { nome: 'arame', tecla: 'M', rotulo: 'Arame' },
   { nome: 'raio-x', tecla: 'Shift+M', rotulo: 'Raio X' },
@@ -66,11 +70,11 @@ function fracaoDiferente(a, b) {
   return diferentes / (x.width * x.height);
 }
 
-async function abrir(tema, largura, altura) {
+async function abrir(largura, altura) {
   const contexto = await navegador.newContext({ viewport: { width: largura, height: altura } });
-  await contexto.addInitScript((escolhido) => {
-    try { localStorage.setItem('mecanifica.bancada.tema', JSON.stringify(escolhido)); localStorage.removeItem('mecanifica.bancada.visao'); } catch { /* sem armazenamento */ }
-  }, tema);
+  await contexto.addInitScript(() => {
+    try { localStorage.removeItem('mecanifica.bancada.visao'); } catch { /* sem armazenamento */ }
+  });
   const pagina = await contexto.newPage();
   const erros = [];
   pagina.on('pageerror', (erro) => erros.push(erro.message));
@@ -81,14 +85,39 @@ async function abrir(tema, largura, altura) {
   return { contexto, pagina, erros };
 }
 
+/* A caixa da legenda e a caixa da peça na tela, as duas em pixels da página: a da peça vem dos oito cantos da caixa de cada malha. */
+const legendaCruzaAPeca = (pagina) => pagina.evaluate(() => {
+  const legenda = document.querySelector('.painel-visao');
+  if (!legenda || legenda.hidden || !legenda.offsetParent) return { legenda: false, cruza: null };
+  const ambiente = window.__mecanificaBancada.ambiente();
+  const canvas = document.querySelector('#cenaBancada').getBoundingClientRect();
+  const V = ambiente.camera.position.constructor;
+  const caixa = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+  ambiente.scene.traverse((no) => {
+    if (!no.isMesh || !no.geometry || !no.userData?.identidadeParte) return;
+    no.geometry.computeBoundingBox();
+    const { min, max } = no.geometry.boundingBox;
+    no.updateWorldMatrix(true, false);
+    for (let i = 0; i < 8; i += 1) {
+      const p = new V(i & 1 ? max.x : min.x, i & 2 ? max.y : min.y, i & 4 ? max.z : min.z).applyMatrix4(no.matrixWorld).project(ambiente.camera);
+      const x = canvas.left + (p.x * 0.5 + 0.5) * canvas.width;
+      const y = canvas.top + (-p.y * 0.5 + 0.5) * canvas.height;
+      caixa.x0 = Math.min(caixa.x0, x); caixa.x1 = Math.max(caixa.x1, x);
+      caixa.y0 = Math.min(caixa.y0, y); caixa.y1 = Math.max(caixa.y1, y);
+    }
+  });
+  const l = legenda.getBoundingClientRect();
+  const cruza = l.left < caixa.x1 && l.right > caixa.x0 && l.top < caixa.y1 && l.bottom > caixa.y0;
+  return { legenda: true, cruza, legendaPx: [l.left, l.top, l.right, l.bottom].map(Math.round), pecaPx: [caixa.x0, caixa.y0, caixa.x1, caixa.y1].map(Math.round) };
+});
 const nomeDaVisao = (pagina) => pagina.$eval('#nomeVisao', (el) => el.textContent.trim());
 const foto = (pagina) => pagina.screenshot({ clip: REGIAO_DA_PECA });
 
 try {
   /* Gate 1: as seis visões, no Foco, em 1400 por 900. */
   {
-    const { contexto, pagina, erros } = await abrir('foco', 1400, 900);
-    await pagina.mouse.move(100, 760);
+    const { contexto, pagina, erros } = await abrir(1400, 900);
+    await pagina.mouse.move(100, 400);
     const solida = await foto(pagina);
     ok('(a) a bancada abre na visão sólida', (await nomeDaVisao(pagina)) === 'Sólida');
     ok('(a2) duas fotos da sólida saem iguais', fracaoDiferente(solida, await foto(pagina)) <= RUIDO_MAXIMO);
@@ -99,6 +128,10 @@ try {
       }
       await pagina.waitForTimeout(1200);
       const nome = await nomeDaVisao(pagina);
+      if (visao.nome === 'curvatura' || visao.nome === 'luz-rasante') {
+        const cruza = await legendaCruzaAPeca(pagina);
+        ok(`(b4) ${visao.nome}: a legenda não cobre a peça`, cruza.legenda && !cruza.cruza, JSON.stringify(cruza));
+      }
       const mudou = fracaoDiferente(solida, await foto(pagina));
       ok(`(b) ${visao.nome}: a tecla liga a visão e o controle mostra o nome dela`, nome === visao.rotulo, nome);
       ok(`(b2) ${visao.nome}: a cena muda em relação à sólida`, mudou > LIMIAR_DE_MUDANCA, `${(mudou * 100).toFixed(1)}% dos pixels`);
@@ -112,9 +145,9 @@ try {
       await pagina.keyboard.press(visao.tecla);
       await pagina.waitForTimeout(1200);
       const antes = await foto(pagina);
-      await pagina.mouse.move(150, 760);
+      await pagina.mouse.move(650, 650);
       await pagina.mouse.down();
-      await pagina.mouse.move(260, 720, { steps: 8 });
+      await pagina.mouse.move(790, 610, { steps: 8 });
       await pagina.mouse.up();
       await pagina.waitForTimeout(1200);
       const girou = fracaoDiferente(antes, await foto(pagina));
@@ -125,28 +158,24 @@ try {
     await contexto.close();
   }
 
-  /* Gate 6: a cena ocupa 70% e nada transborda, nos três temas. */
-  for (const tema of ['foco', 'bancada', 'revisao']) {
+  /* Gate 6: a cena ocupa 70% e nada transborda. */
+  {
     for (const [largura, altura] of [[1400, 900], [1100, 800]]) {
-      const { contexto, pagina, erros } = await abrir(tema, largura, altura);
+      const { contexto, pagina, erros } = await abrir(largura, altura);
       const medida = await pagina.evaluate(() => {
         const canvas = document.querySelector('#cenaBancada').getBoundingClientRect();
-        /* No Revisão a cena é a peça (o canvas) mais a referência ao lado dela. */
-        const lado = document.querySelector('#mesaComparacao .lado-referencia');
-        const referencia = lado && lado.offsetParent ? lado.getBoundingClientRect().width : 0;
         return {
           tema: document.documentElement.dataset.tema,
           canvas: canvas.width,
-          mesa: canvas.width + referencia,
           transbordo: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth,
         };
       });
-      const cena = tema === 'revisao' ? medida.mesa : medida.canvas;
-      ok(`(e) ${tema} em ${largura}: a tela é a do tema`, medida.tema === tema, medida.tema);
-      ok(`(f) ${tema} em ${largura}: a cena ocupa ao menos 70% da largura`, cena >= FRACAO_MINIMA_DA_CENA * largura,
+      const cena = medida.canvas;
+      ok(`(e) em ${largura}: a tela é a da bancada`, medida.tema === 'bancada', medida.tema);
+      ok(`(f) em ${largura}: a cena ocupa ao menos 70% da largura`, cena >= FRACAO_MINIMA_DA_CENA * largura,
         `${Math.round(cena)} de ${largura} (${((cena / largura) * 100).toFixed(1)}%)`);
-      ok(`(g) ${tema} em ${largura}: nada transborda para os lados`, medida.transbordo <= 0, `${medida.transbordo} px`);
-      ok(`(h) ${tema} em ${largura}: nenhuma página emitiu erro`, erros.length === 0, erros.join(' | '));
+      ok(`(g) em ${largura}: nada transborda para os lados`, medida.transbordo <= 0, `${medida.transbordo} px`);
+      ok(`(h) em ${largura}: nenhuma página emitiu erro`, erros.length === 0, erros.join(' | '));
       await contexto.close();
     }
   }
@@ -157,5 +186,5 @@ try {
   await vite.close();
 }
 
-console.log(falhas.length ? `\n${falhas.length} FALHA(S): ${falhas.join(' · ')}` : '\ntudo verde — as seis visões e os três temas medidos no navegador');
+console.log(falhas.length ? `\n${falhas.length} FALHA(S): ${falhas.join(' · ')}` : '\ntudo verde — as seis visões e o arranjo da bancada medido no navegador');
 process.exit(falhas.length ? 1 : 0);

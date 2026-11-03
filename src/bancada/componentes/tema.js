@@ -1,4 +1,4 @@
-/* tema.js — o tema da bancada na página: os atributos da raiz que a folha de estilo usa, os componentes levados para os lugares do tema, os rótulos que mudam de nome e a escolha do tema no menu Controles.
+/* tema.js — o tema da bancada na página: os atributos da raiz que a folha de estilo usa, os componentes levados para os lugares do tema, os rótulos que mudam de nome.
  *
  * Lê do estado central `tema` e escreve nele pela escolha da pessoa, que fica guardada como preferência local. Um tema
  * é a declaração de `temas/temas.js`; aqui ela vira página. A raiz recebe `data-tema`, `data-cores` (o conjunto de
@@ -22,7 +22,7 @@ export function casoDaTela({ selecao, juntas, malhaEmEdicao }) {
 export function montarTema({
   elementos, estado, preferencia, aoMudarCena = () => {}, lerVariavel = null, janela = globalThis,
 }) {
-  const { raiz, escolha, moveis = [], lugares = [], rotulaveis = [] } = elementos;
+  const { raiz, moveis = [], lugares = [], rotulaveis = [] } = elementos;
   const documento = raiz.ownerDocument ?? janela.document;
   const lugarPorNome = new Map(lugares.map((lugar) => [lugar.dataset.lugar, lugar]));
   const casas = new Map(moveis.map((movel) => {
@@ -71,22 +71,6 @@ export function montarTema({
     return resolvida;
   }
 
-  function desenharEscolha(atual) {
-    if (!escolha) return;
-    escolha.replaceChildren(...TEMAS.map((tema) => {
-      const botao = documento.createElement('button');
-      botao.type = 'button';
-      botao.className = 'opcao-tema';
-      botao.dataset.tema = tema.id;
-      botao.setAttribute('role', 'radio');
-      botao.setAttribute('aria-checked', String(tema.id === atual));
-      botao.title = tema.descricao;
-      botao.textContent = tema.rotulo;
-      botao.addEventListener('click', () => escolher(tema.id));
-      return botao;
-    }));
-  }
-
   function aplicar(id) {
     const tema = temaPorId(id);
     raiz.dataset.tema = tema.id;
@@ -94,7 +78,6 @@ export function montarTema({
     raiz.dataset.arrumacao = tema.arrumacao;
     arrumar(tema);
     rotular(tema);
-    desenharEscolha(tema.id);
     aoMudarCena(cenaDoTema(tema), tema);
   }
 

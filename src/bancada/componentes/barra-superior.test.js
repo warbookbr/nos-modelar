@@ -18,11 +18,11 @@ const janelaModal = (id, corpo) => `
 
 const MARCACAO = `
   <button id="btnMenuAbrir" aria-expanded="false">Abrir</button>
-  <button id="btnMenuAtalhos" aria-expanded="false">Controles</button>
+  <button id="btnMenuConfiguracoes" aria-expanded="false">Configurações</button>
   <button id="btnMenuEstado" aria-expanded="false">Estado<span id="selo-estado" hidden></span></button>
   <button id="avisoEstado" hidden></button>
   ${janelaModal('menuAbrir', '<div id="listaAcervo"></div>')}
-  ${janelaModal('menuAtalhos', '<div id="listaAtalhos"></div><span id="avisoAtalho"></span><button id="btnRestaurarAtalhos"></button>')}
+  ${janelaModal('menuConfiguracoes', '<div id="listaAtalhos"></div><span id="avisoAtalho"></span><button id="btnRestaurarAtalhos"></button>')}
   ${janelaModal('menuEstado', '<div id="resumoEstado"></div><div id="listaEventos"></div><button id="btnLimparEventos"></button>')}`;
 
 const COMANDOS = [
@@ -52,7 +52,7 @@ function montar() {
     registroDeEventos,
     registroAtalhos,
     comandos: COMANDOS,
-    entradasDoAcervo: [{ id: 'furgao', montagem: false }, { id: 'peca-de-prova', ensaio: true }],
+    entradasDoAcervo: [{ id: 'furgao', montagem: false }, { id: 'objeto', montagem: true, emDados: true }, { id: 'objeto/base', parteDe: 'objeto' }, { id: 'peca-de-prova', ensaio: true }],
     abrirDoAcervo,
     janela: pagina.janela,
   });
@@ -65,10 +65,10 @@ describe('barra superior', () => {
     $('btnMenuAbrir').click();
     expect([$('menuAbrir').hidden, $('btnMenuAbrir').getAttribute('aria-expanded')]).toEqual([false, 'true']);
     expect(documento.body.classList.contains('modal-aberto')).toBe(true);
-    $('btnMenuAtalhos').click();
-    expect([$('menuAbrir').hidden, $('menuAtalhos').hidden]).toEqual([true, false]);
+    $('btnMenuConfiguracoes').click();
+    expect([$('menuAbrir').hidden, $('menuConfiguracoes').hidden]).toEqual([true, false]);
     janela.teclar({ key: 'Escape' });
-    expect($('menuAtalhos').hidden).toBe(true);
+    expect($('menuConfiguracoes').hidden).toBe(true);
     expect(documento.body.classList.contains('modal-aberto')).toBe(false);
     $('btnMenuAbrir').click();
     $('menuAbrir').querySelector('.modal-backdrop').click();
@@ -78,8 +78,10 @@ describe('barra superior', () => {
   it('o acervo lista as receitas, marca as de ensaio e escolher fecha a janela e abre a peça', () => {
     const { $, abrirDoAcervo } = montar();
     const linhas = $('listaAcervo').querySelectorAll('[data-receita]');
-    expect(linhas.map((l) => l.dataset.receita)).toEqual(['furgao', 'peca-de-prova']);
-    expect(linhas[1].querySelector('.marca-ensaio').textContent).toBe('ensaio');
+    /* o objeto de várias partes é uma entrada de montagem, e a parte dele não é entrada */
+    expect(linhas.map((l) => l.dataset.receita)).toEqual(['furgao', 'objeto', 'peca-de-prova']);
+    expect(linhas[1].querySelector('kbd').textContent).toBe('montagem');
+    expect(linhas[2].querySelector('.marca-ensaio').textContent).toBe('ensaio');
     $('btnMenuAbrir').click();
     linhas[0].click();
     expect($('menuAbrir').hidden).toBe(true);
@@ -104,10 +106,10 @@ describe('barra superior', () => {
 
   it('enquanto captura uma tecla o Esc cancela a captura e não fecha a janela', () => {
     const { $, janela } = montar();
-    $('btnMenuAtalhos').click();
+    $('btnMenuConfiguracoes').click();
     $('listaAtalhos').querySelector('[data-comando="enquadrar"]').click();
     janela.teclar({ key: 'Escape' });
-    expect($('menuAtalhos').hidden).toBe(false);
+    expect($('menuConfiguracoes').hidden).toBe(false);
     expect($('avisoAtalho').textContent).toBe('Captura cancelada.');
   });
 

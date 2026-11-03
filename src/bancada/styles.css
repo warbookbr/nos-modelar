@@ -653,26 +653,6 @@ body.modal-aberto { overflow: hidden; }
 .painel-visao .controle-visao output { text-align: right; }
 .painel-visao .botao.texto { margin-top: var(--e1); padding: var(--e1) var(--e2); }
 
-/* ----- escolha do tema (menu Controles) ----- */
-.escolha-tema {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--e-meio);
-  padding: var(--e-meio);
-  border-radius: var(--raio-p);
-  background: var(--superficie-2);
-}
-.opcao-tema {
-  min-height: 28px;
-  border: 0;
-  border-radius: var(--raio-p);
-  background: transparent;
-  color: var(--texto-2);
-  cursor: pointer;
-}
-.opcao-tema:hover { color: var(--texto); }
-.opcao-tema[aria-checked="true"] { background: var(--superficie); color: var(--texto); font-weight: 500; box-shadow: 0 0 0 1px var(--linha); }
-
 /* ----- busca de comandos (Ctrl+K) ----- */
 .busca-comandos { position: fixed; inset: 0; z-index: 45; }
 .veu-busca { position: absolute; inset: 0; background: var(--veu); }
@@ -1114,15 +1094,6 @@ body.modal-aberto { overflow: hidden; }
 .seletor-visao .seta { color: var(--texto-3); }
 .topo-foco .selo-estado { margin-left: 0; }
 
-.nome-peca { display: flex; align-items: center; gap: var(--e2); min-width: 0; padding: 0 var(--e2); }
-.nome-peca b { overflow: hidden; font-size: var(--t-g); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.estado-sessao { display: inline-flex; align-items: center; gap: var(--e1); color: var(--texto-2); font-size: var(--t-p); white-space: nowrap; }
-.estado-sessao i { width: 6px; height: 6px; border-radius: 50%; background: var(--texto-3); }
-.estado-sessao[data-sessao="conectado"] i { background: var(--ok); }
-.estado-sessao[data-sessao="sincronizando"] i { background: var(--destaque); }
-.estado-sessao[data-sessao="erro"] { color: var(--erro); }
-.estado-sessao[data-sessao="erro"] i { background: var(--erro); }
-
 .busca-gatilho { padding: 0 var(--e2) 0 var(--e3); color: var(--texto-2); }
 .topo-foco .busca-gatilho { color: var(--texto-2); }
 
@@ -1362,7 +1333,6 @@ body.modal-aberto { overflow: hidden; }
 .barra-estado .regua-metrica i { width: 48px; }
 .barra-estado b { color: var(--texto); font-weight: 500; }
 /* A dica corta com reticências quando falta largura: o `text-overflow` só vale num bloco, e não no flex dos outros itens. */
-.barra-estado > .dica-estado { display: block; flex: 1 1 auto; align-self: center; min-width: 0; padding-right: var(--e1); overflow: hidden; color: var(--texto-3); text-overflow: ellipsis; }
 .alternar { border-top: 0; border-right: 0; border-bottom: 0; background: none; color: var(--texto-3); cursor: pointer; }
 .alternar:hover { color: var(--texto); }
 .alternar[aria-pressed="true"] { color: var(--destaque); }
@@ -1375,10 +1345,10 @@ body.modal-aberto { overflow: hidden; }
 /* ----- janela estreita: os rótulos longos saem, os ícones ficam; com eles os três grupos do alto medem 1264 pixels ----- */
 @media (max-width: 1320px) {
   .topo-foco .texto-largo,
-  .topo-foco .texto-botao,
+  .topo-foco #btnMenuEstado > .texto-botao,
+  .topo-foco #btnMenuConfiguracoes > .texto-botao,
   .topo-foco #btnProjecao > span,
   .topo-foco #btnEnquadrar > span,
-  .topo-foco .estado-sessao span,
   .unidade-estado,
   #pecaEstado { display: none; }
   .topo-foco .grupo-flutuante > button,
@@ -1414,18 +1384,23 @@ body.modal-aberto { overflow: hidden; }
 :root[data-arrumacao="bancada"] .grupo-peca > .divisor,
 :root[data-arrumacao="bancada"] .barra-cena > .divisor,
 :root[data-arrumacao="bancada"] .barra-cena > .popover-ancora:has(#btnCena),
-:root[data-arrumacao="bancada"] #btnMenuAtalhos > .texto-botao,
+:root[data-arrumacao="bancada"] #btnMenuConfiguracoes > .texto-botao,
 :root[data-arrumacao="bancada"] #btnMenuEstado > .texto-botao,
 :root[data-arrumacao="bancada"] .barra-cena #btnFocarSelecao > span,
 :root[data-arrumacao="bancada"] .barra-cena #btnCopiarEstado > span { display: none; }
 :root[data-arrumacao="bancada"] [data-movel] > .icone,
 :root[data-arrumacao="bancada"] .seletor-visao .icone { display: block; }
 
+/* A largura do painel da direita: 216 pixels, que é o que a regra dos 70% da cena conta, e 340 enquanto a aba de referência
+   está aberta, porque o botão e os campos dela não cabem em 216. O painel largo só existe nessa aba. */
+:root[data-arrumacao="bancada"] body { --largura-direita: 216px; }
+:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"] .aba-btn.ativa[data-aba="referencias"]) { --largura-direita: 340px; }
+
 /* ----- a cena entre os painéis ----- */
 :root[data-arrumacao="bancada"] #cenaBancada { top: 36px; left: 0; width: 100vw; height: calc(100vh - 60px); }
 :root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]) #cenaBancada { left: 196px; width: calc(100vw - 196px); }
-:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"]) #cenaBancada { width: calc(100vw - 216px); }
-:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]):has(.painel-inspecao[data-aberto="true"]) #cenaBancada { width: calc(100vw - 412px); }
+:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"]) #cenaBancada { width: calc(100vw - var(--largura-direita)); }
+:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]):has(.painel-inspecao[data-aberto="true"]) #cenaBancada { width: calc(100vw - 196px - var(--largura-direita)); }
 /* O modo de edição se vê na borda da cena. */
 :root[data-arrumacao="bancada"] body.editando:not(.auditoria) #cenaBancada { outline: 2px solid var(--destaque); outline-offset: -2px; }
 
@@ -1454,14 +1429,7 @@ body.modal-aberto { overflow: hidden; }
 :root[data-arrumacao="bancada"] .grupo-peca { flex: 1 1 0; }
 :root[data-arrumacao="bancada"] .grupo-direita { flex: 1 1 0; justify-content: flex-end; }
 :root[data-arrumacao="bancada"] .grupo-peca #btnMenuAbrir { order: 1; border-color: var(--linha-forte); }
-:root[data-arrumacao="bancada"] .grupo-peca > .nome-peca { order: 2; }
-:root[data-arrumacao="bancada"] .nome-peca b { font-size: var(--t-m); }
-:root[data-arrumacao="bancada"] .estado-sessao {
-  height: 20px;
-  padding: 0 var(--e2);
-  border: var(--traco);
-  border-radius: var(--raio-p);
-}
+:root[data-arrumacao="bancada"] .grupo-peca #btnMenuConfiguracoes { order: 2; }
 :root[data-arrumacao="bancada"] .topo-foco .busca-gatilho {
   position: absolute;
   left: 50%;
@@ -1529,7 +1497,7 @@ body.modal-aberto { overflow: hidden; }
 
 /* ----- o cubo no canto de cima da cena ----- */
 :root[data-arrumacao="bancada"] .cubo-orientacao { top: calc(36px + var(--e2)); right: var(--e2); }
-:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"]) .cubo-orientacao { right: calc(216px + var(--e2)); }
+:root[data-arrumacao="bancada"] body:has(.painel-inspecao[data-aberto="true"]) .cubo-orientacao { right: calc(var(--largura-direita) + var(--e2)); }
 
 /* ----- os painéis fixos ----- */
 :root[data-arrumacao="bancada"] .painel {
@@ -1550,7 +1518,7 @@ body.modal-aberto { overflow: hidden; }
 }
 :root[data-arrumacao="bancada"] .painel[data-aberto="false"] { display: none; }
 :root[data-arrumacao="bancada"] .painel-partes { left: 0; width: 196px; border-right: var(--traco); }
-:root[data-arrumacao="bancada"] .painel-inspecao { right: 0; width: 216px; border-left: var(--traco); }
+:root[data-arrumacao="bancada"] .painel-inspecao { right: 0; width: var(--largura-direita); border-left: var(--traco); }
 :root[data-arrumacao="bancada"] .painel-cabecalho {
   display: flex;
   flex: none;
@@ -1580,6 +1548,17 @@ body.modal-aberto { overflow: hidden; }
 :root[data-arrumacao="bancada"] .acoes-inspecao { grid-template-columns: 1fr; }
 :root[data-arrumacao="bancada"] body:not(.editando) .acoes-editar { display: none; }
 :root[data-arrumacao="bancada"] body.editando .acoes-editar { order: -1; gap: var(--e1); }
+
+/* A caixa da visão (a legenda da curvatura e da luz rasante) sai de cima da peça: fica sob a barra flutuante da cena, no
+   canto de cima, larga e baixa, onde o enquadramento deixa a margem; no meio embaixo a peça chegava até ela. */
+:root[data-arrumacao="bancada"] .painel-visao {
+  top: 92px;
+  bottom: auto;
+  left: var(--e2);
+  width: 420px;
+  transform: none;
+}
+:root[data-arrumacao="bancada"] body:has(.painel-partes[data-aberto="true"]) .painel-visao { left: calc(196px + var(--e2)); }
 
 /* ----- embaixo: a barra de estado, a barra de edição no meio da cena e os avisos ----- */
 :root[data-arrumacao="bancada"] .barra-estado { height: 24px; background: var(--base); }

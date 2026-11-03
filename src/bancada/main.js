@@ -7,7 +7,6 @@
  * imagem e quem responde primeiro a uma tecla. */
 import './sistema-visual.css';
 import './styles.css';
-import './temas/revisao.css';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../autoria/catalogo-pecas.js';
 import { listarParaBancada } from './acervo-receitas.js';
 import { criarAmbienteBancada } from './criar-ambiente.js';
@@ -21,8 +20,8 @@ import { criarRegistroAtalhos } from './controles/atalhos.js';
 import { criarComandos } from './controles/comandos.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
 import { criarImagemNaCena } from './referencias/imagem-na-cena.js';
-import { criarReferenciaAoLado } from './referencias/referencia-ao-lado.js';
 import { criarEstadoCentral, estadoInicialDaBancada } from './estado/estado-central.js';
+import { criarGravadorDaCamera } from './cena/gravador-da-camera.js';
 import { criarPecaEmCena } from './cena/peca-em-cena.js';
 import { criarEdicaoDaPeca } from './cena/edicao-da-peca.js';
 import { criarVistaDaCena } from './cena/vista-da-cena.js';
@@ -48,9 +47,7 @@ import { montarCartaoDaSelecao, MARGENS_DO_CARTAO } from './componentes/cartao-d
 import { montarCuboDeOrientacao } from './componentes/cubo-de-orientacao.js';
 import { montarBarraDeEdicao } from './componentes/barra-de-edicao.js';
 import { montarBarraDeEstado } from './componentes/barra-de-estado.js';
-import { montarNomeDaPeca } from './componentes/nome-da-peca.js';
 import { montarPopoverDaCena } from './componentes/popover-da-cena.js';
-import { montarMesaDeRevisao } from './componentes/mesa-de-revisao.js';
 import { criarPonteDaCaptura, publicarPonte } from './componentes/ponte-da-captura.js';
 
 /* `sessaoPorUrl` deixa a URL escolher o arquivo de sessão (`?sessao=<caminho>`), em vez do `sessao-ativa.json` compartilhado: só o
@@ -105,19 +102,24 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
      sequência de eventos desde que a página abriu. */
   const registroDeEventos = criarRegistroDeEventos();
 
-  /* O ambiente avisa a cena e a referência da mesa da troca de vista, e as duas nascem depois dele. */
+  /* O ambiente avisa a cena da troca de vista, e ela nasce depois dele. */
   let cena = null;
-  let referenciaAoLado = null;
   const salvarUrlForaDaSubida = () => {
     if (!estado.obter('inicializando') && cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
   };
+  /* A câmera livre muda a cada quadro do giro; o endereço é gravado uma vez, quando ele termina (`gravador-da-camera.js`). */
+  const gravadorDaCamera = criarGravadorDaCamera({ gravar: salvarUrlForaDaSubida });
   const ambiente = criarAmbienteBancada(canvas, {
     aoMudarVista(vista) {
       estado.definir({ vista });
-      salvarUrlForaDaSubida();
-      referenciaAoLado?.aoMudarVista(vista);
+      if (vista === 'livre') gravadorDaCamera.aoMudar();
+      else {
+        gravadorDaCamera.descarregar();
+        salvarUrlForaDaSubida();
+      }
     },
-    aoMudarCameraLivre: salvarUrlForaDaSubida,
+    aoMudarCameraLivre: gravadorDaCamera.aoMudar,
+    aoTerminarCameraLivre: gravadorDaCamera.aoTerminar,
   });
 
   /* A edição da peça nasce depois da imagem de referência, como na subida
@@ -179,7 +181,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   aCadaQuadro(() => {
     edicao.acompanharCamera();
     imagemNaCena.punho.acompanharCamera();
-    referenciaAoLado?.acompanhar();
   });
 
   let sessao = null;
@@ -197,11 +198,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   const vista = criarVistaDaCena({
     ambiente, estado, cena, seletorDeVisao, preferenciasBancada, avisar, parametros: params,
   });
-  /* A referência da mesa do Revisão: a imagem da aba, as vistas dela e a câmera da peça na da vista escolhida. */
-  referenciaAoLado = criarReferenciaAoLado({
-    ambiente, cena, imagemNaCena, estado, alternarProjecao: vista.alternarProjecao, carregarJson: arquivos.carregarJson,
-  });
-
   let paineisDoTema = null;
   /* As ações sobre a peça olhada, as mesmas para o painel da direita, a busca de comandos e o cartão da seleção. */
   const acoesDaPeca = {
@@ -272,6 +268,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   });
 
   vista.aplicarPreferenciasCena({});
+  const acervoDaBancada = listarParaBancada();
   const barraSuperior = montarBarraSuperior({
     elementos: elementos.barraSuperior,
     corpo: elementos.corpo,
@@ -279,7 +276,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     registroDeEventos,
     registroAtalhos,
     comandos,
-    entradasDoAcervo: listarParaBancada(),
+    entradasDoAcervo: acervoDaBancada,
     abrirDoAcervo: (entrada) => sessao.abrirDoAcervo(entrada),
   });
 
@@ -302,10 +299,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     { id: 'painel-referencia', grupo: 'Painéis', rotulo: 'Imagem de referência', executar: () => abrirAbaDoPainel('referencias') },
     { id: 'painel-notas', grupo: 'Painéis', rotulo: 'Anotações', valor: () => String(estado.obter('anotacoes')?.length ?? 0), executar: () => abrirAbaDoPainel('anotacoes') },
     { id: 'estado', grupo: 'Painéis', rotulo: 'Estado da sessão e eventos', executar: () => barraSuperior.abrirJanela('estado') },
-    { id: 'controles', grupo: 'Painéis', rotulo: 'Controles e atalhos', executar: () => barraSuperior.abrirJanela('controles') },
-    ...TEMAS.map((cada) => ({
-      id: `tema-${cada.id}`, grupo: 'Tema', rotulo: cada.rotulo, escolhido: () => estado.obter('tema') === cada.id, executar: () => tema.escolher(cada.id),
-    })),
+    { id: 'configuracoes', grupo: 'Painéis', rotulo: 'Configurações e atalhos', executar: () => barraSuperior.abrirJanela('configuracoes') },
   ];
   /* Abrir uma aba do painel da direita abre o painel no tema que o deixa fechado. */
   function abrirAbaDoPainel(aba) {
@@ -315,13 +309,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   paineisDoTema = montarPaineisDoTema({
     elementos: elementos.paineisDoTema, estado, abrirAba: (aba) => painelInspecao.abrirAba(aba),
   });
-  montarNomeDaPeca({ elementos: elementos.nomeDaPeca, estado });
   montarPopoverDaCena({ elementos: elementos.popoverDaCena });
   /* A caixa da câmera do tema Bancada, com as vistas, é a mesma caixa da cena com outro conteúdo. */
   montarPopoverDaCena({ elementos: elementos.popoverDaCamera });
-  montarMesaDeRevisao({
-    elementos: elementos.mesaDeRevisao, estado, acoes: { abrirNotas: () => abrirAbaDoPainel('anotacoes') },
-  });
   montarCuboDeOrientacao({ elementos: elementos.cuboDeOrientacao, orientacao: () => ambiente.camera.matrixWorldInverse.elements });
   montarCartaoDaSelecao({
     elementos: elementos.cartaoDaSelecao,
@@ -365,7 +355,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     medidasDaPeca: () => cena.medidasDaPeca(),
     acoes: {
       alternarPreferenciaCena: (qual) => vista.alternarPreferenciaCena(qual),
-      abrirControles: () => barraSuperior.abrirJanela('controles'),
+      abrirConfiguracoes: () => barraSuperior.abrirJanela('configuracoes'),
     },
   });
   montarBuscaDeComandos({
@@ -381,6 +371,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
 
   sessao = criarSessaoDaBancada({
     estado, cena, edicao, imagemNaCena, anotacoes3D, registroDeEventos, avisar, mostrarErro, arquivoDaSessao,
+    acervo: () => acervoDaBancada,
   });
   montarSessaoAtiva({
     elementos: elementos.sessaoAtiva,
@@ -392,7 +383,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     elementos: elementos.referenciaMetrica, estado, referenciaMetrica: () => ambiente.referenciaMetrica(),
   });
 
-  await sessao.abrirInicial({ pecaPedida, catalogo, acervo: pecaPedida ? listarParaBancada() : [] });
+  await sessao.abrirInicial({ pecaPedida, catalogo, acervo: pecaPedida ? acervoDaBancada : [] });
   vista.restaurarCameraDaUrl();
 
   // API unificada da Bancada para testes e automações
@@ -407,7 +398,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     seletorDeVisao,
     parametros: params,
     corpo: elementos.corpo,
-    endereco,
+    /* A ponte lê o endereço depois do movimento: o que a câmera ainda tem por gravar sai antes. */
+    endereco: { href: () => { gravadorDaCamera.descarregar(); return endereco.href(); } },
   }));
 
   aoSairDaPagina(() => {

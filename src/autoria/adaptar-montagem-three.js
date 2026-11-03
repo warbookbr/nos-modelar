@@ -19,8 +19,12 @@ function aplicarPoseMundo(objeto, pose) {
 /**
  * Cria uma cena visual derivada exclusivamente da árvore já resolvida.
  * Caminhos persistidos ficam em userData; UUIDs do Three.js não saem daqui.
+ *
+ * Uma instância cuja malha não vira cena (contorno que não fecha em orelhas) derruba a montagem inteira, que é o que quem
+ * confere quer. Quem só quer ver a montagem passa `aoFalhar(caminho, erro)`: a instância fica de fora, e quem chamou
+ * recebe o caminho e o motivo para dizê-lo à pessoa, em vez de a cena não abrir.
  */
-export function adaptarMontagemThree(montagemResolvida) {
+export function adaptarMontagemThree(montagemResolvida, { aoFalhar = null } = {}) {
   if (!montagemResolvida?.id || !Array.isArray(montagemResolvida.instancias)) {
     throw new TypeError('adaptarMontagemThree: informe uma montagem resolvida.');
   }
@@ -35,10 +39,17 @@ export function adaptarMontagemThree(montagemResolvida) {
         percorrer(instancia.montagem);
         continue;
       }
-      const visual = adaptarThree(instancia.definicao.neutro, {
-        materiais: instancia.definicao.neutro.materiais ?? {},
-        nome: instancia.caminho.join('/'),
-      });
+      let visual;
+      try {
+        visual = adaptarThree(instancia.definicao.neutro, {
+          materiais: instancia.definicao.neutro.materiais ?? {},
+          nome: instancia.caminho.join('/'),
+        });
+      } catch (erro) {
+        if (!aoFalhar) throw erro;
+        aoFalhar(instancia.caminho.slice(), erro);
+        continue;
+      }
       aplicarPoseMundo(visual.raiz, instancia.poseMundo);
       visual.raiz.userData = {
         ...visual.raiz.userData,

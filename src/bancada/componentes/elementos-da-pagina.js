@@ -15,7 +15,6 @@ export function lerElementosDaPagina(documento = globalThis.document) {
     corpo: documento.body,
     tema: {
       raiz: documento.documentElement,
-      escolha: id('escolhaTema'),
       moveis: [...documento.querySelectorAll('[data-movel]')],
       lugares: [...documento.querySelectorAll('[data-lugar]')],
       rotulaveis: [...documento.querySelectorAll('[data-rotulo]')],
@@ -31,7 +30,7 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       /* A ordem é a dos botões na barra, e é a ordem em que as janelas fecham. */
       janelas: [
         ['abrir', 'btnMenuAbrir', 'menuAbrir'],
-        ['controles', 'btnMenuAtalhos', 'menuAtalhos'],
+        ['configuracoes', 'btnMenuConfiguracoes', 'menuConfiguracoes'],
         ['estado', 'btnMenuEstado', 'menuEstado'],
       ].map(([chave, idBotao, idJanela]) => ({ chave, botao: id(idBotao), janela: id(idJanela) })),
       selo: id('selo-estado'),
@@ -87,10 +86,6 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       btnFocarSelecao: id('btnFocarSelecao'),
       btnCopiarEstado: id('btnCopiarEstado'),
       btnJuntas: id('btnJuntas'),
-      diagnostico: id('diagnostico'),
-      portas: id('portasPublicadas'),
-      resumoPortas: id('resumoPortas'),
-      listaPortas: id('listaPortas'),
       containerReferencias: id('containerReferencias'),
       recolher: recolhivel('inspecao'),
       anotacoes: {
@@ -127,24 +122,6 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       cena: id('cenaBancada'),
     },
     cuboDeOrientacao: { corpo: id('corpoCubo') },
-    mesaDeRevisao: {
-      mesa: id('mesaComparacao'),
-      vistaDaPeca: id('vistaDaPeca'),
-      edicaoDaPeca: id('edicaoDaPeca'),
-      notasDaPeca: id('notasDaPeca'),
-      btnMostrar: id('btnMostrarReferencia'),
-      btnVista: id('btnVistaReferencia'),
-      nomeVista: id('nomeVistaReferencia'),
-      menuVistas: id('menuVistasReferencia'),
-      modos: [...documento.querySelectorAll('[data-comparar]')],
-      opacidade: id('opacidadeReferencia'),
-      valorOpacidade: id('valorOpacidadeReferencia'),
-      btnMesmaCamera: id('btnMesmaCamera'),
-      btnEsconder: id('btnEsconderReferencia'),
-      imagemAoLado: id('imagemReferenciaAoLado'),
-      imagemSobreposta: id('imagemReferenciaSobreposta'),
-      carga: id('cargaReferencia'),
-    },
     barraDeEdicao: {
       barra: id('barraEdicao'),
       btnJuntas: id('btnModoJuntas'),
@@ -155,14 +132,12 @@ export function lerElementosDaPagina(documento = globalThis.document) {
     },
     barraDeEstado: {
       barra: id('barraEstado'),
-      dica: id('dicaEstado'),
       selecao: id('selecaoEstado'),
       peca: id('pecaEstado'),
       btnGrade: id('btnGradeEstado'),
       btnChao: id('btnChaoEstado'),
       btnAtalhos: id('btnAtalhosEstado'),
     },
-    nomeDaPeca: { nome: id('nomePecaFoco'), sessao: id('estadoSessaoFoco') },
     popoverDaCena: { botao: id('btnCena'), caixa: id('popoverCena') },
     popoverDaCamera: { botao: id('btnCamera'), caixa: id('popoverCamera') },
     referenciaMetrica: {

@@ -6,7 +6,7 @@
 
 export const CHAVES_DA_PONTE = Object.freeze([
   'ready', 'peca', 'pecasDisponiveis', 'nomePeca', 'carregado', 'partes', 'estatisticas', 'imagemReferencia',
-  'diagnosticos', 'selecaoIgnorada', 'controlador', 'ambiente', 'edicaoDeMalha', 'edicaoDeMalhaDesenhaMalha',
+  'diagnosticos', 'portas', 'selecaoIgnorada', 'controlador', 'ambiente', 'edicaoDeMalha', 'edicaoDeMalhaDesenhaMalha',
   'sincronizador', 'selecionar', 'modo', 'vista', 'projecao', 'explosao', 'focar', 'focarContato', 'inspecionarPar',
   'enquadrar', 'enquadramento', 'auditoria', 'semAuditoria', 'carregarPayloadSessao', 'estado', 'marcadoresDePar', 'url',
 ]);
@@ -43,6 +43,10 @@ export function criarPonteDaCaptura({
       if (!cena.modelo) return null;
       return { facesSemParte: cena.modelo.medida?.facesSemParte ?? [] };
     },
+    /* As portas que a peça publica, as mesmas que `npm run descrever` imprime, no formato que a aba Inspeção mostrava
+       (`rotulo`, `id`, `origem`). A aba perdeu o bloco de portas em 2026-11-03; a guarda das portas lê daqui, e o modelo
+       refeito por junta ou por malha troca `medida`, então o getter acompanha cada reconstrução. */
+    get portas() { return cena.modelo?.medida?.portas ?? []; },
     get selecaoIgnorada() {
       const controlador = cena.controlador;
       if (!controlador) return [];

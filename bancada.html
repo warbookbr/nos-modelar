@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- bancada.html — estúdio de inspeção multivista para autoria e validação de montagens. -->
-<html lang="pt-BR" data-tema="foco" data-cores="claro" data-arrumacao="foco">
+<html lang="pt-BR" data-tema="bancada" data-cores="escuro" data-arrumacao="bancada">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -21,6 +21,7 @@
         <symbol id="i-abrir" viewBox="0 0 24 24"><path d="M3.5 7.5v10a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-8l-2-2.5h-5a1 1 0 0 0-1 1z" /></symbol>
         <symbol id="i-editar" viewBox="0 0 24 24"><path d="M4.5 19.5 5.5 15 15.5 5a1.8 1.8 0 0 1 2.5 0l1 1a1.8 1.8 0 0 1 0 2.5l-10 10z" /><path d="M13.5 7l3.5 3.5" /></symbol>
         <symbol id="i-teclado" viewBox="0 0 24 24"><rect x="3" y="6.5" width="18" height="11" rx="1.5" /><path d="M6.5 10h1M10 10h1M13.5 10h1M17 10h.5M7.5 14h9" /></symbol>
+        <symbol id="i-engrenagem" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6" /><circle cx="12" cy="12" r="6.5" /></symbol>
         <symbol id="i-estado" viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6" /></symbol>
         <symbol id="i-perspectiva" viewBox="0 0 24 24"><path d="M4 6.5 20 4v16L4 17.5z" /><path d="M4 12h16" opacity=".5" /></symbol>
         <symbol id="i-visao" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M8.5 18.5a8 8 0 0 0 10-10" /></symbol>
@@ -62,7 +63,7 @@
 
       <div class="barra-controles">
         <button id="btnMenuAbrir" data-movel="abrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false"><svg class="icone" aria-hidden="true"><use href="#i-abrir"></use></svg><span class="texto-botao">Abrir</span></button>
-        <button id="btnMenuAtalhos" data-movel="controles" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false" title="Controles e atalhos"><svg class="icone" aria-hidden="true"><use href="#i-teclado"></use></svg><span class="texto-botao">Controles</span></button>
+        <button id="btnMenuConfiguracoes" data-movel="configuracoes" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false" title="Configurações e atalhos"><svg class="icone" aria-hidden="true"><use href="#i-engrenagem"></use></svg><span class="texto-botao">Configurações</span></button>
         <button id="btnMenuEstado" data-movel="estado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false" title="Estado da sessão e eventos"><svg class="icone" aria-hidden="true"><use href="#i-estado"></use></svg><span class="texto-botao">Estado</span><span id="selo-estado" class="selo-estado" hidden></span></button>
       </div>
 
@@ -76,10 +77,6 @@
           <button class="botao-icone" type="button" data-abrir-painel="partes" aria-expanded="false" title="Partes">
             <svg class="icone" aria-hidden="true"><use href="#i-gaveta"></use></svg><span class="sr">Partes</span>
           </button>
-          <div class="nome-peca">
-            <b id="nomePecaFoco">Aguardando peça…</b>
-            <span id="estadoSessaoFoco" class="estado-sessao"><i aria-hidden="true"></i><span>Sessão local</span></span>
-          </div>
           <span class="divisor" aria-hidden="true"></span>
           <div class="lugar" data-lugar="topo-peca"></div>
         </div>
@@ -116,52 +113,6 @@
           </button>
         </div>
       </header>
-
-      <!-- A MESA DO REVISÃO: o cabeçalho da peça, o lado da referência com o
-           cabeçalho dela e a referência sobreposta à peça. Mora numa casa
-           escondida, e só o tema que lhe dá lugar (`mesa`) a põe na tela; o
-           componente é `componentes/mesa-de-revisao.js`. -->
-      <div class="lugar" data-lugar="mesa"></div>
-      <div class="casa-escondida" hidden>
-        <section id="mesaComparacao" class="mesa-comparacao" data-movel="mesa-comparacao" data-comparacao="sem-referencia" aria-label="Peça e referência">
-          <header class="cabeca-peca">
-            <b>Peça</b>
-            <span id="vistaDaPeca" class="vista-da-peca"></span>
-            <span id="edicaoDaPeca" class="chip-edicao" hidden></span>
-            <button id="notasDaPeca" class="chip-notas" type="button" title="Anotações" hidden></button>
-            <button id="btnMostrarReferencia" class="mostrar-referencia" type="button" title="Mostrar a referência ao lado">
-              <svg class="icone" aria-hidden="true"><use href="#i-imagem"></use></svg>Referência
-            </button>
-          </header>
-          <section class="lado-referencia" aria-label="Referência">
-            <header class="cabeca-referencia">
-              <b>Referência</b>
-              <span class="sem-referencia">esta peça não tem imagem de referência</span>
-              <div class="escolha-vista-referencia">
-                <button id="btnVistaReferencia" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menuVistasReferencia" title="Vista da referência">
-                  <span id="nomeVistaReferencia">Imagem inteira</span><span class="seta" aria-hidden="true">▾</span>
-                </button>
-                <div id="menuVistasReferencia" class="menu-vistas-referencia" role="menu" aria-label="Vista da referência" hidden></div>
-              </div>
-              <div class="controles-referencia">
-                <label class="opacidade-referencia" title="Transparência da referência sobre a peça">
-                  <input id="opacidadeReferencia" type="range" min="10" max="90" step="5" value="50" aria-label="Transparência da referência" />
-                  <output id="valorOpacidadeReferencia" for="opacidadeReferencia">50%</output>
-                </label>
-                <div class="segmento" role="group" aria-label="Comparação">
-                  <button type="button" data-comparar="ao-lado" aria-pressed="true" title="Lado a lado"><svg class="icone" aria-hidden="true"><use href="#i-lado-a-lado"></use></svg><span class="sr">Lado a lado</span></button>
-                  <button type="button" data-comparar="sobreposta" aria-pressed="false" title="Sobreposta, com transparência"><svg class="icone" aria-hidden="true"><use href="#i-sobreposta"></use></svg><span class="sr">Sobreposta</span></button>
-                </div>
-                <button id="btnMesmaCamera" class="botao-icone" type="button" aria-pressed="true" title="Mesma câmera: ligada"><svg class="icone" aria-hidden="true"><use href="#i-vinculo"></use></svg><span class="sr">Mesma câmera</span></button>
-                <button id="btnEsconderReferencia" class="botao-icone" type="button" title="Esconder a referência"><svg class="icone" aria-hidden="true"><use href="#i-olho"></use></svg><span class="sr">Esconder a referência</span></button>
-              </div>
-            </header>
-            <div class="quadro-referencia"><div id="imagemReferenciaAoLado" class="imagem-referencia" role="img" aria-label="Imagem de referência"></div></div>
-          </section>
-          <div class="sobreposicao-referencia" aria-hidden="true"><div id="imagemReferenciaSobreposta" class="imagem-referencia"></div></div>
-          <img id="cargaReferencia" class="carga-referencia" alt="" hidden />
-        </section>
-      </div>
 
       <!-- O cubo de orientação gira com a câmera e cada face leva à vista dela; as
            faces têm `data-vista`, então a barra das vistas as liga como liga os
@@ -225,17 +176,16 @@
         <div class="lugar" data-lugar="barra-edicao"></div>
       </div>
 
-      <!-- A barra de estado: a dica do que o ponteiro faz agora, a seleção, a escala
+      <!-- A barra de estado: a seleção, a escala
            e a unidade, a peça, e os interruptores da grade e do chão. -->
       <footer id="barraEstado" class="barra-estado" data-arrumacoes="foco">
-        <span id="dicaEstado" class="dica-estado"></span>
         <span id="selecaoEstado" class="num"></span>
         <div class="lugar" data-lugar="barra-estado"></div>
         <span class="unidade-estado">Unidade <b class="num">m</b></span>
         <span id="pecaEstado" class="num"></span>
         <button id="btnGradeEstado" class="alternar" type="button" aria-pressed="true" title="Grade (H)"><svg class="icone" aria-hidden="true"><use href="#i-grade"></use></svg>Grade</button>
         <button id="btnChaoEstado" class="alternar" type="button" aria-pressed="false" title="Chão"><svg class="icone" aria-hidden="true"><use href="#i-chao"></use></svg>Chão</button>
-        <button id="btnAtalhosEstado" class="alternar" type="button" title="Controles e atalhos"><svg class="icone" aria-hidden="true"><use href="#i-teclado"></use></svg>Atalhos</button>
+        <button id="btnAtalhosEstado" class="alternar" type="button" title="Configurações e atalhos"><svg class="icone" aria-hidden="true"><use href="#i-teclado"></use></svg>Atalhos</button>
       </footer>
 
       <!-- Aviso de estado: aparece SÓ quando algo está ruim. Indicador que diz
@@ -267,16 +217,15 @@
         </div>
       </div>
 
-      <div id="menuAtalhos" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloAtalhos" hidden>
+      <div id="menuConfiguracoes" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloConfiguracoes" hidden>
         <div class="modal-backdrop" data-fechar-modal></div>
         <div class="modal-conteudo">
           <header class="modal-topo">
-            <h3 id="tituloAtalhos" class="modal-titulo">Controles</h3>
+            <h3 id="tituloConfiguracoes" class="modal-titulo">Configurações</h3>
             <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
           </header>
           <div class="modal-corpo">
-            <h4 class="secao-modal">Tema</h4>
-            <div id="escolhaTema" class="escolha-tema" role="radiogroup" aria-label="Tema da bancada"></div>
+            <h4 class="secao-modal">Atalhos de teclado</h4>
             <p class="modal-descricao">Clique num comando para trocar a tecla.</p>
             <div id="listaAtalhos"></div>
             <h4 class="secao-modal">Ponteiro</h4>
@@ -418,15 +367,6 @@
               title="Arrastar os cantos onde as partes se encontram"><span data-rotulo="juntas">Juntas</span></button>
           </div>
 
-          <div id="diagnostico" class="diagnostico">
-            <span class="rotulo">DIAGNÓSTICO</span>
-            <p>Preparando relatório da peça…</p>
-          </div>
-
-          <details id="portasPublicadas" class="portas" hidden>
-            <summary><span class="rotulo">PORTAS</span> <span id="resumoPortas">0 publicadas</span></summary>
-            <ul id="listaPortas" class="lista-portas"></ul>
-          </details>
         </div>
 
         <!-- ABA 3: REFERÊNCIAS & INTENÇÃO DA IA -->

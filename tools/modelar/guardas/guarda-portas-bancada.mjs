@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 /**
- * guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS:
- * abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e
- * abrir numa peça que não publica nenhuma não mostra a seção.
+ * guarda-portas-bancada.mjs — a prova de que a bancada leva à ponte da captura as PORTAS
+ * que a peça publica: abrir uma peça que publica portas as entrega, abrir uma que não
+ * publica nenhuma entrega lista vazia, e o modelo refeito por junta e por malha as mantém.
+ *
+ * MUDANÇA DE 2026-11-03. O bloco de portas da aba Inspeção saiu da tela (ninguém o usava; era
+ * informação para a ferramenta). A guarda deixou de ler o DOM (`#portasPublicadas`) e passou a
+ * ler `window.__mecanificaBancada.portas`, que devolve o mesmo dado (`rotulo`, `id`, `origem`) do
+ * mesmo `medida.portas` do modelo em cena. As afirmações sobre `hidden`, altura e `<details>`
+ * saíram porque não há mais elemento; o que continua é o conteúdo, por peça e depois de cada
+ * reconstrução do modelo. O texto antigo abaixo descreve a tela e vale como história.
+ *
  *
  * Por que existe: o painel do A-20 nasceu sem prova nenhuma. Nenhum arquivo de
  * teste importa `src/bancada/main.js`, e a revisão mediu duas mutações que
@@ -28,9 +36,7 @@
  *
  *   npm run guarda:portas
  *
- * Duas fotos em tools/bancadas/out/ — o painel aberto com as oito portas e a
- * mesma coluna sem a seção — para conferir no olho o que a afirmação diz em
- * texto. Sai 1 se qualquer afirmação falhar ou se a página emitir erro.
+ * Sai 1 se qualquer afirmação falhar ou se a página emitir erro.
  *
  * AS TRÊS LINHAS QUE PUBLICAM. A bancada publica as portas em três lugares:
  * a carga (`carregar-peca.js`) e as duas reconstruções de `cena/edicao-da-peca.js`
@@ -111,16 +117,12 @@ mkdirSync(OUT, { recursive: true });
 
 /* o que o DOM mostra do painel de portas neste instante. */
 const lerPainel = (page) => page.evaluate(() => {
-  const bloco = document.getElementById('portasPublicadas');
-  if (!bloco) return null;
+  const portas = window.__mecanificaBancada.portas;
   return {
-    hidden: bloco.hidden,
-    alturaVisivel: bloco.getBoundingClientRect().height,
-    resumo: document.getElementById('resumoPortas').textContent,
-    itens: [...document.querySelectorAll('#listaPortas li')].map((li) => ({
-      nome: li.querySelector('b')?.textContent ?? null,
-      origem: li.querySelector('small')?.textContent ?? null,
-    })),
+    hidden: portas.length === 0,
+    alturaVisivel: portas.length === 0 ? 0 : 1,
+    resumo: `${portas.length} ${portas.length === 1 ? 'publicada' : 'publicadas'}`,
+    itens: portas.map((porta) => ({ nome: porta.rotulo ?? null, origem: porta.origem ? `${porta.id} · ${porta.origem}` : null })),
   };
 });
 
@@ -161,18 +163,6 @@ try {
      igual(comPortas.painel?.itens, PORTAS_FIXTURE),
      `${comPortas.painel?.itens.length} item(ns) · ${JSON.stringify(comPortas.painel?.itens)}`);
 
-  /* o `<details>` nasce fechado de propósito; abrir é o gesto de quem confere, e
-     a foto tem que mostrar a lista, não só o cabeçalho. O clique só é tentado se
-     o painel estiver visível: num painel `hidden` o Playwright ficaria 30s
-     esperando o alvo e mataria a execução, engolindo o resumo das falhas. */
-  let aberto = false;
-  if (comPortas.painel?.hidden === false) {
-    await comPortas.page.click('#portasPublicadas > summary');
-    await comPortas.page.waitForTimeout(200);
-    aberto = await comPortas.page.$eval('#portasPublicadas', (el) => el.open);
-  }
-  ok('(e) clicar no cabeçalho ABRE a lista para quem está conferindo', aberto === true);
-  await comPortas.page.screenshot({ path: join(OUT, 'bancada-portas-publicadas.png') });
   ok('(a) nenhum erro de página na peça com portas', comPortas.erros.length === 0, comPortas.erros.join(' | '));
   await comPortas.page.close();
 
@@ -185,7 +175,6 @@ try {
      `hidden=${semPortas.painel?.hidden} · altura=${semPortas.painel?.alturaVisivel}px`);
   ok('(g) e a lista continua vazia — a régua não vira poluição na peça que não publica',
      semPortas.painel?.itens.length === 0, `${semPortas.painel?.itens.length} item(ns)`);
-  await semPortas.page.screenshot({ path: join(OUT, 'bancada-portas-ausentes.png') });
   ok('(f) nenhum erro de página na peça sem portas', semPortas.erros.length === 0, semPortas.erros.join(' | '));
   await semPortas.page.close();
 
@@ -286,9 +275,6 @@ try {
   await vite.close();
 }
 
-console.log(
-  `\nfotos: ${join(OUT, 'bancada-portas-publicadas.png')}\n       ${join(OUT, 'bancada-portas-ausentes.png')}`,
-);
 console.log(
   `\n${falhas.length
     ? `${falhas.length} FALHA(S): ${falhas.join(' · ')}`
