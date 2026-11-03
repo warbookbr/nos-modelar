@@ -22,7 +22,8 @@ encerrado vive em
 
 ## Estado atual
 
-- Ativo: [visões de conferência na bancada](planos/2026-10-30-visoes-de-conferencia-na-bancada.md). Depois vem o [furgão realista](planos/2026-10-30-furgao-realista.md), em rascunho. [Ajustes no núcleo dos veículos](planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) fechou em 2026-10-30. [Renomear para Modelar](planos/encerrados/2026-10-25-renomear-para-modelar.md) fechou em 2026-10-28. [Bateria rápida e retorno cedo](planos/encerrados/2026-10-27-bateria-rapida-e-retorno-cedo.md) fechou em 2026-10-28. [Leitura por demanda e limpeza](planos/encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md) fechou em 2026-10-27, com a entrada por perguntas e o repositório sem as áreas que ninguém usava. [Carroceria por rede de curvas](planos/encerrados/2026-10-24-carroceria-por-rede-de-curvas.md) fechou em 2026-10-25 com o nível oficial de carroceria. [Veículos de referência livre](planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) fechou em 2026-10-20 com 27 veículos de licença livre sem exigência de crédito aprovados pela pessoa. Os anteriores estão na [crônica dos encerrados](planos/encerrados/README.md).
+- Planos ativos: [ajustes da bancada](planos/2026-11-03-ajustes-da-bancada.md), [regras de desenho por família](planos/2026-11-03-regras-de-desenho-por-familia.md), [furgão realista](planos/2026-10-30-furgao-realista.md) e [visões de conferência na bancada](planos/2026-10-30-visoes-de-conferencia-na-bancada.md).
+- Encerrados recentes: [Ajustes no núcleo dos veículos](planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) fechou em 2026-10-30. [Renomear para Modelar](planos/encerrados/2026-10-25-renomear-para-modelar.md) fechou em 2026-10-28. [Bateria rápida e retorno cedo](planos/encerrados/2026-10-27-bateria-rapida-e-retorno-cedo.md) fechou em 2026-10-28. [Leitura por demanda e limpeza](planos/encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md) fechou em 2026-10-27, com a entrada por perguntas e o repositório sem as áreas que ninguém usava. [Carroceria por rede de curvas](planos/encerrados/2026-10-24-carroceria-por-rede-de-curvas.md) fechou em 2026-10-25 com o nível oficial de carroceria. [Veículos de referência livre](planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) fechou em 2026-10-20 com 27 veículos de licença livre sem exigência de crédito aprovados pela pessoa. Os anteriores estão na [crônica dos encerrados](planos/encerrados/README.md).
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
   `npm run exportar:step` e `npm run exportar:obj`. O STEP sai por
@@ -157,7 +158,7 @@ processo teria pego o defeito sozinho e, quando não, o que falta.
 
 ## Pendências atuais
 
-- O plano ativo, o rascunho aberto e os congelados estão em
+- Os planos ativos, o rascunho aberto e os congelados estão em
   [`planos/README.md`](planos/README.md) e na pasta
   [`congelados/`](planos/congelados/README.md).
 - O sucessor escolhido pela pessoa em 2026-10-30 é o furgão realista; a carcaça

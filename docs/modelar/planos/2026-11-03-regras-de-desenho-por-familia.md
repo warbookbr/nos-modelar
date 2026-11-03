@@ -1,8 +1,8 @@
 # Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
 
-**Estado:** pronto
+**Estado:** ativo
 
-**Execução:** em paralelo ao plano ativo, autorizada pela pessoa em 2026-11-03, antes da etapa 4 do furgão realista.
+**Território:** `procedural/criterios/`, `src/autoria/perguntas-do-critico.js`, `src/autoria/regras-de-desenho.test.js`, `tools/modelar/perguntas-do-alinhamento.mjs`, `tools/modelar/pedidos-da-pessoa.mjs`, `.claude/skills/alinhar-modelagem/`, `procedural/nucleo/gaiola-varrida.js`
 
 **Responsável:** sessão principal, com implementador e modelador despachados
 

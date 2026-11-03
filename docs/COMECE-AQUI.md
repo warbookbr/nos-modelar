@@ -162,11 +162,11 @@ automáticas, os [gates](modelar/INDEX.md#gates-completos), que rodam juntos com
 
 Mudança no projeto segue um plano: um documento curto com o problema, o
 resultado esperado, o que entra e o que fica fora, as condições que não podem
-mudar e a prova de que terminou. Só existe um
-[plano ativo](modelar/planos/README.md) por vez, e a pessoa decide
-qual plano entra e quando. Os planos ficam em
-[`docs/modelar/planos/`](modelar/planos/README.md), cujo índice diz qual está
-ativo e qual vem depois; os fechados vão para a pasta `encerrados/` e ficam como
+mudar e a prova de que terminou. Até cinco
+[planos ativos](modelar/planos/README.md) podem andar ao mesmo tempo, cada um com
+território declarado, e a pessoa decide qual plano entra e quando. Os planos ficam em
+[`docs/modelar/planos/`](modelar/planos/README.md), cujo índice diz quais estão
+ativos, em ordem de prioridade, e qual vem depois; os fechados vão para a pasta `encerrados/` e ficam como
 registro, sem mandar em trabalho novo. Uma correção pontual, que devolve o que o
 código e a documentação já prometem, dispensa plano.
 
@@ -209,7 +209,7 @@ serve para mostrar o caráter da forma e nunca como fonte de medida.
   ([peça e montagem](modelar/usar/AUTORIA-DE-PECA.md#montagem)).
 - Peça: o objeto geométrico que uma receita gera, com as partes nomeadas
   ([peça](modelar/usar/AUTORIA-DE-PECA.md#peça)).
-- Plano ativo: o único plano em execução, que autoriza a mudança no projeto
+- Plano ativo: um dos até cinco planos em execução, cada um com território declarado, que autoriza a mudança no projeto
   ([planos](modelar/planos/README.md)).
 - Receita: o arquivo de código que descreve, com as medidas, como a peça se
   constrói ([a receita](modelar/usar/AUTORIA-DE-PECA.md#a-receita-da-tabela-à-malha)).

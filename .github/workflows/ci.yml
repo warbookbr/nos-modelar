@@ -118,7 +118,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run docs:links:check
 
-      - name: Planejamento curto e com um único plano ativo
+      - name: Planejamento curto, com até cinco planos ativos e territórios separados
         if: ${{ !cancelled() }}
         run: npm run planos:check
 

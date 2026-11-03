@@ -1,5 +1,5 @@
-/* planos.mjs — impede que o planejamento volte a ter mais de um plano ativo
-   ou que um plano executivo ultrapasse o limite curto acordado. */
+/* planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem
+   sobreposição, e que nenhum plano executivo ultrapassa o limite curto acordado. */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -50,6 +50,80 @@ function contarLinhas(texto) {
    e plano que ninguém lê não governa nada. */
 const TETO_DE_LINHAS = 300;
 
+/* CONTRATO DE PLANOS ATIVOS (2026-11-03): até MAXIMO_DE_ATIVOS planos `ativo` ao mesmo tempo, cada um com a linha
+   `**Território:**` logo abaixo do Estado, com os caminhos que ele muda (pasta terminada em `/` ou arquivo, entre
+   crases e separados por vírgula) ou `nenhum (aguarda aprovação)`. Dois planos ativos não podem ter caminhos em que um
+   é prefixo do outro. Os caminhos de CAMINHOS_COMPARTILHADOS pertencem a todos e ficam fora dessa conta. */
+export const MAXIMO_DE_ATIVOS = 5;
+export const CAMINHOS_COMPARTILHADOS = [
+  'docs/modelar/planos/',
+  'docs/MAPA.md',
+  'docs/modelar/gerado/',
+  'tools/gates.mjs',
+  '.github/workflows/',
+  'package.json',
+  'package-lock.json',
+];
+
+/* O território de um plano: { caminhos } (vazio quando espera aprovação) ou { problema }. */
+export function territorioDe(texto) {
+  const linha = texto.match(/^\*\*Território:\*\*\s*(.*?)\s*$/m)?.[1];
+  if (linha === undefined) return { problema: 'plano ativo sem a linha **Território:**' };
+  if (/^nenhum \(aguarda aprovação\)\.?$/i.test(linha)) return { caminhos: [] };
+  const caminhos = [...linha.matchAll(/`([^`]+)`/g)].map((m) => m[1].trim());
+  if (caminhos.length === 0) {
+    return { problema: `**Território:** ilegível; liste caminhos entre crases ou escreva "nenhum (aguarda aprovação)": ${linha}` };
+  }
+  const invalido = caminhos.find((c) => !c || c.startsWith('/') || c.includes('..') || /\s/.test(c));
+  if (invalido !== undefined) return { problema: `**Território:** caminho inválido "${invalido}"` };
+  return { caminhos: caminhos.filter((c) => !CAMINHOS_COMPARTILHADOS.some((s) => sobrepoe(c, s))) };
+}
+
+/* Há sobreposição quando os caminhos são iguais ou um é pasta (termina em `/`) que contém o outro. */
+export function sobrepoe(a, b) {
+  return a === b || (a.endsWith('/') && b.startsWith(a)) || (b.endsWith('/') && a.startsWith(b));
+}
+
+function sobreposicoes(territorios) {
+  const problemas = [];
+  for (let i = 0; i < territorios.length; i++) {
+    for (let j = i + 1; j < territorios.length; j++) {
+      for (const a of territorios[i].caminhos) {
+        for (const b of territorios[j].caminhos) {
+          if (sobrepoe(a, b)) {
+            problemas.push(`territórios sobrepostos entre ${territorios[i].nome} e ${territorios[j].nome}: ${a} e ${b} têm o caminho em comum ${a.length <= b.length ? a : b}`);
+          }
+        }
+      }
+    }
+  }
+  return problemas;
+}
+
+/* Os nomes de arquivo dos planos que o bloco "Planos ativos" lista, em ordem de prioridade, ou `undefined` se não houver
+   a declaração. O bloco é o resto da linha da marca mais, quando a linha acaba ali, a lista que vem depois (até a primeira
+   linha em branco após ela); "nenhum" vale lista vazia. */
+const MARCA_DE_ATIVOS = /^(?:-\s*)?(?:\*\*Planos ativos:\*\*|Planos ativos:)(.*)$/mi;
+
+export function ativosDoIndice(texto, marca = MARCA_DE_ATIVOS) {
+  const achado = marca.exec(texto);
+  if (!achado) return undefined;
+  const linhas = [achado[1]];
+  if (!achado[1].trim()) {
+    const seguintes = texto.slice(achado.index + achado[0].length).replace(/^\n/, '').split('\n');
+    let i = 0;
+    while (i < seguintes.length && !seguintes[i].trim()) i++;
+    for (; i < seguintes.length && seguintes[i].trim(); i++) linhas.push(seguintes[i]);
+  } else {
+    const seguintes = texto.slice(achado.index + achado[0].length).replace(/^\n/, '').split('\n');
+    for (let i = 0; i < seguintes.length && /^\s+\S/.test(seguintes[i]); i++) linhas.push(seguintes[i]);
+  }
+  const bloco = linhas.join('\n');
+  const nomes = [...bloco.matchAll(/\]\(([^)]+\.md)(?:#[^)]*)?\)/g)].map((m) => nomeDoLink(m[1]));
+  if (nomes.length === 0 && !/\bnenhum\b/i.test(bloco)) return undefined;
+  return nomes;
+}
+
 export function conferirPlanos({
   pasta = join(RAIZ, 'docs/modelar/planos'),
   indice = join(pasta, 'README.md'),
@@ -58,6 +132,7 @@ export function conferirPlanos({
   if (!existsSync(pasta)) return { problemas: [`pasta de planos ausente: ${pasta}`], planos: [], ativos: [] };
   if (!existsSync(indice)) return { problemas: [`índice de planos ausente: ${indice}`], planos: [], ativos: [] };
 
+  const textoDe = {};
   const planos = planosDe(pasta).map(({ nome, caminho, naRaiz }) => {
     const texto = readFileSync(caminho, 'utf8');
     const linhas = contarLinhas(texto);
@@ -72,52 +147,56 @@ export function conferirPlanos({
         'subpasta guarda o que saiu de cena.',
       );
     }
+    textoDe[nome] = texto;
     return { nome, estado, linhas, naRaiz };
   });
 
   const ativos = planos.filter((plano) => plano.estado === 'ativo');
-  if (ativos.length > 1) problemas.push(`há ${ativos.length} planos ativos: ${ativos.map((p) => p.nome).join(', ')}`);
+  if (ativos.length > MAXIMO_DE_ATIVOS) {
+    problemas.push(`há ${ativos.length} planos ativos; o máximo é ${MAXIMO_DE_ATIVOS}: ${ativos.map((p) => p.nome).join(', ')}`);
+  }
+
+  const territorios = [];
+  for (const plano of ativos) {
+    const { problema, caminhos } = territorioDe(textoDe[plano.nome]);
+    if (problema) problemas.push(`${plano.nome}: ${problema}`);
+    else territorios.push({ nome: plano.nome, caminhos });
+  }
+  problemas.push(...sobreposicoes(territorios));
 
   const textoIndice = readFileSync(indice, 'utf8');
-  const declaracao = textoIndice.match(/^\*\*Plano ativo:\*\*\s*(.+?)\s*$/mi)?.[1];
-  if (!declaracao) problemas.push('README.md: declaração "Plano ativo" ausente');
-  else if (ativos.length === 0 && !/^nenhum\.?$/i.test(declaracao)) {
-    problemas.push(`README.md declara plano ativo, mas nenhum arquivo está ativo: ${declaracao}`);
-  } else if (ativos.length === 1 && !declaracao.includes(`(${ativos[0].nome})`)) {
-    problemas.push(`README.md não aponta para o plano ativo ${ativos[0].nome}`);
+  const listados = ativosDoIndice(textoIndice);
+  if (!listados) problemas.push('README.md: declaração "Planos ativos" ausente');
+  else {
+    const nomes = new Set(ativos.map((p) => p.nome));
+    for (const nome of listados) {
+      if (!nomes.has(nome)) problemas.push(`README.md lista como ativo um plano que não está ativo: ${nome}`);
+    }
+    for (const nome of nomes) {
+      if (!listados.includes(nome)) problemas.push(`README.md não lista o plano ativo ${nome}`);
+    }
+    if (new Set(listados).size !== listados.length) problemas.push('README.md lista o mesmo plano ativo mais de uma vez');
   }
 
   return { problemas, planos, ativos };
 }
 
-/* Os três lugares que dizem qual plano está ativo (README.md da raiz,
-   docs/modelar/INDEX.md e o índice de planos) divergiram sem que nada
-   reprovasse: o README da raiz seguiu dizendo "nenhum plano está ativo"
-   depois da ativação de um plano. Cada lugar é reduzido ao nome do arquivo
-   apontado, ou a 'nenhum', e os três precisam coincidir. */
-const SEM_PLANO = 'nenhum';
-
+/* Os três lugares que dizem quais planos estão ativos (README.md da raiz, docs/modelar/INDEX.md e o índice de planos)
+   divergiram sem que nada reprovasse. Cada lugar é reduzido ao conjunto de arquivos apontados, ou ao vazio quando diz
+   "nenhum", e os três precisam coincidir. */
 function nomeDoLink(destino) {
   return destino.split('#')[0].split('/').pop();
 }
 
 const PADROES_DE_ATIVO = {
-  raiz: { link: /plano ativo é \[[^\]]*\]\(([^)]+)\)/i, nenhum: /nenhum plano está ativo/i },
-  indice: {
-    link: /^-\s*Ativo:\s*\[[^\]]*\]\(([^)]+)\)/mi,
-    nenhum: /^-\s*(Ativo:\s*nenhum|Nenhum plano ativo)/mi,
-  },
-  planos: {
-    link: /^\*\*Plano ativo:\*\*\s*\[[^\]]*\]\(([^)]+)\)/mi,
-    nenhum: /^\*\*Plano ativo:\*\*\s*nenhum\.?\s*$/mi,
-  },
+  raiz: /^Planos ativos:(.*)$/mi,
+  indice: /^-\s*Planos ativos:(.*)$/mi,
+  planos: /^\*\*Planos ativos:\*\*(.*)$/mi,
 };
 
-export function planoAtivoDeclarado(texto, tipo) {
-  const padroes = PADROES_DE_ATIVO[tipo];
-  const link = texto.match(padroes.link);
-  if (link) return nomeDoLink(link[1]);
-  return padroes.nenhum.test(texto) ? SEM_PLANO : undefined;
+export function planosAtivosDeclarados(texto, tipo) {
+  const nomes = ativosDoIndice(texto, PADROES_DE_ATIVO[tipo]);
+  return nomes && [...new Set(nomes)].sort();
 }
 
 export function conferirPlanoAtivoNosIndices({
@@ -126,9 +205,9 @@ export function conferirPlanoAtivoNosIndices({
   planos = join(RAIZ, 'docs/modelar/planos/README.md'),
 } = {}) {
   const fontes = [
-    ['README.md', readme, 'raiz', 'frase "O plano ativo é [..](..)" ou "Nenhum plano está ativo"'],
-    ['docs/modelar/INDEX.md', indice, 'indice', 'linha "- Ativo: [..](..)" ou "- Ativo: nenhum"'],
-    ['docs/modelar/planos/README.md', planos, 'planos', 'declaração "**Plano ativo:**"'],
+    ['README.md', readme, 'raiz', 'parágrafo "Planos ativos:" com os links, ou "Planos ativos: nenhum"'],
+    ['docs/modelar/INDEX.md', indice, 'indice', 'linha "- Planos ativos:" com os links, ou "- Planos ativos: nenhum"'],
+    ['docs/modelar/planos/README.md', planos, 'planos', 'declaração "**Planos ativos:**" com a lista'],
   ];
   const problemas = [];
   const declarados = [];
@@ -137,13 +216,13 @@ export function conferirPlanoAtivoNosIndices({
       problemas.push(`${nome}: arquivo ausente`);
       continue;
     }
-    const declarado = planoAtivoDeclarado(readFileSync(caminho, 'utf8'), tipo);
-    if (!declarado) problemas.push(`${nome}: não declara o plano ativo (esperado ${esperado})`);
-    else declarados.push([nome, declarado]);
+    const declarado = planosAtivosDeclarados(readFileSync(caminho, 'utf8'), tipo);
+    if (!declarado) problemas.push(`${nome}: não declara os planos ativos (esperado ${esperado})`);
+    else declarados.push([nome, declarado.join(', ') || 'nenhum']);
   }
   if (new Set(declarados.map(([, valor]) => valor)).size > 1) {
     problemas.push(
-      `plano ativo diverge entre os índices: ${declarados.map(([nome, valor]) => `${nome} → ${valor}`).join('; ')}`,
+      `planos ativos divergem entre os índices: ${declarados.map(([nome, valor]) => `${nome} → ${valor}`).join('; ')}`,
     );
   }
   return { problemas, declarados };

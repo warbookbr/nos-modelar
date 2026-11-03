@@ -12,7 +12,7 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 
 | roteiro | intenção | quando |
 | --- | --- | --- |
-| `mudar/plano` | trabalhar no projeto | Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia do plano ativo. |
+| `mudar/plano` | trabalhar no projeto | Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia de um dos planos ativos. |
 | `mudar/defeito` | trabalhar no projeto | Um comportamento relatado contradiz o que o código ou a documentação promete. |
 | `documentar` | trabalhar na documentação | Escrever, mover ou cortar documento, fora de um plano. |
 | `pesquisar` | pesquisar | Saber o que já se tentou, mediu ou pesquisou antes de propor algo. |
@@ -45,7 +45,7 @@ Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no moment
 
 ## mudar/plano: Mudar pelo plano
 
-Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia do plano ativo.
+Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia de um dos planos ativos.
 
 Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
 
@@ -62,7 +62,7 @@ Abrir só quando a condição aparecer:
 
 Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.
 
-Passo seguinte, sem estado lido: Leia o plano ativo e trabalhe na fatia em aberto; sem plano ativo, proponha um plano antes de implementar.
+Passo seguinte, sem estado lido: Escolha um dos planos ativos, pelo território, e trabalhe na fatia em aberto dele; sem plano ativo, proponha um plano antes de implementar.
 
 Conferido no fim: npm run gates, com a bateria completa quando muda código.
 

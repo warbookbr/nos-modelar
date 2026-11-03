@@ -2,6 +2,8 @@
 
 **Estado:** rascunho
 
+**Território:** a declarar ao ativar o plano: os caminhos que ele muda, entre crases e separados por vírgula (pasta terminada em `/` ou arquivo), ou `nenhum (aguarda aprovação)`. Dois planos ativos não podem ter territórios sobrepostos (regra no README de planos).
+
 **Responsável:** a definir
 
 **Repositório e base:** a definir

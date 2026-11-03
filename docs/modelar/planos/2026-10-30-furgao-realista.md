@@ -1,6 +1,8 @@
 # Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 
-**Estado:** rascunho
+**Estado:** ativo
+
+**Território:** `procedural/pecas/furgao-realista/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
