@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { acimaDoTeto, ARQUIVO_DOS_PESOS, argumentosDoVitest, comParte, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
+import { acimaDoTeto, ARQUIVO_DOS_PESOS, argumentosDoVitest, comParte, maquinaOcupada, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -36,6 +36,13 @@ describe('a lista dos testes lentos', () => {
     const lentos = [{ arquivo: 'a.test.mjs', ms: 35_000 }, { arquivo: 'b.test.mjs', ms: 40_000 }];
     const sozinho = { 'a.test.mjs': 5_000, 'b.test.mjs': TETO_SOZINHO_MS + 1 };
     expect(pesadosSozinhos(lentos, (f) => sozinho[f]).map((d) => [d.arquivo, d.sozinhoMs])).toEqual([['b.test.mjs', TETO_SOZINHO_MS + 1]]);
+  });
+
+  it('com a carga acima dos processadores a medida sozinha não vale, salvo no CI, que cobra sempre', () => {
+    expect(maquinaOcupada({ carga: 11.8, processadores: 4 })).toBe(true);
+    expect(maquinaOcupada({ carga: 3.9, processadores: 4 })).toBe(false);
+    expect(maquinaOcupada({ carga: 11.8, processadores: 16 })).toBe(false);
+    expect(maquinaOcupada({ carga: 11.8, processadores: 4, ci: true })).toBe(false);
   });
 });
 

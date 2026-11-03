@@ -171,7 +171,10 @@ export const GATES = [
  *
  * `--parar-no-primeiro` continua existindo e volta a rodar um de cada vez, que
  * é o que serve para quem está consertando um gate específico. */
-const CONCORRENCIA_PADRAO = Math.max(2, Math.min(4, availableParallelism()));
+/* O teto de quatro de cada vez era o tamanho da máquina da sessão; numa máquina maior ele deixava processadores parados. O
+   peso de cada gate (PESO_DO_GATE, abaixo) e o orçamento da máquina já seguram a soma, então o número de gates ao mesmo tempo
+   acompanha os processadores. */
+const CONCORRENCIA_PADRAO = Math.max(2, availableParallelism());
 
 /* Os recursos que cada gate ocupa sozinho. Os ausentes não disputam nada. As guardas da bancada, que eram oito gates com um
    servidor do Vite cada, são um gate só (`bancada:guardas`) com um servidor para todas, e é ele que ocupa o cache.

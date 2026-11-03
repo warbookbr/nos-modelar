@@ -10,6 +10,7 @@
  * antes de chegar à main. `npm test` continua rodando a suíte inteira de uma vez. */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { availableParallelism, loadavg } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -118,6 +119,14 @@ export function acimaDoTeto(duracoes, teto = TETO_DO_RAPIDO_MS) {
  * só porque os testes que abrem o Blender e os agentes de modelagem disputavam os 4 processadores; a conferência sozinha separa
  * a carga da máquina do arquivo pesado, que é o que o teto quer pegar (um teste de 8 s sozinho já passa dele na bateria). */
 export const TETO_SOZINHO_MS = 12_000;
+
+/* A medida "sozinho" só vale se a máquina estiver livre. Em 2026-11-03, com três agentes modelando ao lado, a carga média passou
+ * de 11 em 4 processadores, e dois arquivos de uns 6 s mediram 12,5 e 20,5 s sozinhos e reprovaram a bateria. Com a carga média
+ * de um minuto acima do número de processadores na hora da medida, o estouro vira aviso, porque não há como separar o arquivo
+ * pesado da máquina ocupada; o CI, que roda em máquina limpa, cobra sempre. */
+export function maquinaOcupada({ carga, processadores, ci = false }) {
+  return !ci && carga > processadores;
+}
 
 export function pesadosSozinhos(lentos, medir, teto = TETO_SOZINHO_MS) {
   return lentos.map((d) => ({ ...d, sozinhoMs: medir(d.arquivo) })).filter((d) => d.sozinhoMs > teto);
@@ -232,12 +241,19 @@ function rodar(modo) {
   if (Date.parse(gravado) < inicio) return;
   const lentos = acimaDoTeto(duracoes);
   if (!lentos.length) return;
+  const cargaAntes = loadavg()[0];
   const pesados = pesadosSozinhos(lentos, medirSozinho(raiz));
+  const carga = Math.max(cargaAntes, loadavg()[0]);
+  const processadores = availableParallelism();
   const s1 = (ms) => `${Math.round(ms / 100) / 10} s`;
   for (const d of lentos.filter((l) => !pesados.some((p) => p.arquivo === l.arquivo))) {
     console.log(`test:rapidos — ${d.arquivo} levou ${s1(d.ms)} na bateria, mas roda sozinho abaixo de ${TETO_SOZINHO_MS / 1000} s: carga da máquina, não reprova.`);
   }
   if (!pesados.length) return;
+  if (maquinaOcupada({ carga, processadores, ci: Boolean(process.env.CI) })) {
+    console.log(`test:rapidos — aviso: ${pesados.map(({ arquivo, sozinhoMs }) => `${arquivo} (${s1(sozinhoMs)} sozinho)`).join(', ')} passaram do teto, mas a máquina está ocupada (carga ${carga.toFixed(1)} em ${processadores} processadores) e a medida não separa o arquivo da carga; o CI cobra o teto em máquina limpa.`);
+    return;
+  }
   console.error(`test:rapidos — ${pesados.length} arquivo(s) passaram do teto de ${TETO_DO_RAPIDO_MS / 1000} s da bateria rápida e de ${TETO_SOZINHO_MS / 1000} s sozinhos:`);
   for (const { arquivo, ms, sozinhoMs } of pesados) console.error(`  ${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho  ${arquivo}`);
   console.error('Ponha cada um em TESTES_LENTOS, em tools/testes-lentos.mjs, ou deixe-o mais leve.');
