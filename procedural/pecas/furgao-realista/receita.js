@@ -1,4 +1,4 @@
-/* furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano
+/* furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano
  * docs/modelar/planos/2026-10-30-furgao-realista.md, alinhamento no banco de provas furgao-realista-2026-10-30): a lataria
  * detalhada, refeita pela prancha ajustada de 2026-10-31 (a frente mais alta, o para-brisa que envolve as quinas, a curva do teto
  * de dois raios e os raios maiores nas quinas do teto, e o ajuste de largura de 2026-10-31, com as laterais fechando 3,9 graus acima do vinco de
@@ -6,13 +6,25 @@
  * etapa 1 (silhueta, raios e painéis da prancha cotada referencias/quatro-vistas.prancha.png, aceitos pela pessoa), esta etapa desenha as frestas das portas (as duas dianteiras da cabine, a de correr do lado direito e as
  * duas traseiras de abrir), o vinco de cintura discreto ao longo da lateral, as nervuras longitudinais do teto alto e a aba leve dos
  * quatro arcos das rodas, e abre na chapa os vãos do para-brisa, dos vidros das portas da cabine e dos das portas traseiras, cada um
- * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. Os vidros e borrachas, as luzes e o
- * acabamento vêm nas etapas 5 a 7.
+ * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. As luzes e o
+ * acabamento vêm nas etapas 6 e 7.
  *
  * Etapa 4, as rodas e o forro dos arcos: as quatro rodas saem da família `roda-pneu` (pneu 235/65 aro 16 com bojo e ombro, roda de chapa de aço com 5
  * parafusos), na bitola e nos eixos da prancha e apoiadas no chão, e cada arco ganha um forro escuro por dentro da chapa, a 25 mm do pneu, que fecha o oco
  * atrás da roda. A receita expande a chamada da família dentro de `gerarPassos`, soma uma base aos ids locais dela e põe o sufixo da roda nos nomes das
  * partes (pneu, aro, cubo, disco), como a hélice do avião faz com a pá; o forro é a mesma seção varrida em arco que a moldura.
+ *
+ * Etapa 5, os vidros, as borrachas e o interior. Cada vão de vidro da etapa 2 (o para-brisa, os das duas portas da cabine e os das duas portas traseiras; a carga
+ * fica fechada nas laterais) recebe um cristal escurecido e translúcido: as próprias faces que o vão tirou da chapa, com a volta recuada 7,5 mm para dentro pela
+ * superfície (além da perna da aba, de 5 mm) e os pontos de dentro onde estão, de modo que o cristal fica rente à lataria. A junta de 7,5 mm e a aba ficam
+ * sob a borracha de vão, escura, varrida pela volta do vão (`friso` com perfil: 15 mm sobre a chapa, 10 sobre o cristal, 3,5 mm de altura, entrando 1,5 mm
+ * nos dois), que entra na conferência da moldura do vão junto com a aba. Atrás dos cristais fica um interior simples, todo dentro da chapa: o piso, que
+ * assenta no topo dos túneis dos quatro forros dos arcos (736,6) e fica a 10 mm da chapa dos dois lados; a divisória entre a cabine e a carga, que é a seção de dentro
+ * da chapa recuada 28 mm, de lado a lado e do piso ao teto, em z 560; os bancos do motorista (esquerdo, +x) e do passageiro, volumes em L com os cantos
+ * chanfrados; e o painel, sob o pé do para-brisa. Quem olha pelo para-brisa vê o painel, os bancos e a divisória, pelas portas da cabine os bancos, e pelas
+ * portas traseiras a divisória e o piso, e nenhum vão deixa ver o oco. Posição nenhuma é digitada: o interior é derivado da seção da chapa (`secaoDeDentro`)
+ * e da TABELA. O recuo do cristal, o perfil da borracha e as medidas do interior são parâmetros da TABELA (`vidro_*`, `borracha_*`, `piso_*`, `divisoria_*`,
+ * `banco_*`, `painel_*`).
  *
  * Etapa 3, o plástico de baixo, peça própria por fora da chapa (prancha de 2026-11-01): a saia de 299 a 463, que sai 20 mm da lateral, as
  * alargamento de 150 mm que sai 30 mm em volta dos quatro arcos (2026-11-02) e os para-choques, que saem 50 mm na frente e 110 atrás e dobram nas quinas. A chapa
@@ -196,6 +208,13 @@ export const TABELA = {
   aba_vao_largura: 20,
   aba_vao_raio: 3,
   aba_vao_angulo: 90,
+  vidro_folga_borda: 7.5, // o cristal começa 7,5 mm para dentro do vão, além da perna da aba (5 mm), e a borracha cobre a junta
+  vidro_espessura: 4,
+  // borracha de vão (etapa 5): seção [u, v] sobre a borda do vão, u para o vidro e v para fora da chapa; entra 1,5 mm na chapa e no cristal, e cobre a junta de 7,5 mm
+  borracha_fora: 15, // quanto passa sobre a chapa
+  borracha_dentro: 10, // quanto passa sobre o cristal (2,5 mm além da borda dele)
+  borracha_altura: 3.5,
+  borracha_fundo: 1.5,
 
   // vinco de cintura: altura (sobe com o pé do para-brisa, 1480 sobre 1310), meia largura da dobra, profundidade, recuo das quinas e
   // rampa das pontas
@@ -264,6 +283,31 @@ export const TABELA = {
   placa_traseira_y0: 380,
   placa_altura: 130,
   placa_fundo: 8,
+
+  // interior (etapa 5), todo dentro da chapa: o piso assenta nos topos dos túneis dos forros dos arcos (que sobem a 736,6) e fica a 10 mm da face de
+  // dentro da chapa, a divisória atrás dos bancos, dois bancos de cabine e o painel. A margem é a folga entre a divisória e a face de dentro da chapa.
+  piso_y: 735.5,
+  piso_espessura: 20,
+  piso_meia_largura: 988,
+  piso_z_frente: 1740,
+  piso_z_tras: -2655,
+  piso_raio_cantos: 90,
+  divisoria_z: 560, // o eixo da divisória, atrás das janelas das portas da cabine (que acabam em 620)
+  divisoria_espessura: 30,
+  divisoria_margem: 28,
+  banco_x: 400, // o eixo de cada banco; o do motorista fica no lado esquerdo (+x)
+  banco_largura: 540,
+  banco_costas_z: 650, // a face de trás do encosto
+  banco_costas_espessura: 120,
+  banco_profundidade: 520, // do fundo do encosto à frente do assento
+  banco_assento_y: 1190,
+  banco_topo_y: 1790,
+  banco_chanfro: 22,
+  painel_z_tras: 1470,
+  painel_z_frente: 1735,
+  painel_topo_y: 1400,
+  painel_meia_largura: 850,
+  painel_chanfro: 25,
 };
 
 const m = (mm) => mm / 1000;
@@ -1646,6 +1690,29 @@ export function derivar(T) {
   }));
   const final = (n, rot) => copia.get(`${n}|${rot}`) ?? n;
 
+  /* ---- os cristais ----
+     Cada cristal é o mesmo pedaço de superfície que o vão tirou da chapa (as faces da região `vidro:`), com a volta recuada vidro_folga_borda para dentro do
+     vão pela superfície, para ficar além da perna da aba (raio + espessura = 5 mm) e deixar uma junta que a borracha cobre. Os pontos de dentro ficam
+     onde estão, na superfície da chapa, e por isso o cristal é rente à lataria. */
+  const cristais = vidros.map((v) => {
+    const rot = `vidro:${v.nome}`;
+    const L = v.volta.length;
+    const nova = new Map();
+    v.volta.forEach((n, k) => {
+      if (dentroDe.has(n)) throw new Error(`furgao-realista: o ponto ${n} da volta do vão ${v.nome} é também de uma porta`);
+      const pa = P.get(v.volta[(k - 1 + L) % L]); const pb = P.get(v.volta[(k + 1) % L]); const p = P.get(n);
+      const nrm = normalDe(n);
+      const m1 = unit(cruz(nrm, unit(sub(p, pa)))); const m2 = unit(cruz(nrm, unit(sub(pb, p))));
+      const mi = esc(soma(m1, m2), 1 / Math.max(0.3, 1 + dot(m1, m2)));
+      nova.set(n, deslocar(n, esc(mi, T.vidro_folga_borda)));
+    });
+    const nomeDe = (n) => (nova.has(n) ? `${n}_cristal` : n);
+    const fs = facesMestre.filter((_, i) => regiao[i] === rot).map((fc) => fc.map(nomeDe));
+    const posicoesDoCristal = new Map();
+    facesMestre.forEach((fc, i) => { if (regiao[i] === rot) fc.forEach((n) => posicoesDoCristal.set(nomeDe(n), nova.get(n) ?? P.get(n))); });
+    return { nome: v.nome, faces: fs, vertices: [...posicoesDoCristal.keys()].sort(), posicoes: posicoesDoCristal };
+  });
+
   /* ---- vincos ---- */
   const cadeia = (mestres, rotuloDe) => {
     const pedacos = [];
@@ -1728,7 +1795,7 @@ export function derivar(T) {
   const vertices = [...usados].sort();
   /* o plástico de baixo, por fora da chapa: os pontos dele entram no TOPO junto com os da gaiola */
   const plastico = derivarPlastico(T, f);
-  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes])]);
+  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
 
   /* as quatro rodas da família `roda-pneu`, no pneu da prancha, na bitola e no entre-eixos, apoiadas no chão: a chamada da família e o centro de cada uma */
@@ -1740,12 +1807,74 @@ export function derivar(T) {
   }
   return {
     forma: f, aneis: listas.map((l) => ({ nome: l.nome, y: l.y, colunas: l.lista.map((p) => p.col) })), pontos, pontosMm,
-    passo: { vertices, faces, vincos, cantos }, plastico,
+    passo: { vertices, faces, vincos, cantos }, plastico, cristais,
     portas: portas.map((v) => ({ nome: v.nome, volta: v.volta })),
     vidros: vidros.map((v) => ({ nome: v.nome, linha: v.linha, volta: v.volta })),
     abasDosArcos, rodas,
     bordaDeBaixo: [...sol.lista.map((p) => p.nome), ...sol.lista.slice(1, -1).reverse().map((p) => espelho(p.nome))],
   };
+}
+
+/* ---------- o interior ---------- */
+
+/** Corta cada canto da polilinha fechada em `c` mm (ou na metade do lado mais curto), para os volumes de cabine não terem aresta viva. */
+function chanfrar(pts, c) {
+  const n = pts.length;
+  return pts.flatMap((p, k) => {
+    const a = pts[(k - 1 + n) % n]; const b = pts[(k + 1) % n];
+    const ia = [a[0] - p[0], a[1] - p[1]]; const ib = [b[0] - p[0], b[1] - p[1]];
+    const la = Math.hypot(...ia); const lb = Math.hypot(...ib);
+    const ca = Math.min(c, la / 2.1); const cb = Math.min(c, lb / 2.1);
+    return [[p[0] + ia[0] / la * ca, p[1] + ia[1] / la * ca], [p[0] + ib[0] / lb * cb, p[1] + ib[1] / lb * cb]];
+  });
+}
+
+/** A seção de dentro da chapa, em [x, y]: a metade da seção frontal da lateral e do teto recuada `d` mm pela normal, de y0 ao teto. */
+function secaoDeDentro(f, d, y0) {
+  const pl = f.perfilLado;
+  const recuado = pl.map((p, k) => {
+    const a = pl[Math.max(0, k - 1)]; const b = pl[Math.min(pl.length - 1, k + 1)];
+    const t = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(...t);
+    return [p[0] + (-t[1] / l) * d, p[1] + (t[0] / l) * d];
+  });
+  const xEm = (y) => {
+    for (let k = 0; k + 1 < recuado.length; k++) {
+      const [x0, y1] = recuado[k]; const [x1, y2] = recuado[k + 1];
+      if (y1 <= y && y <= y2 && y2 > y1) return lerp(x0, x1, (y - y1) / (y2 - y1));
+    }
+    return recuado[0][0];
+  };
+  const lado = [[xEm(y0), y0], ...recuado.filter((p) => p[1] > y0 && p[0] > 0)];
+  return [...lado, [0, lado.at(-1)[1]]];
+}
+
+/** As peças do interior em milímetro: o piso, a divisória, os dois bancos e o painel, cada uma com o perfil que o `extrusao` pede. */
+export function derivarInterior(T, f) {
+  const yPiso = T.piso_y + T.piso_espessura;
+  /* a divisória é a seção inteira de dentro da chapa, de lado a lado, do piso ao teto */
+  const meia = secaoDeDentro(f, T.divisoria_margem, yPiso - 1);
+  const contorno = [...meia, ...[...meia].reverse().slice(1).map(([x, y]) => [-x, y])];
+  /* o eixo z do extrusao leva [u, v] a x = u e y = -v, e a peça nasce em z de 0 a altura */
+  const divisoria = { nome: 'divisoria', perfil: contorno.map(([x, y]) => [x, -y]), z0: T.divisoria_z - T.divisoria_espessura / 2, espessura: T.divisoria_espessura };
+  const zTrasInterno = T.piso_z_tras;
+  const zFrente = T.piso_z_frente;
+  const meiaLargura = T.piso_meia_largura;
+  const piso = {
+    nome: 'pisoInterior', y0: T.piso_y, altura: T.piso_espessura,
+    perfil: { retangulo: { largura: 2 * meiaLargura, profundidade: zFrente - zTrasInterno, centro: [0, (zFrente + zTrasInterno) / 2], cantos: T.piso_raio_cantos } },
+  };
+  /* o banco: L em [z, y] (encosto e assento), com o pé no piso e os cantos chanfrados; o eixo x do extrusao leva [u, v] a y = -u e z = v, e a peça nasce em x de 0 a altura */
+  const zb = T.banco_costas_z; const zc = zb + T.banco_costas_espessura; const zf = zb + T.banco_profundidade;
+  const ySolo = yPiso - 1; const yA = T.banco_assento_y; const yT = T.banco_topo_y;
+  const Lzy = chanfrar([[zb, ySolo], [zf, ySolo], [zf, yA], [zc, yA], [zc, yT - 180], [zc - 8, yT - 120], [zc - 8, yT], [zb, yT]], T.banco_chanfro);
+  const bancos = [['bancoMotorista', 1], ['bancoPassageiro', -1]].map(([nome, s]) => ({
+    nome, perfil: Lzy.map(([z, y]) => [-y, z]), x0: s * T.banco_x - T.banco_largura / 2, largura: T.banco_largura,
+  }));
+  /* o painel: perfil em [z, y] com a testa junto ao para-brisa, o topo que desce para o motorista e a face de baixo recuada */
+  const zp0 = T.painel_z_tras; const zp1 = T.painel_z_frente;
+  const Pzy = chanfrar([[zp0 + 90, ySolo], [zp1, ySolo], [zp1, T.painel_topo_y - 10], [zp1 - 130, T.painel_topo_y], [zp0 + 30, T.painel_topo_y - 50], [zp0, T.painel_topo_y - 120], [zp0, ySolo + 420]], T.painel_chanfro);
+  const painel = { nome: 'painel', perfil: Pzy.map(([z, y]) => [-y, z]), x0: -T.painel_meia_largura, largura: 2 * T.painel_meia_largura };
+  return { piso, divisoria, bancos, painel };
 }
 
 /* ---------- a roda da família ---------- */
@@ -1777,9 +1906,19 @@ const BASE_DAS_RODAS = 200;
 const CHAPA = { origem: { op: 'subdivisao', id: 1 } };
 const nomeDaAbaDoArco = (a) => `abaArco${a.arco === 'arcoD' ? 'Dianteiro' : 'Traseiro'}${a.lado === 'e' ? 'Esquerdo' : 'Direito'}`;
 
+const nomeDoCristal = (nome) => (nome === 'paraBrisa' ? 'vidroParaBrisa' : nome);
+const nomeDaBorracha = (nome) => `borracha${nome === 'paraBrisa' ? 'ParaBrisa' : nome.replace(/^vidro/, '')}`;
+
+/** A seção da borracha de vão, [u, v] em mm, u para o cristal e v para fora da chapa: assenta na chapa e no cristal (entra `borracha_fundo` nos dois), passa
+ *  `borracha_fora` sobre a chapa e `borracha_dentro` sobre o cristal, sobe `borracha_altura` e desce com o beiral redondo nas duas bordas. */
+export function perfilDaBorracha(T) {
+  const F = T.borracha_fora; const D = T.borracha_dentro; const H = T.borracha_altura; const B = T.borracha_fundo;
+  return [[-F, -B], [D, -B], [D, 0.5], [D - 2, 1.6], [D - 5, H - 0.7], [D - 8, H], [-6, H], [-F + 2.5, 0.55 * H], [-F, 0.4]];
+}
+
 /** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros,  as abas dos arcos, as quatro rodas da família e o forro dos arcos (que vem com o plástico). */
 export function gerarPassos(T) {
-  const { passo, plastico, rodas, vidros, abasDosArcos } = derivar(T);
+  const { passo, plastico, rodas, vidros, cristais, abasDosArcos, forma: f } = derivar(T);
   const passos = [
     ['subdivisao', { origemId: 1, ...passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
     ['parte', { nome: 'carroceria', sel: CHAPA }],
@@ -1801,6 +1940,34 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: v.linha, sel }]);
     passos.push(['material', { sel, usa: 'azul' }]);
   });
+  /* os cristais: a mesma superfície do vão, recuada da borda, engrossada para dentro; e a borracha de vão por cima da junta, varrida pela volta do vão */
+  const perfilBorracha = perfilDaBorracha(T).map(([u, v]) => [m(u), m(v)]);
+  cristais.forEach((c, k) => {
+    const sel = { origem: { op: 'subdivisao', id: 100 + k } };
+    passos.push(['subdivisao', { origemId: 100 + k, vertices: c.vertices, faces: c.faces, borda: 'cantos', niveis: T.niveis, espessura: m(T.vidro_espessura) }]);
+    passos.push(['parte', { nome: nomeDoCristal(c.nome), sel }]);
+    passos.push(['material', { sel, usa: 'vidro' }]);
+  });
+  vidros.forEach((v, k) => {
+    const sel = { origem: { op: 'friso', id: 110 + k } };
+    passos.push(['friso', { origemId: 110 + k, superficie: CHAPA.origem, linha: { nome: nomeDaBorracha(v.nome), pontos: [...v.volta, v.volta[0]] }, perfil: perfilBorracha }]);
+    passos.push(['parte', { nome: nomeDaBorracha(v.nome), sel }]);
+    passos.push(['material', { sel, usa: 'borracha' }]);
+  });
+  /* o interior: piso, divisória, bancos e painel, cada um uma extrusão do perfil que `derivarInterior` escreve */
+  const { piso, divisoria, bancos, painel } = derivarInterior(T, f);
+  const perfilM = (pl) => pl.map(([u, v]) => [m(u), m(v)]);
+  const peca = (id, nome, material, args) => {
+    const sel = { origem: { op: 'extrusao', id } };
+    passos.push(['extrusao', { origemId: id, ...args }]);
+    passos.push(['parte', { nome, sel }]);
+    passos.push(['material', { sel, usa: material }]);
+  };
+  const r = piso.perfil.retangulo;
+  peca(120, piso.nome, 'piso', { perfil: { retangulo: { largura: m(r.largura), profundidade: m(r.profundidade), centro: r.centro.map(m), cantos: m(r.cantos) } }, altura: m(piso.altura), em: [0, m(piso.y0), 0] });
+  peca(121, divisoria.nome, 'divisoria', { perfil: perfilM(divisoria.perfil), eixo: 'z', altura: m(divisoria.espessura), em: [0, 0, m(divisoria.z0)] });
+  bancos.forEach((b, k) => peca(122 + k, b.nome, 'banco', { perfil: perfilM(b.perfil), eixo: 'x', altura: m(b.largura), em: [m(b.x0), 0, 0] }));
+  peca(124, painel.nome, 'painelEscuro', { perfil: perfilM(painel.perfil), eixo: 'x', altura: m(painel.largura), em: [m(painel.x0), 0, 0] });
   const W = m(T.aba_arco_largura); const H = m(T.aba_arco_altura); const fundo = -m(T.espessura) / 2;
   const perfilAba = [[0, fundo], [0, 0.6 * H], [0.12 * W, H], [0.45 * W, 0.8 * H], [W, 0.1 * H], [W, fundo]];
   abasDosArcos.forEach((a, k) => {
@@ -1853,6 +2020,10 @@ const SAIAS = ['saiaPresaEsquerda', 'saiaPresaDireita', 'saiaPortaCabineEsquerda
 const MOLDURAS = ['molduraArcoDianteiroEsquerdo', 'molduraArcoDianteiroDireito', 'molduraArcoTraseiroEsquerdo', 'molduraArcoTraseiroDireito'];
 const PARACHOQUES = ['parachoqueDianteiro', 'parachoqueTraseiro'];
 const PLASTICOS = [...SAIAS, ...MOLDURAS, ...PARACHOQUES];
+const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroPortaTraseiraEsquerda', 'vidroPortaTraseiraDireita'];
+const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita'];
+const BANCOS = ['bancoMotorista', 'bancoPassageiro'];
+const INTERIOR = ['pisoInterior', 'divisoria', ...BANCOS, 'painel'];
 
 export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
@@ -1869,6 +2040,13 @@ export const CONTATOS = [
     { par: [`saiaPresa${lado}`, `forroArco${eixo}${lad}`], motivo: 'a saia vai até a boca do arco e dobra para dentro dela, e essa dobra chega à aba do forro, que passa 8 mm da boca por dentro' },
     { par: [`parachoque${eixo}`, `forroArco${eixo}${lad}`], motivo: 'o para-choque vai até a boca do arco e dobra para dentro dela, e essa dobra chega à aba do forro, que passa 8 mm da boca por dentro' },
   ]),
+  ...ABAS_DOS_VAOS.map((aba, k) => ({ par: [aba, BORRACHAS[k]], motivo: 'a borracha passa sobre a perna da aba (5 mm para dentro do vão) e entra 1,5 mm abaixo da superfície, onde a aba dobra' })),
+  ...BORRACHAS.map((b) => ({ par: ['carroceria', b], motivo: 'a borracha assenta na chapa em volta do vão: passa 15 mm sobre ela e entra 1,5 mm na superfície' })),
+  ...BORRACHAS.map((b, k) => ({ par: [b, CRISTAIS[k]], motivo: 'o cristal começa 7,5 mm para dentro da borda do vão e a borracha passa 2,5 mm sobre a borda dele, entrando 1,5 mm: é a borracha que segura o cristal, e é ela que cobre a junta' })),
+  { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
+  ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
+  { par: ['pisoInterior', 'painel'], motivo: 'o painel assenta no piso e entra 1 mm nele' },
+  ...FORROS.map((forro) => ({ par: ['pisoInterior', forro], motivo: 'o piso assenta no topo do túnel do forro do arco (736,6) e entra 1 mm nele; são o único apoio dele, a 10 mm da chapa dos dois lados' })),
   ...FORROS.map((forro) => ({ par: ['carroceria', forro], motivo: 'a aba do forro assenta na face de dentro da chapa em volta do arco, passando 8 mm da boca, e entra 1 mm na parede' })),
   ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
     { par: [`pneu${sufixo}`, `aro${sufixo}`], motivo: 'o assento do pneu abraça o barril do aro: a borda de dentro da banda é o raio do assento do aro' },
@@ -1887,7 +2065,7 @@ export const ILHAS = RODAS.map(([pneu]) => ({
 export function vaosDeclarados(T) {
   const { vidros, portas, bordaDeBaixo, passo } = derivar(T);
   const naChapa = new Set(passo.vertices);
-  const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] }));
+  const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha, nomeDaBorracha(v.nome)] }));
   for (const p of portas) {
     if (p.nome.startsWith('portaTraseira')) continue;
     if (!p.volta.every((n) => naChapa.has(n))) continue;
@@ -1925,13 +2103,16 @@ export function pontosDeclarados(T = TABELA) {
     { nome: 'pneu dianteiro esquerdo, embaixo, por dentro e atrás', parte: 'pneuDianteiroEsquerdo', medida: 'minimo', em: [xDentro, 0, f.zD - r], toleranciaMm: tol },
     { nome: 'pneu traseiro direito, em cima, por dentro e na frente', parte: 'pneuTraseiroDireito', medida: 'maximo', em: [-xDentro, 2 * r, f.zT + r], toleranciaMm: tol },
     { nome: 'pneu traseiro direito, embaixo, por fora e atrás', parte: 'pneuTraseiroDireito', medida: 'minimo', em: [-xFora, 0, f.zT - r], toleranciaMm: tol },
+    { nome: 'piso do interior, embaixo e atrás: assentado no topo dos túneis dos forros, de 20 mm, a 988 mm do eixo e acabando 2655 mm atrás do centro', parte: 'pisoInterior', medida: 'minimo', em: [-T.piso_meia_largura, T.piso_y, T.piso_z_tras], toleranciaMm: tol },
+    { nome: 'divisória, no alto e na face da frente: a seção de dentro recuada 28 mm da chapa e do teto, 15 mm à frente do eixo dela em z 560', parte: 'divisoria', medida: 'maximo', em: [T.meia_largura - T.divisoria_margem, T.altura - T.divisoria_margem, T.divisoria_z + T.divisoria_espessura / 2], toleranciaMm: tol },
+    { nome: 'banco do motorista, no alto da frente do assento e do lado de fora: 540 mm de largura no lado esquerdo, encosto até 1790, assento a 520 mm do fundo do encosto', parte: 'bancoMotorista', medida: 'maximo', em: [T.banco_x + T.banco_largura / 2, T.banco_topo_y, T.banco_costas_z + T.banco_profundidade], toleranciaMm: tol },
     { nome: 'forro do arco dianteiro esquerdo, embaixo e atrás: a parede de dentro 25 mm além da face de dentro do pneu mais os 2 mm da espessura, as pontas na soleira e a borda da aba 8 mm além da boca', parte: 'forroArcoDianteiroEsquerdo', medida: 'minimo', em: [xDentro - T.forro_folga - T.plastico_espessura, T.soleira_y, f.zD - T.arco_raio - T.forro_sobra], toleranciaMm: 1 },
     { nome: 'forro do arco traseiro direito, em cima e na frente: a aba na face de dentro da chapa, o alto da borda 8 mm acima da boca e a parede de dentro 25 mm além do pneu mais os 2 mm da espessura', parte: 'forroArcoTraseiroDireito', medida: 'maximo', em: [-(xDentro - T.forro_folga - T.plastico_espessura), f.rPneu + T.arco_raio + T.forro_sobra, f.zT + T.arco_raio + T.forro_sobra], toleranciaMm: 1 },
   ];
 }
 
 const receita = {
-  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 4: a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia e os para-choques em plástico escuro e o alargamento dos arcos (da cor da lataria em cima, escuro embaixo), por fora da chapa, o forro escuro dos arcos por dentro e as quatro rodas da família roda-pneu (pneu 235/65 aro 16)' },
+  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 5: os cristais escurecidos rentes à lataria no para-brisa, nas portas da cabine e nas portas traseiras, a borracha de vão em volta de cada um, o piso, os bancos da cabine, o painel e a divisória; a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia e os para-choques em plástico escuro e o alargamento dos arcos (da cor da lataria em cima, escuro embaixo), por fora da chapa, o forro escuro dos arcos por dentro e as quatro rodas da família roda-pneu (pneu 235/65 aro 16)' },
   PARAMS: TABELA,
   MATERIAIS: {
     azul: { tipo: 'liso', cor: '#5d75c9' },
@@ -1939,6 +2120,12 @@ const receita = {
     aco: { tipo: 'metal', cor: '#a9adb3', acabamento: 'escovado' },
     plastico: { tipo: 'liso', cor: '#39393f' },
     forro: { tipo: 'liso', cor: '#1b1c1f' },
+    // o cristal escurecido, translúcido pela mistura do adaptador (opacidade 0,5) para o interior aparecer; o brilho vem da aspereza baixa e da metalicidade
+    vidro: { tipo: 'liso', cor: '#1b2530', mistura: 'transparente', opacidade: 0.5, aspereza: 0.1, metalicidade: 0.35 },
+    piso: { tipo: 'liso', cor: '#2c2d31' },
+    divisoria: { tipo: 'liso', cor: '#5a5d66' },
+    banco: { tipo: 'liso', cor: '#3d4048' },
+    painelEscuro: { tipo: 'liso', cor: '#26272b' },
   },
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
   get TOPO() {
@@ -1948,7 +2135,7 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto, etapa 4: chapa de 5400 por 2000 por 2500 mm com frestas das cinco portas, mais saia, para-choques e alargamento dos arcos por fora (5560 por 2060), forro dos arcos e rodas roda-pneu 235/65 aro 16',
+    objeto: 'furgão médio de teto alto, etapa 5: chapa de 5400 por 2000 por 2500 com frestas, saia, para-choques e alargamento dos arcos (5560 por 2060), forro e rodas, mais cristais, borrachas de vão e interior simples',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
@@ -1998,6 +2185,36 @@ const receita = {
         forma: `forro escuro do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}, por dentro da chapa: aba em volta da boca (passa 8 mm), túnel a 25 mm do pneu e parede de dentro a 25 mm dele, fechando o oco`,
         tecnica: 'subdivisao da pele da seção varrida em arco em torno do eixo da roda, com vinco vivo nas duas dobras, engrossada 2 mm para dentro, plástico escuro',
       })),
+      ...CRISTAIS.map((nome) => ({
+        nome,
+        forma: `cristal escurecido e translúcido do vão ${nome === 'vidroParaBrisa' ? 'do para-brisa' : nome.includes('Cabine') ? `da porta da cabine ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}` : `da porta traseira ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}`}: a mesma superfície do vão, rente à lataria, com a volta recuada 7,5 mm da borda e 4 mm de espessura para dentro`,
+        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada pela superfície, material translúcido escuro',
+      })),
+      ...BORRACHAS.map((nome, k) => ({
+        nome,
+        forma: `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 3,5 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,
+        tecnica: 'friso de perfil desenhado sobre a volta do vão, nos nomes da gaiola, declarado com a aba na moldura do vão',
+      })),
+      {
+        nome: 'pisoInterior',
+        forma: 'piso de 20 mm de y 735,5 a 755,5, 1976 mm de largura de z -2655 a 1740 com cantos de raio 90, assentado no topo dos forros dos arcos e a 10 mm da chapa dos dois lados',
+        tecnica: 'extrusao de um retângulo de cantos redondos em y',
+      },
+      {
+        nome: 'divisoria',
+        forma: 'divisória de 30 mm em z 560, entre a cabine e a carga: a seção de dentro da chapa recuada 28 mm, de lado a lado e do piso ao teto, sem janela',
+        tecnica: 'extrusao em z da seção de dentro (lateral, ombro e teto) derivada do perfil da chapa',
+      },
+      ...BANCOS.map((nome) => ({
+        nome,
+        forma: `banco do ${nome === 'bancoMotorista' ? 'motorista, no lado esquerdo (+x)' : 'passageiro, no lado direito'} da cabine, volume em L de 540 mm de largura em x ${nome === 'bancoMotorista' ? '130 a 670' : '-670 a -130'}: assento até 1190 e encosto até 1790 de z 650 a 770, com 520 mm de profundidade, cantos chanfrados, no piso`,
+        tecnica: 'extrusao em x do perfil em L com os cantos chanfrados',
+      })),
+      {
+        nome: 'painel',
+        forma: 'painel da cabine sob o pé do para-brisa, de 1700 mm de largura e z 1470 a 1735, até 1400 de altura com a testa junto ao vidro, a face de baixo recuada e os cantos chanfrados, no piso',
+        tecnica: 'extrusao em x do perfil lateral com os cantos chanfrados',
+      },
       ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
         {
           nome: `pneu${sufixo}`,
@@ -2010,13 +2227,17 @@ const receita = {
       ]),
     ],
     criteriosDeReprovacao: [
-      'a silhueta lateral, frontal ou de cima se afasta da prancha cotada mais de 15 mm em média ou 40 mm em algum ponto, medida com os vãos do para-brisa tampados (o vidro entra na etapa 5)',
+      'a silhueta lateral, frontal ou de cima se afasta da prancha cotada mais de 15 mm em média ou 40 mm em algum ponto, medida com os cristais e as borrachas',
       'a frente não segue a prancha ajustada: boca do capô fora de 1100, pé do para-brisa fora de 1480, topo fora de 2110, ou a curva do teto sem os dois raios tangentes (1290 e 405) chegando ao teto plano em z 770',
       'o para-brisa não envolve as quinas: borda de cima ou de baixo reta na frontal, ou coluna de chapa diferente de cerca de 100 mm por lado, ou a ponta que não dobra pela quina',
       'um canto de vão de vidro aparece vivo na luz rasante, em degrau ou em aresta, em vez de arredondado',
       'uma fresta de porta não fecha a volta, muda de largura ao longo dela ou sai da linha da prancha',
       'falta uma das cinco portas, ou a de correr aparece também do lado esquerdo',
-      'um vão de vidro não fica aberto, ou a aba dele não cobre a borda inteira',
+      'a aba de um vão de vidro não cobre a borda inteira, ou a borracha não cobre a junta inteira do cristal (15 mm sobre a chapa, 10 sobre o cristal), tem degrau ou dente no canto, sobe mais de 4 mm da lataria ou não é escura',
+      'falta cristal no para-brisa, nas portas da cabine ou nas portas traseiras, ou há vidro no compartimento de carga nas laterais',
+      'algum vão deixa ver o oco do furgão: por um cristal aparece o vazio, e não o painel, os bancos, a divisória ou o piso',
+      'o cristal fica saliente ou afundado em relação à lataria além da borracha (mais de 1 mm na luz rasante), ou deixa fresta aberta entre a borda do vão e o cristal que a borracha não cubra',
+      'falta o piso, a divisória, um dos dois bancos ou o painel, ou algum deles atravessa a chapa, a aba de um vão, um forro, o pneu ou outro volume do interior, ou fica a menos de 10 mm da chapa sem ser o apoio declarado',
       'o vinco de cintura ou as nervuras do teto não aparecem na luz rasante, ou aparecem fortes como degrau',
       'a aba de um arco sobra solta da lateral ou não acompanha o arco inteiro',
       'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou o vão traseiro não acompanha a lateral 100 mm para dentro dela acima do vinco, ou um sulco do teto não cabe no teto de ±630',
