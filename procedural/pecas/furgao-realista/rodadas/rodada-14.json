@@ -1,0 +1,1292 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 14,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/.claude/worktrees/agent-a2d3908f366224404/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "espessura",
+        "onde": "centro do para-brisa",
+        "sentido": "maior",
+        "evidencia": "Vista frontal: coluna central larga com fio claro dividindo o vão em dois; a prancha tem vidro único."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da frente da porta da cabine junto ao arco dianteiro",
+        "sentido": "segmentado",
+        "evidencia": "Curvatura do lado, x 265-390 e y 340-560: borda sem dado, manchas azul e vermelha e serrilhado onde a fresta encontra o arco."
+      },
+      {
+        "parte": "molduraArcoDianteiroEsquerdo",
+        "tipo": "superficie",
+        "onde": "pontas da moldura",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica da parte: ponta de trás afina em bico e a da frente tem onda, em vez de pontas horizontais em altura fixa."
+      },
+      {
+        "parte": "parachoqueTraseiro",
+        "tipo": "ausencia",
+        "onde": "face de trás, centro",
+        "sentido": "faltando",
+        "evidencia": "Vista traseira e isométrica da parte: face lisa, sem o bolso de 400 por 130 que a prancha mostra na traseira."
+      }
+    ],
+    "observacao": "Silhueta e partes principais seguem a prancha. Faltam o lugar da placa traseira e o interior atrás dos vidros, e há uma coluna central no para-brisa que a prancha não tem."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCorrer",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o prazo fixo de 90 s para a bancada carregar o modelo (PRAZO_DE_CARGA_MS) estoura com 41 partes e 187 mil faces; vistas:critica falhou duas vezes, e usei a API com prazo de 900 s",
+    "a prancha nao tem camada de contorno de roda, entao a silhueta com todas as partes do PLANO mede o arco preenchido e a roda abaixo da soleira e nunca fecha",
+    "o retrato do acervo so compara com um arquivo de antes, e o furgao nao tinha um gravado para esta rodada",
+    "a dobra de 10 mm da moldura, da saia e do para-choque na boca atravessa a chapa e toca o forro, o que so o descrever apontou",
+    "quem conduz: a coluna central do para-brisa é a emenda das portas traseiras vista através do carro sem interior; leitura que a falta de interior provoca, e não defeito",
+    "quem conduz: o lugar da placa traseira existe na receita (bolso de 8 mm em y 380 a 510); a vista traseira sem rasante não o mostra",
+    "quem conduz: o serrilhado da fresta junto ao arco e as pontas da moldura vêm da etapa 3, aceita pela pessoa; as rodas e o forro, escopo desta etapa, conferem"
+  ],
+  "notaDePassagem": "Rodas pelo perfil 2.1.0 com diametro, largura e assento da prancha (710, 235, 406,4); chamada expandida em gerarPassos com ids deslocados e sufixo, como a helice do aviao; forro varrido em arco a 25 mm do pneu, acima da soleira.",
+  "receita": {
+    "sha256": "sha256:5e01421c48afb84f5fe3a87ccc1a86069c1cb0cd6e677c88407e691b5a71a3f6",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 93,
+      "acrescentadas": 191,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 9,
+          "texto": " * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. As quatro rodas provisórias da etapa 1 ficam. As rodas da"
+        },
+        {
+          "tipo": "-",
+          "linha": 10,
+          "texto": " * família, os vidros e borrachas, as luzes e o acabamento vêm nas etapas 4 a 7."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * com a aba dobrada para dentro conferida como moldura, cada canto cortado em diagonal para a subdivisão arredondá-lo. Os vidros e borrachas, as luzes e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * acabamento vêm nas etapas 5 a 7."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * Etapa 4, as rodas e o forro dos arcos: as quatro rodas saem da família `roda-pneu` (pneu 235/65 aro 16 com bojo e ombro, roda de chapa de aço com 5"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * parafusos), na bitola e nos eixos da prancha e apoiadas no chão, e cada arco ganha um forro escuro por dentro da chapa, a 25 mm do pneu, que fecha o oco"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * atrás da roda. A receita expande a chamada da família dentro de `gerarPassos`, soma uma base aos ids locais dela e põe o sufixo da roda nos nomes das"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * partes (pneu, aro, cubo, disco), como a hélice do avião faz com a pá; o forro é a mesma seção varrida em arco que a moldura."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "import { gaiolaVarrida } from '../../../nucleo/gaiola-varrida.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  // a roda da família `roda-pneu`: o perfil dela (pneu com bojo, ombro e quatro sulcos ao longo da volta, roda de chapa de aço com 5 parafusos e 5 furos de"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  // ventilação) e o assento do aro de 16 polegadas; o diâmetro e a largura do pneu são os da prancha (710 e 235), e não os 712 do perfil"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  roda_perfil: 'furgao-235-65-r16',"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  roda_assento: 406.4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  // o forro dos arcos: a folga até o pneu, quanto ele passa da boca do arco para encostar na chapa, e o raio onde a parede de dentro acaba"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  forro_folga: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  forro_sobra: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  forro_raio_fundo: 130,"
+        },
+        {
+          "tipo": "-",
+          "linha": 741,
+          "texto": "  const dzPortaMais = dzDe(raioPorta + T.fresta / 2); const dzPortaMenos = dzDe(raioPorta - T.fresta / 2);"
+        },
+        {
+          "tipo": "-",
+          "linha": 746,
+          "texto": "  const dicaX = (s) => () => [s, 0, 0];"
+        },
+        {
+          "tipo": "-",
+          "linha": 747,
+          "texto": "  const fixo = (z) => () => z;"
+        },
+        {
+          "tipo": "+",
+          "linha": 808,
+          "texto": "  /* A peça pronta de uma gaiola varrida: os campos do passo `subdivisao` e as posições em milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 809,
+          "texto": "  const daVarredura = (g) => ({ nome: g.nome, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, posicoes: g.posicoes });"
+        },
+        {
+          "tipo": "+",
+          "linha": 810,
+          "texto": "  const EIXO_X = [1, 0, 0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 811,
+          "texto": "  /* o marco de corte na distância r do eixo de um arco: a linha chega a ele subindo (atrás do arco, vindo do eixo) ou descendo (na frente dele) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 812,
+          "texto": "  const marcoDoArco = (zc, r, cruzando, nome) => ({ cilindro: { eixo: EIXO_X, por: [0, yc, zc], raio: r }, cruzando, ...(nome ? { nome } : {}) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 813,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 795,
+          "texto": "  const secaoSaia = adensar(comAlturas(T.secao_saia, [baixoPortas, cimaPortas]), T.plastico_passo_y).map(([u, y], k, a) => ({ ...tocaChapa({ u, y }), topo: k === a.length - 1 }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 815,
+          "texto": "  const secaoSaia = adensar(comAlturas(T.secao_saia, [baixoPortas, cimaPortas]), T.plastico_passo_y).map(([u, y]) => tocaChapa({ u, y }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 798,
+          "texto": "  const subdividir = (a, b, n) => Array.from({ length: n }, (_, k) => (y) => lerp(a(y), b(y), k / n));"
+        },
+        {
+          "tipo": "-",
+          "linha": 799,
+          "texto": "  const nPor = (a, b) => Math.max(1, Math.ceil(Math.abs(b(cimaPortas) - a(cimaPortas)) / T.saia_passo));"
+        },
+        {
+          "tipo": "-",
+          "linha": 800,
+          "texto": "  const faixaT = dsAlarg.map((d) => ({ z: (y) => zT + dzDe(T.arco_raio + d)(y), d }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 801,
+          "texto": "  const faixaD = dsAlarg.slice().reverse().map((d) => ({ z: (y) => zD - dzDe(T.arco_raio + d)(y), d }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 818,
+          "texto": "  /* as linhas da seção, com o nome das que os cortes e os recortes citam: a de baixo da base das portas, a de cima dela e a do topo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 819,
+          "texto": "  const linhasDaSaia = secaoSaia.map((l, j) => ({ u: l.u, v: l.y, ...(j === iBaixo ? { nome: 'baixoPorta' } : j === iCima ? { nome: 'cimaPorta' } : j === secaoSaia.length - 1 ? { nome: 'topo' } : {}) }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 820,
+          "texto": "  /* o alargamento de cada arco, em volta do eixo da roda: a saída u do perfil em cada distância d da boca, em reta entre as estações, e zero a partir de um"
+        },
+        {
+          "tipo": "+",
+          "linha": 821,
+          "texto": "     ponto entre a última estação e a fresta da porta; a borda de baixo é rolada e a de cima fica aberta */"
+        },
+        {
+          "tipo": "+",
+          "linha": 822,
+          "texto": "  const perfilAlarg = [...dsAlarg.map((d) => [d, saidaAlarg(d)]), [(dsAlarg.at(-1) + (larguraAlarg - T.fresta / 2)) / 2, 0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 823,
+          "texto": "  const alargamentos = [zT, zD].map((zc) => ({ campo: { cilindro: { eixo: EIXO_X, por: [0, yc, zc], raio: T.arco_raio } }, perfil: perfilAlarg, topoAberto: true, rolada: { abaixoDe: yRolo, razao: razaoRolo } }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 824,
+          "texto": "  const passoDaSaia = { passo: T.saia_passo, linha: 'cimaPorta' };"
+        },
+        {
+          "tipo": "-",
+          "linha": 803,
+          "texto": "    /* os cortes em z, de trás para a frente, com o tipo do trecho que começa em cada um: preso (leva a saia inteira) ou de porta (só a de baixo). A saia"
+        },
+        {
+          "tipo": "-",
+          "linha": 804,
+          "texto": "       começa na borda de fora do alargamento do arco traseiro e acaba na fresta da porta da cabine, e dali, em cada arco, as faixas do alargamento vão"
+        },
+        {
+          "tipo": "-",
+          "linha": 805,
+          "texto": "       até a boca, na mesma malha: não há trecho preso entre a fresta e o alargamento. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 806,
+          "texto": "    const cortes = s < 0"
+        },
+        {
+          "tipo": "-",
+          "linha": 807,
+          "texto": "      ? [[(y) => zT + dzJoin(y), 'preso'], [fixo(correrTras - meia), 'porta'], [fixo(correrFrente + meia), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso']]"
+        },
+        {
+          "tipo": "-",
+          "linha": 808,
+          "texto": "      : [[(y) => zT + dzJoin(y), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso']];"
+        },
+        {
+          "tipo": "-",
+          "linha": 809,
+          "texto": "    const estacoes = [...faixaT]; const tipos = faixaT.map(() => 'preso');"
+        },
+        {
+          "tipo": "-",
+          "linha": 810,
+          "texto": "    cortes.forEach(([a, tipo], k) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 811,
+          "texto": "      if (k + 1 >= cortes.length) { estacoes.push({ z: a, d: null }); tipos.push('preso'); return; }"
+        },
+        {
+          "tipo": "-",
+          "linha": 812,
+          "texto": "      const b = cortes[k + 1][0];"
+        },
+        {
+          "tipo": "-",
+          "linha": 813,
+          "texto": "      subdividir(a, b, nPor(a, b)).forEach((z) => { estacoes.push({ z, d: null }); tipos.push(tipo); });"
+        },
+        {
+          "tipo": "-",
+          "linha": 814,
+          "texto": "    });"
+        },
+        {
+          "tipo": "-",
+          "linha": 815,
+          "texto": "    estacoes.push(...faixaD); faixaD.slice(0, -1).forEach(() => tipos.push('preso'));"
+        },
+        {
+          "tipo": "-",
+          "linha": 816,
+          "texto": "    const presa = construirGrade({"
+        },
+        {
+          "tipo": "-",
+          "linha": 817,
+          "texto": "      nome: `saiaPresa${lado}`, estacoes, linhas: secaoSaia, dica: dicaX(s),"
+        },
+        {
+          "tipo": "-",
+          "linha": 818,
+          "texto": "      posicao: (e, l) => [s * (1000 + (e.d === null ? l.u : uContinua(e.d, l.y, l.u, l.topo))), l.y, e.z(l.y)],"
+        },
+        {
+          "tipo": "-",
+          "linha": 819,
+          "texto": "      manter: (i, j) => j < iBaixo || tipos[i] === 'preso',"
+        },
+        {
+          "tipo": "+",
+          "linha": 826,
+          "texto": "    const trilhoDe = (de, ate) => [{ reta: { de: [s * 1000, 0, de], ate: [s * 1000, 0, ate] } }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 827,
+          "texto": "    const quadro = s > 0 ? { u: [s, 0, 0] } : { u: [s, 0, 0], virar: true };"
+        },
+        {
+          "tipo": "+",
+          "linha": 828,
+          "texto": "    const emZ = (z, nome) => ({ em: z - zT, nome });"
+        },
+        {
+          "tipo": "+",
+          "linha": 829,
+          "texto": "    /* os cortes em z, de trás para a frente: a saia começa na borda de fora do alargamento do arco traseiro e acaba na fresta da porta da cabine, e dali, em cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 830,
+          "texto": "       arco, as estações do alargamento vão até a boca, na mesma malha: não há trecho preso entre a fresta e o alargamento. As portas levam só a saia de baixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 831,
+          "texto": "    const frestaD = marcoDoArco(zD, raioPorta - T.fresta / 2, 'descendo', 'frestaDaPorta');"
+        },
+        {
+          "tipo": "+",
+          "linha": 832,
+          "texto": "    const meio = s < 0"
+        },
+        {
+          "tipo": "+",
+          "linha": 833,
+          "texto": "      ? [emZ(correrTras - meia, 'trasDaCorrer'), passoDaSaia, emZ(correrFrente + meia, 'frenteDaCorrer'), passoDaSaia, emZ(portaTras - meia, 'trasDaCabine'), passoDaSaia]"
+        },
+        {
+          "tipo": "+",
+          "linha": 834,
+          "texto": "      : [emZ(portaTras - meia, 'trasDaCabine'), passoDaSaia];"
+        },
+        {
+          "tipo": "+",
+          "linha": 835,
+          "texto": "    const presa = gaiolaVarrida({"
+        },
+        {
+          "tipo": "+",
+          "linha": 836,
+          "texto": "      nome: `saiaPresa${lado}`, trilho: trilhoDe(zT, zD), quadro, secao: linhasDaSaia, fora: [s, 0, 0], alargamento: alargamentos,"
+        },
+        {
+          "tipo": "+",
+          "linha": 837,
+          "texto": "      estacoes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 838,
+          "texto": "        ...dsAlarg.map((d) => marcoDoArco(zT, T.arco_raio + d, 'subindo')), marcoDoArco(zT, rJoin, 'subindo'), passoDaSaia,"
+        },
+        {
+          "tipo": "+",
+          "linha": 839,
+          "texto": "        ...meio, frestaD,"
+        },
+        {
+          "tipo": "+",
+          "linha": 840,
+          "texto": "        ...dsAlarg.slice().reverse().map((d) => marcoDoArco(zD, T.arco_raio + d, 'descendo')),"
+        },
+        {
+          "tipo": "+",
+          "linha": 841,
+          "texto": "      ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 842,
+          "texto": "      remover: [...(s < 0 ? [{ estacoes: ['trasDaCorrer', 'frenteDaCorrer'], linhas: ['baixoPorta', 'topo'] }] : []), { estacoes: ['trasDaCabine', 'frestaDaPorta'], linhas: ['baixoPorta', 'topo'] }],"
+        },
+        {
+          "tipo": "-",
+          "linha": 821,
+          "texto": "    partes.push(fecharPeca(`saiaPresa${lado}`, [presa]));"
+        },
+        {
+          "tipo": "-",
+          "linha": 822,
+          "texto": "    /* o trecho de cada porta, de 380 a 463 */"
+        },
+        {
+          "tipo": "-",
+          "linha": 823,
+          "texto": "    const portas = (s < 0 ? [['PortaCorrer', fixo(correrTras + meia), fixo(correrFrente - meia)]] : [])"
+        },
+        {
+          "tipo": "-",
+          "linha": 824,
+          "texto": "      .concat([[`PortaCabine${lado}`, fixo(portaTras + meia), (y) => zD - dzPortaMais(y)]]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 825,
+          "texto": "    for (const [rotulo, a, b] of portas) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 826,
+          "texto": "      const ests = [...subdividir(a, b, nPor(a, b)), b];"
+        },
+        {
+          "tipo": "-",
+          "linha": 827,
+          "texto": "      const g = construirGrade({ nome: `saia${rotulo}`, estacoes: ests, linhas: secaoSaia.slice(iCima), posicao: (z, l) => [s * (1000 + l.u), l.y, z(l.y)], dica: dicaX(s) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 828,
+          "texto": "      partes.push(fecharPeca(`saia${rotulo}`, [g]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 844,
+          "texto": "    partes.push(daVarredura(presa));"
+        },
+        {
+          "tipo": "+",
+          "linha": 845,
+          "texto": "    /* o trecho de cada porta, de 383 a 463: a porta da cabine acaba na fresta, na borda do alargamento */"
+        },
+        {
+          "tipo": "+",
+          "linha": 846,
+          "texto": "    const linhasDaPorta = linhasDaSaia.slice(iCima);"
+        },
+        {
+          "tipo": "+",
+          "linha": 847,
+          "texto": "    const portas = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 848,
+          "texto": "      ...(s < 0 ? [{ rotulo: 'PortaCorrer', de: correrTras + meia, ate: correrFrente - meia, fim: { fracao: 1 } }] : []),"
+        },
+        {
+          "tipo": "+",
+          "linha": 849,
+          "texto": "      { rotulo: `PortaCabine${lado}`, de: portaTras + meia, ate: zD, fim: marcoDoArco(zD, raioPorta + T.fresta / 2, 'descendo') },"
+        },
+        {
+          "tipo": "+",
+          "linha": 850,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 851,
+          "texto": "    for (const { rotulo, de, ate, fim } of portas) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 852,
+          "texto": "      const g = gaiolaVarrida({ nome: `saia${rotulo}`, trilho: trilhoDe(de, ate), quadro, secao: linhasDaPorta, fora: [s, 0, 0], estacoes: [{ fracao: 0 }, passoDaSaia, fim] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 853,
+          "texto": "      partes.push(daVarredura(g));"
+        },
+        {
+          "tipo": "-",
+          "linha": 835,
+          "texto": "  const linhasMoldura = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 860,
+          "texto": "  const secaoMoldura = ["
+        },
+        {
+          "tipo": "-",
+          "linha": 841,
+          "texto": "  ].map(tocaChapa);"
+        },
+        {
+          "tipo": "-",
+          "linha": 842,
+          "texto": "  /* o ângulo em que a linha da seção cruza a altura y, à frente (lado +1) ou atrás (lado -1) do alto do arco */"
+        },
+        {
+          "tipo": "-",
+          "linha": 843,
+          "texto": "  const anguloNaAltura = (l, y, lado) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 844,
+          "texto": "    let [lo, hi] = lado > 0 ? [-Math.PI / 6, Math.PI / 2] : [Math.PI / 2, (7 * Math.PI) / 6];"
+        },
+        {
+          "tipo": "-",
+          "linha": 845,
+          "texto": "    for (let k = 0; k < 60; k += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 846,
+          "texto": "      const m = (lo + hi) / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 847,
+          "texto": "      const sobe = yc + (T.arco_raio + l.d) * Math.sin(m) < y;"
+        },
+        {
+          "tipo": "-",
+          "linha": 848,
+          "texto": "      if ((lado > 0) === sobe) lo = m; else hi = m;"
+        },
+        {
+          "tipo": "-",
+          "linha": 849,
+          "texto": "    }"
+        },
+        {
+          "tipo": "-",
+          "linha": 850,
+          "texto": "    return (lo + hi) / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 851,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 852,
+          "texto": "  const passoRad = (T.moldura_passo_graus * Math.PI) / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 866,
+          "texto": "  ].map(tocaChapa).map((l, j) => ({ u: l.u, v: l.d, ...(j === 1 ? { nome: 'boca' } : {}) }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 869,
+          "texto": "  const passoDaMoldura = { passo: T.arco_raio * ((T.moldura_passo_graus * Math.PI) / 180), linha: 'boca' };"
+        },
+        {
+          "tipo": "-",
+          "linha": 857,
+          "texto": "      const sufixo = `Arco${rotulo}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;"
+        },
+        {
+          "tipo": "-",
+          "linha": 858,
+          "texto": "      /* a moldura da cor da lataria, de uma ponta à outra: cada linha vai do ângulo em que cruza a altura da ponta da frente ao da de trás */"
+        },
+        {
+          "tipo": "-",
+          "linha": 859,
+          "texto": "      const nomeM = `moldura${sufixo}`;"
+        },
+        {
+          "tipo": "-",
+          "linha": 860,
+          "texto": "      const linhasM = linhasMoldura.map((l) => ({ ...l, aF: anguloNaAltura(l, pontas[zc].frente, 1), aB: anguloNaAltura(l, pontas[zc].tras, -1) }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 861,
+          "texto": "      const nM = Math.ceil((linhasM[0].aB - linhasM[0].aF) / passoRad);"
+        },
+        {
+          "tipo": "-",
+          "linha": 862,
+          "texto": "      const gM = construirGrade({"
+        },
+        {
+          "tipo": "-",
+          "linha": 863,
+          "texto": "        nome: nomeM, estacoes: Array.from({ length: nM + 1 }, (_, k) => k / nM), linhas: linhasM, dica: dicaX(s),"
+        },
+        {
+          "tipo": "-",
+          "linha": 864,
+          "texto": "        posicao: (t, l) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 865,
+          "texto": "          const a = lerp(l.aF, l.aB, t); const rr = T.arco_raio + l.d;"
+        },
+        {
+          "tipo": "-",
+          "linha": 866,
+          "texto": "          return [s * (1000 + l.u), yc + rr * Math.sin(a), zc + rr * Math.cos(a)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 867,
+          "texto": "        },"
+        },
+        {
+          "tipo": "+",
+          "linha": 872,
+          "texto": "      const nome = `moldura${rotulo === 'Dianteiro' ? 'ArcoDianteiro' : 'ArcoTraseiro'}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;"
+        },
+        {
+          "tipo": "+",
+          "linha": 873,
+          "texto": "      const g = gaiolaVarrida({"
+        },
+        {
+          "tipo": "+",
+          "linha": 874,
+          "texto": "        nome, trilho: [{ arco: { centro: [s * 1000, yc, zc], eixo: EIXO_X, de: [s * 1000, yc, zc + T.arco_raio], graus: -200 } }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 875,
+          "texto": "        quadro: s > 0 ? { u: [s, 0, 0], virar: true } : { u: [s, 0, 0] }, secao: secaoMoldura, fora: [s, 0, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 876,
+          "texto": "        estacoes: [{ plano: { eixo: 'y', valor: pontas[zc].frente }, cruzando: 'subindo' }, passoDaMoldura, { plano: { eixo: 'y', valor: pontas[zc].tras }, cruzando: 'descendo' }],"
+        },
+        {
+          "tipo": "-",
+          "linha": 869,
+          "texto": "      partes.push(fecharPeca(nomeM, [gM]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 878,
+          "texto": "      partes.push(daVarredura(g));"
+        },
+        {
+          "tipo": "+",
+          "linha": 882,
+          "texto": "  /* ---- o forro dos arcos: por dentro da chapa, fecha o oco atrás de cada roda ----"
+        },
+        {
+          "tipo": "+",
+          "linha": 883,
+          "texto": "     Um balde aberto para fora, em torno do eixo da roda, só na metade de cima: uma aba assentada na face de dentro da chapa em volta da boca (passa 8 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 884,
+          "texto": "     dela para encostar), o túnel a `forro_folga` do pneu e a parede de dentro, a essa mesma folga da face de dentro do pneu. O trilho é o círculo do túnel,"
+        },
+        {
+          "tipo": "+",
+          "linha": 885,
+          "texto": "     e a seção sai radial (v) e pela largura (u, para dentro). As pontas acabam onde a borda da aba cruza a soleira. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 886,
+          "texto": "  const rForro = T.pneu_diametro / 2 + T.forro_folga;"
+        },
+        {
+          "tipo": "+",
+          "linha": 887,
+          "texto": "  const rBordaForro = T.arco_raio + T.forro_sobra;"
+        },
+        {
+          "tipo": "+",
+          "linha": 888,
+          "texto": "  const angForro = Math.asin((yc - T.soleira_y) / rBordaForro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 889,
+          "texto": "  const fundoForro = f.xMax - (T.bitola / 2 - T.pneu_largura / 2) + T.forro_folga;"
+        },
+        {
+          "tipo": "+",
+          "linha": 890,
+          "texto": "  const tuneis = Math.ceil((fundoForro - pen) / 70);"
+        },
+        {
+          "tipo": "+",
+          "linha": 891,
+          "texto": "  const secaoForro = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 892,
+          "texto": "    { u: -pen, v: rBordaForro - rForro, nome: 'borda' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 893,
+          "texto": "    { u: -pen, v: 0, nome: 'canto' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 894,
+          "texto": "    ...Array.from({ length: tuneis - 1 }, (_, i) => ({ u: -pen - ((i + 1) * (fundoForro - pen)) / tuneis, v: 0 })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 895,
+          "texto": "    { u: -fundoForro, v: 0, nome: 'canto2' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 896,
+          "texto": "    { u: -fundoForro, v: -(rForro - T.forro_raio_fundo) / 2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 897,
+          "texto": "    { u: -fundoForro, v: T.forro_raio_fundo - rForro },"
+        },
+        {
+          "tipo": "+",
+          "linha": 898,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 899,
+          "texto": "  for (const [zc, rotulo] of [[zD, 'Dianteiro'], [zT, 'Traseiro']]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 900,
+          "texto": "    for (const [lado, s] of lados) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 901,
+          "texto": "      const nome = `forroArco${rotulo}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;"
+        },
+        {
+          "tipo": "+",
+          "linha": 902,
+          "texto": "      const g = gaiolaVarrida({"
+        },
+        {
+          "tipo": "+",
+          "linha": 903,
+          "texto": "        nome,"
+        },
+        {
+          "tipo": "+",
+          "linha": 904,
+          "texto": "        trilho: [{ arco: { centro: [s * f.xMax, yc, zc], eixo: EIXO_X, de: [s * f.xMax, yc - rForro * Math.sin(angForro), zc + rForro * Math.cos(angForro)], graus: -(180 + 2 * (angForro / grau)) } }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 905,
+          "texto": "        quadro: s > 0 ? { u: [s, 0, 0], virar: true } : { u: [s, 0, 0] }, secao: secaoForro, fora: [s, 0, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 906,
+          "texto": "        vincos: [{ linha: 'canto', nitidez: 'viva' }, { linha: 'canto2', nitidez: 'viva' }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 907,
+          "texto": "        estacoes: [{ fracao: 0 }, { passo: rForro * ((T.moldura_passo_graus * Math.PI) / 180), linha: 'canto' }, { fracao: 1 }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 908,
+          "texto": "      });"
+        },
+        {
+          "tipo": "+",
+          "linha": 909,
+          "texto": "      partes.push(daVarredura(g));"
+        },
+        {
+          "tipo": "+",
+          "linha": 910,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 911,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 912,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 943,
+          "texto": " * derivar(T) -> a gaiola da chapa e as rodas provisórias, em milímetro e em metro."
+        },
+        {
+          "tipo": "+",
+          "linha": 983,
+          "texto": " * derivar(T) -> a gaiola da chapa, o plástico, o forro e as chamadas das rodas, em milímetro e em metro."
+        },
+        {
+          "tipo": "-",
+          "linha": 949,
+          "texto": " *   rodas: as quatro rodas provisórias, com o perfil do cilindro e a posição."
+        },
+        {
+          "tipo": "+",
+          "linha": 989,
+          "texto": " *   rodas: as quatro rodas, com o sufixo, o centro e a chamada da família roda-pneu."
+        },
+        {
+          "tipo": "-",
+          "linha": 1694,
+          "texto": "  /* as rodas provisórias: cilindros no pneu da prancha, na bitola e no entre-eixos, apoiados no chão */"
+        },
+        {
+          "tipo": "-",
+          "linha": 1695,
+          "texto": "  const xDentro = T.bitola / 2 - T.pneu_largura / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 1696,
+          "texto": "  const xFora = T.bitola / 2 + T.pneu_largura / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1734,
+          "texto": "  /* as quatro rodas da família `roda-pneu`, no pneu da prancha, na bitola e no entre-eixos, apoiadas no chão: a chamada da família e o centro de cada uma */"
+        },
+        {
+          "tipo": "-",
+          "linha": 1698,
+          "texto": "  for (const [eixo, zc] of [['Dianteira', f.zD], ['Traseira', f.zT]]) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1699,
+          "texto": "    for (const [ladoNome, s] of [['Esquerda', 1], ['Direita', -1]]) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1700,
+          "texto": "      rodas.push({ nome: `rodaProvisoria${eixo}${ladoNome}`, s, zc, xDentro, xFora, raio: f.rPneu });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1736,
+          "texto": "  for (const [eixo, zc] of [['Dianteiro', f.zD], ['Traseiro', f.zT]]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1737,
+          "texto": "    for (const [ladoNome, s] of [['Esquerdo', 1], ['Direito', -1]]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1738,
+          "texto": "      rodas.push({ sufixo: `${eixo}${ladoNome}`, s, centro: [s * T.bitola / 2, f.rPneu, zc], chamada: chamadaDaRoda(T, `roda-${eixo.toLowerCase()}-${ladoNome.toLowerCase()}`) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1751,
+          "texto": "/* ---------- a roda da família ---------- */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1752,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 1753,
+          "texto": "let registroDeFamilias = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1754,
+          "texto": "const familias = () => { registroDeFamilias ??= criarRegistroDeFamilias(); return registroDeFamilias; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 1755,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 1756,
+          "texto": "/** A chamada da família `roda-pneu` pelo perfil da tabela. O perfil dá a roda de chapa, os sulcos da banda e os furos de ventilação; o que a prancha fixa"
+        },
+        {
+          "tipo": "+",
+          "linha": 1757,
+          "texto": " *  vale mais que ele: o diâmetro e a largura do pneu (710 e 235) e o assento do aro, que as medidas da família pedem como proporção do diâmetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1758,
+          "texto": "function chamadaDaRoda(T, id) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1759,
+          "texto": "  const D = T.pneu_diametro;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1760,
+          "texto": "  return chamar(familias().obter('roda-pneu'), id, { perfil: T.roda_perfil, diametroPneu: D, larguraPneu: T.pneu_largura / D, diametroAro: T.roda_assento / D });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1761,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 1762,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 1763,
+          "texto": "/* Os ids da família são locais (de 1 a 11) e os nomes das partes são os dela (pneu, aro, cubo, disco): cada roda soma `base` aos ids e põe o sufixo da roda nos"
+        },
+        {
+          "tipo": "+",
+          "linha": 1764,
+          "texto": "   nomes, para as quatro não colidirem entre si nem com os passos desta receita. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1765,
+          "texto": "const comBase = (v, base) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1766,
+          "texto": "  if (Array.isArray(v)) return v.map((x) => comBase(x, base));"
+        },
+        {
+          "tipo": "+",
+          "linha": 1767,
+          "texto": "  if (v && typeof v === 'object') {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1768,
+          "texto": "    return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === 'origemId' || (k === 'id' && typeof v.op === 'string') ? x + base : comBase(x, base)]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 1769,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 1770,
+          "texto": "  return v;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1771,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 1772,
+          "texto": "const PARTES_DA_RODA = ['pneu', 'aro', 'cubo', 'disco'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 1773,
+          "texto": "const BASE_DAS_RODAS = 200;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1774,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 1718,
+          "texto": "/** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros, as abas dos arcos e as quatro rodas provisórias. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1780,
+          "texto": "/** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros,  as abas dos arcos, as quatro rodas da família e o forro dos arcos (que vem com o plástico). */"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az290.png",
+      "peca-frente-rasante-az20.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
