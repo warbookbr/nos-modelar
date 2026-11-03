@@ -1045,79 +1045,6 @@
       ]
     },
     {
-      "imagem": "c02",
-      "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
-      "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
-      "julgamentos": [
-        {
-          "nota": 7,
-          "defeitos": [
-            {
-              "parte": "pneu",
-              "tipo": "espessura",
-              "onde": "borda da banda, lado externo (extremidade da largura)",
-              "sentido": "maior",
-              "evidencia": "Frontal e superior: tira de cerca de 8 px com canto chanfrado em cada extremidade da largura (x 477 a 485 e x 615 a 623). O friso aparece dos dois lados, e a pergunta 14 pede só do lado de dentro. Isométrica: anel no contorno da face próxima."
-            },
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "seção da banda, bojo e ombro",
-              "sentido": "anguloso",
-              "evidencia": "Frontal e superior: a seção é um retângulo com lados retos, sem bojo nem ombro chanfrado. É defeito só se o parâmetro pedir pneumático, o que as imagens não dizem."
-            }
-          ],
-          "briefSha256": "sha256:41cea7cfc8090e42c47e17bc71b67dd820d2bb9d50ce756942f1db7552a40f47",
-          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
-          "data": "2026-10-30T13:41:11.140Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [],
-          "briefSha256": "sha256:41cea7cfc8090e42c47e17bc71b67dd820d2bb9d50ce756942f1db7552a40f47",
-          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
-          "data": "2026-10-30T13:41:11.871Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [],
-          "briefSha256": "sha256:41cea7cfc8090e42c47e17bc71b67dd820d2bb9d50ce756942f1db7552a40f47",
-          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
-          "data": "2026-10-30T13:41:12.518Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "banda, em volta da circunferência",
-              "sentido": "facetado",
-              "evidencia": "frontal e superior: o sombreamento da banda tem faixas em degraus, de cerca de 10 a 20 px; a silhueta na lateral é lisa"
-            }
-          ],
-          "briefSha256": "sha256:41cea7cfc8090e42c47e17bc71b67dd820d2bb9d50ce756942f1db7552a40f47",
-          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
-          "data": "2026-10-30T13:41:13.189Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "ombro, nas duas bordas laterais",
-              "sentido": "anguloso",
-              "evidencia": "frontal e superior: a banda de 130 px tem de cada lado um degrau de 8 px de largura e raio um pouco menor, com chanfro reto nos cantos (≈ 477–485 e 615–623 em x); na isométrica há linha dupla no aro da face. Parece degrau e não ombro contínuo. O friso aparece dos dois lados."
-            }
-          ],
-          "briefSha256": "sha256:41cea7cfc8090e42c47e17bc71b67dd820d2bb9d50ce756942f1db7552a40f47",
-          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
-          "data": "2026-10-30T13:41:13.847Z"
-        }
-      ]
-    },
-    {
       "imagem": "c03",
       "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
       "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
@@ -1853,135 +1780,6 @@
       ]
     },
     {
-      "imagem": "c08",
-      "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
-      "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
-      "julgamentos": [
-        {
-          "nota": 3,
-          "defeitos": [
-            {
-              "parte": "cubo",
-              "tipo": "ausencia",
-              "onde": "centro da face, furo central",
-              "sentido": "faltando",
-              "evidencia": "Na lateral e na isométrica a face é lisa e contínua, sem furo e sem cubo. Só há uma linha de círculo tênue na isométrica."
-            },
-            {
-              "parte": "estruturaCuboAro",
-              "tipo": "ausencia",
-              "onde": "entre o centro e a parede interna do aro",
-              "sentido": "faltando",
-              "evidencia": "Não há raios nem chapa recortada em nenhuma das quatro vistas. A face toda é um disco fechado."
-            },
-            {
-              "parte": "furosDeFixacao",
-              "tipo": "ausencia",
-              "onde": "círculo de fixação ao redor do centro, na face da lateral",
-              "sentido": "faltando",
-              "evidencia": "Na lateral não aparece nenhum furo no círculo ao redor do centro."
-            },
-            {
-              "parte": "aro",
-              "tipo": "ausencia",
-              "onde": "interior do pneu, visto de lado e de frente",
-              "sentido": "faltando",
-              "evidencia": "O perfil é um retângulo único e a lateral é um disco único. Aro e pneu não se distinguem como partes."
-            },
-            {
-              "parte": "discoDaBorda",
-              "tipo": "posicao",
-              "onde": "ponta esquerda do perfil (x ≈ 500 a 514), só de um lado",
-              "sentido": "externa",
-              "evidencia": "Um disco fino de diâmetro maior que o corpo aparece só em uma ponta do perfil, sem par na outra, e a vista não explica o que ele é."
-            }
-          ],
-          "briefSha256": "sha256:ca7fdf59436b1c67cc952dfde3780f4b5713b569a75946e6686a8f501a078769",
-          "imagemSha256": "sha256:6c5aa290523a6c2ed4c6f9b6de546ad41e1db78a3cdeac9d645d44403b86d9e2",
-          "data": "2026-10-30T13:41:31.144Z"
-        },
-        {
-          "nota": 3,
-          "defeitos": [
-            {
-              "parte": "cubo",
-              "tipo": "ausencia",
-              "onde": "centro da face, vista isométrica e lateral",
-              "sentido": "faltando",
-              "evidencia": "A face é um disco liso e contínuo, sem furo central aberto de ponta a ponta (isométrica e lateral, centro)."
-            },
-            {
-              "parte": "furosDeFixacao",
-              "tipo": "ausencia",
-              "onde": "círculo de furos ao redor do cubo",
-              "sentido": "faltando",
-              "evidencia": "Nenhum furo na face, em nenhuma vista que olha o eixo."
-            },
-            {
-              "parte": "chapaOuRaios",
-              "tipo": "ausencia",
-              "onde": "entre cubo e parede interna do aro",
-              "sentido": "faltando",
-              "evidencia": "O interior é fechado por uma face plana. Não se vê chapa vazada nem raios. Só há um círculo tênue a cerca de 85% do raio (isométrica)."
-            },
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "perfil lateral, banda inteira",
-              "sentido": "anguloso",
-              "evidencia": "O perfil é um retângulo de lados retos, com um chanfrado mínimo só nos cantos da ponta direita (frontal e superior). Não há bojo nem ombro de pneumático."
-            },
-            {
-              "parte": "friso",
-              "tipo": "espessura",
-              "onde": "aba da ponta esquerda do perfil",
-              "sentido": "maior",
-              "evidencia": "A aba tem diâmetro maior que a banda, uns 5 mm de cada lado, e vira anel duplo na vista axial. Ela passa do diâmetro externo do pneu em vez de ficar dentro dele (frontal e superior, extremidade esquerda)."
-            }
-          ],
-          "briefSha256": "sha256:ca7fdf59436b1c67cc952dfde3780f4b5713b569a75946e6686a8f501a078769",
-          "imagemSha256": "sha256:6c5aa290523a6c2ed4c6f9b6de546ad41e1db78a3cdeac9d645d44403b86d9e2",
-          "data": "2026-10-30T13:41:31.838Z"
-        },
-        {
-          "nota": 3,
-          "defeitos": [
-            {
-              "parte": "cubo",
-              "tipo": "ausencia",
-              "onde": "centro da face (vista lateral.png, centro do disco)",
-              "sentido": "faltando",
-              "evidencia": "A face circular é uma chapa lisa e fechada. Não há furo central nem cubo identificável; a isométrica também não mostra abertura."
-            },
-            {
-              "parte": "furosDeFixacao",
-              "tipo": "ausencia",
-              "onde": "círculo de furos na face (lateral.png e isometrica.png)",
-              "sentido": "faltando",
-              "evidencia": "Nenhum furo na face em nenhuma vista, nem no topo nem em volta."
-            },
-            {
-              "parte": "chapaOuRaios",
-              "tipo": "ausencia",
-              "onde": "interior do aro, entre cubo e barril (lateral.png)",
-              "sentido": "faltando",
-              "evidencia": "O interior do aro está todo preenchido por uma face opaca. Não há chapa com aberturas nem raios, e o conjunto lê como tambor fechado."
-            },
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "banda do pneu (frontal.png e lateral.png, lados do retângulo)",
-              "sentido": "anguloso",
-              "evidencia": "O perfil é um retângulo de lados retos com chanfro mínimo. Se o pneu prometido era pneumático, falta o bojo e o ombro chanfrado."
-            }
-          ],
-          "briefSha256": "sha256:ca7fdf59436b1c67cc952dfde3780f4b5713b569a75946e6686a8f501a078769",
-          "imagemSha256": "sha256:6c5aa290523a6c2ed4c6f9b6de546ad41e1db78a3cdeac9d645d44403b86d9e2",
-          "data": "2026-10-30T13:41:32.607Z"
-        }
-      ]
-    },
-    {
       "imagem": "c09",
       "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
       "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
@@ -2058,93 +1856,6 @@
           "briefSha256": "sha256:062b85fcada25dfa2eafc4394dde85cd90ae3639db1c2204323fd08398779b64",
           "imagemSha256": "sha256:efc1709fa9c8a7e83926e74de4c640e0db234fcf33478d6f89cc0a994f04abdc",
           "data": "2026-10-30T13:41:35.014Z"
-        }
-      ]
-    },
-    {
-      "imagem": "c10",
-      "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
-      "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
-      "julgamentos": [
-        {
-          "nota": 5,
-          "defeitos": [
-            {
-              "parte": "raios",
-              "tipo": "uniao",
-              "onde": "extremidade externa dos doze raios, junto à parede interna do aro",
-              "sentido": "afastado",
-              "evidencia": "lateral: os raios terminam a cerca de 107 px do centro e a abertura do aro tem raio de cerca de 140 px, o que deixa folga de uns 33 px em todos os raios. Isométrica: as pontas ficam suspensas sem tocar a parede bege."
-            },
-            {
-              "parte": "raios",
-              "tipo": "espessura",
-              "onde": "seção dos doze raios, em toda a extensão",
-              "sentido": "menor",
-              "evidencia": "lateral e isométrica: traço de cerca de 3 px (uns 4 mm pela barra de 100 mm), fino demais para ligar o cubo ao aro numa roda de cerca de 635 mm."
-            },
-            {
-              "parte": "raios",
-              "tipo": "uniao",
-              "onde": "alto à esquerda e embaixo à esquerda da abertura do aro, na isométrica",
-              "sentido": "atravessando",
-              "evidencia": "isométrica: duas lascas brancas em forma de lente, com contorno preto, perto de (610, 530) e de (510, 710), sem explicação pela forma."
-            }
-          ],
-          "briefSha256": "sha256:6c2a61350e66ff0beb2450947d5cbbbc478a8a1bfe56aaa9ed068a584a3bef82",
-          "imagemSha256": "sha256:a03d81d80b38d1aea1065340a3fd01f3c9753785504191a945d2b21185772f08",
-          "data": "2026-10-30T13:41:35.800Z"
-        },
-        {
-          "nota": 5,
-          "defeitos": [
-            {
-              "parte": "raios",
-              "tipo": "comprimento",
-              "onde": "extremidade externa dos doze raios",
-              "sentido": "menor",
-              "evidencia": "Vista lateral: os raios terminam a cerca de 106 px do centro e a abertura do aro tem cerca de 140 px de raio, deixando folga de cerca de 34 px (48 mm). Isométrica: as pontas à direita ficam no ar, antes do barril bege."
-            },
-            {
-              "parte": "raios",
-              "tipo": "uniao",
-              "onde": "encontro entre a ponta externa dos raios e a parede interna do barril",
-              "sentido": "afastado",
-              "evidencia": "Vista lateral: entre o fim de cada raio e o contorno branco da abertura há espaço vazio nos doze raios. O cubo e os raios não ficam presos ao aro nem ao pneu."
-            }
-          ],
-          "briefSha256": "sha256:6c2a61350e66ff0beb2450947d5cbbbc478a8a1bfe56aaa9ed068a584a3bef82",
-          "imagemSha256": "sha256:a03d81d80b38d1aea1065340a3fd01f3c9753785504191a945d2b21185772f08",
-          "data": "2026-10-30T13:41:36.607Z"
-        },
-        {
-          "nota": 5,
-          "defeitos": [
-            {
-              "parte": "raios",
-              "tipo": "uniao",
-              "onde": "extremidade externa dos 12 raios, junto à parede interna do aro",
-              "sentido": "afastado",
-              "evidencia": "lateral: pontas externas a ≈107 px do centro e abertura do aro com raio ≈140 px, deixando ≈47 mm de vazio; na isométrica os raios terminam no ar sobre o fundo do barril"
-            },
-            {
-              "parte": "raios",
-              "tipo": "comprimento",
-              "onde": "extremidade externa dos 12 raios",
-              "sentido": "menor",
-              "evidencia": "lateral: raios de ≈50 px visíveis, do cubo até r≈107 px, sem chegar ao aro em r≈140 px"
-            },
-            {
-              "parte": "pneu",
-              "tipo": "superficie",
-              "onde": "flancos laterais, vista frontal",
-              "sentido": "anguloso",
-              "evidencia": "frontal: silhueta retangular com lados retos e só chanfro mínimo nos cantos, sem bojo; só é defeito se o parâmetro pedir pneumático, e as vistas não dizem qual é"
-            }
-          ],
-          "briefSha256": "sha256:6c2a61350e66ff0beb2450947d5cbbbc478a8a1bfe56aaa9ed068a584a3bef82",
-          "imagemSha256": "sha256:a03d81d80b38d1aea1065340a3fd01f3c9753785504191a945d2b21185772f08",
-          "data": "2026-10-30T13:41:37.365Z"
         }
       ]
     },
@@ -2333,6 +2044,332 @@
           "briefSha256": "sha256:2eefbd3990f4b7aa58c0efee2af1d9c65abd483a22427fa247869c593db71e6b",
           "imagemSha256": "sha256:80c502fecca79721e90958780085ca49ae7f7de9cfdc11200f634b4d4542f1e8",
           "data": "2026-10-30T13:41:41.968Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c02",
+      "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
+      "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
+      "julgamentos": [
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "banda externa, vistas frontal e superior",
+              "sentido": "facetado",
+              "evidencia": "O gradiente da banda aparece em degraus horizontais visíveis, como revolução com poucos lados, na frontal e na superior."
+            }
+          ],
+          "briefSha256": "sha256:c580cfceeeaf2341513b2f993c7344623ea03c960042e43c981b33766fed6f70",
+          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
+          "data": "2026-11-03T15:15:47.888Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "banda externa",
+              "sentido": "segmentado",
+              "evidencia": "Nas vistas frontal e superior a banda mostra faixas horizontais de sombreamento em degraus, como corpo em faces e não superfície contínua."
+            },
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "flanco inferior direito",
+              "sentido": "segmentado",
+              "evidencia": "Na lateral e na isométrica há uma mancha clara em arco no flanco que não corresponde a nenhuma forma. Pode ser artefato de sombreamento."
+            }
+          ],
+          "briefSha256": "sha256:c580cfceeeaf2341513b2f993c7344623ea03c960042e43c981b33766fed6f70",
+          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
+          "data": "2026-11-03T15:15:48.790Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "flanco, trecho embaixo à direita",
+              "sentido": "anguloso",
+              "evidencia": "Na lateral e na isométrica há uma faixa clara em arco no flanco, que lê como plano. A seção de lados retos com chanfro pequeno não mostra bojo. Se o parâmetro pedia pneumático, a superfície está angulosa."
+            }
+          ],
+          "briefSha256": "sha256:c580cfceeeaf2341513b2f993c7344623ea03c960042e43c981b33766fed6f70",
+          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
+          "data": "2026-11-03T15:15:49.706Z"
+        },
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "seção da banda, flancos e ombro em toda a volta",
+              "sentido": "anguloso",
+              "evidencia": "frontal e lateral mostram faixa retangular com chanfro mínimo, sem bojo nem ombro; lê como cilindro maciço, não pneumático"
+            },
+            {
+              "parte": "cubo",
+              "tipo": "espessura",
+              "onde": "diâmetro do disco do cubo",
+              "sentido": "menor",
+              "evidencia": "frontal: cubo de cerca de 118 px em roda de 445 px, mais ou menos 27%, com chapa cheia grande ao redor sem função aparente"
+            }
+          ],
+          "briefSha256": "sha256:c580cfceeeaf2341513b2f993c7344623ea03c960042e43c981b33766fed6f70",
+          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
+          "data": "2026-11-03T15:15:50.637Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "seção da banda, cantos externos e flancos",
+              "sentido": "anguloso",
+              "evidencia": "frontal e superior: lados retos com chanfro mínimo nos dois cantos e sem bojo; lê como maciço, não como pneumático, se o parâmetro pedia pneumático"
+            },
+            {
+              "parte": "cubo",
+              "tipo": "espessura",
+              "onde": "diâmetro da flange do cubo",
+              "sentido": "menor",
+              "evidencia": "lateral: cubo de cerca de 118 px contra abertura do aro de cerca de 280 px; chapa lisa dominante e cubo desproporcionalmente pequeno (proporção fina, não estrutural)"
+            }
+          ],
+          "briefSha256": "sha256:c580cfceeeaf2341513b2f993c7344623ea03c960042e43c981b33766fed6f70",
+          "imagemSha256": "sha256:041043292c6cec74df54aad426cb53d5fbf33917f71e7d09846da43fb9aedd20",
+          "data": "2026-11-03T15:15:51.537Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c08",
+      "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
+      "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
+      "julgamentos": [
+        {
+          "nota": 3,
+          "defeitos": [
+            {
+              "parte": "cubo",
+              "tipo": "ausencia",
+              "onde": "centro da face grande, sem furo central",
+              "sentido": "faltando",
+              "evidencia": "lateral e isométrica: face totalmente cheia, sem furo de ponta a ponta nem tubo de cubo; frontal e superior: perfil sem saliência central"
+            },
+            {
+              "parte": "furosDeFixacao",
+              "tipo": "ausencia",
+              "onde": "círculo em volta do centro da face grande",
+              "sentido": "faltando",
+              "evidencia": "lateral: face lisa, sem nenhum furo"
+            },
+            {
+              "parte": "aro",
+              "tipo": "ausencia",
+              "onde": "barril do aro dentro do pneu",
+              "sentido": "faltando",
+              "evidencia": "lateral, frontal e superior: um só cilindro externo, sem diferença de raio entre aro e pneu nem seção de talão"
+            },
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "banda e ombros",
+              "sentido": "anguloso",
+              "evidencia": "frontal e superior: seção retangular com chanfro mínimo, sem bojo nem ombro de pneumático; a leitura é de cilindro maciço"
+            },
+            {
+              "parte": "friso",
+              "tipo": "posicao",
+              "onde": "borda da face esquerda",
+              "sentido": "externa",
+              "evidencia": "frontal e superior: friso de diâmetro maior que o corpo só em uma face, sem par e sem função legível"
+            }
+          ],
+          "briefSha256": "sha256:e610a2b84515843476661f586b18c0458e830f507ec8e34c49f084b623aea89d",
+          "imagemSha256": "sha256:6c5aa290523a6c2ed4c6f9b6de546ad41e1db78a3cdeac9d645d44403b86d9e2",
+          "data": "2026-11-03T15:15:52.382Z"
+        },
+        {
+          "nota": 3,
+          "defeitos": [
+            {
+              "parte": "cubo",
+              "tipo": "ausencia",
+              "onde": "centro da face",
+              "sentido": "faltando",
+              "evidencia": "frontal, lateral, superior e isométrica: a face é lisa e cheia, sem furo central; só um círculo tênue na isométrica, sem abertura"
+            },
+            {
+              "parte": "furosDeFixacao",
+              "tipo": "ausencia",
+              "onde": "círculo de furação em torno do cubo",
+              "sentido": "faltando",
+              "evidencia": "lateral e isométrica: nenhum furo na face"
+            },
+            {
+              "parte": "pneu",
+              "tipo": "ausencia",
+              "onde": "volta externa do corpo",
+              "sentido": "faltando",
+              "evidencia": "frontal e superior: o corpo é um cilindro reto de uma peça só, sem flanco, ombro ou banda separada do aro"
+            },
+            {
+              "parte": "aro",
+              "tipo": "espessura",
+              "onde": "barril e face",
+              "sentido": "maior",
+              "evidencia": "isométrica e lateral: a face é uma tampa cheia que fecha o barril, em vez de chapa vazada com raios ou furos"
+            },
+            {
+              "parte": "friso",
+              "tipo": "posicao",
+              "onde": "borda da face esquerda (vista frontal)",
+              "sentido": "externa",
+              "evidencia": "frontal e superior: o flange fino de maior diâmetro fica na face da esquerda; a face oposta tem só chanfro"
+            }
+          ],
+          "briefSha256": "sha256:e610a2b84515843476661f586b18c0458e830f507ec8e34c49f084b623aea89d",
+          "imagemSha256": "sha256:6c5aa290523a6c2ed4c6f9b6de546ad41e1db78a3cdeac9d645d44403b86d9e2",
+          "data": "2026-11-03T15:15:53.272Z"
+        },
+        {
+          "nota": 3,
+          "defeitos": [
+            {
+              "parte": "cubo",
+              "tipo": "ausencia",
+              "onde": "centro da face, vista lateral",
+              "sentido": "faltando",
+              "evidencia": "Na lateral e na isométrica a face é um disco cheio, sem furo central aberto nem furos de fixação."
+            },
+            {
+              "parte": "pneu",
+              "tipo": "superficie",
+              "onde": "perfil da banda, vistas frontal e superior",
+              "sentido": "anguloso",
+              "evidencia": "O corpo tem lados retos e só um chanfrado mínimo na ponta direita, sem bojo nem ombro. Pneu e aro não se distinguem e o corpo lê como tambor maciço."
+            },
+            {
+              "parte": "aro",
+              "tipo": "ausencia",
+              "onde": "corpo inteiro, entre cubo e pneu, vistas lateral e superior",
+              "sentido": "faltando",
+              "evidencia": "Não há barril de aro com parede nem junta de talão visível. A seção é maciça de ponta a ponta."
+            },
+            {
+              "parte": "flange",
+              "tipo": "posicao",
+              "onde": "ponta esquerda do corpo, vistas frontal e superior",
+              "sentido": "externa",
+              "evidencia": "Há uma única flange, mais larga em diâmetro que o corpo e sem par na ponta direita. Ela lê como friso do lado de fora."
+            }
+          ],
+          "briefSha256": "sha256:e610a2b84515843476661f586b18c0458e830f507ec8e34c49f084b623aea89d",
+          "imagemSha256": "sha256:6c5aa290523a6c2ed4c6f9b6de546ad41e1db78a3cdeac9d645d44403b86d9e2",
+          "data": "2026-11-03T15:15:54.174Z"
+        }
+      ]
+    },
+    {
+      "imagem": "c10",
+      "agenteSha256": "sha256:04c2b82cfdf098eba3ff543d07e6028da770e62b7d73b564138967e3d18f78e6",
+      "briefSha256": "sha256:124ee163a9d78c253b592775d7a4bf967ea5efc8c099e85dcaf289041431d8ea",
+      "julgamentos": [
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "comprimento",
+              "onde": "extremidade externa dos doze raios",
+              "sentido": "menor",
+              "evidencia": "Na lateral, os raios vão de cerca de 58 a 107 px do centro e a parede interna do aro está em cerca de 140 px. Cerca de 33 px de vazio branco separam cada ponta do aro. Na isométrica as pontas ficam soltas no vazio."
+            },
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "ponta externa de cada raio com a parede interna do aro",
+              "sentido": "afastado",
+              "evidencia": "Lateral e isométrica: nenhum raio toca o aro, e o cubo não fica preso ao aro por nada visível."
+            },
+            {
+              "parte": "chapa ou folhas brancas",
+              "tipo": "superficie",
+              "onde": "quadrante superior esquerdo do interior do aro na isométrica",
+              "sentido": "segmentado",
+              "evidencia": "Duas formas brancas curvas em folha junto a um raio na isométrica. Não aparecem na lateral nem são explicadas por nenhuma parte legível, e não ficam presas ao cubo."
+            }
+          ],
+          "briefSha256": "sha256:25baa6854f81c5ff21293b98ead12218a561bedf97a2c77e9c29d098b24569ac",
+          "imagemSha256": "sha256:a03d81d80b38d1aea1065340a3fd01f3c9753785504191a945d2b21185772f08",
+          "data": "2026-11-03T15:15:55.078Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "comprimento",
+              "onde": "extremidade externa dos doze raios, junto à parede interna do aro",
+              "sentido": "menor",
+              "evidencia": "Vista lateral: o raio do topo termina em y≈515 e o aro começa em y≈482; os raios laterais terminam em x≈443 e x≈657 contra o aro em x≈410 e x≈690. Sobram cerca de 30 px de vazio em volta toda; os raios ficam no ar na isométrica também."
+            },
+            {
+              "parte": "cubo",
+              "tipo": "uniao",
+              "onde": "ligação entre o cubo e a parede interna do aro",
+              "sentido": "afastado",
+              "evidencia": "Vistas lateral e isométrica: o cubo flutua no centro do vazio, sem chapa e sem raio que alcance o aro."
+            },
+            {
+              "parte": "raios",
+              "tipo": "espessura",
+              "onde": "seção dos doze raios, no vazio do aro",
+              "sentido": "menor",
+              "evidencia": "Vista lateral: traços de cerca de 4 px contra um aro de 280 px de diâmetro interno; leem como arame e não como suporte do aro."
+            }
+          ],
+          "briefSha256": "sha256:25baa6854f81c5ff21293b98ead12218a561bedf97a2c77e9c29d098b24569ac",
+          "imagemSha256": "sha256:a03d81d80b38d1aea1065340a3fd01f3c9753785504191a945d2b21185772f08",
+          "data": "2026-11-03T15:15:56.075Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "comprimento",
+              "onde": "extremidade externa dos 12 raios",
+              "sentido": "menor",
+              "evidencia": "Lateral: as pontas terminam a cerca de 107 px do centro e a parede interna do aro está a cerca de 140 px, com fundo branco entre elas. Isométrica: as pontas ficam soltas diante do aro."
+            },
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "ponta externa de cada raio com a parede interna do aro",
+              "sentido": "afastado",
+              "evidencia": "Lateral: nenhum raio toca o aro. Isométrica: os raios flutuam na frente da boca do aro."
+            },
+            {
+              "parte": "raio (lâmina curva)",
+              "tipo": "superficie",
+              "onde": "região superior esquerda da isométrica, em torno de x≈600–620, y≈510–570",
+              "sentido": "segmentado",
+              "evidencia": "Isométrica: uma forma curva em folha, branca e escura, aparece perto do raio de cima. Na lateral não há raio equivalente, e a origem dela não é legível."
+            }
+          ],
+          "briefSha256": "sha256:25baa6854f81c5ff21293b98ead12218a561bedf97a2c77e9c29d098b24569ac",
+          "imagemSha256": "sha256:a03d81d80b38d1aea1065340a3fd01f3c9753785504191a945d2b21185772f08",
+          "data": "2026-11-03T15:15:56.910Z"
         }
       ]
     }

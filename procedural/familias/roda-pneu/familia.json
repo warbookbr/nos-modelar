@@ -455,7 +455,7 @@
     "pneu": [
       "O pneu tem a mesma altura de flanco e a mesma largura de banda em toda a volta?",
       "A seção lê como a banda que o parâmetro pede: bojo e ombro chanfrado no pneumático, lados retos no maciço e na roda sem pneu, e o friso só do lado de dentro?",
-      "Com relevo, as garras ou os sulcos transversais têm o mesmo espaçamento, a mesma largura e a mesma profundidade em volta, cortam a banda de lado a lado sem chegar ao talão, e os sulcos ao longo da volta são paralelos, com a mesma largura e profundidade e sem chegar ao ombro?",
+      "Com relevo, as garras ou os sulcos têm o mesmo espaçamento, a mesma largura e a mesma profundidade em volta e cortam a banda de lado a lado sem chegar ao talão; e, só se a banda tiver sulcos ao longo da volta, eles são paralelos e não chegam ao ombro? A banda sem esses sulcos está certa.",
       "O talão assenta no aro, sem folga nem atravessamento visível?"
     ],
     "aro": [
@@ -476,7 +476,7 @@
     "disco": [
       "A chapa fica inteira dentro do barril do aro, sem sair por nenhum dos lados, e presa ao cubo?",
       "O desvio leva a chapa para o lado do aro que o parâmetro pede?",
-      "Com a volta de ventilação, os furos têm o mesmo diâmetro e o mesmo espaçamento, ficam entre o cubo e o aro sem tocar nenhum dos dois nem os furos de fixação, e atravessam a chapa de lado a lado?"
+      "Só se a chapa tiver furos de ventilação: eles têm o mesmo diâmetro e o mesmo espaçamento, ficam entre o cubo e o aro sem tocar nenhum dos dois nem os furos de fixação, e atravessam a chapa de lado a lado? A chapa cheia, sem eles, está certa."
     ]
   },
   "esboco": {
