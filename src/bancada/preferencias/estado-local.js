@@ -85,12 +85,12 @@ export function criarPreferenciaDeVisao({
   return criarPreferenciaDeEscolha({ chave: CHAVE_VISAO, armazenamento, conhecidas, padrao });
 }
 
-/* O TEMA ESCOLHIDO (Foco, Bancada ou Revisão) também volta entre sessões, pela
+/* O TEMA GRAVADO (só a Bancada existe desde 2026-11-03; um `foco` ou `revisao` de antes cai no padrão) volta entre sessões, pela
    mesma regra: quem diz quais temas existem é `temas/temas.js`. */
 export function criarPreferenciaDeTema({
   armazenamento = globalThis.localStorage,
   conhecidos = [],
-  padrao = 'foco',
+  padrao = 'bancada',
 } = {}) {
   return criarPreferenciaDeEscolha({ chave: CHAVE_TEMA, armazenamento, conhecidas: conhecidos, padrao });
 }

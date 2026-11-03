@@ -1,6 +1,6 @@
-/* painel-inspecao.js — o painel da direita: as abas, a aba Inspeção com os modos, a opacidade, a explosão, as ações, o botão das juntas, o diagnóstico e as portas, e o recolher.
+/* painel-inspecao.js — o painel da direita: as abas, a aba Inspeção com os modos, a opacidade, a explosão, as ações, o botão das juntas e o recolher.
  *
- * Lê do estado central `selecao`, `temHierarquia`, `diagnostico`, `portas`, `juntas` e `preferenciasCena`, recebe a
+ * Lê do estado central `selecao`, `temHierarquia`, `juntas` e `preferenciasCena`, recebe a
  * visão em vigor por `refletirVisao`, e age sobre a peça só pelas ações que recebe. A aba "Imagem REF" é o painel das referências (`painel-referencias.js`),
  * montado pela imagem na cena no contêiner dela, e a aba Anotações é `aba-anotacoes.js`. */
 import { formatarNome } from '../formatar.js';
@@ -17,7 +17,7 @@ export function montarPainelInspecao({ elementos, estado, acoes, aoRecolher, aoE
   const {
     abas, conteudosDasAbas, prefGrade, prefChao, resumo, botoesModo, btnWireframeSelecao, opacidadeSelecao,
     valorOpacidadeSelecao, explosao, valorExplosao, btnSelecionarConjunto, btnFocarSelecao, btnCopiarEstado,
-    btnJuntas, diagnostico, portas, resumoPortas, listaPortas, recolher,
+    btnJuntas, recolher,
   } = elementos;
 
   // Navegação de Abas do Painel Direito
@@ -69,45 +69,13 @@ export function montarPainelInspecao({ elementos, estado, acoes, aoRecolher, aoE
     btnWireframeSelecao.title = visao === 'raio-x' ? TITULO_DO_WIREFRAME['raio-x'] : TITULO_DO_WIREFRAME.outras;
   }
 
-  function refletirDiagnostico({ semParte, componentes }) {
-    if (semParte) {
-      diagnostico.classList.remove('ok');
-      diagnostico.classList.add('alerta');
-      diagnostico.querySelector('p').textContent =
-        `${semParte} faces não pertencem a uma parte semântica.`;
-    } else {
-      diagnostico.classList.remove('alerta');
-      diagnostico.classList.add('ok');
-      diagnostico.querySelector('p').textContent =
-        `${componentes} componentes: nenhuma superfície sem identidade.`;
-    }
-  }
-
-  function refletirPortas(lista) {
-    if (!portas) return;
-    portas.hidden = lista.length === 0;
-    if (!lista.length) return;
-    resumoPortas.textContent = `${lista.length} ${lista.length === 1 ? 'publicada' : 'publicadas'}`;
-    listaPortas.replaceChildren(...lista.map((porta) => {
-      const item = listaPortas.ownerDocument.createElement('li');
-      const nome = listaPortas.ownerDocument.createElement('b');
-      nome.textContent = porta.rotulo;
-      const origem = listaPortas.ownerDocument.createElement('small');
-      origem.textContent = `${porta.id} · ${porta.origem}`;
-      item.append(nome, origem);
-      return item;
-    }));
-  }
-
   estado.assinar(
-    ['selecao', 'temHierarquia', 'diagnostico', 'portas', 'juntas', 'preferenciasCena'],
+    ['selecao', 'temHierarquia', 'juntas', 'preferenciasCena'],
     (valores, mudadas) => {
       if (mudadas.includes('temHierarquia') && valores.temHierarquia !== null) {
         btnSelecionarConjunto.hidden = !valores.temHierarquia;
       }
       if (mudadas.includes('selecao') && valores.selecao) refletirSelecao(valores.selecao, valores.visao);
-      if (mudadas.includes('diagnostico') && valores.diagnostico) refletirDiagnostico(valores.diagnostico);
-      if (mudadas.includes('portas') && valores.portas) refletirPortas(valores.portas);
       if (mudadas.includes('juntas')) {
         btnJuntas?.setAttribute('aria-pressed', String(valores.juntas.modo));
         btnJuntas?.classList.toggle('ativo', valores.juntas.modo);

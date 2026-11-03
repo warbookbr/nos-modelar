@@ -18,11 +18,11 @@ const janelaModal = (id, corpo) => `
 
 const MARCACAO = `
   <button id="btnMenuAbrir" aria-expanded="false">Abrir</button>
-  <button id="btnMenuAtalhos" aria-expanded="false">Controles</button>
+  <button id="btnMenuConfiguracoes" aria-expanded="false">Configurações</button>
   <button id="btnMenuEstado" aria-expanded="false">Estado<span id="selo-estado" hidden></span></button>
   <button id="avisoEstado" hidden></button>
   ${janelaModal('menuAbrir', '<div id="listaAcervo"></div>')}
-  ${janelaModal('menuAtalhos', '<div id="listaAtalhos"></div><span id="avisoAtalho"></span><button id="btnRestaurarAtalhos"></button>')}
+  ${janelaModal('menuConfiguracoes', '<div id="listaAtalhos"></div><span id="avisoAtalho"></span><button id="btnRestaurarAtalhos"></button>')}
   ${janelaModal('menuEstado', '<div id="resumoEstado"></div><div id="listaEventos"></div><button id="btnLimparEventos"></button>')}`;
 
 const COMANDOS = [
@@ -65,10 +65,10 @@ describe('barra superior', () => {
     $('btnMenuAbrir').click();
     expect([$('menuAbrir').hidden, $('btnMenuAbrir').getAttribute('aria-expanded')]).toEqual([false, 'true']);
     expect(documento.body.classList.contains('modal-aberto')).toBe(true);
-    $('btnMenuAtalhos').click();
-    expect([$('menuAbrir').hidden, $('menuAtalhos').hidden]).toEqual([true, false]);
+    $('btnMenuConfiguracoes').click();
+    expect([$('menuAbrir').hidden, $('menuConfiguracoes').hidden]).toEqual([true, false]);
     janela.teclar({ key: 'Escape' });
-    expect($('menuAtalhos').hidden).toBe(true);
+    expect($('menuConfiguracoes').hidden).toBe(true);
     expect(documento.body.classList.contains('modal-aberto')).toBe(false);
     $('btnMenuAbrir').click();
     $('menuAbrir').querySelector('.modal-backdrop').click();
@@ -104,10 +104,10 @@ describe('barra superior', () => {
 
   it('enquanto captura uma tecla o Esc cancela a captura e não fecha a janela', () => {
     const { $, janela } = montar();
-    $('btnMenuAtalhos').click();
+    $('btnMenuConfiguracoes').click();
     $('listaAtalhos').querySelector('[data-comando="enquadrar"]').click();
     janela.teclar({ key: 'Escape' });
-    expect($('menuAtalhos').hidden).toBe(false);
+    expect($('menuConfiguracoes').hidden).toBe(false);
     expect($('avisoAtalho').textContent).toBe('Captura cancelada.');
   });
 

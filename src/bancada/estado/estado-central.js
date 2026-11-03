@@ -65,7 +65,7 @@ export function criarEstadoCentral(inicial = {}) {
  * As chaves do estado da bancada e o valor de cada uma na subida da página. `null` quer dizer "ainda não escrito": o
  * painel que lê a chave não desenha nada até a primeira escrita, e a página fica como o HTML a trouxe.
  */
-export function estadoInicialDaBancada({ pecaPedida = null, visao, tema = 'foco' }) {
+export function estadoInicialDaBancada({ pecaPedida = null, visao, tema = 'bancada' }) {
   return {
     /* verdadeiro até a câmera ser restaurada da URL; enquanto isso a URL não é reescrita */
     inicializando: true,
@@ -84,8 +84,6 @@ export function estadoInicialDaBancada({ pecaPedida = null, visao, tema = 'foco'
     selecao: null,
     temHierarquia: null,
     partes: null,
-    diagnostico: null,
-    portas: null,
     visao,
     /* o tema da tela (`temas/temas.js`), que só decide a aparência e onde cada componente fica */
     tema,
@@ -99,12 +97,6 @@ export function estadoInicialDaBancada({ pecaPedida = null, visao, tema = 'foco'
     ocultas: [],
     /* os painéis do tema que estão abertos, por nome (`partes`, `inspecao`) */
     paineis: {},
-    /* a peça e a referência na mesa do tema Revisão: a referência ao lado, sobreposta ou escondida, a vista dela, se a
-       câmera da peça segue a da referência, se a câmera está agora na da referência, e a transparência da sobreposta
-       (`referencias/referencia-ao-lado.js`) */
-    comparacao: { modo: 'ao-lado', vista: null, mesmaCamera: true, alinhada: false, opacidade: 0.5 },
-    /* a imagem de referência que a mesa mostra, com as vistas que ela tem, ou null quando a peça não tem imagem */
-    imagemDaReferencia: null,
     ofertaDaSessao: null,
     anotacoes: null,
   };

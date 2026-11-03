@@ -1,7 +1,8 @@
-/* temas.js — os temas da bancada: Foco, Bancada e Revisão, cada um declarado como dados.
+/* temas.js — o arranjo da bancada, declarado como dados. Desde 2026-11-03 há um só, a Bancada: os temas Foco e Revisão saíram
+ * por decisão da pessoa, e o seletor de tema com eles. A declaração segue como tabela de um item porque `componentes/tema.js`
+ * a lê para arrumar a página; um id gravado de antes (`foco`, `revisao`) cai no padrão.
  *
- * Os três temas usam os mesmos componentes e o mesmo estado; um tema só decide a aparência e onde cada componente fica
- * (decisão 4 do plano das visões e da interface). Por isso um tema é uma declaração, e não código:
+ * Um tema é uma declaração, e não código:
  *
  *   `cores`      o conjunto de cores de `sistema-visual.css` (`claro` ou `escuro`), escrito em `data-cores` na raiz;
  *   `arrumacao`  a arrumação da folha de estilo (`foco`, `bancada` ou `revisao`; `classica` é a de antes dos temas, que
@@ -15,37 +16,9 @@
  *
  * O módulo não toca a página: o componente `componentes/tema.js` lê esta tabela e arruma a página. */
 
-export const TEMA_PADRAO = 'foco';
+export const TEMA_PADRAO = 'bancada';
 
 export const TEMAS = Object.freeze([
-  Object.freeze({
-    id: 'foco',
-    rotulo: 'Foco',
-    descricao: 'Clara, a peça na tela inteira e os controles em painéis flutuantes.',
-    cores: 'claro',
-    arrumacao: 'foco',
-    lugares: Object.freeze({
-      abrir: 'topo-peca',
-      juntas: 'topo-peca',
-      controles: 'topo-direita',
-      estado: 'topo-direita',
-      projecao: 'barra-cena',
-      'seletor-visao': 'barra-cena',
-      enquadrar: 'barra-cena',
-      'preferencias-cena': 'popover-cena',
-      explosao: 'popover-cena',
-      'regua-metrica': 'barra-estado',
-      'rodape-juntas': 'barra-edicao',
-    }),
-    rotulos: Object.freeze({
-      juntas: 'Editar', 'titulo-partes': 'Partes', 'aba-inspecao': 'Seleção', 'aba-referencias': 'Referência', 'aba-anotacoes': 'Notas',
-    }),
-    paineis: Object.freeze({
-      partes: Object.freeze({ abertoAoNascer: false, largura: 240 }),
-      inspecao: Object.freeze({ abertoAoNascer: false, largura: 272 }),
-    }),
-    cena: Object.freeze({ fundo: '--cena', grade: '--linha-forte', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '--destaque' }),
-  }),
   /* A Bancada é a proposta A: uma estação de CAD escura, com a barra fina no alto, a árvore e o painel da direita fixos
      dos lados da cena (`margem` 0, porque não flutuam), a barra flutuante da cena com a câmera, a projeção, a visão,
      enquadrar, focar e copiar vista, e a barra de estado embaixo. A primeira aba do painel da direita muda de nome com o
@@ -86,43 +59,6 @@ export const TEMAS = Object.freeze([
     cena: Object.freeze({
       fundo: '--cena', degrade: '--cena-2', grade: '--linha-forte', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '--destaque',
     }),
-  }),
-  /* O Revisão é a proposta C sem a faixa de decisão: a cena dividida entre a peça e a referência, cada uma com um
-     cabeçalho fino, a árvore plana encostada à esquerda e o painel da direita encostado do outro lado quando abre. A
-     mesa da comparação (`componentes/mesa-de-revisao.js`) só existe onde o tema lhe dá lugar, e é este o tema que dá;
-     os outros componentes são os do Foco, noutros lugares. A barra da cena desce para o pé da mesa, com focar e copiar
-     a vista ao lado de enquadrar. */
-  Object.freeze({
-    id: 'revisao',
-    rotulo: 'Revisão',
-    descricao: 'Clara, a peça e a referência lado a lado, com a mesma câmera.',
-    cores: 'claro',
-    arrumacao: 'revisao',
-    lugares: Object.freeze({
-      'mesa-comparacao': 'mesa',
-      abrir: 'topo-peca',
-      juntas: 'topo-peca',
-      controles: 'topo-direita',
-      estado: 'topo-direita',
-      projecao: 'barra-cena',
-      'seletor-visao': 'barra-cena',
-      enquadrar: 'barra-cena',
-      focar: 'barra-cena',
-      'copiar-vista': 'barra-cena',
-      'preferencias-cena': 'popover-cena',
-      explosao: 'popover-cena',
-      'regua-metrica': 'barra-estado',
-      'rodape-juntas': 'barra-edicao',
-    }),
-    rotulos: Object.freeze({
-      juntas: 'Editar', 'titulo-partes': 'Partes', 'aba-inspecao': 'Seleção', 'aba-referencias': 'Referência', 'aba-anotacoes': 'Notas',
-      focar: 'Focar', 'copiar-vista': 'Copiar vista',
-    }),
-    paineis: Object.freeze({
-      partes: Object.freeze({ abertoAoNascer: true, largura: 240, margem: 0 }),
-      inspecao: Object.freeze({ abertoAoNascer: false, largura: 272, margem: 0 }),
-    }),
-    cena: Object.freeze({ fundo: '--cena', grade: '--linha-forte', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '--destaque' }),
   }),
 ]);
 

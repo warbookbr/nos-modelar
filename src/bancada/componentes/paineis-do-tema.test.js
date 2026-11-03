@@ -6,7 +6,8 @@ import { criarPagina } from './dom-de-teste.js';
 import { lerElementosDaPagina } from './elementos-da-pagina.js';
 import { FRACAO_MINIMA_DA_CENA, larguraOcupada, montarPaineisDoTema, paineisAoAbrir, paineisQueCabem } from './paineis-do-tema.js';
 
-const PAINEIS = temaPorId('foco').paineis;
+/* Uma declaração com painéis flutuantes (largura mais margem), só para a regra pura: nenhum tema a usa mais. */
+const PAINEIS = { partes: { largura: 240 }, inspecao: { largura: 272 } };
 const PAINEIS_DA_BANCADA = temaPorId('bancada').paineis;
 
 const MARCACAO = `
@@ -15,7 +16,7 @@ const MARCACAO = `
   <aside class="painel" data-painel="partes"><button data-fechar-painel="partes">x</button></aside>
   <aside class="painel" data-painel="inspecao"><button data-fechar-painel="inspecao">x</button></aside>`;
 
-function montar({ tema = 'foco', largura = 1400 } = {}) {
+function montar({ tema = 'bancada', largura = 1400 } = {}) {
   const pagina = criarPagina(MARCACAO);
   pagina.janela.innerWidth = largura;
   const estado = criarEstadoCentral(estadoInicialDaBancada({ visao: 'solida', tema }));
@@ -56,19 +57,7 @@ describe('regra dos painéis', () => {
 });
 
 describe('painéis do tema', () => {
-  it('no Foco nascem fechados e abrem e fecham pelos botões, um de cada vez em 1400', () => {
-    const { documento, aberto, estado } = montar();
-    expect([aberto('partes'), aberto('inspecao')]).toEqual(['false', 'false']);
-    documento.querySelector('[data-abrir-painel="partes"]').click();
-    expect(aberto('partes')).toBe('true');
-    expect(documento.querySelector('[data-abrir-painel="partes"]').getAttribute('aria-expanded')).toBe('true');
-    documento.querySelector('[data-abrir-painel="inspecao"]').click();
-    expect(estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
-    documento.querySelector('[data-fechar-painel="inspecao"]').click();
-    expect(aberto('inspecao')).toBe('false');
-  });
-
-  it('abrir com uma aba escolhe a aba, e encolher a janela deixa só o último aberto', () => {
+  it('abrir com uma aba escolhe a aba, e encolher a janela deixa só a árvore', () => {
     const { paineis, abas, estado, janela } = montar({ largura: 2000 });
     paineis.abrir('partes');
     paineis.abrir('inspecao', { aba: 'referencias' });
@@ -76,7 +65,7 @@ describe('painéis do tema', () => {
     expect(abas).toEqual(['referencias']);
     janela.innerWidth = 1300;
     janela.disparar({ type: 'resize' }, { captura: false });
-    expect(estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
+    expect(estado.obter('paineis')).toEqual({ partes: true, inspecao: false });
   });
 
   it('na Bancada nascem abertos os dois em 1400, só a árvore em 1100, e encolher a janela sem escolha deixa a árvore', () => {
@@ -89,16 +78,5 @@ describe('painéis do tema', () => {
     expect([estreito.aberto('partes'), estreito.aberto('inspecao')]).toEqual(['true', 'false']);
     estreito.paineis.abrir('inspecao');
     expect(estreito.estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
-  });
-
-  it('o Revisão encosta a árvore aberta ao nascer, e trocar de tema volta ao que o tema declara', () => {
-    const { paineis, documento, estado } = montar({ tema: 'revisao' });
-    expect(documento.querySelector('.painel').dataset.aberto).toBe('true');
-    expect(paineis.abrir('inspecao')).toBe(true);
-    expect(estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
-    estado.definir({ tema: 'foco' });
-    expect(documento.querySelector('.painel').dataset.aberto).toBe('false');
-    estado.definir({ tema: 'revisao' });
-    expect(documento.querySelector('.painel').dataset.aberto).toBe('true');
   });
 });

@@ -379,16 +379,11 @@ export function criarPecaEmCena({
       }),
     });
 
-    /* A integridade semântica não ocupa mais espaço fixo no alto da tela. Ela
-       continua no bloco de diagnóstico da aba Inspeção, com detalhe, e vira
-       aviso visível apenas quando há face sem parte. */
+    /* A integridade semântica vira aviso visível apenas quando há face sem parte; os
+       números (componentes, faces sem parte e portas) saem pela ponte da captura e pela linha de comando. */
     const semParte = convertido.medida?.facesSemParte?.length ?? 0;
     estado.definir({ faceSemIdentidade: semParte });
     if (semParte) registroDeEventos.registrar('alerta', `${semParte} faces sem identidade`, formatarNome(convertido.rotulo));
-    estado.definir({
-      diagnostico: { semParte, componentes: convertido.medida?.partes?.size ?? controlador.nomes.length },
-      portas: convertido.medida?.portas ?? [],
-    });
 
     // Seleção 3D por raycast
     selecao3d = criarSelecaoBancada({

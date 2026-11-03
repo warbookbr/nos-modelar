@@ -16,10 +16,9 @@ const MARCACAO = `
   <aside class="painel">
     <button id="btnJuntas" data-movel="juntas"><span data-rotulo="juntas">Juntas</span></button>
     <button class="aba-btn"><span id="abaInspecao" data-rotulo="aba-inspecao">Inspeção</span></button>
-  </aside>
-  <div id="escolhaTema"></div>`;
+  </aside>`;
 
-function montar(temaInicial = 'foco') {
+function montar(temaInicial = 'bancada') {
   const pagina = criarPagina(MARCACAO);
   const estado = criarEstadoCentral(estadoInicialDaBancada({ visao: 'solida', tema: temaInicial }));
   const guardado = [];
@@ -38,42 +37,15 @@ function montar(temaInicial = 'foco') {
 }
 
 describe('temas', () => {
-  it('cada tema declara todos os campos, o Foco é o padrão e id desconhecido cai nele', () => {
+  it('só a Bancada existe, é o padrão, e um id gravado de antes (foco, revisao) cai nela', () => {
     for (const tema of TEMAS) expect(Object.keys(tema).sort()).toEqual([...CAMPOS_DO_TEMA].sort());
-    expect(TEMA_PADRAO).toBe('foco');
-    expect(temaPorId('nenhum').id).toBe('foco');
-    expect(TEMAS.map((tema) => [tema.id, tema.cores])).toEqual([['foco', 'claro'], ['bancada', 'escuro'], ['revisao', 'claro']]);
+    expect(TEMAS.map((tema) => [tema.id, tema.cores])).toEqual([['bancada', 'escuro']]);
+    expect(TEMA_PADRAO).toBe('bancada');
+    for (const antigo of ['nenhum', 'foco', 'revisao']) expect(temaPorId(antigo).id).toBe('bancada');
   });
 });
 
 describe('componente do tema', () => {
-  it('escreve tema, cores e arrumação na raiz e leva os móveis para os lugares do Foco, na ordem do tema', () => {
-    const { documento, $ } = montar('foco');
-    const raiz = documento.documentElement;
-    expect([raiz.dataset.tema, raiz.dataset.cores, raiz.dataset.arrumacao]).toEqual(['foco', 'claro', 'foco']);
-    const barraCena = documento.querySelector('[data-lugar="barra-cena"]');
-    expect(barraCena.children.map((filho) => filho.id)).toEqual(['btnProjecao', 'btnEnquadrar']);
-    expect($('btnJuntas').parentNode.dataset.lugar).toBe('topo-peca');
-    expect($('btnJuntas').textContent).toBe('Editar');
-  });
-
-  it('o Revisão tem arrumação própria, leva os móveis para os lugares dele e pede a cena do Foco', () => {
-    const { documento, $, tema, guardado, aoMudarCena } = montar('foco');
-    tema.escolher('revisao');
-    const raiz = documento.documentElement;
-    expect([raiz.dataset.tema, raiz.dataset.cores, raiz.dataset.arrumacao]).toEqual(['revisao', 'claro', 'revisao']);
-    const barraCena = documento.querySelector('[data-lugar="barra-cena"]');
-    expect(barraCena.children.map((filho) => filho.id)).toEqual(['btnProjecao', 'btnEnquadrar']);
-    expect(documento.querySelector('.vistas').children.map((filho) => filho.dataset.vista)).toEqual(['frontal']);
-    expect($('btnJuntas').parentNode.dataset.lugar).toBe('topo-peca');
-    expect($('btnJuntas').textContent).toBe('Editar');
-    expect(guardado).toEqual(['revisao']);
-    expect(aoMudarCena).toHaveBeenLastCalledWith(
-      { fundo: '#f2f4f3', grade: '#c3c9c6', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '#c2531b' },
-      expect.objectContaining({ id: 'revisao' }),
-    );
-  });
-
   it('a Bancada tem arrumação própria, leva as juntas para o alto como Editar e pede a cena em degradê', () => {
     const { documento, $, aoMudarCena } = montar('bancada');
     const raiz = documento.documentElement;
@@ -86,7 +58,7 @@ describe('componente do tema', () => {
   });
 
   it('na Bancada a primeira aba do painel da direita se chama Peça, Parte ou Edição conforme o caso', () => {
-    const { $, estado, tema } = montar('bancada');
+    const { $, estado } = montar('bancada');
     expect($('abaInspecao').textContent).toBe('Peça');
     estado.definir({ selecao: { selecionadas: ['farolDir'] } });
     expect($('abaInspecao').textContent).toBe('Parte');
@@ -96,10 +68,6 @@ describe('componente do tema', () => {
     expect($('abaInspecao').textContent).toBe('Edição');
     estado.definir({ malhaEmEdicao: false, selecao: { selecionadas: [] } });
     expect($('abaInspecao').textContent).toBe('Peça');
-    tema.escolher('foco');
-    expect($('abaInspecao').textContent).toBe('Seleção');
-    tema.escolher('revisao');
-    expect($('abaInspecao').textContent).toBe('Seleção');
   });
 
   it('o caso da tela é a edição com um modo ligado, a parte com algo escolhido e a peça sem nada', () => {
@@ -108,21 +76,5 @@ describe('componente do tema', () => {
     expect(casoDaTela({ selecao: { selecionadas: ['a'] }, juntas, malhaEmEdicao: false })).toBe('parte');
     expect(casoDaTela({ selecao: { selecionadas: ['a'] }, juntas: { modo: true }, malhaEmEdicao: false })).toBe('edicao');
     expect(casoDaTela({ selecao: null, juntas, malhaEmEdicao: true })).toBe('edicao');
-  });
-
-  it('a cena do Foco chega com as cores lidas das variáveis do sistema visual', () => {
-    const { aoMudarCena } = montar('foco');
-    const [cena] = aoMudarCena.mock.calls[0];
-    expect(cena).toEqual({ fundo: '#f2f4f3', grade: '#c3c9c6', gradeEsmaecida: true, sombraSuave: true, contornoDaSelecao: '#c2531b' });
-  });
-
-  it('a escolha do menu Controles marca o tema em vigor e escolhe pelo clique', () => {
-    const { documento, estado } = montar('revisao');
-    const opcoes = () => documento.querySelectorAll('.opcao-tema');
-    expect(opcoes().map((botao) => [botao.dataset.tema, botao.getAttribute('aria-checked')]))
-      .toEqual([['foco', 'false'], ['bancada', 'false'], ['revisao', 'true']]);
-    opcoes()[0].click();
-    expect(estado.obter('tema')).toBe('foco');
-    expect(documento.querySelector('[data-tema="foco"]').getAttribute('aria-checked')).toBe('true');
   });
 });
