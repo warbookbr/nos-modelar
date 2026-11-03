@@ -63,6 +63,25 @@ natural.
 Para mecanismo, pergunte também o curso de cada movimento e o que não pode se
 tocar em nenhuma posição.
 
+## 4. Regras da família
+
+Depois das perguntas fixas, rode o comando que lê as regras de desenho da
+família declarada e imprime a pergunta de cada uma, já filtrada pelas partes:
+
+```
+node tools/modelar/perguntas-do-alinhamento.mjs <peça>
+node tools/modelar/perguntas-do-alinhamento.mjs --familia <família> [--partes a,b]
+```
+
+Antes de a receita existir, passe `--familia` (e `--partes` quando as partes já
+estiverem decididas). Faça cada pergunta impressa à pessoa e escreva a resposta
+no `PLANO` ou nos `criteriosDeReprovacao`; a regra literal vem impressa junto,
+com a conferência que a mede quando houver. Objeto sem família recebe o conjunto
+geral curto do mesmo comando. As regras moram em
+`procedural/criterios/<família>.json`: uma regra nova que a pessoa pedir depois
+de ver as imagens entra lá, e o pedido é registrado com
+`node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos <arquivo.json>`.
+
 ## Fechando a rodada
 
 A peça nasce como PASTA, com a receita e as imagens dentro:

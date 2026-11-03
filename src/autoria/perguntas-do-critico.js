@@ -5,6 +5,12 @@
  * `procedural/criterios/` (assento, veículo, móvel de caixa) e cada uma traz a condição para entrar: o componente ou a forma que
  * precisa existir no objeto. Sem a condição, a pergunta sobre rodas entraria no esboço que ainda não tem rodas.
  *
+ * O arquivo de família pode trazer também `regras` de desenho: cada uma é uma frase literal sobre como o objeto é desenhado, com a pergunta do
+ * alinhamento, a pergunta de forma que vai ao crítico pelo mesmo caminho das perguntas da família, a condição de existir a parte a que
+ * ela se refere, a conferência que a mede (quando há) e a origem. O campo é opcional e aditivo, por isso o formato continua `@1`: todo
+ * arquivo antigo é válido e dá o mesmo resultado, e só quem lê `regras` (o alinhamento) vê a diferença. Mudar o sentido de um campo que
+ * já existe é que pediria `@2`.
+ *
  * O módulo só trata de forma, e só do que as vistas mostram: de que lado, preso a quê, apoiado onde, virado para onde.
  * Proporção vai para o `--medidas`, onde o crítico não precisa julgar um número, e parte que as vistas não mostram recebe "não
  * consigo responder". O validador recusa a pergunta sem palavra de pergunta ou que começa por verbo (a que se responde com sim ou não
@@ -17,6 +23,10 @@ export const FORMATO_CRITERIOS = 'mecanifica.criterios-do-objeto@1';
 export const TETO_POR_COMPONENTE = 4;
 export const TETO_POR_FAMILIA = 6;
 export const LIMITE_DO_TEXTO = 260;
+/* O teto de regras de desenho por família de objeto. As regras entram no brief do crítico só quando a condição vale, mas o catálogo
+   também alimenta o alinhamento, e uma lista longa demais deixa de ser lida pela pessoa. */
+export const TETO_DE_REGRAS_POR_FAMILIA = 12;
+export const LIMITE_DA_REGRA = 200;
 
 /* A pergunta aberta que fecha a lista quando há perguntas específicas. */
 export const PERGUNTA_ABERTA = 'O que mais, nas imagens, parece estranho na forma e não foi coberto pelas perguntas acima?';
@@ -92,12 +102,53 @@ function lerCondicao(valor, onde) {
   });
 }
 
-/* O arquivo de critérios de uma família de objeto: { formato, id, cobre, perguntas: [{ texto, condicao }] }, até `TETO_POR_FAMILIA` perguntas. */
+const ABSOLUTO = /^(?:[a-z]:\\|\\\\|\/|data:)/i;
+const CONFERENCIA = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+
+function lerTextoCurto(valor, onde, aceito, limite = LIMITE_DO_TEXTO) {
+  if (typeof valor !== 'string' || valor.trim() === '') recusar(onde, valor, aceito);
+  const texto = valor.trim().replace(/\s+/g, ' ');
+  if (texto.length > limite) recusar(onde, `${texto.slice(0, 40)}... (${texto.length} caracteres)`, `${aceito}, de no máximo ${limite} caracteres`);
+  return texto;
+}
+
+/* Uma regra de desenho da família: { id, texto, perguntaDoAlinhamento, perguntaDeForma, condicao, conferencia?, origem }.
+   `texto` é a regra em uma frase terminada em ponto; `perguntaDoAlinhamento` é o que se pergunta à pessoa antes de modelar;
+   `perguntaDeForma` vai ao crítico e passa pelo mesmo validador das perguntas da família; `conferencia` é o nome da conferência que mede
+   a regra, quando existe. */
+function lerRegra(r, onde) {
+  const id = plano(r) && typeof r.id === 'string' ? r.id : '?';
+  const aqui = (campo) => `${onde} ('${id}').${campo}`;
+  if (!plano(r)) recusar(onde, r, 'objeto { "id", "texto", "perguntaDoAlinhamento", "perguntaDeForma", "condicao", "origem" } e, se houver, "conferencia"');
+  for (const chave of Object.keys(r)) {
+    if (!['id', 'texto', 'perguntaDoAlinhamento', 'perguntaDeForma', 'condicao', 'conferencia', 'origem'].includes(chave)) recusar(aqui(chave), r[chave], 'campo conhecido: id, texto, perguntaDoAlinhamento, perguntaDeForma, condicao, conferencia, origem');
+  }
+  if (typeof r.id !== 'string' || !NOME.test(r.id)) recusar(aqui('id'), r.id, 'id em minúsculas, com hífen entre as palavras');
+  const texto = lerTextoCurto(r.texto, aqui('texto'), 'a regra em uma frase', LIMITE_DA_REGRA);
+  if (!texto.endsWith('.')) recusar(aqui('texto'), texto, 'a regra em uma frase só, terminada em "."');
+  if (/[.;!?]\s+\S/.test(texto)) recusar(aqui('texto'), texto, 'a regra em uma frase só: sem ponto final no meio nem ponto e vírgula');
+  const alinhamento = lerTextoCurto(r.perguntaDoAlinhamento, aqui('perguntaDoAlinhamento'), 'a pergunta que se faz à pessoa no alinhamento');
+  if (!alinhamento.endsWith('?')) recusar(aqui('perguntaDoAlinhamento'), alinhamento, 'pergunta terminada em "?"');
+  const forma = lerPergunta(r.perguntaDeForma, aqui('perguntaDeForma'));
+  if (r.condicao === undefined) recusar(aqui('condicao'), undefined, 'o componente ou a forma que precisa existir no objeto para a regra entrar');
+  const condicao = lerCondicao(r.condicao, aqui('condicao'));
+  if (r.conferencia !== undefined && (typeof r.conferencia !== 'string' || !CONFERENCIA.test(r.conferencia))) recusar(aqui('conferencia'), r.conferencia, 'nome da conferência que mede a regra, em minúsculas e com hífen (ou o campo ausente)');
+  const origem = lerTextoCurto(r.origem, aqui('origem'), 'de onde a regra veio (pedido da pessoa, atrito, documento)', LIMITE_DA_REGRA);
+  if (ABSOLUTO.test(origem)) recusar(aqui('origem'), origem, 'origem sem caminho absoluto');
+  return Object.freeze({
+    id: r.id, texto, perguntaDoAlinhamento: alinhamento, perguntaDeForma: forma, condicao,
+    ...(r.conferencia === undefined ? {} : { conferencia: r.conferencia }),
+    origem,
+  });
+}
+
+/* O arquivo de critérios de uma família de objeto: { formato, id, cobre, perguntas: [{ texto, condicao }], regras? }, até
+   `TETO_POR_FAMILIA` perguntas e `TETO_DE_REGRAS_POR_FAMILIA` regras. `regras` é opcional e o arquivo sem ela continua no formato @1. */
 export function lerCriterios(bruto) {
   const id = plano(bruto) && typeof bruto.id === 'string' ? bruto.id : '?';
   const onde = (campo) => `critérios '${id}', ${campo}`;
   if (!plano(bruto)) recusar('critérios', bruto, 'objeto com formato, id, cobre e perguntas');
-  for (const chave of Object.keys(bruto)) if (!['formato', 'id', 'cobre', 'perguntas'].includes(chave)) recusar(onde(chave), bruto[chave], 'campo conhecido: formato, id, cobre, perguntas');
+  for (const chave of Object.keys(bruto)) if (!['formato', 'id', 'cobre', 'perguntas', 'regras'].includes(chave)) recusar(onde(chave), bruto[chave], 'campo conhecido: formato, id, cobre, perguntas, regras');
   if (bruto.formato !== FORMATO_CRITERIOS) recusar(onde('formato'), bruto.formato, `"${FORMATO_CRITERIOS}"`);
   if (typeof bruto.id !== 'string' || !NOME.test(bruto.id)) recusar(onde('id'), bruto.id, 'id em minúsculas, com hífen entre as palavras');
   if (!Array.isArray(bruto.cobre) || bruto.cobre.length === 0 || !bruto.cobre.every((x) => typeof x === 'string' && x.trim() !== '')) recusar(onde('cobre'), bruto.cobre, 'lista dos objetos que a família cobre (cadeira, picape, guarda-roupa...)');
@@ -114,7 +165,22 @@ export function lerCriterios(bruto) {
     if (p.condicao === undefined) recusar(onde(`${campo}.condicao`), undefined, 'o componente ou a forma que precisa existir no objeto para a pergunta entrar');
     return Object.freeze({ texto, condicao: lerCondicao(p.condicao, onde(`${campo}.condicao`)) });
   });
-  return Object.freeze({ formato: FORMATO_CRITERIOS, id: bruto.id, cobre: Object.freeze([...bruto.cobre]), perguntas: Object.freeze(perguntas) });
+  let regras = [];
+  if (bruto.regras !== undefined) {
+    if (!Array.isArray(bruto.regras) || bruto.regras.length === 0) recusar(onde('regras'), bruto.regras, 'lista com ao menos uma regra (ou o campo ausente)');
+    if (bruto.regras.length > TETO_DE_REGRAS_POR_FAMILIA) recusar(onde('regras'), `${bruto.regras.length} regras`, `no máximo ${TETO_DE_REGRAS_POR_FAMILIA} regras por família de objeto; junte as que se medem do mesmo jeito ou divida a família`);
+    const ids = new Set();
+    const formas = new Set(perguntas.map((p) => p.texto));
+    regras = bruto.regras.map((r, i) => {
+      const lida = lerRegra(r, onde(`regras[${i}]`));
+      if (ids.has(lida.id)) recusar(onde(`regras[${i}].id`), lida.id, 'id que ainda não foi usado nesta família');
+      ids.add(lida.id);
+      if (formas.has(lida.perguntaDeForma)) recusar(onde(`regras[${i}].perguntaDeForma`), lida.perguntaDeForma, 'pergunta que ainda não foi feita nesta família, nem por outra regra');
+      formas.add(lida.perguntaDeForma);
+      return lida;
+    });
+  }
+  return Object.freeze({ formato: FORMATO_CRITERIOS, id: bruto.id, cobre: Object.freeze([...bruto.cobre]), perguntas: Object.freeze(perguntas), regras: Object.freeze(regras) });
 }
 
 /* A condição vale para o que o objeto tem? `presentes`: { componentes: [nomes], formas: [ids] }. */
@@ -125,9 +191,19 @@ export function condicaoVale(condicao, presentes) {
     || (condicao.forma ?? []).some((p) => formas.some((n) => casaNome(p, n)));
 }
 
-/* As perguntas de uma família de objeto que entram, na ordem em que o arquivo as escreve. */
+/* As regras de desenho de uma família cuja condição vale para o que o objeto tem, na ordem do arquivo. `presentes` ausente (o
+   alinhamento ainda sem partes) devolve todas. */
+export function regrasDaFamilia(criterios, presentes = null) {
+  return (criterios.regras ?? []).filter((r) => presentes === null || condicaoVale(r.condicao, presentes));
+}
+
+/* As perguntas de uma família de objeto que entram, na ordem em que o arquivo as escreve: as perguntas da família e, depois, a pergunta
+   de forma de cada regra de desenho cuja condição vale. */
 export function perguntasDaFamiliaDeObjeto(criterios, presentes) {
-  return criterios.perguntas.filter((p) => condicaoVale(p.condicao, presentes)).map((p) => p.texto);
+  return juntarPerguntas(
+    criterios.perguntas.filter((p) => condicaoVale(p.condicao, presentes)).map((p) => p.texto),
+    regrasDaFamilia(criterios, presentes).map((r) => r.perguntaDeForma),
+  );
 }
 
 /* Junta as perguntas de componente e de família, sem repetir texto. */

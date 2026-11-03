@@ -35,6 +35,7 @@
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
+ *   node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]   os pedidos de alteração da pessoa, contados por etapa
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -488,7 +489,10 @@ export function resumoDoLaco(peca, { rodadas, decisao }) {
 if (process.argv[1] && process.argv[1].endsWith('rodada-de-modelagem.mjs')) {
   try {
     /* `--perguntas`: as perguntas de forma do brief do crítico, em perguntas-da-peca.mjs */
-    const { codigo, texto } = process.argv.includes('--perguntas') ? await (await import('./perguntas-da-peca.mjs')).comoCLI(process.argv.slice(2)) : await comoCLI(process.argv.slice(2));
+    /* `--pedidos`: os pedidos da pessoa e a contagem por etapa, em pedidos-da-pessoa.mjs */
+    const { codigo, texto } = process.argv.includes('--perguntas') ? await (await import('./perguntas-da-peca.mjs')).comoCLI(process.argv.slice(2))
+      : process.argv.includes('--pedidos') ? (await import('./pedidos-da-pessoa.mjs')).comoCLI(process.argv.slice(2))
+        : await comoCLI(process.argv.slice(2));
     (codigo === 0 ? console.log : console.error)(texto);
     process.exit(codigo);
   } catch (erro) {
