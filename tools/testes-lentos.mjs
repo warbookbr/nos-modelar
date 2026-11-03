@@ -14,6 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const TESTES_LENTOS = [
+  'src/bancada/sessao/montagem-em-dados-acervo.test.js',
   'modulos/esboco/tests/brief-do-critico.test.js',
   'modulos/esboco/tests/camada-sem-perfil.test.js',
   'modulos/esboco/tests/condutor.test.js',
