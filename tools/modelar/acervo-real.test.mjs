@@ -21,6 +21,13 @@ import { alvosDoAcervo, parametrosReutilizavel } from './parametros-peca.mjs';
 
 const SEGUNDOS_POR_ALVO = 2;
 
+/* PEÇA PESADA COM TETO PRÓPRIO. O teto por alvo supõe peças parecidas, e em 2026-11-03 o furgão realista, com as rodas e o forro
+   da etapa 4 (187 mil faces), passou a levar sozinho 84 s das duas execuções no CI, quase todos na medida de contato do
+   descrever, contra 19 s das outras 43 peças juntas; com ele dentro da conta comum, o teto de 88 s reprovava ou passava
+   conforme a máquina (87 s e 102 s em duas rodadas seguidas). A peça listada aqui sai da conta comum e tem o teto dela, cerca
+   de 1,7 vez o medido, para a regressão dela continuar aparecendo sem esconder a das outras. */
+const PECAS_PESADAS = { 'furgao-realista': 145 };
+
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
 
@@ -44,6 +51,10 @@ describe('acervo real, inteiro', () => {
     expect(registros.filter((r) => r.determinismo?.estavel === false).map((r) => r.alvo)).toEqual([]);
     const declarados = registros.reduce((soma, r) => soma + r.totais.declarados, 0);
     expect(declarados).toBeGreaterThan(0);
-    expect(total).toBeLessThan(SEGUNDOS_POR_ALVO * alvos.length);
-  }, 120_000);
+    const comuns = custos.filter(([alvo]) => !(alvo in PECAS_PESADAS));
+    expect(comuns.reduce((soma, [, s]) => soma + s, 0)).toBeLessThan(SEGUNDOS_POR_ALVO * comuns.length);
+    for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
+      expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
+    }
+  }, 300_000);
 });
