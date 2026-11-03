@@ -13,7 +13,8 @@ const ignorados = new Set(['.git', 'node_modules', 'dist', 'coverage']);
 function arquivosSob(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entrada) => {
     const arquivo = resolve(dir, entrada.name);
-    if (entrada.isDirectory()) return ignorados.has(entrada.name) ? [] : arquivosSob(arquivo);
+    /* uma pasta com `.git` próprio é outra cópia do repositório (worktree de agente), e não parte dele */
+    if (entrada.isDirectory()) return ignorados.has(entrada.name) || existsSync(resolve(arquivo, '.git')) ? [] : arquivosSob(arquivo);
     return entrada.isFile() ? [arquivo] : [];
   });
 }
