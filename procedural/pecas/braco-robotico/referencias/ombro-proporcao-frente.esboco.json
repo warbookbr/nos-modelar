@@ -1,0 +1,311 @@
+{
+  "plano": "Três tamanhos do ombro sobre a mesma base e o mesmo anel da cintura, com a coluna da referência (158 x 477 mm, ainda não modelada) presa no anel da junta para dar a proporção do conjunto. O ombro é simplificado num bloco de cantos arredondados com o pé que estreita do anel até a seção; a curva do L fica de fora porque o que está em disputa é o tamanho. Legendas em lista, sem linhas de centro.",
+  "vista": "frontal",
+  "opcoes": [
+    {
+      "titulo": "Opção A: como está",
+      "nota": "Seção de 220 mm, mais larga que a base, eixo da junta a 140 mm do anel e topo a 250 mm.",
+      "legendas": "lista",
+      "formas": [
+        {
+          "id": "pe",
+          "tipo": "caixa",
+          "largura": 230,
+          "altura": 20,
+          "profundidade": 230,
+          "raio": 25,
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "pé da base 230"
+        },
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "sobre": "pe",
+          "cor": "cinza",
+          "rotulo": "base Ø210 x 200"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura Ø210"
+        },
+        {
+          "id": "pescoco",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 20,
+          "eixo": "y",
+          "sobre": "cintura",
+          "cor": "verde",
+          "rotulo": "pé do ombro"
+        },
+        {
+          "id": "ombro",
+          "tipo": "caixa",
+          "largura": 220,
+          "altura": 230,
+          "profundidade": 220,
+          "raio": 25,
+          "sobre": "pescoco",
+          "cor": "verde",
+          "rotulo": "ombro 220 x 250 acima do anel"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 231,
+          "diametroInterno": 40,
+          "espessura": 28,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            5.0,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta Ø231"
+        },
+        {
+          "id": "coluna",
+          "tipo": "caixa",
+          "largura": 158,
+          "altura": 477,
+          "profundidade": 100,
+          "raio": 30,
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            159.5,
+            0
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna da referência 158 x 477"
+        }
+      ]
+    },
+    {
+      "titulo": "Opção B: intermediária",
+      "nota": "Seção de 190 mm, eixo a 115 mm e topo a 210 mm.",
+      "legendas": "lista",
+      "formas": [
+        {
+          "id": "pe",
+          "tipo": "caixa",
+          "largura": 230,
+          "altura": 20,
+          "profundidade": 230,
+          "raio": 25,
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "pé da base 230"
+        },
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "sobre": "pe",
+          "cor": "cinza",
+          "rotulo": "base Ø210 x 200"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura Ø210"
+        },
+        {
+          "id": "pescoco",
+          "tipo": "cone",
+          "diametro": 210,
+          "diametroTopo": 190,
+          "comprimento": 20,
+          "eixo": "y",
+          "sobre": "cintura",
+          "cor": "verde",
+          "rotulo": "pé do ombro"
+        },
+        {
+          "id": "ombro",
+          "tipo": "caixa",
+          "largura": 190,
+          "altura": 190,
+          "profundidade": 190,
+          "raio": 25,
+          "sobre": "pescoco",
+          "cor": "verde",
+          "rotulo": "ombro 190 x 210 acima do anel"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 200,
+          "diametroInterno": 40,
+          "espessura": 28,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            0.0,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta Ø200"
+        },
+        {
+          "id": "coluna",
+          "tipo": "caixa",
+          "largura": 158,
+          "altura": 477,
+          "profundidade": 100,
+          "raio": 30,
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            159.5,
+            0
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna da referência 158 x 477"
+        }
+      ]
+    },
+    {
+      "titulo": "Opção C: na largura da coluna",
+      "nota": "Seção de 160 mm, a da coluna, eixo a 100 mm e topo a 180 mm, a altura que a referência mostra.",
+      "legendas": "lista",
+      "formas": [
+        {
+          "id": "pe",
+          "tipo": "caixa",
+          "largura": 230,
+          "altura": 20,
+          "profundidade": 230,
+          "raio": 25,
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "pé da base 230"
+        },
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "sobre": "pe",
+          "cor": "cinza",
+          "rotulo": "base Ø210 x 200"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura Ø210"
+        },
+        {
+          "id": "pescoco",
+          "tipo": "cone",
+          "diametro": 210,
+          "diametroTopo": 160,
+          "comprimento": 20,
+          "eixo": "y",
+          "sobre": "cintura",
+          "cor": "verde",
+          "rotulo": "pé do ombro"
+        },
+        {
+          "id": "ombro",
+          "tipo": "caixa",
+          "largura": 160,
+          "altura": 160,
+          "profundidade": 160,
+          "raio": 25,
+          "sobre": "pescoco",
+          "cor": "verde",
+          "rotulo": "ombro 160 x 180 acima do anel"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 168,
+          "diametroInterno": 40,
+          "espessura": 28,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            0.0,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta Ø168"
+        },
+        {
+          "id": "coluna",
+          "tipo": "caixa",
+          "largura": 158,
+          "altura": 477,
+          "profundidade": 100,
+          "raio": 30,
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            159.5,
+            0
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna da referência 158 x 477"
+        }
+      ]
+    }
+  ]
+}

@@ -396,7 +396,7 @@ rodada, com duas notas caindo de 9 para 8, aceitas pela pessoa. [As ferramentas
 de modelagem](2026-10-07-as-ferramentas-de-modelagem.md), congelado em
 2026-10-07 com a fatia 1 entregue, voltou como ativo, com a casca adiantada para a
 fatia 2 e o rascunho das [perguntas do
-crítico](2026-10-08-perguntas-do-critico-por-objeto.md) absorvido. [As partes do braço](../congelados/2026-09-26-as-partes-do-braco.md)
+crítico](2026-10-08-perguntas-do-critico-por-objeto.md) absorvido. [As partes do braço](../2026-09-26-as-partes-do-braco.md)
 seguem congeladas.
 
 [O catálogo de famílias](2026-10-06-o-catalogo-de-familias.md) foi

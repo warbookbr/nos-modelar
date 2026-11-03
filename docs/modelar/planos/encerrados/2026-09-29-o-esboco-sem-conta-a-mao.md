@@ -291,7 +291,7 @@ opção.
 ## Depois deste plano
 
 O plano seguinte é [o esboço detalhado coerente](2026-10-01-o-esboco-detalhado-coerente.md),
-e depois dele [as partes do braço](../congelados/2026-09-26-as-partes-do-braco.md),
+e depois dele [as partes do braço](../2026-09-26-as-partes-do-braco.md),
 congeladas em 2026-09-29 para dar lugar a este. A ponte entre o esboço e o
 Mecanifica (um esqueleto de montagem por forma, com o gate de encaixe da peça
 real no volume do esboço) também fica para depois, e exige decidir antes como o

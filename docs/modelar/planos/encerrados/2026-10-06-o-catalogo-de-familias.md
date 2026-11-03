@@ -138,5 +138,5 @@ O banco de provas segue como candidato, para medir o catálogo contra a IA sem
 ele. Os achados em aberto do plano anterior que este não absorve (gate do
 mestre no `--integrar` e no `--feito`, `funcao` fixa, junta por padrão
 limitada, `--editar` no `plano`, brief em arquivo) também ficam como candidatos.
-[As partes do braço](../congelados/2026-09-26-as-partes-do-braco.md) continuam
+[As partes do braço](../2026-09-26-as-partes-do-braco.md) continuam
 congeladas.

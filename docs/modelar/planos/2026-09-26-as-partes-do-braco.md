@@ -1,42 +1,18 @@
 # As partes do braço
 
-**Estado:** congelado
-**Congelado em:** 2026-09-29, por decisão da pessoa · **Base:** branch `claude/revisar-plano-ativo-cyj8c3`
+**Estado:** ativo
 
-**Por que foi congelado:** a pessoa abriu o plano [o esboço sem conta à
-mão](../encerrados/2026-09-29-o-esboco-sem-conta-a-mao.md), que melhora a ferramenta de
-esboço, para o esboço deixar de custar coordenadas calculadas à mão antes de a
-modelagem do braço seguir. O plano das partes do braço tinha sido descongelado
-no mesmo dia, depois de o plano [união de sólidos](../encerrados/2026-09-28-uniao-de-solidos.md)
-fechar com `unir`, `subtrair`, `intersectar`, o arredondamento da costura e o
-ombro refeito e fixado.
+**Território:** `procedural/pecas/braco-robotico/`
 
-**Condição de descongelamento:** a pessoa decidir. O plano
-[o esboço detalhado coerente](../encerrados/2026-10-01-o-esboco-detalhado-coerente.md)
-fechou em 2026-10-06; depois dele vieram [o caminho curto da
-IA](../encerrados/2026-10-07-o-caminho-curto-da-ia.md) e [as ferramentas de
-modelagem](../encerrados/2026-10-07-as-ferramentas-de-modelagem.md).
-
-**O que a união deixou para este plano:** o ombro de coluna unida ao braço está
-fixo na montagem. O inventário do que cada parte restante pede ao núcleo está no
-fechamento do plano da união, e a lacuna que ele apontou, o arredondamento das
-bordas convexas e internas, foi resolvida com limitações escritas em
-`docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`. Cada etapa passa a
-cumprir o passo [Pare e analise](../../usar/PARE-E-ANALISE.md) antes de ser dada
-por boa e antes de pedir o aceite da pessoa.
-
-**Fica parado:** as partes restantes, na ordem anelOmbro, braco, anelCotovelo,
-cotovelo, juntaCotovelo, anelAntebraco, antebraco, carcacaPunho,
-anelTampaPunho, tampaPunho, aneisPunho, garfoPunho e flange; e a exportação do
-braço montado. O ombro de tambor segue em `partes/ombro-tambor`.
+**Descongelado em:** 2026-11-03, por decisão da pessoa, que viu na bancada o ombro desproporcional ao resto do conjunto. Estava congelado desde 2026-09-29 para o esboço deixar de custar conta à mão; os planos do esboço e das ferramentas de modelagem que vieram antes fecharam.
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, base na main em 2026-09-26.
+**Repositório e base:** `warbookbr/nos-modelar`, base na main em 2026-09-26, descongelado sobre o ramo de trabalho de 2026-11-03.
 
 ## Problema observado
 
-O plano [o braço inteiro](../encerrados/2026-09-25-o-braco-inteiro.md) fechou com
+O plano [o braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou com
 a porta conferida contra a forma, o contorno tirado da imagem e o fluxo do
 objeto escrito, mas o braço robótico ainda tem só base e anel da cintura
 fixos. O ombro será refeito pela vista frontal, as outras partes da rodada de
@@ -96,6 +72,8 @@ a modelagem como feita porque a montagem só declara `base`, `anelCintura` e
 próxima conversa com a pessoa.
 
 Em 2026-09-26 a pessoa reabriu a etapa `ombro` com `npm run etapas -- --reabrir`, que guarda o aceite e a receita antigos em `reaberturas`; `npm run objeto` mostra 2 de 3 fixas com o ombro como próxima, e as peças novas seguem fora da montagem até a pessoa confirmar a ordem.
+
+Em 2026-11-03 a pessoa abriu o braço na bancada e apontou que o ombro não está proporcional ao conjunto. Medido contra a prancha da lateral sem cabo: a seção de cima do ombro tem 220 mm de largura, mais que os 189 mm da base, a altura sobre o anel da cintura é de 250 mm contra cerca de 177 mm na referência, e o anel da junta tem 210 mm de diâmetro para uma coluna de 158 mm. A pessoa descongelou o plano para refazer a proporção do ombro primeiro, com as opções desenhadas lado a lado na escala da base e da coluna da referência para ela escolher pela imagem, e as partes seguintes depois, quando ela quiser.
 
 ## Incluído
 

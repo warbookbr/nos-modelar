@@ -192,5 +192,5 @@ a partir de primitivas, e é isso que o plano seguinte ataca.
 
 O plano seguinte é [o catálogo de famílias](2026-10-06-o-catalogo-de-familias.md),
 que absorve a ponte entre o esboço e o Mecanifica. O banco de provas segue como
-candidato, e [as partes do braço](../congelados/2026-09-26-as-partes-do-braco.md)
+candidato, e [as partes do braço](../2026-09-26-as-partes-do-braco.md)
 continuam congeladas.
