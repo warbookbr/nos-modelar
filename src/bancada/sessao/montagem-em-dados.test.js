@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { listarParaBancada } from '../acervo-receitas.js';
 import { processarReceitaSessao } from './carregar-sessao.js';
-import { abrirMontagemDoAcervo } from './montagem-em-dados.js';
+import { abrirMontagemDoAcervo, modeloDaMontagem, resolverMontagemDoAcervo } from './montagem-em-dados.js';
 
 const acervo = listarParaBancada();
 const entrada = (id) => acervo.find((candidata) => candidata.id === id);
@@ -25,19 +25,41 @@ describe('montagem em dados na bancada', () => {
     }
   });
 
-  it('o avião abre com as oito partes da montagem, cada uma com geometria', async () => {
+  it('o avião abre pelas oito instâncias da montagem, cada uma com geometria, e o que não abre é dito', async () => {
     const dado = await entrada('aviao').carregar();
     const modelo = await abrir('aviao');
+    const ids = dado.instancias.map((instancia) => instancia.id).sort();
     expect(modelo.tipo).toBe('montagem');
-    expect([...modelo.partes.keys()].sort()).toEqual(dado.instancias.map((instancia) => instancia.id).sort());
+    /* toda instância ou está na árvore de objetos ou vem em `semGeometria` com o motivo: nenhuma some em silêncio */
+    expect([...modelo.partes.keys(), ...modelo.semGeometria.map((item) => item.caminho)].sort()).toEqual(ids);
     expect(modelo.raiz.userData.hierarquia.map((item) => item.nome).sort()).toEqual([...modelo.partes.keys()].sort());
+    expect(modelo.partes.size).toBeGreaterThanOrEqual(7);
     for (const [nome, grupo] of modelo.partes) {
-      const caixa = caixaDe(grupo);
-      expect(caixa.isEmpty(), nome).toBe(false);
+      expect(caixaDe(grupo).isEmpty(), nome).toBe(false);
       expect(grupo.userData.faces.length, nome).toBeGreaterThan(0);
     }
+    for (const item of modelo.semGeometria) expect(item.motivo).toMatch(/adaptarThree/);
     expect(modelo.medida.facesSemParte).toEqual([]);
-    expect(modelo.estatisticas.partes).toBe(8);
+    expect(modelo.estatisticas.partes).toBe(modelo.partes.size);
+  });
+
+  it('instância cuja malha não vira cena fica de fora com o motivo, e as outras abrem', async () => {
+    const resolvida = await resolverMontagemDoAcervo(await entrada('aviao').carregar(), acervo);
+    const alvo = resolvida.instancias.find((instancia) => instancia.id === 'helice');
+    const face = { id: 1, vs: [1, 2, 3, 4], cor: null, material: null, parte: 'x', liso: 0, solido: false, tinta: [] };
+    /* quadrilátero em gravata: o contorno cruza a si mesmo e não fecha em orelhas */
+    alvo.definicao = {
+      ...alvo.definicao,
+      neutro: {
+        ...alvo.definicao.neutro,
+        V: new Map([[1, [0, 0, 0]], [2, [1, 1, 0]], [3, [1, 0, 0]], [4, [0, 1, 0]]]),
+        F: new Map([[1, face]]),
+      },
+    };
+    const modelo = modeloDaMontagem(resolvida);
+    expect(modelo.semGeometria.map((item) => item.caminho)).toContain('helice');
+    expect(modelo.partes.has('helice')).toBe(false);
+    expect(modelo.partes.has('fuselagem')).toBe(true);
   });
 
   it('cada parte do avião fica onde a receita dela a põe, e as partes não se empilham na origem', async () => {

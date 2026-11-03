@@ -137,17 +137,16 @@ exemplo `npm run ativar:bancada -- furgao` (o nome é o da pasta da peça em
 com a peça. O procedimento completo está em
 [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](modelar/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md).
 
-A bancada abre no tema Foco: a peça ocupa a tela inteira, e os controles ficam
-em grupos flutuantes no alto. À esquerda estão a árvore das partes, o nome da
-peça, Abrir e Editar; no meio, a projeção, a visão, o enquadrar e a caixa da
-cena com a grade, o chão e a explosão; à direita, a busca de comandos e as
-janelas. `Ctrl+K` abre a busca, que acha qualquer comando, visão ou parte pelo
-nome. Clicar numa parte mostra ao lado dela um cartão com as medidas e as
-ações, e "Detalhes" abre o painel da direita. O cubo no canto gira com a
-câmera e leva à vista de cada face. Editar liga o modo de edição, com a barra
-de juntas e malha embaixo e a moldura laranja na tela. Os outros temas,
-Bancada (escura, com painéis fixos) e Revisão, ficam na busca de comandos e na
-janela Controles, e a escolha volta na próxima vez que a página abre.
+A bancada tem um só arranjo, escuro, com a árvore das partes à esquerda e o
+painel da direita fixos, e a cena entre eles. No alto estão, à esquerda, Abrir e
+Configurações; no meio, a busca de comandos; à direita, Inspecionar e Editar, a
+janela Estado e o botão do painel. Abrir lista as peças do acervo e, para o avião
+e o braço robótico, uma entrada de montagem que abre o objeto inteiro. `Ctrl+K`
+abre a busca, que acha qualquer comando, visão ou parte pelo nome. Clicar numa
+parte mostra a seleção no painel da direita, com ver no contexto, isolar, arame,
+opacidade, explosão e focar. O cubo no canto gira com a câmera e leva à vista de
+cada face. Editar liga o modo de edição, com a barra de juntas e malha embaixo e
+a moldura laranja na tela. A janela Configurações traz os atalhos de teclado.
 
 ## Onde estão as regras
 

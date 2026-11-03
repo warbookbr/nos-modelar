@@ -21,6 +21,7 @@ import { criarComandos } from './controles/comandos.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
 import { criarImagemNaCena } from './referencias/imagem-na-cena.js';
 import { criarEstadoCentral, estadoInicialDaBancada } from './estado/estado-central.js';
+import { criarGravadorDaCamera } from './cena/gravador-da-camera.js';
 import { criarPecaEmCena } from './cena/peca-em-cena.js';
 import { criarEdicaoDaPeca } from './cena/edicao-da-peca.js';
 import { criarVistaDaCena } from './cena/vista-da-cena.js';
@@ -106,12 +107,19 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   const salvarUrlForaDaSubida = () => {
     if (!estado.obter('inicializando') && cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
   };
+  /* A câmera livre muda a cada quadro do giro; o endereço é gravado uma vez, quando ele termina (`gravador-da-camera.js`). */
+  const gravadorDaCamera = criarGravadorDaCamera({ gravar: salvarUrlForaDaSubida });
   const ambiente = criarAmbienteBancada(canvas, {
     aoMudarVista(vista) {
       estado.definir({ vista });
-      salvarUrlForaDaSubida();
+      if (vista === 'livre') gravadorDaCamera.aoMudar();
+      else {
+        gravadorDaCamera.descarregar();
+        salvarUrlForaDaSubida();
+      }
     },
-    aoMudarCameraLivre: salvarUrlForaDaSubida,
+    aoMudarCameraLivre: gravadorDaCamera.aoMudar,
+    aoTerminarCameraLivre: gravadorDaCamera.aoTerminar,
   });
 
   /* A edição da peça nasce depois da imagem de referência, como na subida
@@ -390,7 +398,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     seletorDeVisao,
     parametros: params,
     corpo: elementos.corpo,
-    endereco,
+    /* A ponte lê o endereço depois do movimento: o que a câmera ainda tem por gravar sai antes. */
+    endereco: { href: () => { gravadorDaCamera.descarregar(); return endereco.href(); } },
   }));
 
   aoSairDaPagina(() => {

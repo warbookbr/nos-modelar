@@ -72,6 +72,10 @@ A janela "Abrir" lista cada objeto de várias partes como uma entrada que abre a
 
 Se a bancada não conseguir posicionar as peças pela montagem em dados sem um segundo leitor de montagem, a fatia 1 para e volta à pessoa com o que falta.
 
+## Andamento
+
+As fatias 1 e 2 foram feitas em 2026-11-03, no mesmo ramo. A janela Abrir lista `aviao` e `braco-robotico` como uma entrada de montagem cada, lida de `montagem.json` pelo leitor da autoria (`sessao/montagem-em-dados.js`, que só carrega as receitas e entrega o resultado à cena), e as partes saem da janela e continuam abrindo pelo nome no endereço. O avião abre sem o motor: a face 3001 da receita `aviao/motor` não fecha em orelhas no adaptador, e a peça sozinha também não abre na bancada; a bancada abre as outras sete instâncias e diz na janela Estado e no aviso qual ficou de fora e por quê, em vez de não abrir. O braço robótico abre inteiro, com as poses da montagem conferidas por teste. Saíram da tela o diagnóstico e as portas da aba Inspeção, o nome da peça com a luz e a dica de estado; as portas passaram a sair pela chave `portas` da ponte da captura, que a guarda das portas lê no lugar do elemento. O botão de configurações voltou à direita do Abrir, com a lista de atalhos dentro; o Abrir mostra o nome em qualquer largura; a legenda das visões foi para o canto de cima da cena, sob a barra flutuante; o painel da direita tem 340 pixels na aba de referência. Os temas Foco e Revisão e o seletor de tema saíram, com a mesa da peça e a referência ao lado, e a `guarda:temas` mede só o arranjo único. O endereço com a câmera passou a ser gravado só no fim do giro ou do zoom (`cena/gravador-da-camera.js`), com teste que conta as escritas. Falta a aprovação das capturas pela pessoa, `npm run gates` e a fatia 3.
+
 ## Fechamento
 
 A preencher ao concluir ou cancelar.

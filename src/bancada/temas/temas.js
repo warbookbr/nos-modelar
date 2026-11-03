@@ -33,8 +33,8 @@ export const TEMAS = Object.freeze([
     arrumacao: 'bancada',
     lugares: Object.freeze({
       abrir: 'topo-peca',
+      configuracoes: 'topo-peca',
       juntas: 'topo-direita',
-      controles: 'topo-direita',
       estado: 'topo-direita',
       vistas: 'popover-camera',
       projecao: 'barra-cena',

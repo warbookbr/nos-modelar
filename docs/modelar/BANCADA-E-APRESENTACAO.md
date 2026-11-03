@@ -54,8 +54,8 @@ avisa ninguém; a seleção é um objeto novo a cada mudança do controlador das
 partes, e por isso redesenha toda vez.
 
 Cada área da tela é um componente em `src/bancada/componentes/`: a barra
-superior com as janelas Abrir, Controles e Estado (`barra-superior.js`, com
-`menu-abrir.js`, `menu-controles.js` e `menu-estado.js`), a fileira das vistas
+superior com as janelas Abrir, Configurações e Estado (`barra-superior.js`, com
+`menu-abrir.js`, `menu-controles.js`, que desenha a lista de atalhos da janela de Configurações, e `menu-estado.js`), a fileira das vistas
 com a projeção e o seletor de visão (`barra-das-vistas.js`), o painel de
 componentes (`painel-componentes.js`), o painel de inspeção com as abas
 (`painel-inspecao.js` e `aba-anotacoes.js`), o rodapé das juntas
@@ -64,11 +64,10 @@ escala (`referencia-metrica.js`), o teclado (`teclado.js`), o endereço da pági
 (`endereco.js`), os avisos (`avisos.js`), a caixa da visão sobre a cena
 (`caixa-da-visao.js`), a ponte da captura automática (`ponte-da-captura.js`), o
 tema (`tema.js`), a busca de comandos (`busca-de-comandos.js`), os painéis do
-tema (`paineis-do-tema.js`), o nome da peça e o estado da sessão no alto (`nome-da-peca.js`), a caixa
-da cena com a grade, o chão e a explosão e a da câmera do tema Bancada
+tema (`paineis-do-tema.js`), a caixa
+da cena com a grade, o chão e a explosão e a da câmera da Bancada
 (`popover-da-cena.js`), os arquivos que entram e saem pelo navegador
 (`arquivos-da-pagina.js`), o relógio de quadros (`ciclo-da-pagina.js`),
-os componentes do tema Foco e a mesa do tema Revisão (`mesa-de-revisao.js`),
 descritos abaixo. `elementos-da-pagina.js` é o único lugar que procura
 elementos, e entrega a cada componente só o grupo dele. A ponte
 `window.__mecanificaBancada` é um contrato fixo: as chaves dela estão listadas
@@ -79,9 +78,7 @@ controlador das partes, a seleção por clique, os enquadramentos e o estado
 escrito na URL, mora em `cena/peca-em-cena.js`; o ajuste por junta, a edição de
 malha, o desfazer e o alvo do ajuste, em `cena/edicao-da-peca.js`; a projeção,
 a grade, a visão e a câmera restaurada da URL, em `cena/vista-da-cena.js`; a
-imagem de referência na cena, em `referencias/imagem-na-cena.js`; a referência
-da mesa do Revisão, com as vistas dela e a câmera da peça posta na câmera da
-vista, em `referencias/referencia-ao-lado.js`; e de onde vem
+imagem de referência na cena, em `referencias/imagem-na-cena.js`; e de onde vem
 a peça (a sessão ativa, o acervo, o catálogo e a entrega em espera), em
 `sessao/sessao-da-bancada.js`. O `main.js` só monta essas peças, na mesma ordem
 da subida de antes, porque a ordem em que os objetos entram na cena e os
@@ -92,99 +89,82 @@ módulos sem tela não procuram elemento, não ouvem a janela, não leem o ender
 e não pedem quadro ao navegador. Os componentes são testados sobre uma página
 falsa, `componentes/dom-de-teste.js`, sem navegador.
 
-## O sistema visual e os temas
+## O sistema visual e o arranjo da bancada
 
 A aparência da bancada sai de um arquivo só, `src/bancada/sistema-visual.css`,
 com as variáveis de espaço (uma grade de 4 e 8 pixels, mais o meio passo de 2),
 de texto (uma família, três tamanhos e algarismos de largura fixa para os
 números), de cor (cinzas neutros, um destaque, e o erro e o acerto só para
 mensagens) e de forma (raio, traço, sombra e altura de controle). Há dois
-conjuntos com os mesmos nomes: o claro, tirado da proposta B e usado pelos
-temas Foco e Revisão, e o escuro, tirado da proposta A e usado pelo tema
-Bancada. A folha de estilo, `styles.css`, e a de cada arrumação própria de um
-tema, em `src/bancada/temas/` (hoje `revisao.css`), não escrevem cor, tamanho de
-fonte nem espaçamento: `src/bancada/estilo/sistema-visual.test.js` lê cada folha
-da bancada e reprova a declaração que escapar das variáveis, e roda com os
-outros testes da bancada.
+conjuntos com os mesmos nomes, o claro e o escuro; a bancada usa o escuro. A
+folha de estilo, `styles.css`, não escreve cor, tamanho de fonte nem
+espaçamento: `src/bancada/estilo/sistema-visual.test.js` lê cada folha da
+bancada e reprova a declaração que escapar das variáveis, e roda com os outros
+testes da bancada.
 
-Um tema é uma declaração em `src/bancada/temas/temas.js`, e não código. Ele diz
-o conjunto de cores (`cores`), a arrumação da folha de estilo (`arrumacao`, hoje
-`foco`, `bancada`, `revisao` ou `classica`), o lugar de cada componente móvel (`lugares`, do
-nome em `data-movel` na página para o nome em `data-lugar`), o texto dos
-controles que mudam de nome (`rotulos`, pelo `data-rotulo`, com um texto só ou
-um texto por caso da tela: a peça, uma parte escolhida ou a edição), os painéis
-que o tema deixa abrir com a largura de cada um e a margem, que é zero no painel
-fixo (`paineis`), e a cena 3D que ele pede (`cena`: o fundo, o meio do degradê
-quando há, a cor da grade, a grade esmaecida, a sombra suave e a cor do contorno
-da seleção, com as cores escritas como o nome da variável do sistema visual). O componente
-`componentes/tema.js` lê a declaração e escreve `data-tema`, `data-cores` e
-`data-arrumacao` na raiz da página, leva cada componente para o lugar do tema e
-o devolve para casa quando o tema seguinte não o cita, troca os rótulos e
-entrega a cena ao ambiente. A escolha fica no estado central (`tema`), guardada
-como preferência local, e a pessoa a faz na janela Controles e na busca de
-comandos. Tema novo declara esses campos; precisa de CSS só se pedir uma
-arrumação nova, e então escreve as regras dela sob
-`:root[data-arrumacao="<nome>"]`.
+Desde 2026-11-03 a bancada tem um só arranjo, a Bancada. Os temas Foco e Revisão
+saíram por decisão da pessoa, e com eles o seletor de tema, a mesa da peça com a
+referência ao lado e a folha `temas/revisao.css`. O arranjo continua declarado em
+`src/bancada/temas/temas.js`, como dados e não como código, porque o componente
+`componentes/tema.js` o lê para arrumar a página: o conjunto de cores (`cores`),
+a arrumação da folha de estilo (`arrumacao`, `bancada`), o lugar de cada
+componente móvel (`lugares`, do nome em `data-movel` na página para o nome em
+`data-lugar`), o texto dos controles que mudam de nome (`rotulos`, pelo
+`data-rotulo`, com um texto só ou um texto por caso da tela: a peça, uma parte
+escolhida ou a edição), os painéis com a largura de cada um e a margem, que é
+zero no painel fixo (`paineis`), e a cena 3D (`cena`: o fundo, o meio do
+degradê, a cor da grade, a grade esmaecida, a sombra suave e a cor do contorno da
+seleção, com as cores escritas como o nome da variável do sistema visual). O
+componente escreve `data-tema`, `data-cores` e `data-arrumacao` na raiz, leva
+cada componente para o lugar declarado, troca os rótulos e entrega a cena ao
+ambiente. O tema gravado no navegador por uma versão anterior (`foco` ou
+`revisao`) não existe mais e cai no padrão, sem erro. As regras da arrumação ficam
+sob `:root[data-arrumacao="bancada"]` em `styles.css`.
 
-O Foco é o tema padrão. A cena ocupa a tela inteira, e os controles flutuam:
-no alto, o grupo da peça (a árvore, o nome e a sessão, Abrir e Editar), a barra
-da cena (projeção, visão, enquadrar e a caixa da cena com a grade, o chão e a
-explosão) e o grupo da direita (a busca de comandos e as janelas Controles e
-Estado, e o botão dos detalhes); o cubo de orientação (`cubo-de-orientacao.js`)
-no lugar das nove vistas em botão, com faces que levam à vista; a árvore das
-partes como gaveta à esquerda, com isolar e ocultar por linha e sem contagem de
-faces; o cartão da seleção (`cartao-da-selecao.js`) ao lado da parte, com as
-medidas, as ações e "Detalhes", que abre o painel da direita (Seleção,
-Referência e Notas); a barra do modo de edição (`barra-de-edicao.js`), com
-juntas e malha, desfazer, descartar e o rodapé do ajuste; e a barra de estado
-(`barra-de-estado.js`), com a dica do gesto, a seleção, a escala, a unidade e a
-peça. A busca de comandos (`busca-de-comandos.js`) abre com `Ctrl+K` em
-qualquer tema. Os painéis abertos são do componente `paineis-do-tema.js`: abrir
-um painel que deixaria a cena com menos de 70% da largura recolhe o outro, e
-com as larguras do Foco os dois só cabem juntos a partir de 1920 pixels. A cena
-do Foco tem o fundo claro do sistema visual, a grade que some antes da borda, a
-sombra suave no chão e o contorno da seleção na borda da peça no lugar da tinta
-verde (`cena/cenario-do-tema.js` e `cena/contorno-da-selecao.js`).
+A Bancada é a estação de CAD escura da proposta A. A barra do alto, fina, leva à
+esquerda o botão da árvore, Abrir e, à direita dele, Configurações; no meio a
+busca de comandos; e à direita a troca entre Inspecionar e Editar, a janela
+Estado e o botão do painel da direita. O Abrir mostra o nome em toda largura em
+que a barra cabe, e a janela dele lista cada objeto de várias partes (o avião e o
+braço robótico) como uma entrada de montagem, que abre a montagem inteira lida de
+`<objeto>/montagem.json` pelo leitor da autoria, com as peças nas posições da
+montagem; a árvore de objetos lista as instâncias, e as partes dele deixam de ser
+entradas próprias (continuam abrindo pelo nome no endereço, como `?peca=aviao/asas`).
+A janela de Configurações traz a lista de atalhos, que a pessoa troca clicando no
+comando, e a ajuda do ponteiro; a grade e o chão têm interruptor na barra de
+estado e na aba Inspeção, e não se repetem ali. O nome da peça com a luz da
+sessão, a dica do gesto na barra de estado e o bloco de diagnóstico e de portas
+da aba Inspeção saíram da tela: as portas que a peça publica e as faces sem
+identidade saem pela ponte da captura (`portas` e `diagnosticos`) e pela linha de
+comando, e o estado da sessão está na janela Estado. Editar é o botão das juntas,
+e Inspecionar desliga o modo de edição que estiver ligado, pela barra do modo de
+edição. A árvore das partes, com 196 pixels, e o painel da direita, com 216,
+ficam fixos dos lados, e a cena fica entre eles: o canvas encolhe com os painéis
+abertos, e a regra dos 70% conta os dois sem margem. Numa janela de 1400 pixels
+a cena tem 988 de largura, 70,6%; os dois painéis só cabem juntos a partir de
+1374 pixels, e abaixo disso a página nasce só com a árvore, a primeira
+declarada, e o cartão da seleção aparece no lugar do painel da direita, contando
+a posição sobre o canvas. Na aba de referência o painel da direita tem 340
+pixels, porque o botão e os campos dela não cabem em 216, e a cena cede a
+diferença enquanto essa aba está aberta. A primeira aba do painel da direita se
+chama Peça, Parte ou Edição conforme o caso, e no modo de edição começa pela
+ajuda de editar. Sobre a cena ficam a barra flutuante (a caixa das vistas da
+câmera, a projeção, o seletor de visão, enquadrar, focar e copiar vista), o cubo
+de orientação no canto de cima, a legenda das visões de curvatura e de luz
+rasante sob a barra flutuante, no canto de cima, fora do meio da peça, e a barra do
+modo de edição embaixo, no meio da cena; a barra de estado fecha a tela. A cena
+tem o fundo em degradê do conjunto escuro, do `--cena-2` no meio ao `--cena` nas
+bordas, numa textura feita por conta pura em `cena/cenario-do-tema.js`, a grade
+esmaecida, a sombra suave e o contorno da seleção no destaque laranja, e a borda
+da cena fica no destaque enquanto a edição está ligada. A busca de comandos
+(`busca-de-comandos.js`) abre com `Ctrl+K`, e os painéis abertos são do componente
+`paineis-do-tema.js`.
 
-A Bancada é a estação de CAD escura da proposta A, sobre os mesmos componentes.
-A barra do alto, fina, leva à esquerda o botão da árvore, Abrir, o nome e o
-estado da sessão; no meio a busca de comandos; e à direita a troca entre
-Inspecionar e Editar, as janelas Controles e Estado e o botão do painel da
-direita. Editar é o botão das juntas, e Inspecionar desliga o modo de edição que
-estiver ligado, pela barra do modo de edição. A árvore das partes, com 196
-pixels, e o painel da direita, com 216, ficam fixos dos lados, e a cena fica
-entre eles: o canvas encolhe com os painéis abertos, e a regra dos 70% conta os
-dois sem margem. Numa janela de 1400 pixels a cena tem 988 de largura, 70,6%; os
-dois painéis só cabem juntos a partir de 1374 pixels, e abaixo disso a página
-nasce só com a árvore, a primeira declarada, e o cartão da seleção aparece no
-lugar do painel da direita, contando a posição sobre o canvas. A primeira aba do
-painel da direita se chama Peça, Parte ou Edição conforme o caso, e no modo de
-edição começa pela ajuda de editar. Sobre a cena ficam a barra flutuante (a
-caixa das vistas da câmera, a projeção, o seletor de visão, enquadrar, focar e
-copiar vista), o cubo de orientação no canto de cima e a barra do modo de edição
-embaixo, no meio da cena; a barra de estado fecha a tela. A cena tem o fundo em
-degradê do conjunto escuro, do `--cena-2` no meio ao `--cena` nas bordas, numa
-textura feita por conta pura em `cena/cenario-do-tema.js`, a grade esmaecida, a
-sombra suave e o contorno da seleção no destaque laranja, e a borda da cena fica
-no destaque enquanto a edição está ligada. As regras da arrumação ficam sob
-`:root[data-arrumacao="bancada"]` em `styles.css` e desfazem as da arrumação
-clássica, que valem para toda arrumação que não é o Foco.
-
-O Revisão é a proposta C sem a faixa de decisão, que a decisão 4 do plano tirou:
-o veredito e o aceite ficam na conversa com o agente, e a árvore fica plana,
-sem estado de aceite por parte. Ele usa o conjunto claro, a cena do Foco e os
-componentes do Foco noutros lugares, e a arrumação `revisao`
-(`temas/revisao.css`): a barra do alto inteira, a árvore encostada à esquerda e
-aberta ao nascer, o painel da direita encostado do outro lado quando abre (os
-dois sem margem na regra dos 70%, como na Bancada), o cubo no canto da peça e a barra da cena no pé da mesa, com focar e copiar a vista
-ao lado de enquadrar. A mesa é a faixa entre os painéis, dividida entre a peça e
-a referência, cada uma com um cabeçalho fino. A mesa só existe no tema que lhe
-dá lugar (`lugares['mesa-comparacao']`); nos outros ela fica numa casa escondida
-da página. O cabeçalho da peça diz a vista e a projeção, e o modo de edição
-quando ele está ligado. O da referência escolhe a vista da referência, troca
-entre lado a lado e sobreposta (a sobreposta com a transparência sobre a peça),
-liga a mesma câmera e esconde a referência, que devolve a largura toda à peça;
-quando a peça não tem imagem, o lado dela diz isso e a peça fica com a mesa.
+O endereço da página guarda a câmera livre, mas só a grava quando o giro ou o
+zoom terminam (`cena/gravador-da-camera.js`): o controle de órbita avisa a cada
+quadro, e reescrever o endereço umas 60 vezes por segundo fazia o navegador
+frear as trocas e o cursor piscar. A cópia da vista e a ponte da captura
+descarregam o que estiver pendente antes de ler o endereço.
 
 A referência é a imagem que a aba de imagem de referência mostra, lida a cada
 quadro: a que está na cena quando a chave "Na cena" está ligada e, com ela
@@ -219,9 +199,8 @@ em qualquer tema.
 
 ## As visões de conferência
 
-O controle "Visão" fica na barra da cena dos três temas (Foco, Bancada e
-Revisão) e troca o jeito de desenhar a mesma peça, com uma tecla para cada
-visão, que o menu Controles deixa trocar: a
+O controle "Visão" fica na barra da cena e troca o jeito de desenhar a mesma peça, com uma tecla para cada
+visão, que a janela de Configurações deixa trocar: a
 sólida (`O`), o arame que esconde o que fica atrás (`M`), o raio X (`Shift+M`), a
 curvatura (`K`), a zebra (`B`) e a luz rasante (`J`). A escolha volta na próxima
 vez que a página abre, vale depois de trocar de peça, de arrastar uma junta e de
@@ -279,10 +258,11 @@ das guardas de `bancada:guardas`) mede num navegador de verdade o que os testes
 sobre a página falsa não alcançam. Na `carenagem-de-prova`, cada visão ligada
 pela tecla muda a região da peça em mais de 5% dos pixels em relação à sólida, o
 controle mostra o nome dela, a zebra e a luz rasante mudam a imagem quando a
-câmera gira, e voltar à sólida devolve a imagem de antes pixel a pixel. Nos três
-temas, em 1400 e em 1100 pixels de largura, a cena ocupa ao menos 70% da
-largura (no Revisão, a peça mais a referência ao lado) e a página não
-transborda para os lados.
+câmera gira, e voltar à sólida devolve a imagem de antes pixel a pixel. A legenda da curvatura e a da luz rasante não
+cruzam a caixa da peça na tela. Em 1400 e em 1100 pixels de largura a cena
+ocupa ao menos 70% da largura e a página não transborda para os lados. As
+afirmações que só faziam sentido com três temas (o laço pelos temas, a mesa da
+peça com a referência, a escolha gravada) saíram com os temas Foco e Revisão.
 
 ## A imagem de referência
 

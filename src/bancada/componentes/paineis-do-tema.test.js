@@ -57,7 +57,7 @@ describe('regra dos painéis', () => {
 });
 
 describe('painéis do tema', () => {
-  it('abrir com uma aba escolhe a aba, e encolher a janela deixa só a árvore', () => {
+  it('abrir com uma aba escolhe a aba, e encolher a janela deixa só o último aberto', () => {
     const { paineis, abas, estado, janela } = montar({ largura: 2000 });
     paineis.abrir('partes');
     paineis.abrir('inspecao', { aba: 'referencias' });
@@ -65,7 +65,7 @@ describe('painéis do tema', () => {
     expect(abas).toEqual(['referencias']);
     janela.innerWidth = 1300;
     janela.disparar({ type: 'resize' }, { captura: false });
-    expect(estado.obter('paineis')).toEqual({ partes: true, inspecao: false });
+    expect(estado.obter('paineis')).toEqual({ partes: false, inspecao: true });
   });
 
   it('na Bancada nascem abertos os dois em 1400, só a árvore em 1100, e encolher a janela sem escolha deixa a árvore', () => {

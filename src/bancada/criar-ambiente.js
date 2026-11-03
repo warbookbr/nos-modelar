@@ -90,7 +90,7 @@ export function posicionarNoEstudio(objeto, { tamanhoMaximo = 3.4, piso = 0.08 }
   objeto.updateMatrixWorld(true);
 }
 
-export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre } = {}) {
+export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre, aoTerminarCameraLivre } = {}) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
@@ -202,6 +202,10 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   });
   controls.addEventListener('change', () => {
     if (vistaAtual === 'livre') aoMudarCameraLivre?.();
+  });
+  /* O fim do giro ou do zoom (a rodinha o dispara a cada passo): quem grava o endereço espera por ele em vez de gravar a cada `change`. */
+  controls.addEventListener('end', () => {
+    if (vistaAtual === 'livre') aoTerminarCameraLivre?.();
   });
 
   function aplicarVisibilidadeDoCenario() {

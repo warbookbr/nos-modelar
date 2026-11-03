@@ -52,7 +52,7 @@ function montar() {
     registroDeEventos,
     registroAtalhos,
     comandos: COMANDOS,
-    entradasDoAcervo: [{ id: 'furgao', montagem: false }, { id: 'peca-de-prova', ensaio: true }],
+    entradasDoAcervo: [{ id: 'furgao', montagem: false }, { id: 'objeto', montagem: true, emDados: true }, { id: 'objeto/base', parteDe: 'objeto' }, { id: 'peca-de-prova', ensaio: true }],
     abrirDoAcervo,
     janela: pagina.janela,
   });
@@ -78,8 +78,10 @@ describe('barra superior', () => {
   it('o acervo lista as receitas, marca as de ensaio e escolher fecha a janela e abre a peça', () => {
     const { $, abrirDoAcervo } = montar();
     const linhas = $('listaAcervo').querySelectorAll('[data-receita]');
-    expect(linhas.map((l) => l.dataset.receita)).toEqual(['furgao', 'peca-de-prova']);
-    expect(linhas[1].querySelector('.marca-ensaio').textContent).toBe('ensaio');
+    /* o objeto de várias partes é uma entrada de montagem, e a parte dele não é entrada */
+    expect(linhas.map((l) => l.dataset.receita)).toEqual(['furgao', 'objeto', 'peca-de-prova']);
+    expect(linhas[1].querySelector('kbd').textContent).toBe('montagem');
+    expect(linhas[2].querySelector('.marca-ensaio').textContent).toBe('ensaio');
     $('btnMenuAbrir').click();
     linhas[0].click();
     expect($('menuAbrir').hidden).toBe(true);
