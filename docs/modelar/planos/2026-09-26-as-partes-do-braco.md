@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/braco-robotico/`
+**Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`
 
 **Descongelado em:** 2026-11-03, por decisão da pessoa, que viu na bancada o ombro desproporcional ao resto do conjunto. Estava congelado desde 2026-09-29 para o esboço deixar de custar conta à mão; os planos do esboço e das ferramentas de modelagem que vieram antes fecharam.
 
@@ -74,6 +74,8 @@ próxima conversa com a pessoa.
 Em 2026-09-26 a pessoa reabriu a etapa `ombro` com `npm run etapas -- --reabrir`, que guarda o aceite e a receita antigos em `reaberturas`; `npm run objeto` mostra 2 de 3 fixas com o ombro como próxima, e as peças novas seguem fora da montagem até a pessoa confirmar a ordem.
 
 Em 2026-11-03 a pessoa abriu o braço na bancada e apontou que o ombro não está proporcional ao conjunto. Medido contra a prancha da lateral sem cabo: a seção de cima do ombro tem 220 mm de largura, mais que os 189 mm da base, a altura sobre o anel da cintura é de 250 mm contra cerca de 177 mm na referência, e o anel da junta tem 210 mm de diâmetro para uma coluna de 158 mm. A pessoa descongelou o plano para refazer a proporção do ombro primeiro, com as opções desenhadas lado a lado na escala da base e da coluna da referência para ela escolher pela imagem, e as partes seguintes depois, quando ela quiser.
+
+No mesmo dia a pessoa escolheu a opção B (seção de 190 mm, eixo a 115 mm, topo a 210 mm sobre o anel da cintura) e pediu, na mesma rodada, o encontro entre a parte de pé e a deitada sem a quina e os degraus de sombra que ela viu na bancada; a decisão está no `ALINHAMENTO.md` do braço. Duas correções de ferramenta entram no plano porque o ombro as revelou. A luz rasante só era obrigatória no pacote do crítico da peça de lataria, e as marcas do encontro passaram por oito rodadas sem ela; passa a valer também para a peça com sombreamento suave sobre uma emenda de fusão. E `npm run etapas`, ao só ler o estado, derrubou as três etapas fixas e apagou os aceites da base e do anel, porque compara o texto da receita, e o texto mudou em 2026-10-28 com a retirada das referências de terceiros sem mudar a forma; a etapa passa a comparar o que a receita gera e a guardar o aceite de quem quebrou.
 
 ## Incluído
 

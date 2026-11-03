@@ -235,3 +235,9 @@ também um ombro em "T" no estilo dos braços colaborativos, com um cilindro
 deitado sobre o colar; a pessoa ficou com o próprio desenho, porque o "T" deixa
 uma linha de divisão muito visível no encontro dos dois cilindros e lê como uma
 bola sobre um tubo.
+
+## Proporção do ombro, 2026-11-03
+
+A pessoa abriu o braço na bancada e achou o ombro grande demais para o conjunto: a seção de cima tinha 220 mm, mais que a base, o topo ficava a 250 mm do anel da cintura contra cerca de 177 mm na referência, e o anel da junta tinha 231 mm para uma coluna de 158 mm. Ela viu três tamanhos desenhados sobre a mesma base, com a coluna da referência presa no anel da junta (`referencias/ombro-proporcao.png` e `referencias/ombro-proporcao-frente.png`), e escolheu a opção B: seção de 190 mm, eixo da junta a 115 mm do anel da cintura e topo a 210 mm. A forma em L, com o pé redondo no diâmetro do anel da cintura e a saída redonda com o anel fino, continua a mesma.
+
+Na mesma conversa ela apontou marcas no canto de baixo do encontro entre a parte de pé e a deitada, perto do anel: a saída redonda é 5% maior que a seção quadrada, sobra por baixo dela e bate na frente da parte de pé numa quina viva, e o sombreamento suave sobre os triângulos longos da emenda faz degraus de sombra. O ombro refeito não pode ter quina viva nem degrau de sombra nesse encontro, conferido na luz rasante.
