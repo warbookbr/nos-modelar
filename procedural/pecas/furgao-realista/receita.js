@@ -76,23 +76,10 @@ export const TABELA = {
   pneu_diametro: 710,
   pneu_largura: 235,
   arco_raio: 420,
-  // a roda da família `roda-pneu`, no pneu 235/65 aro 16 com bojo e ombro: assento do aro (16 polegadas), largura do aro (fração do pneu), parede do aro, chapa,
-  // cubo, furo central e os 5 furos de fixação (círculo de 130, furo de 16), e o desvio (fração da folga do aro, para fora)
+  // a roda da família `roda-pneu`: o perfil dela (pneu com bojo, ombro e quatro sulcos ao longo da volta, roda de chapa de aço com 5 parafusos e 5 furos de
+  // ventilação) e o assento do aro de 16 polegadas; o diâmetro e a largura do pneu são os da prancha (710 e 235), e não os 712 do perfil
+  roda_perfil: 'furgao-235-65-r16',
   roda_assento: 406.4,
-  roda_largura_aro: 0.75,
-  roda_parede_aro: 4,
-  roda_chapa: 6,
-  roda_largura_cubo: 36,
-  roda_diametro_cubo: 185,
-  roda_furo_central: 75,
-  roda_furos_fixacao: 5,
-  roda_circulo_furos: 130,
-  roda_diametro_furo: 16,
-  roda_desvio: 0.52,
-  // as duas melhorias que a família ganha em paralelo (sulcos ao longo da volta da banda e furos de ventilação na chapa): 0 é desligado; a receita ainda
-  // não as passa à família, e o par de linhas em `chamadaDaRoda` marca onde ligá-las
-  roda_sulcos_circunferenciais: 0,
-  roda_furos_ventilacao: 0,
   // o forro dos arcos: a folga até o pneu, quanto ele passa da boca do arco para encostar na chapa, e o raio onde a parede de dentro acaba
   forro_folga: 25,
   forro_sobra: 8,
@@ -1766,17 +1753,11 @@ export function derivar(T) {
 let registroDeFamilias = null;
 const familias = () => { registroDeFamilias ??= criarRegistroDeFamilias(); return registroDeFamilias; };
 
-/** A chamada da família `roda-pneu` para o pneu da tabela. As medidas da família são proporções do diâmetro do pneu; a tabela as dá em milímetro.
- *  A banda 0 é o pneumático com bojo e ombro, e o tipo 0 a roda de chapa. `roda_sulcos_circunferenciais` e `roda_furos_ventilacao` ficam na tabela, em 0,
- *  para quando a família passar a aceitá-los: é aqui, ao lado de `sulcos`, que eles entram na chamada. */
+/** A chamada da família `roda-pneu` pelo perfil da tabela. O perfil dá a roda de chapa, os sulcos da banda e os furos de ventilação; o que a prancha fixa
+ *  vale mais que ele: o diâmetro e a largura do pneu (710 e 235) e o assento do aro, que as medidas da família pedem como proporção do diâmetro. */
 function chamadaDaRoda(T, id) {
   const D = T.pneu_diametro;
-  return chamar(familias().obter('roda-pneu'), id, {
-    diametroPneu: D, larguraPneu: T.pneu_largura / D, diametroAro: T.roda_assento / D, larguraAro: T.roda_largura_aro, paredeDoAro: T.roda_parede_aro / D,
-    banda: 0, tipo: 0, espessuraDisco: T.roda_chapa / D, larguraCubo: T.roda_largura_cubo / D, diametroCubo: T.roda_diametro_cubo / D,
-    diametroFuroCentral: T.roda_furo_central / D, furosDeFixacao: T.roda_furos_fixacao, diametroCirculoFuros: T.roda_circulo_furos / D,
-    diametroFuro: T.roda_diametro_furo / D, desvio: T.roda_desvio,
-  });
+  return chamar(familias().obter('roda-pneu'), id, { perfil: T.roda_perfil, diametroPneu: D, larguraPneu: T.pneu_largura / D, diametroAro: T.roda_assento / D });
 }
 
 /* Os ids da família são locais (de 1 a 11) e os nomes das partes são os dela (pneu, aro, cubo, disco): cada roda soma `base` aos ids e põe o sufixo da roda nos
@@ -2021,11 +2002,11 @@ const receita = {
         {
           nome: `pneu${sufixo}`,
           forma: `pneu 235/65 aro 16 da roda ${sufixo.replace(/([A-Z])/g, ' $1').toLowerCase().trim()}: 710 mm de diâmetro e 235 de largura, pneumático com bojo no flanco e ombro chanfrado, na bitola de 1730 e no eixo ${sufixo.startsWith('Dianteiro') ? 'dianteiro' : 'traseiro'}, apoiado no chão`,
-          tecnica: 'família roda-pneu: lathe em torno de x da seção do pneu, banda 0 (pneumático), 96 lados, sombreamento liso',
+          tecnica: 'família roda-pneu, perfil furgao-235-65-r16: lathe em torno de x da seção do pneu, banda 0 (pneumático), 96 lados, quatro sulcos ao longo da volta subtraídos da banda, sombreamento liso',
         },
-        { nome: `aro${sufixo}`, forma: 'barril de aço do aro de 16 polegadas, de 4 mm de parede e 75% da largura do pneu, que a banda abraça', tecnica: 'família roda-pneu: lathe em torno de x de um tubo' },
-        { nome: `cubo${sufixo}`, forma: 'cubo da roda de chapa, com o furo central de 75 mm e a volta de 5 furos de fixação de 16 mm no círculo de 130', tecnica: 'família roda-pneu: lathe do anel menos o furo central e os cinco furos repetidos em volta do eixo' },
-        { nome: `disco${sufixo}`, forma: 'chapa de aço da roda de 16 polegadas, de 6 mm, do cubo ao aro, deslocada para fora', tecnica: 'família roda-pneu: lathe em torno de x de um anel, tipo 0 (roda de disco)' },
+        { nome: `aro${sufixo}`, forma: 'barril de aço do aro de 16 polegadas, de 3,6 mm de parede e 70% da largura do pneu, que a banda abraça', tecnica: 'família roda-pneu: lathe em torno de x de um tubo' },
+        { nome: `cubo${sufixo}`, forma: 'cubo da roda de chapa, com o furo central de 71 mm e a volta de 5 furos de fixação de 20 mm no círculo de 118', tecnica: 'família roda-pneu: lathe do anel menos o furo central e os cinco furos repetidos em volta do eixo' },
+        { nome: `disco${sufixo}`, forma: 'chapa de aço da roda de 16 polegadas, de 6 mm, do cubo ao aro, deslocada para fora, com a volta de 5 furos de ventilação de 50 mm no círculo de 277', tecnica: 'família roda-pneu: lathe em torno de x de um anel, tipo 0, menos os cinco furos de ventilação repetidos em volta do eixo' },
       ]),
     ],
     criteriosDeReprovacao: [
