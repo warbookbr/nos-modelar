@@ -1,0 +1,1101 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 9,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem referência: o pedido não traz imagem de alvo; julgado contra a forma prometida em texto",
+    "nota": 4,
+    "defeitos": [
+      {
+        "parte": "pescoco",
+        "tipo": "ausencia",
+        "onde": "dobra do L entre coluna e braço deitado",
+        "sentido": "faltando",
+        "evidencia": "Vista direita e isométrica: bloco cúbico cheio, sem coluna e braço distintos nem pé redondo; lê como caixa, não como L de ponta-cabeça."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "espessura",
+        "onde": "pé redondo, parte baixa",
+        "sentido": "menor",
+        "evidencia": "Direita e frontal: o pé é um prato de poucos milímetros de altura, não o pé de coluna prometido. O corpo apoia no prato por um recorte em arco."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "posicao",
+        "onde": "prato do pé sob o bloco",
+        "sentido": "adiantada",
+        "evidencia": "Direita: prato fino de ~375 a 812 px sob o bloco de 345 a 793 px. Fica deslocado para +z e não centra no bloco; o anel pende além dele do outro lado."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "superficie",
+        "onde": "encontro de baixo e cantos junto à saída, lado -z da vista direita",
+        "sentido": "segmentado",
+        "evidencia": "Direita e luz rasante de lado az10: dobras, rasgos e triângulos de sombra nos cantos inferior e superior esquerdos. Costura não concordada, degrau de sombra."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "superficie",
+        "onde": "seção lateral e topo do corpo, vista superior",
+        "sentido": "facetado",
+        "evidencia": "Superior: contorno em polígono com ponta no topo (~410 px) e laterais saindo além do pé (287 a 813 contra 310 a 790 px). Não lê como cantos arredondados contínuos."
+      }
+    ],
+    "observacao": "O anel está correto (faixa fina, encostada, escura); o pescoço não entrega o L prometido, e o encontro de baixo e a seção alargada reprovam pelos critérios do pedido."
+  },
+  "partes": [
+    {
+      "nome": "pescoco",
+      "confere": false,
+      "observacao": "forma e técnica conferem com o plano; resta remendo de sombra e ponto claro minúsculo no arredondamento do encontro de baixo, e ruído no afunilamento da saída"
+    },
+    {
+      "nome": "anel",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "arredondarCostura recusa a costura inteira (cantos de 3 superfícies e topo coplanar); só aceita com regiao, e o raio não cabe quando o pé tem corte oblíquo",
+    "o guarda de porta mede a faixa de 10 mm junto ao plano: abertura do pé antes de 10 mm reprova com raio 109 mm, sem dizer a causa",
+    "o loft passa de 1000 vértices com 23 seções de 48 lados e recusa (bloco de ids), o que limita seções intermediárias",
+    "o arredondamento deixa um ponto claro minúsculo na faixa do encontro que não consegui eliminar; não achei a origem",
+    "vistas:superficie passa dos 120 s e olhar-bancada --zoom roda mais de 2 min, o que obrigou a rodar em segundo plano",
+    "a rodada 8 e o aceite são do ombro antigo; a próxima ação mostra defeitos antigos em aberto",
+    "quem conduz: o modelador tirou o recuo da frente da coluna para matar a quina, e o L que a pessoa aceitou em 2026-09-29 virou bloco; o PLANO diz L e não diz quanto o braço deitado avança sobre a coluna, o que é falta do plano",
+    "quem conduz: o pé redondo de 10 mm saiu como prato mais largo que o corpo; o PLANO não diz a altura do pé nem que ele não passa do corpo"
+  ],
+  "notaDePassagem": "Saída inscrita na seção (não 5% maior) tira a quina; quadrado de lados planos tira o degrau da emenda; pé redondo até 10 mm por causa da faixa de 10 mm da porta; fillet de 10 mm só embaixo.",
+  "receita": {
+    "sha256": "sha256:298d93df5c145fcb3d352d11e5eef2a5aae1518407d8be4cb120d3b3406548df",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 188,
+      "acrescentadas": 172,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 1,
+          "texto": "/* braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura:"
+        },
+        {
+          "tipo": "-",
+          "linha": 2,
+          "texto": " * um colar redondo, um corpo com planta em \"D\" e o tambor da junta."
+        },
+        {
+          "tipo": "-",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "-",
+          "linha": 4,
+          "texto": " * Terceira etapa da montagem `braco-robotico/montagem.json`. O combinado com a"
+        },
+        {
+          "tipo": "-",
+          "linha": 5,
+          "texto": " * pessoa está em `../../ALINHAMENTO.md`, e o rascunho dela em"
+        },
+        {
+          "tipo": "-",
+          "linha": 6,
+          "texto": " * `../../referencias/ombro-rascunho2-*.png`; os passos são escritos pelo"
+        },
+        {
+          "tipo": "-",
+          "linha": 7,
+          "texto": " * modelador. O raio do colar vem da porta `topo` do anel, por vínculo da"
+        },
+        {
+          "tipo": "-",
+          "linha": 8,
+          "texto": " * montagem, e o corpo segue esse raio."
+        },
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-robotico/ombro — ombro escolhido pela pessoa em 2026-09-28 (L de"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * ponta-cabeça sobre o anel da cintura) e redimensionado em 2026-11-03, opção B:"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * seção de cima de 190 mm de largura, eixo da junta a 115 mm da boca de baixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * (o topo do anel da cintura) e topo a 210 mm."
+        },
+        {
+          "tipo": "-",
+          "linha": 10,
+          "texto": " * A forma anterior, um cotovelo de cano, foi reprovada pela pessoa depois de"
+        },
+        {
+          "tipo": "-",
+          "linha": 11,
+          "texto": " * três rodadas; as duas julgadas estão em `rodadas/` como histórico."
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * O corpo é a união de dois sólidos de lofts: a coluna, que sobe do pé redondo"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * no diâmetro do anel da cintura e vira, logo acima dele, a seção quase"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * quadrada de cantos arredondados até o topo; e o braço deitado, que nasce dentro da"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * coluna com a mesma seção, sai para +Z além da frente dela e volta a ser"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * redondo no fim. A saída é o círculo inscrito na seção quadrada, e por isso"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * nada dela sobra por baixo nem bate na frente da coluna; o encontro de baixo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * entre a frente da coluna e a face de baixo do braço, é arredondado pelo"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * `arredondarCostura` e o sombreamento é liso com ângulo, para a quina que"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * sobra continuar nítida e a emenda não fazer degrau de sombra. O anel é uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * faixa fina escura que encosta na face da saída sem entrar nela."
+        },
+        {
+          "tipo": "-",
+          "linha": 13,
+          "texto": " * Portas que a receita publica:"
+        },
+        {
+          "tipo": "-",
+          "linha": 14,
+          "texto": " *   apoio        — anel que ocupa, eixo +Y, centro no meio da face de baixo do"
+        },
+        {
+          "tipo": "-",
+          "linha": 15,
+          "texto": " *                  colar, borda de baixo do colar. Senta no `topo` do anel."
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * Portas:"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " *   apoio        — anel, eixo +Y, centro no meio da boca de baixo, borda de"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *                  baixo do pé. Senta no `topo` do anel da cintura."
+        },
+        {
+          "tipo": "-",
+          "linha": 17,
+          "texto": " *                  tambor, raio do tambor. O `braco` se prende aqui."
+        },
+        {
+          "tipo": "-",
+          "linha": 18,
+          "texto": " *"
+        },
+        {
+          "tipo": "-",
+          "linha": 19,
+          "texto": " * Regra das portas de apoio do braço: quem recebe publica a face inteira,"
+        },
+        {
+          "tipo": "-",
+          "linha": 20,
+          "texto": " * de raio interno zero ao raio da face, numa faixa de 5 mm para dentro da"
+        },
+        {
+          "tipo": "-",
+          "linha": 21,
+          "texto": " * peça; quem se apoia publica só a borda de baixo, uma faixa de 10 mm de"
+        },
+        {
+          "tipo": "-",
+          "linha": 22,
+          "texto": " * largura até o raio dela e 5 mm para dentro dela. A montagem confere que a"
+        },
+        {
+          "tipo": "-",
+          "linha": 23,
+          "texto": " * borda inteira está sobre a face, sem fresta e no mesmo eixo."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *                  anel, raio do anel."
+        },
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": "  raioDoColar: 105,"
+        },
+        {
+          "tipo": "-",
+          "linha": 29,
+          "texto": "  alturaDoColar: 30,"
+        },
+        {
+          "tipo": "-",
+          "linha": 30,
+          "texto": "  /* Distância, em Z, do eixo vertical da cintura até a face plana do bloco"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "     da frente do corpo, onde o tambor encosta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "  frenteDoBloco: 125,"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "  /* Altura do topo plano do corpo, medida da face de baixo do colar. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 34,
+          "texto": "  alturaDoTopo: 240,"
+        },
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": "  /* A rampa de trás começa no eixo vertical e desce, abaulada, até esta"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": "     altura na borda de trás. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "  alturaDaRampaAtras: 120,"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": "  raioDoTambor: 160,"
+        },
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": "  espessuraDoTambor: 40,"
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": "  /* Altura do eixo do tambor, no meio da face do bloco. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": "  alturaDoEixo: 135,"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": "  /* Acabamento, escolhido pelo modelador. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 43,
+          "texto": "  chanfroDoColar: 3,"
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": "  /* O chanfro de cima é pequeno, para o topo do colar quase ter o raio do"
+        },
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": "     corpo e a linha do encontro continuar legível sem degrau. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "  chanfroDeCimaDoColar: 1.5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 47,
+          "texto": "  suaveDoChanfro: 0.8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "  suaveDoChanfroDeCima: 0.5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "  filDoTambor: 6,"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "  /* Expoente da superelipse da rampa: 2 é quarto de elipse, acima de 1 é"
+        },
+        {
+          "tipo": "-",
+          "linha": 51,
+          "texto": "     sempre convexa; 1,7 desce sem chegar a parede vertical atrás. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "  curvaDaRampa: 1.7,"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "  /* Meio ângulo, visto de cima a partir do eixo -Z, da corda de baixo da"
+        },
+        {
+          "tipo": "-",
+          "linha": 54,
+          "texto": "     rampa. Com zero a fatia de baixo da rampa teria largura nula. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 55,
+          "texto": "  anguloDoPeDaRampa: 10,"
+        },
+        {
+          "tipo": "-",
+          "linha": 56,
+          "texto": "  /* Grade do corpo: o corpo é um loft em Z de retângulos (largura da planta"
+        },
+        {
+          "tipo": "-",
+          "linha": 57,
+          "texto": "     em D por altura até a rampa). Cada retângulo tem divisoesDaLargura"
+        },
+        {
+          "tipo": "-",
+          "linha": 58,
+          "texto": "     pontos em cima e embaixo e divisoesDaAltura em cada lado. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 59,
+          "texto": "  divisoesDaLargura: 6,"
+        },
+        {
+          "tipo": "-",
+          "linha": 60,
+          "texto": "  divisoesDaAltura: 6,"
+        },
+        {
+          "tipo": "-",
+          "linha": 61,
+          "texto": "  /* Estações na parede de trás, iguais em ângulo: do bico ao pé da rampa e"
+        },
+        {
+          "tipo": "-",
+          "linha": 62,
+          "texto": "     do pé da rampa ao eixo; e estações iguais no bloco da frente. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 63,
+          "texto": "  estacoesDoBico: 1,"
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "  estacoesDaRampa: 16,"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": "  estacoesDaFrente: 8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 66,
+          "texto": "  /* Ângulo, a partir do eixo -Z, da última estação de trás. Atrás dela o"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "     polo fica em z = -R, 0,4 mm além dela com 5 graus. Com menos, as faces"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "     do bico saem com menos de 0,5 mm² e a medida de contato as recusa. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 69,
+          "texto": "  anguloDoBico: 5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 70,
+          "texto": "  /* Limite do sombreado liso, em graus: quinas mais fechadas que isto (o V"
+        },
+        {
+          "tipo": "-",
+          "linha": 71,
+          "texto": "     da rampa com a parede, a frente com os lados, as tampas) ficam nítidas. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 72,
+          "texto": "  anguloDoLiso: 10,"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "  lados: 40,"
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "  /* O tambor tem mais lados que o colar, para o contorno ficar liso de frente. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 75,
+          "texto": "  ladosDoTambor: 108,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  /* Vem do anel da cintura pela montagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  raioDoPescoco: 105,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  /* Altura do trecho reto do pé, ainda redondo, acima da boca de baixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  alturaReta: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* Altura do eixo da saída acima da boca de baixo (opção B). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  alturaDoEixo: 115,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  /* Meia largura da seção quadrada de cima: 190 mm de largura. O topo fica em"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "     alturaDoEixo + meiaLargura = 210 mm, e a face de baixo do braço em"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     alturaDoEixo - meiaLargura = 20 mm, onde o pé termina de virar quadrado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  meiaLargura: 95,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  /* Raio dos cantos da seção quadrada de cima: lados planos entre quatro"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "     arcos, para as paredes da coluna e do braço serem planos exatos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  raioDosCantos: 32,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  /* Quanto o braço deitado sai para a frente além da frente da coluna. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  trechoHorizontal: 24,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* Comprimento, no fim do braço, em que a seção volta a ser redonda para a"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "     saída. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  transicaoDaSaida: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  /* Anel da junta: faixa fina, mesmo raio da saída. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  espessuraDoAnel: 28,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  /* Raio da concordância no encontro de baixo entre a coluna e o braço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  raioDoEncontro: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  chanfroDoPescoco: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* Seções intermediárias dos dois lofts, só para os triângulos da emenda"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "     ficarem curtos: triângulo longo faz o sombreamento suave virar degrau. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  estacoes: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  lados: 48,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "export const MATERIAIS = { anelEscuro: { cor: '#4a4d52', aspereza: 0.45 } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 79,
+          "texto": "const ID = { colar: 100, corpo: 200, tambor: 300 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "const ID = { coluna: 100, anel: 200, braco: 300, corpo: 400, concordancia: 500 };"
+        },
+        {
+          "tipo": "-",
+          "linha": 82,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "-",
+          "linha": 83,
+          "texto": "    R: m(t.raioDoColar), hc: m(t.alturaDoColar), zf: m(t.frenteDoBloco),"
+        },
+        {
+          "tipo": "-",
+          "linha": 84,
+          "texto": "    yt: m(t.alturaDoTopo), yr: m(t.alturaDaRampaAtras), Rt: m(t.raioDoTambor),"
+        },
+        {
+          "tipo": "-",
+          "linha": 85,
+          "texto": "    et: m(t.espessuraDoTambor), ye: m(t.alturaDoEixo), c: m(t.chanfroDoColar),"
+        },
+        {
+          "tipo": "-",
+          "linha": 86,
+          "texto": "    s: m(t.suaveDoChanfro), ft: m(t.filDoTambor),"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "    c2: m(t.chanfroDeCimaDoColar), s2: m(t.suaveDoChanfroDeCima),"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  const R = m(t.raioDoPescoco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  const a = m(t.alturaReta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const yEixo = m(t.alturaDoEixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const h = m(t.meiaLargura);"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  /* A frente da coluna está em z = h; o braço passa dela pelo trecho horizontal. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const zFace = h + m(t.trechoHorizontal);"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const zTransicao = zFace - m(t.transicaoDaSaida);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  /* A saída é o círculo inscrito na seção quadrada, e o anel tem o raio da"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "     saída: nada da saída fica fora da seção, nem por baixo dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const Rs = h;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const Ra = Rs;"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const e = m(t.espessuraDoAnel);"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const c = m(t.chanfroDoPescoco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  return { R, a, yEixo, h, zFace, zTransicao, Rs, Ra, e, c };"
+        },
+        {
+          "tipo": "-",
+          "linha": 91,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 92,
+          "texto": "  const { R, hc, zf, yt, yr, Rt, et, ye, c, s, ft, c2, s2 } = derivar(t);"
+        },
+        {
+          "tipo": "-",
+          "linha": 93,
+          "texto": "  const passos = [];"
+        },
+        {
+          "tipo": "-",
+          "linha": 94,
+          "texto": "  const p = t.curvaDaRampa;"
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "  const psi0 = (t.anguloDoPeDaRampa * Math.PI) / 180;"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "  const Rr = R * Math.cos(psi0);"
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "  const yRampa = (z) => yr + (yt - yr) * Math.pow(Math.max(1 - Math.pow(Math.abs(z) / Rr, p), 0), 1 / p);"
+        },
+        {
+          "tipo": "-",
+          "linha": 98,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 99,
+          "texto": "  /* colar: faixa com chanfro nas duas bordas; o de baixo forma a linha escura"
+        },
+        {
+          "tipo": "-",
+          "linha": 100,
+          "texto": "     com o chanfro de cima do anel, o de cima a linha do encontro com o corpo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 101,
+          "texto": "  passos.push(['lathe', {"
+        },
+        {
+          "tipo": "-",
+          "linha": 102,
+          "texto": "    origemId: ID.colar, lados: t.lados, segmentosCurva: 3,"
+        },
+        {
+          "tipo": "-",
+          "linha": 103,
+          "texto": "    perfil: [[0, 0], [R - c, 0, s], [R, c, s], [R, hc - c2, s2], [R - c2, hc, s2], [0, hc]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 105,
+          "texto": "  passos.push(['parte', { nome: 'colar', sel: { origem: { op: 'lathe', id: ID.colar } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 106,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 107,
+          "texto": "  /* corpo: loft ao longo de Z de retângulos verticais. Em cada z a planta"
+        },
+        {
+          "tipo": "-",
+          "linha": 108,
+          "texto": "     em D dá a meia largura (R atrás do eixo pelo círculo, R constante no"
+        },
+        {
+          "tipo": "-",
+          "linha": 109,
+          "texto": "     bloco da frente) e a rampa dá a altura do topo; a rampa só depende de z,"
+        },
+        {
+          "tipo": "-",
+          "linha": 110,
+          "texto": "     então o corte é sempre um retângulo e a quina entre rampa e parede é a"
+        },
+        {
+          "tipo": "-",
+          "linha": 111,
+          "texto": "     linha dos cantos de cima. Todos os retângulos têm os mesmos pontos, e as"
+        },
+        {
+          "tipo": "-",
+          "linha": 112,
+          "texto": "     estações atrás são iguais em ângulo na parede, com uma estação exata no"
+        },
+        {
+          "tipo": "-",
+          "linha": 113,
+          "texto": "     pé da rampa. A face da frente fecha em retângulos concêntricos e o bico"
+        },
+        {
+          "tipo": "-",
+          "linha": 114,
+          "texto": "     de trás numa seção-aresta vertical em z = -R, logo atrás da última estação. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 115,
+          "texto": "  const nb = t.divisoesDaLargura, nv = t.divisoesDaAltura;"
+        },
+        {
+          "tipo": "-",
+          "linha": 116,
+          "texto": "  /* Altura do caminho: o meio do retângulo do bico, que fica dentro de todos"
+        },
+        {
+          "tipo": "-",
+          "linha": 117,
+          "texto": "     os retângulos; os dois polos ficam nela e os anéis da frente encolhem"
+        },
+        {
+          "tipo": "-",
+          "linha": 118,
+          "texto": "     para ela. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 119,
+          "texto": "  const ym = (hc + yr) / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 120,
+          "texto": "  const ret = (w, y0, y1) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 121,
+          "texto": "    const pts = [];"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "    for (let k = 0; k < nb; k++) pts.push([-w + (2 * w * k) / nb, y0]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "    for (let k = 0; k < nv; k++) pts.push([w, y0 + ((y1 - y0) * k) / nv]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 124,
+          "texto": "    for (let k = 0; k < nb; k++) pts.push([w - (2 * w * k) / nb, y1]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 125,
+          "texto": "    for (let k = 0; k < nv; k++) pts.push([-w, y1 - ((y1 - y0) * k) / nv]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 126,
+          "texto": "    /* frame do loft em +Z com u = +X dá w = -Y; as seções ficam todas na"
+        },
+        {
+          "tipo": "-",
+          "linha": 127,
+          "texto": "       altura ym, a mesma dos polos, para o caminho ser reto em Z. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 128,
+          "texto": "    /* o ponto 0 é o meio da base e o ponto lados/2 o meio do topo, para a"
+        },
+        {
+          "tipo": "-",
+          "linha": 129,
+          "texto": "       seção-aresta do bico casar as pontas com eles. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 130,
+          "texto": "    const inv = pts.map(([x, y]) => [x, ym - y]).reverse();"
+        },
+        {
+          "tipo": "-",
+          "linha": 131,
+          "texto": "    const i0 = inv.length - 1 - nb / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 132,
+          "texto": "    return inv.slice(i0).concat(inv.slice(0, i0));"
+        },
+        {
+          "tipo": "-",
+          "linha": 133,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 134,
+          "texto": "  const grau = Math.PI / 180;"
+        },
+        {
+          "tipo": "-",
+          "linha": 135,
+          "texto": "  const th0 = t.anguloDoBico * grau;"
+        },
+        {
+          "tipo": "-",
+          "linha": 136,
+          "texto": "  const thetas = [];"
+        },
+        {
+          "tipo": "-",
+          "linha": 137,
+          "texto": "  for (let k = 0; k < t.estacoesDoBico; k++) thetas.push(th0 + (k / t.estacoesDoBico) * (psi0 - th0));"
+        },
+        {
+          "tipo": "-",
+          "linha": 138,
+          "texto": "  for (let k = 0; k <= t.estacoesDaRampa; k++) thetas.push(psi0 + (k / t.estacoesDaRampa) * (Math.PI / 2 - psi0));"
+        },
+        {
+          "tipo": "-",
+          "linha": 139,
+          "texto": "  const secao = (z, w, y1) => ({ pos: [0, ym, z], contorno: ret(w, hc, y1) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "  const eps = 0.00001;"
+        },
+        {
+          "tipo": "-",
+          "linha": 141,
+          "texto": "  /* bico de trás: a primeira seção é a aresta vertical x = 0 em z = -R, de"
+        },
+        {
+          "tipo": "-",
+          "linha": 142,
+          "texto": "     hc à rampa; o loft liga as duas metades do anel vizinho a ela por quads. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 143,
+          "texto": "  const yBico = yRampa(-R);"
+        },
+        {
+          "tipo": "-",
+          "linha": 144,
+          "texto": "  const secoes = [{ pos: [0, ym, -R], aresta: [[0, ym - hc], [0, ym - yBico]] }];"
+        },
+        {
+          "tipo": "-",
+          "linha": 145,
+          "texto": "  for (const th of thetas) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 146,
+          "texto": "    const z = th >= Math.PI / 2 - 1e-12 ? 0 : -R * Math.cos(th);"
+        },
+        {
+          "tipo": "-",
+          "linha": 147,
+          "texto": "    secoes.push(secao(z, R * Math.sin(th), yRampa(z)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "/* Contorno redondo com `lados` pontos, u no eixo X do mundo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "function redondo(r, lados) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const pts = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  for (let k = 0; k < lados; k++) {"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[11], PASSOS[12]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az10.png",
+      "peca-lado-rasante-az100.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-tresquartos-rasante-az180.png"
+    ]
+  }
+}
