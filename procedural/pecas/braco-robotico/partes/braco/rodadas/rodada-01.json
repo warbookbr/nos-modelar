@@ -1,0 +1,793 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/braco",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/braco-robotico/referencias/coluna-reta.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "coluna",
+        "tipo": "superficie",
+        "onde": "encontro do pé com a coluna, linha de interseção pé/coluna",
+        "sentido": "anguloso",
+        "evidencia": "Direita, frontal e isométrica em arame mostram vinco vivo na interseção, sem faixa de raio; o arredondarCostura prometido não lê como raio."
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "encontro com a coluna, lado direito da peça, perto da base da coluna",
+        "sentido": "segmentado",
+        "evidencia": "Em peca-lado-rasante-az120 há degradê em faixas verticais e mancha preta de borda curva no canto inferior direito (x 780-855, y 690-790); pode ser rasgo ou sombra."
+      }
+    ],
+    "observacao": "Silhueta, diâmetro e altura batem com a Opção 3, mas a costura do encontro pé/coluna não tem o raio prometido e mostra mancha escura sem explicação."
+  },
+  "partes": [
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": "disco de eixo Z de 156 mm, fundido a coluna; o encontro ficou em vinco a 45 graus, sem arredondarCostura"
+    },
+    {
+      "nome": "coluna",
+      "confere": true,
+      "observacao": "cilindro de 156 mm e 477 mm de altura total; chanfro no topo; encontro com o pe sem arredondamento, com marca escura sob luz rasante"
+    }
+  ],
+  "atrito": [
+    "arredondarCostura no encontro de dois cilindros de mesmo raio deixa triangulo degenerado e a auditoria de intersecao fica inconclusiva; ficou desligado",
+    "conferirPortasNaForma mede a parte inteira: a coluna tangente ao plano do anel reprovava a porta do pe; resolvi nomeando o pe como parte e citando a faixa 0 do lathe",
+    "porta citada por lathe inteiro some depois do unir; so a faixa de tampa sobrevive, e o indice da faixa muda com segmentosCurva",
+    "lathe com 6 pontos e lados maior que 72 estoura o bloco de 1000 ids; a coluna ficou com 72 lados e faixa de luz rasante com degraus leves",
+    "as duas partes fundidas aparecem como interpenetra na relacao entre partes do descrever",
+    "o modelador rodou em worktree e o commit precisou de cherry-pick sobre a main local"
+  ],
+  "notaDePassagem": "Pe e coluna sao partes nomeadas de um solido fundido para a porta do pe medir so o pe. Sem arredondarCostura (triangulo degenerado). Topo com face de 78 mm; o anel do cotovelo de 160 mm passa 2 mm.",
+  "receita": {
+    "sha256": "sha256:1b9aa54140bc093865d3eb8fa747f9e7f587972492568844d14fcc4795da0f59",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 143,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-robotico/braco — a coluna redonda e reta, à frente do ombro."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Quarta etapa da montagem `braco-robotico/montagem.json`. A decisão da pessoa"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * (2026-11-03, opção 3) está no fim de `../../ALINHAMENTO.md`: cilindro de 156"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * mm do pé ao topo, 477 mm do fundo do pé ao topo, pé redondo em volta do eixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * da junta do ombro, uma peça só."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial local: o eixo +Z é o eixo da junta do ombro e a origem é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * centro do disco do pé que encosta na face do anel da junta; Y para cima. O"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * pé é um cilindro de eixo Z (raio igual ao da coluna, espessura igual ao"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * diâmetro dela) e a coluna é um cilindro de eixo Y que sobe do eixo da junta,"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * centrado na espessura do pé, de modo que as duas faces do pé ficam"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * tangentes à coluna. O fundo do pé fica a `raioDoPe` abaixo do eixo e o topo"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * a `alturaTotal` acima do fundo."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * Duas partes nomeadas, uma só peça: `pe` e `coluna` recebem o nome antes do"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * `unir`, e o sólido sai fundido. O nome do pé existe para a porta de baixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * medir só o pé: a coluna é tangente ao plano do anel e a conferência de porta"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * olha a parte inteira de onde a porta sai."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * Portas que a receita publica:"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " *   juntaNoOmbro — cilindro interno, eixo +Z, centro no meio do disco do pé que"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " *                  encosta, raio do pé. Senta na `juntaDoOmbro` do ombro."
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " *   topo         — anel que recebe, eixo +Y, centro no meio da face plana de"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " *                  cima, face inteira (raio da coluna). O anel do cotovelo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " *                  de cerca de 160 mm, sai daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * Curso. A rotação é em torno do eixo +Z da junta, e toda a peça fica em"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * z de 0 a 156 mm, à frente da face do anel: nenhum ponto cruza o plano do"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * anel nem entra no bloco do ombro, em nenhum ângulo. A base não limita (vai"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * até z = 115 mm e a coluna começa em 123 mm). O limite é o chão: com o eixo a"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * 360 mm do chão, a coluna encosta nele a cerca de 141 graus da vertical para"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": " * cada lado."
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": " * Encontro do pé com a coluna: `unir` sem `arredondarCostura`, o vinco a 45"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": " * graus de dois cilindros de mesmo raio, que é o desenho da referência. Com"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": " * `raioDoEncontro` maior que zero a costura sai com triângulo degenerado e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * auditoria de interseção fica inconclusiva."
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* Vem do ombro pela montagem (porta `juntaDoOmbro`); o valor daqui só vale"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "     para ver a parte sozinha. Limita o raio do pé: o pé não passa do anel. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  raioDaJunta: 95,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  diametroDaColuna: 156,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* Do fundo do pé ao topo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  alturaTotal: 477,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* O pé é 0,2 mm mais estreito que a coluna: paredes tangentes quebram a"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "     união. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  folgaDoPe: 0.2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  /* Acabamento das carcaças: chanfro estreito nas bordas, com o raio do"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "     vértice suavizado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  chanfro: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  suaveDoChanfro: 0.8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* Concordância no encontro do pé com a coluna; zero a desliga (ver acima). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  raioDoEncontro: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  lados: 72,"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "const ID = { pe: 100, coluna: 200, corpo: 300, concordancia: 400 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const rc = m(t.diametroDaColuna) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  if (rc > m(t.raioDaJunta)) throw new Error('a coluna não cabe no anel da junta: o pé passaria da borda dele.');"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const rp = rc - m(t.folgaDoPe);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  /* O pé tem a espessura do diâmetro da coluna. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const esp = 2 * rc;"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  /* Eixo da junta em y = 0; o fundo do pé em -rp; o topo em alturaTotal - rp. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const yTopo = m(t.alturaTotal) - rp;"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  return { rc, rp, esp, yTopo, c: m(t.chanfro), s: m(t.suaveDoChanfro) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const { rc, rp, esp, yTopo, c, s } = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const passos = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  /* Pé: disco de eixo Z, do plano que encosta no anel à face de trás. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  passos.push(['lathe', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    origemId: ID.pe, eixo: 'z', lados: t.lados, segmentosCurva: 2, em: [0, 0, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    perfil: [[0, 0], [rp - c, 0, s], [rp, c, s], [rp, esp - c, s], [rp - c, esp, s], [0, esp]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  /* Coluna: cilindro de eixo Y do eixo da junta ao topo, com chanfro no topo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  passos.push(['lathe', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    origemId: ID.coluna, eixo: 'y', lados: t.lados, segmentosCurva: 2, em: [0, 0, esp / 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    perfil: [[0, 0], [rc, 0], [rc, yTopo - c, s], [rc - c, yTopo, s], [0, yTopo]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const dePe = { origem: { op: 'lathe', id: ID.pe } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const daColuna = { origem: { op: 'lathe', id: ID.coluna } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  passos.push(['parte', { nome: 'pe', sel: dePe }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  passos.push(['parte', { nome: 'coluna', sel: daColuna }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  passos.push(['unir', { origemId: ID.corpo, solidos: [{ origem: { op: 'lathe', id: ID.pe } }, { origem: { op: 'lathe', id: ID.coluna } }] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const corpo = { origem: { op: 'unir', id: ID.corpo } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  if (t.raioDoEncontro > 0) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  const concordancia = { origem: { op: 'arredondarCostura', id: ID.concordancia } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  if (t.raioDoEncontro > 0) passos.push(['parte', { nome: 'coluna', sel: concordancia, substituir: true }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  /* As portas citam só a faixa de tampa de cada lathe, que o unir não consome; assim a medida da porta olha só o pé e só a coluna. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  passos.push(['publicarPorta', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    nome: 'juntaNoOmbro', de: { op: 'lathe', id: ID.pe, faixa: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    interface: { forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [0, 0, 0], raio: rp, inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  passos.push(['publicarPorta', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "    nome: 'topo', de: { op: 'lathe', id: ID.coluna, faixa: 7 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    interface: { forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: [0, yTopo, esp / 2], raioInterno: 0, raioExterno: rc, inicio: -0.005, fim: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  passos.push(['liso', { sel: corpo, angulo: 20 }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  if (t.raioDoEncontro > 0) passos.push(['liso', { sel: concordancia, angulo: 20 }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  meta: { nome: 'braco-robotico/braco', desc: 'coluna redonda e reta de 156 mm, com o pé redondo em volta do eixo da junta do ombro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  TOPO: { origem: 'centro do disco do pé que encosta no anel da junta; +Z é o eixo da junta, y para cima, a coluna à frente (z de 0 a 156)' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    objeto: 'coluna do braço robótico: cilindro redondo e reto à frente do ombro, que gira em volta do eixo da junta do ombro e leva o anel do cotovelo no topo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    referencias: ['../../referencias/coluna-reta.png', '../../referencias/coluna-reta-lado.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    escala: { medida: 'diâmetro da coluna, do pé ao topo', milimetros: 156 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 156 mm de diâmetro e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "      { nome: 'coluna', forma: 'cilindro redondo e reto de 156 mm do pé ao topo, 477 mm do fundo do pé ao topo, de eixo vertical sobre o pé; topo plano onde assenta o anel do cotovelo; bordas suavizadas', tecnica: 'lathe de eixo Y com chanfro de vértice suavizado no topo, unir, arredondarCostura no encontro com o pé e liso com ângulo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "      'coluna que afunila, engrossa ou tem diâmetro diferente de 156 mm em algum trecho',"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "      'altura do fundo do pé ao topo diferente de 477 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "      'pé que não é redondo em volta do eixo da junta, ou de diâmetro diferente do da coluna',"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "      'fresta, emenda, degrau ou parafuso entre o pé e a coluna: precisa ser uma peça só',"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "      'pé afastado da face do anel da junta ou entrando nele',"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "      'qualquer ponto da peça atrás do plano da face do anel (z menor que 0 no referencial da peça): atravessaria o bloco do ombro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "      'topo inclinado, abaulado ou sem a face plana de assento do anel do cotovelo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "      'bordas vivas, sem o acabamento suavizado das carcaças',"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "      'sombreado torcido ou rasgo no encontro do pé com a coluna',"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "      'sem a porta `topo` para o anel do cotovelo, de eixo vertical',"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "      'curso declarado além do que a geometria permite: nenhum toque com ombro, anel da cintura ou base em ângulo algum; cerca de 141 graus da vertical para cada lado até o chão (eixo a 360 mm)',"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  contatos: [],"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[7]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}

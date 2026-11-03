@@ -143,6 +143,8 @@ isso em vez de inventar um passo por cima.
   Se o plano estiver errado, diga qual campo e por quê.
 - Você não mexe em núcleo, gates, bancada nem ferramenta. Sua superfície é a
   receita da peça.
+- Você não devolve com comando ainda rodando em segundo plano: espere ou pare
+  pelo próprio PID o que você lançou.
 
 ## Como fechar a resposta
 
