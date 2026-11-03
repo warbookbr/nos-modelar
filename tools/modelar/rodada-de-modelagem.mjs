@@ -280,6 +280,25 @@ export async function acaoDaPeca(peca, {
   return { ...decisao, medicao };
 }
 
+const RAIZ_DO_REPOSITORIO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const PASTAS_FORA_DO_REPOSITORIO = ['tools/bancadas/out/', 'tmp/', '.claude/worktrees/'];
+
+/* O ALVO DO VEREDITO FICA NO REPOSITÓRIO. Em 2026-11-03 um crítico escreveu como alvo o caminho absoluto do pedido em
+   `tools/bancadas/out/`, e outro o da prancha dentro da pasta de trabalho de um agente; os dois entraram na rodada gravada, e a
+   conferência de referências do CI, que roda sem essas pastas, reprovou. O alvo que é caminho absoluto vira caminho relativo à raiz
+   (o de uma pasta de trabalho de agente, ao arquivo de mesmo nome no repositório), e o que cai fora do repositório ou não existe é
+   recusado; o texto que não é caminho, como "sem alvo: ...", passa como está. */
+export function alvoDoRepositorio(alvo, raiz = RAIZ_DO_REPOSITORIO) {
+  if (typeof alvo !== 'string' || !alvo.startsWith('/')) return alvo;
+  let relativo = alvo.startsWith(raiz + sep) ? alvo.slice(raiz.length + 1) : null;
+  if (relativo?.startsWith('.claude/worktrees/')) relativo = relativo.split('/').slice(3).join('/');
+  if (!relativo || PASTAS_FORA_DO_REPOSITORIO.some((p) => relativo.startsWith(p)) || !existsSync(join(raiz, relativo))) {
+    throw new Error(`o alvo do veredito (${alvo}) não é um arquivo do repositório; a rodada gravada não pode citar caminho que o CI não tem. `
+      + 'Peça ao crítico o alvo de verdade (a imagem de referência que ele comparou) ou "sem alvo: <motivo>".');
+  }
+  return relativo;
+}
+
 /**
  * Grava a rodada com a medição da ferramenta no lugar da que a sessão escreveria, e recusa o que não se sustenta nela:
  * o veredito do crítico quando a medição da receita atual reprovou, e `medidas` declaradas que contradizem a medição. A receita
@@ -290,6 +309,7 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   try { medicao = await medir(); } catch (erro) {
     throw new Error(`não consegui medir a receita de '${peca}' (${erro.message}): sem medição a rodada não se registra, e o veredito do crítico muito menos.`);
   }
+  if (entrada.veredito) entrada = { ...entrada, veredito: { ...entrada.veredito, alvo: alvoDoRepositorio(entrada.veredito.alvo) } };
   const declaradas = entrada.medidas;
   if (declaradas && typeof declaradas.passou === 'boolean' && declaradas.passou !== medicao.passou) {
     throw new Error(`as medidas declaradas dizem ${declaradas.passou ? 'que passou' : 'que reprovou'} e a ferramenta mediu a receita atual (sha256:${curto(medicao.sha256)}) como ${medicao.passou ? 'aprovada' : 'reprovada'}`

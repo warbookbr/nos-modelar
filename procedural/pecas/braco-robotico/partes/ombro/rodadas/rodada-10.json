@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-braco-robotico-ombro/pedido.md",
+    "alvo": "sem alvo: o pedido não traz imagem de referência; julgado contra a forma prometida em texto",
     "nota": 5,
     "defeitos": [
       {

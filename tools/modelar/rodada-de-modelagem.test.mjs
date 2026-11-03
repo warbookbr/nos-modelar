@@ -392,3 +392,15 @@ describe('a impressão da forma e os afastamentos declarados', () => {
     expect(await impressaoDaForma(`${pasta}/deslocada/receita.js`)).toBe(semDeclarar);
   });
 });
+
+describe('o alvo do veredito fica no repositório', async () => {
+  const { alvoDoRepositorio } = await import('./rodada-de-modelagem.mjs');
+  const raiz = '/repo';
+  it('passa texto que não é caminho e torna relativo o caminho absoluto, inclusive o de pasta de trabalho de agente', () => {
+    expect(alvoDoRepositorio('sem alvo: o plano não cita imagem', raiz)).toBe('sem alvo: o plano não cita imagem');
+  });
+  it('recusa o alvo em pasta que o CI não tem', () => {
+    expect(() => alvoDoRepositorio('/repo/tools/bancadas/out/critica-x/vista.png', raiz)).toThrow(/não é um arquivo do repositório/);
+    expect(() => alvoDoRepositorio('/fora/imagem.png', raiz)).toThrow(/não é um arquivo do repositório/);
+  });
+});

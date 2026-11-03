@@ -10,7 +10,7 @@
   "veredito": {
     "formato": "mecanifica.veredito-de-forma",
     "versao": 1,
-    "alvo": "/home/user/nos-mecanifica/.claude/worktrees/agent-a2d3908f366224404/procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "alvo": "procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
     "nota": 6,
     "defeitos": [
       {
