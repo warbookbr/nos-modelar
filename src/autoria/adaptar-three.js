@@ -1,7 +1,7 @@
 /* adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido. */
 import * as THREE from 'three';
 import { chaveDoCantoLiso, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
-import { triangularConvexa } from '../../procedural/nucleo/triangulacao-face.js';
+import { triangularConvexa, triangularSemDegenerado } from '../../procedural/nucleo/triangulacao-face.js';
 
 const COR_PADRAO = '#77817d';
 
@@ -193,6 +193,12 @@ function triangularPoligono(pontos, normal, rotulo) {
       if (cortou < 0 || nota < melhorNota * (1 - 1e-9)) { cortou = k; melhorNota = nota; }
     }
     if (cortou < 0) {
+      /* Contorno válido com cantos colineares seguidos (o vértice que a booleana ou o perfil deixam no meio de uma aresta):
+         a conta acima recusa a orelha de cada vizinho, porque o canto colinear cai sobre a borda dela. A triangulação do
+         núcleo trata a colinearidade (leque de outro canto, depois orelhas sem canto sobre a diagonal) e devolve null no
+         contorno que de fato se cruza, que segue recusado. */
+      const dele = triangularSemDegenerado(pontos);
+      if (dele) return dele;
       throw new Error(`adaptarThree: ${rotulo} não fecha em orelhas (${n} cantos): contorno auto-interseccionado ou degenerado`);
     }
     const ia = restantes[(cortou + restantes.length - 1) % restantes.length];

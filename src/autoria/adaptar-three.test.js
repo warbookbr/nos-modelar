@@ -75,3 +75,40 @@ describe('adaptarThree — liso com ângulo limite', () => {
     expect(normais.find((x) => x.face === 1).n).toEqual(normais.find((x) => x.face === 2).n);
   });
 });
+
+describe('adaptarThree — contorno válido com cantos colineares', () => {
+  /* Dois cantos seguidos no meio de uma aresta reta (o que uma booleana ou um perfil de extrusão deixam): o polígono é válido
+     e convexo, mas toda orelha de canto vizinho leva um canto colinear sobre a borda, e a primeira conta recusava todas. */
+  const adaptar = (pontos) => {
+    const V = new Map(pontos.map((p, i) => [i + 1, p]));
+    const F = new Map([[1, { id: 1, parte: 'capo', vs: [...V.keys()], cor: null, material: null, liso: 30, solido: false, tinta: [] }]]);
+    return adaptarThree({ V, F, partes: { capo: {} }, orfaos: [] });
+  };
+  const areaDaMalha = (visual) => {
+    const posicao = visual.partes.get('capo').children[0].geometry.getAttribute('position');
+    let soma = 0;
+    for (let i = 0; i < posicao.count; i += 3) {
+      const [a, b, c] = [0, 1, 2].map((k) => [posicao.getX(i + k), posicao.getY(i + k), posicao.getZ(i + k)]);
+      const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+      const v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+      soma += Math.hypot(u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]) / 2;
+    }
+    return soma;
+  };
+
+  it('o contorno do capô do motor do avião (seis cantos, dois colineares) vira malha e cobre a área do polígono', () => {
+    const visual = adaptar([
+      [0.18677669529663687, 0.9432233047033631, 0.676],
+      [0.15694631307311827, 0.9177457514062631, 0.676],
+      [0.15555738918630552, 0.9623103900626798, 0.6727163408413738],
+      [0.15855926864704892, 0.967196910071524, 0.6725496366453996],
+      [0.16040165886416927, 0.970195990073833, 0.6724473226838193],
+      [0.16082633236579919, 0.9708872821760235, 0.6724237391736995],
+    ]);
+    expect(areaDaMalha(visual)).toBeCloseTo(0.0017408028985175187 / 2, 9);
+  });
+
+  it('um contorno que cruza a si mesmo continua recusado', () => {
+    expect(() => adaptar([[0, 0, 0], [1, 1, 0], [1, 0, 0], [0, 1, 0]])).toThrow(/adaptarThree/);
+  });
+});
