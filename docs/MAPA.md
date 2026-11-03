@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1696 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1699 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1060,6 +1060,8 @@
 - `gaiola-por-rede-prova.test.mjs` — gaiola-por-rede-prova.test.mjs — o gate da fatia 2 do plano da carroceria por rede de curvas: a chapa lateral de 1000 × 600 mm
 - `gaiola-por-rede.js` — gaiola-por-rede.js — monta a gaiola da operação `subdivisao` a partir de uma rede de curvas nomeadas e dos retalhos que elas fecham
 - `gaiola-por-rede.test.mjs` — gaiola-por-rede.test.mjs — o ajudante que monta a gaiola da subdivisão por uma rede de curvas nomeadas e os retalhos que elas fecham
+- `gaiola-varrida.js` — gaiola-varrida.js — a gaiola de uma superfície varrida: uma seção dada ao longo de um trilho dado, com estações, alargamento e recortes
+- `gaiola-varrida.test.mjs` — gaiola-varrida.test.mjs — a gaiola varrida: uma régua em reta, um friso em arco com as pontas cortadas numa altura, uma seção com borda rolada e alargamento,…
 - `lacunas.js` — lacunas.js — diagnóstico e planejamento estrutural puros sobre o catálogo. Não executa receita, não grava disco e não decide promoção de capacidade.
 - `lacunas.test.mjs` — lacunas-capacidade.test.mjs — R08: diagnóstico persistível e busca estrutural.
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
@@ -1115,6 +1117,7 @@
 - `gaiola-por-rede-prova.js` — gaiola-por-rede-prova.js — a chapa lateral desenhada por código para a prova da gaiola por rede de curvas
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 - `moldura-prova.js` — moldura-prova.js — a chapa curva com vão de `friso-prova.js` e as molduras em volta da borda dele, desenhadas por código para a conferência da moldura (`mold…
+- `varredura-prova.js` — varredura-prova.js — as três peças varridas de prova da `gaiolaVarrida`, desenhadas por código
 
 ## procedural/nucleo/operacoes/
 
