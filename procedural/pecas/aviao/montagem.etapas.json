@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.registro-de-etapas",
-  "versao": 1,
+  "versao": 2,
   "montagem": "aviao",
   "etapas": [
     {
@@ -12,7 +12,7 @@
         "observacao": "pendências do esboço que seguem: a cintura da cabine e a ondulação da linha de baixo entre o capô e a cabine",
         "analise": "ausente"
       },
-      "receita": "1e52b4bcef0c036e5aa4d86fd51f3b8eab44cd206c527d10fdd644043937b1e2",
+      "forma": "sha256:3c396f5a936716be3d3a4199d16b9d9b5781d4b0cc4840b66aec58e9ab6f72e9",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -41,7 +41,7 @@
         "observacao": "pendências do esboço: o furo da boca de ar abre na face de trás do capô, que a fuselagem tapa, e a raiz dos escapes é lisa onde o esboço tem um leque de frisos",
         "analise": "ausente"
       },
-      "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d",
+      "forma": "sha256:cf775b9f472cf0169e1fc2121020bab09c62d73f970442cb391ebdfb45c916dc",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -69,7 +69,7 @@
         ],
         "analise": "ausente"
       },
-      "receita": "439a47cad9c062f3e2576f46091e86cd73bf32a75f05ff44db1a3d374d097bcd"
+      "forma": "sha256:f48bbc6c2138a5bf84c026fc989231bc6b208e10afbdf6c9adc70e024440330d"
     },
     {
       "instancia": "asas",
@@ -79,7 +79,7 @@
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "receita": "cd534b5363dfe0a350c40c1e355e3aabe9712626b9d70e298e5fc9ce6f2a0a95",
+      "forma": "sha256:1986c46b0548e4360e314c61d28a73e3ca0855ca0385dad624fca869f8bc0755",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -102,7 +102,7 @@
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "receita": "3e5a678fdd9ed0bb3785572e625f1897385150c9b48644a8afd85e0f56e061f3",
+      "forma": "sha256:cb12ffc3d4c7f50accca203c099a4ac7128333cf4762e1bea200cbe6653083b5",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -127,7 +127,7 @@
         ],
         "analise": "ausente"
       },
-      "receita": "a0f4b9847113a707bb2435f6cc3effe6593a23bfbe1103acf1d7596cf0c25644",
+      "forma": "sha256:b292e7f14ac68938e87bc93ec4d04d043d2e48a4acb13cb8abb2356c3e107bb2",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -154,7 +154,7 @@
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "receita": "6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4",
+      "forma": "sha256:222bf0d9f01db92039863599d746cd5f40917a987e2275e21283c23cf4a3c2d5",
       "reaberturas": [
         {
           "por": "a pessoa",
@@ -176,7 +176,7 @@
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "receita": "a035605ff8a4b141f7f3191111d3a1a3b71dbc69148b5f3fc9e5d5b52ec08565",
+      "forma": "sha256:4332a48b0b548a437511ac5e8b51f4dfd4f7bc206221024f48a4445e8e9f3fed",
       "reaberturas": [
         {
           "por": "a pessoa",
