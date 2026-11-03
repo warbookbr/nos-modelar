@@ -13,8 +13,8 @@ O laço começa depois da rodada de
 [`alinhar-modelagem`](../alinhar-modelagem/SKILL.md). Sem plano, não há o que
 cumprir nem contra o que julgar.
 
-Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de declarar pronto ou pedir o aceite, faça o passo de
-[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
+Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de dar por pronto, faça o passo de
+[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`npm run bancada -- <peça> --analise`) e abra as imagens.
 
 
 ## O processo leve, para objeto de uma família

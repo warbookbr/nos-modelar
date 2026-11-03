@@ -1,0 +1,1091 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 10,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/tools/bancadas/out/critica-braco-robotico-ombro/pedido.md",
+    "nota": 5,
+    "defeitos": [
+      {
+        "parte": "anel",
+        "tipo": "uniao",
+        "onde": "face de contato entre o anel e a saída do pescoço",
+        "sentido": "afastado",
+        "evidencia": "Direita e superior: linha clara de 1 a 2 px entre anel e bloco. Tresquartos az240: risco escuro ao longo da junção."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "superficie",
+        "onde": "cantos entre o círculo da saída e o bloco, na frente",
+        "sentido": "segmentado",
+        "evidencia": "Frontal: bolsões côncavos com sombra escura nos cantos inferiores. Frente az120: riscos claros e escuros nos cantos. Tresquartos az240: pinçamento em cerca de (400,300)."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "superficie",
+        "onde": "encontro de baixo entre a frente da parte de pé e a parte deitada, cunha diagonal junto ao degrau",
+        "sentido": "anguloso",
+        "evidencia": "Direita e lado az30: cunha de quina viva com degrau de sombra e facetas. Tresquartos az240: borda serrilhada em cerca de (800-880, 700-760)."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "superficie",
+        "onde": "faixa em que a seção vira redonda junto ao anel, lado de baixo e direito",
+        "sentido": "segmentado",
+        "evidencia": "Topo az30: ponta em cunha à direita em cerca de (1000,805) e mancha de sombra torcida na faixa. Superior: mancha clara ondulada junto à base do anel."
+      }
+    ],
+    "observacao": "Silhueta, medidas e o anel conferem com a promessa. Sem alvo de referência, a nota julga só contra o prometido, e o que reprova é o sombreado no encontro de baixo e nos cantos da saída."
+  },
+  "partes": [
+    {
+      "nome": "pescoco",
+      "confere": true,
+      "observacao": "degrau de 30 mm, saída redonda de raio igual à meia largura, 190x210x190 mm; restam um recorte pequeno no fim do arredondamento e um sombreado apertado no canto de cima junto ao anel"
+    },
+    {
+      "nome": "anel",
+      "confere": true,
+      "observacao": "faixa de 28 mm, 190 mm de diâmetro, escura, encostada na saída sem entrar nela"
+    }
+  ],
+  "atrito": [
+    "arredondarCostura recusou o raio 8 mm quando os lofts ganharam estações densas: a tangência acabava no fim de uma faceta de 2,7 mm junto à frente da parte de pé",
+    "loft aceita no máximo 24 seções; a transição em estações disputa esse limite com as intermediárias",
+    "o script olhar-bancada citado no briefing não existe; o comando é npm run bancada",
+    "quem conduz: as três skills mandavam rodar olhar-bancada --analise, que não existe com esse nome; corrigido para npm run bancada -- <peça> --analise",
+    "quem conduz: os bolsões nos cantos vêm da geometria escolhida; a saída do diâmetro da largura do bloco deixa os quatro cantos do quadrado para a faixa de transição resolver"
+  ],
+  "notaDePassagem": "Estações densas (limite de 24 por loft) encurtam triângulos; a transição em cosseno acaba antes da frente da parte de pé, e o arredondamento cobre a costura inteira, não só o trecho da frente.",
+  "receita": {
+    "sha256": "sha256:30df1aeee08ed758ed64c46539050a3957879a2a6702d510c19aa35d9f92084a",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 106,
+      "acrescentadas": 98,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 1,
+          "texto": "/* braco-robotico/ombro — ombro escolhido pela pessoa em 2026-09-28 (L de"
+        },
+        {
+          "tipo": "-",
+          "linha": 2,
+          "texto": " * ponta-cabeça sobre o anel da cintura) e redimensionado em 2026-11-03, opção B:"
+        },
+        {
+          "tipo": "-",
+          "linha": 3,
+          "texto": " * seção de cima de 190 mm de largura, eixo da junta a 115 mm da boca de baixo"
+        },
+        {
+          "tipo": "-",
+          "linha": 4,
+          "texto": " * (o topo do anel da cintura) e topo a 210 mm."
+        },
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-robotico/ombro — volta ao desenho aceito pela pessoa em 2026-09-29"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * (receita do commit ec06c461) no tamanho da opção B de 2026-11-03: 190 mm de"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * largura, eixo da junta a 115 mm da boca de baixo e topo a 210 mm."
+        },
+        {
+          "tipo": "-",
+          "linha": 6,
+          "texto": " * O corpo é a união de dois sólidos de lofts: a coluna, que sobe do pé redondo"
+        },
+        {
+          "tipo": "-",
+          "linha": 7,
+          "texto": " * no diâmetro do anel da cintura e vira, logo acima dele, a seção quase"
+        },
+        {
+          "tipo": "-",
+          "linha": 8,
+          "texto": " * quadrada de cantos arredondados até o topo; e o braço deitado, que nasce dentro da"
+        },
+        {
+          "tipo": "-",
+          "linha": 9,
+          "texto": " * coluna com a mesma seção, sai para +Z além da frente dela e volta a ser"
+        },
+        {
+          "tipo": "-",
+          "linha": 10,
+          "texto": " * redondo no fim. A saída é o círculo inscrito na seção quadrada, e por isso"
+        },
+        {
+          "tipo": "-",
+          "linha": 11,
+          "texto": " * nada dela sobra por baixo nem bate na frente da coluna; o encontro de baixo,"
+        },
+        {
+          "tipo": "-",
+          "linha": 12,
+          "texto": " * entre a frente da coluna e a face de baixo do braço, é arredondado pelo"
+        },
+        {
+          "tipo": "-",
+          "linha": 13,
+          "texto": " * `arredondarCostura` e o sombreamento é liso com ângulo, para a quina que"
+        },
+        {
+          "tipo": "-",
+          "linha": 14,
+          "texto": " * sobra continuar nítida e a emenda não fazer degrau de sombra. O anel é uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * O corpo é a união de dois lofts. A parte de pé sobe da boca de baixo, com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * frente recuada em relação à parte deitada (o degrau em L). A parte deitada"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * atravessa o topo de trás até a saída redonda, de raio igual à meia largura,"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * por isso nada da saída sobra por baixo nem bate na frente da parte de pé. Na"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * faixa junto ao anel a seção passa de quase quadrada a redonda variando o"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * expoente da superelipse em muitas estações com raio constante, em vez de"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * duas seções longas. O encontro de baixo, entre a frente da parte de pé e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * face de baixo da parte deitada, leva um arredondamento leve. O anel é uma"
+        },
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": "  /* Altura do trecho reto do pé, ainda redondo, acima da boca de baixo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": "  alturaReta: 10,"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  /* Meia largura da seção quadrada de cima: 190 mm de largura. O topo fica em"
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "     alturaDoEixo + meiaLargura = 210 mm, e a face de baixo do braço em"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "     alturaDoEixo - meiaLargura = 20 mm, onde o pé termina de virar quadrado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  /* Meia largura da seção de cima: 190 mm de largura. O topo fica em"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "     alturaDoEixo + meiaLargura = 210 mm. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": "  /* Raio dos cantos da seção quadrada de cima: lados planos entre quatro"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": "     arcos, para as paredes da coluna e do braço serem planos exatos. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "  raioDosCantos: 32,"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": "  /* Quanto o braço deitado sai para a frente além da frente da coluna. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": "  trechoHorizontal: 24,"
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": "  /* Comprimento, no fim do braço, em que a seção volta a ser redonda para a"
+        },
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": "     saída. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": "  transicaoDaSaida: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* Expoente da superelipse da seção quase quadrada: 2 é círculo, 4 é"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "     quadrado de cantos arredondados. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  expoenteDoTopo: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* Quanto a frente da parte de pé fica recuada em relação à frente da parte"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     deitada: o degrau do L. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  recuoDaFrente: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  /* Trecho do braço, antes da saída, em que a seção passa de quase quadrada a"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "     redonda, em estações de expoente decrescente. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  transicaoDaSaida: 25,"
+        },
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": "  /* Raio da concordância no encontro de baixo entre a coluna e o braço. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "  raioDoEncontro: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  /* Raio da concordância no encontro de baixo entre a frente da parte de pé e"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "     a parte deitada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  raioDoEncontro: 8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "  /* Seções intermediárias dos dois lofts, só para os triângulos da emenda"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "     ficarem curtos: triângulo longo faz o sombreamento suave virar degrau. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "  estacoes: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  /* Estações da transição quadrado-redondo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  estacoesDaSaida: 7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  /* Seções intermediárias de cada loft, para os triângulos da emenda ficarem"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "     curtos: triângulo longo faz o sombreamento suave virar degrau. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  estacoes: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "/* `n` valores igualmente espaçados estritamente entre `de` e `ate`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "const entre = (de, ate, n) => Array.from({ length: n }, (_, k) => de + ((ate - de) * (k + 1)) / (n + 1));"
+        },
+        {
+          "tipo": "-",
+          "linha": 61,
+          "texto": "  const a = m(t.alturaReta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "  /* A frente da coluna está em z = h; o braço passa dela pelo trecho horizontal. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": "  const zFace = h + m(t.trechoHorizontal);"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  /* A frente da parte deitada e a saída ficam em z = h. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const zFace = h;"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "  /* A saída é o círculo inscrito na seção quadrada, e o anel tem o raio da"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "     saída: nada da saída fica fora da seção, nem por baixo dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  /* A saída redonda tem o diâmetro da largura do bloco (raio = meia largura):"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "     nada dela sobra por baixo nem pelos lados. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "  return { R, a, yEixo, h, zFace, zTransicao, Rs, Ra, e, c };"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  return { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, c };"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "/* Contorno redondo com `lados` pontos, u no eixo X do mundo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "function redondo(r, lados) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "/* Contorno de superelipse com `lados` pontos, u no eixo X do mundo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "function contorno(r, n, lados) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 81,
+          "texto": "    pts.push([r * Math.cos(th), r * Math.sin(th)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    const cs = Math.cos(th), sn = Math.sin(th);"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    pts.push([r * Math.sign(cs) * Math.abs(cs) ** (2 / n), r * Math.sign(sn) * Math.abs(sn) ** (2 / n)]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 86,
+          "texto": "/* Quadrado de meio lado `r` com cantos de raio `rc`, com o mesmo número de"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "   pontos do redondo (quatro arcos de lados/4 pontos, com um lado plano entre"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "   cada dois), para o loft casar ponto a ponto com o pé. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 89,
+          "texto": "function quadrado(r, rc, lados) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 90,
+          "texto": "  const por = lados / 4;"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "/* Seção da parte de pé: frente arredondada como a do braço, mas recuada, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "   lado de trás reto, de cantos vivos, para a parede de trás descer do braço"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "   até o pé. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "function contornoColuna(r, nFrente, lados, recuo) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 92,
+          "texto": "  for (let q = 0; q < 4; q++) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 93,
+          "texto": "    const cx = (r - rc) * Math.sign(Math.cos(q * Math.PI / 2 + Math.PI / 4));"
+        },
+        {
+          "tipo": "-",
+          "linha": 94,
+          "texto": "    const cy = (r - rc) * Math.sign(Math.sin(q * Math.PI / 2 + Math.PI / 4));"
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "    for (let k = 0; k < por; k++) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));"
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "      pts.push([cx + rc * Math.cos(th), cy + rc * Math.sin(th)]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 98,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const frente = lados - 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  for (let k = 0; k < frente; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    const th = (Math.PI * k) / (frente - 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    const cs = Math.cos(th), sn = Math.sin(th);"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    const v = r * Math.sign(sn) * Math.abs(sn) ** (2 / nFrente);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    pts.push([r * Math.sign(cs) * Math.abs(cs) ** (2 / nFrente), v * (1 - recuo / r)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  pts.push([-r, -r], [r, -r]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 103,
+          "texto": "/* `n` valores igualmente espaçados estritamente entre `de` e `ate`. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "function entre(de, ate, n) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 105,
+          "texto": "  return Array.from({ length: n }, (_, k) => de + ((ate - de) * (k + 1)) / (n + 1));"
+        },
+        {
+          "tipo": "-",
+          "linha": 106,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 107,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 109,
+          "texto": "  const { R, a, yEixo, h, zFace, zTransicao, Rs, Ra, e, c } = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, c } = derivar(t);"
+        },
+        {
+          "tipo": "-",
+          "linha": 111,
+          "texto": "  const rc = m(t.raioDosCantos);"
+        },
+        {
+          "tipo": "-",
+          "linha": 112,
+          "texto": "  const round = (pos, r) => ({ pos, contorno: redondo(r, L) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 113,
+          "texto": "  /* Seção entre o pé redondo (f = 0) e a seção quadrada de cima (f = 1). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 114,
+          "texto": "  const entreContornos = (pos, a0, a1, f) => ({ pos, contorno: a0.map((p, k) => [p[0] + (a1[k][0] - p[0]) * f, p[1] + (a1[k][1] - p[1]) * f]) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 115,
+          "texto": "  const mistura = (y, f) => entreContornos([0, y, 0], redondo(R, L), quadrado(h, rc, L), f);"
+        },
+        {
+          "tipo": "-",
+          "linha": 116,
+          "texto": "  /* Seção entre a seção quadrada (f = 0) e o círculo da saída (f = 1). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 117,
+          "texto": "  const afunila = (z, f) => entreContornos([0, yEixo, z], quadrado(h, rc, L), redondo(Rs, L), f);"
+        },
+        {
+          "tipo": "-",
+          "linha": 118,
+          "texto": "  const quad = (pos, r) => ({ pos, contorno: quadrado(r, Math.max(rc - (h - r), 0.001), L) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 119,
+          "texto": "  const yTopo = yEixo + h;"
+        },
+        {
+          "tipo": "-",
+          "linha": 120,
+          "texto": "  const yBraco = yEixo - h;"
+        },
+        {
+          "tipo": "-",
+          "linha": 121,
+          "texto": "  /* O pé termina de virar quadrado um pouco abaixo da face de baixo do braço,"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "     para as emendas das duas não caírem no mesmo plano. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "  const yPe = yBraco - 0.005;"
+        },
+        {
+          "tipo": "-",
+          "linha": 124,
+          "texto": "  /* Coluna: pé redondo no raio do anel da cintura, que vira a seção quase"
+        },
+        {
+          "tipo": "-",
+          "linha": 125,
+          "texto": "     quadrada na altura onde começa a face de baixo do braço, e sobe até o topo"
+        },
+        {
+          "tipo": "-",
+          "linha": 126,
+          "texto": "     de seção igual. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const nTopo = t.expoenteDoTopo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  const sec = (pos, r, n) => ({ pos, contorno: contorno(r, n, L) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  const recuo = m(t.recuoDaFrente);"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r, nTopo, L, recuo) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a seção de"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "     frente recuada, e termina dentro da parte deitada. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 129,
+          "texto": "    round([0, 0.0004, 0], R - c),"
+        },
+        {
+          "tipo": "-",
+          "linha": 130,
+          "texto": "    round([0, c, 0], R),"
+        },
+        {
+          "tipo": "-",
+          "linha": 131,
+          "texto": "    round([0, a / 2, 0], R),"
+        },
+        {
+          "tipo": "-",
+          "linha": 132,
+          "texto": "    round([0, a, 0], R),"
+        },
+        {
+          "tipo": "-",
+          "linha": 133,
+          "texto": "    ...entre(a, yPe, 3).map((y) => mistura(y, (y - a) / (yPe - a))),"
+        },
+        {
+          "tipo": "-",
+          "linha": 134,
+          "texto": "    quad([0, yPe, 0], h),"
+        },
+        {
+          "tipo": "-",
+          "linha": 135,
+          "texto": "    ...entre(yPe, yTopo - c, t.estacoes).map((y) => quad([0, y, 0], h)),"
+        },
+        {
+          "tipo": "-",
+          "linha": 136,
+          "texto": "    quad([0, yTopo - c, 0], h),"
+        },
+        {
+          "tipo": "-",
+          "linha": 137,
+          "texto": "    quad([0, yTopo - 0.0004, 0], h - c),"
+        },
+        {
+          "tipo": "-",
+          "linha": 138,
+          "texto": "    { pos: [0, yTopo, 0], raio: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    secColuna(0.0004, h - c),"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    secColuna(c, h),"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    ...entre(c, yEixo - 0.0004, t.estacoes).map((y) => secColuna(y, h)),"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    secColuna(yEixo - 0.0004, h),"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    { pos: [0, yEixo, 0], raio: 0 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "  /* Braço deitado: nasce dentro da coluna com a mesma seção, sai para +Z e"
+        },
+        {
+          "tipo": "-",
+          "linha": 141,
+          "texto": "     fecha a saída em z = zFace, sem passar do plano onde o anel encosta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  /* Parte deitada: atravessa o topo de trás até a saída redonda. A transição"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "     de quase quadrada a redonda é feita em estações cujo expoente cai de"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "     forma suave (cosseno), com o raio constante, para as faces não ganharem"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "     facetas nem torcerem o sombreamento. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const ns = t.estacoesDaSaida;"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  const transicao = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  for (let k = 1; k <= ns; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "    const f = k / (ns + 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "    const s = 0.5 - 0.5 * Math.cos(Math.PI * f);"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "    const z = zTransicao + (zFace - c - zTransicao) * f;"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "    transicao.push(sec([0, yEixo, z], h, nTopo + (2 - nTopo) * s));"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 143,
+          "texto": "    { pos: [0, yEixo, 0], raio: 0 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 144,
+          "texto": "    quad([0, yEixo, 0.0004], h),"
+        },
+        {
+          "tipo": "-",
+          "linha": 145,
+          "texto": "    ...entre(0.0004, zTransicao, t.estacoes).map((z) => quad([0, yEixo, z], h)),"
+        },
+        {
+          "tipo": "-",
+          "linha": 146,
+          "texto": "    quad([0, yEixo, zTransicao], h),"
+        },
+        {
+          "tipo": "-",
+          "linha": 147,
+          "texto": "    ...entre(zTransicao, zFace - c, 3).map((z) => afunila(z, (z - zTransicao) / (zFace - c - zTransicao))),"
+        },
+        {
+          "tipo": "-",
+          "linha": 148,
+          "texto": "    round([0, yEixo, zFace - c], Rs),"
+        },
+        {
+          "tipo": "-",
+          "linha": 149,
+          "texto": "    round([0, yEixo, zFace - 0.0004], Rs - c),"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    { pos: [0, yEixo, -h], raio: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    sec([0, yEixo, -h + 0.0004], h, nTopo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    ...entre(-h + 0.0004, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], h, nTopo)),"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    sec([0, yEixo, zTransicao], h, nTopo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    ...transicao,"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    sec([0, yEixo, zFace - c], Rs, 2),"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    sec([0, yEixo, zFace - 0.0004], Rs - c, 2),"
+        },
+        {
+          "tipo": "-",
+          "linha": 158,
+          "texto": "  /* Só o encontro de baixo: em cima os topos ficam rentes e não há canto a arredondar. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 159,
+          "texto": "  if (t.raioDoEncontro > 0) passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.02], max: [1, yBraco + rc + 0.005, 1] } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  if (t.raioDoEncontro > 0) passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, -0.06], max: [1, yEixo + 0.005, 1] } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 170,
+          "texto": "    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: R, inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: Math.SQRT2 * h, inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 176,
+          "texto": "  passos.push(['liso', { sel: corpo, angulo: 45 }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 177,
+          "texto": "  if (t.raioDoEncontro > 0) passos.push(['liso', { sel: concordancia, angulo: 45 }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  passos.push(['liso', { sel: corpo, angulo: 20 }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  if (t.raioDoEncontro > 0) passos.push(['liso', { sel: concordancia, angulo: 20 }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 183,
+          "texto": "  meta: { nome: 'braco-robotico/ombro', desc: 'ombro: L de ponta-cabeça de 190 mm com saída redonda e anel fino' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  meta: { nome: 'braco-robotico/ombro', desc: 'ombro: L de ponta-cabeça de 190 mm, frente de pé recuada, saída redonda e anel fino' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 192,
+          "texto": "      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm: pé redondo no diâmetro do anel da cintura, coluna quase quadrada de cantos arredondados, braço deitado com eixo a 115 mm e topo a 210 mm, saída redonda inscrita; encontro de baixo concordado', tecnica: 'dois lofts de seção quadrada de cantos arredondados (coluna e braço) unidos, com o encontro de baixo arredondado por arredondarCostura e sombreamento liso com ângulo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de superelipse unidos; seção vira redonda em várias estações de raio constante; arredondarCostura no encontro de baixo; liso com ângulo' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 196,
+          "texto": "      'corpo de seção circular em todo o trecho de cima, lendo como cano',"
+        },
+        {
+          "tipo": "-",
+          "linha": 197,
+          "texto": "      'dobra com canto vivo por fora',"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "      'parte de pé sem o degrau em relação à parte deitada (frentes no mesmo plano)',"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "      'saída redonda maior que a largura do bloco, sobrando por baixo ou pelos lados',"
+        },
+        {
+          "tipo": "-",
+          "linha": 199,
+          "texto": "      'saída redonda maior que a seção quadrada, sobrando por baixo ou pelos lados',"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "      'facetas ou sombreado torcido na faixa em que a seção vira redonda junto ao anel',"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "      'rasgo, quina viva ou degrau de sombra no encontro de baixo entre a frente da parte de pé e a parte deitada',"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "      'rasgo ou degrau de sombra nos cantos junto à saída',"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "      'seção de cima facetada na vista de cima, em polígono em vez de cantos arredondados contínuos',"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "      'corpo de seção circular em todo o trecho de cima, lendo como cano',"
+        },
+        {
+          "tipo": "-",
+          "linha": 202,
+          "texto": "      'pé fora do eixo vertical da cintura ou com diâmetro diferente do anel da cintura',"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[11], PASSOS[12]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az240.png",
+      "peca-tresquartos-rasante-az330.png"
+    ]
+  }
+}
