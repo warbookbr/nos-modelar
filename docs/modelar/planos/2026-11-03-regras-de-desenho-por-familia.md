@@ -101,6 +101,8 @@ A prova do gate 2 está em `tools/modelar/prancha/prancha-regras.test.mjs`. A pr
 
 A regra das pontas não tem prancha antiga que a reprove: as pontas penduradas eram do modelo, e a prancha sempre as desenhou assentadas. Por isso a prova dela é um caso sintético, uma moldura que desce até 299. A prancha do furgão realista declara `familia: 'veiculo'` e os dados das seis conferências, no lugar da antiga declaração solta de `divisoes`. Seguem abertas as fatias 3 e 5.
 
+**Fatia 3, operação de varredura.** O núcleo ganhou `gaiolaVarrida` (`procedural/nucleo/gaiola-varrida.js`), uma função pura ao lado de `gaiolaPorEstacoes` e `gaiolaPorRede` que varre uma seção dada ao longo de um trilho de retas e arcos, com estações por distância, corte por altura ou por cilindro nas pontas, alargamento por perfil, borda rolada, topo aberto e remoção de células, e devolve a gaiola no formato do passo `subdivisao`; tem 24 testes em peça de fixture e o retrato do acervo ficou com as 54 peças iguais. A receita do furgão passou a usá-la nas saias presas, nos trechos de saia das portas e nas quatro molduras dos arcos, com os mesmos vértices, faces e vincos a 1e-12 mm; os dois para-choques ficaram no código de antes, porque o recuo lateral da seção na quina muda a escala e o centro do arco juntos, o que a seção rígida não expressa, e a placa e o fechamento ainda dependem dos auxiliares antigos. A receita perdeu só 6 linhas: o ganho está na operação geral, que o próximo veículo usa por dado. Levar os para-choques à varredura pede seção que varia ao longo do trilho e fica para o backlog.
+
 ## Fechamento
 
 A preencher ao concluir ou cancelar.
