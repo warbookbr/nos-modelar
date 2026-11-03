@@ -101,7 +101,7 @@ export const GATES = [
      :junta, :edicao e :gesto) rodam aqui dentro, num Chromium e num servidor do Vite só (tools/modelar/guardas/rodar-guardas.mjs). Cada
      uma continua sendo um script que roda sozinho, e o relatório do gate diz o nome e o veredito de cada uma. */
   'bancada:guardas', 'exportar:check',
-  'guarda:acervo', 'guarda:referencial', 'origens:check',
+  'guarda:acervo', 'guarda:tempo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check',
@@ -200,6 +200,8 @@ export const PESO_DO_GATE = {
   'test:lentos': 4,
   'mcp:visual:check': 2,
   'bancada:guardas': 2,
+  /* Ela mede tempo de parede: com outros gates na máquina o número sai inflado e reprova sem razão, então roda sozinha. */
+  'guarda:tempo': 64,
 };
 const ORCAMENTO_DA_MAQUINA = Math.max(2, availableParallelism());
 
@@ -220,7 +222,7 @@ export const PASTAS_LEVES = [/^procedural\/pecas\//, /^docs\//, /^[^/]+\.md$/];
 
 export const GATES_CURTOS = [
   'typecheck', 'test:rapidos', 'test:lentos', 'build', 'exportar:check',
-  'guarda:acervo', 'guarda:referencial', 'origens:check',
+  'guarda:acervo', 'guarda:tempo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check', 'ferramentas:check',
@@ -244,6 +246,8 @@ export function escolherBateria(alterados) {
  * mudou, e sempre no CI, que chama o script direto. */
 export const GATES_POR_CAMINHO = {
   'guarda:acervo': [/^procedural\//, /^src\//, /^tools\/modelar\/(guardas\/|descrever-peca|resolver-caminho-receita)/, /^package(-lock)?\.json$/],
+  /* O tempo do `descrever` do furgão realista depende do núcleo e do que a peça gera, não de documento. */
+  'guarda:tempo': [/^procedural\//, /^src\//, /^tools\/modelar\/(guardas\/guarda-tempo|descrever-peca|resolver-caminho-receita)/, /^package(-lock)?\.json$/],
   /* As duas conferências de família, medidas na mesma rodada em 133 s e 116 s, seguem a mesma regra pelo que importam. */
   'familias:check': [/^procedural\//, /^src\//, /^modulos\//, /^tools\/modelar\/(familia|aprovacao-da-familia|importar-receita|resolver-caminho-receita|montagem-da-familia)/, /^package(-lock)?\.json$/],
 };
@@ -301,7 +305,7 @@ function lerDuracoesDosGates(raiz = RAIZ) {
  * verde. A pessoa decidiu no mesmo dia: a bateria local roda as conferências baratas e os testes rápidos ligados à mudança, e
  * os gates abaixo, quando algo do que leem mudou, ficam para o CI, ditos no relatório. `--com-pesados` e `--completo` os rodam
  * aqui. */
-export const PESADOS_PARA_O_CI = ['test:lentos', 'mcp:visual:check', 'bancada:guardas', 'guarda:acervo', 'guarda:referencial', 'familias:check', 'desenho:check'];
+export const PESADOS_PARA_O_CI = ['test:lentos', 'mcp:visual:check', 'bancada:guardas', 'guarda:acervo', 'guarda:tempo', 'guarda:referencial', 'familias:check', 'desenho:check'];
 
 /* Quem lê `dist/` só pode começar depois de quem escreve. */
 export const DEPENDE_DE = Object.fromEntries(

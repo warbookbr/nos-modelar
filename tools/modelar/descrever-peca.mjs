@@ -18,6 +18,7 @@ import {
 } from './configuracao-composicoes.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import { criarMemoriaDeAuditoria } from '../../src/autoria/contato-de-solidos.js';
 import { conferirVaosDaPeca, formatarVaos } from '../../src/autoria/molduras-do-vao.js';
 import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import {
@@ -276,16 +277,18 @@ export async function descreverPecaReutilizavel({
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }
 
+  /* Uma memória por execução: o sólido de cada parte e a auditoria de cada par, feitos por `medirPeca` e reaproveitados por `contatosDaPeca`. */
+  const memoria = criarMemoriaDeAuditoria(neutro);
   let descricao;
   let consultaDeSubarvore = null;
   try {
     if (subarvore === null) {
-      descricao = medirPeca(neutro, { partes: partesLidas.length ? partesLidas : null });
+      descricao = medirPeca(neutro, { partes: partesLidas.length ? partesLidas : null, memoria });
     } else {
       const raiz = subarvore.trim();
-      const daRaiz = medirPeca(neutro, { partes: [raiz] });
+      const daRaiz = medirPeca(neutro, { partes: [raiz], memoria });
       const nomes = nomesDaSubarvore(daRaiz.hierarquia, raiz);
-      descricao = medirPeca(neutro, { partes: nomes });
+      descricao = medirPeca(neutro, { partes: nomes, memoria });
       consultaDeSubarvore = { raiz, nomes };
     }
   } catch (erro) {
@@ -432,7 +435,7 @@ export async function descreverPecaReutilizavel({
       falhou = true;
     }
     try {
-      contatos = contatosDaPeca(neutro, receita);
+      contatos = contatosDaPeca(neutro, receita, { memoria });
     } catch (erro) {
       return falha(`NÃO CONSEGUI MEDIR OS CONTATOS\n  ${erro.message}`);
     }
