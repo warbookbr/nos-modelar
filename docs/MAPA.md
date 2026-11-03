@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1716 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1717 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2651,6 +2651,7 @@
 ## tools/modelar/guardas/
 
 - `abre-na-bancada.test.mjs` — abre-na-bancada.test.mjs — toda peça e toda montagem do acervo vira cena Three.js pelo caminho da bancada, sem navegador.
+- `etapas-do-acervo.test.mjs` — etapas-do-acervo.test.mjs — a releitura de todo `montagem.etapas.json` do acervo.
 - `guarda-acervo.mjs` — guarda-acervo.mjs — roda o veredito completo sobre TODO o acervo.
 - `guarda-acervo.test.mjs` — guarda-acervo.test.mjs — a polaridade do veredito de contato.
 - `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
