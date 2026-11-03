@@ -5,7 +5,7 @@
  * de lataria pela procedência da malha executada. */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from './executar-receita.js';
-import { avisoDaDispensa, latariaDaReceita, normalizarLataria, partesDaLataria } from './lataria.js';
+import { avisoDaDispensa, emendaSombreadaDaReceita, latariaDaReceita, normalizarLataria, partesDaLataria, superficieDaReceita } from './lataria.js';
 import { normalizarPlanoDeModelagem } from './plano-de-modelagem.js';
 import provaDeLataria from '../../tools/fixtures/lataria-de-prova/receita.js';
 
@@ -62,5 +62,44 @@ describe('o reconhecimento da peça de lataria', () => {
     expect(Object.keys(neutro.partes).sort()).toEqual(['chapa', 'nervura']);
     expect(partesDaLataria(neutro)).toEqual(['chapa']);
     expect(partesDaLataria(executarReceita({ PASSOS: CUBO }).neutro)).toEqual([]);
+  });
+});
+
+describe('a emenda sombreada leva a luz rasante, e só ela', () => {
+  const UNIR = ['unir', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }] }];
+  const LISO_NA_FUSAO = ['liso', { sel: { origem: { op: 'unir', id: 3 } }, angulo: 45 }];
+
+  it('o liso sobre o resultado de unir, subtrair, intersectar ou arredondarCostura reconhece a emenda', () => {
+    for (const op of ['unir', 'subtrair', 'intersectar', 'arredondarCostura']) {
+      const receita = { PASSOS: [...CUBO, ['liso', { sel: { origem: { op, id: 3 } }, angulo: 45 }]] };
+      expect(emendaSombreadaDaReceita(receita)).toMatchObject({ emenda: true });
+    }
+    const dita = superficieDaReceita({ PASSOS: [UNIR, LISO_NA_FUSAO] }, null);
+    expect(dita).toEqual({ lataria: false, luzRasante: true, porque: 'sombreamento suave (liso em PASSOS[1]) sobre a emenda de uma fusão', partes: null });
+  });
+
+  it('o liso sem ângulo vale, o de ângulo zero não, e o liso fora da fusão não reconhece nada', () => {
+    expect(emendaSombreadaDaReceita({ PASSOS: [UNIR, ['liso', { sel: { origem: { op: 'unir', id: 3 } } }]] }).emenda).toBe(true);
+    expect(emendaSombreadaDaReceita({ PASSOS: [UNIR, ['liso', { sel: { origem: { op: 'unir', id: 3 } }, angulo: 0 }]] }).emenda).toBe(false);
+    expect(emendaSombreadaDaReceita({ PASSOS: [UNIR, ['liso', { sel: { origem: { op: 'cilindro', id: 1 } }, angulo: 45 }]] }).emenda).toBe(false);
+    expect(emendaSombreadaDaReceita({ PASSOS: [UNIR] }).emenda).toBe(false);
+    /* a fusão sem liso é aresta viva, e não sombra suave sobre a emenda */
+    expect(superficieDaReceita({ PASSOS: [UNIR] }, null).luzRasante).toBe(false);
+  });
+
+  it('alcança a fusão pela parte que dela saiu e por seleção composta', () => {
+    const porParte = { PASSOS: [UNIR, ['parte', { nome: 'corpo', sel: { origem: { op: 'unir', id: 3 } } }], ['liso', { sel: { parte: 'corpo' }, angulo: 30 }]] };
+    expect(emendaSombreadaDaReceita(porParte).emenda).toBe(true);
+    const composta = { PASSOS: [UNIR, ['liso', { sel: { uniao: [{ regiao: {} }, { origem: { op: 'unir', id: 3 } }] }, angulo: 30 }]] };
+    expect(emendaSombreadaDaReceita(composta).emenda).toBe(true);
+    const outraParte = { PASSOS: [UNIR, ['parte', { nome: 'corpo', sel: { origem: { op: 'cubo', id: 1 } } }], ['liso', { sel: { parte: 'corpo' }, angulo: 30 }]] };
+    expect(emendaSombreadaDaReceita(outraParte).emenda).toBe(false);
+  });
+
+  it('a lataria segue com as duas vistas, a dispensa tira a luz rasante da emenda, e o passo pode ser objeto', () => {
+    expect(superficieDaReceita({ PASSOS: [{ op: 'subdivisao' }] }, null)).toMatchObject({ lataria: true, luzRasante: true });
+    const dispensada = superficieDaReceita({ PASSOS: [UNIR, LISO_NA_FUSAO] }, { lataria: { dispensa: 'uma peça fundida de plástico, sem chapa' } });
+    expect(dispensada).toMatchObject({ lataria: false, luzRasante: false });
+    expect(emendaSombreadaDaReceita({ PASSOS: [{ op: 'liso', sel: { origem: { op: 'unir', id: 3 } }, angulo: 45 }] }).emenda).toBe(true);
   });
 });

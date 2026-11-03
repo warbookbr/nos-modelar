@@ -28,6 +28,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { assinaturaDaForma } from '../../src/autoria/assinatura-da-forma.js';
 import { auditarIntersecoesMontagem } from '../../src/autoria/auditar-intersecoes-montagem.js';
 import { medirApoioNoChao, submontagensComDeclaracao } from '../../src/autoria/apoio-no-chao.js';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
@@ -95,7 +96,8 @@ export function montagemAteAGeometria(dado, montagem, receitas) {
   };
 }
 
-/* A impressão do texto de cada receita, por instância. Injetável no teste. */
+/* A impressão do texto de cada receita, por instância. Só serve para ler o
+   registro v1, que guardava o texto; o registro novo guarda a forma. */
 function impressoesDasReceitas(montagem, impressoes, emMemoria) {
   if (impressoes) return impressoes;
   if (emMemoria) return {};
@@ -109,13 +111,18 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   const montagem = lerMontagemPersistida(dado);
   const todas = receitas ?? await receitasDaMontagem(montagem);
   const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, todas);
-  const medidas = construidas.length
-    ? juntasPorEtapa(await resolverMontagemPersistida(parcial, carregadoresDeReceitas(todas)), construidas)
-    : [];
+  const resolvida = construidas.length ? await resolverMontagemPersistida(parcial, carregadoresDeReceitas(todas)) : null;
+  const medidas = resolvida ? juntasPorEtapa(resolvida, construidas) : [];
+  /* A forma de cada peça é a assinatura da malha que a receita gerou, com os
+     parâmetros que a montagem derivou; a de uma submontagem não se assina. */
+  for (const medida of medidas) {
+    const neutro = resolvida.instancias.find((item) => item.id === medida.instancia)?.definicao?.neutro;
+    if (neutro) medida.forma = assinaturaDaForma(neutro);
+  }
   const semGeometria = montagem.etapas.slice(construidas.length).map((instancia) => ({ instancia, juntas: [] }));
   const impressao = impressoesDasReceitas(montagem, impressoes, Boolean(receitas));
   for (const medida of [...medidas, ...semGeometria]) {
-    if (impressao[medida.instancia]) medida.receita = impressao[medida.instancia];
+    if (impressao[medida.instancia]) medida.textoDaReceita = impressao[medida.instancia];
   }
   const registroAnterior = anterior !== undefined ? anterior
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;

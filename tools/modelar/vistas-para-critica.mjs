@@ -48,7 +48,6 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync,
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { linhaDaVista } from '../../modulos/esboco/src/lados.js';
-import { latariaDaReceita } from '../../src/autoria/lataria.js';
 import { doAmbiente } from '../ambiente.mjs';
 import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { lerPlano } from '../../modulos/esboco/src/plano.js';
@@ -64,7 +63,7 @@ import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.m
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
   LADO_DA_VISTA_DE_SUPERFICIE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, exigirLuzNaSuperficie, gravarManifesto, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
-  vistasDeSuperficie,
+  superficieDaPeca, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -338,17 +337,32 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
     ? ` Em ocre, a faixa de ${String(faixa.larguraMm).replace('.', ',')} mm de cada lado dos vincos que a forma desenha (${faixa.vincos.join(', ')}): `
       + 'é a dobra pedida, fica fora da escala e não é defeito; a escala é a do resto da chapa.'
     : '';
+  const luz = [
+    'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol a poucos graus do plano da imagem, de duas direções, '
+    + 'escolhidas em cada vista para a luz cair no lado da peça que a câmera vê. O painel '
+    + 'liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. '
+    + 'A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.', '',
+    ...lista(rasante.map(({ arquivo, vista, azimute }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima): ${arquivo}`)), '',
+  ];
+  /* A peça de emenda sombreada leva só a luz rasante: o que ela mostra é a sombra suave que sobe sobre o encontro de dois sólidos
+     fundidos, com degrau, quina ou risco que o sombreamento esconde nas vistas de Modelo. */
+  if (!curvatura.length) {
+    return [
+      '## Superfície', '',
+      'A peça tem sombreamento suave sobre a emenda de sólidos fundidos, e esta vista mostra o que a sombra das vistas de Modelo esconde: '
+      + 'o degrau de sombra, a quina que sobra onde devia haver curva e o risco ao longo do encontro. Diga onde a sombra degrada, quebra ou '
+      + 'desenha uma aresta que a forma não pede. As vistas desta seção olham destes lados, no quadro da peça:', '',
+      ...lista(vistas.map((v) => `${v}: ${LADO_DA_VISTA_DE_SUPERFICIE[v]}`)), '',
+      ...luz,
+    ];
+  }
   return [
     '## Superfície', '',
     'A peça é de chapa, e estas duas vistas mostram o que a sombra das vistas de Modelo esconde: o amassado largo e raso, a ondulação de um '
     + 'painel que devia ser liso e a quina que não corre por igual. Diga onde a chapa afunda, abaula ou ondula sem que a forma peça. As vistas '
     + 'desta seção olham destes lados, no quadro da peça:', '',
     ...lista(vistas.map((v) => `${v}: ${LADO_DA_VISTA_DE_SUPERFICIE[v]}`)), '',
-    'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol a poucos graus do plano da imagem, de duas direções, '
-    + 'escolhidas em cada vista para a luz cair no lado da peça que a câmera vê. O painel '
-    + 'liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. '
-    + 'A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.', '',
-    ...lista(rasante.map(({ arquivo, vista, azimute }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima): ${arquivo}`)), '',
+    ...luz,
     'A curvatura média da chapa: branco onde ela é plana, vermelho onde abaula para fora e azul onde afunda, na escala escrita em cada '
     + 'imagem; cinza claro são as peças que não são a chapa, e cinza escuro a faixa junto da borda e das dobras vivas, sem dado. Uma mancha '
     + `azul cercada de vermelho num painel que devia ser liso é um afundamento.${textoDaFaixa}`, '',
@@ -441,8 +455,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     throw new Error(mensagemDeReferenciasAusentes(referencias.ausentes));
   }
   /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem do Blender: sem ele, recusa antes de gastar captura */
-  const lataria = latariaDaReceita(receita, plano);
-  if (lataria.lataria && !blender) throw new Error(mensagemSemBlender(peca, lataria));
+  const lataria = superficieDaPeca(peca, receita, plano);
+  if (lataria.luzRasante && !blender) throw new Error(mensagemSemBlender(peca, lataria));
   const declarado = await dep.esbocoDeclarado(peca);
   let bruto = null;
   if (declarado) {
@@ -544,7 +558,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   }
 
   const sobreposicao = declarado ? await dep.sobreposicaoDeCortes({ peca, saida: pasta }) : null;
-  const superficie = lataria.lataria ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
+  const superficie = lataria.luzRasante ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
   /* a imagem de luz rasante quase toda escura não chega ao crítico: a luz que não alcança a chapa não mostra relevo nenhum */
   if (superficie) exigirLuzNaSuperficie(peca, superficie);
 
@@ -665,7 +679,9 @@ export function imprimir(resultado) {
   }
   if (resultado.superficie) {
     const { superficie } = resultado;
-    linhas.push('', `SUPERFÍCIE (peça de lataria: ${resultado.lataria.porque}; chapa na curvatura: ${superficie.partes?.length ? superficie.partes.join(', ') : 'a malha inteira'}):`);
+    linhas.push('', resultado.lataria.lataria
+      ? `SUPERFÍCIE (peça de lataria: ${resultado.lataria.porque}; chapa na curvatura: ${superficie.partes?.length ? superficie.partes.join(', ') : 'a malha inteira'}):`
+      : `SUPERFÍCIE (luz rasante: ${resultado.lataria.porque}):`);
     for (const { arquivo } of superficie.rasante) linhas.push(`  ${arquivo} (luz rasante)`);
     for (const { arquivo } of superficie.curvatura) linhas.push(`  ${arquivo} (curvatura da lataria)`);
   }

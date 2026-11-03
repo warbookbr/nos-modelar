@@ -72,7 +72,10 @@ Só a pessoa reabre uma etapa fixa, pelo mesmo critério do aceite humano, com
 A etapa volta a aberta e o aceite e a receita que ela tinha ficam em
 `reaberturas` no registro. O comando recusa sem `--por` completo, etapa que não
 está fixa e etapa que tem posterior fixa ou quebrada; nesse caso reabra da
-última para a primeira, cada uma com o motivo dela.
+última para a primeira, cada uma com o motivo dela. O registro compara a
+`forma` (a malha que a receita gera), e não o texto: comentário e `PLANO` não
+quebram a etapa fixa. A etapa que quebra por forma ou por junta guarda o aceite
+em `reaberturas`, e ler o registro não o apaga.
 
 ## O ciclo de uma etapa
 
@@ -108,6 +111,10 @@ promete, os critérios de reprovação, as perguntas e o limite de 240 caractere
 de novo), com o caminho de todas as imagens e o lado de onde cada vista olha. As perguntas são as da família, quando o `PLANO`
 declara `familia` ou `familiaProcedural`, e, quando a receita declara `REFINA.esboco`, a de onde o alvo difere da referência real:
 o para-brisa saliente do avião veio do esboço, passou por dois críticos e só a pessoa o viu.
+
+Na peça com sombreamento suave sobre a emenda de uma fusão (um `liso` cuja seleção alcança o resultado de `unir`, `subtrair`,
+`intersectar` ou `arredondarCostura`), o pacote leva a luz rasante, sem a curvatura, e o `--registrar` cobra essa vista como cobra
+da lataria; a etapa já fixa pela pessoa fica fora da regra até voltar ao laço.
 
 Na peça de lataria (a receita tem passo `subdivisao` ou declara `PLANO.lataria`), o pacote leva também a luz rasante e a curvatura
 da lataria, que mostram o amassado largo e raso que nenhuma medida e nenhuma vista comum mostram, e elas saem do Blender: rode

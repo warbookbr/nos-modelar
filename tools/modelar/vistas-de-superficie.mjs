@@ -33,7 +33,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { latariaDaReceita, partesDaLataria } from '../../src/autoria/lataria.js';
+import { partesDaLataria, superficieDaReceita } from '../../src/autoria/lataria.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { vincosDaMalha } from '../../src/autoria/vincos-da-malha.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
@@ -73,14 +73,43 @@ export const comandoDasVistas = (peca) => `MODELAR_BLENDER=<caminho do Blender> 
 export const impressaoDoTexto = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
 
 /**
- * Se a peça é de lataria, pela receita (sem executar): `{ lataria, porque, partes }` de `latariaDaReceita`, com o caminho e o
- * texto da receita lida.
+ * Se a etapa da peça, na montagem do objeto dela (`<objeto>/montagem.json`), está fixa no registro: a peça aceita pela pessoa.
+ * Peça fora de montagem, ou sem registro, não está.
+ */
+export function etapaFixaDaPeca(peca, { raiz = join(REPO, 'procedural/pecas') } = {}) {
+  const [objeto, parte] = peca.split('/');
+  if (!parte) return false;
+  const arquivo = join(raiz, objeto, 'montagem.json');
+  const registro = join(raiz, objeto, 'montagem.etapas.json');
+  if (!existsSync(arquivo) || !existsSync(registro)) return false;
+  try {
+    const instancia = (JSON.parse(readFileSync(arquivo, 'utf8')).instancias ?? []).find((item) => item.alvo?.ref === peca);
+    return Boolean(instancia) && JSON.parse(readFileSync(registro, 'utf8')).etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
+  } catch { return false; }
+}
+
+/**
+ * O que a peça leva ao pacote, pela receita (sem executar): `{ lataria, luzRasante, porque, partes }` de `superficieDaReceita`. A peça
+ * de lataria leva a luz rasante e a curvatura; a de emenda sombreada, só a luz rasante. A emenda sombreada não reabre a peça cuja
+ * etapa a pessoa já fixou: o aceite vale como foi dado, e a regra vale quando a peça volta ao laço (a pessoa reabre a etapa, ou ela
+ * quebra). A lataria não tem essa folga, porque a obrigação dela é anterior.
+ */
+export function superficieDaPeca(peca, receita, plano = null, opcoes = {}) {
+  const decidida = superficieDaReceita(receita, plano);
+  if (decidida.luzRasante && !decidida.lataria && etapaFixaDaPeca(peca, opcoes)) {
+    return { ...decidida, luzRasante: false, porque: `${decidida.porque}, e a etapa da peça está fixa por aceite da pessoa` };
+  }
+  return decidida;
+}
+
+/**
+ * O que a peça leva ao pacote, lido da receita do acervo: `superficieDaPeca` com o caminho da receita.
  */
 export async function latariaDaPeca(peca) {
   const caminho = resolverCaminhoReceita(peca);
   const receita = receitaDoModulo(await importarReceita(caminho));
   const plano = normalizarPlanoDeModelagem(receita?.PLANO);
-  return { ...latariaDaReceita(receita, plano), caminho };
+  return { ...superficieDaPeca(peca, receita, plano), caminho };
 }
 
 /* ---------- a luz rasante quase toda escura ---------- */
@@ -124,9 +153,11 @@ export function exigirLuzNaSuperficie(peca, superficie, limiar = LIMIAR_DA_LUZ_R
 
 /** A recusa de gerar as vistas sem Blender, com o comando. */
 export function mensagemSemBlender(peca, lataria) {
-  return `a peça '${peca}' é de lataria (${lataria.porque}), e o pacote do crítico de peça de lataria leva a luz rasante e a curvatura `
-    + 'da lataria, que saem do Blender; MODELAR_BLENDER não aponta o executável. Rode '
-    + `\`${comandoDoPacote(peca)}\`, que gera o pacote inteiro com as duas vistas (só elas saem de \`${comandoDasVistas(peca)}\`).`;
+  const quem = lataria.lataria
+    ? `a peça '${peca}' é de lataria (${lataria.porque}), e o pacote do crítico de peça de lataria leva a luz rasante e a curvatura da lataria, que saem do Blender`
+    : `a peça '${peca}' tem ${lataria.porque}, e o pacote do crítico dela leva a luz rasante, que sai do Blender`;
+  return `${quem}; MODELAR_BLENDER não aponta o executável. Rode `
+    + `\`${comandoDoPacote(peca)}\`, que gera o pacote inteiro com ${lataria.lataria ? 'as duas vistas' : 'a vista'} (só ${lataria.lataria ? 'elas saem' : 'ela sai'} de \`${comandoDasVistas(peca)}\`).`;
 }
 
 /* ---------- os vincos declarados, na malha entregue ---------- */
@@ -158,8 +189,11 @@ export async function vistasDeSuperficie(peca, {
   pasta, blender = doAmbiente('BLENDER'), lataria = null, faixaDosVincos = true, faixaMm = null, executar = spawnSync,
 } = {}) {
   const decidida = lataria ?? await latariaDaPeca(peca);
+  /* A curvatura é da lataria. A peça de emenda sombreada leva só a luz rasante, e a peça que não leva nenhuma das duas (chamada pela
+     linha de comando para olhar) recebe as duas, como sempre. */
+  const comCurvatura = decidida.lataria || !decidida.luzRasante;
   if (!blender) {
-    throw new Error(decidida.lataria ? mensagemSemBlender(peca, decidida)
+    throw new Error(decidida.luzRasante ? mensagemSemBlender(peca, decidida)
       : `as vistas de superfície saem do Blender, e MODELAR_BLENDER não aponta o executável: rode \`${comandoDasVistas(peca)}\`.`);
   }
   const caminho = resolverCaminhoReceita(peca);
@@ -172,9 +206,9 @@ export async function vistasDeSuperficie(peca, {
   let partes = decidida.partes ?? null;
   let executada = null;
   const receitaExecutada = async () => (executada ??= executarReceita(receitaDoModulo(await importarReceita(caminho))));
-  if (!partes) partes = partesDaLataria((await receitaExecutada()).neutro);
+  if (!partes) partes = comCurvatura ? partesDaLataria((await receitaExecutada()).neutro) : [];
   const argsDaFaixa = [];
-  if (faixaDosVincos) {
+  if (faixaDosVincos && comCurvatura) {
     const vincos = vincosDaMalha(null, await receitaExecutada());
     if (vincos.length) {
       const arquivo = join(destino, 'vincos.json');
@@ -185,17 +219,19 @@ export async function vistasDeSuperficie(peca, {
   const prefixo = join(destino, 'peca-');
   const vistas = ['--vista', VISTAS_DE_SUPERFICIE.join(',')];
   rodarBlender(blender, 'luz-rasante.py', ['--malha', obj, '--saida', prefixo, ...vistas], executar);
-  rodarBlender(blender, 'curvatura-da-lataria.py', [
-    '--malha', obj, '--saida', prefixo, ...vistas, ...(partes.length ? ['--lataria', partes.join(',')] : []), ...argsDaFaixa,
-  ], executar);
+  if (comCurvatura) {
+    rodarBlender(blender, 'curvatura-da-lataria.py', [
+      '--malha', obj, '--saida', prefixo, ...vistas, ...(partes.length ? ['--lataria', partes.join(',')] : []), ...argsDaFaixa,
+    ], executar);
+  }
   const rasante = JSON.parse(readFileSync(`${prefixo}rasante.json`, 'utf8')).imagens
     .map((i) => ({ arquivo: i.arquivos.malha, vista: i.vista, azimute: i.azimute, iluminada: i.iluminacao?.fracao ?? null }));
-  const resumo = JSON.parse(readFileSync(`${prefixo}curvatura.json`, 'utf8'));
-  const curvatura = resumo.imagens.map((i) => ({ arquivo: i.legenda, vista: i.vista }));
-  const f = resumo.faixa_dos_vincos ?? null;
+  const resumo = comCurvatura ? JSON.parse(readFileSync(`${prefixo}curvatura.json`, 'utf8')) : null;
+  const curvatura = resumo ? resumo.imagens.map((i) => ({ arquivo: i.legenda, vista: i.vista })) : [];
+  const f = resumo?.faixa_dos_vincos ?? null;
   const faixa = f ? { larguraMm: f.largura_mm, vincos: f.vincos, escala: resumo.escala_1_m, escalaComAFaixa: f.escala_com_a_faixa_1_m } : null;
   const faltam = [...rasante, ...curvatura].map((i) => i.arquivo).filter((a) => !existsSync(a));
-  if (!rasante.length || !curvatura.length || faltam.length) {
+  if (!rasante.length || (comCurvatura && !curvatura.length) || faltam.length) {
     throw new Error(`as vistas de superfície de '${peca}' não saíram inteiras (${rasante.length} da luz rasante, ${curvatura.length} da curvatura${faltam.length ? `; faltam ${faltam.join(', ')}` : ''}).`);
   }
   return { obj, partes, rasante, curvatura, faixa };
@@ -214,6 +250,7 @@ export function gravarManifesto(pasta, { peca, receita, lataria = null, superfic
     peca,
     receita,
     lataria: lataria?.lataria ? { porque: lataria.porque, partes: superficie?.partes ?? lataria.partes ?? null } : null,
+    luzRasante: lataria?.luzRasante ? { porque: lataria.porque } : null,
     superficie: superficie ? {
       rasante: superficie.rasante.map((i) => i.arquivo), curvatura: superficie.curvatura.map((i) => i.arquivo), faixaDosVincos: superficie.faixa ?? null,
       luzRasante: superficie.rasante.map(({ arquivo, vista, azimute, iluminada = null }) => ({ arquivo, vista, azimute, iluminada })),
@@ -239,7 +276,11 @@ export function superficieDoPacote(peca, { pasta, sha256 }) {
     return { ok: false, motivo: `o pacote de ${pasta} mostra outra versão da receita (${String(dado.receita).slice(7, 15)}) que a medida agora (${String(sha256).slice(7, 15)})` };
   }
   const { rasante = [], curvatura = [] } = dado.superficie ?? {};
-  if (!rasante.length || !curvatura.length) return { ok: false, motivo: `o pacote de ${pasta} não trouxe a luz rasante e a curvatura da lataria` };
+  /* a curvatura é da lataria: o pacote da peça de emenda sombreada leva só a luz rasante */
+  const exigeCurvatura = Boolean(dado.lataria);
+  if (!rasante.length || (exigeCurvatura && !curvatura.length)) {
+    return { ok: false, motivo: `o pacote de ${pasta} não trouxe ${exigeCurvatura ? 'a luz rasante e a curvatura da lataria' : 'a luz rasante'}` };
+  }
   const faltam = [...rasante, ...curvatura].filter((a) => !existsSync(a));
   if (faltam.length) return { ok: false, motivo: `o pacote de ${pasta} cita imagens de superfície que não existem mais (${faltam.map((a) => basename(a)).join(', ')})` };
   const medidas = new Map((dado.superficie.luzRasante ?? []).map((i) => [i.arquivo, i]));
@@ -271,7 +312,7 @@ async function principal(argv) {
   const { faixa } = feitas;
   const linhas = [
     `vistas:superficie — ${peca}`,
-    `lataria: ${lataria.lataria ? 'sim' : 'não'} (${lataria.porque}); partes de lataria na curvatura: ${feitas.partes.length ? feitas.partes.join(', ') : 'a malha inteira'}`,
+    `lataria: ${lataria.lataria ? 'sim' : 'não'}${lataria.luzRasante && !lataria.lataria ? ', com luz rasante pela emenda sombreada' : ''} (${lataria.porque}); partes de lataria na curvatura: ${feitas.partes.length ? feitas.partes.join(', ') : 'a malha inteira'}`,
     faixa
       ? `faixa dos vincos fora da escala: ${faixa.larguraMm} mm de ${faixa.vincos.join(', ')}; escala ${faixa.escala} 1/m (com a faixa seria ${faixa.escalaComAFaixa} 1/m)`
       : `faixa dos vincos: ${faixaDosVincos ? 'nenhuma (a peça não declara vinco)' : 'desligada (--sem-faixa-dos-vincos)'}`,

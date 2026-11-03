@@ -50,9 +50,9 @@ import { conferirPontos, formatarPontos } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
-import { avisoDaDispensa, latariaDaReceita } from '../../src/autoria/lataria.js';
+import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
-import { comandoDoPacote, pastaDaRodada, superficieDoPacote } from './vistas-de-superficie.mjs';
+import { comandoDoPacote, pastaDaRodada, superficieDaPeca, superficieDoPacote } from './vistas-de-superficie.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -170,12 +170,17 @@ const LIMITE_DO_RELATORIO = 2000;
 const cortar = (texto) => (texto.length > LIMITE_DO_RELATORIO ? `${texto.slice(0, LIMITE_DO_RELATORIO - 1)}…` : texto);
 const indentar = (texto) => texto.trim().split('\n').map((l) => `  ${l}`).join('\n');
 
+/* A obrigação da luz rasante na medição: a da peça de emenda sombreada ou de lataria. Uma medição sem `luzRasante` (a de antes desta
+   regra, ou a injetada) vale pela lataria. */
+const luzDaMedicao = (medicao) => (medicao.luzRasante?.luzRasante ? medicao.luzRasante
+  : medicao.luzRasante === undefined && medicao.lataria?.lataria ? { luzRasante: true, porque: medicao.lataria.porque } : null);
+
 /**
  * A medição da receita atual da peça, feita pela ferramenta: o veredito de `descrever` (partes, refinamento, contatos, formas e a
  * forma contra a referência), a guarda do acervo e a do referencial sobre a peça, e os `PONTOS` quando ela os declara. Devolve
  * `{ passou, relatorio, sha256, texto, lataria, avisos }`: `sha256` é a impressão do texto da receita que foi medida (a mesma que a rodada
  * grava), `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois, `lataria` diz se a peça é de
- * lataria (`latariaDaReceita`) e `avisos` o que o resumo do laço mostra sem reprovar (a dispensa de `PLANO.lataria`, com o motivo).
+ * lataria (`superficieDaReceita`), `luzRasante` se a peça leva a luz rasante ao pacote (lataria ou emenda sombreada) e `avisos` o que o resumo do laço mostra sem reprovar (a dispensa de `PLANO.lataria`, com o motivo).
  * Peça sem receita resolvível lança.
  */
 export async function medirReceita(peca) {
@@ -199,9 +204,9 @@ export async function medirReceita(peca) {
   /* o PLANO inválido já reprova no `descrever`; aqui ele só não declara a lataria, que então sai dos PASSOS */
   let plano = null;
   try { plano = normalizarPlanoDeModelagem(receita?.PLANO); } catch { plano = null; }
-  const { lataria, porque } = latariaDaReceita(receita, plano);
+  const { lataria, luzRasante, porque } = superficieDaPeca(peca, receita, plano);
   const avisos = [avisoDaDispensa(plano)].filter(Boolean);
-  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, avisos };
+  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos };
 }
 
 /**
@@ -262,12 +267,13 @@ export async function acaoDaPeca(peca, {
     if (atual !== null && atual === julgada) mesmaFormaDaRodada = ultima.numero;
   }
   const decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite });
-  /* a peça de lataria só fecha com a luz rasante e a curvatura da lataria no pacote que o crítico julgou */
-  if (decisao.acao === 'parar-fechou' && medicao.lataria?.lataria && !ultima?.superficie) {
+  /* a peça de lataria só fecha com a luz rasante e a curvatura da lataria no pacote que o crítico julgou, e a de emenda sombreada com a luz rasante */
+  if (decisao.acao === 'parar-fechou' && luzDaMedicao(medicao) && !ultima?.superficie) {
+    const lataria = Boolean(medicao.lataria?.lataria);
     return {
       acao: 'revisar',
-      motivo: `a rodada ${ultima.numero} fechou sem a luz rasante e a curvatura da lataria no pacote do crítico, e a peça é de lataria `
-        + `(${medicao.lataria.porque}): gere o pacote com \`${comandoDoPacote(peca)}\` e despache o crítico de novo.`,
+      motivo: `a rodada ${ultima.numero} fechou sem ${lataria ? 'a luz rasante e a curvatura da lataria' : 'a luz rasante'} no pacote do crítico, e a peça `
+        + `${lataria ? 'é de lataria' : 'tem emenda sombreada'} (${luzDaMedicao(medicao).porque}): gere o pacote com \`${comandoDoPacote(peca)}\` e despache o crítico de novo.`,
       medicao,
     };
   }
@@ -295,15 +301,16 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   }
   /* a peça de lataria: o veredito só se registra se o pacote que o crítico julgou trouxe as duas vistas da versão medida */
   let superficie;
-  if (entrada.veredito && medicao.lataria?.lataria) {
+  if (entrada.veredito && luzDaMedicao(medicao)) {
     const pasta = pacote ?? pastaDaRodada(peca);
     const conferido = superficieDoPacote(peca, { pasta, sha256: medicao.sha256 });
     if (!conferido.ok) {
-      throw new Error(`o veredito do crítico não se registra: '${peca}' é peça de lataria (${medicao.lataria.porque}), e ${conferido.motivo}. `
-        + `O pacote do crítico de peça de lataria leva a luz rasante e a curvatura da lataria: gere-o com \`${comandoDoPacote(peca)}\` `
+      const lataria = Boolean(medicao.lataria?.lataria);
+      throw new Error(`o veredito do crítico não se registra: '${peca}' ${lataria ? 'é peça de lataria' : 'tem emenda sombreada'} (${luzDaMedicao(medicao).porque}), e ${conferido.motivo}. `
+        + `O pacote do crítico de peça ${lataria ? 'de lataria leva a luz rasante e a curvatura da lataria' : 'com emenda sombreada leva a luz rasante'}: gere-o com \`${comandoDoPacote(peca)}\` `
         + '(com --saida, passe a mesma pasta em --pacote), despache o crítico com o pedido.md novo e registre o veredito dele.');
     }
-    superficie = { lataria: medicao.lataria.porque, imagens: conferido.imagens };
+    superficie = { lataria: luzDaMedicao(medicao).porque, imagens: conferido.imagens };
   }
   /* `medidas` e `superficie` são da ferramenta, e o que a entrada declara deles sai */
   const { medidas: _declaradas, superficie: _declarada, ...resto } = entrada;

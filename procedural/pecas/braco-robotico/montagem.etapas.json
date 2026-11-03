@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.registro-de-etapas",
-  "versao": 1,
+  "versao": 2,
   "montagem": "braco-robotico",
   "etapas": [
     {
@@ -11,7 +11,7 @@
         "por": "pessoa",
         "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
       },
-      "receita": "341346d9c9e5e1fe2520911617a9d69c96ac8b549dc6f842d7d78e3219758808"
+      "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e"
     },
     {
       "instancia": "anelCintura",
@@ -28,8 +28,8 @@
             "sobreposicaoRadial": 0.009999999999999995,
             "sobreposicaoAxial": 0,
             "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
+            "tolerancia": 1e-06,
+            "toleranciaNumerica": 1e-06,
             "radialEsperado": {
               "minimo": 0.01,
               "maximo": 0.01,
@@ -64,7 +64,7 @@
         "por": "pessoa",
         "observacao": "aceitou a rodada 2: faixa única de 25 mm"
       },
-      "receita": "c496ba222445cf570e109902f47e7164ff356a600a86b33c3415450eeb91c14a"
+      "forma": "sha256:bfd1572c7750f72867a686ab7501aa807341d42e7a3cda1b901d5047cf9d76c2"
     },
     {
       "instancia": "ombro",
@@ -81,8 +81,8 @@
             "sobreposicaoRadial": 0.009999999999999995,
             "sobreposicaoAxial": 0,
             "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
+            "tolerancia": 1e-06,
+            "toleranciaNumerica": 1e-06,
             "radialEsperado": {
               "minimo": 0.01,
               "maximo": 0.01,
@@ -113,7 +113,7 @@
           }
         }
       ],
-      "receita": "cfd07971aa2a1987b60046fa14dcdc8e9ceba65e09ac4b6ba956f005d5d9e8cb",
+      "forma": "sha256:d6c4b94a6c0b60269cca6e07375e60633077b7dd3fe87b0038ae6abc4376c4da",
       "reaberturas": [
         {
           "por": "pessoa",

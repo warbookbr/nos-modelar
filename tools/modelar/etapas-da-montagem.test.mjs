@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
 import { auditarEtapas, descreverAuditoria, estadoDasEtapas, fixar, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import { receitaComParametros } from './peca-com-parametros.mjs';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
 
@@ -132,13 +133,35 @@ describe('reabrir etapa fixa', () => {
     registro = await reabrir(arquivo, 'meio', POR, { ...opcoes, anterior: registro });
     expect(registro.etapas.map((e) => e.estado)).toEqual(['fixa', 'aberta', 'aberta']);
     expect(registro.etapas[1].aceite).toBeUndefined();
-    expect(registro.etapas[1].reaberturas).toEqual([{ por: 'pessoa', quando: '2026-09-26', motivo: 'refazer pelo desenho novo', aceite: { por: 'pessoa', analise: 'ausente' } }]);
+    expect(registro.etapas[1].reaberturas).toEqual([{ por: 'pessoa', quando: '2026-09-26', motivo: 'refazer pelo desenho novo', aceite: { por: 'pessoa', analise: 'ausente' }, forma: expect.stringMatching(/^sha256:/) }]);
     /* A releitura mantém a etapa aberta e o histórico. */
     const { registro: relido } = await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: registro });
     expect(relido.etapas[1]).toMatchObject({ estado: 'aberta', reaberturas: registro.etapas[1].reaberturas });
     /* Refixar acumula, sem apagar a reabertura. */
     const refixado = await fixar(arquivo, 'meio', aceite, { ...opcoes, anterior: relido });
     expect(refixado.etapas[1]).toMatchObject({ estado: 'fixa', reaberturas: [{ motivo: 'refazer pelo desenho novo' }] });
+  });
+});
+
+describe('a etapa compara a forma que a receita gera, e não o texto', () => {
+  const opcoes = { receitas: RECEITAS, anterior: null, rodadasDe: todasFechadas };
+  const comOutroTexto = { ...RECEITAS, 'bloco-com-pino': { ...RECEITAS['bloco-com-pino'], meta: { nome: 'outro nome', desc: 'comentário novo' }, PLANO: { criterios: ['critério novo'] } } };
+  const comOutraForma = { ...RECEITAS, 'bloco-com-pino': receitaComParametros(RECEITAS['bloco-com-pino'], { raioDoCorpo: 31 }) };
+
+  it('mudar meta e PLANO sem mudar a malha mantém a etapa fixa', async () => {
+    const fixa = await fixar(arquivo, 'base', aceite, opcoes);
+    expect(fixa.etapas[0].forma).toMatch(/^sha256:/);
+    const { registro } = await estadoDasEtapas(arquivo, { receitas: comOutroTexto, anterior: fixa });
+    expect(registro.etapas[0]).toMatchObject({ estado: 'fixa', forma: fixa.etapas[0].forma, aceite });
+  });
+
+  it('mudar a malha quebra a etapa e o aceite sobrevive a duas leituras', async () => {
+    const fixa = await fixar(arquivo, 'base', aceite, opcoes);
+    const { registro: quebrada } = await estadoDasEtapas(arquivo, { receitas: comOutraForma, anterior: fixa });
+    expect(quebrada.etapas[0]).toMatchObject({ estado: 'quebrada', motivo: 'a receita mudou depois do aceite' });
+    const { registro: aberta } = await estadoDasEtapas(arquivo, { receitas: comOutraForma, anterior: quebrada });
+    expect(aberta.etapas[0].estado).toBe('aberta');
+    expect(aberta.etapas[0].reaberturas[0]).toMatchObject({ motivo: 'a receita mudou depois do aceite', aceite: expect.objectContaining({ por: 'pessoa' }), forma: fixa.etapas[0].forma });
   });
 });
 

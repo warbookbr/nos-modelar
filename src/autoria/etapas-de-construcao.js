@@ -13,7 +13,7 @@
    parte entrava pelo flanco da outra. */
 
 export const FORMATO_REGISTRO_DE_ETAPAS = 'mecanifica.registro-de-etapas';
-export const VERSAO_REGISTRO_DE_ETAPAS = 1;
+export const VERSAO_REGISTRO_DE_ETAPAS = 2;
 
 export class ErroEtapaDeConstrucao extends Error {
   constructor(codigo, mensagem) {
@@ -54,40 +54,71 @@ export function juntasPorEtapa(montagemResolvida, etapas) {
 }
 
 /* Junta o que a resolução mediu agora com o que o registro anterior já tinha
-   fixado. Uma etapa fixa cujas juntas deixaram de passar vira `quebrada`: a
-   mudança que a quebrou veio de uma parte anterior, e ninguém fixou isso. */
+   fixado. Uma etapa fixa cujas juntas deixaram de passar, ou cuja forma mudou,
+   vira `quebrada`: a mudança que a quebrou veio de uma parte anterior ou da
+   receita, e ninguém fixou isso.
+
+   A FORMA, E NÃO O TEXTO. A medida de cada etapa traz `forma`, a assinatura do
+   que a receita gerou (`assinatura-da-forma.js`). A versão 1 do registro
+   guardava `receita`, a impressão do texto do arquivo, e um comentário ou uma
+   imagem retirada do `PLANO` quebrava a etapa sem a forma mudar. Registro v1 é
+   lido: o `receita` antigo só vale se a medida traz `textoDaReceita` igual, e
+   nesse caso a forma de agora passa a ser a do aceite; se o texto mudou, a
+   forma do aceite é desconhecida e a etapa quebra, como antes. A migração que
+   confere a forma do aceite pelo git é feita por quem conhece a história.
+
+   O ACEITE NÃO SOME. Quando a etapa fixa quebra, o aceite e a forma que ela
+   tinha vão para `reaberturas`, com o motivo, antes de qualquer leitura
+   seguinte a levar a `aberta`. Sem isso, duas leituras bastavam para apagar o
+   aceite da pessoa sem rastro. */
 export function atualizarRegistro(montagemId, medidas, anterior = null) {
   const fixas = new Map((anterior?.etapas ?? [])
     .filter((etapa) => etapa.estado === 'fixa' || etapa.estado === 'quebrada')
     .map((etapa) => [etapa.instancia, etapa]));
   const historico = new Map((anterior?.etapas ?? [])
     .filter((etapa) => Array.isArray(etapa.reaberturas) && etapa.reaberturas.length)
-    .map((etapa) => [etapa.instancia, { reaberturas: etapa.reaberturas }]));
+    .map((etapa) => [etapa.instancia, etapa.reaberturas]));
   const registro = {
     formato: FORMATO_REGISTRO_DE_ETAPAS,
     versao: VERSAO_REGISTRO_DE_ETAPAS,
     montagem: montagemId,
-    etapas: medidas.map(({ instancia, juntas, receita }) => {
+    etapas: medidas.map(({ instancia, juntas, forma, textoDaReceita }) => {
       const passou = juntas.every((junta) => junta.satisfeita);
       const fixa = fixas.get(instancia);
-      const comReceita = receita ? { receita } : {};
-      if (!fixa) return { instancia, estado: 'aberta', juntas, ...comReceita };
-      /* RECEITA QUE MUDOU DEPOIS DO ACEITE. As juntas só pegam mudança que
-         desencaixa; alargar a base mantém o anel encaixado pelo vínculo, e a
-         etapa continuava fixa com um aceite dado a outra peça. A impressão da
-         receita é guardada ao fixar e comparada a cada leitura. */
-      if (fixa.receita && receita && fixa.receita !== receita) {
-        return { instancia, estado: 'quebrada', juntas, ...comReceita, motivo: 'a receita mudou depois do aceite' };
-      }
+      const comForma = forma ? { forma } : {};
+      if (!fixa) return { instancia, estado: 'aberta', juntas, ...comForma };
       /* Quebrada que voltou a passar não se refixa sozinha com o aceite
-         antigo: a pessoa aceitou outra coisa, e precisa olhar de novo. */
-      if (fixa.estado === 'quebrada') return { instancia, estado: passou ? 'aberta' : 'quebrada', juntas, ...comReceita };
-      return { instancia, estado: passou ? 'fixa' : 'quebrada', juntas, aceite: fixa.aceite, ...(fixa.receita ? { receita: fixa.receita } : comReceita) };
+         antigo: a pessoa aceitou outra coisa, e precisa olhar de novo. O aceite
+         já foi guardado em `reaberturas` quando ela quebrou. */
+      if (fixa.estado === 'quebrada') return { instancia, estado: passou ? 'aberta' : 'quebrada', juntas, ...comForma };
+      /* FORMA QUE MUDOU DEPOIS DO ACEITE. As juntas só pegam mudança que
+         desencaixa; alargar a base mantém o anel encaixado pelo vínculo, e a
+         etapa continuava fixa com um aceite dado a outra peça. */
+      const aceita = fixa.forma ?? null;
+      const mudou = aceita
+        ? Boolean(forma) && aceita !== forma
+        : Boolean(fixa.receita && textoDaReceita) && fixa.receita !== textoDaReceita;
+      const formaDoAceite = aceita ?? (mudou ? null : forma ?? null);
+      if (!mudou && passou) {
+        return { instancia, estado: 'fixa', juntas, ...(formaDoAceite ? { forma: formaDoAceite } : {}), aceite: fixa.aceite };
+      }
+      const motivo = mudou ? 'a receita mudou depois do aceite' : 'uma junta deixou de passar depois do aceite';
+      const guardado = {
+        por: 'leitura do registro', motivo,
+        ...(fixa.aceite ? { aceite: fixa.aceite } : {}),
+        ...(formaDoAceite ? { forma: formaDoAceite } : {}),
+        ...(!formaDoAceite && fixa.receita ? { receita: fixa.receita } : {}),
+      };
+      return {
+        instancia, estado: 'quebrada', juntas, ...comForma, motivo,
+        reaberturas: [...(historico.get(instancia) ?? []), guardado],
+      };
     }),
   };
   /* O histórico de reaberturas atravessa toda releitura: é o que diz que a
      etapa já esteve fixa e por que deixou de estar. */
-  registro.etapas = registro.etapas.map((etapa) => ({ ...etapa, ...(historico.get(etapa.instancia) ?? {}) }));
+  registro.etapas = registro.etapas.map((etapa) => (etapa.reaberturas || !historico.has(etapa.instancia)
+    ? etapa : { ...etapa, reaberturas: historico.get(etapa.instancia) }));
   return registro;
 }
 
@@ -126,7 +157,7 @@ export function fixarEtapa(registro, instancia, aceite) {
 
 /* REABRIR. Só a pessoa reabre uma etapa fixa, como só ela dá o aceite humano:
    nenhum agente reabre por conta própria. A etapa volta a aberta, e o aceite e
-   a receita que ela tinha vão para `reaberturas`, com quem, quando e por quê,
+   a forma que ela tinha vão para `reaberturas`, com quem, quando e por quê,
    em vez de sumir. Recusa reabrir etapa que não está fixa, e recusa reabrir se
    alguma etapa posterior está fixa ou quebrada: ela foi construída em cima
    desta, e reabrir em cascata desfaria aceites que a pessoa não citou. A regra
@@ -148,12 +179,12 @@ export function reabrirEtapa(registro, instancia, { por, quando, motivo } = {}) 
   if (posteriores.length) {
     falhar('etapa-com-posteriores-fixas', `'${instancia}' tem etapas posteriores construídas sobre ela (${posteriores.join(', ')}); reabra-as antes, da última para a primeira.`);
   }
-  const { aceite, receita, reaberturas = [], ...resto } = etapa;
-  const registroDaReabertura = { por: quem, quando: data, motivo: porque, ...(aceite ? { aceite } : {}), ...(receita ? { receita } : {}) };
+  const { aceite, forma, receita, reaberturas = [], ...resto } = etapa;
+  const registroDaReabertura = { por: quem, quando: data, motivo: porque, ...(aceite ? { aceite } : {}), ...(forma ? { forma } : {}), ...(receita ? { receita } : {}) };
   return {
     ...registro,
     etapas: registro.etapas.map((item, i) => (i === indice
-      ? { ...resto, estado: 'aberta', ...(receita ? { receita } : {}), reaberturas: [...reaberturas, registroDaReabertura] }
+      ? { ...resto, estado: 'aberta', ...(forma ? { forma } : {}), reaberturas: [...reaberturas, registroDaReabertura] }
       : item)),
   };
 }

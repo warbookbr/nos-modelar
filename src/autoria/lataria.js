@@ -113,3 +113,64 @@ export function partesDaLataria(neutro) {
   }
   return [...partes].sort();
 }
+
+/* ---------- a emenda sombreada ----------
+ *
+ * A luz rasante vale também para a peça que não é de lataria e tem sombreamento suave sobre a emenda de uma fusão. Por decisão da
+ * pessoa em 2026-11-03: o ombro do braço tinha degraus de sombra e uma quina no encontro de dois sólidos fundidos por `unir`, com
+ * `liso` por cima, e as marcas passaram por oito rodadas porque nenhuma vista comum as mostra; só a luz rasante as mostra.
+ *
+ * COMO SE RECONHECE. Pela receita, sem executar: um passo `liso` (com ângulo maior que zero, ou sem ângulo, que suaviza tudo) cuja
+ * seleção alcança o resultado de uma operação de fusão ou de corte, seja pela origem `{ op, id }` da operação, seja pelo nome de uma
+ * parte que um passo `parte` tirou dessa origem. A regra não vê `liso` por região ou por `onde`, que pode ou não cobrir a emenda sem
+ * a malha executada. A dispensa de `PLANO.lataria` tira a peça desta obrigação como da lataria. A curvatura da lataria continua só
+ * da lataria: ela mede a chapa de superfície livre, e na peça de emenda o que se vê é a sombra, que a luz rasante mostra. */
+export const OPERACOES_DE_FUSAO = Object.freeze(['unir', 'subtrair', 'intersectar', 'arredondarCostura']);
+
+const argumentosDoPasso = (passo) => (Array.isArray(passo) ? passo[1] : passo);
+
+/* Todos os `origem` e `parte` citados numa seleção, em qualquer profundidade (a seleção pode compor outras). */
+function citacoesDaSelecao(sel, achadas = { origens: [], partes: [] }) {
+  if (Array.isArray(sel)) { for (const item of sel) citacoesDaSelecao(item, achadas); return achadas; }
+  if (!sel || typeof sel !== 'object') return achadas;
+  if (sel.origem && typeof sel.origem === 'object' && typeof sel.origem.op === 'string') achadas.origens.push(sel.origem.op);
+  if (typeof sel.parte === 'string') achadas.partes.push(sel.parte);
+  for (const valor of Object.values(sel)) if (valor && typeof valor === 'object') citacoesDaSelecao(valor, achadas);
+  return achadas;
+}
+
+/**
+ * Se a peça tem sombreamento suave sobre a emenda de uma fusão, pela receita (sem executar): `{ emenda, porque }`, com os índices
+ * dos passos `liso` que alcançam a fusão.
+ */
+export function emendaSombreadaDaReceita(receita) {
+  let passos = [];
+  try { passos = Array.isArray(receita?.PASSOS) ? receita.PASSOS : []; } catch { passos = []; }
+  const partesDeFusao = new Set();
+  const liso = [];
+  passos.forEach((passo, i) => {
+    const op = operacaoDoPasso(passo);
+    const args = argumentosDoPasso(passo);
+    if (op === 'parte' && typeof args?.nome === 'string' && citacoesDaSelecao(args.sel).origens.some((o) => OPERACOES_DE_FUSAO.includes(o))) {
+      partesDeFusao.add(args.nome);
+    }
+    if (op !== 'liso' || args?.angulo === 0) return;
+    const { origens, partes } = citacoesDaSelecao(args?.sel);
+    if (origens.some((o) => OPERACOES_DE_FUSAO.includes(o)) || partes.some((p) => partesDeFusao.has(p))) liso.push(i);
+  });
+  if (!liso.length) return { emenda: false, porque: 'nenhum passo liso alcança o resultado de unir, subtrair, intersectar ou arredondarCostura' };
+  return { emenda: true, porque: `sombreamento suave (liso em ${liso.map((i) => `PASSOS[${i}]`).join(', ')}) sobre a emenda de uma fusão` };
+}
+
+/**
+ * O que a peça deve levar ao pacote do crítico, pela receita: `{ lataria, luzRasante, porque, partes }`. A peça de lataria leva a luz
+ * rasante e a curvatura; a de emenda sombreada leva só a luz rasante (`lataria` falso, `luzRasante` verdadeiro); a dispensa de
+ * `PLANO.lataria` tira as duas.
+ */
+export function superficieDaReceita(receita, plano = null) {
+  const decidida = latariaDaReceita(receita, plano);
+  if (decidida.lataria) return { ...decidida, luzRasante: true };
+  if (plano?.lataria?.dispensa) return { ...decidida, luzRasante: false };
+  const emenda = emendaSombreadaDaReceita(receita);
+  return emenda.emenda ? { ...decidida, luzRasante: true, porque: emenda.porque } : { ...decidida, luzRasante: false };
+}

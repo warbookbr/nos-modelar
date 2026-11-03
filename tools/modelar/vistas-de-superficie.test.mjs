@@ -23,7 +23,7 @@ import { afterAll, beforeEach, describe, expect, it, onTestFinished } from 'vite
 import { doAmbiente } from '../ambiente.mjs';
 import { acaoDaPeca, gravarRodada, lerRodadas, medirReceita, registrarMedida, resumoDoLaco } from './rodada-de-modelagem.mjs';
 import {
-  LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, comandoDoPacote, gravarManifesto, impressaoDoTexto, superficieDoPacote, vincosDaMalha, vistasDeSuperficie,
+  LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, comandoDoPacote, gravarManifesto, impressaoDoTexto, mensagemSemBlender, superficieDaPeca, superficieDoPacote, vincosDaMalha, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 import { montarPedido, prefixoDaPeca, vistasParaCritica } from './vistas-para-critica.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
@@ -94,7 +94,7 @@ describe('o pacote do crítico de peça de lataria', () => {
     const resultado = await vistasParaCritica(PECA, {
       saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancada.fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar },
     });
-    expect(superficie.chamadas).toEqual([{ peca: PECA, pasta, lataria: { lataria: true, porque: 'a receita tem superfície livre por subdivisão (PASSOS[0])', partes: null } }]);
+    expect(superficie.chamadas).toEqual([{ peca: PECA, pasta, lataria: { lataria: true, luzRasante: true, porque: 'a receita tem superfície livre por subdivisão (PASSOS[0])', partes: null } }]);
     const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
     const titulos = [...pedido.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
     expect(titulos).toEqual(['Objeto', 'Alvo', 'Referências', 'Modelo', 'Superfície', 'Partes', 'Critérios de reprovação', 'Veredito']);
@@ -502,5 +502,105 @@ describe.skipIf(!BLENDER)('a faixa dos vincos na curvatura, no Blender', () => {
     const [sr, sg] = rgb(semPng, noVinco);
     expect(sr - sg).toBeGreaterThan(80);
     expect(feitas.curvatura.every((i) => existsSync(i.arquivo))).toBe(true);
+  });
+});
+
+/* ---------- a luz rasante da peça de emenda sombreada ---------- */
+
+describe('a luz rasante da peça com sombreamento suave sobre a emenda de uma fusão', () => {
+  const NOME = 'emenda-de-ensaio';
+  const EMENDA = { lataria: false, luzRasante: true, porque: 'sombreamento suave (liso em PASSOS[1]) sobre a emenda de uma fusão', partes: null };
+  let pastas;
+  beforeEach(() => {
+    const base = mkdtempSync(join(area, 'emenda-'));
+    pastas = { rodadas: join(base, 'rodadas'), pacote: join(base, 'pacote'), base };
+    mkdirSync(pastas.pacote, { recursive: true });
+  });
+  const medir = async () => ({ ...(await medirReceita(NAO_LATARIA)), lataria: { lataria: false, porque: EMENDA.porque }, luzRasante: { luzRasante: true, porque: EMENDA.porque } });
+  const veredito = { alvo: 'referencias/alvo.md', nota: 9, defeitos: [], observacao: 'a emenda lê limpa nas vistas de luz rasante' };
+  const entrada = (extra = {}) => ({ partes: [{ nome: 'corpo', confere: true }], notaDePassagem: 'a emenda segue a fusão medida', ...extra });
+  const pacoteDaEmenda = (sha256, { rasante = true } = {}) => {
+    const imagem = join(pastas.pacote, 'peca-lado-rasante-az30.png');
+    writeFileSync(imagem, 'png');
+    gravarManifesto(pastas.pacote, {
+      peca: NOME, receita: sha256, lataria: EMENDA,
+      superficie: rasante ? { partes: [], rasante: [{ arquivo: imagem, vista: 'lado', azimute: 30, iluminada: 0.6 }], curvatura: [] } : null,
+    });
+  };
+
+  it('a vista sai sem a curvatura da lataria: o Blender roda só a luz rasante, e o pacote traz só as imagens dela', async () => {
+    const falso = blenderFalso();
+    const feitas = await vistasDeSuperficie(NAO_LATARIA, { pasta: join(pastas.base, 'vista'), blender: '/b', lataria: EMENDA, executar: falso.executar });
+    expect(falso.chamadas.map((c) => c.script)).toEqual(['luz-rasante.py']);
+    expect(feitas.curvatura).toEqual([]);
+    expect(feitas.rasante).toHaveLength(1);
+    /* a peça sem a decisão, chamada para olhar, segue gerando as duas */
+    const as_duas = blenderFalso();
+    await vistasDeSuperficie(NAO_LATARIA, { pasta: join(pastas.base, 'duas'), blender: '/b', executar: as_duas.executar });
+    expect(as_duas.chamadas.map((c) => c.script)).toEqual(['luz-rasante.py', 'curvatura-da-lataria.py']);
+  });
+
+  it('o pedido da emenda traz a seção da luz rasante, sem a curvatura da lataria', () => {
+    const rasante = [{ arquivo: '/p/peca-lado-rasante-az30.png', vista: 'lado', azimute: 30, iluminada: 0.6 }];
+    const pedido = montarPedido({ peca: 'p', superficie: { rasante, curvatura: [] } });
+    const secao = pedido.slice(pedido.indexOf('## Superfície'), pedido.indexOf('## Veredito'));
+    expect(secao).toContain('sombreamento suave sobre a emenda de sólidos fundidos');
+    expect(secao).toContain('/p/peca-lado-rasante-az30.png');
+    expect(secao).not.toMatch(/curvatura|chapa/);
+  });
+
+  it('sem o Blender a recusa diz que a peça leva a luz rasante, e não fala da curvatura', () => {
+    const texto = mensagemSemBlender(NOME, EMENDA);
+    expect(texto).toContain(`a peça '${NOME}' tem ${EMENDA.porque}`);
+    expect(texto).toContain('leva a luz rasante, que sai do Blender');
+    expect(texto).not.toContain('curvatura');
+  });
+
+  it('o pacote só com a luz rasante basta à emenda, e o de lataria sem a curvatura continua recusado', async () => {
+    const { sha256 } = await medir();
+    pacoteDaEmenda(sha256);
+    expect(superficieDoPacote(NOME, { pasta: pastas.pacote, sha256 })).toEqual({ ok: true, imagens: ['peca-lado-rasante-az30.png'] });
+    pacoteDaEmenda(sha256, { rasante: false });
+    expect(superficieDoPacote(NOME, { pasta: pastas.pacote, sha256 })).toEqual({ ok: false, motivo: `o pacote de ${pastas.pacote} não trouxe a luz rasante` });
+    const imagem = join(pastas.pacote, 'peca-lado-rasante-az30.png');
+    gravarManifesto(pastas.pacote, { peca: NOME, receita: sha256, lataria: { lataria: true, porque: 'subdivisão' }, superficie: { rasante: [{ arquivo: imagem, vista: 'lado', azimute: 30, iluminada: 0.6 }], curvatura: [] } });
+    expect(superficieDoPacote(NOME, { pasta: pastas.pacote, sha256 }).ok).toBe(false);
+  });
+
+  it('o registro da rodada cobra a luz rasante como cobra da lataria: recusa o veredito sem o pacote e grava com ele', async () => {
+    await expect(registrarMedida(NOME, entrada({ veredito }), { medir, pasta: pastas.rodadas, pacote: pastas.pacote }))
+      .rejects.toThrow(`'${NOME}' tem emenda sombreada (${EMENDA.porque}), e a pasta da rodada ${pastas.pacote} não tem o pacote.json`);
+    expect(lerRodadas(NOME, { pasta: pastas.rodadas })).toEqual([]);
+    const { sha256 } = await medir();
+    pacoteDaEmenda(sha256);
+    const { rodada } = await registrarMedida(NOME, entrada({ veredito }), { medir, pasta: pastas.rodadas, pacote: pastas.pacote });
+    expect(rodada.superficie).toEqual({ lataria: EMENDA.porque, imagens: ['peca-lado-rasante-az30.png'] });
+  });
+
+  it('a rodada fechada sem a luz rasante não dá a peça por fechada, e o motivo fala da emenda', async () => {
+    const { texto } = await medir();
+    gravarRodada(NOME, { ...entrada({ veredito }), medidas: { passou: true, relatorio: 'ok' } }, { pasta: pastas.rodadas, receitaTexto: texto });
+    const acao = await acaoDaPeca(NOME, { rodadas: lerRodadas(NOME, { pasta: pastas.rodadas }), limite: 6, medir, pasta: pastas.rodadas });
+    expect(acao.acao).toBe('revisar');
+    expect(acao.motivo).toContain('fechou sem a luz rasante no pacote do crítico, e a peça tem emenda sombreada');
+  });
+});
+
+describe('a emenda sombreada e a etapa fixa', () => {
+  const RECEITA = { PASSOS: [['unir', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }] }], ['liso', { sel: { origem: { op: 'unir', id: 3 } }, angulo: 45 }]] };
+  const montar = (estado) => {
+    const raiz = mkdtempSync(join(area, 'acervo-'));
+    mkdirSync(join(raiz, 'objeto'), { recursive: true });
+    writeFileSync(join(raiz, 'objeto/montagem.json'), JSON.stringify({ instancias: [{ id: 'corpo', alvo: { tipo: 'peca', ref: 'objeto/corpo' } }] }));
+    if (estado) writeFileSync(join(raiz, 'objeto/montagem.etapas.json'), JSON.stringify({ etapas: [{ instancia: 'corpo', estado }] }));
+    return raiz;
+  };
+
+  it('a etapa fixa por aceite da pessoa não é reaberta pela regra, e a aberta, a quebrada e a peça fora de montagem levam a luz rasante', () => {
+    expect(superficieDaPeca('objeto/corpo', RECEITA, null, { raiz: montar('fixa') })).toMatchObject({ lataria: false, luzRasante: false, porque: expect.stringContaining('a etapa da peça está fixa') });
+    for (const estado of ['aberta', 'quebrada', null]) expect(superficieDaPeca('objeto/corpo', RECEITA, null, { raiz: montar(estado) }).luzRasante).toBe(true);
+    expect(superficieDaPeca('solta/peca', RECEITA, null, { raiz: montar('fixa') }).luzRasante).toBe(true);
+    /* a lataria não ganha a folga */
+    expect(superficieDaPeca('objeto/corpo', { PASSOS: [{ op: 'subdivisao' }] }, null, { raiz: montar('fixa') })).toMatchObject({ lataria: true, luzRasante: true });
   });
 });
