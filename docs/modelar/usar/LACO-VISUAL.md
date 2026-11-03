@@ -46,6 +46,16 @@ obrigatórias desde 2026-10-30. A peça é de lataria quando a receita tem passo
 [...] }`, com as partes que são a chapa; a peça de subdivisão que não é chapa
 declara `PLANO.lataria: { dispensa: '<motivo>' }`, que o `descrever` e o resumo
 de `rodada-de-modelagem --acao` mostram como aviso, com o motivo, a cada chamada.
+A luz rasante vale também, sozinha, para a peça que não é de lataria e tem
+sombreamento suave sobre a emenda de uma fusão: um passo `liso` (com ângulo maior
+que zero, ou sem ângulo) cuja seleção alcança o resultado de `unir`, `subtrair`,
+`intersectar` ou `arredondarCostura`, pela origem da operação ou pela parte que
+saiu dela. Por decisão da pessoa em 2026-11-03, porque os degraus de sombra e a
+quina do ombro do braço, no encontro de dois sólidos unidos com `liso` por cima,
+passaram por oito rodadas sem nenhuma vista comum mostrar. O pacote dessa peça
+leva só a luz rasante, sem a curvatura, que mede chapa; o registro da rodada a
+cobra como cobra da lataria, e o `PLANO.lataria.dispensa` a tira. A etapa que a
+pessoa já fixou não é reaberta pela regra; ela vale quando a peça volta ao laço.
 Na curvatura, a faixa de 40 mm junto dos vincos declarados sai em ocre e fora
 da escala, para a dobra pedida não apagar o amassado. Na luz rasante, os dois
 azimutes de cada vista são escolhidos pelo que a câmera dela vê, para a luz cair

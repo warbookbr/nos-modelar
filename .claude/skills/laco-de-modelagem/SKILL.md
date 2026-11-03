@@ -112,6 +112,10 @@ de novo), com o caminho de todas as imagens e o lado de onde cada vista olha. As
 declara `familia` ou `familiaProcedural`, e, quando a receita declara `REFINA.esboco`, a de onde o alvo difere da referência real:
 o para-brisa saliente do avião veio do esboço, passou por dois críticos e só a pessoa o viu.
 
+Na peça com sombreamento suave sobre a emenda de uma fusão (um `liso` cuja seleção alcança o resultado de `unir`, `subtrair`,
+`intersectar` ou `arredondarCostura`), o pacote leva a luz rasante, sem a curvatura, e o `--registrar` cobra essa vista como cobra
+da lataria; a etapa já fixa pela pessoa fica fora da regra até voltar ao laço.
+
 Na peça de lataria (a receita tem passo `subdivisao` ou declara `PLANO.lataria`), o pacote leva também a luz rasante e a curvatura
 da lataria, que mostram o amassado largo e raso que nenhuma medida e nenhuma vista comum mostram, e elas saem do Blender: rode
 `MODELAR_BLENDER=<caminho do Blender> npm run vistas:critica -- <peça>`. Sem o Blender o comando recusa o pacote, e o `--registrar`
