@@ -17,7 +17,7 @@
  * Etapa 5, os vidros, as borrachas e o interior. Cada vão de vidro da etapa 2 (o para-brisa, os das duas portas da cabine e os das duas portas traseiras; a carga
  * fica fechada nas laterais) recebe um cristal escurecido e translúcido: as próprias faces que o vão tirou da chapa, com a volta recuada 7,5 mm para dentro pela
  * superfície (além da perna da aba, de 5 mm) e os pontos de dentro onde estão, de modo que o cristal fica rente à lataria. A junta de 7,5 mm e a aba ficam
- * sob a borracha de vão, escura, varrida pela volta do vão (`friso` com perfil: 15 mm sobre a chapa, 10 sobre o cristal, 3,5 mm de altura, entrando 1,5 mm
+ * sob a borracha de vão, escura, varrida pela volta do vão (`friso` com perfil: 15 mm sobre a chapa, 10 sobre o cristal, 2,2 mm de altura, entrando 1,5 mm
  * nos dois), que entra na conferência da moldura do vão junto com a aba. Atrás dos cristais fica um interior simples, todo dentro da chapa: o piso, que
  * assenta no topo dos túneis dos quatro forros dos arcos (736,6) e fica a 10 mm da chapa dos dois lados; a divisória entre a cabine e a carga, que é a seção de dentro
  * da chapa recuada 28 mm, de lado a lado e do piso ao teto, em z 560; os bancos do motorista (esquerdo, +x) e do passageiro, volumes em L com os cantos
@@ -213,7 +213,7 @@ export const TABELA = {
   // borracha de vão (etapa 5): seção [u, v] sobre a borda do vão, u para o vidro e v para fora da chapa; entra 1,5 mm na chapa e no cristal, e cobre a junta de 7,5 mm
   borracha_fora: 15, // quanto passa sobre a chapa
   borracha_dentro: 10, // quanto passa sobre o cristal (2,5 mm além da borda dele)
-  borracha_altura: 3.5,
+  borracha_altura: 2.2, // baixa o bastante para não sobrar como filete fora do contorno nas vistas de frente e de trás (a pessoa pediu em 2026-11-03)
   borracha_fundo: 1.5,
 
   // vinco de cintura: altura (sobe com o pé do para-brisa, 1480 sobre 1310), meia largura da dobra, profundidade, recuo das quinas e
@@ -1913,7 +1913,7 @@ const nomeDaBorracha = (nome) => `borracha${nome === 'paraBrisa' ? 'ParaBrisa' :
  *  `borracha_fora` sobre a chapa e `borracha_dentro` sobre o cristal, sobe `borracha_altura` e desce com o beiral redondo nas duas bordas. */
 export function perfilDaBorracha(T) {
   const F = T.borracha_fora; const D = T.borracha_dentro; const H = T.borracha_altura; const B = T.borracha_fundo;
-  return [[-F, -B], [D, -B], [D, 0.5], [D - 2, 1.6], [D - 5, H - 0.7], [D - 8, H], [-6, H], [-F + 2.5, 0.55 * H], [-F, 0.4]];
+  return [[-F, -B], [D, -B], [D, 0.5], [D - 2, 0.46 * H], [D - 5, 0.8 * H], [D - 8, H], [-6, H], [-F + 2.5, 0.55 * H], [-F, 0.4]];
 }
 
 /** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros,  as abas dos arcos, as quatro rodas da família e o forro dos arcos (que vem com o plástico). */
@@ -2192,7 +2192,7 @@ const receita = {
       })),
       ...BORRACHAS.map((nome, k) => ({
         nome,
-        forma: `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 3,5 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,
+        forma: `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 2,2 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,
         tecnica: 'friso de perfil desenhado sobre a volta do vão, nos nomes da gaiola, declarado com a aba na moldura do vão',
       })),
       {
