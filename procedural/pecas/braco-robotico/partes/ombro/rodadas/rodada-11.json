@@ -1,0 +1,617 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 11,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o plano não cita imagem de referência; comparação com alvo não foi possível",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "anel",
+        "tipo": "superficie",
+        "onde": "contorno do disco, face frontal",
+        "sentido": "facetado",
+        "evidencia": "Vista frontal: borda do disco em polígono visível, lados retos entre (300,560) e (800,560)."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "superficie",
+        "onde": "encontro de baixo entre a frente da parte de pé e a parte deitada",
+        "sentido": "anguloso",
+        "evidencia": "Vista direita: filete mínimo em (415,935) com bojo escuro em bolha ao lado em (360-500,860-930). Vista frontal: concha escura sob o anel em (300-800,930-970)."
+      },
+      {
+        "parte": "pescoco",
+        "tipo": "superficie",
+        "onde": "transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito",
+        "sentido": "segmentado",
+        "evidencia": "Rasante lado az40: crista pontuda acima do topo perto de (480,80) e serrilhado em (340,330) e (520,840). Tresquartos az240: vincos pinçados em (410,270) e (850,800)."
+      }
+    ],
+    "observacao": "Medidas, degrau e proporção da forma prometida estão certos, mas a emenda do pescoço com a saída e o encontro de baixo têm sombreado torcido, e sem alvo a fidelidade de forma não foi comparada."
+  },
+  "partes": [
+    {
+      "nome": "pescoco",
+      "confere": true,
+      "observacao": "degrau de 30 mm, saída redonda de raio 95, 190x210x190 mm; resta cunha pequena no canto direito na vista de cima e apertado leve junto ao anel"
+    },
+    {
+      "nome": "anel",
+      "confere": true,
+      "observacao": "faixa escura de 28 mm e 190 mm de diâmetro, encostada na saída sem chanfro; resta só a linha fina da junção"
+    }
+  ],
+  "atrito": [
+    "retângulo com raio de canto igual à meia largura duplica pontos nos arcos e gera triângulo sem área; o círculo precisa de contorno próprio",
+    "cilindros perpendiculares de raios iguais dão união aberta; precisou de folga de 0,2 mm e raio de canto 3 mm menor na parte de pé",
+    "o guarda de porta mede o raio externo do apoio contra a peça, então a folga de 0,2 mm mexeu no número da porta"
+  ],
+  "notaDePassagem": "Cantos de pé e deitado com raios próximos dão meia-esquadria plana para o arredondarCostura; a seção vira redonda misturando ponto a ponto em 45 mm; saída sem chanfro encosta no anel.",
+  "receita": {
+    "sha256": "sha256:7c109cd8233f54e5786606b59bba93a572546c024f0b3f0ee3b69c8ed61f168f",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 44,
+      "acrescentadas": 63,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 9,
+          "texto": " * faixa junto ao anel a seção passa de quase quadrada a redonda variando o"
+        },
+        {
+          "tipo": "-",
+          "linha": 10,
+          "texto": " * expoente da superelipse em muitas estações com raio constante, em vez de"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * faixa junto ao anel a seção passa de quase quadrada a redonda crescendo o"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * raio dos cantos em muitas estações, em vez de"
+        },
+        {
+          "tipo": "-",
+          "linha": 30,
+          "texto": "  /* Expoente da superelipse da seção quase quadrada: 2 é círculo, 4 é"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "     quadrado de cantos arredondados. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "  expoenteDoTopo: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* Raio dos cantos da seção quase quadrada, igual na parte de pé e na"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "     deitada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  raioDosCantos: 32,"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "     redonda, em estações de expoente decrescente. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": "  transicaoDaSaida: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "     redonda, com o raio dos cantos crescendo até o círculo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  transicaoDaSaida: 45,"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "  estacoesDaSaida: 7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  estacoesDaSaida: 9,"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "  estacoes: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  estacoes: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "/* A parte de pé é 0,2 mm mais estreita que a deitada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "const folga = 0.0002;"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "/* Contorno de superelipse com `lados` pontos, u no eixo X do mundo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "function contorno(r, n, lados) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "/* Retângulo de meio lado `r` com cantos de raio `rc`, com `lados` pontos"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "   (quatro arcos de lados/4 pontos, com um lado plano entre cada dois). Com"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "   rc = r é o círculo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "function quadrado(r, rc, lados) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const por = lados / 4;"
+        },
+        {
+          "tipo": "-",
+          "linha": 79,
+          "texto": "  for (let k = 0; k < lados; k++) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 80,
+          "texto": "    const th = (2 * Math.PI * k) / lados;"
+        },
+        {
+          "tipo": "-",
+          "linha": 81,
+          "texto": "    const cs = Math.cos(th), sn = Math.sin(th);"
+        },
+        {
+          "tipo": "-",
+          "linha": 82,
+          "texto": "    pts.push([r * Math.sign(cs) * Math.abs(cs) ** (2 / n), r * Math.sign(sn) * Math.abs(sn) ** (2 / n)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  for (let q = 0; q < 4; q++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    const cx = (r - rc) * Math.sign(Math.cos(q * Math.PI / 2 + Math.PI / 4));"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    const cy = (r - rc) * Math.sign(Math.sin(q * Math.PI / 2 + Math.PI / 4));"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    for (let k = 0; k < por; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "      pts.push([cx + rc * Math.cos(th), cy + rc * Math.sin(th)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    }"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "/* Seção da parte de pé: frente arredondada como a do braço, mas recuada, e"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "   lado de trás reto, de cantos vivos, para a parede de trás descer do braço"
+        },
+        {
+          "tipo": "-",
+          "linha": 89,
+          "texto": "   até o pé. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 90,
+          "texto": "function contornoColuna(r, nFrente, lados, recuo) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "/* Círculo com `lados` pontos, no mesmo sentido e com o mesmo número de pontos"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "   do retângulo, para a transição misturar ponto a ponto. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "function redondo(r, lados) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  return Array.from({ length: lados }, (_, k) => [r * Math.cos((2 * Math.PI * k) / lados), r * Math.sin((2 * Math.PI * k) / lados)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "/* Seção da parte de pé: frente plana em z = zf com os dois cantos arredondados"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "   no mesmo raio `rc` dos cantos da parte deitada (por isso o cruzamento dos"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "   dois cantos é uma meia-esquadria plana) e lado de trás reto, de cantos"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "   vivos, para a parede de trás descer do braço até o pé. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "function contornoColuna(r, rc, lados, zf) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 92,
+          "texto": "  const frente = lados - 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 93,
+          "texto": "  for (let k = 0; k < frente; k++) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 94,
+          "texto": "    const th = (Math.PI * k) / (frente - 1);"
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "    const cs = Math.cos(th), sn = Math.sin(th);"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "    const v = r * Math.sign(sn) * Math.abs(sn) ** (2 / nFrente);"
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "    pts.push([r * Math.sign(cs) * Math.abs(cs) ** (2 / nFrente), v * (1 - recuo / r)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  const por = (lados - 2) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  for (let q = 0; q < 2; q++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    const cx = (r - rc) * (q === 0 ? 1 : -1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    for (let k = 0; k < por; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "      pts.push([cx + rc * Math.cos(th), zf - rc + rc * Math.sin(th)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    }"
+        },
+        {
+          "tipo": "-",
+          "linha": 106,
+          "texto": "  const nTopo = t.expoenteDoTopo;"
+        },
+        {
+          "tipo": "-",
+          "linha": 107,
+          "texto": "  const sec = (pos, r, n) => ({ pos, contorno: contorno(r, n, L) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 108,
+          "texto": "  const recuo = m(t.recuoDaFrente);"
+        },
+        {
+          "tipo": "-",
+          "linha": 109,
+          "texto": "  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r, nTopo, L, recuo) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 110,
+          "texto": "  /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a seção de"
+        },
+        {
+          "tipo": "-",
+          "linha": 111,
+          "texto": "     frente recuada, e termina dentro da parte deitada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const rc = m(t.raioDosCantos);"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const sec = (pos, rr) => ({ pos, contorno: quadrado(h, rr, L) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const zf = h - m(t.recuoDaFrente);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  /* A parte de pé é 0,2 mm mais estreita que a deitada: paredes coplanares"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "     quebram a união. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rc - 0.003, r - folga), L, zf * (r - folga) / h) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a frente"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "     recuada, e termina dentro da parte deitada. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 120,
+          "texto": "  /* Parte deitada: atravessa o topo de trás até a saída redonda. A transição"
+        },
+        {
+          "tipo": "-",
+          "linha": 121,
+          "texto": "     de quase quadrada a redonda é feita em estações cujo expoente cai de"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "     forma suave (cosseno), com o raio constante, para as faces não ganharem"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "     facetas nem torcerem o sombreamento. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  /* Parte deitada: atravessa o topo de trás até a saída redonda. Na"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "     transição o raio dos cantos cresce de rc até a meia largura (círculo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "     com o lado constante, em estações de subida suave (cosseno). A saída"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "     termina reta, sem chanfro, para o anel encostar sem linha de luz. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 129,
+          "texto": "    const z = zTransicao + (zFace - c - zTransicao) * f;"
+        },
+        {
+          "tipo": "-",
+          "linha": 130,
+          "texto": "    transicao.push(sec([0, yEixo, z], h, nTopo + (2 - nTopo) * s));"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    const z = zTransicao + (zFace - 0.0004 - zTransicao) * f;"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    const q0 = quadrado(h, rc, L);"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    const q1 = redondo(Rs, L);"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "    transicao.push({ pos: [0, yEixo, z], contorno: q0.map((p, i) => [p[0] + (q1[i][0] - p[0]) * s, p[1] + (q1[i][1] - p[1]) * s]) });"
+        },
+        {
+          "tipo": "-",
+          "linha": 134,
+          "texto": "    sec([0, yEixo, -h + 0.0004], h, nTopo),"
+        },
+        {
+          "tipo": "-",
+          "linha": 135,
+          "texto": "    ...entre(-h + 0.0004, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], h, nTopo)),"
+        },
+        {
+          "tipo": "-",
+          "linha": 136,
+          "texto": "    sec([0, yEixo, zTransicao], h, nTopo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "    sec([0, yEixo, -h + 0.0004], rc),"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "    ...entre(-h + 0.0004, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], rc)),"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "    sec([0, yEixo, zTransicao], rc),"
+        },
+        {
+          "tipo": "-",
+          "linha": 138,
+          "texto": "    sec([0, yEixo, zFace - c], Rs, 2),"
+        },
+        {
+          "tipo": "-",
+          "linha": 139,
+          "texto": "    sec([0, yEixo, zFace - 0.0004], Rs - c, 2),"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    { pos: [0, yEixo, zFace - 0.0004], contorno: redondo(Rs, L) },"
+        },
+        {
+          "tipo": "-",
+          "linha": 159,
+          "texto": "    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: Math.SQRT2 * h, inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: Math.SQRT2 * (h - folga), inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 181,
+          "texto": "      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de superelipse unidos; seção vira redonda em várias estações de raio constante; arredondarCostura no encontro de baixo; liso com ângulo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de retângulo de cantos arredondados de mesmo raio; seção vira redonda crescendo o raio dos cantos em várias estações; arredondarCostura no encontro de baixo; liso com ângulo' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[11], PASSOS[12]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az240.png",
+      "peca-tresquartos-rasante-az330.png"
+    ]
+  }
+}
