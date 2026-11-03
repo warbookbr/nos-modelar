@@ -963,6 +963,32 @@ A curva pode ser `vinco` (nitidez de 0 a 1 ou `'viva'`, que vira vinco nomeado a
 
 Na chapa de prova de 1000 × 600 mm (`procedural/nucleo/fixtures/gaiola-por-rede-prova.js`), com a janela em gota de 230 mm na parte larga e ponta de raio 20 mm, o arco de roda de raio 140 mm e a coluna inclinada, 19 curvas e 10 retalhos (8 de quatro lados e 2 de cinco) dão 654 pontos de gaiola e, em nível 2, 9.480 vértices só de quadriláteros. A superfície passa pelas curvas a até 0,26 mm, os vértices extraordinários são 3 de valência 5 no interior (2 centros e um nó) e 2 nós de borda, a borda da janela é um laço de arestas da malha, o salto de normal da superfície nas curvas lisas compartilhadas fica em até 0,96 grau e na cintura vincada em 12, e `npm run ondulacao` sai sem falha e sem face virada, com o desvio máximo de 0,17 mm; sem o alisamento sai um calombo de 0,43 mm. A moldura de 10 mm como `friso` sobre a curva da janela fecha sólida e interpenetra a chapa de 1,5 mm de espessura. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/modelar/ondulacao-rede.test.mjs`.
 
+### Superfície varrida: `gaiolaVarrida`
+
+Uma saia, uma borda de proteção, uma moldura em volta de um arco ou uma régua são uma seção que se repete ao longo de um caminho. `gaiolaVarrida`, de `procedural/nucleo/gaiola-varrida.js`, recebe a seção como dado, o trilho como dado e as estações como dado, e devolve a gaiola em nomes (`vertices`, `faces`, `vincos`, `cantos`, mais `pontos` em metro e `posicoes` em mm) no formato que o passo `subdivisao` aceita. A subdivisão, a espessura e a sombra continuam no passo, e nada na função conhece veículo. Entra em mm, como `gaiolaPorRede`.
+
+```js
+const friso = gaiolaVarrida({
+  nome: 'molduraDoArco',
+  trilho: [{ arco: { centro: [1000, 330, 0], eixo: [1, 0, 0], de: [1000, 330, 420], graus: -180 } }],
+  quadro: { u: [1, 0, 0], virar: true },            // u fixo na saída lateral; v sai radial
+  secao: [{ u: -1, v: 0, nome: 'boca' }, { u: 20, v: 12 }, { u: 30, v: 40, nome: 'fora' }],
+  estacoes: [{ plano: { eixo: 'y', valor: 420 }, cruzando: 'subindo' }, { passo: 36, linha: 'boca' },
+             { plano: { eixo: 'y', valor: 440 }, cruzando: 'descendo' }],   // pontas cortadas numa altura
+  fora: [1, 0, 0],
+});
+// get TOPO() { return { ...friso.pontos }; }
+// ['subdivisao', { origemId: 3, vertices: friso.vertices, faces: friso.faces, vincos: friso.vincos, cantos: friso.cantos, niveis: 2 }]
+```
+
+O trilho é uma lista de segmentos contíguos, `{ reta: { de, ate } }` e `{ arco: { centro, eixo, de, graus } }` (o arco gira `de` em torno do eixo, com sinal), ou `{ pontos }` para uma polilinha. O quadro fixa um eixo da seção, `u` ou `v`, numa direção; o outro eixo sai do produto com a tangente, e `virar: true` troca o sinal dele. Um ponto da seção `[u, v]` fica em trilho(s) + u·U + v·V.
+
+As estações são cortes que atravessam todas as linhas da seção, e cada linha cruza o corte no seu próprio ponto do trilho. O corte é um marco: `{ em: mm }`, `{ fracao }`, `{ plano: { eixo, valor } }` (o corte por altura é o eixo `'y'`) ou `{ cilindro: { eixo, por, raio } }` (a boca de um arco de roda, ou de qualquer furo), com `cruzando: 'subindo' | 'descendo'` quando a linha cruza o valor mais de uma vez. O primeiro e o último marco são as pontas da superfície. Entre dois marcos, `{ entre: n }` e `{ passo: mm, linha? }` põem as estações por igual, o mesmo número em todas as linhas, e o passo é medido na linha citada ou na mais longa. A `escala` de um marco multiplica o `u` da seção nele e anda em linha reta até o marco seguinte que a declara, para uma borda que sai menos numa ponta do que na outra. Marco que a linha não cruza, ou que cai fora de ordem, grita com o nome do marco e da linha.
+
+O `alargamento` é a segunda superfície, combinada pelo máximo com a da seção: `campo.cilindro` dá a distância d de cada ponto a um cilindro, `perfil` dá a saída u em função de d, e onde ela passa da saída da própria seção ela vence. As linhas que encostam na chapa ficam nela, menos a última se `topoAberto: true`. `rolada: { abaixoDe, razao }` limita, nas linhas abaixo da altura dita, a saída a `razao` vezes a da seção, para a borda de baixo se alargar como se roda. Uma lista de alargamentos, um por arco, dá a cada ponto o maior. Como a continuação do alargamento é a mesma malha da seção, não há costura entre a saia e a moldura. O perfil acaba num ponto entre o último d que tem estação e o primeiro que não deve alargar, para que as estações de fora fiquem na seção.
+
+`remover: [{ estacoes: [a, b], linhas: [c, d] }]` tira as células entre as estações e as linhas de nome citado (o trecho de uma porta, por exemplo), e `vincos: [{ linha, nitidez }]` põe vinco ao longo de uma linha, só nas arestas que ficaram entre duas faces. A orientação das faces é a do vetor `fora`, ou `{ centro, semEixo }` para olhar para longe de um ponto; a soma dos sinais que dá zero grita. Nas provas (`procedural/nucleo/fixtures/varredura-prova.js`, `gaiola-varrida.test.mjs`) uma régua em reta, um friso em arco com as pontas cortadas em duas alturas e uma saia com alargamento e borda rolada saem iguais, byte a byte, a cada execução.
+
 ## Friso ao longo de curva: `friso`
 
 `friso` desenha nervura, tubo ou friso de perfil declarado seguindo uma linha
