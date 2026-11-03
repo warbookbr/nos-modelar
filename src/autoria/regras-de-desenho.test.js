@@ -53,6 +53,17 @@ describe('as regras de desenho da família', () => {
     expect(lerCriterios(comRegras(regra((r) => { delete r.conferencia; }))).regras[0].conferencia).toBeUndefined();
   });
 
+  it('a conferência pode levar os parâmetros da regra, e o nome continua a ser lido como texto', () => {
+    const lida = lerCriterios(comRegras(regra((r) => { r.conferencia = { nome: 'distancia-minima', parametros: { minimo: 30, faixas: [{ medida: 'a', min: 0.5 }] } }; }))).regras[0];
+    expect(lida.conferencia).toBe('distancia-minima');
+    expect(lida.parametros).toEqual({ minimo: 30, faixas: [{ medida: 'a', min: 0.5 }] });
+    expect(Object.isFrozen(lida.parametros.faixas[0])).toBe(true);
+    const erro = (c) => recusa(() => lerCriterios(comRegras(regra((r) => { r.conferencia = c; }))));
+    expect(erro({ nome: 'distancia-minima', limite: 3 }).aceito).toMatch(/campo conhecido: nome, parametros/);
+    expect(erro({ nome: 'distancia-minima', parametros: { minimo: null } }).aceito).toMatch(/números, textos e listas/);
+    expect(erro({ parametros: { minimo: 30 } }).onde).toMatch(/conferencia/);
+  });
+
   it('recusa a regra mal formada dizendo o campo e o que é aceito', () => {
     const erro = (mudar) => recusa(() => lerCriterios(comRegras(regra(mudar))));
     expect(erro((r) => { delete r.texto; }).aceito).toMatch(/a regra em uma frase/);

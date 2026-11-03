@@ -1268,416 +1268,66 @@
         "portas"
       ]
     },
-    "divisoes": [
+    "regras": [
       {
-        "vista": "lateral",
-        "minimo": 30,
-        "pares": [
-          {
-            "a": "parachoqueDianteiroDeLado",
-            "b": "arcoDianteiro",
-            "distancia": 37.5,
-            "em": [
-              1977.52,
-              686.5
-            ]
-          },
-          {
-            "a": "parachoqueDianteiroDeLado",
-            "b": "molduraArcoDianteiro",
-            "distancia": 47.55,
-            "em": [
-              2109,
-              771.55
-            ]
-          },
-          {
-            "a": "parachoqueTraseiroDeLado",
-            "b": "arcoTraseiro",
-            "distancia": 57.36,
-            "em": [
-              -2001.83,
-              578
-            ]
-          },
-          {
-            "a": "parachoqueTraseiroDeLado",
-            "b": "molduraArcoTraseiro",
-            "distancia": 57.62,
-            "em": [
-              -2076.11,
-              635.62
-            ]
-          },
-          {
-            "a": "saia",
-            "b": "molduraArcoTraseiro",
-            "distancia": 60.23,
-            "em": [
-              -1035.42,
-              523.23
-            ]
-          },
-          {
-            "a": "saia",
-            "b": "molduraArcoDianteiro",
-            "distancia": 60.34,
-            "em": [
-              1175.5,
-              523.34
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "molduraArcoDianteiro",
-            "distancia": 61.22,
-            "em": [
-              1721.29,
-              924.94
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "saia",
-            "distancia": 62.42,
-            "em": [
-              1176.46,
-              525.42
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "saia",
-            "distancia": 63.88,
-            "em": [
-              429.18,
-              399.12
-            ]
-          },
-          {
-            "a": "saia",
-            "b": "arcoDianteiro",
-            "distancia": 63.99,
-            "em": [
-              1248.22,
-              463
-            ]
-          },
-          {
-            "a": "saia",
-            "b": "arcoTraseiro",
-            "distancia": 63.99,
-            "em": [
-              -1108.22,
-              463
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "vidroDaCabine",
-            "distancia": 70,
-            "em": [
-              1479.05,
-              1668.54
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "portaDeCorrer",
-            "distancia": 110,
-            "em": [
-              550,
-              1973
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "arcoDianteiro",
-            "distancia": 149.56,
-            "em": [
-              1319.47,
-              759.93
-            ]
-          },
-          {
-            "a": "molduraArcoDianteiro",
-            "b": "arcoDianteiro",
-            "distancia": 149.93,
-            "em": [
-              2148.58,
-              730.69
-            ]
-          },
-          {
-            "a": "molduraArcoTraseiro",
-            "b": "arcoTraseiro",
-            "distancia": 149.94,
-            "em": [
-              -2097.5,
-              593.78
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "molduraArcoTraseiro",
-            "distancia": 160.33,
-            "em": [
-              -860,
-              463.96
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "vidroDaCabine",
-            "distancia": 180,
-            "em": [
-              440,
-              1522.72
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "arcoTraseiro",
-            "distancia": 303.83,
-            "em": [
-              -1161.61,
-              391.01
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "parachoqueDianteiroDeLado",
-            "distancia": 328.34,
-            "em": [
-              1660.06,
-              923.83
-            ]
-          },
-          {
-            "a": "vidroDaCabine",
-            "b": "molduraArcoDianteiro",
-            "distancia": 582.23,
-            "em": [
-              1594.27,
-              910.93
-            ]
-          },
-          {
-            "a": "saia",
-            "b": "parachoqueDianteiroDeLado",
-            "distancia": 662.08,
-            "em": [
-              1922.59,
-              724
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "molduraArcoDianteiro",
-            "distancia": 720.33,
-            "em": [
-              440,
-              463.96
-            ]
-          },
-          {
-            "a": "vidroDaCabine",
-            "b": "arcoDianteiro",
-            "distancia": 732.24,
-            "em": [
-              1629.51,
-              765.07
-            ]
-          },
-          {
-            "a": "saia",
-            "b": "parachoqueTraseiroDeLado",
-            "distancia": 772.39,
-            "em": [
-              -1172.13,
-              463
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "arcoDianteiro",
-            "distancia": 862.36,
-            "em": [
-              1301.31,
-              387.31
-            ]
-          },
-          {
-            "a": "vidroDaCabine",
-            "b": "parachoqueDianteiroDeLado",
-            "distancia": 877.15,
-            "em": [
-              1482.06,
-              1483.66
-            ]
-          },
-          {
-            "a": "vidroDaCabine",
-            "b": "saia",
-            "distancia": 1017,
-            "em": [
-              662,
-              1480
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "parachoqueTraseiroDeLado",
-            "distancia": 1075.91,
-            "em": [
-              -860,
-              579.82
-            ]
-          },
-          {
-            "a": "portaDeCorrer",
-            "b": "parachoqueDianteiroDeLado",
-            "distancia": 1480.6,
-            "em": [
-              440,
-              723.66
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "molduraArcoTraseiro",
-            "distancia": 1570.33,
-            "em": [
-              550,
-              461.97
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "arcoTraseiro",
-            "distancia": 1711.12,
-            "em": [
-              -1160.11,
-              361.28
-            ]
-          },
-          {
-            "a": "vidroDaCabine",
-            "b": "molduraArcoTraseiro",
-            "distancia": 1914.87,
-            "em": [
-              -1073.48,
-              616.36
-            ]
-          },
-          {
-            "a": "vidroDaCabine",
-            "b": "arcoTraseiro",
-            "distancia": 2065.04,
-            "em": [
-              -1211.98,
-              557.26
-            ]
-          },
-          {
-            "a": "molduraArcoDianteiro",
-            "b": "molduraArcoTraseiro",
-            "distancia": 2181,
-            "em": [
-              -1020.67,
-              464.64
-            ]
-          },
-          {
-            "a": "molduraArcoDianteiro",
-            "b": "arcoTraseiro",
-            "distancia": 2322.66,
-            "em": [
-              -1160.11,
-              361.28
-            ]
-          },
-          {
-            "a": "molduraArcoTraseiro",
-            "b": "arcoDianteiro",
-            "distancia": 2322.66,
-            "em": [
-              1300.11,
-              361.28
-            ]
-          },
-          {
-            "a": "arcoDianteiro",
-            "b": "arcoTraseiro",
-            "distancia": 2460.09,
-            "em": [
-              1300.07,
-              357.56
-            ]
-          },
-          {
-            "a": "portaDaCabine",
-            "b": "parachoqueTraseiroDeLado",
-            "distancia": 2485.91,
-            "em": [
-              550,
-              577.9
-            ]
-          },
-          {
-            "a": "vidroDaCabine",
-            "b": "parachoqueTraseiroDeLado",
-            "distancia": 2721.63,
-            "em": [
-              622.56,
-              1506.19
-            ]
-          },
-          {
-            "a": "parachoqueDianteiroDeLado",
-            "b": "molduraArcoTraseiro",
-            "distancia": 2952.68,
-            "em": [
-              -1020.67,
-              464.64
-            ]
-          },
-          {
-            "a": "parachoqueTraseiroDeLado",
-            "b": "molduraArcoDianteiro",
-            "distancia": 3098.67,
-            "em": [
-              1160.69,
-              464.74
-            ]
-          },
-          {
-            "a": "parachoqueDianteiroDeLado",
-            "b": "arcoTraseiro",
-            "distancia": 3100.14,
-            "em": [
-              -1161.61,
-              391.01
-            ]
-          },
-          {
-            "a": "parachoqueTraseiroDeLado",
-            "b": "arcoDianteiro",
-            "distancia": 3242.83,
-            "em": [
-              1301.31,
-              387.31
-            ]
-          },
-          {
-            "a": "parachoqueDianteiroDeLado",
-            "b": "parachoqueTraseiroDeLado",
-            "distancia": 3861.26,
-            "em": [
-              1922.59,
-              724
-            ]
-          }
+        "id": "coluna-e-faixa-de-teto",
+        "conferencia": "medidas-em-faixa",
+        "ok": true,
+        "achados": [],
+        "medidas": [
+          "colunaDeLado = 100.148",
+          "faixaDeTeto = 75"
+        ]
+      },
+      {
+        "id": "alargamento-ao-pneu",
+        "conferencia": "medidas-em-faixa",
+        "ok": true,
+        "achados": [],
+        "medidas": [
+          "larguraDoAlargamento/larguraDoPneu = 0.638",
+          "saidaDoAlargamento/larguraDoPneu = 0.128"
+        ]
+      },
+      {
+        "id": "contorno-continuo-em-volta-da-roda",
+        "conferencia": "contorno-continuo",
+        "ok": true,
+        "achados": [],
+        "medidas": [
+          "roda traseira: saia + moldura da cor da lataria + para-choque traseiro",
+          "roda dianteira: para-choque dianteiro + moldura da cor da lataria + saia"
+        ]
+      },
+      {
+        "id": "linhas-vizinhas-afastadas",
+        "conferencia": "divisoes",
+        "ok": true,
+        "achados": [],
+        "medidas": [
+          "parachoqueDianteiroDeLado × arcoDianteiro 37.5 mm",
+          "parachoqueDianteiroDeLado × molduraArcoDianteiro 47.55 mm",
+          "parachoqueTraseiroDeLado × arcoTraseiro 57.36 mm"
+        ]
+      },
+      {
+        "id": "peca-fixa-nao-cobre-porta",
+        "conferencia": "faixa-cortada-pelas-aberturas",
+        "ok": true,
+        "achados": [],
+        "medidas": [
+          "saia do lado -x: 4 trecho(s)",
+          "saia do lado +x: 2 trecho(s)"
+        ]
+      },
+      {
+        "id": "pontas-da-moldura-assentadas",
+        "conferencia": "pontas-assentadas",
+        "ok": true,
+        "achados": [],
+        "medidas": [
+          "molduraArcoTraseiro sobre saia, parachoqueTraseiroDeLado",
+          "molduraArcoDianteiro sobre saia, parachoqueDianteiroDeLado"
         ]
       }
     ]

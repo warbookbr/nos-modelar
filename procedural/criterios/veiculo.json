@@ -99,6 +99,21 @@
           "*coluna*"
         ]
       },
+      "conferencia": {
+        "nome": "medidas-em-faixa",
+        "parametros": {
+          "medidas": [
+            {
+              "medida": "colunaDeLado",
+              "min": 60
+            },
+            {
+              "medida": "faixaDeTeto",
+              "min": 50
+            }
+          ]
+        }
+      },
       "origem": "Pedido da pessoa na etapa 3 de um veículo de trabalho, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
     },
     {
@@ -144,6 +159,25 @@
           "*roda*"
         ]
       },
+      "conferencia": {
+        "nome": "medidas-em-faixa",
+        "parametros": {
+          "medidas": [
+            {
+              "medida": "larguraDoAlargamento",
+              "base": "larguraDoPneu",
+              "min": 0.5,
+              "max": 0.9
+            },
+            {
+              "medida": "saidaDoAlargamento",
+              "base": "larguraDoPneu",
+              "min": 0.1,
+              "max": 0.2
+            }
+          ]
+        }
+      },
       "origem": "Pedido da pessoa na etapa 3, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
     },
     {
@@ -159,6 +193,7 @@
           "*parachoque*"
         ]
       },
+      "conferencia": "contorno-continuo",
       "origem": "Pedido da pessoa na etapa 3, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
     },
     {
@@ -176,7 +211,12 @@
           "*carroceria*"
         ]
       },
-      "conferencia": "divisoes",
+      "conferencia": {
+        "nome": "divisoes",
+        "parametros": {
+          "minimo": 30
+        }
+      },
       "origem": "Atrito 17 de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md, e pedido da pessoa na etapa 3."
     },
     {
@@ -190,7 +230,7 @@
           "*saia*"
         ]
       },
-      "conferencia": "trechos-da-saia",
+      "conferencia": "faixa-cortada-pelas-aberturas",
       "origem": "Atrito 14 de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md, e pedido da pessoa na etapa 3."
     },
     {
@@ -204,6 +244,7 @@
           "*arco*"
         ]
       },
+      "conferencia": "pontas-assentadas",
       "origem": "Atrito 16 de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md."
     },
     {
