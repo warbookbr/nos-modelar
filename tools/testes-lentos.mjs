@@ -80,6 +80,7 @@ export const TESTES_LENTOS = [
   'tools/modelar/familia.test.mjs',
   'tools/modelar/forma-do-esboco.test.mjs',
   'tools/modelar/medida-do-desenho.test.mjs',
+  'tools/modelar/guardas/abre-na-bancada.test.mjs',
   'tools/modelar/guardas/guarda-acervo.test.mjs',
   'tools/modelar/mcp-degrau-1-preparacao.test.mjs',
   'tools/modelar/olhar-bancada.test.mjs',
