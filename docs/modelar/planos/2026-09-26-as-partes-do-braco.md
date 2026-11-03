@@ -79,6 +79,8 @@ No mesmo dia a pessoa escolheu a opção B (seção de 190 mm, eixo a 115 mm, to
 
 O ombro foi refeito em 2026-11-03 em três rodadas (9 a 11). A rodada 9 tirou o degrau em L e foi descartada pela pessoa; a 10 e a 11 voltaram ao desenho aceito em 2026-09-29, no tamanho B e com a saída redonda na largura do bloco, e a passagem do bloco para o círculo misturada ponto a ponto. A pessoa viu também o bloco cheio da rodada 9 corrigido em imagem e ficou com o desenho em L, e aceitou a rodada 11 com as duas marcas de acabamento que o crítico apontou (nota 6): um beliscão nos cantos em que o bloco vira círculo junto ao anel e um bojo leve no encontro de baixo. A etapa `ombro` está fixa por aceite humano.
 
+A coluna (`braco`) foi alinhada com a pessoa no mesmo dia, pelos esboços em `procedural/pecas/braco-robotico/referencias/`: cilindro reto de 156 mm do pé ao topo, 477 mm de altura, pé redondo em volta do eixo da junta do ombro e topo onde assenta o anel do cotovelo; a decisão está no `ALINHAMENTO.md` do braço.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,

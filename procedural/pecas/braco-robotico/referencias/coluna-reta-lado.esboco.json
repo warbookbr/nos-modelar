@@ -1,0 +1,282 @@
+{
+  "plano": "Compara a coluna que engrossa de 100 a 156 com a coluna redonda de 156 constante.",
+  "vista": "lateral",
+  "opcoes": [
+    {
+      "titulo": "Opção 1b: abertura ao longo da coluna",
+      "nota": "100 mm junto ao pé, engrossando aos poucos até o cilindro de 156 no topo, sem degrau.",
+      "legendas": "lista",
+      "formas": [
+        {
+          "id": "pe",
+          "tipo": "caixa",
+          "largura": 230,
+          "altura": 20,
+          "profundidade": 230,
+          "raio": 25,
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "base"
+        },
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "sobre": "pe",
+          "cor": "cinza"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura"
+        },
+        {
+          "id": "ombro",
+          "tipo": "caixa",
+          "largura": 190,
+          "altura": 210,
+          "profundidade": 190,
+          "raio": 30,
+          "sobre": "cintura",
+          "cor": "verde",
+          "rotulo": "ombro B"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 190,
+          "diametroInterno": 40,
+          "espessura": 28,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            10,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta"
+        },
+        {
+          "id": "pecoluna",
+          "tipo": "cilindro",
+          "diametro": 156,
+          "comprimento": 100,
+          "eixo": "z",
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "cor": "amarelo",
+          "rotulo": "pé redondo da coluna em volta do eixo, 100 de espessura"
+        },
+        {
+          "id": "coluna",
+          "tipo": "loft",
+          "eixo": "y",
+          "sobre": "pecoluna",
+          "desloca": [
+            0,
+            -78,
+            0
+          ],
+          "suave": true,
+          "secoes": [
+            {
+              "pos": 0,
+              "forma": "arredondado",
+              "tamanho": [
+                156,
+                100
+              ],
+              "cantos": 40,
+              "segmentosPorCanto": 8
+            },
+            {
+              "pos": 150,
+              "forma": "arredondado",
+              "tamanho": [
+                156,
+                118
+              ],
+              "cantos": 50,
+              "segmentosPorCanto": 8
+            },
+            {
+              "pos": 300,
+              "forma": "arredondado",
+              "tamanho": [
+                156,
+                145
+              ],
+              "cantos": 68,
+              "segmentosPorCanto": 8
+            },
+            {
+              "pos": 399,
+              "forma": "elipse",
+              "tamanho": [
+                156,
+                156
+              ]
+            }
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna: 100 junto ao pé, engrossando até o cilindro Ø156 no topo"
+        },
+        {
+          "id": "anelcot",
+          "tipo": "anel",
+          "diametroExterno": 160,
+          "diametroInterno": 100,
+          "espessura": 48,
+          "eixo": "y",
+          "sobre": "coluna",
+          "cor": "roxo",
+          "rotulo": "anel do cotovelo Ø160"
+        }
+      ]
+    },
+    {
+      "titulo": "Opção 3: reta, redonda",
+      "nota": "Coluna redonda de 156 a altura inteira: reta de qualquer ângulo, sem o achatado dos lados.",
+      "legendas": "lista",
+      "formas": [
+        {
+          "id": "pe",
+          "tipo": "caixa",
+          "largura": 230,
+          "altura": 20,
+          "profundidade": 230,
+          "raio": 25,
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "base"
+        },
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "sobre": "pe",
+          "cor": "cinza"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura"
+        },
+        {
+          "id": "ombro",
+          "tipo": "caixa",
+          "largura": 190,
+          "altura": 210,
+          "profundidade": 190,
+          "raio": 30,
+          "sobre": "cintura",
+          "cor": "verde",
+          "rotulo": "ombro B"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 190,
+          "diametroInterno": 40,
+          "espessura": 28,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            10,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta"
+        },
+        {
+          "id": "pecoluna",
+          "tipo": "cilindro",
+          "diametro": 156,
+          "comprimento": 156,
+          "eixo": "z",
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "cor": "amarelo",
+          "rotulo": "pé redondo em volta do eixo, 156 de espessura"
+        },
+        {
+          "id": "coluna",
+          "tipo": "loft",
+          "eixo": "y",
+          "sobre": "pecoluna",
+          "desloca": [
+            0,
+            -78,
+            0
+          ],
+          "suave": true,
+          "secoes": [
+            {
+              "pos": 0,
+              "forma": "elipse",
+              "tamanho": [
+                156,
+                156
+              ]
+            },
+            {
+              "pos": 399,
+              "forma": "elipse",
+              "tamanho": [
+                156,
+                156
+              ]
+            }
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna redonda Ø156 do pé ao topo"
+        },
+        {
+          "id": "anelcot",
+          "tipo": "anel",
+          "diametroExterno": 160,
+          "diametroInterno": 100,
+          "espessura": 48,
+          "eixo": "y",
+          "sobre": "coluna",
+          "cor": "roxo",
+          "rotulo": "anel do cotovelo Ø160"
+        }
+      ]
+    }
+  ]
+}
