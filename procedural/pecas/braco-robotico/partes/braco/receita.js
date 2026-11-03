@@ -32,10 +32,12 @@
  * 360 mm do chão, a coluna encosta nele a cerca de 141 graus da vertical para
  * cada lado.
  *
- * Encontro do pé com a coluna: `unir` sem `arredondarCostura`, o vinco a 45
- * graus de dois cilindros de mesmo raio, que é o desenho da referência. Com
- * `raioDoEncontro` maior que zero a costura sai com triângulo degenerado e a
- * auditoria de interseção fica inconclusiva.
+ * Encontro do pé com a coluna: `unir` com `arredondarCostura` de 12 mm. Com o
+ * pé 3 mm mais estreito de raio que a coluna (pé de 150 mm), o arredondamento
+ * sai e a auditoria de interseção fecha. Com pé de 0,2 a 2,5 mm mais estreito
+ * ou sem folga, a costura sai com triângulo degenerado ou o núcleo recusa o
+ * raio, e o resultado depende do raio de modo irregular (3 e 8 mm recusados,
+ * 5 e 12 aceitos pelo núcleo, só 12 e 20 fecham a auditoria).
  */
 
 export const TABELA = {
@@ -45,15 +47,15 @@ export const TABELA = {
   diametroDaColuna: 156,
   /* Do fundo do pé ao topo. */
   alturaTotal: 477,
-  /* O pé é 0,2 mm mais estreito que a coluna: paredes tangentes quebram a
+  /* O pé é 3 mm mais estreito de raio que a coluna: com menos, a costura fica degenerada; paredes tangentes quebram a
      união. */
-  folgaDoPe: 0.2,
+  folgaDoPe: 3,
   /* Acabamento das carcaças: chanfro estreito nas bordas, com o raio do
      vértice suavizado. */
   chanfro: 2,
   suaveDoChanfro: 0.8,
   /* Concordância no encontro do pé com a coluna; zero a desliga (ver acima). */
-  raioDoEncontro: 0,
+  raioDoEncontro: 12,
   lados: 72,
 };
 
@@ -118,7 +120,7 @@ const receita = {
     referencias: ['../../referencias/coluna-reta.png', '../../referencias/coluna-reta-lado.png'],
     escala: { medida: 'diâmetro da coluna, do pé ao topo', milimetros: 156 },
     partes: [
-      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 156 mm de diâmetro e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },
+      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 150 mm de diâmetro (3 mm de raio a menos que a coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },
       { nome: 'coluna', forma: 'cilindro redondo e reto de 156 mm do pé ao topo, 477 mm do fundo do pé ao topo, de eixo vertical sobre o pé; topo plano onde assenta o anel do cotovelo; bordas suavizadas', tecnica: 'lathe de eixo Y com chanfro de vértice suavizado no topo, unir, arredondarCostura no encontro com o pé e liso com ângulo' },
     ],
     criteriosDeReprovacao: [
