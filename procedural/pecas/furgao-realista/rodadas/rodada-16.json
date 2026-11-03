@@ -1,0 +1,395 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 16,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "abaArcoDianteiroDireito",
+        "tipo": "superficie",
+        "onde": "pontas inferiores do lábio, junto à soleira",
+        "sentido": "anguloso",
+        "evidencia": "Vista direita da parte: o lábio termina em corte vertical com espessura cheia, em vez de afinar até sumir."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "ausencia",
+        "onde": "frente, junto às pontas do para-choque, na altura do capô baixo",
+        "sentido": "faltando",
+        "evidencia": "A frontal da prancha desenha módulos de faróis nas pontas e a frontal do modelo mostra a frente lisa, só com o bolso da placa."
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "colunas do para-brisa, do canto do teto ao pé do vidro",
+        "sentido": "segmentado",
+        "evidencia": "Curvatura frontal e de cima: faixa azul ao lado de faixa vermelha ao longo das duas colunas, onde a coluna devia ser contínua."
+      }
+    ],
+    "observacao": "Conjunto fiel à prancha em silhueta e partes, com defeitos só de detalhe; várias vistas por parte e de luz rasante não foram abertas."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCorrer",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroParaBrisa",
+      "confere": true,
+      "observacao": "rente medido so por vista e caixa; a diferenca de superficie para a chapa nao foi medida em mm"
+    },
+    {
+      "nome": "vidroPortaCabineEsquerda",
+      "confere": true,
+      "observacao": "visto so de isometrica e lateral da bancada"
+    },
+    {
+      "nome": "vidroPortaCabineDireita",
+      "confere": true,
+      "observacao": "espelho do esquerdo; nao visto em imagem propria"
+    },
+    {
+      "nome": "vidroPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": "pela janela aparece a divisoria e, nas bordas, a face de dentro da chapa"
+    },
+    {
+      "nome": "vidroPortaTraseiraDireita",
+      "confere": true,
+      "observacao": "pela janela aparece a divisoria e, nas bordas, a face de dentro da chapa"
+    },
+    {
+      "nome": "borrachaParaBrisa",
+      "confere": true,
+      "observacao": "altura baixada de 3,5 para 2,2 mm; nao sobra mais como filete fora do contorno de frente e de tras"
+    },
+    {
+      "nome": "borrachaPortaCabineEsquerda",
+      "confere": true,
+      "observacao": "altura baixada de 3,5 para 2,2 mm; nao sobra mais como filete fora do contorno de frente e de tras"
+    },
+    {
+      "nome": "borrachaPortaCabineDireita",
+      "confere": true,
+      "observacao": "altura baixada de 3,5 para 2,2 mm; nao sobra mais como filete fora do contorno de frente e de tras"
+    },
+    {
+      "nome": "borrachaPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": "altura baixada de 3,5 para 2,2 mm; nao sobra mais como filete fora do contorno de frente e de tras"
+    },
+    {
+      "nome": "borrachaPortaTraseiraDireita",
+      "confere": true,
+      "observacao": "altura baixada de 3,5 para 2,2 mm; nao sobra mais como filete fora do contorno de frente e de tras"
+    },
+    {
+      "nome": "pisoInterior",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "divisoria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "bancoMotorista",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "bancoPassageiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painel",
+      "confere": true,
+      "observacao": "volume simples de perfil chanfrado, sem volante nem detalhe"
+    }
+  ],
+  "atrito": [
+    "o modelador parou quatro vezes por bloqueio automatico do servico; quem conduz fez a correcao da borracha direto na TABELA, por acordo com a pessoa",
+    "o crítico não respondeu as 18 perguntas de forma uma a uma nem conferiu os critérios de reprovação item a item"
+  ],
+  "notaDePassagem": "Borracha de vao com 2,2 mm de altura e o perfil proporcional a ela. Os vidros laterais e traseiros escuros sao a luz: atras deles fica o interior sem luz direta.",
+  "receita": {
+    "sha256": "sha256:bc9200c152316c7533e95634497e40e0daa459df92e7a4fba8a23e921e81c80a",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 4,
+      "acrescentadas": 4,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 20,
+          "texto": " * sob a borracha de vão, escura, varrida pela volta do vão (`friso` com perfil: 15 mm sobre a chapa, 10 sobre o cristal, 3,5 mm de altura, entrando 1,5 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * sob a borracha de vão, escura, varrida pela volta do vão (`friso` com perfil: 15 mm sobre a chapa, 10 sobre o cristal, 2,2 mm de altura, entrando 1,5 mm"
+        },
+        {
+          "tipo": "-",
+          "linha": 216,
+          "texto": "  borracha_altura: 3.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 216,
+          "texto": "  borracha_altura: 2.2, // baixa o bastante para não sobrar como filete fora do contorno nas vistas de frente e de trás (a pessoa pediu em 2026-11-03)"
+        },
+        {
+          "tipo": "-",
+          "linha": 1916,
+          "texto": "  return [[-F, -B], [D, -B], [D, 0.5], [D - 2, 1.6], [D - 5, H - 0.7], [D - 8, H], [-6, H], [-F + 2.5, 0.55 * H], [-F, 0.4]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 1916,
+          "texto": "  return [[-F, -B], [D, -B], [D, 0.5], [D - 2, 0.46 * H], [D - 5, 0.8 * H], [D - 8, H], [-6, H], [-F + 2.5, 0.55 * H], [-F, 0.4]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 2195,
+          "texto": "        forma: `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 3,5 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2195,
+          "texto": "        forma: `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 2,2 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az290.png",
+      "peca-frente-rasante-az20.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
