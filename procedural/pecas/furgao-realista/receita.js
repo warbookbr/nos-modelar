@@ -53,6 +53,8 @@
  * quina (a coluna `D`, que segue a linha da prancha a 122 mm do perfil do para-brisa, 100 mm atrás da ponta dobrada do vidro), desce vertical até o arco e contorna o arco por trás.
  */
 
+import { gaiolaVarrida } from '../../nucleo/gaiola-varrida.js';
+
 export const TABELA = {
   // envelope da classe (prancha): 5400 de comprimento, 2000 de largura sem retrovisores, 2500 de altura, soleira em 300
   comprimento: 5400,
@@ -738,13 +740,10 @@ export function derivarPlastico(T, f) {
   const saida = (sec) => Math.max(...sec.map(([u]) => u));
   const kLado = saida(T.secao_saia) / saida(T.secao_parachoque_dianteiro);
   const kLadoTras = saida(T.secao_saia) / saida(T.secao_parachoque_traseiro);
-  const dzPortaMais = dzDe(raioPorta + T.fresta / 2); const dzPortaMenos = dzDe(raioPorta - T.fresta / 2);
   const baixoPortas = T.porta_base_y - T.fresta / 2; const cimaPortas = T.porta_base_y + T.fresta / 2;
   const lados = [['Esquerda', 1], ['Direita', -1]];
   /* os pontos de seção que tocam a chapa (u = 0) entram na chapa por `pen` */
   const tocaChapa = (l) => (Math.abs(l.u) < 1e-9 ? { ...l, u: -pen } : l);
-  const dicaX = (s) => () => [s, 0, 0];
-  const fixo = (z) => () => z;
   const zT = f.zT; const zD = f.zD;
   const portaTras = T.porta_cabine_tras_z;
   const correrFrente = portaTras - T.coluna_do_meio; const correrTras = correrFrente - T.porta_correr_largura;
@@ -791,82 +790,77 @@ export function derivarPlastico(T, f) {
     return Math.abs(uf) < 1e-9 ? -pen : uf;
   };
 
+  /* A peça pronta de uma gaiola varrida: os campos do passo `subdivisao` e as posições em milímetro. */
+  const daVarredura = (g) => ({ nome: g.nome, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, posicoes: g.posicoes });
+  const EIXO_X = [1, 0, 0];
+  /* o marco de corte na distância r do eixo de um arco: a linha chega a ele subindo (atrás do arco, vindo do eixo) ou descendo (na frente dele) */
+  const marcoDoArco = (zc, r, cruzando, nome) => ({ cilindro: { eixo: EIXO_X, por: [0, yc, zc], raio: r }, cruzando, ...(nome ? { nome } : {}) });
+
   /* ---- a saia ---- */
-  const secaoSaia = adensar(comAlturas(T.secao_saia, [baixoPortas, cimaPortas]), T.plastico_passo_y).map(([u, y], k, a) => ({ ...tocaChapa({ u, y }), topo: k === a.length - 1 }));
+  const secaoSaia = adensar(comAlturas(T.secao_saia, [baixoPortas, cimaPortas]), T.plastico_passo_y).map(([u, y]) => tocaChapa({ u, y }));
   const iBaixo = secaoSaia.findIndex((l) => Math.abs(l.y - baixoPortas) < 1e-9);
   const iCima = secaoSaia.findIndex((l) => Math.abs(l.y - cimaPortas) < 1e-9);
-  const subdividir = (a, b, n) => Array.from({ length: n }, (_, k) => (y) => lerp(a(y), b(y), k / n));
-  const nPor = (a, b) => Math.max(1, Math.ceil(Math.abs(b(cimaPortas) - a(cimaPortas)) / T.saia_passo));
-  const faixaT = dsAlarg.map((d) => ({ z: (y) => zT + dzDe(T.arco_raio + d)(y), d }));
-  const faixaD = dsAlarg.slice().reverse().map((d) => ({ z: (y) => zD - dzDe(T.arco_raio + d)(y), d }));
+  /* as linhas da seção, com o nome das que os cortes e os recortes citam: a de baixo da base das portas, a de cima dela e a do topo */
+  const linhasDaSaia = secaoSaia.map((l, j) => ({ u: l.u, v: l.y, ...(j === iBaixo ? { nome: 'baixoPorta' } : j === iCima ? { nome: 'cimaPorta' } : j === secaoSaia.length - 1 ? { nome: 'topo' } : {}) }));
+  /* o alargamento de cada arco, em volta do eixo da roda: a saída u do perfil em cada distância d da boca, em reta entre as estações, e zero a partir de um
+     ponto entre a última estação e a fresta da porta; a borda de baixo é rolada e a de cima fica aberta */
+  const perfilAlarg = [...dsAlarg.map((d) => [d, saidaAlarg(d)]), [(dsAlarg.at(-1) + (larguraAlarg - T.fresta / 2)) / 2, 0]];
+  const alargamentos = [zT, zD].map((zc) => ({ campo: { cilindro: { eixo: EIXO_X, por: [0, yc, zc], raio: T.arco_raio } }, perfil: perfilAlarg, topoAberto: true, rolada: { abaixoDe: yRolo, razao: razaoRolo } }));
+  const passoDaSaia = { passo: T.saia_passo, linha: 'cimaPorta' };
   for (const [lado, s] of lados) {
-    /* os cortes em z, de trás para a frente, com o tipo do trecho que começa em cada um: preso (leva a saia inteira) ou de porta (só a de baixo). A saia
-       começa na borda de fora do alargamento do arco traseiro e acaba na fresta da porta da cabine, e dali, em cada arco, as faixas do alargamento vão
-       até a boca, na mesma malha: não há trecho preso entre a fresta e o alargamento. */
-    const cortes = s < 0
-      ? [[(y) => zT + dzJoin(y), 'preso'], [fixo(correrTras - meia), 'porta'], [fixo(correrFrente + meia), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso']]
-      : [[(y) => zT + dzJoin(y), 'preso'], [fixo(portaTras - meia), 'porta'], [(y) => zD - dzPortaMenos(y), 'preso']];
-    const estacoes = [...faixaT]; const tipos = faixaT.map(() => 'preso');
-    cortes.forEach(([a, tipo], k) => {
-      if (k + 1 >= cortes.length) { estacoes.push({ z: a, d: null }); tipos.push('preso'); return; }
-      const b = cortes[k + 1][0];
-      subdividir(a, b, nPor(a, b)).forEach((z) => { estacoes.push({ z, d: null }); tipos.push(tipo); });
+    const trilhoDe = (de, ate) => [{ reta: { de: [s * 1000, 0, de], ate: [s * 1000, 0, ate] } }];
+    const quadro = s > 0 ? { u: [s, 0, 0] } : { u: [s, 0, 0], virar: true };
+    const emZ = (z, nome) => ({ em: z - zT, nome });
+    /* os cortes em z, de trás para a frente: a saia começa na borda de fora do alargamento do arco traseiro e acaba na fresta da porta da cabine, e dali, em cada
+       arco, as estações do alargamento vão até a boca, na mesma malha: não há trecho preso entre a fresta e o alargamento. As portas levam só a saia de baixo. */
+    const frestaD = marcoDoArco(zD, raioPorta - T.fresta / 2, 'descendo', 'frestaDaPorta');
+    const meio = s < 0
+      ? [emZ(correrTras - meia, 'trasDaCorrer'), passoDaSaia, emZ(correrFrente + meia, 'frenteDaCorrer'), passoDaSaia, emZ(portaTras - meia, 'trasDaCabine'), passoDaSaia]
+      : [emZ(portaTras - meia, 'trasDaCabine'), passoDaSaia];
+    const presa = gaiolaVarrida({
+      nome: `saiaPresa${lado}`, trilho: trilhoDe(zT, zD), quadro, secao: linhasDaSaia, fora: [s, 0, 0], alargamento: alargamentos,
+      estacoes: [
+        ...dsAlarg.map((d) => marcoDoArco(zT, T.arco_raio + d, 'subindo')), marcoDoArco(zT, rJoin, 'subindo'), passoDaSaia,
+        ...meio, frestaD,
+        ...dsAlarg.slice().reverse().map((d) => marcoDoArco(zD, T.arco_raio + d, 'descendo')),
+      ],
+      remover: [...(s < 0 ? [{ estacoes: ['trasDaCorrer', 'frenteDaCorrer'], linhas: ['baixoPorta', 'topo'] }] : []), { estacoes: ['trasDaCabine', 'frestaDaPorta'], linhas: ['baixoPorta', 'topo'] }],
     });
-    estacoes.push(...faixaD); faixaD.slice(0, -1).forEach(() => tipos.push('preso'));
-    const presa = construirGrade({
-      nome: `saiaPresa${lado}`, estacoes, linhas: secaoSaia, dica: dicaX(s),
-      posicao: (e, l) => [s * (1000 + (e.d === null ? l.u : uContinua(e.d, l.y, l.u, l.topo))), l.y, e.z(l.y)],
-      manter: (i, j) => j < iBaixo || tipos[i] === 'preso',
-    });
-    partes.push(fecharPeca(`saiaPresa${lado}`, [presa]));
-    /* o trecho de cada porta, de 380 a 463 */
-    const portas = (s < 0 ? [['PortaCorrer', fixo(correrTras + meia), fixo(correrFrente - meia)]] : [])
-      .concat([[`PortaCabine${lado}`, fixo(portaTras + meia), (y) => zD - dzPortaMais(y)]]);
-    for (const [rotulo, a, b] of portas) {
-      const ests = [...subdividir(a, b, nPor(a, b)), b];
-      const g = construirGrade({ nome: `saia${rotulo}`, estacoes: ests, linhas: secaoSaia.slice(iCima), posicao: (z, l) => [s * (1000 + l.u), l.y, z(l.y)], dica: dicaX(s) });
-      partes.push(fecharPeca(`saia${rotulo}`, [g]));
+    partes.push(daVarredura(presa));
+    /* o trecho de cada porta, de 383 a 463: a porta da cabine acaba na fresta, na borda do alargamento */
+    const linhasDaPorta = linhasDaSaia.slice(iCima);
+    const portas = [
+      ...(s < 0 ? [{ rotulo: 'PortaCorrer', de: correrTras + meia, ate: correrFrente - meia, fim: { fracao: 1 } }] : []),
+      { rotulo: `PortaCabine${lado}`, de: portaTras + meia, ate: zD, fim: marcoDoArco(zD, raioPorta + T.fresta / 2, 'descendo') },
+    ];
+    for (const { rotulo, de, ate, fim } of portas) {
+      const g = gaiolaVarrida({ nome: `saia${rotulo}`, trilho: trilhoDe(de, ate), quadro, secao: linhasDaPorta, fora: [s, 0, 0], estacoes: [{ fracao: 0 }, passoDaSaia, fim] });
+      partes.push(daVarredura(g));
     }
   }
 
   /* ---- as molduras dos arcos: o alargamento da cor da lataria acima das pontas, em torno do eixo da roda (abaixo delas ele é a saia e os para-choques) ---- */
   const topo = (sec) => Math.max(...sec.map(([, y]) => y));
   const topoSaia = topo(T.secao_saia); const topoDiant = topo(T.secao_parachoque_dianteiro); const topoTras = topo(T.secao_parachoque_traseiro);
-  const linhasMoldura = [
+  const secaoMoldura = [
     ...T.secao_moldura_subida.map(([u, d]) => ({ u, d })),
     ...Array.from({ length: T.moldura_descida_passos }, (_, i) => {
       const q = (i + 1) / T.moldura_descida_passos;
       return { u: T.moldura_saida * (1 - 3 * q ** 2 + 2 * q ** 3), d: ressalto + q * (larguraAlarg - ressalto) };
     }),
-  ].map(tocaChapa);
-  /* o ângulo em que a linha da seção cruza a altura y, à frente (lado +1) ou atrás (lado -1) do alto do arco */
-  const anguloNaAltura = (l, y, lado) => {
-    let [lo, hi] = lado > 0 ? [-Math.PI / 6, Math.PI / 2] : [Math.PI / 2, (7 * Math.PI) / 6];
-    for (let k = 0; k < 60; k += 1) {
-      const m = (lo + hi) / 2;
-      const sobe = yc + (T.arco_raio + l.d) * Math.sin(m) < y;
-      if ((lado > 0) === sobe) lo = m; else hi = m;
-    }
-    return (lo + hi) / 2;
-  };
-  const passoRad = (T.moldura_passo_graus * Math.PI) / 180;
+  ].map(tocaChapa).map((l, j) => ({ u: l.u, v: l.d, ...(j === 1 ? { nome: 'boca' } : {}) }));
   /* as pontas: cada moldura acaba, de cada lado do arco, numa ponta horizontal da boca à borda de fora, na altura do topo da peça escura vizinha */
   const pontas = { [zT]: { tras: topoTras, frente: topoSaia }, [zD]: { tras: topoSaia, frente: topoDiant } };
+  const passoDaMoldura = { passo: T.arco_raio * ((T.moldura_passo_graus * Math.PI) / 180), linha: 'boca' };
   for (const [zc, rotulo] of [[zD, 'Dianteiro'], [zT, 'Traseiro']]) {
     for (const [lado, s] of lados) {
-      const sufixo = `Arco${rotulo}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;
-      /* a moldura da cor da lataria, de uma ponta à outra: cada linha vai do ângulo em que cruza a altura da ponta da frente ao da de trás */
-      const nomeM = `moldura${sufixo}`;
-      const linhasM = linhasMoldura.map((l) => ({ ...l, aF: anguloNaAltura(l, pontas[zc].frente, 1), aB: anguloNaAltura(l, pontas[zc].tras, -1) }));
-      const nM = Math.ceil((linhasM[0].aB - linhasM[0].aF) / passoRad);
-      const gM = construirGrade({
-        nome: nomeM, estacoes: Array.from({ length: nM + 1 }, (_, k) => k / nM), linhas: linhasM, dica: dicaX(s),
-        posicao: (t, l) => {
-          const a = lerp(l.aF, l.aB, t); const rr = T.arco_raio + l.d;
-          return [s * (1000 + l.u), yc + rr * Math.sin(a), zc + rr * Math.cos(a)];
-        },
+      const nome = `moldura${rotulo === 'Dianteiro' ? 'ArcoDianteiro' : 'ArcoTraseiro'}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;
+      const g = gaiolaVarrida({
+        nome, trilho: [{ arco: { centro: [s * 1000, yc, zc], eixo: EIXO_X, de: [s * 1000, yc, zc + T.arco_raio], graus: -200 } }],
+        quadro: s > 0 ? { u: [s, 0, 0], virar: true } : { u: [s, 0, 0] }, secao: secaoMoldura, fora: [s, 0, 0],
+        estacoes: [{ plano: { eixo: 'y', valor: pontas[zc].frente }, cruzando: 'subindo' }, passoDaMoldura, { plano: { eixo: 'y', valor: pontas[zc].tras }, cruzando: 'descendo' }],
       });
-      partes.push(fecharPeca(nomeM, [gM]));
+      partes.push(daVarredura(g));
     }
   }
 
