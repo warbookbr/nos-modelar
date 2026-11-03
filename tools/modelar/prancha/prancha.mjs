@@ -7,6 +7,7 @@
 
 import * as G from './prancha-geometria.mjs';
 import { validarAutoriaPrancha } from './prancha-autoria.mjs';
+import { conferirRegras } from './prancha-conferencias.mjs';
 
 const n = (v) => Number(v.toFixed(2));
 /* Quanto a linha de extensão passa da linha da cota, em pixel de tela. */
@@ -358,6 +359,12 @@ export function prancha(spec) {
     for (const par of r.pares) {
       if (par.distancia < regra.minimo) relatorio.alertas.push(`divisões (${regra.vista}): ${par.a} e ${par.b} ficam a ${n(par.distancia)} mm, menos que ${regra.minimo}`);
     }
+  }
+  /* `familia` liga a prancha às regras de desenho da família (procedural/criterios/): as que se aplicam às camadas e
+     nomeiam uma conferência são executadas aqui, e cada achado vira alerta. O motor só conhece as conferências gerais. */
+  if (spec.familia !== undefined) {
+    relatorio.regras = conferirRegras(spec, camadas, { afastamentoDasDivisoes });
+    for (const r of relatorio.regras) for (const a of r.achados) relatorio.alertas.push(`regra ${r.id} (${r.conferencia}): ${a}`);
   }
 
   const O = [];
@@ -825,6 +832,9 @@ export function imprimirRelatorio(r) {
   for (const d of r.divisoes ?? []) {
     const menores = d.pares.slice(0, 3).map((p) => `${p.a} × ${p.b} ${p.distancia} mm`).join('; ');
     L.push(`  divisões ${d.vista} (mínimo ${d.minimo} mm): ${menores || 'nenhum par'}`);
+  }
+  for (const g of r.regras ?? []) {
+    L.push(`  regra ${g.id} (${g.conferencia}): ${g.ok ? 'passa' : 'REPROVA'}${g.medidas.length ? ` — ${g.medidas.join('; ')}` : ''}`);
   }
   if (r.alertas.length === 0) L.push('  sem alertas');
   else for (const a of r.alertas) L.push(`  ALERTA ${a}`);

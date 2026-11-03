@@ -76,6 +76,31 @@ Fatias 1 e 4 feitas em 2026-11-03, em paralelo à extração das famílias. O fo
 
 Os pedidos ficam em `pedidos.json` na pasta da peça, sem tocar nas rodadas: `rodada-de-modelagem.mjs <peça> --pedidos [arquivo] [--json]` valida, acrescenta e conta por etapa e por regra. Os sete pedidos da etapa 3 do furgão estão registrados em `procedural/pecas/furgao-realista/pedidos.json` (gate 4). Seguem abertas as fatias 2, 3 e 5.
 
+Fatia 2 feita em 2026-11-03. A ligação mora num registro de conferências gerais por nome, em `tools/modelar/prancha/prancha-conferencias.mjs`. A prancha que declara `familia` executa as conferências das regras da família cuja condição vale para as camadas dela (ou para `partes`), e cada achado vira alerta. O motor não conhece veículo: as conferências medem linhas, faixas cortadas, contornos e números, e a regra nomeia a conferência. O campo `conferencia` do catálogo passou a aceitar `{ nome, parametros }`, para que o mínimo e as faixas morem na regra e não no motor; o nome continua lido como texto. Família sem arquivo e nome de conferência fora do registro falham, dizendo a regra e as conferências que existem. A regra que se aplica e não recebe dados da prancha reprova, em vez de passar calada.
+
+Seis regras do veículo ficaram ligadas:
+- `linhas-vizinhas-afastadas` → `divisoes`, com mínimo de 30;
+- `peca-fixa-nao-cobre-porta` → `faixa-cortada-pelas-aberturas`, nome geral no lugar de `trechos-da-saia`;
+- `pontas-da-moldura-assentadas` → `pontas-assentadas`;
+- `contorno-continuo-em-volta-da-roda` → `contorno-continuo`: os trechos em volta de um centro cobrem de um fundo ao outro, com o mesmo raio e a mesma saída na passagem;
+- `alargamento-ao-pneu` → `medidas-em-faixa`, com a largura do alargamento de 0,5 a 0,9 da largura do pneu e a saída de 0,1 a 0,2;
+- `coluna-e-faixa-de-teto` → `medidas-em-faixa`, com a coluna vista de lado de 60 mm ou mais e a faixa acima da porta de 50 ou mais.
+
+As faixas do alargamento saem das escolhas da pessoa sobre o pneu de 235. Ela recusou 45 e 90 de largura (0,19 e 0,38) com 20 de saída (0,085) e aceitou 150 e 30 (0,64 e 0,13). Os tetos de 0,9 e 0,2 marcam onde o alargamento passaria a ler como painel e não como borda do arco. Os mínimos da coluna e da faixa ficam abaixo do que a pessoa escolheu para o furgão (90 a 110 e 60 a 90) e bem acima da lasca que ela recusou (8 e 35). Ficam como valores da regra até haver medida de veículos reais, como prevê o item dos priors.
+
+Ficaram sem medida na prancha:
+- `protecao-com-secao-propria` e `arco-com-alargamento`, que pedem forma e caráter, e não um número;
+- `vidro-com-interior` e `forro-do-arco`, que são do modelo em 3D;
+- `lados-iguais`, que a prancha desenha de um lado só.
+
+A prova do gate 2 está em `tools/modelar/prancha/prancha-regras.test.mjs`. A prancha atual passa nas seis. As antigas entram como dados mínimos tirados das especificações do histórico do git, em `tools/modelar/fixtures/regras-de-desenho/furgao-realista-pranchas-antigas.json`, e cada uma reprova no ponto do pedido da pessoa:
+- `4a345127`: a fresta da porta da cabine a 9,5 mm da borda do alargamento;
+- `207941c9`: o trecho fixo da saia cobre as duas portas;
+- `7c535262`: o alargamento tem 0,19 da largura do pneu e saída de 0,085, e o contorno em volta das duas rodas falta abaixo da emenda de cor;
+- `a67d5ef3`: coluna de 8 e faixa de 35.
+
+A regra das pontas não tem prancha antiga que a reprove: as pontas penduradas eram do modelo, e a prancha sempre as desenhou assentadas. Por isso a prova dela é um caso sintético, uma moldura que desce até 299. A prancha do furgão realista declara `familia: 'veiculo'` e os dados das seis conferências, no lugar da antiga declaração solta de `divisoes`. Seguem abertas as fatias 3 e 5.
+
 ## Fechamento
 
 A preencher ao concluir ou cancelar.

@@ -104,6 +104,14 @@ function lerCondicao(valor, onde) {
 
 const ABSOLUTO = /^(?:[a-z]:\\|\\\\|\/|data:)/i;
 const CONFERENCIA = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+const LIMITE_DOS_PARAMETROS = 1200;
+/* Dado simples dos parâmetros de uma conferência: números finitos, textos, listas e objetos planos deles. */
+const dadoSimples = (v) => (typeof v === 'number' ? Number.isFinite(v)
+  : typeof v === 'string' ? true
+    : Array.isArray(v) ? v.every(dadoSimples)
+      : plano(v) ? Object.values(v).every(dadoSimples) : false);
+const congelarFundo = (v) => (Array.isArray(v) ? Object.freeze(v.map(congelarFundo))
+  : plano(v) ? Object.freeze(Object.fromEntries(Object.entries(v).map(([k, x]) => [k, congelarFundo(x)]))) : v);
 
 function lerTextoCurto(valor, onde, aceito, limite = LIMITE_DO_TEXTO) {
   if (typeof valor !== 'string' || valor.trim() === '') recusar(onde, valor, aceito);
@@ -132,12 +140,21 @@ function lerRegra(r, onde) {
   const forma = lerPergunta(r.perguntaDeForma, aqui('perguntaDeForma'));
   if (r.condicao === undefined) recusar(aqui('condicao'), undefined, 'o componente ou a forma que precisa existir no objeto para a regra entrar');
   const condicao = lerCondicao(r.condicao, aqui('condicao'));
-  if (r.conferencia !== undefined && (typeof r.conferencia !== 'string' || !CONFERENCIA.test(r.conferencia))) recusar(aqui('conferencia'), r.conferencia, 'nome da conferência que mede a regra, em minúsculas e com hífen (ou o campo ausente)');
+  /* `conferencia` é o nome ou { nome, parametros }: os parâmetros são os valores da regra (o mínimo, a faixa) que a
+     conferência geral recebe, para a medida da família morar na regra e não no motor que a executa. */
+  const conferencia = plano(r.conferencia) ? r.conferencia.nome : r.conferencia;
+  if (plano(r.conferencia)) {
+    for (const chave of Object.keys(r.conferencia)) if (!['nome', 'parametros'].includes(chave)) recusar(aqui(`conferencia.${chave}`), r.conferencia[chave], 'campo conhecido: nome, parametros');
+    const p = r.conferencia.parametros;
+    if (p !== undefined && (!plano(p) || !dadoSimples(p) || JSON.stringify(p).length > LIMITE_DOS_PARAMETROS)) recusar(aqui('conferencia.parametros'), p, `objeto de números, textos e listas deles, de no máximo ${LIMITE_DOS_PARAMETROS} caracteres em JSON`);
+  }
+  if (r.conferencia !== undefined && (typeof conferencia !== 'string' || !CONFERENCIA.test(conferencia))) recusar(aqui('conferencia'), r.conferencia, 'nome da conferência que mede a regra, em minúsculas e com hífen, ou { "nome", "parametros" } (ou o campo ausente)');
   const origem = lerTextoCurto(r.origem, aqui('origem'), 'de onde a regra veio (pedido da pessoa, atrito, documento)', LIMITE_DA_REGRA);
   if (ABSOLUTO.test(origem)) recusar(aqui('origem'), origem, 'origem sem caminho absoluto');
   return Object.freeze({
     id: r.id, texto, perguntaDoAlinhamento: alinhamento, perguntaDeForma: forma, condicao,
-    ...(r.conferencia === undefined ? {} : { conferencia: r.conferencia }),
+    ...(conferencia === undefined ? {} : { conferencia }),
+    ...(plano(r.conferencia) && r.conferencia.parametros !== undefined ? { parametros: congelarFundo(r.conferencia.parametros) } : {}),
     origem,
   });
 }

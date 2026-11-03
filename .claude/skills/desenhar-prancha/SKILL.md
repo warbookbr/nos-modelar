@@ -150,6 +150,13 @@ a curva pelo meio.
 
 Por vista, o relatório também dá `contornoFechado` e `pontosForaDoContorno`.
 
+Quando a peça tem família em `procedural/criterios/`, declare `familia` na
+especificação: o motor executa as conferências das regras de desenho dela que se
+aplicam às camadas (`tools/modelar/prancha/prancha-conferencias.mjs`), e a regra
+que se aplica sem dados reprova. Os dados de cada uma vão em
+`conferencias.<nome>` e os números em `medidasNomeadas`; o mínimo e as faixas
+moram na regra, no catálogo. O furgão realista é o exemplo.
+
 ## 7. Rodar, ler o relatório, só então olhar
 
 ```bash

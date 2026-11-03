@@ -666,6 +666,46 @@ function camadasDaFaixa(letra = 'F', comCorrer = true) {
 }
 const naFaixaBase = naFaixa;
 
+/* Os dados das conferências das regras de desenho: as linhas que dividem a lateral (frestas das portas, emendas de peça e
+   de cor, a boca dos arcos e o vidro da porta); a saia cortada pelas portas nos dois lados; as pontas da moldura da cor da
+   lataria assentadas no topo da saia e dos para-choques; e o contorno em volta de cada roda, da moldura à peça escura, de
+   um fundo ao outro. */
+const grausDaBorda = (zc, y, lado) => (anguloDaBordaEm(zc, y, lado) * 180) / Math.PI;
+const contornoEmVolta = (zc, nome, frente, tras) => {
+  const { tras: yTras, frente: yFrente } = PONTAS_DA_MOLDURA[zc];
+  const [a0, a1, a2, a3] = [grausDaBorda(zc, FUNDO_DO_ALARGAMENTO, 1), grausDaBorda(zc, yFrente, 1), grausDaBorda(zc, yTras, -1), grausDaBorda(zc, FUNDO_DO_ALARGAMENTO, -1)];
+  const raio = M.arcoRaio + LARGURA_MOLDURA;
+  return {
+    nome, de: a0, ate: a3,
+    trechos: [
+      { peca: frente, de: a0, ate: a1, raio, saida: SAIDA_DA_MOLDURA },
+      { peca: 'moldura da cor da lataria', de: a1, ate: a2, raio, saida: SAIDA_DA_MOLDURA },
+      { peca: tras, de: a2, ate: a3, raio, saida: SAIDA_DA_MOLDURA },
+    ],
+  };
+};
+const faixaDaSaia = (nome, portas, trechos) => ({
+  nome,
+  faixa: { de: saiaEntreOsArcos[0], ate: saiaEntreOsArcos[1], topo: topoDaSaia },
+  aberturas: portas.map((q) => ({ nome: q.nome, de: q.de, ate: q.ate, base: BASE_DAS_PORTAS })),
+  trechos,
+});
+const DADOS_DAS_REGRAS = {
+  divisoes: [{ vista: 'lateral', camadas: ['portaDaCabine', 'portaDeCorrer', 'vidroDaCabine', 'saia', 'parachoqueDianteiroDeLado', 'parachoqueTraseiroDeLado', 'molduraArcoDianteiro', 'molduraArcoTraseiro', 'arcoDianteiro', 'arcoTraseiro'] }],
+  'faixa-cortada-pelas-aberturas': [
+    faixaDaSaia('saia do lado -x', portasNaSaia, TRECHOS_DA_SAIA),
+    faixaDaSaia('saia do lado +x', portasNaSaia.slice(1), TRECHOS_DA_SAIA_MAIS_X),
+  ],
+  'pontas-assentadas': [
+    { vista: 'lateral', camada: 'molduraArcoTraseiro', apoios: ['saia', 'parachoqueTraseiroDeLado'] },
+    { vista: 'lateral', camada: 'molduraArcoDianteiro', apoios: ['saia', 'parachoqueDianteiroDeLado'] },
+  ],
+  'contorno-continuo': [
+    contornoEmVolta(zT, 'roda traseira', 'saia', 'para-choque traseiro'),
+    contornoEmVolta(zD, 'roda dianteira', 'para-choque dianteiro', 'saia'),
+  ],
+};
+
 export const ESPEC = {
   titulo: 'furgao-realista — prancha ortográfica cotada (medidas em mm)',
   subtitulo: 'Furgão médio de teto alto, medidas de classe do alinhamento de 2026-10-30. Derivada da tabela: divergiu, a tabela manda.',
@@ -818,9 +858,18 @@ export const ESPEC = {
     /* o chão, onde as cotas de altura começam */
     { vista: 'lateral', classe: 'eixo', tipo: 'poli', pts: [[zTras, 0], [3200, 0]] },
   ],
-  /* as linhas que dividem a lateral (frestas das portas, emendas de peça e de cor, a boca dos arcos e o vidro da porta)
-     ficam a 30 mm umas das outras, salvo onde se cruzam ou se encontram */
-  divisoes: [{ vista: 'lateral', minimo: 30, camadas: ['portaDaCabine', 'portaDeCorrer', 'vidroDaCabine', 'saia', 'parachoqueDianteiroDeLado', 'parachoqueTraseiroDeLado', 'molduraArcoDianteiro', 'molduraArcoTraseiro', 'arcoDianteiro', 'arcoTraseiro'] }],
+  /* A família da peça: a prancha executa as conferências das regras de desenho de veículo que se aplicam às camadas dela
+     (procedural/criterios/veiculo.json), com os dados abaixo. Os valores das regras (o mínimo, as faixas) moram no
+     catálogo; aqui ficam só as linhas, os trechos e as medidas desta peça. */
+  familia: 'veiculo',
+  conferencias: DADOS_DAS_REGRAS,
+  medidasNomeadas: {
+    colunaDeLado,
+    faixaDeTeto: FAIXA_TETO_PORTA,
+    larguraDoAlargamento: LARGURA_MOLDURA,
+    saidaDoAlargamento: SAIDA_DA_MOLDURA,
+    larguraDoPneu: M.pneuLargura,
+  },
   landmarks: LANDMARKS,
   anotacoes: [
     ...DETALHES.flatMap(({ titulo, letra, linhas, eixo, z0, alto, secao }) => [
