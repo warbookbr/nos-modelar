@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1707 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1708 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1952,8 +1952,9 @@
 
 - `carregar-sessao.js` — carregar-sessao.js — processa o payload de uma sessão ativa (peça ou montagem) para a cena Three.js.
 - `estado-sessao.js` — estado-sessao.js — modelo canônico do estado de trabalho compartilhado entre IA e operador.
+- `montagem-em-dados-acervo.test.js` — montagem-em-dados-acervo.test.js — LENTO (está em `TESTES_LENTOS`: resolve o avião e o braço reais, uns 20 s; o teste rápido, com uma montagem de fixture, é …
 - `montagem-em-dados.js` — montagem-em-dados.js — abre a montagem persistida (`<objeto>/montagem.json`) como modelo da bancada, com as peças nas posições da montagem.
-- `montagem-em-dados.test.js` — montagem-em-dados.test.js — o avião e o braço robótico abrem inteiros pela montagem em dados, com as peças nas posições dela.
+- `montagem-em-dados.test.js` — montagem-em-dados.test.js — uma montagem pequena, de fixture, abre pela montagem em dados com as peças nas posições dela.
 - `registro-de-eventos.js` — registro-de-eventos.js — a memória curta da bancada.
 - `registro-de-eventos.test.js` — registro-de-eventos.test.js — prova que a memória curta da bancada guarda a sequência certa, junta repetição consecutiva e descarta o antigo, não o recente, …
 - `sessao-da-bancada.js` — sessao-da-bancada.js — de onde vem a peça da bancada: a sessão ativa que a IA envia, a peça aberta do acervo, a do catálogo e a entrega que espera quando a p…
