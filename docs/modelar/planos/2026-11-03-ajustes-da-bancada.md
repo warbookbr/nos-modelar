@@ -29,6 +29,8 @@ Ainda em 2026-11-03, a pessoa decidiu ficar com um arranjo só da tela, o da Ban
 9. A bancada fica só com o arranjo Bancada; os temas Foco e Revisão saem, com o seletor de tema.
 10. Ao girar a câmera, o cursor pisca. O controle de órbita avisa `change` a cada quadro (`src/bancada/criar-ambiente.js`), e a cada aviso a bancada reescreve o endereço com a câmera nova por `history.replaceState` (`componentes/endereco.js`), umas 60 vezes por segundo; o navegador passa a frear as trocas de endereço. O endereço passa a ser gravado só quando o giro ou o zoom terminam.
 
+11. A lista da janela "Abrir peça" passa da altura da janela, e as entradas de baixo ficam fora da tela sem como rolar.
+
 ## Resultado
 
 A janela "Abrir" lista cada objeto de várias partes como uma entrada que abre a montagem inteira; a tela perde o diagnóstico e as portas da aba Inspeção, o nome da peça com a luz e a dica de estado; o botão de configurações volta à direita do "Abrir", que mostra sempre o nome.
@@ -48,6 +50,7 @@ A janela "Abrir" lista cada objeto de várias partes como uma entrada que abre a
 - a aba de referência com largura que mostra o botão e os campos inteiros;
 - a saída dos temas Foco e Revisão e do seletor de tema, com a guarda `guarda:temas` ajustada ao arranjo único;
 - o endereço com a câmera gravado só no fim do giro ou do zoom, com teste que conta as escritas durante um arrasto;
+- a janela "Abrir peça" com a lista limitada à altura da tela e rolando por dentro, com o título e o texto fixos no alto e a barra de rolagem visível;
 - as capturas da bancada para a pessoa aprovar por imagem.
 
 ## Excluído
@@ -74,7 +77,7 @@ Se a bancada não conseguir posicionar as peças pela montagem em dados sem um s
 
 ## Andamento
 
-As fatias 1 e 2 foram feitas em 2026-11-03, no mesmo ramo. A janela Abrir lista `aviao` e `braco-robotico` como uma entrada de montagem cada, lida de `montagem.json` pelo leitor da autoria (`sessao/montagem-em-dados.js`, que só carrega as receitas e entrega o resultado à cena), e as partes saem da janela e continuam abrindo pelo nome no endereço. O avião abre sem o motor: a face 3001 da receita `aviao/motor` não fecha em orelhas no adaptador, e a peça sozinha também não abre na bancada; a bancada abre as outras sete instâncias e diz na janela Estado e no aviso qual ficou de fora e por quê, em vez de não abrir. O braço robótico abre inteiro, com as poses da montagem conferidas por teste. Saíram da tela o diagnóstico e as portas da aba Inspeção, o nome da peça com a luz e a dica de estado; as portas passaram a sair pela chave `portas` da ponte da captura, que a guarda das portas lê no lugar do elemento. O botão de configurações voltou à direita do Abrir, com a lista de atalhos dentro; o Abrir mostra o nome em qualquer largura; a legenda das visões foi para o canto de cima da cena, sob a barra flutuante; o painel da direita tem 340 pixels na aba de referência. Os temas Foco e Revisão e o seletor de tema saíram, com a mesa da peça e a referência ao lado, e a `guarda:temas` mede só o arranjo único. O endereço com a câmera passou a ser gravado só no fim do giro ou do zoom (`cena/gravador-da-camera.js`), com teste que conta as escritas. Falta a aprovação das capturas pela pessoa, `npm run gates` e a fatia 3.
+As fatias 1 e 2 foram feitas em 2026-11-03, no mesmo ramo. A janela Abrir lista `aviao` e `braco-robotico` como uma entrada de montagem cada, lida de `montagem.json` pelo leitor da autoria (`sessao/montagem-em-dados.js`, que só carrega as receitas e entrega o resultado à cena), e as partes saem da janela e continuam abrindo pelo nome no endereço. O avião abre sem o motor: a face 3001 da receita `aviao/motor` não fecha em orelhas no adaptador, e a peça sozinha também não abre na bancada; a bancada abre as outras sete instâncias e diz na janela Estado e no aviso qual ficou de fora e por quê, em vez de não abrir. O braço robótico abre inteiro, com as poses da montagem conferidas por teste. Saíram da tela o diagnóstico e as portas da aba Inspeção, o nome da peça com a luz e a dica de estado; as portas passaram a sair pela chave `portas` da ponte da captura, que a guarda das portas lê no lugar do elemento. O botão de configurações voltou à direita do Abrir, com a lista de atalhos dentro; o Abrir mostra o nome em qualquer largura; a legenda das visões foi para o canto de cima da cena, sob a barra flutuante; o painel da direita tem 340 pixels na aba de referência. Os temas Foco e Revisão e o seletor de tema saíram, com a mesa da peça e a referência ao lado, e a `guarda:temas` mede só o arranjo único. O endereço com a câmera passou a ser gravado só no fim do giro ou do zoom (`cena/gravador-da-camera.js`), com teste que conta as escritas. A lista da janela Abrir ganhou altura limitada e rolagem própria, com a barra fina e sempre visível e o título e o texto fixos (1.264 px de lista em 698 px de área, a última entrada alcançável por rolagem e por foco de teclado; captura `07-janela-abrir-rolagem.png`). Falta a aprovação das capturas pela pessoa, `npm run gates` e a fatia 3.
 
 ## Fechamento
 

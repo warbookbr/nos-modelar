@@ -74,4 +74,15 @@ describe('a folha de estilo da bancada', () => {
     expect(css).toMatch(/aba-btn\.ativa\[data-aba="referencias"\]\) \{ --largura-direita: 340px; \}/);
     expect(css).toMatch(/\.painel-inspecao \{ right: 0; width: var\(--largura-direita\)/);
   });
+
+  it('a lista da janela Abrir tem altura limitada e rola por dentro, com a barra visível, e o título e o texto ficam fixos', () => {
+    const lista = css.match(/#menuAbrir #listaAcervo \{[^}]*\}/)?.[0] ?? '';
+    expect(lista).toMatch(/max-height:\s*calc\(100vh - \d+px\)/);
+    expect(lista).toMatch(/overflow-y:\s*scroll/);
+    expect(lista).toMatch(/min-height:\s*0/);
+    expect(css).toMatch(/#menuAbrir #listaAcervo::-webkit-scrollbar-thumb/);
+    expect(css).toMatch(/#menuAbrir \.modal-corpo \{[^}]*flex-direction:\s*column[^}]*overflow:\s*hidden/);
+    expect(css).toMatch(/#menuAbrir \.modal-descricao \{ flex: none; \}/);
+    expect(html).toMatch(/id="menuAbrir"[\s\S]*?<p class="modal-descricao">[\s\S]*?<div id="listaAcervo" class="linhas">/);
+  });
 });

@@ -282,6 +282,23 @@ body.modal-aberto { overflow: hidden; }
   overflow-y: auto;
   scrollbar-width: thin;
 }
+/* A janela Abrir: o título e o texto ficam fixos no alto e só a lista rola, por dentro, na altura que a tela deixa. A barra de
+   rolagem é fina e sempre visível, na cor do traço da bancada, e as entradas são botões, então Tab percorre a lista e leva a
+   entrada focada para dentro da área visível. */
+#menuAbrir .modal-corpo { display: flex; flex-direction: column; gap: 0; overflow: hidden; }
+#menuAbrir .modal-descricao { flex: none; }
+#menuAbrir #listaAcervo {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(100vh - 200px);
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--linha-forte) var(--superficie-2);
+}
+#menuAbrir #listaAcervo::-webkit-scrollbar { width: var(--e2); }
+#menuAbrir #listaAcervo::-webkit-scrollbar-track { background: var(--superficie-2); }
+#menuAbrir #listaAcervo::-webkit-scrollbar-thumb { border-radius: var(--raio-p); background: var(--linha-forte); }
 .modal-barra .modal-descricao { margin: 0 0 var(--e2); line-height: 1.45; }
 .modal-barra .modal-descricao code { padding: 0 var(--e1); border-radius: var(--raio-p); background: var(--superficie-2); }
 .modal-rodape {
