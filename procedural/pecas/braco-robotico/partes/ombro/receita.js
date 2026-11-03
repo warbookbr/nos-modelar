@@ -55,6 +55,8 @@ export const MATERIAIS = { anelEscuro: { cor: '#4a4d52', aspereza: 0.45 } };
 const m = (mm) => mm / 1000;
 /* `n` valores igualmente espaçados estritamente entre `de` e `ate`. */
 const entre = (de, ate, n) => Array.from({ length: n }, (_, k) => de + ((ate - de) * (k + 1)) / (n + 1));
+/* A parte de pé é 0,2 mm mais estreita que a deitada. */
+const folga = 0.0002;
 const ID = { coluna: 100, anel: 200, braco: 300, corpo: 400, concordancia: 500 };
 
 export function derivar(t = TABELA) {
@@ -122,7 +124,6 @@ export function gerarPassos(t = TABELA) {
   const zf = h - m(t.recuoDaFrente);
   /* A parte de pé é 0,2 mm mais estreita que a deitada: paredes coplanares
      quebram a união. */
-  const folga = 0.0002;
   const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rc - 0.003, r - folga), L, zf * (r - folga) / h) });
   /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a frente
      recuada, e termina dentro da parte deitada. */
@@ -174,7 +175,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['material', { usa: 'anelEscuro', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
   passos.push(['publicarPorta', {
     nome: 'apoio', de: { op: 'unir', id: ID.corpo },
-    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: Math.SQRT2 * h, inicio: 0, fim: 0.005 },
+    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: Math.SQRT2 * (h - folga), inicio: 0, fim: 0.005 },
   }]);
   passos.push(['publicarPorta', {
     nome: 'juntaDoOmbro', de: { op: 'lathe', id: ID.anel },
