@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1696 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1702 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1690,6 +1690,7 @@
 - `adaptar-three.test.js` — adaptar-three.test.js — a malha da cena carrega de qual vértice neutro cada posição veio, que é o que permite a edição devolver o movimento à malha.
 - `ajuste-de-junta.js` — ajuste-de-junta.js — arrastar o canto onde as partes se encontram.
 - `ajuste-de-junta.test.js` — ajuste-de-junta.test.js — o gesto do canto: quais juntas a peça tem, o que anda quando a pessoa puxa uma, e se o que ela desenhou cabe numa receita.
+- `alinhamento-por-familia.js` — alinhamento-por-familia.js — as perguntas do alinhamento de uma família de objeto.
 - `alterar-montagem.js` — alterar-montagem.js — alteração semântica compacta de montagem persistida.
 - `alvo-de-cada-operacao.test.js` — alvo-de-cada-operacao.test.js — toda operação de topologia produz alvo que a régua da absorção entende, reproduz e reprova enquanto a receita não mudar.
 - `alvo-do-ajuste.js` — alvo-do-ajuste.js — o que a pessoa deixou na bancada, escrito como medida.
@@ -1772,6 +1773,7 @@
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.
 - `parametros-declarados.test.js` — parametros-declarados.test.js — a pergunta única não adivinha.
 - `parametros-vivos.js` — parametros-vivos.js — separa liberdade DECLARADA de liberdade REAL.
+- `pedidos-da-pessoa.js` — pedidos-da-pessoa.js — os pedidos de alteração que a pessoa fez ao ver uma etapa, e a contagem por etapa.
 - `perguntas-do-critico.js` — perguntas-do-critico.js — as perguntas de forma que o brief do crítico traz depois das cinco fixas.
 - `perguntas-do-critico.test.js` — perguntas-do-critico.test.js — o validador das perguntas de forma, o arquivo de critérios por família de objeto com a condição por pergunta, o teto com recus…
 - `plano-de-modelagem.js` — plano-de-modelagem.js — o que a peça PROMETE ser, escrito antes da geometria.
@@ -1788,6 +1790,7 @@
 - `razoes-da-peca.test.js` — razoes-da-peca.test.js — as razões que a receita declara, medidas na malha da peça executada: a picape de altura 0,29 do comprimento fora da faixa [0,30, 0,4…
 - `refinamento-global.js` — refinamento-global.js — a receita detalhada refina um andaime da forma global N2.
 - `refinamento-global.test.js` — refinamento-global.test.js — a declaração REFINA, as portas do andaime e a conferência contra a peça executada.
+- `regras-de-desenho.test.js` — regras-de-desenho.test.js — o campo `regras` do arquivo de critérios por família (formato, validação, filtro pela condição), o alinhamento por família e os p…
 - `regua-de-portas.js` — regua-de-portas.js — a conta das portas, pura e sem nenhum import.
 - `regua-de-portas.test.js` — regua-de-portas.test.js — a conta das portas que o núcleo e o gate de contato do esboço dividem.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
@@ -2527,8 +2530,11 @@
 - `partes-de-objeto.test.mjs` — partes-de-objeto.test.mjs — um objeto de várias partes é uma pasta com as partes dentro de `partes/`, e cada ferramenta acha a parte pelo nome curto `objeto/…
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
+- `pedidos-da-pessoa.mjs` — pedidos-da-pessoa.mjs — registra os pedidos de alteração da pessoa e conta quantos foram por etapa.
 - `perguntas-da-peca.mjs` — perguntas-da-peca.mjs — as perguntas de forma que o brief do crítico de uma peça traz depois do pacote de imagens.
 - `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
+- `perguntas-do-alinhamento.mjs` — perguntas-do-alinhamento.mjs — as perguntas do alinhamento da família declarada, filtradas pelas partes.
+- `perguntas-do-alinhamento.test.mjs` — perguntas-do-alinhamento.test.mjs — o comando do alinhamento por família e o registro dos pedidos da pessoa, sobre o furgão realista: a prova retroativa de q…
 - `pngjs.d.ts` — pngjs.d.ts — a declaração mínima do `pngjs` para o typecheck dos testes em TypeScript: o pacote não traz tipos, e `capturar-montagem.test.ts` o usa para mont…
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.

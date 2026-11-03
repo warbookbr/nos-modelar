@@ -70,6 +70,12 @@ As regras de desenho de veículo ficam num catálogo em dados que o alinhamento,
 
 Se a migração para a operação de varredura mudar a peça além da tolerância da silhueta, a fatia 3 para e volta à pessoa com a medida. Se as regras forem tantas que o alinhamento fique longo demais para a pessoa, elas passam a ser filtradas pelas partes declaradas no plano da peça antes de virar pergunta.
 
+## Andamento
+
+Fatias 1 e 4 feitas em 2026-11-03, em paralelo à extração das famílias. O formato ficou em `mecanifica.criterios-do-objeto@1`: `regras` é um campo novo e opcional, o arquivo antigo continua válido e dá o mesmo resultado, e `@2` só seria preciso para mudar o sentido de um campo existente. `procedural/criterios/veiculo.json` tem onze regras: as sete da tabela, a das pontas da moldura (atrito 16), a do vidro com interior, a do forro do arco e a da simetria, estas três vindas do alinhamento. Duas regras apontam para conferências que já existem na prancha (`divisoes` e `trechos-da-saia`); a regra do atrito 15 (cadeia de cotas somando o total) é da prancha e não do desenho do veículo, e fica para o fechamento. O comando `tools/modelar/perguntas-do-alinhamento.mjs` imprime as perguntas da família da peça, filtradas pelas partes, e a skill `alinhar-modelagem` o chama; sobre o `PLANO` do `furgao-realista` e sobre o alinhamento de 2026-10-30 ele faz aparecer as sete regras dos sete pedidos (gate 1). A pergunta de forma de cada regra chega ao crítico por `perguntasDaFamiliaDeObjeto`, o mesmo caminho das perguntas da família.
+
+Os pedidos ficam em `pedidos.json` na pasta da peça, sem tocar nas rodadas: `rodada-de-modelagem.mjs <peça> --pedidos [arquivo] [--json]` valida, acrescenta e conta por etapa e por regra. Os sete pedidos da etapa 3 do furgão estão registrados em `procedural/pecas/furgao-realista/pedidos.json` (gate 4). Seguem abertas as fatias 2, 3 e 5.
+
 ## Fechamento
 
 A preencher ao concluir ou cancelar.

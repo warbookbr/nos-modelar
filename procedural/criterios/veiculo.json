@@ -1,31 +1,252 @@
 {
   "formato": "mecanifica.criterios-do-objeto@1",
   "id": "veiculo",
-  "cobre": ["carro de passeio", "picape", "caminhão", "moto", "bicicleta", "carrinho de mão", "carrinho de bebê"],
+  "cobre": [
+    "carro de passeio",
+    "picape",
+    "caminhão",
+    "moto",
+    "bicicleta",
+    "carrinho de mão",
+    "carrinho de bebê"
+  ],
   "perguntas": [
     {
       "texto": "Em que posição ao longo do veículo fica cada roda, e a que peça do quadro ou da carroceria o eixo dela está preso?",
-      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+      "condicao": {
+        "componente": [
+          "roda"
+        ],
+        "forma": [
+          "*roda*",
+          "*pneu*"
+        ]
+      }
     },
     {
       "texto": "Em que nível cada roda toca o chão, e o que sustenta o corpo do veículo sobre ela?",
-      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+      "condicao": {
+        "componente": [
+          "roda"
+        ],
+        "forma": [
+          "*roda*",
+          "*pneu*"
+        ]
+      }
     },
     {
       "texto": "Em qual plano está o círculo de cada roda, e para onde aponta o eixo dela?",
-      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+      "condicao": {
+        "componente": [
+          "roda"
+        ],
+        "forma": [
+          "*roda*",
+          "*pneu*"
+        ]
+      }
     },
     {
       "texto": "Onde ficam as rodas de um mesmo eixo, uma em relação à outra, vistas de frente e de cima?",
-      "condicao": { "componente": ["roda"], "forma": ["*roda*", "*pneu*"] }
+      "condicao": {
+        "componente": [
+          "roda"
+        ],
+        "forma": [
+          "*roda*",
+          "*pneu*"
+        ]
+      }
     },
     {
       "texto": "Onde fica o lugar de quem dirige, pedala ou empurra, e para que lado as partes indicam que o veículo anda?",
-      "condicao": { "forma": ["*assento*", "*banco*", "*selim*", "*guidao*", "*volante*", "*cabine*", "*alca*"] }
+      "condicao": {
+        "forma": [
+          "*assento*",
+          "*banco*",
+          "*selim*",
+          "*guidao*",
+          "*volante*",
+          "*cabine*",
+          "*alca*"
+        ]
+      }
     },
     {
       "texto": "Por onde se entra na cabine ou se carrega a caçamba, e que parte do corpo cobre ou deixa aberta essa passagem?",
-      "condicao": { "forma": ["*cabine*", "*cacamba*", "*porta*"] }
+      "condicao": {
+        "forma": [
+          "*cabine*",
+          "*cacamba*",
+          "*porta*"
+        ]
+      }
+    }
+  ],
+  "regras": [
+    {
+      "id": "coluna-e-faixa-de-teto",
+      "texto": "A coluna dianteira vista de lado e a faixa de chapa entre a porta e o teto têm largura legível a olho, e nenhuma se reduz a uma lasca.",
+      "perguntaDoAlinhamento": "Qual a largura da coluna do para-brisa vista de lado e da faixa de chapa acima da porta?",
+      "perguntaDeForma": "Vista de lado, que largura têm a coluna do para-brisa e a faixa de chapa acima da porta, e cada uma aparece como faixa de chapa ou como lasca?",
+      "condicao": {
+        "forma": [
+          "*carroceria*",
+          "*parabrisa*",
+          "*para-brisa*",
+          "*cabine*",
+          "*coluna*"
+        ]
+      },
+      "origem": "Pedido da pessoa na etapa 3 de um veículo de trabalho, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
+    },
+    {
+      "id": "protecao-com-secao-propria",
+      "texto": "O plástico de proteção (saia, para-choques e molduras de arco) é uma peça com seção própria que sai da lataria, e não uma cor pintada sobre ela.",
+      "perguntaDoAlinhamento": "Qual a seção do plástico de proteção: quanto sai da lataria, como é a borda de cima e como dobra embaixo?",
+      "perguntaDeForma": "Em cada vista, onde o plástico de proteção sai da lataria, e que perfil mostram as bordas de cima e de baixo dele?",
+      "condicao": {
+        "forma": [
+          "*saia*",
+          "*parachoque*",
+          "*moldura*",
+          "*protecao*",
+          "*friso*"
+        ]
+      },
+      "origem": "Pedido da pessoa na etapa 3, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
+    },
+    {
+      "id": "arco-com-alargamento",
+      "texto": "O arco de roda de veículo de trabalho tem um alargamento que sai do painel e se funde a ele, e não é um simples recorte redondo.",
+      "perguntaDoAlinhamento": "O arco tem alargamento saindo do painel, e como ele se funde à lataria?",
+      "perguntaDeForma": "Como o contorno em volta de cada arco se une ao painel vizinho, e onde o alargamento começa e termina?",
+      "condicao": {
+        "forma": [
+          "*arco*",
+          "*moldura*",
+          "*roda*"
+        ]
+      },
+      "origem": "Pedido da pessoa na etapa 3, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
+    },
+    {
+      "id": "alargamento-ao-pneu",
+      "texto": "A largura e a saída do alargamento do arco são dimensionadas pelo pneu, e o alargamento cobre o pneu com folga visível.",
+      "perguntaDoAlinhamento": "Qual a largura e a saída do alargamento do arco, medidas a partir do pneu?",
+      "perguntaDeForma": "Que parte do pneu o alargamento cobre, vista de frente e de lado, e quanto dele sai do painel?",
+      "condicao": {
+        "forma": [
+          "*arco*",
+          "*moldura*",
+          "*pneu*",
+          "*roda*"
+        ]
+      },
+      "origem": "Pedido da pessoa na etapa 3, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
+    },
+    {
+      "id": "contorno-continuo-em-volta-da-roda",
+      "texto": "O contorno em volta da roda é contínuo da lataria ao plástico de proteção, e só a cor muda na passagem.",
+      "perguntaDoAlinhamento": "O contorno do arco continua no plástico de baixo, ou o plástico o interrompe?",
+      "perguntaDeForma": "Onde o contorno em volta de cada roda muda de cor, e ele segue contínuo nessa passagem?",
+      "condicao": {
+        "forma": [
+          "*arco*",
+          "*moldura*",
+          "*saia*",
+          "*parachoque*"
+        ]
+      },
+      "origem": "Pedido da pessoa na etapa 3, em docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
+    },
+    {
+      "id": "linhas-vizinhas-afastadas",
+      "texto": "Linhas vizinhas de fresta, emenda e borda ficam a 30 mm ou mais umas das outras, e nenhuma corre quase colada a outra.",
+      "perguntaDoAlinhamento": "Quais frestas, emendas e bordas passam perto umas das outras, e quais ficam a menos de 30 mm?",
+      "perguntaDeForma": "Quais linhas de fresta, emenda e borda correm quase coladas umas às outras, e em que vista isso aparece?",
+      "condicao": {
+        "forma": [
+          "*porta*",
+          "*saia*",
+          "*moldura*",
+          "*arco*",
+          "*parachoque*",
+          "*carroceria*"
+        ]
+      },
+      "conferencia": "divisoes",
+      "origem": "Atrito 17 de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md, e pedido da pessoa na etapa 3."
+    },
+    {
+      "id": "peca-fixa-nao-cobre-porta",
+      "texto": "Peça fixa não cobre porta: o corte do plástico segue as frestas, e cada porta leva o seu trecho.",
+      "perguntaDoAlinhamento": "Por onde passa o corte da saia em cada porta, e que trecho fixo fica sobre cada uma?",
+      "perguntaDeForma": "Que peça fixa passa por cima de cada porta, e por onde o corte dela segue as frestas?",
+      "condicao": {
+        "forma": [
+          "*porta*",
+          "*saia*"
+        ]
+      },
+      "conferencia": "trechos-da-saia",
+      "origem": "Atrito 14 de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md, e pedido da pessoa na etapa 3."
+    },
+    {
+      "id": "pontas-da-moldura-assentadas",
+      "texto": "As pontas da moldura do arco terminam assentadas na saia e nos para-choques, sem descer abaixo deles.",
+      "perguntaDoAlinhamento": "Onde terminam as pontas da moldura de cada arco, e em que peça elas assentam?",
+      "perguntaDeForma": "Onde terminam as pontas da moldura de cada arco, e elas ficam acima ou abaixo da borda da saia e dos para-choques?",
+      "condicao": {
+        "forma": [
+          "*moldura*",
+          "*arco*"
+        ]
+      },
+      "origem": "Atrito 16 de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md."
+    },
+    {
+      "id": "vidro-com-interior",
+      "texto": "Todo vidro mostra atrás de si um interior simples, e nenhum vão deixa ver o oco do veículo.",
+      "perguntaDoAlinhamento": "Que interior aparece atrás de cada vidro?",
+      "perguntaDeForma": "Que se vê por trás de cada vidro, em cada vista: um interior simples ou o oco do veículo?",
+      "condicao": {
+        "forma": [
+          "*vidro*",
+          "*parabrisa*",
+          "*para-brisa*",
+          "*cabine*"
+        ]
+      },
+      "origem": "Seção dos detalhes de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
+    },
+    {
+      "id": "forro-do-arco",
+      "texto": "O arco tem forro por dentro, a uma folga do pneu, e o pneu não toca nem atravessa o forro.",
+      "perguntaDoAlinhamento": "Qual a folga entre o pneu e o forro do arco?",
+      "perguntaDeForma": "Onde o pneu fica em relação ao forro do arco, e há trecho em que os dois se tocam ou se atravessam?",
+      "condicao": {
+        "forma": [
+          "*arco*",
+          "*forro*",
+          "*pneu*"
+        ]
+      },
+      "origem": "Seções dos detalhes e dos contatos de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
+    },
+    {
+      "id": "lados-iguais",
+      "texto": "Os dois lados do veículo são iguais, exceto onde uma porta ou peça existe só de um lado, e essa exceção está declarada.",
+      "perguntaDoAlinhamento": "Que peças existem só de um lado, e quais são as exceções à simetria?",
+      "perguntaDeForma": "Que diferença há entre o lado esquerdo e o direito, e ela vem de uma porta ou peça declarada?",
+      "condicao": {
+        "forma": [
+          "*esquerd*",
+          "*direit*"
+        ]
+      },
+      "origem": "Critérios de reprovação de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
     }
   ]
 }

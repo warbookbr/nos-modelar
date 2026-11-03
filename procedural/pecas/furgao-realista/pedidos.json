@@ -1,0 +1,48 @@
+{
+  "formato": "mecanifica.pedidos-da-pessoa@1",
+  "peca": "furgao-realista",
+  "pedidos": [
+    {
+      "texto": "Faixa de chapa acima da porta mais alta e coluna do para-brisa mais grossa vista de lado.",
+      "etapa": "3",
+      "regra": "coluna-e-faixa-de-teto",
+      "ondeMora": "procedural/criterios/veiculo.json#coluna-e-faixa-de-teto"
+    },
+    {
+      "texto": "Para-choques, saia e arcos lineares demais: a saia de plástico como peça própria sobre a chapa, com seção que sai da lataria.",
+      "etapa": "3",
+      "regra": "protecao-com-secao-propria",
+      "ondeMora": "procedural/criterios/veiculo.json#protecao-com-secao-propria"
+    },
+    {
+      "texto": "Arco como o da foto de referência, com alargamento saindo do painel.",
+      "etapa": "3",
+      "regra": "arco-com-alargamento",
+      "ondeMora": "procedural/criterios/veiculo.json#arco-com-alargamento"
+    },
+    {
+      "texto": "Alargamento do arco maior, em largura e em saída.",
+      "etapa": "3",
+      "regra": "alargamento-ao-pneu",
+      "ondeMora": "procedural/criterios/veiculo.json#alargamento-ao-pneu"
+    },
+    {
+      "texto": "A curva do arco continuar no plástico de baixo, com o contorno em volta da roda inteiro e só a cor mudando.",
+      "etapa": "3",
+      "regra": "contorno-continuo-em-volta-da-roda",
+      "ondeMora": "procedural/criterios/veiculo.json#contorno-continuo-em-volta-da-roda"
+    },
+    {
+      "texto": "Divisões próximas junto do arco dianteiro estranhas: fresta, emenda e borda coladas.",
+      "etapa": "3",
+      "regra": "linhas-vizinhas-afastadas",
+      "ondeMora": "procedural/criterios/veiculo.json#linhas-vizinhas-afastadas"
+    },
+    {
+      "texto": "A saia passando sobre as portas: as portas continuavam funcionais?",
+      "etapa": "3",
+      "regra": "peca-fixa-nao-cobre-porta",
+      "ondeMora": "procedural/criterios/veiculo.json#peca-fixa-nao-cobre-porta"
+    }
+  ]
+}
