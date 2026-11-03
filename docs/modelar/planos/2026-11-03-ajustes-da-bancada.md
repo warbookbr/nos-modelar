@@ -27,6 +27,7 @@ A pessoa trouxe para cá, no mesmo dia, as duas correções de interface que as 
 Ainda em 2026-11-03, a pessoa decidiu ficar com um arranjo só da tela, o da Bancada, e tirar os temas Foco e Revisão, sem interruptor que os substitua. Com isso o ponto 7 deixa de existir, porque as legendas só cobriam a peça no Foco.
 
 9. A bancada fica só com o arranjo Bancada; os temas Foco e Revisão saem, com o seletor de tema.
+10. Ao girar a câmera, o cursor pisca. O controle de órbita avisa `change` a cada quadro (`src/bancada/criar-ambiente.js`), e a cada aviso a bancada reescreve o endereço com a câmera nova por `history.replaceState` (`componentes/endereco.js`), umas 60 vezes por segundo; o navegador passa a frear as trocas de endereço. O endereço passa a ser gravado só quando o giro ou o zoom terminam.
 
 ## Resultado
 
@@ -46,6 +47,7 @@ A janela "Abrir" lista cada objeto de várias partes como uma entrada que abre a
 - o "Abrir" com o nome visível em qualquer largura de tela em que a barra cabe;
 - a aba de referência com largura que mostra o botão e os campos inteiros;
 - a saída dos temas Foco e Revisão e do seletor de tema, com a guarda `guarda:temas` ajustada ao arranjo único;
+- o endereço com a câmera gravado só no fim do giro ou do zoom, com teste que conta as escritas durante um arrasto;
 - as capturas da bancada para a pessoa aprovar por imagem.
 
 ## Excluído
