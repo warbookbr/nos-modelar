@@ -5,9 +5,10 @@
 **Planos ativos:**
 
 1. [ajustes da bancada](2026-11-03-ajustes-da-bancada.md). Território: `src/bancada/`, `bancada.html`, `src/autoria/adaptar-montagem-three.js`. Em aberto: a fatia 3 e a aprovação das capturas pela pessoa (as fatias 1 e 2 estão feitas).
-2. [regras de desenho por família](2026-11-03-regras-de-desenho-por-familia.md). Território: `procedural/criterios/`, `src/autoria/perguntas-do-critico.js`, `src/autoria/regras-de-desenho.test.js`, `tools/modelar/perguntas-do-alinhamento.mjs`, `tools/modelar/pedidos-da-pessoa.mjs`, `.claude/skills/alinhar-modelagem/`, `procedural/nucleo/gaiola-varrida.js`. Em aberto: as fatias 2, 3 e 5 (as fatias 1 e 4 estão feitas); entra antes da etapa 4 do furgão.
-3. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: a lataria (etapa 4) em diante, depois das regras de desenho.
-4. [visões de conferência na bancada](2026-10-30-visoes-de-conferencia-na-bancada.md). Território: nenhum (aguarda aprovação). Em aberto: a aprovação da pessoa para fechar o plano (as fatias 1 a 7 estão feitas).
+2. [regras de desenho por família](2026-11-03-regras-de-desenho-por-familia.md). Território: `procedural/criterios/`, `src/autoria/perguntas-do-critico.js`, `src/autoria/regras-de-desenho.test.js`, `tools/modelar/perguntas-do-alinhamento.mjs`, `tools/modelar/pedidos-da-pessoa.mjs`, `.claude/skills/alinhar-modelagem/`, `procedural/nucleo/gaiola-varrida.js`. Em aberto: o fechamento (fatia 5); as fatias 1 a 4 estão feitas, com os para-choques do furgão fora da varredura e devolvidos ao backlog.
+3. [descrever rápido](2026-11-03-descrever-rapido.md). Território: `src/autoria/contato-de-solidos.js`, `src/autoria/contatos-da-peca.js`, `src/autoria/descrever-partes.js`, `src/autoria/arvore-de-caixas.js`. Em aberto: a fatia 1, em execução.
+4. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: a lataria (etapa 4) em diante, depois das regras de desenho.
+5. [visões de conferência na bancada](2026-10-30-visoes-de-conferencia-na-bancada.md). Território: nenhum (aguarda aprovação). Em aberto: a aprovação da pessoa para fechar o plano (as fatias 1 a 7 estão feitas).
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

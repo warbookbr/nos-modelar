@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1708 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1709 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -497,6 +497,7 @@
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-10-30-visoes-de-conferencia-na-bancada.md` — Visões de conferência e interface da bancada — arame, raio X, curvatura, zebra e luz rasante em tempo real, num seletor, e a tela reorganizada em torno da pe…
 - `2026-11-03-ajustes-da-bancada.md` — Ajustes da bancada — o objeto abre inteiro e a tela perde o que a pessoa não usa
+- `2026-11-03-descrever-rapido.md` — Descrever rápido — o mesmo resultado em uma fração do tempo
 - `2026-11-03-regras-de-desenho-por-familia.md` — Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
