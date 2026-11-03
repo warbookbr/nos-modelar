@@ -29,7 +29,7 @@ permissions:
 jobs:
   rapidos:
     name: Testes rápidos e conferências
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # O histórico inteiro, com ramos e tags, porque o gate de vazamento
       # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
@@ -172,7 +172,7 @@ jobs:
 
   lentos:
     name: Testes lentos ${{ matrix.parte }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -198,7 +198,7 @@ jobs:
 
   bancada:
     name: Gates da bancada
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # O histórico inteiro, com ramos e tags, porque o gate de vazamento
       # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
@@ -249,7 +249,7 @@ jobs:
 
   acervo:
     name: Acervo, famílias e MCP
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # O histórico inteiro, com ramos e tags, porque o gate de vazamento
       # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
@@ -316,7 +316,7 @@ jobs:
     name: Juntar à main
     needs: [ rapidos, lentos, bancada, acervo ]
     if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/claude/') || startsWith(github.ref, 'refs/heads/envio/'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
