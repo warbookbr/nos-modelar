@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1708 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1715 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -497,6 +497,7 @@
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-10-30-visoes-de-conferencia-na-bancada.md` — Visões de conferência e interface da bancada — arame, raio X, curvatura, zebra e luz rasante em tempo real, num seletor, e a tela reorganizada em torno da pe…
 - `2026-11-03-ajustes-da-bancada.md` — Ajustes da bancada — o objeto abre inteiro e a tela perde o que a pessoa não usa
+- `2026-11-03-descrever-rapido.md` — Descrever rápido — o mesmo resultado em uma fração do tempo
 - `2026-11-03-regras-de-desenho-por-familia.md` — Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -1701,6 +1702,7 @@
 - `alvo-do-ajuste.test.js` — alvo-do-ajuste.test.js — a régua que decide se a receita reescrita chegou onde a pessoa deixou a peça na bancada.
 - `apoio-no-chao.js` — apoio no chão — serviço neutro, sem Three.js.
 - `apoio-no-chao.test.mjs` — O apoio no chão é medido sobre a malha resolvida: a instância declarada toca o plano do chão dentro da tolerância e nenhuma outra passa abaixo dele. Os cubos…
+- `arvore-de-caixas.js` — arvore-de-caixas — a fase ampla do contato de sólidos: uma árvore binária de caixas alinhadas aos eixos sobre uma lista de caixas (uma por triângulo). Serviç…
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…
@@ -1715,9 +1717,11 @@
 - `conferir-articulacao.js` — conferir-articulacao — o curso de uma articulação declarada, conferido contra as malhas de uma montagem resolvida. Serviço neutro, sem Three.js.
 - `conferir-articulacao.test.mjs` — conferir-articulacao.test.mjs — o curso de uma articulação declarada é amostrado e medido contra as peças que ficam. Montagem sintética de caixas e cilindros…
 - `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.
+- `contato-de-solidos-arvore.test.mjs` — contato-de-solidos-arvore.test.mjs — a árvore de caixas como fase ampla da contenção e do cruzamento NÃO muda nenhuma resposta.
 - `contato-de-solidos-canto-colinear.test.mjs` — contato-de-solidos-canto-colinear.test.mjs — o sólido de uma face com canto colinear (o vértice que a booleana deixa no meio de uma aresta, fatia 10 do plano…
 - `contato-de-solidos-em-milimetro.test.mjs` — contato-de-solidos-em-milimetro.test.mjs — o contato de sólidos numa peça de milímetros (a metro por unidade). Três tolerâncias absolutas do módulo deixavam …
 - `contato-de-solidos-equivalencia.test.mjs` — contato-de-solidos-equivalencia.test.mjs — a contenção de ponto e o cruzamento de malhas, depois de os dados de cada triângulo passarem a ser calculados uma …
+- `contato-de-solidos-memoria.test.mjs` — contato-de-solidos-memoria.test.mjs — a memória de auditoria de uma execução do `descrever` reaproveita sólidos e pares sem mudar nenhuma resposta e sem depe…
 - `contato-de-solidos.js` — contato-de-solidos — o núcleo geométrico que decide se dois sólidos se separam, se encostam ou se invadem. Serviço neutro, sem Three.js.
 - `contato-em-plano-inclinado.test.mjs` — contato-em-plano-inclinado.test.mjs — o vidro sobre face inclinada fecha por vértice novo de booleana ou de interseção de perfis, e esse vértice volta a pouc…
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
@@ -1952,8 +1956,9 @@
 
 - `carregar-sessao.js` — carregar-sessao.js — processa o payload de uma sessão ativa (peça ou montagem) para a cena Three.js.
 - `estado-sessao.js` — estado-sessao.js — modelo canônico do estado de trabalho compartilhado entre IA e operador.
+- `montagem-em-dados-acervo.test.js` — montagem-em-dados-acervo.test.js — LENTO (está em `TESTES_LENTOS`: resolve o avião e o braço reais, uns 20 s; o teste rápido, com uma montagem de fixture, é …
 - `montagem-em-dados.js` — montagem-em-dados.js — abre a montagem persistida (`<objeto>/montagem.json`) como modelo da bancada, com as peças nas posições da montagem.
-- `montagem-em-dados.test.js` — montagem-em-dados.test.js — o avião e o braço robótico abrem inteiros pela montagem em dados, com as peças nas posições dela.
+- `montagem-em-dados.test.js` — montagem-em-dados.test.js — uma montagem pequena, de fixture, abre pela montagem em dados com as peças nas posições dela.
 - `registro-de-eventos.js` — registro-de-eventos.js — a memória curta da bancada.
 - `registro-de-eventos.test.js` — registro-de-eventos.test.js — prova que a memória curta da bancada guarda a sequência certa, junta repetição consecutiva e descarta o antigo, não o recente, …
 - `sessao-da-bancada.js` — sessao-da-bancada.js — de onde vem a peça da bancada: a sessão ativa que a IA envia, a peça aberta do acervo, a do catálogo e a entrega que espera quando a p…
@@ -2276,8 +2281,8 @@
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho com…
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `marcadores-de-conflito.test.mjs` — marcadores-de-conflito.test.mjs — nenhum arquivo rastreado guarda marcador de conflito de junção. Em 2026-10-28 uma junção deixou o plano ativo com os marcad…
-- `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.
-- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente e mais de um plano ativo.
+- `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem sobreposição, e que nenhum plano executivo ultrapassa o…
+- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, mais de cinco planos ativos, ativo sem território e territórios…
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
@@ -2658,6 +2663,8 @@
 - `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
 - `guarda-referencial.mjs` — guarda-referencial.mjs — confere que toda peça do acervo usa o MESMO referencial e está apoiada acima do chão.
 - `guarda-temas-e-visoes.mjs` — guarda-temas-e-visoes.mjs — a prova num navegador de verdade dos gates 1 e 6 do plano das visões de conferência e da interface, no arranjo único da bancada.
+- `guarda-tempo-do-descrever.mjs` — guarda-tempo-do-descrever.mjs — o `descrever` da peça mais pesada do acervo cabe no orçamento de tempo.
+- `guarda-tempo-do-descrever.test.mjs` — guarda-tempo-do-descrever.test.mjs — o veredito da guarda de tempo reprova com o número medido e o orçamento, e a medida só vale para uma peça do tamanho que…
 - `rodar-guardas.mjs` — rodar-guardas.mjs — o gate `bancada:guardas`: as guardas que abrem a bancada num navegador só e, quando precisam, num servidor só.
 - `rodar-guardas.test.mjs` — rodar-guardas.test.mjs — o gate `bancada:guardas` roda cada guarda no processo dela, diz o nome e o veredito de cada uma, e a falha de uma não esconde as out…
 
