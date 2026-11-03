@@ -1,6 +1,8 @@
 # Ajustes da bancada — o objeto abre inteiro e a tela perde o que a pessoa não usa
 
-**Estado:** rascunho
+**Estado:** pronto
+
+**Execução:** em paralelo ao plano ativo, autorizada pela pessoa em 2026-11-03.
 
 **Responsável:** a definir
 
@@ -16,6 +18,11 @@ Ao usar a bancada em 2026-11-03, a pessoa apontou seis pontos.
 4. O botão de atalhos de teclado (`btnMenuAtalhos`) tomou o lugar do botão de configurações, que saiu em 2026-09-16 (commit `8e6808f9`). A pessoa quer o botão de configurações de volta, à direita do "Abrir".
 5. O botão "Abrir" (`btnMenuAbrir`) às vezes mostra só o ícone da pasta, sem o nome.
 6. A dica de estado (`dicaEstado`) da barra de estado não serve à pessoa.
+
+A pessoa trouxe para cá, no mesmo dia, as duas correções de interface que as capturas da fatia 8 do [plano das visões](2026-10-30-visoes-de-conferencia-na-bancada.md) acharam:
+
+7. No tema Foco, as legendas da curvatura e da luz rasante cobrem a peça.
+8. No tema Bancada, a aba de referência fica estreita (216 px) e corta o botão e os campos.
 
 ## Resultado
 
@@ -33,6 +40,7 @@ A janela "Abrir" lista cada objeto de várias partes como uma entrada que abre a
 - a saída de `.nome-peca` com a luz de estado e da `dicaEstado`;
 - o botão de configurações de volta, à direita do "Abrir", no lugar do botão de atalhos; a lista de atalhos passa a ser uma seção da janela de configurações;
 - o "Abrir" com o nome visível em qualquer largura de tela em que a barra cabe;
+- as legendas da curvatura e da luz rasante fora da peça no tema Foco, e a aba de referência com largura que mostra o botão e os campos inteiros no tema Bancada;
 - as capturas da bancada para a pessoa aprovar por imagem.
 
 ## Excluído
@@ -43,14 +51,14 @@ A janela "Abrir" lista cada objeto de várias partes como uma entrada que abre a
 ## Gate de saída
 
 1. Na janela "Abrir", `aviao` e `braco-robotico` aparecem como uma entrada cada uma e abrem as peças todas nas posições da montagem, com a árvore de objetos listando as partes.
-2. Os seis pontos conferidos por teste de página e por captura, e aprovados pela pessoa por imagem.
+2. Os oito pontos conferidos por teste de página e por captura, e aprovados pela pessoa por imagem.
 3. Nenhuma guarda de navegador quebra; as que dependiam dos elementos removidos passam a ler o mesmo dado por outro caminho ou saem junto, com o motivo escrito.
 4. `npm run gates` verde.
 
 ## Fatias
 
 1. **Montagem na janela Abrir.** A varredura reconhece `montagem.json`, a entrada abre a montagem inteira, e a prova com o avião e o braço robótico.
-2. **Barra e aba Inspeção.** As remoções, o botão de configurações de volta com os atalhos dentro e o "Abrir" com nome.
+2. **Barra, aba Inspeção e temas.** As remoções, o botão de configurações de volta com os atalhos dentro, o "Abrir" com nome, as legendas fora da peça no Foco e a aba de referência larga no tema Bancada.
 3. **Aprovação e fechamento.** As capturas para a pessoa e o plano movido para `encerrados/`.
 
 ## Riscos e parada
