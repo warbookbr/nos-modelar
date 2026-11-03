@@ -298,7 +298,7 @@ function numeroGeometrico(valor, quem) {
   return JSON.stringify(Object.is(valor, -0) ? 0 : valor);
 }
 
-function cicloCanonicoDaFace(face, neutro, quem) {
+export function cicloCanonicoDaFace(face, neutro, quem) {
   if (!Array.isArray(face.vs) || face.vs.length < 3) {
     throw new Error(`${quem}: face ${face.id} não tem ciclo geométrico válido.`);
   }

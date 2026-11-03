@@ -63,7 +63,11 @@ registro `montagem.etapas.json`. Só a pessoa reabre uma etapa fixa, com
 `npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`;
 a etapa volta a aberta, o aceite e a receita antigos ficam em `reaberturas`, e o
 comando recusa etapa não fixa e etapa com posterior fixa, que se reabre antes,
-da última para a primeira.
+da última para a primeira. O registro guarda de cada etapa fixa a `forma`, a
+assinatura da malha que a receita gerou; comentário, `meta` e `PLANO` que mudam
+sem mudar a malha não quebram a etapa. Quando a malha ou uma junta muda, a etapa
+vira `quebrada` e o aceite que ela tinha vai para `reaberturas`, com o motivo,
+antes de qualquer releitura a levar a aberta.
 
 ## O pacote de referência
 

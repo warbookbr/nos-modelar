@@ -72,7 +72,10 @@ Só a pessoa reabre uma etapa fixa, pelo mesmo critério do aceite humano, com
 A etapa volta a aberta e o aceite e a receita que ela tinha ficam em
 `reaberturas` no registro. O comando recusa sem `--por` completo, etapa que não
 está fixa e etapa que tem posterior fixa ou quebrada; nesse caso reabra da
-última para a primeira, cada uma com o motivo dela.
+última para a primeira, cada uma com o motivo dela. O registro compara a
+`forma` (a malha que a receita gera), e não o texto: comentário e `PLANO` não
+quebram a etapa fixa. A etapa que quebra por forma ou por junta guarda o aceite
+em `reaberturas`, e ler o registro não o apaga.
 
 ## O ciclo de uma etapa
 

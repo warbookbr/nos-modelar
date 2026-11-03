@@ -76,14 +76,50 @@ describe('registro de etapas', () => {
   });
 });
 
-describe('receita que muda depois do aceite', () => {
-  it('a etapa fixa vira quebrada quando a receita muda, mesmo com a junta passando', () => {
-    const medidas = (receita) => [{ instancia: 'base', juntas: [], receita }];
-    const fixado = fixarEtapa(atualizarRegistro('m', medidas('aaa')), 'base', { por: 'pessoa' });
-    expect(atualizarRegistro('m', medidas('aaa'), fixado).etapas[0].estado).toBe('fixa');
-    const mudou = atualizarRegistro('m', medidas('bbb'), fixado);
-    expect(mudou.etapas[0]).toMatchObject({ estado: 'quebrada', motivo: 'a receita mudou depois do aceite' });
-    /* Na leitura seguinte ela reabre, e só volta a fixa com aceite novo. */
-    expect(atualizarRegistro('m', medidas('bbb'), mudou).etapas[0].estado).toBe('aberta');
+describe('forma que muda depois do aceite', () => {
+  const medidas = (forma, textoDaReceita) => [{ instancia: 'base', juntas: [], forma, textoDaReceita }];
+  const fixo = () => fixarEtapa(atualizarRegistro('m', medidas('forma-a', 'texto-1')), 'base', { por: 'pessoa', observacao: 'ok' });
+
+  it('o texto da receita mudar sem a forma mudar não quebra a etapa', () => {
+    const lido = atualizarRegistro('m', medidas('forma-a', 'texto-2'), fixo());
+    expect(lido.etapas[0]).toMatchObject({ estado: 'fixa', forma: 'forma-a', aceite: { por: 'pessoa' } });
+    expect(lido.etapas[0]).not.toHaveProperty('reaberturas');
+  });
+
+  it('a forma mudar quebra a etapa, e o aceite fica em reaberturas pelas leituras seguintes', () => {
+    const quebrada = atualizarRegistro('m', medidas('forma-b', 'texto-2'), fixo());
+    expect(quebrada.etapas[0]).toMatchObject({ estado: 'quebrada', motivo: 'a receita mudou depois do aceite' });
+    expect(quebrada.etapas[0]).not.toHaveProperty('aceite');
+    const guardado = { motivo: 'a receita mudou depois do aceite', forma: 'forma-a', aceite: { por: 'pessoa', observacao: 'ok' } };
+    expect(quebrada.etapas[0].reaberturas).toEqual([expect.objectContaining(guardado)]);
+    /* Na leitura seguinte ela reabre, e o aceite continua no histórico. */
+    const aberta = atualizarRegistro('m', medidas('forma-b', 'texto-2'), quebrada);
+    expect(aberta.etapas[0]).toMatchObject({ estado: 'aberta', forma: 'forma-b' });
+    expect(aberta.etapas[0].reaberturas).toEqual([expect.objectContaining(guardado)]);
+    const outra = atualizarRegistro('m', medidas('forma-b', 'texto-2'), aberta);
+    expect(outra.etapas[0].reaberturas).toHaveLength(1);
+  });
+
+  it('a junta que deixa de passar também guarda o aceite', async () => {
+    let registro = atualizarRegistro('tres-blocos', await medir());
+    for (const id of ['base', 'meio', 'topo']) registro = fixarEtapa(registro, id, aceite);
+    const dado = montagem();
+    dado.vinculos.find((v) => v.id === 'furoDoTopoNoPinoDoMeio').acrescimo = 1;
+    const quebrada = atualizarRegistro('tres-blocos', await medir(dado), registro);
+    const relida = atualizarRegistro('tres-blocos', await medir(dado), quebrada);
+    const reabertas = relida.etapas[2].reaberturas;
+    expect(reabertas).toEqual([expect.objectContaining({ motivo: 'uma junta deixou de passar depois do aceite', aceite })]);
+  });
+
+  it('lê o registro v1: texto igual adota a forma de agora, texto diferente quebra guardando o aceite', () => {
+    const v1 = { formato: 'mecanifica.registro-de-etapas', versao: 1, montagem: 'm', etapas: [
+      { instancia: 'base', estado: 'fixa', juntas: [], aceite: { por: 'pessoa' }, receita: 'texto-1' },
+    ] };
+    const igual = atualizarRegistro('m', medidas('forma-a', 'texto-1'), v1);
+    expect(igual.etapas[0]).toMatchObject({ estado: 'fixa', forma: 'forma-a', aceite: { por: 'pessoa' } });
+    expect(igual.etapas[0]).not.toHaveProperty('receita');
+    const mudou = atualizarRegistro('m', medidas('forma-a', 'texto-2'), v1);
+    expect(mudou.etapas[0]).toMatchObject({ estado: 'quebrada' });
+    expect(mudou.etapas[0].reaberturas[0]).toMatchObject({ aceite: { por: 'pessoa' }, receita: 'texto-1' });
   });
 });

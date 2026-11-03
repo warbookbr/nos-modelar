@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1715 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1716 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1703,6 +1703,7 @@
 - `apoio-no-chao.js` — apoio no chão — serviço neutro, sem Three.js.
 - `apoio-no-chao.test.mjs` — O apoio no chão é medido sobre a malha resolvida: a instância declarada toca o plano do chão dentro da tolerância e nenhuma outra passa abaixo dele. Os cubos…
 - `arvore-de-caixas.js` — arvore-de-caixas — a fase ampla do contato de sólidos: uma árvore binária de caixas alinhadas aos eixos sobre uma lista de caixas (uma por triângulo). Serviç…
+- `assinatura-da-forma.js` — assinatura-da-forma.js — a impressão do que uma receita gera, para a etapa fixa saber se a peça que a pessoa aceitou continua a mesma.
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…
