@@ -1,6 +1,6 @@
 # Descrever rápido — o mesmo resultado em uma fração do tempo
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `src/autoria/contato-de-solidos.js`, `src/autoria/contatos-da-peca.js`, `src/autoria/descrever-partes.js`, `src/autoria/arvore-de-caixas.js`
 
@@ -51,6 +51,10 @@ O `descrever` dá exatamente o mesmo resultado de hoje em uma fração do tempo,
 
 Se qualquer resultado do `descrever` mudar, a mudança para e volta com a diferença medida.
 
+## Andamento
+
+As fatias 1 e 2 foram feitas em 2026-11-03, no commit `fe06d755`. A árvore de caixas (`src/autoria/arvore-de-caixas.js`) é a fase ampla de `pontoDentroMalha`, e `criarMemoriaDeAuditoria` em `contato-de-solidos.js` faz cada par de partes ser auditado uma vez por execução, servindo a `descreverPeca` e a `contatosDaPeca`. O `descrever` do `furgao-realista` caiu de 904,9 s para 60,9 s com a saída idêntica linha a linha, e a bateria completa do mesmo dia mediu 49,4 s. A guarda `npm run guarda:tempo` (`tools/modelar/guardas/guarda-tempo-do-descrever.mjs`) roda no CI com o orçamento de 180 s, três vezes o tempo medido, e o teste dela reprova o tempo acima do orçamento, a peça que encolheu e a medida que não saiu.
+
 ## Fechamento
 
-A preencher ao concluir ou cancelar.
+Concluído em 2026-11-03, a pedido da pessoa, com os quatro gates de saída cumpridos: o mesmo resultado em menos de um sétimo do tempo, a equivalência provada, a guarda de tempo no CI e a bateria verde. O que sobra de lentidão no furgão está na execução da receita, e não no `descrever`: o retrato da procedência do núcleo, que está no backlog e que a pessoa decidiu corrigir depois da etapa 4 do furgão.

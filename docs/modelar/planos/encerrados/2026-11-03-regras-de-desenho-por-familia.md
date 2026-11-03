@@ -1,6 +1,6 @@
 # Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/criterios/`, `src/autoria/perguntas-do-critico.js`, `src/autoria/regras-de-desenho.test.js`, `tools/modelar/perguntas-do-alinhamento.mjs`, `tools/modelar/pedidos-da-pessoa.mjs`, `.claude/skills/alinhar-modelagem/`, `procedural/nucleo/gaiola-varrida.js`
 
@@ -10,7 +10,7 @@
 
 ## Problema observado
 
-Na etapa 3 do [furgão realista](2026-10-30-furgao-realista.md), a pessoa pediu sete correções depois de ver as imagens, e cada uma custou um ciclo de prancha, modelo e crítico cego. Nenhuma é própria daquele furgão: todas são regras de como um veículo real é desenhado, e nenhuma estava no alinhamento, na prancha ou nas perguntas do crítico. O crítico não apontou nenhuma, porque compara o modelo com a prancha, e a prancha carregava os mesmos palpites. Os registros estão no [alinhamento](../banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md) e nos atritos 14 a 17 do [registro de atritos](../banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md).
+Na etapa 3 do [furgão realista](../2026-10-30-furgao-realista.md), a pessoa pediu sete correções depois de ver as imagens, e cada uma custou um ciclo de prancha, modelo e crítico cego. Nenhuma é própria daquele furgão: todas são regras de como um veículo real é desenhado, e nenhuma estava no alinhamento, na prancha ou nas perguntas do crítico. O crítico não apontou nenhuma, porque compara o modelo com a prancha, e a prancha carregava os mesmos palpites. Os registros estão no [alinhamento](../../banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md) e nos atritos 14 a 17 do [registro de atritos](../../banco-de-provas/furgao-realista-2026-10-30/ATRITOS.md).
 
 | Pedido da pessoa | Regra de veículo que faltava |
 |---|---|
@@ -33,9 +33,9 @@ As regras de desenho de veículo ficam num catálogo em dados que o alinhamento,
 - **Catálogo de regras (ENVOLVER):** o `procedural/criterios/<família>.json` já existe e já leva perguntas ao crítico; ele ganha a lista `regras`, cada uma com a pergunta do alinhamento, a pergunta de forma do crítico e, quando houver medida, o nome da conferência que a cobra. Uma fonte só evita três listas que divergem.
 - **Skill de alinhamento (REFATORAR):** a `alinhar-modelagem` passa a ler as regras da família declarada e a pôr cada uma como pergunta, sem lista escrita na própria skill; objeto sem família usa um conjunto genérico curto.
 - **Conferências da prancha (USAR DIRETO):** a distância mínima entre linhas (`divisoes`) e o corte da saia pelas portas já existem no motor e na especificação; as regras que têm medida apontam para elas.
-- **Operação de varredura (REFATORAR):** a seção varrida ao longo da lataria e o alargamento de arco saem da receita do furgão para uma operação geral do núcleo que varre uma seção dada ao longo de um caminho dado, com estações, borda rolada e pontas cortadas numa altura; a fresta que contorna o arco vira parâmetro da lataria. O modelador mostrou em 2026-11-03 que o [contrato da família](../CONTRATO-DA-FAMILIA.md) não carrega essas malhas (parâmetro sem lista, receita sem como chamar família no meio dos passos, continuação do alargamento na malha da saia), e a pessoa escolheu a operação geral no mesmo dia.
+- **Operação de varredura (REFATORAR):** a seção varrida ao longo da lataria e o alargamento de arco saem da receita do furgão para uma operação geral do núcleo que varre uma seção dada ao longo de um caminho dado, com estações, borda rolada e pontas cortadas numa altura; a fresta que contorna o arco vira parâmetro da lataria. O modelador mostrou em 2026-11-03 que o [contrato da família](../../CONTRATO-DA-FAMILIA.md) não carrega essas malhas (parâmetro sem lista, receita sem como chamar família no meio dos passos, continuação do alargamento na malha da saia), e a pessoa escolheu a operação geral no mesmo dia.
 - **Registro de pedidos (ENVOLVER):** a ferramenta de rodada ganha o campo dos pedidos da pessoa, com o pedido, a regra que faltou e onde ela passou a morar, e conta os pedidos por etapa.
-- **Priors de proporção (ADIAR):** as faixas medidas em veículos reais entram como valores das regras quando houver; o [dossiê de priors por família](../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md) segue como direção, fora deste plano.
+- **Priors de proporção (ADIAR):** as faixas medidas em veículos reais entram como valores das regras quando houver; o [dossiê de priors por família](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md) segue como direção, fora deste plano.
 
 ## Incluído
 
@@ -105,4 +105,4 @@ A regra das pontas não tem prancha antiga que a reprove: as pontas penduradas e
 
 ## Fechamento
 
-A preencher ao concluir ou cancelar.
+Concluído em 2026-11-03, a pedido da pessoa, com as fatias 1 a 4 feitas e os cinco gates de saída cumpridos. A pergunta de cada regra chega ao alinhamento e ao crítico, as seis regras com medida reprovam as pranchas antigas do furgão onde a pessoa pediu correção e passam na aprovada, a varredura gera as saias e as molduras do furgão com a mesma geometria e o acervo igual, e os pedidos da pessoa são contados por etapa. Dois pontos foram ao backlog: os para-choques na varredura, que pedem seção variando ao longo do trilho, e a regra da cadeia de cotas que soma o total (atrito 15), que é da prancha e não do desenho do veículo.

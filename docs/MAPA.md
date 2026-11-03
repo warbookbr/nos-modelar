@@ -496,8 +496,6 @@
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
-- `2026-11-03-descrever-rapido.md` — Descrever rápido — o mesmo resultado em uma fração do tempo
-- `2026-11-03-regras-de-desenho-por-familia.md` — Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -628,6 +626,8 @@
 - `2026-10-30-interface-da-bancada.md` — Interface da bancada — a tela organizada em torno da peça, sobre um sistema visual único, com a forma escolhida pela pessoa por imagem
 - `2026-10-30-visoes-de-conferencia-na-bancada.md` — Visões de conferência e interface da bancada — arame, raio X, curvatura, zebra e luz rasante em tempo real, num seletor, e a tela reorganizada em torno da pe…
 - `2026-11-03-ajustes-da-bancada.md` — Ajustes da bancada — o objeto abre inteiro e a tela perde o que a pessoa não usa
+- `2026-11-03-descrever-rapido.md` — Descrever rápido — o mesmo resultado em uma fração do tempo
+- `2026-11-03-regras-de-desenho-por-familia.md` — Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -2677,7 +2677,7 @@
 - `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
 - `prancha-referencia.mjs` — prancha-referencia.mjs — lê uma prancha rasterizada de referência, calibra pixel→milímetro por duas medidas conhecidas e extrai a silhueta como polilinha em …
 - `prancha-referencia.test.mjs` — Testes do leitor de referência: decodificação PNG sem dependência, calibração por rodas, simplificação e comparação de silhueta. A prancha real não vive no r…
-- `prancha-regras.test.mjs` — As regras de desenho da família ligadas às conferências da prancha (fatia 2 do plano docs/modelar/planos/2026-11-03-regras-de-desenho-por-familia.md). A prov…
+- `prancha-regras.test.mjs` — As regras de desenho da família ligadas às conferências da prancha (fatia 2 do plano docs/modelar/planos/encerrados/2026-11-03-regras-de-desenho-por-familia.…
 - `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…
 - `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
 

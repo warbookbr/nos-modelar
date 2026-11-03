@@ -1,5 +1,5 @@
 /* As regras de desenho da família ligadas às conferências da prancha (fatia 2 do plano
-   docs/modelar/planos/2026-11-03-regras-de-desenho-por-familia.md). A prova do gate 2: cada regra medida reprova a prancha
+   docs/modelar/planos/encerrados/2026-11-03-regras-de-desenho-por-familia.md). A prova do gate 2: cada regra medida reprova a prancha
    antiga do furgão realista no ponto em que a pessoa pediu correção e passa na prancha atual. As antigas entram como dados
    mínimos tirados das especificações do histórico do git (tools/modelar/fixtures/regras-de-desenho/), sem imagem. */
 import { readFileSync } from 'node:fs';
