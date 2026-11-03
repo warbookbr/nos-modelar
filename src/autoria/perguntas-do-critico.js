@@ -197,12 +197,13 @@ export function regrasDaFamilia(criterios, presentes = null) {
   return (criterios.regras ?? []).filter((r) => presentes === null || condicaoVale(r.condicao, presentes));
 }
 
-/* As perguntas de uma família de objeto que entram, na ordem em que o arquivo as escreve: as perguntas da família e, depois, a pergunta
-   de forma de cada regra de desenho cuja condição vale. */
-export function perguntasDaFamiliaDeObjeto(criterios, presentes) {
+/* As perguntas de uma família de objeto que entram, na ordem em que o arquivo as escreve: as perguntas da família e, com `comRegras`,
+   depois delas a pergunta de forma de cada regra de desenho cuja condição vale. As regras falam do detalhe da peça modelada (frestas,
+   alargamento, coluna), e por isso entram só no brief da peça; o esboço, que é blocagem, recebe só as perguntas da família. */
+export function perguntasDaFamiliaDeObjeto(criterios, presentes, { comRegras = false } = {}) {
   return juntarPerguntas(
     criterios.perguntas.filter((p) => condicaoVale(p.condicao, presentes)).map((p) => p.texto),
-    regrasDaFamilia(criterios, presentes).map((r) => r.perguntaDeForma),
+    comRegras ? regrasDaFamilia(criterios, presentes).map((r) => r.perguntaDeForma) : [],
   );
 }
 
@@ -228,6 +229,6 @@ export function linhasDasPerguntas(fixas, especificas, recuo = '  ') {
 export function perguntasDaPeca(plano, { criterios = null, perguntasDaFamilia = null } = {}) {
   const componente = juntarPerguntas(...Object.values(perguntasDaFamilia ?? {}));
   const nomes = (plano?.partes ?? []).map((p) => p.nome);
-  const familia = criterios === null ? [] : perguntasDaFamiliaDeObjeto(criterios, { componentes: nomes, formas: nomes });
+  const familia = criterios === null ? [] : perguntasDaFamiliaDeObjeto(criterios, { componentes: nomes, formas: nomes }, { comRegras: true });
   return { componente, familia, todas: juntarPerguntas(componente, familia) };
 }

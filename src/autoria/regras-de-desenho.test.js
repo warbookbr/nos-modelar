@@ -43,8 +43,10 @@ describe('as regras de desenho da família', () => {
     const lido = lerCriterios(comRegras(regra()));
     expect(Object.isFrozen(lido.regras)).toBe(true);
     expect(lido.regras[0]).toMatchObject({ id: 'porta-visivel', conferencia: 'fresta-da-porta' });
-    expect(perguntasDaFamiliaDeObjeto(lido, { formas: ['portaDireita'] })).toEqual(['De que lado fica a porta?', 'Onde a fresta de cada porta fecha a volta, e em que trecho ela some?']);
-    expect(perguntasDaFamiliaDeObjeto(lido, { formas: ['teto'] })).toEqual([]);
+    expect(perguntasDaFamiliaDeObjeto(lido, { formas: ['portaDireita'] }, { comRegras: true })).toEqual(['De que lado fica a porta?', 'Onde a fresta de cada porta fecha a volta, e em que trecho ela some?']);
+    // sem `comRegras` (o brief do esboço, que é blocagem) só entram as perguntas da família
+    expect(perguntasDaFamiliaDeObjeto(lido, { formas: ['portaDireita'] })).toEqual(['De que lado fica a porta?']);
+    expect(perguntasDaFamiliaDeObjeto(lido, { formas: ['teto'] }, { comRegras: true })).toEqual([]);
   });
 
   it('a conferência é opcional', () => {
