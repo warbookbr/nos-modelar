@@ -7,11 +7,11 @@
       "instancia": "base",
       "estado": "fixa",
       "juntas": [],
+      "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e",
       "aceite": {
         "por": "pessoa",
         "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
-      },
-      "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e"
+      }
     },
     {
       "instancia": "anelCintura",
@@ -28,8 +28,8 @@
             "sobreposicaoRadial": 0.009999999999999995,
             "sobreposicaoAxial": 0,
             "separacaoAxial": 0,
-            "tolerancia": 1e-06,
-            "toleranciaNumerica": 1e-06,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
             "radialEsperado": {
               "minimo": 0.01,
               "maximo": 0.01,
@@ -60,15 +60,15 @@
           }
         }
       ],
+      "forma": "sha256:bfd1572c7750f72867a686ab7501aa807341d42e7a3cda1b901d5047cf9d76c2",
       "aceite": {
         "por": "pessoa",
         "observacao": "aceitou a rodada 2: faixa única de 25 mm"
-      },
-      "forma": "sha256:bfd1572c7750f72867a686ab7501aa807341d42e7a3cda1b901d5047cf9d76c2"
+      }
     },
     {
       "instancia": "ombro",
-      "estado": "fixa",
+      "estado": "quebrada",
       "juntas": [
         {
           "relacao": "ombroSentaNoAnel",
@@ -81,8 +81,8 @@
             "sobreposicaoRadial": 0.009999999999999995,
             "sobreposicaoAxial": 0,
             "separacaoAxial": 0,
-            "tolerancia": 1e-06,
-            "toleranciaNumerica": 1e-06,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
             "radialEsperado": {
               "minimo": 0.01,
               "maximo": 0.01,
@@ -113,7 +113,8 @@
           }
         }
       ],
-      "forma": "sha256:d6c4b94a6c0b60269cca6e07375e60633077b7dd3fe87b0038ae6abc4376c4da",
+      "forma": "sha256:8f764cd79b64d6554434f64c49ae5436403915cbca76fa8936b3c36d0eb13f5b",
+      "motivo": "a receita mudou depois do aceite",
       "reaberturas": [
         {
           "por": "pessoa",
@@ -141,16 +142,21 @@
             ]
           },
           "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "a pessoa, 2026-09-29: aceitou olhando as vistas o ombro de coluna unida ao braço, canto reto e fim redondo no anel",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 8.",
+              "colar: uniao em borda superior do colar, na junção com a base do corpo",
+              "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
+            ]
+          },
+          "forma": "sha256:d6c4b94a6c0b60269cca6e07375e60633077b7dd3fe87b0038ae6abc4376c4da"
         }
-      ],
-      "aceite": {
-        "por": "a pessoa, 2026-09-29: aceitou olhando as vistas o ombro de coluna unida ao braço, canto reto e fim redondo no anel",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 8.",
-          "colar: uniao em borda superior do colar, na junção com a base do corpo",
-          "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
-        ]
-      }
+      ]
     }
   ]
 }
