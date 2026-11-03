@@ -138,7 +138,7 @@ describe('cada conferência reprova quando o que ela guarda muda', () => {
     roda.fonte.perfil = 'inexistente';
     const r = conferirConjunto({ conjunto: c, so: 'c02' });
     expect(codigos(r)).toEqual(['fonte-nao-reproduz']);
-    expect(r.problemas[0].mensagem).toMatch(/não declara o perfil 'inexistente'; os perfis são: bicicleta, carrinho-de-mao, carro, carroca, rodizio, trator, trem/);
+    expect(r.problemas[0].mensagem).toMatch(/não declara o perfil 'inexistente'; os perfis são: bicicleta, carrinho-de-mao, carro, carroca, furgao-235-65-r16, rodizio, trator, trem/);
   });
 
   it('a fonte que viola restrição sem nomeá-la, ou nomeia a que não viola, não se reproduz', () => {
