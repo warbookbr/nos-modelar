@@ -1,12 +1,11 @@
 # Visões de conferência e interface da bancada — arame, raio X, curvatura, zebra e luz rasante em tempo real, num seletor, e a tela reorganizada em torno da peça sobre um sistema visual único
 
-**Estado:** ativo
+**Estado:** concluído
 
-**Território:** nenhum (aguarda aprovação)
 
 **Responsável:** Claude, com a pessoa aprovando o seletor e cada visão por imagem
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [glossário e entrada para pessoas](encerrados/2026-10-30-glossario-e-entrada-para-pessoas.md); absorveu em 2026-10-30 o rascunho da [interface da bancada](encerrados/2026-10-30-interface-da-bancada.md), e o [furgão realista](2026-10-30-furgao-realista.md) ativa depois deste
+**Repositório e base:** `warbookbr/nos-modelar`, main depois do fechamento do plano [glossário e entrada para pessoas](2026-10-30-glossario-e-entrada-para-pessoas.md); absorveu em 2026-10-30 o rascunho da [interface da bancada](2026-10-30-interface-da-bancada.md), e o [furgão realista](../2026-10-30-furgao-realista.md) ativa depois deste
 
 ## Problema observado
 
@@ -65,7 +64,7 @@ As imagens das guardas da bancada e da `vistas:critica` saem iguais às de antes
 3. **Interface no mesmo plano.** Aprovada em 2026-10-30: a pessoa pediu para fazer a reestruturação da interface neste plano, começando já, com agentes em Opus.
 4. **Proposta de tela.** Aprovada em 2026-10-30, depois de ver as três propostas desenhadas: as três viram temas que a pessoa escolhe na bancada, com a escolha lembrada entre sessões; Bancada é a proposta A (escura, painéis fixos), Foco é a proposta B (clara, a peça na tela inteira, painéis flutuantes) e Revisão é a proposta C (a peça e a referência lado a lado com a mesma câmera, e a opção de sobrepor com transparência). O Foco é o tema padrão. Os três temas usam os mesmos componentes e o mesmo estado, e um tema só decide a aparência e onde cada componente fica. O Revisão não tem a faixa de decisão da proposta C (veredito do crítico, medidas e botões de aceite), porque a pessoa recebe o veredito e decide conversando com o agente, e repetir isso na bancada seria uma segunda fonte. O agrupamento da árvore das partes que as propostas A e C desenham não existe nas receitas, que listam as partes sem grupo; a árvore fica plana, e os grupos ficam para decidir depois.
 
-5. **Furgão realista em paralelo.** Aprovada em 2026-10-30: a pessoa abriu uma exceção para adiantar as fatias do plano do [furgão realista](2026-10-30-furgao-realista.md) (alinhamento, cópia, prancha e modelagem) enquanto este plano termina, para não esperar; o furgão continua em rascunho até este fechar, e o trabalho dele fica autorizado por esta decisão, sem segundo plano ativo.
+5. **Furgão realista em paralelo.** Aprovada em 2026-10-30: a pessoa abriu uma exceção para adiantar as fatias do plano do [furgão realista](../2026-10-30-furgao-realista.md) (alinhamento, cópia, prancha e modelagem) enquanto este plano termina, para não esperar; o furgão continua em rascunho até este fechar, e o trabalho dele fica autorizado por esta decisão, sem segundo plano ativo.
 
 ## Riscos e parada
 
@@ -84,3 +83,7 @@ Os dois achados da bancada publicada estão resolvidos. O Wireframe do painel de
 A fatia 8 está em curso em 2026-11-01, e a pessoa ainda não aprovou nada por imagem. As capturas dos três temas e das seis visões, na mesma peça e na mesma janela de 1400 por 900, foram feitas para ela aprovar. A prova que os testes sobre a página falsa não alcançavam passou a ser uma guarda num navegador de verdade, `guarda:temas`, que roda dentro de `bancada:guardas`: na carenagem de prova, cada uma das cinco visões que não são a sólida muda de 16% a 36% dos pixels da região da peça em relação à sólida, a zebra e a luz rasante mudam em 23% e 25% quando a câmera gira, e voltar à sólida devolve a imagem de antes com 0,00% de diferença; a cena ocupa 100% da largura no Foco, 70,6% na Bancada (988 de 1400) e 82,9% no Revisão (1160 de 1400, a peça mais a referência), e nada transborda para os lados em 1400 nem em 1100 pixels. A conferência também corrigiu a dica da barra de estado, que o tema Foco cortava no meio da palavra e que agora termina em reticências. Não foram medidos em imagem o contraste do amassado na zebra e na luz rasante contra a mesma região sem o amassado (o gate 3 só tem a escolha da luz provada por conta, sobre as normais da chapa de prova) nem o estado "carregando" dos controles; a documentação da bancada foi conferida contra o código e corrigida onde divergia; faltam a aprovação da pessoa, `npm run gates -- --completo` e o plano movido para `encerrados/`.
 
 Em 2026-11-03 a pessoa levou ao plano de [ajustes da bancada](2026-11-03-ajustes-da-bancada.md) as duas correções de interface que as capturas da fatia 8 acharam: as legendas da curvatura e da luz rasante que cobrem a peça no tema Foco, e a aba de referência estreita (216 px) no tema Bancada. Este plano fica à espera só da aprovação das capturas pela pessoa, da bateria completa e do fechamento. No mesmo dia a pessoa decidiu ficar só com o arranjo Bancada e tirar os temas Foco e Revisão, o que também é feito no plano de ajustes; a aprovação das capturas passa a ser nesse arranjo único.
+
+## Fechamento
+
+Concluído em 2026-11-03, com as seis visões e a bancada no arranjo único aprovadas pela pessoa por imagem; os temas Foco e Revisão saíram pela decisão dela no plano de [ajustes da bancada](2026-11-03-ajustes-da-bancada.md), que também corrigiu as legendas sobre a peça e a aba de referência estreita. A bateria completa (`npm run gates -- --completo`) rodou em 2026-11-03 sobre o commit `56fd1400` e deu 28 de 29 gates verdes. Os dois testes lentos que falharam passaram sozinhos em seguida: a captura de tela do brief do esboço, recusada pelo navegador com a máquina carregada, e a varredura do acervo real, que levou 101 s contra o teto de 88 s porque a execução do furgão realista custa 42 s, o que foi ao backlog. O CI, que estava parado desde 2026-10-31 pela troca do sistema das máquinas, rodou a lista inteira verde no commit `006151d8` e levou a main e a página a ele. Do gate de saída ficaram sem prova o contraste do amassado na zebra e na luz rasante (gate 3) e o estado "carregando" dos controles, que foram ao backlog.

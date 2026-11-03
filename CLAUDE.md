@@ -39,7 +39,8 @@ dele. `npm run comecar -- <roteiro>` (ou a ferramenta MCP
 - Ao reportar à pessoa, traga um sumário breve do que foi feito, sem termos
   internos, e diga se algo depende da decisão dela, sempre com a recomendação.
 - Rode `npm run gates` antes de enviar; o pesado fica para o CI, que só junta à
-  main com tudo verde. Agente despachado não o roda.
+  main com tudo verde, e confira o CI do envio até a main andar. Agente
+  despachado não o roda.
 - Todo achado responde se o processo o teria pego sozinho. Quando não, o que
   falta vira gate, campo ou instrução antes de a correção ser dada por pronta.
 - Histórico e evidências encerradas não governam trabalho novo, nem por citação

@@ -72,7 +72,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: [ajustes da bancada](docs/modelar/planos/2026-11-03-ajustes-da-bancada.md), [regras de desenho por família](docs/modelar/planos/2026-11-03-regras-de-desenho-por-familia.md), [descrever rápido](docs/modelar/planos/2026-11-03-descrever-rapido.md), [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md) e [visões de conferência na bancada](docs/modelar/planos/2026-10-30-visoes-de-conferencia-na-bancada.md).
+Planos ativos: [regras de desenho por família](docs/modelar/planos/2026-11-03-regras-de-desenho-por-familia.md), [descrever rápido](docs/modelar/planos/2026-11-03-descrever-rapido.md) e [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md).
 
 Já fecharam [ajustes no núcleo dos veículos](docs/modelar/planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](docs/modelar/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos
