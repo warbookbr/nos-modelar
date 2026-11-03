@@ -5,7 +5,8 @@
   "instancias": [
     { "id": "base", "alvo": { "tipo": "peca", "ref": "braco-robotico/base" } },
     { "id": "anelCintura", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-cintura" } },
-    { "id": "ombro", "alvo": { "tipo": "peca", "ref": "braco-robotico/ombro" } }
+    { "id": "ombro", "alvo": { "tipo": "peca", "ref": "braco-robotico/ombro" } },
+    { "id": "braco", "alvo": { "tipo": "peca", "ref": "braco-robotico/braco" } }
   ],
   "relacoes": [
     {
@@ -31,7 +32,7 @@
       }
     }
   ],
-  "etapas": ["base", "anelCintura", "ombro"],
+  "etapas": ["base", "anelCintura", "ombro", "braco"],
   "vinculos": [
     {
       "id": "anelComORaioDaBase",
@@ -44,6 +45,13 @@
       "id": "colarComORaioDoAnel",
       "alvo": { "instancia": "ombro", "param": "raioDoPescoco" },
       "de": { "instancia": "anelCintura", "porta": "topo", "medida": "raioExterno" },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "juntaComORaioDoAnel",
+      "alvo": { "instancia": "braco", "param": "raioDaJunta" },
+      "de": { "instancia": "ombro", "porta": "juntaDoOmbro", "medida": "raio" },
       "unidade": "mm",
       "acrescimo": 0
     }
@@ -62,6 +70,14 @@
       "instancia": "ombro",
       "porta": "apoio",
       "em": { "instancia": "anelCintura", "porta": "topo" },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "bracoNaJuntaDoOmbro",
+      "instancia": "braco",
+      "porta": "juntaNoOmbro",
+      "em": { "instancia": "ombro", "porta": "juntaDoOmbro" },
       "unidade": "mm",
       "afastamento": 0
     }
