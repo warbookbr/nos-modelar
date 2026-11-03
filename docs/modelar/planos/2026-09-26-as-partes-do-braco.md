@@ -77,6 +77,8 @@ Em 2026-11-03 a pessoa abriu o braço na bancada e apontou que o ombro não est�
 
 No mesmo dia a pessoa escolheu a opção B (seção de 190 mm, eixo a 115 mm, topo a 210 mm sobre o anel da cintura) e pediu, na mesma rodada, o encontro entre a parte de pé e a deitada sem a quina e os degraus de sombra que ela viu na bancada; a decisão está no `ALINHAMENTO.md` do braço. Duas correções de ferramenta entram no plano porque o ombro as revelou. A luz rasante só era obrigatória no pacote do crítico da peça de lataria, e as marcas do encontro passaram por oito rodadas sem ela; passa a valer também para a peça com sombreamento suave sobre uma emenda de fusão. E `npm run etapas`, ao só ler o estado, derrubou as três etapas fixas e apagou os aceites da base e do anel, porque compara o texto da receita, e o texto mudou em 2026-10-28 com a retirada das referências de terceiros sem mudar a forma; a etapa passa a comparar o que a receita gera e a guardar o aceite de quem quebrou.
 
+O ombro foi refeito em 2026-11-03 em três rodadas (9 a 11). A rodada 9 tirou o degrau em L e foi descartada pela pessoa; a 10 e a 11 voltaram ao desenho aceito em 2026-09-29, no tamanho B e com a saída redonda na largura do bloco, e a passagem do bloco para o círculo misturada ponto a ponto. A pessoa viu também o bloco cheio da rodada 9 corrigido em imagem e ficou com o desenho em L, e aceitou a rodada 11 com as duas marcas de acabamento que o crítico apontou (nota 6): um beliscão nos cantos em que o bloco vira círculo junto ao anel e um bojo leve no encontro de baixo. A etapa `ombro` está fixa por aceite humano.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,
