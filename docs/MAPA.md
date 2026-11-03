@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1717 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1719 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1088,6 +1088,7 @@
 - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
+- `rastreio-do-retrato.test.ts` — rastreio-do-retrato.test.ts — o atalho do retrato da procedência devolve exatamente a procedência da conta completa.
 - `recortar-arco.test.mjs` — recortar-arco.test.mjs — `recortarArcoNoPerfil`: o arco poligonal recortado na borda de baixo do contorno, com a fusão do corte que cai perto de um vértice.
 - `referencia-posicional.js` — referencia-posicional.js — A REGRA ÚNICA de "isto é referência por id posicional?", para o formato salvo da Oficina.
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
@@ -1313,7 +1314,7 @@
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
-- `receita.js` — braco-robotico/ombro — ombro escolhido pela pessoa em 2026-09-28, partindo da rodada 2 (cotovelo de cano), depois de comparar com o ombro de tambor sobre a b…
+- `receita.js` — braco-robotico/ombro — ombro escolhido pela pessoa em 2026-09-28 (L de ponta-cabeça sobre o anel da cintura) e redimensionado em 2026-11-03, opção B: seção d…
 
 ## procedural/pecas/braco-robotico/partes/ombro-tambor/
 
@@ -1534,6 +1535,7 @@
 - `receita-11.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 - `receita-12.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 - `receita-13.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
+- `receita-14.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 
 ## procedural/pecas/furgao/referencias/
 
