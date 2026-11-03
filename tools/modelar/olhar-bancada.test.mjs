@@ -406,3 +406,11 @@ describe('carga da página', () => {
     expect(PRAZO_DE_CARGA_MS).toBeGreaterThan(30_000);
   });
 });
+
+describe('a ajuda da bancada', () => {
+  it('cita toda opção e toda bandeira que o comando aceita', async () => {
+    const { AJUDA, OPCOES_DA_CLI, BANDEIRAS_DA_CLI } = await import('./olhar-bancada.mjs');
+    const faltando = [...OPCOES_DA_CLI, ...BANDEIRAS_DA_CLI].filter((nome) => !AJUDA.includes(`--${nome}`));
+    expect(faltando).toEqual([]);
+  });
+});

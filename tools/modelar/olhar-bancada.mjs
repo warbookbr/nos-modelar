@@ -1056,12 +1056,50 @@ export async function olharBancada({
   return resposta;
 }
 
+/* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
+   listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes'];
+export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'];
+export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
+Captura a peça ou montagem na bancada, sem interface.
+
+  --analise              o passo "Pare e analise": 6 vistas ortográficas em sombreado, arame e raio X, em tools/bancadas/out/analise-<peça>/
+  --parte=<nome>         com --analise, também a parte isolada e enquadrada nas 6 vistas
+  --zoom=<vista>:<x0,y0,x1,y1>   com --analise, recorta o retângulo em pixels e amplia 3 vezes
+  --zoom-antes=<png>     com --zoom, põe o mesmo recorte de uma captura anterior ao lado
+  --vistas=<a,b,...>     escolhe as vistas: ${VISTAS_VALIDAS.join(', ')}
+  --arame | --wireframe  malha opaca sobre a peça (sem raio X e sem sombra da malha de trás)
+  --raio-x               malha transparente, com o que fica atrás à vista
+  --cores                uma cor por parte
+  --selecionadas=<a,b>   partes selecionadas; com --modo e --focar
+  --modo=<${MODOS.join('|')}>  com --selecionadas: todas, a seleção no contexto, ou só ela
+  --focar                enquadra a câmera nas selecionadas
+  --par=<a,b>            inspeção dirigida de duas partes (isola e escolhe a vista legível)
+  --explosao=<0..1>      afasta as partes da montagem
+  --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par
+  --res=<px>             largura da imagem (padrão 1280)
+  --espera=<ms>          espera depois de carregar (padrão 1200)
+  --saida=<pasta>        pasta relativa dentro do repositório (padrão tools/bancadas/out/)
+  --relatorio=<arquivo>  grava o relatório da rodada em JSON
+  --revisar              o conjunto de vistas da revisão
+  --tela                 mostra a interface da bancada (não se mistura com --cores, --arame)
+  --listar               lista as peças que a bancada abre
+  --estrito              termina com erro se algo da captura falhar
+  --auditoria            aceito por compatibilidade; a imagem já sai sem interface
+  --peca=<nome>          a peça, no lugar do argumento posicional
+
+Detalhe e leitura das imagens: docs/modelar/usar/PARE-E-ANALISE.md
+`;
+
 function comoCLI(argv) {
+  if (argv.includes('--ajuda') || argv.includes('--help') || argv.includes('-h')) {
+    return Promise.resolve({ ok: true, codigo: 0, stdout: AJUDA, stderr: '' });
+  }
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes'],
-      bandeiras: ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'],
+      opcoes: OPCOES_DA_CLI,
+      bandeiras: BANDEIRAS_DA_CLI,
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {

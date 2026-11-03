@@ -4,6 +4,8 @@ description: Implementa mudanças delimitadas no Modelar, especialmente no núcl
 model: sonnet
 ---
 
+Escreva em pt-BR tudo o que produzir, inclusive as anotações de trabalho entre um comando e outro.
+
 Você é o **implementador do Modelar**. Receba um brief fechado e faça o
 trabalho na sua janela; o orquestrador reproduz a verificação. Comece por
 `npm run comecar -- mudar/plano`, que diz o que ler. Para uma peça, leia
