@@ -39,10 +39,12 @@ export const LADOS_DO_RAIO = 16;
 export const LADOS_DA_RODA = 96;
 export const LADOS_DO_FURO = 24;
 
-/** O id da composição: o cubo (`tipo` 0, 1 ou 2), o perfil e o número de raios das raiadas, e a banda lisa ou sulcada. */
-export function idDaRoda({ tipo, raios = 0, maciço = false, sulcada = false }) {
-  const banda = sulcada ? 'sulcada' : 'lisa';
-  if (tipo === 0) return `roda-pneu.disco-${banda}`;
+/** O id da composição: o cubo (`tipo` 0, 1 ou 2), o perfil e o número de raios das raiadas, a banda lisa ou sulcada, o sufixo
+    `-circ` da banda com sulcos ao longo da volta e o `-vent` da chapa com a volta de furos de ventilação. As composições sem as
+    duas melhorias têm o id e a malha de antes delas. */
+export function idDaRoda({ tipo, raios = 0, maciço = false, sulcada = false, circular = false, ventilada = false }) {
+  const banda = `${sulcada ? 'sulcada' : 'lisa'}${circular ? '-circ' : ''}`;
+  if (tipo === 0) return `roda-pneu.disco-${banda}${ventilada ? '-vent' : ''}`;
   return `roda-pneu.${tipo === 1 ? 'raiada' : 'flanges'}-${maciço ? 'macico' : 'tubo'}-${raios}-${banda}`;
 }
 
@@ -60,13 +62,20 @@ const DOS_FUROS = [
   'inicioDaPortaDoEixo', 'profundidadeDosFuros', 'diametroDoFuro', 'raioExternoDoEixo',
 ];
 const DA_CHAPA = ['raioInternoDaChapa', 'raioDaChapa', 'inicioDaChapa', 'fimDaChapa'];
+const DA_VENTILACAO = [
+  'yDoFuroDeVentilacao', 'zDoFuroDeVentilacao', 'raioDoFuroDeVentilacao', 'inicioDaFerramentaDeVentilacao', 'fimDaFerramentaDeVentilacao', 'passoAngularDaVentilacao',
+];
+const DOS_SULCOS_CIRCULARES = [
+  'raioDoFundoDoSulcoCircular', 'raioDoTopoDoSulcoCircular', 'inicioDoPrimeiroSulcoCircular', 'fimDoPrimeiroSulcoCircular', 'passoDosSulcosCirculares',
+];
 const DO_RELEVO = ['larguraDaFerramentaDoSulco', 'alturaDaFerramentaDoSulco', 'larguraDoPrismaDoSulco', 'baseDaFerramentaDoSulco', 'passoDoSulco'];
 
 /** Os escalares (metro) que o `derivar` entrega a cada composição, por forma de cubo e por banda. Exportado para o `derivar`. */
-export function escalaresDaRoda({ tipo, sulcada }) {
+export function escalaresDaRoda({ tipo, sulcada, circular = false, ventilada = false }) {
   return [
     ...DA_BANDA, ...DO_CUBO, ...(tipo === 2 ? DAS_FLANGES : []), ...DOS_FUROS, ...(tipo === 0 ? DA_CHAPA : []),
-    ...(tipo > 0 ? ['diametroDoRaio'] : []), ...(sulcada ? DO_RELEVO : []),
+    ...(tipo > 0 ? ['diametroDoRaio'] : []), ...(sulcada ? DO_RELEVO : []), ...(circular ? DOS_SULCOS_CIRCULARES : []),
+    ...(ventilada ? DA_VENTILACAO : []),
   ];
 }
 
@@ -81,6 +90,11 @@ const SULCO = { op: 'cubo', id: 8 };
 const SULCOS = { op: 'arranja', id: 9, de: SULCO };
 const PNEU_SULCADO = { op: 'subtrair', id: 10 };
 const CHAPA = { op: 'lathe', id: 11 };
+const FURO_DE_VENTILACAO = { op: 'lathe', id: 12 };
+const FUROS_DE_VENTILACAO = { op: 'arranja', id: 13, de: FURO_DE_VENTILACAO };
+const CHAPA_VENTILADA = { op: 'subtrair', id: 14 };
+const SULCO_CIRCULAR = { op: 'lathe', id: 15 };
+const SULCOS_CIRCULARES = { op: 'arranja', id: 16, de: SULCO_CIRCULAR };
 
 const parteDe = (id, nome, origem) => ({ id: `parte-${id}`, operacao: 'parte', argumentos: { nome, sel: { origem } } });
 const materialDe = (id, usa, origem) => ({ id: `material-${id}`, operacao: 'material', argumentos: { usa, sel: { origem } } });
@@ -134,26 +148,53 @@ const PERFIL_DO_PNEU = [
   [p('raioDoAssento'), p('meiaLarguraDoAro')], [p('raioDoAssento'), p('inicioDoAro')],
 ];
 
-function nosDoPneu(sulcada) {
+function nosDoPneu({ sulcada, circular }) {
+  const relevo = sulcada || circular;
   const revolucao = (origemId) => ({
-    id: sulcada ? 'revolucao-pneu-base' : 'revolucao-pneu', operacao: 'lathe',
+    id: relevo ? 'revolucao-pneu-base' : 'revolucao-pneu', operacao: 'lathe',
     argumentos: { origemId, eixo: 'x', lados: p('ladosDaRoda'), perfil: PERFIL_DO_PNEU },
   });
-  if (!sulcada) return [revolucao(1)];
-  /* o relevo: uma ferramenta em +y (o prisma da garra ou do sulco, atravessando a banda de lado a lado) repetida em volta
-     do eixo, subtraída da banda */
-  return [
-    revolucao(7),
-    {
-      id: 'prisma-do-sulco', operacao: 'cubo',
-      argumentos: { origemId: 8, larg: p('larguraDaFerramentaDoSulco'), alt: p('alturaDaFerramentaDoSulco'), prof: p('larguraDoPrismaDoSulco'), em: [0, p('baseDaFerramentaDoSulco'), 0] },
-    },
-    {
-      id: 'repeticao-dos-sulcos', operacao: 'arranja',
-      argumentos: { modo: 'radial', total: p('sulcos'), eixo: 'x', graus: p('passoDoSulco'), pivo: [0, 0, 0], origemId: 9, derivaDe: SULCO, sel: { origem: SULCO } },
-    },
-    { id: 'corte-dos-sulcos', operacao: 'subtrair', argumentos: { origemId: 10, solidos: [{ origem: BASE_DO_PNEU }, { origem: SULCO }, { origem: SULCOS }] } },
-  ];
+  if (!relevo) return [revolucao(1)];
+  /* o relevo transversal: uma ferramenta em +y (o prisma da garra ou do sulco, atravessando a banda de lado a lado) repetida
+     em volta do eixo. O relevo circular: um anel retangular (revolução em torno do eixo) repetido ao longo dele. As duas
+     ferramentas e as cópias saem da mesma subtração da banda. */
+  const nos = [revolucao(7)];
+  const ferramentas = [{ origem: BASE_DO_PNEU }];
+  if (sulcada) {
+    nos.push(
+      {
+        id: 'prisma-do-sulco', operacao: 'cubo',
+        argumentos: { origemId: 8, larg: p('larguraDaFerramentaDoSulco'), alt: p('alturaDaFerramentaDoSulco'), prof: p('larguraDoPrismaDoSulco'), em: [0, p('baseDaFerramentaDoSulco'), 0] },
+      },
+      {
+        id: 'repeticao-dos-sulcos', operacao: 'arranja',
+        argumentos: { modo: 'radial', total: p('sulcos'), eixo: 'x', graus: p('passoDoSulco'), pivo: [0, 0, 0], origemId: 9, derivaDe: SULCO, sel: { origem: SULCO } },
+      },
+    );
+    ferramentas.push({ origem: SULCO }, { origem: SULCOS });
+  }
+  if (circular) {
+    nos.push(
+      {
+        id: 'anel-do-sulco-circular', operacao: 'lathe',
+        argumentos: {
+          origemId: 15, eixo: 'x', lados: p('ladosDaRoda'),
+          perfil: [
+            [p('raioDoFundoDoSulcoCircular'), p('inicioDoPrimeiroSulcoCircular')], [p('raioDoTopoDoSulcoCircular'), p('inicioDoPrimeiroSulcoCircular')],
+            [p('raioDoTopoDoSulcoCircular'), p('fimDoPrimeiroSulcoCircular')], [p('raioDoFundoDoSulcoCircular'), p('fimDoPrimeiroSulcoCircular')],
+            [p('raioDoFundoDoSulcoCircular'), p('inicioDoPrimeiroSulcoCircular')],
+          ],
+        },
+      },
+      {
+        id: 'repeticao-dos-sulcos-circulares', operacao: 'arranja',
+        argumentos: { modo: 'linear', total: p('sulcosCirculares'), d: [p('passoDosSulcosCirculares'), 0, 0], origemId: 16, derivaDe: SULCO_CIRCULAR, sel: { origem: SULCO_CIRCULAR } },
+      },
+    );
+    ferramentas.push({ origem: SULCO_CIRCULAR }, { origem: SULCOS_CIRCULARES });
+  }
+  nos.push({ id: 'corte-dos-sulcos', operacao: 'subtrair', argumentos: { origemId: 10, solidos: ferramentas } });
+  return nos;
 }
 
 const NO_DO_ARO = {
@@ -208,11 +249,36 @@ const NO_DA_CHAPA = {
   },
 };
 
+/* a volta de furos de ventilação: um cilindro (revolução em torno do eixo, no raio da volta) repetido em volta do eixo e
+   subtraído da chapa, que passa a ser a subtração */
+const NOS_DA_VENTILACAO = [
+  {
+    id: 'revolucao-furo-de-ventilacao', operacao: 'lathe',
+    argumentos: {
+      origemId: 12, eixo: 'x', lados: p('ladosDoFuro'), em: [0, p('yDoFuroDeVentilacao'), p('zDoFuroDeVentilacao')],
+      perfil: [
+        [0, p('inicioDaFerramentaDeVentilacao')], [p('raioDoFuroDeVentilacao'), p('inicioDaFerramentaDeVentilacao')],
+        [p('raioDoFuroDeVentilacao'), p('fimDaFerramentaDeVentilacao')], [0, p('fimDaFerramentaDeVentilacao')],
+      ],
+    },
+  },
+  {
+    id: 'repeticao-dos-furos-de-ventilacao', operacao: 'arranja',
+    argumentos: { modo: 'radial', total: p('furosDeVentilacao'), eixo: 'x', graus: p('passoAngularDaVentilacao'), pivo: [0, 0, 0], origemId: 13, derivaDe: FURO_DE_VENTILACAO, sel: { origem: FURO_DE_VENTILACAO } },
+  },
+  {
+    id: 'corte-dos-furos-de-ventilacao', operacao: 'subtrair',
+    argumentos: { origemId: 14, solidos: [{ origem: CHAPA }, { origem: FURO_DE_VENTILACAO }, { origem: FUROS_DE_VENTILACAO }] },
+  },
+];
+
 export const nomeDoNoDoCubo = (k) => `noDoCubo${k}`;
 export const nomeDoNoDoAro = (k) => `noDoAro${k}`;
 
-function parametrosDa({ tipo, raios, maciço, sulcada }) {
-  const parametros = Object.fromEntries(escalaresDaRoda({ tipo, sulcada }).map((nome) => [nome, { tipo: 'numero' }]));
+function parametrosDa({ tipo, raios, maciço, sulcada, circular, ventilada }) {
+  const parametros = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada }).map((nome) => [nome, { tipo: 'numero' }]));
+  if (circular) parametros.sulcosCirculares = { tipo: 'inteiro' };
+  if (ventilada) parametros.furosDeVentilacao = { tipo: 'inteiro' };
   parametros.furos = { tipo: 'inteiro' };
   parametros.ladosDaRoda = { tipo: 'inteiro', padrao: LADOS_DA_RODA };
   parametros.ladosDoFuro = { tipo: 'inteiro', padrao: LADOS_DO_FURO };
@@ -254,35 +320,39 @@ function nosDosRaios({ raios, maciço }) {
   ];
 }
 
-function comporRoda({ tipo, raios = 0, maciço = false, sulcada = false }) {
-  const pneu = sulcada ? PNEU_SULCADO : PNEU;
+function comporRoda({ tipo, raios = 0, maciço = false, sulcada = false, circular = false, ventilada = false }) {
+  const pneu = sulcada || circular ? PNEU_SULCADO : PNEU;
+  const chapa = ventilada ? CHAPA_VENTILADA : CHAPA;
   return Object.freeze({
     formato: FORMATO_COMPOSICAO_PROCEDURAL,
-    id: idDaRoda({ tipo, raios, maciço, sulcada }),
+    id: idDaRoda({ tipo, raios, maciço, sulcada, circular, ventilada }),
     versao: '2.0.0',
-    parametros: parametrosDa({ tipo, raios, maciço, sulcada }),
+    parametros: parametrosDa({ tipo, raios, maciço, sulcada, circular, ventilada }),
     artefatos: { entra: [], sai: [MALHA, PARTE, PORTA] },
     nos: [
       ...(tipo > 0 ? nosDosRaios({ raios, maciço }) : []),
       ...nosDoCubo(tipo),
-      ...nosDoPneu(sulcada),
+      ...nosDoPneu({ sulcada, circular }),
       NO_DO_ARO,
-      ...(tipo === 0 ? [NO_DA_CHAPA] : []),
+      ...(tipo === 0 ? [NO_DA_CHAPA, ...(ventilada ? NOS_DA_VENTILACAO : [])] : []),
       parteDe('pneu', 'pneu', pneu), materialDe('pneu', p('materialDoPneu'), pneu), solidoDe('pneu', pneu),
       parteDe('aro', 'aro', ARO), materialDe('aro', p('materialDoMetal'), ARO), solidoDe('aro', ARO),
       parteDe('cubo', 'cubo', CUBO), materialDe('cubo', p('materialDoMetal'), CUBO), solidoDe('cubo', CUBO),
-      ...(tipo === 0 ? [parteDe('chapa', 'disco', CHAPA), materialDe('chapa', p('materialDoMetal'), CHAPA), solidoDe('chapa', CHAPA)] : []),
+      ...(tipo === 0 ? [parteDe('chapa', 'disco', chapa), materialDe('chapa', p('materialDoMetal'), chapa), solidoDe('chapa', chapa)] : []),
       ...portasDaRoda(pneu),
     ],
   });
 }
 
 const RAIOS = (de, ate, passo = 1) => Array.from({ length: Math.floor((ate - de) / passo) + 1 }, (_, k) => de + k * passo);
+const BANDAS = [
+  { sulcada: false, circular: false }, { sulcada: true, circular: false }, { sulcada: false, circular: true }, { sulcada: true, circular: true },
+];
 const COMBINACOES = [
-  ...[false, true].map((sulcada) => ({ tipo: 0, sulcada })),
-  ...[false, true].flatMap((sulcada) => [false, true].flatMap((maciço) => [
-    ...RAIOS(MINIMO_DE_RAIOS, MAXIMO_DE_RAIOS).map((raios) => ({ tipo: 1, raios, maciço, sulcada })),
-    ...RAIOS(MINIMO_DE_RAIOS + 1, MAXIMO_DE_RAIOS, 2).map((raios) => ({ tipo: 2, raios, maciço, sulcada })),
+  ...BANDAS.flatMap((banda) => [false, true].map((ventilada) => ({ tipo: 0, ...banda, ventilada }))),
+  ...BANDAS.flatMap((banda) => [false, true].flatMap((maciço) => [
+    ...RAIOS(MINIMO_DE_RAIOS, MAXIMO_DE_RAIOS).map((raios) => ({ tipo: 1, raios, maciço, ...banda })),
+    ...RAIOS(MINIMO_DE_RAIOS + 1, MAXIMO_DE_RAIOS, 2).map((raios) => ({ tipo: 2, raios, maciço, ...banda })),
   ])),
 ];
 
