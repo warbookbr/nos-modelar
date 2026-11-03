@@ -1,0 +1,174 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/braco",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/braco-robotico/referencias/coluna-reta-lado.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "coluna",
+        "tipo": "superficie",
+        "onde": "base da coluna dentro do pé, fim do cilindro",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica isolada da coluna: lascas soltas e bordas rasgadas na base (350-550, 580-700). Rasante lado az30: aresta esquerda recortada em (545,705)."
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "encontro do pé com a coluna, bordas do V e pontas laterais",
+        "sentido": "segmentado",
+        "evidencia": "Direita isolada do pé: borda do V em degraus serrilhados e orelhas triangulares nas pontas (235-665, 245-470). Rasante lado az30: recorte e ondulação na junção."
+      },
+      {
+        "parte": "pe",
+        "tipo": "uniao",
+        "onde": "cantos laterais onde o disco encontra a coluna",
+        "sentido": "afastado",
+        "evidencia": "Frontal, (405,1035) e (690,1035): degrau de 3 mm e pontinha. Rasante topo az120, (455,950) e (940,950): agulhas pretas de fresta no encontro."
+      }
+    ],
+    "observacao": "Forma geral, altura, diâmetro e topo plano conferem com a coluna reta redonda do alvo, mas a costura pé-coluna sai serrilhada e rasgada. A porta topo e o anel do cotovelo não aparecem nas vistas."
+  },
+  "partes": [
+    {
+      "nome": "pe",
+      "confere": false,
+      "observacao": "arredondado no encontro com a coluna, mas com 150 mm de diâmetro (3 mm de raio a menos que a coluna), não 156; luz rasante ainda mostra mancha preta e borda ondulada junto à coluna"
+    },
+    {
+      "nome": "coluna",
+      "confere": true,
+      "observacao": "cilindro de 156 mm, 477 mm de altura total, encontro arredondado em 12 mm; faixas leves ainda visíveis na luz rasante"
+    }
+  ],
+  "atrito": [
+    "arredondarCostura entre cilindros quase de mesmo raio só fecha a auditoria em pontos isolados (raio 10, 12 ou 20 com folga 3); outras combinações recusam o raio ou deixam triângulo degenerado",
+    "para o encontro sair arredondado foi preciso afastar o pé 3 mm de raio da medida do PLANO",
+    "lathe de 6 pontos acima de 72 lados estoura o bloco de 1000 ids, o que limita a suavidade da coluna",
+    "não consegui separar rasgo de sombra na mancha preta da luz rasante",
+    "o arredondamento da costura entre dois cilindros quase do mesmo raio só fecha em pontos isolados e piorou a forma"
+  ],
+  "notaDePassagem": "Pé com 150 mm de diâmetro (raio 3 mm menor que a coluna) e arredondarCostura de 12 mm: é o ponto que fecha a auditoria. Pé e coluna são partes nomeadas de um sólido fundido, para a porta do pé medir só o pé.",
+  "receita": {
+    "sha256": "sha256:0b33ffa679cabdcc52214bd42f07dae0ca36cbff10ff397500fcc446446d1e11",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 8,
+      "acrescentadas": 10,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": " * Encontro do pé com a coluna: `unir` sem `arredondarCostura`, o vinco a 45"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": " * graus de dois cilindros de mesmo raio, que é o desenho da referência. Com"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": " * `raioDoEncontro` maior que zero a costura sai com triângulo degenerado e a"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": " * auditoria de interseção fica inconclusiva."
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": " * Encontro do pé com a coluna: `unir` com `arredondarCostura` de 12 mm. Com o"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": " * pé 3 mm mais estreito de raio que a coluna (pé de 150 mm), o arredondamento"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": " * sai e a auditoria de interseção fecha. Com pé de 0,2 a 2,5 mm mais estreito"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * ou sem folga, a costura sai com triângulo degenerado ou o núcleo recusa o"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " * raio, e o resultado depende do raio de modo irregular (3 e 8 mm recusados,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": " * 5 e 12 aceitos pelo núcleo, só 12 e 20 fecham a auditoria)."
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "  /* O pé é 0,2 mm mais estreito que a coluna: paredes tangentes quebram a"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* O pé é 3 mm mais estreito de raio que a coluna: com menos, a costura fica degenerada; paredes tangentes quebram a"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "  folgaDoPe: 0.2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  folgaDoPe: 3,"
+        },
+        {
+          "tipo": "-",
+          "linha": 56,
+          "texto": "  raioDoEncontro: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  raioDoEncontro: 12,"
+        },
+        {
+          "tipo": "-",
+          "linha": 121,
+          "texto": "      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 156 mm de diâmetro e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 150 mm de diâmetro (3 mm de raio a menos que a coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[9], PASSOS[10]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}
