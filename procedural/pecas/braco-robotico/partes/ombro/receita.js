@@ -6,8 +6,8 @@
  * frente recuada em relação à parte deitada (o degrau em L). A parte deitada
  * atravessa o topo de trás até a saída redonda, de raio igual à meia largura,
  * por isso nada da saída sobra por baixo nem bate na frente da parte de pé. Na
- * faixa junto ao anel a seção passa de quase quadrada a redonda variando o
- * expoente da superelipse em muitas estações com raio constante, em vez de
+ * faixa junto ao anel a seção passa de quase quadrada a redonda crescendo o
+ * raio dos cantos em muitas estações, em vez de
  * duas seções longas. O encontro de baixo, entre a frente da parte de pé e a
  * face de baixo da parte deitada, leva um arredondamento leve. O anel é uma
  * faixa fina escura que encosta na face da saída sem entrar nela.
@@ -27,15 +27,15 @@ export const TABELA = {
   /* Meia largura da seção de cima: 190 mm de largura. O topo fica em
      alturaDoEixo + meiaLargura = 210 mm. */
   meiaLargura: 95,
-  /* Expoente da superelipse da seção quase quadrada: 2 é círculo, 4 é
-     quadrado de cantos arredondados. */
-  expoenteDoTopo: 4,
+  /* Raio dos cantos da seção quase quadrada, igual na parte de pé e na
+     deitada. */
+  raioDosCantos: 32,
   /* Quanto a frente da parte de pé fica recuada em relação à frente da parte
      deitada: o degrau do L. */
   recuoDaFrente: 30,
   /* Trecho do braço, antes da saída, em que a seção passa de quase quadrada a
-     redonda, em estações de expoente decrescente. */
-  transicaoDaSaida: 25,
+     redonda, com o raio dos cantos crescendo até o círculo. */
+  transicaoDaSaida: 45,
   /* Anel da junta: faixa fina, mesmo raio da saída. */
   espessuraDoAnel: 28,
   /* Raio da concordância no encontro de baixo entre a frente da parte de pé e
@@ -43,10 +43,10 @@ export const TABELA = {
   raioDoEncontro: 8,
   chanfroDoPescoco: 2,
   /* Estações da transição quadrado-redondo. */
-  estacoesDaSaida: 7,
+  estacoesDaSaida: 9,
   /* Seções intermediárias de cada loft, para os triângulos da emenda ficarem
      curtos: triângulo longo faz o sombreamento suave virar degrau. */
-  estacoes: 6,
+  estacoes: 5,
   lados: 48,
 };
 
@@ -73,28 +73,42 @@ export function derivar(t = TABELA) {
   return { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, c };
 }
 
-/* Contorno de superelipse com `lados` pontos, u no eixo X do mundo. */
-function contorno(r, n, lados) {
+/* Retângulo de meio lado `r` com cantos de raio `rc`, com `lados` pontos
+   (quatro arcos de lados/4 pontos, com um lado plano entre cada dois). Com
+   rc = r é o círculo. */
+function quadrado(r, rc, lados) {
+  const por = lados / 4;
   const pts = [];
-  for (let k = 0; k < lados; k++) {
-    const th = (2 * Math.PI * k) / lados;
-    const cs = Math.cos(th), sn = Math.sin(th);
-    pts.push([r * Math.sign(cs) * Math.abs(cs) ** (2 / n), r * Math.sign(sn) * Math.abs(sn) ** (2 / n)]);
+  for (let q = 0; q < 4; q++) {
+    const cx = (r - rc) * Math.sign(Math.cos(q * Math.PI / 2 + Math.PI / 4));
+    const cy = (r - rc) * Math.sign(Math.sin(q * Math.PI / 2 + Math.PI / 4));
+    for (let k = 0; k < por; k++) {
+      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
+      pts.push([cx + rc * Math.cos(th), cy + rc * Math.sin(th)]);
+    }
   }
   return pts;
 }
 
-/* Seção da parte de pé: frente arredondada como a do braço, mas recuada, e
-   lado de trás reto, de cantos vivos, para a parede de trás descer do braço
-   até o pé. */
-function contornoColuna(r, nFrente, lados, recuo) {
+/* Círculo com `lados` pontos, no mesmo sentido e com o mesmo número de pontos
+   do retângulo, para a transição misturar ponto a ponto. */
+function redondo(r, lados) {
+  return Array.from({ length: lados }, (_, k) => [r * Math.cos((2 * Math.PI * k) / lados), r * Math.sin((2 * Math.PI * k) / lados)]);
+}
+
+/* Seção da parte de pé: frente plana em z = zf com os dois cantos arredondados
+   no mesmo raio `rc` dos cantos da parte deitada (por isso o cruzamento dos
+   dois cantos é uma meia-esquadria plana) e lado de trás reto, de cantos
+   vivos, para a parede de trás descer do braço até o pé. */
+function contornoColuna(r, rc, lados, zf) {
   const pts = [];
-  const frente = lados - 2;
-  for (let k = 0; k < frente; k++) {
-    const th = (Math.PI * k) / (frente - 1);
-    const cs = Math.cos(th), sn = Math.sin(th);
-    const v = r * Math.sign(sn) * Math.abs(sn) ** (2 / nFrente);
-    pts.push([r * Math.sign(cs) * Math.abs(cs) ** (2 / nFrente), v * (1 - recuo / r)]);
+  const por = (lados - 2) / 2;
+  for (let q = 0; q < 2; q++) {
+    const cx = (r - rc) * (q === 0 ? 1 : -1);
+    for (let k = 0; k < por; k++) {
+      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
+      pts.push([cx + rc * Math.cos(th), zf - rc + rc * Math.sin(th)]);
+    }
   }
   pts.push([-r, -r], [r, -r]);
   return pts;
@@ -103,12 +117,15 @@ function contornoColuna(r, nFrente, lados, recuo) {
 export function gerarPassos(t = TABELA) {
   const { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, c } = derivar(t);
   const L = t.lados;
-  const nTopo = t.expoenteDoTopo;
-  const sec = (pos, r, n) => ({ pos, contorno: contorno(r, n, L) });
-  const recuo = m(t.recuoDaFrente);
-  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r, nTopo, L, recuo) });
-  /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a seção de
-     frente recuada, e termina dentro da parte deitada. */
+  const rc = m(t.raioDosCantos);
+  const sec = (pos, rr) => ({ pos, contorno: quadrado(h, rr, L) });
+  const zf = h - m(t.recuoDaFrente);
+  /* A parte de pé é 0,2 mm mais estreita que a deitada: paredes coplanares
+     quebram a união. */
+  const folga = 0.0002;
+  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rc - 0.003, r - folga), L, zf * (r - folga) / h) });
+  /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a frente
+     recuada, e termina dentro da parte deitada. */
   const coluna = [
     { pos: [0, 0, 0], raio: 0 },
     secColuna(0.0004, h - c),
@@ -117,26 +134,27 @@ export function gerarPassos(t = TABELA) {
     secColuna(yEixo - 0.0004, h),
     { pos: [0, yEixo, 0], raio: 0 },
   ];
-  /* Parte deitada: atravessa o topo de trás até a saída redonda. A transição
-     de quase quadrada a redonda é feita em estações cujo expoente cai de
-     forma suave (cosseno), com o raio constante, para as faces não ganharem
-     facetas nem torcerem o sombreamento. */
+  /* Parte deitada: atravessa o topo de trás até a saída redonda. Na
+     transição o raio dos cantos cresce de rc até a meia largura (círculo),
+     com o lado constante, em estações de subida suave (cosseno). A saída
+     termina reta, sem chanfro, para o anel encostar sem linha de luz. */
   const ns = t.estacoesDaSaida;
   const transicao = [];
   for (let k = 1; k <= ns; k++) {
     const f = k / (ns + 1);
     const s = 0.5 - 0.5 * Math.cos(Math.PI * f);
-    const z = zTransicao + (zFace - c - zTransicao) * f;
-    transicao.push(sec([0, yEixo, z], h, nTopo + (2 - nTopo) * s));
+    const z = zTransicao + (zFace - 0.0004 - zTransicao) * f;
+    const q0 = quadrado(h, rc, L);
+    const q1 = redondo(Rs, L);
+    transicao.push({ pos: [0, yEixo, z], contorno: q0.map((p, i) => [p[0] + (q1[i][0] - p[0]) * s, p[1] + (q1[i][1] - p[1]) * s]) });
   }
   const braco = [
     { pos: [0, yEixo, -h], raio: 0 },
-    sec([0, yEixo, -h + 0.0004], h, nTopo),
-    ...entre(-h + 0.0004, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], h, nTopo)),
-    sec([0, yEixo, zTransicao], h, nTopo),
+    sec([0, yEixo, -h + 0.0004], rc),
+    ...entre(-h + 0.0004, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], rc)),
+    sec([0, yEixo, zTransicao], rc),
     ...transicao,
-    sec([0, yEixo, zFace - c], Rs, 2),
-    sec([0, yEixo, zFace - 0.0004], Rs - c, 2),
+    { pos: [0, yEixo, zFace - 0.0004], contorno: redondo(Rs, L) },
     { pos: [0, yEixo, zFace], raio: 0 },
   ];
   const corpo = { origem: { op: 'unir', id: ID.corpo } };
@@ -178,7 +196,7 @@ const receita = {
     referencias: ['../../referencias/frontal.contornos.json'],
     escala: { medida: 'diâmetro do anel da cintura, onde o pé assenta', milimetros: 210 },
     partes: [
-      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de superelipse unidos; seção vira redonda em várias estações de raio constante; arredondarCostura no encontro de baixo; liso com ângulo' },
+      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de retângulo de cantos arredondados de mesmo raio; seção vira redonda crescendo o raio dos cantos em várias estações; arredondarCostura no encontro de baixo; liso com ângulo' },
       { nome: 'anel', forma: 'faixa fina de uns 28 mm, eixo Z, com o mesmo diâmetro da saída (190 mm), encostada na face da saída sem entrar nela, escura', tecnica: 'revolução com perfil' },
     ],
     criteriosDeReprovacao: [
