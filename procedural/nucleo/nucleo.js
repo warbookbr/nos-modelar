@@ -455,10 +455,12 @@ function Face(id, vs) { return { id, vs, cor: null, material: null, parte: null,
 function addV(st, id, pos) {
   if (st.V.has(id)) throw new Error(`oficina: colisão de id de vértice ${id} (bloco pequeno? passo mal-formado?)`);
   st.V.set(id, pos);
+  st.novosV?.push(id);
 }
 function addF(st, id, vs) {
   if (st.F.has(id)) throw new Error(`oficina: colisão de id de face ${id}`);
   st.F.set(id, Face(id, vs));
+  st.novosF?.push(id);
 }
 function grita(st, i, op, ref, motivo) { st.orfaos.push({ passo: i, op, ref, motivo }); }
 
@@ -2894,7 +2896,14 @@ const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA,
 const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
 const operacoesSubdivisao = criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem });
 const operacoesFriso = criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem });
-const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, resolverSelecao, neutroCanonico });
+/* As operações de atributo escrevem só nas faces que `resolverAlvosF` devolve; o despacho lê essas faces de `st.alvosF` para
+   saber quais conferir no retrato (ver `ESCRITA_DAS_OPERACOES`). */
+function resolverAlvosFRastreado(st, a, op, i, opcoes) {
+  const alvos = resolverAlvosF(st, a, op, i, opcoes);
+  if (st.alvosF) for (const fid of alvos) st.alvosF.add(fid);
+  return alvos;
+}
+const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF: resolverAlvosFRastreado, resolverSelecao, neutroCanonico });
 
 const OPS_IMPLEMENTADAS = {
   ...operacoesPrimitivasBasicas,
@@ -3427,8 +3436,61 @@ export function idsMudados(antes, depois) {
     const anterior = antes.get(id);
     if (anterior !== entrada && anterior?.json !== entrada.json) mudados.push(id);
   }
-  return mudados.sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
+  return mudados.sort(compararIds);
 }
+
+/* RASTREIO POR DECLARAÇÃO. Mesmo com o reaproveitamento acima, cada passo ainda compara as 140 mil entradas do furgão uma a uma
+   (79 passos, 22 milhões de comparações, quase todas para constatar que nada mudou). Uma operação do próprio núcleo pode declarar,
+   por mapa, o que escreve nas entradas que já existiam antes do passo:
+     'nada'       nenhuma entrada é tocada (só o tamanho do mapa é conferido);
+     'alvos'      só as entradas que `resolverAlvosF` devolveu no passo (as operações de atributo escrevem a face pelo alvo);
+     'acrescenta' as entradas antigas ficam como estavam e o passo só cria (e não apaga) entradas.
+   Mapa que não tem declaração, ou cujo tamanho contradiz a declaração, segue o caminho completo de `retratarEntradas`. A
+   declaração vale só para a função do próprio núcleo (`executar === OPS[nome]`): operação de extensão ou de outro registro nunca
+   a herda. `OPCOES.retrato` escolhe o caminho: 'completo' ignora as declarações (a conta de antes, referência dos testes) e
+   'conferido' roda os dois e recusa a divergência. O teste `rastreio-do-retrato.test.ts` confere cada declaração contra o
+   acervo e contra mutações no lugar. */
+export const ESCRITA_DAS_OPERACOES = Object.freeze({
+  ...Object.fromEntries([...PRIMITIVAS].map((nome) => [nome, { V: 'acrescenta', F: 'acrescenta' }])),
+  parte: { V: 'nada', F: 'alvos' },
+  material: { V: 'nada', F: 'alvos' },
+  liso: { V: 'nada', F: 'alvos' },
+  solido: { V: 'nada', F: 'alvos' },
+  publicarPorta: { V: 'nada', F: 'nada' },
+  pesar: { V: 'nada', F: 'nada' },
+});
+
+/* `anterior` é o retrato do passo anterior e é ATUALIZADO NO LUGAR: o chamador não o usa mais depois do passo. Devolve
+   `{ retrato, mudados }`, ou null quando a declaração não se sustenta (tamanho diferente do esperado). */
+export function rastrearEntradas(mapa, anterior, nivel, alvos) {
+  if (nivel === 'nada') return mapa.size === anterior.size ? { retrato: anterior, mudados: [] } : null;
+  const mudados = [];
+  if (nivel === 'alvos') {
+    if (mapa.size !== anterior.size) return null;
+    for (const id of alvos) if (!mapa.has(id) || !anterior.has(id)) return null;
+    for (const id of alvos) {
+      const valor = mapa.get(id);
+      const antigo = anterior.get(id);
+      if (antigo.copia !== NAO_COPIAVEL && igualASimples(antigo.copia, valor)) continue;
+      const entrada = { copia: copiaSimples(valor), json: JSON.stringify(valor) };
+      anterior.set(id, entrada);
+      if (entrada.json !== antigo.json) mudados.push(id);
+    }
+  } else {
+    /* `alvos` traz os ids que `addV`/`addF` criaram no passo; se os tamanhos não fecham, alguma entrada foi criada ou apagada
+       por outro caminho e a declaração não se sustenta */
+    const novos = alvos;
+    if (mapa.size !== anterior.size + novos.length) return null;
+    for (const id of novos) if (!mapa.has(id) || anterior.has(id)) return null;
+    for (const id of novos) {
+      const valor = mapa.get(id);
+      anterior.set(id, { copia: copiaSimples(valor), json: JSON.stringify(valor) });
+      mudados.push(id);
+    }
+  }
+  return { retrato: anterior, mudados: mudados.sort(compararIds) };
+}
+const compararIds = (a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0;
 
 /* ----------------------------------------------------------------------------
    NÚCLEO: roda a lista e devolve o NEUTRO em números. Não sabe desenhar.
@@ -3503,8 +3565,9 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), alvosF: null, novosV: null, novosF: null, procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
+  const modoRetrato = OPCOES.retrato ?? 'rapido';
   let retrato = null;
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
@@ -3522,23 +3585,52 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     /* O RETRATO DE ANTES É O DE DEPOIS DO PASSO ANTERIOR. Nada muda `st.V` e `st.F` entre dois passos, então o retrato
        que a procedência tirou ao fim de um passo vale como o de antes do seguinte, e a malha deixa de ser serializada duas
        vezes por passo (era o quadrado do tamanho da peça). Passo que sai antes do fim zera o retrato e o seguinte refaz. */
-    const antesV = retrato?.V ?? retratarEntradas(st.V, null);
-    const antesF = retrato?.F ?? retratarEntradas(st.F, null);
+    let antesV = retrato?.V ?? retratarEntradas(st.V, null);
+    let antesF = retrato?.F ?? retratarEntradas(st.F, null);
     retrato = null;
     const antesPortas = new Set(st.portas.keys()), antesPartes = new Set(Object.keys(st.partes));
     const pose = lerPoseDeCriacao(st, i, op, args);
     if (pose === undefined) return;          // inválida: já gritou, nada construído
     const antes = pose ? new Set(st.V.keys()) : null;
+    const escrita = modoRetrato === 'completo' || registrada.executar !== OPS[registrada.nome] ? undefined : ESCRITA_DAS_OPERACOES[registrada.nome];
+    st.alvosF = escrita?.F === 'alvos' ? new Set() : null;
+    st.novosV = escrita?.V === 'acrescenta' ? [] : null;
+    st.novosF = escrita?.F === 'acrescenta' ? [] : null;
     if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
     else fn(st, args, i);
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
-    const depoisV = retratarEntradas(st.V, antesV);
-    const depoisF = retratarEntradas(st.F, antesF);
+    const { alvosF, novosV, novosF } = st;
+    st.alvosF = st.novosV = st.novosF = null;
+    /* o caminho completo calcula antes do atalho, que atualiza o retrato de antes no lugar */
+    let depoisV = null, depoisF = null, mudadosV = null, mudadosF = null;
+    if (escrita === undefined || modoRetrato === 'conferido') {
+      depoisV = retratarEntradas(st.V, antesV);
+      depoisF = retratarEntradas(st.F, antesF);
+      mudadosV = idsMudados(antesV, depoisV);
+      mudadosF = idsMudados(antesF, depoisF);
+    }
+    if (escrita !== undefined) {
+      const rapidoV = rastrearEntradas(st.V, antesV, escrita.V, novosV);
+      const rapidoF = rastrearEntradas(st.F, antesF, escrita.F, escrita.F === 'acrescenta' ? novosF : alvosF);
+      if (modoRetrato === 'conferido') {
+        const confere = (mapa, completo, mudados, rapido) => rapido === null
+          || (JSON.stringify(rapido.mudados) === JSON.stringify(mudados) && rapido.retrato.size === completo.size
+            && [...completo].every(([id, e]) => rapido.retrato.get(id)?.json === e.json));
+        if (!confere(st.V, depoisV, mudadosV, rapidoV) || !confere(st.F, depoisF, mudadosF, rapidoF)) {
+          throw new Error(`oficina: o rastreio declarado de '${registrada.nome}' divergiu da conta completa no passo ${i}`);
+        }
+      } else {
+        if (rapidoV) { depoisV = rapidoV.retrato; mudadosV = rapidoV.mudados; }
+        if (rapidoF) { depoisF = rapidoF.retrato; mudadosF = rapidoF.mudados; }
+        if (!rapidoV) { depoisV = retratarEntradas(st.V, antesV); mudadosV = idsMudados(antesV, depoisV); }
+        if (!rapidoF) { depoisF = retratarEntradas(st.F, antesF); mudadosF = idsMudados(antesF, depoisF); }
+      }
+    }
     retrato = { V: depoisV, F: depoisF };
     registrarProcedencia(st.procedencia, {
       passo: i, operacao: registrada.id,
       saidas: {
-        vertices: idsMudados(antesV, depoisV), faces: idsMudados(antesF, depoisF),
+        vertices: mudadosV, faces: mudadosF,
         portas: [...st.portas.keys()].filter((id) => !antesPortas.has(id)).sort(),
         partes: Object.keys(st.partes).filter((id) => !antesPartes.has(id)).sort(),
       },
