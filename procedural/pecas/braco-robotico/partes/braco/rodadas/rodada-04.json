@@ -1,0 +1,161 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/braco",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/braco-robotico/referencias/coluna-reta.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "coluna",
+        "tipo": "superficie",
+        "onde": "borda do V da emenda com o pé, na vista superior e na direita",
+        "sentido": "segmentado",
+        "evidencia": "Na superior-orto, a borda do V tem degraus serrilhados; o V é reto, sem a concordância suave que a técnica de arredondar costura prometia."
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "bordas superiores do pé, cantos esquerdo e direito, y≈880 px na frontal",
+        "sentido": "anguloso",
+        "evidencia": "Duas lascas claras em ponta na frontal-orto no cruzamento do raio do pé com a coluna; o arame mostra triangulação desordenada ali."
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "encontro do pé com a coluna, canto esquerdo (lado +z), rasante lado az30 em x 550-680, y 700-830",
+        "sentido": "segmentado",
+        "evidencia": "Cavidade escura em concha e sombreado torcido na costura; vista lado az30 e isométrica mostram entalhe na quina esquerda. A costura devia ser curva contínua."
+      }
+    ],
+    "observacao": "Proporção e silhueta batem com a Opção 3 do alvo; a costura pé/coluna é o único problema: sombreado torcido, cavidade e lascas."
+  },
+  "partes": [
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": "disco de eixo Z de 156 mm, do diâmetro da coluna, fundido a ela, com arredondarCostura de 12 mm levado ao longo da costura até 2,5 mm de cada face e cortado rente a ela (aparar)"
+    },
+    {
+      "nome": "coluna",
+      "confere": true,
+      "observacao": "cilindro de 156 mm e 477 mm de altura total; o arredondamento agora chega até a borda do pé"
+    }
+  ],
+  "atrito": [
+    "os agentes modeladores pararam num bloqueio automático do serviço; quem conduz fez a rodada com a opção nova do núcleo, por acordo com a pessoa",
+    "a pessoa pediu a segunda correção da ferramenta depois da parada sem convergência"
+  ],
+  "notaDePassagem": "Pé do mesmo raio da coluna: a união sai limpa. O canto é fundo só junto às faces do pé, onde a coluna fica tangente a elas e o arredondamento precisa parar; no meio ele quase some.",
+  "receita": {
+    "sha256": "sha256:2d71c35b512855f371c3cfe3fcca9d04e1ae01dec50853bfcbc49d75fff14fa9",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 8,
+      "acrescentadas": 8,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": " * limpa e a auditoria fecha. O arredondamento para a 8 mm de cada face do pé,"
+        },
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": " * onde a coluna fica tangente a ela, e `afinarPontas` faz o raio cair até"
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": " * sumir nos 30 mm antes dessa ponta, em vez de fechar com uma tampa reta que"
+        },
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": " * aparecia como dente (a opção entrou no núcleo em 2026-11-04 por causa desta"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": " * peça, e vale para qualquer costura curva cortada pela regiao)."
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * limpa e a auditoria fecha. A seção do arredondamento é medida até 8 mm de"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " * cada face do pé, onde a coluna fica tangente a ela e a fatia encostaria na"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": " * face; dali até a face, `aparar` leva o anel ao longo da costura e corta o"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": " * tubo rente à face, um quarto de chanfro para dentro do começo dele (sobre a"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": " * aresta do chanfro a união deixaria um triângulo sem área). A opção entrou no"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": " * núcleo em 2026-11-04 por causa desta peça, e vale para qualquer encontro em"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": " * que uma face corta o canto."
+        },
+        {
+          "tipo": "-",
+          "linha": 60,
+          "texto": "  /* Comprimento em que o raio do encontro cai até sumir, antes de cada face do pé. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 61,
+          "texto": "  afinarDoEncontro: 30,"
+        },
+        {
+          "tipo": "-",
+          "linha": 99,
+          "texto": "    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, afinarPontas: m(t.afinarDoEncontro), regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] }, aparar: { min: [-1, -1, 1.25 * c], max: [1, 1, esp - 1.25 * c] } }]);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[9], PASSOS[10]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}
