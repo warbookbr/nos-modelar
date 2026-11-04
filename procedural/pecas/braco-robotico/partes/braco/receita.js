@@ -32,12 +32,14 @@
  * 360 mm do chão, a coluna encosta nele a cerca de 141 graus da vertical para
  * cada lado.
  *
- * Encontro do pé com a coluna: `unir` com `arredondarCostura` de 12 mm. Com o
- * pé 3 mm mais estreito de raio que a coluna (pé de 150 mm), o arredondamento
- * sai e a auditoria de interseção fecha. Com pé de 0,2 a 2,5 mm mais estreito
- * ou sem folga, a costura sai com triângulo degenerado ou o núcleo recusa o
- * raio, e o resultado depende do raio de modo irregular (3 e 8 mm recusados,
- * 5 e 12 aceitos pelo núcleo, só 12 e 20 fecham a auditoria).
+ * Encontro do pé com a coluna: `unir` com `arredondarCostura` de 12 mm, com o
+ * pé do mesmo raio da coluna. O pé mais estreito (3 mm de raio, na rodada 2)
+ * deixava degrau, orelhas e lascas no encontro; do mesmo raio a união sai
+ * limpa e a auditoria fecha. O arredondamento para a 8 mm de cada face do pé,
+ * onde a coluna fica tangente a ela, e `afinarPontas` faz o raio cair até
+ * sumir nos 30 mm antes dessa ponta, em vez de fechar com uma tampa reta que
+ * aparecia como dente (a opção entrou no núcleo em 2026-11-04 por causa desta
+ * peça, e vale para qualquer costura curva cortada pela regiao).
  */
 
 export const TABELA = {
@@ -47,15 +49,16 @@ export const TABELA = {
   diametroDaColuna: 156,
   /* Do fundo do pé ao topo. */
   alturaTotal: 477,
-  /* O pé é 3 mm mais estreito de raio que a coluna: com menos, a costura fica degenerada; paredes tangentes quebram a
-     união. */
-  folgaDoPe: 3,
+  /* Quanto o raio do pé fica abaixo do da coluna; zero é o desenho da pessoa (pé do diâmetro da coluna). */
+  folgaDoPe: 0,
   /* Acabamento das carcaças: chanfro estreito nas bordas, com o raio do
      vértice suavizado. */
   chanfro: 2,
   suaveDoChanfro: 0.8,
   /* Concordância no encontro do pé com a coluna; zero a desliga (ver acima). */
   raioDoEncontro: 12,
+  /* Comprimento em que o raio do encontro cai até sumir, antes de cada face do pé. */
+  afinarDoEncontro: 30,
   lados: 72,
 };
 
@@ -93,7 +96,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['unir', { origemId: ID.corpo, solidos: [{ origem: { op: 'lathe', id: ID.pe } }, { origem: { op: 'lathe', id: ID.coluna } }] }]);
   const corpo = { origem: { op: 'unir', id: ID.corpo } };
   if (t.raioDoEncontro > 0) {
-    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] } }]);
+    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, afinarPontas: m(t.afinarDoEncontro), regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] } }]);
   }
   const concordancia = { origem: { op: 'arredondarCostura', id: ID.concordancia } };
   if (t.raioDoEncontro > 0) passos.push(['parte', { nome: 'coluna', sel: concordancia, substituir: true }]);
@@ -120,7 +123,7 @@ const receita = {
     referencias: ['../../referencias/coluna-reta.png', '../../referencias/coluna-reta-lado.png'],
     escala: { medida: 'diâmetro da coluna, do pé ao topo', milimetros: 156 },
     partes: [
-      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 150 mm de diâmetro (3 mm de raio a menos que a coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },
+      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 156 mm de diâmetro (o da coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },
       { nome: 'coluna', forma: 'cilindro redondo e reto de 156 mm do pé ao topo, 477 mm do fundo do pé ao topo, de eixo vertical sobre o pé; topo plano onde assenta o anel do cotovelo; bordas suavizadas', tecnica: 'lathe de eixo Y com chanfro de vértice suavizado no topo, unir, arredondarCostura no encontro com o pé e liso com ângulo' },
     ],
     criteriosDeReprovacao: [
