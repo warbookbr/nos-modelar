@@ -34,7 +34,7 @@ const maiorEnchimento = (n: any, z0: number, z1: number) => {
   return maior;
 };
 
-describe('arredondarCostura com afinarPontas', () => {
+describe('arredondarCostura com afinarPontas e aparar', () => {
   it('sem a opção, o tubo chega ao limite da regiao com o raio pleno', () => {
     const n = nucleo(passos());
     expect(n.orfaos).toEqual([]);
@@ -63,6 +63,27 @@ describe('arredondarCostura com afinarPontas', () => {
     expect(lascas(com)).toBe(lascas(sem));
     expect(lascas(com)).toBe(lascas(nucleo(passos().slice(0, 3))));
     expect(JSON.stringify(neutroCanonico(com))).toBe(JSON.stringify(neutroCanonico(nucleo(passos({ afinarPontas: 0.03 })))));
+  });
+
+  it('com aparar, o tubo segue a costura fora da regiao e fica rente ao plano de corte', () => {
+    const plano = 1.25 * C;   // fora da aresta do começo do chanfro, a 2 mm da face
+    const n = nucleo(passos({ aparar: { min: [-1, -1, plano], max: [1, 1, ESP - plano] } }));
+    expect(n.orfaos).toEqual([]);
+    const zs: number[] = [];
+    for (const f of n.F.values()) if (f.cor === '#ff0000') for (const v of f.vs) zs.push(n.V.get(v)[2]);
+    // chega até o plano de corte, e não passa dele
+    expect(Math.min(...zs)).toBeCloseTo(plano, 6);
+    expect(Math.max(...zs)).toBeCloseTo(ESP - plano, 6);
+    // entre a regiao e o corte o canto continua cheio
+    expect(maiorEnchimento(n, plano, ZMIN)).toBeGreaterThan(maiorEnchimento(nucleo(passos()), plano, ZMIN));
+    expect(arestasSemPar(n)).toEqual([]);
+    expect(vinculosNaoManifold(n)).toEqual([]);
+  });
+
+  it('aparar sem regiao grita', () => {
+    const ps = passos({ aparar: { min: [-1, -1, 0], max: [1, 1, ESP] } });
+    delete ps[3][1].regiao;
+    expect(nucleo(ps).orfaos.map((o: any) => o.ref)).toContain('aparar');
   });
 
   it('comprimento que não é positivo grita', () => {

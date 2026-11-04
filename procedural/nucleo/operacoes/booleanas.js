@@ -1081,6 +1081,13 @@ export function criarOperacoesBooleanas(servicos) {
        `arestas`    'concavas' (padrão), 'convexas', 'internas', 'todas' ou
                     lista dessas;
        `raioMinimo` opcional, em (0, raio], só tem efeito no modo por fatias;
+       `aparar`     caixa {min,max} do mundo, só com `regiao`: fora da regiao a
+                    seção não é medida, o anel da última estação medida é
+                    levado ao longo da costura, girado com a direção dela, e o
+                    tubo é intersectado com esta caixa. O arredondamento chega
+                    rente à face que corta o canto. O plano da caixa não pode
+                    cair sobre uma aresta do sólido (o começo de um chanfro,
+                    por exemplo): a união deixa ali um triângulo sem área;
        `afinarPontas` opcional, comprimento > 0, só no modo por fatias: na ponta
                     solta de um trecho que a `regiao` cortou, o raio cai em
                     linha até 15% ao longo desse comprimento, em vez de o tubo
@@ -1153,6 +1160,14 @@ export function criarOperacoesBooleanas(servicos) {
       if (!r || typeof r !== 'object' || Array.isArray(r) || Object.keys(r).some((k) => k !== 'min' && k !== 'max') || r.min == null || r.max == null) return grita(st, i, op, 'regiao', 'regiao precisa ser {min:[x,y,z], max:[x,y,z]}');
       try { regiao = { min: st.vec(r.min), max: st.vec(r.max) }; } catch (e) { return grita(st, i, op, 'regiao', e.message); }
       if (regiao.min.some((c, k) => !(c <= regiao.max[k]))) return grita(st, i, op, 'regiao', 'regiao: min não pode passar de max');
+    }
+    let aparar = null;
+    if (a.aparar != null) {
+      const r = a.aparar;
+      if (!r || typeof r !== 'object' || Array.isArray(r) || Object.keys(r).some((k) => k !== 'min' && k !== 'max') || r.min == null || r.max == null) return grita(st, i, op, 'aparar', 'aparar precisa ser {min:[x,y,z], max:[x,y,z]}');
+      try { aparar = { min: st.vec(r.min), max: st.vec(r.max) }; } catch (e) { return grita(st, i, op, 'aparar', e.message); }
+      if (aparar.min.some((c, k) => !(c < aparar.max[k]))) return grita(st, i, op, 'aparar', 'aparar: min precisa ficar abaixo de max em cada eixo');
+      if (!regiao) return grita(st, i, op, 'aparar', 'aparar só vale com regiao: a regiao diz onde a seção é medida, e fora dela o tubo segue a costura até a caixa de aparar');
     }
 
     /* `arestas`: quais arestas ganham raio. 'concavas' (padrão) é o encontro
@@ -1769,6 +1784,26 @@ export function criarOperacoesBooleanas(servicos) {
         let atual = [], pendente = null, deV = null, ateV = null;
         const criadas = [];
         let inicioNaRegiao = false, antesForaDaRegiao = false;
+        /* TUBO APARADO (`aparar`): fora da regiao a seção não é medida (ali a
+           fatia encosta numa face que corta o canto, e o círculo sairia
+           errado); o anel da última estação medida é LEVADO ao longo da
+           costura, girado com a direção dela, até o fim, e o tubo inteiro é
+           depois intersectado com a caixa de aparar. Assim o arredondamento
+           chega à face que corta o canto e fica rente a ela, em vez de parar
+           antes. */
+        const levar = (sec, para) => {
+          const de = sec.estacao, u0 = de.u.map((c) => c / tamanho(de.u)), u1 = para.u.map((c) => c / tamanho(para.u));
+          const eixo = cruz(u0, u1), s = tamanho(eixo), c = ponto(u0, u1);
+          const girar = (v) => {
+            if (!(s > 1e-12)) return v;
+            const k = eixo.map((w) => w / s), kv = cruz(k, v), kk = ponto(k, v);
+            return v.map((w, j) => w * c + kv[j] * s + k[j] * kk * (1 - c));
+          };
+          const anel = sec.anel.map((q) => { const d = girar(sub(q, de.P)); return para.P.map((w, j) => w + d[j]); });
+          const Cl = sub(sec.C, centroT), dC = girar(sub(Cl, de.P));
+          return { anel, C: para.P.map((w, j) => w + dC[j] + centroT[j]), estacao: para, levado: true };
+        };
+        let antesDaPrimeira = [];
         const fecharCadeia = (laco, fimNaRegiao = false) => {
           if (afinarPontas != null && !laco && atual.length >= 2) afinarAsPontas(atual, inicioNaRegiao && deV == null, fimNaRegiao && ateV == null);
           if (atual.length >= 2) { const c = { aneis: atual.map((e) => e.anel), centros: atual.map((e) => e.C), fechada: laco, sinal, deV, ateV }; cadeias.push(c); criadas.push(c); }
@@ -1794,11 +1829,18 @@ export function criarOperacoesBooleanas(servicos) {
             pendente = dentro && e.saida && e.saida.rec ? { dir: e.saida.dir, plano: planoDoCorte(e.saida.rec, e.v), v: e.v, mundo: e.mundo, anel: anelDaQuina } : null;
             continue;
           }
-          if (regiao && !e.mundo.every((c, k) => c >= regiao.min[k] && c <= regiao.max[k])) { todas = false; pendente = null; fecharCadeia(false, true); antesForaDaRegiao = true; continue; }   // a caixa é do mundo
+          if (regiao && !e.mundo.every((c, k) => c >= regiao.min[k] && c <= regiao.max[k])) {   // a caixa é do mundo
+            if (aparar && tamanho(e.u) > 0) {
+              const base = [...atual].reverse().find((s) => s.estacao && !s.levado);
+              if (base) { atual.push(levar(base, e)); continue; }
+              if (!atual.length) { antesDaPrimeira.push(e); continue; }
+            }
+            todas = false; pendente = null; fecharCadeia(false, true); antesForaDaRegiao = true; continue;
+          }
           if (!(tamanho(e.u) > 0)) { todas = false; pendente = null; fecharCadeia(false); continue; }
           const sec = secaoEm(e.P, e.u.map((c) => c / tamanho(e.u)), e.onde);
           if (sec.erro) return sec;
-          if (sec.pula) { todas = false; pendente = null; fecharCadeia(false); antesForaDaRegiao = false; continue; }
+          if (sec.pula) { todas = false; pendente = null; fecharCadeia(false); antesForaDaRegiao = false; antesDaPrimeira = []; continue; }
           if (pendente && !atual.length) {
             const desl = pendente.anel ?? deslizar(sec, pendente.dir, pendente.plano);
             if (!desl) return semCorte(pendente.v, pendente.mundo);
@@ -1808,7 +1850,10 @@ export function criarOperacoesBooleanas(servicos) {
           pendente = null;
           if (!atual.length) inicioNaRegiao = antesForaDaRegiao;
           antesForaDaRegiao = false;
-          atual.push({ ...sec, estacao: e });
+          const medida = { ...sec, estacao: e };
+          if (!atual.length && antesDaPrimeira.length) for (const f of antesDaPrimeira) atual.push(levar(medida, f));
+          antesDaPrimeira = [];
+          atual.push(medida);
         }
         fecharCadeia(fechado && todas);
         /* laço com quina que recomeça na mesma quina em que termina: o
@@ -1943,6 +1988,22 @@ export function criarOperacoesBooleanas(servicos) {
         const r = fechar(props, tri, `o tubo ${n} do arredondamento`, fids);
         if (r.erro) { apaga(); return r; }
         idsAux.add(r.idReservado);
+        if (aparar) {
+          /* a caixa de aparar entra como sólido auxiliar: as faces do corte
+             nascem com o id dela, que é do arredondamento */
+          const lo = local(aparar.min), hi = local(aparar.max);
+          const cubo = M.cube(hi.map((c, j) => c - lo[j]), false);
+          const caixa = cubo.translate(lo);
+          cubo.delete();
+          const marcada = caixa.asOriginal();
+          caixa.delete();
+          idsAux.add(marcada.originalID());
+          const aparado = M.intersection([r.solido, marcada]);
+          r.solido.delete(); marcada.delete();
+          if (aparado.isEmpty()) { aparado.delete(); continue; }
+          (cad.sinal > 0 ? enchem : tiram).push(aparado);
+          continue;
+        }
         (cad.sinal > 0 ? enchem : tiram).push(r.solido);
       }
       if (!curvo) for (const c of concavas) {

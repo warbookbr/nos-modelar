@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:5255e8844d06f459f36f9f5b6b49fb2906c0de1f6f3b71d983de781045264afd",
+  "assinatura": "sha256:a4ceac7622f5d55724bb9f3c5efb6db26ee568900cc510835848566c91e0d5ed",
   "total": 39,
   "operacoes": [
     {
@@ -475,6 +475,10 @@
                 }
               ],
               "description": "Onde o raio não cabe (modo curvo), ele diminui até este mínimo."
+            },
+            "aparar": {
+              "type": "object",
+              "description": "Caixa {min,max}, só com regiao: fora da regiao o tubo segue a costura com o anel da última seção medida e é cortado por esta caixa, rente à face que corta o canto."
             },
             "afinarPontas": {
               "anyOf": [
