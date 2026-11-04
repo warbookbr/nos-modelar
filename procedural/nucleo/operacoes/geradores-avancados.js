@@ -2,7 +2,7 @@
 import { ErroDePerfil, montarPerfil } from '../perfil2d.js';
 
 export function criarOperacoesGeradoresAvancados(servicos) {
-  const { BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias } = servicos;
+  const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias } = servicos;
   return {
   lathe(st, a, i) {
     const b = confereId(st, i, 'lathe', a);
@@ -125,7 +125,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       if (fechadoDe(pontos)) nV -= pontos[ultimo].polo ? 1 : L;   // o último ponto não aloca: ele reusa o primeiro
       for (let idx = 0; idx < pontos.length - 1; idx++) if (!(pontos[idx].polo && pontos[idx + 1].polo)) nF += L;
     }
-    if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: lathe com ${perfil.length} pontos × lados=${L} estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
+    if (nV > BLOCO + FAIXA_ESTENDIDA || nF > BLOCO + FAIXA_ESTENDIDA) throw new Error(`oficina: lathe com ${perfil.length} pontos × lados=${L} estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}): ${nV} vértices / ${nF} faces`);
 
     let cursor = 0, fCursor = 0;
     // origemId (Fase 4): faixas[idx] = ids de face do segmento idx (vazia se polo↔polo) — a MESMA forma que o loft já monta, ver `contratoFaixaLado`.
@@ -140,14 +140,14 @@ export function criarOperacoesGeradoresAvancados(servicos) {
         if (fechado && idx === ultimo) { info.push(info[0]); continue; }   // solda: nenhum id novo
         const p = pontos[idx];
         if (p.polo) {
-          const id = b + cursor;
+          const id = idDoPasso(i, cursor);
           addV(st, id, [0, p.y, 0]);
           cursor += 1;
           info.push({ polo: true, id });
           continue;
         }
         const ids = [];
-        for (let j = 0; j < L; j++) { const t = (j / L) * Math.PI * 2; const id = b + cursor + j; addV(st, id, [Math.cos(t) * p.raio, p.y, Math.sin(t) * p.raio]); ids.push(id); }
+        for (let j = 0; j < L; j++) { const t = (j / L) * Math.PI * 2; const id = idDoPasso(i, cursor + j); addV(st, id, [Math.cos(t) * p.raio, p.y, Math.sin(t) * p.raio]); ids.push(id); }
         cursor += L;
         info.push({ polo: false, ids });
       }
@@ -158,11 +158,11 @@ export function criarOperacoesGeradoresAvancados(servicos) {
         const A = info[idx], B = info[idx + 1];
         if (A.polo && B.polo) { grita(st, i, 'lathe', idx, 'polo↔polo adjacente — perfil degenerado, sem face neste segmento'); continue; }   // 0 faces, cursor não avança
         if (!A.polo && !B.polo) {
-          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.ids[j], B.ids[j], B.ids[n], A.ids[n]]); doLaco[idx].push(fid); }   // anel<->anel: quads (a faixa da esfera)
+          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = idDoPasso(i, fCursor + j); addF(st, fid, [A.ids[j], B.ids[j], B.ids[n], A.ids[n]]); doLaco[idx].push(fid); }   // anel<->anel: quads (a faixa da esfera)
         } else if (A.polo) {
-          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.id, B.ids[j], B.ids[n]]); doLaco[idx].push(fid); }   // polo embaixo -> anel em cima: leque SUL
+          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = idDoPasso(i, fCursor + j); addF(st, fid, [A.id, B.ids[j], B.ids[n]]); doLaco[idx].push(fid); }   // polo embaixo -> anel em cima: leque SUL
         } else {
-          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [B.id, A.ids[n], A.ids[j]]); doLaco[idx].push(fid); }   // anel embaixo -> polo em cima: leque NORTE (invertido)
+          for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = idDoPasso(i, fCursor + j); addF(st, fid, [B.id, A.ids[n], A.ids[j]]); doLaco[idx].push(fid); }   // anel embaixo -> polo em cima: leque NORTE (invertido)
         }
         fCursor += L;
       }
@@ -438,7 +438,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
     // guarda de overflow (D3): soma EXATA — segmento polo<->polo não soma face — ANTES de montar frame/inserir
     let nV = 0; for (const s of secoes) nV += s.polo ? 1 : s.aresta ? L / 2 + 1 : L;
     let nF = 0; for (let idx = 0; idx < secoes.length - 1; idx++) if (!(secoes[idx].polo && secoes[idx + 1].polo)) nF += L;
-    if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: loft com ${secoes.length} seções × lados=${L} estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
+    if (nV > BLOCO + FAIXA_ESTENDIDA || nF > BLOCO + FAIXA_ESTENDIDA) throw new Error(`oficina: loft com ${secoes.length} seções × lados=${L} estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}): ${nV} vértices / ${nF} faces`);
 
     // TANGENTES por seção: ponta = direção do único segmento; interior = média normalizada dos dois vizinhos
     const ultimo = secoes.length - 1;
@@ -530,7 +530,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       if (fechado && idx === ultimo) { info.push(info[0]); continue; }   // solda: nenhum id novo
       const s = secoes[idx];
       if (s.polo) {
-        const id = b + cursor;
+        const id = idDoPasso(i, cursor);
         addV(st, id, s.pos);
         cursor += 1;
         info.push({ polo: true, id });
@@ -555,7 +555,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
         const fila = new Map();
         for (const k of [...new Set(posicao)].sort((x, y) => x - y)) {
           const ca = p0[0] + (d[0] * k) / meia, sa = p0[1] + (d[1] * k) / meia;
-          const id = b + cursor + k;
+          const id = idDoPasso(i, cursor + k);
           addV(st, id, [s.pos[0] + fr.u[0] * ca + fr.w[0] * sa, s.pos[1] + fr.u[1] * ca + fr.w[1] * sa, s.pos[2] + fr.u[2] * ca + fr.w[2] * sa]);
           fila.set(k, id);
         }
@@ -569,7 +569,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
            cos/sin·raio — a MESMA fórmula de posição abaixo, só a origem de
            ca/sa muda; toda a estrutura de cursor/faces é cega a essa troca. */
         const [ca, sa] = s.contorno ? s.contorno[j] : [Math.cos((j / L) * Math.PI * 2) * s.raio, Math.sin((j / L) * Math.PI * 2) * s.raio];
-        const id = b + cursor + j;
+        const id = idDoPasso(i, cursor + j);
         addV(st, id, [s.pos[0] + fr.u[0] * ca + fr.w[0] * sa, s.pos[1] + fr.u[1] * ca + fr.w[1] * sa, s.pos[2] + fr.u[2] * ca + fr.w[2] * sa]);
         ids.push(id);
       }
@@ -589,7 +589,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
            as duas posições coincidem a face vira triângulo. */
         const E = A.aresta ? A : B, R = A.aresta ? B : A;
         for (let j = 0; j < L; j++) {
-          const n = (j + 1) % L, fid = b + fCursor + j;
+          const n = (j + 1) % L, fid = idDoPasso(i, fCursor + j);
           const kj = E.posicao[j], kn = E.posicao[n], passo = kn >= kj ? 1 : -1;
           const naFila = [];
           for (let k = kj; k !== kn + passo; k += passo) if (E.fila.has(k)) naFila.push(E.fila.get(k));
@@ -600,11 +600,11 @@ export function criarOperacoesGeradoresAvancados(servicos) {
           faixas[idx].push(fid);
         }
       } else if (!A.polo && !B.polo) {
-        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.ids[j], B.ids[j], B.ids[n], A.ids[n]]); faixas[idx].push(fid); }   // anel<->anel: quads (a faixa da esfera)
+        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = idDoPasso(i, fCursor + j); addF(st, fid, [A.ids[j], B.ids[j], B.ids[n], A.ids[n]]); faixas[idx].push(fid); }   // anel<->anel: quads (a faixa da esfera)
       } else if (A.polo) {
-        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.id, B.ids[j], B.ids[n]]); faixas[idx].push(fid); }   // polo atrás -> anel na frente: leque SUL
+        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = idDoPasso(i, fCursor + j); addF(st, fid, [A.id, B.ids[j], B.ids[n]]); faixas[idx].push(fid); }   // polo atrás -> anel na frente: leque SUL
       } else {
-        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [B.id, A.ids[n], A.ids[j]]); faixas[idx].push(fid); }   // anel atrás -> polo na frente: leque NORTE (invertido)
+        for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = idDoPasso(i, fCursor + j); addF(st, fid, [B.id, A.ids[n], A.ids[j]]); faixas[idx].push(fid); }   // anel atrás -> polo na frente: leque NORTE (invertido)
       }
       fCursor += L;
     }
