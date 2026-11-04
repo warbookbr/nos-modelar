@@ -71,7 +71,14 @@ try {
     [...new Set(formasNoArrasto)].join(' | '));
   ok('(a3) ao soltar, o ponteiro volta a responder ao que está sob ele',
     ['grab', 'pointer'].includes(await formaDoCursor()), await formaDoCursor());
-  await page.waitForTimeout(180);
+  /* A bancada grava a câmera no endereço 200 ms depois do último aviso do giro (ESPERA_DA_CAMERA_MS, em
+     gravador-da-camera.js), e o amortecimento continua avisando depois de soltar o botão. A espera fixa de 180 ms que
+     estava aqui ficava abaixo disso: a guarda passava ou falhava conforme a máquina (achado de 2026-11-04). Agora ela
+     espera a gravação acontecer, com teto de 5 s. */
+  await page.waitForFunction(
+    () => new URL(window.location.href).searchParams.get('vista') === 'livre',
+    { timeout: 5000 },
+  ).catch(() => {});
   const urlLivre = page.url();
   const estadoLivre = await page.evaluate(() => window.__mecanificaBancada.estado());
   const params = new URL(urlLivre).searchParams;
