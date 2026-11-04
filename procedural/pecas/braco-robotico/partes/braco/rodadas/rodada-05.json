@@ -1,0 +1,179 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/braco",
+  "numero": 5,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/braco-robotico/referencias/coluna-reta.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "coluna",
+        "tipo": "superficie",
+        "onde": "encontro com o pé, lado +z e lado direito, logo acima do pé",
+        "sentido": "segmentado",
+        "evidencia": "Rasante de frente az120: entalhe escuro em bico no encontro. Rasante de lado az30: cavidade escura de borda dentada. Isométrica: degrau pequeno, perto de 415,880."
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "costura de entrada da coluna no pé, face cilíndrica superior",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica isolada do pé e da coluna: contorno serrilhado onde a coluna entra no pé. Arame isométrico: leque de triângulos finos e desordenados na costura. Traseira: vinco em V."
+      }
+    ],
+    "observacao": "Silhueta, altura e diâmetro batem com a referência reta e redonda; só a costura do pé com a coluna mostra rasgo serrilhado e entalhe de sombra no lugar da concordância contínua prometida."
+  },
+  "partes": [
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": "disco de eixo Z de 156 mm, do diâmetro da coluna, fundido a ela, com arredondarCostura de 12 mm levado ao longo da costura e cortado por um molde com o chanfro do pé prolongado (aparar com solido)"
+    },
+    {
+      "nome": "coluna",
+      "confere": true,
+      "observacao": "cilindro de 156 mm e 477 mm de altura total; o arredondamento termina acompanhando o chanfro, sem parede"
+    }
+  ],
+  "atrito": [
+    "os agentes modeladores pararam num bloqueio automático do serviço; quem conduz fez a rodada com a opção nova do núcleo, por acordo com a pessoa",
+    "o crítico apontou um degrau em coordenada da isométrica onde a imagem mostra só a borda do pé"
+  ],
+  "notaDePassagem": "Pé do mesmo raio da coluna: a união sai limpa. O canto é fundo só junto às faces do pé, onde a coluna fica tangente a elas e o arredondamento precisa parar; no meio ele quase some.",
+  "receita": {
+    "sha256": "sha256:bd62f78c658364b06eb368881de59824495436a08f77f97e5ca3d24321ab473b",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 6,
+      "acrescentadas": 15,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": " * tubo rente à face, um quarto de chanfro para dentro do começo dele (sobre a"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": " * aresta do chanfro a união deixaria um triângulo sem área). A opção entrou no"
+        },
+        {
+          "tipo": "-",
+          "linha": 43,
+          "texto": " * núcleo em 2026-11-04 por causa desta peça, e vale para qualquer encontro em"
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": " * que uma face corta o canto."
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": " * tubo por um molde, o pé com o chanfro das bordas prolongado para fora, e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": " * arredondamento termina acompanhando o chanfro. A opção entrou no núcleo em"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": " * 2026-11-04 por causa desta peça, e vale para qualquer encontro em que uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": " * face corta o canto."
+        },
+        {
+          "tipo": "-",
+          "linha": 66,
+          "texto": "const ID = { pe: 100, coluna: 200, corpo: 300, concordancia: 400 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "const ID = { pe: 100, coluna: 200, corpo: 300, concordancia: 400, molde: 500 };"
+        },
+        {
+          "tipo": "-",
+          "linha": 99,
+          "texto": "    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] }, aparar: { min: [-1, -1, 1.25 * c], max: [1, 1, esp - 1.25 * c] } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    /* O molde do corte do arredondamento: o pé com o chanfro das bordas prolongado para fora, até além do raio do encontro."
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "       O arredondamento termina acompanhando o chanfro, e o passo consome o molde. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    const alem = m(t.raioDoEncontro) + 0.01;"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    /* 0,2 mm para dentro do chanfro: o molde em cima do chanfro deixaria face sem área na união, e para fora, lasca no canto arredondado dele */"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    const fora = -0.0002;"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "    passos.push(['lathe', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "      origemId: ID.molde, eixo: 'z', lados: t.lados, segmentosCurva: 2, em: [0, 0, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "      perfil: [[0, -fora], [rp - c, -fora], [rp + alem, c + alem - fora], [rp + alem, esp - c - alem + fora], [rp - c, esp + fora], [0, esp + fora]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] }, aparar: { solido: { origem: { op: 'lathe', id: ID.molde } } } }]);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[10], PASSOS[11]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}
