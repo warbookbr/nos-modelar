@@ -66,3 +66,6 @@ public/sessao-ativa.json
 *.obj
 *.mtl
 importados/
+
+# imagens de conferência do esboço (npm run esboco -- <arquivo> --analise): geradas, nunca versionadas
+**/referencias/*-analise/
