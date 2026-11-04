@@ -38,10 +38,10 @@
  * limpa e a auditoria fecha. A seção do arredondamento é medida até 8 mm de
  * cada face do pé, onde a coluna fica tangente a ela e a fatia encostaria na
  * face; dali até a face, `aparar` leva o anel ao longo da costura e corta o
- * tubo rente à face, um quarto de chanfro para dentro do começo dele (sobre a
- * aresta do chanfro a união deixaria um triângulo sem área). A opção entrou no
- * núcleo em 2026-11-04 por causa desta peça, e vale para qualquer encontro em
- * que uma face corta o canto.
+ * tubo por um molde, o pé com o chanfro das bordas prolongado para fora, e o
+ * arredondamento termina acompanhando o chanfro. A opção entrou no núcleo em
+ * 2026-11-04 por causa desta peça, e vale para qualquer encontro em que uma
+ * face corta o canto.
  */
 
 export const TABELA = {
@@ -63,7 +63,7 @@ export const TABELA = {
 };
 
 const m = (mm) => mm / 1000;
-const ID = { pe: 100, coluna: 200, corpo: 300, concordancia: 400 };
+const ID = { pe: 100, coluna: 200, corpo: 300, concordancia: 400, molde: 500 };
 
 export function derivar(t = TABELA) {
   const rc = m(t.diametroDaColuna) / 2;
@@ -96,7 +96,16 @@ export function gerarPassos(t = TABELA) {
   passos.push(['unir', { origemId: ID.corpo, solidos: [{ origem: { op: 'lathe', id: ID.pe } }, { origem: { op: 'lathe', id: ID.coluna } }] }]);
   const corpo = { origem: { op: 'unir', id: ID.corpo } };
   if (t.raioDoEncontro > 0) {
-    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] }, aparar: { min: [-1, -1, 1.25 * c], max: [1, 1, esp - 1.25 * c] } }]);
+    /* O molde do corte do arredondamento: o pé com o chanfro das bordas prolongado para fora, até além do raio do encontro.
+       O arredondamento termina acompanhando o chanfro, e o passo consome o molde. */
+    const alem = m(t.raioDoEncontro) + 0.01;
+    /* 0,2 mm para dentro do chanfro: o molde em cima do chanfro deixaria face sem área na união, e para fora, lasca no canto arredondado dele */
+    const fora = -0.0002;
+    passos.push(['lathe', {
+      origemId: ID.molde, eixo: 'z', lados: t.lados, segmentosCurva: 2, em: [0, 0, 0],
+      perfil: [[0, -fora], [rp - c, -fora], [rp + alem, c + alem - fora], [rp + alem, esp - c - alem + fora], [rp - c, esp + fora], [0, esp + fora]],
+    }]);
+    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] }, aparar: { solido: { origem: { op: 'lathe', id: ID.molde } } } }]);
   }
   const concordancia = { origem: { op: 'arredondarCostura', id: ID.concordancia } };
   if (t.raioDoEncontro > 0) passos.push(['parte', { nome: 'coluna', sel: concordancia, substituir: true }]);
