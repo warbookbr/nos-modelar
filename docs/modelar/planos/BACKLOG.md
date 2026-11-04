@@ -195,3 +195,16 @@ seta ausente —, mas a bancada não diz isso: o eixo simplesmente não aparece,
 quem olha não distingue "não dá para mover nesse eixo" de "a bancada falhou".
 Origem: fechamento de `encerrados/2026-09-12-a-seta-move-de-verdade.md`.
 
+
+## Triângulo sem área na união de superfícies tangentes
+
+A união de dois cilindros de mesmo raio em L (a coluna do braço sobre o pé)
+deixa um triângulo sem área na geratriz em que as duas superfícies se
+tangenciam: o vértice da costura cai no meio da aresta longa do pé, e o
+adaptador corta a face com três cantos alinhados. `conferirMalha` acusa, e
+nem `guarda:acervo` nem a auditoria da montagem pegam, porque nenhuma das duas
+olha a triangulação do adaptador. A correção é a união retirar o canto
+colinear nesse caso, como já faz na lasca do encaixe, e o que falta no
+processo é a guarda do acervo passar a contar triângulo sem área. Origem: a
+rodada 3 da coluna, em 2026-11-04, provada em
+`procedural/nucleo/operacoes/arredondar-costura-pontas.test.ts`.

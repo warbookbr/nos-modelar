@@ -1081,6 +1081,10 @@ export function criarOperacoesBooleanas(servicos) {
        `arestas`    'concavas' (padrão), 'convexas', 'internas', 'todas' ou
                     lista dessas;
        `raioMinimo` opcional, em (0, raio], só tem efeito no modo por fatias;
+       `afinarPontas` opcional, comprimento > 0, só no modo por fatias: na ponta
+                    solta de um trecho que a `regiao` cortou, o raio cai em
+                    linha até 15% ao longo desse comprimento, em vez de o tubo
+                    fechar com o raio pleno e uma tampa reta;
        `regiao`     caixa {min,max} do mundo: só os vértices e estações dentro
                     dela. Na costura côncava de sempre só vale no modo por
                     fatias e grita no plano; nas classes novas leva ao modo por
@@ -1174,6 +1178,11 @@ export function criarOperacoesBooleanas(servicos) {
     if (a.raioMinimo != null) {
       try { raioMinimo = st.num(a.raioMinimo); } catch (e) { return grita(st, i, op, 'raioMinimo', e.message); }
       if (!(raioMinimo > 0) || !(raioMinimo <= raio)) return grita(st, i, op, 'raioMinimo', `raioMinimo precisa estar em (0, raio] (recebido ${raioMinimo}, com raio ${raio})`);
+    }
+    let afinarPontas = null;
+    if (a.afinarPontas != null) {
+      try { afinarPontas = st.num(a.afinarPontas); } catch (e) { return grita(st, i, op, 'afinarPontas', e.message); }
+      if (!(afinarPontas > 0) || !Number.isFinite(afinarPontas)) return grita(st, i, op, 'afinarPontas', `afinarPontas precisa ser um comprimento > 0 (recebido ${JSON.stringify(a.afinarPontas)} = ${afinarPontas})`);
     }
     if (classes.includes('internas') && de.op !== 'subtrair') {
       return grita(st, i, op, 'arestas', `arestas:'internas' só vale num subtrair, onde a ferramenta deixa faces próprias na peça; ${de.op}:${de.id} não tem ferramenta (tire 'internas' da lista, ou arredonde as arestas do operando antes da booleana)`);
@@ -1734,9 +1743,34 @@ export function criarOperacoesBooleanas(servicos) {
             }
           }
         }
+        /* PONTA AFINADA (`afinarPontas`): a ponta solta de um trecho (o fim da
+           regiao) fechava com o anel de raio pleno e uma tampa reta, que
+           aparecia como um dente na sombra. Com o comprimento declarado, as
+           estações a menos dele dessa ponta refazem a seção com o raio caindo em
+           linha até 15% do pedido, e o tubo some aos poucos. Não afinam a ponta
+           em que o encontro fica plano (ali o tubo já some sozinho) nem a que
+           continua em outro trecho (a quina). */
+        const afinarAsPontas = (lista, inicioSolto, fimSolto) => {
+          const pos = lista.map((s) => s.estacao?.P ?? null);
+          const dist = [0];
+          for (let k = 1; k < lista.length; k++) dist.push(dist[k - 1] + (pos[k] && pos[k - 1] ? tamanho(sub(pos[k], pos[k - 1])) : 0));
+          const total = dist[dist.length - 1];
+          for (let k = 0; k < lista.length; k++) {
+            const e = lista[k].estacao;
+            if (!e) continue;
+            let fator = 1;
+            if (inicioSolto) fator = Math.min(fator, Math.max(0.15, dist[k] / afinarPontas));
+            if (fimSolto) fator = Math.min(fator, Math.max(0.15, (total - dist[k]) / afinarPontas));
+            if (!(fator < 1)) continue;
+            const sec = secaoComRaio(e.P, e.u.map((c) => c / tamanho(e.u)), e.onde, raio * fator);
+            if (sec.anel) lista[k] = { ...sec, estacao: e };
+          }
+        };
         let atual = [], pendente = null, deV = null, ateV = null;
         const criadas = [];
-        const fecharCadeia = (laco) => {
+        let inicioNaRegiao = false, antesForaDaRegiao = false;
+        const fecharCadeia = (laco, fimNaRegiao = false) => {
+          if (afinarPontas != null && !laco && atual.length >= 2) afinarAsPontas(atual, inicioNaRegiao && deV == null, fimNaRegiao && ateV == null);
           if (atual.length >= 2) { const c = { aneis: atual.map((e) => e.anel), centros: atual.map((e) => e.C), fechada: laco, sinal, deV, ateV }; cadeias.push(c); criadas.push(c); }
           atual = []; deV = null; ateV = null;
         };
@@ -1760,11 +1794,11 @@ export function criarOperacoesBooleanas(servicos) {
             pendente = dentro && e.saida && e.saida.rec ? { dir: e.saida.dir, plano: planoDoCorte(e.saida.rec, e.v), v: e.v, mundo: e.mundo, anel: anelDaQuina } : null;
             continue;
           }
-          if (regiao && !e.mundo.every((c, k) => c >= regiao.min[k] && c <= regiao.max[k])) { todas = false; pendente = null; fecharCadeia(false); continue; }   // a caixa é do mundo
+          if (regiao && !e.mundo.every((c, k) => c >= regiao.min[k] && c <= regiao.max[k])) { todas = false; pendente = null; fecharCadeia(false, true); antesForaDaRegiao = true; continue; }   // a caixa é do mundo
           if (!(tamanho(e.u) > 0)) { todas = false; pendente = null; fecharCadeia(false); continue; }
           const sec = secaoEm(e.P, e.u.map((c) => c / tamanho(e.u)), e.onde);
           if (sec.erro) return sec;
-          if (sec.pula) { todas = false; pendente = null; fecharCadeia(false); continue; }
+          if (sec.pula) { todas = false; pendente = null; fecharCadeia(false); antesForaDaRegiao = false; continue; }
           if (pendente && !atual.length) {
             const desl = pendente.anel ?? deslizar(sec, pendente.dir, pendente.plano);
             if (!desl) return semCorte(pendente.v, pendente.mundo);
@@ -1772,7 +1806,9 @@ export function criarOperacoesBooleanas(servicos) {
             deV = pendente.v;
           }
           pendente = null;
-          atual.push(sec);
+          if (!atual.length) inicioNaRegiao = antesForaDaRegiao;
+          antesForaDaRegiao = false;
+          atual.push({ ...sec, estacao: e });
         }
         fecharCadeia(fechado && todas);
         /* laço com quina que recomeça na mesma quina em que termina: o
