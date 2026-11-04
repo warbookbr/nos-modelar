@@ -40,13 +40,17 @@ export const TABELA = {
   espessuraDoAnel: 28,
   /* Raio da concordância no encontro de baixo entre a frente da parte de pé e
      a parte deitada. */
-  raioDoEncontro: 8,
+  raioDoEncontro: 10,
   chanfroDoPescoco: 2,
   /* Estações da transição quadrado-redondo. */
   estacoesDaSaida: 9,
   /* Seções intermediárias de cada loft, para os triângulos da emenda ficarem
      curtos: triângulo longo faz o sombreamento suave virar degrau. */
   estacoes: 5,
+  /* Raio das duas quinas de trás, em planta. */
+  raioDaTraseira: 75,
+  /* Estações das quinas de trás da parte deitada. */
+  estacoesDaTraseira: 24,
   lados: 48,
 };
 
@@ -55,8 +59,8 @@ export const MATERIAIS = { anelEscuro: { cor: '#4a4d52', aspereza: 0.45 } };
 const m = (mm) => mm / 1000;
 /* `n` valores igualmente espaçados estritamente entre `de` e `ate`. */
 const entre = (de, ate, n) => Array.from({ length: n }, (_, k) => de + ((ate - de) * (k + 1)) / (n + 1));
-/* A parte de pé é 0,2 mm mais estreita que a deitada. */
-const folga = 0.0002;
+/* A parte de pé é 0,3 mm mais estreita que a deitada. */
+const folga = 0.0003;
 const ID = { coluna: 100, anel: 200, braco: 300, corpo: 400, concordancia: 500 };
 
 export function derivar(t = TABELA) {
@@ -92,6 +96,22 @@ function quadrado(r, rc, lados) {
   return pts;
 }
 
+/* Retângulo de meia largura `w` e meia altura `a`, com cantos de raio `rc`,
+   no mesmo sentido e com o mesmo número de pontos do `quadrado`. */
+function retangulo(w, a, rc, lados) {
+  const por = lados / 4;
+  const pts = [];
+  for (let q = 0; q < 4; q++) {
+    const cx = (w - rc) * Math.sign(Math.cos(q * Math.PI / 2 + Math.PI / 4));
+    const cy = (a - rc) * Math.sign(Math.sin(q * Math.PI / 2 + Math.PI / 4));
+    for (let k = 0; k < por; k++) {
+      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
+      pts.push([cx + rc * Math.cos(th), cy + rc * Math.sin(th)]);
+    }
+  }
+  return pts;
+}
+
 /* Círculo com `lados` pontos, no mesmo sentido e com o mesmo número de pontos
    do retângulo, para a transição misturar ponto a ponto. */
 function redondo(r, lados) {
@@ -100,11 +120,13 @@ function redondo(r, lados) {
 
 /* Seção da parte de pé: frente plana em z = zf com os dois cantos arredondados
    no mesmo raio `rc` dos cantos da parte deitada (por isso o cruzamento dos
-   dois cantos é uma meia-esquadria plana) e lado de trás reto, de cantos
-   vivos, para a parede de trás descer do braço até o pé. */
-function contornoColuna(r, rc, lados, zf) {
+   dois cantos é uma meia-esquadria plana) e lado de trás reto, com as duas
+   quinas de trás arredondadas no raio `rq` em planta (decisão da pessoa em
+   2026-11-04: as quinas passavam 29 mm além do anel da cintura; com 75 mm
+   ficam 1,7 mm para dentro dele). */
+function contornoColuna(r, rc, lados, zf, rq) {
   const pts = [];
-  const por = (lados - 2) / 2;
+  const por = lados / 4;
   for (let q = 0; q < 2; q++) {
     const cx = (r - rc) * (q === 0 ? 1 : -1);
     for (let k = 0; k < por; k++) {
@@ -112,7 +134,13 @@ function contornoColuna(r, rc, lados, zf) {
       pts.push([cx + rc * Math.cos(th), zf - rc + rc * Math.sin(th)]);
     }
   }
-  pts.push([-r, -r], [r, -r]);
+  for (let q = 0; q < 2; q++) {
+    const cx = (r - rq) * (q === 0 ? -1 : 1);
+    for (let k = 0; k < por; k++) {
+      const th = Math.PI + q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
+      pts.push([cx + rq * Math.cos(th), -(r - rq) + rq * Math.sin(th)]);
+    }
+  }
   return pts;
 }
 
@@ -122,9 +150,10 @@ export function gerarPassos(t = TABELA) {
   const rc = m(t.raioDosCantos);
   const sec = (pos, rr) => ({ pos, contorno: quadrado(h, rr, L) });
   const zf = h - m(t.recuoDaFrente);
-  /* A parte de pé é 0,2 mm mais estreita que a deitada: paredes coplanares
+  /* A parte de pé é 0,3 mm mais estreita que a deitada: paredes coplanares
      quebram a união. */
-  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rc - 0.003, r - folga), L, zf * (r - folga) / h) });
+  const rq = m(t.raioDaTraseira);
+  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rc - 0.003, r - folga), L, zf * (r - folga) / h, Math.min(rq, r - folga)) });
   /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a frente
      recuada, e termina dentro da parte deitada. */
   const coluna = [
@@ -149,10 +178,26 @@ export function gerarPassos(t = TABELA) {
     const q1 = redondo(Rs, L);
     transicao.push({ pos: [0, yEixo, z], contorno: q0.map((p, i) => [p[0] + (q1[i][0] - p[0]) * s, p[1] + (q1[i][1] - p[1]) * s]) });
   }
+  /* Quinas de trás da parte deitada, em planta: nos últimos `rq` antes da
+     traseira a largura acompanha o arco das quinas (meia largura
+     h - rq + rq sen ψ, em z = -h + rq - rq cos ψ). */
+  const nt = t.estacoesDaTraseira;
+  const traseira = [];
+  for (let k = 0; k <= nt; k++) {
+    const psi = (Math.PI / 2) * (k / nt);
+    const w = h - rq + rq * Math.sin(psi);
+    /* a seção estreita na largura e mantém o canto de cima redondo no raio rc,
+       sem achatar: achatado, ele marcava a quina de trás vista de cima. Onde a
+       seção fica mais estreita que o canto, o raio do canto cai aos poucos (o
+       mínimo suave entre rc e a meia largura menos 2 mm): cortado de uma vez,
+       marcava uma dobra no topo; igual à meia largura, deixava dois cantos no
+       mesmo ponto, face sem área, e a união não fechava. */
+    traseira.push({ pos: [0, yEixo, -h + rq - rq * Math.cos(psi)], contorno: retangulo(w, h, (rc ** -6 + (w - 0.002) ** -6) ** (-1 / 6), L) });
+  }
   const braco = [
-    { pos: [0, yEixo, -h], raio: 0 },
-    sec([0, yEixo, -h + 0.0004], rc),
-    ...entre(-h + 0.0004, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], rc)),
+    { pos: [0, yEixo, -h - 0.0004], raio: 0 },
+    ...traseira,
+    ...entre(-h + rq, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], rc)),
     sec([0, yEixo, zTransicao], rc),
     ...transicao,
     { pos: [0, yEixo, zFace - 0.0004], contorno: redondo(Rs, L) },
@@ -164,7 +209,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['loft', { origemId: ID.coluna, secoes: coluna, lados: L, orientacao: [1, 0, 0] }]);
   passos.push(['loft', { origemId: ID.braco, secoes: braco, lados: L, orientacao: [1, 0, 0] }]);
   passos.push(['unir', { origemId: ID.corpo, solidos: [{ origem: { op: 'loft', id: ID.coluna } }, { origem: { op: 'loft', id: ID.braco } }] }]);
-  if (t.raioDoEncontro > 0) passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, -0.06], max: [1, yEixo + 0.005, 1] } }]);
+  if (t.raioDoEncontro > 0) passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, -0.005], max: [1, yEixo + 0.005, 1] } }]);
   passos.push(['parte', { nome: 'pescoco', sel: corpo }]);
   if (t.raioDoEncontro > 0) passos.push(['parte', { nome: 'pescoco', sel: concordancia }]);
   passos.push(['lathe', {
@@ -173,9 +218,11 @@ export function gerarPassos(t = TABELA) {
   }]);
   passos.push(['parte', { nome: 'anel', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
   passos.push(['material', { usa: 'anelEscuro', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
+  /* o ponto do pé mais longe do eixo, tirado do próprio contorno da parte de pé */
+  const raioDoPe = Math.max(...contornoColuna(h - folga, Math.min(rc - 0.003, h - folga), L, zf * (h - folga) / h, Math.min(rq, h - folga)).map(([u, v]) => Math.hypot(u, v)));
   passos.push(['publicarPorta', {
     nome: 'apoio', de: { op: 'unir', id: ID.corpo },
-    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: Math.SQRT2 * (h - folga), inicio: 0, fim: 0.005 },
+    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: raioDoPe, inicio: 0, fim: 0.005 },
   }]);
   passos.push(['publicarPorta', {
     nome: 'juntaDoOmbro', de: { op: 'lathe', id: ID.anel },
