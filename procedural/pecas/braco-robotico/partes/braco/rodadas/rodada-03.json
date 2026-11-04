@@ -1,0 +1,206 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/braco",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/braco-robotico/referencias/coluna-reta-lado.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "coluna",
+        "tipo": "superficie",
+        "onde": "base da coluna, onde encontra o pé, lado -x",
+        "sentido": "anguloso",
+        "evidencia": "Lado, rasante az30: recorte escuro em arco e sombra manchada na altura da base da coluna, sombreado rasgado no encontro. Isométrica: entalhe na quina esquerda."
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "borda do V da costura, face voltada para +x",
+        "sentido": "segmentado",
+        "evidencia": "Vista direita do pé isolado: a borda do V sai em degraus serrilhados. Na isométrica arame a malha da costura é irregular."
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "encontro do pé com a coluna, V da emenda na face lateral",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica e frontal: vinco em V vivo, sem raio. O arredondarCostura prometido não aparece. O alvo mostra emenda contínua."
+      }
+    ],
+    "observacao": "Volume, diâmetro e topo plano batem com o alvo; só o encontro pé e coluna tem defeito, e a altura de 477 mm e a porta topo não dá para conferir nas imagens."
+  },
+  "partes": [
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": "disco de eixo Z de 156 mm, do diâmetro da coluna, fundido a ela, com arredondarCostura de 12 mm afinando nos 30 mm antes de cada face"
+    },
+    {
+      "nome": "coluna",
+      "confere": true,
+      "observacao": "cilindro de 156 mm e 477 mm de altura total; o arredondamento no encontro é raso no meio do V, porque ali as duas superfícies quase se alinham"
+    }
+  ],
+  "atrito": [
+    "os agentes modeladores pararam num bloqueio automático do serviço; quem conduz fez a rodada com a opção nova do núcleo, por acordo com a pessoa",
+    "com o pé e a coluna do mesmo raio o canto só é fundo junto às faces do pé, onde a regiao corta"
+  ],
+  "notaDePassagem": "Pé do mesmo raio da coluna: a união sai limpa. O canto é fundo só junto às faces do pé, onde a coluna fica tangente a elas e o arredondamento precisa parar; no meio ele quase some.",
+  "receita": {
+    "sha256": "sha256:20ed29f58a597ce711e559355789a383d618d2b89b6da019a2db4bd2914b273f",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 11,
+      "acrescentadas": 14,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": " * Encontro do pé com a coluna: `unir` com `arredondarCostura` de 12 mm. Com o"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": " * pé 3 mm mais estreito de raio que a coluna (pé de 150 mm), o arredondamento"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": " * sai e a auditoria de interseção fecha. Com pé de 0,2 a 2,5 mm mais estreito"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": " * ou sem folga, a costura sai com triângulo degenerado ou o núcleo recusa o"
+        },
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": " * raio, e o resultado depende do raio de modo irregular (3 e 8 mm recusados,"
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": " * 5 e 12 aceitos pelo núcleo, só 12 e 20 fecham a auditoria)."
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": " * Encontro do pé com a coluna: `unir` com `arredondarCostura` de 12 mm, com o"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": " * pé do mesmo raio da coluna. O pé mais estreito (3 mm de raio, na rodada 2)"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": " * deixava degrau, orelhas e lascas no encontro; do mesmo raio a união sai"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": " * limpa e a auditoria fecha. O arredondamento para a 8 mm de cada face do pé,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": " * onde a coluna fica tangente a ela, e `afinarPontas` faz o raio cair até"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": " * sumir nos 30 mm antes dessa ponta, em vez de fechar com uma tampa reta que"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": " * aparecia como dente (a opção entrou no núcleo em 2026-11-04 por causa desta"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": " * peça, e vale para qualquer costura curva cortada pela regiao)."
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "  /* O pé é 3 mm mais estreito de raio que a coluna: com menos, a costura fica degenerada; paredes tangentes quebram a"
+        },
+        {
+          "tipo": "-",
+          "linha": 51,
+          "texto": "     união. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "  folgaDoPe: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  /* Quanto o raio do pé fica abaixo do da coluna; zero é o desenho da pessoa (pé do diâmetro da coluna). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  folgaDoPe: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  /* Comprimento em que o raio do encontro cai até sumir, antes de cada face do pé. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  afinarDoEncontro: 30,"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, afinarPontas: m(t.afinarDoEncontro), regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 150 mm de diâmetro (3 mm de raio a menos que a coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 156 mm de diâmetro (o da coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'lathe de eixo Z com chanfro de vértice suavizado, unido à coluna por unir, com arredondarCostura no encontro' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[9], PASSOS[10]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}
