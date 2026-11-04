@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1732 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1154,6 +1154,7 @@
 - `friso.js` — friso.js (operação) — nervura, tubo ou friso que segue uma linha nomeada, com perfil declarado. A linha é uma sequência de pontos nomeados da gaiola de um pa…
 - `furo-raio-por-grupo.test.ts` — furo-raio-por-grupo.test.ts — contrato da F1: cada grupo de centros pode declarar raio e, em furo cego, profundidade próprios, e receber um nome semântico pa…
 - `geradores-avancados.js` — geradores-avancados.js — operações do grupo, isoladas por serviços explícitos do núcleo.
+- `geradores-faixa-estendida.test.ts` — geradores-faixa-estendida.test.ts — o lathe e o loft passam do bloco de 1000 ids do passo e seguem na faixa estendida, como o cilindro, o cone e o arranja já…
 - `lathe-aberto.test.ts` — lathe-aberto.test.ts — o `lathe` em modo polilinha cujo perfil não toca o eixo nas duas pontas nem volta ao primeiro ponto.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
