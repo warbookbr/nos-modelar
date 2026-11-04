@@ -203,6 +203,16 @@ export const TABELA = {
   // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o
   // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda
   vao_canto_degraus: 2,
+  // etapa 6, as luzes e a grade: cada uma é um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda), com a aba dobrada
+  // como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar.
+  farol_base_y: 830, // os anéis de enchimento entre o vinco do para-choque (760) e a boca do capô (1100)
+  farol_topo_y: 1060, // o anel de enchimento em 1054,x
+  lanterna_base_y: 830, // na quina de trás, entre a borda da porta traseira e a lateral, abaixo do vinco de cintura
+  lanterna_topo_y: 1140, // o anel de enchimento em 1138,x
+  seta_base_y: 900, // no paralama, entre o fim da quina da frente e o arco
+  seta_topo_y: 985, // o anel de enchimento em 976,x
+  luz_folga_borda: 5.5, // a lente começa logo além da perna da aba (5 mm)
+  luz_espessura: 4,
   vao_canto_passo_cabine: 28,
   vao_canto_passo_traseiro: 25,
   aba_vao_largura: 20,
@@ -1360,14 +1370,14 @@ export function derivar(T) {
      vao_canto_degraus células, a diagonal que liga a coluna de dentro do canto, no anel da borda, à coluna da borda, no anel
      vao_canto_degraus acima, e cada célula dessa diagonal é partida em dois triângulos, um de cada lado dela. A diagonal fica de
      fora do vão e a célula vizinha dela fica na chapa. A partição das células vem logo depois de montadas as faces. */
-  const colunasDoCanto = (rs, cF, cMeio) => {
+  const colunasDoCanto = (rs, cF, cMeio, k = T.vao_canto_degraus) => {
     const lista = rs[0].lista.map((q) => q.col);
     const iF = lista.indexOf(cF); const iM = lista.indexOf(cMeio);
     if (iF < 0 || iM < 0) throw new Error(`furgao-realista: o anel ${rs[0].nome} não tem a coluna ${cF} ou ${cMeio}`);
     const passo = iM > iF ? 1 : -1;
     const cols = [cF];
-    for (let j = 1; j <= T.vao_canto_degraus; j += 1) cols.unshift(lista[iF + passo * j]);
-    for (let j = 0; j < T.vao_canto_degraus; j += 1) {
+    for (let j = 1; j <= k; j += 1) cols.unshift(lista[iF + passo * j]);
+    for (let j = 0; j < k; j += 1) {
       for (const r of [rs[j], rs[j + 1]]) {
         const l = r.lista.map((q) => q.col);
         if (Math.abs(l.indexOf(cols[j]) - l.indexOf(cols[j + 1])) !== 1) throw new Error(`furgao-realista: as colunas ${cols[j]} e ${cols[j + 1]} do canto do vão não são vizinhas no anel ${r.nome}`);
@@ -1564,10 +1574,10 @@ export function derivar(T) {
      célula dessa diagonal é partida em dois triângulos, um de cada lado dela (a gaiola foi partida acima, antes da volta ser
      conferida pelas arestas). */
   /* de (rs[0], cMeio0) a (rs.at(-1), cMeio1) pelo lado da coluna de fora cF, com os dois cantos cortados em diagonal */
-  const meiaVolta = (rs, cMeio0, cMeio1, cF, s) => {
-    const k = T.vao_canto_degraus;
+  const meiaVolta = (rs, cMeio0, cMeio1, cF, s, degraus = T.vao_canto_degraus) => {
+    const k = degraus;
     const rsB = rs.slice(0, k + 1); const rsT = rs.slice(rs.length - k - 1).reverse();
-    const colsB = colunasDoCanto(rsB, cF, cMeio0); const colsT = colunasDoCanto(rsT, cF, cMeio1);
+    const colsB = colunasDoCanto(rsB, cF, cMeio0, k); const colsT = colunasDoCanto(rsT, cF, cMeio1, k);
     const cadeiaB = rsB.map((r, j) => ponto(r, colsB[j], s)); const cadeiaT = rsT.map((r, j) => ponto(r, colsT[j], s));
     return [
       ...trecho(rsB[0], cMeio0, colsB[0], s), ...cadeiaB.slice(1), ...coluna(cF, rsB[k].y, rsT[k].y, s).slice(1),
@@ -1592,7 +1602,28 @@ export function derivar(T) {
     const foraT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, `r${iForaTraseiro}`, s);
     vidros.push({ nome: `vidroPortaTraseira${sufixo}`, linha: `abaVaoPortaTraseira${sufixo}`, volta: fechar([...foraT, ...[...dentroT].reverse()]) });
   }
-  for (const v of [...portas, ...vidros]) {
+  /* as luzes e a grade (etapa 6): voltas de cantos retos pelas arestas da gaiola, sem partir célula; o farol vai da coluna f7 da
+     frente até a E, onde a quina vira lateral; a grade, de f5 a f5 passando pelo meio; a lanterna, da coluna rq3 (logo depois da
+     borda da porta traseira) até a RS, já na lateral; a seta, no paralama, entre F1 e F3 */
+  const luzes = [];
+  {
+    const rg = aneisEntre(T.farol_base_y, T.farol_topo_y);
+    const metade = meiaVolta(rg, 'f0', 'f0', 'f5', 'e', 0);
+    luzes.push({ nome: 'grade', linha: 'abaVaoGrade', material: 'grade', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });
+  }
+  for (const s of ['e', 'd']) {
+    const o = s === 'e' ? 'Esquerdo' : 'Direito'; const a = s === 'e' ? 'Esquerda' : 'Direita';
+    const rf = aneisEntre(T.farol_base_y, T.farol_topo_y);
+    const foraF = meiaVolta(rf, 'q1', 'q1', 'E', s, 0); const dentroF = meiaVolta(rf, 'q1', 'q1', 'f7', s, 0);
+    luzes.push({ nome: `farol${o}`, linha: `abaVaoFarol${o}`, material: 'farol', volta: fechar([...foraF, ...[...dentroF].reverse()]) });
+    const rl = aneisEntre(T.lanterna_base_y, T.lanterna_topo_y);
+    const foraL = meiaVolta(rl, 'RM', 'RM', 'RS', s, 0); const dentroL = meiaVolta(rl, 'RM', 'RM', 'rq3', s, 0);
+    luzes.push({ nome: `lanterna${a}`, linha: `abaVaoLanterna${a}`, material: 'lanterna', volta: fechar([...foraL, ...[...dentroL].reverse()]) });
+    const rsS = aneisEntre(T.seta_base_y, T.seta_topo_y);
+    const foraS = meiaVolta(rsS, 'F2', 'F2', 'F1', s, 0); const dentroS = meiaVolta(rsS, 'F2', 'F2', 'F3', s, 0);
+    luzes.push({ nome: `seta${a}`, linha: `abaVaoSeta${a}`, material: 'seta', volta: fechar([...foraS, ...[...dentroS].reverse()]) });
+  }
+  for (const v of [...portas, ...vidros, ...luzes]) {
     v.volta.forEach((n, k) => { if (!arestas.has(chave(n, v.volta[(k + 1) % v.volta.length]))) throw new Error(`furgao-realista: a volta ${v.nome} passa fora das arestas entre ${n} e ${v.volta[(k + 1) % v.volta.length]}`); });
   }
 
@@ -1603,11 +1634,11 @@ export function derivar(T) {
     volta.forEach((n, k) => { area = soma(area, cruz(P.get(n), P.get(volta[(k + 1) % volta.length]))); nm = soma(nm, normalDe(n)); });
     return dot(area, nm) < 0 ? [...volta].reverse() : volta;
   };
-  [...portas, ...vidros].forEach((v) => { v.volta = orientar(v.volta); });
+  [...portas, ...vidros, ...luzes].forEach((v) => { v.volta = orientar(v.volta); });
 
   /* ---- as regiões: as faces de dentro de cada volta, pela face à esquerda da primeira aresta e por vizinhança sem cruzar volta ---- */
   const barreira = new Set();
-  [...portas, ...vidros].forEach((v) => v.volta.forEach((n, k) => barreira.add(chave(n, v.volta[(k + 1) % v.volta.length]))));
+  [...portas, ...vidros, ...luzes].forEach((v) => v.volta.forEach((n, k) => barreira.add(chave(n, v.volta[(k + 1) % v.volta.length]))));
   const facesDaAresta = new Map();
   facesMestre.forEach((fc, i) => fc.forEach((n, k) => { const c = chave(n, fc[(k + 1) % fc.length]); if (!facesDaAresta.has(c)) facesDaAresta.set(c, []); facesDaAresta.get(c).push(i); }));
   const regiao = new Array(facesMestre.length).fill(null);
@@ -1626,6 +1657,7 @@ export function derivar(T) {
     }
   };
   vidros.forEach((v) => encher(v.volta, `vidro:${v.nome}`));
+  luzes.forEach((v) => encher(v.volta, `luz:${v.nome}`));
   portas.forEach((v) => encher(v.volta, `porta:${v.nome}`));
 
   /* ---- a fresta ----
@@ -1670,7 +1702,7 @@ export function derivar(T) {
   const regiaoDaFace = [];
   facesMestre.forEach((fc, i) => {
     const r = regiao[i];
-    if (r && r.startsWith('vidro:')) return;
+    if (r && (r.startsWith('vidro:') || r.startsWith('luz:'))) return;
     const rot = r ?? 'carroceria';
     faces.push(fc.map((n) => copia.get(`${n}|${rot}`) ?? n));
     regiaoDaFace.push([fc, rot]);
@@ -1694,8 +1726,7 @@ export function derivar(T) {
      Cada cristal é o mesmo pedaço de superfície que o vão tirou da chapa (as faces da região `vidro:`), com a volta recuada vidro_folga_borda para dentro do
      vão pela superfície, para ficar além da perna da aba (raio + espessura = 5 mm) e deixar uma junta que a borracha cobre. Os pontos de dentro ficam
      onde estão, na superfície da chapa, e por isso o cristal é rente à lataria. */
-  const cristais = vidros.map((v) => {
-    const rot = `vidro:${v.nome}`;
+  const lenteDoVao = (v, rot, folga) => {
     const L = v.volta.length;
     const nova = new Map();
     v.volta.forEach((n, k) => {
@@ -1704,14 +1735,17 @@ export function derivar(T) {
       const nrm = normalDe(n);
       const m1 = unit(cruz(nrm, unit(sub(p, pa)))); const m2 = unit(cruz(nrm, unit(sub(pb, p))));
       const mi = esc(soma(m1, m2), 1 / Math.max(0.3, 1 + dot(m1, m2)));
-      nova.set(n, deslocar(n, esc(mi, T.vidro_folga_borda)));
+      nova.set(n, deslocar(n, esc(mi, folga)));
     });
     const nomeDe = (n) => (nova.has(n) ? `${n}_cristal` : n);
     const fs = facesMestre.filter((_, i) => regiao[i] === rot).map((fc) => fc.map(nomeDe));
     const posicoesDoCristal = new Map();
     facesMestre.forEach((fc, i) => { if (regiao[i] === rot) fc.forEach((n) => posicoesDoCristal.set(nomeDe(n), nova.get(n) ?? P.get(n))); });
     return { nome: v.nome, faces: fs, vertices: [...posicoesDoCristal.keys()].sort(), posicoes: posicoesDoCristal };
-  });
+  };
+  const cristais = vidros.map((v) => lenteDoVao(v, `vidro:${v.nome}`, T.vidro_folga_borda));
+  /* as lentes das luzes: o pedaço de superfície que o vão tirou, recuado logo além da perna da aba, rente à lataria */
+  const lentes = luzes.map((v) => ({ ...lenteDoVao(v, `luz:${v.nome}`, T.luz_folga_borda), material: v.material, linha: v.linha }));
 
   /* ---- vincos ---- */
   const cadeia = (mestres, rotuloDe) => {
@@ -1810,6 +1844,7 @@ export function derivar(T) {
     passo: { vertices, faces, vincos, cantos }, plastico, cristais,
     portas: portas.map((v) => ({ nome: v.nome, volta: v.volta })),
     vidros: vidros.map((v) => ({ nome: v.nome, linha: v.linha, volta: v.volta })),
+    luzes: luzes.map((v) => ({ nome: v.nome, linha: v.linha, material: v.material, volta: v.volta })), lentes,
     abasDosArcos, rodas,
     bordaDeBaixo: [...sol.lista.map((p) => p.nome), ...sol.lista.slice(1, -1).reverse().map((p) => espelho(p.nome))],
   };
@@ -1918,7 +1953,7 @@ export function perfilDaBorracha(T) {
 
 /** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros,  as abas dos arcos, as quatro rodas da família e o forro dos arcos (que vem com o plástico). */
 export function gerarPassos(T) {
-  const { passo, plastico, rodas, vidros, cristais, abasDosArcos, forma: f } = derivar(T);
+  const { passo, plastico, rodas, vidros, cristais, luzes, lentes, abasDosArcos, forma: f } = derivar(T);
   const passos = [
     ['subdivisao', { origemId: 1, ...passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
     ['parte', { nome: 'carroceria', sel: CHAPA }],
@@ -1953,6 +1988,23 @@ export function gerarPassos(T) {
     passos.push(['friso', { origemId: 110 + k, superficie: CHAPA.origem, linha: { nome: nomeDaBorracha(v.nome), pontos: [...v.volta, v.volta[0]] }, perfil: perfilBorracha }]);
     passos.push(['parte', { nome: nomeDaBorracha(v.nome), sel }]);
     passos.push(['material', { sel, usa: 'borracha' }]);
+  });
+  /* as luzes e a grade (etapa 6): a aba dobrada de cada vão, como a dos vidros, e a lente rente à lataria, no material de cada uma */
+  luzes.forEach((v, k) => {
+    const sel = { origem: { op: 'friso', id: 900 + k } };
+    passos.push(['friso', {
+      origemId: 900 + k, superficie: CHAPA.origem, linha: { nome: v.linha, pontos: [...v.volta, v.volta[0]] },
+      aba: { largura: m(T.aba_vao_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
+    }]);
+    passos.push(['parte', { nome: v.nome, sel }]);
+    passos.push(['material', { sel, usa: 'azul' }]);
+  });
+  /* a aba e a lente são a mesma parte, cada uma no seu material: o PLANO tem teto de 64 partes */
+  lentes.forEach((c, k) => {
+    const sel = { origem: { op: 'subdivisao', id: 920 + k } };
+    passos.push(['subdivisao', { origemId: 920 + k, vertices: c.vertices, faces: c.faces, borda: 'cantos', niveis: T.niveis, espessura: m(T.luz_espessura) }]);
+    passos.push(['parte', { nome: c.nome, sel }]);
+    passos.push(['material', { sel, usa: c.material }]);
   });
   /* o interior: piso, divisória, bancos e painel, cada um uma extrusão do perfil que `derivarInterior` escreve */
   const { piso, divisoria, bancos, painel } = derivarInterior(T, f);
@@ -2022,6 +2074,7 @@ const PARACHOQUES = ['parachoqueDianteiro', 'parachoqueTraseiro'];
 const PLASTICOS = [...SAIAS, ...MOLDURAS, ...PARACHOQUES];
 const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroPortaTraseiraEsquerda', 'vidroPortaTraseiraDireita'];
 const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita'];
+const LUZES = ['grade', 'farolEsquerdo', 'lanternaEsquerda', 'setaEsquerda', 'farolDireito', 'lanternaDireita', 'setaDireita'];
 const BANCOS = ['bancoMotorista', 'bancoPassageiro'];
 const INTERIOR = ['pisoInterior', 'divisoria', ...BANCOS, 'painel'];
 
@@ -2043,6 +2096,7 @@ export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((aba, k) => ({ par: [aba, BORRACHAS[k]], motivo: 'a borracha passa sobre a perna da aba (5 mm para dentro do vão) e entra 1,5 mm abaixo da superfície, onde a aba dobra' })),
   ...BORRACHAS.map((b) => ({ par: ['carroceria', b], motivo: 'a borracha assenta na chapa em volta do vão: passa 15 mm sobre ela e entra 1,5 mm na superfície' })),
   ...BORRACHAS.map((b, k) => ({ par: [b, CRISTAIS[k]], motivo: 'o cristal começa 7,5 mm para dentro da borda do vão e a borracha passa 2,5 mm sobre a borda dele, entrando 1,5 mm: é a borracha que segura o cristal, e é ela que cobre a junta' })),
+  ...LUZES.map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
   { par: ['pisoInterior', 'painel'], motivo: 'o painel assenta no piso e entra 1 mm nele' },
@@ -2063,9 +2117,10 @@ export const ILHAS = RODAS.map(([pneu]) => ({
 
 /* Os vãos da chapa: os dos vidros com a aba dobrada como moldura, e os das portas, que a própria porta ocupa com a fresta em volta. */
 export function vaosDeclarados(T) {
-  const { vidros, portas, bordaDeBaixo, passo } = derivar(T);
+  const { vidros, luzes, portas, bordaDeBaixo, passo } = derivar(T);
   const naChapa = new Set(passo.vertices);
   const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha, nomeDaBorracha(v.nome)] }));
+  for (const v of luzes) vaos.push({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] });
   for (const p of portas) {
     if (p.nome.startsWith('portaTraseira')) continue;
     if (!p.volta.every((n) => naChapa.has(n))) continue;
@@ -2126,6 +2181,11 @@ const receita = {
     divisoria: { tipo: 'liso', cor: '#5a5d66' },
     banco: { tipo: 'liso', cor: '#3d4048' },
     painelEscuro: { tipo: 'liso', cor: '#26272b' },
+    // as lentes das luzes (etapa 6), opacas para o oco do furgão não aparecer por elas
+    farol: { tipo: 'liso', cor: '#d9e0e4', aspereza: 0.12, metalicidade: 0.4 },
+    lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2 },
+    seta: { tipo: 'liso', cor: '#d98a1f', aspereza: 0.2 },
+    grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
   },
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
   get TOPO() {
@@ -2194,6 +2254,26 @@ const receita = {
         nome,
         forma: `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 2,2 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,
         tecnica: 'friso de perfil desenhado sobre a volta do vão, nos nomes da gaiola, declarado com a aba na moldura do vão',
+      })),
+      {
+        nome: 'grade',
+        forma: 'grade escura e fosca entre os faróis, sem marca nem logotipo, de x -360 a 360 e de y 830 a 1054, rente à lataria, com 4 mm de espessura e a aba do vão dobrada para dentro',
+        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
+      },
+      ...['Esquerdo', 'Direito'].map((lado) => ({
+        nome: `farol${lado}`,
+        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} na quina da frente, embutido e rente: de x 504 até a lateral, dobrando a quina, de y 830 a 1054, lente clara opaca de 4 mm e a aba do vão dobrada para dentro`,
+        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
+      })),
+      ...['Esquerda', 'Direita'].map((lado) => ({
+        nome: `lanterna${lado}`,
+        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} vertical na quina de trás, embutida e rente: da porta traseira até a lateral, de y 830 a 1138, lente vermelha opaca de 4 mm e a aba do vão dobrada para dentro`,
+        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
+      })),
+      ...['Esquerda', 'Direita'].map((lado) => ({
+        nome: `seta${lado}`,
+        forma: `seta ${lado === 'Esquerda' ? 'esquerda' : 'direita'} no paralama, entre a quina da frente e o arco: cerca de 120 por 77 mm, de y 900 a 977, lente âmbar opaca rente e a aba do vão dobrada para dentro`,
+        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
       })),
       {
         nome: 'pisoInterior',
