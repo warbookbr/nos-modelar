@@ -208,9 +208,15 @@ export const TABELA = {
   farol_base_y: 830, // os anéis de enchimento entre o vinco do para-choque (760) e a boca do capô (1100)
   farol_topo_y: 1060, // o anel de enchimento em 1054,x
   lanterna_base_y: 830, // na quina de trás, entre a borda da porta traseira e a lateral, abaixo do vinco de cintura
-  lanterna_topo_y: 1140, // o anel de enchimento em 1138,x
+  // o anel boca1 (1125): acima dele os anéis de enchimento ficam a 12,5 mm, e o trecho curto junto da quina faz a aba do vão se dobrar
+  lanterna_topo_y: 1130,
   seta_base_y: 900, // no paralama, entre o fim da quina da frente e o arco
   seta_topo_y: 985, // o anel de enchimento em 976,x
+  // a luz de freio alta, sobre as portas traseiras: na quina curva da traseira para o teto, entre dois anéis do ombro (o das portas é o 2),
+  // de x -r a x r pela coluna r de número freio_coluna (a r3 cai em x 185 a 191), com cerca de 370 por 55 mm
+  freio_anel_base: 3,
+  freio_anel_topo: 4,
+  freio_coluna: 3,
   luz_folga_borda: 5.5, // a lente começa logo além da perna da aba (5 mm)
   luz_espessura: 4,
   vao_canto_passo_cabine: 28,
@@ -1623,6 +1629,13 @@ export function derivar(T) {
     const foraS = meiaVolta(rsS, 'F2', 'F2', 'F1', s, 0); const dentroS = meiaVolta(rsS, 'F2', 'F2', 'F3', s, 0);
     luzes.push({ nome: `seta${a}`, linha: `abaVaoSeta${a}`, material: 'seta', volta: fechar([...foraS, ...[...dentroS].reverse()]) });
   }
+  /* a luz de freio alta: os anéis do ombro não são horizontais na traseira, e por isso a volta não passa por `meiaVolta` (que sobe pela
+     coluna só nos anéis horizontais); vai pelos dois anéis do ombro, de r0 à coluna de fora e de volta, e o espelho fecha o outro lado */
+  {
+    const base = anel(`ombro${T.freio_anel_base}`); const topo = anel(`ombro${T.freio_anel_topo}`); const cF = `r${T.freio_coluna}`;
+    const metade = [...trecho(base, 'r0', cF, 'e'), ...trecho(topo, cF, 'r0', 'e')];
+    luzes.push({ nome: 'luzDeFreio', linha: 'abaVaoLuzDeFreio', material: 'lanterna', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });
+  }
   for (const v of [...portas, ...vidros, ...luzes]) {
     v.volta.forEach((n, k) => { if (!arestas.has(chave(n, v.volta[(k + 1) % v.volta.length]))) throw new Error(`furgao-realista: a volta ${v.nome} passa fora das arestas entre ${n} e ${v.volta[(k + 1) % v.volta.length]}`); });
   }
@@ -1726,7 +1739,7 @@ export function derivar(T) {
      Cada cristal é o mesmo pedaço de superfície que o vão tirou da chapa (as faces da região `vidro:`), com a volta recuada vidro_folga_borda para dentro do
      vão pela superfície, para ficar além da perna da aba (raio + espessura = 5 mm) e deixar uma junta que a borracha cobre. Os pontos de dentro ficam
      onde estão, na superfície da chapa, e por isso o cristal é rente à lataria. */
-  const lenteDoVao = (v, rot, folga) => {
+  const lenteDoVao = (v, rot, folga, sufixo = '_cristal') => {
     const L = v.volta.length;
     const nova = new Map();
     v.volta.forEach((n, k) => {
@@ -1737,7 +1750,7 @@ export function derivar(T) {
       const mi = esc(soma(m1, m2), 1 / Math.max(0.3, 1 + dot(m1, m2)));
       nova.set(n, deslocar(n, esc(mi, folga)));
     });
-    const nomeDe = (n) => (nova.has(n) ? `${n}_cristal` : n);
+    const nomeDe = (n) => (nova.has(n) ? `${n}${sufixo}` : n);
     const fs = facesMestre.filter((_, i) => regiao[i] === rot).map((fc) => fc.map(nomeDe));
     const posicoesDoCristal = new Map();
     facesMestre.forEach((fc, i) => { if (regiao[i] === rot) fc.forEach((n) => posicoesDoCristal.set(nomeDe(n), nova.get(n) ?? P.get(n))); });
@@ -1745,7 +1758,7 @@ export function derivar(T) {
   };
   const cristais = vidros.map((v) => lenteDoVao(v, `vidro:${v.nome}`, T.vidro_folga_borda));
   /* as lentes das luzes: o pedaço de superfície que o vão tirou, recuado logo além da perna da aba, rente à lataria */
-  const lentes = luzes.map((v) => ({ ...lenteDoVao(v, `luz:${v.nome}`, T.luz_folga_borda), material: v.material, linha: v.linha }));
+  const lentes = luzes.map((v) => ({ ...lenteDoVao(v, `luz:${v.nome}`, T.luz_folga_borda, '_lente'), material: v.material, linha: v.linha }));
 
   /* ---- vincos ---- */
   const cadeia = (mestres, rotuloDe) => {
@@ -1829,7 +1842,7 @@ export function derivar(T) {
   const vertices = [...usados].sort();
   /* o plástico de baixo, por fora da chapa: os pontos dele entram no TOPO junto com os da gaiola */
   const plastico = derivarPlastico(T, f);
-  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes])]);
+  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
 
   /* as quatro rodas da família `roda-pneu`, no pneu da prancha, na bitola e no entre-eixos, apoiadas no chão: a chamada da família e o centro de cada uma */
@@ -2074,7 +2087,7 @@ const PARACHOQUES = ['parachoqueDianteiro', 'parachoqueTraseiro'];
 const PLASTICOS = [...SAIAS, ...MOLDURAS, ...PARACHOQUES];
 const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroPortaTraseiraEsquerda', 'vidroPortaTraseiraDireita'];
 const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita'];
-const LUZES = ['grade', 'farolEsquerdo', 'lanternaEsquerda', 'setaEsquerda', 'farolDireito', 'lanternaDireita', 'setaDireita'];
+const LUZES = ['grade', 'farolEsquerdo', 'lanternaEsquerda', 'setaEsquerda', 'farolDireito', 'lanternaDireita', 'setaDireita', 'luzDeFreio'];
 const BANCOS = ['bancoMotorista', 'bancoPassageiro'];
 const INTERIOR = ['pisoInterior', 'divisoria', ...BANCOS, 'painel'];
 
@@ -2267,7 +2280,7 @@ const receita = {
       })),
       ...['Esquerda', 'Direita'].map((lado) => ({
         nome: `lanterna${lado}`,
-        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} vertical na quina de trás, embutida e rente: da porta traseira até a lateral, de y 830 a 1138, lente vermelha opaca de 4 mm e a aba do vão dobrada para dentro`,
+        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} vertical na quina de trás, embutida e rente: da porta traseira até a lateral, de y 830 a 1125, lente vermelha opaca de 4 mm e a aba do vão dobrada para dentro`,
         tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
       })),
       ...['Esquerda', 'Direita'].map((lado) => ({
@@ -2275,6 +2288,11 @@ const receita = {
         forma: `seta ${lado === 'Esquerda' ? 'esquerda' : 'direita'} no paralama, entre a quina da frente e o arco: cerca de 120 por 77 mm, de y 900 a 977, lente âmbar opaca rente e a aba do vão dobrada para dentro`,
         tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
       })),
+      {
+        nome: 'luzDeFreio',
+        forma: 'luz de freio alta no meio, sobre as portas traseiras, na quina curva da traseira para o teto: de x -190 a 190 e de y 2429 a 2467, cerca de 370 por 55 mm, lente vermelha opaca rente de 4 mm e a aba do vão dobrada para dentro',
+        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
+      },
       {
         nome: 'pisoInterior',
         forma: 'piso de 20 mm de y 735,5 a 755,5, 1976 mm de largura de z -2655 a 1740 com cantos de raio 90, assentado no topo dos forros dos arcos e a 10 mm da chapa dos dois lados',
