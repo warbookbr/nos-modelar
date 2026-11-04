@@ -1081,13 +1081,16 @@ export function criarOperacoesBooleanas(servicos) {
        `arestas`    'concavas' (padrão), 'convexas', 'internas', 'todas' ou
                     lista dessas;
        `raioMinimo` opcional, em (0, raio], só tem efeito no modo por fatias;
-       `aparar`     caixa {min,max} do mundo, só com `regiao`: fora da regiao a
-                    seção não é medida, o anel da última estação medida é
-                    levado ao longo da costura, girado com a direção dela, e o
-                    tubo é intersectado com esta caixa. O arredondamento chega
-                    rente à face que corta o canto. O plano da caixa não pode
-                    cair sobre uma aresta do sólido (o começo de um chanfro,
-                    por exemplo): a união deixa ali um triângulo sem área;
+       `aparar`     só com `regiao`: fora da regiao a seção não é medida, o anel
+                    da última estação medida é levado ao longo da costura,
+                    girado com a direção dela, e o tubo é intersectado com o
+                    corte. O corte é uma caixa {min,max} do mundo ou
+                    {solido: <seleção>}, um sólido da receita que o passo
+                    consome (o molde: a peça com o chanfro da borda prolongado,
+                    por exemplo, para o arredondamento terminar acompanhando o
+                    chanfro). Face do corte em cima de face ou aresta do sólido
+                    deixa triângulo sem área na união: afaste o corte uma
+                    fração de milímetro para dentro;
        `afinarPontas` opcional, comprimento > 0, só no modo por fatias: na ponta
                     solta de um trecho que a `regiao` cortou, o raio cai em
                     linha até 15% ao longo desse comprimento, em vez de o tubo
@@ -1161,13 +1164,26 @@ export function criarOperacoesBooleanas(servicos) {
       try { regiao = { min: st.vec(r.min), max: st.vec(r.max) }; } catch (e) { return grita(st, i, op, 'regiao', e.message); }
       if (regiao.min.some((c, k) => !(c <= regiao.max[k]))) return grita(st, i, op, 'regiao', 'regiao: min não pode passar de max');
     }
-    let aparar = null;
+    let aparar = null, facesDoMolde = null;
     if (a.aparar != null) {
       const r = a.aparar;
-      if (!r || typeof r !== 'object' || Array.isArray(r) || Object.keys(r).some((k) => k !== 'min' && k !== 'max') || r.min == null || r.max == null) return grita(st, i, op, 'aparar', 'aparar precisa ser {min:[x,y,z], max:[x,y,z]}');
-      try { aparar = { min: st.vec(r.min), max: st.vec(r.max) }; } catch (e) { return grita(st, i, op, 'aparar', e.message); }
-      if (aparar.min.some((c, k) => !(c < aparar.max[k]))) return grita(st, i, op, 'aparar', 'aparar: min precisa ficar abaixo de max em cada eixo');
-      if (!regiao) return grita(st, i, op, 'aparar', 'aparar só vale com regiao: a regiao diz onde a seção é medida, e fora dela o tubo segue a costura até a caixa de aparar');
+      if (!regiao) return grita(st, i, op, 'aparar', 'aparar só vale com regiao: a regiao diz onde a seção é medida, e fora dela o tubo segue a costura até o corte');
+      if (r && typeof r === 'object' && !Array.isArray(r) && Object.keys(r).length === 1 && r.solido != null) {
+        /* MOLDE: um sólido da receita, que o passo consome. O tubo fica só com
+           o que está dentro dele, e o sólido some da peça junto com o passo. */
+        const antes = st.orfaos.length;
+        const sel = resolverSelecao(st, r.solido, op, i);
+        if (st.orfaos.length > antes) return;
+        facesDoMolde = [...sel.faces].sort((x, y) => x - y);
+        if (!facesDoMolde.length) return grita(st, i, op, 'aparar', 'aparar.solido não tem face nenhuma');
+        const daPeca = new Set(faces);
+        if (facesDoMolde.some((f) => daPeca.has(f))) return grita(st, i, op, 'aparar', 'aparar.solido precisa ser um sólido à parte, fora da peça que se arredonda');
+        aparar = { molde: true };
+      } else {
+        if (!r || typeof r !== 'object' || Array.isArray(r) || Object.keys(r).some((k) => k !== 'min' && k !== 'max') || r.min == null || r.max == null) return grita(st, i, op, 'aparar', 'aparar precisa ser {min:[x,y,z], max:[x,y,z]} ou {solido: <seleção>}');
+        try { aparar = { min: st.vec(r.min), max: st.vec(r.max) }; } catch (e) { return grita(st, i, op, 'aparar', e.message); }
+        if (aparar.min.some((c, k) => !(c < aparar.max[k]))) return grita(st, i, op, 'aparar', 'aparar: min precisa ficar abaixo de max em cada eixo');
+      }
     }
 
     /* `arestas`: quais arestas ganham raio. 'concavas' (padrão) é o encontro
@@ -1989,14 +2005,18 @@ export function criarOperacoesBooleanas(servicos) {
         if (r.erro) { apaga(); return r; }
         idsAux.add(r.idReservado);
         if (aparar) {
-          /* a caixa de aparar entra como sólido auxiliar: as faces do corte
-             nascem com o id dela, que é do arredondamento */
-          const lo = local(aparar.min), hi = local(aparar.max);
-          const cubo = M.cube(hi.map((c, j) => c - lo[j]), false);
-          const caixa = cubo.translate(lo);
-          cubo.delete();
-          const marcada = caixa.asOriginal();
-          caixa.delete();
+          /* a caixa (ou o molde) entra como sólido auxiliar: as faces do corte
+             nascem com o id dele, que é do arredondamento */
+          let marcada;
+          if (aparar.molde) marcada = manifolds[1].asOriginal();
+          else {
+            const lo = local(aparar.min), hi = local(aparar.max);
+            const cubo = M.cube(hi.map((c, j) => c - lo[j]), false);
+            const caixa = cubo.translate(lo);
+            cubo.delete();
+            marcada = caixa.asOriginal();
+            caixa.delete();
+          }
           idsAux.add(marcada.originalID());
           const aparado = M.intersection([r.solido, marcada]);
           r.solido.delete(); marcada.delete();
@@ -2061,7 +2081,7 @@ export function criarOperacoesBooleanas(servicos) {
       registro.faces = [...registro.faces.filter((f) => !fora.has(f)), ...pedacosDeEntrada].sort((x, y) => x - y);
       registro.costura = registro.costura.filter((f) => !fora.has(f));
     };
-    const rodar = (tentativa) => nucleoBooleano(st, i, op, wasm, a.origemId, [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, centro: curvo?.centro, grade: curvo?.grade, tentativa, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
+    const rodar = (tentativa) => nucleoBooleano(st, i, op, wasm, a.origemId, facesDoMolde ? [faces, facesDoMolde] : [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, centro: curvo?.centro, grade: curvo?.grade, tentativa, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
     /* Os prismas em meia-esquadria são exatos no canto reto, mas no canto
        torto as tampas vizinhas não coincidem e podem deixar a casca aberta
        (o braço inclinado a 20° com raio 0,01). O portão de casca fechada

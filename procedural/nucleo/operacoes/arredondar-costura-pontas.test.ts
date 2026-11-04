@@ -80,6 +80,23 @@ describe('arredondarCostura com afinarPontas e aparar', () => {
     expect(vinculosNaoManifold(n)).toEqual([]);
   });
 
+  it('com aparar por molde, o tubo termina acompanhando o chanfro, e o molde some da peça', () => {
+    const alem = RAIO + 0.01, dentro = 0.0002;
+    const molde = ['lathe', { origemId: 9, eixo: 'z', lados: 72, segmentosCurva: 2, em: [0, 0, 0], perfil: [[0, dentro], [R - C, dentro], [R + alem, C + alem + dentro], [R + alem, ESP - C - alem - dentro], [R - C, ESP - dentro], [0, ESP - dentro]] }];
+    const ps = passos({ aparar: { solido: { origem: { op: 'lathe', id: 9 } } } });
+    const n = nucleo([...ps.slice(0, 3), molde, ...ps.slice(3)]);
+    expect(n.orfaos).toEqual([]);
+    // o molde não sobra: ele vai a |x| = R + RAIO + 1 cm, e a peça não passa de R para os lados
+    for (const f of n.F.values()) for (const v of f.vs) expect(Math.abs(n.V.get(v)[0])).toBeLessThan(R + 0.001);
+    // nenhum vértice do arredondamento passa do chanfro prolongado
+    for (const f of n.F.values()) if (f.cor === '#ff0000') for (const v of f.vs) {
+      const p = n.V.get(v), rho = Math.hypot(p[0], p[1]);
+      expect(Math.min(p[2], ESP - p[2]) - (rho - (R - C))).toBeGreaterThan(-1e-6);
+    }
+    expect(arestasSemPar(n)).toEqual([]);
+    expect(vinculosNaoManifold(n)).toEqual([]);
+  });
+
   it('aparar sem regiao grita', () => {
     const ps = passos({ aparar: { min: [-1, -1, 0], max: [1, 1, ESP] } });
     delete ps[3][1].regiao;

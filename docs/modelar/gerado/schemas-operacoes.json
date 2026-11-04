@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:a4ceac7622f5d55724bb9f3c5efb6db26ee568900cc510835848566c91e0d5ed",
+  "assinatura": "sha256:62bd501446ebc389370f7250bc663b712f6eec67c4e499ae9733b77f371f12cf",
   "total": 39,
   "operacoes": [
     {
@@ -478,7 +478,7 @@
             },
             "aparar": {
               "type": "object",
-              "description": "Caixa {min,max}, só com regiao: fora da regiao o tubo segue a costura com o anel da última seção medida e é cortado por esta caixa, rente à face que corta o canto."
+              "description": "Só com regiao: fora da regiao o tubo segue a costura com o anel da última seção medida e é cortado por uma caixa {min,max} ou por {solido: <seleção>}, um molde da receita que o passo consome."
             },
             "afinarPontas": {
               "anyOf": [
