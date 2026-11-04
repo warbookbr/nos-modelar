@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1727 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1729 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1132,6 +1132,7 @@
 - `arredondar-canto.test.ts` — arredondar-canto.test.ts — o vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `arredondar-chapa-furada.test.ts` — arredondar-chapa-furada.test.ts — as três recusas que sobravam ao arredondar as arestas de uma chapa de 6 mm com furos oblongos.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
+- `arredondar-costura-pontas.test.ts` — arredondar-costura-pontas.test.ts — a ponta solta do arredondamento por fatias. A fixture é a coluna do braço robótico reduzida ao essencial: um disco de eix…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
 - `arredondar-facetado.test.ts` — arredondar-facetado.test.ts — arredondarAresta numa forma facetada não devolve a face vizinha torta. O arco anda no plano perpendicular à aresta e o canto da…
 - `arredondar-tampa-partida.test.ts` — arredondar-tampa-partida.test.ts — arredondarAresta e filete numa aresta cujo lado é uma tampa partida.
@@ -1320,6 +1321,7 @@
 
 - `receita-01.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
 - `receita-02.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
+- `receita-03.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
