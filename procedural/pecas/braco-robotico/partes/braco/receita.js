@@ -35,11 +35,13 @@
  * Encontro do pé com a coluna: `unir` com `arredondarCostura` de 12 mm, com o
  * pé do mesmo raio da coluna. O pé mais estreito (3 mm de raio, na rodada 2)
  * deixava degrau, orelhas e lascas no encontro; do mesmo raio a união sai
- * limpa e a auditoria fecha. O arredondamento para a 8 mm de cada face do pé,
- * onde a coluna fica tangente a ela, e `afinarPontas` faz o raio cair até
- * sumir nos 30 mm antes dessa ponta, em vez de fechar com uma tampa reta que
- * aparecia como dente (a opção entrou no núcleo em 2026-11-04 por causa desta
- * peça, e vale para qualquer costura curva cortada pela regiao).
+ * limpa e a auditoria fecha. A seção do arredondamento é medida até 8 mm de
+ * cada face do pé, onde a coluna fica tangente a ela e a fatia encostaria na
+ * face; dali até a face, `aparar` leva o anel ao longo da costura e corta o
+ * tubo rente à face, um quarto de chanfro para dentro do começo dele (sobre a
+ * aresta do chanfro a união deixaria um triângulo sem área). A opção entrou no
+ * núcleo em 2026-11-04 por causa desta peça, e vale para qualquer encontro em
+ * que uma face corta o canto.
  */
 
 export const TABELA = {
@@ -57,8 +59,6 @@ export const TABELA = {
   suaveDoChanfro: 0.8,
   /* Concordância no encontro do pé com a coluna; zero a desliga (ver acima). */
   raioDoEncontro: 12,
-  /* Comprimento em que o raio do encontro cai até sumir, antes de cada face do pé. */
-  afinarDoEncontro: 30,
   lados: 72,
 };
 
@@ -96,7 +96,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['unir', { origemId: ID.corpo, solidos: [{ origem: { op: 'lathe', id: ID.pe } }, { origem: { op: 'lathe', id: ID.coluna } }] }]);
   const corpo = { origem: { op: 'unir', id: ID.corpo } };
   if (t.raioDoEncontro > 0) {
-    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, afinarPontas: m(t.afinarDoEncontro), regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] } }]);
+    passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, 0.008], max: [1, rc + 0.01, esp - 0.008] }, aparar: { min: [-1, -1, 1.25 * c], max: [1, 1, esp - 1.25 * c] } }]);
   }
   const concordancia = { origem: { op: 'arredondarCostura', id: ID.concordancia } };
   if (t.raioDoEncontro > 0) passos.push(['parte', { nome: 'coluna', sel: concordancia, substituir: true }]);
