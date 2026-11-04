@@ -1,0 +1,782 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 17,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "topo do para-brisa, junção com o teto",
+        "sentido": "anguloso",
+        "evidencia": "lado az30, ponta sobe acima do teto; tresquartos az90 mostra degrau no mesmo ponto"
+      },
+      {
+        "parte": "parachoqueDianteiro",
+        "tipo": "uniao",
+        "onde": "entre o para-choque e o painel da grade e dos faróis",
+        "sentido": "afastado",
+        "evidencia": "tresquartos az90, faixa preta e vão na frente; grade e faróis com arestas quebradas. Pode ser só sombra, não confirmei nas vistas normais"
+      }
+    ],
+    "observacao": "Proporção, perfil e partes abertas seguem a prancha; achei só dois pontos de superfície, e a maior parte das partes e das luzes rasantes eu não abri."
+  },
+  "partes": [
+    {
+      "nome": "grade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "farolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "farolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "setaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "setaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzDeFreio",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o worktree partia de um commit 5 atras do 'etapa 6 em andamento' que a tarefa dizia ser a base",
+    "o descrever so acusa a parte ausente nos contatos e nao mostra os orfaos do nucleo; precisei executar a receita a mao para ver o passo que falhou",
+    "a bancada importa playwright e serve o wasm do manifold por caminho dentro do worktree, que nao tem node_modules; um link simbolico e recusado pelo vite",
+    "a analise com --parte passou de 600 s sem gravar a parte isolada",
+    "meiaVolta so sobe por aneis horizontais e nao serve aos aneis do ombro na traseira",
+    "o crítico leu como vão a junta recuada das lentes na luz rasante; na frontal ampliada, sombreada e em arame, as bordas das luzes estão limpas"
+  ],
+  "notaDePassagem": "Lentes com sufixo _lente para nao cruzar nomes com os cristais. Topo da lanterna no anel boca1 (1125). Luz de freio entre os aneis 3 e 4 do ombro. Nenhum contato novo: cada luz toca so a carroceria.",
+  "receita": {
+    "sha256": "sha256:e2090e0e800177be287ebb286ef45d8d2906b3acb381140c1411cea073eb6b5f",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 18,
+      "acrescentadas": 116,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 206,
+          "texto": "  // etapa 6, as luzes e a grade: cada uma é um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda), com a aba dobrada"
+        },
+        {
+          "tipo": "+",
+          "linha": 207,
+          "texto": "  // como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar."
+        },
+        {
+          "tipo": "+",
+          "linha": 208,
+          "texto": "  farol_base_y: 830, // os anéis de enchimento entre o vinco do para-choque (760) e a boca do capô (1100)"
+        },
+        {
+          "tipo": "+",
+          "linha": 209,
+          "texto": "  farol_topo_y: 1060, // o anel de enchimento em 1054,x"
+        },
+        {
+          "tipo": "+",
+          "linha": 210,
+          "texto": "  lanterna_base_y: 830, // na quina de trás, entre a borda da porta traseira e a lateral, abaixo do vinco de cintura"
+        },
+        {
+          "tipo": "+",
+          "linha": 211,
+          "texto": "  // o anel boca1 (1125): acima dele os anéis de enchimento ficam a 12,5 mm, e o trecho curto junto da quina faz a aba do vão se dobrar"
+        },
+        {
+          "tipo": "+",
+          "linha": 212,
+          "texto": "  lanterna_topo_y: 1130,"
+        },
+        {
+          "tipo": "+",
+          "linha": 213,
+          "texto": "  seta_base_y: 900, // no paralama, entre o fim da quina da frente e o arco"
+        },
+        {
+          "tipo": "+",
+          "linha": 214,
+          "texto": "  seta_topo_y: 985, // o anel de enchimento em 976,x"
+        },
+        {
+          "tipo": "+",
+          "linha": 215,
+          "texto": "  // a luz de freio alta, sobre as portas traseiras: na quina curva da traseira para o teto, entre dois anéis do ombro (o das portas é o 2),"
+        },
+        {
+          "tipo": "+",
+          "linha": 216,
+          "texto": "  // de x -r a x r pela coluna r de número freio_coluna (a r3 cai em x 185 a 191), com cerca de 370 por 55 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 217,
+          "texto": "  freio_anel_base: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 218,
+          "texto": "  freio_anel_topo: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 219,
+          "texto": "  freio_coluna: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 220,
+          "texto": "  luz_folga_borda: 5.5, // a lente começa logo além da perna da aba (5 mm)"
+        },
+        {
+          "tipo": "+",
+          "linha": 221,
+          "texto": "  luz_espessura: 4,"
+        },
+        {
+          "tipo": "-",
+          "linha": 1363,
+          "texto": "  const colunasDoCanto = (rs, cF, cMeio) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1379,
+          "texto": "  const colunasDoCanto = (rs, cF, cMeio, k = T.vao_canto_degraus) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1369,
+          "texto": "    for (let j = 1; j <= T.vao_canto_degraus; j += 1) cols.unshift(lista[iF + passo * j]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 1370,
+          "texto": "    for (let j = 0; j < T.vao_canto_degraus; j += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1385,
+          "texto": "    for (let j = 1; j <= k; j += 1) cols.unshift(lista[iF + passo * j]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1386,
+          "texto": "    for (let j = 0; j < k; j += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1567,
+          "texto": "  const meiaVolta = (rs, cMeio0, cMeio1, cF, s) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1568,
+          "texto": "    const k = T.vao_canto_degraus;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1583,
+          "texto": "  const meiaVolta = (rs, cMeio0, cMeio1, cF, s, degraus = T.vao_canto_degraus) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1584,
+          "texto": "    const k = degraus;"
+        },
+        {
+          "tipo": "-",
+          "linha": 1570,
+          "texto": "    const colsB = colunasDoCanto(rsB, cF, cMeio0); const colsT = colunasDoCanto(rsT, cF, cMeio1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1586,
+          "texto": "    const colsB = colunasDoCanto(rsB, cF, cMeio0, k); const colsT = colunasDoCanto(rsT, cF, cMeio1, k);"
+        },
+        {
+          "tipo": "-",
+          "linha": 1595,
+          "texto": "  for (const v of [...portas, ...vidros]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1611,
+          "texto": "  /* as luzes e a grade (etapa 6): voltas de cantos retos pelas arestas da gaiola, sem partir célula; o farol vai da coluna f7 da"
+        },
+        {
+          "tipo": "+",
+          "linha": 1612,
+          "texto": "     frente até a E, onde a quina vira lateral; a grade, de f5 a f5 passando pelo meio; a lanterna, da coluna rq3 (logo depois da"
+        },
+        {
+          "tipo": "+",
+          "linha": 1613,
+          "texto": "     borda da porta traseira) até a RS, já na lateral; a seta, no paralama, entre F1 e F3 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1614,
+          "texto": "  const luzes = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 1615,
+          "texto": "  {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1616,
+          "texto": "    const rg = aneisEntre(T.farol_base_y, T.farol_topo_y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1617,
+          "texto": "    const metade = meiaVolta(rg, 'f0', 'f0', 'f5', 'e', 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1618,
+          "texto": "    luzes.push({ nome: 'grade', linha: 'abaVaoGrade', material: 'grade', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1619,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 1620,
+          "texto": "  for (const s of ['e', 'd']) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1621,
+          "texto": "    const o = s === 'e' ? 'Esquerdo' : 'Direito'; const a = s === 'e' ? 'Esquerda' : 'Direita';"
+        },
+        {
+          "tipo": "+",
+          "linha": 1622,
+          "texto": "    const rf = aneisEntre(T.farol_base_y, T.farol_topo_y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1623,
+          "texto": "    const foraF = meiaVolta(rf, 'q1', 'q1', 'E', s, 0); const dentroF = meiaVolta(rf, 'q1', 'q1', 'f7', s, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1624,
+          "texto": "    luzes.push({ nome: `farol${o}`, linha: `abaVaoFarol${o}`, material: 'farol', volta: fechar([...foraF, ...[...dentroF].reverse()]) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1625,
+          "texto": "    const rl = aneisEntre(T.lanterna_base_y, T.lanterna_topo_y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1626,
+          "texto": "    const foraL = meiaVolta(rl, 'RM', 'RM', 'RS', s, 0); const dentroL = meiaVolta(rl, 'RM', 'RM', 'rq3', s, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1627,
+          "texto": "    luzes.push({ nome: `lanterna${a}`, linha: `abaVaoLanterna${a}`, material: 'lanterna', volta: fechar([...foraL, ...[...dentroL].reverse()]) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1628,
+          "texto": "    const rsS = aneisEntre(T.seta_base_y, T.seta_topo_y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1629,
+          "texto": "    const foraS = meiaVolta(rsS, 'F2', 'F2', 'F1', s, 0); const dentroS = meiaVolta(rsS, 'F2', 'F2', 'F3', s, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1630,
+          "texto": "    luzes.push({ nome: `seta${a}`, linha: `abaVaoSeta${a}`, material: 'seta', volta: fechar([...foraS, ...[...dentroS].reverse()]) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1631,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 1632,
+          "texto": "  /* a luz de freio alta: os anéis do ombro não são horizontais na traseira, e por isso a volta não passa por `meiaVolta` (que sobe pela"
+        },
+        {
+          "tipo": "+",
+          "linha": 1633,
+          "texto": "     coluna só nos anéis horizontais); vai pelos dois anéis do ombro, de r0 à coluna de fora e de volta, e o espelho fecha o outro lado */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1634,
+          "texto": "  {"
+        },
+        {
+          "tipo": "+",
+          "linha": 1635,
+          "texto": "    const base = anel(`ombro${T.freio_anel_base}`); const topo = anel(`ombro${T.freio_anel_topo}`); const cF = `r${T.freio_coluna}`;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1636,
+          "texto": "    const metade = [...trecho(base, 'r0', cF, 'e'), ...trecho(topo, cF, 'r0', 'e')];"
+        },
+        {
+          "tipo": "+",
+          "linha": 1637,
+          "texto": "    luzes.push({ nome: 'luzDeFreio', linha: 'abaVaoLuzDeFreio', material: 'lanterna', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1638,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 1639,
+          "texto": "  for (const v of [...portas, ...vidros, ...luzes]) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1606,
+          "texto": "  [...portas, ...vidros].forEach((v) => { v.volta = orientar(v.volta); });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1650,
+          "texto": "  [...portas, ...vidros, ...luzes].forEach((v) => { v.volta = orientar(v.volta); });"
+        },
+        {
+          "tipo": "-",
+          "linha": 1610,
+          "texto": "  [...portas, ...vidros].forEach((v) => v.volta.forEach((n, k) => barreira.add(chave(n, v.volta[(k + 1) % v.volta.length]))));"
+        },
+        {
+          "tipo": "+",
+          "linha": 1654,
+          "texto": "  [...portas, ...vidros, ...luzes].forEach((v) => v.volta.forEach((n, k) => barreira.add(chave(n, v.volta[(k + 1) % v.volta.length]))));"
+        },
+        {
+          "tipo": "+",
+          "linha": 1673,
+          "texto": "  luzes.forEach((v) => encher(v.volta, `luz:${v.nome}`));"
+        },
+        {
+          "tipo": "-",
+          "linha": 1673,
+          "texto": "    if (r && r.startsWith('vidro:')) return;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1718,
+          "texto": "    if (r && (r.startsWith('vidro:') || r.startsWith('luz:'))) return;"
+        },
+        {
+          "tipo": "-",
+          "linha": 1697,
+          "texto": "  const cristais = vidros.map((v) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1698,
+          "texto": "    const rot = `vidro:${v.nome}`;"
+        },
+        {
+          "tipo": "+",
+          "linha": 1742,
+          "texto": "  const lenteDoVao = (v, rot, folga, sufixo = '_cristal') => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 1707,
+          "texto": "      nova.set(n, deslocar(n, esc(mi, T.vidro_folga_borda)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 1751,
+          "texto": "      nova.set(n, deslocar(n, esc(mi, folga)));"
+        },
+        {
+          "tipo": "-",
+          "linha": 1709,
+          "texto": "    const nomeDe = (n) => (nova.has(n) ? `${n}_cristal` : n);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1753,
+          "texto": "    const nomeDe = (n) => (nova.has(n) ? `${n}${sufixo}` : n);"
+        },
+        {
+          "tipo": "-",
+          "linha": 1714,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 1758,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 1759,
+          "texto": "  const cristais = vidros.map((v) => lenteDoVao(v, `vidro:${v.nome}`, T.vidro_folga_borda));"
+        },
+        {
+          "tipo": "+",
+          "linha": 1760,
+          "texto": "  /* as lentes das luzes: o pedaço de superfície que o vão tirou, recuado logo além da perna da aba, rente à lataria */"
+        },
+        {
+          "tipo": "+",
+          "linha": 1761,
+          "texto": "  const lentes = luzes.map((v) => ({ ...lenteDoVao(v, `luz:${v.nome}`, T.luz_folga_borda, '_lente'), material: v.material, linha: v.linha }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 1798,
+          "texto": "  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1845,
+          "texto": "  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1860,
+          "texto": "    luzes: luzes.map((v) => ({ nome: v.nome, linha: v.linha, material: v.material, volta: v.volta })), lentes,"
+        },
+        {
+          "tipo": "-",
+          "linha": 1921,
+          "texto": "  const { passo, plastico, rodas, vidros, cristais, abasDosArcos, forma: f } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 1969,
+          "texto": "  const { passo, plastico, rodas, vidros, cristais, luzes, lentes, abasDosArcos, forma: f } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2005,
+          "texto": "  /* as luzes e a grade (etapa 6): a aba dobrada de cada vão, como a dos vidros, e a lente rente à lataria, no material de cada uma */"
+        },
+        {
+          "tipo": "+",
+          "linha": 2006,
+          "texto": "  luzes.forEach((v, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 2007,
+          "texto": "    const sel = { origem: { op: 'friso', id: 900 + k } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 2008,
+          "texto": "    passos.push(['friso', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 2009,
+          "texto": "      origemId: 900 + k, superficie: CHAPA.origem, linha: { nome: v.linha, pontos: [...v.volta, v.volta[0]] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2010,
+          "texto": "      aba: { largura: m(T.aba_vao_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2011,
+          "texto": "    }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2012,
+          "texto": "    passos.push(['parte', { nome: v.nome, sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2013,
+          "texto": "    passos.push(['material', { sel, usa: 'azul' }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2014,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 2015,
+          "texto": "  /* a aba e a lente são a mesma parte, cada uma no seu material: o PLANO tem teto de 64 partes */"
+        },
+        {
+          "tipo": "+",
+          "linha": 2016,
+          "texto": "  lentes.forEach((c, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 2017,
+          "texto": "    const sel = { origem: { op: 'subdivisao', id: 920 + k } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 2018,
+          "texto": "    passos.push(['subdivisao', { origemId: 920 + k, vertices: c.vertices, faces: c.faces, borda: 'cantos', niveis: T.niveis, espessura: m(T.luz_espessura) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2019,
+          "texto": "    passos.push(['parte', { nome: c.nome, sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2020,
+          "texto": "    passos.push(['material', { sel, usa: c.material }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2021,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 2090,
+          "texto": "const LUZES = ['grade', 'farolEsquerdo', 'lanternaEsquerda', 'setaEsquerda', 'farolDireito', 'lanternaDireita', 'setaDireita', 'luzDeFreio'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 2112,
+          "texto": "  ...LUZES.map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),"
+        },
+        {
+          "tipo": "-",
+          "linha": 2066,
+          "texto": "  const { vidros, portas, bordaDeBaixo, passo } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2133,
+          "texto": "  const { vidros, luzes, portas, bordaDeBaixo, passo } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 2136,
+          "texto": "  for (const v of luzes) vaos.push({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 2197,
+          "texto": "    // as lentes das luzes (etapa 6), opacas para o oco do furgão não aparecer por elas"
+        },
+        {
+          "tipo": "+",
+          "linha": 2198,
+          "texto": "    farol: { tipo: 'liso', cor: '#d9e0e4', aspereza: 0.12, metalicidade: 0.4 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2199,
+          "texto": "    lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2200,
+          "texto": "    seta: { tipo: 'liso', cor: '#d98a1f', aspereza: 0.2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2201,
+          "texto": "    grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2272,
+          "texto": "        nome: 'grade',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2273,
+          "texto": "        forma: 'grade escura e fosca entre os faróis, sem marca nem logotipo, de x -360 a 360 e de y 830 a 1054, rente à lataria, com 4 mm de espessura e a aba do vão dobrada para dentro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2274,
+          "texto": "        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2275,
+          "texto": "      },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2276,
+          "texto": "      ...['Esquerdo', 'Direito'].map((lado) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 2277,
+          "texto": "        nome: `farol${lado}`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2278,
+          "texto": "        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} na quina da frente, embutido e rente: de x 504 até a lateral, dobrando a quina, de y 830 a 1054, lente clara opaca de 4 mm e a aba do vão dobrada para dentro`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2279,
+          "texto": "        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2280,
+          "texto": "      })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 2281,
+          "texto": "      ...['Esquerda', 'Direita'].map((lado) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 2282,
+          "texto": "        nome: `lanterna${lado}`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2283,
+          "texto": "        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} vertical na quina de trás, embutida e rente: da porta traseira até a lateral, de y 830 a 1125, lente vermelha opaca de 4 mm e a aba do vão dobrada para dentro`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2284,
+          "texto": "        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2285,
+          "texto": "      })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 2286,
+          "texto": "      ...['Esquerda', 'Direita'].map((lado) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 2287,
+          "texto": "        nome: `seta${lado}`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2288,
+          "texto": "        forma: `seta ${lado === 'Esquerda' ? 'esquerda' : 'direita'} no paralama, entre a quina da frente e o arco: cerca de 120 por 77 mm, de y 900 a 977, lente âmbar opaca rente e a aba do vão dobrada para dentro`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2289,
+          "texto": "        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2290,
+          "texto": "      })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 2291,
+          "texto": "      {"
+        },
+        {
+          "tipo": "+",
+          "linha": 2292,
+          "texto": "        nome: 'luzDeFreio',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2293,
+          "texto": "        forma: 'luz de freio alta no meio, sobre as portas traseiras, na quina curva da traseira para o teto: de x -190 a 190 e de y 2429 a 2467, cerca de 370 por 55 mm, lente vermelha opaca rente de 4 mm e a aba do vão dobrada para dentro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2294,
+          "texto": "        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',"
+        },
+        {
+          "tipo": "+",
+          "linha": 2295,
+          "texto": "      },"
+        },
+        {
+          "tipo": "+",
+          "linha": 2296,
+          "texto": "      {"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az300.png",
+      "peca-frente-rasante-az30.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
