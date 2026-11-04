@@ -1,0 +1,343 @@
+{
+  "plano": "Três jeitos de o ombro assentar no anel da cintura (210 mm), na mesma escala da montagem: o bloco de 190 mm, topo a 210 mm do anel, face da frente a 123 mm do eixo da cintura, com o anel da junta e a coluna na frente. Hoje a frente do pé é redonda e a traseira é quadrada, com quinas vivas que passam 29 mm além do anel. O degrau em L da frente fica de fora porque não está em disputa. Base, anel, ombro, junta e coluna: cinco formas, legendas em lista, sem linhas de centro.",
+  "vista": "superior",
+  "legendas": "lista",
+  "opcoes": [
+    {
+      "titulo": "1: como está",
+      "nota": "Traseira quadrada, quinas 29 mm além do anel.",
+      "formas": [
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "base Ø210"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura Ø210"
+        },
+        {
+          "id": "ombro",
+          "tipo": "loft",
+          "eixo": "y",
+          "sobre": "cintura",
+          "desloca": [
+            0,
+            0,
+            14
+          ],
+          "secoes": [
+            {
+              "pos": 0,
+              "forma": "arredondado",
+              "tamanho": [
+                190,
+                218
+              ],
+              "cantos": [
+                32,
+                32,
+                2,
+                2
+              ],
+              "segmentosPorCanto": 16
+            },
+            {
+              "pos": 210,
+              "forma": "arredondado",
+              "tamanho": [
+                190,
+                218
+              ],
+              "cantos": [
+                32,
+                32,
+                2,
+                2
+              ],
+              "segmentosPorCanto": 16
+            }
+          ],
+          "cor": "verde",
+          "rotulo": "ombro 190"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 190,
+          "diametroInterno": 40,
+          "espessura": 20,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            10,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta"
+        },
+        {
+          "id": "coluna",
+          "tipo": "cilindro",
+          "diametro": 156,
+          "comprimento": 477,
+          "eixo": "y",
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            160,
+            0
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna Ø156"
+        }
+      ]
+    },
+    {
+      "titulo": "2: traseira redonda",
+      "nota": "A metade de trás vira meia-lua de 190, dentro do anel.",
+      "formas": [
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "base Ø210"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura Ø210"
+        },
+        {
+          "id": "ombro",
+          "tipo": "loft",
+          "eixo": "y",
+          "sobre": "cintura",
+          "desloca": [
+            0,
+            0,
+            14
+          ],
+          "secoes": [
+            {
+              "pos": 0,
+              "forma": "arredondado",
+              "tamanho": [
+                190,
+                218
+              ],
+              "cantos": [
+                32,
+                32,
+                95,
+                95
+              ],
+              "segmentosPorCanto": 16
+            },
+            {
+              "pos": 210,
+              "forma": "arredondado",
+              "tamanho": [
+                190,
+                218
+              ],
+              "cantos": [
+                32,
+                32,
+                95,
+                95
+              ],
+              "segmentosPorCanto": 16
+            }
+          ],
+          "cor": "verde",
+          "rotulo": "ombro, trás redondo"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 190,
+          "diametroInterno": 40,
+          "espessura": 20,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            10,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta"
+        },
+        {
+          "id": "coluna",
+          "tipo": "cilindro",
+          "diametro": 156,
+          "comprimento": 477,
+          "eixo": "y",
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            160,
+            0
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna Ø156"
+        }
+      ]
+    },
+    {
+      "titulo": "3: quinas aparadas",
+      "nota": "Traseira quadrada, com cantos de 60 mm, que passam 4 mm do anel.",
+      "formas": [
+        {
+          "id": "base",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 200,
+          "eixo": "y",
+          "centro": [
+            0,
+            0,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "base Ø210"
+        },
+        {
+          "id": "cintura",
+          "tipo": "cilindro",
+          "diametro": 210,
+          "comprimento": 25,
+          "eixo": "y",
+          "sobre": "base",
+          "cor": "roxo",
+          "rotulo": "anel da cintura Ø210"
+        },
+        {
+          "id": "ombro",
+          "tipo": "loft",
+          "eixo": "y",
+          "sobre": "cintura",
+          "desloca": [
+            0,
+            0,
+            14
+          ],
+          "secoes": [
+            {
+              "pos": 0,
+              "forma": "arredondado",
+              "tamanho": [
+                190,
+                218
+              ],
+              "cantos": [
+                32,
+                32,
+                60,
+                60
+              ],
+              "segmentosPorCanto": 16
+            },
+            {
+              "pos": 210,
+              "forma": "arredondado",
+              "tamanho": [
+                190,
+                218
+              ],
+              "cantos": [
+                32,
+                32,
+                60,
+                60
+              ],
+              "segmentosPorCanto": 16
+            }
+          ],
+          "cor": "verde",
+          "rotulo": "ombro, cantos 60"
+        },
+        {
+          "id": "junta",
+          "tipo": "anel",
+          "diametroExterno": 190,
+          "diametroInterno": 40,
+          "espessura": 20,
+          "eixo": "z",
+          "ponta": {
+            "id": "ombro",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            10,
+            0
+          ],
+          "cor": "roxo",
+          "rotulo": "anel da junta"
+        },
+        {
+          "id": "coluna",
+          "tipo": "cilindro",
+          "diametro": 156,
+          "comprimento": 477,
+          "eixo": "y",
+          "ponta": {
+            "id": "junta",
+            "lado": "+z"
+          },
+          "desloca": [
+            0,
+            160,
+            0
+          ],
+          "cor": "amarelo",
+          "rotulo": "coluna Ø156"
+        }
+      ]
+    }
+  ]
+}
