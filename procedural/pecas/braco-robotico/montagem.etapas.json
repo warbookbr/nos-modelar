@@ -114,6 +114,15 @@
         }
       ],
       "forma": "sha256:1b6a3121f6d82373a885bd26eda48e7e221b98870f9aa43559478460bcaca24b",
+      "aceite": {
+        "por": "pessoa, 2026-11-03: 'Vamos com a opção B sim, prosseguimos com a que a gente tava trabalhando', depois de ver a rodada 11 e as marcas de acabamento junto à saída e no encontro de baixo",
+        "defeitosAceitos": [
+          "anel: superficie em contorno do disco, face frontal",
+          "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
+          "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "pessoa",
@@ -155,13 +164,19 @@
           },
           "forma": "sha256:d6c4b94a6c0b60269cca6e07375e60633077b7dd3fe87b0038ae6abc4376c4da"
         }
-      ],
+      ]
+    },
+    {
+      "instancia": "braco",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015",
       "aceite": {
-        "por": "pessoa, 2026-11-03: 'Vamos com a opção B sim, prosseguimos com a que a gente tava trabalhando', depois de ver a rodada 11 e as marcas de acabamento junto à saída e no encontro de baixo",
+        "por": "Tiago, 2026-11-04, pelas imagens da rodada 5, com o arredondamento acompanhando o chanfro",
         "defeitosAceitos": [
-          "anel: superficie em contorno do disco, face frontal",
-          "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
-          "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
         ],
         "analise": "ausente"
       }
