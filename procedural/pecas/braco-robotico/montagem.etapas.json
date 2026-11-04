@@ -113,16 +113,8 @@
           }
         }
       ],
-      "forma": "sha256:1b6a3121f6d82373a885bd26eda48e7e221b98870f9aa43559478460bcaca24b",
-      "aceite": {
-        "por": "pessoa, 2026-11-03: 'Vamos com a opção B sim, prosseguimos com a que a gente tava trabalhando', depois de ver a rodada 11 e as marcas de acabamento junto à saída e no encontro de baixo",
-        "defeitosAceitos": [
-          "anel: superficie em contorno do disco, face frontal",
-          "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
-          "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
-        ],
-        "analise": "ausente"
-      },
+      "forma": "sha256:7bfefdef59eef5af30f2d40e0e4a5ad628c22b98e45be86fe4de573b4d221150",
+      "motivo": "a receita mudou depois do aceite",
       "reaberturas": [
         {
           "por": "pessoa",
@@ -163,8 +155,31 @@
             ]
           },
           "forma": "sha256:d6c4b94a6c0b60269cca6e07375e60633077b7dd3fe87b0038ae6abc4376c4da"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "pessoa, 2026-11-03: 'Vamos com a opção B sim, prosseguimos com a que a gente tava trabalhando', depois de ver a rodada 11 e as marcas de acabamento junto à saída e no encontro de baixo",
+            "defeitosAceitos": [
+              "anel: superficie em contorno do disco, face frontal",
+              "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
+              "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:1b6a3121f6d82373a885bd26eda48e7e221b98870f9aa43559478460bcaca24b"
         }
-      ]
+      ],
+      "aceite": {
+        "por": "Tiago, 2026-11-04: quinas de trás de 75 mm dentro do anel, posição mantida pela recomendação, forma aprovada sem crítico",
+        "defeitosAceitos": [
+          "anel: superficie em contorno do disco, face frontal",
+          "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
+          "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+        ],
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "braco",

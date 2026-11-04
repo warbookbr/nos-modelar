@@ -218,11 +218,11 @@ export function gerarPassos(t = TABELA) {
   }]);
   passos.push(['parte', { nome: 'anel', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
   passos.push(['material', { usa: 'anelEscuro', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
-  /* o ponto do pé mais longe do eixo, tirado do próprio contorno da parte de pé */
+  /* o ponto do pé mais longe do eixo, tirado do próprio contorno da parte de pé; a porta é a faixa de contato de 10 mm junto a ele, que a junta com o anel cobra */
   const raioDoPe = Math.max(...contornoColuna(h - folga, Math.min(rc - 0.003, h - folga), L, zf * (h - folga) / h, Math.min(rq, h - folga)).map(([u, v]) => Math.hypot(u, v)));
   passos.push(['publicarPorta', {
     nome: 'apoio', de: { op: 'unir', id: ID.corpo },
-    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: raioDoPe, inicio: 0, fim: 0.005 },
+    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: raioDoPe - 0.010, raioExterno: raioDoPe, inicio: 0, fim: 0.005 },
   }]);
   passos.push(['publicarPorta', {
     nome: 'juntaDoOmbro', de: { op: 'lathe', id: ID.anel },
