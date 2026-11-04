@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import { conferirMalha } from './conferir-malha.js';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos; roda puro no vitest/esbuild)
-import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../procedural/nucleo/entrada.js';
+import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, FAIXA_ESTENDIDA, montarAnimar, avaliarChaves, bindPoseOssos } from '../../procedural/nucleo/entrada.js';
 // @ts-expect-error — módulo .js neutro de medição (a régua que a bancada e o CLI compartilham)
 import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
 
@@ -1291,16 +1291,19 @@ describe('P2 — lathe (perfil de revolução)', () => {
     expect([...n.F.keys()].sort((a, b) => a - b)).toEqual([0, 1, 2, 3]);   // cursor de face não pulou id nenhum
   });
 
-  it('guarda de overflow (D3) no limite EXATO — vértice (perfil só-anéis) e face (perfil alternando polo/anel) de forma independente', () => {
-    // limite de VÉRTICE: 2 anéis × lados=500 -> 1000 vértices exatos (passa); 501 -> 1002 (estoura)
-    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: 500, superficie: true }]], {}, {})).not.toThrow();
-    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: 501, superficie: true }]], {}, {})).toThrow(/estoura o bloco/);
-    // limite de FACE, independente do de vértice: perfil ALTERNANDO anel/polo (barato em vértice, caro em face —
-    // todo segmento é anel<->polo, nunca degenerado) com lados=8. N=126 pontos (63 anéis+63 polos) -> 567 V / 1000 F exatos (passa);
-    // N=127 -> 575 V / 1008 F (a guarda de FACE estoura primeiro, o vértice nem chegou perto do bloco)
+  it('guarda de overflow (D3) — passa do bloco para a faixa estendida e só grita acima dela, em vértice e em face de forma independente', () => {
+    // O lathe segue na faixa estendida depois do bloco (achado de 2026-11-04), e o teto passou a ser
+    // BLOCO + FAIXA_ESTENDIDA. A guarda conta antes de gerar, então o caso acima do teto não gera nada.
+    const TETO = BLOCO + FAIXA_ESTENDIDA;
+    // VÉRTICE: 2 anéis × lados=501 -> 1002 vértices, que antes estourava e agora passa; acima do teto, grita
+    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: 501, superficie: true }]], {}, {})).not.toThrow();
+    expect(() => nucleo([['lathe', { id: 0, perfil: [[1, 0], [1, 1]], lados: TETO / 2 + 1, superficie: true }]], {}, {})).toThrow(/estoura o bloco/);
+    // FACE, independente do vértice: perfil ALTERNANDO anel/polo com lados=8 custa 8 faces por segmento.
+    // N=127 -> 1008 F (passa do bloco, segue na faixa); N tal que 8(N-1) = TETO + 8 estoura pela face,
+    // com os vértices (~4,5 por ponto) longe do teto
     const alternado = (nPontos: number) => Array.from({ length: nPontos }, (_, k) => (k % 2 === 0 ? [1, k] : [0, k]));
-    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(126), lados: 8, superficie: true }]], {}, {})).not.toThrow();
-    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(127), lados: 8, superficie: true }]], {}, {})).toThrow(/estoura o bloco/);
+    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(127), lados: 8, superficie: true }]], {}, {})).not.toThrow();
+    expect(() => nucleo([['lathe', { id: 0, perfil: alternado(TETO / 8 + 2), lados: 8, superficie: true }]], {}, {})).toThrow(/estoura o bloco.*faces/);
   });
 
   it('params por NOME (raio e y) resolvem como nas outras ops; mudar o VALOR do PARAM não renumera', () => {
@@ -1889,18 +1892,14 @@ describe('P4 — loft (seções ao longo de um caminho 3D)', () => {
     expect(J(grande.V)).not.toBe(J(pequeno.V));
   });
 
-  it('guarda de overflow (D3) no limite EXATO — vértice (2 anéis, lados grande) e face (caminho alternando anel/polo) de forma independente', () => {
-    // limite de VÉRTICE: 2 anéis × lados=500 -> 1000 vértices exatos (passa); 501 -> 1002 (estoura)
-    expect(() => nucleo([['loft', { id: 0, lados: 500, secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 1, 0], raio: 1 }] }]], {}, {})).not.toThrow();
-    expect(() => nucleo([['loft', { id: 0, lados: 501, secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 1, 0], raio: 1 }] }]], {}, {})).toThrow(/estoura o bloco/);
-    // limite de FACE, independente do de vértice: caminho ALTERNANDO anel/polo (barato em vértice, caro
-    // em face — todo segmento é anel<->polo, nunca degenerado), lados=8. N=126 seções (63 anéis+63
-    // polos) -> 567 V / 1000 F exatos (passa); N=127 -> 575 V / 1008 F (a guarda de FACE estoura
-    // primeiro, o vértice nem chegou perto do bloco) — os MESMOS números do lathe (o custo por
-    // seção/segmento é idêntico; só a forma do ponto mudou de [raio,y] pra {pos,raio}).
+  it('guarda de overflow (D3) — passa do bloco para a faixa estendida e só grita acima dela, em vértice e em face de forma independente', () => {
+    // Os mesmos números do lathe: o custo por seção e por segmento é idêntico, só a forma do ponto muda.
+    const TETO = BLOCO + FAIXA_ESTENDIDA;
+    expect(() => nucleo([['loft', { id: 0, lados: 501, secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 1, 0], raio: 1 }] }]], {}, {})).not.toThrow();
+    expect(() => nucleo([['loft', { id: 0, lados: TETO / 2 + 1, secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 1, 0], raio: 1 }] }]], {}, {})).toThrow(/estoura o bloco/);
     const alternado = (nPontos: number) => Array.from({ length: nPontos }, (_, k) => ({ pos: [0, k, 0], raio: k % 2 === 0 ? 1 : 0 }));
-    expect(() => nucleo([['loft', { id: 0, lados: 8, secoes: alternado(126) }]], {}, {})).not.toThrow();
-    expect(() => nucleo([['loft', { id: 0, lados: 8, secoes: alternado(127) }]], {}, {})).toThrow(/estoura o bloco/);
+    expect(() => nucleo([['loft', { id: 0, lados: 8, secoes: alternado(127) }]], {}, {})).not.toThrow();
+    expect(() => nucleo([['loft', { id: 0, lados: 8, secoes: alternado(TETO / 8 + 2) }]], {}, {})).toThrow(/estoura o bloco.*faces/);
   });
 
 });
