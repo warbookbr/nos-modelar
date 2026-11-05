@@ -1334,7 +1334,7 @@
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
-- `receita.js` — braco-robotico/ombro — volta ao desenho aceito pela pessoa em 2026-09-29 (receita do commit ec06c461) no tamanho da opção B de 2026-11-03: 190 mm de largura,…
+- `receita.js` — braco-robotico/ombro — o corpo é UMA malha contínua, por subdivisão de uma gaiola.
 
 ## procedural/pecas/braco-robotico/partes/ombro-tambor/
 
