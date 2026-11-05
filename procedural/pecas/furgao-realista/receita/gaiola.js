@@ -578,9 +578,9 @@ export function derivar(T) {
     const foraT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, `r${iForaTraseiro}`, s);
     vidros.push({ nome: `vidroPortaTraseira${sufixo}`, linha: `abaVaoPortaTraseira${sufixo}`, volta: fechar([...foraT, ...[...dentroT].reverse()]) });
   }
-  /* as luzes e a grade (etapa 6): voltas de cantos retos pelas arestas da gaiola, sem partir célula; o farol vai da coluna f7 da
-     frente até a E, onde a quina vira lateral; a grade, de f5 a f5 passando pelo meio; a lanterna, da coluna rq3 (logo depois da
-     borda da porta traseira) até a RS, já na lateral; a seta, no paralama, entre F1 e F3 */
+  /* a grade e as lanternas (etapa 6): voltas de cantos retos pelas arestas da gaiola, sem partir célula; a grade, de f5 a f5 passando
+     pelo meio; a lanterna, da coluna rq3 (logo depois da borda da porta traseira) até a RS, já na lateral. Os faróis e os piscas não
+     são vão da gaiola desde 2026-11-05: são `aberturaPorContorno` sobre a chapa pronta (`receita/farol.js`) */
   const luzes = [];
   {
     const rg = aneisEntre(T.grade_base_y, T.grade_topo_y);
@@ -588,16 +588,10 @@ export function derivar(T) {
     luzes.push({ nome: 'grade', linha: 'abaVaoGrade', material: 'grade', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });
   }
   for (const s of ['e', 'd']) {
-    const o = s === 'e' ? 'Esquerdo' : 'Direito'; const a = s === 'e' ? 'Esquerda' : 'Direita';
-    const rf = aneisEntre(T.farol_base_y, T.farol_topo_y);
-    const foraF = meiaVolta(rf, 'q1', 'q1', 'E', s, 0); const dentroF = meiaVolta(rf, 'q1', 'q1', 'f7', s, 0);
-    luzes.push({ nome: `farol${o}`, linha: `abaVaoFarol${o}`, material: 'farol', volta: fechar([...foraF, ...[...dentroF].reverse()]) });
+    const a = s === 'e' ? 'Esquerda' : 'Direita';
     const rl = aneisEntre(T.lanterna_base_y, T.lanterna_topo_y);
     const foraL = meiaVolta(rl, 'RM', 'RM', 'RS', s, 0); const dentroL = meiaVolta(rl, 'RM', 'RM', 'rq3', s, 0);
     luzes.push({ nome: `lanterna${a}`, linha: `abaVaoLanterna${a}`, material: 'lanterna', volta: fechar([...foraL, ...[...dentroL].reverse()]) });
-    const rsS = aneisEntre(T.seta_base_y, T.seta_topo_y);
-    const foraS = meiaVolta(rsS, 'F2', 'F2', 'F1', s, 0); const dentroS = meiaVolta(rsS, 'F2', 'F2', 'F3', s, 0);
-    luzes.push({ nome: `seta${a}`, linha: `abaVaoSeta${a}`, material: 'seta', volta: fechar([...foraS, ...[...dentroS].reverse()]) });
   }
   /* a luz de freio alta: os anéis do ombro não são horizontais na traseira, e por isso a volta não passa por `meiaVolta` (que sobe pela
      coluna só nos anéis horizontais); vai pelos dois anéis do ombro, de r0 à coluna de fora e de volta, e o espelho fecha o outro lado */

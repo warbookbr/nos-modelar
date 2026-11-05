@@ -79,10 +79,11 @@ import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
 import { m } from './receita/geometria.js';
 import { forma } from './receita/forma.js';
 import { derivar } from './receita/gaiola.js';
+import { contornoPorRetos, derivarFarois } from './receita/farol.js';
 import { derivarInterior } from './receita/interior.js';
 import { BASE_DAS_RODAS, comBase, familias } from './receita/rodas.js';
 import {
-  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, CRISTAIS, FORROS, LUZES, MOLDURAS, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
+  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, CRISTAIS, FAROIS, FORROS, LUZES, PISCAS, MOLDURAS, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
 } from './receita/nomes.js';
 
@@ -225,17 +226,20 @@ export const TABELA = {
   vao_canto_degraus: 2,
   // etapa 6, as luzes e a grade: cada uma é um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda), com a aba dobrada
   // como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar.
-  farol_base_y: 830, // os anéis de enchimento entre o vinco do para-choque (760) e a boca do capô (1100)
-  farol_topo_y: 1060, // o anel de enchimento em 1054,x
-  // a grade entre os faróis: as mesmas alturas dos faróis em 2026-11-05, com chave própria para ela descer até o para-choque sem
-  // levar os faróis junto
+  // Os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,
+  // em [x, y] mm na vista frontal, no lado esquerdo (+x; o direito o espelha): o farol é afinado, com a ponta de dentro descendo em diagonal
+  // até a grade e a de fora indo a x 980, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente.
+  farol_perfil: [[430, 960], [600, 890], [980, 900], [980, 1090], [560, 1065]],
+  pisca_perfil: [[860, 898], [980, 900], [980, 1090], [860, 1082]], // o desenho do pisca; o vão é cortado pelo farol recuado pisca_margem
+  farol_recuo_lente: 3, // a lente do farol entra 3 mm no vão: a borda da chapa e a aba aparecem em volta dela
+  pisca_margem: 6, // o vão do pisca fica 6 mm dentro da borda do farol (3 além da lente), porque o vão não pode encostar na borda do sólido
+  pisca_recuo_lente: 0, // o pisca enche o vão aberto na lente do farol, e por isso encosta nela
+  // a grade entre os faróis: as alturas que eram as dos faróis até 2026-11-05, com chave própria para ela descer até o para-choque
   grade_base_y: 830,
   grade_topo_y: 1060,
   lanterna_base_y: 830, // na quina de trás, entre a borda da porta traseira e a lateral, abaixo do vinco de cintura
   // o anel boca1 (1125): acima dele os anéis de enchimento ficam a 12,5 mm, e o trecho curto junto da quina faz a aba do vão se dobrar
   lanterna_topo_y: 1130,
-  seta_base_y: 900, // no paralama, entre o fim da quina da frente e o arco
-  seta_topo_y: 985, // o anel de enchimento em 976,x
   // a luz de freio alta, sobre as portas traseiras: na quina curva da traseira para o teto, entre dois anéis do ombro (o das portas é o 2),
   // de x -r a x r pela coluna r de número freio_coluna (a r3 cai em x 185 a 191), com cerca de 370 por 55 mm
   freio_anel_base: 3,
@@ -353,6 +357,10 @@ export const TABELA = {
 /* ---------- passos ---------- */
 
 const CHAPA = { origem: { op: 'subdivisao', id: 1 } };
+/** Os ids dos passos dos faróis: por lado k, o vão do farol (800 + 2k), o do pisca na lente dele (801 + 2k) e a aba (940 + k). */
+const ID_FAROL = (k) => 800 + 2 * k;
+const ID_PISCA = (k) => 801 + 2 * k;
+const ID_ABA_FAROL = (k) => 940 + k;
 
 /** A seção da borracha de vão, [u, v] em mm, u para o cristal e v para fora da chapa: assenta na chapa e no cristal (entra `borracha_fundo` nos dois), passa
  *  `borracha_fora` sobre a chapa e `borracha_dentro` sobre o cristal, sobe `borracha_altura` e desce com o beiral redondo nas duas bordas. */
@@ -366,8 +374,6 @@ export function gerarPassos(T) {
   const { passo, plastico, rodas, vidros, cristais, luzes, lentes, abasDosArcos, forma: f } = derivar(T);
   const passos = [
     ['subdivisao', { origemId: 1, ...passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
-    ['parte', { nome: 'carroceria', sel: CHAPA }],
-    ['material', { sel: CHAPA, usa: 'azul' }],
   ];
   /* o plástico de baixo: cada peça é a pele de uma seção varrida por fora da chapa, engrossada para dentro */
   plastico.forEach((pl, k) => {
@@ -416,6 +422,36 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: c.nome, sel }]);
     passos.push(['material', { sel, usa: c.material }]);
   });
+  /* os faróis e os piscas (2026-11-05): cada farol é um vão pelo contorno na camada da frente da chapa, vista pela frente, com a lente
+     recuada; o pisca é um segundo vão aberto nessa lente, e a aba do farol é o friso sobre a borda do vão. A chapa de cada vão é a
+     do vão anterior, e a carroceria é a do último */
+  const farois = derivarFarois(T);
+  const mm = (x) => m(x);
+  farois.forEach((fa, k) => {
+    const chapaAnterior = k === 0 ? CHAPA : { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k - 1) } };
+    passos.push(['aberturaPorContorno', {
+      origemId: ID_FAROL(k), chapa: chapaAnterior, contorno: contornoPorRetos(fa.farol, mm), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.farol_recuo_lente),
+    }]);
+    passos.push(['aberturaPorContorno', {
+      origemId: ID_PISCA(k), chapa: { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k), parte: 'lente' } }, contorno: contornoPorRetos(fa.pisca, mm), vista: 'z', lente: true, recuoDaLente: m(T.pisca_recuo_lente),
+    }]);
+    const aba = { origem: { op: 'friso', id: ID_ABA_FAROL(k) } };
+    passos.push(['friso', {
+      origemId: ID_ABA_FAROL(k), superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, linha: { nome: `abaVaoFarol${fa.lado}` },
+      aba: { largura: m(T.aba_vao_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
+    }]);
+    const lenteDoFarol = { origem: { op: 'aberturaPorContorno', id: ID_PISCA(k) } };
+    passos.push(['parte', { nome: `farol${fa.lado}`, sel: aba }]);
+    passos.push(['material', { sel: aba, usa: 'azul' }]);
+    passos.push(['parte', { nome: `farol${fa.lado}`, sel: lenteDoFarol }]);
+    passos.push(['material', { sel: lenteDoFarol, usa: 'farol' }]);
+    const pisca = { origem: { op: 'aberturaPorContorno', id: ID_PISCA(k), parte: 'lente' } };
+    passos.push(['parte', { nome: `pisca${fa.lado}`, sel: pisca }]);
+    passos.push(['material', { sel: pisca, usa: 'pisca' }]);
+  });
+  const carroceria = { origem: { op: 'aberturaPorContorno', id: ID_FAROL(farois.length - 1) } };
+  passos.push(['parte', { nome: 'carroceria', sel: carroceria }]);
+  passos.push(['material', { sel: carroceria, usa: 'azul' }]);
   /* o interior: piso, divisória, bancos e painel, cada um uma extrusão do perfil que `derivarInterior` escreve */
   const { piso, divisoria, bancos, painel } = derivarInterior(T, f);
   const perfilM = (pl) => pl.map(([u, v]) => [m(u), m(v)]);
@@ -490,7 +526,8 @@ export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((aba, k) => ({ par: [aba, BORRACHAS[k]], motivo: 'a borracha passa sobre a perna da aba (5 mm para dentro do vão) e entra 1,5 mm abaixo da superfície, onde a aba dobra' })),
   ...BORRACHAS.map((b) => ({ par: ['carroceria', b], motivo: 'a borracha assenta na chapa em volta do vão: passa 15 mm sobre ela e entra 1,5 mm na superfície' })),
   ...BORRACHAS.map((b, k) => ({ par: [b, CRISTAIS[k]], motivo: 'o cristal começa 7,5 mm para dentro da borda do vão e a borracha passa 2,5 mm sobre a borda dele, entrando 1,5 mm: é a borracha que segura o cristal, e é ela que cobre a junta' })),
-  ...LUZES.map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
+  ...[...LUZES, ...FAROIS].map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
+  ...FAROIS.map((farol, k) => ({ par: [farol, PISCAS[k]], motivo: 'o pisca é o pedaço que o vão do pisca tirou da lente do farol, do tamanho do vão: as duas se encostam na parede dele' })),
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
   { par: ['pisoInterior', 'painel'], motivo: 'o painel assenta no piso e entra 1 mm nele' },
@@ -515,6 +552,8 @@ export function vaosDeclarados(T) {
   const naChapa = new Set(passo.vertices);
   const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha, nomeDaBorracha(v.nome)] }));
   for (const v of luzes) vaos.push({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] });
+  derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `farol${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, frisos: [`abaVaoFarol${fa.lado}`] }));
+  derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `pisca${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_PISCA(k) }, semMoldura: { motivo: 'é o vão que o pisca ocupa na lente do farol, do tamanho dele; a borda é a do pisca com a lente, sem aba nem moldura' } }));
   for (const p of portas) {
     if (p.nome.startsWith('portaTraseira')) continue;
     if (!p.volta.every((n) => naChapa.has(n))) continue;
@@ -578,7 +617,7 @@ const receita = {
     // as lentes das luzes (etapa 6), opacas para o oco do furgão não aparecer por elas
     farol: { tipo: 'liso', cor: '#d9e0e4', aspereza: 0.12, metalicidade: 0.4 },
     lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2 },
-    seta: { tipo: 'liso', cor: '#d98a1f', aspereza: 0.2 },
+    pisca: { tipo: 'liso', cor: '#d98a1f', aspereza: 0.2 },
     grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
   },
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
@@ -656,17 +695,17 @@ const receita = {
       },
       ...['Esquerdo', 'Direito'].map((lado) => ({
         nome: `farol${lado}`,
-        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} na quina da frente, embutido e rente: de x 504 até a lateral, dobrando a quina, de y 830 a 1054, lente clara opaca de 4 mm e a aba do vão dobrada para dentro`,
-        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
+        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} afinado, rente na frente: a ponta de dentro desce em diagonal até a grade, a de fora contorna a quina até x 980; y 890 a 1090, lente clara de 4 mm recuada 3 mm e aba do vão para dentro`,
+        tecnica: 'aberturaPorContorno na vista frontal, na camada da frente da chapa, com lente e recuoDaLente; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',
+      })),
+      ...['Esquerdo', 'Direito'].map((lado) => ({
+        nome: `pisca${lado}`,
+        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do conjunto do farol: x 860 a 980, y 898 a 1090, 6 mm dentro da borda do farol, lente âmbar opaca do tamanho do vão na lente do farol`,
+        tecnica: 'segundo aberturaPorContorno, sobre a lente do farol, com lente e recuoDaLente 0; o pedaço retirado é o pisca',
       })),
       ...['Esquerda', 'Direita'].map((lado) => ({
         nome: `lanterna${lado}`,
         forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} vertical na quina de trás, embutida e rente: da porta traseira até a lateral, de y 830 a 1125, lente vermelha opaca de 4 mm e a aba do vão dobrada para dentro`,
-        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
-      })),
-      ...['Esquerda', 'Direita'].map((lado) => ({
-        nome: `seta${lado}`,
-        forma: `seta ${lado === 'Esquerda' ? 'esquerda' : 'direita'} no paralama, entre a quina da frente e o arco: cerca de 120 por 77 mm, de y 900 a 977, lente âmbar opaca rente e a aba do vão dobrada para dentro`,
         tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
       })),
       {
