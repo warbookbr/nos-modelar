@@ -43,18 +43,18 @@ recusa, com o motivo, não é opção para a peça.
 
 ## O atalho de formas
 
-Cada forma tem `id`, que vira o nome da parte, e o gerador: `op` e `args` de uma
-operação geradora do catálogo (`cubo`, `chamferBox`, `cilindro`, `cone`,
-`esfera`, `extrusao`, `lathe`, `loft`) ou `ajudante` e `args` de uma gaiola. A
-posição é uma só entre `centro: [x, y, z]`, `sobre: '<id>'` (a base no topo
-daquela forma) e `ponta: { id, lado }` (encostada na face do lado pedido), com
-`desloca: [dx, dy, dz]` depois e `rotacao: [rx, ry, rz]` em graus antes. Tudo
-se resolve pela caixa da malha que o núcleo gerou, em metro.
+O esboço é em milímetro. Cada forma tem `id` e o gerador, `op` e `args` de um
+gerador do catálogo ou `ajudante` e `args` de uma gaiola, e a posição sai da
+malha das outras, sem conta: `encosta: { id, lado }` leva a forma até tocar a
+outra, `alinha: { "+z": "corpo" }` a deixa rente a uma face, `centro` aceita a
+âncora `"corpo.+y"`, e `rotacao` com `pivo` gira na junta. `npm run
+esboco:nucleo -- --ajuda` traz o resto e um exemplo.
 
 ## Conferir antes de mostrar
 
-`--so-montar` monta e confere as receitas e imprime, por opção, as partes, as
-faces, a caixa em milímetro e o hash do neutroCanonico, sem abrir a bancada.
+`--so-montar` monta e confere as receitas e imprime, por opção, as partes, a
+caixa em milímetro e o relato de contatos, sem abrir a bancada; `--estrito`
+recusa a travessia que a forma não declarou em `contato`.
 Depois rode sem ele, abra a imagem com `Read` e confira que cada opção mostra a
 diferença em disputa, que a câmera é a mesma (a ferramenta imprime onde a caixa
 comum caiu em cada captura) e que nada foi cortado pelo quadro. Quando a

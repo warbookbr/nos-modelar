@@ -1,0 +1,310 @@
+{
+ "plano": "Guitarra elétrica genérica de estudo: corpo, braço, mão e ponte, duas inclinações da mão.",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "mão reta",
+   "nota": "sem inclinação",
+   "formas": [
+    {
+     "id": "corpo",
+     "tipo": "extrusao",
+     "perfil": [
+      [
+       0,
+       0
+      ],
+      [
+       110,
+       10
+      ],
+      [
+       160,
+       60
+      ],
+      [
+       165,
+       140
+      ],
+      [
+       130,
+       200
+      ],
+      [
+       140,
+       250
+      ],
+      [
+       175,
+       330
+      ],
+      [
+       150,
+       420
+      ],
+      [
+       115,
+       450
+      ],
+      [
+       100,
+       380
+      ],
+      [
+       60,
+       330
+      ],
+      [
+       -60,
+       330
+      ],
+      [
+       -100,
+       400
+      ],
+      [
+       -120,
+       470
+      ],
+      [
+       -150,
+       440
+      ],
+      [
+       -170,
+       330
+      ],
+      [
+       -140,
+       250
+      ],
+      [
+       -130,
+       200
+      ],
+      [
+       -165,
+       140
+      ],
+      [
+       -160,
+       60
+      ],
+      [
+       -110,
+       10
+      ]
+     ],
+     "comprimento": 45,
+     "eixo": "z",
+     "centro": [
+      0,
+      225,
+      0
+     ],
+     "cor": "laranja",
+     "rotulo": "corpo"
+    },
+    {
+     "id": "braco",
+     "tipo": "caixa",
+     "largura": 52,
+     "altura": 650,
+     "profundidade": 24,
+     "centro": [
+      0,
+      660,
+      12
+     ],
+     "cor": "amarelo",
+     "rotulo": "braço"
+    },
+    {
+     "id": "mao",
+     "tipo": "caixa",
+     "largura": 70,
+     "altura": 180,
+     "profundidade": 15,
+     "centro": [
+      0,
+      1070,
+      0
+     ],
+     "rotacao": [
+      0,
+      0,
+      0
+     ],
+     "cor": "amarelo",
+     "rotulo": "mão"
+    },
+    {
+     "id": "ponte",
+     "tipo": "caixa",
+     "largura": 80,
+     "altura": 20,
+     "profundidade": 10,
+     "centro": [
+      0,
+      120,
+      27
+     ],
+     "cor": "cinza",
+     "rotulo": "ponte"
+    }
+   ]
+  },
+  {
+   "titulo": "mão a 12°",
+   "nota": "inclinada para trás",
+   "formas": [
+    {
+     "id": "corpo",
+     "tipo": "extrusao",
+     "perfil": [
+      [
+       0,
+       0
+      ],
+      [
+       110,
+       10
+      ],
+      [
+       160,
+       60
+      ],
+      [
+       165,
+       140
+      ],
+      [
+       130,
+       200
+      ],
+      [
+       140,
+       250
+      ],
+      [
+       175,
+       330
+      ],
+      [
+       150,
+       420
+      ],
+      [
+       115,
+       450
+      ],
+      [
+       100,
+       380
+      ],
+      [
+       60,
+       330
+      ],
+      [
+       -60,
+       330
+      ],
+      [
+       -100,
+       400
+      ],
+      [
+       -120,
+       470
+      ],
+      [
+       -150,
+       440
+      ],
+      [
+       -170,
+       330
+      ],
+      [
+       -140,
+       250
+      ],
+      [
+       -130,
+       200
+      ],
+      [
+       -165,
+       140
+      ],
+      [
+       -160,
+       60
+      ],
+      [
+       -110,
+       10
+      ]
+     ],
+     "comprimento": 45,
+     "eixo": "z",
+     "centro": [
+      0,
+      225,
+      0
+     ],
+     "cor": "laranja",
+     "rotulo": "corpo"
+    },
+    {
+     "id": "braco",
+     "tipo": "caixa",
+     "largura": 52,
+     "altura": 650,
+     "profundidade": 24,
+     "centro": [
+      0,
+      660,
+      12
+     ],
+     "cor": "amarelo",
+     "rotulo": "braço"
+    },
+    {
+     "id": "mao",
+     "tipo": "caixa",
+     "largura": 70,
+     "altura": 180,
+     "profundidade": 15,
+     "centro": [
+      0,
+      1070,
+      0
+     ],
+     "rotacao": [
+      -12,
+      0,
+      0
+     ],
+     "cor": "amarelo",
+     "rotulo": "mão"
+    },
+    {
+     "id": "ponte",
+     "tipo": "caixa",
+     "largura": 80,
+     "altura": 20,
+     "profundidade": 10,
+     "centro": [
+      0,
+      120,
+      27
+     ],
+     "cor": "cinza",
+     "rotulo": "ponte"
+    }
+   ]
+  }
+ ]
+}

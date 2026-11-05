@@ -78,7 +78,7 @@ describe('os seis tipos das opções de forma', () => {
     expect(chanfro.op).toBe('chamferBox');
     const raio = traduzirForma({ id: 'a', tipo: 'caixa', largura: 230, altura: 20, profundidade: 230, raio: 25, centro: [0, 0, 0] }).forma;
     expect(raio.op).toBe('extrusao');
-    expect(raio.args.perfil.retangulo.cantos).toBe(0.025);
+    expect(raio.args.perfil.retangulo.cantos).toBe(25);
     expect(tamanhoMm(raio).tamanho).toEqual([230, 20, 230]);
   });
 

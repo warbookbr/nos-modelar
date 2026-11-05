@@ -1,6 +1,7 @@
 /* ler-esboco.js — abre no esboço 2.0 os `.esboco.json` de opções de forma que já existem, sem reescrevê-los.
  *
- * O LEITOR traduz os seis tipos que as opções de forma usam para operações do núcleo, em metro:
+ * O LEITOR traduz os seis tipos que as opções de forma usam para operações do núcleo, em mm, como o 2.0 (a conversão para metro é
+ * de `milimetro.js`, na montagem):
  *   caixa      `cubo`; com `chanfro`, `chamferBox`; com `raio` de canto ou `furos`, `extrusao` do retângulo de cantos redondos
  *              em y (o canto arredondado do esboço é o das quatro arestas verticais), com os furos passantes;
  *   cilindro   `cilindro` no eixo; com `achatado`, `extrusao` do círculo cortado pela corda do lado achatado;
@@ -16,8 +17,8 @@
  *
  * A POSIÇÃO vira o atalho de `opcao.js`: `centro` em vetor (o centro da forma, que o leitor leva ao centro da caixa da malha),
  * `sobre`, `ponta`, `desloca` e `rotacao`. A âncora (`"<id>.<ancora>"`), `encosta`, `alinha`, `de`/`para`, componente, espelho,
- * arranjo, recorte, unidade, curso e parâmetro por expressão são recusados com o nome do campo: o 2.0 posiciona pela caixa da
- * malha que o núcleo gerou e não reimplementa o resto do esboço antigo.
+ * arranjo, recorte, unidade, curso e parâmetro por expressão do esboço antigo são recusados com o nome do campo e, quando o 2.0 tem
+ * o equivalente, com o nome dele: o leitor abre o que existe sem reescrita, e o arquivo novo se escreve no 2.0.
  *
  * A CONFERÊNCIA. Cada forma traduzida é executada sozinha e a caixa da malha é comparada com a medida declarada (largura, altura e
  * profundidade da caixa; diâmetro e comprimento do cilindro, do anel e do cone; a caixa do perfil e o comprimento da extrusão; a
@@ -28,8 +29,8 @@
  * as recusas como `{ opcao, forma, motivo }`. Um arquivo abre quando não há recusa. Núcleo puro: recebe o JSON já lido. */
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { caixaDaMalha, lerRotacao, RecusaDoEsboco } from './opcao.js';
+import { argsEmMetro, MM } from './milimetro.js';
 
-const mm = (x) => x / 1000;
 const EIXOS = ['x', 'y', 'z'];
 const IDX = { x: 0, y: 1, z: 2 };
 /* o plano do perfil do esboço antigo: os eixos de mundo de u e de v para cada eixo de extrusão */
@@ -41,7 +42,7 @@ const ORIENTACAO_DO_LOFT = { y: [1, 0, 0], x: [0, 0, 1], z: [1, 0, 0] };
 const LADOS_DO_CIRCULO = 48;
 const LADOS_DA_ELIPSE = 48;
 const TOLERANCIA_MM = 0.5;
-const EPSILON_DA_TAMPA = 1e-5;
+const EPSILON_DA_TAMPA_MM = 0.01;
 const ESTACOES_DO_SUAVE = 6;
 
 const RAIZ_ACEITA = new Set(['opcoes', 'vista', 'plano', 'legendas', 'linhasCentro', 'formato']);
@@ -62,12 +63,12 @@ const POR_QUE_NAO = {
   familia: 'a forma de família não é traduzida; numa receita ela é `chamar` pelo registro de composições, escrito em "passos"',
   envolve: 'a faixa `envolve` não tem operação equivalente no núcleo',
   usa: 'a instância de componente não é traduzida; o componente vira receita própria ou família',
-  espelha: 'o espelho não é traduzido; no núcleo ele é `espelha`, escrito em "passos"',
-  arranja: 'o arranjo não é traduzido; no núcleo ele é `arranja`, escrito em "passos"',
+  espelha: 'o espelho do esboço antigo não é traduzido; no 2.0 ele é o campo `espelha` da forma',
+  arranja: 'o arranjo do esboço antigo não é traduzido; no 2.0 ele é o campo `repete` da forma',
   subtrai: 'o recorte não é traduzido; no núcleo ele é `subtrair`, escrito em "passos"',
   cortador: 'o cortador não é traduzido; no núcleo ele é o segundo sólido de `subtrair`, escrito em "passos"',
-  encosta: '`encosta` não é traduzido; o 2.0 posiciona por centro, sobre, ponta e desloca, e no núcleo há `encostar`',
-  alinha: '`alinha` não é traduzido; o 2.0 posiciona por centro, sobre, ponta e desloca',
+  encosta: 'o `encosta` do esboço antigo não é traduzido; no 2.0 ele é `encosta: { id, lado }`, até a malha tocar',
+  alinha: 'o `alinha` do esboço antigo não é traduzido; no 2.0 ele é `alinha: { "<lado>": "<id>" }`',
   de: 'a haste por `de`/`para` não é traduzida; o 2.0 posiciona por centro, sobre, ponta, desloca e rotacao',
   para: 'a haste por `de`/`para` não é traduzida; o 2.0 posiciona por centro, sobre, ponta, desloca e rotacao',
   encaixa: '`encaixa` (âncora com giro) não é traduzido; o 2.0 posiciona pela caixa da malha',
@@ -204,7 +205,7 @@ function densificarSuave(posicoes, contornos) {
   return saida;
 }
 
-/** O gerador (op e args, em metro) e a caixa local esperada (mm) de uma forma do esboço antigo. */
+/** O gerador (op e args, em mm) e a caixa local esperada (mm) de uma forma do esboço antigo. */
 function traduzirGerador(f) {
   const t = f.tipo;
   if (t === 'caixa') {
@@ -213,18 +214,18 @@ function traduzirGerador(f) {
     if (f.chanfro !== undefined) {
       positivo(f.chanfro, 'chanfro');
       if (f.raio !== undefined || f.furos || f.furo) erro('"chanfro" não combina com "raio" nem com furos');
-      return { op: 'chamferBox', args: { larg: mm(L), alt: mm(A), prof: mm(P), chanfro: mm(f.chanfro) }, esperado };
+      return { op: 'chamferBox', args: { larg: L, alt: A, prof: P, chanfro: f.chanfro }, esperado };
     }
     const furos = (f.furos ?? (f.furo ? [f.furo] : [])).map((h, k) => {
       positivo(h.diametro, `furos[${k}].diametro`);
       const c = h.centro ?? [0, 0];
-      return { circulo: { raio: mm(h.diametro / 2), centro: [mm(c[0]), mm(c[1])] } };
+      return { circulo: { raio: h.diametro / 2, centro: [c[0], c[1]] } };
     });
     if (f.raio || furos.length) {
       if (f.raio !== undefined && !(num(f.raio) && f.raio >= 0)) erro('"raio" da caixa é um número em mm');
-      return { op: 'extrusao', args: { eixo: 'y', altura: mm(A), perfil: { retangulo: { largura: mm(L), profundidade: mm(P), ...(f.raio ? { cantos: mm(f.raio) } : {}) } }, ...(furos.length ? { furos } : {}), segmentosArco: 6 }, esperado };
+      return { op: 'extrusao', args: { eixo: 'y', altura: A, perfil: { retangulo: { largura: L, profundidade: P, ...(f.raio ? { cantos: f.raio } : {}) } }, ...(furos.length ? { furos } : {}), segmentosArco: 6 }, esperado };
     }
-    return { op: 'cubo', args: { larg: mm(L), alt: mm(A), prof: mm(P) }, esperado };
+    return { op: 'cubo', args: { larg: L, alt: A, prof: P }, esperado };
   }
   if (t === 'cilindro') {
     const d = positivo(f.diametro, 'diametro'); const c = positivo(f.comprimento, 'comprimento');
@@ -238,11 +239,11 @@ function traduzirGerador(f) {
       const [eu] = PLANO_ANTIGO[e];
       const s = lado[0] === '+' ? 1 : -1;
       const n = lado[1] === eu ? [s, 0] : [0, s];
-      const perfil = cortarPoligono(circulo(d / 2, lados), n, d / 2 - profundidade).map((p) => paraOPlanoDaExtrusao(e, p).map(mm));
+      const perfil = cortarPoligono(circulo(d / 2, lados), n, d / 2 - profundidade).map((p) => paraOPlanoDaExtrusao(e, p));
       esperado[IDX[lado[1]]] = d - profundidade;
-      return { op: 'extrusao', args: { eixo: e, altura: mm(c), perfil }, esperado, achatado: true };
+      return { op: 'extrusao', args: { eixo: e, altura: c, perfil }, esperado, achatado: true };
     }
-    return { op: 'cilindro', args: { raio: mm(d / 2), altura: mm(c), lados, eixo: e }, esperado, raioDoCirculo: d / 2, lados };
+    return { op: 'cilindro', args: { raio: d / 2, altura: c, lados, eixo: e }, esperado, raioDoCirculo: d / 2, lados };
   }
   if (t === 'anel') {
     const de = positivo(f.diametroExterno, 'diametroExterno'); const esp = positivo(f.espessura, 'espessura');
@@ -250,20 +251,20 @@ function traduzirGerador(f) {
     if (!num(di) || di < 0 || di >= de) erro('"diametroInterno" fica entre 0 e o diâmetro externo');
     const e = f.eixo ?? 'y'; if (!EIXOS.includes(e)) erro('"eixo" é x, y ou z');
     const esperado = [de, de, de]; esperado[IDX[e]] = esp;
-    return { op: 'extrusao', args: { eixo: e, altura: mm(esp), perfil: { circulo: { raio: mm(de / 2) } }, ...(di > 0 ? { furos: [{ circulo: { raio: mm(di / 2) } }] } : {}), segmentosArco: 12 }, esperado, raioDoCirculo: de / 2, lados: 48 };
+    return { op: 'extrusao', args: { eixo: e, altura: esp, perfil: { circulo: { raio: de / 2 } }, ...(di > 0 ? { furos: [{ circulo: { raio: di / 2 } }] } : {}), segmentosArco: 12 }, esperado, raioDoCirculo: de / 2, lados: 48 };
   }
   if (t === 'cone') {
     const d0 = positivo(f.diametro, 'diametro'); const c = positivo(f.comprimento, 'comprimento');
     const d1 = f.diametroTopo ?? 0;
     if (!num(d1) || d1 < 0 || d1 === d0) erro('"diametroTopo" é 0 (a ponta) ou um tronco diferente do diâmetro');
     const e = f.eixo ?? 'y'; if (!EIXOS.includes(e)) erro('"eixo" é x, y ou z');
-    const perfil = d1 > 0 ? [[0, 0], [mm(d0 / 2), 0], [mm(d1 / 2), mm(c)], [0, mm(c)]] : [[0, 0], [mm(d0 / 2), 0], [0, mm(c)]];
+    const perfil = d1 > 0 ? [[0, 0], [d0 / 2, 0], [d1 / 2, c], [0, c]] : [[0, 0], [d0 / 2, 0], [0, c]];
     const dm = Math.max(d0, d1); const esperado = [dm, dm, dm]; esperado[IDX[e]] = c;
     return { op: 'lathe', args: { perfil, eixo: e, lados: LADOS_DO_CIRCULO }, esperado, raioDoCirculo: dm / 2, lados: LADOS_DO_CIRCULO };
   }
   if (t === 'esfera') {
     const d = positivo(f.diametro, 'diametro');
-    return { op: 'esfera', args: { raio: mm(d / 2) }, esperado: [d, d, d], raioDoCirculo: d / 2, lados: 16 };
+    return { op: 'esfera', args: { raio: d / 2 }, esperado: [d, d, d], raioDoCirculo: d / 2, lados: 16 };
   }
   if (t === 'extrusao') {
     const c = positivo(f.comprimento, 'comprimento');
@@ -277,7 +278,7 @@ function traduzirGerador(f) {
     /* com origem "perfil" o centro da forma é a origem do perfil, e o centro da caixa fica no meio da caixa do perfil */
     const desvioDoCentro = [0, 0, 0];
     if (f.origem === 'perfil') { desvioDoCentro[IDX[eu]] = (caixaPerfil[0] + caixaPerfil[1]) / 2; desvioDoCentro[IDX[ev]] = (caixaPerfil[2] + caixaPerfil[3]) / 2; }
-    return { op: 'extrusao', args: { eixo: e, altura: mm(c), perfil: f.perfil.map((p) => paraOPlanoDaExtrusao(e, p).map(mm)) }, esperado, desvioDoCentro };
+    return { op: 'extrusao', args: { eixo: e, altura: c, perfil: f.perfil.map((p) => paraOPlanoDaExtrusao(e, p)) }, esperado, desvioDoCentro };
   }
   if (t === 'loft') {
     const e = f.eixo ?? 'y'; if (!EIXOS.includes(e)) erro('"eixo" é x, y ou z');
@@ -300,28 +301,28 @@ function traduzirGerador(f) {
     /* o plano da seção do esboço levado ao do loft do núcleo: +u é a orientação, +w é orientação × tangente */
     const tangente = eixoVetor(e); const O = ORIENTACAO_DO_LOFT[e]; const W = cruz(O, tangente);
     const [eu, ev] = PLANO_ANTIGO[e];
-    const paraLoft = ([u, v]) => { const m = [0, 0, 0]; m[IDX[eu]] = u; m[IDX[ev]] = v; return [mm(dot(m, O)), mm(dot(m, W))]; };
+    const paraLoft = ([u, v]) => { const m = [0, 0, 0]; m[IDX[eu]] = u; m[IDX[ev]] = v; return [dot(m, O), dot(m, W)]; };
     let contornos = estacoes.map((s) => (s.pts ? s.pts.map(paraLoft) : null));
     const amostra = contornos.find(Boolean);
     if (area2(amostra) < 0) contornos = contornos.map((c) => (c ? [...c].reverse() : c));
     /* O caminho é a reta do eixo, e todo polo (a seção ponto e a tampa) fica nela: o loft do núcleo põe cada seção perpendicular
        à tangente do caminho, e um polo fora da reta inclinaria as seções das pontas. A seção ponto com centro deslocado e a tampa
        de uma seção que não envolve o eixo (o leque do polo cruzaria a borda) ficam sem equivalente. */
-    const pos = (p) => tangente.map((x) => x * mm(p));
+    const pos = (p) => tangente.map((x) => x * p);
     const envolveOEixo = (pts) => pts.every((q, i) => { const r = pts[(i + 1) % pts.length]; return q[0] * r[1] - q[1] * r[0] > 0; });
     for (const s of estacoes) if (!s.pts && (s.centro ?? [0, 0]).some((x) => x !== 0)) erro('a seção ponto com "centro" deslocado não tem equivalente no loft do núcleo, cujo caminho é a reta do eixo');
     const secoes = [];
     const primeira = estacoes[0]; const ultima = estacoes[estacoes.length - 1];
     for (const s of [primeira, ultima]) if (s.pts && !envolveOEixo(s.pts)) erro('a tampa do loft vai ao eixo, e a seção da ponta não o envolve (o centro dela está deslocado demais)');
-    if (primeira.pts) secoes.push({ pos: pos(primeira.pos - EPSILON_DA_TAMPA * 1000), raio: 0 });
+    if (primeira.pts) secoes.push({ pos: pos(primeira.pos - EPSILON_DA_TAMPA_MM), raio: 0 });
     estacoes.forEach((s, i) => secoes.push(contornos[i] ? { pos: pos(s.pos), contorno: contornos[i] } : { pos: pos(s.pos), raio: 0 }));
-    if (ultima.pts) secoes.push({ pos: pos(ultima.pos + EPSILON_DA_TAMPA * 1000), raio: 0 });
+    if (ultima.pts) secoes.push({ pos: pos(ultima.pos + EPSILON_DA_TAMPA_MM), raio: 0 });
     /* a caixa esperada: a das seções declaradas no plano e as posições no eixo */
     const todos = comPontos.flatMap((s) => s.pts);
     const esperado = [0, 0, 0];
     esperado[IDX[eu]] = Math.max(...todos.map((p) => p[0])) - Math.min(...todos.map((p) => p[0]));
     esperado[IDX[ev]] = Math.max(...todos.map((p) => p[1])) - Math.min(...todos.map((p) => p[1]));
-    esperado[IDX[e]] = ultima.pos - primeira.pos + (primeira.pts ? EPSILON_DA_TAMPA * 1000 : 0) + (ultima.pts ? EPSILON_DA_TAMPA * 1000 : 0);
+    esperado[IDX[e]] = ultima.pos - primeira.pos + (primeira.pts ? EPSILON_DA_TAMPA_MM : 0) + (ultima.pts ? EPSILON_DA_TAMPA_MM : 0);
     return { op: 'loft', args: { lados: n, orientacao: O, secoes }, esperado, folga: f.suave ? 1 : 0 };
   }
   if (t === 'revolucao') {
@@ -330,7 +331,7 @@ function traduzirGerador(f) {
     if (!Array.isArray(f.perfil) || f.perfil.length < 2) erro('"perfil" é uma lista de 2 ou mais pontos [raio, altura]');
     const pts = f.perfil.map((p) => (Array.isArray(p) ? p : [p.raio, p.altura]));
     if (!pts.every((p) => p.every(num))) erro('o perfil da revolução precisa de números');
-    const perfil = pts.map(([r, h]) => [mm(r), mm(h)]);
+    const perfil = pts.map(([r, h]) => [r, h]);
     if (perfil[0][0] > 0) perfil.unshift([0, perfil[0][1]]);
     if (perfil[perfil.length - 1][0] > 0) perfil.push([0, perfil[perfil.length - 1][1]]);
     const rm = Math.max(...pts.map((p) => p[0])); const esperado = [2 * rm, 2 * rm, 2 * rm]; esperado[IDX[e]] = pts[pts.length - 1][1] - pts[0][1];
@@ -342,10 +343,10 @@ function traduzirGerador(f) {
 
 /** Confere a caixa da malha do gerador contra a medida declarada, em mm. */
 function conferir(g) {
-  const { neutro } = executarReceita({ meta: { nome: 'conferencia' }, PASSOS: [[g.op, { origemId: 1, ...g.args }]] });
+  const { neutro } = executarReceita({ meta: { nome: 'conferencia' }, PASSOS: [[g.op, argsEmMetro(g.op, { origemId: 1, ...g.args })]] });
   if (neutro.orfaos?.length) erro(`o núcleo recusou o ${g.op}: ${neutro.orfaos[0].motivo}`);
   const c = caixaDaMalha(neutro);
-  const tamanho = c.tamanho.map((x) => x * 1000);
+  const tamanho = c.tamanho.map((x) => x * MM);
   const flecha = g.raioDoCirculo ? g.raioDoCirculo * (1 - Math.cos(Math.PI / (g.lados ?? LADOS_DO_CIRCULO))) * 2 : 0;
   const tol = TOLERANCIA_MM + flecha + (g.folga ?? 0);
   const k = [0, 1, 2].find((i) => Math.abs(tamanho[i] - g.esperado[i]) > tol);
@@ -353,7 +354,7 @@ function conferir(g) {
   return { tamanhoMm: tamanho, esperadoMm: g.esperado };
 }
 
-/** Uma forma do esboço antigo em forma do 2.0 (metro), com a conferência. */
+/** Uma forma do esboço antigo em forma do 2.0 (mm), com a conferência. */
 export function traduzirForma(f) {
   if (!f || typeof f !== 'object') erro('a forma precisa ser um objeto');
   if (typeof f.id !== 'string') erro('a forma precisa de "id"');
@@ -369,13 +370,13 @@ export function traduzirForma(f) {
   const forma = { id: f.id, op: g.op, args: g.args };
   if (f.centro !== undefined) {
     if (!Array.isArray(f.centro) || f.centro.length !== 3 || !f.centro.every(num)) erro('"centro" por âncora, ponto nomeado ou "entre" não é traduzido; o 2.0 aceita o vetor [x, y, z]');
-    forma.centro = f.centro.map((x, k) => mm(x + (g.desvioDoCentro?.[k] ?? 0)));
+    forma.centro = f.centro.map((x, k) => x + (g.desvioDoCentro?.[k] ?? 0));
   }
   if (f.sobre !== undefined) forma.sobre = f.sobre;
   if (f.ponta !== undefined) forma.ponta = f.ponta;
   if (f.desloca !== undefined) {
     if (!Array.isArray(f.desloca) || f.desloca.length !== 3 || !f.desloca.every(num)) erro('"desloca" é [dx, dy, dz] em mm');
-    forma.desloca = f.desloca.map(mm);
+    forma.desloca = [...f.desloca];
   }
   if (f.rotacao !== undefined) {
     const r = Array.isArray(f.rotacao) ? f.rotacao : { eixo: f.rotacao?.eixo, graus: f.rotacao?.angulo ?? f.rotacao?.graus };
@@ -386,7 +387,7 @@ export function traduzirForma(f) {
   if (f.cor !== undefined) forma.cor = f.cor;
   if (f.rotulo !== undefined) forma.rotulo = f.rotulo;
   /* sem posição, o esboço punha o centro da forma na origem; o atalho deixaria a forma onde o gerador a pôs */
-  if (forma.centro === undefined && forma.sobre === undefined && forma.ponta === undefined) forma.centro = [0, 0, 0].map((_, k) => mm(g.desvioDoCentro?.[k] ?? 0));
+  if (forma.centro === undefined && forma.sobre === undefined && forma.ponta === undefined) forma.centro = [0, 0, 0].map((_, k) => g.desvioDoCentro?.[k] ?? 0);
   return { forma, conferencia };
 }
 

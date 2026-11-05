@@ -29,7 +29,7 @@ export function medirVao(neutro, partes, pontos) {
   const cantos = []; let desvio = null;
   for (let k = 0; k < pontos.length; k += 1) {
     const girado = [...pontos.slice(k), ...pontos.slice(0, k)];
-    const r = medirAbertura(malha, { contorno: contornoReto(girado), poligono: girado.map((p) => p.map(m)), interior, bico: girado[0].map(m) });
+    const r = medirAbertura(malha, { contorno: contornoReto(girado, 1000), poligono: girado.map((p) => p.map(m)), interior, bico: girado[0].map(m) });
     if (r.erroDaBorda || !r.desvio) return { erro: r.erroDaBorda ?? `a borda saiu em ${r.voltas.fora} volta(s)` };
     desvio ??= r.desvio.fora;
     cantos.push({ canto: pontos[k].map((x) => r2(x)), desenhado: r2(r.bico.anguloDesenhado), naMalha: r2(r.bico.anguloNaMalha), diferenca: r2(r.bico.diferenca) });

@@ -1,0 +1,37 @@
+docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/guitarra.esboco.json: esboço do 2.0
+  cabeça reta: 4 partes (corpo, braco, cabeca, ponte), 211 faces, 0 sem parte; x -170.4..170.5, y -470.0..690.6, z -0.0..55.0 mm; neutro c56282bd3cbed9e6
+  contatos de "cabeça reta" (a medida do descrever, tolerância de 0,001 mm):
+    encosta    braco e cabeca (esperado: encosta)
+    encosta    braco e corpo (esperado: encosta)
+    encosta    corpo e ponte (esperado: encosta)
+    nenhuma travessia
+    3 par(es) a mais de 20 mm um do outro
+  cabeça a 12 graus: 4 partes (corpo, braco, cabeca, ponte), 211 faces, 0 sem parte; x -170.4..170.5, y -470.0..689.8, z -7.4..55.0 mm; neutro dd73e809cd6ec853
+  contatos de "cabeça a 12 graus" (a medida do descrever, tolerância de 0,001 mm):
+    encosta    braco e cabeca (esperado: encosta)
+    encosta    braco e corpo (esperado: encosta)
+    encosta    corpo e ponte (esperado: encosta)
+    nenhuma travessia
+    3 par(es) a mais de 20 mm um do outro
+  cabeça reta, vista isometrica: a caixa comum na tela tem o centro em 0, 0 e o quadro -0.83612, -0.92593, 0.83612, 0.92593 (de -1 a 1)
+  cabeça reta, vista direita: a caixa comum na tela tem o centro em 0, 0 e o quadro -0.18349, -0.92593, 0.18349, 0.92593 (de -1 a 1)
+  cabeça reta, vista frontal: a caixa comum na tela tem o centro em 0, 0 e o quadro -0.92593, -0.85554, 0.92593, 0.85554 (de -1 a 1)
+  cabeça a 12 graus, vista isometrica: a caixa comum na tela tem o centro em 0, 0 e o quadro -0.83612, -0.92593, 0.83612, 0.92593 (de -1 a 1)
+  cabeça a 12 graus, vista direita: a caixa comum na tela tem o centro em 0, 0 e o quadro -0.18349, -0.92593, 0.18349, 0.92593 (de -1 a 1)
+  cabeça a 12 graus, vista frontal: a caixa comum na tela tem o centro em 0, 0 e o quadro -0.92593, -0.85554, 0.92593, 0.85554 (de -1 a 1)
+mesma câmera: a caixa comum difere no máximo 0.00e+0 do quadro entre as capturas de cada vista
+imagem: docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/guitarra-tres-vistas.png (1200x3118)
+docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/guitarra-de-quem-conduz.esboco.json: esboço antigo, traduzido pelo leitor
+  mão reta: 4 partes (corpo, braco, mao, ponte), 53 faces, 0 sem parte; x -172.5..172.5, y -10.0..1160.0, z -22.5..32.0 mm; neutro bc63293787466934
+  contatos de "mão reta" (a medida do descrever, tolerância de 0,001 mm):
+    atravessa  braco e mao: 5,000 mm pelo eixo y (NÃO DECLARADA)
+    atravessa  corpo e ponte: 0,500 mm pelo eixo z (NÃO DECLARADA)
+    folga      braco e corpo: as caixas se sobrepõem e os sólidos não se tocam
+    3 par(es) a mais de 20 mm um do outro
+  mão a 12°: 4 partes (corpo, braco, mao, ponte), 53 faces, 0 sem parte; x -172.5..172.5, y -10.0..1159.6, z -26.0..32.0 mm; neutro fb2132ac088772f1
+  contatos de "mão a 12°" (a medida do descrever, tolerância de 0,001 mm):
+    atravessa  braco e mao: 4,593 mm pelo eixo y (NÃO DECLARADA)
+    atravessa  corpo e ponte: 0,500 mm pelo eixo z (NÃO DECLARADA)
+    folga      braco e corpo: as caixas se sobrepõem e os sólidos não se tocam
+    3 par(es) a mais de 20 mm um do outro
+RECUSADO pelo modo estrito: 4 travessia(s) não declarada(s) ou contato(s) esperado(s) que a malha não dá

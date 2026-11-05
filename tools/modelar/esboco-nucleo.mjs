@@ -2,21 +2,30 @@
 /* esboco-nucleo.mjs — o esboço 2.0: as opções de forma de um esboço saem das operações do núcleo, cada uma montada como receita em
  * memória e capturada na bancada com a mesma câmera, lado a lado numa imagem só com o título e a nota de cada uma.
  *
- * Uso: npm run esboco:nucleo -- <arquivo> [--vista <v>] [--saida <png>] [--largura <px>] [--sem-cores] [--so-montar]
+ * Uso: npm run esboco:nucleo -- <arquivo> [--vista <v> | --vistas <v1,v2,...>] [--saida <png>] [--largura <px>] [--sem-cores]
+ *      [--rotulos | --sem-rotulos] [--estrito] [--perto <mm>] [--so-montar]
  *
  * O arquivo é um `.esboco.json` de opções de forma (o antigo, que o leitor de `modulos/esboco-nucleo/src/ler-esboco.js` traduz sem
- * reescrita, ou o do 2.0, com `passos` e `formas` em metro) ou um módulo `.mjs`/`.js` cujo `default` é o esboço do 2.0, para a
- * opção que precisa de código (a chapa da gaiola, o contorno de um vão). Cada opção vira receita por `receitaDaOpcao`
- * (`modulos/esboco-nucleo/src/opcao.js`), executada pelo executor; o que o leitor ou o núcleo recusam sai com o motivo, e nada é
- * desenhado de outro jeito.
+ * reescrita, ou o do 2.0, em mm) ou um módulo `.mjs`/`.js` cujo `default` é o esboço do 2.0, para a opção que precisa de código (a
+ * chapa da gaiola, o contorno de um vão). Cada opção vira receita por `receitaDaOpcao` (`modulos/esboco-nucleo/src/opcao.js`),
+ * executada pelo executor; o que o leitor ou o núcleo recusam sai com o motivo, e nada é desenhado de outro jeito.
+ *
+ * O RELATO DE CONTATOS. A cada rodada, para cada opção, sai em texto quem encosta, quem atravessa e com quanto, e a folga entre as
+ * formas que ficam perto (`relatoDeContatos` de `modulos/esboco-nucleo/src/contatos.js`, a medida do `descrever` sobre o neutro
+ * da opção), com o que cada forma declarou esperar. Com `--estrito` o comando sai com erro, antes da captura, quando há travessia
+ * não declarada ou relação declarada que a malha não dá.
  *
  * A MESMA CÂMERA. A bancada encaixa cada peça no estúdio na escala dela, e a câmera automática enquadra cada uma por conta própria;
- * duas opções de tamanhos diferentes sairiam em escalas diferentes. Aqui a câmera é uma só, ortográfica, na direção da vista,
- * centrada no centro da caixa que junta as malhas de todas as opções e com o quadro dessa caixa vista da câmera, mais 8% de
+ * duas opções de tamanhos diferentes sairiam em escalas diferentes. Aqui a câmera é uma só por vista, ortográfica, na direção da
+ * vista, centrada no centro da caixa que junta as malhas de todas as opções e com o quadro dessa caixa vista da câmera, mais 8% de
  * margem. Em cada opção a página converte essa câmera do espaço da receita para o do estúdio pela transformação que a bancada deu
- * à peça (`olharComoReferencia` da ponte), e devolve onde o centro e o quadro dos oito cantos da caixa comum caíram na tela: os números saem
- * no relato, e iguais em todas as opções provam a mesma câmera. As vistas são as da bancada (isometrica, frontal, traseira,
- * direita, esquerda, superior, inferior); a padrão é a do esboço.
+ * à peça (`olharComoReferencia` da ponte), e devolve onde o centro e o quadro dos oito cantos da caixa comum caíram na tela: os
+ * números saem no relato, e iguais em todas as opções provam a mesma câmera. As vistas são as da bancada (isometrica, frontal,
+ * traseira, direita, esquerda, superior, inferior); a padrão é a do esboço. Com `--vistas`, cada opção sai numa linha com um painel
+ * por vista, e o nome da vista em cada painel.
+ *
+ * OS RÓTULOS. Com `rotulos: true` na raiz do esboço, ou `--rotulos`, cada forma do atalho ganha um número sobre o centro da caixa
+ * dela na imagem, e a legenda dos números sai embaixo da opção.
  *
  * `capturarLadoALado` é exportado para `variantes.mjs`, que junta as variantes de uma receita do mesmo jeito. Precisa do
  * Chromium do Playwright, como `npm run bancada`. */
@@ -29,6 +38,7 @@ import { neutroCanonico } from '../../procedural/nucleo/nucleo.js';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { lerEsboco } from '../../modulos/esboco-nucleo/src/ler-esboco.js';
 import { receitaDaOpcao, RecusaDoEsboco, caixaDaMalha } from '../../modulos/esboco-nucleo/src/opcao.js';
+import { PERTO_MM, relatoDeContatos, textoDoRelato } from '../../modulos/esboco-nucleo/src/contatos.js';
 import { abrirCapturaCompartilhada, PRAZO_DE_CARGA_MS } from './olhar-bancada.mjs';
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 
@@ -36,26 +46,53 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SESSOES = join(REPO, 'tools/bancadas/out/sessoes');
 const MARGEM = 0.08;
 
+/** O exemplo da ajuda: o 2.0 com a extrusão de contorno por spline, o encosta, o alinha e o giro com pivô (o teste o monta). */
+export const EXEMPLO = `  { "opcoes": [{ "titulo": "cabeça a 12 graus", "formas": [
+    { "id": "corpo", "op": "extrusao", "rotacao": [180, 0, 0], "args": { "eixo": "z", "altura": 45, "perfil": { "contorno": {
+        "inicio": [30, 330], "trechos": [{ "spline": [[120, 448], [170, 330], [168, 120], [0, 0], [-168, 120],
+        [-170, 330], [-122, 470], [-30, 330]] }] } } } },
+    { "id": "braco", "op": "cubo", "args": { "larg": 52, "alt": 650, "prof": 24 },
+      "encosta": { "id": "corpo", "lado": "+y" }, "alinha": { "+z": "corpo" } },
+    { "id": "cabeca", "op": "cubo", "args": { "larg": 70, "alt": 180, "prof": 15 },
+      "encosta": { "id": "braco", "lado": "+y" }, "alinha": { "+z": "braco" },
+      "rotacao": { "eixo": "x", "graus": -12, "pivo": "cabeca.-y-z" } } ] }] }`;
+
 export const AJUDA = `npm run esboco:nucleo -- <arquivo> [opções]  (node tools/modelar/esboco-nucleo.mjs)
 O esboço 2.0: cada opção de forma é uma receita do núcleo, montada em memória e capturada na bancada com a mesma câmera, e as
-opções saem lado a lado numa imagem só, com o título e a nota de cada uma.
+opções saem lado a lado numa imagem só. A cada rodada sai o relato de contatos de cada opção.
 
-O arquivo é um .esboco.json de opções de forma (o antigo abre sem reescrita: caixa com raio e chanfro, cilindro, anel, cone em
-tronco, extrusão e loft, posicionados por centro, sobre, ponta, desloca e rotacao) ou o do 2.0, em metro: cada opção com
-"passos" (passos crus do núcleo, com tudo o que o catálogo oferece), "topo" (pontos nomeados) e "formas" (o atalho: { id, op,
-args } ou { id, ajudante: "gaiolaPorLacos" | "gaiolaPorEstacoes" | "gaiolaPorRede" | "gaiolaVarrida", args }, posicionada por
-centro, sobre, ponta, desloca e rotacao pela caixa da malha que o núcleo gerou). Um módulo .mjs cujo default é o esboço do 2.0
-serve para a opção que precisa de código. O que o leitor ou o núcleo não fazem é recusado com o motivo.
+O arquivo é o .esboco.json do 2.0, em mm (ou o antigo, que abre sem reescrita), ou um módulo .mjs cujo default é o esboço.
+Cada opção tem "formas" (o atalho), e pode ter "passos" crus do núcleo e "topo" (pontos nomeados), tudo em mm. Uma forma é
+{ id, op, args } de um gerador do catálogo (cubo, chamferBox, cilindro, extrusao, lathe, loft, ...) ou { id, ajudante, args } de
+uma gaiola, e a posição sai da malha das outras, sem conta:
+  centro: [x, y, z] | "corpo.+z" (com "por": "-z", a âncora da própria forma que vai ao ponto)
+  sobre: "corpo"                   a base no topo da caixa do corpo
+  ponta: { id, lado }              encostada na face da caixa
+  encosta: { id, lado }            levada pelo eixo do lado até a malha tocar a da outra
+  alinha: { "+z": "corpo" }        a face +z rente à face +z do corpo ("corpo.-z" cita outra face; x, y, z centram)
+  desloca: [dx, dy, dz]            soma no fim (com encosta, no eixo do toque é folga)
+  rotacao: [rx, ry, rz] | { eixo, graus, pivo: "braco.+y-z" }   sem pivô gira no centro, antes da posição
+  repete: { total, d } | { total, eixo, graus|volta, pivo }    o arranja do núcleo
+  espelha: "x" | { eixo, pos | em: "corpo" }                     o espelha do núcleo
+  contato: { "corpo": "atravessa" }  a relação esperada ("encosta", "atravessa", "folga"); o encosta declara a dele
+A âncora é "centro" ou lados de eixos distintos ("+y", "+y-z", "-x+y+z") da caixa da forma. Exemplo, a cabeça de uma guitarra
+girando 12 graus para trás na junta com o braço, sobre um corpo de contorno por spline (no eixo z o perfil [u, v] vai a (x, -y),
+e o giro de 180 graus em x o põe como desenhado):
+${EXEMPLO}
 
-  --vista <v>      isometrica, frontal, traseira, direita, esquerda, superior ou inferior (padrão: a do esboço)
-  --saida <png>    onde gravar a imagem (padrão: tools/bancadas/out/esboco-nucleo-<nome>.png)
-  --largura <px>   a largura de cada opção na imagem (padrão 640)
-  --sem-cores      a cor dos materiais, em vez de uma cor por parte
-  --so-montar      monta e confere as receitas, imprime os números, e não abre a bancada
-  --ajuda          esta mensagem
+  --vista <v>        isometrica, frontal, traseira, direita, esquerda, superior ou inferior (padrão: a do esboço)
+  --vistas <v1,v2>   um painel por vista, cada opção numa linha (por exemplo isometrica,direita,frontal)
+  --rotulos          um número sobre cada forma e a legenda embaixo da opção (ou "rotulos": true no esboço); --sem-rotulos tira
+  --estrito          sai com erro, antes da captura, se houver travessia não declarada ou contato declarado que não se dá
+  --perto <mm>       até que folga o relato lista o par (padrão ${PERTO_MM})
+  --saida <png>      onde gravar a imagem (padrão: tools/bancadas/out/esboco-nucleo-<nome>.png)
+  --largura <px>     a largura de cada painel na imagem (padrão 640, ou 420 com --vistas)
+  --sem-cores        a cor dos materiais, em vez de uma cor por parte
+  --so-montar        monta, confere e imprime os números e o relato, e não abre a bancada
+  --ajuda            esta mensagem
 
-Imprime, por opção, as partes, as faces, a caixa da malha em mm e o hash do neutroCanonico, e a posição da caixa comum na tela
-de cada captura (a mesma câmera). Precisa do Chromium do Playwright.
+Imprime, por opção, as partes, as faces, a caixa da malha em mm, o hash do neutroCanonico e o relato de contatos, e a posição
+da caixa comum na tela de cada captura (a mesma câmera). Precisa do Chromium do Playwright.
 `;
 
 export const hashDoNeutro = (neutro) => createHash('sha256').update(JSON.stringify(neutroCanonico(neutro))).digest('hex');
@@ -72,21 +109,27 @@ export async function lerArquivoDeEsboco(caminho) {
   return JSON.parse(readFileSync(abs, 'utf8'));
 }
 
-/** Monta as receitas das opções. Devolve `{ vista, paineis, recusas }`; com recusa, `paineis` fica vazio. */
-export function montarOpcoes(esboco, { nome = 'esboco' } = {}) {
+/** Monta as receitas das opções, com o relato de contatos de cada uma. Devolve `{ vista, paineis, recusas }`; com recusa, `paineis` fica vazio. */
+export function montarOpcoes(esboco, { nome = 'esboco', perto = PERTO_MM } = {}) {
   const lido = lerEsboco(esboco);
   if (lido.recusas.length) return { vista: lido.vista, paineis: [], recusas: lido.recusas, formato: lido.formato };
   const paineis = []; const recusas = [];
   lido.opcoes.forEach((o, i) => {
     try {
       const r = receitaDaOpcao(o, { nome: `${nome}-${i + 1}` });
-      paineis.push({ titulo: o.titulo ?? `opção ${i + 1}`, nota: o.nota ?? '', receita: r.receita, neutro: r.neutro, partes: r.partes, facesSemParte: r.facesSemParte, formas: r.formas });
+      const contatos = relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto });
+      paineis.push({ titulo: o.titulo ?? `opção ${i + 1}`, nota: o.nota ?? '', receita: r.receita, neutro: r.neutro, partes: r.partes, facesSemParte: r.facesSemParte, formas: r.formas, contatos });
     } catch (e) {
       if (!(e instanceof RecusaDoEsboco)) throw e;
       recusas.push({ opcao: o.titulo ?? `opção ${i + 1}`, forma: null, motivo: e.message });
     }
   });
-  return { vista: lido.vista, paineis: recusas.length ? [] : paineis, recusas, formato: lido.formato, conferencias: lido.conferencias };
+  return { vista: lido.vista, rotulos: esboco?.rotulos === true, paineis: recusas.length ? [] : paineis, recusas, formato: lido.formato, conferencias: lido.conferencias };
+}
+
+/** Os números das formas visíveis de um painel, na ordem do esboço: `{ n, texto, ponto }`, com o ponto em metro, no espaço da receita. */
+export function rotulosDoPainel(painel) {
+  return (painel.formas ?? []).filter((f) => !f.oculto).map((f, i) => ({ n: i + 1, texto: f.rotulo ?? f.id, ponto: f.caixa.centro.map((x) => x / 1000) }));
 }
 
 const unit = (v) => { const n = Math.hypot(...v); return v.map((x) => x / n); };
@@ -116,7 +159,7 @@ export function cameraComum(neutros, vista) {
 }
 
 /* Roda na página: converte a câmera do espaço da receita para o do estúdio pela transformação que a bancada deu à peça, aplica,
-   e devolve onde o centro e o quadro dos cantos da caixa comum caem na tela, de -1 a 1. */
+   e devolve onde o centro e o quadro dos cantos da caixa comum caem na tela, de -1 a 1, e onde caem os `pontos` pedidos. */
 function aplicarCameraNaPagina(cam) {
   const amb = window.__mecanificaBancada.ambiente();
   let raiz = null;
@@ -138,27 +181,41 @@ function aplicarCameraNaPagina(cam) {
   const cantos = [];
   for (const x of [cam.caixa.min[0], cam.caixa.max[0]]) for (const y of [cam.caixa.min[1], cam.caixa.max[1]]) for (const z of [cam.caixa.min[2], cam.caixa.max[2]]) cantos.push(naTela([x, y, z]));
   const quadro = [Math.min(...cantos.map((c) => c[0])), Math.min(...cantos.map((c) => c[1])), Math.max(...cantos.map((c) => c[0])), Math.max(...cantos.map((c) => c[1]))];
-  return { escala: escala.x, centro: naTela(cam.centro), quadro };
+  return { escala: escala.x, centro: naTela(cam.centro), quadro, pontos: (cam.pontos ?? []).map(naTela) };
 }
 
 const esperarQuadros = (n) => new Promise((ok) => { const passo = (k) => (k <= 0 ? ok(true) : requestAnimationFrame(() => passo(k - 1))); passo(n); });
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
+/* uma captura com os números das formas por cima, na posição que a página devolveu */
+function imagemComRotulos(png, W, H, rotulos, pontos) {
+  const marcas = (rotulos ?? []).map((r, i) => {
+    const [x, y] = pontos[i];
+    return `<span class="r" style="left:${((x + 1) / 2) * W}px;top:${((1 - y) / 2) * H}px">${r.n}</span>`;
+  }).join('');
+  return `<div class="i" style="width:${W}px;height:${H}px"><img src="data:image/png;base64,${png.toString('base64')}" width="${W}" height="${H}">${marcas}</div>`;
+}
+const legenda = (rotulos) => (rotulos?.length ? `<div class="l">${rotulos.map((r) => `<b>${r.n}</b> ${esc(r.texto)}`).join(' &nbsp; ')}</div>` : '');
+const ESTILO = '.p{background:#fff;border:1px solid #ddd}.i{position:relative}.i img{display:block}.r{position:absolute;transform:translate(-50%,-50%);min-width:18px;height:18px;padding:0 3px;border-radius:10px;background:#fff;border:2px solid #222;font:bold 12px/18px sans-serif;text-align:center;color:#222}.t{font-size:17px;font-weight:bold;padding:8px 10px 2px}.n{font-size:14px;padding:0 10px 6px;line-height:1.35}.l{font-size:13px;padding:0 10px 10px;color:#333}.v{font-size:13px;padding:6px 10px;color:#555;border-top:1px solid #eee}';
+
 /**
- * Captura cada painel na bancada com a mesma câmera e junta as capturas numa imagem, lado a lado.
+ * Captura cada painel na bancada com a mesma câmera por vista e junta as capturas numa imagem.
  * @param {object} o
- * @param {Array<{titulo, nota, receita, neutro}>} o.paineis
- * @param {string} o.vista   a vista da bancada
- * @param {string} o.saida   o PNG a gravar
- * @param {string} o.titulo  a linha de cima da imagem
- * @returns {Promise<{ saida, camera, telas: Array, largura, altura }>}
+ * @param {Array<{titulo, nota, receita, neutro, rotulos?}>} o.paineis   `rotulos`: [{ n, texto, ponto }], ponto em metro
+ * @param {string} [o.vista]     a vista da bancada (uma)
+ * @param {string[]} [o.vistas]  várias vistas: cada painel sai numa linha, com uma captura por vista
+ * @param {string} o.saida       o PNG a gravar
+ * @param {string} o.titulo      a linha de cima da imagem
+ * @returns {Promise<{ saida, cameras, telas: Array, largura, altura }>}
  */
-export async function capturarLadoALado({ paineis, vista, saida, titulo, largura = 640, cores = true, rodape = '', logger = () => {} }) {
+export async function capturarLadoALado({ paineis, vista, vistas = null, saida, titulo, largura = null, cores = true, rodape = '', logger = () => {} }) {
   if (!paineis.length) throw new Error('nada a capturar');
-  const camera = cameraComum(paineis.map((p) => p.neutro), vista);
-  const W = Math.max(320, Math.round(largura / 2) * 2);
-  const H = Math.min(1400, Math.max(320, Math.round((W * camera.meiaAltura) / camera.meiaLargura / 2) * 2));
+  const lista = vistas?.length ? vistas : [vista];
+  const grade = lista.length > 1;
+  const cameras = lista.map((v) => cameraComum(paineis.map((p) => p.neutro), v));
+  const W = Math.max(320, Math.round((largura ?? (grade ? 420 : 640)) / 2) * 2);
+  const H = Math.min(1400, Math.max(320, Math.max(...cameras.map((c) => Math.round((W * c.meiaAltura) / c.meiaLargura / 2) * 2))));
   mkdirSync(SESSOES, { recursive: true });
   const arquivos = paineis.map((p, i) => join(SESSOES, `esboco-nucleo-${process.pid}-${i + 1}.json`));
   paineis.forEach((p, i) => {
@@ -172,30 +229,37 @@ export async function capturarLadoALado({ paineis, vista, saida, titulo, largura
     writeFileSync(arquivos[i], JSON.stringify(payload), 'utf8');
   });
   const captura = await abrirCapturaCompartilhada({ logger: null });
-  const telas = []; const imagens = [];
+  const telas = []; const blocos = [];
   try {
     const page = await captura.browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });
     const erros = [];
     page.on('pageerror', (e) => erros.push(e.message));
     for (const [i, p] of paineis.entries()) {
-      const params = new URLSearchParams({ sessao: relative(REPO, arquivos[i]).replaceAll('\\', '/'), projecao: 'ortografica', vista });
+      const params = new URLSearchParams({ sessao: relative(REPO, arquivos[i]).replaceAll('\\', '/'), projecao: 'ortografica', vista: lista[0] });
       await page.goto(`${captura.base}?${params}`, { waitUntil: 'load', timeout: PRAZO_DE_CARGA_MS });
       await page.waitForFunction(() => { const b = window.__mecanificaBancada; if (b?.erro) throw new Error(String(b.erro)); return b?.carregado === true; }, undefined, { timeout: PRAZO_DE_CARGA_MS });
       await page.evaluate((c) => window.__mecanificaBancada.auditoria({ cores: c }), cores);
       await page.evaluate(esperarQuadros, 3);
-      const tela = await page.evaluate(aplicarCameraNaPagina, camera);
-      if (tela.erro) throw new Error(`${p.titulo}: ${tela.erro}`);
-      await page.evaluate(esperarQuadros, 4);
-      const dados = reduzirPorMedia(await page.screenshot({ type: 'png' }));
-      imagens.push(dados);
-      telas.push({ titulo: p.titulo, ...tela });
-      logger(`${p.titulo}: a caixa comum na tela tem o centro em ${tela.centro.join(', ')} e o quadro ${tela.quadro.join(', ')} (de -1 a 1)`);
+      const imagens = [];
+      for (const camera of cameras) {
+        const tela = await page.evaluate(aplicarCameraNaPagina, { ...camera, pontos: (p.rotulos ?? []).map((r) => r.ponto) });
+        if (tela.erro) throw new Error(`${p.titulo}: ${tela.erro}`);
+        await page.evaluate(esperarQuadros, 4);
+        imagens.push({ vista: camera.vista, html: imagemComRotulos(reduzirPorMedia(await page.screenshot({ type: 'png' })), W, H, p.rotulos, tela.pontos) });
+        telas.push({ titulo: p.titulo, vista: camera.vista, centro: tela.centro, quadro: tela.quadro, escala: tela.escala });
+        logger(`${p.titulo}${grade ? `, vista ${camera.vista}` : ''}: a caixa comum na tela tem o centro em ${tela.centro.join(', ')} e o quadro ${tela.quadro.join(', ')} (de -1 a 1)`);
+      }
+      blocos.push({ p, imagens });
     }
     if (erros.length) throw new Error(`a página da bancada emitiu erro: ${erros[0]}`);
     await page.close();
-    const colunas = paineis.map((p, i) => `<div class="p"><img src="data:image/png;base64,${imagens[i].toString('base64')}" width="${W}" height="${H}"><div class="t">${esc(p.titulo)}</div><div class="n">${esc(p.nota)}</div></div>`).join('');
-    const html = `<html><head><meta charset="utf-8"></head><body style="margin:0;background:#f4f2ee;font-family:sans-serif;color:#222"><div style="padding:10px 14px;font-size:20px"><b>${esc(titulo)}</b></div><div style="display:grid;grid-template-columns:repeat(${paineis.length},${W}px);gap:10px;padding:0 14px">${colunas}</div><div style="padding:8px 14px 12px;font-size:13px;color:#555">${esc(rodape)}</div><style>.p{background:#fff;border:1px solid #ddd}.p img{display:block}.t{font-size:17px;font-weight:bold;padding:8px 10px 2px}.n{font-size:14px;padding:0 10px 10px;line-height:1.35}</style></body></html>`;
-    const folha = await captura.browser.newPage({ viewport: { width: paineis.length * (W + 10) + 18, height: H + 200 } });
+    const texto = (p) => `<div class="t">${esc(p.titulo)}</div><div class="n">${esc(p.nota)}</div>${legenda(p.rotulos)}`;
+    const corpo = grade
+      ? blocos.map(({ p, imagens }) => `<div class="p" style="margin-bottom:10px"><div style="display:grid;grid-template-columns:repeat(${imagens.length},${W}px);gap:6px">${imagens.map((im) => `<div>${im.html}<div class="v">vista ${esc(VISTAS_BANCADA[im.vista].nome.toLowerCase())}</div></div>`).join('')}</div>${texto(p)}</div>`).join('')
+      : `<div style="display:grid;grid-template-columns:repeat(${paineis.length},${W}px);gap:10px">${blocos.map(({ p, imagens }) => `<div class="p">${imagens[0].html}${texto(p)}</div>`).join('')}</div>`;
+    const html = `<html><head><meta charset="utf-8"></head><body style="margin:0;background:#f4f2ee;font-family:sans-serif;color:#222"><div style="padding:10px 14px;font-size:20px"><b>${esc(titulo)}</b></div><div style="padding:0 14px">${corpo}</div><div style="padding:8px 14px 12px;font-size:13px;color:#555">${esc(rodape)}</div><style>${ESTILO}</style></body></html>`;
+    const colunas = grade ? lista.length : paineis.length;
+    const folha = await captura.browser.newPage({ viewport: { width: colunas * (W + 10) + 30, height: H + 200 } });
     await folha.setContent(html);
     mkdirSync(dirname(saida), { recursive: true });
     await folha.screenshot({ path: saida, fullPage: true });
@@ -205,15 +269,18 @@ export async function capturarLadoALado({ paineis, vista, saida, titulo, largura
     for (const a of arquivos) rmSync(a, { force: true });
   }
   const png = PNG.sync.read(readFileSync(saida));
-  return { saida, camera, telas, largura: png.width, altura: png.height, quadro: [W, H] };
+  return { saida, camera: cameras[0], cameras, telas, largura: png.width, altura: png.height, quadro: [W, H] };
 }
 
-/** A maior diferença, em coordenada de tela (de -1 a 1), entre onde o centro e o quadro da caixa comum caíram nas capturas. */
+/** A maior diferença, em coordenada de tela (de -1 a 1), entre onde o centro e o quadro da caixa comum caíram nas capturas de uma mesma vista. */
 export function diferencaDeCamera(telas) {
   let maior = 0;
+  const primeira = new Map();
   for (const t of telas) {
-    for (const e of [0, 1]) maior = Math.max(maior, Math.abs(t.centro[e] - telas[0].centro[e]));
-    for (const e of [0, 1, 2, 3]) maior = Math.max(maior, Math.abs(t.quadro[e] - telas[0].quadro[e]));
+    const p = primeira.get(t.vista ?? '') ?? t;
+    primeira.set(t.vista ?? '', p);
+    for (const e of [0, 1]) maior = Math.max(maior, Math.abs(t.centro[e] - p.centro[e]));
+    for (const e of [0, 1, 2, 3]) maior = Math.max(maior, Math.abs(t.quadro[e] - p.quadro[e]));
   }
   return maior;
 }
@@ -222,29 +289,45 @@ const caixaMm = (neutro) => { const c = caixaDaMalha(neutro); return c.min.map((
 
 async function principal(argv) {
   if (argv.includes('--ajuda') || !argv.length) { process.stdout.write(AJUDA); return argv.length ? 0 : 2; }
-  const COM_VALOR = ['--vista', '--saida', '--largura'];
+  const COM_VALOR = ['--vista', '--vistas', '--saida', '--largura', '--perto'];
   const valor = (f) => { const i = argv.indexOf(f); return i >= 0 ? argv[i + 1] : null; };
   const arquivo = argv.find((a, i) => !a.startsWith('--') && !COM_VALOR.includes(argv[i - 1]));
   if (!arquivo || !existsSync(arquivo)) { console.error(`esboco:nucleo: arquivo ${arquivo ?? '(nenhum)'} não existe\n\n${AJUDA}`); return 2; }
+  const perto = valor('--perto') === null ? PERTO_MM : Number(valor('--perto'));
+  if (!(perto >= 0)) { console.error('esboco:nucleo: --perto é uma distância em mm'); return 2; }
+  const vistas = valor('--vistas')?.split(',').map((v) => v.trim()).filter(Boolean) ?? null;
+  for (const v of [...(vistas ?? []), valor('--vista')].filter(Boolean)) if (!VISTAS_BANCADA[v]) { console.error(`esboco:nucleo: vista "${v}" não existe (${Object.keys(VISTAS_BANCADA).join(', ')})`); return 2; }
   const nome = basename(arquivo).replace(/\..*$/, '');
   const esboco = await lerArquivoDeEsboco(arquivo);
-  const r = montarOpcoes(esboco, { nome });
+  const r = montarOpcoes(esboco, { nome, perto });
   console.log(`${arquivo}: esboço ${r.formato === 'antigo' ? 'antigo, traduzido pelo leitor' : 'do 2.0'}`);
   if (r.recusas.length) {
     console.error(`RECUSADO: ${r.recusas.length} recusa(s)`);
     for (const q of r.recusas) console.error(`  ${[q.opcao, q.forma].filter(Boolean).join(', ') || 'esboço'}: ${q.motivo}`);
     return 1;
   }
-  for (const p of r.paineis) console.log(`  ${p.titulo}: ${p.partes.length} partes (${p.partes.join(', ')}), ${p.neutro.F.size} faces, ${p.facesSemParte} sem parte; ${caixaMm(p.neutro)} mm; neutro ${hashDoNeutro(p.neutro).slice(0, 16)}`);
+  let problemas = 0;
+  for (const p of r.paineis) {
+    console.log(`  ${p.titulo}: ${p.partes.length} partes (${p.partes.join(', ')}), ${p.neutro.F.size} faces, ${p.facesSemParte} sem parte; ${caixaMm(p.neutro)} mm; neutro ${hashDoNeutro(p.neutro).slice(0, 16)}`);
+    console.log(`  contatos de "${p.titulo}" (a medida do descrever, tolerância de ${String(p.contatos.tolerancia * 1000).replace(".", ",")} mm):`);
+    console.log(textoDoRelato(p.contatos));
+    problemas += p.contatos.naoDeclaradas.length + p.contatos.faltam.length;
+  }
+  if (argv.includes('--estrito') && problemas) {
+    console.error(`RECUSADO pelo modo estrito: ${problemas} travessia(s) não declarada(s) ou contato(s) esperado(s) que a malha não dá`);
+    return 1;
+  }
   if (argv.includes('--so-montar')) return 0;
+  const rotulos = argv.includes('--sem-rotulos') ? false : argv.includes('--rotulos') || r.rotulos;
+  const paineis = r.paineis.map((p) => ({ ...p, rotulos: rotulos ? rotulosDoPainel(p) : null }));
   const vista = valor('--vista') ?? r.vista ?? 'isometrica';
   const saida = resolve(valor('--saida') ?? join(REPO, 'tools/bancadas/out', `esboco-nucleo-${nome}.png`));
   const res = await capturarLadoALado({
-    paineis: r.paineis, vista, saida, titulo: `${nome}: ${r.paineis.length} opções pelo núcleo`, largura: Number(valor('--largura') ?? 640), cores: !argv.includes('--sem-cores'),
-    rodape: `Mesma câmera em todas: vista ${vista}, ortográfica, centrada na caixa que junta as opções. Cada opção é uma receita do núcleo capturada na bancada (npm run esboco:nucleo).`,
+    paineis, vista, vistas, saida, titulo: `${nome}: ${paineis.length} opções pelo núcleo`, largura: valor('--largura') === null ? null : Number(valor('--largura')), cores: !argv.includes('--sem-cores'),
+    rodape: `Mesma câmera em todas as opções${vistas ? ', vista a vista' : `: vista ${vista}`}, ortográfica, centrada na caixa que junta as opções. Cada opção é uma receita do núcleo capturada na bancada (npm run esboco:nucleo).`,
     logger: (t) => console.log(`  ${t}`),
   });
-  console.log(`mesma câmera: a caixa comum difere no máximo ${diferencaDeCamera(res.telas).toExponential(2)} do quadro entre as capturas`);
+  console.log(`mesma câmera: a caixa comum difere no máximo ${diferencaDeCamera(res.telas).toExponential(2)} do quadro entre as capturas${vistas ? ' de cada vista' : ''}`);
   console.log(`imagem: ${res.saida} (${res.largura}x${res.altura})`);
   return 0;
 }

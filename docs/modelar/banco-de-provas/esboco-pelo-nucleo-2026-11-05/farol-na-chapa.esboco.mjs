@@ -11,12 +11,13 @@
  * O farol é um vão com a lente recuada 3 mm (a borda da chapa aparece em volta dela). Onde o pisca fica dentro do conjunto (A e
  * B), ele é um segundo vão aberto na lente do farol, com o contorno do pisca cortado pelo farol recuado 6 mm, porque o vão não
  * pode encostar na borda do sólido que corta; onde ele fica embaixo (C), é um segundo vão na chapa, 8 mm abaixo do farol. Nada
- * aqui vem de referência externa; as medidas da borda contra o desenho estão em `medir-farol.mjs`. */
+ * aqui vem de referência externa; as medidas da borda contra o desenho estão em `medir-farol.mjs`. Escrito em mm, como todo esboço
+ * do 2.0 desde a fatia 5; a chapa da fixture, em metro, vem a mm aqui. */
 import { readFileSync } from 'node:fs';
 import { PLANO as _PLANO, TABELA, derivar, passoDaChapa } from '../../../../tools/fixtures/abertura-de-prova/chapa.js';
 
 const FAROL = JSON.parse(readFileSync(new URL('../../../../procedural/pecas/furgao-realista/referencias/farol-dianteiro.esboco.json', import.meta.url), 'utf8'));
-const m = (mm) => mm / 1000;
+const mParaMm = (x) => x * 1000;
 
 /** A ponta de dentro do farol vai a x 120 e o topo a z 300; y vira -z. */
 export const ENCAIXE = Object.freeze({ x: 120, z: 300 });
@@ -57,28 +58,29 @@ export function desenhoDaOpcao(opcao) {
   return { farol: f, seta: dentro ? cortarPorConvexo(s, f, MARGEM_DO_PISCA_MM) : s, setaNaLente: dentro, setaDesenhada: s };
 }
 
-/** O contorno fechado de `curva2d`, em metro, por retos. */
-export const contornoReto = (pontos) => ({ inicio: pontos[0].map(m), trechos: [...pontos.slice(1), pontos[0]].map((p) => ({ reto: p.map(m) })) });
+/** O contorno fechado de `curva2d`, por retos, na unidade dos pontos dividida por `divisor` (1: mm, como o 2.0; 1000: metro). */
+export const contornoReto = (pontos, divisor = 1) => ({ inicio: pontos[0].map((x) => x / divisor), trechos: [...pontos.slice(1), pontos[0]].map((p) => ({ reto: p.map((x) => x / divisor) })) });
 
 function opcaoNaChapa(opcao) {
   const d = derivar(TABELA);
   const des = desenhoDaOpcao(opcao);
+  /* o 2.0 é em mm: a chapa da fixture, em metro, vem a mm (a espessura e os pontos do topo) */
   const passos = [
-    ['subdivisao', { origemId: 1, ...passoDaChapa(TABELA, d) }],
-    ['aberturaPorContorno', { origemId: 3, chapa: { origem: { op: 'subdivisao', id: 1 } }, contorno: contornoReto(des.farol), vista: 'y', lente: true, recuoDaLente: m(RECUO_DA_LENTE_MM) }],
+    ['subdivisao', { origemId: 1, ...passoDaChapa(TABELA, d), espessura: TABELA.chapa.espessura }],
+    ['aberturaPorContorno', { origemId: 3, chapa: { origem: { op: 'subdivisao', id: 1 } }, contorno: contornoReto(des.farol), vista: 'y', lente: true, recuoDaLente: RECUO_DA_LENTE_MM }],
   ];
   if (des.setaNaLente) {
-    passos.push(['aberturaPorContorno', { origemId: 4, chapa: { origem: { op: 'aberturaPorContorno', id: 3, parte: 'lente' } }, contorno: contornoReto(des.seta), vista: 'y', lente: true, recuoDaLente: m(2) }]);
+    passos.push(['aberturaPorContorno', { origemId: 4, chapa: { origem: { op: 'aberturaPorContorno', id: 3, parte: 'lente' } }, contorno: contornoReto(des.seta), vista: 'y', lente: true, recuoDaLente: 2 }]);
     passos.push(['parte', { nome: 'chapa', sel: { origem: { op: 'aberturaPorContorno', id: 3 } } }]);
     passos.push(['parte', { nome: 'farol', sel: { origem: { op: 'aberturaPorContorno', id: 4 } } }]);
     passos.push(['parte', { nome: 'pisca', sel: { origem: { op: 'aberturaPorContorno', id: 4, parte: 'lente' } } }]);
   } else {
-    passos.push(['aberturaPorContorno', { origemId: 4, chapa: { origem: { op: 'aberturaPorContorno', id: 3 } }, contorno: contornoReto(des.seta), vista: 'y', lente: true, recuoDaLente: m(2) }]);
+    passos.push(['aberturaPorContorno', { origemId: 4, chapa: { origem: { op: 'aberturaPorContorno', id: 3 } }, contorno: contornoReto(des.seta), vista: 'y', lente: true, recuoDaLente: 2 }]);
     passos.push(['parte', { nome: 'chapa', sel: { origem: { op: 'aberturaPorContorno', id: 4 } } }]);
     passos.push(['parte', { nome: 'farol', sel: { origem: { op: 'aberturaPorContorno', id: 3, parte: 'lente' } } }]);
     passos.push(['parte', { nome: 'pisca', sel: { origem: { op: 'aberturaPorContorno', id: 4, parte: 'lente' } } }]);
   }
-  return { titulo: opcao.titulo, nota: `${opcao.nota} Na chapa curva: o vão pelo contorno, a lente recuada ${RECUO_DA_LENTE_MM} mm${des.setaNaLente ? ' e o pisca aberto na lente' : ' e o pisca num vão próprio'}.`, passos, topo: d.pontos };
+  return { titulo: opcao.titulo, nota: `${opcao.nota} Na chapa curva: o vão pelo contorno, a lente recuada ${RECUO_DA_LENTE_MM} mm${des.setaNaLente ? ' e o pisca aberto na lente' : ' e o pisca num vão próprio'}.`, passos, topo: Object.fromEntries(Object.entries(d.pontos).map(([k, p]) => [k, p.map(mParaMm)])) };
 }
 
 export const PLANO_DA_CHAPA = _PLANO;

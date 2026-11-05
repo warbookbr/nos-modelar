@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1633 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1638 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -294,7 +294,7 @@
 
 ## docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/
 
-- `README.md` — Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2 e 3
+- `README.md` — Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2, 3 e 5
 - `conferir-comparador.mjs` — conferir-comparador.mjs — o comparador de contornos que saiu do módulo antigo (`tools/modelar/comparar-contornos.mjs`) dá o mesmo resultado que o dele (`modu…
 - `conferir-formas-simples.mjs` — conferir-formas-simples.mjs — a conta que `formasDoEsbocoSimples` (tools/modelar/esboco-para-passos.mjs) faz é a do módulo antigo.
 - `contar.mjs` — contar.mjs — as contagens do inventário do esboço (plano "Esboço pelo núcleo", fatia 1), reexecutáveis.
@@ -718,14 +718,19 @@
 
 ## modulos/esboco-nucleo/src/
 
+- `contatos.js` — contatos.js — o relato de contatos de uma opção do esboço 2.0: quem encosta, quem atravessa e com quanto, e a folga entre as formas que ficam perto, com o qu…
+- `erros.js` — erros.js — a recusa do esboço 2.0: o que o núcleo ou o atalho não fazem volta com o motivo e o lugar.
+- `geometria.js` — geometria.js — as contas do atalho do esboço 2.0 sobre a malha que o núcleo gerou: a malha de uma parte, a caixa, as âncoras da caixa, o giro e o espelho de …
 - `ler-esboco.js` — ler-esboco.js — abre no esboço 2.0 os `.esboco.json` de opções de forma que já existem, sem reescrevê-los.
+- `milimetro.js` — milimetro.js — o esboço 2.0 é escrito em milímetro, como o esboço antigo, e o núcleo trabalha em metro: este arquivo converte.
 - `opcao.js` — opcao.js — o esboço 2.0: cada opção de forma é uma pequena receita do núcleo, montada em memória, e este arquivo a monta.
 - `variantes.js` — variantes.js — as variantes de uma receita: a mesma receita rodada com trocas de valores na TABELA, para a pessoa escolher entre opções de forma pelo que a p…
 
 ## modulos/esboco-nucleo/tests/
 
-- `atalho.test.js` — atalho.test.js — o atalho de posição do esboço 2.0: centro, sobre, ponta, desloca e rotacao resolvidos pela caixa da malha que o núcleo gerou, as formas com …
+- `atalho.test.js` — atalho.test.js — o atalho de posição do esboço 2.0, em mm: centro, sobre, ponta, desloca e rotacao resolvidos pela caixa da malha que o núcleo gerou, as form…
 - `leitor.test.js` — leitor.test.js — o leitor dos esboços antigos: cada `.esboco.json` versionado abre no esboço 2.0 ou é recusado com o motivo, as treze opções de forma de peça…
+- `posicao.test.js` — posicao.test.js — a fatia 5 do esboço 2.0: a posição sem conta (âncora, encosta até a malha tocar, alinha, pivô do giro), a cópia pelo arranja e pelo espelha…
 - `variantes.test.js` — variantes.test.js — o gate 2 do plano esboço pelo núcleo: a cópia de prova da mesa com três variantes declaradas dá, na variante com o valor aceito, a mesma …
 
 ## modulos/exportador-cad/src/

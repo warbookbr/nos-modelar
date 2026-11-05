@@ -1,0 +1,40 @@
+{
+  "formato": "esboco-nucleo@1",
+  "vista": "isometrica",
+  "rotulos": true,
+  "opcoes": [
+    {
+      "titulo": "cabeça reta",
+      "nota": "a cabeça segue a linha do braço",
+      "formas": [
+        { "id": "corpo", "rotulo": "corpo", "op": "extrusao", "rotacao": [180, 0, 0],
+          "args": { "eixo": "z", "altura": 45, "perfil": { "contorno": { "inicio": [30, 330], "trechos": [{ "spline": [
+            [95, 372], [120, 448], [152, 428], [170, 330], [138, 240], [168, 120], [110, 14], [0, 0],
+            [-110, 14], [-168, 120], [-138, 240], [-170, 330], [-150, 440], [-122, 470], [-98, 400], [-30, 330]] }] } } } },
+        { "id": "braco", "rotulo": "braço", "op": "cubo", "args": { "larg": 52, "alt": 650, "prof": 24 },
+          "encosta": { "id": "corpo", "lado": "+y" }, "alinha": { "+z": "corpo" } },
+        { "id": "cabeca", "rotulo": "cabeça", "op": "cubo", "args": { "larg": 70, "alt": 180, "prof": 15 },
+          "encosta": { "id": "braco", "lado": "+y" }, "alinha": { "+z": "braco" } },
+        { "id": "ponte", "rotulo": "ponte", "op": "cubo", "args": { "larg": 80, "alt": 20, "prof": 10 },
+          "encosta": { "id": "corpo", "lado": "+z" }, "alinha": { "-y": "corpo" }, "desloca": [0, 100, 0] }
+      ]
+    },
+    {
+      "titulo": "cabeça a 12 graus",
+      "nota": "a cabeça gira 12 graus para trás na junta com o braço",
+      "formas": [
+        { "id": "corpo", "rotulo": "corpo", "op": "extrusao", "rotacao": [180, 0, 0],
+          "args": { "eixo": "z", "altura": 45, "perfil": { "contorno": { "inicio": [30, 330], "trechos": [{ "spline": [
+            [95, 372], [120, 448], [152, 428], [170, 330], [138, 240], [168, 120], [110, 14], [0, 0],
+            [-110, 14], [-168, 120], [-138, 240], [-170, 330], [-150, 440], [-122, 470], [-98, 400], [-30, 330]] }] } } } },
+        { "id": "braco", "rotulo": "braço", "op": "cubo", "args": { "larg": 52, "alt": 650, "prof": 24 },
+          "encosta": { "id": "corpo", "lado": "+y" }, "alinha": { "+z": "corpo" } },
+        { "id": "cabeca", "rotulo": "cabeça", "op": "cubo", "args": { "larg": 70, "alt": 180, "prof": 15 },
+          "encosta": { "id": "braco", "lado": "+y" }, "alinha": { "+z": "braco" },
+          "rotacao": { "eixo": "x", "graus": -12, "pivo": "cabeca.-y-z" } },
+        { "id": "ponte", "rotulo": "ponte", "op": "cubo", "args": { "larg": 80, "alt": 20, "prof": 10 },
+          "encosta": { "id": "corpo", "lado": "+z" }, "alinha": { "-y": "corpo" }, "desloca": [0, 100, 0] }
+      ]
+    }
+  ]
+}

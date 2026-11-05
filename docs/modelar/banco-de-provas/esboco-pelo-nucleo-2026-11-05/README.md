@@ -1,4 +1,4 @@
-# Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2 e 3
+# Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2, 3 e 5
 
 Inventário do plano [esboço pelo núcleo](../../planos/2026-11-05-esboco-pelo-nucleo.md), em 2026-11-05, sobre a main em `c1933085`.
 Ele responde quem usa o módulo `modulos/esboco/` hoje, quais recursos do esboço os arquivos guardados usam de fato, se alguma peça
@@ -226,8 +226,10 @@ por `bordaDoVao`, fica a 0,000 mm do desenho nas três opções, nos dois sentid
 menos de 0,01 grau: o bico de A tem 61,31 graus e o de B 60,32, os dois iguais aos desenhados, e o topo de cada farol é a reta do
 desenho. O pisca, medido pela borda que a operação registra (o caminho de `bordaDoVao` não fecha na lente, e a causa não foi
 investigada), fica a 0,003 mm do desenho em A e a 0,000 em B e C, com a maior diferença de ângulo de 0,02 grau (A). É a forma que a
-peça daria, porque é a mesma receita que a bancada executou: o hash do neutroCanonico é `78248fa1cd409ad4` (A, 2.634 faces),
-`098c3b2fc9573244` (B, 2.553) e `a712ed3365ebfce7` (C, 2.680). O que o esboço antigo prometeu e a gaiola subdividida não entregou, o
+peça daria, porque é a mesma receita que a bancada executou: o hash do neutroCanonico era `78248fa1cd409ad4` (A, 2.634 faces),
+`098c3b2fc9573244` (B, 2.553) e `a712ed3365ebfce7` (C, 2.680). Na fatia 5 o arquivo passou a mm (seção 8), e a ida e volta da
+chapa da fixture de metro a mm mudou a última casa de alguns pontos: os hashes passaram a `07cccf8ce10d816a`, `b7d71c302a66d67d` e
+`7ef0d857d23d909b`, com as mesmas faces e as mesmas medidas da borda, do pisca e dos ângulos. O que o esboço antigo prometeu e a gaiola subdividida não entregou, o
 bico e o topo numa linha só, o vão por contorno entrega; a escolha da pessoa entre as três continua sendo pela imagem.
 
 ### Gate 2: a mesa com três variantes
@@ -330,3 +332,58 @@ parâmetros novos de uma família com `esboco`, o Envelope do Condutor e a recei
 que comparavam o sólido de cada forma de todos os esboços de prova com a caixa que o módulo calculava. O portão de contato do esboço
 sobre as caixas da família `cadeira` saiu do teste dela, porque as duas medidas que ele fazia (atravessamento acima de 1 mm e peça
 solta) já são testes da própria família.
+
+## 8. Fatia 5: a praticidade do 2.0 e a guitarra
+
+A fatia 5 partiu de um esboço de guitarra feito por quem conduz no formato antigo,
+[`guitarra-de-quem-conduz.esboco.json`](guitarra-de-quem-conduz.esboco.json), com as posições calculadas à mão: ele saiu com o braço
+à frente do corpo, a ponte atrás e a cabeça girando pelo centro e descolando do braço, e só a vista de lado mostrou isso. A fatia
+acrescentou ao 2.0 o relato de contatos a cada rodada, a posição sem conta (a âncora de face e de ponto, `encosta` até a malha tocar,
+`alinha` por outra face e o pivô do giro), a cópia pelo `arranja` e pelo `espelha` do núcleo, os rótulos numerados na imagem, a
+ajuda com um exemplo curto, as vistas juntas como opção e a unidade em milímetro, como o formato antigo; o que cada uma faz está no
+[README do módulo](../../../../modulos/esboco-nucleo/README.md). O farol do gate 1 (`farol-na-chapa.esboco.mjs`) passou a mm, com as
+mesmas medidas, e o leitor dos esboços antigos passou a entregar mm, com as 13 opções de forma abrindo como antes.
+
+```bash
+npm run esboco:nucleo -- docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/guitarra.esboco.json --vistas isometrica,direita,frontal --estrito --largura 380 --saida <png>
+npm run esboco:nucleo -- docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/guitarra-de-quem-conduz.esboco.json --so-montar --estrito
+npx vitest run modulos/esboco-nucleo/
+```
+
+A guitarra refeita no 2.0 é [`guitarra.esboco.json`](guitarra.esboco.json), com as duas opções: a cabeça reta e a cabeça girada 12
+graus para trás na junta com o braço (`rotacao: { eixo: "x", graus: -12, pivo: "cabeca.-y-z" }`, a aresta de baixo e de trás da
+cabeça). O corpo é a extrusão de um contorno de spline de 16 pontos, que fecha por um trecho reto no encaixe do braço, girado 180 graus
+em x porque no eixo z o perfil [u, v] da extrusão do núcleo vai a (x, -y). O braço encosta no corpo por +y com a face da frente rente
+à do corpo, a cabeça encosta no braço por +y rente à frente dele, e a ponte encosta no corpo por +z com a base alinhada à do corpo e
+100 mm acima dela, a única medida de posição do arquivo, que é decisão de forma e não conta. O relato
+([`guitarra-relato.txt`](guitarra-relato.txt), a saída das duas rodadas abaixo) dá, nas duas opções, o braço encostado no corpo, a
+cabeça encostada no braço e a ponte encostada no corpo, nenhuma travessia, e os três outros pares a mais de 20 mm; o `--estrito`
+passa, e a caixa comum cai no mesmo lugar da tela nas duas opções em cada vista (diferença 0).
+
+![a guitarra nas duas opções, em três vistas, com os números das formas](guitarra-tres-vistas.png)
+
+O mesmo relato sobre o arquivo de quem conduz, aberto pelo leitor sem reescrita, mede os erros que só a vista de lado tinha mostrado:
+nas duas opções a cabeça atravessa o braço (5,000 mm em y na reta e 4,593 mm na girada, que gira pelo centro dela), a ponte atravessa
+o corpo 0,500 mm em z, e o braço fica solto do corpo (as caixas se sobrepõem e os sólidos não se tocam: a borda do encaixe ficou em y
+320 e o pé do braço em 335). O `--estrito` o recusa com 4 travessias não declaradas.
+
+| | quem conduz, formato antigo | a fatia 5, no 2.0 |
+|---|---|---|
+| linhas do arquivo, como gravado | 310 (JSON com recuo de 1) | 40 |
+| linhas com o mesmo recuo de 1 | 310 | 320 |
+| números no arquivo | 134 | 101 |
+| coordenadas de posição calculadas à mão | 24 (o `centro` de 4 formas em 2 opções) | 0; uma medida de forma, a ponte 100 mm acima da base do corpo, em cada opção |
+| rodadas até sair certa | a que ficou gravada saiu errada, e o acerto não chegou ao arquivo | 1: a primeira montagem já deu o relato acima, e a imagem foi conferida uma vez |
+| erros de posição medidos pelo relato | 4 travessias não declaradas e o braço solto, nas duas opções | nenhum |
+
+As linhas como gravado medem o arquivo que cada um escreveu; com o mesmo recuo os dois ficam parecidos, porque os 32 pontos da spline
+do corpo, repetidos nas duas opções, são a maior parte dos números do 2.0. O que cai é o número que se calcula: o 2.0 não tem
+coordenada de posição, e os 101 números são medidas de forma (o contorno, os tamanhos, o giro e a altura da ponte). Os números de
+quem conduz incluem os 21 pontos do contorno do corpo, também repetidos.
+
+O que não deu: o relato mede a travessia pela menor profundidade entre as caixas dos corpos, a medida do `descrever`, e a folga de um
+par cujas caixas se sobrepõem sai sem distância (o braço solto do corpo, acima); o `repete` do cilindro é recusado, porque a origem do
+`cilindro` do núcleo são só as laterais e o `arranja` copiaria o tubo sem as tampas, e o caminho é a `extrusao` de `{ circulo }`; a
+guitarra não usa `repete` nem `espelha` (o corpo não é simétrico e as quatro formas são as do arquivo de quem conduz, para a
+comparação), que se provam no teste `modulos/esboco-nucleo/tests/posicao.test.js`; e o leitor dos esboços antigos continua recusando
+o `encosta`, o `alinha` e a âncora do formato antigo, agora com o nome do equivalente no 2.0.
