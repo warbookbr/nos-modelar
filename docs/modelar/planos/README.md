@@ -6,6 +6,7 @@
 
 1. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: as rodas e o forro dos arcos (etapa 4) em diante.
 2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`. Em aberto: o ombro refeito na opção B escolhida pela pessoa, com o encontro sem quina, a luz rasante na peça com emenda sombreada e as etapas que não perdem o aceite, e depois as partes restantes e a exportação do braço montado.
+3. [limites do sólido por laços](2026-11-05-limites-do-solido-por-lacos.md). Território: `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/fixtures/solido-por-lacos/`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `docs/modelar/banco-de-provas/limites-do-solido-por-lacos-2026-11-05/`. Em aberto: os cinco limites que a coluna do braço mostrou e a parte pela gaiola.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
