@@ -256,7 +256,7 @@ const receita = {
     referencias: ['../../referencias/frontal.contornos.json'],
     escala: { medida: 'diâmetro do anel da cintura, onde o pé assenta', milimetros: 210 },
     partes: [
-      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm de largura e 220 mm de comprimento na direção da junta: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de retângulo de cantos arredondados de mesmo raio; seção vira redonda crescendo o raio dos cantos em várias estações; arredondarCostura no encontro de baixo; liso com ângulo' },
+      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm de largura por 220 de comprimento na direção da junta: parte de pé com a frente recuada 30 mm da deitada, quinas de 75 em planta, saída redonda do diâmetro da largura; eixo a 115, topo a 210', tecnica: 'dois lofts de retângulo de cantos arredondados de mesmo raio; seção vira redonda crescendo o raio dos cantos em várias estações; arredondarCostura no encontro de baixo; liso com ângulo' },
       { nome: 'anel', forma: 'faixa fina de uns 28 mm, eixo Z, com o mesmo diâmetro da saída (190 mm), encostada na face da saída sem entrar nela, escura', tecnica: 'revolução com perfil' },
     ],
     criteriosDeReprovacao: [
