@@ -50,7 +50,7 @@ nome de seleção, não nome de parte.
 
 As operações que publicam `origem` aceitam endereçamento estrutural conforme
 [`references/operacoes-procedurais.md`](references/operacoes-procedurais.md),
-que é consulta, e não leitura de partida.
+que é consulta.
 
 **ID LITERAL:** nenhuma operação de edição exige id numérico, e `sel` ocupa o
 lugar dele em cada uma, com a cardinalidade da forma por id: `moveV` pede
