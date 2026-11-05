@@ -1,7 +1,7 @@
 # Chassi P2 — relatório da prova do quarto dianteiro
 
-Rodada P2 do [plano do chassi](../planos/2026-08-18-chassi-realista-kernel-geometrico.md),
-executada sob [`planos/2026-08-19-chassi-p2-prova-do-quarto.md`](../planos/2026-08-19-chassi-p2-prova-do-quarto.md).
+Rodada P2 do [plano do chassi](../planos/encerrados/2026-08-18-chassi-realista-kernel-geometrico.md),
+executada sob [`planos/encerrados/2026-08-19-chassi-p2-prova-do-quarto.md`](../planos/encerrados/2026-08-19-chassi-p2-prova-do-quarto.md).
 Alvo em [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md);
 contrato em [`CHASSI-P1-CONTRATO-DA-CAGE.md`](CHASSI-P1-CONTRATO-DA-CAGE.md).
 

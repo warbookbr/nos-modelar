@@ -1,11 +1,13 @@
 # Chassi realista — representação de superfície para carroceria
 
-**Estado:** rascunho
+**Estado:** cancelado
+
+**Encerramento (2026-11-05):** a representação que este plano decidiu, a gaiola de quads com vincos avaliada por subdivisão Catmull-Clark no núcleo, foi construída pelo plano da [carroceria por subdivisão](2026-10-21-carroceria-por-subdivisao.md) e seguida pela [gaiola que segue as feições](2026-10-23-gaiola-que-segue-as-feicoes.md) e pela [carroceria por rede de curvas](2026-10-24-carroceria-por-rede-de-curvas.md). As rodadas P2 a P4 deste plano não rodaram e não rodam mais; o conteúdo abaixo é registro, não autorização.
 
 **Responsável:** Codex
 
 **Dossiê:**
-[`../ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](../historico/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
+[`../ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](../../historico/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
 
 ## Objetivo desta fase
 
@@ -88,7 +90,7 @@ JavaScript puro, não um kernel.
 
 ### P0 — alvo, referência e limiares — **fechada**
 
-Em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../historico/CHASSI-P0-ALVO-E-LIMIARES.md): perfil
+Em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../../historico/CHASSI-P0-ALVO-E-LIMIARES.md): perfil
 `realistaApresentacao / F3 / dimensional` declarado antes de modelar, envelope e
 quinze landmarks, cinco curvas mestras, limiares dos oito eixos, oito condições
 de rejeição visual e orçamento por nível. Duas decisões:
@@ -101,7 +103,7 @@ de rejeição visual e orçamento por nível. Duas decisões:
 
 ### P1 — contrato da cage — **fechada**
 
-Em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../historico/CHASSI-P1-CONTRATO-DA-CAGE.md):
+Em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../../historico/CHASSI-P1-CONTRATO-DA-CAGE.md):
 `mecanifica.cage-quad@1` como artefato autoral separado, aresta como par ordenado
 derivado, loop nomeado com domínio fechado, seção como conferência e não como
 geradora, herança de `parte` pelas filhas e diff em três classes. Duas decisões:

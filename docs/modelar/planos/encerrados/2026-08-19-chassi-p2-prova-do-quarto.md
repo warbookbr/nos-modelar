@@ -1,6 +1,8 @@
 # Chassi P2 — prova descartável do quarto dianteiro
 
-**Estado:** pronto
+**Estado:** cancelado
+
+**Encerramento (2026-11-05):** a prova descartável foi apagada em 2026-09-22, e a subdivisão com vincos que ela testava entrou no núcleo pelo plano da [carroceria por subdivisão](2026-10-21-carroceria-por-subdivisao.md), com testes cegos próprios. A rodada Q7 não roda mais; o conteúdo abaixo é registro, não autorização.
 
 **Responsável:** Claude
 
@@ -11,8 +13,8 @@ Executar a prova decisiva da rodada P2 do
 reabrir a representação decidida — cage de quads com vincos, avaliada por
 Catmull-Clark determinística.
 
-Alvo em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../historico/CHASSI-P0-ALVO-E-LIMIARES.md);
-contrato em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../historico/CHASSI-P1-CONTRATO-DA-CAGE.md).
+Alvo em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../../historico/CHASSI-P0-ALVO-E-LIMIARES.md);
+contrato em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../../historico/CHASSI-P1-CONTRATO-DA-CAGE.md).
 
 ## O que esta prova é, e o que ela não é
 

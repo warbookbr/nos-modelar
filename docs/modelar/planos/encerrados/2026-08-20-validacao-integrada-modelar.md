@@ -1,6 +1,8 @@
 # Validação integrada do Modelar — valor Agent-First
 
-**Estado:** pronto
+**Estado:** cancelado
+
+**Encerramento (2026-11-05):** o ensaio não começou. O fluxo que ele compararia mudou depois de agosto (leitura por demanda, crítico cego, bancada de conferência, esboço pelo núcleo), e a pergunta de um ensaio comparativo hoje pede protocolo novo, em plano próprio. O conteúdo abaixo é registro, não autorização.
 
 **Responsável:** Codex
 

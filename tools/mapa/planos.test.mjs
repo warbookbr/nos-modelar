@@ -1,5 +1,5 @@
 /* planos.test.mjs — prova que o gate recusa plano grande, estados inválidos,
-   índice divergente, mais de cinco planos ativos, ativo sem território e territórios sobrepostos. */
+   índice divergente, plano parado que o índice não liga, mais de cinco planos ativos, ativo sem território e territórios sobrepostos. */
 import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -96,9 +96,15 @@ describe('gate dos planos curtos', () => {
      continua abaixo do novo: sem este caso, subir o teto e apagar o limite por
      engano dariam o mesmo verde. */
   it('aceita plano logo abaixo do teto', () => {
-    const pasta = ambiente();
+    const pasta = ambiente('**Planos ativos:** nenhum.\n\nEm rascunho: [grande](2026-08-02-grande.md).\n');
     gravar(pasta, '2026-08-02-grande.md', 'rascunho', 300);
     expect(conferirPlanos({ pasta }).problemas).toEqual([]);
+  });
+
+  it('recusa plano em rascunho ou pronto na raiz que o índice não liga', () => {
+    const pasta = ambiente();
+    gravar(pasta, '2026-08-02-esquecido.md', 'pronto');
+    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/não liga o plano em 'pronto' 2026-08-02-esquecido\.md/);
   });
 
   it('recusa índice que não lista um plano ativo', () => {

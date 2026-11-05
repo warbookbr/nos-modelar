@@ -1,7 +1,7 @@
 # Chassi P1 — contrato da malha de controle
 
 Rodada P1 do plano
-[`planos/2026-08-18-chassi-realista-kernel-geometrico.md`](../planos/2026-08-18-chassi-realista-kernel-geometrico.md).
+[`planos/encerrados/2026-08-18-chassi-realista-kernel-geometrico.md`](../planos/encerrados/2026-08-18-chassi-realista-kernel-geometrico.md).
 Alvo dimensional em
 [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md); fundamentação da
 representação em

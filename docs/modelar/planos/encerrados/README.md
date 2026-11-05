@@ -10,6 +10,7 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
+- Quatro planos de agosto saíram da raiz em 2026-11-05, conferidos contra o que veio depois: o [chassi realista](./2026-08-18-chassi-realista-kernel-geometrico.md) e a [prova do quarto dianteiro](./2026-08-19-chassi-p2-prova-do-quarto.md) foram cancelados porque a subdivisão com vincos que eles decidiram e iam provar entrou no núcleo pela [carroceria por subdivisão](./2026-10-21-carroceria-por-subdivisao.md); o [motor de prancha](./2026-08-20-motor-de-prancha-autonomia.md) foi dado por concluído em R4 parcial, sem a R5; e a [validação integrada](./2026-08-20-validacao-integrada-modelar.md) foi cancelada antes de começar, porque o fluxo que ela compararia mudou e um ensaio comparativo hoje pede protocolo novo.
 - [Esboço pelo núcleo](./2026-11-05-esboco-pelo-nucleo.md) foi concluído em 2026-11-05: o esboço antigo saiu e o 2.0 faz cada opção de forma como receita do núcleo, em milímetros, com posição sem conta, relato de contatos e variantes de receita lado a lado; a conferência do avião passou a ler as formas gravadas, igual à de antes.
 - [Navegação de receitas](./2026-11-05-navegacao-de-receitas.md) foi concluído em 2026-11-05: o comando `receita:mapa` para qualquer receita, a convenção de dividir acima de 1.000 linhas e a receita do furgão em oito arquivos com a malha igual; um modelador de estudo leu cerca de 30 KB da receita contra 81 KB da linha de base.
 - [Abertura de contorno livre](./2026-11-05-abertura-de-contorno-livre.md) foi concluído em 2026-11-05: a operação `aberturaPorContorno` corta a chapa de subdivisão por um contorno desenhado numa vista, com a costura limpa, a aba pelo `friso`, a lente recuada e o vão na conferência de moldura; na peça de teste as bordas ficam a 0,125 mm do desenho.
@@ -134,8 +135,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   [`RELATORIO-SONDA-SUPERCARRO-1-0.md`](../../historico/RELATORIO-SONDA-SUPERCARRO-1-0.md)
   (`docs/modelar/historico/RELATORIO-SONDA-SUPERCARRO-1-0.md`).
 - A qualidade visual da carroceria foi reprovada depois desse fechamento. O
-  [plano do chassi realista](../2026-08-18-chassi-realista-kernel-geometrico.md)
-  (`docs/modelar/planos/2026-08-18-chassi-realista-kernel-geometrico.md`)
+  [plano do chassi realista](./2026-08-18-chassi-realista-kernel-geometrico.md)
+  (`docs/modelar/planos/encerrados/2026-08-18-chassi-realista-kernel-geometrico.md`)
   está em `rascunho` e não autoriza implementação. A causa raiz é de
   representação, não de refino: a carroceria rejeitada é um único `loft` de nove
   seções elípticas. A representação de autoria já foi decidida no
@@ -161,8 +162,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   transversal é conferência e não geradora; e a malha compilada **não tem
   identidade persistida** — persistem a cage e o nome semântico, que a face já
   carrega na linha canônica. A prova descartável do quarto dianteiro está em
-  execução no [plano P2](../2026-08-19-chassi-p2-prova-do-quarto.md)
-  (`docs/modelar/planos/2026-08-19-chassi-p2-prova-do-quarto.md`), em zona
+  execução no [plano P2](./2026-08-19-chassi-p2-prova-do-quarto.md)
+  (`docs/modelar/planos/encerrados/2026-08-19-chassi-p2-prova-do-quarto.md`), em zona
   privada e sem tocar o núcleo. A rodada Q1 entregou Catmull-Clark determinística
   com vinco semi-agudo, canto de retalho congelado e borda curva relaxando. Q1 a
   Q5 estão feitas e medidas em
@@ -204,8 +205,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   (`docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md`). Limite medido e registrado: desvio
   de silhueta é confiável, curvatura vinda de raster é ruído. A medida contrariou
   a análise visual — o erro grave não era o teto, eram a traseira e o nariz.
-- O plano de [autonomia verificável do Motor de Prancha](../2026-08-20-motor-de-prancha-autonomia.md)
-  (`docs/modelar/planos/2026-08-20-motor-de-prancha-autonomia.md`) está
+- O plano de [autonomia verificável do Motor de Prancha](./2026-08-20-motor-de-prancha-autonomia.md)
+  (`docs/modelar/planos/encerrados/2026-08-20-motor-de-prancha-autonomia.md`) está
   **congelado em `pronto`**. Ele auditou o motor, a skill, métricas, referências,
   sobreposição e crítica; R0–R3 foram aprovadas, mas a R4 só demonstrou autoria
   independente e mutações, não impacto 3D comparável. A linha de base R0 está em
@@ -225,8 +226,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/historico/RELATORIO-MOTOR-DE-PRANCHA-R3.md`. A R4 parcial está em
   `docs/modelar/historico/RELATORIO-MOTOR-DE-PRANCHA-R4.md`; R5 não executa neste
   recorte.
-- O plano de [validação integrada do valor Agent-First](../2026-08-20-validacao-integrada-modelar.md)
-  (`docs/modelar/planos/2026-08-20-validacao-integrada-modelar.md`) está
+- O plano de [validação integrada do valor Agent-First](./2026-08-20-validacao-integrada-modelar.md)
+  (`docs/modelar/planos/encerrados/2026-08-20-validacao-integrada-modelar.md`) está
   **congelado em `pronto` antes de R0**. Seu comparativo da trava só pode ser
   retomado se a auditoria ativa mantiver válidas suas premissas e métricas.
 - O plano de [auditoria das práticas de autoria 3D](./2026-08-20-auditoria-praticas-autoria-3d.md)
@@ -732,17 +733,17 @@ foi concluída com decisão `corrigir`. Ela preserva a base semântica e congela
 P2 e a validação integrada até uma prova privada ligar o aceite visual ao
 fechamento e exercitar seções de caráter declaradas.
 
-A [validação integrada do valor Agent-First](../2026-08-20-validacao-integrada-modelar.md)
+A [validação integrada do valor Agent-First](./2026-08-20-validacao-integrada-modelar.md)
 está **congelada em `pronto` antes de R0**. O comparativo da trava pode ser
 retomado somente depois que a auditoria decidir se sua premissa e suas métricas
 continuam válidas.
 
-O plano de [autonomia verificável do Motor de Prancha](../2026-08-20-motor-de-prancha-autonomia.md)
+O plano de [autonomia verificável do Motor de Prancha](./2026-08-20-motor-de-prancha-autonomia.md)
 está **congelado em `pronto`**: R0–R3 foram aprovadas, R4 só prova autoria e
 mutações, e impacto 3D permanece não demonstrado. R5 não executa; essa pergunta
 foi transferida para a validação integrada.
 
-O [P2 do chassi](../2026-08-19-chassi-p2-prova-do-quarto.md) está **congelado no
+O [P2 do chassi](./2026-08-19-chassi-p2-prova-do-quarto.md) está **congelado no
 estado `pronto`**. Suas evidências e a decisão pendente sobre a alteração local
 permanecem íntegras, mas Q7 não executa enquanto a confiabilidade da prancha —
 alvo e fonte de julgamento da prova — estiver sob auditoria ativa.
@@ -762,7 +763,7 @@ inversões de curvatura na silhueta do P0 que ninguém tinha visto. Método
 registrado na skill `desenhar-prancha`.
 
 **Plano histórico em rascunho:**
-[`2026-08-18-chassi-realista-kernel-geometrico.md`](../2026-08-18-chassi-realista-kernel-geometrico.md).
+[`2026-08-18-chassi-realista-kernel-geometrico.md`](./2026-08-18-chassi-realista-kernel-geometrico.md).
 Ele está em `rascunho` e não autoriza implementação. A representação então
 decidida era malha de controle de quadriláteros com vincos,
 avaliada por subdivisão Catmull-Clark nativa, com a malha densa como produto

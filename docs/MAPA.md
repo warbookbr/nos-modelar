@@ -501,10 +501,6 @@
 
 ## docs/modelar/planos/
 
-- `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
-- `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
-- `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
-- `2026-08-20-validacao-integrada-modelar.md` — Validação integrada do Modelar — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
@@ -576,15 +572,19 @@
 - `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
 - `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
+- `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
 - `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
 - `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
 - `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
 - `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
+- `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
 - `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
 - `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
 - `2026-08-20-aceite-visual-e-prova-de-superficie.md` — Aceite visual vinculante e prova de superfície
 - `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
+- `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
+- `2026-08-20-validacao-integrada-modelar.md` — Validação integrada do Modelar — valor Agent-First
 - `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
 - `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
@@ -2259,7 +2259,7 @@
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `marcadores-de-conflito.test.mjs` — marcadores-de-conflito.test.mjs — nenhum arquivo rastreado guarda marcador de conflito de junção. Em 2026-10-28 uma junção deixou o plano ativo com os marcad…
 - `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem sobreposição, e que nenhum plano executivo ultrapassa o…
-- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, mais de cinco planos ativos, ativo sem território e territórios…
+- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de cinco planos ativos…
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.

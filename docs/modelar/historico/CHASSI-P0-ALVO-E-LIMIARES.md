@@ -9,7 +9,7 @@
 
 
 Rodada P0 do plano
-[`planos/2026-08-18-chassi-realista-kernel-geometrico.md`](../planos/2026-08-18-chassi-realista-kernel-geometrico.md).
+[`planos/encerrados/2026-08-18-chassi-realista-kernel-geometrico.md`](../planos/encerrados/2026-08-18-chassi-realista-kernel-geometrico.md).
 Fundamentação em
 [`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
 

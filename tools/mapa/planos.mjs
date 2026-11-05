@@ -178,6 +178,15 @@ export function conferirPlanos({
     if (new Set(listados).size !== listados.length) problemas.push('README.md lista o mesmo plano ativo mais de uma vez');
   }
 
+  /* Plano em rascunho ou pronto na raiz precisa de link no índice: em 2026-11-05 quatro planos de agosto estavam
+     parados na raiz sem aparecer nele, e ninguém os via. */
+  const linkados = new Set([...textoIndice.matchAll(/\]\(([^)]+\.md)(?:#[^)]*)?\)/g)].map((m) => nomeDoLink(m[1])));
+  for (const plano of planos) {
+    if (plano.naRaiz && (plano.estado === 'rascunho' || plano.estado === 'pronto') && !linkados.has(plano.nome)) {
+      problemas.push(`README.md não liga o plano em '${plano.estado}' ${plano.nome}; ligue-o no índice ou encerre-o`);
+    }
+  }
+
   return { problemas, planos, ativos };
 }
 
