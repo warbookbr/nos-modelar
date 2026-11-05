@@ -109,8 +109,11 @@ export const TABELA = {
   // ventilação) e o assento do aro de 16 polegadas; o diâmetro e a largura do pneu são os da prancha (710 e 235), e não os 712 do perfil
   roda_perfil: 'furgao-235-65-r16',
   roda_assento: 406.4,
-  // o forro dos arcos: a folga até o pneu, quanto ele passa da boca do arco para encostar na chapa, e o raio onde a parede de dentro acaba
-  forro_folga: 25,
+  // o forro dos arcos: a folga do túnel até a banda do pneu, a da parede de dentro até a face de dentro do pneu, quanto ele passa da boca
+  // do arco para encostar na chapa, e o raio onde a parede de dentro acaba. As duas folgas eram uma só até 2026-11-05: separadas, o
+  // túnel sobe ou desce sem mexer na parede que encosta nos forros do piso.
+  forro_folga_tunel: 25,
+  forro_folga_parede: 25,
   forro_sobra: 8,
   forro_raio_fundo: 130,
 
@@ -224,6 +227,10 @@ export const TABELA = {
   // como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar.
   farol_base_y: 830, // os anéis de enchimento entre o vinco do para-choque (760) e a boca do capô (1100)
   farol_topo_y: 1060, // o anel de enchimento em 1054,x
+  // a grade entre os faróis: as mesmas alturas dos faróis em 2026-11-05, com chave própria para ela descer até o para-choque sem
+  // levar os faróis junto
+  grade_base_y: 830,
+  grade_topo_y: 1060,
   lanterna_base_y: 830, // na quina de trás, entre a borda da porta traseira e a lateral, abaixo do vinco de cintura
   // o anel boca1 (1125): acima dele os anéis de enchimento ficam a 12,5 mm, e o trecho curto junto da quina faz a aba do vão se dobrar
   lanterna_topo_y: 1130,
@@ -487,7 +494,7 @@ export const CONTATOS = [
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
   { par: ['pisoInterior', 'painel'], motivo: 'o painel assenta no piso e entra 1 mm nele' },
-  ...FORROS.map((forro) => ({ par: ['pisoInterior', forro], motivo: 'o piso assenta no topo do túnel do forro do arco (736,6) e entra 1 mm nele; são o único apoio dele, a 10 mm da chapa dos dois lados' })),
+  ...FORROS.map((forro) => ({ par: ['pisoInterior', forro], motivo: 'o piso assenta no topo do túnel do forro do arco e entra 1 mm nele (a altura do piso é `piso_y` e a do túnel sai de `forro_folga_tunel`, na TABELA); são o único apoio dele, afastado da chapa dos dois lados' })),
   ...FORROS.map((forro) => ({ par: ['carroceria', forro], motivo: 'a aba do forro assenta na face de dentro da chapa em volta do arco, passando 8 mm da boca, e entra 1 mm na parede' })),
   ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
     { par: [`pneu${sufixo}`, `aro${sufixo}`], motivo: 'o assento do pneu abraça o barril do aro: a borda de dentro da banda é o raio do assento do aro' },
@@ -545,11 +552,11 @@ export function pontosDeclarados(T = TABELA) {
     { nome: 'pneu dianteiro esquerdo, embaixo, por dentro e atrás', parte: 'pneuDianteiroEsquerdo', medida: 'minimo', em: [xDentro, 0, f.zD - r], toleranciaMm: tol },
     { nome: 'pneu traseiro direito, em cima, por dentro e na frente', parte: 'pneuTraseiroDireito', medida: 'maximo', em: [-xDentro, 2 * r, f.zT + r], toleranciaMm: tol },
     { nome: 'pneu traseiro direito, embaixo, por fora e atrás', parte: 'pneuTraseiroDireito', medida: 'minimo', em: [-xFora, 0, f.zT - r], toleranciaMm: tol },
-    { nome: 'piso do interior, embaixo e atrás: assentado no topo dos túneis dos forros, de 20 mm, a 988 mm do eixo e acabando 2655 mm atrás do centro', parte: 'pisoInterior', medida: 'minimo', em: [-T.piso_meia_largura, T.piso_y, T.piso_z_tras], toleranciaMm: tol },
+    { nome: `piso do interior, embaixo e atrás: assentado no topo dos túneis dos forros, de ${T.piso_espessura} mm, a ${T.piso_meia_largura} mm do eixo e acabando ${-T.piso_z_tras} mm atrás do centro`, parte: 'pisoInterior', medida: 'minimo', em: [-T.piso_meia_largura, T.piso_y, T.piso_z_tras], toleranciaMm: tol },
     { nome: 'divisória, no alto e na face da frente: a seção de dentro recuada 28 mm da chapa e do teto, 15 mm à frente do eixo dela em z 560', parte: 'divisoria', medida: 'maximo', em: [T.meia_largura - T.divisoria_margem, T.altura - T.divisoria_margem, T.divisoria_z + T.divisoria_espessura / 2], toleranciaMm: tol },
     { nome: 'banco do motorista, no alto da frente do assento e do lado de fora: 540 mm de largura no lado esquerdo, encosto até 1790, assento a 520 mm do fundo do encosto', parte: 'bancoMotorista', medida: 'maximo', em: [T.banco_x + T.banco_largura / 2, T.banco_topo_y, T.banco_costas_z + T.banco_profundidade], toleranciaMm: tol },
-    { nome: 'forro do arco dianteiro esquerdo, embaixo e atrás: a parede de dentro 25 mm além da face de dentro do pneu mais os 2 mm da espessura, as pontas na soleira e a borda da aba 8 mm além da boca', parte: 'forroArcoDianteiroEsquerdo', medida: 'minimo', em: [xDentro - T.forro_folga - T.plastico_espessura, T.soleira_y, f.zD - T.arco_raio - T.forro_sobra], toleranciaMm: 1 },
-    { nome: 'forro do arco traseiro direito, em cima e na frente: a aba na face de dentro da chapa, o alto da borda 8 mm acima da boca e a parede de dentro 25 mm além do pneu mais os 2 mm da espessura', parte: 'forroArcoTraseiroDireito', medida: 'maximo', em: [-(xDentro - T.forro_folga - T.plastico_espessura), f.rPneu + T.arco_raio + T.forro_sobra, f.zT + T.arco_raio + T.forro_sobra], toleranciaMm: 1 },
+    { nome: `forro do arco dianteiro esquerdo, embaixo e atrás: a parede de dentro ${T.forro_folga_parede} mm além da face de dentro do pneu mais os ${T.plastico_espessura} mm da espessura, as pontas na soleira e a borda da aba ${T.forro_sobra} mm além da boca`, parte: 'forroArcoDianteiroEsquerdo', medida: 'minimo', em: [xDentro - T.forro_folga_parede - T.plastico_espessura, T.soleira_y, f.zD - T.arco_raio - T.forro_sobra], toleranciaMm: 1 },
+    { nome: `forro do arco traseiro direito, em cima e na frente: a aba na face de dentro da chapa, o alto da borda ${T.forro_sobra} mm acima da boca e a parede de dentro ${T.forro_folga_parede} mm além do pneu mais os ${T.plastico_espessura} mm da espessura`, parte: 'forroArcoTraseiroDireito', medida: 'maximo', em: [-(xDentro - T.forro_folga_parede - T.plastico_espessura), f.rPneu + T.arco_raio + T.forro_sobra, f.zT + T.arco_raio + T.forro_sobra], toleranciaMm: 1 },
   ];
 }
 

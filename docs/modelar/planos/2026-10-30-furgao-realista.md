@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`
+**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
@@ -132,3 +132,5 @@ O modelador fez as luzes escolhidas, e a pessoa achou o farol estranho antes do 
 Com o furgão em pausa, a pessoa deixou em 2026-11-05 que a receita (`receita.js` e a pasta `receita/` que a divisão criar) passe ao plano da [navegação de receitas](encerrados/2026-11-05-navegacao-de-receitas.md), que a divide por assunto com a malha igual; ela volta a este território quando aquele plano fechar. A receita voltou ao furgão em 2026-11-05, dividida em `receita.js` e `receita/`. Uma tarefa de estudo descartável na receita dividida achou três pontos para quando o furgão voltar: a grade e os faróis dividem `farol_topo_y`, de modo que a grade não baixa sem chave própria; o topo do túnel do forro e a folga do forro até o pneu dividem `forro_folga`, e o piso não sobe sem soltar dos forros; e os motivos dos contatos do piso citam medidas escritas à mão, que ficam velhas quando a `TABELA` muda.
 
 Com o esboço antigo removido em 2026-11-05, o campo `esboco` da família `roda-pneu` só confere os pontos gravados em `tools/modelar/familia-com-esboco.andaimes.json`; a pessoa decidiu tirá-lo, e isso fica para quando o furgão voltar, porque a família é território deste plano.
+
+O furgão voltou em 2026-11-05 por essas pendências, sem mudar a forma. A `roda-pneu` deixou de declarar `esboco`, e saíram os onze andaimes gravados que só ela usava (os seis da fixture de prova ficam); a restrição `cubo-dentro-da-tolerancia-do-esboco` guarda o nome, que o registro de aprovação cita, com o motivo sem o esboço. A grade ganhou `grade_base_y` e `grade_topo_y`, com as alturas dos faróis, e o forro ganhou `forro_folga_tunel` e `forro_folga_parede`, as duas a 25 mm. O motivo do contato do piso com os forros e os nomes dos pontos do piso e dos forros passaram a citar a TABELA em vez de números escritos à mão; os outros motivos de contato da receita ainda citam números. O retrato do furgão antes e depois saiu igual. O passo seguinte é o farol pela abertura de contorno livre, mostrado à pessoa em imagem antes do crítico.

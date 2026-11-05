@@ -271,12 +271,12 @@ export function derivarPlastico(T, f) {
 
   /* ---- o forro dos arcos: por dentro da chapa, fecha o oco atrás de cada roda ----
      Um balde aberto para fora, em torno do eixo da roda, só na metade de cima: uma aba assentada na face de dentro da chapa em volta da boca (passa 8 mm
-     dela para encostar), o túnel a `forro_folga` do pneu e a parede de dentro, a essa mesma folga da face de dentro do pneu. O trilho é o círculo do túnel,
+     dela para encostar), o túnel a `forro_folga_tunel` da banda do pneu e a parede de dentro a `forro_folga_parede` da face de dentro do pneu. O trilho é o círculo do túnel,
      e a seção sai radial (v) e pela largura (u, para dentro). As pontas acabam onde a borda da aba cruza a soleira. */
-  const rForro = T.pneu_diametro / 2 + T.forro_folga;
+  const rForro = T.pneu_diametro / 2 + T.forro_folga_tunel;
   const rBordaForro = T.arco_raio + T.forro_sobra;
   const angForro = Math.asin((yc - T.soleira_y) / rBordaForro);
-  const fundoForro = f.xMax - (T.bitola / 2 - T.pneu_largura / 2) + T.forro_folga;
+  const fundoForro = f.xMax - (T.bitola / 2 - T.pneu_largura / 2) + T.forro_folga_parede;
   const tuneis = Math.ceil((fundoForro - pen) / 70);
   const secaoForro = [
     { u: -pen, v: rBordaForro - rForro, nome: 'borda' },

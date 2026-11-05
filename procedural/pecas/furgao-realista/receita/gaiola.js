@@ -583,7 +583,7 @@ export function derivar(T) {
      borda da porta traseira) até a RS, já na lateral; a seta, no paralama, entre F1 e F3 */
   const luzes = [];
   {
-    const rg = aneisEntre(T.farol_base_y, T.farol_topo_y);
+    const rg = aneisEntre(T.grade_base_y, T.grade_topo_y);
     const metade = meiaVolta(rg, 'f0', 'f0', 'f5', 'e', 0);
     luzes.push({ nome: 'grade', linha: 'abaVaoGrade', material: 'grade', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });
   }

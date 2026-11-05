@@ -1,7 +1,7 @@
 /* composicoes.js — as composições da família `roda-pneu`: a roda de disco e as duas raiadas, cada uma com a banda lisa ou com
    relevo.
 
-   Quatro partes em torno do eixo x, com a origem no centro do pneu como no componente `roda` do esboço: o pneu (uma revolução
+   Quatro partes em torno do eixo x, com a origem no centro do pneu: o pneu (uma revolução
    da seção da banda), o aro (o barril, um tubo que a banda abraça), o cubo (uma revolução, de onde saem o furo central e os
    furos de fixação, cortados por `subtrair`) e o disco (a chapa da roda de disco, ou os raios das raiadas). O cubo é uma parte
    à parte porque as portas `eixo` e `furos-de-fixacao` saem dele, e a conferência da porta mede o raio sobre os vértices da
