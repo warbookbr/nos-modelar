@@ -68,17 +68,17 @@
     },
     {
       "instancia": "ombro",
-      "estado": "quebrada",
+      "estado": "aberta",
       "juntas": [
         {
           "relacao": "ombroSentaNoAnel",
           "com": "anelCintura",
-          "satisfeita": false,
+          "satisfeita": true,
           "medidas": {
             "disponiveis": true,
             "alinhamento": 1,
             "descentro": 0,
-            "sobreposicaoRadial": 0,
+            "sobreposicaoRadial": 0.009999999999999995,
             "sobreposicaoAxial": 0,
             "separacaoAxial": 0,
             "tolerancia": 0.000001,
@@ -113,7 +113,7 @@
           }
         }
       ],
-      "forma": "sha256:cf461ded20add52275ad56d44ad0ee9c82830c42d8b1e658d6a1dc496a9b247d",
+      "forma": "sha256:044eb4dd48da557474c1046f50d41f5d7cb478114aaafb7e854626f2ab4ab6ee",
       "reaberturas": [
         {
           "por": "pessoa",

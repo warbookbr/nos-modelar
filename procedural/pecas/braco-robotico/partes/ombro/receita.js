@@ -55,6 +55,10 @@ export const TABELA = {
   estacoes: 5,
   /* Raio das duas quinas de trás, em planta. */
   raioDaTraseira: 75,
+  /* Raio das duas quinas da frente da parte de pé, em planta (decisão da
+     pessoa em 2026-11-05: com o alongamento elas passavam 13 mm além do anel
+     da cintura; com 75 mm ficam dentro dele, como as de trás). */
+  raioDaFrenteDoPe: 75,
   /* Estações das quinas de trás da parte deitada. */
   estacoesDaTraseira: 24,
   lados: 48,
@@ -125,8 +129,9 @@ function redondo(r, lados) {
 }
 
 /* Seção da parte de pé: frente plana em z = zf com os dois cantos arredondados
-   no mesmo raio `rc` dos cantos da parte deitada (por isso o cruzamento dos
-   dois cantos é uma meia-esquadria plana) e lado de trás reto, com as duas
+   no raio `rc` em planta (era o raio dos cantos da parte deitada; desde
+   2026-11-05 é o raio da frente do pé, para caber no anel da cintura) e lado
+   de trás reto, com as duas
    quinas de trás arredondadas no raio `rq` em planta (decisão da pessoa em
    2026-11-04: as quinas passavam 29 mm além do anel da cintura; com 75 mm
    ficam 1,7 mm para dentro dele). */
@@ -159,7 +164,8 @@ export function gerarPassos(t = TABELA) {
   /* A parte de pé é 0,3 mm mais estreita que a deitada: paredes coplanares
      quebram a união. */
   const rq = m(t.raioDaTraseira);
-  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rc - 0.003, r - folga), L, zf * (r - folga) / h, Math.min(rq, r - folga)) });
+  const rf = m(t.raioDaFrenteDoPe);
+  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rf, r - folga), L, zf * (r - folga) / h, Math.min(rq, r - folga)) });
   /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a frente
      recuada, e termina dentro da parte deitada. */
   const coluna = [
@@ -225,7 +231,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['parte', { nome: 'anel', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
   passos.push(['material', { usa: 'anelEscuro', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
   /* o ponto do pé mais longe do eixo, tirado do próprio contorno da parte de pé; a porta é a faixa de contato de 10 mm junto a ele, que a junta com o anel cobra */
-  const raioDoPe = Math.max(...contornoColuna(h - folga, Math.min(rc - 0.003, h - folga), L, zf * (h - folga) / h, Math.min(rq, h - folga)).map(([u, v]) => Math.hypot(u, v)));
+  const raioDoPe = Math.max(...contornoColuna(h - folga, Math.min(rf, h - folga), L, zf * (h - folga) / h, Math.min(rq, h - folga)).map(([u, v]) => Math.hypot(u, v)));
   passos.push(['publicarPorta', {
     nome: 'apoio', de: { op: 'unir', id: ID.corpo },
     interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: raioDoPe - 0.010, raioExterno: raioDoPe, inicio: 0, fim: 0.005 },
