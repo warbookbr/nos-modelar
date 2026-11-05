@@ -8,7 +8,7 @@ import { PLANO, TABELA, derivar, m, parteEmVolta, passoDaChapa } from './chapa.j
 
 export { TABELA };
 
-/** Os passos; `T.aba` nulo tira a aba, e `T.lente.elevar` sobe a lente acima da chapa para a imagem. */
+/** Os passos; `T.aba` nulo tira a aba. A lente fica no lugar, recuada pelo padrão da operação para além da perna da aba. */
 export function gerarPassos(T = TABELA) {
   const d = derivar(T);
   const passos = [
@@ -18,7 +18,6 @@ export function gerarPassos(T = TABELA) {
     parteEmVolta(T),
     ['parte', { nome: 'lente', sel: { origem: { op: 'aberturaPorContorno', id: 3, parte: 'lente' } }, substituir: true }],
   ];
-  if (T.lente?.elevar) passos.push(['transladar', { sel: { grupo: 'lente' }, d: [0, m(T.lente.elevar), 0] }]);
   if (T.aba) {
     passos.push(
       ['friso', { origemId: 4, superficie: { op: 'aberturaPorContorno', id: 3 }, linha: { nome: 'abaDoVao' }, aba: { largura: m(T.aba.largura), angulo: T.aba.angulo, raio: m(T.aba.raio) } }],
@@ -34,5 +33,7 @@ export default {
   PARAMS: TABELA,
   get TOPO() { return { origem: 'canto da gaiola em x = 0 e z = 0, y para cima', ...derivar(this.PARAMS).pontos }; },
   get PASSOS() { return gerarPassos(this.PARAMS); },
+  /* o vão da abertura, com a aba que segue a borda de fora dele: a conferência da moldura mede a cobertura sobre essa borda */
+  vaos: [{ nome: 'vao', superficie: { op: 'aberturaPorContorno', id: 3 }, frisos: ['abaDoVao'] }],
   PLANO,
 };

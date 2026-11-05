@@ -18,6 +18,13 @@
  *   vaos: [{ nome, borda: [nomes dos pontos, o primeiro repetido no fim na volta fechada], frisos: [nomes das linhas],
  *            parcial?: { motivo }, tolerancia?: metro, superficie?: { op: 'subdivisao', id } }]
  *   vaos: [{ nome, borda, semMoldura: { motivo }, superficie? }]
+ *   vaos: [{ nome, superficie: { op: 'aberturaPorContorno', id }, frisos | semMoldura, parcial?, tolerancia? }]
+ *
+ * A ABERTURA POR CONTORNO. O vão que o passo `aberturaPorContorno` abre não segue a gaiola e não tem nomes: a borda dele é a volta
+ * de fora que o passo registra em `neutro.aberturas` (a mesma que o friso segue), e o vão se declara pela origem do passo, sem
+ * `borda`. Os frisos declarados precisam seguir essa abertura (`superficie: { op: 'aberturaPorContorno', id }` no friso), e a
+ * cobertura se mede como a de um vão de gaiola. Toda abertura por contorno também precisa de declaração: a que nenhum vão cita
+ * reprova, com a origem e o tamanho da borda.
  *
  * A borda sobre uma chapa com `simetria: 'x'` segue a regra do friso: a borda que não toca o plano de simetria se confere nas duas
  * metades (a cópia espelhada dos frisos contra a imagem da borda); a que toca o plano numa ponta continua pela imagem espelhada, a que
@@ -74,21 +81,26 @@ export function lerVaosDeclarados(receita, registros, quem = 'vãos da peça') {
     if (nomes.has(nome)) throw new Error(`${onde}: o vão ${citar(nome)} já foi declarado.`);
     nomes.add(nome);
     const aqui = `${onde} (${citar(nome)})`;
-    if (!Array.isArray(borda) || borda.length < 3 || borda.some((n) => typeof n !== 'string' || !n)) {
-      throw new Error(`${aqui}: 'borda' precisa ser a lista dos nomes de ponto da borda do vão, três ou mais (bordaDoVao da gaiola os dá).`);
-    }
     let superficieLida = null;
     if (superficie !== undefined && superficie !== null) {
-      if (typeof superficie !== 'object' || Array.isArray(superficie) || superficie.op !== 'subdivisao' || !Number.isSafeInteger(superficie.id) || Object.keys(superficie).some((k) => k !== 'op' && k !== 'id')) {
-        throw new Error(`${aqui}: 'superficie' precisa ser a origem da chapa, { op: 'subdivisao', id }, recebi ${JSON.stringify(superficie)}.`);
+      if (typeof superficie !== 'object' || Array.isArray(superficie) || !['subdivisao', 'aberturaPorContorno'].includes(superficie.op) || !Number.isSafeInteger(superficie.id) || Object.keys(superficie).some((k) => k !== 'op' && k !== 'id')) {
+        throw new Error(`${aqui}: 'superficie' precisa ser a origem da chapa, { op: 'subdivisao', id }, ou a da abertura por contorno, { op: 'aberturaPorContorno', id }, recebi ${JSON.stringify(superficie)}.`);
       }
-      superficieLida = { op: 'subdivisao', id: superficie.id };
+      superficieLida = { op: superficie.op, id: superficie.id };
     }
+    const daAbertura = superficieLida?.op === 'aberturaPorContorno';
+    if (daAbertura && borda !== undefined && borda !== null) {
+      throw new Error(`${aqui}: a borda de uma abertura por contorno é a volta de fora do vão que o passo registra, e não tem nomes; tire 'borda'.`);
+    }
+    if (!daAbertura && (!Array.isArray(borda) || borda.length < 3 || borda.some((n) => typeof n !== 'string' || !n))) {
+      throw new Error(`${aqui}: 'borda' precisa ser a lista dos nomes de ponto da borda do vão, três ou mais (bordaDoVao da gaiola os dá); o vão de uma abertura por contorno se declara sem borda, com superficie: { op: 'aberturaPorContorno', id }.`);
+    }
+    const bordaLida = daAbertura ? null : [...borda];
     if (semMoldura !== undefined && semMoldura !== null) {
       const junto = ['frisos', 'parcial', 'tolerancia'].filter((k) => item[k] !== undefined && item[k] !== null);
       if (junto.length) throw new Error(`${aqui}: 'semMoldura' declara a abertura sem moldura, e '${junto[0]}' é da moldura; declare um ou outro.`);
       const lida = lerMotivo(semMoldura, 'semMoldura', aqui, 'a abertura fica sem moldura');
-      return { nome, borda: [...borda], frisos: [], parcial: null, tolerancia: TOLERANCIA_DA_MOLDURA, semMoldura: lida, superficie: superficieLida };
+      return { nome, borda: bordaLida, frisos: [], parcial: null, tolerancia: TOLERANCIA_DA_MOLDURA, semMoldura: lida, superficie: superficieLida };
     }
     if (!Array.isArray(frisos) || !frisos.length || frisos.some((n) => typeof n !== 'string' || !n)) {
       throw new Error(`${aqui}: 'frisos' precisa ser a lista dos nomes de linha dos frisos que contornam o vão; a abertura sem moldura de propósito declara no lugar ${EXEMPLO_SEM_MOLDURA}.`);
@@ -100,7 +112,7 @@ export function lerVaosDeclarados(receita, registros, quem = 'vãos da peça') {
     if (tolerancia !== undefined && (!Number.isFinite(tolerancia) || tolerancia < TOLERANCIA_MINIMA_DO_VAO || tolerancia > TOLERANCIA_MAXIMA_DO_VAO)) {
       throw new Error(`${aqui}: 'tolerancia' precisa ser um número em metro de ${TOLERANCIA_MINIMA_DO_VAO} a ${TOLERANCIA_MAXIMA_DO_VAO}, recebi ${JSON.stringify(tolerancia)}. Acima disso a moldura não cobre a borda.`);
     }
-    return { nome, borda: [...borda], frisos: [...frisos], parcial: parcialLida, tolerancia: tolerancia ?? TOLERANCIA_DA_MOLDURA, semMoldura: null, superficie: superficieLida };
+    return { nome, borda: bordaLida, frisos: [...frisos], parcial: parcialLida, tolerancia: tolerancia ?? TOLERANCIA_DA_MOLDURA, semMoldura: null, superficie: superficieLida };
   });
 }
 
@@ -158,7 +170,7 @@ export function bordasNaMalha(gaiola, nomes, neutro, onde) {
 function chapaDoVao(d, dele, chapas, onde) {
   if (d.frisos.length) {
     const sem = dele.find((r) => r.gaiola == null);
-    if (sem) throw new Error(`${onde}: o friso ${citar(sem.nome)} não segue uma chapa (superficie): a moldura de um vão se confere sobre a malha da chapa.`);
+    if (sem) throw new Error(`${onde}: o friso ${citar(sem.nome)} não segue uma chapa (superficie)${sem.superficie != null ? ", e sim a borda de uma abertura por contorno: declare o vão dela com superficie: { op: 'aberturaPorContorno', id }, sem borda" : ''}: a moldura de um vão se confere sobre a malha da chapa.`);
     const gaiolas = new Set(dele.map((r) => r.gaiola));
     if (gaiolas.size !== 1) throw new Error(`${onde}: os frisos ${lista(d.frisos)} seguem chapas diferentes; um vão é de uma chapa só.`);
     const gaiola = dele[0].gaiola;
@@ -195,9 +207,18 @@ export function conferirVaosDaPeca(neutro, receita = {}) {
   const declaradasPorChapa = new Map();
   const aberturasDe = new Map();
   const aberturasDaChapa = (c) => { if (!aberturasDe.has(c)) aberturasDe.set(c, c.vertices ? aberturasDaGaiola(c).filter((v) => v.abertura) : []); return aberturasDe.get(c); };
+  const porContorno = neutro.aberturas ?? [];
+  const declaradaPorContorno = new Map();
   for (const d of declarados) {
     const onde = `vaos: o vão ${citar(d.nome)}`;
     const dele = registros.filter((r) => d.frisos.includes(r.nome));
+    if (d.superficie?.op === 'aberturaPorContorno') {
+      const { passo, ...saida } = vaoDaAbertura(d, dele, porContorno, registros, neutro, onde);
+      if (declaradaPorContorno.has(passo)) throw new Error(`${onde}: a abertura aberturaPorContorno:${d.superficie.id} já é o vão ${citar(declaradaPorContorno.get(passo))}.`);
+      declaradaPorContorno.set(passo, d.nome);
+      vaos.push(saida);
+      continue;
+    }
     const chapa = chapaDoVao(d, dele, chapas, onde);
     const saida = { nome: d.nome, frisos: d.frisos, parcial: d.parcial, semMoldura: d.semMoldura, tolerancia: d.tolerancia, problemas: [], descobertos: [], emendas: [], comprimento: 0, amostras: 0, cobertas: 0 };
     const { cadeias, noPlano } = bordasNaMalha(chapa, d.borda, neutro, onde);
@@ -231,11 +252,49 @@ export function conferirVaosDaPeca(neutro, receita = {}) {
       aberturas.push({ chapa: rotuloDaChapa(chapa), passo: chapa.passo, pontos: v.indices.map(nomeDe), comprimento: v.comprimento, centro: v.centro, cosseno: v.cosseno, coerencia: v.coerencia, vao });
     }
   }
+  for (const a of porContorno) {
+    const pontos = a.borda.fora.map((v) => neutro.V.get(v)).filter(Boolean);
+    const centro = [0, 1, 2].map((c) => pontos.reduce((s, p) => s + p[c], 0) / Math.max(1, pontos.length));
+    aberturas.push({ chapa: `aberturaPorContorno:${a.origemId}`, passo: a.passo, pontos: [], comprimento: comprimentoDa({ pontos: pontos.map((p) => ({ p })), fechada: true }), centro, cosseno: null, coerencia: null, vao: declaradaPorContorno.get(a.passo) ?? null, porContorno: { origemId: a.origemId, pontos: a.borda.fora.length } });
+  }
   const problemas = [
     ...vaos.flatMap((v) => v.problemas.map((t) => `${citar(v.nome)}: ${t}`)),
     ...aberturas.filter((a) => a.vao === null).map(problemaDaAbertura),
   ];
   return { declarados: declarados.length, vaos, aberturas, problemas, ok: problemas.length === 0 };
+}
+
+/* O vão de uma abertura por contorno: a borda é a volta de fora que o passo registrou em `neutro.aberturas`, e os frisos declarados
+   precisam segui-la. -> a saída do vão, como a de um vão de gaiola, com o passo da abertura. */
+function vaoDaAbertura(d, dele, porContorno, registros, neutro, onde) {
+  const abertura = porContorno.find((a) => a.origemId === d.superficie.id);
+  if (!abertura) {
+    const existentes = porContorno.map((a) => `aberturaPorContorno:${a.origemId}`);
+    throw new Error(`${onde}: 'superficie' diz aberturaPorContorno:${d.superficie.id}, que não é abertura da peça (o passo não existe ou gritou). Aberturas: ${existentes.length ? existentes.join(', ') : '(nenhuma)'}.`);
+  }
+  const fora = dele.find((r) => r.gaiola != null || r.superficie !== abertura.passo);
+  if (fora) throw new Error(`${onde}: o friso ${citar(fora.nome)} não segue a borda da abertura aberturaPorContorno:${abertura.origemId}; o friso do vão dela leva superficie: { op: 'aberturaPorContorno', id: ${abertura.origemId} }.`);
+  const borda = abertura.borda.fora.map((v) => {
+    const p = neutro.V.get(v);
+    if (!p) throw new Error(`${onde}: o vértice ${v} da borda da abertura aberturaPorContorno:${abertura.origemId} não existe mais na malha; a moldura se confere sobre a borda que o passo deixou.`);
+    return { nome: null, p };
+  });
+  const saida = { nome: d.nome, frisos: d.frisos, parcial: d.parcial, semMoldura: d.semMoldura, tolerancia: d.tolerancia, problemas: [], descobertos: [], emendas: [], comprimento: 0, amostras: 0, cobertas: 0, passo: abertura.passo };
+  if (d.semMoldura) {
+    saida.comprimento = comprimentoDa({ pontos: borda, fechada: true });
+    const seguem = registros.filter((r) => r.gaiola == null && r.superficie === abertura.passo);
+    if (seguem.length) {
+      const r = conferirMoldura({ borda, fechada: true, frisos: seguem, tolerancia: d.tolerancia });
+      if (r.cobertas > 0) saida.problemas.push(`declarado sem moldura (${d.semMoldura.motivo}) e ${((100 * r.cobertas) / r.amostras).toFixed(1).replace('.', ',')}% da borda fica sob a faixa de um friso que segue a abertura (${lista([...new Set(seguem.map((f) => f.nome))])}): declare os frisos do vão em \`frisos\` no lugar de \`semMoldura\`.`);
+    }
+    return saida;
+  }
+  const r = conferirMoldura({ borda, fechada: true, frisos: dele, tolerancia: d.tolerancia });
+  saida.comprimento = r.comprimento; saida.amostras = r.amostras; saida.cobertas = r.cobertas;
+  saida.descobertos = r.descobertos.map((t) => ({ ...t, espelhada: false }));
+  saida.emendas = r.emendas.map((t) => ({ ...t, espelhada: false }));
+  saida.problemas = problemasDoVao(saida);
+  return saida;
 }
 
 const comprimentoDa = (c) => {
@@ -246,6 +305,9 @@ const comprimentoDa = (c) => {
 };
 
 function problemaDaAbertura(a) {
+  if (a.porContorno) {
+    return `a abertura ${a.chapa} não tem declaração em \`vaos\`: a borda de fora do vão, de ${a.porContorno.pontos} pontos e ${mm(a.comprimento)} mm, centrada em ${ponto(a.centro)}. Declare o vão em \`vaos\` da receita com { nome, superficie: { op: 'aberturaPorContorno', id: ${a.porContorno.origemId} }, frisos } e os frisos que seguem a borda dela, ou, se a abertura fica sem moldura de propósito, com ${EXEMPLO_SEM_MOLDURA} no lugar dos frisos.`;
+  }
   const mostrados = a.pontos.length > 6 ? `${lista(a.pontos.slice(0, 6))} e mais ${a.pontos.length - 6}` : lista(a.pontos);
   return `a chapa ${a.chapa} tem uma abertura sem declaração em \`vaos\`: a volta de borda livre de ${a.pontos.length} pontos da gaiola e ${mm(a.comprimento)} mm, centrada em ${ponto(a.centro)}, pelos pontos ${mostrados}. Declare o vão em \`vaos\` da receita com a borda (\`bordaDoVao\` da gaiola a dá, ou a curva da rede) e os frisos que o contornam, ou, se a abertura fica sem moldura de propósito, com ${EXEMPLO_SEM_MOLDURA}.`;
 }

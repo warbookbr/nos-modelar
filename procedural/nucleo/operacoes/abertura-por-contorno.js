@@ -34,11 +34,15 @@
 
    AS RECUSAS, antes de mexer na malha: contorno que não fecha (o fecho implícito de `curva2d` vira um reto que ninguém desenhou),
    que se cruza, que sai da chapa (um ponto fora da projeção dela, ou um lado que cruza a borda dela vista do eixo), que atravessa a
-   chapa mais de uma vez (a chapa dobrada sobre si na vista) e com segmentos abaixo do piso.
+   chapa mais de uma vez (a chapa dobrada sobre si na vista), com segmentos abaixo do piso e com o recuo da lente que o vão não
+   comporta (um lado some ou o contorno recuado se cruza).
 
-   A LENTE (`lente: true`). O pedaço retirado sai como sólido próprio, a interseção da chapa com o mesmo prisma, calculada pela
-   Manifold aqui (todas as faces são novas, no bloco do passo, depois da parede) e limpa pela mesma fusão. As faces de pele herdam o
-   liso da chapa; nenhuma herda parte, cor nem material.
+   A LENTE (`lente: true`). O pedaço retirado sai como sólido próprio, a interseção da chapa com o prisma do contorno recuado
+   `recuoDaLente` para dentro do vão (cada lado levado para dentro, cada canto na esquadria: `recuarPoligono`), calculada pela
+   Manifold aqui (todas as faces são novas, no bloco do passo, depois da parede) e limpa pela mesma fusão. A pele dela fica sobre a
+   da chapa e a volta dela fica além da perna da aba que o friso dobra para dentro do vão; o recuo padrão é RECUO_PADRAO_DA_LENTE
+   vezes a espessura da chapa medida pela reta do eixo antes do corte (`espessuraVistaDoEixo`), e o recuo 0 dá a lente do tamanho
+   do vão. As faces de pele herdam o liso da chapa; nenhuma herda parte, cor nem material.
 
    ORIGEM PUBLICADA `{ op: 'aberturaPorContorno', id }`: as faces da chapa cortada, com a parede do vão. `parte: 'parede'` é só a
    parede, `parte: 'lente'` só a lente. O registro guarda também as duas bordas do vão (`borda.fora`, a da face de fora da chapa,
@@ -64,6 +68,10 @@ const SEGMENTOS_MAXIMOS = 4096;
 /** Giro, em graus, a partir do qual um ponto da referência fina é canto vivo. */
 const GIRO_DO_CANTO_VIVO = 0.5;
 const SEGMENTOS_ARCO_PADRAO = 4;
+/** O recuo padrão da lente, em espessuras da chapa: a aba do friso dobra para dentro do vão e a face de fora da perna dela fica a
+ *  raio + espessura da borda; com o raio da dobra até uma espessura, a lente recuada 2,5 espessuras fica ao menos meia espessura
+ *  além dela. Na peça de teste (2 mm, aba de raio 1 mm) a lente fica a 1,685 mm da aba, e com 3 mm de recuo ainda a cruza no bico. */
+export const RECUO_PADRAO_DA_LENTE = 2.5;
 /** Distância, em metro, até a qual um vértice da costura é o ponto do polígono desenhado (a Manifold devolve Float32). */
 const NO_POLIGONO = 2e-6;
 
@@ -239,6 +247,90 @@ function conferirProjecao(V, faces, poligono, vista) {
     }
   }
   return null;
+}
+
+/** espessuraVistaDoEixo(V, faces, poligono, vista) -> metro | null: a espessura da chapa nos pontos do contorno, antes do corte,
+ *  pela reta do eixo: a distância entre a primeira e a última vez que ela cruza a casca, vezes o cosseno da normal da face de cima
+ *  com o eixo (a espessura medida pela normal, numa chapa de duas faces paralelas). A mediana dos pontos; a lente recuada usa esta
+ *  medida no recuo padrão, porque é calculada antes do corte, e o registro guarda também a medida da borda, depois dele. */
+export function espessuraVistaDoEixo(V, faces, poligono, vista) {
+  const { eixo, u: iu, v: iv } = VISTAS[vista];
+  const tris = [];
+  for (const vs of faces.values()) {
+    const pts = vs.map((v) => V.get(v));
+    const n = newell(pts); const l = tamanho(n);
+    if (!(l > 0) || Math.abs(n[eixo] / l) <= 0.1) continue;
+    for (let k = 1; k + 1 < pts.length; k++) tris.push({ p: [pts[0], pts[k], pts[k + 1]], cos: Math.abs(n[eixo] / l) });
+  }
+  const medidas = [];
+  for (const q of poligono) {
+    let baixo = null, alto = null;
+    for (const { p: [a, b, c], cos } of tris) {
+      const d = (b[iu] - a[iu]) * (c[iv] - a[iv]) - (c[iu] - a[iu]) * (b[iv] - a[iv]);
+      if (d === 0) continue;
+      const s = ((q[0] - a[iu]) * (c[iv] - a[iv]) - (c[iu] - a[iu]) * (q[1] - a[iv])) / d;
+      const r = ((b[iu] - a[iu]) * (q[1] - a[iv]) - (q[0] - a[iu]) * (b[iv] - a[iv])) / d;
+      if (s < -1e-12 || r < -1e-12 || s + r > 1 + 1e-12) continue;
+      const w = a[eixo] + s * (b[eixo] - a[eixo]) + r * (c[eixo] - a[eixo]);
+      if (!baixo || w < baixo.w) baixo = { w, cos };
+      if (!alto || w > alto.w) alto = { w, cos };
+    }
+    if (baixo && alto && alto.w > baixo.w) medidas.push((alto.w - baixo.w) * alto.cos);
+  }
+  medidas.sort((x, y) => x - y);
+  return medidas.length ? medidas[medidas.length >> 1] : null;
+}
+
+/** recuarPoligono(poligono, d) -> { poligono, lados } | { erro }: o polígono com cada lado levado `d` para dentro e cada canto no
+ *  encontro dos dois lados recuados (a esquadria: o bico vivo continua vivo, com o mesmo ângulo, e entra d / sen(meio ângulo)).
+ *  O lado que o recuo encolhe a nada antes de `d` sai, e os vizinhos dele se encontram (o evento de aresta do esqueleto reto, um
+ *  de cada vez, do que some primeiro): junto de um bico vivo, o segmento curto do arco que o forma some assim. `lados` diz quantos
+ *  saíram. Recusa o recuo que fecha o vão, ou que deixa o polígono recuado se cruzar (o vão estreito demais para ele). */
+export function recuarPoligono(poligono, d) {
+  if (!(d > 0)) return { poligono: poligono.map((p) => [...p]), lados: 0 };
+  const sentido = Math.sign(areaDoPoligono2(poligono));
+  const n0 = poligono.length;
+  /* cada lado é a reta dele, com a direção e a normal para dentro; o canto i é o encontro dos lados i − 1 e i, linear em d */
+  let lados = poligono.map((q, k) => {
+    const b = poligono[(k + 1) % n0]; const t = [b[0] - q[0], b[1] - q[1]]; const l = Math.hypot(t[0], t[1]);
+    return { q, dir: [t[0] / l, t[1] / l], nor: [(-sentido * t[1]) / l, (sentido * t[0]) / l] };
+  });
+  const encontro = (A, B, s) => {
+    const pa = [A.q[0] + A.nor[0] * s, A.q[1] + A.nor[1] * s], pb = [B.q[0] + B.nor[0] * s, B.q[1] + B.nor[1] * s];
+    const den = A.dir[0] * B.dir[1] - A.dir[1] * B.dir[0];
+    if (Math.abs(den) < 1e-12) return null;
+    const t = ((pb[0] - pa[0]) * B.dir[1] - (pb[1] - pa[1]) * B.dir[0]) / den;
+    return [pa[0] + A.dir[0] * t, pa[1] + A.dir[1] * t];
+  };
+  for (let volta = 0; volta < n0; volta++) {
+    const n = lados.length;
+    if (n < 3) return { erro: `o recuo de ${mm(d)} mm fecha o vão inteiro` };
+    const zero = []; const um = [];
+    for (let k = 0; k < n; k++) {
+      const A = lados[(k - 1 + n) % n], B = lados[k];
+      const c0 = encontro(A, B, 0), c1 = encontro(A, B, 1);
+      if (!c0 || !c1) return { erro: `com o recuo de ${mm(d)} mm dois lados paralelos do contorno, perto de ${texto2(B.q)}, se encontram` };
+      zero.push(c0); um.push(c1);
+    }
+    /* o lado k vai do canto k ao canto k + 1, com o comprimento ao longo da direção dele linear em d */
+    let sai = -1, primeiro = Infinity;
+    for (let k = 0; k < n; k++) {
+      const j = (k + 1) % n; const { dir } = lados[k];
+      const comprimento = (zero[j][0] - zero[k][0]) * dir[0] + (zero[j][1] - zero[k][1]) * dir[1];
+      const taxa = (um[j][0] - zero[j][0] - um[k][0] + zero[k][0]) * dir[0] + (um[j][1] - zero[j][1] - um[k][1] + zero[k][1]) * dir[1];
+      if (!(taxa < 0)) continue;
+      const quando = -comprimento / taxa;
+      if (quando < d && quando < primeiro) { primeiro = quando; sai = k; }
+    }
+    if (sai < 0) {
+      const novo = zero.map((c, k) => [c[0] + (um[k][0] - c[0]) * d, c[1] + (um[k][1] - c[1]) * d]);
+      const diagnostico = diagnosticarContorno(novo);
+      if (diagnostico || Math.sign(areaDoPoligono2(novo)) !== sentido) return { erro: `com o recuo de ${mm(d)} mm o contorno recuado se cruza${diagnostico ? ` (${diagnostico.mensagem.replace(/\[(-?[\d.e-]+), (-?[\d.e-]+)\]/g, (_, u, v) => texto2([Number(u), Number(v)]))})` : ''}: o vão é estreito demais para ele` };
+      return { poligono: novo, lados: n0 - n };
+    }
+    lados = lados.filter((_, k) => k !== sai);
+  }
+  return { erro: `o recuo de ${mm(d)} mm fecha o vão inteiro` };
 }
 
 /* ---- o prisma ---- */
@@ -588,6 +680,12 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       if (n != null && (!Number.isInteger(n) || n < 1 || n > SEGMENTOS_MAXIMOS)) return grita(st, i, OP, campo, `${campo} precisa ser inteiro de 1 a ${SEGMENTOS_MAXIMOS}, e veio ${n}`);
     }
     if (a.lente != null && typeof a.lente !== 'boolean') return grita(st, i, OP, 'lente', 'lente só aceita true (o pedaço retirado sai como sólido próprio) ou false');
+    let recuoDeclarado = null;
+    if (a.recuoDaLente != null) {
+      if (!a.lente) return grita(st, i, OP, 'recuoDaLente', 'recuoDaLente recua a lente para dentro do vão, e o passo não declarou lente: true; declare a lente ou tire o recuo');
+      try { recuoDeclarado = st.num(a.recuoDaLente); } catch (e) { return grita(st, i, OP, 'recuoDaLente', String(e.message)); }
+      if (!Number.isFinite(recuoDeclarado) || recuoDeclarado < 0) return grita(st, i, OP, 'recuoDaLente', `recuoDaLente é a distância, em metro e zero ou mais, de que a volta da lente entra no vão a partir da borda; veio ${a.recuoDaLente}`);
+    }
     const num = (x) => st.num(x);
 
     // ---- o desenho ----
@@ -642,15 +740,28 @@ export function criarOperacoesAberturaPorContorno(servicos) {
 
     /* a lente sai da Manifold aqui, antes de o corte mexer na peça: a recusa dela não deixa a chapa cortada pela metade */
     const { u: iu, v: iv } = VISTAS[vista];
-    const noDesenho = (p) => poligono.some((q) => Math.hypot(p[iu] - q[0], p[iv] - q[1]) <= NO_POLIGONO);
+    const noPoligono = (P) => (p) => P.some((q) => Math.hypot(p[iu] - q[0], p[iv] - q[1]) <= NO_POLIGONO);
+    const noDesenho = noPoligono(poligono);
     let lenteCalculada = null;
+    let recuoDaLente = null;
     if (copia) {
+      /* a lente recuada: a interseção da chapa com o prisma do contorno recuado, de modo que a volta dela fica além da perna da
+         aba que o friso dobra na borda, e a pele dela continua sobre a da chapa */
+      if (recuoDeclarado != null) recuoDaLente = recuoDeclarado;
+      else {
+        const e = espessuraVistaDoEixo(st.V, facesDaChapa, poligono, vista);
+        if (e == null) return grita(st, i, OP, 'recuoDaLente', 'a espessura da chapa no contorno não se mede pela reta do eixo, e o recuo padrão da lente depende dela; declare recuoDaLente em metro');
+        recuoDaLente = RECUO_PADRAO_DA_LENTE * e;
+      }
+      const recuado = recuarPoligono(poligono, recuoDaLente);
+      if (recuado.erro) return grita(st, i, OP, 'recuoDaLente', `a lente não cabe no vão: ${recuado.erro}; reduza recuoDaLente (o recuo de 0 deixa a lente do tamanho do vão)`);
       let r;
-      try { r = intersecaoNaManifold(wasm, [copia, prisma]); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
+      try { r = intersecaoNaManifold(wasm, [copia, recuoDaLente > 0 ? prismaDoContorno(recuado.poligono, vista, wMin - margem, wMax + margem) : prisma]); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
       const facesL = new Map(r.faces.map((f, k) => [k, f.vs]));
       const paredeL = new Set(r.faces.map((f, k) => (f.solido === 1 ? k : -1)).filter((k) => k >= 0));
       const costuraL = new Set([...paredeL].flatMap((k) => facesL.get(k)));
-      const fixosL = new Set([...costuraL].filter((v) => noDesenho(r.pontos[v])));
+      const naVoltaDaLente = noPoligono(recuado.poligono);
+      const fixosL = new Set([...costuraL].filter((v) => naVoltaDaLente(r.pontos[v])));
       const limpaL0 = limparCostura({ pos: (v) => r.pontos[v], faces: facesL, costura: costuraL, fixos: fixosL, piso, parede: paredeL });
       lenteCalculada = { r, limpaL: tirarValenciaDois(fundirLascas({ pos: (v) => r.pontos[v], faces: limpaL0.faces, costura: costuraL, parede: paredeL, piso }).faces) };
     }
@@ -779,9 +890,9 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       }
     }
 
-    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length } });
+    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length } });
     registraOrigem(st, i, OP, a.origemId, {
-      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista, passo: i, lenteDeclarada: !!a.lente,
+      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente,
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
       limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length },
     });

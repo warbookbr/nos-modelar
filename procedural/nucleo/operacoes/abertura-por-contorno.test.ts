@@ -16,7 +16,7 @@ import { executarReceita } from '../../../src/autoria/executar-receita.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { analisarTopologia } from '../topologia.js';
 // @ts-expect-error — núcleo em JavaScript.
-import { pisoDeSegmentos, errosDosBicos } from './abertura-por-contorno.js';
+import { pisoDeSegmentos, errosDosBicos, recuarPoligono, RECUO_PADRAO_DA_LENTE } from './abertura-por-contorno.js';
 // @ts-expect-error — adaptador em JavaScript.
 import { adaptarThree } from '../../../src/autoria/adaptar-three.js';
 // @ts-expect-error — peça de teste em JavaScript.
@@ -24,7 +24,11 @@ import receita from '../../../tools/fixtures/abertura-de-prova/receita.js';
 // @ts-expect-error — peça de teste em JavaScript.
 import { TABELA, alturaDaChapa, derivar, passoDaChapa } from '../../../tools/fixtures/abertura-de-prova/chapa.js';
 // @ts-expect-error — medidas em JavaScript.
-import { medirAbertura, qualidadeDasFaces } from '../../../tools/fixtures/abertura-de-prova/medir.mjs';
+import { medirAbertura, qualidadeDasFaces, relacaoEntrePartes } from '../../../tools/fixtures/abertura-de-prova/medir.mjs';
+// @ts-expect-error — núcleo em JavaScript.
+import { manifoldCarregada } from '../manifold.js';
+// @ts-expect-error — adaptador em JavaScript.
+import { conferirVaosDaPeca, formatarVaos } from '../../../src/autoria/molduras-do-vao.js';
 import { areasDeTriangulo, arestasSemPar, escalaDaPeca, vinculosNaoManifold } from '../../../tools/oficina/conferir-malha';
 
 const m = (mm: number) => mm / 1000;
@@ -169,10 +173,42 @@ describe('aberturaPorContorno na peça de teste', () => {
     const daAba = [...new Set([...neutro.F.values()].filter((f: any) => f.parte === 'aba').flatMap((f: any) => f.vs))].map((v) => neutro.V.get(v));
     expect(daAba.filter((p: number[]) => dentro(p[0], p[2])).length / daAba.length).toBeGreaterThan(0.9);
     expect(Math.min(...daAba.map((p: number[]) => p[1] - altura(p[0], p[2])))).toBeLessThan(-m(TABELA.aba.largura));
-    /* a lente, sem a subida da imagem, cabe no prisma do contorno */
+    /* a lente cabe no prisma do contorno */
     const lente = [...new Set([...neutro.F.values()].filter((f: any) => f.parte === 'lente').flatMap((f: any) => f.vs))].map((v) => neutro.V.get(v));
     expect(lente.every((p: number[]) => dentro(p[0], p[2]) || Math.min(...d.poligono.map((q: number[], k: number) => aoSegmento([p[0], 0, p[2]], [q[0], 0, q[1]], [d.poligono[(k + 1) % d.poligono.length][0], 0, d.poligono[(k + 1) % d.poligono.length][1]]))) < 1e-6)).toBe(true);
     console.log(JSON.stringify({ folgaDaAbaMm: folga * 1000, abaDentroDoVao: daAba.filter((p: number[]) => dentro(p[0], p[2])).length / daAba.length, abaDesceMm: -1000 * Math.min(...daAba.map((p: number[]) => p[1] - altura(p[0], p[2]))) }));
+  });
+
+  it('a lente fica no lugar, recuada para além da perna da aba: nenhum volume em comum com a aba nem com a chapa', () => {
+    const wasm = manifoldCarregada();
+    const [abertura] = A.neutro.aberturas;
+    expect(abertura.recuoDaLente).toBeCloseTo(RECUO_PADRAO_DA_LENTE * m(TABELA.chapa.espessura), 6);
+    /* a volta da lente vista de cima fica a recuoDaLente do contorno desenhado */
+    const P = derivar().poligono;
+    const aoContorno = (p: number[]) => Math.min(...P.map((q: number[], k: number) => { const r = P[(k + 1) % P.length]; const uv = [r[0] - q[0], r[1] - q[1]]; const t = Math.max(0, Math.min(1, ((p[0] - q[0]) * uv[0] + (p[2] - q[1]) * uv[1]) / (uv[0] ** 2 + uv[1] ** 2))); return Math.hypot(p[0] - q[0] - uv[0] * t, p[2] - q[1] - uv[1] * t); }));
+    const daLente = [...new Set([...A.neutro.F.values()].filter((f: any) => f.parte === 'lente').flatMap((f: any) => f.vs))].map((v) => A.neutro.V.get(v));
+    const menor = Math.min(...daLente.map(aoContorno));
+    expect(Math.abs(menor - abertura.recuoDaLente)).toBeLessThan(1e-6);
+    const comAba = relacaoEntrePartes(A.neutro, ['lente'], ['aba'], wasm);
+    const comChapa = relacaoEntrePartes(A.neutro, ['lente'], ['chapa', 'emVoltaDoVao'], wasm);
+    expect(comAba.volumeMm3).toBeLessThan(1e-6);
+    expect(comAba.distanciaMm).toBeGreaterThan(1);
+    expect(comChapa.volumeMm3).toBeLessThan(1e-6);
+    expect(comChapa.distanciaMm).toBeCloseTo(abertura.recuoDaLente * 1000, 3);
+    /* sem o recuo, a lente ocupa o vão inteiro e atravessa a aba; com 3 mm (raio + espessura) ela ainda a cruza perto do bico */
+    const comRecuo = (recuo: number) => {
+      const passos = receita.PASSOS.map((p: any) => (p[0] === 'aberturaPorContorno' ? [p[0], { ...p[1], recuoDaLente: recuo }] : p));
+      const { neutro } = executarReceita(comTabela(TABELA, passos));
+      expect(neutro.orfaos).toEqual([]);
+      return relacaoEntrePartes(neutro, ['lente'], ['aba'], wasm, { distancia: false });
+    };
+    const semRecuo = comRecuo(0); const raioMaisEspessura = comRecuo(m(3));
+    expect(semRecuo.volumeMm3).toBeGreaterThan(1000);
+    expect(raioMaisEspessura.volumeMm3).toBeGreaterThan(0.1);
+    /* e em toda posição da varredura, com o recuo padrão */
+    const naVarredura = varredura.map(({ dx, segmentos, r }) => ({ dx, segmentos, volumeMm3: relacaoEntrePartes(r.neutro, ['lente'], ['aba'], wasm, { distancia: false }).volumeMm3 }));
+    expect(naVarredura.filter((x) => !(x.volumeMm3 < 1e-6))).toEqual([]);
+    console.log(JSON.stringify({ recuoDaLenteMm: abertura.recuoDaLente * 1000, lenteAoContornoMm: menor * 1000, lenteComAba: comAba, lenteComChapa: comChapa, recuo0: semRecuo, recuo3mm: raioMaisEspessura }));
   });
 
   it('a limpeza age na costura de toda posição, e a espessura medida na borda é a da chapa', () => {
@@ -231,10 +267,56 @@ describe('aberturaPorContorno: as recusas dizem o que fazer', () => {
     expect(recusa({ lente: 'sim' })).toMatch(/lente só aceita true/);
   });
 
+  it('o recuo da lente: sem lente, negativo e maior que o vão comporta', () => {
+    expect(recusa({ recuoDaLente: 0.005 })).toMatch(/recuoDaLente recua a lente para dentro do vão, e o passo não declarou lente: true/);
+    expect(recusa({ lente: true, recuoDaLente: -0.001 })).toMatch(/recuoDaLente é a distância, em metro e zero ou mais/);
+    expect(recusa({ lente: true, recuoDaLente: 0.06 })).toMatch(/a lente não cabe no vão: (o recuo de 60 mm fecha o vão inteiro|com o recuo de 60 mm o contorno recuado se cruza).*reduza recuoDaLente/);
+    /* o polígono recuado mantém o bico: cada lado anda d para dentro e o canto entra d / sen(meio ângulo) */
+    const { poligono } = recuarPoligono(d.poligono, m(5));
+    const k = 0; const n = poligono.length;
+    const angulo = (P: number[][]) => { const a = P[(k - 1 + n) % n], p = P[k], b = P[(k + 1) % n]; const u = [a[0] - p[0], a[1] - p[1]], v = [b[0] - p[0], b[1] - p[1]]; return (Math.acos((u[0] * v[0] + u[1] * v[1]) / (Math.hypot(...u) * Math.hypot(...v))) * 180) / Math.PI; };
+    expect(angulo(poligono)).toBeCloseTo(angulo(d.poligono), 6);
+    expect(Math.hypot(poligono[0][0] - d.poligono[0][0], poligono[0][1] - d.poligono[0][1])).toBeCloseTo(m(5) / Math.sin((angulo(d.poligono) * Math.PI) / 360), 9);
+  });
+
   it('o friso sobre a abertura recusa pontos na linha', () => {
     const passos = [...passosCom({}), ['friso', { origemId: 4, superficie: { op: 'aberturaPorContorno', id: 3 }, linha: { nome: 'aba', pontos: ['a', 'b'] }, aba: { largura: 0.008, angulo: 90, raio: 0.001 } }]];
     const { neutro } = executarReceita(comTabela(TABELA, passos));
     expect(neutro.orfaos.map((o: any) => o.motivo)).toEqual([expect.stringMatching(/é a borda de fora do vão inteira, e não leva pontos/)]);
+  });
+});
+
+describe('a moldura do vão reconhece a abertura por contorno', () => {
+  const { neutro } = executarReceita(receita);
+  const VAO = { nome: 'vao', superficie: { op: 'aberturaPorContorno', id: 3 }, frisos: ['abaDoVao'] };
+  const motivo = 'a abertura de prova fica sem aba nesta conferência, para medir a declaração';
+
+  it('o vão declarado com a aba tem a borda de fora inteira coberta', () => {
+    const r = conferirVaosDaPeca(neutro, receita);
+    expect(r.problemas).toEqual([]);
+    const [v] = r.vaos;
+    expect(v.amostras).toBeGreaterThan(700);
+    expect(v.cobertas).toBe(v.amostras);
+    expect(r.aberturas).toMatchObject([{ chapa: 'aberturaPorContorno:3', vao: 'vao' }]);
+    expect(formatarVaos(r)).toMatch(/1 vão\(s\) declarado\(s\); 1 abertura\(s\) nas chapas, todas declaradas/);
+    console.log(JSON.stringify({ moldura: { comprimentoMm: v.comprimento * 1000, amostras: v.amostras, cobertas: v.cobertas, descobertos: v.descobertos.length, emendas: v.emendas.length } }));
+  });
+
+  it('a abertura sem declaração reprova com a origem dela', () => {
+    expect(conferirVaosDaPeca(neutro, {}).problemas).toEqual([expect.stringMatching(/a abertura aberturaPorContorno:3 não tem declaração em `vaos`: a borda de fora do vão, de \d+ pontos e 802,2 mm.*superficie: \{ op: 'aberturaPorContorno', id: 3 \}/)]);
+  });
+
+  it('sem moldura: passa sem aba e reprova quando a aba cobre a borda', () => {
+    const semAba = executarReceita(comTabela({ ...TABELA, aba: null })).neutro;
+    expect(conferirVaosDaPeca(semAba, { vaos: [{ nome: 'vao', superficie: VAO.superficie, semMoldura: { motivo } }] }).problemas).toEqual([]);
+    expect(conferirVaosDaPeca(neutro, { vaos: [{ nome: 'vao', superficie: VAO.superficie, semMoldura: { motivo } }] }).problemas).toEqual([expect.stringMatching(/declarado sem moldura .* 100,0% da borda fica sob a faixa de um friso que segue a abertura \('abaDoVao'\)/)]);
+  });
+
+  it('a declaração errada diz o que fazer', () => {
+    expect(() => conferirVaosDaPeca(neutro, { vaos: [{ ...VAO, borda: ['p1_1', 'p1_2', 'p2_2'] }] })).toThrow(/a borda de uma abertura por contorno é a volta de fora do vão que o passo registra.*tire 'borda'/);
+    expect(() => conferirVaosDaPeca(neutro, { vaos: [{ ...VAO, superficie: { op: 'aberturaPorContorno', id: 9 } }] })).toThrow(/aberturaPorContorno:9, que não é abertura da peça.*Aberturas: aberturaPorContorno:3/);
+    expect(() => conferirVaosDaPeca(neutro, { vaos: [{ nome: 'vao', borda: ['p1_1', 'p1_2', 'p2_2', 'p1_1'], frisos: ['abaDoVao'] }] })).toThrow(/não segue uma chapa \(superficie\), e sim a borda de uma abertura por contorno/);
+    expect(() => conferirVaosDaPeca(neutro, { vaos: [VAO, { ...VAO, nome: 'outro' }] })).toThrow(/a abertura aberturaPorContorno:3 já é o vão 'vao'/);
   });
 });
 

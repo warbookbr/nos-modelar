@@ -9,7 +9,10 @@
  *
  * O CONTORNO DESENHADO é o analítico, pelos trechos (reto e arcoTangente, os que a peça de teste usa), e não o polígono que
  * a discretização do arco dá: o desvio contra ele inclui a flecha dos segmentos do arco. O desvio contra o polígono também
- * sai, para separar o erro do corte do erro da discretização. Tudo em metro na entrada; as medidas saem em milímetro e grau. */
+ * sai, para separar o erro do corte do erro da discretização. Tudo em metro na entrada; as medidas saem em milímetro e grau.
+ *
+ * A LENTE NO LUGAR. `relacaoEntrePartes` mede se duas partes fechadas se cruzam (o volume da interseção pela Manifold) e a menor
+ * distância entre elas, para a lente recuada contra a aba e contra a chapa. */
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
@@ -200,4 +203,46 @@ export function qualidadeDasFaces(neutro, ids, limite = 0.003) {
     menor = Math.min(menor, razao); if (razao < limite) abaixo++;
   }
   return { faces: ids.length, menorRazao: menor, abaixoDoLimite: abaixo, limite };
+}
+
+/** relacaoEntrePartes(neutro, a, b, wasm, { distancia }) -> { volumeMm3, distanciaMm }: o volume da interseção dos sólidos de
+ *  duas listas de partes, pela Manifold (`wasm`, a instância que o núcleo carregou), e a menor distância entre as malhas, de cada
+ *  vértice de uma aos triângulos da outra, nos dois sentidos (com `distancia: false`, só o volume). Cada lista precisa formar um
+ *  sólido fechado. */
+export function relacaoEntrePartes(neutro, a, b, wasm, { distancia = true } = {}) {
+  const sub3 = (p, q) => [p[0] - q[0], p[1] - q[1], p[2] - q[2]];
+  const dot3 = (p, q) => p[0] * q[0] + p[1] * q[1] + p[2] * q[2];
+  const cruz3 = (p, q) => [p[1] * q[2] - p[2] * q[1], p[2] * q[0] - p[0] * q[2], p[0] * q[1] - p[1] * q[0]];
+  const tam = (p) => Math.hypot(p[0], p[1], p[2]);
+  const aoSegmento = (p, u, v) => { const uv = sub3(v, u); const s = Math.max(0, Math.min(1, dot3(sub3(p, u), uv) / dot3(uv, uv))); return tam(sub3(p, [u[0] + uv[0] * s, u[1] + uv[1] * s, u[2] + uv[2] * s])); };
+  const aoTriangulo = ([x, y, z], p) => {
+    const n = cruz3(sub3(y, x), sub3(z, x)); const l = tam(n);
+    if (l > 0) { const N = n.map((c) => c / l); const h = dot3(sub3(p, x), N); const q = sub3(p, N.map((c) => c * h)); if ([[x, y], [y, z], [z, x]].every(([u, v]) => dot3(cruz3(sub3(v, u), sub3(q, u)), N) >= 0)) return Math.abs(h); }
+    return Math.min(aoSegmento(p, x, y), aoSegmento(p, y, z), aoSegmento(p, z, x));
+  };
+  const malha = (partes) => {
+    const faces = [...neutro.F.values()].filter((f) => partes.includes(f.parte));
+    const ids = [...new Set(faces.flatMap((f) => f.vs))];
+    const tris = [];
+    for (const f of faces) for (let k = 1; k + 1 < f.vs.length; k++) tris.push([f.vs[0], f.vs[k], f.vs[k + 1]]);
+    return { ids, tris, pontos: ids.map((v) => neutro.V.get(v)), triangulos: tris.map((t) => t.map((v) => neutro.V.get(v))) };
+  };
+  const solido = ({ ids, tris }) => {
+    const indice = new Map(ids.map((v, k) => [v, k]));
+    const props = new Float32Array(ids.length * 3); ids.forEach((v, k) => props.set(neutro.V.get(v), 3 * k));
+    const mesh = new wasm.Mesh({ numProp: 3, vertProperties: props, triVerts: Uint32Array.from(tris.flat().map((v) => indice.get(v))) });
+    mesh.merge();
+    return new wasm.Manifold(mesh);
+  };
+  const A = malha(a), B = malha(b);
+  const sa = solido(A), sb = solido(B);
+  try {
+    const r = wasm.Manifold.intersection(sa, sb);
+    const volumeMm3 = r.volume() * 1e9; r.delete();
+    if (!distancia) return { volumeMm3, distanciaMm: null };
+    let d = Infinity;
+    for (const p of A.pontos) for (const t of B.triangulos) d = Math.min(d, aoTriangulo(t, p));
+    for (const p of B.pontos) for (const t of A.triangulos) d = Math.min(d, aoTriangulo(t, p));
+    return { volumeMm3, distanciaMm: d * 1000 };
+  } finally { sa.delete(); sb.delete(); }
 }

@@ -252,6 +252,7 @@ const definicoes = {
       segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos arcos e nas concordâncias do contorno (padrão 4); abaixo do piso do bico, o passo grita com o piso.'],
       segmentosSpline: ['inteiro', 'Segmentos por vão de spline do contorno (padrão 8).'],
       lente: ['booleano', "true: o pedaço retirado sai como sólido próprio, citável por { op, id, parte: 'lente' }."],
+      recuoDaLente: ['escalar', 'Com lente, quanto a volta dela entra no vão a partir da borda, em metro, para ficar além da perna da aba do friso; padrão 2,5 vezes a espessura da chapa, e 0 dá a lente do tamanho do vão.'],
     },
     obrigatorios: ['origemId', 'chapa', 'contorno', 'vista'],
     passos: [
@@ -264,7 +265,7 @@ const definicoes = {
       'O corte é o subtrair do núcleo, depois da subdivisão: face que o corte não toca fica com id e cantos, face cortada fica com o id no maior pedaço, e a parede do vão ganha id novo no bloco do passo, depois dos pedaços. A costura deixa a borda sobre o polígono do contorno.',
       'Depois do corte, a aresta que toca a costura e mede menos de 1% da maior aresta das faces em volta, e o canto quase reto, são fundidos num ponto só (fica o ponto do contorno, e a malha fina em volta se move menos que isso); a face de pele que ainda sai fina se junta à vizinha quando o resultado sai convexo. A face que some era pedaço sem área, e a face de antes que some entra em consumidas.',
       'O bico vivo se mede contra a tangente dos trechos que o formam: com segmentos de menos, a corda do primeiro segmento abre ou fecha o bico, e acima de 2 graus de erro o passo grita com o piso de segmentosArco (ou segmentosSpline) que o deixa abaixo.',
-      'Gritam, antes de mexer na malha: o contorno que não fecha, o que se cruza, o que sai da chapa vista do eixo, o que a chapa dobrada atravessa mais de uma vez e o que fica abaixo do piso do bico.',
+      'Gritam, antes de mexer na malha: o contorno que não fecha, o que se cruza, o que sai da chapa vista do eixo, o que a chapa dobrada atravessa mais de uma vez, o que fica abaixo do piso do bico e o recuo da lente que o vão não comporta.',
       "A origem sem parte são as faces da chapa cortada, com a parede; parte: 'parede' só a parede; parte: 'lente' o pedaço retirado, com lente: true. O friso segue a borda de fora do vão por superficie: { op: 'aberturaPorContorno', id }.",
       'Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora.',
     ],

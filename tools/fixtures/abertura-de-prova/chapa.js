@@ -15,8 +15,6 @@ export const TABELA = {
   contorno: { bico: [220, 430], fimDoReto: [520, 480], fimDoArco: [540, 380], segmentosArco: 32 },
   /* a aba que dobra a borda de fora do vão para baixo: perna, giro em graus e raio da face de dentro da dobra */
   aba: { largura: 8, angulo: 90, raio: 1 },
-  /* a lente sobe acima da chapa, só para a imagem mostrar o vão, a parede e a aba por dentro dele */
-  lente: { elevar: 100 },
   /* a caixa em [x, z] em volta do vão que a parte `emVoltaDoVao` nomeia, para a bancada enquadrar a borda */
   emVolta: { de: [190, 350], ate: [600, 500] },
 };
@@ -64,7 +62,7 @@ export const PLANO = {
   partes: [
     { nome: 'chapa', forma: 'chapa de 2 mm de duas curvaturas com o vão do contorno projetado em y', tecnica: 'subdivisao com medidas e espessura' },
     { nome: 'emVoltaDoVao', forma: 'as faces da mesma chapa em volta do vão, nomeadas para a bancada enquadrar a borda', tecnica: 'parte por região' },
-    { nome: 'lente', forma: 'o pedaço da chapa que o vão retirou, como sólido próprio', tecnica: 'aberturaPorContorno com lente' },
+    { nome: 'lente', forma: 'o pedaço da chapa que o vão retirou, como sólido próprio, no lugar e recuado para além da perna da aba', tecnica: 'aberturaPorContorno com lente e o recuo padrão' },
     { nome: 'aba', forma: 'aba de 8 mm dobrada a 90 graus para baixo ao longo da borda de fora do vão', tecnica: 'friso com aba sobre a borda da abertura' },
   ],
   criteriosDeReprovacao: ['a borda do vão sai do contorno desenhado ou arredonda o bico', 'a chapa tem amassado, ondulação ou dobra que a forma não pede'],

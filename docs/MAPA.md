@@ -147,7 +147,7 @@
 
 ## docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/
 
-- `README.md` — Abertura de contorno livre — as técnicas medidas e a operação
+- `README.md` — Abertura de contorno livre — as técnicas medidas, a operação e a lente no lugar
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 

@@ -1,11 +1,12 @@
-# Abertura de contorno livre — as técnicas medidas e a operação
+# Abertura de contorno livre — as técnicas medidas, a operação e a lente no lugar
 
 Provas do plano [abertura de contorno livre](../../planos/2026-11-05-abertura-de-contorno-livre.md), em 2026-11-05. A peça de
 teste é `tools/fixtures/abertura-de-prova/`: uma chapa de subdivisão de 800 por 800 mm, 2 mm de espessura e duas curvaturas, com
 um vão desenhado na vista superior que sai de um bico vivo de 40,4 graus, segue reto 304 mm e volta ao bico por dois arcos
 tangentes. A fatia 1 mediu as duas técnicas de corte e não aprovou nenhuma; as fatias 2 e 3 fizeram a operação
 `aberturaPorContorno` pela técnica que a pessoa escolheu, o corte depois da subdivisão com uma limpeza da costura, e a aba e a
-lente sobre ela.
+lente sobre ela; a fatia 4 recuou a lente para dentro do vão, ensinou a moldura do vão a reconhecer a abertura e tirou as imagens
+com a lente no lugar.
 
 ## Fatia 1: as duas técnicas
 
@@ -127,24 +128,82 @@ chapa curva. Na peça de teste a aba de 8 mm a 90 graus com raio de 1 mm segue a
 onde a linha corta pela corda), entra no vão até 6,1 mm (a esquadria no bico), desce 11,5 mm abaixo da pele de fora e sai
 fechada. A lente é o pedaço retirado, a interseção da chapa com o mesmo prisma
 calculada pela Manifold dentro da operação antes do corte e limpa pelos mesmos três passos, citável por
-`{ op: 'aberturaPorContorno', id, parte: 'lente' }`; ela sai fechada, com o menor triângulo de 1,5e-8 m². Na peça de teste a lente
-sobe 100 mm só para a imagem mostrar o vão, a parede e a aba; no lugar, ela ocupa o vão inteiro e atravessa a aba, que entra 3 mm
-nele, e a receita que a quiser como lente de verdade precisa recuá-la.
+`{ op: 'aberturaPorContorno', id, parte: 'lente' }`; ela sai fechada, com o menor triângulo de 1,5e-8 m². Até a fatia 3 a lente
+ocupava o vão inteiro e atravessava a aba, que entra 3 mm nele, e na peça de teste subia 100 mm só para a imagem mostrar o vão, a
+parede e a aba.
 
-As imagens são da vista isométrica da bancada, recortadas em volta do vão: `abertura-sombreado.png` e `abertura-arame.png` mostram o
-vão com a parede, a aba por dentro da borda e a lente acima, e `abertura-bico-sombreado.png` e `abertura-bico-arame.png` o bico de
-perto. No arame se veem os leques que a booleana abre dos vértices da malha para os pontos do arco menor, que a limpeza deixa com
-razão acima de 0,0039.
+As imagens da fatia 3 são da vista isométrica da bancada, recortadas em volta do vão, com a lente 100 mm acima:
+`abertura-sombreado.png` e `abertura-arame.png` mostram o vão com a parede, a aba por dentro da borda e a lente acima, e
+`abertura-bico-sombreado.png` e `abertura-bico-arame.png` o bico de perto. No arame se veem os leques que a booleana abre dos
+vértices da malha para os pontos do arco menor, que a limpeza deixa com razão acima de 0,0039.
+
+## Fatia 4: a lente no lugar e a moldura do vão
+
+A pessoa aprovou a forma da peça de teste em 2026-11-05 e pediu a lente recuada para dentro da aba, como os cristais e as lentes do
+furgão: a volta recuada logo além da perna da aba, rente à chapa. A lente passou a ser a interseção da chapa com o prisma do
+contorno recuado, `recuoDaLente` para dentro do vão, e o recuo é um campo da operação. O contorno recuado (`recuarPoligono`) leva
+cada lado para dentro e põe cada canto no encontro dos dois lados recuados, de modo que o bico continua vivo, com o mesmo ângulo, e
+entra recuo / sen(meio ângulo); o lado que encolhe a nada antes do recuo sai e os vizinhos se encontram, que é o que acontece com o
+segmento curto do arco junto do bico com 64 segmentos por quarto (sem isso, o lado de 10,4 mm que chega ao bico em dx -4 virava).
+O padrão é 2,5 vezes a espessura da chapa, medida antes do corte pela reta do eixo nos pontos do contorno (1,999999 mm nesta
+peça): a face de fora da perna da aba fica a raio + espessura da borda, e com o raio da dobra até uma espessura a lente fica ao
+menos meia espessura além dela. A peça de teste usa o padrão, sem declarar o recuo, e a lente já não sobe.
+
+A relação da lente com a aba e com a chapa é medida pela Manifold (o volume da interseção dos dois sólidos) e pela menor distância
+entre as malhas, de cada vértice de uma aos triângulos da outra, em `relacaoEntrePartes` de `tools/fixtures/abertura-de-prova/medir.mjs`:
+
+| recuo da lente | volume em comum com a aba | distância à aba | volume em comum com a chapa | distância à chapa |
+|---|---:|---:|---:|---:|
+| 0 (a lente do tamanho do vão, como até a fatia 3) | 3160,7 mm³ | 0 | 0,11 mm³ (a parede em comum) | 0 |
+| 3 mm (raio + espessura) | 4,43 mm³ (junto do bico) | 0 | 0 | 3,000 mm |
+| 3,5 mm | 0 | 0,177 mm | 0 | 3,500 mm |
+| 5,000 mm (o padrão) | 0 | 1,685 mm | 0 | 5,000 mm |
+
+Com o padrão, a volta da lente vista de cima fica a 4,9997 mm do contorno desenhado (o recuo menos a precisão Float32 da Manifold),
+e nas treze posições da varredura a lente não tem volume em comum com a aba. O recuo de 3 mm, que é onde a perna da aba fica ao
+longo da borda, ainda cruza a aba junto do bico, onde o friso segue a corda e a esquadria entra 6,1 mm no vão. O `descrever` da peça
+dá `aba lente folga`, decidido pelos sólidos; os pares da lente com `chapa` e com `emVoltaDoVao` saem `interpenetra` pela caixa,
+porque as duas partes da chapa são pedaços abertos do mesmo sólido e a medida de sólidos não decide (são os pares inconclusivos do
+`descrever`), e a medida acima, com a chapa inteira, dá volume zero e 5,000 mm.
+
+Na posição da peça a lente tem 224 faces (eram 249) e o menor triângulo dela é 1,35e-8 m²; a peça inteira continua sem aresta sem
+par, vínculo não manifold, triângulo abaixo do piso ou lasca, com o menor triângulo de 1,31e-8 m², e nas treze posições da
+varredura o menor triângulo da peça fica entre 2,5e-9 e 2,0e-8 m², acima do piso de 1,29e-9. `npm run malha:conferir` só dá
+alertas (2034 faces tortas da subdivisão, 72 n-gons, 15 polos e as três ilhas da chapa, da lente e da aba). Os recortes do gate 2
+(as bordas a 0,125 mm do desenho, o bico com 39,00 graus) não mudam, porque a chapa e a aba são as mesmas.
+
+A moldura do vão (`src/autoria/molduras-do-vao.js`) reconhece a abertura pela lista `neutro.aberturas` que a operação registra. O
+vão se declara sem borda, pela origem do passo, e a borda é a volta de fora do vão, a mesma que o friso segue:
+
+```js
+vaos: [{ nome: 'vao', superficie: { op: 'aberturaPorContorno', id: 3 }, frisos: ['abaDoVao'] }],
+```
+
+Na peça de teste a borda tem 802,2 mm, e as 856 amostras dela (uma a cada milímetro) ficam todas sob a pegada da aba, sem trecho
+descoberto e sem emenda. Como no vão de gaiola, a abertura que nenhum vão cita reprova com a origem e o tamanho da borda, o vão
+`semMoldura` reprova quando um friso que segue a abertura cobre a borda, e a declaração com `borda`, com uma origem que não é
+abertura da peça, com um friso que não segue a abertura ou com a mesma abertura em dois vãos grita com o que fazer.
+
+As imagens da fatia 4 são da vista isométrica da bancada com 5120 pixels de largura, com a lente no lugar: `lente-no-lugar-sombreado.png`
+e `lente-no-lugar-arame.png` mostram o vão inteiro, com a junta entre a lente e a borda e a aba por dentro dela,
+`lente-bico-sombreado.png` e `lente-bico-arame.png` o bico de perto, onde a ponta da lente fica 14,5 mm para dentro do bico do
+vão, e `lente-arco-sombreado.png` e `lente-arco-arame.png` o arco menor, onde a junta e a perna da aba se veem de lado.
 
 ## Como reproduzir
 
 ```text
 npx vitest run procedural/nucleo/operacoes/abertura-por-contorno.test.ts
 npm run malha:conferir -- tools/fixtures/abertura-de-prova
+npm run descrever -- tools/fixtures/abertura-de-prova
 npm run bancada -- tools/fixtures/abertura-de-prova --analise --res=2560 --zoom=isometrica:1100,490,1440,790
+npm run bancada -- tools/fixtures/abertura-de-prova --analise --res=5120 --saida=tools/bancadas/out/abertura-5120
 ```
 
 O teste imprime as medidas em JSON, as da posição da peça e as da varredura com e sem a limpeza, e trava a ausência dos triângulos
 sem área e das lascas em toda posição. As imagens desta pasta são recortes de
 `tools/bancadas/out/analise-tools-fixtures-abertura-de-prova/bancada-tools-fixtures-abertura-de-prova-isometrica-orto{,-arame}.png`:
-o vão em (1100, 490) a (1440, 790), ampliado duas vezes, e o bico em (1105, 595) a (1245, 690), ampliado cinco vezes.
+o vão em (1100, 490) a (1440, 790), ampliado duas vezes, e o bico em (1105, 595) a (1245, 690), ampliado cinco vezes, com a
+receita da fatia 3 (commit `b32a755f`). As da fatia 4 são recortes de
+`tools/bancadas/out/abertura-5120/bancada-tools-fixtures-abertura-de-prova-isometrica-orto{,-arame}.png`: o vão em (2660, 800) a
+(3400, 1180), sem ampliar, o bico em (2680, 820) a (2840, 930) e o arco em (3230, 1000) a (3390, 1170), ampliados quatro vezes.
+O teste da lente imprime o recuo e as relações da tabela, e o da moldura a cobertura.

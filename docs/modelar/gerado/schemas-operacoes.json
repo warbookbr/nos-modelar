@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:6ce516b275b1b130e43fb89d25642e9e9a025d04c01b7ccc71938d2061670fbe",
+  "assinatura": "sha256:061d94b018e14ec8700741c27d591984322d7739f1a62e253eb678d629860b52",
   "total": 40,
   "operacoes": [
     {
@@ -73,6 +73,20 @@
             "lente": {
               "type": "boolean",
               "description": "true: o pedaço retirado sai como sólido próprio, citável por { op, id, parte: 'lente' }."
+            },
+            "recuoDaLente": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Com lente, quanto a volta dela entra no vão a partir da borda, em metro, para ficar além da perna da aba do friso; padrão 2,5 vezes a espessura da chapa, e 0 dá a lente do tamanho do vão."
             }
           }
         },
@@ -224,7 +238,7 @@
           "O corte é o subtrair do núcleo, depois da subdivisão: face que o corte não toca fica com id e cantos, face cortada fica com o id no maior pedaço, e a parede do vão ganha id novo no bloco do passo, depois dos pedaços. A costura deixa a borda sobre o polígono do contorno.",
           "Depois do corte, a aresta que toca a costura e mede menos de 1% da maior aresta das faces em volta, e o canto quase reto, são fundidos num ponto só (fica o ponto do contorno, e a malha fina em volta se move menos que isso); a face de pele que ainda sai fina se junta à vizinha quando o resultado sai convexo. A face que some era pedaço sem área, e a face de antes que some entra em consumidas.",
           "O bico vivo se mede contra a tangente dos trechos que o formam: com segmentos de menos, a corda do primeiro segmento abre ou fecha o bico, e acima de 2 graus de erro o passo grita com o piso de segmentosArco (ou segmentosSpline) que o deixa abaixo.",
-          "Gritam, antes de mexer na malha: o contorno que não fecha, o que se cruza, o que sai da chapa vista do eixo, o que a chapa dobrada atravessa mais de uma vez e o que fica abaixo do piso do bico.",
+          "Gritam, antes de mexer na malha: o contorno que não fecha, o que se cruza, o que sai da chapa vista do eixo, o que a chapa dobrada atravessa mais de uma vez, o que fica abaixo do piso do bico e o recuo da lente que o vão não comporta.",
           "A origem sem parte são as faces da chapa cortada, com a parede; parte: 'parede' só a parede; parte: 'lente' o pedaço retirado, com lente: true. O friso segue a borda de fora do vão por superficie: { op: 'aberturaPorContorno', id }.",
           "Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora."
         ],
