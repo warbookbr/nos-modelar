@@ -197,18 +197,25 @@
     },
     {
       "instancia": "braco",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015",
-      "aceite": {
-        "por": "Tiago, 2026-11-04, pelas imagens da rodada 5, com o arredondamento acompanhando o chanfro",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
-        ],
-        "analise": "ausente"
-      }
+      "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024",
+      "reaberturas": [
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "Tiago, 2026-11-04, pelas imagens da rodada 5, com o arredondamento acompanhando o chanfro",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015"
+        }
+      ]
     }
   ]
 }
