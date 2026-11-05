@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/fixtures/solido-por-lacos/`, `docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/`
+**Território:** `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/fixtures/solido-por-lacos/`, `docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/`, `tools/modelar/capacidade.mjs` na linha da ficha
 
 **Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-05; a sessão do braço fica parada até este plano fechar
 

@@ -24,6 +24,7 @@ export const CAPACIDADES = Object.freeze({
   gaiolaVarrida: { arquivo: 'procedural/nucleo/gaiola-varrida.js', funcao: 'gaiolaVarrida', de: 'procedural/nucleo/gaiola-varrida.js' },
   gaiolaInterpolada: { arquivo: 'procedural/nucleo/gaiola-interpolada.js', funcao: 'gaiolaPorEstacoes', de: ESTACOES },
   gaiolaAneis: { arquivo: 'procedural/nucleo/gaiola-aneis.js', funcao: 'gaiolaPorEstacoes', de: ESTACOES },
+  gaiolaPorLacos: { arquivo: 'procedural/nucleo/gaiola-por-lacos.js', funcao: 'gaiolaPorLacos', de: 'procedural/nucleo/gaiola-por-lacos.js' },
 });
 
 export const LIMITE_DE_LINHAS = 60;
