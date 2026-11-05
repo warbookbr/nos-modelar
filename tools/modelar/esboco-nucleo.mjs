@@ -26,7 +26,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { neutroCanonico } from '../../procedural/nucleo/nucleo.js';
-import { VISTAS_BANCADA } from '../../src/bancada/estado-bancada.js';
+import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { lerEsboco } from '../../modulos/esboco-nucleo/src/ler-esboco.js';
 import { receitaDaOpcao, RecusaDoEsboco, caixaDaMalha } from '../../modulos/esboco-nucleo/src/opcao.js';
 import { abrirCapturaCompartilhada, PRAZO_DE_CARGA_MS } from './olhar-bancada.mjs';

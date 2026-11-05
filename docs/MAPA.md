@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1788 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1789 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1899,6 +1899,7 @@
 - `veredito-de-forma.test.js` — veredito-de-forma.test.js — o veredito que não deixa a correção para o chute.
 - `vincos-da-malha.js` — vincos-da-malha.js — os vincos nomeados que os passos `subdivisao` declaram, onde eles ficaram na malha entregue.
 - `vinculos-de-medida.js` — vinculos-de-medida.js — o grafo de "esta medida vem daquela porta" dentro de uma montagem, e a ordem de construção que ele impõe.
+- `vistas-da-bancada.js` — vistas-da-bancada.js — as direções das vistas nomeadas da bancada, em dado puro, para quem roda sem navegador (o esboço 2.0) e para a própria bancada, que as…
 
 ## src/bancada/
 
