@@ -53,6 +53,7 @@ A fatia 3 acrescenta ao território, ao começar, os arquivos que migra (as skil
 2. O esboço 2.0 e as variantes de receita, com os gates 1 e 2. Feita em 2026-11-05.
 3. A migração das skills, do agente e do pacote do crítico. Feita em 2026-11-05.
 4. A remoção do módulo antigo, o histórico e o fechamento. A remoção e o histórico em 2026-11-05; o fechamento fica com quem conduz o plano.
+5. A praticidade do 2.0, decidida pela pessoa em 2026-11-05 depois de um esboço de guitarra feito por quem conduz: o relato de contatos entre as formas em texto a cada rodada (a medida do `descrever`, já no núcleo), o posicionamento sem conta no atalho (âncoras de face, `encosta`, alinhamento por outra face e pivô de rotação), espelho e repetição no atalho, rótulos numerados na imagem, a ajuda com um exemplo curto que use spline e pivô, o 2.0 em milímetros e as vistas juntas como opção. A prova é refazer a guitarra num arquivo mais curto, em uma rodada, com o relato de contatos confirmando as juntas.
 
 ## Riscos e parada
 
