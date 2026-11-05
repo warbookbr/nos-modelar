@@ -8,6 +8,7 @@
 2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`. Em aberto: o ombro refeito na opção B escolhida pela pessoa, com o encontro sem quina, a luz rasante na peça com emenda sombreada e as etapas que não perdem o aceite, e depois as partes restantes e a exportação do braço montado.
 3. [a porta de entrada dos agentes](2026-11-05-porta-de-entrada-dos-agentes.md). Território no plano. Em aberto: a ficha da gaiola e o `--ajuda` que faltam.
 4. [abertura de contorno livre](2026-11-05-abertura-de-contorno-livre.md). Território no plano. Em aberto: cortar a chapa depois ou antes da subdivisão.
+5. [sólido por laços](2026-11-05-solido-por-lacos.md). Território no plano. Em aberto: começa quando o ombro aceito chegar à main.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

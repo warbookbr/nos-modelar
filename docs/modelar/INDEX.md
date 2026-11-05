@@ -22,7 +22,7 @@ encerrado vive em
 
 ## Estado atual
 
-- Planos ativos: [furgão realista](planos/2026-10-30-furgao-realista.md), [as partes do braço](planos/2026-09-26-as-partes-do-braco.md), [a porta de entrada dos agentes](planos/2026-11-05-porta-de-entrada-dos-agentes.md) e [abertura de contorno livre](planos/2026-11-05-abertura-de-contorno-livre.md).
+- Planos ativos: [furgão realista](planos/2026-10-30-furgao-realista.md), [as partes do braço](planos/2026-09-26-as-partes-do-braco.md), [a porta de entrada dos agentes](planos/2026-11-05-porta-de-entrada-dos-agentes.md), [abertura de contorno livre](planos/2026-11-05-abertura-de-contorno-livre.md) e [sólido por laços](planos/2026-11-05-solido-por-lacos.md).
 - Encerrados recentes: [Regras de desenho por família](planos/encerrados/2026-11-03-regras-de-desenho-por-familia.md) e [descrever rápido](planos/encerrados/2026-11-03-descrever-rapido.md) fecharam em 2026-11-03. [Renomear para Modelar](planos/encerrados/2026-10-25-renomear-para-modelar.md) fechou em 2026-10-28. [Bateria rápida e retorno cedo](planos/encerrados/2026-10-27-bateria-rapida-e-retorno-cedo.md) fechou em 2026-10-28. [Leitura por demanda e limpeza](planos/encerrados/2026-10-22-leitura-por-demanda-e-limpeza.md) fechou em 2026-10-27, com a entrada por perguntas e o repositório sem as áreas que ninguém usava. Os anteriores estão na [crônica dos encerrados](planos/encerrados/README.md).
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
