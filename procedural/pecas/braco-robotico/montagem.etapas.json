@@ -114,6 +114,16 @@
         }
       ],
       "forma": "sha256:008db946851ad0d0010d8442ae0d8133dd71b4d77decb1dc349c26a045dcb3f3",
+      "aceite": {
+        "por": "pessoa, 2026-11-05: aceitou o ombro 30 mm mais longo, em malha única pela gaiola, com o topo plano até a parede de trás",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 11.",
+          "anel: superficie em contorno do disco, face frontal",
+          "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
+          "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+        ],
+        "analise": "feita"
+      },
       "reaberturas": [
         {
           "por": "pessoa",
@@ -183,17 +193,7 @@
           },
           "forma": "sha256:7bfefdef59eef5af30f2d40e0e4a5ad628c22b98e45be86fe4de573b4d221150"
         }
-      ],
-      "aceite": {
-        "por": "pessoa, 2026-11-05: aceitou o ombro 30 mm mais longo, em malha única pela gaiola, com o topo plano até a parede de trás",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 11.",
-          "anel: superficie em contorno do disco, face frontal",
-          "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
-          "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
-        ],
-        "analise": "feita"
-      }
+      ]
     },
     {
       "instancia": "braco",
