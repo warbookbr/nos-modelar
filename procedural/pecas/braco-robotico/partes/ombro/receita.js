@@ -1,16 +1,22 @@
-/* braco-robotico/ombro — volta ao desenho aceito pela pessoa em 2026-09-29
- * (receita do commit ec06c461) no tamanho da opção B de 2026-11-03: 190 mm de
- * largura, eixo da junta a 115 mm da boca de baixo e topo a 210 mm.
+/* braco-robotico/ombro — o corpo é UMA malha contínua, por subdivisão de uma gaiola.
  *
- * O corpo é a união de dois lofts. A parte de pé sobe da boca de baixo, com a
- * frente recuada em relação à parte deitada (o degrau em L). A parte deitada
- * atravessa o topo de trás até a saída redonda, de raio igual à meia largura,
- * por isso nada da saída sobra por baixo nem bate na frente da parte de pé. Na
- * faixa junto ao anel a seção passa de quase quadrada a redonda crescendo o
- * raio dos cantos em muitas estações, em vez de
- * duas seções longas. O encontro de baixo, entre a frente da parte de pé e a
- * face de baixo da parte deitada, leva um arredondamento leve. O anel é uma
- * faixa fina escura que encosta na face da saída sem entrar nela.
+ * Decisão da pessoa em 2026-11-05: o corpo deixa de ser dois lofts unidos com o encontro arredondado depois, porque a
+ * emenda da união deixava uma faixa de sombra inclinada e uma lasca junto ao anel. A forma de fora é a de antes: 190 mm
+ * de largura, 220 de comprimento na direção da junta (+Z), eixo da saída a 115 mm da boca de baixo, topo a 210, parte de
+ * pé com quinas de 75 mm em planta e frente recuada 30 mm da parte deitada (o degrau do L), cantos de 32 mm na seção da
+ * parte deitada e saída redonda do diâmetro da largura na face da frente.
+ *
+ * A gaiola é uma só, em anéis: cada anel é o contorno da peça cortada por um plano x = constante, um laço em L com o mesmo
+ * número de pontos em todos os planos. O laço sobe pela parede de trás, corre pelo topo até a saída, desce pela face da
+ * saída, volta pela face de baixo da parte deitada, sobe a curva do encontro, desce pela frente do pé e volta pelo fundo.
+ * Assim cada linha da malha corre do pé à parte deitada sem corte, e o que muda de um plano a outro é só a posição dos
+ * pontos: as quinas de 75 mm em planta, os cantos de 32 mm da seção, a seção que vira redonda na saída e o degrau do L.
+ * A curva côncava do encontro de baixo é um quarto de elipse de `avancoDoEncontro` por `alturaDoEncontro` posto nos
+ * próprios pontos do laço, e não uma operação depois. As duas paredes de lado, em x = ±meiaLargura, fecham o sólido com uma
+ * escada de faces entre a cadeia de fora e a de dentro do L. Vinco vivo na borda de baixo e na borda da saída; o resto é
+ * liso.
+ *
+ * O anel é uma faixa fina escura, por revolução, que encosta na face da saída sem entrar nela.
  *
  * Portas:
  *   apoio        — anel, eixo +Y, centro no meio da boca de baixo, borda de
@@ -27,59 +33,44 @@ export const TABELA = {
   /* Meia largura da seção de cima: 190 mm de largura. O topo fica em
      alturaDoEixo + meiaLargura = 210 mm. */
   meiaLargura: 95,
-  /* Raio dos cantos da seção quase quadrada, igual na parte de pé e na
-     deitada. */
+  /* Raio dos cantos da seção quase quadrada da parte deitada. */
   raioDosCantos: 32,
   /* Quanto a frente da parte de pé fica recuada em relação à frente da parte
      deitada: o degrau do L. */
   recuoDaFrente: 30,
   /* Quanto o L inteiro se estende para a frente além do quadrado de 190 mm
      (decisão da pessoa em 2026-11-05: o ombro mais longo na direção da
-     junta, com a traseira no lugar). A frente da parte de pé, a da parte
-     deitada, o anel e a coluna avançam o mesmo tanto, e o degrau do L fica
-     igual. */
+     junta, com a traseira no lugar). */
   alongamento: 30,
   /* Trecho do braço, antes da saída, em que a seção passa de quase quadrada a
-     redonda, com o raio dos cantos crescendo até o círculo. */
+     redonda. */
   transicaoDaSaida: 45,
   /* Anel da junta: faixa fina, mesmo raio da saída. */
   espessuraDoAnel: 28,
-  /* Raio da concordância no encontro de baixo entre a frente da parte de pé e
-     a parte deitada. */
-  raioDoEncontro: 0,
-  /* Curva do encontro de baixo feita no próprio loft da parte de pé: um quarto
-     de elipse côncavo que sai da frente do pé, vertical, e chega à face de
-     baixo da parte deitada, horizontal. `avancoDoEncontro` é quanto ela
-     avança para a frente e `alturaDoEncontro`, quanto sobe; o pé abaixo dela
-     fica como estava, dentro do anel da cintura. */
+  /* Curva do encontro de baixo, nos pontos da gaiola: um quarto de elipse
+     côncavo que sai da frente do pé, vertical, e chega à face de baixo da
+     parte deitada, horizontal. `avancoDoEncontro` é quanto ela avança para a
+     frente e `alturaDoEncontro`, quanto sobe. */
   avancoDoEncontro: 12,
   alturaDoEncontro: 12,
-  estacoesDoEncontro: 12,
-  chanfroDoPescoco: 2,
-  /* Estações da transição quadrado-redondo. */
-  estacoesDaSaida: 9,
-  /* Seções intermediárias de cada loft, para os triângulos da emenda ficarem
-     curtos: triângulo longo faz o sombreamento suave virar degrau. */
-  estacoes: 5,
   /* Raio das duas quinas de trás, em planta. */
   raioDaTraseira: 75,
   /* Raio das duas quinas da frente da parte de pé, em planta (decisão da
-     pessoa em 2026-11-05: com o alongamento elas passavam 13 mm além do anel
-     da cintura; com 75 mm ficam dentro dele, como as de trás). */
+     pessoa em 2026-11-05: ficam dentro do anel da cintura, como as de trás). */
   raioDaFrenteDoPe: 75,
-  /* Estações das quinas de trás da parte deitada. */
-  estacoesDaTraseira: 24,
+  /* Gaiola: planos de corte por quarto de quina do pé e por quarto de canto
+     da seção, e níveis da subdivisão. */
+  estacoesDaQuina: 6,
+  estacoesDoCanto: 4,
+  niveis: 2,
+  /* Lados da revolução do anel. */
   lados: 48,
 };
 
 export const MATERIAIS = { anelEscuro: { cor: '#4a4d52', aspereza: 0.45 } };
 
 const m = (mm) => mm / 1000;
-/* `n` valores igualmente espaçados estritamente entre `de` e `ate`. */
-const entre = (de, ate, n) => Array.from({ length: n }, (_, k) => de + ((ate - de) * (k + 1)) / (n + 1));
-/* A parte de pé é 0,3 mm mais estreita que a deitada. */
-const folga = 0.0003;
-const ID = { coluna: 100, anel: 200, braco: 300, corpo: 400, concordancia: 500 };
+const ID = { corpo: 400, anel: 200 };
 
 export function derivar(t = TABELA) {
   const R = m(t.raioDoPescoco);
@@ -88,181 +79,211 @@ export function derivar(t = TABELA) {
   /* A frente da parte deitada e a saída ficam em z = h + alongamento. */
   const zFace = h + m(t.alongamento);
   const zTransicao = zFace - m(t.transicaoDaSaida);
-  /* A saída redonda tem o diâmetro da largura do bloco (raio = meia largura):
-     nada dela sobra por baixo nem pelos lados. */
+  /* A saída redonda tem o diâmetro da largura do bloco (raio = meia largura). */
   const Rs = h;
   const Ra = Rs;
   const e = m(t.espessuraDoAnel);
-  const c = m(t.chanfroDoPescoco);
-  return { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, c };
+  return { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, ...gaiola(t) };
 }
 
-/* Retângulo de meio lado `r` com cantos de raio `rc`, com `lados` pontos
-   (quatro arcos de lados/4 pontos, com um lado plano entre cada dois). Com
-   rc = r é o círculo. */
-function quadrado(r, rc, lados) {
-  const por = lados / 4;
-  const pts = [];
-  for (let q = 0; q < 4; q++) {
-    const cx = (r - rc) * Math.sign(Math.cos(q * Math.PI / 2 + Math.PI / 4));
-    const cy = (r - rc) * Math.sign(Math.sin(q * Math.PI / 2 + Math.PI / 4));
-    for (let k = 0; k < por; k++) {
-      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
-      pts.push([cx + rc * Math.cos(th), cy + rc * Math.sin(th)]);
-    }
-  }
-  return pts;
-}
+const pot = (v) => v ** -6;
+/* mínimo suave entre dois raios: nenhum dos dois é passado */
+const minimoSuave = (a, b) => (pot(a) + pot(b)) ** (-1 / 6);
 
-/* Retângulo de meia largura `w` e meia altura `a`, com cantos de raio `rc`,
-   no mesmo sentido e com o mesmo número de pontos do `quadrado`. */
-function retangulo(w, a, rc, lados) {
-  const por = lados / 4;
-  const pts = [];
-  for (let q = 0; q < 4; q++) {
-    const cx = (w - rc) * Math.sign(Math.cos(q * Math.PI / 2 + Math.PI / 4));
-    const cy = (a - rc) * Math.sign(Math.sin(q * Math.PI / 2 + Math.PI / 4));
-    for (let k = 0; k < por; k++) {
-      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
-      pts.push([cx + rc * Math.cos(th), cy + rc * Math.sin(th)]);
-    }
-  }
-  return pts;
-}
+/* A gaiola, em milímetro até o fim, e em metro nos pontos que saem.
+ *
+ * Cada anel é o contorno da peça cortada por um plano x = constante: um laço em L de `n` pontos, que sobe pela parede de
+ * trás, corre pelo topo até a saída, desce pela face da saída, volta pela face de baixo da parte deitada, sobe a curva do
+ * encontro, desce pela frente do pé e volta pelo fundo. O laço tem o mesmo número de pontos em todos os planos, então cada
+ * linha da malha corre do pé à saída sem corte, e o que muda de um plano a outro é a posição dos pontos: as quinas de 75 mm
+ * em planta, os cantos da seção, a seção que vira redonda e a curva do encontro saem todos da posição dos pontos. As duas
+ * paredes de lado, em x = ±meiaLargura, fecham o sólido com uma escada de faces entre a cadeia de fora e a de dentro do L. */
+function gaiola(t) {
+  const L = t.meiaLargura;
+  const yE = t.alturaDoEixo;
+  const zFace = L + t.alongamento;
+  const zT = zFace - t.transicaoDaSaida;
+  const zf0 = zFace - t.recuoDaFrente;
+  const rcA = t.raioDosCantos;
+  const rf = t.raioDaFrenteDoPe;
+  const rq = t.raioDaTraseira;
+  const dz = t.avancoDoEncontro;
+  const alt = t.alturaDoEncontro;
+  const yInterno = yE - L;
+  const y0 = yInterno - alt;
 
-/* Círculo com `lados` pontos, no mesmo sentido e com o mesmo número de pontos
-   do retângulo, para a transição misturar ponto a ponto. */
-function redondo(r, lados) {
-  return Array.from({ length: lados }, (_, k) => [r * Math.cos((2 * Math.PI * k) / lados), r * Math.sin((2 * Math.PI * k) / lados)]);
-}
+  const S = (z) => (z <= zT ? 0 : z >= zFace ? 1 : 0.5 - 0.5 * Math.cos((Math.PI * (z - zT)) / (zFace - zT)));
+  /* meia largura da parte deitada em z: a traseira acompanha o arco das quinas em planta */
+  const larg = (z) => (z >= -L + rq ? L : L - rq + Math.sqrt(Math.max(0, rq * rq - (z + L - rq) ** 2)));
+  /* raio dos cantos da seção em z: cresce até o círculo na saída; na traseira não passa da largura menos 2 mm */
+  const raioDaSecao = (z) => {
+    const pre = rcA + (L - rcA) * S(z);
+    const w = larg(z);
+    return w < L - 1e-9 ? minimoSuave(pre, w - 2) : pre;
+  };
+  /* altura do topo da parte deitada em (x, z); a de baixo é a espelhada em torno do eixo */
+  const yTopo = (x, z) => {
+    const w = larg(z);
+    const r = raioDaSecao(z);
+    const c = w - r;
+    const ax = Math.abs(x);
+    return ax <= c ? yE + L : yE + L - r + Math.sqrt(Math.max(0, r * r - (ax - c) ** 2));
+  };
+  const yFundo = (x, z) => 2 * yE - yTopo(x, z);
+  /* quinas em planta: atrás e na frente do pé */
+  const zTras = (x) => { const ax = Math.abs(x); const c = L - rq; return ax > c ? -L + rq - Math.sqrt(Math.max(0, rq * rq - (ax - c) ** 2)) : -L; };
+  const zFrente = (x) => { const ax = Math.abs(x); const c = L - rf; return ax > c ? zf0 - rf + Math.sqrt(Math.max(0, rf * rf - (ax - c) ** 2)) : zf0; };
 
-/* Seção da parte de pé: frente plana em z = zf com os dois cantos arredondados
-   no raio `rc` em planta (era o raio dos cantos da parte deitada; desde
-   2026-11-05 é o raio da frente do pé, para caber no anel da cintura) e lado
-   de trás reto, com as duas
-   quinas de trás arredondadas no raio `rq` em planta (decisão da pessoa em
-   2026-11-04: as quinas passavam 29 mm além do anel da cintura; com 75 mm
-   ficam 1,7 mm para dentro dele). */
-function contornoColuna(r, rc, lados, zf, rq) {
-  const pts = [];
-  const por = lados / 4;
-  for (let q = 0; q < 2; q++) {
-    const cx = (r - rc) * (q === 0 ? 1 : -1);
-    for (let k = 0; k < por; k++) {
-      const th = q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
-      pts.push([cx + rc * Math.cos(th), zf - rc + rc * Math.sin(th)]);
+  /* planos de corte, de x = -L a x = L: pelos arcos das quinas e dos cantos, e alguns no trecho reto de trás */
+  const lista = [];
+  /* o domo da traseira: na parede de trás a seção tem meia largura L - rq e o canto cai de uma vez, em arco */
+  const rTras = minimoSuave(rcA, L - rq - 2);
+  lista.push(0);
+  for (let k = 1; k <= 4; k++) lista.push(L - rq - rTras + rTras * Math.sin((Math.PI / 2) * (k / 4)));
+  for (let k = 1; k <= t.estacoesDaQuina; k++) lista.push(L - rq + rq * Math.sin((Math.PI / 2) * (k / t.estacoesDaQuina)));
+  for (let k = 0; k <= t.estacoesDoCanto; k++) lista.push(L - rcA + rcA * Math.sin((Math.PI / 2) * (k / t.estacoesDoCanto)));
+  lista.sort((p, q) => p - q);
+  const metade = [];
+  for (const x of lista) {
+    if (!metade.length || x - metade[metade.length - 1] > 2.5) metade.push(x);
+    else if (Math.abs(x - L) < 1e-9) metade[metade.length - 1] = x;
+  }
+  metade[metade.length - 1] = L;
+  const planos = [...metade.slice(1).reverse().map((x) => -x), ...metade];
+
+  const taus = [0, 0.015, 0.05, 0.12, 0.25, 0.45, 0.7];
+  const nTrans = 6;
+  const nBaixo = 9;
+  const nCurva = 6;
+  const aneis = planos.map((x) => {
+    const zr = zTras(x);
+    const yp = yTopo(x, zr);
+    const zfx = zFrente(x);
+    const zEnc = zfx + dz;
+    const yFim = yFundo(x, zEnc);
+    const fora = [[zr, 0]];
+    for (const f of [0.25, 0.5, 0.75]) fora.push([zr, yp * f]);
+    for (const tau of taus) { const z = zr + tau * (zT - zr); fora.push([z, yTopo(x, z)]); }
+    fora.push([zT, yTopo(x, zT)]);
+    for (let j = 1; j < nTrans; j++) { const z = zT + ((zFace - zT) * j) / nTrans; fora.push([z, yTopo(x, z)]); }
+    fora.push([zFace, yTopo(x, zFace)]);
+    const dentro = [[zfx, 0], [zfx, y0 / 2]];
+    for (let k = 0; k < nCurva; k++) {
+      const th = ((Math.PI / 2) * k) / (nCurva - 1);
+      dentro.push([zfx + dz * (1 - Math.cos(th)), y0 + (yFim - y0) * Math.sin(th)]);
+    }
+    for (let j = 1; j <= nBaixo; j++) {
+      const f = 1 - (1 - j / (nBaixo + 1)) ** 1.4;
+      const z = zEnc + (zFace - zEnc) * f;
+      dentro.push([z, yFundo(x, z)]);
+    }
+    dentro.push([zFace, yFundo(x, zFace)]);
+    const fundo = [0.25, 0.5, 0.75].map((f) => [zfx + (zr - zfx) * f, 0]);
+    return { x, fora, dentro, fundo };
+  });
+
+  const nO = aneis[0].fora.length;
+  const nB = aneis[0].fundo.length;
+  const pontosMm = {};
+  const nomeDe = (r, grupo, j) => `a${r}_${grupo}${j}`;
+  const ultimo = aneis.length - 1;
+  aneis.forEach((an, r) => {
+    an.fora.forEach(([z, y], j) => { pontosMm[nomeDe(r, 'o', j)] = [an.x, y, z]; });
+    an.dentro.forEach(([z, y], j) => {
+      /* na parede de lado a saída se fecha numa ponta: o ponto de cima e o de baixo são o mesmo */
+      if (j === nO - 1 && (r === 0 || r === ultimo)) return;
+      pontosMm[nomeDe(r, 'i', j)] = [an.x, y, z];
+    });
+    an.fundo.forEach(([z, y], j) => { pontosMm[nomeDe(r, 'b', j)] = [an.x, y, z]; });
+  });
+  const nm = (r, grupo, j) => ((grupo === 'i' && j === nO - 1 && (r === 0 || r === ultimo)) ? nomeDe(r, 'o', j) : nomeDe(r, grupo, j));
+  /* o laço em ordem: de fora (de trás à saída), de dentro (da saída ao pé) e o fundo (da frente do pé à traseira) */
+  const laco = (r) => [
+    ...Array.from({ length: nO }, (_, j) => nm(r, 'o', j)),
+    ...Array.from({ length: nO }, (_, j) => nm(r, 'i', nO - 1 - j)),
+    ...Array.from({ length: nB }, (_, j) => nm(r, 'b', j)),
+  ];
+  const limpa = (f) => {
+    const g = f.filter((v, k) => v !== f[(k + 1) % f.length]);
+    return g.length >= 3 ? g : null;
+  };
+  const tiras = [];
+  for (let r = 0; r < ultimo; r++) {
+    const a = laco(r);
+    const b = laco(r + 1);
+    for (let q = 0; q < a.length; q++) {
+      const f = limpa([a[q], a[(q + 1) % a.length], b[(q + 1) % a.length], b[q]]);
+      if (f) tiras.push(f);
     }
   }
-  for (let q = 0; q < 2; q++) {
-    const cx = (r - rq) * (q === 0 ? -1 : 1);
-    for (let k = 0; k < por; k++) {
-      const th = Math.PI + q * Math.PI / 2 + (Math.PI / 2) * (k / (por - 1));
-      pts.push([cx + rq * Math.cos(th), -(r - rq) + rq * Math.sin(th)]);
-    }
-  }
-  return pts;
+  const paredes = [];
+  const parede = (r) => {
+    const fs = [];
+    fs.push([nm(r, 'o', 0), nm(r, 'o', 1), nm(r, 'i', 1), nm(r, 'i', 0), ...Array.from({ length: nB }, (_, j) => nm(r, 'b', j))]);
+    for (let j = 1; j < nO - 1; j++) fs.push([nm(r, 'o', j), nm(r, 'o', j + 1), nm(r, 'i', j + 1), nm(r, 'i', j)]);
+    return fs.map(limpa).filter(Boolean);
+  };
+  const p0 = parede(0);
+  const p1 = parede(ultimo);
+  /* orientação: normais para fora; a das tiras confere pelo volume, as das paredes pelo sinal de x */
+  const normal = (f) => {
+    let nx = 0; let ny = 0; let nz = 0;
+    f.forEach((v, k) => {
+      const [x1, y1, z1] = pontosMm[v];
+      const [x2, y2, z2] = pontosMm[f[(k + 1) % f.length]];
+      nx += (y1 - y2) * (z1 + z2); ny += (z1 - z2) * (x1 + x2); nz += (x1 - x2) * (y1 + y2);
+    });
+    return [nx, ny, nz];
+  };
+  const orienta = (fs, sx) => fs.map((f) => (normal(f)[0] * sx > 0 ? f : [...f].reverse()));
+  /* a tira do topo reto, no plano do meio, deve apontar para +y */
+  const tiraDoTopo = tiras.find((f) => f.every((v) => Math.abs(pontosMm[v][1] - (yE + L)) < 1e-9 && Math.abs(pontosMm[v][0]) < 1e-9 + 10));
+  const tirasOk = tiraDoTopo && normal(tiraDoTopo)[1] < 0 ? tiras.map((f) => [...f].reverse()) : tiras;
+  const faces = [...tirasOk, ...orienta(p0, -1), ...orienta(p1, 1)];
+
+  const pontos = {};
+  for (const [k, v] of Object.entries(pontosMm)) pontos[k] = v.map(m);
+  const rs = Array.from({ length: aneis.length }, (_, r) => r);
+  const nomeSeq = (lista2) => lista2.filter((v, k, arr) => v !== arr[k - 1]);
+  const fundoDe = (r) => [nm(r, 'i', 0), ...Array.from({ length: nB }, (_, j) => nm(r, 'b', j)), nm(r, 'o', 0)];
+  const bordaDeBaixo = nomeSeq([
+    ...rs.map((r) => nm(r, 'o', 0)),
+    ...fundoDe(ultimo).reverse().slice(1),
+    ...[...rs].reverse().map((r) => nm(r, 'i', 0)).slice(0),
+    ...fundoDe(0).slice(1),
+  ]);
+  const bordaDaSaida = nomeSeq([...rs.map((r) => nm(r, 'o', nO - 1)), ...[...rs].reverse().map((r) => nm(r, 'i', nO - 1))]);
+  if (bordaDaSaida[bordaDaSaida.length - 1] !== bordaDaSaida[0]) bordaDaSaida.push(bordaDaSaida[0]);
+  const vincos = [
+    { nome: 'bordaDeBaixo', pontos: bordaDeBaixo, nitidez: 'viva' },
+    { nome: 'bordaDaSaida', pontos: bordaDaSaida, nitidez: 'viva' },
+  ];
+  const raioDoPe = Math.max(...aneis.flatMap((an) => [Math.hypot(an.x, an.dentro[0][0]), Math.hypot(an.x, an.fora[0][0])]));
+  return { pontos, passo: { vertices: Object.keys(pontos), faces, vincos }, raioDoPe: m(raioDoPe) };
 }
 
 export function gerarPassos(t = TABELA) {
-  const { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, c } = derivar(t);
+  const { yEixo, zFace, Ra, e, passo, raioDoPe } = derivar(t);
   const L = t.lados;
-  const rc = m(t.raioDosCantos);
-  const sec = (pos, rr) => ({ pos, contorno: quadrado(h, rr, L) });
-  const zf = h + m(t.alongamento) - m(t.recuoDaFrente);
-  /* A parte de pé é 0,3 mm mais estreita que a deitada: paredes coplanares
-     quebram a união. */
-  const rq = m(t.raioDaTraseira);
-  const rf = m(t.raioDaFrenteDoPe);
-  const secColuna = (y, r, avanco = 0) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rf, r - folga), L, (zf + avanco) * (r - folga) / h, Math.min(rq, r - folga)) });
-  /* Curva do encontro de baixo: sobe até a face de baixo da parte deitada
-     (yb), 1 mm para dentro dela. */
-  const yb = yEixo - h + 0.001;
-  const y0 = yb - m(t.alturaDoEncontro);
-  const dz = m(t.avancoDoEncontro);
-  const curva = Array.from({ length: t.estacoesDoEncontro }, (_, k) => {
-    const u = (k + 1) / (t.estacoesDoEncontro + 1);
-    return secColuna(y0 + (yb - y0) * u, h, dz * (1 - Math.sqrt(1 - u * u)));
-  });
-  /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a frente
-     recuada, e termina dentro da parte deitada. */
-  const coluna = [
-    { pos: [0, 0, 0], raio: 0 },
-    secColuna(0.0004, h - c),
-    secColuna(c, h),
-    ...entre(c, y0, t.estacoes).map((y) => secColuna(y, h)),
-    secColuna(y0, h),
-    ...curva,
-    secColuna(yb, h, dz),
-    ...entre(yb, yEixo - 0.0004, 2).map((y) => secColuna(y, h, dz)),
-    secColuna(yEixo - 0.0004, h, dz),
-    { pos: [0, yEixo, 0], raio: 0 },
-  ];
-  /* Parte deitada: atravessa o topo de trás até a saída redonda. Na
-     transição o raio dos cantos cresce de rc até a meia largura (círculo),
-     com o lado constante, em estações de subida suave (cosseno). A saída
-     termina reta, sem chanfro, para o anel encostar sem linha de luz. */
-  const ns = t.estacoesDaSaida;
-  const transicao = [];
-  for (let k = 1; k <= ns; k++) {
-    const f = k / (ns + 1);
-    const s = 0.5 - 0.5 * Math.cos(Math.PI * f);
-    const z = zTransicao + (zFace - 0.0004 - zTransicao) * f;
-    const q0 = quadrado(h, rc, L);
-    const q1 = redondo(Rs, L);
-    transicao.push({ pos: [0, yEixo, z], contorno: q0.map((p, i) => [p[0] + (q1[i][0] - p[0]) * s, p[1] + (q1[i][1] - p[1]) * s]) });
-  }
-  /* Quinas de trás da parte deitada, em planta: nos últimos `rq` antes da
-     traseira a largura acompanha o arco das quinas (meia largura
-     h - rq + rq sen ψ, em z = -h + rq - rq cos ψ). */
-  const nt = t.estacoesDaTraseira;
-  const traseira = [];
-  for (let k = 0; k <= nt; k++) {
-    const psi = (Math.PI / 2) * (k / nt);
-    const w = h - rq + rq * Math.sin(psi);
-    /* a seção estreita na largura e mantém o canto de cima redondo no raio rc,
-       sem achatar: achatado, ele marcava a quina de trás vista de cima. Onde a
-       seção fica mais estreita que o canto, o raio do canto cai aos poucos (o
-       mínimo suave entre rc e a meia largura menos 2 mm): cortado de uma vez,
-       marcava uma dobra no topo; igual à meia largura, deixava dois cantos no
-       mesmo ponto, face sem área, e a união não fechava. */
-    traseira.push({ pos: [0, yEixo, -h + rq - rq * Math.cos(psi)], contorno: retangulo(w, h, (rc ** -6 + (w - 0.002) ** -6) ** (-1 / 6), L) });
-  }
-  const braco = [
-    { pos: [0, yEixo, -h - 0.0004], raio: 0 },
-    ...traseira,
-    ...entre(-h + rq, zTransicao, t.estacoes).map((z) => sec([0, yEixo, z], rc)),
-    sec([0, yEixo, zTransicao], rc),
-    ...transicao,
-    { pos: [0, yEixo, zFace - 0.0004], contorno: redondo(Rs, L) },
-    { pos: [0, yEixo, zFace], raio: 0 },
-  ];
-  const corpo = { origem: { op: 'unir', id: ID.corpo } };
-  const concordancia = { origem: { op: 'arredondarCostura', id: ID.concordancia } };
+  const corpo = { origem: { op: 'subdivisao', id: ID.corpo } };
   const passos = [];
-  passos.push(['loft', { origemId: ID.coluna, secoes: coluna, lados: L, orientacao: [1, 0, 0] }]);
-  passos.push(['loft', { origemId: ID.braco, secoes: braco, lados: L, orientacao: [1, 0, 0] }]);
-  passos.push(['unir', { origemId: ID.corpo, solidos: [{ origem: { op: 'loft', id: ID.coluna } }, { origem: { op: 'loft', id: ID.braco } }] }]);
-  if (t.raioDoEncontro > 0) passos.push(['arredondarCostura', { origemId: ID.concordancia, de: { op: 'unir', id: ID.corpo }, raio: m(t.raioDoEncontro), raioMinimo: 0.003, regiao: { min: [-1, -1, -0.005], max: [1, yEixo + 0.005, 1] } }]);
+  passos.push(['subdivisao', { origemId: ID.corpo, ...passo, niveis: t.niveis }]);
   passos.push(['parte', { nome: 'pescoco', sel: corpo }]);
-  if (t.raioDoEncontro > 0) passos.push(['parte', { nome: 'pescoco', sel: concordancia }]);
   passos.push(['lathe', {
     origemId: ID.anel, eixo: 'z', lados: L, em: [0, yEixo, zFace],
     perfil: [[0, 0], [Ra, 0], [Ra, e], [0, e]],
   }]);
   passos.push(['parte', { nome: 'anel', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
   passos.push(['material', { usa: 'anelEscuro', sel: { origem: { op: 'lathe', id: ID.anel } } }]);
-  /* o ponto do pé mais longe do eixo, tirado do próprio contorno da parte de pé; a porta é a faixa de contato de 10 mm junto a ele, que a junta com o anel cobra */
-  const raioDoPe = Math.max(...contornoColuna(h - folga, Math.min(rf, h - folga), L, zf * (h - folga) / h, Math.min(rq, h - folga)).map(([u, v]) => Math.hypot(u, v)));
+  /* o ponto do pé mais longe do eixo, tirado do anel de baixo da gaiola; a porta é a faixa de contato de 10 mm junto a ele, que a junta com o anel cobra */
   passos.push(['publicarPorta', {
-    nome: 'apoio', de: { op: 'unir', id: ID.corpo },
+    nome: 'apoio', de: corpo.origem,
     interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: raioDoPe - 0.010, raioExterno: raioDoPe, inicio: 0, fim: 0.005 },
   }]);
   passos.push(['publicarPorta', {
     nome: 'juntaDoOmbro', de: { op: 'lathe', id: ID.anel },
     interface: { forma: 'cilindro', papel: 'externa', eixo: [0, 0, 1], centro: [0, yEixo, zFace + e], raio: Ra, inicio: 0, fim: 0.005 },
   }]);
-  passos.push(['liso', { sel: corpo, angulo: 20 }]);
-  if (t.raioDoEncontro > 0) passos.push(['liso', { sel: concordancia, angulo: 20 }]);
   passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.anel } }, angulo: 45 }]);
   return passos;
 }
@@ -271,13 +292,13 @@ const receita = {
   meta: { nome: 'braco-robotico/ombro', desc: 'ombro: L de ponta-cabeça de 190 por 220 mm, frente de pé recuada, saída redonda e anel fino' },
   PARAMS: TABELA,
   MATERIAIS,
-  TOPO: { origem: 'centro da boca de baixo do pescoço; y para cima, a saída para +Z' },
+  get TOPO() { return { origem: 'centro da boca de baixo do pescoço; y para cima, a saída para +Z', ...derivar(this.PARAMS).pontos }; },
   PLANO: {
     objeto: 'ombro do braço robótico: gira com a cintura e carrega a junta do ombro, de eixo horizontal',
     referencias: ['../../referencias/frontal.contornos.json'],
     escala: { medida: 'diâmetro do anel da cintura, onde o pé assenta', milimetros: 210 },
     partes: [
-      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm de largura por 220 de comprimento na direção da junta: parte de pé com a frente recuada 30 mm da deitada, quinas de 75 em planta, saída redonda do diâmetro da largura; eixo a 115, topo a 210', tecnica: 'dois lofts de retângulo de cantos arredondados de mesmo raio; seção vira redonda crescendo o raio dos cantos em várias estações; arredondarCostura no encontro de baixo; liso com ângulo' },
+      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm de largura por 220 de comprimento na direção da junta: parte de pé com a frente recuada 30 mm da deitada, quinas de 75 em planta, saída redonda do diâmetro da largura; eixo a 115, topo a 210', tecnica: 'uma malha contínua por subdivisao de gaiola de anéis do pé à saída; seção de cantos arredondados que vira redonda; curva do encontro de baixo nos pontos da gaiola; vincos vivos na borda de baixo e na borda da saída' },
       { nome: 'anel', forma: 'faixa fina de uns 28 mm, eixo Z, com o mesmo diâmetro da saída (190 mm), encostada na face da saída sem entrar nela, escura', tecnica: 'revolução com perfil' },
     ],
     criteriosDeReprovacao: [
