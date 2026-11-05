@@ -10,6 +10,7 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
+- [Esboço pelo núcleo](./2026-11-05-esboco-pelo-nucleo.md) foi concluído em 2026-11-05: o esboço antigo saiu e o 2.0 faz cada opção de forma como receita do núcleo, em milímetros, com posição sem conta, relato de contatos e variantes de receita lado a lado; a conferência do avião passou a ler as formas gravadas, igual à de antes.
 - [Navegação de receitas](./2026-11-05-navegacao-de-receitas.md) foi concluído em 2026-11-05: o comando `receita:mapa` para qualquer receita, a convenção de dividir acima de 1.000 linhas e a receita do furgão em oito arquivos com a malha igual; um modelador de estudo leu cerca de 30 KB da receita contra 81 KB da linha de base.
 - [Abertura de contorno livre](./2026-11-05-abertura-de-contorno-livre.md) foi concluído em 2026-11-05: a operação `aberturaPorContorno` corta a chapa de subdivisão por um contorno desenhado numa vista, com a costura limpa, a aba pelo `friso`, a lente recuada e o vão na conferência de moldura; na peça de teste as bordas ficam a 0,125 mm do desenho.
 - [Sólido por laços](./2026-11-05-solido-por-lacos.md) foi concluído em 2026-11-05: o ajudante `gaiolaPorLacos` monta a gaiola fechada de uma peça pelo contorno em cada plano, com recusa das medidas em todos os pontos e dos planos próximos demais, aviso de amostragem desigual e compensação do canto; a peça de teste refaz o corpo do ombro do braço a até 0,431 mm.

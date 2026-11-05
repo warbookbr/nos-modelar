@@ -1,6 +1,6 @@
 # Esboço 2D: o que era, o que ensinou e como recriar
 
-O esboço antigo (`modulos/esboco/`) saiu do repositório em 2026-11-05, na fatia 4 do plano [esboço pelo núcleo](../planos/2026-11-05-esboco-pelo-nucleo.md), por decisão da pessoa do mesmo dia. No lugar dele ficou o esboço 2.0 ([`modulos/esboco-nucleo/`](../../../modulos/esboco-nucleo/README.md)), em que cada opção de forma é uma pequena receita do núcleo, e as variantes de receita, que trocam valores da `TABELA` de uma peça que já existe.
+O esboço antigo (`modulos/esboco/`) saiu do repositório em 2026-11-05, na fatia 4 do plano [esboço pelo núcleo](../planos/encerrados/2026-11-05-esboco-pelo-nucleo.md), por decisão da pessoa do mesmo dia. No lugar dele ficou o esboço 2.0 ([`modulos/esboco-nucleo/`](../../../modulos/esboco-nucleo/README.md)), em que cada opção de forma é uma pequena receita do núcleo, e as variantes de receita, que trocam valores da `TABELA` de uma peça que já existe.
 
 ## O que era
 

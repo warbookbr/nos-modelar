@@ -74,7 +74,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md), [as partes do braço](docs/modelar/planos/2026-09-26-as-partes-do-braco.md) e [esboço pelo núcleo](docs/modelar/planos/2026-11-05-esboco-pelo-nucleo.md).
+Planos ativos: [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md) e [as partes do braço](docs/modelar/planos/2026-09-26-as-partes-do-braco.md).
 
 Já fecharam [ajustes no núcleo dos veículos](docs/modelar/planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](docs/modelar/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos

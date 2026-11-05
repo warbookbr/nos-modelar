@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `procedural/nucleo/operacoes/booleanas.js` no arredondamento da costura, `procedural/nucleo/operacoes/geradores-avancados.js` no limite de ids do lathe e do loft
+**Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`, `procedural/nucleo/operacoes/booleanas.js` no arredondamento da costura, `procedural/nucleo/operacoes/geradores-avancados.js` no limite de ids do lathe e do loft
 
 **Descongelado em:** 2026-11-03, por decisão da pessoa, que viu na bancada o ombro desproporcional ao resto do conjunto. Estava congelado desde 2026-09-29 para o esboço deixar de custar conta à mão; os planos do esboço e das ferramentas de modelagem que vieram antes fecharam.
 
@@ -11,7 +11,7 @@
 **Repositório e base:** `warbookbr/nos-modelar`, base na main em 2026-09-26, descongelado sobre o ramo de trabalho de 2026-11-03.
 
 
-Em 2026-11-05, com o braço parado, a pessoa deixou que a ferramenta de vistas do crítico (`vistas-para-critica.mjs`) passe ao plano do [esboço pelo núcleo](2026-11-05-esboco-pelo-nucleo.md) durante a migração do pacote do crítico; ela volta a este território quando aquele plano fechar.
+Em 2026-11-05, com o braço parado, a pessoa deixou que a ferramenta de vistas do crítico (`vistas-para-critica.mjs`) passe ao plano do [esboço pelo núcleo](encerrados/2026-11-05-esboco-pelo-nucleo.md) durante a migração do pacote do crítico; ela voltou a este território quando aquele plano fechou, em 2026-11-05.
 ## Problema observado
 
 O plano [o braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou com
