@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/variantes.mjs`, `docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/`
+**Território:** `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/variantes.mjs`, `docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/`, `tools/modelar/vistas-para-critica.mjs`, cedida pelo plano do braço
 
 **Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-05
 
