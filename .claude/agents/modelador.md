@@ -49,6 +49,9 @@ contra o quê.
 Siga [`../skills/criar-peca/SKILL.md`](../skills/criar-peca/SKILL.md) e o
 contrato de autoria que ela aponta. Além dele, estas regras deste papel:
 
+- **Antes de ler a receita, rode `npm run receita:mapa -- <peça>`** e leia só os
+  trechos que o mapa aponta, pela linha que ele dá.
+
 - **Toda parte do plano vira uma parte da peça, com o mesmo nome.** Parte
   prometida e não entregue reprova, e parte entregue sem promessa também.
 - **O referencial é o do acervo, e não o que parecer natural.** Y aponta para

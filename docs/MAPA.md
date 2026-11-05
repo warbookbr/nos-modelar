@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1765 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1776 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -355,6 +355,11 @@
 - `ROTEIRO.md` — Medida de leitura da leitura por demanda
 - `tarefa-corrigir.md` — Tarefa de corrigir
 - `tarefa-modelar.md` — Tarefa de modelar
+
+## docs/modelar/banco-de-provas/navegacao-de-receitas-2026-11-05/
+
+- `README.md` — Navegação de receitas, 2026-11-05
+- `hash-da-malha.mjs` — hash-da-malha.mjs — o hash da malha canônica de uma receita, para provar que a divisão em arquivos não muda nada.
 
 ## docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/
 
@@ -1558,6 +1563,16 @@
 
 - `receita.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 
+## procedural/pecas/furgao-realista/receita/
+
+- `forma.js` — furgao-realista, receita/forma.js — a forma da chapa em milímetro: os perfis da frente, de trás, a seção frontal e a planta (`forma`), os anéis horizontais e…
+- `gaiola.js` — furgao-realista, receita/gaiola.js — a gaiola da chapa (`derivar`): os anéis com as colunas, as faces, a cobertura do teto, o espelho, as voltas das portas e…
+- `geometria.js` — furgao-realista, receita/geometria.js — as contas que os outros assuntos usam: a conversão para metro, as curvas 2D em milímetro (o contorno com raios, o com…
+- `interior.js` — furgao-realista, receita/interior.js — o interior (etapa 5), todo dentro da chapa: o piso, a divisória, os dois bancos e o painel, cada um com o perfil que o…
+- `nomes.js` — furgao-realista, receita/nomes.js — os nomes das partes, que o PLANO, os PASSOS e os contatos citam: as listas por grupo (rodas, forros, abas, plástico, cris…
+- `plastico.js` — furgao-realista, receita/plastico.js — o plástico de baixo (etapa 3), por fora da chapa: a saia, as molduras e o alargamento dos arcos, o forro dos arcos e o…
+- `rodas.js` — furgao-realista, receita/rodas.js — a roda da família `roda-pneu`: o registro das famílias, a chamada pelo perfil da TABELA e a soma da base aos ids locais d…
+
 ## procedural/pecas/furgao-realista/referencias/
 
 - `alvo.md` — Alvo: furgao-realista
@@ -2583,6 +2598,8 @@
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
+- `mapa-da-receita.mjs` — mapa-da-receita.mjs — o mapa de uma receita do acervo, para ler só o trecho que se precisa.
+- `mapa-da-receita.test.mjs` — mapa-da-receita.test.mjs — o mapa de toda receita do acervo sai sem erro, cada linha citada tem o nome dito e a saída cabe numa tela
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `material-da-peca.mjs` — material-da-peca.mjs — imprime tudo que pertence a uma peça e onde está.
 - `material-da-peca.test.mjs` — material-da-peca.test.mjs — o retrato do espalhamento, antes de arrumar.

@@ -51,6 +51,10 @@ Um comando dá o mapa de qualquer receita do acervo (as seções da `TABELA`, as
 
 Se a divisão de uma receita mudar a malha, para e volta à pessoa.
 
+## Andamento
+
+As fatias 1 e 2 fecharam em 2026-11-05, com as provas em [`navegacao-de-receitas-2026-11-05/`](../banco-de-provas/navegacao-de-receitas-2026-11-05/README.md). Na linha de base, o modelador leu a receita do furgão em 235 chamadas e 889 KB, 81 KB em média por transcrição que a leu, e a leitura de receita ou peça foi 19,5% do que as ferramentas lhe devolveram. `npm run receita:mapa -- <peça>` dá o mapa das 56 receitas do acervo, o teste confere a linha de cada nome citado e as 80 linhas, e o do furgão tem 75 linhas. A convenção divide a receita acima de 1.000 linhas e ficou no README das provas, porque o guia que o roteiro de peça nova lê está fora do território. A receita do furgão virou `receita.js` com 743 linhas e sete arquivos em `receita/`, com a malha canônica, os `PASSOS` e as declarações iguais antes e depois.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar.

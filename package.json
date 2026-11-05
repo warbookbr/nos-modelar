@@ -64,6 +64,7 @@
     "guarda:referencial": "node tools/modelar/guardas/guarda-referencial.mjs",
     "material": "node tools/modelar/material-da-peca.mjs",
     "descrever": "node tools/modelar/descrever-peca.mjs",
+    "receita:mapa": "node tools/modelar/mapa-da-receita.mjs",
     "forma:esboco": "node tools/modelar/forma-do-esboco.mjs",
     "receita:planejada": "node tools/modelar/receita-planejada.mjs",
     "parametros": "node tools/modelar/parametros-peca.mjs",
