@@ -1,5 +1,32 @@
 /* gaiola-por-rede.js — monta a gaiola da operação `subdivisao` a partir de uma rede de curvas nomeadas e dos retalhos que elas fecham
  *
+ * FICHA gaiolaPorRede
+ * serve: gaiola de chapa contínua cujas arestas seguem curvas de feição nomeadas, preenchida por retalhos entre elas.
+ * quando: a chapa tem feições que a grade de estações não acompanha (contorno de janela, arco de roda, cintura, borda de vão); em
+ *   chapa de seções regulares ao longo de um eixo use gaiolaPorEstacoes, e para uma faixa de seção constante use gaiolaVarrida.
+ * unidades: curvas e nós entram em mm; `pontos` sai em metro, para pôr em TOPO.
+ * campos:
+ *   curvas: [{ nome, pontos, fechada?, poligonal?, vinco?, peso?, exata?, passo? }] pontos são [x, y, z] ou o nome de um nó.
+ *   nos: { nome: [x, y, z] | { curva, fracao } } ponto nomeado onde curvas se encontram; o nó { curva, fracao } fica sobre uma curva.
+ *   retalhos: [{ nome, borda, divisoes? }] borda são as curvas (ou { curva, de?, ate? }) que fecham o retalho, de três a oito lados.
+ *   passo: espaçamento alvo da rede em mm, de onde saem as divisões que o retalho não declara.
+ *   anguloMax: maior desvio de direção, em graus, entre duas arestas seguidas de uma curva (15 por padrão).
+ *   fora: [x, y, z] o sentido para onde a chapa olha, que vira as faces.
+ *   leitura: true | { peso?, erro?, inclinacao?, estrito? } como em gaiolaPorEstacoes: as curvas vêm de imagem, com erro.
+ *   interior: peso da cota dos pontos de dentro dos retalhos (padrão 1); false os deixa sem cota.
+ *   liso: true (padrão), false ou { iteracoes, energia, ancora } alisa o miolo para a tangente não quebrar entre retalhos.
+ *   anguloDeCanto: desvio em graus a partir do qual o encontro de duas arestas de borda é canto vivo (35 por padrão).
+ *   cantos: nomes de nós que ficam canto vivo além dos achados.
+ *   simetria: 'x' declara a metade x >= 0, que o passo espelha.
+ *   prefixo: texto posto na frente do nome de todo ponto.
+ * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, ... }.
+ * exemplo:
+ *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
+ *     curvas: [{ nome: 'baixo', pontos: ['A', 'B'] }, { nome: 'direita', pontos: ['B', 'C'] }, { nome: 'cima', pontos: ['C', 'D'] }, { nome: 'esquerda', pontos: ['D', 'A'] }],
+ *     retalhos: [{ nome: 'placa', borda: ['baixo', 'direita', 'cima', 'esquerda'] }] })
+ * peça: procedural/nucleo/fixtures/gaiola-por-rede-prova.js (chapa lateral de prova, com janela em gota, arco de roda e coluna).
+ * FIM DA FICHA
+ *
  * Função pura, sem Three.js e sem domínio. Na modelagem de carroceria a superfície se define pelas curvas de feição (contorno da janela,
  * arco da roda, cintura, linha do teto, bordas dos vãos) e se preenche entre elas. A gaiola por estações é uma grade de fatias que essas
  * feições cruzam; aqui as arestas da gaiola SEGUEM as curvas. A receita declara as curvas e quais curvas fecham cada retalho; o ajudante

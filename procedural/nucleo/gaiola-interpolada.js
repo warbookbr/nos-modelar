@@ -1,5 +1,25 @@
 /* gaiola-interpolada.js — estações interpoladas e colunas por curva de seção, opções da gaiola por estações
  *
+ * FICHA gaiolaInterpolada
+ * serve: opções `curvas` e `interpolar` da gaiola por estações: poucas estações-chave valem por muitas, e as colunas saem de uma curva de seção.
+ * quando: a chapa muda devagar entre cortes e declarar cada estação à mão seria ruído; para estações todas declaradas use gaiolaPorEstacoes sem
+ *   essas opções. Chama-se pela definição de gaiolaPorEstacoes, e não existe como função de receita.
+ * unidades: as mesmas de gaiolaPorEstacoes (em de estação e de coluna em metro).
+ * campos:
+ *   interpolar: { passo? } a estação { nome, em } sem colunas é interpolada (PCHIP) entre as estações-chave; com passo gera as que faltam.
+ *   passo: espaçamento máximo, na unidade de `em`, das estações geradas; o intervalo que passa do dobro de um vizinho se divide ao meio.
+ *   curvas: [{ nome, colunas: [{ nome, fracao }] }] colunas a frações fixas do comprimento de uma curva de seção.
+ *   fracao: posição da coluna na curva, de 0 a 1 em ordem crescente.
+ *   chaves: true num seletor de cantos ou medidas marca só as estações-chave, porque a estação gerada não é citável.
+ * devolve: o mesmo que gaiolaPorEstacoes, com `estacoes: [{ nome, em, tipo }]` (tipo 'chave', 'interpolada', 'gerada' ou 'parcial').
+ * exemplo:
+ *   gaiolaPorEstacoes({ eixo: 'z', interpolar: { passo: 0.3 }, estacoes: [
+ *     { nome: 'p', em: 0, colunas: [{ nome: 'a', em: [1, 0] }, { nome: 'b', em: [1, 1] }] },
+ *     { nome: 'q', em: 0.1, colunas: [{ nome: 'a', em: [1, 0] }, { nome: 'b', em: [1, 1] }] },
+ *     { nome: 'r', em: 1, colunas: [{ nome: 'a', em: [1, 0] }, { nome: 'b', em: [1, 1] }] }] })
+ * peça: procedural/nucleo/fixtures/gaiola-interpolada-prova.js (chapa de prova com estações-chave e curva de seção).
+ * FIM DA FICHA
+ *
  * Função pura, sem Three.js e sem domínio. `gaiolaPorEstacoes` chama `expandirEstacoes` quando a definição declara
  * `interpolar` ou `curvas`, e recebe de volta estações comuns, com todas as colunas escritas; sem as duas opções, nada
  * aqui roda e a saída do ajudante é a de antes, byte a byte.

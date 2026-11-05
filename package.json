@@ -104,6 +104,7 @@
     "leitura:obrigatoria": "node tools/mapa/leitura-obrigatoria.mjs",
     "roteiros:gerar": "node tools/mapa/roteiros.mjs --gerar",
     "comecar": "node tools/modelar/comecar.mjs",
+    "capacidade": "node tools/modelar/capacidade.mjs",
     "medir:transcricao": "node tools/modelar/medir-transcricao.mjs",
     "uso": "node tools/modelar/uso.mjs",
     "diario": "node tools/modelar/ler-diario.mjs",

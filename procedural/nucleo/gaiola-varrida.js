@@ -1,5 +1,28 @@
 /* gaiola-varrida.js — a gaiola de uma superfície varrida: uma seção dada ao longo de um trilho dado, com estações, alargamento e recortes
  *
+ * FICHA gaiolaVarrida
+ * serve: gaiola de uma faixa de chapa de seção constante, varrida por um trilho (reta, arco ou polilinha), com estações por altura ou raio.
+ * quando: saia, borda, friso, régua, moldura ou arco, em que a seção é a mesma e o trilho é que anda; para uma chapa inteira com
+ *   seções que mudam use gaiolaPorEstacoes, e para feições que cortam a chapa use gaiolaPorRede.
+ * unidades: trilho, seção e estações entram em mm; `pontos` sai em metro, para pôr em TOPO.
+ * campos:
+ *   nome: prefixo dos pontos, que saem como `${nome}_${estacao}_${linha}`.
+ *   trilho: [{ reta: { de, ate } }, { arco: { centro, eixo, de, graus } }, ...] contíguos, ou { pontos: [[x, y, z], ...] }.
+ *   quadro: { u: [x, y, z] } ou { v: [x, y, z] }, com virar? para trocar o sinal do outro eixo; a seção vive no plano que a tangente atravessa.
+ *   secao: [[u, v] | { u, v, nome? }, ...] as linhas da superfície, de pelo menos duas, cada uma um ponto da seção.
+ *   estacoes: marcos { em } | { fracao } | { plano: { eixo, valor } } | { cilindro: { eixo, por, raio } }, com { entre: n } ou { passo: mm } entre eles.
+ *   fora: [x, y, z] ou { centro, semEixo? }: o lado para onde a chapa olha, que decide a normal das faces.
+ *   vincos: [{ linha, nitidez }] vinco ao longo de uma linha da seção.
+ *   remover: [{ estacoes: [marcoA, marcoB], linhas: [linhaA, linhaB] }] tira as células entre os marcos e as linhas citados.
+ *   alargamento: { campo: { cilindro }, perfil: [[d, u], ...], topoAberto?, rolada? } segunda superfície que alarga a seção em volta de um cilindro.
+ * devolve: { nome, vertices, faces, vincos, cantos, pontos, posicoes, nomeDe(estacao, linha), estacoes, linhas, comprimento }.
+ * exemplo:
+ *   gaiolaVarrida({ nome: 'regua', trilho: [{ reta: { de: [0, 0, 0], ate: [0, 0, 1000] } }], quadro: { u: [1, 0, 0] },
+ *     secao: [{ u: 0, v: 0, nome: 'baixo' }, { u: 0, v: 100, nome: 'cima' }],
+ *     estacoes: [{ fracao: 0 }, { passo: 100 }, { fracao: 1 }], fora: [1, 0, 0] })
+ * peça: procedural/pecas/furgao-realista/receita.js (saias e molduras dos arcos).
+ * FIM DA FICHA
+ *
  * Função pura, sem Three.js e sem domínio. A receita declara o trilho (segmentos de reta e de arco, ou uma polilinha), a seção (as linhas
  * da superfície, cada uma um ponto [u, v] em mm) e as estações (os cortes que atravessam as linhas); `gaiolaVarrida` devolve os pontos, as
  * faces e os vincos em nomes, no formato que o passo `subdivisao` aceita, como o fazem `gaiolaPorEstacoes` e `gaiolaPorRede`. A
