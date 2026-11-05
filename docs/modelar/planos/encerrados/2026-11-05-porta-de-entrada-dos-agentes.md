@@ -1,8 +1,8 @@
 # A porta de entrada dos agentes — o modelador acha como usar uma capacidade numa ficha curta, sem garimpar o código
 
-**Estado:** ativo
+**Estado:** concluído
 
-**Território:** `tools/modelar/capacidade.mjs`, `tools/modelar/capacidade.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/modelar-carroceria.md`, `.claude/skills/criar-peca/references/operacoes-procedurais.md`, `procedural/nucleo/gaiola-por-estacoes.js`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-interpolada.js`, `procedural/nucleo/gaiola-aneis.js`, `tools/modelar/vistas-de-passos.mjs`, `tools/modelar/comparar-silhueta.mjs`, `docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/`
+**Território:** `tools/modelar/capacidade.mjs`, `tools/modelar/capacidade.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/modelar-carroceria.md`, `.claude/skills/criar-peca/references/operacoes-procedurais.md`, `procedural/nucleo/gaiola-por-estacoes.js`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-interpolada.js`, `procedural/nucleo/gaiola-aneis.js`, `tools/modelar/vistas-de-passos.mjs`, `tools/modelar/comparar-silhueta.mjs`, `tools/modelar/conferir-pontos.mjs`, `docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/`
 
 **Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-05
 
@@ -10,7 +10,7 @@
 
 ## Problema observado
 
-Duas medições de 2026-11-05 chegaram ao mesmo achado; o script e os números estão nas [provas](../banco-de-provas/porta-de-entrada-2026-11-05/README.md). A primeira contou o texto que as 436 transcrições de agentes guardadas receberam das ferramentas: no modelador, 31% são imagens, cerca de 15% são leitura do código do núcleo e das ferramentas e 12% são documentação. O arquivo de código mais lido pelo modelador é `gaiola-por-estacoes.js`, com 477 KB somados, seguido do código das ferramentas que ele abria para achar as opções (`descrever-peca.mjs`, `vistas-de-passos.mjs`, `comparar-silhueta.mjs`, `guarda-acervo.mjs`). A segunda leu os quatro modeladores do braço: o da gaiola fez 26 chamadas e leu cerca de 112 mil caracteres, dois terços deles só para descobrir como se usa a gaiola, que está explicada em quatro lugares (a referência de operações da `criar-peca`, o `modelar-carroceria.md`, os cabeçalhos de três ou quatro arquivos do núcleo e a `carenagem-de-prova`). As ferramentas do projeto respondem bem; o gasto é de descoberta. O catálogo de capacidades cobre as operações do motor, mas não os ajudantes que montam a gaiola.
+Duas medições de 2026-11-05 chegaram ao mesmo achado; o script e os números estão nas [provas](../../banco-de-provas/porta-de-entrada-2026-11-05/README.md). A primeira contou o texto que as 436 transcrições de agentes guardadas receberam das ferramentas: no modelador, 31% são imagens, cerca de 15% são leitura do código do núcleo e das ferramentas e 12% são documentação. O arquivo de código mais lido pelo modelador é `gaiola-por-estacoes.js`, com 477 KB somados, seguido do código das ferramentas que ele abria para achar as opções (`descrever-peca.mjs`, `vistas-de-passos.mjs`, `comparar-silhueta.mjs`, `guarda-acervo.mjs`). A segunda leu os quatro modeladores do braço: o da gaiola fez 26 chamadas e leu cerca de 112 mil caracteres, dois terços deles só para descobrir como se usa a gaiola, que está explicada em quatro lugares (a referência de operações da `criar-peca`, o `modelar-carroceria.md`, os cabeçalhos de três ou quatro arquivos do núcleo e a `carenagem-de-prova`). As ferramentas do projeto respondem bem; o gasto é de descoberta. O catálogo de capacidades cobre as operações do motor, mas não os ajudantes que montam a gaiola.
 
 ## Resultado
 
@@ -59,4 +59,6 @@ Se a ficha precisar de um formato de comentário que obrigue a reescrever o cód
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-05. As fatias 1 a 4 entraram na main: a medição das transcrições nas [provas](../../banco-de-provas/porta-de-entrada-2026-11-05/README.md), o comando `npm run capacidade` com as fichas dos cinco ajudantes de gaiola, o `--ajuda` em `vistas-de-passos`, `comparar-silhueta` e, no fechamento, `conferir-pontos`, a linha do modelador e o histórico separado da instrução nos dois documentos lidos.
+
+A fatia 5 mediu um modelador real numa peça de estudo descartável, uma guitarra elétrica genérica, com o mesmo script. Ele usou a ficha como primeira parada. A leitura de código do núcleo e das ferramentas caiu de cerca de 39 KB por agente, a média da linha de base, para 28 KB, e o texto total recebido caiu de 262 KB para 200 KB; em proporção ficou em 13,9% contra 14,8%, e o gate 1 pedia menos da metade. Ele não passou, e o plano registra por quê: o corpo da guitarra pedia uma gaiola fechada, que nenhum ajudante dava, e o modelador leu `subdivisao.js` por dentro para escrevê-la à mão, o que o [sólido por laços](../2026-11-05-solido-por-lacos.md) resolve; o `conferir-pontos` não tinha `--ajuda`, que entrou no fechamento; e a regra de quando duas superfícies encostam só existia no código de `contato-de-solidos.js`, que foi ao backlog como ficha de contato. A medida é de um agente só e serve de direção, não de prova.

@@ -509,7 +509,6 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-05-abertura-de-contorno-livre.md` — Abertura de contorno livre — a chapa ganha um vão pela curva que a receita desenha, sem depender das linhas da gaiola
-- `2026-11-05-porta-de-entrada-dos-agentes.md` — A porta de entrada dos agentes — o modelador acha como usar uma capacidade numa ficha curta, sem garimpar o código
 - `2026-11-05-solido-por-lacos.md` — Sólido por laços — a receita dá o contorno da peça em cada plano, e o núcleo monta a gaiola fechada e a subdivide numa malha só
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -643,6 +642,7 @@
 - `2026-11-03-ajustes-da-bancada.md` — Ajustes da bancada — o objeto abre inteiro e a tela perde o que a pessoa não usa
 - `2026-11-03-descrever-rapido.md` — Descrever rápido — o mesmo resultado em uma fração do tempo
 - `2026-11-03-regras-de-desenho-por-familia.md` — Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
+- `2026-11-05-porta-de-entrada-dos-agentes.md` — A porta de entrada dos agentes — o modelador acha como usar uma capacidade numa ficha curta, sem garimpar o código
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

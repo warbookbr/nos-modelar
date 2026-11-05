@@ -140,8 +140,19 @@ export function formatarPontos(resultado) {
   return `${linhas.join('\n')}\n`;
 }
 
+const AJUDA = `node tools/modelar/conferir-pontos.mjs <peça>
+Mede os PONTOS que a receita exporta contra a malha e dá o desvio de cada um em mm, com ✓ ou ✗; sai com código 1 se algum
+passar da tolerância. Cada ponto é { nome, em: [x, y, z] em mm, toleranciaMm } e mais um destes:
+  entre: ['a', 'b']               o centro da junta, onde as caixas das duas partes se sobrepõem;
+  parte: 'a', medida?             um ponto da caixa da parte: medida 'centro' (padrão), 'minimo' ou 'maximo'.
+`;
+
 async function principal(argv) {
   const alvo = argv[2];
+  if (alvo === '--ajuda') {
+    process.stdout.write(AJUDA);
+    return 0;
+  }
   if (!alvo) {
     process.stderr.write('uso: node tools/modelar/conferir-pontos.mjs <peça>\n');
     return 2;
