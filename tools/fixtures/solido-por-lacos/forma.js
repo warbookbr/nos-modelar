@@ -1,5 +1,5 @@
-/* forma.js — a forma e a gaiola da peça de teste do plano do sólido por laços: um L de ponta-cabeça fechado, feito de uma
- * malha só por subdivisão de uma gaiola de laços, um laço por plano x = constante.
+/* forma.js — a forma da peça de teste do plano do sólido por laços: um L de ponta-cabeça fechado, feito de uma malha só por
+ * subdivisão da gaiola que `gaiolaPorLacos` (procedural/nucleo/gaiola-por-lacos.js) monta a partir de um laço por plano x.
  *
  * A FORMA. Uma parte deitada de 190 mm de largura (x de -95 a 95) e 190 de altura (y de 20 a 210), que corre em z de -95 a
  * 125 e acaba numa saída redonda do diâmetro da largura, de eixo z a 115 mm do chão; por baixo da traseira, uma parte de pé
@@ -8,17 +8,19 @@
  * da saída, e a borda de cima da parede de trás tem 10 mm. O encontro de baixo, entre a frente do pé e a face de baixo da
  * parte deitada, é um quarto de elipse côncavo de 12 por 12 mm nos próprios pontos da gaiola.
  *
- * A GAIOLA. Cada laço é o contorno da peça cortada pelo plano x: sobe pela parede de trás (`fora`, de trás para a saída, com o
- * topo), desce pela face da saída, volta pela face de baixo da parte deitada, sobe a curva do encontro e desce pela frente do pé
- * (`dentro`, guardado da frente do pé à saída), e volta pelo fundo (`fundo`). Todos os laços têm o mesmo número de pontos,
- * então as faces entre dois laços vizinhos são quadriláteros ponto a ponto (as tiras), e as duas paredes de lado, nos planos
- * x = ±95, são tampadas por uma escada de faces entre a cadeia `fora` e a `dentro`. Nos dois planos de lado a saída redonda se
- * fecha numa ponta, e o último ponto de `dentro` é o mesmo de `fora`. Os vincos vivos são a borda de baixo e a borda da saída.
+ * OS LAÇOS. Cada laço é o contorno da peça cortada pelo plano x, em trechos na ordem da volta: `tras` sobe a parede de trás,
+ * os cinco trechos de `TABELA.topo` (de `borda` a `topo`) vão pelo topo até o começo da transição, com os pontos mais perto junto
+ * da parede, `transicao` desce até a saída, `saida` desce pela face da saída, `baixo` volta pela face de baixo da parte deitada,
+ * `encontro` desce a curva do encontro, `frente` desce a frente do pé e `fundo` volta pelo chão. Cada trecho sai daqui como
+ * polilinha densa tirada das funções da forma, e o ajudante a reamostra no número de pontos da tabela. A tampa das paredes de
+ * lado é a escada do `fundo` à `saida`, e por isso a cadeia de `tras` à `transicao` e a de `baixo` à `frente` têm o mesmo número
+ * de pontos; nos dois planos de lado a `saida` tem comprimento zero e o ajudante a funde numa ponta. Os vincos vivos são a borda
+ * da faixa do `fundo` (a borda de baixo) e a da `saida`.
  *
- * É a transcrição da gaiola escrita à mão que a fatia 1 do plano leva para esta peça neutra, separada em três funções para a
- * fatia 2 ver o que é da forma e o que é geral: `planosDeCorte` e `lacoNoPlano` são da forma, e `gaiolaDosLacos` é a montagem
- * que o ajudante vai envolver. As opções em `TABELA.limites` refazem os quatro limites que o plano lista; a tabela padrão é a
- * forma de referência. Tudo em milímetro até os pontos que saem, em metro. Nenhum dado vem de referência externa. */
+ * `planosDeCorte` e `lacoNoPlano` são da forma; a montagem é do ajudante. As opções em `TABELA.limites` e `TABELA.compensarCantos`
+ * refazem os limites e a compensação que o plano lista; a tabela padrão é a forma de referência. Tudo em milímetro até os
+ * pontos que saem, em metro. Nenhum dado vem de referência externa. */
+import { gaiolaPorLacos } from '../../../procedural/nucleo/gaiola-por-lacos.js';
 
 export const m = (mm) => mm / 1000;
 
@@ -46,20 +48,27 @@ export const TABELA = {
   estacoesDaQuina: 6,
   estacoesDoCanto: 4,
   estacoesDoReto: 3,
-  /* A amostragem do laço: frações da parede de trás e do fundo, frações do topo de trás até o começo da transição, e os
-     pontos da transição, da face de baixo e da curva do encontro. */
-  fracoesDaParede: [0.25, 0.5, 0.75],
-  fracoesDoFundo: [0.25, 0.5, 0.75],
-  fracoesDoTopo: [0, 0.015, 0.05, 0.12, 0.25, 0.45, 0.7],
-  pontosDaTransicao: 6,
-  pontosDeBaixo: 9,
-  pontosDoEncontro: 6,
+  /* Pontos de cada trecho do laço, com as duas pontas. O topo, de trás até o começo da transição, vai em cinco trechos que
+     acabam nas frações `ate` dele, com os pontos mais perto junto da parede, onde o topo se curva para a borda de trás. A
+     escada da tampa pede o mesmo número de pontos de tras, do topo e da transição (18, contando uma vez cada emenda) e de
+     baixo, do encontro e da frente (18). */
+  pontos: { tras: 5, transicao: 7, saida: 2, baixo: 11, encontro: 6, frente: 3, fundo: 5 },
+  topo: [
+    { nome: 'borda', ate: 0.015, pontos: 2 },
+    { nome: 'quina', ate: 0.05, pontos: 2 },
+    { nome: 'topoDeTras', ate: 0.12, pontos: 2 },
+    { nome: 'topoDoMeio', ate: 0.45, pontos: 3 },
+    { nome: 'topo', ate: 1, pontos: 3 },
+  ],
   niveis: 2,
-  /* Os quatro limites. `distanciaMinimaEntrePlanos` tira o plano de corte a menos dessa distância do anterior (a forma de
-     referência usa 2,5 mm; com 0 ficam todos, e só o plano repetido sai). `medidas` põe cota exata em todos os pontos da
-     gaiola ('todos') ou em nenhum ('nenhuma'). Os outros dois (a aresta mais macia e o calombo da amostragem desigual) saem
-     da forma de referência e da amostragem acima, sem opção própria. */
-  limites: { distanciaMinimaEntrePlanos: 2.5, medidas: 'nenhuma' },
+  /* Os limites. `distanciaMinimaEntrePlanos` tira o plano de corte a menos dessa distância do anterior (a forma de
+     referência usa 2,5 mm; com 0 ficam todos e o ajudante recusa os planos próximos). `medidas` passa ao ajudante: null não põe
+     cota, e 'todos' pede cota exata em todos os pontos, que o ajudante recusa. */
+  limites: { distanciaMinimaEntrePlanos: 2.5, medidas: null },
+  /* A compensação dos cantos da seção: com true, o ajudante move os pontos do topo e da transição nos laços dos cantos (|x| a
+     partir de meiaLargura - raioDosCantos) para a superfície limite passar por eles, e o canto de 32 mm sai com 31,8 mm no
+     corte; false deixa a gaiola como declarada, que fica a 0,43 mm do corpo feito à mão. */
+  compensarCantos: false,
 };
 
 /* Funções da forma em (x, z), em milímetro. */
@@ -121,9 +130,14 @@ export function planosDeCorte(t) {
   return [...metade.slice(1).reverse().map((x) => -x), ...metade];
 }
 
-/** lacoNoPlano(t, x) -> { x, fora, dentro, fundo }: o contorno da peça no plano x, em [z, y] mm, em três cadeias. `fora` vai do
- *  chão atrás, pela parede de trás e pelo topo, até a saída; `dentro` vai do chão na frente do pé, pela curva do encontro e pela
- *  face de baixo, até a saída; `fundo` são os pontos do chão entre a frente do pé e a traseira. */
+/* polilinha densa de uma curva em [z, y], virada para [y, z] (o ponto [u, v] do laço no eixo x) */
+const DENSIDADE = 96;
+function curva(f, a, b, n = DENSIDADE) {
+  return Array.from({ length: n + 1 }, (_, k) => { const [z, y] = f(a + ((b - a) * k) / n); return [y, z]; });
+}
+
+/** lacoNoPlano(t, x) -> { em, trechos }: o contorno da peça no plano x, em [y, z] mm, nos trechos da volta, cada um uma
+ *  polilinha densa que começa onde a anterior acaba. */
 export function lacoNoPlano(t, x) {
   const { L, yE, zFace, zT, yTopo, yFundo, zTras, zFrente } = funcoesDaForma(t);
   const dz = t.avancoDoEncontro;
@@ -133,114 +147,51 @@ export function lacoNoPlano(t, x) {
   const zfx = zFrente(x);
   const zEnc = zfx + dz;
   const yFim = yFundo(x, zEnc);
-  const fora = [[zr, 0]];
-  for (const f of t.fracoesDaParede) fora.push([zr, yp * f]);
-  for (const tau of t.fracoesDoTopo) { const z = zr + tau * (zT - zr); fora.push([z, yTopo(x, z)]); }
-  fora.push([zT, yTopo(x, zT)]);
-  for (let j = 1; j < t.pontosDaTransicao; j++) { const z = zT + ((zFace - zT) * j) / t.pontosDaTransicao; fora.push([z, yTopo(x, z)]); }
-  fora.push([zFace, yTopo(x, zFace)]);
-  const dentro = [[zfx, 0], [zfx, y0 / 2]];
-  for (let k = 0; k < t.pontosDoEncontro; k++) {
-    const th = ((Math.PI / 2) * k) / (t.pontosDoEncontro - 1);
-    dentro.push([zfx + dz * (1 - Math.cos(th)), y0 + (yFim - y0) * Math.sin(th)]);
-  }
-  for (let j = 1; j <= t.pontosDeBaixo; j++) {
-    const f = 1 - (1 - j / (t.pontosDeBaixo + 1)) ** 1.4;
-    const z = zEnc + (zFace - zEnc) * f;
-    dentro.push([z, yFundo(x, z)]);
-  }
-  dentro.push([zFace, yFundo(x, zFace)]);
-  const fundo = t.fracoesDoFundo.map((f) => [zfx + (zr - zfx) * f, 0]);
-  if (fora.length !== dentro.length) throw new RangeError(`lacoNoPlano: a cadeia de fora tem ${fora.length} pontos e a de dentro ${dentro.length}; a escada da parede de lado pede o mesmo número`);
-  return { x, fora, dentro, fundo };
+  const noTopo = (z) => [z, yTopo(x, z)];
+  const noFundo = (z) => [z, yFundo(x, z)];
+  return {
+    em: x,
+    trechos: {
+      tras: curva((y) => [zr, y], 0, yp, 1),
+      ...Object.fromEntries(t.topo.map((d, k) => [d.nome, curva(noTopo, zr + (k ? t.topo[k - 1].ate : 0) * (zT - zr), zr + d.ate * (zT - zr))])),
+      transicao: curva(noTopo, zT, zFace),
+      saida: curva((y) => [zFace, y], yTopo(x, zFace), yFundo(x, zFace), 1),
+      baixo: curva(noFundo, zFace, zEnc),
+      encontro: curva((th) => [zfx + dz * (1 - Math.cos(th)), y0 + (yFim - y0) * Math.sin(th)], Math.PI / 2, 0),
+      frente: curva((y) => [zfx, y], y0, 0, 1),
+      fundo: curva((z) => [z, 0], zfx, zr, 1),
+    },
+  };
 }
 
-/** gaiolaDosLacos(aneis, { medidas }) -> { pontos, passo, pontosMm }: a gaiola fechada a partir dos laços, no formato do passo
- *  `subdivisao`. As tiras ligam ponto a ponto dois laços vizinhos; as paredes do primeiro e do último laço são a escada entre
- *  `fora` e `dentro`, com a face do pé fechada pelo `fundo`; o ponto de `dentro` que coincide com o último de `fora` nos dois
- *  laços de lado sai como um ponto só. A orientação das tiras confere pelo topo (normal +y) e a das paredes pelo sinal de x. */
-export function gaiolaDosLacos(aneis, { medidas = 'nenhuma' } = {}) {
-  const nO = aneis[0].fora.length;
-  const nB = aneis[0].fundo.length;
-  for (const an of aneis) {
-    if (an.fora.length !== nO || an.dentro.length !== nO || an.fundo.length !== nB) throw new RangeError(`gaiolaDosLacos: o laço em x = ${an.x} tem ${an.fora.length}/${an.dentro.length}/${an.fundo.length} pontos, e o primeiro ${nO}/${nO}/${nB}`);
+/** argumentosDaGaiola(t) -> o que a peça de teste passa a `gaiolaPorLacos`. */
+export function argumentosDaGaiola(t = TABELA) {
+  const ordem = ['tras', ...t.topo.map((d) => d.nome), 'transicao', 'saida', 'baixo', 'encontro', 'frente', 'fundo'];
+  const a = {
+    nome: 'corpo',
+    eixo: 'x',
+    trechos: ordem.map((nome) => ({ nome, pontos: t.pontos[nome] ?? t.topo.find((d) => d.nome === nome).pontos })),
+    lacos: planosDeCorte(t).map((x) => lacoNoPlano(t, x)),
+    tampa: { de: 'fundo', ate: 'saida' },
+    vincos: [
+      { nome: 'bordaDeBaixo', trecho: 'fundo', nitidez: 'viva' },
+      { nome: 'bordaDaSaida', trecho: 'saida', nitidez: 'viva' },
+    ],
+  };
+  if (t.limites?.medidas != null) a.medidas = t.limites.medidas;
+  if (t.compensarCantos) {
+    a.compensar = {
+      trechos: [...t.topo.map((d) => d.nome), 'transicao'],
+      lacos: a.lacos.map((l, r) => (Math.abs(l.em) >= t.meiaLargura - t.raioDosCantos - 1e-9 ? `l${r}` : null)).filter(Boolean),
+    };
   }
-  const pontosMm = {};
-  const nomeDe = (r, grupo, j) => `l${r}_${grupo}${j}`;
-  const ultimo = aneis.length - 1;
-  const ponta = (r, grupo, j) => grupo === 'i' && j === nO - 1 && (r === 0 || r === ultimo);
-  aneis.forEach((an, r) => {
-    an.fora.forEach(([z, y], j) => { pontosMm[nomeDe(r, 'o', j)] = [an.x, y, z]; });
-    an.dentro.forEach(([z, y], j) => { if (!ponta(r, 'i', j)) pontosMm[nomeDe(r, 'i', j)] = [an.x, y, z]; });
-    an.fundo.forEach(([z, y], j) => { pontosMm[nomeDe(r, 'b', j)] = [an.x, y, z]; });
-  });
-  const nm = (r, grupo, j) => (ponta(r, grupo, j) ? nomeDe(r, 'o', j) : nomeDe(r, grupo, j));
-  const laco = (r) => [
-    ...Array.from({ length: nO }, (_, j) => nm(r, 'o', j)),
-    ...Array.from({ length: nO }, (_, j) => nm(r, 'i', nO - 1 - j)),
-    ...Array.from({ length: nB }, (_, j) => nm(r, 'b', j)),
-  ];
-  const limpa = (f) => {
-    const g = f.filter((v, k) => v !== f[(k + 1) % f.length]);
-    return g.length >= 3 ? g : null;
-  };
-  const tiras = [];
-  for (let r = 0; r < ultimo; r++) {
-    const a = laco(r);
-    const b = laco(r + 1);
-    for (let q = 0; q < a.length; q++) {
-      const f = limpa([a[q], a[(q + 1) % a.length], b[(q + 1) % a.length], b[q]]);
-      if (f) tiras.push(f);
-    }
-  }
-  const parede = (r) => {
-    const fs = [[nm(r, 'o', 0), nm(r, 'o', 1), nm(r, 'i', 1), nm(r, 'i', 0), ...Array.from({ length: nB }, (_, j) => nm(r, 'b', j))]];
-    for (let j = 1; j < nO - 1; j++) fs.push([nm(r, 'o', j), nm(r, 'o', j + 1), nm(r, 'i', j + 1), nm(r, 'i', j)]);
-    return fs.map(limpa).filter(Boolean);
-  };
-  const normal = (f) => {
-    let nx = 0; let ny = 0; let nz = 0;
-    f.forEach((v, k) => {
-      const [x1, y1, z1] = pontosMm[v];
-      const [x2, y2, z2] = pontosMm[f[(k + 1) % f.length]];
-      nx += (y1 - y2) * (z1 + z2); ny += (z1 - z2) * (x1 + x2); nz += (x1 - x2) * (y1 + y2);
-    });
-    return [nx, ny, nz];
-  };
-  const orienta = (fs, sx) => fs.map((f) => (normal(f)[0] * sx > 0 ? f : [...f].reverse()));
-  const yMax = Math.max(...Object.values(pontosMm).map((p) => p[1]));
-  const tiraDoTopo = tiras.find((f) => f.every((v) => Math.abs(pontosMm[v][1] - yMax) < 1e-9 && Math.abs(pontosMm[v][0]) < 1e-9 + 10));
-  const tirasOk = tiraDoTopo && normal(tiraDoTopo)[1] < 0 ? tiras.map((f) => [...f].reverse()) : tiras;
-  const faces = [...tirasOk, ...orienta(parede(0), -1), ...orienta(parede(ultimo), 1)];
-
-  const pontos = {};
-  for (const [k, v] of Object.entries(pontosMm)) pontos[k] = v.map(m);
-  const rs = Array.from({ length: aneis.length }, (_, r) => r);
-  const semRepetir = (lista) => lista.filter((v, k, arr) => v !== arr[k - 1]);
-  const fundoDe = (r) => [nm(r, 'i', 0), ...Array.from({ length: nB }, (_, j) => nm(r, 'b', j)), nm(r, 'o', 0)];
-  const bordaDeBaixo = semRepetir([
-    ...rs.map((r) => nm(r, 'o', 0)),
-    ...fundoDe(ultimo).reverse().slice(1),
-    ...[...rs].reverse().map((r) => nm(r, 'i', 0)),
-    ...fundoDe(0).slice(1),
-  ]);
-  const bordaDaSaida = semRepetir([...rs.map((r) => nm(r, 'o', nO - 1)), ...[...rs].reverse().map((r) => nm(r, 'i', nO - 1))]);
-  if (bordaDaSaida[bordaDaSaida.length - 1] !== bordaDaSaida[0]) bordaDaSaida.push(bordaDaSaida[0]);
-  const vincos = [
-    { nome: 'bordaDeBaixo', pontos: bordaDeBaixo, nitidez: 'viva' },
-    { nome: 'bordaDaSaida', pontos: bordaDaSaida, nitidez: 'viva' },
-  ];
-  const passo = { vertices: Object.keys(pontos), faces, vincos };
-  if (medidas === 'todos') passo.medidas = Object.keys(pontos);
-  else if (medidas !== 'nenhuma') throw new RangeError(`gaiolaDosLacos: medidas é 'todos' ou 'nenhuma', e veio ${JSON.stringify(medidas)}`);
-  return { pontos, passo, pontosMm };
+  return a;
 }
 
-/** derivar(t) -> { planos, aneis, pontos, passo, pontosMm }: a gaiola da peça de teste pela tabela. */
+/** derivar(t) -> { planos, ...a saída de gaiolaPorLacos }: a gaiola da peça de teste pela tabela. */
 export function derivar(t = TABELA) {
-  const planos = planosDeCorte(t);
-  const aneis = planos.map((x) => lacoNoPlano(t, x));
-  return { planos, aneis, ...gaiolaDosLacos(aneis, { medidas: t.limites?.medidas ?? 'nenhuma' }) };
+  const args = argumentosDaGaiola(t);
+  return { planos: args.lacos.map((l) => l.em), ...gaiolaPorLacos(args) };
 }
 
 export const PLANO = {
@@ -248,7 +199,7 @@ export const PLANO = {
   referencias: ['referencias/alvo.md'],
   escala: { medida: 'largura da parte deitada', milimetros: 190 },
   partes: [
-    { nome: 'corpo', forma: 'L de ponta-cabeça de 190 mm de largura por 220 de comprimento, parte de pé recuada 30 mm, quinas de 75 em planta, cantos de 32 na seção e saída redonda de 190 mm', tecnica: 'subdivisão de uma gaiola de laços, um laço por plano x, com as paredes de lado em escada e vincos vivos na borda de baixo e na da saída' },
+    { nome: 'corpo', forma: 'L de ponta-cabeça de 190 mm de largura por 220 de comprimento, parte de pé recuada 30 mm, quinas de 75 em planta, cantos de 32 na seção e saída redonda de 190 mm', tecnica: 'subdivisão da gaiola de gaiolaPorLacos, um laço por plano x em doze trechos, com as paredes de lado tampadas em escada e vincos vivos na borda de baixo e na da saída' },
   ],
   criteriosDeReprovacao: [
     'emenda, faixa de sombra ou degrau entre a parte de pé e a parte deitada',

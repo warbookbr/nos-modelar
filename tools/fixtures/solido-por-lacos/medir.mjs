@@ -1,11 +1,11 @@
-/* medir.mjs — as medidas da fatia 1 do plano do sólido por laços sobre a malha que o núcleo entrega: o desvio entre duas malhas
- * (a peça de teste contra o corpo feito à mão, ou uma variante contra a forma de referência), o corte da malha por um plano e,
- * no corte, o canto da seção (o recuo da superfície em relação à quina viva e a faixa plana do topo), que mede o terceiro limite
- * contra o `arredondarAresta`; e, na gaiola, a menor distância entre planos de corte e a maior razão entre dois trechos vizinhos
- * do laço, que medem o segundo e o quarto limites antes de subdividir. O fechamento (aresta sem par, vínculo não manifold e triângulo sem área) é medido pelas funções de
- * `tools/oficina/conferir-malha.ts`, no teste ao lado, e a ondulação e o calombo pela ferramenta `ondulacao`. Entra em metro;
- * as medidas saem em milímetro. */
-import { derivar } from './forma.js';
+/* medir.mjs — as medidas do plano do sólido por laços sobre a malha que o núcleo entrega: o desvio entre duas malhas (a peça de
+ * teste contra o corpo feito à mão, ou uma variante contra a forma de referência), o corte da malha por um plano e, no corte, o
+ * canto da seção da peça em L (o recuo da superfície em relação à quina viva e a faixa plana do topo), que mede o terceiro limite
+ * contra o `arredondarAresta`, e o raio das duas curvas da dobra em U; e, na tabela, a menor distância entre planos de corte. O
+ * fechamento (aresta sem par, vínculo não manifold e triângulo sem área) é medido pelas funções de
+ * `tools/oficina/conferir-malha.ts`, no teste ao lado, a ondulação e o calombo pela ferramenta `ondulacao`, e a amostragem desigual
+ * pelos avisos de `gaiolaPorLacos`. Entra em metro; as medidas saem em milímetro. */
+import { planosDeCorte } from './forma.js';
 
 const MM = 1000;
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -140,30 +140,23 @@ export function cantoDaSecao(malha, T) {
   return cantoDoCorte(cortePorPlano(malha, 'z', 0), { quina: [L, yTopo], centro: [L - r, yTopo - r] });
 }
 
-/** menorDistanciaEntrePlanos(T) -> a menor distância, em mm, entre dois planos de corte vizinhos da tabela. */
+/** menorDistanciaEntrePlanos(T) -> a menor distância, em mm, entre dois planos de corte vizinhos da tabela da peça em L. */
 export function menorDistanciaEntrePlanos(T) {
-  const p = derivar(T).planos;
+  const p = planosDeCorte(T);
   return Math.min(...p.slice(1).map((x, k) => x - p[k]));
 }
 
-/** razaoDeAmostragem(T) -> { razao, entre, trechosMm }: no laço do plano x = 0, a maior razão entre os comprimentos de dois
- *  trechos vizinhos do laço que não ficam dos dois lados de um vinco vivo (o chão e a borda da saída), e os dois trechos. */
-export function razaoDeAmostragem(T) {
-  const { aneis } = derivar(T);
-  const an = aneis.find((a) => Math.abs(a.x) < 1e-9);
-  /* o laço em ordem: fora (de trás à saída), dentro de volta (da saída ao pé) e o fundo; os pontos de vinco são o primeiro e o
-     último de fora e de dentro, e o fundo todo fica no chão */
-  const laco = [...an.fora, ...[...an.dentro].reverse(), ...an.fundo];
-  const n = laco.length; const nO = an.fora.length;
-  const vinco = new Set([0, nO - 1, nO, 2 * nO - 1, ...an.fundo.map((_, j) => 2 * nO + j)]);
-  const trecho = (k) => Math.hypot(laco[(k + 1) % n][0] - laco[k][0], laco[(k + 1) % n][1] - laco[k][1]);
-  let razao = 1; let entre = null;
-  for (let k = 0; k < n; k++) {
-    const j = (k + 1) % n;
-    if (vinco.has(j)) continue;
-    const a = trecho(k); const b = trecho(j);
-    const q = Math.max(a, b) / Math.min(a, b);
-    if (q > razao) { razao = q; entre = [laco[k], laco[j], laco[(j + 1) % n]].map((p) => p.map((x) => Number(x.toFixed(1)))); }
-  }
-  return { razao: Number(razao.toFixed(2)), pontosZY: entre };
+/** raioDaDobra(malha, T) -> { fora, dentro }: no corte x = 0 da dobra em U, a distância ao centro da dobra dos pontos de cada curva
+ *  a até 60 graus do fundo, em mm: { media, minimo, maximo }. */
+export function raioDaDobra(malha, T) {
+  const c = [T.alturaDoCentro, 0];
+  const meio = (T.raioDeFora + T.raioDeDentro) / 2;
+  const naCurva = cortePorPlano(malha, 'x', 0).filter((p) => p[0] < c[0] && Math.atan2(c[0] - p[0], Math.abs(p[1] - c[1])) > Math.PI / 6);
+  const arred = (x) => Number(x.toFixed(3));
+  const raio = (lista) => {
+    const ds = lista.map((p) => Math.hypot(p[0] - c[0], p[1] - c[1]));
+    return { media: arred(ds.reduce((s, x) => s + x, 0) / ds.length), minimo: arred(Math.min(...ds)), maximo: arred(Math.max(...ds)) };
+  };
+  const dist = (p) => Math.hypot(p[0] - c[0], p[1] - c[1]);
+  return { fora: raio(naCurva.filter((p) => dist(p) > meio)), dentro: raio(naCurva.filter((p) => dist(p) < meio)) };
 }
