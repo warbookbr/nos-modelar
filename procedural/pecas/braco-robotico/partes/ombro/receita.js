@@ -46,7 +46,15 @@ export const TABELA = {
   espessuraDoAnel: 28,
   /* Raio da concordância no encontro de baixo entre a frente da parte de pé e
      a parte deitada. */
-  raioDoEncontro: 10,
+  raioDoEncontro: 0,
+  /* Curva do encontro de baixo feita no próprio loft da parte de pé: um quarto
+     de elipse côncavo que sai da frente do pé, vertical, e chega à face de
+     baixo da parte deitada, horizontal. `avancoDoEncontro` é quanto ela
+     avança para a frente e `alturaDoEncontro`, quanto sobe; o pé abaixo dela
+     fica como estava, dentro do anel da cintura. */
+  avancoDoEncontro: 12,
+  alturaDoEncontro: 12,
+  estacoesDoEncontro: 12,
   chanfroDoPescoco: 2,
   /* Estações da transição quadrado-redondo. */
   estacoesDaSaida: 9,
@@ -165,15 +173,28 @@ export function gerarPassos(t = TABELA) {
      quebram a união. */
   const rq = m(t.raioDaTraseira);
   const rf = m(t.raioDaFrenteDoPe);
-  const secColuna = (y, r) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rf, r - folga), L, zf * (r - folga) / h, Math.min(rq, r - folga)) });
+  const secColuna = (y, r, avanco = 0) => ({ pos: [0, y, 0], contorno: contornoColuna(r - folga, Math.min(rf, r - folga), L, (zf + avanco) * (r - folga) / h, Math.min(rq, r - folga)) });
+  /* Curva do encontro de baixo: sobe até a face de baixo da parte deitada
+     (yb), 1 mm para dentro dela. */
+  const yb = yEixo - h + 0.001;
+  const y0 = yb - m(t.alturaDoEncontro);
+  const dz = m(t.avancoDoEncontro);
+  const curva = Array.from({ length: t.estacoesDoEncontro }, (_, k) => {
+    const u = (k + 1) / (t.estacoesDoEncontro + 1);
+    return secColuna(y0 + (yb - y0) * u, h, dz * (1 - Math.sqrt(1 - u * u)));
+  });
   /* Parte de pé: sobe da boca de baixo até a altura do eixo, com a frente
      recuada, e termina dentro da parte deitada. */
   const coluna = [
     { pos: [0, 0, 0], raio: 0 },
     secColuna(0.0004, h - c),
     secColuna(c, h),
-    ...entre(c, yEixo - 0.0004, t.estacoes).map((y) => secColuna(y, h)),
-    secColuna(yEixo - 0.0004, h),
+    ...entre(c, y0, t.estacoes).map((y) => secColuna(y, h)),
+    secColuna(y0, h),
+    ...curva,
+    secColuna(yb, h, dz),
+    ...entre(yb, yEixo - 0.0004, 2).map((y) => secColuna(y, h, dz)),
+    secColuna(yEixo - 0.0004, h, dz),
     { pos: [0, yEixo, 0], raio: 0 },
   ];
   /* Parte deitada: atravessa o topo de trás até a saída redonda. Na
