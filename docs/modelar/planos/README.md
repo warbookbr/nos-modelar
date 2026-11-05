@@ -6,13 +6,12 @@
 
 1. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/` sem a receita, cedida à navegação de receitas, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: as rodas e o forro dos arcos (etapa 4) em diante.
 2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`. Em aberto: o ombro refeito na opção B escolhida pela pessoa, com o encontro sem quina, a luz rasante na peça com emenda sombreada e as etapas que não perdem o aceite, e depois as partes restantes e a exportação do braço montado.
-3. [abertura de contorno livre](2026-11-05-abertura-de-contorno-livre.md). Território no plano. Em aberto: cortar a chapa depois ou antes da subdivisão.
-4. [esboço pelo núcleo](2026-11-05-esboco-pelo-nucleo.md). Território no plano. Em aberto: o inventário do que usa o esboço de hoje.
-5. [navegação de receitas](2026-11-05-navegacao-de-receitas.md). Território no plano, com a receita do furgão cedida pelo plano dele. Em aberto: o comando do mapa da receita.
+3. [esboço pelo núcleo](2026-11-05-esboco-pelo-nucleo.md). Território no plano. Em aberto: o inventário do que usa o esboço de hoje.
+4. [navegação de receitas](2026-11-05-navegacao-de-receitas.md). Território no plano, com a receita do furgão cedida pelo plano dele. Em aberto: o comando do mapa da receita.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
-[Sólido por laços](encerrados/2026-11-05-solido-por-lacos.md) fechou em 2026-11-05, com o ajudante `gaiolaPorLacos` no núcleo e a peça em L e a dobra em U aprovadas pela pessoa; o ombro e o cotovelo passam a ele pelo plano do braço. [A porta de entrada dos agentes](encerrados/2026-11-05-porta-de-entrada-dos-agentes.md) fechou em 2026-11-05, com a ficha por capacidade e o `--ajuda` nas ferramentas; a leitura de código do modelador caiu cerca de 30% em volume, sem chegar à metade pedida, e o que faltou ficou no sólido por laços e no backlog.
+[Abertura de contorno livre](encerrados/2026-11-05-abertura-de-contorno-livre.md) fechou em 2026-11-05, com a operação `aberturaPorContorno`, a aba, a lente recuada e a moldura do vão, aprovada pela pessoa na peça de teste. [Sólido por laços](encerrados/2026-11-05-solido-por-lacos.md) fechou em 2026-11-05, com o ajudante `gaiolaPorLacos` no núcleo e a peça em L e a dobra em U aprovadas pela pessoa; o ombro e o cotovelo passam a ele pelo plano do braço. [A porta de entrada dos agentes](encerrados/2026-11-05-porta-de-entrada-dos-agentes.md) fechou em 2026-11-05, com a ficha por capacidade e o `--ajuda` nas ferramentas; a leitura de código do modelador caiu cerca de 30% em volume, sem chegar à metade pedida, e o que faltou ficou no sólido por laços e no backlog.
 
 [Glossário e entrada para pessoas](encerrados/2026-10-30-glossario-e-entrada-para-pessoas.md) fechou em 2026-10-30, com a página de entrada para pessoas aprovada e sem glossário separado.
 

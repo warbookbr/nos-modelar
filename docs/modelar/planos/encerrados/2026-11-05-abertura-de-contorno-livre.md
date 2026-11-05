@@ -1,6 +1,6 @@
 # Abertura de contorno livre — a chapa ganha um vão pela curva que a receita desenha, sem depender das linhas da gaiola
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/operacoes/friso.js`, `src/autoria/molduras-do-vao.js`, `tools/fixtures/abertura-de-prova/`, `docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/`, `procedural/nucleo/fixtures/motor-r00-baseline.json` e `procedural/nucleo/catalogo.test.mjs` no registro da operação, `.claude/skills/criar-peca/references/operacoes-procedurais.md` na documentação dela
 
@@ -58,10 +58,12 @@ Se nem o corte depois nem o corte antes da subdivisão passarem no gate 1 na pe�
 
 ## Andamento
 
-A fatia 1 fechou em 2026-11-05 sem técnica aprovada, com as medidas nas [provas](../banco-de-provas/abertura-de-contorno-2026-11-05/README.md): o corte depois da subdivisão acerta a forma e deixa triângulos sem área junto da costura, e o corte na gaiola sai limpo mas afasta a chapa quase 3 mm e se dobra em 4 de 10 posições. A recomendação levada à pessoa é o corte depois com uma limpeza da costura dentro da operação nova.
+A fatia 1 fechou em 2026-11-05 sem técnica aprovada, com as medidas nas [provas](../../banco-de-provas/abertura-de-contorno-2026-11-05/README.md): o corte depois da subdivisão acerta a forma e deixa triângulos sem área junto da costura, e o corte na gaiola sai limpo mas afasta a chapa quase 3 mm e se dobra em 4 de 10 posições. A recomendação levada à pessoa é o corte depois com uma limpeza da costura dentro da operação nova.
 
 As fatias 2 e 3 fecharam em 2026-11-05. A operação `aberturaPorContorno` corta a chapa pelo `subtrair` do núcleo, chamado de dentro dela, e limpa a costura em três passos (funde os pontos rentes ao contorno, junta as lascas e tira o vértice entre duas faces). Nas 13 posições do teste a peça sai sem triângulo sem área nem lasca, as duas bordas a 0,125 mm do desenho com 32 segmentos, o bico com 39,00 graus contra 40,38 desenhados e a espessura de 2,000 mm na borda; o `friso` aceita a borda da abertura e a lente sai citável. Falta a fatia 4: a moldura do vão, o recuo da lente (no lugar, ela atravessa a aba em 3 mm), a documentação e a aprovação da pessoa por imagem.
 
+A fatia 4 fechou em 2026-11-05. A lente sai recuada para dentro da aba pelo campo `recuoDaLente`, com padrão de 2,5 espessuras da chapa, o que na peça de teste dá 5 mm do contorno, nenhum volume em comum com a aba e 1,7 mm de folga até ela, com o bico vivo no mesmo ângulo. A moldura do vão reconhece a abertura pela volta registrada no núcleo, com as 856 amostras da borda cobertas pela aba, e a operação está documentada na referência de operações da `criar-peca`.
+
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-05. A operação `aberturaPorContorno` corta a chapa de subdivisão por um contorno fechado desenhado numa vista e projetado, limpa a costura, devolve a borda para o `friso` fazer a aba e a lente recuada para dentro dela, e o vão entra na conferência de moldura. Na peça de teste e na varredura de posições, a malha sai sem triângulo sem área nem lasca, as bordas a 0,125 mm do desenho e o bico com 39,00 graus contra 40,38 desenhados. A pessoa aprovou a forma por imagem, pediu o recuo da lente e o fechamento; o padrão de 2,5 espessuras vale para aba com raio da dobra de até uma espessura, e acima disso a receita declara o recuo. O uso no furgão volta pelo plano dele, no farol.

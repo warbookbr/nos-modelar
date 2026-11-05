@@ -1,5 +1,5 @@
 /* abertura-por-contorno.test.ts — a operação `aberturaPorContorno` na peça de teste `tools/fixtures/abertura-de-prova/`, pelos
-   gates do plano da abertura de contorno livre (`docs/modelar/planos/2026-11-05-abertura-de-contorno-livre.md`):
+   gates do plano da abertura de contorno livre (`docs/modelar/planos/encerrados/2026-11-05-abertura-de-contorno-livre.md`):
      gate 1: a chapa com a abertura, a lente e a aba saem sem aresta sem par, vínculo não manifold, triângulo sem área (as funções de
              `tools/oficina/conferir-malha.ts`) nem lasca (`face-fina` de `procedural/nucleo/topologia.js`), na posição da peça e
              com o contorno deslocado de 1 a 11 mm, no piso de segmentos e com 32 por quarto de arco, e em mais três posições com

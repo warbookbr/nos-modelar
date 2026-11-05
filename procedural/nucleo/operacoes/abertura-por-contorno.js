@@ -1,5 +1,5 @@
 /* abertura-por-contorno.js (operação) — `aberturaPorContorno`: um vão na chapa pela curva que a receita desenha numa vista, sem
-   depender das linhas da gaiola. Plano `docs/modelar/planos/2026-11-05-abertura-de-contorno-livre.md`; as medidas da técnica estão
+   depender das linhas da gaiola. Plano `docs/modelar/planos/encerrados/2026-11-05-abertura-de-contorno-livre.md`; as medidas da técnica estão
    em `docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/README.md`.
 
    O CONTORNO é o de `curva2d.js` (`{ inicio, trechos }`, com reto, arco, arcoTangente, concordancia e spline), desenhado num plano

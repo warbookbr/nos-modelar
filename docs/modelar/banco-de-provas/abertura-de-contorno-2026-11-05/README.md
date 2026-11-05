@@ -1,6 +1,6 @@
 # Abertura de contorno livre — as técnicas medidas, a operação e a lente no lugar
 
-Provas do plano [abertura de contorno livre](../../planos/2026-11-05-abertura-de-contorno-livre.md), em 2026-11-05. A peça de
+Provas do plano [abertura de contorno livre](../../planos/encerrados/2026-11-05-abertura-de-contorno-livre.md), em 2026-11-05. A peça de
 teste é `tools/fixtures/abertura-de-prova/`: uma chapa de subdivisão de 800 por 800 mm, 2 mm de espessura e duas curvaturas, com
 um vão desenhado na vista superior que sai de um bico vivo de 40,4 graus, segue reto 304 mm e volta ao bico por dois arcos
 tangentes. A fatia 1 mediu as duas técnicas de corte e não aprovou nenhuma; as fatias 2 e 3 fizeram a operação
