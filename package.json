@@ -121,6 +121,8 @@
     "nome:check": "node tools/arquitetura/nome-antigo.mjs",
     "contorno": "node tools/modelar/contorno-da-imagem.mjs",
     "esboco": "node tools/modelar/esboco.mjs",
+    "esboco:nucleo": "node tools/modelar/esboco-nucleo.mjs",
+    "variantes": "node tools/modelar/variantes.mjs",
     "contorno:prancha": "node tools/modelar/prancha/prancha-dos-contornos.mjs",
     "objeto": "node tools/modelar/objeto.mjs"
   },

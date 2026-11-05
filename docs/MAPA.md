@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1776 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1788 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -312,8 +312,11 @@
 
 ## docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/
 
-- `README.md` — Esboço pelo núcleo — inventário da fatia 1
+- `README.md` — Esboço pelo núcleo — inventário da fatia 1 e provas da fatia 2
 - `contar.mjs` — contar.mjs — as contagens do inventário do esboço (plano "Esboço pelo núcleo", fatia 1), reexecutáveis.
+- `farol-na-chapa.esboco.mjs` — farol-na-chapa.esboco.mjs — gate 1 do plano esboço pelo núcleo: as três opções do farol de 2026-11-05 refeitas pelo esboço 2.0 numa chapa curva de teste, com…
+- `medir-farol.mjs` — medir-farol.mjs — as medidas do gate 1 do plano esboço pelo núcleo: em cada opção do farol na chapa curva (`farol-na-chapa.esboco.mjs`), a borda de fora de c…
+- `mesa-com-variantes.js` — mesa-com-variantes — cópia de prova de `procedural/pecas/mesa-quadrada-escura/receita.js` para o gate 2 do plano esboço pelo núcleo: o mesmo código, com este…
 
 ## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/braco/
 
@@ -725,6 +728,22 @@
 ## modulos/esboco/
 
 - `README.md` — @modelar/esboco
+
+## modulos/esboco-nucleo/
+
+- `README.md` — Esboço pelo núcleo
+
+## modulos/esboco-nucleo/src/
+
+- `ler-esboco.js` — ler-esboco.js — abre no esboço 2.0 os `.esboco.json` de opções de forma que já existem, sem reescrevê-los.
+- `opcao.js` — opcao.js — o esboço 2.0: cada opção de forma é uma pequena receita do núcleo, montada em memória, e este arquivo a monta.
+- `variantes.js` — variantes.js — as variantes de uma receita: a mesma receita rodada com trocas de valores na TABELA, para a pessoa escolher entre opções de forma pelo que a p…
+
+## modulos/esboco-nucleo/tests/
+
+- `atalho.test.js` — atalho.test.js — o atalho de posição do esboço 2.0: centro, sobre, ponta, desloca e rotacao resolvidos pela caixa da malha que o núcleo gerou, as formas com …
+- `leitor.test.js` — leitor.test.js — o leitor dos esboços antigos: cada `.esboco.json` versionado abre no esboço 2.0 ou é recusado com o motivo, as treze opções de forma de peça…
+- `variantes.test.js` — variantes.test.js — o gate 2 do plano esboço pelo núcleo: a cópia de prova da mesa com três variantes declaradas dá, na variante com o valor aceito, a mesma …
 
 ## modulos/esboco/componentes/
 
@@ -2549,6 +2568,7 @@
 - `esboco-familias.test.mjs` — A ponte das famílias procedurais para o esboço (`esboco-familias.mjs` e `modulos/esboco/src/familia.js`), com a roda 2.0 e o cilindro hidráulico de verdade: …
 - `esboco-medidas-no-andaime.test.mjs` — A prova das medidas do `plano.medidas` lidas na blocagem do nível zero, sobre os esboços do módulo e do banco de provas que as declaram: a leitura na blocage…
 - `esboco-nivel-zero.mjs` — esboco-nivel-zero.mjs — o adaptador que liga o Condutor do esboço ao nível zero.
+- `esboco-nucleo.mjs` — esboco-nucleo.mjs — o esboço 2.0: as opções de forma de um esboço saem das operações do núcleo, cada uma montada como receita em memória e capturada na banca…
 - `esboco-para-andaime.mjs` — esboco-para-andaime.mjs — o adaptador que liga o esboço ao andaime da forma global N2.
 - `esboco-para-andaime.test.mjs` — A prova do tradutor do nível zero sobre os esboços do módulo e do banco de provas: o andaime é aceito por `normalizarAndaimeGlobal`, a blocagem compila e fec…
 - `esboco-para-passos.mjs` — esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Modelar (`cubo`, `chamferBox`, `cilindro`, `extrusao`, `rotaciona` e `pa…
@@ -2681,6 +2701,7 @@
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `uso.mjs` — uso.mjs — registro local do que a IA pede às ferramentas de entrada, e o resumo dele: `npm run uso`.
 - `uso.test.mjs` — uso.test.mjs — o registro de uso: grava uma linha por pedido de ajuda, de roteiro e por recusa; resume o que a IA mais pede e o que não encontra; nunca quebr…
+- `variantes.mjs` — variantes.mjs — as variantes de uma receita lado a lado: a receita rodada com cada troca de valores da TABELA que ela declara em `VARIANTES`, capturada na ba…
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.
 - `vinco-na-imagem.test.mjs` — vinco-na-imagem.test.mjs — a dobra viva chega à imagem como aresta, nos dois caminhos de imagem: a cena da bancada (`adaptarThree`, que põe a normal de cada …

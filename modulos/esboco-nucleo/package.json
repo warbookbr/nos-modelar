@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "@modelar/esboco-nucleo",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "O esboço 2.0: cada opção de forma é uma pequena receita do núcleo, com o atalho de posição pela caixa da malha, o leitor dos esboços antigos de opções de forma e as variantes de receita."
+}

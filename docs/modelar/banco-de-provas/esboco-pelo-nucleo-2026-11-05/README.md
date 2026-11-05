@@ -1,4 +1,4 @@
-# Esboço pelo núcleo — inventário da fatia 1
+# Esboço pelo núcleo — inventário da fatia 1 e provas da fatia 2
 
 Inventário do plano [esboço pelo núcleo](../../planos/2026-11-05-esboco-pelo-nucleo.md), em 2026-11-05, sobre a main em `c1933085`.
 Ele responde quem usa o módulo `modulos/esboco/` hoje, quais recursos do esboço os arquivos guardados usam de fato, se alguma peça
@@ -169,3 +169,74 @@ módulo; a outra saída é tirar a conferência e ficar só com o envelope do an
 calibração do crítico, que se gera de novo pelas capturas da bancada ou guarda as imagens de hoje sem o desenhista, o gate
 `desenho:check`, que sai com o desenhista, o campo `esboco` das famílias `roda-pneu` e `dobradica`, e o tradutor de receitas
 externas, cujo destino é o esboço. Nenhum desses arquivos está no território do plano, e `vistas-para-critica.mjs` está no do braço.
+
+## 6. Fatia 2: o esboço 2.0, as variantes e os gates 1 e 2
+
+A fatia 2 entregou o módulo [`modulos/esboco-nucleo/`](../../../../modulos/esboco-nucleo/README.md), com `npm run esboco:nucleo -- <arquivo>`
+(`tools/modelar/esboco-nucleo.mjs`) e `npm run variantes -- <peça>` (`tools/modelar/variantes.mjs`), os dois com `--ajuda`. Cada opção é
+uma receita do núcleo em memória, com passos crus (todo o catálogo, as gaiolas, `gaiolaPorLacos`, `aberturaPorContorno` e as famílias
+por `chamar`) e o atalho de formas posicionadas por `centro`, `sobre`, `ponta`, `desloca` e `rotacao`, resolvido pela caixa da malha
+que o núcleo gerou. A captura é a da bancada: cada opção abre numa página com a sessão dela, e a câmera é uma só, ortográfica e
+centrada na caixa que junta as malhas de todas as opções, convertida para o estúdio de cada página pela transformação que a bancada
+deu à peça. A página devolve onde o centro e o quadro dos oito cantos da caixa comum caíram na tela, e nas quatro imagens desta
+pasta a diferença entre as opções é zero até a quinta casa.
+
+```bash
+npm run esboco:nucleo -- docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/farol-na-chapa.esboco.mjs --saida <png>
+npm run esboco:nucleo -- docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/farol-na-chapa.esboco.mjs --vista isometrica --saida <png>
+node docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/medir-farol.mjs [--json]
+npm run variantes -- docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/mesa-com-variantes.js --saida <png>
+npx vitest run modulos/esboco-nucleo/
+```
+
+O leitor dos esboços antigos abre as 13 opções de forma de peça guardadas (11 do braço, o farol e a lanterna do furgão) sem
+reescrita e sem recusa, e a malha de cada uma das 220 formas confere com a medida declarada a 0,5 mm mais a flecha do círculo. Dos 86
+`.esboco.json` versionados, 21 abrem: as 13 opções de forma, as 7 receitas externas traduzidas e um teste do módulo antigo
+(`modulos/esboco/tests/fixtures/teste-cubo.esboco.json`). Os 65 recusados são os 33
+esboços detalhados do banco de provas, 29 dos 30 testes do módulo antigo e as 3 fixtures de ferramenta, todos com o motivo: campo da
+raiz que o 2.0 não lê (`parametros`, `contato`, `pontos`, `simetrico`, `curso`, `estilos`, em 62 arquivos), unidade do Condutor
+(33), haste por `de`/`para` (18), componente (17), tubo (14), espelho (13), `alinha` (12), forma de família (11), expressão no lugar
+de número (6), casca do loft (4), centro por âncora (4) e, um arquivo cada, a tampa do loft com a seção fora do eixo, `encosta` e o
+recorte. Nenhum deles é opção de forma, e todos são do uso que a seção 5 deixou de fora.
+
+O teste do leitor abre cada `.esboco.json` versionado e exige que abra ou traga o motivo, e que as 13 opções de forma abram com
+todas as faces em parte; o dos seis tipos confere a caixa e o fechamento de cada tradução (o anel e o loft sem aresta de borda, a
+face plana do cilindro achatado no lado pedido, a base do cone no início do eixo, o perfil da extrusão em cada vértice desenhado).
+Duas lacunas do loft ficaram medidas: o loft do núcleo sai aberto sem polo, e o leitor o tampa com um polo a 0,01 mm da seção da
+ponta, uma tampa plana a menos de 0,01 mm; e o polo fica na reta do eixo, porque um polo fora dela inclina as seções das pontas
+(medido no ombro com cantos `[32, 32, 2, 2]`, cuja malha saía com 364 mm em vez de 210 antes da correção). A extrusão côncava passa
+(o farol A tem perfil côncavo e confere vértice a vértice).
+
+### Gate 1: as opções do farol numa chapa curva
+
+[`farol-na-chapa.esboco.mjs`](farol-na-chapa.esboco.mjs) é um esboço do 2.0 em módulo: lê o farol e o pisca da direita das três
+opções de `procedural/pecas/furgao-realista/referencias/farol-dianteiro.esboco.json` e os leva à chapa da abertura de prova
+(`tools/fixtures/abertura-de-prova/chapa.js`, 800 por 800 mm, 2 mm, raio 600 mm em x e 900 mm em z), com a ponta de dentro do farol
+em x 120 e o topo em z 300. O farol é um vão de `aberturaPorContorno` com a lente recuada 3 mm. O pisca de A e de B fica dentro do
+conjunto e é um segundo vão aberto na lente do farol, com o contorno cortado pelo farol recuado 6 mm, porque o vão não pode encostar
+na borda do sólido que corta; o de C fica 8 mm abaixo do farol e é um segundo vão na chapa. As três receitas executam sem recusa,
+com todas as faces em parte (`chapa`, `farol` e `pisca`).
+
+![as três opções do farol na chapa curva, vistas de cima](farol-na-chapa-superior.png)
+
+![as mesmas opções em isométrica, com a curvatura da chapa](farol-na-chapa-isometrica.png)
+
+[`medir-farol.mjs`](medir-farol.mjs) mede cada vão contra o contorno desenhado. A borda de fora do farol, achada nas arestas da chapa
+por `bordaDoVao`, fica a 0,000 mm do desenho nas três opções, nos dois sentidos, e cada canto tem na malha o ângulo do desenho a
+menos de 0,01 grau: o bico de A tem 61,31 graus e o de B 60,32, os dois iguais aos desenhados, e o topo de cada farol é a reta do
+desenho. O pisca, medido pela borda que a operação registra (o caminho de `bordaDoVao` não fecha na lente, e a causa não foi
+investigada), fica a 0,003 mm do desenho em A e a 0,000 em B e C, com a maior diferença de ângulo de 0,02 grau (A). É a forma que a
+peça daria, porque é a mesma receita que a bancada executou: o hash do neutroCanonico é `78248fa1cd409ad4` (A, 2.634 faces),
+`098c3b2fc9573244` (B, 2.553) e `a712ed3365ebfce7` (C, 2.680). O que o esboço antigo prometeu e a gaiola subdividida não entregou, o
+bico e o topo numa linha só, o vão por contorno entrega; a escolha da pessoa entre as três continua sendo pela imagem.
+
+### Gate 2: a mesa com três variantes
+
+[`mesa-com-variantes.js`](mesa-com-variantes.js) é a cópia de prova de `procedural/pecas/mesa-quadrada-escura/receita.js`, o mesmo
+código com um parágrafo no cabeçalho e `VARIANTES` no fim: o tampo de 40 mm (o aceito), de 25 mm e de 60 mm. A receita do acervo não
+mudou. A variante aceita dá o neutroCanonico `fffabfa1c97c3332…`, o mesmo da receita do acervo e da cópia sem troca, e as outras duas
+dão `4b40277eb58d16be…` e `39758461aee95348…`, com as mesmas 274 faces e a mesma caixa externa; o teste
+`modulos/esboco-nucleo/tests/variantes.test.js` confere a igualdade pelo hash inteiro e que a tabela do acervo continua com 40 mm
+depois das variantes.
+
+![as três espessuras de tampo da mesa, lado a lado e na mesma câmera](mesa-variantes.png)
