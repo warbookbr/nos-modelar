@@ -501,7 +501,6 @@
 
 ## docs/modelar/planos/
 
-- `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `BACKLOG.md` — Backlog aberto
@@ -605,6 +604,7 @@
 - `2026-09-15-modo-de-edicao-de-malha.md` — Modo de edição de malha — vértice, aresta e face
 - `2026-09-16-topologia-e-leitura-do-gesto.md` — Topologia, mover a peça, e ler o gesto
 - `2026-09-17-nada-depende-da-bicicleta.md` — Nada depende da bicicleta
+- `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-09-22-a-peca-nasce-encaixada.md` — A peça nasce encaixada
 - `2026-09-22-o-motor-mora-num-lugar-so.md` — O núcleo mora num lugar só, e se chama núcleo
 - `2026-09-22-o-teste-carrega-o-que-ele-prova.md` — O teste carrega o que ele prova

@@ -10,6 +10,7 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
+- [O que o braço robótico achou](./2026-09-21-o-que-o-braco-robotico-achou.md) foi concluído em 2026-11-05, conferido item por item: três achados já estavam resolvidos, a junta de flanco e a técnica prometida foram para o plano do braço e quatro foram para o backlog.
 - Quatro planos de agosto saíram da raiz em 2026-11-05, conferidos contra o que veio depois: o [chassi realista](./2026-08-18-chassi-realista-kernel-geometrico.md) e a [prova do quarto dianteiro](./2026-08-19-chassi-p2-prova-do-quarto.md) foram cancelados porque a subdivisão com vincos que eles decidiram e iam provar entrou no núcleo pela [carroceria por subdivisão](./2026-10-21-carroceria-por-subdivisao.md); o [motor de prancha](./2026-08-20-motor-de-prancha-autonomia.md) foi dado por concluído em R4 parcial, sem a R5; e a [validação integrada](./2026-08-20-validacao-integrada-modelar.md) foi cancelada antes de começar, porque o fluxo que ela compararia mudou e um ensaio comparativo hoje pede protocolo novo.
 - [Esboço pelo núcleo](./2026-11-05-esboco-pelo-nucleo.md) foi concluído em 2026-11-05: o esboço antigo saiu e o 2.0 faz cada opção de forma como receita do núcleo, em milímetros, com posição sem conta, relato de contatos e variantes de receita lado a lado; a conferência do avião passou a ler as formas gravadas, igual à de antes.
 - [Navegação de receitas](./2026-11-05-navegacao-de-receitas.md) foi concluído em 2026-11-05: o comando `receita:mapa` para qualquer receita, a convenção de dividir acima de 1.000 linhas e a receita do furgão em oito arquivos com a malha igual; um modelador de estudo leu cerca de 30 KB da receita contra 81 KB da linha de base.
@@ -465,7 +466,7 @@ bicicleta](2026-09-17-nada-depende-da-bicicleta.md) fechou em
 2026-09-22 com a remoção da peça, e o acervo ficou sem peça, declarado num
 `ACERVO-SEM-PECA.md` que saiu quando o braço repovoou o acervo.
 
-O [que o braço robótico achou](../2026-09-21-o-que-o-braco-robotico-achou.md) é
+O [que o braço robótico achou](./2026-09-21-o-que-o-braco-robotico-achou.md) é
 **rascunho** aberto em 2026-09-21. O braço foi modelado como sonda, e não como
 peça, e duas rodadas bastaram para levantar a lista: o corpus de teste virou um
 segundo acervo visível na bancada, o visor morreu na migração para pasta sem

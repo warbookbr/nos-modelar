@@ -1,6 +1,8 @@
 # O que o braço robótico achou
 
-**Estado:** rascunho
+**Estado:** concluído
+
+**Encerramento (2026-11-05):** conferido item por item contra o repositório de hoje. Já resolvidos: a imagem do crítico (captura e escala comum, pelo plano de [ajustes no núcleo dos veículos](2026-10-21-ajustes-no-nucleo-dos-veiculos.md)), as tampas do cilindro (documentadas nas armadilhas por operação) e o teto de realismo (a subdivisão com vincos entrou no núcleo pela [carroceria por subdivisão](2026-10-21-carroceria-por-subdivisao.md)). A medida de junta de flanco e a conferência da técnica prometida foram para o plano [das partes do braço](../2026-09-26-as-partes-do-braco.md), que chega ao cotovelo; a pasta de peça sem receita, a peça avulsa conferida antes da malha, o veredito "não julguei" e a pergunta do referencial no alinhamento foram para o [backlog](../BACKLOG.md). O `loft` continua sem tampa plana, e o afinamento liso que o pedia sai pelo sólido por laços. O conteúdo abaixo é registro, não autorização.
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
