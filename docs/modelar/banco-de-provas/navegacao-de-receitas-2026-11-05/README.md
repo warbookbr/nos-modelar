@@ -1,6 +1,6 @@
 # Navegação de receitas, 2026-11-05
 
-Provas do plano [navegação de receitas](../../planos/2026-11-05-navegacao-de-receitas.md): a linha de base da leitura da receita pelo modelador, o comando do mapa da receita, a convenção de divisão e a divisão da receita do furgão.
+Provas do plano [navegação de receitas](../../planos/encerrados/2026-11-05-navegacao-de-receitas.md): a linha de base da leitura da receita pelo modelador, o comando do mapa da receita, a convenção de divisão e a divisão da receita do furgão.
 
 ## Linha de base
 

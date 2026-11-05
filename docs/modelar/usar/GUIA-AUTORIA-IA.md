@@ -9,7 +9,7 @@ Ao receber um pedido de criação ou modificação geométrica, siga a skill `cr
 
 ## 2. Anatomia Canônica de uma Receita Procedural
 
-Uma receita de peça reside em `procedural/pecas/<nome-da-peca>/receita.js` e segue a cadeia de [`AUTORIA-DE-PECA.md`](AUTORIA-DE-PECA.md): `TABELA` em milímetros exportada como `PARAMS`, `derivar`, `gerarPassos` e `get PASSOS`. O exemplo mínimo abaixo é executado por `tools/modelar/exemplo-canonico.test.mjs` pelo caminho do acervo.
+Uma receita de peça reside em `procedural/pecas/<nome-da-peca>/receita.js` e segue a cadeia de [`AUTORIA-DE-PECA.md`](AUTORIA-DE-PECA.md): `TABELA` em milímetros exportada como `PARAMS`, `derivar`, `gerarPassos` e `get PASSOS`. O exemplo mínimo abaixo é executado por `tools/modelar/exemplo-canonico.test.mjs` pelo caminho do acervo. Acima de 1.000 linhas, a receita se divide em `receita/<assunto>.js` ([convenção](../banco-de-provas/navegacao-de-receitas-2026-11-05/README.md#a-convenção-de-divisão)), e `npm run receita:mapa -- <peça>` dá o mapa dela.
 
 ```javascript exemplo-canonico
 export const TABELA = { base_largura: 120, base_profundidade: 80, base_espessura: 10, coluna_lado: 30, coluna_altura: 90 };

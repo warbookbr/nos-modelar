@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/furgao-realista/referencias/`, `procedural/pecas/furgao-realista/rodadas/`, `procedural/pecas/furgao-realista/pedidos.json`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`
+**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
@@ -129,4 +129,4 @@ Na etapa 7, em 2026-11-05, a pessoa achou as luzes pouco estilizadas e mostrou c
 
 O modelador fez as luzes escolhidas, e a pessoa achou o farol estranho antes do crítico: o topo pulava de um anel ao outro num degrau e a ponta em bico saiu arredondada, porque o vão só segue as linhas da gaiola e a subdivisão arredonda os cantos dele. A pessoa notou que o esboço prometia formas que o núcleo não entrega e, em 2026-11-05, pôs o furgão em pausa para abrir o plano da [abertura de contorno livre](encerrados/2026-11-05-abertura-de-contorno-livre.md) e concluir o da [porta de entrada dos agentes](encerrados/2026-11-05-porta-de-entrada-dos-agentes.md). As luzes feitas ficaram fora da main, sem aceite, e o furgão volta pelo farol com a ferramenta nova.
 
-Com o furgão em pausa, a pessoa deixou em 2026-11-05 que a receita (`receita.js` e a pasta `receita/` que a divisão criar) passe ao plano da [navegação de receitas](2026-11-05-navegacao-de-receitas.md), que a divide por assunto com a malha igual; ela volta a este território quando aquele plano fechar.
+Com o furgão em pausa, a pessoa deixou em 2026-11-05 que a receita (`receita.js` e a pasta `receita/` que a divisão criar) passe ao plano da [navegação de receitas](encerrados/2026-11-05-navegacao-de-receitas.md), que a divide por assunto com a malha igual; ela volta a este território quando aquele plano fechar. A receita voltou ao furgão em 2026-11-05, dividida em `receita.js` e `receita/`. Uma tarefa de estudo descartável na receita dividida achou três pontos para quando o furgão voltar: a grade e os faróis dividem `farol_topo_y`, de modo que a grade não baixa sem chave própria; o topo do túnel do forro e a folga do forro até o pneu dividem `forro_folga`, e o piso não sobe sem soltar dos forros; e os motivos dos contatos do piso citam medidas escritas à mão, que ficam velhas quando a `TABELA` muda.

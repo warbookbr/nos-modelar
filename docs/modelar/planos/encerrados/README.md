@@ -10,6 +10,7 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
+- [Navegação de receitas](./2026-11-05-navegacao-de-receitas.md) foi concluído em 2026-11-05: o comando `receita:mapa` para qualquer receita, a convenção de dividir acima de 1.000 linhas e a receita do furgão em oito arquivos com a malha igual; um modelador de estudo leu cerca de 30 KB da receita contra 81 KB da linha de base.
 - [Abertura de contorno livre](./2026-11-05-abertura-de-contorno-livre.md) foi concluído em 2026-11-05: a operação `aberturaPorContorno` corta a chapa de subdivisão por um contorno desenhado numa vista, com a costura limpa, a aba pelo `friso`, a lente recuada e o vão na conferência de moldura; na peça de teste as bordas ficam a 0,125 mm do desenho.
 - [Sólido por laços](./2026-11-05-solido-por-lacos.md) foi concluído em 2026-11-05: o ajudante `gaiolaPorLacos` monta a gaiola fechada de uma peça pelo contorno em cada plano, com recusa das medidas em todos os pontos e dos planos próximos demais, aviso de amostragem desigual e compensação do canto; a peça de teste refaz o corpo do ombro do braço a até 0,431 mm.
 - [A porta de entrada dos agentes](./2026-11-05-porta-de-entrada-dos-agentes.md) foi concluído em 2026-11-05: o comando `capacidade` com a ficha de cada ajudante de gaiola recortada do código, o `--ajuda` nas ferramentas que o modelador abria por dentro e o histórico separado da instrução; um modelador real leu cerca de 30% menos código, sem chegar à metade que o gate pedia, pelos motivos registrados no fechamento.
