@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1763 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1765 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -309,6 +309,11 @@
 ## docs/modelar/banco-de-provas/empilhadeira-2026-10-14/referencias/empilhadeira_lateral.pacote/
 
 - `roteiro.md` — Roteiro da análise
+
+## docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/
+
+- `README.md` — Esboço pelo núcleo — inventário da fatia 1
+- `contar.mjs` — contar.mjs — as contagens do inventário do esboço (plano "Esboço pelo núcleo", fatia 1), reexecutáveis.
 
 ## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/braco/
 

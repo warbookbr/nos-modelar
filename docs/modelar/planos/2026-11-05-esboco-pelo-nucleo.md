@@ -58,6 +58,10 @@ A fatia 3 acrescenta ao território, ao começar, os arquivos que migra (as skil
 
 Se o inventário mostrar que uma peça aceita depende do esboço para reproduzir a forma, para e volta à pessoa antes de remover. Se o pacote do crítico precisar mudar enquanto o plano do braço ainda o tiver no território, espera ou pede à pessoa que mude o território.
 
+## Andamento
+
+Fatia 1, em 2026-11-05, com o [inventário](../banco-de-provas/esboco-pelo-nucleo-2026-11-05/README.md) e as contagens reexecutáveis em `contar.mjs` ao lado dele. Nenhuma peça aceita depende do esboço para reproduzir a forma: nenhuma receita está no fecho de import do módulo, e o andaime do avião é um arquivo guardado. Dependem dele a conferência e o crítico: 39 arquivos o importam direto e 62 por outro, 6 gates entre eles; as sete partes do avião com `REFINA.esboco` medem a forma contra o sólido do esboço e têm o alvo do crítico gerado por ele; e todo veredito carrega o módulo pelo comparador de contornos, que o braço usa. Dos 86 esboços guardados, os 13 feitos depois de 2026-10-19 são opções de forma de peça, só com caixa, cilindro, anel, loft, extrusão e cone em tronco, posicionados por `centro`, `sobre`, `ponta` e `desloca`, sem Condutor, contato, componente nem âncora. O 2.0 mínimo cobre esse subconjunto pelo `cubo`, `chamferBox`, `cilindro`, `extrusao`, `lathe` e `loft` do núcleo, com rotação, revolução, recorte, espelho e parâmetros por custo baixo; a seção inclinada do loft fica sem equivalente, e a tampa plana do loft e a extrusão côncava se medem na fatia 2. Antes da remoção, a pessoa decide entre gravar as formas resolvidas do avião como dado e tirar a conferência delas, e o destino do conjunto de calibração do crítico, e o território precisa crescer para o comparador de contornos, o pacote do crítico, a calibração e o tradutor de receitas externas.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar.
