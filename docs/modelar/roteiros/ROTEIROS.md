@@ -19,8 +19,7 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 | `modelar/peca/familia` | modelar | A peça é um caso de uma família que já existe, como aparelho, móvel, cadeira ou roda. |
 | `modelar/peca/nova` | modelar | Nenhuma família serve, e a receita nova se escreve com as operações do motor. |
 | `modelar/peca/corrigir` | modelar | Corrigir ou refinar uma peça que já está no acervo, ou absorver um ajuste feito na bancada. |
-| `modelar/esboco` | modelar | Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço. |
-| `modelar/laco-do-esboco` | modelar | Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço. |
+| `modelar/opcoes` | modelar | Há escolha de forma no alinhamento ou na modelagem: as opções saem lado a lado pelo esboço 2.0 ou pelas variantes da receita. |
 | `modelar/auditar-peca` | modelar | Obter evidência objetiva de uma peça antes de publicar ou homologar. |
 | `modelar/auditar-montagem` | modelar | Conferir composição, relações, encaixes e impacto de um conjunto montado. |
 
@@ -29,7 +28,7 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 Sem roteiro, ou com o nome de um grupo, o `comecar` faz a pergunta do grupo e lista os ramos:
 
 - `mudar`: A mudança segue o plano ativo ou corrige um defeito pontual?
-- `modelar`: A tarefa é uma peça, um esboço sem referência ou uma auditoria?
+- `modelar`: A tarefa é uma peça, as opções de forma dela ou uma auditoria?
 - `modelar/peca`: A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?
 
 ## Regras cobradas por gate
@@ -270,52 +269,26 @@ Passo seguinte, sem estado lido: Leia a receita da peça e o veredito ou o ajust
 
 Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.
 
-## modelar/esboco: Esboçar um objeto em formas primitivas
+## modelar/opcoes: Mostrar as opções de forma em disputa
 
-Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço.
+Há escolha de forma no alinhamento ou na modelagem: as opções saem lado a lado pelo esboço 2.0 ou pelas variantes da receita.
 
-Ler antes de começar, num orçamento de 14.000 bytes (linha de base de 23.789 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 12.000 bytes (linha de base de 6.830 bytes em 2026-11-05):
 
 - `CLAUDE.md`
-- `.claude/skills/esboco-detalhado/SKILL.md`
+- `.claude/skills/esbocar-opcoes/SKILL.md`
 
 Abrir só quando a condição aparecer:
 
-- `.claude/skills/esboco-detalhado/formas-e-componentes.md`, quando for usar forma curva, tubo, âncora relativa ou componente pronto.
-- `.claude/skills/esboco-detalhado/leitura-em-texto.md`, quando for ler o modelo em texto antes da imagem.
-- `.claude/skills/esboco-detalhado/regras-de-contato.md`, quando o gate de contato reprovar.
-- `docs/modelar/usar/PARE-E-ANALISE.md`, quando for conferir o esboço em imagem.
+- `modulos/esboco-nucleo/README.md`, quando a opção pede um campo do esboço 2.0 que a skill não traz.
 
-Skill: `esboco-detalhado`.
+Skill: `esbocar-opcoes`.
 
-Comandos: `npm run esboco -- --ajuda [tópico]`, `npm run esboco -- --condutor <arquivo>`, `npm run esboco -- <arquivo> --descrever`, `npm run esboco -- <arquivo> --composta`.
+Comandos: `npm run esboco:nucleo -- <arquivo> [--so-montar]`, `npm run variantes -- <peça> [--so-montar]`.
 
-Passo seguinte, sem estado lido: Rode npm run esboco -- --condutor <arquivo> e siga o Portão do estágio.
+Passo seguinte, sem estado lido: Escreva as opções como variantes da receita ou como esboço do 2.0, confira com --so-montar e mostre a imagem à pessoa com a referência.
 
-Conferido no fim: O Portão de cada estágio do Condutor e a nota 8 ou mais do crítico visual cego.
-
-## modelar/laco-do-esboco: Conduzir o laço do esboço
-
-Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço.
-
-Ler antes de começar, num orçamento de 12.000 bytes (linha de base de 13.878 bytes em 2026-10-08):
-
-- `CLAUDE.md`
-- `.claude/skills/laco-do-esboco/SKILL.md`
-
-Abrir só quando a condição aparecer:
-
-- `docs/modelar/usar/PARE-E-ANALISE.md`, quando for conferir o esboço em imagem.
-- `docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md`, quando o objeto é do banco de provas e o custo vai ser registrado.
-- `docs/modelar/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
-
-Skill: `laco-do-esboco`.
-
-Comandos: `npm run esboco -- --condutor <arquivo> --veredito <unidade|marco-N|objeto> --nota <0-10> --motivo <texto>`, `npm run banco-de-provas:registrar`.
-
-Passo seguinte, sem estado lido: Siga a skill laco-do-esboco: despache o esbocista e registre cada veredito do crítico.
-
-Conferido no fim: O fluxo do Condutor em Concluído, com cada nota do crítico em 8 ou mais.
+Conferido no fim: A pessoa escolhe pela imagem, e a escolha vira decisão escrita no PLANO e valor da TABELA.
 
 ## modelar/auditar-peca: Auditar uma peça pronta
 

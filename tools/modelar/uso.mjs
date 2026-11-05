@@ -2,9 +2,10 @@
 /* uso.mjs — registro local do que a IA pede às ferramentas de entrada, e o resumo dele: `npm run uso`.
  *
  * A divulgação progressiva só funciona se o índice acerta: o tópico que a IA procura existe, o roteiro que ela pede tem esse
- * nome, e a recusa que ela leva aponta o tópico que resolve. Nada disso aparece sem um registro. Três comandos acrescentam
- * uma linha JSON a `.diario/uso.jsonl` (fora do Git, junto do diário da oficina): `esboco --ajuda <tópico>` (o tópico pedido,
- * e se existia), `comecar <roteiro>` (idem) e as recusas do esboço e do gate de contato (a mensagem e o tópico apontado).
+ * nome, e a recusa que ela leva aponta o tópico que resolve. Nada disso aparece sem um registro. Quem registra acrescenta
+ * uma linha JSON a `.diario/uso.jsonl` (fora do Git, junto do diário da oficina): `comecar <roteiro>` (o roteiro pedido, e se
+ * existia) e as recusas do gate de contato (a mensagem e o tópico apontado). Até 2026-11-05 o `esboco --ajuda <tópico>` e as
+ * recusas do esboço antigo também registravam; o esboço antigo saiu, e as linhas que eles gravaram continuam lidas como antes.
  * `npm run uso` resume: tópicos mais pedidos, tópicos não encontrados, roteiros pedidos e recusas repetidas.
  *
  * O registro mede a ferramenta, nunca o agente, e não pode atrapalhar o comando que registra: qualquer falha de escrita é
@@ -99,7 +100,7 @@ const lista = (itens, linha) => (itens.length === 0 ? ['  nenhum'] : [...itens.s
 
 export function formatarUso(resumo, caminho) {
   const n = (x) => String(x).padStart(4);
-  if (resumo.total === 0) return `registro de uso vazio (${caminho}): rode npm run esboco -- --ajuda <tópico> ou npm run comecar -- <roteiro> e volte aqui\n`;
+  if (resumo.total === 0) return `registro de uso vazio (${caminho}): rode npm run comecar -- <roteiro> e volte aqui\n`;
   return [
     `registro de uso: ${resumo.total} ${resumo.total === 1 ? 'evento' : 'eventos'} de ${resumo.de} a ${resumo.ate} em ${caminho}`,
     '',

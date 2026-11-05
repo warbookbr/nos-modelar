@@ -3,18 +3,15 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { medirEsboco } from '../../modulos/esboco/src/descrever.js';
-import { perguntasDoEsboco } from '../../modulos/esboco/src/perguntas.js';
 import { conferirRazoesDaPeca, normalizarRazoesDaPeca } from '../../src/autoria/razoes-da-peca.js';
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { medidasEsperadas, vistasGravadas } from '../../src/autoria/calibracao-do-critico.js';
 import {
   RAIZ, ErroDaFonte, brief, briefDaImagem, caminhoDoConjunto, chamadaDaFonte, conferir, conferirConjunto, descreverFonte, esbocoDaFonte, executarChamada,
-  faltaNoAgente, hashDaImagem, hashDoAgente, hashDoBrief, hashDoDesenho, idsDaMedidaDaPeca, lerConjuntoDoDisco, linhaDoEstado, migrarImagemDosJulgamentos, modeloDoBrief, prepararImagem,
+  faltaNoAgente, fonteDeEsbocoGravada, hashDaImagem, hashDoAgente, hashDoBrief, idsDaMedidaDaPeca, linhasDoBriefDoObjeto, lerConjuntoDoDisco, linhaDoEstado, migrarImagemDosJulgamentos, modeloDoBrief, prepararImagem,
   prepararImagemGuardada, principal, registrar, resumo, vazamentosDoBrief, vocabularioDoAgente,
 } from './calibracao-do-critico.mjs';
 import { hashDe } from './aprovacao-da-familia.mjs';
-import { linhasDoBriefDoObjeto } from './esboco.mjs';
 
 /* uma cópia do conjunto versionado com `resultados` esvaziado: nenhum teste depende do que já foi julgado */
 const conjuntoNovo = () => ({ ...JSON.parse(JSON.stringify(lerConjuntoDoDisco())), resultados: [] });
@@ -62,7 +59,7 @@ describe('cada conferência reprova quando o que ela guarda muda', () => {
     c.critico.agente.sha256 = `sha256:${'0'.repeat(64)}`;
     const r = conferirConjunto({ conjunto: c, so: 'c05' });
     expect(codigos(r)).toContain('agente-mudou');
-    expect(r.problemas.find((p) => p.codigo === 'agente-mudou').mensagem).toMatch(/meça de novo/);
+    expect(r.problemas.find((p) => p.codigo === 'agente-mudou').mensagem).toMatch(/meça o crítico de novo/);
   });
 
   it('o texto do brief mudou: o hash do modelo deixa de bater', () => {
@@ -91,20 +88,20 @@ describe('cada conferência reprova quando o que ela guarda muda', () => {
     expect(hashDaImagem(trocada)).not.toBe(hashDaImagem(img));
   });
 
-  it('o desenho da fonte mudou: a mutação de uma imagem muda a impressão e a geometria', () => {
+  it('a geometria da fonte mudou: a mutação de uma imagem muda a geometria', () => {
     const c = conjuntoNovo();
     imagem(c, 'facetado').fonte.argumentos[0].valor = 16;
     const r = conferirConjunto({ conjunto: c, so: 'c06' });
-    expect(codigos(r)).toEqual(expect.arrayContaining(['desenho-mudou', 'geometria-mudou']));
+    expect(codigos(r)).toContain('geometria-mudou');
   });
 
-  it('o arquivo do esboço mudou ou o remendo mudou o desenho', () => {
+  it('o arquivo do esboço mudou: a impressão gravada no conjunto e a das fontes de esboço são conferidas', () => {
     const c = conjuntoNovo();
     imagem(c, 'picape-baixa').fonte.arquivoSha256 = `sha256:${'3'.repeat(64)}`;
     expect(codigos(conferirConjunto({ conjunto: c, so: 'c03' }))).toContain('esboco-mudou');
     const d = conjuntoNovo();
-    imagem(d, 'dobradicas-por-fora').fonte.remendo = { plano: { familia: 'movel-de-caixa' }, parametros: { alturaPorta: 1700 } };
-    expect(codigos(conferirConjunto({ conjunto: d, so: 'c07' }))).toContain('desenho-mudou');
+    imagem(d, 'dobradicas-por-fora').fonte.arquivo = imagem(d, 'picape-baixa').fonte.arquivo;
+    expect(codigos(conferirConjunto({ conjunto: d, so: 'c07' }))).toContain('fonte-nao-reproduz');
   });
 
   it('o PNG gravado não é o arquivo: o sha256 do arquivo é conferido', () => {
@@ -171,12 +168,10 @@ describe('decide vale dos dois lados', () => {
     expect(sobra.problemas.find((p) => p.codigo === 'medida-nao-decide').mensagem).toMatch(/reprova razao:hastePelaCamisa, que nenhum defeito cita/);
   });
 
-  it('a picape: a razão reprova pelo `--medidas` do esboço, e só ela', () => {
+  it('a picape: a razão reprova pelo `--medidas` do esboço, e só ela (a medida que o módulo antigo deu, gravada)', () => {
     const c = lerConjuntoDoDisco();
-    const { bruto } = esbocoDaFonte(imagem(c, 'picape-baixa').fonte);
-    const medido = medirEsboco(bruto, { projecao: false });
-    expect(medido.plano.achados.map((a) => `${a.tipo}:${a.nome}`)).toEqual(['medida-fora:alturaPeloComprimento']);
-    expect(medido.plano.opcoes[0].medidas.find((m) => m.nome === 'alturaPeloComprimento')).toMatchObject({ tipo: 'razao', medido: 0.28, a_mm: 1400, b_mm: 5000, faixa: [0.3, 0.4], ok: false });
+    expect(fonteDeEsbocoGravada(imagem(c, 'picape-baixa')).medidas).toEqual(['esboco-medida:alturaPeloComprimento']);
+    expect(fonteDeEsbocoGravada(imagem(c, 'dobradicas-por-fora')).medidas).toEqual([]);
     expect(medidasEsperadas(imagem(c, 'picape-baixa'))).toEqual(['esboco-medida:alturaPeloComprimento']);
   });
 
@@ -233,21 +228,19 @@ describe('o crítico: o agente e o brief', () => {
 
   it('o guarda-roupa remendado com a família entra no brief novo com a pergunta da dobradiça e da porta', () => {
     const c = lerConjuntoDoDisco();
-    const { bruto } = esbocoDaFonte(imagem(c, 'dobradicas-por-fora').fonte);
-    const perguntas = perguntasDoEsboco(bruto).todas;
+    const { perguntas } = fonteDeEsbocoGravada(imagem(c, 'dobradicas-por-fora'));
     expect(perguntas.some((p) => /dobradiça/.test(p))).toBe(true);
     expect(perguntas.some((p) => /gaveta/.test(p))).toBe(true);
   });
 });
 
-describe('a descrição das fontes e a impressão do desenho', () => {
-  it('descreve a mutação de cada fonte numa frase e a impressão não depende da ordem das vistas lidas', () => {
+describe('a descrição das fontes', () => {
+  it('descreve a mutação de cada fonte numa frase', () => {
     const c = lerConjuntoDoDisco();
     expect(descreverFonte(imagem(c, 'haste-grossa').fonte)).toBe('cilindro-hidraulico no ponto medio; haste=110; viola haste-abaixo-do-embolo, haste-grossa-demais');
     expect(descreverFonte(imagem(c, 'raios-curtos').fonte)).toContain('noDoAro* × 0.75 nas componentes 1,2');
     expect(descreverFonte(imagem(c, 'controle-cilindro').fonte)).toContain('geometria aprovada do ponto medio');
     expect(descreverFonte(imagem(c, 'controle-roda').fonte)).toBe('roda-pneu no perfil carro; geometria aprovada do perfil carro');
-    expect(hashDoDesenho([{ vista: 'a', r: { largura: 1, altura: 1, svg: 'x' } }])).not.toBe(hashDoDesenho([{ vista: 'a', r: { largura: 1, altura: 1, svg: 'y' } }]));
     expect(caminhoDoConjunto()).toMatch(/calibracao-do-critico\/conjunto\.json$/);
   });
 });
@@ -499,10 +492,5 @@ describe('a imagem preparada guardada', () => {
     expect(outra).not.toBe(prepararImagemGuardada(imagem(c, 'facetado'), c));
     expect(JSON.stringify(outra)).toBe(JSON.stringify(prepararImagem(mutada, c)));
     expect(outra.fonteSha256).not.toBe(prepararImagemGuardada(imagem(c, 'facetado'), c).fonteSha256);
-    /* o remendo do esboço entra na chave: o desenho muda com ele */
-    const remendada = structuredClone(imagem(c, 'dobradicas-por-fora'));
-    const original = prepararImagemGuardada(remendada, c);
-    remendada.fonte.remendo = { plano: { familia: 'movel-de-caixa' }, parametros: { alturaPorta: 1700 } };
-    expect(prepararImagemGuardada(remendada, c).desenho).not.toBe(original.desenho);
   });
 });

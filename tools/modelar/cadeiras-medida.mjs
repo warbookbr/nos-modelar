@@ -6,18 +6,18 @@
 
    O alvo de cada perfil é o esboço que `receitaParaEsboco` tira da receita do externo em `fixtures/receita-externa-cadeiras/`, com o
    ajuste da pessoa na `cadeira_almofadada_clara` (o topo das pernas da frente encosta no assento). A caixa envolvente do alvo vem das caixas
-   que `descreverEsboco` lê. O volume do alvo é a união das caixas da receita (volume contado uma vez só onde elas se sobrepõem) menos o
+   que `caixasDoEsboco` (`esboco-para-passos.mjs`) lê, em centésimos de mm. O volume do alvo é a união das caixas da receita (volume contado uma vez só onde elas se sobrepõem) menos o
    que o chanfro do esboço tira, mais o dos cilindros; o volume da família é o da malha (fórmula de Newell sobre cada face). */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { descreverEsboco } from '../../modulos/esboco/src/descrever.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { chamar } from '../../src/autoria/chamar-familia.js';
 import { CADEIRA } from '../../procedural/familias/cadeira/index.js';
 import { geometriaDaCadeira } from '../../procedural/familias/cadeira/geometria.js';
 import { criarRegistroDeFamilias } from '../../procedural/familias/index.js';
 import { chanfroDoEsboco, receitaParaEsboco, volumeDaPeca } from './receita-externa.mjs';
+import { caixasDoEsboco } from './esboco-para-passos.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const PASTA_DAS_RECEITAS = join(AQUI, 'fixtures', 'receita-externa-cadeiras');
@@ -66,7 +66,7 @@ function volumeDaUniao(caixas) {
 export function medirAlvo(perfil) {
   const receita = receitaDoAlvo(perfil);
   const { esboco } = receitaParaEsboco(receita);
-  const formas = descreverEsboco(esboco).opcoes[0].formas;
+  const formas = caixasDoEsboco(esboco);
   const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
   for (const f of formas) {
     [f.caixa.x, f.caixa.y, f.caixa.z].forEach(([a, b], k) => { min[k] = Math.min(min[k], a); max[k] = Math.max(max[k], b); });

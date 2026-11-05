@@ -1,7 +1,8 @@
 /* suporte.js — a receita de prova da conferência da forma contra o esboço.
  *
  * Um bloco de 200 por 100 por 120 mm com um furo passante de 60 mm de diâmetro e, acima dele, uma viga de 300 por 40 por 60 mm inclinada
- * 30 graus em z. `bloco.esboco.json` desenha as duas formas (o furo é o recorte de um cilindro) e `andaime.json` reserva uma caixa para
+ * 30 graus em z. `bloco.esboco.json` desenha as duas formas (o furo é o recorte de um cilindro), `bloco.formas.json` guarda as formas que o
+ * módulo antigo do esboço resolvia dele (com a composta do esboço inteiro, o alvo do pacote do crítico) e `andaime.json` reserva uma caixa para
  * cada uma, folgada o bastante para o envelope do `REFINA` aprovar também as variantes defeituosas, de modo que só a razão de volume
  * contra o esboço as recuse. Cada pasta ao lado (`ok`, `sem-recorte`, `menor`, `deslocada`, `viga-reta`, `minimo-proprio`) é uma receita
  * de uma linha que chama esta função com um defeito diferente; `deslocada-declarada` é o bloco deslocado de propósito, com o
@@ -53,7 +54,7 @@ export function receitaDoBloco({
     TOPO: { origem: 'centro da base do bloco, no chão; y para cima' },
     PLANO: {
       objeto: 'bloco com um furo passante e uma viga inclinada acima dele, para provar a conferência da forma contra o esboço',
-      referencias: ['../andaime.json', '../bloco.esboco.json'],
+      referencias: ['../andaime.json', '../bloco.formas.json'],
       escala: { medida: 'largura do bloco', milimetros: 200 },
       partes: [
         { nome: 'bloco', forma: 'caixa de 200 por 100 por 120 mm com um furo passante de 60 mm de diâmetro, 30 mm para o lado +x', tecnica: 'caixa menos cilindro' },
@@ -66,7 +67,7 @@ export function receitaDoBloco({
     },
     REFINA: {
       andaime: '../andaime.json',
-      esboco: { arquivo: '../bloco.esboco.json', opcao: 1, formas, minimo, ...esboco },
+      esboco: { arquivo: '../bloco.formas.json', opcao: 1, formas, minimo, ...esboco },
       partes: { bloco: 'bloco', viga: 'viga' },
       tolerancia,
     },

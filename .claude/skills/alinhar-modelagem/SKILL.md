@@ -13,8 +13,8 @@ cobrado por `npm run guarda:acervo`. Uma rodada inteira respondida está em
 
 Pergunte uma coisa por vez e escreva o que for decidido. Resposta vaga não
 avança: se a pessoa não souber, ofereça duas opções concretas. Quando a escolha
-for de forma, mostre as opções desenhadas lado a lado com a skill
-[esbocar-opcoes](../esbocar-opcoes/SKILL.md), junto da foto, e confira a imagem com o passo de análise dela antes de mostrar. Não modele no
+for de forma, mostre as opções lado a lado com a skill
+[esbocar-opcoes](../esbocar-opcoes/SKILL.md), junto da foto, e confira a imagem como ela diz antes de mostrar. Não modele no
 meio da rodada nem escolha operação do motor; a técnica entra como descrição
 curta, e a escolha fina é do modelador.
 
@@ -109,14 +109,7 @@ lataria leva a luz rasante e a curvatura da lataria ao crítico. Num objeto de v
 para `etapas` da montagem v5, e cada encaixe anotado vira um vínculo de medida
 ou uma posição por porta, conforme
 [`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md).
-O alinhamento parte da forma de referência ou da medida; o esboço detalhado é opcional e só serve sem referência. Quando a peça nasce de uma unidade de esboço aprovado, rode primeiro
-`npm run receita:planejada -- <esboço.esboco.json> --unidade <unidade> --peca <objeto>/<peça>`.
-Ele grava a receita planejada com a `TABELA`, os `PONTOS`, o `REFINA`, os `contatos`,
-as `formas`, as partes do `PLANO` e a composta da unidade como alvo, a partir do que o
-esboço diz, e deixa vazios o texto do objeto, as referências e os critérios de
-reprovação, que esta rodada escreve. O normalizador do `PLANO` recusa a receita até
-os três estarem preenchidos. O comando não toca receita que já tem passos, e
-`--saida <pasta>` gera numa árvore espelho sem mexer no acervo.
+O alinhamento parte da forma de referência ou da medida.
 
 Rode `npm run guarda:acervo` e mostre o resultado, depois leia em voz alta para
 a pessoa o que ficou escrito e pergunte se é isso.

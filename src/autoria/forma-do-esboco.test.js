@@ -1,6 +1,6 @@
 /* forma-do-esboco.test.js — a forma de cada parte da receita contra a forma do esboço, pela razão interseção/união de volume.
    O esboço é sintético e escrito à mão no formato de `formasResolvidas`: um bloco com um furo passante (o recorte de um cilindro) e uma viga
-   inclinada 30 graus em z, os de `tools/fixtures/forma-do-esboco/bloco.esboco.json`. A receita que reproduz a forma dá razão acima de
+   inclinada 30 graus em z, os de `tools/fixtures/forma-do-esboco/bloco.esboco.json` (guardados resolvidos em `bloco.formas.json`). A receita que reproduz a forma dá razão acima de
    0,99, a menor e a deslocada reprovam, a viga sem a inclinação reprova, e o bloco sem o recorte dá a razão que o recorte tira. */
 import { describe, expect, it } from 'vitest';
 import { conferirFormaDoEsboco, textoDaRazao } from './forma-do-esboco.js';
@@ -37,7 +37,7 @@ const esbocoDoBloco = (...maisFormas) => ({
   ],
 });
 
-const DECLARACAO = { arquivo: 'bloco.esboco.json', opcao: 1, formas: { bloco: 'bloco', viga: 'viga' }, minimo: 0.99 };
+const DECLARACAO = { arquivo: 'bloco.formas.json', opcao: 1, formas: { bloco: 'bloco', viga: 'viga' }, minimo: 0.99 };
 const neutroDe = (opcoes) => {
   const { neutro } = executarReceita(receitaDoBloco(opcoes));
   expect(neutro.orfaos).toEqual([]);
@@ -142,7 +142,7 @@ describe('o que a conferência não consegue medir também reprova, dizendo o mo
     const r = conferir({}, { ...DECLARACAO, formas: { bloco: 'bloco', viga: 'trave' } });
     expect(r.ok).toBe(false);
     expect(r.achados).toEqual([expect.objectContaining({ codigo: 'forma-do-esboco-desconhecida', parte: 'viga', formas: ['trave'] })]);
-    expect(r.achados[0].mensagem).toBe("a parte 'viga' declara refinar a forma 'trave' do esboço bloco.esboco.json (opção Bloco e viga), e a opção não tem essa forma (formas: bloco, furo, viga).");
+    expect(r.achados[0].mensagem).toBe("a parte 'viga' declara refinar a forma 'trave' do esboço bloco.formas.json (opção Bloco e viga), e a opção não tem essa forma (formas: bloco, furo, viga).");
     expect(r.partes.map((p) => p.parte)).toEqual(['bloco']);
   });
 

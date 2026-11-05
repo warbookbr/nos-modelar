@@ -18,6 +18,10 @@ mesmo nome da unidade, e as formas da unidade viram as partes da receita. A rece
 refina o [andaime](andaime.json) que o esboço traduz, gravado com
 `npm run esboco -- docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json --andaime procedural/pecas/aviao/andaime.json`,
 e declara em `REFINA.partes` qual volume do andaime cada parte dela refina.
+O comando é do esboço antigo, que saiu em 2026-11-05; o andaime ficou como estava, e
+as formas resolvidas da opção 1 que as sete partes com `REFINA.esboco` conferem, com
+as malhas de família e a composta de cada unidade (o alvo do crítico), foram gravadas
+em [`esboco-r2.formas.json`](esboco-r2.formas.json) e em `alvos/`.
 
 | peça | o que é, pelas formas do esboço |
 |---|---|

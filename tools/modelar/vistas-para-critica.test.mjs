@@ -286,18 +286,11 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const base = mkdtempSync(join(area, 'capturas-'));
     const pasta = join(base, 'rodada');
     const bancada = bancadaFalsa(base, PECA);
-    const chamadasDaComposta = [];
     const resultado = await vistasParaCritica(PECA, {
       saida: pasta,
       pastaDasCapturas: base,
       dependencias: {
         olharBancada: bancada.fazer,
-        composta: async (arquivo, opcoes) => {
-          chamadasDaComposta.push({ arquivo, opcoes });
-          const destino = arquivo.replace(/\.esboco\.json$/, `${opcoes.unidade ? `-unidade-${opcoes.unidade}` : ''}-composta.png`);
-          writeFileSync(destino, 'composta');
-          return { destino };
-        },
         sobreposicaoDeCortes: async ({ saida }) => {
           const arquivos = ['x', 'y', 'z'].map((e) => { const a = join(saida, `sobreposicao-${e}.png`); writeFileSync(a, e); return a; });
           return { arquivos, paineis: [{ eixo: 'x', valor: 1, desvioMaximoMm: 1.25 }], notas: [] };
@@ -305,11 +298,11 @@ describe('o pacote de uma receita que refina um esboço', () => {
         ...(aoComposta ?? {}),
       },
     });
-    return { base, pasta, bancada, chamadasDaComposta, resultado };
+    return { base, pasta, bancada, resultado };
   }
 
   it('grava o pedido na pasta da rodada, com as capturas de sempre, o alvo, a sobreposição e as partes do plano', async () => {
-    const { pasta, bancada, chamadasDaComposta, resultado } = await montar();
+    const { pasta, bancada, resultado } = await montar();
     const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
     expect(resultado.pedido).toBe(join(pasta, 'pedido.md'));
     expect(titulos(pedido)).toEqual(['Objeto', 'Alvo', 'Referências', 'Modelo', 'Sobreposição', 'Partes', 'Critérios de reprovação', 'Perguntas', 'Veredito']);
@@ -326,15 +319,13 @@ describe('o pacote de uma receita que refina um esboço', () => {
     expect(pedido).toContain('### viga');
     expect(pedido).toContain('Forma prometida: caixa de 200 por 100 por 120 mm com um furo passante de 60 mm de diâmetro');
     expect(pedido).toContain(`  1. ${PERGUNTA_DO_ALVO}`);
-    expect(chamadasDaComposta).toHaveLength(1);
   }, 60_000);
 
-  it('o alvo é gerado da cópia do esboço declarado, na pasta da rodada, e a unidade é a nula porque nenhuma forma ligada declara unidade', async () => {
-    const { pasta, chamadasDaComposta, resultado } = await montar();
-    expect(chamadasDaComposta[0].arquivo).toBe(join(pasta, 'alvo', 'bloco.esboco.json'));
-    expect(readFileSync(join(pasta, 'alvo', 'bloco.esboco.json'), 'utf8')).toBe(readFileSync('tools/fixtures/forma-do-esboco/bloco.esboco.json', 'utf8'));
-    expect(chamadasDaComposta[0].opcoes).toEqual({ unidade: null });
+  it('o alvo é a composta guardada com as formas do esboço, copiada para a pasta da rodada, e a unidade é a nula porque nenhuma forma ligada declara unidade', async () => {
+    const { pasta, resultado } = await montar();
+    expect(resultado.alvo.unidade).toBeNull();
     expect(resultado.alvo.imagem).toBe(join(pasta, 'alvo', 'bloco-composta.png'));
+    expect(readFileSync(resultado.alvo.imagem)).toEqual(readFileSync('tools/fixtures/forma-do-esboco/alvos/bloco-composta.png'));
     expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain(`- ${resultado.alvo.imagem}`);
   }, 60_000);
 
@@ -354,7 +345,6 @@ describe('o pacote de uma receita que refina um esboço', () => {
       saida: pasta, pastaDasCapturas: base,
       dependencias: {
         olharBancada: bancada.fazer,
-        composta: async (arquivo) => { const destino = arquivo.replace(/\.esboco\.json$/, '-composta.png'); writeFileSync(destino, 'c'); return { destino }; },
         sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
       },
     });
@@ -400,7 +390,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     expect(registro.recebidas.every((c) => c === compartilhada)).toBe(true);
   }, 60_000);
 
-  it('a opção do esboço que não é a primeira recusa antes de gastar captura', async () => {
+  it('a opção que as formas guardadas não são recusa antes de gastar captura', async () => {
     const base = mkdtempSync(join(area, 'opcao-'));
     let capturou = false;
     await expect(vistasParaCritica(PECA, {
@@ -408,10 +398,26 @@ describe('o pacote de uma receita que refina um esboço', () => {
       dependencias: {
         olharBancada: async () => { capturou = true; },
         esbocoDeclarado: async () => ({
-          esboco: join(process.cwd(), 'tools/fixtures/forma-do-esboco/bloco.esboco.json'), opcao: 2, minimo: 0.9, ligadas: { bloco: ['bloco'] },
+          esboco: join(process.cwd(), 'tools/fixtures/forma-do-esboco/bloco.formas.json'), opcao: 2, minimo: 0.9, ligadas: { bloco: ['bloco'] },
         }),
       },
-    })).rejects.toThrow(/primeira opção do esboço/);
+    })).rejects.toThrow(/guarda a opção 1 \(Bloco e viga\) do esboço, e a declaração pede a opção 2/);
+    expect(capturou).toBe(false);
+  }, 60_000);
+
+  it('a unidade sem composta guardada recusa antes de gastar captura, dizendo as que há', async () => {
+    const base = mkdtempSync(join(area, 'sem-alvo-'));
+    const bruto = JSON.parse(readFileSync('tools/fixtures/forma-do-esboco/bloco.formas.json', 'utf8'));
+    const sem = join(base, 'bloco.formas.json');
+    writeFileSync(sem, JSON.stringify({ ...bruto, alvos: {} }));
+    let capturou = false;
+    await expect(vistasParaCritica(PECA, {
+      saida: join(base, 'rodada'), pastaDasCapturas: base,
+      dependencias: {
+        olharBancada: async () => { capturou = true; },
+        esbocoDeclarado: async () => ({ esboco: sem, opcao: 1, minimo: 0.9, ligadas: { bloco: ['bloco'] } }),
+      },
+    })).rejects.toThrow(/não guardam a composta do esboço inteiro, que é o alvo do crítico desta peça \(guardadas: nenhuma\)/);
     expect(capturou).toBe(false);
   }, 60_000);
 });
@@ -431,8 +437,6 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
       saida: pasta, pastaDasCapturas: base,
       dependencias: {
         olharBancada: bancada.fazer,
-        formasDoEsboco: async () => ({ formas: ids.map((id) => ({ id, unidade: 'motor' })) }),
-        composta: async (arquivo, opcoes) => { const destino = arquivo.replace(/\.esboco\.json$/, `-unidade-${opcoes.unidade}-composta.png`); writeFileSync(destino, 'c'); return { destino }; },
         sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
         olharEtapas: async (arquivo, opcoes) => { pedidosDeEtapas.push({ arquivo, opcoes }); return olharEtapas(arquivo, opcoes); },
       },
@@ -456,10 +460,12 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     expect(resultado.montada.instancia).toBe('motor');
   }, 60_000);
 
-  it('a unidade do alvo é a das formas ligadas, e a composta é pedida para ela', async () => {
-    const { resultado } = await montar(async () => { const e = new Error('sem montado'); e.codigo = 'foco-fora-das-etapas'; throw e; });
+  it('a unidade do alvo é a das formas ligadas, e o alvo é a composta guardada dela', async () => {
+    const { resultado, ids } = await montar(async () => { const e = new Error('sem montado'); e.codigo = 'foco-fora-das-etapas'; throw e; });
+    expect(ids.length).toBeGreaterThan(0);
     expect(resultado.alvo.unidade).toBe('motor');
-    expect(basename(resultado.alvo.imagem)).toBe('aviao-unidade-motor-composta.png');
+    expect(basename(resultado.alvo.imagem)).toBe('motor-composta.png');
+    expect(readFileSync(resultado.alvo.imagem)).toEqual(readFileSync('procedural/pecas/aviao/alvos/motor-composta.png'));
   }, 60_000);
 
   it('a peça fora das etapas já construídas segue sem vista montada, com o aviso no relatório e sem a seção no pedido', async () => {

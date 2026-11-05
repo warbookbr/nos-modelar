@@ -1,0 +1,33 @@
+{
+  "formato": "mecanifica.fontes-de-esboco-da-calibracao@1",
+  "gravadoEm": "2026-11-05",
+  "por": "docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs",
+  "fontes": {
+    "c03": {
+      "arquivo": "docs/modelar/banco-de-provas/calibracao-do-critico/fontes/picape-baixa.esboco.json",
+      "arquivoSha256": "sha256:1fc151a6080eb4329201e6b7b5ae7a66b4ed7b156646074a0f020a7175c2a07f",
+      "objeto": "Picape: Picape de cabine simples com caçamba aberta.",
+      "perguntas": [
+        "Onde fica o lugar de quem dirige, pedala ou empurra, e para que lado as partes indicam que o veículo anda?",
+        "Por onde se entra na cabine ou se carrega a caçamba, e que parte do corpo cobre ou deixa aberta essa passagem?"
+      ],
+      "medidas": [
+        "esboco-medida:alturaPeloComprimento"
+      ]
+    },
+    "c07": {
+      "arquivo": "docs/modelar/banco-de-provas/rodada-2026-10-08/guarda-roupa/guarda-roupa.esboco.json",
+      "arquivoSha256": "sha256:89ed882a7a306afc5cea30e2970d24ee15cf13d6380b4b9571e16be02df3494e",
+      "objeto": "Guarda-roupa de quarto: Caixa de MDF com duas portas de abrir, um vão de prateleiras, um de cabideiro e duas gavetas embaixo.",
+      "perguntas": [
+        "Onde fica cada dobradiça com a porta fechada: escondida atrás da porta e presa por dentro do corpo, como pede o móvel de porta sobreposta, ou à vista na face externa da lateral ou da porta?",
+        "Que parte da frente do corpo fica descoberta, e a partir de qual borda cada porta gira, ou em que trilho, no teto e no piso, desliza cada folha de correr?",
+        "Por onde cada gaveta entra e sai, e em que peças do corpo ela se apoia?",
+        "O que segura cada prateleira, e em que peças do corpo ela encosta?",
+        "Em que face de cada porta e de cada gaveta fica o puxador, e perto de qual borda?",
+        "O que toca o chão, e o que fica entre o chão e a base do corpo?"
+      ],
+      "medidas": []
+    }
+  }
+}

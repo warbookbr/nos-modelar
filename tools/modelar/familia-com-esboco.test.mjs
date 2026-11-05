@@ -1,6 +1,7 @@
 /* familia-com-esboco.test.mjs — a conferência da família com o componente do esboço de mesmo nome, ponta a ponta: o
-   componente `roda` do esboço expandido nos parâmetros da família, traduzido para o andaime do nível zero e conferido pelo
-   REFINA contra a peça que a família gera (`chamar` e `executarReceita`, com o registro de composições).
+   andaime do componente `roda` nos parâmetros da família (o que o módulo antigo do esboço expandia e traduzia, guardado em
+   `familia-com-esboco.andaimes.json` quando ele saiu) conferido pelo REFINA contra a peça que a família gera (`chamar` e
+   `executarReceita`, com o registro de composições).
 
    A prova: a família `roda-com-esboco` (tools/fixtures/familia-com-esboco), cujo pneu, disco e cubos repetem o que o
    componente `roda` desenha, passa no mínimo, no ponto médio e no máximo; a mesma família com o pneu engordado além do
@@ -11,9 +12,8 @@ import { describe, expect, it } from 'vitest';
 import { lerFamilia } from '../../src/autoria/familia.js';
 import { TUBO_DE_PROVA } from '../fixtures/familia-chamavel/familia.js';
 import { CONTRATO_DA_RODA, RODA_COM_ESBOCO, criarRodaDeProva } from '../fixtures/familia-com-esboco/familia.js';
-import { andaimeDoEsboco } from './esboco-para-andaime.mjs';
 import { esbocoMinimo, pontosDaFamilia } from '../../src/autoria/familia-esboco.js';
-import { conferirFamiliaComEsboco, conferirFamiliaNosTresPontos, descreverConferenciaDaFamilia } from './familia-com-esboco.mjs';
+import { andaimeDoComponente, conferirFamiliaComEsboco, conferirFamiliaNosTresPontos, descreverConferenciaDaFamilia } from './familia-com-esboco.mjs';
 
 const copia = (x) => JSON.parse(JSON.stringify(x));
 const comContrato = (mudar, defeito) => {
@@ -46,7 +46,7 @@ describe('a família que bate com o componente do esboço', () => {
 
   it('o andaime sai do componente nos parâmetros do ponto: o pneu do esboço tem o diâmetro e a largura da família', () => {
     for (const { ponto, parametros } of pontosDaFamilia(RODA_COM_ESBOCO.contrato)) {
-      const { andaime, tabela } = andaimeDoEsboco(esbocoMinimo(RODA_COM_ESBOCO.contrato, parametros));
+      const { andaime, tabela } = andaimeDoComponente(esbocoMinimo(RODA_COM_ESBOCO.contrato, parametros));
       const pneu = andaime.volumes.find((v) => v.id === tabela['roda.pneu']);
       expect(pneu, ponto).toMatchObject({ tipo: 'anel', raioExterno: parametros.diametro / 2, raioInterno: parametros.aro / 2, espessura: parametros.largura });
     }
@@ -64,6 +64,11 @@ describe('a família que bate com o componente do esboço', () => {
   it('confere também um ponto qualquer da faixa, com os parâmetros que diferem dos padrões', () => {
     const r = conferirFamiliaComEsboco({ familia: RODA_COM_ESBOCO, parametros: { diametro: 700, largura: 150 } });
     expect(r).toMatchObject({ estado: 'conferida', ok: true, parametros: { diametro: 700, aro: 420, largura: 150 } });
+  });
+
+  it('o ponto cujo andaime não foi guardado é recusado, dizendo o componente, os parâmetros e o caminho', () => {
+    expect(() => conferirFamiliaComEsboco({ familia: RODA_COM_ESBOCO, parametros: { diametro: 701 } }))
+      .toThrow(/o andaime do componente 'roda' com .*"diametro":701.* não foi guardado .*Tire o 'esboco' da família ou traga o componente para o esboço 2\.0/);
   });
 });
 

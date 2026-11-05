@@ -31,7 +31,9 @@
 import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
 
-const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+/* As formas resolvidas da opção 1 do esboço aprovado (`aviao.esboco.json` da segunda rodada), guardadas como dado em 2026-11-05, quando o
+   módulo antigo do esboço saiu; a conferência de forma e o alvo do crítico as leem. */
+const ESBOCO = '../../esboco-r2.formas.json';
 const slug = (id) => id.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 
 /* parte -> [forma prometida, técnica], no nome da forma do esboço */

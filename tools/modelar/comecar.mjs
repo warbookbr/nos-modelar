@@ -1,26 +1,22 @@
 #!/usr/bin/env node
-/* comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro] [--arquivo <x.esboco.json>]`.
+/* comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro]`.
  *
  * Os roteiros de `docs/modelar/roteiros/roteiros.json` formam uma árvore pelos nomes (`modelar/peca/familia`). Sem roteiro,
  * ou com o nome de um grupo (`modelar`, `modelar/peca`), o comando faz a pergunta do grupo e lista os ramos, e a resposta é o
  * argumento da chamada seguinte. Com uma folha (ou só o último nome, quando é único), devolve a leitura antes de começar, com
  * as seções `arquivo#âncora` entregues ali mesmo, o que abrir só quando a condição aparecer, a skill, os comandos, a lista
  * gerada na hora (famílias, peças do acervo ou operações) e o passo seguinte lido do estado: os planos ativos e a tarefa de
- * `comunicacao.md` para quem muda o projeto, e a situação do Condutor para o esboço com `--arquivo`. Um nome que não é nó
- * busca o tópico nos títulos dos documentos de uso, das skills e de `docs/modelar/`, e `arquivo#âncora` entrega a seção.
+ * `comunicacao.md` para quem muda o projeto. Um nome que não é nó busca o tópico nos títulos dos documentos de uso, das skills e
+ * de `docs/modelar/`, e `arquivo#âncora` entrega a seção. Até 2026-11-05 o `--arquivo` lia o Condutor de um esboço detalhado; o
+ * esboço antigo saiu, e com ele o Condutor.
  *
- * O comando só lê. O Condutor só é consultado quando o estado dele já existe, porque a situação do Condutor cria o estado
- * (com o estado existente, ela o regrava com o mesmo conteúdo). A
- * ferramenta MCP `comecar` chama a mesma função `comecar`, e as duas respondem igual. */
-import { spawnSync } from 'node:child_process';
+ * O comando só lê. A ferramenta MCP `comecar` chama a mesma função `comecar`, e as duas respondem igual. */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ancoraDe, carregarRoteiros, filhosDoNo, medirRoteiro, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
 import { ativosDoIndice } from '../mapa/planos.mjs';
-import { lerTopicos, README_DO_ESBOCO } from './esboco-ajuda.mjs';
 import { registrarUso } from './uso.mjs';
-import { COMPONENTES } from '../../modulos/esboco/componentes/index.js';
 
 const milhar = (n) => n.toLocaleString('pt-BR');
 
@@ -68,22 +64,6 @@ function passoDaTarefa(t) {
   return `A ${t.id} está com a outra IA (${t.status}); não mexa nos arquivos dela até o relatório.`;
 }
 
-/* A situação do Condutor de um esboço, só quando o estado já existe: { texto, passo }. */
-export function situacaoDoCondutor(arquivo, raiz = RAIZ) {
-  if (!existsSync(arquivo)) return { texto: null, passo: `O arquivo ${arquivo} não existe; confira o caminho.` };
-  if (!existsSync(`${arquivo}.condutor.json`)) {
-    return { texto: null, passo: `O esboço ainda não tem Condutor: rode npm run esboco -- --condutor ${arquivo} para começar pela Maquete.` };
-  }
-  const r = spawnSync(process.execPath, [join(raiz, 'tools/modelar/esboco.mjs'), '--condutor', arquivo], { encoding: 'utf8', cwd: raiz });
-  const texto = (r.stdout || r.stderr || '').trim();
-  const portao = /^Portão de (.+?): (passa|não passa)/m.exec(texto);
-  let passo = 'Siga o que o Condutor diz acima.';
-  if (/Concluído/.test(texto) && !portao) passo = 'O fluxo do Condutor está concluído: registre o custo no banco de provas, se o objeto for de lá.';
-  else if (portao?.[2] === 'passa') passo = `O Portão de ${portao[1]} passa: rode npm run esboco -- --condutor ${arquivo} --proximo.`;
-  else if (portao) passo = `O Portão de ${portao[1]} não passa: resolva o que falta acima e rode --proximo.`;
-  return { texto, passo };
-}
-
 /* As famílias registradas, do `familia.json` de cada uma: `id versão: perfis`. */
 export function listaDeFamilias(raiz = RAIZ) {
   const pasta = join(raiz, 'procedural/familias');
@@ -110,16 +90,6 @@ export function listaDePecas(raiz = RAIZ) {
 function disponivel(roteiro, raiz) {
   if (roteiro.lista === 'familias') return listaDeFamilias(raiz).map((l) => `família ${l}`);
   if (roteiro.lista === 'pecas') return [`${listaDePecas(raiz).length} peças no acervo: ${listaDePecas(raiz).join(', ')}`];
-  if (roteiro.id === 'modelar/esboco' || roteiro.id === 'modelar/laco-do-esboco') {
-    const topicos = lerTopicos(readFileSync(README_DO_ESBOCO, 'utf8'));
-    const k = topicos.findIndex((t) => t.id === 'formas');
-    const formas = [];
-    for (let i = k + 1; i < topicos.length && topicos[i].nivel === 3; i++) formas.push(topicos[i].id);
-    return [
-      `formas ${formas.join(', ')} (npm run esboco -- --ajuda <forma>)`,
-      `componentes ${Object.keys(COMPONENTES).join(', ')} (npm run esboco -- --ajuda catalogo)`,
-    ];
-  }
   if (roteiro.id.startsWith('modelar/')) {
     const caminho = join(raiz, 'docs/modelar/gerado/catalogo-capacidades.json');
     const operacoes = existsSync(caminho) ? JSON.parse(readFileSync(caminho, 'utf8')).operacoes ?? [] : [];
@@ -211,8 +181,8 @@ export function buscarTopico(consulta, raiz = RAIZ, limite = 8) {
   return achados.sort((a, b) => b.pontos - a.pontos || a.bytes - b.bytes || a.item.localeCompare(b.item)).slice(0, limite);
 }
 
-/* A resposta da entrada: { ok, codigo, texto, resultado }. `arquivo` é o esboço cujo Condutor dá o passo seguinte. */
-export function comecar({ roteiro: consulta = null, arquivo = null, raiz = RAIZ } = {}) {
+/* A resposta da entrada: { ok, codigo, texto, resultado }. */
+export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
   const dados = carregarRoteiros(raiz);
   const estado = estadoGeral(raiz);
   if (consulta === null || String(consulta).trim() === '') {
@@ -255,18 +225,9 @@ export function comecar({ roteiro: consulta = null, arquivo = null, raiz = RAIZ 
   const recursos = disponivel(r, raiz);
   let estadoTexto = [];
   let passo = r.passo;
-  let condutor = null;
   if (r.id === 'mudar/plano') {
     estadoTexto = estado.linhas;
     passo = passoDeMudar(estado, r);
-  } else if (r.id === 'modelar/esboco' || r.id === 'modelar/laco-do-esboco') {
-    if (arquivo) {
-      condutor = situacaoDoCondutor(arquivo, raiz);
-      passo = condutor.passo;
-      if (condutor.texto) estadoTexto = condutor.texto.split('\n');
-    } else {
-      estadoTexto = ['sem --arquivo: passe o esboço em andamento para ler o Condutor dele'];
-    }
   }
   const inteiros = r.ler.filter((a) => partesDaLeitura(a).ancora === null);
   const secoes = r.ler.filter((a) => partesDaLeitura(a).ancora !== null);
@@ -297,14 +258,7 @@ export function comecar({ roteiro: consulta = null, arquivo = null, raiz = RAIZ 
 
 function executar(argv) {
   const args = [...argv];
-  let arquivo = null;
-  const i = args.indexOf('--arquivo');
-  if (i >= 0) {
-    const bruto = args[i + 1];
-    args.splice(i, 2);
-    if (bruto) arquivo = relative(RAIZ, resolve(process.env.INIT_CWD ?? process.cwd(), bruto)) || bruto;
-  }
-  const r = comecar({ roteiro: args[0] ?? null, arquivo });
+  const r = comecar({ roteiro: args[0] ?? null });
   (r.ok ? process.stdout : process.stderr).write(r.texto);
   process.exitCode = r.codigo;
 }

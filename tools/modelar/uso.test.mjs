@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { caminhoDoUso, chaveDaRecusa, formatarUso, lerUso, registrarUso, resumirUso } from './uso.mjs';
 
-const ESBOCO = fileURLToPath(new URL('./esboco.mjs', import.meta.url));
 const COMECAR = fileURLToPath(new URL('./comecar.mjs', import.meta.url));
 const pasta = () => mkdtempSync(join(tmpdir(), 'uso-'));
 const sem = (extra = {}) => ({ ...process.env, VITEST: '', MODELAR_USO: '', MODELAR_USO_ARQUIVO: '', MECANIFICA_USO: '', MECANIFICA_USO_ARQUIVO: '', ...extra });
@@ -71,19 +70,6 @@ describe('registrarUso', () => {
 });
 
 describe('os comandos registram sem mudar o resultado', () => {
-  it('esboco --ajuda grava o tópico pedido e o que não existe, com a mesma saída e o mesmo código com o registro desligado', () => {
-    const arquivo = join(pasta(), 'uso.jsonl');
-    const ligado = spawnSync(process.execPath, [ESBOCO, '--ajuda', 'caxia'], { encoding: 'utf8', env: sem({ MODELAR_USO_ARQUIVO: arquivo }) });
-    spawnSync(process.execPath, [ESBOCO, '--ajuda', 'caixa'], { encoding: 'utf8', env: sem({ MODELAR_USO_ARQUIVO: arquivo }) });
-    const desligado = spawnSync(process.execPath, [ESBOCO, '--ajuda', 'caxia'], { encoding: 'utf8', env: sem({ MODELAR_USO: '0' }) });
-    expect(ligado.status).toBe(1);
-    expect(ligado.stderr).toBe(desligado.stderr);
-    expect(lerUso(arquivo).map(({ evento, topico, achado }) => ({ evento, topico, achado }))).toEqual([
-      { evento: 'ajuda', topico: 'caxia', achado: false },
-      { evento: 'ajuda', topico: 'caixa', achado: true },
-    ]);
-  });
-
   it('comecar grava o roteiro pedido e o desconhecido', () => {
     const arquivo = join(pasta(), 'uso.jsonl');
     spawnSync(process.execPath, [COMECAR, 'mudar'], { encoding: 'utf8', env: sem({ MODELAR_USO_ARQUIVO: arquivo }) });
@@ -98,9 +84,9 @@ describe('os comandos registram sem mudar o resultado', () => {
   it('um registro que não dá para gravar não muda a saída nem o código do comando', () => {
     const base = pasta();
     mkdirSync(join(base, 'uso.jsonl'));
-    const r = spawnSync(process.execPath, [ESBOCO, '--ajuda', 'caixa'], { encoding: 'utf8', env: sem({ MODELAR_USO_ARQUIVO: join(base, 'uso.jsonl') }) });
+    const r = spawnSync(process.execPath, [COMECAR, 'pesquisar'], { encoding: 'utf8', env: sem({ MODELAR_USO_ARQUIVO: join(base, 'uso.jsonl') }) });
     expect(r.status).toBe(0);
-    expect(r.stdout).toContain('### Caixa');
+    expect(r.stdout).toContain('roteiro pesquisar');
     expect(r.stderr).toBe('');
   });
 });

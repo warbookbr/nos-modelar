@@ -1,4 +1,5 @@
-/* A varredura de parâmetros, o `descrever` e o Envelope do Condutor enxergam o registro de composições.
+/* A varredura de parâmetros e o `descrever` enxergam o registro de composições. (O Envelope do Condutor do esboço antigo também
+   o recebia, e o teste dele saiu com o esboço antigo em 2026-11-05.)
 
    A receita da fixture (`tools/fixtures/composicao-parametrica/`) compõe por `CHAMADAS_COMPOSICOES` e deriva as chamadas de
    `PARAMS`. Antes desta mudança nenhum desses caminhos recebia o registro, e a execução falhava com "exige registroComposicoes".
@@ -8,19 +9,13 @@
    - sem registro, cada caminho recusa dizendo o que falta, e uma configuração inválida é recusada com o motivo;
    - a receita que usa `PASSOS` tem a mesma saída com e sem registro entregue. */
 import { describe, expect, it } from 'vitest';
-import { mkdtempSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { varrerLote, varrerSensibilidade } from '../../src/autoria/varrer-parametros.js';
 import { varrerReutilizavel } from './varrer-peca.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita, REPO } from './resolver-caminho-receita.mjs';
 import { criarConfiguracao } from '../fixtures/composicao-parametrica/configuracao.mjs';
-import { envelopeDaReceitaArquivo } from './esboco-nivel-zero.mjs';
 import { carregarConfiguracaoDeComposicoes, validarConfiguracao } from './configuracao-composicoes.mjs';
-import { planoDeDetalhe, criarEstado } from '../../modulos/esboco/src/condutor.js';
 
 const PASTA = 'tools/fixtures/composicao-parametrica';
 const RECEITA = `${PASTA}/receita.js`;
@@ -135,44 +130,5 @@ describe('a configuração do registro', () => {
     const r = await descreverPecaReutilizavel({ peca: RECEITA, composicoes: `${PASTA}/composicoes.js` });
     expect(r).toMatchObject({ ok: false, codigo: 2 });
     expect(r.stderr).toContain('não exporta a configuração');
-  });
-});
-
-describe('o Envelope do Condutor recebe o registro pelo mesmo caminho', () => {
-  /* a sapata do esboço é o bloco da base, na mesma posição do suporte de `refina-forma-global` */
-  const esboco = {
-    plano: { nivel: 'detalhado' },
-    opcoes: [{ titulo: 'Suporte', formas: [{ id: 'sapata', tipo: 'caixa', largura: 200, altura: 20, profundidade: 200, centro: [0, 10, 0] }] }],
-  };
-  const estado = { ...criarEstado(esboco, 'suporte.esboco.json'), opcao: 'Suporte', unidades: planoDeDetalhe(esboco).unidades };
-
-  function receitaComposta(largura) {
-    const dir = mkdtempSync(join(tmpdir(), 'envelope-composta-'));
-    const idBloco = pathToFileURL(join(REPO, PASTA, 'composicoes.js')).href;
-    const caminho = join(dir, 'receita.js');
-    writeFileSync(caminho, `import { ID_BLOCO } from '${idBloco}';
-export default {
-  meta: { nome: 'sapata-composta' },
-  PARAMS: {},
-  MATERIAIS: { aco: { cor: '#888888' } },
-  REFINA: { andaime: '../andaime.json', partes: { sapata: 'sapata' }, tolerancia: { envelope: 2, porta: 0.5 } },
-  CHAMADAS_COMPOSICOES: [{ id: 'sapata', composicao: ID_BLOCO, argumentos: { origem: 1, largura: ${largura}, altura: 0.02, profundidade: 0.2, centro: [0, 0, 0], parte: 'sapata', material: 'aco' } }],
-};
-`);
-    return caminho;
-  }
-
-  it('confere a receita composta contra o volume, e reprova a que passa dele', async () => {
-    const dentro = await envelopeDaReceitaArquivo({ bruto: esboco, estado, unidade: 'sapata', caminhoDaReceita: receitaComposta(0.2), composicoes: CONFIGURACAO });
-    expect(dentro).toMatchObject({ unidade: 'sapata', ok: true, falta: [] });
-    expect(dentro.refina.partes.map((p) => `${p.parte} -> ${p.volume}`)).toEqual(['sapata -> sapata']);
-    const fora = await envelopeDaReceitaArquivo({ bruto: esboco, estado, unidade: 'sapata', caminhoDaReceita: receitaComposta(0.26), ...registros() });
-    expect(fora.ok).toBe(false);
-    expect(new Set(fora.refina.achados)).toEqual(new Set(['parte-fora-do-envelope']));
-  });
-
-  it('sem o registro, recusa dizendo o que falta', async () => {
-    await expect(envelopeDaReceitaArquivo({ bruto: esboco, estado, unidade: 'sapata', caminhoDaReceita: receitaComposta(0.2) }))
-      .rejects.toThrow(/falta o registro de composições[\s\S]*--composicoes=/);
   });
 });

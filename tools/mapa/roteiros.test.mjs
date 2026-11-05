@@ -212,18 +212,15 @@ describe('o gate leitura:obrigatoria recusa', () => {
     expect(problemas).toContain('"linhaDeBase" deve ser');
   });
 
-  it('o esboço detalhado é opcional: nenhum roteiro padrão o cita como etapa, e os dois do esboço dizem a condição de uso', () => {
+  it('o esboço antigo saiu: nenhum roteiro cita o esboço detalhado, o Condutor nem o esbocista, e o das opções de forma usa o esboço 2.0', () => {
     const dados = carregarRoteiros();
-    const DO_ESBOCO = ['modelar/esboco', 'modelar/laco-do-esboco'];
-    const cita = (texto) => /esbo[çc]|esbocista/i.test(texto);
-    for (const r of dados.roteiros.filter((x) => !DO_ESBOCO.includes(x.id))) {
-      const etapa = [r.skill, r.passo, ...(r.comandos ?? []), ...(r.ler ?? []).map((l) => (typeof l === 'string' ? l : l.arquivo))].join('\n');
-      expect(cita(etapa), `o roteiro ${r.id} cita o esboço como etapa`).toBe(false);
+    const tudo = (r) => [r.skill, r.passo, r.quando, ...(r.comandos ?? []), ...(r.ler ?? []).map((l) => (typeof l === 'string' ? l : l.arquivo)), ...(r.sobDemanda ?? []).map((s) => s.arquivo)].join('\n');
+    for (const r of dados.roteiros) {
+      expect(tudo(r), r.id).not.toMatch(/esboco-detalhado|laco-do-esboco|esbocista|--condutor|npm run esboco -- /);
     }
-    for (const id of DO_ESBOCO) {
-      const r = dados.roteiros.find((x) => x.id === id);
-      expect(r.quando, id).toMatch(/sem forma de referência/);
-      expect(r.quando, id).toMatch(/escolha da pessoa/);
-    }
+    const opcoes = dados.roteiros.find((x) => x.id === 'modelar/opcoes');
+    expect(opcoes.skill).toBe('esbocar-opcoes');
+    expect(opcoes.comandos.join('\n')).toMatch(/npm run esboco:nucleo/);
+    expect(opcoes.comandos.join('\n')).toMatch(/npm run variantes/);
   });
 });

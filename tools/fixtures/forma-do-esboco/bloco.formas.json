@@ -1,0 +1,14 @@
+{
+  "formato": "mecanifica.formas-resolvidas@1",
+  "opcao": {"numero":1,"titulo":"Bloco e viga"},
+  "parametros": {},
+  "pontos": {},
+  "origem": {"esboco":"tools/fixtures/forma-do-esboco/bloco.esboco.json","opcao":1,"gravadoEm":"2026-11-05","por":"docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs"},
+  "orientacao": null,
+  "alvos": {"*":"alvos/bloco-composta.png"},
+  "formas": [
+    {"id":"bloco","tipo":"caixa","oculto":false,"unidade":null,"parte":null,"origem":null,"geometria":{"centro":[0,50,0],"caixa":{"min":[-100,0,-60],"max":[100,100,60]},"matriz":[[1,0,0],[0,1,0],[0,0,1]],"eixo":"y","largura":200,"altura":100,"profundidade":120,"recorte":{"cortadores":[{"id":"furo","retiradoMm3":282629.8041259274}],"volumeCheioMm3":2400000,"volumeMm3":2117370.1958740726},"ancoras":{"centro":[0,50,0]}}},
+    {"id":"furo","tipo":"cilindro","oculto":true,"cortador":true,"unidade":null,"parte":null,"origem":null,"geometria":{"centro":[30,50,0],"caixa":{"min":[0,-30,-30],"max":[60,130,30]},"matriz":[[1,0,0],[0,1,0],[0,0,1]],"eixo":"y","diametro":60,"comprimento":160,"ancoras":{"centro":[30,50,0],"inicio":[30,-30,0],"fim":[30,130,0]}}},
+    {"id":"viga","tipo":"caixa","oculto":false,"unidade":null,"parte":null,"origem":null,"geometria":{"centro":[0,400,0],"caixa":{"min":[-139.9038105676658,307.67949192431126,-30],"max":[139.9038105676658,492.32050807568874,30]},"matriz":[[0.8660254037844387,-0.49999999999999994,0],[0.49999999999999994,0.8660254037844387,0],[0,0,1]],"eixo":"y","largura":300,"altura":40,"profundidade":60,"ancoras":{"centro":[0,400,0]}}}
+  ]
+}

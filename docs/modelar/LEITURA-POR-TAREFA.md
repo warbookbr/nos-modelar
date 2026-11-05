@@ -6,8 +6,8 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
 - Estado, objetivo e horizonte: `VISAO.md`, `INDEX.md` e `planos/README.md`.
 - **O que já existe, antes de propor ferramenta ou capacidade:** as operações do
   núcleo no catálogo gerado, [`gerado/CATALOGO-CAPACIDADES.md`](gerado/CATALOGO-CAPACIDADES.md);
-  as formas, o posicionamento, os componentes e os comandos do esboço em
-  [`modulos/esboco/README.md`](../../modulos/esboco/README.md), e os outros
+  as opções de forma pelo núcleo em
+  [`modulos/esboco-nucleo/README.md`](../../modulos/esboco-nucleo/README.md), e os outros
   módulos no README de cada um; o que faz cada arquivo de `tools/` e `src/`
   em [`../MAPA.md`](../MAPA.md).
 - Autoria de peça: contrato em `usar/AUTORIA-DE-PECA.md`, razões em `AUTORIA-IA.md`.
@@ -50,5 +50,5 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   `BANCADA-E-APRESENTACAO.md` separa o que é de `src/bancada/` do que é de
   `src/autoria/`; o procedimento está em `usar/AJUSTE-DA-BANCADA.md`.
 - Homologação: `HOMOLOGACAO-FLUXO-IA.md` e `FLUXO-MODELAGEM-IA.md`.
-- Freio ou roda: a família `roda-pneu` (`procedural/familias/roda-pneu/`) e, no esboço, `.claude/skills/esboco-detalhado/faixas-rodas-discos.md`.
+- Freio ou roda: a família `roda-pneu` (`procedural/familias/roda-pneu/`).
 - Trabalho histórico: o README da zona histórica antes de abrir evidências.

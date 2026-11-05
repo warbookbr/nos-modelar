@@ -7,7 +7,8 @@
  * milímetro, na mesma escala.
  *
  * O QUE ELE FAZ. Lê o `REFINA.esboco` da receita e liga cada parte às formas do esboço, como a conferência de forma. O sólido de cada
- * forma vem de `src/autoria/solido-do-esboco.js` (o recorte aplicado, a malha da família), a malha do modelo vem da execução da receita,
+ * forma vem de `src/autoria/solido-do-esboco.js` sobre as formas resolvidas guardadas (o `.formas.json` que o `REFINA.esboco` aponta, com o
+ * recorte aplicado e a malha de família guardada), a malha do modelo vem da execução da receita,
  * e as duas são cortadas por planos perpendiculares a cada eixo, em `FRACOES_DOS_CORTES` da caixa do modelo (um quarto, a metade e três
  * quartos). Cada corte é desenhado de frente, visto do lado positivo do eixo, como as vistas direita, superior e frontal: o esboço em
  * vermelho grosso e o modelo em azul fino por cima, com a escala escrita em cada painel e uma barra de comprimento conhecido. Um
@@ -26,8 +27,7 @@ import { pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 import { esbocoDeclarado } from './forma-do-esboco.mjs';
-import { formasDoEsboco, malhaDaFormaDeFamilia } from './esboco-solido.mjs';
-import { lerPlano } from '../../modulos/esboco/src/plano.js';
+import { lerFormasGuardadas } from './refinamento-global.mjs';
 import { ErroDoSolido, criarContextoDeSolidos, criarSolidosDoEsboco, triangularPoligonos } from '../../src/autoria/solido-do-esboco.js';
 
 export const FRACOES_DOS_CORTES = Object.freeze([0.25, 0.5, 0.75]);
@@ -348,7 +348,7 @@ export async function sobreposicaoDeCortes({ peca, saida, fracoes = FRACOES_DOS_
   try {
     bruto = JSON.parse(readFileSync(declarado.esboco, 'utf8'));
   } catch (erro) {
-    throw new Error(`não foi possível ler o esboço ${declarado.esboco}: ${erro.message}`);
+    throw new Error(`não foi possível ler as formas do esboço ${declarado.esboco}: ${erro.message}`);
   }
   const execucao = await (dependencias.executar ?? ((p) => descreverPecaReutilizavel({ peca: p, semVeredito: true })))(peca);
   if (!execucao.ok) throw new Error(`a peça '${peca}' não executou:\n${execucao.stderr.trim()}`);
@@ -361,11 +361,11 @@ export async function sobreposicaoDeCortes({ peca, saida, fracoes = FRACOES_DOS_
   const caixa = caixaDosTriangulos(triangulosDoModelo);
   if (!caixa) throw new Error(`a peça '${peca}' não tem face nas partes que o REFINA.esboco liga (${partes.join(', ')}); não há o que cortar.`);
 
-  const dados = formasDoEsboco(bruto, declarado.opcao);
+  const { dados, malhaDaFamilia } = await lerFormasGuardadas(bruto, declarado.opcao, declarado.esboco);
   const contexto = criarContextoDeSolidos({ origem: [0, 1, 2].map((k) => (caixa.min[k] + caixa.max[k]) / 2) });
   let triangulosDoEsboco = [];
   try {
-    const solidos = criarSolidosDoEsboco(dados, { contexto, malhaDaFamilia: malhaDaFormaDeFamilia });
+    const solidos = criarSolidosDoEsboco(dados, { contexto, malhaDaFamilia });
     for (const id of formasLigadas(declarado.ligadas)) {
       let malha;
       try {
@@ -382,7 +382,7 @@ export async function sobreposicaoDeCortes({ peca, saida, fracoes = FRACOES_DOS_
   }
   if (!triangulosDoEsboco.length) throw new Error(`o esboço ${declarado.esboco} não deu sólido para nenhuma das formas que '${peca}' liga; não há o que sobrepor.`);
 
-  const orientacao = lerPlano(bruto.plano)?.orientacao ?? null;
+  const orientacao = dados.orientacao ?? null;
   const ajuste = planosComMaterial(valoresDosCortes(caixa, fracoes), triangulosDoModelo, fracoes);
   const valores = ajuste.valores;
   for (const { eixo, de, para } of ajuste.mudancas) notas.push(`o corte em ${eixo} = ${arredondar(de)} mm não cruzava o modelo e foi para ${eixo} = ${arredondar(para)} mm`);

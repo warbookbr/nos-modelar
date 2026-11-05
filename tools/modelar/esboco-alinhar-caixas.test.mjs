@@ -3,13 +3,12 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { formasResolvidas } from '../../modulos/esboco/src/formas-resolvidas.js';
 import { alinharCaixas } from './esboco-alinhar-caixas.mjs';
-import { caixaDosPassos, passosDoEsboco } from './esboco-para-passos.mjs';
+import { caixaDosPassos, formasDoEsbocoSimples, passosDoEsboco } from './esboco-para-passos.mjs';
 import { receitaParaEsboco } from './receita-externa.mjs';
 
 const caixa = (id, [x0, x1], [y0, y1], [z0, z1]) => ({ id, tipo: 'caixa', largura: x1 - x0, altura: y1 - y0, profundidade: z1 - z0, centro: [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2] });
-const resolvidas = (formas) => formasResolvidas({ opcoes: [{ titulo: 't', formas }] }, 1).formas;
+const resolvidas = (formas) => formasDoEsbocoSimples({ opcoes: [{ titulo: 't', formas }] }, 1).formas;
 const de = (formas, id) => formas.find((f) => f.id === id).geometria.caixa;
 
 describe('alinhar caixas', () => {

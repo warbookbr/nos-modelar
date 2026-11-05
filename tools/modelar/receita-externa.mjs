@@ -12,14 +12,27 @@
    ponta de raio positivo, e o giro vai no `rotacao`.
 
    Rotação. `rot` da receita (Euler XYZ do Blender, `R = Rz·Ry·Rx`, em torno do centro da peça) vira `rotacao` do esboço com a mesma convenção
-   (`angulosDaMatriz` do módulo, medida no caso da caixa: rx = +90 leva +y a +z). A peça com `cortes`, `curva` ou `afinar` ainda não é traduzida, e a
+   (`angulosDaMatriz` abaixo, a do módulo antigo do esboço, medida no caso da caixa: rx = +90 leva +y a +z). A peça com `cortes`, `curva` ou `afinar` ainda não é traduzida, e a
    extrusão cujo perfil se cruza na receita de origem também não; as duas saem em `recusas` com o motivo.
 
    Materiais. O bloco `realista.materiais` e a tabela `cores` da receita passam para o `materiais` da raiz do esboço sem perda, e cada forma leva o
-   nome do seu `material`. O esboço guarda e não interpreta (ver o tópico `materiais` da ajuda do esboço); `materiaisParaReceita` faz o caminho de volta. */
+   nome do seu `material`. O esboço guarda e não interpreta; `materiaisParaReceita` faz o caminho de volta.
 
-import { angulosDaMatriz } from '../../modulos/esboco/src/giro.js';
+   Quem lê o esboço traduzido é `esboco-para-passos.mjs` (as formas em números e os passos da receita) e o leitor do esboço 2.0
+   (`modulos/esboco-nucleo/`). */
+
 import { ehSimples } from '../../procedural/nucleo/contorno.js';
+
+/* Os ângulos [rx, ry, rz] em graus de uma matriz de rotação, na convenção M = Rz·Ry·Rx: a conta do módulo antigo do esboço (`giro.js`),
+   que saiu em 2026-11-05, copiada sem mudança. */
+const limpoDoGiro = (x) => (Math.abs(x) < 1e-9 ? 0 : x);
+export function angulosDaMatriz(M) {
+  const graus = (a) => limpoDoGiro(Number(((a * 180) / Math.PI).toFixed(9)));
+  const sy = Math.max(-1, Math.min(1, -M[2][0]));
+  const ry = Math.asin(sy);
+  if (Math.abs(sy) > 1 - 1e-9) return [graus(Math.atan2(-M[1][2], M[1][1])), graus(ry), 0];
+  return [graus(Math.atan2(M[2][1], M[2][2])), graus(ry), graus(Math.atan2(M[1][0], M[0][0]))];
+}
 
 const mm = (v) => Math.round(v * 1e6) / 1e3;
 const r3 = (v) => Math.round(v * 1000) / 1000;
@@ -285,7 +298,7 @@ export function envolventeDaPeca(p, opcoes = {}) {
   return { min: [0, 1, 2].map((k) => Math.min(...v.map((q) => q[k]))), max: [0, 1, 2].map((k) => Math.max(...v.map((q) => q[k]))) };
 }
 
-/** A caixa que o esboço devolve (`caixa` de `descreverEsboco`, em mm e com y para cima) no quadro da receita, em metro. */
+/** A caixa que o esboço devolve (`caixa` de `caixasDoEsboco`, em mm e com y para cima) no quadro da receita, em metro. */
 export function caixaDoEsboco(caixa) {
   const { x, y, z } = caixa;
   return { min: [x[0], -z[1], y[0]].map((v) => v / 1000), max: [x[1], -z[0], y[1]].map((v) => v / 1000) };

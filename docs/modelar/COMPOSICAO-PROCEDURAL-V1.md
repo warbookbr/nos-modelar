@@ -93,8 +93,7 @@ expandem antes de executar e preservam o orçamento recebido. A entrada canônic
 registra a assinatura do registro e as chamadas; assim a impressão da receita
 exportada muda quando a composição ou sua configuração muda.
 
-Na linha de comando, `npm run descrever`, `npm run varrer` e `npm run esboco --
---envelope <unidade> <receita.js>` recebem o registro por `--composicoes=<módulo>`,
+Na linha de comando, `npm run descrever` e `npm run varrer` recebem o registro por `--composicoes=<módulo>`,
 um módulo que exporta (`default` ou `configuracao`) um objeto ou função que devolve
 `{ registroComposicoes, registroOperacoes?, orcamentoComposicoes? }`. Na API, os
 mesmos três campos entram como opção, e `varrerLote`, `varrerSensibilidade` e

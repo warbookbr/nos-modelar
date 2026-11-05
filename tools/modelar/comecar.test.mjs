@@ -1,6 +1,6 @@
 /* comecar.test.mjs — a entrada por intenção: a pergunta inicial com o estado, a pergunta de cada grupo da árvore, cada folha
    com a sua leitura, as seções entregues e o passo seguinte, a busca por tópico e a seção por âncora, o passo lido do plano
-   ativo, de comunicacao.md e do Condutor, e a ferramenta MCP respondendo igual à função. */
+   ativo e de comunicacao.md, e a ferramenta MCP respondendo igual à função. */
 import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -8,12 +8,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { carregarRoteiros, CAMINHO_JSON, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
-import { buscarTopico, comecar, listaDeFamilias, listaDePecas, planosAtivos, resolverRoteiro, situacaoDoCondutor, tarefasAbertas } from './comecar.mjs';
+import { buscarTopico, comecar, listaDeFamilias, listaDePecas, planosAtivos, resolverRoteiro, tarefasAbertas } from './comecar.mjs';
 import { comecarEntrada, criarFerramentasComecar } from '../mcp/perfis/comecar.mjs';
 
 const CLI = fileURLToPath(new URL('./comecar.mjs', import.meta.url));
-const ESBOCO = fileURLToPath(new URL('./esboco.mjs', import.meta.url));
-const FIXTURE = join(RAIZ, 'modulos/esboco/tests/fixtures/moto-curvas.esboco.json');
 const { roteiros, perguntas } = carregarRoteiros();
 /* Montado por partes para o gate de links não tomar o plano de mentira por citação quebrada. */
 const PLANO_DE_TESTE = ['docs', 'modelar', 'planos', '2026-01-01-teste.md'].join('/');
@@ -76,10 +74,8 @@ describe('comecar <roteiro>', () => {
     }
   });
 
-  it('para modelar, diz o que está disponível: as formas e os componentes do esboço, e as operações do motor para a peça', () => {
-    const esboco = comecar({ roteiro: 'modelar/esboco' }).resultado.disponivel.join('\n');
-    expect(esboco).toMatch(/formas caixa, cilindro.*tubo/);
-    expect(esboco).toMatch(/componentes roda, garfo.*dobradica/);
+  it('para modelar, diz o que está disponível: as operações do motor, que as opções de forma também usam', () => {
+    expect(comecar({ roteiro: 'modelar/opcoes' }).resultado.disponivel[0]).toMatch(/^\d+ operações do motor/);
     expect(comecar({ roteiro: 'modelar/peca/nova' }).resultado.disponivel[0]).toMatch(/^\d+ operações do motor/);
   });
 
@@ -94,10 +90,10 @@ describe('comecar <roteiro>', () => {
   it('um grupo faz a pergunta dele e lista só os filhos diretos, e o último nome único resolve sozinho', () => {
     const grupo = comecar({ roteiro: 'modelar' });
     expect(grupo.resultado.pergunta).toBe(perguntas.modelar);
-    expect(grupo.resultado.roteiros.map((x) => x.id)).toEqual(['modelar/peca', 'modelar/esboco', 'modelar/laco-do-esboco', 'modelar/auditar-peca', 'modelar/auditar-montagem']);
+    expect(grupo.resultado.roteiros.map((x) => x.id)).toEqual(['modelar/peca', 'modelar/opcoes', 'modelar/auditar-peca', 'modelar/auditar-montagem']);
     expect(grupo.resultado.roteiros[0]).toEqual({ id: 'modelar/peca', grupo: true, pergunta: perguntas['modelar/peca'] });
     expect(comecar({ roteiro: 'modelar/peca' }).resultado.roteiros.map((x) => x.id)).toEqual(['modelar/peca/familia', 'modelar/peca/nova', 'modelar/peca/corrigir']);
-    expect(resolverRoteiro(roteiros, 'esboco').roteiro.id).toBe('modelar/esboco');
+    expect(resolverRoteiro(roteiros, 'opcoes').roteiro.id).toBe('modelar/opcoes');
     expect(resolverRoteiro(roteiros, 'familia').roteiro.id).toBe('modelar/peca/familia');
     expect(resolverRoteiro(roteiros, 'pesquisar').roteiro.id).toBe('pesquisar');
   });
@@ -116,7 +112,7 @@ describe('comecar <roteiro>', () => {
     const r = comecar({ roteiro: 'xqzw' });
     expect(r).toMatchObject({ ok: false, codigo: 1, erro: { codigo: 'roteiro_desconhecido' } });
     expect(r.texto).toContain('"xqzw" não é um ramo nem um título de documento.');
-    expect(r.texto).toContain('modelar/esboco');
+    expect(r.texto).toContain('modelar/opcoes');
   });
 });
 
@@ -170,19 +166,6 @@ describe('o passo seguinte lido do estado', () => {
     }
   });
 
-  it('o esboço sem estado do Condutor manda começar e não cria o estado; com estado, o passo vem do Portão', () => {
-    const pasta = mkdtempSync(join(tmpdir(), 'comecar-esboco-'));
-    const arquivo = join(pasta, 'moto.esboco.json');
-    copyFileSync(FIXTURE, arquivo);
-    const sem = comecar({ roteiro: 'modelar/esboco', arquivo });
-    expect(sem.resultado.passo).toContain(`rode npm run esboco -- --condutor ${arquivo}`);
-    expect(existsSync(`${arquivo}.condutor.json`)).toBe(false);
-    spawnSync(process.execPath, [ESBOCO, '--condutor', arquivo], { encoding: 'utf8', cwd: RAIZ });
-    const com = comecar({ roteiro: 'modelar/esboco', arquivo });
-    expect(com.resultado.estado[0]).toBe('condutor de moto.esboco.json: nível detalhado, modo objeto');
-    expect(com.resultado.passo).toBe(`O Portão de Maquete passa: rode npm run esboco -- --condutor ${arquivo} --proximo.`);
-    expect(situacaoDoCondutor(join(pasta, 'sumiu.esboco.json')).passo).toContain('não existe');
-  });
 });
 
 describe('a linha de comando e o MCP', () => {

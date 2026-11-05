@@ -11,8 +11,6 @@ import { comecar } from '../../modelar/comecar.mjs';
 
 export const comecarEntrada = z.object({
   roteiro: z.string().min(1).optional(),
-  /* O esboço em andamento, relativo à raiz do repositório; com ele, o passo seguinte do esboço vem do Condutor. */
-  arquivo: z.string().min(1).optional(),
 }).strict();
 
 export function criarFerramentasComecar() {
@@ -23,8 +21,8 @@ export function criarFerramentasComecar() {
         'Por onde começar uma tarefa no Modelar, por perguntas. Sem roteiro, pergunta pela tarefa (mudar, documentar, pesquisar, '
         + 'modelar) e dá o estado do trabalho; com um grupo (modelar, modelar/peca), faz a pergunta dele e lista os ramos. Com uma '
         + 'folha, devolve a leitura com as seções entregues, o que abrir só quando a condição aparecer, a skill, os comandos, a lista '
-        + 'gerada (famílias, peças, operações) e o passo seguinte, lido do plano ativo, de comunicacao.md ou, com arquivo, do Condutor '
-        + 'do esboço. Outro nome busca o tópico nos títulos dos documentos, e arquivo#âncora entrega a seção.',
+        + 'gerada (famílias, peças, operações) e o passo seguinte, lido do plano ativo ou de comunicacao.md. Outro nome busca o tópico '
+        + 'nos títulos dos documentos, e arquivo#âncora entrega a seção.',
       inputSchema: comecarEntrada,
       outputSchema: z.object({
         ok: z.boolean(),
@@ -33,7 +31,7 @@ export function criarFerramentasComecar() {
         resultado: z.record(z.string(), z.unknown()),
         erro: z.object({ codigo: z.string(), mensagem: z.string(), acao: z.string() }).optional(),
       }).strict(),
-      executar: async (entrada) => comecar({ roteiro: entrada.roteiro ?? null, arquivo: entrada.arquivo ?? null }),
+      executar: async (entrada) => comecar({ roteiro: entrada.roteiro ?? null }),
       conteudo: (executado) => [{ type: 'text', text: executado.texto }],
       anotacoes: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },

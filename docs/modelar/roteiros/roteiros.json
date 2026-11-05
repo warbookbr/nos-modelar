@@ -3,7 +3,7 @@
   "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes valem para toda intenção. Os que nenhum gate cobra são as regras do CLAUDE.md, o contrato mínimo que entra em todo contexto e que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro; os que um gate cobra ficam listados no ROTEIROS.md e chegam como recusa do gate. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
   "perguntas": {
     "mudar": "A mudança segue o plano ativo ou corrige um defeito pontual?",
-    "modelar": "A tarefa é uma peça, um esboço sem referência ou uma auditoria?",
+    "modelar": "A tarefa é uma peça, as opções de forma dela ou uma auditoria?",
     "modelar/peca": "A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?"
   },
   "invariantes": [
@@ -625,81 +625,31 @@
       }
     },
     {
-      "id": "modelar/esboco",
+      "id": "modelar/opcoes",
       "intencao": "modelar",
-      "titulo": "Esboçar um objeto em formas primitivas",
-      "quando": "Opcional, só sem forma de referência e por escolha da pessoa: escrever o esboço.",
+      "titulo": "Mostrar as opções de forma em disputa",
+      "quando": "Há escolha de forma no alinhamento ou na modelagem: as opções saem lado a lado pelo esboço 2.0 ou pelas variantes da receita.",
       "ler": [
         "CLAUDE.md",
-        ".claude/skills/esboco-detalhado/SKILL.md"
+        ".claude/skills/esbocar-opcoes/SKILL.md"
       ],
       "sobDemanda": [
         {
-          "arquivo": ".claude/skills/esboco-detalhado/formas-e-componentes.md",
-          "quando": "for usar forma curva, tubo, âncora relativa ou componente pronto"
-        },
-        {
-          "arquivo": ".claude/skills/esboco-detalhado/leitura-em-texto.md",
-          "quando": "for ler o modelo em texto antes da imagem"
-        },
-        {
-          "arquivo": ".claude/skills/esboco-detalhado/regras-de-contato.md",
-          "quando": "o gate de contato reprovar"
-        },
-        {
-          "arquivo": "docs/modelar/usar/PARE-E-ANALISE.md",
-          "quando": "for conferir o esboço em imagem"
+          "arquivo": "modulos/esboco-nucleo/README.md",
+          "quando": "a opção pede um campo do esboço 2.0 que a skill não traz"
         }
       ],
-      "skill": "esboco-detalhado",
+      "skill": "esbocar-opcoes",
       "comandos": [
-        "npm run esboco -- --ajuda [tópico]",
-        "npm run esboco -- --condutor <arquivo>",
-        "npm run esboco -- <arquivo> --descrever",
-        "npm run esboco -- <arquivo> --composta"
+        "npm run esboco:nucleo -- <arquivo> [--so-montar]",
+        "npm run variantes -- <peça> [--so-montar]"
       ],
-      "passo": "Rode npm run esboco -- --condutor <arquivo> e siga o Portão do estágio.",
-      "conferido": "O Portão de cada estágio do Condutor e a nota 8 ou mais do crítico visual cego.",
-      "orcamentoBytes": 14000,
-      "linhaDeBase": {
-        "bytes": 23789,
-        "data": "2026-10-08"
-      }
-    },
-    {
-      "id": "modelar/laco-do-esboco",
-      "intencao": "modelar",
-      "titulo": "Conduzir o laço do esboço",
-      "quando": "Opcional, só sem forma de referência e por escolha da pessoa: conduzir o laço.",
-      "ler": [
-        "CLAUDE.md",
-        ".claude/skills/laco-do-esboco/SKILL.md"
-      ],
-      "sobDemanda": [
-        {
-          "arquivo": "docs/modelar/usar/PARE-E-ANALISE.md",
-          "quando": "for conferir o esboço em imagem"
-        },
-        {
-          "arquivo": "docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md",
-          "quando": "o objeto é do banco de provas e o custo vai ser registrado"
-        },
-        {
-          "arquivo": "docs/modelar/usar/README.md",
-          "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
-        }
-      ],
-      "skill": "laco-do-esboco",
-      "comandos": [
-        "npm run esboco -- --condutor <arquivo> --veredito <unidade|marco-N|objeto> --nota <0-10> --motivo <texto>",
-        "npm run banco-de-provas:registrar"
-      ],
-      "passo": "Siga a skill laco-do-esboco: despache o esbocista e registre cada veredito do crítico.",
-      "conferido": "O fluxo do Condutor em Concluído, com cada nota do crítico em 8 ou mais.",
+      "passo": "Escreva as opções como variantes da receita ou como esboço do 2.0, confira com --so-montar e mostre a imagem à pessoa com a referência.",
+      "conferido": "A pessoa escolhe pela imagem, e a escolha vira decisão escrita no PLANO e valor da TABELA.",
       "orcamentoBytes": 12000,
       "linhaDeBase": {
-        "bytes": 13878,
-        "data": "2026-10-08"
+        "bytes": 6830,
+        "data": "2026-11-05"
       }
     },
     {

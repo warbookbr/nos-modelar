@@ -14,7 +14,7 @@
  *     andaime: 'andaime.json',                       // caminho relativo à pasta da peça
  *     alvo: 'alvo.json',                             // opcional: o alvo N2, para o G01 sobre a malha da peça
  *     esboco: {                                      // opcional: a forma de cada parte contra a forma do esboço que ela refina
- *       arquivo: 'aviao.esboco.json', opcao: 1,      // caminho relativo à pasta da peça; opção (número a partir de 1, ou título)
+ *       arquivo: 'aviao.formas.json', opcao: 1,      // as formas resolvidas guardadas, relativas à pasta da peça; a opção delas
  *       formas: { coluna: 'coluna', base: ['base', 'sapata'], porta: { formas: 'porta', minimo: 0.9 } },
  *       minimo: 0.95,                                // razão interseção/união de volume, abaixo da qual a parte reprova
  *     },                                             // a parte que se afasta do esboço de propósito declara o deslocamento (ver abaixo)
@@ -34,6 +34,8 @@
  * Receita sem `REFINA` não muda em nada, e `REFINA` sem `esboco` também não. A declaração é opcional e versionada (`formato`, `versao`):
  * a forma canônica que sai daqui carrega os dois, e a entrada aceita escrevê-los. `esboco` só é validado aqui; a conferência está em
  * `forma-do-esboco.js` (o sólido do esboço inteiro, com recortes e inclinações, e a Manifold), que a conferência do envelope não usa.
+ * O `arquivo` é um `.formas.json`, as formas resolvidas do esboço gravadas como dado (`mecanifica.formas-resolvidas@1`): o `.esboco.json`
+ * que ele apontava até 2026-11-05 só se lia pelo módulo antigo do esboço, que saiu (ver `docs/modelar/historico/esboco-2d.md`).
  *
  * UNIDADES E QUADRO. O andaime está em milímetro e o núcleo em metro; o quadro de coordenadas é o mesmo, com a
  * mesma origem e os mesmos eixos. A conversão é fixa (1 mm = 0,001), a mesma que `porta-confere-forma.js` usa.
@@ -84,7 +86,7 @@ function tolerancia(valor, quem, campo, limite) {
   return valor;
 }
 
-const CAMINHO_DO_ESBOCO = /^(?![a-z][a-z0-9+.-]*:)(?!\/)(?!.*\\)[^\0]+\.esboco\.json$/i;
+const CAMINHO_DO_ESBOCO = /^(?![a-z][a-z0-9+.-]*:)(?!\/)(?!.*\\)[^\0]+\.formas\.json$/i;
 const objeto = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
 function razaoMinima(valor, quem, campo) {
@@ -187,7 +189,10 @@ export function normalizarEsbocoDoRefinamento(valor, { quem = 'REFINA.esboco' } 
   const ausentes = ['arquivo', 'formas', 'minimo'].filter((chave) => !Object.hasOwn(valor, chave));
   if (ausentes.length) falhar(quem, `precisa declarar: ${ausentes.join(', ')}.`);
   if (typeof valor.arquivo !== 'string' || !CAMINHO_DO_ESBOCO.test(valor.arquivo.trim())) {
-    falhar(quem, `'arquivo' precisa ser o caminho relativo de um .esboco.json, sem caminho absoluto, endereço ou barra invertida; recebeu ${exibir(valor.arquivo)}.`);
+    const antigo = typeof valor.arquivo === 'string' && /\.esboco\.json$/i.test(valor.arquivo.trim())
+      ? ' O .esboco.json só se lia pelo módulo antigo do esboço, que saiu em 2026-11-05; a conferência lê as formas resolvidas dele, guardadas num .formas.json.'
+      : '';
+    falhar(quem, `'arquivo' precisa ser o caminho relativo de um .formas.json (as formas resolvidas do esboço, guardadas), sem caminho absoluto, endereço ou barra invertida; recebeu ${exibir(valor.arquivo)}.${antigo}`);
   }
   const opcao = valor.opcao ?? 1;
   if (!((Number.isInteger(opcao) && opcao >= 1) || (typeof opcao === 'string' && opcao.trim()))) {

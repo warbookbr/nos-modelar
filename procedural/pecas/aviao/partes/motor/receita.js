@@ -519,7 +519,7 @@ const receita = {
     /* cada parte contra a forma de mesmo nome do esboço aprovado, com os recortes: em 2026-10-15 deram capo 0,981, entradaDeAr 0,958
        e os escapes 0,969 */
     esboco: {
-      arquivo: '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json',
+      arquivo: '../../esboco-r2.formas.json',
       opcao: 1,
       formas: { capo: 'capo', entradaDeAr: 'entradaDeAr', escapeD: 'escapeD', escapeE: 'escapeE' },
       minimo: 0.95,

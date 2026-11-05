@@ -26,8 +26,10 @@
  * modelo, montado, sobreposição, partes, critérios e perguntas, com o lado de onde cada vista olha. Ele não conta como a peça foi feita.
  *
  * O QUE MAIS A PASTA TRAZ, quando a receita permite:
- *  - o alvo novo, quando ela declara `REFINA.esboco`: a composta da unidade do esboço, gerada agora pela ferramenta do esboço sobre uma
- *    cópia do arquivo declarado, e nunca a imagem guardada, que pode ser de uma versão anterior do esboço;
+ *  - o alvo, quando ela declara `REFINA.esboco`: a composta da unidade do esboço aprovado que tem mais das formas ligadas, guardada com
+ *    as formas resolvidas que o `REFINA.esboco` aponta (`alvos` do `.formas.json`). Até 2026-11-05 a composta saía na hora, da cópia do
+ *    `.esboco.json` pela ferramenta do esboço antigo, para nunca ser de uma versão anterior do esboço; o esboço antigo saiu, as formas
+ *    resolvidas e a composta foram gravadas juntas, do mesmo arquivo, e por isso a imagem é a da versão das formas que a conferência mede;
  *  - as vistas montadas, quando a peça é uma instância de `<objeto>/montagem.json`: as etapas já construídas juntas, com o quadro na
  *    caixa da peça. Duas vezes o crítico errou por ver a peça pequena demais no conjunto: leu um degrau na junta do capô, e a deriva
  *    mais grossa do que é;
@@ -47,16 +49,14 @@ import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { linhaDaVista } from '../../modulos/esboco/src/lados.js';
+import { linhaDaVista } from './lados-das-vistas.mjs';
 import { doAmbiente } from '../ambiente.mjs';
 import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
-import { lerPlano } from '../../modulos/esboco/src/plano.js';
-import { vistaDoMesmoOlho } from '../../modulos/esboco/src/referencia.js';
+import { vistaDoMesmoOlho, vistaDoNome } from './comparar-contornos.mjs';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { lerArgumentos } from './argumentos.mjs';
-import { vistaDoNome } from './esboco-referencia.mjs';
 import { abrirCapturaCompartilhada, olharBancada } from './olhar-bancada.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
@@ -147,7 +147,7 @@ export function partesDoPlano(receita) {
 
 /* ---------- o lado de onde cada vista olha ---------- */
 
-/* Cada vista da bancada e da montagem é, em olho, uma vista do esboço (`modulos/esboco/src/lados.js`), que já sabe dizer de onde ela olha
+/* Cada vista da bancada e da montagem é, em olho, uma vista do esboço (`lados-das-vistas.mjs`), que já sabe dizer de onde ela olha
    e, com a orientação do esboço, o lado do objeto que ela mostra. */
 const VISTA_DO_ESBOCO = Object.freeze({
   isometrica: 'isometrica', frontal: 'frontal', direita: 'lateral', esquerda: 'lateral-oposta', traseira: 'frontal-oposta', superior: 'superior', inferior: 'inferior',
@@ -372,40 +372,35 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
 
 /* ---------- o alvo, a vista montada e a sobreposição ---------- */
 
-/* A opção que a receita refina precisa ser a primeira do esboço: a composta de uma unidade desenha a primeira opção, e um alvo da opção
-   errada seria um alvo de outra forma. */
-function exigirPrimeiraOpcao(declarado, bruto) {
-  const primeira = bruto?.opcoes?.[0]?.titulo;
-  if (declarado.opcao === 1 || (typeof declarado.opcao === 'string' && declarado.opcao === primeira)) return;
-  throw new Error(`o alvo é a composta da primeira opção do esboço, e REFINA.esboco.opcao é ${JSON.stringify(declarado.opcao)}; a composta da opção que a receita refina ainda não sai por aqui.`);
-}
+/* A chave da composta do esboço inteiro em `alvos`, quando nenhuma forma ligada declara unidade. */
+export const ALVO_DO_ESBOCO_INTEIRO = '*';
 
 /**
- * O alvo novo de uma receita que declara `REFINA.esboco`: copia o esboço declarado para `pasta/alvo` e gera a composta da unidade
- * dele, com a ferramenta do esboço (`npm run esboco -- <cópia> --unidade <unidade> --composta`), nunca a imagem guardada. Devolve
- * `{ copia, imagem, unidade, escolha }`.
+ * O alvo de uma receita que declara `REFINA.esboco`: a composta da unidade que tem mais das formas ligadas, guardada em `alvos` das
+ * formas resolvidas (`dados`, o `.formas.json` que `declarado.esboco` aponta; o caminho da imagem é relativo a ele). A unidade nula, de
+ * quando nenhuma forma ligada declara unidade, é a do esboço inteiro (`*`). Recusa a unidade sem composta guardada, dizendo as que há, e
+ * a composta que não existe. Devolve `{ origem, unidade, escolha }`; `copiarAlvo` a leva para `pasta/alvo`.
  */
-export async function gerarAlvo({ declarado, bruto, dados, pasta, dependencias = {} }) {
-  exigirPrimeiraOpcao(declarado, bruto);
+export function alvoGuardado({ declarado, dados }) {
   const ids = [...new Set(Object.values(declarado.ligadas).flatMap((v) => (Array.isArray(v) ? v : v.formas)))].sort();
   const escolha = unidadeDoAlvo(dados, ids);
-  const { copia, imagem } = await gerarCompostaDaUnidade({ arquivo: declarado.esboco, unidade: escolha.unidade, pasta, dependencias });
-  return { copia, imagem, unidade: escolha.unidade, escolha };
+  const chave = escolha.unidade ?? ALVO_DO_ESBOCO_INTEIRO;
+  const alvos = dados.alvos ?? {};
+  if (!Object.hasOwn(alvos, chave)) {
+    throw new Error(`as formas do esboço em ${declarado.esboco} não guardam a composta ${escolha.unidade ? `da unidade '${escolha.unidade}'` : 'do esboço inteiro'}, que é o alvo do crítico desta peça (guardadas: ${Object.keys(alvos).join(', ') || 'nenhuma'}).`);
+  }
+  const origem = resolve(dirname(declarado.esboco), alvos[chave]);
+  if (!existsSync(origem)) throw new Error(`a composta ${alvos[chave]} que ${declarado.esboco} guarda como alvo não existe (procurada em ${origem}).`);
+  return { origem, unidade: escolha.unidade, escolha };
 }
 
-/**
- * A composta de uma unidade do esboço, gerada agora pela ferramenta do esboço: copia o `arquivo` (o `.esboco.json`) para `pasta/alvo` e
- * roda a composta sobre a cópia (a unidade `null` desenha o esboço inteiro). É o que o pacote do crítico faz para o alvo, e o que a receita
- * planejada (`receita-planejada.mjs`) usa para gravar o alvo ao lado da receita. Devolve `{ copia, imagem }`.
- */
-export async function gerarCompostaDaUnidade({ arquivo, unidade, pasta, dependencias = {} }) {
+/** Copia o alvo guardado (`alvoGuardado`) para `pasta/alvo`. Devolve `{ imagem, unidade, escolha }`. */
+export function copiarAlvo({ origem, unidade, escolha }, pasta) {
   const pastaDoAlvo = join(pasta, 'alvo');
   mkdirSync(pastaDoAlvo, { recursive: true });
-  const copia = join(pastaDoAlvo, basename(arquivo));
-  copyFileSync(arquivo, copia);
-  const composta = dependencias.composta ?? (async (destino, opcoes) => (await import('./esboco.mjs')).compostaArquivo(destino, opcoes));
-  const feita = await composta(copia, { unidade });
-  return { copia, imagem: feita.destino };
+  const imagem = join(pastaDoAlvo, basename(origem));
+  copyFileSync(origem, imagem);
+  return { imagem, unidade, escolha };
 }
 
 /** A montagem `<objeto>/montagem.json` de uma peça `<objeto>/<parte>` e a instância dela, ou null se a peça não é instância de uma. */
@@ -436,7 +431,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     olharBancada,
     abrirCaptura: abrirCapturaCompartilhada,
     esbocoDeclarado: async (p) => (await import('./forma-do-esboco.mjs')).esbocoDeclarado(p),
-    formasDoEsboco: async (bruto, opcao) => (await import('./esboco-solido.mjs')).formasDoEsboco(bruto, opcao),
+    formasGuardadas: async (bruto, opcao, onde) => (await (await import('./refinamento-global.mjs')).lerFormasGuardadas(bruto, opcao, onde)).dados,
     olharEtapas: async (arquivo, opcoes) => (await import('./etapas-da-montagem.mjs')).olharEtapas(arquivo, opcoes),
     sobreposicaoDeCortes: async (opcoes) => (await import('./sobreposicao-de-cortes.mjs')).sobreposicaoDeCortes(opcoes),
     vistasDeSuperficie,
@@ -458,14 +453,18 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   const lataria = superficieDaPeca(peca, receita, plano);
   if (lataria.luzRasante && !blender) throw new Error(mensagemSemBlender(peca, lataria));
   const declarado = await dep.esbocoDeclarado(peca);
-  let bruto = null;
+  /* as formas do esboço que a receita refina e o alvo guardado com elas, conferidos antes de gastar captura */
+  let dados = null;
+  let alvoDaReceita = null;
   if (declarado) {
+    let bruto;
     try {
       bruto = JSON.parse(readFileSync(declarado.esboco, 'utf8'));
     } catch (erro) {
-      throw new Error(`não foi possível ler o esboço ${declarado.esboco}: ${erro.message}`);
+      throw new Error(`não foi possível ler as formas do esboço ${declarado.esboco}: ${erro.message}`);
     }
-    exigirPrimeiraOpcao(declarado, bruto);
+    dados = await dep.formasGuardadas(bruto, declarado.opcao, declarado.esboco);
+    alvoDaReceita = alvoGuardado({ declarado, dados });
   }
   const montagem = montagemDaPeca(peca);
   const avisos = [];
@@ -537,12 +536,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     await compartilhada?.fechar();
   }
 
-  /* O alvo vem do esboço de agora e não da imagem guardada. */
-  let alvo = null;
-  if (declarado) {
-    const dados = await dep.formasDoEsboco(bruto, declarado.opcao);
-    alvo = await gerarAlvo({ declarado, bruto, dados, pasta, dependencias: dep });
-  }
+  /* O alvo é a composta guardada com as formas do esboço que a receita refina. */
+  const alvo = alvoDaReceita ? copiarAlvo(alvoDaReceita, pasta) : null;
 
   /* As vistas montadas, com o quadro na peça. Peça que ainda não está entre as etapas construídas não tem conjunto a mostrar, e isso
      vai no relatório, e não como falha: a etapa é fixada na ordem, e uma peça fora dela é trabalho adiantado. */
@@ -562,7 +557,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
   /* a imagem de luz rasante quase toda escura não chega ao crítico: a luz que não alcança a chapa não mostra relevo nenhum */
   if (superficie) exigirLuzNaSuperficie(peca, superficie);
 
-  const orientacao = bruto ? lerPlano(bruto.plano)?.orientacao ?? null : null;
+  const orientacao = dados?.orientacao ?? null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);
   const pedido = montarPedido({
     peca,
@@ -669,7 +664,7 @@ export function imprimir(resultado) {
   }
   if (resultado.alvo) {
     const { alvo } = resultado;
-    linhas.push('', `ALVO (a composta ${alvo.unidade ? `da unidade ${alvo.unidade}` : 'do esboço inteiro'}, gerada agora pela ferramenta do esboço):`, `  ${alvo.imagem}`);
+    linhas.push('', `ALVO (a composta ${alvo.unidade ? `da unidade ${alvo.unidade}` : 'do esboço inteiro'}, guardada com as formas do esboço):`, `  ${alvo.imagem}`);
     const unidades = Object.entries(alvo.escolha.contagem);
     if (unidades.length > 1) linhas.push(`  as formas ligadas estão em ${unidades.length} unidades (${unidades.map(([u, n]) => `${u}: ${n}`).join(', ')}); o alvo é a que tem mais`);
     if (alvo.escolha.semUnidade.length && unidades.length) linhas.push(`  sem unidade declarada no esboço, fora do alvo: ${alvo.escolha.semUnidade.join(', ')}`);

@@ -164,8 +164,8 @@ Sem o campo nada muda para receita nenhuma, e a conferência do envelope só o l
 REFINA: {
   andaime: 'andaime.json',
   esboco: {
-    arquivo: '../../esboco/aviao.esboco.json',   // relativo à pasta da peça, confinado ao repositório, de um .esboco.json
-    opcao: 1,                                    // número a partir de 1 ou título da opção; padrão 1
+    arquivo: '../../esboco-r2.formas.json',      // relativo à pasta da peça, confinado ao repositório: as formas resolvidas guardadas
+    opcao: 1,                                    // número a partir de 1 ou título da opção que o arquivo guarda; padrão 1
     formas: {                                    // parte da receita -> forma do esboço
       fuselagem: 'fuselagem',
       asa: ['asaD', 'pontaD'],                   // uma parte pode refinar mais de uma forma: a comparação é com a união delas
@@ -197,6 +197,16 @@ campo existe. Os achados são:
 - `parte-sem-solido`: a malha da parte não forma um sólido fechado e orientado, e sem sólido não há volume para comparar. A parte que a
   conferência não consegue medir reprova em vez de passar, porque o campo é uma declaração da receita.
 
+AS FORMAS DO ESBOÇO SÃO DADO GUARDADO. Até 2026-11-05 o `arquivo` era o `.esboco.json`, que o módulo antigo do esboço resolvia a cada
+veredito. O módulo saiu (plano esboço pelo núcleo, histórico em [`historico/esboco-2d.md`](historico/esboco-2d.md)), e o `arquivo` é um
+`.formas.json`: as formas resolvidas da opção (`mecanifica.formas-resolvidas@1`, a saída de `formasResolvidas` gravada uma vez), com
+`origem` (o esboço, a opção e a data), `malhas` (a malha de cada forma de família, como o módulo a lia, recentrada e com as faces para
+fora), `orientacao` (o `plano.orientacao` do esboço, que o pacote do crítico usa) e `alvos` (a composta de cada unidade, o alvo do
+crítico, com o caminho relativo ao arquivo). `lerFormasGuardadas` de `tools/modelar/refinamento-global.mjs` confere o formato e que a
+opção declarada é a guardada, e a declaração que ainda aponta um `.esboco.json` é recusada dizendo isso. As sete partes do avião com
+`REFINA.esboco` leem `procedural/pecas/aviao/esboco-r2.formas.json`, e a conferência delas deu, antes e depois da troca, as mesmas
+razões, bit a bit, e o mesmo veredito ([prova](banco-de-provas/esboco-pelo-nucleo-2026-11-05/README.md)).
+
 `src/autoria/solido-do-esboco.js` monta o sólido de cada forma de `formasResolvidas` (`mecanifica.formas-resolvidas@1`), sem importar o
 módulo do esboço. A geometria do tipo vem do tradutor do nível zero, no quadro local da forma (`volumeLocalDaForma`, que dá o volume da
 N2 com a matriz identidade, de modo que a rotação em dois eixos deixa de importar), com os mesmos lados do esboço; o sólido é essa
@@ -205,11 +215,11 @@ continuar saindo. O que a N2 muda é refeito: o loft com seção inclinada, seç
 cada par de seções (a casca é o externo menos a cavidade, que passa 1 mm da boca), e o loft sem nada disso fica como o tradutor o põe,
 a superfície de cada ponto ao ponto correspondente da seguinte, que é a que o esboço desenha e a que o `loft` do núcleo faz; a caixa com
 `furos` é a caixa menos um cilindro de 128 lados por furo; o tubo com canto sem raio de curva é um tubo por trecho e uma esfera por
-junta; e a forma de família é a malha que o provedor de `tools/modelar/esboco-familias.mjs` entrega (a que o módulo já leu,
-recentrada e com as faces para fora), uma parte da família por vez e unidas, porque o aro e o pneu se sobrepõem e a união de sólidos
+junta; e a forma de família é a malha guardada em `malhas` (a que o provedor do módulo antigo entregava, recentrada e com as faces
+para fora), uma parte da família por vez e unidas, porque o aro e o pneu se sobrepõem e a união de sólidos
 fechados é definida onde a malha das duas juntas não é.
 
-O recorte de uma forma (`geometria.recorte.cortadores`) é lido como em `modulos/esboco/src/recorte.js`: o sólido da forma inteira menos
+O recorte de uma forma (`geometria.recorte.cortadores`) é lido como o módulo antigo do esboço o lia: o sólido da forma inteira menos
 o sólido de cada molde, que pode ser qualquer forma da opção, visível ou `cortador`, e pode ter o próprio recorte. `folga` engrossa o
 molde deslocando cada face dele para fora (em canto vivo o vão passa de `folga`), peça convexa por peça convexa (o casco de cada faixa do
 loft), e só vale para molde convexo ou loft; `profundidade` com `lado` deixa do molde só a fatia que entra `profundidade` mm na forma a
@@ -218,20 +228,18 @@ recusados. As coordenadas entram na Manifold relativas ao centro das partes medi
 cerca de um milionésimo do volume), e os sólidos saem iguais a cada execução.
 
 `src/autoria/forma-do-esboco.js` faz a conferência (`conferirFormaDoEsboco`) e não conhece disco: recebe as formas resolvidas e a peça
-executada. O adaptador `tools/modelar/esboco-solido.mjs` lê a opção pelo módulo, guarda no processo o resultado de
-`formasResolvidas` pela impressão do esboço (resolver a opção do avião inteiro leva 45 s, dos quais 40 s são a superfície das 15 formas
-de família, gerada a frio pelo provedor, e 3 s os recortes do módulo; a conferência dos sólidos e das razões depois leva meio segundo),
-entrega a malha de cada família e carrega o módulo, as famílias e a Manifold só quando a receita declara o campo.
-`tools/modelar/refinamento-global.mjs` lê o esboço do caminho que a receita declara, confinado ao repositório como o andaime, o
-veredito de `descrever-peca` roda a conferência junto com o `REFINA`, como já roda o envelope e as portas, e a `guarda:acervo` passa por
-ele. A linha de comando `npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --mesmo-id` (ou
+executada. `tools/modelar/refinamento-global.mjs` lê as formas guardadas do caminho que a receita declara, confinado ao repositório como
+o andaime, entrega a malha de cada família e carrega a Manifold só quando a receita declara o campo; o veredito de `descrever-peca` roda
+a conferência junto com o `REFINA`, como já roda o envelope e as portas, e a `guarda:acervo` passa por ele. Ler as formas guardadas do
+avião leva uma fração de segundo, onde resolver a opção pelo módulo antigo levava 45 s. A linha de comando
+`npm run forma:esboco -- <peça> --esboco=<arquivo.formas.json> --mesmo-id` (ou
 `--formas=parte:forma+forma,...`, com `--minimo=` e `--opcao=`) mede uma receita que não declara o campo, ligando cada parte à forma de
 mesmo id, sem mudá-la; serve para medir uma peça fixa ou escolher o mínimo antes de escrever a declaração.
 
 Limites. A razão mede volume e não o lugar de cada detalhe, e a parte que erra por menos que o mínimo passa; o mínimo é de quem
 declara, e a razão que a parte tem de fato volta em `partes`. A faixa (`envolve`) não tem sólido. O loft de seções muito torcidas, como
 uma pá, usa a superfície que a N2 faz, e o volume dela difere da fórmula do prismatoide do tradutor em até 5%. O `volumeMm3` e a caixa
-que o módulo calcula para a forma de família recortada vêm das peças convexas dela e não valem como referência (a ponta da asa do avião
+que o módulo calculava para a forma de família recortada vêm das peças convexas dela e não valem como referência (a ponta da asa do avião
 sai com volume negativo e a deriva com a caixa 268 mm mais baixa); o sólido da conferência não os usa.
 
 ### A parte que se afasta do esboço de propósito
@@ -293,11 +301,11 @@ afastamentos, e a impressão da forma do laço muda quando `novas` muda.
 
 ## Andaime derivado do esboço
 
-O esboço continua sendo onde a IA escreve, e o andaime do nível zero sai dele. `src/autoria/tradutor-nivel-zero.js`
-(`traduzirFormasParaAndaime`) lê as formas já resolvidas pelo módulo (`formasResolvidas`, formato
-`mecanifica.formas-resolvidas@1`, descrito no README do esboço) e devolve o andaime, sem importar o módulo; o adaptador
-`tools/modelar/esboco-para-andaime.mjs` (`andaimeDoEsboco`, `andaimeDoArquivo`) lê o esboço, chama as duas pontas e
-`descreverTraducao` imprime o resultado em texto. O resultado é `{ andaime, tabela, naoTraduzidas, perdas, ocultas }`: o andaime
+O andaime do nível zero saía do esboço antigo. `src/autoria/tradutor-nivel-zero.js` (`traduzirFormasParaAndaime`) lê as formas já
+resolvidas (formato `mecanifica.formas-resolvidas@1`) e devolve o andaime, sem importar módulo de esboço, e continua no repositório; o
+adaptador que lia o `.esboco.json` pelo módulo antigo (`tools/modelar/esboco-para-andaime.mjs`) saiu com ele em 2026-11-05, e os
+andaimes que ele gerou (o do avião, `procedural/pecas/aviao/andaime.json`, e os dos componentes das famílias,
+`tools/modelar/familia-com-esboco.andaimes.json`) ficaram como dado guardado. O resultado é `{ andaime, tabela, naoTraduzidas, perdas, ocultas }`: o andaime
 já aceito por `normalizarAndaimeGlobal`, a tabela do id do esboço para o id do andaime, as formas visíveis que ficaram de fora
 com o motivo (`{ id, tipo, motivo }`), o relatório de perdas das formas aproximadas e os ids das formas `oculto: true`, que são
 referência do esboço e não entram.
@@ -385,8 +393,8 @@ A prova está em `tools/modelar/forma-da-peca-no-veredito.test.mjs`, sobre o sup
 (`alvo.json`): a malha que confere passa, e a sapata deslocada 30 mm reprova em duas silhuetas e no envelope.
 
 A prova está em `src/autoria/tradutor-nivel-zero.test.js` (cada tipo com formas escritas à mão, a rotação, as aproximações com
-valores analíticos, o recolhimento, as recusas, os ids e o determinismo) e em `tools/modelar/esboco-para-andaime.test.mjs`
-(as fixtures do módulo e do banco de provas): nas formas exatas o volume coincide com o do esboço dentro de 1e-6 relativo e o
+valores analíticos, o recolhimento, as recusas, os ids e o determinismo); até 2026-11-05 também em `tools/modelar/esboco-para-andaime.test.mjs`
+(as fixtures do módulo antigo e do banco de provas, que saíram com ele): nas formas exatas o volume coincide com o do esboço dentro de 1e-6 relativo e o
 envelope dentro de 1e-5 mm, e dentro de r (1 - cos(pi / n)) no cilindro e no tubo fora dos eixos, em cada forma, unidade, parte e
 no conjunto; as formas aproximadas sem perda de volume (caixa com raio, cilindro achatado, loft sem casca nem inclinação) têm o
 mesmo erro, e a caçamba do carrinho (casca e seção inclinada) é provada à parte, com o envelope externo dentro de 1%, a perda
@@ -433,7 +441,7 @@ evidências em PNG, saiu em 2026-10-25 sem chamador.
 O tradutor do nível zero e a leitura das medidas na blocagem têm teste próprio:
 
 ```text
-npx vitest run src/autoria/tradutor-nivel-zero.test.js tools/modelar/esboco-para-andaime.test.mjs src/autoria/medidas-na-blocagem.test.js tools/modelar/esboco-medidas-no-andaime.test.mjs
+npx vitest run src/autoria/tradutor-nivel-zero.test.js src/autoria/medidas-na-blocagem.test.js
 ```
 
 Os PNGs são conveniência de inspeção. Os SVGs, JSONs e hashes do manifesto são

@@ -23,8 +23,7 @@ o que se lê antes de começar é o que o roteiro diz.
 | conferir uma peça pronta | `auditar-peca` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | conferir um conjunto montado | `auditar-montagem` | [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md) |
 | parar e analisar uma forma antes de declará-la pronta | `olhar-bancada --analise` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md) |
-| parar e analisar um esboço de opções antes de mostrá-lo | `esboco --analise` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#esboço) |
-| esboçar um objeto inteiro em formas primitivas, com crítico entre unidades (opcional: só objeto sem forma de referência, por escolha da pessoa) | `esboco-detalhado` (quem esboça) e `laco-do-esboco` (quem conduz) | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#esboço) |
+| mostrar à pessoa as opções de forma em disputa, lado a lado | `esbocar-opcoes` (`npm run esboco:nucleo`, `npm run variantes`) | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#opções-de-forma) |
 | desenhar a prancha alvo | `desenhar-prancha` | [`CONTRATO-AUTORIA-PRANCHA.md`](CONTRATO-AUTORIA-PRANCHA.md) |
 | trazer de volta um ajuste feito na bancada | `absorver-ajuste-da-bancada` | [`AJUSTE-DA-BANCADA.md`](AJUSTE-DA-BANCADA.md) |
 

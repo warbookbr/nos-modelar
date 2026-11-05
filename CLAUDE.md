@@ -8,7 +8,7 @@ dele. `npm run comecar -- <roteiro>` (ou a ferramenta MCP
 - `mudar`: A mudança segue o plano ativo ou corrige um defeito pontual?
 - `documentar`: Escrever, mover ou cortar documento, fora de um plano.
 - `pesquisar`: Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
-- `modelar`: A tarefa é uma peça, um esboço sem referência ou uma auditoria?
+- `modelar`: A tarefa é uma peça, as opções de forma dela ou uma auditoria?
 <!-- roteiros:fim -->
 
 <!-- invariantes:inicio -->

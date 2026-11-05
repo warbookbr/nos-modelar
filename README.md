@@ -26,11 +26,13 @@ ele. A definição completa está em
 
 ## Ferramentas
 
-- **esboço**, opcional e fora do fluxo padrão, indicado só para objeto sem forma de referência e por escolha da pessoa ([`modulos/esboco`](modulos/esboco/README.md), skills
-  `esboco-detalhado` e `laco-do-esboco`): desenha o objeto inteiro em formas
-  primitivas a partir de um JSON, com gate de contato, Condutor por estágios e
-  crítico cego, antes da peça procedural; a referência do JSON se consulta por
-  tópico com `npm run esboco -- --ajuda`.
+- **esboço 2.0** ([`modulos/esboco-nucleo`](modulos/esboco-nucleo/README.md), skill
+  `esbocar-opcoes`): as opções de forma em disputa saem das operações do núcleo,
+  as mesmas da peça, lado a lado e com a mesma câmera da bancada
+  (`npm run esboco:nucleo`); numa peça que já existe, as variantes de valores da
+  `TABELA` saem do mesmo jeito (`npm run variantes`). O esboço antigo, com
+  desenhista próprio, saiu em 2026-11-05
+  ([histórico](docs/modelar/historico/esboco-2d.md)).
 - **motor de prancha** (`tools/modelar/prancha/prancha.mjs`, skill
   `desenhar-prancha`): desenha em 2D o contorno de referência de um invólucro
   antes de existir geometria 3D, e `prancha-referencia.mjs` compara a silhueta

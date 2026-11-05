@@ -1,4 +1,4 @@
-# Esboço pelo núcleo — inventário da fatia 1 e provas da fatia 2
+# Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2 e 3
 
 Inventário do plano [esboço pelo núcleo](../../planos/2026-11-05-esboco-pelo-nucleo.md), em 2026-11-05, sobre a main em `c1933085`.
 Ele responde quem usa o módulo `modulos/esboco/` hoje, quais recursos do esboço os arquivos guardados usam de fato, se alguma peça
@@ -240,3 +240,93 @@ dão `4b40277eb58d16be…` e `39758461aee95348…`, com as mesmas 274 faces e a 
 depois das variantes.
 
 ![as três espessuras de tampo da mesa, lado a lado e na mesma câmera](mesa-variantes.png)
+
+## 7. Fatia 3: a migração para fora do módulo antigo
+
+A fatia 3 tirou do módulo antigo tudo o que ficava no repositório, e o que ele resolvia na hora virou dado gravado uma vez. Os scripts
+desta seção que leem o módulo (`gravar-o-que-o-modulo-resolvia.mjs`, `conferir-formas-simples.mjs` e `conferir-comparador.mjs`) rodaram
+no último commit que o tinha e não rodam depois dele; o `medir-conferencia-do-aviao.mjs` roda sempre.
+
+```bash
+node docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs aviao fixtures calibracao   # só com o módulo
+node docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/conferir-formas-simples.mjs                                    # só com o módulo
+node docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/conferir-comparador.mjs                                        # só com o módulo
+node docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/medir-conferencia-do-aviao.mjs --comparar docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/conferencia-do-aviao-antes.json
+npm run calibracao:check
+```
+
+### O avião
+
+As formas resolvidas da opção 1 do esboço aprovado que as sete partes com `REFINA.esboco` ligam, com os moldes do recorte delas, estão
+em [`procedural/pecas/aviao/esboco-r2.formas.json`](../../../../procedural/pecas/aviao/esboco-r2.formas.json) (`mecanifica.formas-resolvidas@1`,
+2,0 MB): 118 das 140 formas da opção, as 15 malhas de família que elas usam (as cinco pás, as asas, as pontas, os estabilizadores e as
+três rodas), a orientação do plano do esboço e o alvo do crítico de cada uma das sete unidades, a composta gerada como o pacote do
+crítico a gerava, em `procedural/pecas/aviao/alvos/` (892 KB). As receitas apontam o `REFINA.esboco.arquivo` para esse arquivo, a
+normalização do `REFINA` só aceita `.formas.json` e recusa o `.esboco.json` dizendo por quê, e a conferência, a sobreposição de cortes e o
+pacote do crítico leem as formas, as malhas, a orientação e o alvo de lá.
+
+A conferência de forma foi medida antes da troca, com o módulo resolvendo o `aviao.esboco.json` a cada execução
+([`conferencia-do-aviao-antes.json`](conferencia-do-aviao-antes.json)), e depois, lendo o arquivo guardado: nas 7 peças e 102 partes, a
+maior diferença em qualquer número (razão e os três volumes de cada parte) é 0, o veredito de cada parte e os achados são os mesmos, e o
+texto do veredito inteiro de `descrever-peca` é o mesmo byte a byte. A leitura do arquivo leva uma fração de segundo, onde resolver a
+opção pelo módulo levava 45 s.
+
+### As peças pequenas que saíram do módulo
+
+O comparador de contornos (`src/referencia.js`, com o que ele usava de `projecao.js` e as vistas de `index.js`) foi para
+`tools/modelar/comparar-contornos.mjs`, junto do contorno por parte do veredito, sem as medidas sugeridas do `plano.medidas` e a imagem
+da sobreposição, que só o esboço usava; a forma que ele compara é a de malha. Nas duas fixtures do contorno por parte e nos três contornos
+do braço contra cada uma das cinco partes, 17 comparações, o resultado inteiro e o texto saem iguais aos do módulo. O texto de que lado
+cada vista olha (`src/lados.js`) foi para `tools/modelar/lados-das-vistas.mjs`, junto do pacote do crítico, e as 60 frases conferidas (as
+sete vistas e os blocos do brief, sem orientação e com cada uma das quatro frentes, e a vista de mesmo olho da referência) saem iguais.
+
+O provedor da malha de família (`src/familia.js`) não saiu do módulo: depois de as malhas do avião ficarem guardadas, ninguém fora do
+esboço antigo o usa, e o esboço 2.0 chama a família pelo passo `chamar`.
+
+As receitas do externo (`receita-externa.mjs`) traduzem para um esboço de caixas, cilindros, cones e extrusões pelo centro e pela
+rotação, e quem as resolvia era o módulo. A conta que essas formas pedem (a matriz, o prisma de cada tipo e a caixa pelos vértices
+girados) ficou em `formasDoEsbocoSimples` de `tools/modelar/esboco-para-passos.mjs`, e o `angulosDaMatriz` do tradutor ficou no
+próprio tradutor. Comparada campo a campo com o módulo em [`conferir-formas-simples.mjs`](conferir-formas-simples.mjs), nos 41 esboços das
+receitas do externo versionadas e nos três que os testes escrevem à mão, 758 formas, não há diferença acima de 1e-9 mm. A medida das
+cadeiras contra o alvo (`cadeiras-medida.mjs medidas`) sai igual, linha a linha.
+
+### O crítico e a calibração
+
+O pacote do crítico deixou de carregar o módulo: o lado de cada vista vem de `lados-das-vistas.mjs`, a vista de mesmo olho da
+referência do comparador, a orientação e o alvo das formas guardadas. O alvo é a composta guardada, copiada para a pasta da rodada, e a
+falta dela, ou a opção que não é a guardada, recusa antes de gastar captura.
+
+A calibração do crítico só fazia sentido inteira com o desenhista de linhas do módulo: o `gerar` desenhava as quatro vistas de cada
+imagem por ele, e o `calibracao:check` conferia que o que a fonte desenha hoje é o que foi gravado. Isso saiu. O que fica é o conjunto
+como foi julgado: os PNG gravados, a geometria de cada fonte de família contra o `aprovacao.json`, o arquivo de cada fonte de esboço, o
+agente e o texto fixo do brief, as medidas que reprovam cada defeito e a pontuação. O texto do brief do crítico do objeto veio do esboço
+para a calibração sem mudança, e o objeto, as perguntas e as medidas das duas imagens de fonte esboço (c03 e c07) foram gravados em
+`docs/modelar/banco-de-provas/calibracao-do-critico/fontes-de-esboco.json`. O gate dá o mesmo resultado de antes (12 de 12 imagens, 4
+defeitos reprovados pela medida, agente e brief iguais aos gravados, o crítico acerta 11 de 12), e os doze briefs saem iguais byte a
+byte. Refazer o conjunto depois disso é gerá-lo por outro desenhista, as capturas da bancada, e medir o crítico de novo.
+
+O `desenho:check` era o gate do próprio desenhista de linhas, e sai com ele na fatia 4.
+
+### As famílias com `esboco`
+
+`roda-pneu` e `dobradica` declaram o campo `esboco` do contrato, e os testes delas conferem a família contra o andaime do componente
+de mesmo nome, que o módulo expandia. Os andaimes dos 20 esboços mínimos que as conferências do repositório pedem (os três pontos e os
+oito perfis da `roda-pneu`, os três pontos da `dobradica` e os pontos da fixture `roda-com-esboco`) foram gravados em
+`tools/modelar/familia-com-esboco.andaimes.json`, pela impressão do esboço mínimo, e a conferência os lê; o ponto que não está lá é
+recusado dizendo o componente e os parâmetros. A `roda-pneu` é do território do plano do furgão, e nenhum arquivo dela mudou.
+
+### As skills, o agente e os roteiros
+
+A skill `esbocar-opcoes` passou ao esboço 2.0: as opções de forma saem pelas variantes da receita (`npm run variantes`) ou pelo
+`npm run esboco:nucleo`. As skills `esboco-detalhado` e `laco-do-esboco` e o agente `esbocista` saíram. Os roteiros `modelar/esboco` e
+`modelar/laco-do-esboco` deram lugar a `modelar/opcoes`, e a pergunta do grupo `modelar` no `CLAUDE.md` passou a ser "a peça, as opções
+de forma dela ou uma auditoria". O `comecar` deixou de ler o Condutor (`--arquivo`), na linha de comando e no MCP.
+
+### O que se perdeu
+
+Com o desenhista de linhas foram o redesenho do conjunto de calibração e a conferência de que o desenho de cada fonte não mudou. Com o
+módulo, a conferência de forma de um `.esboco.json` qualquer (só as formas guardadas se conferem), a expansão dos componentes para
+parâmetros novos de uma família com `esboco`, o Envelope do Condutor e a receita planejada a partir de uma unidade do esboço, e os testes
+que comparavam o sólido de cada forma de todos os esboços de prova com a caixa que o módulo calculava. O portão de contato do esboço
+sobre as caixas da família `cadeira` saiu do teste dela, porque as duas medidas que ele fazia (atravessamento acima de 1 mm e peça
+solta) já são testes da própria família.

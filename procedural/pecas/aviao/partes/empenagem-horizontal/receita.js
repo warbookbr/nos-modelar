@@ -44,7 +44,9 @@ import { chamar, criarRegistroDeFamilias } from '../../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../../nucleo/composicoes.js';
 import { nucleo } from '../../../../nucleo/entrada.js';
 
-const ESBOCO = '../../../../../docs/modelar/banco-de-provas/aviao-2026-10-11/esboco-r2/aviao.esboco.json';
+/* As formas resolvidas da opção 1 do esboço aprovado (`aviao.esboco.json` da segunda rodada), guardadas como dado em 2026-11-05, quando o
+   módulo antigo do esboço saiu; a conferência de forma e o alvo do crítico as leem. */
+const ESBOCO = '../../esboco-r2.formas.json';
 const LADOS = [['D', 'd', 'direito'], ['E', 'e', 'esquerdo']];
 const porLado = (fazer) => LADOS.flatMap(([L, l, nome]) => fazer(L, l, nome));
 

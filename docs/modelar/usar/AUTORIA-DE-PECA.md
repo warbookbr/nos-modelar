@@ -109,12 +109,11 @@ forma do esboço declara também `REFINA.esboco`, e a parte abaixo da razão
 interseção/união de volume mínima reprova. O formato e o que cada um confere
 estão no contrato da forma global N2 (`CONTRATO-FORMA-GLOBAL-N2`) e em
 [`CONFERIR-CONTRA-REFERENCIA.md`](CONFERIR-CONTRA-REFERENCIA.md). O alvo que vai
-ao crítico é a composta da unidade, gerada de novo por `npm run vistas:critica`, e
-nunca a imagem guardada na rodada do esboço: o alvo do motor do avião era de antes
-de uma correção do desenho, e só a pessoa percebeu. A receita planejada de uma
-unidade do esboço aprovado sai de `npm run receita:planejada`, descrito em
-[`alinhar-modelagem`](../../../.claude/skills/alinhar-modelagem/SKILL.md); ela deixa
-vazios o objeto, as referências e os critérios, e o `PLANO` é recusado até lá.
+ao crítico é a composta da unidade, guardada com as formas resolvidas do esboço
+(o `.formas.json` que o `REFINA.esboco` aponta), e não a imagem de uma rodada do
+esboço: o alvo do motor do avião era de antes de uma correção do desenho, e só a
+pessoa percebeu. O esboço antigo saiu em 2026-11-05, e as formas e as compostas
+foram gravadas juntas, do mesmo arquivo.
 
 Uma família do núcleo (`procedural/familias`, como a superfície aerodinâmica da pá
 e da asa ou a roda-pneu) entra numa receita de peça pelos `PASSOS`: a receita expande

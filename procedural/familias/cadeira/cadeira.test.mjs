@@ -7,7 +7,6 @@
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { chamar, ErroChamadaDeFamilia } from '../../../src/autoria/chamar-familia.js';
-import { descreverEsboco } from '../../../modulos/esboco/src/descrever.js';
 import { sha256Hex } from '../../nucleo/sha256.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { CADEIRA, CONTRATO_DA_CADEIRA } from './index.js';
@@ -234,17 +233,6 @@ describe('as regras construtivas, medidas na geometria', () => {
   it('as pernas da frente da cadeira branca de madeira encostam no assento (ajuste da pessoa)', () => {
     const { caixas, yU } = g('cadeira-branca-de-madeira');
     for (const lado of ['esq', 'dir']) expect(Math.abs(faixa(achar(caixas, `perna-frente-${lado}`)).y1 - yU)).toBeLessThanOrEqual(TOLERANCIA);
-  });
-
-  it.each(CASOS)('%s: o portão de contato do esboço, sobre as caixas separadas, não acha atravessamento acima de 1 mm nem peça solta', (nome) => {
-    const { caixas } = g(nome);
-    const esboco = {
-      opcoes: [{ titulo: nome, nota: '', formas: caixas.map((c) => ({ id: c.nome.replace(/[^a-z0-9]+/g, '_'), rotulo: c.nome, tipo: 'caixa', largura: c.larg, altura: c.alt, profundidade: c.prof, centro: [c.centro[0], c.centro[1] + c.alt / 2, c.centro[2]] })) }],
-      vista: 'isometrica',
-    };
-    const opcao = descreverEsboco(esboco).opcoes[0];
-    expect((opcao.sobreposicoes3d ?? []).filter((s) => s.penetracao_mm > TOLERANCIA)).toEqual([]);
-    expect(opcao.soltas ?? []).toEqual([]);
   });
 
   it('a estrutura depende só da combinação e o id sai dela', () => {

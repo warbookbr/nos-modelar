@@ -3,7 +3,6 @@
 import { readFileSync } from 'node:fs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { describe, expect, it } from 'vitest';
-import { COMPONENTES } from '../../modulos/esboco/componentes/index.js';
 import {
   ErroFamilia, FERRAMENTAS_DE_FAMILIA, FORMATO_FAMILIA, LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM,
   LIMITE_DA_TOLERANCIA_DO_ENVELOPE_NA_FAMILIA_MM, PAPEIS_POR_TIPO_DE_PORTA, SCHEMA_FAMILIA, TIPOS_DE_PORTA, TIPOS_DE_PORTA_COM_VOLUME,
@@ -15,6 +14,21 @@ import {
   LIMITE_DA_TOLERANCIA_DA_PORTA_MM, LIMITE_DA_TOLERANCIA_DO_ENVELOPE_MM, normalizarRefinamentoGlobal,
 } from './refinamento-global.js';
 import { resolverPortasDeMontagem } from './interfaces-montagem.js';
+
+/* Os parâmetros de cada componente do esboço antigo, como `componentes/*.json` os declarava quando o módulo saiu (2026-11-05): o
+   vínculo `esboco` da família ainda nomeia um deles, e `lerFamilia` o confere contra esta lista quando ela é dada. */
+const COMPONENTES_DO_ESBOCO = Object.freeze({
+  roda: ['diametro', 'aro', 'largura', 'espessuraDisco', 'diametroCubo', 'salienciaCubo', 'raios', 'raioCubo', 'larguraRaio', 'espessuraAro', 'larguraAro', 'flanges', 'diametroFlange', 'espessuraFlange', 'ombro'],
+  garfo: ['diametro', 'diametroPerna', 'alturaPerna', 'diametroCoroa', 'alturaCoroa'],
+  quadro: ['comprimento', 'largura', 'altura', 'larguraColuna', 'alturaColuna', 'profundidadeColuna'],
+  mancal: ['larguraBase', 'alturaBase', 'profundidadeBase', 'raioBase', 'distanciaDosFuros', 'diametroDosFuros', 'diametroAlojamento', 'diametroFuro', 'espessuraAlojamento', 'diametroEixo', 'comprimentoEixo'],
+  parafuso: ['diametro', 'diametroCabeca', 'alturaCabeca', 'sextavada'],
+  mola: ['raio', 'fio', 'passo', 'aneis', 'espiras', 'espessuraSapata'],
+  engrenagem: ['dentes', 'modulo', 'espessura', 'diametroCubo', 'salienciaCubo'],
+  rolamento: ['diametro', 'furo', 'largura', 'esferas', 'terco'],
+  perfil: ['largura', 'altura', 'espessura', 'comprimento', 'u', 'tubo', 'fenda'],
+  dobradica: ['altura', 'diametroPino', 'larguraAba', 'espessura', 'angulo', 'fechamento'],
+});
 
 const ler = (caminho) => JSON.parse(readFileSync(new URL(caminho, import.meta.url), 'utf8'));
 const fixture = () => ler('../../tools/fixtures/familia-de-prova/familia.json');
@@ -122,7 +136,7 @@ describe('familia — a fixture válida', () => {
   });
 
   it('confere o vínculo com os componentes reais do esboço quando eles são dados', () => {
-    const componentes = Object.fromEntries(Object.entries(COMPONENTES).map(([nome, c]) => [nome, Object.keys(c.parametros)]));
+    const componentes = COMPONENTES_DO_ESBOCO;
     expect(lerFamilia(fixture(), { componentes }).esboco.componente).toBe('roda');
   });
 });
@@ -251,7 +265,7 @@ describe('familia — cada defeito é recusado com campo, valor e o que é aceit
   it('vínculo com o esboço: parâmetro da família inexistente, componente e parâmetro de componente desconhecidos', () => {
     expect(recusa(variar((f) => { f.esboco.mapa.diametro = 'diametroExterno'; })).message).toMatch(/esboco\.mapa\.diametro recebeu "diametroExterno"; aceito: um parâmetro da família, ou o produto de dois \('a \* b'\), entre: aro, diametro/);
     expect(recusa(variar((f) => { f.esboco.mapa = {}; })).campo).toBe('esboco.mapa');
-    const componentes = Object.fromEntries(Object.entries(COMPONENTES).map(([nome, c]) => [nome, Object.keys(c.parametros)]));
+    const componentes = COMPONENTES_DO_ESBOCO;
     expect(recusa(variar((f) => { f.esboco.componente = 'pneu'; }), { componentes }).message).toMatch(/esboco\.componente recebeu "pneu"; aceito: um componente do esboço: dobradica, engrenagem/);
     expect(recusa(variar((f) => { f.esboco.mapa.altura = 'largura'; }), { componentes }).message).toMatch(/esboco\.mapa\.altura recebeu "altura"; aceito: um parâmetro do componente 'roda': aro, diametro/);
   });

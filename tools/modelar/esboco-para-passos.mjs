@@ -14,7 +14,7 @@
    escolhidos pela própria conferência, entre as variantes possíveis, e a forma que nenhuma variante reproduz sai em `recusas` com o motivo.
    Núcleo puro: recebe o esboço lido e devolve `{ passos, partes, recusas, conferencias }`. */
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { formasResolvidas } from '../../modulos/esboco/src/formas-resolvidas.js';
+import { deslocarContorno, ehConvexo } from '../../procedural/nucleo/contorno.js';
 import { alinharCaixas } from './esboco-alinhar-caixas.mjs';
 
 const TOLERANCIA_MM = 0.5;
@@ -61,6 +61,154 @@ function passosDeRotacao(matriz, sinal, pivo, sel) {
     passos.push(['rotaciona', { eixo, graus: sinal * grau(ang), pivo, sel }]);
   }
   return passos;
+}
+
+/* ---------- as formas do esboço em números ----------
+
+   O esboço que chega aqui é o das receitas do externo (`receita-externa.mjs`): caixa (com chanfro), cilindro, cone e extrusão, cada uma
+   pelo `centro` absoluto e, quando gira, pela `rotacao` [rx, ry, rz] em graus. Até 2026-11-05 quem as resolvia era o módulo antigo do
+   esboço (`formasResolvidas`); ele saiu, e a conta que estas formas pedem ficou aqui, a mesma dele: a matriz M = Rz·Ry·Rx, o prisma
+   local de cada tipo (o círculo de 128 lados, ou de `lados`; a caixa chanfrada em quatro seções com a de cima recuada pelo chanfro; o
+   cone em duas seções; a extrusão com o perfil centrado na caixa dele e anti-horário) e a caixa envolvente pelos vértices do prisma
+   girado. Foi conferida contra o módulo, campo a campo, em todas as receitas do externo versionadas antes de ele sair. A forma de outro
+   tipo passa só com o centro, e a conversão a recusa dizendo o tipo; posição por relação (`sobre`, `ponta` e as outras) é recusada aqui,
+   porque esse esboço é o do 2.0 (`modulos/esboco-nucleo/`). */
+
+const EIXOS = ['x', 'y', 'z'];
+const SEGMENTOS = 128;
+const RELACOES = ['sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'de', 'para', 'encaixa', 'espelha', 'arranja', 'usa', 'subtrai', 'ligar'];
+const limpo = (x) => (Math.abs(x) < 1e-12 ? 0 : x);
+const baseDoEixo = (eixo) => (eixo === 'x' ? { e: 0, u: 2, v: 1 } : eixo === 'z' ? { e: 2, u: 0, v: 1 } : { e: 1, u: 0, v: 2 });
+const ponto3 = (b, u, v, w) => { const p = [0, 0, 0]; p[b.u] = u; p[b.v] = v; p[b.e] = w; return p; };
+const aplicarMatriz = (v, m) => (m ? [0, 1, 2].map((i) => m[i][0] * v[0] + m[i][1] * v[1] + m[i][2] * v[2]) : v);
+function circuloN(r, n) {
+  const p = [];
+  for (let i = 0; i < n; i++) { const a = (2 * Math.PI * i) / n; p.push([r * Math.cos(a), r * Math.sin(a)]); }
+  return p;
+}
+const retanguloChanfrado = (l, p, c) => [[-l / 2 + c, -p / 2], [l / 2 - c, -p / 2], [l / 2, -p / 2 + c], [l / 2, p / 2 - c],
+  [l / 2 - c, p / 2], [-l / 2 + c, p / 2], [-l / 2, p / 2 - c], [-l / 2, -p / 2 + c]];
+
+/** A matriz da `rotacao` [rx, ry, rz] em graus (M = Rz·Ry·Rx), ou null sem giro. */
+export function matrizDaRotacao(rot) {
+  if (!Array.isArray(rot)) return null;
+  const [rx = 0, ry = 0, rz = 0] = rot;
+  if (!rx && !ry && !rz) return null;
+  const [cx, sx, cy, sy, cz, sz] = [rx, ry, rz].flatMap((g) => [Math.cos((g * Math.PI) / 180), Math.sin((g * Math.PI) / 180)]);
+  return [
+    [cz * cy, cz * sy * sx - sz * cx, cz * sy * cx + sz * sx],
+    [sz * cy, sz * sy * sx + cz * cx, sz * sy * cx - cz * sx],
+    [-sy, cy * sx, cy * cx],
+  ];
+}
+
+/* O prisma local da forma: a base dos eixos, o perfil, o comprimento e, na caixa chanfrada e no cone, as seções. */
+function prismaDaForma(f, onde) {
+  if (f.tipo === 'caixa') {
+    if (f.raio !== undefined || f.furo !== undefined || f.furos !== undefined) throw new Error(`${onde}: caixa com raio de canto ou furo não é desta conversão`);
+    if (f.chanfro !== undefined) {
+      const c = f.chanfro;
+      const cheio = retanguloChanfrado(f.largura, f.profundidade, c);
+      const topo = deslocarContorno(cheio, c);
+      const h = f.altura / 2;
+      return { b: baseDoEixo('y'), perfil: cheio, comprimento: f.altura, secoes: [{ w: -h, perfil: topo }, { w: -h + c, perfil: cheio }, { w: h - c, perfil: cheio }, { w: h, perfil: topo }] };
+    }
+    const [l, p] = [f.largura / 2, f.profundidade / 2];
+    return { b: baseDoEixo('y'), perfil: [[-l, -p], [l, -p], [l, p], [-l, p]], comprimento: f.altura };
+  }
+  if (f.tipo === 'cilindro') {
+    if (f.achatado !== undefined) throw new Error(`${onde}: cilindro achatado não é desta conversão`);
+    return { b: baseDoEixo(f.eixo ?? 'y'), perfil: circuloN(f.diametro / 2, f.lados || SEGMENTOS), comprimento: f.comprimento };
+  }
+  if (f.tipo === 'cone') {
+    const h = f.comprimento / 2;
+    const base0 = circuloN(f.diametro / 2, SEGMENTOS);
+    return { b: baseDoEixo(f.eixo ?? 'y'), perfil: base0, comprimento: f.comprimento, secoes: [{ w: -h, perfil: base0 }, { w: h, perfil: circuloN((f.diametroTopo ?? 0) / 2, SEGMENTOS) }] };
+  }
+  /* extrusão: o perfil centrado na caixa dele (ou na origem dele, com `origem: "perfil"`), anti-horário */
+  const doPerfil = f.origem === 'perfil';
+  const us = f.perfil.map((q) => q[0]); const vs = f.perfil.map((q) => q[1]);
+  const cu = doPerfil ? 0 : (Math.min(...us) + Math.max(...us)) / 2;
+  const cv = doPerfil ? 0 : (Math.min(...vs) + Math.max(...vs)) / 2;
+  const area = f.perfil.reduce((acc, q, i) => acc + q[0] * f.perfil[(i + 1) % f.perfil.length][1] - f.perfil[(i + 1) % f.perfil.length][0] * q[1], 0);
+  const centrado = f.perfil.map((q) => [q[0] - cu, q[1] - cv]);
+  return { b: baseDoEixo(f.eixo ?? 'y'), perfil: area >= 0 ? centrado : [...centrado].reverse(), comprimento: f.comprimento, naoConvexo: !ehConvexo(f.perfil) };
+}
+
+function caixaLocal(pr, m) {
+  if (!pr.secoes && !m) {
+    const min = [0, 0, 0]; const max = [0, 0, 0];
+    min[pr.b.e] = -pr.comprimento / 2; max[pr.b.e] = pr.comprimento / 2;
+    min[pr.b.u] = Math.min(...pr.perfil.map((p) => p[0])); max[pr.b.u] = Math.max(...pr.perfil.map((p) => p[0]));
+    min[pr.b.v] = Math.min(...pr.perfil.map((p) => p[1])); max[pr.b.v] = Math.max(...pr.perfil.map((p) => p[1]));
+    return { min, max };
+  }
+  const h = pr.comprimento / 2;
+  const secoes = pr.secoes ?? [{ w: -h, perfil: pr.perfil }, { w: h, perfil: pr.perfil }];
+  const vs = secoes.flatMap((sc) => sc.perfil.map(([u, v]) => aplicarMatriz(ponto3(pr.b, u, v, sc.w), m)));
+  return { min: [0, 1, 2].map((i) => Math.min(...vs.map((p) => p[i]))), max: [0, 1, 2].map((i) => Math.max(...vs.map((p) => p[i]))) };
+}
+
+function geometriaDoTipo(f, pr) {
+  const eixo = EIXOS[pr.b.e];
+  if (f.tipo === 'caixa') return { eixo, largura: f.largura, altura: pr.comprimento, profundidade: f.profundidade, ...(f.chanfro !== undefined ? { chanfro: f.chanfro } : {}) };
+  if (f.tipo === 'cilindro') return { eixo, diametro: f.diametro, comprimento: pr.comprimento, ...(f.lados !== undefined ? { lados: f.lados } : {}) };
+  if (f.tipo === 'cone') return { eixo, diametro: f.diametro, diametroTopo: f.diametroTopo ?? 0, comprimento: pr.comprimento };
+  return { eixo, eixosDoPerfil: [EIXOS[pr.b.u], EIXOS[pr.b.v]], comprimento: pr.comprimento, convexo: pr.naoConvexo !== true, perfil: pr.perfil };
+}
+
+/**
+ * As formas da opção `opcao` (número a partir de 1, ou o título) de um esboço de receita do externo, como o módulo antigo as resolvia
+ * (`mecanifica.formas-resolvidas@1`, sem recorte nem componente): `{ formato, opcao, parametros, pontos, formas }`, cada forma com
+ * `geometria` { centro, caixa, matriz, eixo, medidas do tipo, ancoras }.
+ */
+export function formasDoEsbocoSimples(esboco, opcao = 1) {
+  if (!esboco || !Array.isArray(esboco.opcoes) || esboco.opcoes.length === 0) throw new Error('o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
+  const indice = typeof opcao === 'string' ? esboco.opcoes.findIndex((o) => o?.titulo === opcao) : opcao - 1;
+  if (!Number.isInteger(indice) || indice < 0 || indice >= esboco.opcoes.length) throw new Error(`a opção ${JSON.stringify(opcao)} não existe (o esboço tem ${esboco.opcoes.length})`);
+  const o = esboco.opcoes[indice];
+  if (esboco.parametros !== undefined || o.parametros !== undefined) throw new Error('parâmetros e expressões são do esboço antigo, que saiu; escreva os números');
+  const formas = (o.formas ?? []).map((f, k) => {
+    const onde = `forma ${f.id ?? k + 1}`;
+    const relacao = RELACOES.find((r) => f[r] !== undefined);
+    if (relacao) throw new Error(`${onde}: "${relacao}" posiciona por relação, e esta conversão lê só o centro absoluto e a rotação; para opções de forma use o esboço 2.0 (npm run esboco:nucleo)`);
+    if (!Array.isArray(f.centro) || f.centro.length !== 3 || !f.centro.every(Number.isFinite)) throw new Error(`${onde}: "centro" precisa ser [x, y, z] em mm`);
+    const comuns = { id: f.id, tipo: f.tipo, oculto: f.oculto === true, ...(f.cor !== undefined ? { cor: f.cor } : {}), ...(f.rotulo !== undefined ? { rotulo: f.rotulo } : {}), unidade: null, parte: null, origem: null };
+    const centro = [...f.centro];
+    if (!['caixa', 'cilindro', 'cone', 'extrusao'].includes(f.tipo)) {
+      return { ...comuns, geometria: { centro, caixa: { min: centro, max: centro }, matriz: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], ancoras: { centro } } };
+    }
+    const m = matrizDaRotacao(f.rotacao);
+    const pr = prismaDaForma(f, onde);
+    const local = caixaLocal(pr, m);
+    const ancoras = { centro };
+    if (f.tipo !== 'caixa') {
+      for (const [nome, w] of [['inicio', -pr.comprimento / 2], ['fim', pr.comprimento / 2]]) {
+        const d = aplicarMatriz(ponto3(pr.b, 0, 0, w), m);
+        ancoras[nome] = [centro[0] + d[0], centro[1] + d[1], centro[2] + d[2]];
+      }
+    }
+    return {
+      ...comuns,
+      geometria: {
+        centro,
+        caixa: { min: local.min.map((v, i) => v + centro[i]), max: local.max.map((v, i) => v + centro[i]) },
+        matriz: m ? m.map((linha) => linha.map(limpo)) : [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        ...geometriaDoTipo(f, pr),
+        ancoras,
+      },
+    };
+  });
+  return { formato: 'mecanifica.formas-resolvidas@1', opcao: { numero: indice + 1, ...(o.titulo ? { titulo: o.titulo } : {}) }, parametros: {}, pontos: { ...(esboco.pontos ?? {}), ...(o.pontos ?? {}) }, formas };
+}
+
+/** A caixa envolvente de cada forma da opção em centésimos de milímetro, `{ id, caixa: { x: [min, max], y, z } }`, como a leitura em texto
+ *  do módulo antigo (`descreverEsboco`) a dava. */
+export function caixasDoEsboco(esboco, opcao = 1) {
+  const r2 = (x) => Math.round(x * 100) / 100;
+  return formasDoEsbocoSimples(esboco, opcao).formas.map(({ id, geometria: { caixa } }) => ({
+    id, caixa: Object.fromEntries(EIXOS.map((e, k) => [e, [r2(caixa.min[k]), r2(caixa.max[k])]])),
+  }));
 }
 
 /* ---------- uma forma ---------- */
@@ -195,7 +343,7 @@ export function aplicarAjustes(formas, ajustes) {
 }
 
 export function passosDoEsboco(esboco, { opcao = 1, alinhar = false, ajustes = [] } = {}) {
-  const dados = formasResolvidas(esboco, opcao);
+  const dados = formasDoEsbocoSimples(esboco, opcao);
   let alteracoes = [];
   if (alinhar) { const r = alinharCaixas(dados.formas); dados.formas = r.formas; alteracoes = r.alteracoes; }
   if (ajustes.length) dados.formas = aplicarAjustes(dados.formas, ajustes).formas;

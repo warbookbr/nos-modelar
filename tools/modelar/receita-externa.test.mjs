@@ -5,7 +5,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { descreverEsboco } from '../../modulos/esboco/src/descrever.js';
+import { caixasDoEsboco, formasDoEsbocoSimples } from './esboco-para-passos.mjs';
 import { caixaDoEsboco, chanfroDoEsboco, envolventeDaPeca, esbocoParaReceita, matrizDeEuler, materiaisParaReceita, receitaParaEsboco, volumeDaPeca } from './receita-externa.mjs';
 
 const PASTA = join(fileURLToPath(new URL('.', import.meta.url)), 'fixtures', 'receita-externa');
@@ -16,7 +16,7 @@ const difMm = (a, b) => Math.max(...[0, 1, 2].flatMap((k) => [Math.abs(a.min[k] 
 
 /* a caixa envolvente que o esboço lê de cada forma, no quadro da receita, pelo nome da peça (`rotulo`) */
 function envolventesLidas(esboco) {
-  const lido = descreverEsboco(esboco).opcoes[0].formas;
+  const lido = caixasDoEsboco(esboco);
   const porId = new Map(lido.map((f) => [f.id, f]));
   return new Map(esboco.opcoes[0].formas.map((f) => [f.rotulo, caixaDoEsboco(porId.get(f.id).caixa)]));
 }
@@ -34,7 +34,7 @@ describe('receita do externo para esboço', () => {
     const { esboco, recusas } = receitaParaEsboco(receita);
     expect(esboco.opcoes[0].formas.length + recusas.length).toBe(receita.pecas.length);
     expect(recusas.every((r) => typeof r.motivo === 'string' && !r.motivo.startsWith('rot'))).toBe(true);
-    expect(() => descreverEsboco(esboco)).not.toThrow();
+    expect(() => formasDoEsbocoSimples(esboco)).not.toThrow();
   });
 
   it.each(receitas)('%s: o bloco de materiais volta igual ao da receita', (_nome, receita) => {
@@ -83,7 +83,7 @@ describe('receita do externo para esboço', () => {
   });
 
   it('a convenção de ângulos do esboço: a caixa girada 90° em x leva a altura a z; em z, a largura a y', () => {
-    const caixa = (rotacao) => descreverEsboco({ materiais: {}, opcoes: [{ formas: [{ id: 'a', tipo: 'caixa', largura: 100, altura: 200, profundidade: 50, centro: [0, 0, 0], rotacao }] }] }).opcoes[0].formas[0].caixa;
+    const caixa = (rotacao) => caixasDoEsboco({ materiais: {}, opcoes: [{ formas: [{ id: 'a', tipo: 'caixa', largura: 100, altura: 200, profundidade: 50, centro: [0, 0, 0], rotacao }] }] })[0].caixa;
     expect(caixa([90, 0, 0])).toEqual({ x: [-50, 50], y: [-25, 25], z: [-100, 100] });
     expect(caixa([0, 0, 90])).toEqual({ x: [-100, 100], y: [-50, 50], z: [-25, 25] });
   });
@@ -142,7 +142,7 @@ describe('receita do externo para esboço', () => {
       expect(recusas).toEqual([]);
       const forma = esboco.opcoes[0].formas[0];
       expect(forma.tipo).toBe('cone');
-      const lido = descreverEsboco(esboco).opcoes[0].formas[0];
+      const lido = formasDoEsbocoSimples(esboco).formas[0].geometria;
       /* o início do cone do esboço é a ponta cujo raio é o `diametro`. A base da receita fica em centro e a ponta em centro + altura; as duas
          giram com a peça em torno do meio, e o esboço as lê em milímetro no quadro dele */
       const u = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] }[c.eixo];

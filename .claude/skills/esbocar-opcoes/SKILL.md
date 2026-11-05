@@ -1,95 +1,71 @@
 ---
 name: esbocar-opcoes
-description: Mostra à pessoa, em imagem, as opções de forma em disputa, lado a lado na mesma escala e com a referência, e pergunta qual se parece mais. Use no alinhamento sempre que houver escolha de forma. Não use para a peça final nem para prancha cotada.
+description: Mostra à pessoa, em imagem, as opções de forma em disputa, lado a lado na mesma câmera, feitas pelas mesmas operações da peça (o esboço 2.0 ou as variantes da receita), e pergunta qual se parece mais. Use no alinhamento e na modelagem sempre que houver escolha de forma. Não use para a peça final nem para prancha cotada.
 ---
 
 # Esboçar opções de forma
 
-A pessoa entende forma vendo, e não lendo medidas. Sempre que o alinhamento
-chegar a uma escolha de forma (em pé ou deitado, encostado na face ou na ponta,
-redondo ou achatado), desenhe as opções com esta ferramenta em vez de
-descrevê-las em texto. A referência completa do JSON está em
-[`modulos/esboco/README.md`](../../../modulos/esboco/README.md); esta skill
-diz como usá-la no alinhamento.
+A pessoa entende forma vendo, e não lendo medidas. Sempre que o alinhamento ou
+a modelagem chegar a uma escolha de forma (em pé ou deitado, encostado na face
+ou na ponta, a ponta em bico ou arredondada), mostre as opções em imagem em vez
+de descrevê-las em texto. As opções saem das operações do núcleo, as mesmas
+que a peça usa, e por isso mostram o que a peça consegue ser. A referência dos
+campos está no [README do esboço 2.0](../../../modulos/esboco-nucleo/README.md).
 
-Para esboçar o objeto inteiro com contrato, medidas, unidades e crítico, use a
-skill [`esboco-detalhado`](../esboco-detalhado/SKILL.md).
+## Qual dos dois caminhos
+
+Quando a peça já existe e a escolha é de valores (a espessura do tampo, o raio
+da ponta, a altura do vão), declare as opções como variantes da receita: a
+receita exporta `VARIANTES: [{ nome, nota, tabela: { chave: valor } }]`, cada
+variante troca valores da `TABELA`, e `npm run variantes -- <peça>` roda a
+receita com cada troca e junta as capturas numa imagem, com a mesma câmera. A
+receita do acervo não muda, e a variante com os valores aceitos dá a mesma
+malha de antes. O exemplo é
+[`mesa-com-variantes.js`](../../../docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/mesa-com-variantes.js).
+
+Quando a peça ainda não existe, ou a escolha é de forma e não de valor, escreva
+um esboço do 2.0: cada opção é uma pequena receita do núcleo, com `passos`
+crus (todo o catálogo, as gaiolas, `aberturaPorContorno`, as famílias por
+`chamar`), `topo` com os pontos nomeados e o atalho `formas`, que posiciona
+formas simples por relação. Rode `npm run esboco:nucleo -- <arquivo>`; o
+arquivo é um `.esboco.json` ou um módulo `.mjs` cujo default é o esboço, para a
+opção que precisa de código. O exemplo é
+[`farol-na-chapa.esboco.mjs`](../../../docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/farol-na-chapa.esboco.mjs).
+Os `.esboco.json` de opções de forma escritos antes do 2.0 abrem sem reescrita.
 
 ## Pare e planeje
 
-Antes de escrever o JSON, decida por escrito, em um parágrafo curto por decisão, o que segue. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto; os campos do `plano` de um esboço detalhado estão na skill `esboco-detalhado`. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md).
+Antes de escrever, decida por escrito, em um parágrafo curto por decisão, o que
+está em disputa e o que fica igual em todas as opções, quantas opções (duas ou
+três, cada uma com uma diferença que se vê), a vista que mostra a diferença e a
+parte da peça que entra. Esboce só o que está em disputa. Uma opção que o núcleo
+não faz é recusada com o motivo, e a recusa é informação: a forma que o núcleo
+não dá não é opção para a peça.
 
-## Escrever e rodar
+## O atalho de formas
 
-Escreva `<peça>/referencias/<assunto>.esboco.json` e rode
-`npm run esboco -- <arquivo>`, que grava `<assunto>.png` e `<assunto>.svg` ao
-lado. O exemplo de referência é
-[`ombro-opcoes.esboco.json`](../../../procedural/pecas/braco-robotico/referencias/ombro-opcoes.esboco.json).
-
-A raiz tem `opcoes` e, opcionalmente, `vista`: `isometrica` (padrão, a que a
-pessoa entende melhor), `frontal`, `lateral` ou `superior`. Cada opção tem
-`titulo`, `nota` (uma frase curta) e `formas`, e todas saem na mesma escala,
-com barra de 100 mm. Cada forma tem `id`, `tipo`, `cor` e `rotulo` opcional,
-que sai fora do desenho como legenda numerada com linha de chamada. Com `legendas: "lista"` (raiz ou opção) o rótulo vira balão numerado sobre a peça e chave numerada abaixo do desenho, sem linha de chamada nem colunas laterais; a peça totalmente atrás de outra ganha balão tracejado na borda de quem a cobre e "(oculta nesta vista)" na chave.
-
-Os tipos são `caixa` (`largura` x, `altura` y, `profundidade` z, `raio` de
-canto ou `chanfro` nas doze arestas, e `furos: [{ diametro, centro: [x, z] }]`),
-`cilindro` (`diametro`, `comprimento`, `eixo`, `achatado`), `anel`
-(`diametroExterno`, `diametroInterno`, `espessura`, `eixo`), `cone`
-(`diametro` da base, `diametroTopo` para o tronco, `comprimento`, `eixo`),
-`esfera` (`diametro`), `extrusao` (`perfil: [[u, v], ...]` polígono simples,
-convexo ou côncavo, `comprimento`, `eixo`), `loft` (`secoes: [{ pos, forma:
-"retangulo" | "elipse" | "poligono" | "arredondado", tamanho: [u, v], centro:
-[u, v], raio, cantos, nome }, ...]` em ordem crescente de `pos`, `eixo`, e
-`casca: { espessura, aberta: "fim" | "inicio" }` para a bacia oca), `revolucao` (`perfil:
-[[raio, altura], ...]` do começo ao fim do eixo, `eixo`, `lados`) e `tubo`
-(`caminho` de 2 ou mais pontos, `diametro`, `raioCurva`). Para tanque, banco e
-carenagem use `loft` (a seção muda de tamanho e de centro ao longo do eixo, e
-`nome` numa seção vira a âncora `<id>.<nome>`), para uma sela ou um U use
-`extrusao` com o perfil côncavo, e para escapamento, cubo e farol use
-`revolucao`. Não há curva livre nem seção côncava de loft: as formas são
-facetadas, e `"suave": true` no loft e na revolução passa uma curva de tangente
-contínua pelas seções (ou mais seções e mais pontos no perfil).
-
-Posicione pela relação e não por coordenada: a primeira forma leva
-`centro: [0, 0, 0]`; as demais usam `sobre: "<id>"` (base no topo daquela) ou
-`ponta: { id, lado: "+x" }` (encosta na face daquele lado), com `desloca` para
-o ajuste fino. `rotacao: [rx, ry, rz]` em graus gira pela regra da mão direita
-em torno do eixo de mundo: rx=+90 leva +y para +z, ry=+90 leva +z para +x e
-rz=+90 leva +x para +y.
-
-## Limpar o desenho
-
-`linhasCentro: true` no topo ou na opção traça os eixos de cilindros, anéis e
-furos. `ocultar` (topo, opção ou forma; o nível mais interno vence, `[]` religa)
-desliga `linhasCentro`, `legendas`, `numeracao`, `marcadores`, `escala`,
-`titulo` ou `nota`. `oculto: true` numa forma a tira do desenho sem apagá-la,
-e ela segue valendo como referência de `sobre` e `ponta`. Um rótulo que já
-começa com número ("1. base") não recebe outro.
-
-## Limites
-
-No modo de legendas padrão, com mais de uns 6 formas por opção o desenho degrada: numa moto de 10 formas as
-legendas se cruzam, a escala cai para 0,15 px/mm e as linhas de chamada cortam o
-desenho. Com mais de uns 6 formas use `legendas: "lista"`, que sobe a escala
-(na mesma moto, 0,28 px/mm na isométrica) e tira as linhas de chamada. Esboce só o que está em
-disputa e divida em vários esboços quando ainda assim ficar cheio.
+Cada forma tem `id`, que vira o nome da parte, e o gerador: `op` e `args` de uma
+operação geradora do catálogo (`cubo`, `chamferBox`, `cilindro`, `cone`,
+`esfera`, `extrusao`, `lathe`, `loft`) ou `ajudante` e `args` de uma gaiola. A
+posição é uma só entre `centro: [x, y, z]`, `sobre: '<id>'` (a base no topo
+daquela forma) e `ponta: { id, lado }` (encostada na face do lado pedido), com
+`desloca: [dx, dy, dz]` depois e `rotacao: [rx, ry, rz]` em graus antes. Tudo
+se resolve pela caixa da malha que o núcleo gerou, em metro.
 
 ## Conferir antes de mostrar
 
-Abra o PNG com `Read`. Para qualquer esboço que vá à pessoa, rode
-`npm run esboco -- <arquivo> --analise` (8 imagens, sem linhas de centro, mais 4 ou 8 quando há sobreposição na projeção; num esboço denso `--analise --rapido` confere contato e projeção só em texto, sem imagem, enquanto você corrige, e `--sugerir` liga a busca de explosão, que custa mais; acrescente `--centros` só se a pessoa quiser vê-las, o que gera 16 e as variantes) e leia as imagens conforme a seção
-Esboço de
-[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md):
-legenda que cruza, balão no elemento errado, escala pequena, oclusão errada e
-rotação no sentido errado. Relate os defeitos por vista e região e o que não
-foi conferido. Havendo foto, a conferência numérica contra ela
-(`--referencia`, por vista e por parte) vem antes das imagens e não as
-substitui.
+`--so-montar` monta e confere as receitas e imprime, por opção, as partes, as
+faces, a caixa em milímetro e o hash do neutroCanonico, sem abrir a bancada.
+Depois rode sem ele, abra a imagem com `Read` e confira que cada opção mostra a
+diferença em disputa, que a câmera é a mesma (a ferramenta imprime onde a caixa
+comum caiu em cada captura) e que nada foi cortado pelo quadro. Quando a
+escolha é de medida, meça a malha (`--so-montar` dá a caixa; `npm run descrever`
+dá o resto) em vez de confiar na imagem.
 
 ## Como mostrar
 
-Mostre à pessoa a foto de referência e o esboço juntos, uma frase curta por
+Mostre à pessoa a referência e a imagem das opções juntas, uma frase curta por
 opção dizendo o que muda entre elas, e termine com a pergunta "qual se parece
 mais com o objeto?". A resposta vira decisão escrita no PLANO, como na skill
-[alinhar-modelagem](../alinhar-modelagem/SKILL.md).
+[alinhar-modelagem](../alinhar-modelagem/SKILL.md), e a variante escolhida vira
+o valor da `TABELA`.

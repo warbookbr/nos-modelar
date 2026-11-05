@@ -18,7 +18,7 @@ Etapa e, aprovação da forma. Entra a folha comparativa aberta como imagem, com
 
 Quando não há modelo, imagem, receita de outro projeto nem medida, o Blender serve para bloquear a forma só para medir: uma caixa, as proporções e o perfil. Exportam-se as medidas, por exemplo as dimensões da caixa e os pontos do perfil lido na vista lateral, e reescreve-se tudo em receita pelo núcleo, seguindo as etapas d e e. A malha do Blender nunca é levada ao repositório nem à receita.
 
-O esboço detalhado é a alternativa opcional e só entra por escolha da pessoa. Ele parte das skills `esboco-detalhado` e `laco-do-esboco` e dos roteiros `modelar/esboco` e `modelar/laco-do-esboco`. O alinhamento prévio, com opções de forma lado a lado em imagem, é conduzido pela skill `alinhar-modelagem`.
+O alinhamento prévio, com opções de forma lado a lado em imagem, é conduzido pela skill `alinhar-modelagem`, e as opções saem pela skill `esbocar-opcoes` e pelo roteiro `modelar/opcoes`, com as operações do núcleo.
 
 ## Resumo
 

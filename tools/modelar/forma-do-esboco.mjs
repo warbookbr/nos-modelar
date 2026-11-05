@@ -4,12 +4,13 @@
  *
  * O veredito de `descrever-peca` roda essa conferência quando a receita declara `REFINA.esboco`. Esta CLI roda a mesma conferência
  * (`src/autoria/forma-do-esboco.js`) sobre uma receita que não declara, ligando as partes às formas por linha de comando: serve para medir
- * uma peça fixa, ou para escolher o mínimo antes de escrever a declaração. A receita é executada sem veredito, o esboço é resolvido pelo
- * módulo (a parte cara, guardada no processo) e a saída diz a razão interseção/união de volume de cada parte.
+ * uma peça fixa, ou para escolher o mínimo antes de escrever a declaração. A receita é executada sem veredito, as formas do esboço vêm do
+ * `.formas.json` guardado (as formas resolvidas da opção, `mecanifica.formas-resolvidas@1`; o `.esboco.json` só se lia pelo módulo antigo
+ * do esboço, que saiu em 2026-11-05) e a saída diz a razão interseção/união de volume de cada parte.
  *
- *   npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --mesmo-id [--opcao=1] [--minimo=0.95]
- *   npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --formas=asa:asaD+pontaD,porta:porta
- *   npm run forma:esboco -- <peça> --esboco=<arquivo.esboco.json> --mesmo-id --desloca='roda:0,-17,0:a roda encosta no chão'
+ *   npm run forma:esboco -- <peça> --esboco=<arquivo.formas.json> --mesmo-id [--opcao=1] [--minimo=0.95]
+ *   npm run forma:esboco -- <peça> --esboco=<arquivo.formas.json> --formas=asa:asaD+pontaD,porta:porta
+ *   npm run forma:esboco -- <peça> --esboco=<arquivo.formas.json> --mesmo-id --desloca='roda:0,-17,0:a roda encosta no chão'
  *   npm run forma:esboco -- <peça>
  *
  * Sem `--esboco`, a CLI lê o `REFINA.esboco` que a receita declara: o arquivo, a opção, o mapa das partes às formas, os mínimos e os afastamentos declarados. Os
@@ -26,7 +27,8 @@ import { pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { OPCAO_COMPOSICOES } from './configuracao-composicoes.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
-import { conferirFormaDoEsbocoDoJson, formasDoEsboco } from './esboco-solido.mjs';
+import { lerFormasGuardadas } from './refinamento-global.mjs';
+import { conferirFormaDoEsboco } from '../../src/autoria/forma-do-esboco.js';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento, textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -103,17 +105,17 @@ export async function formaDoEsbocoDaPeca({ peca, esboco, opcao = 1, minimo = MI
   try {
     bruto = JSON.parse(readFileSync(esboco, 'utf8'));
   } catch (erro) {
-    throw new Error(`não foi possível ler o esboço ${esboco}: ${erro.message}`);
+    throw new Error(`não foi possível ler as formas do esboço ${esboco}: ${erro.message}`);
   }
   const t0 = performance.now();
-  const dados = formasDoEsboco(bruto, opcao);
+  const { dados, malhaDaFamilia } = await lerFormasGuardadas(bruto, opcao, basename(esboco));
   const resolverMs = performance.now() - t0;
   const partes = [...new Set([...neutro.F.values()].map((f) => f.parte).filter(Boolean))].sort();
   const ids = new Set(dados.formas.map((f) => f.id));
   const ligadas = declaradas ?? comDeslocamentos(ligarPartes({ partes, ids, formas, mesmoId }), deslocamentos);
   const declaracao = normalizarEsbocoDoRefinamento({ arquivo: basename(esboco), opcao, formas: ligadas, minimo });
   const t1 = performance.now();
-  const resultado = conferirFormaDoEsbocoDoJson({ esboco: declaracao, bruto, neutro });
+  const resultado = conferirFormaDoEsboco({ esboco: declaracao, dados, neutro, malhaDaFamilia });
   return {
     resultado,
     semForma: partes.filter((parte) => !declaracao.formas.some((f) => f.parte === parte)),
@@ -136,7 +138,7 @@ export function descreverFormaDoEsboco({ peca, resultado, semForma, tempo }) {
     ...(afastadas.length ? ['  afastadas do esboço de propósito (deslocamento e motivo declarados):', ...afastadas.map((p) => `    ${p.parte}: ${textoDoAfastamento(afastamentoDaParte(p))}`)] : []),
     ...(semForma.length ? [`  sem forma ligada, fora da conferência: ${semForma.join(', ')}`] : []),
     ...resultado.achados.map((a) => `  ACHADO ${a.codigo}: ${a.mensagem}`),
-    `  tempo: resolver a opção do esboço ${segundos(tempo.resolverMs)} s, sólidos e razões ${segundos(tempo.conferirMs)} s`,
+    `  tempo: ler as formas do esboço ${segundos(tempo.resolverMs)} s, sólidos e razões ${segundos(tempo.conferirMs)} s`,
   ];
   return `${linhas.join('\n')}\n`;
 }
@@ -156,14 +158,14 @@ export async function comoCLI(argv) {
   const esboco = lido.opcao('esboco');
   const peca = lido.posicional;
   if (esboco === null || !esboco.trim()) {
-    if (lido.opcao('formas') !== null || lido.bandeira('mesmo-id')) return uso('diga o esboço: --esboco=<arquivo .esboco.json>');
+    if (lido.opcao('formas') !== null || lido.bandeira('mesmo-id')) return uso('diga as formas do esboço: --esboco=<arquivo .formas.json>');
     let declarado;
     try {
       declarado = await esbocoDeclarado(peca);
     } catch (erro) {
       return { codigo: 1, stdout: '', stderr: `forma-do-esboco: ${erro.message}\n` };
     }
-    if (!declarado) return uso('diga o esboço: --esboco=<arquivo .esboco.json>, ou declare REFINA.esboco na receita');
+    if (!declarado) return uso('diga as formas do esboço: --esboco=<arquivo .formas.json>, ou declare REFINA.esboco na receita');
     try {
       const feito = await formaDoEsbocoDaPeca({ peca, ...declarado, composicoes: lido.opcao(OPCAO_COMPOSICOES) });
       return { codigo: feito.resultado.ok ? 0 : 1, stdout: descreverFormaDoEsboco({ peca, ...feito }), stderr: '', ...feito };

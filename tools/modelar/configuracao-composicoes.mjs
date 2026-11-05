@@ -2,7 +2,7 @@
  *
  * Uma receita que compõe por `CHAMADAS_COMPOSICOES` só executa com um registro
  * de composições explícito (`procedural/nucleo/composicoes.js`). Os comandos
- * `descrever`, `varrer` e `esboco --envelope` o recebem por `--composicoes=<módulo>`,
+ * `descrever` e `varrer` o recebem por `--composicoes=<módulo>`,
  * e a API deles por `registroComposicoes` (mais `registroOperacoes` e
  * `orcamentoComposicoes`, quando a configuração os traz). Nenhum registro é
  * descoberto por varredura de pastas: quem chama aponta o módulo.

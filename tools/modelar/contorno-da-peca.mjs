@@ -1,6 +1,6 @@
 /* contorno-da-peca.mjs — o contorno por parte no veredito da peça.
  *
- * O comparador é o do esboço (`modulos/esboco/src/referencia.js`: razão interseção/união de 0,85 e desvio de até o maior entre 5 mm
+ * O comparador é `comparar-contornos.mjs` (o que era do esboço antigo: razão interseção/união de 0,85 e desvio de até o maior entre 5 mm
  * e 3% da maior dimensão da referência), sem número novo. Aqui só se acha o contorno e se entrega a ele as partes da peça no lugar
  * das formas do esboço: cada parte da malha vira uma "forma de malha" (`facesDaMalha`, os triângulos em milímetro, triangulados
  * como o núcleo faz) e a região do contorno casa com a parte de mesmo nome, a convenção do esboço quando `plano.referencia` não
@@ -15,7 +15,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
 import { prepararSolido } from '../../src/autoria/contato-de-solidos.js';
-import { conferirReferencia, formatarConferencia, lerContornos, VISTAS_DA_REFERENCIA } from '../../modulos/esboco/src/referencia.js';
+import { conferirReferencia, formatarConferencia, lerContornos, VISTAS_DA_REFERENCIA } from './comparar-contornos.mjs';
 
 const MM = 1000;
 const FIM_DO_CONTORNO = '.contornos.json';

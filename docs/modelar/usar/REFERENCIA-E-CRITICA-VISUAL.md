@@ -31,11 +31,11 @@ rasante e a curvatura da lataria, sem as quais a rodada dela não fecha (ver
 modelou nem o histórico da construção. Sempre que a forma vai à pessoa, a
 legibilidade cega (só a imagem e "o que é isto?") roda antes.
 
-Três laços usam outro pacote, sem receita, código nem medidas e com o mesmo
+Dois laços usam outro pacote, sem receita, código nem medidas e com o mesmo
 veredito: o refino de carroceria, com o pacote cego e as rodadas além da
-primeira com a pessoa; o
-processo leve, com a prancha dos perfis (skill `laco-de-modelagem`); e o esboço,
-com o brief do Condutor (skill `laco-do-esboco`).
+primeira com a pessoa; e o processo leve, com a prancha dos perfis (skill
+`laco-de-modelagem`). O laço do esboço antigo, com o brief do Condutor, saiu com
+ele em 2026-11-05.
 
 Ele responde com o veredito `mecanifica.veredito-de-forma` em bloco JSON:
 `alvo`, `nota` de 0 a 10, `observacao` de até 240 caracteres e `defeitos`, cada
@@ -50,9 +50,7 @@ nunca aprovação: quem aprova forma é a pessoa.
 A rodada fecha com nota 8 ou mais e nenhum defeito. No laço de uma peça
 (`rodada-de-modelagem`), o limite é de 6 rodadas, e o laço para antes se 3
 rodadas seguidas não reduzem os defeitos; passar disso é decisão da pessoa,
-gravada no `limite.json` da pasta de rodadas da peça, com quem decidiu e por quê. No laço do esboço, cada unidade tem 3
-rodadas para chegar a 8, e a quarta só com o sim da pessoa, registrado pelo
-Condutor. No mapa de partes e na prancha (`rodadas-com-critico.mjs`), que julgam
+gravada no `limite.json` da pasta de rodadas da peça, com quem decidiu e por quê. No mapa de partes e na prancha (`rodadas-com-critico.mjs`), que julgam
 desenho e não forma, a nota 9 fecha, e depois de três rodadas a pessoa decide. O veredito entra no registro como o crítico o devolveu, e quem conduz
 o laço não edita a nota nem os defeitos.
 

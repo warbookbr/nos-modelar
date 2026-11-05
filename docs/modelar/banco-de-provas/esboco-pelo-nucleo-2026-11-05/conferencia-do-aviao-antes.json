@@ -1,0 +1,1465 @@
+{
+  "asas": {
+    "forma": {
+      "ok": true,
+      "partes": [
+        {
+          "parte": "aileronD",
+          "formas": [
+            "aileronD"
+          ],
+          "razao": 0.9997034720105269,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 21769833.32662778,
+          "volumeFormasMm3": 21763377.961720265,
+          "volumeComumMm3": 21763377.96172027
+        },
+        {
+          "parte": "aileronE",
+          "formas": [
+            "aileronE"
+          ],
+          "razao": 0.9958757320516084,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 21769832.963756282,
+          "volumeFormasMm3": 21763377.96172026,
+          "volumeComumMm3": 21721627.05460713
+        },
+        {
+          "parte": "asaD",
+          "formas": [
+            "asaD"
+          ],
+          "razao": 0.9999032424831402,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 830774119.6502604,
+          "volumeFormasMm3": 830763714.8557572,
+          "volumeComumMm3": 830728723.7397377
+        },
+        {
+          "parte": "asaE",
+          "formas": [
+            "asaE"
+          ],
+          "razao": 0.9995044240909883,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 830763798.0390745,
+          "volumeFormasMm3": 830763714.9096768,
+          "volumeComumMm3": 830557852.2018828
+        },
+        {
+          "parte": "eixoAileronD",
+          "formas": [
+            "eixoAileronD"
+          ],
+          "razao": 0.9975238660314754,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 828000.4920862351,
+          "volumeFormasMm3": 830036.4817720547,
+          "volumeComumMm3": 827990.8342082298
+        },
+        {
+          "parte": "eixoAileronE",
+          "formas": [
+            "eixoAileronE"
+          ],
+          "razao": 0.9975238661454695,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 828000.543726173,
+          "volumeFormasMm3": 830036.4817720547,
+          "volumeComumMm3": 827990.8600435611
+        },
+        {
+          "parte": "eixoFlapD",
+          "formas": [
+            "eixoFlapD"
+          ],
+          "razao": 0.9975241310745218,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 2805253.5492770723,
+          "volumeFormasMm3": 2812150.8690655623,
+          "volumeComumMm3": 2805220.910291154
+        },
+        {
+          "parte": "eixoFlapE",
+          "formas": [
+            "eixoFlapE"
+          ],
+          "razao": 0.9975241451278541,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 2805253.584521519,
+          "volumeFormasMm3": 2812150.8690655623,
+          "volumeComumMm3": 2805220.947676302
+        },
+        {
+          "parte": "flapD",
+          "formas": [
+            "flapD"
+          ],
+          "razao": 0.9999126991960473,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 49367500.412211105,
+          "volumeFormasMm3": 49363190.58973598,
+          "volumeComumMm3": 49363190.58973598
+        },
+        {
+          "parte": "flapE",
+          "formas": [
+            "flapE"
+          ],
+          "razao": 0.9901033361777097,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 49367497.12353227,
+          "volumeFormasMm3": 49363190.58973598,
+          "volumeComumMm3": 49119852.97998487
+        },
+        {
+          "parte": "pontaD",
+          "formas": [
+            "pontaD"
+          ],
+          "razao": 0.4308232015748626,
+          "minimo": 0.43,
+          "ok": true,
+          "alongamento": {
+            "+y": 220.7
+          },
+          "motivo": "a ponta levantada sobe uns 9% da semi-envergadura (72 graus, e não os 56 do esboço) e tem os cantos arredondados vistos de cima, como a referência real",
+          "volumeParteMm3": 50347076.29882798,
+          "volumeFormasMm3": 38454856.93586722,
+          "volumeComumMm3": 26738407.05133888
+        },
+        {
+          "parte": "pontaE",
+          "formas": [
+            "pontaE"
+          ],
+          "razao": 0.43106950751560763,
+          "minimo": 0.43,
+          "ok": true,
+          "alongamento": {
+            "+y": 220.7
+          },
+          "motivo": "a ponta levantada sobe uns 9% da semi-envergadura (72 graus, e não os 56 do esboço) e tem os cantos arredondados vistos de cima, como a referência real",
+          "volumeParteMm3": 50342090.31045275,
+          "volumeFormasMm3": 38454856.766045325,
+          "volumeComumMm3": 26747587.062774472
+        },
+        {
+          "parte": "suporteAileron1D",
+          "formas": [
+            "suporteAileron1D"
+          ],
+          "razao": 0.9995436337947886,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 999170.6453409572,
+          "volumeFormasMm3": 999520.3396307825,
+          "volumeComumMm3": 999117.4066854939
+        },
+        {
+          "parte": "suporteAileron1E",
+          "formas": [
+            "suporteAileron1E"
+          ],
+          "razao": 0.9995436337947909,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 999170.6453409569,
+          "volumeFormasMm3": 999520.3396307826,
+          "volumeComumMm3": 999117.4066854948
+        },
+        {
+          "parte": "suporteAileron2D",
+          "formas": [
+            "suporteAileron2D"
+          ],
+          "razao": 0.999543631058743,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 999170.5991985437,
+          "volumeFormasMm3": 999520.2914742673,
+          "volumeComumMm3": 999117.3581790391
+        },
+        {
+          "parte": "suporteAileron2E",
+          "formas": [
+            "suporteAileron2E"
+          ],
+          "razao": 0.9995436310587444,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 999170.5991985425,
+          "volumeFormasMm3": 999520.2914742675,
+          "volumeComumMm3": 999117.3581790393
+        },
+        {
+          "parte": "suporteFlap1D",
+          "formas": [
+            "suporteFlap1D"
+          ],
+          "razao": 0.9996305136569951,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 1234370.600922227,
+          "volumeFormasMm3": 1234720.4008364978,
+          "volumeComumMm3": 1234317.3848852934
+        },
+        {
+          "parte": "suporteFlap1E",
+          "formas": [
+            "suporteFlap1E"
+          ],
+          "razao": 0.9996305136569951,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 1234370.6009222274,
+          "volumeFormasMm3": 1234720.4008364978,
+          "volumeComumMm3": 1234317.384885294
+        },
+        {
+          "parte": "suporteFlap2D",
+          "formas": [
+            "suporteFlap2D"
+          ],
+          "razao": 0.999630473708492,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 1234370.4057625527,
+          "volumeFormasMm3": 1234720.3346594572,
+          "volumeComumMm3": 1234317.2295728468
+        },
+        {
+          "parte": "suporteFlap2E",
+          "formas": [
+            "suporteFlap2E"
+          ],
+          "razao": 0.9996304737084906,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 1234370.4057625527,
+          "volumeFormasMm3": 1234720.3346594567,
+          "volumeComumMm3": 1234317.2295728456
+        }
+      ],
+      "achados": []
+    },
+    "veredito": {
+      "ok": true,
+      "stderr": ""
+    }
+  },
+  "empenagem-horizontal": {
+    "forma": {
+      "ok": true,
+      "partes": [
+        {
+          "parte": "eixoProfundorD",
+          "formas": [
+            "eixoProfundorD"
+          ],
+          "razao": 0.8698426728930214,
+          "minimo": 0.85,
+          "ok": true,
+          "motivo": "a haste acaba 21 mm antes do degrau novo, em x 1959, 236 mm mais curta que a do esboço; até 2215 ela ficava a 3 mm da face de cima do profundor; razão 0,87",
+          "volumeParteMm3": 1239587.113981989,
+          "volumeFormasMm3": 1425040.2152047954,
+          "volumeComumMm3": 1239573.035680865
+        },
+        {
+          "parte": "eixoProfundorE",
+          "formas": [
+            "eixoProfundorE"
+          ],
+          "razao": 0.869842663143986,
+          "minimo": 0.85,
+          "ok": true,
+          "motivo": "a haste acaba 21 mm antes do degrau novo, em x 1959, 236 mm mais curta que a do esboço; até 2215 ela ficava a 3 mm da face de cima do profundor; razão 0,87",
+          "volumeParteMm3": 1239587.098336517,
+          "volumeFormasMm3": 1425040.2152047954,
+          "volumeComumMm3": 1239573.0209726738
+        },
+        {
+          "parte": "estabilizadorD",
+          "formas": [
+            "estabilizadorD"
+          ],
+          "razao": 0.8914215106673239,
+          "minimo": 0.88,
+          "ok": true,
+          "motivo": "a ponta tem a metade da corda da raiz (606 mm, e não os 736 do esboço) e o vão do degrau recuado para 1980 muda o recorte; razão 0,891 na rodada de ajustes de 2026-10-15",
+          "volumeParteMm3": 93128868.41834544,
+          "volumeFormasMm3": 104024588.0940999,
+          "volumeComumMm3": 92917856.25066845
+        },
+        {
+          "parte": "estabilizadorE",
+          "formas": [
+            "estabilizadorE"
+          ],
+          "razao": 0.8914267853250487,
+          "minimo": 0.88,
+          "ok": true,
+          "motivo": "a ponta tem a metade da corda da raiz (606 mm, e não os 736 do esboço) e o vão do degrau recuado para 1980 muda o recorte; razão 0,891 na rodada de ajustes de 2026-10-15",
+          "volumeParteMm3": 93129533.0545871,
+          "volumeFormasMm3": 104024587.98478673,
+          "volumeComumMm3": 92918460.12506983
+        },
+        {
+          "parte": "profundorD",
+          "formas": [
+            "profundorD"
+          ],
+          "razao": 0.7054419619608829,
+          "minimo": 0.7,
+          "ok": true,
+          "motivo": "o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,705 e 0,704",
+          "volumeParteMm3": 26955301.534602623,
+          "volumeFormasMm3": 33284428.64677507,
+          "volumeComumMm3": 24917666.150470857
+        },
+        {
+          "parte": "profundorE",
+          "formas": [
+            "profundorE"
+          ],
+          "razao": 0.7039480990604132,
+          "minimo": 0.7,
+          "ok": true,
+          "motivo": "o bordo de fuga da ponta fica mais à frente com a corda de 606 mm, as seções ficam mais finas (88/41/60/51), o degrau recua de 2236 para 1980 e o bordo ganha o rasgo do compensador; razão 0,705 e 0,704",
+          "volumeParteMm3": 26902537.758854046,
+          "volumeFormasMm3": 33284428.646775074,
+          "volumeComumMm3": 24864900.88097067
+        },
+        {
+          "parte": "suporteProfundor1D",
+          "formas": [
+            "suporteProfundor1D"
+          ],
+          "razao": 0.9747667818061887,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 786577.7053413505,
+          "volumeFormasMm3": 767218.5772572799,
+          "volumeComumMm3": 766971.075230358
+        },
+        {
+          "parte": "suporteProfundor1E",
+          "formas": [
+            "suporteProfundor1E"
+          ],
+          "razao": 0.9747696746395367,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 786577.7053413505,
+          "volumeFormasMm3": 767218.5772572799,
+          "volumeComumMm3": 766972.2278479155
+        },
+        {
+          "parte": "suporteProfundor2D",
+          "formas": [
+            "suporteProfundor2D"
+          ],
+          "razao": 0.9549701620113267,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 786577.718461205,
+          "volumeFormasMm3": 751639.714471069,
+          "volumeComumMm3": 751393.4379564561
+        },
+        {
+          "parte": "suporteProfundor2E",
+          "formas": [
+            "suporteProfundor2E"
+          ],
+          "razao": 0.9549701620470542,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 786577.718461205,
+          "volumeFormasMm3": 751639.714471069,
+          "volumeComumMm3": 751393.4379708355
+        },
+        {
+          "parte": "suporteProfundor3D",
+          "formas": [
+            "suporteProfundor3D"
+          ],
+          "razao": 0.9549701564280652,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 786577.7208670267,
+          "volumeFormasMm3": 751639.7029238505,
+          "volumeComumMm3": 751393.4312439213
+        },
+        {
+          "parte": "suporteProfundor3E",
+          "formas": [
+            "suporteProfundor3E"
+          ],
+          "razao": 0.9549701556164318,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 786577.7208670267,
+          "volumeFormasMm3": 751639.7029238505,
+          "volumeComumMm3": 751393.4309172602
+        }
+      ],
+      "achados": []
+    },
+    "veredito": {
+      "ok": true,
+      "stderr": ""
+    }
+  },
+  "empenagem-vertical": {
+    "forma": {
+      "ok": true,
+      "partes": [
+        {
+          "parte": "deriva",
+          "formas": [
+            "deriva.fin"
+          ],
+          "razao": 0.9890662598559259,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 194968584.928441,
+          "volumeFormasMm3": 196122262.22293022,
+          "volumeComumMm3": 194470525.82547477
+        },
+        {
+          "parte": "dobradicaLeme1D",
+          "formas": [
+            "dobradicaLeme1D"
+          ],
+          "razao": 0.9977161875097845,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 434269.4299936362,
+          "volumeFormasMm3": 434424.09618894884,
+          "volumeComumMm3": 433850.21279609314
+        },
+        {
+          "parte": "dobradicaLeme1E",
+          "formas": [
+            "dobradicaLeme1E"
+          ],
+          "razao": 0.9977161847370825,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 434269.42999362113,
+          "volumeFormasMm3": 434424.09618894884,
+          "volumeComumMm3": 433850.212192551
+        },
+        {
+          "parte": "dobradicaLeme2D",
+          "formas": [
+            "dobradicaLeme2D"
+          ],
+          "razao": 0.9977162069029889,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 434269.37872106856,
+          "volumeFormasMm3": 434424.03022869583,
+          "volumeComumMm3": 433850.1584680162
+        },
+        {
+          "parte": "dobradicaLeme2E",
+          "formas": [
+            "dobradicaLeme2E"
+          ],
+          "razao": 0.9977162069029758,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 434269.37872106733,
+          "volumeFormasMm3": 434424.03022869583,
+          "volumeComumMm3": 433850.1584680127
+        },
+        {
+          "parte": "dobradicaLeme3D",
+          "formas": [
+            "dobradicaLeme3D"
+          ],
+          "razao": 0.9977161653396619,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 434269.3923813227,
+          "volumeFormasMm3": 434424.0547674578,
+          "volumeComumMm3": 433850.1684985921
+        },
+        {
+          "parte": "dobradicaLeme3E",
+          "formas": [
+            "dobradicaLeme3E"
+          ],
+          "razao": 0.9977161748539115,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 434269.39238132385,
+          "volumeFormasMm3": 434424.0547674578,
+          "volumeComumMm3": 433850.1705695613
+        },
+        {
+          "parte": "dorsal",
+          "formas": [
+            "deriva.dorsal"
+          ],
+          "razao": 0.3084266442552972,
+          "minimo": 0.3,
+          "ok": true,
+          "alongamento": {
+            "-x": 57.5,
+            "+x": 57.5
+          },
+          "motivo": "a dorsal lisa pedida na rodada de ajustes: o dorso sobe e a crista vira o bordo de ataque da deriva, tangente a ele na junção a 415 mm da raiz, por um filete côncavo de até 240 mm de base, no lugar da aleta de ponta fina de 125 mm do esboço; a razão de volume cai a 0,30 porque a dorsal é mais fina e acaba na deriva",
+          "volumeParteMm3": 10611119.533170946,
+          "volumeFormasMm3": 26773426.06650113,
+          "volumeComumMm3": 8812408.396711167
+        },
+        {
+          "parte": "eixoLeme",
+          "formas": [
+            "eixoLeme"
+          ],
+          "razao": 0.9975244678449939,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 1313501.0190536245,
+          "volumeFormasMm3": 1316730.848527679,
+          "volumeComumMm3": 1313486.1105599145
+        },
+        {
+          "parte": "leme",
+          "formas": [
+            "leme"
+          ],
+          "razao": 0.9998498485082098,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 49266723.85101773,
+          "volumeFormasMm3": 49259326.41812582,
+          "volumeComumMm3": 49259326.39852938
+        }
+      ],
+      "achados": []
+    },
+    "veredito": {
+      "ok": true,
+      "stderr": ""
+    }
+  },
+  "helice": {
+    "forma": {
+      "ok": true,
+      "partes": [
+        {
+          "parte": "cone",
+          "formas": [
+            "cone"
+          ],
+          "razao": 0.9976431914781417,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 52190097.75208499,
+          "volumeFormasMm3": 52298021.063096754,
+          "volumeComumMm3": 52182422.15177184
+        },
+        {
+          "parte": "pa1",
+          "formas": [
+            "helicePa"
+          ],
+          "razao": 0.9999999683653217,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 4826066.806014733,
+          "volumeFormasMm3": 4826066.77143621,
+          "volumeComumMm3": 4826066.712389935
+        },
+        {
+          "parte": "pa2",
+          "formas": [
+            "helicePa1"
+          ],
+          "razao": 0.9999999622389647,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 4826066.775105045,
+          "volumeFormasMm3": 4826066.747552376,
+          "volumeComumMm3": 4826066.67021007
+        },
+        {
+          "parte": "pa3",
+          "formas": [
+            "helicePa2"
+          ],
+          "razao": 0.999999970184043,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 4826067.078594883,
+          "volumeFormasMm3": 4826067.029976195,
+          "volumeComumMm3": 4826066.982338634
+        },
+        {
+          "parte": "pa4",
+          "formas": [
+            "helicePa3"
+          ],
+          "razao": 0.9999999698511629,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 4826066.800529544,
+          "volumeFormasMm3": 4826066.807558296,
+          "volumeComumMm3": 4826066.731293769
+        },
+        {
+          "parte": "pa5",
+          "formas": [
+            "helicePa4"
+          ],
+          "razao": 0.9999999682492355,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 4826066.845830686,
+          "volumeFormasMm3": 4826066.819199275,
+          "volumeComumMm3": 4826066.755899324
+        }
+      ],
+      "achados": []
+    },
+    "veredito": {
+      "ok": true,
+      "stderr": ""
+    }
+  },
+  "motor": {
+    "forma": {
+      "ok": true,
+      "partes": [
+        {
+          "parte": "capo",
+          "formas": [
+            "capo"
+          ],
+          "razao": 0.9813822516336256,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 1574851102.0364957,
+          "volumeFormasMm3": 1602222139.0120091,
+          "volumeComumMm3": 1573610184.6750834
+        },
+        {
+          "parte": "entradaDeAr",
+          "formas": [
+            "entradaDeAr"
+          ],
+          "razao": 0.958100287835251,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 1201919.1788752533,
+          "volumeFormasMm3": 1186824.6537243223,
+          "volumeComumMm3": 1168814.5738993401
+        },
+        {
+          "parte": "escapeD",
+          "formas": [
+            "escapeD"
+          ],
+          "razao": 0.9693546493898547,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 17848564.305498354,
+          "volumeFormasMm3": 17853136.375145968,
+          "volumeComumMm3": 17573071.23764104
+        },
+        {
+          "parte": "escapeE",
+          "formas": [
+            "escapeE"
+          ],
+          "razao": 0.969354649547033,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 17848564.318208802,
+          "volumeFormasMm3": 17853136.37514599,
+          "volumeComumMm3": 17573071.245344266
+        }
+      ],
+      "achados": []
+    },
+    "veredito": {
+      "ok": true,
+      "stderr": ""
+    }
+  },
+  "trem-do-nariz": {
+    "forma": {
+      "ok": true,
+      "partes": [
+        {
+          "parte": "alavancaNariz",
+          "formas": [
+            "alavancaNariz"
+          ],
+          "razao": 0.9975243897094843,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 49338.89758339734,
+          "volumeFormasMm3": 49460.22427517037,
+          "volumeComumMm3": 49338.33811667965
+        },
+        {
+          "parte": "atuadorCorpoNariz",
+          "formas": [
+            "atuadorCorpoNariz"
+          ],
+          "razao": 0.9975245872121298,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 81169.41911190224,
+          "volumeFormasMm3": 81368.98420299184,
+          "volumeComumMm3": 81168.48959496192
+        },
+        {
+          "parte": "atuadorHasteNariz",
+          "formas": [
+            "atuadorHasteNariz"
+          ],
+          "razao": 0.9975239015752067,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 28342.195483077656,
+          "volumeFormasMm3": 28411.901837575002,
+          "volumeComumMm3": 28341.87292829493
+        },
+        {
+          "parte": "carenagemTremNariz",
+          "formas": [
+            "carenagemTremNariz"
+          ],
+          "razao": 0.9998936815841536,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 55360228.51395695,
+          "volumeFormasMm3": 55362180.679412246,
+          "volumeComumMm3": 55358261.48244494
+        },
+        {
+          "parte": "compassoInfNariz",
+          "formas": [
+            "compassoInfNariz"
+          ],
+          "razao": 0.2765761314823294,
+          "minimo": 0.27,
+          "ok": true,
+          "alongamento": {
+            "-y": 17
+          },
+          "motivo": "o braço de baixo liga o joelho, que desce 8,5 mm, à coroa, que desce 17 mm",
+          "volumeParteMm3": 24458.224623755297,
+          "volumeFormasMm3": 22780.036496543722,
+          "volumeComumMm3": 10234.388060689884
+        },
+        {
+          "parte": "compassoSupNariz",
+          "formas": [
+            "compassoSupNariz"
+          ],
+          "razao": 0.663345065471862,
+          "minimo": 0.66,
+          "ok": true,
+          "alongamento": {
+            "-y": 8.5
+          },
+          "motivo": "o braço de cima parte da perna, que não desce, e acompanha o joelho, que desce 8,5 mm",
+          "volumeParteMm3": 24458.225258583923,
+          "volumeFormasMm3": 22780.037238863224,
+          "volumeComumMm3": 18838.705798100174
+        },
+        {
+          "parte": "coroaNariz",
+          "formas": [
+            "coroaNariz"
+          ],
+          "razao": 0.9975243764997008,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "a coroa está no pé do pistão: o trem desce 17 mm para a roda encostar no chão",
+          "volumeParteMm3": 151619.17776695336,
+          "volumeFormasMm3": 151992.02051717584,
+          "volumeComumMm3": 151617.4595062562
+        },
+        {
+          "parte": "eixoPivoNariz",
+          "formas": [
+            "eixoPivoNariz"
+          ],
+          "razao": 0.997524400668032,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 401966.44500884414,
+          "volumeFormasMm3": 402954.9149514735,
+          "volumeComumMm3": 401961.896891367
+        },
+        {
+          "parte": "eixoRodaNariz",
+          "formas": [
+            "eixoRodaNariz"
+          ],
+          "razao": 0.9975244191085033,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o eixo atravessa o garfo na altura do centro da roda: o trem desce 17 mm para a roda encostar no chão",
+          "volumeParteMm3": 98677.80554905534,
+          "volumeFormasMm3": 98920.45513488354,
+          "volumeComumMm3": 98676.68616214798
+        },
+        {
+          "parte": "garfoNariz",
+          "formas": [
+            "garfoNariz"
+          ],
+          "razao": 0.9975245198558877,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o garfo pende da coroa: o trem desce 17 mm para a roda encostar no chão",
+          "volumeParteMm3": 208225.8376661688,
+          "volumeFormasMm3": 208737.8499325551,
+          "volumeComumMm3": 208223.4776768923
+        },
+        {
+          "parte": "mancalNarizD",
+          "formas": [
+            "mancalNarizD"
+          ],
+          "razao": 0.9990759501812618,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 348836.30900333636,
+          "volumeFormasMm3": 349083.65139259957,
+          "volumeComumMm3": 348798.6774688648
+        },
+        {
+          "parte": "mancalNarizE",
+          "formas": [
+            "mancalNarizE"
+          ],
+          "razao": 0.9990759501812622,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 348836.3090033363,
+          "volumeFormasMm3": 349083.65139259957,
+          "volumeComumMm3": 348798.67746886483
+        },
+        {
+          "parte": "orelhaAtuadorNariz",
+          "formas": [
+            "orelhaAtuadorNariz"
+          ],
+          "razao": 0.9993066089635047,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 112726.38354423805,
+          "volumeFormasMm3": 112786.34906164806,
+          "volumeComumMm3": 112717.26061832634
+        },
+        {
+          "parte": "pernaNariz",
+          "formas": [
+            "pernaNariz"
+          ],
+          "razao": 0.9975245223615018,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 613995.16038856,
+          "volumeFormasMm3": 615504.9225390377,
+          "volumeComumMm3": 613988.1985107469
+        },
+        {
+          "parte": "pinoAtuadorNariz",
+          "formas": [
+            "pinoAtuadorNariz"
+          ],
+          "razao": 0.9975238485798079,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 18952.39531230182,
+          "volumeFormasMm3": 18999.012070149183,
+          "volumeComumMm3": 18952.181210791747
+        },
+        {
+          "parte": "pinoCompassoNariz",
+          "formas": [
+            "pinoCompassoNariz"
+          ],
+          "razao": 0.9975244486108225,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -8.5,
+            0
+          ],
+          "motivo": "o joelho do compasso fica no meio da descida da coroa: desce 8,5 mm",
+          "volumeParteMm3": 18043.936920799322,
+          "volumeFormasMm3": 18088.306881077588,
+          "volumeComumMm3": 18043.73238115059
+        },
+        {
+          "parte": "pistaoNariz",
+          "formas": [
+            "pistaoNariz"
+          ],
+          "razao": 0.8408328144547889,
+          "minimo": 0.84,
+          "ok": true,
+          "alongamento": {
+            "-y": 17
+          },
+          "motivo": "o pistão alonga 17 mm para a roda encostar no chão",
+          "volumeParteMm3": 163748.7133964285,
+          "volumeFormasMm3": 138312.7376449263,
+          "volumeComumMm3": 137971.8886055514
+        },
+        {
+          "parte": "rodaNariz",
+          "formas": [
+            "rodaNariz"
+          ],
+          "razao": 1.0021692208993949,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "a roda encosta no chão: o trem desce 17 mm para a roda encostar no chão",
+          "volumeParteMm3": 8212004.105210622,
+          "volumeFormasMm3": 8176468.116205816,
+          "volumeComumMm3": 8203114.03573093
+        }
+      ],
+      "achados": []
+    },
+    "veredito": {
+      "ok": true,
+      "stderr": ""
+    }
+  },
+  "trens-principais": {
+    "forma": {
+      "ok": true,
+      "partes": [
+        {
+          "parte": "atuadorCorpoPrincipalD",
+          "formas": [
+            "atuadorCorpoPrincipalD"
+          ],
+          "razao": 0.99398613341476,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 265543.17343804444,
+          "volumeFormasMm3": 267149.7456135171,
+          "volumeComumMm3": 265543.15801520506
+        },
+        {
+          "parte": "atuadorCorpoPrincipalE",
+          "formas": [
+            "atuadorCorpoPrincipalE"
+          ],
+          "razao": 0.9939861819842716,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 265543.1767461386,
+          "volumeFormasMm3": 267149.7456135171,
+          "volumeComumMm3": 265543.16617149697
+        },
+        {
+          "parte": "atuadorHastePrincipalD",
+          "formas": [
+            "atuadorHastePrincipalD"
+          ],
+          "razao": 0.9939863533844142,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 112192.03611839392,
+          "volumeFormasMm3": 112870.78627009645,
+          "volumeComumMm3": 112192.02866089597
+        },
+        {
+          "parte": "atuadorHastePrincipalE",
+          "formas": [
+            "atuadorHastePrincipalE"
+          ],
+          "razao": 0.9939863295590903,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 112192.0245153668,
+          "volumeFormasMm3": 112870.78627009645,
+          "volumeComumMm3": 112192.02152823245
+        },
+        {
+          "parte": "compassoInfPrincipalD",
+          "formas": [
+            "compassoInfPrincipalD"
+          ],
+          "razao": 0.4661626644901657,
+          "minimo": 0.46,
+          "ok": true,
+          "alongamento": {
+            "-y": 21
+          },
+          "motivo": "o braço de baixo do compasso mantém o joelho e a ponta de baixo desce 21 mm com o pino de baixo",
+          "volumeParteMm3": 39533.14804398403,
+          "volumeFormasMm3": 35952.62940143807,
+          "volumeComumMm3": 24000.509627835807
+        },
+        {
+          "parte": "compassoInfPrincipalE",
+          "formas": [
+            "compassoInfPrincipalE"
+          ],
+          "razao": 0.4661626668587974,
+          "minimo": 0.46,
+          "ok": true,
+          "alongamento": {
+            "-y": 21
+          },
+          "motivo": "o braço de baixo do compasso mantém o joelho e a ponta de baixo desce 21 mm com o pino de baixo",
+          "volumeParteMm3": 39533.14698179675,
+          "volumeFormasMm3": 35952.62940143807,
+          "volumeComumMm3": 24000.509373292145
+        },
+        {
+          "parte": "compassoSupPrincipalD",
+          "formas": [
+            "compassoSupPrincipalD"
+          ],
+          "razao": 0.9939851710503033,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 35736.3836709516,
+          "volumeFormasMm3": 35952.62724932284,
+          "volumeComumMm3": 35736.38100050765
+        },
+        {
+          "parte": "compassoSupPrincipalE",
+          "formas": [
+            "compassoSupPrincipalE"
+          ],
+          "razao": 0.9939851722304504,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 35736.3818531855,
+          "volumeFormasMm3": 35952.62724932283,
+          "volumeComumMm3": 35736.38011564492
+        },
+        {
+          "parte": "coroaPrincipalD",
+          "formas": [
+            "coroaPrincipalD"
+          ],
+          "razao": 0.9999819330052552,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "a coroa desce 17 mm com o garfo, no pé da perna",
+          "volumeParteMm3": 811820.1851599293,
+          "volumeFormasMm3": 811831.4364819605,
+          "volumeComumMm3": 811818.477128367
+        },
+        {
+          "parte": "coroaPrincipalE",
+          "formas": [
+            "coroaPrincipalE"
+          ],
+          "razao": 0.9999819330052558,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "a coroa desce 17 mm com o garfo, no pé da perna",
+          "volumeParteMm3": 811820.1851599294,
+          "volumeFormasMm3": 811831.4364819604,
+          "volumeComumMm3": 811818.4771283673
+        },
+        {
+          "parte": "eixoRodaPrincipalD",
+          "formas": [
+            "eixoRodaPrincipalD"
+          ],
+          "razao": 0.9939855738982084,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o eixo desce 17 mm com a roda, que encosta no chão",
+          "volumeParteMm3": 122360.60398498375,
+          "volumeFormasMm3": 123100.98576600575,
+          "volumeComumMm3": 122360.6039845197
+        },
+        {
+          "parte": "eixoRodaPrincipalE",
+          "formas": [
+            "eixoRodaPrincipalE"
+          ],
+          "razao": 0.993985573898208,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o eixo desce 17 mm com a roda, que encosta no chão",
+          "volumeParteMm3": 122360.60398498375,
+          "volumeFormasMm3": 123100.98576600575,
+          "volumeComumMm3": 122360.60398451966
+        },
+        {
+          "parte": "garfoExtPrincipalD",
+          "formas": [
+            "garfoExtPrincipalD"
+          ],
+          "razao": 1,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o garfo desce 17 mm com a roda, que encosta no chão",
+          "volumeParteMm3": 1586310,
+          "volumeFormasMm3": 1586310,
+          "volumeComumMm3": 1586310
+        },
+        {
+          "parte": "garfoExtPrincipalE",
+          "formas": [
+            "garfoExtPrincipalE"
+          ],
+          "razao": 1,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o garfo desce 17 mm com a roda, que encosta no chão",
+          "volumeParteMm3": 1586310,
+          "volumeFormasMm3": 1586310,
+          "volumeComumMm3": 1586310
+        },
+        {
+          "parte": "garfoIntPrincipalD",
+          "formas": [
+            "garfoIntPrincipalD"
+          ],
+          "razao": 1,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o garfo desce 17 mm com a roda, que encosta no chão",
+          "volumeParteMm3": 1586310,
+          "volumeFormasMm3": 1586310,
+          "volumeComumMm3": 1586310
+        },
+        {
+          "parte": "garfoIntPrincipalE",
+          "formas": [
+            "garfoIntPrincipalE"
+          ],
+          "razao": 1,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "o garfo desce 17 mm com a roda, que encosta no chão",
+          "volumeParteMm3": 1586310,
+          "volumeFormasMm3": 1586310,
+          "volumeComumMm3": 1586310
+        },
+        {
+          "parte": "orelhaAtuadorPrincipalD",
+          "formas": [
+            "orelhaAtuadorPrincipalD"
+          ],
+          "razao": 0.9993917848101298,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 107138.61973164596,
+          "volumeFormasMm3": 107188.63184330975,
+          "volumeComumMm3": 107131.026601315
+        },
+        {
+          "parte": "orelhaAtuadorPrincipalE",
+          "formas": [
+            "orelhaAtuadorPrincipalE"
+          ],
+          "razao": 0.9993917848101311,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 107138.61973164589,
+          "volumeFormasMm3": 107188.6318433097,
+          "volumeComumMm3": 107131.02660131501
+        },
+        {
+          "parte": "pernaPrincipalD",
+          "formas": [
+            "pernaPrincipalD"
+          ],
+          "razao": 0.9670743517537815,
+          "minimo": 0.95,
+          "ok": true,
+          "alongamento": {
+            "-y": 17
+          },
+          "motivo": "a perna ganha 17 mm de comprimento no pé: o trem desce 17 mm para a roda encostar no chão",
+          "volumeParteMm3": 12763314.021109564,
+          "volumeFormasMm3": 12376000.000000011,
+          "volumeComumMm3": 12359261.249491585
+        },
+        {
+          "parte": "pernaPrincipalE",
+          "formas": [
+            "pernaPrincipalE"
+          ],
+          "razao": 0.9670743517537815,
+          "minimo": 0.95,
+          "ok": true,
+          "alongamento": {
+            "-y": 17
+          },
+          "motivo": "a perna ganha 17 mm de comprimento no pé: o trem desce 17 mm para a roda encostar no chão",
+          "volumeParteMm3": 12763314.021109562,
+          "volumeFormasMm3": 12376000.000000011,
+          "volumeComumMm3": 12359261.249491585
+        },
+        {
+          "parte": "pinoAtuadorPrincipalD",
+          "formas": [
+            "pinoAtuadorPrincipalD"
+          ],
+          "razao": 0.9939865098754075,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 39330.200799584396,
+          "volumeFormasMm3": 39568.14341112971,
+          "volumeComumMm3": 39330.200785489025
+        },
+        {
+          "parte": "pinoAtuadorPrincipalE",
+          "formas": [
+            "pinoAtuadorPrincipalE"
+          ],
+          "razao": 0.9939865098754075,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 39330.200799584396,
+          "volumeFormasMm3": 39568.14341112971,
+          "volumeComumMm3": 39330.200785489025
+        },
+        {
+          "parte": "pinoCompassoAltoPrincipalD",
+          "formas": [
+            "pinoCompassoAltoPrincipalD"
+          ],
+          "razao": 0.9939845714577383,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 25171.30312615635,
+          "volumeFormasMm3": 25323.63564682006,
+          "volumeComumMm3": 25171.30312615635
+        },
+        {
+          "parte": "pinoCompassoAltoPrincipalE",
+          "formas": [
+            "pinoCompassoAltoPrincipalE"
+          ],
+          "razao": 0.9939845714577383,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 25171.30312615635,
+          "volumeFormasMm3": 25323.63564682006,
+          "volumeComumMm3": 25171.30312615635
+        },
+        {
+          "parte": "pinoCompassoBaixoPrincipalD",
+          "formas": [
+            "pinoCompassoBaixoPrincipalD"
+          ],
+          "razao": 0.45625305946062866,
+          "minimo": 0.45,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -21,
+            0
+          ],
+          "alongamento": {
+            "+z": 66.4
+          },
+          "motivo": "o pino de baixo do compasso desce 21 mm até a junção da perna com a coroa e vai 66,4 mm além da ponta de trás do esboço, até entrar na face da frente da coroa",
+          "volumeParteMm3": 55017.29183412866,
+          "volumeFormasMm3": 25323.6347020492,
+          "volumeComumMm3": 25171.3074825123
+        },
+        {
+          "parte": "pinoCompassoBaixoPrincipalE",
+          "formas": [
+            "pinoCompassoBaixoPrincipalE"
+          ],
+          "razao": 0.4562530893136602,
+          "minimo": 0.45,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -21,
+            0
+          ],
+          "alongamento": {
+            "+z": 66.4
+          },
+          "motivo": "o pino de baixo do compasso desce 21 mm até a junção da perna com a coroa e vai 66,4 mm além da ponta de trás do esboço, até entrar na face da frente da coroa",
+          "volumeParteMm3": 55017.291834128686,
+          "volumeFormasMm3": 25323.6347020492,
+          "volumeComumMm3": 25171.30861348356
+        },
+        {
+          "parte": "pinoCompassoPrincipalD",
+          "formas": [
+            "pinoCompassoPrincipalD"
+          ],
+          "razao": 0.9939850163408422,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 25171.31040811537,
+          "volumeFormasMm3": 25323.63163763286,
+          "volumeComumMm3": 25171.310407627203
+        },
+        {
+          "parte": "pinoCompassoPrincipalE",
+          "formas": [
+            "pinoCompassoPrincipalE"
+          ],
+          "razao": 0.993985016340842,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 25171.31040811537,
+          "volumeFormasMm3": 25323.63163763286,
+          "volumeComumMm3": 25171.3104076272
+        },
+        {
+          "parte": "pinoPivoPrincipalD",
+          "formas": [
+            "pinoPivoPrincipalD"
+          ],
+          "razao": 0.9939857585896672,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 484541.9170583786,
+          "volumeFormasMm3": 487473.70158087456,
+          "volumeComumMm3": 484541.9170583786
+        },
+        {
+          "parte": "pinoPivoPrincipalE",
+          "formas": [
+            "pinoPivoPrincipalE"
+          ],
+          "razao": 0.9939857585896672,
+          "minimo": 0.95,
+          "ok": true,
+          "volumeParteMm3": 484541.9170583786,
+          "volumeFormasMm3": 487473.70158087456,
+          "volumeComumMm3": 484541.9170583786
+        },
+        {
+          "parte": "rodaPrincipalD",
+          "formas": [
+            "rodaPrincipalD"
+          ],
+          "razao": 1.0021769241714487,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "a roda encosta no chão: o trem desce 17 mm; o furo do cubo tem o diâmetro do eixo (28 mm), e não os 62,9 do esboço",
+          "volumeParteMm3": 23886172.871886194,
+          "volumeFormasMm3": 23680213.949780222,
+          "volumeComumMm3": 23809052.3686432
+        },
+        {
+          "parte": "rodaPrincipalE",
+          "formas": [
+            "rodaPrincipalE"
+          ],
+          "razao": 1.0021610878373033,
+          "minimo": 0.95,
+          "ok": true,
+          "deslocamento": [
+            0,
+            -17,
+            0
+          ],
+          "motivo": "a roda encosta no chão: o trem desce 17 mm; o furo do cubo tem o diâmetro do eixo (28 mm), e não os 62,9 do esboço",
+          "volumeParteMm3": 23886172.87135069,
+          "volumeFormasMm3": 23680213.949755,
+          "volumeComumMm3": 23808864.456865754
+        }
+      ],
+      "achados": []
+    },
+    "veredito": {
+      "ok": true,
+      "stderr": ""
+    }
+  }
+}
