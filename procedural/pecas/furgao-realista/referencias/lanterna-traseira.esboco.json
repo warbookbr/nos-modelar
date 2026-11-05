@@ -1,0 +1,216 @@
+{
+ "plano": "Três desenhos da lanterna de trás no canto direito da traseira, na mesma escala: o canto como bloco com a quina de 90 mm, a face de trás voltada para a esquerda do desenho e a lateral para a direita, o para-choque e a lanterna em uma a três formas. Até cinco formas por opção, legenda padrão, sem linhas de centro. A opção 0 é a peça de hoje.",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "0: como está",
+   "nota": "Faixa fina na quina, de 830 a 1.125.",
+   "formas": [
+    {
+     "id": "traseira",
+     "tipo": "caixa",
+     "largura": 900,
+     "altura": 900,
+     "profundidade": 600,
+     "raio": 90,
+     "centro": [
+      0,
+      950,
+      0
+     ],
+     "cor": "azul",
+     "rotulo": "canto de trás (porta à esquerda, lateral à direita)"
+    },
+    {
+     "id": "parachoque",
+     "tipo": "caixa",
+     "largura": 940,
+     "altura": 160,
+     "profundidade": 640,
+     "raio": 30,
+     "centro": [
+      0,
+      580,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "para-choque"
+    },
+    {
+     "id": "lanterna",
+     "tipo": "caixa",
+     "largura": 60,
+     "altura": 295,
+     "profundidade": 60,
+     "raio": 25.0,
+     "centro": [
+      420.0,
+      977.5,
+      270.0
+     ],
+     "cor": "vermelho",
+     "rotulo": "lanterna"
+    }
+   ]
+  },
+  {
+   "titulo": "1: alta, contornando a quina",
+   "nota": "De 720 a 1.240, larga atrás, dobrando a quina e entrando na lateral.",
+   "formas": [
+    {
+     "id": "traseira",
+     "tipo": "caixa",
+     "largura": 900,
+     "altura": 900,
+     "profundidade": 600,
+     "raio": 90,
+     "centro": [
+      0,
+      950,
+      0
+     ],
+     "cor": "azul",
+     "rotulo": "canto de trás (porta à esquerda, lateral à direita)"
+    },
+    {
+     "id": "parachoque",
+     "tipo": "caixa",
+     "largura": 940,
+     "altura": 160,
+     "profundidade": 640,
+     "raio": 30,
+     "centro": [
+      0,
+      580,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "para-choque"
+    },
+    {
+     "id": "lanternaAtras",
+     "tipo": "caixa",
+     "largura": 150,
+     "altura": 520,
+     "profundidade": 12,
+     "centro": [
+      285.0,
+      980.0,
+      306
+     ],
+     "cor": "vermelho",
+     "rotulo": "lanterna"
+    },
+    {
+     "id": "lanternaQuina",
+     "tipo": "caixa",
+     "largura": 110,
+     "altura": 520,
+     "profundidade": 110,
+     "raio": 50.0,
+     "centro": [
+      395.0,
+      980.0,
+      245.0
+     ],
+     "cor": "vermelho"
+    },
+    {
+     "id": "lanternaLado",
+     "tipo": "caixa",
+     "largura": 12,
+     "altura": 520,
+     "profundidade": 85,
+     "centro": [
+      456,
+      980.0,
+      172.5
+     ],
+     "cor": "vermelho"
+    }
+   ]
+  },
+  {
+   "titulo": "2: alta, em cunha",
+   "nota": "Mais larga em cima e estreita embaixo, dobrando a quina sem entrar na lateral.",
+   "formas": [
+    {
+     "id": "traseira",
+     "tipo": "caixa",
+     "largura": 900,
+     "altura": 900,
+     "profundidade": 600,
+     "raio": 90,
+     "centro": [
+      0,
+      950,
+      0
+     ],
+     "cor": "azul",
+     "rotulo": "canto de trás (porta à esquerda, lateral à direita)"
+    },
+    {
+     "id": "parachoque",
+     "tipo": "caixa",
+     "largura": 940,
+     "altura": 160,
+     "profundidade": 640,
+     "raio": 30,
+     "centro": [
+      0,
+      580,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "para-choque"
+    },
+    {
+     "id": "lanternaAtras",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       300,
+       720
+      ],
+      [
+       360,
+       720
+      ],
+      [
+       360,
+       1240
+      ],
+      [
+       230,
+       1240
+      ]
+     ],
+     "comprimento": 12,
+     "centro": [
+      0,
+      0,
+      306
+     ],
+     "cor": "vermelho",
+     "rotulo": "lanterna"
+    },
+    {
+     "id": "lanternaQuina",
+     "tipo": "caixa",
+     "largura": 110,
+     "altura": 520,
+     "profundidade": 110,
+     "raio": 50.0,
+     "centro": [
+      395.0,
+      980.0,
+      245.0
+     ],
+     "cor": "vermelho"
+    }
+   ]
+  }
+ ]
+}
