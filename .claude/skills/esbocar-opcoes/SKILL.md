@@ -1,6 +1,6 @@
 ---
 name: esbocar-opcoes
-description: Mostra à pessoa, em imagem, as opções de forma em disputa, lado a lado na mesma câmera, feitas pelas mesmas operações da peça (o esboço 2.0 ou as variantes da receita), e pergunta qual se parece mais. Use no alinhamento e na modelagem sempre que houver escolha de forma. Não use para a peça final nem para prancha cotada.
+description: Mostra à pessoa as opções de forma em disputa, lado a lado, feitas pelas operações da peça (esboço 2.0 ou variantes da receita), e pergunta qual se parece mais. Use quando houver escolha de forma. Não use para a peça final.
 ---
 
 # Esboçar opções de forma
@@ -20,8 +20,8 @@ receita exporta `VARIANTES: [{ nome, nota, tabela: { chave: valor } }]`, cada
 variante troca valores da `TABELA`, e `npm run variantes -- <peça>` roda a
 receita com cada troca e junta as capturas numa imagem, com a mesma câmera. A
 receita do acervo não muda, e a variante com os valores aceitos dá a mesma
-malha de antes. O exemplo é
-[`mesa-com-variantes.js`](../../../docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/mesa-com-variantes.js).
+malha de antes. O exemplo é a
+[cópia de prova da mesa com três espessuras de tampo](../../../docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/mesa-com-variantes.js).
 
 Quando a peça ainda não existe, ou a escolha é de forma e não de valor, escreva
 um esboço do 2.0: cada opção é uma pequena receita do núcleo, com `passos`
@@ -38,9 +38,8 @@ Os `.esboco.json` de opções de forma escritos antes do 2.0 abrem sem reescrita
 Antes de escrever, decida por escrito, em um parágrafo curto por decisão, o que
 está em disputa e o que fica igual em todas as opções, quantas opções (duas ou
 três, cada uma com uma diferença que se vê), a vista que mostra a diferença e a
-parte da peça que entra. Esboce só o que está em disputa. Uma opção que o núcleo
-não faz é recusada com o motivo, e a recusa é informação: a forma que o núcleo
-não dá não é opção para a peça.
+parte da peça que entra. Esboce só o que está em disputa. A opção que o núcleo
+recusa, com o motivo, não é opção para a peça.
 
 ## O atalho de formas
 

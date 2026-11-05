@@ -299,18 +299,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run familias:check
 
-      # O conjunto de calibração do crítico: o desenho de cada fonte, o agente e o brief têm de ser os gravados, e a medida
+      # O conjunto de calibração do crítico: as imagens, a fonte de cada uma, o agente e o brief têm de ser os gravados, e a medida
       # tem de reprovar sem o crítico o que o conjunto diz ser dela. Sem este passo o crítico poderia mudar sem remedir.
       - name: Conjunto de calibração do crítico em dia com o crítico e com as fontes
         if: ${{ !cancelled() }}
         run: npm run calibracao:check
-
-      # A medida do desenho de linhas: os casos montados à mão provam a medida (zero no desenho certo, acusa o traço plantado e o tirado), e
-      # as quarenta e oito vistas do conjunto de calibração ficam dentro do registro das causas. Sem este passo o desenhista poderia
-      # voltar a traçar a emenda entre partes, o cruzamento sem linha e a aresta atrás de outra peça sem que ninguém medisse.
-      - name: Desenho de linhas medido contra a referência de profundidade e normal
-        if: ${{ !cancelled() }}
-        run: npm run desenho:check
 
   juntar:
     name: Juntar à main

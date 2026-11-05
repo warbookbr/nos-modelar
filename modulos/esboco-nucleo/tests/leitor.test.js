@@ -51,7 +51,8 @@ describe('os esboços guardados', () => {
   });
 
   it('todo .esboco.json versionado abre ou é recusado com o motivo', () => {
-    expect(versionados.length).toBeGreaterThanOrEqual(86);
+    /* 86 em 2026-11-05, e 55 depois de o esboço antigo sair com os 30 dos testes dele e a fixture da receita planejada */
+    expect(versionados.length).toBeGreaterThanOrEqual(55);
     let abriram = 0;
     for (const f of versionados) {
       const r = abrir(ler(f));

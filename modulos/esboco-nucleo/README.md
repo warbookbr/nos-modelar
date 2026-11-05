@@ -1,6 +1,6 @@
 # Esboço pelo núcleo
 
-O esboço 2.0 faz as opções de forma com as mesmas operações da peça. Cada opção é uma pequena receita do núcleo, montada em memória, executada pelo executor e capturada na bancada com a mesma câmera das outras opções, e as opções saem lado a lado numa imagem só. O módulo é do plano [esboço pelo núcleo](../../docs/modelar/planos/2026-11-05-esboco-pelo-nucleo.md), substitui o uso de opções de forma do módulo antigo `modulos/esboco/` e não o importa. A parte headless está aqui; a linha de comando e a captura estão em `tools/modelar/esboco-nucleo.mjs` (`npm run esboco:nucleo`) e `tools/modelar/variantes.mjs` (`npm run variantes`).
+O esboço 2.0 faz as opções de forma com as mesmas operações da peça. Cada opção é uma pequena receita do núcleo, montada em memória, executada pelo executor e capturada na bancada com a mesma câmera das outras opções, e as opções saem lado a lado numa imagem só. O módulo é do plano [esboço pelo núcleo](../../docs/modelar/planos/2026-11-05-esboco-pelo-nucleo.md), substitui o uso de opções de forma do módulo antigo `modulos/esboco/`, que saiu em 2026-11-05 ([histórico](../../docs/modelar/historico/esboco-2d.md)). A parte headless está aqui; a linha de comando e a captura estão em `tools/modelar/esboco-nucleo.mjs` (`npm run esboco:nucleo`) e `tools/modelar/variantes.mjs` (`npm run variantes`).
 
 ## A opção
 

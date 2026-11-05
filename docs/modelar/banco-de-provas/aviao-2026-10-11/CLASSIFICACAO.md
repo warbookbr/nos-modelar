@@ -115,7 +115,8 @@ colisão sem o limite, e o 14, a medida do recuo do escape, foram corrigidos no
 fechamento do plano. O 8 não procede: a cota da hélice na prancha é a altura
 desenhada de lado, e a medida do plano confere a mesma coisa. Ao corrigi-lo, um
 esbocista alargou a tolerância da medida para ela passar, o que o processo não
-pegou; o [agente](../../../../.claude/agents/esbocista.md) passou a proibir isso.
+pegou; o agente `esbocista` passou a proibir isso (ele saiu com o esboço antigo em
+2026-11-05, ver o [histórico](../../historico/esboco-2d.md)).
 Os 38 que seguem abertos vão ao [backlog](../../planos/BACKLOG.md), por decisão da
 pessoa em 2026-10-13, com a integração como o primeiro grupo a puxar.
 
