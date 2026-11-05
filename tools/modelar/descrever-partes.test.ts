@@ -241,3 +241,19 @@ describe('descrever-partes — régua headless', () => {
     expect(resultado.stdout).toContain('braco-robotico/base');
   });
 });
+
+describe('a medida que quebra mostra o passo recusado', () => {
+  /* No furgão, em 2026-11-05, a abertura do farol foi recusada, a carroceria ficou sem seleção e o descrever só dizia que a parte
+     não existia; o modelador teve de rodar a receita por dentro para achar a recusa. */
+  it('a parte pedida que não existe vem com os órfãos, que dizem a causa', async () => {
+    const modulo = { meta: { nome: 'sonda-de-recusa' }, PASSOS: [
+      ['cubo', { origemId: 1, lado: 0.1 }],
+      ['aberturaPorContorno', { origemId: 2, chapa: { origem: { op: 'cubo', id: 1 } }, vista: 'q', contorno: { inicio: [0, 0], trechos: [] } }],
+      ['parte', { nome: 'tampa', sel: { origem: { op: 'aberturaPorContorno', id: 2 } } }],
+    ] };
+    const r = await descreverPecaReutilizavel({ peca: 'sonda-de-recusa', modulo, partes: ['tampa'], semVeredito: true });
+    expect(r.codigo).toBe(1);
+    expect(r.stderr).toMatch(/NÃO CONSEGUI MEDIR/);
+    expect(r.stderr).toMatch(/ÓRFÃO\(S\), que costumam ser a causa:\n {2}passo 1 \(aberturaPorContorno\): vista precisa ser/);
+  });
+});

@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`, `procedural/nucleo/operacoes/booleanas.js` no arredondamento da costura, `procedural/nucleo/operacoes/geradores-avancados.js` no limite de ids do lathe e do loft
+**Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`, `procedural/nucleo/operacoes/booleanas.js` no arredondamento da costura, `procedural/nucleo/operacoes/geradores-avancados.js` no limite de ids do lathe e do loft, `tools/modelar/conferir-pontos.mjs`, `tools/modelar/guardas/guarda-acervo.mjs`
 
 **Descongelado em:** 2026-11-03, por decisão da pessoa, que viu na bancada o ombro desproporcional ao resto do conjunto. Estava congelado desde 2026-09-29 para o esboço deixar de custar conta à mão; os planos do esboço e das ferramentas de modelagem que vieram antes fecharam.
 
@@ -104,7 +104,8 @@ Ainda em 2026-11-05, com o `gaiolaPorLacos` no núcleo, a pessoa pediu a coluna 
   as partes posicionadas e grava tudo junto. Peça única ou partes com a
   posição de cada uma é decidido com a pessoa antes da fatia 5;
 - `conferir:referencia` por parte, comparando cada parte posicionada com o
-  contorno dela no arquivo de contornos.
+  contorno dela no arquivo de contornos;
+- dois achados herdados do [rascunho do braço robótico](encerrados/2026-09-21-o-que-o-braco-robotico-achou.md), fechado em 2026-11-05: a medida de junta do `conferir-pontos`, que toma o centro da sobreposição das caixas e erra quando uma parte entra pelo flanco da outra, como no cotovelo; e a conferência de que a técnica escrita no `PLANO` de cada parte foi a usada, que hoje é só leitura do crítico.
 
 ## Excluído
 

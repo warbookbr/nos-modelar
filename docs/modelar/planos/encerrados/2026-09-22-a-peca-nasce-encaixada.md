@@ -216,7 +216,7 @@ A fatia 5 registra se isso aparece; se aparecer, a proporção entre partes vira
 campo do `PLANO` e conferência da etapa.
 
 O rascunho [o que o braço robótico
-achou](../2026-09-21-o-que-o-braco-robotico-achou.md) lista seis achados de código
+achou](./2026-09-21-o-que-o-braco-robotico-achou.md) lista seis achados de código
 levantados pelo braço. Os que tocarem montagem ou laço são lidos antes da fatia
 1, para não construir em cima de defeito conhecido.
 

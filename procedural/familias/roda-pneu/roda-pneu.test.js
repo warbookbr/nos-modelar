@@ -1,14 +1,12 @@
 /* roda-pneu.test.js — a família `roda-pneu` medida na malha. As quatro partes (pneu, aro, cubo, disco) e o volume de cada uma
    contra a fórmula; a banda (pneumática, maciça, sem pneu com friso, com relevo); o cubo de disco, os raios de um plano e os
    raios de duas flanges, com o corte de cada barra contra a conta à mão; a escala (a malha cresce na proporção do diâmetro); as
-   três portas; cada restrição do contrato; os oito perfis chamados só pelo nome; e a conferência com o componente `roda` do
-   esboço. A camada mecânica da aprovação, que mede os pontos, os perfis e a escala deles, roda uma vez no fim. */
+   três portas; cada restrição do contrato; e os oito perfis chamados só pelo nome. A camada mecânica da aprovação, que mede os pontos, os perfis e a escala deles, roda uma vez no fim. */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { caixasPorParte, portasPublicadas } from '../../../src/autoria/descrever-partes.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { aprovarFamilia, medirPonto, pontosDaFamilia, pontosDosPerfis } from '../../../tools/modelar/aprovacao-da-familia.mjs';
-import { conferirFamiliaComEsboco, conferirFamiliaNosTresPontos } from '../../../tools/modelar/familia-com-esboco.mjs';
 import { descreverEstrutura } from '../../extensoes/estrutura-de-barras/estrutura.js';
 import { neutroCanonico } from '../../nucleo/entrada.js';
 import { sha256Hex } from '../../nucleo/sha256.js';
@@ -109,10 +107,10 @@ const volumeDoAro = (v) => {
 };
 
 describe('a família roda-pneu no registro do produto', () => {
-  it('está em FAMILIAS, declara o vínculo com o componente roda e a faixa de 50 a 2000 mm de diâmetro', () => {
+  it('está em FAMILIAS, sem vínculo com o esboço, e com a faixa de 50 a 2000 mm de diâmetro', () => {
     expect(FAMILIAS).toContain(RODA_PNEU);
     expect(RODA_PNEU.contrato.id).toBe('roda-pneu');
-    expect(RODA_PNEU.contrato.esboco.componente).toBe('roda');
+    expect(RODA_PNEU.contrato.esboco).toBeUndefined();
     expect(RODA_PNEU.contrato.portas.map(({ id }) => id)).toEqual(['assento-do-pneu', 'eixo', 'furos-de-fixacao']);
     expect(Object.keys(RODA_PNEU.contrato.perguntas)).toEqual(['aro', 'cubo', 'disco', 'pneu', 'raios']);
     expect(P.diametroPneu).toMatchObject({ unidade: 'mm', minimo: 50, maximo: 2000 });
@@ -774,7 +772,7 @@ describe('os perfis: o nome e o diâmetro bastam, e o chamador sobrescreve só o
   });
 });
 
-describe('a camada mecânica da aprovação e a conferência com o esboço', () => {
+describe('a camada mecânica da aprovação', () => {
   it('cada perfil passa na medição da aprovação (malha fechada, portas, determinismo, corte positivo de cada barra)', () => {
     for (const nome of NOMES_DOS_PERFIS) {
       const parametros = completo({ perfil: nome });
@@ -785,27 +783,6 @@ describe('a camada mecânica da aprovação e a conferência com o esboço', () 
         const estrutura = resultado.medidas.find(({ ferramenta }) => ferramenta === 'estruturaDeBarras');
         expect(estrutura.cortes).toHaveLength(parametros.raios);
       }
-    }
-  }, 180_000);
-
-  it('a conferência com o componente roda passa nos três pontos e nos oito perfis, com as quatro partes e a porta do assento no lugar', () => {
-    const conferencia = conferirFamiliaNosTresPontos({ familia: RODA_PNEU, registro, materiais: MATERIAIS });
-    expect(conferencia.estado).toBe('conferida');
-    expect(conferencia.pontos.map(({ ponto: nome }) => nome)).toEqual(['minimo', 'medio', 'maximo']);
-    for (const pt of conferencia.pontos) {
-      expect(pt.achados).toEqual([]);
-      expect(pt.partes.map(({ parte }) => parte)).toEqual(['aro', 'cubo', 'disco', 'pneu']);
-      expect(pt.portas).toEqual([{ id: 'assento-do-pneu', estado: 'no-lugar' }]);
-      expect(pt.portasSemVinculo).toEqual(['eixo', 'furos-de-fixacao']);
-    }
-    for (const nome of NOMES_DOS_PERFIS) {
-      const resultado = conferirFamiliaComEsboco({ familia: RODA_PNEU, parametros: completo({ perfil: nome }), registro, materiais: MATERIAIS });
-      expect(resultado.achados, nome).toEqual([]);
-      expect(resultado.estado).toBe('conferida');
-      expect(resultado.portas).toEqual([{ id: 'assento-do-pneu', estado: 'no-lugar' }]);
-      /* o pneu fica rente ao volume do esboço (o friso passa dele pela altura dele) */
-      const excesso = resultado.partes.find(({ parte }) => parte === 'pneu').excessoMm;
-      expect(excesso, nome).toBeCloseTo(0, 6);
     }
   }, 180_000);
 

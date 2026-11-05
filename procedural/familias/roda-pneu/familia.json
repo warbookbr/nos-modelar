@@ -254,7 +254,7 @@
     {
       "id": "cubo-dentro-da-tolerancia-do-esboco",
       "expressao": "(abs(desvio) * larguraPneu / 2 + larguraCubo / 2 - larguraPneu / 2) * diametroPneu <= 45",
-      "motivo": "o cubo passa da largura do pneu por mais de 45 mm de um dos lados, e a conferência com o esboço, que dá 50 mm de tolerância ao envelope, não o aceita"
+      "motivo": "o cubo passa da largura do pneu por mais de 45 mm de um dos lados"
     },
     {
       "id": "cubo-cabe-no-aro",
@@ -478,34 +478,6 @@
       "O desvio leva a chapa para o lado do aro que o parâmetro pede?",
       "Só se a chapa tiver furos de ventilação: eles têm o mesmo diâmetro e o mesmo espaçamento, ficam entre o cubo e o aro sem tocar nenhum dos dois nem os furos de fixação, e atravessam a chapa de lado a lado? A chapa cheia, sem eles, está certa."
     ]
-  },
-  "esboco": {
-    "componente": "roda",
-    "mapa": {
-      "diametro": "diametroPneu",
-      "aro": "diametroAro * diametroPneu",
-      "largura": "larguraPneu * diametroPneu"
-    },
-    "conferencia": {
-      "versao": 1,
-      "partes": {
-        "pneu": "pneu",
-        "aro": "pneu",
-        "cubo": "pneu",
-        "disco": "pneu"
-      },
-      "portas": [
-        {
-          "porta": "assento-do-pneu",
-          "volume": "pneu",
-          "lado": "-x"
-        }
-      ],
-      "tolerancia": {
-        "envelope": 50,
-        "porta": 0.5
-      }
-    }
   },
   "perfis": {
     "bicicleta": {

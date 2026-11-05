@@ -253,6 +253,7 @@ const definicoes = {
       segmentosSpline: ['inteiro', 'Segmentos por vão de spline do contorno (padrão 8).'],
       lente: ['booleano', "true: o pedaço retirado sai como sólido próprio, citável por { op, id, parte: 'lente' }."],
       recuoDaLente: ['escalar', 'Com lente, quanto a volta dela entra no vão a partir da borda, em metro, para ficar além da perna da aba do friso; padrão 2,5 vezes a espessura da chapa, e 0 dá a lente do tamanho do vão.'],
+      sentido: ['texto', "'+' ou '-': num corpo fechado, que a reta do eixo atravessa mais de uma vez (a frente e a traseira de uma carroceria vistas pela frente), corta só a camada vista desse lado do eixo, com o prisma parado entre ela e a seguinte; sem ele, a chapa atravessada duas vezes é recusada."],
     },
     obrigatorios: ['origemId', 'chapa', 'contorno', 'vista'],
     passos: [
