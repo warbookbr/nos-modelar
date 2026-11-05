@@ -1,5 +1,4 @@
-/* chapa.js — as medidas e a geometria comum às duas versões da abertura de prova (`receita.js`, o corte da chapa já subdividida,
- * e `corte-na-gaiola.js`, o corte da gaiola antes da subdivisão): a gaiola de 9 por 9 pontos a cada 100 mm sobre a
+/* chapa.js — as medidas e a geometria da abertura de prova (`receita.js`): a gaiola de 9 por 9 pontos a cada 100 mm sobre a
  * superfície de duas curvaturas de `procedural/nucleo/fixtures/friso-prova.js` (raio 600 mm em x e 900 mm em z), sem vão, e
  * o contorno do vão desenhado na vista superior, em [x, z]. O contorno sai do bico, segue reto até o fim do trecho reto e volta
  * ao bico por dois arcos tangentes, de modo que o único canto é o bico. Nenhum dado vem de referência externa. */
@@ -14,10 +13,10 @@ export const m = (mm) => mm / 1000;
 export const TABELA = {
   chapa: { pontos: 9, passo: 100, topo: 300, centro: [400, 400], raioX: 600, raioZ: 900, espessura: 2, niveis: 2 },
   contorno: { bico: [220, 430], fimDoReto: [520, 480], fimDoArco: [540, 380], segmentosArco: 32 },
-  /* o prisma do corte depois da subdivisão passa da chapa nos dois sentidos de y: a chapa fica entre 78 e 300 mm de altura */
-  prisma: { de: 0, ate: 500 },
-  /* no corte da gaiola, os pontos novos ficam na superfície da chapa sem vão; medidos, a subdivisão os interpola */
-  corte: { medirPontosNovos: false },
+  /* a aba que dobra a borda de fora do vão para baixo: perna, giro em graus e raio da face de dentro da dobra */
+  aba: { largura: 8, angulo: 90, raio: 1 },
+  /* a lente sobe acima da chapa, só para a imagem mostrar o vão, a parede e a aba por dentro dele */
+  lente: { elevar: 100 },
   /* a caixa em [x, z] em volta do vão que a parte `emVoltaDoVao` nomeia, para a bancada enquadrar a borda */
   emVolta: { de: [190, 350], ate: [600, 500] },
 };
@@ -65,6 +64,8 @@ export const PLANO = {
   partes: [
     { nome: 'chapa', forma: 'chapa de 2 mm de duas curvaturas com o vão do contorno projetado em y', tecnica: 'subdivisao com medidas e espessura' },
     { nome: 'emVoltaDoVao', forma: 'as faces da mesma chapa em volta do vão, nomeadas para a bancada enquadrar a borda', tecnica: 'parte por região' },
+    { nome: 'lente', forma: 'o pedaço da chapa que o vão retirou, como sólido próprio', tecnica: 'aberturaPorContorno com lente' },
+    { nome: 'aba', forma: 'aba de 8 mm dobrada a 90 graus para baixo ao longo da borda de fora do vão', tecnica: 'friso com aba sobre a borda da abertura' },
   ],
   criteriosDeReprovacao: ['a borda do vão sai do contorno desenhado ou arredonda o bico', 'a chapa tem amassado, ondulação ou dobra que a forma não pede'],
 };

@@ -34,8 +34,10 @@ describe('catálogo de capacidades — R05', () => {
        e em `operacoes` (a maior, arredondarCostura, tem 523 bytes em cada
        lista). Tirar a repetição seria um formato @2, com os consumidores do
        MCP junto; fica registrado como atrito, e o teto deixa folga para quatro
-       operações do tamanho da maior: 32 574 + 4 × 1 100 ≈ 37 000. */
-    expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(37_000);
+       operações do tamanho da maior: 32 574 + 4 × 1 100 ≈ 37 000. Em 2026-11-05 a
+       aberturaPorContorno levou o catálogo a 37 358 bytes, e o teto passou a
+       38 000, de novo com folga para uma operação do tamanho da maior. */
+    expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(38_000);
   });
 
   it('busca por efeito, artefato e identidade sem executar receita', () => {
@@ -59,7 +61,7 @@ describe('catálogo de capacidades — R05', () => {
     expect(buscarCapacidades(catalogo, { texto: 'revolucionar' }).operacoes.map(({ nome }) => nome)).toContain('lathe');
     const primeira = buscarCapacidades(catalogo, { limite: 3 });
     const segunda = buscarCapacidades(catalogo, { limite: 3, cursor: primeira.proximoCursor });
-    expect(primeira).toMatchObject({ total: 39, retornadas: 3, truncado: true, omitidas: 36 });
+    expect(primeira).toMatchObject({ total: 40, retornadas: 3, truncado: true, omitidas: 37 });
     expect(segunda.operacoes.map(({ id }) => id)).not.toEqual(expect.arrayContaining(primeira.operacoes.map(({ id }) => id)));
   });
 });

@@ -25,6 +25,7 @@ import { criarOperacoesTransformacoes } from './operacoes/transformacoes.js';
 import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
 import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
+import { criarOperacoesAberturaPorContorno } from './operacoes/abertura-por-contorno.js';
 import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
 import { lerOnde, resolverOnde } from './selecao-geometrica.js';
 import earcut from 'earcut';
@@ -1704,6 +1705,26 @@ CONTRATOS_ORIGEM.friso = {
     return faces.length ? { faces } : { erro: `origem friso:${origem.id}${origem.parte ? ` (${origem.parte})` : ''} não tem nenhuma face viva` };
   },
 };
+/* aberturaPorContorno — a chapa cortada pelo contorno (`operacoes/abertura-por-contorno.js`): sem parte, as faces da chapa com a
+   parede do vão; `parte: 'parede'` só a parede, e `parte: 'lente'` o pedaço retirado, quando o passo declarou `lente: true`. */
+CONTRATOS_ORIGEM.aberturaPorContorno = {
+  validar(origem) {
+    const msg = "aberturaPorContorno usa op, id e parte opcional ('parede' ou 'lente')";
+    if (!Object.keys(origem).every((k) => k === 'op' || k === 'id' || k === 'parte')) return msg;
+    if (origem.parte != null && !['parede', 'lente'].includes(origem.parte)) return msg;
+    return null;
+  },
+  resolver(st, registro, origem) {
+    if (origem.parte === 'lente' && !registro.lenteDeclarada) return { erro: `origem aberturaPorContorno:${origem.id} (lente): o passo não declarou lente: true, e o pedaço retirado não saiu como sólido` };
+    const lista = origem.parte ? registro[origem.parte] : registro.faces;
+    for (const f of lista) {
+      const consumo = conferirConsumo(st, f, `a face ${f} da origem aberturaPorContorno:${origem.id}`);
+      if (consumo) return { erro: consumo };
+    }
+    const faces = lista.filter((f) => st.F.has(f));
+    return faces.length ? { faces } : { erro: `origem aberturaPorContorno:${origem.id}${origem.parte ? ` (${origem.parte})` : ''} não tem nenhuma face viva` };
+  },
+};
 /* casca — extensão nativa `procedural/extensoes/casca`: o resultado publica três grupos, citáveis por `parte`:
    `externa` (as faces fechadas do sólido, que continuam com id e vértices), `interna` (a parede de dentro, uma por face
    externa) e `borda` (a borda das faces abertas, uma por aresta). Sem `parte`, são todas. Os grupos são de significado
@@ -2896,6 +2917,7 @@ const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA,
 const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
 const operacoesSubdivisao = criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem });
 const operacoesFriso = criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem });
+const operacoesAberturaPorContorno = criarOperacoesAberturaPorContorno({ BLOCO, FAIXA_ESTENDIDA, BASE_ESTENDIDA, idDoPasso, grita, addV, addF, registraOrigem, resolverSelecao, textoDeclaracoes, subtrair: operacoesBooleanas.subtrair, manifoldCarregada, erroDaCargaDaManifold });
 /* As operações de atributo escrevem só nas faces que `resolverAlvosF` devolve; o despacho lê essas faces de `st.alvosF` para
    saber quais conferir no retrato (ver `ESCRITA_DAS_OPERACOES`). */
 function resolverAlvosFRastreado(st, a, op, i, opcoes) {
@@ -2917,6 +2939,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesBooleanas,
   ...operacoesSubdivisao,
   ...operacoesFriso,
+  ...operacoesAberturaPorContorno,
 };
 
 /* Configuração explícita do módulo que preserva os nomes curtos das receitas.
@@ -2928,6 +2951,7 @@ const NOMES_DAS_OPERACOES = [
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
   'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao', 'friso',
+  'aberturaPorContorno',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 
@@ -3664,6 +3688,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   Object.defineProperty(saida, 'frisos', { value: st.frisos ?? [], enumerable: false });
   /* chapas: a gaiola de cada passo `subdivisao`, para a conferência dos vãos achar as aberturas pela borda livre. Fora da enumeração, como `frisos`. */
   Object.defineProperty(saida, 'chapas', { value: st.chapas ?? [], enumerable: false });
+  /* aberturas: a borda, a espessura e a limpeza de cada passo `aberturaPorContorno`, para a conferência dos vãos e as provas. Fora da enumeração, como `chapas`. */
+  Object.defineProperty(saida, 'aberturas', { value: st.aberturas ?? [], enumerable: false });
   return saida;
 }
 

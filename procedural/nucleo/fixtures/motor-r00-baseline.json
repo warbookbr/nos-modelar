@@ -40,7 +40,8 @@
     "parte",
     "pesar",
     "subdivisao",
-    "friso"
+    "friso",
+    "aberturaPorContorno"
   ],
   "casos": [
     {
@@ -431,6 +432,16 @@
       "hashCanonico": "f58992ff34d1a561696fd4104c3f276ee1b88fd7c7570f772afce77f8e0ce73e",
       "vertices": 70,
       "faces": 68,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/aberturaPorContorno",
+      "operacoes": [
+        "aberturaPorContorno"
+      ],
+      "hashCanonico": "10759ad75590d0aa1ca7dedbe1fafbef55dae4a318c2c81fb09633b2bfeb6d48",
+      "vertices": 194,
+      "faces": 212,
       "diagnosticos": 0
     }
   ]

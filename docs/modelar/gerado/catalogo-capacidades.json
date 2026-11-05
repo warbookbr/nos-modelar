@@ -1,12 +1,46 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:62bd501446ebc389370f7250bc663b712f6eec67c4e499ae9733b77f371f12cf",
+  "assinatura": "sha256:6ce516b275b1b130e43fb89d25642e9e9a025d04c01b7ccc71938d2061670fbe",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
       "versao": "1.0.0",
       "requer": [],
       "operacoes": [
+        {
+          "id": "mecanifica.operacao.aberturaPorContorno",
+          "nome": "aberturaPorContorno",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [
+              "mecanifica.malha-poligonal@1"
+            ],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "transforma-malha"
+          ],
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Abrir na chapa um vão pelo contorno desenhado numa vista, sem depender da gaiola, com a borda para o friso e o pedaço retirado.",
+            "schema": "mecanifica.argumentos.aberturaPorContorno@1",
+            "obrigatorios": [
+              "origemId",
+              "chapa",
+              "contorno",
+              "vista"
+            ]
+          }
+        },
         {
           "id": "mecanifica.operacao.apagaFace",
           "nome": "apagaFace",
@@ -1173,6 +1207,40 @@
     }
   ],
   "operacoes": [
+    {
+      "id": "mecanifica.operacao.aberturaPorContorno",
+      "nome": "aberturaPorContorno",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Abrir na chapa um vão pelo contorno desenhado numa vista, sem depender da gaiola, com a borda para o friso e o pedaço retirado.",
+        "schema": "mecanifica.argumentos.aberturaPorContorno@1",
+        "obrigatorios": [
+          "origemId",
+          "chapa",
+          "contorno",
+          "vista"
+        ]
+      }
+    },
     {
       "id": "mecanifica.operacao.apagaFace",
       "nome": "apagaFace",

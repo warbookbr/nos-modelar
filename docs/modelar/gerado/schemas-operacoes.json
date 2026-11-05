@@ -1,8 +1,236 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:62bd501446ebc389370f7250bc663b712f6eec67c4e499ae9733b77f371f12cf",
-  "total": 39,
+  "assinatura": "sha256:6ce516b275b1b130e43fb89d25642e9e9a025d04c01b7ccc71938d2061670fbe",
+  "total": 40,
   "operacoes": [
+    {
+      "id": "mecanifica.operacao.aberturaPorContorno",
+      "nome": "aberturaPorContorno",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Abrir na chapa um vão pelo contorno desenhado numa vista, sem depender da gaiola, com a borda para o friso e o pedaço retirado.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.aberturaPorContorno@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "chapa",
+            "contorno",
+            "vista"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade obrigatória da chapa cortada, da parede e da borda do vão."
+            },
+            "chapa": {
+              "type": "object",
+              "description": "Seleção do sólido fechado que o vão corta, como { origem: { op: 'subdivisao', id } } de uma chapa com espessura."
+            },
+            "contorno": {
+              "type": "object",
+              "description": "O contorno do vão, { inicio: [u, v], trechos: [...] } de curva2d (reto, arco, arcoTangente, concordancia e spline), em metros no plano da vista, escrito fechado: o último trecho termina no início. O encontro de dois trechos sem concordância é canto vivo; a concordância de raio declarado arredonda o canto."
+            },
+            "vista": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "O eixo ao longo do qual o contorno é projetado: na 'y' o ponto [u, v] é [x, z], na 'x' é [z, y] e na 'z' é [x, y]."
+            },
+            "segmentosArco": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segmentos por quarto de volta nos arcos e nas concordâncias do contorno (padrão 4); abaixo do piso do bico, o passo grita com o piso."
+            },
+            "segmentosSpline": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segmentos por vão de spline do contorno (padrão 8)."
+            },
+            "lente": {
+              "type": "boolean",
+              "description": "true: o pedaço retirado sai como sólido próprio, citável por { op, id, parte: 'lente' }."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "subdivisao",
+              {
+                "origemId": 1,
+                "vertices": [
+                  "g00",
+                  "g01",
+                  "g02",
+                  "g10",
+                  "g11",
+                  "g12",
+                  "g20",
+                  "g21",
+                  "g22"
+                ],
+                "faces": [
+                  [
+                    "g00",
+                    "g01",
+                    "g11",
+                    "g10"
+                  ],
+                  [
+                    "g01",
+                    "g02",
+                    "g12",
+                    "g11"
+                  ],
+                  [
+                    "g10",
+                    "g11",
+                    "g21",
+                    "g20"
+                  ],
+                  [
+                    "g11",
+                    "g12",
+                    "g22",
+                    "g21"
+                  ]
+                ],
+                "niveis": 2,
+                "espessura": 0.002
+              }
+            ],
+            [
+              "aberturaPorContorno",
+              {
+                "origemId": 2,
+                "chapa": {
+                  "origem": {
+                    "op": "subdivisao",
+                    "id": 1
+                  }
+                },
+                "vista": "y",
+                "contorno": {
+                  "inicio": [
+                    0.07,
+                    0.08
+                  ],
+                  "trechos": [
+                    {
+                      "reto": [
+                        0.13,
+                        0.08
+                      ]
+                    },
+                    {
+                      "reto": [
+                        0.1,
+                        0.13
+                      ]
+                    },
+                    {
+                      "reto": [
+                        0.07,
+                        0.08
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          ],
+          "PARAMS": {
+            "g00": [
+              0,
+              0,
+              0
+            ],
+            "g01": [
+              0,
+              0,
+              0.1
+            ],
+            "g02": [
+              0,
+              0,
+              0.2
+            ],
+            "g10": [
+              0.1,
+              0,
+              0
+            ],
+            "g11": [
+              0.1,
+              0.01,
+              0.1
+            ],
+            "g12": [
+              0.1,
+              0,
+              0.2
+            ],
+            "g20": [
+              0.2,
+              0,
+              0
+            ],
+            "g21": [
+              0.2,
+              0,
+              0.1
+            ],
+            "g22": [
+              0.2,
+              0,
+              0.2
+            ]
+          },
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "A chapa é um sólido fechado e orientado, que a reta do eixo da vista atravessa uma vez em cada ponto do contorno.",
+          "O contorno cabe inteiro dentro da chapa vista do eixo, não se cruza e fecha no início."
+        ],
+        "limites": [
+          "O corte é o subtrair do núcleo, depois da subdivisão: face que o corte não toca fica com id e cantos, face cortada fica com o id no maior pedaço, e a parede do vão ganha id novo no bloco do passo, depois dos pedaços. A costura deixa a borda sobre o polígono do contorno.",
+          "Depois do corte, a aresta que toca a costura e mede menos de 1% da maior aresta das faces em volta, e o canto quase reto, são fundidos num ponto só (fica o ponto do contorno, e a malha fina em volta se move menos que isso); a face de pele que ainda sai fina se junta à vizinha quando o resultado sai convexo. A face que some era pedaço sem área, e a face de antes que some entra em consumidas.",
+          "O bico vivo se mede contra a tangente dos trechos que o formam: com segmentos de menos, a corda do primeiro segmento abre ou fecha o bico, e acima de 2 graus de erro o passo grita com o piso de segmentosArco (ou segmentosSpline) que o deixa abaixo.",
+          "Gritam, antes de mexer na malha: o contorno que não fecha, o que se cruza, o que sai da chapa vista do eixo, o que a chapa dobrada atravessa mais de uma vez e o que fica abaixo do piso do bico.",
+          "A origem sem parte são as faces da chapa cortada, com a parede; parte: 'parede' só a parede; parte: 'lente' o pedaço retirado, com lente: true. O friso segue a borda de fora do vão por superficie: { op: 'aberturaPorContorno', id }.",
+          "Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora."
+        ],
+        "diagnosticos": []
+      }
+    },
     {
       "id": "mecanifica.operacao.apagaFace",
       "nome": "apagaFace",
@@ -1852,7 +2080,7 @@
             },
             "superficie": {
               "type": "object",
-              "description": "Origem {op:'subdivisao', id} de um passo anterior: a linha segue os vértices da malha dele sobre as arestas da gaiola (no ponto limite quando ele tem medidas), e v segue a normal da face de fora da chapa."
+              "description": "Origem {op:'subdivisao', id} de um passo anterior: a linha segue os vértices da malha dele sobre as arestas da gaiola (no ponto limite quando ele tem medidas), e v segue a normal da face de fora da chapa. Ou {op:'aberturaPorContorno', id}: a linha é a borda de fora do vão inteira, com linha só { nome }, e v segue a normal da pele em volta."
             },
             "normal": {
               "anyOf": [
@@ -2062,7 +2290,7 @@
           "ALIASES": []
         },
         "precondicoes": [
-          "Com superficie, o passo subdivisao citado vem antes e gerou malha, e cada par seguido da linha é aresta da gaiola dele.",
+          "Com superficie, o passo subdivisao citado vem antes e gerou malha, e cada par seguido da linha é aresta da gaiola dele; o passo aberturaPorContorno citado vem antes, e a linha é só { nome }, sem pontos nem variacao.",
           "Sem superficie, a polilinha declara normal.",
           "Declare perfil ou aba, um dos dois; a aba exige superficie e uma linha de arestas de borda livre, e sai sólida na chapa com espessura e pele na chapa sem ela."
         ],
@@ -2075,6 +2303,7 @@
           "Na simetria em x da superfície, a linha que toca o plano x = 0 numa ponta continua na imagem espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia espelhada; o perfil assimétrico emendado pela costura não fica espelhado.",
           "A aba da chapa com espessura é sólido próprio que encosta na parede da borda da chapa, sem fusão: a receita nomeia as partes e declara o contato. Na chapa sem espessura a aba é pele aberta, que continua a borda do vão com as faces orientadas como as da chapa. Ela sai da linha pela normal média das faces da borda, e não pela tangente exata da superfície limite.",
           "A aba que volta por baixo da chapa (ângulo grande com perna longa) e a que atravessa a própria dobra gritam; nas quinas de um vão o perfil estica pela esquadria.",
+          "Na borda de uma aberturaPorContorno, o ponto que deixa um trecho mais curto que o recuo da esquadria nas duas pontas dele (com folga de metade) sai da linha, e o friso segue a corda até o canto vivo; na peça de teste a aba fica a no máximo 0,18 mm da borda.",
           "origem publica as faces sem sub-endereço por posição; parte: 'lateral' cita a superfície varrida e 'pontas' as tampas das pontas abertas."
         ],
         "diagnosticos": []

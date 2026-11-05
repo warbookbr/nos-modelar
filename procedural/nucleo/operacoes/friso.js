@@ -26,12 +26,19 @@
    função dá a volta. Com `perfil`, `largura` é a extensão em u do perfil (a de `perfil` é só a forma, e a escala em u é
    largura / extensão); com `aba`, `largura` é a perna reta e `angulo` o giro da dobra, que mudam por rampa. No degrau as duas
    faixas se cortam no plano que passa pelo ponto da linha, pela normal e pelo encontro das duas bordas de fora (a meia-esquadria
-   de faixas de larguras diferentes), e a junta é um anel só, soldado às duas. */
+   de faixas de larguras diferentes), e a junta é um anel só, soldado às duas.
+
+   A BORDA DE UMA ABERTURA. Com `superficie: { op: 'aberturaPorContorno', id }`, a linha é a borda de fora do vão que aquele passo
+   abriu, inteira e fechada (`linha: { nome }`, sem pontos), e a normal é a da pele em volta de cada ponto (`bordaDaAbertura`).
+   A borda tem os pontos que o corte deixou, alguns a frações de milímetro de um canto vivo; o ponto que deixa um trecho mais
+   curto que o recuo da esquadria nas duas pontas dele (o de `varrerPerfil`, com folga de metade) sai da linha (`afinarNosCantos`),
+   e o friso segue a corda até o canto. A espessura é a que o passo da abertura mediu na borda. */
 import { ANGULO_MAXIMO_DA_ABA, ErroDoFriso, TRECHO_MAXIMO_EM_ARESTAS, cadeiaRefinada, ladoDaBorda, menorArestaDoPerfil, passosDoArcoDaAba, perfilDaAba, perfilDaPeleDaAba, posicoesDaLinha, tampaDaAba, varrerPerfil } from '../friso.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 import { espelharGaiolaEmX } from '../subdivisao.js';
 import { formaParaContorno, ErroDePerfil, SEGMENTOS_ARCO_PADRAO } from '../perfil2d.js';
 import { ehSimples } from '../contorno.js';
+import { bordaDaAbertura } from './abertura-por-contorno.js';
 
 /** A aba sai com as faces lisas até este ângulo, como as da superfície: a dobra arredonda a sombra e a ponta e a espessura ficam vivas. */
 const LISO_DA_ABA = valorDoLiso(30);
@@ -90,6 +97,60 @@ function registroDaVarredura({ passo, origemId, nome, aba, superficie, gaiola, c
     secoes: lidas.map(({ s, p, e, d }) => ({ s, p, e, d })),
     extremos: fechada ? null : [lidas[0].anel, lidas[lidas.length - 1].anel],
   };
+}
+
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const emMm = (p) => `[${p.map((x) => Number((x * 1000).toFixed(2))).join(', ')}] mm`;
+
+/* A linha sobre a borda de fora de uma abertura por contorno: uma cadeia fechada, com o lado da chapa. */
+function linhaNaAbertura(st, a) {
+  const b = bordaDaAbertura(st, a.superficie);
+  if (b.erro) return { erro: ['superficie', b.erro] };
+  let lado;
+  try { lado = ladoDaBorda(b.faces, b.cadeia); } catch (e) {
+    if (!(e instanceof ErroDoFriso)) throw e;
+    return { erro: ['superficie', `a borda do vão da abertura ${a.superficie.id}, perto de ${emMm(b.pontos[e.indice ?? 0])}: ${e.motivo}; o friso lê a borda como o passo da abertura a deixou`] };
+  }
+  const pontos = b.pontos; const nomeDoIndice = (j) => `${emMm(pontos[Math.min(j, pontos.length - 1)])} da borda do vão`;
+  return { cadeias: [{ pontos, normais: b.normais, fechada: true, espelhada: false, lado, nomeDoIndice, nomes: [], passo: 1 }], espessura: b.espessura, passo: b.passo, gaiola: null };
+}
+
+/** afinarNosCantos(cadeia, perfil) -> cadeia: tira da volta os pontos que deixam um trecho mais curto que o recuo da esquadria
+ *  nas duas pontas dele, com folga de metade. O recuo num ponto é o de `varrerPerfil`: o perfil fica no plano bissetor, e cada
+ *  ponto dele recua ao longo da direção da curva o quanto a sua projeção nela vezes a tangente de meio giro; a linha sobre a chapa
+ *  curva também gira pela normal, e aí o recuo vem de v. Do trecho de pior falta sai a ponta de giro menor, e a conta se refaz;
+ *  o canto mais vivo nunca sai. */
+export function afinarNosCantos(c, perfil) {
+  const unit = (a) => { const l = Math.hypot(a[0], a[1], a[2]); return l > 0 ? [a[0] / l, a[1] / l, a[2] / l] : null; };
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  let pontos = c.pontos; let normais = c.normais;
+  for (let volta = 0; volta < c.pontos.length && pontos.length > 3; volta++) {
+    const n = pontos.length;
+    const giro = []; const recuo = [];
+    for (let k = 0; k < n; k++) {
+      const tA = unit(sub(pontos[k], pontos[(k - 1 + n) % n])); const tS = unit(sub(pontos[(k + 1) % n], pontos[k]));
+      const cos = Math.max(-1, Math.min(1, dot(tA, tS)));
+      giro.push(Math.acos(cos));
+      const T = unit([tA[0] + tS[0], tA[1] + tS[1], tA[2] + tS[2]]); const K = unit(sub(tS, tA));
+      const N = T && unit(sub(normais[k], T.map((x) => x * dot(normais[k], T))));
+      if (!T || !K || !N) { recuo.push(0); continue; }
+      const B = cruz(N, T); const tanMeio = Math.tan(Math.min(giro[k], 3.1) / 2);
+      recuo.push(Math.max(...perfil.map(([u, v]) => Math.abs(u * dot(B, K) + v * dot(N, K)))) * tanMeio);
+    }
+    let pior = -1; let falta = 0;
+    for (let k = 0; k < n; k++) {
+      const j = (k + 1) % n;
+      const f = 1.5 * (recuo[k] + recuo[j]) - Math.hypot(...sub(pontos[j], pontos[k]));
+      if (f > falta) { falta = f; pior = k; }
+    }
+    if (pior < 0) break;
+    const j = (pior + 1) % n;
+    const sai = giro[j] < giro[pior] || (giro[j] === giro[pior] && j > pior) ? j : pior;
+    pontos = pontos.filter((_, k) => k !== sai); normais = normais.filter((_, k) => k !== sai);
+  }
+  const nomeDoIndice = (j) => `${emMm(pontos[Math.min(j, pontos.length - 1)])} da borda do vão`;
+  return { ...c, pontos, normais, nomeDoIndice };
 }
 
 export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem }) {
@@ -292,9 +353,14 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     const extra = Object.keys(linha).filter((k) => k !== 'nome' && k !== 'pontos');
     if (extra.length) return grita(st, i, 'friso', 'linha', `a linha tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome e pontos`);
     if (typeof linha.nome !== 'string' || !linha.nome) return grita(st, i, 'friso', 'linha', `a linha precisa de nome, como ${EXEMPLO_DE_LINHA}`);
-    if (!Array.isArray(linha.pontos) || linha.pontos.length < 2) return grita(st, i, 'friso', 'linha', `a linha ${citar(linha.nome)} precisa de dois pontos ou mais; repita o primeiro no fim para fechar a volta`);
-    const fechada = linha.pontos.length > 2 && iguais(linha.pontos[0], linha.pontos[linha.pontos.length - 1]);
-    if (fechada && linha.pontos.length < 4) return grita(st, i, 'friso', 'linha', `a volta ${citar(linha.nome)} precisa de três pontos distintos ou mais`);
+    /* sobre a borda de uma abertura por contorno, a linha é a borda de fora do vão inteira: só o nome */
+    const daAbertura = !!a.superficie && typeof a.superficie === 'object' && a.superficie.op === 'aberturaPorContorno';
+    if (daAbertura) {
+      if (linha.pontos != null) return grita(st, i, 'friso', 'linha', `sobre a abertura ${a.superficie.id} a linha ${citar(linha.nome)} é a borda de fora do vão inteira, e não leva pontos; escreva só { nome: ${citar(linha.nome)} }`);
+      if (a.variacao != null) return grita(st, i, 'friso', 'variacao', 'a variacao cita pontos nomeados da linha, e a borda de uma abertura por contorno não tem nomes; tire variacao');
+    } else if (!Array.isArray(linha.pontos) || linha.pontos.length < 2) return grita(st, i, 'friso', 'linha', `a linha ${citar(linha.nome)} precisa de dois pontos ou mais; repita o primeiro no fim para fechar a volta`);
+    const fechada = daAbertura || (linha.pontos.length > 2 && iguais(linha.pontos[0], linha.pontos[linha.pontos.length - 1]));
+    if (!daAbertura && fechada && linha.pontos.length < 4) return grita(st, i, 'friso', 'linha', `a volta ${citar(linha.nome)} precisa de três pontos distintos ou mais`);
     /* pontas: 'aberta' tampa o perfil plano, 'fechada' encolhe o perfil até um ponto; a volta não tem ponta */
     let pontas = ['aberta', 'aberta'];
     if (a.ponta != null) {
@@ -343,7 +409,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     if (a.superficie != null) {
       if (a.normal != null) return grita(st, i, 'friso', 'normal', 'normal só vale na polilinha; sobre a superfície o friso segue a normal da chapa');
       let r;
-      try { r = linhaNaSuperficie(st, a, linha.pontos, fechada); } catch (e) { return grita(st, i, 'friso', 'superficie', String(e.message)); }
+      try { r = daAbertura ? linhaNaAbertura(st, a) : linhaNaSuperficie(st, a, linha.pontos, fechada); } catch (e) { return grita(st, i, 'friso', 'superficie', String(e.message)); }
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
       espessuraDaChapa = r.espessura; passoDaChapa = r.passo; gaiolaDaChapa = r.gaiola;
       if (comAba) {
@@ -410,7 +476,8 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     }
 
     const vertices = []; const faces = []; const lateral = []; const tampas = [];
-    for (const c of cadeias) {
+    for (const c0 of cadeias) {
+      const c = daAbertura ? afinarNosCantos(c0, comAba ? perfil.map(([w, v]) => [c0.lado * w, v]) : perfil) : c0;
       let s;
       try {
         let doPerfil = comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil; let aVariacao = null; let trechoMaximo = null;
