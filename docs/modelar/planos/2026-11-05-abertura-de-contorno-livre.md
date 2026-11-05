@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/operacoes/friso.js`, `src/autoria/molduras-do-vao.js`, `tools/fixtures/abertura-de-prova/`, `docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/`
+**Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/operacoes/friso.js`, `src/autoria/molduras-do-vao.js`, `tools/fixtures/abertura-de-prova/`, `docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/`, `procedural/nucleo/fixtures/motor-r00-baseline.json` e `procedural/nucleo/catalogo.test.mjs` no registro da operação, `.claude/skills/criar-peca/references/operacoes-procedurais.md` na documentação dela
 
 **Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-05
 
@@ -59,6 +59,8 @@ Se nem o corte depois nem o corte antes da subdivisão passarem no gate 1 na pe�
 ## Andamento
 
 A fatia 1 fechou em 2026-11-05 sem técnica aprovada, com as medidas nas [provas](../banco-de-provas/abertura-de-contorno-2026-11-05/README.md): o corte depois da subdivisão acerta a forma e deixa triângulos sem área junto da costura, e o corte na gaiola sai limpo mas afasta a chapa quase 3 mm e se dobra em 4 de 10 posições. A recomendação levada à pessoa é o corte depois com uma limpeza da costura dentro da operação nova.
+
+As fatias 2 e 3 fecharam em 2026-11-05. A operação `aberturaPorContorno` corta a chapa pelo `subtrair` do núcleo, chamado de dentro dela, e limpa a costura em três passos (funde os pontos rentes ao contorno, junta as lascas e tira o vértice entre duas faces). Nas 13 posições do teste a peça sai sem triângulo sem área nem lasca, as duas bordas a 0,125 mm do desenho com 32 segmentos, o bico com 39,00 graus contra 40,38 desenhados e a espessura de 2,000 mm na borda; o `friso` aceita a borda da abertura e a lente sai citável. Falta a fatia 4: a moldura do vão, o recuo da lente (no lugar, ela atravessa a aba em 3 mm), a documentação e a aprovação da pessoa por imagem.
 
 ## Fechamento
 
