@@ -8,7 +8,6 @@ import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { execucaoDe } from '../../../src/autoria/varrer-parametros.js';
-import { conferirFamiliaNosTresPontos } from '../../../tools/modelar/familia-com-esboco.mjs';
 import { conferirMontagemDaFamilia } from '../../../tools/modelar/montagem-da-familia.mjs';
 import { ErroChamadaDeFamilia, FAMILIAS, chamar, criarRegistroDeFamilias } from '../index.js';
 import { DOBRADICA } from './index.js';
@@ -173,15 +172,6 @@ describe('a malha sem detalhes microscópicos', () => {
       expect(Math.min(...xs)).toBeCloseTo(0, 6);
       expect(Math.max(...xs)).toBeCloseTo(geo.xExterno, 6);
     }
-  });
-});
-
-describe('a conferência com o esboço', () => {
-  it('o componente dobradica do esboço contém a peça no mínimo, no médio e no máximo', () => {
-    const r = conferirFamiliaNosTresPontos({ familia: DOBRADICA });
-    expect(r.estado).toBe('conferida');
-    expect(r.pontos.map((p) => p.estado)).toEqual(['conferida', 'conferida', 'conferida']);
-    for (const ponto of r.pontos) expect(ponto.portas).toEqual([{ id: 'eixo-do-pino', estado: 'no-lugar' }]);
   });
 });
 

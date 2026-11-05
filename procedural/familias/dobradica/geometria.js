@@ -4,8 +4,7 @@
    declarado e a conta analítica do encosto vêm da mesma conta. Os parâmetros entram em milímetro, como o contrato.
 
    O QUADRO. O eixo do pino é y e está no centro (y de -altura/2 a +altura/2); as folhas ficam em +x (a folha D, a que
-   fica) e em -x (a folha E, a que gira), com a espessura em z, centrada no plano do pino: é o quadro do componente
-   `dobradica` do esboço, de modo que a conferência com o esboço compara a mesma posição. Com o ângulo 0 as duas folhas
+   fica) e em -x (a folha E, a que gira), com a espessura em z, centrada no plano do pino. Com o ângulo 0 as duas folhas
    estão no mesmo plano (dobradiça aberta); a folha E gira de 0 até o encosto, em direção a -z, e o eixo das portas é -y
    para o ângulo positivo fechar a dobradiça nesse sentido.
 

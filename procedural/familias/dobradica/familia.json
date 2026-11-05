@@ -47,17 +47,5 @@
     "pino": [
       "O pino atravessa todos os nós de ponta a ponta, concêntrico com eles?"
     ]
-  },
-  "esboco": {
-    "componente": "dobradica",
-    "mapa": { "altura": "altura", "diametroPino": "diametroPino", "espessura": "espessura", "larguraAba": "larguraFolha" },
-    "conferencia": {
-      "versao": 1,
-      "partes": { "pino": "pino", "nosD": "pino", "nosE": "pino", "folhaD": "abaD", "folhaE": "abaE" },
-      "portas": [
-        { "porta": "eixo-do-pino", "volume": "pino", "lado": "-y" }
-      ],
-      "tolerancia": { "envelope": 8, "porta": 0.5 }
-    }
   }
 }
