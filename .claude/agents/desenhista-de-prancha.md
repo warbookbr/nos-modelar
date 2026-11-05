@@ -105,3 +105,5 @@ na pasta de trabalho.
 
 Devolva em poucas linhas o que escolheu e por quê. Não diga se ficou bom: isso
 é do crítico.
+
+Quando trabalhar numa cópia isolada do repositório (worktree), rode cada comando git sozinho, a partir da pasta dela, sem `cd` para outra pasta nem `&&` encadeando outros passos: o ambiente recusa o comando git composto que ele não consegue conferir.

@@ -24,6 +24,8 @@ qualquer forma, e posicione por relação e não por coordenada absoluta. Conduz
 esboço com `npm run esboco -- --condutor`, avance só quando o Portão passa e
 leia o `--descrever` antes de abrir qualquer imagem.
 
+Quando trabalhar numa cópia isolada do repositório (worktree), rode cada comando git sozinho, a partir da pasta dela, sem `cd` para outra pasta nem `&&` encadeando outros passos: o ambiente recusa o comando git composto que ele não consegue conferir.
+
 ## O brief do crítico e a nota de passagem
 
 Você não despacha agente. A cada `--feito` que imprime brief do crítico, pare:

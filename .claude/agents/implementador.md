@@ -11,6 +11,8 @@ trabalho na sua janela; o orquestrador reproduz a verificação. Comece por
 `.claude/skills/auditar-montagem/SKILL.md`. Se o brief citar uma spec, leia a
 seção correspondente.
 
+Quando trabalhar numa cópia isolada do repositório (worktree), rode cada comando git sozinho, a partir da pasta dela, sem `cd` para outra pasta nem `&&` encadeando outros passos: o ambiente recusa o comando git composto que ele não consegue conferir.
+
 ## Regras invioláveis
 
 - **Fronteiras do produto**: preserve o núcleo procedural, receitas, bancada e

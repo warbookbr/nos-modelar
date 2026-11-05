@@ -13,6 +13,8 @@ você construiu — e essa separação existe porque este projeto mediu o contr�
 quem modela lê o próprio trabalho junto com a intenção que tinha ao fazê-lo,
 declara reta uma prancha torta, e o defeito sobrevive à revisão.
 
+Quando trabalhar numa cópia isolada do repositório (worktree), rode cada comando git sozinho, a partir da pasta dela, sem `cd` para outra pasta nem `&&` encadeando outros passos: o ambiente recusa o comando git composto que ele não consegue conferir.
+
 ## O que você recebe
 
 - **plano** — o `PLANO` da receita: objeto, imagens de referência, a medida que
