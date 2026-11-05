@@ -55,6 +55,8 @@ export const TABELA = {
   alturaDoEncontro: 12,
   /* Raio das duas quinas de trás, em planta. */
   raioDaTraseira: 75,
+  /* Raio do canto de cima na parede de trás, onde o topo é plano até a parede. */
+  raioDaQuinaDeTras: 10,
   /* Raio das duas quinas da frente da parte de pé, em planta (decisão da
      pessoa em 2026-11-05: ficam dentro do anel da cintura, como as de trás). */
   raioDaFrenteDoPe: 75,
@@ -86,10 +88,6 @@ export function derivar(t = TABELA) {
   return { R, yEixo, h, zFace, zTransicao, Rs, Ra, e, ...gaiola(t) };
 }
 
-const pot = (v) => v ** -6;
-/* mínimo suave entre dois raios: nenhum dos dois é passado */
-const minimoSuave = (a, b) => (pot(a) + pot(b)) ** (-1 / 6);
-
 /* A gaiola, em milímetro até o fim, e em metro nos pontos que saem.
  *
  * Cada anel é o contorno da peça cortada por um plano x = constante: um laço em L de `n` pontos, que sobe pela parede de
@@ -119,7 +117,10 @@ function gaiola(t) {
   const raioDaSecao = (z) => {
     const pre = rcA + (L - rcA) * S(z);
     const w = larg(z);
-    return w < L - 1e-9 ? minimoSuave(pre, w - 2) : pre;
+    /* na traseira o topo fica plano até a parede e o canto só cresce com a largura: quem arredonda ali é a quina em planta */
+    if (w >= L - 1e-9) return pre;
+    const u = Math.min(1, Math.max(0, (w - (L - rq)) / rq));
+    return t.raioDaQuinaDeTras + (pre - t.raioDaQuinaDeTras) * u * u * (3 - 2 * u);
   };
   /* altura do topo da parte deitada em (x, z); a de baixo é a espelhada em torno do eixo */
   const yTopo = (x, z) => {
@@ -136,10 +137,7 @@ function gaiola(t) {
 
   /* planos de corte, de x = -L a x = L: pelos arcos das quinas e dos cantos, e alguns no trecho reto de trás */
   const lista = [];
-  /* o domo da traseira: na parede de trás a seção tem meia largura L - rq e o canto cai de uma vez, em arco */
-  const rTras = minimoSuave(rcA, L - rq - 2);
-  lista.push(0);
-  for (let k = 1; k <= 4; k++) lista.push(L - rq - rTras + rTras * Math.sin((Math.PI / 2) * (k / 4)));
+  for (let k = 0; k <= 3; k++) lista.push(((L - rq) * k) / 3);
   for (let k = 1; k <= t.estacoesDaQuina; k++) lista.push(L - rq + rq * Math.sin((Math.PI / 2) * (k / t.estacoesDaQuina)));
   for (let k = 0; k <= t.estacoesDoCanto; k++) lista.push(L - rcA + rcA * Math.sin((Math.PI / 2) * (k / t.estacoesDoCanto)));
   lista.sort((p, q) => p - q);
