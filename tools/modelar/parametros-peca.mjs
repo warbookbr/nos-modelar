@@ -81,7 +81,7 @@ function erroDeUso(mensagem) {
 }
 
 /** Diagnostica um alvo já resolvido; devolve o registro, nunca lança. */
-async function diagnosticarAlvo(alvo, raiz = REPO, { sondar = true } = {}) {
+async function diagnosticarAlvo(alvo, raiz = REPO, { sondar = true, apenas = null, aoSondar = null } = {}) {
   let caminho;
   try {
     caminho = resolverCaminhoReceita(alvo, { raiz });
@@ -106,7 +106,7 @@ async function diagnosticarAlvo(alvo, raiz = REPO, { sondar = true } = {}) {
       totais: { declarados: 0, vivos: 0, inertes: 0 },
     };
   }
-  return { alvo, ...diagnosticarParametros(receita, { sondar }) };
+  return { alvo, ...diagnosticarParametros(receita, { sondar, apenas, aoSondar }) };
 }
 
 function tabelaDoAcervo(registros) {
@@ -170,7 +170,7 @@ function tabelaDoAcervo(registros) {
  * `raiz` (CLI: `--raiz=pasta`) aponta um acervo reduzido dentro do repositório,
  * com a mesma estrutura de pastas; o padrão é o acervo real.
  */
-export async function parametrosReutilizavel({ alvo = null, acervo = false, completo = false, raiz = null, sondar = true } = {}) {
+export async function parametrosReutilizavel({ alvo = null, acervo = false, completo = false, raiz = null, sondar = true, apenas = null, aoSondar = null } = {}) {
   let base;
   try { base = raizDoAcervo(raiz); } catch (erro) { return erroDeUso(erro.message); }
   if (acervo && alvo) {
@@ -197,7 +197,7 @@ export async function parametrosReutilizavel({ alvo = null, acervo = false, comp
     };
   }
 
-  const registro = await diagnosticarAlvo(alvo, base, { sondar });
+  const registro = await diagnosticarAlvo(alvo, base, { sondar, apenas, aoSondar });
   if (!registro.carregou) {
     return {
       ok: false,
@@ -219,22 +219,45 @@ export async function parametrosReutilizavel({ alvo = null, acervo = false, comp
   };
 }
 
+const AJUDA = `npm run parametros -- <peça> [opções]  (node tools/modelar/parametros-peca.mjs)
+Diz quais parâmetros da receita mudam a peça medida. Cada parâmetro é sondado com um valor vizinho, e cada sonda refaz
+a peça inteira: numa peça grande o diagnóstico completo leva horas, e o progresso sai no stderr.
+
+  --parametros=<a,b>  sonda só os parâmetros com esses nomes ou prefixos (ex.: --parametros=farol_,lanterna_topo_y)
+  --completo          lista também os parâmetros inertes um a um
+  --acervo            varre o acervo inteiro (não aceita peça junto)
+  --raiz=<pasta>      acervo reduzido dentro do repositório
+`;
+
 function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['raiz'],
-      bandeiras: ['acervo', 'completo'],
+      opcoes: ['raiz', 'parametros'],
+      bandeiras: ['acervo', 'completo', 'ajuda'],
       posicional: { nome: 'a receita', obrigatorio: false },
     });
   } catch (erro) {
     return erroDeUso(erro.message);
   }
+  if (lido.bandeira('ajuda')) return { codigo: 0, stdout: AJUDA, stderr: '', resultado: null };
+  const apenas = lido.opcao('parametros')?.split(',').map((p) => p.trim()).filter(Boolean) ?? null;
+  if (apenas && !apenas.length) return erroDeUso('--parametros veio vazio; informe nomes ou prefixos de parâmetro ou omita a opção');
+  /* O progresso vai para o stderr a cada sonda: sem ele, o diagnóstico de uma peça grande ficava dez minutos mudo e
+     quem chamava não distinguia demora de travamento. */
+  const inicio = Date.now();
+  const aoSondar = ({ nome, indice, total }) => {
+    const passados = (Date.now() - inicio) / 1000;
+    const resta = indice ? ` (cerca de ${Math.round((passados / indice) * (total - indice) / 60)} min restantes)` : '';
+    process.stderr.write(`  sondando ${indice + 1}/${total}: ${nome}${resta}\n`);
+  };
   return parametrosReutilizavel({
     alvo: lido.posicional,
     acervo: lido.bandeira('acervo'),
     completo: lido.bandeira('completo'),
     raiz: lido.opcao('raiz') ?? null,
+    apenas,
+    aoSondar,
   });
 }
 

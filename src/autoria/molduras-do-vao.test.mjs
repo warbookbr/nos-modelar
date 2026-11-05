@@ -382,7 +382,8 @@ describe('o descrever da peça', () => {
     const r = await descreve(receita(c, ['moldura']));
     expect(r.stderr).not.toMatch(/MOLDURA EM VOLTA/);
     expect(r.stdout).toMatch(/MOLDURA EM VOLTA DO VÃO — 1 vão\(s\) declarado\(s\)/);
-    expect(r.stdout).toMatch(/janela: frisos 'moldura'; borda de 802,\d mm, 100,0% da borda coberta, 0 trecho\(s\) descoberto\(s\), nenhuma emenda; borda inteira; tolerância 0,5 mm/);
+    /* no resumo, o que é comum aos vãos limpos sai no cabeçalho do grupo e a linha do vão guarda só os frisos e a borda */
+    expect(r.stdout).toMatch(/1 vão\(s\) com 100,0% da borda coberta, 0 trecho descoberto, nenhuma emenda, borda inteira, tolerância 0,5 mm:\n {4}janela: frisos 'moldura'; borda de 802,\d mm/);
     expect(r.resultado.molduras.ok).toBe(true);
   });
 

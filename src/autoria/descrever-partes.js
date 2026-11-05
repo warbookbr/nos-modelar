@@ -819,10 +819,16 @@ export function formatarDescricao(descricao, { peca = null, casas = 6, resumo = 
 
   linhas.push('HIERARQUIA DE PARTES — pai semântico declarado, não transformação herdada');
   const hierarquia = Array.isArray(descricao.hierarquia) ? descricao.hierarquia : [];
-  const linhasHierarquia = hierarquia.map((item) => [item.nome, item.pai ?? '— raiz —']);
-  linhas.push(...(linhasHierarquia.length
-    ? tabela([{ titulo: 'parte' }, { titulo: 'pai' }], linhasHierarquia)
-    : ['(nenhuma parte)']));
+  /* No resumo, a parte na raiz não ganha linha: numa peça de 64 partes todas na raiz eram 64 linhas iguais
+     que o agente lia sem decidir nada (achado de 2026-11-05). Só a parte com pai aparece, e a raiz vira contagem. */
+  const naRaiz = hierarquia.filter((item) => !item.pai).length;
+  const linhasHierarquia = (resumo ? hierarquia.filter((item) => item.pai) : hierarquia)
+    .map((item) => [item.nome, item.pai ?? '— raiz —']);
+  if (!hierarquia.length) linhas.push('(nenhuma parte)');
+  else {
+    if (linhasHierarquia.length) linhas.push(...tabela([{ titulo: 'parte' }, { titulo: 'pai' }], linhasHierarquia));
+    if (resumo && naRaiz) linhas.push(`${naRaiz} parte(s) na raiz${linhasHierarquia.length ? ', fora as de cima' : ''}; a lista inteira sai com --completo.`);
+  }
   linhas.push('');
 
   linhas.push('CAIXA POR PARTE — envelope da parte inteira, alinhado aos eixos');
@@ -867,7 +873,8 @@ export function formatarDescricao(descricao, { peca = null, casas = 6, resumo = 
   linhas.push('');
 
   linhas.push('RELAÇÃO ENTRE PARTES — medida corpo a corpo, pelo par de corpos que decide');
-  linhas.push(
+  if (resumo) linhas.push('vão por eixo: positivo é folga, negativo é sobreposição; a legenda inteira sai com --completo.');
+  else linhas.push(
     'vão por eixo: positivo é folga, negativo é sobreposição, e é sempre o da caixa. '
     + 'distância: em `folga` é a distância entre os corpos; em `interpenetra` é a menor '
     + 'profundidade que separa as caixas dos dois. relação: das caixas, e corrigida pelo '

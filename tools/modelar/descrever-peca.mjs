@@ -475,7 +475,7 @@ export async function descreverPecaReutilizavel({
       return falha(`NÃO CONSEGUI CONFERIR OS VÃOS\n  ${erro.message}`);
     }
     if (molduras.declarados || molduras.aberturas.length) {
-      stdout += formatarVaos(molduras);
+      stdout += formatarVaos(molduras, { resumo });
       if (!molduras.ok) {
         stderr += `\n${molduras.problemas.length} PROBLEMA(S) NA MOLDURA EM VOLTA DO VÃO\n${molduras.problemas.map((t) => `  ${t}`).join('\n')}\n`;
         falhou = true;
@@ -659,17 +659,32 @@ export async function descreverPecaReutilizavel({
   };
 }
 
+const AJUDA = `npm run descrever -- <peça> [opções]  (node tools/modelar/descrever-peca.mjs)
+Mede a peça pela malha e dá o veredito de contato, forma prometida e vãos. A saída padrão é o resumo.
+
+  --partes=<a,b>         só essas partes, com as relações entre elas
+  --subarvore=<raiz>     a parte e tudo que tem ela como pai
+  --completo             as tabelas inteiras: caixa por eixo, todas as relações, a hierarquia e a legenda
+  --casas=<0..12>        casas decimais (padrão 6)
+  --listar               lista as peças
+  --sem-veredito         mede sem conferir contato e forma (a saída avisa)
+  --composicoes=<módulo> registro de composições a usar
+
+Para conferir um encaixe, peça as duas partes: --partes=a,b. O resumo já traz todo contato e as folgas menores.
+`;
+
 function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['partes', 'subarvore', 'casas', OPCAO_COMPOSICOES],
-      bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito'],
+      bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito', 'ajuda'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
     return erroDeUso(erro.message);
   }
+  if (lido.bandeira('ajuda')) return { codigo: 0, stdout: AJUDA, stderr: '', resultado: null };
   const partesDeclaradas = lido.opcao('partes');
   const partes = partesDeclaradas === null
     ? []

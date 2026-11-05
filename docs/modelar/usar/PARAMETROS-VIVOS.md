@@ -17,6 +17,12 @@ npm run parametros -- --acervo
 O primeiro diagnostica uma receita; o segundo faz o retrato do acervo inteiro em
 alguns segundos. `--completo` lista os inertes um a um em vez de resumir.
 
+Cada parâmetro é sondado refazendo a peça inteira, e numa peça grande o
+diagnóstico completo leva horas (o furgão tem 177 parâmetros e 34 s por
+execução). `--parametros=<a,b>` sonda só os que têm esses nomes ou prefixos,
+com a mesma resposta do diagnóstico completo para cada um, e os outros saem
+contados como não sondados. O progresso de cada sonda sai no stderr.
+
 ## O que ele responde
 
 Para cada número dentro de `PARAMS`, o comando sonda um valor vizinho, mede a
