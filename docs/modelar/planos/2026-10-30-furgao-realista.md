@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`
+**Território:** `procedural/pecas/furgao-realista/referencias/`, `procedural/pecas/furgao-realista/rodadas/`, `procedural/pecas/furgao-realista/pedidos.json`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
@@ -128,3 +128,5 @@ Etapa 6, as luzes e a grade, feita em 2026-11-04: dois faróis e a grade entre e
 Na etapa 7, em 2026-11-05, a pessoa achou as luzes pouco estilizadas e mostrou como caráter a foto de um furgão real, que não entra no repositório. Entre as opções desenhadas em [farol-dianteiro](../../../procedural/pecas/furgao-realista/referencias/farol-dianteiro.png) e [lanterna-traseira](../../../procedural/pecas/furgao-realista/referencias/lanterna-traseira.png), ela escolheu o farol A e a lanterna 1. O farol fica afinado, com a ponta de dentro descendo em diagonal até a grade e a de fora contornando a quina pelo paralama, e o pisca deixa de ser luz solta no paralama e vira a ponta âmbar do mesmo conjunto. A grade cresce para cerca de 800 por 400 mm, desce até o para-choque e ganha barras horizontais. A lanterna sobe de 720 a 1.240 mm, larga na traseira, contornando a quina e entrando na lateral. O teto de 64 partes continua: o pisca segue como parte própria dentro do conjunto do farol, e os faróis de neblina ficam de fora.
 
 O modelador fez as luzes escolhidas, e a pessoa achou o farol estranho antes do crítico: o topo pulava de um anel ao outro num degrau e a ponta em bico saiu arredondada, porque o vão só segue as linhas da gaiola e a subdivisão arredonda os cantos dele. A pessoa notou que o esboço prometia formas que o núcleo não entrega e, em 2026-11-05, pôs o furgão em pausa para abrir o plano da [abertura de contorno livre](2026-11-05-abertura-de-contorno-livre.md) e concluir o da [porta de entrada dos agentes](encerrados/2026-11-05-porta-de-entrada-dos-agentes.md). As luzes feitas ficaram fora da main, sem aceite, e o furgão volta pelo farol com a ferramenta nova.
+
+Com o furgão em pausa, a pessoa deixou em 2026-11-05 que a receita (`receita.js` e a pasta `receita/` que a divisão criar) passe ao plano da [navegação de receitas](2026-11-05-navegacao-de-receitas.md), que a divide por assunto com a malha igual; ela volta a este território quando aquele plano fechar.

@@ -4,10 +4,11 @@
 
 **Planos ativos:**
 
-1. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: as rodas e o forro dos arcos (etapa 4) em diante.
+1. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/` sem a receita, cedida à navegação de receitas, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: as rodas e o forro dos arcos (etapa 4) em diante.
 2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`. Em aberto: o ombro refeito na opção B escolhida pela pessoa, com o encontro sem quina, a luz rasante na peça com emenda sombreada e as etapas que não perdem o aceite, e depois as partes restantes e a exportação do braço montado.
 3. [abertura de contorno livre](2026-11-05-abertura-de-contorno-livre.md). Território no plano. Em aberto: cortar a chapa depois ou antes da subdivisão.
 4. [esboço pelo núcleo](2026-11-05-esboco-pelo-nucleo.md). Território no plano. Em aberto: o inventário do que usa o esboço de hoje.
+5. [navegação de receitas](2026-11-05-navegacao-de-receitas.md). Território no plano, com a receita do furgão cedida pelo plano dele. Em aberto: o comando do mapa da receita.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
@@ -23,7 +24,7 @@ A lista está em ordem de prioridade. A ordem desempata quando dois planos preci
 receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16, com as oito peças no núcleo, a montagem
 auditada e o avião aprovado pela pessoa; a picape, o braço robótico, o carrinho de mão e a empilhadeira vêm em seguida, na ordem
 que a pessoa escolher. [As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14, e o código delas saiu em 2026-10-25.
-Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) e [navegação de receitas](2026-11-05-navegacao-de-receitas.md).
+Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
 

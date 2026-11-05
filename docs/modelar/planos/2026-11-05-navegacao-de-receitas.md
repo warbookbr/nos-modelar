@@ -1,12 +1,12 @@
 # Navegação de receitas — o agente acha o trecho da receita que precisa sem lê-la inteira
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar o plano
+**Território:** `tools/modelar/mapa-da-receita.mjs`, `tools/modelar/mapa-da-receita.test.mjs`, `procedural/pecas/furgao-realista/receita.js`, `procedural/pecas/furgao-realista/receita/`, `docs/modelar/banco-de-provas/navegacao-de-receitas-2026-11-05/`, `.claude/agents/modelador.md`
 
-**Responsável:** a definir
+**Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-05
 
-**Repositório e base:** este repositório
+**Repositório e base:** este repositório, a partir da main de 2026-11-05
 
 ## Problema observado
 
@@ -25,8 +25,9 @@ Um comando dá o mapa de qualquer receita do acervo (as seções da `TABELA`, as
 
 - o comando do mapa, para qualquer receita;
 - a convenção de divisão, com o tamanho que a dispara;
-- a divisão da receita maior, provada pela malha igual;
-- a medição antes e depois num modelador real.
+- a divisão da receita maior, a do furgão, com 2.369 linhas (a seguinte, a das asas do avião, tem 838), provada pela malha igual; o plano do furgão cedeu a receita enquanto está em pausa;
+- a medição antes e depois num modelador real;
+- uma linha na definição do modelador apontando o mapa da receita antes de ler a receita.
 
 ## Excluído
 
