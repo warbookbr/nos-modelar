@@ -1228,7 +1228,7 @@
 
 ## procedural/pecas/braco-robotico/partes/braco/
 
-- `receita.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
+- `receita.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro, numa malha única por subdivisão de uma gaiola.
 
 ## procedural/pecas/braco-robotico/partes/braco/rodadas/
 

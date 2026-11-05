@@ -197,7 +197,7 @@
     },
     {
       "instancia": "braco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
       "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024",
       "reaberturas": [
@@ -215,7 +215,16 @@
           },
           "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015"
         }
-      ]
+      ],
+      "aceite": {
+        "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
