@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1738 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1746 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -144,6 +144,10 @@
 
 - `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
 - `MEDICAO-DE-TOKENS-2026-10.md` — Onde vão os tokens do esbocista (2026-10-07)
+
+## docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/
+
+- `README.md` — Abertura de contorno livre — fatia 1, as duas técnicas medidas
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
@@ -1130,6 +1134,8 @@
 
 ## procedural/nucleo/operacoes/
 
+- `abertura-por-contorno.js` — abertura-por-contorno.js — PROTÓTIPO da fatia 1 do plano `docs/modelar/planos/2026-11-05-abertura-de-contorno-livre.md`, ainda sem registro como operação: ne…
+- `abertura-por-contorno.test.ts` — abertura-por-contorno.test.ts — a linha de base da fatia 1 do plano da abertura de contorno livre, sobre a peça de teste `tools/fixtures/abertura-de-prova/`,…
 - `arestas-em-cadeia.js` — arestas-em-cadeia.js — arredondar de uma vez a cadeia de arestas que continua em tangência a partir da escolhida.
 - `arestas-em-grupos.js` — arestas-em-grupos.js — arredondar ou chanfrar uma aresta cujo lado é uma face PARTIDA em várias coplanares.
 - `arranja-contrato.test.ts` — arranja-contrato.test.ts — o que a op `arranja` PROMETE no comentário e não estava afirmado em lugar nenhum.
@@ -2107,6 +2113,17 @@
 
 - `requisitos-da-peca-de-prova.js` — requisitos-da-peca-de-prova.js — o que uma peça precisa TER para as guardas provarem o que dizem provar.
 - `requisitos-da-peca-de-prova.test.mjs` — requisitos-da-peca-de-prova.test.mjs — a régua da peça de prova mede o que as guardas realmente exigem, e reprova quando falta.
+
+## tools/fixtures/abertura-de-prova/
+
+- `chapa.js` — chapa.js — as medidas e a geometria comum às duas versões da abertura de prova (`receita.js`, o corte da chapa já subdividida, e `corte-na-gaiola.js`, o cort…
+- `corte-na-gaiola.js` — corte-na-gaiola.js — a abertura de prova pela segunda técnica que a fatia 1 mediu: o contorno corta a gaiola de 9 por 9 pontos antes da subdivisão (`cortarGa…
+- `medir.mjs` — medir.mjs — as medidas do gate 2 do plano da abertura de contorno livre sobre a malha de uma peça com vão por contorno: a borda do vão achada na malha, o des…
+- `receita.js` — abertura-de-prova — a peça de teste neutra do plano da abertura de contorno livre: uma chapa curva de subdivisão com 2 mm de espessura e um vão de contorno l…
+
+## tools/fixtures/abertura-de-prova/referencias/
+
+- `alvo.md` — Alvo da abertura de prova
 
 ## tools/fixtures/acervo/peca-de-prova/
 
