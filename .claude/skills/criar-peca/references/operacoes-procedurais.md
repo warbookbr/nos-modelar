@@ -692,7 +692,7 @@ um laço e um do outro. Os vértices extraordinários que isso deixa a gaiola de
 declarados em `aneis[nome].extraordinarios` com a valência, e o resto da malha é de
 quadriláteros regulares. Toda face do anel segue o sentido das faces da grade, e a que
 sai ao contrário, um laço que se cruza num canto de lados muito diferentes, faz o anel
-gritar com os pontos. As chapas de prova dos anéis são `procedural/nucleo/fixtures/gaiola-aneis-prova.js`, `gaiola-gota-prova.js` e `gaiola-borda-livre-prova.js`.
+gritar com os pontos. As chapas de prova dos anéis são `procedural/nucleo/fixtures/gaiola-aneis-prova.js`, `procedural/nucleo/fixtures/gaiola-gota-prova.js` e `procedural/nucleo/fixtures/gaiola-borda-livre-prova.js`.
 
 Meça os pontos do anel com peso, e não com cota exata: a cota exata põe 56 faces viradas
 na superfície em nível 2 junto dos cantos da chapa da fatia 1, e a de peso 5 deixa a chapa
