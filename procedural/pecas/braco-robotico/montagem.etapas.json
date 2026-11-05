@@ -68,17 +68,17 @@
     },
     {
       "instancia": "ombro",
-      "estado": "fixa",
+      "estado": "quebrada",
       "juntas": [
         {
           "relacao": "ombroSentaNoAnel",
           "com": "anelCintura",
-          "satisfeita": true,
+          "satisfeita": false,
           "medidas": {
             "disponiveis": true,
             "alinhamento": 1,
             "descentro": 0,
-            "sobreposicaoRadial": 0.009999999999999995,
+            "sobreposicaoRadial": 0,
             "sobreposicaoAxial": 0,
             "separacaoAxial": 0,
             "tolerancia": 0.000001,
@@ -113,8 +113,7 @@
           }
         }
       ],
-      "forma": "sha256:7bfefdef59eef5af30f2d40e0e4a5ad628c22b98e45be86fe4de573b4d221150",
-      "motivo": "a receita mudou depois do aceite",
+      "forma": "sha256:cf461ded20add52275ad56d44ad0ee9c82830c42d8b1e658d6a1dc496a9b247d",
       "reaberturas": [
         {
           "por": "pessoa",
@@ -169,17 +168,22 @@
             "analise": "ausente"
           },
           "forma": "sha256:1b6a3121f6d82373a885bd26eda48e7e221b98870f9aa43559478460bcaca24b"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "Tiago, 2026-11-04: quinas de trás de 75 mm dentro do anel, posição mantida pela recomendação, forma aprovada sem crítico",
+            "defeitosAceitos": [
+              "anel: superficie em contorno do disco, face frontal",
+              "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
+              "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:7bfefdef59eef5af30f2d40e0e4a5ad628c22b98e45be86fe4de573b4d221150"
         }
-      ],
-      "aceite": {
-        "por": "Tiago, 2026-11-04: quinas de trás de 75 mm dentro do anel, posição mantida pela recomendação, forma aprovada sem crítico",
-        "defeitosAceitos": [
-          "anel: superficie em contorno do disco, face frontal",
-          "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
-          "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
-        ],
-        "analise": "ausente"
-      }
+      ]
     },
     {
       "instancia": "braco",

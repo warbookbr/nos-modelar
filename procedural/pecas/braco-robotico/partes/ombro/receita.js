@@ -33,6 +33,12 @@ export const TABELA = {
   /* Quanto a frente da parte de pé fica recuada em relação à frente da parte
      deitada: o degrau do L. */
   recuoDaFrente: 30,
+  /* Quanto o L inteiro se estende para a frente além do quadrado de 190 mm
+     (decisão da pessoa em 2026-11-05: o ombro mais longo na direção da
+     junta, com a traseira no lugar). A frente da parte de pé, a da parte
+     deitada, o anel e a coluna avançam o mesmo tanto, e o degrau do L fica
+     igual. */
+  alongamento: 30,
   /* Trecho do braço, antes da saída, em que a seção passa de quase quadrada a
      redonda, com o raio dos cantos crescendo até o círculo. */
   transicaoDaSaida: 45,
@@ -67,8 +73,8 @@ export function derivar(t = TABELA) {
   const R = m(t.raioDoPescoco);
   const yEixo = m(t.alturaDoEixo);
   const h = m(t.meiaLargura);
-  /* A frente da parte deitada e a saída ficam em z = h. */
-  const zFace = h;
+  /* A frente da parte deitada e a saída ficam em z = h + alongamento. */
+  const zFace = h + m(t.alongamento);
   const zTransicao = zFace - m(t.transicaoDaSaida);
   /* A saída redonda tem o diâmetro da largura do bloco (raio = meia largura):
      nada dela sobra por baixo nem pelos lados. */
@@ -149,7 +155,7 @@ export function gerarPassos(t = TABELA) {
   const L = t.lados;
   const rc = m(t.raioDosCantos);
   const sec = (pos, rr) => ({ pos, contorno: quadrado(h, rr, L) });
-  const zf = h - m(t.recuoDaFrente);
+  const zf = h + m(t.alongamento) - m(t.recuoDaFrente);
   /* A parte de pé é 0,3 mm mais estreita que a deitada: paredes coplanares
      quebram a união. */
   const rq = m(t.raioDaTraseira);
@@ -235,7 +241,7 @@ export function gerarPassos(t = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'braco-robotico/ombro', desc: 'ombro: L de ponta-cabeça de 190 mm, frente de pé recuada, saída redonda e anel fino' },
+  meta: { nome: 'braco-robotico/ombro', desc: 'ombro: L de ponta-cabeça de 190 por 220 mm, frente de pé recuada, saída redonda e anel fino' },
   PARAMS: TABELA,
   MATERIAIS,
   TOPO: { origem: 'centro da boca de baixo do pescoço; y para cima, a saída para +Z' },
@@ -244,7 +250,7 @@ const receita = {
     referencias: ['../../referencias/frontal.contornos.json'],
     escala: { medida: 'diâmetro do anel da cintura, onde o pé assenta', milimetros: 210 },
     partes: [
-      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de retângulo de cantos arredondados de mesmo raio; seção vira redonda crescendo o raio dos cantos em várias estações; arredondarCostura no encontro de baixo; liso com ângulo' },
+      { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm de largura e 220 mm de comprimento na direção da junta: parte de pé com a frente recuada 30 mm da parte deitada (degrau), parte deitada atravessando o topo até a saída redonda de diâmetro igual à largura; eixo a 115 mm, topo a 210 mm', tecnica: 'dois lofts de retângulo de cantos arredondados de mesmo raio; seção vira redonda crescendo o raio dos cantos em várias estações; arredondarCostura no encontro de baixo; liso com ângulo' },
       { nome: 'anel', forma: 'faixa fina de uns 28 mm, eixo Z, com o mesmo diâmetro da saída (190 mm), encostada na face da saída sem entrar nela, escura', tecnica: 'revolução com perfil' },
     ],
     criteriosDeReprovacao: [
@@ -259,7 +265,8 @@ const receita = {
       'anel entrando na saída ou afastado dela',
       'anel grosso como tambor em vez de faixa fina',
       'pé fora do eixo vertical da cintura',
-      'ombro mais largo que 190 mm ou com o topo acima de 210 mm do anel da cintura',
+      'ombro mais largo que 190 mm, mais longo que 220 mm na direção da junta ou com o topo acima de 210 mm do anel da cintura',
+      'traseira ou pé fora do anel da cintura vistos de cima',
     ],
   },
   contatos: [
