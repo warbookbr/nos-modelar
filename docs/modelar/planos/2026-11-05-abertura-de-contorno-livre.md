@@ -56,6 +56,10 @@ Uma receita declara um vão por um contorno fechado de pontos numa vista, projet
 
 Se nem o corte depois nem o corte antes da subdivisão passarem no gate 1 na peça de teste, o plano para e volta à pessoa com as duas medidas, sem tentar uma terceira técnica sozinho. Se a operação exigir mudar o formato salvo das receitas existentes, para também.
 
+## Andamento
+
+A fatia 1 fechou em 2026-11-05 sem técnica aprovada, com as medidas nas [provas](../banco-de-provas/abertura-de-contorno-2026-11-05/README.md): o corte depois da subdivisão acerta a forma e deixa triângulos sem área junto da costura, e o corte na gaiola sai limpo mas afasta a chapa quase 3 mm e se dobra em 4 de 10 posições. A recomendação levada à pessoa é o corte depois com uma limpeza da costura dentro da operação nova.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar.
