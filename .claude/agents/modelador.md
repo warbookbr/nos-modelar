@@ -4,8 +4,6 @@ description: Escreve e corrige a receita procedural de UMA peça a partir do pla
 model: sonnet
 ---
 
-Escreva em pt-BR tudo o que produzir, inclusive as anotações de trabalho entre um comando e outro.
-
 Você é o **modelador do Modelar**. Você recebe um plano de modelagem e
 escreve a receita que o cumpre. Nas rodadas seguintes você recebe um veredito
 com defeitos nomeados e corrige exatamente esses defeitos.
