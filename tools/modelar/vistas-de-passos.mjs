@@ -133,8 +133,20 @@ export async function gerarFolha(entrada, { alinhar = false, ajustes = [], saida
   return { ...r, contatos: contatosDasCaixas(r.dados.formas), id, recusasDaTraducao: traducao.recusas };
 }
 
+const AJUDA = `node tools/modelar/vistas-de-passos.mjs <receita.json | esboco.json> [opções]
+Converte a receita do externo (ou um esboço) em passos e escreve a folha de seis vistas de cada peça, mais a caixa envolvente de cada uma.
+
+  --alinhar              alinha as caixas antes de desenhar (passos de esboco-alinhar-caixas)
+  --ajustes <arquivo>    ajustes da pessoa, em JSON, aplicados na conversão
+  --saida <pasta>        onde escrever <id>.png e <id>.pecas.txt (padrão: a pasta atual)
+  --ajuda                esta mensagem
+
+Imprime o número de peças, as recusadas e os pares de caixas que se atravessam (embutidos e passantes). Precisa do Chromium do Playwright.
+`;
+
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const args = process.argv.slice(2);
+  if (args.includes('--ajuda')) { process.stdout.write(AJUDA); process.exit(0); }
   const arquivo = args.find((a) => !a.startsWith('--') && args[args.indexOf(a) - 1] !== '--ajustes' && args[args.indexOf(a) - 1] !== '--saida');
   if (!arquivo) { console.error('uso: node tools/modelar/vistas-de-passos.mjs <receita.json | esboco.json> [--alinhar] [--ajustes <ajustes.json>] [--saida <pasta>]'); process.exit(2); }
   const valor = (flag) => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : null; };

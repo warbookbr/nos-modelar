@@ -1,5 +1,30 @@
 /* gaiola-aneis.js — anéis de gaiola em volta de um vão, opção da gaiola por estações
  *
+ * FICHA gaiolaAneis
+ * serve: opção `aneis` da gaiola por estações: laços de arestas apertados em volta de um vão, para moldura, calha, lábio ou borda de janela.
+ * quando: o vão precisa de bordas nítidas com a grade larga ao redor; para um vão sem moldura basta `vaos` em gaiolaPorEstacoes. Chama-se
+ *   pela definição de gaiolaPorEstacoes, e não existe como função de receita.
+ * unidades: recuo, largura, raio e relevo em mm; os pontos da gaiola, em metro como em gaiolaPorEstacoes.
+ * campos:
+ *   nome: nome do anel, de onde saem os pontos `${nome}_a${volta}_…` e a transição `${nome}_c${j}_…`.
+ *   vao: nome do vão declarado em `vaos` que o anel contorna.
+ *   recuo: mm, número ou um por lado (`{ baixo: 60, cima: 80, padrao? }`); com recuo > 0 o anel preenche o vão por dentro, e com 0 cresce para fora.
+ *   voltas: quantos laços de arestas; a volta 1 é a abertura e as seguintes se afastam dela.
+ *   largura: mm entre uma volta e a seguinte; `larguras` dá uma por intervalo quando diferem.
+ *   raio: mm do arredondamento dos cantos da abertura (só com recuo); `raios` troca o de um canto pelo nome do ponto, e 0 o deixa vivo.
+ *   relevo: lista de mm que desloca cada volta pela normal da chapa.
+ *   segmentos: máximo de segmentos por quarto de volta nos arcos dos cantos (par, padrão 4).
+ *   camadas: de uma a quatro camadas de faces da grade que o anel troca com recuo 0.
+ *   arredondar: true contorna os cantos das voltas com arco, em vez de esquadria (com recuo 0).
+ * devolve: em `aneis[nome]` da saída de gaiolaPorEstacoes: { vao, fechada, voltas, costuras, borda, extraordinarios }.
+ * exemplo:
+ *   gaiolaPorEstacoes({ eixo: 'z', virar: true, vaos: [{ nome: 'janela', estacoes: ['e1', 'e5'], colunas: ['c1', 'c5'] }],
+ *     aneis: [{ nome: 'janela', vao: 'janela', recuo: 95, voltas: 2, largura: 10 }],
+ *     estacoes: [0, 1, 2, 3, 4, 5, 6].map((e) => ({ nome: `e${e}`, em: 0.1 * e,
+ *       colunas: [0, 1, 2, 3, 4, 5, 6].filter((c) => !(e > 1 && e < 5 && c > 1 && c < 5)).map((c) => ({ nome: `c${c}`, em: [0.1 * c, 0.1 * (0.1 * c) ** 2] })) })) })
+ * peça: procedural/nucleo/fixtures/gaiola-aneis-prova.js (chapa de prova com janela e arco, em anéis).
+ * FIM DA FICHA
+ *
  * Função pura, sem Three.js e sem domínio. `gaiolaPorEstacoes` chama `lerAneis` e `construirAneis` quando a definição
  * declara `aneis`; sem a opção nada aqui roda e a saída do ajudante é a de antes, byte a byte.
  *

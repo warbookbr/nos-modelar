@@ -68,9 +68,14 @@ Prove com os comandos do repositório antes de devolver:
 ```bash
 npm run descrever -- <peça>
 node tools/modelar/conferir-pontos.mjs <peça>
-npm run guarda:acervo
-npm run guarda:referencial
+npm run guarda:acervo -- <peça>
+npm run guarda:referencial -- <peça>
 ```
+
+Com o nome da peça, as guardas conferem só ela; o acervo inteiro fica para os
+gates. A saída do `descrever` é o resumo, e `--partes=a,b` mede um encaixe.
+
+Para usar uma capacidade do núcleo, a primeira parada é `npm run capacidade -- <nome>` (sem nome, lista as capacidades de gaiola) e o `--ajuda` de cada ferramenta, antes de abrir o código; e `node tools/modelar/rodada-de-modelagem.mjs <peça> --acao` já resume os defeitos em aberto da rodada anterior, sem precisar abrir o JSON dela.
 
 ## Confira parte por parte antes de devolver
 

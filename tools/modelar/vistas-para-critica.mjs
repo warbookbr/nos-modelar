@@ -650,9 +650,22 @@ export function imprimir(resultado) {
   if (!resultado.partes.length) {
     linhas.push('  a receita não declara partes no PLANO; nenhuma vista isolada foi feita.');
   }
-  for (const { parte, resultado: r } of resultado.porParte) {
-    linhas.push(`  ${parte}:`);
-    for (const arquivo of arquivosDe(r)) linhas.push(`    ${arquivo}`);
+  /* O caminho de cada vista isolada repete a pasta, a peça e o sufixo; numa peça de 64 partes eram 150 linhas de caminho
+     quase iguais (achado de 2026-11-05). Quando todos seguem o mesmo molde, o molde sai uma vez e a parte lista só as vistas
+     dela, e o caminho de cada uma se reconstrói por ele; o pedido do crítico continua com os caminhos inteiros. */
+  const molde = /^(.*-)([a-z]+)(-sel-)(.+)(-isolar-orto-focado\.png)$/;
+  const porParte = resultado.porParte.map(({ parte, resultado: r }) => ({ parte, arquivos: arquivosDe(r) }));
+  const casados = porParte.flatMap(({ parte, arquivos }) => arquivos.map((a) => ({ parte, m: molde.exec(a) })));
+  const prefixos = new Set(casados.map(({ m }) => m?.[1]));
+  const cabe = casados.length && casados.every(({ parte, m }) => m && m[4] === parte) && prefixos.size === 1;
+  if (cabe) {
+    linhas.push(`  cada vista em ${[...prefixos][0]}<vista>-sel-<parte>-isolar-orto-focado.png`);
+    for (const { parte, arquivos } of porParte) linhas.push(`  ${parte}: ${arquivos.map((a) => molde.exec(a)[2]).join(', ')}`);
+  } else {
+    for (const { parte, arquivos } of porParte) {
+      linhas.push(`  ${parte}:`);
+      for (const arquivo of arquivos) linhas.push(`    ${arquivo}`);
+    }
   }
   if (resultado.alvo) {
     const { alvo } = resultado;

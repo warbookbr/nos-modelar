@@ -140,6 +140,21 @@ export async function conferirReferencial(pecas = pecasDoAcervo(ACERVO)) {
 }
 
 if (process.argv[1] && process.argv[1].endsWith('guarda-referencial.mjs')) {
+  /* Com nomes de peça, confere só elas, como a guarda:acervo; sem nome, o acervo inteiro, que os gates rodam. */
+  const pedidas = process.argv.slice(2).filter((a) => !a.startsWith('-'));
+  if (pedidas.length) {
+    const todas = pecasDoAcervo(ACERVO);
+    const desconhecidas = pedidas.filter((p) => !todas.includes(p));
+    if (desconhecidas.length) {
+      console.error(`guarda:referencial — não conheço ${desconhecidas.join(', ')}. As peças têm o nome da pasta em procedural/pecas/.`);
+      process.exit(1);
+    }
+    const { reprovadas } = await conferirReferencial(pedidas);
+    for (const { peca, motivo } of reprovadas) console.error(`guarda:referencial — ${peca} REPROVOU\n${motivo}\n`);
+    if (reprovadas.length) process.exit(1);
+    console.log(`guarda:referencial ok — ${pedidas.join(', ')} (só as pedidas; o acervo inteiro roda sem nome, nos gates).`);
+    process.exit(0);
+  }
   const { pecas, reprovadas } = await conferirReferencial();
   if (pecas.length === 0) {
     if (!vazioDeclarado()) {
@@ -154,5 +169,5 @@ if (process.argv[1] && process.argv[1].endsWith('guarda-referencial.mjs')) {
     console.error(`guarda:referencial — ${peca} REPROVOU\n${motivo}\n`);
   }
   if (reprovadas.length) process.exit(1);
-  console.log(`guarda:referencial ok — ${pecas.length} peça(s) no mesmo referencial: ${pecas.join(', ')}.`);
+  console.log(`guarda:referencial ok — ${pecas.length} peça(s) no mesmo referencial.`);
 }

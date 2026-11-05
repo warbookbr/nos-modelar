@@ -311,6 +311,23 @@ if (!isMainThread && workerData?.fioDaGuarda) {
 }
 
 if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
+  /* Com nomes de peça, a guarda confere só elas. Quem modela uma peça pagava a varredura do acervo inteiro (110 s, 56 peças)
+     a cada medida, para saber da sua (achado de 2026-11-05). Sem nome, é a varredura inteira, que os gates rodam. */
+  const pedidas = process.argv.slice(2).filter((a) => !a.startsWith('-'));
+  if (pedidas.length) {
+    const todas = pecasDoAcervo();
+    const desconhecidas = pedidas.filter((p) => !todas.includes(p));
+    if (desconhecidas.length) {
+      console.error(`guarda:acervo — não conheço ${desconhecidas.join(', ')}. As peças têm o nome da pasta em procedural/pecas/, como furgao-realista ou braco-robotico/ombro.`);
+      process.exit(1);
+    }
+    const { reprovadas, esperando } = await conferirAcervo(pedidas);
+    for (const { peca, motivo } of reprovadas) console.error(`guarda:acervo — ${peca} REPROVOU\n${motivo}\n`);
+    for (const { peca, montagem, instancia } of esperando) console.log(`guarda:acervo — ${peca} planejada, sem geometria: espera a etapa '${instancia}' de ${montagem}.`);
+    if (reprovadas.length) process.exit(1);
+    console.log(`guarda:acervo ok — ${pedidas.join(', ')} (só as pedidas; o acervo inteiro roda sem nome, nos gates).`);
+    process.exit(0);
+  }
   const { pecas, reprovadas, esperando } = await conferirAcervo();
   if (pecas.length === 0) {
     if (!vazioDeclarado()) {
@@ -337,6 +354,6 @@ if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.m
   }
   if (reprovadas.length) process.exit(1);
   const medidas = pecas.filter((peca) => !esperando.some((e) => e.peca === peca));
-  console.log(`guarda:acervo ok — ${medidas.length} peça(s) medida(s)${medidas.length ? `: ${medidas.join(', ')}` : ''}`
+  console.log(`guarda:acervo ok — ${medidas.length} peça(s) medida(s)`
     + `${esperando.length ? `; ${esperando.length} planejada(s) esperando a etapa` : ''}.`);
 }

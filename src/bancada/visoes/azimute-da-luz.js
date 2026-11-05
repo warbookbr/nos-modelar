@@ -77,8 +77,13 @@ function luzNasAmostras(N, vista, rasanteGraus, azimuteGraus) {
  * sem ele, cada uma pesa o mesmo, como os pixels do Blender. Devolve `{ azimutes: [a, b], estimativa }`, com a fração rasante e
  * a alcançada de cada um, arredondadas a quatro casas como no Python.
  */
+/* A fração alcançada mínima de cada azimute do par, a mesma de `superficie.ILUMINADA_MINIMA`: o limiar do pacote do crítico
+   (0,25) e uma margem de 0,05 para o erro da estimativa. */
+export const ILUMINADA_MINIMA = 0.30;
+
 export function escolherAzimutes(normais, vista, rasanteGraus = RASANTE_GRAUS, {
   pesos = null, passo = 10, separacao = 90, preferido = AZIMUTE_PREFERIDO, folga = 0.05, rasaAte = RASA_ATE_GRAUS,
+  iluminadaMinima = ILUMINADA_MINIMA,
 } = {}) {
   if (separacao % passo || 360 % passo) throw new RangeError(`passo ${passo} precisa dividir 360 e a separação ${separacao}`);
   const n = Math.floor(normais.length / 3);
@@ -95,7 +100,11 @@ export function escolherAzimutes(normais, vista, rasanteGraus = RASANTE_GRAUS, {
   const candidatos = Array.from({ length: Math.round(360 / passo) }, (_, k) => k * passo);
   const luz = new Map(candidatos.map((a) => [a, luzNasAmostras(N, vista, rasanteGraus, a)]));
   const rasa = new Map(candidatos.map((a) => [a, media((i) => luz.get(a)[i] > 0 && luz.get(a)[i] <= teto)]));
-  const pares = candidatos.map((a) => [a, modulo360(a + separacao)]);
+  const ilum = new Map(candidatos.map((a) => [a, media((i) => luz.get(a)[i] > 0)]));
+  /* só entram os pares em que a luz dos dois azimutes alcança a peça acima do limiar; sem nenhum, ficam todos, como antes */
+  const todos = candidatos.map((a) => [a, modulo360(a + separacao)]);
+  const acesos = todos.filter((p) => ilum.get(p[0]) >= iluminadaMinima && ilum.get(p[1]) >= iluminadaMinima);
+  const pares = acesos.length ? acesos : todos;
   const nota = (p) => Math.min(rasa.get(p[0]), rasa.get(p[1]));
   const melhor = Math.max(...pares.map(nota));
   const distancia = (a) => Math.abs(modulo360(a - preferido + 180) - 180);
@@ -103,7 +112,7 @@ export function escolherAzimutes(normais, vista, rasanteGraus = RASANTE_GRAUS, {
     .filter((p) => nota(p) >= melhor - folga)
     .sort((p, q) => distancia(p[0]) - distancia(q[0]) || p[0] - q[0])[0];
   const estimativa = {};
-  for (const k of [a, b]) estimativa[k] = { rasante: arredondar4(rasa.get(k)), iluminada: arredondar4(media((i) => luz.get(k)[i] > 0)) };
+  for (const k of [a, b]) estimativa[k] = { rasante: arredondar4(rasa.get(k)), iluminada: arredondar4(ilum.get(k)) };
   return { azimutes: [a, b], estimativa };
 }
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1733 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1738 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -347,6 +347,10 @@
 - `tarefa-corrigir.md` — Tarefa de corrigir
 - `tarefa-modelar.md` — Tarefa de modelar
 
+## docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/
+
+- `README.md` — Linha de base da porta de entrada dos agentes, 2026-11-05
+
 ## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/
 
 - `README.md` — Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)
@@ -496,6 +500,8 @@
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
+- `2026-11-05-abertura-de-contorno-livre.md` — Abertura de contorno livre — a chapa ganha um vão pela curva que a receita desenha, sem depender das linhas da gaiola
+- `2026-11-05-porta-de-entrada-dos-agentes.md` — A porta de entrada dos agentes — o modelador acha como usar uma capacidade numa ficha curta, sem garimpar o código
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -2421,6 +2427,8 @@
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `caminho-procedural.test.ts` — caminho-procedural.test.ts — a raiz procedural é neutra: não volta a `fps`, que era o nome do jogo removido, nem a `prototipos`, que dizia experimento sobre …
 - `capacidade-symlink.mjs` — capacidade-symlink.mjs — este ambiente consegue criar vínculo simbólico?
+- `capacidade.mjs` — capacidade.mjs — a primeira parada de quem vai usar um ajudante de gaiola: `npm run capacidade` lista, `npm run capacidade -- <nome>` dá a ficha.
+- `capacidade.test.mjs` — capacidade.test.mjs — a ficha de cada capacidade de gaiola: recortada do cabeçalho, em até 60 linhas, com os campos no código e o exemplo executável
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /

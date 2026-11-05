@@ -115,8 +115,20 @@ export function compararSilhueta(receita, fonte, { toleranciaMm = null, rigoroso
   return { linhas, falha, tolerancia: tol, lateral: lat, frontal: fro, regiao };
 }
 
+const AJUDA = `node tools/modelar/comparar-silhueta.mjs <receita.js> <fonte-partes.json> [opções]
+Compara a silhueta de uma receita com a de um modelo de referência medido por modelo-de-referencia.mjs, em fatias sobre a superfície da malha.
+
+  --tolerancia-mm <mm>   tolerância por fatia (padrão: 5% do comprimento)
+  --rigoroso             tolerância de 2% do comprimento e nenhuma fatia pode passar dela; confere escala e proporção, não a forma
+  --cabine auto|<de>:<ate>   mede à parte a região da cabine; auto toma o que fica acima da cintura da fonte, e <de>:<ate> é uma faixa em y, em mm
+  --ajuda                esta mensagem
+
+Código de saída: 0 confere, 1 a silhueta se afasta da referência, 2 uso errado ou fonte sem o campo frente. Mede forma, e quem aprova é a pessoa.
+`;
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const a = process.argv.slice(2);
+  if (a.includes('--ajuda')) { process.stdout.write(AJUDA); process.exit(0); }
   const COM_VALOR = ['--tolerancia-mm', '--cabine'];
   const valor = (flag) => { const i = a.indexOf(flag); return i >= 0 ? a[i + 1] : null; };
   const posicionais = a.filter((x, i) => !x.startsWith('--') && !COM_VALOR.includes(a[i - 1]));

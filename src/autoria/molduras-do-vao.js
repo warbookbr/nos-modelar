@@ -296,12 +296,23 @@ function problemasDoVao(v) {
 }
 
 /** O texto da seção dos vãos para o `descrever`. */
-export function formatarVaos(resultado) {
+export function formatarVaos(resultado, { resumo = false } = {}) {
   if (!resultado || (!resultado.declarados && !resultado.aberturas?.length)) return '';
   const aberturas = resultado.aberturas ?? [];
   const semDeclaracao = aberturas.filter((a) => a.vao === null).length;
   const linhas = ['', `MOLDURA EM VOLTA DO VÃO — ${resultado.declarados} vão(s) declarado(s); ${aberturas.length} abertura(s) nas chapas, ${semDeclaracao ? `${semDeclaracao} sem declaração` : 'todas declaradas'}`];
+  /* No resumo, o que é igual em todos os vãos limpos (borda inteira coberta, nenhum trecho descoberto, nenhuma emenda, a mesma
+     tolerância) sai uma vez no cabeçalho do grupo, e cada vão guarda a linha dele só com o que varia: os frisos e a borda. Nada
+     se perde, só a repetição (achado de 2026-11-05: treze linhas iguais no furgão). O vão com algo a ler segue com a linha inteira. */
+  const limpo = (v) => !v.semMoldura && !v.parcial && v.amostras && v.cobertas === v.amostras && !v.descobertos.length && !v.emendas.length;
+  const limpos = resumo ? resultado.vaos.filter(limpo) : [];
+  for (const tol of [...new Set(limpos.map((v) => v.tolerancia))]) {
+    const grupo = limpos.filter((v) => v.tolerancia === tol);
+    linhas.push(`  ${grupo.length} vão(s) com 100,0% da borda coberta, 0 trecho descoberto, nenhuma emenda, borda inteira, tolerância ${mm(tol)} mm:`);
+    for (const v of grupo) linhas.push(`    ${v.nome}: frisos ${lista(v.frisos)}; borda de ${mm(v.comprimento)} mm`);
+  }
   for (const v of resultado.vaos) {
+    if (limpos.includes(v)) continue;
     if (v.semMoldura) { linhas.push(`  ${v.nome}: sem moldura declarada (${v.semMoldura.motivo}); borda de ${mm(v.comprimento)} mm`); continue; }
     const cobertura = v.amostras ? `${((100 * v.cobertas) / v.amostras).toFixed(1).replace('.', ',')}% da borda coberta` : 'sem medida';
     const emendas = v.emendas.length ? `${v.emendas.length} emenda(s) (${v.emendas.filter((e) => e.ok).length} ok)` : 'nenhuma emenda';

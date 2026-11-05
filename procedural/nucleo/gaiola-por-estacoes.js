@@ -1,5 +1,37 @@
 /* gaiola-por-estacoes.js — monta a gaiola da operação `subdivisao` a partir de estações e colunas nomeadas
  *
+ * FICHA gaiolaPorEstacoes
+ * serve: gaiola de chapa contínua como grade de estações (cortes ao longo de um eixo) por colunas nomeadas.
+ * quando: a superfície tem seções que mudam devagar ao longo de um eixo (carenagem, lateral, teto); com feições que
+ *   cortam a grade em diagonal use gaiolaPorRede, e para uma seção varrida por um trilho use gaiolaVarrida.
+ * unidades: `em` das estações e das colunas entra em metro e `pontos` sai em metro, para pôr em TOPO; espalhe `passo` no passo
+ *   subdivisao. Recuo, largura e raio dos anéis são em mm.
+ * campos:
+ *   eixo: 'x', 'y' ou 'z' (em é a posição nele), ou { curva, pontos, normal, fechada? } para um eixo curvo.
+ *   estacoes: [{ nome, em, colunas, regiao? }] em ordem crescente de em; coluna é { nome, em: [u, v, w?], de?, comeca?, termina? }.
+ *   regioes: [{ nome, estacoes: [de, ate], colunas: [de, ate] }] adensa só um trecho, com estações e colunas parciais.
+ *   vaos: [{ nome, estacoes, colunas, livre? }] tira as faces entre duas estações e duas colunas; bordaDoVao(nome) dá a borda.
+ *   aneis: [{ nome, vao, recuo, voltas, largura }] laços de arestas em volta de um vão (detalhe em gaiola-aneis.js).
+ *   vincos: [{ nome, coluna | estacao, de?, ate?, nitidez }] vinco ao longo de uma coluna ou de uma estação.
+ *   cantos: lista de { estacao?, coluna? } cujos pontos ficam vivos; só a estação ou só a coluna marca a linha inteira.
+ *   medidas: lista de { estacao?, coluna?, peso? } cujos pontos a superfície limite atravessa (com peso, só aproxima).
+ *   leitura: true | { peso?, erro?, inclinacao?, estrito? } declara que as cotas vêm de imagem, com erro.
+ *   simetria: 'x' declara a metade x >= 0, que o passo espelha antes de subdividir.
+ *   virar: true inverte a ordem dos vértices de cada face, virando a normal.
+ *   prefixo: texto posto na frente do nome de todo ponto.
+ *   curvas: [{ nome, colunas: [{ nome, fracao }] }] colunas a frações fixas de uma curva de seção (gaiola-interpolada.js).
+ *   interpolar: { passo? } preenche as estações sem colunas pelas estações-chave (gaiola-interpolada.js).
+ * devolve: { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, origens, entradas, estrutura, aneis?, avisos? }.
+ * exemplo:
+ *   gaiolaPorEstacoes({ eixo: 'z', simetria: 'x',
+ *     estacoes: [
+ *       { nome: 'tras', em: 0, colunas: [{ nome: 'centro', em: [0, 0.8] }, { nome: 'ombro', em: [0.4, 0.7] }, { nome: 'soleira', em: [0.5, 0.1] }] },
+ *       { nome: 'frente', em: 1, colunas: [{ nome: 'centro', em: [0, 0.8] }, { nome: 'ombro', em: [0.4, 0.7] }, { nome: 'soleira', em: [0.5, 0.1] }] },
+ *     ],
+ *     vincos: [{ nome: 'ombro', coluna: 'ombro', nitidez: 'viva' }], medidas: [{ estacao: 'tras' }, { estacao: 'frente' }] })
+ * peça: procedural/pecas/carenagem-de-prova/receita.js (função derivar).
+ * FIM DA FICHA
+ *
  * Função pura, sem Three.js e sem domínio: recebe estações nomeadas ao longo de um eixo, cada uma com as suas colunas
  * nomeadas em ordem, e devolve os pontos, as faces, os vincos, os cantos e as medidas já escritos em nomes, no formato
  * que o passo `subdivisao` aceita. A receita espalha `passo` no passo e `pontos` em TOPO, e nenhum índice sai dela.

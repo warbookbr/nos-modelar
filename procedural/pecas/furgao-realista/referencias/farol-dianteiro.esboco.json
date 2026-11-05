@@ -1,0 +1,693 @@
+{
+ "plano": "Três desenhos de farol com o pisca dentro do conjunto e a grade maior com barras, vistos de frente, na mesma escala: a frente da carroceria de 1960 mm até a boca do capô em 1.120, o para-choque, a grade de 800 por 400 descendo até ele e quatro barras, os dois faróis e os dois piscas. Onze formas por opção, legendas em lista, só a primeira de cada par com rótulo. O farol contorna a quina pela lateral, o que esta vista não mostra.",
+ "vista": "frontal",
+ "legendas": "lista",
+ "opcoes": [
+  {
+   "titulo": "A: farol afinado, pisca na ponta",
+   "nota": "A ponta de dentro desce em diagonal para a grade; o pisca é a ponta de fora.",
+   "formas": [
+    {
+     "id": "frente",
+     "tipo": "caixa",
+     "largura": 1960,
+     "altura": 520,
+     "profundidade": 100,
+     "centro": [
+      0,
+      860,
+      -50
+     ],
+     "cor": "azul",
+     "rotulo": "frente, até a boca do capô"
+    },
+    {
+     "id": "parachoque",
+     "tipo": "caixa",
+     "largura": 2000,
+     "altura": 200,
+     "profundidade": 140,
+     "centro": [
+      0,
+      550,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "para-choque"
+    },
+    {
+     "id": "grade",
+     "tipo": "caixa",
+     "largura": 800,
+     "altura": 400,
+     "profundidade": 20,
+     "centro": [
+      0,
+      840,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "grade"
+    },
+    {
+     "id": "barra0",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      700,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra1",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      780,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra2",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      860,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra3",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      940,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "farolAD",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       430,
+       960
+      ],
+      [
+       600,
+       890
+      ],
+      [
+       980,
+       900
+      ],
+      [
+       980,
+       1090
+      ],
+      [
+       560,
+       1065
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      5
+     ],
+     "cor": "branco",
+     "rotulo": "farol"
+    },
+    {
+     "id": "farolAE",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       -560,
+       1065
+      ],
+      [
+       -980,
+       1090
+      ],
+      [
+       -980,
+       900
+      ],
+      [
+       -600,
+       890
+      ],
+      [
+       -430,
+       960
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      5
+     ],
+     "cor": "branco"
+    },
+    {
+     "id": "setaAD",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       860,
+       898
+      ],
+      [
+       980,
+       900
+      ],
+      [
+       980,
+       1090
+      ],
+      [
+       860,
+       1082
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      12
+     ],
+     "cor": "laranja",
+     "rotulo": "pisca"
+    },
+    {
+     "id": "setaAE",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       -860,
+       1082
+      ],
+      [
+       -980,
+       1090
+      ],
+      [
+       -980,
+       900
+      ],
+      [
+       -860,
+       898
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      12
+     ],
+     "cor": "laranja"
+    }
+   ]
+  },
+  {
+   "titulo": "B: faixa inclinada",
+   "nota": "Farol estreito que sobe para a quina, pisca na parte de baixo da ponta.",
+   "formas": [
+    {
+     "id": "frente",
+     "tipo": "caixa",
+     "largura": 1960,
+     "altura": 520,
+     "profundidade": 100,
+     "centro": [
+      0,
+      860,
+      -50
+     ],
+     "cor": "azul",
+     "rotulo": "frente, até a boca do capô"
+    },
+    {
+     "id": "parachoque",
+     "tipo": "caixa",
+     "largura": 2000,
+     "altura": 200,
+     "profundidade": 140,
+     "centro": [
+      0,
+      550,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "para-choque"
+    },
+    {
+     "id": "grade",
+     "tipo": "caixa",
+     "largura": 800,
+     "altura": 400,
+     "profundidade": 20,
+     "centro": [
+      0,
+      840,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "grade"
+    },
+    {
+     "id": "barra0",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      700,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra1",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      780,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra2",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      860,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra3",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      940,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "farolBD",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       420,
+       990
+      ],
+      [
+       470,
+       930
+      ],
+      [
+       980,
+       975
+      ],
+      [
+       980,
+       1090
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      5
+     ],
+     "cor": "branco",
+     "rotulo": "farol"
+    },
+    {
+     "id": "farolBE",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       -980,
+       1090
+      ],
+      [
+       -980,
+       975
+      ],
+      [
+       -470,
+       930
+      ],
+      [
+       -420,
+       990
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      5
+     ],
+     "cor": "branco"
+    },
+    {
+     "id": "setaBD",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       800,
+       960
+      ],
+      [
+       980,
+       975
+      ],
+      [
+       980,
+       1035
+      ],
+      [
+       800,
+       1020
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      12
+     ],
+     "cor": "laranja",
+     "rotulo": "pisca"
+    },
+    {
+     "id": "setaBE",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       -800,
+       1020
+      ],
+      [
+       -980,
+       1035
+      ],
+      [
+       -980,
+       975
+      ],
+      [
+       -800,
+       960
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      12
+     ],
+     "cor": "laranja"
+    }
+   ]
+  },
+  {
+   "titulo": "C: cunha com o pisca embaixo",
+   "nota": "Farol mais alto, em cunha, e o pisca numa faixa logo abaixo dele.",
+   "formas": [
+    {
+     "id": "frente",
+     "tipo": "caixa",
+     "largura": 1960,
+     "altura": 520,
+     "profundidade": 100,
+     "centro": [
+      0,
+      860,
+      -50
+     ],
+     "cor": "azul",
+     "rotulo": "frente, até a boca do capô"
+    },
+    {
+     "id": "parachoque",
+     "tipo": "caixa",
+     "largura": 2000,
+     "altura": 200,
+     "profundidade": 140,
+     "centro": [
+      0,
+      550,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "para-choque"
+    },
+    {
+     "id": "grade",
+     "tipo": "caixa",
+     "largura": 800,
+     "altura": 400,
+     "profundidade": 20,
+     "centro": [
+      0,
+      840,
+      0
+     ],
+     "cor": "preto",
+     "rotulo": "grade"
+    },
+    {
+     "id": "barra0",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      700,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra1",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      780,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra2",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      860,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "barra3",
+     "tipo": "caixa",
+     "largura": 760,
+     "altura": 22,
+     "profundidade": 10,
+     "centro": [
+      0,
+      940,
+      15
+     ],
+     "cor": "cinza"
+    },
+    {
+     "id": "farolCD",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       980,
+       930
+      ],
+      [
+       980,
+       1090
+      ],
+      [
+       500,
+       1060
+      ],
+      [
+       450,
+       930
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      5
+     ],
+     "cor": "branco",
+     "rotulo": "farol"
+    },
+    {
+     "id": "farolCE",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       -450,
+       930
+      ],
+      [
+       -500,
+       1060
+      ],
+      [
+       -980,
+       1090
+      ],
+      [
+       -980,
+       930
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      5
+     ],
+     "cor": "branco"
+    },
+    {
+     "id": "setaCD",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       470,
+       880
+      ],
+      [
+       980,
+       880
+      ],
+      [
+       980,
+       922
+      ],
+      [
+       470,
+       922
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      12
+     ],
+     "cor": "laranja",
+     "rotulo": "pisca"
+    },
+    {
+     "id": "setaCE",
+     "tipo": "extrusao",
+     "eixo": "z",
+     "origem": "perfil",
+     "perfil": [
+      [
+       -470,
+       922
+      ],
+      [
+       -980,
+       922
+      ],
+      [
+       -980,
+       880
+      ],
+      [
+       -470,
+       880
+      ]
+     ],
+     "comprimento": 10,
+     "centro": [
+      0,
+      0,
+      12
+     ],
+     "cor": "laranja"
+    }
+   ]
+  }
+ ]
+}

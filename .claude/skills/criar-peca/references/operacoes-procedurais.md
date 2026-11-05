@@ -300,7 +300,7 @@ Declare `nomes` no passo, um por cópia, e cite por nome:
 `derivaDe` e `de` recebem uma ORIGEM — `{op,id}` —, não o `origemId` cru. O
 exemplo abaixo escreve `TABUA` nos dois, e `TABUA` é a origem inteira, não o
 número. Trocar por um inteiro dá `derivaDe inválida: origem precisa ser um
-objeto com op e id`, e custou três rodadas a quem leu isto como identificador.
+objeto com op e id`.
 
 ```js
 const TABUA = { op: 'cubo', id: 7 };   // ← origem, não número
@@ -362,8 +362,7 @@ precisar acompanhar a curva, porque essa distância cai de três a quatro vezes 
 cada nível. Quando a gaiola é amostra de uma forma desenhada e a densidade
 dela varia, marque todos os pontos, e não só as cotas: sem medida, a superfície
 fica para dentro da amostra cerca de curvatura × passo² / 6, e a faixa adensada
-salta para fora do resto (4,5 mm na carenagem de prova, contra 0,3 mm na faixa
-fina), enquanto cada cota medida sozinha vira um calombo. Com todos os pontos
+salta para fora do resto, enquanto cada cota medida sozinha vira um calombo. Com todos os pontos
 marcados, gradue o passo para que nenhum intervalo passe do dobro do vizinho,
 porque um salto de quatro vezes ondula a superfície junto da faixa e, junto de
 uma borda livre, espreme as linhas da malha até dobrar a face; e um recorte na
@@ -390,19 +389,13 @@ peso, mais perto da cota e mais a superfície copia o erro dela. Use o peso
 quando muitas cotas vizinhas vêm de uma leitura com erro da ordem de
 milímetros, porque com todas exatas a superfície passa por cada erro e ondula;
 use a cota exata para o que a peça precisa acertar, como a altura de um vão ou
-de um encaixe, e misture as duas no mesmo passo. Numa chapa de grade de
-100 mm com vinte cotas alinhadas e ruído de até ±2 mm, a exata dá desvio de
-normal p95 de 1,43 grau, e o peso 1 dá 0,65 grau, com desvio médio de 0,79 mm
-às cotas (ruído médio de 1,04 mm) e de 0,53 mm à forma sem ruído, contra
-1,04 mm da exata; peso 4 deixa 0,48 mm nas cotas e 0,85 grau, peso 16,
-0,22 mm e 1,06 grau. Na `gaiolaPorEstacoes`, `peso` entra no seletor da
+de um encaixe, e misture as duas no mesmo passo. Na `gaiolaPorEstacoes`, `peso` entra no seletor da
 medida, como `{ estacao: 'meio', peso: 1 }`. A formulação, o sistema normal e
 o ganho, que grita como na exata, estão em `ajustarGaiolaAsMedidasComPeso`, em
 `procedural/nucleo/subdivisao.js`.
 
 Dado lido de imagem entra com peso por padrão: a cota exata nos pontos lidos faz a
-superfície passar por cada erro de leitura (no sétimo teste cego, erros de 1,6 a
-2,9 mm viraram rugas). No passo, `pesoPadrao: 1` (número ou nome de `PARAMS`) faz o
+superfície passar por cada erro de leitura. No passo, `pesoPadrao: 1` (número ou nome de `PARAMS`) faz o
 nome escrito sozinho em `medidas` ter esse peso em vez de ser exato, e a cota de
 projeto que a peça precisa acertar se escreve `{ ponto: 'alturaDoVao', exata: true }`;
 a declaração de um ponto (peso ou `exata`) vence o padrão sobre ele, e `exata` com
@@ -411,12 +404,7 @@ inclinacao, estrito }`) declara que as estações e as colunas vêm de leitura, 
 medida sem `peso` ganha o peso da leitura (1 por padrão); `exata: true` na medida
 a mantém exata, como em `{ estacao: 'e1', coluna: 'c2', exata: true }`, e o `peso`
 próprio vale mais que o da leitura. Sem `leitura` nem `pesoPadrao`, o nome sozinho
-continua cota exata, e a receita escrita antes tem a mesma malha. Numa chapa de
-1600 mm com erro de ±2 mm plantado em todos os pontos, a exata ondula até 2,32 mm
-(21 falhas a `--limiar-mm=1`) e o peso padrão até 0,73 mm (nenhuma a esse limiar), e o
-peso não leva a chapa abaixo de 0,3 mm quando o erro está nos pontos da gaiola;
-numa chapa lisa de raio 2 m o peso 1 deixa a superfície perto de 0,7 mm para dentro
-dos pontos. A leitura também avisa pelo nome quando duas estações-chave vizinhas
+continua cota exata, e a receita escrita antes tem a mesma malha. O peso não leva a chapa abaixo de 0,3 mm quando o erro está nos pontos da gaiola, e numa chapa lisa de raio 2 m o peso 1 deixa a superfície perto de 0,7 mm para dentro dos pontos. A leitura também avisa pelo nome quando duas estações-chave vizinhas
 ficam mais perto do que o erro sustenta: duas leituras diferem até 2 × `erro` (mm,
 2 por padrão), e a inclinação que só o erro põe é essa diferença dividida pelo
 espaçamento; acima de `inclinacao` (0,1) a gaiola devolve em `avisos`
@@ -457,9 +445,7 @@ de `PARAMS`) muda o ângulo, `liso: false` devolve as faces chapadas,
 `quebraNosVincos: 'todos'` quebra também nos vincos de nitidez fracionária
 (que na superfície limite são lisos, e por isso ficam fora por padrão) e
 `'nenhum'` deixa só o ângulo. Só a marca de sombra muda: as posições e as faces
-são as mesmas com qualquer valor. Na carenagem de prova, a sombra lisa tira as
-listras de triângulo que a luz chapada desenhava nas pontas da cintura e a
-quebra mantém a dobra até onde o vinco termina. A bancada respeita a quebra; as
+são as mesmas com qualquer valor. A bancada respeita a quebra; as
 vistas da receita (`vistas-da-receita`) desenham toda face chapada. Um ombro
 de nitidez fracionária que em nível 2 tem arestas acima de 30 graus continua
 facetado; suba `niveis` ou adense as colunas antes de subir o ângulo.
@@ -634,9 +620,7 @@ const h = gaiolaPorEstacoes({
 Entre a última volta e a grade o anel acrescenta sozinho laços de transição
 (`<anel>_c<j>_…`), cada um até duas vezes mais largo que o anterior, até a aresta da
 grade: a face de 10 mm ao lado de uma de 100 mm dobra a superfície quando a
-subdivisão leva os vértices ao limite (na chapa de prova da fatia 1, com uma só faixa
-de 120 mm ao lado da volta de 10 mm, 137 faces viradas em nível 2 e 614 em nível 3,
-mesmo com os pontos do anel de peso 5; com a transição, nenhuma), e o dobro de uma faixa
+subdivisão leva os vértices ao limite, e o dobro de uma faixa
 à seguinte é o que ela aguenta. A transição acompanha a grade de cada lado da borda: a
 última faixa tem de 0,4 a 2,5 vezes a aresta que sai dali, e o mesmo número de laços
 serve a todos os lados, cada lado com a sua razão de alargamento. A gota de uma janela
@@ -708,24 +692,7 @@ um laço e um do outro. Os vértices extraordinários que isso deixa a gaiola de
 declarados em `aneis[nome].extraordinarios` com a valência, e o resto da malha é de
 quadriláteros regulares. Toda face do anel segue o sentido das faces da grade, e a que
 sai ao contrário, um laço que se cruza num canto de lados muito diferentes, faz o anel
-gritar com os pontos. Na chapa de prova da fatia 1 (`procedural/nucleo/fixtures/gaiola-aneis-prova.js`, raios de 2 e
-3 m, um vão de 900 × 1000 mm com cantos de 50 mm e um recorte de 300 × 800 mm na borda), os
-pontos do anel ficam a 0,009 mm da chapa, os lados das voltas a 0,03 mm do gabarito da
-janela e a 0,11 mm do do recorte, o raio dos arcos a 0,12 mm do pedido (medido pelo círculo
-por três pontos do arco), e as pontas do anel aberto exatamente sobre a borda livre. Na
-chapa da gota (`procedural/nucleo/fixtures/gaiola-gota-prova.js`, raios de 1800 e 2500 mm, uma gota de 450 mm que tem 230 mm de
-altura na estação larga e 10 mm na ponta, numa grade que a acompanha com arestas de 38 a 67 mm
-em 500 × 975 mm), o anel de recuo 0 troca duas camadas de faces e sai com 241 pontos e 202
-quadriláteros, as voltas a 10,000 e 20,000 mm da borda nos lados e os cantos em esquadria. O anel
-de recuo por lado, na mesma gota com o vão 60 mm, 80 mm e 70 mm maior que a abertura em 588 × 1050 mm,
-põe a abertura a 60,0 mm da borda do vão embaixo, a 80,0 mm em cima e a 70,0 mm nas pontas (a
-menos de 0,05 mm), com as voltas a 10 e 20 mm dela, o canto de 50 mm com o raio pedido mais a
-distância e a ponta viva; sai com 223 pontos, 187 quadriláteros e dez vértices extraordinários
-declarados (valência 3, 5 e 6). A metade de chapa
-com o vão de colunas que terminam e começam (`procedural/nucleo/fixtures/gaiola-borda-livre-prova.js`, 17 estações e 16
-colunas a 50 mm) sai com 294 pontos, as pontas das voltas exatamente no plano de simetria.
-Nas três chapas `npm run ondulacao` não acusa falha fora de `junto`, nem face virada, com a
-moldura lisa e com a moldura em relevo de 10 mm, e o maior desvio da superfície à versão suavizada fica em 0,83 mm.
+gritar com os pontos. As chapas de prova dos anéis são `procedural/nucleo/fixtures/gaiola-aneis-prova.js`, `procedural/nucleo/fixtures/gaiola-gota-prova.js` e `procedural/nucleo/fixtures/gaiola-borda-livre-prova.js`.
 
 Meça os pontos do anel com peso, e não com cota exata: a cota exata põe 56 faces viradas
 na superfície em nível 2 junto dos cantos da chapa da fatia 1, e a de peso 5 deixa a chapa
@@ -788,8 +755,7 @@ falha traz `extensaoEmEspacamentos`. Até uns dois espaçamentos, mova cada pont
 nomeado 1,5 vez o desvio contra o sinal dele e rode de novo, e repita até a
 falha sumir: uma rodada tira quase tudo, e acima de três a versão suavizada
 acompanha o ponto que se moveu, uma rodada tira cerca de um quarto e a falha
-reaparece nos vizinhos (numa ondulação de seis pontos de 1,7 mm desenhada por
-código, cinco rodadas). O ponto nomeado pode não ser entrada da `TABELA`: o de
+reaparece nos vizinhos. O ponto nomeado pode não ser entrada da `TABELA`: o de
 estação gerada pela interpolação (`estacao_k_coluna`) não se cita, e quem o
 define são as duas estações-chave vizinhas na mesma coluna, que andam juntas, e
 o de coluna que sai de curva de seção sai dos pontos-chave da curva, que são o
@@ -806,17 +772,12 @@ sobre si que o desvio e a emenda não pegam; ela é falha mesmo junto de uma fei
 traz `faces`, `facesViradas` (a mancha cuja normal fica contra a da face da gaiola
 declarada de que descende), `arestas` e `anguloGraus`, e a superfície traz
 `facesViradas`, a soma: a cota exata nos pontos do anel dá 58, perto das 56 da área
-projetada. O limiar padrão é 0,3 mm (`--limiar-mm=`): numa chapa desenhada
-por código com todos os pontos medidos, a forma lisa fica abaixo de 0,23 mm e a
-ondulação de 1 mm plantada entre dois pontos vizinhos sai com 0,88 mm e esses
-dois pontos à frente. Com `medidas`, os pontos citados são os da gaiola
+projetada. O limiar padrão é 0,3 mm (`--limiar-mm=`). Com `medidas`, os pontos citados são os da gaiola
 ajustada, e mexer no ponto declarado move o ajustado. A função
 `ondulacaoDaReceita`, de `tools/modelar/ondulacao-da-superficie.mjs`, faz o
 mesmo num teste. Uma feição desenhada mais estreita que três espaçamentos da
 gaiola sai acusada mesmo com a superfície sobre a forma; alargue a feição ou
-adense as colunas ao redor dela. Na carenagem de prova, colunas a 175 mm longe do
-vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora da
-forma, e com colunas a 87,5 mm a leitura não acha nada. A zebra serve ao reflexo
+adense as colunas ao redor dela. A zebra serve ao reflexo
 (a continuidade entre painéis), e não ao defeito; para o amassado largo e raso use
 a luz rasante e a curvatura da lataria (`tools/blender/luz-rasante.py` e
 `curvatura-da-lataria.py`, em `docs/modelar/modelar-carroceria.md`). A peça com
@@ -828,8 +789,7 @@ como aviso, e a carroceria de outra técnica declara `PLANO.lataria: { partes:
 npm run vistas:superficie -- <peça>`. Na curvatura, a lataria a até 40 mm dos
 vincos nomeados dos passos `subdivisao` sai em ocre e fora da escala (`--faixa-mm=`
 muda a faixa, `--sem-faixa-dos-vincos` volta à escala da lataria inteira), porque
-a dobra pedida esticava a escala e apagava o amassado: na carenagem de prova a
-escala cai de 11,1 para 1,11 1/m. O ocre é a feição declarada, e não defeito.
+a dobra pedida esticava a escala e apagava o amassado. O ocre é a feição declarada, e não defeito.
 
 Para a falha de mais de três espaçamentos, rode `npm run alisar --
 <receita.js>` (`tools/modelar/alisar-a-superficie.mjs`) em vez de rodadas de
@@ -863,11 +823,7 @@ entrada declarada, a coluna de curva de seção com a curva, a fração e os
 pontos-chave, ou a estação gerada com as chaves, a fração e os nós),
 `entradas` (as coordenadas editáveis, como `z800/quarto[2].v`) e `estrutura`
 (o que não é entrada), e a ondulação traz `origem` em cada ponto que cita.
-Numa chapa desenhada por código, com erro de leitura de até 1,5 mm plantado nos
-pontos-chave, o alisamento tira as nove falhas (de até 0,74 mm, quatro delas de
-mais de três espaçamentos) editando números de no máximo 1,4 mm, com as
-medidas a até 1,66 mm; com uma quina real de 15 graus sem vinco, a falha
-cai de 0,59 a 0,48 mm e sai `alisavel: false`. A entrega de carroceria não
+Com uma quina real sem vinco declarado, a falha não some e sai `alisavel: false`. A entrega de carroceria não
 deixa falha de ondulação que o alisamento consiga tirar dentro do erro de
 leitura dos cortes.
 
@@ -881,12 +837,7 @@ pontos das curvas; o ponto de dentro de um retalho segue o preenchimento e não 
 medida. A ferramenta fixa as divisões de cada arco e a posição dos pontos nele
 (a rede as refaz a cada milímetro movido e desliza os pontos com a curvatura) e
 confere no fim sem fixar: `malhaNova` diz se a rede refez a divisão de algum
-arco e quantas falhas a malha nova tem. Numa chapa desenhada por código (19
-curvas, 10 retalhos, 264 números), com erro de 1,5 mm em nove pontos-chave, as
-seis falhas (até 0,65 mm) saem editando 122 números de no máximo 1,8 mm, com os
-240 pontos medidos a até 1,27 mm; com a cintura e a coluna sem o vinco que a
-forma dobra, e a tolerância de 1 mm, sai `alisavel: false` com duas falhas, de
-0,44 e 0,35 mm.
+arco e quantas falhas a malha nova tem.
 
 Quando os vincos vêm das linhas 3D de um pacote (`ler-linhas --3d`, que confere
 cada linha contra os cortes do pacote e põe a que atravessa um corte longe do
@@ -961,7 +912,7 @@ O interior de um retalho de quatro lados é a interpolação transfinita de Coon
 
 A curva pode ser `vinco` (nitidez de 0 a 1 ou `'viva'`, que vira vinco nomeado ao longo de todas as arestas dela) e pode levar `peso` ou `exata: true`. As curvas e os pontos de dentro entram em `medidas` (curva exata por padrão, interior com o peso 1 de `interior`), e `leitura: true` faz a cota da curva sem peso ganhar o peso da leitura, com aviso dos pontos-chave mais perto do que o erro sustenta, como na gaiola por estações. O canto vivo da borda (desvio de direção acima de `anguloDeCanto`, 35 graus) sai sozinho em `passo.cantos`. A moldura é um `friso` com `linha: { nome, pontos: rede.linha('janela') }`, e a linha da curva fechada repete o primeiro ponto no fim. Três coisas gritam ou avisam com o nome: o canto quase reto ou agudo que dobra o preenchimento de Coons (`cantoQuaseReto`, `cantoAgudo`, ou grito se uma face dobra), o arco que vira mais de 22,5 graus numa divisão só (`curvaturaConcentrada`, que pede um nó onde a curvatura muda, como a emenda de um arco com uma reta) e o espaçamento que salta de um arco ao vizinho mais de três vezes (`gradacaoBrusca`).
 
-Na chapa de prova de 1000 × 600 mm (`procedural/nucleo/fixtures/gaiola-por-rede-prova.js`), com a janela em gota de 230 mm na parte larga e ponta de raio 20 mm, o arco de roda de raio 140 mm e a coluna inclinada, 19 curvas e 10 retalhos (8 de quatro lados e 2 de cinco) dão 654 pontos de gaiola e, em nível 2, 9.480 vértices só de quadriláteros. A superfície passa pelas curvas a até 0,26 mm, os vértices extraordinários são 3 de valência 5 no interior (2 centros e um nó) e 2 nós de borda, a borda da janela é um laço de arestas da malha, o salto de normal da superfície nas curvas lisas compartilhadas fica em até 0,96 grau e na cintura vincada em 12, e `npm run ondulacao` sai sem falha e sem face virada, com o desvio máximo de 0,17 mm; sem o alisamento sai um calombo de 0,43 mm. A moldura de 10 mm como `friso` sobre a curva da janela fecha sólida e interpenetra a chapa de 1,5 mm de espessura. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/modelar/ondulacao-rede.test.mjs`.
+A chapa de prova da rede é `procedural/nucleo/fixtures/gaiola-por-rede-prova.js`. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/modelar/ondulacao-rede.test.mjs`.
 
 ### Superfície varrida: `gaiolaVarrida`
 
@@ -1035,9 +986,7 @@ fechada demais para a largura do perfil grita com o ponto da gaiola mais perto.
 A linha que muda de direção numa aresta da gaiola faz canto mesmo na chapa lisa,
 porque cada aresta da gaiola vira uma curva da superfície que chega ao ponto na
 direção da aresta. Cada trecho é corda da chapa, e com `medidas` a corda fica a
-cerca de passo² / (8 × raio) da superfície limite: na chapa de prova do teste,
-com raios de 600 e 900 mm e nível 2, o tubo, a nervura e o friso de ponta
-fechada ficam a no máximo 0,15 mm da linha limite. Na simetria em `x` da
+cerca de passo² / (8 × raio) da superfície limite. Na simetria em `x` da
 superfície, a linha que toca o plano `x = 0` numa ponta continua na imagem
 espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia
 espelhada. `origem` publica as faces, `parte: 'lateral'` a superfície varrida e
@@ -1061,9 +1010,9 @@ const g = gaiolaPorEstacoes({ /* ... */ vaos: [{ nome: 'janela', estacoes: ['e3'
 
 A linha é a borda livre de um vão ou do contorno, pelos nomes de ponto da gaiola e em qualquer sentido: o passo acha de que lado fica a chapa pelo sentido em que a face percorre cada aresta, e grita com o ponto quando um trecho tem duas faces (`este trecho da linha não é borda livre da chapa`) ou muda de lado. `gaiolaPorEstacoes` devolve `bordaDoVao(nome)`, a sequência de pontos da borda do vão pelo nome que o vão tem em `vaos`, com o primeiro repetido no fim quando a borda é uma volta e sem repetir quando o vão abre na borda da chapa; a ordem é a da face que ficou (a chapa à esquerda, vista de fora) e `virar` a inverte. Na simetria em `x`, a borda de um vão que cruza o plano `x = 0` vira uma volta só e fica simétrica, como em qualquer friso. As quinas vivas de 90 graus do vão saem com a esquadria do varrimento, e a ponta aberta da borda do contorno ganha tampas de quadriláteros.
 
-As faces da aba saem lisas a 30 graus, como as da superfície: as arestas vivas (a ponta livre, a parede de espessura, o canto da perna) dividem a normal por inteiro e o arco de 22,5 graus por segmento (`segmentosArco` por quarto de volta, padrão 4) não divide; só nas quinas vivas de 90 graus do vão a sombra do arco se divide até 13 graus, porque as faces de lados opostos da esquadria ficam a 31 graus umas das outras, perto do limiar. A aba é um sólido próprio que nasce na parede da borda da chapa, sem fusão: nomeie as duas com `parte` e declare o contato em `contatos`, que `contatosDaPeca` mede como `interpenetram` porque a costura difere da parede por até 0,07 mm. Na chapa de prova (`procedural/nucleo/fixtures/aba-prova.js`, raios de 600 e 900 mm, nível 2, aba de 20 mm a 90 graus com raio de 2 mm e chapa de 2 mm) a aba acompanha a borda do vão a no máximo 0,17 mm da linha limite, a dobra tem o raio e o ângulo declarados (erro de 0,0007 mm no raio e 0,01 grau, a raiz a até 0,4 grau da normal da chapa), os 32 vértices de fora da costura coincidem com os da chapa e os de dentro ficam a até 0,07 mm, e cada parte fecha sem achado no `conferir-malha`. A aba não confere colisão com outras partes nem com a aba de um vão vizinho.
+As faces da aba saem lisas a 30 graus, como as da superfície: as arestas vivas (a ponta livre, a parede de espessura, o canto da perna) dividem a normal por inteiro e o arco de 22,5 graus por segmento (`segmentosArco` por quarto de volta, padrão 4) não divide; só nas quinas vivas de 90 graus do vão a sombra do arco se divide até 13 graus, porque as faces de lados opostos da esquadria ficam a 31 graus umas das outras, perto do limiar. A aba é um sólido próprio que nasce na parede da borda da chapa, sem fusão: nomeie as duas com `parte` e declare o contato em `contatos`, que `contatosDaPeca` mede como `interpenetram` porque a costura difere da parede por até 0,07 mm. A chapa de prova da aba é `procedural/nucleo/fixtures/aba-prova.js`. A aba não confere colisão com outras partes nem com a aba de um vão vizinho.
 
-Sem `espessura` no passo da superfície a chapa é só a pele (é o que o pacote cego entrega), e a mesma declaração `aba: { largura, angulo, raio }` faz a aba em PELE: uma superfície aberta, de quadriláteros, sem tampas e sem espessura própria. A pele continua a borda do vão com as faces orientadas como as da chapa (a normal da aba sai da linha igual à da chapa e gira com a dobra), dobra para dentro num arco de raio `raio` e `angulo` graus, e segue em perna reta de `largura`. O `raio` é então o da própria pele, e não o da face de dentro: para a pele coincidir com a face de fora de uma chapa de espessura `t` e raio interno `r`, declare `raio` igual a `r + t`. A aba não ganha espessura declarada à parte, porque a pele que o pacote entrega não a tem; a receita que quer a aba sólida declara a espessura na chapa, e o caso com espessura sai como antes. Os mesmos gritos valem (`raio`, `largura` e `angulo` inválidos, aba que passa por baixo da chapa, trecho que não é borda livre), e a pele não faz parte de um sólido: não declare contato de volume com a chapa, e confira a continuidade pela borda em comum, cujos vértices da primeira fileira coincidem com os da borda da chapa e cujas arestas são percorridas em sentido oposto. Na chapa de prova sem espessura, a aba de 20 mm a 90 graus com raio de 2 mm acompanha a borda do vão a no máximo 0,17 mm da linha limite, o raio sai com erro de 0,0001 mm e o ângulo de 0,01 grau, a perna tem 20,00 mm, os 32 vértices da primeira fileira coincidem com os da borda da chapa (32 arestas de costura, todas em sentido oposto), nenhuma aresta é percorrida duas vezes no mesmo sentido, o diedro entre faces vizinhas fica em 22,5 graus fora das quatro quinas de 90 graus do vão e em 90,3 graus nelas, e duas execuções dão a mesma malha. A prova está em `procedural/nucleo/friso-aba-pele.test.mjs`.
+Sem `espessura` no passo da superfície a chapa é só a pele (é o que o pacote cego entrega), e a mesma declaração `aba: { largura, angulo, raio }` faz a aba em PELE: uma superfície aberta, de quadriláteros, sem tampas e sem espessura própria. A pele continua a borda do vão com as faces orientadas como as da chapa (a normal da aba sai da linha igual à da chapa e gira com a dobra), dobra para dentro num arco de raio `raio` e `angulo` graus, e segue em perna reta de `largura`. O `raio` é então o da própria pele, e não o da face de dentro: para a pele coincidir com a face de fora de uma chapa de espessura `t` e raio interno `r`, declare `raio` igual a `r + t`. A aba não ganha espessura declarada à parte, porque a pele que o pacote entrega não a tem; a receita que quer a aba sólida declara a espessura na chapa, e o caso com espessura sai como antes. Os mesmos gritos valem (`raio`, `largura` e `angulo` inválidos, aba que passa por baixo da chapa, trecho que não é borda livre), e a pele não faz parte de um sólido: não declare contato de volume com a chapa, e confira a continuidade pela borda em comum, cujos vértices da primeira fileira coincidem com os da borda da chapa e cujas arestas são percorridas em sentido oposto. A prova está em `procedural/nucleo/friso-aba-pele.test.mjs`.
 
 ### Largura e ângulo variáveis ao longo da linha, e o canto em meia-esquadria: `variacao`
 
@@ -1082,7 +1031,7 @@ Com `perfil`, só `largura` vale, e é a extensão em u do perfil: o perfil de e
 
 O degrau de largura vale só num canto vivo, a partir de 10 graus de giro da linha (`GIRO_MINIMO_DO_DEGRAU`, em `procedural/nucleo/friso.js`), e as duas faixas se cortam na meia-esquadria: o plano que passa pelo ponto da linha, pela normal e pelo encontro das duas bordas de fora, que com larguras iguais é o plano bissetor de sempre. Cada ponto do perfil cai nesse plano no mesmo lugar visto de uma faixa e da outra, e por isso a junta tem um anel só, soldado às duas faixas, sem entalhe, furo nem face côncava; o deslocamento do anel ao longo da tangente bissetora é u × (largura antes − largura depois) / (2 sen φ), com φ a metade do giro. Grita com o nome e o ponto: campo desconhecido, ponto que não está na linha ou passa mais de uma vez, valor ou degrau malformado, `valor` junto de `antes` e `depois`, degrau na ponta da linha aberta, degrau numa linha que segue reta ou vira menos de 10 graus (`a largura muda em degrau neste ponto, e a linha só vira 8 graus`), degrau na aba e ponto de degrau no plano de simetria. Na simetria em `x` a cópia espelhada leva a mesma variação, e na linha emendada pela imagem o ponto espelhado troca `antes` e `depois`, porque a linha o percorre ao contrário.
 
-Na chapa de prova de `procedural/nucleo/fixtures/friso-prova.js` (a volta de 400 mm em volta do vão de cantos vivos, com travessa de 14 mm, montante de 7 mm, perfil de 5 mm de profundidade e chapa de 2 mm), a moldura sai com 64 estações de 4 pontos (256 vértices e 256 faces), fechada (512 arestas, todas de duas faces, nenhuma borda), em um corpo, sem face côncava, sem face fina e sem reprova; as estações fora dos cantos têm 14,000 e 7,000 mm de largura a menos de 1 µm, o volume fica a 0,35% da soma largura × profundidade × comprimento, e a borda de cada faixa entra e sai do canto com a direção que tem na moldura de largura igual, a 0,3 grau. A conferência de malha com triangulação acusa `face-torta`, como o tubo da mesma chapa. A aba da chapa de prova com a perna de 12 a 24 mm e o ângulo de 90 a 60 graus entre dois pontos da borda sai fechada, em um corpo e sem face côncava. Sem `variacao` o friso sai bit a bit como antes: o teste confere o hash do neutro dos três passos de prova anteriores a esta opção. A prova está em `procedural/nucleo/friso-largura-variavel.test.mjs`, e o contato declarado da moldura com a chapa em `friso-contato.test.mjs`.
+A chapa de prova da moldura de largura variável é `procedural/nucleo/fixtures/friso-prova.js`. A conferência de malha com triangulação acusa `face-torta`, como o tubo da mesma chapa. Sem `variacao` o friso sai bit a bit como antes: o teste confere o hash do neutro dos três passos de prova anteriores a esta opção. A prova está em `procedural/nucleo/friso-largura-variavel.test.mjs`, e o contato declarado da moldura com a chapa em `friso-contato.test.mjs`.
 
 ### A moldura em volta de um vão: `vaos` da receita
 
@@ -1294,7 +1243,7 @@ por alias, sendo `+X` o lado de FORA do carro.
 unem, com a exceção de `onde`, que filtra o que os outros juntaram (chave
 desconhecida GRITA nomeando todos). `sel:{tudo:true}` é a
 ÚNICA forma explícita de "a peça inteira" — todos os vértices e todas as
-faces vivos (Rodada B da Fase 3.5). Só aceita o literal `true`
+faces vivos. Só aceita o literal `true`
 (`false`/`1`/`'sim'` GRITAM). **Deliberadamente diferente de `sel` ausente,
 que continua GRITANDO**: ausência nunca virou "tudo" — um erro de digitação
 (`fases:` em vez de `faces:`) não pode pintar a peça inteira em silêncio; só
@@ -1314,7 +1263,7 @@ da operação ou o comentário canônico antes de citar e nunca suponha que
 No loft **e no lathe** (o `lathe` reusa o MESMO contrato do loft, faixa×lado — é o
 TEMPLATE de que o loft generalizou), `sel:{origem:{op:'loft'|'lathe',id,
 faixa?,lado?}}` endereça a grade de duas dimensões da origem — **`faixa` e
-`lado` são os DOIS opcionais** (D-130, Rodada A da Fase 3.5), ausente =
+`lado` são os DOIS opcionais** (D-130), ausente =
 "todos" nesse eixo: `{faixa}` é o anel/segmento local zero-based;
 `{faixa,lado}` é uma face só; `{lado}` sem `faixa` é a **coluna** (uma face
 por faixa, no mesmo lado — pula faixa sem lateral, e lado fora do limite em
@@ -1324,7 +1273,7 @@ SEGMENTO entre dois pontos consecutivos do perfil (a mesma contagem da
 guarda `polo↔polo` da op: segmento degenerado não emite face, é pulado na
 união e GRITA se endereçado explícito, igual a uma faixa sem lateral no
 loft). **Cada eixo também aceita um FILTRO DE PROGRESSÃO `{passo,fase}`**
-(D-130, Rodada C da Fase 3.5) — o índice `k` daquele eixo entra se
+(D-130) — o índice `k` daquele eixo entra se
 `k%passo===fase`: `{lado:{passo:2,fase:0}}` são os lados pares de toda faixa,
 `{lado:{passo:2,fase:1}}` os ímpares, `{faixa:{passo:3,fase:0}}` cada
 terceiro anel. `passo` inteiro `≥1`, `fase` inteiro em `[0,passo)`, **os dois
@@ -1478,3 +1427,105 @@ está no catálogo gerado (`descrever_capacidade`).
 `inflate` continua blocky; o `filete` tem os limites declarados no catálogo;
 JS puro não tem replay canônico. Superfície lisa de chapa é a `subdivisao`, com a
 técnica de `docs/modelar/modelar-carroceria.md`. Não declare uma forma coberta sem evidência visual e estrutural.
+
+## Histórico
+
+Os números que se mediram nas chapas de prova e o que se tentou, tirados do corpo da referência, que guarda só a instrução. Nada desta seção manda fazer alguma coisa; os números valem para a peça e para a versão da ferramenta em que foram medidos.
+
+### Superfície subdividida: medidas
+
+Sem medida em todos os pontos, a faixa adensada saltou para fora do resto da lateral da carenagem de prova: 4,5 mm, contra 0,3 mm na faixa fina.
+
+Numa chapa de grade de
+100 mm com vinte cotas alinhadas e ruído de até ±2 mm, a exata dá desvio de
+normal p95 de 1,43 grau, e o peso 1 dá 0,65 grau, com desvio médio de 0,79 mm
+às cotas (ruído médio de 1,04 mm) e de 0,53 mm à forma sem ruído, contra
+1,04 mm da exata; peso 4 deixa 0,48 mm nas cotas e 0,85 grau, peso 16,
+0,22 mm e 1,06 grau.
+
+No sétimo teste cego, erros de leitura de 1,6 a 2,9 mm viraram rugas na superfície que passou exatamente pelos pontos lidos.
+
+Numa chapa de 1600 mm com erro de ±2 mm plantado em todos os pontos, a cota exata ondula até 2,32 mm (21 falhas a `--limiar-mm=1`) e o peso padrão até 0,73 mm (nenhuma a esse limiar).
+
+Na carenagem de prova, a sombra lisa tira as
+listras de triângulo que a luz chapada desenhava nas pontas da cintura e a
+quebra mantém a dobra até onde o vinco termina.
+
+### Superfície subdividida: anéis
+
+Na chapa de prova da fatia 1, com uma só faixa de 120 mm ao lado da volta de 10 mm, a superfície saiu com 137 faces viradas em nível 2 e 614 em nível 3, mesmo com os pontos do anel de peso 5; com a transição, nenhuma.
+
+Na chapa de prova da fatia 1 (`procedural/nucleo/fixtures/gaiola-aneis-prova.js`, raios de 2 e
+3 m, um vão de 900 × 1000 mm com cantos de 50 mm e um recorte de 300 × 800 mm na borda), os
+pontos do anel ficam a 0,009 mm da chapa, os lados das voltas a 0,03 mm do gabarito da
+janela e a 0,11 mm do do recorte, o raio dos arcos a 0,12 mm do pedido (medido pelo círculo
+por três pontos do arco), e as pontas do anel aberto exatamente sobre a borda livre. Na
+chapa da gota (`procedural/nucleo/fixtures/gaiola-gota-prova.js`, raios de 1800 e 2500 mm, uma gota de 450 mm que tem 230 mm de
+altura na estação larga e 10 mm na ponta, numa grade que a acompanha com arestas de 38 a 67 mm
+em 500 × 975 mm), o anel de recuo 0 troca duas camadas de faces e sai com 241 pontos e 202
+quadriláteros, as voltas a 10,000 e 20,000 mm da borda nos lados e os cantos em esquadria. O anel
+de recuo por lado, na mesma gota com o vão 60 mm, 80 mm e 70 mm maior que a abertura em 588 × 1050 mm,
+põe a abertura a 60,0 mm da borda do vão embaixo, a 80,0 mm em cima e a 70,0 mm nas pontas (a
+menos de 0,05 mm), com as voltas a 10 e 20 mm dela, o canto de 50 mm com o raio pedido mais a
+distância e a ponta viva; sai com 223 pontos, 187 quadriláteros e dez vértices extraordinários
+declarados (valência 3, 5 e 6). A metade de chapa
+com o vão de colunas que terminam e começam (`procedural/nucleo/fixtures/gaiola-borda-livre-prova.js`, 17 estações e 16
+colunas a 50 mm) sai com 294 pontos, as pontas das voltas exatamente no plano de simetria.
+Nas três chapas `npm run ondulacao` não acusa falha fora de `junto`, nem face virada, com a
+moldura lisa e com a moldura em relevo de 10 mm, e o maior desvio da superfície à versão suavizada fica em 0,83 mm.
+
+### Superfície subdividida: ondulação e alisamento
+
+Numa ondulação de seis pontos de 1,7 mm desenhada por código, a rodada que tira cerca de um quarto da falha precisou de cinco repetições.
+
+Numa chapa desenhada
+por código com todos os pontos medidos, a forma lisa fica abaixo de 0,23 mm e a
+ondulação de 1 mm plantada entre dois pontos vizinhos sai com 0,88 mm e esses
+dois pontos à frente.
+
+Na carenagem de prova, colunas a 175 mm longe do
+vinco, fundidas em triângulos perto dele, deixaram a superfície 0,35 mm fora da
+forma, e com colunas a 87,5 mm a leitura não acha nada.
+
+Na carenagem de prova a escala da curvatura cai de 11,1 para 1,11 1/m com a faixa dos vincos fora da escala.
+
+Numa chapa desenhada por código, com erro de leitura de até 1,5 mm plantado nos
+pontos-chave, o alisamento tira as nove falhas (de até 0,74 mm, quatro delas de
+mais de três espaçamentos) editando números de no máximo 1,4 mm, com as
+medidas a até 1,66 mm; com uma quina real de 15 graus sem vinco, a falha
+cai de 0,59 a 0,48 mm e sai `alisavel: false`.
+
+Numa chapa desenhada por código (19
+curvas, 10 retalhos, 264 números), com erro de 1,5 mm em nove pontos-chave, as
+seis falhas (até 0,65 mm) saem editando 122 números de no máximo 1,8 mm, com os
+240 pontos medidos a até 1,27 mm; com a cintura e a coluna sem o vinco que a
+forma dobra, e a tolerância de 1 mm, sai `alisavel: false` com duas falhas, de
+0,44 e 0,35 mm.
+
+### Rede de curvas e retalhos: gaiolaPorRede
+
+Na chapa de prova de 1000 × 600 mm (`procedural/nucleo/fixtures/gaiola-por-rede-prova.js`), com a janela em gota de 230 mm na parte larga e ponta de raio 20 mm, o arco de roda de raio 140 mm e a coluna inclinada, 19 curvas e 10 retalhos (8 de quatro lados e 2 de cinco) dão 654 pontos de gaiola e, em nível 2, 9.480 vértices só de quadriláteros. A superfície passa pelas curvas a até 0,26 mm, os vértices extraordinários são 3 de valência 5 no interior (2 centros e um nó) e 2 nós de borda, a borda da janela é um laço de arestas da malha, o salto de normal da superfície nas curvas lisas compartilhadas fica em até 0,96 grau e na cintura vincada em 12, e `npm run ondulacao` sai sem falha e sem face virada, com o desvio máximo de 0,17 mm; sem o alisamento sai um calombo de 0,43 mm. A moldura de 10 mm como `friso` sobre a curva da janela fecha sólida e interpenetra a chapa de 1,5 mm de espessura.
+
+### Friso, aba e variação
+
+Na chapa de prova do teste,
+com raios de 600 e 900 mm e nível 2, o tubo, a nervura e o friso de ponta
+fechada ficam a no máximo 0,15 mm da linha limite.
+
+Na chapa de prova (`procedural/nucleo/fixtures/aba-prova.js`, raios de 600 e 900 mm, nível 2, aba de 20 mm a 90 graus com raio de 2 mm e chapa de 2 mm) a aba acompanha a borda do vão a no máximo 0,17 mm da linha limite, a dobra tem o raio e o ângulo declarados (erro de 0,0007 mm no raio e 0,01 grau, a raiz a até 0,4 grau da normal da chapa), os 32 vértices de fora da costura coincidem com os da chapa e os de dentro ficam a até 0,07 mm, e cada parte fecha sem achado no `conferir-malha`.
+
+Na chapa de prova sem espessura, a aba de 20 mm a 90 graus com raio de 2 mm acompanha a borda do vão a no máximo 0,17 mm da linha limite, o raio sai com erro de 0,0001 mm e o ângulo de 0,01 grau, a perna tem 20,00 mm, os 32 vértices da primeira fileira coincidem com os da borda da chapa (32 arestas de costura, todas em sentido oposto), nenhuma aresta é percorrida duas vezes no mesmo sentido, o diedro entre faces vizinhas fica em 22,5 graus fora das quatro quinas de 90 graus do vão e em 90,3 graus nelas, e duas execuções dão a mesma malha.
+
+Na chapa de prova de `procedural/nucleo/fixtures/friso-prova.js` (a volta de 400 mm em volta do vão de cantos vivos, com travessa de 14 mm, montante de 7 mm, perfil de 5 mm de profundidade e chapa de 2 mm), a moldura sai com 64 estações de 4 pontos (256 vértices e 256 faces), fechada (512 arestas, todas de duas faces, nenhuma borda), em um corpo, sem face côncava, sem face fina e sem reprova; as estações fora dos cantos têm 14,000 e 7,000 mm de largura a menos de 1 µm, o volume fica a 0,35% da soma largura × profundidade × comprimento, e a borda de cada faixa entra e sai do canto com a direção que tem na moldura de largura igual, a 0,3 grau.
+
+A aba da chapa de prova com a perna de 12 a 24 mm e o ângulo de 90 a 60 graus entre dois pontos da borda sai fechada, em um corpo e sem face côncava.
+
+### Seleção e identidade
+
+Ler a `origem` como identificador custou três rodadas a quem escreveu `origemId` no lugar dela.
+
+A seleção `sel:{tudo:true}` veio na Rodada B da Fase 3.5.
+
+A seleção `faixa`/`lado` de `lathe` e `loft` veio na Rodada A da Fase 3.5 (D-130).
+
+O filtro de progressão `{passo,fase}` veio na Rodada C da Fase 3.5 (D-130).

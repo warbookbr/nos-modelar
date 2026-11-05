@@ -205,7 +205,7 @@ function medirReceita(receita) {
  * vezes igual e tem os parâmetros contados, sem nenhum declarado vivo ou inerte.
  * Serve à varredura do acervo real, em que as sondas são quase todo o custo.
  */
-export function diagnosticarParametros(receita, { medir = medirReceita, sondar = true } = {}) {
+export function diagnosticarParametros(receita, { medir = medirReceita, sondar = true, apenas = null, aoSondar = null } = {}) {
   if (!receita || typeof receita !== 'object') {
     throw new Error('diagnosticarParametros: informe uma receita já carregada.');
   }
@@ -260,9 +260,15 @@ export function diagnosticarParametros(receita, { medir = medirReceita, sondar =
     };
   }
 
+  /* `apenas` restringe as sondas aos caminhos que começam por um dos prefixos pedidos. Cada sonda refaz a peça inteira, e numa
+     peça grande o diagnóstico completo leva horas (o furgão: 177 parâmetros, 34 s por execução; achado de 2026-11-05). A
+     resposta de cada parâmetro sondado é a mesma do diagnóstico completo; os outros ficam como não sondados, e não como inertes. */
+  const todos = caminhosNumericos(params);
+  const escolhidos = apenas?.length ? todos.filter((c) => apenas.some((p) => c.join('.') === p || c.join('.').startsWith(p))) : todos;
   const parametros = [];
-  for (const caminho of caminhosNumericos(params)) {
+  for (const [indice, caminho] of escolhidos.entries()) {
     const nome = caminho.join('.');
+    aoSondar?.({ nome, indice, total: escolhidos.length });
     const valor = lerCaminho(params, caminho);
     let registro = { caminho: nome, valor, estado: 'inerte', efeito: null, sondas: [] };
     for (const sonda of sondas(valor)) {
@@ -288,7 +294,7 @@ export function diagnosticarParametros(receita, { medir = medirReceita, sondar =
     carregou: true,
     erro: null,
     indiagnosticavel: null,
-    totais: { declarados: parametros.length, vivos, inertes: parametros.length - vivos },
+    totais: { declarados: todos.length, vivos, inertes: parametros.length - vivos, ...(escolhidos.length !== todos.length ? { naoSondados: todos.length - escolhidos.length } : {}) },
     parametros,
     determinismo,
     assinaturaBase,
@@ -313,9 +319,9 @@ export function formatarDiagnostico(diagnostico, { alvo = 'receita', completo = 
       + '  Sem parte medida não há como saber se um parâmetro move alguma coisa;\n'
       + "  publique identidade semântica com o passo 'parte' antes de perguntar.\n";
   }
-  const { declarados, vivos, inertes } = diagnostico.totais;
+  const { declarados, vivos, inertes, naoSondados } = diagnostico.totais;
   const linhas = [`PARÂMETROS DE ${alvo}`];
-  linhas.push(`  ${declarados} declarado(s) — ${vivos} vivo(s), ${inertes} inerte(s)`);
+  linhas.push(`  ${declarados} declarado(s) — ${vivos} vivo(s), ${inertes} inerte(s)${naoSondados ? `, ${naoSondados} não sondado(s) por --parametros` : ''}`);
   if (!diagnostico.determinismo.estavel) {
     linhas.push('  ⚠ MEDIÇÃO INSTÁVEL: a mesma entrada mediu diferente duas vezes.');
     linhas.push('    Enquanto isso valer, "mudou" não separa efeito de ruído.');

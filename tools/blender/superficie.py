@@ -40,8 +40,15 @@ def luz_nas_amostras(normais, vista, rasante_graus, azimute_graus, sombra=None):
     return np.where(acesa, c, 0.0)
 
 
+# A fração alcançada que um azimute precisa ter na estimativa para entrar no par: o limiar com que o pacote do crítico recusa a
+# imagem escura (LIMIAR_DA_LUZ_RASANTE, 0,25, em tools/modelar/vistas-de-superficie.mjs) mais uma margem de 0,05 para o erro da
+# estimativa. Sem ela a escolha olhava só a fração rasante e podia ficar com um azimute que o pacote recusava: o furgão com os
+# faróis novos teve a estimativa de 0,258 na frente a 30 graus e a imagem saiu com 0,248 (achado de 2026-11-05).
+ILUMINADA_MINIMA = 0.30
+
+
 def escolher_azimutes(normais, vista, rasante_graus, sombra=None, passo=10.0, separacao=90.0, preferido=30.0, folga=0.05,
-                      rasa_ate_graus=RASA_ATE_GRAUS):
+                      rasa_ate_graus=RASA_ATE_GRAUS, iluminada_minima=ILUMINADA_MINIMA):
     """Os dois azimutes da luz rasante de uma vista, escolhidos pelo que a câmera dela vê. `normais` (N, 3) são as normais da
     superfície nas amostras que a câmera vê (uma por pixel de uma grade, de modo que cada uma pesa a área projetada que cobre).
     Cada azimute da grade de `passo` graus vale a fração das amostras que a luz alcança, fora da sombra, a até `rasa_ate_graus`
@@ -62,11 +69,15 @@ def escolher_azimutes(normais, vista, rasante_graus, sombra=None, passo=10.0, se
     luz = {a: luz_nas_amostras(N, vista, rasante_graus, a, sombra) for a in candidatos}
     rasa = {a: float(((c > 0) & (c <= teto)).mean()) for a, c in luz.items()}
     pares = [(a, (a + separacao) % 360) for a in candidatos]
+    ilum = {a: float((c > 0).mean()) for a, c in luz.items()}
+    # só entram os pares em que a luz dos dois azimutes alcança a peça acima do limiar; sem nenhum, ficam todos, como antes
+    acesos = [p for p in pares if ilum[p[0]] >= iluminada_minima and ilum[p[1]] >= iluminada_minima]
+    pares = acesos or pares
     nota = {p: min(rasa[p[0]], rasa[p[1]]) for p in pares}
     melhor = max(nota.values())
     distancia = lambda a: abs((a - preferido + 180) % 360 - 180)
     a, b = min((p for p in pares if nota[p] >= melhor - folga), key=lambda p: (distancia(p[0]), p[0]))
-    return [a, b], {k: {'rasante': round(rasa[k], 4), 'iluminada': round(float((luz[k] > 0).mean()), 4)} for k in (a, b)}
+    return [a, b], {k: {'rasante': round(rasa[k], 4), 'iluminada': round(ilum[k], 4)} for k in (a, b)}
 
 
 LIMIAR_DE_PIXEL_ACESO = 8 / 255   # a luminância (0 a 1, no PNG) acima da qual o pixel da peça conta como iluminado; sem luz de ambiente, o que a luz não alcança sai 0
