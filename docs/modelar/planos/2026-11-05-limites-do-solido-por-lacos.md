@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/fixtures/solido-por-lacos/`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `docs/modelar/banco-de-provas/limites-do-solido-por-lacos-2026-11-05/`
+**Território:** `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/fixtures/solido-por-lacos/`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/nucleo.js` no contrato de origem da subdivisao, `procedural/nucleo/subdivisao-grupos.test.ts`, `procedural/nucleo/uso-operacoes.js`, `docs/modelar/banco-de-provas/limites-do-solido-por-lacos-2026-11-05/`
 
 **Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-05 ("vamos resolver o que der pra não ficar pendência")
 
@@ -27,7 +27,7 @@ Uma peça de teste neutra com a forma da coluna (um disco e um cilindro que sobe
 - reproduzir cada limite numa peça de teste neutra em `tools/fixtures/solido-por-lacos/`, antes de corrigir;
 - a correção de cada um no ajudante, ou a recusa com o motivo e o que fazer, quando a correção não couber;
 - os grupos de faces da gaiola publicados pelo `subdivisao` para a seleção de parte;
-- a ficha do ajudante e o banco de provas com as medidas de antes e depois.
+- a ficha do ajudante e o banco de provas com as medidas de antes e depois, nas [provas](../banco-de-provas/limites-do-solido-por-lacos-2026-11-05/README.md).
 
 ## Excluído
 

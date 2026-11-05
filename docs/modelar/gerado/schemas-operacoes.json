@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:84fcae3f49c369d46540d09fd8f52314553421788784d6164e73a46791e7c65b",
+  "assinatura": "sha256:f0881637566bd7553c71a6c5a048110f918e10136854bf265ad9613f6c216ee6",
   "total": 40,
   "operacoes": [
     {
@@ -4339,6 +4339,10 @@
               "type": "string",
               "minLength": 1,
               "description": "Onde a sombra lisa se divide qualquer que seja o ângulo: 'vivos' (padrão), nas arestas que descendem de vinco vivo, que continua dobra nas pontas onde o diedro cai abaixo do ângulo; 'todos', também nos vincos de nitidez fracionária; 'nenhum', só pelo ângulo."
+            },
+            "grupos": {
+              "type": "array",
+              "description": "Grupos de faces da gaiola, {nome, pontos}: pontos é a lista de nomes de ponto da gaiola, e o grupo é o conjunto das faces da gaiola cujos pontos estão todos nela. A origem do passo cita o grupo em `parte` ({ op: 'subdivisao', id, parte: nome }), e a seleção de `parte` recorta a superfície refinada pela gaiola e não por caixa. Só sem espessura e sem simetria; o nome não pode ser externa, interna nem borda. A gaiolaPorLacos devolve os grupos prontos (grupos: [{ nome, lacos: [de, ate], trechos }]) em passo.grupos."
             }
           }
         },

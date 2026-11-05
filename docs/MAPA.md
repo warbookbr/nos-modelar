@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1639 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1647 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -344,6 +344,10 @@
 - `ROTEIRO.md` — Medida de leitura da leitura por demanda
 - `tarefa-corrigir.md` — Tarefa de corrigir
 - `tarefa-modelar.md` — Tarefa de modelar
+
+## docs/modelar/banco-de-provas/limites-do-solido-por-lacos-2026-11-05/
+
+- `README.md` — Limites do sólido por laços — provas das fatias 1 a 3
 
 ## docs/modelar/banco-de-provas/navegacao-de-receitas-2026-11-05/
 
@@ -1010,6 +1014,7 @@
 - `selecao-geometrica.test.mjs` — selecao-geometrica.test.mjs — `sel.onde`: face e aresta por propriedade geométrica, sem identificador numérico. As expectativas vêm de contas sobre as coorde…
 - `selecao-nas-edicoes.test.mjs` — selecao-nas-edicoes.test.mjs — `sel` no lugar do id em moveV, moveF, moveA, vira, mescla, pesar e filete.
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
+- `subdivisao-grupos.test.ts` — subdivisao-grupos.test.ts — os grupos de faces da gaiola do passo `subdivisao` (campo `grupos`): cada grupo é uma lista de nomes de ponto, as faces dele são …
 - `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
 - `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação,…
 - `topologia.js` — topologia.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve. Até 2026-10-27 morava em `modulos/topologia/`; …
@@ -2207,7 +2212,12 @@
 ## tools/fixtures/solido-por-lacos/
 
 - `aresta-arredondada.js` — aresta-arredondada.js — a peça de comparação do terceiro limite da peça de teste: uma caixa da mesma seção da parte deitada (190 mm de largura, de y = 20 a 2…
+- `coluna-forma.js` — coluna-forma — os laços da peça de teste "coluna sobre disco" do plano dos limites do sólido por laços: um disco de eixo z e um cilindro de eixo y que sobe d…
+- `coluna-medir.mjs` — coluna-medir — as medidas da peça de teste "coluna sobre disco" sobre a malha que o núcleo entrega, cada uma contra o número declarado em `coluna-forma.js`: …
+- `coluna.js` — coluna-sobre-disco — a peça de teste do plano dos limites do sólido por laços: um disco de eixo z (raio 78 mm, espessura 156 mm) e um cilindro de 156 mm de d…
+- `coluna.test.ts` — coluna.test.ts — a peça de teste "coluna sobre disco" do plano dos limites do sólido por laços (`coluna.js`): um disco e um cilindro que sobe dele, tangente …
 - `desenhar-canto.mjs` — desenhar-canto.mjs — desenha o terceiro limite da peça de teste do sólido por laços: o canto de cima em +x da seção da parte deitada, no corte z = 0, em quat…
+- `desenhar-vistas.mjs` — desenhar-vistas.mjs — desenha as quatro vistas da peça de teste "coluna sobre disco" (isométrica, frontal, direita e superior) em PNG, sem navegador: projeçã…
 - `dobra-em-u.js` — dobra-em-u — o segundo caso do plano do sólido por laços: uma barra dobrada em U, de 120 mm de largura em x, fechada numa malha só pela subdivisão da gaiola …
 - `forma.js` — forma.js — a forma da peça de teste do plano do sólido por laços: um L de ponta-cabeça fechado, feito de uma malha só por subdivisão da gaiola que `gaiolaPor…
 - `medir-limites.mjs` — medir-limites.mjs — imprime, em JSON, as medidas do plano do sólido por laços nas peças de teste: a ondulação de `tools/modelar/ondulacao-da-superficie.mjs` …
@@ -2217,6 +2227,7 @@
 
 ## tools/fixtures/solido-por-lacos/referencias/
 
+- `alvo-da-coluna.md` — Alvo da coluna sobre disco
 - `alvo.md` — Alvo do sólido por laços
 
 ## tools/fixtures/solido-por-lacos/variantes/

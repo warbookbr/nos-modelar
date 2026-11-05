@@ -5,6 +5,7 @@
    (a mesma receita dá a mesma malha) e o gate 3, os quatro limites do ombro: a recusa da cota exata em todos os pontos e dos planos
    próximos, a compensação que leva o canto e a dobra ao raio pedido, e os avisos de amostragem desigual. Os números estão em
    `docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/README.md`. */
+import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — serviço de autoria em JavaScript.
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
@@ -61,6 +62,15 @@ describe('sólido por laços: a peça em L e a dobra em U pela gaiola de gaiolaP
     expect(u.gate1).toEqual({ arestasSemPar: 0, vinculosNaoManifold: 0, triangulosSemArea: 0 });
     expect([l.vertices, l.faces]).toEqual([13034, 13032]);
     expect([u.vertices, u.faces]).toEqual([7874, 7872]);
+  });
+
+  it('as duas saem iguais às de antes do plano dos limites do sólido por laços: a mesma impressão da malha, até o micrômetro', () => {
+    /* a impressão é o sha1 dos vértices (em metro, a 6 casas) e das faces com a parte; o ajudante de antes dava os mesmos valores */
+    const impressao = (n: any) => createHash('sha1').update(JSON.stringify([
+      [...n.V.entries()].map(([k, v]: any) => [k, v.map((x: number) => Number(x.toFixed(6)))]), [...n.F.entries()].map(([k, f]: any) => [k, f.vs, f.parte]),
+    ])).digest('hex').slice(0, 12);
+    expect(impressao(neutro)).toBe('36b4d573a66c');
+    expect(impressao(neutroU)).toBe('6467eb2f5077');
   });
 
   it('gate 2: a forma de fora do L fica a até 0,5 mm do corpo feito à mão, e a ondulação não passa a dele', () => {

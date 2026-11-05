@@ -1670,14 +1670,19 @@ CONTRATOS_ORIGEM.arredondarCostura = contratoFaces('arredondarCostura');
    das bordas livres e dos vãos). Sem `parte`, são todas. */
 CONTRATOS_ORIGEM.subdivisao = {
   validar(origem) {
-    const msg = "subdivisao usa op, id e parte opcional ('externa', 'interna' ou 'borda', só com espessura)";
+    const msg = "subdivisao usa op, id e parte opcional ('externa', 'interna' ou 'borda', só com espessura, ou o nome de um grupo declarado em `grupos` do passo)";
     if (!Object.keys(origem).every((k) => k === 'op' || k === 'id' || k === 'parte')) return msg;
-    if (origem.parte != null && !['externa', 'interna', 'borda'].includes(origem.parte)) return msg;
+    if (origem.parte != null && (typeof origem.parte !== 'string' || !origem.parte)) return msg;
     return null;
   },
   resolver(st, registro, origem) {
-    if (origem.parte != null && !registro.espessura) return { erro: `origem subdivisao:${origem.id} (${origem.parte}): a superfície não tem espessura, e parte só existe com espessura` };
-    const lista = origem.parte ? registro[origem.parte] : registro.faces;
+    /* `grupos` do passo: as faces da superfície refinada que descendem das faces da gaiola de cada grupo, citáveis pelo nome em `parte` */
+    const grupo = origem.parte != null ? registro.grupos?.[origem.parte] : undefined;
+    if (origem.parte != null && !grupo) {
+      if (!['externa', 'interna', 'borda'].includes(origem.parte)) return { erro: `origem subdivisao:${origem.id} (${origem.parte}): subdivisao usa parte opcional ('externa', 'interna' ou 'borda', só com espessura) ou o nome de um grupo declarado em grupos do passo (${Object.keys(registro.grupos ?? {}).map((g) => `'${g}'`).join(', ') || 'nenhum'})` };
+      if (!registro.espessura) return { erro: `origem subdivisao:${origem.id} (${origem.parte}): a superfície não tem espessura, e parte só existe com espessura` };
+    }
+    const lista = grupo ?? (origem.parte ? registro[origem.parte] : registro.faces);
     for (const f of lista) {
       const consumo = conferirConsumo(st, f, `a face ${f} da origem subdivisao:${origem.id}`);
       if (consumo) return { erro: consumo };

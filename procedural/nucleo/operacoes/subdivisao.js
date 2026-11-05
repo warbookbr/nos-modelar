@@ -83,6 +83,48 @@ function vincosPorNome(lista, indiceDoNome, faces, st) {
   return { vincos };
 }
 
+const EXEMPLO_DE_GRUPO = "{ nome: 'pe', pontos: ['g00', 'g01', 'g10', 'g11'] }";
+
+/** gruposPorNome(lista, declarados, faces) -> { grupos: [[nome, índices das faces da gaiola]] } ou { erro }
+ *  Cada grupo é uma lista de nomes de ponto da gaiola, e as faces dele são as da gaiola cujos pontos estão todos na lista; assim
+ *  o grupo se declara pelos nomes e nenhum índice de face sai da receita. `gaiolaPorLacos` devolve os grupos prontos, por faixa de
+ *  laços e por trecho. */
+export function gruposPorNome(lista, declarados, faces) {
+  if (!Array.isArray(lista) || !lista.length) return { erro: `grupos precisa ser lista não vazia de grupos nomeados, como ${EXEMPLO_DE_GRUPO}` };
+  const indiceDoNome = new Map();
+  declarados.forEach((v, k) => { if (typeof v === 'string') indiceDoNome.set(v, k); });
+  const vistos = new Set(); const grupos = [];
+  for (const g of lista) {
+    if (!g || typeof g !== 'object' || Array.isArray(g)) return { erro: `cada grupo precisa ser objeto como ${EXEMPLO_DE_GRUPO}` };
+    if (typeof g.nome !== 'string' || !g.nome) return { erro: `cada grupo precisa de nome, como ${EXEMPLO_DE_GRUPO}` };
+    const extra = Object.keys(g).filter((k) => k !== 'nome' && k !== 'pontos');
+    if (extra.length) return { erro: `o grupo ${citar(g.nome)} tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome e pontos` };
+    if (['externa', 'interna', 'borda'].includes(g.nome)) return { erro: `o grupo ${citar(g.nome)} tem o nome de uma parte da chapa com espessura; escolha outro nome` };
+    if (vistos.has(g.nome)) return { erro: `o nome de grupo ${citar(g.nome)} aparece mais de uma vez` };
+    vistos.add(g.nome);
+    if (!Array.isArray(g.pontos) || !g.pontos.length || g.pontos.some((p) => typeof p !== 'string')) return { erro: `o grupo ${citar(g.nome)} precisa de pontos: lista de nomes de ponto da gaiola` };
+    const dentro = new Set();
+    for (const p of g.pontos) {
+      if (!indiceDoNome.has(p)) return { erro: `o grupo ${citar(g.nome)} cita o ponto ${citar(p)}, que não é ponto nomeado da gaiola` };
+      dentro.add(indiceDoNome.get(p));
+    }
+    const membros = [];
+    faces.forEach((f, k) => { if (f.every((v) => dentro.has(v))) membros.push(k); });
+    if (!membros.length) return { erro: `o grupo ${citar(g.nome)} não tem nenhuma face da gaiola com todos os pontos dentro dele` };
+    grupos.push([g.nome, membros]);
+  }
+  return { grupos };
+}
+
+/* De qual face da gaiola desce cada face da superfície refinada: o primeiro nível dá uma face por canto de cada face da gaiola, em
+   ordem, e cada nível seguinte dá quatro por face, em ordem. */
+function donoDasFaces(faces, niveis) {
+  if (niveis === 0) return faces.map((_, k) => k);
+  let dono = faces.flatMap((f, k) => f.map(() => k));
+  for (let n = 1; n < niveis; n++) dono = dono.flatMap((d) => [d, d, d, d]);
+  return dono;
+}
+
 const MAXIMO_DE_LUGARES = 5;
 const arredondar = (x) => Number(x.toPrecision(3));
 
@@ -253,6 +295,14 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       if (!Number.isFinite(espessura) || espessura <= 0) return grita(st, i, 'subdivisao', 'espessura', `a espessura precisa ser maior que zero, e veio ${espessura}`);
       if (a.lado != null && a.lado !== 'contraNormal' && a.lado !== 'normal') return grita(st, i, 'subdivisao', 'lado', `lado precisa ser 'contraNormal' (o material contra a normal das faces, o padrão) ou 'normal', e veio ${JSON.stringify(a.lado)}`);
     } else if (a.lado != null) return grita(st, i, 'subdivisao', 'lado', 'lado só vale com espessura: declare a espessura da chapa');
+    let grupos = null;
+    if (a.grupos != null) {
+      if (espessura !== null) return grita(st, i, 'subdivisao', 'grupos', 'grupos só vale sem espessura: com espessura a origem já tem as partes externa, interna e borda');
+      if (a.simetria != null) return grita(st, i, 'subdivisao', 'grupos', 'grupos não vale com simetria: a gaiola espelhada tem faces que o grupo não nomeou');
+      const lidos = gruposPorNome(a.grupos, declarados, gaiola.faces);
+      if (lidos.erro) return grita(st, i, 'subdivisao', 'grupos', lidos.erro);
+      grupos = lidos.grupos;
+    }
     let liso = false;
     if (a.liso !== false) {
       const angulo = a.liso == null ? LISO_PADRAO : st.num(a.liso);
@@ -262,11 +312,18 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     if (!QUEBRAS.includes(quebra)) return grita(st, i, 'subdivisao', 'quebraNosVincos', `quebraNosVincos precisa ser 'vivos' (o padrão: a sombra se divide nos vincos vivos), 'todos' (também nos de nitidez fracionária) ou 'nenhum', e veio ${JSON.stringify(quebra)}`);
     if (liso === false && a.quebraNosVincos != null) return grita(st, i, 'subdivisao', 'quebraNosVincos', 'quebraNosVincos só vale com as faces lisas; com liso: false toda aresta já divide a sombra');
     let r;
+    let gruposDaGaiola = null;
     try {
       /* Com medidas, a malha entregue vai à superfície limite: sem isso o ponto medido ficaria a centímetros da malha de
          nível finito, e a cota não apareceria na peça. Sem medidas, a malha é a do nível pedido, como no oráculo. */
       r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(st.num(a.niveis ?? 2)), borda: a.borda ?? 'suave', aoLimite: a.medidas != null, comVincos: true });
     } catch (e) { return grita(st, i, 'subdivisao', 'gaiola', String(e.message)); }
+    if (grupos) {
+      /* a superfície refinada, antes da espessura, tem as faces em ordem de descendência; a de cada grupo é a que desce de uma face dele */
+      const dono = donoDasFaces(gaiola.faces, Math.trunc(st.num(a.niveis ?? 2)));
+      if (dono.length !== r.faces.length) return grita(st, i, 'subdivisao', 'grupos', `a superfície refinada tem ${r.faces.length} faces e a descendência da gaiola ${dono.length}`);
+      gruposDaGaiola = Object.fromEntries(grupos.map(([nome, membros]) => { const m = new Set(membros); return [nome, dono.flatMap((d, k) => (m.has(d) ? [k] : []))]; }));
+    }
     /* as arestas da superfície em que a sombra se divide; com espessura, a face interna repete cada uma a nS vértices */
     const nS = r.vertices.length;
     const quebras = liso === false || quebra === 'nenhum' ? [] : r.vincos.filter(([, , viva]) => quebra === 'todos' || viva).map(([p, q]) => [p, q]);
@@ -302,8 +359,10 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       });
     }
     if (a.origemId != null) {
-      const grupos = partes ? Object.fromEntries(Object.entries(partes).map(([nome, lista]) => [nome, lista.map((k) => facesSaida[k])])) : {};
-      registraOrigem(st, i, 'subdivisao', a.origemId, { faces: facesSaida, espessura: partes !== null, ...grupos });
+      const daChapa = partes ? Object.fromEntries(Object.entries(partes).map(([nome, lista]) => [nome, lista.map((k) => facesSaida[k])])) : {};
+      const contrato = { faces: facesSaida, espessura: partes !== null, ...daChapa };
+      if (gruposDaGaiola) contrato.grupos = Object.fromEntries(Object.entries(gruposDaGaiola).map(([nome, lista]) => [nome, lista.map((k) => facesSaida[k])]));
+      registraOrigem(st, i, 'subdivisao', a.origemId, contrato);
     }
     /* A gaiola da chapa, para a conferência dos vãos (`src/autoria/molduras-do-vao.js`) achar as aberturas pela borda livre dela:
        os nomes, as faces por índice da gaiola cheia (a simetria aplicada), as posições, os níveis e a imagem espelhada. Só leitura;
