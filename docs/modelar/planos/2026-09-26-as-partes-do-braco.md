@@ -89,6 +89,8 @@ Em 2026-11-04 a pessoa aceitou a coluna (rodada 5) e apontou o encaixe do ombro 
 
 Em 2026-11-05 a pessoa reabriu o ombro na bancada pelo vão entre ele e a base e, desenhando o antes e o depois, pediu o L inteiro 30 mm mais longo na direção da junta, com a traseira no lugar, e as quinas da frente do pé também em 75 mm, para caber no anel da cintura. O encontro de baixo, arredondado depois da união dos dois lofts, deixava uma faixa de sombra inclinada na lateral; por sugestão dela, o corpo passou a ser uma malha única por subdivisão de uma gaiola em L, com a curva do encontro nos próprios pontos. Por escolha dela entre duas saídas, o topo ficou plano até a parede de trás, sem a crista do domo. Ela fez o papel do crítico e aceitou o ombro pelas imagens, e a etapa está fixa por aceite humano. A gaiola escrita na receita ficou como candidata a ferramenta geral do núcleo, no backlog. No mesmo dia saiu das definições dos agentes a frase que pedia pt-BR nas anotações de trabalho, que fazia o serviço interromper o modelador.
 
+Ainda em 2026-11-05, com o `gaiolaPorLacos` no núcleo, a pessoa pediu a coluna refeita da mesma forma, para ver: o pé e o tubo saem de uma gaiola em planos z, sem a união dos dois cilindros, com as medidas aceitas. Ela a aceitou pelas imagens, e a etapa está fixa por aceite humano. Os limites do ajudante que a coluna mostrou estão no backlog.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,
