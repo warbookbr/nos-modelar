@@ -22,7 +22,7 @@ const BASE = [
   { id: 'parachoque', op: 'cubo', args: { larg: 2060, alt: 344, prof: 90 }, centro: [0, 552, Z_FRENTE + 5] },
 ];
 
-const OPCOES = [
+export const OPCOES = [
   { titulo: '1: limpa', nota: 'Trapézio de cantos moderados entre o capô e o para-choque, a ponta de dentro encostando na moldura da grade; grade de cantos de cima redondos, até o para-choque, com três barras retas.',
     farol: [[460, 770], [985, 770], [985, 1080], [490, 1080]], farolRaio: 40, pisca: [[890, 770], [985, 770], [985, 1080], [890, 1080]],
     grade: [[-420, 724], [420, 724], [420, 1060], [-420, 1060]], gradeRaio: 45, barras: { meia: 380, y: 850, passo: 78, total: 3 } },
@@ -35,7 +35,7 @@ const OPCOES = [
     faixa: [[430, 985], [330, 958], [-330, 958], [-430, 985], [-445, 970], [-335, 942], [335, 942], [445, 970]] },
 ];
 
-function opcao(o) {
+export function opcao(o) {
   const formas = [...BASE, placa('grade', o.grade, o.gradeRaio, 12)];
   const b = o.barras;
   formas.push({ id: 'barras', op: 'cubo', args: { larg: 2 * b.meia, alt: 14, prof: 10 }, centro: [0, b.y, 12 + 5], repete: { total: b.total, d: [0, b.passo, 0] } });
