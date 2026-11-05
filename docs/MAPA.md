@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1761 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1763 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -509,6 +509,8 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-05-abertura-de-contorno-livre.md` — Abertura de contorno livre — a chapa ganha um vão pela curva que a receita desenha, sem depender das linhas da gaiola
+- `2026-11-05-esboco-pelo-nucleo.md` — Esboço pelo núcleo — as opções de forma saem das mesmas operações da peça e se comparam lado a lado na bancada
+- `2026-11-05-navegacao-de-receitas.md` — Navegação de receitas — o agente acha o trecho da receita que precisa sem lê-la inteira
 - `2026-11-05-solido-por-lacos.md` — Sólido por laços — a receita dá o contorno da peça em cada plano, e o núcleo monta a gaiola fechada e a subdivide numa malha só
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto

@@ -8,6 +8,7 @@
 2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`. Em aberto: o ombro refeito na opção B escolhida pela pessoa, com o encontro sem quina, a luz rasante na peça com emenda sombreada e as etapas que não perdem o aceite, e depois as partes restantes e a exportação do braço montado.
 3. [abertura de contorno livre](2026-11-05-abertura-de-contorno-livre.md). Território no plano. Em aberto: cortar a chapa depois ou antes da subdivisão.
 4. [sólido por laços](2026-11-05-solido-por-lacos.md). Território no plano. Em aberto: começa quando o ombro aceito chegar à main.
+5. [esboço pelo núcleo](2026-11-05-esboco-pelo-nucleo.md). Território no plano. Em aberto: o inventário do que usa o esboço de hoje.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
@@ -23,7 +24,7 @@ A lista está em ordem de prioridade. A ordem desempata quando dois planos preci
 receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16, com as oito peças no núcleo, a montagem
 auditada e o avião aprovado pela pessoa; a picape, o braço robótico, o carrinho de mão e a empilhadeira vêm em seguida, na ordem
 que a pessoa escolher. [As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14, e o código delas saiu em 2026-10-25.
-Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md).
+Em rascunho: [o que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) e [navegação de receitas](2026-11-05-navegacao-de-receitas.md).
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
 
