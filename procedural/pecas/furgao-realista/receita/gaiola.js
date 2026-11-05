@@ -578,15 +578,10 @@ export function derivar(T) {
     const foraT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, `r${iForaTraseiro}`, s);
     vidros.push({ nome: `vidroPortaTraseira${sufixo}`, linha: `abaVaoPortaTraseira${sufixo}`, volta: fechar([...foraT, ...[...dentroT].reverse()]) });
   }
-  /* a grade e as lanternas (etapa 6): voltas de cantos retos pelas arestas da gaiola, sem partir célula; a grade, de f5 a f5 passando
-     pelo meio; a lanterna, da coluna rq3 (logo depois da borda da porta traseira) até a RS, já na lateral. Os faróis e os piscas não
-     são vão da gaiola desde 2026-11-05: são `aberturaPorContorno` sobre a chapa pronta (`receita/farol.js`) */
+  /* as lanternas (etapa 6): voltas de cantos retos pelas arestas da gaiola, sem partir célula, da coluna rq3 (logo depois da borda da
+     porta traseira) até a RS, já na lateral. Os faróis, os piscas e a grade não são vão da gaiola desde 2026-11-05: são
+     `aberturaPorContorno` sobre a chapa pronta (`receita/farol.js`) */
   const luzes = [];
-  {
-    const rg = aneisEntre(T.grade_base_y, T.grade_topo_y);
-    const metade = meiaVolta(rg, 'f0', 'f0', 'f5', 'e', 0);
-    luzes.push({ nome: 'grade', linha: 'abaVaoGrade', material: 'grade', volta: fechar([...metade, ...[...metade].reverse().map(espelho)]) });
-  }
   for (const s of ['e', 'd']) {
     const a = s === 'e' ? 'Esquerda' : 'Direita';
     const rl = aneisEntre(T.lanterna_base_y, T.lanterna_topo_y);

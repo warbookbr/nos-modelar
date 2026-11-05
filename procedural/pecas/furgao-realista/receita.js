@@ -79,7 +79,7 @@ import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
 import { m } from './receita/geometria.js';
 import { forma } from './receita/forma.js';
 import { derivar } from './receita/gaiola.js';
-import { contornoPorRetos, derivarFarois } from './receita/farol.js';
+import { contornoPorRetos, derivarFarois, derivarGrade } from './receita/farol.js';
 import { derivarInterior } from './receita/interior.js';
 import { BASE_DAS_RODAS, comBase, familias } from './receita/rodas.js';
 import {
@@ -229,14 +229,25 @@ export const TABELA = {
   // Os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,
   // em [x, y] mm na vista frontal, no lado esquerdo (+x; o direito o espelha): o farol é afinado, com a ponta de dentro descendo em diagonal
   // até a grade e a de fora indo a x 980, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente.
-  farol_perfil: [[430, 960], [600, 890], [980, 900], [980, 1090], [560, 1065]],
-  pisca_perfil: [[860, 898], [980, 900], [980, 1090], [860, 1082]], // o desenho do pisca; o vão é cortado pelo farol recuado pisca_margem
+  farol_perfil: [[460, 840], [985, 840], [985, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô
+  farol_raio: 40, // a concordância dos quatro cantos do farol
+  pisca_x_dentro: 890, // o pisca ocupa a ponta de fora do farol, de x 890 à borda dele
   farol_recuo_lente: 3, // a lente do farol entra 3 mm no vão: a borda da chapa e a aba aparecem em volta dela
   pisca_margem: 6, // o vão do pisca fica 6 mm dentro da borda do farol (3 além da lente), porque o vão não pode encostar na borda do sólido
   pisca_recuo_lente: 0, // o pisca enche o vão aberto na lente do farol, e por isso encosta nela
-  // a grade entre os faróis: as alturas que eram as dos faróis até 2026-11-05, com chave própria para ela descer até o para-choque
-  grade_base_y: 830,
+  // a grade (2026-11-05, conjunto 1 do esboço): também um vão pelo contorno, de x -420 a 420, do topo do para-choque (que sai da seção do para-choque, e
+  // não de um número aqui) a grade_topo_y; os cantos de cima têm concordância e os de baixo ficam vivos no para-choque. O vão começa grade_embutido mm
+  // abaixo do topo dele, por trás da pele do para-choque, para a aba de baixo ficar escondida e nenhuma fresta abrir entre os dois
+  grade_embutido: 24,
+  grade_meia_largura: 420,
   grade_topo_y: 1060,
+  grade_raio_topo: 45,
+  grade_lente_recuo: 3, // a lente da grade entra 3 mm no vão, como a do farol
+  grade_recuo: 18, // a lente escura da grade recua 18 mm para dentro do vão, dentro da perna de 20 mm da aba
+  grade_barras_y: [850, 928, 1006], // as três barras horizontais
+  grade_barra_largura: 760,
+  grade_barra_altura: 28,
+  grade_barra_saliencia: 14, // quanto a barra sai da lente para a frente (sempre atrás da superfície da chapa)
   lanterna_base_y: 830, // na quina de trás, entre a borda da porta traseira e a lateral, abaixo do vinco de cintura
   // o anel boca1 (1125): acima dele os anéis de enchimento ficam a 12,5 mm, e o trecho curto junto da quina faz a aba do vão se dobrar
   lanterna_topo_y: 1130,
@@ -361,6 +372,8 @@ const CHAPA = { origem: { op: 'subdivisao', id: 1 } };
 const ID_FAROL = (k) => 800 + 2 * k;
 const ID_PISCA = (k) => 801 + 2 * k;
 const ID_ABA_FAROL = (k) => 940 + k;
+/** Os ids dos passos da grade: o vão (804), a aba (944), a translação da lente (945) e as barras (130 + k). */
+const ID_GRADE = 804;
 
 /** A seção da borracha de vão, [u, v] em mm, u para o cristal e v para fora da chapa: assenta na chapa e no cristal (entra `borracha_fundo` nos dois), passa
  *  `borracha_fora` sobre a chapa e `borracha_dentro` sobre o cristal, sobe `borracha_altura` e desce com o beiral redondo nas duas bordas. */
@@ -430,10 +443,10 @@ export function gerarPassos(T) {
   farois.forEach((fa, k) => {
     const chapaAnterior = k === 0 ? CHAPA : { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k - 1) } };
     passos.push(['aberturaPorContorno', {
-      origemId: ID_FAROL(k), chapa: chapaAnterior, contorno: contornoPorRetos(fa.farol, mm), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.farol_recuo_lente),
+      origemId: ID_FAROL(k), chapa: chapaAnterior, contorno: contornoPorRetos(fa.farol, mm, T.farol_raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.farol_recuo_lente),
     }]);
     passos.push(['aberturaPorContorno', {
-      origemId: ID_PISCA(k), chapa: { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k), parte: 'lente' } }, contorno: contornoPorRetos(fa.pisca, mm), vista: 'z', lente: true, recuoDaLente: m(T.pisca_recuo_lente),
+      origemId: ID_PISCA(k), chapa: { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k), parte: 'lente' } }, contorno: contornoPorRetos(fa.pisca, mm, fa.raioPisca), vista: 'z', lente: true, recuoDaLente: m(T.pisca_recuo_lente),
     }]);
     const aba = { origem: { op: 'friso', id: ID_ABA_FAROL(k) } };
     passos.push(['friso', {
@@ -449,7 +462,38 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: `pisca${fa.lado}`, sel: pisca }]);
     passos.push(['material', { sel: pisca, usa: 'pisca' }]);
   });
-  const carroceria = { origem: { op: 'aberturaPorContorno', id: ID_FAROL(farois.length - 1) } };
+  /* a grade (2026-11-05): um terceiro vão pelo contorno, sobre a chapa do último farol; a lente escura recua `grade_recuo` para dentro do
+     vão, dentro da perna da aba, e as três barras são extrusões retas que nascem na lente e ficam atrás da superfície da chapa; a aba, a
+     lente e as barras são a mesma parte 'grade'. A base do vão é o topo do para-choque, que sobe do lado de fora e cobre a parede de baixo */
+  const grade = derivarGrade(T);
+  const chapaDaGrade = { origem: { op: 'aberturaPorContorno', id: ID_FAROL(farois.length - 1) } };
+  passos.push(['aberturaPorContorno', {
+    origemId: ID_GRADE, chapa: chapaDaGrade, contorno: contornoPorRetos(grade.contorno, mm, grade.raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.grade_lente_recuo),
+  }]);
+  const abaDaGrade = { origem: { op: 'friso', id: 944 } };
+  passos.push(['friso', {
+    origemId: 944, superficie: { op: 'aberturaPorContorno', id: ID_GRADE }, linha: { nome: 'abaVaoGrade' },
+    aba: { largura: m(T.aba_vao_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
+  }]);
+  const lenteDaGrade = { origem: { op: 'aberturaPorContorno', id: ID_GRADE, parte: 'lente' } };
+  passos.push(['transladar', { sel: lenteDaGrade, d: [0, 0, -m(T.grade_recuo)] }]);
+  passos.push(['parte', { nome: 'grade', sel: abaDaGrade }]);
+  passos.push(['material', { sel: abaDaGrade, usa: 'azul' }]);
+  passos.push(['parte', { nome: 'grade', sel: lenteDaGrade }]);
+  passos.push(['material', { sel: lenteDaGrade, usa: 'grade' }]);
+  /* a face da lente recuada fica em z do nariz menos o degrau da frente menos o recuo; a barra sai um pouco para trás dela e vem até
+     `grade_barra_saliencia` à frente, de modo que a frente da barra ainda fica atrás da chapa */
+  const zFaceDaLente = T.comprimento / 2 - T.degrau_frente_recuo - T.grade_recuo;
+  grade.barras.forEach((b, k) => {
+    const sel = { origem: { op: 'extrusao', id: 130 + k } };
+    passos.push(['extrusao', {
+      origemId: 130 + k, eixo: 'z', altura: m(T.grade_barra_saliencia + 2), em: [0, 0, m(zFaceDaLente - 2)],
+      perfil: { retangulo: { largura: m(T.grade_barra_largura), profundidade: m(T.grade_barra_altura), centro: [0, -m(b.y)] } },
+    }]);
+    passos.push(['parte', { nome: 'grade', sel }]);
+    passos.push(['material', { sel, usa: 'grade' }]);
+  });
+  const carroceria = { origem: { op: 'aberturaPorContorno', id: ID_GRADE } };
   passos.push(['parte', { nome: 'carroceria', sel: carroceria }]);
   passos.push(['material', { sel: carroceria, usa: 'azul' }]);
   /* o interior: piso, divisória, bancos e painel, cada um uma extrusão do perfil que `derivarInterior` escreve */
@@ -526,7 +570,7 @@ export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((aba, k) => ({ par: [aba, BORRACHAS[k]], motivo: 'a borracha passa sobre a perna da aba (5 mm para dentro do vão) e entra 1,5 mm abaixo da superfície, onde a aba dobra' })),
   ...BORRACHAS.map((b) => ({ par: ['carroceria', b], motivo: 'a borracha assenta na chapa em volta do vão: passa 15 mm sobre ela e entra 1,5 mm na superfície' })),
   ...BORRACHAS.map((b, k) => ({ par: [b, CRISTAIS[k]], motivo: 'o cristal começa 7,5 mm para dentro da borda do vão e a borracha passa 2,5 mm sobre a borda dele, entrando 1,5 mm: é a borracha que segura o cristal, e é ela que cobre a junta' })),
-  ...[...LUZES, ...FAROIS].map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
+  ...[...LUZES, ...FAROIS, 'grade'].map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
   ...FAROIS.map((farol, k) => ({ par: [farol, PISCAS[k]], motivo: 'o pisca é o pedaço que o vão do pisca tirou da lente do farol, do tamanho do vão: as duas se encostam na parede dele' })),
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
@@ -553,6 +597,7 @@ export function vaosDeclarados(T) {
   const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha, nomeDaBorracha(v.nome)] }));
   for (const v of luzes) vaos.push({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] });
   derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `farol${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, frisos: [`abaVaoFarol${fa.lado}`] }));
+  vaos.push({ nome: 'grade', superficie: { op: 'aberturaPorContorno', id: ID_GRADE }, frisos: ['abaVaoGrade'], parcial: { motivo: 'os dois cantos de baixo do vão são vivos e ficam 24 mm abaixo do topo do para-choque, por trás da pele dele: a aba não dobra nesses 44 mm de cada lado, que nenhuma vista de frente alcança, e a lente e a aba de cima e dos lados cobrem o resto da volta' } });
   derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `pisca${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_PISCA(k) }, semMoldura: { motivo: 'é o vão que o pisca ocupa na lente do farol, do tamanho dele; a borda é a do pisca com a lente, sem aba nem moldura' } }));
   for (const p of portas) {
     if (p.nome.startsWith('portaTraseira')) continue;
@@ -690,17 +735,17 @@ const receita = {
       })),
       {
         nome: 'grade',
-        forma: 'grade escura e fosca entre os faróis, sem marca nem logotipo, de x -360 a 360 e de y 830 a 1054, rente à lataria, com 4 mm de espessura e a aba do vão dobrada para dentro',
-        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',
+        forma: 'grade escura e fosca entre os faróis, sem marca, de x -420 a 420 e de y 724 (topo do para-choque) a 1060, cantos de cima de raio 45 e os de baixo vivos; lente recuada 18 mm, aba em volta e três barras retas de 760 mm em y 850, 928 e 1006',
+        tecnica: 'terceira aberturaPorContorno na vista frontal, com lente, base 24 mm abaixo do topo do para-choque; friso com aba, lente transladada 18 mm em z e barras em extrusão em z; tudo na mesma parte',
       },
       ...['Esquerdo', 'Direito'].map((lado) => ({
         nome: `farol${lado}`,
-        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} afinado, rente na frente: a ponta de dentro desce em diagonal até a grade, a de fora contorna a quina até x 980; y 890 a 1090, lente clara de 4 mm recuada 3 mm e aba do vão para dentro`,
-        tecnica: 'aberturaPorContorno na vista frontal, na camada da frente da chapa, com lente e recuoDaLente; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',
+        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} trapézio de cantos de raio 40: [460, 840], [985, 840], [985, 1080], [490, 1080], topo na boca do capô, ponta de dentro junto da grade; lente clara recuada 3 mm e aba do vão para dentro`,
+        tecnica: 'aberturaPorContorno na vista frontal, na camada da frente da chapa, com lente, recuoDaLente e concordância nos cantos; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',
       })),
       ...['Esquerdo', 'Direito'].map((lado) => ({
         nome: `pisca${lado}`,
-        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do conjunto do farol: x 860 a 980, y 898 a 1090, 6 mm dentro da borda do farol, lente âmbar opaca do tamanho do vão na lente do farol`,
+        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do farol: x 890 a 985, na altura toda dele, 6 mm dentro da borda, cantos de fora na concordância do farol, lente âmbar opaca do tamanho do vão`,
         tecnica: 'segundo aberturaPorContorno, sobre a lente do farol, com lente e recuoDaLente 0; o pedaço retirado é o pisca',
       })),
       ...['Esquerda', 'Direita'].map((lado) => ({
@@ -764,6 +809,7 @@ const receita = {
       'a roda não é a da família roda-pneu no pneu 235/65 aro 16 (710 mm de diâmetro, 235 de largura, com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos, ou não fica na bitola de 1730 e nos eixos da prancha',
       'o forro de um arco falta, deixa ver o oco do carro pelo arco, não é escuro, fica a menos de 20 mm ou a mais de 30 mm do pneu em algum ponto, ou não encosta na chapa em volta da boca',
       'o alargamento de um arco não cobre o pneu com folga visível, na vista de cima ou na frontal, ou o forro passa para fora da boca do arco',
+      'a grade não é um vão escuro de lente recuada com três barras horizontais retas e cantos de cima redondos, ou deixa fresta aberta contra o para-choque, ou o farol não é o trapézio de cantos arredondados com o pisca âmbar na ponta de fora',
       'alguma peça fica solta no ar ou atravessa outra sem motivo',
       'o lado esquerdo e o direito diferem fora da porta de correr',
       'aparece marca, logotipo ou nome de fabricante',
