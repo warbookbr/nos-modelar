@@ -15,6 +15,7 @@
  *   cantos: [{ entre: [a, b], laco? }] o ponto entre dois trechos fica vivo, em todos os laços ou num só.
  *   medidas: [{ trecho | entre, laco?, peso? }] cota nos pontos marcados; em todos os pontos é recusado.
  *   compensar: true | { trechos, lacos? } move os pontos para a superfície limite passar por eles: o arco de r sai com r.
+ *     Em peça nova, declare-o nos trechos de canto e de curva (decisão da pessoa, 2026-11-05).
  * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe(laco, trecho, k), lacos, trechos, avisos, compensacao? }.
  * exemplo:
  *   gaiolaPorLacos({ nome: 'barra', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' },
