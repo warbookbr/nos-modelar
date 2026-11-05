@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1747 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1760 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -404,6 +404,10 @@
 
 - `RESULTADO.md` — Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)
 - `sonda-passos.mjs` — sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha execut…
+
+## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
+
+- `README.md` — Sólido por laços — fatia 1, a linha de base
 
 ## docs/modelar/banco-de-provas/suporte-tubo-2026-10-10/
 
@@ -2293,6 +2297,27 @@
 ## tools/fixtures/refina-forma-global/sapata-deslocada/
 
 - `receita.js` — O suporte com a sapata 1 mm para +x: outra malha, ainda dentro do envelope de 2 mm do volume da sapata.
+
+## tools/fixtures/solido-por-lacos/
+
+- `aresta-arredondada.js` — aresta-arredondada.js — a peça de comparação do terceiro limite da peça de teste: uma caixa da mesma seção da parte deitada (190 mm de largura, de y = 20 a 2…
+- `desenhar-canto.mjs` — desenhar-canto.mjs — desenha o terceiro limite da peça de teste do sólido por laços: o canto de cima em +x da seção da parte deitada, no corte z = 0, em três…
+- `forma.js` — forma.js — a forma e a gaiola da peça de teste do plano do sólido por laços: um L de ponta-cabeça fechado, feito de uma malha só por subdivisão de uma gaiola…
+- `medir-limites.mjs` — medir-limites.mjs — imprime, em JSON, as medidas dos quatro limites da gaiola de laços na peça de teste do sólido por laços: a ondulação de `tools/modelar/on…
+- `medir.mjs` — medir.mjs — as medidas da fatia 1 do plano do sólido por laços sobre a malha que o núcleo entrega: o desvio entre duas malhas (a peça de teste contra o corpo…
+- `receita.js` — solido-por-lacos — a peça de teste neutra do plano do sólido por laços: um L de ponta-cabeça de 190 por 220 mm fechado numa malha só pela subdivisão de uma g…
+- `solido-por-lacos.test.ts` — solido-por-lacos.test.ts — a linha de base da fatia 1 do plano do sólido por laços, sobre a peça de teste `tools/fixtures/solido-por-lacos/`: a gaiola de laç…
+
+## tools/fixtures/solido-por-lacos/referencias/
+
+- `alvo.md` — Alvo do sólido por laços
+
+## tools/fixtures/solido-por-lacos/variantes/
+
+- `medidas-em-todos.js` — medidas-em-todos — a peça de teste do sólido por laços no limite 1, cota exata em todos os pontos da gaiola (tabela em `variantes.js`).
+- `planos-proximos.js` — planos-proximos — a peça de teste do sólido por laços no limite 2, planos de corte a menos de 2,5 mm entre si (tabela em `variantes.js`).
+- `poucos-planos-na-quina.js` — poucos-planos-na-quina — a peça de teste do sólido por laços no limite 4, metade dos planos por quarto de quina em planta (tabela em `variantes.js`).
+- `variantes.js` — variantes.js — as tabelas que refazem, na peça de teste do sólido por laços, os limites que a gaiola de laços escrita à mão mostrou, cada uma mudando só o qu…
 
 ## tools/fixtures/tres-blocos-vinculados/
 

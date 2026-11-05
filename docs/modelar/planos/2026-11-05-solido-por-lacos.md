@@ -55,6 +55,10 @@ Uma receita declara uma lista de laços fechados, um por plano ao longo de um ei
 
 Se a mesma forma do ombro não sair do ajudante sem uma opção que só o ombro usa, para e volta à pessoa. Se resolver um dos limites pedir mudança no passo `subdivisao`, para também, porque o passo é de todas as chapas.
 
+## Andamento
+
+A fatia 1 fechou em 2026-11-05 com a linha de base nas [provas](../banco-de-provas/solido-por-lacos-2026-11-05/README.md): a peça de teste `tools/fixtures/solido-por-lacos/` refaz a gaiola do ombro sem citar o braço, sai fechada (nenhuma aresta sem par, vínculo não manifold nem triângulo sem área) e fica a 0,000 mm do corpo do ombro. Os quatro limites se reproduzem nela com número: a cota exata em todos os pontos dá uma emenda de 62,6 mm e 302 faces viradas, os planos a 0,12 mm uma ondulação de 5,16 mm na traseira, o canto de 32 mm sai com o recuo de um arco de 34,2 mm contra 32,0 do `arredondarAresta`, e metade dos planos na quina leva o calombo do encontro de 0,58 a 1,27 mm. Para a fatia 2 ficam a tampa das paredes de lado, cuja escada obriga as duas cadeias do laço a ter o mesmo número de pontos, a ponta da saída que se fecha num ponto, a orientação pelo volume e os vincos declarados por trecho do laço.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar.
