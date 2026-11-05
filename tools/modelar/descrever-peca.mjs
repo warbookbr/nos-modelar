@@ -292,7 +292,10 @@ export async function descreverPecaReutilizavel({
       consultaDeSubarvore = { raiz, nomes };
     }
   } catch (erro) {
-    return falha(`NÃO CONSEGUI MEDIR\n  ${erro.message}`);
+    /* A medida que quebra por parte que não existe costuma ter a causa num passo recusado antes, que só os órfãos dizem: no furgão,
+       em 2026-11-05, a abertura recusada deixou a carroceria sem seleção e a mensagem só dizia que a parte não existia. */
+    const recusados = neutro.orfaos.length ? `\n\n${neutro.orfaos.length} ÓRFÃO(S), que costumam ser a causa:\n  ${amostraDeOrfaos(neutro).join('\n  ')}` : '';
+    return falha(`NÃO CONSEGUI MEDIR\n  ${erro.message}${recusados}`);
   }
 
   let stdout = '';

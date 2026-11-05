@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:061d94b018e14ec8700741c27d591984322d7739f1a62e253eb678d629860b52",
+  "assinatura": "sha256:84fcae3f49c369d46540d09fd8f52314553421788784d6164e73a46791e7c65b",
   "total": 40,
   "operacoes": [
     {
@@ -87,6 +87,11 @@
                 }
               ],
               "description": "Com lente, quanto a volta dela entra no vão a partir da borda, em metro, para ficar além da perna da aba do friso; padrão 2,5 vezes a espessura da chapa, e 0 dá a lente do tamanho do vão."
+            },
+            "sentido": {
+              "type": "string",
+              "minLength": 1,
+              "description": "'+' ou '-': num corpo fechado, que a reta do eixo atravessa mais de uma vez (a frente e a traseira de uma carroceria vistas pela frente), corta só a camada vista desse lado do eixo, com o prisma parado entre ela e a seguinte; sem ele, a chapa atravessada duas vezes é recusada."
             }
           }
         },

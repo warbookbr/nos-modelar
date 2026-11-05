@@ -347,3 +347,44 @@ describe('aberturaPorContorno nas vistas x e z', () => {
     });
   }
 });
+
+describe('aberturaPorContorno numa chapa que a reta do eixo atravessa duas vezes', () => {
+  /* duas chapas iguais, uma 300 mm abaixo da outra, como a frente e a traseira de uma carroceria fechada vistas pela frente: a
+     reta do eixo y atravessa as duas. Sem `sentido` a operação recusa; com ele, corta só a camada vista daquele lado e a outra
+     fica como estava, vértice por vértice. No furgão, em 2026-11-05, o farol recusou por isto, e a peça de teste do plano da
+     abertura, uma chapa só, não tinha como mostrar. */
+  const d = derivar();
+  const chapa = passoDaChapa();
+  const ren = (n: string) => n.replace(/^p/, 'q');
+  const baixa = { ...chapa, vertices: chapa.vertices.map(ren), faces: chapa.faces.map((f: string[]) => f.map(ren)), cantos: chapa.cantos.map(ren), medidas: chapa.medidas.map(ren) };
+  const TOPO = { ...d.pontos, ...Object.fromEntries(Object.entries(d.pontos).map(([k, p]) => [ren(k), [(p as number[])[0], (p as number[])[1] - m(300), (p as number[])[2]]])) };
+  const rodar = (abertura: any) => executarReceita({ meta: { nome: 'abertura-em-duas-camadas' }, PARAMS: {}, TOPO, PASSOS: [
+    ['subdivisao', { origemId: 1, ...chapa }], ['subdivisao', { origemId: 2, ...baixa }],
+    ...(abertura ? [['aberturaPorContorno', { origemId: 3, chapa: { tudo: true }, vista: 'y', segmentosArco: 32, contorno: d.trechos, lente: true, ...abertura }]] : []),
+  ] }).neutro;
+  const meio = (TABELA.chapa.topo - 150) / 1000;
+  const facesDe = (neutro: any, acima: boolean) => [...neutro.F.values()].filter((f: any) => f.vs.every((v: number) => (neutro.V.get(v)[1] > meio) === acima))
+    .map((f: any) => f.vs.map((v: number) => neutro.V.get(v).map((x: number) => x.toFixed(9)).join(',')).join(';')).sort();
+  const antes = rodar(null);
+
+  it('sem sentido, recusa e diz que sentido corta uma camada só', () => {
+    const neutro = rodar({});
+    expect(neutro.orfaos).toHaveLength(1);
+    expect(neutro.orfaos[0].motivo).toMatch(/atravessa a chapa 2 vezes.*declare sentido/);
+  });
+
+  for (const [sentido, cortada] of [['+', true], ['-', false]] as const) {
+    it(`sentido '${sentido}': corta só a chapa ${cortada ? 'de cima' : 'de baixo'}, fechada e sem lasca, e a outra fica igual`, () => {
+      const neutro = rodar({ sentido });
+      expect(neutro.orfaos).toEqual([]);
+      expect(gate1(neutro)).toMatchObject({ arestasSemPar: 0, vinculosNaoManifold: 0, triangulosSemArea: 0, faceFina: 0, reprova: [] });
+      expect(facesDe(neutro, !cortada)).toEqual(facesDe(antes, !cortada));
+      expect(facesDe(neutro, cortada)).not.toEqual(facesDe(antes, cortada));
+    });
+  }
+
+  it('sentido fora de + e - grita pelo campo', () => {
+    const neutro = rodar({ sentido: 'frente' });
+    expect(neutro.orfaos[0].ref).toBe('sentido');
+  });
+});

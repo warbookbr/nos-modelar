@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`
+**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `procedural/nucleo/uso-operacoes.js`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/descrever-partes.test.ts`
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
@@ -134,3 +134,5 @@ Com o furgão em pausa, a pessoa deixou em 2026-11-05 que a receita (`receita.js
 Com o esboço antigo removido em 2026-11-05, o campo `esboco` da família `roda-pneu` só confere os pontos gravados em `tools/modelar/familia-com-esboco.andaimes.json`; a pessoa decidiu tirá-lo, e isso fica para quando o furgão voltar, porque a família é território deste plano.
 
 O furgão voltou em 2026-11-05 por essas pendências, sem mudar a forma. A `roda-pneu` deixou de declarar `esboco`, e saíram os onze andaimes gravados que só ela usava (os seis da fixture de prova ficam); a restrição `cubo-dentro-da-tolerancia-do-esboco` guarda o nome, que o registro de aprovação cita, com o motivo sem o esboço. A grade ganhou `grade_base_y` e `grade_topo_y`, com as alturas dos faróis, e o forro ganhou `forro_folga_tunel` e `forro_folga_parede`, as duas a 25 mm. O motivo do contato do piso com os forros e os nomes dos pontos do piso e dos forros passaram a citar a TABELA em vez de números escritos à mão; os outros motivos de contato da receita ainda citam números. O retrato do furgão antes e depois saiu igual. O passo seguinte é o farol pela abertura de contorno livre, mostrado à pessoa em imagem antes do crítico.
+
+Na rodada 18 o modelador não fez o farol: a `aberturaPorContorno` recusou a carroceria, porque a reta do eixo z atravessa a frente e as portas traseiras, e a operação, provada só numa chapa aberta, corta a peça inteira ao longo do eixo. O defeito foi da ferramenta, e o processo não o pegaria, porque a peça de teste do plano dela nunca foi um corpo fechado. Com o sim da pessoa, em 2026-11-05, a operação ganhou `sentido` ('+' ou '-'), que corta só a camada vista desse lado e para o prisma entre ela e a seguinte, recusando quando as duas se sobrepõem em profundidade; a chapa entra na booleana pelas faces já resolvidas, e não pela seleção de novo. O teste novo corta uma de duas chapas empilhadas e confere a outra vértice por vértice. O modelador também relatou que o `descrever` só dizia que a parte não existia: a medida que quebra passou a trazer os passos recusados.

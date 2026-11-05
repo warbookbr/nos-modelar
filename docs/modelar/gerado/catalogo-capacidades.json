@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:061d94b018e14ec8700741c27d591984322d7739f1a62e253eb678d629860b52",
+  "assinatura": "sha256:84fcae3f49c369d46540d09fd8f52314553421788784d6164e73a46791e7c65b",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
