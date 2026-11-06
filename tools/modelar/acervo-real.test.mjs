@@ -27,8 +27,11 @@ const SEGUNDOS_POR_ALVO = 2;
    conforme a máquina (87 s e 102 s em duas rodadas seguidas). A peça listada aqui sai da conta comum e tem o teto dela, cerca
    de 1,7 vez o medido, para a regressão dela continuar aparecendo sem esconder a das outras. Em 2026-11-05 os faróis e a grade
    passaram a ser três vãos pela `aberturaPorContorno`, cada um uma booleana sobre a chapa inteira, e o furgão foi a 152 s no CI
-   (82 s antes deles, na mesma máquina local que mediu 160 s depois); o teto foi a 260 s, a mesma razão. */
-const PECAS_PESADAS = { 'furgao-realista': 260 };
+   (82 s antes deles, na mesma máquina local que mediu 160 s depois); o teto foi a 260 s, a mesma razão. Em 2026-11-06 as duas
+   lanternas passaram a ser vãos na quina pela mesma operação, com a limpeza fina em todos, e o furgão foi a 305 s no CI; o perfil
+   local deu 67 dos 99 s de uma execução nas sete aberturas, 41 deles na booleana da chapa inteira (o item do backlog "Booleana
+   de um vão sem percorrer a chapa inteira"). O teto foi a 450 s, e o prazo do teste a 600 s. */
+const PECAS_PESADAS = { 'furgao-realista': 450 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
@@ -58,5 +61,5 @@ describe('acervo real, inteiro', () => {
     for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
       expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
     }
-  }, 420_000);
+  }, 600_000);
 });
