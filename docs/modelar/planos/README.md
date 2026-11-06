@@ -5,7 +5,8 @@
 **Planos ativos:**
 
 1. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto (etapa 7): a limpeza fina nas aberturas, as portas traseiras mais estreitas e as lanternas pela vista diagonal, depois o interior da lente e os acabamentos.
-2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`. Em aberto: as partes restantes, a começar pelo anel do cotovelo e pelo cotovelo, e a exportação do braço montado.
+2. [abertura só na vizinhança do vão](2026-11-06-abertura-so-na-vizinhanca.md). Território: `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/aberturas-em-teste/`, `tools/modelar/acervo-real.test.mjs`. Começa depois da rodada das portas traseiras do furgão: o corte de um vão sem refazer a chapa inteira.
+3. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`. Em aberto: as partes restantes, a começar pelo anel do cotovelo e pelo cotovelo, e a exportação do braço montado.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
