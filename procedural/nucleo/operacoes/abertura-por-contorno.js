@@ -421,17 +421,22 @@ export function limparCostura({ pos, faces, costura, fixos, fracao = FRACAO_DA_F
   const posicao = (v) => pos(v);
   const nivel = (v) => (fixos.has(v) ? 2 : costura.has(v) ? 1 : 0);
   const recusadas = new Set();
+  /* as faces de cada vértice, montadas uma vez e mantidas a cada fusão: refazê-las a cada volta custava a casca inteira por
+     fusão (no furgão, 18 s das três aberturas), e só as faces do vértice que sai mudam */
+  const facesDe = new Map();
+  for (const [id, vs] of F) for (const v of vs) { if (!facesDe.has(v)) facesDe.set(v, new Set()); facesDe.get(v).add(id); }
   for (let volta = 0; volta < 10000; volta++) {
-    const facesDe = new Map(); const arestas = new Map();
-    for (const [id, vs] of F) for (let k = 0; k < vs.length; k++) {
+    /* só as faces que tocam a costura têm aresta nela */
+    const daCostura = new Set();
+    for (const v of costura) for (const id of facesDe.get(v) ?? []) daCostura.add(id);
+    const arestas = new Map();
+    for (const id of daCostura) { const vs = F.get(id); for (let k = 0; k < vs.length; k++) {
       const a = vs[k], b = vs[(k + 1) % vs.length];
-      if (!facesDe.has(a)) facesDe.set(a, new Set());
-      facesDe.get(a).add(id);
       if (!costura.has(a) && !costura.has(b)) continue;
       const chave = a < b ? `${a},${b}` : `${b},${a}`;
       if (!arestas.has(chave)) arestas.set(chave, { a: Math.min(a, b), b: Math.max(a, b), faces: [] });
       arestas.get(chave).faces.push(id);
-    }
+    } }
     const maiorAresta = (id) => { const vs = F.get(id); let m = 0; for (let k = 0; k < vs.length; k++) m = Math.max(m, tamanho(sub(posicao(vs[k]), posicao(vs[(k + 1) % vs.length])))); return m; };
     const candidatas = [];
     for (const [chave, e] of arestas) {
@@ -442,8 +447,8 @@ export function limparCostura({ pos, faces, costura, fixos, fracao = FRACAO_DA_F
     }
     /* o canto quase reto (o triângulo com os vizinhos abaixo de dez pisos de área), que o adaptador cortaria numa orelha sem
        área, se funde ao vizinho mais perto; a face sem área perde a aresta mais curta */
-    if (piso > 0) for (const [id, vs] of F) {
-      if (!vs.some((v) => costura.has(v))) continue;
+    if (piso > 0) for (const id of daCostura) {
+      const vs = F.get(id);
       const n = vs.length;
       const pares = [];
       if (tamanho(newell(vs.map(posicao))) / 2 < 10 * piso) {
@@ -483,11 +488,13 @@ export function limparCostura({ pos, faces, costura, fixos, fracao = FRACAO_DA_F
       if (na === 2 && nb === 2 && !(c.l <= 2 * NO_POLIGONO)) { recusadas.add(c.chave); continue; }
       const [sai, fica] = na > nb ? [c.b, c.a] : nb > na ? [c.a, c.b] : [c.b, c.a];
       if (!fusaoValida(F, facesDe, sai, fica, posicao)) { recusadas.add(c.chave); continue; }
+      if (!facesDe.has(fica)) facesDe.set(fica, new Set());
       for (const id of [...facesDe.get(sai)]) {
         const vs = F.get(id).map((v) => (v === sai ? fica : v));
         const limpa = vs.filter((v, k) => v !== vs[(k + 1) % vs.length]);
-        if (limpa.length < 3) { F.delete(id); removidas.push(id); } else F.set(id, limpa);
+        if (limpa.length < 3) { F.delete(id); removidas.push(id); for (const v of vs) facesDe.get(v)?.delete(id); } else { F.set(id, limpa); facesDe.get(fica).add(id); }
       }
+      facesDe.delete(sai);
       fundidos.set(sai, fica);
       for (const [a, b] of fundidos) if (b === sai) fundidos.set(a, fica);
       fez = true;
