@@ -1,0 +1,653 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 19,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "topo da coluna do para-brisa, junto à linha do teto",
+        "sentido": "anguloso",
+        "evidencia": "Rasante de lado az30: ponta fina e clara passa acima da linha do teto, acima do pé da coluna do para-brisa; lê como lasca e não como faixa de chapa."
+      }
+    ],
+    "observacao": "Silhueta lateral, frontal, traseira e de cima concorda com a prancha; só abri 8 das cerca de 80 partes e 1 das 8 rasantes, então a nota vale para o que vi."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borrachaPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borrachaPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzDeFreio",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "farolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "farolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piscaEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piscaDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "grade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pisoInterior",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painel",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o bancada de linha de comando tem prazo fixo de 90 s e o furgao leva cerca de 2 min para executar a receita: so rodou chamando olharBancada com prazoDeCargaMs maior",
+    "porta traseira vertical com fim de x 739 (recuo 105 no topo) fez aberturaPorContorno da lanterna falhar sem aviso: so aparece em orfaos do neutro, sem mensagem do descrever",
+    "lanternas sumiram da lista de partes e descrever acusou 'sem parte carroceria' em vez de apontar o passo que falhou",
+    "a bancada e o pacote do critico tinham prazo fixo de 90 s por carga e o furgao leva uns 2 min na pagina; os dois ganharam --prazo, e a mensagem do estouro diz como usa-lo"
+  ],
+  "notaDePassagem": "Porta vertical em x 814 (recuo 105 em y 1190, folga 30 no topo): 739 (recuo 105 no topo) quebrava a abertura da lanterna. Topo 2280 e o anel ombro, 40 mm abaixo de 2320. Janela com margem 80 igual.",
+  "receita": {
+    "sha256": "sha256:4342bf01a9f36fcda41ae3d001577fcc0269262606766d47ccd08dd1089dee90",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 35,
+      "acrescentadas": 63,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": " * da etapa 2 não muda, e o envelope passa de 5400 por 2000 a 5560 por 2060 (2040 na saia). Cada peça é a pele de uma seção da prancha (`TABELA.secao_*`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * da etapa 2 não muda, e o envelope passa de 5400 por 2040 a 5560 por 2100 (2080 na saia). Cada peça é a pele de uma seção da prancha (`TABELA.secao_*`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 82,
+          "texto": "import { contornoPorRetos, derivarFarois, derivarGrade } from '.././receita/farol.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "import { contornoPorRetos, derivarFarois, derivarGrade, derivarLanternas } from '.././receita/farol.js';"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "  // envelope da classe (prancha): 5400 de comprimento, 2000 de largura sem retrovisores, 2500 de altura, soleira em 300"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  // envelope da classe (prancha): 5400 de comprimento, 2040 de largura sem retrovisores (2000 até 2026-11-06, quando a pessoa pediu 20 mm a mais de cada lado), 2500 de altura, soleira em 300"
+        },
+        {
+          "tipo": "-",
+          "linha": 98,
+          "texto": "  meia_largura: 1000,"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  meia_largura: 1020,"
+        },
+        {
+          "tipo": "-",
+          "linha": 105,
+          "texto": "  bitola: 1730, // a face de fora do pneu fica em x 982,5, 17,5 mm para dentro da lateral"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  bitola: 1730, // a face de fora do pneu fica em x 982,5, 37,5 mm para dentro da lateral (17,5 até 2026-11-06: a bitola não mudou com a largura, porque o arco não pede)"
+        },
+        {
+          "tipo": "-",
+          "linha": 148,
+          "texto": "  // no vinco em raio 3000 e sem quina; o prolongamento chega ao teto em x 910 (1820 de largura), e a quina do teto tem raio 300"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  // no vinco em raio 3000 e sem quina; o prolongamento chega ao teto em x 930 (1860 de largura, os mesmos 90 mm de inclinação), e a quina do teto tem raio 300"
+        },
+        {
+          "tipo": "-",
+          "linha": 150,
+          "texto": "  meia_largura_no_teto: 910,"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  meia_largura_no_teto: 930,"
+        },
+        {
+          "tipo": "-",
+          "linha": 204,
+          "texto": "  porta_traseira_topo_y: 2380, // no anel do ombro que cai no começo da quina de trás (2320), 10 mm para dentro da traseira vertical"
+        },
+        {
+          "tipo": "+",
+          "linha": 204,
+          "texto": "  porta_traseira_topo_y: 2280, // 2026-11-06: o topo das portas é o anel `ombro` (ombro_y), 40 mm abaixo de onde a traseira vertical acaba e a curva do teto começa (altura menos raio_quina_traseira, 2320); as laterais das portas são verticais e os cantos de cima de fora, cortados em diagonal"
+        },
+        {
+          "tipo": "+",
+          "linha": 205,
+          "texto": "  ombro_traseiro_y: 2380, // o anel `ombro${anel_porta_traseira}`, que era o topo das portas: fica onde estava, 10 mm para dentro da traseira vertical, e a luz de freio e o teto não mudam"
+        },
+        {
+          "tipo": "-",
+          "linha": 221,
+          "texto": "  vidro_traseiro_x_dentro: 80,"
+        },
+        {
+          "tipo": "-",
+          "linha": 222,
+          "texto": "  vidro_traseiro_x_fora: 820,"
+        },
+        {
+          "tipo": "-",
+          "linha": 223,
+          "texto": "  vidro_traseiro_folga_fora: 45, // a borda de fora da janela corre 45 mm para dentro da borda de fora da porta, que acompanha a lateral"
+        },
+        {
+          "tipo": "+",
+          "linha": 222,
+          "texto": "  vidro_traseiro_x_dentro: 80, // a janela das portas traseiras é um retângulo com a mesma margem (vidro_traseiro_margem) de dentro, de fora e de cima"
+        },
+        {
+          "tipo": "+",
+          "linha": 223,
+          "texto": "  vidro_traseiro_margem: 80,"
+        },
+        {
+          "tipo": "+",
+          "linha": 224,
+          "texto": "  porta_traseira_folga_topo: 30, // 2026-11-06: a borda de fora das portas é vertical, e no topo delas a lateral prolongada já entrou; ela fica pelo menos tanto dentro do fim da traseira reta ali"
+        },
+        {
+          "tipo": "+",
+          "linha": 225,
+          "texto": "  porta_traseira_recuo: 105, // 2026-11-06: as portas traseiras acabam 105 mm antes do fim da traseira reta, e a lanterna larga ocupa a quina livre atrás delas"
+        },
+        {
+          "tipo": "-",
+          "linha": 227,
+          "texto": "  // etapa 6, as luzes e a grade: cada uma é um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda), com a aba dobrada"
+        },
+        {
+          "tipo": "-",
+          "linha": 228,
+          "texto": "  // como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar."
+        },
+        {
+          "tipo": "-",
+          "linha": 229,
+          "texto": "  // Os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,"
+        },
+        {
+          "tipo": "+",
+          "linha": 229,
+          "texto": "  // etapa 6, as luzes: as lanternas e a luz de freio são cada uma um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda),"
+        },
+        {
+          "tipo": "+",
+          "linha": 230,
+          "texto": "  // com a aba dobrada como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar."
+        },
+        {
+          "tipo": "+",
+          "linha": 231,
+          "texto": "  // Os faróis, os piscas e a grade deixaram a gaiola: os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,"
+        },
+        {
+          "tipo": "-",
+          "linha": 231,
+          "texto": "  // até a grade e a de fora indo a x 980, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente."
+        },
+        {
+          "tipo": "-",
+          "linha": 232,
+          "texto": "  farol_perfil: [[460, 840], [985, 840], [985, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô"
+        },
+        {
+          "tipo": "+",
+          "linha": 233,
+          "texto": "  // até a grade e a de fora indo a x 1000, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente."
+        },
+        {
+          "tipo": "+",
+          "linha": 234,
+          "texto": "  farol_perfil: [[460, 840], [1005, 840], [1005, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô"
+        },
+        {
+          "tipo": "-",
+          "linha": 234,
+          "texto": "  pisca_x_dentro: 890, // o pisca ocupa a ponta de fora do farol, de x 890 à borda dele"
+        },
+        {
+          "tipo": "+",
+          "linha": 236,
+          "texto": "  pisca_x_dentro: 910, // o pisca ocupa a ponta de fora do farol, de x 890 à borda dele"
+        },
+        {
+          "tipo": "-",
+          "linha": 251,
+          "texto": "  lanterna_base_y: 830, // na quina de trás, entre a borda da porta traseira e a lateral, abaixo do vinco de cintura"
+        },
+        {
+          "tipo": "-",
+          "linha": 252,
+          "texto": "  // o anel boca1 (1125): acima dele os anéis de enchimento ficam a 12,5 mm, e o trecho curto junto da quina faz a aba do vão se dobrar"
+        },
+        {
+          "tipo": "-",
+          "linha": 253,
+          "texto": "  lanterna_topo_y: 1130,"
+        },
+        {
+          "tipo": "+",
+          "linha": 253,
+          "texto": "  lanterna_base_y: 720, // as lanternas de trás (2026-11-06, opção 1 do esboço): vãos pelo contorno, um por lado, vistos pela diagonal da quina; de 720 a 1240 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 254,
+          "texto": "  lanterna_topo_y: 1240,"
+        },
+        {
+          "tipo": "+",
+          "linha": 255,
+          "texto": "  lanterna_x_dentro: 856, // a borda de dentro na face de trás, na mesma distância da quina de antes da largura nova (836 com a lateral em 1000)"
+        },
+        {
+          "tipo": "+",
+          "linha": 256,
+          "texto": "  lanterna_entra_lado: 85, // quanto o vão entra na lateral além do fim do arco da quina"
+        },
+        {
+          "tipo": "+",
+          "linha": 257,
+          "texto": "  lanterna_raio: 25, // a concordância dos quatro cantos do vão"
+        },
+        {
+          "tipo": "+",
+          "linha": 258,
+          "texto": "  lanterna_recuo_lente: 3, // a lente da lanterna entra 3 mm no vão, como a do farol"
+        },
+        {
+          "tipo": "+",
+          "linha": 259,
+          "texto": "  lanterna_aba_largura: 6, // a perna da aba da lanterna é mais curta que a dos outros vãos: o vão começa em 720, abaixo do topo do piso (735 a 755, a cerca de 10 mm da chapa), e uma perna de 10 mm ou mais encosta nele"
+        },
+        {
+          "tipo": "-",
+          "linha": 346,
+          "texto": "  piso_meia_largura: 988,"
+        },
+        {
+          "tipo": "+",
+          "linha": 352,
+          "texto": "  piso_meia_largura: 1008,"
+        },
+        {
+          "tipo": "-",
+          "linha": 364,
+          "texto": "  painel_meia_largura: 850,"
+        },
+        {
+          "tipo": "+",
+          "linha": 370,
+          "texto": "  painel_meia_largura: 870,"
+        },
+        {
+          "tipo": "+",
+          "linha": 383,
+          "texto": "/** Os ids dos passos das lanternas de trás, por lado k: o vão (806 + k) e a aba (946 + k). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 384,
+          "texto": "const ID_LANTERNA = (k) => 806 + k;"
+        },
+        {
+          "tipo": "+",
+          "linha": 385,
+          "texto": "const ID_ABA_LANTERNA = (k) => 946 + k;"
+        },
+        {
+          "tipo": "-",
+          "linha": 421,
+          "texto": "  /* as luzes e a grade (etapa 6): a aba dobrada de cada vão, como a dos vidros, e a lente rente à lataria, no material de cada uma */"
+        },
+        {
+          "tipo": "+",
+          "linha": 430,
+          "texto": "  /* as luzes da gaiola (etapa 6): a aba dobrada de cada vão, como a dos vidros, e a lente rente à lataria, no material de cada uma */"
+        },
+        {
+          "tipo": "-",
+          "linha": 446,
+          "texto": "      origemId: ID_FAROL(k), chapa: chapaAnterior, contorno: contornoPorRetos(fa.farol, mm, T.farol_raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.farol_recuo_lente),"
+        },
+        {
+          "tipo": "+",
+          "linha": 455,
+          "texto": "      origemId: ID_FAROL(k), chapa: chapaAnterior, contorno: contornoPorRetos(fa.farol, mm, T.farol_raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.farol_recuo_lente), limpezaFina: true,"
+        },
+        {
+          "tipo": "-",
+          "linha": 449,
+          "texto": "      origemId: ID_PISCA(k), chapa: { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k), parte: 'lente' } }, contorno: contornoPorRetos(fa.pisca, mm, fa.raioPisca), vista: 'z', lente: true, recuoDaLente: m(T.pisca_recuo_lente),"
+        },
+        {
+          "tipo": "+",
+          "linha": 458,
+          "texto": "      origemId: ID_PISCA(k), chapa: { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k), parte: 'lente' } }, contorno: contornoPorRetos(fa.pisca, mm, fa.raioPisca), vista: 'z', lente: true, recuoDaLente: m(T.pisca_recuo_lente), limpezaFina: true,"
+        },
+        {
+          "tipo": "-",
+          "linha": 471,
+          "texto": "    origemId: ID_GRADE, chapa: chapaDaGrade, contorno: contornoPorRetos(grade.contorno, mm, grade.raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.grade_lente_recuo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 480,
+          "texto": "    origemId: ID_GRADE, chapa: chapaDaGrade, contorno: contornoPorRetos(grade.contorno, mm, grade.raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.grade_lente_recuo), limpezaFina: true,"
+        },
+        {
+          "tipo": "-",
+          "linha": 496,
+          "texto": "  const carroceria = { origem: { op: 'aberturaPorContorno', id: ID_GRADE } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 505,
+          "texto": "  const lanternas = derivarLanternas(T, f);"
+        },
+        {
+          "tipo": "+",
+          "linha": 506,
+          "texto": "  for (const [k, la] of lanternas.entries()) { // as lanternas de trás: um vão por quina, visto pela diagonal, com lente recuada; aba e lente são a mesma parte"
+        },
+        {
+          "tipo": "+",
+          "linha": 507,
+          "texto": "    const chapaAnterior = { origem: { op: 'aberturaPorContorno', id: k === 0 ? ID_GRADE : ID_LANTERNA(k - 1) } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 508,
+          "texto": "    passos.push(['aberturaPorContorno', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 509,
+          "texto": "      origemId: ID_LANTERNA(k), chapa: chapaAnterior, contorno: contornoPorRetos(la.contorno, mm, T.lanterna_raio), vista: la.vista, sentido: '+', lente: true, recuoDaLente: m(T.lanterna_recuo_lente), limpezaFina: true,"
+        },
+        {
+          "tipo": "+",
+          "linha": 510,
+          "texto": "    }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 511,
+          "texto": "    const aba = { origem: { op: 'friso', id: ID_ABA_LANTERNA(k) } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 512,
+          "texto": "    passos.push(['friso', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 513,
+          "texto": "      origemId: ID_ABA_LANTERNA(k), superficie: { op: 'aberturaPorContorno', id: ID_LANTERNA(k) }, linha: { nome: `abaVaoLanterna${la.lado}` },"
+        },
+        {
+          "tipo": "+",
+          "linha": 514,
+          "texto": "      aba: { largura: m(T.lanterna_aba_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 515,
+          "texto": "    }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 516,
+          "texto": "    const lente = { origem: { op: 'aberturaPorContorno', id: ID_LANTERNA(k), parte: 'lente' } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 517,
+          "texto": "    passos.push(['parte', { nome: `lanterna${la.lado}`, sel: aba }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 518,
+          "texto": "    passos.push(['material', { sel: aba, usa: 'azul' }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 519,
+          "texto": "    passos.push(['parte', { nome: `lanterna${la.lado}`, sel: lente }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 520,
+          "texto": "    passos.push(['material', { sel: lente, usa: 'lanterna' }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 521,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 522,
+          "texto": "  const carroceria = { origem: { op: 'aberturaPorContorno', id: ID_LANTERNA(lanternas.length - 1) } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 625,
+          "texto": "  derivarLanternas(T, forma(T)).forEach((la, k) => vaos.push({ nome: `lanterna${la.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LANTERNA(k) }, frisos: [`abaVaoLanterna${la.lado}`] }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 676,
+          "texto": "    objeto: 'furgão médio de teto alto, etapa 5: chapa de 5400 por 2000 por 2500 com frestas, saia, para-choques e alargamento dos arcos (5560 por 2060), forro e rodas, mais cristais, borrachas de vão e interior simples',"
+        },
+        {
+          "tipo": "+",
+          "linha": 703,
+          "texto": "    objeto: 'furgão médio de teto alto, etapa 5: chapa de 5400 por 2040 por 2500 com frestas, saia, para-choques e alargamento dos arcos (5560 por 2100), forro e rodas, mais cristais, borrachas de vão e interior simples',"
+        },
+        {
+          "tipo": "-",
+          "linha": 683,
+          "texto": "        forma: 'chapa de 2 mm: lateral vertical até o vinco em 1190 e fechando 3,9 graus até o teto de ±630; capô de 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405, frestas de 6 mm, sulcos, vãos redondos; o plástico de baixo se soma por fora',"
+        },
+        {
+          "tipo": "+",
+          "linha": 710,
+          "texto": "        forma: 'chapa de 2 mm, 2040 de largura: lateral vertical até 1190, fechando 3,9 graus até o teto de ±650; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405; portas traseiras de lados verticais (x 814), topo 2280, cantos redondos',"
+        },
+        {
+          "tipo": "-",
+          "linha": 743,
+          "texto": "        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} trapézio de cantos de raio 40: [460, 840], [985, 840], [985, 1080], [490, 1080], topo na boca do capô, ponta de dentro junto da grade; lente clara recuada 3 mm e aba do vão para dentro`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 770,
+          "texto": "        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} trapézio de cantos de raio 40: [460, 840], [1005, 840], [1005, 1080], [490, 1080], topo na boca do capô, ponta de dentro junto da grade; lente clara recuada 3 mm e aba do vão para dentro`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 748,
+          "texto": "        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do farol: x 890 a 985, na altura toda dele, 6 mm dentro da borda, cantos de fora na concordância do farol, lente âmbar opaca do tamanho do vão`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 775,
+          "texto": "        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do farol: x 910 a 1005, na altura toda dele, 6 mm dentro da borda, cantos de fora na concordância do farol, lente âmbar opaca do tamanho do vão`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 753,
+          "texto": "        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} vertical na quina de trás, embutida e rente: da porta traseira até a lateral, de y 830 a 1125, lente vermelha opaca de 4 mm e a aba do vão dobrada para dentro`,"
+        },
+        {
+          "tipo": "-",
+          "linha": 754,
+          "texto": "        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada 5,5 mm pela superfície, e friso com aba sobre a borda do vão',"
+        },
+        {
+          "tipo": "+",
+          "linha": 780,
+          "texto": "        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} alta, opção 1: um vão só de y 720 a 1240, larga atrás (de x 856, mesma distância da quina), dobrando a quina e entrando 85 mm na lateral; cantos de raio 25, lente vermelha recuada 3 mm, aba de 6 mm`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 781,
+          "texto": "        tecnica: 'aberturaPorContorno com lente, vista por vetor na diagonal da quina ([1, 0, -1] na de +x, [-1, 0, -1] na de -x) e sentido +, limpezaFina; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',"
+        },
+        {
+          "tipo": "-",
+          "linha": 806,
+          "texto": "      'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou o vão traseiro não acompanha a lateral 100 mm para dentro dela acima do vinco, ou um sulco do teto não cabe no teto de ±630',"
+        },
+        {
+          "tipo": "+",
+          "linha": 833,
+          "texto": "      'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou um sulco do teto não cabe no teto de ±650',"
+        },
+        {
+          "tipo": "+",
+          "linha": 834,
+          "texto": "      'a borda de fora de uma porta traseira não é vertical, ou o topo dela passa de 2320 (onde a curva do teto começa atrás), ou os cantos de cima dela não são redondos, ou a janela dela não é um retângulo de bordas paralelas às da porta',"
+        },
+        {
+          "tipo": "-",
+          "linha": 824,
+          "texto": "      'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2060 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 852,
+          "texto": "      'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2100 mm',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
