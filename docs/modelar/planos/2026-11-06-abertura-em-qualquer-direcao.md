@@ -29,7 +29,7 @@ A receita dá uma direção qualquer para a vista, e o vão que dobra a quina de
 - a bateria de peças de teste em `tools/fixtures/aberturas-em-teste/`, uma por caso, cada uma com o gate de malha e de borda: o vão que dobra a quina; dois vãos vizinhos (a menor folga entre eles) e o vão dentro da lente de outro; o contorno que cruza um vinco vivo e o que passa perto da borda da chapa; o contorno côncavo (em L e em estrela) e o de bico muito agudo; a superfície de dupla curvatura forte; o corpo fechado de três camadas na mesma reta (um tubo dobrado em U) com `sentido`; e a chapa feita por outra gaiola (por rede e por laços);
 - a correção de cada limite que couber na operação, ou a recusa com a medida e o que fazer;
 - o tempo de cada caso e o de um vão numa chapa do tamanho da do furgão;
-- o banco de provas com as medidas e as imagens das peças, para a pessoa ver.
+- o [banco de provas](../banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/README.md) com as medidas e as imagens das peças, para a pessoa ver.
 
 ## Excluído
 
