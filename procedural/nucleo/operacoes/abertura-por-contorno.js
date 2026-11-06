@@ -66,6 +66,33 @@ import { LIMITE_DE_FACE_FINA } from '../topologia.js';
 
 /** As vistas: o eixo ao longo do qual o contorno é projetado e os eixos de u e v no plano do desenho. */
 export const VISTAS = Object.freeze({ x: Object.freeze({ eixo: 0, u: 2, v: 1 }), y: Object.freeze({ eixo: 1, u: 0, v: 2 }), z: Object.freeze({ eixo: 2, u: 0, v: 1 }) });
+
+/** quadroDaVista(vista) -> { nome, eixo, u, v, local(p), mundo(p) } | null. Nos três eixos, os índices de VISTAS sobre as coordenadas
+ *  como estão (local e mundo são a identidade, e a malha sai a mesma de antes). Num vetor [dx, dy, dz], a vista olha ao longo dele: o
+ *  desenho fica no plano perpendicular, com u horizontal (perpendicular a y e ao vetor; no vetor vertical, x) e v = d × u, e `local`
+ *  leva um ponto a [u, v, w], com w ao longo do vetor; `mundo` faz o inverso. O quadro é ortonormal e direito. */
+export function quadroDaVista(vista) {
+  if (typeof vista === 'string') {
+    if (!Object.hasOwn(VISTAS, vista)) return null;
+    const { eixo, u, v } = VISTAS[vista];
+    return { nome: `do eixo ${vista}`, eixo, u, v, identidade: true, local: (p) => p, mundo: (p) => p };
+  }
+  if (!Array.isArray(vista) || vista.length !== 3 || !vista.every(Number.isFinite)) return null;
+  const l = Math.hypot(...vista);
+  if (!(l > 0)) return null;
+  const d = vista.map((c) => c / l);
+  let u = cruz([0, 1, 0], d);
+  if (tamanho(u) < 1e-9) u = [1, 0, 0];
+  u = u.map((c) => c / tamanho(u));
+  const v = cruz(d, u);
+  return {
+    nome: `da direção [${vista.map((c) => fmt(c)).join(', ')}]`, eixo: 2, u: 0, v: 1,
+    local: (p) => [ponto(p, u), ponto(p, v), ponto(p, d)],
+    mundo: (q) => [0, 1, 2].map((c) => q[0] * u[c] + q[1] * v[c] + q[2] * d[c]),
+  };
+}
+/* um mapa de vértices visto no quadro, com o ponto local guardado na primeira leitura */
+const noQuadro = (V, q) => { if (q.identidade) return V; const memo = new Map(); return { get: (v) => { if (!memo.has(v)) { const p = V.get(v); memo.set(v, p && q.local(p)); } return memo.get(v); } }; };
 /** O erro máximo do ângulo de um bico vivo, em graus: o gate 2 do plano. */
 export const ERRO_MAXIMO_DO_BICO = 2;
 /** A aresta da costura mais curta que esta fração da maior aresta das faces em volta é fundida num ponto só. A lasca que
@@ -196,8 +223,9 @@ function distanciaAoTriangulo(p, a, b, c) {
 
 /** A chapa vista do eixo da vista: quantas vezes a reta do eixo por cada ponto do contorno atravessa a casca, e se algum lado do
  *  contorno cruza a borda dela (a aresta entre uma face virada para o eixo e outra que não está). Devolve null ou a recusa. */
-function conferirProjecao(V, faces, poligono, vista, sentido = null) {
-  const { eixo, u: iu, v: iv } = VISTAS[vista];
+function conferirProjecao(Vmundo, faces, poligono, q, sentido = null) {
+  const V = noQuadro(Vmundo, q);
+  const { eixo, u: iu, v: iv } = q; const vista = q.nome;
   const proj = (p) => [p[iu], p[iv]];
   const lado = new Map(); const tris = [];
   for (const [fid, vs] of faces) {
@@ -240,8 +268,8 @@ function conferirProjecao(V, faces, poligono, vista, sentido = null) {
   if (!sentido) {
     for (const p of doContorno) {
       const c = camadas(p).length;
-      if (c === 0) return { recusa: `o ponto ${texto2(p)} do contorno fica fora da chapa vista do eixo ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro ou troque a vista` };
-      if (c > 2) return { recusa: `no ponto ${texto2(p)} do contorno a reta do eixo ${vista} atravessa a chapa ${Math.floor(c / 2)} vezes: a chapa se dobra sobre si nesta vista e o corte abriria mais de uma camada; desenhe o contorno numa vista em que a chapa passa uma vez só, ou declare sentido ('+' ou '-') para cortar só a camada vista desse lado do eixo` };
+      if (c === 0) return { recusa: `o ponto ${texto2(p)} do contorno fica fora da chapa vista ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro ou troque a vista` };
+      if (c > 2) return { recusa: `no ponto ${texto2(p)} do contorno a reta ${vista} atravessa a chapa ${Math.floor(c / 2)} vezes: a chapa se dobra sobre si nesta vista e o corte abriria mais de uma camada; desenhe o contorno numa vista em que a chapa passa uma vez só, ou declare sentido ('+' ou '-') para cortar só a camada vista desse lado do eixo` };
     }
   } else {
     /* a primeira camada vista do lado `sentido`: a face de dentro dela e a de fora da seguinte, em cada ponto medido */
@@ -251,7 +279,7 @@ function conferirProjecao(V, faces, poligono, vista, sentido = null) {
     for (const p of medidos) {
       const ds = camadas(p).map((w) => sinal * w).sort((a, b) => b - a); // do mais perto de quem olha ao mais longe
       if (ds.length === 0) {
-        if (medidos.indexOf(p) < doContorno.length) return { recusa: `o ponto ${texto2(p)} do contorno fica fora da chapa vista do eixo ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro ou troque a vista` };
+        if (medidos.indexOf(p) < doContorno.length) return { recusa: `o ponto ${texto2(p)} do contorno fica fora da chapa vista ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro ou troque a vista` };
         continue;
       }
       const dentro = ds[Math.min(1, ds.length - 1)];
@@ -260,7 +288,7 @@ function conferirProjecao(V, faces, poligono, vista, sentido = null) {
     }
     if (ondeSeguinte) {
       if (seguinteMaisPerto >= dentroMaisFundo - 1e-6) {
-        return { recusa: `com sentido '${sentido}' a primeira camada da chapa e a seguinte se sobrepõem em profundidade: a face de dentro da primeira chega a ${mm(sinal * dentroMaisFundo)} mm em ${vista} no ponto ${texto2(ondeDentro)}, e a de fora da seguinte a ${mm(sinal * seguinteMaisPerto)} mm no ponto ${texto2(ondeSeguinte)}, de modo que nenhum plano passa entre elas no vão inteiro; desenhe o contorno onde as camadas ficam separadas ou troque a vista` };
+        return { recusa: `com sentido '${sentido}' a primeira camada da chapa e a seguinte se sobrepõem em profundidade: a face de dentro da primeira chega a ${mm(sinal * dentroMaisFundo)} mm na vista ${vista} no ponto ${texto2(ondeDentro)}, e a de fora da seguinte a ${mm(sinal * seguinteMaisPerto)} mm no ponto ${texto2(ondeSeguinte)}, de modo que nenhum plano passa entre elas no vão inteiro; desenhe o contorno onde as camadas ficam separadas ou troque a vista` };
       }
       corte = sinal * (dentroMaisFundo + seguinteMaisPerto) / 2;
     }
@@ -281,7 +309,7 @@ function conferirProjecao(V, faces, poligono, vista, sentido = null) {
     for (let k = 0; k < n; k++) {
       const c = poligono[k], d = poligono[(k + 1) % n];
       if (orient(pa, pb, c) !== orient(pa, pb, d) && orient(c, d, pa) !== orient(c, d, pb)) {
-        return { recusa: `o lado do contorno de ${texto2(c)} a ${texto2(d)} cruza a borda da chapa vista do eixo ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro` };
+        return { recusa: `o lado do contorno de ${texto2(c)} a ${texto2(d)} cruza a borda da chapa vista ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro` };
       }
     }
   }
@@ -309,8 +337,10 @@ function pontosDeDentro(poligono, n = 12) {
  *  pela reta do eixo: a distância entre a primeira e a última vez que ela cruza a casca, vezes o cosseno da normal da face de cima
  *  com o eixo (a espessura medida pela normal, numa chapa de duas faces paralelas). A mediana dos pontos; a lente recuada usa esta
  *  medida no recuo padrão, porque é calculada antes do corte, e o registro guarda também a medida da borda, depois dele. */
-export function espessuraVistaDoEixo(V, faces, poligono, vista) {
-  const { eixo, u: iu, v: iv } = VISTAS[vista];
+export function espessuraVistaDoEixo(Vmundo, faces, poligono, vista) {
+  const q = typeof vista === 'object' && vista && 'local' in vista ? vista : quadroDaVista(vista);
+  const V = noQuadro(Vmundo, q);
+  const { eixo, u: iu, v: iv } = q;
   const tris = [];
   for (const vs of faces.values()) {
     const pts = vs.map((v) => V.get(v));
@@ -394,11 +424,11 @@ export function recuarPoligono(poligono, d) {
 /* ---- o prisma ---- */
 
 /** O prisma do contorno ao longo do eixo, de `de` a `ate`: { pontos, faces }, fechado e com as faces para fora. */
-function prismaDoContorno(poligono, vista, de, ate) {
-  const { eixo, u: iu, v: iv } = VISTAS[vista];
+function prismaDoContorno(poligono, q, de, ate) {
+  const { eixo, u: iu, v: iv } = q;
   const ccw = areaDoPoligono2(poligono) > 0 ? poligono : [...poligono].reverse();
   const N = ccw.length;
-  const em3d = (q, w) => { const p = [0, 0, 0]; p[iu] = q[0]; p[iv] = q[1]; p[eixo] = w; return p; };
+  const em3d = (s, w) => { const p = [0, 0, 0]; p[iu] = s[0]; p[iv] = s[1]; p[eixo] = w; return q.mundo(p); };
   const pontos = [...ccw.map((q) => em3d(q, de)), ...ccw.map((q) => em3d(q, ate))];
   const faces = [];
   for (let g = 0; g < N; g++) faces.push([g, (g + 1) % N, N + ((g + 1) % N), N + g]);
@@ -732,8 +762,8 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
     if (declaracoes.length > 1) return grita(st, i, OP, 'origemId', textoDeclaracoes(a.origemId, declaracoes));
     if (a.chapa == null) return grita(st, i, OP, 'chapa', "chapa é a seleção do sólido fechado que o vão corta, como { origem: { op: 'subdivisao', id } } de uma chapa com espessura");
-    if (!Object.hasOwn(VISTAS, a.vista)) return grita(st, i, OP, 'vista', `vista precisa ser 'x', 'y' ou 'z', o eixo ao longo do qual o contorno é projetado (na 'y' o ponto [u, v] é [x, z], na 'x' é [z, y] e na 'z' é [x, y]); veio ${JSON.stringify(a.vista)}`);
-    const vista = a.vista;
+    const quadro = quadroDaVista(Array.isArray(a.vista) ? a.vista.map((x) => st.num(x)) : a.vista);
+    if (!quadro) return grita(st, i, OP, 'vista', `vista precisa ser 'x', 'y' ou 'z', o eixo ao longo do qual o contorno é projetado (na 'y' o ponto [u, v] é [x, z], na 'x' é [z, y] e na 'z' é [x, y]), ou um vetor [dx, dy, dz] não nulo, a direção de onde se olha (o desenho fica no plano perpendicular a ele, com u horizontal); veio ${JSON.stringify(a.vista)}`);
     const contorno = a.contorno;
     if (!contorno || typeof contorno !== 'object' || Array.isArray(contorno)) return grita(st, i, OP, 'contorno', 'contorno precisa ser { inicio: [u, v], trechos: [...] }, o de curva2d (reto, arco, arcoTangente, concordancia e spline), em metros na vista');
     let segmentosArco; let segmentosSpline;
@@ -786,18 +816,19 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const idsDaChapa = [...selecao.faces].sort((x, y) => x - y);
     if (!idsDaChapa.length) return grita(st, i, OP, 'chapa', 'a seleção da chapa não tem face nenhuma');
     const facesDaChapa = new Map(idsDaChapa.map((id) => [id, [...st.F.get(id).vs]]));
-    const projecao = conferirProjecao(st.V, facesDaChapa, poligono, vista, sentido);
+    const projecao = conferirProjecao(st.V, facesDaChapa, poligono, quadro, sentido);
     if (projecao.recusa) return grita(st, i, OP, 'contorno', projecao.recusa);
-    const { eixo } = VISTAS[vista];
+    const { eixo } = quadro;
+    const Vl = noQuadro(st.V, quadro);
     let wMin = Infinity, wMax = -Infinity;
-    for (const vs of facesDaChapa.values()) for (const v of vs) { const w = st.V.get(v)[eixo]; wMin = Math.min(wMin, w); wMax = Math.max(wMax, w); }
+    for (const vs of facesDaChapa.values()) for (const v of vs) { const w = Vl.get(v)[eixo]; wMin = Math.min(wMin, w); wMax = Math.max(wMax, w); }
     const margem = 0.25 * (wMax - wMin) + 1e-3;
     /* com a camada, o prisma vai de fora da chapa, do lado de quem olha, até o plano entre a primeira camada e a seguinte */
     const de = projecao.corte != null && sentido === '+' ? projecao.corte : wMin - margem;
     const ate = projecao.corte != null && sentido === '-' ? projecao.corte : wMax + margem;
     const facesDaCamada = projecao.corte == null ? facesDaChapa : new Map([...facesDaChapa].filter(([, vs]) => projecao.naCamada(vs)));
     let prisma;
-    try { prisma = prismaDoContorno(poligono, vista, de, ate); } catch (e) {
+    try { prisma = prismaDoContorno(poligono, quadro, de, ate); } catch (e) {
       if (e instanceof ErroDePerfil) return grita(st, i, OP, 'contorno', e.message);
       throw e;
     }
@@ -810,8 +841,8 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const copia = a.lente ? { pontos: vertDaChapa.map((v) => [...st.V.get(v)]), faces: idsDaChapa.map((id) => facesDaChapa.get(id).map((v) => indiceDaChapa.get(v))), liso: idsDaChapa.map((id) => st.F.get(id).liso) } : null;
 
     /* a lente sai da Manifold aqui, antes de o corte mexer na peça: a recusa dela não deixa a chapa cortada pela metade */
-    const { u: iu, v: iv } = VISTAS[vista];
-    const noPoligono = (P) => (p) => P.some((q) => Math.hypot(p[iu] - q[0], p[iv] - q[1]) <= NO_POLIGONO);
+    const { u: iu, v: iv } = quadro;
+    const noPoligono = (P) => (p) => { const l = quadro.local(p); return P.some((q) => Math.hypot(l[iu] - q[0], l[iv] - q[1]) <= NO_POLIGONO); };
     const noDesenho = noPoligono(poligono);
     let lenteCalculada = null;
     let recuoDaLente = null;
@@ -820,14 +851,14 @@ export function criarOperacoesAberturaPorContorno(servicos) {
          aba que o friso dobra na borda, e a pele dela continua sobre a da chapa */
       if (recuoDeclarado != null) recuoDaLente = recuoDeclarado;
       else {
-        const e = espessuraVistaDoEixo(st.V, facesDaCamada, poligono, vista);
+        const e = espessuraVistaDoEixo(st.V, facesDaCamada, poligono, quadro);
         if (e == null) return grita(st, i, OP, 'recuoDaLente', 'a espessura da chapa no contorno não se mede pela reta do eixo, e o recuo padrão da lente depende dela; declare recuoDaLente em metro');
         recuoDaLente = RECUO_PADRAO_DA_LENTE * e;
       }
       const recuado = recuarPoligono(poligono, recuoDaLente);
       if (recuado.erro) return grita(st, i, OP, 'recuoDaLente', `a lente não cabe no vão: ${recuado.erro}; reduza recuoDaLente (o recuo de 0 deixa a lente do tamanho do vão)`);
       let r;
-      try { r = intersecaoNaManifold(wasm, [copia, recuoDaLente > 0 ? prismaDoContorno(recuado.poligono, vista, de, ate) : prisma]); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
+      try { r = intersecaoNaManifold(wasm, [copia, recuoDaLente > 0 ? prismaDoContorno(recuado.poligono, quadro, de, ate) : prisma]); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
       const facesL = new Map(r.faces.map((f, k) => [k, f.vs]));
       const paredeL = new Set(r.faces.map((f, k) => (f.solido === 1 ? k : -1)).filter((k) => k >= 0));
       const costuraL = new Set([...paredeL].flatMap((k) => facesL.get(k)));
@@ -918,16 +949,16 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const raizDe = (f) => { let x = f; while (st.pedacosDe.has(x)) x = st.pedacosDe.get(x); return x; };
     const facesDaVolta = (volta) => { const s = new Set(volta); return facesDaChapaCortada.filter((f) => !parede.has(f) && st.F.get(f).vs.some((v) => s.has(v))); };
     const naExterna = (volta) => facesDaVolta(volta).some((f) => externas.has(raizDe(f)));
-    const paraOEixo = (volta) => facesDaVolta(volta).reduce((s, f) => s + newell(st.F.get(f).vs.map((v) => st.V.get(v)))[eixo], 0);
+    const paraOEixo = (volta) => facesDaVolta(volta).reduce((s, f) => s + newell(st.F.get(f).vs.map((v) => quadro.local(st.V.get(v))))[eixo], 0);
     let [fora, dentro] = voltas;
     const ef = naExterna(fora), ed = naExterna(dentro);
     if (ef !== ed ? ed : paraOEixo(dentro) > paraOEixo(fora)) [fora, dentro] = [dentro, fora];
     /* cada volta começa no ponto do início do desenho e anda no sentido em que ele foi desenhado */
     const sentidoDesenhado = Math.sign(areaDoPoligono2(poligono));
     const ordenar = (volta) => {
-      const q = volta.map((v) => [st.V.get(v)[iu], st.V.get(v)[iv]]);
+      const q = volta.map((v) => { const l = quadro.local(st.V.get(v)); return [l[iu], l[iv]]; });
       let lista = Math.sign(areaDoPoligono2(q)) === sentidoDesenhado ? [...volta] : [...volta].reverse();
-      const k = lista.findIndex((v) => Math.hypot(st.V.get(v)[iu] - poligono[0][0], st.V.get(v)[iv] - poligono[0][1]) <= NO_POLIGONO);
+      const k = lista.findIndex((v) => { const l = quadro.local(st.V.get(v)); return Math.hypot(l[iu] - poligono[0][0], l[iv] - poligono[0][1]) <= NO_POLIGONO; });
       if (k > 0) lista = [...lista.slice(k), ...lista.slice(0, k)];
       return lista;
     };
@@ -937,7 +968,8 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     for (const v of fora) {
       if (!fixos.has(v)) continue;
       const p = st.V.get(v);
-      const par = dentro.find((w) => fixos.has(w) && Math.hypot(st.V.get(w)[iu] - p[iu], st.V.get(w)[iv] - p[iv]) <= NO_POLIGONO);
+      const pl = quadro.local(p);
+      const par = dentro.find((w) => { if (!fixos.has(w)) return false; const l = quadro.local(st.V.get(w)); return Math.hypot(l[iu] - pl[iu], l[iv] - pl[iv]) <= NO_POLIGONO; });
       if (par == null) continue;
       const n = facesDaChapaCortada.filter((f) => !parede.has(f) && st.F.get(f).vs.includes(v)).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
       if (tamanho(n) > 0) espessuras.push(Math.abs(ponto(sub(p, st.V.get(par)), n)) / tamanho(n));
@@ -963,9 +995,9 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       }
     }
 
-    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length } });
+    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length } });
     registraOrigem(st, i, OP, a.origemId, {
-      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente,
+      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista: a.vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente,
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
       limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length },
     });

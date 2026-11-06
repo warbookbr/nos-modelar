@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1653 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1654 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2046,6 +2046,10 @@
 ## tools/fixtures/abertura-de-prova/referencias/
 
 - `alvo.md` — Alvo da abertura de prova
+
+## tools/fixtures/aberturas-em-teste/
+
+- `caixa-de-quinas.js` — caixa-de-quinas.js — peça de teste do plano da abertura em qualquer direção: uma caixa oca de 800 por 800 mm em planta e 600 de altura, com as quatro quinas …
 
 ## tools/fixtures/acervo/peca-de-prova/
 

@@ -389,3 +389,27 @@ describe('aberturaPorContorno numa chapa que a reta do eixo atravessa duas vezes
     expect(neutro.orfaos[0].ref).toBe('sentido');
   });
 });
+
+describe('aberturaPorContorno numa vista por vetor', () => {
+  it('a vista [0, 0, 1] dá a mesma malha que a vista z', () => {
+    const d = derivar();
+    const chapa = passoDaChapa();
+    const ida = (p: number[]) => [p[0], p[2], p[1]];
+    const faces = chapa.faces.map((f: string[]) => [...f].reverse());
+    const TOPO = Object.fromEntries(Object.entries(d.pontos).map(([k, p]) => [k, ida(p as number[])]));
+    const rodar = (vista: any) => executarReceita({ meta: { nome: 'abertura-z' }, PARAMS: {}, TOPO, PASSOS: [['subdivisao', { origemId: 1, ...chapa, faces }], ['aberturaPorContorno', { origemId: 3, chapa: { origem: { op: 'subdivisao', id: 1 } }, vista, segmentosArco: 32, contorno: d.trechos, lente: true }]] }).neutro;
+    const a = rodar('z'); const b = rodar([0, 0, 1]);
+    expect(b.orfaos).toEqual([]);
+    expect([...b.V]).toEqual([...a.V]);
+    expect([...b.F].map(([k, f]: any) => [k, f.vs])).toEqual([...a.F].map(([k, f]: any) => [k, f.vs]));
+  });
+
+  it('o vetor nulo ou de tamanho errado grita pelo campo vista', () => {
+    const d = derivar();
+    for (const vista of [[0, 0, 0], [1, 0]]) {
+      const { neutro } = executarReceita(comTabela(TABELA, [['subdivisao', { origemId: 1, ...passoDaChapa() }], ['aberturaPorContorno', { origemId: 3, chapa: { origem: { op: 'subdivisao', id: 1 } }, vista, contorno: d.trechos }]]));
+      expect(neutro.orfaos[0].ref).toBe('vista');
+      expect(neutro.orfaos[0].motivo).toMatch(/vetor \[dx, dy, dz\] não nulo/);
+    }
+  });
+});

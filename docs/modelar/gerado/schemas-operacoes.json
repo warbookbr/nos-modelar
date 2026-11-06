@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:f0881637566bd7553c71a6c5a048110f918e10136854bf265ad9613f6c216ee6",
+  "assinatura": "sha256:0c6dd350360a070cdd18986f2f311cc68fe88cd0b33c7d0b3f075b458764c6f1",
   "total": 40,
   "operacoes": [
     {
@@ -35,12 +35,21 @@
               "description": "O contorno do vão, { inicio: [u, v], trechos: [...] } de curva2d (reto, arco, arcoTangente, concordancia e spline), em metros no plano da vista, escrito fechado: o último trecho termina no início. O encontro de dois trechos sem concordância é canto vivo; a concordância de raio declarado arredonda o canto."
             },
             "vista": {
-              "enum": [
-                "x",
-                "y",
-                "z"
+              "anyOf": [
+                {
+                  "enum": [
+                    "x",
+                    "y",
+                    "z"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
               ],
-              "description": "O eixo ao longo do qual o contorno é projetado: na 'y' o ponto [u, v] é [x, z], na 'x' é [z, y] e na 'z' é [x, y]."
+              "description": "O eixo ao longo do qual o contorno é projetado: na 'y' o ponto [u, v] é [x, z], na 'x' é [z, y] e na 'z' é [x, y]. Ou um vetor [dx, dy, dz], a direção de onde se olha, para o vão que dobra uma quina: o desenho fica no plano perpendicular a ele, com u horizontal (perpendicular a y e ao vetor) e v = vetor × u."
             },
             "segmentosArco": {
               "anyOf": [
