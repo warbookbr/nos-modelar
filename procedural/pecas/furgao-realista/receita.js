@@ -221,8 +221,8 @@ export const TABELA = {
   vidro_traseiro_topo_y: 2200,
   vidro_traseiro_x_dentro: 80, // a janela das portas traseiras é um retângulo com a mesma margem (vidro_traseiro_margem) de dentro, de fora e de cima
   vidro_traseiro_margem: 80,
-  porta_traseira_folga_topo: 30, // 2026-11-06: a borda de fora das portas é vertical, e no topo delas a lateral prolongada já entrou; ela fica pelo menos tanto dentro do fim da traseira reta ali
-  porta_traseira_recuo: 105, // 2026-11-06: as portas traseiras acabam 105 mm antes do fim da traseira reta, e a lanterna larga ocupa a quina livre atrás delas
+  porta_traseira_folga_lanterna: 2, // 2026-11-06: a tira de fora da fresta das portas acaba tanto antes da borda de dentro da lanterna: com a borda da tira sobre o corte do vão, o motor apaga o vértice dela
+  porta_traseira_vao_quina: 15, // 2026-11-06: a borda de fora das portas fica em lanterna_x_dentro; onde a traseira reta acaba antes dele (no alto), a coluna seguinte é um ponto da quina de trás pelo menos tanto além da borda
   // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o
   // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda
   vao_canto_degraus: 2,
@@ -707,7 +707,7 @@ const receita = {
     partes: [
       {
         nome: 'carroceria',
-        forma: 'chapa de 2 mm, 2040 de largura: lateral vertical até 1190, fechando 3,9 graus até o teto de ±650; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405; portas traseiras de lados verticais (x 814), topo 2280, cantos redondos',
+        forma: 'chapa de 2040 de largura: lateral vertical até 1190, fechando 3,9 graus até o teto de ±650; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405; portas traseiras de lados verticais em x 856, topo 2280',
         tecnica: 'subdivisao de gaiola de anéis, ombro e cobertura com colunas nas portas e arco de 580; porta dividida meia fresta por lado, borda dobrada 4 mm; frente em dois arcos tangentes com coroa em y; cantos dos vãos em diagonal de duas células',
       },
       ...ABAS_DOS_VAOS.map((nome) => ({
@@ -831,7 +831,7 @@ const receita = {
       'o vinco de cintura ou as nervuras do teto não aparecem na luz rasante, ou aparecem fortes como degrau',
       'a aba de um arco sobra solta da lateral ou não acompanha o arco inteiro',
       'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou um sulco do teto não cabe no teto de ±650',
-      'a borda de fora de uma porta traseira não é vertical, ou o topo dela passa de 2320 (onde a curva do teto começa atrás), ou os cantos de cima dela não são redondos, ou a janela dela não é um retângulo de bordas paralelas às da porta',
+      'a borda de fora de uma porta traseira não é vertical nem rente à lanterna, ou o topo dela passa de 2320, ou os cantos de cima dela não são redondos, ou a janela dela não é um retângulo de bordas paralelas às da porta',
       'a luz rasante ou a curvatura mostram amassado, ondulação ou serrilhado que a forma não pede, fora das frestas, dos vãos e dos vincos, nem na fresta da porta da cabine junto ao arco dianteiro',
       'um pneu não toca o chão, ou toca ou atravessa o arco da roda, a lateral ou o forro do arco',
       'a roda não é a da família roda-pneu no pneu 235/65 aro 16 (710 mm de diâmetro, 235 de largura, com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos, ou não fica na bitola de 1730 e nos eixos da prancha',

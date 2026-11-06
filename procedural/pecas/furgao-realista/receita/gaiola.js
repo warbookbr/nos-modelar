@@ -67,15 +67,16 @@ export function derivar(T) {
     const s = an.sec; const xTras = s.xS - s.rB;
     const pt = T.vao_canto_passo_traseiro; const kk = T.vao_canto_degraus;
     const dentro = T.vidro_traseiro_x_dentro;
-    /* a borda de fora das portas é vertical: a coluna `porta_traseira_recuo` para dentro do fim da traseira reta na altura do topo das portas, onde a
-       lateral prolongada está mais para dentro; a do vidro fica vidro_traseiro_margem dentro da da porta, a mesma margem de dentro e de cima */
-    const xPorta = Math.min(f.xBordaTraseira(T.lateral_reta_ate_y) - T.porta_traseira_recuo, f.xBordaTraseira(T.porta_traseira_topo_y) - T.porta_traseira_folga_topo);
+    /* a borda de fora das portas é vertical e a fresta dela é o limite entre a porta e a lanterna: a tira de fora da fresta acaba `porta_traseira_folga_lanterna` antes da borda de dentro da
+       lanterna (`lanterna_x_dentro`), que fica livre da dobra; a do vidro fica vidro_traseiro_margem dentro da da porta, a mesma margem de dentro e de cima */
+    const xPorta = T.lanterna_x_dentro - T.fresta / 2 - T.fresta_borda_largura - T.porta_traseira_folga_lanterna;
     const corpo = (xt, y) => {
       const fora = xPorta - T.vidro_traseiro_margem;
       const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);
       const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);
       const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (10 - 2 * kk) + 1e-6);
-      return [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, xPorta, xt];
+      /* no alto a traseira reta já acabou aquém de xPorta (845 contra 856 em 2280): a borda da porta fica na quina de trás, e a última coluna passa a ser um ponto da quina um pouco além dela */
+      return [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, xPorta, Math.max(xt, xPorta + T.porta_traseira_vao_quina)];
     };
     if (an.horizontal) return corpo(xTras, an.y);
     const ref = horizontais.at(-1);
@@ -319,7 +320,7 @@ export function derivar(T) {
     /* quina de trás e traseira */
     add('RS', pontoLado(sec, zFim));
     [1, 2, 3].forEach((k) => add(k === 2 ? 'RM' : `rq${k}`, pontoQuinaTras(sec, (k / 4) * (Math.PI / 2))));
-    colunasTras(an).reverse().forEach((x, k, l) => add(`r${l.length - 1 - k}`, pontoTras(sec, x)));
+    colunasTras(an).reverse().forEach((x, k, l) => add(`r${l.length - 1 - k}`, x > sec.xS - sec.rB + 1e-9 ? pontoQuinaTras(sec, Math.acos(Math.min(1, (x - (sec.xS - sec.rB)) / sec.rB))) : pontoTras(sec, x)));
     listas.push({ nome: an.nome, y: an.y, sec, horizontal: an.horizontal, lista });
   });
 
