@@ -92,6 +92,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Peça avulsa conferida antes da malha | do mesmo rascunho: o `guarda:acervo` já aceita a parte planejada que espera a vez numa montagem, mas uma peça avulsa com `PLANO` e sem passos vai direto à medida de contatos, então o alinhamento dela não é conferido antes de existir malha |
 | Veredito "não julguei" | do mesmo rascunho: o veredito de forma exige nota de 0 a 10, e um crítico que não recebeu alvo não tem nota legítima; o esquema precisa de um jeito de dizer que não julgou, com o motivo |
 | Referencial na rodada de alinhamento | do mesmo rascunho: a pergunta de qual eixo é o vertical e onde fica o chão não está na rodada de alinhamento; hoje só o `guarda:referencial` pega o erro, depois da geometria escrita |
+| Divulgação progressiva sem a pessoa no laço | o registro de uso (`npm run uso`, de 2026-10-19 a 2026-11-05) mostra uns 80 pedidos de roteiro e só 9 tópicos de `--ajuda`, nenhum na modelagem por receita, e a mesma recusa do loft repetida 4 vezes; com a pessoa e a sessão principal dirigindo o laço, a IA quase não precisa pedir. Medir com um agente que recebe só o objetivo de uma peça por receita pequena, sem instrução de quem orquestra, o que ele pede ao `comecar` e ao `--ajuda`, quando, e onde erra por não pedir; pedido pela pessoa em 2026-11-06 |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro

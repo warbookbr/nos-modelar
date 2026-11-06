@@ -236,7 +236,10 @@ function erroDeTempo(timeoutMs, progresso) {
 }
 
 function erroDeCarga(prazoMs, progresso, detalhe) {
-  const erro = new Error(`A bancada não terminou de carregar dentro do prazo de ${prazoMs} ms (${descreverProgresso(progresso)}). ${detalhe}`);
+  /* A peça pesada (o furgão realista leva uns 2 min para executar a receita na página) estourava o prazo fixo sem dizer como
+     dar mais tempo, e o modelador de 2026-11-06 contornou chamando `olharBancada` por script; a mensagem traz a opção. */
+  const erro = new Error(`A bancada não terminou de carregar dentro do prazo de ${prazoMs} ms (${descreverProgresso(progresso)}). ${detalhe}`
+    + ` Se a peça só é pesada, repita com --prazo=<segundos> (o padrão é ${PRAZO_DE_CARGA_MS / 1000}).`);
   erro.codigo = 'tempo_esgotado';
   return erro;
 }
@@ -1058,7 +1061,7 @@ export async function olharBancada({
 
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
-export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes'];
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes'];
 export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
@@ -1079,6 +1082,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par
   --res=<px>             largura da imagem (padrão 1280)
   --espera=<ms>          espera depois de carregar (padrão 1200)
+  --prazo=<s>            prazo de carga da peça por tentativa (padrão 90; peça pesada pede mais)
   --saida=<pasta>        pasta relativa dentro do repositório (padrão tools/bancadas/out/)
   --relatorio=<arquivo>  grava o relatório da rodada em JSON
   --revisar              o conjunto de vistas da revisão
@@ -1126,8 +1130,13 @@ function comoCLI(argv) {
       erro: new ErroDeUso('--tela mostra a interface da bancada; não se mistura com --cores, --arame ou --auditoria.'),
     }));
   }
+  const prazo = lido.opcao('prazo');
+  if (prazo !== undefined && prazo !== null && !(Number(prazo) > 0)) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(`--prazo pede segundos maiores que zero; veio "${prazo}".`) }));
+  }
   return olharBancada({
     peca: lido.opcao('peca') ?? lido.posicional,
+    ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
     vistas: lido.opcao('vistas'), selecionadas: lido.opcao('selecionadas'), par: lido.opcao('par'),
     modo: lido.opcao('modo'), projecao: lido.opcao('projecao'), explosao: lido.opcao('explosao', '0'),
     res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),

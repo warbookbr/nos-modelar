@@ -402,6 +402,7 @@ describe('carga da página', () => {
     expect(resposta.erro.mensagem).toMatch(/vista 'isometrica'/);
     expect(resposta.erro.mensagem).toMatch(/\d+ ms gastos nesta captura/);
     expect(resposta.erro.mensagem).toMatch(/0 de 2 imagens feitas, faltavam 2/);
+    expect(resposta.erro.mensagem).toMatch(/repita com --prazo=<segundos>/);
     expect(contagem.esperas.every((opcoes) => opcoes.timeout === 5)).toBe(true);
     expect(PRAZO_DE_CARGA_MS).toBeGreaterThan(30_000);
   });
