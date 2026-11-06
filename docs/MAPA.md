@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1652 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1653 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -510,7 +510,7 @@
 
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
-- `2026-11-05-limites-do-solido-por-lacos.md` — Limites do sólido por laços — a coluna do braço sai pelos laços sem contorno à mão
+- `2026-11-06-abertura-em-qualquer-direcao.md` — Abertura de contorno em qualquer direção — o vão que dobra a quina sai inteiro, e os limites da operação ficam medidos
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -650,6 +650,7 @@
 - `2026-11-03-regras-de-desenho-por-familia.md` — Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
 - `2026-11-05-abertura-de-contorno-livre.md` — Abertura de contorno livre — a chapa ganha um vão pela curva que a receita desenha, sem depender das linhas da gaiola
 - `2026-11-05-esboco-pelo-nucleo.md` — Esboço pelo núcleo — as opções de forma saem das mesmas operações da peça e se comparam lado a lado na bancada
+- `2026-11-05-limites-do-solido-por-lacos.md` — Limites do sólido por laços — a coluna do braço sai pelos laços sem contorno à mão
 - `2026-11-05-navegacao-de-receitas.md` — Navegação de receitas — o agente acha o trecho da receita que precisa sem lê-la inteira
 - `2026-11-05-porta-de-entrada-dos-agentes.md` — A porta de entrada dos agentes — o modelador acha como usar uma capacidade numa ficha curta, sem garimpar o código
 - `2026-11-05-solido-por-lacos.md` — Sólido por laços — a receita dá o contorno da peça em cada plano, e o núcleo monta a gaiola fechada e a subdivide numa malha só
