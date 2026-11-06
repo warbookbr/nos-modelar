@@ -224,9 +224,9 @@ export const TABELA = {
   // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o
   // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda
   vao_canto_degraus: 2,
-  // etapa 6, as luzes e a grade: cada uma é um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda), com a aba dobrada
-  // como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar.
-  // Os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,
+  // etapa 6, as luzes: as lanternas e a luz de freio são cada uma um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda),
+  // com a aba dobrada como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar.
+  // Os faróis, os piscas e a grade deixaram a gaiola: os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,
   // em [x, y] mm na vista frontal, no lado esquerdo (+x; o direito o espelha): o farol é afinado, com a ponta de dentro descendo em diagonal
   // até a grade e a de fora indo a x 980, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente.
   farol_perfil: [[460, 840], [985, 840], [985, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô
@@ -418,7 +418,7 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: nomeDaBorracha(v.nome), sel }]);
     passos.push(['material', { sel, usa: 'borracha' }]);
   });
-  /* as luzes e a grade (etapa 6): a aba dobrada de cada vão, como a dos vidros, e a lente rente à lataria, no material de cada uma */
+  /* as luzes da gaiola (etapa 6): a aba dobrada de cada vão, como a dos vidros, e a lente rente à lataria, no material de cada uma */
   luzes.forEach((v, k) => {
     const sel = { origem: { op: 'friso', id: 900 + k } };
     passos.push(['friso', {
