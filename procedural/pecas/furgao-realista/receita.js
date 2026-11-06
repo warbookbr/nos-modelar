@@ -219,8 +219,8 @@ export const TABELA = {
   vidro_traseiro_base_y: 1700,
   vidro_traseiro_topo_y: 2200,
   vidro_traseiro_x_dentro: 80,
-  vidro_traseiro_x_fora: 740,
-  porta_traseira_recuo: 80, // 2026-11-06: as portas traseiras acabam 80 mm antes do fim da traseira reta, e a lanterna larga ocupa a quina livre atrás delas
+  vidro_traseiro_x_fora: 715,
+  porta_traseira_recuo: 105, // 2026-11-06: as portas traseiras acabam 105 mm antes do fim da traseira reta, e a lanterna larga ocupa a quina livre atrás delas
   vidro_traseiro_folga_fora: 45, // a borda de fora da janela corre 45 mm para dentro da borda de fora da porta, que acompanha a lateral
   // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o
   // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda
@@ -251,7 +251,7 @@ export const TABELA = {
   grade_barra_saliencia: 14, // quanto a barra sai da lente para a frente (sempre atrás da superfície da chapa)
   lanterna_base_y: 720, // as lanternas de trás (2026-11-06, opção 1 do esboço): vãos pelo contorno, um por lado, vistos pela diagonal da quina; de 720 a 1240 mm
   lanterna_topo_y: 1240,
-  lanterna_x_dentro: 836, // a borda de dentro na face de trás, logo depois da fresta e da borda da porta traseira (que acaba em 820)
+  lanterna_x_dentro: 836, // a borda de dentro na face de trás, logo depois da fresta e da borda da porta traseira (que acaba em 795)
   lanterna_entra_lado: 85, // quanto o vão entra na lateral além do fim do arco da quina
   lanterna_raio: 25, // a concordância dos quatro cantos do vão
   lanterna_recuo_lente: 3, // a lente da lanterna entra 3 mm no vão, como a do farol
@@ -706,7 +706,7 @@ const receita = {
     partes: [
       {
         nome: 'carroceria',
-        forma: 'chapa de 2 mm: lateral vertical até 1190, fechando 3,9 graus até o teto de ±630; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405, frestas de 6 mm, portas traseiras até x 820, sulcos, vãos redondos; plástico por fora',
+        forma: 'chapa de 2 mm: lateral vertical até 1190, fechando 3,9 graus até o teto de ±630; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405, frestas de 6 mm, portas traseiras até x 795, sulcos, vãos redondos; plástico por fora',
         tecnica: 'subdivisao de gaiola de anéis, ombro e cobertura com colunas nas portas e arco de 580; porta dividida meia fresta por lado, borda dobrada 4 mm; frente em dois arcos tangentes com coroa em y; cantos dos vãos em diagonal de duas células',
       },
       ...ABAS_DOS_VAOS.map((nome) => ({
