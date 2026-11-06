@@ -1,4 +1,4 @@
-/* vao-da-quina.test.ts — fatia 1 do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`):
+/* vao-da-quina.test.ts — fatia 1 do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`):
    o vão que dobra a quina de uma caixa oca de quinas redondas, visto da diagonal [1, 0, 1], sai num vão só, com a malha fechada
    (nenhuma aresta sem par, vínculo não manifold, triângulo sem área nem lasca) e a borda a menos de 0,5 mm do desenho nas duas
    faces da pele, alcançando a face +z e a face +x. A caixa sem vão também sai sem lasca: o limite do `gaiolaPorLacos` que a

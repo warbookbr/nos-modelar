@@ -1,4 +1,4 @@
-/* dois-vaos.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`):
+/* dois-vaos.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`):
    dois vãos vizinhos na mesma chapa e o vão dentro da lente de outro, em `dois-vaos.js`. A menor folga que a operação aceita é
    a partir de 0,3 mm: o segundo contorno só precisa ficar fora do furo do primeiro, visto do mesmo eixo. Abaixo disso a limpeza da
    costura do segundo funde vértices da borda do primeiro (que o friso nela lê) e a tira de chapa entre os dois sai lasca, e a operação

@@ -1,4 +1,4 @@
-/* superficies.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`):
+/* superficies.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`):
    a superfície de dupla curvatura forte (`dupla-curvatura.js`), o corpo de várias camadas na mesma reta com `sentido`
    (`tres-camadas.js`) e a chapa feita por outra gaiola, por rede e por laços (`chapa-por-rede.js` e `casco-por-lacos.js`). Cada caso
    mede o gate de malha e a borda do vão contra o desenho a menos de 0,5 mm, ou recusa com a medida e o que fazer. */

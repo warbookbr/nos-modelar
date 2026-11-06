@@ -1,4 +1,4 @@
-/* formas.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`):
+/* formas.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`):
    o contorno côncavo (em L e em estrela de cinco pontas) e o de bico muito agudo, em `contornos-de-forma.js`, e o contorno que cruza um
    vinco vivo e o que passa perto da borda da chapa, em `vinco-e-borda.js`. Cada caso mede o gate de malha (nenhuma aresta sem par,
    vínculo não manifold, triângulo sem área nem lasca) e a borda do vão contra o desenho a menos de 0,5 mm, ou recusa com a medida. */

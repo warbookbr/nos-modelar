@@ -1,4 +1,4 @@
-/* chapa-grande.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`):
+/* chapa-grande.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`):
    o tempo de um vão numa chapa de cerca de 250 mil faces, do tamanho da do furgão (`chapa-grande.js`, 12 por 12 pontos, cinco níveis).
    É um teste lento (cerca de um minuto, com a memória de 3 GB): fica em `TESTES_LENTOS` de `tools/testes-lentos.mjs`. Mede o tempo da
    subdivisão sem o vão e o do passo todo, o gate de malha e a borda contra o desenho, e imprime os números do banco de provas. Antes

@@ -1,6 +1,6 @@
 # Abertura de contorno em qualquer direção — o vão que dobra a quina sai inteiro, e os limites da operação ficam medidos
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/abertura-de-prova/`, `tools/fixtures/aberturas-em-teste/`, `docs/modelar/banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
 
@@ -29,7 +29,7 @@ A receita dá uma direção qualquer para a vista, e o vão que dobra a quina de
 - a bateria de peças de teste em `tools/fixtures/aberturas-em-teste/`, uma por caso, cada uma com o gate de malha e de borda: o vão que dobra a quina; dois vãos vizinhos (a menor folga entre eles) e o vão dentro da lente de outro; o contorno que cruza um vinco vivo e o que passa perto da borda da chapa; o contorno côncavo (em L e em estrela) e o de bico muito agudo; a superfície de dupla curvatura forte; o corpo fechado de três camadas na mesma reta (um tubo dobrado em U) com `sentido`; e a chapa feita por outra gaiola (por rede e por laços);
 - a correção de cada limite que couber na operação, ou a recusa com a medida e o que fazer;
 - o tempo de cada caso e o de um vão numa chapa do tamanho da do furgão;
-- o [banco de provas](../banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/README.md) com as medidas e as imagens das peças, para a pessoa ver.
+- o [banco de provas](../../banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/README.md) com as medidas e as imagens das peças, para a pessoa ver.
 
 ## Excluído
 
@@ -58,4 +58,4 @@ Se a vista diagonal não fechar a malha na quina por causa da costura com faces 
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-06. A `aberturaPorContorno` aceita a vista por vetor, e o vão que dobra a quina de uma caixa oca de quinas redondas sai num vão só, fechado, sem lasca e com a borda no desenho nas duas faces; a limpeza fina da costura (`limpezaFina`, ligada por padrão nas vistas oblíquas) tirou a tira que o corte a 45° deixava, e o `gaiolaPorLacos` passou a tampar o trecho final reto de vários pontos. A bateria de nove peças de teste passou em dois vãos a 0,3 mm na mesma face e a 0,2 mm um em cada face da quina, no vão dentro da lente de outro, nos contornos em L, em estrela e de bico de até 4 graus, no contorno sobre um vinco vivo e a 1 mm da borda, na sela e na cúpula, nas folhas de duas e três camadas com `sentido`, nas chapas por rede e por laços e numa chapa de 249 mil faces (41 s pelo vão). Ficaram como recusa, com a medida: dois vãos a menos de 0,3 mm, bico abaixo de 2 graus sem reduzir o recuo da lente, camadas sobrepostas e a camada do meio de um corpo de três. Foram ao backlog a lasca do vão pelo flanco da sela e o adaptador do Three com parte de 125 mil faces; o custo da booleana sobre a chapa inteira já estava lá. A malha do furgão saiu igual. A pessoa aprovou as peças em imagem. As medidas estão no [banco de provas](../../banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/README.md).
