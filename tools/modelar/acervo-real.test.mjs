@@ -25,8 +25,10 @@ const SEGUNDOS_POR_ALVO = 2;
    da etapa 4 (187 mil faces), passou a levar sozinho 84 s das duas execuções no CI, quase todos na medida de contato do
    descrever, contra 19 s das outras 43 peças juntas; com ele dentro da conta comum, o teto de 88 s reprovava ou passava
    conforme a máquina (87 s e 102 s em duas rodadas seguidas). A peça listada aqui sai da conta comum e tem o teto dela, cerca
-   de 1,7 vez o medido, para a regressão dela continuar aparecendo sem esconder a das outras. */
-const PECAS_PESADAS = { 'furgao-realista': 145 };
+   de 1,7 vez o medido, para a regressão dela continuar aparecendo sem esconder a das outras. Em 2026-11-05 os faróis e a grade
+   passaram a ser três vãos pela `aberturaPorContorno`, cada um uma booleana sobre a chapa inteira, e o furgão foi a 152 s no CI
+   (82 s antes deles, na mesma máquina local que mediu 160 s depois); o teto foi a 260 s, a mesma razão. */
+const PECAS_PESADAS = { 'furgao-realista': 260 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
@@ -56,5 +58,5 @@ describe('acervo real, inteiro', () => {
     for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
       expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
     }
-  }, 300_000);
+  }, 420_000);
 });

@@ -213,9 +213,13 @@ function conferirProjecao(V, faces, poligono, vista, sentido = null) {
       tris.push({ fid, t, w, caixa });
     }
   }
+  /* só os triângulos cuja caixa toca a do contorno podem estar sob um ponto medido (todos ficam dentro dela): num corpo fechado
+     de centenas de milhares de faces, medir cada ponto contra a casca inteira custava mais que o corte */
+  const caixaDoContorno = [Math.min(...poligono.map((p) => p[0])), Math.min(...poligono.map((p) => p[1])), Math.max(...poligono.map((p) => p[0])), Math.max(...poligono.map((p) => p[1]))];
+  const perto = tris.filter(({ caixa }) => !(caixa[2] < caixaDoContorno[0] || caixa[0] > caixaDoContorno[2] || caixa[3] < caixaDoContorno[1] || caixa[1] > caixaDoContorno[3]));
   const camadas = (p) => {
     const profundidades = [];
-    for (const { fid, t, w, caixa } of tris) {
+    for (const { fid, t, w, caixa } of perto) {
       if (p[0] < caixa[0] || p[0] > caixa[2] || p[1] < caixa[1] || p[1] > caixa[3]) continue;
       const d = (t[1][0] - t[0][0]) * (t[2][1] - t[0][1]) - (t[2][0] - t[0][0]) * (t[1][1] - t[0][1]);
       if (d === 0) continue;
@@ -314,10 +318,12 @@ export function espessuraVistaDoEixo(V, faces, poligono, vista) {
     if (!(l > 0) || Math.abs(n[eixo] / l) <= 0.1) continue;
     for (let k = 1; k + 1 < pts.length; k++) tris.push({ p: [pts[0], pts[k], pts[k + 1]], cos: Math.abs(n[eixo] / l) });
   }
+  const [u0, v0, u1, v1] = [Math.min(...poligono.map((q) => q[0])), Math.min(...poligono.map((q) => q[1])), Math.max(...poligono.map((q) => q[0])), Math.max(...poligono.map((q) => q[1]))];
+  const perto = tris.filter(({ p: [a, b, c] }) => !(Math.max(a[iu], b[iu], c[iu]) < u0 || Math.min(a[iu], b[iu], c[iu]) > u1 || Math.max(a[iv], b[iv], c[iv]) < v0 || Math.min(a[iv], b[iv], c[iv]) > v1));
   const medidas = [];
   for (const q of poligono) {
     let baixo = null, alto = null;
-    for (const { p: [a, b, c], cos } of tris) {
+    for (const { p: [a, b, c], cos } of perto) {
       const d = (b[iu] - a[iu]) * (c[iv] - a[iv]) - (c[iu] - a[iu]) * (b[iv] - a[iv]);
       if (d === 0) continue;
       const s = ((q[0] - a[iu]) * (c[iv] - a[iv]) - (c[iu] - a[iu]) * (q[1] - a[iv])) / d;

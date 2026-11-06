@@ -354,7 +354,8 @@ describe('aberturaPorContorno numa chapa que a reta do eixo atravessa duas vezes
      fica como estava, vértice por vértice. No furgão, em 2026-11-05, o farol recusou por isto, e a peça de teste do plano da
      abertura, uma chapa só, não tinha como mostrar. */
   const d = derivar();
-  const chapa = passoDaChapa();
+  /* um nível de subdivisão: o que está em prova é a camada, e não a costura fina, que os gates de cima já medem */
+  const chapa = { ...passoDaChapa(), niveis: 1 };
   const ren = (n: string) => n.replace(/^p/, 'q');
   const baixa = { ...chapa, vertices: chapa.vertices.map(ren), faces: chapa.faces.map((f: string[]) => f.map(ren)), cantos: chapa.cantos.map(ren), medidas: chapa.medidas.map(ren) };
   const TOPO = { ...d.pontos, ...Object.fromEntries(Object.entries(d.pontos).map(([k, p]) => [ren(k), [(p as number[])[0], (p as number[])[1] - m(300), (p as number[])[2]]])) };
