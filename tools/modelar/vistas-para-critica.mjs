@@ -44,7 +44,7 @@
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
  *
- * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] */
+ * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] */
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -426,7 +426,7 @@ export function montagemDaPeca(peca, { raiz = REPO } = {}) {
 
    `saida` é a pasta da rodada, onde saem o pedido, o alvo, as vistas montadas e a sobreposição; as capturas da bancada continuam em
    `tools/bancadas/out`, com os nomes de sempre. `dependencias` troca o que o teste não quer pagar. */
-export async function vistasParaCritica(peca, { logger = null, saida = null, pastaDasCapturas = SAIDA_PADRAO, dependencias = {} } = {}) {
+export async function vistasParaCritica(peca, { logger = null, saida = null, prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, dependencias = {} } = {}) {
   const dep = {
     olharBancada,
     abrirCaptura: abrirCapturaCompartilhada,
@@ -484,7 +484,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pas
     + VISTAS_DA_PARTE.split(',').length * partes.length;
   let feitas = 0;
   const capturar = async (quem, opcoes) => {
-    const resposta = await dep.olharBancada({ ...opcoes, logger, ...(compartilhada ? { compartilhada } : {}) });
+    const resposta = await dep.olharBancada({ ...opcoes, logger, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...(compartilhada ? { compartilhada } : {}) });
     exigirCaptura(resposta, quem, { feitas, total });
     feitas += arquivosDe(resposta).length;
     return resposta;
@@ -702,12 +702,15 @@ export function imprimir(resultado) {
 async function principal(argv) {
   let lido;
   try {
-    lido = lerArgumentos(argv.slice(2), { opcoes: ['saida'], posicional: { nome: 'a peça', obrigatorio: true } });
+    lido = lerArgumentos(argv.slice(2), { opcoes: ['saida', 'prazo'], posicional: { nome: 'a peça', obrigatorio: true } });
+    if (lido.opcao('prazo') !== null && !(Number(lido.opcao('prazo')) > 0)) throw new Error(`--prazo pede segundos maiores que zero; veio "${lido.opcao('prazo')}".`);
   } catch (erro) {
-    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>]\n${erro.message}\n`);
+    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>]\n${erro.message}\n`);
     return 2;
   }
-  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida') });
+  /* --prazo: a peça pesada (o furgão realista, em 2026-11-06) não entra na cena nos 90 s de cada captura. */
+  const prazo = lido.opcao('prazo');
+  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
   process.stdout.write(imprimir(resultado));
   return 0;
 }

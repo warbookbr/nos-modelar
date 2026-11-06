@@ -390,6 +390,16 @@ describe('o pacote de uma receita que refina um esboço', () => {
     expect(registro.recebidas.every((c) => c === compartilhada)).toBe(true);
   }, 60_000);
 
+  it('o prazo de carga dado ao pacote chega a toda captura', async () => {
+    const base = mkdtempSync(join(area, 'prazo-'));
+    const bancada = bancadaFalsa(base, PECA);
+    const prazos = [];
+    const dependencias = { olharBancada: async (opcoes) => { prazos.push(opcoes.prazoDeCargaMs); return bancada.fazer(opcoes); } };
+    await vistasParaCritica(PECA, { saida: join(base, 'rodada'), pastaDasCapturas: base, prazoDeCargaMs: 300_000, dependencias });
+    expect(prazos.length).toBeGreaterThan(3);
+    expect(prazos.every((p) => p === 300_000)).toBe(true);
+  }, 60_000);
+
   it('a opção que as formas guardadas não são recusa antes de gastar captura', async () => {
     const base = mkdtempSync(join(area, 'opcao-'));
     let capturou = false;
