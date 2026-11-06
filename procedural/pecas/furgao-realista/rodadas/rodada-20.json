@@ -1,0 +1,132 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 20,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "fresta da porta da cabine junto ao arco dianteiro",
+        "sentido": "segmentado",
+        "evidencia": "Curvatura de lado e tresquartos: borda do arco com dente de serra entre a porta da cabine e a boca do arco dianteiro."
+      },
+      {
+        "parte": "molduraArcoDianteiroEsquerdo",
+        "tipo": "superficie",
+        "onde": "pontas de baixo, atrás e na frente",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica isolada: ponta de trás termina em bico fino e a da frente em cauda ondulada, sem ponta horizontal."
+      }
+    ],
+    "observacao": "Silhueta, proporções e partes conferem; a nota é só da superfície da fresta junto ao arco e da forma das pontas da moldura, nas 23 partes que vi."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzDeFreio",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o PLANO lista 64 partes de uma vez e eu só conferi a forma de 4 (carroceria, as duas lanternas e a luz de freio): as demais não foram tocadas e ficaram sem conferência nesta rodada",
+    "aberturaPorContorno apaga o vértice de uma borda de fresta que coincide com o corte do vão: o erro só aparece no descrever, como vão não conferido, sem apontar a causa",
+    "a coluna da porta em x 856 não cabe na traseira reta no alto (845 em y 2280), e a gaiola só aceita colunas de quina com o ajuste que fiz em gaiola.js; o erro inicial saiu como carroceria ausente, sem mensagem",
+    "a carroceria e as lanternas somem do resultado do descrever sem erro claro quando a gaiola tem coluna fora de ordem",
+    "o descrever leva cerca de 85 s e a bancada cerca de 2 min por rodada, o que encarece cada tentativa de ajuste fino",
+    "o crítico abriu 23 de 100 partes e 4 de 8 superfícies: a nota vale só para o que ele viu, e nada cobra que as partes que a rodada mudou estejam entre as abertas"
+  ],
+  "notaDePassagem": "Porta em x 846, não 856: a tira da fresta não pode cair sobre o corte do vão da lanterna, que apaga o vértice; a fresta de 6 mm separa porta e lanterna. No alto a traseira reta acaba em 845 e a coluna da porta passa à quina.",
+  "receita": {
+    "sha256": "sha256:e6b0f88fc834b650d72575f81d46cd84ccdb211b469c88b2de7577e9e0889487",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 4,
+      "acrescentadas": 4,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 224,
+          "texto": "  porta_traseira_folga_topo: 30, // 2026-11-06: a borda de fora das portas é vertical, e no topo delas a lateral prolongada já entrou; ela fica pelo menos tanto dentro do fim da traseira reta ali"
+        },
+        {
+          "tipo": "-",
+          "linha": 225,
+          "texto": "  porta_traseira_recuo: 105, // 2026-11-06: as portas traseiras acabam 105 mm antes do fim da traseira reta, e a lanterna larga ocupa a quina livre atrás delas"
+        },
+        {
+          "tipo": "+",
+          "linha": 224,
+          "texto": "  porta_traseira_folga_lanterna: 2, // 2026-11-06: a tira de fora da fresta das portas acaba tanto antes da borda de dentro da lanterna: com a borda da tira sobre o corte do vão, o motor apaga o vértice dela"
+        },
+        {
+          "tipo": "+",
+          "linha": 225,
+          "texto": "  porta_traseira_vao_quina: 15, // 2026-11-06: a borda de fora das portas fica em lanterna_x_dentro; onde a traseira reta acaba antes dele (no alto), a coluna seguinte é um ponto da quina de trás pelo menos tanto além da borda"
+        },
+        {
+          "tipo": "-",
+          "linha": 710,
+          "texto": "        forma: 'chapa de 2 mm, 2040 de largura: lateral vertical até 1190, fechando 3,9 graus até o teto de ±650; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405; portas traseiras de lados verticais (x 814), topo 2280, cantos redondos',"
+        },
+        {
+          "tipo": "+",
+          "linha": 710,
+          "texto": "        forma: 'chapa de 2040 de largura: lateral vertical até 1190, fechando 3,9 graus até o teto de ±650; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405; portas traseiras de lados verticais em x 856, topo 2280',"
+        },
+        {
+          "tipo": "-",
+          "linha": 834,
+          "texto": "      'a borda de fora de uma porta traseira não é vertical, ou o topo dela passa de 2320 (onde a curva do teto começa atrás), ou os cantos de cima dela não são redondos, ou a janela dela não é um retângulo de bordas paralelas às da porta',"
+        },
+        {
+          "tipo": "+",
+          "linha": 834,
+          "texto": "      'a borda de fora de uma porta traseira não é vertical nem rente à lanterna, ou o topo dela passa de 2320, ou os cantos de cima dela não são redondos, ou a janela dela não é um retângulo de bordas paralelas às da porta',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
