@@ -687,9 +687,10 @@ export function dividirCantosRetos({ pos, faces, limite }) {
             const orelha = [at(0), at(1), at(2)];
             const resto = [at(0), ...Array.from({ length: n - 2 }, (_, j) => at(j + 2))];
             if (lado < 0) { orelha.reverse(); resto.reverse(); }
-            const bom = (f) => f.length === 3 ? area(f[0], f[1], f[2]) >= limite : f.every((_, j) => area(f[(j + f.length - 1) % f.length], f[j], f[(j + 1) % f.length]) >= limite);
+            const retos = (f) => f.length === 3 ? (area(f[0], f[1], f[2]) >= limite ? 0 : 3) : f.filter((_, j) => area(f[(j + f.length - 1) % f.length], f[j], f[(j + 1) % f.length]) < limite).length;
             const voltada = (f) => ponto(newell(f.map(pos)), ref) > 0;
-            if (!bom(orelha) || !bom(resto) || !voltada(orelha) || !voltada(resto)) continue;
+            /* a orelha sai sem canto alinhado, e o resto com menos deles que a face de antes (a face de dois cantos alinhados se divide em duas rodadas) */
+            if (retos(orelha) || retos(resto) >= retos(P) || !voltada(orelha) || !voltada(resto)) continue;
             partes = [...partes.slice(0, q), resto, orelha, ...partes.slice(q + 1)];
             feito = true;
             break;
@@ -897,6 +898,9 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const [minDaChapa, maxDaChapa] = extremosDos(vertDaChapa.map((v) => st.V.get(v)));
     const escala = Math.max(...[0, 1, 2].map((c) => maxDaChapa[c] - minDaChapa[c]));
     const piso = 2e-9 * escala * escala;
+    /* o piso da divisão é o do gate de malha, que mede a área do triângulo contra o maior raio da peça inteira, e não da chapa: 2e-9 dele */
+    let raioDaPeca = 0; for (const p of st.V.values()) raioDaPeca = Math.max(raioDaPeca, Math.hypot(p[0], p[1], p[2]));
+    const pisoDaDivisao = 2e-9 * raioDaPeca * raioDaPeca;
     const copia = a.lente ? { pontos: vertDaChapa.map((v) => [...st.V.get(v)]), faces: idsDaChapa.map((id) => facesDaChapa.get(id).map((v) => indiceDaChapa.get(v))), liso: idsDaChapa.map((id) => st.F.get(id).liso) } : null;
 
     /* a lente sai da Manifold aqui, antes de o corte mexer na peça: a recusa dela não deixa a chapa cortada pela metade */
@@ -924,7 +928,17 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const naVoltaDaLente = noPoligono(recuado.poligono);
       const fixosL = new Set([...costuraL].filter((v) => naVoltaDaLente(r.pontos[v])));
       const limpaL0 = limparCostura({ pos: (v) => r.pontos[v], faces: facesL, costura: costuraL, fixos: fixosL, piso, parede: paredeL, guardaDeFina: limpezaFina });
-      lenteCalculada = { r, limpaL: tirarValenciaDois(fundirLascas({ pos: (v) => r.pontos[v], faces: limpaL0.faces, costura: costuraL, parede: paredeL, piso }).faces) };
+      const limpaL = tirarValenciaDois(fundirLascas({ pos: (v) => r.pontos[v], faces: limpaL0.faces, costura: costuraL, parede: paredeL, piso }).faces);
+      /* a face da lente com três cantos alinhados se divide como a da chapa; a parte nova leva a face de origem da primeira */
+      const origemDaParte = new Map();
+      if (limpezaFina) {
+        let proxima = Math.max(-1, ...limpaL.faces.keys()) + 1;
+        for (const [k, partes] of dividirCantosRetos({ pos: (v) => r.pontos[v], faces: limpaL.faces, limite: pisoDaDivisao })) {
+          limpaL.faces.set(k, partes[0]);
+          for (const vs of partes.slice(1)) { limpaL.faces.set(proxima, vs); origemDaParte.set(proxima, k); proxima++; }
+        }
+      }
+      lenteCalculada = { r, limpaL, origemDaParte };
     }
 
     // ---- o corte: o prisma entra no fim da faixa do passo, a booleana o tira da chapa, e ele sai ----
@@ -985,7 +999,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     }
     /* o canto alinhado que a limpeza não pode fundir (o vértice da vizinha) divide a face por uma diagonal, para o adaptador não cortar nele uma orelha sem área */
     let divisoes = 0;
-    for (const [f, partes] of limpezaFina ? dividirCantosRetos({ pos: posDaPeca, faces: valencia.faces, limite: piso }) : []) {
+    for (const [f, partes] of limpezaFina ? dividirCantosRetos({ pos: posDaPeca, faces: valencia.faces, limite: pisoDaDivisao }) : []) {
       const face = st.F.get(f);
       face.vs = melhorInicio(posDaPeca, partes[0]); face.tinta = [];
       for (const vs of partes.slice(1)) {
@@ -1002,6 +1016,12 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     }
     const usados = new Set(); for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
     for (const v of tocados) if (!usados.has(v)) st.V.delete(v);
+    /* a costura deste vão a menos que a fusão de uns décimos de milímetro da borda de um vão aberto antes: a limpeza funde os vértices
+       dela, a borda registrada do outro vão perde vértices (o friso nela quebra) e a tira de chapa entre os dois sai lasca */
+    for (const antes of st.aberturas ?? []) {
+      const perdidos = [...antes.borda.fora, ...antes.borda.dentro].filter((v) => !st.V.has(v)).length;
+      if (perdidos) return grita(st, i, OP, 'contorno', `a costura deste vão chega tão perto da borda do vão do passo ${antes.passo} que a limpeza fundiu ${perdidos} vértices dela e a borda dele ficou sem os pontos que registrou: a folga entre os dois vãos medida na bateria (2026-11-06) é de 0,3 mm no mínimo, e abaixo de 1 mm a tira de chapa entre eles já é fina; afaste o contorno do vão vizinho, ou desenhe os dois como um vão só`);
+    }
     const facesDaChapaCortada = facesDoCorte.filter((f) => st.F.has(f)).sort((x, y) => x - y);
     /* o quanto a fusão mexeu na superfície: a distância de cada vértice que saiu às faces que ficaram em volta do que ficou */
     let desvioDaFusao = 0;
@@ -1056,7 +1076,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     // ---- a lente, calculada antes do corte e posta na peça depois da parede ----
     const lente = [];
     if (lenteCalculada) {
-      const { r, limpaL } = lenteCalculada;
+      const { r, limpaL, origemDaParte } = lenteCalculada;
       const usadosL = [...new Set([...limpaL.faces.values()].flat())].sort((x, y) => x - y);
       const base = proximoLocal(st.V, i);
       if (base + usadosL.length > topo || proximaFace + limpaL.faces.size > topo) return grita(st, i, OP, 'lente', `a lente estoura o bloco e a faixa estendida de ids do passo (${topo})`);
@@ -1065,17 +1085,20 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       for (const [k, vs] of [...limpaL.faces].sort((x, y) => x[0] - y[0])) {
         const id = idDoPasso(i, proximaFace++);
         addF(st, id, melhorInicio((v) => r.pontos[v], vs).map((v) => idV.get(v)));
-        const origem = r.faces[k];
+        const origem = r.faces[origemDaParte.get(k) ?? k];
         if (origem.solido === 0) st.F.get(id).liso = copia.liso[origem.face];
         lente.push(id);
       }
     }
 
-    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes } });
+    /* as faces finas (a lasca da topologia) que a limpeza não achou como desfazer, na chapa cortada com a parede e na lente: o gate de
+       malha as acusa, e o registro diz quantas ficaram para quem lê */
+    const finasRestantes = [...facesDaChapaCortada, ...lente].filter((f) => st.F.has(f) && razaoDaFace(st.F.get(f).vs.map((v) => st.V.get(v))) < LIMITE_DE_FACE_FINA).length;
+    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes } });
     registraOrigem(st, i, OP, a.origemId, {
       faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista: a.vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente,
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
-      limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes },
+      limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes },
     });
   },
   };

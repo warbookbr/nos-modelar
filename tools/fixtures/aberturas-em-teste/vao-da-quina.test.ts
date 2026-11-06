@@ -5,6 +5,7 @@
    bateria achou (a escada fechando a última face sobre a reta do trecho `ate`) fica no teste dele, em `gaiola-por-lacos.test.ts`. */
 import { describe, expect, it } from 'vitest';
 import { passosDaCaixa, RETANGULO_DA_QUINA } from './caixa-de-quinas.js';
+import { passosNaQuina } from './dois-vaos.js';
 import { desvioDoVao, exigirFechada, gate1, piorDesvio, recusaDe, rodar } from './medidas';
 
 const ABERTURA = { vista: [1, 0, 1], sentido: '+', contorno: RETANGULO_DA_QUINA, segmentosArco: 8 };
@@ -57,5 +58,27 @@ describe('o vão que dobra a quina pela vista [1, 0, 1]', () => {
     const { TOPO: T, PASSOS: P } = passosDaCaixa({ ...ABERTURA, sentido: undefined });
     const recusa = recusaDe(rodar(T, P, 'caixa-de-quinas'));
     expect(recusa).toMatch(/atravessa a chapa 2 vezes.*declare sentido/);
+  });
+});
+
+describe('dois vãos vizinhos na quina, um em cada face (o caso do furgão)', () => {
+  /* o primeiro, da face +z (vista z, x de 0 a 300 mm), e o segundo, da face +x (vista x, z de 0 até `u`), compartilham os y de 250 a 450.
+     A borda do primeiro, vista do eixo x, cai num z que a malha do arco decide; o teste mede esse z numa rodada do primeiro e põe a
+     borda do segundo a `delta` mm antes dele. A folga que importa é a vista do eixo do segundo: o contorno só não pode tocar o furo. */
+  const primeiro = (() => { const { TOPO, PASSOS } = passosNaQuina({ xDoPrimeiro: 300 }); return rodar(TOPO, PASSOS, 'dois-vaos-na-quina'); })();
+  const zDoPrimeiro = Math.min(...[...primeiro.aberturas[0].borda.fora, ...primeiro.aberturas[0].borda.dentro].map((v: number) => primeiro.V.get(v)).filter((p: number[]) => Math.abs(p[0] - 0.3) < 1e-5).map((p: number[]) => p[2])) * 1000;
+  const vizinho = (delta: number) => { const { TOPO, PASSOS } = passosNaQuina({ xDoPrimeiro: 300, uDoSegundo: zDoPrimeiro - delta }); return rodar(TOPO, PASSOS, 'dois-vaos-na-quina'); };
+
+  it('a 5 mm do furo do primeiro, visto do eixo do segundo, sai fechada e sem lasca', () => {
+    const neutro = vizinho(5);
+    expect(neutro.orfaos).toEqual([]);
+    expect(neutro.aberturas).toHaveLength(2);
+    exigirFechada(gate1(neutro));
+    console.log(JSON.stringify({ quinaVizinhos: { zDaBordaDoPrimeiroMm: Number(zDoPrimeiro.toFixed(3)), faces: neutro.F.size, ms: neutro.ms } }));
+  });
+
+  it('com o contorno do segundo dentro do furo do primeiro, recusa e diz que a borda de um vão aberto antes conta', () => {
+    const recusa = recusaDe(vizinho(-1));
+    expect(recusa).toMatch(/aberturaPorContorno\.contorno: .*cruza a borda da chapa vista do eixo x.*a borda de um vão aberto antes conta/);
   });
 });

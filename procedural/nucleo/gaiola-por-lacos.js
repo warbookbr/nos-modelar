@@ -54,7 +54,10 @@
  * A TAMPA. A escada liga, no primeiro e no último laço, o ponto j da cadeia A (do fim de `de`, para a frente na volta, até o
  * começo de `ate`) ao ponto j da cadeia B (do começo de `de`, para trás, até o fim de `ate`), e por isso as duas cadeias precisam
  * do mesmo número de pontos. A primeira face é o trecho `de` com o primeiro degrau, as do meio são quadriláteros entre dois
- * degraus, e o trecho `ate` com mais de dois pontos fecha a última face. Um laço que se funde num ponto só dispensa a tampa.
+ * degraus, e o trecho `ate` com mais de dois pontos fecha a última face: curvo, como face própria; reto (pontos alinhados), com os
+ * pontos dentro da última face da escada, entre o degrau e a ponta, porque uma face só de pontos alinhados teria área zero. Um laço que
+ * se funde num ponto só dispensa a tampa. Faixa fina na tampa: a primeira faixa (de `de` ao primeiro degrau) mede a largura do passo
+ * do primeiro arco da cadeia, e uma faixa de 9 mm por 560 mm que a subdivisão com espessura rasga em lascas pede arcos de menos pontos.
  *
  * A LÂMINA. O laço de ponta de área zero (uma linha, duas linhas em cruz, um ponto: o fundo de um disco tangente ao plano, ou a ponta
  * em que duas paredes se encostam) é uma lâmina: os pontos dele que coincidem se fundem, todos, e não leva tampa; as tiras dos dois

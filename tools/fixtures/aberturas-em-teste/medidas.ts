@@ -46,9 +46,10 @@ function facesDosTriangulosSemArea(raiz: any, neutro: any, piso: number): string
 }
 
 /** O gate 1 sobre as faces do neutro que passam em `filtro`. */
-export function gate1(neutro: any, filtro?: (f: any) => boolean) {
+export function gate1(neutro: any, filtro?: (f: any) => boolean, { adaptador = true } = {}) {
   const sel = !filtro ? neutro : { ...neutro, F: new Map([...neutro.F].filter(([, f]: any) => filtro(f))) };
-  const { raiz } = adaptarThree(sel, { nome: 'peca-de-teste' });
+  /* o adaptador estoura a pilha numa parte de 125 mil faces (`push(...lote.faces)`): a chapa de 250 mil faces mede sem ele */
+  const raiz = adaptador ? adaptarThree(sel, { nome: 'peca-de-teste' }).raiz : { traverse: () => {} };
   const areas = areasDeTriangulo(raiz, escalaDaPeca(sel));
   const topologia = analisarTopologia({ vertices: sel.V, faces: sel.F }, { triangulacao: true });
   const reprova = topologia.achados.filter((a: any) => a.severidade === 'reprova' || a.nivel === 'reprova').map((a: any) => a.codigo);

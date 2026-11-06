@@ -4,6 +4,7 @@
  * o desenho é um retângulo de u -150 a 150 e v (que é y) de 250 a 450 mm, metade na face +z e metade na face +x. Nada vem de
  * referência externa. */
 import { gaiolaPorLacos } from '../../../procedural/nucleo/gaiola-por-lacos.js';
+import { receitaDe } from './chapas.js';
 
 export const MEIA = 400;
 export const RAIO = 120;
@@ -45,3 +46,6 @@ export function passosDaCaixa(abertura = null) {
 
 /** O retângulo de prova no plano da vista diagonal, em metros. */
 export const RETANGULO_DA_QUINA = { inicio: [-0.15, 0.25], trechos: [{ reto: [0.15, 0.25] }, { reto: [0.15, 0.45] }, { reto: [-0.15, 0.45] }, { reto: [-0.15, 0.25] }] };
+
+const padrao = passosDaCaixa({ vista: [1, 0, 1], sentido: '+', contorno: RETANGULO_DA_QUINA, segmentosArco: 8 });
+export default receitaDe({ nome: 'caixa-de-quinas', desc: 'caixa oca de 800 por 800 por 600 mm de quinas redondas com um vão de 300 por 200 mm que dobra a quina +x +z, aberto pela vista [1, 0, 1]' }, padrao.TOPO, padrao.PASSOS, { lentes: [2] });

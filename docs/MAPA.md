@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1654 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1670 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -130,6 +130,10 @@
 ## docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/
 
 - `README.md` — Abertura de contorno livre — as técnicas medidas, a operação e a lente no lugar
+
+## docs/modelar/banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/
+
+- `README.md` — Abertura em qualquer direção — a bateria de limites da operação
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
@@ -2050,6 +2054,21 @@
 ## tools/fixtures/aberturas-em-teste/
 
 - `caixa-de-quinas.js` — caixa-de-quinas.js — peça de teste do plano da abertura em qualquer direção: uma caixa oca de 800 por 800 mm em planta e 600 de altura, com as quatro quinas …
+- `casco-por-lacos.js` — casco-por-lacos.js — peça de teste do plano da abertura em qualquer direção: a chapa feita por outra gaiola, a gaiola por laços.
+- `chapa-grande.js` — chapa-grande.js — peça de teste do plano da abertura em qualquer direção: o tempo de um vão numa chapa do tamanho da do furgão.
+- `chapa-grande.test.ts` — chapa-grande.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`): o tempo de um vão…
+- `chapa-por-rede.js` — chapa-por-rede.js — peça de teste do plano da abertura em qualquer direção: a chapa feita por outra gaiola, a gaiola por rede.
+- `chapas.js` — chapas.js — os blocos das peças de teste neutras da bateria do plano da abertura em qualquer direção: a chapa por grade (uma gaiola de pontos a cada `passo` …
+- `contornos-de-forma.js` — contornos-de-forma.js — peça de teste do plano da abertura em qualquer direção: o contorno côncavo (em L e em estrela) e o de bico muito agudo.
+- `dois-vaos.js` — dois-vaos.js — peça de teste do plano da abertura em qualquer direção: dois vãos na mesma chapa e o vão dentro da lente de outro.
+- `dois-vaos.test.ts` — dois-vaos.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`): dois vãos vizinhos n…
+- `dupla-curvatura.js` — dupla-curvatura.js — peça de teste do plano da abertura em qualquer direção: a superfície de dupla curvatura forte.
+- `formas.test.ts` — formas.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`): o contorno côncavo (em …
+- `medidas.ts` — medidas.ts — as medidas da bateria do plano da abertura em qualquer direção, as mesmas do gate 1 e do gate 2 do plano da abertura de contorno livre, aplicada…
+- `superficies.test.ts` — superficies.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`): a superfície de du…
+- `tres-camadas.js` — tres-camadas.js — peça de teste do plano da abertura em qualquer direção: o corpo de várias camadas na mesma reta, com `sentido`.
+- `vao-da-quina.test.ts` — vao-da-quina.test.ts — fatia 1 do plano da abertura em qualquer direção (`docs/modelar/planos/2026-11-06-abertura-em-qualquer-direcao.md`): o vão que dobra a…
+- `vinco-e-borda.js` — vinco-e-borda.js — peça de teste do plano da abertura em qualquer direção: o contorno que cruza um vinco vivo e o que passa perto da borda da chapa.
 
 ## tools/fixtures/acervo/peca-de-prova/
 

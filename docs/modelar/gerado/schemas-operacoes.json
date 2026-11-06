@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:0c6dd350360a070cdd18986f2f311cc68fe88cd0b33c7d0b3f075b458764c6f1",
+  "assinatura": "sha256:524f6d0c052c90832557939d73819054dad6230163e0bf4223ec2a9c40abc543",
   "total": 40,
   "operacoes": [
     {
@@ -101,6 +101,10 @@
               "type": "string",
               "minLength": 1,
               "description": "'+' ou '-': num corpo fechado, que a reta do eixo atravessa mais de uma vez (a frente e a traseira de uma carroceria vistas pela frente), corta só a camada vista desse lado do eixo, com o prisma parado entre ela e a seguinte; sem ele, a chapa atravessada duas vezes é recusada."
+            },
+            "limpezaFina": {
+              "type": "boolean",
+              "description": "true: a limpeza da costura não torna lasca uma face de pele saudável e a face com três cantos alinhados se divide por uma diagonal (o vão que dobra uma quina pede); false: a limpeza de antes. Sem ele, true na vista por vetor oblíqua e false nos eixos x, y e z, para a malha de vãos já aceitos não mudar."
             }
           }
         },
@@ -254,6 +258,9 @@
           "O bico vivo se mede contra a tangente dos trechos que o formam: com segmentos de menos, a corda do primeiro segmento abre ou fecha o bico, e acima de 2 graus de erro o passo grita com o piso de segmentosArco (ou segmentosSpline) que o deixa abaixo.",
           "Gritam, antes de mexer na malha: o contorno que não fecha, o que se cruza, o que sai da chapa vista do eixo, o que a chapa dobrada atravessa mais de uma vez, o que fica abaixo do piso do bico e o recuo da lente que o vão não comporta.",
           "A origem sem parte são as faces da chapa cortada, com a parede; parte: 'parede' só a parede; parte: 'lente' o pedaço retirado, com lente: true. O friso segue a borda de fora do vão por superficie: { op: 'aberturaPorContorno', id }.",
+          "Dois vãos vistos do mesmo eixo: o contorno do segundo precisa de 0,3 mm ou mais de folga do furo do primeiro (a bateria de 2026-11-06 mediu); abaixo disso a limpeza funde vértices da borda do primeiro e o passo recusa com a medida, e o contorno que toca o furo ou entra nele recusa como contorno que cruza a borda da chapa. Vãos de vistas diferentes só precisam que o do segundo não toque o furo do primeiro visto do eixo dele.",
+          "Com sentido, a camada cortada é a que fica de um lado do plano que passa entre as duas, medido nos pontos do contorno e numa grade dentro dele; a outra camada que passe desse plano fora do contorno recusa o vão pela borda, e a recusa diz o plano. A camada do meio de um corpo de três não se alcança.",
+          "A limpeza da costura deixa a lasca que não acha como desfazer (na sela de flanco forte, uma face da parede ou da lente com quatro pontos alinhados) e a conta em limpeza.finasRestantes do registro; o gate de malha a acusa.",
           "Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora."
         ],
         "diagnosticos": []
