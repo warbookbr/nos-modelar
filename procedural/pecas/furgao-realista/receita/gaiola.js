@@ -67,13 +67,15 @@ export function derivar(T) {
     const s = an.sec; const xTras = s.xS - s.rB;
     const pt = T.vao_canto_passo_traseiro; const kk = T.vao_canto_degraus;
     const dentro = T.vidro_traseiro_x_dentro;
-    /* a borda de fora do vidro fica 45 mm dentro da borda de fora da porta, que acompanha a lateral, e não passa de 820 */
+    /* a borda de fora das portas é a coluna antes do fim da traseira reta, `porta_traseira_recuo` para dentro dela e acompanhando a lateral;
+       a do vidro fica 45 mm dentro da da porta e não passa de vidro_traseiro_x_fora */
     const corpo = (xt, y) => {
-      const fora = Math.min(T.vidro_traseiro_x_fora, f.xBordaTraseira(y) - T.vidro_traseiro_folga_fora);
+      const xPorta = f.xBordaTraseira(y) - T.porta_traseira_recuo;
+      const fora = Math.min(T.vidro_traseiro_x_fora, xPorta - T.vidro_traseiro_folga_fora);
       const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);
       const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);
       const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (10 - 2 * kk) + 1e-6);
-      return [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, ...entre(fora, xt, (xt - fora) / 2 + 1e-6), xt];
+      return [0, dentro, ...cantoDentro, ...miolo, ...cantoFora, fora, xPorta, xt];
     };
     if (an.horizontal) return corpo(xTras, an.y);
     const ref = horizontais.at(-1);
@@ -535,8 +537,8 @@ export function derivar(T) {
     const subida = listas.slice(iBaseTras, iTopoTras + 1);
     portas.push({
       nome: `portaTraseira${sufixo}`,
-      volta: fechar([...trecho(subida[0], 'r0', `r${nR}`, s), ...subida.map((x) => ponto(x, `r${nR}`, s)),
-        ...trecho(subida.at(-1), `r${nR}`, 'r0', s), ...[...subida].reverse().map((x) => ponto(x, 'r0', s))]),
+      volta: fechar([...trecho(subida[0], 'r0', `r${nR - 1}`, s), ...subida.map((x) => ponto(x, `r${nR - 1}`, s)),
+        ...trecho(subida.at(-1), `r${nR - 1}`, 'r0', s), ...[...subida].reverse().map((x) => ponto(x, 'r0', s))]),
     });
   }
   portas.push({
@@ -578,16 +580,9 @@ export function derivar(T) {
     const foraT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, `r${iForaTraseiro}`, s);
     vidros.push({ nome: `vidroPortaTraseira${sufixo}`, linha: `abaVaoPortaTraseira${sufixo}`, volta: fechar([...foraT, ...[...dentroT].reverse()]) });
   }
-  /* as lanternas (etapa 6): voltas de cantos retos pelas arestas da gaiola, sem partir célula, da coluna rq3 (logo depois da borda da
-     porta traseira) até a RS, já na lateral. Os faróis, os piscas e a grade não são vão da gaiola desde 2026-11-05: são
+  /* a luz de freio é o único vão de luz da gaiola. Os faróis, os piscas, a grade e as lanternas não são vão da gaiola: são
      `aberturaPorContorno` sobre a chapa pronta (`receita/farol.js`) */
   const luzes = [];
-  for (const s of ['e', 'd']) {
-    const a = s === 'e' ? 'Esquerda' : 'Direita';
-    const rl = aneisEntre(T.lanterna_base_y, T.lanterna_topo_y);
-    const foraL = meiaVolta(rl, 'RM', 'RM', 'RS', s, 0); const dentroL = meiaVolta(rl, 'RM', 'RM', 'rq3', s, 0);
-    luzes.push({ nome: `lanterna${a}`, linha: `abaVaoLanterna${a}`, material: 'lanterna', volta: fechar([...foraL, ...[...dentroL].reverse()]) });
-  }
   /* a luz de freio alta: os anéis do ombro não são horizontais na traseira, e por isso a volta não passa por `meiaVolta` (que sobe pela
      coluna só nos anéis horizontais); vai pelos dois anéis do ombro, de r0 à coluna de fora e de volta, e o espelho fecha o outro lado */
   {

@@ -38,3 +38,22 @@ export function derivarGrade(T) {
   const contorno = [[-w, y0], [w, y0], [w, y1], [-w, y1]];
   return { contorno, raio: (p) => (p[1] === y1 ? T.grade_raio_topo : 0), barras: T.grade_barras_y.map((y) => ({ y })) };
 }
+
+/** As duas lanternas de trás, em mm [u, v] no plano da vista pela diagonal da quina (a opção 1 de `referencias/lanterna-traseira.esboco.json`):
+ *  um vão só por lanterna, de `lanterna_base_y` a `lanterna_topo_y`, da borda de dentro na face de trás (x `lanterna_x_dentro`), dobrando a
+ *  quina e entrando `lanterna_entra_lado` mm na lateral além do fim do arco. Na quina de +x (a esquerda) a vista olha ao longo de [1, 0, -1],
+ *  com u = -(x + z) / raiz de 2 e v = y; na de -x a vista é [-1, 0, -1] e o desenho é o espelho (u troca de sinal). A face de trás e a
+ *  lateral são lidas na altura do meio do vão, onde a lateral ainda é vertical. */
+export function derivarLanternas(T, f) {
+  const yMeio = (T.lanterna_base_y + T.lanterna_topo_y) / 2;
+  const zTras = f.zR(yMeio); const xLado = f.xBordaTraseira(yMeio) + T.raio_planta_tras;
+  const u = (x, z) => -(x + z) / Math.SQRT2;
+  const uDentro = u(T.lanterna_x_dentro, zTras);
+  const uFora = u(xLado, zTras + T.raio_planta_tras + T.lanterna_entra_lado);
+  const y0 = T.lanterna_base_y; const y1 = T.lanterna_topo_y;
+  const retangulo = (lo, hi) => [[lo, y0], [hi, y0], [hi, y1], [lo, y1]];
+  return [
+    { lado: 'Esquerda', vista: [1, 0, -1], contorno: retangulo(uFora, uDentro) },
+    { lado: 'Direita', vista: [-1, 0, -1], contorno: retangulo(-uDentro, -uFora) },
+  ];
+}
