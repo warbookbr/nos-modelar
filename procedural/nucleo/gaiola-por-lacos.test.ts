@@ -83,6 +83,38 @@ describe('gaiolaPorLacos: a barra', () => {
   });
 });
 
+describe('gaiolaPorLacos: o trecho `ate` da tampa com vários pontos alinhados', () => {
+  /* a bateria da abertura em qualquer direção (2026-11-06) achou: a escada fechava a última face sobre a reta do trecho `ate`, uma
+     face de área zero que o ajudante recusava; agora os pontos entram na última face, entre o degrau e a ponta, como os de `de`
+     entram na primeira */
+  const areaDaFace = (g: any, f: string[]) => {
+    let n = [0, 0, 0];
+    f.forEach((v, k) => {
+      const [x1, y1, z1] = g.pontosMm[v]; const [x2, y2, z2] = g.pontosMm[f[(k + 1) % f.length]];
+      n = [n[0] + (y1 - y2) * (z1 + z2), n[1] + (z1 - z2) * (x1 + x2), n[2] + (x1 - x2) * (y1 + y2)];
+    });
+    return Math.hypot(...n) / 2;
+  };
+  for (const [lados, degraus] of [[3, 'dois degraus'], [2, 'um degrau']] as const) {
+    it(`com ${degraus}, o trecho com 4 pontos fecha a escada sem face de área zero e a barra mantém o volume`, () => {
+      const g = gaiolaPorLacos(barra({ trechos: [{ nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: lados }, { nome: 'cima', pontos: 4 }, { nome: 'tras', pontos: lados }] }));
+      const c = conferir(g);
+      expect(c.soltas + c.repetidas).toBe(0);
+      expect(c.volume).toBeCloseTo(100 * 30 * 40, 6);
+      expect(Math.min(...g.passo.faces.map((f: string[]) => areaDaFace(g, f)))).toBeGreaterThan(1);
+      expect(g.passo.faces.some((f: string[]) => f.length === 6)).toBe(lados === 2 || lados === 3);
+      expect(entrega(g).orfaos).toEqual([]);
+    });
+  }
+  it('o trecho `ate` curvo (arco) continua fechando com a face própria', () => {
+    const arco = Array.from({ length: 5 }, (_, k) => [30 + 6 * Math.sin((Math.PI * k) / 4), 40 - 10 * k]);
+    const g = gaiolaPorLacos(barra({ trechos: trechosDaBarra.map((t) => (t.nome === 'cima' ? { ...t, pontos: 5 } : t)), lacos: [0, 50, 100].map((em) => ({ em, trechos: { ...lacoDaBarra(em).trechos, cima: arco } })) }));
+    const c = conferir(g);
+    expect(c.soltas + c.repetidas).toBe(0);
+    expect(g.passo.faces.some((f: string[]) => f.length === 5)).toBe(true);
+  });
+});
+
 describe('gaiolaPorLacos: a ponta e o polo', () => {
   /* cunha: a face de cima encolhe até um ponto no último laço, e o último laço inteiro se funde num ponto no caso do polo */
   const cunha = (ultimo: (em: number) => any) => gaiolaPorLacos(barra({ lacos: [lacoDaBarra(0), lacoDaBarra(50), ultimo(100)] }));

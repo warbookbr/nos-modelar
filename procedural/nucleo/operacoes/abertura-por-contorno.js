@@ -75,7 +75,7 @@ export function quadroDaVista(vista) {
   if (typeof vista === 'string') {
     if (!Object.hasOwn(VISTAS, vista)) return null;
     const { eixo, u, v } = VISTAS[vista];
-    return { nome: `do eixo ${vista}`, eixo, u, v, identidade: true, local: (p) => p, mundo: (p) => p };
+    return { nome: `do eixo ${vista}`, eixo, u, v, identidade: true, alinhada: true, local: (p) => p, mundo: (p) => p };
   }
   if (!Array.isArray(vista) || vista.length !== 3 || !vista.every(Number.isFinite)) return null;
   const l = Math.hypot(...vista);
@@ -86,7 +86,7 @@ export function quadroDaVista(vista) {
   u = u.map((c) => c / tamanho(u));
   const v = cruz(d, u);
   return {
-    nome: `da direção [${vista.map((c) => fmt(c)).join(', ')}]`, eixo: 2, u: 0, v: 1,
+    nome: `da direção [${vista.map((c) => fmt(c)).join(', ')}]`, eixo: 2, u: 0, v: 1, alinhada: d.filter((c) => Math.abs(c) > 1e-12).length === 1,
     local: (p) => [ponto(p, u), ponto(p, v), ponto(p, d)],
     mundo: (q) => [0, 1, 2].map((c) => q[0] * u[c] + q[1] * v[c] + q[2] * d[c]),
   };
@@ -309,7 +309,7 @@ function conferirProjecao(Vmundo, faces, poligono, q, sentido = null) {
     for (let k = 0; k < n; k++) {
       const c = poligono[k], d = poligono[(k + 1) % n];
       if (orient(pa, pb, c) !== orient(pa, pb, d) && orient(c, d, pa) !== orient(c, d, pb)) {
-        return { recusa: `o lado do contorno de ${texto2(c)} a ${texto2(d)} cruza a borda da chapa vista ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro` };
+        return { recusa: `o lado do contorno de ${texto2(c)} a ${texto2(d)} cruza a borda da chapa vista ${vista}: o vão precisa caber inteiro dentro dela (a borda de um vão aberto antes conta: a chapa não tem material dentro dele, e dois vãos vistos do mesmo eixo precisam de folga entre os contornos); traga o contorno para dentro, afastado da borda e dos vãos vizinhos nesta vista${corte == null ? '' : `; com sentido, a camada é o que fica ${sentido === '+' ? 'acima' : 'abaixo'} do plano a ${mm(corte)} mm no eixo, e uma face da outra camada que passe desse plano fora do contorno também conta como borda: aproxime as camadas do contorno ou desenhe-o onde a outra camada não chega ao plano`}` };
       }
     }
   }
@@ -451,7 +451,7 @@ function prismaDoContorno(poligono, q, de, ate) {
  *  corre na costura; o vértice que fica é o fixo, depois o da costura, depois o de
  *  menor id. Devolve as faces novas (sem as que sumiram), o mapa vértice que saiu -> vértice que ficou e os ids das faces que
  *  sumiram. */
-export function limparCostura({ pos, faces, costura, fixos, fracao = FRACAO_DA_FUSAO, piso = 0, parede = new Set() }) {
+export function limparCostura({ pos, faces, costura, fixos, fracao = FRACAO_DA_FUSAO, piso = 0, parede = new Set(), guardaDeFina = false }) {
   const F = new Map([...faces].map(([id, vs]) => [id, [...vs]]));
   const fundidos = new Map(); const removidas = [];
   const posicao = (v) => pos(v);
@@ -523,7 +523,7 @@ export function limparCostura({ pos, faces, costura, fixos, fracao = FRACAO_DA_F
       const na = nivel(c.a), nb = nivel(c.b);
       if (na === 2 && nb === 2 && !(c.l <= 2 * NO_POLIGONO)) { recusadas.add(c.chave); continue; }
       const [sai, fica] = na > nb ? [c.b, c.a] : nb > na ? [c.a, c.b] : [c.b, c.a];
-      if (!fusaoValida(F, facesDe, sai, fica, posicao)) { recusadas.add(c.chave); continue; }
+      if (!fusaoValida(F, facesDe, sai, fica, posicao, parede, guardaDeFina)) { recusadas.add(c.chave); continue; }
       if (!facesDe.has(fica)) facesDe.set(fica, new Set());
       for (const id of [...facesDe.get(sai)]) {
         const vs = F.get(id).map((v) => (v === sai ? fica : v));
@@ -544,7 +544,7 @@ export function limparCostura({ pos, faces, costura, fixos, fracao = FRACAO_DA_F
 /* A fusão de `sai` em `fica` mantém a casca: a aresta tem exatamente duas faces, que a têm em sequência; nenhuma outra face
    tem os dois; os vizinhos comuns são só os terceiros cantos das faces triangulares da aresta; e nenhuma face em volta de `sai`
    vira (a normal dela não inverte nem zera). */
-function fusaoValida(F, facesDe, sai, fica, pos) {
+function fusaoValida(F, facesDe, sai, fica, pos, parede = new Set(), guardaDeFina = false) {
   const deSai = facesDe.get(sai) ?? new Set(); const deFica = facesDe.get(fica) ?? new Set();
   const daAresta = [...deSai].filter((id) => deFica.has(id));
   if (daAresta.length !== 2) return false;
@@ -562,6 +562,12 @@ function fusaoValida(F, facesDe, sai, fica, pos) {
     const vs = F.get(id);
     const antes = newell(vs.map(pos)); const depois = newell(vs.map((v) => pos(v === sai ? fica : v)));
     if (!(ponto(antes, depois) > 0) || !(tamanho(depois) > 1e-6 * tamanho(antes))) return false;
+    /* a fusão não pode tornar fina uma face de pele: sobre uma costura reta, fundir um vértice atrás do outro puxa as faces da
+       pele em leque (13 triângulos de 12 mm de base por 160 de altura, no vão da quina da caixa) */
+    if (guardaDeFina && !parede.has(id) && vs.length <= 4) {
+      const r = razaoDaFace(vs.map(pos)); const r2 = razaoDaFace(vs.map((v) => pos(v === sai ? fica : v)));
+      if (r >= 1.5 * LIMITE_DE_FACE_FINA && r2 < LIMITE_DE_FACE_FINA) return false;
+    }
   }
   return true;
 }
@@ -657,13 +663,60 @@ export function tirarValenciaDois(faces) {
   return { faces: F, removidas };
 }
 
+/** dividirCantosRetos({ pos, faces, limite }) -> Map id -> lista de partes (a primeira fica com o id), só das faces que dividiu.
+ *  A face com três cantos seguidos alinhados (o triângulo deles abaixo de `limite` de área) tem de ter o vértice do meio, porque a
+ *  vizinha da outra aresta o tem, mas a triangulação do adaptador pode cortar uma orelha sem área ali (float32 deixa de 3e-10 m² de
+ *  ruído num lado de 77 mm). Ela se divide por uma diagonal que parte desse canto, em partes sem canto alinhado e do mesmo sentido. */
+export function dividirCantosRetos({ pos, faces, limite }) {
+  const area = (a, b, c) => tamanho(cruz(sub(pos(b), pos(a)), sub(pos(c), pos(a)))) / 2;
+  const divididas = new Map();
+  for (const [id, vs] of faces) {
+    if (vs.length < 4) continue;
+    const ref = newell(vs.map(pos));
+    let partes = [vs];
+    for (let volta = 0; volta < 16; volta++) {
+      let feito = false;
+      for (let q = 0; q < partes.length && !feito; q++) {
+        const P = partes[q]; const n = P.length;
+        if (n < 4) continue;
+        for (let k = 0; k < n && !feito; k++) {
+          if (!(area(P[(k - 1 + n) % n], P[k], P[(k + 1) % n]) < limite)) continue;
+          /* a diagonal de P[k] para o canto dois adiante, ou dois atrás */
+          for (const lado of [1, -1]) {
+            const at = (j) => P[((k + lado * j) % n + n) % n];
+            const orelha = [at(0), at(1), at(2)];
+            const resto = [at(0), ...Array.from({ length: n - 2 }, (_, j) => at(j + 2))];
+            if (lado < 0) { orelha.reverse(); resto.reverse(); }
+            const bom = (f) => f.length === 3 ? area(f[0], f[1], f[2]) >= limite : f.every((_, j) => area(f[(j + f.length - 1) % f.length], f[j], f[(j + 1) % f.length]) >= limite);
+            const voltada = (f) => ponto(newell(f.map(pos)), ref) > 0;
+            if (!bom(orelha) || !bom(resto) || !voltada(orelha) || !voltada(resto)) continue;
+            partes = [...partes.slice(0, q), resto, orelha, ...partes.slice(q + 1)];
+            feito = true;
+            break;
+          }
+        }
+      }
+      if (!feito) break;
+    }
+    if (partes.length > 1) divididas.set(id, partes);
+  }
+  return divididas;
+}
+
 /* ---- a interseção da lente, direto na Manifold ---- */
+
+/** O menor e o maior de cada coordenada de uma lista de pontos, em laço: numa chapa de cem mil vértices o `Math.max(...lista)` estoura a pilha. */
+function extremosDos(pontos) {
+  const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+  for (const p of pontos) for (let c = 0; c < 3; c++) { if (p[c] < min[c]) min[c] = p[c]; if (p[c] > max[c]) max[c] = p[c]; }
+  return [min, max];
+}
 
 /** A interseção de dois sólidos { pontos, faces } (faces por índice, fechados e orientados), em pedaços convexos por face de
  *  entrada: { pontos, faces: [{ solido, face, vs }] }. Os pontos são os da saída da Manifold (Float32, em coordenada local). */
 function intersecaoNaManifold(wasm, solidos) {
   const todos = solidos.flatMap((s) => s.pontos);
-  const min = [0, 1, 2].map((c) => Math.min(...todos.map((p) => p[c]))), max = [0, 1, 2].map((c) => Math.max(...todos.map((p) => p[c])));
+  const [min, max] = extremosDos(todos);
   const centro = [0, 1, 2].map((c) => (min[c] + max[c]) / 2);
   const grade = 2 ** Math.floor(Math.log2(Math.max(...[0, 1, 2].map((c) => max[c] - min[c])) * 2 ** -20));
   const local = (p) => [0, 1, 2].map((c) => Math.round((p[c] - centro[c]) / grade) * grade);
@@ -776,6 +829,11 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     }
     if (a.sentido != null && a.sentido !== '+' && a.sentido !== '-') return grita(st, i, OP, 'sentido', `sentido só aceita '+' ou '-', o lado do eixo da vista de onde se olha a camada que o vão corta, num corpo que a reta do eixo atravessa mais de uma vez; veio ${JSON.stringify(a.sentido)}`);
     const sentido = a.sentido ?? null;
+    if (a.limpezaFina != null && typeof a.limpezaFina !== 'boolean') return grita(st, i, OP, 'limpezaFina', 'limpezaFina só aceita true (a limpeza da costura não torna fina uma face de pele e divide a face com canto alinhado) ou false (a limpeza de antes); sem ela, true na vista por vetor oblíqua e false nos eixos x, y e z (e no vetor paralelo a um deles)');
+    /* a limpeza fina: a fusão da costura recusa o que torna lasca uma face de pele saudável, e a face com três cantos alinhados se
+       divide por uma diagonal. Na vista por vetor, o vão da quina precisa dela; nos eixos fica desligada por padrão, porque muda a
+       malha de vãos já aceitos (no furgão, 2026-11-06, a grade ganhava 53 faces); declare true para adotá-la */
+    const limpezaFina = a.limpezaFina ?? !quadro.alinhada;
     if (a.lente != null && typeof a.lente !== 'boolean') return grita(st, i, OP, 'lente', 'lente só aceita true (o pedaço retirado sai como sólido próprio) ou false');
     let recuoDeclarado = null;
     if (a.recuoDaLente != null) {
@@ -836,7 +894,8 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const vertDaChapa = [...new Set(idsDaChapa.flatMap((id) => facesDaChapa.get(id)))].sort((x, y) => x - y);
     const indiceDaChapa = new Map(vertDaChapa.map((v, k) => [v, k]));
     /* o piso de área da booleana, 2e-9 do quadrado do tamanho da chapa: o canto e a face abaixo de dez pisos se fundem */
-    const escala = Math.max(...[0, 1, 2].map((c) => Math.max(...vertDaChapa.map((v) => st.V.get(v)[c])) - Math.min(...vertDaChapa.map((v) => st.V.get(v)[c]))));
+    const [minDaChapa, maxDaChapa] = extremosDos(vertDaChapa.map((v) => st.V.get(v)));
+    const escala = Math.max(...[0, 1, 2].map((c) => maxDaChapa[c] - minDaChapa[c]));
     const piso = 2e-9 * escala * escala;
     const copia = a.lente ? { pontos: vertDaChapa.map((v) => [...st.V.get(v)]), faces: idsDaChapa.map((id) => facesDaChapa.get(id).map((v) => indiceDaChapa.get(v))), liso: idsDaChapa.map((id) => st.F.get(id).liso) } : null;
 
@@ -864,7 +923,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const costuraL = new Set([...paredeL].flatMap((k) => facesL.get(k)));
       const naVoltaDaLente = noPoligono(recuado.poligono);
       const fixosL = new Set([...costuraL].filter((v) => naVoltaDaLente(r.pontos[v])));
-      const limpaL0 = limparCostura({ pos: (v) => r.pontos[v], faces: facesL, costura: costuraL, fixos: fixosL, piso, parede: paredeL });
+      const limpaL0 = limparCostura({ pos: (v) => r.pontos[v], faces: facesL, costura: costuraL, fixos: fixosL, piso, parede: paredeL, guardaDeFina: limpezaFina });
       lenteCalculada = { r, limpaL: tirarValenciaDois(fundirLascas({ pos: (v) => r.pontos[v], faces: limpaL0.faces, costura: costuraL, parede: paredeL, piso }).faces) };
     }
 
@@ -910,7 +969,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const costura = new Set([...parede].flatMap((f) => st.F.get(f).vs));
     const fixos = new Set([...costura].filter((v) => noDesenho(st.V.get(v))));
     const posDaPeca = (v) => st.V.get(v);
-    const limpa = limparCostura({ pos: posDaPeca, faces: new Map(facesDoCorte.map((f) => [f, st.F.get(f).vs])), costura, fixos, piso, parede });
+    const limpa = limparCostura({ pos: posDaPeca, faces: new Map(facesDoCorte.map((f) => [f, st.F.get(f).vs])), costura, fixos, piso, parede, guardaDeFina: limpezaFina });
     const antesDaFusao = new Map([...limpa.fundidos.keys()].map((v) => [v, [...st.V.get(v)]]));
     /* na fusão de lascas fica a face de antes do passo, que guarda a identidade; entre duas do mesmo tipo, a vizinha */
     const lascas = fundirLascas({ pos: posDaPeca, faces: limpa.faces, costura, parede, piso, preferir: (outra, lasca) => (localDe(i, outra) != null && localDe(i, lasca) == null ? lasca : outra) });
@@ -923,6 +982,23 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     for (const [f, vs] of valencia.faces) {
       const face = st.F.get(f);
       if (face.vs.length !== vs.length || face.vs.some((v, k) => v !== vs[k])) { face.vs = melhorInicio(posDaPeca, vs); face.tinta = []; }
+    }
+    /* o canto alinhado que a limpeza não pode fundir (o vértice da vizinha) divide a face por uma diagonal, para o adaptador não cortar nele uma orelha sem área */
+    let divisoes = 0;
+    for (const [f, partes] of limpezaFina ? dividirCantosRetos({ pos: posDaPeca, faces: valencia.faces, limite: piso }) : []) {
+      const face = st.F.get(f);
+      face.vs = melhorInicio(posDaPeca, partes[0]); face.tinta = [];
+      for (const vs of partes.slice(1)) {
+        const novo = idDoPasso(i, proximaFace++);
+        addF(st, novo, melhorInicio(posDaPeca, vs));
+        const nf = st.F.get(novo);
+        nf.cor = face.cor; nf.material = face.material; nf.parte = face.parte; nf.liso = face.liso; nf.solido = face.solido;
+        if (st.parteAtribuidaEm?.has(f)) st.parteAtribuidaEm.set(novo, st.parteAtribuidaEm.get(f));
+        (st.pedacosDe ??= new Map()).set(novo, f);
+        if (parede.has(f)) parede.add(novo);
+        facesDoCorte.push(novo);
+        divisoes++;
+      }
     }
     const usados = new Set(); for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
     for (const v of tocados) if (!usados.has(v)) st.V.delete(v);
@@ -995,11 +1071,11 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       }
     }
 
-    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length } });
+    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes } });
     registraOrigem(st, i, OP, a.origemId, {
       faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista: a.vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente,
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
-      limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length },
+      limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes },
     });
   },
   };

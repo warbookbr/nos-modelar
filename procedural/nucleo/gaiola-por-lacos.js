@@ -372,10 +372,13 @@ export function gaiolaPorLacos(o = {}) {
     if (lamina[r]) return [];
     const fs = [];
     const de = []; for (let q = inicio[iDe]; ; q = (q + 1) % N) { de.push(nm(r, q)); if (q === fimDe(iDe)) break; }
-    fs.push([...de, nm(r, A[1]), nm(r, B[1])]);
-    for (let j = 1; j + 1 < n; j++) fs.push([nm(r, A[j]), nm(r, A[j + 1]), nm(r, B[j + 1]), nm(r, B[j])]);
     const ate = []; for (let q = inicio[iAte]; ; q = (q + 1) % N) { ate.push(nm(r, q)); if (q === fimDe(iAte)) break; }
-    if (ate.length > 2) fs.push(ate);
+    /* o trecho `ate` com vários pontos alinhados: a face que o fecharia sozinha teria área zero, então os pontos entram na última
+       face da escada, entre o degrau e a ponta, como os de `de` entram na primeira */
+    const reta = ate.length > 2 && Math.hypot(...normalDaFace(ate, pontosMm)) / 2 <= TOLERANCIA_DE_FUSAO_MM * Math.max(...ate.map((v) => Math.hypot(...sub3(pontosMm[v], pontosMm[ate[0]]))), 1);
+    fs.push([...de, ...(reta && n === 2 ? ate : [nm(r, A[1]), nm(r, B[1])])]);
+    for (let j = 1; j + 1 < n; j++) fs.push([nm(r, A[j]), ...(j + 1 === n - 1 && reta ? ate : [nm(r, A[j + 1]), nm(r, B[j + 1])]), nm(r, B[j])]);
+    if (ate.length > 2 && !reta) fs.push(ate);
     return fs.map(limpa).filter(Boolean);
   };
   const tampas = [0, R - 1].map((r) => ({ r, faces: tampa(r) }));
