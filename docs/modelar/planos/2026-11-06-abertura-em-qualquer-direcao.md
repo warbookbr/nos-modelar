@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/abertura-de-prova/`, `tools/fixtures/aberturas-em-teste/`, `docs/modelar/banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/`
+**Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/abertura-de-prova/`, `tools/fixtures/aberturas-em-teste/`, `docs/modelar/banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
 
 **Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-06; o furgão fica em pausa enquanto este plano corre
 
