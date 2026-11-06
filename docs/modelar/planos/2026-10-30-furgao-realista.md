@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`, `src/bancada/`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`
+**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`, `src/bancada/`, `src/autoria/corte-de-plano.js`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
@@ -149,4 +149,4 @@ Rodada de 2026-11-06, depois da volta: as aberturas dos faróis, dos piscas e da
 
 Rodada de 2026-11-06, a largura e as portas traseiras: a pessoa viu a traseira e achou estranhos o topo das portas traseiras e as janelas, porque as portas afinavam para cima junto com a lataria. Por decisão dela a van ficou 40 mm mais larga (2.040 mm sem retrovisores, valor novo do alvo em `referencias/alvo.md`), com a chapa, o plástico, as molduras, os vidros, o interior e as lanternas acompanhando e os faróis, a grade e as lanternas com o mesmo desenho. As portas traseiras ganharam as laterais verticais (x 814) e o topo em 2.280, 40 mm abaixo do começo da curva do teto atrás (2.320), com os cantos de cima de fora arredondados, e as janelas são retângulos de margem igual de dentro, de fora e de cima. A luz de freio alta e o teto não mudaram.
 
-Em 2026-11-06, para conferir uma linha clara entre o pé das portas traseiras e o para-choque, que pode ser o fundo oco do furgão visto pela fresta, a pessoa pediu à bancada um corte da peça por um plano: a metade de um lado do plano fica translúcida e a outra inteira, e a vista olha através da translúcida. A bancada e a `olhar-bancada.mjs` entraram no território por isso.
+Em 2026-11-06, para conferir uma linha clara entre o pé das portas traseiras e o para-choque, que pode ser o fundo oco do furgão visto pela fresta, a pessoa pediu à bancada um corte da peça por um plano: a metade de um lado do plano fica translúcida e a outra inteira, e a vista olha através da translúcida. A bancada e a `olhar-bancada.mjs` entraram no território por isso, com a leitura do pedido de corte em `src/autoria/corte-de-plano.js`, porque o gate de fronteira proíbe a linha de comando de importar da bancada. A opção é `--corte=<eixo>:<mm>` com `--corte-lado=<mais|menos>`, e o corte em z no meio mostrou o furgão oco abaixo do piso; na câmera ortográfica a linha clara não aparece, e ela era o topo do degrau do para-choque visto de cima.
