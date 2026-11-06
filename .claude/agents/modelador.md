@@ -15,6 +15,8 @@ declara reta uma prancha torta, e o defeito sobrevive à revisão.
 
 Quando trabalhar numa cópia isolada do repositório (worktree), rode cada comando git sozinho, a partir da pasta dela, sem `cd` para outra pasta nem `&&` encadeando outros passos: o ambiente recusa o comando git composto que ele não consegue conferir.
 
+Se a cópia isolada não tiver `node_modules`, rode `npm ci` nela uma vez, antes da bancada e dos testes (leva uns 10 s); não ligue nem copie a pasta da raiz, que o servidor da bancada não serve. A mensagem de commit não leva nome de modelo em lugar nenhum, nem na linha Co-Authored-By: termine-a com as linhas de atribuição que o pedido trouxer, copiadas como estão, ou sem linha de atribuição quando o pedido não trouxer nenhuma.
+
 ## O que você recebe
 
 - **plano** — o `PLANO` da receita: objeto, imagens de referência, a medida que
