@@ -28,7 +28,7 @@
  *
  * Etapa 3, o plástico de baixo, peça própria por fora da chapa (prancha de 2026-11-01): a saia de 299 a 463, que sai 20 mm da lateral, as
  * alargamento de 150 mm que sai 30 mm em volta dos quatro arcos (2026-11-02) e os para-choques, que saem 50 mm na frente e 110 atrás e dobram nas quinas. A chapa
- * da etapa 2 não muda, e o envelope passa de 5400 por 2000 a 5560 por 2060 (2040 na saia). Cada peça é a pele de uma seção da prancha (`TABELA.secao_*`,
+ * da etapa 2 não muda, e o envelope passa de 5400 por 2040 a 5560 por 2100 (2080 na saia). Cada peça é a pele de uma seção da prancha (`TABELA.secao_*`,
  * [para fora da chapa, altura] em milímetro) varrida por um trilho e engrossada para dentro pela espessura do passo `subdivisao`, e o
  * trilho é a lateral reta (saia), o círculo da moldura em torno do eixo da roda ou a planta do para-choque (reta, quina e lateral).
  * A saia é cortada pelas frestas das portas, de 6 mm: cada porta leva o seu trecho, de 383 a 463; ficam presos os 299 a 377 sob as portas,
@@ -93,16 +93,16 @@ export { derivar } from './receita/gaiola.js';
 export { derivarInterior } from './receita/interior.js';
 
 export const TABELA = {
-  // envelope da classe (prancha): 5400 de comprimento, 2000 de largura sem retrovisores, 2500 de altura, soleira em 300
+  // envelope da classe (prancha): 5400 de comprimento, 2040 de largura sem retrovisores (2000 até 2026-11-06, quando a pessoa pediu 20 mm a mais de cada lado), 2500 de altura, soleira em 300
   comprimento: 5400,
-  meia_largura: 1000,
+  meia_largura: 1020,
   altura: 2500,
   soleira_y: 300,
 
   // rodas e arcos: entre-eixos e balanço dianteiro (o traseiro sai da diferença), bitola, pneu 235/65 aro 16, arco com 65 mm de folga
   entre_eixos: 3300,
   balanco_dianteiro: 980,
-  bitola: 1730, // a face de fora do pneu fica em x 982,5, 17,5 mm para dentro da lateral
+  bitola: 1730, // a face de fora do pneu fica em x 982,5, 37,5 mm para dentro da lateral (17,5 até 2026-11-06: a bitola não mudou com a largura, porque o arco não pede)
   pneu_diametro: 710,
   pneu_largura: 235,
   arco_raio: 420,
@@ -145,9 +145,9 @@ export const TABELA = {
   raio_quina_traseira: 180,
 
   // seção frontal, em [x, y]: lateral vertical em x 1000 até o vinco de cintura e fechando daí até o teto (3,9 graus), com a passagem
-  // no vinco em raio 3000 e sem quina; o prolongamento chega ao teto em x 910 (1820 de largura), e a quina do teto tem raio 300
+  // no vinco em raio 3000 e sem quina; o prolongamento chega ao teto em x 930 (1860 de largura, os mesmos 90 mm de inclinação), e a quina do teto tem raio 300
   lateral_reta_ate_y: 1190,
-  meia_largura_no_teto: 910,
+  meia_largura_no_teto: 930,
   raio_lateral: 3000,
   raio_ombro: 300,
 
@@ -201,7 +201,8 @@ export const TABELA = {
   porta_correr_largura: 1300,
   porta_correr_topo_y: 2200,
   porta_traseira_base_y: 600, // a prancha desenha 590; sobe 10 mm para a tira da fresta não encostar no degrau do para-choque em 580
-  porta_traseira_topo_y: 2380, // no anel do ombro que cai no começo da quina de trás (2320), 10 mm para dentro da traseira vertical
+  porta_traseira_topo_y: 2280, // 2026-11-06: o topo das portas é o anel `ombro` (ombro_y), 40 mm abaixo de onde a traseira vertical acaba e a curva do teto começa (altura menos raio_quina_traseira, 2320); as laterais das portas são verticais e os cantos de cima de fora, cortados em diagonal
+  ombro_traseiro_y: 2380, // o anel `ombro${anel_porta_traseira}`, que era o topo das portas: fica onde estava, 10 mm para dentro da traseira vertical, e a luz de freio e o teto não mudam
   anel_porta_traseira: 2,
 
   // a coluna da fresta da frente na quina: quanto a quina fica para a frente dela e o mínimo da faixa de trás dela até a lateral
@@ -218,10 +219,10 @@ export const TABELA = {
   moldura_vidro_cabine: 70,
   vidro_traseiro_base_y: 1700,
   vidro_traseiro_topo_y: 2200,
-  vidro_traseiro_x_dentro: 80,
-  vidro_traseiro_x_fora: 715,
+  vidro_traseiro_x_dentro: 80, // a janela das portas traseiras é um retângulo com a mesma margem (vidro_traseiro_margem) de dentro, de fora e de cima
+  vidro_traseiro_margem: 80,
+  porta_traseira_folga_topo: 30, // 2026-11-06: a borda de fora das portas é vertical, e no topo delas a lateral prolongada já entrou; ela fica pelo menos tanto dentro do fim da traseira reta ali
   porta_traseira_recuo: 105, // 2026-11-06: as portas traseiras acabam 105 mm antes do fim da traseira reta, e a lanterna larga ocupa a quina livre atrás delas
-  vidro_traseiro_folga_fora: 45, // a borda de fora da janela corre 45 mm para dentro da borda de fora da porta, que acompanha a lateral
   // cantos dos vãos: cada canto é cortado por uma diagonal de vao_canto_degraus células (cada célula da gaiola vira dois triângulos, e o
   // vão fica com um de cada), e o vidro da porta da cabine e os das portas traseiras ganham colunas a esse passo junto de cada borda
   vao_canto_degraus: 2,
@@ -229,10 +230,10 @@ export const TABELA = {
   // com a aba dobrada como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar.
   // Os faróis, os piscas e a grade deixaram a gaiola: os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,
   // em [x, y] mm na vista frontal, no lado esquerdo (+x; o direito o espelha): o farol é afinado, com a ponta de dentro descendo em diagonal
-  // até a grade e a de fora indo a x 980, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente.
-  farol_perfil: [[460, 840], [985, 840], [985, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô
+  // até a grade e a de fora indo a x 1000, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente.
+  farol_perfil: [[460, 840], [1005, 840], [1005, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô
   farol_raio: 40, // a concordância dos quatro cantos do farol
-  pisca_x_dentro: 890, // o pisca ocupa a ponta de fora do farol, de x 890 à borda dele
+  pisca_x_dentro: 910, // o pisca ocupa a ponta de fora do farol, de x 890 à borda dele
   farol_recuo_lente: 3, // a lente do farol entra 3 mm no vão: a borda da chapa e a aba aparecem em volta dela
   pisca_margem: 6, // o vão do pisca fica 6 mm dentro da borda do farol (3 além da lente), porque o vão não pode encostar na borda do sólido
   pisca_recuo_lente: 0, // o pisca enche o vão aberto na lente do farol, e por isso encosta nela
@@ -251,7 +252,7 @@ export const TABELA = {
   grade_barra_saliencia: 14, // quanto a barra sai da lente para a frente (sempre atrás da superfície da chapa)
   lanterna_base_y: 720, // as lanternas de trás (2026-11-06, opção 1 do esboço): vãos pelo contorno, um por lado, vistos pela diagonal da quina; de 720 a 1240 mm
   lanterna_topo_y: 1240,
-  lanterna_x_dentro: 836, // a borda de dentro na face de trás, logo depois da fresta e da borda da porta traseira (que acaba em 795)
+  lanterna_x_dentro: 856, // a borda de dentro na face de trás, na mesma distância da quina de antes da largura nova (836 com a lateral em 1000)
   lanterna_entra_lado: 85, // quanto o vão entra na lateral além do fim do arco da quina
   lanterna_raio: 25, // a concordância dos quatro cantos do vão
   lanterna_recuo_lente: 3, // a lente da lanterna entra 3 mm no vão, como a do farol
@@ -348,7 +349,7 @@ export const TABELA = {
   // dentro da chapa, a divisória atrás dos bancos, dois bancos de cabine e o painel. A margem é a folga entre a divisória e a face de dentro da chapa.
   piso_y: 735.5,
   piso_espessura: 20,
-  piso_meia_largura: 988,
+  piso_meia_largura: 1008,
   piso_z_frente: 1740,
   piso_z_tras: -2655,
   piso_raio_cantos: 90,
@@ -366,7 +367,7 @@ export const TABELA = {
   painel_z_tras: 1470,
   painel_z_frente: 1735,
   painel_topo_y: 1400,
-  painel_meia_largura: 850,
+  painel_meia_largura: 870,
   painel_chanfro: 25,
 };
 
@@ -699,14 +700,14 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto, etapa 5: chapa de 5400 por 2000 por 2500 com frestas, saia, para-choques e alargamento dos arcos (5560 por 2060), forro e rodas, mais cristais, borrachas de vão e interior simples',
+    objeto: 'furgão médio de teto alto, etapa 5: chapa de 5400 por 2040 por 2500 com frestas, saia, para-choques e alargamento dos arcos (5560 por 2100), forro e rodas, mais cristais, borrachas de vão e interior simples',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
     partes: [
       {
         nome: 'carroceria',
-        forma: 'chapa de 2 mm: lateral vertical até 1190, fechando 3,9 graus até o teto de ±630; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405, frestas de 6 mm, portas traseiras até x 795, sulcos, vãos redondos; plástico por fora',
+        forma: 'chapa de 2 mm, 2040 de largura: lateral vertical até 1190, fechando 3,9 graus até o teto de ±650; capô 1100 a 1480, para-brisa até 2110, teto de raios 1290 e 405; portas traseiras de lados verticais (x 814), topo 2280, cantos redondos',
         tecnica: 'subdivisao de gaiola de anéis, ombro e cobertura com colunas nas portas e arco de 580; porta dividida meia fresta por lado, borda dobrada 4 mm; frente em dois arcos tangentes com coroa em y; cantos dos vãos em diagonal de duas células',
       },
       ...ABAS_DOS_VAOS.map((nome) => ({
@@ -766,17 +767,17 @@ const receita = {
       },
       ...['Esquerdo', 'Direito'].map((lado) => ({
         nome: `farol${lado}`,
-        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} trapézio de cantos de raio 40: [460, 840], [985, 840], [985, 1080], [490, 1080], topo na boca do capô, ponta de dentro junto da grade; lente clara recuada 3 mm e aba do vão para dentro`,
+        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} trapézio de cantos de raio 40: [460, 840], [1005, 840], [1005, 1080], [490, 1080], topo na boca do capô, ponta de dentro junto da grade; lente clara recuada 3 mm e aba do vão para dentro`,
         tecnica: 'aberturaPorContorno na vista frontal, na camada da frente da chapa, com lente, recuoDaLente e concordância nos cantos; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',
       })),
       ...['Esquerdo', 'Direito'].map((lado) => ({
         nome: `pisca${lado}`,
-        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do farol: x 890 a 985, na altura toda dele, 6 mm dentro da borda, cantos de fora na concordância do farol, lente âmbar opaca do tamanho do vão`,
+        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do farol: x 910 a 1005, na altura toda dele, 6 mm dentro da borda, cantos de fora na concordância do farol, lente âmbar opaca do tamanho do vão`,
         tecnica: 'segundo aberturaPorContorno, sobre a lente do farol, com lente e recuoDaLente 0; o pedaço retirado é o pisca',
       })),
       ...['Esquerda', 'Direita'].map((lado) => ({
         nome: `lanterna${lado}`,
-        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} alta, opção 1: um vão só de y 720 a 1240, larga atrás (de x 836, depois da porta traseira), dobrando a quina e entrando 85 mm na lateral; cantos de raio 25, lente vermelha recuada 3 mm, aba de 6 mm`,
+        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} alta, opção 1: um vão só de y 720 a 1240, larga atrás (de x 856, mesma distância da quina), dobrando a quina e entrando 85 mm na lateral; cantos de raio 25, lente vermelha recuada 3 mm, aba de 6 mm`,
         tecnica: 'aberturaPorContorno com lente, vista por vetor na diagonal da quina ([1, 0, -1] na de +x, [-1, 0, -1] na de -x) e sentido +, limpezaFina; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',
       })),
       {
@@ -829,7 +830,8 @@ const receita = {
       'falta o piso, a divisória, um dos dois bancos ou o painel, ou algum deles atravessa a chapa, a aba de um vão, um forro, o pneu ou outro volume do interior, ou fica a menos de 10 mm da chapa sem ser o apoio declarado',
       'o vinco de cintura ou as nervuras do teto não aparecem na luz rasante, ou aparecem fortes como degrau',
       'a aba de um arco sobra solta da lateral ou não acompanha o arco inteiro',
-      'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou o vão traseiro não acompanha a lateral 100 mm para dentro dela acima do vinco, ou um sulco do teto não cabe no teto de ±630',
+      'a lateral não é vertical até o vinco de cintura e inclinada 3,9 graus acima dele, ou um sulco do teto não cabe no teto de ±650',
+      'a borda de fora de uma porta traseira não é vertical, ou o topo dela passa de 2320 (onde a curva do teto começa atrás), ou os cantos de cima dela não são redondos, ou a janela dela não é um retângulo de bordas paralelas às da porta',
       'a luz rasante ou a curvatura mostram amassado, ondulação ou serrilhado que a forma não pede, fora das frestas, dos vãos e dos vincos, nem na fresta da porta da cabine junto ao arco dianteiro',
       'um pneu não toca o chão, ou toca ou atravessa o arco da roda, a lateral ou o forro do arco',
       'a roda não é a da família roda-pneu no pneu 235/65 aro 16 (710 mm de diâmetro, 235 de largura, com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos, ou não fica na bitola de 1730 e nos eixos da prancha',
@@ -847,7 +849,7 @@ const receita = {
       'a fresta da porta da cabine não corre na borda de fora do alargamento (raio 570, 150 mm da boca) ou corta o alargamento',
       'a fresta da frente da porta da cabine não corre 122 mm atrás do perfil do para-brisa (100 atrás da ponta do vidro), ou o topo dela não deixa 75 mm de faixa de teto acima, em 2035',
       'falta a faixa recuada da entrada de ar ou o lugar da placa no para-choque dianteiro, ou o lugar da placa no traseiro',
-      'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2060 mm',
+      'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2100 mm',
     ],
     lataria: { partes: ['carroceria'] },
   },

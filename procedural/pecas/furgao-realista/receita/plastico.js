@@ -213,7 +213,7 @@ export function derivarPlastico(T, f) {
   const alargamentos = [zT, zD].map((zc) => ({ campo: { cilindro: { eixo: EIXO_X, por: [0, yc, zc], raio: T.arco_raio } }, perfil: perfilAlarg, topoAberto: true, rolada: { abaixoDe: yRolo, razao: razaoRolo } }));
   const passoDaSaia = { passo: T.saia_passo, linha: 'cimaPorta' };
   for (const [lado, s] of lados) {
-    const trilhoDe = (de, ate) => [{ reta: { de: [s * 1000, 0, de], ate: [s * 1000, 0, ate] } }];
+    const trilhoDe = (de, ate) => [{ reta: { de: [s * T.meia_largura, 0, de], ate: [s * T.meia_largura, 0, ate] } }];
     const quadro = s > 0 ? { u: [s, 0, 0] } : { u: [s, 0, 0], virar: true };
     const emZ = (z, nome) => ({ em: z - zT, nome });
     /* os cortes em z, de trás para a frente: a saia começa na borda de fora do alargamento do arco traseiro e acaba na fresta da porta da cabine, e dali, em cada
@@ -261,7 +261,7 @@ export function derivarPlastico(T, f) {
     for (const [lado, s] of lados) {
       const nome = `moldura${rotulo === 'Dianteiro' ? 'ArcoDianteiro' : 'ArcoTraseiro'}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;
       const g = gaiolaVarrida({
-        nome, trilho: [{ arco: { centro: [s * 1000, yc, zc], eixo: EIXO_X, de: [s * 1000, yc, zc + T.arco_raio], graus: -200 } }],
+        nome, trilho: [{ arco: { centro: [s * T.meia_largura, yc, zc], eixo: EIXO_X, de: [s * T.meia_largura, yc, zc + T.arco_raio], graus: -200 } }],
         quadro: s > 0 ? { u: [s, 0, 0], virar: true } : { u: [s, 0, 0] }, secao: secaoMoldura, fora: [s, 0, 0],
         estacoes: [{ plano: { eixo: 'y', valor: pontas[zc].frente }, cruzando: 'subindo' }, passoDaMoldura, { plano: { eixo: 'y', valor: pontas[zc].tras }, cruzando: 'descendo' }],
       });

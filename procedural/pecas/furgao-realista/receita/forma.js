@@ -189,12 +189,12 @@ export function aneisDoOmbro(T, f) {
      anel do ombro até ele é medida ao longo do perfil */
   const dTopo = (() => {
     const { pl } = aPartirDe(f.perfilTras, T.ombro_y); const s = acumulado(pl);
-    const k = pl.findIndex((p) => p[1] >= T.porta_traseira_topo_y);
+    const k = pl.findIndex((p) => p[1] >= T.ombro_traseiro_y);
     if (k < 1) throw new Error('furgao-realista: o perfil de trás não chega ao topo das portas traseiras');
-    const t = (T.porta_traseira_topo_y - pl[k - 1][1]) / (pl[k][1] - pl[k - 1][1]);
+    const t = (T.ombro_traseiro_y - pl[k - 1][1]) / (pl[k][1] - pl[k - 1][1]);
     return lerp(s[k - 1], s[k], t);
   })();
-  if (!(dTopo > 0 && f.zR(T.ombro_y) - f.zR(T.porta_traseira_topo_y) < 12)) throw new Error('furgao-realista: o topo das portas traseiras precisa ficar acima do ombro e a menos de 12 mm da traseira vertical');
+  if (!(dTopo > 0 && f.zR(T.ombro_y) - f.zR(T.ombro_traseiro_y) < 12)) throw new Error('furgao-realista: o anel do ombro traseiro precisa ficar acima do ombro e a menos de 12 mm da traseira vertical');
   const rF0 = f.raioFrente(T.ombro_y);
   /* até o anel do topo das portas traseiras, o começo da quina de trás segue a lateral prolongada, para a fresta de fora das portas
      traseiras não entortar no alto; dali ao teto o raio fecha até o da borda do teto */

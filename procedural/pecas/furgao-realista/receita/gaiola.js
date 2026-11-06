@@ -67,11 +67,11 @@ export function derivar(T) {
     const s = an.sec; const xTras = s.xS - s.rB;
     const pt = T.vao_canto_passo_traseiro; const kk = T.vao_canto_degraus;
     const dentro = T.vidro_traseiro_x_dentro;
-    /* a borda de fora das portas é a coluna antes do fim da traseira reta, `porta_traseira_recuo` para dentro dela e acompanhando a lateral;
-       a do vidro fica 45 mm dentro da da porta e não passa de vidro_traseiro_x_fora */
+    /* a borda de fora das portas é vertical: a coluna `porta_traseira_recuo` para dentro do fim da traseira reta na altura do topo das portas, onde a
+       lateral prolongada está mais para dentro; a do vidro fica vidro_traseiro_margem dentro da da porta, a mesma margem de dentro e de cima */
+    const xPorta = Math.min(f.xBordaTraseira(T.lateral_reta_ate_y) - T.porta_traseira_recuo, f.xBordaTraseira(T.porta_traseira_topo_y) - T.porta_traseira_folga_topo);
     const corpo = (xt, y) => {
-      const xPorta = f.xBordaTraseira(y) - T.porta_traseira_recuo;
-      const fora = Math.min(T.vidro_traseiro_x_fora, xPorta - T.vidro_traseiro_folga_fora);
+      const fora = xPorta - T.vidro_traseiro_margem;
       const cantoDentro = Array.from({ length: kk }, (_, j) => dentro + (j + 1) * pt);
       const cantoFora = Array.from({ length: kk }, (_, j) => fora - (kk - j) * pt);
       const miolo = entre(cantoDentro.at(-1), cantoFora[0], (cantoFora[0] - cantoDentro.at(-1)) / (10 - 2 * kk) + 1e-6);
@@ -377,13 +377,14 @@ export function derivar(T) {
     { rs: aneisEntre(T.para_brisa_base_y, T.para_brisa_topo_y), cMeio: 'f0', cantos: ['q3'] },
     { rs: aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y), cMeio: meioDoVidroDaCabine, cantos: ['S0', 'vidroCabineTras'] },
     { rs: aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y), cMeio: meioDoVidroTraseiro, cantos: ['r1', `r${iForaTraseiro}`] },
+    { rs: aneisEntre(T.porta_traseira_base_y, T.porta_traseira_topo_y), cMeio: 'r0', cantos: [`r${nR - 1}`], soTopo: true },
   ];
   const diagonaisDosCantos = [];
   const arcosDosCantos = [];
-  for (const { rs, cMeio, cantos } of cantosDosVaos) {
+  for (const { rs, cMeio, cantos, soTopo } of cantosDosVaos) {
     const k = T.vao_canto_degraus;
     for (const cF of cantos) {
-      for (const sub2 of [rs.slice(0, k + 1), rs.slice(rs.length - k - 1).reverse()]) {
+      for (const sub2 of soTopo ? [rs.slice(rs.length - k - 1).reverse()] : [rs.slice(0, k + 1), rs.slice(rs.length - k - 1).reverse()]) {
         const cols = colunasDoCanto(sub2, cF, cMeio);
         const nome = (r, c) => r.lista.find((q) => q.col === c).nome;
         for (let j = 0; j < k; j += 1) diagonaisDosCantos.push([nome(sub2[j], cols[j]), nome(sub2[j + 1], cols[j + 1])]);
@@ -533,12 +534,17 @@ export function derivar(T) {
     });
     /* a porta traseira sobe pelos anéis horizontais e pelos do ombro até o anel do topo dela */
     const iBaseTras = listas.findIndex((x) => x.horizontal && Math.abs(x.y - T.porta_traseira_base_y) < 1e-6);
-    const iTopoTras = listas.findIndex((x) => x.nome === `ombro${T.anel_porta_traseira}`);
+    const iTopoTras = listas.findIndex((x) => x.horizontal && Math.abs(x.y - T.porta_traseira_topo_y) < 1e-6);
     const subida = listas.slice(iBaseTras, iTopoTras + 1);
+    /* os dois cantos de cima de fora são cortados em diagonal, como os dos vidros: a subida de fora acaba vao_canto_degraus anéis antes do topo e a diagonal
+       leva à coluna de dentro do canto no anel do topo */
+    const kc = T.vao_canto_degraus; const cF = `r${nR - 1}`;
+    const rsC = subida.slice(subida.length - kc - 1).reverse();
+    const colsC = colunasDoCanto(rsC, cF, 'r0', kc);
     portas.push({
       nome: `portaTraseira${sufixo}`,
-      volta: fechar([...trecho(subida[0], 'r0', `r${nR - 1}`, s), ...subida.map((x) => ponto(x, `r${nR - 1}`, s)),
-        ...trecho(subida.at(-1), `r${nR - 1}`, 'r0', s), ...[...subida].reverse().map((x) => ponto(x, 'r0', s))]),
+      volta: fechar([...trecho(subida[0], 'r0', cF, s), ...subida.slice(0, subida.length - kc).map((x) => ponto(x, cF, s)),
+        ...rsC.slice(0, -1).reverse().map((r, j) => ponto(r, colsC[kc - 1 - j], s)).slice(0), ...trecho(subida.at(-1), colsC[0], 'r0', s).slice(1), ...[...subida].reverse().map((x) => ponto(x, 'r0', s))]),
     });
   }
   portas.push({
