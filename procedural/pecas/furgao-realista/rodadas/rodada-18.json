@@ -1,0 +1,1105 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 18,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "bancoMotorista",
+        "tipo": "superficie",
+        "onde": "face de trás do encosto, perto de 2/3 da altura",
+        "sentido": "segmentado",
+        "evidencia": "isométrica do banco: duas faixas horizontais em relevo no encosto, que o alvo não pede"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "nervuras do teto, no trecho do teto plano",
+        "sentido": "anguloso",
+        "evidencia": "rasante tresquartos az0: as nervuras saem como fendas escuras profundas, não como relevo de um ou dois milímetros"
+      },
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "transição da coluna do para-brisa com a quina do teto, dos dois lados",
+        "sentido": "segmentado",
+        "evidencia": "curvatura frente: faixa azul cercada de vermelho em x≈90 e x≈740, y≈180 a 270; afundamento e ondulação onde a chapa devia ser contínua"
+      }
+    ],
+    "observacao": "Forma, proporção e partes conferem com a prancha nas vistas que abri; os achados são de superfície, e várias partes e vistas (rasantes, arame, raio X) ficaram sem abrir."
+  },
+  "partes": [
+    {
+      "nome": "grade",
+      "confere": true,
+      "observacao": "vão por contorno de 724 a 1060, lente recuada 18 mm e três barras, mas a aba falta em 44 mm de cada canto de baixo, atrás do para-choque (declarado parcial)"
+    },
+    {
+      "nome": "farolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "farolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piscaEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piscaDireito",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "bancada sem playwright no worktree e vistas:critica sem Blender; usei o rasterizador de vistas-de-passos em script de rascunho",
+    "rasterDaVista sem enquadre estoura a pilha na peça inteira (spread de arrays grandes)",
+    "a aba do friso não cobre os 44 mm dos cantos vivos de baixo da grade, e a guarda de moldura exigiu declarar parcial",
+    "quem conduz: os 3 defeitos do crítico são de rodadas anteriores (coluna, nervuras do teto, banco); a lataria atrás da frente saiu igual vértice por vértice, salvo a seta antiga do paralama",
+    "processo: o modelador pôs o nome do modelo no commit nas duas rodadas apesar do brief; nenhum gate confere a mensagem de commit; quem conduz a refez",
+    "processo: a bancada não roda no worktree do agente sem node_modules, e o link para o da raiz fica fora do que o servidor serve; o pacote saiu no checkout principal",
+    "crítico: nota 8 sem abrir todas as partes nem arame e raio X; quem conduz abriu a rasante e a curvatura da frente, sem ondulação em volta do farol e da grade"
+  ],
+  "notaDePassagem": "Base da grade 24 mm abaixo do topo do para-choque: a aba de baixo fica atrás da pele dele e a fresta com forro visível some. Lente recuada por transladar de 18 mm, dentro da aba de 20.",
+  "receita": {
+    "sha256": "sha256:df5d7258d891384a3c149c3afb98d62ba6637dc7a19331c6be7f7324ba9913ed",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 1668,
+      "acrescentadas": 134,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": " * Os arquivos. A receita passou do limiar da convenção de divisão (docs/modelar/banco-de-provas/navegacao-de-receitas-2026-11-05) e"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": " * se divide por assunto: aqui ficam a TABELA, `gerarPassos`, os contatos, os vãos, as ilhas, os pontos e o PLANO; a derivação mora em"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": " * `receita/`: `geometria.js` (as contas), `forma.js` (perfis e anéis), `plastico.js` (o plástico de baixo), `gaiola.js` (`derivar`),"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": " * `interior.js`, `rodas.js` e `nomes.js` (os nomes das partes). `npm run receita:mapa -- furgao-realista` dá a linha de cada trecho."
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "import { gaiolaVarrida } from '../../../nucleo/gaiola-varrida.js';"
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "import { m } from '.././receita/geometria.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "import { forma } from '.././receita/forma.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "import { derivar } from '.././receita/gaiola.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "import { contornoPorRetos, derivarFarois, derivarGrade } from '.././receita/farol.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "import { derivarInterior } from '.././receita/interior.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "import { BASE_DAS_RODAS, comBase, familias } from '.././receita/rodas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "import {"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, CRISTAIS, FAROIS, FORROS, LUZES, PISCAS, MOLDURAS, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "} from '.././receita/nomes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "export { forma } from '.././receita/forma.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "export { derivarPlastico } from '.././receita/plastico.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "export { derivar } from '.././receita/gaiola.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "export { derivarInterior } from '.././receita/interior.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "  // o forro dos arcos: a folga até o pneu, quanto ele passa da boca do arco para encostar na chapa, e o raio onde a parede de dentro acaba"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "  forro_folga: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  // o forro dos arcos: a folga do túnel até a banda do pneu, a da parede de dentro até a face de dentro do pneu, quanto ele passa da boca"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  // do arco para encostar na chapa, e o raio onde a parede de dentro acaba. As duas folgas eram uma só até 2026-11-05: separadas, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  // túnel sobe ou desce sem mexer na parede que encosta nos forros do piso."
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  forro_folga_tunel: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  forro_folga_parede: 25,"
+        },
+        {
+          "tipo": "-",
+          "linha": 208,
+          "texto": "  farol_base_y: 830, // os anéis de enchimento entre o vinco do para-choque (760) e a boca do capô (1100)"
+        },
+        {
+          "tipo": "-",
+          "linha": 209,
+          "texto": "  farol_topo_y: 1060, // o anel de enchimento em 1054,x"
+        },
+        {
+          "tipo": "+",
+          "linha": 229,
+          "texto": "  // Os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,"
+        },
+        {
+          "tipo": "+",
+          "linha": 230,
+          "texto": "  // em [x, y] mm na vista frontal, no lado esquerdo (+x; o direito o espelha): o farol é afinado, com a ponta de dentro descendo em diagonal"
+        },
+        {
+          "tipo": "+",
+          "linha": 231,
+          "texto": "  // até a grade e a de fora indo a x 980, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente."
+        },
+        {
+          "tipo": "+",
+          "linha": 232,
+          "texto": "  farol_perfil: [[460, 840], [985, 840], [985, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô"
+        },
+        {
+          "tipo": "+",
+          "linha": 233,
+          "texto": "  farol_raio: 40, // a concordância dos quatro cantos do farol"
+        },
+        {
+          "tipo": "+",
+          "linha": 234,
+          "texto": "  pisca_x_dentro: 890, // o pisca ocupa a ponta de fora do farol, de x 890 à borda dele"
+        },
+        {
+          "tipo": "+",
+          "linha": 235,
+          "texto": "  farol_recuo_lente: 3, // a lente do farol entra 3 mm no vão: a borda da chapa e a aba aparecem em volta dela"
+        },
+        {
+          "tipo": "+",
+          "linha": 236,
+          "texto": "  pisca_margem: 6, // o vão do pisca fica 6 mm dentro da borda do farol (3 além da lente), porque o vão não pode encostar na borda do sólido"
+        },
+        {
+          "tipo": "+",
+          "linha": 237,
+          "texto": "  pisca_recuo_lente: 0, // o pisca enche o vão aberto na lente do farol, e por isso encosta nela"
+        },
+        {
+          "tipo": "+",
+          "linha": 238,
+          "texto": "  // a grade (2026-11-05, conjunto 1 do esboço): também um vão pelo contorno, de x -420 a 420, do topo do para-choque (que sai da seção do para-choque, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 239,
+          "texto": "  // não de um número aqui) a grade_topo_y; os cantos de cima têm concordância e os de baixo ficam vivos no para-choque. O vão começa grade_embutido mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 240,
+          "texto": "  // abaixo do topo dele, por trás da pele do para-choque, para a aba de baixo ficar escondida e nenhuma fresta abrir entre os dois"
+        },
+        {
+          "tipo": "+",
+          "linha": 241,
+          "texto": "  grade_embutido: 24,"
+        },
+        {
+          "tipo": "+",
+          "linha": 242,
+          "texto": "  grade_meia_largura: 420,"
+        },
+        {
+          "tipo": "+",
+          "linha": 243,
+          "texto": "  grade_topo_y: 1060,"
+        },
+        {
+          "tipo": "+",
+          "linha": 244,
+          "texto": "  grade_raio_topo: 45,"
+        },
+        {
+          "tipo": "+",
+          "linha": 245,
+          "texto": "  grade_lente_recuo: 3, // a lente da grade entra 3 mm no vão, como a do farol"
+        },
+        {
+          "tipo": "+",
+          "linha": 246,
+          "texto": "  grade_recuo: 18, // a lente escura da grade recua 18 mm para dentro do vão, dentro da perna de 20 mm da aba"
+        },
+        {
+          "tipo": "+",
+          "linha": 247,
+          "texto": "  grade_barras_y: [850, 928, 1006], // as três barras horizontais"
+        },
+        {
+          "tipo": "+",
+          "linha": 248,
+          "texto": "  grade_barra_largura: 760,"
+        },
+        {
+          "tipo": "+",
+          "linha": 249,
+          "texto": "  grade_barra_altura: 28,"
+        },
+        {
+          "tipo": "+",
+          "linha": 250,
+          "texto": "  grade_barra_saliencia: 14, // quanto a barra sai da lente para a frente (sempre atrás da superfície da chapa)"
+        },
+        {
+          "tipo": "-",
+          "linha": 213,
+          "texto": "  seta_base_y: 900, // no paralama, entre o fim da quina da frente e o arco"
+        },
+        {
+          "tipo": "-",
+          "linha": 214,
+          "texto": "  seta_topo_y: 985, // o anel de enchimento em 976,x"
+        },
+        {
+          "tipo": "-",
+          "linha": 329,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "-",
+          "linha": 330,
+          "texto": "const grau = Math.PI / 180;"
+        },
+        {
+          "tipo": "-",
+          "linha": 331,
+          "texto": "const lerp = (a, b, t) => a + (b - a) * t;"
+        },
+        {
+          "tipo": "-",
+          "linha": 332,
+          "texto": "const suave = (t) => { const u = Math.min(1, Math.max(0, t)); return u * u * (3 - 2 * u); };"
+        },
+        {
+          "tipo": "-",
+          "linha": 333,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 334,
+          "texto": "/* ---------- curvas 2D em milímetro ---------- */"
+        },
+        {
+          "tipo": "-",
+          "linha": 335,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 336,
+          "texto": "/* A poligonal com o raio de cada canto ([u, v, raio?]) virada em polilinha densa: cada canto com raio vira arco tangente aos dois"
+        },
+        {
+          "tipo": "-",
+          "linha": 337,
+          "texto": "   trechos, amostrado a cada grau. O canto sem raio fica vivo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 338,
+          "texto": "function contornoComRaios(pts) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 339,
+          "texto": "  const saida = [[pts[0][0], pts[0][1]]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 340,
+          "texto": "  for (let i = 1; i < pts.length - 1; i += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 341,
+          "texto": "    const [px, py, r = 0] = pts[i];"
+        },
+        {
+          "tipo": "-",
+          "linha": 342,
+          "texto": "    const a = pts[i - 1]; const b = pts[i + 1];"
+        },
+        {
+          "tipo": "-",
+          "linha": 343,
+          "texto": "    const d1 = [px - a[0], py - a[1]]; const l1 = Math.hypot(...d1);"
+        },
+        {
+          "tipo": "-",
+          "linha": 344,
+          "texto": "    const d2 = [b[0] - px, b[1] - py]; const l2 = Math.hypot(...d2);"
+        },
+        {
+          "tipo": "-",
+          "linha": 345,
+          "texto": "    const u1 = [d1[0] / l1, d1[1] / l1]; const u2 = [d2[0] / l2, d2[1] / l2];"
+        },
+        {
+          "tipo": "-",
+          "linha": 346,
+          "texto": "    const giro = Math.atan2(u1[0] * u2[1] - u1[1] * u2[0], u1[0] * u2[0] + u1[1] * u2[1]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 347,
+          "texto": "    if (!r || Math.abs(giro) < 1e-9) { saida.push([px, py]); continue; }"
+        },
+        {
+          "tipo": "-",
+          "linha": 348,
+          "texto": "    const t = r * Math.tan(Math.abs(giro) / 2);"
+        },
+        {
+          "tipo": "-",
+          "linha": 349,
+          "texto": "    if (t > l1 / 2 + 1e-6 || t > l2 / 2 + 1e-6) throw new Error(`furgao-realista: o raio ${r} no canto [${px}, ${py}] não cabe entre os vizinhos`);"
+        },
+        {
+          "tipo": "-",
+          "linha": 350,
+          "texto": "    const t1 = [px - u1[0] * t, py - u1[1] * t];"
+        },
+        {
+          "tipo": "-",
+          "linha": 351,
+          "texto": "    const sinal = Math.sign(giro);"
+        },
+        {
+          "tipo": "-",
+          "linha": 352,
+          "texto": "    const n = [-u1[1] * sinal, u1[0] * sinal];"
+        },
+        {
+          "tipo": "-",
+          "linha": 353,
+          "texto": "    const c = [t1[0] + n[0] * r, t1[1] + n[1] * r];"
+        },
+        {
+          "tipo": "-",
+          "linha": 354,
+          "texto": "    const a0 = Math.atan2(t1[1] - c[1], t1[0] - c[0]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 355,
+          "texto": "    const passos = Math.max(2, Math.ceil(Math.abs(giro) / grau));"
+        },
+        {
+          "tipo": "-",
+          "linha": 356,
+          "texto": "    for (let k = 0; k <= passos; k += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 357,
+          "texto": "      const ang = a0 + (giro * k) / passos;"
+        },
+        {
+          "tipo": "-",
+          "linha": 358,
+          "texto": "      saida.push([c[0] + r * Math.cos(ang), c[1] + r * Math.sin(ang)]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 359,
+          "texto": "    }"
+        },
+        {
+          "tipo": "-",
+          "linha": 360,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 361,
+          "texto": "  saida.push([pts.at(-1)[0], pts.at(-1)[1]]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 362,
+          "texto": "  return saida;"
+        },
+        {
+          "tipo": "-",
+          "linha": 363,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 364,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 365,
+          "texto": "/* O comprimento acumulado de uma polilinha. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 366,
+          "texto": "function acumulado(pl) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 367,
+          "texto": "  const s = [0];"
+        },
+        {
+          "tipo": "-",
+          "linha": 368,
+          "texto": "  for (let i = 1; i < pl.length; i += 1) s.push(s[i - 1] + Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][1] - pl[i - 1][1]));"
+        },
+        {
+          "tipo": "-",
+          "linha": 369,
+          "texto": "  return s;"
+        },
+        {
+          "tipo": "-",
+          "linha": 370,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 371,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 372,
+          "texto": "/* O ponto da polilinha à distância `d` do começo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 373,
+          "texto": "function pontoNaDistancia(pl, s, d) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 374,
+          "texto": "  let i = 1;"
+        },
+        {
+          "tipo": "-",
+          "linha": 375,
+          "texto": "  while (i < pl.length - 1 && s[i] < d) i += 1;"
+        },
+        {
+          "tipo": "-",
+          "linha": 376,
+          "texto": "  const t = s[i] === s[i - 1] ? 0 : Math.min(1, Math.max(0, (d - s[i - 1]) / (s[i] - s[i - 1])));"
+        },
+        {
+          "tipo": "-",
+          "linha": 377,
+          "texto": "  return [lerp(pl[i - 1][0], pl[i][0], t), lerp(pl[i - 1][1], pl[i][1], t)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 378,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 379,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 380,
+          "texto": "/* O u da polilinha na altura v, pelo primeiro trecho que a atravessa (a polilinha sobe em v). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 381,
+          "texto": "function uNaAltura(pl, v) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 382,
+          "texto": "  for (let i = 1; i < pl.length; i += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 383,
+          "texto": "    const [u0, v0] = pl[i - 1]; const [u1, v1] = pl[i];"
+        },
+        {
+          "tipo": "-",
+          "linha": 384,
+          "texto": "    if ((v - v0) * (v - v1) <= 0 && v1 !== v0) return lerp(u0, u1, (v - v0) / (v1 - v0));"
+        },
+        {
+          "tipo": "-",
+          "linha": 385,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 386,
+          "texto": "  throw new Error(`furgao-realista: o perfil não chega à altura ${v}`);"
+        },
+        {
+          "tipo": "-",
+          "linha": 387,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 388,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 389,
+          "texto": "/* O trecho da polilinha entre as alturas v0 e v1 (sobe em v), cortado nelas. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 390,
+          "texto": "function trechoEntre(pl, v0, v1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 391,
+          "texto": "  const saida = [[uNaAltura(pl, v0), v0]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 392,
+          "texto": "  for (const p of pl) if (p[1] > v0 + 1e-9 && p[1] < v1 - 1e-9) saida.push(p);"
+        },
+        {
+          "tipo": "-",
+          "linha": 393,
+          "texto": "  return saida;"
+        },
+        {
+          "tipo": "-",
+          "linha": 394,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 395,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 396,
+          "texto": "/* O trecho da polilinha a partir do primeiro ponto em que ela atinge a altura v (o resto, até o fim). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 397,
+          "texto": "function aPartirDe(pl, v) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 398,
+          "texto": "  const s = acumulado(pl);"
+        },
+        {
+          "tipo": "-",
+          "linha": 399,
+          "texto": "  for (let i = 1; i < pl.length; i += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 400,
+          "texto": "    const [u0, v0] = pl[i - 1]; const [u1, v1] = pl[i];"
+        },
+        {
+          "tipo": "-",
+          "linha": 401,
+          "texto": "    if ((v - v0) * (v - v1) <= 0 && v1 !== v0) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 402,
+          "texto": "      const p = [lerp(u0, u1, (v - v0) / (v1 - v0)), v];"
+        },
+        {
+          "tipo": "-",
+          "linha": 403,
+          "texto": "      return { pl: [p, ...pl.slice(i)], s0: s[i - 1] + Math.hypot(p[0] - u0, p[1] - v0) };"
+        },
+        {
+          "tipo": "-",
+          "linha": 404,
+          "texto": "    }"
+        },
+        {
+          "tipo": "-",
+          "linha": 405,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 406,
+          "texto": "  throw new Error(`furgao-realista: o perfil não chega à altura ${v}`);"
+        },
+        {
+          "tipo": "-",
+          "linha": 407,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 408,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 409,
+          "texto": "/* As alturas em que o perfil pede anel: a cada `passo` de arco ou a cada `giroMax` graus de giro, o que vier antes. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 410,
+          "texto": "function alturasDoPerfil(polilinha, passo, giroMax) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 411,
+          "texto": "  /* os trechos retos longos (o capô, o para-brisa) se dividem antes, para o passo de arco valer dentro deles */"
+        },
+        {
+          "tipo": "-",
+          "linha": 412,
+          "texto": "  const pl = [polilinha[0]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 413,
+          "texto": "  for (let i = 1; i < polilinha.length; i += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 414,
+          "texto": "    const [a, b] = [polilinha[i - 1], polilinha[i]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 415,
+          "texto": "    const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / (passo / 8)));"
+        },
+        {
+          "tipo": "-",
+          "linha": 416,
+          "texto": "    for (let k = 1; k <= n; k += 1) pl.push([lerp(a[0], b[0], k / n), lerp(a[1], b[1], k / n)]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 417,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 418,
+          "texto": "  const alturas = [pl[0][1]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 419,
+          "texto": "  let arco = 0; let giro = 0;"
+        },
+        {
+          "tipo": "-",
+          "linha": 420,
+          "texto": "  for (let i = 1; i < pl.length; i += 1) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 421,
+          "texto": "    arco += Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][1] - pl[i - 1][1]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 422,
+          "texto": "    if (i + 1 < pl.length) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 423,
+          "texto": "      const a = Math.atan2(pl[i][1] - pl[i - 1][1], pl[i][0] - pl[i - 1][0]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 424,
+          "texto": "      const b = Math.atan2(pl[i + 1][1] - pl[i][1], pl[i + 1][0] - pl[i][0]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 425,
+          "texto": "      let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;"
+        },
+        {
+          "tipo": "-",
+          "linha": 426,
+          "texto": "      giro += Math.abs(d) / grau;"
+        },
+        {
+          "tipo": "-",
+          "linha": 427,
+          "texto": "    }"
+        },
+        {
+          "tipo": "-",
+          "linha": 428,
+          "texto": "    if (arco >= passo || giro >= giroMax) { alturas.push(pl[i][1]); arco = 0; giro = 0; }"
+        },
+        {
+          "tipo": "-",
+          "linha": 429,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 430,
+          "texto": "  return alturas;"
+        },
+        {
+          "tipo": "-",
+          "linha": 431,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 432,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 433,
+          "texto": "/* Pontos igualmente espaçados entre a e b, sem as pontas, com passo de no máximo `passo`. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 434,
+          "texto": "function entre(a, b, passo) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 435,
+          "texto": "  const n = Math.max(1, Math.ceil(Math.abs(b - a) / passo - 1e-9));"
+        },
+        {
+          "tipo": "-",
+          "linha": 436,
+          "texto": "  return Array.from({ length: n - 1 }, (_, k) => lerp(a, b, (k + 1) / n));"
+        },
+        {
+          "tipo": "-",
+          "linha": 437,
+          "texto": "}"
+        },
+        {
+          "tipo": "-",
+          "linha": 438,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 439,
+          "texto": "/* ---------- a forma, em milímetro ---------- */"
+        },
+        {
+          "tipo": "-",
+          "linha": 440,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 441,
+          "texto": "/** Os perfis, as funções de fatia e as medidas derivadas, tudo da TABELA. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 442,
+          "texto": "export function forma(T) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 443,
+          "texto": "  const zFrente = T.comprimento / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 444,
+          "texto": "  const zTras = -T.comprimento / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 445,
+          "texto": "  const xMax = T.meia_largura;"
+        },
+        {
+          "tipo": "-",
+          "linha": 446,
+          "texto": "  const ys = T.soleira_y;"
+        },
+        {
+          "tipo": "-",
+          "linha": 447,
+          "texto": "  const zD = zFrente - T.balanco_dianteiro;"
+        },
+        {
+          "tipo": "-",
+          "linha": 448,
+          "texto": "  const zT = zD - T.entre_eixos;"
+        },
+        {
+          "tipo": "-",
+          "linha": 449,
+          "texto": "  const rPneu = T.pneu_diametro / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 450,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 451,
+          "texto": "  /* perfil da frente, [z, y], do pé do nariz ao teto */"
+        },
+        {
+          "tipo": "-",
+          "linha": 452,
+          "texto": "  const baseVidro = [zFrente - T.base_vidro_recuo, T.base_vidro_y];"
+        },
+        {
+          "tipo": "-",
+          "linha": 453,
+          "texto": "  const boca = [baseVidro[0] + T.capo_comprimento, T.boca_y];"
+        },
+        {
+          "tipo": "-",
+          "linha": 454,
+          "texto": "  const topoVidro = [baseVidro[0] - (T.topo_vidro_y - baseVidro[1]) / Math.tan(T.para_brisa_angulo * grau), T.topo_vidro_y];"
+        },
+        {
+          "tipo": "-",
+          "linha": 455,
+          "texto": "  const anguloCapo = Math.atan2(baseVidro[1] - boca[1], boca[0] - baseVidro[0]) / grau;"
+        },
+        {
+          "tipo": "-",
+          "linha": 456,
+          "texto": "  const frenteDensa = contornoComRaios(["
+        },
+        {
+          "tipo": "-",
+          "linha": 457,
+          "texto": "    [zFrente - 4 * T.raio_nariz_base, ys], [zFrente, ys, T.raio_nariz_base], [zFrente, T.parachoque_topo_y, T.raio_parachoque_topo],"
+        },
+        {
+          "tipo": "-",
+          "linha": 458,
+          "texto": "    [zFrente - T.degrau_frente_recuo, T.degrau_frente_y, T.raio_degrau_frente], [...boca, T.raio_boca], [...baseVidro, T.raio_base_vidro],"
+        },
+        {
+          "tipo": "-",
+          "linha": 459,
+          "texto": "    [...topoVidro],"
+        },
+        {
+          "tipo": "-",
+          "linha": 460,
+          "texto": "  ]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 461,
+          "texto": "  /* o perfil começa no pé do raio do nariz (o trecho reto da soleira fica de fora) */"
+        },
+        {
+          "tipo": "-",
+          "linha": 462,
+          "texto": "  const frenteAteVidro = frenteDensa.slice(frenteDensa.findIndex((p) => p[0] > zFrente - T.raio_nariz_base - 1e-6));"
+        },
+        {
+          "tipo": "-",
+          "linha": 463,
+          "texto": "  /* A curva do teto sobre o para-brisa: dois arcos tangentes, o de raio_arco_vidro saindo do para-brisa no topo do vidro e o de"
+        },
+        {
+          "tipo": "-",
+          "linha": 464,
+          "texto": "     raio_arco_testa chegando ao teto plano, que somam os 55 graus do para-brisa. O filete não desenha dois raios emendados, então os"
+        },
+        {
+          "tipo": "-",
+          "linha": 465,
+          "texto": "     arcos são calculados aqui: o ângulo da emenda sai da subida que falta até o teto. Uma direção é o ângulo do trecho, de 0 (para a"
+        },
+        {
+          "tipo": "-",
+          "linha": 466,
+          "texto": "     frente) a 180 graus (para trás); no para-brisa ela é 180 menos o ângulo do vidro. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 467,
+          "texto": "  const dirVidro = Math.PI - T.para_brisa_angulo * grau;"
+        },
+        {
+          "tipo": "-",
+          "linha": 468,
+          "texto": "  const cosEmenda = ((T.altura - T.topo_vidro_y) - T.raio_arco_testa - T.raio_arco_vidro * Math.cos(dirVidro)) / (T.raio_arco_testa - T.raio_arco_vidro);"
+        },
+        {
+          "tipo": "-",
+          "linha": 469,
+          "texto": "  if (!(Math.abs(cosEmenda) <= 1)) throw new Error('furgao-realista: os dois raios da curva do teto não fecham a subida até o teto');"
+        },
+        {
+          "tipo": "-",
+          "linha": 470,
+          "texto": "  const dirEmenda = Math.acos(cosEmenda);"
+        },
+        {
+          "tipo": "-",
+          "linha": 471,
+          "texto": "  if (dirEmenda <= dirVidro || dirEmenda >= Math.PI) throw new Error('furgao-realista: a emenda dos dois raios da curva do teto sai fora da curva');"
+        },
+        {
+          "tipo": "-",
+          "linha": 472,
+          "texto": "  const arcoTangente = (inicio, r, a, b) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 473,
+          "texto": "    const n = Math.max(2, Math.ceil(Math.abs(b - a) / grau));"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
