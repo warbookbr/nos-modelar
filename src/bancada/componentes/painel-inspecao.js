@@ -5,6 +5,7 @@
  * montado pela imagem na cena no contêiner dela, e a aba Anotações é `aba-anotacoes.js`. */
 import { formatarNome } from '../formatar.js';
 import { montarRecolher } from './painel-componentes.js';
+import { montarControleDeCorte } from './controle-de-corte.js';
 
 export const TITULO_DO_WIREFRAME = Object.freeze({
   /* O "Wireframe" da Inspeção é o raio X só da seleção; com a peça inteira
@@ -98,6 +99,8 @@ export function montarPainelInspecao({ elementos, estado, acoes, aoRecolher, aoE
   btnJuntas?.addEventListener('click', () => acoes.alternarModoJuntas());
   prefGrade?.addEventListener('change', () => acoes.aplicarPreferenciasCena({ grade: prefGrade.checked }));
   prefChao?.addEventListener('change', () => acoes.aplicarPreferenciasCena({ chao: prefChao.checked }));
+  /* A vista de corte nasce depois do controle de opacidade; sem a ação (um teste, uma página sem ela) o controle não aparece. */
+  montarControleDeCorte({ ancora: opacidadeSelecao.closest('label') ?? opacidadeSelecao, acoes });
   montarRecolher(recolher, { aoRecolher });
 
   /* A visão em vigor chega pela barra das vistas, que a reflete junto com o

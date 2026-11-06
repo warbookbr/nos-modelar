@@ -9,6 +9,7 @@ import {
 } from './estado-bancada.js';
 import { nomesDaSubarvore } from '../autoria/hierarquia-partes.js';
 import { hslDeAuditoria } from '../autoria/cor-de-auditoria.js';
+import { OPACIDADE_DO_CORTE, normalizarCorte } from '../autoria/corte-de-plano.js';
 
 const VERDE_DESTAQUE = new THREE.Color('#35c98a');
 
@@ -33,13 +34,15 @@ export function corDeAuditoria(indice) {
 function materiaisDoGrupo(grupo) {
   const materiais = [];
   grupo.traverse((objeto) => {
-    if (!objeto.isMesh) return;
+    if (!objeto.isMesh || objeto.name === NOME_DA_CAMADA_DE_CORTE) return;
     for (const material of Array.isArray(objeto.material) ? objeto.material : [objeto.material]) {
       if (material && !materiais.includes(material)) materiais.push(material);
     }
   });
   return materiais;
 }
+
+const NOME_DA_CAMADA_DE_CORTE = '__corte_translucido__';
 
 function guardarMaterial(material) {
   if (material.userData.estadoBancada) return;
@@ -157,6 +160,60 @@ export function sincronizarArame(grupo, ligado) {
   });
 }
 
+/* A VISTA DE CORTE. Cada malha recebe, no material original, o recorte do lado normal do plano (`clippingPlanes`), e ganha
+   uma malha-filha de mesma geometria, com cópia do material, recortada no lado oposto e desenhada translúcida e sem
+   escrever profundidade: o que fica atrás do plano de corte continua à vista através dela. O plano é dado no
+   referencial da peça e levado ao do mundo pela matriz da raiz. */
+function planosDoCorte(raiz, corte) {
+  raiz.updateWorldMatrix(true, false);
+  const normal = new THREE.Vector3(corte.eixo === 'x' ? 1 : 0, corte.eixo === 'y' ? 1 : 0, corte.eixo === 'z' ? 1 : 0);
+  const ponto = normal.clone().multiplyScalar(corte.posicao);
+  const doLadoMais = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, ponto).applyMatrix4(raiz.matrixWorld);
+  const doLadoMenos = new THREE.Plane().setFromNormalAndCoplanarPoint(normal.clone().negate(), ponto).applyMatrix4(raiz.matrixWorld);
+  /* O recorte descarta o que fica do lado negativo do plano; o translúcido guarda o lado pedido, o normal guarda o outro. */
+  return corte.lado === 'mais'
+    ? { translucido: [doLadoMais], normal: [doLadoMenos] }
+    : { translucido: [doLadoMenos], normal: [doLadoMais] };
+}
+
+export function sincronizarCorte(grupo, raiz, corte) {
+  const planos = corte ? planosDoCorte(raiz, corte) : null;
+  const fantasmas = [];
+  const malhas = [];
+  grupo.traverse((objeto) => {
+    if (!objeto.isMesh) return;
+    if (objeto.name === NOME_DA_CAMADA_DE_CORTE) fantasmas.push(objeto);
+    else malhas.push(objeto);
+  });
+  for (const fantasma of fantasmas) {
+    fantasma.removeFromParent();
+    for (const material of Array.isArray(fantasma.material) ? fantasma.material : [fantasma.material]) material.dispose();
+  }
+  for (const malha of malhas) {
+    const materiais = Array.isArray(malha.material) ? malha.material : [malha.material];
+    for (const material of materiais) {
+      if (!material) continue;
+      const mudou = Boolean(material.clippingPlanes) !== Boolean(planos);
+      material.clippingPlanes = planos ? planos.normal : null;
+      if (mudou) material.needsUpdate = true;
+    }
+    if (!planos) continue;
+    const copias = materiais.map((material) => {
+      const copia = material.clone();
+      copia.clippingPlanes = planos.translucido;
+      copia.transparent = true;
+      copia.opacity = OPACIDADE_DO_CORTE;
+      copia.depthWrite = false;
+      return copia;
+    });
+    const fantasma = new THREE.Mesh(malha.geometry, Array.isArray(malha.material) ? copias : copias[0]);
+    fantasma.name = NOME_DA_CAMADA_DE_CORTE;
+    fantasma.raycast = () => {};
+    fantasma.renderOrder = 1;
+    malha.add(fantasma);
+  }
+}
+
 function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = false, apresentacaoSelecao = null, semTinta = false) {
   restaurarMaterial(material);
   if (arame === 'raio-x') {
@@ -218,6 +275,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
   let coresPorParte = false;
   let arame = false;
   let auditoria = false;
+  let corte = null;
   let wireframeSelecao = false;
   let opacidadeSelecao = 1;
   /* As partes que a pessoa escondeu uma a uma pela árvore. Ficam fora da cena em
@@ -294,6 +352,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       for (const material of materiaisDoGrupo(grupo)) {
         aplicarEstadoMaterial(material, visual, cor, arameDaParte, apresentacaoSelecao, auditoria || !tintaDaSelecao);
       }
+      sincronizarCorte(grupo, raiz, corte);
     }
     aoMudar?.(estado());
   }
@@ -411,6 +470,14 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       arame = ligado === 'raio-x' ? 'raio-x' : Boolean(ligado);
       aplicarVisual();
       return arame;
+    },
+    /** O corte em vigor (`{ eixo, posicao, lado }`, posição em mm do referencial da peça) ou `null`. */
+    get corte() { return corte ? { ...corte } : null; },
+    /** Liga o corte ou, com `null`, o desliga; pedido inválido lança. */
+    definirCorte(novo) {
+      corte = normalizarCorte(novo);
+      aplicarVisual();
+      return this.corte;
     },
     definirWireframeSelecao(ligado) {
       wireframeSelecao = Boolean(ligado);

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1672 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1675 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1692,6 +1692,7 @@
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.
 - `cor-de-auditoria.js` — cor-de-auditoria.js — a paleta da auditoria visual, e a conferência dela.
 - `cor-de-auditoria.test.mjs` — A paleta da auditoria e a conferência dela.
+- `corte-de-plano.js` — corte-de-plano.js — a vista de corte da bancada: um plano perpendicular a um eixo (x, y ou z), numa posição em milímetro do referencial da peça. O lado escol…
 - `curvatura-da-lataria.js` — curvatura-da-lataria.js — a curvatura média da lataria por vértice, a escala e a cor dela, e a faixa junto dos vincos declarados, sobre uma malha de triângul…
 - `curvatura-da-lataria.test.mjs` — curvatura-da-lataria.test.mjs — a curvatura média da lataria em JavaScript (curvatura-da-lataria.js) contra a do Blender.
 - `derivar-catalogo-montagens.js` — derivar-catalogo-montagens.js — índice determinístico limitado às raízes dadas.
@@ -1841,6 +1842,8 @@
 - `cartao-da-selecao.test.js` — cartao-da-selecao.test.js — o cartão aparece com a seleção e some na edição e com os detalhes abertos, mostra nome e medidas, marca os modos, chama as ações …
 - `ciclo-da-pagina.js` — ciclo-da-pagina.js — o relógio de quadros da bancada e a saída da página: o que acompanha a câmera a cada quadro e o que se desmonta quando a página sai.
 - `ciclo-da-pagina.test.js` — ciclo-da-pagina.test.js — o relógio roda a função já na montagem e de novo a cada quadro até parar, e a saída da página roda uma vez só.
+- `controle-de-corte.js` — controle-de-corte.js — o controle da vista de corte na aba Inspeção: o eixo, a posição em milímetro e o lado que fica translúcido.
+- `controle-de-corte.test.js` — controle-de-corte.test.js — o controle da vista de corte chama a ação com eixo, posição e lado, desliga com "Sem corte" e mostra a recusa.
 - `cubo-de-orientacao.js` — cubo-de-orientacao.js — o cubo de orientação do tema Foco, no lugar das nove vistas em botão: gira com a câmera e cada face leva à vista dela.
 - `cubo-de-orientacao.test.js` — cubo-de-orientacao.test.js — o giro do cubo é o da câmera com o y da página trocado, a face que a câmera olha fica de frente para quem vê, e o cubo gira a ca…
 - `dom-de-teste.js` — dom-de-teste.js — uma página falsa, mínima, para os testes dos componentes da bancada rodarem no Node sem navegador.

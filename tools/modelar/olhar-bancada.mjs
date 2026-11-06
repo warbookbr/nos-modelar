@@ -16,6 +16,7 @@ import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
 import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
+import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/corte-de-plano.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { analisarPeca } from './analise-da-peca.mjs';
@@ -329,6 +330,8 @@ export async function olharBancada({
   auditoria = false,
   coresPorParte = false,
   arame = false,
+  /* A vista de corte: `{ eixo, posicao, lado }` (posição em mm do referencial da peça); o lado fica translúcido. */
+  corte: corteDeclarado = null,
   capturarEmMemoria = false,
   timeoutMs = null,
   /* O prazo de cada etapa da carga da página (abrir, ponte, modelo), por tentativa. */
@@ -437,6 +440,12 @@ export async function olharBancada({
        quando a ponte existe — imagem com cromo é pior, não é rodada quebrada. */
     const auditoriaEfetiva = Boolean(auditoria || revisar);
     if (focar && !selecionadas.length) erroDeUso('--focar exige --selecionadas');
+    let corte = null;
+    if (corteDeclarado) {
+      try { corte = normalizarCorte(corteDeclarado); } catch (erro) { erroDeUso(erro.message); }
+      if (arame) erroDeUso('--corte não se mistura com --arame, --wireframe ou --raio-x: o corte já usa a transparência para mostrar o que fica atrás.');
+      if (par) erroDeUso('--corte não se mistura com --par: a inspeção de par escolhe a vista e o foco por conta própria.');
+    }
     for (const vista of vistas) {
       if (vista !== 'inspecao-par' && !VISTAS_VALIDAS.includes(vista)) {
         erroDeUso(`vista '${vista}' não existe. Use: ${VISTAS_VALIDAS.join(', ')}`);
@@ -497,6 +506,7 @@ export async function olharBancada({
       par ? 'par' : null,
       focar ? 'focado' : null,
       arame === 'raio-x' ? 'raio-x' : (arame ? 'arame' : null),
+      corte ? `corte-${corte.eixo}${corte.posicao}-${corte.lado}` : null,
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
     if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
@@ -567,7 +577,7 @@ export async function olharBancada({
        não troca. Com `compartilhada`, uma chamada que terminou bem deixa a página aberta, e a próxima da mesma peça, do mesmo quadro,
        da mesma projeção e da mesma explosão reaplica a auditoria, a seleção e o modo pela ponte, como a primeira já fazia por cima
        da URL, e refaz o enquadramento. Qualquer outra diferença abre página nova. */
-    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar;
+    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte;
     const chaveDaPagina = JSON.stringify({ peca, sessao: sessaoDaCaptura, largura, altura, projecao, explosao });
     chaveDaPaginaDaChamada = chaveDaPagina;
     reaproveitavelDaChamada = reaproveitavel;
@@ -791,6 +801,8 @@ export async function olharBancada({
           await page.evaluate(() => window.__mecanificaBancada.focar());
         }
       }
+      /* O corte vale para todas as vistas da chamada: liga na primeira, pela ponte, e a cena o mantém. */
+      if (corte && indice === 0) await page.evaluate((pedido) => window.__mecanificaBancada.corte(pedido), corte);
       /* AUDITORIA depois de escolher a vista e antes de esperar o quadro: o modo
          mexe no tamanho do canvas (o cromo sai e o desenho ocupa tudo), e mudar
          isso depois da espera capturaria o quadro do layout velho. */
@@ -1061,7 +1073,7 @@ export async function olharBancada({
 
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
-export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes'];
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado'];
 export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
@@ -1074,6 +1086,8 @@ Captura a peça ou montagem na bancada, sem interface.
   --arame | --wireframe  malha opaca sobre a peça (sem raio X e sem sombra da malha de trás)
   --raio-x               malha transparente, com o que fica atrás à vista
   --cores                uma cor por parte
+  --corte=<x|y|z>:<mm>   vista de corte: um plano perpendicular ao eixo, na posição em mm do referencial da peça (ex.: z:0); um lado fica translúcido (opacidade 0,15) e o outro, normal e inteiro
+  --corte-lado=<mais|menos>  com --corte: o lado do eixo que fica translúcido (padrão mais); não se mistura com --arame, --raio-x, --par nem --analise
   --selecionadas=<a,b>   partes selecionadas; com --modo e --focar
   --modo=<${MODOS.join('|')}>  com --selecionadas: todas, a seleção no contexto, ou só ela
   --focar                enquadra a câmera nas selecionadas
@@ -1095,7 +1109,7 @@ Captura a peça ou montagem na bancada, sem interface.
 Detalhe e leitura das imagens: docs/modelar/usar/PARE-E-ANALISE.md
 `;
 
-function comoCLI(argv) {
+export function comoCLI(argv) {
   if (argv.includes('--ajuda') || argv.includes('--help') || argv.includes('-h')) {
     return Promise.resolve({ ok: true, codigo: 0, stdout: AJUDA, stderr: '' });
   }
@@ -1114,6 +1128,22 @@ function comoCLI(argv) {
      mostra a malha da superfície que se vê, o raio X o que está escondido. */
   const arame = lido.bandeira('raio-x') ? 'raio-x' : (lido.bandeira('arame') || lido.bandeira('wireframe'));
   const tela = lido.bandeira('tela');
+  const textoDoCorte = lido.opcao('corte');
+  const textoDoLado = lido.opcao('corte-lado');
+  let corte = null;
+  try {
+    if (textoDoLado !== undefined && textoDoLado !== null && (textoDoCorte === undefined || textoDoCorte === null)) {
+      throw new Error('--corte-lado só vale junto de --corte.');
+    }
+    if (textoDoCorte !== undefined && textoDoCorte !== null) {
+      corte = { ...lerCorte(textoDoCorte), lado: lerLadoDoCorte(textoDoLado) };
+      if (lido.bandeira('analise')) throw new Error('--corte não se mistura com --analise: a análise tira as próprias vistas.');
+      if (arame) throw new Error('--corte não se mistura com --arame, --wireframe ou --raio-x: o corte já usa a transparência para mostrar o que fica atrás.');
+      if (lido.opcao('par')) throw new Error('--corte não se mistura com --par: a inspeção de par escolhe a vista e o foco por conta própria.');
+    }
+  } catch (erro) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
+  }
   /* `--analise`: o passo "Pare e analise" (docs/modelar/usar/PARE-E-ANALISE.md). */
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
@@ -1151,6 +1181,7 @@ function comoCLI(argv) {
     auditoria: !tela,
     coresPorParte: lido.bandeira('cores'),
     arame,
+    corte,
   });
 }
 

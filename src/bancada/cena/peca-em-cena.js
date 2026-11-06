@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { caixaDoVisivel, posicionarNoEstudio } from '../criar-ambiente.js';
 import { criarControladorPartes } from '../controlar-partes.js';
+import { normalizarCorte } from '../../autoria/corte-de-plano.js';
 import { criarSelecaoBancada } from '../criar-selecao.js';
 import { alvosDeEnquadramento, escreverEstadoNaUrl, lerEstadoDaUrl } from '../estado-bancada.js';
 import { formatarNome } from '../formatar.js';
@@ -45,6 +46,8 @@ export function criarPecaEmCena({
      tema desliga quando marca a seleção pelo contorno. */
   let ocultas = [];
   let tintaDaSelecao = true;
+  /* O corte pedido segue a peça: o controlador é refeito a cada modelo, e o plano é do referencial da peça. */
+  let corte = null;
 
   /** O tamanho e as faces de `grupos`, nas unidades da peça (metros), sem a escala que a pôs no estúdio. */
   function medidasDe(grupos) {
@@ -349,6 +352,7 @@ export function criarPecaEmCena({
     if (!deAjuste) ocultas = [];
     if (ocultas.length) ocultas = controlador.definirOcultas(ocultas);
     if (!tintaDaSelecao) controlador.definirTintaDaSelecao(false);
+    if (corte) controlador.definirCorte(corte);
     estado.definir({ ocultas });
 
     estado.definir({ temHierarquia: controlador.temHierarquia() });
@@ -421,6 +425,12 @@ export function criarPecaEmCena({
     definirTintaDaSelecao(ligada) {
       tintaDaSelecao = Boolean(ligada);
       controlador?.definirTintaDaSelecao(tintaDaSelecao);
+    },
+    get corte() { return corte ? { ...corte } : null; },
+    definirCorte(novo) {
+      corte = normalizarCorte(novo);
+      controlador?.definirCorte(corte);
+      return corte ? { ...corte } : null;
     },
     caixaDaSelecaoNaTela,
     medidasDaSelecao: () => (controlador ? medidasDe(controlador.gruposSelecionados()) : null),

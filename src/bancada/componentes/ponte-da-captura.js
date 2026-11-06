@@ -8,7 +8,7 @@ export const CHAVES_DA_PONTE = Object.freeze([
   'ready', 'peca', 'pecasDisponiveis', 'nomePeca', 'carregado', 'partes', 'estatisticas', 'imagemReferencia',
   'diagnosticos', 'portas', 'selecaoIgnorada', 'controlador', 'ambiente', 'edicaoDeMalha', 'edicaoDeMalhaDesenhaMalha',
   'sincronizador', 'selecionar', 'modo', 'vista', 'projecao', 'explosao', 'focar', 'focarContato', 'inspecionarPar',
-  'enquadrar', 'enquadramento', 'auditoria', 'semAuditoria', 'carregarPayloadSessao', 'estado', 'marcadoresDePar', 'url',
+  'enquadrar', 'enquadramento', 'auditoria', 'semAuditoria', 'corte', 'carregarPayloadSessao', 'estado', 'marcadoresDePar', 'url',
 ]);
 
 export function criarPonteDaCaptura({
@@ -104,6 +104,9 @@ export function criarPonteDaCaptura({
       ambiente.redimensionar?.();
       return { auditoria: false };
     },
+    /* A vista de corte: `{ eixo, posicao, lado }` liga, `null` desliga, sem argumento só lê. O lado (`mais` ou `menos` do eixo)
+       fica translúcido e o outro lado, normal. Devolve o corte em vigor; pedido inválido lança. */
+    corte: (pedido) => (pedido === undefined ? cena.corte : cena.definirCorte(pedido)),
     carregarPayloadSessao: (payload) => sincronizador.definirPayload(payload),
     estado: () => ({
       peca: estado.obter('nomePeca'),

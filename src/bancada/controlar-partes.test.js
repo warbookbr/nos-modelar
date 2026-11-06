@@ -179,3 +179,68 @@ describe('arame opaco', () => {
     expect(malha.children).toHaveLength(0);
   });
 });
+
+describe('vista de corte', () => {
+  function montar() {
+    const raiz = new THREE.Group();
+    raiz.scale.setScalar(0.01);
+    raiz.position.set(5, 0, 0);
+    raiz.updateMatrixWorld(true);
+    const grupo = new THREE.Group();
+    grupo.userData.identidadeParte = 'caixa';
+    const malha = new THREE.Mesh(new THREE.BoxGeometry(100, 100, 100), new THREE.MeshStandardMaterial());
+    grupo.add(malha);
+    raiz.add(grupo);
+    const controlador = criarControladorPartes({ raiz, partes: new Map([['caixa', grupo]]) });
+    const fantasmas = () => malha.children.filter((filho) => filho.name === '__corte_translucido__');
+    /* um ponto do referencial da peça, levado ao mundo como a bancada o desenha */
+    const mundo = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(raiz.matrixWorld);
+    const mantido = (planos, ponto) => planos.every((plano) => plano.distanceToPoint(ponto) >= 0);
+    return { controlador, malha, fantasmas, mundo, mantido };
+  }
+
+  it('o lado escolhido vira malha translúcida e o outro fica normal, no referencial da peça (mm)', () => {
+    const { controlador, malha, fantasmas, mundo, mantido } = montar();
+    expect(controlador.definirCorte({ eixo: 'z', posicao: 20, lado: 'mais' })).toEqual({ eixo: 'z', posicao: 20, lado: 'mais' });
+    expect(fantasmas()).toHaveLength(1);
+    const [fantasma] = fantasmas();
+    expect(fantasma.material).toMatchObject({ transparent: true, opacity: 0.15, depthWrite: false });
+    expect(fantasma.geometry).toBe(malha.geometry);
+    expect(malha.material.transparent).toBe(false);
+    const doMais = mundo(0, 0, 30);
+    const doMenos = mundo(0, 0, 10);
+    expect(mantido(fantasma.material.clippingPlanes, doMais)).toBe(true);
+    expect(mantido(fantasma.material.clippingPlanes, doMenos)).toBe(false);
+    expect(mantido(malha.material.clippingPlanes, doMais)).toBe(false);
+    expect(mantido(malha.material.clippingPlanes, doMenos)).toBe(true);
+  });
+
+  it('o lado menos inverte o recorte, e trocar o corte não acumula malhas', () => {
+    const { controlador, malha, fantasmas, mundo, mantido } = montar();
+    controlador.definirCorte({ eixo: 'x', posicao: 0, lado: 'mais' });
+    controlador.definirCorte({ eixo: 'x', posicao: 0, lado: 'menos' });
+    expect(fantasmas()).toHaveLength(1);
+    expect(mantido(fantasmas()[0].material.clippingPlanes, mundo(-10, 0, 0))).toBe(true);
+    expect(mantido(malha.material.clippingPlanes, mundo(10, 0, 0))).toBe(true);
+  });
+
+  it('desligar devolve a peça inteira e normal, mesmo com a seleção mudando', () => {
+    const { controlador, malha, fantasmas } = montar();
+    controlador.definirCorte({ eixo: 'y', posicao: 0, lado: 'mais' });
+    controlador.selecionar('caixa');
+    expect(fantasmas()).toHaveLength(1);
+    expect(controlador.definirCorte(null)).toBeNull();
+    expect(fantasmas()).toHaveLength(0);
+    expect(malha.material.clippingPlanes).toBeNull();
+    expect(controlador.corte).toBeNull();
+  });
+
+  it('recusa eixo, posição e lado inválidos sem mexer no corte em vigor', () => {
+    const { controlador } = montar();
+    controlador.definirCorte({ eixo: 'z', posicao: 1, lado: 'mais' });
+    expect(() => controlador.definirCorte({ eixo: 'w', posicao: 1 })).toThrow(/eixo "w"/);
+    expect(() => controlador.definirCorte({ eixo: 'z', posicao: 'meio' })).toThrow(/não é um número/);
+    expect(() => controlador.definirCorte({ eixo: 'z', posicao: 1, lado: 'cima' })).toThrow(/--corte-lado/);
+    expect(controlador.corte).toEqual({ eixo: 'z', posicao: 1, lado: 'mais' });
+  });
+});

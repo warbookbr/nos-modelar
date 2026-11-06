@@ -207,6 +207,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     definirExplosao: (valor) => cena.controlador?.definirExplosao(valor),
     alternarWireframeSelecao: () => cena.controlador?.definirWireframeSelecao(!cena.controlador.estado().wireframeSelecao),
     definirOpacidadeSelecao: (valor) => cena.controlador?.definirOpacidadeSelecao(valor),
+    definirCorte: (corte) => cena.definirCorte(corte),
     async copiarVista() {
       if (cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
       try {

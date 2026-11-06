@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
-import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, criarDicas, olharBancada } from './olhar-bancada.mjs';
+import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, comoCLI, criarDicas, olharBancada } from './olhar-bancada.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -309,7 +309,7 @@ describe('carga da página', () => {
   const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
 
   function bancadaContada({ falharPonte = false } = {}) {
-    const contagem = { servidores: 0, navegadores: 0, paginas: 0, cargas: 0, esperas: [], vistasTrocadas: 0, paginasFechadas: 0, navegadoresFechados: 0 };
+    const contagem = { servidores: 0, navegadores: 0, paginas: 0, cargas: 0, esperas: [], cortes: [], vistasTrocadas: 0, paginasFechadas: 0, navegadoresFechados: 0 };
     const page = {
       on() {},
       off() {},
@@ -323,8 +323,9 @@ describe('carga da página', () => {
         }
       },
       async waitForTimeout() {},
-      async evaluate(fn) {
+      async evaluate(fn, argumento) {
         const texto = String(fn);
+        if (texto.includes('.corte(')) { contagem.cortes.push(argumento); return argumento; }
         if (texto.includes('definirVista')) { contagem.vistasTrocadas += 1; return undefined; }
         if (texto.includes('__modelarQuadros')) return undefined;
         if (texto.includes('b.ready')) {
@@ -391,6 +392,24 @@ describe('carga da página', () => {
     expect(contagem.paginasFechadas).toBe(2);
   });
 
+  it('a vista de corte liga o plano uma vez, pela ponte, para todas as vistas da chamada', async () => {
+    const { contagem, dependencias } = bancadaContada();
+    const resposta = await olharBancada({
+      ...comum, vistas: ['traseira', 'frontal'], corte: { eixo: 'z', posicao: 0, lado: 'mais' }, dependencias,
+    });
+    expect(resposta.ok).toBe(true);
+    expect(contagem.cortes).toEqual([{ eixo: 'z', posicao: 0, lado: 'mais' }]);
+    expect(resposta.resultado.capturas).toHaveLength(2);
+  });
+
+  it('a vista de corte recusa pedido mal formado e a mistura com arame na própria chamada', async () => {
+    const { dependencias } = bancadaContada();
+    const ruim = await olharBancada({ ...comum, corte: { eixo: 'k', posicao: 1 }, dependencias });
+    expect(ruim.erro.mensagem).toMatch(/eixo "k" não existe/);
+    const misturado = await olharBancada({ ...comum, corte: { eixo: 'z', posicao: 1 }, arame: 'raio-x', dependencias });
+    expect(misturado.erro.mensagem).toMatch(/não se mistura com --arame/);
+  });
+
   it('o prazo de carga vai como opção do Playwright e o estouro diz a etapa, o tempo e quantas imagens faltavam', async () => {
     const { contagem, dependencias } = bancadaContada({ falharPonte: true });
     const resposta = await olharBancada({ ...comum, vistas: ['isometrica', 'frontal'], prazoDeCargaMs: 5, dependencias });
@@ -405,6 +424,32 @@ describe('carga da página', () => {
     expect(resposta.erro.mensagem).toMatch(/repita com --prazo=<segundos>/);
     expect(contagem.esperas.every((opcoes) => opcoes.timeout === 5)).toBe(true);
     expect(PRAZO_DE_CARGA_MS).toBeGreaterThan(30_000);
+  });
+});
+
+describe('a vista de corte', () => {
+  async function recusa(argv) {
+    const resposta = await comoCLI(argv);
+    expect(resposta.ok).toBe(false);
+    expect(resposta.codigo).toBe(2);
+    expect(resposta.erro.categoria).toBe('uso');
+    return resposta.erro.mensagem;
+  }
+
+  it('recusa eixo inválido, posição não numérica, corte sem posição e lado inválido', async () => {
+    expect(await recusa(['fixture-visual', '--corte=w:0'])).toMatch(/eixo "w" não existe; use x, y, z/);
+    expect(await recusa(['fixture-visual', '--corte=z:meio'])).toMatch(/posição "meio" não é um número/);
+    expect(await recusa(['fixture-visual', '--corte=z:'])).toMatch(/posição "" não é um número/);
+    expect(await recusa(['fixture-visual', '--corte=z'])).toMatch(/pede <eixo>:<posição em mm>/);
+    expect(await recusa(['fixture-visual', '--corte=z:0', '--corte-lado=frente'])).toMatch(/use mais ou menos/);
+    expect(await recusa(['fixture-visual', '--corte-lado=mais'])).toMatch(/só vale junto de --corte/);
+  });
+
+  it('recusa a mistura com arame, raio X, par e análise, antes de abrir servidor ou navegador', async () => {
+    expect(await recusa(['fixture-visual', '--corte=z:0', '--arame'])).toMatch(/não se mistura com --arame/);
+    expect(await recusa(['fixture-visual', '--corte=z:0', '--raio-x'])).toMatch(/não se mistura com --arame/);
+    expect(await recusa(['fixture-visual', '--corte=z:0', '--par=a,b'])).toMatch(/não se mistura com --par/);
+    expect(await recusa(['fixture-visual', '--corte=z:0', '--analise'])).toMatch(/não se mistura com --analise/);
   });
 });
 

@@ -97,6 +97,8 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre,
     powerPreference: 'high-performance',
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  /* A vista de corte recorta cada material pelo plano (`clippingPlanes`), o que o renderizador só faz com isto ligado. */
+  renderer.localClippingEnabled = true;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;

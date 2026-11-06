@@ -74,3 +74,16 @@ describe('ponte da captura', () => {
     expect(janela.__mecanificaBancada).toBe(ponte);
   });
 });
+
+describe('ponte da captura — corte', () => {
+  it('liga, lê e desliga o corte pela cena', () => {
+    const { ponte, cena } = montar();
+    let em = null;
+    Object.defineProperty(cena, 'corte', { get: () => em });
+    cena.definirCorte = vi.fn((pedido) => { em = pedido; return em; });
+    expect(ponte.corte()).toBeNull();
+    expect(ponte.corte({ eixo: 'z', posicao: 0, lado: 'mais' })).toEqual({ eixo: 'z', posicao: 0, lado: 'mais' });
+    expect(ponte.corte()).toEqual({ eixo: 'z', posicao: 0, lado: 'mais' });
+    expect(ponte.corte(null)).toBeNull();
+  });
+});
