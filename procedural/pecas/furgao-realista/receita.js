@@ -79,11 +79,12 @@ import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
 import { m } from './receita/geometria.js';
 import { forma } from './receita/forma.js';
 import { derivar } from './receita/gaiola.js';
-import { contornoPorRetos, derivarFarois, derivarGrade, derivarLanternas } from './receita/farol.js';
+import { contornoPorRetos, derivarFarois, derivarGrade, derivarLanternas, derivarLuzesDeCanto, derivarPiscasLaterais, raiosDoContorno } from './receita/farol.js';
 import { derivarInterior } from './receita/interior.js';
+import { derivarLuzesPorDentro } from './receita/luzes.js';
 import { BASE_DAS_RODAS, comBase, familias } from './receita/rodas.js';
 import {
-  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, CRISTAIS, FAROIS, FORROS, LUZES, PISCAS, MOLDURAS, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
+  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, AROS, CRISTAIS, FAROIS, FORROS, LUZES, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
 } from './receita/nomes.js';
 
@@ -228,15 +229,44 @@ export const TABELA = {
   vao_canto_degraus: 2,
   // etapa 6, as luzes: as lanternas e a luz de freio são cada uma um vão na gaiola, de cantos retos pelas arestas (a subdivisão os arredonda),
   // com a aba dobrada como os vidros e uma lente rente à lataria. Os anéis são os que já existem, para a forma aceita da chapa não mudar.
-  // Os faróis, os piscas e a grade deixaram a gaiola: os faróis e os piscas (2026-11-05, forma A de `referencias/farol-dianteiro.esboco.json`) são vãos pelo contorno sobre a chapa pronta,
-  // em [x, y] mm na vista frontal, no lado esquerdo (+x; o direito o espelha): o farol é afinado, com a ponta de dentro descendo em diagonal
-  // até a grade e a de fora indo a x 1000, onde a quina vira lateral, e o pisca é a ponta de fora do mesmo conjunto, um segundo vão na lente.
-  farol_perfil: [[460, 840], [1005, 840], [1005, 1080], [490, 1080]], // o conjunto 1 do esboço (farol de 240 mm), o trapézio com o topo na boca do capô
-  farol_raio: 40, // a concordância dos quatro cantos do farol
-  pisca_x_dentro: 910, // o pisca ocupa a ponta de fora do farol, de x 890 à borda dele
-  farol_recuo_lente: 3, // a lente do farol entra 3 mm no vão: a borda da chapa e a aba aparecem em volta dela
-  pisca_margem: 6, // o vão do pisca fica 6 mm dentro da borda do farol (3 além da lente), porque o vão não pode encostar na borda do sólido
-  pisca_recuo_lente: 0, // o pisca enche o vão aberto na lente do farol, e por isso encosta nela
+  // Os faróis, as luzes de canto, os piscas laterais e a grade deixaram a gaiola: são vãos pelo contorno sobre a chapa pronta, cada um com lente recuada,
+  // e atrás de cada lente vêm o refletor (uma capa) e a lâmpada, em partes próprias (etapa 8, `referencias/luzes.md`). Tudo no lado esquerdo (+x); o direito o espelha.
+  // O farol é um trapézio em [x, y] na vista frontal: o lado de dentro (junto da grade) vertical em x 460, a base e o topo horizontais, e o lado de fora inclinado,
+  // com o topo mais curto que a base (as fotos), para a luz de canto encostar nele por uma fresta. A largura vem da divisão do conjunto de x 460 a 1005: o farol
+  // fica com cerca de três quartos dele e a luz de canto, que dobra a quina e entra pela lateral, com o resto.
+  farol_x_dentro: 460,
+  farol_x_fora_base: 870, // o canto de baixo de fora, 410 mm de base (cerca de 1,7 por 1 com os 240 mm de altura aprovados)
+  farol_inclinacao: 0.15, // quanto o lado inclinado avança na base, em fração da largura da base (nas fotos, cerca de 15%)
+  farol_y_base: 840,
+  farol_y_topo: 1080, // o topo na boca do capô
+  farol_raio: 45, // a concordância dos quatro cantos do farol: 45 mm, o mais perto dos cantos pouco arredondados das fotos em que o corte da chapa fecha (com 20 a 40 mm a booleana do vão do lado direito deixa a borda aberta)
+  farol_recuo_lente: 3, // a lente de cada luz entra 3 mm no vão: a borda da chapa e a aba aparecem em volta dela
+  farol_aro_meia_largura: 6, // o aro cinza do farol é um friso simétrico sobre a borda do vão: 6 mm sobre a chapa e 6 sobre a lente (12 de largura, 2,2 de altura)
+  farol_aro_altura: 1.8,
+  farol_aro_fundo: 1.9, // quanto o aro entra na chapa (menos que a espessura de 2 mm)
+  refletor_encosto: 4.8, // a borda do refletor assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente (3 de recuo e 2 de espessura)
+  refletor_espessura: 2,
+  farol_refletor_profundidade: 140, // do plano da lente ao fundo do refletor, 145 mm contando o encosto: 60% dos 240 de altura, como o da carcaça das fotos
+  farol_lampada_x: 0.25, // a lâmpada principal a 25% da largura (da meia altura) a partir do lado de dentro
+  farol_posicao_x: 0.72, // a de posição, na segunda concavidade, entre 65% e 80%
+  farol_posicao_y: 0.4, // e um pouco abaixo da meia altura, em fração da altura
+  farol_posicao_profundidade: 45, // a segunda concavidade é menor e mais funda: 45 mm além do fundo largo
+  farol_posicao_raio: 50,
+  refletor_furo: 16, // o furo do soquete no fundo da capa, de raio
+  refletor_facetas: 12, // as facetas largas: 6 de cada lado da lâmpada principal, cada uma uma faixa curva entre dois vincos
+  luz_canto_fresta: 14, // a fresta entre o lado inclinado do farol e o de dentro da luz de canto
+  luz_canto_entra_lado: 60, // quanto o vão entra na lateral além do fim do arco da quina
+  luz_canto_base_razao: 0.62, // a base é curta: 62% do topo
+  luz_canto_barriga: 22, // o lado de fora é curvo: no meio ele sai 22 mm além da corda
+  luz_canto_raios: [55, 140, 60], // as concordâncias dos três cantos do lado de fora, de baixo para cima
+  luz_canto_profundidade: 38,
+  luz_canto_lampada_y: 0.45,
+  pisca_lateral_z: [1680, 1830], // atrás da roda dianteira, no paralama, rente à fresta da porta (z 1660) e sobre o arco (a boca dele acaba em y 925)
+  pisca_lateral_y: [1011, 1069], // a pílula de 150 por 58 mm, cerca de 2,5 por 1
+  pisca_lateral_afinamento: 5, // a ponta da frente é 10 mm mais baixa que a de trás
+  pisca_lateral_raio: 24,
+  pisca_lateral_profundidade: 22,
+  refletor_inset_luz: 7, // a borda do refletor da luz de canto e do pisca, para dentro do vão
   // a grade (2026-11-05, conjunto 1 do esboço): também um vão pelo contorno, de x -420 a 420, do topo do para-choque (que sai da seção do para-choque, e
   // não de um número aqui) a grade_topo_y; os cantos de cima têm concordância e os de baixo ficam vivos no para-choque. O vão começa grade_embutido mm
   // abaixo do topo dele, por trás da pele do para-choque, para a aba de baixo ficar escondida e nenhuma fresta abrir entre os dois
@@ -374,10 +404,15 @@ export const TABELA = {
 /* ---------- passos ---------- */
 
 const CHAPA = { origem: { op: 'subdivisao', id: 1 } };
-/** Os ids dos passos dos faróis: por lado k, o vão do farol (800 + 2k), o do pisca na lente dele (801 + 2k) e a aba (940 + k). */
-const ID_FAROL = (k) => 800 + 2 * k;
-const ID_PISCA = (k) => 801 + 2 * k;
+/** Os ids dos passos das luzes da frente, por lado k: o vão do farol (810 + k), o da luz de canto (812 + k) e o do pisca lateral (814 + k); as abas
+ *  (940 + k, 950 + k e 952 + k) e o aro do farol (954 + k); os refletores (960 + i, na ordem de `REFLETORES`) e as lâmpadas (970 + 2i, o bulbo, e 971 + 2i, a tampinha). */
+const ID_FAROL = (k) => 810 + k;
+const ID_LUZ_CANTO = (k) => 812 + k;
+const ID_PISCA_LATERAL = (k) => 814 + k;
 const ID_ABA_FAROL = (k) => 940 + k;
+const ID_ABA_LUZ_CANTO = (k) => 950 + k;
+const ID_ABA_PISCA_LATERAL = (k) => 952 + k;
+const ID_ARO_FAROL = (k) => 954 + k;
 /** Os ids dos passos da grade: o vão (804), a aba (944), a translação da lente (945) e as barras (130 + k). */
 const ID_GRADE = 804;
 /** Os ids dos passos das lanternas de trás, por lado k: o vão (806 + k) e a aba (946 + k). */
@@ -393,7 +428,7 @@ export function perfilDaBorracha(T) {
 
 /** Os PASSOS: a chapa subdividida com espessura, as abas dos vãos dos vidros,  as abas dos arcos, as quatro rodas da família e o forro dos arcos (que vem com o plástico). */
 export function gerarPassos(T) {
-  const { passo, plastico, rodas, vidros, cristais, luzes, lentes, abasDosArcos, forma: f } = derivar(T);
+  const { passo, plastico, rodas, vidros, cristais, luzes, lentes, abasDosArcos, refletores, lampadas, forma: f } = derivar(T);
   const passos = [
     ['subdivisao', { origemId: 1, ...passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
   ];
@@ -444,38 +479,76 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: c.nome, sel }]);
     passos.push(['material', { sel, usa: c.material }]);
   });
-  /* os faróis e os piscas (2026-11-05): cada farol é um vão pelo contorno na camada da frente da chapa, vista pela frente, com a lente
-     recuada; o pisca é um segundo vão aberto nessa lente, e a aba do farol é o friso sobre a borda do vão. A chapa de cada vão é a
-     do vão anterior, e a carroceria é a do último */
-  const farois = derivarFarois(T);
+  /* as luzes da frente (etapa 8): cada uma é um vão pelo contorno na chapa pronta, com a lente recuada e a aba dobrada para dentro, um depois do outro. O farol é visto
+     pela frente, a luz de canto pela diagonal da quina e o pisca lateral pelo eixo x; cada chapa é a do vão anterior, e a carroceria é a do último. A lente e a aba são a
+     mesma parte, cada uma no seu material; o aro do farol é o friso de perfil simétrico sobre a borda do vão, e atrás da lente vêm o refletor e a lâmpada. */
   const mm = (x) => m(x);
-  farois.forEach((fa, k) => {
-    const chapaAnterior = k === 0 ? CHAPA : { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k - 1) } };
+  let anterior = CHAPA;
+  const abrir = (origemId, contorno, raios, vista, extra = {}) => {
     passos.push(['aberturaPorContorno', {
-      origemId: ID_FAROL(k), chapa: chapaAnterior, contorno: contornoPorRetos(fa.farol, mm, T.farol_raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.farol_recuo_lente), limpezaFina: true,
+      origemId, chapa: anterior, contorno: contornoPorRetos(contorno, mm, raiosDoContorno(contorno, raios)), vista, sentido: '+', lente: true, recuoDaLente: m(T.farol_recuo_lente), limpezaFina: true, ...extra,
     }]);
-    passos.push(['aberturaPorContorno', {
-      origemId: ID_PISCA(k), chapa: { origem: { op: 'aberturaPorContorno', id: ID_FAROL(k), parte: 'lente' } }, contorno: contornoPorRetos(fa.pisca, mm, fa.raioPisca), vista: 'z', lente: true, recuoDaLente: m(T.pisca_recuo_lente), limpezaFina: true,
-    }]);
-    const aba = { origem: { op: 'friso', id: ID_ABA_FAROL(k) } };
+    anterior = { origem: { op: 'aberturaPorContorno', id: origemId } };
+  };
+  const abaELente = (idVao, idAba, nome, nomeDaLinha, materialDaLente) => {
+    const aba = { origem: { op: 'friso', id: idAba } };
     passos.push(['friso', {
-      origemId: ID_ABA_FAROL(k), superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, linha: { nome: `abaVaoFarol${fa.lado}` },
+      origemId: idAba, superficie: { op: 'aberturaPorContorno', id: idVao }, linha: { nome: nomeDaLinha },
       aba: { largura: m(T.aba_vao_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
     }]);
-    const lenteDoFarol = { origem: { op: 'aberturaPorContorno', id: ID_PISCA(k) } };
-    passos.push(['parte', { nome: `farol${fa.lado}`, sel: aba }]);
-    passos.push(['material', { sel: aba, usa: 'azul' }]);
-    passos.push(['parte', { nome: `farol${fa.lado}`, sel: lenteDoFarol }]);
-    passos.push(['material', { sel: lenteDoFarol, usa: 'farol' }]);
-    const pisca = { origem: { op: 'aberturaPorContorno', id: ID_PISCA(k), parte: 'lente' } };
-    passos.push(['parte', { nome: `pisca${fa.lado}`, sel: pisca }]);
-    passos.push(['material', { sel: pisca, usa: 'pisca' }]);
+    const lente = { origem: { op: 'aberturaPorContorno', id: idVao, parte: 'lente' } };
+    passos.push(['parte', { nome, sel: aba }]);
+    passos.push(['material', { sel: aba, usa: 'aroCinza' }]);
+    passos.push(['parte', { nome, sel: lente }]);
+    passos.push(['material', { sel: lente, usa: materialDaLente }]);
+  };
+  const farois = derivarFarois(T);
+  const luzesDeCanto = derivarLuzesDeCanto(T, f);
+  const piscasLaterais = derivarPiscasLaterais(T);
+  const perfilDoAro = [[-1, -T.farol_aro_fundo], [1, -T.farol_aro_fundo], [1, 0.15 * T.farol_aro_altura], [0.67, T.farol_aro_altura], [-0.67, T.farol_aro_altura], [-1, 0.15 * T.farol_aro_altura]]
+    .map(([u, v]) => [m(u * T.farol_aro_meia_largura), m(v)]);
+  farois.forEach((fa, k) => abrir(ID_FAROL(k), fa.farol, fa.raios, 'z'));
+  luzesDeCanto.forEach((lc, k) => abrir(ID_LUZ_CANTO(k), lc.contorno, lc.raios, lc.vista));
+  piscasLaterais.forEach((pl, k) => abrir(ID_PISCA_LATERAL(k), pl.contorno, pl.raios, pl.vista));
+  farois.forEach((fa, k) => {
+    abaELente(ID_FAROL(k), ID_ABA_FAROL(k), `farol${fa.lado}`, `abaVaoFarol${fa.lado}`, 'lenteIncolor');
+    const aro = { origem: { op: 'friso', id: ID_ARO_FAROL(k) } };
+    passos.push(['friso', { origemId: ID_ARO_FAROL(k), superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, linha: { nome: `aroFarol${fa.lado}` }, perfil: perfilDoAro }]);
+    passos.push(['parte', { nome: `aroFarol${fa.lado}`, sel: aro }]);
+    passos.push(['material', { sel: aro, usa: 'aroCinza' }]);
+  });
+  luzesDeCanto.forEach((lc, k) => abaELente(ID_LUZ_CANTO(k), ID_ABA_LUZ_CANTO(k), `luzDeCanto${lc.lado}`, `abaVaoLuzDeCanto${lc.lado}`, 'lenteIncolor'));
+  piscasLaterais.forEach((pl, k) => abaELente(ID_PISCA_LATERAL(k), ID_ABA_PISCA_LATERAL(k), `piscaLateral${pl.lado}`, `abaVaoPiscaLateral${pl.lado}`, 'lenteAmbar'));
+  /* por dentro: o refletor de cada luz, uma capa engrossada para dentro, e a lâmpada, uma revolução com o soquete atrás (a do farol com a tampinha na ponta) */
+  refletores.forEach((r, i) => {
+    const sel = { origem: { op: 'subdivisao', id: 960 + i } };
+    passos.push(['subdivisao', {
+      origemId: 960 + i, vertices: r.capa.vertices, faces: r.capa.faces, ...(r.capa.vincos.length ? { vincos: r.capa.vincos } : {}), borda: 'cantos', niveis: T.niveis, espessura: m(r.espessura),
+    }]);
+    passos.push(['parte', { nome: r.nome, sel }]);
+    passos.push(['material', { sel, usa: 'refletor' }]);
+  });
+  lampadas.forEach((l, i) => {
+    const em = l.base.map(mm);
+    const girar = (sel) => { if (l.graus) passos.push(['rotaciona', { eixo: 'y', graus: l.graus, pivo: em, sel }]); };
+    const bulbo = { origem: { op: 'lathe', id: 970 + 2 * i } };
+    passos.push(['lathe', { origemId: 970 + 2 * i, eixo: l.eixo, lados: 24, perfil: l.bulbo.map(([r, a]) => [mm(r), mm(a)]), em }]);
+    girar(bulbo);
+    passos.push(['parte', { nome: l.nome, sel: bulbo }]);
+    passos.push(['material', { sel: bulbo, usa: 'lampada' }]);
+    if (l.nome === 'lampadaFarolEsquerdo' || l.nome === 'lampadaFarolDireito') {
+      const tampa = { origem: { op: 'lathe', id: 971 + 2 * i } };
+      passos.push(['lathe', { origemId: 971 + 2 * i, eixo: l.eixo, lados: 24, perfil: l.tampinha.map(([r, a]) => [mm(r), mm(a)]), em }]);
+      girar(tampa);
+      passos.push(['parte', { nome: l.nome, sel: tampa }]);
+      passos.push(['material', { sel: tampa, usa: 'aco' }]);
+    }
   });
   /* a grade (2026-11-05): um terceiro vão pelo contorno, sobre a chapa do último farol; a lente escura recua `grade_recuo` para dentro do
      vão, dentro da perna da aba, e as três barras são extrusões retas que nascem na lente e ficam atrás da superfície da chapa; a aba, a
      lente e as barras são a mesma parte 'grade'. A base do vão é o topo do para-choque, que sobe do lado de fora e cobre a parede de baixo */
   const grade = derivarGrade(T);
-  const chapaDaGrade = { origem: { op: 'aberturaPorContorno', id: ID_FAROL(farois.length - 1) } };
+  const chapaDaGrade = anterior;
   passos.push(['aberturaPorContorno', {
     origemId: ID_GRADE, chapa: chapaDaGrade, contorno: contornoPorRetos(grade.contorno, mm, grade.raio), vista: 'z', sentido: '+', lente: true, recuoDaLente: m(T.grade_lente_recuo), limpezaFina: true,
   }]);
@@ -596,8 +669,14 @@ export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((aba, k) => ({ par: [aba, BORRACHAS[k]], motivo: 'a borracha passa sobre a perna da aba (5 mm para dentro do vão) e entra 1,5 mm abaixo da superfície, onde a aba dobra' })),
   ...BORRACHAS.map((b) => ({ par: ['carroceria', b], motivo: 'a borracha assenta na chapa em volta do vão: passa 15 mm sobre ela e entra 1,5 mm na superfície' })),
   ...BORRACHAS.map((b, k) => ({ par: [b, CRISTAIS[k]], motivo: 'o cristal começa 7,5 mm para dentro da borda do vão e a borracha passa 2,5 mm sobre a borda dele, entrando 1,5 mm: é a borracha que segura o cristal, e é ela que cobre a junta' })),
-  ...[...LUZES, ...FAROIS, 'grade'].map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
-  ...FAROIS.map((farol, k) => ({ par: [farol, PISCAS[k]], motivo: 'o pisca é o pedaço que o vão do pisca tirou da lente do farol, do tamanho do vão: as duas se encostam na parede dele' })),
+  ...[...LUZES, ...FAROIS, ...LUZES_DE_CANTO, ...PISCAS_LATERAIS, 'grade'].map((a) => ({ par: ['carroceria', a], motivo: 'a aba da luz nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
+  ...AROS.map((aro, k) => ({ par: ['carroceria', aro], motivo: 'o aro do farol é um friso que entra 1,9 mm na chapa em volta do vão, 6 mm de cada lado da borda' })),
+  ...AROS.map((aro, k) => ({ par: [aro, FAROIS[k]], motivo: 'o aro cobre 6 mm da borda da lente e a aba do farol, que a lente recuada leva na mesma parte, passa pelo meio dele' })),
+  ...AROS.map((aro, k) => ({ par: [aro, REFLETORES[k]], motivo: 'a borda do refletor assenta por trás do aro, 8 mm para dentro da borda do vão, e o aro, que desce até a face da lente, chega a ela' })),
+  ...LUZES_POR_DENTRO.flatMap(([luz, refletor, lampadas]) => [
+    { par: [luz, refletor], motivo: 'a borda do refletor assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente, que é a luz' },
+    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da capa e o bulbo passa por ele; a de posição assenta no fundo da segunda concavidade' })),
+  ]),
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
   { par: ['pisoInterior', 'painel'], motivo: 'o painel assenta no piso e entra 1 mm nele' },
@@ -623,9 +702,15 @@ export function vaosDeclarados(T) {
   const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha, nomeDaBorracha(v.nome)] }));
   for (const v of luzes) vaos.push({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] });
   derivarLanternas(T, forma(T)).forEach((la, k) => vaos.push({ nome: `lanterna${la.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LANTERNA(k) }, frisos: [`abaVaoLanterna${la.lado}`] }));
-  derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `farol${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, frisos: [`abaVaoFarol${fa.lado}`] }));
+  derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `farol${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, frisos: [`abaVaoFarol${fa.lado}`, `aroFarol${fa.lado}`] }));
+  derivarLuzesDeCanto(T, forma(T)).forEach((lc, k) => vaos.push({ nome: `luzDeCanto${lc.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LUZ_CANTO(k) }, frisos: [`abaVaoLuzDeCanto${lc.lado}`] }));
+  derivarPiscasLaterais(T).forEach((pl, k) => vaos.push({ nome: `piscaLateral${pl.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_PISCA_LATERAL(k) }, frisos: [`abaVaoPiscaLateral${pl.lado}`] }));
+  const { refletores } = derivarLuzesPorDentro(T, forma(T));
+  for (const [, refletor] of LUZES_POR_DENTRO) {
+    const capa = refletores.find((r) => r.nome === refletor).capa;
+    vaos.push({ nome: `furo${refletor.replace(/^refletor/, 'DoRefletor')}`, borda: [...capa.furo, capa.furo[0]], semMoldura: { motivo: 'é o furo do soquete no fundo do refletor, por onde passa o bulbo da lâmpada: a flange dela o fecha por trás, e a borda dele não leva moldura' } });
+  }
   vaos.push({ nome: 'grade', superficie: { op: 'aberturaPorContorno', id: ID_GRADE }, frisos: ['abaVaoGrade'], parcial: { motivo: 'os dois cantos de baixo do vão são vivos e ficam 24 mm abaixo do topo do para-choque, por trás da pele dele: a aba não dobra nesses 44 mm de cada lado, que nenhuma vista de frente alcança, e a lente e a aba de cima e dos lados cobrem o resto da volta' } });
-  derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `pisca${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_PISCA(k) }, semMoldura: { motivo: 'é o vão que o pisca ocupa na lente do farol, do tamanho dele; a borda é a do pisca com a lente, sem aba nem moldura' } }));
   for (const p of portas) {
     if (p.nome.startsWith('portaTraseira')) continue;
     if (!p.volta.every((n) => naChapa.has(n))) continue;
@@ -687,9 +772,13 @@ const receita = {
     banco: { tipo: 'liso', cor: '#3d4048' },
     painelEscuro: { tipo: 'liso', cor: '#26272b' },
     // as lentes das luzes (etapa 6), opacas para o oco do furgão não aparecer por elas
-    farol: { tipo: 'liso', cor: '#d9e0e4', aspereza: 0.12, metalicidade: 0.4 },
+    // as lentes da frente (etapa 8): a do farol e a da luz de canto transparentes e incolores, a do pisca lateral âmbar translúcida, como os vidros
+    lenteIncolor: { tipo: 'liso', cor: '#eef4f6', mistura: 'transparente', opacidade: 0.2, aspereza: 0.05, metalicidade: 0.1 },
+    lenteAmbar: { tipo: 'liso', cor: '#e08a14', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1 },
+    aroCinza: { tipo: 'liso', cor: '#4a4c52', aspereza: 0.6 },
+    refletor: { tipo: 'metal', cor: '#d6d9dd', acabamento: 'escovado' },
+    lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
     lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2 },
-    pisca: { tipo: 'liso', cor: '#d98a1f', aspereza: 0.2 },
     grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
   },
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
@@ -700,7 +789,7 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto, etapa 5: chapa de 5400 por 2040 por 2500 com frestas, saia, para-choques e alargamento dos arcos (5560 por 2100), forro e rodas, mais cristais, borrachas de vão e interior simples',
+    objeto: 'furgão médio de teto alto: chapa de 5400 por 2040 por 2500 com frestas, saia, para-choques, forro e rodas, cristais, interior simples e, na frente, farol, luz de canto e pisca lateral com lente, refletor e lâmpada',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
@@ -767,13 +856,58 @@ const receita = {
       },
       ...['Esquerdo', 'Direito'].map((lado) => ({
         nome: `farol${lado}`,
-        forma: `farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'} trapézio de cantos de raio 40: [460, 840], [1005, 840], [1005, 1080], [490, 1080], topo na boca do capô, ponta de dentro junto da grade; lente clara recuada 3 mm e aba do vão para dentro`,
+        forma: `lente do farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, lisa, transparente e incolor, recuada 3 mm, no trapézio de y 840 a 1080 e x 460 a 870 na base: dentro vertical, fora inclinado 15% da base, cantos de raio 30; a aba cinza vai na mesma parte`,
         tecnica: 'aberturaPorContorno na vista frontal, na camada da frente da chapa, com lente, recuoDaLente e concordância nos cantos; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',
       })),
+      ...AROS.map((nome) => ({
+        nome,
+        forma: `aro cinza escuro em volta da lente do farol ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}, de largura constante: 6 mm sobre a chapa e 6 sobre a borda da lente, 1,8 mm de altura, entrando 1,9 mm na chapa`,
+        tecnica: 'friso de perfil simétrico sobre a borda do vão aberto pelo farol (superficie aberturaPorContorno)',
+      })),
       ...['Esquerdo', 'Direito'].map((lado) => ({
-        nome: `pisca${lado}`,
-        forma: `pisca ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, a ponta de fora do farol: x 910 a 1005, na altura toda dele, 6 mm dentro da borda, cantos de fora na concordância do farol, lente âmbar opaca do tamanho do vão`,
-        tecnica: 'segundo aberturaPorContorno, sobre a lente do farol, com lente e recuoDaLente 0; o pedaço retirado é o pisca',
+        nome: `refletorFarol${lado}`,
+        forma: `refletor do farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: capa única de metal claro, borda no contorno da lente por dentro do aro, curva até o fundo (145 mm), sem placa; fundo a 25% da largura, 2ª concavidade a 72%, 12 facetas`,
+        tecnica: 'subdivisao de malha polar com furo de soquete de 16 mm, parábola mais poço gaussiano, vincos vivos em 12 raios, 2 mm para trás; o direito é o espelho',
+      })),
+      ...['Esquerdo', 'Direito'].map((lado) => ({
+        nome: `lampadaFarol${lado}`,
+        forma: `lâmpada principal do farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: bulbo de 11 mm de raio e 52 de comprimento com flange de soquete atrás do furo da capa, material claro, e a tampinha metálica na ponta (a máscara que corta a luz alta)`,
+        tecnica: 'dois lathe em torno de z na posição do furo, o bulbo e a tampinha na mesma parte, cada um no seu material',
+      })),
+      ...['Esquerdo', 'Direito'].map((lado) => ({
+        nome: `lampadaPosicaoFarol${lado}`,
+        forma: `lâmpada de posição do farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: bulbo pequeno de 5,5 mm de raio e 24 de comprimento no fundo da segunda concavidade do refletor, material claro`,
+        tecnica: 'lathe em torno de z',
+      })),
+      ...['Esquerda', 'Direita'].map((lado) => ({
+        nome: `luzDeCanto${lado}`,
+        forma: `lente da luz de canto ${lado === 'Esquerda' ? 'esquerda' : 'direita'}, lisa, incolor, recuada 3 mm: lado de dentro inclinado como o de fora do farol, a 14 mm dele, base curta, lado de fora curvo dobrando a quina e entrando 60 mm na lateral`,
+        tecnica: 'aberturaPorContorno com lente, vista pela diagonal da quina ([1, 0, 1] na de +x, [-1, 0, 1] na de -x) e sentido +, concordâncias nos cantos; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte',
+      })),
+      ...['Esquerda', 'Direita'].map((lado) => ({
+        nome: `refletorLuzDeCanto${lado}`,
+        forma: `refletor em concha da luz de canto ${lado === 'Esquerda' ? 'esquerda' : 'direita'}: capa de 2 mm em metal claro, a borda 7 mm para dentro do vão, 38 mm de profundidade ao longo da diagonal da quina e furo de soquete de 9 mm de raio`,
+        tecnica: 'subdivisao de uma malha polar, cada ponto levado à superfície da quina na reta da vista e recuado para dentro ao longo dela',
+      })),
+      ...['Esquerda', 'Direita'].map((lado) => ({
+        nome: `lampadaLuzDeCanto${lado}`,
+        forma: `lâmpada da luz de canto ${lado === 'Esquerda' ? 'esquerda' : 'direita'}: bulbo de 7 mm de raio e 26 de comprimento com flange, no furo da concha, com o eixo na diagonal da quina`,
+        tecnica: 'lathe em torno de z, girado 45 graus em y',
+      })),
+      ...['Esquerdo', 'Direito'].map((lado) => ({
+        nome: `piscaLateral${lado}`,
+        forma: `lente do pisca lateral ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}, lisa, âmbar translúcida, recuada 3 mm, no paralama atrás da roda dianteira: pílula de 150 por 58 mm em z 1680 a 1830 e y 1011 a 1069, a ponta da frente mais baixa`,
+        tecnica: 'aberturaPorContorno com lente, vista pelo eixo x ([1, 0, 0] na de +x, [-1, 0, 0] na de -x) e sentido +, pontas de raio 24; friso com aba; a aba e a lente são a mesma parte',
+      })),
+      ...['Esquerdo', 'Direito'].map((lado) => ({
+        nome: `refletorPiscaLateral${lado}`,
+        forma: `refletor em concha do pisca lateral ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: capa de 2 mm em metal claro, a borda 4 mm para dentro do vão e 22 mm de profundidade para dentro da chapa, com furo de soquete de 4,5 mm de raio`,
+        tecnica: 'subdivisao de uma malha polar, a profundidade ao longo de x',
+      })),
+      ...['Esquerdo', 'Direito'].map((lado) => ({
+        nome: `lampadaPiscaLateral${lado}`,
+        forma: `lâmpada do pisca lateral ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: bulbo de 5 mm de raio e 20 de comprimento com flange, no furo da concha, com o eixo em x`,
+        tecnica: 'lathe em torno de x',
       })),
       ...['Esquerda', 'Direita'].map((lado) => ({
         nome: `lanterna${lado}`,
@@ -837,7 +971,11 @@ const receita = {
       'a roda não é a da família roda-pneu no pneu 235/65 aro 16 (710 mm de diâmetro, 235 de largura, com bojo e ombro) numa roda de chapa de aço de 16 polegadas com 5 parafusos, ou não fica na bitola de 1730 e nos eixos da prancha',
       'o forro de um arco falta, deixa ver o oco do carro pelo arco, não é escuro, fica a menos de 20 mm ou a mais de 30 mm do pneu em algum ponto, ou não encosta na chapa em volta da boca',
       'o alargamento de um arco não cobre o pneu com folga visível, na vista de cima ou na frontal, ou o forro passa para fora da boca do arco',
-      'a grade não é um vão escuro de lente recuada com três barras horizontais retas e cantos de cima redondos, ou deixa fresta aberta contra o para-choque, ou o farol não é o trapézio de cantos arredondados com o pisca âmbar na ponta de fora',
+      'a grade não é um vão escuro de lente recuada com três barras horizontais retas e cantos de cima redondos, ou deixa fresta aberta contra o para-choque',
+      'o farol não é o trapézio com o lado de dentro vertical e o de fora inclinado, lente lisa transparente e incolor e aro cinza escuro de largura constante em volta',
+      'o refletor do farol é placa plana, ou não é uma capa única da borda da lente ao fundo, ou o fundo não fica a 20% a 30% da largura do lado de dentro, ou falta a 2ª concavidade, a lâmpada principal com a tampinha ou a de posição',
+      'a luz de canto não encosta no farol pelo lado inclinado, por uma fresta, nem dobra a quina; falta o pisca lateral âmbar em pílula atrás da roda dianteira, ou uma luz da frente sem refletor em concha e lâmpada',
+      'o refletor ou a lâmpada de uma luz da frente atravessa a chapa, o capô, o forro do arco ou outra luz',
       'alguma peça fica solta no ar ou atravessa outra sem motivo',
       'o lado esquerdo e o direito diferem fora da porta de correr',
       'aparece marca, logotipo ou nome de fabricante',

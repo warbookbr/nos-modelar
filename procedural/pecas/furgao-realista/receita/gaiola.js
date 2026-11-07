@@ -5,6 +5,7 @@
 import { cruz, dot, entre, esc, grau, lerp, m, soma, sub, suave, unit } from './geometria.js';
 import { aneisDoOmbro, aneisHorizontais, forma, pontoFrente, pontoLado, pontoNoCaminho, pontoQuinaTras, pontoTras, projetarNaSecao, secaoHorizontal } from './forma.js';
 import { derivarPlastico } from './plastico.js';
+import { derivarLuzesPorDentro } from './luzes.js';
 import { chamadaDaRoda } from './rodas.js';
 
 /* ---------- a gaiola ---------- */
@@ -803,7 +804,8 @@ export function derivar(T) {
   const vertices = [...usados].sort();
   /* o plástico de baixo, por fora da chapa: os pontos dele entram no TOPO junto com os da gaiola */
   const plastico = derivarPlastico(T, f);
-  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes])]);
+  const { refletores, lampadas } = derivarLuzesPorDentro(T, f);
+  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes]), ...refletores.flatMap((r) => [...r.capa.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
 
   /* as quatro rodas da família `roda-pneu`, no pneu da prancha, na bitola e no entre-eixos, apoiadas no chão: a chamada da família e o centro de cada uma */
@@ -818,7 +820,7 @@ export function derivar(T) {
     passo: { vertices, faces, vincos, cantos }, plastico, cristais,
     portas: portas.map((v) => ({ nome: v.nome, volta: v.volta })),
     vidros: vidros.map((v) => ({ nome: v.nome, linha: v.linha, volta: v.volta })),
-    luzes: luzes.map((v) => ({ nome: v.nome, linha: v.linha, material: v.material, volta: v.volta })), lentes,
+    luzes: luzes.map((v) => ({ nome: v.nome, linha: v.linha, material: v.material, volta: v.volta })), lentes, refletores, lampadas,
     abasDosArcos, rodas,
     bordaDeBaixo: [...sol.lista.map((p) => p.nome), ...sol.lista.slice(1, -1).reverse().map((p) => espelho(p.nome))],
   };

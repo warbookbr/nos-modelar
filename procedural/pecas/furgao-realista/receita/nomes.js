@@ -21,6 +21,16 @@ export const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPor
 export const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita'];
 export const LUZES = ['lanternaEsquerda', 'lanternaDireita', 'luzDeFreio'];
 export const FAROIS = ['farolEsquerdo', 'farolDireito'];
-export const PISCAS = ['piscaEsquerdo', 'piscaDireito'];
+export const AROS = ['aroFarolEsquerdo', 'aroFarolDireito'];
+export const LUZES_DE_CANTO = ['luzDeCantoEsquerda', 'luzDeCantoDireita'];
+export const PISCAS_LATERAIS = ['piscaLateralEsquerdo', 'piscaLateralDireito'];
+/** Cada luz da frente com o seu refletor e a sua lâmpada: [luz, refletor, lâmpadas]. */
+export const LUZES_POR_DENTRO = [
+  ...['Esquerdo', 'Direito'].map((l) => [`farol${l}`, `refletorFarol${l}`, [`lampadaFarol${l}`, `lampadaPosicaoFarol${l}`]]),
+  ...['Esquerda', 'Direita'].map((l) => [`luzDeCanto${l}`, `refletorLuzDeCanto${l}`, [`lampadaLuzDeCanto${l}`]]),
+  ...['Esquerdo', 'Direito'].map((l) => [`piscaLateral${l}`, `refletorPiscaLateral${l}`, [`lampadaPiscaLateral${l}`]]),
+];
+export const REFLETORES = LUZES_POR_DENTRO.map(([, r]) => r);
+export const LAMPADAS = LUZES_POR_DENTRO.flatMap(([, , l]) => l);
 export const BANCOS = ['bancoMotorista', 'bancoPassageiro'];
 export const INTERIOR = ['pisoInterior', 'divisoria', ...BANCOS, 'painel'];
