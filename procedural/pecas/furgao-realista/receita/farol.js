@@ -88,10 +88,28 @@ export function derivarGrade(T) {
   return { contorno, raio: (p) => (p[1] === y1 ? T.grade_raio_topo : 0), barras: T.grade_barras_y.map((y) => ({ y })) };
 }
 
-/** As duas lanternas de trás, em mm [u, v] no plano da vista pela diagonal da quina (a opção 1 de `referencias/lanterna-traseira.esboco.json`):
- *  um vão só por lanterna, de `lanterna_base_y` a `lanterna_topo_y`, da borda de dentro na face de trás (x `lanterna_x_dentro`), dobrando a
- *  quina e entrando `lanterna_entra_lado` mm na lateral além do fim do arco. Na quina de +x (a esquerda) a vista olha ao longo de [1, 0, -1],
- *  com u = -(x + z) / raiz de 2 e v = y; na de -x a vista é [-1, 0, -1] e o desenho é o espelho (u troca de sinal). A face de trás e a
+/** A superfície de trás da chapa na planta (a face de trás, a quina de raio `raio_planta_tras` e a lateral, lidas na altura y), para pôr a lanterna sobre ela:
+ *  `ponto(u, y)` é o ponto onde a reta do olhar da lanterna esquerda (a diagonal [1, 0, -1], com u = -(x + z) / raiz de 2) atravessa a superfície. */
+export function superficieDeTras(T, f) {
+  const dados = (y) => { const xL = f.xs(y); const xc = f.xBordaTraseira(y); const zB = f.zR(y); return { R: xL - xc, xL, xc, zB, zc: zB + (xL - xc) }; };
+  const sdf = (x, z, d) => (x > d.xc && z < d.zc ? Math.hypot(x - d.xc, z - d.zc) - d.R : Math.max(x - d.xL, d.zB - z));
+  /* x = (w - u) / raiz de 2 e z = -(u + w) / raiz de 2, com w ao longo da diagonal para fora */
+  const ponto = (u, y) => {
+    const d = dados(y);
+    const em = (w) => [(w - u) / Math.SQRT2, y, -(u + w) / Math.SQRT2];
+    let lo = 0; let hi = 6000;
+    for (let k = 0; k < 60; k += 1) { const mid = (lo + hi) / 2; const p = em(mid); if (sdf(p[0], p[2], d) < 0) lo = mid; else hi = mid; }
+    return em((lo + hi) / 2);
+  };
+  return { ponto };
+}
+
+/** As duas lanternas de trás, em mm [u, v] no plano da vista pela diagonal da quina (a opção 1 de `referencias/lanterna-traseira.esboco.json`, refeita em
+ *  2026-11-07 pelas fotos de estudo): uma peça vertical de `lanterna_base_y` a `lanterna_topo_y`, da borda de dentro na face de trás (x `lanterna_x_dentro`), dobrando a
+ *  quina e entrando `lanterna_entra_lado` mm na lateral além do fim do arco. O lado de dentro é vertical, o topo desce de dentro para fora `lanterna_topo_queda` da
+ *  altura da faixa de cima, e a base tem os dois cantos redondos. A lente se divide em quatro faixas (`faixas`, de cima para baixo: freio, ré, pisca e neblina), cada
+ *  uma um vão próprio com a sua cor, separadas por `lanterna_linha` mm de chapa. Na quina de +x (a esquerda) a vista olha ao longo de [1, 0, -1], com
+ *  u = -(x + z) / raiz de 2 e v = y; na de -x a vista é [-1, 0, -1] e o desenho é o espelho (u troca de sinal e a ordem dos pontos se inverte). A face de trás e a
  *  lateral são lidas na altura do meio do vão, onde a lateral ainda é vertical. */
 export function derivarLanternas(T, f) {
   const yMeio = (T.lanterna_base_y + T.lanterna_topo_y) / 2;
@@ -100,9 +118,27 @@ export function derivarLanternas(T, f) {
   const uDentro = u(T.lanterna_x_dentro, zTras);
   const uFora = u(xLado, zTras + T.raio_planta_tras + T.lanterna_entra_lado);
   const y0 = T.lanterna_base_y; const y1 = T.lanterna_topo_y;
-  const retangulo = (lo, hi) => [[lo, y0], [hi, y0], [hi, y1], [lo, y1]];
+  const g = T.lanterna_linha;
+  const alturas = T.lanterna_faixas.map((p) => p * (y1 - y0));
+  alturas[alturas.length - 1] = y1 - y0 - g * (alturas.length - 1) - alturas.slice(0, -1).reduce((s, h) => s + h, 0);
+  const queda = T.lanterna_topo_queda * alturas[0];
+  const nomes = ['Freio', 'Re', 'Pisca', 'Neblina'];
+  const materiais = ['lenteVermelha', 'lenteIncolor', 'lenteAmbar', 'lenteVermelha'];
+  let yTopo = y1;
+  const faixas = alturas.map((h, i) => {
+    const yBase = yTopo - h;
+    const contorno = [[uFora, yBase], [uDentro, yBase], [uDentro, yTopo], [uFora, i === 0 ? yTopo - queda : yTopo]];
+    const rBase = i === alturas.length - 1 ? T.lanterna_raio_base : T.lanterna_raio_linha;
+    const rTopo = i === 0 ? T.lanterna_raio_topo : T.lanterna_raio_linha;
+    yTopo = yBase - g;
+    return { base: nomes[i], material: materiais[i], contorno, raios: [rBase, rBase, rTopo, rTopo] };
+  });
+  const espelhar = (pts) => pts.map(([a, v]) => [-a, v]).reverse();
   return [
-    { lado: 'Esquerda', vista: [1, 0, -1], contorno: retangulo(uFora, uDentro) },
-    { lado: 'Direita', vista: [-1, 0, -1], contorno: retangulo(-uDentro, -uFora) },
+    { lado: 'Esquerda', vista: [1, 0, -1], contorno: [[uFora, y0], [uDentro, y0], [uDentro, y1], [uFora, y1 - queda]], faixas },
+    {
+      lado: 'Direita', vista: [-1, 0, -1], contorno: espelhar([[uFora, y0], [uDentro, y0], [uDentro, y1], [uFora, y1 - queda]]),
+      faixas: faixas.map((fx) => ({ ...fx, contorno: espelhar(fx.contorno), raios: [...fx.raios].reverse() })),
+    },
   ];
 }

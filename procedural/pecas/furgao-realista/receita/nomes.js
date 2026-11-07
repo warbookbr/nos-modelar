@@ -19,7 +19,10 @@ export const PARACHOQUES = ['parachoqueDianteiro', 'parachoqueTraseiro'];
 export const PLASTICOS = [...SAIAS, ...MOLDURAS, ...PARACHOQUES];
 export const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroPortaTraseiraEsquerda', 'vidroPortaTraseiraDireita'];
 export const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita'];
-export const LUZES = ['lanternaEsquerda', 'lanternaDireita', 'luzDeFreio'];
+/** As quatro faixas da lente da lanterna de trás, de cima para baixo (freio, ré, pisca e neblina), e a lanterna de cada lado como a lista das suas partes de lente. */
+export const FAIXAS_DA_LANTERNA = ['Freio', 'Re', 'Pisca', 'Neblina'];
+export const LANTERNAS = ['Esquerda', 'Direita'].flatMap((lado) => FAIXAS_DA_LANTERNA.map((faixa) => `lanterna${faixa}${lado}`));
+export const LUZES = [...LANTERNAS, 'luzDeFreio'];
 export const FAROIS = ['farolEsquerdo', 'farolDireito'];
 /** Os piscas da ponta do farol, que saíram na etapa 8; ficam só porque as cópias das rodadas 18 a 20 importam este módulo vivo. */
 export const PISCAS = ['piscaEsquerdo', 'piscaDireito'];
@@ -32,6 +35,10 @@ export const LUZES_POR_DENTRO = [
   ...['Esquerda', 'Direita'].map((l) => [`luzDeCanto${l}`, `refletorLuzDeCanto${l}`, [`lampadaLuzDeCanto${l}`]]),
   ...['Esquerdo', 'Direito'].map((l) => [`piscaLateral${l}`, `refletorPiscaLateral${l}`, [`lampadaPiscaLateral${l}`]]),
 ];
+/** Cada lanterna com o seu refletor (as quatro conchas numa capa só) e as suas quatro lâmpadas: [lentes, refletor, lâmpadas]. */
+export const LANTERNAS_POR_DENTRO = ['Esquerda', 'Direita'].map((l) => [
+  FAIXAS_DA_LANTERNA.map((faixa) => `lanterna${faixa}${l}`), `refletorLanterna${l}`, FAIXAS_DA_LANTERNA.map((faixa) => `lampadaLanterna${faixa}${l}`),
+]);
 export const REFLETORES = LUZES_POR_DENTRO.map(([, r]) => r);
 export const LAMPADAS = LUZES_POR_DENTRO.flatMap(([, , l]) => l);
 export const BANCOS = ['bancoMotorista', 'bancoPassageiro'];

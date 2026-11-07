@@ -84,7 +84,7 @@ import { derivarInterior } from './receita/interior.js';
 import { derivarLuzesPorDentro } from './receita/luzes.js';
 import { BASE_DAS_RODAS, comBase, familias } from './receita/rodas.js';
 import {
-  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, AROS, CRISTAIS, FAROIS, FORROS, LUZES, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
+  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, AROS, CRISTAIS, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
 } from './receita/nomes.js';
 
@@ -281,11 +281,25 @@ export const TABELA = {
   grade_barra_largura: 760,
   grade_barra_altura: 28,
   grade_barra_saliencia: 14, // quanto a barra sai da lente para a frente (sempre atrás da superfície da chapa)
-  lanterna_base_y: 720, // as lanternas de trás (2026-11-06, opção 1 do esboço): vãos pelo contorno, um por lado, vistos pela diagonal da quina; de 720 a 1240 mm
+  lanterna_base_y: 760, // as lanternas de trás (2026-11-06, opção 1 do esboço): vãos pelo contorno, vistos pela diagonal da quina; de 760 (2026-11-07: eram 720, mas o piso do interior vai de 735,5 a 755,5 e o refletor de 100 mm não passa por ele) a 1240 mm, 480 de altura para cerca de 300 de largura pela chapa
   lanterna_topo_y: 1240,
   lanterna_x_dentro: 856, // a borda de dentro na face de trás, na mesma distância da quina de antes da largura nova (836 com a lateral em 1000)
   lanterna_entra_lado: 85, // quanto o vão entra na lateral além do fim do arco da quina
-  lanterna_raio: 25, // a concordância dos quatro cantos do vão
+  lanterna_faixas: [0.35, 0.17, 0.21, 0.23], // as quatro faixas da lente de cima para baixo (freio, ré, pisca, neblina), em fração da altura no lado de dentro; a última leva o que sobrar (2026-11-07, fotos de estudo)
+  lanterna_linha: 7, // a chapa fina entre duas faixas, em mm
+  lanterna_topo_queda: 0.4, // o topo desce de dentro para fora esta fração da altura da faixa de cima
+  lanterna_raio_base: 55, // os dois cantos de baixo da base, bem redondos
+  lanterna_raio_topo: 20, // os dois cantos de cima
+  lanterna_raio_linha: 8, // os cantos das faixas que dão na linha de chapa
+  lanterna_refletor_inset: 5, // a borda de cada concha, para dentro do contorno da faixa
+  lanterna_refletor_profundidade: 95, // do plano da lente ao fundo da concha, 100 mm contando o encosto
+  lanterna_refletor_fundo_plano: 0.2, // até esta fração do raio a concha tem o fundo plano, onde a flange da lâmpada assenta
+  lanterna_aneis: [1, 0.78, 0.56, 0.38, 0.27], // os anéis da malha polar de cada concha: menos que os 8 do farol, para a cena ficar abaixo de 250 mil faces
+  lanterna_refletor_passo: 40, // o comprimento máximo de um trecho reto da borda de cada concha
+  lanterna_furo: 7, // o furo do soquete no fundo de cada concha, de raio
+  lanterna_lampada_raio: 6,
+  lanterna_lampada_comprimento: 30,
+  lanterna_lampada_flange: 11,
   lanterna_recuo_lente: 3, // a lente da lanterna entra 3 mm no vão, como a do farol
   lanterna_aba_largura: 6, // a perna da aba da lanterna é mais curta que a dos outros vãos: o vão começa em 720, abaixo do topo do piso (735 a 755, a cerca de 10 mm da chapa), e uma perna de 10 mm ou mais encosta nele
   // a luz de freio alta, sobre as portas traseiras: na quina curva da traseira para o teto, entre dois anéis do ombro (o das portas é o 2),
@@ -416,9 +430,9 @@ const ID_ABA_PISCA_LATERAL = (k) => 952 + k;
 const ID_ARO_FAROL = (k) => 954 + k;
 /** Os ids dos passos da grade: o vão (804), a aba (944), a translação da lente (945) e as barras (130 + k). */
 const ID_GRADE = 804;
-/** Os ids dos passos das lanternas de trás, por lado k: o vão (806 + k) e a aba (946 + k). */
-const ID_LANTERNA = (k) => 806 + k;
-const ID_ABA_LANTERNA = (k) => 946 + k;
+/** Os ids dos passos das lanternas de trás, por lado k e faixa i (de cima para baixo): o vão (1100 + 4k + i) e a aba (1110 + 4k + i). */
+const ID_LANTERNA = (k, i) => 1100 + 4 * k + i;
+const ID_ABA_LANTERNA = (k, i) => 1110 + 4 * k + i;
 
 /** A seção da borracha de vão, [u, v] em mm, u para o cristal e v para fora da chapa: assenta na chapa e no cristal (entra `borracha_fundo` nos dois), passa
  *  `borracha_fora` sobre a chapa e `borracha_dentro` sobre o cristal, sobe `borracha_altura` e desce com o beiral redondo nas duas bordas. */
@@ -576,24 +590,31 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: 'grade', sel }]);
     passos.push(['material', { sel, usa: 'grade' }]);
   });
+  /* as lanternas de trás (2026-11-07): cada faixa da lente é um vão próprio, visto pela diagonal da quina, com lente recuada e aba; a chapa de `lanterna_linha` mm entre
+     os vãos é a linha que separa as faixas. Aba e lente são a mesma parte de cada faixa, e cada faixa tem a sua cor. */
   const lanternas = derivarLanternas(T, f);
-  for (const [k, la] of lanternas.entries()) { // as lanternas de trás: um vão por quina, visto pela diagonal, com lente recuada; aba e lente são a mesma parte
-    const chapaAnterior = { origem: { op: 'aberturaPorContorno', id: k === 0 ? ID_GRADE : ID_LANTERNA(k - 1) } };
-    passos.push(['aberturaPorContorno', {
-      origemId: ID_LANTERNA(k), chapa: chapaAnterior, contorno: contornoPorRetos(la.contorno, mm, T.lanterna_raio), vista: la.vista, sentido: '+', lente: true, recuoDaLente: m(T.lanterna_recuo_lente), limpezaFina: true,
-    }]);
-    const aba = { origem: { op: 'friso', id: ID_ABA_LANTERNA(k) } };
-    passos.push(['friso', {
-      origemId: ID_ABA_LANTERNA(k), superficie: { op: 'aberturaPorContorno', id: ID_LANTERNA(k) }, linha: { nome: `abaVaoLanterna${la.lado}` },
-      aba: { largura: m(T.lanterna_aba_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
-    }]);
-    const lente = { origem: { op: 'aberturaPorContorno', id: ID_LANTERNA(k), parte: 'lente' } };
-    passos.push(['parte', { nome: `lanterna${la.lado}`, sel: aba }]);
-    passos.push(['material', { sel: aba, usa: 'azul' }]);
-    passos.push(['parte', { nome: `lanterna${la.lado}`, sel: lente }]);
-    passos.push(['material', { sel: lente, usa: 'lanterna' }]);
+  let chapaAnterior = { origem: { op: 'aberturaPorContorno', id: ID_GRADE } };
+  for (const [k, la] of lanternas.entries()) {
+    for (const [i, fx] of la.faixas.entries()) {
+      const nome = `lanterna${fx.base}${la.lado}`;
+      passos.push(['aberturaPorContorno', {
+        origemId: ID_LANTERNA(k, i), chapa: chapaAnterior, contorno: contornoPorRetos(fx.contorno, mm, raiosDoContorno(fx.contorno, fx.raios)), vista: la.vista, sentido: '+', lente: true,
+        recuoDaLente: m(T.lanterna_recuo_lente), limpezaFina: true,
+      }]);
+      chapaAnterior = { origem: { op: 'aberturaPorContorno', id: ID_LANTERNA(k, i) } };
+      const aba = { origem: { op: 'friso', id: ID_ABA_LANTERNA(k, i) } };
+      passos.push(['friso', {
+        origemId: ID_ABA_LANTERNA(k, i), superficie: chapaAnterior.origem, linha: { nome: `abaVao${nome[0].toUpperCase()}${nome.slice(1)}` },
+        aba: { largura: m(T.lanterna_aba_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
+      }]);
+      const lente = { origem: { op: 'aberturaPorContorno', id: ID_LANTERNA(k, i), parte: 'lente' } };
+      passos.push(['parte', { nome, sel: aba }]);
+      passos.push(['material', { sel: aba, usa: 'azul' }]);
+      passos.push(['parte', { nome, sel: lente }]);
+      passos.push(['material', { sel: lente, usa: fx.material }]);
+    }
   }
-  const carroceria = { origem: { op: 'aberturaPorContorno', id: ID_LANTERNA(lanternas.length - 1) } };
+  const carroceria = { origem: chapaAnterior.origem };
   passos.push(['parte', { nome: 'carroceria', sel: carroceria }]);
   passos.push(['material', { sel: carroceria, usa: 'azul' }]);
   /* o interior: piso, divisória, bancos e painel, cada um uma extrusão do perfil que `derivarInterior` escreve */
@@ -678,6 +699,10 @@ export const CONTATOS = [
     { par: [luz, refletor], motivo: 'a borda do refletor assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente, que é a luz' },
     ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da capa e o bulbo passa por ele; a de posição assenta no fundo da segunda concavidade' })),
   ]),
+  ...LANTERNAS_POR_DENTRO.flatMap(([lentes, refletor, lampadas]) => [
+    ...lentes.map((lente) => ({ par: [lente, refletor], motivo: 'a borda de cada concha assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente da faixa dela; a parede entre duas conchas fica atrás da linha de chapa entre as lentes' })),
+    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da concha da faixa dela e o bulbo passa por ele' })),
+  ]),
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
   { par: ['pisoInterior', 'painel'], motivo: 'o painel assenta no piso e entra 1 mm nele' },
@@ -702,7 +727,7 @@ export function vaosDeclarados(T) {
   const naChapa = new Set(passo.vertices);
   const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha, nomeDaBorracha(v.nome)] }));
   for (const v of luzes) vaos.push({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] });
-  derivarLanternas(T, forma(T)).forEach((la, k) => vaos.push({ nome: `lanterna${la.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LANTERNA(k) }, frisos: [`abaVaoLanterna${la.lado}`] }));
+  derivarLanternas(T, forma(T)).forEach((la, k) => la.faixas.forEach((fx, i) => vaos.push({ nome: `lanterna${fx.base}${la.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LANTERNA(k, i) }, frisos: [`abaVaoLanterna${fx.base}${la.lado}`] })));
   derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `farol${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, frisos: [`abaVaoFarol${fa.lado}`, `aroFarol${fa.lado}`] }));
   derivarLuzesDeCanto(T, forma(T)).forEach((lc, k) => vaos.push({ nome: `luzDeCanto${lc.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LUZ_CANTO(k) }, frisos: [`abaVaoLuzDeCanto${lc.lado}`] }));
   derivarPiscasLaterais(T).forEach((pl, k) => vaos.push({ nome: `piscaLateral${pl.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_PISCA_LATERAL(k) }, frisos: [`abaVaoPiscaLateral${pl.lado}`] }));
@@ -710,6 +735,10 @@ export function vaosDeclarados(T) {
   for (const [, refletor] of LUZES_POR_DENTRO) {
     const capa = refletores.find((r) => r.nome === refletor).capa;
     vaos.push({ nome: `furo${refletor.replace(/^refletor/, 'DoRefletor')}`, borda: [...capa.furo, capa.furo[0]], semMoldura: { motivo: 'é o furo do soquete no fundo do refletor, por onde passa o bulbo da lâmpada: a flange dela o fecha por trás, e a borda dele não leva moldura' } });
+  }
+  for (const [lentes, refletor] of LANTERNAS_POR_DENTRO) {
+    const capa = refletores.find((r) => r.nome === refletor).capa;
+    capa.furos.forEach((furo, i) => vaos.push({ nome: `furoDoRefletorLanterna${lentes[i].replace(/^lanterna/, '')}`, borda: [...furo, furo[0]], semMoldura: { motivo: 'é o furo do soquete no fundo da concha do refletor, por onde passa o bulbo da lâmpada: a flange dela o fecha por trás, e a borda dele não leva moldura' } }));
   }
   vaos.push({ nome: 'grade', superficie: { op: 'aberturaPorContorno', id: ID_GRADE }, frisos: ['abaVaoGrade'], parcial: { motivo: 'os dois cantos de baixo do vão são vivos e ficam 24 mm abaixo do topo do para-choque, por trás da pele dele: a aba não dobra nesses 44 mm de cada lado, que nenhuma vista de frente alcança, e a lente e a aba de cima e dos lados cobrem o resto da volta' } });
   for (const p of portas) {
@@ -780,6 +809,8 @@ const receita = {
     refletor: { tipo: 'metal', cor: '#d6d9dd', acabamento: 'escovado' },
     lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
     lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2 },
+    // as faixas da lente da lanterna de trás (etapa 8): lisas e translúcidas, vermelha, incolor e âmbar; o relevo fica para o plano de material
+    lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1 },
     grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
   },
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
@@ -790,7 +821,7 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'furgão médio de teto alto: chapa de 5400 por 2040 por 2500 com frestas, saia, para-choques, forro e rodas, cristais, interior simples e, na frente, farol, luz de canto e pisca lateral com lente, refletor e lâmpada',
+    objeto: 'furgão médio de teto alto: chapa de 5400 por 2040 por 2500 com frestas, saia, para-choques, forro e rodas, cristais, interior simples, luzes da frente e lanterna de quatro faixas atrás, cada luz com lente, refletor e lâmpada',
     referencias: ['referencias/quatro-vistas.prancha.png', 'referencias/alvo.md'],
     escala: { medida: 'comprimento total da carroceria, do nariz em z 2700 à traseira em z -2700', milimetros: 5400 },
     familia: 'veiculo',
@@ -910,11 +941,26 @@ const receita = {
         forma: `lâmpada do pisca lateral ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: bulbo de 5 mm de raio e 20 de comprimento com flange, no furo da concha, com o eixo em x`,
         tecnica: 'lathe em torno de x',
       })),
+      ...['Esquerda', 'Direita'].flatMap((lado) => [
+        ['Freio', 'vermelha (freio), 35% da altura dentro, topo descendo para fora 40% dela'],
+        ['Re', 'incolor (ré), 17% da altura'],
+        ['Pisca', 'âmbar (pisca), 21% da altura'],
+        ['Neblina', 'vermelha (neblina), 23% da altura, cantos de baixo de raio 55'],
+      ].map(([faixa, cor]) => ({
+        nome: `lanterna${faixa}${lado}`,
+        forma: `faixa ${cor}, da lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} (y 760 a 1240, de x 856, dobrando a quina e entrando 85 mm na lateral), 7 mm de chapa entre faixas; lente lisa translúcida recuada 3 mm`,
+        tecnica: 'aberturaPorContorno com lente na diagonal da quina ([1, 0, -1] em +x, [-1, 0, -1] em -x), um vão por faixa; friso com aba; aba e lente na mesma parte, cada uma no seu material',
+      }))),
       ...['Esquerda', 'Direita'].map((lado) => ({
-        nome: `lanterna${lado}`,
-        forma: `lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'} alta, opção 1: um vão só de y 720 a 1240, larga atrás (de x 856, mesma distância da quina), dobrando a quina e entrando 85 mm na lateral; cantos de raio 25, lente vermelha recuada 3 mm, aba de 6 mm`,
-        tecnica: 'aberturaPorContorno com lente, vista por vetor na diagonal da quina ([1, 0, -1] na de +x, [-1, 0, -1] na de -x) e sentido +, limpezaFina; friso com aba sobre a borda do vão; a aba e a lente são a mesma parte, cada uma no seu material',
+        nome: `refletorLanterna${lado}`,
+        forma: `refletor da lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'}: capa única de 2 mm em metal claro, quatro conchas na vertical, uma atrás de cada faixa, de fundo plano e 100 mm de profundidade, separadas por paredes rente à lente`,
+        tecnica: 'subdivisao de quatro malhas polares ligadas por faixas de quadriláteros nas bordas que se defrontam, levadas à quina de trás e recuadas na diagonal; o direito é o espelho',
       })),
+      ...['Esquerda', 'Direita'].flatMap((lado) => ['Freio', 'Re', 'Pisca', 'Neblina'].map((faixa) => ({
+        nome: `lampadaLanterna${faixa}${lado}`,
+        forma: `lâmpada da faixa ${faixa === 'Re' ? 'de ré' : `de ${faixa.toLowerCase()}`} da lanterna ${lado === 'Esquerda' ? 'esquerda' : 'direita'}: bulbo de 6 mm de raio e 30 de comprimento com flange, no furo do centro da concha, eixo na diagonal da quina`,
+        tecnica: 'lathe em torno de z, girado 135 graus em y (-135 na direita)',
+      }))),
       {
         nome: 'luzDeFreio',
         forma: 'luz de freio alta no meio, sobre as portas traseiras, na quina curva da traseira para o teto: de x -190 a 190 e de y 2429 a 2467, cerca de 370 por 55 mm, lente vermelha opaca rente de 4 mm e a aba do vão dobrada para dentro',
