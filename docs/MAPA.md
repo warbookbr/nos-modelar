@@ -514,7 +514,6 @@
 
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
-- `2026-11-06-abertura-so-na-vizinhanca.md` — Abertura só na vizinhança do vão — o corte de um vão na chapa sem refazer a chapa inteira
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -659,6 +658,7 @@
 - `2026-11-05-porta-de-entrada-dos-agentes.md` — A porta de entrada dos agentes — o modelador acha como usar uma capacidade numa ficha curta, sem garimpar o código
 - `2026-11-05-solido-por-lacos.md` — Sólido por laços — a receita dá o contorno da peça em cada plano, e o núcleo monta a gaiola fechada e a subdivide numa malha só
 - `2026-11-06-abertura-em-qualquer-direcao.md` — Abertura de contorno em qualquer direção — o vão que dobra a quina sai inteiro, e os limites da operação ficam medidos
+- `2026-11-06-abertura-so-na-vizinhanca.md` — Abertura só na vizinhança do vão — o corte de um vão na chapa sem refazer a chapa inteira
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -2075,7 +2075,7 @@
 - `tres-camadas.js` — tres-camadas.js — peça de teste do plano da abertura em qualquer direção: o corpo de várias camadas na mesma reta, com `sentido`.
 - `vao-da-quina.test.ts` — vao-da-quina.test.ts — fatia 1 do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`): o vão …
 - `vinco-e-borda.js` — vinco-e-borda.js — peça de teste do plano da abertura em qualquer direção: o contorno que cruza um vinco vivo e o que passa perto da borda da chapa.
-- `vizinhanca.test.ts` — vizinhanca.test.ts — bateria do plano `docs/modelar/planos/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o trecho da chapa em volta d…
+- `vizinhanca.test.ts` — vizinhanca.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o trecho da chapa…
 
 ## tools/fixtures/acervo/peca-de-prova/
 

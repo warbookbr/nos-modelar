@@ -1,16 +1,16 @@
 # Abertura só na vizinhança do vão — o corte de um vão na chapa sem refazer a chapa inteira
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/aberturas-em-teste/`, `tools/modelar/acervo-real.test.mjs`
 
 **Responsável:** Claude, com a pessoa aprovando por imagem qualquer peça cuja malha mude
 
-**Repositório e base:** `warbookbr/nos-modelar`, main depois da rodada das portas traseiras rente às lanternas do [furgão realista](2026-10-30-furgao-realista.md), que vem antes deste na ordem escolhida pela pessoa em 2026-11-06
+**Repositório e base:** `warbookbr/nos-modelar`, main depois da rodada das portas traseiras rente às lanternas do [furgão realista](../2026-10-30-furgao-realista.md), que vem antes deste na ordem escolhida pela pessoa em 2026-11-06
 
 ## Problema observado
 
-Cada `aberturaPorContorno` entrega à booleana a chapa inteira e o prisma do contorno, e a booleana solda, confere e remonta as centenas de milhares de faces da chapa para tirar um vão que ocupa um canto dela. No furgão realista, em 2026-11-06, as sete aberturas (dois faróis, dois piscas, a grade e as duas lanternas) levaram 67 dos 99 s de uma execução da receita no perfil local, 41 deles em `nucleoBooleano`; o teste do acervo real mediu 305 s no CI contra o teto de 260, que subiu a 450, e a bancada leva uns 2 min para mostrar a peça, o que obrigou a opção `--prazo` na bancada e no pacote do crítico. Cada vão novo soma outra passada na chapa inteira. O item "Booleana de um vão sem percorrer a chapa inteira" do [backlog](BACKLOG.md) guarda as medidas.
+Cada `aberturaPorContorno` entrega à booleana a chapa inteira e o prisma do contorno, e a booleana solda, confere e remonta as centenas de milhares de faces da chapa para tirar um vão que ocupa um canto dela. No furgão realista, em 2026-11-06, as sete aberturas (dois faróis, dois piscas, a grade e as duas lanternas) levaram 67 dos 99 s de uma execução da receita no perfil local, 41 deles em `nucleoBooleano`; o teste do acervo real mediu 305 s no CI contra o teto de 260, que subiu a 450, e a bancada leva uns 2 min para mostrar a peça, o que obrigou a opção `--prazo` na bancada e no pacote do crítico. Cada vão novo soma outra passada na chapa inteira. O item "Booleana de um vão sem percorrer a chapa inteira" do [backlog](../BACKLOG.md) guarda as medidas.
 
 ## Resultado
 
@@ -31,7 +31,7 @@ USAR DIRETO a booleana existente, a limpeza da costura e o retrato do acervo (`t
 ## Excluído
 
 - mudar a receita do furgão ou de qualquer peça;
-- mudar `procedural/nucleo/operacoes/booleanas.js`, que é território do [braço](2026-09-26-as-partes-do-braco.md) no arredondamento da costura; se a solução pedir mudança nele, para e pede à pessoa que mude um dos territórios;
+- mudar `procedural/nucleo/operacoes/booleanas.js`, que é território do [braço](../2026-09-26-as-partes-do-braco.md) no arredondamento da costura; se a solução pedir mudança nele, para e pede à pessoa que mude um dos territórios;
 - o custo do `descrever` e da medida de contato do furgão.
 
 ## Gate de saída
@@ -63,4 +63,4 @@ Fatia 3, o furgão e o acervo, em 2026-11-07. As sete aberturas do furgão caír
 
 ## Fechamento
 
-A preencher ao concluir ou cancelar.
+Concluído em 2026-11-07, na main pelos commits `be5dea3f` (o recorte, os testes e o andamento) e `2c6db705` (o teto do furgão), com o fechamento neste registro. A booleana de cada vão vê só a vizinhança dele, fechada por uma banda e com o andaime que mantém a caixa da chapa inteira; as sete aberturas do furgão caíram de 50,9 s para 3,7 s, a execução dele de 84,4 s para 30 s, e ele abre na bancada no prazo padrão. O retrato do acervo deu 55 de 56 peças iguais; o furgão mudou a triangulação junto de três vãos, com volume igual a menos de 3e-4, e a pessoa o aprovou em 2026-11-07 pelas vistas frontal e traseira ortográficas em 1920 px, que saíram iguais pixel a pixel às de antes. O gate 5 vale pelo CI deste envio. O item do backlog da booleana de um vão saiu, por entregue; o custo do retrato da procedência (`retratarEntradas`, uns 11 s por execução do furgão, agora a maior parcela) entrou no item da execução do furgão.

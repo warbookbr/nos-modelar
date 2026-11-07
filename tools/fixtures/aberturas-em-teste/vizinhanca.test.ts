@@ -1,4 +1,4 @@
-/* vizinhanca.test.ts — bateria do plano `docs/modelar/planos/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o
+/* vizinhanca.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o
    trecho da chapa em volta dele, fechado por uma banda que sai da peça depois, e o resto da chapa fica como está.
      - o vão no meio da cúpula de quatro níveis (60 mil faces) recorta a vizinhança: uma fração pequena das faces entra na booleana, a
        malha sai fechada e sem lasca, a borda segue o desenho e as faces longe do vão ficam com o id e os cantos de antes;
