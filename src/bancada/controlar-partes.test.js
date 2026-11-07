@@ -188,13 +188,13 @@ describe('vista de corte', () => {
     raiz.updateMatrixWorld(true);
     const grupo = new THREE.Group();
     grupo.userData.identidadeParte = 'caixa';
-    const malha = new THREE.Mesh(new THREE.BoxGeometry(100, 100, 100), new THREE.MeshStandardMaterial());
+    const malha = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), new THREE.MeshStandardMaterial());
     grupo.add(malha);
     raiz.add(grupo);
     const controlador = criarControladorPartes({ raiz, partes: new Map([['caixa', grupo]]) });
     const fantasmas = () => malha.children.filter((filho) => filho.name === '__corte_translucido__');
-    /* um ponto do referencial da peça, levado ao mundo como a bancada o desenha */
-    const mundo = (x, y, z) => new THREE.Vector3(x, y, z).applyMatrix4(raiz.matrixWorld);
+    /* um ponto do referencial da peça, dado em mm e levado ao mundo como a bancada o desenha: a malha da peça é em metro */
+    const mundo = (x, y, z) => new THREE.Vector3(x / 1000, y / 1000, z / 1000).applyMatrix4(raiz.matrixWorld);
     const mantido = (planos, ponto) => planos.every((plano) => plano.distanceToPoint(ponto) >= 0);
     return { controlador, malha, fantasmas, mundo, mantido };
   }

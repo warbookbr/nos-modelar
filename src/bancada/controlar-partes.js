@@ -167,7 +167,9 @@ export function sincronizarArame(grupo, ligado) {
 function planosDoCorte(raiz, corte) {
   raiz.updateWorldMatrix(true, false);
   const normal = new THREE.Vector3(corte.eixo === 'x' ? 1 : 0, corte.eixo === 'y' ? 1 : 0, corte.eixo === 'z' ? 1 : 0);
-  const ponto = normal.clone().multiplyScalar(corte.posicao);
+  /* a posição vem em milímetro e a malha da peça está em metro (o núcleo trabalha em metro); em 2026-11-07 o corte em x 735 do
+     furgão caiu a 735 m, fora da peça, e não cortou nada, porque o teste usava uma caixa em milímetro */
+  const ponto = normal.clone().multiplyScalar(corte.posicao / 1000);
   const doLadoMais = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, ponto).applyMatrix4(raiz.matrixWorld);
   const doLadoMenos = new THREE.Plane().setFromNormalAndCoplanarPoint(normal.clone().negate(), ponto).applyMatrix4(raiz.matrixWorld);
   /* O recorte descarta o que fica do lado negativo do plano; o translúcido guarda o lado pedido, o normal guarda o outro. */
