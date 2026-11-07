@@ -18,6 +18,7 @@ export const TESTES_LENTOS = [
   'tools/modelar/guardas/etapas-do-acervo.test.mjs',
   'tools/fixtures/solido-por-lacos/solido-por-lacos.test.ts',
   'tools/fixtures/aberturas-em-teste/chapa-grande.test.ts',
+  'tools/fixtures/aberturas-em-teste/vizinhanca.test.ts',
   'src/bancada/sessao/montagem-em-dados-acervo.test.js',
   'modulos/exportador-cad/tests/exportador-cad.test.js',
   'modulos/textura/tests/metal-tecido.test.js',
