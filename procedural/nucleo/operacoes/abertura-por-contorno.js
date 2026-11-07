@@ -12,6 +12,20 @@
    maior pedaço, e a parede do vão (o que sobra das laterais do prisma dentro da chapa) ganha id novo no bloco do passo, depois dos
    pedaços. O prisma não fica na peça, e nenhuma face dele entra em `consumidas`.
 
+   A VIZINHANÇA. A booleana solda, confere e remonta toda face que recebe, e a chapa de um corpo tem centenas de milhares delas para um
+   vão que ocupa um canto (no furgão, 41 dos 99 s de uma execução eram a booleana da chapa inteira em sete vãos). O `subtrair` recebe
+   só o trecho da chapa em volta do vão (`vizinhancaDoVao`): as faces cuja caixa toca a do prisma e as que dividem um vértice com elas,
+   de modo que as faces da borda do trecho não tocam o prisma e saem da booleana como entraram. O trecho de uma chapa com espessura
+   tem uma volta de borda na pele de fora e outra na de dentro, e a banda (`bandaDaVizinhanca`, um zíper entre as duas voltas) o fecha
+   num sólido que a Manifold aceita; dois tetraedros pequenos, nos cantos da caixa da chapa (`andaimeDaCaixa`), fazem a booleana e a
+   Manifold medirem seus limiares na caixa da chapa inteira, como antes do recorte (sem eles a grade do furgão saía 5 mm diferente).
+   A banda e o andaime saem da peça depois do corte, e o registro guarda a chapa inteira: as faces que a booleana não viu ficam como
+   estavam. O trecho que não fecha por uma banda de duas voltas (o vão junto da borda da chapa, onde as peles se juntam), o que passa
+   de metade da chapa e a banda torcida não recortam, e a booleana vê a chapa inteira, como antes; `vizinhanca` no registro diz qual
+   foi e por quê (a chapa de menos de FACES_MINIMAS_PARA_RECORTAR faces também não recorta). O vértice novo da booleana recebe o id na ordem da saída da Manifold, que muda com a malha que ela recebe, e a
+   limpeza desempata fusões por id: a malha de um vão recortado pode diferir, por uma fusão a mais ou a menos, da do vão que a
+   booleana vê a chapa inteira, na mesma forma até a fusão (a diferença medida no furgão está no plano da vizinhança).
+
    A LIMPEZA DA COSTURA. A costura passa a décimos de milímetro, ou menos, de vértices e arestas da malha fina, e deixa lasca e
    triângulo sem área junto da borda (medido na fatia 1 em todas as dez posições do contorno). Depois do corte, em três passos:
      - `limparCostura` funde num ponto só a aresta que toca a costura e mede menos que `FRACAO_DA_FUSAO` da maior aresta das faces
@@ -642,8 +656,9 @@ export function fundirLascas({ pos, faces, costura, parede, limite = 1.5 * LIMIT
 
 /** tirarValenciaDois(faces) -> { faces, removidas }: o vértice que só duas faces usam, com os mesmos dois vizinhos nas duas, está no
  *  meio da aresta entre elas (as duas dividiriam duas arestas, a dobra que `topologia.js` reprova); ele sai das duas, como na
- *  booleana. A face que fica com menos de três cantos some. */
-export function tirarValenciaDois(faces) {
+ *  booleana. A face que fica com menos de três cantos some. `protegidos` são os vértices que outras faces, fora das dadas, também
+ *  usam (a borda da vizinhança recortada): a contagem de usos deles está incompleta, e eles ficam. */
+export function tirarValenciaDois(faces, protegidos = new Set()) {
   const F = new Map([...faces].map(([id, vs]) => [id, [...vs]]));
   const removidas = [];
   for (let volta = 0; volta < 8; volta++) {
@@ -651,7 +666,7 @@ export function tirarValenciaDois(faces) {
     for (const [id, vs] of F) for (const v of vs) { if (!usos.has(v)) usos.set(v, []); usos.get(v).push(id); }
     let tirou = false;
     for (const [v, donos] of [...usos].sort((x, y) => x[0] - y[0])) {
-      if (donos.length !== 2 || !donos.every((id) => F.has(id))) continue;
+      if (donos.length !== 2 || protegidos.has(v) || !donos.every((id) => F.has(id))) continue;
       const vizinhos = donos.map((id) => { const vs = F.get(id); const k = vs.indexOf(v); return new Set([vs[(k - 1 + vs.length) % vs.length], vs[(k + 1) % vs.length]]); });
       if (![...vizinhos[0]].every((w) => vizinhos[1].has(w))) continue;
       for (const id of donos) F.set(id, F.get(id).filter((w) => w !== v));
@@ -715,9 +730,10 @@ function extremosDos(pontos) {
 
 /** A interseção de dois sólidos { pontos, faces } (faces por índice, fechados e orientados), em pedaços convexos por face de
  *  entrada: { pontos, faces: [{ solido, face, vs }] }. Os pontos são os da saída da Manifold (Float32, em coordenada local). */
-function intersecaoNaManifold(wasm, solidos) {
-  const todos = solidos.flatMap((s) => s.pontos);
-  const [min, max] = extremosDos(todos);
+function intersecaoNaManifold(wasm, solidos, caixa = null) {
+  /* `caixa` é a caixa de [min, max] que fixa o centro e a grade; sem ela, a dos sólidos. A lente de uma chapa recortada à vizinhança
+     do vão passa a caixa da chapa inteira, para a grade e as coordenadas da Manifold serem as de antes do recorte. */
+  const [min, max] = caixa ?? extremosDos(solidos.flatMap((s) => s.pontos));
   const centro = [0, 1, 2].map((c) => (min[c] + max[c]) / 2);
   const grade = 2 ** Math.floor(Math.log2(Math.max(...[0, 1, 2].map((c) => max[c] - min[c])) * 2 ** -20));
   const local = (p) => [0, 1, 2].map((c) => Math.round((p[c] - centro[c]) / grade) * grade);
@@ -768,6 +784,110 @@ function intersecaoNaManifold(wasm, solidos) {
   } finally { for (const m of manifolds) m.delete(); }
 }
 
+/* ---- a vizinhança do vão: o recorte da chapa que a booleana vê ---- */
+
+/** A vizinhança só compensa quando é uma parte da chapa: acima desta fração das faces dela, a booleana vê a chapa inteira. */
+export const FRACAO_MAXIMA_DA_VIZINHANCA = 0.5;
+/** Abaixo deste número de faces a booleana da chapa inteira é barata (uma chapa de cinco mil faces leva uns 0,2 s), e o recorte não
+ *  paga o andaime e a banda: a chapa pequena segue sem recorte, com a malha que a operação sempre deu a ela. */
+export const FACES_MINIMAS_PARA_RECORTAR = 5000;
+/** A folga da caixa do prisma, em fração da maior dimensão dela, dentro da qual uma face é semente da vizinhança. Fica muito acima do erro
+ *  de Float32 e de grade da Manifold (2^-20 da caixa), de modo que a face fora da semente não é tocada pela booleana. */
+const FOLGA_DA_VIZINHANCA = 1e-3;
+
+/** bandaDaVizinhanca(pos, faces) -> { banda, bordas, voltas } | { motivo }
+ *  `faces` é um Map id -> vértices de um trecho da chapa, e `pos` dá o ponto de um vértice. A borda do trecho (a aresta cuja
+ *  oposta não está nele) de uma chapa com espessura tem duas voltas, a da pele de fora e a da de dentro; a banda são os triângulos que
+ *  ligam uma à outra, a parede que a chapa teria no recorte, de modo que o trecho e a banda formam um sólido fechado e orientado, que a
+ *  booleana aceita. Cada volta anda no sentido em que o trecho a percorre. A banda é um zíper: a partir do par de vértices mais
+ *  próximo, avança a volta cuja próxima diagonal sai mais curta. Recusa, com o motivo, a borda que não é de duas voltas simples e a
+ *  banda cujas diagonais passam de um quinto do tamanho da volta (a banda torcida, que ligaria vértices que não se correspondem). */
+export function bandaDaVizinhanca(pos, faces) {
+  const dirigidas = new Set();
+  for (const vs of faces.values()) for (let k = 0; k < vs.length; k++) dirigidas.add(`${vs[k]}>${vs[(k + 1) % vs.length]}`);
+  const proximo = new Map(); const bordas = [];
+  for (const vs of faces.values()) for (let k = 0; k < vs.length; k++) {
+    const a = vs[k], b = vs[(k + 1) % vs.length];
+    if (dirigidas.has(`${b}>${a}`)) continue;
+    if (proximo.has(a)) return { motivo: `a borda da vizinhança toca a si mesma no vértice ${a}` };
+    proximo.set(a, b); bordas.push([a, b]);
+  }
+  const vistos = new Set(); const voltas = [];
+  for (const inicio of [...proximo.keys()].sort((x, y) => x - y)) {
+    if (vistos.has(inicio)) continue;
+    const volta = []; let c = inicio;
+    while (c != null && !vistos.has(c)) { vistos.add(c); volta.push(c); c = proximo.get(c); }
+    if (c !== inicio) return { motivo: 'a borda da vizinhança não fecha em voltas simples' };
+    voltas.push(volta);
+  }
+  if (voltas.length !== 2) return { motivo: `a borda da vizinhança tem ${voltas.length} voltas, e não as duas (pele de fora e de dentro) de uma chapa com espessura` };
+  const P = [...voltas[0]].reverse(); const Q = voltas[1];
+  const dist = (x, y) => tamanho(sub(pos(x), pos(y)));
+  let melhor = Infinity; let i0 = 0, j0 = 0;
+  for (let i = 0; i < P.length; i++) for (let j = 0; j < Q.length; j++) { const d = dist(P[i], Q[j]); if (d < melhor) { melhor = d; i0 = i; j0 = j; } }
+  const n = P.length, m = Q.length;
+  const banda = []; let diagonal = 0;
+  for (let i = 0, j = 0; i < n || j < m;) {
+    const pi = P[(i0 + i) % n], pi1 = P[(i0 + i + 1) % n], qj = Q[(j0 + j) % m], qj1 = Q[(j0 + j + 1) % m];
+    const avancaP = i >= n ? false : j >= m ? true : dist(pi1, qj) <= dist(pi, qj1);
+    if (avancaP) { banda.push([pi, pi1, qj]); diagonal = Math.max(diagonal, dist(pi1, qj)); i++; } else { banda.push([qj1, qj, pi]); diagonal = Math.max(diagonal, dist(pi, qj1)); j++; }
+  }
+  const [min, max] = extremosDos(voltas[0].map(pos));
+  const porte = Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
+  if (!(diagonal <= 0.2 * porte)) return { motivo: `a banda da vizinhança liga vértices a ${fmt(diagonal * 1000)} mm, mais de um quinto dos ${fmt(porte * 1000)} mm da borda: as duas voltas não se correspondem` };
+  return { banda, bordas, voltas };
+}
+
+/** vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma }) -> { ids, banda, bordas, voltas } | { motivo }
+ *  O trecho da chapa que a booleana do vão precisa ver: as faces cuja caixa toca a do prisma (`proximas` são as que tocam o contorno
+ *  na vista, e só entre elas há semente) mais as que dividem um vértice com elas, de modo que as faces da borda do trecho não tocam o
+ *  prisma e saem da booleana como entraram. `ids` sai em ordem crescente, de `idsDaChapa`. Recusa o recorte (e a booleana vê a chapa
+ *  inteira) quando o trecho passa de FRACAO_MAXIMA_DA_VIZINHANCA da chapa ou não fecha pela banda. */
+export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, caixaDaChapa }) {
+  if (idsDaChapa.length < FACES_MINIMAS_PARA_RECORTAR) return { motivo: `a chapa tem ${idsDaChapa.length} faces, menos que as ${FACES_MINIMAS_PARA_RECORTAR} a partir das quais o recorte compensa` };
+  const [min, max] = extremosDos(pontosDoPrisma);
+  const folga = FOLGA_DA_VIZINHANCA * Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
+  const sementes = new Set(); const verticesDasSementes = new Set();
+  for (const [id, vs] of proximas) {
+    const [a, b] = extremosDos(vs.map((v) => V.get(v)));
+    if (a[0] > max[0] + folga || b[0] < min[0] - folga || a[1] > max[1] + folga || b[1] < min[1] - folga || a[2] > max[2] + folga || b[2] < min[2] - folga) continue;
+    sementes.add(id);
+    for (const v of vs) verticesDasSementes.add(v);
+  }
+  if (!sementes.size) return { motivo: 'nenhuma face da chapa toca o prisma do vão' };
+  const ids = idsDaChapa.filter((id) => sementes.has(id) || F.get(id).vs.some((v) => verticesDasSementes.has(v)));
+  if (ids.length > FRACAO_MAXIMA_DA_VIZINHANCA * idsDaChapa.length) return { motivo: `a vizinhança do vão tem ${ids.length} das ${idsDaChapa.length} faces da chapa, mais que ${FRACAO_MAXIMA_DA_VIZINHANCA * 100}%` };
+  const r = bandaDaVizinhanca((v) => V.get(v), new Map(ids.map((id) => [id, F.get(id).vs])));
+  if (r.motivo) return r;
+  const andaime = andaimeDaCaixa(extremosDos([...new Set(ids.flatMap((id) => F.get(id).vs))].map((v) => V.get(v)).concat(pontosDoPrisma)), extremosDos([...caixaDaChapa, ...pontosDoPrisma]));
+  return andaime.motivo ? andaime : { ids, ...r, andaime };
+}
+
+/** andaimeDaCaixa(caixaNova, caixaVelha) -> { pontos, faces } | { motivo }
+ *  Os limiares da booleana (a grade da Manifold, a solda dos vértices novos, o piso de área, o teto da correção) são frações da caixa
+ *  dos sólidos que ela recebe. O trecho da vizinhança tem caixa menor que a da chapa, e a malha do corte mudaria com ela (no furgão, a
+ *  grade ganhava 5 mm). Para a booleana ver a caixa de antes, o sólido ganha dois tetraedros pequenos, um em cada canto da caixa velha, sem
+ *  nada em comum com o trecho: eles só alargam a caixa, saem da booleana como entraram e saem da peça depois. Sem andaime
+ *  quando as caixas são a mesma; recusa quando um canto da caixa velha cai junto do trecho. */
+export function andaimeDaCaixa(nova, velha) {
+  const [minN, maxN] = nova; const [minV, maxV] = velha;
+  if ([0, 1, 2].every((c) => minN[c] <= minV[c] && maxN[c] >= maxV[c])) return { pontos: [], faces: [] };
+  const lado = Math.max(maxV[0] - minV[0], maxV[1] - minV[1], maxV[2] - minV[2]);
+  /* a face do tetraedro tem de passar do piso de área da booleana (2e-9 do quadrado da caixa) com folga */
+  const e = 2e-3 * lado;
+  const pontos = []; const faces = [];
+  for (const [canto, sinal] of [[minV, 1], [maxV, -1]]) {
+    const n = pontos.length;
+    const p = [canto, [canto[0] + sinal * e, canto[1], canto[2]], [canto[0], canto[1] + sinal * e, canto[2]], [canto[0], canto[1], canto[2] + sinal * e]];
+    const [lo, hi] = extremosDos(p);
+    if ([0, 1, 2].every((c) => lo[c] <= maxN[c] + e && hi[c] >= minN[c] - e)) return { motivo: `o canto ${texto2([canto[0], canto[1]])} da caixa da chapa fica junto do trecho da vizinhança, e o andaime que fixa a caixa da booleana tocaria nele` };
+    const f = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]].map((q) => q.map((k) => k + n));
+    if (sinal < 0) for (const q of f) q.reverse();
+    pontos.push(...p); faces.push(...f);
+  }
+  return { pontos, faces };
+}
+
 /* ---- as bordas do vão ---- */
 
 /** As voltas de borda entre a parede e o resto da casca, cada uma uma lista de vértices; `faces` é a casca, `parede` o conjunto
@@ -807,7 +927,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const base = BASE_ESTENDIDA + i * FAIXA_ESTENDIDA;
     return id >= base && id < base + FAIXA_ESTENDIDA ? BLOCO + id - base : null;
   };
-  const proximoLocal = (mapa, i) => { let m = -1; for (const id of mapa.keys()) { const k = localDe(i, id); if (k != null && k > m) m = k; } return m + 1; };
+  const proximoLocal = (ids, i, exceto = null) => { let m = -1; for (const id of ids) { if (exceto?.has(id)) continue; const k = localDe(i, id); if (k != null && k > m) m = k; } return m + 1; };
 
   return {
   aberturaPorContorno(st, a, i) {
@@ -874,37 +994,75 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     if (st.orfaos.length > antes) return;
     const idsDaChapa = [...selecao.faces].sort((x, y) => x - y);
     if (!idsDaChapa.length) return grita(st, i, OP, 'chapa', 'a seleção da chapa não tem face nenhuma');
-    const facesDaChapa = new Map(idsDaChapa.map((id) => [id, [...st.F.get(id).vs]]));
-    const projecao = conferirProjecao(st.V, facesDaChapa, poligono, quadro, sentido);
-    if (projecao.recusa) return grita(st, i, OP, 'contorno', projecao.recusa);
-    const { eixo } = quadro;
+    const { eixo, u: iu, v: iv } = quadro;
     const Vl = noQuadro(st.V, quadro);
+    /* uma passada pela chapa: a profundidade dela no eixo, a caixa dela, e as faces que tocam a caixa do contorno na vista, as únicas
+       que a conferência da projeção e a espessura medem (nenhuma outra face cruza um ponto nem um lado do contorno) */
+    const [u0, v0, u1, v1] = [Math.min(...poligono.map((p) => p[0])), Math.min(...poligono.map((p) => p[1])), Math.max(...poligono.map((p) => p[0])), Math.max(...poligono.map((p) => p[1]))];
     let wMin = Infinity, wMax = -Infinity;
-    for (const vs of facesDaChapa.values()) for (const v of vs) { const w = Vl.get(v)[eixo]; wMin = Math.min(wMin, w); wMax = Math.max(wMax, w); }
+    const minDaChapa = [Infinity, Infinity, Infinity], maxDaChapa = [-Infinity, -Infinity, -Infinity];
+    const proximas = new Map();
+    for (const id of idsDaChapa) {
+      const vs = st.F.get(id).vs;
+      let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+      for (const v of vs) {
+        const p = st.V.get(v); const l = quadro.identidade ? p : Vl.get(v);
+        for (let c = 0; c < 3; c++) { if (p[c] < minDaChapa[c]) minDaChapa[c] = p[c]; if (p[c] > maxDaChapa[c]) maxDaChapa[c] = p[c]; }
+        const w = l[eixo]; if (w < wMin) wMin = w; if (w > wMax) wMax = w;
+        if (l[iu] < a0) a0 = l[iu]; if (l[iu] > a1) a1 = l[iu]; if (l[iv] < b0) b0 = l[iv]; if (l[iv] > b1) b1 = l[iv];
+      }
+      if (!(a1 < u0 - 1e-9 || a0 > u1 + 1e-9 || b1 < v0 - 1e-9 || b0 > v1 + 1e-9)) proximas.set(id, vs);
+    }
+    const projecao = conferirProjecao(st.V, proximas, poligono, quadro, sentido);
+    if (projecao.recusa) return grita(st, i, OP, 'contorno', projecao.recusa);
     const margem = 0.25 * (wMax - wMin) + 1e-3;
     /* com a camada, o prisma vai de fora da chapa, do lado de quem olha, até o plano entre a primeira camada e a seguinte */
     const de = projecao.corte != null && sentido === '+' ? projecao.corte : wMin - margem;
     const ate = projecao.corte != null && sentido === '-' ? projecao.corte : wMax + margem;
-    const facesDaCamada = projecao.corte == null ? facesDaChapa : new Map([...facesDaChapa].filter(([, vs]) => projecao.naCamada(vs)));
+    const facesDaCamada = projecao.corte == null ? proximas : new Map([...proximas].filter(([, vs]) => projecao.naCamada(vs)));
     let prisma;
     try { prisma = prismaDoContorno(poligono, quadro, de, ate); } catch (e) {
       if (e instanceof ErroDePerfil) return grita(st, i, OP, 'contorno', e.message);
       throw e;
     }
-    /* a cópia da chapa antes do corte, para a lente */
-    const vertDaChapa = [...new Set(idsDaChapa.flatMap((id) => facesDaChapa.get(id)))].sort((x, y) => x - y);
-    const indiceDaChapa = new Map(vertDaChapa.map((v, k) => [v, k]));
     /* o piso de área da booleana, 2e-9 do quadrado do tamanho da chapa: o canto e a face abaixo de dez pisos se fundem */
-    const [minDaChapa, maxDaChapa] = extremosDos(vertDaChapa.map((v) => st.V.get(v)));
     const escala = Math.max(...[0, 1, 2].map((c) => maxDaChapa[c] - minDaChapa[c]));
     const piso = 2e-9 * escala * escala;
     /* o piso da divisão é o do gate de malha, que mede a área do triângulo contra o maior raio da peça inteira, e não da chapa: 2e-9 dele */
     let raioDaPeca = 0; for (const p of st.V.values()) raioDaPeca = Math.max(raioDaPeca, Math.hypot(p[0], p[1], p[2]));
     const pisoDaDivisao = 2e-9 * raioDaPeca * raioDaPeca;
-    const copia = a.lente ? { pontos: vertDaChapa.map((v) => [...st.V.get(v)]), faces: idsDaChapa.map((id) => facesDaChapa.get(id).map((v) => indiceDaChapa.get(v))), liso: idsDaChapa.map((id) => st.F.get(id).liso) } : null;
+
+    /* A VIZINHANÇA. A booleana solda, confere e remonta toda face que recebe, e a chapa de um corpo tem centenas de milhares delas
+       para um vão que ocupa um canto: ela recebe só o trecho da chapa em volta do vão, fechado por uma banda que liga as duas peles
+       (e que sai da peça depois), e o resto da chapa fica como está, com os mesmos ids. Quando o trecho não fecha por uma banda de
+       duas voltas, ou passa de metade da chapa, a booleana vê a chapa inteira, como antes. */
+    const topo = BLOCO + FAIXA_ESTENDIDA;
+    const viz = vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa] });
+    const recortada = !viz.motivo;
+    const idsPerto = recortada ? viz.ids : idsDaChapa;
+    /* no fim da faixa do passo, abaixo do prisma: a banda e as faces do andaime (e os vértices dele), que saem da peça depois do corte */
+    const nAndaime = recortada ? viz.andaime.faces.length : 0;
+    const nDaBanda = recortada ? viz.banda.length + nAndaime : 0;
+    const idPB = (g) => idDoPasso(i, topo - prisma.faces.length - nDaBanda + g);
+    const idPA = (g) => idDoPasso(i, topo - prisma.pontos.length - (recortada ? viz.andaime.pontos.length : 0) + g);
+    const idsDaBanda = recortada ? Array.from({ length: nDaBanda }, (_, g) => idPB(g)) : [];
+    const tirarBanda = () => {
+      for (const f of idsDaBanda) { st.F.delete(f); st.consumidas.delete(f); st.pedacosDe.delete(f); }
+      if (recortada) viz.andaime.pontos.forEach((_, g) => st.V.delete(idPA(g)));
+    };
+    /* a cópia da vizinhança antes do corte, para a lente: o trecho da chapa e a banda */
+    const vsDaVizinhanca = [...idsPerto.map((id) => [...st.F.get(id).vs]), ...(recortada ? viz.banda : [])];
+    const vertDaVizinhanca = [...new Set(vsDaVizinhanca.flat())].sort((x, y) => x - y);
+    const indiceDaVizinhanca = new Map(vertDaVizinhanca.map((v, k) => [v, k]));
+    /* com o andaime da caixa, para a Manifold medir a tolerância dela na caixa da chapa inteira, como antes do recorte */
+    const andaimeDaLente = recortada ? viz.andaime : { pontos: [], faces: [] };
+    const copia = a.lente ? {
+      pontos: [...vertDaVizinhanca.map((v) => [...st.V.get(v)]), ...andaimeDaLente.pontos],
+      faces: [...vsDaVizinhanca.map((vs) => vs.map((v) => indiceDaVizinhanca.get(v))), ...andaimeDaLente.faces.map((f) => f.map((k) => vertDaVizinhanca.length + k))],
+      liso: [...idsPerto.map((id) => st.F.get(id).liso), ...(recortada ? viz.banda : []).map(() => undefined), ...andaimeDaLente.faces.map(() => undefined)],
+    } : null;
 
     /* a lente sai da Manifold aqui, antes de o corte mexer na peça: a recusa dela não deixa a chapa cortada pela metade */
-    const { u: iu, v: iv } = quadro;
     const noPoligono = (P) => (p) => { const l = quadro.local(p); return P.some((q) => Math.hypot(l[iu] - q[0], l[iv] - q[1]) <= NO_POLIGONO); };
     const noDesenho = noPoligono(poligono);
     let lenteCalculada = null;
@@ -921,7 +1079,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const recuado = recuarPoligono(poligono, recuoDaLente);
       if (recuado.erro) return grita(st, i, OP, 'recuoDaLente', `a lente não cabe no vão: ${recuado.erro}; reduza recuoDaLente (o recuo de 0 deixa a lente do tamanho do vão)`);
       let r;
-      try { r = intersecaoNaManifold(wasm, [copia, recuoDaLente > 0 ? prismaDoContorno(recuado.poligono, quadro, de, ate) : prisma]); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
+      try { const prismaDaLente = recuoDaLente > 0 ? prismaDoContorno(recuado.poligono, quadro, de, ate) : prisma; r = intersecaoNaManifold(wasm, [copia, prismaDaLente], extremosDos([minDaChapa, maxDaChapa, ...prismaDaLente.pontos])); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
       const facesL = new Map(r.faces.map((f, k) => [k, f.vs]));
       const paredeL = new Set(r.faces.map((f, k) => (f.solido === 1 ? k : -1)).filter((k) => k >= 0));
       const costuraL = new Set([...paredeL].flatMap((k) => facesL.get(k)));
@@ -942,20 +1100,24 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     }
 
     // ---- o corte: o prisma entra no fim da faixa do passo, a booleana o tira da chapa, e ele sai ----
-    const topo = BLOCO + FAIXA_ESTENDIDA;
     const idPV = (g) => idDoPasso(i, topo - prisma.pontos.length + g);
     const idPF = (g) => idDoPasso(i, topo - prisma.faces.length + g);
     prisma.pontos.forEach((p, g) => addV(st, idPV(g), p));
     prisma.faces.forEach((f, g) => addF(st, idPF(g), f.map(idPV)));
+    if (recortada) {
+      viz.andaime.pontos.forEach((p, g) => addV(st, idPA(g), p));
+      [...viz.banda, ...viz.andaime.faces.map((f) => f.map(idPA))].forEach((vs, g) => addF(st, idPB(g), vs));
+    }
     const doPrisma = new Set(prisma.faces.map((_, g) => idPF(g)));
     const tirarPrisma = () => {
       for (const f of doPrisma) { st.F.delete(f); st.consumidas.delete(f); }
       for (let g = 0; g < prisma.pontos.length; g++) st.V.delete(idPV(g));
+      tirarBanda();
     };
     const antesDoCorte = st.orfaos.length;
     /* a chapa vai à booleana pelas faces já resolvidas, e não pela seleção de novo: resolvida aqui, uma seleção que pega a peça
        inteira (`tudo`) pegaria também o prisma */
-    subtrair(st, { origemId: a.origemId, solidos: [{ f: idsDaChapa }, { f: [...doPrisma] }] }, i);
+    subtrair(st, { origemId: a.origemId, solidos: [{ f: [...idsPerto, ...idsDaBanda] }, { f: [...doPrisma] }] }, i);
     if (st.orfaos.length > antesDoCorte) {
       for (const o of st.orfaos.slice(antesDoCorte)) { o.op = OP; o.ref = o.ref === 'solidos' || o.ref === 'solidos[0]' ? 'chapa' : o.ref; o.motivo = `o corte da chapa pela booleana recusou: ${o.motivo}`; }
       tirarPrisma();
@@ -966,10 +1128,14 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     if (!registros.length) st.origens.delete(a.origemId);
     for (const f of doPrisma) st.consumidas.delete(f);
     for (let g = 0; g < prisma.pontos.length; g++) st.V.delete(idPV(g));
+    /* a banda existiu só para a booleana ver um sólido fechado: sai da peça, e das faces do corte */
+    tirarBanda();
+    const daBanda = new Set(idsDaBanda);
+    doCorte.faces = doCorte.faces.filter((f) => !daBanda.has(f));
 
     /* a parede: o que sobrou das laterais do prisma (a face que guardou o id dele e os pedaços dela), com id novo depois dos pedaços */
     const daParede = (f) => doPrisma.has(f) || doPrisma.has(st.pedacosDe.get(f));
-    let proximaFace = proximoLocal(new Map([...st.F].filter(([id]) => !doPrisma.has(id))), i);
+    let proximaFace = proximoLocal(st.F.keys(), i, doPrisma);
     const renumerada = new Map();
     for (const f of doCorte.faces.filter((id) => doPrisma.has(id)).sort((x, y) => x - y)) {
       const face = st.F.get(f); const novo = idDoPasso(i, proximaFace++);
@@ -987,7 +1153,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const antesDaFusao = new Map([...limpa.fundidos.keys()].map((v) => [v, [...st.V.get(v)]]));
     /* na fusão de lascas fica a face de antes do passo, que guarda a identidade; entre duas do mesmo tipo, a vizinha */
     const lascas = fundirLascas({ pos: posDaPeca, faces: limpa.faces, costura, parede, piso, preferir: (outra, lasca) => (localDe(i, outra) != null && localDe(i, lasca) == null ? lasca : outra) });
-    const valencia = tirarValenciaDois(lascas.faces);
+    const valencia = tirarValenciaDois(lascas.faces, new Set(recortada ? viz.voltas.flat() : []));
     const tocados = new Set([...limpa.faces.values(), ...facesDoCorte.map((f) => st.F.get(f).vs)].flat());
     for (const f of [...limpa.removidas, ...lascas.removidas, ...valencia.removidas]) {
       st.F.delete(f); parede.delete(f); st.pedacosDe.delete(f);
@@ -1014,7 +1180,9 @@ export function criarOperacoesAberturaPorContorno(servicos) {
         divisoes++;
       }
     }
-    const usados = new Set(); for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
+    /* só as faces do corte usam um vértice tocado, a não ser os da borda da vizinhança, que a face de fora dela também usa e que a face
+       da borda, que a booleana não tocou, mantém */
+    const usados = new Set(); for (const f of facesDoCorte) { const face = st.F.get(f); if (face) for (const v of face.vs) usados.add(v); }
     for (const v of tocados) if (!usados.has(v)) st.V.delete(v);
     /* a costura deste vão a menos que a fusão de uns décimos de milímetro da borda de um vão aberto antes: a limpeza funde os vértices
        dela, a borda registrada do outro vão perde vértices (o friso nela quebra) e a tira de chapa entre os dois sai lasca */
@@ -1022,13 +1190,23 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const perdidos = [...antes.borda.fora, ...antes.borda.dentro].filter((v) => !st.V.has(v)).length;
       if (perdidos) return grita(st, i, OP, 'contorno', `a costura deste vão chega tão perto da borda do vão do passo ${antes.passo} que a limpeza fundiu ${perdidos} vértices dela e a borda dele ficou sem os pontos que registrou: a folga entre os dois vãos medida na bateria (2026-11-06) é de 0,3 mm no mínimo, e abaixo de 1 mm a tira de chapa entre eles já é fina; afaste o contorno do vão vizinho, ou desenhe os dois como um vão só`);
     }
-    const facesDaChapaCortada = facesDoCorte.filter((f) => st.F.has(f)).sort((x, y) => x - y);
+    const facesPerto = facesDoCorte.filter((f) => st.F.has(f)).sort((x, y) => x - y);
+    /* a borda da vizinhança saiu da booleana como entrou: cada aresta dela está nas faces do corte, e o recorte não deixou fenda */
+    if (recortada) {
+      const arestas = new Set();
+      for (const f of facesPerto) { const vs = st.F.get(f).vs; for (let k = 0; k < vs.length; k++) arestas.add(`${vs[k]}>${vs[(k + 1) % vs.length]}`); }
+      const perdidas = viz.bordas.filter(([x, y]) => !arestas.has(`${x}>${y}`)).length;
+      if (perdidas) return grita(st, i, OP, 'chapa', `o corte alcançou a borda da vizinhança recortada da chapa (${perdidas} arestas dela mudaram, de ${viz.bordas.length}) e abriu uma fenda entre o trecho cortado e o resto da chapa; o vão passa da vizinhança que a operação recorta, e o recorte deveria ter coberto o prisma com folga`);
+    }
+    /* a chapa cortada inteira: o que a booleana não viu, como estava, e o trecho cortado */
+    const dentroDaVizinhanca = new Set(idsPerto);
+    const facesDaChapaCortada = recortada ? [...idsDaChapa.filter((f) => !dentroDaVizinhanca.has(f)), ...facesPerto].sort((x, y) => x - y) : facesPerto;
     /* o quanto a fusão mexeu na superfície: a distância de cada vértice que saiu às faces que ficaram em volta do que ficou */
     let desvioDaFusao = 0;
     for (const [sai, p] of antesDaFusao) {
       const fica = limpa.fundidos.get(sai);
       let d = Infinity;
-      for (const f of facesDaChapaCortada) {
+      for (const f of facesPerto) {
         const vs = st.F.get(f).vs;
         if (!vs.includes(fica)) continue;
         for (let k = 1; k + 1 < vs.length; k++) d = Math.min(d, distanciaAoTriangulo(p, st.V.get(vs[0]), st.V.get(vs[k]), st.V.get(vs[k + 1])));
@@ -1037,13 +1215,13 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     }
 
     // ---- as bordas: a de fora é a que encosta na face externa de uma chapa por subdivisão, ou a voltada para o eixo ----
-    const casca = new Map(facesDaChapaCortada.map((f) => [f, st.F.get(f).vs]));
+    const casca = new Map(facesPerto.map((f) => [f, st.F.get(f).vs]));
     const voltas = voltasDaBorda(casca, parede);
     if (!voltas || voltas.length !== 2) return grita(st, i, OP, 'chapa', `o corte deixou ${voltas ? voltas.length : 'uma'} borda${voltas?.length === 1 ? '' : 's'} ${voltas ? '' : 'que não fecha '}em vez das duas de uma chapa (a de fora e a de dentro); confira que a chapa é uma chapa com espessura que o contorno atravessa uma vez`);
     const externas = new Set();
     for (const regs of st.origens.values()) for (const r of regs) if (r.op === 'subdivisao' && Array.isArray(r.externa)) for (const f of r.externa) externas.add(f);
     const raizDe = (f) => { let x = f; while (st.pedacosDe.has(x)) x = st.pedacosDe.get(x); return x; };
-    const facesDaVolta = (volta) => { const s = new Set(volta); return facesDaChapaCortada.filter((f) => !parede.has(f) && st.F.get(f).vs.some((v) => s.has(v))); };
+    const facesDaVolta = (volta) => { const s = new Set(volta); return facesPerto.filter((f) => !parede.has(f) && st.F.get(f).vs.some((v) => s.has(v))); };
     const naExterna = (volta) => facesDaVolta(volta).some((f) => externas.has(raizDe(f)));
     const paraOEixo = (volta) => facesDaVolta(volta).reduce((s, f) => s + newell(st.F.get(f).vs.map((v) => quadro.local(st.V.get(v))))[eixo], 0);
     let [fora, dentro] = voltas;
@@ -1067,7 +1245,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const pl = quadro.local(p);
       const par = dentro.find((w) => { if (!fixos.has(w)) return false; const l = quadro.local(st.V.get(w)); return Math.hypot(l[iu] - pl[iu], l[iv] - pl[iv]) <= NO_POLIGONO; });
       if (par == null) continue;
-      const n = facesDaChapaCortada.filter((f) => !parede.has(f) && st.F.get(f).vs.includes(v)).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
+      const n = facesPerto.filter((f) => !parede.has(f) && st.F.get(f).vs.includes(v)).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
       if (tamanho(n) > 0) espessuras.push(Math.abs(ponto(sub(p, st.V.get(par)), n)) / tamanho(n));
     }
     espessuras.sort((x, y) => x - y);
@@ -1078,7 +1256,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     if (lenteCalculada) {
       const { r, limpaL, origemDaParte } = lenteCalculada;
       const usadosL = [...new Set([...limpaL.faces.values()].flat())].sort((x, y) => x - y);
-      const base = proximoLocal(st.V, i);
+      const base = proximoLocal(st.V.keys(), i);
       if (base + usadosL.length > topo || proximaFace + limpaL.faces.size > topo) return grita(st, i, OP, 'lente', `a lente estoura o bloco e a faixa estendida de ids do passo (${topo})`);
       const idV = new Map(usadosL.map((v, k) => [v, idDoPasso(i, base + k)]));
       for (const v of usadosL) addV(st, idV.get(v), r.pontos[v]);
@@ -1093,10 +1271,11 @@ export function criarOperacoesAberturaPorContorno(servicos) {
 
     /* as faces finas (a lasca da topologia) que a limpeza não achou como desfazer, na chapa cortada com a parede e na lente: o gate de
        malha as acusa, e o registro diz quantas ficaram para quem lê */
-    const finasRestantes = [...facesDaChapaCortada, ...lente].filter((f) => st.F.has(f) && razaoDaFace(st.F.get(f).vs.map((v) => st.V.get(v))) < LIMITE_DE_FACE_FINA).length;
-    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes } });
+    const finasRestantes = [...facesPerto, ...lente].filter((f) => st.F.has(f) && razaoDaFace(st.F.get(f).vs.map((v) => st.V.get(v))) < LIMITE_DE_FACE_FINA).length;
+    const vizinhanca = { recortada, faces: idsPerto.length, daChapa: idsDaChapa.length, ...(recortada ? {} : { motivo: viz.motivo }) };
+    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, vizinhanca, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes } });
     registraOrigem(st, i, OP, a.origemId, {
-      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista: a.vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente,
+      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista: a.vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente, vizinhanca,
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
       limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes },
     });

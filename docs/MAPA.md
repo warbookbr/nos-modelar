@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1676 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1677 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2075,6 +2075,7 @@
 - `tres-camadas.js` — tres-camadas.js — peça de teste do plano da abertura em qualquer direção: o corpo de várias camadas na mesma reta, com `sentido`.
 - `vao-da-quina.test.ts` — vao-da-quina.test.ts — fatia 1 do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`): o vão …
 - `vinco-e-borda.js` — vinco-e-borda.js — peça de teste do plano da abertura em qualquer direção: o contorno que cruza um vinco vivo e o que passa perto da borda da chapa.
+- `vizinhanca.test.ts` — vizinhanca.test.ts — bateria do plano `docs/modelar/planos/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o trecho da chapa em volta d…
 
 ## tools/fixtures/acervo/peca-de-prova/
 

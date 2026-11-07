@@ -21,6 +21,11 @@ describe('um vão numa chapa de 250 mil faces', () => {
     exigirFechada(gate1(neutro, undefined, { adaptador: false }));
     const d = desvioDoVao(neutro, 0, 'y', VAO);
     expect(piorDesvio(d)).toBeLessThan(0.5);
+    /* o vão recorta a vizinhança: a booleana vê uma fração da chapa, e o passo custa o da subdivisão, e não nove vezes ele (34 s contra
+       3,6 s, medidos antes do recorte do plano `2026-11-06-abertura-so-na-vizinhanca.md`) */
+    expect(neutro.aberturas[0].vizinhanca.recortada).toBe(true);
+    expect(neutro.aberturas[0].vizinhanca.faces).toBeLessThan(0.1 * neutro.aberturas[0].vizinhanca.daChapa);
+    expect(neutro.ms - base.ms).toBeLessThan(3 * base.ms);
     console.log(JSON.stringify({ chapaGrande: { facesSemVao: base.F.size, facesComVao: neutro.F.size, msSubdivisao: base.ms, msPassoTodo: neutro.ms, msDoVao: neutro.ms - base.ms, desvioMm: Number(piorDesvio(d).toFixed(4)), limpeza: neutro.aberturas[0].limpeza, rssMB: Math.round(process.memoryUsage().rss / 1e6) } }));
   }, 900000);
 });
