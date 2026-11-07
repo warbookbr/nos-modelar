@@ -238,9 +238,9 @@ export function derivar(T) {
     const xFimDaCoroa = Math.max(xQ3 + 1, an.y >= yDQuina - 1e-9 ? xDoCaminho(caminhoQuina(an)) : sec.xS);
     const coroa = (p) => {
       const x = Math.abs(p[0]);
-      /* a descida é C2 no encontro com o fim da coluna q3: 1 - (1 - u²)³ chega a 1 sem inclinação nem curvatura, e a cauda quíntica sai de 1 do mesmo jeito; com a parábola (inclinação 2/xQ3) e a cauda cúbica ali havia um vinco, a faixa vermelha e azul ao longo da coluna A */
-      const u = x / xQ3; const t = Math.min(1, Math.max(0, (x - xQ3) / (xFimDaCoroa - xQ3)));
-      const g = x <= xQ3 ? 1 - (1 - u * u) ** 3 : 1 - t * t * t * (t * (6 * t - 15) + 10);
+      /* a descida é C1 no fim da coluna q3: a cauda é um Hermite que sai de 1 com a inclinação da parábola (2/xQ3) e chega a zero sem inclinação em xFim; com a cauda saindo na horizontal havia ali um vinco, a faixa vermelha e azul ao longo da coluna A. A parábola do centro, que desenha o arco do vidro, não muda. */
+      const u = x / xQ3; const w = xFimDaCoroa - xQ3; const t = Math.min(1, Math.max(0, (x - xQ3) / w));
+      const g = x <= xQ3 ? u * u : (2 * t ** 3 - 3 * t * t + 1) + (t ** 3 - 2 * t * t + t) * (2 / xQ3) * w;
       return [p[0], p[1] - flechaEm(p[1]) * g, p[2]];
     };
     colunasFrente(an).forEach((x, k) => add(`f${k}`, coroa(pontoFrente(sec, x))));
