@@ -30,8 +30,11 @@ const SEGUNDOS_POR_ALVO = 2;
    (82 s antes deles, na mesma máquina local que mediu 160 s depois); o teto foi a 260 s, a mesma razão. Em 2026-11-06 as duas
    lanternas passaram a ser vãos na quina pela mesma operação, com a limpeza fina em todos, e o furgão foi a 305 s no CI; o perfil
    local deu 67 dos 99 s de uma execução nas sete aberturas, 41 deles na booleana da chapa inteira (o item do backlog "Booleana
-   de um vão sem percorrer a chapa inteira"). O teto foi a 450 s, e o prazo do teste a 600 s. */
-const PECAS_PESADAS = { 'furgao-realista': 450 };
+   de um vão sem percorrer a chapa inteira"). O teto foi a 450 s, e o prazo do teste a 600 s. Em 2026-11-07 a booleana de cada vão passou a ver só a vizinhança dele
+   (plano `2026-11-06-abertura-so-na-vizinhanca.md`): as sete aberturas caíram de 51 s para 3,7 s no perfil local, as duas execuções
+   mais a conta do furgão, de 194 s para 86 s na máquina local, e o teto de 305 s medido no CI vira cerca de 136 s; o teto voltou a 230 s,
+   1,7 vez isso, e o prazo do teste, 400 s. */
+const PECAS_PESADAS = { 'furgao-realista': 230 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
@@ -61,5 +64,5 @@ describe('acervo real, inteiro', () => {
     for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
       expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
     }
-  }, 600_000);
+  }, 400_000);
 });
