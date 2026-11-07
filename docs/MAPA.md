@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1677 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1678 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -332,6 +332,7 @@
 - `farol-contorno.esboco.mjs` — farol-contorno.esboco.mjs — três tratamentos do contorno do farol A do furgão (2026-11-05), numa chapa curva de prova, para a pessoa escolher: o atual (cinco…
 - `farol-e-grade-altura.esboco.mjs` — farol-e-grade-altura.esboco.mjs — o conjunto 1 (limpo) de `farol-e-grade.esboco.mjs`, escolhido pela pessoa em 2026-11-05, com o farol mais baixo: o topo fic…
 - `farol-e-grade.esboco.mjs` — farol-e-grade.esboco.mjs — três conjuntos de farol e grade para a frente do furgão (2026-11-05), desenhados de frente para a pessoa escolher o caráter antes …
+- `farol-interior.esboco.mjs` — farol-interior.esboco.mjs — opções do interior do farol dianteiro do furgão realista, para a pessoa escolher em 2026-11-07.
 
 ## docs/modelar/banco-de-provas/importar-objeto-2026-10-15/
 
