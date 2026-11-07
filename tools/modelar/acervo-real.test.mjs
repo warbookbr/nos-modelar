@@ -33,8 +33,11 @@ const SEGUNDOS_POR_ALVO = 2;
    de um vão sem percorrer a chapa inteira"). O teto foi a 450 s, e o prazo do teste a 600 s. Em 2026-11-07 a booleana de cada vão passou a ver só a vizinhança dele
    (plano `2026-11-06-abertura-so-na-vizinhanca.md`): as sete aberturas caíram de 51 s para 3,7 s no perfil local, as duas execuções
    mais a conta do furgão, de 194 s para 86 s na máquina local, e o teto de 305 s medido no CI vira cerca de 136 s; o teto voltou a 230 s,
-   1,7 vez isso, e o prazo do teste, 400 s. */
-const PECAS_PESADAS = { 'furgao-realista': 230 };
+   1,7 vez isso, e o prazo do teste, 400 s. Na etapa 8, ainda em 2026-11-07, entraram mais quatro vãos (as luzes de canto e os
+   piscas laterais), e a vizinhança deles não recorta (`vizinhanca.motivo` no registro: borda com uma volta só nas luzes de canto,
+   que dobram a quina, e banda de 96 mm nos piscas), então os quatro voltam à booleana da chapa inteira; o furgão foi a 245 s no
+   CI, e o teto vai a 420 s, 1,7 vez isso, com o prazo do teste em 600 s, até a vizinhança cobrir esses dois casos (item do backlog). */
+const PECAS_PESADAS = { 'furgao-realista': 420 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
@@ -64,5 +67,5 @@ describe('acervo real, inteiro', () => {
     for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
       expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
     }
-  }, 400_000);
+  }, 600_000);
 });
