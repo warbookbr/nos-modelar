@@ -48,6 +48,10 @@ const ID_DE_FAMILIA = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 const NOME_DE_PARTE = /^[a-zA-Z][a-zA-Z0-9]*$/;
 const LIMITE_TEXTO = 240;
 const LIMITE_LISTA = 64;
+/* As partes têm teto próprio desde 2026-11-07: o furgão realista, um veículo inteiro, chegou às 64 com a lataria, os vidros, as
+   rodas, o plástico, as luzes e o interior simples, e o interior dos faróis e das lanternas (refletor e lâmpada) passaria disso;
+   a pessoa escolheu 128 só para as partes, e as outras listas do PLANO seguem em 64. */
+const LIMITE_PARTES = 128;
 
 /* Motivo e critério têm tamanho mínimo pela mesma razão que o motivo de contato
    tem: campo livre que aceita "ok" é campo que some. */
@@ -127,8 +131,8 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     falhar(quem, "'escala.milimetros' precisa ser número finito maior que zero.");
   }
 
-  if (!Array.isArray(valor.partes) || valor.partes.length === 0 || valor.partes.length > LIMITE_LISTA) {
-    falhar(quem, `'partes' precisa ser lista não vazia com no máximo ${LIMITE_LISTA} itens.`);
+  if (!Array.isArray(valor.partes) || valor.partes.length === 0 || valor.partes.length > LIMITE_PARTES) {
+    falhar(quem, `'partes' precisa ser lista não vazia com no máximo ${LIMITE_PARTES} itens.`);
   }
   const partes = valor.partes
     .map((parte, i) => umaParte(parte, quem, `partes[${i}]`))

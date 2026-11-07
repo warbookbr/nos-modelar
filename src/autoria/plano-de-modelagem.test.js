@@ -36,6 +36,14 @@ describe('plano de modelagem', () => {
     expect(invertido).toEqual(plano);
   });
 
+  it('as partes vão até 128 e as outras listas até 64', () => {
+    const partes = (n) => Array.from({ length: n }, (_, k) => ({ nome: `parte${k}`, forma: 'forma de prova da parte', tecnica: 'caixa' }));
+    expect(com({ partes: partes(128) }).partes).toHaveLength(128);
+    expect(() => com({ partes: partes(129) })).toThrow(/no máximo 128/);
+    const criterios = Array.from({ length: 65 }, (_, k) => `critério de prova número ${k}`);
+    expect(() => com({ criteriosDeReprovacao: criterios })).toThrow(/no máximo 64/);
+  });
+
   it('ausência é ausência, e não invalidez: quem exige plano é o gate', () => {
     expect(normalizarPlanoDeModelagem(undefined)).toBe(null);
     expect(normalizarPlanoDeModelagem(null)).toBe(null);

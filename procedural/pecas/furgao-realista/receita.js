@@ -437,7 +437,7 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome: v.nome, sel }]);
     passos.push(['material', { sel, usa: 'azul' }]);
   });
-  /* a aba e a lente são a mesma parte, cada uma no seu material: o PLANO tem teto de 64 partes */
+  /* a aba e a lente são a mesma parte, cada uma no seu material: o PLANO tinha teto de 64 partes, e desde 2026-11-07 tem 128 */
   lentes.forEach((c, k) => {
     const sel = { origem: { op: 'subdivisao', id: 920 + k } };
     passos.push(['subdivisao', { origemId: 920 + k, vertices: c.vertices, faces: c.faces, borda: 'cantos', niveis: T.niveis, espessura: m(T.luz_espessura) }]);
