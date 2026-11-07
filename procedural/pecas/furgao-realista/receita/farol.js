@@ -123,7 +123,7 @@ export function derivarLanternas(T, f) {
   alturas[alturas.length - 1] = y1 - y0 - g * (alturas.length - 1) - alturas.slice(0, -1).reduce((s, h) => s + h, 0);
   const queda = T.lanterna_topo_queda * alturas[0];
   const nomes = ['Freio', 'Re', 'Pisca', 'Neblina'];
-  const materiais = ['lenteVermelha', 'lenteIncolor', 'lenteAmbar', 'lenteVermelha'];
+  const materiais = ['lenteVermelha', 'lenteLeitosa', 'lenteAmbar', 'lenteVermelha'];
   let yTopo = y1;
   const faixas = alturas.map((h, i) => {
     const yBase = yTopo - h;

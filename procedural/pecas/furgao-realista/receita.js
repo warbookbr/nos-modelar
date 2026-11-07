@@ -810,6 +810,8 @@ const receita = {
     lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
     lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2 },
     // as faixas da lente da lanterna de trás (etapa 8): lisas e translúcidas, vermelha, incolor e âmbar; o relevo fica para o plano de material
+    // a faixa de ré da lanterna: incolor e leitosa, de plástico fosco, para a lente não sumir sem o aro cinza do farol e o refletor aparecer esmaecido por trás
+    lenteLeitosa: { tipo: 'liso', cor: '#e9eceb', mistura: 'transparente', opacidade: 0.7, aspereza: 0.65, metalicidade: 0 },
     lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1 },
     grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
   },
