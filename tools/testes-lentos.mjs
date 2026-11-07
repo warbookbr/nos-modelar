@@ -19,6 +19,7 @@ export const TESTES_LENTOS = [
   'tools/fixtures/solido-por-lacos/solido-por-lacos.test.ts',
   'tools/fixtures/aberturas-em-teste/chapa-grande.test.ts',
   'tools/fixtures/aberturas-em-teste/vizinhanca.test.ts',
+  'procedural/nucleo/operacoes/abertura-por-contorno.test.ts',
   'src/bancada/sessao/montagem-em-dados-acervo.test.js',
   'modulos/exportador-cad/tests/exportador-cad.test.js',
   'modulos/textura/tests/metal-tecido.test.js',
