@@ -238,7 +238,9 @@ export function derivar(T) {
     const xFimDaCoroa = Math.max(xQ3 + 1, an.y >= yDQuina - 1e-9 ? xDoCaminho(caminhoQuina(an)) : sec.xS);
     const coroa = (p) => {
       const x = Math.abs(p[0]);
-      const g = x <= xQ3 ? (x / xQ3) ** 2 : 1 - suave((x - xQ3) / (xFimDaCoroa - xQ3));
+      /* a descida é C2 no encontro com o fim da coluna q3: 1 - (1 - u²)³ chega a 1 sem inclinação nem curvatura, e a cauda quíntica sai de 1 do mesmo jeito; com a parábola (inclinação 2/xQ3) e a cauda cúbica ali havia um vinco, a faixa vermelha e azul ao longo da coluna A */
+      const u = x / xQ3; const t = Math.min(1, Math.max(0, (x - xQ3) / (xFimDaCoroa - xQ3)));
+      const g = x <= xQ3 ? 1 - (1 - u * u) ** 3 : 1 - t * t * t * (t * (6 * t - 15) + 10);
       return [p[0], p[1] - flechaEm(p[1]) * g, p[2]];
     };
     colunasFrente(an).forEach((x, k) => add(`f${k}`, coroa(pontoFrente(sec, x))));

@@ -254,6 +254,7 @@ export const TABELA = {
   farol_posicao_raio: 50,
   refletor_furo: 16, // o furo do soquete no fundo da capa, de raio
   refletor_facetas: 12, // as facetas largas: 6 de cada lado da lâmpada principal, cada uma uma faixa curva entre dois vincos
+  refletor_faceta_relevo: 300, // quanto cada faceta afunda no meio entre dois vincos, em mm: o relevo que a luz rasante lê em metal claro
   luz_canto_fresta: 14, // a fresta entre o lado inclinado do farol e o de dentro da luz de canto
   luz_canto_entra_lado: 60, // quanto o vão entra na lateral além do fim do arco da quina
   luz_canto_base_razao: 0.62, // a base é curta: 62% do topo
@@ -404,6 +405,7 @@ export const TABELA = {
 /* ---------- passos ---------- */
 
 const CHAPA = { origem: { op: 'subdivisao', id: 1 } };
+const MEDIDA_DO_TETO = 'cobertura4_5_e'; // um ponto do teto plano, longe das nervuras (colunas 3 e 7), onde a superfície limite fica em y igual à altura
 /** Os ids dos passos das luzes da frente, por lado k: o vão do farol (810 + k), o da luz de canto (812 + k) e o do pisca lateral (814 + k); as abas
  *  (940 + k, 950 + k e 952 + k) e o aro do farol (954 + k); os refletores (960 + i, na ordem de `REFLETORES`) e as lâmpadas (970 + 2i, o bulbo, e 971 + 2i, a tampinha). */
 const ID_FAROL = (k) => 810 + k;
@@ -430,7 +432,8 @@ export function perfilDaBorracha(T) {
 export function gerarPassos(T) {
   const { passo, plastico, rodas, vidros, cristais, luzes, lentes, abasDosArcos, refletores, lampadas, forma: f } = derivar(T);
   const passos = [
-    ['subdivisao', { origemId: 1, ...passo, borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
+    /* `medidas` liga o ponto limite: a malha entregue deixa de ser a do nível 1 (que, no teto plano e na curva do teto, mostra o reticulado de Catmull-Clark em pontinhos de curvatura) e passa a ter cada vértice na superfície limite. A medida é um ponto do teto plano, em y exato, que a superfície limite já atravessa, e por isso não move a gaiola. */
+    ['subdivisao', { origemId: 1, ...passo, medidas: [MEDIDA_DO_TETO], borda: 'cantos', niveis: T.niveis, espessura: m(T.espessura) }],
   ];
   /* o plástico de baixo: cada peça é a pele de uma seção varrida por fora da chapa, engrossada para dentro */
   plastico.forEach((pl, k) => {

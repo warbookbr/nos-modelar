@@ -157,8 +157,11 @@ export function derivarLuzesPorDentro(T, f) {
     const rhoDoPonto = (p) => { const v = sub(p, centro); return norma(v) / alcance(centro, unit(v), borda); };
     const profundidade = (rho, p) => {
       const dq = norma(sub(p, q));
-      const poco = T.farol_posicao_profundidade * Math.exp(-((dq / T.farol_posicao_raio) ** 2)) * (1 - rho ** 3);
-      return T.farol_refletor_profundidade * (1 - rho ** 2) + poco;
+      const poco = T.farol_posicao_profundidade * Math.exp(-((dq / T.farol_posicao_raio) ** 2)) * (1 - rho ** 2) ** 2 * 2;
+      /* as facetas: entre dois vincos a capa é uma calha, funda no meio e rasa no vinco, de modo que a luz rasante e o metal claro leem os 12 painéis */
+      const fase = ((Math.atan2(p[1] - centro[1], p[0] - centro[0]) + Math.PI) / (2 * Math.PI)) * T.refletor_facetas;
+      const calha = 0.5 - Math.abs(fase - Math.floor(fase) - 0.5);
+      return T.farol_refletor_profundidade * (1 - rho ** 2) + poco + T.refletor_faceta_relevo * (calha - 0.25) * Math.max(0, Math.min(1, (rho - 0.3) / 0.4)) ** 2 * (1 - rho ** 2) ** 2 * 2;
     };
     const posicao = (p, prof) => [p[0], p[1], S.zS(p[0], p[1]) - encosto - prof];
     const capa = capaPolar({ prefixo: 'refletorFarolEsquerdo', borda, centro, raioFuro: T.refletor_furo, profundidade, posicao, fora: [0, 0, 1], facetas: T.refletor_facetas });
