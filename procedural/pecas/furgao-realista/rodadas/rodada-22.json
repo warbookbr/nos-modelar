@@ -1,0 +1,508 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "furgao-realista",
+  "numero": 22,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/furgao-realista/referencias/quatro-vistas.prancha.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "carroceria",
+        "tipo": "superficie",
+        "onde": "pé do para-brisa, entre o capô e a coluna",
+        "sentido": "segmentado",
+        "evidencia": "peca-lado-rasante-az30 e curvatura de lado e tresquartos: mancha escura e fios azuis curtos nas duas pontas inferiores do para-brisa."
+      },
+      {
+        "parte": "grade",
+        "tipo": "superficie",
+        "onde": "extremidade direita das três barras, na luz rasante de frente",
+        "sentido": "segmentado",
+        "evidencia": "peca-frente-rasante-az10: as barras mostram degraus e cortes serrilhados perto de x 860 que a forma não pede."
+      },
+      {
+        "parte": "luzDeCantoEsquerda",
+        "tipo": "superficie",
+        "onde": "aro em volta da lente, em todo o contorno",
+        "sentido": "facetado",
+        "evidencia": "Isométrica isolada: o aro cinza tem lados poligonais visíveis, e não curva contínua nos cantos de concordância."
+      },
+      {
+        "parte": "molduraArcoDianteiroEsquerdo",
+        "tipo": "superficie",
+        "onde": "pontas do arco, esquerda afilada em lasca e direita ondulada",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica isolada: o arco termina em lasca aguda à esquerda e em borda ondulada à direita, e não nas pontas horizontais em 463, 580 e 724 da forma prometida."
+      },
+      {
+        "parte": "refletorFarolEsquerdo",
+        "tipo": "superficie",
+        "onde": "borda de cima e lateral direita da capa, e facetas",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica isolada: a capa lê como papel amassado, com a borda rasgada e ondulada e as facetas irregulares, e não como concha única lisa de 12 facetas."
+      }
+    ],
+    "observacao": "Silhueta, portas, vãos, luzes e rodas batem com a prancha nas vistas que abri; os defeitos são de forma fina em molduras, refletor e junto do para-brisa. Vi só 12 das cerca de 100 partes."
+  },
+  "partes": [
+    {
+      "nome": "carroceria",
+      "confere": false,
+      "observacao": "coroa sem vinco na coluna A, mas a faixa de curvatura dela continua; a ponta do teto na rasante é o canto iluminado, e a trama de pontinhos não mudou"
+    },
+    {
+      "nome": "abaVaoParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaVaoPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPresaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "saiaPortaCorrer",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parachoqueTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroArcoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borrachaParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borrachaPortaCabineEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borrachaPortaCabineDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borrachaPortaTraseiraEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borrachaPortaTraseiraDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "grade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "farolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "farolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroFarolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroFarolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "refletorFarolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "refletorFarolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaFarolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaFarolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaPosicaoFarolEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaPosicaoFarolDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzDeCantoEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzDeCantoDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "refletorLuzDeCantoEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "refletorLuzDeCantoDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaLuzDeCantoEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaLuzDeCantoDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piscaLateralEsquerdo",
+      "confere": false,
+      "observacao": "fica à frente da fresta da porta, sobre o arco, e não atrás da roda dianteira: ali só há porta"
+    },
+    {
+      "nome": "piscaLateralDireito",
+      "confere": false,
+      "observacao": "fica à frente da fresta da porta, sobre o arco, e não atrás da roda dianteira: ali só há porta"
+    },
+    {
+      "nome": "refletorPiscaLateralEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "refletorPiscaLateralDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaPiscaLateralEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lampadaPiscaLateralDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaEsquerda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaDireita",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzDeFreio",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pisoInterior",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "divisoria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "bancoMotorista",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "bancoPassageiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoDianteiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoDianteiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiroEsquerdo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiroDireito",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o Blender não estava no brief; o caminho veio depois e só então as vistas de superfície saíram",
+    "ondulacao-da-superficie recusa a peça: o vértice 490 do passo 0 foi tirado por passo posterior",
+    "a bancada recusa sobrescrever --saida e falha em silêncio quando o motor recusa a receita",
+    "aoLimite só liga com medidas não vazias; uma opção própria evitaria a medida de um ponto plano",
+    "a ponta do teto na rasante é um canto lateral iluminado, e sem a gaiola do encontro dos anéis não achei a causa",
+    "a ponta acima do teto da rodada 21 era o canto iluminado na rasante, com o resto do teto preto como o fundo; o crítico não a citou de novo nesta rodada"
+  ],
+  "notaDePassagem": "Cauda da coroa em Hermite C1 sai da parábola com a mesma inclinação, sem vinco na coluna A. Facetas do refletor por calha, com peso zero na borda para manter o contato com o aro.",
+  "receita": {
+    "sha256": "sha256:486637d795aabd275b820ab53154bd642d862d5b73cc3c26cf7f4531d63a4a5d",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 1,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 257,
+          "texto": "  refletor_faceta_relevo: 300, // quanto cada faceta afunda no meio entre dois vincos, em mm: o relevo que a luz rasante lê em metal claro"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes carroceria",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
