@@ -668,10 +668,16 @@ const comFrase = (inicio, frase) => cortar(frase ? `${inicio}: ${frase}` : inici
 
 /**
  * O mapa em texto, numa tela. Quando a forma completa passa de LIMITE_DE_LINHAS, a seguinte junta mais funções na linha das curtas
- * e põe numa linha só os blocos de PASSOS sem comentário; a primeira que cabe é a que sai.
+ * e põe numa linha só os blocos de PASSOS sem comentário, e a última lista as seções da TABELA corridas, sem a frase de cada uma;
+ * a primeira que cabe é a que sai.
  */
 export function formatarMapa(mapa) {
-  const formas = [{ curta: CURTA, passosCompactos: false }, { curta: CURTA, passosCompactos: true }, { curta: 2 * CURTA, passosCompactos: true }];
+  const formas = [
+    { curta: CURTA, passosCompactos: false },
+    { curta: CURTA, passosCompactos: true },
+    { curta: 2 * CURTA, passosCompactos: true },
+    { curta: 2 * CURTA, passosCompactos: true, tabelaCompacta: true },
+  ];
   let texto = '';
   for (const forma of formas) {
     texto = formatarNaForma(mapa, forma);
@@ -680,7 +686,7 @@ export function formatarMapa(mapa) {
   return texto;
 }
 
-function formatarNaForma(mapa, { curta, passosCompactos }) {
+function formatarNaForma(mapa, { curta, passosCompactos, tabelaCompacta = false }) {
   const saida = [];
   const multi = mapa.arquivos.length > 1;
   const onde = (arquivo) => (multi ? `${arquivo} ` : '');
@@ -694,10 +700,9 @@ function formatarNaForma(mapa, { curta, passosCompactos }) {
     const t = mapa.tabela;
     const diferenca = t.soCarregadas ? `, ${t.soCarregadas} só na carregada` : '';
     saida.push(`TABELA ${onde(t.arquivo)}${t.linha}–${t.fim}: ${t.chavesCarregadas} chaves em ${t.secoes.length} seções${diferenca}`);
-    for (const s of t.secoes) {
-      const mais = s.chaves.length > 1 ? ` +${s.chaves.length - 1}` : '';
-      saida.push(comFrase(`${String(s.linha).padStart(6)} ${s.nome}${mais}`, s.frase));
-    }
+    const mais = (s) => (s.chaves.length > 1 ? ` +${s.chaves.length - 1}` : '');
+    if (tabelaCompacta) saida.push(...linhasCompactas('  seções: ', t.secoes.map((s) => `${s.linha} ${s.nome}${mais(s)}`)));
+    else for (const s of t.secoes) saida.push(comFrase(`${String(s.linha).padStart(6)} ${s.nome}${mais(s)}`, s.frase));
   }
 
   saida.push(`funções, por cabeçalho; as de menos de ${curta} linhas na linha dele`);
