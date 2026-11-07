@@ -21,7 +21,9 @@ export const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPor
 export const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita'];
 export const LUZES = ['lanternaEsquerda', 'lanternaDireita', 'luzDeFreio'];
 export const FAROIS = ['farolEsquerdo', 'farolDireito'];
-export const AROS = ['aroFarolEsquerdo', 'aroFarolDireito'];
+/** Os piscas da ponta do farol, que saíram na etapa 8; ficam só porque as cópias das rodadas 18 a 20 importam este módulo vivo. */
+export const PISCAS = ['piscaEsquerdo', 'piscaDireito'];
+export const AROS =['aroFarolEsquerdo', 'aroFarolDireito'];
 export const LUZES_DE_CANTO = ['luzDeCantoEsquerda', 'luzDeCantoDireita'];
 export const PISCAS_LATERAIS = ['piscaLateralEsquerdo', 'piscaLateralDireito'];
 /** Cada luz da frente com o seu refletor e a sua lâmpada: [luz, refletor, lâmpadas]. */
