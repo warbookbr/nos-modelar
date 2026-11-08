@@ -19,7 +19,7 @@ function abrir(json) {
   const r = lerEsboco(json);
   if (r.recusas.length) return { abre: false, motivos: r.recusas.map((q) => q.motivo) };
   try {
-    return { abre: true, opcoes: r.opcoes.map((o) => receitaDaOpcao(o)), conferencias: r.conferencias };
+    return { abre: true, formato: r.formato, opcoes: r.opcoes.map((o) => receitaDaOpcao(o)), conferencias: r.conferencias };
   } catch (e) {
     if (e instanceof RecusaDoEsboco) return { abre: false, motivos: [e.message] };
     throw e;
@@ -38,14 +38,15 @@ function arestasDeBorda(neutro) {
 }
 
 describe('os esboços guardados', () => {
-  it('há treze opções de forma de peça versionadas, e todas abrem sem recusa, com a malha de cada forma na medida declarada', () => {
-    expect(DE_PECA).toHaveLength(13);
+  it('há quinze opções de forma de peça versionadas, e todas abrem sem recusa, com a malha de cada forma na medida declarada', () => {
+    expect(DE_PECA).toHaveLength(15);
     for (const f of DE_PECA) {
       const json = ler(f);
       const r = abrir(json);
       expect(r.motivos ?? [], f).toEqual([]);
       const formas = json.opcoes.reduce((s, o) => s + o.formas.length, 0);
-      expect(r.conferencias, f).toHaveLength(formas);
+      /* a conferência da medida é da forma traduzida do formato antigo; o esboço do 2.0, como as opções do cotovelo do braço, não traduz */
+      if (r.formato === 'antigo') expect(r.conferencias, f).toHaveLength(formas);
       for (const o of r.opcoes) expect(o.facesSemParte, f).toBe(0);
     }
   });

@@ -1,0 +1,233 @@
+{
+ "plano": "Cotovelo do braço robótico: três formas limpas sobre a coluna de 156 mm e o colar fixo de 48 mm, com a saída redonda para +x, onde vão o anel do antebraço e o antebraço.",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "1: tambor deitado",
+   "nota": "cilindro de 195 mm no eixo da junta",
+   "formas": [
+    {
+     "id": "coluna",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 160,
+      "eixo": "y",
+      "lados": 64
+     }
+    },
+    {
+     "id": "colar",
+     "op": "cilindro",
+     "args": {
+      "raio": 82,
+      "altura": 48,
+      "eixo": "y",
+      "lados": 64
+     },
+     "sobre": "coluna"
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 97.5,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 64
+     },
+     "sobre": "colar"
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 72,
+      "altura": 24,
+      "eixo": "x",
+      "lados": 64
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x",
+     "desloca": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 65,
+      "altura": 120,
+      "eixo": "x",
+      "lados": 64
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  },
+  {
+   "titulo": "2: bloco arredondado",
+   "nota": "175 x 195 x 156, cantos de 45",
+   "formas": [
+    {
+     "id": "coluna",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 160,
+      "eixo": "y",
+      "lados": 64
+     }
+    },
+    {
+     "id": "colar",
+     "op": "cilindro",
+     "args": {
+      "raio": 82,
+      "altura": 48,
+      "eixo": "y",
+      "lados": 64
+     },
+     "sobre": "coluna"
+    },
+    {
+     "id": "cotovelo",
+     "op": "extrusao",
+     "args": {
+      "eixo": "z",
+      "altura": 156,
+      "perfil": {
+       "retangulo": {
+        "largura": 175,
+        "profundidade": 195,
+        "cantos": 45
+       }
+      },
+      "segmentosArco": 8
+     },
+     "sobre": "colar"
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 72,
+      "altura": 24,
+      "eixo": "x",
+      "lados": 64
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x",
+     "desloca": [
+      0,
+      17,
+      0
+     ]
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 65,
+      "altura": 120,
+      "eixo": "x",
+      "lados": 64
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  },
+  {
+   "titulo": "3: coluna que sobe e cruza",
+   "nota": "tubo de 156 em pé e outro deitado no alto",
+   "formas": [
+    {
+     "id": "coluna",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 160,
+      "eixo": "y",
+      "lados": 64
+     }
+    },
+    {
+     "id": "colar",
+     "op": "cilindro",
+     "args": {
+      "raio": 82,
+      "altura": 48,
+      "eixo": "y",
+      "lados": 64
+     },
+     "sobre": "coluna"
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 117,
+      "eixo": "y",
+      "lados": 64
+     },
+     "sobre": "colar"
+    },
+    {
+     "id": "travessa",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 64
+     },
+     "centro": "cotovelo.+y",
+     "por": "+y",
+     "desloca": [
+      0,
+      78,
+      0
+     ],
+     "contato": {
+      "cotovelo": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 72,
+      "altura": 24,
+      "eixo": "x",
+      "lados": 64
+     },
+     "centro": "travessa.+x",
+     "por": "-x",
+     "desloca": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 65,
+      "altura": 120,
+      "eixo": "x",
+      "lados": 64
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  }
+ ]
+}

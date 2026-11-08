@@ -200,6 +200,15 @@
       "estado": "fixa",
       "juntas": [],
       "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024",
+      "aceite": {
+        "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -215,16 +224,112 @@
           },
           "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015"
         }
+      ]
+    },
+    {
+      "instancia": "anelCotovelo",
+      "estado": "fixa",
+      "juntas": [
+        {
+          "relacao": "anelCotoveloSentaNaColuna",
+          "com": "braco",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.009999999999999995,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.01,
+              "maximo": 0.01,
+              "nominal": 0.01,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
       ],
+      "forma": "sha256:945c028af9c000ab5cce3ef84b0b39245213ded28208e8172761490fb78e7545",
       "aceite": {
-        "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
+        "por": "pessoa, 2026-11-08: aceitou o colar do cotovelo rente à coluna, com 25 mm",
         "defeitosAceitos": [
-          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
         "analise": "ausente"
       }
+    },
+    {
+      "instancia": "cotovelo",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "cotoveloSentaNoColar",
+          "com": "anelCotovelo",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.009999999999999995,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.01,
+              "maximo": 0.01,
+              "nominal": 0.01,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "forma": "sha256:4c68b93c4fa3a1e9e4a40980cc96d405edb48c774d69cdf851f3f4c2057fb129"
     }
   ]
 }
