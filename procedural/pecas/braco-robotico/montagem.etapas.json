@@ -228,7 +228,7 @@
     },
     {
       "instancia": "anelCotovelo",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelCotoveloSentaNaColuna",
@@ -273,7 +273,14 @@
           }
         }
       ],
-      "forma": "sha256:945c028af9c000ab5cce3ef84b0b39245213ded28208e8172761490fb78e7545"
+      "forma": "sha256:945c028af9c000ab5cce3ef84b0b39245213ded28208e8172761490fb78e7545",
+      "aceite": {
+        "por": "pessoa, 2026-11-08: aceitou o colar do cotovelo rente à coluna, com 25 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
