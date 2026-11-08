@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1706 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1713 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2305,10 +2305,15 @@
 - `medir.mjs` — medir.mjs — as medidas do plano do sólido por laços sobre a malha que o núcleo entrega: o desvio entre duas malhas (a peça de teste contra o corpo feito à mã…
 - `receita.js` — solido-por-lacos — a peça de teste neutra do plano do sólido por laços: um L de ponta-cabeça de 190 por 220 mm fechado numa malha só pela subdivisão da gaiol…
 - `solido-por-lacos.test.ts` — solido-por-lacos.test.ts — os gates do plano do sólido por laços sobre as duas peças de teste de `tools/fixtures/solido-por-lacos/`, o L de ponta-cabeça (`re…
+- `tubos-forma.js` — tubos-forma.js — a forma da peça de prova "dois tubos que se cruzam": um tubo em pé, de 156 mm de diâmetro, cruzado no alto por um tubo deitado de mesmo diâm…
+- `tubos-hoje.js` — tubos-hoje — a peça de prova de `tubos.js` pela técnica anterior aos campos `encolhe` e `esvai`: dois laços a 0,2 mm um do outro em volta da tangente, com vi…
+- `tubos.js` — tubos — a peça de prova do plano "trecho que some entre laços" (`docs/modelar/planos/2026-11-08-trecho-que-some-entre-lacos.md`): um tubo em pé e outro deita…
+- `tubos.test.ts` — tubos.test.ts — a peça de prova do plano "trecho que some entre laços" (`tubos.js`): dois tubos que se cruzam, o filete do encontro sumindo na tangente. A té…
 
 ## tools/fixtures/solido-por-lacos/referencias/
 
 - `alvo-da-coluna.md` — Alvo da coluna sobre disco
+- `alvo-dos-tubos.md` — Alvo dos tubos
 - `alvo.md` — Alvo do sólido por laços
 
 ## tools/fixtures/solido-por-lacos/variantes/
@@ -2506,6 +2511,8 @@
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
+- `dobra-da-superficie.mjs` — dobra-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita dobra com diedro agudo fora de vinco declarado, e diz a parte, o lugar e o ângulo.
+- `dobra-da-superficie.test.mjs` — dobra-da-superficie.test.mjs — a régua de dobra sobre superfícies pequenas feitas aqui: duas faces que se dobram num ângulo conhecido. O diedro é 180 graus m…
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `esboco-alinhar-caixas.mjs` — esboco-alinhar-caixas.mjs — alinha as caixas de um esboço onde a receita de origem as deixou desencontradas por pouco. Núcleo puro: recebe as formas resolvid…
 - `esboco-alinhar-caixas.test.mjs` — O alinhamento das caixas de um esboço: simetria, colunas, degrau, contato e folga, com o limite de cada regra, e as onze cadeiras convertem com o alinhamento…

@@ -2,7 +2,10 @@
    a escada da tampa, a fusão da ponta, a orientação pelo volume, as três formas de vinco, cantos e medidas, os avisos de amostragem
    desigual, a compensação, as recusas com a medida na mensagem, a entrega ao passo `subdivisao` e a mesma saída a cada chamada. As
    peças de teste do plano, com as medidas contra o ombro feito à mão, estão em `tools/fixtures/solido-por-lacos/`. A ficha é a do
-   comando `capacidade`, recortada do cabeçalho e conferida aqui pelo mesmo `lerFicha`. */
+   comando `capacidade`, recortada do cabeçalho e conferida aqui pelo mesmo `lerFicha`. Os campos `encolhe` (trecho que vai a um ponto
+   numa faixa de laços) e `esvai` (nitidez do vinco que cai a zero numa faixa) têm a seção própria no fim, com a prova de que sem eles a
+   gaiola das peças de teste é a de antes. */
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
@@ -11,6 +14,12 @@ import { DISTANCIA_MINIMA_ENTRE_PLANOS_MM, RAZAO_MAXIMA_DE_AMOSTRAGEM, gaiolaPor
 import { nucleo } from './entrada.js';
 // @ts-expect-error — ferramenta em JavaScript.
 import { LIMITE_DE_LINHAS, lerFicha } from '../../tools/modelar/capacidade.mjs';
+// @ts-expect-error — peça de teste em JavaScript.
+import { derivar as derivarL } from '../../tools/fixtures/solido-por-lacos/forma.js';
+// @ts-expect-error — peça de teste em JavaScript.
+import { derivar as derivarColuna } from '../../tools/fixtures/solido-por-lacos/coluna-forma.js';
+// @ts-expect-error — peça de teste em JavaScript.
+import { derivar as derivarDobra } from '../../tools/fixtures/solido-por-lacos/dobra-em-u.js';
 
 type Uv = [number, number];
 const trechosDaBarra = [{ nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: 3 }, { nome: 'cima', pontos: 2 }, { nome: 'tras', pontos: 3 }];
@@ -420,5 +429,123 @@ describe('gaiolaPorLacos: a compensação junto da tampa e os grupos de faces (l
     expect(por.frente.every((p: string) => /frente|cima0/.test(p))).toBe(true);
     expect(grito(() => gaiolaPorLacos(barra({ grupos: [{ nome: 'a' }, { nome: 'a' }] })))).toMatch(/o grupo 'a' aparece duas vezes/);
     expect(grito(() => gaiolaPorLacos(barra({ grupos: [{ nome: 'a', lacos: ['l2', 'l9'] }] })))).toMatch(/cita o laço 'l9', que não existe/);
+  });
+});
+
+describe('gaiolaPorLacos: o trecho que encolhe até um ponto numa faixa de laços (encolhe)', () => {
+  /* a seção de 30 mm de lado: o trecho `frente`, de y = 0 a y = f em z = 40, e o `cima`, de [f, 40] a [30, 0] */
+  const laco = (em: number, f: number) => ({ em, trechos: { baixo: [[0, 0], [0, 40]], frente: [[0, 40], [f, 40]], cima: [[f, 40], [30, 0]], tras: [[30, 0], [0, 0]] } });
+  const trechos = (encolhe?: Record<string, unknown>, extra: Record<string, unknown> = {}) => [
+    { nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: 4, ...(encolhe ? { encolhe } : {}), ...extra }, { nome: 'cima', pontos: 2 }, { nome: 'tras', pontos: 4 },
+  ];
+  const EMS = [0, 10, 20, 30, 40];
+  /* a receita dá o trecho inteiro em todo laço da faixa e um ponto em `ate`: a frente de 30 mm, e de zero no último laço */
+  const cheios = EMS.map((em) => laco(em, em === 40 ? 0 : 30));
+  const com = (encolhe: Record<string, unknown> | undefined, lacos = cheios) => gaiolaPorLacos(barra({ trechos: trechos(encolhe), lacos }));
+  const y = (g: any, l: string, k: number) => g.pontosMm[g.nomeDe(l, 'frente', k)][1];
+
+  it('os pontos se aproximam por igual, no peso da posição do laço, e se fundem no laço final', () => {
+    const g = com({ de: 'l1', ate: 'l4' });
+    /* l1 (de) fica como a receita deu; em l2 e l3 o trecho mede 20 e 10 mm, com passo igual entre os 4 pontos; em l4 é um ponto só */
+    expect([0, 1, 2, 3].map((k) => y(g, 'l1', k))).toEqual([0, 10, 20, 30]);
+    [0, 20 / 3, 40 / 3, 20].forEach((v, k) => expect(y(g, 'l2', k)).toBeCloseTo(v, 9));
+    expect(y(g, 'l3', 3)).toBeCloseTo(10, 9);
+    expect(g.passo.vertices.filter((v: string) => v.startsWith('barra_l4_frente'))).toHaveLength(1);
+    /* o vizinho começa onde o trecho acaba: a face de cima começa em y = 20 no laço l2 */
+    expect(g.pontosMm[g.nomeDe('l2', 'cima', 0)][1]).toBeCloseTo(20, 9);
+    const c = conferir(g);
+    expect(c.soltas + c.repetidas).toBe(0);
+    expect(entrega(g).orfaos).toEqual([]);
+    expect(g.avisos.filter((a: any) => a.ref === 'facesFinas')).toEqual([]);
+  });
+
+  it('é o mesmo que a receita dar à mão o trecho já encolhido em cada laço', () => {
+    const g = com({ de: 'l1', ate: 'l4' });
+    const aMao = gaiolaPorLacos(barra({
+      trechos: trechos(),
+      lacos: [laco(0, 30), laco(10, 30), laco(20, 20), laco(30, 10), laco(40, 0)],
+    }));
+    expect(g.passo.faces).toEqual(aMao.passo.faces);
+    for (const [nome, p] of Object.entries(aMao.pontosMm) as [string, number[]][]) p.forEach((v, k) => expect(g.pontosMm[nome][k]).toBeCloseTo(v, 9));
+  });
+
+  it('a curva `entrada` parte parada: o peso é 2t² - t³, menor que o linear no começo da faixa', () => {
+    const g = com({ de: 'l1', ate: 'l4', curva: 'entrada' });
+    const t = 1 / 3;
+    expect(y(g, 'l2', 3)).toBeCloseTo(30 * (1 - t * t * (2 - t)), 9);
+    expect(y(g, 'l2', 3)).toBeGreaterThan(y(com({ de: 'l1', ate: 'l4' }), 'l2', 3));
+    expect(y(g, 'l3', 3)).toBeCloseTo(30 * (1 - (2 / 3) ** 2 * (2 - 2 / 3)), 9);
+  });
+
+  it('sem `encolhe` o trecho fica como a receita deu, e `primeiro` e `ultimo` valem como nomes', () => {
+    expect(y(com(undefined), 'l2', 3)).toBe(30);
+    expect(y(com({ de: 'primeiro', ate: 'ultimo' }), 'l2', 3)).toBeCloseTo(15, 9);
+  });
+
+  it('recusa a faixa inválida com o laço, a medida e o que fazer', () => {
+    expect(grito(() => com({ de: 'l3', ate: 'l1' }))).toMatch(/o trecho 'frente', em encolhe, vai do laço 'l3' ao 'l1', e o primeiro precisa vir antes do segundo/);
+    expect(grito(() => com({ de: 'l2', ate: 'l2' }))).toMatch(/o primeiro precisa vir antes do segundo/);
+    expect(grito(() => com({ de: 'l1', ate: 'l9' }))).toMatch(/o trecho 'frente', em encolhe cita o laço 'l9', que não existe/);
+    expect(grito(() => com({ de: 'l1' }))).toMatch(/encolhe sem ate; ate é o nome do laço/);
+    expect(grito(() => com([] as any))).toMatch(/encolhe \[\]; encolhe é \{ de, ate \}/);
+    expect(grito(() => com({ de: 'l1', ate: 'l4', curva: 'salto' }))).toMatch(/curva é 'linear' ou 'entrada'/);
+    /* o trecho precisa ser um ponto em `ate`: aqui mede 30 mm */
+    expect(grito(() => com({ de: 'l1', ate: 'l3' }))).toMatch(/o trecho 'frente', em encolhe, mede 30 mm no laço 'l3' \(x = 30 mm\), onde a faixa acaba; nele o trecho precisa ser um ponto/);
+    /* dois trechos seguidos com faixas diferentes não se encontram depois de encolher */
+    const dois = [{ nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: 4, encolhe: { de: 'l1', ate: 'l4' } }, { nome: 'cima', pontos: 2, encolhe: { de: 'l2', ate: 'l4' } }, { nome: 'tras', pontos: 4 }];
+    const lacos = EMS.map((em) => ({ em, trechos: { baixo: [[0, 0], [0, 40]], frente: [[0, 40], [em === 40 ? 0 : 30, 40]], cima: em === 40 ? [[0, 40]] : [[30, 40], [30, 0]], tras: em === 40 ? [[0, 40], [0, 0]] : [[30, 0], [0, 0]] } }));
+    expect(grito(() => gaiolaPorLacos(barra({ trechos: dois, lacos })))).toMatch(/no laço 'l2' \(x = 20 mm\), depois de encolher, o trecho 'cima' começa a 10 mm de onde o 'frente' acaba; trechos seguidos que encolhem usam a mesma faixa/);
+  });
+});
+
+describe('gaiolaPorLacos: o vinco que perde a nitidez numa faixa de laços (esvai)', () => {
+  const lacos = [0, 10, 20, 30, 40].map((em) => lacoDaBarra(em));
+  const com = (v: Record<string, unknown>) => gaiolaPorLacos(barra({ lacos, vincos: [{ nome: 'v', entre: ['baixo', 'frente'], nitidez: 0.8, ...v }] }));
+
+  it('mantém a nitidez até `de`, cai a zero em `ate` com a média em cada aresta, e acaba aí', () => {
+    const g = com({ esvai: { de: 'l1', ate: 'l4' } });
+    expect(g.passo.vincos.map((v: any) => v.nome)).toEqual(['v', 'v_1', 'v_2', 'v_3']);
+    [0.8, 0.666667, 0.4, 0.133333].forEach((n, k) => expect(g.passo.vincos[k].nitidez).toBeCloseTo(n, 6));
+    expect(g.passo.vincos.map((v: any) => v.pontos)).toEqual([0, 1, 2, 3].map((r) => [`barra_l${r}_frente0`, `barra_l${r + 1}_frente0`]));
+    expect(entrega(g, { niveis: 2 }).orfaos).toEqual([]);
+    /* o vinco acaba no laço `ate`, sem aresta de nitidez zero até o fim dos laços */
+    const cedo = com({ esvai: { de: 'l0', ate: 'l2' } });
+    expect(cedo.passo.vincos.map((v: any) => v.pontos)).toEqual([['barra_l0_frente0', 'barra_l1_frente0'], ['barra_l1_frente0', 'barra_l2_frente0']]);
+    [0.6, 0.2].forEach((n, k) => expect(cedo.passo.vincos[k].nitidez).toBeCloseTo(n, 6));
+  });
+
+  it('a curva `entrada` começa a tirar a nitidez parada, e a faixa inteira desce até zero', () => {
+    const linear = com({ esvai: { de: 'l0', ate: 'l4' } }).passo.vincos.map((v: any) => v.nitidez);
+    const entrada = com({ esvai: { de: 'l0', ate: 'l4', curva: 'entrada' } }).passo.vincos.map((v: any) => v.nitidez);
+    expect(entrada[0]).toBeGreaterThan(linear[0]);
+    expect(entrada.every((n: number, k: number) => k === 0 || n < entrada[k - 1])).toBe(true);
+    expect(entrada[3]).toBeGreaterThan(0);
+  });
+
+  it('o vinco sem `esvai` sai como antes, um só e de nitidez constante', () => {
+    expect(com({}).passo.vincos).toEqual([{ nome: 'v', pontos: [0, 1, 2, 3, 4].map((r) => `barra_l${r}_frente0`), nitidez: 0.8 }]);
+  });
+
+  it('recusa nitidez viva, faixa fora dos laços do vinco, faixa invertida e vinco que não corre pelos laços', () => {
+    expect(grito(() => com({ nitidez: 'viva', esvai: { de: 'l1', ate: 'l3' } }))).toMatch(/esvai com nitidez "viva"; a nitidez que cai até zero parte de um número entre 0 \(exclusive\) e 1/);
+    expect(grito(() => com({ esvai: { de: 'l3', ate: 'l1' } }))).toMatch(/esvai vai de 'l3' a 'l1', e o primeiro precisa vir antes do segundo/);
+    expect(grito(() => com({ lacos: ['l1', 'l3'], esvai: { de: 'l0', ate: 'l2' } }))).toMatch(/esvai vai do laço 'l0' ao 'l2', e o vinco só corre do 'l1' ao 'l3'/);
+    expect(grito(() => com({ esvai: { de: 'l1', ate: 'l9' } }))).toMatch(/cita o laço 'l9', que não existe/);
+    expect(grito(() => com({ esvai: { de: 'l1' } }))).toMatch(/esvai sem ate/);
+    for (const forma of [{ entre: undefined, trecho: 'baixo' }, { entre: undefined, laco: 'l1' }]) {
+      expect(grito(() => com({ ...forma, esvai: { de: 'l1', ate: 'l3' } }))).toMatch(/esvai, que só vale no vinco de entre/);
+    }
+  });
+});
+
+describe('gaiolaPorLacos: sem os campos novos a malha das peças de teste é a de antes', () => {
+  /* a assinatura da gaiola inteira (passo, pontos, alvos, avisos, laços e compensação) tirada antes de `encolhe` e `esvai` existirem; se uma
+     das peças mudar de propósito, tire a assinatura de novo com a mesma conta */
+  const assinatura = (g: any) => createHash('sha256').update(JSON.stringify({ passo: g.passo, pontosMm: g.pontosMm, alvosMm: g.alvosMm, avisos: g.avisos, lacos: g.lacos, compensacao: g.compensacao ?? null })).digest('hex').slice(0, 16);
+
+  it('o L, a coluna sobre o disco e a dobra em U saem com a mesma gaiola', () => {
+    expect(assinatura(derivarL())).toBe('3029c2a3c583412e');
+    expect(assinatura(derivarColuna())).toBe('ee545fece7402051');
+    expect(assinatura(derivarDobra())).toBe('3abcad80f4b1506d');
   });
 });

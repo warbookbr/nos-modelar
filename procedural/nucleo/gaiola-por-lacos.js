@@ -8,12 +8,14 @@
  * campos:
  *   nome: prefixo dos pontos, que saem como `${nome}_${laco}_${trecho}${k}`.
  *   eixo: 'x', 'y' ou 'z'; o ponto [u, v] do laço são os outros dois eixos na ordem x, y, z.
- *   trechos: [{ nome, pontos, razao?, some? }] a volta do laço em ordem, e quantos pontos (com as duas pontas) o trecho tem em todo
- *     laço. razao é o último segmento sobre o primeiro (1: iguais; 0,2: encurtam); some, em mm, funde o trecho num ponto onde mede menos.
+ *   trechos: [{ nome, pontos, razao?, some?, encolhe? }] a volta do laço em ordem, e quantos pontos (com as duas pontas) o trecho tem em
+ *     todo laço. razao é o último segmento sobre o primeiro (1: iguais; 0,2: encurtam); some, em mm, funde o trecho num ponto onde mede
+ *     menos; encolhe { de, ate, curva? } leva o trecho de inteiro, no laço de, a um ponto no laço ate, aos poucos (curva 'linear' ou 'entrada').
  *   lacos: [{ nome?, em, trechos: { [trecho]: [[u, v], ...] } }] em crescente; o trecho começa onde o anterior acaba.
  *   tampa: { de, ate } os trechos entre os quais a escada tampa as pontas; as duas cadeias entre eles têm os mesmos pontos.
- *   vincos: [{ nome, trecho | entre: [a, b] | laco, trechos?, lacos?: [de, ate], nitidez }] borda da faixa de um trecho, linha ou
- *     volta de laço; lacos limita o trecho ou o entre a uma faixa de laços. Vinco 'viva' de laço inteiro em dois planos os libera do mínimo.
+ *   vincos: [{ nome, trecho | entre: [a, b] | laco, trechos?, lacos?: [de, ate], nitidez, esvai? }] borda da faixa de um trecho, linha ou
+ *     volta de laço; lacos limita o trecho ou o entre a uma faixa de laços; esvai { de, ate, curva? } faz a nitidez do entre cair a zero
+ *     entre dois laços. Vinco 'viva' de laço inteiro em dois planos os libera do mínimo.
  *   cantos: [{ entre: [a, b], laco? }] o ponto entre dois trechos fica vivo, em todos os laços ou num só.
  *   medidas: [{ trecho | entre, laco?, peso? }] cota nos pontos marcados; em todos os pontos é recusado.
  *   compensar: true | { trechos, lacos?, pontas? } move os pontos para a superfície limite passar por eles: o arco de r sai com r.
@@ -27,7 +29,7 @@
  *       cima: [[30, 40], [30, 0]], tras: [[30, 0], [0, 0]] } })),
  *     vincos: [{ nome: 'pontas', laco: 'primeiro', nitidez: 'viva' }] })
  * peça: tools/fixtures/solido-por-lacos/coluna.js (disco e cilindro) e tools/fixtures/solido-por-lacos/dobra-em-u.js (dobra em U);
- *   o L é receita.js na mesma pasta.
+ *   o L é receita.js na mesma pasta; encolhe e esvai, em tubos.js (dois tubos que se cruzam), com a técnica antiga em tubos-hoje.js.
  * FIM DA FICHA
  *
  * Função pura, sem Three.js e sem domínio. A receita dá, em cada plano, o contorno fechado da peça cortada por ele, em trechos
@@ -50,6 +52,21 @@
  * partido em oito. Com `some` s, o trecho que mede menos que s mm num laço vira um ponto, o do meio dele, e os vizinhos acabam e
  * começam nele (a forma muda até s/2 mm ali): o trecho que some e volta entre planos não deixa então um leque de faces finas, e
  * `lacos[k].sumiram` diz em que laços cada trecho foi fundido. O trecho que mede zero já se funde sozinho.
+ *
+ * O TRECHO QUE ENCOLHE. `encolhe: { de, ate }` num trecho o leva, nos laços de `de` a `ate`, da forma inteira que a receita dá a um ponto:
+ * em cada laço entre os dois, cada ponto da polilinha anda em linha reta até o ponto que o trecho tem em `ate`, com o peso da posição do
+ * laço na faixa ('linear': proporcional ao eixo; 'entrada': parte parado, 2t² - t³, para a faixa não começar de repente). Os pontos do trecho,
+ * reamostrados por igual, se aproximam por igual e se fundem no laço final, e o trecho que some entre planos a 2,5 mm não deixa leque de
+ * faces finas nem exige laço a 0,2 mm do vizinho. A receita dá o trecho inteiro em todo laço da faixa e um ponto (ou pontos que coincidem)
+ * em `ate`; os trechos seguidos que encolhem usam a mesma faixa e o mesmo ponto lá, e os vizinhos que não encolhem acabam e começam nas
+ * pontas dele, como no `some`. Com a ponta andando muito sobre um arco do vizinho, ele a segue pela corda (1,3 mm numa faixa de 40 mm
+ * sobre o círculo de 78 mm), então prefira o trecho curto, ou o vizinho com pontos perto da ponta. Faixa invertida, laço que não existe
+ * e trecho que não mede zero em `ate` são recusados com o laço e a medida. Sem `encolhe`, a malha sai idêntica à de antes do campo.
+ *
+ * O VINCO QUE ESVAI. `esvai: { de, ate }` num vinco de `entre` (a linha do ponto entre dois trechos, que corre pelos laços) mantém a nitidez
+ * declarada até o laço `de`, a faz cair a zero em `ate` pelo mesmo peso e acaba aí: cada aresta entre dois laços leva a média da nitidez
+ * dos dois, e o vinco sai em vários, de nitidez constante cada um (`${nome}_${k}`). A nitidez parte de um número de 0 (exclusive) a 1, e
+ * não do 'viva'; a faixa fica dentro dos laços do vinco; o vinco de trecho ou de laço não aceita `esvai`.
  *
  * A TAMPA. A escada liga, no primeiro e no último laço, o ponto j da cadeia A (do fim de `de`, para a frente na volta, até o
  * começo de `ate`) ao ponto j da cadeia B (do começo de `de`, para trás, até o fim de `ate`), e por isso as duas cadeias precisam
@@ -177,8 +194,24 @@ function lerTrechos(trechos) {
       if (t[campo] != null && !(Number.isFinite(t[campo]) && t[campo] > 0)) falha(`o trecho ${citar(t.nome)} traz ${campo} ${JSON.stringify(t[campo])}; ${campo === 'razao' ? 'razao é quanto o último segmento mede do primeiro, número maior que zero (1 é passo igual)' : 'some é o comprimento em mm abaixo do qual o trecho vira um ponto no laço, número maior que zero'}`);
     }
   }
-  return trechos.map((t) => ({ nome: t.nome, pontos: t.pontos, razao: t.razao ?? 1, some: t.some ?? 0 }));
+  return trechos.map((t) => ({ nome: t.nome, pontos: t.pontos, razao: t.razao ?? 1, some: t.some ?? 0, ...(t.encolhe != null ? { encolhe: lerFaixaQueSome(t.encolhe, `o trecho ${citar(t.nome)}`, 'encolhe') } : {}) }));
 }
+
+const CURVAS_DA_FAIXA = ['linear', 'entrada'];
+
+/* { de, ate, curva? } de `encolhe` e de `esvai`: dois laços, em nome ou 'primeiro' e 'ultimo', e como o peso vai de 0 a 1 entre eles */
+function lerFaixaQueSome(f, onde, campo) {
+  if (f == null || typeof f !== 'object' || Array.isArray(f)) falha(`${onde} traz ${campo} ${JSON.stringify(f)}; ${campo} é { de, ate }, os dois laços entre os quais ${campo === 'encolhe' ? 'o trecho vai de inteiro a um ponto' : 'a nitidez do vinco cai a zero'}`);
+  for (const k of ['de', 'ate']) if (typeof f[k] !== 'string' || !f[k]) falha(`${onde} traz ${campo} sem ${k}; ${k} é o nome do laço (ou 'primeiro' e 'ultimo') ${k === 'de' ? 'onde a faixa começa, ainda inteira' : 'onde ela acaba, com o efeito completo'}`);
+  if (f.curva != null && !CURVAS_DA_FAIXA.includes(f.curva)) falha(`${onde} traz ${campo} com curva ${JSON.stringify(f.curva)}; curva é ${CURVAS_DA_FAIXA.map(citar).join(' ou ')} (linear: o peso cresce igual com a posição; entrada: parte parado, para a faixa não começar de repente, e chega com a inclinação média da linear)`);
+  return { de: f.de, ate: f.ate, curva: f.curva ?? 'linear' };
+}
+
+/* o peso de 0 (em `de`) a 1 (em `ate`) de um laço na faixa, pela posição em mm no eixo */
+const pesoNaFaixa = (em, emDe, emAte, curva) => {
+  const t = Math.min(1, Math.max(0, (em - emDe) / (emAte - emDe)));
+  return curva === 'entrada' ? t * t * (2 - t) : t;
+};
 
 const comprimentoDe = (poli) => poli.slice(1).reduce((t, p, k) => t + Math.hypot(p[0] - poli[k][0], p[1] - poli[k][1]), 0);
 
@@ -213,9 +246,70 @@ function fundirCurtos(polilinhas, trechos) {
   return { polilinhas: saida, sumiu };
 }
 
+/* a faixa de laços de cada trecho com `encolhe`, em posição de laço: [{ de, ate, curva }] ou null, na ordem dos trechos */
+function faixasDeEncolhimento(trechos, nomesDosLacos) {
+  const laco = (nome, onde) => {
+    if (nome === 'primeiro') return 0;
+    if (nome === 'ultimo') return nomesDosLacos.length - 1;
+    const r = nomesDosLacos.indexOf(nome);
+    if (r < 0) falha(`${onde} cita o laço ${citar(nome)}, que não existe`);
+    return r;
+  };
+  return trechos.map((t) => {
+    if (!t.encolhe) return null;
+    const onde = `o trecho ${citar(t.nome)}, em encolhe`;
+    const de = laco(t.encolhe.de, onde); const ate = laco(t.encolhe.ate, onde);
+    if (de >= ate) falha(`${onde}, vai do laço ${citar(nomesDosLacos[de])} ao ${citar(nomesDosLacos[ate])}, e o primeiro precisa vir antes do segundo`);
+    return { de, ate, curva: t.encolhe.curva };
+  });
+}
+
+/* O trecho com `encolhe: { de, ate }` vai de inteiro, no laço `de`, a um ponto, no laço `ate`: nos laços entre os dois, cada ponto da polilinha
+   que a receita deu anda em linha reta até o ponto que o trecho tem no laço `ate`, com o peso da posição do laço na faixa, de modo que os
+   pontos do trecho (reamostrados por igual) se aproximam por igual e se fundem no laço final, sem leque de faces finas. O trecho tem de
+   medir zero no laço `ate`, e os trechos seguidos que encolhem usam o mesmo ponto lá. Os laços fora da faixa ficam como a receita deu.
+   Os trechos vizinhos que não encolhem acabam e começam nas pontas do trecho que encolhe, como no `some`: só o ponto da ponta deles troca.
+   Quando a ponta anda muito sobre a curva do vizinho (o arco do círculo), ele a segue pela corda, então o trecho que encolhe deve ser
+   curto ou o vizinho ter pontos perto da ponta. */
+function encolherTrechos(lidos, trechos, e, faixas) {
+  if (!faixas.some(Boolean)) return;
+  const n = trechos.length;
+  const ondeAcaba = (r) => `${citar(lidos[r].nome)} (${e} = ${br(lidos[r].em)} mm)`;
+  faixas.forEach((f, i) => {
+    if (!f) return;
+    const medida = comprimentoDe(lidos[f.ate].polilinhas[i]);
+    if (medida > TOLERANCIA_DE_FUSAO_MM) falha(`o trecho ${citar(trechos[i].nome)}, em encolhe, mede ${br(medida, 3)} mm no laço ${ondeAcaba(f.ate)}, onde a faixa acaba; nele o trecho precisa ser um ponto (a polilinha de um ponto só, ou de pontos que coincidem) para os pontos se fundirem, e os trechos vizinhos acabam e começam nesse ponto`);
+  });
+  const alvos = faixas.map((f, i) => (f ? lidos[f.ate].polilinhas[i][0] : null));
+  lidos.forEach((l, r) => {
+    const novas = l.polilinhas.map((poli, i) => {
+      const f = faixas[i];
+      if (!f || r < f.de || r > f.ate) return null;
+      const w = pesoNaFaixa(l.em, lidos[f.de].em, lidos[f.ate].em, f.curva);
+      return poli.map(([u, v]) => [u + (alvos[i][0] - u) * w, v + (alvos[i][1] - v) * w]);
+    });
+    novas.forEach((poli, i) => { if (poli) l.polilinhas[i] = poli; });
+    novas.forEach((poli, i) => {
+      if (poli) return;
+      const alvo = l.polilinhas[i].map((q) => [...q]);
+      const ant = novas[(i + n - 1) % n]; const prox = novas[(i + 1) % n];
+      if (ant) alvo[0] = [...ant[ant.length - 1]];
+      if (prox) alvo[alvo.length - 1] = [...prox[0]];
+      l.polilinhas[i] = alvo;
+    });
+    l.polilinhas.forEach((poli, i) => {
+      const ant = l.polilinhas[(i + n - 1) % n];
+      const fim = ant[ant.length - 1];
+      const d = Math.hypot(poli[0][0] - fim[0], poli[0][1] - fim[1]);
+      if (d > TOLERANCIA_DE_FUSAO_MM) falha(`no laço ${citar(l.nome)} (${e} = ${br(l.em)} mm), depois de encolher, o trecho ${citar(trechos[i].nome)} começa a ${br(d, 3)} mm de onde o ${citar(trechos[(i + n - 1) % n].nome)} acaba; trechos seguidos que encolhem usam a mesma faixa, de e ate, e o mesmo ponto no laço final`);
+    });
+  });
+}
+
 function lerLacos(lacos, trechos, e, fechados = new Set()) {
   if (!Array.isArray(lacos) || lacos.length < 2) falha('lacos precisa ser lista de pelo menos dois laços { em, trechos }');
   const nomes = new Set();
+  const faixas = faixasDeEncolhimento(trechos, lacos.map((l, r) => l?.nome ?? `l${r}`));
   const lidos = lacos.map((l, r) => {
     const nome = l?.nome ?? `l${r}`;
     if (nomes.has(nome)) falha(`o laço ${citar(nome)} aparece duas vezes`);
@@ -237,8 +331,7 @@ function lerLacos(lacos, trechos, e, fechados = new Set()) {
       const d = Math.hypot(poli[0][0] - fim[0], poli[0][1] - fim[1]);
       if (d > TOLERANCIA_DE_FUSAO_MM) falha(`no laço ${citar(nome)}, o trecho ${citar(trechos[i].nome)} começa em [${poli[0].map((x) => br(x, 3)).join('; ')}] e o ${citar(trechos[(i + trechos.length - 1) % trechos.length].nome)} acaba em [${fim.map((x) => br(x, 3)).join('; ')}], a ${br(d, 3)} mm; cada trecho começa onde o anterior acaba`);
     });
-    const { polilinhas, sumiu } = fundirCurtos(pontos.map((p) => p.poli), trechos);
-    return { nome, em: l.em, polilinhas, sumiu };
+    return { nome, em: l.em, polilinhas: pontos.map((p) => p.poli) };
   });
   const perto = [];
   for (let r = 1; r < lidos.length; r++) {
@@ -253,6 +346,11 @@ function lerLacos(lacos, trechos, e, fechados = new Set()) {
     const { a, b, d } = perto.reduce((x, y) => (y.d < x.d ? y : x));
     const outros = perto.length > 1 ? `, e mais ${perto.length - 1} ${perto.length === 2 ? 'par fica' : 'pares ficam'} abaixo do mínimo` : '';
     falha(`os laços ${citar(a.nome)} (${e} = ${br(a.em)} mm) e ${citar(b.nome)} (${e} = ${br(b.em)} mm) ficam a ${br(d)} mm um do outro, abaixo do mínimo de ${br(DISTANCIA_MINIMA_ENTRE_PLANOS_MM)} mm${outros}: planos tão perto ondulam a superfície (na peça de teste do plano, a 0,12 mm, uma falha de 5,16 mm); tire um dos dois, afaste-os, ou, se for um chanfro estreito, ponha nos dois planos um vinco 'viva' de laço inteiro (vincos: [{ nome, laco, nitidez: 'viva' }], sem trechos), que isola a faixa dos vizinhos e a libera do mínimo`);
+  }
+  encolherTrechos(lidos, trechos, e, faixas);
+  for (const l of lidos) {
+    const { polilinhas, sumiu } = fundirCurtos(l.polilinhas, trechos);
+    l.polilinhas = polilinhas; l.sumiu = sumiu;
   }
   return lidos;
 }
@@ -423,6 +521,29 @@ export function gaiolaPorLacos(o = {}) {
   /* vincos */
   const semRepetir = (l) => l.filter((v, k) => v !== l[k - 1]);
   const rs = [...Array(R).keys()];
+  /* O vinco `entre` com `esvai: { de, ate }` tem a nitidez declarada até o laço `de`, cai dela até zero no laço `ate` (pelo peso da posição
+     do laço, linear ou suave) e acaba aí. A aresta entre dois laços leva a média da nitidez dos dois; as de mesma nitidez formam um vinco só,
+     e o nome dos outros leva o índice da primeira aresta, `${nome}_${k}`. */
+  const vincoQueEsvai = (v, onde, faixa, linha, semRepetirPontos) => {
+    if (typeof v.nitidez !== 'number' || !(v.nitidez > 0 && v.nitidez <= 1)) falha(`${onde} traz esvai com nitidez ${JSON.stringify(v.nitidez)}; a nitidez que cai até zero parte de um número entre 0 (exclusive) e 1, e o 'viva' não cai`);
+    const f = lerFaixaQueSome(v.esvai, onde, 'esvai');
+    const de = lacoDe(f.de, `${onde}.esvai`); const ate = lacoDe(f.ate, `${onde}.esvai`);
+    if (de >= ate) falha(`${onde}.esvai vai de ${citar(f.de)} a ${citar(f.ate)}, e o primeiro precisa vir antes do segundo`);
+    if (de < faixa[0] || ate > faixa[faixa.length - 1]) falha(`${onde}.esvai vai do laço ${citar(lacos[de].nome)} ao ${citar(lacos[ate].nome)}, e o vinco só corre do ${citar(lacos[faixa[0]].nome)} ao ${citar(lacos[faixa[faixa.length - 1]].nome)}; a faixa em que a nitidez cai fica dentro dele`);
+    const valor = faixa.map((r) => (r <= de ? v.nitidez : r >= ate ? 0 : v.nitidez * (1 - pesoNaFaixa(lacos[r].em, lacos[de].em, lacos[ate].em, f.curva))));
+    const arestas = [];
+    for (let k = 0; k + 1 < faixa.length; k++) {
+      const nitidez = Number(((valor[k] + valor[k + 1]) / 2).toFixed(6));
+      if (nitidez > 0 && linha[k] !== linha[k + 1]) arestas.push({ a: linha[k], b: linha[k + 1], nitidez, k });
+    }
+    const grupos = [];
+    for (const x of arestas) {
+      const g = grupos[grupos.length - 1];
+      if (g && g.nitidez === x.nitidez && g.pontos[g.pontos.length - 1] === x.a) g.pontos.push(x.b);
+      else grupos.push({ nitidez: x.nitidez, pontos: [x.a, x.b], k: x.k });
+    }
+    return grupos.map((g, j) => ({ nome: j === 0 ? v.nome : `${v.nome}_${g.k}`, pontos: semRepetirPontos(g.pontos), nitidez: g.nitidez }));
+  };
   const trechoNoLaco = (r, i) => { const l = []; for (let q = inicio[i]; ; q = (q + 1) % N) { l.push(nm(r, q)); if (q === fimDe(i)) break; } return l; };
   const vincos = [];
   for (const [k, v] of (o.vincos ?? []).entries()) {
@@ -435,6 +556,7 @@ export function gaiolaPorLacos(o = {}) {
     if (v.lacos != null && v.laco != null) falha(`${onde} traz lacos e laco; lacos limita o vinco de trecho ou de entre a uma faixa de laços`);
     const faixa = faixaDeLacos(v.lacos, onde);
     if (v.trecho != null) {
+      if (v.esvai != null) falha(`${onde} traz esvai, que só vale no vinco de entre (a linha do ponto entre dois trechos, que corre pelos laços); o vinco de trecho contorna a faixa e não tem uma direção em que a nitidez possa cair`);
       const i = exigeTrecho(v.trecho, onde);
       const ida = faixa.map((r) => nm(r, inicio[i]));
       const volta = [...faixa].reverse().map((r) => nm(r, fimDe(i)));
@@ -444,8 +566,11 @@ export function gaiolaPorLacos(o = {}) {
       if (!Array.isArray(v.entre) || v.entre.length !== 2) falha(`${onde}.entre precisa ser [a, b], dois trechos seguidos`);
       const [a, b] = v.entre.map((t) => exigeTrecho(t, onde));
       if ((a + 1) % trechos.length !== b) falha(`${onde}.entre cita ${citar(v.entre[0])} e ${citar(v.entre[1])}, que não são seguidos na volta`);
-      vincos.push({ nome: v.nome, pontos: semRepetir(faixa.map((r) => nm(r, inicio[b]))), nitidez: v.nitidez });
+      const linha = faixa.map((r) => nm(r, inicio[b]));
+      if (v.esvai == null) vincos.push({ nome: v.nome, pontos: semRepetir(linha), nitidez: v.nitidez });
+      else vincos.push(...vincoQueEsvai(v, onde, faixa, linha, semRepetir));
     } else {
+      if (v.esvai != null) falha(`${onde} traz esvai, que só vale no vinco de entre (a linha do ponto entre dois trechos, que corre pelos laços); o vinco ${v.trecho != null ? 'de trecho' : 'de laço'} não tem uma direção em que a nitidez possa cair`);
       const r = lacoDe(v.laco, onde);
       if (v.trechos == null) {
         const volta = semRepetir([...Array(N + 1).keys()].map((q) => nm(r, q)));
