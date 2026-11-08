@@ -24,7 +24,7 @@
           "espessuraDisco": 0.004,
           "furosDeFixacao": 3,
           "furosDeVentilacao": 0,
-          "ladosDoPneu": 24,
+          "ladosDoPneu": 96,
           "larguraAro": 0.4,
           "larguraCubo": 0.02,
           "larguraDoSulco": 0.15,
@@ -40,7 +40,7 @@
           "sulcosCirculares": 0,
           "tipo": 0
         },
-        "hash": "sha256:237aab9f0bc1907170b19f1c82a90fdae3711bf296c19271a5f8e3cd46372647",
+        "hash": "sha256:5ef1b731d02d951c91d650cfdd2bf90312123e8406bd81c804da18e7b10dca10",
         "medidas": []
       },
       "medio": {
@@ -62,13 +62,13 @@
           "espessuraDisco": 0.03,
           "furosDeFixacao": 6,
           "furosDeVentilacao": 6,
-          "ladosDoPneu": 112,
+          "ladosDoPneu": 96,
           "larguraAro": 0.7,
           "larguraCubo": 0.1,
           "larguraDoSulco": 0.4,
           "larguraDoSulcoCircular": 0.25,
           "larguraPneu": 0.2,
-          "ombroRedondo": 1,
+          "ombroRedondo": 0,
           "paredeDoAro": 0.02,
           "paredeDoRaio": 0.3,
           "profundidadeDoSulco": 0.3,
@@ -78,7 +78,7 @@
           "sulcosCirculares": 3,
           "tipo": 1
         },
-        "hash": "sha256:c098a52682a701a80bf46f7f91cd850c188adab5488a55246af390b3116bbebc",
+        "hash": "sha256:1e8029e3be4d82beb11faed691e3bc5b4f8d25951327a9f09197d888cfebd252",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
@@ -979,5 +979,33 @@
     }
   },
   "critico": null,
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-10-29",
+    "aprovou": true,
+    "prancha": "docs/modelar/banco-de-provas/familias-2026-10-11/roda-pneu-v2-perfis-prancha.png",
+    "perfis": {
+      "bicicleta": {
+        "hash": "sha256:27cabd8eefc1768e086e8b7d8f5df2d72ad351a2b67735c9f9b089a098f794ab"
+      },
+      "carrinho-de-mao": {
+        "hash": "sha256:bac8fc287565144647d7bc81537b24db597b651b20262625f4828ca3efae0ee6"
+      },
+      "carro": {
+        "hash": "sha256:8bc2bf8d2f2d72140c5a07ea82f6be645d37ebf5eaed1da76064150a4be5bbb7"
+      },
+      "carroca": {
+        "hash": "sha256:4f3dbb19889dc6be40482e4181fb03a9597e68c53a8917ab049873f4acab2380"
+      },
+      "rodizio": {
+        "hash": "sha256:bdd200b9ff364b0d41b5b879089a4cb62864a83a31e6c7b98fc0ec18ac4722f9"
+      },
+      "trator": {
+        "hash": "sha256:c839c93322a6cc88c293d388f11d1f8be47e3172faa65bfa4210d53339a2af1a"
+      },
+      "trem": {
+        "hash": "sha256:b5671dbb1cf6a7d504283e694774c6f5c237a34ae1d14392a4741fcf26e208b9"
+      }
+    },
+    "observacao": "reassinada em 2026-10-29 depois da fatia 10 do plano dos ajustes no núcleo dos veículos, que funde os pedaços coplanares da booleana: só a divisão das faces planas mudou, com caixa e partes iguais e volume e área iguais a 1e-6; a pessoa aprovou vendo cada peça sólida antes e depois"
+  }
 }

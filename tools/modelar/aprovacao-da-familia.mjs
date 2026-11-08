@@ -21,7 +21,8 @@
  *
  * O resultado fica em `aprovacao.json`, ao lado do `familia.json`: a camada mecânica com o hash da geometria de cada um
  * dos três pontos e a data, e as camadas do crítico e da pessoa vazias (`null`). Reaprovar uma geometria diferente
- * esvazia o que o crítico e a pessoa tinham julgado, porque eles julgaram outra forma. Quem confere depois é
+ * esvazia o que o crítico e a pessoa tinham julgado, porque eles julgaram outra forma; a assinatura da pessoa, que é dos
+ * perfis, segue quando todo perfil assinado sai com o mesmo hash (2026-11-08). Quem confere depois é
  * `conferirAprovacao` (o gate `familias:check`): o hash dos três pontos tem de continuar batendo. */
 import { fork } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -430,6 +431,11 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
   const mesmaGeometria = Boolean(anterior?.mecanica?.pontos) && NOMES_DOS_PONTOS.every((nome) => anterior.mecanica.pontos[nome]?.hash === pontos[nome].hash)
     && Object.keys(perfis).every((nome) => anterior.mecanica.perfis?.[nome]?.hash === perfis[nome].hash)
     && Object.keys(anterior.mecanica.perfis ?? {}).length === Object.keys(perfis).length;
+  /* A pessoa assina a prancha dos perfis (`pessoa.perfis`, com o hash de cada um). Quando todo perfil que ela assinou sai com o mesmo
+     hash, a assinatura segue valendo mesmo que um dos três pontos tenha mudado: ela julgou os perfis, e eles são os mesmos. O crítico,
+     que julga os pontos, é esvaziado como antes. */
+  const assinados = Object.entries(anterior?.pessoa?.perfis ?? {});
+  const pessoaSegue = Boolean(anterior?.pessoa) && assinados.length > 0 && assinados.every(([nome, assinado]) => perfis[nome]?.hash === assinado?.hash);
   const aprovacao = {
     formato: FORMATO_APROVACAO,
     familia: id,
@@ -451,10 +457,10 @@ export function aprovarFamilia(familia, { pasta = null, data = null, gravar = tr
       } : {}),
     },
     critico: mesmaGeometria ? (anterior.critico ?? null) : null,
-    pessoa: mesmaGeometria ? (anterior.pessoa ?? null) : null,
+    pessoa: mesmaGeometria || pessoaSegue ? (anterior.pessoa ?? null) : null,
   };
   writeFileSync(join(pasta, ARQUIVO_APROVACAO), `${JSON.stringify(aprovacao, null, 2)}\n`, 'utf8');
-  return { ...resultado, gravada: true, esvaziou: Boolean(anterior) && !mesmaGeometria && Boolean(anterior.critico || anterior.pessoa) };
+  return { ...resultado, gravada: true, esvaziou: Boolean(anterior) && !mesmaGeometria && Boolean(anterior.critico || (anterior.pessoa && !pessoaSegue)) };
 }
 
 /** As medições que `aprovarFamilia` pede, na ordem em que as pede: os três pontos, a varredura, os perfis e a escala deles. */

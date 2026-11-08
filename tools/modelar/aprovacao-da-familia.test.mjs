@@ -182,6 +182,22 @@ describe('os perfis da família: um ponto por perfil e a escala varrida', () => 
     expect(dosPerfis(definirFamilia({ contrato: comOutro, composicoes: COMPOSICOES_DO_TUBO, derivar: derivarDoTubo })).map(({ codigo, ponto }) => `${codigo}:${ponto}`)).toEqual(['perfil-nao-aprovado:perfil curto']);
   }, 60_000);
 
+  it('a assinatura da pessoa segue quando os perfis que ela assinou não mudam, e cai quando um deles muda', () => {
+    const pasta = pastaDa(COM_PERFIS);
+    const antes = aprovarFamilia(COM_PERFIS, { pasta, data: '2026-10-11' });
+    const pessoa = { aprovou: true, perfis: { barra: { hash: antes.perfis.barra.hash }, cano: { hash: antes.perfis.cano.hash } } };
+    writeFileSync(join(pasta, 'aprovacao.json'), JSON.stringify({ ...lerAprovacao(pasta), critico: { nota: 9 }, pessoa }));
+    /* só o ponto máximo muda (diâmetro 200, fora dos dois perfis): o crítico, que julga os pontos, cai; a pessoa, que assinou os perfis, segue */
+    const soMaximo = comOutroDerivar(COM_PERFIS, (derivado, parametros) => (parametros.diametro === 200 ? { ...derivado, argumentos: { ...derivado.argumentos, raio: derivado.argumentos.raio + 0.001 } } : derivado));
+    const r1 = aprovarFamilia(soMaximo, { pasta, data: '2026-10-12' });
+    expect(r1.esvaziou).toBe(true);
+    expect(lerAprovacao(pasta)).toMatchObject({ critico: null, pessoa });
+    /* o perfil cano muda: a assinatura cai */
+    const cano = comOutroDerivar(COM_PERFIS, (derivado, parametros) => (parametros.comprimento === 300 && parametros.diametro === 60 ? { ...derivado, argumentos: { ...derivado.argumentos, raio: derivado.argumentos.raio * 1.5 } } : derivado));
+    aprovarFamilia(cano, { pasta, data: '2026-10-13' });
+    expect(lerAprovacao(pasta).pessoa).toBeNull();
+  }, 60_000);
+
   it('o perfil cujo ponto a família recusa não existe: o contrato recusa na leitura', () => {
     const quebrado = structuredClone(contrato);
     quebrado.perfis.barra.parametros.comprimento = 20;
