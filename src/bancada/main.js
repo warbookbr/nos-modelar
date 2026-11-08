@@ -13,7 +13,8 @@ import { criarAmbienteBancada } from './criar-ambiente.js';
 import { arquivoDaSessaoNaUrl } from './sessao/sincronizador.js';
 import { criarSessaoDaBancada } from './sessao/sessao-da-bancada.js';
 import { criarRegistroDeEventos } from './sessao/registro-de-eventos.js';
-import { criarPreferenciaDeTema, criarPreferenciaDeVisao, criarPreferenciasBancada } from './preferencias/estado-local.js';
+import { criarPreferenciaDeAmbiente, criarPreferenciaDeTema, criarPreferenciaDeVisao, criarPreferenciasBancada } from './preferencias/estado-local.js';
+import { AMBIENTES, AMBIENTE_PADRAO } from './cena/ambiente-de-reflexo.js';
 import { TEMAS, TEMA_PADRAO, temaPorId } from './temas/temas.js';
 import { VISOES, VISAO_PADRAO, criarSeletorDeVisao, visaoDisponivel } from './visoes/registro-de-visoes.js';
 import { criarRegistroAtalhos } from './controles/atalhos.js';
@@ -109,7 +110,13 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   };
   /* A câmera livre muda a cada quadro do giro; o endereço é gravado uma vez, quando ele termina (`gravador-da-camera.js`). */
   const gravadorDaCamera = criarGravadorDaCamera({ gravar: salvarUrlForaDaSubida });
+  /* O ambiente de reflexo: `?ambiente=estudio|ceu|nenhum` na URL manda (e vale também na imagem de auditoria); sem ele vale o que a
+     pessoa deixou escolhido, e o estúdio na primeira vez. */
+  const preferenciaDeAmbiente = criarPreferenciaDeAmbiente({ conhecidos: AMBIENTES, padrao: AMBIENTE_PADRAO });
+  const ambienteDaUrl = AMBIENTES.includes(params.get('ambiente')) ? params.get('ambiente') : null;
   const ambiente = criarAmbienteBancada(canvas, {
+    ambienteDeReflexo: ambienteDaUrl ?? preferenciaDeAmbiente.ler(),
+    ambienteDeReflexoFixo: ambienteDaUrl !== null,
     aoMudarVista(vista) {
       estado.definir({ vista });
       if (vista === 'livre') gravadorDaCamera.aoMudar();
@@ -356,6 +363,13 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     medidasDaPeca: () => cena.medidasDaPeca(),
     acoes: {
       alternarPreferenciaCena: (qual) => vista.alternarPreferenciaCena(qual),
+      ambienteDeReflexo: () => ambiente.ambienteDeReflexo(),
+      /* o botão gira estúdio, céu aberto e nenhum; devolve o que ficou */
+      girarAmbienteDeReflexo: () => {
+        const proximo = AMBIENTES[(AMBIENTES.indexOf(ambiente.ambienteDeReflexo()) + 1) % AMBIENTES.length];
+        ambiente.definirAmbienteDeReflexo(proximo, { fixo: true });
+        return preferenciaDeAmbiente.salvar(proximo);
+      },
       abrirConfiguracoes: () => barraSuperior.abrirJanela('configuracoes'),
     },
   });

@@ -91,6 +91,8 @@ Em 2026-11-05 a pessoa reabriu o ombro na bancada pelo vão entre ele e a base e
 
 Ainda em 2026-11-05, com o `gaiolaPorLacos` no núcleo, a pessoa pediu a coluna refeita da mesma forma, para ver: o pé e o tubo saem de uma gaiola em planos z, sem a união dos dois cilindros, com as medidas aceitas. Ela a aceitou pelas imagens, e a etapa está fixa por aceite humano. Os limites do ajudante que a coluna mostrou estão no backlog.
 
+Em 2026-11-08 a pessoa alinhou o anel do cotovelo e o cotovelo (seção no `ALINHAMENTO.md` do braço). O anel virou colar fixo, rente à coluna e com 25 mm, e está fixo por aceite dela. O cotovelo, na opção do tubo em pé cruzado no alto pelo tubo deitado, foi feito pelo `gaiolaPorLacos` e fica aberto: embaixo da frente, onde o tubo deitado passa do tubo em pé, o filete termina numa aba torta, e a correção é do ajudante, no backlog, por outra sessão.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,

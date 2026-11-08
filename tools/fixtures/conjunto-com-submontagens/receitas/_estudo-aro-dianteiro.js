@@ -12,7 +12,7 @@ export const PARAMS = {
   meiaBandaNeg: '= -meiaBanda',
 };
 export const TOPO = { lados: 40 };
-export const MATERIAIS = { liga: { cor: '#aab2bb', aspereza: 0.30, metalness: 0.82 } };
+export const MATERIAIS = { liga: { cor: '#aab2bb', aspereza: 0.30 } };
 const ARO = 1501;
 export const ALIASES = [['aroInteiro', { origem: { op: 'lathe', id: ARO } }]];
 

@@ -4,7 +4,7 @@
  * A capa é uma malha polar: a borda é o contorno do vão encolhido (as quinas concordadas com o raio menos o encolhimento), cada anel é a borda reduzida em direção
  * ao centro (a lâmpada principal), e o último anel é o círculo do furo. A profundidade de cada ponto é uma função do quanto ele já andou até o centro, e as facetas
  * são vincos vivos ao longo de raios. Os pontos têm nome e entram no TOPO; o lado direito é o espelho do esquerdo, com as faces na ordem invertida. */
-import { superficieDaFrente, derivarFarois, derivarLuzesDeCanto, derivarPiscasLaterais } from './farol.js';
+import { superficieDaFrente, superficieDeTras, derivarFarois, derivarLanternas, derivarLuzesDeCanto, derivarPiscasLaterais } from './farol.js';
 
 /* ---------- contas em 2D ---------- */
 
@@ -79,15 +79,15 @@ const ANEIS = [1, 0.88, 0.76, 0.64, 0.52, 0.42, 0.33, 0.25];
 /** A capa de uma luz: pontos nomeados `${prefixo}_${anel}_${raio}`, faces entre os anéis (do contorno ao furo) e os vincos dos raios de faceta. `borda` é o
  *  contorno 2D anti-horário, `centro` o ponto de onde os raios partem, `profundidade(rho, p)` quanto o ponto fica atrás da borda (mm), `posicao(p, prof)` o ponto 3D
  *  (mm) e `fora` a direção 3D para onde a face de frente da capa olha (as faces são viradas se a ordem estiver ao contrário). */
-function capaPolar({ prefixo, borda, centro, raioFuro, profundidade, posicao, fora, facetas }) {
-  const J = borda.length; const K = ANEIS.length;
+function capaPolar({ prefixo, borda, centro, raioFuro, profundidade, posicao, fora, facetas, aneis = ANEIS }) {
+  const J = borda.length; const K = aneis.length;
   const nome = (k, j) => `${prefixo}_${k}_${j % J}`;
   const posicoes = new Map();
   for (let j = 0; j < J; j += 1) {
     const v = sub(borda[j], centro); const L = norma(v);
     for (let k = 0; k <= K; k += 1) {
-      const rho = k < K ? ANEIS[k] : raioFuro / L;
-      if (k === K && rho > ANEIS[K - 1] - 0.03) throw new Error(`furgao-realista: o furo do soquete (${raioFuro} mm) fica a ${(raioFuro / L).toFixed(2)} do contorno em ${prefixo}, e não cabe depois do último anel`);
+      const rho = k < K ? aneis[k] : raioFuro / L;
+      if (k === K && rho > aneis[K - 1] - 0.03) throw new Error(`furgao-realista: o furo do soquete (${raioFuro} mm) fica a ${(raioFuro / L).toFixed(2)} do contorno em ${prefixo}, e não cabe depois do último anel`);
       const p = soma(centro, esc(v, rho));
       posicoes.set(nome(k, j), posicao(p, profundidade(rho, p)));
     }
@@ -123,6 +123,7 @@ function espelhar(capa, de, para) {
     faces: capa.faces.map(([p, q, r, s]) => [renome(p), renome(s), renome(r), renome(q)]),
     vincos: capa.vincos.map((v) => ({ ...v, nome: renome(v.nome), pontos: v.pontos.map(renome) })),
     furo: capa.furo.map(renome).reverse(),
+    ...(capa.furos ? { furos: capa.furos.map((fu) => fu.map(renome).reverse()) } : {}),
   };
 }
 
@@ -213,6 +214,54 @@ export function derivarLuzesPorDentro(T, f) {
     const perfil = perfilDaLampada(5, 20, 9);
     lampadas.push({ nome: 'lampadaPiscaLateralEsquerdo', base, eixo: 'x', graus: 0, ...perfil });
     lampadas.push({ nome: 'lampadaPiscaLateralDireito', base: [-base[0], base[1], base[2]], eixo: 'x', graus: 180, ...perfil });
+  }
+
+  /* ---- as lanternas de trás: um refletor por lanterna, quatro conchas lado a lado com a parede entre elas, e uma lâmpada no fundo de cada concha. Cada concha é uma
+     capa polar no contorno da faixa da lente por dentro (a borda recuada `lanterna_refletor_inset`), de fundo plano no meio, levada à superfície da quina de trás e
+     recuada ao longo da diagonal. A parede entre duas conchas é a faixa que liga a borda de baixo de uma à de cima da seguinte, rente à lente, atrás da linha de
+     chapa que separa as faixas. O resto é como na luz de canto. ---- */
+  const [lanE] = derivarLanternas(T, f);
+  {
+    const Sb = superficieDeTras(T, f);
+    const d = [Math.SQRT1_2, 0, -Math.SQRT1_2];
+    const ins = T.lanterna_refletor_inset;
+    const prof = (rho) => T.lanterna_refletor_profundidade * (1 - Math.max(rho, T.lanterna_refletor_fundo_plano) ** 2);
+    const posicao = (p, pr) => { const s = Sb.ponto(p[0], p[1]); const t = encosto + pr; return [s[0] - d[0] * t, s[1], s[2] - d[2] * t]; };
+    const faixas = lanE.faixas.map((fx) => {
+      /* os cantos que dão na linha de chapa ficam vivos na concha: as bordas que se defrontam têm de ter os mesmos pontos para a parede ligá-las */
+      const borda = concordar(encolher(fx.contorno, ins), fx.raios.map((r) => (r <= T.lanterna_raio_linha ? 0 : Math.max(0, r - ins))), T.lanterna_refletor_passo);
+      const centro = [fx.contorno.reduce((s, p) => s + p[0], 0) / 4, fx.contorno.reduce((s, p) => s + p[1], 0) / 4];
+      const prefixo = `refletorLanternaEsquerda${fx.base}`;
+      const capa = capaPolar({ prefixo, borda, centro, raioFuro: T.lanterna_furo, profundidade: (rho) => prof(rho), posicao, fora: d, facetas: 0, aneis: T.lanterna_aneis });
+      return { fx, borda, centro, prefixo, capa };
+    });
+    /* a parede: os pontos da borda de baixo de uma concha e da borda de cima da seguinte, na mesma ordem em u */
+    const ponta = (fa, cima) => {
+      const ys = fa.borda.map((p) => p[1]); const alvo = cima ? Math.max(...ys) : Math.min(...ys);
+      return fa.borda.map((p, j) => ({ u: p[0], nome: `${fa.prefixo}_0_${j}` })).filter((_, j) => Math.abs(ys[j] - alvo) < 1e-6).sort((a, b) => a.u - b.u);
+    };
+    const posicoes = new Map(); const faces = []; const furos = [];
+    faixas.forEach((fa) => { fa.capa.posicoes.forEach((v, n) => posicoes.set(n, v)); faces.push(...fa.capa.faces); furos.push(fa.capa.furo); });
+    for (let i = 0; i + 1 < faixas.length; i += 1) {
+      const a = ponta(faixas[i], false); const b = ponta(faixas[i + 1], true);
+      if (a.length !== b.length || a.some((p, k) => Math.abs(p.u - b[k].u) > 1e-6)) throw new Error(`furgao-realista: a borda de baixo da concha ${i} e a de cima da ${i + 1} da lanterna não têm os mesmos pontos`);
+      for (let k = 0; k + 1 < a.length; k += 1) {
+        const q = [a[k].nome, a[k + 1].nome, b[k + 1].nome, b[k].nome];
+        const [p0, p1, p2] = q.map((n) => posicoes.get(n));
+        const u = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]]; const v = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]];
+        const nrm = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+        faces.push(nrm[0] * d[0] + nrm[1] * d[1] + nrm[2] * d[2] < 0 ? [q[0], q[3], q[2], q[1]] : q);
+      }
+    }
+    const capa = { vertices: [...posicoes.keys()].sort(), faces, vincos: [], posicoes, furo: furos[0], furos };
+    refletores.push({ nome: 'refletorLanternaEsquerda', capa, espessura: T.refletor_espessura });
+    refletores.push({ nome: 'refletorLanternaDireita', capa: espelhar(capa, 'Esquerda', 'Direita'), espessura: T.refletor_espessura });
+    const perfil = perfilDaLampada(T.lanterna_lampada_raio, T.lanterna_lampada_comprimento, T.lanterna_lampada_flange);
+    for (const fa of faixas) {
+      const b = posicao(fa.centro, prof(0));
+      lampadas.push({ nome: `lampadaLanterna${fa.fx.base}Esquerda`, base: b, eixo: 'z', graus: 135, ...perfil });
+      lampadas.push({ nome: `lampadaLanterna${fa.fx.base}Direita`, base: [-b[0], b[1], b[2]], eixo: 'z', graus: -135, ...perfil });
+    }
   }
   return { refletores, lampadas };
 }

@@ -43,6 +43,7 @@ export function criarPreferenciasBancada({ armazenamento = globalThis.localStora
 
 const CHAVE_VISAO = 'mecanifica.bancada.visao';
 const CHAVE_TEMA = 'mecanifica.bancada.tema';
+const CHAVE_AMBIENTE = 'mecanifica.bancada.ambiente';
 
 /* Uma escolha entre opções conhecidas, guardada numa chave própria: o que foi
    guardado e deixou de valer volta ao padrão, em vez de prender a bancada numa
@@ -93,4 +94,14 @@ export function criarPreferenciaDeTema({
   padrao = 'bancada',
 } = {}) {
   return criarPreferenciaDeEscolha({ chave: CHAVE_TEMA, armazenamento, conhecidas: conhecidos, padrao });
+}
+
+/* O AMBIENTE DE REFLEXO (estúdio, céu aberto ou nenhum) volta entre sessões, pela mesma regra: quem diz quais existem é
+   `cena/ambiente-de-reflexo.js`, e um nome gravado que deixou de valer volta ao padrão. */
+export function criarPreferenciaDeAmbiente({
+  armazenamento = globalThis.localStorage,
+  conhecidos = [],
+  padrao = 'estudio',
+} = {}) {
+  return criarPreferenciaDeEscolha({ chave: CHAVE_AMBIENTE, armazenamento, conhecidas: conhecidos, padrao });
 }

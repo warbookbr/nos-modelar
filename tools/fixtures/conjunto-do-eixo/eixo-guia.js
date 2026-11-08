@@ -13,7 +13,7 @@
 import { executar, colisaoDe } from '../../../procedural/nucleo/entrada.js';
 export const PARAMS = { raio: 0.019, inicio: -0.040, comprimento: 0.055, fim: 0.015 };
 export const TOPO = { lados: 24 };
-export const MATERIAIS = { aco: { cor: '#a3adb6', aspereza: 0.42, metalness: 0.76 } };
+export const MATERIAIS = { aco: { cor: '#a3adb6', aspereza: 0.42 } };
 const EIXO = 7201;
 export const ALIASES = [['inteiro', { unir: [{ origem: { op: 'cilindro', id: EIXO } }, { origem: { op: 'cilindro', id: EIXO, tampa: 'fundo' } }, { origem: { op: 'cilindro', id: EIXO, tampa: 'topo' } }] }]];
 export const PASSOS = [

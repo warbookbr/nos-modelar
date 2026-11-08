@@ -52,10 +52,10 @@ export function derivarInterior(T, f) {
     nome: 'pisoInterior', y0: T.piso_y, altura: T.piso_espessura,
     perfil: { retangulo: { largura: 2 * meiaLargura, profundidade: zFrente - zTrasInterno, centro: [0, (zFrente + zTrasInterno) / 2], cantos: T.piso_raio_cantos } },
   };
-  /* o banco: L em [z, y] (encosto e assento), com o pé no piso e os cantos chanfrados; o eixo x do extrusao leva [u, v] a y = -u e z = v, e a peça nasce em x de 0 a altura */
+  /* o banco: L em [z, y] (encosto reto e assento: sem degrau nem cabeceira, que o alvo não pede), com o pé no piso e os cantos chanfrados; o eixo x do extrusao leva [u, v] a y = -u e z = v, e a peça nasce em x de 0 a altura */
   const zb = T.banco_costas_z; const zc = zb + T.banco_costas_espessura; const zf = zb + T.banco_profundidade;
   const ySolo = yPiso - 1; const yA = T.banco_assento_y; const yT = T.banco_topo_y;
-  const Lzy = chanfrar([[zb, ySolo], [zf, ySolo], [zf, yA], [zc, yA], [zc, yT - 180], [zc - 8, yT - 120], [zc - 8, yT], [zb, yT]], T.banco_chanfro);
+  const Lzy = chanfrar([[zb, ySolo], [zf, ySolo], [zf, yA], [zc, yA], [zc, yT], [zb, yT]], T.banco_chanfro);
   const bancos = [['bancoMotorista', 1], ['bancoPassageiro', -1]].map(([nome, s]) => ({
     nome, perfil: Lzy.map(([z, y]) => [-y, z]), x0: s * T.banco_x - T.banco_largura / 2, largura: T.banco_largura,
   }));

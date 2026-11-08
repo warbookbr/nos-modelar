@@ -16,7 +16,7 @@ export const PARAMS = {
   chanfro: 0.004,
 };
 export const TOPO = {};
-export const MATERIAIS = { aluminio: { cor: '#a45c3d', aspereza: 0.54, metalness: 0.35 } };
+export const MATERIAIS = { aluminio: { cor: '#a45c3d', aspereza: 0.54 } };
 const GARRA_INTERNA = 1401;
 const GARRA_EXTERNA = 1402;
 const PONTE = 1403;

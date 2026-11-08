@@ -14,7 +14,7 @@ export const PARAMS = {
 };
 
 export const TOPO = { lados: 32 };
-export const MATERIAIS = { acoCubo: { cor: '#8b949e', aspereza: 0.48, metalness: 0.78 } };
+export const MATERIAIS = { acoCubo: { cor: '#8b949e', aspereza: 0.48 } };
 const CUBO = 1201;
 export const ALIASES = [['cuboInteiro', { origem: { op: 'lathe', id: CUBO } }]];
 

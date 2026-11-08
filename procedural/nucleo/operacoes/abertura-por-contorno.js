@@ -20,8 +20,12 @@
    num sólido que a Manifold aceita; dois tetraedros pequenos, nos cantos da caixa da chapa (`andaimeDaCaixa`), fazem a booleana e a
    Manifold medirem seus limiares na caixa da chapa inteira, como antes do recorte (sem eles a grade do furgão saía 5 mm diferente).
    A banda e o andaime saem da peça depois do corte, e o registro guarda a chapa inteira: as faces que a booleana não viu ficam como
-   estavam. O trecho que não fecha por uma banda de duas voltas (o vão junto da borda da chapa, onde as peles se juntam), o que passa
-   de metade da chapa e a banda torcida não recortam, e a booleana vê a chapa inteira, como antes; `vizinhanca` no registro diz qual
+   estavam. O trecho que alcança a parede de outro vão, ou a lateral da chapa, onde as peles se juntam e a borda tem uma volta só,
+   perde as faces de parede (`soltarParedes`: a face sem pele do outro lado, a até duas espessuras na direção contrária à normal) e a
+   banda refaz a parede entre as duas voltas que sobram; a parede que toca o prisma fica, e então o trecho não recorta. O trecho que
+   ainda não fecha por uma banda de duas voltas, o que passa de metade da chapa e a banda torcida (a diagonal dela passa de uma vez e
+   meia a hipotenusa da maior aresta da borda com a espessura, e não do porte da borda, que a malha grossa estoura sem que as voltas
+   deixem de se corresponder) não recortam, e a booleana vê a chapa inteira, como antes; `vizinhanca` no registro diz qual
    foi e por quê (a chapa de menos de FACES_MINIMAS_PARA_RECORTAR faces também não recorta). O vértice novo da booleana recebe o id na ordem da saída da Manifold, que muda com a malha que ela recebe, e a
    limpeza desempata fusões por id: a malha de um vão recortado pode diferir, por uma fusão a mais ou a menos, da do vão que a
    booleana vê a chapa inteira, na mesma forma até a fusão (a diferença medida no furgão está no plano da vizinhança).
@@ -728,6 +732,41 @@ function extremosDos(pontos) {
   return [min, max];
 }
 
+/** A distância, em metro, abaixo da qual a projeção de uma face no desenho conta como tocando o contorno (o prisma): acima do erro
+ *  de Float32 e da grade da Manifold, abaixo da folga de 0,3 mm que a operação exige entre dois vãos. */
+const TOQUE_NO_PRISMA = 1e-4;
+
+/** projecaoToca(poligonoDaFace, contorno, eps) -> boolean: o polígono 2D da face (um segmento, se a face é paralela ao eixo) cruza o
+ *  contorno, está dentro dele, o contém ou chega a `eps` dele. */
+function projecaoToca(face, contorno, eps) {
+  const dentroDe = (p, poli) => {
+    let c = false;
+    for (let k = 0, j = poli.length - 1; k < poli.length; j = k++) {
+      const a = poli[k], b = poli[j];
+      if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < ((b[0] - a[0]) * (p[1] - a[1])) / (b[1] - a[1]) + a[0]) c = !c;
+    }
+    return c;
+  };
+  if (face.some((p) => dentroDe(p, contorno)) || contorno.some((p) => dentroDe(p, face))) return true;
+  const dPS = (p, a, b) => {
+    const ab = [b[0] - a[0], b[1] - a[1]]; const l2 = ab[0] * ab[0] + ab[1] * ab[1];
+    const t = l2 > 0 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * ab[0] + (p[1] - a[1]) * ab[1]) / l2)) : 0;
+    return Math.hypot(p[0] - a[0] - t * ab[0], p[1] - a[1] - t * ab[1]);
+  };
+  const cruza = (a, b, c, d) => {
+    const o = (p, q, r) => (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+    return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0;
+  };
+  for (let i = 0; i < face.length; i++) {
+    const a = face[i], b = face[(i + 1) % face.length];
+    for (let j = 0; j < contorno.length; j++) {
+      const c = contorno[j], d = contorno[(j + 1) % contorno.length];
+      if (cruza(a, b, c, d) || dPS(a, c, d) <= eps || dPS(b, c, d) <= eps || dPS(c, a, b) <= eps || dPS(d, a, b) <= eps) return true;
+    }
+  }
+  return false;
+}
+
 /** A interseção de dois sólidos { pontos, faces } (faces por índice, fechados e orientados), em pedaços convexos por face de
  *  entrada: { pontos, faces: [{ solido, face, vs }] }. Os pontos são os da saída da Manifold (Float32, em coordenada local). */
 function intersecaoNaManifold(wasm, solidos, caixa = null) {
@@ -794,6 +833,13 @@ export const FACES_MINIMAS_PARA_RECORTAR = 5000;
 /** A folga da caixa do prisma, em fração da maior dimensão dela, dentro da qual uma face é semente da vizinhança. Fica muito acima do erro
  *  de Float32 e de grade da Manifold (2^-20 da caixa), de modo que a face fora da semente não é tocada pela booleana. */
 const FOLGA_DA_VIZINHANCA = 1e-3;
+/** A diagonal mais longa da banda, em vezes a hipotenusa da maior aresta da borda com a espessura: acima disso as voltas não se correspondem. */
+const FOLGA_DA_DIAGONAL = 1.5;
+/** Até quantas espessuras, na direção contrária à normal, uma face de pele tem a pele do outro lado; a face sem pele ali é parede. */
+const ALCANCE_DA_PELE = 2;
+/** O cosseno, no máximo, entre a normal de uma face de pele e a da face de pele do outro lado: as duas olham para lados opostos, a menos
+ *  da curvatura da chapa entre elas (cerca de 35 graus). */
+const COS_DA_PELE_OPOSTA = -0.8;
 
 /** bandaDaVizinhanca(pos, faces) -> { banda, bordas, voltas } | { motivo }
  *  `faces` é um Map id -> vértices de um trecho da chapa, e `pos` dá o ponto de um vértice. A borda do trecho (a aresta cuja
@@ -820,7 +866,7 @@ export function bandaDaVizinhanca(pos, faces) {
     if (c !== inicio) return { motivo: 'a borda da vizinhança não fecha em voltas simples' };
     voltas.push(volta);
   }
-  if (voltas.length !== 2) return { motivo: `a borda da vizinhança tem ${voltas.length} voltas, e não as duas (pele de fora e de dentro) de uma chapa com espessura` };
+  if (voltas.length !== 2) return { nVoltas: voltas.length, motivo: `a borda da vizinhança tem ${voltas.length} voltas, e não as duas (pele de fora e de dentro) de uma chapa com espessura` };
   const P = [...voltas[0]].reverse(); const Q = voltas[1];
   const dist = (x, y) => tamanho(sub(pos(x), pos(y)));
   let melhor = Infinity; let i0 = 0, j0 = 0;
@@ -832,9 +878,13 @@ export function bandaDaVizinhanca(pos, faces) {
     const avancaP = i >= n ? false : j >= m ? true : dist(pi1, qj) <= dist(pi, qj1);
     if (avancaP) { banda.push([pi, pi1, qj]); diagonal = Math.max(diagonal, dist(pi1, qj)); i++; } else { banda.push([qj1, qj, pi]); diagonal = Math.max(diagonal, dist(pi, qj1)); j++; }
   }
-  const [min, max] = extremosDos(voltas[0].map(pos));
-  const porte = Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
-  if (!(diagonal <= 0.2 * porte)) return { motivo: `a banda da vizinhança liga vértices a ${fmt(diagonal * 1000)} mm, mais de um quinto dos ${fmt(porte * 1000)} mm da borda: as duas voltas não se correspondem` };
+  /* Um par que se corresponde fica a uma espessura de distância e a uma aresta de deslocamento ao longo da volta: a diagonal do zíper
+     passa da maior aresta da borda só pela espessura (`melhor`), e na malha grossa ela é longa sem que as voltas deixem de se
+     corresponder. A banda torcida liga vértices a distâncias que a aresta e a espessura não explicam. */
+  let aresta = 0;
+  for (const [a, b] of bordas) aresta = Math.max(aresta, dist(a, b));
+  const limite = FOLGA_DA_DIAGONAL * Math.hypot(aresta, melhor);
+  if (!(diagonal <= limite)) return { motivo: `a banda da vizinhança liga vértices a ${fmt(diagonal * 1000)} mm, mais que ${FOLGA_DA_DIAGONAL} vez a aresta de ${fmt(aresta * 1000)} mm da borda com a espessura de ${fmt(melhor * 1000)} mm: as duas voltas não se correspondem` };
   return { banda, bordas, voltas };
 }
 
@@ -842,8 +892,10 @@ export function bandaDaVizinhanca(pos, faces) {
  *  O trecho da chapa que a booleana do vão precisa ver: as faces cuja caixa toca a do prisma (`proximas` são as que tocam o contorno
  *  na vista, e só entre elas há semente) mais as que dividem um vértice com elas, de modo que as faces da borda do trecho não tocam o
  *  prisma e saem da booleana como entraram. `ids` sai em ordem crescente, de `idsDaChapa`. Recusa o recorte (e a booleana vê a chapa
- *  inteira) quando o trecho passa de FRACAO_MAXIMA_DA_VIZINHANCA da chapa ou não fecha pela banda. */
-export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, caixaDaChapa }) {
+ *  inteira) quando o trecho passa de FRACAO_MAXIMA_DA_VIZINHANCA da chapa ou não fecha pela banda. Com `espessura` (metro, ou função que a
+ *  dá) e `tocaOPrisma(id)`, o trecho de uma volta só tenta perder as faces de parede (`soltarParedes`) antes de recusar; `paredes` diz
+ *  quais perdeu. */
+export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, caixaDaChapa, espessura = null, tocaOPrisma = null }) {
   if (idsDaChapa.length < FACES_MINIMAS_PARA_RECORTAR) return { motivo: `a chapa tem ${idsDaChapa.length} faces, menos que as ${FACES_MINIMAS_PARA_RECORTAR} a partir das quais o recorte compensa` };
   const [min, max] = extremosDos(pontosDoPrisma);
   const folga = FOLGA_DA_VIZINHANCA * Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
@@ -855,12 +907,80 @@ export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, ca
     for (const v of vs) verticesDasSementes.add(v);
   }
   if (!sementes.size) return { motivo: 'nenhuma face da chapa toca o prisma do vão' };
-  const ids = idsDaChapa.filter((id) => sementes.has(id) || F.get(id).vs.some((v) => verticesDasSementes.has(v)));
+  let ids = idsDaChapa.filter((id) => sementes.has(id) || F.get(id).vs.some((v) => verticesDasSementes.has(v)));
   if (ids.length > FRACAO_MAXIMA_DA_VIZINHANCA * idsDaChapa.length) return { motivo: `a vizinhança do vão tem ${ids.length} das ${idsDaChapa.length} faces da chapa, mais que ${FRACAO_MAXIMA_DA_VIZINHANCA * 100}%` };
-  const r = bandaDaVizinhanca((v) => V.get(v), new Map(ids.map((id) => [id, F.get(id).vs])));
+  const pos = (v) => V.get(v);
+  let r = bandaDaVizinhanca(pos, new Map(ids.map((id) => [id, F.get(id).vs])));
+  let paredes = [];
+  const e = r.motivo && r.nVoltas != null && tocaOPrisma ? (typeof espessura === 'function' ? espessura() : espessura) : null;
+  if (e > 0) {
+    /* o trecho alcançou a parede de outro vão: tirar dela as faces de parede devolve as duas voltas, e a banda refaz a parede */
+    const s = soltarParedes({ V, F, ids, idsDaChapa, espessura: e, tocaOPrisma });
+    if (s.motivo) return { ...r, motivo: `${r.motivo}; ${s.motivo}` };
+    const sem = new Set(s.paredes);
+    const resto = ids.filter((id) => !sem.has(id));
+    const r2 = bandaDaVizinhanca(pos, new Map(resto.map((id) => [id, F.get(id).vs])));
+    if (r2.motivo) return { ...r, motivo: `${r.motivo}; tiradas as ${s.paredes.length} faces de parede, ${r2.motivo}` };
+    ids = resto; r = r2; paredes = s.paredes;
+  }
   if (r.motivo) return r;
   const andaime = andaimeDaCaixa(extremosDos([...new Set(ids.flatMap((id) => F.get(id).vs))].map((v) => V.get(v)).concat(pontosDoPrisma)), extremosDos([...caixaDaChapa, ...pontosDoPrisma]));
-  return andaime.motivo ? andaime : { ids, ...r, andaime };
+  return andaime.motivo ? andaime : { ids, ...r, andaime, paredes };
+}
+
+/** soltarParedes({ V, F, ids, idsDaChapa, espessura, tocaOPrisma }) -> { paredes } | { motivo }
+ *  As faces do trecho `ids` que são parede de outro vão (ou a lateral da chapa) e não pele: uma face de pele tem do outro lado da chapa,
+ *  na direção contrária à da normal e a até ALCANCE_DA_PELE espessuras, uma face de normal oposta; a parede tem ali o miolo da chapa.
+ *  Recusa o trecho sem parede nenhuma (o que impede as duas voltas é outra coisa) e o que tem parede que toca o prisma, porque então o
+ *  vão corta a parede e ela tem de entrar na booleana. `tocaOPrisma(id)` diz se a face toca o prisma do vão. */
+export function soltarParedes({ V, F, ids, idsDaChapa, espessura, tocaOPrisma }) {
+  const alcance = ALCANCE_DA_PELE * espessura;
+  const caixaDe = (vs) => extremosDos(vs.map((v) => V.get(v)));
+  const [lo, hi] = extremosDos(ids.flatMap((id) => F.get(id).vs).map((v) => V.get(v)));
+  const candidatas = [];
+  for (const id of idsDaChapa) {
+    const vs = F.get(id).vs; const [a, b] = caixaDe(vs);
+    if (a[0] > hi[0] + alcance || b[0] < lo[0] - alcance || a[1] > hi[1] + alcance || b[1] < lo[1] - alcance || a[2] > hi[2] + alcance || b[2] < lo[2] - alcance) continue;
+    const pts = vs.map((v) => V.get(v)); const n = newell(pts); const l = tamanho(n);
+    if (!(l > 0)) continue;
+    candidatas.push({ id, pts, n: [n[0] / l, n[1] / l, n[2] / l], a, b });
+  }
+  const acha = (f) => {
+    const pts = f.pts; const d = [-f.n[0], -f.n[1], -f.n[2]];
+    const c = [0, 1, 2].map((k) => pts.reduce((s, p) => s + p[k], 0) / pts.length);
+    const fim = [c[0] + d[0] * alcance, c[1] + d[1] * alcance, c[2] + d[2] * alcance];
+    for (const g of candidatas) {
+      if (g.id === f.id || ponto(g.n, f.n) > COS_DA_PELE_OPOSTA) continue;
+      if (g.a[0] > Math.max(c[0], fim[0]) || g.b[0] < Math.min(c[0], fim[0]) || g.a[1] > Math.max(c[1], fim[1]) || g.b[1] < Math.min(c[1], fim[1]) || g.a[2] > Math.max(c[2], fim[2]) || g.b[2] < Math.min(c[2], fim[2])) continue;
+      for (let k = 1; k + 1 < g.pts.length; k++) {
+        const t = raioNoTriangulo(c, d, g.pts[0], g.pts[k], g.pts[k + 1]);
+        if (t != null && t <= alcance) return true;
+      }
+    }
+    return false;
+  };
+  const porId = new Map(candidatas.map((g) => [g.id, g]));
+  const paredes = [];
+  for (const id of ids) {
+    const f = porId.get(id);
+    if (f && !acha(f)) paredes.push(id);
+  }
+  if (!paredes.length) return { motivo: 'o trecho não tem face de parede para tirar' };
+  const toca = paredes.find((id) => tocaOPrisma(id));
+  if (toca != null) return { motivo: `a face de parede ${toca} toca o prisma do vão, e então o corte a alcança` };
+  return { paredes };
+}
+
+/** A distância ao longo do raio (origem o, direção d) até o triângulo abc, ou null (Möller-Trumbore, só para a frente). */
+function raioNoTriangulo(o, d, a, b, c) {
+  const e1 = sub(b, a), e2 = sub(c, a); const p = cruz(d, e2); const det = ponto(e1, p);
+  if (Math.abs(det) < 1e-18) return null;
+  const s = sub(o, a); const u = ponto(s, p) / det;
+  if (u < -1e-9 || u > 1 + 1e-9) return null;
+  const q = cruz(s, e1); const v = ponto(d, q) / det;
+  if (v < -1e-9 || u + v > 1 + 1e-9) return null;
+  const t = ponto(e2, q) / det;
+  return t > 1e-12 ? t : null;
 }
 
 /** andaimeDaCaixa(caixaNova, caixaVelha) -> { pontos, faces } | { motivo }
@@ -1037,7 +1157,13 @@ export function criarOperacoesAberturaPorContorno(servicos) {
        (e que sai da peça depois), e o resto da chapa fica como está, com os mesmos ids. Quando o trecho não fecha por uma banda de
        duas voltas, ou passa de metade da chapa, a booleana vê a chapa inteira, como antes. */
     const topo = BLOCO + FAIXA_ESTENDIDA;
-    const viz = vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa] });
+    /* a face toca o prisma quando a projeção dela no desenho encosta no contorno (o prisma atravessa a chapa de lado a lado) */
+    const espessuraDaChapa = () => espessuraVistaDoEixo(st.V, facesDaCamada, poligono, quadro);
+    const tocaOPrisma = (id) => {
+      const vs = proximas.get(id);
+      return vs != null && projecaoToca(vs.map((v) => { const l = quadro.identidade ? st.V.get(v) : Vl.get(v); return [l[iu], l[iv]]; }), poligono, TOQUE_NO_PRISMA);
+    };
+    const viz = vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa], espessura: espessuraDaChapa, tocaOPrisma });
     const recortada = !viz.motivo;
     const idsPerto = recortada ? viz.ids : idsDaChapa;
     /* no fim da faixa do passo, abaixo do prisma: a banda e as faces do andaime (e os vértices dele), que saem da peça depois do corte */
