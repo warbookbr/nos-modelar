@@ -69,13 +69,13 @@ describe('a revisão e o material', () => {
       relevo: { tipo: 'granulado' },
     };
     expect(descreverPeca(comMaterial(declaracao)).aparencia.materiais[0].propriedades).toEqual({
-      ...declaracao, relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 },
+      ...declaracao, relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35, projecao: 'caixa', eixo: 'y' },
     });
   });
 
   it('declarar só o tipo do relevo e declarar os padrões por extenso é a mesma revisão', () => {
     const a = revisao({ cor: '#223344', relevo: { tipo: 'granulado' } });
-    const b = revisao({ cor: '#223344', relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 } });
+    const b = revisao({ cor: '#223344', relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35, projecao: 'caixa', eixo: 'y' } });
     expect(a.assinaturaModelo).toBe(b.assinaturaModelo);
   });
 

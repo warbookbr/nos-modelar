@@ -73,15 +73,21 @@ export const CAMPOS_DA_APARENCIA = Object.freeze([
    banda, a altura da letra, o grão); o padrão de cada tipo é o de uma peça de tamanho de carro. A intensidade é a profundidade
    relativa, de 0 (liso) a 1 (a mais funda que o mapa suporta). */
 export const RELEVOS = Object.freeze({
-  prismas: { escala: faixa(0.5, 100, 6, 'mm'), intensidade: faixa(0, 1, 0.5) },
-  bandaDeRodagem: { escala: faixa(2, 200, 30, 'mm'), intensidade: faixa(0, 1, 0.6) },
-  letras: { escala: faixa(2, 100, 12, 'mm'), intensidade: faixa(0, 1, 0.5) },
-  granulado: { escala: faixa(0.05, 5, 0.4, 'mm'), intensidade: faixa(0, 1, 0.35) },
+  prismas: { escala: faixa(0.5, 100, 6, 'mm'), intensidade: faixa(0, 1, 0.5), projecao: 'caixa' },
+  bandaDeRodagem: { escala: faixa(2, 200, 30, 'mm'), intensidade: faixa(0, 1, 0.6), projecao: 'cilindrica' },
+  letras: { escala: faixa(2, 100, 12, 'mm'), intensidade: faixa(0, 1, 0.5), projecao: 'cilindrica' },
+  granulado: { escala: faixa(0.05, 5, 0.4, 'mm'), intensidade: faixa(0, 1, 0.35), projecao: 'caixa' },
 });
+
+/* A PROJEÇÃO diz como a coordenada de textura nasce da malha (`coordenada-de-textura.js`): `plana` projeta no plano normal ao
+   `eixo`; `cilindrica` enrola em volta da linha do `eixo` pelo centro da caixa da parte (u = ângulo × raio, v ao longo do eixo);
+   `caixa` escolhe por triângulo o eixo dominante da normal. O `eixo` (x, y ou z, padrão y) vale para `plana` e `cilindrica`. */
+export const PROJECOES = Object.freeze(['plana', 'cilindrica', 'caixa']);
+export const EIXOS_DA_PROJECAO = Object.freeze(['x', 'y', 'z']);
 
 export const TIPOS_DE_RELEVO = Object.freeze(Object.keys(RELEVOS));
 
-const CAMPOS_DO_RELEVO = Object.freeze(['tipo', 'escala', 'intensidade']);
+const CAMPOS_DO_RELEVO = Object.freeze(['tipo', 'escala', 'intensidade', 'projecao', 'eixo']);
 
 const dizer = (v) => (typeof v === 'string' ? JSON.stringify(v) : String(v));
 
@@ -101,7 +107,7 @@ function numeroNaFaixa(nome, campo, valor, spec) {
 
 function relevoNormalizado(nome, valor) {
   if (!valor || typeof valor !== 'object' || Array.isArray(valor)) {
-    throw recusa(nome, 'relevo', `precisa ser objeto { tipo, escala?, intensidade? } (recebido ${dizer(valor)}).`);
+    throw recusa(nome, 'relevo', `precisa ser objeto { tipo, escala?, intensidade?, projecao?, eixo? } (recebido ${dizer(valor)}).`);
   }
   for (const chave of Object.keys(valor)) {
     if (!CAMPOS_DO_RELEVO.includes(chave)) {
@@ -116,7 +122,11 @@ function relevoNormalizado(nome, valor) {
   const intensidade = valor.intensidade === undefined
     ? spec.intensidade.padrao
     : numeroNaFaixa(nome, 'relevo.intensidade', valor.intensidade, spec.intensidade);
-  return Object.freeze({ tipo: valor.tipo, escala, intensidade });
+  const projecao = valor.projecao === undefined ? spec.projecao : valor.projecao;
+  if (!PROJECOES.includes(projecao)) throw recusa(nome, 'relevo.projecao', `precisa ser um de ${PROJECOES.join(', ')} (recebido ${dizer(valor.projecao)}).`);
+  const eixo = valor.eixo === undefined ? 'y' : valor.eixo;
+  if (!EIXOS_DA_PROJECAO.includes(eixo)) throw recusa(nome, 'relevo.eixo', `precisa ser um de ${EIXOS_DA_PROJECAO.join(', ')} (recebido ${dizer(valor.eixo)}).`);
+  return Object.freeze({ tipo: valor.tipo, escala, intensidade, projecao, eixo });
 }
 
 function campoNormalizado(nome, campo, valor) {

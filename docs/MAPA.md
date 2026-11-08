@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1698 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1700 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1709,6 +1709,8 @@
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
 - `contatos-da-peca.test.mjs` — contatos-da-peca.test.mjs — a medida só vale se ela REPROVAR alguma coisa.
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.
+- `coordenada-de-textura.js` — coordenada-de-textura.js — a coordenada de textura (uv) de um relevo, calculada da malha neutra. Função pura, sem Three.js, sem disco, relógio nem acaso: a m…
+- `coordenada-de-textura.test.js` — Testes da coordenada de textura: faixa contínua num cilindro, grade regular numa placa, caixa num cubo inclinado e determinismo.
 - `cor-de-auditoria.js` — cor-de-auditoria.js — a paleta da auditoria visual, e a conferência dela.
 - `cor-de-auditoria.test.mjs` — A paleta da auditoria e a conferência dela.
 - `corte-de-plano.js` — corte-de-plano.js — a vista de corte da bancada: um plano perpendicular a um eixo (x, y ou z), numa posição em milímetro do referencial da peça. O lado escol…

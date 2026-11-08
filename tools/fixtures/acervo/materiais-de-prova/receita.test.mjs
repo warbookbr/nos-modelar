@@ -58,6 +58,45 @@ describe('peça de prova dos materiais', () => {
     expect(Object.keys(porRelevo)).toHaveLength(2);
   });
 
+  it('só o material com relevo ganha uv e mapas; os outros seguem sem coordenada de textura', () => {
+    const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
+    const malhaDe = (nome, i = 0) => partes.get(nome).children[i];
+    for (const nome of ['placaDeTinta', 'placaDeVidro', 'calotaEspelhada', 'discoDeAcoPintado', 'anteparoDoVidro']) {
+      const m = malhaDe(nome);
+      expect(m.geometry.getAttribute('uv'), nome).toBeUndefined();
+      expect(m.material.normalMap ?? null, nome).toBeNull();
+      expect(m.material.roughnessMap ?? null, nome).toBeNull();
+    }
+    for (const nome of ['placaDeLente', 'blocoDePlastico']) {
+      const m = malhaDe(nome);
+      expect(m.geometry.getAttribute('uv').count, nome).toBe(m.geometry.getAttribute('position').count);
+      expect(m.material.normalMap, nome).toBeTruthy();
+      expect(m.material.roughnessMap, nome).toBeTruthy();
+    }
+    for (const m of partes.get('pneuDeBorracha').children) {
+      expect(m.geometry.getAttribute('uv').count).toBe(m.geometry.getAttribute('position').count);
+      expect(m.material.normalMap).toBeTruthy();
+    }
+  });
+
+  it('a banda do pneu recebe uma faixa contínua: v ao longo da altura e u dando a volta em tiles inteiros', () => {
+    const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
+    const banda = partes.get('pneuDeBorracha').children.find((m) => m.material.normalMap && m.userData.faces.length > 100);
+    const uv = banda.geometry.getAttribute('uv');
+    const pos = banda.geometry.getAttribute('position');
+    let menorU = Infinity; let maiorU = -Infinity;
+    for (let t = 0; t < uv.count; t += 3) {
+      const us = [0, 1, 2].map((k) => uv.getX(t + k));
+      /* nenhum triângulo estica por uma volta inteira: a emenda do ângulo está desenrolada */
+      expect(Math.max(...us) - Math.min(...us)).toBeLessThan(1);
+      for (const u of us) { menorU = Math.min(menorU, u); maiorU = Math.max(maiorU, u); }
+    }
+    /* tile da banda: 4 períodos de 30 mm = 0,12 m; a circunferência de 0,628 m dá 5 tiles */
+    expect(maiorU - menorU).toBeGreaterThan(4.5);
+    expect(maiorU - menorU).toBeLessThan(5.5);
+    expect(pos.count).toBe(uv.count);
+  });
+
   it('é determinística: duas execuções dão a mesma malha', () => {
     const a = malha();
     const b = malha();

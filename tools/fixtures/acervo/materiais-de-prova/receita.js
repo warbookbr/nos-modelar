@@ -203,7 +203,7 @@ export const MATERIAIS = {
   },
   /* os flancos do pneu: a mesma borracha (um fio mais lisa, porque o flanco não rola), com as letras e os números em baixo-relevo (a medida, sem marca) */
   borrachaComLetras: {
-    tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'letras', escala: 12, intensidade: 0.5 },
+    tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'letras', escala: 25, intensidade: 1 },
   },
   /* a lente de lanterna: vermelho com verniz e a grade de prismas */
   lenteDePrismas: {

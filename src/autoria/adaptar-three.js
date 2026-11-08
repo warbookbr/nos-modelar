@@ -2,6 +2,8 @@
 import * as THREE from 'three';
 import { chaveDoCantoLiso, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
 import { normalizarMaterial, normalizarMateriais } from './material-da-receita.js';
+import { coordenadasDeTextura, caixaDaParte } from './coordenada-de-textura.js';
+import { gerarMapaDeFlocos, gerarMapasDoRelevo, metrosPorTileDoRelevo } from '../../modulos/textura/src/mapas.js';
 import { triangularConvexa, triangularSemDegenerado } from '../../procedural/nucleo/triangulacao-face.js';
 
 const COR_PADRAO = '#77817d';
@@ -109,6 +111,66 @@ export function propriedadesFisicas(declarado) {
   return propriedades;
 }
 
+/* OS MAPAS DO RELEVO E DOS FLOCOS (fatia 3). Só o material que declara `relevo` ou `flocos` ganha `uv`, `normalMap` e `roughnessMap`;
+   os demais seguem sem coordenada de textura e sem mapa. A imagem vem do módulo de textura (`modulos/textura/src/mapas.js`), a
+   coordenada de `coordenada-de-textura.js`, na convenção do glTF (v = 0 é a primeira linha da imagem; o `DataTexture` do Three.js
+   também põe a primeira linha em v = 0). Sem `tangent` na geometria, o Three.js monta a base da normal pelas derivadas da uv, e
+   para a uv do glTF o `y` da escala da normal troca de sinal, como o `GLTFLoader` faz. O tile é repetido (`RepeatWrapping`). */
+const PX_DO_RELEVO = { prismas: 256, bandaDeRodagem: 256, letras: 576, granulado: 256 };
+const PX_DOS_FLOCOS = 256;
+const SEMENTE_DOS_MAPAS = 1;
+const cacheDeTexturas = new Map();
+
+function texturaDeDados(rgba, lado, repeticao) {
+  const t = new THREE.DataTexture(new Uint8Array(rgba.buffer, rgba.byteOffset, rgba.byteLength), lado, lado, THREE.RGBAFormat);
+  t.colorSpace = THREE.NoColorSpace;
+  t.wrapS = THREE.RepeatWrapping;
+  t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(repeticao, repeticao);
+  t.magFilter = THREE.LinearFilter;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.generateMipmaps = true;
+  t.anisotropy = 4;
+  t.needsUpdate = true;
+  return t;
+}
+
+/** Os mapas de um material: { metrosPorTile, normal, aspereza } (texturas; `normal` pode faltar), ou null sem `relevo` nem `flocos`. */
+export function mapasDoMaterial(declarado) {
+  if (!declarado || (!declarado.relevo && !(declarado.flocos > 0))) return null;
+  const chave = JSON.stringify([declarado.relevo, declarado.flocos]);
+  if (cacheDeTexturas.has(chave)) return cacheDeTexturas.get(chave);
+  const saida = { metrosPorTile: 1, normal: null, aspereza: null };
+  let tileDoRelevo = null;
+  if (declarado.relevo) {
+    const { tipo, escala, intensidade } = declarado.relevo;
+    const m = gerarMapasDoRelevo({ tipo, escala, intensidade }, { px: PX_DO_RELEVO[tipo], semente: SEMENTE_DOS_MAPAS });
+    tileDoRelevo = m.metrosPorTile;
+    saida.metrosPorTile = tileDoRelevo;
+    saida.normal = texturaDeDados(m.normal, m.largura, 1);
+    saida.aspereza = texturaDeDados(m.aspereza, m.largura, 1);
+    saida.normal.userData = { mapa: 'normal' };
+  }
+  if (declarado.flocos > 0) {
+    const f = gerarMapaDeFlocos(declarado.flocos, { px: PX_DOS_FLOCOS, semente: SEMENTE_DOS_MAPAS });
+    if (tileDoRelevo === null) {
+      saida.metrosPorTile = f.metrosPorTile;
+      saida.aspereza = texturaDeDados(f.aspereza, f.largura, 1);
+    } else {
+      /* relevo e flocos juntos: a aspereza dos flocos vale pelos dois, e o tile dos flocos entra na uv do relevo por repetição */
+      saida.aspereza = texturaDeDados(f.aspereza, f.largura, tileDoRelevo / f.metrosPorTile);
+    }
+  }
+  cacheDeTexturas.set(chave, saida);
+  return saida;
+}
+
+/** A projeção da uv do material: a do relevo, ou a de caixa quando só há flocos. */
+export function projecaoDoMaterial(declarado) {
+  if (declarado.relevo) return { relevo: declarado.relevo, metrosPorTile: metrosPorTileDoRelevo(declarado.relevo.tipo, declarado.relevo.escala) };
+  return { relevo: { projecao: 'caixa', eixo: 'y' }, metrosPorTile: mapasDoMaterial(declarado).metrosPorTile };
+}
+
 function criarMaterial(info) {
   const emissivo = new THREE.Color(info.cor).multiplyScalar(Math.max(0, info.emissivo));
   const base = {
@@ -121,6 +183,11 @@ function criarMaterial(info) {
     opacity: info.opacidade,
     side: THREE.DoubleSide,
   };
+  const mapas = mapasDoMaterial(info.declarado);
+  if (mapas) {
+    if (mapas.normal) { base.normalMap = mapas.normal; base.normalScale = new THREE.Vector2(1, -1); }
+    if (mapas.aspereza) base.roughnessMap = mapas.aspereza;
+  }
   if (!pedeMaterialFisico(info.declarado)) return new THREE.MeshStandardMaterial(base);
   /* Com transmissão o vidro deixa passar a luz pelo próprio passe do renderizador: a opacidade e a mistura transparente
      dariam um vidro apagado em cima de um vidro que já transmite. */
@@ -401,6 +468,14 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
     lote.faces.push(face.id);
   }
 
+  /* a caixa da parte inteira (todas as malhas dela), para a projeção cilíndrica de duas malhas da mesma parte coincidir */
+  const posicoesDaParte = new Map();
+  for (const lote of grupos.values()) {
+    if (!mapasDoMaterial(lote.material.declarado)) continue;
+    if (!posicoesDaParte.has(lote.parte)) posicoesDaParte.set(lote.parte, []);
+    posicoesDaParte.get(lote.parte).push(lote.posicoes);
+  }
+
   const partes = new Map();
   for (const lote of grupos.values()) {
     let grupoParte = partes.get(lote.parte);
@@ -428,6 +503,14 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
        Uma mesma coordenada pode ocorrer em diversos triângulos não indexados;
        este elo permite atualizá-los todos durante a prévia de edição. */
     geometria.setAttribute('origemVertice', atributoDeIds(lote.vertices, 'vértice'));
+    if (mapasDoMaterial(lote.material.declarado)) {
+      const { relevo, metrosPorTile } = projecaoDoMaterial(lote.material.declarado);
+      const todas = posicoesDaParte.get(lote.parte).flat();
+      geometria.setAttribute('uv', new THREE.Float32BufferAttribute(
+        coordenadasDeTextura(lote.posicoes, relevo, metrosPorTile, caixaDaParte(todas, relevo.eixo)),
+        2,
+      ));
+    }
     geometria.computeBoundingBox();
     geometria.computeBoundingSphere();
 

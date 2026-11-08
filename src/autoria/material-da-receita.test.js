@@ -23,7 +23,7 @@ describe('normalizarMaterial — campo desconhecido', () => {
 
   it('recusa subcampo desconhecido do relevo, dizendo os aceitos', () => {
     expect(() => normalizarMaterial('m', { relevo: { tipo: 'prismas', altura: 2 } }))
-      .toThrow(/relevo\.altura.*Aceitos em relevo: tipo, escala, intensidade/);
+      .toThrow(/relevo\.altura.*Aceitos em relevo: tipo, escala, intensidade, projecao, eixo/);
   });
 
   it('recusa declaração que não é objeto', () => {
@@ -70,7 +70,7 @@ describe('normalizarMaterial — faixas', () => {
     for (const tipo of TIPOS_DE_RELEVO) {
       const { escala, intensidade } = RELEVOS[tipo];
       expect(normalizarMaterial('m', { relevo: { tipo, escala: escala.min, intensidade: 1 } }).relevo)
-        .toEqual({ tipo, escala: escala.min, intensidade: 1 });
+        .toEqual({ tipo, escala: escala.min, intensidade: 1, projecao: RELEVOS[tipo].projecao, eixo: 'y' });
       expect(() => normalizarMaterial('m', { relevo: { tipo, escala: escala.max * 2 } }), `${tipo} escala`).toThrow('relevo.escala');
       expect(() => normalizarMaterial('m', { relevo: { tipo, escala: escala.min / 2 } }), `${tipo} escala baixa`).toThrow('relevo.escala');
       expect(() => normalizarMaterial('m', { relevo: { tipo, intensidade: intensidade.max + 0.1 } }), `${tipo} intensidade`).toThrow('relevo.intensidade');
@@ -104,7 +104,7 @@ describe('normalizarMaterial — valores padrão', () => {
   it('o relevo declarado só pelo tipo toma escala e intensidade do tipo', () => {
     for (const tipo of TIPOS_DE_RELEVO) {
       expect(normalizarMaterial('m', { relevo: { tipo } }).relevo).toEqual({
-        tipo, escala: RELEVOS[tipo].escala.padrao, intensidade: RELEVOS[tipo].intensidade.padrao,
+        tipo, escala: RELEVOS[tipo].escala.padrao, intensidade: RELEVOS[tipo].intensidade.padrao, projecao: RELEVOS[tipo].projecao, eixo: 'y',
       });
     }
   });
