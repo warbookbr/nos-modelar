@@ -2,11 +2,13 @@
 
 **Estado:** ativo
 
-**Território:** `modulos/textura/`, `modulos/exportador-gltf/`, `tools/modelar/exportar-gltf.mjs`, `src/bancada/`, `src/autoria/adaptar-three.js`, `src/autoria/material-da-receita.js`
+**Território:** `modulos/textura/`, `modulos/exportador-gltf/`, `tools/modelar/exportar-gltf.mjs`, `src/bancada/`, `src/autoria/adaptar-three.js`, `src/autoria/material-da-receita.js`, `tools/fixtures/acervo/materiais-de-prova/`, `src/autoria/descrever-partes.js`, `tools/modelagem/revisao-modelagem.mjs`, `tools/modelar/exportar-obj.mjs`
 
 **Responsável:** Tiago (aprovação por imagem) e a IA da sessão (implementação)
 
 **Repositório e base:** `warbookbr/nos-modelar`, base na main de 2026-11-08.
+
+Em 2026-11-08, na fatia 1, entraram no território a pasta da peça de prova, que segue o padrão dos ensaios em `tools/fixtures/acervo/`, e os três lugares que liam o material com lista própria: a revisão, que só rastreia as oito propriedades antigas, e o exportador OBJ, que passa a usar o normalizador. O adaptador do núcleo, que alimenta a Oficina, fica fora e ignora os campos novos.
 
 ## Problema observado
 
