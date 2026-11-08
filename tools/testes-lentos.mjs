@@ -19,6 +19,7 @@ export const TESTES_LENTOS = [
   'tools/fixtures/solido-por-lacos/solido-por-lacos.test.ts',
   'tools/fixtures/solido-por-lacos/tubos.test.ts',
   'tools/fixtures/solido-por-lacos/tubos-fatiados.test.ts',
+  'tools/modelar/vinco-oculto-pecas.test.mjs',
   'tools/fixtures/aberturas-em-teste/chapa-grande.test.ts',
   'tools/fixtures/aberturas-em-teste/vizinhanca.test.ts',
   'procedural/nucleo/operacoes/abertura-por-contorno.test.ts',

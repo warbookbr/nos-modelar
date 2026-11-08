@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1716 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1719 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2642,6 +2642,9 @@
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.
 - `vinco-na-imagem.test.mjs` — vinco-na-imagem.test.mjs — a dobra viva chega à imagem como aresta, nos dois caminhos de imagem: a cena da bancada (`adaptarThree`, que põe a normal de cada …
+- `vinco-oculto-pecas.test.mjs` — vinco-oculto-pecas.test.mjs — a régua de vinco e chanfro não declarados (`vinco-oculto.mjs`) contra as peças que a calibram: pega a faixa da peça dos tubos f…
+- `vinco-oculto.mjs` — vinco-oculto.mjs — acha na superfície de subdivisão o vinco e o chanfro que a receita não declarou, e desenha onde estão.
+- `vinco-oculto.test.mjs` — vinco-oculto.test.mjs — a régua de vinco e chanfro não declarados sobre malhas pequenas feitas aqui: uma folha com uma dobra reta (o vinco que ninguém pediu)…
 - `vincos-da-rede.mjs` — vincos-da-rede.mjs — as peças de `vincos-das-linhas.mjs` para a gaiola que sai de `gaiolaPorRede`: as cadeias são as curvas da rede, a declaração de vinco va…
 - `vincos-da-rede.test.mjs` — vincos-da-rede.test.mjs — `vincos-das-linhas` sobre a gaiola por rede de curvas.
 - `vincos-das-linhas-chaves.test.mjs` — vincos-das-linhas-chaves.test.mjs — `vincos-das-linhas` cita só nomes que a receita declara e separa a borda de vão.
