@@ -3,13 +3,18 @@
      - o vão no meio da cúpula de quatro níveis (60 mil faces) recorta a vizinhança: uma fração pequena das faces entra na booleana, a
        malha sai fechada e sem lasca, a borda segue o desenho e as faces longe do vão ficam com o id e os cantos de antes;
      - o recorte é determinístico: duas execuções dão a mesma malha, byte a byte;
-     - o vão cuja vizinhança chega à lateral da chapa (uma volta de borda só, e não as duas das peles), o vão que cobre mais da metade da
-       chapa e a chapa de menos de cinco mil faces não recortam: a booleana vê a chapa inteira, o registro diz o motivo e o corte sai igual de correto;
+     - o vão cuja vizinhança chega à lateral da chapa ou à parede de outro vão (uma volta de borda só, e não as duas das peles) perde as
+       faces de parede do trecho, e a banda refaz a parede: recorta, e o corte sai fechado e no desenho;
+     - o vão que dobra a quina de uma malha grossa (a banda liga vértices a dezenas de milímetros, mais de um quinto do porte da borda,
+       sem que as voltas deixem de se corresponder) recorta;
+     - o vão que cobre mais da metade da chapa e a chapa de menos de cinco mil faces não recortam: a booleana vê a chapa inteira, o
+       registro diz o motivo e o corte sai igual de correto;
      - o tempo: o vão custa uma fração do que custava a chapa inteira (antes, nove vezes a subdivisão; agora, uma). */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
 import { bandaDaVizinhanca, andaimeDaCaixa } from '../../../procedural/nucleo/operacoes/abertura-por-contorno.js';
 import { VAO, domo } from './chapa-grande.js';
+import { passosDaCaixa, RETANGULO_DA_QUINA } from './caixa-de-quinas.js';
 import { chapaDeGrade, dosPassos, passoDaAbertura, retangulo } from './chapas.js';
 import { desvioDoVao, exigirFechada, gate1, piorDesvio, rodar } from './medidas';
 
@@ -74,17 +79,63 @@ describe('a vizinhança do vão numa cúpula de 60 mil faces', () => {
   });
 });
 
-describe('o vão cuja vizinhança passa do recorte vê a chapa inteira', () => {
-  it('a 1 mm da borda da chapa: o trecho inclui a lateral dela, a borda dele é uma volta só, não recorta, e o corte sai fechado e no desenho', () => {
+describe('o vão cuja vizinhança alcança uma parede perde as faces de parede e recorta', () => {
+  it('a 1 mm da borda da chapa: o trecho inclui a lateral dela, que sai do trecho, e o corte sai fechado e no desenho', () => {
     const contorno = retangulo(1, 285, 201, 485);
     const neutro = com(3, contorno);
     expect(neutro.orfaos).toEqual([]);
-    expect(neutro.aberturas[0].vizinhanca).toMatchObject({ recortada: false, motivo: expect.stringMatching(/1 voltas/) });
+    const viz = neutro.aberturas[0].vizinhanca;
+    expect(viz.recortada).toBe(true);
+    expect(viz.faces).toBeLessThan(0.2 * viz.daChapa);
     exigirFechada(gate1(neutro));
     expect(piorDesvio(desvioDoVao(neutro, 0, 'y', contorno))).toBeLessThan(0.5);
   });
 
-  it('que cobre mais da metade da chapa: não recorta, e o corte sai fechado e no desenho', () => {
+  /* dois vãos na cúpula de 16 mil faces, o segundo a `folga` mm da parede do primeiro: a malha tem faces de 9 mm, e o trecho do segundo
+     inclui as faces de parede do primeiro, que ligam as duas peles e deixam a borda dele com uma volta só */
+  const primeiro = retangulo(285, 285, 485, 485);
+  const doSegundo = (folga: number) => retangulo(485 + folga, 340, 560, 430);
+  const dois = (niveis: number, folga: number) => {
+    const c = cupula(niveis);
+    return rodar(c.TOPO, [['subdivisao', { origemId: 1, ...c.passo }], passoDaAbertura(2, dosPassos('subdivisao', 1), { vista: 'y', contorno: primeiro }),
+      passoDaAbertura(3, dosPassos('aberturaPorContorno', 2), { vista: 'y', contorno: doSegundo(folga) })], 'vizinhanca');
+  };
+  for (const folga of [1, 4]) {
+    it(`a ${folga} mm da parede de outro vão: recorta, sai fechado, com as duas bordas no desenho e as faces longe dele como estavam`, () => {
+      const base = dois(3, 40);
+      const neutro = dois(3, folga);
+      expect(neutro.orfaos).toEqual([]);
+      const viz = neutro.aberturas[1].vizinhanca;
+      expect(viz.recortada, JSON.stringify(viz)).toBe(true);
+      expect(viz.faces).toBeLessThan(0.1 * viz.daChapa);
+      exigirFechada(gate1(neutro, undefined, { adaptador: false }));
+      expect(Math.max(piorDesvio(desvioDoVao(neutro, 0, 'y', primeiro)), piorDesvio(desvioDoVao(neutro, 1, 'y', doSegundo(folga))))).toBeLessThan(0.5);
+      /* longe: toda a face a mais de 60 mm do retângulo do segundo vão, no plano x, z (o primeiro vão é o mesmo na base) */
+      const longe = (n: any, f: any) => f.vs.every((v: number) => { const p = n.V.get(v); return Math.max(486 - p[0] * 1000, p[0] * 1000 - 560, 340 - p[2] * 1000, p[2] * 1000 - 430) > 60; });
+      const dadas = [...base.F].filter(([, f]: any) => longe(base, f));
+      expect(dadas.length).toBeGreaterThan(5000);
+      for (const [id, f] of dadas) expect(neutro.F.get(id)?.vs, `a face ${id}`).toEqual((f as any).vs);
+    });
+  }
+});
+
+describe('o vão que dobra a quina de uma malha grossa', () => {
+  const ABERTURA = { vista: [1, 0, 1], sentido: '+', contorno: RETANGULO_DA_QUINA, segmentosArco: 8 };
+
+  it('recorta mesmo com a banda ligando vértices a dezenas de milímetros, e sai fechado e no desenho', () => {
+    const { TOPO, PASSOS } = passosDaCaixa(ABERTURA);
+    const neutro = rodar(TOPO, PASSOS, 'vizinhanca');
+    expect(neutro.orfaos).toEqual([]);
+    const viz = neutro.aberturas[0].vizinhanca;
+    expect(viz.daChapa).toBeGreaterThan(5000);
+    expect(viz.recortada, JSON.stringify(viz)).toBe(true);
+    exigirFechada(gate1(neutro));
+    expect(piorDesvio(desvioDoVao(neutro, 0, ABERTURA.vista, RETANGULO_DA_QUINA))).toBeLessThan(0.5);
+  });
+});
+
+describe('o vão que cobre mais da metade da chapa vê a chapa inteira', () => {
+  it('não recorta, e o corte sai fechado e no desenho', () => {
     const contorno = retangulo(60, 60, 710, 710);
     const neutro = com(3, contorno);
     expect(neutro.orfaos).toEqual([]);
@@ -138,6 +189,17 @@ describe('a banda e o andaime', () => {
     baixo.forEach((v, k) => torto.set(v, pontos.get(n + ((n - k) % n))!));
     const r = bandaDaVizinhanca((v: number) => torto.get(v)!, new Map([[1000, cima], [1001, baixo]]));
     expect(r.motivo).toMatch(/não se correspondem/);
+  });
+
+  it('a malha grossa liga as duas voltas sem torcer: a diagonal passa de um quinto do porte, mas é a aresta com a espessura', () => {
+    /* o quadrado de 100 mm de lado com um ponto a cada 50 mm: a diagonal do zíper é a aresta de 50 mm com os 2 mm de espessura */
+    const grosso = new Map<number, number[]>();
+    const alto = [[0, 0], [50, 0], [100, 0], [100, 50], [100, 100], [50, 100], [0, 100], [0, 50]];
+    alto.forEach(([x, z], k) => { grosso.set(k, [x, 0, z]); grosso.set(8 + k, [x, -2, z]); });
+    const topo = Array.from({ length: 8 }, (_, k) => 7 - k); const fundo = Array.from({ length: 8 }, (_, k) => 8 + k);
+    const r = bandaDaVizinhanca((v: number) => grosso.get(v)!, new Map([[1000, topo], [1001, fundo]]));
+    expect(r.motivo).toBeUndefined();
+    expect(r.banda).toHaveLength(16);
   });
 
   it('o andaime só existe quando a caixa do trecho é menor que a da chapa, e fica longe do trecho', () => {
