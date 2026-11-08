@@ -24,6 +24,7 @@ import { criarResolverNumerico } from '../../procedural/nucleo/expressoes.js';
 import { idDoPasso } from '../../procedural/nucleo/nucleo.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
 import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
+import { aceitasDaReceita, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -45,8 +46,8 @@ function newell(pts) {
 }
 
 /* As superfícies dos passos `subdivisao` da receita: vértices em metro, faces, arestas de vinco, a parte de cada vértice e o ponto da gaiola. */
-export function superficiesDaReceita(receita) {
-  const { entrada, neutro } = executarReceita(receita);
+export function superficiesDaReceita(receita, executada = null) {
+  const { entrada, neutro } = executada ?? executarReceita(receita);
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
   const { num } = criarResolverNumerico(dict);
   const vec = (a) => (typeof a === 'string' ? dict[a] : a).map(num);
@@ -132,11 +133,18 @@ export function dobraDaSuperficie(sup, opcoes = {}) {
   return { arestas: arestas.size, dobras };
 }
 
-/** dobraDaReceita(receita, opcoes) -> { opcoes, superficies: [{ passo, ...dobraDaSuperficie }], dobras } */
-export function dobraDaReceita(receita, opcoes = {}) {
+/** dobraDaReceita(receita, opcoes, executada?) -> { opcoes, superficies: [{ passo, ...dobraDaSuperficie, aceitas }], dobras, aceitas }; a dobra que `PLANO.dobrasAceitas`
+ *  cobre sai de `dobras` e entra em `aceitas`, com o motivo. `executada` é o resultado de `executarReceita`, quando quem chama já o tem. */
+export function dobraDaReceita(receita, opcoes = {}, executada = null) {
   const o = { ...PADROES, ...opcoes };
-  const superficies = superficiesDaReceita(receita).map((sup) => ({ passo: sup.passo, facesTiradas: sup.facesTiradas, ...dobraDaSuperficie(sup, o) }));
-  return { opcoes: o, superficies, dobras: superficies.reduce((s, x) => s + x.dobras.length, 0) };
+  const aceitas = aceitasDaReceita(receita);
+  const superficies = superficiesDaReceita(receita, executada).map((sup) => {
+    const r = dobraDaSuperficie(sup, o);
+    const { aceitos, restantes } = separarAceitos(aceitas, r.dobras.map((d) => ({ ...d, tipo: 'dobra' })));
+    const sem = ({ tipo, ...resto }) => resto;
+    return { passo: sup.passo, facesTiradas: sup.facesTiradas, ...r, dobras: restantes.map(sem), aceitas: aceitos.map(sem) };
+  });
+  return { opcoes: o, superficies, dobras: superficies.reduce((s, x) => s + x.dobras.length, 0), aceitas: superficies.reduce((s, x) => s + x.aceitas.length, 0) };
 }
 
 /** A frase de cada dobra, para o relato de quem chama. */

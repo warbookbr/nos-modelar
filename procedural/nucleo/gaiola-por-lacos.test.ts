@@ -293,13 +293,16 @@ describe('gaiolaPorLacos: o laço de ponta de área zero e a tampa em cruz (limi
     expect(entrega(g).orfaos).toEqual([]);
   });
 
-  it('a cruz com espessura na ponta é recusada: a escada põe degraus sobre a mesma reta, com a medida e o que fazer', () => {
-    const m = grito(() => prismaDaCruz([1, 1, 1]));
-    expect(m).toMatch(/a tampa do laço 'l0' \(x = 0 mm\) tem 2 faces de área zero, a primeira com os pontos 'x_l0_t2/);
-    expect(m).toMatch(/triangulação geral do polígono côncavo não cabe aqui/);
-    expect(m).toMatch(/corte por outro eixo.*área zero/);
-    /* a ponta convexa continua aceita */
+  it('a cruz com espessura na ponta é aceita: a escada põe degraus sobre a mesma reta, e a tampa vira a triangulação do contorno por orelhas', () => {
+    const g = prismaDaCruz([1, 1, 1]);
+    expect(facesDeAreaZero(g)).toBe(0);
+    const c = conferir(g);
+    expect(c.soltas + c.repetidas).toBe(0);
+    expect(c.volume).toBeGreaterThan(0);
+    expect(entrega(g).orfaos).toEqual([]);
+    /* a ponta convexa continua com a escada */
     expect(conferir(gaiolaPorLacos(barra())).soltas).toBe(0);
+    expect(gaiolaPorLacos(barra()).passo.faces).toHaveLength(2 * 6 + 2 * 2);
   });
 });
 

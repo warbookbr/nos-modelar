@@ -88,7 +88,9 @@
  * A LÂMINA. O laço de ponta de área zero (uma linha, duas linhas em cruz, um ponto: o fundo de um disco tangente ao plano, ou a ponta
  * em que duas paredes se encostam) é uma lâmina: os pontos dele que coincidem se fundem, todos, e não leva tampa; as tiras dos dois
  * lados se casam sobre ela. A escada ligaria pontos que coincidem e daria faces de área zero. O laço côncavo com área (uma cruz
- * grossa) continua pedindo escada que caiba: se algum degrau cai sobre a reta do vizinho, a tampa é recusada com a medida.
+ * grossa, o laço da faixa sob um círculo) fica com a escada quando ela cabe; se algum degrau cai sobre a reta do vizinho, a tampa é a
+ * triangulação do contorno por orelhas, na ordem da volta (a mesma orientação), sem exigir cadeias iguais. Só é recusada, com os trechos a
+ * reamostrar, a volta que se toca (o mesmo ponto duas vezes) ou em que nenhuma orelha cabe.
  *
  * OS VINCOS. `{ trecho: t }` é a borda da faixa que o trecho t varre: a linha do primeiro ponto de t por todos os laços, o trecho
  * no último laço, a linha do último ponto de volta e o trecho no primeiro laço. `{ entre: [a, b] }` é só a linha do ponto entre a
@@ -100,7 +102,7 @@
  * a 0,12 mm, uma falha de 5,16 mm na traseira) e são recusados com os dois planos e a distância, salvo se os dois levam vinco
  * 'viva' na volta inteira (`{ laco, nitidez: 'viva' }`, sem `trechos`): o vinco isola a faixa, e o chanfro de 2 mm do topo de um
  * cilindro passa a 2 mm do plano vizinho. A cota exata em todos os pontos (`medidas: 'todos'`, ou marcas que cobrem todos) dobra a
- * superfície e é recusada: marque só os pontos de cota. A tampa com face de área zero num laço côncavo é recusada (A LÂMINA).
+ * superfície e é recusada: marque só os pontos de cota. A tampa de laço côncavo sem triangulação é recusada com o trecho a reamostrar (A LÂMINA).
  *
  * OS AVISOS. Onde dois trechos vizinhos de um laço têm pontos espaçados muito diferentes (razão acima de RAZAO_MAXIMA_DE_AMOSTRAGEM
  * entre o último segmento de um e o primeiro do outro, fora de vinco e de canto), a subdivisão deixa calombo; o mesmo vale para
@@ -618,16 +620,63 @@ export function gaiolaPorLacos(o = {}) {
     return fs.map(limpa).filter(Boolean);
   };
   const tampas = [0, R - 1].map((r) => ({ r, faces: tampa(r) }));
-  for (const { r, faces: fs } of tampas) {
-    /* a escada liga o ponto j de uma cadeia ao j da outra; num laço côncavo (em cruz, em T) um degrau pode cair sobre a reta do vizinho */
-    const nulas = fs.filter((f) => {
-      const [nx, ny, nz] = normalDaFace(f, pontosMm);
-      const maior = Math.max(...f.map((v, k) => Math.hypot(...sub3(pontosMm[v], pontosMm[f[(k + 1) % f.length]]))));
-      return Math.hypot(nx, ny, nz) / 2 <= TOLERANCIA_DE_FUSAO_MM * Math.max(maior, 1);
-    });
-    if (nulas.length) {
-      falha(`a tampa do laço ${citar(lacos[r].nome)} (${o.eixo} = ${br(lacos[r].em)} mm) tem ${nulas.length} ${nulas.length === 1 ? 'face' : 'faces'} de área zero, a primeira com os pontos ${nulas[0].map(citar).join(', ')}: a escada liga o ponto j de uma cadeia ao ponto j da outra, e num laço côncavo em cruz ou em T os degraus caem sobre a mesma reta; uma triangulação geral do polígono côncavo não cabe aqui, então corte por outro eixo, em que o primeiro e o último laço sejam convexos, ou deixe o laço da ponta com área zero (uma linha ou um ponto), que o ajudante funde sem tampa`);
+  const areaNula = (f) => {
+    const [nx, ny, nz] = normalDaFace(f, pontosMm);
+    const maior = Math.max(...f.map((v, k) => Math.hypot(...sub3(pontosMm[v], pontosMm[f[(k + 1) % f.length]]))));
+    return Math.hypot(nx, ny, nz) / 2 <= TOLERANCIA_DE_FUSAO_MM * Math.max(maior, 1);
+  };
+  /* o trecho a que cada ponto da volta do laço r pertence (o ponto fundido fica com o trecho do menor índice) */
+  const trechoDoPonto = (r, nome) => {
+    for (let q = 0; q < N; q++) {
+      if (nomeCru(r, rep[r][q]) !== nome) continue;
+      let i = trechos.length - 1; while (inicio[i] > rep[r][q]) i--;
+      return trechos[i].nome;
     }
+    return null;
+  };
+  /* A TAMPA DO LAÇO CÔNCAVO. Quando a escada põe um degrau sobre a reta do vizinho (a cruz, o T, o trecho coincidente), a tampa é a triangulação
+     do contorno do laço por orelhas, na ordem da volta: a mesma orientação da escada, sem exigir cadeias iguais nem laço convexo. Fica recusado o
+     contorno em que o mesmo ponto passa duas vezes (um laço que se toca) ou em que nenhuma orelha cabe, com os trechos a reamostrar. */
+  const porOrelhas = (r) => {
+    const nomesDaVolta = []; for (let q = 0; q < N; q++) { const n = nm(r, q); if (n !== nomesDaVolta[nomesDaVolta.length - 1]) nomesDaVolta.push(n); }
+    if (nomesDaVolta.length > 1 && nomesDaVolta[0] === nomesDaVolta[nomesDaVolta.length - 1]) nomesDaVolta.pop();
+    if (new Set(nomesDaVolta).size !== nomesDaVolta.length) return { repetido: nomesDaVolta.find((n, k) => nomesDaVolta.indexOf(n) !== k) };
+    const pt = (n) => [pontosMm[n][outros[0]], pontosMm[n][outros[1]]];
+    let area2 = 0; nomesDaVolta.forEach((n, k) => { const a = pt(n); const b = pt(nomesDaVolta[(k + 1) % nomesDaVolta.length]); area2 += a[0] * b[1] - b[0] * a[1]; });
+    const sinal = Math.sign(area2) || 1;
+    const folga = TOLERANCIA_DE_FUSAO_MM * 10;
+    const cruz = (a, b, c) => ((b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0])) * sinal;
+    const dentro = (p, a, b, c) => cruz(a, b, p) >= -folga && cruz(b, c, p) >= -folga && cruz(c, a, p) >= -folga;
+    const resto = [...nomesDaVolta]; const tri = [];
+    while (resto.length > 3) {
+      let achou = -1;
+      for (let i = 0; i < resto.length && achou < 0; i++) {
+        const a = pt(resto[(i + resto.length - 1) % resto.length]); const b = pt(resto[i]); const c = pt(resto[(i + 1) % resto.length]);
+        if (cruz(a, b, c) <= folga) continue;
+        if (resto.some((n, k) => k !== i && k !== (i + 1) % resto.length && k !== (i + resto.length - 1) % resto.length && dentro(pt(n), a, b, c))) continue;
+        achou = i;
+      }
+      if (achou < 0) return { preso: resto };
+      tri.push([resto[(achou + resto.length - 1) % resto.length], resto[achou], resto[(achou + 1) % resto.length]]);
+      resto.splice(achou, 1);
+    }
+    tri.push([...resto]);
+    return { faces: tri.filter((f) => !areaNula(f)) };
+  };
+  for (const t of tampas) {
+    const { r, faces: fs } = t;
+    /* a escada liga o ponto j de uma cadeia ao ponto j da outra; num laço côncavo (em cruz, em T) um degrau pode cair sobre a reta do vizinho */
+    const nulas = fs.filter(areaNula);
+    if (!nulas.length) continue;
+    const alt = porOrelhas(r);
+    if (alt.faces) { t.faces = alt.faces; continue; }
+    const onde = `a tampa do laço ${citar(lacos[r].nome)} (${o.eixo} = ${br(lacos[r].em)} mm)`;
+    if (alt.repetido) {
+      const tr = trechoDoPonto(r, alt.repetido);
+      falha(`${onde} não tem triangulação: o ponto ${citar(alt.repetido)}${tr ? ` (do trecho ${citar(tr)})` : ''} aparece duas vezes na volta, que se toca; reamostre ${tr ? `o trecho ${citar(tr)}` : 'o trecho que o repete'} para os pontos não coincidirem, una os trechos que se tocam (une), ou deixe o laço da ponta com área zero`);
+    }
+    const trs = [...new Set(alt.preso.map((n) => trechoDoPonto(r, n)).filter(Boolean))];
+    falha(`${onde} tem ${nulas.length} ${nulas.length === 1 ? 'face' : 'faces'} de área zero na escada, a primeira com os pontos ${nulas[0].map(citar).join(', ')}, e nenhuma orelha cabe no contorno que sobra (${alt.preso.length} pontos, dos trechos ${trs.map(citar).join(', ')}); reamostre esses trechos com outro número de pontos ou corte por outro eixo, em que o primeiro e o último laço sejam convexos`);
   }
   faces.push(...tampas[0].faces.map((f) => [...f].reverse()), ...tampas[1].faces);
   /* com costura, a linha dobrada sobre si deixa pares de faces sobre os mesmos pontos, uma em cada sentido: são a membrana de espessura zero

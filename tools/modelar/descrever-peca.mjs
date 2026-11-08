@@ -27,6 +27,8 @@ import {
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { dobraDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
+import { textoDoAchado, vincoOcultoDaReceita } from './vinco-oculto.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -140,6 +142,41 @@ export function ilhasDaPeca(contatos, receita = {}) {
       + ' encoste as partes, ou declare a ilha em `ilhas` da receita com { contem: <uma parte dela>, motivo }.');
   }
   return { grupos, problemas };
+}
+
+/* A DOBRA E O VINCO QUE NINGUÉM DECLAROU, COMO AVISO. As réguas `dobra-da-superficie` (diedro abaixo de 120 graus fora de vinco declarado) e `vinco-oculto`
+   (cadeia de arestas viva que a receita não pediu, e o chanfro que ladeia duas delas) rodam sobre as superfícies de subdivisão da peça já executada. O que
+   `PLANO.dobrasAceitas` cobre vem separado, com o motivo; o resto é aviso e não reprova: a pessoa decide o limiar e onde ligá-las a um gate. Devolve o texto ou
+   null quando a peça não tem subdivisão ou não há nada a dizer. */
+function textoDasReguasDeSuperficie(receita, entrada, neutro) {
+  if (!(entrada.PASSOS ?? []).some((p) => (Array.isArray(p) ? p[0] : p?.op) === 'subdivisao')) return null;
+  const executada = { entrada, neutro };
+  let dobras; let vincos;
+  try {
+    dobras = dobraDaReceita(receita, {}, executada);
+    vincos = vincoOcultoDaReceita(receita, {}, executada);
+  } catch (erro) {
+    return `\nDOBRA E VINCO NÃO DECLARADOS: as réguas não rodaram (${erro.message})\n`;
+  }
+  const abertas = [
+    ...dobras.superficies.flatMap((s) => s.dobras.map((d) => textoDaDobra(d))),
+    ...vincos.superficies.flatMap((s) => [...s.vincos, ...s.chanfros].map((a) => textoDoAchado(a))),
+  ];
+  const aceitas = [
+    ...dobras.superficies.flatMap((s) => s.aceitas.map((d) => `${textoDaDobra(d)} (aceita: ${d.motivo})`)),
+    ...vincos.superficies.flatMap((s) => s.aceitos.map((a) => `${textoDoAchado(a)} (aceito: ${a.motivo})`)),
+  ];
+  if (!abertas.length && !aceitas.length) return null;
+  let texto = '';
+  if (abertas.length) {
+    const lista = abertas.length > 12 ? [...abertas.slice(0, 12), `... e mais ${abertas.length - 12}`] : abertas;
+    texto += `\n${abertas.length} DOBRA(S) E VINCO(S) NÃO DECLARADO(S) (aviso; não reprova)\n${lista.map((t) => `  ${t}`).join('\n')}\n`
+      + '  Se a feição é desenho, declare-a em `PLANO.dobrasAceitas` com a parte, a região e o motivo; se não é, a gaiola está errada ali.\n';
+  }
+  if (aceitas.length) {
+    texto += `\n${aceitas.length} DOBRA(S) E VINCO(S) ACEITO(S) PELO PLANO\n${aceitas.slice(0, 12).map((t) => `  ${t}`).join('\n')}${aceitas.length > 12 ? `\n  ... e mais ${aceitas.length - 12}` : ''}\n`;
+  }
+  return texto;
 }
 
 export async function descreverPecaReutilizavel({
@@ -384,6 +421,11 @@ export async function descreverPecaReutilizavel({
     if (avisoDaLataria) {
       stdout += `\nLATARIA DISPENSADA\n  ${avisoDaLataria}\n`;
       stderr += `\nAVISO: ${avisoDaLataria}\n`;
+    }
+    const textoDasReguas = textoDasReguasDeSuperficie(receita, entrada, neutro);
+    if (textoDasReguas) {
+      stdout += textoDasReguas;
+      stderr += `\nAVISO: ${textoDasReguas.trim().split('\n')[0]}\n`;
     }
     if (plano) {
       const nomes = new Set();

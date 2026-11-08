@@ -25,6 +25,7 @@
 
 import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../procedural/criterios/index.js';
 import { normalizarLataria } from './lataria.js';
+import { normalizarDobrasAceitas } from './dobras-aceitas.js';
 
 export const FORMATO_PLANO_DE_MODELAGEM = 'mecanifica.plano-de-modelagem';
 export const VERSAO_PLANO_DE_MODELAGEM = 1;
@@ -36,8 +37,9 @@ export const CAMPOS_PLANO = Object.freeze([
    caixa) de `procedural/criterios/`, e `familiaProcedural` é a família de `procedural/familias/` que gerou a peça, de onde o brief do
    crítico lê as `perguntas` por componente. `lataria` diz se a peça é de chapa de superfície livre e quais partes são a chapa, ou a
    dispensa com o motivo (`lataria.js`): o pacote do crítico de peça de lataria leva a luz rasante e a curvatura da lataria. Plano sem
-   eles produz a mesma forma canônica de antes. */
-export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria']);
+   eles produz a mesma forma canônica de antes. `dobrasAceitas` lista a dobra, o vinco e o chanfro que a peça aceita de propósito, com o motivo
+   (`dobras-aceitas.js`): as réguas de superfície não os contam e os listam como aceitos. */
+export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria', 'dobrasAceitas']);
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
 
@@ -151,6 +153,7 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     ...(valor.familia === undefined ? {} : { familia: valor.familia }),
     ...(valor.familiaProcedural === undefined ? {} : { familiaProcedural: valor.familiaProcedural }),
     ...(valor.lataria === undefined ? {} : { lataria: normalizarLataria(valor.lataria, nomes, { quem }) }),
+    ...(valor.dobrasAceitas === undefined ? {} : { dobrasAceitas: normalizarDobrasAceitas(valor.dobrasAceitas, nomes, { quem }) }),
   };
 }
 

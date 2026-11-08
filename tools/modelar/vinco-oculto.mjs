@@ -22,6 +22,7 @@
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
+import { aceitasDaReceita, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
 import { superficiesDaReceita } from './dobra-da-superficie.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -126,19 +127,22 @@ export function vincoOcultoDaSuperficie(sup, opcoes = {}) {
   return { vincos, chanfros, arestasCrista: cristas.length, segmentos: { vinco: cadeias.filter((_, i) => !emPar.has(i)).flatMap((c) => c.itens.map((x) => [V[x.e.a], V[x.e.b]])), chanfro: cadeias.filter((_, i) => emPar.has(i)).flatMap((c) => c.itens.map((x) => [V[x.e.a], V[x.e.b]])) } };
 }
 
-/** vincoOcultoDaReceita(receita, opcoes) -> { opcoes, superficies, vincos, chanfros } */
-export function vincoOcultoDaReceita(receita, opcoes = {}) {
+/** vincoOcultoDaReceita(receita, opcoes, executada?) -> { opcoes, superficies, vincos, chanfros, aceitos }; o achado que `PLANO.dobrasAceitas` cobre sai de `vincos` e `chanfros`
+ *  e entra em `aceitos`, com o motivo. `executada` é o resultado de `executarReceita`, quando quem chama já o tem. */
+export function vincoOcultoDaReceita(receita, opcoes = {}, executada = null) {
   const o = { ...PADROES, ...opcoes };
-  const sups = superficiesDaReceita(receita);
-  const superficies = sups.map((sup) => {
+  const aceitas = aceitasDaReceita(receita);
+  const superficies = superficiesDaReceita(receita, executada).map((sup) => {
     const { segmentos, ...r } = vincoOcultoDaSuperficie(sup, o);
-    return { passo: sup.passo, ...r, _sup: sup, _segmentos: segmentos };
+    const v = separarAceitos(aceitas, r.vincos); const c = separarAceitos(aceitas, r.chanfros);
+    return { passo: sup.passo, ...r, vincos: v.restantes, chanfros: c.restantes, aceitos: [...v.aceitos, ...c.aceitos], _sup: sup, _segmentos: segmentos };
   });
   return {
     opcoes: o,
     superficies: superficies.map(({ _sup, _segmentos, ...r }) => r),
     vincos: superficies.reduce((s, x) => s + x.vincos.length, 0),
     chanfros: superficies.reduce((s, x) => s + x.chanfros.length, 0),
+    aceitos: superficies.reduce((s, x) => s + x.aceitos.length, 0),
     _desenho: superficies.map((x) => ({ sup: x._sup, segmentos: x._segmentos })),
   };
 }
