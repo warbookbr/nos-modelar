@@ -70,7 +70,7 @@ describe('na cena da peça de prova', () => {
   it('o aço pintado e o plástico têm verniz fosco, entre o fosco e o brilhante', () => {
     const aco = materialDaParte(partes, 'discoDeAcoPintado');
     const plastico = materialDaParte(partes, 'blocoDePlastico');
-    expect(aco.clearcoat).toBeCloseTo(0.3, 6);
+    expect(aco.clearcoat).toBeCloseTo(0.5, 6);
     expect(plastico.clearcoat).toBeCloseTo(0.6, 6);
     expect(aco.clearcoatRoughness).toBeGreaterThan(0.2);
     expect(plastico.clearcoatRoughness).toBeGreaterThan(0.2);

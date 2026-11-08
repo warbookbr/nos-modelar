@@ -10,19 +10,24 @@ import { listarAcervo, listarParaBancada } from '../../../../src/bancada/acervo-
 const malha = () => executarReceita(receita).neutro;
 /* o anteparo é a barra escura atrás do vidro, no mesmo x dele: fica fora da fila das seis peças */
 const ANTEPARO = 'anteparoDoVidro';
-const PARTES = ['placaDeTinta', 'placaDeVidro', 'calotaEspelhada', 'discoDeAcoPintado', 'pneuDeBorracha', 'blocoDePlastico'];
+const PARTES = ['placaDeTinta', 'placaDeVidro', 'calotaEspelhada', 'discoDeAcoPintado', 'pneuDeBorracha', 'blocoDePlastico', 'placaDeLente'];
 
 describe('peça de prova dos materiais', () => {
-  it('declara os seis materiais do plano e o do anteparo do vidro, e o normalizador os aceita', () => {
+  it('declara os seis materiais do plano e os da lente, dos flancos do pneu e do anteparo do vidro, e o normalizador os aceita', () => {
     expect(Object.keys(MATERIAIS).sort()).toEqual(
-      ['acoPintado', 'anteparoDoVidro', 'borrachaComRelevo', 'metalEspelhado', 'plasticoGranulado', 'tintaComVerniz', 'vidro'],
+      ['acoPintado', 'anteparoDoVidro', 'borrachaComLetras', 'borrachaComRelevo', 'lenteDePrismas', 'metalEspelhado', 'plasticoGranulado', 'tintaComVerniz', 'vidro'],
     );
     const n = normalizarMateriais(MATERIAIS);
     expect(n.tintaComVerniz.verniz).toBe(1);
     expect(n.vidro).toMatchObject({ transmissao: 1, indiceDeRefracao: 1.5, tomDoVidro: '#a8cdbd', mistura: 'transparente' });
     expect(n.metalEspelhado).toMatchObject({ metalicidade: 1, aspereza: 0.02 });
     expect(n.acoPintado.verniz).toBeGreaterThan(0);
+    expect(n.acoPintado.metalicidade).toBeGreaterThan(0.4);
+    expect(n.acoPintado.metalicidade).toBeLessThan(0.9);
+    expect(n.acoPintado.asperezaDoVerniz).toBeGreaterThan(0.2);
     expect(n.borrachaComRelevo.relevo.tipo).toBe('bandaDeRodagem');
+    expect(n.borrachaComLetras.relevo.tipo).toBe('letras');
+    expect(n.lenteDePrismas.relevo.tipo).toBe('prismas');
     expect(n.plasticoGranulado.relevo.tipo).toBe('granulado');
   });
 
@@ -39,7 +44,18 @@ describe('peça de prova dos materiais', () => {
     const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
     expect([...partes.keys()].sort()).toEqual([...PARTES, ANTEPARO].sort());
     const cores = [...partes.values()].map((g) => g.children[0].material.color.getHexString());
-    expect(new Set(cores).size).toBe(7);
+    expect(new Set(cores).size).toBe(8);
+  });
+
+  it('o pneu tem dois materiais: os flancos levam as letras e a banda com os ombros leva o relevo de rodagem', () => {
+    const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
+    const malhas = partes.get('pneuDeBorracha').children;
+    expect(malhas).toHaveLength(2);
+    const porRelevo = Object.fromEntries(malhas.map((g) => [g.userData.faces.length, g]));
+    const contagens = malhas.map((g) => g.userData.faces.length).sort((a, b) => a - b);
+    /* 48 lados: dois flancos de 48 faces, e a banda com os dois ombros de 48 faces cada, mais o aro de dentro na parte da banda */
+    expect(contagens).toEqual([96, 48 * 4]);
+    expect(Object.keys(porRelevo)).toHaveLength(2);
   });
 
   it('é determinística: duas execuções dão a mesma malha', () => {

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1696 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1698 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -813,12 +813,14 @@
 - `index.js` — Gerador determinístico da imagem de cor de um material, em JavaScript puro (sem Blender, sem Three.js e sem o núcleo do Modelar). A entrada é o material no f…
 - `liso.js` — Cor chapada de tinta ou plástico com variação suave e ruído fraco (porte de `_liso` do Blender).
 - `madeira.js` — Madeira (porte de `_madeira` do Blender para um tile contínuo).
+- `mapas.js` — Mapas de relevo (normal e altura) e de aspereza que acompanham a imagem de cor. Mesma regra do módulo: a mesma entrada e a mesma semente dão os mesmos bytes,…
 - `metal.js` — Metal (porte de `_metal` do Blender para um tile contínuo).
 - `ruido.js` — Ruído determinístico e contínuo nas bordas do tile (gradiente de Perlin com rede periódica). Sem Math.random: todo número vem de um hash inteiro da semente e…
 - `tecido.js` — Tecido (porte de `_tecido` do Blender para um tile contínuo): trama simples de dois fios que se cruzam alternados (xadrez de fios por cima e por baixo), cada…
 
 ## modulos/textura/tests/
 
+- `mapas.test.js` — Testes dos mapas de relevo e de aspereza: determinismo, tile sem emenda, escala em metros, normal unitária e recusas.
 - `metal-tecido.test.js` — Testes de metal e tecido: determinismo, tile contínuo, efeito de cada campo, e regressão de madeira e liso.
 - `textura.test.js` — Testes do gerador de textura: determinismo, tile contínuo, veio, tábuas, liso e recusas.
 

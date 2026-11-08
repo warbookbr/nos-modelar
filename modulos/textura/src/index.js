@@ -97,3 +97,5 @@ export function texturaParaPng(textura) {
   png.data = Buffer.from(textura.rgba.buffer, textura.rgba.byteOffset, textura.rgba.byteLength);
   return new Uint8Array(PNG.sync.write(png));
 }
+
+export { gerarMapasDoRelevo, gerarMapaDeFlocos, metrosPorTileDoRelevo, TIPOS_DE_RELEVO, TEXTO_DAS_LETRAS } from './mapas.js';

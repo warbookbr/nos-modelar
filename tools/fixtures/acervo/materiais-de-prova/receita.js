@@ -13,7 +13,7 @@
  * ELA NÃO É CONTEÚDO. Mora em `tools/fixtures/acervo/` junto das outras receitas de ensaio, fora do acervo publicado.
  * `guarda:acervo` não a varre, e a bancada a lista como ensaio.
  *
- * Referencial: Y para cima, o chão em y = 0, as seis peças em fila ao longo de x, 260 mm entre centros, de frente para +z. */
+ * Referencial: Y para cima, o chão em y = 0, as sete peças em fila ao longo de x (a sétima é a placa da lente com prismas), 260 mm entre centros, de frente para +z. */
 
 const m = (mm) => mm / 1000;
 
@@ -54,11 +54,15 @@ export const TABELA = {
   blocoLargura: 200,
   blocoAltura: 70,
   blocoProfundidade: 90,
+  /* a placa da lente com prismas: largura, altura e espessura da peça */
+  lenteLargura: 200,
+  lenteAltura: 160,
+  lenteEspessura: 10,
   lados: 48,
 };
 
-const COLUNA = { tinta: -2.5, vidro: -1.5, metal: -0.5, aco: 0.5, borracha: 1.5, plastico: 2.5 };
-const ID = { tinta: 10, vidro: 20, anteparo: 25, metal: 30, aco: 40, borracha: 50, plastico: 60 };
+const COLUNA = { tinta: -2.5, vidro: -1.5, metal: -0.5, aco: 0.5, borracha: 1.5, plastico: 2.5, lente: 3.5 };
+const ID = { tinta: 10, vidro: 20, anteparo: 25, metal: 30, aco: 40, borracha: 50, plastico: 60, lente: 70 };
 
 export function gerarPassos(t = TABELA) {
   const x = (coluna) => m(COLUNA[coluna] * t.passo);
@@ -122,6 +126,8 @@ export function gerarPassos(t = TABELA) {
   passos.push(['cilindro', {
     origemId: ID.aco, raio: m(t.discoRaio), altura: m(t.discoEspessura), lados: t.lados, eixo: 'y', em: [x('aco'), 0, 0],
   }]);
+  /* normal suave na lateral do disco: a tinta corre pela borda sem a faixa de cada lado */
+  passos.push(['liso', { angulo: 60, sel: { origem: { op: 'cilindro', id: ID.aco } } }]);
   parte('discoDeAcoPintado', { alias: 'discoInteiro' }, 'acoPintado');
 
   /* borracha com relevo: o anel do pneu, a banda larga e contínua que o relevo de rodagem pede */
@@ -140,12 +146,21 @@ export function gerarPassos(t = TABELA) {
     ],
   }]);
   parte('pneuDeBorracha', { origem: { op: 'lathe', id: ID.borracha } }, 'borrachaComRelevo');
+  /* o perfil tem seis segmentos: 0 é o flanco de baixo, 1 o ombro, 2 a banda, 3 o ombro, 4 o flanco de cima e 5 o aro de dentro.
+     Os dois flancos levam as letras; a banda e os ombros ficam com o relevo de rodagem. */
+  for (const faixa of [0, 4]) passos.push(['material', { sel: { origem: { op: 'lathe', id: ID.borracha, faixa } }, usa: 'borrachaComLetras' }]);
 
   /* plástico granulado: o bloco de faces planas e largas */
   passos.push(['cubo', {
     origemId: ID.plastico, larg: m(t.blocoLargura), alt: m(t.blocoAltura), prof: m(t.blocoProfundidade), em: [x('plastico'), 0, 0],
   }]);
   parte('blocoDePlastico', { origem: { op: 'cubo', id: ID.plastico } }, 'plasticoGranulado');
+
+  /* a placa da lente: face plana larga para a grade de prismas se ler */
+  passos.push(['cubo', {
+    origemId: ID.lente, larg: m(t.lenteLargura), alt: m(t.lenteAltura), prof: m(t.lenteEspessura), em: [x('lente'), 0, 0],
+  }]);
+  parte('placaDeLente', { origem: { op: 'cubo', id: ID.lente } }, 'lenteDePrismas');
 
   return passos;
 }
@@ -180,11 +195,20 @@ export const MATERIAIS = {
   },
   /* aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima */
   acoPintado: {
-    tipo: 'metal', acabamento: 'pintado', cor: '#b9bcc2', aspereza: 0.42, metalicidade: 0.6, verniz: 0.3, asperezaDoVerniz: 0.3,
+    tipo: 'metal', acabamento: 'pintado', cor: '#6f737b', aspereza: 0.32, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35,
   },
   /* borracha preta fosca com o relevo da banda de rodagem */
   borrachaComRelevo: {
     tipo: 'liso', cor: '#1f1f23', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'bandaDeRodagem', escala: 30, intensidade: 0.6 },
+  },
+  /* os flancos do pneu: a mesma borracha (um fio mais lisa, porque o flanco não rola), com as letras e os números em baixo-relevo (a medida, sem marca) */
+  borrachaComLetras: {
+    tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'letras', escala: 12, intensidade: 0.5 },
+  },
+  /* a lente de lanterna: vermelho com verniz e a grade de prismas */
+  lenteDePrismas: {
+    tipo: 'liso', cor: '#b3202a', aspereza: 0.18, metalicidade: 0, verniz: 0.8, asperezaDoVerniz: 0.06,
+    relevo: { tipo: 'prismas', escala: 6, intensidade: 0.5 },
   },
   /* plástico preto acetinado, entre o fosco e o brilhante, com granulado fino */
   plasticoGranulado: {
@@ -198,7 +222,7 @@ export const receitaMateriaisDeProva = {
     nome: 'Peça de prova dos materiais',
     versao: '1.0.0',
     autor: 'Modelar',
-    desc: 'ensaio dos seis materiais realistas, em fila (o vidro com uma barra escura atrás): tinta com verniz, vidro, metal espelhado, aço pintado, borracha com relevo e plástico granulado; não é conteúdo do acervo',
+    desc: 'ensaio dos materiais realistas, em fila (o vidro com uma barra escura atrás): tinta com verniz, vidro, metal espelhado, aço pintado, borracha com relevo (banda nas faixas e letras nos flancos), plástico granulado e lente com prismas; não é conteúdo do acervo',
   },
   PARAMS: TABELA,
   ALIASES,
