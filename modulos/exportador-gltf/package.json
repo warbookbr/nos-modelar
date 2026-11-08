@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Exportador glTF 2.0 binário (.glb) da malha neutra, com materiais PBR, extensões oficiais e texturas embutidas.",
+  "name": "@modelar/exportador-gltf",
+  "version": "1.0.0",
+  "type": "module"
+}

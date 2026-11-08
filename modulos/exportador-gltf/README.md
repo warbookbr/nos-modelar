@@ -1,0 +1,7 @@
+# Exportador glTF 2.0 binário
+
+O módulo serializa a malha neutra de uma peça como `.glb`, com uma malha por parte (o nome da parte) e uma primitiva por material usado nela. A unidade é o metro e o eixo y aponta para cima, como na malha neutra. A porta pública é `src/index.js`, com `exportarGltf({ nome, neutro, materiais, ambiente })`; a ficha da capacidade está no cabeçalho desse arquivo. A linha de comando é `npm run exportar:gltf -- <peça> [--saida <arquivo>] [--ambiente estudio|ceu]`.
+
+Os materiais passam pelo normalizador (`src/autoria/material-da-receita.js`) e saem como `pbrMetallicRoughness` mais as extensões oficiais de verniz, transmissão, volume, índice de refração e força do emissivo. O material com `relevo` ou `flocos` leva `TEXCOORD_0`, calculado pela função da bancada (`src/autoria/coordenada-de-textura.js`), e os mapas de normal e de aspereza de `modulos/textura/src/mapas.js`, embutidos em PNG. O ambiente vai em `scenes[0].extras.ambiente`, porque o glTF não leva luz de ambiente.
+
+A saída é a mesma byte a byte: a ordem de partes, primitivas, materiais e imagens vem dos nomes e dos ids de face, e o arquivo não leva data. O que a bancada mostra e o arquivo não leva: `semLuz`, `contorno`, `mistura: recorte` (a bancada também a trata como opaca) e o `tomDoVidro` de material sem transmissão (a luz só atravessa o vidro que transmite). Sem tangente no arquivo, quem abre calcula a base da normal, e o validador avisa disso.

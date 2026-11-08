@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1700 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1706 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -767,6 +767,20 @@
 
 - `canto-colinear.test.js` — canto-colinear.test.js — perfil de extrusão com um vértice no meio de uma aresta (caso 2 do plano dos veículos), no STEP.
 - `exportador-cad.test.js` — exportador-cad.test.js — suíte de testes do exportador CAD cobrindo R01, R02 e R04.
+
+## modulos/exportador-gltf/
+
+- `README.md` — Exportador glTF 2.0 binário
+
+## modulos/exportador-gltf/src/
+
+- `gerar-gltf.js` — gerar-gltf.js — monta o JSON e o BIN do glTF 2.0 a partir da malha neutra e do catálogo de materiais da receita. Sem Three.js, sem disco, sem relógio nem aca…
+- `glb.js` — glb.js — o contêiner glTF binário (.glb): cabeçalho de 12 bytes, o pedaço JSON (preenchido com espaços até múltiplo de 4) e o pedaço BIN (preenchido com zero…
+- `index.js` — index.js — porta pública do exportador glTF 2.0 binário (.glb) da malha neutra.
+
+## modulos/exportador-gltf/tests/
+
+- `exportador-gltf.test.js` — exportador-gltf.test.js — estrutura do glTF, extensões, TEXCOORD só com relevo, determinismo, unidade e o validador oficial.
 
 ## modulos/exportador-obj/
 
@@ -2505,6 +2519,7 @@
 - `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": o registro de etapas, a junta medida quando a parte entra e a recusa de seguir com…
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exemplo-canonico.test.mjs` — exemplo-canonico.test.mjs — o exemplo de receita que a documentação ensina precisa passar pelo mesmo caminho que o acervo.
+- `exportar-gltf.mjs` — exportar-gltf.mjs — CLI que grava uma receita procedural como glTF 2.0 binário (.glb), com os materiais dela. Uso: npm run exportar:gltf -- <peça> [--saida <…
 - `exportar-obj.mjs` — exportar-obj.mjs — CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj).
 - `exportar-obj.test.mjs` — exportar-obj.test.mjs — suíte de testes da CLI de exportação OBJ.
 - `exportar-peca.mjs` — exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto só lê.
