@@ -369,6 +369,7 @@ export const TABELA = {
   moldura_saida: 30,
   moldura_descida_passos: 12,
   moldura_largura: 150,
+  moldura_ponta_degrau: 6, // a borda de fora da moldura acaba num corte reto de 6 mm de volta à chapa, em vez de afinar até zero em lasca
   // Acima da linha da saia e dos para-choques ele é da cor da lataria (as molduras) e acaba, de cada lado do arco, numa ponta horizontal da boca à borda de
   // fora, na altura do topo da peça escura vizinha (o da saia, o do para-choque dianteiro à frente do arco dianteiro e o do traseiro atrás do arco
   // traseiro). Daí até 299 o mesmo alargamento segue na saia e nos para-choques, na mesma malha: a superfície deles é a maior entre a da peça e a do alargamento.

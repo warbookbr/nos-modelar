@@ -247,13 +247,20 @@ export function derivarPlastico(T, f) {
   /* ---- as molduras dos arcos: o alargamento da cor da lataria acima das pontas, em torno do eixo da roda (abaixo delas ele é a saia e os para-choques) ---- */
   const topo = (sec) => Math.max(...sec.map(([, y]) => y));
   const topoSaia = topo(T.secao_saia); const topoDiant = topo(T.secao_parachoque_dianteiro); const topoTras = topo(T.secao_parachoque_traseiro);
+  /* a moldura não afina até zero: a descida para na saída `moldura_ponta_degrau` e a borda de fora acaba num corte reto de volta à chapa (o degrau de uma peça de
+     plástico real), em vez da lasca que a saída zerando deixava. O q do corte sai da mesma curva u = saida (1 − 3q² + 2q³). */
+  let qCorte = 1;
+  { let lo = 0; let hi = 1; for (let k = 0; k < 40; k += 1) { const mid = (lo + hi) / 2; if (1 - 3 * mid ** 2 + 2 * mid ** 3 > T.moldura_ponta_degrau / T.moldura_saida) lo = mid; else hi = mid; } qCorte = (lo + hi) / 2; }
+  const passosAteOCorte = Math.round(T.moldura_descida_passos * qCorte);
   const secaoMoldura = [
     ...T.secao_moldura_subida.map(([u, d]) => ({ u, d })),
-    ...Array.from({ length: T.moldura_descida_passos }, (_, i) => {
-      const q = (i + 1) / T.moldura_descida_passos;
+    ...Array.from({ length: passosAteOCorte }, (_, i) => {
+      const q = ((i + 1) / passosAteOCorte) * qCorte;
       return { u: T.moldura_saida * (1 - 3 * q ** 2 + 2 * q ** 3), d: ressalto + q * (larguraAlarg - ressalto) };
     }),
-  ].map(tocaChapa).map((l, j) => ({ u: l.u, v: l.d, ...(j === 1 ? { nome: 'boca' } : {}) }));
+  ];
+  secaoMoldura.push({ u: 0, d: secaoMoldura.at(-1).d });
+  const linhasDaMoldura = secaoMoldura.map(tocaChapa).map((l, j, a) => ({ u: l.u, v: l.d, ...(j === 1 ? { nome: 'boca' } : j === a.length - 2 ? { nome: 'quinaDaPonta' } : {}) }));
   /* as pontas: cada moldura acaba, de cada lado do arco, numa ponta horizontal da boca à borda de fora, na altura do topo da peça escura vizinha */
   const pontas = { [zT]: { tras: topoTras, frente: topoSaia }, [zD]: { tras: topoSaia, frente: topoDiant } };
   const passoDaMoldura = { passo: T.arco_raio * ((T.moldura_passo_graus * Math.PI) / 180), linha: 'boca' };
@@ -262,7 +269,8 @@ export function derivarPlastico(T, f) {
       const nome = `moldura${rotulo === 'Dianteiro' ? 'ArcoDianteiro' : 'ArcoTraseiro'}${lado === 'Esquerda' ? 'Esquerdo' : 'Direito'}`;
       const g = gaiolaVarrida({
         nome, trilho: [{ arco: { centro: [s * T.meia_largura, yc, zc], eixo: EIXO_X, de: [s * T.meia_largura, yc, zc + T.arco_raio], graus: -200 } }],
-        quadro: s > 0 ? { u: [s, 0, 0], virar: true } : { u: [s, 0, 0] }, secao: secaoMoldura, fora: [s, 0, 0],
+        quadro: s > 0 ? { u: [s, 0, 0], virar: true } : { u: [s, 0, 0] }, secao: linhasDaMoldura, fora: [s, 0, 0],
+        vincos: [{ linha: 'quinaDaPonta', nitidez: 'viva' }],
         estacoes: [{ plano: { eixo: 'y', valor: pontas[zc].frente }, cruzando: 'subindo' }, passoDaMoldura, { plano: { eixo: 'y', valor: pontas[zc].tras }, cruzando: 'descendo' }],
       });
       partes.push(daVarredura(g));
