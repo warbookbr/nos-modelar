@@ -9,6 +9,14 @@ cotovelo pelo plano dela.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-08.
 
+Em 2026-11-08 entraram as fatias 1 e 2: a régua da dobra (`tools/modelar/dobra-da-superficie.mjs`, diedro abaixo de 120° fora
+de vinco declarado), o `encolhe` no trecho, que segue a curva do vizinho, e o `esvai` no vinco, com a peça de prova dos tubos
+cruzados sobre um disco. A aba e as rugas sumiram, a régua dá 0 dobras e as outras malhas ficaram idênticas; a ondulação
+guarda 5 marcas de até 1,1 mm no contorno real do pé do filete, que a pessoa aceitou. Fatiada ao longo do tubo deitado, a
+frente do tubo em pé vira rampa e mostra o topo do disco, o que o cotovelo reprova como degrau; a pessoa pediu testar a peça
+fatiada na horizontal, com o tubo em pé redondo em cada laço. A régua acusa 14 dobras nos refletores do furgão, que são
+facetas aprovadas: ela fica como aviso até haver um jeito de a peça declarar a dobra intencional.
+
 ## Problema observado
 
 O cotovelo do braço (`procedural/pecas/braco-robotico/partes/cotovelo/receita.js`, 2026-11-08) é um tubo em pé cruzado no alto
@@ -58,10 +66,11 @@ recusa diz o trecho, os laços e o que falta. A medida da dobra: ENVOLVER o `des
 
 ## Fatias
 
-1. A peça de prova que reproduz a aba com a técnica de hoje, e a medida da dobra que a reprova.
-2. O trecho que encolhe e o vinco que esvai, com a peça de prova refeita por eles; primeira imagem à pessoa.
-3. A tampa com laço côncavo.
-4. Fechamento, com aviso à sessão do braço.
+1. A peça de prova que reproduz a aba com a técnica de hoje, e a medida da dobra que a reprova (feita).
+2. O trecho que encolhe e o vinco que esvai, com a peça de prova refeita por eles (feita).
+3. A mesma peça fatiada na horizontal, com a base redonda inteira sobre o disco e a parede vertical até o tubo deitado.
+4. A tampa com laço côncavo, e a dobra intencional declarada pela peça, para a régua passar a aviso no `descrever`.
+5. Fechamento, com aviso à sessão do braço.
 
 ## Riscos e parada
 
