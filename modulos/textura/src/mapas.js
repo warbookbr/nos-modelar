@@ -21,21 +21,33 @@
 import { ErroDeTextura } from './erro.js';
 import { campoDeRuido, hashInt, limitar } from './ruido.js';
 
-export const TIPOS_DE_RELEVO = Object.freeze(['prismas', 'bandaDeRodagem', 'letras', 'granulado']);
+export const TIPOS_DE_RELEVO = Object.freeze(['prismas', 'bandaDeRodagem', 'letras', 'granulado', 'flanco']);
 export const DESENHOS_DA_BANDA = Object.freeze(['costelas', 'v']);
 
 /* períodos do padrão por lado do tile (só prismas e granulado; a banda e as letras seguem a faixa) */
 export const PERIODOS_POR_TILE = Object.freeze({ prismas: 4, granulado: 16 });
 
 /* a profundidade do relevo em fração do período, para intensidade 1 */
-const PROFUNDIDADE = Object.freeze({ prismas: 0.5, bandaDeRodagem: 0.45, letras: 0.3, granulado: 0.6 });
+const PROFUNDIDADE = Object.freeze({ prismas: 0.5, bandaDeRodagem: 0.45, letras: 0.3, granulado: 0.6, flanco: 0.3 });
 
 /* o que a aspereza perde (0 = nada) nas partes altas do relevo, para o reflexo não ser igual no fundo e no topo */
-const ASPEREZA_DO_RELEVO = Object.freeze({ prismas: 0, bandaDeRodagem: 0.12, letras: 0.1, granulado: 0.25 });
+const ASPEREZA_DO_RELEVO = Object.freeze({ prismas: 0, bandaDeRodagem: 0.12, letras: 0.1, granulado: 0.25, flanco: 0.1 });
 
 /* O texto das letras: genérico, uma medida de pneu sem marca, em grade de 5 x 7 células com 1 de espaço entre letras. */
 export const TEXTO_DAS_LETRAS = '205/55R16 91';
 const FONTE = Object.freeze({
+  A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+  B: ['11110', '10001', '10001', '11110', '10001', '10001', '11110'],
+  C: ['01110', '10001', '10000', '10000', '10000', '10001', '01110'],
+  D: ['11110', '10001', '10001', '10001', '10001', '10001', '11110'],
+  E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+  I: ['01110', '00100', '00100', '00100', '00100', '00100', '01110'],
+  L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+  S: ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
+  T: ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+  U: ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+  3: ['11110', '00001', '00001', '01110', '00001', '00001', '11110'],
+  4: ['00010', '00110', '01010', '10010', '11111', '00010', '00010'],
   0: ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
   1: ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
   2: ['01110', '10001', '00001', '00010', '00100', '01000', '11111'],
@@ -47,6 +59,25 @@ const FONTE = Object.freeze({
   ' ': ['00000', '00000', '00000', '00000', '00000', '00000', '00000'],
 });
 const COLUNAS_DO_TEXTO = TEXTO_DAS_LETRAS.length * 6 - 1;
+
+/* O FLANCO (a face lateral de peça redonda com marcações): a medida principal no meio, textos secundários menores (55 % da altura)
+   e genéricos, anéis finos em baixo-relevo, uma faixa serrilhada junto do aro e um granulado muito fino em toda a face. As
+   posições são frações da largura (o v: 0 é a borda de fora, o ombro, e 1 é o aro) e do comprimento (o u) do tile. */
+export const TEXTOS_DO_FLANCO = Object.freeze({
+  radial: 'RADIAL', tubeless: 'TUBELESS', codigo: 'A1B2 C3D4 24',
+});
+const FLANCO = Object.freeze({
+  principal: { v: 0.47 },
+  secundarios: [
+    { texto: TEXTOS_DO_FLANCO.radial, u: 0.08, v: 0.241 },
+    { texto: TEXTOS_DO_FLANCO.tubeless, u: 0.66, v: 0.241 },
+    { texto: TEXTOS_DO_FLANCO.codigo, u: 0.7, v: 0.688 },
+  ],
+  /* anéis: o do ombro, e dois junto do aro (o de centragem e o segundo, mais fino); largura em células da medida principal */
+  aneis: [{ v: 0.094, largura: 0.7 }, { v: 0.81, largura: 0.5 }, { v: 0.87, largura: 0.7 }],
+  serrilha: { de: 0.914, ate: 0.984, passo: 1, fenda: 0.45 },
+  grao: 0.12,
+});
 
 function conferirPx(px) {
   if (!Number.isInteger(px) || px < 16 || px > 4096) throw new ErroDeTextura('px deve ser um inteiro de 16 a 4096.');
@@ -70,6 +101,10 @@ export function medidasPadraoDoRelevo(tipo, escala) {
   if (tipo === 'letras') {
     const celula = m / 7;
     return { comprimentoM: COLUNAS_DO_TEXTO * celula * 1.6, larguraM: 7 * celula * 2.5 };
+  }
+  if (tipo === 'flanco') {
+    const celula = m / 7;
+    return { comprimentoM: COLUNAS_DO_TEXTO * celula * 3.4, larguraM: 7 * celula * 6.5 };
   }
   if (tipo === 'bandaDeRodagem') return { comprimentoM: 5 * m, larguraM: 5 * m };
   const lado = PERIODOS_POR_TILE[tipo] * m;
@@ -162,35 +197,86 @@ function alturaDaBanda(px, desenho, blocos) {
   return suavizar(h, px, px, Math.max(1, Math.round(px / 192)), Math.max(1, Math.round(px / 192)), 1);
 }
 
-/* A linha de texto das letras, centrada no tile; o resto do tile é fundo plano (altura 1) e a letra é baixo-relevo. */
-function alturaDasLetras(largura, altura, comprimentoM, larguraM, escala) {
-  const h = new Float32Array(largura * altura);
-  const celula = escala / 7000;
-  const texto = COLUNAS_DO_TEXTO * celula;
-  const u0 = (comprimentoM - texto) / 2;
-  const v0 = (larguraM - 7 * celula) / 2;
+/* Pinta um texto na cobertura (0 a 1) de um tile `largura` x `altura` px de `comp` x `larg` metros: a célula tem `celulaM`, o
+   canto de cima à esquerda do texto está em (`uM`, `vM`) metros. Supersampling 3 x 3, só na caixa do texto. */
+function pintarTexto(cobre, largura, altura, comp, larg, texto, celulaM, uM, vM) {
+  const colunas = texto.length * 6 - 1;
+  const i0 = Math.max(0, Math.floor((uM / comp) * largura) - 1);
+  const i1 = Math.min(largura - 1, Math.ceil(((uM + colunas * celulaM) / comp) * largura) + 1);
+  const j0 = Math.max(0, Math.floor((vM / larg) * altura) - 1);
+  const j1 = Math.min(altura - 1, Math.ceil(((vM + 7 * celulaM) / larg) * altura) + 1);
   const sub = 3;
-  for (let j = 0; j < altura; j += 1) {
-    for (let i = 0; i < largura; i += 1) {
-      let cobre = 0;
+  for (let j = j0; j <= j1; j += 1) {
+    for (let i = i0; i <= i1; i += 1) {
+      let acerto = 0;
       for (let b = 0; b < sub; b += 1) {
         for (let a = 0; a < sub; a += 1) {
-          const mu = ((i + (a + 0.5) / sub) / largura) * comprimentoM - u0;
-          const mv = ((j + (b + 0.5) / sub) / altura) * larguraM - v0;
+          const mu = ((i + (a + 0.5) / sub) / largura) * comp - uM;
+          const mv = ((j + (b + 0.5) / sub) / altura) * larg - vM;
           if (mu < 0 || mv < 0) continue;
-          const cx = Math.floor(mu / celula);
-          const cy = Math.floor(mv / celula);
-          if (cy > 6 || cx >= COLUNAS_DO_TEXTO) continue;
+          const cx = Math.floor(mu / celulaM);
+          const cy = Math.floor(mv / celulaM);
+          if (cy > 6 || cx >= colunas) continue;
           const c = cx % 6;
-          if (c < 5 && FONTE[TEXTO_DAS_LETRAS[Math.floor(cx / 6)]][cy][c] === '1') cobre += 1;
+          if (c < 5 && FONTE[texto[Math.floor(cx / 6)]][cy][c] === '1') acerto += 1;
         }
       }
-      h[j * largura + i] = 1 - cobre / (sub * sub);
+      cobre[j * largura + i] = Math.max(cobre[j * largura + i], acerto / (sub * sub));
     }
   }
-  const pixelU = comprimentoM / largura;
-  const pixelV = larguraM / altura;
-  return suavizar(h, largura, altura, Math.max(1, Math.round((celula * 0.25) / pixelU)), Math.max(1, Math.round((celula * 0.25) / pixelV)), 2);
+}
+
+function altoRelevoDaCobertura(cobre, largura, altura, comp, larg, celulaM) {
+  const h = new Float32Array(cobre.length);
+  for (let p = 0; p < h.length; p += 1) h[p] = 1 - cobre[p];
+  const pixelU = comp / largura;
+  const pixelV = larg / altura;
+  return suavizar(h, largura, altura, Math.max(1, Math.round((celulaM * 0.25) / pixelU)), Math.max(1, Math.round((celulaM * 0.25) / pixelV)), 2);
+}
+
+/* A linha de texto das letras, centrada no tile; o resto do tile é fundo plano (altura 1) e a letra é baixo-relevo. */
+function alturaDasLetras(largura, altura, comprimentoM, larguraM, escala) {
+  const cobre = new Float32Array(largura * altura);
+  const celula = escala / 7000;
+  pintarTexto(cobre, largura, altura, comprimentoM, larguraM, TEXTO_DAS_LETRAS, celula, (comprimentoM - COLUNAS_DO_TEXTO * celula) / 2, (larguraM - 7 * celula) / 2);
+  return altoRelevoDaCobertura(cobre, largura, altura, comprimentoM, larguraM, celula);
+}
+
+/* O flanco: a medida principal e os textos secundários em baixo-relevo, os anéis e a serrilha em sulco, e o grão fino por cima. */
+function alturaDoFlanco(largura, altura, comp, larg, escala, semente) {
+  const cobre = new Float32Array(largura * altura);
+  const celula = escala / 7000;
+  const menor = celula * 0.55;
+  pintarTexto(cobre, largura, altura, comp, larg, TEXTO_DAS_LETRAS, celula, (comp - COLUNAS_DO_TEXTO * celula) / 2, larg * FLANCO.principal.v - 3.5 * celula);
+  for (const t of FLANCO.secundarios) pintarTexto(cobre, largura, altura, comp, larg, t.texto, menor, comp * t.u, larg * t.v - 3.5 * menor);
+  const pixelU = comp / largura;
+  const pixelV = larg / altura;
+  const { serrilha } = FLANCO;
+  const passo = celula * serrilha.passo;
+  for (let j = 0; j < altura; j += 1) {
+    const v = (j + 0.5) / altura;
+    let anel = 0;
+    for (const a of FLANCO.aneis) anel = Math.max(anel, limitar(((a.largura * celula) / 2 - Math.abs(v - a.v) * larg) / pixelV + 0.5));
+    const naSerrilha = v >= serrilha.de && v <= serrilha.ate;
+    for (let i = 0; i < largura; i += 1) {
+      let c = anel;
+      if (naSerrilha) {
+        const fase = frac(((i + 0.5) * pixelU) / passo);
+        c = Math.max(c, limitar(((serrilha.fenda * passo) / 2 - Math.abs(fase - 0.5) * passo) / pixelU + 0.5));
+      }
+      const p = j * largura + i;
+      cobre[p] = Math.max(cobre[p], c);
+    }
+  }
+  const h = altoRelevoDaCobertura(cobre, largura, altura, comp, larg, menor);
+  const sem = Math.round(semente * 1000);
+  for (let j = 0; j < altura; j += 1) {
+    for (let i = 0; i < largura; i += 1) {
+      const g = (hashInt(i >> 1, j >> 1, sem + 0x6a1) / 4294967296 - 0.5) * FLANCO.grao;
+      h[j * largura + i] = limitar(h[j * largura + i] + g);
+    }
+  }
+  return h;
 }
 
 function alturaDoGranulado(px, semente) {
@@ -265,17 +351,18 @@ export function gerarMapasDoRelevo(relevo, { px = 256, semente = 1, comprimentoM
   numeroEm(larg, 'larguraM', 1e-6, 100);
 
   const largura = px;
-  const altura = tipo === 'letras' ? Math.min(4096, Math.max(16, Math.round((px * larg) / comp))) : px;
+  const altura = tipo === 'letras' || tipo === 'flanco' ? Math.min(4096, Math.max(16, Math.round((px * larg) / comp))) : px;
   let hmap;
   if (tipo === 'prismas') hmap = alturaDosPrismas(px);
   else if (tipo === 'bandaDeRodagem') hmap = alturaDaBanda(px, desenho, Math.max(1, Math.round(larg / (escala / 1000))));
   else if (tipo === 'letras') hmap = alturaDasLetras(largura, altura, comp, larg, escala);
+  else if (tipo === 'flanco') hmap = alturaDoFlanco(largura, altura, comp, larg, escala, semente);
   else hmap = alturaDoGranulado(px, semente);
 
   const lado = tipo === 'prismas' || tipo === 'granulado' ? padrao.comprimentoM : comp;
   const ladoV = tipo === 'prismas' || tipo === 'granulado' ? padrao.larguraM : larg;
   /* nas letras o período que a profundidade segue é a largura da letra (5 células de 1/7 da altura) */
-  const periodoM = tipo === 'letras' ? ((escala / 1000) / 7) * 5 : escala / 1000;
+  const periodoM = tipo === 'letras' || tipo === 'flanco' ? ((escala / 1000) / 7) * 5 : escala / 1000;
   const normal = normalDaAltura(hmap, largura, altura, intensidade * PROFUNDIDADE[tipo] * periodoM, lado / largura, ladoV / altura);
 
   /* a aspereza cai um pouco nas partes altas (polidas pelo uso) e fica inteira no fundo */

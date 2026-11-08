@@ -89,14 +89,14 @@ function mediasDaFaixa(posicoes, relevo, base) {
  *  - `bandaDeRodagem`: a largura é a extensão da faixa ao longo do eixo (os triângulos de lateral), e o desenho cobre essa
  *    largura UMA vez, de v = 0 a v = 1, com o meio em v = 0,5; em volta o tile, quadrado, de lado igual à largura, repete um número
  *    inteiro de vezes na circunferência de referência;
- *  - `letras`: a largura é a extensão radial das tampas do cilindro (o flanco), a linha de texto fica no meio dela, e o tile
+ *  - `letras` e `flanco`: a largura é a extensão radial das tampas do cilindro (o flanco), a linha de texto fica no meio dela, e o tile
  *    cobre meia volta (o texto aparece duas vezes na volta, em lados opostos), com comprimento de meia circunferência no raio
  *    médio.
  * Devolve `{ larguraM, comprimentoM, voltas }` ou `null` quando a projeção não é cilíndrica, o tipo não é um desses dois ou a malha não
  * tem a faixa (sem tampa, ou sem lateral).
  */
 export function medidasDaProjecao(posicoes, relevo, parte = {}) {
-  if (relevo.projecao !== 'cilindrica' || (relevo.tipo !== 'bandaDeRodagem' && relevo.tipo !== 'letras')) return null;
+  if (relevo.projecao !== 'cilindrica' || (relevo.tipo !== 'bandaDeRodagem' && relevo.tipo !== 'letras' && relevo.tipo !== 'flanco')) return null;
   const eixo = relevo.eixo ?? 'y';
   const base = { ...caixaDaParte(posicoes, eixo), ...parte };
   const f = mediasDaFaixa(posicoes, relevo, base);

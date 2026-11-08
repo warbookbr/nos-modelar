@@ -116,7 +116,7 @@ export function propriedadesFisicas(declarado) {
    coordenada de `coordenada-de-textura.js`, na convenção do glTF (v = 0 é a primeira linha da imagem; o `DataTexture` do Three.js
    também põe a primeira linha em v = 0). Sem `tangent` na geometria, o Three.js monta a base da normal pelas derivadas da uv, e
    para a uv do glTF o `y` da escala da normal troca de sinal, como o `GLTFLoader` faz. O tile é repetido (`RepeatWrapping`). */
-const PX_DO_RELEVO = { prismas: 256, bandaDeRodagem: 384, letras: 1024, granulado: 256 };
+const PX_DO_RELEVO = { prismas: 256, bandaDeRodagem: 384, letras: 1024, granulado: 256, flanco: 2048 };
 const PX_DOS_FLOCOS = 256;
 const SEMENTE_DOS_MAPAS = 1;
 const cacheDeTexturas = new Map();

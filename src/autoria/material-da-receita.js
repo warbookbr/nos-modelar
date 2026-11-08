@@ -77,6 +77,8 @@ export const RELEVOS = Object.freeze({
   bandaDeRodagem: { escala: faixa(2, 200, 15, 'mm'), intensidade: faixa(0, 1, 0.6), projecao: 'cilindrica' },
   letras: { escala: faixa(2, 100, 12, 'mm'), intensidade: faixa(0, 1, 0.5), projecao: 'cilindrica' },
   granulado: { escala: faixa(0.05, 5, 0.4, 'mm'), intensidade: faixa(0, 1, 0.35), projecao: 'caixa' },
+  /* a face lateral de peça redonda com marcações: a medida principal (a escala é a altura dela), textos menores, anéis, faixa serrilhada e grão fino */
+  flanco: { escala: faixa(3, 30, 6.5, 'mm'), intensidade: faixa(0, 1, 0.7), projecao: 'cilindrica' },
 });
 
 /* A PROJEÇÃO diz como a coordenada de textura nasce da malha (`coordenada-de-textura.js`): `plana` projeta no plano normal ao

@@ -15,7 +15,7 @@ const PARTES = ['placaDeTinta', 'placaDeVidro', 'calotaEspelhada', 'discoDeAcoPi
 describe('peça de prova dos materiais', () => {
   it('declara os seis materiais do plano e os da lente, dos flancos do pneu e do anteparo do vidro, e o normalizador os aceita', () => {
     expect(Object.keys(MATERIAIS).sort()).toEqual(
-      ['acoPintado', 'anteparoDoVidro', 'borrachaComLetras', 'borrachaComRelevo', 'lenteDePrismas', 'metalEspelhado', 'plasticoGranulado', 'tintaComVerniz', 'vidro'],
+      ['acoPintado', 'anteparoDoVidro', 'borrachaComRelevo', 'borrachaDoFlanco', 'lenteDePrismas', 'metalEspelhado', 'plasticoGranulado', 'tintaComVerniz', 'vidro'],
     );
     const n = normalizarMateriais(MATERIAIS);
     expect(n.tintaComVerniz.verniz).toBe(1);
@@ -26,7 +26,7 @@ describe('peça de prova dos materiais', () => {
     expect(n.acoPintado.metalicidade).toBeLessThan(0.9);
     expect(n.acoPintado.asperezaDoVerniz).toBeGreaterThan(0.2);
     expect(n.borrachaComRelevo.relevo.tipo).toBe('bandaDeRodagem');
-    expect(n.borrachaComLetras.relevo.tipo).toBe('letras');
+    expect(n.borrachaDoFlanco.relevo.tipo).toBe('flanco');
     expect(n.lenteDePrismas.relevo.tipo).toBe('prismas');
     expect(n.plasticoGranulado.relevo.tipo).toBe('granulado');
   });
@@ -47,7 +47,7 @@ describe('peça de prova dos materiais', () => {
     expect(new Set(cores).size).toBe(8);
   });
 
-  it('o pneu tem dois materiais: os flancos levam as letras e a banda com os ombros leva o relevo de rodagem', () => {
+  it('o pneu tem dois materiais: os flancos levam as marcações e a banda com os ombros leva o relevo de rodagem', () => {
     const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
     const malhas = partes.get('pneuDeBorracha').children;
     expect(malhas).toHaveLength(2);

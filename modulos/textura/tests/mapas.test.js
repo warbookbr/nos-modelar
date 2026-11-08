@@ -6,9 +6,9 @@ import {
 } from '../src/index.js';
 
 const hash = (rgba) => createHash('sha256').update(rgba).digest('hex');
-const padrao = { prismas: 6, bandaDeRodagem: 15, letras: 12, granulado: 0.4 };
+const padrao = { prismas: 6, bandaDeRodagem: 15, letras: 12, granulado: 0.4, flanco: 6.5 };
 const relevo = (tipo, extra = {}) => ({ tipo, escala: padrao[tipo], intensidade: 0.6, ...extra });
-const pxDe = (tipo) => (tipo === 'letras' ? 512 : 96);
+const pxDe = (tipo) => (tipo === 'letras' ? 512 : tipo === 'flanco' ? 1024 : 96);
 
 /* diferença média entre duas colunas / linhas de um campo largura x altura */
 function saltoDaColuna(h, w, alt, a, b) {
@@ -33,7 +33,7 @@ describe('gerarMapasDoRelevo', () => {
         expect(hash(a.normal)).toBe(hash(b.normal));
         expect(hash(a.aspereza)).toBe(hash(b.aspereza));
         const c = gerarMapasDoRelevo(relevo(tipo), { px, semente: 4 });
-        if (tipo === 'granulado') expect(hash(c.normal)).not.toBe(hash(a.normal));
+        if (tipo === 'granulado' || tipo === 'flanco') expect(hash(c.normal)).not.toBe(hash(a.normal));
         else expect(hash(c.normal)).toBe(hash(a.normal));
       });
 
@@ -173,6 +173,72 @@ describe('gerarMapasDoRelevo', () => {
     expect((maxY - minY) / m.altura).toBeLessThan(0.4);
     expect(minX / m.largura).toBeGreaterThan(0.15);
     expect(maxX / m.largura).toBeLessThan(0.85);
+  });
+
+  describe('flanco', () => {
+    const C = 0.228;
+    const L = 0.0425;
+    const m = gerarMapasDoRelevo({ tipo: 'flanco', escala: 6.5, intensidade: 0.9 }, { px: 2048, comprimentoM: C, larguraM: L });
+    const w = m.largura;
+    const hgt = m.altura;
+    const dentro = (u0, u1, v0, v1) => {
+      let n = 0; let minI = Infinity; let maxI = -Infinity; let minJ = Infinity; let maxJ = -Infinity;
+      for (let j = Math.floor(v0 * hgt); j < Math.ceil(v1 * hgt); j += 1) {
+        for (let i = Math.floor(u0 * w); i < Math.ceil(u1 * w); i += 1) {
+          if (m.relevo[j * w + i] < 0.5) { n += 1; minI = Math.min(minI, i); maxI = Math.max(maxI, i); minJ = Math.min(minJ, j); maxJ = Math.max(maxJ, j); }
+        }
+      }
+      return { n, altura: (maxJ - minJ + 1) * (L / hgt), largura: (maxI - minI + 1) * (C / w), centroI: (minI + maxI) / 2 / w, centroJ: (minJ + maxJ) / 2 / hgt };
+    };
+
+    it('a medida principal tem 6,5 mm, fica no meio do flanco e centrada em volta do tile', () => {
+      const t = dentro(0.3, 0.66, 0.4, 0.55);
+      expect(t.n).toBeGreaterThan(200);
+      expect(t.altura * 1000).toBeGreaterThan(5.5);
+      expect(t.altura * 1000).toBeLessThan(7.5);
+      expect(Math.abs(t.centroI - 0.5)).toBeLessThan(0.02);
+      expect(Math.abs(t.centroJ - 0.47)).toBeLessThan(0.03);
+    });
+
+    it('os textos secundários são menores (cerca de 3,6 mm) e ficam em outras posições', () => {
+      for (const [u0, u1, v0, v1] of [[0.06, 0.2, 0.18, 0.3], [0.62, 0.78, 0.18, 0.3], [0.68, 0.9, 0.63, 0.75]]) {
+        const t = dentro(u0, u1, v0, v1);
+        expect(t.n).toBeGreaterThan(80);
+        expect(t.altura * 1000).toBeGreaterThan(2.8);
+        expect(t.altura * 1000).toBeLessThan(4.5);
+      }
+    });
+
+    it('tem anéis finos concêntricos (linhas retas em v), um junto do ombro e dois junto do aro', () => {
+      const linha = Array.from({ length: hgt }, (_, j) => {
+        let s = 0;
+        for (let i = 0; i < w; i += 1) s += m.relevo[j * w + i];
+        return s / w;
+      });
+      for (const v of [0.094, 0.81, 0.87]) {
+        const j = Math.round(v * hgt - 0.5);
+        const vizinho = Math.max(linha[j - 6], linha[j + 6]);
+        expect(Math.min(linha[j - 1], linha[j], linha[j + 1])).toBeLessThan(vizinho - 0.4);
+      }
+    });
+
+    it('a faixa serrilhada junto do aro tem riscos radiais finos e o resto da face não', () => {
+      const variacao = (v) => {
+        const j = Math.round(v * hgt);
+        let s = 0;
+        for (let i = 1; i < w; i += 1) s += Math.abs(m.relevo[j * w + i] - m.relevo[j * w + i - 1]);
+        return s / w;
+      };
+      expect(variacao(0.95)).toBeGreaterThan(0.08);
+      expect(variacao(0.35)).toBeLessThan(0.03);
+    });
+
+    it('tem grão fino em toda a face: a altura varia um pouco mesmo onde não há marcação', () => {
+      const j = Math.round(0.35 * hgt);
+      const valores = Array.from({ length: 200 }, (_, i) => m.relevo[j * w + 300 + i]);
+      expect(Math.max(...valores) - Math.min(...valores)).toBeGreaterThan(0.01);
+      expect(Math.max(...valores) - Math.min(...valores)).toBeLessThan(0.1);
+    });
   });
 
   it('o PNG da normal sai pelo mesmo caminho da cor', () => {

@@ -176,6 +176,9 @@ describe('o relevo normalizado com projeção', () => {
     expect(() => relevo('prismas', { desenho: 'v' })).toThrow(/relevo\.desenho/);
     expect(relevo('prismas')).not.toHaveProperty('desenho');
     expect(relevo('letras').projecao).toBe('cilindrica');
+    expect(relevo('flanco')).toMatchObject({ escala: 6.5, intensidade: 0.7, projecao: 'cilindrica' });
+    expect(() => relevo('flanco', { escala: 1 })).toThrow('relevo.escala');
+    expect(() => relevo('flanco', { desenho: 'v' })).toThrow(/relevo\.desenho/);
     expect(relevo('prismas', { projecao: 'plana', eixo: 'x' })).toMatchObject({ projecao: 'plana', eixo: 'x' });
     expect(() => relevo('prismas', { projecao: 'esferica' })).toThrow(/relevo\.projecao/);
     expect(() => relevo('prismas', { eixo: 'w' })).toThrow(/relevo\.eixo/);

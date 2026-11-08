@@ -148,7 +148,7 @@ export function gerarPassos(t = TABELA) {
   parte('pneuDeBorracha', { origem: { op: 'lathe', id: ID.borracha } }, 'borrachaComRelevo');
   /* o perfil tem seis segmentos: 0 é o flanco de baixo, 1 o ombro, 2 a banda, 3 o ombro, 4 o flanco de cima e 5 o aro de dentro.
      Os dois flancos levam as letras; a banda e os ombros ficam com o relevo de rodagem. */
-  for (const faixa of [0, 4]) passos.push(['material', { sel: { origem: { op: 'lathe', id: ID.borracha, faixa } }, usa: 'borrachaComLetras' }]);
+  for (const faixa of [0, 4]) passos.push(['material', { sel: { origem: { op: 'lathe', id: ID.borracha, faixa } }, usa: 'borrachaDoFlanco' }]);
 
   /* plástico granulado: o bloco de faces planas e largas */
   passos.push(['cubo', {
@@ -201,9 +201,9 @@ export const MATERIAIS = {
   borrachaComRelevo: {
     tipo: 'liso', cor: '#1f1f23', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'bandaDeRodagem', escala: 15, intensidade: 0.8, desenho: 'costelas' },
   },
-  /* os flancos do pneu: a mesma borracha (um fio mais lisa, porque o flanco não rola), com as letras e os números em baixo-relevo (a medida, sem marca) */
-  borrachaComLetras: {
-    tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'letras', escala: 12, intensidade: 0.9 },
+  /* os flancos do pneu: a mesma borracha (um fio mais lisa, porque o flanco não rola), com as marcações do flanco em relevo: a medida principal de 6,5 mm, textos menores genéricos, anéis, faixa serrilhada e grão fino (sem marca) */
+  borrachaDoFlanco: {
+    tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'flanco', escala: 6.5, intensidade: 0.9 },
   },
   /* a lente de lanterna: vermelho com verniz e a grade de prismas */
   lenteDePrismas: {
