@@ -549,3 +549,48 @@ describe('gaiolaPorLacos: sem os campos novos a malha das peças de teste é a d
     expect(assinatura(derivarDobra())).toBe('3abcad80f4b1506d');
   });
 });
+
+describe('gaiolaPorLacos: o vizinho que passa da ponta do trecho que encolhe é seguido sobre a curva dele', () => {
+  /* um círculo de raio 50 em [u, v]: `dir` é a metade da direita, do alto até o fundo T = [0, -50], e `esq` a da esquerda, de T ao alto; `calombo` é
+     o trecho que sai da metade da direita a -60 graus, desce 8 mm e entra na da esquerda a -120 graus. Nos laços da faixa as metades vão
+     até T, passando do ponto onde o calombo as toca. */
+  const ponto = (graus: number): Uv => [50 * Math.cos((graus * Math.PI) / 180), 50 * Math.sin((graus * Math.PI) / 180)];
+  const arco = (de: number, ate: number, n = 91): Uv[] => Array.from({ length: n }, (_, k) => ponto(de + ((ate - de) * k) / (n - 1)));
+  const laco = (em: number, ultimo: boolean) => ({
+    em,
+    trechos: {
+      esq: arco(-90, -267),
+      cima: [ponto(93), ponto(87)],
+      dir: arco(87, -90),
+      calombo: ultimo ? [[0, -50]] : [ponto(-60), [ponto(-60)[0], ponto(-60)[1] - 8], [ponto(-120)[0], ponto(-120)[1] - 8], ponto(-120)],
+    },
+  });
+  const g = gaiolaPorLacos({
+    nome: 'c', eixo: 'x', tampa: { de: 'cima', ate: 'calombo' },
+    trechos: [{ nome: 'esq', pontos: 9 }, { nome: 'cima', pontos: 2 }, { nome: 'dir', pontos: 9 }, { nome: 'calombo', pontos: 7, encolhe: { de: 'primeiro', ate: 'ultimo' } }],
+    lacos: [0, 10, 20, 30].map((em, k) => laco(em, k === 3)),
+  });
+  const raio = (nome: string) => { const p = g.pontosMm[nome]; return Math.hypot(p[1], p[2]); };
+
+  it('a ponta do trecho e o fim do vizinho ficam sobre o círculo em todo laço, e o encontro anda até o fundo', () => {
+    for (const l of ['l0', 'l1', 'l2', 'l3']) {
+      expect(raio(g.nomeDe(l, 'calombo', 0)), `${l} começo`).toBeCloseTo(50, 2);
+      expect(raio(g.nomeDe(l, 'dir', 7)), `${l} metade`).toBeCloseTo(50, 1);
+    }
+    /* o encontro está a -60 graus em l0 e vai a -90 em l3, de 10 em 10 graus: o peso é de 1/3 por laço */
+    const angulo = (l: string) => (Math.atan2(g.pontosMm[g.nomeDe(l, 'calombo', 0)][2], g.pontosMm[g.nomeDe(l, 'calombo', 0)][1]) * 180) / Math.PI;
+    expect(angulo('l0')).toBeCloseTo(-60, 1);
+    expect(angulo('l1')).toBeCloseTo(-70, 1);
+    expect(angulo('l2')).toBeCloseTo(-80, 1);
+  });
+
+  it('o calombo encolhe com a altura acima do círculo, sem entrar nele', () => {
+    const fundo = (l: string) => Math.max(...[0, 1, 2, 3, 4, 5, 6].map((k) => raio(g.nomeDe(l, 'calombo', k))));
+    expect(fundo('l0')).toBeGreaterThan(55);
+    expect(fundo('l1')).toBeLessThan(fundo('l0'));
+    expect(fundo('l2')).toBeLessThan(fundo('l1'));
+    expect(Math.min(...[0, 1, 2, 3, 4, 5, 6].map((k) => raio(g.nomeDe('l2', 'calombo', k))))).toBeGreaterThan(49.9);
+    const c = conferir(g);
+    expect(c.soltas + c.repetidas).toBe(0);
+  });
+});

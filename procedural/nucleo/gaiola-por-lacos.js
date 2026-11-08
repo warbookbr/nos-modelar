@@ -264,13 +264,60 @@ function faixasDeEncolhimento(trechos, nomesDosLacos) {
   });
 }
 
+/* o ponto da polilinha mais perto de `p`: { k, t, ponto, d }, o segmento k (de k a k+1), a fração t nele, o ponto e a distância */
+function maisPertoNaPolilinha(poli, p) {
+  let melhor = null;
+  for (let k = 0; k + 1 < poli.length; k++) {
+    const dx = poli[k + 1][0] - poli[k][0]; const dy = poli[k + 1][1] - poli[k][1];
+    const q = dx * dx + dy * dy;
+    const t = q > 0 ? Math.min(1, Math.max(0, ((p[0] - poli[k][0]) * dx + (p[1] - poli[k][1]) * dy) / q)) : 0;
+    const ponto = [poli[k][0] + dx * t, poli[k][1] + dy * t];
+    const d = Math.hypot(p[0] - ponto[0], p[1] - ponto[1]);
+    if (!melhor || d < melhor.d) melhor = { k, t, ponto, d };
+  }
+  return melhor;
+}
+
+/* a posição, pelo comprimento desde o começo, do ponto { k, t } da polilinha, e o ponto a `s` mm do começo com o índice do segmento */
+const posicaoNaPolilinha = (poli, { k, t }) => comprimentoDe(poli.slice(0, k + 1)) + t * Math.hypot(poli[k + 1][0] - poli[k][0], poli[k + 1][1] - poli[k][1]);
+function pontoEm(poli, s) {
+  let falta = s;
+  for (let k = 0; k + 1 < poli.length; k++) {
+    const d = Math.hypot(poli[k + 1][0] - poli[k][0], poli[k + 1][1] - poli[k][1]);
+    if (falta <= d || k + 2 === poli.length) { const t = d > 0 ? Math.min(1, falta / d) : 0; return { k, t, ponto: [poli[k][0] + (poli[k + 1][0] - poli[k][0]) * t, poli[k][1] + (poli[k + 1][1] - poli[k][1]) * t] }; }
+    falta -= d;
+  }
+  return { k: 0, t: 0, ponto: [...poli[0]] };
+}
+
+/* o ângulo da tangente da polilinha a `s` mm do começo, interpolado entre o dos segmentos vizinhos (o do segmento muda de repente no vértice) */
+function anguloEm(poli, s) {
+  const seg = []; let c = 0;
+  for (let k = 0; k + 1 < poli.length; k++) {
+    const dx = poli[k + 1][0] - poli[k][0]; const dy = poli[k + 1][1] - poli[k][1];
+    const d = Math.hypot(dx, dy);
+    seg.push({ de: c, ate: c + d, ang: Math.atan2(dy, dx) }); c += d;
+  }
+  let k = seg.findIndex((x) => s <= x.ate); if (k < 0) k = seg.length - 1;
+  const meio = (x) => (x.de + x.ate) / 2;
+  const entre = (a, b) => { let d = b.ang - a.ang; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; const t = (s - meio(a)) / (meio(b) - meio(a) || 1); return a.ang + d * Math.min(1, Math.max(0, t)); };
+  if (s < meio(seg[k]) && k > 0) return entre(seg[k - 1], seg[k]);
+  if (s >= meio(seg[k]) && k + 1 < seg.length) return entre(seg[k], seg[k + 1]);
+  return seg[k].ang;
+}
+
+/* Distância (mm) até a qual o ponto onde o trecho que encolhe toca o vizinho conta como estando sobre a polilinha dele. */
+const ENCAIXE_NO_VIZINHO_MM = 0.05;
+
 /* O trecho com `encolhe: { de, ate }` vai de inteiro, no laço `de`, a um ponto, no laço `ate`: nos laços entre os dois, cada ponto da polilinha
    que a receita deu anda em linha reta até o ponto que o trecho tem no laço `ate`, com o peso da posição do laço na faixa, de modo que os
    pontos do trecho (reamostrados por igual) se aproximam por igual e se fundem no laço final, sem leque de faces finas. O trecho tem de
    medir zero no laço `ate`, e os trechos seguidos que encolhem usam o mesmo ponto lá. Os laços fora da faixa ficam como a receita deu.
    Os trechos vizinhos que não encolhem acabam e começam nas pontas do trecho que encolhe, como no `some`: só o ponto da ponta deles troca.
-   Quando a ponta anda muito sobre a curva do vizinho (o arco do círculo), ele a segue pela corda, então o trecho que encolhe deve ser
-   curto ou o vizinho ter pontos perto da ponta. */
+   Se a polilinha do vizinho passa do ponto onde o trecho o toca (o arco do círculo que, nos laços da faixa, segue até o ponto final), a
+   ponta do trecho anda sobre essa curva, e não pela corda: o encontro está a `peso` do caminho, pelo comprimento, entre o ponto onde o
+   trecho o toca e o fim da polilinha, o vizinho é cortado nele, e o desvio que isso dá à ponta se espalha pelo trecho, de modo que a
+   superfície do vizinho fica na forma dele. */
 function encolherTrechos(lidos, trechos, e, faixas) {
   if (!faixas.some(Boolean)) return;
   const n = trechos.length;
@@ -282,21 +329,72 @@ function encolherTrechos(lidos, trechos, e, faixas) {
   });
   const alvos = faixas.map((f, i) => (f ? lidos[f.ate].polilinhas[i][0] : null));
   lidos.forEach((l, r) => {
-    const novas = l.polilinhas.map((poli, i) => {
-      const f = faixas[i];
-      if (!f || r < f.de || r > f.ate) return null;
-      const w = pesoNaFaixa(l.em, lidos[f.de].em, lidos[f.ate].em, f.curva);
-      return poli.map(([u, v]) => [u + (alvos[i][0] - u) * w, v + (alvos[i][1] - v) * w]);
-    });
-    novas.forEach((poli, i) => { if (poli) l.polilinhas[i] = poli; });
+    const pesos = faixas.map((f) => (f && r >= f.de && r <= f.ate ? pesoNaFaixa(l.em, lidos[f.de].em, lidos[f.ate].em, f.curva) : null));
+    const cruas = l.polilinhas;
+    const novas = cruas.map((poli, i) => (pesos[i] === null ? null : poli.map(([u, v]) => [u + (alvos[i][0] - u) * pesos[i], v + (alvos[i][1] - v) * pesos[i]])));
+    const saida = cruas.map((poli, i) => novas[i] ?? poli);
+    /* o vizinho j da cadeia de trechos que encolhem (de a até b) passa do ponto onde ela o toca? Então a cadeia o segue (guia); senão, só
+       a ponta do vizinho troca. `i` é o trecho da ponta que toca j. */
+    const guiaDe = (i, j, antes) => {
+      const cru = cruas[j]; const iCru = cruas[i];
+      if (cru.length < 2) return null;
+      const toque = antes ? iCru[0] : iCru[iCru.length - 1];
+      const encontro = antes ? cru[cru.length - 1] : cru[0];
+      if (Math.hypot(encontro[0] - toque[0], encontro[1] - toque[1]) <= TOLERANCIA_DE_FUSAO_MM) return null;
+      const perto = maisPertoNaPolilinha(cru, toque);
+      if (perto.d > ENCAIXE_NO_VIZINHO_MM) falha(`no laço ${citar(l.nome)} (${e} = ${br(l.em)} mm), o trecho ${citar(trechos[j].nome)} passa do ponto onde o ${citar(trechos[i].nome)}, que encolhe, o toca, mas o ponto fica a ${br(perto.d, 3)} mm dele; o vizinho que passa da ponta segue a curva em que a ponta está`);
+      const s0 = posicaoNaPolilinha(cru, perto); const alvo = antes ? comprimentoDe(cru) : 0;
+      return { cru, antes, corte: pontoEm(cru, alvo - (alvo - s0) * (1 - pesos[i])) };
+    };
+    /* o ponto `p` levado pelo peso `w` ao longo da curva do guia até o ponto final dele (o fim da polilinha se ela vem antes do trecho, o
+       começo se vem depois): o ponto da curva mais perto anda pelo comprimento, e a distância dele à curva, girada com a tangente, encolhe
+       com (1 - w), de modo que o ponto fica à mesma altura sobre a curva em vez de cortar a corda */
+    const seguir = ({ cru, antes }, p, w) => {
+      const perto = maisPertoNaPolilinha(cru, p);
+      const s0 = posicaoNaPolilinha(cru, perto); const total = comprimentoDe(cru);
+      const alvo = antes ? total : 0;
+      const sJ = alvo - (alvo - s0) * (1 - w);
+      const J = pontoEm(cru, sJ);
+      const giro = anguloEm(cru, sJ) - anguloEm(cru, s0);
+      const dx = p[0] - perto.ponto[0]; const dy = p[1] - perto.ponto[1];
+      const c = Math.cos(giro); const sn = Math.sin(giro);
+      return [J.ponto[0] + (dx * c - dy * sn) * (1 - w), J.ponto[1] + (dx * sn + dy * c) * (1 - w)];
+    };
+    /* a cadeia de trechos seguidos que encolhem: o primeiro e o último dela tocam os vizinhos que não encolhem */
+    const comeco = (i) => { let a = i; while (novas[(a + n - 1) % n] && (a + n - 1) % n !== i) a = (a + n - 1) % n; return a; };
+    const fimDe = (i) => { let b = i; while (novas[(b + 1) % n] && (b + 1) % n !== i) b = (b + 1) % n; return b; };
+    const guias = new Map();
     novas.forEach((poli, i) => {
-      if (poli) return;
-      const alvo = l.polilinhas[i].map((q) => [...q]);
-      const ant = novas[(i + n - 1) % n]; const prox = novas[(i + 1) % n];
-      if (ant) alvo[0] = [...ant[ant.length - 1]];
-      if (prox) alvo[alvo.length - 1] = [...prox[0]];
-      l.polilinhas[i] = alvo;
+      if (!poli) return;
+      const a0 = comeco(i); const b0 = fimDe(i);
+      if (!guias.has(a0)) guias.set(a0, { a: novas[(a0 + n - 1) % n] ? null : guiaDe(a0, (a0 + n - 1) % n, true), b: novas[(b0 + 1) % n] ? null : guiaDe(b0, (b0 + 1) % n, false) });
+      const { a: gA, b: gB } = guias.get(a0);
+      if (gA || gB) {
+        /* com os dois guias, cada ponto fica com o do lado mais perto, pelo inverso do quadrado da distância à curva de cada um */
+        saida[i] = cruas[i].map((q, k) => {
+          const pa = gA ? seguir(gA, q, pesos[i]) : novas[i][k];
+          const pb = gB ? seguir(gB, q, pesos[i]) : novas[i][k];
+          if (!gA || !gB) return gA ? pa : pb;
+          const da = maisPertoNaPolilinha(gA.cru, q).d; const db = maisPertoNaPolilinha(gB.cru, q).d;
+          const wa = (1 / (da * da + 1e-12)) / (1 / (da * da + 1e-12) + 1 / (db * db + 1e-12));
+          return [pa[0] * wa + pb[0] * (1 - wa), pa[1] * wa + pb[1] * (1 - wa)];
+        });
+      }
     });
+    novas.forEach((poli, i) => {
+      if (!poli) return;
+      const ant = (i + n - 1) % n; const prox = (i + 1) % n;
+      const { a: gA, b: gB } = guias.get(comeco(i));
+      /* cada vizinho acaba (ou começa) onde o trecho começa (ou acaba) */
+      for (const [j, antes, g] of [[ant, true, comeco(i) === i ? gA : null], [prox, false, fimDe(i) === i ? gB : null]]) {
+        if (novas[j]) continue;
+        const ponta = saida[i][antes ? 0 : saida[i].length - 1];
+        const v = g ? (antes ? [...g.cru.slice(0, g.corte.k + 1).map((q) => [...q]), [...ponta]] : [[...ponta], ...g.cru.slice(g.corte.k + 1).map((q) => [...q])]) : [...saida[j]];
+        if (!g) { if (antes) v[v.length - 1] = [...ponta]; else v[0] = [...ponta]; }
+        saida[j] = v;
+      }
+    });
+    l.polilinhas = saida;
     l.polilinhas.forEach((poli, i) => {
       const ant = l.polilinhas[(i + n - 1) % n];
       const fim = ant[ant.length - 1];
@@ -310,6 +408,8 @@ function lerLacos(lacos, trechos, e, fechados = new Set()) {
   if (!Array.isArray(lacos) || lacos.length < 2) falha('lacos precisa ser lista de pelo menos dois laços { em, trechos }');
   const nomes = new Set();
   const faixas = faixasDeEncolhimento(trechos, lacos.map((l, r) => l?.nome ?? `l${r}`));
+  /* no laço da faixa de um trecho que encolhe, o vizinho dele pode passar da ponta, e a ponta se confere depois de encolher */
+  const encolhendo = (i, r) => { const f = faixas[(i + trechos.length) % trechos.length]; return !!f && r >= f.de && r <= f.ate; };
   const lidos = lacos.map((l, r) => {
     const nome = l?.nome ?? `l${r}`;
     if (nomes.has(nome)) falha(`o laço ${citar(nome)} aparece duas vezes`);
@@ -326,6 +426,7 @@ function lerLacos(lacos, trechos, e, fechados = new Set()) {
       return { poli, i };
     });
     pontos.forEach(({ poli, i }) => {
+      if (encolhendo(i, r) || encolhendo(i - 1, r)) return;
       const ant = pontos[(i + trechos.length - 1) % trechos.length].poli;
       const fim = ant[ant.length - 1];
       const d = Math.hypot(poli[0][0] - fim[0], poli[0][1] - fim[1]);

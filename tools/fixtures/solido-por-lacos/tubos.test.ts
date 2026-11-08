@@ -9,6 +9,8 @@ import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { analisarTopologia } from '../../../procedural/nucleo/topologia.js';
 // @ts-expect-error — régua em JavaScript.
 import { dobraDaReceita } from '../../modelar/dobra-da-superficie.mjs';
+// @ts-expect-error — régua em JavaScript.
+import { ondulacaoDaReceita } from '../../modelar/ondulacao-da-superficie.mjs';
 // @ts-expect-error — peça de teste em JavaScript.
 import hoje from './tubos-hoje.js';
 // @ts-expect-error — peça de teste em JavaScript.
@@ -85,6 +87,49 @@ describe('dois tubos que se cruzam: a técnica nova (encolhe e esvai) sai sem ab
     expect(r.dobras).toBe(0);
     expect(r.superficies[0].dobras).toEqual([]);
   }, LENTO);
+
+  it('a malha é simétrica em z (nenhum vértice a mais de 0,01 mm do espelho) e o círculo do tubo deitado não afunda onde a faixa encolhe', () => {
+    const doDisco = new Set<string>();
+    for (const f of neutro.F.values()) if (f.parte === 'disco') for (const v of f.vs) doDisco.add(v);
+    const pontos = [...neutro.V.entries()].filter(([id]: [string, number[]]) => !doDisco.has(id)).map(([, p]: [string, number[]]) => p.map((c) => c * 1000));
+    const grade = new Map<string, number[][]>();
+    const k = (p: number[]) => `${Math.round(p[0] / 0.5)},${Math.round(p[1] / 0.5)}`;
+    for (const p of pontos) { const c = k(p); grade.set(c, [...(grade.get(c) ?? []), p]); }
+    let pior = 0;
+    for (const p of pontos) {
+      let melhor = Infinity;
+      const [cx, cy] = [Math.round(p[0] / 0.5), Math.round(p[1] / 0.5)];
+      for (let dx = -2; dx <= 2; dx++) for (let dy = -2; dy <= 2; dy++) for (const q of grade.get(`${cx + dx},${cy + dy}`) ?? []) melhor = Math.min(melhor, Math.hypot(q[0] - p[0], q[1] - p[1], q[2] + p[2]));
+      pior = Math.max(pior, melhor);
+    }
+    expect(pior).toBeLessThan(0.01);
+    /* a barriga do tubo deitado (y abaixo do eixo, em x de 60 a 90, antes do chanfro da frente) fica no raio dele, até 0,3 mm para dentro, onde a ponta da faixa anda */
+    const barriga = pontos.filter((p: number[]) => p[0] >= 60 && p[0] < 90 && p[1] < 87 && Math.abs(p[2]) > 2 && Math.abs(p[2]) < 40).map((p: number[]) => Math.hypot(p[1] - 117, p[2]) - 78);
+    expect(Math.min(...barriga)).toBeGreaterThan(-0.3);
+  }, LENTO);
+
+  it('a ondulação fica em até 5 falhas de no máximo 1,2 mm, nos dois lados juntos, junto da base do filete e do começo da faixa', () => {
+    const s = ondulacaoDaReceita(nova).superficies[0];
+    expect(s.falhas.length).toBeLessThanOrEqual(5);
+    expect(s.desvioMm.maximo).toBeLessThan(1.2);
+    expect(s.facesViradas).toBe(0);
+  }, LENTO);
+
+  it('o disco sob o tubo em pé é parte própria do mesmo diâmetro, com o topo em y = 0, e a folga até o fundo do tubo deitado é de 39 mm', () => {
+    const caixa = (nome: string) => {
+      const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
+      for (const f of neutro.F.values()) if (f.parte === nome) for (const v of f.vs) neutro.V.get(v).forEach((c: number, a: number) => { min[a] = Math.min(min[a], c * 1000); max[a] = Math.max(max[a], c * 1000); });
+      return { min, max };
+    };
+    const d = caixa('disco');
+    expect(d.min[1]).toBeCloseTo(-25, 3);
+    expect(d.max[1]).toBeCloseTo(0, 3);
+    expect(d.max[0] - d.min[0]).toBeCloseTo(156, 1);
+    expect(d.max[2] - d.min[2]).toBeCloseTo(156, 1);
+    const pe = caixa('tuboEmPe');
+    expect(pe.max[2] - pe.min[2]).toBeCloseTo(156, 0);
+    expect(nova.TABELA.alturaDoEixo - nova.TABELA.raio).toBe(39);
+  });
 
   it('a técnica nova recusa passo de faixa menor que o mínimo entre planos', () => {
     expect(() => derivar(tabelaDe('nova', { passoDoEncolhimento: 2 }), 'nova')).toThrow(/passoDoEncolhimento abaixo de 2,5 mm/);

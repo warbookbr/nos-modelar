@@ -20,6 +20,8 @@ export const TABELA = {
   raio: 78,
   alturaDoEixo: 117,
   comprimento: 175,
+  /* o disco sob o tubo em pé: mesmo diâmetro, como parte própria; o topo dele é o fundo do tubo em pé (y = 0), a folga até o fundo do tubo deitado é alturaDoEixo - raio */
+  alturaDoDisco: 25,
   chanfro: 2,
   fundoDoChanfro: 2.6,
   nitidezDoChanfro: 0.8,
@@ -51,6 +53,7 @@ const graus = (g) => (g * Math.PI) / 180;
 /* Os trechos da parede do tubo em pé, do filete à face de baixo: a fração acumulada da altura em que cada um acaba e os pontos dele. */
 export const PAREDE_DE_HOJE = [['A', 0.03, 2], ['B', 0.08, 3], ['C', 0.17, 3], ['D', 0.32, 4], ['E', 0.55, 5], ['F', 0.78, 5], ['G', 0.92, 3], ['H', 1, 3]];
 const PONTOS_DO_ARCO = 19;
+const VERTICES_DO_ARCO_NA_NOVA = 121;
 const nomesDaFaixa = (parede) => ['filD', ...parede.map(([n]) => `lado${n}_D`), 'chPeD', 'pe', 'chPeE', ...[...parede].reverse().map(([n]) => `lado${n}_E`), 'filE'];
 
 function exigirTecnica(tecnica) {
@@ -92,7 +95,7 @@ export function planosDeCorte(t = TABELA, tecnica = 'hoje') {
   const lista = angulos.map((g) => ({ x: -rc * Math.cos(graus(g)), tipo: 'perna' })).filter(({ x }) => x < xDe - 2.5 - 1e-6);
   lista[0].tipo = 'tras';
   const m = Math.max(1, Math.floor(t.inicioDoEncolhimento / t.passoDoEncolhimento + 1e-9));
-  for (let k = 0; k < m; k++) lista.push({ x: xDe + (t.inicioDoEncolhimento * k) / m, tipo: 'perna', faixa: k === 0 ? 'de' : null });
+  for (let k = 0; k < m; k++) lista.push({ x: xDe + (t.inicioDoEncolhimento * k) / m, tipo: 'perna', naFaixa: true, faixa: k === 0 ? 'de' : null });
   lista.push({ x: rc, tipo: 'zero', faixa: 'ate' });
   const n = Math.max(0, Math.ceil((ate - rc) / t.passoNaFrente) - 1);
   for (let k = 1; k <= n; k++) lista.push({ x: rc + ((ate - rc) * k) / (n + 1), tipo: 'zero' });
@@ -135,10 +138,14 @@ export function lacoNoPlano(t, plano, tecnica = 'hoje') {
   const fim = 2 * Math.PI + phi2;
   const meio = (3 * Math.PI) / 2;
   const dFundo = 3 / R;
+  /* na técnica 'nova' o arco é dado com muitos vértices e, nos laços da faixa que encolhe, segue até o fundo do círculo: `gaiolaPorLacos` o
+     corta onde a ponta da faixa chega, que anda sobre o arco */
+  const denso = tecnica === 'nova' ? VERTICES_DO_ARCO_NA_NOVA : PONTOS_DO_ARCO;
+  const ateOFundo = plano.naFaixa && !fundida;
   const tr = {
-    arcoE: arcoDe(inicio, meio - dFundo, PONTOS_DO_ARCO),
+    arcoE: arcoDe(ateOFundo ? Math.PI / 2 : inicio, meio - dFundo, denso),
     cima: [[-R * Math.sin(dFundo), -R * Math.cos(dFundo)], [R * Math.sin(dFundo), -R * Math.cos(dFundo)]],
-    arcoD: arcoDe(meio + dFundo, fim, PONTOS_DO_ARCO),
+    arcoD: arcoDe(meio + dFundo, ateOFundo ? (5 * Math.PI) / 2 : fim, denso),
   };
   if (fundida) {
     const fundo = [R * Math.cos(phi2), R * Math.sin(phi2)];
