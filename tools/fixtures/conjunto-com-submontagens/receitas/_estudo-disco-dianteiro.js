@@ -12,7 +12,7 @@ export const PARAMS = {
   assentoRaioExterno: 0.085,
 };
 export const TOPO = { lados: 40 };
-export const MATERIAIS = { ferroFundido: { cor: '#6e747a', aspereza: 0.82, metalness: 0.42 } };
+export const MATERIAIS = { ferroFundido: { cor: '#6e747a', aspereza: 0.82 } };
 const DISCO = 1301;
 export const ALIASES = [['discoInteiro', { origem: { op: 'lathe', id: DISCO } }]];
 

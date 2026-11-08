@@ -11,7 +11,7 @@ export const PARAMS = {
 };
 
 export const TOPO = { lados: 24 };
-export const MATERIAIS = { aco: { cor: '#737b84', aspereza: 0.58, metalness: 0.72 } };
+export const MATERIAIS = { aco: { cor: '#737b84', aspereza: 0.58 } };
 
 const EIXO = 1101;
 const cilindroInteiro = (id) => ({ unir: [

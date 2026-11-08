@@ -3,7 +3,7 @@
 import { executar, colisaoDe } from '../../../procedural/nucleo/entrada.js';
 export const PARAMS = { raioInterno: 0.040, raioExterno: 0.070, inicio: 0.025, fim: 0.040 };
 export const TOPO = { lados: 24 };
-export const MATERIAIS = { aluminio: { cor: '#b38a61', aspereza: 0.5, metalness: 0.42 } };
+export const MATERIAIS = { aluminio: { cor: '#b38a61', aspereza: 0.5 } };
 const TAMPA = 7301;
 export const ALIASES = [['inteiro', { origem: { op: 'lathe', id: TAMPA } }]];
 export const PASSOS = [
