@@ -1,4 +1,4 @@
-/* receita.js — a peça de prova do plano "união de dois tubos com arredondamento" (`docs/modelar/planos/2026-11-08-uniao-de-tubos-com-arredondamento.md`):
+/* receita.js — a peça de prova do plano "união de dois tubos com arredondamento" (`docs/modelar/planos/encerrados/2026-11-08-uniao-de-tubos-com-arredondamento.md`):
  * um tubo em pé de 156 mm de diâmetro sobre um disco do mesmo diâmetro, cruzado no alto por um tubo deitado também de 156 mm e 175 mm de
  * comprimento, com o fundo a 39 mm acima do topo do disco e a frente 19 mm além da frente do tubo em pé. Cada tubo é um cilindro na direção dele;
  * a união é `unir` e o encontro côncavo, `arredondarCostura` de raio constante em modo curvo, com `raioMinimo` e `afinarPontas` para o

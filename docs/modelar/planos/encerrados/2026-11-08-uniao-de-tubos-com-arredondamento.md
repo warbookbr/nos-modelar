@@ -1,6 +1,6 @@
 # União de dois tubos com arredondamento: o tubo em pé redondo até a base, cruzado por um tubo deitado afastado
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `tools/fixtures/uniao-de-tubos/`, `procedural/nucleo/operacoes/booleanas.js`
 
@@ -25,7 +25,7 @@ idêntica, e só as rodadas encerradas 09 e 10 do ombro mudaram de hash, sem mud
 
 O cotovelo do braço pede o tubo em pé redondo até o colar e cruzado no alto por um tubo deitado que passa 19 mm à frente dele,
 com o encontro arredondado e sem degrau (`procedural/pecas/braco-robotico/ALINHAMENTO.md`, "O anel do cotovelo e o cotovelo").
-O plano do [trecho que some entre laços](encerrados/2026-11-08-trecho-que-some-entre-lacos.md) mostrou que uma gaiola só não dá
+O plano do [trecho que some entre laços](2026-11-08-trecho-que-some-entre-lacos.md) mostrou que uma gaiola só não dá
 essa forma: fatiada ao longo do tubo deitado, o pé da frente vira rampa; fatiada na horizontal, a junção sob o tubo deitado
 sai ondulada. A pessoa decidiu esperar uma união dos dois tubos com arredondamento, e o cotovelo fica aberto até lá.
 
@@ -78,4 +78,12 @@ usa, parar e trazer à pessoa o que a medida mostrou antes de mexer em `booleana
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-08, com o encontro aprovado pela pessoa por imagem. A peça de prova (`tools/fixtures/uniao-de-tubos/`)
+faz os dois tubos de mesmo diâmetro por revolução, cada um na direção dele, e os junta com `unir` e `arredondarCostura`: a base
+sai redonda e inteira rente ao disco, o arredondamento de 10 mm faz a frente de baixo limpo, e a ponta de trás afina até sumir
+na borda da tampa plana, sem dobra, sem vinco e sem aresta aguda pelas réguas. A correção ficou em `arredondarCostura`
+(`procedural/nucleo/operacoes/booleanas.js`): no modo curvo, a recusa da bola que encostaria numa quina passou a valer também
+quando a fatia chega a uma face plana que limita o sólido, e o raio afina de forma contínua até o maior que cabe, com o aviso
+`faceLimite`. O ombro, a coluna do braço e a fixture do ombro saem com a malha idêntica; as rodadas encerradas 09 e 10 do ombro
+mudaram de hash, sem mudar a contagem de dobras. Fica o calombo de 0,75 mm nos pontos tangentes laterais, dentro do limite de
+ondulação. `booleanas.js` volta ao plano do braço, que refaz o cotovelo com essa operação.

@@ -516,7 +516,6 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
-- `2026-11-08-uniao-de-tubos-com-arredondamento.md` — União de dois tubos com arredondamento: o tubo em pé redondo até a base, cruzado por um tubo deitado afastado
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -664,6 +663,7 @@
 - `2026-11-06-abertura-so-na-vizinhanca.md` — Abertura só na vizinhança do vão — o corte de um vão na chapa sem refazer a chapa inteira
 - `2026-11-08-materiais-realistas.md` — Materiais realistas e exportação glTF
 - `2026-11-08-trecho-que-some-entre-lacos.md` — Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
+- `2026-11-08-uniao-de-tubos-com-arredondamento.md` — União de dois tubos com arredondamento: o tubo em pé redondo até a base, cruzado por um tubo deitado afastado
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -2341,7 +2341,7 @@
 ## tools/fixtures/uniao-de-tubos/
 
 - `medir.mjs` — medir.mjs — as medidas da peça de prova "união de dois tubos" (`receita.js`).
-- `receita.js` — receita.js — a peça de prova do plano "união de dois tubos com arredondamento" (`docs/modelar/planos/2026-11-08-uniao-de-tubos-com-arredondamento.md`): um tu…
+- `receita.js` — receita.js — a peça de prova do plano "união de dois tubos com arredondamento" (`docs/modelar/planos/encerrados/2026-11-08-uniao-de-tubos-com-arredondamento.…
 - `uniao-de-tubos.test.ts` — uniao-de-tubos.test.ts — a peça de prova do plano "união de dois tubos com arredondamento" (`receita.js`): dois tubos de 156 mm que se cruzam, unidos por `un…
 
 ## tools/fixtures/uniao-de-tubos/referencias/
