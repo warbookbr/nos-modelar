@@ -1,6 +1,7 @@
 /* adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido. */
 import * as THREE from 'three';
 import { chaveDoCantoLiso, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
+import { normalizarMaterial, normalizarMateriais } from './material-da-receita.js';
 import { triangularConvexa, triangularSemDegenerado } from '../../procedural/nucleo/triangulacao-face.js';
 
 const COR_PADRAO = '#77817d';
@@ -38,25 +39,33 @@ export function idsDeOrigem(atributo) {
   return Array.from({ length: atributo.count }, (_, i) => idDeOrigem(atributo, i));
 }
 
-function materialDaFace(face, materiais) {
-  const definicao = face.material ? materiais[face.material] ?? {} : {};
+const MATERIAL_SEM_DECLARACAO = normalizarMaterial('(sem declaração)');
+
+/* O MATERIAL DA FACE sai do catálogo já NORMALIZADO (`normalizarMateriais`), que recusa campo desconhecido e dá os padrões; aqui só
+   se traduz o que a cena já usa (cor, aspereza, metalicidade, emissivo, transparência e opacidade). Os campos novos (verniz,
+   transmissão, índice de refração, tom do vidro, flocos e relevo) seguem em `declarado`, guardados, e ainda não mudam a cena: a
+   tradução para o material físico é a fatia 2 do plano de materiais realistas. Por isso `chave` não os inclui; quando a tradução
+   entrar, eles entram na chave, para duas declarações que diferem só no verniz não virarem o mesmo material. */
+export function materialDaFace(face, catalogo) {
+  const definicao = face.material && Object.hasOwn(catalogo, face.material) ? catalogo[face.material] : MATERIAL_SEM_DECLARACAO;
   const cor = definicao.cor ?? face.cor ?? COR_PADRAO;
   const transparente = definicao.mistura === 'transparente';
   return {
     chave: JSON.stringify([
       cor,
-      definicao.aspereza ?? 0.68,
-      definicao.metalicidade ?? 0.12,
-      definicao.emissivo ?? 0,
+      definicao.aspereza,
+      definicao.metalicidade,
+      definicao.emissivo,
       transparente,
-      definicao.opacidade ?? (transparente ? 0.58 : 1),
+      definicao.opacidade,
     ]),
     cor,
-    aspereza: definicao.aspereza ?? 0.68,
-    metalicidade: definicao.metalicidade ?? 0.12,
-    emissivo: definicao.emissivo ?? 0,
+    aspereza: definicao.aspereza,
+    metalicidade: definicao.metalicidade,
+    emissivo: definicao.emissivo,
     transparente,
-    opacidade: definicao.opacidade ?? (transparente ? 0.58 : 1),
+    opacidade: definicao.opacidade,
+    declarado: definicao,
   };
 }
 
@@ -328,6 +337,7 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
   raiz.name = nome;
   raiz.userData = { tipo: 'peca-procedural', nome };
 
+  const catalogo = normalizarMateriais(materiais);
   const preparo = prepararFaces(neutro);
   const suaves = normaisSuaves(neutro, preparo);
   const grupos = new Map();
@@ -335,7 +345,7 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
   for (const face of [...neutro.F.values()].sort((a, b) => a.id - b.id)) {
     if (!face.parte) facesSemParte.push(face.id);
     const parte = face.parte || 'estrutura-sem-nome';
-    const material = materialDaFace(face, materiais);
+    const material = materialDaFace(face, catalogo);
     const chave = `${parte}\u0000${material.chave}`;
     let lote = grupos.get(chave);
     if (!lote) {
