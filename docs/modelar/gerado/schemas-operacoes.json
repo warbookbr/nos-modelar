@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:524f6d0c052c90832557939d73819054dad6230163e0bf4223ec2a9c40abc543",
+  "assinatura": "sha256:87eaaef255764e14a15d642d973357cdb8d12455744a4f395c2bf1cff9a94039",
   "total": 40,
   "operacoes": [
     {
@@ -827,7 +827,8 @@
         "limites": [
           "Sem arestas, só a costura côncava; classe sem aresta grita e diz qual classe existe.",
           "Costura entre faces planas: prismas em meia-esquadria. Costura sobre superfície curva facetada: arredondamento por fatias, que termina onde o encontro fica plano e recusa quina da própria costura nas classes novas.",
-          "Onde três arestas do mesmo tipo se encontram a ponta fica reta."
+          "Onde três arestas do mesmo tipo se encontram a ponta fica reta.",
+          "Arredondamento côncavo (modo curvo) que chega à borda de uma face plana que limita o sólido (a tampa de um tubo rente à parede de outro, com o plano deixando o sólido todo de um lado): o raio cai de forma contínua até o maior que cabe antes da borda, ignorando raioMinimo, e o arredondamento some nela, sem aresta aguda nem fatia no plano da face; abaixo de 5% do raio a estação sai. O resultado traz o aviso faceLimite em neutro.avisos."
         ],
         "diagnosticos": []
       }
