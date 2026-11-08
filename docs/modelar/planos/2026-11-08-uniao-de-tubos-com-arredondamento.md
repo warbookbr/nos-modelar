@@ -2,12 +2,18 @@
 
 **Estado:** ativo
 
-**Território:** `tools/fixtures/uniao-de-tubos/`
+**Território:** `tools/fixtures/uniao-de-tubos/`, `procedural/nucleo/operacoes/booleanas.js`
 
 **Responsável:** Tiago (aprovação por imagem) e a IA da sessão do furgão (implementação); a sessão do braço refaz o cotovelo
 pelo plano dela com o que este entregar.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-08.
+
+A fatia 1 (2026-11-08) fez a peça de prova com `unir` e `arredondarCostura` como estão: a base sai redonda e inteira sobre o
+disco, a parede é vertical, o arredondamento de 10 mm faz a frente de baixo limpo e para antes da base, e a régua de vinco
+oculto não acha nada. Sobra um entalhe na ponta de trás, onde o tubo deitado acaba rente às costas do tubo em pé e o
+arredondamento chega ao plano da tampa em fatias degeneradas (2 dobras de 100° e 107°). A pessoa passou `booleanas.js` a este
+plano para a correção, vindo do plano do braço.
 
 ## Problema observado
 
