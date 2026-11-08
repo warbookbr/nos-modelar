@@ -17,6 +17,14 @@ frente do tubo em pé vira rampa e mostra o topo do disco, o que o cotovelo repr
 fatiada na horizontal, com o tubo em pé redondo em cada laço. A régua acusa 14 dobras nos refletores do furgão, que são
 facetas aprovadas: ela fica como aviso até haver um jeito de a peça declarar a dobra intencional.
 
+A fatia 3 (2026-11-08) fez a peça fatiada na horizontal (`tubos-fatiados.js`): a base sai redonda e inteira sobre o disco,
+com a parede vertical, e o campo novo `une` costura os pontos coincidentes não consecutivos, de modo que o tubo deitado nasce
+exato no fundo dele. A junção abaixo do tubo deitado ficou com uma faixa ondulada (1 dobra, 66 marcas de até 2,4 mm), e três
+variantes de planos não a tiraram; a tentativa parou como combinado com a pessoa, e a saída para a forma do cotovelo passa a
+ser a união de dois sólidos com filete, fora deste plano. Junto entrou a régua `tools/modelar/vinco-oculto.mjs`, que acha vinco
+e chanfro não declarados e desenha os achados numa imagem: ela pega a faixa da peça fatiada e a aba de hoje, fica quieta nas
+peças boas e aponta 33 bordas de lataria no furgão, que ficam para a pessoa; não vai a gate.
+
 ## Problema observado
 
 O cotovelo do braço (`procedural/pecas/braco-robotico/partes/cotovelo/receita.js`, 2026-11-08) é um tubo em pé cruzado no alto
@@ -68,7 +76,7 @@ recusa diz o trecho, os laços e o que falta. A medida da dobra: ENVOLVER o `des
 
 1. A peça de prova que reproduz a aba com a técnica de hoje, e a medida da dobra que a reprova (feita).
 2. O trecho que encolhe e o vinco que esvai, com a peça de prova refeita por eles (feita).
-3. A mesma peça fatiada na horizontal, com a base redonda inteira sobre o disco e a parede vertical até o tubo deitado.
+3. A mesma peça fatiada na horizontal, com a costura `une` e a régua de vinco oculto (feita; a junção não chegou ao nível da fatiada em x).
 4. A tampa com laço côncavo, e a dobra intencional declarada pela peça, para a régua passar a aviso no `descrever`.
 5. Fechamento, com aviso à sessão do braço.
 
