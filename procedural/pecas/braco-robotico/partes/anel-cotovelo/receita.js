@@ -19,7 +19,7 @@
 
 export const TABELA = {
   raio: 78,
-  altura: 48,
+  altura: 25,
   /* Acabamento, escolhido pelo modelador. */
   chanfro: 2,
   suaveDoChanfro: 0.8,
@@ -76,7 +76,7 @@ const receita = {
     referencias: ['../../referencias/lateral.prancha.png', '../../referencias/cotovelo-opcao3.png'],
     escala: { medida: 'diâmetro do colar, igual ao da coluna', milimetros: 156 },
     partes: [
-      { nome: 'anel', forma: 'anel reto de revolução escuro, 156 mm de diâmetro e 48 mm de altura, perpendicular à coluna, uma faixa só, bordas com chanfro estreito de 2 mm de bordas suavizadas', tecnica: 'revolução com perfil' },
+      { nome: 'anel', forma: 'anel reto de revolução escuro, 156 mm de diâmetro e 25 mm de altura, como o anel da cintura, perpendicular à coluna, uma faixa só, bordas com chanfro estreito de 2 mm de bordas suavizadas', tecnica: 'revolução com perfil' },
     ],
     criteriosDeReprovacao: [
       'colar inclinado em relação à coluna',
