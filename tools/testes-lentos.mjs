@@ -17,6 +17,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 export const TESTES_LENTOS = [
   'tools/modelar/guardas/etapas-do-acervo.test.mjs',
   'tools/fixtures/solido-por-lacos/solido-por-lacos.test.ts',
+  'tools/fixtures/solido-por-lacos/tubos.test.ts',
   'tools/fixtures/aberturas-em-teste/chapa-grande.test.ts',
   'tools/fixtures/aberturas-em-teste/vizinhanca.test.ts',
   'procedural/nucleo/operacoes/abertura-por-contorno.test.ts',
