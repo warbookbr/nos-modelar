@@ -1,7 +1,6 @@
 /* material-fisico.test.js — a tradução do material normalizado para o material do Three.js (fatia 2 do plano de materiais realistas):
  * o material físico só nasce quando a declaração traz campo físico novo, e cada campo vai para a propriedade certa. */
 import { describe, expect, it } from 'vitest';
-import * as THREE from 'three';
 import { adaptarThree, pedeMaterialFisico, propriedadesFisicas, ESPESSURA_DO_VIDRO, DISTANCIA_DE_ATENUACAO_DO_VIDRO } from './adaptar-three.js';
 import { normalizarMaterial } from './material-da-receita.js';
 import { executarReceita } from './executar-receita.js';
@@ -30,7 +29,7 @@ describe('os campos vão para as propriedades certas', () => {
       verniz: 0.7, asperezaDoVerniz: 0.12, transmissao: 0.9, indiceDeRefracao: 1.45, tomDoVidro: '#a8cdbd',
     }));
     expect(p).toMatchObject({ clearcoat: 0.7, clearcoatRoughness: 0.12, transmission: 0.9, ior: 1.45 });
-    expect(p.attenuationColor.getHexString()).toBe(new THREE.Color('#a8cdbd').getHexString());
+    expect(p.attenuationColor.getHexString()).toBe('a8cdbd');
     expect(p.thickness).toBe(ESPESSURA_DO_VIDRO);
     expect(p.attenuationDistance).toBe(DISTANCIA_DE_ATENUACAO_DO_VIDRO);
   });
