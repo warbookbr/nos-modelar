@@ -82,7 +82,7 @@ import { derivar } from './receita/gaiola.js';
 import { contornoPorRetos, derivarFarois, derivarGrade, derivarLanternas, derivarLuzesDeCanto, derivarPiscasLaterais, raiosDoContorno } from './receita/farol.js';
 import { derivarInterior } from './receita/interior.js';
 import { derivarLuzesPorDentro } from './receita/luzes.js';
-import { BASE_DAS_RODAS, comBase, familias } from './receita/rodas.js';
+import { BASE_DAS_RODAS, comBase, familias, materiaisDoPneu } from './receita/rodas.js';
 import {
   ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, AROS, CRISTAIS, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
@@ -106,6 +106,11 @@ export const TABELA = {
   bitola: 1730, // a face de fora do pneu fica em x 982,5, 37,5 mm para dentro da lateral (17,5 até 2026-11-06: a bitola não mudou com a largura, porque o arco não pede)
   pneu_diametro: 710,
   pneu_largura: 235,
+  // a forma do pneu (2026-11-08): 112 lados em volta (a silhueta de 96 lados ainda mostrava a faceta de perto), o ombro em arco de três segmentos no lugar do chanfro
+  // reto, e o ângulo da normal suave do pneu, que apaga os gomos do arco (30 graus cada) e da parede do bojo (33) sem alisar a quina dos sulcos (90)
+  pneu_lados: 112,
+  pneu_ombro_redondo: 1,
+  pneu_liso_angulo: 35,
   arco_raio: 420,
   // a roda da família `roda-pneu`: o perfil dela (pneu com bojo, ombro e quatro sulcos ao longo da volta, roda de chapa de aço com 5 parafusos e 5 furos de
   // ventilação) e o assento do aro de 16 polegadas; o diâmetro e a largura do pneu são os da prancha (710 e 235), e não os 712 do perfil
@@ -455,7 +460,7 @@ export function gerarPassos(T) {
     const sel = { origem: { op: 'subdivisao', id: 50 + k } };
     passos.push(['subdivisao', { origemId: 50 + k, vertices: pl.vertices, faces: pl.faces, vincos: pl.vincos, cantos: pl.cantos, borda: 'cantos', niveis: T.niveis, espessura: m(T.plastico_espessura) }]);
     passos.push(['parte', { nome: pl.nome, sel }]);
-    passos.push(['material', { sel, usa: MOLDURAS.includes(pl.nome) ? 'azul' : FORROS.includes(pl.nome) ? 'forro' : 'plastico' }]);
+    passos.push(['material', { sel, usa: FORROS.includes(pl.nome) ? 'forro' : 'plastico' }]);
   });
   vidros.forEach((v, k) => {
     const sel = { origem: { op: 'friso', id: 20 + k } };
@@ -472,7 +477,7 @@ export function gerarPassos(T) {
     const sel = { origem: { op: 'subdivisao', id: 100 + k } };
     passos.push(['subdivisao', { origemId: 100 + k, vertices: c.vertices, faces: c.faces, borda: 'cantos', niveis: T.niveis, espessura: m(T.vidro_espessura) }]);
     passos.push(['parte', { nome: nomeDoCristal(c.nome), sel }]);
-    passos.push(['material', { sel, usa: 'vidro' }]);
+    passos.push(['material', { sel, usa: nomeDoCristal(c.nome).includes('PortaTraseira') ? 'vidroEscuro' : 'vidro' }]);
   });
   vidros.forEach((v, k) => {
     const sel = { origem: { op: 'friso', id: 110 + k } };
@@ -559,7 +564,7 @@ export function gerarPassos(T) {
       passos.push(['lathe', { origemId: 971 + 2 * i, eixo: l.eixo, lados: 24, perfil: l.tampinha.map(([r, a]) => [mm(r), mm(a)]), em }]);
       girar(tampa);
       passos.push(['parte', { nome: l.nome, sel: tampa }]);
-      passos.push(['material', { sel: tampa, usa: 'aco' }]);
+      passos.push(['material', { sel: tampa, usa: 'tampinha' }]);
     }
   });
   /* a grade (2026-11-05): um terceiro vão pelo contorno, sobre a chapa do último farol; a lente escura recua `grade_recuo` para dentro do
@@ -612,7 +617,7 @@ export function gerarPassos(T) {
       }]);
       const lente = { origem: { op: 'aberturaPorContorno', id: ID_LANTERNA(k, i), parte: 'lente' } };
       passos.push(['parte', { nome, sel: aba }]);
-      passos.push(['material', { sel: aba, usa: 'azul' }]);
+      passos.push(['material', { sel: aba, usa: `aba${fx.material[0].toUpperCase()}${fx.material.slice(1)}` }]);
       passos.push(['parte', { nome, sel: lente }]);
       passos.push(['material', { sel: lente, usa: fx.material }]);
     }
@@ -655,13 +660,15 @@ export function gerarPassos(T) {
     for (const passo of daFamilia) {
       const [operacao, argumentos] = comBase(passo, base);
       if (operacao === 'publicarPorta') continue;
-      if (operacao === 'parte') { nomeadas.push(argumentos.sel); passos.push([operacao, { ...argumentos, nome: `${argumentos.nome}${r.sufixo}` }]); continue; }
+      if (operacao === 'parte') { nomeadas.push(argumentos); passos.push([operacao, { ...argumentos, nome: `${argumentos.nome}${r.sufixo}` }]); continue; }
       passos.push([operacao, argumentos]);
     }
-    for (const sel of nomeadas) {
+    /* o pneu leva a banda e o flanco, cada um no seu material, e a roda de aço o aço pintado (o `aco` da família); isto vem antes de girar e transladar, com os ids da família */
+    passos.push(...materiaisDoPneu(nomeadas.find(({ nome }) => nome === 'pneu').sel, base, T));
+    for (const { nome, sel } of nomeadas) {
       if (r.s < 0) passos.push(['rotaciona', { eixo: 'y', graus: 180, pivo: [0, 0, 0], sel }]);
       passos.push(['transladar', { d: r.centro.map(m), sel }]);
-      passos.push(['liso', { angulo: 30, sel }]);
+      passos.push(['liso', { angulo: nome === 'pneu' ? T.pneu_liso_angulo : 30, sel }]);
     }
   });
   return passos;
@@ -789,35 +796,62 @@ export function pontosDeclarados(T = TABELA) {
   ];
 }
 
+/* Os materiais (plano de materiais realistas, 2026-11-08), com os valores que a pessoa aprovou na peça de prova `tools/fixtures/acervo/materiais-de-prova`. A lataria
+   é tinta sólida com verniz no azul de sempre; os vidros claros da frente têm leve tom verde e passam a luz (transmissão); os das portas traseiras são escurecidos; a
+   roda é aço pintado de prata acetinado; o pneu tem a banda com o desenho de costelas e o flanco com as marcações, os dois em borracha preta fosca, no eixo x da roda;
+   as lentes levam prismas nas cores de antes; o refletor é espelhado; a saia, os para-choques e as molduras dos arcos são plástico preto acetinado e granulado. */
+const LENTE_DE_PRISMAS = { tipo: 'prismas', escala: 6, intensidade: 0.5 };
+/* a aba de uma faixa da lanterna na cor da própria lente, opaca e sem relevo (a lente é translúcida, e a aba é a moldura em volta dela) */
+const abaDaLente = (lente) => ({ tipo: 'liso', cor: lente.cor, aspereza: lente.aspereza, metalicidade: 0 });
+const LENTES = {
+  // as lentes das luzes (etapa 6), opacas para o oco do furgão não aparecer por elas
+  // as lentes da frente (etapa 8): a do farol e a da luz de canto transparentes e incolores, a do pisca lateral âmbar translúcida, como os vidros
+  lenteIncolor: { tipo: 'liso', cor: '#eef4f6', mistura: 'transparente', opacidade: 0.2, aspereza: 0.05, metalicidade: 0.1, relevo: LENTE_DE_PRISMAS },
+  lenteAmbar: { tipo: 'liso', cor: '#e08a14', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1, relevo: LENTE_DE_PRISMAS },
+  lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2, relevo: LENTE_DE_PRISMAS },
+  // as faixas da lente da lanterna de trás (etapa 8): lisas e translúcidas, vermelha, incolor e âmbar
+  // a faixa de ré da lanterna: incolor e leitosa, de plástico fosco, para a lente não sumir sem o aro cinza do farol e o refletor aparecer esmaecido por trás
+  lenteLeitosa: { tipo: 'liso', cor: '#e9eceb', mistura: 'transparente', opacidade: 0.7, aspereza: 0.65, metalicidade: 0, relevo: LENTE_DE_PRISMAS },
+  lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1, relevo: LENTE_DE_PRISMAS },
+};
+export const MATERIAIS_DO_FURGAO = {
+  // tinta sólida com verniz: base de aspereza média, verniz inteiro e liso por cima
+  azul: { tipo: 'liso', cor: '#5d75c9', aspereza: 0.5, metalicidade: 0.05, verniz: 1, asperezaDoVerniz: 0.04 },
+  // a borracha de vão em volta dos cristais; o pneu tem os seus (`pneuBanda` e `pneuFlanco`)
+  borracha: { tipo: 'liso', cor: '#26262b' },
+  // aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima; é o `aco` que a família roda-pneu dá ao aro, ao cubo e ao disco
+  aco: { tipo: 'metal', acabamento: 'pintado', cor: '#6f737b', aspereza: 0.32, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },
+  // a tampinha da lâmpada do farol: o aço escovado de antes
+  tampinha: { tipo: 'metal', cor: '#a9adb3', acabamento: 'escovado' },
+  // plástico preto acetinado, entre o fosco e o brilhante, com granulado fino: a saia, os para-choques e as molduras dos arcos
+  plastico: { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35, relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 } },
+  forro: { tipo: 'liso', cor: '#1b1c1f' },
+  // o para-brisa e os vidros da cabine: claros, com leve tom verde, por transmissão
+  vidro: { tipo: 'liso', cor: '#e4f0ee', mistura: 'transparente', opacidade: 0.25, aspereza: 0.03, metalicidade: 0, transmissao: 1, indiceDeRefracao: 1.5, tomDoVidro: '#a8cdbd' },
+  // os vidros das portas de trás: escurecidos (a cor escura da base tinge o que passa)
+  vidroEscuro: { tipo: 'liso', cor: '#1b2530', mistura: 'transparente', opacidade: 0.5, aspereza: 0.03, metalicidade: 0, transmissao: 0.8, indiceDeRefracao: 1.5, tomDoVidro: '#2a3d40' },
+  // o pneu, borracha preta fosca: a banda com o desenho de costelas e o flanco com as marcações em relevo (sem nome de fabricante); o eixo da roda é x
+  pneuBanda: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'bandaDeRodagem', escala: 15, intensidade: 0.8, desenho: 'costelas', eixo: 'x' } },
+  pneuFlanco: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'flanco', escala: 6.5, intensidade: 0.9, eixo: 'x' } },
+  piso: { tipo: 'liso', cor: '#2c2d31' },
+  divisoria: { tipo: 'liso', cor: '#5a5d66' },
+  banco: { tipo: 'liso', cor: '#3d4048' },
+  painelEscuro: { tipo: 'liso', cor: '#26272b' },
+  ...LENTES,
+  abaLenteVermelha: abaDaLente(LENTES.lenteVermelha),
+  abaLenteLeitosa: abaDaLente(LENTES.lenteLeitosa),
+  abaLenteAmbar: abaDaLente(LENTES.lenteAmbar),
+  aroCinza: { tipo: 'liso', cor: '#4a4c52', aspereza: 0.6 },
+  // o refletor, metal espelhado: quase sem aspereza e todo metal
+  refletor: { tipo: 'metal', acabamento: 'pintado', cor: '#e8eaed', aspereza: 0.02, metalicidade: 1 },
+  lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
+  grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
+};
+
 const receita = {
-  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 5: os cristais escurecidos rentes à lataria no para-brisa, nas portas da cabine e nas portas traseiras, a borracha de vão em volta de cada um, o piso, os bancos da cabine, o painel e a divisória; a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia e os para-choques em plástico escuro e o alargamento dos arcos (da cor da lataria em cima, escuro embaixo), por fora da chapa, o forro escuro dos arcos por dentro e as quatro rodas da família roda-pneu (pneu 235/65 aro 16)' },
+  meta: { nome: 'furgao-realista', desc: 'furgão médio de teto alto com cabine de bico curto, etapa 5: os cristais rentes à lataria no para-brisa, nas portas da cabine (claros, de leve tom verde) e nas portas traseiras (escurecidos), a borracha de vão em volta de cada um, o piso, os bancos da cabine, o painel e a divisória; a lataria em chapa contínua com as frestas das portas, o vinco de cintura, as nervuras do teto, as abas dos arcos, o para-brisa envolvente e os vãos dos vidros abertos, a saia e os para-choques em plástico escuro e o alargamento dos arcos (em plástico preto acetinado, junto com a saia e os para-choques), por fora da chapa, o forro escuro dos arcos por dentro e as quatro rodas da família roda-pneu (pneu 235/65 aro 16)' },
   PARAMS: TABELA,
-  MATERIAIS: {
-    azul: { tipo: 'liso', cor: '#5d75c9' },
-    borracha: { tipo: 'liso', cor: '#26262b' },
-    aco: { tipo: 'metal', cor: '#a9adb3', acabamento: 'escovado' },
-    plastico: { tipo: 'liso', cor: '#39393f' },
-    forro: { tipo: 'liso', cor: '#1b1c1f' },
-    // o cristal escurecido, translúcido pela mistura do adaptador (opacidade 0,5) para o interior aparecer; o brilho vem da aspereza baixa e da metalicidade
-    vidro: { tipo: 'liso', cor: '#1b2530', mistura: 'transparente', opacidade: 0.5, aspereza: 0.1, metalicidade: 0.35 },
-    piso: { tipo: 'liso', cor: '#2c2d31' },
-    divisoria: { tipo: 'liso', cor: '#5a5d66' },
-    banco: { tipo: 'liso', cor: '#3d4048' },
-    painelEscuro: { tipo: 'liso', cor: '#26272b' },
-    // as lentes das luzes (etapa 6), opacas para o oco do furgão não aparecer por elas
-    // as lentes da frente (etapa 8): a do farol e a da luz de canto transparentes e incolores, a do pisca lateral âmbar translúcida, como os vidros
-    lenteIncolor: { tipo: 'liso', cor: '#eef4f6', mistura: 'transparente', opacidade: 0.2, aspereza: 0.05, metalicidade: 0.1 },
-    lenteAmbar: { tipo: 'liso', cor: '#e08a14', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1 },
-    aroCinza: { tipo: 'liso', cor: '#4a4c52', aspereza: 0.6 },
-    refletor: { tipo: 'metal', cor: '#d6d9dd', acabamento: 'escovado' },
-    lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
-    lanterna: { tipo: 'liso', cor: '#9a1f1f', aspereza: 0.2 },
-    // as faixas da lente da lanterna de trás (etapa 8): lisas e translúcidas, vermelha, incolor e âmbar; o relevo fica para o plano de material
-    // a faixa de ré da lanterna: incolor e leitosa, de plástico fosco, para a lente não sumir sem o aro cinza do farol e o refletor aparecer esmaecido por trás
-    lenteLeitosa: { tipo: 'liso', cor: '#e9eceb', mistura: 'transparente', opacidade: 0.7, aspereza: 0.65, metalicidade: 0 },
-    lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1 },
-    grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
-  },
+  MATERIAIS: MATERIAIS_DO_FURGAO,
   /* `origem` diz o referencial; os pontos da gaiola, derivados da TABELA atual, entram aqui pelo nome. */
   get TOPO() {
     return {
@@ -858,8 +892,8 @@ const receita = {
       })),
       ...MOLDURAS.map((nome) => ({
         nome,
-        forma: `moldura do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}, na cor da lataria: alargamento de 150 mm que sai 30, cheio até 30 da boca e descendo tangente à chapa; dobra de 10 mm para dentro; pontas horizontais em 463, 580 e 724`,
-        tecnica: 'subdivisao da pele da seção varrida em torno do eixo da roda, com as pontas em altura fixa, engrossada para dentro 2 mm, material da lataria',
+        forma: `moldura do arco ${nome.includes('Dianteiro') ? 'dianteiro' : 'traseiro'} ${nome.endsWith('Esquerdo') ? 'esquerdo' : 'direito'}, em plástico preto acetinado e granulado: alargamento de 150 mm que sai 30, cheio até 30 da boca e descendo tangente à chapa; dobra de 10 mm para dentro; pontas horizontais em 463, 580 e 724`,
+        tecnica: 'subdivisao da pele da seção varrida em torno do eixo da roda, com as pontas em altura fixa, engrossada para dentro 2 mm, material do plástico preto acetinado',
       })),
       {
         nome: 'parachoqueDianteiro',
@@ -878,8 +912,8 @@ const receita = {
       })),
       ...CRISTAIS.map((nome) => ({
         nome,
-        forma: `cristal escurecido e translúcido do vão ${nome === 'vidroParaBrisa' ? 'do para-brisa' : nome.includes('Cabine') ? `da porta da cabine ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}` : `da porta traseira ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}`}: a mesma superfície do vão, rente à lataria, com a volta recuada 7,5 mm da borda e 4 mm de espessura para dentro`,
-        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada pela superfície, material translúcido escuro',
+        forma: `cristal ${nome.includes('PortaTraseira') ? 'escurecido' : 'claro, de leve tom verde,'} do vão ${nome === 'vidroParaBrisa' ? 'do para-brisa' : nome.includes('Cabine') ? `da porta da cabine ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}` : `da porta traseira ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}`}: a mesma superfície do vão, rente à lataria, com a volta recuada 7,5 mm da borda e 4 mm de espessura para dentro`,
+        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada pela superfície, vidro por transmissão (claro com tom verde na frente e na cabine, escurecido nas portas traseiras)',
       })),
       ...BORRACHAS.map((nome, k) => ({
         nome,
@@ -994,8 +1028,8 @@ const receita = {
       ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
         {
           nome: `pneu${sufixo}`,
-          forma: `pneu 235/65 aro 16 da roda ${sufixo.replace(/([A-Z])/g, ' $1').toLowerCase().trim()}: 710 mm de diâmetro e 235 de largura, pneumático com bojo no flanco e ombro chanfrado, na bitola de 1730 e no eixo ${sufixo.startsWith('Dianteiro') ? 'dianteiro' : 'traseiro'}, apoiado no chão`,
-          tecnica: 'família roda-pneu, perfil furgao-235-65-r16: lathe em torno de x da seção do pneu, banda 0 (pneumático), 96 lados, quatro sulcos ao longo da volta subtraídos da banda, sombreamento liso',
+          forma: `pneu 235/65 aro 16 da roda ${sufixo.replace(/([A-Z])/g, ' $1').toLowerCase().trim()}: 710 mm de diâmetro e 235 de largura, pneumático com bojo no flanco e ombro arredondado, na bitola de 1730 e no eixo ${sufixo.startsWith('Dianteiro') ? 'dianteiro' : 'traseiro'}, apoiado no chão`,
+          tecnica: 'família roda-pneu, perfil furgao-235-65-r16: lathe em torno de x, 112 lados, ombro em arco de três segmentos, quatro sulcos subtraídos da banda, sombreamento liso de 35 graus, banda e flanco cada um no seu material com relevo',
         },
         { nome: `aro${sufixo}`, forma: 'barril de aço do aro de 16 polegadas, de 3,6 mm de parede e 70% da largura do pneu, que a banda abraça', tecnica: 'família roda-pneu: lathe em torno de x de um tubo' },
         { nome: `cubo${sufixo}`, forma: 'cubo da roda de chapa, com o furo central de 71 mm e a volta de 5 furos de fixação de 20 mm no círculo de 118', tecnica: 'família roda-pneu: lathe do anel menos o furo central e os cinco furos repetidos em volta do eixo' },
@@ -1033,7 +1067,7 @@ const receita = {
       'aparece marca, logotipo ou nome de fabricante',
       'a saia ou um para-choque não é plástico escuro por fora da chapa com a seção da prancha: saia de 299 a 463 saindo 20, dianteiro saindo 50 em duas alturas, traseiro saindo 110 com o degrau plano em 580',
       'a saia não é cortada pelas frestas: cada porta deve levar o seu trecho de 383 a 463, e ficam presos os 299 a 377 sob as portas e os trechos entre as portas e os arcos, sem trecho preso de 10 mm junto à fresta do arco dianteiro',
-      'a moldura não é da cor da lataria, marca linha na borda de fora (volta à chapa de repente), diminui a boca, não dobra 10 mm para dentro do arco, passa menos de 2 mm acima da aba, ou desce abaixo da ponta vizinha',
+      'a moldura não é do plástico preto da saia e dos para-choques, marca linha na borda de fora (volta à chapa de repente), diminui a boca, não dobra 10 mm para dentro do arco, passa menos de 2 mm acima da aba, ou desce abaixo da ponta vizinha',
       'o alargamento não tem 150 de largura e 30 de saída nos quatro arcos, em volta toda, ou não segue na saia e nos para-choques, com a mesma saída, abaixo das pontas até 299',
       'a continuação escura do alargamento marca emenda com a saia ou com o para-choque, ou há linhas de fresta, emenda de peça ou de cor a menos de 30 mm uma da outra fora dos encontros',
       'a fresta da porta da cabine não corre na borda de fora do alargamento (raio 570, 150 mm da boca) ou corta o alargamento',

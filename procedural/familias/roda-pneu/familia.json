@@ -243,6 +243,22 @@
       "minimo": 0.01,
       "maximo": 0.2,
       "medio": 0.06
+    },
+    "ladosDoPneu": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 96,
+      "minimo": 24,
+      "maximo": 192,
+      "medio": 112
+    },
+    "ombroRedondo": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 1
     }
   },
   "restricoes": [

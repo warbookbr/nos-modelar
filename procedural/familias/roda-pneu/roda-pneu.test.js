@@ -16,7 +16,7 @@ import {
   ALTURA_DO_BOJO, CHANFRO_MAXIMO_DO_OMBRO_MM, ESPESSURA_DO_FRISO, FRACAO_DO_CHANFRO, FRACAO_DO_CHANFRO_DA_RODA_SEM_PNEU, FRACAO_DO_CHANFRO_NA_LARGURA,
   TALUDE_DO_FRISO,
 } from './derivar.js';
-import { DENSIDADE_DO_ACO, LADOS_DA_RODA, LADOS_DO_FURO, LADOS_DO_RAIO, MAXIMO_DE_RAIOS, MINIMO_DE_RAIOS } from './composicoes.js';
+import { DENSIDADE_DO_ACO, LADOS_DA_RODA, LADOS_DO_FURO, LADOS_DO_RAIO, MAXIMO_DE_RAIOS, MINIMO_DE_RAIOS, faixasDoPneu } from './composicoes.js';
 
 const registro = criarRegistroDeFamilias({ familias: [RODA_PNEU] });
 const MATERIAIS = {
@@ -424,6 +424,60 @@ describe('as duas melhorias gerais: os sulcos ao longo da volta da banda e a vol
     expect(v).toMatchObject({ tipo: 0, banda: 0, furosDeFixacao: 5, sulcosCirculares: 4, furosDeVentilacao: 5 });
     const { neutro } = rodar({ perfil: 'furgao-235-65-r16' });
     expect(portasPublicadas(neutro).find(({ id }) => id === 'furos-de-fixacao').interface.centros).toHaveLength(5);
+  });
+});
+
+describe('a forma do pneu: os lados em volta e o ombro redondo', () => {
+  const base = { perfil: 'furgao-235-65-r16', sulcosCirculares: 0, furosDeVentilacao: 0 };
+  const aneis = (neutro, nome) => new Set([...neutro.F.values()].filter((f) => f.parte === nome).flatMap((f) => f.vs).map((v) => {
+    const [, y, z] = neutro.V.get(v);
+    return `${Math.round(Math.hypot(y, z) / MM * 1e3)}|${Math.round(neutro.V.get(v)[0] / MM * 1e3)}`;
+  }));
+
+  it('com 96 lados e sem o ombro redondo a malha é a de antes, e a composição não ganha sufixo', () => {
+    const antes = hash(rodar(base).neutro);
+    expect(hash(rodar({ ...base, ladosDoPneu: 96, ombroRedondo: 0 }).neutro)).toBe(antes);
+    expect(chamar(RODA_PNEU, 'roda', { ...base, ladosDoPneu: 96 }).composicao).toBe('roda-pneu.disco-lisa');
+    expect(chamar(RODA_PNEU, 'roda', { ...base, ombroRedondo: 1 }).composicao).toBe('roda-pneu.disco-lisa-ombro');
+  });
+
+  it('mais lados em volta valem para o pneu e para o aro que ele abraça, e o cubo e a chapa seguem com os 96', () => {
+    const v = completo(base);
+    const { rA, xb, xm, R, ch, flanco } = medidasDoPneu(v);
+    const antes = rodar(base).neutro;
+    const { neutro } = rodar({ ...base, ladosDoPneu: 128 });
+    const faces = (n, nome) => [...n.F.values()].filter((f) => f.parte === nome).length;
+    expect(faces(neutro, 'pneu')).toBe(10 * 128);
+    expect(faces(neutro, 'aro')).toBe(4 * 128);
+    expect(faces(neutro, 'cubo')).toBe(faces(antes, 'cubo'));
+    expect(faces(neutro, 'disco')).toBe(faces(antes, 'disco'));
+    const bojo = rA + ALTURA_DO_BOJO * flanco;
+    const passo = (2 * xm - 2 * ch) / 6;
+    const secao = [[rA, -xb], [bojo, -xm], [R - ch, -xm], [R, -xm + ch], [R, -xm + ch + passo], [R, -xm + ch + 2 * passo], [R, xm - ch], [R - ch, xm], [bojo, xm], [rA, xb]];
+    expect(volumeDaParte(neutro, 'pneu')).toBeCloseTo(volumeDaRevolucao(secao, 128), 0);
+  });
+
+  it('o ombro redondo troca o chanfro por um arco de quarto de círculo em três segmentos: dois anéis a mais por ombro, sobre o círculo do chanfro', () => {
+    const v = completo(base);
+    const { R, xm, ch } = medidasDoPneu(v);
+    const reto = rodar(base).neutro;
+    const { neutro } = rodar({ ...base, ombroRedondo: 1 });
+    expect(neutro.orfaos ?? []).toEqual([]);
+    expect(caixasPorParte(neutro).caixas.get('pneu').corpos).toBe(1);
+    expect(aneis(neutro, 'pneu').size - aneis(reto, 'pneu').size).toBe(4 * 1);
+    const contagem = (n, nome) => [...n.F.values()].filter((f) => f.parte === nome).length;
+    expect(contagem(neutro, 'pneu') - contagem(reto, 'pneu')).toBe(4 * LADOS_DA_RODA);
+    /* os pontos do arco estão a `ch` do centro do arco, que fica em (R - ch, -xm + ch) à esquerda */
+    const noArco = verticesDaParte(neutro, 'pneu').filter(([x, ...yz]) => x < -xm + ch + 1e-6 && Math.hypot(...yz) > R - ch + 1e-6 && Math.hypot(...yz) < R - 1e-6);
+    expect(noArco.length).toBeGreaterThan(0);
+    for (const [x, y, z] of noArco) expect(Math.hypot(x + xm - ch, Math.hypot(y, z) - (R - ch))).toBeCloseTo(ch, 5);
+    /* o volume cresce em relação ao chanfro reto: o arco abaula para fora da corda */
+    expect(volumeDaParte(neutro, 'pneu')).toBeGreaterThan(volumeDaParte(reto, 'pneu'));
+  });
+
+  it('as faixas do pneu: o flanco são cinco segmentos e a banda o resto, com ou sem o ombro redondo', () => {
+    expect(faixasDoPneu()).toEqual({ flancos: [0, 1, 7, 8, 9], banda: [2, 3, 4, 5, 6] });
+    expect(faixasDoPneu({ ombroRedondo: true })).toEqual({ flancos: [0, 1, 11, 12, 13], banda: [2, 3, 4, 5, 6, 7, 8, 9, 10] });
   });
 });
 

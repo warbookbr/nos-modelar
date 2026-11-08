@@ -34,8 +34,13 @@
    `diametroCirculoDeVentilacao / 2`, com o primeiro furo a meio passo de +y (entre dois parafusos, quando as duas contagens
    são iguais). Os dois parâmetros opcionais valem zero por padrão, e com zero a composição é a de antes deles.
 
+   OS LADOS E O OMBRO. `ladosDoPneu` (96 por padrão, como sempre) é o número de lados da revolução do pneu e do aro que ele abraça, para a silhueta
+   de um pneu grande ficar redonda sem mexer no cubo nem na chapa. `ombroRedondo` 1 troca o chanfro reto de cada ombro por um arco de quarto de círculo de raio
+   igual ao chanfro, em três segmentos: os pontos intermediários saem de `derivar` em [raio, x] (E à esquerda, D à direita, 1 e 2 na ordem do perfil). Onde há
+   friso (o lado de -x), o arco não existe e os dois pontos ficam sobre a parede reta, sem mudar a forma. Com 0 e 96 a composição é a de antes.
+
    Puro e determinístico: nenhuma leitura de relógio, de sorteio ou de arquivo. */
-import { escalaresDaRoda, idDaRoda, nomeDoNoDoAro, nomeDoNoDoCubo } from './composicoes.js';
+import { LADOS_DO_PNEU, escalaresDaRoda, idDaRoda, nomeDoNoDoAro, nomeDoNoDoCubo } from './composicoes.js';
 
 const MM = 0.001;
 export const ALTURA_DO_BOJO = 0.35;
@@ -56,6 +61,7 @@ export function derivar({
   paredeDoRaio, cruzamento, alturaDoFriso, sulcos, profundidadeDoSulco, larguraDoSulco,
   sulcosCirculares = 0, larguraDoSulcoCircular = 0, profundidadeDoSulcoCircular = 0,
   furosDeVentilacao = 0, diametroCirculoDeVentilacao = 0, diametroFuroDeVentilacao = 0,
+  ladosDoPneu = LADOS_DO_PNEU, ombroRedondo = 0,
 }) {
   const D = diametroPneu;
   const alturaDoFrisoMm = alturaDoFriso * D;
@@ -169,13 +175,30 @@ export function derivar({
       passoAngularDaVentilacao: 360 / furosDeVentilacao,
     });
   }
-  const argumentos = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada }).map((nome) => [nome, todos[nome]]));
+  const redondo = ombroRedondo > 0;
+  if (redondo) {
+    /* o arco de quarto de círculo de raio `chanfro`, de (raioDoPneu - chanfro, -meiaLargura) a (raioDoPneu, -meiaLargura + chanfro) à esquerda, nos ângulos de 30 e 60 graus */
+    const noArco = (graus, lado) => {
+      const a = (graus * Math.PI) / 180;
+      return [raioDoPneu - chanfro + chanfro * Math.sin(a), lado * (meiaLargura - chanfro + chanfro * Math.cos(a))];
+    };
+    const [e1, e2, d2, d1] = [noArco(30, -1), noArco(60, -1), noArco(30, 1), noArco(60, 1)];
+    /* com friso o lado esquerdo é a parede reta de (raioDoPneu - chanfro) a raioDoFriso em x = -meiaLargura: os dois pontos ficam nela */
+    const naParede = (t) => [raioDoPneu - chanfro + t * (raioDoFriso - (raioDoPneu - chanfro)), -meiaLargura];
+    const [p1, p2] = comFriso ? [naParede(1 / 3), naParede(2 / 3)] : [e1, e2];
+    Object.assign(todos, {
+      raioDoOmbroE1: mm(p1[0]), xDoOmbroE1: mm(p1[1]), raioDoOmbroE2: mm(p2[0]), xDoOmbroE2: mm(p2[1]),
+      raioDoOmbroD1: mm(d1[0]), xDoOmbroD1: mm(d1[1]), raioDoOmbroD2: mm(d2[0]), xDoOmbroD2: mm(d2[1]),
+    });
+  }
+  const argumentos = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo: redondo }).map((nome) => [nome, todos[nome]]));
+  argumentos.ladosDoPneu = ladosDoPneu;
   argumentos.furos = furosDeFixacao;
   argumentos.materialDoPneu = banda === 2 ? 'aco' : 'borracha';
   if (sulcada) argumentos.sulcos = sulcos;
   if (circular) argumentos.sulcosCirculares = sulcosCirculares;
   if (ventilada) argumentos.furosDeVentilacao = furosDeVentilacao;
-  if (tipo === 0) return { composicao: idDaRoda({ tipo, sulcada, circular, ventilada }), argumentos };
+  if (tipo === 0) return { composicao: idDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo: redondo }), argumentos };
 
   /* os raios */
   const maciço = paredeDoRaio === 0;
@@ -193,5 +216,5 @@ export function derivar({
     argumentos[nomeDoNoDoCubo(k)] = noEm(xDoCubo, raioDoNoDoCubo, k * passo);
     argumentos[nomeDoNoDoAro(k)] = noEm(xDoAro, raioDoNoDoAro, k * passo + sentido * cruzamento * passo);
   }
-  return { composicao: idDaRoda({ tipo, raios, maciço, sulcada, circular }), argumentos };
+  return { composicao: idDaRoda({ tipo, raios, maciço, sulcada, circular, ombroRedondo: redondo }), argumentos };
 }
