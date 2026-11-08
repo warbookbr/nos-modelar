@@ -5,7 +5,7 @@
 import { textoDasMedidas } from './cartao-da-selecao.js';
 
 export function montarBarraDeEstado({ elementos, estado, medidasDaPeca, acoes }) {
-  const { barra, selecao: textoSelecao, peca, btnGrade, btnChao, btnAtalhos } = elementos;
+  const { barra, selecao: textoSelecao, peca, btnGrade, btnChao, btnAmbiente, btnAtalhos } = elementos;
   if (!barra) return;
 
   estado.assinar(['selecao', 'partes', 'juntas', 'malhaEmEdicao', 'preferenciasCena', 'atalhos'], (valores, mudadas) => {
@@ -23,5 +23,12 @@ export function montarBarraDeEstado({ elementos, estado, medidasDaPeca, acoes })
 
   btnGrade?.addEventListener('click', () => acoes.alternarPreferenciaCena('grade'));
   btnChao?.addEventListener('click', () => acoes.alternarPreferenciaCena('chao'));
+  /* O AMBIENTE DE REFLEXO gira entre estúdio, céu aberto e nenhum; o botão mostra o que está valendo. */
+  const NOMES_DO_AMBIENTE = { estudio: 'Estúdio', ceu: 'Céu aberto', nenhum: 'Sem ambiente' };
+  const mostrarAmbiente = (nome) => {
+    if (btnAmbiente) btnAmbiente.lastChild.textContent = NOMES_DO_AMBIENTE[nome] ?? nome;
+  };
+  if (btnAmbiente && acoes.ambienteDeReflexo) mostrarAmbiente(acoes.ambienteDeReflexo());
+  btnAmbiente?.addEventListener('click', () => mostrarAmbiente(acoes.girarAmbienteDeReflexo()));
   btnAtalhos?.addEventListener('click', () => acoes.abrirConfiguracoes());
 }

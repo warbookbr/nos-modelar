@@ -8,12 +8,14 @@ import { normalizarMateriais } from '../../../../src/autoria/material-da-receita
 import { listarAcervo, listarParaBancada } from '../../../../src/bancada/acervo-receitas.js';
 
 const malha = () => executarReceita(receita).neutro;
+/* o anteparo é a barra escura atrás do vidro, no mesmo x dele: fica fora da fila das seis peças */
+const ANTEPARO = 'anteparoDoVidro';
 const PARTES = ['placaDeTinta', 'placaDeVidro', 'calotaEspelhada', 'discoDeAcoPintado', 'pneuDeBorracha', 'blocoDePlastico'];
 
 describe('peça de prova dos materiais', () => {
-  it('declara os seis materiais do plano, e o normalizador os aceita', () => {
+  it('declara os seis materiais do plano e o do anteparo do vidro, e o normalizador os aceita', () => {
     expect(Object.keys(MATERIAIS).sort()).toEqual(
-      ['acoPintado', 'borrachaComRelevo', 'metalEspelhado', 'plasticoGranulado', 'tintaComVerniz', 'vidro'],
+      ['acoPintado', 'anteparoDoVidro', 'borrachaComRelevo', 'metalEspelhado', 'plasticoGranulado', 'tintaComVerniz', 'vidro'],
     );
     const n = normalizarMateriais(MATERIAIS);
     expect(n.tintaComVerniz.verniz).toBe(1);
@@ -24,20 +26,20 @@ describe('peça de prova dos materiais', () => {
     expect(n.plasticoGranulado.relevo.tipo).toBe('granulado');
   });
 
-  it('entrega as seis partes, cada uma com seu material, sem órfão nem face sem parte', () => {
+  it('entrega as seis partes e o anteparo, cada uma com seu material, sem órfão nem face sem parte', () => {
     const neutro = malha();
     expect(neutro.orfaos ?? []).toEqual([]);
     const descricao = descreverPeca(neutro);
-    expect(descricao.partes.map((p) => p.nome).sort()).toEqual([...PARTES].sort());
+    expect(descricao.partes.map((p) => p.nome).sort()).toEqual([...PARTES, ANTEPARO].sort());
     expect(descricao.totais.facesSemParte).toBe(0);
     expect(descricao.aparencia.materiais.map((m) => m.nome).sort()).toEqual(Object.keys(MATERIAIS).sort());
   });
 
   it('a cena traz uma malha por material, sem fundir materiais diferentes', () => {
     const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
-    expect([...partes.keys()].sort()).toEqual([...PARTES].sort());
+    expect([...partes.keys()].sort()).toEqual([...PARTES, ANTEPARO].sort());
     const cores = [...partes.values()].map((g) => g.children[0].material.color.getHexString());
-    expect(new Set(cores).size).toBe(6);
+    expect(new Set(cores).size).toBe(7);
   });
 
   it('é determinística: duas execuções dão a mesma malha', () => {

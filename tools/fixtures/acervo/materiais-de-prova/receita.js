@@ -29,6 +29,12 @@ export const TABELA = {
   vidroLargura: 200,
   vidroAltura: 160,
   vidroEspessura: 6,
+  /* o anteparo atrás do vidro: uma barra escura que o vidro deixa ver (largura, altura, espessura, recuo atrás do vidro e deslocamento em x) */
+  anteparoLargura: 70,
+  anteparoAltura: 160,
+  anteparoEspessura: 14,
+  anteparoRecuo: 60,
+  anteparoDeslocamento: 20,
   /* a calota do metal espelhado: raio da borda, altura do domo, e o degrau da borda */
   calotaRaio: 90,
   calotaAltura: 55,
@@ -49,7 +55,7 @@ export const TABELA = {
 };
 
 const COLUNA = { tinta: -2.5, vidro: -1.5, metal: -0.5, aco: 0.5, borracha: 1.5, plastico: 2.5 };
-const ID = { tinta: 10, vidro: 20, metal: 30, aco: 40, borracha: 50, plastico: 60 };
+const ID = { tinta: 10, vidro: 20, anteparo: 25, metal: 30, aco: 40, borracha: 50, plastico: 60 };
 
 export function gerarPassos(t = TABELA) {
   const x = (coluna) => m(COLUNA[coluna] * t.passo);
@@ -83,6 +89,16 @@ export function gerarPassos(t = TABELA) {
     origemId: ID.vidro, larg: m(t.vidroLargura), alt: m(t.vidroAltura), prof: m(t.vidroEspessura), em: [x('vidro'), 0, 0],
   }]);
   parte('placaDeVidro', { origem: { op: 'cubo', id: ID.vidro } }, 'vidro');
+
+  /* o anteparo do vidro: sem ele a placa de vidro só mostra o fundo da bancada, e não há como ver o tom nem a transmissão */
+  passos.push(['cubo', {
+    origemId: ID.anteparo,
+    larg: m(t.anteparoLargura),
+    alt: m(t.anteparoAltura),
+    prof: m(t.anteparoEspessura),
+    em: [x('vidro') + m(t.anteparoDeslocamento), 0, -m(t.anteparoRecuo)],
+  }]);
+  parte('anteparoDoVidro', { origem: { op: 'cubo', id: ID.anteparo } }, 'anteparoDoVidro');
 
   /* metal espelhado: a calota, um domo de revolução com o degrau da borda */
   passos.push(['lathe', {
@@ -152,6 +168,10 @@ export const MATERIAIS = {
     tipo: 'liso', cor: '#e4f0ee', mistura: 'transparente', opacidade: 0.25, aspereza: 0.03, metalicidade: 0,
     transmissao: 1, indiceDeRefracao: 1.5, tomDoVidro: '#a8cdbd',
   },
+  /* o anteparo escuro atrás do vidro: tinta lisa e fosca, só para o vidro ter o que mostrar */
+  anteparoDoVidro: {
+    tipo: 'liso', cor: '#2a2e35', aspereza: 0.7, metalicidade: 0,
+  },
   /* metal espelhado: quase sem aspereza e todo metal */
   metalEspelhado: {
     tipo: 'metal', acabamento: 'pintado', cor: '#d6d9dd', aspereza: 0.04, metalicidade: 1,
@@ -176,7 +196,7 @@ export const receitaMateriaisDeProva = {
     nome: 'Peça de prova dos materiais',
     versao: '1.0.0',
     autor: 'Modelar',
-    desc: 'ensaio dos seis materiais realistas, em fila: tinta com verniz, vidro, metal espelhado, aço pintado, borracha com relevo e plástico granulado; não é conteúdo do acervo',
+    desc: 'ensaio dos seis materiais realistas, em fila (o vidro com uma barra escura atrás): tinta com verniz, vidro, metal espelhado, aço pintado, borracha com relevo e plástico granulado; não é conteúdo do acervo',
   },
   PARAMS: TABELA,
   ALIASES,

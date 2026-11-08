@@ -5,11 +5,13 @@ import { VISTAS_BANCADA } from './estado-bancada.js';
 import { caixaDoVisivel } from './caixa-do-visivel.js';
 import { criarCenarioDoTema, criarFundoEmDegrade } from './cena/cenario-do-tema.js';
 import { criarContornoDaSelecao } from './cena/contorno-da-selecao.js';
+import { AMBIENTE_PADRAO, AMBIENTES, criarAmbientesDeReflexo } from './cena/ambiente-de-reflexo.js';
 
 export { caixaDoVisivel };
 
 const COR_FUNDO = '#dce2df';
 const DURACAO_TRANSICAO = 280;
+const FATOR_DAS_LUZES_COM_AMBIENTE = 0.25;
 
 function suavizar(t) {
   return 1 - (1 - t) ** 3;
@@ -90,7 +92,7 @@ export function posicionarNoEstudio(objeto, { tamanhoMaximo = 3.4, piso = 0.08 }
   objeto.updateMatrixWorld(true);
 }
 
-export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre, aoTerminarCameraLivre } = {}) {
+export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre, aoTerminarCameraLivre, ambienteDeReflexo = AMBIENTE_PADRAO, ambienteDeReflexoFixo = false } = {}) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
@@ -131,7 +133,25 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre,
   grade.material.opacity = 0.34;
   scene.add(grade);
 
-  scene.add(new THREE.HemisphereLight('#ffffff', '#829088', 2.15));
+  /* O AMBIENTE DE REFLEXO (estúdio ou céu aberto, gerados em `cena/ambiente-de-reflexo.js`) vira o mapa de reflexo da cena inteira
+     (PMREM), e é o que o verniz, o vidro e o metal espelhado refletem. A imagem de auditoria (a do crítico e das capturas) segue
+     SEM ambiente, para a nota ficar comparável entre rodadas, a menos que o ambiente tenha sido pedido de forma explícita
+     (`?ambiente=` na URL, `ambienteDeReflexoFixo`). A intensidade é baixa porque as quatro luzes de baixo seguem acesas. */
+  const reflexos = criarAmbientesDeReflexo(renderer);
+  let ambienteEscolhido = AMBIENTES.includes(ambienteDeReflexo) ? ambienteDeReflexo : AMBIENTE_PADRAO;
+  let ambienteFixo = Boolean(ambienteDeReflexoFixo);
+  function aplicarAmbienteDeReflexo() {
+    const nome = auditoria && !ambienteFixo ? 'nenhum' : ambienteEscolhido;
+    scene.environment = reflexos.mapa(nome);
+    scene.environmentIntensity = 1;
+    /* com o ambiente aceso as luzes de baixo descem, para o reflexo e a luz direta não somarem em estouro; sem ambiente valem as de sempre */
+    const fator = nome === 'nenhum' ? 1 : FATOR_DAS_LUZES_COM_AMBIENTE;
+    for (const { luz, base } of luzes) luz.intensity = base * fator;
+  }
+  const luzes = [];
+  const acender = (luz) => { luzes.push({ luz, base: luz.intensity }); scene.add(luz); return luz; };
+
+  acender(new THREE.HemisphereLight('#ffffff', '#829088', 2.15));
 
   const principal = new THREE.DirectionalLight('#fff8ec', 4.4);
   principal.position.set(4.8, 7.2, 5.4);
@@ -142,15 +162,16 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre,
   principal.shadow.camera.top = 5;
   principal.shadow.camera.bottom = -5;
   principal.shadow.bias = -0.00035;
-  scene.add(principal);
+  acender(principal);
 
   const preenchimento = new THREE.DirectionalLight('#c9e2ff', 2.2);
   preenchimento.position.set(-5, 3.4, 4);
-  scene.add(preenchimento);
+  acender(preenchimento);
 
   const recorte = new THREE.DirectionalLight('#d8fff0', 2.7);
   recorte.position.set(-2.5, 5.8, -5);
-  scene.add(recorte);
+  acender(recorte);
+  aplicarAmbienteDeReflexo();
 
   /* O CENÁRIO DO TEMA: a grade que some nas bordas, a sombra suave no chão e o
      contorno da seleção (`cena/cenario-do-tema.js`, `cena/contorno-da-selecao.js`).
@@ -420,6 +441,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre,
     principal.castShadow = !auditoria;
     aplicarVisibilidadeDoCenario();
     scene.background = auditoria ? new THREE.Color('#f2f4f3') : fundoDoTema();
+    aplicarAmbienteDeReflexo();
     return auditoria;
   }
 
@@ -655,6 +677,15 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre,
     },
     preferenciasCena: () => ({ ...preferenciasCena }),
     definirAuditoria,
+    /** O ambiente de reflexo: `estudio`, `ceu` ou `nenhum`. `fixo` o mantém também na imagem de auditoria. */
+    definirAmbienteDeReflexo(nome, { fixo = ambienteFixo } = {}) {
+      if (!AMBIENTES.includes(nome)) throw new Error(`ambiente '${nome}' desconhecido. Aceitos: ${AMBIENTES.join(', ')}.`);
+      ambienteEscolhido = nome;
+      ambienteFixo = Boolean(fixo);
+      aplicarAmbienteDeReflexo();
+      return nome;
+    },
+    ambienteDeReflexo: () => ambienteEscolhido,
     definirCenaDoTema,
     /** O contorno da seleção por cima do quadro: `{ cor, grupos }`, com `grupos()` lido a cada quadro, ou `null`. */
     definirContorno(pedido) { contornoDoTema = pedido ?? null; },
@@ -670,6 +701,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre,
       controls.dispose();
       contorno.destruir();
       degrade?.textura.dispose();
+      reflexos.destruir();
       renderer.dispose();
     },
   };

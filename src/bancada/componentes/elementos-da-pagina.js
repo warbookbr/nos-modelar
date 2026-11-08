@@ -136,6 +136,7 @@ export function lerElementosDaPagina(documento = globalThis.document) {
       peca: id('pecaEstado'),
       btnGrade: id('btnGradeEstado'),
       btnChao: id('btnChaoEstado'),
+      btnAmbiente: id('btnAmbienteEstado'),
       btnAtalhos: id('btnAtalhosEstado'),
     },
     popoverDaCena: { botao: id('btnCena'), caixa: id('popoverCena') },

@@ -4,7 +4,7 @@
  * com a CÓPIA CONGELADA da função de antes do normalizador (`materialDaFaceAntes`, escrita à mão e que não importa nada do
  * normalizador): cada material declarado, mais a face sem declaração, a face que cita nome que a receita não declara e a face
  * com cor própria. O material de cena sai igual (cor, aspereza, metalicidade, emissivo, transparência, opacidade e a chave que
- * agrupa as malhas), então a cena também. Receitas do acervo e peças de ensaio entram todas. */
+ * agrupa as malhas), então a cena também. Receitas do acervo, peças de ensaio e toda receita com `MATERIAIS` em `tools/fixtures/` entram todas. */
 import { readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -67,7 +67,7 @@ function arquivosJs(pasta) {
 
 async function receitasComMateriais() {
   const achadas = [];
-  for (const raiz of ['procedural/pecas', 'tools/fixtures/acervo']) {
+  for (const raiz of ['procedural/pecas', 'tools/fixtures']) {
     for (const arquivo of arquivosJs(join(REPO, raiz))) {
       const modulo = await import(pathToFileURL(arquivo).href);
       const materiais = modulo.MATERIAIS ?? modulo.default?.MATERIAIS;

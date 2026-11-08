@@ -41,10 +41,10 @@ export function idsDeOrigem(atributo) {
 
 const MATERIAL_SEM_DECLARACAO = normalizarMaterial('(sem declaração)');
 
-/* O MATERIAL DA FACE sai do catálogo já NORMALIZADO (`normalizarMateriais`), que recusa campo desconhecido e dá os padrões; aqui só
-   se traduz o que a cena já usa (cor, aspereza, metalicidade, emissivo, transparência e opacidade). Os campos novos (verniz,
-   transmissão, índice de refração, tom do vidro, flocos e relevo) seguem em `declarado`, guardados, e ainda não mudam a cena: a
-   tradução para o material físico é a fatia 2 do plano de materiais realistas. Eles já entram na `chave` que agrupa as malhas,
+/* O MATERIAL DA FACE sai do catálogo já NORMALIZADO (`normalizarMateriais`), que recusa campo desconhecido e dá os padrões; aqui
+   viajam a cor, a aspereza, a metalicidade, o emissivo, a transparência e a opacidade, e `declarado` leva a declaração inteira para
+   `criarMaterial`, que traduz verniz, transmissão, índice de refração e tom do vidro para o material físico (fatia 2 do plano de
+   materiais realistas); flocos e relevo seguem guardados até a fatia 3. Os campos novos já entram na `chave` que agrupa as malhas,
    para duas declarações que diferem só no verniz não virarem a mesma malha; com todos nos padrões, a chave agrupa como antes. */
 export function materialDaFace(face, catalogo) {
   const definicao = face.material && Object.hasOwn(catalogo, face.material) ? catalogo[face.material] : MATERIAL_SEM_DECLARACAO;
@@ -76,9 +76,42 @@ export function materialDaFace(face, catalogo) {
   };
 }
 
+/* O MATERIAL FÍSICO só nasce quando a declaração traz algum campo físico novo fora do padrão: verniz, transmissão, tom do vidro ou
+   índice de refração diferente do vidro comum (1,5). Sem eles o material é o `MeshStandardMaterial` de sempre, com as mesmas
+   propriedades, e a cena das receitas de hoje não muda. `flocos` e `relevo` são da fatia 3 do plano e aqui só ficam guardados.
+   O `tomDoVidro` é a cor que a luz toma ao atravessar 2 cm de vidro (a distância de atenuação), numa chapa de 1 cm de espessura
+   de referência: o tom vale pela metade do caminho, o que dá o leve tom verde do vidro comum sem tingir a vista toda. */
+export const ESPESSURA_DO_VIDRO = 0.01;
+export const DISTANCIA_DE_ATENUACAO_DO_VIDRO = 0.02;
+
+export function pedeMaterialFisico(declarado) {
+  return Boolean(declarado) && (
+    declarado.verniz > 0
+    || declarado.transmissao > 0
+    || declarado.tomDoVidro !== null
+    || declarado.indiceDeRefracao !== 1.5
+  );
+}
+
+/** As propriedades do `MeshPhysicalMaterial` que a declaração pede (campos do Three.js), sem criar o material. */
+export function propriedadesFisicas(declarado) {
+  const propriedades = {
+    clearcoat: declarado.verniz,
+    clearcoatRoughness: declarado.asperezaDoVerniz,
+    transmission: declarado.transmissao,
+    ior: declarado.indiceDeRefracao,
+  };
+  if (declarado.transmissao > 0 || declarado.tomDoVidro !== null) {
+    propriedades.thickness = ESPESSURA_DO_VIDRO;
+    propriedades.attenuationDistance = DISTANCIA_DE_ATENUACAO_DO_VIDRO;
+    if (declarado.tomDoVidro !== null) propriedades.attenuationColor = new THREE.Color(declarado.tomDoVidro);
+  }
+  return propriedades;
+}
+
 function criarMaterial(info) {
   const emissivo = new THREE.Color(info.cor).multiplyScalar(Math.max(0, info.emissivo));
-  return new THREE.MeshStandardMaterial({
+  const base = {
     color: info.cor,
     roughness: info.aspereza,
     metalness: info.metalicidade,
@@ -87,7 +120,12 @@ function criarMaterial(info) {
     transparent: info.transparente,
     opacity: info.opacidade,
     side: THREE.DoubleSide,
-  });
+  };
+  if (!pedeMaterialFisico(info.declarado)) return new THREE.MeshStandardMaterial(base);
+  /* Com transmissão o vidro deixa passar a luz pelo próprio passe do renderizador: a opacidade e a mistura transparente
+     dariam um vidro apagado em cima de um vidro que já transmite. */
+  if (info.declarado.transmissao > 0) { base.transparent = false; base.opacity = 1; base.side = THREE.FrontSide; }
+  return new THREE.MeshPhysicalMaterial({ ...base, ...propriedadesFisicas(info.declarado) });
 }
 
 /* normal do triângulo (a,b,c), NÃO normalizada: o módulo é o dobro da área, e é

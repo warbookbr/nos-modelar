@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1689 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1692 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1744,6 +1744,7 @@
 - `material-da-receita.acervo.test.js` — material-da-receita.acervo.test.js — a prova de que o normalizador não muda a cena de nenhuma receita do acervo.
 - `material-da-receita.js` — material-da-receita.js — o normalizador único do material declarado em `MATERIAIS` da receita.
 - `material-da-receita.test.js` — material-da-receita.test.js — o normalizador do material da receita: recusa o campo que não conhece, confere faixa, dá o padrão e mantém o sentido dos campos…
+- `material-fisico.test.js` — material-fisico.test.js — a tradução do material normalizado para o material do Three.js (fatia 2 do plano de materiais realistas): o material físico só nasc…
 - `medidas-na-blocagem.js` — Medidas do `plano.medidas` do esboço lidas na blocagem do nível zero. O esboço mede cada medida declarada sobre as próprias formas (a caixa que envolve as fo…
 - `medidas-na-blocagem.test.js` — As medidas do plano lidas na blocagem do nível zero, sobre formas resolvidas escritas à mão (sem o módulo do esboço): a caixa de um eixo e a distância entre …
 - `medir-blocagem-nivel-zero.js` — Medida sobre a blocagem N2 de um andaime: compila com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por volume, o volum…
@@ -1817,6 +1818,8 @@
 
 ## src/bancada/cena/
 
+- `ambiente-de-reflexo.js` — ambiente-de-reflexo.js — o ambiente gerado que a bancada usa como mapa de reflexo (PMREM) do verniz, do vidro e do metal.
+- `ambiente-de-reflexo.test.js` — ambiente-de-reflexo.test.js — o ambiente gerado é determinístico e tem o caráter pedido (estúdio e céu aberto).
 - `cenario-do-tema.js` — cenario-do-tema.js — o cenário que um tema pode pedir à cena 3D: a grade que some nas bordas e a sombra suave no chão.
 - `cenario-do-tema.test.js` — cenario-do-tema.test.js — a grade do tema some nas bordas, a sombra só recebe sombra, os dois nascem invisíveis, e o contorno procura a máscara em volta do p…
 - `contorno-da-selecao.js` — contorno-da-selecao.js — o contorno da seleção na borda da peça: uma linha da cor de destaque em volta da silhueta das partes escolhidas, desenhada por cima …
