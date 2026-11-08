@@ -317,6 +317,8 @@ export async function olharBancada({
   modo: modoDeclarado = null,
   projecao: projecaoDeclarada = null,
   explosao: explosaoDeclarada = 0,
+  /* `ambiente`: 'estudio', 'ceu' ou 'nenhum', o ambiente de reflexo da bancada (`?ambiente=`); sem ele vale o padrão da página. */
+  ambiente = null,
   res: resDeclarada = 1280,
   espera: esperaDeclarada = 1200,
   saida: saidaDeclarada = null,
@@ -412,6 +414,9 @@ export async function olharBancada({
     const modo = par ? 'isolar' : (modoDeclarado ?? 'todas');
     const projecao = projecaoDeclarada ?? (revisar || par ? 'ortografica' : 'perspectiva');
     const explosao = Number(explosaoDeclarada ?? 0);
+    if (ambiente !== null && !['estudio', 'ceu', 'nenhum'].includes(ambiente)) {
+      erroDeUso(`--ambiente pede estudio, ceu ou nenhum; veio "${ambiente}".`);
+    }
     /* `--res` aceita LARGURA ou LARGURAxALTURA.
      *
      * A proporção era 16:9 fixa no código, e objeto ALTO gastava o quadro à toa:
@@ -578,7 +583,7 @@ export async function olharBancada({
        da mesma projeção e da mesma explosão reaplica a auditoria, a seleção e o modo pela ponte, como a primeira já fazia por cima
        da URL, e refaz o enquadramento. Qualquer outra diferença abre página nova. */
     const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte;
-    const chaveDaPagina = JSON.stringify({ peca, sessao: sessaoDaCaptura, largura, altura, projecao, explosao });
+    const chaveDaPagina = JSON.stringify({ peca, sessao: sessaoDaCaptura, largura, altura, projecao, explosao, ambiente });
     chaveDaPaginaDaChamada = chaveDaPagina;
     reaproveitavelDaChamada = reaproveitavel;
     let paginaNova = true;
@@ -673,6 +678,7 @@ export async function olharBancada({
       if (projecao === 'ortografica') params.set('projecao', 'ortografica');
       if (modoAlvo !== 'todas') params.set('modo', modoAlvo);
       if (explosao > 0) params.set('explosao', explosao.toFixed(2));
+      if (ambiente) params.set('ambiente', ambiente);
       const query = params.toString();
       return query ? `${base}?${query}` : base;
     };
@@ -1073,7 +1079,7 @@ export async function olharBancada({
 
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
-export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado'];
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente'];
 export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
@@ -1088,6 +1094,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --cores                uma cor por parte
   --corte=<x|y|z>:<mm>   vista de corte: um plano perpendicular ao eixo, na posição em mm do referencial da peça (ex.: z:0); um lado fica translúcido (opacidade 0,15) e o outro, normal e inteiro
   --corte-lado=<mais|menos>  com --corte: o lado do eixo que fica translúcido (padrão mais); não se mistura com --arame, --raio-x, --par nem --analise
+  --ambiente=<estudio|ceu|nenhum>  o ambiente de reflexo da bancada; sem ele vale o padrão da página (a imagem de auditoria sai sem ambiente)
   --selecionadas=<a,b>   partes selecionadas; com --modo e --focar
   --modo=<${MODOS.join('|')}>  com --selecionadas: todas, a seleção no contexto, ou só ela
   --focar                enquadra a câmera nas selecionadas
@@ -1168,7 +1175,7 @@ export function comoCLI(argv) {
     peca: lido.opcao('peca') ?? lido.posicional,
     ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
     vistas: lido.opcao('vistas'), selecionadas: lido.opcao('selecionadas'), par: lido.opcao('par'),
-    modo: lido.opcao('modo'), projecao: lido.opcao('projecao'), explosao: lido.opcao('explosao', '0'),
+    modo: lido.opcao('modo'), projecao: lido.opcao('projecao'), explosao: lido.opcao('explosao', '0'), ambiente: lido.opcao('ambiente') ?? null,
     res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
