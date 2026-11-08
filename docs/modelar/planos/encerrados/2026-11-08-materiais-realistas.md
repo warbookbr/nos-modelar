@@ -1,6 +1,6 @@
 # Materiais realistas e exportação glTF
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `modulos/textura/`, `modulos/exportador-gltf/`, `tools/modelar/exportar-gltf.mjs`, `src/bancada/`, `src/autoria/adaptar-three.js`, `src/autoria/material-da-receita.js`, `tools/fixtures/acervo/materiais-de-prova/`, `src/autoria/descrever-partes.js`, `tools/modelagem/revisao-modelagem.mjs`, `tools/modelar/exportar-obj.mjs`
 
@@ -103,4 +103,15 @@ na exportação, escrito aqui.
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-08, com as quatro fatias aprovadas pela pessoa por imagem. O material da receita tem um normalizador
+único (`src/autoria/material-da-receita.js`) que recusa campo desconhecido e serve à bancada, à revisão e aos exportadores; a
+bancada mostra verniz, transmissão, metal espelhado e relevo sob o estúdio escuro (padrão) e o céu aberto, gerados pelo
+projeto; `modulos/textura/` gera os mapas de relevo e aspereza (prismas, banda de rodagem em costelas ou v, letras, flanco,
+granulado e flocos), aplicados pela coordenada que o próprio `relevo` declara; e `npm run exportar:gltf -- <peça>` grava um
+`.glb` determinístico que passa no validador oficial sem erro (peça de prova, geladeira e furgão realista) e que o Blender
+importa com verniz, transmissão, IOR e mapas ligados. A imagem de auditoria do crítico segue sem ambiente.
+
+Devolvido ao backlog e a outros planos: a aplicação no furgão, que é a etapa de materiais do plano dele; o arquivo sem
+TANGENT (o validador avisa e cada programa calcula a base da normal à sua maneira); a hierarquia das partes no glTF, que sai
+plana com o pai em `extras.pai`; `semLuz`, `contorno` e `mistura: recorte` fora do glTF; e o que a [ferramenta de
+material](../2026-11-08-ferramenta-de-material.md) propõe para ver, compor e reaproveitar materiais.

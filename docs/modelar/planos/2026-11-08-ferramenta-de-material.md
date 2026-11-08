@@ -2,8 +2,8 @@
 
 **Estado:** rascunho
 
-**Território:** a declarar ao ativar, depois que o plano dos [materiais realistas](2026-11-08-materiais-realistas.md) fechar,
-porque divide com ele `src/autoria/material-da-receita.js`, `modulos/textura/` e `src/bancada/`; a captura toca
+**Território:** a declarar ao ativar; o plano dos [materiais realistas](encerrados/2026-11-08-materiais-realistas.md), que dividia
+com este `src/autoria/material-da-receita.js`, `modulos/textura/` e `src/bancada/`, fechou em 2026-11-08; a captura toca
 `tools/modelar/olhar-bancada.mjs`, hoje do furgão.
 
 **Responsável:** Tiago (aprovação por imagem) e a IA da sessão (implementação)

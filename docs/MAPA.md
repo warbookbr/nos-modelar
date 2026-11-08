@@ -516,7 +516,6 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
-- `2026-11-08-materiais-realistas.md` — Materiais realistas e exportação glTF
 - `2026-11-08-trecho-que-some-entre-lacos.md` — Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -663,6 +662,7 @@
 - `2026-11-05-solido-por-lacos.md` — Sólido por laços — a receita dá o contorno da peça em cada plano, e o núcleo monta a gaiola fechada e a subdivide numa malha só
 - `2026-11-06-abertura-em-qualquer-direcao.md` — Abertura de contorno em qualquer direção — o vão que dobra a quina sai inteiro, e os limites da operação ficam medidos
 - `2026-11-06-abertura-so-na-vizinhanca.md` — Abertura só na vizinhança do vão — o corte de um vão na chapa sem refazer a chapa inteira
+- `2026-11-08-materiais-realistas.md` — Materiais realistas e exportação glTF
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
