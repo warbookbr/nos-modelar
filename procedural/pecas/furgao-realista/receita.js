@@ -816,7 +816,7 @@ const LENTES = {
 };
 export const MATERIAIS_DO_FURGAO = {
   // tinta sólida com verniz: base de aspereza média, verniz inteiro e liso por cima
-  azul: { tipo: 'liso', cor: '#5d75c9', aspereza: 0.5, metalicidade: 0.05, verniz: 1, asperezaDoVerniz: 0.04 },
+  azul: { tipo: 'liso', cor: '#3350b0', aspereza: 0.5, metalicidade: 0.05, verniz: 1, asperezaDoVerniz: 0.04 },
   // a borracha de vão em volta dos cristais; o pneu tem os seus (`pneuBanda` e `pneuFlanco`)
   borracha: { tipo: 'liso', cor: '#26262b' },
   // aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima; é o `aco` que a família roda-pneu dá ao aro, ao cubo e ao disco
@@ -828,11 +828,11 @@ export const MATERIAIS_DO_FURGAO = {
   forro: { tipo: 'liso', cor: '#1b1c1f' },
   // o para-brisa e os vidros da cabine: claros, com leve tom verde, por transmissão
   vidro: { tipo: 'liso', cor: '#e4f0ee', mistura: 'transparente', opacidade: 0.25, aspereza: 0.03, metalicidade: 0, transmissao: 1, indiceDeRefracao: 1.5, tomDoVidro: '#a8cdbd' },
-  // os vidros das portas de trás: escurecidos (a cor escura da base tinge o que passa)
-  vidroEscuro: { tipo: 'liso', cor: '#1b2530', mistura: 'transparente', opacidade: 0.5, aspereza: 0.03, metalicidade: 0, transmissao: 0.8, indiceDeRefracao: 1.5, tomDoVidro: '#2a3d40' },
-  // o pneu, borracha preta fosca: a banda com o desenho de costelas e o flanco com as marcações em relevo (sem nome de fabricante); o eixo da roda é x
+  // os vidros das portas de trás: escuros como insulfilm: opacos, com verniz para o reflexo (com transmissão, mesmo baixa, o fundo claro da bancada aparecia através deles)
+  vidroEscuro: { tipo: 'liso', cor: '#010203', aspereza: 0.5, metalicidade: 0, verniz: 0.25, asperezaDoVerniz: 0.08, indiceDeRefracao: 1.5 },
+  // o pneu, borracha preta fosca: a banda com o desenho de costelas e o flanco com as marcações em relevo (sem nome de fabricante), a medida principal com 18 mm de altura; o eixo da roda é x
   pneuBanda: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'bandaDeRodagem', escala: 15, intensidade: 0.8, desenho: 'costelas', eixo: 'x' } },
-  pneuFlanco: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'flanco', escala: 6.5, intensidade: 0.9, eixo: 'x' } },
+  pneuFlanco: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'flanco', escala: 18, intensidade: 1, eixo: 'x' } },
   piso: { tipo: 'liso', cor: '#2c2d31' },
   divisoria: { tipo: 'liso', cor: '#5a5d66' },
   banco: { tipo: 'liso', cor: '#3d4048' },
