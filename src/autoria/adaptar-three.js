@@ -44,8 +44,8 @@ const MATERIAL_SEM_DECLARACAO = normalizarMaterial('(sem declaração)');
 /* O MATERIAL DA FACE sai do catálogo já NORMALIZADO (`normalizarMateriais`), que recusa campo desconhecido e dá os padrões; aqui só
    se traduz o que a cena já usa (cor, aspereza, metalicidade, emissivo, transparência e opacidade). Os campos novos (verniz,
    transmissão, índice de refração, tom do vidro, flocos e relevo) seguem em `declarado`, guardados, e ainda não mudam a cena: a
-   tradução para o material físico é a fatia 2 do plano de materiais realistas. Por isso `chave` não os inclui; quando a tradução
-   entrar, eles entram na chave, para duas declarações que diferem só no verniz não virarem o mesmo material. */
+   tradução para o material físico é a fatia 2 do plano de materiais realistas. Eles já entram na `chave` que agrupa as malhas,
+   para duas declarações que diferem só no verniz não virarem a mesma malha; com todos nos padrões, a chave agrupa como antes. */
 export function materialDaFace(face, catalogo) {
   const definicao = face.material && Object.hasOwn(catalogo, face.material) ? catalogo[face.material] : MATERIAL_SEM_DECLARACAO;
   const cor = definicao.cor ?? face.cor ?? COR_PADRAO;
@@ -58,6 +58,13 @@ export function materialDaFace(face, catalogo) {
       definicao.emissivo,
       transparente,
       definicao.opacidade,
+      definicao.verniz,
+      definicao.asperezaDoVerniz,
+      definicao.transmissao,
+      definicao.indiceDeRefracao,
+      definicao.tomDoVidro,
+      definicao.flocos,
+      definicao.relevo,
     ]),
     cor,
     aspereza: definicao.aspereza,

@@ -61,6 +61,14 @@ export const CAMPOS = Object.freeze({
 
 export const CAMPOS_ACEITOS = Object.freeze(Object.keys(CAMPOS));
 
+/* OS CAMPOS QUE A REVISÃO PERSISTE: os oito que a revisão já gravava, na mesma ordem, e os sete novos. Persistem-se só os
+   declarados (campo ausente não entra), então a revisão já gravada, sem campo novo, segue idêntica. Os campos da textura (tipo,
+   acabamento, brilho, desgaste e afins) seguem fora da revisão, como sempre estiveram: incluí-los mudaria as revisões gravadas. */
+export const CAMPOS_DA_APARENCIA = Object.freeze([
+  'cor', 'emissivo', 'aspereza', 'metalicidade', 'semLuz', 'contorno', 'mistura', 'opacidade',
+  'verniz', 'asperezaDoVerniz', 'transmissao', 'indiceDeRefracao', 'tomDoVidro', 'flocos', 'relevo',
+]);
+
 /* O relevo é um objeto declarado por tipo. A escala é o período do padrão em milímetro (o passo do prisma, o passo do desenho da
    banda, a altura da letra, o grão); o padrão de cada tipo é o de uma peça de tamanho de carro. A intensidade é a profundidade
    relativa, de 0 (liso) a 1 (a mais funda que o mapa suporta). */

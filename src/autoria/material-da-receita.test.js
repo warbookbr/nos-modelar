@@ -142,3 +142,18 @@ describe('normalizarMaterial — os campos de hoje ficam como estavam', () => {
     expect(() => normalizarMateriais({ a: { cor: '#111111' }, b: { cro: '#222222' } })).toThrow("material 'b': campo 'cro'");
   });
 });
+
+describe('a chave que agrupa as malhas', () => {
+  it('separa dois materiais que diferem só no verniz, ou só no relevo, e funde os iguais', async () => {
+    const { materialDaFace } = await import('./adaptar-three.js');
+    const catalogo = normalizarMateriais({
+      a: { cor: '#112233' }, b: { cor: '#112233', verniz: 1 }, c: { cor: '#112233' },
+      d: { cor: '#112233', relevo: { tipo: 'granulado' } }, e: { cor: '#112233', relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 } },
+    });
+    const chave = (material) => materialDaFace({ material }, catalogo).chave;
+    expect(chave('a')).toBe(chave('c'));
+    expect(chave('a')).not.toBe(chave('b'));
+    expect(chave('a')).not.toBe(chave('d'));
+    expect(chave('d')).toBe(chave('e'));
+  });
+});

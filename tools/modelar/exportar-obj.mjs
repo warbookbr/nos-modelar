@@ -4,6 +4,7 @@ import { basename, dirname, extname, isAbsolute, join, relative, resolve } from 
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { exportarObj, resolverEscalaPadrao, validarMalhaObj, validarOpcoes } from '../../modulos/exportador-obj/src/index.js';
 import { separarCorpos } from '../../modulos/exportador-cad/src/separar-corpos.js';
+import { normalizarMaterial } from '../../src/autoria/material-da-receita.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita } from './importar-receita.mjs';
 
@@ -37,28 +38,27 @@ export async function carregarModuloTextura(caminho = CAMINHO_MODULO_TEXTURA) {
   return modulo;
 }
 
-const TIPOS_DE_TEXTURA = ['madeira', 'metal', 'tecido', 'liso'];
-
 /* O módulo de textura recebe a especificação do material ({ tipo, cor: [r, g, b], ... }), e a receita do acervo guarda o material por
    nome, com `tipo` e `cor` em hexadecimal em MATERIAIS. Sem `tipo` declarado, o nome decide: o que cita metal, aço ou cromo vira
    `metal`, madeira vira `madeira`, tecido ou pano vira `tecido`, e o resto vira `liso`. */
 export function especificacaoDeTextura(nome, entrada = {}) {
-  const { tipo: tipoDeclarado, cor, metalicidade, aspereza, brilho, ...resto } = entrada;
-  let tipo = tipoDeclarado;
+  /* A declaração passa antes pelo normalizador único (campo desconhecido, faixa e tipo recusados com o nome do material); daqui
+     só se lê o que o módulo de textura usa, e só o que a receita declarou, para a especificação de hoje não ganhar campo. */
+  const material = normalizarMaterial(nome, entrada);
+  const declarado = (campo) => entrada[campo] !== undefined;
+  let tipo = material.tipo;
   if (!tipo) {
     const n = nome.toLowerCase();
     tipo = /madeira|vime/.test(n) ? 'madeira' : /tecido|pano|estofado/.test(n) ? 'tecido' : /metal|inox|cromo|ferro|^aco/.test(n) ? 'metal' : 'liso';
   }
-  if (!TIPOS_DE_TEXTURA.includes(tipo)) throw new Error(`material '${nome}': tipo '${tipo}' desconhecido (esperado ${TIPOS_DE_TEXTURA.join(', ')}).`);
   let rgb = [128, 128, 128];
-  if (typeof cor === 'string' && /^#[0-9a-fA-F]{6}$/.test(cor)) rgb = [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16));
-  else if (Array.isArray(cor) && cor.length === 3) rgb = cor;
-  const extras = {};
-  for (const campo of ['desgaste', 'veio', 'borda', 'tabuas', 'ferrugem', 'manchas', 'rasgos', 'acabamento']) if (resto[campo] !== undefined) extras[campo] = resto[campo];
-  if (brilho !== undefined) {
-    if (typeof brilho !== 'number' || !Number.isFinite(brilho) || brilho < 0 || brilho > 1) throw new Error(`material '${nome}': brilho precisa ser número entre 0 e 1 (recebido ${JSON.stringify(brilho)}).`);
-    extras.brilho = brilho;
+  if (material.cor) {
+    const hex = material.cor.length === 4 ? [...material.cor.slice(1)].map((c) => c + c).join('') : material.cor.slice(1);
+    rgb = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
   }
+  const extras = {};
+  for (const campo of ['desgaste', 'veio', 'borda', 'tabuas', 'ferrugem', 'manchas', 'rasgos', 'acabamento']) if (declarado(campo)) extras[campo] = material[campo];
+  if (declarado('brilho')) extras.brilho = material.brilho;
   return { tipo, cor: rgb, ...extras };
 }
 

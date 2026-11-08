@@ -79,6 +79,7 @@
    pior que nome nenhum; aqui a coluna se chama `origem` porque é exatamente
    uma origem, a mesma de `sel:{origem}` e de `origemId`. */
 
+import { CAMPOS_DA_APARENCIA, normalizarMaterial } from './material-da-receita.js';
 import { sha256Hex } from './assinatura-geometria.js';
 import { auditarParDeSolidos, exigirMemoriaDoNeutro, prepararSolido, solidoEmMemoria } from './contato-de-solidos.js';
 
@@ -596,7 +597,7 @@ function selecionarNomes(partes, filtro, quem) {
    antigas não a declaram e continuam com a aparência persistida que já tinham;
    quando presente, porém, ela precisa entrar na descrição para que trocar
    metal por plástico seja observável pela assinatura/diff. */
-const PROPRIEDADES_DE_MATERIAL = ['cor', 'emissivo', 'aspereza', 'metalicidade', 'semLuz', 'contorno', 'mistura', 'opacidade'];
+const PROPRIEDADES_DE_MATERIAL = CAMPOS_DA_APARENCIA;
 
 /* A revisão não precisa nem pode guardar uma face por id. Ela guarda a
    DISTRIBUIÇÃO de acabamentos dentro de cada parte semântica: material
@@ -631,7 +632,11 @@ function propriedadesPersistiveisDoMaterial(material, nome, quem) {
   for (const chave of PROPRIEDADES_DE_MATERIAL) {
     if (!Object.hasOwn(material, chave)) continue;
     const valor = material[chave];
-    if (chave === 'cor' || chave === 'mistura') {
+    if (chave === 'relevo') {
+      /* o relevo persiste completo (tipo, escala e intensidade já com os padrões do tipo), para declarar só o tipo e declarar o
+         padrão por extenso serem a mesma revisão */
+      propriedades.relevo = { ...normalizarMaterial(nome, { relevo: valor }).relevo };
+    } else if (chave === 'cor' || chave === 'mistura' || chave === 'tomDoVidro') {
       if (typeof valor !== 'string' || valor === '') throw new Error(`${quem}: material '${nome}.${chave}' precisa ser texto não vazio.`);
       propriedades[chave] = valor;
     } else if (chave === 'semLuz') {

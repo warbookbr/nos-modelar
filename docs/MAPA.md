@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1686 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1689 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2086,6 +2086,11 @@
 - `vinco-e-borda.js` — vinco-e-borda.js — peça de teste do plano da abertura em qualquer direção: o contorno que cruza um vinco vivo e o que passa perto da borda da chapa.
 - `vizinhanca.test.ts` — vizinhanca.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o trecho da chapa…
 
+## tools/fixtures/acervo/materiais-de-prova/
+
+- `receita.js` — materiais-de-prova/receita.js — a peça de prova dos materiais realistas (plano 2026-11-08-materiais-realistas).
+- `receita.test.mjs` — receita.test.mjs — a peça de prova dos materiais declara os seis materiais do plano, passa pelo normalizador e abre na bancada.
+
 ## tools/fixtures/acervo/peca-de-prova/
 
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
@@ -2465,6 +2470,7 @@
 - `descrever-montagem-persistida.mjs` — descrever-montagem-persistida.mjs — CLI confinada do contexto JSON para IA.
 - `descrever-montagem-persistida.test.ts` — Prova a CLI confinada que descreve montagem persistida arbitrária em JSON.
 - `descrever-montagem.mjs` — descrever-montagem.mjs — lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. Não abre renderizador, não aplica pose e não conhece automóve…
+- `descrever-partes-materiais.test.mjs` — descrever-partes-materiais.test.mjs — a revisão persiste os campos novos do material (verniz, transmissão, relevo e os demais) e as revisões já gravadas segu…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.

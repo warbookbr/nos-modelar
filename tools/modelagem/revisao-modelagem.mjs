@@ -8,6 +8,7 @@
  * enquadramento sempre produzem exatamente o mesmo JSON.
  */
 import { createHash } from 'node:crypto';
+import { CAMPOS_DA_APARENCIA } from '../../src/autoria/material-da-receita.js';
 import { compararIntencoes, normalizarIntencaoPeca } from '../../src/autoria/intencao-peca.js';
 
 export const FORMATO_REVISAO = 'mecanifica.revisao-modelagem';
@@ -252,7 +253,7 @@ function portaLegadaDaDescricao(valor, quem, campo) {
 /* Opcional para preservar revisões anteriores que não gravavam metalicidade;
    quando declarada, participa do modelo canônico e portanto da assinatura e
    do diff de aparência. */
-const PROPRIEDADES_MATERIAL = ['cor', 'emissivo', 'aspereza', 'metalicidade', 'semLuz', 'contorno', 'mistura', 'opacidade'];
+const PROPRIEDADES_MATERIAL = CAMPOS_DA_APARENCIA;
 
 function propriedadesMaterial(valor, quem, campo) {
   objeto(valor, quem, campo);
@@ -261,7 +262,15 @@ function propriedadesMaterial(valor, quem, campo) {
   for (const chave of PROPRIEDADES_MATERIAL) {
     if (!Object.hasOwn(valor, chave)) continue;
     const entrada = valor[chave];
-    if (chave === 'cor' || chave === 'mistura') resultado[chave] = texto(entrada, quem, `${campo}.${chave}`);
+    if (chave === 'relevo') {
+      objeto(entrada, quem, `${campo}.relevo`);
+      chavesExatas(entrada, ['tipo', 'escala', 'intensidade'], quem, `${campo}.relevo`);
+      resultado.relevo = {
+        tipo: texto(entrada.tipo, quem, `${campo}.relevo.tipo`),
+        escala: numero(entrada.escala, quem, `${campo}.relevo.escala`),
+        intensidade: numero(entrada.intensidade, quem, `${campo}.relevo.intensidade`),
+      };
+    } else if (chave === 'cor' || chave === 'mistura' || chave === 'tomDoVidro') resultado[chave] = texto(entrada, quem, `${campo}.${chave}`);
     else if (chave === 'semLuz') {
       if (typeof entrada !== 'boolean') erro(quem, `'${campo}.${chave}' precisa ser booleano.`);
       resultado[chave] = entrada;

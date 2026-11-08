@@ -10,6 +10,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { materialDaFace } from './adaptar-three.js';
+import { especificacaoDeTextura } from '../../tools/modelar/exportar-obj.mjs';
 import { normalizarMateriais } from './material-da-receita.js';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -36,6 +37,22 @@ function materialDaFaceAntes(face, materiais) {
     transparente,
     opacidade: definicao.opacidade ?? (transparente ? 0.58 : 1),
   };
+}
+
+/* A especificação de textura de antes do normalizador, congelada (exportar-obj.mjs na main de 2026-11-08). */
+function especificacaoAntes(nome, entrada = {}) {
+  const { tipo: tipoDeclarado, cor, brilho, ...resto } = entrada;
+  let tipo = tipoDeclarado;
+  if (!tipo) {
+    const n = nome.toLowerCase();
+    tipo = /madeira|vime/.test(n) ? 'madeira' : /tecido|pano|estofado/.test(n) ? 'tecido' : /metal|inox|cromo|ferro|^aco/.test(n) ? 'metal' : 'liso';
+  }
+  let rgb = [128, 128, 128];
+  if (typeof cor === 'string' && /^#[0-9a-fA-F]{6}$/.test(cor)) rgb = [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16));
+  const extras = {};
+  for (const campo of ['desgaste', 'veio', 'borda', 'tabuas', 'ferrugem', 'manchas', 'rasgos', 'acabamento']) if (resto[campo] !== undefined) extras[campo] = resto[campo];
+  if (brilho !== undefined) extras.brilho = brilho;
+  return { tipo, cor: rgb, ...extras };
 }
 
 function arquivosJs(pasta) {
@@ -76,9 +93,22 @@ describe('o normalizador sobre o acervo', () => {
         { id: 3, material: 'nome-que-a-receita-nao-declara' },
         ...nomes.flatMap((material) => [{ id: 4, material }, { id: 5, material, cor: '#fedcba' }]),
       ];
+      /* A chave agora inclui os campos novos, então o texto muda; o que não pode mudar é o agrupamento: duas faces têm a mesma chave
+         nova se, e só se, tinham a mesma chave de antes. */
+      const novaDaAntiga = new Map();
+      const antigaDaNova = new Map();
       for (const face of faces) {
-        const { declarado, ...depois } = materialDaFace(face, catalogo);
-        expect(depois, `${arquivo} / ${face.material ?? '(sem material)'}`).toEqual(materialDaFaceAntes(face, declarados));
+        const { declarado, chave, ...depois } = materialDaFace(face, catalogo);
+        const { chave: chaveAntes, ...antes } = materialDaFaceAntes(face, declarados);
+        expect(depois, `${arquivo} / ${face.material ?? '(sem material)'}`).toEqual(antes);
+        expect(novaDaAntiga.get(chaveAntes) ?? chave, `${arquivo} agrupa diferente`).toBe(chave);
+        expect(antigaDaNova.get(chave) ?? chaveAntes, `${arquivo} agrupa diferente`).toBe(chaveAntes);
+        novaDaAntiga.set(chaveAntes, chave);
+        antigaDaNova.set(chave, chaveAntes);
+        comparacoes += 1;
+      }
+      for (const nome of nomes) {
+        expect(especificacaoDeTextura(nome, declarados[nome]), `${arquivo} / ${nome} (textura)`).toEqual(especificacaoAntes(nome, declarados[nome]));
         comparacoes += 1;
       }
       materiais += nomes.length;
