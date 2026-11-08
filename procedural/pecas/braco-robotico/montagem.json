@@ -7,7 +7,8 @@
     { "id": "anelCintura", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-cintura" } },
     { "id": "ombro", "alvo": { "tipo": "peca", "ref": "braco-robotico/ombro" } },
     { "id": "braco", "alvo": { "tipo": "peca", "ref": "braco-robotico/braco" } },
-    { "id": "anelCotovelo", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-cotovelo" } }
+    { "id": "anelCotovelo", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-cotovelo" } },
+    { "id": "cotovelo", "alvo": { "tipo": "peca", "ref": "braco-robotico/cotovelo" } }
   ],
   "relacoes": [
     {
@@ -42,9 +43,20 @@
         "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
         "toleranciaNumerica": 0.000001
       }
+    },
+    {
+      "id": "cotoveloSentaNoColar",
+      "tipo": "assentaAnular",
+      "referencia": { "caminho": ["anelCotovelo"], "porta": "topo" },
+      "movel": { "caminho": ["cotovelo"], "porta": "apoio" },
+      "especificacao": {
+        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
+        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
+        "toleranciaNumerica": 0.000001
+      }
     }
   ],
-  "etapas": ["base", "anelCintura", "ombro", "braco", "anelCotovelo"],
+  "etapas": ["base", "anelCintura", "ombro", "braco", "anelCotovelo", "cotovelo"],
   "vinculos": [
     {
       "id": "anelComORaioDaBase",
@@ -71,6 +83,13 @@
       "id": "colarComORaioDaColuna",
       "alvo": { "instancia": "anelCotovelo", "param": "raio" },
       "de": { "instancia": "braco", "porta": "topo", "medida": "raioExterno" },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "cotoveloComORaioDoColar",
+      "alvo": { "instancia": "cotovelo", "param": "raio" },
+      "de": { "instancia": "anelCotovelo", "porta": "topo", "medida": "raioExterno" },
       "unidade": "mm",
       "acrescimo": 0
     }
@@ -105,6 +124,14 @@
       "instancia": "anelCotovelo",
       "porta": "apoio",
       "em": { "instancia": "braco", "porta": "topo" },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "cotoveloSobreOColar",
+      "instancia": "cotovelo",
+      "porta": "apoio",
+      "em": { "instancia": "anelCotovelo", "porta": "topo" },
       "unidade": "mm",
       "afastamento": 0
     }
