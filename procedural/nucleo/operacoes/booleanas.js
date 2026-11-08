@@ -1482,17 +1482,34 @@ export function criarOperacoesBooleanas(servicos) {
         }
         return adj;
       };
+      /* FACE PLANA QUE LIMITA O SÓLIDO (só no arredondamento que enche, classe côncava de sempre). Onde a superfície que a bola rola acaba numa face
+         plana que dobra mais de 45° (a tampa de um tubo, rente à parede do outro) e o plano dessa face deixa o sólido inteiro de um lado só, o raio
+         não pode passar da borda: o círculo que não cabe tem o raio reduzido de forma contínua, até o maior que cabe, e o arredondamento afina até
+         sumir na borda (`secaoEm`), em vez de cair em passos até o `raioMinimo` e terminar em fatias degeneradas sobre o plano da face. */
+      let locaisDoSolido = null;
+      const planosLimitantes = [];
+      const planoLimitante = (n, X) => {
+        const d = ponto(n, X);
+        const conhecido = planosLimitantes.find((c) => ponto(c.n, n) > 1 - 1e-9 && Math.abs(c.d - d) <= 1e3 * eps);
+        if (conhecido) return conhecido.limita;
+        if (!locaisDoSolido) { const vistos = new Set(); for (const f of faces) for (const v of st.F.get(f).vs) vistos.add(v); locaisDoSolido = [...vistos].map((v) => pl(v)); }
+        const limita = !locaisDoSolido.some((q) => ponto(n, q) - d > 1e3 * eps);
+        planosLimitantes.push({ n, d, limita });
+        return limita;
+      };
       const caminhar = (adj, P, primeiro, comprimento) => {
         const pts = [P, primeiro.p], normais = [primeiro.n];
         let total = tamanho(sub(primeiro.p, P));
+        let naFace = false;
         while (total < comprimento) {
           const cur = pts[pts.length - 1], ant = pts[pts.length - 2];
           const prox = (adj.get(chaveP(cur)) ?? []).filter((o) => tamanho(sub(o.p, ant)) > 1e3 * eps);
           if (prox.length !== 1) break;
+          if (!restrito && sinal > 0 && ponto(prox[0].n, normais[normais.length - 1]) < Math.cos(Math.PI / 4) && planoLimitante(prox[0].n, cur)) naFace = true;
           pts.push(prox[0].p); normais.push(prox[0].n);
           total += tamanho(sub(prox[0].p, cur));
         }
-        return { pts, normais, total };
+        return { pts, normais, total, naFace };
       };
       const maisPerto = (curva, C) => {
         let melhor = null;
@@ -1532,7 +1549,8 @@ export function criarOperacoesBooleanas(servicos) {
         }
       }
       /* Seção num ponto P da costura (local), com a direção u da costura ali. */
-      const secaoComRaio = (P, u, onde, raio) => {
+      let ultimaNaFace = false;
+      const secaoDoRaio = (P, u, onde, raio) => {
         const adj = fatia(P, u);
         const saidas = adj.get(chaveP(P)) ?? [];
         if (saidas.length !== 2) return { pula: true };
@@ -1548,6 +1566,7 @@ export function criarOperacoesBooleanas(servicos) {
         const recuo = raio / Math.tan(theta / 2);
         const comprimento = 3 * recuo + 2 * raio;
         const cA = caminhar(adj, P, A, comprimento), cB = caminhar(adj, P, B, comprimento);
+        ultimaNaFace = cA.naFace || cB.naFace;
         // Newton no plano da fatia
         const e1 = dA, e2 = cruz(u, e1);
         let C = P.map((c, j) => c + b[j] * raio / Math.sin(theta / 2));
@@ -1585,8 +1604,9 @@ export function criarOperacoesBooleanas(servicos) {
            dois segmentos que dobram mais de 45° (a parede de um rebaixo mais
            curta que o raio, e o fundo logo depois), o círculo do Newton
            tangencia outra coisa e o arredondamento sairia errado. */
-        if (restrito) {
+        if (restrito || cA.naFace || cB.naFace) {
           for (const [curva, perto] of [[cA, na], [cB, nb]]) {
+            if (!restrito && !curva.naFace) continue;   // fora das classes novas, só a superfície que chega a uma face plana que limita o sólido
             const seg = (k) => sub(curva.pts[k + 1], curva.pts[k]);
             const cos45 = Math.cos(Math.PI / 4);
             const quina = (k) => ponto(seg(k - 1), seg(k)) < cos45 * tamanho(seg(k - 1)) * tamanho(seg(k));
@@ -1627,13 +1647,34 @@ export function criarOperacoesBooleanas(servicos) {
         return { anel: [Q, ...arco], C: C.map((c, j) => c + centroT[j]) };   // anel local, centro no mundo
       };
 
+      const secaoComRaio = (P, u, onde, raio) => {
+        ultimaNaFace = false;
+        const r = secaoDoRaio(P, u, onde, raio);
+        return r.erro ? { ...r, naFace: ultimaNaFace } : r;
+      };
+
       /* onde o raio pedido não cabe (a tangência passa do fim da superfície,
          ou ela dobra mais de 45° antes dela), com `raioMinimo` o raio LOCAL
          cai em passos de 3/4 até o mínimo, e o tubo afina naquele trecho; sem
          ele a recusa é a de sempre. */
       const reducoes = [];   // as estações em que o raio caiu, para o aviso do passo
+      const aoLimite = [];   // as estações em que o raio caiu até caber antes da borda de uma face plana que limita o sólido
       const secaoEm = (P, u, onde) => {
         const primeira = secaoComRaio(P, u, onde, raio);
+        if (primeira.erro && primeira.naFace) {
+          /* o maior raio que cabe antes da borda da face plana: reduz pela metade até caber e refina por bisseção; sem raio que caiba, a estação sai
+             (a costura chegou à borda) */
+          let bom = null, ruim = raio;
+          for (let r = raio / 2; r >= raio * 1e-3; r /= 2) { const sec = secaoComRaio(P, u, onde, r); if (!sec.erro) { bom = { r, sec }; break; } ruim = r; }
+          if (!bom) return { pula: true };
+          for (let k = 0; k < 14; k++) {
+            const meio = (bom.r + ruim) / 2, sec = secaoComRaio(P, u, onde, meio);
+            if (sec.erro) ruim = meio; else bom = { r: meio, sec };
+          }
+          if (bom.r < raio * 0.05) return { pula: true };   // abaixo de 5% do raio o arredondamento já sumiu: a estação sai, e o tubo termina na anterior
+          aoLimite.push({ onde, raio: bom.r });
+          return bom.sec;
+        }
         if (!primeira.erro || raioMinimo == null) return primeira;
         for (let r = raio * 0.75; ; r *= 0.75) {
           const rr = Math.max(r, raioMinimo);
@@ -1880,7 +1921,7 @@ export function criarOperacoesBooleanas(servicos) {
         }
       }
       if (!cadeias.length) return { vazio: `a costura de ${de.op}:${de.id} não tem aresta ${classes.map((c) => (c === 'concavas' ? 'côncava' : c === 'convexas' ? 'convexa' : 'interna')).join(' nem ')} a arredondar dentro da regiao pedida ou com o raio pedido; confira arestas, regiao e raio` };
-      return { cadeias, centro: centroT, grade: gradeT, reducoes };
+      return { cadeias, centro: centroT, grade: gradeT, reducoes, aoLimite };
     };
 
     /* O RAIO PRECISA CABER: nas duas tampas de cada prisma (já cortadas em
@@ -1952,7 +1993,7 @@ export function criarOperacoesBooleanas(servicos) {
       }
       const cheias = partes.filter((p) => !p.vazio);
       if (!cheias.length) return { erro: partes[0].vazio };
-      return { cadeias: cheias.flatMap((p) => p.cadeias), centro: cheias[0].centro, grade: cheias[0].grade, reducoes: cheias.flatMap((p) => p.reducoes) };
+      return { cadeias: cheias.flatMap((p) => p.cadeias), centro: cheias[0].centro, grade: cheias[0].grade, reducoes: cheias.flatMap((p) => p.reducoes), aoLimite: cheias.flatMap((p) => p.aoLimite ?? []) };
     };
     let curvo = null;
     if (modo === 'curvo') {
@@ -2100,6 +2141,11 @@ export function criarOperacoesBooleanas(servicos) {
       if (!curvo && raioMinimo != null) {
         st.avisos.push({ passo: i, op, ref: 'raioMinimo', raioPedido: raio, raioMinimo, raioMenor: raio, estacoes: 0,
           motivo: `raioMinimo não teve efeito: a costura é plana, cada aresta cabe no raio pedido ${raio} e todas saíram com ele` });
+      }
+      if (curvo?.aoLimite?.length) {
+        const menor = Math.min(...curvo.aoLimite.map((q) => q.raio));
+        st.avisos.push({ passo: i, op, ref: 'faceLimite', raioPedido: raio, raioMenor: menor, estacoes: curvo.aoLimite.length,
+          motivo: `o raio ${raio} passaria da borda de uma face plana que limita o sólido em ${curvo.aoLimite.length} estação(ões) da costura; o raio caiu até o maior que cabe antes da borda (no mínimo ${menor}) e o arredondamento afina até sumir nela` });
       }
       if (curvo?.reducoes?.length) {
         const menor = Math.min(...curvo.reducoes.map((q) => q.raio));
