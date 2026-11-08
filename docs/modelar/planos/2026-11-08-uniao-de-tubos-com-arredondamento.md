@@ -15,6 +15,12 @@ oculto não acha nada. Sobra um entalhe na ponta de trás, onde o tubo deitado a
 arredondamento chega ao plano da tampa em fatias degeneradas (2 dobras de 100° e 107°). A pessoa passou `booleanas.js` a este
 plano para a correção, vindo do plano do braço.
 
+A fatia 2 (2026-11-08) corrigiu a causa em `arredondarCostura`: a bola rolava até a borda de uma face plana que limita o
+sólido sem recusa, e agora o raio afina de forma contínua até sumir antes dessa borda, com o aviso `faceLimite`. A peça de
+prova sai com 0 dobras, 0 vincos e 0 arestas agudas; o ombro, a coluna do braço e a fixture do ombro saem com a malha
+idêntica, e só as rodadas encerradas 09 e 10 do ombro mudaram de hash, sem mudar a contagem de dobras. Fica o calombo de
+0,75 mm nos pontos tangentes laterais, dentro do limite de ondulação de 1,1 mm, onde o fim da cadeia de estações é abrupto.
+
 ## Problema observado
 
 O cotovelo do braço pede o tubo em pé redondo até o colar e cruzado no alto por um tubo deitado que passa 19 mm à frente dele,
