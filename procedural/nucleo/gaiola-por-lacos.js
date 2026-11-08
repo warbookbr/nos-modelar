@@ -16,6 +16,8 @@
  *   vincos: [{ nome, trecho | entre: [a, b] | laco, trechos?, lacos?: [de, ate], nitidez, esvai? }] borda da faixa de um trecho, linha ou
  *     volta de laço; lacos limita o trecho ou o entre a uma faixa de laços; esvai { de, ate, curva? } faz a nitidez do entre cair a zero
  *     entre dois laços. Vinco 'viva' de laço inteiro em dois planos os libera do mínimo.
+ *   une: [[trechoA, trechoB], ...] funde, em cada laço, os pontos dos dois trechos que coincidem, mesmo sem serem vizinhos na volta: a linha
+ *     dobrada sobre si (a ponta fina de um tubo, uma lâmina no meio) fica com um ponto só; recusa trecho que falta e par sem ponto comum.
  *   cantos: [{ entre: [a, b], laco? }] o ponto entre dois trechos fica vivo, em todos os laços ou num só.
  *   medidas: [{ trecho | entre, laco?, peso? }] cota nos pontos marcados; em todos os pontos é recusado.
  *   compensar: true | { trechos, lacos?, pontas? } move os pontos para a superfície limite passar por eles: o arco de r sai com r.
@@ -67,6 +69,13 @@
  * declarada até o laço `de`, a faz cair a zero em `ate` pelo mesmo peso e acaba aí: cada aresta entre dois laços leva a média da nitidez
  * dos dois, e o vinco sai em vários, de nitidez constante cada um (`${nome}_${k}`). A nitidez parte de um número de 0 (exclusive) a 1, e
  * não do 'viva'; a faixa fica dentro dos laços do vinco; o vinco de trecho ou de laço não aceita `esvai`.
+ *
+ * A COSTURA. `une: [[a, b]]` funde, em cada laço, os pontos do trecho a que coincidem com os do trecho b (a distância de TOLERANCIA_DE_FUSAO_MM),
+ * mesmo que os dois não sejam vizinhos na volta: o laço de uma ponta fina de tubo, em que as duas laterais de um ouvido de largura zero ficam uma
+ * sobre a outra, tem então um ponto só por posição, e a malha casa pelos pontos em vez de ter duas folhas soltas. As faces que a costura deixa sobre
+ * os mesmos pontos, uma em cada sentido (a membrana de espessura zero entre o laço fino e o ponto em que ele nasce), saem juntas. A linha em que
+ * o sólido toca a si mesmo dos dois lados deixa quatro faces numa aresta e continua recusada. O par sem nenhum ponto em comum, em laço algum, é
+ * recusado com os dois trechos; sem `une`, nada muda na malha.
  *
  * A TAMPA. A escada liga, no primeiro e no último laço, o ponto j da cadeia A (do fim de `de`, para a frente na volta, até o
  * começo de `ate`) ao ponto j da cadeia B (do começo de `de`, para trás, até o fim de `ate`), e por isso as duas cadeias precisam
@@ -534,6 +543,31 @@ export function gaiolaPorLacos(o = {}) {
     }
     return dono;
   });
+  /* a costura: os pontos de dois trechos que coincidem num laço se fundem, mesmo que os trechos não sejam vizinhos na volta */
+  const costuras = [];
+  if (o.une != null) {
+    if (!Array.isArray(o.une) || !o.une.length) falha('une precisa ser lista não vazia de pares [trechoA, trechoB]');
+    o.une.forEach((par, k) => {
+      const onde = `une[${k}]`;
+      if (!Array.isArray(par) || par.length !== 2 || par[0] === par[1]) falha(`${onde} precisa ser um par de dois trechos diferentes [trechoA, trechoB], e veio ${JSON.stringify(par)}`);
+      const [a, b] = par.map((t) => exigeTrecho(t, onde));
+      const doTrecho = (i) => { const qs = []; for (let q = inicio[i]; ; q = (q + 1) % N) { qs.push(q); if (q === fimDe(i)) break; } return qs; };
+      const qa = doTrecho(a); const qb = doTrecho(b);
+      let uniu = 0;
+      uv.forEach((volta, r) => {
+        const raiz = (x) => { while (rep[r][x] !== x) x = rep[r][x]; return x; };
+        for (const x of qa) for (const y of qb) {
+          if (Math.hypot(volta[x][0] - volta[y][0], volta[x][1] - volta[y][1]) > TOLERANCIA_DE_FUSAO_MM) continue;
+          const ra = raiz(x); const rb = raiz(y);
+          uniu++;
+          if (ra !== rb) rep[r][Math.max(ra, rb)] = Math.min(ra, rb);
+        }
+        for (let q = 0; q < N; q++) rep[r][q] = raiz(q);
+      });
+      if (!uniu) falha(`${onde} une os trechos ${citar(par[0])} e ${citar(par[1])}, mas nenhum ponto de um coincide com um do outro em laço algum (a ${TOLERANCIA_DE_FUSAO_MM} mm); a costura funde pontos que já estão no mesmo lugar, então confira as polilinhas dos dois`);
+      costuras.push([par[0], par[1]]);
+    });
+  }
   const nm = (r, q) => nomeCru(r, rep[r][((q % N) + N) % N]);
 
   const pontosMm = {};
@@ -596,6 +630,19 @@ export function gaiolaPorLacos(o = {}) {
     }
   }
   faces.push(...tampas[0].faces.map((f) => [...f].reverse()), ...tampas[1].faces);
+  /* com costura, a linha dobrada sobre si deixa pares de faces sobre os mesmos pontos, uma em cada sentido: são a membrana de espessura zero
+     dos dois lados da linha, sem volume, e saem juntas */
+  if (costuras.length) {
+    const grupos = new Map();
+    faces.forEach((f, k) => { const c = [...f].sort().join('|'); grupos.set(c, [...(grupos.get(c) ?? []), k]); });
+    const sentidoDe = (f) => { const m = f.indexOf([...f].sort()[0]); return f[(m + 1) % f.length] < f[(m + f.length - 1) % f.length]; };
+    const sai = new Set();
+    for (const ks of grupos.values()) {
+      const mais = ks.filter((k) => sentidoDe(faces[k])); const menos = ks.filter((k) => !sentidoDe(faces[k]));
+      for (let j = 0; j < Math.min(mais.length, menos.length); j++) { sai.add(mais[j]); sai.add(menos[j]); }
+    }
+    if (sai.size) { const ficam = faces.filter((_, k) => !sai.has(k)); faces.length = 0; faces.push(...ficam); }
+  }
 
   /* fechamento: cada aresta em duas faces, uma em cada sentido */
   const sentido = new Map();

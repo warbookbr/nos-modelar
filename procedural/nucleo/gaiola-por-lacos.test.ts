@@ -594,3 +594,26 @@ describe('gaiolaPorLacos: o vizinho que passa da ponta do trecho que encolhe é 
     expect(c.soltas + c.repetidas).toBe(0);
   });
 });
+
+describe('gaiolaPorLacos: a costura de pontos que coincidem sem serem vizinhos (une)', () => {
+  /* a barra de 40 por a: no laço do meio a seção vai a zero e vira uma linha dobrada sobre si, em que `baixo` e `cima` coincidem pontos a pontos */
+  const laco = (em: number, a: number) => ({ em, trechos: { baixo: [[0, 0], [0, 40]], frente: [[0, 40], [a, 40]], cima: [[a, 40], [a, 0]], tras: [[a, 0], [0, 0]] } });
+  const ampulheta = (extra: Record<string, unknown> = {}) => gaiolaPorLacos(barra({
+    trechos: [{ nome: 'baixo', pontos: 5 }, { nome: 'frente', pontos: 2 }, { nome: 'cima', pontos: 5 }, { nome: 'tras', pontos: 2 }],
+    tampa: { de: 'frente', ate: 'tras' },
+    lacos: [laco(0, 30), laco(10, 0), laco(20, 30)], ...extra,
+  }));
+
+  it('sem a costura a linha dobrada tem os pontos em dobro; com ela, a linha em que o sólido toca a si mesmo dos dois lados é recusada, porque a aresta fica com quatro faces', () => {
+    const sem = ampulheta();
+    expect(sem.passo.vertices.filter((v: string) => v.startsWith('barra_l1_')).length).toBeGreaterThan(6);
+    expect(grito(() => ampulheta({ une: [['baixo', 'cima']] }))).toMatch(/a aresta 'barra_l1_\w+'-'barra_l1_\w+' aparece 2 vezes no mesmo sentido/);
+  });
+
+  it('recusa trecho que não existe, par igual, lista vazia e trechos sem ponto em comum', () => {
+    expect(grito(() => ampulheta({ une: [['baixo', 'lado']] }))).toMatch(/une\[0\] cita o trecho 'lado', que não está em trechos/);
+    expect(grito(() => ampulheta({ une: [['baixo', 'baixo']] }))).toMatch(/une\[0\] precisa ser um par de dois trechos diferentes/);
+    expect(grito(() => ampulheta({ une: [] }))).toMatch(/une precisa ser lista não vazia de pares/);
+    expect(grito(() => ampulheta({ une: [['frente', 'tras']] }))).toMatch(/une\[0\] une os trechos 'frente' e 'tras', mas nenhum ponto de um coincide com um do outro/);
+  });
+});

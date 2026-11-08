@@ -28,10 +28,10 @@ describe('tubos fatiados na horizontal', () => {
     expect(g.avisos.filter((a: any) => a.ref === 'facesFinas')).toEqual([]);
   });
 
-  it('a base é o círculo inteiro de raio 76 em y = 0 e 78 acima, e a parede é vertical até o fundo do tubo deitado (y = 39)', () => {
-    const raios = (laco: string) => Object.entries(g.pontosMm).filter(([n]) => n.startsWith(`k_${laco}_`)).map(([, p]: [string, any]) => Math.hypot(p[0], p[2]));
+  it('a base é o círculo inteiro de raio 76 em y = 0 e 78 acima, e a parede é vertical até o fundo do tubo deitado (y = 39), onde o tubo deitado nasce como uma linha', () => {
+    const raios = (laco: string) => Object.entries(g.alvosMm).filter(([n]) => n.startsWith(`k_${laco}_`)).map(([, p]: [string, any]) => Math.hypot(p[0], p[2]));
     const nomes = g.lacos.map((l: any) => l.nome);
-    const abaixo = g.lacos.filter((l: any) => l.em <= 39 + 1e-9).map((l: any) => l.nome);
+    const abaixo = g.lacos.filter((l: any) => l.em < 39 - 1e-9).map((l: any) => l.nome);
     expect(nomes.length).toBeGreaterThan(abaixo.length);
     expect(Math.max(...raios(abaixo[0]))).toBeCloseTo(76, 1);
     for (const l of abaixo.slice(1)) {
@@ -60,7 +60,7 @@ describe('tubos fatiados na horizontal', () => {
     const d = dobraDaReceita(fatiada);
     expect(d.dobras).toBeLessThanOrEqual(1);
     const o = ondulacaoDaReceita(fatiada).superficies[0];
-    expect(o.falhas.length).toBeLessThanOrEqual(80);
+    expect(o.falhas.length).toBeLessThanOrEqual(70);
     expect(o.desvioMm.maximo).toBeLessThan(2.5);
     expect(o.facesViradas).toBeLessThanOrEqual(2);
   }, LENTO);

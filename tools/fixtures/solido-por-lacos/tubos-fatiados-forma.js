@@ -9,7 +9,8 @@
  * (reta, em x = -78), o chanfro, a lateral até o filete, o filete do encontro (um arco de Bézier tangente à lateral e ao círculo), o arco do
  * círculo que passa da lateral, o filete, a lateral até a frente, o chanfro e a tampa da frente (reta, em x = 97), e a volta pelo lado -z. Onde o
  * trecho não existe (a tampa abaixo de y = 39, o arco acima de y = 117) ele é um ponto, e os pontos seguidos que coincidem se fundem. Em
- * y = 195, onde a corda do tubo deitado vai a zero, o laço tem área zero (uma linha), que o ajudante trata como lâmina. */
+ * y = 195, onde a corda do tubo deitado vai a zero, o laço tem área zero (uma linha), que o ajudante trata como lâmina. Em y = 39 o tubo deitado
+ * nasce como uma linha de 19 mm à frente do círculo (o ouvido): as duas laterais e os dois chanfros da frente coincidem, e `une` os funde. */
 import { gaiolaPorLacos } from '../../../procedural/nucleo/gaiola-por-lacos.js';
 
 export const TABELA = {
@@ -22,10 +23,13 @@ export const TABELA = {
   nitidezDoChanfro: 0.8,
   /* a tangente do filete, em mm sobre a lateral e sobre o círculo, no máximo; onde não cabe, o filete encolhe com a sobra */
   tangenteDoFilete: 10,
+  /* e no máximo esta vez a meia largura do tubo deitado no plano, para o filete não ser maior que o ouvido fino do fundo */
+  fileteMaximoPorCorda: 1,
   /* os ângulos (graus, a partir do fundo do tubo deitado) dos planos do tubo deitado: o espaçamento nas pontas passa de 2,5 mm */
   angulos: [0, 15, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 165, 180],
   /* os planos da parede do tubo em pé, de y = 0 (o chanfro) até o fundo do tubo deitado */
   planosDaParede: [0, 2.6, 7, 14, 22, 30, 36],
+  compensar: true,
   niveis: 2,
 };
 
@@ -42,7 +46,7 @@ export function planosDeCorte(t = TABELA) {
   const fundo = eixo - r;
   const lista = t.planosDaParede.map((y, k) => ({ y: y === 0 ? 0 : y, tipo: k === 0 ? 'base' : 'parede' }));
   if (lista[lista.length - 1].y > fundo - 2.5) throw new Error('tubos-fatiados-forma: o último plano da parede fica a menos de 2,5 mm do fundo do tubo deitado');
-  t.angulos.forEach((g, k) => lista.push({ y: eixo - r * Math.cos(rad(g)), tipo: k === 0 ? 'parede' : k === t.angulos.length - 1 ? 'topo' : 'tubo', angulo: g }));
+  t.angulos.forEach((g, k) => lista.push({ y: eixo - r * Math.cos(rad(g)), tipo: k === t.angulos.length - 1 ? 'topo' : 'tubo', angulo: g }));
   return lista;
 }
 
@@ -68,10 +72,11 @@ export function lacoNoPlano(t, { y, tipo }) {
   const salaT = sobreOTubo ? (-dc) - x0 : 0;
   const salaF = sobreOTubo ? x1 - dc : 0;
   const bevT = Math.min(ch, 0.35 * salaT); const bevF = Math.min(ch, 0.35 * salaF);
-  const tlT = temFilete ? Math.max(0, Math.min(t.tangenteDoFilete, 0.55 * (salaT - bevT))) : 0;
-  const tlF = temFilete ? Math.max(0, Math.min(t.tangenteDoFilete, 0.55 * (salaF - bevF))) : 0;
+  const limiteT = Math.min(t.tangenteDoFilete, t.fileteMaximoPorCorda * c);
+  const tlT = temFilete ? Math.max(0, Math.min(limiteT, 0.55 * (salaT - bevT))) : 0;
+  const tlF = temFilete ? Math.max(0, Math.min(limiteT, 0.55 * (salaF - bevF))) : 0;
   const folgaDoArco = temFilete ? Math.max(0, Math.PI - 2 * alfa) : Math.PI;
-  const dAng = temFilete ? Math.min(t.tangenteDoFilete / r, 0.45 * folgaDoArco) : 0;
+  const dAng = temFilete ? Math.min(limiteT / r, 0.45 * folgaDoArco) : 0;
   const tr = {};
   /* sem o retângulo: as pontas dos trechos de tampa, chanfro, lateral e filete são o ponto do círculo em z = 0, atrás e na frente */
   if (!sobreOTubo) {
@@ -117,7 +122,7 @@ export function trechosDaVolta() {
 export function argumentosDaGaiola(t = TABELA) {
   const planos = planosDeCorte(t);
   const lacos = planos.map((p) => lacoNoPlano(t, p));
-  const iFundo = planos.findIndex((p) => p.tipo === 'tubo') - 1;
+  const iFundo = planos.findIndex((p) => p.tipo === 'tubo');
   const nome = (i) => `l${i}`;
   const entre = (a, b) => ({ nome: `${a}_${b}`, entre: [a, b], lacos: [nome(iFundo), 'ultimo'], nitidez: t.nitidezDoChanfro });
   const vincos = [
@@ -125,7 +130,9 @@ export function argumentosDaGaiola(t = TABELA) {
     entre('capTras', 'bevTrasD'), entre('bevTrasD', 'ladoTrasD'), entre('ladoFrenteD', 'bevFrenteD'), entre('bevFrenteD', 'capFrente'),
     entre('capFrente', 'bevFrenteE'), entre('bevFrenteE', 'ladoFrenteE'), entre('ladoTrasE', 'bevTrasE'), entre('bevTrasE', 'capTras'),
   ];
-  return { nome: 'k', eixo: 'y', tampa: { de: 'capTras', ate: 'capFrente' }, trechos: trechosDaVolta(), lacos, vincos };
+  /* em y = 39 o tubo deitado é uma linha: as duas laterais da frente e os dois chanfros coincidem, e a costura os une */
+  const une = [['ladoFrenteD', 'ladoFrenteE'], ['bevFrenteD', 'bevFrenteE']];
+  return { nome: 'k', eixo: 'y', tampa: { de: 'capTras', ate: 'capFrente' }, trechos: trechosDaVolta(), lacos, vincos, une, ...(t.compensar ? { compensar: { trechos: ['arcoD', 'arcoE', 'ladoFrenteD', 'ladoFrenteE', 'ladoTrasD', 'ladoTrasE'], lacos: lacos.slice(2, -2).map((_, k) => `l${k + 2}`) } } : {}) };
 }
 
 export function derivar(t = TABELA, ajudante = gaiolaPorLacos) {
