@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1725 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1729 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2337,6 +2337,16 @@
 ## tools/fixtures/tres-blocos-vinculados/receitas/
 
 - `bloco.js` — bloco.js — o bloco da fixture neutra "três blocos vinculados", nas três variações que ela usa: só pino, furo e pino, e só furo. Um arquivo só gera as três, p…
+
+## tools/fixtures/uniao-de-tubos/
+
+- `medir.mjs` — medir.mjs — as medidas da peça de prova "união de dois tubos" (`receita.js`).
+- `receita.js` — receita.js — a peça de prova do plano "união de dois tubos com arredondamento" (`docs/modelar/planos/2026-11-08-uniao-de-tubos-com-arredondamento.md`): um tu…
+- `uniao-de-tubos.test.ts` — uniao-de-tubos.test.ts — a peça de prova do plano "união de dois tubos com arredondamento" (`receita.js`): dois tubos de 156 mm que se cruzam, unidos por `un…
+
+## tools/fixtures/uniao-de-tubos/referencias/
+
+- `alvo.md` — Alvo da união de dois tubos
 
 ## tools/gates/
 
