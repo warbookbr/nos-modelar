@@ -10,6 +10,8 @@
 
 Em 2026-11-08, na fatia 1, entraram no território a pasta da peça de prova, que segue o padrão dos ensaios em `tools/fixtures/acervo/`, e os três lugares que liam o material com lista própria: a revisão, que só rastreia as oito propriedades antigas, e o exportador OBJ, que passa a usar o normalizador. O adaptador do núcleo, que alimenta a Oficina, fica fora e ignora os campos novos.
 
+A fatia 2 fechou em 2026-11-08 com a pessoa aprovando por imagem a peça de prova: estúdio escuro de faixas recortadas, céu aberto, tinta com verniz, vidro, metal espelhado, borracha e plástico acetinado. O aço pintado ainda lê como plástico claro e passa à fatia 3. A primeira versão saiu com o ambiente de cabeça para baixo (a linha 0 da textura de dados é o nadir), o que deixava o metal cinza e a tinta desbotada; os testes do ambiente passaram a conferir a orientação. A imagem de auditoria do crítico segue sem ambiente, e a opção `--ambiente` da `olhar-bancada.mjs` fica para a etapa de materiais do furgão, que é dona do arquivo.
+
 ## Problema observado
 
 Hoje o material da receita é uma cor com transparência, aspereza e metalicidade, e o módulo de textura gera só a imagem da cor
