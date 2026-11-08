@@ -763,7 +763,7 @@ export function derivar(T) {
         const z = P.get(n)[2];
         if (z <= zNervuraIni + 1 && z >= zNervuraFim - 1) pts.push(n);
       }
-      vincos.push({ nome: `nervura${b}_${s}`, pontos: pts, nitidez: T.nervura_nitidez });
+      vincos.push({ nome: `nervura${b}_${s}`, pontos: pts, nitidez: b === 3 || b === 7 ? T.nervura_nitidez_fundo : T.nervura_nitidez });
     }
   }
 

@@ -260,6 +260,7 @@ export const TABELA = {
   luz_canto_base_razao: 0.62, // a base é curta: 62% do topo
   luz_canto_barriga: 22, // o lado de fora é curvo: no meio ele sai 22 mm além da corda
   luz_canto_raios: [55, 140, 60], // as concordâncias dos três cantos do lado de fora, de baixo para cima
+  luz_canto_segmentos: 6, // segmentos de cada concordância do contorno da luz de canto (o padrão é 4): o aro lia como polígono nos cantos de raio 55 e 140
   luz_canto_profundidade: 38,
   luz_canto_lampada_y: 0.45,
   pisca_lateral_z: [1680, 1830], // atrás da roda dianteira, no paralama, rente à fresta da porta (z 1660) e sobre o arco (a boca dele acaba em y 925)
@@ -278,7 +279,7 @@ export const TABELA = {
   grade_lente_recuo: 3, // a lente da grade entra 3 mm no vão, como a do farol
   grade_recuo: 18, // a lente escura da grade recua 18 mm para dentro do vão, dentro da perna de 20 mm da aba
   grade_barras_y: [850, 928, 1006], // as três barras horizontais
-  grade_barra_largura: 760,
+  grade_barra_largura: 838, // as barras vão de parede a parede do vão (meia largura menos 1), com as pontas dentro da perna da aba: ponta solta a 20 mm da parede deixava sombras em degrau na luz rasante
   grade_barra_altura: 28,
   grade_barra_saliencia: 14, // quanto a barra sai da lente para a frente (sempre atrás da superfície da chapa)
   lanterna_base_y: 760, // as lanternas de trás (2026-11-06, opção 1 do esboço): vãos pelo contorno, vistos pela diagonal da quina; de 760 (2026-11-07: eram 720, mas o piso do interior vai de 735,5 a 755,5 e o refletor de 100 mm não passa por ele) a 1240 mm, 480 de altura para cerca de 300 de largura pela chapa
@@ -344,7 +345,8 @@ export const TABELA = {
   nervura_profundidade: 8,
   nervura_recuo: 150,
   nervura_rampa: 200,
-  nervura_nitidez: 0.7,
+  nervura_nitidez: 0.5, // os ombros do sulco: dobra branda, para a luz rasante ler um canal e não uma fenda
+  nervura_nitidez_fundo: 0, // o fundo do sulco sem vinco: canal arredondado, e não um V
 
   // aba leve dos arcos das rodas: largura no alto do arco e nas pontas, altura sobre a chapa e o comprimento em que afina nas pontas
   aba_arco_largura: 32,
@@ -523,7 +525,7 @@ export function gerarPassos(T) {
   const perfilDoAro = [[-1, -T.farol_aro_fundo], [1, -T.farol_aro_fundo], [1, 0.15 * T.farol_aro_altura], [0.67, T.farol_aro_altura], [-0.67, T.farol_aro_altura], [-1, 0.15 * T.farol_aro_altura]]
     .map(([u, v]) => [m(u * T.farol_aro_meia_largura), m(v)]);
   farois.forEach((fa, k) => abrir(ID_FAROL(k), fa.farol, fa.raios, 'z'));
-  luzesDeCanto.forEach((lc, k) => abrir(ID_LUZ_CANTO(k), lc.contorno, lc.raios, lc.vista));
+  luzesDeCanto.forEach((lc, k) => abrir(ID_LUZ_CANTO(k), lc.contorno, lc.raios, lc.vista, { segmentosArco: T.luz_canto_segmentos }));
   piscasLaterais.forEach((pl, k) => abrir(ID_PISCA_LATERAL(k), pl.contorno, pl.raios, pl.vista));
   farois.forEach((fa, k) => {
     abaELente(ID_FAROL(k), ID_ABA_FAROL(k), `farol${fa.lado}`, `abaVaoFarol${fa.lado}`, 'lenteIncolor');
