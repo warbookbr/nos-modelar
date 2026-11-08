@@ -6,7 +6,7 @@ import { normalizarPlanoDeModelagem } from './plano-de-modelagem.js';
 
 const PARTES = ['refletor', 'carroceria'];
 const MOTIVO = 'facetas do refletor aprovadas de propósito';
-const aceita = { parte: 'refletor', motivo: MOTIVO };
+const aceita = { parte: 'refletor', motivo: MOTIVO, regiao: { min: [-50, -50, -50], max: [50, 50, 50] } };
 const recusa = (valor) => { try { normalizarDobrasAceitas(valor, PARTES); } catch (e) { return e.message; } throw new Error('não recusou'); };
 
 const PLANO = {
@@ -30,7 +30,8 @@ describe('PLANO.dobrasAceitas: o normalizador', () => {
   it('recusa lista vazia, parte fora do plano, motivo curto, região sem volume, tipo desconhecido, chave alheia e item repetido', () => {
     expect(recusa([])).toMatch(/lista não vazia/);
     expect(recusa([{ ...aceita, parte: 'farol' }])).toMatch(/'dobrasAceitas\[0\]\.parte' cita "farol", que não está em 'partes' do plano \(refletor, carroceria\)/);
-    expect(recusa([{ parte: 'refletor', motivo: 'ok' }])).toMatch(/motivo' precisa dizer, em pelo menos 15 caracteres/);
+    expect(recusa([{ ...aceita, motivo: 'ok' }])).toMatch(/motivo' precisa dizer, em pelo menos 15 caracteres/);
+    expect(recusa([{ parte: 'refletor', motivo: MOTIVO }])).toMatch(/'dobrasAceitas\[0\]\.regiao' é obrigatória/);
     expect(recusa([{ ...aceita, regiao: { min: [0, 0, 0], max: [0, 5, 5] } }])).toMatch(/min não menor que max em algum eixo/);
     expect(recusa([{ ...aceita, regiao: { min: [0, 0], max: [1, 1, 1] } }])).toMatch(/precisa ser \[x, y, z\]/);
     expect(recusa([{ ...aceita, tipos: ['quina'] }])).toMatch(/traz "quina"; os tipos são dobra, vinco, chanfro/);
@@ -51,7 +52,7 @@ describe('PLANO.dobrasAceitas: o normalizador', () => {
 
 describe('PLANO.dobrasAceitas: o que a aceitação cobre', () => {
   const lista = normalizarDobrasAceitas([
-    { parte: 'refletor', motivo: MOTIVO },
+    { parte: 'refletor', motivo: MOTIVO, regiao: { min: [800, -10, -10], max: [1000, 10, 10] } },
     { parte: 'carroceria', tipos: ['vinco'], regiao: { min: [0, 0, 0], max: [100, 100, 100] }, motivo: 'a quina do para-choque é desenho' },
   ], PARTES);
 
@@ -65,7 +66,7 @@ describe('PLANO.dobrasAceitas: o que a aceitação cobre', () => {
   });
 
   it('separa os achados em aceitos, com o motivo, e restantes; e uma receita sem o campo não aceita nada', () => {
-    const achados = [{ tipo: 'dobra', parte: 'refletor', posicaoMm: [0, 0, 0] }, { tipo: 'dobra', parte: 'carroceria', posicaoMm: [0, 0, 0] }];
+    const achados = [{ tipo: 'dobra', parte: 'refletor', posicaoMm: [900, 0, 0] }, { tipo: 'dobra', parte: 'carroceria', posicaoMm: [0, 0, 0] }];
     const { aceitos, restantes } = separarAceitos(lista, achados);
     expect(aceitos).toEqual([{ ...achados[0], motivo: MOTIVO }]);
     expect(restantes).toEqual([achados[1]]);

@@ -5,11 +5,11 @@
  * uma lataria que se dobra sem vinco de gaiola. A receita as aceita em `PLANO.dobrasAceitas`, ao lado de `criteriosDeReprovacao`, e as réguas deixam de
  * contá-las e as listam como aceitas, com o motivo, para ninguém ter de reler a malha para saber o que foi aceito.
  *
- * O CAMPO. `PLANO.dobrasAceitas: [{ parte, motivo, regiao?, tipos? }]`:
+ * O CAMPO. `PLANO.dobrasAceitas: [{ parte, motivo, regiao, tipos? }]`:
  *  - `parte`: o nome de uma parte do plano. O achado vale quando a parte dele é essa (ou uma das que ele junta, `a+b`).
  *  - `motivo`: por que a feição é desenho, em pelo menos 15 caracteres, como o motivo de contato. Campo livre que aceita "ok" é campo que some.
- *  - `regiao`: `{ min: [x, y, z], max: [x, y, z] }`, em milímetro, no referencial da peça; sem ela, vale a parte inteira. O achado vale quando a posição
- *    dele cai dentro da caixa. Prefira a região: declarar a parte inteira aceita também o defeito que aparecer nela depois.
+ *  - `regiao`: `{ min: [x, y, z], max: [x, y, z] }`, obrigatória, em milímetro, no referencial da peça. O achado vale quando a posição dele cai dentro
+ *    da caixa. Aceitar a parte inteira esconderia também o defeito que aparecesse nela depois (decisão da pessoa, 2026-11-08).
  *  - `tipos`: subconjunto de 'dobra', 'vinco' e 'chanfro'; sem ele, os três.
  * O normalizador recusa: lista vazia ou com mais de 64 itens; parte que não está em `partes` do plano; motivo curto, longo, ou com UUID ou caminho
  * absoluto; região com os dois cantos iguais ou invertidos, ou com número que não é finito; tipo desconhecido ou repetido; chave que não é uma
@@ -17,8 +17,8 @@
  *
  * COMO O FURGÃO O DECLARARIA (a receita dele é de outro plano; isto é só o formato). Os refletores do farol e da lanterna têm facetas aprovadas:
  *   dobrasAceitas: [
- *     { parte: 'refletorFarolEsquerdo', tipos: ['dobra', 'vinco'], motivo: 'facetas do refletor, aprovadas pela pessoa em 2026-11-07' },
- *     { parte: 'refletorFarolDireito', tipos: ['dobra', 'vinco'], motivo: 'facetas do refletor, aprovadas pela pessoa em 2026-11-07' },
+ *     { parte: 'refletorFarolEsquerdo', tipos: ['dobra', 'vinco'], regiao: { min: [460, 840, 2600], max: [870, 1080, 2750] }, motivo: 'facetas do refletor, aprovadas pela pessoa em 2026-11-07' },
+ *     { parte: 'refletorFarolDireito', tipos: ['dobra', 'vinco'], regiao: { min: [-870, 840, 2600], max: [-460, 1080, 2750] }, motivo: 'facetas do refletor, aprovadas pela pessoa em 2026-11-07' },
  *     { parte: 'parachoqueDianteiro', tipos: ['vinco'], regiao: { min: [-1100, 280, 2300], max: [1100, 520, 2800] }, motivo: 'a quina do para-choque é desenho' },
  *   ] */
 
@@ -45,11 +45,11 @@ function canto(valor, quem, campo) {
 export function normalizarDobrasAceitas(valor, nomesDasPartes, { quem = 'PLANO' } = {}) {
   const campo = 'dobrasAceitas';
   if (!Array.isArray(valor) || valor.length === 0 || valor.length > LIMITE_LISTA) {
-    falhar(quem, `'${campo}' precisa ser lista não vazia com no máximo ${LIMITE_LISTA} itens, cada um { parte, motivo, regiao?, tipos? }.`);
+    falhar(quem, `'${campo}' precisa ser lista não vazia com no máximo ${LIMITE_LISTA} itens, cada um { parte, motivo, regiao, tipos? }.`);
   }
   const itens = valor.map((item, i) => {
     const onde = `${campo}[${i}]`;
-    if (!item || typeof item !== 'object' || Array.isArray(item)) falhar(quem, `'${onde}' precisa ser objeto { parte, motivo, regiao?, tipos? }.`);
+    if (!item || typeof item !== 'object' || Array.isArray(item)) falhar(quem, `'${onde}' precisa ser objeto { parte, motivo, regiao, tipos? }.`);
     const alheia = Object.keys(item).find((c) => !CAMPOS_DA_ACEITACAO.includes(c));
     if (alheia) falhar(quem, `'${onde}.${alheia}' não é permitido; use ${CAMPOS_DA_ACEITACAO.join(', ')}.`);
     if (typeof item.parte !== 'string' || !nomesDasPartes.includes(item.parte.trim())) {
@@ -60,7 +60,8 @@ export function normalizarDobrasAceitas(valor, nomesDasPartes, { quem = 'PLANO' 
     if (motivo.length > LIMITE_TEXTO) falhar(quem, `'${onde}.motivo' excede ${LIMITE_TEXTO} caracteres.`);
     if (UUID.test(motivo) || ABSOLUTO.test(motivo)) falhar(quem, `'${onde}.motivo' não pode conter UUID, caminho absoluto ou binário local.`);
     const aceita = { parte: item.parte.trim(), motivo };
-    if (item.regiao !== undefined) {
+    if (item.regiao === undefined) falhar(quem, `'${onde}.regiao' é obrigatória: a caixa { min: [x, y, z], max: [x, y, z] } em mm onde a feição é de propósito; aceitar a parte inteira esconderia o defeito que aparecesse nela depois.`);
+    {
       if (!item.regiao || typeof item.regiao !== 'object' || Array.isArray(item.regiao) || Object.keys(item.regiao).some((c) => c !== 'min' && c !== 'max')) {
         falhar(quem, `'${onde}.regiao' precisa ser { min: [x, y, z], max: [x, y, z] }.`);
       }
