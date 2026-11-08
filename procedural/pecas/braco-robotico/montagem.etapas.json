@@ -200,6 +200,15 @@
       "estado": "fixa",
       "juntas": [],
       "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024",
+      "aceite": {
+        "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -215,16 +224,56 @@
           },
           "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015"
         }
+      ]
+    },
+    {
+      "instancia": "anelCotovelo",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "anelCotoveloSentaNaColuna",
+          "com": "braco",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.009999999999999995,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.01,
+              "maximo": 0.01,
+              "nominal": 0.01,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
       ],
-      "aceite": {
-        "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
-        ],
-        "analise": "ausente"
-      }
+      "forma": "sha256:09e2ed296a6b9abe49d87fafbd08a962c3cec3d6550791a6fc79ffbbeff4fca3"
     }
   ]
 }
