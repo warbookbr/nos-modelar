@@ -12,6 +12,8 @@ Em 2026-11-08, na fatia 1, entraram no território a pasta da peça de prova, qu
 
 A fatia 2 fechou em 2026-11-08 com a pessoa aprovando por imagem a peça de prova: estúdio escuro de faixas recortadas, céu aberto, tinta com verniz, vidro, metal espelhado, borracha e plástico acetinado. O aço pintado ainda lê como plástico claro e passa à fatia 3. A primeira versão saiu com o ambiente de cabeça para baixo (a linha 0 da textura de dados é o nadir), o que deixava o metal cinza e a tinta desbotada; os testes do ambiente passaram a conferir a orientação. A imagem de auditoria do crítico segue sem ambiente, e a opção `--ambiente` da `olhar-bancada.mjs` fica para a etapa de materiais do furgão, que é dona do arquivo.
 
+A fatia 3 fechou em 2026-11-08 com a pessoa aprovando por imagem os prismas da lente, o granulado, a banda de rodagem no desenho `costelas` (o `v` fica como opção) e o relevo `flanco` (medida numa linha, duas vezes na volta, textos genéricos menores, anéis, faixa serrilhada e grão fino), e o aço pintado acertado. O adaptador não gerava coordenada de textura, e a pessoa escolheu a projeção declarada no próprio `relevo` (`projecao` plana, cilíndrica ou caixa, e `eixo`), calculada por uma função pura em `src/autoria/coordenada-de-textura.js` que o exportador glTF vai usar igual. Nenhuma peça do acervo usa relevo, e a cena delas segue idêntica.
+
 ## Problema observado
 
 Hoje o material da receita é uma cor com transparência, aspereza e metalicidade, e o módulo de textura gera só a imagem da cor
