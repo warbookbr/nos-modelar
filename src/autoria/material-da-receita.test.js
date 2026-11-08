@@ -70,7 +70,7 @@ describe('normalizarMaterial — faixas', () => {
     for (const tipo of TIPOS_DE_RELEVO) {
       const { escala, intensidade } = RELEVOS[tipo];
       expect(normalizarMaterial('m', { relevo: { tipo, escala: escala.min, intensidade: 1 } }).relevo)
-        .toEqual({ tipo, escala: escala.min, intensidade: 1, projecao: RELEVOS[tipo].projecao, eixo: 'y' });
+        .toEqual({ tipo, escala: escala.min, intensidade: 1, projecao: RELEVOS[tipo].projecao, eixo: 'y', ...(tipo === 'bandaDeRodagem' ? { desenho: 'costelas' } : {}) });
       expect(() => normalizarMaterial('m', { relevo: { tipo, escala: escala.max * 2 } }), `${tipo} escala`).toThrow('relevo.escala');
       expect(() => normalizarMaterial('m', { relevo: { tipo, escala: escala.min / 2 } }), `${tipo} escala baixa`).toThrow('relevo.escala');
       expect(() => normalizarMaterial('m', { relevo: { tipo, intensidade: intensidade.max + 0.1 } }), `${tipo} intensidade`).toThrow('relevo.intensidade');
@@ -104,7 +104,7 @@ describe('normalizarMaterial — valores padrão', () => {
   it('o relevo declarado só pelo tipo toma escala e intensidade do tipo', () => {
     for (const tipo of TIPOS_DE_RELEVO) {
       expect(normalizarMaterial('m', { relevo: { tipo } }).relevo).toEqual({
-        tipo, escala: RELEVOS[tipo].escala.padrao, intensidade: RELEVOS[tipo].intensidade.padrao, projecao: RELEVOS[tipo].projecao, eixo: 'y',
+        tipo, escala: RELEVOS[tipo].escala.padrao, intensidade: RELEVOS[tipo].intensidade.padrao, projecao: RELEVOS[tipo].projecao, eixo: 'y', ...(tipo === 'bandaDeRodagem' ? { desenho: 'costelas' } : {}),
       });
     }
   });

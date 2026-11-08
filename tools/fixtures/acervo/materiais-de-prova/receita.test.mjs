@@ -79,22 +79,41 @@ describe('peça de prova dos materiais', () => {
     }
   });
 
-  it('a banda do pneu recebe uma faixa contínua: v ao longo da altura e u dando a volta em tiles inteiros', () => {
+  it('a banda do pneu recebe uma faixa contínua e centrada: v de 0 a 1 de ombro a ombro e u dando a volta em tiles inteiros', () => {
     const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
     const banda = partes.get('pneuDeBorracha').children.find((m) => m.material.normalMap && m.userData.faces.length > 100);
     const uv = banda.geometry.getAttribute('uv');
     const pos = banda.geometry.getAttribute('position');
-    let menorU = Infinity; let maiorU = -Infinity;
+    let menorU = Infinity; let maiorU = -Infinity; let menorV = Infinity; let maiorV = -Infinity;
     for (let t = 0; t < uv.count; t += 3) {
       const us = [0, 1, 2].map((k) => uv.getX(t + k));
       /* nenhum triângulo estica por uma volta inteira: a emenda do ângulo está desenrolada */
       expect(Math.max(...us) - Math.min(...us)).toBeLessThan(1);
-      for (const u of us) { menorU = Math.min(menorU, u); maiorU = Math.max(maiorU, u); }
+      for (let k = 0; k < 3; k += 1) {
+        menorU = Math.min(menorU, us[k]); maiorU = Math.max(maiorU, us[k]);
+        menorV = Math.min(menorV, uv.getY(t + k)); maiorV = Math.max(maiorV, uv.getY(t + k));
+      }
     }
-    /* tile da banda: 4 períodos de 30 mm = 0,12 m; a circunferência de 0,628 m dá 5 tiles */
-    expect(maiorU - menorU).toBeGreaterThan(4.5);
-    expect(maiorU - menorU).toBeLessThan(5.5);
+    /* a banda tem 80 mm de largura: o desenho a cobre uma vez, e a circunferência de 628 mm dá 8 tiles de 80 mm */
+    expect(menorV).toBeCloseTo(0, 5);
+    expect(maiorV).toBeCloseTo(1, 5);
+    expect(maiorU - menorU).toBeGreaterThan(7.5);
+    expect(maiorU - menorU).toBeLessThan(8.5);
     expect(pos.count).toBe(uv.count);
+    /* o mapa foi gerado para a largura medida: tile quadrado */
+    expect(banda.material.normalMap.image.width).toBe(banda.material.normalMap.image.height);
+  });
+
+  it('o flanco do pneu leva uma linha de texto: v de 0 a 1 do raio de fora ao de dentro, o mapa mais largo que alto', () => {
+    const { partes } = adaptarThree(malha(), { materiais: MATERIAIS });
+    const flanco = partes.get('pneuDeBorracha').children.find((m) => m.material.normalMap && m.userData.faces.length <= 100);
+    const uv = flanco.geometry.getAttribute('uv');
+    let menorV = Infinity; let maiorV = -Infinity;
+    for (let k = 0; k < uv.count; k += 1) { menorV = Math.min(menorV, uv.getY(k)); maiorV = Math.max(maiorV, uv.getY(k)); }
+    expect(menorV).toBeCloseTo(0, 5);
+    expect(maiorV).toBeCloseTo(1, 5);
+    const { width, height } = flanco.material.normalMap.image;
+    expect(width).toBeGreaterThan(height * 3);
   });
 
   it('é determinística: duas execuções dão a mesma malha', () => {

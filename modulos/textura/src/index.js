@@ -99,3 +99,4 @@ export function texturaParaPng(textura) {
 }
 
 export { gerarMapasDoRelevo, gerarMapaDeFlocos, metrosPorTileDoRelevo, TIPOS_DE_RELEVO, TEXTO_DAS_LETRAS } from './mapas.js';
+export { medidasPadraoDoRelevo, DESENHOS_DA_BANDA } from './mapas.js';

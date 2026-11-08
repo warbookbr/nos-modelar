@@ -1,6 +1,6 @@
 // Testes da coordenada de textura: faixa contínua num cilindro, grade regular numa placa, caixa num cubo inclinado e determinismo.
 import { describe, expect, it } from 'vitest';
-import { coordenadasDeTextura } from './coordenada-de-textura.js';
+import { coordenadasDeTextura, medidasDaProjecao } from './coordenada-de-textura.js';
 import { normalizarMaterial } from './material-da-receita.js';
 
 const relevo = (tipo, extra = {}) => normalizarMaterial('t', { relevo: { tipo, ...extra } }).relevo;
@@ -43,45 +43,65 @@ function girar(ponto, eixo, ang) {
 }
 
 describe('coordenadasDeTextura', () => {
-  it('numa banda de cilindro dá uma faixa contínua: v é a altura em tiles, u corre uma volta inteira de tiles sem salto', () => {
-    const tile = 0.12; // 5 tiles na circunferência de 0,628 m
+  it('numa banda de cilindro dá uma faixa contínua: v cobre a largura uma vez só, com o meio em 0,5, e u dá uma volta de tiles inteiros', () => {
     const lados = 48;
-    const P = cilindro(0.1, 0.08, lados);
-    const uv = coordenadasDeTextura(P, relevo('bandaDeRodagem'), tile);
+    /* a banda NÃO começa em y = 0: a origem do eixo não pode importar */
+    const P = cilindro(0.1, 0.08, lados, 0.3);
+    const rel = relevo('bandaDeRodagem');
+    const medidas = medidasDaProjecao(P, rel);
+    expect(medidas.larguraM).toBeCloseTo(0.08, 9);
+    expect(medidas.voltas).toBe(8); // 2π·0,1 / 0,08 = 7,85
+    const uv = coordenadasDeTextura(P, rel, 0.123);
     expect(uv.length).toBe((P.length / 3) * 2);
-    let menorU = Infinity; let maiorU = -Infinity;
+    let menorU = Infinity; let maiorU = -Infinity; let menorV = Infinity; let maiorV = -Infinity;
     for (let t = 0; t < P.length / 9; t += 1) {
       const us = [0, 1, 2].map((k) => uv[t * 6 + 2 * k]);
-      /* dentro de cada triângulo, mesmo no que cruza a emenda, a coordenada anda pouco: a volta tem 5 tiles em 48 lados */
-      expect(Math.max(...us) - Math.min(...us)).toBeLessThan(5 / lados + 1e-6);
+      /* dentro de cada triângulo, mesmo no que cruza a emenda, a coordenada anda pouco: a volta tem 8 tiles em 48 lados */
+      expect(Math.max(...us) - Math.min(...us)).toBeLessThan(8 / lados + 1e-6);
       for (let k = 0; k < 3; k += 1) {
-        expect(uv[t * 6 + 2 * k + 1]).toBeCloseTo(-P[t * 9 + 3 * k + 1] / tile, 5);
+        const v = uv[t * 6 + 2 * k + 1];
+        expect(v).toBeCloseTo((P[t * 9 + 3 * k + 1] - 0.3) / 0.08, 5);
+        menorV = Math.min(menorV, v); maiorV = Math.max(maiorV, v);
         menorU = Math.min(menorU, us[k]); maiorU = Math.max(maiorU, us[k]);
       }
     }
-    /* a volta cobre 5 tiles inteiros (um número inteiro, logo sem emenda) */
-    expect(maiorU - menorU).toBeGreaterThan(5 - 5 / lados - 1e-6);
-    expect(maiorU - menorU).toBeLessThan(5 + 5 / lados + 1e-6);
-    /* a mesma posição no ângulo, uma volta depois, cai no mesmo ponto do tile: u mod 5 do vértice em ângulo 0 e em ângulo 2π */
-    const u0 = uv[0] - Math.floor(uv[0] / 5) * 5;
-    const uVolta = (uv[0] + 5) - Math.floor((uv[0] + 5) / 5) * 5;
+    expect(menorV).toBeCloseTo(0, 6);
+    expect(maiorV).toBeCloseTo(1, 6);
+    /* o meio da largura é v = 0,5 */
+    expect((menorV + maiorV) / 2).toBeCloseTo(0.5, 6);
+    expect(maiorU - menorU).toBeGreaterThan(8 - 8 / lados - 1e-6);
+    expect(maiorU - menorU).toBeLessThan(8 + 8 / lados + 1e-6);
+    /* a volta fecha: u de um vértice e o de uma volta depois diferem de 8 tiles, inteiro */
+    const u0 = uv[0] - Math.floor(uv[0] / 8) * 8;
+    const uVolta = (uv[0] + 8) - Math.floor((uv[0] + 8) / 8) * 8;
     expect(uVolta).toBeCloseTo(u0, 9);
   });
 
-  it('as faces de topo e fundo do cilindro seguem a volta: v é o raio e o texto corre em arco', () => {
-    const tile = 0.05;
-    /* um trecho da tampa de cima (normal +y) entre os raios 0,06 e 0,09, de 0 a 10 graus, anti-horário visto de +y */
+  it('as tampas do cilindro levam a linha de texto: v é o raio de fora para dentro, 0 a 1, e o texto dá duas voltas na circunferência', () => {
     const ponto = (r, g) => [r * Math.cos((g * Math.PI) / 180), 0.1, r * Math.sin((g * Math.PI) / 180)];
     const P = [...ponto(0.06, 10), ...ponto(0.06, 0), ...ponto(0.09, 0), ...ponto(0.06, 10), ...ponto(0.09, 0), ...ponto(0.09, 10)];
-    const uv = coordenadasDeTextura(P, relevo('letras'), tile, { centro: [0, 0.05, 0], raio: 0.1 });
-    const voltas = Math.round((2 * Math.PI * 0.1) / tile);
+    const rel = relevo('letras');
+    const medidas = medidasDaProjecao(P, rel, { centro: [0, 0.05, 0], raio: 0.1 });
+    expect(medidas.larguraM).toBeCloseTo(0.03, 9);
+    expect(medidas.comprimentoM).toBeCloseTo((Math.PI * 0.15) / 2, 9);
+    expect(medidas.voltas).toBe(2);
+    const uv = coordenadasDeTextura(P, rel, 0.05, { centro: [0, 0.05, 0], raio: 0.1 });
     for (let k = 0; k < 6; k += 1) {
       const r = Math.hypot(P[3 * k], P[3 * k + 2]);
-      expect(uv[2 * k + 1]).toBeCloseTo(-r / tile, 5);
+      expect(uv[2 * k + 1]).toBeCloseTo((0.09 - r) / 0.03, 5);
     }
-    /* 10 graus de arco são voltas/36 tiles, no mesmo sentido para os dois raios */
-    expect(Math.abs(uv[0] - uv[2])).toBeCloseTo(voltas / 36, 5);
+    /* 10 graus de arco são 2/36 de tile, no mesmo sentido nos dois raios */
+    expect(Math.abs(uv[0] - uv[2])).toBeCloseTo(2 / 36, 5);
     expect(uv[0] - uv[2]).toBeCloseTo(uv[10] - uv[4], 5);
+  });
+
+  it('o desenho da banda é simétrico: dois vértices à mesma distância do meio da faixa têm v a igual distância de 0,5', () => {
+    const P = cilindro(0.1, 0.08, 24, -0.2);
+    const uv = coordenadasDeTextura(P, relevo('bandaDeRodagem'), 0.1);
+    const porY = new Map();
+    for (let k = 0; k < P.length / 3; k += 1) porY.set(Math.round(P[3 * k + 1] * 1e6), uv[2 * k + 1]);
+    const ys = [...porY.keys()].sort((a, b) => a - b);
+    expect(porY.get(ys[0]) + porY.get(ys[1])).toBeCloseTo(1, 6);
   });
 
   it('numa placa dá uma grade regular: o passo de u e de v é a aresta dividida pelo tile', () => {
@@ -150,6 +170,11 @@ describe('o relevo normalizado com projeção', () => {
     expect(relevo('prismas')).toMatchObject({ projecao: 'caixa', eixo: 'y' });
     expect(relevo('granulado').projecao).toBe('caixa');
     expect(relevo('bandaDeRodagem').projecao).toBe('cilindrica');
+    expect(relevo('bandaDeRodagem').desenho).toBe('costelas');
+    expect(relevo('bandaDeRodagem', { desenho: 'v' }).desenho).toBe('v');
+    expect(() => relevo('bandaDeRodagem', { desenho: 'espinha' })).toThrow(/relevo\.desenho.*costelas, v/);
+    expect(() => relevo('prismas', { desenho: 'v' })).toThrow(/relevo\.desenho/);
+    expect(relevo('prismas')).not.toHaveProperty('desenho');
     expect(relevo('letras').projecao).toBe('cilindrica');
     expect(relevo('prismas', { projecao: 'plana', eixo: 'x' })).toMatchObject({ projecao: 'plana', eixo: 'x' });
     expect(() => relevo('prismas', { projecao: 'esferica' })).toThrow(/relevo\.projecao/);

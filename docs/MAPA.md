@@ -820,7 +820,7 @@
 
 ## modulos/textura/tests/
 
-- `mapas.test.js` — Testes dos mapas de relevo e de aspereza: determinismo, tile sem emenda, escala em metros, normal unitária e recusas.
+- `mapas.test.js` — Testes dos mapas de relevo e de aspereza: determinismo, tile sem emenda, escala em metros, normal unitária, banda centrada e simétrica, letras numa linha e r…
 - `metal-tecido.test.js` — Testes de metal e tecido: determinismo, tile contínuo, efeito de cada campo, e regressão de madeira e liso.
 - `textura.test.js` — Testes do gerador de textura: determinismo, tile contínuo, veio, tábuas, liso e recusas.
 

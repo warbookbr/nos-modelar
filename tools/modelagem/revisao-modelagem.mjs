@@ -264,13 +264,14 @@ function propriedadesMaterial(valor, quem, campo) {
     const entrada = valor[chave];
     if (chave === 'relevo') {
       objeto(entrada, quem, `${campo}.relevo`);
-      chavesExatas(entrada, ['tipo', 'escala', 'intensidade', 'projecao', 'eixo'], quem, `${campo}.relevo`);
+      chavesExatas(entrada, ['tipo', 'escala', 'intensidade', 'projecao', 'eixo', 'desenho'], quem, `${campo}.relevo`);
       resultado.relevo = {
         tipo: texto(entrada.tipo, quem, `${campo}.relevo.tipo`),
         escala: numero(entrada.escala, quem, `${campo}.relevo.escala`),
         intensidade: numero(entrada.intensidade, quem, `${campo}.relevo.intensidade`),
         projecao: texto(entrada.projecao, quem, `${campo}.relevo.projecao`),
         eixo: texto(entrada.eixo, quem, `${campo}.relevo.eixo`),
+        ...(Object.hasOwn(entrada, 'desenho') ? { desenho: texto(entrada.desenho, quem, `${campo}.relevo.desenho`) } : {}),
       };
     } else if (chave === 'cor' || chave === 'mistura' || chave === 'tomDoVidro') resultado[chave] = texto(entrada, quem, `${campo}.${chave}`);
     else if (chave === 'semLuz') {

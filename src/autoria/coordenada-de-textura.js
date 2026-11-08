@@ -62,10 +62,60 @@ function planar(P, o, eixo, sinal, metrosPorTile, saida, s) {
   }
 }
 
+/* Os triângulos de tampa (normal quase paralela ao eixo) e os de lateral, e o que a faixa que leva o relevo mede. */
+function mediasDaFaixa(posicoes, relevo, base) {
+  const eixo = relevo.eixo ?? 'y';
+  const [p, q] = PAR_CICLICO[eixo];
+  const a = INDICE[eixo];
+  let amin = Infinity; let amax = -Infinity; let rmin = Infinity; let rmax = -Infinity;
+  for (let o = 0; o < posicoes.length; o += 9) {
+    const axial = Math.abs(normalDoTriangulo(posicoes, o)[a]) > LIMITE_AXIAL;
+    for (let k = 0; k < 3; k += 1) {
+      if (!axial) {
+        amin = Math.min(amin, posicoes[o + 3 * k + a]);
+        amax = Math.max(amax, posicoes[o + 3 * k + a]);
+      } else {
+        const r = Math.hypot(posicoes[o + 3 * k + p] - base.centro[p], posicoes[o + 3 * k + q] - base.centro[q]);
+        rmin = Math.min(rmin, r);
+        rmax = Math.max(rmax, r);
+      }
+    }
+  }
+  return { amin, amax, rmin, rmax };
+}
+
+/**
+ * As medidas da faixa que leva o relevo, para o mapa nascer do tamanho dela. Só a projeção cilíndrica as tem, e só para dois tipos:
+ *  - `bandaDeRodagem`: a largura é a extensão da faixa ao longo do eixo (os triângulos de lateral), e o desenho cobre essa
+ *    largura UMA vez, de v = 0 a v = 1, com o meio em v = 0,5; em volta o tile, quadrado, de lado igual à largura, repete um número
+ *    inteiro de vezes na circunferência de referência;
+ *  - `letras`: a largura é a extensão radial das tampas do cilindro (o flanco), a linha de texto fica no meio dela, e o tile
+ *    cobre meia volta (o texto aparece duas vezes na volta, em lados opostos), com comprimento de meia circunferência no raio
+ *    médio.
+ * Devolve `{ larguraM, comprimentoM, voltas }` ou `null` quando a projeção não é cilíndrica, o tipo não é um desses dois ou a malha não
+ * tem a faixa (sem tampa, ou sem lateral).
+ */
+export function medidasDaProjecao(posicoes, relevo, parte = {}) {
+  if (relevo.projecao !== 'cilindrica' || (relevo.tipo !== 'bandaDeRodagem' && relevo.tipo !== 'letras')) return null;
+  const eixo = relevo.eixo ?? 'y';
+  const base = { ...caixaDaParte(posicoes, eixo), ...parte };
+  const f = mediasDaFaixa(posicoes, relevo, base);
+  if (relevo.tipo === 'bandaDeRodagem') {
+    const larguraM = f.amax - f.amin;
+    if (!(larguraM > 0)) return null;
+    return {
+      larguraM, comprimentoM: larguraM, voltas: Math.max(1, Math.round((2 * Math.PI * base.raio) / larguraM)), inicio: f.amin, tipo: 'banda',
+    };
+  }
+  const larguraM = f.rmax - f.rmin;
+  if (!(larguraM > 0)) return null;
+  return { larguraM, comprimentoM: (Math.PI * (f.rmax + f.rmin)) / 2, voltas: 2, inicio: f.rmax, tipo: 'letras' };
+}
+
 /**
  * @param {ArrayLike<number>} posicoes triângulos não indexados, x y z em metro
- * @param {{projecao: string, eixo: string}} relevo o relevo normalizado
- * @param {number} metrosPorTile o lado do tile do mapa, em metro
+ * @param {{projecao: string, eixo: string, tipo?: string}} relevo o relevo normalizado
+ * @param {number} metrosPorTile o lado do tile do mapa, em metro (vale onde `medidasDaProjecao` não se aplica)
  * @param {{centro?: number[], raio?: number}} [parte] o centro da caixa e o maior raio da PARTE inteira (a cilíndrica usa a mesma
  *   referência em todas as malhas da parte); sem ele valem os da própria lista
  * @returns {Float32Array} u, v por vértice, em tiles
@@ -79,6 +129,7 @@ export function coordenadasDeTextura(posicoes, relevo, metrosPorTile, parte = {}
   const saida = new Float32Array((posicoes.length / 3) * 2);
   const base = projecao === 'cilindrica' ? { ...caixaDaParte(posicoes, eixo), ...parte } : null;
   const voltas = base ? Math.max(1, Math.round((2 * Math.PI * base.raio) / metrosPorTile)) : 0;
+  const faixa = projecao === 'cilindrica' ? medidasDaProjecao(posicoes, relevo, parte) : null;
   for (let o = 0, s = 0; o < posicoes.length; o += 9, s += 6) {
     const n = normalDoTriangulo(posicoes, o);
     if (projecao === 'plana') {
@@ -105,9 +156,16 @@ export function coordenadasDeTextura(posicoes, relevo, metrosPorTile, parte = {}
       const maior = Math.max(...t);
       const menor = Math.min(...t);
       if (maior - menor > 0.5) for (let k = 0; k < 3; k += 1) if (maior - t[k] > 0.5) t[k] += 1;
+      const naFaixa = faixa !== null && ((faixa.tipo === 'banda' && !axial) || (faixa.tipo === 'letras' && axial));
       for (let k = 0; k < 3; k += 1) {
-        saida[s + 2 * k] = t[k] * voltas;
-        saida[s + 2 * k + 1] = -(axial ? raio[k] : posicoes[o + 3 * k + a]) / metrosPorTile;
+        if (naFaixa) {
+          saida[s + 2 * k] = t[k] * faixa.voltas;
+          /* banda: v de 0 a 1 de um ombro ao outro, o meio em 0,5; letras: o raio de fora é o alto do texto */
+          saida[s + 2 * k + 1] = faixa.tipo === 'banda' ? (posicoes[o + 3 * k + a] - faixa.inicio) / faixa.larguraM : (faixa.inicio - raio[k]) / faixa.larguraM;
+        } else {
+          saida[s + 2 * k] = t[k] * voltas;
+          saida[s + 2 * k + 1] = -(axial ? raio[k] : posicoes[o + 3 * k + a]) / metrosPorTile;
+        }
       }
     }
   }
