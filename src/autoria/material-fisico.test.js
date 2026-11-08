@@ -72,8 +72,9 @@ describe('na cena da peça de prova', () => {
     const aco = materialDaParte(partes, 'discoDeAcoPintado');
     const plastico = materialDaParte(partes, 'blocoDePlastico');
     expect(aco.clearcoat).toBeCloseTo(0.3, 6);
-    expect(plastico.clearcoat).toBeCloseTo(0.2, 6);
+    expect(plastico.clearcoat).toBeCloseTo(0.6, 6);
     expect(aco.clearcoatRoughness).toBeGreaterThan(0.2);
     expect(plastico.clearcoatRoughness).toBeGreaterThan(0.2);
+    expect(materialDaParte(partes, 'pneuDeBorracha').clearcoat ?? 0).toBe(0);
   });
 });

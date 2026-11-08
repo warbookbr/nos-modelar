@@ -6,13 +6,15 @@
  * sol de borda suave e o chão claro. O valor de cada pixel passa de 1 nas faixas e no sol (luz HDR), que é o que faz o reflexo
  * parecer luz e não parede.
  *
- * Convenção: coluna x de largura L é o azimute 2π·(x+0,5)/L; a linha y de altura A é a elevação π/2 − π·(y+0,5)/A (topo = zênite). */
+ * Convenção: coluna x de largura L é o azimute 2π·(x+0,5)/L; a linha y de altura A é a elevação −π/2 + π·(y+0,5)/A: a linha 0 é o nadir e a última o zênite, que é a ordem das linhas de
+ * uma textura de dados no Three.js (v = 0 embaixo; a imagem não se inverte). */
 import * as THREE from 'three';
 
 export const AMBIENTES = Object.freeze(['estudio', 'ceu', 'nenhum']);
 export const AMBIENTE_PADRAO = 'estudio';
-export const LARGURA_DO_AMBIENTE = 256;
-export const ALTURA_DO_AMBIENTE = 128;
+/* 1024 por 512: com 256 por 128 a borda de uma faixa de 10 graus tinha poucos pixels e o PMREM a embaçava num cinza uniforme */
+export const LARGURA_DO_AMBIENTE = 1024;
+export const ALTURA_DO_AMBIENTE = 512;
 
 const grau = Math.PI / 180;
 const passo = (a, b, x) => {
@@ -34,30 +36,31 @@ function faixaDeLuz(az, el, { azimute, meiaLargura, de, ate, suave }) {
   return horizontal * vertical;
 }
 
+/* O ESTÚDIO É ESCURO, como o de foto de carro: parede e teto quase pretos, chão cinza escuro, e a luz toda nas faixas, brilhantes
+   e de borda bem recortada (`suave` de poucos graus), que a tinta e o metal refletem como linhas nítidas sobre o fundo escuro. */
 const FAIXAS_DO_ESTUDIO = [
-  /* a calota de luz do teto, que vai até o zênite e dá o reflexo de cima ao domo e ao capô */
-  { azimute: 0, meiaLargura: 200, de: 66, ate: 120, suave: 8, luz: 2.5 },
-  /* seis faixas altas em pé em volta, como as caixas de luz de um estúdio de carro */
-  { azimute: 30, meiaLargura: 9, de: 6, ate: 62, suave: 5, luz: 6 },
-  { azimute: 90, meiaLargura: 9, de: 6, ate: 62, suave: 5, luz: 4 },
-  { azimute: 150, meiaLargura: 9, de: 6, ate: 62, suave: 5, luz: 6 },
-  { azimute: 210, meiaLargura: 9, de: 6, ate: 62, suave: 5, luz: 4 },
-  { azimute: 270, meiaLargura: 9, de: 6, ate: 62, suave: 5, luz: 6 },
-  { azimute: 330, meiaLargura: 9, de: 6, ate: 62, suave: 5, luz: 4 },
-  /* duas faixas baixas e longas, de um lado e do outro, que correm pela chapa */
-  { azimute: 60, meiaLargura: 40, de: 14, ate: 24, suave: 4, luz: 1.5 },
-  { azimute: 240, meiaLargura: 40, de: 14, ate: 24, suave: 4, luz: 1.5 },
+  /* duas faixas longas no teto, de um lado e do outro */
+  { azimute: 0, meiaLargura: 38, de: 52, ate: 84, suave: 1.5, luz: 5 },
+  { azimute: 180, meiaLargura: 38, de: 52, ate: 84, suave: 1.5, luz: 5 },
+  /* seis faixas altas em pé em volta, como as caixas de luz de um estúdio de carro; descem abaixo do horizonte como se o chão as refletisse, para a chapa vertical ver faixas e não só o chão escuro */
+  { azimute: 30, meiaLargura: 5, de: -35, ate: 66, suave: 1.5, luz: 6 },
+  { azimute: 90, meiaLargura: 5, de: -35, ate: 66, suave: 1.5, luz: 4 },
+  { azimute: 150, meiaLargura: 5, de: -35, ate: 66, suave: 1.5, luz: 6 },
+  { azimute: 210, meiaLargura: 5, de: -35, ate: 66, suave: 1.5, luz: 4 },
+  { azimute: 270, meiaLargura: 5, de: -35, ate: 66, suave: 1.5, luz: 6 },
+  { azimute: 330, meiaLargura: 5, de: -35, ate: 66, suave: 1.5, luz: 4 },
+  /* duas faixas baixas e longas, que correm pela chapa e desenham o horizonte no metal */
+  { azimute: 60, meiaLargura: 40, de: 9, ate: 15, suave: 1.5, luz: 2.5 },
+  { azimute: 240, meiaLargura: 40, de: 9, ate: 15, suave: 1.5, luz: 2.5 },
 ];
 
 function corDoEstudio(az, el) {
-  /* fundo neutro: a parede de cinza médio que clareia para o alto; o chão, um cinza mais escuro */
-  const parede = mistura(0.32, 0.55, passo(0, 60 * grau, el));
-  const chao = mistura(0.2, 0.12, passo(0, -60 * grau, el));
+  /* parede e teto quase pretos; o chão, um cinza escuro que se separa da parede na linha do horizonte */
+  const parede = mistura(0.012, 0.02, passo(0, 60 * grau, el));
+  const chao = mistura(0.09, 0.045, passo(0, -60 * grau, el));
   let luz = el >= 0 ? parede : chao;
-  const horizonte = 1 - passo(0, 5 * grau, Math.abs(el));
-  luz += horizonte * 0.05;
   for (const f of FAIXAS_DO_ESTUDIO) luz += f.luz * faixaDeLuz(az, el, f);
-  return [luz, luz * 0.99, luz * 0.97];
+  return [luz, luz, luz];
 }
 
 const SOL = { azimute: 40, elevacao: 48, raio: 5, luz: 40 };
@@ -88,7 +91,7 @@ export function pixelsDoAmbiente(tipo, largura = LARGURA_DO_AMBIENTE, altura = A
   const cor = tipo === 'estudio' ? corDoEstudio : corDoCeu;
   const dados = new Float32Array(largura * altura * 4);
   for (let y = 0; y < altura; y++) {
-    const el = Math.PI / 2 - (Math.PI * (y + 0.5)) / altura;
+    const el = -Math.PI / 2 + (Math.PI * (y + 0.5)) / altura;
     for (let x = 0; x < largura; x++) {
       const az = (2 * Math.PI * (x + 0.5)) / largura;
       const [r, g, b] = cor(az, el);

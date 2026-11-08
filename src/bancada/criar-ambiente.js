@@ -146,10 +146,11 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre,
     scene.environmentIntensity = 1;
     /* com o ambiente aceso as luzes de baixo descem, para o reflexo e a luz direta não somarem em estouro; sem ambiente valem as de sempre */
     const fator = nome === 'nenhum' ? 1 : FATOR_DAS_LUZES_COM_AMBIENTE;
-    for (const { luz, base } of luzes) luz.intensity = base * fator;
+    /* com ambiente as luzes de baixo também ficam neutras: o verde da luz de recorte e o azul do preenchimento tingiam o topo das peças pretas */
+    for (const { luz, base, cor } of luzes) { luz.intensity = base * fator; if (cor) luz.color.set(nome === 'nenhum' ? cor : '#ffffff'); }
   }
   const luzes = [];
-  const acender = (luz) => { luzes.push({ luz, base: luz.intensity }); scene.add(luz); return luz; };
+  const acender = (luz) => { luzes.push({ luz, base: luz.intensity, cor: luz.color ? `#${luz.color.getHexString()}` : null }); scene.add(luz); return luz; };
 
   acender(new THREE.HemisphereLight('#ffffff', '#829088', 2.15));
 

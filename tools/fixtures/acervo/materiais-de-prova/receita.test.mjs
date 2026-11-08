@@ -20,7 +20,7 @@ describe('peça de prova dos materiais', () => {
     const n = normalizarMateriais(MATERIAIS);
     expect(n.tintaComVerniz.verniz).toBe(1);
     expect(n.vidro).toMatchObject({ transmissao: 1, indiceDeRefracao: 1.5, tomDoVidro: '#a8cdbd', mistura: 'transparente' });
-    expect(n.metalEspelhado).toMatchObject({ metalicidade: 1, aspereza: 0.04 });
+    expect(n.metalEspelhado).toMatchObject({ metalicidade: 1, aspereza: 0.02 });
     expect(n.acoPintado.verniz).toBeGreaterThan(0);
     expect(n.borrachaComRelevo.relevo.tipo).toBe('bandaDeRodagem');
     expect(n.plasticoGranulado.relevo.tipo).toBe('granulado');

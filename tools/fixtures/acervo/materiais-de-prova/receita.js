@@ -39,6 +39,9 @@ export const TABELA = {
   calotaRaio: 90,
   calotaAltura: 55,
   calotaBorda: 8,
+  /* os lados do domo e os pontos do perfil: o reflexo de um espelho pede casca lisa, e as faces largas quebravam a imagem */
+  calotaLados: 96,
+  calotaPontos: 14,
   /* o disco de aço pintado */
   discoRaio: 100,
   discoEspessura: 30,
@@ -82,6 +85,8 @@ export function gerarPassos(t = TABELA) {
     altura: m(t.placaAltura),
     em: [x('tinta'), 0, 0],
   }]);
+  /* normal suave na chapa curva, para a faixa de luz correr por ela em vez de saltar de faceta em faceta */
+  passos.push(['liso', { angulo: 60, sel: { origem: { op: 'extrusao', id: ID.tinta } } }]);
   parte('placaDeTinta', { origem: { op: 'extrusao', id: ID.tinta } }, 'tintaComVerniz');
 
   /* vidro: a placa plana */
@@ -101,19 +106,16 @@ export function gerarPassos(t = TABELA) {
   parte('anteparoDoVidro', { origem: { op: 'cubo', id: ID.anteparo } }, 'anteparoDoVidro');
 
   /* metal espelhado: a calota, um domo de revolução com o degrau da borda */
-  passos.push(['lathe', {
-    origemId: ID.metal,
-    lados: t.lados,
-    em: [x('metal'), 0, 0],
-    perfil: [
-      [0, 0],
-      [m(t.calotaRaio), 0],
-      [m(t.calotaRaio), m(t.calotaBorda)],
-      [m(t.calotaRaio * 0.8), m(t.calotaAltura * 0.62)],
-      [m(t.calotaRaio * 0.45), m(t.calotaAltura * 0.9)],
-      [0, m(t.calotaAltura)],
-    ],
-  }]);
+  /* o perfil do domo é um quarto de elipse (raio da borda por altura do domo), em pontos de ângulo igual, depois do degrau da borda */
+  const perfilDoDomo = [[0, 0], [m(t.calotaRaio), 0], [m(t.calotaRaio), m(t.calotaBorda)]];
+  for (let i = 1; i <= t.calotaPontos; i++) {
+    const a = (i / t.calotaPontos) * (Math.PI / 2);
+    perfilDoDomo.push([m(t.calotaRaio) * Math.cos(a), m(t.calotaBorda) + m(t.calotaAltura - t.calotaBorda) * Math.sin(a)]);
+  }
+  perfilDoDomo[perfilDoDomo.length - 1][0] = 0;
+  passos.push(['lathe', { origemId: ID.metal, lados: t.calotaLados, em: [x('metal'), 0, 0], perfil: perfilDoDomo }]);
+  /* normal suave no domo, para o espelho refletir uma curva e não faces */
+  passos.push(['liso', { angulo: 75, sel: { origem: { op: 'lathe', id: ID.metal } } }]);
   parte('calotaEspelhada', { origem: { op: 'lathe', id: ID.metal } }, 'metalEspelhado');
 
   /* aço pintado: o disco da roda, com a face plana larga */
@@ -174,7 +176,7 @@ export const MATERIAIS = {
   },
   /* metal espelhado: quase sem aspereza e todo metal */
   metalEspelhado: {
-    tipo: 'metal', acabamento: 'pintado', cor: '#d6d9dd', aspereza: 0.04, metalicidade: 1,
+    tipo: 'metal', acabamento: 'pintado', cor: '#e8eaed', aspereza: 0.02, metalicidade: 1,
   },
   /* aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima */
   acoPintado: {
@@ -186,7 +188,7 @@ export const MATERIAIS = {
   },
   /* plástico preto acetinado, entre o fosco e o brilhante, com granulado fino */
   plasticoGranulado: {
-    tipo: 'liso', cor: '#1b1b1e', aspereza: 0.5, metalicidade: 0, verniz: 0.2, asperezaDoVerniz: 0.4,
+    tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35,
     relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 },
   },
 };
