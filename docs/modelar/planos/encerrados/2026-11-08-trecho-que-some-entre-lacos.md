@@ -1,6 +1,6 @@
 # Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/fixtures/solido-por-lacos/`
 
@@ -77,7 +77,7 @@ recusa diz o trecho, os laços e o que falta. A medida da dobra: ENVOLVER o `des
 1. A peça de prova que reproduz a aba com a técnica de hoje, e a medida da dobra que a reprova (feita).
 2. O trecho que encolhe e o vinco que esvai, com a peça de prova refeita por eles (feita).
 3. A mesma peça fatiada na horizontal, com a costura `une` e a régua de vinco oculto (feita; a junção não chegou ao nível da fatiada em x).
-4. A tampa com laço côncavo, e a dobra intencional declarada pela peça, para a régua passar a aviso no `descrever`.
+4. A tampa com laço côncavo, e a dobra intencional declarada pela peça, para a régua passar a aviso no `descrever` (feita).
 5. Fechamento, com aviso à sessão do braço.
 
 ## Riscos e parada
@@ -88,4 +88,16 @@ pontos fixos com fusão gradual, ou laço com número variável de pontos e cost
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-08. O `gaiolaPorLacos` ganhou o `encolhe` (o trecho que encolhe até um ponto numa faixa de laços,
+seguindo a curva do vizinho), o `esvai` (o vinco que perde a nitidez até zero), o `une` (a costura de pontos coincidentes que
+não são vizinhos na volta) e a tampa de laço côncavo por triangulação do contorno; as malhas das peças que não usam os campos
+seguiram idênticas. A aba do cotovelo some na peça de prova fatiada ao longo do tubo deitado, aprovada pela pessoa, com o pé
+da frente em rampa. Duas réguas novas, `tools/modelar/dobra-da-superficie.mjs` e `tools/modelar/vinco-oculto.mjs`, acham a
+dobra e o vinco ou chanfro não declarados e entram no `descrever` como aviso, com o campo `PLANO.dobrasAceitas`
+(`src/autoria/dobras-aceitas.js`) para a peça declarar o que é de propósito. O campo foi ligado em
+`src/autoria/plano-de-modelagem.js`, do território do furgão, na mesma sessão que conduz os dois planos.
+
+Devolvido ao backlog: a união de dois sólidos com filete, de que o cotovelo depende para ter o tubo em pé redondo até o
+colar (a peça fatiada na horizontal deixou a junção ondulada, e a pessoa decidiu esperar essa operação); as dobras e vincos
+que as réguas apontam no furgão, para a receita dele declarar; e a região obrigatória em `dobrasAceitas` no acervo, se a
+pessoa quiser.

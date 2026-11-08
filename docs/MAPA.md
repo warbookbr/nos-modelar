@@ -516,7 +516,6 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
-- `2026-11-08-trecho-que-some-entre-lacos.md` — Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -663,6 +662,7 @@
 - `2026-11-06-abertura-em-qualquer-direcao.md` — Abertura de contorno em qualquer direção — o vão que dobra a quina sai inteiro, e os limites da operação ficam medidos
 - `2026-11-06-abertura-so-na-vizinhanca.md` — Abertura só na vizinhança do vão — o corte de um vão na chapa sem refazer a chapa inteira
 - `2026-11-08-materiais-realistas.md` — Materiais realistas e exportação glTF
+- `2026-11-08-trecho-que-some-entre-lacos.md` — Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -2314,7 +2314,7 @@
 - `tubos-forma.js` — tubos-forma.js — a forma da peça de prova "dois tubos que se cruzam": um tubo em pé, de 156 mm de diâmetro, cruzado no alto por um tubo deitado de mesmo diâm…
 - `tubos-hoje-aceita.js` — tubos-hoje-aceita — `tubos-hoje.js` (a técnica de hoje, com a aba torta e a aresta fina na frente do tubo em pé) com o PLANO declarando a aba como aceita, em…
 - `tubos-hoje.js` — tubos-hoje — a peça de prova de `tubos.js` pela técnica anterior aos campos `encolhe` e `esvai`: dois laços a 0,2 mm um do outro em volta da tangente, com vi…
-- `tubos.js` — tubos — a peça de prova do plano "trecho que some entre laços" (`docs/modelar/planos/2026-11-08-trecho-que-some-entre-lacos.md`): um tubo em pé e outro deita…
+- `tubos.js` — tubos — a peça de prova do plano "trecho que some entre laços" (`docs/modelar/planos/encerrados/2026-11-08-trecho-que-some-entre-lacos.md`): um tubo em pé e …
 - `tubos.test.ts` — tubos.test.ts — a peça de prova do plano "trecho que some entre laços" (`tubos.js`): dois tubos que se cruzam, o filete do encontro sumindo na tangente. A té…
 
 ## tools/fixtures/solido-por-lacos/referencias/

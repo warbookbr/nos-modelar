@@ -1,4 +1,4 @@
-/* tubos — a peça de prova do plano "trecho que some entre laços" (`docs/modelar/planos/2026-11-08-trecho-que-some-entre-lacos.md`): um tubo em
+/* tubos — a peça de prova do plano "trecho que some entre laços" (`docs/modelar/planos/encerrados/2026-11-08-trecho-que-some-entre-lacos.md`): um tubo em
  * pé e outro deitado, de 156 mm de diâmetro, que o cruza no alto e passa 19 mm à frente dele, numa malha só por `gaiolaPorLacos`, com o
  * filete do encontro sumindo na tangente da parede do tubo em pé com o plano de corte. Esta é a técnica nova: a faixa do tubo em pé
  * (filete, parede, chanfro e pé) encolhe até um ponto do círculo do tubo deitado numa faixa de laços a 2,5 mm um do outro (`encolhe` nos
