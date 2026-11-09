@@ -81,12 +81,13 @@ import { forma } from './receita/forma.js';
 import { derivar } from './receita/gaiola.js';
 import { contornoPorRetos, derivarFarois, derivarGrade, derivarLanternas, derivarLuzesDeCanto, derivarPiscasLaterais, raiosDoContorno } from './receita/farol.js';
 import { derivarInterior } from './receita/interior.js';
+import { derivarJanelas } from './receita/janela.js';
 import { derivarLuzesPorDentro } from './receita/luzes.js';
 import { derivarDetalhes, passosDosDetalhes } from './receita/detalhes.js';
 import { BASE_DAS_RODAS, comBase, familias, materiaisDoPneu } from './receita/rodas.js';
 import {
   ANTENA, MACANETAS, PLACAS_DAS_MACANETAS, PONTEIRA,
-  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, AROS, CRISTAIS, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
+  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, AROS, CRISTAIS, JANELAS_DA_CABINE, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
 } from './receita/nomes.js';
 
@@ -167,7 +168,7 @@ export const TABELA = {
   raio_planta_tras: 100,
   raio_teto_tras: 40,
 
-  // chapa: espessura e níveis da subdivisão (com 2 níveis a chapa passa de 250 mil faces, que o adaptador da cena não carrega)
+  // chapa: espessura e níveis da subdivisão (com 2 níveis a chapa tem uns 4 vezes as faces de 1 nível e a cena fica pesada de abrir na bancada; o teto de 250 mil faces que se citava aqui não existia: era o adaptador da cena que estourava a pilha, e isso foi corrigido)
   espessura: 2,
   niveis: 1,
   nitidez_dobra_frente: 0.9, // o topo do para-choque e a boca do capô, de raio curto na prancha
@@ -223,9 +224,29 @@ export const TABELA = {
   // coluna q3 da quina, onde a prancha põe a ponta do vidro, a 100 mm da lateral), vidro da porta da cabine (base na altura do pé do
   // para-brisa, topo e moldura de trás; a frente é a quina da coluna), vidros das portas traseiras; e a aba dobrada de cada vão
   para_brisa_base_y: 1490, // a prancha desenha 1500 para o para-brisa e 1480 para o vidro da porta; com dois anéis a 20 mm um do outro a gaiola enche de anéis a 10 mm, que a aba do vão não dobra, e os dois ficam num anel só
-  vidro_cabine_base_y: 1490,
+  vidro_cabine_base_y: 1490, // do vão antigo da gaiola: só ordena os anéis, que a janela nova (abaixo) não usa
   vidro_cabine_topo_y: 1960,
   moldura_vidro_cabine: 70,
+  // a janela da cabine (2026-11-09, pela referência da pessoa; as cotas dela são de outro veículo, e só a proporção vale): dois vidros por lado, abertos na chapa pronta pelo
+  // contorno visto de lado. A frente da porta é vertical até `janela_sill_y` (um anel da gaiola), segue para trás por esse anel e sobe pela coluna nova (z `coluna_nova_z_base` no pé e
+  // 90 mm atrás da fresta antiga no topo, a coluna S0 da gaiola), que é a borda de trás do triângulo fixo e a de frente do vidro da porta, `coluna_nova_meia_largura` para cada lado.
+  janela_sill_y: 1414,
+  coluna_nova_z_base: 1230,
+  coluna_nova_meia_largura: 36,
+  janela_base_y: 1535, // a borda de baixo dos dois vidros é uma reta que passa por aqui em z `janela_base_z` e sobe `janela_base_subida` mm por mm para trás
+  janela_base_z: 1230,
+  janela_base_subida: 0.12,
+  janela_topo_y: 1945, // a borda de cima do vidro da porta, que também sobe para trás, mais devagar
+  janela_topo_z: 1180,
+  janela_topo_subida: 0.08,
+  janela_traseira_z_base: 715, // a borda de trás do vidro da porta: o pé mais à frente que o alto
+  janela_traseira_z_topo: 645,
+  janela_segmentos_arco: 8, // por quarto de volta nos cantos dos vidros, para a borracha e a aba contornarem o canto sem facetas
+  janela_raio: 40,
+  janela_raio_traseiro: 110, // o canto de cima de trás, bem arredondado
+  triangulo_topo_y: 1900, // o alto do triângulo, onde a frente e a trás quase se encontram
+  triangulo_raio_topo: 25,
+  triangulo_folga_frente: 25, // do fim da quina do para-brisa, onde a lateral começa, até a borda da frente do triângulo
   vidro_traseiro_base_y: 1700,
   vidro_traseiro_topo_y: 2200,
   vidro_traseiro_x_dentro: 80, // a janela das portas traseiras é um retângulo com a mesma margem (vidro_traseiro_margem) de dentro, de fora e de cima
@@ -303,7 +324,7 @@ export const TABELA = {
   lanterna_refletor_inset: 5, // a borda de cada concha, para dentro do contorno da faixa
   lanterna_refletor_profundidade: 95, // do plano da lente ao fundo da concha, 100 mm contando o encosto
   lanterna_refletor_fundo_plano: 0.2, // até esta fração do raio a concha tem o fundo plano, onde a flange da lâmpada assenta
-  lanterna_aneis: [1, 0.78, 0.56, 0.38, 0.27], // os anéis da malha polar de cada concha: menos que os 8 do farol, para a cena ficar abaixo de 250 mil faces
+  lanterna_aneis: [1, 0.78, 0.56, 0.38, 0.27], // os anéis da malha polar de cada concha: menos que os 8 do farol, para a cena ficar mais leve (a escolha é de peso, e não de um teto de faces: o teto de 250 mil que se citava aqui era o adaptador da cena estourando a pilha, já corrigido)
   lanterna_refletor_passo: 40, // o comprimento máximo de um trecho reto da borda de cada concha
   lanterna_furo: 7, // o furo do soquete no fundo de cada concha, de raio
   lanterna_lampada_raio: 6,
@@ -482,6 +503,10 @@ const ID_ABA_FAROL = (k) => 940 + k;
 const ID_ABA_LUZ_CANTO = (k) => 950 + k;
 const ID_ABA_PISCA_LATERAL = (k) => 952 + k;
 const ID_ARO_FAROL = (k) => 954 + k;
+/** Os ids dos passos da janela da cabine, por vidro k (a ordem de `derivarJanelas`): o vão (1200 + k), a aba (1210 + k) e a borracha (1220 + k). */
+const ID_JANELA = (k) => 1200 + k;
+const ID_ABA_JANELA = (k) => 1210 + k;
+const ID_BORRACHA_JANELA = (k) => 1220 + k;
 /** Os ids dos passos da grade: o vão (804), a aba (944), a translação da lente (945) e as barras (130 + k). */
 const ID_GRADE = 804;
 /** Os ids dos passos das lanternas de trás, por lado k e faixa i (de cima para baixo): o vão (1100 + 4k + i) e a aba (1110 + 4k + i). */
@@ -571,6 +596,26 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome, sel: lente }]);
     passos.push(['material', { sel: lente, usa: materialDaLente }]);
   };
+  /* a janela da cabine (2026-11-09): o triângulo fixo e o vidro da porta, de cada lado, são os primeiros vãos da cadeia; cada um tem a aba e a borracha dos outros vãos de vidro, no mesmo
+     material, e o vidro é a lente recuada `vidro_folga_borda` da borda, como o cristal dos outros, sob a borracha */
+  const janelas = derivarJanelas(T, f);
+  janelas.forEach((j, k) => abrir(ID_JANELA(k), j.contorno, j.raios, j.vista, { recuoDaLente: m(T.vidro_folga_borda), segmentosArco: T.janela_segmentos_arco }));
+  janelas.forEach((j, k) => {
+    const aba = { origem: { op: 'friso', id: ID_ABA_JANELA(k) } };
+    passos.push(['friso', {
+      origemId: ID_ABA_JANELA(k), superficie: { op: 'aberturaPorContorno', id: ID_JANELA(k) }, linha: { nome: j.aba },
+      aba: { largura: m(T.aba_vao_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
+    }]);
+    passos.push(['parte', { nome: j.aba, sel: aba }]);
+    passos.push(['material', { sel: aba, usa: 'azul' }]);
+    const vidro = { origem: { op: 'aberturaPorContorno', id: ID_JANELA(k), parte: 'lente' } };
+    passos.push(['parte', { nome: j.cristal, sel: vidro }]);
+    passos.push(['material', { sel: vidro, usa: 'vidro' }]);
+    const borracha = { origem: { op: 'friso', id: ID_BORRACHA_JANELA(k) } };
+    passos.push(['friso', { origemId: ID_BORRACHA_JANELA(k), superficie: { op: 'aberturaPorContorno', id: ID_JANELA(k) }, linha: { nome: j.borracha }, perfil: perfilBorracha }]);
+    passos.push(['parte', { nome: j.borracha, sel: borracha }]);
+    passos.push(['material', { sel: borracha, usa: 'borracha' }]);
+  });
   const farois = derivarFarois(T);
   const luzesDeCanto = derivarLuzesDeCanto(T, f);
   const piscasLaterais = derivarPiscasLaterais(T);
@@ -791,6 +836,7 @@ export function vaosDeclarados(T) {
   const naChapa = new Set(passo.vertices);
   const vaos = vidros.map((v) => ({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha, nomeDaBorracha(v.nome)] }));
   for (const v of luzes) vaos.push({ nome: v.nome, borda: [...v.volta, v.volta[0]], frisos: [v.linha] });
+  derivarJanelas(T, forma(T)).forEach((j, k) => vaos.push({ nome: j.cristal, superficie: { op: 'aberturaPorContorno', id: ID_JANELA(k) }, frisos: [j.aba, j.borracha] }));
   derivarLanternas(T, forma(T)).forEach((la, k) => la.faixas.forEach((fx, i) => vaos.push({ nome: `lanterna${fx.base}${la.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LANTERNA(k, i) }, frisos: [`abaVaoLanterna${fx.base}${la.lado}`] })));
   derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `farol${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, frisos: [`abaVaoFarol${fa.lado}`, `aroFarol${fa.lado}`] }));
   derivarLuzesDeCanto(T, forma(T)).forEach((lc, k) => vaos.push({ nome: `luzDeCanto${lc.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LUZ_CANTO(k) }, frisos: [`abaVaoLuzDeCanto${lc.lado}`] }));
@@ -937,7 +983,7 @@ const receita = {
       ...ABAS_DOS_VAOS.map((nome) => ({
         nome,
         forma: `aba da borda do vão ${nome.replace('abaVao', '')}, dobrada para dentro a 90 graus com raio de 3 mm e perna de 20 mm, em volta do vão inteiro, cantos arredondados incluídos`,
-        tecnica: 'friso com aba sobre a borda do vão, pelos nomes da gaiola',
+        tecnica: nome.includes('Triangulo') || nome.includes('PortaCabine') ? 'friso com aba sobre a borda do vão aberto pelo contorno (superficie aberturaPorContorno)' : 'friso com aba sobre a borda do vão, pelos nomes da gaiola',
       })),
       ...ABAS_DOS_ARCOS.map((nome) => ({
         nome,
@@ -976,13 +1022,17 @@ const receita = {
       })),
       ...CRISTAIS.map((nome) => ({
         nome,
-        forma: `cristal ${nome.includes('PortaTraseira') ? 'escurecido' : 'claro, de leve tom verde,'} do vão ${nome === 'vidroParaBrisa' ? 'do para-brisa' : nome.includes('Cabine') ? `da porta da cabine ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}` : `da porta traseira ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}`}: a mesma superfície do vão, rente à lataria, com a volta recuada 7,5 mm da borda e 4 mm de espessura para dentro`,
-        tecnica: 'subdivisao das faces que o vão tirou da chapa, com a volta recuada pela superfície, vidro por transmissão (claro com tom verde na frente e na cabine, escurecido nas portas traseiras)',
+        forma: JANELAS_DA_CABINE.includes(nome)
+          ? `${nome.includes('Triangulo') ? 'triângulo fixo na carroceria, entre a coluna do para-brisa e a coluna nova quase vertical' : 'vidro da porta, atrás da coluna nova: bordas de baixo e de cima subindo para trás, canto de cima de trás redondo, borda de trás inclinada'}, lado ${nome.endsWith('Esquerda') ? 'esquerdo' : 'direito'}, claro, recuado 7,5 mm da borda`
+          : `cristal ${nome.includes('PortaTraseira') ? 'escurecido' : 'claro, de leve tom verde,'} do vão ${nome === 'vidroParaBrisa' ? 'do para-brisa' : `da porta traseira ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}`}: a mesma superfície do vão, rente à lataria, com a volta recuada 7,5 mm da borda e 4 mm de espessura para dentro`,
+        tecnica: JANELAS_DA_CABINE.includes(nome)
+          ? 'aberturaPorContorno na vista pelo eixo x, com lente recuada 7,5 mm: o vidro é a lente, no material do vidro claro com tom verde'
+          : 'subdivisao das faces que o vão tirou da chapa, com a volta recuada pela superfície, vidro por transmissão (claro com tom verde no para-brisa, escurecido nas portas traseiras)',
       })),
       ...BORRACHAS.map((nome, k) => ({
         nome,
         forma: `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 2,2 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,
-        tecnica: 'friso de perfil desenhado sobre a volta do vão, nos nomes da gaiola, declarado com a aba na moldura do vão',
+        tecnica: nome.includes('Triangulo') || nome.includes('PortaCabine') ? 'friso de perfil desenhado sobre a borda do vão aberto pelo contorno, o mesmo perfil dos outros vãos de vidro, declarado com a aba na moldura do vão' : 'friso de perfil desenhado sobre a volta do vão, nos nomes da gaiola, declarado com a aba na moldura do vão',
       })),
       {
         nome: 'grade',

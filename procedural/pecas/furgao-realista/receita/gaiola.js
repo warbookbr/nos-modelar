@@ -3,7 +3,7 @@
  */
 
 import { cruz, dot, entre, esc, grau, lerp, m, soma, sub, suave, unit } from './geometria.js';
-import { aneisDoOmbro, aneisHorizontais, forma, pontoFrente, pontoLado, pontoNoCaminho, pontoQuinaTras, pontoTras, projetarNaSecao, secaoHorizontal } from './forma.js';
+import { aneisDoOmbro, aneisHorizontais, colunaDaJanela, forma, pontoFrente, pontoLado, pontoNoCaminho, pontoQuinaTras, pontoTras, projetarNaSecao, secaoHorizontal } from './forma.js';
 import { derivarPlastico } from './plastico.js';
 import { derivarLuzesPorDentro } from './luzes.js';
 import { chamadaDaRoda } from './rodas.js';
@@ -100,6 +100,8 @@ export function derivar(T) {
   const yDQuina = f.rPneu + Math.sqrt(rArcoPorta ** 2 - (f.pePortaQuina[0] - f.zD) ** 2);
   const secTopoQuina = secaoHorizontal(T, f, T.para_brisa_topo_y);
   const aTopoQuina = caminhoDeZ(secTopoQuina, f.zFrestaQuina(T.para_brisa_topo_y)) / secTopoQuina.rF;
+  const zColuna = colunaDaJanela(T, f);
+  const yPeJanela = horizontais.find((a) => a.y >= T.janela_sill_y - 3).y;
   const caminhoQuina = (an) => (an.horizontal && an.y <= T.para_brisa_topo_y ? caminhoDeZ(an.sec, f.zFrestaQuina(an.y)) : an.sec.rF * aTopoQuina);
   const caminhoD = (an) => {
     if (an.horizontal && an.y <= T.porta_cabine_topo_y) return caminhoDeZ(an.sec, f.zFrestaFrente(an.y));
@@ -203,7 +205,9 @@ export function derivar(T) {
     }
     if (temD) g.push({ col: 'D', s: sD });
     if (temB) {
-      const L = Math.max(sq - sD, T.alcance_coluna_porta);
+      let L = Math.max(sq - sD, T.alcance_coluna_porta);
+      /* da altura do pé da frente da porta até o topo dela, a S0 é a coluna nova da janela (quase vertical), e não 90 mm atrás da D: ela é a frente da porta na altura da janela */
+      if (an.horizontal && an.y >= yPeJanela - 1e-6 && an.y <= T.porta_cabine_topo_y + 1e-6) L = Math.max(sec.zF - sec.rF - zColuna(an.y) + sq - sD, T.alcance_coluna_porta);
       [1, 2, 3].forEach((k) => g.push({ col: k === 3 ? 'S0' : `b${k}`, s: sD + (k * L) / 3 }));
     }
     return g;
@@ -303,14 +307,6 @@ export function derivar(T) {
           .forEach((p) => itens.push({ col: p.col, z: p.z, y: an.y }));
       }
     }
-    /* nos anéis do vidro da porta da cabine, as colunas dos cantos do vão, a vao_canto_passo_cabine uma da outra a partir de cada
-       borda lateral dele (S1 e S2 na frente, T1 e T2 atrás) */
-    if (an.horizontal && an.y >= T.vidro_cabine_base_y - 1e-6 && an.y <= T.vidro_cabine_topo_y + 1e-6) {
-      const zS0 = itens.find((it) => it.col === 'S0')?.z ?? sec.zF - sec.rF;
-      for (let j = 1; j <= T.vao_canto_degraus; j += 1) {
-        itens.push({ col: `S${j}`, z: zS0 - j * T.vao_canto_passo_cabine, y: sec.yS }, { col: `T${j}`, z: zVidroCabTras + j * T.vao_canto_passo_cabine, y: sec.yS });
-      }
-    }
     /* No capô e no para-lama, onde a quina acaba mais para trás a cada anel, as colunas de enchimento da lateral ficam em z fixo e a
        primeira delas ao lado do fim da quina (E) se afasta e some a cada poucos anéis: a face ao lado de E oscila de 40 a 150 mm e a
        luz rasante mostra a beira do capô em degraus. Colunas_do_capo colunas sobem junto com E, a colunas_do_capo_passo uma da outra, e as de z fixo
@@ -391,16 +387,8 @@ export function derivar(T) {
   const aneisEntre = (yb, yt) => listas.filter((x) => x.horizontal && x.y >= yb - 1e-6 && x.y <= yt + 1e-6);
   const iForaTraseiro = 2 + 2 * T.vao_canto_degraus + (9 - 2 * T.vao_canto_degraus); // r0, a borda de dentro, os cantos, o miolo e os cantos de fora
   const meioDoVidroTraseiro = `r${Math.ceil((1 + iForaTraseiro) / 2)}`;
-  const meioDoVidroDaCabine = (() => {
-    const rs = aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y);
-    const colunasBaixo = rs[0].lista.map((q) => q.col);
-    const [k0, k1] = [colunasBaixo.indexOf('vidroCabineTras'), colunasBaixo.indexOf('S0')].sort((a, b) => a - b);
-    const comuns = colunasBaixo.slice(k0 + 1, k1).filter((c) => rs.at(-1).lista.some((q) => q.col === c) && /^l-?\d+$/.test(c));
-    return comuns[Math.floor(comuns.length / 2)];
-  })();
   const cantosDosVaos = [
     { rs: aneisEntre(T.para_brisa_base_y, T.para_brisa_topo_y), cMeio: 'f0', cantos: ['q3'] },
-    { rs: aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y), cMeio: meioDoVidroDaCabine, cantos: ['S0', 'vidroCabineTras'] },
     { rs: aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y), cMeio: meioDoVidroTraseiro, cantos: ['r1', `r${iForaTraseiro}`] },
     { rs: aneisEntre(T.porta_traseira_base_y, T.porta_traseira_topo_y), cMeio: 'r0', cantos: [`r${nR - 1}`], soTopo: true },
   ];
@@ -551,10 +539,13 @@ export function derivar(T) {
   for (const s of ['e', 'd']) {
     const sufixo = s === 'e' ? 'Esquerda' : 'Direita';
     const topo = anelEm(T.porta_cabine_topo_y);
-    const colD = listas.filter((x) => x.horizontal && x.y > yD && x.y <= T.porta_cabine_topo_y).map((x) => ponto(x, 'D', s));
+    /* a frente da porta: vertical (a coluna D) até o anel do pé da janela, para trás por esse anel até a coluna nova (a S0) e por ela até o topo da porta; o triângulo de vidro e a chapa
+       logo abaixo dele ficam na carroceria, à frente da coluna e acima desse anel, fora da porta */
+    const pe = anelEm(yPeJanela);
+    const colD = listas.filter((x) => x.horizontal && x.y > yD && x.y <= yPeJanela + 1e-6).map((x) => ponto(x, 'D', s));
     portas.push({
       nome: `portaCabine${sufixo}`,
-      volta: fechar([...trecho(R380, 'D', 'D', s), ...colD, ...trecho(topo, 'D', 'portaCabineTras', s),
+      volta: fechar([...trecho(R380, 'D', 'D', s), ...colD, ...trecho(pe, 'D', 'S0', s), ...coluna('S0', yPeJanela, T.porta_cabine_topo_y, s), ...trecho(topo, 'S0', 'portaCabineTras', s),
         ...coluna('portaCabineTras', T.porta_cabine_topo_y, yBase, s), ...trecho(R380, 'portaCabineTras', 'D', s)]),
     });
     /* a porta traseira sobe pelos anéis horizontais e pelos do ombro até o anel do topo dela */
@@ -601,11 +592,6 @@ export function derivar(T) {
   }
   for (const s of ['e', 'd']) {
     const sufixo = s === 'e' ? 'Esquerda' : 'Direita';
-    const rs = aneisEntre(T.vidro_cabine_base_y, T.vidro_cabine_topo_y);
-    const meio = meioDoVidroDaCabine;
-    const frente = meiaVolta(rs, meio, meio, 'S0', s);
-    const tras = meiaVolta(rs, meio, meio, 'vidroCabineTras', s);
-    vidros.push({ nome: `vidroPortaCabine${sufixo}`, linha: `abaVaoPortaCabine${sufixo}`, volta: fechar([...frente, ...[...tras].reverse()]) });
     const rt = aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y);
     const dentroT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, 'r1', s);
     const foraT = meiaVolta(rt, meioDoVidroTraseiro, meioDoVidroTraseiro, `r${iForaTraseiro}`, s);

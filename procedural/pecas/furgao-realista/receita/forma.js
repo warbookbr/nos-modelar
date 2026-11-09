@@ -242,3 +242,17 @@ export function projetarNaSecao(sec, p) {
   for (const c of cand) { const d = Math.hypot(c.q[0] - x, c.q[1] - z); if (d < dm) { dm = d; melhor = c; } }
   return { p: [sx * melhor.q[0], p[1], melhor.q[1]], n: [sx * melhor.n[0], 0, melhor.n[1]] };
 }
+
+/* A coluna nova da janela da cabine (2026-11-09), vista de lado: o z dela por altura, do pé da frente da porta (`janela_sill_y`) ao topo da porta. No pé ela está em `coluna_nova_z_base`
+   e no topo `alcance_coluna_porta` atrás da fresta da frente antiga (a coluna D, que segue o para-brisa), onde a coluna S0 já ficava; entre os dois a linha é reta e quase vertical.
+   É a frente da porta na altura da janela, a borda de trás do triângulo fixo e a de frente do vidro da porta. */
+export function colunaDaJanela(T, f) {
+  const sec = secaoHorizontal(T, f, T.porta_cabine_topo_y);
+  const zLado = sec.zF - sec.rF;
+  const zD = f.zFrestaFrente(T.porta_cabine_topo_y);
+  const sQ = sec.rF * Math.PI / 2;
+  const sD = zD <= zLado ? sQ + (zLado - zD) : sec.rF * Math.acos(Math.min(1, Math.max(-1, 1 - (sec.zF - zD) / sec.rF)));
+  const sS0 = sD + Math.max(sQ - sD, T.alcance_coluna_porta);
+  const zTopo = zLado - (sS0 - sQ);
+  return (y) => lerp(T.coluna_nova_z_base, zTopo, (y - T.janela_sill_y) / (T.porta_cabine_topo_y - T.janela_sill_y));
+}
