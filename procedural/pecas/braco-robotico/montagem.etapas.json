@@ -197,18 +197,9 @@
     },
     {
       "instancia": "braco",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024",
-      "aceite": {
-        "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
-        ],
-        "analise": "ausente"
-      },
+      "forma": "sha256:ce46d0b6d23a5973646efcf58919e3364277e5771ab6c67b161261548da5fa00",
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -223,15 +214,30 @@
             "analise": "ausente"
           },
           "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015"
+        },
+        {
+          "por": "pessoa",
+          "quando": "2026-11-09",
+          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
+          "aceite": {
+            "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024"
         }
       ]
     },
     {
-      "instancia": "anelCotovelo",
-      "estado": "fixa",
+      "instancia": "cotovelo",
+      "estado": "aberta",
       "juntas": [
         {
-          "relacao": "anelCotoveloSentaNaColuna",
+          "relacao": "cotoveloSentaNaColuna",
           "com": "braco",
           "satisfeita": true,
           "medidas": {
@@ -273,70 +279,7 @@
           }
         }
       ],
-      "forma": "sha256:945c028af9c000ab5cce3ef84b0b39245213ded28208e8172761490fb78e7545",
-      "aceite": {
-        "por": "pessoa, 2026-11-08: aceitou o colar do cotovelo rente à coluna, com 25 mm",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "cotovelo",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "cotoveloSentaNoColar",
-          "com": "anelCotovelo",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.009999999999999995,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
       "forma": "sha256:577dba8778a7840f7f66207ab925a0fc6ebb74c7fd955ae2679688492aa419b8",
-      "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o cotovelo com o eixo paralelo ao do ombro e a saída para o lado oposto",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      },
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -362,12 +305,25 @@
             "analise": "ausente"
           },
           "forma": "sha256:accd2d46ad4366621347b97dd3747d0352f61c07c26cb8537f0517582573ecb8"
+        },
+        {
+          "por": "pessoa",
+          "quando": "2026-11-09",
+          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou o cotovelo com o eixo paralelo ao do ombro e a saída para o lado oposto",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:577dba8778a7840f7f66207ab925a0fc6ebb74c7fd955ae2679688492aa419b8"
         }
       ]
     },
     {
       "instancia": "anelAntebraco",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [
         {
           "relacao": "anelAntebracoSentaNaSaida",
@@ -413,13 +369,6 @@
         }
       ],
       "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6",
-      "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      },
       "reaberturas": [
         {
           "por": "pessoa",
@@ -433,12 +382,25 @@
             "analise": "ausente"
           },
           "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6"
+        },
+        {
+          "por": "pessoa",
+          "quando": "2026-11-09",
+          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6"
         }
       ]
     },
     {
       "instancia": "antebraco",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [
         {
           "relacao": "antebracoSentaNoAnel",
@@ -484,13 +446,21 @@
         }
       ],
       "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a",
-      "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      }
+      "reaberturas": [
+        {
+          "por": "pessoa",
+          "quando": "2026-11-09",
+          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a"
+        }
+      ]
     }
   ]
 }

@@ -3,131 +3,314 @@
   "versao": 5,
   "id": "braco-robotico",
   "instancias": [
-    { "id": "base", "alvo": { "tipo": "peca", "ref": "braco-robotico/base" } },
-    { "id": "anelCintura", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-cintura" } },
-    { "id": "ombro", "alvo": { "tipo": "peca", "ref": "braco-robotico/ombro" } },
-    { "id": "braco", "alvo": { "tipo": "peca", "ref": "braco-robotico/braco" } },
-    { "id": "anelCotovelo", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-cotovelo" } },
-    { "id": "cotovelo", "alvo": { "tipo": "peca", "ref": "braco-robotico/cotovelo" } },
-    { "id": "anelAntebraco", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-antebraco" } },
-    { "id": "antebraco", "alvo": { "tipo": "peca", "ref": "braco-robotico/antebraco" } }
+    {
+      "id": "base",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/base"
+      }
+    },
+    {
+      "id": "anelCintura",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/anel-cintura"
+      }
+    },
+    {
+      "id": "ombro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/ombro"
+      }
+    },
+    {
+      "id": "braco",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/braco"
+      }
+    },
+    {
+      "id": "cotovelo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/cotovelo"
+      }
+    },
+    {
+      "id": "anelAntebraco",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/anel-antebraco"
+      }
+    },
+    {
+      "id": "antebraco",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/antebraco"
+      }
+    }
   ],
   "relacoes": [
     {
       "id": "anelSentaNaBase",
       "tipo": "assentaAnular",
-      "referencia": { "caminho": ["base"], "porta": "assento" },
-      "movel": { "caminho": ["anelCintura"], "porta": "apoio" },
+      "referencia": {
+        "caminho": [
+          "base"
+        ],
+        "porta": "assento"
+      },
+      "movel": {
+        "caminho": [
+          "anelCintura"
+        ],
+        "porta": "apoio"
+      },
       "especificacao": {
-        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "toleranciaNumerica": 0.000001
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
       }
     },
     {
       "id": "ombroSentaNoAnel",
       "tipo": "assentaAnular",
-      "referencia": { "caminho": ["anelCintura"], "porta": "topo" },
-      "movel": { "caminho": ["ombro"], "porta": "apoio" },
+      "referencia": {
+        "caminho": [
+          "anelCintura"
+        ],
+        "porta": "topo"
+      },
+      "movel": {
+        "caminho": [
+          "ombro"
+        ],
+        "porta": "apoio"
+      },
       "especificacao": {
-        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "toleranciaNumerica": 0.000001
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
       }
     },
     {
-      "id": "anelCotoveloSentaNaColuna",
+      "id": "cotoveloSentaNaColuna",
       "tipo": "assentaAnular",
-      "referencia": { "caminho": ["braco"], "porta": "topo" },
-      "movel": { "caminho": ["anelCotovelo"], "porta": "apoio" },
+      "referencia": {
+        "caminho": [
+          "braco"
+        ],
+        "porta": "topo"
+      },
+      "movel": {
+        "caminho": [
+          "cotovelo"
+        ],
+        "porta": "apoio"
+      },
       "especificacao": {
-        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "toleranciaNumerica": 0.000001
-      }
-    },
-    {
-      "id": "cotoveloSentaNoColar",
-      "tipo": "assentaAnular",
-      "referencia": { "caminho": ["anelCotovelo"], "porta": "topo" },
-      "movel": { "caminho": ["cotovelo"], "porta": "apoio" },
-      "especificacao": {
-        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "toleranciaNumerica": 0.000001
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
       }
     },
     {
       "id": "anelAntebracoSentaNaSaida",
       "tipo": "assentaAnular",
-      "referencia": { "caminho": ["cotovelo"], "porta": "saida" },
-      "movel": { "caminho": ["anelAntebraco"], "porta": "apoio" },
+      "referencia": {
+        "caminho": [
+          "cotovelo"
+        ],
+        "porta": "saida"
+      },
+      "movel": {
+        "caminho": [
+          "anelAntebraco"
+        ],
+        "porta": "apoio"
+      },
       "especificacao": {
-        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "toleranciaNumerica": 0.000001
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
       }
     },
     {
       "id": "antebracoSentaNoAnel",
       "tipo": "assentaAnular",
-      "referencia": { "caminho": ["anelAntebraco"], "porta": "topo" },
-      "movel": { "caminho": ["antebraco"], "porta": "apoio" },
+      "referencia": {
+        "caminho": [
+          "anelAntebraco"
+        ],
+        "porta": "topo"
+      },
+      "movel": {
+        "caminho": [
+          "antebraco"
+        ],
+        "porta": "apoio"
+      },
       "especificacao": {
-        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
-        "toleranciaNumerica": 0.000001
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
       }
     }
   ],
-  "etapas": ["base", "anelCintura", "ombro", "braco", "anelCotovelo", "cotovelo", "anelAntebraco", "antebraco"],
+  "etapas": [
+    "base",
+    "anelCintura",
+    "ombro",
+    "braco",
+    "cotovelo",
+    "anelAntebraco",
+    "antebraco"
+  ],
   "vinculos": [
     {
       "id": "anelComORaioDaBase",
-      "alvo": { "instancia": "anelCintura", "param": "raio" },
-      "de": { "instancia": "base", "porta": "assento", "medida": "raioExterno" },
+      "alvo": {
+        "instancia": "anelCintura",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "base",
+        "porta": "assento",
+        "medida": "raioExterno"
+      },
       "unidade": "mm",
       "acrescimo": 0
     },
     {
       "id": "colarComORaioDoAnel",
-      "alvo": { "instancia": "ombro", "param": "raioDoPescoco" },
-      "de": { "instancia": "anelCintura", "porta": "topo", "medida": "raioExterno" },
+      "alvo": {
+        "instancia": "ombro",
+        "param": "raioDoPescoco"
+      },
+      "de": {
+        "instancia": "anelCintura",
+        "porta": "topo",
+        "medida": "raioExterno"
+      },
       "unidade": "mm",
       "acrescimo": 0
     },
     {
       "id": "juntaComORaioDoAnel",
-      "alvo": { "instancia": "braco", "param": "raioDaJunta" },
-      "de": { "instancia": "ombro", "porta": "juntaDoOmbro", "medida": "raio" },
+      "alvo": {
+        "instancia": "braco",
+        "param": "raioDaJunta"
+      },
+      "de": {
+        "instancia": "ombro",
+        "porta": "juntaDoOmbro",
+        "medida": "raio"
+      },
       "unidade": "mm",
       "acrescimo": 0
     },
     {
-      "id": "colarComORaioDaColuna",
-      "alvo": { "instancia": "anelCotovelo", "param": "raio" },
-      "de": { "instancia": "braco", "porta": "topo", "medida": "raioExterno" },
-      "unidade": "mm",
-      "acrescimo": 0
-    },
-    {
-      "id": "cotoveloComORaioDoColar",
-      "alvo": { "instancia": "cotovelo", "param": "raio" },
-      "de": { "instancia": "anelCotovelo", "porta": "topo", "medida": "raioExterno" },
+      "id": "cotoveloComORaioDaColuna",
+      "alvo": {
+        "instancia": "cotovelo",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "braco",
+        "porta": "topo",
+        "medida": "raioExterno"
+      },
       "unidade": "mm",
       "acrescimo": 0
     },
     {
       "id": "anelComORaioDaSaida",
-      "alvo": { "instancia": "anelAntebraco", "param": "raio" },
-      "de": { "instancia": "cotovelo", "porta": "saida", "medida": "raioExterno" },
+      "alvo": {
+        "instancia": "anelAntebraco",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "cotovelo",
+        "porta": "saida",
+        "medida": "raioExterno"
+      },
       "unidade": "mm",
       "acrescimo": 0
     },
     {
       "id": "antebracoComORaioDoAnel",
-      "alvo": { "instancia": "antebraco", "param": "raio" },
-      "de": { "instancia": "anelAntebraco", "porta": "topo", "medida": "raioExterno" },
+      "alvo": {
+        "instancia": "antebraco",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "anelAntebraco",
+        "porta": "topo",
+        "medida": "raioExterno"
+      },
       "unidade": "mm",
       "acrescimo": 0
     }
@@ -137,7 +320,10 @@
       "id": "anelSobreABase",
       "instancia": "anelCintura",
       "porta": "apoio",
-      "em": { "instancia": "base", "porta": "assento" },
+      "em": {
+        "instancia": "base",
+        "porta": "assento"
+      },
       "unidade": "mm",
       "afastamento": 0
     },
@@ -145,7 +331,10 @@
       "id": "ombroSobreOAnel",
       "instancia": "ombro",
       "porta": "apoio",
-      "em": { "instancia": "anelCintura", "porta": "topo" },
+      "em": {
+        "instancia": "anelCintura",
+        "porta": "topo"
+      },
       "unidade": "mm",
       "afastamento": 0
     },
@@ -153,23 +342,21 @@
       "id": "bracoNaJuntaDoOmbro",
       "instancia": "braco",
       "porta": "juntaNoOmbro",
-      "em": { "instancia": "ombro", "porta": "juntaDoOmbro" },
+      "em": {
+        "instancia": "ombro",
+        "porta": "juntaDoOmbro"
+      },
       "unidade": "mm",
       "afastamento": 0
     },
     {
-      "id": "colarSobreAColuna",
-      "instancia": "anelCotovelo",
-      "porta": "apoio",
-      "em": { "instancia": "braco", "porta": "topo" },
-      "unidade": "mm",
-      "afastamento": 0
-    },
-    {
-      "id": "cotoveloSobreOColar",
+      "id": "cotoveloSobreAColuna",
       "instancia": "cotovelo",
       "porta": "apoio",
-      "em": { "instancia": "anelCotovelo", "porta": "topo" },
+      "em": {
+        "instancia": "braco",
+        "porta": "topo"
+      },
       "unidade": "mm",
       "afastamento": 0
     },
@@ -177,7 +364,10 @@
       "id": "anelSobreASaida",
       "instancia": "anelAntebraco",
       "porta": "apoio",
-      "em": { "instancia": "cotovelo", "porta": "saida" },
+      "em": {
+        "instancia": "cotovelo",
+        "porta": "saida"
+      },
       "unidade": "mm",
       "afastamento": 0
     },
@@ -185,7 +375,10 @@
       "id": "antebracoSobreOAnel",
       "instancia": "antebraco",
       "porta": "apoio",
-      "em": { "instancia": "anelAntebraco", "porta": "topo" },
+      "em": {
+        "instancia": "anelAntebraco",
+        "porta": "topo"
+      },
       "unidade": "mm",
       "afastamento": 0
     }

@@ -2,7 +2,7 @@
  *
  * Quarta etapa da montagem `braco-robotico/montagem.json`. A decisão da pessoa
  * (2026-11-03, opção 3) está no fim de `../../ALINHAMENTO.md`: cilindro de 156
- * mm do pé ao topo, 477 mm do fundo do pé ao topo, pé redondo em volta do eixo
+ * mm do pé ao topo, 502 mm do fundo do pé ao topo, pé redondo em volta do eixo
  * da junta do ombro, uma peça só. Em 2026-11-05 a pessoa pediu a peça numa
  * superfície só, sem união: antes eram dois `lathe` unidos com
  * `arredondarCostura` no encontro, e a emenda deixava malhas que não se casam.
@@ -42,8 +42,7 @@
  *   juntaNoOmbro — cilindro interno, eixo +Z, centro no meio do disco do pé que
  *                  encosta, raio do pé. Senta na `juntaDoOmbro` do ombro.
  *   topo         — anel que recebe, eixo +Y, centro no meio da face plana de
- *                  cima, face inteira (raio da coluna). O anel do cotovelo,
- *                  de cerca de 160 mm, sai daqui.
+ *                  cima, face inteira (raio da coluna). O cotovelo assenta aqui.
  *
  * Curso. A rotação é em torno do eixo +Z da junta, e toda a peça fica em
  * z de 0 a 156 mm, à frente da face do anel: nenhum ponto cruza o plano do
@@ -59,7 +58,7 @@ export const TABELA = {
   raioDaJunta: 95,
   diametroDaColuna: 156,
   /* Do fundo do pé ao topo. */
-  alturaTotal: 477,
+  alturaTotal: 502,
   /* Chanfro estreito: o do topo da coluna (2 por 2) e o das faces do pé (2 de raio por `fundoDoChanfroDoPe` de fundo, que é o
      primeiro passo entre planos e não pode ser menor que 2,5). */
   chanfro: 2,
@@ -210,24 +209,24 @@ const receita = {
   PARAMS: TABELA,
   get TOPO() { return { origem: 'centro do disco do pé que encosta no anel da junta; +Z é o eixo da junta, y para cima, a coluna à frente (z de 0 a 156)', ...derivar(this.PARAMS).pontos }; },
   PLANO: {
-    objeto: 'coluna do braço robótico: cilindro redondo e reto à frente do ombro, que gira em volta do eixo da junta do ombro e leva o anel do cotovelo no topo',
+    objeto: 'coluna do braço robótico: cilindro redondo e reto à frente do ombro, que gira em volta do eixo da junta do ombro e leva o cotovelo no topo',
     referencias: ['../../referencias/coluna-reta.png', '../../referencias/coluna-reta-lado.png'],
     escala: { medida: 'diâmetro da coluna, do pé ao topo', milimetros: 156 },
     partes: [
       { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 156 mm de diâmetro (o da coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'gaiolaPorLacos de eixo Z, uma malha única com a coluna: laço de disco de raio 78 mais a faixa da coluna, tampas planas com chanfro em vinco, filete do encontro nos próprios pontos do laço, compensar nas curvas' },
-      { nome: 'coluna', forma: 'cilindro redondo e reto de 156 mm do pé ao topo, 477 mm do fundo do pé ao topo, de eixo vertical sobre o pé; topo plano onde assenta o anel do cotovelo; bordas suavizadas', tecnica: 'mesma malha única por gaiolaPorLacos: parede da coluna em trechos de passo crescente, chanfro do topo com vinco, planos em torno do eixo da coluna, compensar nos trechos de canto e de curva, sem unir' },
+      { nome: 'coluna', forma: 'cilindro redondo e reto de 156 mm do pé ao topo, 502 mm do fundo do pé ao topo, de eixo vertical sobre o pé; topo plano onde assenta o cotovelo; bordas suavizadas', tecnica: 'mesma malha única por gaiolaPorLacos: parede da coluna em trechos de passo crescente, chanfro do topo com vinco, planos em torno do eixo da coluna, compensar nos trechos de canto e de curva, sem unir' },
     ],
     criteriosDeReprovacao: [
       'coluna que afunila, engrossa ou tem diâmetro diferente de 156 mm em algum trecho',
-      'altura do fundo do pé ao topo diferente de 477 mm',
+      'altura do fundo do pé ao topo diferente de 502 mm',
       'pé que não é redondo em volta do eixo da junta, ou de diâmetro diferente do da coluna',
       'fresta, emenda, degrau ou parafuso entre o pé e a coluna: precisa ser uma peça só',
       'pé afastado da face do anel da junta ou entrando nele',
       'qualquer ponto da peça atrás do plano da face do anel (z menor que 0 no referencial da peça): atravessaria o bloco do ombro',
-      'topo inclinado, abaulado ou sem a face plana de assento do anel do cotovelo',
+      'topo inclinado, abaulado ou sem a face plana de assento do cotovelo',
       'bordas vivas, sem o acabamento suavizado das carcaças',
       'sombreado torcido ou rasgo no encontro do pé com a coluna',
-      'sem a porta `topo` para o anel do cotovelo, de eixo vertical',
+      'sem a porta `topo` para o cotovelo, de eixo vertical',
       'curso declarado além do que a geometria permite: nenhum toque com ombro, anel da cintura ou base em ângulo algum; cerca de 141 graus da vertical para cada lado até o chão (eixo a 360 mm)',
     ],
   },
