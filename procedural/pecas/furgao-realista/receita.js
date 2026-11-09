@@ -816,8 +816,8 @@ const LENTES = {
   lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1, relevo: LENTE_DE_PRISMAS },
 };
 export const MATERIAIS_DO_FURGAO = {
-  // tinta sólida com verniz: base de aspereza média, verniz inteiro e liso por cima
-  azul: { tipo: 'liso', cor: '#3350b0', aspereza: 0.5, metalicidade: 0.05, verniz: 1, asperezaDoVerniz: 0.04 },
+  // tinta sólida com verniz: base de aspereza média e verniz por cima; verniz 0,8 e asperezaDoVerniz 0,12 foram a escolha da pessoa em 2026-11-09, a versão B entre três versões
+  azul: { tipo: 'liso', cor: '#3350b0', aspereza: 0.5, metalicidade: 0.05, verniz: 0.8, asperezaDoVerniz: 0.12 },
   // a borracha de vão em volta dos cristais; o pneu tem os seus (`pneuBanda` e `pneuFlanco`)
   borracha: { tipo: 'liso', cor: '#26262b' },
   // aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima; é o `aco` que a família roda-pneu dá ao aro, ao cubo e ao disco
