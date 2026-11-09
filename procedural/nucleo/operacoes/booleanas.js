@@ -752,6 +752,10 @@ export function criarOperacoesBooleanas(servicos) {
         const um = [], dois = [];
         for (let t = k; ; t = (t + 1) % P.length) { um.push(P[t]); if (t === melhor) break; }
         for (let t = melhor; ; t = (t + 1) % P.length) { dois.push(P[t]); if (t === k) break; }
+        /* a diagonal que deixa uma das metades sem área de verdade (a do portão de face degenerada; dois cantos de tubos a poucos micrômetros um do outro, onde a
+           geratriz de um cilindro cruza a do outro) devolve o pedaço sem área que a fusão acabou de absorver, e o
+           laço do acabamento oscila até desistir; o canto colinear fica, e `melhorInicio` põe o leque longe dele */
+        if (areaDe(pos, um) < piso * 1e-3 || areaDe(pos, dois) < piso * 1e-3) continue;
         return [...semColinear(um), ...semColinear(dois)];
       }
       return [P];

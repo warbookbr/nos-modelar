@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1730 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1081,6 +1081,7 @@
 - `arredondar-chapa-furada.test.ts` — arredondar-chapa-furada.test.ts — as três recusas que sobravam ao arredondar as arestas de uma chapa de 6 mm com furos oblongos.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
 - `arredondar-costura-pontas.test.ts` — arredondar-costura-pontas.test.ts — a ponta solta do arredondamento por fatias. A fixture é a coluna do braço robótico reduzida ao essencial: um disco de eix…
+- `arredondar-costura-tubos-altos.test.ts` — arredondar-costura-tubos-altos.test.ts — dois tubos de mesmo diâmetro em T, o vertical mais alto que o raio, unidos e arredondados. Com 144 lados as geratriz…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
 - `arredondar-facetado.test.ts` — arredondar-facetado.test.ts — arredondarAresta numa forma facetada não devolve a face vizinha torta. O arco anda no plano perpendicular à aresta e o canto da…
 - `arredondar-tampa-partida.test.ts` — arredondar-tampa-partida.test.ts — arredondarAresta e filete numa aresta cujo lado é uma tampa partida.
