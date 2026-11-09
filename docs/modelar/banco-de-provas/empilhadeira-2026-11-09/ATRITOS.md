@@ -35,3 +35,12 @@ processo o teria pego sozinho e o destino.
    `alinhar-modelagem` passou a pedir a razão entre medidas em cada vista antes de modelar; a largura sai da ficha,
    com a proporção interna da vista de cima (carcaça a 0,89 da largura nos pneus), e a decisão vai à pessoa com a
    imagem.
+6. **A tampa do capô foi medida no olho na vista de trás e saiu errada.** O perfil de trás de cada parte foi lido à mão
+   na imagem, e o topo das colunas do encosto, que aparece atrás do capô, foi tomado como aba da tampa: a tampa virou
+   uma laje mais larga que o capô, quando na referência é um painel central com 68% da largura, entre dois ombros
+   laranja, com a aba de trás descendo sobre a grade. A grade saiu como rebaixo laranja e é moldura cinza em U; o
+   contrapeso saiu trapézio e tem os lados côncavos. O processo não pegou: só a lateral tinha mapa de partes, e o
+   rascunho foi à pessoa sem comparação com a referência; foi a pessoa que apontou. Destino: a traseira foi refeita
+   com os trechos de cada cor medidos linha a linha na vista de trás, e conferida pela divisão por cor do rascunho
+   contra a da referência (80% dos pixels na mesma classe; o resto é o eixo, que não é da carcaça); a skill
+   `esbocar-opcoes` passou a pedir essa conferência antes de mostrar, e a ferramenta que a faz entrou no backlog.

@@ -46,7 +46,7 @@ describe('os esboços guardados', () => {
       const json = ler(f);
       const r = abrir(json);
       expect(r.motivos ?? [], f).toEqual([]);
-      const formas = json.opcoes.reduce((s, o) => s + o.formas.length, 0);
+      const formas = json.opcoes.reduce((s, o) => s + (o.formas ?? []).length, 0); // a opção só de passos, como a carcaça da empilhadeira, não tem formas
       /* a conferência da medida é da forma traduzida do formato antigo; o esboço do 2.0, como as opções do cotovelo do braço, não traduz */
       if (r.formato === 'antigo') expect(r.conferencias, f).toHaveLength(formas);
       for (const o of r.opcoes) expect(o.facesSemParte, f).toBe(0);
