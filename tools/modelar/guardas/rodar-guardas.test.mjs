@@ -78,7 +78,10 @@ describe('rodarGuardas', () => {
       repo, escrever: () => {}, faixas: 2,
     });
     expect(resultados.map((r) => r.nome)).toEqual(['guarda:rapida', 'guarda:lenta', 'guarda:outra']);
-    expect(Date.now() - inicio).toBeLessThan(900 + 800);
+    /* juntas, a rodada dura menos que a soma das três: a prova não depende de quanto a máquina leva para subir cada processo,
+       que com carga passou dos 800 ms de folga fixa que este teste tinha (falhou com 1701 ms contra 1700 em 2026-11-09) */
+    const somadas = resultados.reduce((s, r) => s + r.duracao, 0);
+    expect(Date.now() - inicio).toBeLessThan(somadas);
   });
 
   it('nenhum navegador sobe quando nenhuma guarda usa um', async () => {
