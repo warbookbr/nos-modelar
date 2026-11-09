@@ -22,8 +22,12 @@
    A banda e o andaime saem da peça depois do corte, e o registro guarda a chapa inteira: as faces que a booleana não viu ficam como
    estavam. O trecho que alcança a parede de outro vão, ou a lateral da chapa, onde as peles se juntam e a borda tem uma volta só,
    perde as faces de parede (`soltarParedes`: a face sem pele do outro lado, a até duas espessuras na direção contrária à normal) e a
-   banda refaz a parede entre as duas voltas que sobram; a parede que toca o prisma fica, e então o trecho não recorta. O trecho que
-   ainda não fecha por uma banda de duas voltas, o que passa de metade da chapa e a banda torcida (a diagonal dela passa de uma vez e
+   banda refaz a parede entre as voltas que sobram. A borda tem número par de voltas, duas por anel de pele (o vão vizinho que o trecho
+   envolve deixa quatro): a banda casa cada volta com a mais próxima, a da outra pele, e mede cada par pela aresta e pela espessura
+   dele. O trecho que ainda não fecha (a parede toca o prisma, ou tiradas as faces de parede a borda toca a si mesma) engole o tubo de
+   parede inteiro do vão vizinho (`absorverTubos`: as faces de parede ligadas às que ele já tem, as de pele que dividem vértice com
+   elas, e a face que ficou de fora no meio do trecho, o poço), de modo que a borda corre só pelas peles. O trecho que ainda não fecha
+   por uma banda de voltas em pares, o que passa de metade da chapa e a banda torcida (a diagonal dela passa de uma vez e
    meia a hipotenusa da maior aresta da borda com a espessura, e não do porte da borda, que a malha grossa estoura sem que as voltas
    deixem de se corresponder) não recortam, e a booleana vê a chapa inteira, como antes; `vizinhanca` no registro diz qual
    foi e por quê (a chapa de menos de FACES_MINIMAS_PARA_RECORTAR faces também não recorta). O vértice novo da booleana recebe o id na ordem da saída da Manifold, que muda com a malha que ela recebe, e a
@@ -825,6 +829,10 @@ function intersecaoNaManifold(wasm, solidos, caixa = null) {
 
 /* ---- a vizinhança do vão: o recorte da chapa que a booleana vê ---- */
 
+/** O controle das provas: com `ligado = false` a booleana vê sempre a chapa inteira, a malha de referência contra a qual as provas medem o
+ *  recorte. A receita não o alcança; só o teste o desliga, e o religa no fim. */
+export const CONTROLE_DO_RECORTE = { ligado: true };
+
 /** A vizinhança só compensa quando é uma parte da chapa: acima desta fração das faces dela, a booleana vê a chapa inteira. */
 export const FRACAO_MAXIMA_DA_VIZINHANCA = 0.5;
 /** Abaixo deste número de faces a booleana da chapa inteira é barata (uma chapa de cinco mil faces leva uns 0,2 s), e o recorte não
@@ -837,17 +845,22 @@ const FOLGA_DA_VIZINHANCA = 1e-3;
 const FOLGA_DA_DIAGONAL = 1.5;
 /** Até quantas espessuras, na direção contrária à normal, uma face de pele tem a pele do outro lado; a face sem pele ali é parede. */
 const ALCANCE_DA_PELE = 2;
+/** Até quantas arestas tem a volta de borda, e quantas faces tem o lado de fora dela, que o trecho fecha como um poço (face que ficou de fora no meio dele). */
+const TAMANHO_DO_POCO = 12;
+/** O poço é pequeno diante do trecho: o trecho tem no mínimo tantas faces quanto este número de vezes as do lado de fora da volta. */
+const FACES_POR_POCO = 20;
 /** O cosseno, no máximo, entre a normal de uma face de pele e a da face de pele do outro lado: as duas olham para lados opostos, a menos
  *  da curvatura da chapa entre elas (cerca de 35 graus). */
 const COS_DA_PELE_OPOSTA = -0.8;
 
 /** bandaDaVizinhanca(pos, faces) -> { banda, bordas, voltas } | { motivo }
  *  `faces` é um Map id -> vértices de um trecho da chapa, e `pos` dá o ponto de um vértice. A borda do trecho (a aresta cuja
- *  oposta não está nele) de uma chapa com espessura tem duas voltas, a da pele de fora e a da de dentro; a banda são os triângulos que
+ *  oposta não está nele) de uma chapa com espessura tem duas voltas, a da pele de fora e a da de dentro (quatro, ou mais, em pares, quando
+ *  o trecho envolve o anel de outro vão: cada volta se casa com a mais próxima); a banda são os triângulos que
  *  ligam uma à outra, a parede que a chapa teria no recorte, de modo que o trecho e a banda formam um sólido fechado e orientado, que a
  *  booleana aceita. Cada volta anda no sentido em que o trecho a percorre. A banda é um zíper: a partir do par de vértices mais
  *  próximo, avança a volta cuja próxima diagonal sai mais curta. Recusa, com o motivo, a borda que não é de duas voltas simples e a
- *  banda cujas diagonais passam de um quinto do tamanho da volta (a banda torcida, que ligaria vértices que não se correspondem). */
+ *  banda cujas diagonais passam de 1,5 vez a hipotenusa da maior aresta do par de voltas com a espessura (a banda torcida, que ligaria vértices que não se correspondem). */
 export function bandaDaVizinhanca(pos, faces) {
   const dirigidas = new Set();
   for (const vs of faces.values()) for (let k = 0; k < vs.length; k++) dirigidas.add(`${vs[k]}>${vs[(k + 1) % vs.length]}`);
@@ -866,25 +879,43 @@ export function bandaDaVizinhanca(pos, faces) {
     if (c !== inicio) return { motivo: 'a borda da vizinhança não fecha em voltas simples' };
     voltas.push(volta);
   }
-  if (voltas.length !== 2) return { nVoltas: voltas.length, motivo: `a borda da vizinhança tem ${voltas.length} voltas, e não as duas (pele de fora e de dentro) de uma chapa com espessura` };
-  const P = [...voltas[0]].reverse(); const Q = voltas[1];
+  if (voltas.length < 2 || voltas.length % 2) return { nVoltas: voltas.length, motivo: `a borda da vizinhança tem ${voltas.length} voltas, e não as duas (pele de fora e de dentro) de uma chapa com espessura` };
   const dist = (x, y) => tamanho(sub(pos(x), pos(y)));
-  let melhor = Infinity; let i0 = 0, j0 = 0;
-  for (let i = 0; i < P.length; i++) for (let j = 0; j < Q.length; j++) { const d = dist(P[i], Q[j]); if (d < melhor) { melhor = d; i0 = i; j0 = j; } }
-  const n = P.length, m = Q.length;
-  const banda = []; let diagonal = 0;
-  for (let i = 0, j = 0; i < n || j < m;) {
-    const pi = P[(i0 + i) % n], pi1 = P[(i0 + i + 1) % n], qj = Q[(j0 + j) % m], qj1 = Q[(j0 + j + 1) % m];
-    const avancaP = i >= n ? false : j >= m ? true : dist(pi1, qj) <= dist(pi, qj1);
-    if (avancaP) { banda.push([pi, pi1, qj]); diagonal = Math.max(diagonal, dist(pi1, qj)); i++; } else { banda.push([qj1, qj, pi]); diagonal = Math.max(diagonal, dist(pi, qj1)); j++; }
+  /* cada volta de uma pele tem a sua par na outra: as mais próximas se casam (duas voltas: as duas; o trecho que engole o tubo de
+     parede de outro vão tem quatro, as de fora e as de dentro do anel) */
+  const pares = []; const usadas = new Set();
+  if (voltas.length === 2) pares.push([0, 1, null]);
+  else {
+    const candidatos = [];
+    for (let i = 0; i < voltas.length; i++) for (let j = i + 1; j < voltas.length; j++) {
+      let menor = Infinity;
+      for (const x of voltas[i]) for (const y of voltas[j]) { const d = dist(x, y); if (d < menor) menor = d; }
+      candidatos.push([menor, i, j]);
+    }
+    candidatos.sort((x, y) => x[0] - y[0] || x[1] - y[1] || x[2] - y[2]);
+    for (const [, i, j] of candidatos) if (!usadas.has(i) && !usadas.has(j)) { usadas.add(i); usadas.add(j); pares.push([i, j, null]); }
   }
-  /* Um par que se corresponde fica a uma espessura de distância e a uma aresta de deslocamento ao longo da volta: a diagonal do zíper
-     passa da maior aresta da borda só pela espessura (`melhor`), e na malha grossa ela é longa sem que as voltas deixem de se
-     corresponder. A banda torcida liga vértices a distâncias que a aresta e a espessura não explicam. */
-  let aresta = 0;
-  for (const [a, b] of bordas) aresta = Math.max(aresta, dist(a, b));
-  const limite = FOLGA_DA_DIAGONAL * Math.hypot(aresta, melhor);
-  if (!(diagonal <= limite)) return { motivo: `a banda da vizinhança liga vértices a ${fmt(diagonal * 1000)} mm, mais que ${FOLGA_DA_DIAGONAL} vez a aresta de ${fmt(aresta * 1000)} mm da borda com a espessura de ${fmt(melhor * 1000)} mm: as duas voltas não se correspondem` };
+  const banda = [];
+  for (const par of pares) {
+    const P = [...voltas[par[0]]].reverse(); const Q = voltas[par[1]];
+    let melhor = Infinity; let i0 = 0, j0 = 0;
+    for (let i = 0; i < P.length; i++) for (let j = 0; j < Q.length; j++) { const d = dist(P[i], Q[j]); if (d < melhor) { melhor = d; i0 = i; j0 = j; } }
+    const n = P.length, m = Q.length;
+    let diagonal = 0;
+    for (let i = 0, j = 0; i < n || j < m;) {
+      const pi = P[(i0 + i) % n], pi1 = P[(i0 + i + 1) % n], qj = Q[(j0 + j) % m], qj1 = Q[(j0 + j + 1) % m];
+      const avancaP = i >= n ? false : j >= m ? true : dist(pi1, qj) <= dist(pi, qj1);
+      if (avancaP) { banda.push([pi, pi1, qj]); diagonal = Math.max(diagonal, dist(pi1, qj)); i++; } else { banda.push([qj1, qj, pi]); diagonal = Math.max(diagonal, dist(pi, qj1)); j++; }
+    }
+    /* Um par que se corresponde fica a uma espessura de distância e a uma aresta de deslocamento ao longo da volta: a diagonal do zíper
+       passa da maior aresta da borda só pela espessura (`melhor`), e na malha grossa ela é longa sem que as voltas deixem de se
+       corresponder. A banda torcida liga vértices a distâncias que a aresta e a espessura não explicam. */
+    const nas = new Set([...voltas[par[0]], ...voltas[par[1]]]);
+    let aresta = 0;
+    for (const [a, b] of bordas) if (nas.has(a)) aresta = Math.max(aresta, dist(a, b));
+    const limite = FOLGA_DA_DIAGONAL * Math.hypot(aresta, melhor);
+    if (!(diagonal <= limite)) return { motivo: `a banda da vizinhança liga vértices a ${fmt(diagonal * 1000)} mm, mais que ${FOLGA_DA_DIAGONAL} vez a aresta de ${fmt(aresta * 1000)} mm da borda com a espessura de ${fmt(melhor * 1000)} mm: as duas voltas não se correspondem` };
+  }
   return { banda, bordas, voltas };
 }
 
@@ -893,9 +924,10 @@ export function bandaDaVizinhanca(pos, faces) {
  *  na vista, e só entre elas há semente) mais as que dividem um vértice com elas, de modo que as faces da borda do trecho não tocam o
  *  prisma e saem da booleana como entraram. `ids` sai em ordem crescente, de `idsDaChapa`. Recusa o recorte (e a booleana vê a chapa
  *  inteira) quando o trecho passa de FRACAO_MAXIMA_DA_VIZINHANCA da chapa ou não fecha pela banda. Com `espessura` (metro, ou função que a
- *  dá) e `tocaOPrisma(id)`, o trecho de uma volta só tenta perder as faces de parede (`soltarParedes`) antes de recusar; `paredes` diz
- *  quais perdeu. */
+ *  dá) e `tocaOPrisma(id)`, o trecho que a banda recusa tenta perder as faces de parede (`soltarParedes`) e, se ainda assim não fecha,
+ *  engolir o tubo de parede inteiro (`absorverTubos`) antes de recusar; `paredes` diz quais perdeu. */
 export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, caixaDaChapa, espessura = null, tocaOPrisma = null }) {
+  if (!CONTROLE_DO_RECORTE.ligado) return { motivo: 'o recorte da vizinhança está desligado (controle de prova)' };
   if (idsDaChapa.length < FACES_MINIMAS_PARA_RECORTAR) return { motivo: `a chapa tem ${idsDaChapa.length} faces, menos que as ${FACES_MINIMAS_PARA_RECORTAR} a partir das quais o recorte compensa` };
   const [min, max] = extremosDos(pontosDoPrisma);
   const folga = FOLGA_DA_VIZINHANCA * Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
@@ -912,63 +944,149 @@ export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, ca
   const pos = (v) => V.get(v);
   let r = bandaDaVizinhanca(pos, new Map(ids.map((id) => [id, F.get(id).vs])));
   let paredes = [];
-  const e = r.motivo && r.nVoltas != null && tocaOPrisma ? (typeof espessura === 'function' ? espessura() : espessura) : null;
+  const e = r.motivo && tocaOPrisma ? (typeof espessura === 'function' ? espessura() : espessura) : null;
   if (e > 0) {
     /* o trecho alcançou a parede de outro vão: tirar dela as faces de parede devolve as duas voltas, e a banda refaz a parede */
-    const s = soltarParedes({ V, F, ids, idsDaChapa, espessura: e, tocaOPrisma });
-    if (s.motivo) return { ...r, motivo: `${r.motivo}; ${s.motivo}` };
-    const sem = new Set(s.paredes);
-    const resto = ids.filter((id) => !sem.has(id));
-    const r2 = bandaDaVizinhanca(pos, new Map(resto.map((id) => [id, F.get(id).vs])));
-    if (r2.motivo) return { ...r, motivo: `${r.motivo}; tiradas as ${s.paredes.length} faces de parede, ${r2.motivo}` };
-    ids = resto; r = r2; paredes = s.paredes;
+    const ehParede = classificadorDeParede({ V, F, idsDaChapa, espessura: e });
+    const s = soltarParedes({ V, F, ids, idsDaChapa, espessura: e, tocaOPrisma, ehParede });
+    let porque = s.motivo;
+    if (!s.motivo) {
+      const sem = new Set(s.paredes);
+      const resto = ids.filter((id) => !sem.has(id));
+      const r2 = bandaDaVizinhanca(pos, new Map(resto.map((id) => [id, F.get(id).vs])));
+      if (!r2.motivo) { ids = resto; r = r2; paredes = s.paredes; } else porque = `tiradas as ${s.paredes.length} faces de parede, ${r2.motivo}`;
+    }
+    if (r.motivo) {
+      /* a parede que não sai (a que o corte alcança, ou o tubo inteiro de um vão que a borda atravessa): o trecho a engole */
+      const t = absorverTubos({ F, ids, idsDaChapa, ehParede });
+      if (t.motivo) return { ...r, motivo: `${r.motivo}; ${porque}; ${t.motivo}` };
+      const r3 = bandaDaVizinhanca(pos, new Map(t.ids.map((id) => [id, F.get(id).vs])));
+      if (r3.motivo) return { ...r, motivo: `${r.motivo}; ${porque}; com os ${t.tubos} faces de tubo de parede dentro, ${r3.motivo}` };
+      ids = t.ids; r = r3;
+    }
   }
   if (r.motivo) return r;
   const andaime = andaimeDaCaixa(extremosDos([...new Set(ids.flatMap((id) => F.get(id).vs))].map((v) => V.get(v)).concat(pontosDoPrisma)), extremosDos([...caixaDaChapa, ...pontosDoPrisma]));
   return andaime.motivo ? andaime : { ids, ...r, andaime, paredes };
 }
 
-/** soltarParedes({ V, F, ids, idsDaChapa, espessura, tocaOPrisma }) -> { paredes } | { motivo }
- *  As faces do trecho `ids` que são parede de outro vão (ou a lateral da chapa) e não pele: uma face de pele tem do outro lado da chapa,
- *  na direção contrária à da normal e a até ALCANCE_DA_PELE espessuras, uma face de normal oposta; a parede tem ali o miolo da chapa.
- *  Recusa o trecho sem parede nenhuma (o que impede as duas voltas é outra coisa) e o que tem parede que toca o prisma, porque então o
- *  vão corta a parede e ela tem de entrar na booleana. `tocaOPrisma(id)` diz se a face toca o prisma do vão. */
-export function soltarParedes({ V, F, ids, idsDaChapa, espessura, tocaOPrisma }) {
+/** classificadorDeParede({ V, F, idsDaChapa, espessura }) -> (id) => boolean
+ *  Diz se uma face da chapa é parede (de outro vão ou da lateral da chapa) e não pele: uma face de pele tem do outro lado da chapa, na
+ *  direção contrária à da normal e a até ALCANCE_DA_PELE espessuras, uma face de normal oposta; a parede tem ali o miolo da chapa.
+ *  A busca da pele oposta passa por uma grade de células de 25 espessuras sobre a chapa inteira, e a face de área nula não é parede. */
+export function classificadorDeParede({ V, F, idsDaChapa, espessura }) {
   const alcance = ALCANCE_DA_PELE * espessura;
-  const caixaDe = (vs) => extremosDos(vs.map((v) => V.get(v)));
-  const [lo, hi] = extremosDos(ids.flatMap((id) => F.get(id).vs).map((v) => V.get(v)));
-  const candidatas = [];
+  const celula = 25 * espessura;
+  const cel = (x) => Math.floor(x / celula);
+  const dados = new Map(); const grade = new Map(); const grandes = [];
+  const LIMITE_DE_CELULAS = 512;
   for (const id of idsDaChapa) {
-    const vs = F.get(id).vs; const [a, b] = caixaDe(vs);
-    if (a[0] > hi[0] + alcance || b[0] < lo[0] - alcance || a[1] > hi[1] + alcance || b[1] < lo[1] - alcance || a[2] > hi[2] + alcance || b[2] < lo[2] - alcance) continue;
-    const pts = vs.map((v) => V.get(v)); const n = newell(pts); const l = tamanho(n);
+    const pts = F.get(id).vs.map((v) => V.get(v)); const n = newell(pts); const l = tamanho(n);
     if (!(l > 0)) continue;
-    candidatas.push({ id, pts, n: [n[0] / l, n[1] / l, n[2] / l], a, b });
+    const [a, b] = extremosDos(pts);
+    const g = { id, pts, n: [n[0] / l, n[1] / l, n[2] / l], a, b };
+    dados.set(id, g);
+    const [i0, j0, k0, i1, j1, k1] = [cel(a[0]), cel(a[1]), cel(a[2]), cel(b[0]), cel(b[1]), cel(b[2])];
+    if ((i1 - i0 + 1) * (j1 - j0 + 1) * (k1 - k0 + 1) > LIMITE_DE_CELULAS) { grandes.push(g); continue; }
+    for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) for (let k = k0; k <= k1; k++) {
+      const c = `${i},${j},${k}`; const lista = grade.get(c); if (lista) lista.push(g); else grade.set(c, [g]);
+    }
   }
-  const acha = (f) => {
-    const pts = f.pts; const d = [-f.n[0], -f.n[1], -f.n[2]];
-    const c = [0, 1, 2].map((k) => pts.reduce((s, p) => s + p[k], 0) / pts.length);
-    const fim = [c[0] + d[0] * alcance, c[1] + d[1] * alcance, c[2] + d[2] * alcance];
-    for (const g of candidatas) {
-      if (g.id === f.id || ponto(g.n, f.n) > COS_DA_PELE_OPOSTA) continue;
-      if (g.a[0] > Math.max(c[0], fim[0]) || g.b[0] < Math.min(c[0], fim[0]) || g.a[1] > Math.max(c[1], fim[1]) || g.b[1] < Math.min(c[1], fim[1]) || g.a[2] > Math.max(c[2], fim[2]) || g.b[2] < Math.min(c[2], fim[2])) continue;
-      for (let k = 1; k + 1 < g.pts.length; k++) {
-        const t = raioNoTriangulo(c, d, g.pts[0], g.pts[k], g.pts[k + 1]);
-        if (t != null && t <= alcance) return true;
-      }
+  const tem = (f, g, c, fim) => {
+    if (g.id === f.id || ponto(g.n, f.n) > COS_DA_PELE_OPOSTA) return false;
+    if (g.a[0] > Math.max(c[0], fim[0]) || g.b[0] < Math.min(c[0], fim[0]) || g.a[1] > Math.max(c[1], fim[1]) || g.b[1] < Math.min(c[1], fim[1]) || g.a[2] > Math.max(c[2], fim[2]) || g.b[2] < Math.min(c[2], fim[2])) return false;
+    const d = [-f.n[0], -f.n[1], -f.n[2]];
+    for (let k = 1; k + 1 < g.pts.length; k++) {
+      const t = raioNoTriangulo(c, d, g.pts[0], g.pts[k], g.pts[k + 1]);
+      if (t != null && t <= alcance) return true;
     }
     return false;
   };
-  const porId = new Map(candidatas.map((g) => [g.id, g]));
-  const paredes = [];
-  for (const id of ids) {
-    const f = porId.get(id);
-    if (f && !acha(f)) paredes.push(id);
-  }
+  const memo = new Map();
+  return (id) => {
+    if (memo.has(id)) return memo.get(id);
+    const f = dados.get(id); let parede = false;
+    if (f) {
+      const d = [-f.n[0], -f.n[1], -f.n[2]];
+      const c = [0, 1, 2].map((k) => f.pts.reduce((s, p) => s + p[k], 0) / f.pts.length);
+      const fim = [c[0] + d[0] * alcance, c[1] + d[1] * alcance, c[2] + d[2] * alcance];
+      let pele = grandes.some((g) => tem(f, g, c, fim));
+      for (let i = cel(Math.min(c[0], fim[0])); !pele && i <= cel(Math.max(c[0], fim[0])); i++) for (let j = cel(Math.min(c[1], fim[1])); !pele && j <= cel(Math.max(c[1], fim[1])); j++) for (let k = cel(Math.min(c[2], fim[2])); !pele && k <= cel(Math.max(c[2], fim[2])); k++) {
+        for (const g of grade.get(`${i},${j},${k}`) ?? []) if (tem(f, g, c, fim)) { pele = true; break; }
+      }
+      parede = !pele;
+    }
+    memo.set(id, parede);
+    return parede;
+  };
+}
+
+/** soltarParedes({ V, F, ids, idsDaChapa, espessura, tocaOPrisma, ehParede }) -> { paredes } | { motivo }
+ *  As faces do trecho `ids` que são parede de outro vão (ou a lateral da chapa) e não pele (ver `classificadorDeParede`).
+ *  Recusa o trecho sem parede nenhuma (o que impede as duas voltas é outra coisa) e o que tem parede que toca o prisma, porque então o
+ *  vão corta a parede e ela tem de entrar na booleana. `tocaOPrisma(id)` diz se a face toca o prisma do vão. */
+export function soltarParedes({ V, F, ids, idsDaChapa, espessura, tocaOPrisma, ehParede = classificadorDeParede({ V, F, idsDaChapa, espessura }) }) {
+  const paredes = ids.filter((id) => ehParede(id));
   if (!paredes.length) return { motivo: 'o trecho não tem face de parede para tirar' };
   const toca = paredes.find((id) => tocaOPrisma(id));
   if (toca != null) return { motivo: `a face de parede ${toca} toca o prisma do vão, e então o corte a alcança` };
   return { paredes };
+}
+
+/** absorverTubos({ F, ids, idsDaChapa, ehParede }) -> { ids, tubos } | { motivo }
+ *  O vão vizinho deixa na chapa um tubo de parede que liga as duas peles, e o trecho que o alcança pela metade tem a borda com voltas
+ *  que passam de uma pele à outra pela parede. Aqui o trecho engole o tubo inteiro: das faces de parede que já tem, segue pelas que
+ *  dividem um vértice com elas e são parede, e leva junto as faces de pele que dividem um vértice com o tubo, de modo que a borda
+ *  do trecho volta a correr só pelas peles, longe do tubo; a parede que a borda ainda alcança entra na rodada seguinte. Recusa quando
+ *  o trecho passa de FRACAO_MAXIMA_DA_VIZINHANCA da chapa. `ids` sai em ordem crescente. */
+export function absorverTubos({ F, ids, idsDaChapa, ehParede }) {
+  const daFace = new Map();
+  for (const id of idsDaChapa) for (const v of F.get(id).vs) { const l = daFace.get(v); if (l) l.push(id); else daFace.set(v, [id]); }
+  const trecho = new Set(ids); const tubos = new Set(); let fila = [];
+  const semear = (id) => { if (tubos.has(id)) return; tubos.add(id); trecho.add(id); fila.push(id); };
+  for (const id of ids) if (ehParede(id)) semear(id);
+  for (let rodada = 0; ; rodada++) {
+    for (let k = 0; k < fila.length; k++) {
+      for (const v of F.get(fila[k]).vs) for (const n of daFace.get(v)) { trecho.add(n); if (ehParede(n)) semear(n); }
+      if (trecho.size > FRACAO_MAXIMA_DA_VIZINHANCA * idsDaChapa.length) return { motivo: `o tubo de parede do vão vizinho leva a vizinhança a mais que ${FRACAO_MAXIMA_DA_VIZINHANCA * 100}% das ${idsDaChapa.length} faces da chapa` };
+    }
+    fila = [];
+    /* a parede que a borda ainda alcança: a face do outro lado de uma aresta de borda */
+    const dirigidas = new Set();
+    for (const id of trecho) { const vs = F.get(id).vs; for (let k = 0; k < vs.length; k++) dirigidas.add(`${vs[k]}>${vs[(k + 1) % vs.length]}`); }
+    for (const id of trecho) {
+      const vs = F.get(id).vs;
+      for (let k = 0; k < vs.length; k++) {
+        const a = vs[k], b = vs[(k + 1) % vs.length];
+        if (dirigidas.has(`${b}>${a}`)) continue;
+        for (const n of daFace.get(b)) if (!trecho.has(n) && F.get(n).vs.some((v, q, vsn) => v === b && vsn[(q + 1) % vsn.length] === a) && ehParede(n)) semear(n);
+      }
+    }
+    if (!fila.length || rodada > 50) break;
+  }
+  /* o poço: a volta de borda pequena (uma face, ou poucas, que ficou de fora no meio do trecho) fecha com as faces do outro lado dela */
+  for (let rodada = 0; rodada < 5; rodada++) {
+    const proximo = new Map(); const dirigidas = new Set();
+    for (const id of trecho) { const vs = F.get(id).vs; for (let k = 0; k < vs.length; k++) dirigidas.add(`${vs[k]}>${vs[(k + 1) % vs.length]}`); }
+    for (const id of trecho) { const vs = F.get(id).vs; for (let k = 0; k < vs.length; k++) { const a = vs[k], b = vs[(k + 1) % vs.length]; if (!dirigidas.has(`${b}>${a}`)) proximo.set(a, b); } }
+    const vistos = new Set(); let tampou = false;
+    for (const inicio of [...proximo.keys()].sort((x, y) => x - y)) {
+      if (vistos.has(inicio)) continue;
+      const volta = []; let c = inicio;
+      while (c != null && !vistos.has(c)) { vistos.add(c); volta.push(c); c = proximo.get(c); }
+      if (c !== inicio || volta.length > TAMANHO_DO_POCO) continue;
+      const fora = new Set();
+      for (let k = 0; k < volta.length; k++) {
+        const a = volta[k], b = volta[(k + 1) % volta.length];
+        for (const n of daFace.get(b)) if (!trecho.has(n) && F.get(n).vs.some((v, q, vsn) => v === b && vsn[(q + 1) % vsn.length] === a)) fora.add(n);
+      }
+      if (!fora.size || fora.size > TAMANHO_DO_POCO || FACES_POR_POCO * fora.size > trecho.size) continue;
+      for (const n of fora) trecho.add(n);
+      tampou = true;
+    }
+    if (!tampou) break;
+  }
+  return { ids: idsDaChapa.filter((id) => trecho.has(id)), tubos: tubos.size };
 }
 
 /** A distância ao longo do raio (origem o, direção d) até o triângulo abc, ou null (Möller-Trumbore, só para a frente). */
