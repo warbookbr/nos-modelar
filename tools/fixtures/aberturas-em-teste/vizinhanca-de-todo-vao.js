@@ -13,7 +13,10 @@
  *   - `vaoDeTubo`: o trecho tem uma volta e só sete das faces do tubo do vão vizinho; tiradas elas, a banda liga vértices a 95 mm
  *     (a família das origens 1101 a 1107, rentes ao chanfro do vão da porta, onde o trecho leva um pedaço do tubo dele);
  *   - `vaoRente`: a borda do trecho toca a si mesma num vértice, onde duas lascas rentes à parede de um vão vizinho se encontram
- *     (a mesma família, nas origens em que a borda "toca a si mesma").
+ *     (a mesma família, nas origens em que a borda "toca a si mesma");
+ *   - `paredeNaBordaA` e `paredeNaBordaB`: a banda de duas voltas passa no limite, mas o trecho leva as faces de parede do vão aberto
+ *     antes, e a booleana recusava o sólido por dentro ("o sólido 0 não é fechado") e deixava a operação órfã, enquanto a chapa inteira
+ *     abria. O trecho com face de parede passa a tirá-las (ou a engolir o tubo) como o que a banda recusa.
  *
  * Nada vem de referência externa. */
 import { chapaDeGrade, dosPassos, passoDaAbertura, poligonoDeRetas, receitaDe, retangulo } from './chapas.js';
@@ -27,6 +30,8 @@ export const PECAS = {
   vaoJuntoDeOutro: { triangulo: [295, 170, 254], vaos: [[518, 365, 585, 432], [463, 361, 502, 400]] },
   vaoDeTubo: { triangulo: [208, 169, 195], vaos: [[395, 362, 483, 450]] },
   vaoRente: { triangulo: [274, 269, 283], vaos: [[498, 499, 579, 580], [429, 520, 465, 556]] },
+  paredeNaBordaA: { triangulo: [195, 211, 191], vaos: [[341, 378, 374, 411]] },
+  paredeNaBordaB: { triangulo: [270, 160, 258], vaos: [[500, 238, 532, 270]] },
 };
 
 /** Os passos da peça: a subdivisão, os vãos pequenos em sequência e o triângulo por último. Devolve também os contornos, na ordem dos vãos. */

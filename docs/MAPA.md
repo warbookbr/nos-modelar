@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1773 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1774 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2146,6 +2146,7 @@
 - `chapa-por-rede.js` — chapa-por-rede.js — peça de teste do plano da abertura em qualquer direção: a chapa feita por outra gaiola, a gaiola por rede.
 - `chapas.js` — chapas.js — os blocos das peças de teste neutras da bateria do plano da abertura em qualquer direção: a chapa por grade (uma gaiola de pontos a cada `passo` …
 - `contornos-de-forma.js` — contornos-de-forma.js — peça de teste do plano da abertura em qualquer direção: o contorno côncavo (em L e em estrela) e o de bico muito agudo.
+- `controle-do-recorte.test.ts` — controle-do-recorte.test.ts — a trava de `CONTROLE_DO_RECORTE` (plano `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`): o controle que desliga o recorte d…
 - `dois-vaos.js` — dois-vaos.js — peça de teste do plano da abertura em qualquer direção: dois vãos na mesma chapa e o vão dentro da lente de outro.
 - `dois-vaos.test.ts` — dois-vaos.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`): dois vãos…
 - `dupla-curvatura.js` — dupla-curvatura.js — peça de teste do plano da abertura em qualquer direção: a superfície de dupla curvatura forte.

@@ -61,6 +61,9 @@ for (const nome of Object.keys(PECAS)) {
       const viz = recortada.aberturas.map((a: any) => a.vizinhanca);
       expect(viz.map((v: any) => v.recortada), JSON.stringify(viz.map((v: any) => v.motivo))).toEqual(contornos.map(() => true));
       expect(viz[ultimo].faces).toBeLessThan(0.3 * viz[ultimo].daChapa);
+      expect(['direto', 'paredes soltas', 'tubo absorvido'], 'o caminho em que o trecho fechou').toContain(viz[ultimo].via);
+      if (nome.startsWith('paredeNaBorda')) expect(viz[ultimo].via).toBe('paredes soltas');
+      expect(viz[ultimo].facesDeTubo).toBeGreaterThanOrEqual(0);
       expect(inteira.aberturas.map((a: any) => a.vizinhanca.recortada)).toEqual(contornos.map(() => false));
     });
 
@@ -107,7 +110,9 @@ describe('a banda de vários pares', () => {
   let id = 0;
   const colocar = (p: number[][], y: number) => p.map(([x, z]) => { pontos.set(id, [x, y, z]); return id++; });
   const fora = volta(50, 10), dentro = volta(20, 10);
-  const foraCima = colocar(fora, 0), foraBaixo = colocar(fora, -2), dentroCima = colocar(dentro, 0), dentroBaixo = colocar(dentro, -2);
+  /* os ids intercalados (fora de cima, dentro de cima, fora de baixo, dentro de baixo): as voltas saem na ordem do menor id, e casar por
+     índice (0 com 1, 2 com 3) ligaria o anel de fora ao de dentro; só o casamento por proximidade acerta */
+  const foraCima = colocar(fora, 0), dentroCima = colocar(dentro, 0), foraBaixo = colocar(fora, -2), dentroBaixo = colocar(dentro, -2);
   faces.set(1000, [...foraCima].reverse()); faces.set(1001, foraBaixo);
   faces.set(1002, dentroCima); faces.set(1003, [...dentroBaixo].reverse());
   const pos = (v: number) => pontos.get(v)!;

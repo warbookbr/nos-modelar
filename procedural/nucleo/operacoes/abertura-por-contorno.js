@@ -830,7 +830,8 @@ function intersecaoNaManifold(wasm, solidos, caixa = null) {
 /* ---- a vizinhança do vão: o recorte da chapa que a booleana vê ---- */
 
 /** O controle das provas: com `ligado = false` a booleana vê sempre a chapa inteira, a malha de referência contra a qual as provas medem o
- *  recorte. A receita não o alcança; só o teste o desliga, e o religa no fim. */
+ *  recorte. Só um teste pode usá-lo, e o religa no fim: uma receita, que é JS e importa o núcleo, alcançaria este objeto, e o teste
+ *  `controle-do-recorte.test.ts` reprova qualquer uso dele fora de arquivo `*.test.*` e deste módulo. */
 export const CONTROLE_DO_RECORTE = { ligado: true };
 
 /** A vizinhança só compensa quando é uma parte da chapa: acima desta fração das faces dela, a booleana vê a chapa inteira. */
@@ -925,7 +926,9 @@ export function bandaDaVizinhanca(pos, faces) {
  *  prisma e saem da booleana como entraram. `ids` sai em ordem crescente, de `idsDaChapa`. Recusa o recorte (e a booleana vê a chapa
  *  inteira) quando o trecho passa de FRACAO_MAXIMA_DA_VIZINHANCA da chapa ou não fecha pela banda. Com `espessura` (metro, ou função que a
  *  dá) e `tocaOPrisma(id)`, o trecho que a banda recusa tenta perder as faces de parede (`soltarParedes`) e, se ainda assim não fecha,
- *  engolir o tubo de parede inteiro (`absorverTubos`) antes de recusar; `paredes` diz quais perdeu. */
+ *  engolir o tubo de parede inteiro (`absorverTubos`) antes de recusar; o trecho que a banda aceita mas que tem face de parede segue o mesmo
+ *  caminho e, se nenhum fecha, fica com a banda direta. `paredes` diz quais perdeu, `via` por qual caminho fechou ('direto', 'paredes soltas'
+ *  ou 'tubo absorvido') e `tubos` quantas faces de tubo engoliu. */
 export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, caixaDaChapa, espessura = null, tocaOPrisma = null }) {
   if (!CONTROLE_DO_RECORTE.ligado) return { motivo: 'o recorte da vizinhança está desligado (controle de prova)' };
   if (idsDaChapa.length < FACES_MINIMAS_PARA_RECORTAR) return { motivo: `a chapa tem ${idsDaChapa.length} faces, menos que as ${FACES_MINIMAS_PARA_RECORTAR} a partir das quais o recorte compensa` };
@@ -943,31 +946,38 @@ export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, ca
   if (ids.length > FRACAO_MAXIMA_DA_VIZINHANCA * idsDaChapa.length) return { motivo: `a vizinhança do vão tem ${ids.length} das ${idsDaChapa.length} faces da chapa, mais que ${FRACAO_MAXIMA_DA_VIZINHANCA * 100}%` };
   const pos = (v) => V.get(v);
   let r = bandaDaVizinhanca(pos, new Map(ids.map((id) => [id, F.get(id).vs])));
-  let paredes = [];
-  const e = r.motivo && tocaOPrisma ? (typeof espessura === 'function' ? espessura() : espessura) : null;
+  let paredes = []; let via = 'direto'; let tubos = 0;
+  /* a classificação de parede roda sempre: o trecho que a banda aceita com face de parede de um vão aberto antes (a borda corre por
+     ela, ou ela fica dentro) sai da banda como um sólido que a booleana pode recusar por dentro, e passa pelo mesmo caminho do que a
+     banda recusa. Sem parede nenhuma no trecho, a banda direta vale. */
+  const e = tocaOPrisma ? (typeof espessura === 'function' ? espessura() : espessura) : null;
   if (e > 0) {
-    /* o trecho alcançou a parede de outro vão: tirar dela as faces de parede devolve as duas voltas, e a banda refaz a parede */
     const ehParede = classificadorDeParede({ V, F, idsDaChapa, espessura: e });
-    const s = soltarParedes({ V, F, ids, idsDaChapa, espessura: e, tocaOPrisma, ehParede });
-    let porque = s.motivo;
-    if (!s.motivo) {
-      const sem = new Set(s.paredes);
-      const resto = ids.filter((id) => !sem.has(id));
-      const r2 = bandaDaVizinhanca(pos, new Map(resto.map((id) => [id, F.get(id).vs])));
-      if (!r2.motivo) { ids = resto; r = r2; paredes = s.paredes; } else porque = `tiradas as ${s.paredes.length} faces de parede, ${r2.motivo}`;
-    }
-    if (r.motivo) {
-      /* a parede que não sai (a que o corte alcança, ou o tubo inteiro de um vão que a borda atravessa): o trecho a engole */
-      const t = absorverTubos({ F, ids, idsDaChapa, ehParede });
-      if (t.motivo) return { ...r, motivo: `${r.motivo}; ${porque}; ${t.motivo}` };
-      const r3 = bandaDaVizinhanca(pos, new Map(t.ids.map((id) => [id, F.get(id).vs])));
-      if (r3.motivo) return { ...r, motivo: `${r.motivo}; ${porque}; com os ${t.tubos} faces de tubo de parede dentro, ${r3.motivo}` };
-      ids = t.ids; r = r3;
+    const comParede = !r.motivo && ids.some((id) => ehParede(id));
+    if (r.motivo || comParede) {
+      const direto = { ids, r };
+      /* o trecho alcançou a parede de outro vão: tirar dela as faces de parede devolve as duas voltas, e a banda refaz a parede */
+      const s = soltarParedes({ V, F, ids, idsDaChapa, espessura: e, tocaOPrisma, ehParede });
+      let porque = s.motivo;
+      if (!s.motivo) {
+        const sem = new Set(s.paredes);
+        const resto = ids.filter((id) => !sem.has(id));
+        const r2 = bandaDaVizinhanca(pos, new Map(resto.map((id) => [id, F.get(id).vs])));
+        if (!r2.motivo) { ids = resto; r = r2; paredes = s.paredes; via = 'paredes soltas'; } else porque = `tiradas as ${s.paredes.length} faces de parede, ${r2.motivo}`;
+      }
+      if (via === 'direto') {
+        /* a parede que não sai (a que o corte alcança, ou o tubo inteiro de um vão que a borda atravessa): o trecho a engole */
+        const t = absorverTubos({ F, ids, idsDaChapa, ehParede });
+        const r3 = t.motivo ? t : bandaDaVizinhanca(pos, new Map(t.ids.map((id) => [id, F.get(id).vs])));
+        if (!r3.motivo) { ids = t.ids; r = r3; tubos = t.tubos; via = 'tubo absorvido'; }
+        else if (r.motivo) return { ...r, motivo: `${r.motivo}; ${porque}; ${t.motivo ?? `com os ${t.tubos} faces de tubo de parede dentro, ${r3.motivo}`}` };
+        else { ids = direto.ids; r = direto.r; }
+      }
     }
   }
   if (r.motivo) return r;
   const andaime = andaimeDaCaixa(extremosDos([...new Set(ids.flatMap((id) => F.get(id).vs))].map((v) => V.get(v)).concat(pontosDoPrisma)), extremosDos([...caixaDaChapa, ...pontosDoPrisma]));
-  return andaime.motivo ? andaime : { ids, ...r, andaime, paredes };
+  return andaime.motivo ? andaime : { ids, ...r, andaime, paredes, via, tubos };
 }
 
 /** classificadorDeParede({ V, F, idsDaChapa, espessura }) -> (id) => boolean
@@ -1167,8 +1177,8 @@ export function criarOperacoesAberturaPorContorno(servicos) {
   };
   const proximoLocal = (ids, i, exceto = null) => { let m = -1; for (const id of ids) { if (exceto?.has(id)) continue; const k = localDe(i, id); if (k != null && k > m) m = k; } return m + 1; };
 
-  return {
-  aberturaPorContorno(st, a, i) {
+  const ops = {
+  aberturaPorContorno(st, a, i, chapaInteiraPor = null) {
     if (a.origemId == null) return grita(st, i, OP, 'origemId', `${OP} é sempre estrutural: origemId é obrigatório (a chapa cortada, a parede e a borda do vão são citadas por ele)`);
     if (!Number.isSafeInteger(a.origemId) || a.origemId < 0) return grita(st, i, OP, 'origemId', 'origemId precisa ser inteiro não-negativo');
     const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
@@ -1281,7 +1291,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const vs = proximas.get(id);
       return vs != null && projecaoToca(vs.map((v) => { const l = quadro.identidade ? st.V.get(v) : Vl.get(v); return [l[iu], l[iv]]; }), poligono, TOQUE_NO_PRISMA);
     };
-    const viz = vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa], espessura: espessuraDaChapa, tocaOPrisma });
+    const viz = chapaInteiraPor ? { motivo: chapaInteiraPor } : vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa], espessura: espessuraDaChapa, tocaOPrisma });
     const recortada = !viz.motivo;
     const idsPerto = recortada ? viz.ids : idsDaChapa;
     /* no fim da faixa do passo, abaixo do prisma: a banda e as faces do andaime (e os vértices dele), que saem da peça depois do corte */
@@ -1363,6 +1373,13 @@ export function criarOperacoesAberturaPorContorno(servicos) {
        inteira (`tudo`) pegaria também o prisma */
     subtrair(st, { origemId: a.origemId, solidos: [{ f: [...idsPerto, ...idsDaBanda] }, { f: [...doPrisma] }] }, i);
     if (st.orfaos.length > antesDoCorte) {
+      /* a rede: o trecho recortado que a booleana recusa por dentro não deixa a peça órfã, o vão é refeito na chapa inteira com o motivo no registro */
+      if (recortada) {
+        const recusa = st.orfaos[antesDoCorte].motivo;
+        st.orfaos.length = antesDoCorte;
+        tirarPrisma();
+        return ops.aberturaPorContorno(st, a, i, `a booleana recusou o trecho recortado (${recusa.slice(0, 160)}), e o vão foi refeito na chapa inteira`);
+      }
       for (const o of st.orfaos.slice(antesDoCorte)) { o.op = OP; o.ref = o.ref === 'solidos' || o.ref === 'solidos[0]' ? 'chapa' : o.ref; o.motivo = `o corte da chapa pela booleana recusou: ${o.motivo}`; }
       tirarPrisma();
       return;
@@ -1513,18 +1530,20 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       }
     }
 
-    /* as faces finas (a lasca da topologia) que a limpeza não achou como desfazer, na chapa cortada com a parede e na lente: o gate de
-       malha as acusa, e o registro diz quantas ficaram para quem lê */
+    /* as faces finas (a lasca da topologia) que a limpeza não achou como desfazer, nas faces que a booleana devolveu (o trecho recortado,
+       ou a chapa inteira quando ela a viu toda) e na lente: o gate de malha as acusa, e o registro diz quantas ficaram para quem lê;
+       `limpeza.escopoDasFinas` diz se a conta é do 'trecho' ou da 'chapa' */
     const finasRestantes = [...facesPerto, ...lente].filter((f) => st.F.has(f) && razaoDaFace(st.F.get(f).vs.map((v) => st.V.get(v))) < LIMITE_DE_FACE_FINA).length;
-    const vizinhanca = { recortada, faces: idsPerto.length, daChapa: idsDaChapa.length, ...(recortada ? {} : { motivo: viz.motivo }) };
-    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, vizinhanca, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes } });
+    const vizinhanca = { recortada, faces: idsPerto.length, daChapa: idsDaChapa.length, ...(recortada ? { via: viz.via, facesDeTubo: viz.tubos } : { motivo: viz.motivo }) };
+    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, vizinhanca, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes, escopoDasFinas: recortada ? 'trecho' : 'chapa' } });
     registraOrigem(st, i, OP, a.origemId, {
       faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista: a.vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente, vizinhanca,
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
-      limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes },
+      limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes, escopoDasFinas: recortada ? 'trecho' : 'chapa' },
     });
   },
   };
+  return ops;
 }
 
 /** bordaDaAbertura(st, origem) -> { pontos, normais, faces, cadeia, espessura, passo } | { erro }
