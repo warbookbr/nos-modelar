@@ -202,6 +202,7 @@ export const TABELA = {
   quina_fresta_ref: 30, // a linha que ordena as colunas da quina da frente, onde a fresta da porta corria antes de recuar (o para-brisa não mudou)
   p_inicio_y: 1330, // a partir daqui, e até o ombro, a quina ganha colunas entre E e D: p1 onde a D antiga ficava e as outras a passo_p
   passo_p: 30, // distância entre as colunas p
+  retorno_d_y: 2280, // até onde a coluna D, acima do topo da porta, acaba de voltar para a quina: no ombro ela já está lá, e as colunas p somem uma por anel pelo caminho, e não de uma vez
   para_brisa_topo_y: 2075, // o anel do topo do vão do para-brisa, que era o do topo da porta antes de ela descer
   coluna_do_meio: 110,
   porta_correr_largura: 1300,
@@ -1075,8 +1076,9 @@ const receita = {
       'falta a faixa recuada da entrada de ar ou o lugar da placa no para-choque dianteiro, ou o lugar da placa no traseiro',
       'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2100 mm',
     ],
-    /* As feições que as réguas de superfície acham e que são desenho, cada uma na caixa justa em volta dela (2026-11-09). Ficam de fora, por parecerem defeito e
-       não por serem desenho, os dois pares de vincos do canto de cima da frente do teto (em [±893; 2188; 1216] e [±857; 2073; 1301]), relatados à parte. */
+    /* As feições que as réguas de superfície acham e que são desenho, cada uma na caixa justa em volta dela (2026-11-09). A régua dá a posição de uma cadeia de vincos pelo centro
+       dela, e a caixa da coluna do para-brisa fica no meio da coluna: o pé e o canto de cima do teto, onde havia nó e bico (2026-11-09: as colunas p morriam de uma vez, a descida
+       da coroa tinha salto de curvatura), ficam fora dela, e achado novo ali volta a aparecer. */
     dobrasAceitas: [
       ...[['Esquerdo', 1], ['Direito', -1]].map(([lado, s]) => ({
         parte: `refletorFarol${lado}`, tipos: ['dobra', 'vinco'],
@@ -1091,8 +1093,8 @@ const receita = {
       { parte: 'carroceria', tipos: ['vinco'], regiao: { min: [-60, 314, -2695], max: [60, 330, -2678] },
         motivo: 'raio de 40 mm do pé da traseira (raio_traseira_base) em toda a largura, visto de perto: a borda de baixo da traseira arredondada, pedida na tabela' },
       ...[1, -1].map((s) => ({
-        parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 910 : -935, 1760, 1505], max: [s > 0 ? 935 : -910, 1785, 1528] },
-        motivo: 'quina da coluna do para-brisa envolvente, de raio 160 (raio_coluna_base e raio_coluna_topo), onde o vidro dobra para a lateral: desenho da prancha',
+        parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 899 : -923, 1919, 1389], max: [s > 0 ? 923 : -899, 1943, 1413] },
+        motivo: 'crista da borda da coroa ao longo da coluna do para-brisa (quina de raio 160 onde o vidro dobra para a lateral: desenho da prancha); a caixa é o meio da coluna, e o pé e o canto do teto ficam fora dela',
       })),
       { parte: 'parachoqueDianteiro', tipos: ['vinco'], regiao: { min: [-60, 298, 2676], max: [60, 310, 2696] },
         motivo: 'quina de baixo do lábio da seção do para-choque (ponto [15, 302] de secao_parachoque_dianteiro), ao longo de toda a frente: perfil da prancha' },
