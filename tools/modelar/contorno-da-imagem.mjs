@@ -142,7 +142,7 @@ export function formasEmMm({ ajustadas, avisos, detalhes }, mmPorPx) {
 export async function mapaRotulado(pngBuffer, segmentacao, { opacidade = 0.2 } = {}) {
   const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });
   const { chromium } = (await import('playwright')).default;
-  const navegador = await lancarChromium(chromium);
+  const navegador = await lancarChromium(chromium, { webgl: false });
   try {
     const pagina = await navegador.newPage();
     const ordem = (segmentacao.ordem ?? Object.keys(segmentacao.regioes)).filter((n) => segmentacao.regioes[n]);

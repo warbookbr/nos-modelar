@@ -15,56 +15,61 @@ Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-la
 - capo / coluna
 - coluna / tampaMotor
 - coluna / lateral
+- capo / lateral
 
 ## Etapa 3 — divisas, folha 2 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-02.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- capo / lateral
 - capo / ressaltoCapo
 - cilindroInclinacao / torre
 - cilindroInclinacao / painel
 - lateral / tampaMotor
+- painel / piso
+- furo / lateral
 
 ## Etapa 4 — divisas, folha 3 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-03.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- furo / lateral
 - painel / paralama
-- painel / piso
 - paralama / torre
-- frenteLateral / painel
+- paralama / piso
+- frenteLateral / paralama
+- frenteLateral / piso
+- piso / tampaMotor
 
 ## Etapa 5 — divisas, folha 4 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-04.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- frenteLateral / paralama
-- piso / tampaMotor
 - lateral / piso
 - chassi / frenteLateral
 - capo / contrapeso
+- aroTraseiro / capo
+- aroTraseiro / lateral
+- capo / pocoTraseiro
 
 ## Etapa 6 — divisas, folha 5 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-05.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- capo / pocoTraseiro
-- lateral / pocoTraseiro
 - capo / cuboTraseiro
-- contrapeso / pocoTraseiro
+- aroTraseiro / contrapeso
+- aroTraseiro / pocoTraseiro
 - cuboTraseiro / pocoTraseiro
+- contrapeso / pocoTraseiro
+- cuboDianteiro / frenteLateral
 
 ## Etapa 7 — divisas, folha 6 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-06.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- frenteLateral / piso
-- cuboDianteiro / frenteLateral
 - chassi / cuboDianteiro
 - chassi / torre
 - frenteLateral / lateral
+- aroTraseiro / cuboTraseiro
+- lateral / pocoTraseiro
 
 ## Etapa 8 — fechamento
 

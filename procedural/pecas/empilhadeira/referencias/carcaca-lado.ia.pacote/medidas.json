@@ -1,5 +1,6 @@
 {
  "naBorda": {
+  "aroTraseiro": 1,
   "capo": 0.998,
   "chassi": 0.998,
   "cilindroInclinacao": 1,
@@ -10,10 +11,10 @@
   "frenteLateral": 0.998,
   "furo": 1,
   "lateral": 1,
-  "painel": 0.944,
+  "painel": 1,
   "paralama": 1,
-  "piso": 0.947,
-  "pocoTraseiro": 0.963,
+  "piso": 1,
+  "pocoTraseiro": 0.964,
   "ressaltoCapo": 0.958,
   "sombra": 0.18,
   "tampa": 1,
@@ -137,6 +138,16 @@
    ]
   },
   {
+   "a": "painel",
+   "b": "piso",
+   "caixa": [
+    400,
+    316,
+    501,
+    373
+   ]
+  },
+  {
    "a": "furo",
    "b": "lateral",
    "caixa": [
@@ -151,19 +162,9 @@
    "b": "paralama",
    "caixa": [
     383,
-    336,
-    439,
-    375
-   ]
-  },
-  {
-   "a": "painel",
-   "b": "piso",
-   "caixa": [
-    466,
-    342,
-    505,
-    415
+    335,
+    424,
+    374
    ]
   },
   {
@@ -177,13 +178,13 @@
    ]
   },
   {
-   "a": "frenteLateral",
-   "b": "painel",
+   "a": "paralama",
+   "b": "piso",
    "caixa": [
-    415,
-    345,
-    500,
-    415
+    400,
+    336,
+    439,
+    375
    ]
   },
   {
@@ -194,6 +195,16 @@
     340,
     439,
     379
+   ]
+  },
+  {
+   "a": "frenteLateral",
+   "b": "piso",
+   "caixa": [
+    415,
+    345,
+    507,
+    441
    ]
   },
   {
@@ -237,8 +248,8 @@
    ]
   },
   {
-   "a": "capo",
-   "b": "pocoTraseiro",
+   "a": "aroTraseiro",
+   "b": "capo",
    "caixa": [
     733,
     372,
@@ -247,13 +258,23 @@
    ]
   },
   {
-   "a": "lateral",
-   "b": "pocoTraseiro",
+   "a": "aroTraseiro",
+   "b": "lateral",
    "caixa": [
-    695,
+    700,
     380,
     757,
-    484
+    450
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "pocoTraseiro",
+   "caixa": [
+    748,
+    373,
+    811,
+    412
    ]
   },
   {
@@ -267,13 +288,23 @@
    ]
   },
   {
-   "a": "contrapeso",
+   "a": "aroTraseiro",
+   "b": "contrapeso",
+   "caixa": [
+    804,
+    380,
+    843,
+    451
+   ]
+  },
+  {
+   "a": "aroTraseiro",
    "b": "pocoTraseiro",
    "caixa": [
-    810,
-    380,
-    854,
-    493
+    701,
+    381,
+    838,
+    452
    ]
   },
   {
@@ -287,13 +318,13 @@
    ]
   },
   {
-   "a": "frenteLateral",
-   "b": "piso",
+   "a": "contrapeso",
+   "b": "pocoTraseiro",
    "caixa": [
-    472,
-    391,
-    511,
-    441
+    812,
+    385,
+    854,
+    493
    ]
   },
   {
@@ -334,6 +365,26 @@
     417,
     512,
     497
+   ]
+  },
+  {
+   "a": "aroTraseiro",
+   "b": "cuboTraseiro",
+   "caixa": [
+    787,
+    417,
+    826,
+    456
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "pocoTraseiro",
+   "caixa": [
+    690,
+    426,
+    729,
+    484
    ]
   }
  ],
@@ -442,9 +493,9 @@
      707,
      471.25
     ],
-    "desvioPx": 0.143494,
-    "verticesAntes": 11,
-    "verticesDepois": 36,
+    "desvioPx": 0.145888,
+    "verticesAntes": 16,
+    "verticesDepois": 37,
     "desvioMm": 0.6
    },
    {
@@ -476,9 +527,9 @@
      492.25,
      413.9
     ],
-    "desvioPx": 0.146564,
-    "verticesAntes": 16,
-    "verticesDepois": 37,
+    "desvioPx": 0.134778,
+    "verticesAntes": 11,
+    "verticesDepois": 32,
     "desvioMm": 0.6
    },
    {
@@ -612,10 +663,10 @@
      869,
      391
     ],
-    "desvioPx": 0.841021,
-    "verticesAntes": 15,
-    "verticesDepois": 8,
-    "desvioMm": 3.6
+    "desvioPx": 0.96725,
+    "verticesAntes": 23,
+    "verticesDepois": 12,
+    "desvioMm": 4.1
    },
    {
     "parte": "capo",
