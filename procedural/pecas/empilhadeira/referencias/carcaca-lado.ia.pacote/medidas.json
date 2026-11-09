@@ -1,0 +1,346 @@
+{
+ "naBorda": {
+  "capo": 0.998,
+  "chassi": 0.998,
+  "cilindroInclinacao": 1,
+  "coluna": 1,
+  "contrapeso": 0.99,
+  "cuboDianteiro": 1,
+  "cuboTraseiro": 0.904,
+  "frenteLateral": 0.986,
+  "furo": 1,
+  "lateral": 1,
+  "painel": 1,
+  "paralama": 0.974,
+  "piso": 1,
+  "pocoTraseiro": 0.95,
+  "ressaltoCapo": 0.958,
+  "sombra": 0.18,
+  "tampa": 1,
+  "tampaMotor": 1,
+  "torre": 1
+ },
+ "minimo": 0.8,
+ "abaixo": [
+  "sombra"
+ ],
+ "semDonoPx": 0,
+ "semDonoAnexadosPx": 2776,
+ "mascaraSuavizada": {
+  "tirados": 15,
+  "postos": 26
+ },
+ "buracosFechados": {
+  "buracos": 11,
+  "pixels": 59,
+  "maximo": 64
+ },
+ "divisas": [
+  {
+   "a": "coluna",
+   "b": "tampa",
+   "caixa": [
+    728,
+    255,
+    767,
+    294
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "tampa",
+   "caixa": [
+    736,
+    264,
+    885,
+    320
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "coluna",
+   "caixa": [
+    725,
+    265,
+    764,
+    333
+   ]
+  },
+  {
+   "a": "coluna",
+   "b": "tampaMotor",
+   "caixa": [
+    675,
+    276,
+    716,
+    339
+   ]
+  },
+  {
+   "a": "coluna",
+   "b": "lateral",
+   "caixa": [
+    678,
+    304,
+    754,
+    343
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "lateral",
+   "caixa": [
+    724,
+    309,
+    763,
+    404
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "ressaltoCapo",
+   "caixa": [
+    860,
+    307,
+    899,
+    346
+   ]
+  },
+  {
+   "a": "cilindroInclinacao",
+   "b": "torre",
+   "caixa": [
+    364,
+    313,
+    404,
+    352
+   ]
+  },
+  {
+   "a": "cilindroInclinacao",
+   "b": "painel",
+   "caixa": [
+    379,
+    314,
+    418,
+    360
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "tampaMotor",
+   "caixa": [
+    626,
+    315,
+    702,
+    379
+   ]
+  },
+  {
+   "a": "painel",
+   "b": "piso",
+   "caixa": [
+    400,
+    316,
+    501,
+    373
+   ]
+  },
+  {
+   "a": "furo",
+   "b": "lateral",
+   "caixa": [
+    685,
+    320,
+    745,
+    386
+   ]
+  },
+  {
+   "a": "painel",
+   "b": "paralama",
+   "caixa": [
+    383,
+    335,
+    424,
+    374
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "torre",
+   "caixa": [
+    335,
+    338,
+    374,
+    377
+   ]
+  },
+  {
+   "a": "paralama",
+   "b": "piso",
+   "caixa": [
+    400,
+    337,
+    444,
+    376
+   ]
+  },
+  {
+   "a": "frenteLateral",
+   "b": "paralama",
+   "caixa": [
+    386,
+    341,
+    444,
+    380
+   ]
+  },
+  {
+   "a": "frenteLateral",
+   "b": "piso",
+   "caixa": [
+    420,
+    347,
+    507,
+    441
+   ]
+  },
+  {
+   "a": "piso",
+   "b": "tampaMotor",
+   "caixa": [
+    537,
+    344,
+    650,
+    383
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "piso",
+   "caixa": [
+    483,
+    355,
+    650,
+    441
+   ]
+  },
+  {
+   "a": "chassi",
+   "b": "frenteLateral",
+   "caixa": [
+    373,
+    366,
+    467,
+    492
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "contrapeso",
+   "caixa": [
+    810,
+    370,
+    906,
+    409
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "pocoTraseiro",
+   "caixa": [
+    733,
+    372,
+    834,
+    411
+   ]
+  },
+  {
+   "a": "lateral",
+   "b": "pocoTraseiro",
+   "caixa": [
+    695,
+    380,
+    757,
+    484
+   ]
+  },
+  {
+   "a": "capo",
+   "b": "cuboTraseiro",
+   "caixa": [
+    762,
+    373,
+    801,
+    412
+   ]
+  },
+  {
+   "a": "contrapeso",
+   "b": "pocoTraseiro",
+   "caixa": [
+    810,
+    380,
+    855,
+    493
+   ]
+  },
+  {
+   "a": "cuboTraseiro",
+   "b": "pocoTraseiro",
+   "caixa": [
+    747,
+    381,
+    828,
+    496
+   ]
+  },
+  {
+   "a": "cuboDianteiro",
+   "b": "frenteLateral",
+   "caixa": [
+    383,
+    402,
+    455,
+    457
+   ]
+  },
+  {
+   "a": "chassi",
+   "b": "cuboDianteiro",
+   "caixa": [
+    354,
+    404,
+    455,
+    493
+   ]
+  },
+  {
+   "a": "chassi",
+   "b": "torre",
+   "caixa": [
+    331,
+    405,
+    372,
+    497
+   ]
+  },
+  {
+   "a": "frenteLateral",
+   "b": "lateral",
+   "caixa": [
+    473,
+    417,
+    512,
+    497
+   ]
+  }
+ ],
+ "traco": {
+  "bordaSubpixel": true,
+  "fundoTom": 255,
+  "tolerancia": 0.35,
+  "subamostras": 8
+ }
+}
