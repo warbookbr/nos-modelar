@@ -532,7 +532,9 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
       identidadeParte: lote.parte,
       faces: lote.faces.slice(),
     };
-    grupoParte.userData.faces.push(...lote.faces);
+    /* em laço, e não por espalhamento: `push(...lista)` passa cada face como argumento, e uma parte com mais de umas 120 mil faces
+       estourava a pilha (RangeError), que era o "teto de 250 mil faces" anotado no furgão realista (medido em 2026-11-09) */
+    for (const id of lote.faces) grupoParte.userData.faces.push(id);
     grupoParte.add(malha);
   }
 

@@ -112,3 +112,16 @@ describe('adaptarThree — contorno válido com cantos colineares', () => {
     expect(() => adaptar([[0, 0, 0], [1, 1, 0], [1, 0, 0], [0, 1, 0]])).toThrow(/adaptarThree/);
   });
 });
+
+describe('adaptarThree — parte com muitas faces', () => {
+  it('uma parte de 300 mil faces sobe para a cena sem estourar a pilha', () => {
+    const n = 300_000;
+    const V = new Map();
+    const F = new Map();
+    for (let i = 0; i <= n; i += 1) { V.set(2 * i, [i * 0.001, 0, 0]); V.set(2 * i + 1, [i * 0.001, 0.001, 0]); }
+    for (let i = 0; i < n; i += 1) F.set(i, { id: i, parte: 'chapa', vs: [2 * i, 2 * i + 2, 2 * i + 3, 2 * i + 1] });
+    const { partes, estatisticas } = adaptarThree({ V, F, partes: { chapa: {} }, orfaos: [] });
+    expect(estatisticas.facesNeutras).toBe(n);
+    expect(partes.get('chapa').userData.faces).toHaveLength(n);
+  });
+});
