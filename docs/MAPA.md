@@ -2200,7 +2200,7 @@
 
 ## tools/fixtures/costuras-e-furos/dentes-no-fim-do-arredondamento/
 
-- `dentes-no-fim-do-arredondamento.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 2 inverte os números marcados.
+- `dentes-no-fim-do-arredondamento.test.mjs` — A fatia 1 do plano "costuras e furos limpos" fixou o defeito (24 pontas em 18 trechos); a causa era o registro da costura do `unir`, que perdia 9 trechos de …
 - `receita.js` — dentes-no-fim-do-arredondamento/receita.js — peça de prova do defeito "dentes de serra onde o arredondamento da costura afina até sumir junto a uma face plan…
 
 ## tools/fixtures/costuras-e-furos/dois-bracos-numa-carcaca-curva/
@@ -2210,7 +2210,7 @@
 
 ## tools/fixtures/costuras-e-furos/face-degenerada-em-dois-lathe/
 
-- `face-degenerada-em-dois-lathe.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `face-degenerada-em-dois-lathe.test.mjs` — A fatia 1 do plano "costuras e furos limpos" fixou 1 face de três cantos colineares nesta peça (o deitado de 195 mm), e a fatia 3 ia buscar a origem dela. A …
 - `receita.js` — face-degenerada-em-dois-lathe/receita.js — peça de prova do defeito "o `unir` com `arredondarCostura` de dois `lathe` deixa face de três cantos colineares" (…
 
 ## tools/fixtures/costuras-e-furos/frente-rente-a-tampa/
@@ -2230,7 +2230,7 @@
 
 ## tools/fixtures/costuras-e-furos/muitos-lados-no-unir/
 
-- `muitos-lados-no-unir.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `muitos-lados-no-unir.test.mjs` — A fatia 1 do plano "costuras e furos limpos" fixou a recusa ("não cabe no vértice 2048 da costura") e 1 órfão com 224 lados. A causa era o registro da costur…
 - `receita.js` — muitos-lados-no-unir/receita.js — peça de prova do defeito "dois `lathe` de muitos lados no `unir` com `arredondarCostura` deixam vértice órfão" (plano "cost…
 
 ## tools/fixtures/costuras-e-furos/subtrair-que-nao-corta/
@@ -2842,6 +2842,8 @@
 
 ## tools/modelar/reguas-de-malha/
 
+- `costura-registrada.mjs` — costura-registrada.mjs — régua: a costura que o `unir` registra (`arestas` do registro de origem) contra a costura geométrica da malha que ele entregou (plan…
+- `costura-registrada.test.mjs` — costura-registrada.test.mjs — a costura que o `unir` registra tem de ser a costura geométrica da malha que ele entrega (plano "costuras e furos limpos"). Ant…
 - `face-degenerada.mjs` — face-degenerada.mjs — régua de malha: a face de três ou mais cantos que não define plano (plano "costuras e furos limpos", fatia 1).
 - `face-degenerada.test.mjs` — face-degenerada.test.mjs — a régua acha exatamente o que o `adaptarThree` recusa como "é degenerada".
 - `reguas-de-malha.mjs` — reguas-de-malha.mjs — as três réguas de malha juntas (plano "costuras e furos limpos", fatia 1): a face degenerada, o triângulo fino em região plana e o serr…

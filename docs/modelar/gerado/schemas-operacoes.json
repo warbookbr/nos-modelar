@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:87eaaef255764e14a15d642d973357cdb8d12455744a4f395c2bf1cff9a94039",
+  "assinatura": "sha256:cbd5784f389aae64f0a82afb90cf21fe8dddbaebb24db45f74948ca664f21c57",
   "total": 40,
   "operacoes": [
     {
@@ -4668,7 +4668,8 @@
         "limites": [
           "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
           "Cite a costura com {op:'unir', id, costura:true}.",
-          "Resultado vazio grita."
+          "Resultado vazio grita.",
+          "O registro da costura (as arestas que o arredondarCostura lê) tem todas as arestas entre faces de sólidos diferentes, também onde a sopa de triângulos da Manifold parte um diedro em dois e o canto do meio é tirado por quase colinear: a aresta que o atravessa continua registrada, ligando os dois vizinhos. Sem isso o registro perdia esses trechos e o arredondarCostura fazia tubo curto com tampa nos restos (dentes no fim do arredondamento, face degenerada). A régua tools/modelar/reguas-de-malha/costura-registrada.mjs compara o registro com a costura geométrica."
         ],
         "diagnosticos": []
       }

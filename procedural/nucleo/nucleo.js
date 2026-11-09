@@ -3690,6 +3690,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* avisos: o que um passo fez de diferente do pedido sem falhar (o raio que o `arredondarCostura` reduziu com `raioMinimo`). Fora da enumeração, como `facesDasPortas`: não entra na forma canônica. */
   Object.defineProperty(saida, 'avisos', { value: st.avisos, enumerable: false });
   /* frisos: a pegada e as pontas de cada friso varrido, para a conferência da moldura em volta de um vão. Fora da enumeração, como `avisos`. */
+  /* origens: o registro de cada origem (`origemId` → lista de registros do passo), só para ler: as provas da costura da `unir` comparam o `arestas` registrado com a costura geométrica. Fora da enumeração, como `avisos`. */
+  Object.defineProperty(saida, 'origens', { value: st.origens });
   Object.defineProperty(saida, 'frisos', { value: st.frisos ?? [], enumerable: false });
   /* chapas: a gaiola de cada passo `subdivisao`, para a conferência dos vãos achar as aberturas pela borda livre. Fora da enumeração, como `frisos`. */
   Object.defineProperty(saida, 'chapas', { value: st.chapas ?? [], enumerable: false });

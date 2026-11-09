@@ -702,6 +702,18 @@ export function criarOperacoesBooleanas(servicos) {
        no meio de uma aresta reta: tirá-lo das duas faces não abre fenda, e
        deixá-lo faz o adaptador cortar uma orelha sem área. Canto novo usado
        por três faces ou mais é quina de verdade e fica. */
+    /* O canto tirado pode estar no meio de uma aresta da costura (o diedro de 135° que a faceta de um tubo faz com a face do outro sai partido em
+       dois triângulos pela sopa da Manifold, com o canto do meio sobre a reta). As duas arestas que chegam nele estão em `costura`, e ao tirar o
+       canto elas viram uma só, entre os vizinhos: sem isto o laço de ids definitivos descarta as duas metades, o registro perde o trecho (9 trechos de uns 4 mm, 18 metades,
+       na peça de prova dos dentes; 50, 66, 40 e 72 arestas nas partes do braço) e o `arredondarCostura`, vendo o buraco entre arestas registradas de 0,1 mm,
+       faz de cada resto um tubo curto com tampa, que são os dentes no fim do arredondamento. */
+    const religaCostura = (v, donosDoCanto) => {
+      const vizinhos = donosDoCanto.map((P) => { const k = P.indexOf(v); return [P[(k + P.length - 1) % P.length], P[(k + 1) % P.length]]; });
+      const [a, c] = vizinhos[0];
+      if (!vizinhos.every(([x, y]) => (x === a && y === c) || (x === c && y === a))) return;
+      const k = (x, y) => (x < y ? `${x}_${y}` : `${y}_${x}`);
+      if (costura.has(k(a, v)) && costura.has(k(v, c))) costura.add(k(a, c));
+    };
     const poligonos = [...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])];
     for (let passada = 0; passada < 4; passada++) {
       const usos = new Map();
@@ -716,6 +728,7 @@ export function criarOperacoesBooleanas(servicos) {
           return tamanho(cruz(sub(pos(v), a), sub(c, a))) / 2 < piso;
         });
         if (!reto) continue;
+        religaCostura(v, donos);
         for (const P of donos) P.splice(P.indexOf(v), 1);
         tirou = true;
       }
@@ -737,6 +750,10 @@ export function criarOperacoesBooleanas(servicos) {
        saída da Manifold), para as arestas casarem com as dos pedaços */
     const cicloRepDasMantidas = (fid) => cicloRep(st.F.get(fid).vs);
     const areaTri = (a, b, c) => tamanho(cruz(sub(pos(b), pos(a)), sub(pos(c), pos(a)))) / 2;
+    /* a metade que a diagonal deixa só pode ter a área que o adaptador do visor aceita (`adaptarThree` recusa a face de dobro da área até 1e-12 m²), com o
+       dobro de folga, e não só o milésimo do piso, que em peça de menos de 0,7 m fica abaixo disso: o dente do elo do punho 5, três cantos de um anel de
+       0,02 a 0,05 mm em linha, saía como face de 9,9e-13 m² */
+    const semArea = Math.max(piso * 1e-3, 1e-12);
     const semColinear = (P) => {
       if (P.length <= 3) return [P];
       for (let k = 0; k < P.length; k++) {
@@ -755,7 +772,7 @@ export function criarOperacoesBooleanas(servicos) {
         /* a diagonal que deixa uma das metades sem área de verdade (a do portão de face degenerada; dois cantos de tubos a poucos micrômetros um do outro, onde a
            geratriz de um cilindro cruza a do outro) devolve o pedaço sem área que a fusão acabou de absorver, e o
            laço do acabamento oscila até desistir; o canto colinear fica, e `melhorInicio` põe o leque longe dele */
-        if (areaDe(pos, um) < piso * 1e-3 || areaDe(pos, dois) < piso * 1e-3) continue;
+        if (areaDe(pos, um) < semArea || areaDe(pos, dois) < semArea) continue;
         return [...semColinear(um), ...semColinear(dois)];
       }
       return [P];
@@ -828,6 +845,7 @@ export function criarOperacoesBooleanas(servicos) {
         if (donos.length !== 2) continue;
         const vizinhos = donos.map(([, P]) => { const k = P.indexOf(v); return new Set([P[(k + P.length - 1) % P.length], P[(k + 1) % P.length]]); });
         if (![...vizinhos[0]].every((w) => vizinhos[1].has(w))) continue;
+        religaCostura(v, donos.map((item) => item[1]));
         for (const item of donos) item[1] = item[1].filter((w) => w !== v);
         tirou = true;
       }
