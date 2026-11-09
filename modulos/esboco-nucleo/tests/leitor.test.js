@@ -38,8 +38,8 @@ function arestasDeBorda(neutro) {
 }
 
 describe('os esboços guardados', () => {
-  it('há dezoito opções de forma de peça versionadas, e todas abrem sem recusa, com a malha de cada forma na medida declarada', () => {
-    expect(DE_PECA).toHaveLength(18);
+  it('há dezenove opções de forma de peça versionadas, e todas abrem sem recusa, com a malha de cada forma na medida declarada', () => {
+    expect(DE_PECA).toHaveLength(19);
     for (const f of DE_PECA) {
       const json = ler(f);
       const r = abrir(json);

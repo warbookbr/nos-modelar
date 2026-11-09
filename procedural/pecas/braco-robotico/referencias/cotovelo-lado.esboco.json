@@ -1,0 +1,370 @@
+{
+ "plano": "Braço robótico visto de cima: a saída do cotovelo para o mesmo lado da saída do ombro, somando os afastamentos, ou para o lado oposto, trazendo o antebraço de volta para perto da base.",
+ "vista": "superior",
+ "opcoes": [
+  {
+   "titulo": "mesmo lado do ombro",
+   "nota": "o antebraço fica dois afastamentos à frente da base",
+   "formas": [
+    {
+     "id": "base",
+     "op": "cilindro",
+     "args": {
+      "raio": 105,
+      "altura": 250,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      125,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "ombro",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 220,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      365,
+      15
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "anelOmbro",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 28,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      365,
+      139
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "pe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 156,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      365,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "coluna",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 400,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      565,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "colar",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      777,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 117,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      848,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 190,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      906,
+      248.0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      906,
+      355.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "peAntebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 156,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      906,
+      446.0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": [
+      126.5,
+      906,
+      446.0
+     ],
+     "por": "centro"
+    }
+   ]
+  },
+  {
+   "titulo": "lado oposto ao ombro",
+   "nota": "o antebraço volta para perto da linha da base",
+   "formas": [
+    {
+     "id": "base",
+     "op": "cilindro",
+     "args": {
+      "raio": 105,
+      "altura": 250,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      125,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "ombro",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 220,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      365,
+      15
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "anelOmbro",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 28,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      365,
+      139
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "pe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 156,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      365,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "coluna",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 400,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      565,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "colar",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      777,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 117,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      848,
+      231
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 190,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      906,
+      214.0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      906,
+      106.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "peAntebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 156,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      0,
+      906,
+      16.0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": [
+      126.5,
+      906,
+      16.0
+     ],
+     "por": "centro"
+    }
+   ]
+  }
+ ]
+}
