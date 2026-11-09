@@ -284,7 +284,7 @@
     },
     {
       "instancia": "cotovelo",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "cotoveloSentaNoColar",
@@ -356,7 +356,14 @@
           },
           "forma": "sha256:accd2d46ad4366621347b97dd3747d0352f61c07c26cb8537f0517582573ecb8"
         }
-      ]
+      ],
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o cotovelo com o eixo paralelo ao do ombro e a saída para o lado oposto",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "anelAntebraco",
