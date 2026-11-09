@@ -95,6 +95,8 @@ Ainda em 2026-11-05, com o `gaiolaPorLacos` no núcleo, a pessoa pediu a coluna 
 
 Em 2026-11-08 a pessoa alinhou o anel do cotovelo e o cotovelo (seção no `ALINHAMENTO.md` do braço). O anel virou colar fixo, rente à coluna e com 25 mm, e está fixo por aceite dela. O cotovelo, na opção do tubo em pé cruzado no alto pelo tubo deitado, foi feito pelo `gaiolaPorLacos` e fica aberto: embaixo da frente, onde o tubo deitado passa do tubo em pé, o filete termina numa aba torta, e a correção é do ajudante, no backlog, por outra sessão.
 
+Em 2026-11-09 o cotovelo foi refeito como dois tubos unidos com arredondamento e alongado a 190 mm, e entraram o anel do antebraço (único de 25 mm, rente) e o antebraço (tubo de 156 mm). Com o antebraço montado, a pessoa conferiu os eixos e viu que a junta do cotovelo girava o antebraço em torno dele mesmo; o cotovelo virou espelho do ombro, com o eixo paralelo ao dele e a saída para o lado oposto, e o antebraço virou o T da coluna. As três etapas estão fixas por aceite dela, o antebraço com o pé de 176 mm até a conferência de porta aceitar peça em T (backlog). O alinhamento passou a perguntar o eixo de cada junta. Segue o punho.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,

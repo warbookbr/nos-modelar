@@ -367,7 +367,7 @@
     },
     {
       "instancia": "anelAntebraco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelAntebracoSentaNaSaida",
@@ -413,6 +413,13 @@
         }
       ],
       "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "pessoa",
@@ -431,7 +438,7 @@
     },
     {
       "instancia": "antebraco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "antebracoSentaNoAnel",
@@ -476,7 +483,14 @@
           }
         }
       ],
-      "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a"
+      "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
