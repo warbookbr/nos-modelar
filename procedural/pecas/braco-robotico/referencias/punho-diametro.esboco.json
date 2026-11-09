@@ -1,0 +1,318 @@
+{
+ "plano": "Punho do braço robótico: as três juntas (4 paralela ao cotovelo na carcaça, 5 vertical, 6 no flange) com 190 mm, o diâmetro do braço, ou reduzidas a 135 mm, a altura da carcaça do punho na prancha, com o degrau no anel da junta 4. O antebraço e a carcaça ficam com 190 nas duas; o flange tem 154 mm nas duas.",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "1: punho com 190 mm",
+   "nota": "um diâmetro só do ombro ao flange",
+   "formas": [
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 300,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": [
+      103,
+      0,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "carcaca",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 210,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      0,
+      10
+     ],
+     "por": "centro",
+     "contato": {
+      "antebraco": "atravessa"
+     }
+    },
+    {
+     "id": "anel4",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 25,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      0,
+      127.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "pe4",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 190,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      0,
+      235
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "tubo5",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 200,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -100,
+      235
+     ],
+     "por": "centro",
+     "contato": {
+      "pe4": "atravessa"
+     }
+    },
+    {
+     "id": "anel5",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 25,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -212.5,
+      235
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "casa6",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 190,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -320,
+      235
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "anel6",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 25,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -320,
+      342.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "flange",
+     "op": "cilindro",
+     "args": {
+      "raio": 77,
+      "altura": 43,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -320,
+      376.5
+     ],
+     "por": "centro"
+    }
+   ]
+  },
+  {
+   "titulo": "2: punho com 135 mm",
+   "nota": "degrau no anel da junta 4, como a prancha",
+   "formas": [
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 300,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": [
+      103,
+      0,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "carcaca",
+     "op": "cilindro",
+     "args": {
+      "raio": 95,
+      "altura": 210,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      0,
+      10
+     ],
+     "por": "centro",
+     "contato": {
+      "antebraco": "atravessa"
+     }
+    },
+    {
+     "id": "anel4",
+     "op": "cilindro",
+     "args": {
+      "raio": 67.5,
+      "altura": 25,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      0,
+      127.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "pe4",
+     "op": "cilindro",
+     "args": {
+      "raio": 67.5,
+      "altura": 135.0,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      0,
+      207.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "tubo5",
+     "op": "cilindro",
+     "args": {
+      "raio": 67.5,
+      "altura": 200,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -100,
+      207.5
+     ],
+     "por": "centro",
+     "contato": {
+      "pe4": "atravessa"
+     }
+    },
+    {
+     "id": "anel5",
+     "op": "cilindro",
+     "args": {
+      "raio": 67.5,
+      "altura": 25,
+      "eixo": "y",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -212.5,
+      207.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "casa6",
+     "op": "cilindro",
+     "args": {
+      "raio": 67.5,
+      "altura": 135.0,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -292.5,
+      207.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "anel6",
+     "op": "cilindro",
+     "args": {
+      "raio": 67.5,
+      "altura": 25,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -292.5,
+      287.5
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "flange",
+     "op": "cilindro",
+     "args": {
+      "raio": 77,
+      "altura": 43,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": [
+      253,
+      -292.5,
+      321.5
+     ],
+     "por": "centro"
+    }
+   ]
+  }
+ ]
+}
