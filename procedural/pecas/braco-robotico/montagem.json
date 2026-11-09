@@ -58,6 +58,13 @@
         "tipo": "peca",
         "ref": "braco-robotico/elo-punho-4"
       }
+    },
+    {
+      "id": "anelPunho5",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/anel-punho-5"
+      }
     }
   ],
   "relacoes": [
@@ -258,6 +265,39 @@
         },
         "toleranciaNumerica": 1e-06
       }
+    },
+    {
+      "id": "anelPunho5SentaNaSaida",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "eloPunho4"
+        ],
+        "porta": "saida"
+      },
+      "movel": {
+        "caminho": [
+          "anelPunho5"
+        ],
+        "porta": "apoio"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
     }
   ],
   "etapas": [
@@ -268,7 +308,8 @@
     "anelAntebraco",
     "antebraco",
     "anelPunho4",
-    "eloPunho4"
+    "eloPunho4",
+    "anelPunho5"
   ],
   "vinculos": [
     {
@@ -354,6 +395,20 @@
       },
       "unidade": "mm",
       "acrescimo": 0
+    },
+    {
+      "id": "anelPunho5ComORaioDaSaida",
+      "alvo": {
+        "instancia": "anelPunho5",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "eloPunho4",
+        "porta": "saida",
+        "medida": "raioExterno"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
     }
   ],
   "posicoes": [
@@ -430,6 +485,17 @@
       "em": {
         "instancia": "anelPunho4",
         "porta": "topo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "anelPunho5SobreASaida",
+      "instancia": "anelPunho5",
+      "porta": "apoio",
+      "em": {
+        "instancia": "eloPunho4",
+        "porta": "saida"
       },
       "unidade": "mm",
       "afastamento": 0
