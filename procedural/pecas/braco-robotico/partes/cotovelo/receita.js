@@ -2,7 +2,7 @@
  *
  * Quinta etapa da montagem `braco-robotico/montagem.json`. O combinado com a pessoa (2026-11-08, opção "3 ajustada") está em
  * `../../ALINHAMENTO.md`, seção "O anel do cotovelo e o cotovelo": tubo de 156 mm em pé, assentado no `topo` do colar, e outro
- * de 156 mm deitado no alto, no eixo da junta, com 175 mm de comprimento e a ponta de trás rente às costas do tubo em pé. O topo
+ * de 156 mm deitado no alto, no eixo da junta, com 190 mm de comprimento (175 na prancha, alongado 15 mm a pedido da pessoa em 2026-11-09) e a ponta de trás rente às costas do tubo em pé. O topo
  * fica a 195 mm do colar e o eixo da junta a 117 mm. A saída é a face da frente do tubo deitado, no lado em que o antebraço segue.
  *
  * Referencial local: origem no centro da face de baixo do tubo em pé (a que assenta no colar); y para cima; x é o eixo do tubo
@@ -30,7 +30,7 @@ export const TABELA = {
   /* Altura do eixo da junta acima da face de baixo; o topo fica em alturaDoEixo + raio. */
   alturaDoEixo: 117,
   /* Comprimento do tubo deitado; a ponta de trás fica rente às costas do tubo em pé. */
-  comprimento: 175,
+  comprimento: 190,
   /* Chanfro estreito das bordas das tampas, em mm. */
   chanfro: 2,
   /* Lados dos dois cilindros de revolução. */
@@ -95,14 +95,14 @@ const receita = {
     escala: { medida: 'diâmetro dos dois tubos, igual ao do colar', milimetros: 156 },
     partes: [
       { nome: 'tuboEmPe', forma: 'cilindro reto de 156 mm de diâmetro e eixo vertical, que sobe do colar sem degrau até cruzar o tubo deitado; face de baixo plana com chanfro de 2 mm, concordância no encontro, uma peça só', tecnica: 'lathe de eixo y unido ao tubo deitado por unir; arredondarCostura de raio constante em modo curvo, com raioMinimo e afinarPontas; chanfro de 2 mm no perfil' },
-      { nome: 'tuboDeitado', forma: 'cilindro reto de 156 mm de diâmetro e 175 mm de comprimento, eixo horizontal a 117 mm, topo a 195; ponta de trás rente às costas do tubo em pé, face da frente plana com chanfro de 2 mm é a saída', tecnica: 'lathe de eixo x unido ao tubo em pé por unir; tampas planas nas duas pontas com chanfro de 2 mm no perfil; o arredondamento afina até sumir na tampa de trás' },
+      { nome: 'tuboDeitado', forma: 'cilindro reto de 156 mm de diâmetro e 190 mm de comprimento, eixo horizontal a 117 mm, topo a 195; ponta de trás rente às costas do tubo em pé, face da frente plana com chanfro de 2 mm é a saída', tecnica: 'lathe de eixo x unido ao tubo em pé por unir; tampas planas nas duas pontas com chanfro de 2 mm no perfil; o arredondamento afina até sumir na tampa de trás' },
     ],
     criteriosDeReprovacao: [
       'degrau entre o colar e o tubo em pé, ou diâmetro diferente de 156 mm',
       'ponta de trás do tubo deitado além das costas do tubo em pé, ou recuada delas',
       'quina viva ou faixa de sombra no encontro dos dois tubos: o encontro tem concordância',
       'saída fora do eixo do tubo deitado, ou sem a face redonda plana de eixo horizontal',
-      'cotovelo mais alto que 195 mm ou mais largo que 175 mm',
+      'cotovelo mais alto que 195 mm ou mais largo que 190 mm',
       'bordas das tampas vivas, sem o chanfro de 2 mm',
       'fresta, emenda ou parafuso entre os dois tubos: precisa ser uma peça só',
     ],
