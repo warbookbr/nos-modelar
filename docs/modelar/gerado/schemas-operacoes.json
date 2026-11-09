@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:cbd5784f389aae64f0a82afb90cf21fe8dddbaebb24db45f74948ca664f21c57",
+  "assinatura": "sha256:0db7347c35f727a2e8ff96d1f1a385b2020eb4de3b87e4bf3c79325d3554d2bf",
   "total": 40,
   "operacoes": [
     {
@@ -828,7 +828,8 @@
           "Sem arestas, só a costura côncava; classe sem aresta grita e diz qual classe existe.",
           "Costura entre faces planas: prismas em meia-esquadria. Costura sobre superfície curva facetada: arredondamento por fatias, que termina onde o encontro fica plano e recusa quina da própria costura nas classes novas.",
           "Onde três arestas do mesmo tipo se encontram a ponta fica reta.",
-          "Arredondamento côncavo (modo curvo) que chega à borda de uma face plana que limita o sólido (a tampa de um tubo rente à parede de outro, com o plano deixando o sólido todo de um lado): o raio cai de forma contínua até o maior que cabe antes da borda, ignorando raioMinimo, e o arredondamento some nela, sem aresta aguda nem fatia no plano da face; abaixo de 5% do raio a estação sai. O resultado traz o aviso faceLimite em neutro.avisos."
+          "Arredondamento côncavo (modo curvo) que chega à borda de uma face plana que limita o sólido (a tampa de um tubo rente à parede de outro, com o plano deixando o sólido todo de um lado): o raio cai de forma contínua até o maior que cabe antes da borda, ignorando raioMinimo, e o arredondamento some nela, sem aresta aguda nem fatia no plano da face; abaixo de 5% do raio a estação sai. O resultado traz o aviso faceLimite em neutro.avisos.",
+          "Costura em oito (dois tubos tangentes, com nós de grau 4 nos pontos de tangência), no modo curvo: cada nó é atravessado pelo par de arestas mais reto e cada laço é percorrido inteiro, começando no nó; sem isso o tubo saía partido no meio de um laço, com tampa reta nas duas pontas. Vale só com nós de grau 2 e 4 e laços sem vértice repetido."
         ],
         "diagnosticos": []
       }

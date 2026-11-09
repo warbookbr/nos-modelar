@@ -20,6 +20,7 @@
 
 export const LIMITE_DA_VIRADA = 90;
 export const ALCANCE_DO_TRECHO = 3;
+export const ABERTURA_DO_FIM_SECO_MM = 0.5;
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -100,10 +101,11 @@ function viradas(P, fechada) {
 export function medirSerrilhadoDaCostura(neutro, { faces = null, limite = LIMITE_DA_VIRADA } = {}) {
   const dentro = faces ?? facesDaCostura(neutro);
   const linhas = [];
-  let pontas = 0, trechos = 0;
+  let pontas = 0, trechos = 0, pontasLargas = 0;
   if (dentro.size) {
     for (const { ids, fechada } of linhasDaCostura(neutro, dentro)) {
-      const vs = viradas(ids.map((v) => neutro.V.get(v)), fechada);
+      const P = ids.map((v) => neutro.V.get(v));
+      const vs = viradas(P, fechada);
       const n = vs.length;
       const marcas = [];
       let maior = 0;
@@ -111,9 +113,12 @@ export function medirSerrilhadoDaCostura(neutro, { faces = null, limite = LIMITE
       let t = 0;
       for (let k = 0; k < marcas.length; k++) if (k === 0 || marcas[k] - marcas[k - 1] > ALCANCE_DO_TRECHO) t++;
       if (fechada && t > 1 && marcas[0] + n - marcas[marcas.length - 1] <= ALCANCE_DO_TRECHO) t--;
-      pontas += marcas.length; trechos += t;
-      linhas.push({ vertices: n, fechada, pontas: marcas.length, trechos: t, maiorDesvioMm: +maior.toFixed(3) });
+      /* abertura da ponta: a distância entre os dois vizinhos do vértice que dá meia-volta. O bico em que o arredondamento some afina até menos de 0,3 mm; a ponta com
+         mais de `ABERTURA_DO_FIM_SECO_MM` de abertura é o tubo que termina numa tampa reta (fim seco). O bico da união de tubos aceita (175°) tem 1,67 mm e conta aqui. */
+      const largas = marcas.filter((i) => P[(i + n - 1) % n] && P[(i + 1) % n] && norma(sub(P[(i + n - 1) % n], P[(i + 1) % n])) * 1000 > ABERTURA_DO_FIM_SECO_MM).length;
+      pontas += marcas.length; trechos += t; pontasLargas += largas;
+      linhas.push({ vertices: n, fechada, pontas: marcas.length, trechos: t, pontasLargas: largas, maiorDesvioMm: +maior.toFixed(3) });
     }
   }
-  return { linhas, pontas, trechos, faces: dentro.size };
+  return { linhas, pontas, trechos, pontasLargas, faces: dentro.size };
 }

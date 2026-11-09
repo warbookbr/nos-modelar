@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1771 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1772 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2842,6 +2842,7 @@
 
 ## tools/modelar/reguas-de-malha/
 
+- `costura-em-oito.test.mjs` — costura-em-oito.test.mjs — a costura de dois tubos tangentes é um oito, com um nó de grau 4 em cada ponto de tangência (o elo do punho 5). O construtor de li…
 - `costura-registrada.mjs` — costura-registrada.mjs — régua: a costura que o `unir` registra (`arestas` do registro de origem) contra a costura geométrica da malha que ele entregou (plan…
 - `costura-registrada.test.mjs` — costura-registrada.test.mjs — a costura que o `unir` registra tem de ser a costura geométrica da malha que ele entrega (plano "costuras e furos limpos"). Ant…
 - `face-degenerada.mjs` — face-degenerada.mjs — régua de malha: a face de três ou mais cantos que não define plano (plano "costuras e furos limpos", fatia 1).
