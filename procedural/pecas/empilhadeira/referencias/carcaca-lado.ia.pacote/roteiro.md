@@ -30,37 +30,37 @@ Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-la
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-03.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- painel / piso
 - furo / lateral
 - painel / paralama
+- painel / piso
 - paralama / torre
-- paralama / piso
+- frenteLateral / painel
 
 ## Etapa 5 — divisas, folha 4 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-04.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
 - frenteLateral / paralama
-- frenteLateral / piso
 - piso / tampaMotor
 - lateral / piso
 - chassi / frenteLateral
+- capo / contrapeso
 
 ## Etapa 6 — divisas, folha 5 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-05.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- capo / contrapeso
 - capo / pocoTraseiro
 - lateral / pocoTraseiro
 - capo / cuboTraseiro
 - contrapeso / pocoTraseiro
+- cuboTraseiro / pocoTraseiro
 
 ## Etapa 7 — divisas, folha 6 de 6
 
 Abra /home/user/nos-modelar/procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/divisas-06.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:
 
-- cuboTraseiro / pocoTraseiro
+- frenteLateral / piso
 - cuboDianteiro / frenteLateral
 - chassi / cuboDianteiro
 - chassi / torre

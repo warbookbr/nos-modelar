@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1746 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1748 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1515,6 +1515,10 @@
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
 
+## procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/
+
+- `roteiro.md` — Roteiro da análise
+
 ## procedural/pecas/freezer-horizontal/
 
 - `receita.js` — freezer-horizontal — freezer horizontal de tampo: corpo branco sobre o chão, junta escura que cobre o topo do corpo, tampo arredondado assentado sobre a junt…
@@ -2634,6 +2638,7 @@
 - `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.
 - `montagem-da-familia.mjs` — montagem-da-familia.mjs — a montagem v5 que uma família de objeto gera, conferida pela aprovação mecânica.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `navegador.mjs` — navegador.mjs — os argumentos e o lançamento do Chromium sem tela que as capturas da bancada, do esboço e do contorno usam.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `objeto.mjs` — objeto.mjs — em que etapa do fluxo um objeto está, e o que vem a seguir.
 - `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.

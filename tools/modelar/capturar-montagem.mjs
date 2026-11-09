@@ -6,6 +6,7 @@
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
+import { lancarChromium } from './navegador.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 /* Montagens aceitam o mesmo conjunto ortográfico da bancada. A revisão
@@ -215,9 +216,7 @@ export async function capturarMontagem({
     const carregarPlaywright = dependencias.carregarPlaywright
       ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
     const playwright = await carregarPlaywright();
-    browser = await playwright.chromium.launch({
-      args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
-    });
+    browser = await lancarChromium(playwright.chromium);
     garantirPrazo();
     const altura = alturaPedida ?? Math.round(largura * 9 / 16);
     const page = await browser.newPage({ viewport: { width: largura, height: altura }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });

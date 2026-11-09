@@ -29,6 +29,7 @@ import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 import { esbocoDeclarado } from './forma-do-esboco.mjs';
 import { lerFormasGuardadas } from './refinamento-global.mjs';
 import { ErroDoSolido, criarContextoDeSolidos, criarSolidosDoEsboco, triangularPoligonos } from '../../src/autoria/solido-do-esboco.js';
+import { lancarChromium } from './navegador.mjs';
 
 export const FRACOES_DOS_CORTES = Object.freeze([0.25, 0.5, 0.75]);
 export const EIXOS_DOS_CORTES = Object.freeze(['x', 'y', 'z']);
@@ -316,7 +317,7 @@ export function svgDosPaineis(paineis, { orientacao = null, area: areaPedida = n
 /** O SVG como PNG, rasterizado pelo Chromium do Playwright, como o esboço rasteriza o dele. `navegador` opcional. */
 export async function rasterizarSvg(svg, largura, altura, destino, navegador = null) {
   const proprio = !navegador;
-  if (proprio) navegador = await (await import('playwright')).default.chromium.launch();
+  if (proprio) navegador = await lancarChromium((await import('playwright')).default.chromium);
   try {
     const pagina = await navegador.newPage({ viewport: { width: largura, height: altura } });
     await pagina.setContent(`<!doctype html><body style="margin:0;background:#fff">${svg}</body>`);

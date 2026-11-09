@@ -11,8 +11,12 @@ processo o teria pego sozinho e o destino.
    `esquerda`) falhou em todas as tentativas com `page.screenshot: Protocol error (Page.captureScreenshot): Unable to
    capture screenshot`, e com `--vistas` de quatro painéis falhou em cerca de metade. Reproduz com a maquete
    `procedural/pecas/empilhadeira/referencias/maquete.esboco.json` neste ambiente (Chromium headless 1243 no lugar do
-   1194 que o Playwright do projeto pede). O processo não pega: é ambiente, mas a ferramenta não tenta de novo. Destino:
-   o item "Captura de tela recusada pelo Chromium" do backlog, com esta evidência.
+   1194 que o Playwright do projeto pede). O processo não pega: é ambiente, mas a ferramenta não tenta de novo. A causa
+   apareceu na carcaça, quando nenhuma captura passava: o 1243 ignora `--use-gl=swiftshader` e só cria o contexto WebGL
+   pelo ANGLE com o SwiftShader liberado (0 de 4 lançamentos contra 4 de 4, medido nos dois Chromium do contêiner).
+   Destino: `tools/modelar/navegador.mjs`, com os dois conjuntos de argumentos e o lançamento que cai no Chromium de
+   /opt/pw-browsers quando falta o da versão fixada, usado pela bancada, pela captura da montagem, pelo esboço e pelo
+   contorno; o apelido em PLAYWRIGHT_BROWSERS_PATH deixou de ser preciso.
 3. **O esboço 2.0 não conhecia o `inflate`.** O passo `["inflate", {...}]` no esboço da carcaça voltava recusado pela
    tabela de milímetro (`a operação "inflate" não está na tabela de medidas`), e `divisoes`, `estacoes` e
    `expoenteSecao` eram tratados como medida. O processo pegou, pela recusa com o nome do campo, que é o desenho da

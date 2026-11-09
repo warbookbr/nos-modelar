@@ -23,6 +23,7 @@ import { analisarPeca } from './analise-da-peca.mjs';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 import { reduzirEmParalelo } from './reduzir-em-paralelo.mjs';
+import { lancarChromium } from './navegador.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -134,7 +135,6 @@ export function criarDicas() {
   };
 }
 const PROJECOES = ['perspectiva', 'ortografica'];
-const ARGUMENTOS_DO_CHROMIUM = ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'];
 
 class ErroDeUso extends Error {
   constructor(mensagem) {
@@ -280,7 +280,7 @@ export async function abrirCapturaCompartilhada({ dependencias = {}, logger = nu
     await vite.listen();
     const { port } = vite.httpServer.address();
     const pw = await carregarPlaywright();
-    browser = await pw.chromium.launch({ args: ARGUMENTOS_DO_CHROMIUM });
+    browser = await lancarChromium(pw.chromium);
     if (typeof logger === 'function') logger('info', 'Servidor e navegador abertos uma vez para as capturas seguintes.');
     return {
       vite,
@@ -570,7 +570,7 @@ export async function olharBancada({
       const carregarPlaywright = dependencias.carregarPlaywright
         ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
       const pw = await carregarPlaywright();
-      browser = await pw.chromium.launch({ args: ARGUMENTOS_DO_CHROMIUM });
+      browser = await lancarChromium(pw.chromium);
     }
     garantirPrazo();
     /* BORDA SUAVIZADA: a página abre com `deviceScaleFactor` igual ao fator de amostragem, a bancada já desenha o buffer em

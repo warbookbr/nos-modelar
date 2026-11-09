@@ -6,14 +6,14 @@
   "coluna": 1,
   "contrapeso": 0.99,
   "cuboDianteiro": 1,
-  "cuboTraseiro": 0.904,
-  "frenteLateral": 0.986,
+  "cuboTraseiro": 0.916,
+  "frenteLateral": 0.998,
   "furo": 1,
   "lateral": 1,
-  "painel": 1,
-  "paralama": 0.974,
-  "piso": 1,
-  "pocoTraseiro": 0.95,
+  "painel": 0.944,
+  "paralama": 1,
+  "piso": 0.947,
+  "pocoTraseiro": 0.963,
   "ressaltoCapo": 0.958,
   "sombra": 0.18,
   "tampa": 1,
@@ -137,16 +137,6 @@
    ]
   },
   {
-   "a": "painel",
-   "b": "piso",
-   "caixa": [
-    400,
-    316,
-    501,
-    373
-   ]
-  },
-  {
    "a": "furo",
    "b": "lateral",
    "caixa": [
@@ -161,9 +151,19 @@
    "b": "paralama",
    "caixa": [
     383,
-    335,
-    424,
-    374
+    336,
+    439,
+    375
+   ]
+  },
+  {
+   "a": "painel",
+   "b": "piso",
+   "caixa": [
+    466,
+    342,
+    505,
+    415
    ]
   },
   {
@@ -177,13 +177,13 @@
    ]
   },
   {
-   "a": "paralama",
-   "b": "piso",
+   "a": "frenteLateral",
+   "b": "painel",
    "caixa": [
-    400,
-    337,
-    444,
-    376
+    415,
+    345,
+    500,
+    415
    ]
   },
   {
@@ -191,19 +191,9 @@
    "b": "paralama",
    "caixa": [
     386,
-    341,
-    444,
-    380
-   ]
-  },
-  {
-   "a": "frenteLateral",
-   "b": "piso",
-   "caixa": [
-    420,
-    347,
-    507,
-    441
+    340,
+    439,
+    379
    ]
   },
   {
@@ -270,9 +260,9 @@
    "a": "capo",
    "b": "cuboTraseiro",
    "caixa": [
-    762,
+    761,
     373,
-    801,
+    800,
     412
    ]
   },
@@ -282,7 +272,7 @@
    "caixa": [
     810,
     380,
-    855,
+    854,
     493
    ]
   },
@@ -290,10 +280,20 @@
    "a": "cuboTraseiro",
    "b": "pocoTraseiro",
    "caixa": [
-    747,
+    748,
     381,
     828,
     496
+   ]
+  },
+  {
+   "a": "frenteLateral",
+   "b": "piso",
+   "caixa": [
+    472,
+    391,
+    511,
+    441
    ]
   },
   {
@@ -310,7 +310,7 @@
    "a": "chassi",
    "b": "cuboDianteiro",
    "caixa": [
-    354,
+    358,
     404,
     455,
     493
@@ -342,5 +342,385 @@
   "fundoTom": 255,
   "tolerancia": 0.35,
   "subamostras": 8
+ },
+ "formas": {
+  "ajustadas": [
+   {
+    "parte": "lateral",
+    "nome": "fundo da lateral",
+    "forma": "reta",
+    "de": [
+     499.25,
+     493.6
+    ],
+    "ate": [
+     700,
+     493.6
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 2,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "lateral",
+    "nome": "junta com o capo",
+    "forma": "reta",
+    "de": [
+     745,
+     325
+    ],
+    "ate": [
+     745.25,
+     391.5
+    ],
+    "desvioPx": 0.234676,
+    "verticesAntes": 2,
+    "verticesDepois": 2,
+    "desvioMm": 1
+   },
+   {
+    "parte": "lateral",
+    "nome": "topo sob a coluna",
+    "forma": "reta",
+    "de": [
+     706,
+     322
+    ],
+    "ate": [
+     740,
+     322
+    ],
+    "desvioPx": 0,
+    "verticesAntes": 2,
+    "verticesDepois": 2,
+    "desvioMm": 0
+   },
+   {
+    "parte": "lateral",
+    "nome": "rampa",
+    "forma": "curva",
+    "de": [
+     576.6,
+     411.4
+    ],
+    "ate": [
+     685,
+     328
+    ],
+    "desvioPx": 0.146736,
+    "verticesAntes": 31,
+    "verticesDepois": 84,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "lateral",
+    "nome": "borda do degrau",
+    "forma": "reta",
+    "de": [
+     497,
+     428
+    ],
+    "ate": [
+     550,
+     428
+    ],
+    "desvioPx": 0.4498,
+    "verticesAntes": 8,
+    "verticesDepois": 2,
+    "desvioMm": 1.9
+   },
+   {
+    "parte": "lateral",
+    "nome": "arco traseiro",
+    "forma": "curva",
+    "de": [
+     742.4,
+     393.6
+    ],
+    "ate": [
+     707,
+     471.25
+    ],
+    "desvioPx": 0.143494,
+    "verticesAntes": 11,
+    "verticesDepois": 36,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "lateral",
+    "nome": "costura com a frente",
+    "forma": "reta",
+    "de": [
+     491,
+     433
+    ],
+    "ate": [
+     494,
+     480
+    ],
+    "desvioPx": 0.537769,
+    "verticesAntes": 8,
+    "verticesDepois": 2,
+    "desvioMm": 2.3
+   },
+   {
+    "parte": "frenteLateral",
+    "nome": "borda do arco sobre o piso",
+    "forma": "curva",
+    "de": [
+     435,
+     359.25
+    ],
+    "ate": [
+     492.25,
+     413.9
+    ],
+    "desvioPx": 0.146564,
+    "verticesAntes": 16,
+    "verticesDepois": 37,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "frenteLateral",
+    "nome": "arco da roda",
+    "forma": "curva",
+    "de": [
+     422,
+     416.25
+    ],
+    "ate": [
+     453.5,
+     473.9
+    ],
+    "desvioPx": 0.145957,
+    "verticesAntes": 15,
+    "verticesDepois": 36,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "paralama",
+    "nome": "topo da aba",
+    "forma": "reta",
+    "de": [
+     361.9,
+     353.5
+    ],
+    "ate": [
+     392,
+     353.6
+    ],
+    "desvioPx": 0.294997,
+    "verticesAntes": 3,
+    "verticesDepois": 2,
+    "desvioMm": 1.3
+   },
+   {
+    "parte": "paralama",
+    "nome": "base da aba",
+    "forma": "reta",
+    "de": [
+     360.9,
+     360.5
+    ],
+    "ate": [
+     396.5,
+     360.5
+    ],
+    "desvioPx": 0.239088,
+    "verticesAntes": 2,
+    "verticesDepois": 2,
+    "desvioMm": 1
+   },
+   {
+    "parte": "painel",
+    "nome": "barra da frente",
+    "forma": "reta",
+    "de": [
+     414.25,
+     269
+    ],
+    "ate": [
+     402.4,
+     320.25
+    ],
+    "desvioPx": 0.252869,
+    "verticesAntes": 4,
+    "verticesDepois": 2,
+    "desvioMm": 1.1
+   },
+   {
+    "parte": "painel",
+    "nome": "barra de tras",
+    "forma": "reta",
+    "de": [
+     447.4,
+     271.75
+    ],
+    "ate": [
+     436.75,
+     318.9
+    ],
+    "desvioPx": 0.262321,
+    "verticesAntes": 4,
+    "verticesDepois": 2,
+    "desvioMm": 1.1
+   },
+   {
+    "parte": "painel",
+    "nome": "rampa do painel",
+    "forma": "reta",
+    "de": [
+     446,
+     329.75
+    ],
+    "ate": [
+     482.9,
+     354.9
+    ],
+    "desvioPx": 1.24411,
+    "verticesAntes": 9,
+    "verticesDepois": 4,
+    "desvioMm": 5.3
+   },
+   {
+    "parte": "coluna",
+    "nome": "topo da coluna",
+    "forma": "reta",
+    "de": [
+     690.4,
+     271.5
+    ],
+    "ate": [
+     746.25,
+     268.5
+    ],
+    "desvioPx": 0.324199,
+    "verticesAntes": 4,
+    "verticesDepois": 2,
+    "desvioMm": 1.4
+   },
+   {
+    "parte": "capo",
+    "nome": "fundo do capo",
+    "forma": "reta",
+    "de": [
+     749,
+     392
+    ],
+    "ate": [
+     869,
+     391
+    ],
+    "desvioPx": 0.841021,
+    "verticesAntes": 15,
+    "verticesDepois": 8,
+    "desvioMm": 3.6
+   },
+   {
+    "parte": "capo",
+    "nome": "canto de tras arredondado",
+    "forma": "curva",
+    "de": [
+     845,
+     280
+    ],
+    "ate": [
+     873.25,
+     307.6
+    ],
+    "desvioPx": 0.138807,
+    "verticesAntes": 10,
+    "verticesDepois": 27,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "tampa",
+    "nome": "topo da tampa",
+    "forma": "reta",
+    "de": [
+     767.6,
+     269.9
+    ],
+    "ate": [
+     848,
+     272.25
+    ],
+    "desvioPx": 1.000172,
+    "verticesAntes": 5,
+    "verticesDepois": 2,
+    "desvioMm": 4.3
+   },
+   {
+    "parte": "tampaMotor",
+    "nome": "frente arredondada",
+    "forma": "curva",
+    "de": [
+     578.25,
+     304.25
+    ],
+    "ate": [
+     549.75,
+     344.4
+    ],
+    "desvioPx": 0.143304,
+    "verticesAntes": 6,
+    "verticesDepois": 20,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "furo",
+    "nome": "furo, quarto de cima e de tras",
+    "forma": "curva",
+    "de": [
+     713.75,
+     332.4
+    ],
+    "ate": [
+     729,
+     364.6
+    ],
+    "desvioPx": 0.136262,
+    "verticesAntes": 7,
+    "verticesDepois": 23,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "furo",
+    "nome": "furo, baixo",
+    "forma": "curva",
+    "de": [
+     729,
+     364.6
+    ],
+    "ate": [
+     701.6,
+     367.6
+    ],
+    "desvioPx": 0.132497,
+    "verticesAntes": 7,
+    "verticesDepois": 19,
+    "desvioMm": 0.6
+   },
+   {
+    "parte": "furo",
+    "nome": "furo, frente",
+    "forma": "curva",
+    "de": [
+     701.6,
+     367.6
+    ],
+    "ate": [
+     713.75,
+     332.4
+    ],
+    "desvioPx": 0.119813,
+    "verticesAntes": 9,
+    "verticesDepois": 20,
+    "desvioMm": 0.5
+   }
+  ],
+  "avisos": [],
+  "detalhes": []
  }
 }

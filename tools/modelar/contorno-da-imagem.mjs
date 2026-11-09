@@ -66,6 +66,7 @@ import {
   segmentar, silhuetaEmPedacos, sobreposicao, svgDoMapa, etiquetasFora, FONTE_DA_ETIQUETA, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
+import { lancarChromium } from './navegador.mjs';
 import { acaoDaPasta, aceitar, lerRodadas as lerRodadasDaPasta, registrarRodada as registrarNaPasta, novaSerie as novaSerieDaPasta } from './rodadas-com-critico.mjs';
 
 export const FORMATO = 'mecanifica.contornos@1';
@@ -141,7 +142,7 @@ export function formasEmMm({ ajustadas, avisos, detalhes }, mmPorPx) {
 export async function mapaRotulado(pngBuffer, segmentacao, { opacidade = 0.2 } = {}) {
   const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });
   const { chromium } = (await import('playwright')).default;
-  const navegador = await chromium.launch();
+  const navegador = await lancarChromium(chromium);
   try {
     const pagina = await navegador.newPage();
     const ordem = (segmentacao.ordem ?? Object.keys(segmentacao.regioes)).filter((n) => segmentacao.regioes[n]);
