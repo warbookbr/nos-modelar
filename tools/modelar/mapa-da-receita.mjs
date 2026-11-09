@@ -668,8 +668,9 @@ const comFrase = (inicio, frase) => cortar(frase ? `${inicio}: ${frase}` : inici
 
 /**
  * O mapa em texto, numa tela. Quando a forma completa passa de LIMITE_DE_LINHAS, a seguinte junta mais funções na linha das curtas
- * e põe numa linha só os blocos de PASSOS sem comentário, e a última lista as seções da TABELA corridas, sem a frase de cada uma;
- * a primeira que cabe é a que sai.
+ * e põe numa linha só os blocos de PASSOS sem comentário, a seguinte lista as seções da TABELA corridas, sem a frase de cada uma,
+ * e a última conta os valores de cada arquivo em vez de listá-los e põe todos os blocos de PASSOS corridos, sem a frase (o furgão
+ * realista, com 111 partes, passou das outras em 2026-11-09); a primeira que cabe é a que sai.
  */
 export function formatarMapa(mapa) {
   const formas = [
@@ -677,6 +678,7 @@ export function formatarMapa(mapa) {
     { curta: CURTA, passosCompactos: true },
     { curta: 2 * CURTA, passosCompactos: true },
     { curta: 2 * CURTA, passosCompactos: true, tabelaCompacta: true },
+    { curta: 2 * CURTA, passosCompactos: true, tabelaCompacta: true, valoresContados: true, passosSemFrase: true },
   ];
   let texto = '';
   for (const forma of formas) {
@@ -686,7 +688,7 @@ export function formatarMapa(mapa) {
   return texto;
 }
 
-function formatarNaForma(mapa, { curta, passosCompactos, tabelaCompacta = false }) {
+function formatarNaForma(mapa, { curta, passosCompactos, tabelaCompacta = false, valoresContados = false, passosSemFrase = false }) {
   const saida = [];
   const multi = mapa.arquivos.length > 1;
   const onde = (arquivo) => (multi ? `${arquivo} ` : '');
@@ -722,7 +724,8 @@ function formatarNaForma(mapa, { curta, passosCompactos, tabelaCompacta = false 
       }
     }
     const valores = mapa.valores.filter((v) => v.arquivo === f.arquivo).map((v) => `${v.linha} ${v.nome}`);
-    if (multi && valores.length) saida.push(...linhasCompactas('     valores: ', valores, '         '));
+    if (multi && valores.length && valoresContados) saida.push(`     valores: ${valores.length}, de ${valores[0]} a ${valores.at(-1)}`);
+    else if (multi && valores.length) saida.push(...linhasCompactas('     valores: ', valores, '         '));
   }
   if (!multi && mapa.valores.length) saida.push(...linhasCompactas('valores: ', mapa.valores.map((v) => `${v.linha} ${v.nome}`)));
 
@@ -739,9 +742,9 @@ function formatarNaForma(mapa, { curta, passosCompactos, tabelaCompacta = false 
   const resto = ps.porOperacao.length > 6 ? ', …' : '';
   const cabecaPassos = ps.linha ? `PASSOS ${onde(ps.arquivo)}${ps.linha} ${ps.nome}` : 'PASSOS';
   saida.push(cortar(`${cabecaPassos}: ${ps.total} passos, ${ps.partes} partes (${ops}${resto})`, LARGURA));
-  const semFrase = passosCompactos ? ps.blocos.filter((b) => !b.frase) : [];
+  const semFrase = passosSemFrase ? ps.blocos : passosCompactos ? ps.blocos.filter((b) => !b.frase) : [];
   for (const b of ps.blocos.filter((x) => !semFrase.includes(x))) saida.push(comFrase(`${String(b.linha).padStart(6)} ${b.nome}`, b.frase));
-  if (semFrase.length) saida.push(...linhasCompactas('  sem comentário: ', semFrase.map((b) => `${b.linha} ${b.nome}`)));
+  if (semFrase.length) saida.push(...linhasCompactas(passosSemFrase ? '  blocos: ' : '  sem comentário: ', semFrase.map((b) => `${b.linha} ${b.nome}`)));
   return `${saida.join('\n')}\n`;
 }
 
