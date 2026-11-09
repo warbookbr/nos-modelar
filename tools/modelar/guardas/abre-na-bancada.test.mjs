@@ -37,9 +37,7 @@ describe('o acervo abre na bancada', () => {
       }
     }
     expect(reprovadas, `peças que não abrem na bancada:\n${reprovadas.join('\n')}`).toEqual([]);
-    /* o furgão realista leva sozinho uns 250 s no CI desde a janela da cabine (oito vãos na booleana da chapa inteira, plano
-       `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`), e o prazo padrão de 180 s não cobre o acervo */
-  }, 600_000);
+  });
 
   it('cada montagem abre com todas as instâncias, sem aviso de "abriu sem"', async () => {
     const reprovadas = [];
