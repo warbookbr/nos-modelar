@@ -635,7 +635,7 @@
     },
     {
       "instancia": "anelPunho6",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelPunho6SentaNaSaida",
@@ -680,11 +680,18 @@
           }
         }
       ],
-      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6"
+      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o anel da junta 6 e o flange",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "flange",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "flangeSentaNoAnel",
@@ -729,7 +736,14 @@
           }
         }
       ],
-      "forma": "sha256:dc5bb25a5fc59f514fa0b17ca34473b5290f8d743e854ae183e8789b2ac72229"
+      "forma": "sha256:dc5bb25a5fc59f514fa0b17ca34473b5290f8d743e854ae183e8789b2ac72229",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o anel da junta 6 e o flange",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
