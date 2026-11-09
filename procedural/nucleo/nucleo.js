@@ -2253,9 +2253,10 @@ function transportaLoft(uPrev, t) {
    quando ela é dada; senão do quadro determinístico do `quadroLoft`.
    Devolve `{erro}` quando a face não é plana: um furo numa face torta não tem
    plano de entrada, e furar "mais ou menos no plano médio" seria a escolha
-   interna voltando pela janela. */
-function poligonoPlano(st, fid, referencia) {
-  const f = st.F.get(fid);
+   interna voltando pela janela. `faceLike` ({vs}) é o contorno de uma região
+   plana de várias faces, que o `furo` lê como uma face só. */
+function poligonoPlano(st, fid, referencia, faceLike) {
+  const f = faceLike ?? st.F.get(fid);
   const P = f.vs.map((v) => st.V.get(v));
   if (P.some((p) => !p)) return { erro: `a face ${fid} tem canto sem posição` };
   if (P.length < 3) return { erro: `a face ${fid} tem ${P.length} canto(s) — um polígono precisa de 3` };

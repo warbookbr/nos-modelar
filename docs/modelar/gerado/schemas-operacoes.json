@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:0db7347c35f727a2e8ff96d1f1a385b2020eb4de3b87e4bf3c79325d3554d2bf",
+  "assinatura": "sha256:b3b301d7924643bdea8d0e431fb77896437d5c426a7993bb9601ea33f5d18694",
   "total": 40,
   "operacoes": [
     {
@@ -828,8 +828,7 @@
           "Sem arestas, só a costura côncava; classe sem aresta grita e diz qual classe existe.",
           "Costura entre faces planas: prismas em meia-esquadria. Costura sobre superfície curva facetada: arredondamento por fatias, que termina onde o encontro fica plano e recusa quina da própria costura nas classes novas.",
           "Onde três arestas do mesmo tipo se encontram a ponta fica reta.",
-          "Arredondamento côncavo (modo curvo) que chega à borda de uma face plana que limita o sólido (a tampa de um tubo rente à parede de outro, com o plano deixando o sólido todo de um lado): o raio cai de forma contínua até o maior que cabe antes da borda, ignorando raioMinimo, e o arredondamento some nela, sem aresta aguda nem fatia no plano da face; abaixo de 5% do raio a estação sai. O resultado traz o aviso faceLimite em neutro.avisos.",
-          "Costura em oito (dois tubos tangentes, com nós de grau 4 nos pontos de tangência), no modo curvo: cada nó é atravessado pelo par de arestas mais reto e cada laço é percorrido inteiro, começando no nó; sem isso o tubo saía partido no meio de um laço, com tampa reta nas duas pontas. Vale só com nós de grau 2 e 4 e laços sem vértice repetido."
+          "Arredondamento côncavo (modo curvo) que chega à borda de uma face plana que limita o sólido (a tampa de um tubo rente à parede de outro, com o plano deixando o sólido todo de um lado): o raio cai de forma contínua até o maior que cabe antes da borda, ignorando raioMinimo, e o arredondamento some nela, sem aresta aguda nem fatia no plano da face; abaixo de 5% do raio a estação sai. O resultado traz o aviso faceLimite em neutro.avisos."
         ],
         "diagnosticos": []
       }
@@ -2514,7 +2513,8 @@
         ],
         "limites": [
           "lados precisa ser ≡ 2 (mod 4) — 10, 14 ou 18, nunca múltiplo de 4. A seção começa com um vértice em 0°, então múltiplo de 4 põe outro VÉRTICE no topo, a 90°, e um furo centrado no eixo cai entre duas faces e não cabe em nenhuma. Foi o que destravou o olho do machado depois de lados:16 recusar em todas as estações.",
-          "de precisa resolver para exatamente UMA face, e ela precisa ser grande o bastante e plana. O furo tem de caber na face de entrada E na de saída, e as duas precisam se enxergar: com lados:12 o lado 2 enxerga o 9, e o 2 com o 8 não.",
+          "de e saida precisam resolver para UMA face, ou para uma REGIÃO plana: todas as faces coplanares ligadas por aresta, como a tampa em leque do `lathe` (`{op:'lathe',id,faixa}`), que o furo lê como uma face só de contorno único (região com buraco ou que toca a si mesma é recusada; o polo do leque, sem outra face, sai da malha). A face precisa ser convexa, grande o bastante e plana. O furo tem de caber na face de entrada E na de saída, e as duas precisam se enxergar: com lados:12 o lado 2 enxerga o 9, e o 2 com o 8 não.",
+          "A face furada de contorno denso (48 cantos ou mais) cuja repartição teria triângulo fino (razão de aspecto acima de 10 com o maior lado acima de 4 vezes a aresta média do contorno, como mede a régua triangulo-fino) é refeita em anéis: em volta de cada furo, um anel de quadriláteros (um por aresta do furo, as mesmas faces `borda`/`saida` de sempre) ligando-o a um polígono de apoio, e o resto da face em triângulos de Delaunay com pontos de reforço numa grade hexagonal, sem vértice novo sobre o contorno da face. Sem triângulo fino, ou com menos de 48 cantos, a face fica como era. Os cantos novos não têm endereço próprio, e as faces do preenchimento (que agora existe também com um furo só) seguem endereçadas por `preenchimento`.",
           "O furo CONSOME as faces de entrada e saída, que viram a borda anular do corte, e a origem antiga passa a ser recusada inteira. Una as duas origens num ALIAS, ou ponha a peça furada como primeira geometria e use sel:{tudo:true}."
         ],
         "diagnosticos": []
@@ -4669,8 +4669,7 @@
         "limites": [
           "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
           "Cite a costura com {op:'unir', id, costura:true}.",
-          "Resultado vazio grita.",
-          "O registro da costura (as arestas que o arredondarCostura lê) tem todas as arestas entre faces de sólidos diferentes, também onde a sopa de triângulos da Manifold parte um diedro em dois e o canto do meio é tirado por quase colinear: a aresta que o atravessa continua registrada, ligando os dois vizinhos. Sem isso o registro perdia esses trechos e o arredondarCostura fazia tubo curto com tampa nos restos (dentes no fim do arredondamento, face degenerada). A régua tools/modelar/reguas-de-malha/costura-registrada.mjs compara o registro com a costura geométrica."
+          "Resultado vazio grita."
         ],
         "diagnosticos": []
       }
