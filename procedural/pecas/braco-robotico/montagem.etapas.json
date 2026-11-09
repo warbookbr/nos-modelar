@@ -197,9 +197,18 @@
     },
     {
       "instancia": "braco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
       "forma": "sha256:489416bafeb3199e337eda62b61dfa502a23e3dbbb69a1bf876d179fa7079216",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+          "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+          "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -234,7 +243,7 @@
     },
     {
       "instancia": "anelAntebraco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelAntebracoSentaNaSaida",
@@ -280,6 +289,13 @@
         }
       ],
       "forma": "sha256:0aac9441c2302403154a031e60cf12ffce511d250ba106abe32e02a8326b794c",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "pessoa",
@@ -311,7 +327,7 @@
     },
     {
       "instancia": "antebraco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "antebracoSentaNoAnel",
@@ -371,7 +387,14 @@
           },
           "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a"
         }
-      ]
+      ],
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
