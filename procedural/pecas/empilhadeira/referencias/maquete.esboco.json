@@ -1,0 +1,514 @@
+{
+ "plano": "Maquete de volumes da empilhadeira pela TABELA do alinhamento, para conferir proporção e segmentação contra as vistas de IA.",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "maquete pela TABELA",
+   "nota": "entre-eixos 1700, largura 1150, protetor 2150, torre 2100",
+   "formas": [
+    {
+     "id": "rodaDe",
+     "op": "cilindro",
+     "args": {
+      "raio": 352.5,
+      "altura": 180,
+      "eixo": "z",
+      "lados": 48
+     },
+     "centro": [
+      0,
+      352.5,
+      485
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "rodaTe",
+     "op": "cilindro",
+     "args": {
+      "raio": 272.5,
+      "altura": 150,
+      "eixo": "z",
+      "lados": 48
+     },
+     "centro": [
+      -1700,
+      272.5,
+      485
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "rodaDd",
+     "op": "cilindro",
+     "args": {
+      "raio": 352.5,
+      "altura": 180,
+      "eixo": "z",
+      "lados": 48
+     },
+     "centro": [
+      0,
+      352.5,
+      -485
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "rodaTd",
+     "op": "cilindro",
+     "args": {
+      "raio": 272.5,
+      "altura": 150,
+      "eixo": "z",
+      "lados": 48
+     },
+     "centro": [
+      -1700,
+      272.5,
+      -485
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "contrapeso",
+     "op": "cubo",
+     "args": {
+      "larg": 380,
+      "alt": 440,
+      "prof": 1070
+     },
+     "centro": [
+      -1885,
+      443,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "capo",
+     "op": "cubo",
+     "args": {
+      "larg": 700,
+      "alt": 520,
+      "prof": 1070
+     },
+     "centro": [
+      -1700,
+      900,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "tampa",
+     "op": "cubo",
+     "args": {
+      "larg": 650,
+      "alt": 60,
+      "prof": 1000
+     },
+     "centro": [
+      -1700,
+      1160,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "lateral",
+     "op": "cubo",
+     "args": {
+      "larg": 1130,
+      "alt": 560,
+      "prof": 1070
+     },
+     "centro": [
+      -1000,
+      480,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "piso",
+     "op": "cubo",
+     "args": {
+      "larg": 900,
+      "alt": 40,
+      "prof": 900
+     },
+     "centro": [
+      -250,
+      560,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "paralama",
+     "op": "cubo",
+     "args": {
+      "larg": 640,
+      "alt": 40,
+      "prof": 1150
+     },
+     "centro": [
+      0,
+      800,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "garfoe",
+     "op": "cubo",
+     "args": {
+      "larg": 1070,
+      "alt": 40,
+      "prof": 100
+     },
+     "centro": [
+      985,
+      70,
+      250
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "talaoe",
+     "op": "cubo",
+     "args": {
+      "larg": 40,
+      "alt": 1000,
+      "prof": 100
+     },
+     "centro": [
+      470,
+      550,
+      250
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "garfod",
+     "op": "cubo",
+     "args": {
+      "larg": 1070,
+      "alt": 40,
+      "prof": 100
+     },
+     "centro": [
+      985,
+      70,
+      -250
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "talaod",
+     "op": "cubo",
+     "args": {
+      "larg": 40,
+      "alt": 1000,
+      "prof": 100
+     },
+     "centro": [
+      470,
+      550,
+      -250
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "colFe",
+     "op": "cubo",
+     "args": {
+      "larg": 60,
+      "alt": 1350,
+      "prof": 60
+     },
+     "centro": [
+      -50,
+      1475,
+      450
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "colTe",
+     "op": "cubo",
+     "args": {
+      "larg": 60,
+      "alt": 1600,
+      "prof": 60
+     },
+     "centro": [
+      -1150,
+      1350,
+      450
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "colFd",
+     "op": "cubo",
+     "args": {
+      "larg": 60,
+      "alt": 1350,
+      "prof": 60
+     },
+     "centro": [
+      -50,
+      1475,
+      -450
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "colTd",
+     "op": "cubo",
+     "args": {
+      "larg": 60,
+      "alt": 1600,
+      "prof": 60
+     },
+     "centro": [
+      -1150,
+      1350,
+      -450
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "teto",
+     "op": "cubo",
+     "args": {
+      "larg": 1160,
+      "alt": 60,
+      "prof": 960
+     },
+     "centro": [
+      -600,
+      2120,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "banco",
+     "op": "cubo",
+     "args": {
+      "larg": 500,
+      "alt": 350,
+      "prof": 480
+     },
+     "centro": [
+      -900,
+      1365,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "volante",
+     "op": "cilindro",
+     "args": {
+      "raio": 180,
+      "altura": 40,
+      "eixo": "y",
+      "lados": 48
+     },
+     "centro": [
+      -150,
+      1450,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "glp",
+     "op": "cilindro",
+     "args": {
+      "raio": 160,
+      "altura": 700,
+      "eixo": "z",
+      "lados": 48
+     },
+     "centro": [
+      -1700,
+      1390,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "escape",
+     "op": "cilindro",
+     "args": {
+      "raio": 45,
+      "altura": 950,
+      "eixo": "y",
+      "lados": 48
+     },
+     "centro": [
+      -1180,
+      1665,
+      430
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "canale",
+     "op": "cubo",
+     "args": {
+      "larg": 120,
+      "alt": 2100,
+      "prof": 90
+     },
+     "centro": [
+      330,
+      1110,
+      365
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "postee",
+     "op": "cubo",
+     "args": {
+      "larg": 30,
+      "alt": 1000,
+      "prof": 60
+     },
+     "centro": [
+      440,
+      1100,
+      470
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "canald",
+     "op": "cubo",
+     "args": {
+      "larg": 120,
+      "alt": 2100,
+      "prof": 90
+     },
+     "centro": [
+      330,
+      1110,
+      -365
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "posted",
+     "op": "cubo",
+     "args": {
+      "larg": 30,
+      "alt": 1000,
+      "prof": 60
+     },
+     "centro": [
+      440,
+      1100,
+      -470
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "travessaAlta",
+     "op": "cubo",
+     "args": {
+      "larg": 120,
+      "alt": 80,
+      "prof": 820
+     },
+     "centro": [
+      330,
+      2120,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "travessaBaixa",
+     "op": "cubo",
+     "args": {
+      "larg": 120,
+      "alt": 80,
+      "prof": 820
+     },
+     "centro": [
+      330,
+      700,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "carro",
+     "op": "cubo",
+     "args": {
+      "larg": 40,
+      "alt": 420,
+      "prof": 1000
+     },
+     "centro": [
+      400,
+      330,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "barra900",
+     "op": "cubo",
+     "args": {
+      "larg": 30,
+      "alt": 40,
+      "prof": 1000
+     },
+     "centro": [
+      440,
+      900,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "barra1250",
+     "op": "cubo",
+     "args": {
+      "larg": 30,
+      "alt": 40,
+      "prof": 1000
+     },
+     "centro": [
+      440,
+      1250,
+      0
+     ],
+     "por": "centro"
+    },
+    {
+     "id": "barra1580",
+     "op": "cubo",
+     "args": {
+      "larg": 30,
+      "alt": 40,
+      "prof": 1000
+     },
+     "centro": [
+      440,
+      1580,
+      0
+     ],
+     "por": "centro"
+    }
+   ]
+  }
+ ]
+}

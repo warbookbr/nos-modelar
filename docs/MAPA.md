@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1743 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1746 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -296,6 +296,10 @@
 
 - `roteiro.md` — Roteiro da análise
 
+## docs/modelar/banco-de-provas/empilhadeira-2026-11-09/
+
+- `ATRITOS.md` — Empilhadeira — atritos
+
 ## docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/
 
 - `README.md` — Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2, 3 e 5
@@ -524,6 +528,7 @@
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
+- `2026-11-09-empilhadeira.md` — Empilhadeira inteira, da carcaça aos garfos, por partes plugadas numa montagem
 - `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -1505,6 +1510,10 @@
 ## procedural/pecas/carro-taxi/referencias/
 
 - `alvo.md` — Alvo: carro-taxi
+
+## procedural/pecas/empilhadeira/
+
+- `ALINHAMENTO.md` — Empilhadeira — alinhamento
 
 ## procedural/pecas/freezer-horizontal/
 
