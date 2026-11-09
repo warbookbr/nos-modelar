@@ -34,7 +34,7 @@ export const TABELA = {
   /* Chanfro estreito das bordas das tampas, em mm. */
   chanfro: 2,
   /* Lados dos dois cilindros de revolução. */
-  lados: 96,
+  lados: 144,
   /* Arredondamento do encontro: raio nominal, raio mínimo e distância de afinamento até sumir nas pontas (mm). */
   raioDoEncontro: 10,
   raioMinimo: 3,
