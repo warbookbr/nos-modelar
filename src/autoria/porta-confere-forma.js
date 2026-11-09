@@ -7,14 +7,16 @@
 
    A conferência mede duas coisas na peça executada. Primeiro, o plano: alguma
    face de onde a porta sai (`de`) precisa ter vértice no plano que passa pelo
-   centro, perpendicular ao eixo. Segundo, o raio: entre os vértices das
-   partes de onde a porta sai que ficam a até `FAIXA_DO_RAIO` desse plano, o
-   mais afastado do eixo precisa estar no raio declarado (`raioExterno` do
-   anel, `raio` do cilindro). A faixa existe porque a borda costuma ter chanfro ou filete: o
-   anel da base do braço tem a face plana até 103,5 mm e o corpo em 105 mm, e
-   a porta declara, com razão, o raio do corpo. A medida fica nas partes da
-   origem porque outra parte da mesma peça pode passar perto do plano: o tambor
-   do ombro desce até perto do plano do colar.
+   centro, perpendicular ao eixo. Segundo, o raio: a face que assenta (as faces
+   da origem da porta que estão no plano, mais as coplanares ligadas a elas por
+   aresta, e que cabem no círculo declarado) tem de caber no raio declarado (`raioExterno` do anel, `raio` do
+   cilindro), e o raio declarado tem de ser alcançado por ela ou, quando a
+   borda tem chanfro ou filete, por um vértice das faces vizinhas a até
+   `FAIXA_DO_RAIO` do plano que não passe do raio: o anel da base do braço tem
+   a face plana até 103,5 mm e o corpo em 105 mm, e a porta declara, com razão,
+   o raio do corpo. Nada fora dessa face é medido: o filete e o tubo de uma
+   peça em T passam perto do plano sem assentar nele, e o tambor do ombro
+   desce até perto do plano do colar.
 
    Recebe o resultado do núcleo, com `facesDasPortas`, e devolve os achados. */
 export const TOLERANCIA = 0.0001;
@@ -28,6 +30,52 @@ function medir(ponto, centro, eixo) {
   const d = sub(ponto, centro);
   const t = dot(d, eixo);
   return { t, r: Math.hypot(d[0] - t * eixo[0], d[1] - t * eixo[1], d[2] - t * eixo[2]) };
+}
+
+/* A face que assenta: as faces da porta que ficam no plano (todos os vértices a `TOLERANCIA` dele) e as coplanares ligadas a elas por aresta.
+   `vizinhos` são os vértices das faces ligadas a ela por aresta, dentro da faixa do plano (chanfro, filete), e só servem para alcançar o raio do corpo. */
+function faceDaPorta(neutro, faces, centro, eixo, raio) {
+  const noPlano = (face) => face.vs.every((v) => Math.abs(medir(neutro.V.get(v), centro, eixo).t) <= TOLERANCIA);
+  const porAresta = new Map();
+  for (const [id, face] of neutro.F) {
+    const n = face.vs.length;
+    for (let i = 0; i < n; i++) {
+      const a = face.vs[i], b = face.vs[(i + 1) % n];
+      const k = a < b ? `${a}|${b}` : `${b}|${a}`;
+      if (!porAresta.has(k)) porAresta.set(k, []);
+      porAresta.get(k).push(id);
+    }
+  }
+  const vizinhasDe = (id) => {
+    const face = neutro.F.get(id);
+    const saida = [];
+    const n = face.vs.length;
+    for (let i = 0; i < n; i++) {
+      const a = face.vs[i], b = face.vs[(i + 1) % n];
+      for (const o of porAresta.get(a < b ? `${a}|${b}` : `${b}|${a}`) ?? []) if (o !== id) saida.push(o);
+    }
+    return saida;
+  };
+  /* a região cresce só por faces coplanares que cabem no círculo declarado: o tubo da peça em T tem a face rente à da porta e outro raio */
+  const cabe = (face) => face.vs.every((v) => medir(neutro.V.get(v), centro, eixo).r <= raio + TOLERANCIA);
+  const dentro = new Set();
+  const fila = [];
+  for (const f of faces) if (neutro.F.has(f) && noPlano(neutro.F.get(f))) { dentro.add(f); fila.push(f); }
+  while (fila.length) {
+    for (const o of vizinhasDe(fila.pop())) if (!dentro.has(o) && noPlano(neutro.F.get(o)) && cabe(neutro.F.get(o))) { dentro.add(o); fila.push(o); }
+  }
+  /* a borda: das faces da região para fora, as faces ligadas por aresta que ficam inteiras na faixa do plano (o chanfro e as bordas suavizadas dele) */
+  const naFaixa = (face) => face.vs.every((v) => Math.abs(medir(neutro.V.get(v), centro, eixo).t) <= FAIXA_DO_RAIO);
+  const vizinhasFora = new Set();
+  const borda = [...dentro];
+  while (borda.length) {
+    for (const o of vizinhasDe(borda.pop())) if (!dentro.has(o) && !vizinhasFora.has(o) && naFaixa(neutro.F.get(o))) { vizinhasFora.add(o); borda.push(o); }
+  }
+  const regiao = new Set();
+  for (const f of dentro) for (const v of neutro.F.get(f).vs) regiao.add(v);
+  const vizinhos = new Set();
+  for (const f of vizinhasFora) for (const v of neutro.F.get(f).vs) vizinhos.add(v);
+  return { regiao, vizinhos };
 }
 
 export function conferirPortasNaForma(neutro) {
@@ -60,15 +108,23 @@ export function conferirPortasNaForma(neutro) {
         achados.push({ porta: id, codigo: 'porta-fora-do-plano', mensagem: `a porta '${id}' declara o plano no centro ${JSON.stringify(I.centro)}, e a face mais perto da origem dela está a ${mm(distancia)} dele.`, desvio: distancia });
         continue;
       }
-      const daParte = new Set();
-      for (const face of neutro.F.values()) if (partes.has(face.parte)) for (const v of face.vs) daParte.add(v);
+      const { regiao, vizinhos } = faceDaPorta(neutro, faces, I.centro, eixo, raio);
       let maior = 0;
-      for (const v of daParte) {
+      for (const v of regiao) maior = Math.max(maior, medir(neutro.V.get(v), I.centro, eixo).r);
+      /* a porta que sai de uma face lateral (o rolo da chapa, a parede de um cilindro) não tem face no plano: valem os vértices dela que estão nele */
+      for (const v of daOrigem) {
         const { t, r } = medir(neutro.V.get(v), I.centro, eixo);
-        if (Math.abs(t) <= FAIXA_DO_RAIO && r > maior) maior = r;
+        if (Math.abs(t) <= TOLERANCIA) maior = Math.max(maior, r);
       }
-      if (Math.abs(maior - raio) > TOLERANCIA) {
-        achados.push({ porta: id, codigo: 'porta-com-raio-errado', mensagem: `a porta '${id}' declara raio ${mm(raio)}, e a peça junto do plano dela chega a ${mm(maior)} do eixo.`, desvio: maior - raio });
+      /* a borda chanfrada ou com filete: o raio declarado pode ser o do corpo, que só as faces vizinhas à face plana alcançam */
+      let alcance = maior;
+      for (const v of vizinhos) {
+        const { t, r } = medir(neutro.V.get(v), I.centro, eixo);
+        if (Math.abs(t) <= FAIXA_DO_RAIO && r <= raio + TOLERANCIA) alcance = Math.max(alcance, r);
+      }
+      if (maior > raio + TOLERANCIA || raio - alcance > TOLERANCIA) {
+        const visto = maior > raio + TOLERANCIA ? maior : alcance;
+        achados.push({ porta: id, codigo: 'porta-com-raio-errado', mensagem: `a porta '${id}' declara raio ${mm(raio)}, e a peça junto do plano dela chega a ${mm(visto)} do eixo.`, desvio: visto - raio });
       }
     } else if (I.forma === 'plano') {
       const normal = I.normal ?? I.eixo;

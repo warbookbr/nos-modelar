@@ -50,6 +50,19 @@ describe('a porta confere com a forma', () => {
     expect(conferirPortasNaForma(n)).toEqual([]);
   });
 
+  it('peça em T: o tubo rente à face e o filete do encontro não entram na medida do raio da porta', () => {
+    /* pé redondo de raio 5 cm com a face de cima em y=0,1 e um tubo de mesmo raio deitado rente a essa face (o eixo dele em y=0,05), unido */
+    const passos = [
+      ['lathe', { origemId: 1, lados: 24, perfil: [[0, 0], [0.05, 0], [0.05, 0.1], [0, 0.1]] }],
+      ['lathe', { origemId: 2, lados: 24, perfil: [[0, 0], [0.05, 0], [0.05, 0.12], [0, 0.12]], eixo: 'x', em: [0, 0.05, 0] }],
+      ['unir', { origemId: 3, solidos: [{ origem: { op: 'lathe', id: 1 } }, { origem: { op: 'lathe', id: 2 } }] }],
+      ['publicarPorta', { id: 'topo', de: { op: 'lathe', id: 1 }, interface: anel(0.1, 0.05) }],
+    ];
+    const n = nucleo(passos, {}, {}, {}, null, []);
+    expect(n.orfaos).toEqual([]);
+    expect(conferirPortasNaForma(n)).toEqual([]);
+  });
+
   it('as portas das partes fixas do braço passam', async () => {
     for (const parte of ['base', 'anel-cintura', 'ombro']) {
       const receita = (await import(`../../procedural/pecas/braco-robotico/partes/${parte}/receita.js`)).default;
