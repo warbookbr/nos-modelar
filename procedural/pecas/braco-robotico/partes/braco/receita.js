@@ -1,7 +1,7 @@
 /* braco-robotico/braco — a coluna redonda e reta, à frente do ombro, numa malha única por subdivisão de uma gaiola.
  *
  * Quarta etapa da montagem `braco-robotico/montagem.json`. A decisão da pessoa
- * (2026-11-03, opção 3) está no fim de `../../ALINHAMENTO.md`: cilindro de 156
+ * (2026-11-03, opção 3) está no fim de `../../ALINHAMENTO.md`: cilindro de 190
  * mm do pé ao topo, 502 mm do fundo do pé ao topo, pé redondo em volta do eixo
  * da junta do ombro, uma peça só. Em 2026-11-05 a pessoa pediu a peça numa
  * superfície só, sem união: antes eram dois `lathe` unidos com
@@ -27,7 +27,7 @@
  * tampa da gaiola, planas. O filete do encontro é uma quádrica tangente à
  * parede e ao círculo do pé, posta nos pontos do laço, e a tangente dela é a de
  * um filete de `raioDoEncontro` entre as duas superfícies (raio * tg(metade da
- * dobra)); onde as duas ficam tangentes (z = 78) a dobra some e o trecho do filete
+ * dobra)); onde as duas ficam tangentes (z = 95) a dobra some e o trecho do filete
  * vira uns poucos milímetros quase retos. A parede da coluna tem trechos de
  * passo crescente a partir do filete, para a subdivisão não deixar calombo.
  * `compensar` vai nos trechos de curva dos planos de dentro, e fica de fora nos
@@ -35,7 +35,7 @@
  *
  * Duas partes nomeadas, uma só malha: o pé é o que está de y = -raio ao eixo da
  * junta mais o raio (a metade de baixo do pé, escolhida por região), e a coluna é o resto.
- * A parede da coluna entre o eixo da junta e o topo do pé (y de 0 a 78 mm) fica
+ * A parede da coluna entre o eixo da junta e o topo do pé (y de 0 a 95 mm) fica
  * por isso na parte `pe`: a região do núcleo recorta por caixa, não pela superfície.
  *
  * Portas que a receita publica:
@@ -45,7 +45,7 @@
  *                  cima, face inteira (raio da coluna). O cotovelo assenta aqui.
  *
  * Curso. A rotação é em torno do eixo +Z da junta, e toda a peça fica em
- * z de 0 a 156 mm, à frente da face do anel: nenhum ponto cruza o plano do
+ * z de 0 a 190 mm, à frente da face do anel: nenhum ponto cruza o plano do
  * anel nem entra no bloco do ombro, em nenhum ângulo. O limite é o chão: com o
  * eixo a 360 mm do chão, a coluna encosta nele a cerca de 141 graus da vertical
  * para cada lado.
@@ -56,7 +56,7 @@ export const TABELA = {
   /* Vem do ombro pela montagem (porta `juntaDoOmbro`); o valor daqui só vale
      para ver a parte sozinha. Limita o raio do pé: o pé não passa do anel. */
   raioDaJunta: 95,
-  diametroDaColuna: 156,
+  diametroDaColuna: 190,
   /* Do fundo do pé ao topo. */
   alturaTotal: 502,
   /* Chanfro estreito: o do topo da coluna (2 por 2) e o das faces do pé (2 de raio por `fundoDoChanfroDoPe` de fundo, que é o
@@ -205,19 +205,19 @@ export function gerarPassos(t = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'braco-robotico/braco', desc: 'coluna redonda e reta de 156 mm, com o pé redondo em volta do eixo da junta do ombro, numa malha só' },
+  meta: { nome: 'braco-robotico/braco', desc: 'coluna redonda e reta de 190 mm, com o pé redondo em volta do eixo da junta do ombro, numa malha só' },
   PARAMS: TABELA,
-  get TOPO() { return { origem: 'centro do disco do pé que encosta no anel da junta; +Z é o eixo da junta, y para cima, a coluna à frente (z de 0 a 156)', ...derivar(this.PARAMS).pontos }; },
+  get TOPO() { return { origem: 'centro do disco do pé que encosta no anel da junta; +Z é o eixo da junta, y para cima, a coluna à frente (z de 0 a 190)', ...derivar(this.PARAMS).pontos }; },
   PLANO: {
     objeto: 'coluna do braço robótico: cilindro redondo e reto à frente do ombro, que gira em volta do eixo da junta do ombro e leva o cotovelo no topo',
     referencias: ['../../referencias/coluna-reta.png', '../../referencias/coluna-reta-lado.png'],
-    escala: { medida: 'diâmetro da coluna, do pé ao topo', milimetros: 156 },
+    escala: { medida: 'diâmetro da coluna, do pé ao topo', milimetros: 190 },
     partes: [
-      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 156 mm de diâmetro (o da coluna) e 156 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'gaiolaPorLacos de eixo Z, uma malha única com a coluna: laço de disco de raio 78 mais a faixa da coluna, tampas planas com chanfro em vinco, filete do encontro nos próprios pontos do laço, compensar nas curvas' },
-      { nome: 'coluna', forma: 'cilindro redondo e reto de 156 mm do pé ao topo, 502 mm do fundo do pé ao topo, de eixo vertical sobre o pé; topo plano onde assenta o cotovelo; bordas suavizadas', tecnica: 'mesma malha única por gaiolaPorLacos: parede da coluna em trechos de passo crescente, chanfro do topo com vinco, planos em torno do eixo da coluna, compensar nos trechos de canto e de curva, sem unir' },
+      { nome: 'pe', forma: 'disco redondo de eixo Z (o da junta do ombro), 190 mm de diâmetro (o da coluna) e 190 mm de espessura, encostado na face do anel da junta, fundido à coluna: uma peça só', tecnica: 'gaiolaPorLacos de eixo Z, uma malha única com a coluna: laço de disco de raio 95 mais a faixa da coluna, tampas planas com chanfro em vinco, filete do encontro nos próprios pontos do laço, compensar nas curvas' },
+      { nome: 'coluna', forma: 'cilindro redondo e reto de 190 mm do pé ao topo, 502 mm do fundo do pé ao topo, de eixo vertical sobre o pé; topo plano onde assenta o cotovelo; bordas suavizadas', tecnica: 'mesma malha única por gaiolaPorLacos: parede da coluna em trechos de passo crescente, chanfro do topo com vinco, planos em torno do eixo da coluna, compensar nos trechos de canto e de curva, sem unir' },
     ],
     criteriosDeReprovacao: [
-      'coluna que afunila, engrossa ou tem diâmetro diferente de 156 mm em algum trecho',
+      'coluna que afunila, engrossa ou tem diâmetro diferente de 190 mm em algum trecho',
       'altura do fundo do pé ao topo diferente de 502 mm',
       'pé que não é redondo em volta do eixo da junta, ou de diâmetro diferente do da coluna',
       'fresta, emenda, degrau ou parafuso entre o pé e a coluna: precisa ser uma peça só',

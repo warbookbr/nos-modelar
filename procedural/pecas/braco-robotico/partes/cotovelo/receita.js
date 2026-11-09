@@ -1,9 +1,9 @@
 /* braco-robotico/cotovelo — o tubo em pé que sobe da coluna, cruzado no alto por um tubo deitado no eixo da junta, numa malha única.
  *
  * Quinta etapa da montagem `braco-robotico/montagem.json`. O combinado com a pessoa (2026-11-08, opção "3 ajustada") está em
- * `../../ALINHAMENTO.md`, seção "O anel do cotovelo e o cotovelo" (o colar saiu em 2026-11-09, ver "A saída do colar"): tubo de 156 mm em pé, assentado no `topo` da coluna, e outro
- * de 156 mm deitado no alto, no eixo da junta, com 190 mm de comprimento (175 na prancha, alongado 15 mm a pedido da pessoa em 2026-11-09) e a ponta da frente rente à frente do tubo em pé. O topo
- * fica a 195 mm do topo da coluna e o eixo da junta a 117 mm. O eixo do tubo deitado é z, paralelo ao da junta do ombro (porta `juntaDoOmbro`, +Z); a saída é a face de trás (-z) dele, para o lado oposto ao que a saída do ombro aponta (correção do eixo, 2026-11-09, ver ALINHAMENTO.md).
+ * `../../ALINHAMENTO.md`, seção "O anel do cotovelo e o cotovelo" (o colar saiu em 2026-11-09, ver "A saída do colar"): tubo de 190 mm em pé, assentado no `topo` da coluna, e outro
+ * de 190 mm deitado no alto, no eixo da junta, com 210 mm de comprimento (175 na prancha, alongado 15 mm a pedido da pessoa em 2026-11-09 e mais 20 mm com os tubos de 190 mm, para a face de saída passar 20 mm do tubo em pé, como passava 34 mm com 156) e a ponta da frente rente à frente do tubo em pé. O topo
+ * fica a 212 mm do topo da coluna e o eixo da junta a 117 mm. O eixo do tubo deitado é z, paralelo ao da junta do ombro (porta `juntaDoOmbro`, +Z); a saída é a face de trás (-z) dele, para o lado oposto ao que a saída do ombro aponta (correção do eixo, 2026-11-09, ver ALINHAMENTO.md).
  *
  * Referencial local: origem no centro da face de baixo do tubo em pé (a que assenta na coluna); y para cima; z é o eixo do tubo
  * deitado, com a saída para -z (eixo paralelo ao da junta do ombro, saída para o lado oposto a ela, decisão da pessoa em `referencias/cotovelo-lado.png`); x atravessa o cotovelo de lado a lado. O eixo
@@ -26,11 +26,11 @@
  */
 export const TABELA = {
   /* Vem da coluna pela montagem (porta `topo`, medida `raioExterno`); o valor daqui só vale para ver a parte sozinha. */
-  raio: 78,
+  raio: 95,
   /* Altura do eixo da junta acima da face de baixo; o topo fica em alturaDoEixo + raio. */
   alturaDoEixo: 117,
   /* Comprimento do tubo deitado; a ponta da frente fica rente à frente do tubo em pé. */
-  comprimento: 190,
+  comprimento: 210,
   /* Chanfro estreito das bordas das tampas, em mm. */
   chanfro: 2,
   /* Lados dos dois cilindros de revolução. */
@@ -86,24 +86,24 @@ export function gerarPassos(t = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'braco-robotico/cotovelo', desc: 'cotovelo do braço robótico: tubo de 156 mm em pé cruzado no alto por outro deitado no eixo da junta, numa malha só' },
+  meta: { nome: 'braco-robotico/cotovelo', desc: 'cotovelo do braço robótico: tubo de 190 mm em pé cruzado no alto por outro deitado no eixo da junta, numa malha só' },
   PARAMS: TABELA,
   get TOPO() { return { origem: 'centro da face de baixo do tubo em pé; y para cima, a saída para -z', ...derivar(this.PARAMS).pontos }; },
   PLANO: {
-    objeto: 'cotovelo do braço robótico: tubo de 156 mm em pé, subindo da coluna, cruzado no alto por um tubo deitado no eixo da junta, que termina na saída redonda onde segue o antebraço',
+    objeto: 'cotovelo do braço robótico: tubo de 190 mm em pé, subindo da coluna, cruzado no alto por um tubo deitado no eixo da junta, que termina na saída redonda onde segue o antebraço',
     referencias: ['../../referencias/cotovelo-opcao3.png', '../../referencias/lateral-sem-cabo.prancha.png'],
-    escala: { medida: 'diâmetro dos dois tubos, igual ao da coluna', milimetros: 156 },
+    escala: { medida: 'diâmetro dos dois tubos, igual ao da coluna', milimetros: 190 },
     partes: [
-      { nome: 'tuboEmPe', forma: 'cilindro reto de 156 mm de diâmetro e eixo vertical, que sobe da coluna sem degrau até cruzar o tubo deitado; face de baixo plana com chanfro de 2 mm, concordância no encontro, uma peça só', tecnica: 'lathe de eixo y unido ao tubo deitado por unir; arredondarCostura de raio constante em modo curvo, com raioMinimo e afinarPontas; chanfro de 2 mm no perfil' },
-      { nome: 'tuboDeitado', forma: 'cilindro reto de 156 mm de diâmetro e 190 mm de comprimento, eixo horizontal z a 117 mm, topo a 195; ponta da frente rente à frente do tubo em pé, face de trás plana com chanfro de 2 mm é a saída', tecnica: 'lathe de eixo z unido ao tubo em pé por unir; tampas planas nas duas pontas com chanfro de 2 mm no perfil; o arredondamento afina até sumir na tampa da frente' },
+      { nome: 'tuboEmPe', forma: 'cilindro reto de 190 mm de diâmetro e eixo vertical, que sobe da coluna sem degrau até cruzar o tubo deitado; face de baixo plana com chanfro de 2 mm, concordância no encontro, uma peça só', tecnica: 'lathe de eixo y unido ao tubo deitado por unir; arredondarCostura de raio constante em modo curvo, com raioMinimo e afinarPontas; chanfro de 2 mm no perfil' },
+      { nome: 'tuboDeitado', forma: 'cilindro reto de 190 mm de diâmetro e 210 mm de comprimento, eixo horizontal z a 117 mm, topo a 212; ponta da frente rente à frente do tubo em pé, face de trás plana com chanfro de 2 mm é a saída', tecnica: 'lathe de eixo z unido ao tubo em pé por unir; tampas planas nas duas pontas com chanfro de 2 mm no perfil; o arredondamento afina até sumir na tampa da frente' },
     ],
     criteriosDeReprovacao: [
       'junta do cotovelo com eixo que não seja paralelo ao da junta do ombro (+Z), ou saída para o mesmo lado da saída do ombro em vez do oposto (-Z)',
-      'degrau entre a coluna e o tubo em pé, ou diâmetro diferente de 156 mm',
+      'degrau entre a coluna e o tubo em pé, ou diâmetro diferente de 190 mm',
       'ponta da frente do tubo deitado além da frente do tubo em pé, ou recuada dela',
       'quina viva ou faixa de sombra no encontro dos dois tubos: o encontro tem concordância',
       'saída fora do eixo do tubo deitado, ou sem a face redonda plana de eixo z (-Z)',
-      'cotovelo mais alto que 195 mm ou mais largo que 190 mm',
+      'cotovelo mais alto que 212 mm ou mais largo que 190 mm, ou tubo deitado de comprimento diferente de 210 mm',
       'bordas das tampas vivas, sem o chanfro de 2 mm',
       'fresta, emenda ou parafuso entre os dois tubos: precisa ser uma peça só',
     ],

@@ -273,3 +273,7 @@ O lado da saída do cotovelo foi escolhido pela pessoa entre duas opções vista
 ## A saída do colar, 2026-11-09
 
 O `anelCotovelo` sai do braço porque os anéis escuros marcam juntas que giram e o colar do cotovelo não gira. A coluna cresce 25 mm no lugar dele, de 477 para 502 mm do fundo do pé ao topo, e o cotovelo assenta direto na porta `topo` da coluna, com o raio vindo dela. O topo do cotovelo e o antebraço ficam na mesma altura de antes.
+
+## Tubos de 190 mm do ombro ao punho, 2026-11-09
+
+A pessoa comparou o braço com tubos de 156 e de 190 mm e escolheu 190, o diâmetro do anel do ombro, para o braço ficar robusto e com um diâmetro só do ombro ao punho. A coluna, o cotovelo, o anel do antebraço e o antebraço passam a 190 mm, o raio vem das portas da montagem e o cotovelo sobe 17 mm (o topo vai de 195 a 212 mm). Duas medidas acompanharam o diâmetro para as portas continuarem dentro da forma: o pé do antebraço passa de 176 a 210 mm de espessura (o diâmetro mais os mesmos 20 mm de recuo; com 205 ou menos a porta `apoio` reprova) e o tubo deitado do cotovelo passa de 190 a 210 mm de comprimento (com 208 ou menos a porta `saida` mede o tubo em pé).

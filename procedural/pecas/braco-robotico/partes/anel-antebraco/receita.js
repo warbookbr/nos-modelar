@@ -1,7 +1,7 @@
 /* braco-robotico/anel-antebraco — o anel escuro da junta do cotovelo, entre o tubo deitado do cotovelo e o antebraço.
  *
  * Sexta etapa da montagem `braco-robotico/montagem.json`. O combinado com a pessoa está em `../../ALINHAMENTO.md`, seções "O anel do
- * cotovelo e o cotovelo" e "A saída do cotovelo e o antebraço" (2026-11-09): anel único reto de 25 mm de largura, rente aos 156 mm do
+ * cotovelo e o cotovelo" e "A saída do cotovelo e o antebraço" (2026-11-09): anel único reto de 25 mm de largura, rente aos 190 mm do
  * tubo deitado, perpendicular ao eixo da junta, com o chanfro estreito de 2 mm das bordas, escuro como os outros anéis (opção 1 de
  * `../../referencias/saida-cotovelo-anel.png`). O raio vem da porta `saida` do cotovelo, por vínculo da montagem; o valor da
  * TABELA só vale para ver a parte sozinha.
@@ -16,7 +16,7 @@
 
 export const TABELA = {
   /* Vem do cotovelo pela montagem (porta `saida`, medida `raioExterno`); o valor daqui só vale para ver a parte sozinha. */
-  raio: 78,
+  raio: 95,
   /* Largura do anel ao longo do eixo. */
   largura: 25,
   /* Acabamento, como o colar. */
@@ -67,9 +67,9 @@ const receita = {
   PLANO: {
     objeto: 'anel único escuro da junta do cotovelo, rente ao tubo deitado do cotovelo, onde o antebraço assenta',
     referencias: ['../../referencias/saida-cotovelo-anel.png', '../../referencias/lateral-sem-cabo.prancha.png'],
-    escala: { medida: 'diâmetro do anel, igual ao do tubo deitado do cotovelo', milimetros: 156 },
+    escala: { medida: 'diâmetro do anel, igual ao do tubo deitado do cotovelo', milimetros: 190 },
     partes: [
-      { nome: 'anel', forma: 'anel reto de revolução escuro, 156 mm de diâmetro e 25 mm de largura, como o colar e o anel da cintura, perpendicular ao eixo da junta, uma faixa só, bordas com chanfro estreito de 2 mm de bordas suavizadas', tecnica: 'revolução com perfil de eixo x' },
+      { nome: 'anel', forma: 'anel reto de revolução escuro, 190 mm de diâmetro e 25 mm de largura, como o colar e o anel da cintura, perpendicular ao eixo da junta, uma faixa só, bordas com chanfro estreito de 2 mm de bordas suavizadas', tecnica: 'revolução com perfil de eixo x' },
     ],
     criteriosDeReprovacao: [
       'anel inclinado em relação ao eixo da junta',

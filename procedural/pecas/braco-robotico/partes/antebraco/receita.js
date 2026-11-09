@@ -2,13 +2,13 @@
  *
  * Sétima etapa da montagem `braco-robotico/montagem.json`. O combinado com a pessoa (2026-11-09) está em `../../ALINHAMENTO.md`,
  * seções "A saída do cotovelo e o antebraço" e "O eixo da junta do cotovelo": o antebraço é o mesmo T que a coluna é no ombro, um pé
- * redondo de 156 mm deitado no eixo da junta, encostado no anel do antebraço, e o tubo de 156 mm saindo dele, perpendicular ao eixo,
+ * redondo de 190 mm deitado no eixo da junta, encostado no anel do antebraço, e o tubo de 190 mm saindo dele, perpendicular ao eixo,
  * na horizontal, para +x do mundo (a direita na vista frontal do braço montado), com 253 mm do eixo da junta à ponta
  * (`../../referencias/cotovelo-eixo.png`, `../../referencias/lateral-sem-cabo.prancha.png`). O raio vem da porta `topo` do anel do
  * antebraço, por vínculo da montagem; o valor da TABELA só vale para ver a parte sozinha.
  *
  * Referencial local: origem no centro da face do pé que encosta no anel; x é o eixo da junta, para fora do anel (no mundo, -Z); y
- * para cima; z é o eixo do tubo (no mundo, +X). O pé é um cilindro de eixo x, de raio igual ao do tubo e espessura `espessuraDoPe` (176 mm,
+ * para cima; z é o eixo do tubo (no mundo, +X). O pé é um cilindro de eixo x, de raio igual ao do tubo e espessura `espessuraDoPe` (210 mm,
  * 20 mm mais que o diâmetro), e o tubo sai do eixo da junta (z = 0) rente à face de fora do pé (o tubo não passa dela); do lado do
  * anel sobram 20 mm entre o tubo e o plano do anel, para a porta `apoio` medir só o pé (ver a nota em TABELA). O tubo vai de z = 0 a `comprimento`.
  *
@@ -23,11 +23,11 @@
 
 export const TABELA = {
   /* Vem do anel pela montagem (porta `topo`, medida `raioExterno`); o valor daqui só vale para ver a parte sozinha. */
-  raio: 78,
+  raio: 95,
   /* Do eixo da junta à ponta do tubo, da prancha. */
   comprimento: 253,
   /* Espessura do pé ao longo do eixo da junta. O tubo fica rente à face de fora e sobra, do lado do anel, um recuo de espessuraDoPe - diâmetro: sem ele o tubo roçaria o plano do anel e a porta `apoio` mediria o tubo como se fosse o pé. */
-  espessuraDoPe: 176,
+  espessuraDoPe: 210,
   /* Chanfro estreito das bordas das tampas, como as carcaças do braço. */
   chanfro: 2,
   suaveDoChanfro: 0.8,
@@ -78,21 +78,21 @@ export function gerarPassos(t = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'braco-robotico/antebraco', desc: 'antebraço do braço robótico: pé redondo de 156 mm no eixo da junta do cotovelo e tubo de 156 mm na horizontal para +x, 253 mm do eixo à ponta, numa malha só' },
+  meta: { nome: 'braco-robotico/antebraco', desc: 'antebraço do braço robótico: pé redondo de 190 mm no eixo da junta do cotovelo e tubo de 190 mm na horizontal para +x, 253 mm do eixo à ponta, numa malha só' },
   PARAMS: TABELA,
   get TOPO() { return { origem: 'centro da face do pé que encosta no anel; x é o eixo da junta (no mundo -Z), y para cima, z ao longo do tubo (no mundo +X)', ...derivar(this.PARAMS).pontos }; },
   PLANO: {
-    objeto: 'antebraço do braço robótico: pé redondo no eixo da junta do cotovelo, encostado no anel, e o tubo de 156 mm que sai dele na horizontal para +x do mundo até o punho; o mesmo T da coluna',
+    objeto: 'antebraço do braço robótico: pé redondo no eixo da junta do cotovelo, encostado no anel, e o tubo de 190 mm que sai dele na horizontal para +x do mundo até o punho; o mesmo T da coluna',
     referencias: ['../../referencias/cotovelo-eixo.png', '../../referencias/cotovelo-lado.png', '../../referencias/antebraco-opcoes.png', '../../referencias/lateral-sem-cabo.prancha.png'],
-    escala: { medida: 'diâmetro do tubo e do pé, igual ao do cotovelo e da coluna', milimetros: 156 },
+    escala: { medida: 'diâmetro do tubo e do pé, igual ao do cotovelo e da coluna', milimetros: 190 },
     partes: [
-      { nome: 'pe', forma: 'disco redondo de eixo da junta do cotovelo (-Z no mundo), 156 mm de diâmetro e 176 mm de espessura, com a face de dentro encostada no anel do antebraço e a de fora rente ao tubo, fundido ao tubo com concordância no encontro: uma peça só', tecnica: 'lathe de eixo x unido ao tubo por unir; arredondarCostura de raio constante em modo curvo, com raioMinimo e afinarPontas; chanfro de 2 mm nas duas faces do perfil' },
-      { nome: 'tubo', forma: 'cilindro reto de 156 mm que sai do eixo da junta, perpendicular a ele, na horizontal para +x do mundo, 253 mm do eixo à ponta, sem degrau, rente à face de fora do pé; tampa da ponta plana com chanfro de 2 mm é a saída', tecnica: 'lathe de eixo z unido ao pé por unir; chanfro de 2 mm no perfil da tampa da ponta; o arredondamento afina até sumir onde o encontro é tangente' },
+      { nome: 'pe', forma: 'disco redondo de eixo da junta do cotovelo (-Z no mundo), 190 mm de diâmetro e 210 mm de espessura, com a face de dentro encostada no anel do antebraço e a de fora rente ao tubo, fundido ao tubo com concordância no encontro: uma peça só', tecnica: 'lathe de eixo x unido ao tubo por unir; arredondarCostura de raio constante em modo curvo, com raioMinimo e afinarPontas; chanfro de 2 mm nas duas faces do perfil' },
+      { nome: 'tubo', forma: 'cilindro reto de 190 mm que sai do eixo da junta, perpendicular a ele, na horizontal para +x do mundo, 253 mm do eixo à ponta, sem degrau, rente à face de fora do pé; tampa da ponta plana com chanfro de 2 mm é a saída', tecnica: 'lathe de eixo z unido ao pé por unir; chanfro de 2 mm no perfil da tampa da ponta; o arredondamento afina até sumir onde o encontro é tangente' },
     ],
     criteriosDeReprovacao: [
       'tubo que não saia na horizontal para +x do mundo (por exemplo, seguindo o eixo da junta, para trás)',
       'pé fora do eixo da junta do cotovelo, ou não encostado no anel do antebraço',
-      'diâmetro do tubo ou do pé diferente de 156 mm',
+      'diâmetro do tubo ou do pé diferente de 190 mm',
       'comprimento do eixo da junta à ponta diferente de 253 mm',
       'tubo afunilado, ou com degrau depois do pé',
       'tubo passando da face de fora do pé, em vez de rente a ela',

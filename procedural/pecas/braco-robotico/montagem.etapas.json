@@ -199,7 +199,7 @@
       "instancia": "braco",
       "estado": "aberta",
       "juntas": [],
-      "forma": "sha256:ce46d0b6d23a5973646efcf58919e3364277e5771ab6c67b161261548da5fa00",
+      "forma": "sha256:ef0d6a78417269397d6c236badccd5ad043c94db17138ae317cfd5bd0d308253",
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -279,7 +279,7 @@
           }
         }
       ],
-      "forma": "sha256:577dba8778a7840f7f66207ab925a0fc6ebb74c7fd955ae2679688492aa419b8",
+      "forma": "sha256:9c05f9a28d75c9e768ad06efa80f975ea95b40a44cedf02065497ea34169eabd",
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -368,7 +368,7 @@
           }
         }
       ],
-      "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6",
+      "forma": "sha256:0aac9441c2302403154a031e60cf12ffce511d250ba106abe32e02a8326b794c",
       "reaberturas": [
         {
           "por": "pessoa",
@@ -445,7 +445,7 @@
           }
         }
       ],
-      "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a",
+      "forma": "sha256:6c62ea8ef4c04071f02c11166c12c267421fe1859aeb8421012cb75ee9555946",
       "reaberturas": [
         {
           "por": "pessoa",
