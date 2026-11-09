@@ -330,6 +330,13 @@
         }
       ],
       "forma": "sha256:accd2d46ad4366621347b97dd3747d0352f61c07c26cb8537f0517582573ecb8",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o cotovelo com o tubo deitado de 190 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -343,14 +350,56 @@
           },
           "forma": "sha256:af0ccd52407968b23b08aa6aee8d487c1f325f99e8455af10357b0d507a52739"
         }
+      ]
+    },
+    {
+      "instancia": "anelAntebraco",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "anelAntebracoSentaNaSaida",
+          "com": "cotovelo",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.009999999999999995,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.01,
+              "maximo": 0.01,
+              "nominal": 0.01,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
       ],
-      "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o cotovelo com o tubo deitado de 190 mm",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      }
+      "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6"
     }
   ]
 }

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1729 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1730 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1241,6 +1241,10 @@
 ## procedural/pecas/braco-robotico/
 
 - `ALINHAMENTO.md` — Braço robótico — rodada de alinhamento
+
+## procedural/pecas/braco-robotico/partes/anel-antebraco/
+
+- `receita.js` — braco-robotico/anel-antebraco — o anel escuro da junta do cotovelo, entre o tubo deitado do cotovelo e o antebraço.
 
 ## procedural/pecas/braco-robotico/partes/anel-cintura/
 
