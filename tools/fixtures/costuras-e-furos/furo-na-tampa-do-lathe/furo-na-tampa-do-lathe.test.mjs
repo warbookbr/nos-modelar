@@ -11,7 +11,7 @@ describe('furo numa tampa de lathe', () => {
     expect(m.orfaos).toEqual([]);
     expect(m.arestasSoltas).toBe(0);
     expect(m.facesDegeneradas).toBe(0);
-    expect(m.faces).toBe(523);
+    expect(m.faces).toBe(595);
   });
 
   it('o polo do leque some com a face: nenhum vértice fica sem face, e a tampa da frente não deixa triângulo fino', () => {

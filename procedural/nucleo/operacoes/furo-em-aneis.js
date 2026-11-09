@@ -17,7 +17,6 @@
    byte a byte como era. Qualquer prova que falhe, o teto de crescimento (4 vezes os triângulos da repartição antiga) ou os limites de 1.500 cantos e 40.000
    pontos de grade devolvem `{motivo}`, e o `furo` segue com a repartição antiga e põe o motivo em `neutro.avisos`. A aresta do apoio mais longa que 8 vezes
    a aresta média (o lado reto de um rasgo) é partida, e o polígono da `borda` dela vira um triângulo mais um leque, para não ter cantos colineares. */
-import earcut from 'earcut';
 import { triangularFace } from '../triangulacao-face.js';
 
 /* Só a face de contorno denso (48 cantos ou mais) é refeita. Nela a repartição sem vértice novo liga cada canto do contorno a um furo a dezenas de arestas
@@ -128,30 +127,69 @@ function apoioPelasRetas(contorno, anel, raioMedio, margemDentro) {
   return { motivo: 'o polígono de apoio não cabe na face com folga, nem com um oitavo do raio do furo' };
 }
 
-/* UM furo: o setor j é o polígono do contorno de ancoras[j] a ancoras[j+1], do canto j+1 do apoio de volta ao canto j; cada um sai por orelhas, e a
-   reta do canto j do apoio à âncora j é aresta fixa */
-function repartirEmSetores(contorno, apoio, inicio, ancoras, L) {
+/* Orelhas de um polígono simples anti-horário, com cantos colineares permitidos: só corta orelha de área positiva, sem outro canto dentro, sobre a borda
+   ou sobre a diagonal dela (o canto colinear de uma reta de setor é vértice da malha e não pode ficar fora de nenhum triângulo); entre as orelhas livres
+   corta a de melhor forma (soma dos lados ao quadrado sobre a área), com empate no menor índice. Devolve os triângulos em índices do polígono, ou null. */
+function orelhas(pts, eps) {
+  const resto = pts.map((_, k) => k);
+  const tris = [];
+  while (resto.length > 3) {
+    let melhor = -1, nota = Infinity;
+    for (let c = 0; c < resto.length; c++) {
+      const a = resto[(c + resto.length - 1) % resto.length], b = resto[c], d = resto[(c + 1) % resto.length];
+      const area = cruz2(pts[a], pts[b], pts[d]);
+      if (!(area > eps)) continue;
+      let livre = true;
+      for (const v of resto) {
+        if (v === a || v === b || v === d) continue;
+        if (cruz2(pts[a], pts[b], pts[v]) >= -eps && cruz2(pts[b], pts[d], pts[v]) >= -eps && cruz2(pts[d], pts[a], pts[v]) >= -eps) { livre = false; break; }
+      }
+      if (!livre) continue;
+      const q = (dist(pts[a], pts[b]) ** 2 + dist(pts[b], pts[d]) ** 2 + dist(pts[d], pts[a]) ** 2) / area;
+      if (q < nota * (1 - 1e-9)) { nota = q; melhor = c; }
+    }
+    if (melhor < 0) return null;
+    tris.push([resto[(melhor + resto.length - 1) % resto.length], resto[melhor], resto[(melhor + 1) % resto.length]]);
+    resto.splice(melhor, 1);
+  }
+  if (!(cruz2(pts[resto[0]], pts[resto[1]], pts[resto[2]]) > eps)) return null;
+  tris.push([resto[0], resto[1], resto[2]]);
+  return tris;
+}
+
+/* UM furo: o setor j é o polígono do contorno de ancoras[j] a ancoras[j+1], da reta j+1 de volta ao apoio (do canto j+1 ao canto j) e pela reta j até a âncora.
+   Cada reta (do canto do apoio à âncora) leva pontos de reforço a cada `passo`, que são vértices dos dois setores vizinhos, e é aresta fixa. */
+function repartirEmSetores(contorno, apoio, inicio, ancoras, L, passo, escala) {
   const n = contorno.length;
+  const pontos = [];
+  const retaDe = [];
+  for (let j = 0; j < L; j++) {
+    const a = apoio[inicio[j]], b = contorno[ancoras[j]];
+    const m = Math.max(0, Math.round(dist(a, b) / passo) - 1);
+    const lista = [];
+    for (let t = 1; t <= m; t++) { lista.push(pontos.length); pontos.push([a[0] + (b[0] - a[0]) * t / (m + 1), a[1] + (b[1] - a[1]) * t / (m + 1)]); }
+    retaDe.push(lista);
+  }
   const triangulos = [], fixas = [], retas = [];
+  const eps = 1e-12 * escala * escala;
   for (let j = 0; j < L; j++) {
     const jn = (j + 1) % L;
     const cantos = [];
     for (let k = ancoras[j]; ; k = (k + 1) % n) { cantos.push({ tipo: 'contorno', i: k }); if (k === ancoras[jn]) break; }
+    for (let t = retaDe[jn].length - 1; t >= 0; t--) cantos.push({ tipo: 'extra', m: retaDe[jn][t] });
     const q0 = inicio[j], q1 = inicio[jn] === 0 ? apoio.length : inicio[jn];
     for (let q = q1; q >= q0; q--) cantos.push({ tipo: 'apoio', k: 0, j: q % apoio.length });
-    const pts = cantos.map((t) => (t.tipo === 'contorno' ? contorno[t.i] : apoio[t.j]));
-    const sai = earcut(pts.flat(), [], 2);
-    if (sai.length % 3 || sai.length / 3 !== cantos.length - 2) return { motivo: `o setor ${j} do furo não fechou em orelhas (${cantos.length} cantos)` };
-    for (let t = 0; t < sai.length; t += 3) {
-      const tri = [sai[t], sai[t + 1], sai[t + 2]];
-      if (cruz2(pts[tri[0]], pts[tri[1]], pts[tri[2]]) < 0) [tri[1], tri[2]] = [tri[2], tri[1]];
-      if (!(cruz2(pts[tri[0]], pts[tri[1]], pts[tri[2]]) > 0)) return { motivo: `o setor ${j} do furo tem triângulo de área nula` };
-      triangulos.push({ cantos: tri.map((x) => cantos[x]), setor: j });
-    }
-    fixas.push([{ tipo: 'apoio', k: 0, j: q0 }, { tipo: 'contorno', i: ancoras[j] }]);
+    for (const m of retaDe[j]) cantos.push({ tipo: 'extra', m });
+    const pts = cantos.map((t) => (t.tipo === 'contorno' ? contorno[t.i] : t.tipo === 'apoio' ? apoio[t.j] : pontos[t.m]));
+    const sai = orelhas(pts, eps);
+    if (!sai) return { motivo: `o setor ${j} do furo não fechou em orelhas de área positiva (${cantos.length} cantos)` };
+    for (const tri of sai) triangulos.push({ cantos: tri.map((x) => cantos[x]), setor: j });
+    // a reta j em trechos fixos: do canto do apoio, pelos pontos, à âncora
+    const cadeia = [{ tipo: 'apoio', k: 0, j: q0 }, ...retaDe[j].map((m) => ({ tipo: 'extra', m })), { tipo: 'contorno', i: ancoras[j] }];
+    for (let t = 0; t + 1 < cadeia.length; t++) fixas.push([cadeia[t], cadeia[t + 1]]);
     retas.push([apoio[q0], contorno[ancoras[j]]]);
   }
-  return { triangulos, fixas, retas };
+  return { triangulos, fixas, retas, pontos };
 }
 
 /**
@@ -213,34 +251,35 @@ export function refazerEmAneis(entrada) {
   const referencia = contorno.length + M * L + 2 * M - 2;
   const area = (P) => Math.abs(P.reduce((s, p, k) => { const q = P[(k + 1) % P.length]; return s + (p[0] * q[1] - q[0] * p[1]) / 2; }, 0));
   const livre = area(contorno) - apoios.reduce((s, A) => s + area(A), 0);
-  const estimar = (fator) => M * L + contorno.length + cantosDeApoio + 2 * M - 2 + 2 * Math.ceil(livre / (0.866 * (fator * media) ** 2));
+  const compRetas = ancoras ? ancoras.reduce((t, a, j) => t + dist(apoios[0][inicio[0][j]], contorno[a]), 0) : 0;
+  const estimar = (fator) => M * L + contorno.length + cantosDeApoio + 2 * M - 2 + 2 * Math.ceil(livre / (0.866 * (fator * media) ** 2)) + 2 * Math.ceil(compRetas / (fator * media));
   if (estimar(FATORES_DA_GRADE[0]) > CRESCIMENTO_MAXIMO * referencia) {
     return { motivo: `a refeitura daria cerca de ${estimar(FATORES_DA_GRADE[0])} triângulos, mais de ${CRESCIMENTO_MAXIMO} vezes os ${referencia} da repartição antiga` };
   }
 
-  /* a repartição do resto, sem vértice novo: com UM furo, um polígono por setor (o contorno de uma âncora à outra e o apoio de volta), cada um por orelhas, com a
-     reta do setor como aresta fixa; com vários, pontes e orelhas sobre a face inteira */
-  let base;
-  if (M === 1) {
-    base = repartirEmSetores(contorno, apoios[0], inicio[0], ancoras, L);
-  } else {
+  /* a repartição do resto, sem vértice novo (fora os pontos das retas): com UM furo, um polígono por setor (o contorno de uma âncora à outra e o apoio de volta),
+     cada um por orelhas, com as retas dos setores como arestas fixas e com pontos de reforço; com vários, pontes e orelhas sobre a face inteira */
+  let baseVarios = null;
+  if (M > 1) {
     const r = particionar(contorno, apoios, escala, raios);
     if (!r || r.erro) return { motivo: `a repartição do contorno menos os apoios não fecha${r && r.erro ? `: ${r.erro}` : ''}` };
-    base = { triangulos: [...r.bordas.flat(), ...r.preenchimento].map((d) => ({ cantos: d.cantos.map((t) => (t.tipo === 'anel' ? { tipo: 'apoio', k: t.k, j: t.j } : t)) })), fixas: [] };
+    baseVarios = { triangulos: [...r.bordas.flat(), ...r.preenchimento].map((d) => ({ cantos: d.cantos.map((t) => (t.tipo === 'anel' ? { tipo: 'apoio', k: t.k, j: t.j } : t)) })), fixas: [], pontos: [] };
   }
-  if (base.motivo) return base;
 
   /* o passo da grade de reforço começa em 4 vezes a aresta média e fecha (3, 2,5 e 2) até a refeitura não ter triângulo fino pela mesma régua; se nenhum
      passo chega lá, fica o mais fino que coube no teto */
   let melhor = null;
   for (const fator of FATORES_DA_GRADE) {
     if (melhor && estimar(fator) > CRESCIMENTO_MAXIMO * referencia) break;
+    const base = M === 1 ? repartirEmSetores(contorno, apoios[0], inicio[0], ancoras, L, fator * media, escala) : baseVarios;
+    if (base.motivo) { if (!melhor) return base; break; }
     const r = montar(entrada, apoios, inicio, base, fator);
     if (!r) break;
     melhor = r;
     const ponto = (t) => (t.tipo === 'contorno' ? contorno[t.i] : t.tipo === 'anel' ? aneis[t.k][t.j] : t.tipo === 'apoio' ? r.apoios[t.k][t.j] : r.extras[t.m]);
-    const poligonos = [...r.bordas.flat(), ...r.preenchimento].map((d) => d.cantos.map(ponto));
-    if (!temTrianguloFino(poligonos, media)) break;
+    const poligonos = [...r.bordas.flat(), ...r.preenchimento, ...r.anexados].map((d) => d.cantos.map(ponto));
+    melhor.fino = temTrianguloFino(poligonos, media);
+    if (!melhor.fino) break;
   }
   if (!melhor) return { motivo: 'a grade de reforço não fechou a triangulação (a prova de contagem, área ou arestas falhou, ou a grade passa de 40000 pontos)' };
   return melhor;
@@ -253,7 +292,7 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, inicio
   const pontos = [];
   const indice = new Map();
   const idDe = (t) => {
-    const chave = `${t.tipo}|${t.i ?? ''}|${t.k ?? ''}|${t.j ?? ''}`;
+    const chave = `${t.tipo}|${t.i ?? ''}|${t.k ?? ''}|${t.j ?? ''}|${t.m ?? ''}`;
     if (!indice.has(chave)) {
       indice.set(chave, pontos.length);
       tags.push(t);
@@ -262,6 +301,13 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, inicio
     return indice.get(chave);
   };
   const usados = [];
+  // os pontos das retas dos setores já são vértices de reforço: entram primeiro, com a etiqueta que os setores usam
+  for (const p of base.pontos) {
+    indice.set(`extra||||${usados.length}`, pontos.length);
+    tags.push({ tipo: 'extra', m: usados.length });
+    usados.push(p);
+    pontos.push(p);
+  }
   const tri = base.triangulos.map((d) => ({ ids: d.cantos.map(idDe), setor: d.setor }));
   const cantosDeApoio = apoios.reduce((s, A) => s + A.length, 0);
 
@@ -378,7 +424,6 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, inicio
      pode triangular com um triângulo de área nula; então a borda j fica só com o triângulo da aresta do furo e do canto do meio do apoio, e o resto do
      leque entra no preenchimento, onde o setor de j o recolhe. O resto é preenchimento. */
   const leque = [];
-  const anexos = aneis.map((anel) => anel.map(() => []));
   const bordas = aneis.map((anel, k) => anel.map((_, j) => {
     const n = (j + 1) % L;
     const q0 = inicio[k][j];
@@ -392,12 +437,16 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, inicio
     for (let q = meio; q < q1; q++) leque.push({ cantos: [{ tipo: 'anel', k, j: n }, apoio(q), apoio(q + 1)], k, j });
     return { cantos: [{ tipo: 'anel', k, j: n }, { tipo: 'anel', k, j }, apoio(meio)] };
   }));
-  const preenchimento = [...finais.map((t) => ({ cantos: t.map((x) => tags[x]) })), ...leque];
-  /* o que cada aresta do furo leva junto na `borda j` (e na `saida j`): o leque do apoio partido e, com UM furo, o setor inteiro, que é a área que a face
-     `borda j` da repartição antiga cobria. Com vários furos a `borda` cobria só os triângulos da aresta do furo, e o resto era preenchimento. */
-  finais.forEach((t, idx) => { if (t.setor != null) anexos[0][t.setor].push(idx); });
-  leque.forEach((d, idx) => anexos[d.k][d.j].push(finais.length + idx));
-  return { bordas, preenchimento, apoios, extras: usados, anexos };
+  /* Duas famílias que não se sobrepõem. `anexados` são as faces que a `borda j` (e a `saida j`) leva além do quadrilátero e que NÃO entram no
+     `preenchimento`: o leque do apoio partido e, com UM furo, o setor inteiro, que é a área que a face `borda j` da repartição antiga cobria. O
+     `preenchimento` é o resto: com UM furo, nada, como antes; com vários, os triângulos que não são do leque, e a `borda` cobre só o quadrilátero. */
+  const anexados = leque.slice();
+  const preenchimento = [];
+  for (const t of finais) {
+    const desc = { cantos: t.map((x) => tags[x]) };
+    if (t.setor != null) anexados.push({ ...desc, k: 0, j: t.setor }); else preenchimento.push(desc);
+  }
+  return { bordas, preenchimento, anexados, apoios, extras: usados };
 }
 
 function sePerto(A, B, escala) {

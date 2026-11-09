@@ -61,10 +61,10 @@ export function criarOperacoesEstruturais(servicos) {
     const inicio = seguinte.keys().next().value;
     const ciclo = [inicio];
     for (let v = seguinte.get(inicio); v !== inicio; v = seguinte.get(v)) {
-      if (v == null || ciclo.length > seguinte.size) return grita(st, i, op, campo, `a borda d${rotulo.slice(1)} não fecha numa volta só`), null;
+      if (v == null || ciclo.length > seguinte.size) return grita(st, i, op, campo, `a borda d${rotulo} não fecha numa volta só`), null;
       ciclo.push(v);
     }
-    if (ciclo.length !== seguinte.size) return grita(st, i, op, campo, `a borda d${rotulo.slice(1)} tem mais de uma volta (${ciclo.length} de ${seguinte.size} arestas): região com buraco não entra`), null;
+    if (ciclo.length !== seguinte.size) return grita(st, i, op, campo, `a borda d${rotulo} tem mais de uma volta (${ciclo.length} de ${seguinte.size} arestas): região com buraco não entra`), null;
     return { id: ids[0], ids, regiao: true, face: { vs: ciclo, rotulo, cor: fonte.cor, material: fonte.material, parte: fonte.parte, liso: fonte.liso, solido: fonte.solido } };
   }
   /* Os grupos de faces coplanares que se tocam por aresta dos dois lados da aresta. Um grupo de mais de uma face é uma
@@ -788,7 +788,10 @@ export function criarOperacoesEstruturais(servicos) {
     const refazer = (plano, aneisUV, lado) => {
       if (plano.uv.length < CANTOS_DO_CONTORNO_DENSO) return null;
       const r = refazerEmAneis({ contorno: plano.uv, aneis: aneisUV, raios: raiosPorFuro, escala: plano.escala, particionar, margemDentro, media: arestaMedia([plano.uv, ...aneisUV]) });
-      if (r.bordas) return r;
+      if (r.bordas) {
+        if (r.fino) st.avisos.push({ passo: i, op: 'furo', ref: 'trianguloFino', lado, motivo: `a face de ${plano.uv.length} cantos refeita em anéis ainda tem triângulo fino (razão acima de 10 com o maior lado acima de 4 vezes a aresta média)` });
+        return r;
+      }
       st.avisos.push({ passo: i, op: 'furo', ref: 'repartiçãoAntiga', lado, motivo: `a face de ${plano.uv.length} cantos não foi refeita em anéis (${r.motivo}); vale a repartição de sempre, com triângulos longos` });
       return null;
     };
@@ -827,7 +830,8 @@ export function criarOperacoesEstruturais(servicos) {
     const nExtras = (refeitaE ? refeitaE.extras.length : 0) + (refeitaS ? refeitaS.extras.length : 0);
 
     // guarda de overflow (D3), contada antes de inserir
-    const nV = 2 * L * M + nApoios + nExtras, nF = M * (temSaida ? 3 * L : 2 * L + 1) + cheioE.length + cheioS.length;
+    const nAnexados = (refeitaE ? refeitaE.anexados.length : 0) + (refeitaS ? refeitaS.anexados.length : 0);
+    const nV = 2 * L * M + nApoios + nExtras, nF = M * (temSaida ? 3 * L : 2 * L + 1) + cheioE.length + cheioS.length + nAnexados;
     if (nV > BLOCO + FAIXA_ESTENDIDA || nF > BLOCO + FAIXA_ESTENDIDA) {
       const motivo = `furo com ${M} anel(éis) de ${L} lados estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}): ${nV} vértices / ${nF} faces`;
       if (resolucao.derivado) return grita(st, i, 'furo', 'lados', `${motivo} — aumente o desvio`);
@@ -895,6 +899,17 @@ export function criarOperacoesEstruturais(servicos) {
     for (const desc of cheioE) { const id = idDoPasso(i, cursor); addF(st, id, desc.cantos.map(cantoEntrada)); preenchimento.push(id); herda(id, fEntrada); cursor++; }
     for (const desc of cheioS) { const id = idDoPasso(i, cursor); addF(st, id, desc.cantos.map(cantoSaida)); preenchimentoDaSaida.push(id); herda(id, fSaida); cursor++; }
 
+    /* as faces que a `borda j` (e a `saida j`) leva além do quadrilátero: ficam só nela, nunca no preenchimento */
+    const anexar = (refeita, cantoDe, herdaDe, destino) => {
+      if (!refeita) return;
+      refeita.anexados.forEach((desc) => {
+        const id = idDoPasso(i, cursor); addF(st, id, desc.cantos.map(cantoDe)); herda(id, herdaDe); cursor++;
+        (furos[desc.k][destino] ??= refeita.bordas[desc.k].map(() => []))[desc.j].push(id);
+      });
+    };
+    anexar(refeitaE, cantoEntrada, fEntrada, 'anexosBorda');
+    anexar(refeitaS, cantoSaida, fSaida, 'anexosSaida');
+
     // as faces cortadas SOMEM da malha e ENTRAM no registro de consumo
     const consumir = [...regiaoE.ids, ...(regiaoS ? regiaoS.ids : [])];
     const tocados = new Set();
@@ -905,10 +920,6 @@ export function criarOperacoesEstruturais(servicos) {
       for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
       for (const v of [...tocados].sort((x, y) => x - y)) if (!usados.has(v)) st.V.delete(v);
     }
-
-    // o setor de cada aresta do furo na face refeita em anéis: as faces do preenchimento que a `borda j` (e a `saida j`) leva junto
-    if (refeitaE) refeitaE.anexos.forEach((porJ, k) => { furos[k].anexosBorda = porJ.map((lista) => lista.map((q) => preenchimento[q])); });
-    if (refeitaS) refeitaS.anexos.forEach((porJ, k) => { furos[k].anexosSaida = porJ.map((lista) => lista.map((q) => preenchimentoDaSaida[q])); });
 
     registraOrigem(st, i, 'furo', a.origemId, { furos, grupos, preenchimento, preenchimentoDaSaida });
   },

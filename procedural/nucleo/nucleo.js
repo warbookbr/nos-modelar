@@ -1454,9 +1454,9 @@ const CONTRATOS_ORIGEM = {
       }
       if (origem.saida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem saída; o fundo dele é tampa:'fundo'` };
       if (origem.tampa != null && passante) return { erro: `origem furo:${origem.id} é um furo PASSANTE — não tem fundo; a borda do outro lado é o eixo 'saida'` };
-      if (origem.preenchimento != null && !registro.preenchimento.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo, ou com um só numa face de 48 cantos ou mais refeita em anéis` };
+      if (origem.preenchimento != null && !registro.preenchimento.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
       if (origem.preenchimentoDaSaida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem preenchimento de saída; o outro lado dele é a tampa 'fundo'` };
-      if (origem.preenchimentoDaSaida != null && !registro.preenchimentoDaSaida.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda de saída dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo, ou com um só numa face de 48 cantos ou mais refeita em anéis` };
+      if (origem.preenchimentoDaSaida != null && !registro.preenchimentoDaSaida.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda de saída dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
 
       /* quais FUROS: o eixo `furo` ausente é "todos", como as famílias. */
       const furosDoAlvo = grupo ? grupo.furos : Array.from({ length: M }, (_, k) => k);
@@ -2278,7 +2278,7 @@ function poligonoPlano(st, fid, referencia, faceLike) {
   if (referencia) {
     const dot = referencia[0] * N[0] + referencia[1] * N[1] + referencia[2] * N[2];
     const px = referencia[0] - N[0] * dot, py = referencia[1] - N[1] * dot, pz = referencia[2] - N[2] * dot;
-    if (Math.hypot(px, py, pz) < 1e-4) return { erro: `orientacao ${JSON.stringify(referencia.map((n) => +n.toFixed(6)))} é paralela à normal ${faceLike?.rotulo ? `d${rotulo.slice(1)}` : `da face ${fid}`} — a projeção no plano da face é nula, não há orientação a declarar` };
+    if (Math.hypot(px, py, pz) < 1e-4) return { erro: `orientacao ${JSON.stringify(referencia.map((n) => +n.toFixed(6)))} é paralela à normal ${faceLike?.rotulo ? `d${rotulo}` : `da face ${fid}`} — a projeção no plano da face é nula, não há orientação a declarar` };
     u = norm3(px, py, pz);
   } else {
     u = quadroLoft(N)[0];
