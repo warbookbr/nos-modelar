@@ -330,6 +330,13 @@
         }
       ],
       "forma": "sha256:577dba8778a7840f7f66207ab925a0fc6ebb74c7fd955ae2679688492aa419b8",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o cotovelo com o eixo paralelo ao do ombro e a saída para o lado oposto",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -356,14 +363,7 @@
           },
           "forma": "sha256:accd2d46ad4366621347b97dd3747d0352f61c07c26cb8537f0517582573ecb8"
         }
-      ],
-      "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o cotovelo com o eixo paralelo ao do ombro e a saída para o lado oposto",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      }
+      ]
     },
     {
       "instancia": "anelAntebraco",
@@ -476,7 +476,7 @@
           }
         }
       ],
-      "forma": "sha256:392a2c1f9b552cad91d74b37df094220ed791e85a98a0ff05f99d904abd3504a"
+      "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a"
     }
   ]
 }

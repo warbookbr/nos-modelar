@@ -1261,7 +1261,7 @@
 
 ## procedural/pecas/braco-robotico/partes/antebraco/
 
-- `receita.js` — braco-robotico/antebraco — o tubo reto que sai do anel do antebraço, na horizontal, até onde a carcaça do punho se prende.
+- `receita.js` — braco-robotico/antebraco — um pé redondo deitado no eixo da junta do cotovelo e o tubo que sai dele na horizontal, numa malha única.
 
 ## procedural/pecas/braco-robotico/partes/base/
 
