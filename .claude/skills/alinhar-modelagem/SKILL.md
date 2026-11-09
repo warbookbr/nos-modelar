@@ -61,7 +61,11 @@ natural.
    frase verificável.
 
 Para mecanismo, pergunte também o curso de cada movimento e o que não pode se
-tocar em nenhuma posição.
+tocar em nenhuma posição, e o eixo de cada junta dito em relação ao da junta
+anterior, paralelo ou perpendicular, conferido contra o movimento que ela deve
+fazer e não contra a direção que a imagem sugere: no braço robótico, a saída
+do cotovelo tirada da prancha girava o antebraço em torno dele mesmo, e o braço
+não dobrava.
 
 ## 4. Regras da família
 

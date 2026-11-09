@@ -1,0 +1,185 @@
+{
+ "plano": "Cotovelo do braço: a saída e o anel apontando para a direita (como estava, o anel só gira o antebraço no eixo dele) ou para a frente, paralelos à junta do ombro, com o antebraço preso por um pé redondo como a coluna no ombro.",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "como estava: junta no eixo do antebraço",
+   "nota": "o anel só gira o antebraço em torno dele mesmo",
+   "formas": [
+    {
+     "id": "coluna",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 160,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "colar",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "y",
+      "lados": 96
+     },
+     "sobre": "coluna"
+    },
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 117,
+      "eixo": "y",
+      "lados": 96
+     },
+     "sobre": "colar"
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 190,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      17,
+      78,
+      0
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  },
+  {
+   "titulo": "corrigido: junta paralela ao ombro",
+   "nota": "espelho do ombro; o antebraço sobe e desce",
+   "formas": [
+    {
+     "id": "coluna",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 160,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "colar",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "y",
+      "lados": 96
+     },
+     "sobre": "coluna"
+    },
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 117,
+      "eixo": "y",
+      "lados": 96
+     },
+     "sobre": "colar"
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 190,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      0,
+      78,
+      17
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": "cotovelo.+z",
+     "por": "-z"
+    },
+    {
+     "id": "pe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 156,
+      "eixo": "z",
+      "lados": 96
+     },
+     "centro": "anel.+z",
+     "por": "-z"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "pe.centro",
+     "por": "-x",
+     "contato": {
+      "pe": "atravessa"
+     }
+    }
+   ]
+  }
+ ]
+}
