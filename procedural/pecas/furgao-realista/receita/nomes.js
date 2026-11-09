@@ -43,3 +43,10 @@ export const REFLETORES = LUZES_POR_DENTRO.map(([, r]) => r);
 export const LAMPADAS = LUZES_POR_DENTRO.flatMap(([, , l]) => l);
 export const BANCOS = ['bancoMotorista', 'bancoPassageiro'];
 export const INTERIOR = ['pisoInterior', 'divisoria', ...BANCOS, 'painel'];
+/** Os detalhes pequenos da etapa 8 (2026-11-09): a antena do teto (o pé em gota e a haste), as cinco maçanetas (a alça e a placa rasa em anel de cada uma) e a ponteira do escapamento. */
+export const ANTENA = ['antenaPe', 'antenaHaste'];
+const LOCAIS_DAS_MACANETAS = ['CabineEsquerda', 'CabineDireita', 'Correr', 'TraseiraEsquerda', 'TraseiraDireita'];
+export const MACANETAS = LOCAIS_DAS_MACANETAS.map((l) => `macaneta${l}`);
+export const PLACAS_DAS_MACANETAS = LOCAIS_DAS_MACANETAS.map((l) => `placaMacaneta${l}`);
+export const PONTEIRA = 'ponteiraEscapamento';
+export const DETALHES = [...ANTENA, ...MACANETAS, ...PLACAS_DAS_MACANETAS, PONTEIRA];

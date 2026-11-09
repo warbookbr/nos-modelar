@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1735 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1736 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1505,6 +1505,7 @@
 
 ## procedural/pecas/furgao-realista/receita/
 
+- `detalhes.js` — furgao-realista, receita/detalhes.js — os detalhes pequenos da etapa 8 (2026-11-09), aprovados pela pessoa nos esboços de docs/modelar/banco-de-provas/furgao…
 - `farol.js` — furgao-realista, receita/farol.js — os contornos das luzes da frente e da grade e das lanternas de trás: o farol, a luz de canto e o pisca lateral (etapa 8, …
 - `forma.js` — furgao-realista, receita/forma.js — a forma da chapa em milímetro: os perfis da frente, de trás, a seção frontal e a planta (`forma`), os anéis horizontais e…
 - `gaiola.js` — furgao-realista, receita/gaiola.js — a gaiola da chapa (`derivar`): os anéis com as colunas, as faces, a cobertura do teto, o espelho, as voltas das portas e…
