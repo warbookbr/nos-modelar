@@ -6,7 +6,8 @@
 
 **Descongelado em:** 2026-11-03, por decisão da pessoa, que viu na bancada o ombro desproporcional ao resto do conjunto. Estava congelado desde 2026-09-29 para o esboço deixar de custar conta à mão; os planos do esboço e das ferramentas de modelagem que vieram antes fecharam.
 
-**Responsável:** Tiago (autoria) e a IA da sessão (implementação)
+**Responsável:** Tiago (autoria e crítica por imagem) e, desde 2026-11-09, a IA da sessão do furgão, que recebeu o plano da sessão
+do braço com o braço inteiro fixo e as decisões técnicas delegadas pela pessoa; falta a fatia 2, a exportação.
 
 **Repositório e base:** `warbookbr/nos-modelar`, base na main em 2026-09-26, descongelado sobre o ramo de trabalho de 2026-11-03.
 
