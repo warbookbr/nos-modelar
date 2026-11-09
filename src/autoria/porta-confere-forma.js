@@ -111,13 +111,18 @@ export function conferirPortasNaForma(neutro) {
       const { regiao, vizinhos } = faceDaPorta(neutro, faces, I.centro, eixo, raio);
       let maior = 0;
       for (const v of regiao) maior = Math.max(maior, medir(neutro.V.get(v), I.centro, eixo).r);
-      /* a porta que sai de uma face lateral (o rolo da chapa, a parede de um cilindro) não tem face no plano: valem os vértices dela que estão nele */
+      /* a porta que sai de uma face lateral (o rolo da chapa, a parede de um cilindro, o eixo da dobradiça de uma asa) não tem face no plano: valem os vértices das faces da origem dela que estão a até `FAIXA_DO_RAIO` do plano, e o mais afastado do eixo tem de estar no raio */
+      let lateral = 0;
+      const semFace = !regiao.size;
       for (const v of daOrigem) {
         const { t, r } = medir(neutro.V.get(v), I.centro, eixo);
         if (Math.abs(t) <= TOLERANCIA) maior = Math.max(maior, r);
+        if (Math.abs(t) <= FAIXA_DO_RAIO) lateral = Math.max(lateral, r);
       }
+      if (semFace) maior = Math.max(maior, lateral);
       /* a borda chanfrada ou com filete: o raio declarado pode ser o do corpo, que só as faces vizinhas à face plana alcançam */
       let alcance = maior;
+      if (semFace) alcance = Math.max(alcance, Math.min(lateral, raio + TOLERANCIA));
       for (const v of vizinhos) {
         const { t, r } = medir(neutro.V.get(v), I.centro, eixo);
         if (Math.abs(t) <= FAIXA_DO_RAIO && r <= raio + TOLERANCIA) alcance = Math.max(alcance, r);
