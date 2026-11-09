@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1773 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1778 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -523,6 +523,7 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
+- `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` — Abertura na vizinhança de todo vão: o vão grande e o vão junto de outro também recortam só o trecho dele
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
 - `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
 - `BACKLOG.md` — Backlog aberto
@@ -1532,6 +1533,7 @@
 - `gaiola.js` — furgao-realista, receita/gaiola.js — a gaiola da chapa (`derivar`): os anéis com as colunas, as faces, a cobertura do teto, o espelho, as voltas das portas e…
 - `geometria.js` — furgao-realista, receita/geometria.js — as contas que os outros assuntos usam: a conversão para metro, as curvas 2D em milímetro (o contorno com raios, o com…
 - `interior.js` — furgao-realista, receita/interior.js — o interior (etapa 5), todo dentro da chapa: o piso, a divisória, os dois bancos e o painel, cada um com o perfil que o…
+- `janela.js` — furgao-realista, receita/janela.js — os contornos da janela da cabine (2026-11-09, pela referência da pessoa): um triângulo de vidro fixo na frente, na carro…
 - `luzes.js` — furgao-realista, receita/luzes.js — por dentro das luzes da frente (etapa 8, `referencias/luzes.md`): o refletor de cada luz, uma capa única cuja borda segue…
 - `nomes.js` — furgao-realista, receita/nomes.js — os nomes das partes, que o PLANO, os PASSOS e os contatos citam: as listas por grupo (rodas, forros, abas, plástico, cris…
 - `plastico.js` — furgao-realista, receita/plastico.js — o plástico de baixo (etapa 3), por fora da chapa: a saia, as molduras e o alargamento dos arcos, o forro dos arcos e o…
@@ -2200,7 +2202,7 @@
 
 ## tools/fixtures/costuras-e-furos/dentes-no-fim-do-arredondamento/
 
-- `dentes-no-fim-do-arredondamento.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 2 inverte os números marcados.
+- `dentes-no-fim-do-arredondamento.test.mjs` — A fatia 1 do plano "costuras e furos limpos" fixou o defeito (24 pontas em 18 trechos); a causa era o registro da costura do `unir`, que perdia 9 trechos de …
 - `receita.js` — dentes-no-fim-do-arredondamento/receita.js — peça de prova do defeito "dentes de serra onde o arredondamento da costura afina até sumir junto a uma face plan…
 
 ## tools/fixtures/costuras-e-furos/dois-bracos-numa-carcaca-curva/
@@ -2210,7 +2212,7 @@
 
 ## tools/fixtures/costuras-e-furos/face-degenerada-em-dois-lathe/
 
-- `face-degenerada-em-dois-lathe.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `face-degenerada-em-dois-lathe.test.mjs` — A fatia 1 do plano "costuras e furos limpos" fixou 1 face de três cantos colineares nesta peça (o deitado de 195 mm), e a fatia 3 ia buscar a origem dela. A …
 - `receita.js` — face-degenerada-em-dois-lathe/receita.js — peça de prova do defeito "o `unir` com `arredondarCostura` de dois `lathe` deixa face de três cantos colineares" (…
 
 ## tools/fixtures/costuras-e-furos/frente-rente-a-tampa/
@@ -2230,7 +2232,7 @@
 
 ## tools/fixtures/costuras-e-furos/muitos-lados-no-unir/
 
-- `muitos-lados-no-unir.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `muitos-lados-no-unir.test.mjs` — A fatia 1 do plano "costuras e furos limpos" fixou a recusa ("não cabe no vértice 2048 da costura") e 1 órfão com 224 lados. A causa era o registro da costur…
 - `receita.js` — muitos-lados-no-unir/receita.js — peça de prova do defeito "dois `lathe` de muitos lados no `unir` com `arredondarCostura` deixam vértice órfão" (plano "cost…
 
 ## tools/fixtures/costuras-e-furos/subtrair-que-nao-corta/
@@ -2842,6 +2844,9 @@
 
 ## tools/modelar/reguas-de-malha/
 
+- `costura-em-oito.test.mjs` — costura-em-oito.test.mjs — a costura de dois tubos tangentes é um oito, com um nó de grau 4 em cada ponto de tangência (o elo do punho 5). O construtor de li…
+- `costura-registrada.mjs` — costura-registrada.mjs — régua: a costura que o `unir` registra (`arestas` do registro de origem) contra a costura geométrica da malha que ele entregou (plan…
+- `costura-registrada.test.mjs` — costura-registrada.test.mjs — a costura que o `unir` registra tem de ser a costura geométrica da malha que ele entrega (plano "costuras e furos limpos"). Ant…
 - `face-degenerada.mjs` — face-degenerada.mjs — régua de malha: a face de três ou mais cantos que não define plano (plano "costuras e furos limpos", fatia 1).
 - `face-degenerada.test.mjs` — face-degenerada.test.mjs — a régua acha exatamente o que o `adaptarThree` recusa como "é degenerada".
 - `face-torcida.mjs` — face-torcida.mjs — régua de malha: a face que se cruza e o triângulo virado (plano "costuras e furos limpos", refeitura do `furo` em anéis).
