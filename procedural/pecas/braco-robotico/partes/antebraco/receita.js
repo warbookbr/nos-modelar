@@ -8,22 +8,22 @@
  * antebraço, por vínculo da montagem; o valor da TABELA só vale para ver a parte sozinha.
  *
  * Referencial local: origem no centro da face do pé que encosta no anel; x é o eixo da junta, para fora do anel (no mundo, -Z); y
- * para cima; z é o eixo do tubo (no mundo, +X). O pé é um cilindro de eixo x, de raio igual ao do tubo e espessura `espessuraDoPe` (210 mm,
- * 20 mm mais que o diâmetro), e o tubo sai do eixo da junta (z = 0) rente à face de fora do pé (o tubo não passa dela); do lado do
- * anel sobram 20 mm entre o tubo e o plano do anel, para a porta `apoio` medir só o pé (ver a nota em TABELA). O tubo vai de z = 0 a `comprimento`.
+ * para cima; z é o eixo do tubo (no mundo, +X). O pé é um cilindro de eixo x, de raio igual ao do tubo e espessura `espessuraDoPe` (190 mm,
+ * igual ao diâmetro), e o tubo sai do eixo da junta (z = 0) rente às duas faces do pé (x de 0 a 190). O tubo vai de z = 0 a `comprimento`.
  *
  * Técnica da do cotovelo: dois `lathe` unidos por `unir`, com `arredondarCostura` no encontro, e chanfro de 2 mm no próprio perfil
  * das tampas. Duas partes nomeadas, uma só malha: o tubo é o que está além do pé (z a partir do raio) e o pé é o resto.
  *
  * Carcaça da junta 4 (seção "O punho, 2026-11-09" de `../../ALINHAMENTO.md`, esboço `../../referencias/punho-diametro.esboco.json`, formas
- * `carcaca` e `anel4`): um tubo deitado de 190 mm e 210 mm de comprimento, de eixo x local (paralelo ao do cotovelo e ao do ombro),
+ * `carcaca` e `anel4`): um tubo deitado de 190 mm de diâmetro e de comprimento, de eixo x local (paralelo ao do cotovelo e ao do ombro),
  * centrado na ponta do tubo (z = `comprimento`, 443 mm do eixo do cotovelo), com a ponta de trás rente às costas do tubo (x = `espessuraDoPe`,
  * o plano de fora do pé) e a face da frente em x = `espessuraDoPe` - `comprimentoDaCarcaca` (no mundo, para +Z, o lado oposto ao da saída do
  * cotovelo). A técnica é a da carcaça do cotovelo no braço superior: `lathe` unido por `unir`, `arredondarCostura` de raio 10 em 144 lados e
  * chanfro de 2 mm nas duas tampas. O tubo termina no centro da carcaça (dentro dela), sem chanfro na ponta. Contornos do núcleo, os mesmos do
  * braço superior: a parede de trás do tubo é tangente à tampa de trás da carcaça, e o `unir` deixaria uma fresta, então `avancoDaPonta` põe
- * essa tampa 0,05 mm além; a porta `apoio` sai da tampa do `lathe` do pé (`lathe` + `faixa`), e não do `unir`, porque a face da frente da carcaça fica no mesmo plano x = 0 e a conferência da porta mediria a carcaça junto; a conferência da porta `saida` mede a parte inteira, então a parte `carcaca` leva só a região da carcaça (o filete
- * do encontro com o tubo, que passa de 95 mm do eixo da carcaça, fica na parte `tubo`).
+ * essa tampa 0,05 mm além. As portas `apoio` e `saida` saem da tampa do `lathe` do pé e da carcaça (`lathe` + `faixa`), e não do `unir`: saindo do
+ * `unir`, a conferência da porta contra a forma mede a peça inteira (536 mm do eixo). A parte `carcaca` leva só a região da carcaça (z a partir de
+ * `comprimento` - `raio`) e a `pe` o que fica até z = `raio`. O pé e a carcaça têm 190 mm e o tubo vai de x = 0 a 190, rente às duas faces do pé, sem recuo.
  *
  * Portas que a receita publica:
  *   apoio — anel que ocupa, eixo +X local, centro no meio da face do pé que encosta, borda dessa face. Senta no `topo` do anel.
@@ -36,10 +36,10 @@ export const TABELA = {
   raio: 95,
   /* Do eixo da junta do cotovelo ao eixo da junta 4, o centro da carcaça: 253 mm de tubo aparente (da prancha) mais o raio do pé e o da carcaça (95 + 95). */
   comprimento: 443,
-  /* Espessura do pé ao longo do eixo da junta. O tubo fica rente à face de fora e sobra, do lado do anel, um recuo de espessuraDoPe - diâmetro: sem ele o tubo roçaria o plano do anel e a porta `apoio` mediria o tubo como se fosse o pé. */
-  espessuraDoPe: 210,
+  /* Espessura do pé ao longo do eixo da junta, igual ao diâmetro: o tubo fica rente às duas faces do pé. */
+  espessuraDoPe: 190,
   /* Comprimento da carcaça da junta 4, ao longo do eixo da junta; a ponta de trás fica rente às costas do tubo. */
-  comprimentoDaCarcaca: 210,
+  comprimentoDaCarcaca: 190,
   /* Quanto a tampa de trás da carcaça passa das costas do tubo, em mm: as duas são tangentes e o `unir` deixaria uma fresta (a partir de 0,01 mm ele fecha). */
   avancoDaPonta: 0.05,
   /* Chanfro estreito das bordas das tampas, como as carcaças do braço. */
@@ -95,7 +95,7 @@ export function gerarPassos(t = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'braco-robotico/antebraco', desc: 'antebraço do braço robótico: pé redondo de 190 mm no eixo da junta do cotovelo, tubo de 190 mm na horizontal para +x e carcaça da junta 4 (210 mm, eixo paralelo ao do cotovelo) na ponta, numa malha só' },
+  meta: { nome: 'braco-robotico/antebraco', desc: 'antebraço do braço robótico: pé redondo de 190 mm no eixo da junta do cotovelo, tubo de 190 mm na horizontal para +x e carcaça da junta 4 (190 mm, eixo paralelo ao do cotovelo) na ponta, numa malha só' },
   PARAMS: TABELA,
   get TOPO() { return { origem: 'centro da face do pé que encosta no anel; x é o eixo da junta (no mundo -Z), y para cima, z ao longo do tubo (no mundo +X)', ...derivar(this.PARAMS).pontos }; },
   PLANO: {
@@ -103,9 +103,9 @@ const receita = {
     referencias: ['../../referencias/cotovelo-eixo.png', '../../referencias/cotovelo-lado.png', '../../referencias/antebraco-opcoes.png', '../../referencias/lateral-sem-cabo.prancha.png'],
     escala: { medida: 'diâmetro do tubo e do pé, igual ao do cotovelo e da coluna', milimetros: 190 },
     partes: [
-      { nome: 'pe', forma: 'disco redondo de eixo da junta do cotovelo (-Z no mundo), 190 mm de diâmetro e 210 mm de espessura, com a face de dentro encostada no anel do antebraço e a de fora rente ao tubo, fundido ao tubo com concordância no encontro: uma peça só', tecnica: 'lathe de eixo x unido ao tubo por unir; arredondarCostura de raio constante em modo curvo, com raioMinimo e afinarPontas; chanfro de 2 mm nas duas faces do perfil' },
-      { nome: 'tubo', forma: 'cilindro reto de 190 mm, perpendicular ao eixo da junta, para +x do mundo, sem degrau, rente à face de fora do pé, até o centro da carcaça (443 mm do eixo; 253 mm aparentes entre pé e carcaça)', tecnica: 'lathe de eixo z unido ao pé e à carcaça por unir, sem chanfro na ponta (que fica dentro da carcaça); o arredondamento afina até sumir onde o encontro é tangente' },
-      { nome: 'carcaca', forma: 'tubo deitado de 190 mm e 210 mm de comprimento, eixo z do mundo, centrado na ponta do tubo, ponta de trás rente às costas dele; face da frente plana com chanfro de 2 mm, para +Z, é a saída do anel da junta 4; fundido ao tubo', tecnica: 'lathe de eixo x com chanfro de 2 mm no perfil, unido ao tubo por unir; arredondarCostura de raio 10, modo curvo; avancoDaPonta de 0,05 mm na tampa de trás; parte por região' },
+      { nome: 'pe', forma: 'disco redondo de eixo da junta do cotovelo (-Z no mundo), 190 mm de diâmetro e de espessura, com a face de dentro encostada no anel do antebraço, as duas faces rentes ao tubo, fundido ao tubo com concordância no encontro: uma peça só', tecnica: 'lathe de eixo x unido ao tubo por unir; arredondarCostura de raio constante em modo curvo, com raioMinimo e afinarPontas; chanfro de 2 mm nas duas faces do perfil' },
+      { nome: 'tubo', forma: 'cilindro reto de 190 mm, perpendicular ao eixo da junta, para +x do mundo, sem degrau, rente às duas faces do pé, até o centro da carcaça (443 mm do eixo; 253 mm aparentes entre pé e carcaça)', tecnica: 'lathe de eixo z unido ao pé e à carcaça por unir, sem chanfro na ponta (que fica dentro da carcaça); o arredondamento afina até sumir onde o encontro é tangente' },
+      { nome: 'carcaca', forma: 'tubo deitado de 190 mm de diâmetro e de comprimento, eixo z do mundo, centrado na ponta do tubo, ponta de trás rente às costas dele; face da frente plana com chanfro de 2 mm, para +Z, é a saída do anel da junta 4; fundido ao tubo', tecnica: 'lathe de eixo x com chanfro de 2 mm no perfil, unido ao tubo por unir; arredondarCostura de raio 10, modo curvo; avancoDaPonta de 0,05 mm na tampa de trás; parte por região' },
     ],
     criteriosDeReprovacao: [
       'tubo que não saia na horizontal para +x do mundo (por exemplo, seguindo o eixo da junta, para trás)',
@@ -114,10 +114,10 @@ const receita = {
       'distância do eixo da junta do cotovelo ao eixo da carcaça diferente de 443 mm (253 mm de tubo aparente entre o pé e a carcaça)',
       'eixo da carcaça que não seja paralelo ao da junta do cotovelo e do ombro (eixo z do mundo)',
       'face da frente da carcaça (a saída) voltada para o mesmo lado da saída do cotovelo (-Z do mundo), em vez do oposto (+Z)',
-      'carcaça de diâmetro diferente de 190 mm ou de comprimento diferente de 210 mm, ou com a ponta de trás fora de rente às costas do tubo',
+      'carcaça de diâmetro diferente de 190 mm ou de comprimento diferente de 190 mm, ou com a ponta de trás fora de rente às costas do tubo',
       'fresta, emenda, degrau ou sulco entre o tubo e a carcaça, ou quina viva no encontro: precisa ser uma peça só',
       'tubo afunilado, ou com degrau depois do pé ou na entrada da carcaça',
-      'tubo passando da face de fora do pé, em vez de rente a ela',
+      'tubo passando de uma face do pé, ou recuado dela, em vez de rente às duas',
       'quina viva ou faixa de sombra no encontro do pé com o tubo, ou fresta, emenda ou parafuso entre eles: precisa ser uma peça só',
       'aresta viva nas bordas das tampas, sem o chanfro estreito de 2 mm',
     ],
