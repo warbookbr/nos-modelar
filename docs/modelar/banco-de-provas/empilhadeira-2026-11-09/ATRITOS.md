@@ -59,3 +59,9 @@ processo o teria pego sozinho e o destino.
    saiu de `compensar` com um laço a cada 20 a 40 mm (largura no pedido, ponta 5 mm para dentro, cor a 75%), e o
    limite está escrito no cabeçalho de `lacos-pelas-vistas.js`. A medida por faixa de altura foi feita em script
    solto; entra no backlog junto da comparação por cor.
+9. **O bico do capô dava a volta inteira e deixava uma listra no laranja.** Com a ponta da planta levada inteira à
+   silhueta, o degrau do bico (55 mm na lateral) corria de um lado ao outro com a mesma profundidade, e de trás aparecia
+   como uma listra horizontal que a referência não tem: nela o bico morre nos cantos. A comparação por cor não vê
+   listra dentro de uma cor; a pessoa perguntou o que era. Destino: `lacosPelasVistas` ganhou `cantos: 'fixos'`, que
+   deixa os cantos da planta no lugar e encolhe o recuo da ponta na altura em que a silhueta fica aquém do extremo, e
+   `extremos`, para o corpo menor que acompanha um maior (a grade); o laranja foi a 85% de coincidência.

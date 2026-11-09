@@ -15,6 +15,9 @@
  *   estacoes: [a, ...] as alturas dos laços, em crescente; a primeira e a última são levadas para dentro da silhueta.
  *   pontos: quantos pontos têm o início e o fim de cada laço (padrão 9), e pontosDoLado, quantos tem cada lado (padrão 4).
  *   espessuraMinima: o menor comprimento do lado do laço, em mm (padrão 2); no laço curto os recuos encolhem por igual até caber.
+ *   cantos: 'acompanham' (padrão) leva a ponta inteira da planta à silhueta, e o degrau da silhueta dá a volta com a mesma
+ *     profundidade; 'fixos' deixa os cantos da planta onde estão e encolhe o recuo da ponta na altura em que a silhueta fica aquém
+ *     do extremo dela, e o degrau some para os lados. extremos: { inicio?, fim? } troca o extremo a que 'fixos' se refere.
  * devolve: { trechos, lacos, tampa, meiaPlanta, avisos }, com os trechos `inicio`, `direita`, `fim` e `esquerda`; o ponto do laço é
  *   [l, c], o que em `gaiolaPorLacos` de eixo y é [x, z].
  * exemplo:
@@ -29,6 +32,11 @@
  * fica em c0 + recuoDoInicio(l) e a do fim em c1 - recuoDoFim(l), onde o recuo é o que a planta mede naquela lateral. O perfil da
  * ponta que a silhueta de lado traz (o canto arredondado, o degrau de um bico, a rampa) vale então em toda a largura, deslocado
  * pela curva da planta, em vez de valer só onde a planta chega ao extremo.
+ *
+ * OS CANTOS FIXOS. Com `cantos: 'fixos'`, o recuo de cada ponta é multiplicado por 1 - d / R, onde d é quanto a silhueta fica aquém
+ * do extremo dela naquela altura e R é o recuo da planta no canto (na meia largura máxima); abaixo de zero vale zero, e a ponta
+ * fica reta. O canto da planta fica então no mesmo lugar em toda altura, e só o meio da ponta acompanha a silhueta: o bico de um
+ * capô morre nos cantos em vez de dar a volta com a profundidade do centro.
  *
  * O LAÇO CURTO. Onde o intervalo da altura mede menos que os dois recuos somados (a aba de uma tampa, a ponta de um bico), os
  * recuos encolhem por igual até o lado do laço medir `espessuraMinima`, e a altura entra em `avisos`.
@@ -77,7 +85,7 @@ const poligonoValido = (p, nome) => {
 
 /**
  * Os laços horizontais de um corpo visto de lado, de frente ou de trás e de cima, para `gaiolaPorLacos`.
- * @param {{ lado: number[][], perfil: number[][], planta: number[][], estacoes: number[], pontos?: number, pontosDoLado?: number, espessuraMinima?: number }} o
+ * @param {{ lado: number[][], perfil: number[][], planta: number[][], estacoes: number[], pontos?: number, pontosDoLado?: number, espessuraMinima?: number, cantos?: 'acompanham' | 'fixos', extremos?: { inicio?: number, fim?: number } }} o
  */
 export function lacosPelasVistas(o) {
   if (o == null || typeof o !== 'object') erro('espera { lado, perfil, planta, estacoes }');
@@ -118,6 +126,15 @@ export function lacosPelasVistas(o) {
     return { inicio: cortes[0] - cMin, fim: cMax - cortes[cortes.length - 1] };
   };
 
+  const cantos = o.cantos ?? 'acompanham';
+  if (cantos !== 'acompanham' && cantos !== 'fixos') erro("cantos é 'acompanham' ou 'fixos'");
+  const csDoLado = o.lado.map((p) => p[0]);
+  const extremos = { inicio: o.extremos?.inicio ?? Math.min(...csDoLado), fim: o.extremos?.fim ?? Math.max(...csDoLado) };
+  if (!Number.isFinite(extremos.inicio) || !Number.isFinite(extremos.fim)) erro('extremos precisa ser { inicio?, fim? } com números');
+  const noCantoDaPlanta = recuos(meiaPlanta);
+  /* o fator do recuo de uma ponta quando os cantos são fixos: d é quanto a silhueta fica aquém do extremo naquela altura */
+  const fator = (d, R) => (cantos === 'fixos' && R > 0 ? Math.max(0, 1 - Math.max(0, d) / R) : 1);
+
   const avisos = [];
   const lacos = o.estacoes.map((a, r) => {
     if (a < aMin - folga || a > aMax + folga) erro(`a estação ${br(a)} mm está fora da silhueta de lado, que vai de ${br(aMin)} a ${br(aMax)} mm`);
@@ -135,13 +152,15 @@ export function lacosPelasVistas(o) {
     const noCanto = recuos(w);
     const cabe = c1 - c0 - espessura;
     if (!(cabe > 0)) erro(`o intervalo da altura ${br(a)} mm mede ${br(c1 - c0)} mm, menos que a espessuraMinima`);
-    const soma = noCanto.inicio + noCanto.fim;
+    const fI = fator(c0 - extremos.inicio, noCantoDaPlanta.inicio);
+    const fF = fator(extremos.fim - c1, noCantoDaPlanta.fim);
+    const soma = fI * noCanto.inicio + fF * noCanto.fim;
     const k = soma > cabe ? cabe / soma : 1;
     if (k < 1) avisos.push(`na altura ${br(a)} mm o intervalo (${br(c1 - c0)} mm) é curto para os recuos da planta (${br(soma)} mm), que encolheram a ${br(k * 100)}%`);
     const N = 24;
     const ls = Array.from({ length: N + 1 }, (_, i) => -w + (2 * w * i) / N);
-    const inicio = ls.map((l) => [l, c0 + k * recuos(l).inicio]);
-    const fim = ls.map((l) => [l, c1 - k * recuos(l).fim]).reverse();
+    const inicio = ls.map((l) => [l, c0 + k * fI * recuos(l).inicio]);
+    const fim = ls.map((l) => [l, c1 - k * fF * recuos(l).fim]).reverse();
     return {
       nome: `e${r}`,
       em: a,

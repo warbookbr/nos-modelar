@@ -29,6 +29,26 @@ describe('lacosPelasVistas', () => {
     });
   });
 
+  it("com cantos 'fixos' o canto da planta fica no lugar em toda altura e só o meio da ponta acompanha a silhueta", () => {
+    const { lacos } = lacosPelasVistas(vistas({ perfil: [[0, 500], [500, 500]], cantos: 'fixos' }));
+    const fimDoLado = [600, 620, 640, 600, 568, 560];
+    lacos.forEach((laco, r) => {
+      expect(doCentro(laco.trechos.fim)[1]).toBeCloseTo(fimDoLado[r], 1);
+      /* o canto da planta está a 200 mm do extremo dela (640): fica em 440 em toda altura */
+      expect(laco.trechos.fim[0][1]).toBeCloseTo(440, 0);
+    });
+    /* a silhueta 250 mm aquém do extremo, mais que os 200 do canto: a ponta fica reta */
+    const reto = lacosPelasVistas(vistas({ lado: [[0, 0], [640, 0], [640, 250], [390, 250], [390, 500], [0, 500]], perfil: [[0, 500], [500, 500]],
+      cantos: 'fixos', estacoes: [0, 200, 300, 500] })).lacos[3].trechos.fim;
+    for (const p of reto) expect(p[1]).toBeCloseTo(390, 3);
+    /* extremos troca a referência: o corpo que fica 100 mm aquém de um maior usa o extremo dele, e o recuo cai à metade */
+    const menor = lacosPelasVistas(vistas({ lado: [[300, 0], [540, 0], [540, 500], [300, 500]], perfil: [[0, 500], [500, 500]], cantos: 'fixos',
+      extremos: { fim: 640 }, estacoes: [0, 500] })).lacos[0].trechos.fim;
+    expect(doCentro(menor)[1]).toBeCloseTo(540, 1);
+    expect(menor[0][1]).toBeCloseTo(540 - 200 * 0.5, 0);
+    expect(() => lacosPelasVistas(vistas({ cantos: 'soltos' }))).toThrow("cantos é 'acompanham' ou 'fixos'");
+  });
+
   it('a meia largura de cada laço é a do perfil na altura dele', () => {
     const { lacos, meiaPlanta } = lacosPelasVistas(vistas());
     expect(meiaPlanta).toBe(500);

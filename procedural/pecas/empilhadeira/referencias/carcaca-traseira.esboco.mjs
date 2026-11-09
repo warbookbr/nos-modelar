@@ -113,6 +113,7 @@ const FUROS_GRADE = [
 ];
 const CONTRA = [[505, 92], [503, 98], [499, 100.5], [486, 101], [478, 103], [470, 105], [462, 107.5], [454, 110.5], [446, 114],
   [438, 119], [430, 125.5], [424, 131], [419, 137], [417, 141], [415, 143.5], [400, 143.5]];
+const PONTA_DO_CAPO = 2172;  // o extremo de trás da silhueta do capô, no bico
 const TOPO_CAPO = 1112;      // os ombros do capô, na linha 282 da vista de trás
 const TOPO_CONTRA = 645;     // o contrapeso acaba reto, 12 mm para dentro do capô, e a divisa fica fechada; a cunha que sobe atrás fica de fora
 
@@ -122,19 +123,21 @@ export const VISTAS_DO_CAPO = {
   lado: lado('capo', ([z, y]) => [z, y > 1100 ? TOPO_CAPO : y]),
   perfil: perfil(CAPO), planta: plantaTraseira(meiaCapo, 1400),
   estacoes: [632.5, 650, 666, 700, 740, 780, 800, 812, 825, 860, 900, 940, 980, 1020, 1060, 1085, 1100, TOPO_CAPO],
+  cantos: 'fixos',
 };
 let capo = corpo('capo', VISTAS_DO_CAPO, QUINAS);
 capo = booleana('subtrair', [capo, extZ(simetrico(VAO_GRADE.map(([y, w]) => [y, w + 1])), -1950, -2300)]);
 parte('capo', capo, LARANJA);
 
 /* grade: a moldura cinza em U apoiada na rampa de trás do capô, acompanhando a planta, e o fundo escuro ------------------------ */
+/* a placa é um bloco fundo (300 mm para dentro), para as duas faces não se cruzarem no laço curto: só a face de trás aparece */
 const rampa = (de, ate) => [[-(2052 + de), 990], [-(2052 + ate), 990], [-(2112 + ate), 795], [-(2112 + de), 795]];
 const perfilDoVao = perfil([[362, 70], ...VAO_GRADE]);
 const placa = (nome, de, ate) => corpo(nome, { lado: rampa(de, ate), perfil: perfilDoVao, planta: plantaTraseira(meiaCapo, 1400),
-  estacoes: [796, 805, 815, 840, 900, 960, 989], pontos: 9, pontosDoLado: 2 }, QUINAS);
+  estacoes: [796, 805, 815, 840, 900, 960, 989], cantos: 'fixos', extremos: { inicio: -PONTA_DO_CAPO } }, QUINAS);
 const furos = FUROS_GRADE.map((f) => extZ(f.map(([x, y]) => [x * MM, H(y)]), -1900, -2300));
-parte('grade', booleana('subtrair', [placa('grade', -40, 14), ...furos]), CINZA_CLARO);
-parte('fundoGrade', placa('fundoGrade', -95, -70), ESCURO);
+parte('grade', booleana('subtrair', [placa('grade', -300, 14), ...furos]), CINZA_CLARO);
+parte('fundoGrade', placa('fundoGrade', -320, -70), ESCURO);
 
 /* tampa: o painel central com a aba de trás ------------------------------------------------------------------------------------ */
 const meiaTampa = 101.5 * MM;
