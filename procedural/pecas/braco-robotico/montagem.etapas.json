@@ -354,7 +354,7 @@
     },
     {
       "instancia": "anelAntebraco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelAntebracoSentaNaSaida",
@@ -399,7 +399,14 @@
           }
         }
       ],
-      "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6"
+      "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o anel do antebraço, único de 25 mm e rente à saída do cotovelo",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
