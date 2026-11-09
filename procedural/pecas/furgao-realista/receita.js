@@ -1075,6 +1075,46 @@ const receita = {
       'falta a faixa recuada da entrada de ar ou o lugar da placa no para-choque dianteiro, ou o lugar da placa no traseiro',
       'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2100 mm',
     ],
+    /* As feições que as réguas de superfície acham e que são desenho, cada uma na caixa justa em volta dela (2026-11-09). Ficam de fora, por parecerem defeito e
+       não por serem desenho, os dois pares de vincos do canto de cima da frente do teto (em [±893; 2188; 1216] e [±857; 2073; 1301]), relatados à parte. */
+    dobrasAceitas: [
+      ...[['Esquerdo', 1], ['Direito', -1]].map(([lado, s]) => ({
+        parte: `refletorFarol${lado}`, tipos: ['dobra', 'vinco'],
+        regiao: { min: [s > 0 ? 495 : -635, 885, 2495], max: [s > 0 ? 635 : -495, 1035, 2540] },
+        motivo: 'facetas do refletor do farol (12 vincos vivos em raios, plano da etapa 8), aprovadas pela pessoa por imagem em 2026-11-07',
+      })),
+      ...[['Esquerda', 1], ['Direita', -1]].flatMap(([lado, s]) => [['freio', 1068], ['ré', 979], ['pisca', 872]].map(([faixa, y]) => ({
+        parte: `refletorLanterna${lado}`, tipos: ['dobra', 'vinco'],
+        regiao: { min: [s > 0 ? 930 : -995, y - 13, -2650], max: [s > 0 ? 995 : -930, y + 13, -2570] },
+        motivo: `parede divisória e concha da faixa de ${faixa} do refletor da lanterna, aprovadas pela pessoa por imagem em 2026-11-07 (a parede liga as conchas)`,
+      }))),
+      { parte: 'carroceria', tipos: ['vinco'], regiao: { min: [-60, 314, -2695], max: [60, 330, -2678] },
+        motivo: 'raio de 40 mm do pé da traseira (raio_traseira_base) em toda a largura, visto de perto: a borda de baixo da traseira arredondada, pedida na tabela' },
+      ...[1, -1].map((s) => ({
+        parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 910 : -935, 1760, 1505], max: [s > 0 ? 935 : -910, 1785, 1528] },
+        motivo: 'quina da coluna do para-brisa envolvente, de raio 160 (raio_coluna_base e raio_coluna_topo), onde o vidro dobra para a lateral: desenho da prancha',
+      })),
+      { parte: 'parachoqueDianteiro', tipos: ['vinco'], regiao: { min: [-60, 298, 2676], max: [60, 310, 2696] },
+        motivo: 'quina de baixo do lábio da seção do para-choque (ponto [15, 302] de secao_parachoque_dianteiro), ao longo de toda a frente: perfil da prancha' },
+      { parte: 'parachoqueDianteiro', tipos: ['vinco'], regiao: { min: [-60, 370, 2720], max: [60, 387, 2740] },
+        motivo: 'quina de cima do lábio, entre os pontos [46, 375] e [44, 382] da seção, onde começa a faixa recuada da entrada de ar: perfil da prancha' },
+      ...[1, -1].map((s) => ({
+        parte: 'parachoqueDianteiro', tipos: ['vinco'], regiao: { min: [s > 0 ? 1015 : -1045, 478, 2355], max: [s > 0 ? 1045 : -1015, 498, 2385] },
+        motivo: 'degrau de cima da faixa recuada (pontos [30, 482] e [44, 488] da seção) que segue pela lateral do para-choque até o arco: perfil da prancha',
+      })),
+      ...[524, 646].map((y) => ({
+        parte: 'parachoqueDianteiro', tipos: ['vinco'], regiao: { min: [-200, y - 8, 2740], max: [200, y + 8, 2752] },
+        motivo: 'cantos chanfrados do bolso do lugar da placa dianteira (400 por 130, fundo recuado 8 mm), pedido pelo plano; visto de perto na frontal',
+      })),
+      ...[1, -1].map((s) => ({
+        parte: 'parachoqueTraseiro', tipos: ['vinco'], regiao: { min: [s > 0 ? 1015 : -1045, 296, -2270], max: [s > 0 ? 1045 : -1015, 310, -2237] },
+        motivo: 'quina de baixo da seção do para-choque traseiro (pontos [60, 302] e [95, 312]) na lateral, em continuação à da reta de trás: perfil da prancha',
+      })),
+      ...[384, 506].map((y) => ({
+        parte: 'parachoqueTraseiro', tipos: ['vinco'], regiao: { min: [-205, y - 8, -2812], max: [205, y + 8, -2800] },
+        motivo: 'cantos chanfrados do bolso do lugar da placa traseira (400 por 130, fundo recuado 8 mm), pedido pelo plano; visto de perto na traseira',
+      })),
+    ],
     lataria: { partes: ['carroceria'] },
   },
   contatos: CONTATOS,
