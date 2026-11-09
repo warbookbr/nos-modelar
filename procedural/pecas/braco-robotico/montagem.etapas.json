@@ -523,7 +523,7 @@
     },
     {
       "instancia": "anelPunho5",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelPunho5SentaNaSaida",
@@ -568,7 +568,14 @@
           }
         }
       ],
-      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6"
+      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o anel da junta 5 do punho",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
