@@ -65,6 +65,13 @@
         "tipo": "peca",
         "ref": "braco-robotico/anel-punho-5"
       }
+    },
+    {
+      "id": "eloPunho5",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/elo-punho-5"
+      }
     }
   ],
   "relacoes": [
@@ -298,6 +305,39 @@
         },
         "toleranciaNumerica": 1e-06
       }
+    },
+    {
+      "id": "eloPunho5SentaNoAnel",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "anelPunho5"
+        ],
+        "porta": "topo"
+      },
+      "movel": {
+        "caminho": [
+          "eloPunho5"
+        ],
+        "porta": "apoio"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
     }
   ],
   "etapas": [
@@ -309,7 +349,8 @@
     "antebraco",
     "anelPunho4",
     "eloPunho4",
-    "anelPunho5"
+    "anelPunho5",
+    "eloPunho5"
   ],
   "vinculos": [
     {
@@ -409,6 +450,20 @@
       },
       "unidade": "mm",
       "acrescimo": 0
+    },
+    {
+      "id": "eloPunho5ComORaioDoAnel",
+      "alvo": {
+        "instancia": "eloPunho5",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "anelPunho5",
+        "porta": "topo",
+        "medida": "raioExterno"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
     }
   ],
   "posicoes": [
@@ -496,6 +551,17 @@
       "em": {
         "instancia": "eloPunho4",
         "porta": "saida"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "eloPunho5SobreOAnel",
+      "instancia": "eloPunho5",
+      "porta": "apoio",
+      "em": {
+        "instancia": "anelPunho5",
+        "porta": "topo"
       },
       "unidade": "mm",
       "afastamento": 0

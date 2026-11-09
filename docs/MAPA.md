@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1733 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1734 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1294,6 +1294,10 @@
 ## procedural/pecas/braco-robotico/partes/elo-punho-4/
 
 - `receita.js` — braco-robotico/elo-punho-4 — o elo rígido entre a junta 4 e a junta 5 do punho: um pé redondo no eixo da junta 4 e o tubo que desce dele na vertical, numa ma…
+
+## procedural/pecas/braco-robotico/partes/elo-punho-5/
+
+- `receita.js` — braco-robotico/elo-punho-5 — o elo rígido entre a junta 5 e a junta 6 do punho: um pé curto no eixo da junta 5 e o tubo deitado que o atravessa, numa malha ú…
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
