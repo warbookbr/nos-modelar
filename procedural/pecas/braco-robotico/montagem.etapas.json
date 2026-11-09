@@ -284,7 +284,7 @@
     },
     {
       "instancia": "cotovelo",
-      "estado": "quebrada",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "cotoveloSentaNoColar",
@@ -329,8 +329,7 @@
           }
         }
       ],
-      "forma": "sha256:28810ed3c6d3c61c71666ff92efbdcafe4eddb047abee89caee537c596cdafc6",
-      "motivo": "a receita mudou depois do aceite",
+      "forma": "sha256:accd2d46ad4366621347b97dd3747d0352f61c07c26cb8537f0517582573ecb8",
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -344,7 +343,14 @@
           },
           "forma": "sha256:af0ccd52407968b23b08aa6aee8d487c1f325f99e8455af10357b0d507a52739"
         }
-      ]
+      ],
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o cotovelo com o tubo deitado de 190 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
