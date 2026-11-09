@@ -5,15 +5,19 @@
    dessas liga um canto do contorno, a dezenas de milímetros, a uma aresta do furo de um milímetro: triângulos longos e finos, de razão de aspecto
    até 13 898 no flange do braço, que o sombreamento suave mostra como estrias.
 
-   O QUE É. Quando o contorno da face tem 48 cantos ou mais e a repartição antiga tem um triângulo fino (o critério da régua `triangulo-fino` do repositório: razão de aspecto acima de 10 e maior
-   lado acima de 4 vezes a aresta média do contorno), a face é refeita:
+   O QUE É. Quando o contorno da face tem 48 cantos ou mais, a face é refeita (sem passar pela repartição antiga, que é a parte cara):
      1. em volta de cada furo, um anel de quadriláteros: cada aresta do furo ganha o quadrilátero que a liga à aresta correspondente de um POLÍGONO DE
-        APOIO, o contorno do furo afastado `d` para fora (miter), com `d` igual ao raio médio do furo e reduzido pela metade até o apoio caber com folga;
-     2. o resto da face (o contorno menos os polígonos de apoio) pela repartição de sempre, mais pontos de reforço numa grade hexagonal de passo 3 vezes
-        a aresta média, sem chegar a menos de 0,8 passo do contorno nem dos apoios, e então por flips de Delaunay que respeitam as arestas do contorno e
-        dos apoios (nunca flipadas), o que dá triângulos próximos do equilátero.
-   Nenhum vértice cai sobre o contorno da face nem dentro de um furo, então a vizinhança da peça não ganha junção em T. A face que a repartição antiga
-   já fazia sem triângulo fino fica byte a byte como era. Qualquer prova que falhe aqui devolve `null`, e o `furo` segue com a repartição antiga. */
+        APOIO, o contorno do furo afastado `d` para fora (com vários furos, pela esquadria; com um furo, sobre a reta do canto ao contorno que a repartição
+        antiga dava ao setor), com `d` igual ao raio médio do furo e reduzido pela metade até o apoio caber com folga;
+     2. o resto da face (o contorno menos os polígonos de apoio) pela repartição de sempre (com um furo, um polígono por setor), mais pontos de reforço
+        numa grade hexagonal de passo 4 vezes a aresta média, sem chegar a menos de meio passo do contorno, dos apoios nem das retas dos setores, e então
+        por flips de Delaunay que respeitam as arestas do contorno, dos apoios e dos setores (nunca flipadas); o passo fecha (3, 2,5, 2) até não restar
+        triângulo fino pela régua.
+   Nenhum vértice cai sobre o contorno da face nem dentro de um furo, então a vizinhança da peça não ganha junção em T. A face de menos de 48 cantos fica
+   byte a byte como era. Qualquer prova que falhe, o teto de crescimento (4 vezes os triângulos da repartição antiga) ou os limites de 1.500 cantos e 40.000
+   pontos de grade devolvem `{motivo}`, e o `furo` segue com a repartição antiga e põe o motivo em `neutro.avisos`. A aresta do apoio mais longa que 8 vezes
+   a aresta média (o lado reto de um rasgo) é partida, e o polígono da `borda` dela vira um triângulo mais um leque, para não ter cantos colineares. */
+import earcut from 'earcut';
 import { triangularFace } from '../triangulacao-face.js';
 
 /* Só a face de contorno denso (48 cantos ou mais) é refeita. Nela a repartição sem vértice novo liga cada canto do contorno a um furo a dezenas de arestas
@@ -26,6 +30,7 @@ const FATOR_DO_LADO = 4;
 const FATORES_DA_GRADE = [4, 3, 2.5, 2];
 const LIMITE_DE_CANTOS = 1500;
 const LIMITE_DA_GRADE = 40000;
+const CRESCIMENTO_MAXIMO = 4;
 const FATOR_DA_FOLGA = 0.5;
 
 const cruz2 = (a, b, c) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
@@ -84,50 +89,164 @@ function dentroDoCirculo(a, b, c, d, eps) {
   return det > eps;
 }
 
+/* UM furo: os cantos do apoio sobre as retas que dividem o furo em setores. A reta do canto j do anel sai dele para fora, pela esquadria (a normal do
+   canto), até o contorno, e termina no canto do contorno mais perto de onde a normal o encontra (a âncora). Num furo redondo ela é radial, como era na
+   repartição antiga; num rasgo ela acompanha a normal do lado reto, e o apoio fica a uma distância de verdade dele. */
+function apoioPelasRetas(contorno, anel, raioMedio, margemDentro) {
+  const n = contorno.length;
+  const L = anel.length;
+  const fora = afastar(anel, 1);
+  const normais = anel.map((p, j) => { const v = [fora[j][0] - p[0], fora[j][1] - p[1]]; const l = Math.hypot(v[0], v[1]) || 1; return [v[0] / l, v[1] / l]; });
+  const ancoras = [];
+  for (let j = 0; j < L; j++) {
+    const p = anel[j], u = normais[j];
+    let tMenor = Infinity;
+    for (let k = 0; k < n; k++) {
+      const a = contorno[k], b = contorno[(k + 1) % n];
+      const e = [b[0] - a[0], b[1] - a[1]];
+      const det = u[0] * e[1] - u[1] * e[0];
+      if (!(Math.abs(det) > 1e-18)) continue;
+      const t = ((a[0] - p[0]) * e[1] - (a[1] - p[1]) * e[0]) / det;
+      const q = ((a[0] - p[0]) * u[1] - (a[1] - p[1]) * u[0]) / det;
+      if (t > 0 && q >= 0 && q <= 1 && t < tMenor) tMenor = t;
+    }
+    if (!Number.isFinite(tMenor)) return { motivo: `a normal do canto ${j} do furo não encontra o contorno da face` };
+    const acerto = [p[0] + u[0] * tMenor, p[1] + u[1] * tMenor];
+    let melhor = 0, menor = Infinity;
+    for (let k = 0; k < n; k++) { const d = dist(contorno[k], acerto); if (d < menor) { menor = d; melhor = k; } }
+    ancoras.push(melhor);
+  }
+  let passos = 0;
+  for (let j = 0; j < L; j++) passos += (ancoras[(j + 1) % L] - ancoras[j] + n) % n;
+  if (passos !== n) return { motivo: 'as retas do furo ao contorno não dão uma volta só (as âncoras não andam sempre no mesmo sentido)' };
+  const direcao = anel.map((p, j) => { const q = contorno[ancoras[j]]; const l = dist(p, q) || 1; return [(q[0] - p[0]) / l, (q[1] - p[1]) / l]; });
+  for (const f of [1, 0.5, 0.25, 0.125]) {
+    const d = raioMedio * f;
+    const apoio = anel.map((p, j) => [p[0] + direcao[j][0] * d, p[1] + direcao[j][1] * d]);
+    if (apoio.every((p) => margemDentro(contorno, p) > 0.5 * d)) return { apoio, ancoras };
+  }
+  return { motivo: 'o polígono de apoio não cabe na face com folga, nem com um oitavo do raio do furo' };
+}
+
+/* UM furo: o setor j é o polígono do contorno de ancoras[j] a ancoras[j+1], do canto j+1 do apoio de volta ao canto j; cada um sai por orelhas, e a
+   reta do canto j do apoio à âncora j é aresta fixa */
+function repartirEmSetores(contorno, apoio, inicio, ancoras, L) {
+  const n = contorno.length;
+  const triangulos = [], fixas = [], retas = [];
+  for (let j = 0; j < L; j++) {
+    const jn = (j + 1) % L;
+    const cantos = [];
+    for (let k = ancoras[j]; ; k = (k + 1) % n) { cantos.push({ tipo: 'contorno', i: k }); if (k === ancoras[jn]) break; }
+    const q0 = inicio[j], q1 = inicio[jn] === 0 ? apoio.length : inicio[jn];
+    for (let q = q1; q >= q0; q--) cantos.push({ tipo: 'apoio', k: 0, j: q % apoio.length });
+    const pts = cantos.map((t) => (t.tipo === 'contorno' ? contorno[t.i] : apoio[t.j]));
+    const sai = earcut(pts.flat(), [], 2);
+    if (sai.length % 3 || sai.length / 3 !== cantos.length - 2) return { motivo: `o setor ${j} do furo não fechou em orelhas (${cantos.length} cantos)` };
+    for (let t = 0; t < sai.length; t += 3) {
+      const tri = [sai[t], sai[t + 1], sai[t + 2]];
+      if (cruz2(pts[tri[0]], pts[tri[1]], pts[tri[2]]) < 0) [tri[1], tri[2]] = [tri[2], tri[1]];
+      if (!(cruz2(pts[tri[0]], pts[tri[1]], pts[tri[2]]) > 0)) return { motivo: `o setor ${j} do furo tem triângulo de área nula` };
+      triangulos.push({ cantos: tri.map((x) => cantos[x]), setor: j });
+    }
+    fixas.push([{ tipo: 'apoio', k: 0, j: q0 }, { tipo: 'contorno', i: ancoras[j] }]);
+    retas.push([apoio[q0], contorno[ancoras[j]]]);
+  }
+  return { triangulos, fixas, retas };
+}
+
 /**
  * Refaz a face em anéis. `contorno` e `aneis` em 2D como o `furo` os tem (contorno anti-horário, anéis anti-horários), `particionar` a repartição de
- * sempre e `margemDentro` a margem do núcleo. Devolve { bordas, preenchimento, apoios, extras } com os cantos por etiqueta
- * ({tipo:'contorno',i} | {tipo:'anel',k,j} | {tipo:'apoio',k,j} | {tipo:'extra',m}), `bordas[k][j]` o quadrilátero da aresta j do anel k, `apoios[k]` os
- * cantos 2D do polígono de apoio e `extras` os pontos de reforço; ou null quando a face não pede, ou não aceita, a refeitura.
+ * sempre e `margemDentro` a margem do núcleo. Devolve { bordas, preenchimento, apoios, extras, anexos } com os cantos por etiqueta
+ * ({tipo:'contorno',i} | {tipo:'anel',k,j} | {tipo:'apoio',k,j} | {tipo:'extra',m}), `bordas[k][j]` o polígono da aresta j do anel k (o quadrilátero, ou
+ * mais cantos onde a aresta do apoio foi partida), `apoios[k]` os cantos 2D do polígono de apoio, `extras` os pontos de reforço e `anexos[k][j]` os
+ * índices do `preenchimento` que ficam no setor da aresta j do furo k (o triângulo vai ao furo do anel mais próximo); ou { motivo } quando a face não
+ * aceita a refeitura (o `furo` segue com a repartição antiga e avisa).
  */
 export function refazerEmAneis(entrada) {
-  const { contorno, aneis, raios, escala, particionar, margemDentro } = entrada;
+  const { contorno, aneis, raios, escala, particionar, margemDentro, media } = entrada;
   const M = aneis.length;
   const L = aneis[0].length;
-  if (M * L > LIMITE_DE_CANTOS || contorno.length > LIMITE_DE_CANTOS) return null;
+  if (M * L > LIMITE_DE_CANTOS || contorno.length > LIMITE_DE_CANTOS) return { motivo: `${contorno.length} cantos no contorno e ${M * L} nos anéis passam do limite de ${LIMITE_DE_CANTOS}` };
   const centroDe = (anel) => [anel.reduce((s, p) => s + p[0], 0) / anel.length, anel.reduce((s, p) => s + p[1], 0) / anel.length];
-  const raioMedio = aneis.map((anel) => { const c = centroDe(anel); return anel.reduce((s, p) => s + dist(p, c), 0) / anel.length; });
+  const centros = aneis.map(centroDe);
+  const raioMedio = aneis.map((anel, k) => anel.reduce((s, p) => s + dist(p, centros[k]), 0) / anel.length);
 
-  // o apoio: o maior afastamento (o raio médio do furo, depois metade, um quarto, um oitavo) em que o apoio, com a folga de meio afastamento, cabe
-  let apoios = null;
-  for (const f of [1, 0.5, 0.25, 0.125]) {
-    const d = raioMedio.map((r) => r * f);
-    const folgados = aneis.map((anel, k) => afastar(anel, 1.5 * d[k]));
-    const cabe = folgados.every((F) => F.every((p) => margemDentro(contorno, p) > 0))
-      && folgados.every((F, k) => folgados.every((G, l) => l <= k || !sePerto(F, G, escala)));
-    if (cabe) { apoios = aneis.map((anel, k) => afastar(anel, d[k])); break; }
+  /* o apoio: o maior afastamento (o raio médio do furo, depois metade, um quarto, um oitavo) em que o apoio, com a folga de meio afastamento, cabe.
+     Com UM furo, cada canto do apoio fica sobre a reta do canto do anel até o canto do contorno que a repartição antiga lhe dava (`ancoras`), e essa reta
+     é aresta da malha: o setor de cada aresta do furo (a face `borda` de antes) continua um polígono que a malha nova só subdivide. */
+  let apoiosSimples = null, ancoras = null;
+  if (M === 1) {
+    const r = apoioPelasRetas(contorno, aneis[0], raioMedio[0], margemDentro);
+    if (r.motivo) return r;
+    apoiosSimples = [r.apoio]; ancoras = r.ancoras;
+  } else {
+    for (const f of [1, 0.5, 0.25, 0.125]) {
+      const d = raioMedio.map((r) => r * f);
+      const folgados = aneis.map((anel, k) => afastar(anel, 1.5 * d[k]));
+      const cabe = folgados.every((F) => F.every((p) => margemDentro(contorno, p) > 0))
+        && folgados.every((F, k) => folgados.every((G, l) => l <= k || !sePerto(F, G, escala)));
+      if (cabe) { apoiosSimples = aneis.map((anel, k) => afastar(anel, d[k])); break; }
+    }
+    if (!apoiosSimples) return { motivo: 'os polígonos de apoio não cabem na face com folga, nem com um oitavo do raio dos furos' };
   }
-  if (!apoios) return null;
 
-  // a repartição do resto: o contorno menos os apoios, sem vértice novo
-  const base = particionar(contorno, apoios, escala, raios);
-  if (!base || base.erro) return null;
+  /* a aresta longa do apoio (o lado reto de um rasgo) é partida em trechos de no máximo o passo da grade, para o triângulo que a usa não ser fino;
+     `inicio[k][j]` é o índice, no apoio k, do canto que nasce do canto j do anel */
+  const limiteDaAresta = 2 * FATORES_DA_GRADE[0] * media;
+  const inicio = [];
+  const apoios = apoiosSimples.map((A) => {
+    const saida = [];
+    inicio.push(A.map((p, j) => {
+      const idx = saida.length;
+      saida.push(p);
+      const q = A[(j + 1) % A.length];
+      const partes = Math.ceil(dist(p, q) / limiteDaAresta - 1e-9);
+      for (let s = 1; s < partes; s++) saida.push([p[0] + (q[0] - p[0]) * s / partes, p[1] + (q[1] - p[1]) * s / partes]);
+      return idx;
+    }));
+    return saida;
+  });
+  const cantosDeApoio = apoios.reduce((s, A) => s + A.length, 0);
+
+  /* o teto de crescimento: a refeitura não passa de CRESCIMENTO_MAXIMO vezes os triângulos da repartição antiga (n + M·L + 2M − 2), estimados antes de
+     triangular qualquer coisa pela grade de cada passo */
+  const referencia = contorno.length + M * L + 2 * M - 2;
+  const area = (P) => Math.abs(P.reduce((s, p, k) => { const q = P[(k + 1) % P.length]; return s + (p[0] * q[1] - q[0] * p[1]) / 2; }, 0));
+  const livre = area(contorno) - apoios.reduce((s, A) => s + area(A), 0);
+  const estimar = (fator) => M * L + contorno.length + cantosDeApoio + 2 * M - 2 + 2 * Math.ceil(livre / (0.866 * (fator * media) ** 2));
+  if (estimar(FATORES_DA_GRADE[0]) > CRESCIMENTO_MAXIMO * referencia) {
+    return { motivo: `a refeitura daria cerca de ${estimar(FATORES_DA_GRADE[0])} triângulos, mais de ${CRESCIMENTO_MAXIMO} vezes os ${referencia} da repartição antiga` };
+  }
+
+  /* a repartição do resto, sem vértice novo: com UM furo, um polígono por setor (o contorno de uma âncora à outra e o apoio de volta), cada um por orelhas, com a
+     reta do setor como aresta fixa; com vários, pontes e orelhas sobre a face inteira */
+  let base;
+  if (M === 1) {
+    base = repartirEmSetores(contorno, apoios[0], inicio[0], ancoras, L);
+  } else {
+    const r = particionar(contorno, apoios, escala, raios);
+    if (!r || r.erro) return { motivo: `a repartição do contorno menos os apoios não fecha${r && r.erro ? `: ${r.erro}` : ''}` };
+    base = { triangulos: [...r.bordas.flat(), ...r.preenchimento].map((d) => ({ cantos: d.cantos.map((t) => (t.tipo === 'anel' ? { tipo: 'apoio', k: t.k, j: t.j } : t)) })), fixas: [] };
+  }
+  if (base.motivo) return base;
 
   /* o passo da grade de reforço começa em 4 vezes a aresta média e fecha (3, 2,5 e 2) até a refeitura não ter triângulo fino pela mesma régua; se nenhum
-     passo chega lá, fica o mais fino que fechou */
+     passo chega lá, fica o mais fino que coube no teto */
   let melhor = null;
   for (const fator of FATORES_DA_GRADE) {
-    const r = montar(entrada, apoios, base, fator);
+    if (melhor && estimar(fator) > CRESCIMENTO_MAXIMO * referencia) break;
+    const r = montar(entrada, apoios, inicio, base, fator);
     if (!r) break;
     melhor = r;
     const ponto = (t) => (t.tipo === 'contorno' ? contorno[t.i] : t.tipo === 'anel' ? aneis[t.k][t.j] : t.tipo === 'apoio' ? r.apoios[t.k][t.j] : r.extras[t.m]);
     const poligonos = [...r.bordas.flat(), ...r.preenchimento].map((d) => d.cantos.map(ponto));
-    if (!temTrianguloFino(poligonos, entrada.media)) break;
+    if (!temTrianguloFino(poligonos, media)) break;
   }
+  if (!melhor) return { motivo: 'a grade de reforço não fechou a triangulação (a prova de contagem, área ou arestas falhou, ou a grade passa de 40000 pontos)' };
   return melhor;
 }
 
-function montar({ contorno, aneis, escala, margemDentro, media }, apoios, base, fatorDaGrade) {
+function montar({ contorno, aneis, escala, margemDentro, media }, apoios, inicio, base, fatorDaGrade) {
   const M = aneis.length;
   const L = aneis[0].length;
   const tags = [];
@@ -143,28 +262,25 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, base, 
     return indice.get(chave);
   };
   const usados = [];
-  // `particionar` descreve o anel de apoio com a etiqueta 'anel': aqui o anel dele é o apoio
-  const comoApoio = (t) => (t.tipo === 'anel' ? { tipo: 'apoio', k: t.k, j: t.j } : t);
-  const tri = [];
-  for (const d of [...base.bordas.flat(), ...base.preenchimento]) tri.push(d.cantos.map((t) => idDe(comoApoio(t))));
+  const tri = base.triangulos.map((d) => ({ ids: d.cantos.map(idDe), setor: d.setor }));
+  const cantosDeApoio = apoios.reduce((s, A) => s + A.length, 0);
 
   // a grade de reforço
-  const h0 = media;
-  const passo = fatorDaGrade * h0;
+  const passo = fatorDaGrade * media;
   const folga = FATOR_DA_FOLGA * passo;
   const caixa = contorno.reduce((c, p) => [Math.min(c[0], p[0]), Math.min(c[1], p[1]), Math.max(c[2], p[0]), Math.max(c[3], p[1])], [Infinity, Infinity, -Infinity, -Infinity]);
   const origem = [(caixa[0] + caixa[2]) / 2, (caixa[1] + caixa[3]) / 2];
   const linhas = Math.ceil((caixa[3] - caixa[1]) / (passo * Math.sqrt(3) / 2) / 2) + 1;
   const colunas = Math.ceil((caixa[2] - caixa[0]) / passo / 2) + 2;
   const extras = [];
-  const grade = (2 * linhas + 1) * (2 * colunas + 1);
-  if (grade > LIMITE_DA_GRADE) return null;   // o passo é pequeno demais para a face: fica a repartição antiga
+  if ((2 * linhas + 1) * (2 * colunas + 1) > LIMITE_DA_GRADE) return null;
   if (passo > 0 && passo < Math.max(caixa[2] - caixa[0], caixa[3] - caixa[1])) {
     for (let r = -linhas; r <= linhas; r++) {
       for (let c = -colunas; c <= colunas; c++) {
         const p = [origem[0] + (c + (Math.abs(r) % 2) * 0.5) * passo, origem[1] + r * passo * Math.sqrt(3) / 2];
         if (!(margemDentro(contorno, p) >= folga)) continue;
         if (apoios.some((A) => margemDentro(A, p) > 0 || distanciaAoPoligono(p, A) < folga)) continue;
+        if ((base.retas ?? []).some(([a, b]) => distanciaAoSegmento(p, a, b) < folga)) continue;
         extras.push(p);
       }
     }
@@ -178,11 +294,13 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, base, 
   const poe = (t) => { for (let e = 0; e < 3; e++) arestas.set(chave(t[e], t[(e + 1) % 3]), t); };
   const tira = (t) => { for (let e = 0; e < 3; e++) if (arestas.get(chave(t[e], t[(e + 1) % 3])) === t) arestas.delete(chave(t[e], t[(e + 1) % 3])); };
   const triangulos = new Set();
-  const novo = (a, b, c) => { const t = [a, b, c]; triangulos.add(t); poe(t); return t; };
+  const novo = (a, b, c, setor) => { const t = [a, b, c]; t.setor = setor; triangulos.add(t); poe(t); return t; };
   const remove = (t) => { tira(t); triangulos.delete(t); };
-  for (const t of tri) novo(...t);
+  for (const t of tri) novo(...t.ids, t.setor);
   const fixa = new Set();
   for (const k of arestas.keys()) { const [a, b] = k.split('>'); if (!arestas.has(chave(b, a))) { fixa.add(k); fixa.add(chave(b, a)); } }
+  // as retas dos setores (um furo só) também são arestas fixas: os flips e os reforços não as cruzam
+  for (const [x, y] of base.fixas) { const a = idDe(x), b = idDe(y); fixa.add(chave(a, b)); fixa.add(chave(b, a)); }
 
   const legaliza = (pilha) => {
     let guarda = 100 * (triangulos.size + 10);
@@ -196,19 +314,41 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, base, 
       if (!dentroDoCirculo(pontos[u], pontos[v], pontos[p], pontos[w], epsCirculo)) continue;
       if (!(cruz2(pontos[u], pontos[w], pontos[p]) > eps && cruz2(pontos[w], pontos[v], pontos[p]) > eps)) continue;
       remove(t1); remove(t2);
-      novo(u, w, p); novo(w, v, p);
+      novo(u, w, p, t1.setor); novo(w, v, p, t1.setor);
       pilha.push([u, w], [w, v], [v, p], [p, u]);
     }
   };
   legaliza([...arestas.keys()].sort().map((k) => k.split('>').map(Number)));
-  for (const p of extras) {
-    let alvo = null, sobre = false;
-    for (const t of triangulos) {
-      const a = pontos[t[0]], b = pontos[t[1]], c = pontos[t[2]];
-      const s = [cruz2(a, b, p), cruz2(b, c, p), cruz2(c, a, p)];
-      if (s.every((x) => x > eps)) { alvo = t; break; }
-      if (s.every((x) => x > -eps)) sobre = true;
+
+  /* localização do triângulo que contém o ponto por caminhada: parte do último triângulo criado e atravessa a aresta pela qual o ponto está à direita;
+     sem vizinho (aresta de borda) ou depois de muitos passos, cai na varredura linear, que é a conta de sempre */
+  const posicao = (t, p) => {
+    const s = [cruz2(pontos[t[0]], pontos[t[1]], p), cruz2(pontos[t[1]], pontos[t[2]], p), cruz2(pontos[t[2]], pontos[t[0]], p)];
+    return { s, estrito: s.every((x) => x > eps), sobre: s.every((x) => x > -eps) };
+  };
+  let ultimo = null;
+  const localizar = (p) => {
+    let t = ultimo && triangulos.has(ultimo) ? ultimo : null;
+    for (let passos = 0; t && passos < 4 * triangulos.size + 10; passos++) {
+      const { s, estrito, sobre } = posicao(t, p);
+      if (estrito) return { alvo: t, sobre: false };
+      if (sobre) return { alvo: null, sobre: true };
+      let e = 0;
+      for (let q = 1; q < 3; q++) if (s[q] < s[e]) e = q;
+      const viz = arestas.get(chave(t[(e + 1) % 3], t[e]));
+      if (!viz) break;
+      t = viz;
     }
+    let sobre = false;
+    for (const u of triangulos) {
+      const r = posicao(u, p);
+      if (r.estrito) return { alvo: u, sobre: false };
+      if (r.sobre) sobre = true;
+    }
+    return { alvo: null, sobre };
+  };
+  for (const p of extras) {
+    const { alvo, sobre } = localizar(p);
     if (!alvo || sobre) continue;
     const id = pontos.length;
     tags.push({ tipo: 'extra', m: usados.length });
@@ -216,14 +356,13 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, base, 
     pontos.push(p);
     const [a, b, c] = alvo;
     remove(alvo);
-    novo(a, b, id); novo(b, c, id); novo(c, a, id);
+    novo(a, b, id, alvo.setor); novo(b, c, id, alvo.setor); ultimo = novo(c, a, id, alvo.setor);
     legaliza([[a, b], [b, c], [c, a]]);
   }
 
   // as provas: contagem, área, cada aresta de borda uma vez, cada interna em duas direções
   const finais = [...triangulos];
-  const nExtras = usados.length;
-  const esperado = contorno.length + M * L + 2 * M - 2 + 2 * nExtras;
+  const esperado = contorno.length + cantosDeApoio + 2 * M - 2 + 2 * usados.length;
   if (finais.length !== esperado) return null;
   let area = 0;
   for (const [a, b, c] of finais) { const t = cruz2(pontos[a], pontos[b], pontos[c]) / 2; if (!(t > 0)) return null; area += t; }
@@ -235,13 +374,30 @@ function montar({ contorno, aneis, escala, margemDentro, media }, apoios, base, 
     if (!fora && !arestas.has(chave(y, x))) return null;
   }
 
-  // as famílias: a borda j do anel k é o quadrilátero da aresta j; o resto é preenchimento
+  /* as famílias: a borda j do anel k é o quadrilátero da aresta j. Onde a aresta do apoio foi partida, o polígono teria cantos colineares, que o adaptador
+     pode triangular com um triângulo de área nula; então a borda j fica só com o triângulo da aresta do furo e do canto do meio do apoio, e o resto do
+     leque entra no preenchimento, onde o setor de j o recolhe. O resto é preenchimento. */
+  const leque = [];
+  const anexos = aneis.map((anel) => anel.map(() => []));
   const bordas = aneis.map((anel, k) => anel.map((_, j) => {
     const n = (j + 1) % L;
-    return { cantos: [{ tipo: 'anel', k, j: n }, { tipo: 'anel', k, j }, { tipo: 'apoio', k, j }, { tipo: 'apoio', k, j: n }] };
+    const q0 = inicio[k][j];
+    const q1 = inicio[k][n] === 0 ? apoios[k].length : inicio[k][n];
+    const apoio = (q) => ({ tipo: 'apoio', k, j: q % apoios[k].length });
+    if (q1 - q0 === 1) return { cantos: [{ tipo: 'anel', k, j: n }, { tipo: 'anel', k, j }, apoio(q0), apoio(q1)] };
+    /* o canto do meio do apoio liga os dois cantos do furo; a metade de lá do leque sai do canto j do anel e a metade de cá do canto j+1, o mais perto
+       de cada trecho, para o triângulo não ficar fino */
+    const meio = q0 + Math.floor((q1 - q0) / 2);
+    for (let q = q0; q < meio; q++) leque.push({ cantos: [{ tipo: 'anel', k, j }, apoio(q), apoio(q + 1)], k, j });
+    for (let q = meio; q < q1; q++) leque.push({ cantos: [{ tipo: 'anel', k, j: n }, apoio(q), apoio(q + 1)], k, j });
+    return { cantos: [{ tipo: 'anel', k, j: n }, { tipo: 'anel', k, j }, apoio(meio)] };
   }));
-  const preenchimento = finais.map((t) => ({ cantos: t.map((x) => tags[x]) }));
-  return { bordas, preenchimento, apoios, extras: usados };
+  const preenchimento = [...finais.map((t) => ({ cantos: t.map((x) => tags[x]) })), ...leque];
+  /* o que cada aresta do furo leva junto na `borda j` (e na `saida j`): o leque do apoio partido e, com UM furo, o setor inteiro, que é a área que a face
+     `borda j` da repartição antiga cobria. Com vários furos a `borda` cobria só os triângulos da aresta do furo, e o resto era preenchimento. */
+  finais.forEach((t, idx) => { if (t.setor != null) anexos[0][t.setor].push(idx); });
+  leque.forEach((d, idx) => anexos[d.k][d.j].push(finais.length + idx));
+  return { bordas, preenchimento, apoios, extras: usados, anexos };
 }
 
 function sePerto(A, B, escala) {

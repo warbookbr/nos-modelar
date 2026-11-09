@@ -2,47 +2,70 @@
 import { criarArestasEmGrupos, grupoCoplanar, indiceDeArestas } from './arestas-em-grupos.js';
 import { criarArestasEmCadeia, lerCadeia } from './arestas-em-cadeia.js';
 import { desvioDeFacePlana } from './face-plana.js';
-import { arestaMedia, CANTOS_DO_CONTORNO_DENSO, refazerEmAneis, temTrianguloFino } from './furo-em-aneis.js';
+import { arestaMedia, CANTOS_DO_CONTORNO_DENSO, refazerEmAneis } from './furo-em-aneis.js';
 
 export function criarOperacoesEstruturais(servicos) {
   const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAresta, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
   const arestasEmGrupos = criarArestasEmGrupos({ addV, addF, registraOrigem, grita });
   const arestasEmCadeia = criarArestasEmCadeia({ addV, addF, registraOrigem, grita, idDoPasso });
-  /* A face de entrada (ou de saída) do `furo`: uma face só, como sempre, ou uma REGIÃO PLANA de várias faces, como a tampa em leque do `lathe`:
-     as faces que `origem` resolve têm de ser, juntas, o grupo inteiro de faces coplanares ligadas por aresta (grupoCoplanar), com a borda
-     numa volta só. A região vira uma face de contorno único (as arestas que só uma das faces usa, na orientação delas), com a cor, o material
-     e a parte da face de menor id; os vértices de dentro dela (o polo do leque) somem na publicação se nenhuma outra face os usa.
-     Devolve { id, ids, face } ou null depois de gritar. */
+  /* A face de entrada (ou de saída) do `furo`: uma face só, como sempre, ou uma REGIÃO plana de várias faces, como a tampa em leque do `lathe` ou o setor
+     (`borda`) que uma face refeita em anéis deu a um furo: as faces vivas que `origem` resolve têm de ser coplanares (do grupo coplanar da menor), ligadas
+     por aresta, com a mesma cor, o mesmo material, a mesma parte e o mesmo liso e sólido, e a borda delas numa volta só. A região vira uma face de
+     contorno único (as arestas que só uma das faces usa, na orientação delas); os vértices de dentro dela (o polo do leque) somem na publicação se nenhuma
+     outra face os usa. Face da origem que já foi apagada não conta. Devolve { id, ids, face, regiao } ou null depois de gritar. */
   function regiaoDeEntrada(st, origem, op, campo, i) {
     const validacao = validarOrigem(origem);
     if (validacao.erro) return grita(st, i, op, campo, `${campo} exige uma origem estrutural {op,id,…}: ${validacao.erro}`), null;
     const r = resolverOrigem(st, origem);
     if (r.erro) return grita(st, i, op, campo, r.erro), null;
-    const ids = [...new Set(r.faces)].sort((x, y) => x - y);
+    const citadas = [...new Set(r.faces)].sort((x, y) => x - y);
+    const ids = citadas.filter((f) => st.F.has(f));
+    const dita = `${JSON.stringify(origem)} resolveu para ${ids.length} face(s) viva(s)${citadas.length > ids.length ? ` (${citadas.length - ids.length} já apagada(s))` : ''}`;
     if (ids.length === 1) return { id: ids[0], ids, face: st.F.get(ids[0]), regiao: false };
-    if (ids.length === 0) return grita(st, i, op, campo, `${campo} precisa resolver para EXATAMENTE uma face, ou para uma região plana de faces ligadas: ${JSON.stringify(origem)} resolveu para 0`), null;
+    if (ids.length === 0) return grita(st, i, op, campo, `${campo} precisa resolver para EXATAMENTE uma face, ou para uma região plana de faces ligadas: ${dita}`), null;
+    const lista = `${ids.slice(0, 8).join(', ')}${ids.length > 8 ? ', …' : ''}`;
+    const rotulo = `a região de ${ids.length} faces de ${campo} (${lista})`;
     const grupo = grupoCoplanar(st, indiceDeArestas(st), ids[0]);
-    if (grupo.size !== ids.length || ids.some((f) => !grupo.has(f))) {
-      return grita(st, i, op, campo, `${campo} precisa resolver para EXATAMENTE uma face, ou para uma região plana de faces ligadas por aresta e coplanares: ${JSON.stringify(origem)} resolveu para ${ids.length} faces (${ids.slice(0, 8).join(', ')}${ids.length > 8 ? ', …' : ''}), mas o grupo coplanar do menor id tem ${grupo.size}`), null;
+    const fora = ids.filter((f) => !grupo.has(f));
+    if (fora.length) {
+      return grita(st, i, op, campo, `${campo} precisa resolver para EXATAMENTE uma face, ou para uma região plana de faces ligadas por aresta e coplanares: ${dita} (${lista}), e ${fora.length} delas não estão no grupo coplanar ligado à de menor id ${ids[0]} (por exemplo a ${fora[0]})`), null;
     }
+    const fonte = st.F.get(ids[0]);
+    for (const nome of ['cor', 'material', 'parte', 'liso', 'solido']) {
+      const diferente = ids.find((f) => st.F.get(f)[nome] !== fonte[nome]);
+      if (diferente != null) return grita(st, i, op, campo, `${rotulo} mistura ${nome}: a face ${ids[0]} tem ${JSON.stringify(fonte[nome] ?? null)} e a ${diferente} tem ${JSON.stringify(st.F.get(diferente)[nome] ?? null)}; o furo lê a região como uma face só e as faces novas herdariam o atributo de uma delas, então a região precisa ter um atributo só`), null;
+    }
+    const conjunto = new Set(ids);
     const arestas = new Map();
     for (const fid of ids) { const vs = st.F.get(fid).vs; for (let k = 0; k < vs.length; k++) arestas.set(`${vs[k]}>${vs[(k + 1) % vs.length]}`, [vs[k], vs[(k + 1) % vs.length]]); }
+    // ligadas por aresta: a varredura a partir da menor alcança todas
+    const vistas = new Set([ids[0]]);
+    const fila = [ids[0]];
+    const dono = new Map();
+    for (const fid of ids) { const vs = st.F.get(fid).vs; for (let k = 0; k < vs.length; k++) dono.set(`${vs[k]}>${vs[(k + 1) % vs.length]}`, fid); }
+    while (fila.length) {
+      const vs = st.F.get(fila.pop()).vs;
+      for (let k = 0; k < vs.length; k++) {
+        const viz = dono.get(`${vs[(k + 1) % vs.length]}>${vs[k]}`);
+        if (viz != null && conjunto.has(viz) && !vistas.has(viz)) { vistas.add(viz); fila.push(viz); }
+      }
+    }
+    if (vistas.size !== ids.length) return grita(st, i, op, campo, `${rotulo} não é ligada por aresta: só ${vistas.size} das ${ids.length} faces se alcançam a partir da ${ids[0]}`), null;
     const seguinte = new Map();
-    for (const [chave, [a, b]] of arestas) {
+    for (const [, [a, b]] of arestas) {
       if (arestas.has(`${b}>${a}`)) continue;
-      if (seguinte.has(a)) return grita(st, i, op, campo, `a região de ${ids.length} faces de ${campo} toca a si mesma no vértice ${a}: a borda não é uma volta só`), null;
+      if (seguinte.has(a)) return grita(st, i, op, campo, `${rotulo} toca a si mesma no vértice ${a}: a borda não é uma volta só`), null;
       seguinte.set(a, b);
     }
-    if (!seguinte.size) return grita(st, i, op, campo, `a região de ${ids.length} faces de ${campo} não tem borda (superfície fechada)`), null;
+    if (!seguinte.size) return grita(st, i, op, campo, `${rotulo} não tem borda (superfície fechada)`), null;
     const inicio = seguinte.keys().next().value;
     const ciclo = [inicio];
     for (let v = seguinte.get(inicio); v !== inicio; v = seguinte.get(v)) {
-      if (v == null || ciclo.length > seguinte.size) return grita(st, i, op, campo, `a borda da região de ${ids.length} faces de ${campo} não fecha numa volta só`), null;
+      if (v == null || ciclo.length > seguinte.size) return grita(st, i, op, campo, `a borda d${rotulo.slice(1)} não fecha numa volta só`), null;
       ciclo.push(v);
     }
-    if (ciclo.length !== seguinte.size) return grita(st, i, op, campo, `a borda da região de ${ids.length} faces de ${campo} tem mais de uma volta (${ciclo.length} de ${seguinte.size} arestas): região com buraco não entra`), null;
-    const fonte = st.F.get(ids[0]);
-    return { id: ids[0], ids, regiao: true, face: { vs: ciclo, cor: fonte.cor, material: fonte.material, parte: fonte.parte, liso: fonte.liso, solido: fonte.solido } };
+    if (ciclo.length !== seguinte.size) return grita(st, i, op, campo, `a borda d${rotulo.slice(1)} tem mais de uma volta (${ciclo.length} de ${seguinte.size} arestas): região com buraco não entra`), null;
+    return { id: ids[0], ids, regiao: true, face: { vs: ciclo, rotulo, cor: fonte.cor, material: fonte.material, parte: fonte.parte, liso: fonte.liso, solido: fonte.solido } };
   }
   /* Os grupos de faces coplanares que se tocam por aresta dos dois lados da aresta. Um grupo de mais de uma face é uma
      tampa partida (perfil com furo, contorno por trechos); a costura em grupos cuida dela e a costura simples, de uma
@@ -755,15 +778,31 @@ export function criarOperacoesEstruturais(servicos) {
     }
 
     /* ---- as bordas, montadas ANTES de reservar id ----
+       Face de contorno denso (48 cantos ou mais): refeita em anéis (furo-em-aneis.js), sem passar pela repartição antiga, que é a parte cara. Se a
+       refeitura não aceita a face, o motivo sai em `avisos` e vale a repartição de sempre.
        UM anel: a volta simples de sempre, byte por byte. VÁRIOS: a partição
        por pontes e orelhas, que devolve as mesmas `L` faces por anel mais o
        preenchimento. */
     let bordaE = null, bordaS = null, cheioE = [], cheioS = [];
+    const aneisSaida = temSaida ? saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])) : null;
+    const refazer = (plano, aneisUV, lado) => {
+      if (plano.uv.length < CANTOS_DO_CONTORNO_DENSO) return null;
+      const r = refazerEmAneis({ contorno: plano.uv, aneis: aneisUV, raios: raiosPorFuro, escala: plano.escala, particionar, margemDentro, media: arestaMedia([plano.uv, ...aneisUV]) });
+      if (r.bordas) return r;
+      st.avisos.push({ passo: i, op: 'furo', ref: 'repartiçãoAntiga', lado, motivo: `a face de ${plano.uv.length} cantos não foi refeita em anéis (${r.motivo}); vale a repartição de sempre, com triângulos longos` });
+      return null;
+    };
+    const refeitaE = refazer(entrada, anelUVEntrada, 'entrada');
+    const refeitaS = temSaida ? refazer(saida, aneisSaida, 'saida') : null;
+    if (refeitaE) { bordaE = refeitaE.bordas; cheioE = refeitaE.preenchimento; }
+    if (refeitaS) { bordaS = refeitaS.bordas; cheioS = refeitaS.preenchimento; }
     if (M === 1) {
-      bordaE = bordaAnular(relEntrada[0].uvRel, relEntrada[0].anelRel);
-      if (bordaE.erro) return grita(st, i, 'furo', 'de', `entrada: ${bordaE.erro}`);
-      bordaE = [bordaE.faces];
-      if (temSaida) {
+      if (!refeitaE) {
+        bordaE = bordaAnular(relEntrada[0].uvRel, relEntrada[0].anelRel);
+        if (bordaE.erro) return grita(st, i, 'furo', 'de', `entrada: ${bordaE.erro}`);
+        bordaE = [bordaE.faces];
+      }
+      if (temSaida && !refeitaS) {
         const r = bordaAnular(saida.rel[0].uvRel, ordemSaida.map((j) => saida.rel[0].anelRel[j]));
         if (r.erro) return grita(st, i, 'furo', 'saida', `saída: ${r.erro}`);
         bordaS = [r.faces];
@@ -773,32 +812,18 @@ export function criarOperacoesEstruturais(servicos) {
          da saída não são a mesma, e uma ordem que fecha num lado pode travar no
          outro. `raiosPorFuro` preserva a ordem declarada; se todos os raios
          empatam, a terceira ordem é igual à declarada e some sozinha. */
-      const pE = particionar(entrada.uv, anelUVEntrada, entrada.escala, raiosPorFuro);
-      if (pE.erro) return grita(st, i, 'furo', 'de', `entrada: ${pE.erro}`);
-      bordaE = pE.bordas; cheioE = pE.preenchimento;
-      if (temSaida) {
-        const pS = particionar(saida.uv, saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])), saida.escala, raiosPorFuro);
+      if (!refeitaE) {
+        const pE = particionar(entrada.uv, anelUVEntrada, entrada.escala, raiosPorFuro);
+        if (pE.erro) return grita(st, i, 'furo', 'de', `entrada: ${pE.erro}`);
+        bordaE = pE.bordas; cheioE = pE.preenchimento;
+      }
+      if (temSaida && !refeitaS) {
+        const pS = particionar(saida.uv, aneisSaida, saida.escala, raiosPorFuro);
         if (pS.erro) return grita(st, i, 'furo', 'saida', `saída: ${pS.erro}`);
         bordaS = pS.bordas; cheioS = pS.preenchimento;
       }
     }
-
-    /* ---- a face furada refeita em anéis, onde a repartição acima deixou triângulo fino ----
-       Só a face cuja repartição tem triângulo fino (furo-em-aneis.js) é refeita: as outras ficam como eram. */
-    const refazer = (plano, aneisUV, bordas, cheio) => {
-      const contorno = plano.uv;
-      const poligonos = (M === 1 && bordas[0][0].externos
-        ? bordas[0].map((desc) => [...desc.externos.map((q) => contorno[q]), ...desc.anel.map((q) => aneisUV[0][q])])
-        : [...bordas.flat(), ...cheio].map((desc) => desc.cantos.map((t) => (t.tipo === 'contorno' ? contorno[t.i] : aneisUV[t.k][t.j]))));
-      const media = arestaMedia([contorno, ...aneisUV]);
-      if (contorno.length < CANTOS_DO_CONTORNO_DENSO || !temTrianguloFino(poligonos, media)) return null;
-      return refazerEmAneis({ contorno, aneis: aneisUV, raios: raiosPorFuro, escala: plano.escala, particionar, margemDentro, media });
-    };
-    const refeitaE = refazer(entrada, anelUVEntrada, bordaE, cheioE);
-    if (refeitaE) { bordaE = refeitaE.bordas; cheioE = refeitaE.preenchimento; }
-    const refeitaS = temSaida ? refazer(saida, saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])), bordaS, cheioS) : null;
-    if (refeitaS) { bordaS = refeitaS.bordas; cheioS = refeitaS.preenchimento; }
-    const nApoios = (refeitaE ? M * L : 0) + (refeitaS ? M * L : 0);
+    const nApoios = (refeitaE ? refeitaE.apoios.reduce((s, A) => s + A.length, 0) : 0) + (refeitaS ? refeitaS.apoios.reduce((s, A) => s + A.length, 0) : 0);
     const nExtras = (refeitaE ? refeitaE.extras.length : 0) + (refeitaS ? refeitaS.extras.length : 0);
 
     // guarda de overflow (D3), contada antes de inserir
@@ -880,6 +905,10 @@ export function criarOperacoesEstruturais(servicos) {
       for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
       for (const v of [...tocados].sort((x, y) => x - y)) if (!usados.has(v)) st.V.delete(v);
     }
+
+    // o setor de cada aresta do furo na face refeita em anéis: as faces do preenchimento que a `borda j` (e a `saida j`) leva junto
+    if (refeitaE) refeitaE.anexos.forEach((porJ, k) => { furos[k].anexosBorda = porJ.map((lista) => lista.map((q) => preenchimento[q])); });
+    if (refeitaS) refeitaS.anexos.forEach((porJ, k) => { furos[k].anexosSaida = porJ.map((lista) => lista.map((q) => preenchimentoDaSaida[q])); });
 
     registraOrigem(st, i, 'furo', a.origemId, { furos, grupos, preenchimento, preenchimentoDaSaida });
   },

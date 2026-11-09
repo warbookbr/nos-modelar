@@ -1454,9 +1454,9 @@ const CONTRATOS_ORIGEM = {
       }
       if (origem.saida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem saída; o fundo dele é tampa:'fundo'` };
       if (origem.tampa != null && passante) return { erro: `origem furo:${origem.id} é um furo PASSANTE — não tem fundo; a borda do outro lado é o eixo 'saida'` };
-      if (origem.preenchimento != null && !registro.preenchimento.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
+      if (origem.preenchimento != null && !registro.preenchimento.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo, ou com um só numa face de 48 cantos ou mais refeita em anéis` };
       if (origem.preenchimentoDaSaida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem preenchimento de saída; o outro lado dele é a tampa 'fundo'` };
-      if (origem.preenchimentoDaSaida != null && !registro.preenchimentoDaSaida.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda de saída dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
+      if (origem.preenchimentoDaSaida != null && !registro.preenchimentoDaSaida.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda de saída dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo, ou com um só numa face de 48 cantos ou mais refeita em anéis` };
 
       /* quais FUROS: o eixo `furo` ausente é "todos", como as famílias. */
       const furosDoAlvo = grupo ? grupo.furos : Array.from({ length: M }, (_, k) => k);
@@ -1484,14 +1484,17 @@ const CONTRATOS_ORIGEM = {
         if (grupo) return `do furo ${local} do grupo '${grupo.nome}' da origem furo:${origem.id}`;
         return M === 1 ? `da origem furo:${origem.id}` : `do furo ${k} da origem furo:${origem.id}`;
       };
-      const colher = (nome, lista, eixo, alvo) => {
+      /* `anexos[j]` são as faces do preenchimento que a face refeita em anéis dá à aresta j do furo (o setor que a repartição antiga dava à `borda j`): quem
+         escolhe a borda j leva junto o que ela cobria */
+      const colher = (nome, lista, eixo, alvo, anexos = null) => {
+        const leva = (j) => { for (const g of anexos?.[j] ?? []) if (st.F.has(g)) faces.push(g); };
         if (eixoDeIndiceUnico(eixo)) {
           const r = indiceDeEixo(st, eixo, lista.length);
           if (r.erro) return { erro: `${nome} '${eixo}' ${alvo} ${r.erro}` };
           if (r.idx >= lista.length) return { erro: `${nome} ${textoDeEixo(eixo, r.idx)} fora do limite ${alvo} (0..${lista.length - 1})` };
           const f = lista[r.idx];
           if (!st.F.has(f)) return { erro: `${nome} ${textoDeEixo(eixo, r.idx)} ${alvo} foi removida${consumoDe(st, f)}` };
-          faces.push(f);
+          faces.push(f); leva(r.idx);
           return null;
         }
         const idx = indicesEixo(eixo, lista.length);
@@ -1503,7 +1506,7 @@ const CONTRATOS_ORIGEM = {
           const f = lista[k];
           const consumo = conferirConsumo(st, f, `${nome} ${k} ${alvo}`);
           if (consumo) return { erro: consumo };
-          if (st.F.has(f)) faces.push(f);
+          if (st.F.has(f)) { faces.push(f); leva(k); }
         }
         return null;
       };
@@ -1512,12 +1515,12 @@ const CONTRATOS_ORIGEM = {
         const k = furosDoAlvo[local];
         const registroDoFuro = furos[k];
         const alvo = alvoDo(k, local);
-        const familias = [['borda', registroDoFuro.bordas], ['parede', registroDoFuro.paredes], ['saida', registroDoFuro.saidas]];
-        for (const [nome, lista] of familias) {
+        const familias = [['borda', registroDoFuro.bordas, registroDoFuro.anexosBorda], ['parede', registroDoFuro.paredes, null], ['saida', registroDoFuro.saidas, registroDoFuro.anexosSaida]];
+        for (const [nome, lista, anexos] of familias) {
           if (lista == null) continue;
           const eixo = origem[nome];
           if (eixo == null && !semFamilia) continue;
-          const erro = colher(nome, lista, eixo, alvo);
+          const erro = colher(nome, lista, eixo, alvo, anexos);
           if (erro) return erro;
         }
         if (registroDoFuro.fundo != null && (origem.tampa != null || semFamilia)) {
@@ -1541,7 +1544,7 @@ const CONTRATOS_ORIGEM = {
         if (erro) return erro;
       }
       if (!faces.length) return { erro: `origem furo:${origem.id} não tem nenhuma face correspondente` };
-      return { faces };
+      return { faces: [...new Set(faces)] };
     },
   },
   /* filete (ciclo "Curva e filete v1") — a origem que a op `filete` publica: os
@@ -2257,9 +2260,10 @@ function transportaLoft(uPrev, t) {
    plana de várias faces, que o `furo` lê como uma face só. */
 function poligonoPlano(st, fid, referencia, faceLike) {
   const f = faceLike ?? st.F.get(fid);
+  const rotulo = faceLike?.rotulo ?? `a face ${fid}`;
   const P = f.vs.map((v) => st.V.get(v));
-  if (P.some((p) => !p)) return { erro: `a face ${fid} tem canto sem posição` };
-  if (P.length < 3) return { erro: `a face ${fid} tem ${P.length} canto(s) — um polígono precisa de 3` };
+  if (P.some((p) => !p)) return { erro: `${rotulo} tem canto sem posição` };
+  if (P.length < 3) return { erro: `${rotulo} tem ${P.length} canto(s) — um polígono precisa de 3` };
   const N = normalDaFace(st.V, f.vs);
   const c = [0, 0, 0];
   for (const p of P) { c[0] += p[0] / P.length; c[1] += p[1] / P.length; c[2] += p[2] / P.length; }
@@ -2268,13 +2272,13 @@ function poligonoPlano(st, fid, referencia, faceLike) {
   const tol = 1e-6 * Math.max(1, escala);
   for (let k = 0; k < P.length; k++) {
     const d = (P[k][0] - c[0]) * N[0] + (P[k][1] - c[1]) * N[1] + (P[k][2] - c[2]) * N[2];
-    if (Math.abs(d) > tol) return { erro: `a face ${fid} não é plana: o canto ${f.vs[k]} está a ${d.toFixed(6)} do plano médio (tolerância ${tol.toExponential(1)})` };
+    if (Math.abs(d) > tol) return { erro: `${rotulo} não é plana: o canto ${f.vs[k]} está a ${d.toFixed(6)} do plano médio (tolerância ${tol.toExponential(1)})` };
   }
   let u;
   if (referencia) {
     const dot = referencia[0] * N[0] + referencia[1] * N[1] + referencia[2] * N[2];
     const px = referencia[0] - N[0] * dot, py = referencia[1] - N[1] * dot, pz = referencia[2] - N[2] * dot;
-    if (Math.hypot(px, py, pz) < 1e-4) return { erro: `orientacao ${JSON.stringify(referencia.map((n) => +n.toFixed(6)))} é paralela à normal da face ${fid} — a projeção no plano da face é nula, não há orientação a declarar` };
+    if (Math.hypot(px, py, pz) < 1e-4) return { erro: `orientacao ${JSON.stringify(referencia.map((n) => +n.toFixed(6)))} é paralela à normal ${faceLike?.rotulo ? `d${rotulo.slice(1)}` : `da face ${fid}`} — a projeção no plano da face é nula, não há orientação a declarar` };
     u = norm3(px, py, pz);
   } else {
     u = quadroLoft(N)[0];
