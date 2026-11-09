@@ -48,6 +48,9 @@ processo o teria pego sozinho e o destino.
    está no contorno lateral, e o contorno cruzado com a planta curva só o mantém no centro: para os lados a planta
    corta antes, e a borda de baixo do capô, vista de trás, sobe no meio. Na referência a divisa é uma reta, porque o
    canto acompanha a curva da traseira. A comparação por cor não acusou (o laranja coincidia em 90%); a pessoa apontou.
-   Destino: no rascunho a divisa passou a ser reta, com o canto fora do contorno (o laranja foi a 95%). O limite é do
-   método: o que acompanha a traseira curva (o canto, o bico do capô, a rampa da grade) pede a seção lateral levada ao
-   longo da planta, e não o cruzamento das duas, e é isso que o gerador por vistas precisa ganhar ao virar recurso.
+   Destino: `lacosPelasVistas` (`procedural/nucleo/lacos-pelas-vistas.js`, com teste e ficha em `npm run capacidade`)
+   dá os laços horizontais de `gaiolaPorLacos` a partir da silhueta de lado, da largura por altura e da planta, com a
+   ponta da planta levada à silhueta em toda altura; o rascunho da traseira (`carcaca-traseira.esboco.mjs`) passou a
+   sair dele, com a divisa reta, o bico acompanhando a curva e a superfície lisa da subdivisão. A coincidência por cor
+   caiu de 81% para 70% porque a subdivisão arredonda os cantos e a caixa ficou 2% mais larga no bico; a forma é
+   julgada pela pessoa na imagem.

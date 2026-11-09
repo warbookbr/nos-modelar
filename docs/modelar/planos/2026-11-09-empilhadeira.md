@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 
@@ -41,6 +41,9 @@ da torre, elevação, volante) nos eixos certos e nenhuma peça cruzando outra.
 - Os envios são checkpoints no ramo da sessão e **não** vão à main: o commit de
   checkpoint leva `[skip ci]` na mensagem, porque o CI junta à main todo envio
   verde a `claude/**`. A junção à main fica para quando a pessoa pedir.
+- Em 2026-11-09 a pessoa pediu o gerador que leva a seção lateral ao longo da
+  planta (`lacosPelasVistas`, no núcleo), depois de ver a divisa do capô em
+  arco no rascunho da traseira; por isso o território inclui os arquivos dele.
 - As imagens de IA entram em `procedural/pecas/empilhadeira/referencias/` como
   alvo de caráter, uma vista por arquivo, sem valer como medida (CLAUDE.md); a
   lateral entra pelos contornos de outubro. A medida vem da `TABELA`.

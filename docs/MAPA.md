@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1748 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1751 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1023,6 +1023,8 @@
 - `gaiola-por-rede.test.mjs` — gaiola-por-rede.test.mjs — o ajudante que monta a gaiola da subdivisão por uma rede de curvas nomeadas e os retalhos que elas fecham
 - `gaiola-varrida.js` — gaiola-varrida.js — a gaiola de uma superfície varrida: uma seção dada ao longo de um trilho dado, com estações, alargamento e recortes
 - `gaiola-varrida.test.mjs` — gaiola-varrida.test.mjs — a gaiola varrida: uma régua em reta, um friso em arco com as pontas cortadas numa altura, uma seção com borda rolada e alargamento,…
+- `lacos-pelas-vistas.js` — lacos-pelas-vistas.js — os laços de `gaiolaPorLacos` tirados de três vistas: a silhueta de lado, a largura por altura e a planta
+- `lacos-pelas-vistas.test.mjs` — lacos-pelas-vistas.test.mjs — os laços tirados de três vistas: a ponta acompanha a planta em toda altura, a gaiola por laços os aceita e as entradas que não …
 - `lacunas.js` — lacunas.js — diagnóstico e planejamento estrutural puros sobre o catálogo. Não executa receita, não grava disco e não decide promoção de capacidade.
 - `lacunas.test.mjs` — lacunas-capacidade.test.mjs — R08: diagnóstico persistível e busca estrutural.
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
@@ -1514,6 +1516,10 @@
 ## procedural/pecas/empilhadeira/
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
+
+## procedural/pecas/empilhadeira/referencias/
+
+- `carcaca-traseira.esboco.mjs` — carcaca-traseira.esboco.mjs — o rascunho da traseira da carcaça (capô, tampa, grade e contrapeso) pelas três vistas.
 
 ## procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/
 
