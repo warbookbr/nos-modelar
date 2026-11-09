@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1730 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1258,6 +1258,10 @@
 ## procedural/pecas/braco-robotico/partes/anel-cotovelo/
 
 - `receita.js` — braco-robotico/anel-cotovelo — o colar fixo entre a coluna e o cotovelo.
+
+## procedural/pecas/braco-robotico/partes/antebraco/
+
+- `receita.js` — braco-robotico/antebraco — o tubo reto que sai do anel do antebraço, na horizontal, até onde a carcaça do punho se prende.
 
 ## procedural/pecas/braco-robotico/partes/base/
 
