@@ -579,7 +579,7 @@
     },
     {
       "instancia": "eloPunho5",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "eloPunho5SentaNoAnel",
@@ -624,7 +624,14 @@
           }
         }
       ],
-      "forma": "sha256:7655646e5cd30df1dd691122ee7e4dbb07aa635bef490796db37b3e85ed2afe3"
+      "forma": "sha256:7655646e5cd30df1dd691122ee7e4dbb07aa635bef490796db37b3e85ed2afe3",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o elo da junta 5 do punho, com o pé e o tubo de 135 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
