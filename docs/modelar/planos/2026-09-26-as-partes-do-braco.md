@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`, `procedural/nucleo/operacoes/booleanas.js` no arredondamento da costura, `procedural/nucleo/operacoes/geradores-avancados.js` no limite de ids do lathe e do loft, `tools/modelar/conferir-pontos.mjs`, `tools/modelar/guardas/guarda-acervo.mjs`, `src/autoria/porta-confere-forma.js` na conferência da porta contra a forma, por decisão da pessoa em 2026-11-09
+**Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/conferir-pontos.mjs`, `src/autoria/porta-confere-forma.js` na conferência da porta contra a forma, por decisão da pessoa em 2026-11-09
 
 **Descongelado em:** 2026-11-03, por decisão da pessoa, que viu na bancada o ombro desproporcional ao resto do conjunto. Estava congelado desde 2026-09-29 para o esboço deixar de custar conta à mão; os planos do esboço e das ferramentas de modelagem que vieram antes fecharam.
 
@@ -13,6 +13,7 @@
 
 Em 2026-11-05, com o braço parado, a pessoa deixou que a ferramenta de vistas do crítico (`vistas-para-critica.mjs`) passe ao plano do [esboço pelo núcleo](encerrados/2026-11-05-esboco-pelo-nucleo.md) durante a migração do pacote do crítico; ela voltou a este território quando aquele plano fechou, em 2026-11-05.
 Em 2026-11-08 a pessoa passou `procedural/nucleo/operacoes/booleanas.js` ao plano da [união de tubos com arredondamento](encerrados/2026-11-08-uniao-de-tubos-com-arredondamento.md), que corrigiu o `arredondarCostura` onde o arredondamento chega à tampa plana de um tubo; ele voltou a este território quando aquele plano fechou, no mesmo dia, e o cotovelo é refeito com `unir` e `arredondarCostura`.
+Em 2026-11-09, com o braço inteiro fixo e a exportação por fazer, a pessoa passou `booleanas.js`, `geradores-avancados.js` e `guarda-acervo.mjs` ao plano das [costuras e furos limpos](2026-11-09-costuras-e-furos-limpos.md) e `etapas-da-montagem.mjs` ao das [ferramentas de conferência e de vista](2026-11-09-ferramentas-de-conferencia-e-vista.md); eles voltam a este território quando aqueles planos fecharem.
 
 ## Problema observado
 

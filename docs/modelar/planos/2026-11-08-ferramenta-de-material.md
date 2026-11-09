@@ -3,8 +3,8 @@
 **Estado:** rascunho
 
 **Território:** a declarar ao ativar; o plano dos [materiais realistas](encerrados/2026-11-08-materiais-realistas.md), que dividia
-com este `src/autoria/material-da-receita.js`, `modulos/textura/` e `src/bancada/`, fechou em 2026-11-08; a captura toca
-`tools/modelar/olhar-bancada.mjs`, hoje do furgão.
+com este `src/autoria/material-da-receita.js`, `modulos/textura/` e `src/bancada/`, fechou em 2026-11-08; o `--ambiente` da captura já existe, e a câmera
+por ponto e o nome curto passaram ao plano das [ferramentas de conferência e de vista](2026-11-09-ferramentas-de-conferencia-e-vista.md).
 
 **Responsável:** Tiago (aprovação por imagem) e a IA da sessão (implementação)
 
@@ -42,8 +42,6 @@ o material efetivo de cada parte e de onde veio cada valor.
   espelhado, aço pintado, borracha, plástico acetinado), sem objeto nem marca, e a receita declara `base` mais o que muda.
 - **Material efetivo:** o normalizador devolve, para cada campo, o valor final e a origem (padrão, base ou receita), e a
   bancada e o `descrever` o mostram.
-- **Captura:** `--ambiente` na `olhar-bancada.mjs`, nome de arquivo curto com resumo da seleção, e câmera por azimute,
-  elevação e distância.
 
 ## Excluído
 
@@ -60,7 +58,7 @@ o material efetivo de cada parte e de onde veio cada valor.
 
 ## Fatias
 
-1. Material efetivo com origem, e a captura com `--ambiente`, nome curto e câmera.
+1. Material efetivo com origem.
 2. Amostra rápida.
 3. Relevo composto, com o pneu de prova num material.
 4. Biblioteca de materiais e a adoção nas peças que já declaram material físico.

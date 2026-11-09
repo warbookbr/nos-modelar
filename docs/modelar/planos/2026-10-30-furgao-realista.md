@@ -2,7 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`, `src/autoria/corte-de-plano.js`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`
+**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`, `src/autoria/corte-de-plano.js`
+
+Em 2026-11-09 `src/autoria/plano-de-modelagem.js` e `tools/modelar/olhar-bancada.mjs`, com os testes deles, passaram ao plano das [ferramentas de conferência e de vista](2026-11-09-ferramentas-de-conferencia-e-vista.md), que os muda para todas as peças.
 
 **Responsável:** Claude, com a pessoa decidindo o alinhamento e aprovando a forma por imagem
 
