@@ -1258,7 +1258,7 @@
 
 ## procedural/pecas/braco-robotico/partes/antebraco/
 
-- `receita.js` — braco-robotico/antebraco — um pé redondo deitado no eixo da junta do cotovelo e o tubo que sai dele na horizontal, numa malha única.
+- `receita.js` — braco-robotico/antebraco — um pé redondo deitado no eixo da junta do cotovelo, o tubo que sai dele na horizontal e, na ponta, a carcaça da junta 4, numa malh…
 
 ## procedural/pecas/braco-robotico/partes/base/
 

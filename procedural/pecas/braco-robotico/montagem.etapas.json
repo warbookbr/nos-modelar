@@ -327,7 +327,7 @@
     },
     {
       "instancia": "antebraco",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [
         {
           "relacao": "antebracoSentaNoAnel",
@@ -372,7 +372,7 @@
           }
         }
       ],
-      "forma": "sha256:6c62ea8ef4c04071f02c11166c12c267421fe1859aeb8421012cb75ee9555946",
+      "forma": "sha256:cfe0e44ab8548a92240f39d11843fe8f69da868df96fcf13fc09658fa8dc88af",
       "reaberturas": [
         {
           "por": "pessoa",
@@ -386,15 +386,21 @@
             "analise": "ausente"
           },
           "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a"
+        },
+        {
+          "por": "pessoa",
+          "quando": "2026-11-09",
+          "motivo": "a carcaça da junta 4 do punho passa a fazer parte do antebraço",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:6c62ea8ef4c04071f02c11166c12c267421fe1859aeb8421012cb75ee9555946"
         }
-      ],
-      "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      }
+      ]
     }
   ]
 }
