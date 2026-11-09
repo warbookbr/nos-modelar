@@ -353,8 +353,12 @@ try {
     ['de tras', 'traseira'],
   ];
   for (const [comoEstaOlhando, vista] of angulos) {
-    await pagina.evaluate((v) => window.__mecanificaBancada.ambiente().definirVista(v), vista);
-    await pagina.waitForTimeout(900);
+    /* A troca de vista é animada, e a prova lê o pixel onde o vértice se projeta com a câmera daquele instante: com a
+       espera fixa de 900 ms, o CI carregado tirava a foto da vista de frente com a câmera ainda andando, e o ponto
+       caía fora do realce (falhou duas vezes, em 2026-11-08 e 2026-11-09). A prova é do realce, e não da transição,
+       então a vista vai instantânea e a foto espera dois quadros desenhados. */
+    await pagina.evaluate((v) => window.__mecanificaBancada.ambiente().definirVista(v, { instantaneo: true }), vista);
+    await pagina.evaluate(() => new Promise((pronto) => requestAnimationFrame(() => requestAnimationFrame(pronto))));
     const branco = await realceAparece();
     ok(`o vértice selecionado aparece branco na imagem, ${comoEstaOlhando}`,
       branco !== null && branco >= 200, branco === null ? 'fora do quadro' : `canal mais escuro ${branco}`);
