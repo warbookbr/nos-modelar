@@ -411,7 +411,7 @@
     },
     {
       "instancia": "anelPunho4",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelPunho4SentaNaSaida",
@@ -456,11 +456,18 @@
           }
         }
       ],
-      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6"
+      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o anel e o elo da junta 4 do punho, com 135 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "eloPunho4",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "eloPunho4SentaNoAnel",
@@ -505,7 +512,14 @@
           }
         }
       ],
-      "forma": "sha256:1dbdb6d83d668745f96805d978d9fd501f22b6a6efb8493b4d285c259ef31207"
+      "forma": "sha256:1dbdb6d83d668745f96805d978d9fd501f22b6a6efb8493b4d285c259ef31207",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o anel e o elo da junta 4 do punho, com 135 mm",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
