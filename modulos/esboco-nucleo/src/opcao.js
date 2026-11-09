@@ -59,6 +59,11 @@ import {
 
 export { RecusaDoEsboco, LADOS };
 export const AJUDANTES = Object.freeze({ gaiolaPorLacos, gaiolaPorEstacoes, gaiolaPorRede, gaiolaVarrida });
+/* Os nomes de cor que os esboços guardados usam (2026-11-09), cada um num tom de bancada; o mais é '#rrggbb'. */
+const CORES_POR_NOME = Object.freeze({
+  cinza: '#8a9096', preto: '#1c1d20', branco: '#e8eae6', azul: '#3f63b8', verde: '#4f8a52', vermelho: '#b8433b',
+  amarelo: '#d8b43a', laranja: '#d97a2b', roxo: '#7a55a8',
+});
 const CHAVES_DA_FORMA = new Set(['id', 'op', 'args', 'ajudante', 'subdivisao', 'centro', 'por', 'sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'rotacao', 'repete', 'espelha', 'contato', 'oculto', 'cor', 'rotulo']);
 const CHAVES_DA_OPCAO = new Set(['titulo', 'nota', 'passos', 'topo', 'aliases', 'formas', 'legendas']);
 export const RELACOES = Object.freeze(['encosta', 'atravessa', 'folga']);
@@ -351,7 +356,18 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
     if (espelho) PASSOS.push(['espelha', { eixo: espelho.eixo, pos: espelho.pos, sel }]);
     partes.push(f.id);
   }
-  const receita = { meta: { nome: nome ?? (opcao.titulo ?? 'opcao') }, PASSOS, ...(Object.keys(topo).length ? { TOPO: topo } : {}), ...(aliases.length ? { ALIASES: aliases } : {}) };
+  /* A COR DA FORMA VIRA MATERIAL. O campo `cor` era aceito e só seguia para o relato, e a captura sorteava uma cor por parte que
+     mudava entre opções (2026-11-09, esboço do retrovisor do furgão). Agora a forma com `cor` ganha um material liso dessa cor, e a
+     captura com cor de material (`--sem-cores`, ou sozinha quando alguma forma declara cor) a mostra igual em todas as opções. */
+  const MATERIAIS = {};
+  for (const f of formas) {
+    if (f.cor === undefined || f.cor === null) continue;
+    const hex = typeof f.cor === 'string' ? (CORES_POR_NOME[f.cor] ?? f.cor) : null;
+    if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) recusar(`'cor' precisa ser '#rrggbb' ou um de ${Object.keys(CORES_POR_NOME).join(', ')}; veio ${JSON.stringify(f.cor)}`, `${rotulo}, forma "${f.id}"`);
+    MATERIAIS[`cor-${f.id}`] = { cor: hex.toLowerCase() };
+    PASSOS.push(['material', { sel: { grupo: f.id }, usa: `cor-${f.id}` }]);
+  }
+  const receita = { meta: { nome: nome ?? (opcao.titulo ?? 'opcao') }, PASSOS, ...(Object.keys(MATERIAIS).length ? { MATERIAIS } : {}), ...(Object.keys(topo).length ? { TOPO: topo } : {}), ...(aliases.length ? { ALIASES: aliases } : {}) };
   /* a receita inteira passa pelo executor, que é a conferência final: o que o núcleo não faz volta aqui com o motivo */
   const neutro = executar(receita, rotulo);
   for (const id of partes) {

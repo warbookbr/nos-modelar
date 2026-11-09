@@ -79,3 +79,16 @@ describe('o atalho de posição', () => {
     expect(recusa({ titulo: 't', formas: [{ id: 'a', ajudante: 'gaiolaQueNaoExiste' }] })).toMatch(/ajudante "gaiolaQueNaoExiste" não existe/);
   });
 });
+
+describe('a cor da forma', () => {
+  it('vira um material liso da forma, e a cor fora do formato é recusada', () => {
+    const { receita, neutro } = receitaDaOpcao({ formas: [{ id: 'corpo', op: 'cubo', args: { lado: 100 }, cor: '#141416' }, { id: 'tampa', op: 'cubo', args: { lado: 50 }, sobre: 'corpo' }] });
+    expect(receita.MATERIAIS).toEqual({ 'cor-corpo': { cor: '#141416' } });
+    const doCorpo = [...neutro.F.values()].filter((f) => f.parte === 'corpo');
+    expect(doCorpo.length).toBeGreaterThan(0);
+    expect(doCorpo.every((f) => f.material === 'cor-corpo')).toBe(true);
+    expect([...neutro.F.values()].filter((f) => f.parte === 'tampa').every((f) => !f.material)).toBe(true);
+    expect(receitaDaOpcao({ formas: [{ id: 'corpo', op: 'cubo', args: { lado: 100 }, cor: 'preto' }] }).receita.MATERIAIS).toEqual({ 'cor-corpo': { cor: '#1c1d20' } });
+    expect(() => receitaDaOpcao({ formas: [{ id: 'corpo', op: 'cubo', args: { lado: 100 }, cor: 'grafite' }] })).toThrow(/'cor' precisa ser '#rrggbb' ou um de cinza/);
+  });
+});
