@@ -33,6 +33,8 @@ const X_CORPO = 58; // onde o perfil do colchete entra no relevo
 const X_VAO = 104; // o fundo do vão: o corpo de apoio tem 46 mm de espessura além de X_CORPO
 const PLACA_E = 40; // espessura da placa
 const RELEVO = 22; // altura do relevo abaulado sobre a placa
+const GIRO = 10; // graus em torno do eixo vertical; positivo leva a ponta da carcaça para -z (para cima na vista superior)
+const X_DOBRA = X_VAO + RAIO_VAO; // onde os braços deixam o corpo de apoio e dobram: depois dos cantos do vão
 const DOBRADICA = { larg: 40, alt: 90, prof: PROF_BRACO + 8 };
 
 /** Contorno [a, b] de um polígono com cada canto concordado por um arco de raio `r` (um número ou um por vértice, limitado ao que
@@ -135,7 +137,13 @@ function retrovisor(dist, prof) {
     ['cubo', { origemId: 1, larg: 30, alt: 900, prof: 700, em: [-15, -410, 0] }],
     ['extrusao', { origemId: 2, eixo: 'x', altura: PLACA_E, perfil: paraX(placaYZ), segmentosArco: 8 }],
     ['loft', { origemId: 3, secoes: relevo, lados: 36 }],
+    /* o colchete duas vezes, cortado em x na dobra: o corpo de apoio fica reto e os braços giram */
     ['extrusao', { origemId: 4, eixo: 'z', altura: PROF_BRACO, perfil: paraZ(colchete), em: [0, 0, Z0 - PROF_BRACO / 2] }],
+    ['cubo', { origemId: 19, larg: X_DOBRA + 50, alt: 600, prof: 200, em: [(X_DOBRA - 50) / 2, 60, Z0] }],
+    ['intersectar', { origemId: 20, solidos: [{ origem: { op: 'extrusao', id: 4 } }, { origem: { op: 'cubo', id: 19 } }] }],
+    ['extrusao', { origemId: 21, eixo: 'z', altura: PROF_BRACO, perfil: paraZ(colchete), em: [0, 0, Z0 - PROF_BRACO / 2] }],
+    ['cubo', { origemId: 22, larg: X_DOBRA + 50, alt: 600, prof: 200, em: [(X_DOBRA - 50) / 2, 60, Z0] }],
+    ['subtrair', { origemId: 23, solidos: [{ origem: { op: 'extrusao', id: 21 } }, { origem: { op: 'cubo', id: 22 } }] }],
     ['extrusao', { origemId: 5, eixo: 'z', altura: DOBRADICA.prof, perfil: paraZ(dobradica), em: [0, 0, Z0 - DOBRADICA.prof / 2] }],
     /* a carcaça duas vezes, porque cada booleana consome a entrada: uma para a lente, outra para o resto */
     ['loft', { origemId: 6, secoes: loft, lados: 36 }],
@@ -149,8 +157,12 @@ function retrovisor(dist, prof) {
     ['subtrair', { origemId: 14, solidos: [{ origem: { op: 'subtrair', id: 11 } }, { origem: { op: 'extrusao', id: 12 } }, { origem: { op: 'extrusao', id: 13 } }] }],
     ['extrusao', { origemId: 15, eixo: 'z', altura: PROF_VIDRO, perfil: polReb(yPlanoBaixo, yAlto, 0.8, 24), em: [0, 0, zF + PROF_REB - PROF_VIDRO] }],
     ['extrusao', { origemId: 16, eixo: 'z', altura: PROF_VIDRO, perfil: polReb(yFundo, yConvexoAlto, 0.8, 24), em: [0, 0, zF + PROF_REB - PROF_VIDRO] }],
-    ['unir', { origemId: 17, solidos: [{ origem: { op: 'extrusao', id: 2 } }, { origem: { op: 'loft', id: 3 } }, { origem: { op: 'extrusao', id: 4 } }, { origem: { op: 'extrusao', id: 5 } }] }],
-    ['unir', { origemId: 18, solidos: [{ origem: { op: 'unir', id: 17 } }, { origem: { op: 'subtrair', id: 14 } }] }],
+    /* o fixo: placa, relevo e corpo de apoio; o que gira: braços, dobradiça e carcaça, em torno do eixo y que passa pela dobra */
+    ['unir', { origemId: 17, solidos: [{ origem: { op: 'extrusao', id: 2 } }, { origem: { op: 'loft', id: 3 } }, { origem: { op: 'intersectar', id: 20 } }] }],
+    ['unir', { origemId: 24, solidos: [{ origem: { op: 'subtrair', id: 23 } }, { origem: { op: 'extrusao', id: 5 } }, { origem: { op: 'subtrair', id: 14 } }] }],
+    ...[{ op: 'unir', id: 24 }, { op: 'intersectar', id: 8 }, { op: 'extrusao', id: 15 }, { op: 'extrusao', id: 16 }]
+      .map((origem) => ['rotaciona', { eixo: 'y', graus: GIRO, pivo: [X_DOBRA, 0, Z0], sel: { origem } }]),
+    ['unir', { origemId: 18, solidos: [{ origem: { op: 'unir', id: 17 } }, { origem: { op: 'unir', id: 24 } }] }],
     ['parte', { nome: 'porta', sel: { origem: { op: 'cubo', id: 1 } } }],
     ['parte', { nome: 'estrutura', sel: { origem: { op: 'unir', id: 18 } } }],
     ['parte', { nome: 'lente', sel: { origem: { op: 'intersectar', id: 8 } } }],
@@ -160,7 +172,7 @@ function retrovisor(dist, prof) {
   return { passos };
 }
 
-const a = retrovisor(275, 110);
+const a = retrovisor(235, 110);
 
 export default {
   formato: 'esboco-nucleo@1',
