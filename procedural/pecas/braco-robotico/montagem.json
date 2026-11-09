@@ -51,6 +51,13 @@
         "tipo": "peca",
         "ref": "braco-robotico/anel-punho-4"
       }
+    },
+    {
+      "id": "eloPunho4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/elo-punho-4"
+      }
     }
   ],
   "relacoes": [
@@ -218,6 +225,39 @@
         },
         "toleranciaNumerica": 1e-06
       }
+    },
+    {
+      "id": "eloPunho4SentaNoAnel",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "anelPunho4"
+        ],
+        "porta": "topo"
+      },
+      "movel": {
+        "caminho": [
+          "eloPunho4"
+        ],
+        "porta": "apoio"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
     }
   ],
   "etapas": [
@@ -227,7 +267,8 @@
     "braco",
     "anelAntebraco",
     "antebraco",
-    "anelPunho4"
+    "anelPunho4",
+    "eloPunho4"
   ],
   "vinculos": [
     {
@@ -299,6 +340,20 @@
       },
       "unidade": "mm",
       "acrescimo": 0
+    },
+    {
+      "id": "eloComORaioDoAnel",
+      "alvo": {
+        "instancia": "eloPunho4",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "anelPunho4",
+        "porta": "topo",
+        "medida": "raioExterno"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
     }
   ],
   "posicoes": [
@@ -364,6 +419,17 @@
       "em": {
         "instancia": "antebraco",
         "porta": "saida"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "eloPunho4SobreOAnel",
+      "instancia": "eloPunho4",
+      "porta": "apoio",
+      "em": {
+        "instancia": "anelPunho4",
+        "porta": "topo"
       },
       "unidade": "mm",
       "afastamento": 0
