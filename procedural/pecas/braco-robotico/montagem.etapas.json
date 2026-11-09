@@ -327,7 +327,7 @@
     },
     {
       "instancia": "antebraco",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "antebracoSentaNoAnel",
@@ -400,7 +400,14 @@
           },
           "forma": "sha256:6c62ea8ef4c04071f02c11166c12c267421fe1859aeb8421012cb75ee9555946"
         }
-      ]
+      ],
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o antebraço com a carcaça da junta 4, pé e carcaça de 190 mm e o tubo rente",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      }
     }
   ]
 }
