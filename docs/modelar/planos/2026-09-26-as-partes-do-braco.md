@@ -97,6 +97,8 @@ Em 2026-11-08 a pessoa alinhou o anel do cotovelo e o cotovelo (seção no `ALIN
 
 Em 2026-11-09 o cotovelo foi refeito como dois tubos unidos com arredondamento e alongado a 190 mm, e entraram o anel do antebraço (único de 25 mm, rente) e o antebraço (tubo de 156 mm). Com o antebraço montado, a pessoa conferiu os eixos e viu que a junta do cotovelo girava o antebraço em torno dele mesmo; o cotovelo virou espelho do ombro, com o eixo paralelo ao dele e a saída para o lado oposto, e o antebraço virou o T da coluna. As três etapas estão fixas por aceite dela, o antebraço com o pé de 176 mm até a conferência de porta aceitar peça em T (backlog). O alinhamento passou a perguntar o eixo de cada junta. Segue o punho.
 
+Ainda em 2026-11-09 o colar do cotovelo saiu (não gira) e a coluna cresceu 25 mm; a coluna e o cotovelo viraram uma peça só, o braço superior, depois da correção do `arredondarCostura` no T com o tubo vertical alto; os tubos passaram a 190 mm, o diâmetro do anel do ombro; a conferência da porta contra a forma passou a medir a face que assenta (território estendido pela pessoa); e o punho entrou com as três juntas, a carcaça da junta 4 no antebraço, os anéis e elos de 135 mm e o flange de 154 mm com oito furos e um central. Todas as etapas até o elo da junta 5 estão fixas por aceite dela; o anel da junta 6 e o flange esperam o aceite. Falta a exportação do braço montado.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,

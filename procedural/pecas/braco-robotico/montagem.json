@@ -72,6 +72,20 @@
         "tipo": "peca",
         "ref": "braco-robotico/elo-punho-5"
       }
+    },
+    {
+      "id": "anelPunho6",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/anel-punho-6"
+      }
+    },
+    {
+      "id": "flange",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/flange"
+      }
     }
   ],
   "relacoes": [
@@ -338,6 +352,72 @@
         },
         "toleranciaNumerica": 1e-06
       }
+    },
+    {
+      "id": "anelPunho6SentaNaSaida",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "eloPunho5"
+        ],
+        "porta": "saida"
+      },
+      "movel": {
+        "caminho": [
+          "anelPunho6"
+        ],
+        "porta": "apoio"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    },
+    {
+      "id": "flangeSentaNoAnel",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "anelPunho6"
+        ],
+        "porta": "topo"
+      },
+      "movel": {
+        "caminho": [
+          "flange"
+        ],
+        "porta": "apoio"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
     }
   ],
   "etapas": [
@@ -350,7 +430,9 @@
     "anelPunho4",
     "eloPunho4",
     "anelPunho5",
-    "eloPunho5"
+    "eloPunho5",
+    "anelPunho6",
+    "flange"
   ],
   "vinculos": [
     {
@@ -464,6 +546,34 @@
       },
       "unidade": "mm",
       "acrescimo": 0
+    },
+    {
+      "id": "anelPunho6ComORaioDaSaida",
+      "alvo": {
+        "instancia": "anelPunho6",
+        "param": "raio"
+      },
+      "de": {
+        "instancia": "eloPunho5",
+        "porta": "saida",
+        "medida": "raioExterno"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "flangeComORaioDoAnel",
+      "alvo": {
+        "instancia": "flange",
+        "param": "raioDoApoio"
+      },
+      "de": {
+        "instancia": "anelPunho6",
+        "porta": "topo",
+        "medida": "raioExterno"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
     }
   ],
   "posicoes": [
@@ -561,6 +671,28 @@
       "porta": "apoio",
       "em": {
         "instancia": "anelPunho5",
+        "porta": "topo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "anelPunho6SobreASaida",
+      "instancia": "anelPunho6",
+      "porta": "apoio",
+      "em": {
+        "instancia": "eloPunho5",
+        "porta": "saida"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "flangeSobreOAnel",
+      "instancia": "flange",
+      "porta": "apoio",
+      "em": {
+        "instancia": "anelPunho6",
         "porta": "topo"
       },
       "unidade": "mm",

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1734 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1736 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1264,6 +1264,10 @@
 
 - `receita.js` — braco-robotico/anel-punho-5 — o anel escuro da junta 5 do punho, na ponta de baixo do elo da junta 4.
 
+## procedural/pecas/braco-robotico/partes/anel-punho-6/
+
+- `receita.js` — braco-robotico/anel-punho-6 — o anel escuro da junta 6 do punho, na ponta (face da frente) do elo da junta 5.
+
 ## procedural/pecas/braco-robotico/partes/antebraco/
 
 - `receita.js` — braco-robotico/antebraco — um pé redondo deitado no eixo da junta do cotovelo, o tubo que sai dele na horizontal e, na ponta, a carcaça da junta 4, numa malh…
@@ -1298,6 +1302,10 @@
 ## procedural/pecas/braco-robotico/partes/elo-punho-5/
 
 - `receita.js` — braco-robotico/elo-punho-5 — o elo rígido entre a junta 5 e a junta 6 do punho: um pé curto no eixo da junta 5 e o tubo deitado que o atravessa, numa malha ú…
+
+## procedural/pecas/braco-robotico/partes/flange/
+
+- `receita.js` — braco-robotico/flange — o disco onde a ferramenta se prende, na face da frente do anel da junta 6.
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
