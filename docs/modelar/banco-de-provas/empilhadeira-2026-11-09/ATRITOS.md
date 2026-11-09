@@ -44,3 +44,10 @@ processo o teria pego sozinho e o destino.
    com os trechos de cada cor medidos linha a linha na vista de trás, e conferida pela divisão por cor do rascunho
    contra a da referência (80% dos pixels na mesma classe; o resto é o eixo, que não é da carcaça); a skill
    `esbocar-opcoes` passou a pedir essa conferência antes de mostrar, e a ferramenta que a faz entrou no backlog.
+7. **A divisa entre o capô e o contrapeso saiu em arco na vista de trás.** O canto arredondado da ponta de trás do capô
+   está no contorno lateral, e o contorno cruzado com a planta curva só o mantém no centro: para os lados a planta
+   corta antes, e a borda de baixo do capô, vista de trás, sobe no meio. Na referência a divisa é uma reta, porque o
+   canto acompanha a curva da traseira. A comparação por cor não acusou (o laranja coincidia em 90%); a pessoa apontou.
+   Destino: no rascunho a divisa passou a ser reta, com o canto fora do contorno (o laranja foi a 95%). O limite é do
+   método: o que acompanha a traseira curva (o canto, o bico do capô, a rampa da grade) pede a seção lateral levada ao
+   longo da planta, e não o cruzamento das duas, e é isso que o gerador por vistas precisa ganhar ao virar recurso.
