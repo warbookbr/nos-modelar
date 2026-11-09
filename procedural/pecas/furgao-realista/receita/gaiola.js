@@ -177,7 +177,8 @@ export function derivar(T) {
   const contaP = (an) => {
     const i = aneis.indexOf(an);
     const sR = caminhoQuina(an); const sD = caminhoD(an);
-    const cabe = Math.max(1, Math.floor((sD - sR) / T.passo_p));
+    /* as colunas p ficam a passo_p uma da outra a partir da p1 (a sR), e a última fica a no mínimo `p_folga_d` da D: quando a D se aproxima, a última coluna chega a ela devagar, e a face entre as duas afina até sumir, em vez de a coluna sumir no meio de uma face larga e de todas as outras trocarem de lugar */
+    const cabe = Math.max(1, 1 + Math.floor((sD - sR - T.p_folga_d) / T.passo_p));
     const abaixo = i > 0 && aneis[i - 1].horizontal && aneis[i - 1].y >= T.p_inicio_y ? contaP(aneis[i - 1]) : 0;
     return Math.min(cabe, abaixo + 1);
   };
@@ -197,10 +198,10 @@ export function derivar(T) {
        p_inicio_y até o ombro, que tem as mesmas colunas do teto, cuja cobertura conta as que vêm antes de D. */
     if (temD && an.horizontal && an.y >= T.p_inicio_y && an.y < T.ombro_y) {
       const sR = caminhoQuina(an);
-      if (sR > sE + 1 && sR < sD - T.passo_p / 2) {
+      if (sR > sE + 1 && sR <= sD - T.p_folga_d) {
         g.push({ col: 'p1', s: sR });
         const n = contaP(an);
-        for (let k = 1; k < n; k += 1) g.push({ col: `p${k + 1}`, s: sR + ((sD - sR) * k) / n });
+        for (let k = 1; k < n; k += 1) g.push({ col: `p${k + 1}`, s: sR + k * T.passo_p });
       }
     }
     if (temD) g.push({ col: 'D', s: sD });
