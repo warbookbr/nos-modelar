@@ -1103,7 +1103,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par
   --res=<px>             largura da imagem (padrão 1280)
   --espera=<ms>          espera depois de carregar (padrão 1200)
-  --prazo=<s>            prazo de carga da peça por tentativa (padrão 90; peça pesada pede mais)
+  --prazo=<s>            prazo de carga da peça por tentativa, também na --analise (padrão 90; peça pesada pede mais)
   --saida=<pasta>        pasta relativa dentro do repositório (padrão tools/bancadas/out/)
   --relatorio=<arquivo>  grava o relatório da rodada em JSON
   --revisar              o conjunto de vistas da revisão
@@ -1151,12 +1151,17 @@ export function comoCLI(argv) {
   } catch (erro) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
   }
+  const prazo = lido.opcao('prazo');
+  if (prazo !== undefined && prazo !== null && !(Number(prazo) > 0)) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(`--prazo pede segundos maiores que zero; veio "${prazo}".`) }));
+  }
   /* `--analise`: o passo "Pare e analise" (docs/modelar/usar/PARE-E-ANALISE.md). */
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
     return analisarPeca({
       peca, parte: lido.opcao('parte'), zoom: lido.opcao('zoom'), zoomAntes: lido.opcao('zoom-antes'),
       saida: lido.opcao('saida'), res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), olhar: olharBancada,
+      ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
     }).then((r) => (r.ok
       ? { ok: true, codigo: 0, stdout: `análise de ${peca}:\n${r.arquivos.map((a) => `  ${a}`).join('\n')}\n`, stderr: '', resultado: { arquivos: r.arquivos } }
       : r), (erro) => erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
@@ -1166,10 +1171,6 @@ export function comoCLI(argv) {
       relato: novoRelato(),
       erro: new ErroDeUso('--tela mostra a interface da bancada; não se mistura com --cores, --arame ou --auditoria.'),
     }));
-  }
-  const prazo = lido.opcao('prazo');
-  if (prazo !== undefined && prazo !== null && !(Number(prazo) > 0)) {
-    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(`--prazo pede segundos maiores que zero; veio "${prazo}".`) }));
   }
   return olharBancada({
     peca: lido.opcao('peca') ?? lido.posicional,

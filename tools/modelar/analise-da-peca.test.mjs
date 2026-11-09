@@ -43,6 +43,15 @@ describe('analisarPeca', () => {
     expect(r.arquivos.at(-1).replaceAll('\\', '/')).toBe(`${PASTA}/manifesto.json`);
   });
 
+  it('leva o prazo de carga pedido a cada captura, e sem pedido deixa o padrão da bancada', async () => {
+    const comPrazo = [];
+    await analisarPeca({ peca: PECA, parte: 'corpo', olhar: olharFalso(comPrazo), prazoDeCargaMs: 600_000 });
+    expect(comPrazo.every((c) => c.prazoDeCargaMs === 600_000)).toBe(true);
+    const semPrazo = [];
+    await analisarPeca({ peca: PECA, olhar: olharFalso(semPrazo) });
+    expect(semPrazo.every((c) => !('prazoDeCargaMs' in c))).toBe(true);
+  });
+
   it('recorta o zoom 3x e compõe o par antes/depois; repetir a rodada não colide', async () => {
     const area = mkdtempSync(join(tmpdir(), 'antes-'));
     const antes = join(area, 'antes.png');

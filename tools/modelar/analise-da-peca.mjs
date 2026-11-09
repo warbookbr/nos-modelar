@@ -99,7 +99,7 @@ const gravarPng = (arquivo, png) => writeFileSync(arquivo, PNG.sync.write(png));
  * manifesto. `olhar` é o `olharBancada`. Devolve `{ ok, arquivos, manifesto }`
  * ou a resposta da primeira captura que falhou.
  */
-export async function analisarPeca({ peca, parte = null, zoom = null, zoomAntes = null, saida = null, olhar, res = '1280', espera = '1200' }) {
+export async function analisarPeca({ peca, parte = null, zoom = null, zoomAntes = null, saida = null, olhar, res = '1280', espera = '1200', prazoDeCargaMs = undefined }) {
   if (!peca) throw new Error('--analise exige a peça (--peca=<nome>).');
   if (zoomAntes && !zoom) throw new Error('--zoom-antes exige --zoom.');
   const pedidoDeZoom = zoom ? lerZoom(zoom) : null;
@@ -122,7 +122,7 @@ export async function analisarPeca({ peca, parte = null, zoom = null, zoomAntes 
   const arquivos = [];
   const porModo = {};
   const chamar = async (extra) => {
-    const r = await olhar({ peca, projecao: 'ortografica', res, espera, saida: pasta, estrito: false, auditoria: true, ...extra });
+    const r = await olhar({ peca, projecao: 'ortografica', res, espera, saida: pasta, estrito: false, auditoria: true, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...extra });
     if (!r.ok) return r;
     for (const a of r.resultado.arquivos) arquivos.push(relative(REPO, resolve(REPO, a)));
     return r;
