@@ -199,7 +199,7 @@
       "instancia": "braco",
       "estado": "aberta",
       "juntas": [],
-      "forma": "sha256:ef0d6a78417269397d6c236badccd5ad043c94db17138ae317cfd5bd0d308253",
+      "forma": "sha256:489416bafeb3199e337eda62b61dfa502a23e3dbbb69a1bf876d179fa7079216",
       "reaberturas": [
         {
           "por": "leitura do registro",
@@ -233,101 +233,12 @@
       ]
     },
     {
-      "instancia": "cotovelo",
-      "estado": "aberta",
-      "juntas": [
-        {
-          "relacao": "cotoveloSentaNaColuna",
-          "com": "braco",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.009999999999999995,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:9c05f9a28d75c9e768ad06efa80f975ea95b40a44cedf02065497ea34169eabd",
-      "reaberturas": [
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o cotovelo por união de dois tubos com arredondamento, e pediu alisar a sombra das costas, feito com 144 lados",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:af0ccd52407968b23b08aa6aee8d487c1f325f99e8455af10357b0d507a52739"
-        },
-        {
-          "por": "pessoa",
-          "quando": "2026-11-09",
-          "motivo": "o eixo da junta do cotovelo passa a ser paralelo ao do ombro, e o cotovelo vira espelho do ombro",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o cotovelo com o tubo deitado de 190 mm",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:accd2d46ad4366621347b97dd3747d0352f61c07c26cb8537f0517582573ecb8"
-        },
-        {
-          "por": "pessoa",
-          "quando": "2026-11-09",
-          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o cotovelo com o eixo paralelo ao do ombro e a saída para o lado oposto",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:577dba8778a7840f7f66207ab925a0fc6ebb74c7fd955ae2679688492aa419b8"
-        }
-      ]
-    },
-    {
       "instancia": "anelAntebraco",
       "estado": "aberta",
       "juntas": [
         {
           "relacao": "anelAntebracoSentaNaSaida",
-          "com": "cotovelo",
+          "com": "braco",
           "satisfeita": true,
           "medidas": {
             "disponiveis": true,

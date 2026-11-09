@@ -32,13 +32,6 @@
       }
     },
     {
-      "id": "cotovelo",
-      "alvo": {
-        "tipo": "peca",
-        "ref": "braco-robotico/cotovelo"
-      }
-    },
-    {
       "id": "anelAntebraco",
       "alvo": {
         "tipo": "peca",
@@ -121,44 +114,11 @@
       }
     },
     {
-      "id": "cotoveloSentaNaColuna",
-      "tipo": "assentaAnular",
-      "referencia": {
-        "caminho": [
-          "braco"
-        ],
-        "porta": "topo"
-      },
-      "movel": {
-        "caminho": [
-          "cotovelo"
-        ],
-        "porta": "apoio"
-      },
-      "especificacao": {
-        "sobreposicaoRadial": {
-          "nominal": 0.01,
-          "toleranciaFabricacao": {
-            "menos": 0,
-            "mais": 0
-          }
-        },
-        "sobreposicaoAxial": {
-          "nominal": 0,
-          "toleranciaFabricacao": {
-            "menos": 0,
-            "mais": 0
-          }
-        },
-        "toleranciaNumerica": 1e-06
-      }
-    },
-    {
       "id": "anelAntebracoSentaNaSaida",
       "tipo": "assentaAnular",
       "referencia": {
         "caminho": [
-          "cotovelo"
+          "braco"
         ],
         "porta": "saida"
       },
@@ -225,7 +185,6 @@
     "anelCintura",
     "ombro",
     "braco",
-    "cotovelo",
     "anelAntebraco",
     "antebraco"
   ],
@@ -273,27 +232,13 @@
       "acrescimo": 0
     },
     {
-      "id": "cotoveloComORaioDaColuna",
-      "alvo": {
-        "instancia": "cotovelo",
-        "param": "raio"
-      },
-      "de": {
-        "instancia": "braco",
-        "porta": "topo",
-        "medida": "raioExterno"
-      },
-      "unidade": "mm",
-      "acrescimo": 0
-    },
-    {
       "id": "anelComORaioDaSaida",
       "alvo": {
         "instancia": "anelAntebraco",
         "param": "raio"
       },
       "de": {
-        "instancia": "cotovelo",
+        "instancia": "braco",
         "porta": "saida",
         "medida": "raioExterno"
       },
@@ -350,22 +295,11 @@
       "afastamento": 0
     },
     {
-      "id": "cotoveloSobreAColuna",
-      "instancia": "cotovelo",
-      "porta": "apoio",
-      "em": {
-        "instancia": "braco",
-        "porta": "topo"
-      },
-      "unidade": "mm",
-      "afastamento": 0
-    },
-    {
       "id": "anelSobreASaida",
       "instancia": "anelAntebraco",
       "porta": "apoio",
       "em": {
-        "instancia": "cotovelo",
+        "instancia": "braco",
         "porta": "saida"
       },
       "unidade": "mm",

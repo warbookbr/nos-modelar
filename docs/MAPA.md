@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1730 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1273,7 +1273,7 @@
 
 ## procedural/pecas/braco-robotico/partes/braco/
 
-- `receita.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro, numa malha única por subdivisão de uma gaiola.
+- `receita.js` — braco-robotico/braco — o braço superior, rígido da junta do ombro à junta do cotovelo, numa malha única de três tubos.
 
 ## procedural/pecas/braco-robotico/partes/braco/rodadas/
 
@@ -1282,10 +1282,6 @@
 - `receita-03.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
 - `receita-04.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
 - `receita-05.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
-
-## procedural/pecas/braco-robotico/partes/cotovelo/
-
-- `receita.js` — braco-robotico/cotovelo — o tubo em pé que sobe da coluna, cruzado no alto por um tubo deitado no eixo da junta, numa malha única.
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
