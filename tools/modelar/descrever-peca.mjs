@@ -148,7 +148,8 @@ export function ilhasDaPeca(contatos, receita = {}) {
    (cadeia de arestas viva que a receita não pediu, e o chanfro que ladeia duas delas) rodam sobre as superfícies de subdivisão da peça já executada. O que
    `PLANO.dobrasAceitas` cobre vem separado, com o motivo; o resto é aviso e não reprova: a pessoa decide o limiar e onde ligá-las a um gate. Devolve o texto ou
    null quando a peça não tem subdivisão ou não há nada a dizer. */
-function textoDasReguasDeSuperficie(receita, entrada, neutro) {
+function textoDasReguasDeSuperficie(receita, entrada, neutro, { resumo = true } = {}) {
+  const corte = resumo ? 12 : Infinity;
   if (!(entrada.PASSOS ?? []).some((p) => (Array.isArray(p) ? p[0] : p?.op) === 'subdivisao')) return null;
   const executada = { entrada, neutro };
   let dobras; let vincos;
@@ -169,12 +170,12 @@ function textoDasReguasDeSuperficie(receita, entrada, neutro) {
   if (!abertas.length && !aceitas.length) return null;
   let texto = '';
   if (abertas.length) {
-    const lista = abertas.length > 12 ? [...abertas.slice(0, 12), `... e mais ${abertas.length - 12}`] : abertas;
+    const lista = abertas.length > corte ? [...abertas.slice(0, corte), `... e mais ${abertas.length - corte} (\`--completo\` lista todos)`] : abertas;
     texto += `\n${abertas.length} DOBRA(S) E VINCO(S) NÃO DECLARADO(S) (aviso; não reprova)\n${lista.map((t) => `  ${t}`).join('\n')}\n`
       + '  Se a feição é desenho, declare-a em `PLANO.dobrasAceitas` com a parte, a região e o motivo; se não é, a gaiola está errada ali.\n';
   }
   if (aceitas.length) {
-    texto += `\n${aceitas.length} DOBRA(S) E VINCO(S) ACEITO(S) PELO PLANO\n${aceitas.slice(0, 12).map((t) => `  ${t}`).join('\n')}${aceitas.length > 12 ? `\n  ... e mais ${aceitas.length - 12}` : ''}\n`;
+    texto += `\n${aceitas.length} DOBRA(S) E VINCO(S) ACEITO(S) PELO PLANO\n${aceitas.slice(0, corte).map((t) => `  ${t}`).join('\n')}${aceitas.length > corte ? `\n  ... e mais ${aceitas.length - corte} (\`--completo\` lista todos)` : ''}\n`;
   }
   return texto;
 }
@@ -422,7 +423,7 @@ export async function descreverPecaReutilizavel({
       stdout += `\nLATARIA DISPENSADA\n  ${avisoDaLataria}\n`;
       stderr += `\nAVISO: ${avisoDaLataria}\n`;
     }
-    const textoDasReguas = textoDasReguasDeSuperficie(receita, entrada, neutro);
+    const textoDasReguas = textoDasReguasDeSuperficie(receita, entrada, neutro, { resumo });
     if (textoDasReguas) {
       stdout += textoDasReguas;
       stderr += `\nAVISO: ${textoDasReguas.trim().split('\n')[0]}\n`;
