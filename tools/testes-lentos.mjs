@@ -35,6 +35,7 @@ export const TESTES_LENTOS = [
   'procedural/nucleo/friso-contato.test.mjs',
   'procedural/nucleo/gaiola-por-rede-contato.test.mjs',
   'procedural/nucleo/operacoes/arredondar-costura-convexa.test.ts',
+  'procedural/nucleo/operacoes/arredondar-costura-tubos-altos.test.ts',
   'procedural/nucleo/operacoes/booleana-casca-raspada.test.ts',
   'procedural/pecas/carenagem-de-prova/receita.test.mjs',
   'src/autoria/curvatura-da-lataria.test.mjs',
