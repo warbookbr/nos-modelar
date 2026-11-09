@@ -1,0 +1,202 @@
+{
+ "plano": "Antebraço do braço: tubo de 253 mm depois do anel de 25 mm, com a seção da junta (156) ou a da prancha (129).",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "1: tubo de 156 mm",
+   "nota": "o mesmo diâmetro do cotovelo e da coluna",
+   "formas": [
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 120,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      9.5,
+      78,
+      0
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  },
+  {
+   "titulo": "2: tubo de 129 mm",
+   "nota": "a altura do antebraço na prancha, com degrau no anel",
+   "formas": [
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 120,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      9.5,
+      78,
+      0
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 64.5,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  },
+  {
+   "titulo": "3: tubo afunilado de 156 a 129",
+   "nota": "sai rente ao anel e afina até a carcaça do punho",
+   "formas": [
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 120,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      9.5,
+      78,
+      0
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x"
+    },
+    {
+     "id": "antebraco",
+     "op": "lathe",
+     "args": {
+      "eixo": "x",
+      "lados": 96,
+      "perfil": [
+       [
+        0,
+        0
+       ],
+       [
+        78,
+        0
+       ],
+       [
+        64.5,
+        253
+       ],
+       [
+        0,
+        253
+       ]
+      ]
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  }
+ ]
+}

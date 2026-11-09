@@ -1,0 +1,210 @@
+{
+ "plano": "Saída do cotovelo do braço: o anel escuro da junta entre o cotovelo e o antebraço, em três larguras; o antebraço de 129 mm é o mesmo nas três.",
+ "vista": "isometrica",
+ "opcoes": [
+  {
+   "titulo": "1: anel único de 25 mm",
+   "nota": "como o colar e o anel da cintura",
+   "formas": [
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 120,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      9.5,
+      78,
+      0
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 25,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 64.5,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  },
+  {
+   "titulo": "2: anel único de 69 mm",
+   "nota": "a largura do anel na prancha",
+   "formas": [
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 120,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      9.5,
+      78,
+      0
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 69,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 64.5,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  },
+  {
+   "titulo": "3: junta de 24 e anel de 65, com ranhura",
+   "nota": "as duas faixas da prancha, separadas por ranhura",
+   "formas": [
+    {
+     "id": "tuboEmPe",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 120,
+      "eixo": "y",
+      "lados": 96
+     }
+    },
+    {
+     "id": "cotovelo",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 175,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "tuboEmPe.+y",
+     "por": "+y",
+     "desloca": [
+      9.5,
+      78,
+      0
+     ],
+     "contato": {
+      "tuboEmPe": "atravessa"
+     }
+    },
+    {
+     "id": "junta",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 24,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "cotovelo.+x",
+     "por": "-x"
+    },
+    {
+     "id": "ranhura",
+     "op": "cilindro",
+     "args": {
+      "raio": 74,
+      "altura": 4,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "junta.+x",
+     "por": "-x"
+    },
+    {
+     "id": "anel",
+     "op": "cilindro",
+     "args": {
+      "raio": 78,
+      "altura": 65,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "ranhura.+x",
+     "por": "-x"
+    },
+    {
+     "id": "antebraco",
+     "op": "cilindro",
+     "args": {
+      "raio": 64.5,
+      "altura": 253,
+      "eixo": "x",
+      "lados": 96
+     },
+     "centro": "anel.+x",
+     "por": "-x"
+    }
+   ]
+  }
+ ]
+}
