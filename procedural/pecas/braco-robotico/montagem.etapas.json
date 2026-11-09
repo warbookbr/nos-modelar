@@ -373,6 +373,13 @@
         }
       ],
       "forma": "sha256:5b92d53e321bc8e351e330ea29b0215a28fc9ec26cd6c70a113a6b46a2ac5bb7",
+      "aceite": {
+        "por": "pessoa, 2026-11-09: aceitou o antebraço com a carcaça da junta 4, pé e carcaça de 190 mm e o tubo rente",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+        ],
+        "analise": "ausente"
+      },
       "reaberturas": [
         {
           "por": "pessoa",
@@ -400,14 +407,56 @@
           },
           "forma": "sha256:6c62ea8ef4c04071f02c11166c12c267421fe1859aeb8421012cb75ee9555946"
         }
+      ]
+    },
+    {
+      "instancia": "anelPunho4",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "anelPunho4SentaNaSaida",
+          "com": "antebraco",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.010000000000000002,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.01,
+              "maximo": 0.01,
+              "nominal": 0.01,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
       ],
-      "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o antebraço com a carcaça da junta 4, pé e carcaça de 190 mm e o tubo rente",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-        ],
-        "analise": "ausente"
-      }
+      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6"
     }
   ]
 }

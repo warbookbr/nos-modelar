@@ -44,6 +44,13 @@
         "tipo": "peca",
         "ref": "braco-robotico/antebraco"
       }
+    },
+    {
+      "id": "anelPunho4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-robotico/anel-punho-4"
+      }
     }
   ],
   "relacoes": [
@@ -178,6 +185,39 @@
         },
         "toleranciaNumerica": 1e-06
       }
+    },
+    {
+      "id": "anelPunho4SentaNaSaida",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "antebraco"
+        ],
+        "porta": "saida"
+      },
+      "movel": {
+        "caminho": [
+          "anelPunho4"
+        ],
+        "porta": "apoio"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.01,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
     }
   ],
   "etapas": [
@@ -186,7 +226,8 @@
     "ombro",
     "braco",
     "anelAntebraco",
-    "antebraco"
+    "antebraco",
+    "anelPunho4"
   ],
   "vinculos": [
     {
@@ -312,6 +353,17 @@
       "em": {
         "instancia": "anelAntebraco",
         "porta": "topo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "anelPunho4SobreASaida",
+      "instancia": "anelPunho4",
+      "porta": "apoio",
+      "em": {
+        "instancia": "antebraco",
+        "porta": "saida"
       },
       "unidade": "mm",
       "afastamento": 0
