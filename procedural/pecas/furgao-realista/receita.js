@@ -76,14 +76,16 @@
  */
 
 import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
-import { m } from './receita/geometria.js';
+import { grau, m } from './receita/geometria.js';
 import { forma } from './receita/forma.js';
 import { derivar } from './receita/gaiola.js';
 import { contornoPorRetos, derivarFarois, derivarGrade, derivarLanternas, derivarLuzesDeCanto, derivarPiscasLaterais, raiosDoContorno } from './receita/farol.js';
 import { derivarInterior } from './receita/interior.js';
 import { derivarLuzesPorDentro } from './receita/luzes.js';
+import { derivarDetalhes, passosDosDetalhes } from './receita/detalhes.js';
 import { BASE_DAS_RODAS, comBase, familias, materiaisDoPneu } from './receita/rodas.js';
 import {
+  ANTENA, MACANETAS, PLACAS_DAS_MACANETAS, PONTEIRA,
   ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BORRACHAS, AROS, CRISTAIS, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
 } from './receita/nomes.js';
@@ -202,6 +204,7 @@ export const TABELA = {
   quina_fresta_ref: 30, // a linha que ordena as colunas da quina da frente, onde a fresta da porta corria antes de recuar (o para-brisa não mudou)
   p_inicio_y: 1330, // a partir daqui, e até o ombro, a quina ganha colunas entre E e D: p1 onde a D antiga ficava e as outras a passo_p
   passo_p: 30, // distância entre as colunas p
+  retorno_d_y: 2280, // até onde a coluna D, acima do topo da porta, acaba de voltar para a quina: no ombro ela já está lá, e as colunas p somem uma por anel pelo caminho, e não de uma vez
   para_brisa_topo_y: 2075, // o anel do topo do vão do para-brisa, que era o do topo da porta antes de ela descer
   coluna_do_meio: 110,
   porta_correr_largura: 1300,
@@ -422,6 +425,49 @@ export const TABELA = {
   painel_topo_y: 1400,
   painel_meia_largura: 870,
   painel_chanfro: 25,
+
+  // os detalhes pequenos (etapa 8, 2026-11-09), aprovados por esboço em banco-de-provas/furgao-realista-2026-10-30/detalhes.
+  // Antena: o pé em gota de 120 por 60 mm e 35 de altura, a 60 mm da borda do vão do para-brisa (em arco sobre o teto), com a base entrando 1,7 mm na chapa;
+  // a haste de 300 mm que afina de 8 para 4 mm de diâmetro, 10 graus para trás da vertical, nascendo 10 mm dentro do pé.
+  antena_pe_comprimento: 120,
+  antena_pe_largura: 60,
+  antena_pe_altura: 35,
+  antena_recuo_borda: 60,
+  antena_embutir: 1.7,
+  antena_lados: 16,
+  antena_haste_comprimento: 300,
+  antena_haste_raio_base: 4,
+  antena_haste_raio_ponta: 2,
+  antena_haste_inclinacao: 10,
+  antena_haste_embutir: 10,
+  antena_haste_lados: 12,
+  antena_liso_angulo: 40,
+  // Maçanetas: a altura do centro da alça, abaixo do vinco de cintura; a alça de 180 por 40 mm, com os pés de 18 mm a 70 mm do meio, a 15 mm da porta;
+  // o rebaixo de 210 por 70 mm que a placa em anel (8 mm de largura, 5 de altura) faz de conta, a 70 mm da borda da porta que abre.
+  macaneta_y: 1060,
+  macaneta_alca_comprimento: 180,
+  macaneta_alca_altura: 40,
+  macaneta_alca_fora: 15,
+  macaneta_alca_espessura: 7,
+  macaneta_pe_largura: 18,
+  macaneta_pe_afastamento: 70,
+  macaneta_chanfro: 4,
+  macaneta_embutir: 1.5,
+  macaneta_rebaixo_comprimento: 210,
+  macaneta_rebaixo_largura: 70,
+  macaneta_placa_borda: 8,
+  macaneta_placa_altura: 5,
+  macaneta_placa_cantos: 10,
+  macaneta_borda_porta: 70,
+  // Ponteira: o tubo reto de 55 mm de diâmetro e 3 de parede, a 180 mm do meio (lado esquerdo, +x), com o topo entrando 1 mm no fundo do para-choque traseiro e a boca 50 mm atrás da face dele.
+  ponteira_diametro: 55,
+  ponteira_parede: 3,
+  ponteira_x: 180,
+  ponteira_recuo_boca: 50,
+  ponteira_embutir: 1,
+  ponteira_folga_frente: 5, // a frente do tubo acaba atrás da linha da chapa da traseira, sem encostar nela
+  ponteira_segmentos: 6,
+  ponteira_liso_angulo: 30,
 };
 
 /* ---------- passos ---------- */
@@ -671,6 +717,8 @@ export function gerarPassos(T) {
       passos.push(['liso', { angulo: nome === 'pneu' ? T.pneu_liso_angulo : 30, sel }]);
     }
   });
+  /* os detalhes pequenos (2026-11-09): a antena, as maçanetas e a ponteira, depois de tudo, com ids a partir de 2000: nenhuma parte anterior muda */
+  passos.push(...passosDosDetalhes(T, f));
   return passos;
 }
 
@@ -718,6 +766,12 @@ export const CONTATOS = [
   { par: ['pisoInterior', 'painel'], motivo: 'o painel assenta no piso e entra 1 mm nele' },
   ...FORROS.map((forro) => ({ par: ['pisoInterior', forro], motivo: 'o piso assenta no topo do túnel do forro do arco e entra 1 mm nele (a altura do piso é `piso_y` e a do túnel sai de `forro_folga_tunel`, na TABELA); são o único apoio dele, afastado da chapa dos dois lados' })),
   ...FORROS.map((forro) => ({ par: ['carroceria', forro], motivo: 'a aba do forro assenta na face de dentro da chapa em volta do arco, passando 8 mm da boca, e entra 1 mm na parede' })),
+  /* os detalhes pequenos (2026-11-09): cada um assenta na peça que o carrega, entrando uma fração de milímetro nela */
+  { par: ['carroceria', ANTENA[0]], motivo: 'o pé da antena assenta no teto da frente, 60 mm atrás da borda do vão do para-brisa, com a base inclinada como o teto e entrando 1,7 mm na chapa de 2 mm, sem passar por ela' },
+  { par: [ANTENA[0], ANTENA[1]], motivo: 'a haste nasce 10 mm dentro do pé, na seção mais alta dele, e sai dele inclinada 10 graus para trás da vertical' },
+  ...MACANETAS.map((alca) => ({ par: ['carroceria', alca], motivo: 'os dois pés da alça assentam na chapa da porta, dentro da placa em anel, e entram 1,5 mm nela' })),
+  ...PLACAS_DAS_MACANETAS.map((placa) => ({ par: ['carroceria', placa], motivo: 'a placa rasa em anel, que faz de conta o rebaixo, assenta na chapa da porta em volta da alça e entra 1,5 mm nela' })),
+  { par: ['parachoqueTraseiro', PONTEIRA], motivo: 'o topo do tubo da ponteira encosta no fundo do para-choque traseiro, onde ele sai da chapa, e entra 1 mm nele; a frente do tubo acaba 5 mm atrás da linha da chapa da traseira e a boca fica 50 mm atrás da face do para-choque' },
   ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
     { par: [`pneu${sufixo}`, `aro${sufixo}`], motivo: 'o assento do pneu abraça o barril do aro: a borda de dentro da banda é o raio do assento do aro' },
     { par: [`aro${sufixo}`, `disco${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do aro' },
@@ -780,6 +834,10 @@ export function pontosDeclarados(T = TABELA) {
   const xDentro = T.bitola / 2 - T.pneu_largura / 2;
   const xFora = T.bitola / 2 + T.pneu_largura / 2;
   const r = T.pneu_diametro / 2;
+  const detalhes = derivarDetalhes(T, f);
+  const { antena, ponteira } = detalhes;
+  const cabine = detalhes.macanetas[0];
+  const rad = antena.haste.inclinacao * grau;
   return [
     { nome: 'canto de cima da caixa da carroceria: a lateral, o teto e o nariz', parte: 'carroceria', medida: 'maximo', em: [f.xMax, T.altura, f.zFrente], toleranciaMm: tol },
     { nome: 'canto de baixo da caixa da carroceria: a lateral direita, a soleira e a traseira', parte: 'carroceria', medida: 'minimo', em: [-f.xMax, T.soleira_y, f.zTras], toleranciaMm: tol },
@@ -793,6 +851,9 @@ export function pontosDeclarados(T = TABELA) {
     { nome: 'banco do motorista, no alto da frente do assento e do lado de fora: 540 mm de largura no lado esquerdo, encosto até 1790, assento a 520 mm do fundo do encosto', parte: 'bancoMotorista', medida: 'maximo', em: [T.banco_x + T.banco_largura / 2, T.banco_topo_y, T.banco_costas_z + T.banco_profundidade], toleranciaMm: tol },
     { nome: `forro do arco dianteiro esquerdo, embaixo e atrás: a parede de dentro ${T.forro_folga_parede} mm além da face de dentro do pneu mais os ${T.plastico_espessura} mm da espessura, as pontas na soleira e a borda da aba ${T.forro_sobra} mm além da boca`, parte: 'forroArcoDianteiroEsquerdo', medida: 'minimo', em: [xDentro - T.forro_folga_parede - T.plastico_espessura, T.soleira_y, f.zD - T.arco_raio - T.forro_sobra], toleranciaMm: 1 },
     { nome: `forro do arco traseiro direito, em cima e na frente: a aba na face de dentro da chapa, o alto da borda ${T.forro_sobra} mm acima da boca e a parede de dentro ${T.forro_folga_parede} mm além do pneu mais os ${T.plastico_espessura} mm da espessura`, parte: 'forroArcoTraseiroDireito', medida: 'maximo', em: [-(xDentro - T.forro_folga_parede - T.plastico_espessura), f.rPneu + T.arco_raio + T.forro_sobra, f.zT + T.arco_raio + T.forro_sobra], toleranciaMm: 1 },
+    { nome: `ponta da haste da antena, em cima e à frente: ${T.antena_haste_comprimento} mm de haste acima do pé e a ponta de ${2 * T.antena_haste_raio_ponta} mm, inclinada ${T.antena_haste_inclinacao} graus para trás`, parte: 'antenaHaste', medida: 'maximo', em: [antena.haste.raioBase, antena.base[0] + antena.comprimento * Math.cos(rad) + antena.haste.raioPonta * Math.sin(rad), antena.base[1] + antena.haste.raioBase * Math.cos(rad)], toleranciaMm: tol },
+    { nome: 'alça da maçaneta da porta da cabine esquerda, por fora, em cima e na frente: 15 mm além da chapa, 20 mm acima do centro e 90 mm à frente do centro da alça', parte: 'macanetaCabineEsquerda', medida: 'maximo', em: [cabine.xs + cabine.alcaFora, cabine.yc + cabine.alturaDaAlca / 2, cabine.c + T.macaneta_alca_comprimento / 2], toleranciaMm: tol },
+    { nome: 'boca da ponteira, embaixo, por dentro e atrás: o tubo de 55 mm a 180 mm do meio, com o topo no fundo do para-choque e a boca 50 mm atrás da face dele', parte: 'ponteiraEscapamento', medida: 'minimo', em: [ponteira.x - ponteira.raio, ponteira.y - ponteira.raio, ponteira.zBoca], toleranciaMm: tol },
   ];
 }
 
@@ -815,8 +876,8 @@ const LENTES = {
   lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1, relevo: LENTE_DE_PRISMAS },
 };
 export const MATERIAIS_DO_FURGAO = {
-  // tinta sólida com verniz: base de aspereza média, verniz inteiro e liso por cima
-  azul: { tipo: 'liso', cor: '#3350b0', aspereza: 0.5, metalicidade: 0.05, verniz: 1, asperezaDoVerniz: 0.04 },
+  // tinta sólida com verniz: base de aspereza média e verniz por cima; verniz 0,8 e asperezaDoVerniz 0,12 foram a escolha da pessoa em 2026-11-09, a versão B entre três versões
+  azul: { tipo: 'liso', cor: '#3350b0', aspereza: 0.5, metalicidade: 0.05, verniz: 0.8, asperezaDoVerniz: 0.12 },
   // a borracha de vão em volta dos cristais; o pneu tem os seus (`pneuBanda` e `pneuFlanco`)
   borracha: { tipo: 'liso', cor: '#26262b' },
   // aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima; é o `aco` que a família roda-pneu dá ao aro, ao cubo e ao disco
@@ -846,6 +907,9 @@ export const MATERIAIS_DO_FURGAO = {
   refletor: { tipo: 'metal', acabamento: 'pintado', cor: '#e8eaed', aspereza: 0.02, metalicidade: 1 },
   lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
   grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
+  // os detalhes pequenos (2026-11-09): o plástico preto da saia sem o granulado, que numa haste de 4 mm e numa alça de 40 mm só faria ruído; e o aço do escapamento, o `aco` mais escuro
+  plasticoLiso: { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35 },
+  acoEscuro: { tipo: 'metal', acabamento: 'pintado', cor: '#34363b', aspereza: 0.35, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },
 };
 
 const receita = {
@@ -1035,6 +1099,31 @@ const receita = {
         { nome: `cubo${sufixo}`, forma: 'cubo da roda de chapa, com o furo central de 71 mm e a volta de 5 furos de fixação de 20 mm no círculo de 118', tecnica: 'família roda-pneu: lathe do anel menos o furo central e os cinco furos repetidos em volta do eixo' },
         { nome: `disco${sufixo}`, forma: 'chapa de aço da roda de 16 polegadas, de 6 mm, do cubo ao aro, deslocada para fora, com a volta de 5 furos de ventilação de 50 mm no círculo de 277', tecnica: 'família roda-pneu: lathe em torno de x de um anel, tipo 0, menos os cinco furos de ventilação repetidos em volta do eixo' },
       ]),
+      {
+        nome: ANTENA[0],
+        forma: 'pé da antena: gota baixa de 120 por 60 mm e 35 mm de altura, fina na frente, inclinada como o teto, no meio do teto (x 0) a 60 mm da borda do vão do para-brisa, com a base assentada na curva do teto sem vão',
+        tecnica: 'loft de seções em superelipse (16 lados) de fundo achatado, com pontas fechadas, girado pela inclinação do teto e com a base entrando 1,7 mm na chapa de 2 mm; sombreamento liso de 40 graus',
+      },
+      {
+        nome: ANTENA[1],
+        forma: 'haste da antena: 300 mm acima do pé, afinando de 8 mm de diâmetro na base para 4 na ponta, inclinada 10 graus para trás da vertical, nascendo dentro da seção mais alta do pé',
+        tecnica: 'lathe de 12 lados de um perfil reto (cone) com a base 10 mm dentro do pé, girada 10 graus em x; plástico preto liso',
+      },
+      ...MACANETAS.map((nome) => ({
+        nome,
+        forma: `${/Traseira/.test(nome) ? 'alça vertical de 180 por 40 mm, para a porta traseira, junto da borda do meio, a 70 mm dela' : 'alça horizontal de 180 por 40 mm, a 70 mm da borda da porta que abre (traseira da porta da cabine, frente da de correr)'}, na altura de 1060 mm, em U com dois pés de 18 mm a 70 mm do meio da alça, a 15 mm da porta, de plástico preto`,
+        tecnica: 'extrusão de um perfil em U de 14 pontos (barra de 7 mm de espessura com os cantos de fora chanfrados em 4 mm e dois pés), pela altura de 40 mm; os pés entram 1,5 mm na chapa',
+      })),
+      ...PLACAS_DAS_MACANETAS.map((nome) => ({
+        nome,
+        forma: 'placa rasa em anel em volta da alça, de 226 por 86 mm por fora e 210 por 70 mm por dentro, 5 mm acima da chapa, da cor da lataria: faz de conta o rebaixo da chapa, que abrir na carroceria mudaria a malha dela',
+        tecnica: 'extrusão de um retângulo de cantos chanfrados com um furo retangular, entrando 1,5 mm na chapa',
+      })),
+      {
+        nome: PONTEIRA,
+        forma: 'ponteira de escapamento: tubo reto de 55 mm de diâmetro e 3 de parede, 155 mm, sob o para-choque traseiro no lado esquerdo (x 180), encostado no fundo dele, com a boca 50 mm atrás da face dele',
+        tecnica: 'extrusão em z de um círculo com furo circular (24 lados), topo entrando 1 mm no fundo do para-choque; aço escuro',
+      },
     ],
     criteriosDeReprovacao: [
       'a silhueta lateral, frontal ou de cima se afasta da prancha cotada mais de 15 mm em média ou 40 mm em algum ponto, medida com os cristais e as borrachas',
@@ -1074,9 +1163,13 @@ const receita = {
       'a fresta da frente da porta da cabine não corre 122 mm atrás do perfil do para-brisa (100 atrás da ponta do vidro), ou o topo dela não deixa 75 mm de faixa de teto acima, em 2035',
       'falta a faixa recuada da entrada de ar ou o lugar da placa no para-choque dianteiro, ou o lugar da placa no traseiro',
       'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2100 mm',
+      'a antena flutua sobre o teto, atravessa a chapa por dentro, fica fora do meio do teto ou longe da borda do para-brisa, ou a haste não é fina e quase em pé, inclinada para trás',
+      'falta uma maçaneta nas portas da cabine, na de correr ou nas duas traseiras, ou uma fica longe da borda da porta que abre, fora da altura de maçaneta, flutua ou atravessa a porta',
+      'a ponteira não sai sob o para-choque traseiro do lado esquerdo, não encosta no fundo dele, fica na frente da face dele ou flutua',
     ],
-    /* As feições que as réguas de superfície acham e que são desenho, cada uma na caixa justa em volta dela (2026-11-09). Ficam de fora, por parecerem defeito e
-       não por serem desenho, os dois pares de vincos do canto de cima da frente do teto (em [±893; 2188; 1216] e [±857; 2073; 1301]), relatados à parte. */
+    /* As feições que as réguas de superfície acham e que são desenho, cada uma na caixa justa em volta dela (2026-11-09). A régua dá a posição de uma cadeia de vincos pelo centro
+       dela, e a caixa da coluna do para-brisa fica no meio da coluna: o pé e o canto de cima do teto, onde havia nó e bico (2026-11-09: as colunas p morriam de uma vez, a descida
+       da coroa tinha salto de curvatura), ficam fora dela, e achado novo ali volta a aparecer. */
     dobrasAceitas: [
       ...[['Esquerdo', 1], ['Direito', -1]].map(([lado, s]) => ({
         parte: `refletorFarol${lado}`, tipos: ['dobra', 'vinco'],
@@ -1091,8 +1184,8 @@ const receita = {
       { parte: 'carroceria', tipos: ['vinco'], regiao: { min: [-60, 314, -2695], max: [60, 330, -2678] },
         motivo: 'raio de 40 mm do pé da traseira (raio_traseira_base) em toda a largura, visto de perto: a borda de baixo da traseira arredondada, pedida na tabela' },
       ...[1, -1].map((s) => ({
-        parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 910 : -935, 1760, 1505], max: [s > 0 ? 935 : -910, 1785, 1528] },
-        motivo: 'quina da coluna do para-brisa envolvente, de raio 160 (raio_coluna_base e raio_coluna_topo), onde o vidro dobra para a lateral: desenho da prancha',
+        parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 899 : -923, 1919, 1389], max: [s > 0 ? 923 : -899, 1943, 1413] },
+        motivo: 'crista da borda da coroa ao longo da coluna do para-brisa (quina de raio 160 onde o vidro dobra para a lateral: desenho da prancha); a caixa é o meio da coluna, e o pé e o canto do teto ficam fora dela',
       })),
       { parte: 'parachoqueDianteiro', tipos: ['vinco'], regiao: { min: [-60, 298, 2676], max: [60, 310, 2696] },
         motivo: 'quina de baixo do lábio da seção do para-choque (ponto [15, 302] de secao_parachoque_dianteiro), ao longo de toda a frente: perfil da prancha' },

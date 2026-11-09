@@ -105,8 +105,10 @@ export function derivar(T) {
     if (an.horizontal && an.y <= T.porta_cabine_topo_y) return caminhoDeZ(an.sec, f.zFrestaFrente(an.y));
     /* Acima do topo da porta a coluna D não tem mais a fresta a seguir. Com a fresta a 122 mm do perfil ela fica quase no fim da quina,
        longe de E: ela volta, até o topo do vão do para-brisa, para a posição que tinha com a fresta a quina_fresta_ref, a mesma do teto da
-       etapa 2; com ela parada em 2035 a curva do teto saía com calombo de 2,9 mm no ombro. */
-    const t = suave((an.y - T.porta_cabine_topo_y) / (T.para_brisa_topo_y - T.porta_cabine_topo_y));
+       etapa 2; com ela parada em 2035 a curva do teto saía com calombo de 2,9 mm no ombro. A volta se estende até retorno_d_y (o ombro): em 40 mm de
+       altura (2035 a 2075) a D andava 126 mm e as quatro colunas p entre E e D morriam de uma vez, num leque de triângulos no canto de cima da coluna
+       do para-brisa; com a volta até o ombro elas morrem uma por anel. */
+    const t = suave((an.y - T.porta_cabine_topo_y) / (T.retorno_d_y - T.porta_cabine_topo_y));
     return lerp(an.sec.rF * aTopoPorta, caminhoQuina(an), t);
   };
 
@@ -167,6 +169,17 @@ export function derivar(T) {
     return T.cintura_profundidade * suave((zIni - z) / T.cintura_rampa) * suave((z - zFim) / T.cintura_rampa);
   };
 
+  /* Quantas colunas p um anel tem entre E e D: o que cabe a passo_p, e no máximo uma a mais que o anel de baixo, para cada uma nascer num anel
+     (nascendo duas ou mais de uma vez a face entre os anéis vira um leque de triângulos, e a luz rasante mostra um nó na quina). A volta da D
+     (caminhoD) já tira uma por anel lá em cima. */
+  const contaP = (an) => {
+    const i = aneis.indexOf(an);
+    const sR = caminhoQuina(an); const sD = caminhoD(an);
+    const cabe = Math.max(1, Math.floor((sD - sR) / T.passo_p));
+    const abaixo = i > 0 && aneis[i - 1].horizontal && aneis[i - 1].y >= T.p_inicio_y ? contaP(aneis[i - 1]) : 0;
+    return Math.min(cabe, abaixo + 1);
+  };
+
   /* o grupo da quina da frente e da coluna D, por anel: q1..q3, E, e D, b1, b2, S0 quando existem; cada um com o caminho s */
   const grupoQuina = (an) => {
     const sec = an.sec; const sq = sQuina(sec);
@@ -182,9 +195,9 @@ export function derivar(T) {
        p_inicio_y até o ombro, que tem as mesmas colunas do teto, cuja cobertura conta as que vêm antes de D. */
     if (temD && an.horizontal && an.y >= T.p_inicio_y && an.y < T.ombro_y) {
       const sR = caminhoQuina(an);
-      if (sR > sE + 1 && sR < sD - 1) {
+      if (sR > sE + 1 && sR < sD - T.passo_p / 2) {
         g.push({ col: 'p1', s: sR });
-        const n = Math.floor((sD - sR) / T.passo_p);
+        const n = contaP(an);
         for (let k = 1; k < n; k += 1) g.push({ col: `p${k + 1}`, s: sR + ((sD - sR) * k) / n });
       }
     }
@@ -224,7 +237,11 @@ export function derivar(T) {
     if (y <= f.boca[1]) return 0;
     if (y <= T.para_brisa_base_y) return T.flecha_capo_base * suave((y - f.boca[1]) / (T.para_brisa_base_y - f.boca[1]));
     if (y <= T.para_brisa_topo_y) return lerp(T.flecha_capo_base, T.flecha_vidro_topo, (y - T.para_brisa_base_y) / (T.para_brisa_topo_y - T.para_brisa_base_y));
-    return T.flecha_vidro_topo * (1 - suave((y - T.para_brisa_topo_y) / (T.altura - T.para_brisa_topo_y)));
+    /* acima do vão a flecha some até o teto plano: um Hermite que sai do topo do vão com a inclinação da reta de baixo e chega a zero sem inclinação;
+       com a descida suave saindo na horizontal, a inclinação da flecha dava um salto no anel do topo do vão, e na quina ficava ali um vinco de 13 graus, de 190 mm */
+    const L = T.altura - T.para_brisa_topo_y; const u = (y - T.para_brisa_topo_y) / L;
+    const m0 = ((T.flecha_vidro_topo - T.flecha_capo_base) / (T.para_brisa_topo_y - T.para_brisa_base_y)) * L;
+    return T.flecha_vidro_topo * (2 * u ** 3 - 3 * u * u + 1) + m0 * (u ** 3 - 2 * u * u + u);
   };
   const listas = [];
   aneis.forEach((an) => {
@@ -239,8 +256,12 @@ export function derivar(T) {
     const coroa = (p) => {
       const x = Math.abs(p[0]);
       /* a descida é C1 no fim da coluna q3: a cauda é um Hermite que sai de 1 com a inclinação da parábola (2/xQ3) e chega a zero sem inclinação em xFim; com a cauda saindo na horizontal havia ali um vinco, a faixa vermelha e azul ao longo da coluna A. A parábola do centro, que desenha o arco do vidro, não muda. */
+      /* 2026-11-09: a cauda é um Hermite de quinto grau, e não de terceiro: com a inclinação contínua e a curvatura não, a descida (até 50 mm em 60 de largura) dava
+         um salto de curvatura em q3 e outro em xFim, e a luz rasante e a régua de vinco liam as duas colunas como vinco de 14 e de 20 graus ao longo do para-brisa, torcidos no canto do teto.
+         Aqui o valor, a inclinação e a curvatura da parábola saem iguais em q3, e chegam a zero em xFim (a diferença para a cauda antiga é de no máximo 3 mm). */
       const u = x / xQ3; const w = xFimDaCoroa - xQ3; const t = Math.min(1, Math.max(0, (x - xQ3) / w));
-      const g = x <= xQ3 ? u * u : (2 * t ** 3 - 3 * t * t + 1) + (t ** 3 - 2 * t * t + t) * (2 / xQ3) * w;
+      const m0 = (2 / xQ3) * w; const c0 = (2 / xQ3 ** 2) * w * w;
+      const g = x <= xQ3 ? u * u : (1 - 10 * t ** 3 + 15 * t ** 4 - 6 * t ** 5) + m0 * (t - 6 * t ** 3 + 8 * t ** 4 - 3 * t ** 5) + (c0 / 2) * (t * t - 3 * t ** 3 + 3 * t ** 4 - t ** 5);
       return [p[0], p[1] - flechaEm(p[1]) * g, p[2]];
     };
     colunasFrente(an).forEach((x, k) => add(`f${k}`, coroa(pontoFrente(sec, x))));

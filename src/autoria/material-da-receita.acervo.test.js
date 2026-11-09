@@ -94,12 +94,16 @@ describe('o normalizador sobre o acervo', () => {
         ...nomes.flatMap((material) => [{ id: 4, material }, { id: 5, material, cor: '#fedcba' }]),
       ];
       /* A chave agora inclui os campos novos, então o texto muda; o que não pode mudar é o agrupamento: duas faces têm a mesma chave
-         nova se, e só se, tinham a mesma chave de antes. */
+         nova se, e só se, tinham a mesma chave de antes somada aos campos novos. */
       const novaDaAntiga = new Map();
       const antigaDaNova = new Map();
       for (const face of faces) {
         const { declarado, chave, ...depois } = materialDaFace(face, catalogo);
-        const { chave: chaveAntes, ...antes } = materialDaFaceAntes(face, declarados);
+        const { chave: chaveDeAntes, ...antes } = materialDaFaceAntes(face, declarados);
+        /* Os campos que vieram com o normalizador (verniz, transmissão, relevo e os outros, do sétimo item da chave em diante) separam
+           de propósito dois materiais que antes eram iguais, como o plástico granulado e o liso do furgão; o agrupamento de antes vale
+           com eles somados à chave de antes. */
+        const chaveAntes = JSON.stringify([...JSON.parse(chaveDeAntes), ...JSON.parse(chave).slice(6)]);
         expect(depois, `${arquivo} / ${face.material ?? '(sem material)'}`).toEqual(antes);
         expect(novaDaAntiga.get(chaveAntes) ?? chave, `${arquivo} agrupa diferente`).toBe(chave);
         expect(antigaDaNova.get(chave) ?? chaveAntes, `${arquivo} agrupa diferente`).toBe(chaveAntes);

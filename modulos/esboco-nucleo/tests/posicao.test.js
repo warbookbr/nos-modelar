@@ -123,6 +123,8 @@ describe('o 2.0 em mm', () => {
     expect(argsEmMetro('extrusao', { origemId: 3, eixo: 'z', altura: 45, segmentosSpline: 8, perfil: { contorno: { inicio: [30, 330], trechos: [{ arco: { centro: [0, 0], angulo: 90 } }, { spline: [[100, 0]] }] } } }))
       .toEqual({ origemId: 3, eixo: 'z', altura: 0.045, segmentosSpline: 8, perfil: { contorno: { inicio: [0.03, 0.33], trechos: [{ arco: { centro: [0, 0], angulo: 90 } }, { spline: [[0.1, 0]] }] } } });
     expect(argsEmMetro('transladar', { d: [10, 0, 0], sel: { grupo: 'a', regiao: { min: [0, 0, 0], max: [1000, 1000, 1000] } } }).sel.regiao.max).toEqual([1, 1, 1]);
+    const costura = argsEmMetro('arredondarCostura', { de: { op: 'unir', id: 1 }, raio: 10, raioMinimo: 3, afinarPontas: 40, regiao: { min: [0, 0, 0], max: [100, 200, 300] } });
+    expect([costura.raio, costura.raioMinimo, costura.afinarPontas, costura.regiao.max]).toEqual([0.01, 0.003, 0.04, [0.1, 0.2, 0.3]]);
     expect(() => argsEmMetro('displace', { amplitude: 2 })).toThrow(/não está na tabela/);
     expect(() => argsEmMetro('cubo', { lado: ['*', 'a', 2] })).toThrow(/expressão/);
   });

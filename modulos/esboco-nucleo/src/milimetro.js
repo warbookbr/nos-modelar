@@ -47,6 +47,7 @@ export const TABELA_DE_MEDIDAS = Object.freeze({
   moveV: ['d'], moveF: ['d'], moveA: ['d'], extruda: ['dist'],
   subdivisao: ['vertices', 'espessura'],
   aberturaPorContorno: ['contorno', 'recuoDaLente'],
+  arredondarCostura: ['raio', 'raioMinimo', 'afinarPontas', 'regiao', 'aparar'],
   friso: ['perfil', 'fechamento', 'aba'],
 });
 
