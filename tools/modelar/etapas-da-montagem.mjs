@@ -330,8 +330,22 @@ export function descreverAuditoria(auditoria) {
   return linhas.join('\n');
 }
 
-function gravar(arquivoMontagem, registro) {
-  writeFileSync(arquivoDoRegistro(arquivoMontagem), `${JSON.stringify(registro, null, 2)}\n`, 'utf8');
+/* O REGISTRO SE GRAVA SÓ QUANDO MUDA, E SEMPRE NA MESMA ORDEM. Ler o estado regravava o arquivo (2026-11-09): a cada leitura os
+   campos `aceite` e `reaberturas` trocavam de lugar e o git mostrava o registro mudado sem mudança, e uma etapa quebrada lida
+   duas vezes virava `aberta`, com o aceite da pessoa guardado no histórico. Agora só `--fixar` e `--reabrir` gravam, a etapa sai
+   com os campos na ordem de ORDEM_DA_ETAPA, e o arquivo não é tocado quando o texto seria o mesmo. */
+const ORDEM_DA_ETAPA = ['instancia', 'estado', 'juntas', 'forma', 'receita', 'motivo', 'aceite', 'reaberturas'];
+const etapaOrdenada = (etapa) => Object.fromEntries([
+  ...ORDEM_DA_ETAPA.filter((chave) => chave in etapa).map((chave) => [chave, etapa[chave]]),
+  ...Object.keys(etapa).filter((chave) => !ORDEM_DA_ETAPA.includes(chave)).sort().map((chave) => [chave, etapa[chave]]),
+]);
+
+export function gravarRegistro(arquivoMontagem, registro) {
+  const arquivo = arquivoDoRegistro(arquivoMontagem);
+  const texto = `${JSON.stringify({ ...registro, etapas: registro.etapas.map(etapaOrdenada) }, null, 2)}\n`;
+  if (existsSync(arquivo) && readFileSync(arquivo, 'utf8') === texto) return false;
+  writeFileSync(arquivo, texto, 'utf8');
+  return true;
 }
 
 const descrever = (registro) => registro.etapas
@@ -339,7 +353,7 @@ const descrever = (registro) => registro.etapas
     ? ` — ${juntas.map((j) => `${j.relacao} ${j.satisfeita ? 'passa' : 'REPROVA'}`).join(', ')}` : ''}`)
   .join('\n');
 
-async function comoCLI(argv) {
+export async function comoCLI(argv) {
   const arquivo = argv.find((a) => !a.startsWith('--') && a.endsWith('.json'));
   if (!arquivo) return { codigo: 1, texto: 'diga a montagem: etapas-da-montagem.mjs <montagem.json> [--fixar <instância> --por <quem>]' };
   const caminho = resolve(arquivo);
@@ -355,7 +369,7 @@ async function comoCLI(argv) {
   const reaberta = valor('--reabrir');
   if (reaberta) {
     const registro = await reabrir(caminho, reaberta, valor('--por'));
-    gravar(caminho, registro);
+    gravarRegistro(caminho, registro);
     const proxima = proximaEtapa(registro);
     return { codigo: 0, texto: `etapa '${reaberta}' reaberta.\n${descrever(registro)}\npróxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}` };
   }
@@ -363,7 +377,7 @@ async function comoCLI(argv) {
   const registro = instancia
     ? await fixar(caminho, instancia, { por: valor('--por'), observacao: valor('--observacao'), aceiteHumano: argv.includes('--aceite-humano') })
     : (await estadoDasEtapas(caminho)).registro;
-  gravar(caminho, registro);
+  if (instancia) gravarRegistro(caminho, registro);
   const proxima = proximaEtapa(registro);
   return {
     codigo: 0,
