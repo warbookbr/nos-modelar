@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1743 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1769 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2191,6 +2191,51 @@
 - `materializar-catalogo.mjs` — Materializa o conjunto do eixo como catálogo MCP descartável, na pasta passada como argumento. O destino é obrigatório: gravar dentro do repositório por omis…
 - `suporte-de-eixo.js` — suporte-de-eixo.js — suporte com alojamento, piloto e assento anular, do conjunto de prova descrito em `eixo-guia.js`.
 
+## tools/fixtures/costuras-e-furos/
+
+- `medir.mjs` — medir.mjs — executa uma peça de prova de `tools/fixtures/costuras-e-furos/` e devolve os números das três réguas de malha mais a contagem de arestas soltas, …
+- `tubos-em-t.js` — tubos-em-t.js — o gerador das peças de prova de união de dois tubos do plano "costuras e furos limpos" (`docs/modelar/planos/2026-11-09-costuras-e-furos-limp…
+
+## tools/fixtures/costuras-e-furos/dentes-no-fim-do-arredondamento/
+
+- `dentes-no-fim-do-arredondamento.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 2 inverte os números marcados.
+- `receita.js` — dentes-no-fim-do-arredondamento/receita.js — peça de prova do defeito "dentes de serra onde o arredondamento da costura afina até sumir junto a uma face plan…
+
+## tools/fixtures/costuras-e-furos/dois-bracos-numa-carcaca-curva/
+
+- `dois-bracos-numa-carcaca-curva.test.mjs` — Fatia 1 do plano "costuras e furos limpos". O caso do retrovisor do furgão não reproduziu a recusa do arredondarCostura nesta forma reduzida (carcaça em conc…
+- `receita.js` — dois-bracos-numa-carcaca-curva/receita.js — peça de prova do defeito "o `arredondarCostura` recusa a costura de dois braços chatos numa carcaça curva" (plano…
+
+## tools/fixtures/costuras-e-furos/face-degenerada-em-dois-lathe/
+
+- `face-degenerada-em-dois-lathe.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `receita.js` — face-degenerada-em-dois-lathe/receita.js — peça de prova do defeito "o `unir` com `arredondarCostura` de dois `lathe` deixa face de três cantos colineares" (…
+
+## tools/fixtures/costuras-e-furos/frente-rente-a-tampa/
+
+- `frente-rente-a-tampa.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `receita.js` — frente-rente-a-tampa/receita.js — peça de prova do defeito "o `unir` deixa uma fresta quando a frente de um tubo fica rente à tampa de outro" (plano "costura…
+
+## tools/fixtures/costuras-e-furos/furo-em-face-plana/
+
+- `furo-em-face-plana.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 4 inverte os números marcados.
+- `receita.js` — furo-em-face-plana/receita.js — peça de prova do defeito "o `furo` refaz a face plana em leques de triângulos longos" (plano "costuras e furos limpos"): um d…
+
+## tools/fixtures/costuras-e-furos/furo-na-tampa-do-lathe/
+
+- `furo-na-tampa-do-lathe.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 4 inverte os números marcados.
+- `receita.js` — furo-na-tampa-do-lathe/receita.js — peça de prova do defeito "o `furo` recusa a tampa de um `lathe`, que sai em leque" (plano "costuras e furos limpos"): um …
+
+## tools/fixtures/costuras-e-furos/muitos-lados-no-unir/
+
+- `muitos-lados-no-unir.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `receita.js` — muitos-lados-no-unir/receita.js — peça de prova do defeito "dois `lathe` de muitos lados no `unir` com `arredondarCostura` deixam vértice órfão" (plano "cost…
+
+## tools/fixtures/costuras-e-furos/subtrair-que-nao-corta/
+
+- `receita.js` — subtrair-que-nao-corta/receita.js — peça de prova do defeito "um `subtrair` que não corta nada passa calado" (plano "costuras e furos limpos"): um bloco de 1…
+- `subtrair-que-nao-corta.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte o número marcado.
+
 ## tools/fixtures/familia-chamavel/
 
 - `composicoes.js` — Fixture de teste: as duas composições da família `tubo-de-prova`, uma barra maciça e um tubo de parede. Quem a usa é `procedural/familias/familias.test.js` e…
@@ -2792,6 +2837,17 @@
 - `prancha-regras.test.mjs` — As regras de desenho da família ligadas às conferências da prancha (fatia 2 do plano docs/modelar/planos/encerrados/2026-11-03-regras-de-desenho-por-familia.…
 - `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…
 - `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
+
+## tools/modelar/reguas-de-malha/
+
+- `face-degenerada.mjs` — face-degenerada.mjs — régua de malha: a face de três ou mais cantos que não define plano (plano "costuras e furos limpos", fatia 1).
+- `face-degenerada.test.mjs` — face-degenerada.test.mjs — a régua acha exatamente o que o `adaptarThree` recusa como "é degenerada".
+- `reguas-de-malha.mjs` — reguas-de-malha.mjs — as três réguas de malha juntas (plano "costuras e furos limpos", fatia 1): a face degenerada, o triângulo fino em região plana e o serr…
+- `resumo-do-acervo.mjs` — resumo-do-acervo.mjs — roda as três réguas de malha sobre o acervo inteiro (`procedural/pecas/` e `tools/fixtures/acervo/`) e imprime uma tabela e, com `--js…
+- `serrilhado-da-costura.mjs` — serrilhado-da-costura.mjs — régua de malha: degraus e pontas de serra na linha onde as faces de um `arredondarCostura` encontram o resto do sólido (plano "co…
+- `serrilhado-da-costura.test.mjs` — serrilhado-da-costura.test.mjs — a régua mede a direção que vira e volta na linha onde as faces do arredondamento encontram o resto.
+- `triangulo-fino.mjs` — triangulo-fino.mjs — régua de malha: o triângulo fino e longo numa região plana (plano "costuras e furos limpos", fatia 1).
+- `triangulo-fino.test.mjs` — triangulo-fino.test.mjs — a régua conta o leque que cruza uma região plana e deixa passar o que a triangulação não pode evitar.
 
 ## tools/oficina/
 
