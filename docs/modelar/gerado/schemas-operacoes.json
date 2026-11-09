@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:97cd8b14421429c093b886d807c5f0fc785b90c3d375743d82225bb862702a07",
+  "assinatura": "sha256:b9956bd0c855e7da074f5a53791b326bdcdb2a43357235201a57625813728646",
   "total": 40,
   "operacoes": [
     {
@@ -260,7 +260,7 @@
           "A origem sem parte são as faces da chapa cortada, com a parede; parte: 'parede' só a parede; parte: 'lente' o pedaço retirado, com lente: true. O friso segue a borda de fora do vão por superficie: { op: 'aberturaPorContorno', id }.",
           "Dois vãos vistos do mesmo eixo: o contorno do segundo precisa de 0,3 mm ou mais de folga do furo do primeiro (a bateria de 2026-11-06 mediu); abaixo disso a limpeza funde vértices da borda do primeiro e o passo recusa com a medida, e o contorno que toca o furo ou entra nele recusa como contorno que cruza a borda da chapa. Vãos de vistas diferentes só precisam que o do segundo não toque o furo do primeiro visto do eixo dele.",
           "Com sentido, a camada cortada é a que fica de um lado do plano que passa entre as duas, medido nos pontos do contorno e numa grade dentro dele; a outra camada que passe desse plano fora do contorno recusa o vão pela borda, e a recusa diz o plano. A camada do meio de um corpo de três não se alcança.",
-          "A limpeza da costura deixa a lasca que não acha como desfazer (na sela de flanco forte, uma face da parede ou da lente com quatro pontos alinhados) e a conta em limpeza.finasRestantes do registro; o gate de malha a acusa.",
+          "A limpeza da costura deixa a lasca que não acha como desfazer (na sela de flanco forte, uma face da parede ou da lente com quatro pontos alinhados) e a conta em limpeza.finasRestantes do registro, das faces que a booleana devolveu (limpeza.escopoDasFinas diz se foi o trecho recortado da vizinhança ou a chapa inteira); o gate de malha a acusa. O registro vizinhanca diz se o vão recortou o trecho e por qual caminho (via: direto, paredes soltas ou tubo absorvido, com facesDeTubo), ou o motivo de a booleana ter visto a chapa inteira.",
           "Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora."
         ],
         "diagnosticos": []
