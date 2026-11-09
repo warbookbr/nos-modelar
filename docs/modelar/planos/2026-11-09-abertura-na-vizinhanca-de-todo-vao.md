@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/aberturas-em-teste/`, `tools/modelar/acervo-real.test.mjs`, `tools/modelar/guardas/abre-na-bancada.test.mjs`
+**Território:** `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/aberturas-em-teste/`, `tools/modelar/acervo-real.test.mjs`, `tools/modelar/guardas/abre-na-bancada.test.mjs`, `tools/modelar/guardas/guarda-tempo-do-descrever.mjs`
 
 **Responsável:** a IA da sessão do furgão, com as decisões técnicas delegadas pela pessoa em 2026-11-09; a pessoa é a
 crítica por imagem e só vê o furgão se a malha dele mudar de forma.
@@ -25,8 +25,8 @@ registro (`vizinhanca.motivo`) dá em cada uma:
   abertura colada à parede de outro vão": a borda sai com uma volta ou toca a si mesma, por lascas de 1 a 3 mm rentes ao
   chanfro do vão da porta.
 
-O teto do furgão subiu a 860 s e o prazo dos dois testes a 1.000 s e 600 s no mesmo dia, para o envio não ficar parado, e
-voltam a cair com este plano.
+O teto do furgão subiu a 860 s e o prazo dos dois testes a 1.000 s e 600 s no mesmo dia, para o envio não ficar parado, e o
+orçamento do `guarda:tempo`, que mediu 202,8 s no `descrever`, foi de 180 s a 300 s; todos voltam a cair com este plano.
 
 ## Resultado
 
@@ -46,7 +46,7 @@ DIRETO o `vizinhanca.test.ts` e o perfil por passo como prova.
 - a vizinhança que absorve o tubo de parede inteiro do vão vizinho, quando a borda encosta nele;
 - uma peça de prova em `tools/fixtures/aberturas-em-teste/` para cada um dos três motivos, que hoje cai na chapa inteira e
   passa a recortar, com a malha do vão igual à da chapa inteira dentro da tolerância da booleana;
-- os tetos do `acervo-real.test.mjs` e do `abre-na-bancada.test.mjs` medidos de novo.
+- os tetos do `acervo-real.test.mjs` e do `abre-na-bancada.test.mjs` medidos de novo, e o orçamento do `guarda:tempo` de volta a 180 s.
 
 ## Excluído
 
