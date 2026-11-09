@@ -24,7 +24,7 @@ export function criarOperacoesEstruturais(servicos) {
     if (ids.length === 1) return { id: ids[0], ids, face: st.F.get(ids[0]), regiao: false };
     if (ids.length === 0) return grita(st, i, op, campo, `${campo} precisa resolver para EXATAMENTE uma face, ou para uma região plana de faces ligadas: ${dita}`), null;
     const lista = `${ids.slice(0, 8).join(', ')}${ids.length > 8 ? ', …' : ''}`;
-    const rotulo = `a região de ${ids.length} faces de ${campo} (${lista})`;
+    const rotulo = `a região de ${ids.length} faces do campo ${campo} (${lista})`;
     const grupo = grupoCoplanar(st, indiceDeArestas(st), ids[0]);
     const fora = ids.filter((f) => !grupo.has(f));
     if (fora.length) {

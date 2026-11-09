@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1771 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1773 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2844,7 +2844,9 @@
 
 - `face-degenerada.mjs` — face-degenerada.mjs — régua de malha: a face de três ou mais cantos que não define plano (plano "costuras e furos limpos", fatia 1).
 - `face-degenerada.test.mjs` — face-degenerada.test.mjs — a régua acha exatamente o que o `adaptarThree` recusa como "é degenerada".
-- `reguas-de-malha.mjs` — reguas-de-malha.mjs — as três réguas de malha juntas (plano "costuras e furos limpos", fatia 1): a face degenerada, o triângulo fino em região plana e o serr…
+- `face-torcida.mjs` — face-torcida.mjs — régua de malha: a face que se cruza e o triângulo virado (plano "costuras e furos limpos", refeitura do `furo` em anéis).
+- `face-torcida.test.mjs` — face-torcida.test.mjs — a régua acha a face em gravata e o triângulo virado, e deixa passar a face convexa e a face côncava boa; e a peça do caso do furo ceg…
+- `reguas-de-malha.mjs` — reguas-de-malha.mjs — as réguas de malha juntas (plano "costuras e furos limpos", fatia 1; a de face torcida é exportada à parte, fora do conjunto medido): a…
 - `resumo-do-acervo.mjs` — resumo-do-acervo.mjs — roda as três réguas de malha sobre o acervo inteiro (`procedural/pecas/` e `tools/fixtures/acervo/`) e imprime uma tabela e, com `--js…
 - `serrilhado-da-costura.mjs` — serrilhado-da-costura.mjs — régua de malha: degraus e pontas de serra na linha onde as faces de um `arredondarCostura` encontram o resto do sólido (plano "co…
 - `serrilhado-da-costura.test.mjs` — serrilhado-da-costura.test.mjs — a régua mede a direção que vira e volta na linha onde as faces do arredondamento encontram o resto.

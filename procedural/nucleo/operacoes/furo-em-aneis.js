@@ -72,6 +72,12 @@ function afastar(anel, d) {
   });
 }
 
+/** Verdadeiro se o polígono (cantos em 2D) tem todo giro estritamente positivo (mais que `eps` no dobro da área): convexo, sem canto colinear e anti-horário. */
+export function convexoAntiHorario(P, eps) {
+  for (let t = 0; t < P.length; t++) if (!(cruz2(P[(t + P.length - 1) % P.length], P[t], P[(t + 1) % P.length]) > eps)) return false;
+  return true;
+}
+
 function distanciaAoSegmento(p, a, b) {
   const abx = b[0] - a[0], aby = b[1] - a[1];
   const l2 = abx * abx + aby * aby;
@@ -130,7 +136,7 @@ function apoioPelasRetas(contorno, anel, raioMedio, margemDentro) {
 /* Orelhas de um polígono simples anti-horário, com cantos colineares permitidos: só corta orelha de área positiva, sem outro canto dentro, sobre a borda
    ou sobre a diagonal dela (o canto colinear de uma reta de setor é vértice da malha e não pode ficar fora de nenhum triângulo); entre as orelhas livres
    corta a de melhor forma (soma dos lados ao quadrado sobre a área), com empate no menor índice. Devolve os triângulos em índices do polígono, ou null. */
-function orelhas(pts, eps) {
+export function orelhas(pts, eps) {
   const resto = pts.map((_, k) => k);
   const tris = [];
   while (resto.length > 3) {
@@ -275,8 +281,21 @@ export function refazerEmAneis(entrada) {
     if (base.motivo) { if (!melhor) return base; break; }
     const r = montar(entrada, apoios, inicio, base, fator);
     if (!r) break;
-    melhor = r;
     const ponto = (t) => (t.tipo === 'contorno' ? contorno[t.i] : t.tipo === 'anel' ? aneis[t.k][t.j] : t.tipo === 'apoio' ? r.apoios[t.k][t.j] : r.extras[t.m]);
+    /* a prova da borda: cada polígono do anel (o quadrilátero, o triângulo e os do leque) é estritamente convexo e anti-horário no plano da face. O canto do
+       apoio anda na direção da âncora, quase tangente ao contorno quando o furo está perto da borda, e a prova de margem sozinha deixa passar o quadrilátero
+       em gravata, que o adaptador entrega com um triângulo virado; as bordas não dependem da grade, então a falha vale para todos os passos */
+    const epsBorda = 1e-12 * escala * escala;
+    for (const [k, lista] of r.bordas.entries()) {
+      for (const [j, d] of lista.entries()) {
+        if (!convexoAntiHorario(d.cantos.map(ponto), epsBorda)) return { motivo: `a borda ${j} do anel ${k} sairia torcida ou invertida no plano da face (o apoio não envolve o furo com folga)` };
+      }
+    }
+    for (const d of r.anexados) {
+      if (d.cantos.some((t) => t.tipo === 'extra' || t.tipo === 'contorno')) continue;
+      if (!convexoAntiHorario(d.cantos.map(ponto), epsBorda)) return { motivo: `o leque da aresta ${d.j} do anel ${d.k} sairia invertido no plano da face` };
+    }
+    melhor = r;
     const poligonos = [...r.bordas.flat(), ...r.preenchimento, ...r.anexados].map((d) => d.cantos.map(ponto));
     melhor.fino = temTrianguloFino(poligonos, media);
     if (!melhor.fino) break;

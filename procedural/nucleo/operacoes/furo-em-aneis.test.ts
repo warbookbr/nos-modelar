@@ -8,6 +8,10 @@ import { conferirMalha } from '../../../tools/oficina/conferir-malha.js';
 import { adaptarThree } from '../../../src/autoria/adaptar-three.js';
 // @ts-expect-error — régua de malha em JavaScript.
 import { medirTrianguloFino } from '../../../tools/modelar/reguas-de-malha/triangulo-fino.mjs';
+// @ts-expect-error — régua de malha em JavaScript.
+import { medirFaceTorcida } from '../../../tools/modelar/reguas-de-malha/face-torcida.mjs';
+// @ts-expect-error — refeitura em JavaScript.
+import { convexoAntiHorario, orelhas } from './furo-em-aneis.js';
 
 const m = (mm: number) => mm / 1000;
 const R = m(77), E = m(43);
@@ -112,7 +116,7 @@ describe('furo: o que a região recusa', () => {
     const ids = [...plano.F.keys()].sort((a: number, b: number) => a - b);
     const n = nucleo([['plano', { origemId: 1, largura: m(90), profundidade: m(90), seg: 3 }], ['apagaFace', { sel: { f: [ids[4]] } }], ['apagaFace', { sel: { f: [ids[8]] } }],
       ['furo', { origemId: 2, lados: 18, de: { op: 'plano', id: 1 }, centro: [m(-30), 0, m(-30)], raio: m(5), profundidade: m(3), orientacao: [1, 0, 0] }]] as any, {}, {});
-    expect(motivos(n).join('|')).toMatch(/a região de 7 faces de de .* toca a si mesma no vértice \d+: a borda não é uma volta só/);
+    expect(motivos(n).join('|')).toMatch(/a região de 7 faces do campo de .* toca a si mesma no vértice \d+: a borda não é uma volta só/);
   });
 
   it('setores alternados de um furo anterior (do mesmo plano, mas sem ligação entre si): recusa, porque não é ligada por aresta', () => {
@@ -241,5 +245,45 @@ describe('furo: a refeitura nunca termina pior que a repartição antiga, e os d
         expect(motivos(c).join('|'), nome).toMatch(/abriu UM anel só/);
       }
     }
+  });
+});
+
+describe('furo: a borda refeita é convexa, ou o furo volta à repartição antiga com aviso', () => {
+  const disco = (lados: number) => ['cilindro', { origemId: 1, raio: 0.077, altura: 0.02, lados }];
+  const entrada = { op: 'cilindro', id: 1, tampa: 'topo' };
+  // furos cegos a menos de 1 mm do lado de um disco denso: o canto do apoio anda quase tangente ao contorno e o quadrilátero da borda saía em gravata
+  const CASOS: Record<string, any[]> = {
+    'disco de 60 lados, furo de 5,5 mm a 0,78 mm do lado': [disco(60), ['furo', { origemId: 2, lados: 10, de: entrada, orientacao: [0.9135567143956582, 0, 0.9746120339735643], centro: [0.07057605148962429, 0.02, 0.0023984993752123062], raio: 0.005495620250701904, profundidade: 0.003 }]],
+    'disco de 52 lados, furo de 1,4 mm a menos de 1 mm do lado': [disco(52), ['furo', { origemId: 2, lados: 10, de: entrada, orientacao: [-0.6292623909568351, 0, -0.9960289447105651], centro: [-0.008091016324423897, 0.02, -0.07443128511003139], raio: 0.001371739387512207, profundidade: 0.003 }]],
+    'disco de 96 lados, furo passante de 0,5 mm junto ao lado': [disco(96), ['furo', { origemId: 2, lados: 6, de: entrada, orientacao: [-0.15490717724454606, 0, 0.1890646971888867], centro: [-0.07608679992222601, 0.02, -0.003281383940469392], raio: 0.0005027494877576828, saida: { op: 'cilindro', id: 1, tampa: 'fundo' } }]],
+  };
+  for (const [nome, passos] of Object.entries(CASOS)) {
+    it(`${nome}: sem face torcida e sem órfão; se a refeitura recuou, o aviso diz a borda`, () => {
+      const n = nucleo(passos as any, {}, {});
+      expect(n.orfaos).toEqual([]);
+      expect(medirFaceTorcida(n).torcidas).toBe(0);
+      const antigas = n.avisos.filter((a: any) => a.ref === 'repartiçãoAntiga');
+      expect(antigas.length).toBeGreaterThan(0);
+      expect(antigas[0].motivo).toMatch(/torcida ou invertida/);
+    });
+  }
+
+  it('convexoAntiHorario: o quadrado passa; a gravata, o canto colinear e o horário não', () => {
+    expect(convexoAntiHorario([[0, 0], [1, 0], [1, 1], [0, 1]], 1e-12)).toBe(true);
+    expect(convexoAntiHorario([[0, 0], [1, 0], [0, 1], [1, 1]], 1e-12)).toBe(false);
+    expect(convexoAntiHorario([[0, 0], [1, 0], [2, 0], [1, 1]], 1e-12)).toBe(false);
+    expect(convexoAntiHorario([[0, 0], [0, 1], [1, 1], [1, 0]], 1e-12)).toBe(false);
+  });
+
+  it('orelhas com canto colinear sobre a diagonal: a orelha que deixaria o canto de fora não é cortada (a prova é `>= -eps`, e `> eps` a deixaria passar)', () => {
+    // triângulo equilátero a(0,0) b(2,0) d(1,√3) com um canto v no meio da aresta d→a: a orelha em b é a de melhor forma e deixaria v fora dos triângulos
+    const h = Math.sqrt(3);
+    const pts = [[0, 0], [2, 0], [1, h], [0.5, h / 2]];
+    const t = orelhas(pts, 1e-12);
+    expect(t).not.toBeNull();
+    expect(t).toHaveLength(2);
+    // todo canto aparece em algum triângulo, e nenhum triângulo é a orelha (0,1,2) que deixaria o 3 sem uso
+    expect(new Set(t.flat())).toEqual(new Set([0, 1, 2, 3]));
+    expect(t.some((x: number[]) => [...x].sort().join() === '0,1,2')).toBe(false);
   });
 });
