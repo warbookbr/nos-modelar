@@ -91,3 +91,57 @@ Proporção que não lê como empilhadeira de 2,5 t (torre baixa ou fina demais,
 rodas traseiras do tamanho das dianteiras, protetor estreito); peça que cruza
 outra; roda fora do chão; junta com eixo errado; garfos fora do carro; cilindro
 de GLP sem berço.
+
+## Carcaça (fatias 1 e 2)
+
+Referências de caráter da carcaça isolada, trazidas pela pessoa em 2026-11-09,
+uma vista por arquivo: `referencias/carcaca-lado.ia.png`,
+`referencias/carcaca-cima.ia.png`, `referencias/carcaca-frente.ia.png` e
+`referencias/carcaca-tras.ia.png`. Elas substituem a lateral de outubro como
+fonte de forma da carcaça, porque mostram a mesma máquina das vistas inteiras
+sem as peças que escondem a carcaça (rodas, torre, protetor, banco). A lateral
+é mapeada por parte com `npm run contorno`
+(`referencias/carcaca-lado.ia.regioes.json`), com as âncoras nos centros dos
+dois cubos: o dianteiro a 352,5 mm do chão (raio do pneu 7.00-12) e o traseiro
+a 1.700 mm dele (entre-eixos da ficha), o que dá 4,28 mm/px.
+
+A escala de cada vista vem da ficha e a forma vem da vista. Comprimento e
+altura saem da lateral pela calibração dos cubos. A largura sai da vista de
+cima pela largura nos pneus da ficha (1.150 mm em 351 px, 3,28 mm/px), porque a
+vista de cima escalada pela lateral daria a carcaça com 1.320 mm e os pneus com
+1.485 mm, uma razão entre largura e entre-eixos que nenhuma classe real tem
+(atrito 5). Com isso a carcaça fica com 1.040 mm nos paralamas dianteiros,
+1.010 mm no meio e 1.020 mm no capô, e o canto de trás do capô, visto de cima, é
+um arco que tira 110 mm de cada lado nos últimos 220 mm.
+
+A carcaça é uma peça rígida, `carcaca`, com estas partes nomeadas, cada uma
+com a sua cor por material:
+
+| parte | o que é | cor | vista que a define |
+|---|---|---|---|
+| `chassi` | chapas do chassi atrás dos cubos dianteiros e a travessa que recebe os pinos da torre | cinza | frente e lado |
+| `laterais` | o corpo laranja dos dois lados, com o arco da roda dianteira, a borda de cima em diagonal e o furo da tampa de combustível só do lado esquerdo | laranja | lado e cima |
+| `paralamas` | as abas laranja sobre as rodas dianteiras, com o canto da frente arredondado em planta | laranja | cima e lado |
+| `piso` | o piso do operador com o tapete e os dois degraus antiderrapantes | cinza escuro | cima e lado |
+| `painel` | o anteparo inclinado à frente do posto, de onde sai a coluna de direção | cinza | lado e cima |
+| `tampaMotor` | a tampa arredondada sobre o motor, que é a base do banco | cinza | cima e lado |
+| `colunas` | os montantes atrás da tampa do motor, onde se apoiam os pés de trás do protetor | cinza | lado e cima |
+| `capo` | a caixa laranja de trás, com o canto traseiro arredondado em planta | laranja | cima, lado e trás |
+| `tampa` | a tampa cinza do alto do capô, com a grade do radiador logo abaixo dela | cinza | trás e lado |
+| `contrapeso` | o bloco cinza de baixo, atrás, com o rasgo do pino de reboque e os poços das rodas traseiras | cinza | trás e lado |
+
+A técnica de cada volume é a da carcaça bruta: a silhueta lateral da parte (o
+contorno em mm da lateral, simplificado) extrudada na largura da parte e
+cruzada com a planta dela (o contorno da vista de cima), por `extrusao` e
+`intersectar`. Os poços das rodas saem por `subtrair` do cilindro do pneu com
+40 mm de folga em volta, do lado de dentro do pneu até fora da carcaça, porque
+as rodas ficam parcialmente sob os paralamas e o capô (os pneus dianteiros
+ocupam de 395 a 575 mm do centro, e a carcaça vai até 520). Na fatia 2 entram
+as arestas arredondadas (`arredondarAresta`, raio de 30 mm no capô, nas
+laterais e na tampa do motor, 10 mm nas chapas), a grade com as aletas, as
+lanternas rentes, o furo da tampa de combustível, os degraus, o rasgo do
+contrapeso e as linhas de painel do capô.
+
+O que fica fora da carcaça, embora apareça nas vistas dela: o cubo e o
+diferencial do eixo dianteiro (fatia 3), o eixo traseiro com a suspensão
+(fatia 3) e o pé da torre com o suporte da inclinação (fatia 4).
