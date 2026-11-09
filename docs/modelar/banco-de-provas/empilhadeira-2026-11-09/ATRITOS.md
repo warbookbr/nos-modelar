@@ -51,6 +51,11 @@ processo o teria pego sozinho e o destino.
    Destino: `lacosPelasVistas` (`procedural/nucleo/lacos-pelas-vistas.js`, com teste e ficha em `npm run capacidade`)
    dá os laços horizontais de `gaiolaPorLacos` a partir da silhueta de lado, da largura por altura e da planta, com a
    ponta da planta levada à silhueta em toda altura; o rascunho da traseira (`carcaca-traseira.esboco.mjs`) passou a
-   sair dele, com a divisa reta, o bico acompanhando a curva e a superfície lisa da subdivisão. A coincidência por cor
-   caiu de 81% para 70% porque a subdivisão arredonda os cantos e a caixa ficou 2% mais larga no bico; a forma é
-   julgada pela pessoa na imagem.
+   sair dele, com a divisa reta, o bico acompanhando a curva e a superfície lisa da subdivisão.
+8. **O capô subdividido saiu ondulado.** Com `compensar: true` em `gaiolaPorLacos`, a superfície passava de 10 a 30 mm
+   do pedido e fazia uma onda depois de cada degrau da silhueta (o bico do capô), e a caixa ficava 2% mais larga. A
+   comparação por cor só mostrou a queda (de 81% para 70%), sem dizer onde; a pessoa viu as ondas na imagem. Destino: a
+   malha subdividida foi medida por faixa de altura (meia largura e traseira no centro, contra o pedido), o rascunho
+   saiu de `compensar` com um laço a cada 20 a 40 mm (largura no pedido, ponta 5 mm para dentro, cor a 75%), e o
+   limite está escrito no cabeçalho de `lacos-pelas-vistas.js`. A medida por faixa de altura foi feita em script
+   solto; entra no backlog junto da comparação por cor.

@@ -33,6 +33,10 @@
  * O LAÇO CURTO. Onde o intervalo da altura mede menos que os dois recuos somados (a aba de uma tampa, a ponta de um bico), os
  * recuos encolhem por igual até o lado do laço medir `espessuraMinima`, e a altura entra em `avisos`.
  *
+ * SEM COMPENSAR. Com `compensar: true` em `gaiolaPorLacos`, a superfície de um capô de 1.190 mm passou de 10 a 30 mm do pedido e
+ * ondulou depois de cada degrau da silhueta; sem ela, com um laço a cada 20 a 40 mm, a largura sai no pedido e a ponta fica 5 mm
+ * para dentro, sem onda (medido em 2026-11-09, por faixa de altura da malha subdividida). Deixe `compensar` para o arco de cota.
+ *
  * AS RECUSAS. Silhueta que uma altura corta em mais de um intervalo, altura fora da silhueta, perfil fora de ordem e planta com
  * menos de três pontos são recusados com a medida. */
 

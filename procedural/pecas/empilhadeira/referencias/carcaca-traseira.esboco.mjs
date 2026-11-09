@@ -62,10 +62,10 @@ function booleana(op, solidos) {
 function parte(nome, sel, cor) {
   passos.push(['parte', { nome, sel }], ['pincel', { modo: 'face', sel, cor }], ['liso', { sel, angulo: 35 }]);
 }
-/** O corpo de `lacosPelasVistas`, subdividido. */
+/** O corpo de `lacosPelasVistas`, subdividido. Sem `compensar`: nestes laços ela passou de 10 a 30 mm do pedido e ondulou o capô. */
 function corpo(nome, vistas, extra = {}) {
   const { meiaPlanta, avisos, ...lacos } = lacosPelasVistas(vistas);
-  const g = gaiolaPorLacos({ nome, eixo: 'y', ...lacos, compensar: true, ...extra });
+  const g = gaiolaPorLacos({ nome, eixo: 'y', ...lacos, ...extra });
   Object.assign(topo, g.pontosMm);
   origem += 1;
   passos.push(['subdivisao', { origemId: origem, ...g.passo, niveis: 2 }]);
@@ -74,7 +74,7 @@ function corpo(nome, vistas, extra = {}) {
 
 /* (linha em px, meia largura em px) de baixo para cima -> [altura, meia largura] em mm, e o polígono simétrico (x, y) */
 /* a face da frente de cada corpo é plana e fica escondida no conjunto: as duas quinas dela levam vinco */
-const QUINAS = { vincos: [{ nome: 'quinaDireita', entre: ['direita', 'fim'], nitidez: 'viva' }, { nome: 'quinaEsquerda', entre: ['fim', 'esquerda'], nitidez: 'viva' }] };
+export const QUINAS = { vincos: [{ nome: 'quinaDireita', entre: ['direita', 'fim'], nitidez: 'viva' }, { nome: 'quinaEsquerda', entre: ['fim', 'esquerda'], nitidez: 'viva' }] };
 
 const perfil = (meias) => meias.map(([y, w]) => [H(y), w * MM]);
 const simetrico = (meias) => [...meias.map(([y, w]) => [w * MM, H(y)]), ...[...meias].reverse().map(([y, w]) => [-w * MM, H(y)])];
@@ -118,11 +118,12 @@ const TOPO_CONTRA = 645;     // o contrapeso acaba reto, 12 mm para dentro do ca
 
 /* capô: o casco laranja, com o vão da grade ------------------------------------------------------------------------------------ */
 const meiaCapo = 148 * MM;
-let capo = corpo('capo', {
+export const VISTAS_DO_CAPO = {
   lado: lado('capo', ([z, y]) => [z, y > 1100 ? TOPO_CAPO : y]),
   perfil: perfil(CAPO), planta: plantaTraseira(meiaCapo, 1400),
-  estacoes: [632.5, 645, 666, 730, 790, 812, 900, 980, 1050, 1085, 1103, TOPO_CAPO],
-}, QUINAS);
+  estacoes: [632.5, 650, 666, 700, 740, 780, 800, 812, 825, 860, 900, 940, 980, 1020, 1060, 1085, 1100, TOPO_CAPO],
+};
+let capo = corpo('capo', VISTAS_DO_CAPO, QUINAS);
 capo = booleana('subtrair', [capo, extZ(simetrico(VAO_GRADE.map(([y, w]) => [y, w + 1])), -1950, -2300)]);
 parte('capo', capo, LARANJA);
 
