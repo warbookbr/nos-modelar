@@ -21,6 +21,7 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira o conjunto 180 graus para os três quartos de trás. */
 import { ferramentas, CINZA, ESCURO } from './carcaca-traseira.esboco.mjs';
+import { gaiolaVarrida } from '../../../nucleo/gaiola-varrida.js';
 import carcaca from './carcaca.esboco.mjs';
 
 const CINZA_PROTETOR = '#565b60';   // o mesmo cinza das colunas e da tampa do motor
@@ -105,6 +106,28 @@ const X_PE_TRAS = [460, 516];
 const X_PE_FRENTE = [455, 512];
 const Y_JUNTA = 1990;   // a altura em que as colunas acabam de se inclinar para dentro e entram no perfil do teto
 
+/* O trilho da coluna da frente, do lado s (1 é +x): sobe pelo eixo da coluna do pé (PE_FRENTE) a y 1.990, inclinando-se para dentro do
+   meio do pé ao meio do teto, segue reto no plano do teto até a dobra de raio `r` e corre no alto até z -1.300. O meio em x vem da
+   seção vista de frente: de 455 a 512 em y 768 (20 mm abaixo do pé) a 425 a 480 em Y_JUNTA. */
+function trilhoDaColunaFrente(s, r = 60) {
+  const meio = (y) => { const f = (y - (PE_FRENTE - 20)) / (Y_JUNTA - (PE_FRENTE - 20)); return ((X_PE_FRENTE[0] + X_PE_FRENTE[1]) * (1 - f) + (X_TETO[0] + X_TETO[1]) * f) / 2; };
+  const x = s * (X_TETO[0] + X_TETO[1]) / 2;
+  const B = [zEixoFrente(Y_TETO), Y_TETO]; const C = [-1300, Y_TETO];
+  const u1 = [B[0] - zEixoFrente(PE_FRENTE), B[1] - PE_FRENTE]; const l1 = Math.hypot(...u1); u1[0] /= l1; u1[1] /= l1;
+  const u2 = [C[0] - B[0], C[1] - B[1]]; const l2 = Math.hypot(...u2); u2[0] /= l2; u2[1] /= l2;
+  const giro = Math.atan2(u1[0] * u2[1] - u1[1] * u2[0], u1[0] * u2[0] + u1[1] * u2[1]);
+  const t = r * Math.tan(Math.abs(giro) / 2);
+  const ini = [B[0] - u1[0] * t, B[1] - u1[1] * t]; const fim = [B[0] + u2[0] * t, B[1] + u2[1] * t];
+  const sg = Math.sign(giro); const n1 = [-u1[1] * sg, u1[0] * sg]; const cen = [ini[0] + n1[0] * r, ini[1] + n1[1] * r];
+  const P = ([z, y]) => [x, y, z];
+  /* o giro no plano (z, y) de ângulo `giro` é, em torno do eixo x, o giro de -giro */
+  return [{ reta: { de: [s * meio(PE_FRENTE), PE_FRENTE, zEixoFrente(PE_FRENTE)], ate: P([zEixoFrente(Y_JUNTA), Y_JUNTA]) } },
+    { reta: { de: P([zEixoFrente(Y_JUNTA), Y_JUNTA]), ate: P(ini) } },
+    { arco: { centro: P(cen), eixo: [1, 0, 0], de: P(ini), graus: -giro * 180 / Math.PI } }, { reta: { de: P(fim), ate: P(C) } }];
+}
+/* a seção do tubo da coluna da frente: 55 mm em x por 70 de lado, com as quatro quinas vivas */
+const SECAO_COLUNA = [{ u: -27.5, v: -35, nome: 'a' }, { u: 27.5, v: -35, nome: 'b' }, { u: 27.5, v: 35, nome: 'c' }, { u: -27.5, v: 35, nome: 'd' }];
+
 export function montarProtetorPosto(estado) {
   const { extX, extY, extZ, booleana, parte } = ferramentas(estado);
   const unir = (...s) => booleana('unir', s);
@@ -114,14 +137,21 @@ export function montarProtetorPosto(estado) {
   const emX = (s, [a, b]) => (s > 0 ? [a, b] : [-b, -a]);
   /* gira uma forma já feita em torno do eixo x, pelo pivô [x, y, z] */
   const girarX = (sel, graus, pivo) => { estado.passos.push(['rotaciona', { eixo: 'x', graus, pivo, sel }]); return sel; };
+  /* o tubo de seção SECAO_COLUNA pelo trilho, fechado e tampado, subdividido como o corpo da carcaça */
+  const tubo = (nome, trilho) => {
+    const g = gaiolaVarrida({ nome, trilho, quadro: { u: [1, 0, 0] }, secao: SECAO_COLUNA, fechada: true, tampas: true,
+      estacoes: [{ fracao: 0 }, { passo: 50 }, { fracao: 1 }], vincos: SECAO_COLUNA.map(({ nome: linha }) => ({ linha, nitidez: 'viva' })) });
+    Object.assign(estado.topo, Object.fromEntries(g.posicoes));
+    estado.origem += 1;
+    estado.passos.push(['subdivisao', { origemId: estado.origem, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: 2 }]);
+    return { origem: { op: 'subdivisao', id: estado.origem } };
+  };
 
   /* --- protetor: as quatro colunas, o quadro e a grade do teto ------------------------------------------------------------------- */
-  /* A coluna da frente e o perfil de lado do teto são um tubo só: a faixa de 70 mm ao longo do caminho que sobe pela coluna, dobra com
-     raio de 60 mm (de lado o canto de fora da lateral é quase vivo: px 486 na linha 65 e 489 na 50) e corre no alto até a coluna de
-     trás. A inclinação para dentro (o pé por fora do painel, o alto na largura do teto) sai do cruzamento com a seção vista de frente. */
-  const caminho = caminhoComCurvas([[zEixoFrente(PE_FRENTE), PE_FRENTE], [zEixoFrente(Y_TETO), Y_TETO], [-1300, Y_TETO]], [60]);
-  const ladoFrente = faixa(caminho, 35);
-  const secaoFrente = (s) => { const p = [[X_PE_FRENTE[0], PE_FRENTE - 20], [X_PE_FRENTE[1], PE_FRENTE - 20], [X_TETO[1], Y_JUNTA], [X_TETO[1], TOPO + 5], [X_TETO[0], TOPO + 5], [X_TETO[0], Y_JUNTA]]; return s > 0 ? p : espelhoX(p).reverse(); };
+  /* A coluna da frente e o perfil de lado do teto são um tubo só: a seção de 55 por 70 mm varrida pelo trilho que sobe pelo eixo da
+     coluna, dobra com raio de 60 mm (de lado o canto de fora da lateral é quase vivo: px 486 na linha 65 e 489 na 50) e corre no alto
+     até a coluna de trás. O pé fica no meio de 455 a 512 e o trilho se inclina para dentro até o meio do teto (425 a 480) em y 1.990. */
+  const colunaFrente = (s) => tubo(`colunaFrente${s > 0 ? 'E' : 'D'}`, trilhoDaColunaFrente(s));
   /* O perfil de lado do teto, da dobra até a coluna de trás, pelo contorno da lateral (ver as medidas do teto): a borda de baixo com a
      quina de dentro em arco, o topo com o canto de fora redondo (px 490 na linha 48, 503 na 45, 523 na 42 e 537 na 39,5). */
   const perfilTeto = [[ZL(678), YL(80)], [ZL(578), YL(81)], [ZL(533), YL(84)], [ZL(525), YL(87)], [ZL(519), YL(90)], [ZL(514), YL(93)],
@@ -135,7 +165,7 @@ export function montarProtetorPosto(estado) {
     [-1215, TOPO], [ZL(678), YL(95)], [ZL(681), YL(140)], [ZL(689), YL(200)], [ZL(690), YL(260)]];
   const secaoTras = (s) => { const p = [[X_PE_TRAS[0], 1120], [X_PE_TRAS[1], 1120], [X_TETO[1], Y_JUNTA], [X_TETO[1], TOPO + 5], [X_TETO[0], TOPO + 5], [X_TETO[0], Y_JUNTA]]; return s > 0 ? p : espelhoX(p).reverse(); };
   const quadros = lados((s) => unir(
-    cruzar(extX(ladoFrente, ...emX(s, [380, 600])), extZ(secaoFrente(s), -1400, 100)),
+    colunaFrente(s),
     extX(perfilTeto, ...emX(s, X_TETO)),
     cruzar(extX(ladoTras, ...emX(s, [380, 600])), extZ(secaoTras(s), -1600, -1100)),
   ));

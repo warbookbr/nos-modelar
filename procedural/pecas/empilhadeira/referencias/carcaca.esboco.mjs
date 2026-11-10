@@ -18,8 +18,9 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a peça 180 graus para os três quartos de trás. */
 import {
-  ferramentas, montarTraseira, lado, simplifica, REGIOES, LARANJA, CINZA, ESCURO,
+  ferramentas, montarTraseira, lado, REGIOES, LARANJA, CINZA, ESCURO,
 } from './carcaca-traseira.esboco.mjs';
+import { contornoComArcos } from '../../../nucleo/arcos-do-contorno.js';
 
 const ESCURO_PISO = '#34383c';   // o tapete do piso: cinza escuro, mais claro que o fundo da grade
 
@@ -44,20 +45,6 @@ const espelhoX = (xy) => xy.map(([x, y]) => [-x, y]);         // o mesmo perfil 
 const LADOS = 96;
 const circulo = (cz, cy, r, n = LADOS) => Array.from({ length: n }, (_, k) => [cz + r * Math.cos(2 * Math.PI * k / n), cy + r * Math.sin(2 * Math.PI * k / n)]);
 
-/* O círculo que melhor passa pelos pontos (mínimos quadrados de Kasa): [cz, cy, r]. */
-function ajustarCirculo(pts) {
-  const a = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]; const b = [0, 0, 0];
-  for (const [x, y] of pts) {
-    const v = [x, y, 1]; const w = -(x * x + y * y);
-    for (let i = 0; i < 3; i += 1) { b[i] += v[i] * w; for (let j = 0; j < 3; j += 1) a[i][j] += v[i] * v[j]; }
-  }
-  const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
-    + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
-  const d = det(a);
-  const s = [0, 1, 2].map((k) => det(a.map((linha, i) => linha.map((v, j) => (j === k ? b[i] : v)))) / d);
-  const cz = -s[0] / 2; const cy = -s[1] / 2;
-  return [cz, cy, Math.sqrt(cz * cz + cy * cy - s[2])];
-}
 /* os pontos do círculo c de p0 a p1, pelo lado em que fica pm, com passo de 360/LADOS graus */
 function arcoDoCirculo([cz, cy, r], p0, p1, pm) {
   const ang = ([z, y]) => Math.atan2(y - cy, z - cz);
@@ -68,40 +55,13 @@ function arcoDoCirculo([cz, cy, r], p0, p1, pm) {
   const n = Math.max(2, Math.ceil(Math.abs(d) / (2 * Math.PI / LADOS)));
   return Array.from({ length: n + 1 }, (_, k) => [cz + r * Math.cos(a0 + d * k / n), cy + r * Math.sin(a0 + d * k / n)]);
 }
-/* o trecho do contorno bruto de `de` a `ate` (o mais curto dos dois sentidos), com o sentido */
-function trechoBruto(c, de, ate) {
-  const perto = (p) => c.reduce((m, q, i) => (Math.hypot(q[0] - p[0], q[1] - p[1]) < Math.hypot(c[m][0] - p[0], c[m][1] - p[1]) ? i : m), 0);
-  const n = c.length; const ia = perto(de); const ib = perto(ate);
-  const ida = (ib - ia + n) % n;
-  const passo = ida <= n / 2 ? 1 : -1; const t = [];
-  for (let i = ia; i !== ib; i = (i + passo + n) % n) t.push(c[i]);
-  t.push(c[ib]);
-  return { t, passo };
-}
 /** O contorno lateral da parte com os trechos em arco trocados pelo círculo ajustado aos pontos do contorno bruto, a 96 lados por
  *  volta. A simplificação do contorno (tolerância de 6 mm) deixava os arcos em facetas de 20 a 25 graus. `arcos` é uma lista de
  *  { de, ate } em [z, y] da lateral; `ajuste` acerta um ponto [z, y] da lateral, depois dos arcos, e pode devolver vários. Devolve [z do modelo, y] e os
  *  círculos usados. */
 function ladoSuave(regiao, arcos, ajuste = (p) => p) {
-  const bruto = REGIOES[regiao].contornoMm;
-  let c = simplifica(bruto);
-  const circulos = arcos.map(({ de, ate }) => {
-    const { t } = trechoBruto(bruto, de, ate);
-    const circ = ajustarCirculo(t);
-    const pts = arcoDoCirculo(circ, t[0], t[t.length - 1], t[Math.floor(t.length / 2)]);
-    const n = c.length;
-    const perto = (p) => c.reduce((m, q, i) => (Math.hypot(q[0] - p[0], q[1] - p[1]) < Math.hypot(c[m][0] - p[0], c[m][1] - p[1]) ? i : m), 0);
-    const ja = perto(t[0]); const jb = perto(t[t.length - 1]);
-    const ida = (jb - ja + n) % n;
-    if (ida <= n / 2) {
-      const r = [...c.slice(ja), ...c.slice(0, ja)];
-      c = [...pts, ...r.slice(ida + 1)];
-    } else {
-      const r = [...c.slice(jb), ...c.slice(0, jb)];
-      c = [...[...pts].reverse(), ...r.slice(n - ida + 1)];
-    }
-    return circ;
-  });
+  const { pontos: c, circulos: cs } = contornoComArcos(REGIOES[regiao].contornoMm, { arcos });
+  const circulos = cs.map(({ centro, raio }) => [centro[0], centro[1], raio]);
   const a = c.flatMap((p) => { const q = ajuste(p); return Array.isArray(q[0]) ? q : [q]; });
   const limpo = a.filter((p, i) => { const q = a[(i + a.length - 1) % a.length]; return Math.hypot(p[0] - q[0], p[1] - q[1]) > 0.5; });
   return { zy: limpo.map(([z, y]) => [-z, y]), circulos };
