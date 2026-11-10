@@ -19,6 +19,321 @@
         ],
         "analise": "ausente"
       }
+    },
+    {
+      "instancia": "eixoDianteiro",
+      "estado": "fixa",
+      "juntas": [
+        {
+          "relacao": "eixoNaPassagemDosPocos",
+          "com": "carcaca",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "folgaRadial": 0.3175,
+            "folgaRadialMinima": 0.3175,
+            "folgaRadialMaxima": 0.3175,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "especificacaoFolgaRadial": {
+              "minimo": 0.3175,
+              "maximo": 0.3175,
+              "nominal": 0.3175,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "inicioReferencia": -0.377,
+            "fimReferencia": 0.377,
+            "inicioMovel": -0.377,
+            "fimMovel": 0.377,
+            "sobraInicio": 0,
+            "sobraFim": 0,
+            "sobreposicaoAxial": 0.754,
+            "separacaoAxial": 0
+          }
+        }
+      ],
+      "forma": "sha256:158e289082875efbfd428b7dc2e59f825b54afe9834871a76d662564391c0f55",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: Entendi, podemos seguir suas recomendações e avançar (aceite dos dois eixos como na imagem, com a junta do traseiro medida pelos poços)",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 2.",
+          "cubosDianteiros: superficie em tampa e flange, ponta externa de cada lado",
+          "eixoDianteiro: uniao em assentos em x=±270..323, topo do bloco sobre o tubo"
+        ],
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "rodaDianteiraEsquerda",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "rodaDianteiraEsquerdaGiraNoCubo",
+          "com": "eixoDianteiro",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.04500000000000002,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.045,
+              "maximo": 0.045,
+              "nominal": 0.045,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "forma": "sha256:90404fcf110c3022e70d65a235205559d2d42b53d7b73facb94d012b3845ba4c"
+    },
+    {
+      "instancia": "rodaDianteiraDireita",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "rodaDianteiraDireitaGiraNoCubo",
+          "com": "eixoDianteiro",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.04500000000000002,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.045,
+              "maximo": 0.045,
+              "nominal": 0.045,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "forma": "sha256:90404fcf110c3022e70d65a235205559d2d42b53d7b73facb94d012b3845ba4c"
+    },
+    {
+      "instancia": "eixoTraseiro",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "eixoTraseiroNaPassagemDosPocos",
+          "com": "carcaca",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "folgaRadial": 0.279,
+            "folgaRadialMinima": 0.279,
+            "folgaRadialMaxima": 0.279,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "especificacaoFolgaRadial": {
+              "minimo": 0.279,
+              "maximo": 0.279,
+              "nominal": 0.279,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "inicioReferencia": -0.405,
+            "fimReferencia": 0.405,
+            "inicioMovel": -0.405,
+            "fimMovel": 0.405,
+            "sobraInicio": 0,
+            "sobraFim": 0,
+            "sobreposicaoAxial": 0.81,
+            "separacaoAxial": 0
+          }
+        }
+      ],
+      "forma": "sha256:77ab664e65c2ae807523bdfbd3c8d7601f52ff0a810b8a420b6ae7a59b773d48"
+    },
+    {
+      "instancia": "torre",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "olhalDireitoDaTorreNoEixo",
+          "com": "eixoDianteiro",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "folgaRadial": 0.0020000000000000018,
+            "folgaRadialMinima": 0.002,
+            "folgaRadialMaxima": 0.002,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "especificacaoFolgaRadial": {
+              "minimo": 0.002,
+              "maximo": 0.002,
+              "nominal": 0.002,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "inicioReferencia": -0.262,
+            "fimReferencia": -0.21500000000000002,
+            "inicioMovel": -0.262,
+            "fimMovel": -0.21500000000000002,
+            "sobraInicio": 0,
+            "sobraFim": 0,
+            "sobreposicaoAxial": 0.046999999999999986,
+            "separacaoAxial": 0
+          }
+        },
+        {
+          "relacao": "olhalEsquerdoDaTorreNoEixo",
+          "com": "eixoDianteiro",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "folgaRadial": 0.0020000000000000018,
+            "folgaRadialMinima": 0.002,
+            "folgaRadialMaxima": 0.002,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "especificacaoFolgaRadial": {
+              "minimo": 0.002,
+              "maximo": 0.002,
+              "nominal": 0.002,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "inicioReferencia": -0.262,
+            "fimReferencia": -0.21500000000000002,
+            "inicioMovel": -0.262,
+            "fimMovel": -0.21500000000000002,
+            "sobraInicio": 0,
+            "sobraFim": 0,
+            "sobreposicaoAxial": 0.046999999999999986,
+            "separacaoAxial": 0
+          }
+        }
+      ],
+      "forma": "sha256:94ee09130db5a9014afd556d47bbff68511909c62ac6997840b51cad35f153b2"
+    },
+    {
+      "instancia": "canalInterno",
+      "estado": "aberta",
+      "juntas": [],
+      "forma": "sha256:6457fc9d0f3dcdbeb879ffc6a45455bd52cd5de1d725cfadb16371619b8f1313"
+    },
+    {
+      "instancia": "cilindroElevacao",
+      "estado": "aberta",
+      "juntas": [
+        {
+          "relacao": "cilindroElevacaoNoAssento",
+          "com": "torre",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.03,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.03,
+              "maximo": 0.03,
+              "nominal": 0.03,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "forma": "sha256:b0bcbbc25e06342ca9b9b9fd7be9add6697be40aa49cde2ebd23c5ba13c84bff"
     }
   ]
 }

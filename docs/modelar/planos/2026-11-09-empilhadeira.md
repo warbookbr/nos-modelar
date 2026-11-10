@@ -260,6 +260,14 @@ esta muito bom sim, pode prosseguir normalmente". Com isso o rascunho fecha e
 começam as receitas, uma etapa por vez, pela carcaça. A lateral e a ficha
 ficam como fonte de medida, e as outras vistas de IA como caráter da forma.
 
+As etapas da carcaça e do eixo dianteiro ficaram fixas no mesmo dia, com o
+aceite da pessoa e os defeitos abertos atribuídos nos registros das rodadas. A
+pessoa aceitou também o eixo traseiro, com a junta medida pelo alinhamento com
+os poços, e aprovou a opção de ombro largo na família `roda-pneu`, que é do
+plano do furgão: o padrão dela não muda, e a prancha da família volta à pessoa.
+A torre entrou em receita pelo mastro externo, o canal interno e o cilindro de
+elevação.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
