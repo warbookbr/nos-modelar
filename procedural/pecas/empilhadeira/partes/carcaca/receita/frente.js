@@ -162,14 +162,21 @@ export function montarCarcaca(estado, T, contornos) {
   const TM = T.tampaMotor;
   const FRENTE_TM = -TM.frente; const TRAS_TM = -TM.tras;
   const ladoNariz = TM.nariz.map(([dz, w]) => [w, FRENTE_TM - dz]);
-  const RECOLHE_TM = [...TM.recolhe, [TM.recolhe[TM.recolhe.length - 1][0], TRAS_TM]];
+  /* o recolhimento até o canto de trás, redondo em planta, para os laços curtos do encosto terem o mesmo canto que os de baixo */
+  const xTrasTM = TM.recolhe[TM.recolhe.length - 1][0];
+  const RECOLHE_TM = [...TM.recolhe, ...arco(xTrasTM - TM.cantoDeTras, TRAS_TM + TM.cantoDeTras, TM.cantoDeTras, 0, -90)];
+  /* as quinas de trás vivas no corpo e esvaindo no encosto, entre as alturas de `esvai`: os laços dali para cima são o topo do banco */
+  const VT = TM.vincoDeTras;
+  const lacoEm = (a) => `e${TM.estacoes.indexOf(a)}`;
+  const esvai = { de: lacoEm(VT.esvai[0]), ate: lacoEm(VT.esvai[1]) };
+  const vincosDeTras = [{ nome: 'trasDir', entre: ['inicio', 'direita'] }, { nome: 'trasEsq', entre: ['esquerda', 'inicio'] }]
+    .map((v) => ({ ...v, nitidez: VT.nitidez, esvai }));
   const tampaMotor = corpo('tampaMotor', {
     lado: L(TM.lado),
     perfil: TM.perfil,
     planta: [...[...RECOLHE_TM].reverse(), ...[...ladoNariz].reverse(), ...ladoNariz.slice(1).map(([x, z]) => [-x, z]), ...espelhoX(RECOLHE_TM)],
     estacoes: TM.estacoes,
-  }, { vincos: [{ nome: 'base', laco: 'primeiro', nitidez: 'viva' },
-    { nome: 'trasDir', entre: ['inicio', 'direita'], nitidez: 'viva' }, { nome: 'trasEsq', entre: ['esquerda', 'inicio'], nitidez: 'viva' }] });
+  }, { vincos: [{ nome: 'base', laco: 'primeiro', nitidez: 'viva' }, ...vincosDeTras] });
   parte('tampaMotor', tampaMotor, COR.cinza);
 
   /* colunas: o bloco atrás da tampa do motor, com a borda de trás dentro do capô */
