@@ -15,9 +15,15 @@
  * duas caixas sai no relato: como cada eixo é ajustado em separado, a desproporção do objeto inteiro só aparece nesse número.
  *
  * AS RODADAS. `--registrar=<respostas.json>` confere que toda região da grade tem resposta, `{ "igual": true }` ou
- * `{ "diferencas": ["onde e o quê", ...] }`, e grava `rodadas/rodada-NN.json`; região sem resposta, resposta vazia ou nome que não é
+ * `{ "diferencas": ["forma: onde e o quê", "detalhe: ...", ...] }`, e grava `rodadas/rodada-NN.json`; região sem resposta, resposta vazia ou nome que não é
  * da grade recusam a rodada com a lista. `aceitas: { "B1": ["..."] }` guarda a diferença que quem conduz decidiu não corrigir (o eixo
  * que não é da peça, o detalhe que fica para outra fatia), com o motivo, e o pedido seguinte a repete ao crítico naquela região.
+ *
+ * FORMA E DETALHE. Nas duas primeiras rodadas da traseira o crítico encheu as três diferenças de toda região, citou o que o pedido
+ * mandava ignorar e, de uma rodada para a outra, trocou o lado de um adjetivo (o canto de baixo do laranja era vivo na referência e
+ * depois abaulado). Por isso cada diferença diz o tipo: `forma` (contorno, proporção, divisa entre materiais, volume) é o que quem
+ * conduz confere contra as linhas do modelo e corrige; `detalhe` (friso, botão, relevo, grade) vai em lista à fatia de detalhe. O
+ * pedido diz que região certa leva `igual`, e `--fora` escreve nele o que aparece na referência e não é da peça.
  *
  * AS LINHAS DO MODELO. A linha suave dentro de uma cor (um friso, uma onda) o crítico toma por luz: a listra do capô passou. Com
  * `--linhas=<png>`, o desenho de `npm run linhas:modelo` (o contorno, a divisa, a quina e a dobra, tirados da malha na mesma vista)
@@ -26,7 +32,7 @@
  * USO
  *   npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
  *     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="a traseira de uma máquina, vista de trás"]
- *     [--linhas=<png>]
+ *     [--linhas=<png>] [--fora="o eixo e as rodas"]
  *   npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
  *
  * `--caixa-ref` é a caixa do que é modelado, em px da referência (sem o que aparece nela e não é da peça). `--painel` é o retângulo
@@ -42,6 +48,7 @@ export const SOBREPOSICAO = 0.2;
 export const AMPLIACAO = 8;       // px da folha por px da referência
 export const REGIOES_POR_FOLHA = 3;
 export const LIMITE_DA_FRASE = 240;
+export const TIPOS = Object.freeze(['forma', 'detalhe']);
 const LETRAS = 'ABCDEFGHIJKL';
 const AZUL = [0, 90, 255]; const PRETO = [20, 20, 20]; const BRANCO = [255, 255, 255];
 
@@ -251,7 +258,7 @@ export function montarLeitura(o) {
 }
 
 /** O pedido ao crítico: as folhas, as perguntas de cada região e o formato da resposta. */
-export function pedido({ pasta, regioes, folhas, objeto, aceitas = {}, linhas = false }) {
+export function pedido({ pasta, regioes, folhas, objeto, aceitas = {}, linhas = false, fora = null }) {
   const nomes = regioes.map((r) => r.nome);
   const jaAceitas = Object.entries(aceitas).filter(([, v]) => v.length);
   return `# Leitura por regiões
@@ -265,7 +272,8 @@ Cada folha traz ${REGIOES_POR_FOLHA} regiões ampliadas, a referência à esquer
 O terceiro painel, LINHAS, é a referência clareada com as linhas que o MODELO tem, tiradas da geometria dele e não da luz: em
 vermelho o contorno e a divisa entre partes, em azul a quina e o degrau, em verde a dobra fechada da superfície.` : ''}
 
-Para CADA região (${nomes[0]} a ${nomes[nomes.length - 1]}), olhando só a forma (ignore brilho, sombra, textura e acabamento):
+Para CADA região (${nomes[0]} a ${nomes[nomes.length - 1]}), olhando só a forma (ignore brilho, sombra, textura e acabamento):${fora ? `
+Não é do corpo modelado, e você não cita: ${fora}.` : ''}
 
 1. Onde é cada cor ou material na referência e onde é no rascunho: as divisas estão no mesmo lugar e têm a mesma forma?
 2. Há linha, borda, degrau, friso ou quina que existe na referência e falta no rascunho? E que existe no rascunho e não na referência?
@@ -276,12 +284,15 @@ ${linhas ? `4. No painel LINHAS: cada linha colorida do modelo tem debaixo dela 
 Responda com um JSON e nada mais, com TODAS as regiões:
 
 \`\`\`json
-{ "regioes": { "${nomes[0]}": { "igual": true }, "${nomes[1] ?? nomes[0]}": { "diferencas": ["em cima, à direita: o canto do vão é redondo na referência e chanfrado no rascunho"] } },
+{ "regioes": { "${nomes[0]}": { "igual": true }, "${nomes[1] ?? nomes[0]}": { "diferencas": ["forma: em cima, à direita, o canto do vão é redondo na referência e chanfrado no rascunho"] } },
   "graves": ["as três diferenças mais graves da vista inteira, uma frase cada"] }
 \`\`\`
 
-Cada diferença é uma frase de até ${LIMITE_DA_FRASE} caracteres que diz ONDE na região (em cima, embaixo, à esquerda, à direita, no centro)
-e O QUE difere; no máximo três por região. Região sem diferença de forma leva \`{ "igual": true }\`.
+Cada diferença é uma frase de até ${LIMITE_DA_FRASE} caracteres que começa por \`forma:\` ou \`detalhe:\` e diz ONDE na região (em cima, embaixo,
+à esquerda, à direita, no centro) e O QUE difere. \`forma\` é o contorno, a proporção, a posição e a forma da divisa entre materiais e
+o volume de uma parte; \`detalhe\` é o que cabe dentro de uma parte sem mudar o contorno dela: friso, botão, relevo, grade, furo. Liste só
+o que você vê com segurança, as de forma primeiro, no máximo três por região; a região sem diferença leva \`{ "igual": true }\`, e
+é isso que se espera de uma região certa.
 `;
 }
 
@@ -289,10 +300,10 @@ e O QUE difere; no máximo três por região. Região sem diferença de forma le
 export function conferirRespostas(regioes, respostas) {
   const recusas = [];
   const dadas = respostas?.regioes;
-  if (dadas == null || typeof dadas !== 'object' || Array.isArray(dadas)) return { recusas: ['as respostas precisam de "regioes": { "<nome>": { "igual": true } | { "diferencas": [...] } }'], iguais: [], comDiferenca: [], diferencas: 0 };
+  if (dadas == null || typeof dadas !== 'object' || Array.isArray(dadas)) return { recusas: ['as respostas precisam de "regioes": { "<nome>": { "igual": true } | { "diferencas": [...] } }'], iguais: [], comDiferenca: [], diferencas: 0, porTipo: {} };
   const nomes = new Set(regioes.map((r) => r.nome));
   for (const n of Object.keys(dadas)) if (!nomes.has(n)) recusas.push(`a região "${n}" não é da grade (${regioes[0].nome} a ${regioes[regioes.length - 1].nome})`);
-  const iguais = []; const comDiferenca = []; let diferencas = 0;
+  const iguais = []; const comDiferenca = []; let diferencas = 0; const porTipo = Object.fromEntries(TIPOS.map((t) => [t, 0]));
   for (const { nome } of regioes) {
     const r = dadas[nome];
     if (r == null) { recusas.push(`a região ${nome} ficou sem resposta`); continue; }
@@ -302,19 +313,22 @@ export function conferirRespostas(regioes, respostas) {
     if (r.igual === true) { recusas.push(`a região ${nome} diz "igual": true e lista diferenças`); continue; }
     const ruim = lista.find((d) => typeof d !== 'string' || !d.trim() || d.length > LIMITE_DA_FRASE);
     if (ruim !== undefined) { recusas.push(`a região ${nome} tem uma diferença vazia ou com mais de ${LIMITE_DA_FRASE} caracteres`); continue; }
+    const semTipo = lista.find((d) => !TIPOS.some((t) => d.startsWith(`${t}:`)));
+    if (semTipo !== undefined) { recusas.push(`a região ${nome} tem uma diferença que não começa por ${TIPOS.map((t) => `"${t}:"`).join(' ou ')}`); continue; }
     comDiferenca.push(nome); diferencas += lista.length;
+    for (const t of TIPOS) porTipo[t] += lista.filter((d) => d.startsWith(`${t}:`)).length;
   }
   for (const [n, v] of Object.entries(respostas.aceitas ?? {})) {
     if (!nomes.has(n)) recusas.push(`"aceitas" cita a região "${n}", que não é da grade`);
     else if (!Array.isArray(v) || v.some((d) => typeof d !== 'string' || !d.trim())) recusas.push(`"aceitas" da região ${n} precisa ser uma lista de frases com o motivo`);
   }
-  return { recusas, iguais, comDiferenca, diferencas };
+  return { recusas, iguais, comDiferenca, diferencas, porTipo };
 }
 
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
 const AJUDA = `npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="<o que é e de onde é visto>"]
-    [--linhas=<png de linhas:modelo>]
+    [--linhas=<png de linhas:modelo>] [--fora="<o que aparece na referência e não é da peça>"]
 npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
 
 Corta a referência e a captura do rascunho na mesma grade e grava indice.png, folha-NN.png, pedido.md e leitura.json.
@@ -346,10 +360,10 @@ export function executar(argv) {
       const { dir, numero } = ultimaRodada(pasta);
       mkdirSync(dir, { recursive: true });
       const arquivo = join(dir, `rodada-${String(numero + 1).padStart(2, '0')}.json`);
-      writeFileSync(arquivo, `${JSON.stringify({ formato: 'modelar.leitura-por-regioes.rodada@1', captura: leitura.captura, iguais: r.iguais, comDiferenca: r.comDiferenca, diferencas: r.diferencas, regioes: respostas.regioes, graves: respostas.graves ?? [], aceitas: respostas.aceitas ?? {} }, null, 1)}\n`);
+      writeFileSync(arquivo, `${JSON.stringify({ formato: 'modelar.leitura-por-regioes.rodada@1', captura: leitura.captura, iguais: r.iguais, comDiferenca: r.comDiferenca, diferencas: r.diferencas, porTipo: r.porTipo, regioes: respostas.regioes, graves: respostas.graves ?? [], aceitas: respostas.aceitas ?? {} }, null, 1)}\n`);
       const linhas = r.comDiferenca.flatMap((n) => respostas.regioes[n].diferencas.map((d) => `  ${n}: ${d}`));
-      const proxima = r.diferencas ? 'corrija as diferenças, ou aceite com o motivo em "aceitas", e rode a leitura de novo sobre a captura nova' : 'nenhuma diferença: leve a imagem à pessoa';
-      return { codigo: 0, stdout: `rodada ${numero + 1}: ${r.iguais.length} regiões iguais, ${r.comDiferenca.length} com diferença, ${r.diferencas} diferenças\n${linhas.join('\n')}${linhas.length ? '\n' : ''}próxima ação: ${proxima}\n${arquivo}\n`, stderr: '' };
+      const proxima = r.porTipo.forma ? 'confira cada diferença de forma contra as linhas do modelo, corrija ou aceite com o motivo em "aceitas", e rode a leitura de novo sobre a captura nova' : (r.diferencas ? 'só restam detalhes: leve a imagem à pessoa com a lista deles' : 'nenhuma diferença: leve a imagem à pessoa');
+      return { codigo: 0, stdout: `rodada ${numero + 1}: ${r.iguais.length} regiões iguais, ${r.comDiferenca.length} com diferença, ${r.porTipo.forma} de forma e ${r.porTipo.detalhe} de detalhe\n${linhas.join('\n')}${linhas.length ? '\n' : ''}próxima ação: ${proxima}\n${arquivo}\n`, stderr: '' };
     }
     for (const n of ['referencia', 'caixa-ref', 'captura']) if (!valor(n)) throw new ErroDaLeitura(`falta --${n}`);
     const grade = valor('grade') ? valor('grade').split('x').map(Number) : GRADE_PADRAO;
@@ -365,7 +379,7 @@ export function executar(argv) {
     writeFileSync(join(pasta, 'indice.png'), paraPng(r.indice));
     r.folhas.forEach((f, i) => writeFileSync(join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`), paraPng(f)));
     const { ultima } = ultimaRodada(pasta);
-    writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto: valor('objeto'), aceitas: ultima?.aceitas ?? {}, linhas: r.comLinhas }));
+    writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto: valor('objeto'), aceitas: ultima?.aceitas ?? {}, linhas: r.comLinhas, fora: valor('fora') }));
     writeFileSync(join(pasta, 'leitura.json'), `${JSON.stringify({ formato: 'modelar.leitura-por-regioes@1', referencia: valor('referencia'), captura: valor('captura'), caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), painel: r.painel, caixaDaCaptura: r.caixaDaCaptura, grade, proporcao: { referencia: Number(r.proporcao.referencia.toFixed(4)), rascunho: Number(r.proporcao.rascunho.toFixed(4)) }, regioes: r.regioes }, null, 1)}\n`);
     const desvio = (r.proporcao.rascunho / r.proporcao.referencia - 1) * 100;
     return { codigo: 0, stdout: `${r.regioes.length} regiões em ${r.folhas.length} folhas, em ${pasta}\naltura sobre largura: referência ${r.proporcao.referencia.toFixed(3)}, rascunho ${r.proporcao.rascunho.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)\npedido ao crítico: ${join(pasta, 'pedido.md')}\n`, stderr: '' };

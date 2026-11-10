@@ -1,0 +1,148 @@
+{
+ "formato": "modelar.leitura-por-regioes.rodada@1",
+ "captura": "/tmp/claude-0/-home-user-nos-modelar/a45881b0-884a-5495-8d79-e44b78fae420/scratchpad/carc/t9.png",
+ "iguais": [],
+ "comDiferenca": [
+  "A1",
+  "A2",
+  "A3",
+  "A4",
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "C1",
+  "C2",
+  "C3",
+  "C4"
+ ],
+ "diferencas": 29,
+ "porTipo": {
+  "forma": 7,
+  "detalhe": 22
+ },
+ "regioes": {
+  "A1": {
+   "diferencas": [
+    "detalhe: à esquerda, o ombro da referência tem uma quina paralela à borda, como um chanfro; no rascunho a superfície é um arco liso",
+    "forma: no centro, a aba da tampa tem a borda de baixo reta no rascunho; na referência os cantos dela são arredondados sobre o vão",
+    "detalhe: à direita, a divisa entre o laranja e o cinza é uma quina arredondada na referência e um degrau reto no rascunho"
+   ]
+  },
+  "A2": {
+   "diferencas": [
+    "detalhe: embaixo, o vão da referência tem colmeia, furos e friso; no rascunho é liso",
+    "detalhe: à esquerda, a barra inclinada é grossa e curva na referência e fina e reta no rascunho",
+    "detalhe: em cima, a tampa da referência tem um abaulado central; no rascunho é lisa, com uma dobra sob a aba"
+   ]
+  },
+  "A3": {
+   "diferencas": [
+    "detalhe: embaixo, o miolo da grade tem aletas e dois níveis na referência",
+    "detalhe: à direita, a barra inclinada é grossa e curva na referência e fina e reta no rascunho"
+   ]
+  },
+  "A4": {
+   "diferencas": [
+    "detalhe: à direita, o ombro da referência tem uma quina paralela à borda; no rascunho é um arco liso",
+    "detalhe: à esquerda, a abertura lateral tem moldura arredondada e furos na referência"
+   ]
+  },
+  "B1": {
+   "diferencas": [
+    "forma: à esquerda, o canto de baixo do laranja é abaulado na referência e vivo no rascunho",
+    "detalhe: em cima, à direita, a moldura do vão é um recesso arredondado com friso na referência",
+    "detalhe: embaixo, a faixa cinza tem friso duplo e o botão em relevo na referência; no rascunho o botão é um quadrado quase sem relevo"
+   ]
+  },
+  "B2": {
+   "diferencas": [
+    "detalhe: em cima, a divisa do vão com o laranja tem moldura em degrau com recorte curvo na referência",
+    "detalhe: embaixo, o rasgo da referência é irregular, com aletas e um degrau; no rascunho é uma pílula lisa",
+    "forma: no centro, a borda de baixo do laranja é abaulada na referência e viva no rascunho"
+   ]
+  },
+  "B3": {
+   "diferencas": [
+    "detalhe: embaixo, o rasgo tem aletas e canto chanfrado com degrau na referência",
+    "forma: no centro, a borda de baixo do laranja é abaulada na referência e viva no rascunho"
+   ]
+  },
+  "B4": {
+   "diferencas": [
+    "detalhe: à esquerda, em cima, o vão tem moldura em recesso arredondada na referência",
+    "forma: à direita, o canto de baixo do laranja é abaulado na referência e vivo no rascunho",
+    "detalhe: embaixo, o botão é um bloco em relevo com friso duplo na referência"
+   ]
+  },
+  "C1": {
+   "diferencas": [
+    "forma: embaixo, o pé da referência parece alargar e ter o canto de fora redondo; no rascunho é mais estreito",
+    "detalhe: no centro, a face cinza é plana com leve degrau na referência e curva no rascunho"
+   ]
+  },
+  "C2": {
+   "diferencas": [
+    "detalhe: em cima, à direita, a placa sob o rasgo tem borda em degrau, canto chanfrado e um botão na referência",
+    "detalhe: à direita, o nicho tem um lado inclinado e dois batentes na referência",
+    "detalhe: embaixo, a meia-lua é um arco fundo com uma peça dentro na referência e rasa no rascunho"
+   ]
+  },
+  "C3": {
+   "diferencas": [
+    "detalhe: em cima, à esquerda, a placa tem degrau e canto chanfrado na referência; no rascunho é um retângulo sem relevo",
+    "detalhe: no centro, o nicho tem o lado direito inclinado e dois batentes na referência"
+   ]
+  },
+  "C4": {
+   "diferencas": [
+    "forma: embaixo, à direita, o pé da referência parece mais largo e de canto redondo; no rascunho é mais estreito"
+   ]
+  }
+ },
+ "graves": [
+  "as aberturas (grade, molduras, furos laterais, rasgo) são lisas no rascunho e têm aletas, molduras e degraus na referência",
+  "o ombro do laranja é um arco liso no rascunho e tem uma quina paralela à borda na referência; a borda de baixo do laranja é viva no rascunho e abaulada na referência",
+  "a faixa e o corpo do contrapeso perdem os frisos, o botão em relevo e a placa em degrau"
+ ],
+ "aceitas": {
+  "C1": [
+   "o alargamento do pé é a sombra do chão: com ele as linhas do modelo passavam 10 px por fora do corpo cinza (rodada anterior)",
+   "o laranja atrás do arco é a lateral da carcaça e o eixo não é da carcaça"
+  ],
+  "C4": [
+   "o alargamento do pé é a sombra do chão: com ele as linhas do modelo passavam 10 px por fora do corpo cinza (rodada anterior)",
+   "o laranja atrás do arco é a lateral da carcaça e o eixo não é da carcaça"
+  ],
+  "A1": [
+   "a quina do ombro é detalhe da superfície do capô e fica para a receita, com a silhueta já sobre a da referência nas linhas"
+  ],
+  "A4": [
+   "a quina do ombro é detalhe da superfície do capô e fica para a receita, com a silhueta já sobre a da referência nas linhas"
+  ],
+  "A2": [
+   "a grade fina, os furos e as molduras do vão ficam para a fatia de detalhe"
+  ],
+  "A3": [
+   "a grade fina, os furos e as molduras do vão ficam para a fatia de detalhe"
+  ],
+  "B1": [
+   "os frisos e o botão em relevo da faixa ficam para a fatia de detalhe"
+  ],
+  "B4": [
+   "os frisos e o botão em relevo da faixa ficam para a fatia de detalhe"
+  ],
+  "B2": [
+   "as aletas e o degrau do rasgo ficam para a fatia de detalhe"
+  ],
+  "B3": [
+   "as aletas e o degrau do rasgo ficam para a fatia de detalhe"
+  ],
+  "C2": [
+   "a placa em degrau, os batentes do nicho e a peça da meia-lua ficam para a fatia de detalhe"
+  ],
+  "C3": [
+   "a placa em degrau e os batentes do nicho ficam para a fatia de detalhe"
+  ]
+ }
+}

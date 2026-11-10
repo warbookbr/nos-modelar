@@ -105,7 +105,7 @@ function tira(x0, x1, meia, de, ate) {
 /* o capô: o canto de baixo quase vivo, o degrau do flanco entre as linhas 330 e 326 e o ombro chanfrado, com o topo plano a 117 px */
 const CAPO = [[401, 143], [398, 146], [394, 148], [370, 148], [350, 147], [334, 146], [330, 145], [326, 142], [322, 140], [314, 139],
   [306, 138], [298, 136], [290, 131], [286, 127], [283, 121], [281.9, 117]];
-const TAMPA = [[318, 100], [314, 101.5], [284, 101.5], [278, 100], [275, 96], [273, 90], [272, 84]];
+const TAMPA = [[318, 92], [316.5, 98], [313, 101.5], [284, 101.5], [278, 100], [275, 96], [273, 90], [272, 84]];
 const VAO_GRADE = [[361.5, 58], [361, 70], [360, 79], [358.5, 85.5], [356.5, 89.5], [354, 92], [350, 94], [342, 96], [334, 98], [326, 99], [318, 101], [306, 101]];
 /* os furos começam sob a aba da tampa (linha 313) e têm o canto de baixo de fora redondo, como o vão */
 const FUROS_GRADE = [
@@ -142,8 +142,8 @@ export const VISTAS_DO_CAPO = {
   perfil: perfil(CAPO), planta: plantaTraseira(meiaCapo, 1400),
   estacoes: [632.5, 650, 666, 720, 790, 850, 905, 918, 934, 950, 1010, 1047, 1079, 1100, TOPO_CAPO],
 };
-/* a borda de baixo viva, como a divisa da referência, e o topo do ombro com quina */
-const VINCOS_DO_CAPO = { vincos: [...QUINAS.vincos, { nome: 'base', laco: 'primeiro', nitidez: 'viva' }, { nome: 'ombro', laco: 'ultimo', nitidez: 0.6 }] };
+/* a borda de baixo com raio pequeno (a leitura deu viva demais com o vinco inteiro e redonda demais sem ele) e o ombro com quina */
+const VINCOS_DO_CAPO = { vincos: [...QUINAS.vincos, { nome: 'base', laco: 'primeiro', nitidez: 0.5 }, { nome: 'ombro', laco: 'ultimo', nitidez: 0.6 }] };
 let capo = corpo('capo', VISTAS_DO_CAPO, VINCOS_DO_CAPO);
 /* a borda em volta do vão: um degrau de BORDA_MM de fundo e BORDA px de largura, que acompanha a superfície do capô. Sai do vão
    alargado menos o mesmo capô recuado BORDA_MM. */

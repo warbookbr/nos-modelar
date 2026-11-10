@@ -90,12 +90,14 @@ describe('leitura por regiões', () => {
 
   it('recusa a rodada em que alguma região ficou sem resposta, e conta as diferenças da que está inteira', () => {
     const regioes = regioesDaGrade(800, 480, [2, 2]);
-    const falta = conferirRespostas(regioes, { regioes: { A1: { igual: true }, A2: { diferencas: [] }, B1: { igual: true, diferencas: ['x'] }, Z9: { igual: true } } });
+    const falta = conferirRespostas(regioes, { regioes: { A1: { igual: true }, A2: { diferencas: [] }, B1: { igual: true, diferencas: ['forma: x'] }, Z9: { igual: true } } });
     expect(falta.recusas).toEqual(['a região "Z9" não é da grade (A1 a B2)', 'a região A2 não diz "igual": true nem lista diferenças',
       'a região B1 diz "igual": true e lista diferenças', 'a região B2 ficou sem resposta']);
-    const inteira = conferirRespostas(regioes, { regioes: { A1: { igual: true }, A2: { diferencas: ['em cima: a quina é viva na referência e redonda no rascunho', 'embaixo: falta o friso'] },
-      B1: { igual: true }, B2: { diferencas: ['à direita: o vão é mais largo'] } }, aceitas: { B2: ['o eixo não é desta peça'] } });
-    expect(inteira).toEqual({ recusas: [], iguais: ['A1', 'B1'], comDiferenca: ['A2', 'B2'], diferencas: 3 });
+    const inteira = conferirRespostas(regioes, { regioes: { A1: { igual: true }, A2: { diferencas: ['forma: em cima, a quina é viva na referência e redonda no rascunho', 'detalhe: embaixo, falta o friso'] },
+      B1: { igual: true }, B2: { diferencas: ['forma: à direita, o vão é mais largo'] } }, aceitas: { B2: ['o eixo não é desta peça'] } });
+    expect(inteira).toEqual({ recusas: [], iguais: ['A1', 'B1'], comDiferenca: ['A2', 'B2'], diferencas: 3, porTipo: { forma: 2, detalhe: 1 } });
+    expect(conferirRespostas(regioes, { regioes: { A1: { diferencas: ['em cima: sem tipo'] }, A2: { igual: true }, B1: { igual: true }, B2: { igual: true } } }).recusas)
+      .toEqual(['a região A1 tem uma diferença que não começa por "forma:" ou "detalhe:"']);
     expect(conferirRespostas(regioes, { regioes: { A1: { diferencas: ['x'.repeat(241)] }, A2: { igual: true }, B1: { igual: true }, B2: { igual: true } } }).recusas)
       .toEqual(['a região A1 tem uma diferença vazia ou com mais de 240 caracteres']);
     expect(conferirRespostas(regioes, {}).recusas).toHaveLength(1);
@@ -119,17 +121,18 @@ describe('leitura por regiões', () => {
     const recusa = executar([`--saida=${join(pasta, 'l')}`, `--registrar=${join(pasta, 'r.json')}`]);
     expect(recusa.codigo).toBe(1);
     expect(recusa.stderr).toContain('a região A2 ficou sem resposta');
-    writeFileSync(join(pasta, 'r.json'), JSON.stringify({ regioes: { A1: { igual: true }, A2: { diferencas: ['em cima: o quadrado é menor'] }, B1: { igual: true }, B2: { igual: true } },
+    writeFileSync(join(pasta, 'r.json'), JSON.stringify({ regioes: { A1: { igual: true }, A2: { diferencas: ['forma: em cima, o quadrado é menor'] }, B1: { igual: true }, B2: { igual: true } },
       aceitas: { A2: ['o quadrado fica para a fatia de detalhe'] } }));
     const ok = executar([`--saida=${join(pasta, 'l')}`, `--registrar=${join(pasta, 'r.json')}`]);
     expect(ok.codigo).toBe(0);
-    expect(ok.stdout).toContain('rodada 1: 3 regiões iguais, 1 com diferença, 1 diferenças');
-    expect(ok.stdout).toContain('  A2: em cima: o quadrado é menor');
+    expect(ok.stdout).toContain('rodada 1: 3 regiões iguais, 1 com diferença, 1 de forma e 0 de detalhe');
+    expect(ok.stdout).toContain('  A2: forma: em cima, o quadrado é menor');
     executar(args);
     expect(readFileSync(join(pasta, 'l', 'pedido.md'), 'utf8')).toContain('- A2: o quadrado fica para a fatia de detalhe');
 
     expect(executar(['--saida=x']).codigo).toBe(2);
     expect(executar(['--ajuda']).stdout).toContain('npm run leitura:regioes');
     expect(pedido({ pasta: '/p', regioes: regioesDaGrade(80, 48, [2, 2]), folhas: 2 })).not.toContain('Já aceito');
+    expect(pedido({ pasta: '/p', regioes: regioesDaGrade(80, 48, [2, 2]), folhas: 2, fora: 'o eixo e as rodas' })).toContain('Não é do corpo modelado, e você não cita: o eixo e as rodas.');
   });
 });

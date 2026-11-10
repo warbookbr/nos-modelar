@@ -83,3 +83,12 @@ processo o teria pego sozinho e o destino.
    `npm run linhas:modelo` (`tools/modelar/linhas-do-modelo.mjs`) tira da malha o contorno, a divisa entre partes, a
    quina e a dobra fechada, na mesma vista, e a leitura as põe sobre a referência como terceiro painel de cada região
    (`--linhas`), com a pergunta de cada linha no pedido.
+11. **O crítico da leitura enche toda região e troca o lado de um adjetivo de uma rodada para a outra.** Nas duas
+   rodadas da traseira (`leitura-traseira/rodada-01.json` e `rodada-02.json`) ele listou diferença nas doze regiões,
+   quase sempre três por região, citou a grade e o eixo que o pedido mandava ignorar e disse do canto de baixo do
+   laranja primeiro que era vivo na referência e depois que era abaulado. Lidas contra as linhas do modelo, várias
+   eram verdadeiras e de forma (a faixa do contrapeso, os cantos dos rebaixos, a aba da tampa), uma era a sombra do
+   chão lida como pé alargado, e a maioria era detalhe que não cabe no rascunho. Destino: cada diferença passou a
+   dizer o tipo (`forma` ou `detalhe`), o comando conta as duas em separado e só manda corrigir a de forma; o pedido
+   diz que região certa leva `igual` e `--fora` escreve nele o que não é da peça. A conferência de cada diferença de
+   forma contra as linhas é de quem conduz, e o que ficar aceito leva o motivo.
