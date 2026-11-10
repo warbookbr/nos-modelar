@@ -71,3 +71,13 @@ processo o teria pego sozinho e o destino.
    do degrau). A seção do meio do capô passou a ser a silhueta lateral mais esse recuo, sem degrau, com o vão cortando
    da soleira ao topo, e a lateral do rascunho continua mostrando o degrau, agora pelo vão. O processo não pegaria:
    silhueta lateral de casco com vão no meio não é a seção do meio, e isso entra como pergunta ao ler a lateral.
+10. **Quem conduz olha a vista inteira e não vê o defeito; com o lugar apontado, vê na hora.** Os quatro defeitos da
+   traseira (itens 6, 7 e 9, e a borda arredondada em volta do vão, que a pessoa apontou por último) passaram por
+   quem conduzia, e cada um foi reconhecido assim que a pessoa disse onde olhar. A ordenação automática das regiões por
+   diferença de cor e de borda, tentada primeiro, não serve sozinha: a sombra do rascunho vira classe errada e as
+   diferenças antigas abafam a nova. O que serve é a leitura forçada de todas as regiões, ampliadas e lado a lado: um
+   crítico sem a história, com as doze regiões dos rascunhos antigos, achou a tampa larga, a divisa em arco e a borda
+   do vão, e mais uma dezena de diferenças que ninguém tinha listado; a listra do capô ele tomou por sombra. Destino:
+   `npm run leitura:regioes` (`tools/modelar/leitura-por-regioes.mjs`) corta as duas vistas na mesma grade, escreve o
+   pedido do crítico e recusa a rodada em que alguma região ficou sem resposta; a linha suave dentro de uma cor fica
+   para as linhas do modelo tiradas da malha, no backlog.

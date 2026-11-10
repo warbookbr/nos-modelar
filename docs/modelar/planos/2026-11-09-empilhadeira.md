@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 
@@ -44,6 +44,10 @@ da torre, elevação, volante) nos eixos certos e nenhuma peça cruzando outra.
 - Em 2026-11-09 a pessoa pediu o gerador que leva a seção lateral ao longo da
   planta (`lacosPelasVistas`, no núcleo), depois de ver a divisa do capô em
   arco no rascunho da traseira; por isso o território inclui os arquivos dele.
+- Em 2026-11-10 a pessoa pediu a camada de conferência que entrega a quem conduz
+  cada lugar da vista, um por um (`npm run leitura:regioes`), depois de achar
+  quatro defeitos na traseira que a vista inteira não mostrou; o território
+  inclui os arquivos dela.
 - As imagens de IA entram em `procedural/pecas/empilhadeira/referencias/` como
   alvo de caráter, uma vista por arquivo, sem valer como medida (CLAUDE.md); a
   lateral entra pelos contornos de outubro. A medida vem da `TABELA`.

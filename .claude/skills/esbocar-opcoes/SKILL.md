@@ -60,8 +60,8 @@ diferença em disputa, que a câmera é a mesma (a ferramenta imprime onde a cai
 comum caiu em cada captura) e que nada foi cortado pelo quadro. Quando a
 escolha é de medida, meça a malha (`--so-montar` dá a caixa; `npm run descrever`
 dá o resto) em vez de confiar na imagem.
-Rascunho que segue uma vista de referência: compare antes a divisão por cor
-das duas, onde é cada material em cada uma.
+Rascunho que segue uma vista de referência: antes de mostrar, rode
+`npm run leitura:regioes` e leve o `pedido.md` a um crítico.
 
 ## Como mostrar
 
