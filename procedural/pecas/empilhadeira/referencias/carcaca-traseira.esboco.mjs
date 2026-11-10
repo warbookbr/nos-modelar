@@ -174,13 +174,15 @@ export function montarTraseira(estado, { pocoDaRoda = null } = {}) {
   /* grade: a moldura cinza em U apoiada na rampa do vão (de z 2058 a y 980 até z 2110 a y 812, na lateral), e o fundo escuro.
      A moldura acompanha a curva da planta do capô, como o laranja: reta de lado a lado, ela sobrava para fora dele nos cantos das
      lanternas (a pessoa viu nos três quartos). A moldura tem a espessura real, da face de trás do fundo (70 mm à frente da rampa) a
-     14 mm atrás dela; nas alturas largas o laço fica mais curto que o recuo da planta, e `curto: 'inicio'` leva a face de trás com o
-     recuo inteiro e a da frente com a mesma curva, encostada no fundo. */
+     14 mm atrás dela, 84 mm. Com `espessuraMinima: 60` todo laço em que os recuos da planta deixariam o lado com menos de 60 mm é
+     curto (em toda altura, pois o recuo no canto vai de 56 a 96 mm), e `curto: 'inicio'` leva a face de trás com o recuo inteiro e a
+     da frente com a mesma curva, encostada no fundo. Só com os laços largos curtos, a barra de baixo afinava a 29 mm nos lados e o
+     laranja da soleira aparecia pelos furos nos três quartos. */
   /* a ponta de baixo fica a z 2094 e não a 2112: o teto PONTA_DO_CAPO - 6 de `secaoDoMeio` deixa a face do capô 20 mm aquém ali, e a
      moldura passava 40,7 mm para trás do laranja na vista da direita (medido com `sobra-entre-partes`, grade em capo) */
   const rampa = (de, ate) => [[-(2052 + de), 990], [-(2052 + ate), 990], [-(2094 + ate), 795], [-(2094 + de), 795]];
   const placa = (nome, de, ate) => corpo(nome, { lado: rampa(de, ate), perfil: perfil([[363, 58], ...VAO_GRADE]), planta: plantaTraseira(meiaCapo, 1400),
-    estacoes: [796, 806, 820, 850, 900, 950, 989], curto: 'inicio' }, QUINAS);
+    estacoes: [796, 806, 820, 850, 900, 950, 989], curto: 'inicio', espessuraMinima: 60 }, QUINAS);
   const furos = FUROS_GRADE.map((f) => extZ(f.map(([x, y]) => [x * MM, H(y)]), -1700, -2300));
   parte('grade', booleana('subtrair', [placa('grade', -70, 14), ...furos]), CINZA_CLARO);
   parte('fundoGrade', placa('fundoGrade', -320, -70), ESCURO);

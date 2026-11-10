@@ -164,7 +164,7 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   bloco à parte, porque é vão cortado depois e não encolhimento. No capô da
   traseira, sem `compensar`: 3,6 mm na meia largura, 10 a 15 mm junto do canto,
   18,3 no centro abaixo do vão e 29,5 no degrau da soleira.
-- **T12, a fazer.** `lacosPelasVistas` aceita `curto: 'encolhe' (padrão) |
+- **T12, entregue.** `lacosPelasVistas` aceita `curto: 'encolhe' (padrão) |
   'fim' | 'inicio'`; com 'fim', no laço curto o fim fica com o recuo inteiro da
   planta e o início é a mesma curva, recuada do comprimento do intervalo. Muda
   `lacos-pelas-vistas.js`, o teste e `carcaca-traseira.esboco.mjs`; o padrão dá
@@ -172,7 +172,7 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   sem aviso. Pronto: aba da tampa e moldura com a espessura real, sem bloco
   escondido, e `sobra:partes` até 3 mm na vista de cima (a moldura reta dava
   29,4 mm).
-- **T13, núcleo entregue; falta a troca na carcaça.** `contornoComArcos(anel, { tolerancia, arcos })` em
+- **T13, entregue.** `contornoComArcos(anel, { tolerancia, arcos })` em
   `procedural/nucleo/arcos-do-contorno.js`, com teste e ficha: simplifica o
   anel (6 mm por padrão), troca cada trecho `{ de, ate }` pelo círculo ajustado
   a 96 lados por volta e devolve os pontos, os círculos com o desvio, os
@@ -180,7 +180,7 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   declarado. Prova: arco de 386 mm com ruído de 0,5 mm sai com o raio a 1 mm.
   Pronto: `ladoSuave` sai da carcaça com a malha idêntica e o aviso aponta os
   arcos facetados da traseira.
-- **T14, núcleo entregue; falta a troca no protetor.** `gaiolaVarrida` aceita `fechada: true` (a seção volta da
+- **T14, entregue na coluna da frente.** `gaiolaVarrida` aceita `fechada: true` (a seção volta da
   última linha à primeira) e `tampas: true` (uma face em cada ponta, com a
   orientação pelo volume e o aro em vinco, ou `'redondas'` sem ele); sem eles a saída é a de hoje, byte a byte, que o
   furgão usa. O perfil em U já existe (seção aberta, `espessura` do passo e
@@ -188,6 +188,14 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   `protetor-posto.esboco.mjs`. Prova: tubo quadrado em L com dobra fecha, com
   toda aresta em duas faces. Pronto: a coluna da frente sai num passo, com a
   seção de 70 mm a 1 mm em toda estação, no lugar de extrusões cruzadas.
+- **Como ficaram as três.** Na traseira a moldura tem 84 mm e a aba segue a
+  lateral, com sobra de 0,0 mm na vista de cima; a moldura pediu
+  `espessuraMinima: 60`, porque sem ele a barra de baixo afinava a 29 mm. A
+  carcaça com `contornoComArcos` saiu com o mesmo hash. A coluna da frente mede
+  de 69,84 a 70,07 mm depois de alisada, com estações a cada 7,5 graus na dobra
+  (a 50 mm de passo a face de dentro caía a 66). A coluna de trás continua em
+  extrusões cruzadas: é chapa de seção variável, que a varredura de seção
+  constante não faz.
 - **Plano próprio, em rascunho.** O degrau, o sulco e a borda rebaixada sobre a
   superfície estão em
   [rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md), que espera um
@@ -234,8 +242,7 @@ com o teto de planos ativos em seis.
 No mesmo dia as três frentes ficaram em rascunho sobre a carcaça e a máquina
 inteira foi montada num módulo só, de sessenta partes, com as pendências entre
 as partes resolvidas na carcaça e a TABELA do alinhamento com a medida adotada
-e a fonte de cada linha. As fatias T9 a T11 foram entregues, e a T13 e a T14
-têm o núcleo pronto.
+e a fonte de cada linha. As fatias T9 a T14 foram entregues.
 
 ## Fechamento
 

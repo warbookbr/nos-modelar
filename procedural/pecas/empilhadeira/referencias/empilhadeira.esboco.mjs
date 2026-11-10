@@ -28,7 +28,6 @@ const atravessa = (a, b, motivo) => ({ par: [a, b], relacao: 'atravessa', motivo
 const DA_CARCACA = [
   ['capo', 'colunas', 'a borda de trás das colunas entra no capô, para não abrir fresta'],
   ['capo', 'contrapeso', 'o contrapeso acaba 12 mm dentro do capô, divisa fechada'],
-  ['capo', 'grade', 'a moldura da grade fica no vão do capô'],
   ['capo', 'fundoGrade', 'o fundo da grade fica no vão do capô'],
   ['capo', 'laterais', 'o corpo das laterais vai 36 mm dentro do capô'],
   ['capo', 'pocoTraseiro', 'o fundo do poço traseiro sobe sob o capô'],
@@ -40,9 +39,7 @@ const DA_CARCACA = [
   ['degraus', 'piso', 'os degraus encostam no piso pelo lado, 1 mm dentro'],
   ['degraus', 'tampaMotor', 'a rampa do degrau passa sob a tampa do motor'],
   ['fundoGrade', 'grade', 'o fundo escuro é a mesma rampa da moldura, recuada'],
-  ['fundoGrade', 'tampa', 'a aba da tampa cobre o alto do fundo da grade'],
   ['furo', 'laterais', 'o fundo do furo da tampa de combustível fica no furo'],
-  ['grade', 'tampa', 'a aba da tampa cobre o alto da moldura'],
   ['laterais', 'painel', 'o painel assenta entre as laterais'],
   ['laterais', 'paralamas', 'a aba e a beira do paralama nascem do corpo das laterais'],
   ['laterais', 'piso', 'o piso fica entre as laterais'],
@@ -53,6 +50,12 @@ const DA_CARCACA = [
   ['painel', 'tapete', 'o tapete passa sob o painel'],
   ['piso', 'tampaMotor', 'o pé da tampa do motor desce 20 mm no piso'],
   ['piso', 'tapete', 'o tapete é a chapa de cima do piso'],
+];
+/* as que não se tocam: a moldura da grade e a aba da tampa têm a espessura real (fatia T12) e não são mais blocos fundos dentro do capô */
+const FOLGAS_DA_CARCACA = [
+  ['capo', 'grade', 'a moldura da grade fica no vão do capô, sem tocar a borda dele'],
+  ['fundoGrade', 'tampa', 'a aba da tampa passa sobre o fundo da grade, sem tocá-lo'],
+  ['grade', 'tampa', 'a aba da tampa passa sobre a moldura, sem tocá-la'],
 ];
 /* AS FRENTES sobre a carcaça e entre si */
 const DAS_FRENTES = [
@@ -88,6 +91,6 @@ export default {
     nota: 'rascunho das fatias 1 a 7, com as pendências entre as partes acertadas na carcaça',
     passos: estado.passos,
     topo: estado.topo,
-    contatos: [...DA_CARCACA, ...DAS_FRENTES].map(([a, b, m]) => atravessa(a, b, m)),
+    contatos: [...[...DA_CARCACA, ...DAS_FRENTES].map(([a, b, m]) => atravessa(a, b, m)), ...FOLGAS_DA_CARCACA.map(([a, b, motivo]) => ({ par: [a, b], relacao: 'folga', motivo }))],
   }],
 };
