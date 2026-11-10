@@ -140,7 +140,15 @@ const interpolar = (tabela, v) => {
 /* o vão vai da soleira da grade ao topo: sob a tampa o capô é aberto, e a aba dela cobre a traseira */
 const VAO = [...VAO_GRADE, [281, 101.5], [268, 101.5]];
 const meiaDoVao = (y) => interpolar(perfil(VAO), y);
-const secaoDoMeio = ([z, y]) => (z > 1970 && y >= 800 ? [Math.min(z + recuoDaPlanta(meiaDoVao(y)), PONTA_DO_CAPO - 6), y] : [z, y]);
+/* A borda rebaixada em volta do vão (BORDA px de largura, 16 mm de fundo, em `montarTraseira`) tira a silhueta lateral da beira do
+   vão: o que a lateral vê é a superfície cheia logo fora da borda. A seção do meio leva então o recuo da planta na largura do vão mais
+   a borda, e o teto passa a 20 mm além do bico. Com o recuo só na largura do vão e o teto em PONTA_DO_CAPO - 6, o canto de cima e de
+   trás do laranja ficava 17 a 45 mm aquém da referência na vista da direita (coluna 870 da lateral: laranja da linha 299 na
+   referência e da 320 no rascunho; coluna 876: 317 e 351), a aba da tampa sobrava solta sobre um vão branco, e a borda de trás
+   descia em degraus (leitura da direita, rodada 4, A4 e B4). */
+const BORDA_DO_VAO_PX = 5;
+const secaoDoMeio = ([z, y]) => (z > 1970 && y >= 800
+  ? [Math.min(z + recuoDaPlanta((meiaDoVao(y) + BORDA_DO_VAO_PX) * MM), PONTA_DO_CAPO + 20), y] : [z, y]);
 export const VISTAS_DO_CAPO = {
   lado: lado('capo', ([z, y]) => secaoDoMeio([z, y > 1100 ? TOPO_CAPO : y])),
   perfil: perfil(CAPO), planta: plantaTraseira(meiaCapo, 1400),
@@ -155,7 +163,7 @@ export function montarTraseira(estado) {
   let capo = corpo('capo', VISTAS_DO_CAPO, VINCOS_DO_CAPO);
   /* a borda em volta do vão: um degrau de BORDA_MM de fundo e BORDA px de largura, que acompanha a superfície do capô. Sai do vão
      alargado menos o mesmo capô recuado BORDA_MM. */
-  const BORDA = 5; const BORDA_MM = 16;
+  const BORDA = BORDA_DO_VAO_PX; const BORDA_MM = 16;
   /* o vão vai até z 1760: o fundo escuro da grade acompanha a curva e, nos cantos, fica a z 1887, atrás de um vão mais raso */
   const FUNDO_DO_VAO = -1760;
   const recuado = corpo('capoRecuado', { ...VISTAS_DO_CAPO, lado: VISTAS_DO_CAPO.lado.map(([c, a]) => [c < -1900 ? c + BORDA_MM : c, a]) }, VINCOS_DO_CAPO);
