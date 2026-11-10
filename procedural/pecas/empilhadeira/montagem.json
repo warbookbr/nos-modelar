@@ -1,0 +1,20 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "empilhadeira",
+  "instancias": [
+    {
+      "id": "carcaca",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/carcaca"
+      }
+    }
+  ],
+  "relacoes": [],
+  "etapas": [
+    "carcaca"
+  ],
+  "vinculos": [],
+  "posicoes": []
+}
