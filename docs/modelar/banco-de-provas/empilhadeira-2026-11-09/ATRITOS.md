@@ -164,3 +164,10 @@ processo o teria pego sozinho e o destino.
    do olhal do pé da torre, que é pino em furo com 2 mm de folga, e o par não tem como ser declarado assim. A lateral
    da torre foi conferida contra os contornos por script à parte, pela mesma falta do item 16. O processo pegou os
    três, pelo relato de contatos e pelo relato de quem montou.
+18. **Os eixos e as rodas em rascunho ficaram presos por três medidas da carcaça.** As quatro rodas tocam o chão e nada
+   atravessa. O poço da roda dianteira corta de 414 mm para fora e a banda do pneu pede 349; o pneu traseiro fica
+   estreito por dentro porque o contrapeso chega a 492 mm dentro do disco da roda; e o diâmetro traseiro ficou em 568
+   pelo cubo da carcaça, contra 545 da TABELA e 612 da lateral. Três faltas de ferramenta: `sobra:partes` compara o
+   pneu, que de lado é um anel, e acusa o aro e o cubo como fora dele; o relato de contatos deu 76 mm de travessia
+   num toque rente que cruzava 0,01 mm, que é a medida da caixa e não a da travessia; e cada sonda de interferência
+   remontava a carcaça, 50 s por consulta, o que a montagem sem relato já resolveu. O processo pegou todos.

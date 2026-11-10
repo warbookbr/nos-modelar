@@ -18,7 +18,9 @@
  *   (`frente.ia.png`, 3,395 mm/px pela aba, 357 px de 366 a 723) dá o dianteiro de 362 a 439 (620 a 358 mm).
  *   As vistas dão o pneu com 250 a 265 mm de banda; o poço da carcaça corta de 414 mm para fora na frente e o fundo do poço traseiro
  *   ocupa até 420 mm, e com essa banda o pneu entraria na carcaça. Vale a banda da TABELA na proporção das larguras da carcaça
- *   (180 x 596,4/511 = 210 mm) nas duas rodas: a dianteira de 459 a 669 mm e a traseira de 440 a 650 mm do centro.
+ *   (180 x 596,4/511 = 210 mm) na dianteira, de 459 a 669 mm do centro (45 mm de folga até o poço, a 414). Atrás, o contrapeso
+ *   da carcaça chega a 492 mm dentro do disco da roda (y 495, z -1897), e a traseira vai de 497 a 655 mm (158 mm, perto dos 150 do
+ *   6.00-9 da TABELA sem escala), com o pneu de fora 5 mm além dos 650 da vista de cima.
  *   Cubos e eixo dianteiro: a vista de frente da carcaça (`carcaca-frente.ia.png`, 3,385 mm/px, centro na coluna 545,5, altura
  *   4,296 mm/px): a tampa cinza do cubo nas colunas 393 a 408 (516 a 463 mm), Ø 90 (linhas 442 a 462); o flange escuro nas 408 a 425
  *   (463 a 404 mm), Ø 220 (linhas 425 a 476); o tubo do eixo Ø 150 (linhas 432 a 467 nas colunas 430 a 445). A lateral da carcaça
@@ -26,6 +28,7 @@
  *   Cubos traseiros: a vista de trás da carcaça (`carcaca-tras.ia.png`, 4,03 mm/px): a tampa cinza nas colunas 365 a 379, Ø 89
  *   (linhas 457 a 479), e o cubo escuro Ø 177 (linhas 445 a 489 na coluna 388). Ela põe a ponta da tampa a 689 mm do centro, 39 mm
  *   fora do pneu da vista de trás inteira (653); vale a roda, e a tampa fica dentro do aro.
+ *   Aros: 12 e 9 polegadas (raio do talão 160 e 120 mm), com o disco rente ao flange do cubo.
  *   Diferencial: o tambor escuro entre as chapas do chassi na vista de frente da carcaça (colunas 510 a 580, linhas 422 a 462) fica
  *   atrás do pé da torre; o corpo do diferencial é um bojo de Ø 300 no meio do eixo, de -120 a 120 mm, que é caráter e não medida.
  *   Eixo traseiro: a viga, as mangas e a barra não aparecem inteiras em nenhuma vista (a de trás as esconde atrás do contrapeso e a
@@ -92,8 +95,9 @@ export function montarEixosRodas(estado) {
   /* EIXO DIANTEIRO ---------------------------------------------------------------------------------------------------------- */
   /* a carcaça do eixo: o tubo de Ø 150 de flange a flange (404 mm) e o bojo do diferencial no meio. Passa pelo entalhe das chapas
      do chassi (o contorno lateral `chassi` contorna o cubo: parede da frente em z 98 a 100, de y 338 a 426, e o teto do entalhe pelos
-     vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8)). O assento de cada lado, na espessura da chapa (266 a 327 mm, 4 mm para dentro de cada face), sobe do tubo até esse
-     teto: é a face pela qual o eixo se apoia no chassi. */
+     vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8)). O assento de cada lado, na espessura da chapa (266 a 327 mm, 4 mm para dentro de cada face), sobe do tubo até 0,5 mm desse
+     teto: é a face pela qual o eixo se apoia no chassi. Rente ao teto, a face inclinada coincidente saía no relato de contatos como
+     travessia (com a profundidade da caixa, 76 mm); com 0,5 mm sai como folga. */
   const D = RODA_D;
   const assento = [[30, 380], [72, 380], [72, 432.2], [60.5, 428.5], [30, 459.5]];
   parte('eixoDianteiro', unir(

@@ -43,9 +43,7 @@
   "grade": "capo",
   "fundoGrade": "capo",
   "furo": "laterais",
-  "tunel": "laterais",
-  "arosDianteiros": "pneusDianteiros",
-  "arosTraseiros": "pneusTraseiros"
+  "tunel": "laterais"
  },
  "vistasDaSobra": [
   "superior",
@@ -55,31 +53,70 @@
  "vistas": {
   "frontal": {
    "referencia": "frente.ia.png",
-   "caixaRef": [362, 274, 730, 537],
+   "caixaRef": [
+    362,
+    274,
+    730,
+    537
+   ],
    "ignorar": [
-    [440, 274, 650, 537],
-    [362, 274, 730, 352]
+    [
+     440,
+     274,
+     650,
+     537
+    ],
+    [
+     362,
+     274,
+     730,
+     352
+    ]
    ],
    "fora": "a torre com o carro porta-garfos, os garfos, as correntes e a grade de carga (tudo o que fica no meio, entre os pneus), o protetor do operador com as luzes e o volante; a carcaça aparece só nos paralamas laranja e ao lado da torre",
-   "grade": [4, 3],
+   "grade": [
+    4,
+    3
+   ],
    "visto": "de frente"
   },
   "traseira": {
    "referencia": "tras.ia.png",
-   "caixaRef": [373, 281, 700, 538],
+   "caixaRef": [
+    373,
+    281,
+    700,
+    538
+   ],
    "ignorar": [
-    [373, 281, 700, 290]
+    [
+     373,
+     281,
+     700,
+     290
+    ]
    ],
    "fora": "o pé do protetor do operador e o berço do cilindro de gás no alto da tampa, e a sombra no chão",
-   "grade": [4, 3],
+   "grade": [
+    4,
+    3
+   ],
    "visto": "de trás"
   },
   "superior": {
    "referencia": "cima.ia.png",
    "girar": 270,
-   "caixaRef": [120, 79, 472, 696],
+   "caixaRef": [
+    120,
+    79,
+    472,
+    696
+   ],
    "fora": "o protetor do operador (a grade cinza de tubos por cima do posto), o banco, o volante e as alavancas, o cilindro de gás com o berço e as cintas sobre o capô, o escape, as luzes e a torre com o carro porta-garfos na frente",
-   "grade": [4, 3],
+   "grade": [
+    4,
+    3
+   ],
    "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
   }
  }
