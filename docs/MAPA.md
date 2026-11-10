@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1860 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1863 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -299,6 +299,7 @@
 ## docs/modelar/banco-de-provas/empilhadeira-2026-11-09/
 
 - `ATRITOS.md` — Empilhadeira — atritos
+- `CUSTO-POR-PECA.md` — Custo por peça da empilhadeira
 
 ## docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/
 
@@ -2802,6 +2803,8 @@
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `contorno-da-peca.mjs` — contorno-da-peca.mjs — o contorno por parte no veredito da peça.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
+- `custo-por-peca.mjs` — custo-por-peca.mjs — a tabela de custo de cada peça de um objeto, lida dos registros de rodada e do registro das etapas.
+- `custo-por-peca.test.mjs` — custo-por-peca.test.mjs — os números da tabela de custo numa fixture de duas peças, a rodada incompleta e a saída estável.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
 - `derivar-catalogo-montagens.test.ts` — Prova catálogo global confinado às raízes explicitamente resolvidas.

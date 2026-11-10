@@ -125,6 +125,7 @@
     "sobra:partes": "node tools/modelar/sobra-entre-partes.mjs",
     "casamento:vista": "node tools/modelar/casamento-da-vista.mjs",
     "conferir:vistas": "node tools/modelar/conferir-vistas.mjs",
+    "custo:peca": "node tools/modelar/custo-por-peca.mjs",
     "vista:rapida": "node tools/modelar/vista-rapida.mjs",
     "esboco:nucleo": "node tools/modelar/esboco-nucleo.mjs",
     "variantes": "node tools/modelar/variantes.mjs",

@@ -91,9 +91,15 @@ roteiro que diz a ordem e o critério de saída de cada uma.
 
 ## Fatias
 
-0. **Linha de base.** Um comando lê os registros de rodada de um objeto e dá,
+0. **Linha de base, entregue em 2026-11-10.** Um comando (`npm run custo:peca`) lê os registros de rodada de um objeto e dá,
    por peça, as rodadas, as notas, os defeitos por atribuição e o que ficou
-   aberto. Saída: a tabela da empilhadeira no banco de provas.
+   aberto. Saída: a tabela da empilhadeira no banco de provas, em
+   [`CUSTO-POR-PECA.md`](../banco-de-provas/empilhadeira-2026-11-09/CUSTO-POR-PECA.md).
+   A empilhadeira deu 19 peças em 30 rodadas, média de 1,58 por peça, 6 fechadas
+   na primeira rodada e 12 fixas por aceite com 28 defeitos abertos; das
+   atribuições, 19 foram ao plano, 10 ao modelador, 8 à ferramenta e 2 ao
+   crítico. O avião dá 2,75 rodadas por peça e o braço 6, pelo mesmo comando.
+   Nenhum registro traz data, e gravá-la entra na fatia 1.
 1. **Fluxo único.** O comando que diz o próximo passo de um objeto, da
    referência à etapa fixa; o registro que aceita o relato de várias peças; no
    pedido do crítico, a referência por vista, a vista em corte e a contradição
