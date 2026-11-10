@@ -2,7 +2,8 @@
  * 7 do plano), montado sobre a carcaça em rascunho (`carcaca.esboco.mjs`).
  *
  * O módulo exporta `montarProtetorPosto(estado)`, que escreve as partes num estado { passos, topo, origem } como `montarTraseira`;
- * rodado sozinho, ele monta a carcaça inteira (os passos da opção de `carcaca.esboco.mjs`) e as partes daqui por cima.
+ * rodado sozinho, ele monta a carcaça inteira (os passos da opção de `carcaca.esboco.mjs`) e as partes daqui por cima. O protetor
+ * (fatia 5) é a receita da etapa, `../partes/protetor/receita.js`, chamada daqui; o posto e os acessórios continuam neste rascunho.
  *
  * DE ONDE VEM CADA MEDIDA.
  *   Lado: `lateral.contornos.json` (4,437 mm/px, z da lateral para trás). Na lateral o cubo dianteiro fica em z 200,5 e y 189,5 e o
@@ -21,20 +22,13 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira o conjunto 180 graus para os três quartos de trás. */
 import { ferramentas, CINZA, ESCURO } from './carcaca-traseira.esboco.mjs';
-import { gaiolaVarrida } from '../../../nucleo/gaiola-varrida.js';
+import { montarProtetor, derivar as derivarProtetor } from '../partes/protetor/receita.js';
 import carcaca from './carcaca.esboco.mjs';
 
-const CINZA_PROTETOR = '#565b60';   // o mesmo cinza das colunas e da tampa do motor
 const ESCURO_BANCO = '#2a2d30';
 const CLARO = '#b4b8ba';            // o cilindro de gás, cinza claro nas vistas de cima e de trás
-const VERMELHO = '#c0302a';         // as lanternas de cima
-
-/* a lateral da máquina inteira levada à carcaça (ver o cabeçalho) */
-const ZL = (px) => -(px - 349.8) * 4.2955 + 194.1;
-const YL = (py) => (493.6 - py) * 4.2955 + 183.9;
 
 const circulo = (cu, cv, r, n = 48) => Array.from({ length: n }, (_, k) => [cu + r * Math.cos(2 * Math.PI * k / n), cv + r * Math.sin(2 * Math.PI * k / n)]);
-const espelhoX = (xy) => xy.map(([x, y]) => [-x, y]);
 const retangulo = (u0, v0, u1, v1) => [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];
 /* o retângulo de cantos redondos, de raio r, com 6 segmentos por canto */
 function arredondado(u0, v0, u1, v1, r) {
@@ -57,62 +51,14 @@ function faixa(caminho, h) {
   return [...esq, ...dir.reverse()];
 }
 
-/* --- as medidas ---------------------------------------------------------------------------------------------------------------- */
-/* PROTETOR. A coluna da frente, pela borda da frente dela na lateral: px 398 na linha 350 e px 460 na linha 110, uma reta de 14,5 graus
-   para trás (z = -12,9 a 800,7 mm e -279,2 a 1.831,6 mm). A seção de lado tem 70 mm (18 px nas linhas 275 a 350, onde nada se junta a
-   ela), e o eixo dela fica 36 mm atrás da borda. */
-const INCL = (-279.2 + 12.9) / (1831.6 - 800.7);                       // dz/dy da coluna da frente: -0,258
-const zFrente = (y) => -12.9 + INCL * (y - 800.7);                      // a borda da frente da coluna da frente
-const zEixoFrente = (y) => zFrente(y) - 36;
-const PE_FRENTE = 788;          // o pé da coluna da frente: a face de cima da aba do paralama (792 mm na carcaça), 4 mm dentro
-/* O teto. O topo do quadro na lateral fica na linha 39,5 (y 2.135), sem as lanternas, que sobem à linha 36 (2.149); a ficha dá 2.150
-   de altura do protetor e a vista de trás, na escala da largura, 2.097. Adotado: o topo do quadro a 2.135 e as lanternas até 2.150.
-   As travessas têm 70 mm de altura (de trás, a travessa de trás ocupa as linhas 42 a 58, 64 mm, e de frente a da frente, 36 a 48). O
-   perfil de lado do teto é mais fundo: na lateral ele desce até a linha 80 (y 1.980), 155 mm, com a quina de dentro da frente num
-   arco largo até a coluna (px 578 na linha 81, 533 na 84, 519 na 90, 511 na 96, 504 na 102 e 499 na 111). */
-const TOPO = 2135; const ALTURA_PERFIL = 70; const Y_TETO = TOPO - 45;
-/* O fim de trás do teto: a borda de trás da coluna de trás na lateral vai a px 720 na linha 50 (z -1.396); de cima a travessa de trás
-   fica nas colunas 757 a 770 (z -1.423 a -1.476); adotado -1.425 na face de trás da travessa. A frente do teto, pela lateral: a
-   borda da frente na linha 50 fica no px 489 (z -405); de cima o quadro plano começa na coluna 497 (z -368). */
-const TRAS_TETO = -1425;
-/* As larguras (meia largura por fora). Trás: as colunas de trás vão de 406 a 665 na linha 270 (520 mm) e de 418 a 653 no alto, linha
-   48 (474 mm); de frente, a coluna da frente vai de 412 a 690 na linha 340 (477 mm) e de 426 a 678 na 145 (432 mm). A ficha dá 960 de
-   largura do protetor (480). Adotado: o teto com 480 por fora e 55 de perfil; a coluna de trás com o pé de 460 a 516, dentro da face
-   de cima das colunas cinza da carcaça (516); a coluna da frente com o pé de 455 a 512 e o alto na largura do teto, 32 mm para dentro,
-   como a vista de frente a inclina (leitura de frente da máquina inteira, rodada 1, B1 e B4), sobre a aba do
-   paralama; o painel da carcaça recolhe os cantos da frente a 415 mm de z 10 a -90 para dar lugar a ele (até a integração da máquina
-   inteira o pé ficava de 500 a 556, por fora do painel de 496). */
-const X_TETO = [425, 480];
-const X_PE_TRAS = [460, 516];
-const X_PE_FRENTE = [455, 512];
-const Y_JUNTA = 1990;   // a altura em que as colunas acabam de se inclinar para dentro e entram no perfil do teto
-
-/* O trilho da coluna da frente, do lado s (1 é +x): sobe pelo eixo da coluna do pé (PE_FRENTE) a y 1.990, inclinando-se para dentro do
-   meio do pé ao meio do teto, segue reto no plano do teto até a dobra de raio `r` e corre no alto até z -1.300. O meio em x vem da
-   seção vista de frente: de 455 a 512 em y 768 (20 mm abaixo do pé) a 425 a 480 em Y_JUNTA. */
-function trilhoDaColunaFrente(s, r = 60) {
-  const meio = (y) => { const f = (y - (PE_FRENTE - 20)) / (Y_JUNTA - (PE_FRENTE - 20)); return ((X_PE_FRENTE[0] + X_PE_FRENTE[1]) * (1 - f) + (X_TETO[0] + X_TETO[1]) * f) / 2; };
-  const x = s * (X_TETO[0] + X_TETO[1]) / 2;
-  const B = [zEixoFrente(Y_TETO), Y_TETO]; const C = [-1300, Y_TETO];
-  const u1 = [B[0] - zEixoFrente(PE_FRENTE), B[1] - PE_FRENTE]; const l1 = Math.hypot(...u1); u1[0] /= l1; u1[1] /= l1;
-  const u2 = [C[0] - B[0], C[1] - B[1]]; const l2 = Math.hypot(...u2); u2[0] /= l2; u2[1] /= l2;
-  const giro = Math.atan2(u1[0] * u2[1] - u1[1] * u2[0], u1[0] * u2[0] + u1[1] * u2[1]);
-  const t = r * Math.tan(Math.abs(giro) / 2);
-  const ini = [B[0] - u1[0] * t, B[1] - u1[1] * t]; const fim = [B[0] + u2[0] * t, B[1] + u2[1] * t];
-  const sg = Math.sign(giro); const n1 = [-u1[1] * sg, u1[0] * sg]; const cen = [ini[0] + n1[0] * r, ini[1] + n1[1] * r];
-  const P = ([z, y]) => [x, y, z];
-  /* o giro no plano (z, y) de ângulo `giro` é, em torno do eixo x, o giro de -giro */
-  const pe = [s * meio(PE_FRENTE), PE_FRENTE, zEixoFrente(PE_FRENTE)]; const junta = P([zEixoFrente(Y_JUNTA), Y_JUNTA]);
-  const dist = (a, b) => Math.hypot(...a.map((v, k) => v - b[k]));
-  const s0 = dist(pe, junta) + dist(junta, P(ini));
-  return {
-    trilho: [{ reta: { de: pe, ate: junta } }, { reta: { de: junta, ate: P(ini) } },
-      { arco: { centro: P(cen), eixo: [1, 0, 0], de: P(ini), graus: -giro * 180 / Math.PI } }, { reta: { de: P(fim), ate: P(C) } }],
-    dobra: [s0, s0 + r * Math.abs(giro)],
-  };
-}
-/* a seção do tubo da coluna da frente: 55 mm em x por 70 de lado, com as quatro quinas vivas */
-const SECAO_COLUNA = [{ u: -27.5, v: -35, nome: 'a' }, { u: 27.5, v: -35, nome: 'b' }, { u: 27.5, v: 35, nome: 'c' }, { u: -27.5, v: 35, nome: 'd' }];
+/* --- o protetor ---------------------------------------------------------------------------------------------------------------- */
+/* AS QUATRO COLUNAS, O QUADRO E A GRADE DO TETO, AS LUZES DE TRABALHO, AS LANTERNAS E O ESPELHO MORAM NA RECEITA DA ETAPA (2026-11-10),
+   `../partes/protetor/receita.js` (`montarProtetor`), com as medidas e a fonte de cada uma na TABELA dela; este módulo só a chama
+   sobre o estado da máquina, e a alça de acesso (fatia 7) e o encosto tiram dela a coluna da frente e a calibração da lateral. A
+   forma é a deste rascunho, com os pés cortados pelo plano do apoio na carcaça (a face de cima da aba do paralama e a das colunas),
+   onde antes entravam nela. */
+const PROTETOR = derivarProtetor();
+const { ZL, YL, zEixoFrente } = PROTETOR;
 
 export function montarProtetorPosto(estado) {
   const { extX, extY, extZ, booleana, parte } = ferramentas(estado);
@@ -123,69 +69,9 @@ export function montarProtetorPosto(estado) {
   const emX = (s, [a, b]) => (s > 0 ? [a, b] : [-b, -a]);
   /* gira uma forma já feita em torno do eixo x, pelo pivô [x, y, z] */
   const girarX = (sel, graus, pivo) => { estado.passos.push(['rotaciona', { eixo: 'x', graus, pivo, sel }]); return sel; };
-  /* o tubo de seção SECAO_COLUNA pelo trilho, fechado e tampado, subdividido como o corpo da carcaça */
-  const tubo = (nome, { trilho, dobra }) => {
-    /* a cada 50 mm nas retas e a cada 7,5 graus na dobra, para que a face de dentro (raio de 25 mm) siga o arco */
-    const g = gaiolaVarrida({ nome, trilho, quadro: { u: [1, 0, 0] }, secao: SECAO_COLUNA, fechada: true, tampas: true,
-      estacoes: [{ fracao: 0 }, { passo: 50 }, { em: dobra[0] }, { entre: 10 }, { em: dobra[1] }, { passo: 50 }, { fracao: 1 }], vincos: SECAO_COLUNA.map(({ nome: linha }) => ({ linha, nitidez: 'viva' })) });
-    Object.assign(estado.topo, Object.fromEntries(g.posicoes));
-    estado.origem += 1;
-    estado.passos.push(['subdivisao', { origemId: estado.origem, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: 2 }]);
-    return { origem: { op: 'subdivisao', id: estado.origem } };
-  };
+  /* --- protetor: a receita da etapa, no referencial da máquina ------------------------------------------------------------------ */
+  montarProtetor(estado);
 
-  /* --- protetor: as quatro colunas, o quadro e a grade do teto ------------------------------------------------------------------- */
-  /* A coluna da frente e o perfil de lado do teto são um tubo só: a seção de 55 por 70 mm varrida pelo trilho que sobe pelo eixo da
-     coluna, dobra com raio de 60 mm (de lado o canto de fora da lateral é quase vivo: px 486 na linha 65 e 489 na 50) e corre no alto
-     até a coluna de trás. O pé fica no meio de 455 a 512 e o trilho se inclina para dentro até o meio do teto (425 a 480) em y 1.990. */
-  const colunaFrente = (s) => tubo(`colunaFrente${s > 0 ? 'E' : 'D'}`, trilhoDaColunaFrente(s));
-  /* O perfil de lado do teto, da dobra até a coluna de trás, pelo contorno da lateral (ver as medidas do teto): a borda de baixo com a
-     quina de dentro em arco, o topo com o canto de fora redondo (px 490 na linha 48, 503 na 45, 523 na 42 e 537 na 39,5). */
-  const perfilTeto = [[ZL(678), YL(80)], [ZL(578), YL(81)], [ZL(533), YL(84)], [ZL(525), YL(87)], [ZL(519), YL(90)], [ZL(514), YL(93)],
-    [ZL(511), YL(96)], [ZL(504), YL(102)], [ZL(499), YL(111)], [zFrente(YL(111)) - 5, YL(111)], [ZL(478), YL(75)], [ZL(486), YL(60)],
-    [ZL(490), YL(50)], [ZL(503), YL(45)], [ZL(523), TOPO - 8], [ZL(537), TOPO], [ZL(678), TOPO]];
-  /* A coluna de trás, uma chapa larga de lado que se afina para cima (na lateral, a borda de trás vai de px 749 na linha 275 a 726 na
-     95 e 720 na 50; a da frente, de 690 na 260 a 678 na 95), apoiada na face de cima das colunas cinza da carcaça (y 1.143 a 1.154, de
-     z -1.269 a -1.508). O canto de cima e de trás é redondo, com 40 mm. */
-  const ladoTras = [[-1272, 1138], [-1505, 1138], [ZL(741), YL(200)], [ZL(732), YL(140)], [ZL(726), YL(95)], [ZL(722), YL(65)],
-    ...Array.from({ length: 7 }, (_, k) => { const a = Math.PI + Math.PI / 2 * k / 6; return [TRAS_TETO + 40 + 40 * Math.cos(a), TOPO - 40 - 40 * Math.sin(a)]; }),
-    [-1215, TOPO], [ZL(678), YL(95)], [ZL(681), YL(140)], [ZL(689), YL(200)], [ZL(690), YL(260)]];
-  const secaoTras = (s) => { const p = [[X_PE_TRAS[0], 1120], [X_PE_TRAS[1], 1120], [X_TETO[1], Y_JUNTA], [X_TETO[1], TOPO + 5], [X_TETO[0], TOPO + 5], [X_TETO[0], Y_JUNTA]]; return s > 0 ? p : espelhoX(p).reverse(); };
-  const quadros = lados((s) => unir(
-    colunaFrente(s),
-    extX(perfilTeto, ...emX(s, X_TETO)),
-    cruzar(extX(ladoTras, ...emX(s, [380, 600])), extZ(secaoTras(s), -1600, -1100)),
-  ));
-  /* as travessas do teto: a da frente sobre a dobra (de frente, o perfil de cima vai de lado a lado nas linhas 36 a 48) e a de trás,
-     que leva as lanternas (de trás, linhas 42 a 58) */
-  const zDobra = zEixoFrente(Y_TETO);
-  const travessas = [extX(retangulo(zDobra - 80, TOPO - ALTURA_PERFIL, zDobra - 5, TOPO), -X_TETO[0] - 1, X_TETO[0] + 1),
-    extX(retangulo(TRAS_TETO, TOPO - ALTURA_PERFIL, TRAS_TETO + 75, TOPO), -X_TETO[0] - 1, X_TETO[0] + 1)];
-  parte('protetor', unir(...quadros, ...travessas), CINZA_PROTETOR);
-
-  /* A grade do teto: seis barras ao comprido, nas linhas 185, 220, 255, 290, 325 e 360 da vista de cima (35 px, 135 mm, entre elas) e
-     nas colunas 464 a 603 da de trás (27 px, 108 mm); adotado 120 mm, simétricas. Duas barras atravessadas, nas colunas 607 e 645 da
-     vista de cima (z -814 e -969). Barras de 30 mm, de 2.095 a 2.130 mm, apoiadas nas travessas e no perfil do teto. */
-  const Z_GRADE = [zDobra - 75, TRAS_TETO + 70];
-  const barras = [60, 180, 300].flatMap((x) => [x, -x]).map((x) => extX(retangulo(Z_GRADE[1], TOPO - 40, Z_GRADE[0], TOPO - 5), x - 15, x + 15));
-  const atravessadas = [-814, -969].map((z) => extX(retangulo(z - 15, TOPO - 40, z + 15, TOPO - 5), -X_TETO[0] - 1, X_TETO[0] + 1));
-  parte('gradeTeto', unir(...barras, ...atravessadas), CINZA_PROTETOR);
-
-  /* As luzes de trabalho: na lateral, px 437 a 462 nas linhas 84 a 130 (z -181 a -288, y 1.745 a 1.943), à frente da coluna da
-     frente; de frente, colunas 415 a 440 e 663 a 690 nas linhas 84 a 126, sobre a coluna. Uma caixa de 90 mm de largura e de lado,
-     de 1.750 a 1.940, com a face de trás na face da frente da coluna (inclinada como ela), de 445 a 530 mm: centrada na borda de fora
-     da coluna, que ali vai de 433 a 489 mm. Na primeira rodada, de 415 a 505, ela ficava sobre a coluna de frente; na segunda, de 470
-     a 555, passava toda para fora e aparecia de trás, onde a referência a esconde atrás da coluna de trás. */
-  const ladoLuz = [[zFrente(1750) - 3, 1750], [zFrente(1940) - 3, 1940], [zFrente(1940) + 90, 1940], [zFrente(1750) + 90, 1750]];
-  parte('luzesTrabalho', unir(...lados((s) => extX(ladoLuz, ...emX(s, [445, 530])))), ESCURO);
-  /* As lanternas do alto, na face de trás da travessa de trás: de trás, linhas 44 a 57, colunas 434 a 485 e 586 a 631 (205 a 410 mm
-     do centro), dentro da altura da travessa (a primeira rodada as pôs acima dela, e de trás sobravam por cima); de lado, px 720 a
-     736 nas linhas 36 a 68. */
-  parte('lanternas', unir(...lados((s) => extX(retangulo(TRAS_TETO - 18, TOPO - 60, TRAS_TETO + 2, TOPO - 5), ...emX(s, [205, 410])))), VERMELHO);
-  /* O espelho, do lado esquerdo (+x): na lateral px 484 a 501 nas linhas 117 a 155 (z -382 a -455, y 1.637 a 1.801); de trás,
-     colunas 430 a 447 (356 a 426 mm). Preso à face de trás da coluna da frente por um braço. */
-  parte('espelho', unir(extX(retangulo(-455, 1640, -385, 1800), 356, 426),
-    extX(retangulo(-395, 1705, zFrente(1720) - 66, 1730), 400, 440)), ESCURO);
   /* A alça de acesso, atrás de cada coluna da frente: na lateral a coluna engrossa das linhas 265 a 110 (y 1.166 a 1.831) até px 486
      na linha 140, 60 mm atrás da face de trás dela. Um tubo de 30 mm paralelo à coluna, com dois braços até ela. */
   const alcaY = [1180, 1820];

@@ -69,7 +69,7 @@ const FOLGAS = [
 /* AS FRENTES sobre a carcaça e entre si */
 const DAS_FRENTES = [
   ['alavancas', 'painel', 'as hastes das alavancas saem da face de cima do painel'],
-  ['alcas', 'protetor', 'os braços da alça entram na coluna da frente'],
+  ['alcas', 'quadro', 'os braços da alça entram na coluna da frente'],
   ['assento', 'encosto', 'o encosto assenta na almofada'],
   ['assento', 'tampaMotor', 'a base do assento segue a face curva da tampa do motor'],
   ['berco', 'cintas', 'as cintas passam pelos apoios do berço'],
@@ -78,14 +78,17 @@ const DAS_FRENTES = [
   ['colunaDirecao', 'painel', 'a coluna de direção sai de dentro do painel'],
   ['colunaDirecao', 'piso', 'o pé da coluna de direção fica no corpo do piso sob o painel'],
   ['colunaDirecao', 'volante', 'o eixo da coluna entra no cubo do volante'],
-  ['colunas', 'protetor', 'os pés de trás do protetor entram nas colunas da carcaça'],
   ['escape', 'tampa', 'o pé do escape assenta na tampa do capô'],
-  ['gradeTeto', 'protetor', 'as barras da grade se apoiam nas travessas do teto'],
-  ['lanternas', 'protetor', 'as lanternas ficam na face de trás da travessa'],
-  ['luzesTrabalho', 'protetor', 'as luzes ficam presas na face da frente da coluna'],
+  ['gradeTeto', 'quadro', 'as barras da grade se apoiam nas travessas do teto'],
+  ['lanternas', 'quadro', 'as lanternas ficam na face de trás da travessa'],
+  ['luzesTrabalho', 'quadro', 'as luzes ficam presas na face da frente da coluna'],
   ['painel', 'pedais', 'as hastes dos pedais saem da rampa do painel'],
-  ['paralamas', 'protetor', 'os pés da frente do protetor assentam na aba do paralama'],
-  ['espelho', 'protetor', 'o braço do espelho entra 5 mm na face de trás da coluna da frente'],
+  ['espelho', 'quadro', 'o braço do espelho entra 5 mm na face de trás da coluna da frente'],
+];
+/* os pés do protetor (a receita da etapa) cortados pelo plano do apoio: assentam face sobre face, sem entrar na carcaça */
+const ENCOSTAM = [
+  ['colunas', 'quadro', 'os pés de trás do protetor assentam na face de cima das colunas da carcaça'],
+  ['paralamas', 'quadro', 'os pés da frente do protetor assentam na face de cima da aba do paralama'],
 ];
 
 export default {
@@ -96,6 +99,7 @@ export default {
     nota: 'rascunho das fatias 1 a 7, com as pendências entre as partes acertadas na carcaça',
     passos: estado.passos,
     topo: estado.topo,
-    contatos: [...[...DA_CARCACA, ...DAS_FRENTES].map(([a, b, m]) => atravessa(a, b, m)), ...FOLGAS.map(([a, b, motivo]) => ({ par: [a, b], relacao: 'folga', motivo }))],
+    contatos: [...[...DA_CARCACA, ...DAS_FRENTES].map(([a, b, m]) => atravessa(a, b, m)), ...ENCOSTAM.map(([a, b, motivo]) => ({ par: [a, b], relacao: 'encosta', motivo })),
+      ...FOLGAS.map(([a, b, motivo]) => ({ par: [a, b], relacao: 'folga', motivo }))],
   }],
 };

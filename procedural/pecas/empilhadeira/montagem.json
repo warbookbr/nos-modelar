@@ -114,6 +114,13 @@
         "tipo": "peca",
         "ref": "empilhadeira/cilindro-inclinacao"
       }
+    },
+    {
+      "id": "protetor",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/protetor"
+      }
     }
   ],
   "relacoes": [
@@ -403,7 +410,8 @@
     "garfoDireito",
     "correntes",
     "cilindroInclinacaoEsquerdo",
-    "cilindroInclinacaoDireito"
+    "cilindroInclinacaoDireito",
+    "protetor"
   ],
   "vinculos": [
     {
@@ -597,6 +605,17 @@
       "em": {
         "instancia": "torre",
         "porta": "orelhaDireita"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "protetorNasColunas",
+      "instancia": "protetor",
+      "porta": "peTrasEsquerdo",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoProtetorTrasEsquerdo"
       },
       "unidade": "mm",
       "afastamento": 0

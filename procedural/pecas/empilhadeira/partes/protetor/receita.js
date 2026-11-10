@@ -37,7 +37,9 @@ export const TABELA = {
      de 455 a 512 mm em y 768, e o tubo se inclina para dentro até o meio do teto em y 1.990, segue no plano do teto até a dobra de raio
      60 e corre no alto até z -1.300. Estações a cada 50 mm nas retas e dez na dobra. O pé nasce 20 mm abaixo do apoio na aba do
      paralama, na mesma reta, e o plano da face de cima da aba o corta: no rascunho o fim do tubo, perpendicular a ele, entrava na aba
-     atrás e ficava acima dela na frente. */
+     atrás e ficava acima dela na frente. A gaiola vai sem nível de subdivisão (no rascunho, 2): com as quinas vivas a seção já é o
+     retângulo e a dobra já segue o arco pelas dez estações, e subdividida ela punha três vértices no meio de cada lado da face do
+     corte do pé, que nenhum leque nem orelha da triangulação serve (o OBJ da luz rasante a recusa). */
   coluna: {
     borda: [[-12.9, 800.7], [-279.2, 1831.6]],
     recuoDoEixo: 36,
@@ -47,10 +49,13 @@ export const TABELA = {
     raioDaDobra: 60,
     fimNoAlto: -1300,
     estacoes: { passo: 50, naDobra: 10 },
+    niveis: 0,
   },
 
   /* O TETO. O topo do quadro a 2.135 (lateral, linha 39,5), o eixo do perfil 45 mm abaixo dele, as travessas de 70 mm de altura, o
-     fim de trás na face de trás da travessa de trás em z -1.425 e a meia largura do perfil de 425 a 480. O perfil de lado, da dobra
+     fim de trás na face de trás da travessa de trás em z -1.425 e a meia largura do perfil de 425 a 480, a do tubo da coluna da frente;
+     o perfil extrudado sai 1 mm além do tubo de cada lado, porque rente a ele as faces das duas se cruzavam no mesmo plano e a face de
+     baixo da travessa da frente ficava com vértices em fila dos dois lados, de triângulo sem área. O perfil de lado, da dobra
      até a coluna de trás, pelo contorno da lateral em px: a borda de baixo com a quina de dentro da frente em arco, 5 mm à frente da
      borda da coluna, e o topo com o canto de fora redondo, de px 523 a 8 mm do topo a 537 no topo. */
   teto: {
@@ -58,6 +63,7 @@ export const TABELA = {
     perfil: {
       baixo: [[678, 80], [578, 81], [533, 84], [525, 87], [519, 90], [514, 93], [511, 96], [504, 102], [499, 111]],
       aFrenteDaBorda: 5,
+      alemDoTubo: 1,
       frente: [[478, 75], [486, 60], [490, 50], [503, 45]],
       canto: { px: 523, abaixoDoTopo: 8 },
       topo: [537, 678],
@@ -190,7 +196,7 @@ export function montarProtetor(estado, T = TABELA) {
   const emX = (s, [a, b]) => (s > 0 ? [a, b] : [-b, -a]);
   const TE = T.teto; const C = T.coluna; const CT = T.colunaTras; const TOPO = D.TOPO;
 
-  /* o tubo da seção da coluna pelo trilho, fechado e tampado, subdividido como o corpo da carcaça: a cada 50 mm nas retas e dez
+  /* o tubo da seção da coluna pelo trilho, fechado e tampado, pelo passo `subdivisao` sem nível: a cada 50 mm nas retas e dez
      estações na dobra, para que a face de dentro siga o arco */
   const tubo = (nome, { trilho, dobra }) => {
     const g = gaiolaVarrida({ nome, trilho, quadro: { u: [1, 0, 0] }, secao: D.secaoColuna, fechada: true, tampas: true,
@@ -198,7 +204,7 @@ export function montarProtetor(estado, T = TABELA) {
       vincos: D.secaoColuna.map(({ nome: linha }) => ({ linha, nitidez: 'viva' })) });
     Object.assign(estado.topo, Object.fromEntries(g.posicoes));
     estado.origem += 1;
-    estado.passos.push(['subdivisao', { origemId: estado.origem, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: 2 }]);
+    estado.passos.push(['subdivisao', { origemId: estado.origem, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: C.niveis }]);
     return { origem: { op: 'subdivisao', id: estado.origem } };
   };
 
@@ -212,7 +218,7 @@ export function montarProtetor(estado, T = TABELA) {
     const lado = s > 0 ? 'Esquerdo' : 'Direito';
     const juntos = unir(
       tubo(`colunaFrente${s > 0 ? 'E' : 'D'}`, D.trilhoDaColunaFrente(s)),
-      extX(D.perfilTeto, ...emX(s, TE.x)),
+      extX(D.perfilTeto, ...emX(s, [TE.x[0] - TE.perfil.alemDoTubo, TE.x[1] + TE.perfil.alemDoTubo])),
       cruzar(extX(D.ladoTras, ...emX(s, CT.silhuetaEmX)), extZ(D.secaoTras(s), CT.secaoEmZ[0], CT.secaoEmZ[1])),
     );
     cortes[`peFrente${lado}`] = cortar(juntos, extX(D.corte(D.APOIOS[`frente${lado}`]), ...emX(s, [C.pe.x[0] - al, C.pe.x[1] + al])));
@@ -271,13 +277,54 @@ export function gerarTopo(T = TABELA) {
   return Object.fromEntries(Object.entries(estado.topo).map(([nome, p]) => [nome, p.map(m)]));
 }
 
-export const CONTATOS = [];
+export const CONTATOS = [
+  { par: ['gradeTeto', 'quadro'], motivo: 'as barras da grade, de 2.095 a 2.130 mm, entram 5 mm nas travessas do teto, que vão de 2.065 a 2.135, e as atravessadas vão até 1 mm além da face de dentro do perfil de lado' },
+  { par: ['lanternas', 'quadro'], motivo: 'as lanternas entram 2 mm na face de trás da travessa de trás, em z -1.425' },
+  { par: ['luzesTrabalho', 'quadro'], motivo: 'a face de trás de cada luz fica 3 mm dentro da face da frente da coluna da frente, inclinada como ela' },
+  { par: ['espelho', 'quadro'], motivo: 'o braço do espelho entra 5 mm na face de trás da coluna da frente esquerda, em y 1.705 a 1.730' },
+];
 
 const receita = {
-  meta: { nome: 'empilhadeira/protetor', desc: 'protetor do operador da empilhadeira' },
+  meta: { nome: 'empilhadeira/protetor', desc: 'protetor do operador da empilhadeira: as quatro colunas e o quadro do teto, a grade do teto, as luzes de trabalho, o espelho e as lanternas do alto' },
   PARAMS: TABELA,
   get TOPO() { return { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z', ...gerarTopo(this.PARAMS) }; },
+  PLANO: {
+    objeto: 'o protetor do operador de uma empilhadeira de contrapeso de 2,5 t: as quatro colunas, o teto em grade, as luzes de trabalho, o espelho e as lanternas do alto, numa peça rígida presa à carcaça pelos quatro pés',
+    referencias: ['../../referencias/tras.ia.png', '../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],
+    escala: { medida: 'altura do protetor do operador, no topo do quadro do teto (TABELA do alinhamento, rascunho; 2.150 na ficha, com as lanternas)', milimetros: 2135 },
+    partes: [
+      { nome: 'quadro', forma: 'quatro colunas cinza e o quadro do teto a 2.135 mm, 960 de largura: a da frente, tubo de 55 por 70 inclinado 14,5 graus para trás, dobra com raio 60 e segue como perfil do teto; a de trás, chapa que se afina para cima; duas travessas', tecnica: 'tubo por gaiolaVarrida fechada e tampada, subdividido, unido ao perfil do teto extrudado em x e à coluna de trás (silhueta em x cruzada com a seção em z); cada pé cortado pelo plano do apoio; travessas extrudadas' },
+      { nome: 'gradeTeto', forma: 'a grade cinza do teto: seis barras de 30 mm ao comprido, a 60, 180 e 300 mm do centro, e duas atravessadas em z -814 e -969, de 2.095 a 2.130 mm, apoiadas nas travessas', tecnica: 'retângulos laterais extrudados em x, unidos' },
+      { nome: 'luzesTrabalho', forma: 'duas luzes de trabalho escuras, caixas de 90 mm de lado de 1.750 a 1.940 mm, presas na face da frente de cada coluna da frente e inclinadas como ela, de 445 a 530 mm do centro', tecnica: 'quadrilátero lateral extrudado em x, um de cada lado' },
+      { nome: 'espelho', forma: 'o espelho escuro do lado esquerdo (+x), de 70 por 160 mm, de 356 a 426 mm do centro, atrás da coluna da frente e preso à face de trás dela por um braço', tecnica: 'retângulos laterais extrudados em x, unidos' },
+      { nome: 'lanternas', forma: 'duas lanternas vermelhas na face de trás da travessa de trás, de 205 a 410 mm do centro e de 2.075 a 2.130 mm', tecnica: 'retângulos laterais extrudados em x, um de cada lado' },
+    ],
+    criteriosDeReprovacao: [
+      'o protetor estreito ou baixo para uma empilhadeira de 2,5 t: o teto com menos de 960 mm de largura ou abaixo de 2.100 mm',
+      'um pé fora do apoio: o da frente fora da aba do paralama ou o de trás fora das colunas da carcaça, ou um pé cruzando a carcaça',
+      'a coluna da frente de pé na vertical, ou sem a dobra que a leva ao perfil de lado do teto',
+      'o teto sem a grade de barras, ou a grade solta das travessas',
+      'a luz, o espelho ou a lanterna solta da coluna ou da travessa, ou o espelho do lado direito de quem dirige',
+      'cor trocada: o quadro laranja, ou a lanterna que não é vermelha',
+    ],
+    lataria: { partes: ['quadro'] },
+  },
   contatos: CONTATOS,
+  /* Os extremos que a TABELA fixa, em mm: a grade, as luzes, o espelho e as lanternas. O quadro tem o extremo no tubo e no corte do pé,
+     e fica com as vistas. */
+  get PONTOS() {
+    const T = this.PARAMS; const D = derivar(T); const TE = T.teto; const G = T.grade; const LU = T.luzes; const E = T.espelho; const LA = T.lanternas;
+    const xTravessa = TE.x[0] + TE.travessas.alem;
+    return [
+      { nome: 'canto da frente da grade, em cima', parte: 'gradeTeto', medida: 'maximo', em: [xTravessa, D.TOPO - G.abaixoDoTopo[1], D.zDobra - G.frente], toleranciaMm: 0.5 },
+      { nome: 'canto de trás da grade, embaixo', parte: 'gradeTeto', medida: 'minimo', em: [-xTravessa, D.TOPO - G.abaixoDoTopo[0], TE.tras + G.tras], toleranciaMm: 0.5 },
+      { nome: 'luz de trabalho esquerda, na frente e em cima', parte: 'luzesTrabalho', medida: 'maximo', em: [LU.x[1], LU.y[1], D.zFrente(LU.y[0]) + LU.fundo], toleranciaMm: 0.5 },
+      { nome: 'espelho, no braço', parte: 'espelho', medida: 'maximo', em: [E.braco.x[1], E.y[1], D.zFrente(E.braco.em) - E.braco.atras], toleranciaMm: 0.5 },
+      { nome: 'espelho, embaixo e atrás', parte: 'espelho', medida: 'minimo', em: [E.x[0], E.y[0], E.z[0]], toleranciaMm: 0.5 },
+      { nome: 'lanterna direita, embaixo e atrás', parte: 'lanternas', medida: 'minimo', em: [-LA.x[1], D.TOPO - LA.abaixoDoTopo[0], TE.tras + LA.z[0]], toleranciaMm: 0.5 },
+      { nome: 'lanterna esquerda, em cima e na frente', parte: 'lanternas', medida: 'maximo', em: [LA.x[1], D.TOPO - LA.abaixoDoTopo[1], TE.tras + LA.z[1]], toleranciaMm: 0.5 },
+    ];
+  },
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
