@@ -208,7 +208,10 @@
     "capo": "capo",
     "tampa": "tampa",
     "contrapeso": "contrapeso",
-    "lateral": "laterais",
+    "lateral+piso+aro": [
+     "laterais",
+     "degraus"
+    ],
     "paralama": "paralamas",
     "pocoTraseiro": "pocoTraseiro",
     "furo": "furo"

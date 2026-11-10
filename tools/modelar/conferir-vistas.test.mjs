@@ -298,4 +298,105 @@ describe('conferir vistas', () => {
     const ruim = await rodar('nova-ruim', dupla, [`--rodadas-de=${join(pasta, 'nao-tem')}`]);
     expect(ruim.codigo).toBe(2); expect(ruim.stderr).toContain('--rodadas-de: a pasta');
   });
+
+  it('a vista só de contornos mede a sobreposição, a caixa por lado e o maior afastamento por parte, sem casamento nem crítico', async () => {
+    /* o arquivo de contornos na metade da escala do modelo: "a" é o cubo esq inteiro, "b" passa 20 mm do dir para a direita, e a
+       sombra embaixo fica fora do conjunto */
+    const ret = (x0, x1, y0, y1) => ({ contornoMm: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]] });
+    const arquivo = (espelho) => {
+      const r = (x0, x1, y0, y1) => (espelho ? ret(-x1, -x0, y0, y1) : ret(x0, x1, y0, y1));
+      return { formato: 'mecanifica.contornos@1', mmPorPx: 1, regioes: { a: { pedacos: [r(-50, 0, -25, 25)] }, b: { pedacos: [r(0, 60, -25, 25)] }, sombra: { pedacos: [r(-60, 70, -40, -26)] } } };
+    };
+    writeFileSync(join(pasta, 'dois.contornos.json'), JSON.stringify(arquivo(false)));
+    writeFileSync(join(pasta, 'dois-espelho.contornos.json'), JSON.stringify(arquivo(true)));
+    const vista = { contornos: 'dois.contornos.json', escala: 2, ancora: { contorno: [0, 0], modelo: [0, 0, 0] }, partes: { a: 'esq', b: ['dir'], 'a+b': ['esq', 'dir'] }, ignorarRegioes: ['sombra'] };
+    const cfg = { ...CONFIG, vistas: { frontal: vista } };
+    const { conta, deps } = contando();
+    const r = await rodar('contornos', cfg, [], deps);
+    expect(r.stderr).toBe(''); expect(r.codigo).toBe(0); expect(conta.montagens).toBe(1);
+    const dir = join(pasta, 'contornos', 'frontal');
+    expect(existsSync(join(dir, 'contornos.png'))).toBe(true); expect(existsSync(join(dir, 'contornos.json'))).toBe(true);
+    for (const f of ['casamento.json', 'pedido.md', 'leitura.json', 'captura.png']) expect(existsSync(join(dir, f)), f).toBe(false);
+    const resumo = JSON.parse(readFileSync(join(pasta, 'contornos', 'resumo.json'), 'utf8'));
+    const v = resumo.vistas.frontal;
+    expect(v.tipo).toBe('contornos'); expect(v.eixos).toEqual({ horizontal: 'x', vertical: 'y' });
+    const mm = v.mmPorPx;
+    const { a, b } = v.partes;
+    expect(a.sobreposicao).toBeGreaterThan(0.97);
+    expect(Math.abs(b.sobreposicao - 100 / 120)).toBeLessThan(0.02);
+    expect(Math.abs(v.conjunto.sobreposicao - 200 / 220)).toBeLessThan(0.02);
+    /* a caixa da referência de b vai a x = 120 e a do modelo a 100: o modelo fica 20 mm aquém à direita, e o resto empata */
+    expect(Math.abs(b.caixaReferencia.x[1] - 120)).toBeLessThanOrEqual(mm); expect(Math.abs(b.caixaModelo.x[1] - 100)).toBeLessThanOrEqual(mm);
+    expect(Math.abs(b.lados.direita + 20)).toBeLessThanOrEqual(mm);
+    for (const lado of ['esquerda', 'baixo', 'cima']) expect(Math.abs(b.lados[lado]), lado).toBeLessThanOrEqual(mm);
+    /* o maior afastamento de b é de 20 mm nos dois sentidos: da borda direita da referência (x perto de 120) até o modelo, e da borda
+       direita do modelo (x perto de 100, no meio da altura) até a da referência, que está a 20 mm à direita e em cima */
+    expect(Math.abs(b.afastamento.maior.mm - 20)).toBeLessThanOrEqual(1.5 * mm);
+    expect(Math.abs(b.afastamento.daReferencia.em.x - 120)).toBeLessThanOrEqual(1.5 * mm);
+    expect(Math.abs(b.afastamento.doModelo.em.x - 100)).toBeLessThanOrEqual(1.5 * mm);
+    expect(a.afastamento.maior.mm).toBeLessThanOrEqual(1.5 * mm);
+    /* a entrada com "+" junta as partes do arquivo, e o conjunto deixa a sombra de fora */
+    expect(v.partes['a+b'].sobreposicao).toBeCloseTo(v.conjunto.sobreposicao, 3);
+    expect(Math.abs(v.conjunto.caixaReferencia.y[0] + 50)).toBeLessThanOrEqual(mm);
+    const md = readFileSync(join(pasta, 'contornos', 'resumo.md'), 'utf8');
+    expect(md).toContain('## Vista frontal, só de contornos'); expect(md).toContain('não há casamento, captura nem pedido ao crítico');
+    expect(md).toContain('Fora do conjunto: sombra.');
+    expect(md.indexOf('- b (número 2 no desenho; dir)')).toBeGreaterThan(-1);
+    expect(md.indexOf('- b (')).toBeLessThan(md.indexOf('- a ('));
+    expect(r.stdout).toContain('vista frontal: só de contornos; sobreposição do conjunto');
+    /* o desenho tem a cor da classe do modelo, clareada, e as cores da paleta dos contornos */
+    const im = dePng(readFileSync(join(dir, 'contornos.png')));
+    const cores = new Set(); for (let i = 0; i < im.dados.length; i += 3) cores.add([...im.dados.subarray(i, i + 3)].join());
+    expect(cores.has('0,90,255')).toBe(true); expect(cores.has('220,0,40')).toBe(true);
+    /* o contorno desenhado olhando para o outro lado, com "espelhar", dá as mesmas medidas; e a rodada se repete igual */
+    expect((await rodar('contornos-espelho', { ...CONFIG, vistas: { frontal: { ...vista, contornos: 'dois-espelho.contornos.json', espelhar: true } } })).codigo).toBe(0);
+    const espelho = JSON.parse(readFileSync(join(pasta, 'contornos-espelho', 'resumo.json'), 'utf8')).vistas.frontal;
+    expect(espelho.partes).toEqual(v.partes); expect(espelho.conjunto).toEqual(v.conjunto);
+    const antes = lerArvore(join(pasta, 'contornos'));
+    await rodar('contornos', cfg); expect(lerArvore(join(pasta, 'contornos'))).toEqual(antes);
+    /* as recusas da vista de contornos */
+    for (const [nome, extra, trecho] of [
+      ['rc-ambos', { referencia: 'ref.png' }, 'vistas.frontal: tem "referencia" e "contornos"'],
+      ['rc-arquivo', { contornos: 'nao-tem.contornos.json' }, 'vistas.frontal.contornos:'],
+      ['rc-regiao', { partes: { c: 'esq' } }, 'vistas.frontal.partes.c: o arquivo não tem a parte "c" (a, b, sombra)'],
+      ['rc-mais', { partes: { 'a+c': 'esq' } }, 'vistas.frontal.partes.a+c: o arquivo não tem a parte "c"'],
+      ['rc-escala', { escala: 0 }, 'vistas.frontal.escala: espera um número maior que zero'],
+      ['rc-ancora', { ancora: { contorno: [0, 0] } }, 'vistas.frontal.ancora:'],
+      ['rc-caixa', { caixaRef: [0, 0, 10, 10] }, 'vistas.frontal.caixaRef: não vale numa vista só de contornos'],
+      ['rc-ignorar', { ignorarRegioes: ['b'] }, 'a parte "b" está em "partes" e no ignorado'],
+      ['rc-modelo', { partes: { a: 'capo' } }, 'vistas.frontal.partes.a: a parte "capo" não existe na opção'],
+    ]) {
+      const x = await rodar(nome, { ...CONFIG, vistas: { frontal: { ...vista, ...extra } } });
+      expect(x.codigo, nome).toBe(2); expect(x.stderr, nome).toContain(trecho);
+    }
+  });
+
+  it('a vista com "escalaVertical" é conferida com duas escalas e o resumo diz isso; sem o campo nada muda', async () => {
+    expect((await rodar('uma-escala')).codigo).toBe(0);
+    expect((await rodar('duas-escalas', { ...CONFIG, vistas: { frontal: { ...CONFIG.vistas.frontal, escalaVertical: 1 } } })).codigo).toBe(0);
+    const um = JSON.parse(readFileSync(join(pasta, 'uma-escala', 'resumo.json'), 'utf8')).vistas.frontal;
+    const dois = JSON.parse(readFileSync(join(pasta, 'duas-escalas', 'resumo.json'), 'utf8')).vistas.frontal;
+    /* com fator 1 e a mesma proporção nas duas caixas, o quadro é o mesmo e a medida também */
+    expect(dois.regioes).toEqual(um.regioes); expect(um.escalaVertical).toBeUndefined();
+    expect(dois).toMatchObject({ escalaVertical: 1, proporcaoDaCaixaEmPx: 0.5 });
+    expect(readFileSync(join(pasta, 'duas-escalas', 'resumo.md'), 'utf8')).toContain('A vista foi conferida com duas escalas');
+    expect(readFileSync(join(pasta, 'uma-escala', 'resumo.md'), 'utf8')).not.toContain('duas escalas');
+    /* fator 2: a referência de 100 px de altura vale 200 mm, e o modelo de 100 mm só cobre a metade de baixo dela */
+    expect((await rodar('fator-2', { ...CONFIG, vistas: { frontal: { ...CONFIG.vistas.frontal, ignorar: [], escalaVertical: 2 } } })).codigo).toBe(0);
+    const caso = JSON.parse(readFileSync(join(pasta, 'fator-2', 'frontal', 'casamento.json'), 'utf8'));
+    expect(caso.quadroRef).toEqual([10, 60, 210, 110]); expect(caso.proporcao.referencia).toBeCloseTo(1, 6);
+    const ruim = await rodar('r-escala', { ...CONFIG, vistas: { frontal: { ...CONFIG.vistas.frontal, escalaVertical: 0 } } });
+    expect(ruim.codigo).toBe(2); expect(ruim.stderr).toContain('vistas.frontal.escalaVertical: espera um número maior que zero');
+  });
+
+  it('"dentro" em lista aceita o par em texto e o par com vistas próprias, medido só nelas', async () => {
+    const r = await rodar('dentro-lista', { ...CONFIG, dentro: ['esq:dir', { par: 'dir:esq', vistas: ['frontal'] }], vistasDaSobra: ['superior'] });
+    expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
+    const resumo = JSON.parse(readFileSync(join(pasta, 'dentro-lista', 'resumo.json'), 'utf8'));
+    expect(resumo.sobras.map((x) => `${x.vista}:${x.contida}:${x.continente}`)).toEqual(['superior:esq:dir', 'frontal:dir:esq']);
+    expect(readFileSync(join(pasta, 'dentro-lista', 'resumo.md'), 'utf8')).toContain('Pares com vistas próprias, medidos só nelas: dir em esq (frontal)');
+    const ruim = await rodar('r-dentro-lista', { ...CONFIG, dentro: [{ par: 'dir:esq', vistas: ['cima'] }] });
+    expect(ruim.codigo).toBe(2); expect(ruim.stderr).toContain('dentro.dir: a vista "cima" não existe na bancada');
+    expect((await rodar('r-dentro-capo', { ...CONFIG, dentro: ['esq:capo'] })).stderr).toContain('dentro.esq: a parte "capo" não existe na opção');
+  });
 });
