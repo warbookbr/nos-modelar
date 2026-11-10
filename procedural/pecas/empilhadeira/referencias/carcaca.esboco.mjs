@@ -97,10 +97,15 @@ const laterais = cortar(unir(meio, ...frentes, aro), ...pocos(POCO_D), ...pocos(
 parte('laterais', laterais, LARANJA);
 parte('furo', extX(FURO, 545, 561), ESCURO);
 
-/* piso: o tapete escuro no meio, com a silhueta lateral do piso (o piso a 765 mm, a rampa até o painel e o espelho do degrau), e os
-   degraus cinza dos lados, de z 431 a 719 com o piso do degrau a 490 mm (a lateral dá a borda de baixo do piso a 470-486 mm ali) */
-parte('piso', extX(lado('piso'), -TAPETE, TAPETE), ESCURO_PISO);
-const degrau = L([[431, 300], [431, 490], [719, 490], [719, 300]]);
+/* piso: o corpo cinza no meio, com a silhueta lateral do piso (o piso a 765 mm, a rampa até o painel e o espelho do degrau), e por cima
+   dele o tapete escuro, uma chapa de 10 mm de z 340 a 667. A lateral mostra o espelho do piso cinza médio e a vista de cima mostra o
+   tapete escuro (leituras da rodada 2: direita B1-B2, cima C2-C3).
+   Os degraus cinza dos lados: o piso do degrau a 490 mm de z 431 a 719 (a lateral dá a borda de baixo do piso a 470-486 mm ali), e
+   daí uma rampa 12 mm acima da borda diagonal da lateral até z 1238, porque a vista de cima mostra cinza entre a tampa do motor e o
+   laranja da lateral até as colunas (linhas 161-187 nas colunas 570-690), e no rascunho ali aparecia o laranja (cima, rodada 2). */
+parte('piso', extX(lado('piso'), -TAPETE, TAPETE), CINZA);
+parte('tapete', extX(L([[340, 760], [667, 765], [667, 775], [340, 770]]), -TAPETE + 5, TAPETE - 5), ESCURO_PISO);
+const degrau = L([[431, 300], [431, 490], [719, 500], [1238, 908], [1238, 300]]);
 parte('degraus', unir(extX(degrau, TAPETE - 1, DEGRAU), extX(degrau, -DEGRAU, -TAPETE + 1)), CINZA);
 
 /* painel: o anteparo inclinado, pela lateral sem a coluna de direção (que é outra peça): a frente reta em z 0-36 de 760 a 915 mm, o
