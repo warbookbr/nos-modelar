@@ -214,3 +214,30 @@ abaixo leva isso em conta.
   acima; o corpo laranja atrás da aba, que o rascunho mostra até 600 mm do
   centro, a vista de frente não mostra além de 465.
 
+## Decisões das receitas (2026-11-10)
+
+A máquina saiu do rascunho para dezenove receitas em `partes/`, com a malha do
+rascunho aprovado, e a medida de cada peça está na `TABELA` da receita dela, com
+a fonte. As decisões que mudaram alguma coisa em relação ao rascunho foram
+estas, e a pessoa aceitou todas ao fixar as etapas.
+
+O ombro do pneu ficou em 62 mm, o valor que reproduz o rascunho com menor
+diferença (3,3 mm na roda dianteira e 1,6 na traseira), pela opção de ombro
+largo que a família `roda-pneu` ganhou; com o ombro redondo o lado do pneu é
+uma curva só, do talão à banda. Os furos de fixação da roda traseira foram para
+o círculo de 115,5 mm, porque a chapa do disco os cobria. A junta do eixo
+traseiro é medida pelo alinhamento com os poços, e não pelo assento plano do
+suporte, que a montagem não mede. Os pés do protetor são cortados no plano de
+apoio, os da frente na aba do paralama e os de trás no bloco das colunas, e a
+dobra da frente das colunas chega à coluna numa curva contínua. A alça é um
+tubo redondo de 30 mm preso ao protetor, com o braço de cima 35 mm abaixo do
+rascunho por causa dessa curva. O encosto do banco avançou 45 mm para assentar
+inteiro na almofada. O escape é um tubo só de 90 mm, com o cotovelo em curva de
+raio 100. As cúpulas do cilindro de gás são meias elipses. Pedais e alavancas
+fazem parte da peça da coluna de direção, por serem rígidos com ela.
+
+Três questões de forma que os críticos levantaram ficaram como estão por
+decisão da pessoa ("pode fixar, seguimos como está"): as colunas de trás do
+protetor em chapa larga, o assento do banco em laje sem abas e a grade de carga
+e o volante em barras de aresta viva.
+

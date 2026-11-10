@@ -202,3 +202,16 @@ processo o teria pego sozinho e o destino.
    arquivo que o ramo mudou. O processo não distingue a carga da máquina do defeito nesses quatro: a bateria rápida já
    separa os dois casos quando o arquivo roda sozinho abaixo do teto, e falta o mesmo cuidado no teste de razão de
    tempo e nas esperas fixas das guardas da bancada, que são de outros planos e ficam aqui como pedido.
+22. **As dezenove receitas mostraram onde o laço gasta e o que ele não vê.** Sete peças fecharam na primeira rodada, sem
+   defeito, e eram todas prismas, tubos e revoluções simples. As que pediram duas ou três rodadas eram as de superfície
+   moldada (carcaça, banco, protetor, rodas), e nelas o crítico manteve a nota e trocou de defeitos de uma rodada para
+   a outra. Cinco vezes ele leu como peça atravessando outra um encaixe que a auditoria mede como livre (o assento do
+   eixo, o pneu na carcaça, a camisa do cilindro no painel, os montantes do carro no canal, o banco sobre a tampa),
+   sempre por não ter vista em corte. Duas vezes comparou a vista de lado com fotos de frente e de trás. Uma face
+   degenerada do berço do gás passou por todas as medições da peça e só foi recusada na exportação das vistas de
+   superfície. Três famílias ou ajudantes ficaram estreitos para a máquina: a roda, o cilindro hidráulico e a varredura
+   de seção constante. O relato de um modelador com várias peças precisou ser repartido à mão para o registro. Tudo
+   isso está no roteiro do plano [núcleo para qualquer mecanismo](../../planos/2026-11-10-nucleo-para-qualquer-mecanismo.md),
+   nas fatias 1, 4 e 5. O processo pegou a face degenerada e os defeitos de forma pelo crítico; não pegou sozinho as
+   leituras erradas de encaixe, que só a medida de quem conduz desfez.
+
