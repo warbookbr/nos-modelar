@@ -54,7 +54,7 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a máquina 180 graus para os três quartos de trás. */
 import carcaca from './carcaca.esboco.mjs';
-import { ferramentas, CINZA, CINZA_CLARO, ESCURO } from './carcaca-traseira.esboco.mjs';
+import { ferramentas, CINZA, ESCURO } from './carcaca-traseira.esboco.mjs';
 
 const PRETO = '#26282b';         // garfos, placa e grade: o quase preto da vista de frente (escuro mais claro que o fundo)
 const ACO = '#b4b8bc';           // as hastes cromadas (cinza claro na vista de cima, colunas 364 a 375)
