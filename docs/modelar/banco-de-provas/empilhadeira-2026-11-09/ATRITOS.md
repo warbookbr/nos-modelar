@@ -156,3 +156,11 @@ processo o teria pego sozinho e o destino.
    rodada foi recusada por isso. O processo pegou os cinco, pelo relato de quem montou. Vão ao backlog. A carcaça
    também ficou devendo: as colunas da frente do protetor caem por fora do painel, e a vista de frente as põe por
    dentro; para isso o painel teria no máximo 415 mm de meia largura junto ao eixo dianteiro.
+17. **A torre e os garfos em rascunho deixaram três pendências na carcaça e nas ferramentas.** Dez partes sobre a
+   carcaça, em três rodadas registradas. A largura da torre vem de três fontes que não concordam (820 mm na TABELA,
+   706 na vista de cima, 555 na de frente na escala da carcaça), e ficou em 620 porque acima disso ela atravessa a
+   aba do paralama. O cilindro de inclinação atravessa o painel e o piso, e a carcaça fica devendo um rebaixo no
+   painel (x 305 a 405, y 810 a 910, z 0 a -160). O relato de contatos acusa como travessia o eixo dianteiro dentro
+   do olhal do pé da torre, que é pino em furo com 2 mm de folga, e o par não tem como ser declarado assim. A lateral
+   da torre foi conferida contra os contornos por script à parte, pela mesma falta do item 16. O processo pegou os
+   três, pelo relato de contatos e pelo relato de quem montou.
