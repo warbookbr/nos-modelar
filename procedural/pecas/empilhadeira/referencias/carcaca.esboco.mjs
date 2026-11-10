@@ -102,11 +102,15 @@ parte('furo', extX(FURO, 545, 561), ESCURO);
    tapete escuro (leituras da rodada 2: direita B1-B2, cima C2-C3).
    Os degraus cinza dos lados: o piso do degrau a 490 mm de z 431 a 719 (a lateral dá a borda de baixo do piso a 470-486 mm ali), e
    daí uma rampa 12 mm acima da borda diagonal da lateral até z 1238, porque a vista de cima mostra cinza entre a tampa do motor e o
-   laranja da lateral até as colunas (linhas 161-187 nas colunas 570-690), e no rascunho ali aparecia o laranja (cima, rodada 2). */
+   laranja da lateral até as colunas (linhas 161-187 nas colunas 570-690), e no rascunho ali aparecia o laranja (cima, rodada 2).
+   A rampa vai só até 525 mm: na vista de cima o cinza dela acaba na linha 161 e o laranja da lateral vai de 161 a 146 (colunas
+   576-690); com ela até 568 mm a faixa laranja sumia (cima, rodada 3, B1 e B4). */
 parte('piso', extX(lado('piso'), -TAPETE, TAPETE), CINZA);
 parte('tapete', extX(L([[340, 760], [667, 765], [667, 775], [340, 770]]), -TAPETE + 5, TAPETE - 5), ESCURO_PISO);
-const degrau = L([[431, 300], [431, 490], [719, 500], [1238, 908], [1238, 300]]);
-parte('degraus', unir(extX(degrau, TAPETE - 1, DEGRAU), extX(degrau, -DEGRAU, -TAPETE + 1)), CINZA);
+const degrau = L([[431, 300], [431, 490], [719, 500], [719, 300]]);
+const rampa = L([[700, 300], [700, 500], [719, 500], [1238, 908], [1238, 300]]);
+const RAMPA = 525;
+parte('degraus', unir(extX(degrau, TAPETE - 1, DEGRAU), extX(degrau, -DEGRAU, -TAPETE + 1), extX(rampa, TAPETE - 1, RAMPA), extX(rampa, -RAMPA, -TAPETE + 1)), CINZA);
 
 /* painel: o anteparo inclinado, pela lateral sem a coluna de direção (que é outra peça): a frente reta em z 0-36 de 760 a 915 mm, o
    topo sob a coluna e a descida até o piso em z 404 a 763 mm. Planta da vista de cima: a moldura cinza vai das linhas 165 a 426 nas
