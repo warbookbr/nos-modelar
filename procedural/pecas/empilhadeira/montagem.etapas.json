@@ -1,0 +1,24 @@
+{
+  "formato": "mecanifica.registro-de-etapas",
+  "versao": 2,
+  "montagem": "empilhadeira",
+  "etapas": [
+    {
+      "instancia": "carcaca",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:541cda7bbec45bfee845bbb8bec31d98a6f041b2452facbaff5bd9f12a1e088c",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: Sim, aceito da maneira como esta, podemos seguir em frente",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 4 defeito(s) apontado(s) na rodada 3.",
+          "colunas: superficie em laje atrás da tampa do motor",
+          "contrapeso: uniao em borda de cima do contrapeso sob a borda de baixo do capô",
+          "laterais: superficie em painel da rampa diagonal e anel do arco da roda dianteira",
+          "pocoTraseiro: ausencia em poço atrás do arco da lateral, onde o alvo mostra eixo e roda"
+        ],
+        "analise": "ausente"
+      }
+    }
+  ]
+}
