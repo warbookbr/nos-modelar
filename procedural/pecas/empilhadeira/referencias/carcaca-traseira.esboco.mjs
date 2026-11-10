@@ -173,15 +173,17 @@ export function montarTraseira(estado, { pocoDaRoda = null } = {}) {
 
   /* grade: a moldura cinza em U apoiada na rampa do vão (de z 2058 a y 980 até z 2110 a y 812, na lateral), e o fundo escuro.
      A moldura acompanha a curva da planta do capô, como o laranja: reta de lado a lado, ela sobrava para fora dele nos cantos das
-     lanternas (a pessoa viu nos três quartos). É um bloco fundo, de que só a face de trás aparece, para o laço não ficar curto. */
+     lanternas (a pessoa viu nos três quartos). A moldura tem a espessura real, da face de trás do fundo (70 mm à frente da rampa) a
+     14 mm atrás dela; nas alturas largas o laço fica mais curto que o recuo da planta, e `curto: 'inicio'` leva a face de trás com o
+     recuo inteiro e a da frente com a mesma curva, encostada no fundo. */
   /* a ponta de baixo fica a z 2094 e não a 2112: o teto PONTA_DO_CAPO - 6 de `secaoDoMeio` deixa a face do capô 20 mm aquém ali, e a
      moldura passava 40,7 mm para trás do laranja na vista da direita (medido com `sobra-entre-partes`, grade em capo) */
   const rampa = (de, ate) => [[-(2052 + de), 990], [-(2052 + ate), 990], [-(2094 + ate), 795], [-(2094 + de), 795]];
-  const placa = (nome, ate) => corpo(nome, { lado: rampa(-320, ate), perfil: perfil([[363, 58], ...VAO_GRADE]), planta: plantaTraseira(meiaCapo, 1400),
-    estacoes: [796, 806, 820, 850, 900, 950, 989] }, QUINAS);
+  const placa = (nome, de, ate) => corpo(nome, { lado: rampa(de, ate), perfil: perfil([[363, 58], ...VAO_GRADE]), planta: plantaTraseira(meiaCapo, 1400),
+    estacoes: [796, 806, 820, 850, 900, 950, 989], curto: 'inicio' }, QUINAS);
   const furos = FUROS_GRADE.map((f) => extZ(f.map(([x, y]) => [x * MM, H(y)]), -1700, -2300));
-  parte('grade', booleana('subtrair', [placa('grade', 14), ...furos]), CINZA_CLARO);
-  parte('fundoGrade', placa('fundoGrade', -70), ESCURO);
+  parte('grade', booleana('subtrair', [placa('grade', -70, 14), ...furos]), CINZA_CLARO);
+  parte('fundoGrade', placa('fundoGrade', -320, -70), ESCURO);
 
   /* tampa: o painel central com a aba de trás ------------------------------------------------------------------------------------ */
   const meiaTampa = 101.5 * MM;
@@ -189,11 +191,12 @@ export function montarTraseira(estado, { pocoDaRoda = null } = {}) {
   const plantaDaTampa = [[meiaTampa, -1490], ...[...bordaDaTampa].reverse().map(([f, z]) => [meiaTampa * f, -z]),
     ...bordaDaTampa.slice(1).map(([f, z]) => [-meiaTampa * f, -z]), [-meiaTampa, -1490]];
   const tampa = corpo('tampa', {
-    /* a face de dentro da aba vai a z 1850, escondida no capô: com a aba de 23 a 80 mm de fundo o laço ficava curto, o recuo da planta
-       encolhia e a aba saía quase reta, sobrando para fora do laranja nos cantos */
-    lado: lado('tampa', ([z, y]) => [z > 1970 && z < 2065 && y < 1125 ? 1850 : z, y > 1140 ? 1150 : (y > 1100 && y < 1125 ? TOPO_CAPO : y)]),
+    /* a aba tem a espessura da lateral (70 a 120 mm de fundo), mais curta que o recuo da planta nos cantos (120 mm): com `curto:
+       'inicio'` a face de trás leva o recuo inteiro e a de dentro a mesma curva. No padrão, que encolhe o recuo, a aba saía quase
+       reta e sobrava para fora do laranja nos cantos, e por isso a face de dentro ia a z 1850, escondida no capô */
+    lado: lado('tampa', ([z, y]) => [z, y > 1140 ? 1150 : (y > 1100 && y < 1125 ? TOPO_CAPO : y)]),
     perfil: perfil(TAMPA), planta: plantaDaTampa,
-    estacoes: [985, 1000, 1050, 1090, 1107, 1117, 1135, 1150],
+    estacoes: [985, 1000, 1050, 1090, 1107, 1117, 1135, 1150], curto: 'inicio',
   }, QUINAS);
   parte('tampa', tampa, CINZA_CLARO);
 

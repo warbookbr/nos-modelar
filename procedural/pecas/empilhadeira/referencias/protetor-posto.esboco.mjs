@@ -45,25 +45,6 @@ function arredondado(u0, v0, u1, v1, r) {
   return pts;
 }
 
-/** O caminho [z, y] com as quinas internas trocadas por arcos de raio `raios[i]` (um por quina), a cada 6 graus. */
-function caminhoComCurvas(pts, raios) {
-  const out = [pts[0]];
-  for (let i = 1; i < pts.length - 1; i += 1) {
-    const [a, b, c] = [pts[i - 1], pts[i], pts[i + 1]];
-    const u1 = [b[0] - a[0], b[1] - a[1]]; const l1 = Math.hypot(...u1); u1[0] /= l1; u1[1] /= l1;
-    const u2 = [c[0] - b[0], c[1] - b[1]]; const l2 = Math.hypot(...u2); u2[0] /= l2; u2[1] /= l2;
-    const giro = Math.atan2(u1[0] * u2[1] - u1[1] * u2[0], u1[0] * u2[0] + u1[1] * u2[1]);
-    const r = raios[i - 1]; const t = r * Math.tan(Math.abs(giro) / 2);
-    const ini = [b[0] - u1[0] * t, b[1] - u1[1] * t];
-    const s = Math.sign(giro); const n1 = [-u1[1] * s, u1[0] * s];
-    const cen = [ini[0] + n1[0] * r, ini[1] + n1[1] * r];
-    const a0 = Math.atan2(ini[1] - cen[1], ini[0] - cen[0]);
-    const passos = Math.max(2, Math.ceil(Math.abs(giro) / (6 * Math.PI / 180)));
-    for (let k = 0; k <= passos; k += 1) { const ang = a0 + giro * k / passos; out.push([cen[0] + r * Math.cos(ang), cen[1] + r * Math.sin(ang)]); }
-  }
-  out.push(pts[pts.length - 1]);
-  return out;
-}
 /** A faixa de largura 2h em volta do caminho [z, y]: a seção constante de um tubo ou perfil ao longo dele, vista de lado. */
 function faixa(caminho, h) {
   const esq = []; const dir = [];
@@ -121,9 +102,14 @@ function trilhoDaColunaFrente(s, r = 60) {
   const sg = Math.sign(giro); const n1 = [-u1[1] * sg, u1[0] * sg]; const cen = [ini[0] + n1[0] * r, ini[1] + n1[1] * r];
   const P = ([z, y]) => [x, y, z];
   /* o giro no plano (z, y) de ângulo `giro` é, em torno do eixo x, o giro de -giro */
-  return [{ reta: { de: [s * meio(PE_FRENTE), PE_FRENTE, zEixoFrente(PE_FRENTE)], ate: P([zEixoFrente(Y_JUNTA), Y_JUNTA]) } },
-    { reta: { de: P([zEixoFrente(Y_JUNTA), Y_JUNTA]), ate: P(ini) } },
-    { arco: { centro: P(cen), eixo: [1, 0, 0], de: P(ini), graus: -giro * 180 / Math.PI } }, { reta: { de: P(fim), ate: P(C) } }];
+  const pe = [s * meio(PE_FRENTE), PE_FRENTE, zEixoFrente(PE_FRENTE)]; const junta = P([zEixoFrente(Y_JUNTA), Y_JUNTA]);
+  const dist = (a, b) => Math.hypot(...a.map((v, k) => v - b[k]));
+  const s0 = dist(pe, junta) + dist(junta, P(ini));
+  return {
+    trilho: [{ reta: { de: pe, ate: junta } }, { reta: { de: junta, ate: P(ini) } },
+      { arco: { centro: P(cen), eixo: [1, 0, 0], de: P(ini), graus: -giro * 180 / Math.PI } }, { reta: { de: P(fim), ate: P(C) } }],
+    dobra: [s0, s0 + r * Math.abs(giro)],
+  };
 }
 /* a seção do tubo da coluna da frente: 55 mm em x por 70 de lado, com as quatro quinas vivas */
 const SECAO_COLUNA = [{ u: -27.5, v: -35, nome: 'a' }, { u: 27.5, v: -35, nome: 'b' }, { u: 27.5, v: 35, nome: 'c' }, { u: -27.5, v: 35, nome: 'd' }];
@@ -138,9 +124,10 @@ export function montarProtetorPosto(estado) {
   /* gira uma forma já feita em torno do eixo x, pelo pivô [x, y, z] */
   const girarX = (sel, graus, pivo) => { estado.passos.push(['rotaciona', { eixo: 'x', graus, pivo, sel }]); return sel; };
   /* o tubo de seção SECAO_COLUNA pelo trilho, fechado e tampado, subdividido como o corpo da carcaça */
-  const tubo = (nome, trilho) => {
+  const tubo = (nome, { trilho, dobra }) => {
+    /* a cada 50 mm nas retas e a cada 7,5 graus na dobra, para que a face de dentro (raio de 25 mm) siga o arco */
     const g = gaiolaVarrida({ nome, trilho, quadro: { u: [1, 0, 0] }, secao: SECAO_COLUNA, fechada: true, tampas: true,
-      estacoes: [{ fracao: 0 }, { passo: 50 }, { fracao: 1 }], vincos: SECAO_COLUNA.map(({ nome: linha }) => ({ linha, nitidez: 'viva' })) });
+      estacoes: [{ fracao: 0 }, { passo: 50 }, { em: dobra[0] }, { entre: 10 }, { em: dobra[1] }, { passo: 50 }, { fracao: 1 }], vincos: SECAO_COLUNA.map(({ nome: linha }) => ({ linha, nitidez: 'viva' })) });
     Object.assign(estado.topo, Object.fromEntries(g.posicoes));
     estado.origem += 1;
     estado.passos.push(['subdivisao', { origemId: estado.origem, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: 2 }]);

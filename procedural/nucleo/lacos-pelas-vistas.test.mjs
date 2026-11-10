@@ -91,6 +91,45 @@ describe('lacosPelasVistas', () => {
     expect(Math.min(...aba.fim.map((p) => p[1]))).toBeGreaterThan(540);
   });
 
+  it("com curto: 'fim' a aba de 60 mm acompanha a planta curva e mede 60 em toda a lateral, sem aviso; 'inicio' é o espelho", () => {
+    const lado = [[540, 0], [600, 0], [600, 200], [0, 200], [0, 150], [540, 150]];
+    const planta = PLANTA.map(([l, c]) => [l, c - 40]);
+    const r = lacosPelasVistas({ lado, perfil: [[0, 480], [200, 480]], planta, estacoes: [0, 100, 160, 200], curto: 'fim' });
+    expect(r.avisos).toEqual([]);
+    for (const laco of r.lacos.slice(0, 2)) {
+      const { inicio, fim } = laco.trechos;
+      const fimNaOrdem = [...fim].reverse();
+      inicio.forEach(([l, c], i) => { expect(fimNaOrdem[i][0]).toBe(l); expect(fimNaOrdem[i][1] - c).toBeCloseTo(60, 9); });
+      /* o fim é o da planta: 600 no centro e 400 no canto (o recuo de 184 mm em l = 480) */
+      expect(doCentro(fim)[1]).toBeCloseTo(600, 6);
+      expect(emLateral(fim, 480)[1]).toBeCloseTo(600 - 184, 1);
+      expect(laco.trechos.direita[1][1] - laco.trechos.direita[0][1]).toBeCloseTo(60, 9);
+    }
+    /* as alturas que não são curtas saem como no padrão */
+    const padrao = lacosPelasVistas({ lado, perfil: [[0, 480], [200, 480]], planta, estacoes: [0, 100, 160, 200] });
+    expect(r.lacos.slice(2)).toEqual(padrao.lacos.slice(2));
+    /* o espelho: a aba no início, sob um corpo que vai até 600, com a planta arredondada no início */
+    const espelho = (pts) => pts.map(([l, c]) => [l, 600 - c]);
+    const ladoI = lado.map(([c, a]) => [600 - c, a]);
+    const ri = lacosPelasVistas({ lado: ladoI, perfil: [[0, 480], [200, 480]], planta: espelho(planta), estacoes: [0, 100, 160, 200], curto: 'inicio' });
+    expect(ri.avisos).toEqual([]);
+    ri.lacos.forEach((laco, n) => {
+      const fimNaOrdem = [...r.lacos[n].trechos.fim].reverse();
+      laco.trechos.inicio.forEach(([l, c], i) => { expect(l).toBeCloseTo(fimNaOrdem[i][0], 9); expect(c).toBeCloseTo(600 - fimNaOrdem[i][1], 9); });
+    });
+    expect(() => lacosPelasVistas({ lado, perfil: [[0, 480], [200, 480]], planta, estacoes: [0, 200], curto: 'corta' })).toThrow("curto é 'encolhe', 'fim' ou 'inicio'");
+  });
+
+  it("o padrão de curto é 'encolhe' e dá a saída de antes do campo, byte a byte", () => {
+    /* o sha256 do JSON da saída, tirado do código anterior ao campo curto: a aba do fim e uma aba no início, ambas curtas */
+    const resumo = (r) => createHash('sha256').update(JSON.stringify(r)).digest('hex').slice(0, 16);
+    const aba = { lado: [[540, 0], [600, 0], [600, 200], [0, 200], [0, 150], [540, 150]], perfil: [[0, 480], [200, 480]], planta: PLANTA.map(([l, c]) => [l, c - 40]), estacoes: [0, 100, 160, 200] };
+    const base = { lado: [[0, 0], [60, 0], [60, 200], [600, 200], [600, 250], [0, 250]], perfil: [[0, 480], [250, 480]], planta: PLANTA, estacoes: [0, 100, 190, 250] };
+    expect(resumo(lacosPelasVistas(aba))).toBe('09b6edc3d7cdd0f4');
+    expect(resumo(lacosPelasVistas({ ...aba, curto: 'encolhe' }))).toBe('09b6edc3d7cdd0f4');
+    expect(resumo(lacosPelasVistas(base))).toBe('c11264eb0b6480a6');
+  });
+
   it('com centro 0 a saída é idêntica à de antes, byte a byte, e o corpo deslocado dá os mesmos laços somados do centro', () => {
     /* o sha256 do JSON da saída, tirado do código anterior ao campo centro, com os mesmos casos (o terceiro tem aviso de perfil) */
     const ANTES = ['a7ab0986ece6d1cf', 'c1d41ad8e14c6bb5', '4dada21f8d90cbc6'];

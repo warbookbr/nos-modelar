@@ -14,12 +14,15 @@
  *     ponta em cada lateral (quanto a borda fica aquém do extremo da planta).
  *   estacoes: [a, ...] as alturas dos laços, em crescente; a primeira e a última são levadas para dentro da silhueta.
  *   pontos: quantos pontos têm o início e o fim de cada laço (padrão 9), e pontosDoLado, quantos tem cada lado (padrão 4).
- *   espessuraMinima: o menor comprimento do lado do laço, em mm (padrão 2); no laço curto os recuos encolhem por igual até caber.
+ *   espessuraMinima: o menor comprimento do lado do laço, em mm (padrão 2); no laço curto, com curto 'encolhe', os recuos encolhem por igual até caber.
  *   centro: a lateral do eixo de simetria do corpo, em mm (padrão 0); a planta é lida em torno dela, o perfil continua sendo a
  *     meia largura e os laços saem deslocados; a planta que não é simétrica em torno dela entra em `avisos` com a medida.
  *   cantos: 'acompanham' (padrão) leva a ponta inteira da planta à silhueta, e o degrau da silhueta dá a volta com a mesma
  *     profundidade; 'fixos' deixa os cantos da planta onde estão e encolhe o recuo da ponta na altura em que a silhueta fica aquém
  *     do extremo dela, e o degrau some para os lados. extremos: { inicio?, fim? } troca o extremo a que 'fixos' se refere.
+ *   curto: o que fazer no laço mais curto que os recuos. 'encolhe' (padrão) encolhe os dois recuos por igual e avisa; 'fim' dá ao fim o
+ *     recuo inteiro da planta e faz o início a mesma curva, recuada do comprimento do intervalo (a aba ou a moldura de espessura
+ *     constante que acompanha a ponta do fim), sem aviso; 'inicio' é o espelho.
  * devolve: { trechos, lacos, tampa, meiaPlanta, avisos }, com meiaPlanta medida do centro e os trechos `inicio`, `direita`, `fim` e `esquerda`; o ponto do laço é
  *   [l, c], o que em `gaiolaPorLacos` de eixo y é [x, z].
  * exemplo:
@@ -41,7 +44,10 @@
  * capô morre nos cantos em vez de dar a volta com a profundidade do centro.
  *
  * O LAÇO CURTO. Onde o intervalo da altura mede menos que os dois recuos somados (a aba de uma tampa, a ponta de um bico), os
- * recuos encolhem por igual até o lado do laço medir `espessuraMinima`, e a altura entra em `avisos`.
+ * recuos encolhem por igual até o lado do laço medir `espessuraMinima`, e a altura entra em `avisos`. Com `curto: 'fim'` o fim fica
+ * com o recuo inteiro da planta (com o fator dos cantos fixos) e o início é a mesma curva recuada de c1 - c0: o laço vira uma faixa
+ * de espessura c1 - c0, medida no comprimento, em toda a lateral, e o início passa de c0 para trás nos lados, por onde a ponta da
+ * planta recua. `curto: 'inicio'` faz o mesmo a partir do início. A altura que não é curta sai como no padrão.
  *
  * A SILHUETA NÃO É A SEÇÃO DO MEIO quando o corpo tem um vão no centro da ponta (a grade de um capô): acima da soleira do vão, o
  * que a vista de lado mostra é a borda dele, aquém da ponta pelo recuo da planta naquela largura. Dê em `lado` a seção do meio
@@ -94,7 +100,7 @@ const poligonoValido = (p, nome) => {
 
 /**
  * Os laços horizontais de um corpo visto de lado, de frente ou de trás e de cima, para `gaiolaPorLacos`.
- * @param {{ lado: number[][], perfil: number[][], planta: number[][], estacoes: number[], pontos?: number, pontosDoLado?: number, espessuraMinima?: number, centro?: number, cantos?: 'acompanham' | 'fixos', extremos?: { inicio?: number, fim?: number } }} o
+ * @param {{ lado: number[][], perfil: number[][], planta: number[][], estacoes: number[], pontos?: number, pontosDoLado?: number, espessuraMinima?: number, centro?: number, cantos?: 'acompanham' | 'fixos', extremos?: { inicio?: number, fim?: number }, curto?: 'encolhe' | 'fim' | 'inicio' }} o
  */
 export function lacosPelasVistas(o) {
   if (o == null || typeof o !== 'object') erro('espera { lado, perfil, planta, estacoes }');
@@ -148,6 +154,8 @@ export function lacosPelasVistas(o) {
 
   const cantos = o.cantos ?? 'acompanham';
   if (cantos !== 'acompanham' && cantos !== 'fixos') erro("cantos é 'acompanham' ou 'fixos'");
+  const curto = o.curto ?? 'encolhe';
+  if (curto !== 'encolhe' && curto !== 'fim' && curto !== 'inicio') erro("curto é 'encolhe', 'fim' ou 'inicio'");
   const csDoLado = o.lado.map((p) => p[0]);
   const extremos = { inicio: o.extremos?.inicio ?? Math.min(...csDoLado), fim: o.extremos?.fim ?? Math.max(...csDoLado) };
   if (!Number.isFinite(extremos.inicio) || !Number.isFinite(extremos.fim)) erro('extremos precisa ser { inicio?, fim? } com números');
@@ -174,12 +182,16 @@ export function lacosPelasVistas(o) {
     const fI = fator(c0 - extremos.inicio, noCantoDaPlanta.inicio);
     const fF = fator(extremos.fim - c1, noCantoDaPlanta.fim);
     const soma = fI * noCanto.inicio + fF * noCanto.fim;
-    const k = soma > cabe ? cabe / soma : 1;
+    const eCurto = soma > cabe;
+    const k = eCurto && curto === 'encolhe' ? cabe / soma : 1;
     if (k < 1) avisos.push(`na altura ${br(a)} mm o intervalo (${br(c1 - c0)} mm) é curto para os recuos da planta (${br(soma)} mm), que encolheram a ${br(k * 100)}%`);
     const N = 24;
     const ls = Array.from({ length: N + 1 }, (_, i) => -w + (2 * w * i) / N);
-    const inicio = ls.map((l) => [naPlanta(l), c0 + k * fI * recuos(l).inicio]);
-    const fim = ls.map((l) => [naPlanta(l), c1 - k * fF * recuos(l).fim]).reverse();
+    /* no laço curto com 'fim' ou 'inicio', a ponta escolhida leva o recuo inteiro e a outra é ela recuada do intervalo */
+    const cInicio = eCurto && curto === 'fim' ? (l) => c0 - fF * recuos(l).fim : (l) => c0 + k * fI * recuos(l).inicio;
+    const cFim = eCurto && curto === 'inicio' ? (l) => c1 + fI * recuos(l).inicio : (l) => c1 - k * fF * recuos(l).fim;
+    const inicio = ls.map((l) => [naPlanta(l), cInicio(l)]);
+    const fim = ls.map((l) => [naPlanta(l), cFim(l)]).reverse();
     return {
       nome: `e${r}`,
       em: a,
