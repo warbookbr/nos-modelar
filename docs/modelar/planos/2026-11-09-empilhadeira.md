@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/classes-de-cor.mjs`, `tools/modelar/classes-de-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 
@@ -124,9 +124,9 @@ ordem veio de um agente de planejamento, por valor sobre custo; os defeitos de
 origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por número.
 
 - **T0, entregue.** `leitura:regioes`, `linhas:modelo` e `lacosPelasVistas`.
-- **T1.** `perfil:cor`: a referência reduzida às cores declaradas, com os
-  trechos de cada cor por linha e a meia largura por altura; a classificação
-  mora em `classes-de-cor.mjs`, um lugar só.
+- **T1, entregue.** `perfil:cor`: a referência reduzida às cores declaradas, com
+  os trechos de cada cor por linha e a meia largura por altura; a classificação
+  (`classificar` de `perfil-por-cor.mjs`) é a que as fatias seguintes usam.
 - **T2.** Cor chapada da malha contra as classes da referência, por região: a
   fração de classe trocada ordena as regiões da leitura.
 - **T3.** Casamento de linhas: a distância de cada linha do modelo à divisa de
