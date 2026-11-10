@@ -1,0 +1,86 @@
+{
+ "objeto": "a carcaça de uma empilhadeira com os eixos e as quatro rodas (pneus pretos, aros e cubos cinza, eixos escuros)",
+ "cores": {
+  "laranja": "#e2641e",
+  "cinza": "#6b7074",
+  "escuro": "#1e2022"
+ },
+ "partes": {
+  "chassi": "cinza",
+  "paralamas": "laranja",
+  "laterais": "laranja",
+  "furo": "escuro",
+  "piso": "cinza",
+  "degraus": "cinza",
+  "painel": "escuro",
+  "tampaMotor": "cinza",
+  "colunas": "cinza",
+  "pocoTraseiro": "escuro",
+  "capo": "laranja",
+  "tampa": "cinza",
+  "grade": "cinza",
+  "fundoGrade": "escuro",
+  "contrapeso": "cinza",
+  "fundoRasgo": "escuro",
+  "fundoNicho": "escuro",
+  "pino": "cinza",
+  "trinco": "cinza",
+  "tapete": "escuro",
+  "tunel": "escuro",
+  "pneusDianteiros": "escuro",
+  "arosDianteiros": "cinza",
+  "pneusTraseiros": "escuro",
+  "arosTraseiros": "cinza",
+  "eixoDianteiro": "escuro",
+  "cubosDianteiros": "cinza",
+  "eixoTraseiro": "escuro",
+  "suporteTraseiro": "cinza",
+  "mangas": "escuro",
+  "cubosTraseiros": "cinza",
+  "barraDirecao": "cinza"
+ },
+ "dentro": {
+  "grade": "capo",
+  "fundoGrade": "capo",
+  "furo": "laterais",
+  "tunel": "laterais",
+  "arosDianteiros": "pneusDianteiros",
+  "arosTraseiros": "pneusTraseiros"
+ },
+ "vistasDaSobra": [
+  "superior",
+  "direita"
+ ],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {
+  "frontal": {
+   "referencia": "frente.ia.png",
+   "caixaRef": [362, 274, 730, 537],
+   "ignorar": [
+    [440, 274, 650, 537],
+    [362, 274, 730, 352]
+   ],
+   "fora": "a torre com o carro porta-garfos, os garfos, as correntes e a grade de carga (tudo o que fica no meio, entre os pneus), o protetor do operador com as luzes e o volante; a carcaça aparece só nos paralamas laranja e ao lado da torre",
+   "grade": [4, 3],
+   "visto": "de frente"
+  },
+  "traseira": {
+   "referencia": "tras.ia.png",
+   "caixaRef": [373, 281, 700, 538],
+   "ignorar": [
+    [373, 281, 700, 290]
+   ],
+   "fora": "o pé do protetor do operador e o berço do cilindro de gás no alto da tampa, e a sombra no chão",
+   "grade": [4, 3],
+   "visto": "de trás"
+  },
+  "superior": {
+   "referencia": "cima.ia.png",
+   "girar": 270,
+   "caixaRef": [120, 79, 472, 696],
+   "fora": "o protetor do operador (a grade cinza de tubos por cima do posto), o banco, o volante e as alavancas, o cilindro de gás com o berço e as cintas sobre o capô, o escape, as luzes e a torre com o carro porta-garfos na frente",
+   "grade": [4, 3],
+   "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
+  }
+ }
+}
