@@ -1,0 +1,377 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/carcaca",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "chassi",
+        "tipo": "superficie",
+        "onde": "duas chapas na frente, com aberturas grandes",
+        "sentido": "segmentado",
+        "evidencia": "Direita e isométrica da parte: as chapas são molduras finas com vãos, o fundo aparece branco por dentro; o alvo mostra chapas cheias com o cubo."
+      },
+      {
+        "parte": "colunas",
+        "tipo": "superficie",
+        "onde": "caixa reta atrás do banco, topo e cantos",
+        "sentido": "anguloso",
+        "evidencia": "Superior e isométrica: caixa de arestas vivas cruzando toda a largura; no alvo os montantes são estreitos e arredondados. Na traseira ela sobe acima do ombro laranja (x 325-370)."
+      },
+      {
+        "parte": "pino",
+        "tipo": "ausencia",
+        "onde": "nicho do contrapeso, dentro dos dois furos escuros",
+        "sentido": "faltando",
+        "evidencia": "Traseira: os dois furos do nicho vazios; só um semicírculo na borda de baixo, fora do nicho."
+      },
+      {
+        "parte": "pocoTraseiro",
+        "tipo": "ausencia",
+        "onde": "forro de 15 mm por dentro do arco das laterais",
+        "sentido": "faltando",
+        "evidencia": "Direita: o arco traseiro é uma linha fina e um retângulo preto (x 630-690, y 735-830), sem a faixa do forro."
+      },
+      {
+        "parte": "tampaMotor",
+        "tipo": "superficie",
+        "onde": "borda traseira do banco e topo",
+        "sentido": "segmentado",
+        "evidencia": "Lado az30 e tresquartos az0: borda ondulada e dobrada atrás (x 580-870, y 340-500); curvatura com faixa vermelha forte no alto."
+      }
+    ],
+    "observacao": "A silhueta e as cores batem com o alvo, mas o meio da carcaça (banco, colunas, painel) lê como caixas, e o pino e o forro do poço traseiro faltam; piso, tapete, degraus, painel e tampaMotor não foram vistos isolados."
+  },
+  "partes": [
+    {
+      "nome": "chassi",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laterais",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "furo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tunel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paralamas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piso",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tapete",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "degraus",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaMotor",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "colunas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pocoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "grade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoGrade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "contrapeso",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoRasgo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoNicho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pino",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "trinco",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "arredondarCostura convexas e fragil: raio 25 com 8 paineis deixava lasca, e 24 paineis so passa com raio 22 ou 30; regiao alem de z -1230 tambem deixava lasca",
+    "depois do arredondarCostura a origem do intersectar nao inclui a concordancia; para a booleana seguinte foi preciso nomear as duas como parte e citar por grupo",
+    "o arco do cubo ate y 338 deixava triangulo sem area na face da frente do chassi, que so vistas:superficie acusa; descrever e malha:conferir nao",
+    "vistas:superficie suaviza com 30 graus fixos (comum.py) e ignora o liso da receita: a face plana do lado sai riscada junto da borda quebrada, como ja saia a frente das laterais",
+    "o comentario do eixo dianteiro em eixos-rodas.esboco.mjs ainda diz parede do entalhe em z 98 a 100, e agora ela fica em 88",
+    "rodada 1, caixa escura atras do arco traseiro: e o fundo do pocoTraseiro, vao do eixo e da roda da etapa seguinte; atribuido ao plano, que nao diz ao critico que a peca vem sem rodas; o processo nao pegaria sozinho",
+    "rodada 2, colunas em caixa e chassi em moldura: o critico da rodada 1 deu as duas como forma prometida; o alvo de lado traz banco, protetor e cubo, de etapas seguintes; atribuido ao plano",
+    "rodada 2, pino ausente no nicho: a barra entre os dois furos escuros da traseira e o pino, visto isolado na rodada 1; atribuido ao critico",
+    "rodada 2, forro do pocoTraseiro e borda ondulada da tampaMotor: atribuidos ao modelador, vao a rodada 3",
+    "o critico trocou os cinco defeitos de uma rodada para a outra com a mesma nota 6; a contradicao entre rodadas so aparece a quem conduz lendo os dois vereditos"
+  ],
+  "notaDePassagem": "A carcaca segue sem porta. Os encaixes do eixo dianteiro foram mantidos: o teto do vao do chassi e o mesmo e a parede da frente foi a 88 mm, longe do tubo de raio 75. A borda das laterais e o arredondarCostura sobre o intersectar do meio, citado depois por grupo laterais. A quina do capo e um subtrair sob o vao, entre x -400 e 400. A caixa escura atras do arco traseiro e o fundo do pocoTraseiro, onde entram a roda e o eixo traseiros.",
+  "receita": {
+    "sha256": "sha256:8d9a71a1de78e17f20b6b16704a712830d0c6cf18f9c07df5b49ee822a8bf7b1",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 4,
+      "acrescentadas": 31,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    /* A silhueta das chapas com dois trechos curvos trocados pelo círculo ajustado ao contorno: o arco em volta do cubo (centro (24,"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "       369), raio 124, desvio de 6 mm) até 305 mm de altura, de onde o fundo do vão sobe reto (levado até 338 mm, o arco deixava"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "       triângulo sem área na face da frente das chapas), e a frente do pescoço (centro (-232, 657), raio 221, desvio de 7 mm);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "       simplificados eles saíam em facetas e dentes. O teto do vão, de (-87, 438) a (2, 525), fica como medido: o assento do eixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "       dianteiro (etapa dos eixos) sobe até 0,5 mm dos vértices dele, e o círculo da volta do pescoço o atravessava. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    arcos: [{ de: [94.21, 261.51], ate: [-80.82, 304.86] }, { de: [-36.4, 545.73], ate: [-10.17, 690.25] }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    /* O vão do cubo chega a 0 a 2 mm do fim da frente das chapas (100 mm à frente do eixo) entre 338 e 426 mm de altura, e ali a"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "       chapa partia em duas, com a emenda à vista no meio dela. O fundo do vão fica 12 mm atrás do fim da frente, e a chapa é inteira. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    almaDaFrente: { espessura: 12, y: [300, 440] },"
+        },
+        {
+          "tipo": "-",
+          "linha": 100,
+          "texto": "    pe: [[560, 1000], [572, 934], [588, 902], [600, 870], [600, 340], [579, 312], [569, 305], [562, 295], [555, 277],"
+        },
+        {
+          "tipo": "-",
+          "linha": 101,
+          "texto": "      [548, 260], [538, 226], [518, 185]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    pe: [[560, 1000], [572, 934], [588, 902], [600, 870]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    /* O canto de baixo do pé, de frente: os pontos medidos (600 a 340, 579 a 312, 569 a 305, 562 a 295, 555 a 277, 548 a 260, 538 a"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "       226, 518 a 185) davam a quina a 340 mm e degraus de 10 a 20 graus abaixo dela, e de lado a faixa sob a quina lia peça escura"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "       separada. Ele é a curva de segundo grau que sai vertical de 600 mm a 450 de altura, tem o canto medido (600, 340) por ponto de"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "       controle e chega na direção dele à ponta de baixo (518, 185): fica a até 6 mm dos pontos medidos abaixo da quina e a 16,5 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "       dentro da quina, e de lado a sombra desce aos poucos, sem vinco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    peDeBaixo: { de: [600, 450], quina: [600, 340], ate: [518, 185], trechos: 12 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    /* A borda de cima do corpo, do degrau à diagonal que sobe até as colunas, é quebrada com raio de 25 mm: na lateral de caráter ela"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "       tem o brilho de uma borda virada de 3 a 5 px (13 a 21 mm), e viva ela lia plana. A caixa pega só essa borda, dos dois lados, de"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "       z -435 (atrás da frente em volta da roda) a -1230, 8 mm antes da quina da diagonal em z -1238 (y 896), onde o pé começa a"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "       recolher com o capô; passando dela a concordância deixava lasca. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "    bordaDeCima: { raio: 22, paineis: 24, regiao: { min: [-700, 440, -1230], max: [700, 890, -435] } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 215,
+          "texto": "      /* A quina de cima do bico, sob o vão. De lado a silhueta descia em dois degraus: o bico a z 2163 até 770 mm, a borda rebaixada a"
+        },
+        {
+          "tipo": "+",
+          "linha": 216,
+          "texto": "         2147 até 791 e, acima da soleira, o flanco a 2078 a 2096, porque a planta já recuou 32 mm na ponta da soleira (234 mm do"
+        },
+        {
+          "tipo": "+",
+          "linha": 217,
+          "texto": "         centro). Na lateral de caráter o bico entra no flanco por uma curva só, de 77 mm de fundo em 43 mm de altura. A quina sai por"
+        },
+        {
+          "tipo": "+",
+          "linha": 218,
+          "texto": "         subtrair, a 400 mm do centro para cada lado, do que fica atrás da curva em S (derivada nula nas duas pontas) de z 2172 a 735"
+        },
+        {
+          "tipo": "+",
+          "linha": 219,
+          "texto": "         mm de altura a z 2081 a 805, e de z 2081 até 830: o bico e o flanco mantêm a medida, e só a quina e a borda de baixo do vão"
+        },
+        {
+          "tipo": "+",
+          "linha": 220,
+          "texto": "         saem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 221,
+          "texto": "      quinaDaSoleira: { y: [735, 805], z: [2172, 2081], ate: 830, meia: 400, trechos: 16 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 258,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], subdivisao: ['vertices', 'espessura'] };"
+        },
+        {
+          "tipo": "-",
+          "linha": 259,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 284,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], subdivisao: ['vertices', 'espessura'], arredondarCostura: ['raio', 'regiao'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 285,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro)"
+        },
+        {
+          "tipo": "+",
+          "linha": 286,
+          "texto": "  : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, w]) => [k, emMetro(w)])) : v);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes capo, contrapeso, painel, tampa, tampaMotor",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
