@@ -15,9 +15,10 @@
  * "offset" da roda), tirado do pneu da carcaça (417 + 250/2 = 542) e da face do flange do eixo (463): 79 mm. A família o recebe como
  * `desvio`, a fração da folga do aro que o disco ocupa.
  *
- * O que a família não faz, e por isso fica diferente do rascunho: o ombro do pneu, que o rascunho arredondava com uns 55 mm de raio,
- * sai com o arco de 9 mm que é o máximo da família (`CHANFRO_MAXIMO_DO_OMBRO_MM`), e o flanco vai reto do bojo ao ombro; a revolução
- * tem 96 lados no lugar de 48.
+ * O ombro do pneu é o ombro largo da família (`ombroDoPneu`, a fração do flanco, aprovado pela pessoa em 2026-11-10): o arco de 62 mm
+ * de raio, que é o vão axial do ombro do rascunho (de 0 a 62 mm da face, na seção que o rascunho dá às duas rodas) e o arco que mais
+ * se aproxima dele, a até 3,3 mm de cada ponto da seção do rascunho (o de 55 ficaria a 5,6 mm). O que a família não faz, e por isso
+ * fica diferente do rascunho: o flanco vai reto do bojo ao ombro, e a revolução tem 96 lados no lugar de 48.
  *
  * A cadeia: a TABELA em mm; `derivar` leva as medidas aos parâmetros da família (em proporção do diâmetro) e chama a família;
  * `gerarPassos` expande a chamada, que já sai em metro, e acrescenta o sombreamento de cada parte. `montarRodaDianteira` escreve a
@@ -49,8 +50,9 @@ export const TABELA = {
   /* o assento da roda: a face de dentro do cubo fica a esta distância do plano do meio do pneu, para dentro (o pneu de 417 a 667 mm
      da carcaça e a face do flange do eixo) */
   assento: RODA.xDentro + RODA.banda / 2 - EIXO.cubo.face,
-  /* a forma do pneu: o ombro em arco (o da família, de 9 mm) e 96 lados */
+  /* a forma do pneu: o ombro largo em arco, de 62 mm de raio (o do rascunho), e 96 lados */
   ombroRedondo: 1,
+  ombro: 62,
   ladosDoPneu: 96,
   /* o sombreamento suave, com a quina acima deste ângulo nítida (o do eixo e da carcaça) */
   anguloDoLiso: 35,
@@ -64,13 +66,14 @@ export const MATERIAIS = {
 let registro = null;
 const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };
 
-/** A chamada da família `roda-pneu` com as medidas da TABELA, em proporção do diâmetro do pneu. */
-export function derivar(T = TABELA) {
+/** A chamada da família `roda-pneu` com as medidas da TABELA, em proporção do diâmetro do pneu (o ombro em proporção do flanco).
+ *  A roda traseira (`../roda-traseira/receita.js`) chama a mesma com a TABELA dela e o id dela. */
+export function derivar(T = TABELA, id = 'roda-dianteira') {
   const D = T.diametroDoPneu;
   /* o centro do cubo, no referencial da roda (o meio do pneu em x 0, o lado de fora em +x), e o desvio que o põe lá */
   const centroDoCubo = -T.assento + T.larguraDoCubo / 2;
   const desvio = centroDoCubo / ((T.larguraDoAro - T.disco) / 2);
-  return chamar(familias().obter('roda-pneu'), 'roda-dianteira', {
+  return chamar(familias().obter('roda-pneu'), id, {
     diametroPneu: D,
     larguraPneu: T.banda / D,
     diametroAro: T.diametroDoAro / D,
@@ -87,6 +90,7 @@ export function derivar(T = TABELA) {
     diametroFuro: T.diametroDoFuro / D,
     desvio,
     ombroRedondo: T.ombroRedondo,
+    ombroDoPneu: T.ombro / ((D - T.diametroDoAro) / 2),
     ladosDoPneu: T.ladosDoPneu,
   });
 }
@@ -95,13 +99,13 @@ export function derivar(T = TABELA) {
 export const PARTES = ['pneu', 'aro', 'cubo', 'disco'];
 
 /** Os passos da família, em metro, como ela os expande. */
-function passosDaFamilia(T) {
-  return expandirChamadasDeComposicao(familias().registroComposicoes, [derivar(T)]).passos;
+function passosDaFamilia(T, id) {
+  return expandirChamadasDeComposicao(familias().registroComposicoes, [derivar(T, id)]).passos;
 }
 
 /** Os PASSOS, em metro: a roda da família e o sombreamento de cada parte. */
-export function gerarPassos(T = TABELA) {
-  const passos = passosDaFamilia(T);
+export function gerarPassos(T = TABELA, id = undefined) {
+  const passos = passosDaFamilia(T, id);
   const lisos = passos.filter(([op]) => op === 'parte').map(([, { sel }]) => ['liso', { sel, angulo: T.anguloDoLiso }]);
   return [...passos, ...lisos];
 }
@@ -119,11 +123,11 @@ const comBase = (v, base) => {
 /** Monta uma roda no estado { passos, topo, origem } da máquina inteira, em mm: o centro do pneu em `centro`, o lado de fora para +x
  *  (`lado` 1) ou para -x (`lado` -1, meia volta em y), as partes com os nomes de `nomes` (o nome da família para o da máquina) e a cor
  *  do material de cada uma pelo pincel, porque o rascunho não tem MATERIAIS. Sem as portas, que são da montagem. */
-export function montarRodaDianteira(estado, { centro, lado = 1, nomes = {} }, T = TABELA) {
+export function montarRodaDianteira(estado, { centro, lado = 1, nomes = {} }, T = TABELA, id = undefined) {
   const base = estado.origem;
   let maior = 0;
   const nomeadas = [];
-  for (const passo of passosDaFamilia(T)) {
+  for (const passo of passosDaFamilia(T, id)) {
     const [op, args] = comBase(passo, base);
     if (op === 'publicarPorta') continue;
     if (Number.isFinite(args.origemId)) maior = Math.max(maior, args.origemId);
@@ -156,7 +160,7 @@ const receita = {
     escala: { medida: 'diâmetro do pneu (7.00-12 da ficha da classe 2,5 t)', milimetros: 705 },
     familiaProcedural: 'roda-pneu',
     partes: [
-      { nome: 'pneu', forma: 'pneu preto de Ø 705 e 250 mm de banda, banda lisa, ombro em arco curto e flanco com bojo, do talão de Ø 320 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo: revolução em torno de x, 96 lados' },
+      { nome: 'pneu', forma: 'pneu preto de Ø 705 e 250 mm de banda, banda lisa, ombro largo em arco de 62 mm e flanco com bojo, do talão de Ø 320 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 96 lados' },
       { nome: 'aro', forma: 'barril cinza do aro de 12 polegadas, de 18 mm de parede e 234 mm de largura, que o talão do pneu abraça', tecnica: 'família roda-pneu: revolução em torno de x de um tubo' },
       { nome: 'cubo', forma: 'anel cinza de Ø 200 e 30 mm, com o furo de Ø 110 e seis furos de Ø 14, cuja face de dentro fica 79 mm para dentro do meio do pneu', tecnica: 'família roda-pneu: revolução do anel menos o furo central e os seis furos repetidos em volta do eixo' },
       { nome: 'disco', forma: 'chapa cinza de 15 mm do cubo ao aro, recuada para dentro do pneu', tecnica: 'família roda-pneu, tipo 0: revolução em torno de x de um anel' },

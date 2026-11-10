@@ -1,7 +1,8 @@
 /* roda-pneu.test.js — a família `roda-pneu` medida na malha. As quatro partes (pneu, aro, cubo, disco) e o volume de cada uma
    contra a fórmula; a banda (pneumática, maciça, sem pneu com friso, com relevo); o cubo de disco, os raios de um plano e os
    raios de duas flanges, com o corte de cada barra contra a conta à mão; a escala (a malha cresce na proporção do diâmetro); as
-   três portas; cada restrição do contrato; e os oito perfis chamados só pelo nome. A camada mecânica da aprovação, que mede os pontos, os perfis e a escala deles, roda uma vez no fim. */
+   três portas; o ombro largo, que sem o parâmetro deixa cada roda com a assinatura de antes dele; cada restrição do contrato; e os nove
+   perfis chamados só pelo nome. A camada mecânica da aprovação, que mede os pontos, os perfis e a escala deles, roda uma vez no fim. */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { caixasPorParte, portasPublicadas } from '../../../src/autoria/descrever-partes.js';
@@ -30,7 +31,7 @@ const rodar = (parametros = {}) => executarReceita({
 }, registro);
 const P = RODA_PNEU.contrato.parametros;
 const PERFIS = RODA_PNEU.contrato.perfis;
-const NOMES_DOS_PERFIS = ['bicicleta', 'carrinho-de-mao', 'carro', 'carroca', 'furgao-235-65-r16', 'rodizio', 'trator', 'trem'];
+const NOMES_DOS_PERFIS = ['bicicleta', 'carrinho-de-mao', 'carro', 'carroca', 'empilhadeira-700-12', 'furgao-235-65-r16', 'rodizio', 'trator', 'trem'];
 const ponto = (nome) => Object.fromEntries(Object.entries(P).map(([chave, def]) => [chave, def[nome]]));
 const hash = (neutro) => sha256Hex(JSON.stringify(neutroCanonico(neutro)));
 /* os valores completos de uma chamada: o padrão, o perfil e o que o chamador escreve, nessa ordem */
@@ -481,6 +482,94 @@ describe('a forma do pneu: os lados em volta e o ombro redondo', () => {
   });
 });
 
+describe('o ombro largo: a fração do flanco sem o teto de 9 mm, para o pneu industrial', () => {
+  /* As assinaturas da malha antes do ombro largo (2026-11-10): os três pontos (o máximo sem o ombro largo, que o máximo do contrato agora
+     liga), os oito perfis de antes, os mesmos com o ombro redondo e com 128 lados. Os 16 primeiros algarismos do sha256 do neutro canônico. */
+  const ANTES = {
+    minimo: [ponto('minimo'), '5ef1b731d02d951c'],
+    medio: [ponto('medio'), '1e8029e3be4d82be'],
+    'maximo sem o ombro largo': [{ ...ponto('maximo'), ombroDoPneu: 0 }, '61c6e2b8df3c3351'],
+    bicicleta: [{ perfil: 'bicicleta' }, '27cabd8eefc1768e'],
+    'bicicleta redonda': [{ perfil: 'bicicleta', ladosDoPneu: 128, ombroRedondo: 1 }, '4c7bf5413bcebe47'],
+    'carrinho-de-mao': [{ perfil: 'carrinho-de-mao' }, 'bac8fc2875651446'],
+    'carrinho-de-mao redondo': [{ perfil: 'carrinho-de-mao', ombroRedondo: 1 }, '3b9b7c70841c9784'],
+    carro: [{ perfil: 'carro' }, '8bc2bf8d2f2d7214'],
+    'carro redondo': [{ perfil: 'carro', ombroRedondo: 1 }, 'aabac4c9b7516a88'],
+    carroca: [{ perfil: 'carroca' }, '4f3dbb19889dc6be'],
+    furgao: [{ perfil: 'furgao-235-65-r16' }, '7d6e175823d0f56e'],
+    'furgao redondo': [{ perfil: 'furgao-235-65-r16', ombroRedondo: 1 }, '44d90b3383d339f4'],
+    rodizio: [{ perfil: 'rodizio' }, 'bdd200b9ff364b0d'],
+    'rodizio redondo': [{ perfil: 'rodizio', ombroRedondo: 1 }, 'a4abce8d4e4bed40'],
+    trator: [{ perfil: 'trator' }, 'c839c93322a6cc88'],
+    'trator redondo': [{ perfil: 'trator', ombroRedondo: 1 }, '693369ff0951bce9'],
+    trem: [{ perfil: 'trem' }, 'b5671dbb1cf6a7d5'],
+    'trem redondo': [{ perfil: 'trem', ombroRedondo: 1 }, '9b62a1ae9b721954'],
+  };
+  const largo = { perfil: 'empilhadeira-700-12', ombroRedondo: 0 };
+
+  it('sem o ombro largo (o padrão 0), cada roda sai com a assinatura da malha de antes dele', () => {
+    for (const [nome, [parametros, assinatura]] of Object.entries(ANTES)) expect(hash(rodar(parametros).neutro).slice(0, 16), nome).toBe(assinatura);
+  });
+
+  it('o ombro é a fração pedida do flanco, sem o teto de 9 mm: o chanfro vai de (R - c, -xm) a (R, -xm + c), e o volume é o da seção', () => {
+    const v = completo(largo);
+    const { R, rA, flanco, xm, xb } = medidasDoPneu(v);
+    const c = v.ombroDoPneu * flanco;
+    expect(c).toBeGreaterThan(5 * CHANFRO_MAXIMO_DO_OMBRO_MM);
+    const { neutro } = rodar(largo);
+    expect(neutro.orfaos ?? []).toEqual([]);
+    expect(caixasPorParte(neutro).caixas.get('pneu').corpos).toBe(1);
+    const vs = verticesDaParte(neutro, 'pneu');
+    const ha = (r, x) => vs.some(([vx, ...yz]) => Math.abs(vx - x) < 1e-6 && Math.abs(raioDe([0, ...yz]) - r) < 1e-6);
+    for (const lado of [-1, 1]) {
+      expect(ha(R - c, lado * xm), `ombro em ${lado}`).toBe(true);
+      expect(ha(R, lado * (xm - c)), `banda em ${lado}`).toBe(true);
+    }
+    const bojo = rA + ALTURA_DO_BOJO * flanco;
+    const passo = (2 * xm - 2 * c) / 6;
+    const secao = [[rA, -xb], [bojo, -xm], [R - c, -xm], [R, -xm + c], [R, -xm + c + passo], [R, -xm + c + 2 * passo], [R, xm - c], [R - c, xm], [bojo, xm], [rA, xb]];
+    expect(volumeDaParte(neutro, 'pneu')).toBeCloseTo(volumeDaRevolucao(secao, LADOS_DA_RODA), 0);
+  });
+
+  it('a porta do assento declara o raio que a face plana de dentro alcança, o do ombro, e a malha a confere; com friso segue o do friso', () => {
+    const v = completo(largo);
+    const { R, flanco } = medidasDoPneu(v);
+    for (const parametros of [largo, { ...largo, ombroRedondo: 1 }]) {
+      const { neutro } = rodar(parametros);
+      const assento = portasPublicadas(neutro).find(({ id }) => id === 'assento-do-pneu').interface;
+      expect(assento.raioExterno / MM).toBeCloseTo(R - v.ombroDoPneu * flanco, 9);
+      expect(conferirPortasNaForma(neutro)).toEqual([]);
+    }
+    const trem = { perfil: 'trem', ombroDoPneu: 0.3 };
+    const { neutro } = rodar(trem);
+    expect(portasPublicadas(neutro).find(({ id }) => id === 'assento-do-pneu').interface.raioExterno / MM).toBeCloseTo(completo(trem).diametroPneu / 2, 9);
+    expect(conferirPortasNaForma(neutro)).toEqual([]);
+  });
+
+  it('convive com o ombro redondo: o arco de três segmentos tem o raio do ombro largo', () => {
+    const v = completo({ perfil: 'empilhadeira-700-12' });
+    const { R, xm, flanco } = medidasDoPneu(v);
+    const c = v.ombroDoPneu * flanco;
+    const { neutro } = rodar({ perfil: 'empilhadeira-700-12' });
+    const noArco = verticesDaParte(neutro, 'pneu').filter(([x, ...yz]) => x < -xm + c - 1e-6 && Math.hypot(...yz) > R - c + 1e-6 && Math.hypot(...yz) < R - 1e-6);
+    expect(noArco.length).toBe(2 * LADOS_DA_RODA);
+    for (const [x, y, z] of noArco) expect(Math.hypot(x + xm - c, Math.hypot(y, z) - (R - c))).toBeCloseTo(c, 5);
+  });
+
+  it('o ombro que passa de 30% da banda é recusado com as duas medidas em mm, e o que passa de 0,6 do flanco pela faixa', () => {
+    const v = completo({ perfil: 'empilhadeira-700-12', larguraPneu: 0.2 });
+    const c = v.ombroDoPneu * medidasDoPneu(v).flanco;
+    const banda = 0.3 * v.larguraPneu * v.diametroPneu;
+    let erro = null;
+    try { rodar({ perfil: 'empilhadeira-700-12', larguraPneu: 0.2 }); } catch (e) { erro = e; }
+    expect(erro?.restricao).toBe('ombro-cabe-na-banda');
+    const [, esquerda, direita] = erro.message.match(/o lado esquerdo vale ([\d.]+) e o direito ([\d.]+)/);
+    expect(Number(esquerda)).toBeCloseTo(c, 6);
+    expect(Number(direita)).toBeCloseTo(banda, 6);
+    expect(() => rodar({ perfil: 'empilhadeira-700-12', ombroDoPneu: 0.7 })).toThrow(/parametros\.ombroDoPneu/);
+  });
+});
+
 describe('os raios: o tipo escolhe a composição e o número de raios cabe nos 64 nós da extensão', () => {
   it('o tipo 0 é a roda de disco, o 1 a raiada de um plano e o 2 a de duas flanges, com o perfil do raio: tubo com parede, maciço sem ela', () => {
     expect(chamar(RODA_PNEU, 'roda', {}).composicao).toBe('roda-pneu.disco-lisa');
@@ -765,6 +854,7 @@ describe('o contrato recusa combinação impossível', () => {
     'ventilacao-afastada-dos-furos-de-fixacao': { perfil: 'furgao-235-65-r16', diametroCirculoDeVentilacao: 0.3 },
     'ventilacao-dentro-da-borda': { perfil: 'furgao-235-65-r16', diametroCirculoDeVentilacao: 0.5 },
     'ventilacao-furos-vizinhos-separados': { perfil: 'furgao-235-65-r16', furosDeVentilacao: 12 },
+    'ombro-cabe-na-banda': { perfil: 'empilhadeira-700-12', larguraPneu: 0.2 },
   };
   it('há um caso para cada restrição do contrato', () => {
     expect(Object.keys(CASOS).sort()).toEqual(RODA_PNEU.contrato.restricoes.map(({ id }) => id).sort());
@@ -783,17 +873,17 @@ describe('o contrato recusa combinação impossível', () => {
     expect(() => rodar({ furosDeFixacao: 13 })).toThrow(/parametros\.furosDeFixacao/);
     expect(() => rodar({ furosDeFixacao: 4.5 })).toThrow(/parametros\.furosDeFixacao/);
     expect(() => rodar({ banda: 4 })).toThrow(/parametros\.banda/);
-    expect(() => rodar({ perfil: 'moto' })).toThrow(/parametros\.perfil.*bicicleta, carrinho-de-mao, carro, carroca, furgao-235-65-r16, rodizio, trator, trem/);
+    expect(() => rodar({ perfil: 'moto' })).toThrow(/parametros\.perfil.*bicicleta, carrinho-de-mao, carro, carroca, empilhadeira-700-12, furgao-235-65-r16, rodizio, trator, trem/);
   });
 });
 
 describe('os perfis: o nome e o diâmetro bastam, e o chamador sobrescreve só o que quiser', () => {
-  it('a família declara os oito perfis, e cada um é uma chamada que ela aceita, com a composição que o objeto pede', () => {
+  it('a família declara os nove perfis, e cada um é uma chamada que ela aceita, com a composição que o objeto pede', () => {
     expect(Object.keys(PERFIS).sort()).toEqual(NOMES_DOS_PERFIS);
     const esperadas = {
       carro: 'roda-pneu.disco-lisa', bicicleta: 'roda-pneu.flanges-macico-32-lisa', 'carrinho-de-mao': 'roda-pneu.disco-lisa', rodizio: 'roda-pneu.disco-lisa',
       trator: 'roda-pneu.disco-sulcada', trem: 'roda-pneu.disco-lisa', carroca: 'roda-pneu.raiada-macico-12-lisa',
-      'furgao-235-65-r16': 'roda-pneu.disco-lisa-circ-vent',
+      'furgao-235-65-r16': 'roda-pneu.disco-lisa-circ-vent', 'empilhadeira-700-12': 'roda-pneu.disco-lisa-ombro',
     };
     for (const nome of NOMES_DOS_PERFIS) {
       expect(chamar(RODA_PNEU, 'roda', { perfil: nome }).composicao).toBe(esperadas[nome]);
@@ -840,7 +930,7 @@ describe('a camada mecânica da aprovação', () => {
     }
   }, 180_000);
 
-  it('a aprovação mecânica passa nos três pontos, nos oito perfis, na varredura e na escala dos perfis', () => {
+  it('a aprovação mecânica passa nos três pontos, nos nove perfis, na varredura e na escala dos perfis', () => {
     const resultado = aprovarFamilia(RODA_PNEU, { gravar: false });
     expect(resultado.problemas).toEqual([]);
     expect(resultado.aprovada).toBe(true);

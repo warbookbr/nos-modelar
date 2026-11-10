@@ -59,7 +59,7 @@ const p = (nome) => ({ parametro: nome });
 /* os parâmetros escalares (metro), por grupo, e os inteiros */
 const DA_BANDA = [
   'raioDoAssento', 'raioDoBojo', 'raioDoOmbro', 'raioDoPneu', 'raioDoFriso', 'inicioDaLargura', 'meiaLargura', 'inicioDoAro',
-  'meiaLarguraDoAro', 'inicioDaBandaEsquerda', 'fimDoFriso', 'fimDoTalude', 'fimDaBanda', 'raioInternoDoAro',
+  'meiaLarguraDoAro', 'inicioDaBandaEsquerda', 'fimDoFriso', 'fimDoTalude', 'fimDaBanda', 'raioInternoDoAro', 'raioDaFaceDoAssento',
 ];
 const DO_CUBO = ['raioDoFuroCentral', 'raioDoCubo', 'inicioDoCubo', 'fimDoCubo'];
 const DAS_FLANGES = ['raioDaFlange', 'inicioDoMiolo', 'fimDoMiolo'];
@@ -110,7 +110,9 @@ const parteDe = (id, nome, origem) => ({ id: `parte-${id}`, operacao: 'parte', a
 const materialDe = (id, usa, origem) => ({ id: `material-${id}`, operacao: 'material', argumentos: { usa, sel: { origem } } });
 const solidoDe = (id, origem) => ({ id: `solido-${id}`, operacao: 'solido', argumentos: { sel: { origem } } });
 
-/* as três portas, as mesmas em todas as variantes: o anel do assento no pneu, o anel do furo central e o círculo de furos no cubo */
+/* as três portas, as mesmas em todas as variantes: o anel do assento no pneu, o anel do furo central e o círculo de furos no cubo. O raio
+   externo do assento é o que a face plana de dentro do pneu alcança: o do friso, ou o do ombro quando o ombro largo passa da faixa
+   em que a conferência da porta mede o raio (`derivar`) */
 function portasDaRoda(pneu) {
   return [
     {
@@ -119,7 +121,7 @@ function portasDaRoda(pneu) {
         id: 'assento-do-pneu', de: pneu,
         interface: {
           forma: 'anel', papel: 'ocupa', eixo: [-1, 0, 0], centro: [p('inicioDaLargura'), 0, 0],
-          raioInterno: p('raioDoAssento'), raioExterno: p('raioDoFriso'), inicio: p('inicioDaPortaDoPneu'), fim: 0,
+          raioInterno: p('raioDoAssento'), raioExterno: p('raioDaFaceDoAssento'), inicio: p('inicioDaPortaDoPneu'), fim: 0,
         },
       },
     },

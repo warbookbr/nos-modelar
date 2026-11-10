@@ -39,6 +39,14 @@
    igual ao chanfro, em três segmentos: os pontos intermediários saem de `derivar` em [raio, x] (E à esquerda, D à direita, 1 e 2 na ordem do perfil). Onde há
    friso (o lado de -x), o arco não existe e os dois pontos ficam sobre a parede reta, sem mudar a forma. Com 0 e 96 a composição é a de antes.
 
+   O OMBRO LARGO. `ombroDoPneu` maior que zero troca o chanfro limitado (a fração do flanco, até 9 mm e até 30% da largura) pela
+   fração pedida do flanco, sem o teto de 9 mm: o pneu industrial alto, de ombro de dezenas de milímetros. Convive com
+   `ombroRedondo` (o arco passa a ter o raio do ombro largo). O máximo do contrato (0,6 do flanco) deixa o ombro acima do bojo, e a
+   restrição `ombro-cabe-na-banda` recusa, com as duas medidas em mm, o ombro que passa de 30% da largura da banda. Com o ombro
+   acima de 10 mm o chanfro sai da faixa em que a conferência da porta do assento procura o raio, e a porta passa a declarar como
+   raio externo o raio que a face plana de dentro alcança (`raioDaFaceDoAssento`, o raio do ombro); sem o ombro largo, ou com
+   friso (a parede de dentro é plana até o friso), ele é o raio do friso, como sempre. Com 0 a roda é a de antes.
+
    Puro e determinístico: nenhuma leitura de relógio, de sorteio ou de arquivo. */
 import { LADOS_DO_PNEU, escalaresDaRoda, idDaRoda, nomeDoNoDoAro, nomeDoNoDoCubo } from './composicoes.js';
 
@@ -61,7 +69,7 @@ export function derivar({
   paredeDoRaio, cruzamento, alturaDoFriso, sulcos, profundidadeDoSulco, larguraDoSulco,
   sulcosCirculares = 0, larguraDoSulcoCircular = 0, profundidadeDoSulcoCircular = 0,
   furosDeVentilacao = 0, diametroCirculoDeVentilacao = 0, diametroFuroDeVentilacao = 0,
-  ladosDoPneu = LADOS_DO_PNEU, ombroRedondo = 0,
+  ladosDoPneu = LADOS_DO_PNEU, ombroRedondo = 0, ombroDoPneu = 0,
 }) {
   const D = diametroPneu;
   const alturaDoFrisoMm = alturaDoFriso * D;
@@ -75,7 +83,8 @@ export function derivar({
   const meiaLargura = largura / 2;
   const comAroProprio = banda === 0 || banda === 3;
   const meiaLarguraDoAro = (comAroProprio ? larguraAro * largura : largura) / 2;
-  const chanfro = Math.min(
+  const ombroLargo = ombroDoPneu > 0;
+  const chanfro = ombroLargo ? ombroDoPneu * flanco : Math.min(
     (banda === 2 ? FRACAO_DO_CHANFRO_DA_RODA_SEM_PNEU : FRACAO_DO_CHANFRO) * flanco, CHANFRO_MAXIMO_DO_OMBRO_MM, FRACAO_DO_CHANFRO_NA_LARGURA * largura,
   );
   const comFriso = alturaDoFrisoMm > 0;
@@ -107,6 +116,7 @@ export function derivar({
     raioDoBojo: mm(raioDoAssento + ALTURA_DO_BOJO * flanco),
     raioDoAssento: mm(raioDoAssento),
     raioDoFriso: mm(raioDoFriso),
+    raioDaFaceDoAssento: mm(ombroLargo && !comFriso ? raioDoPneu - chanfro : raioDoFriso),
     inicioDaLargura: mm(-meiaLargura),
     meiaLargura: mm(meiaLargura),
     inicioDoAro: mm(-meiaLarguraDoAro),
