@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/classes-de-cor.mjs`, `tools/modelar/classes-de-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 
@@ -115,6 +115,32 @@ da torre, elevação, volante) nos eixos certos e nenhuma peça cruzando outra.
 7. **Acessórios.** Cilindro de GLP com berço e cintas, escape, alça de acesso.
 8. **Fechamento.** Auditoria da montagem, vistas finais, atritos classificados,
    backlog e o plano movido para `encerrados/`.
+
+## Fatias de ferramenta (camada de conferência)
+
+A pessoa pediu em 2026-11-10 que a conferência que achou os defeitos da traseira
+vire recurso geral, e deu liberdade para criar ferramenta e melhorar o núcleo. A
+ordem veio de um agente de planejamento, por valor sobre custo; os defeitos de
+origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por número.
+
+- **T0, entregue.** `leitura:regioes`, `linhas:modelo` e `lacosPelasVistas`.
+- **T1.** `perfil:cor`: a referência reduzida às cores declaradas, com os
+  trechos de cada cor por linha e a meia largura por altura; a classificação
+  mora em `classes-de-cor.mjs`, um lugar só.
+- **T2.** Cor chapada da malha contra as classes da referência, por região: a
+  fração de classe trocada ordena as regiões da leitura.
+- **T3.** Casamento de linhas: a distância de cada linha do modelo à divisa de
+  classes mais próxima da referência, e a divisa sem linha; confirma ou derruba
+  por número a diferença de forma do crítico.
+- **T4.** `sobra:partes`: quanto de uma parte aparece fora do contorno da parte
+  que a contém em cada vista, com a relação declarada por quem conduz (item 12).
+- **T5.** Aviso em `gaiolaPorLacos` quando `compensar` leva a superfície além do
+  pedido (item 8): mudança de núcleo, sem mudar malha.
+- **T6.** Um comando por rodada (`conferir:vistas`) que encadeia T1 a T4 e a
+  leitura para todas as vistas com referência, e a entrada nas skills.
+- **Adiado.** A entrada pela receita de peça (`PLANO.referencias` com vista e
+  caixa) encosta no território do plano de ferramentas de conferência e de
+  vista; fica para ele ou para quando a pessoa passar o arquivo.
 
 ## Método de cada parte
 
