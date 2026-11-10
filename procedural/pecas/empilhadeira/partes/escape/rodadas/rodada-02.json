@@ -1,0 +1,417 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/escape",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "escape",
+        "tipo": "ausencia",
+        "onde": "fuste, entre o pé e o cotovelo",
+        "sentido": "faltando",
+        "evidencia": "tras.ia.png e cima.ia.png mostram luva perfurada ao longo do tubo; nas vistas do modelo o fuste é liso. O plano prometia só o tubo escuro, então é detalhe do alvo."
+      }
+    ],
+    "observacao": "Os critérios de reprovação não se cumprem: o escape fica atrás à direita, a ponta recua, passa de 2.000 mm, é preto e a curva é contínua; só vi a luva perfurada em falta e a ponta afiada no pé."
+  },
+  "partes": [
+    {
+      "nome": "escape",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a seção da varredura é uma só: a ponta passou de Ø 80 para Ø 90, a do tubo",
+    "o relato do modelador trouxe quatro pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 2, luva perfurada: o plano promete so o tubo, como o proprio critico registrou; atribuido ao plano, fica como detalhe para a pessoa"
+  ],
+  "notaDePassagem": "O escape é um tubo só, varrido por gaiolaVarrida: reta de pé até o pivô em 1.960, curva de raio 100 que vira 35 graus para trás, e a ponta reta até 110 mm do pivô, o fim da ponta do rascunho. O pé continua cortado pelas duas superfícies medidas da tampa, 0,5 mm acima dela.",
+  "receita": {
+    "sha256": "sha256:ca7e36f8964190c36d6d8948b43c36441a50c7eb48ab4e3ea51a7771df3895b0",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 22,
+      "acrescentadas": 48,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "import { gaiolaVarrida } from '../../../../../nucleo/gaiola-varrida.js';"
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "  /* O TUBO de raio 45 com o eixo em x -355 e z -1.567, do corte do pé até 1.990; a ponta de raio 40, de 1.950 a 2.070, inclinada 35"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "     graus para trás no pivô do eixo em 1.960. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 34,
+          "texto": "  tubo: { x: -355, z: -1567, raio: 45, ate: 1990 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": "  ponta: { raio: 40, y: [1950, 2070], graus: -35, pivoY: 1960 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* O TUBO de raio 45, um trilho só: de pé com o eixo em x -355 e z -1.567, do corte do pé até o pivô em 1.960, onde vira 35 graus para"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     trás numa curva de raio 100, e a ponta reta até 110 mm do pivô, ao longo dela (o fim da ponta do rascunho, que ia de 1.950 a 2.070"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     girada no pivô). No rascunho a ponta era outro cilindro, de raio 40, nascendo dentro do topo reto do tubo, em degrau; a seção agora"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "     é a mesma do tubo, de 96 lados. Estações a cada 100 mm no tubo, 16 na curva e 4 na ponta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  tubo: { x: -355, z: -1567, raio: 45, pivoY: 1960, graus: 35, raioDaCurva: 100, ponta: 110, estacoes: { passo: 100, naCurva: 16, naPonta: 4 } },"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "const circulo = (cu, cv, r, n) => Array.from({ length: n }, (_, k) => [cu + r * Math.cos(2 * Math.PI * k / n), cv + r * Math.sin(2 * Math.PI * k / n)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  /* o trilho do tubo: a reta de pé, a curva que vira para trás (-z) e a reta da ponta */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  const TU = T.tubo; const a = TU.graus * Math.PI / 180; const R = TU.raioDaCurva;"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const t = R * Math.tan(a / 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const dir = [0, Math.cos(a), -Math.sin(a)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const pivo = [TU.x, TU.pivoY, TU.z];"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const inicio = [TU.x, P.de + P.folga, TU.z];"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const a0 = [TU.x, TU.pivoY - t, TU.z]; const a1 = pivo.map((v, k) => v + dir[k] * t); const fim = pivo.map((v, k) => v + dir[k] * TU.ponta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const centro = [TU.x, TU.pivoY - t, TU.z - R];"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  /* o sentido do giro em torno de x que leva a0 a a1 (a regra do arco do trilho) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const rad = [0, a0[1] - centro[1], a0[2] - centro[2]]; const kr = [0, -rad[2], rad[1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const ponto = (th) => [TU.x, centro[1] + rad[1] * Math.cos(th) + kr[1] * Math.sin(th), centro[2] + rad[2] * Math.cos(th) + kr[2] * Math.sin(th)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const graus = Math.hypot(...ponto(a).map((v, k) => v - a1[k])) < 1e-6 ? TU.graus : -TU.graus;"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const L = [a0[1] - inicio[1], R * a];"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const caminho = { trilho: [{ reta: { de: inicio, ate: a0 } }, { arco: { centro, eixo: [1, 0, 0], de: a0, graus } }, { reta: { de: a1, ate: fim } }], marcos: [L[0], L[0] + L[1]], fim, dir };"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const secao = Array.from({ length: T.lados }, (_, k) => ({ u: TU.raio * Math.cos(2 * Math.PI * k / T.lados), v: TU.raio * Math.sin(2 * Math.PI * k / T.lados), nome: `l${k}` }));"
+        },
+        {
+          "tipo": "-",
+          "linha": 63,
+          "texto": "  return { sobFrente: abaixo(P.frente), sobLado: abaixo(P.lado), portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  return { sobFrente: abaixo(P.frente), sobLado: abaixo(P.lado), caminho, secao, portas };"
+        },
+        {
+          "tipo": "-",
+          "linha": 69,
+          "texto": "  const { extX, extY, extZ, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "-",
+          "linha": 70,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  const { extX, extZ, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "  const TU = T.tubo; const PO = T.ponta; const P = T.pe; const n = T.lados;"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const P = T.pe; const E = T.tubo.estacoes; const { trilho, marcos } = D.caminho;"
+        },
+        {
+          "tipo": "-",
+          "linha": 75,
+          "texto": "  /* o tubo, menos o que fica abaixo das duas superfícies do pé ao mesmo tempo; a ponta girada no pivô */"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "  const tubo = cortar(extY(circulo(TU.x, TU.z, TU.raio, n), P.de + P.folga, TU.ate),"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "    cruzar(extZ(D.sobFrente, Math.min(...zs), Math.max(...zs)), extX(D.sobLado, Math.min(...xs), Math.max(...xs))));"
+        },
+        {
+          "tipo": "-",
+          "linha": 78,
+          "texto": "  const ponta = extY(circulo(TU.x, TU.z, PO.raio, n), PO.y[0], PO.y[1]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 79,
+          "texto": "  estado.passos.push(['rotaciona', { eixo: 'x', graus: PO.graus, pivo: [TU.x, PO.pivoY, TU.z], sel: ponta }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 80,
+          "texto": "  const escape = unir(tubo, ponta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  /* o tubo varrido, fechado e tampado, pelo passo `subdivisao` sem nível, menos o que fica abaixo das duas superfícies do pé ao mesmo"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "     tempo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const g = gaiolaVarrida({ nome: 'escape', trilho, quadro: { u: [1, 0, 0] }, secao: D.secao, fechada: true, tampas: true,"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "    estacoes: [{ fracao: 0 }, { passo: E.passo }, { em: marcos[0] }, { entre: E.naCurva }, { em: marcos[1] }, { entre: E.naPonta }, { fracao: 1 }] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  Object.assign(estado.topo, Object.fromEntries(g.posicoes));"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  estado.origem += 1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  estado.passos.push(['subdivisao', { origemId: estado.origem, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: 0 }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  const tubo = { origem: { op: 'subdivisao', id: estado.origem } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  const escape = cortar(tubo, cruzar(extZ(D.sobFrente, Math.min(...zs), Math.max(...zs)), extX(D.sobLado, Math.min(...xs), Math.max(...xs))));"
+        },
+        {
+          "tipo": "-",
+          "linha": 86,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], rotaciona: ['pivo'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "/** Os pontos nomeados da gaiola do tubo, em metro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "export function gerarTopo(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  montarEscape(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  return Object.fromEntries(Object.entries(estado.topo).map(([nome, p]) => [nome, p.map(m)]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  get TOPO() { return { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z', ...gerarTopo(this.PARAMS) }; },"
+        },
+        {
+          "tipo": "-",
+          "linha": 110,
+          "texto": "      { nome: 'escape', forma: 'o tubo escuro de 90 mm de pé em x -355 e z -1.567, do pé na tampa do capô a 1.990, e a ponta de 80 mm inclinada 35 graus para trás até 2.070', tecnica: 'círculos de 96 lados extrudados em y; o pé cortado pelas duas superfícies da face da tampa (perfis de frente e de lado extrudados, cruzados); a ponta girada em torno de x e unida' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "      { nome: 'escape', forma: 'o tubo escuro de 90 mm de pé em x -355 e z -1.567, do pé na tampa do capô ao pivô em 1.960, curva contínua de raio 100 que o vira 35 graus para trás e a ponta reta até 2.076', tecnica: 'gaiolaVarrida de seção redonda de 96 lados (reta, arco, reta), fechada e tampada; o pé cortado pelas duas superfícies da face da tampa (perfis de frente e de lado extrudados, cruzados)' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "      'o cotovelo em degrau ou em corte reto, em vez da curva contínua do tubo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "    lataria: { partes: ['escape'] },"
+        },
+        {
+          "tipo": "-",
+          "linha": 120,
+          "texto": "  /* O extremo de cima, da frente e da esquerda: o tubo na largura e na frente, e o canto de cima da tampa da ponta girada, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  /* O extremo de cima, da frente e da esquerda, em mm: o tubo na largura e na frente, e o canto de cima da tampa da ponta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "    const T = this.PARAMS; const TU = T.tubo; const PO = T.ponta; const a = PO.graus * Math.PI / 180;"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "    const yTopo = PO.pivoY + (PO.y[1] - PO.pivoY) * Math.cos(a) + PO.raio * Math.abs(Math.sin(a));"
+        },
+        {
+          "tipo": "-",
+          "linha": 124,
+          "texto": "    return [{ nome: 'escape, em cima, na frente e à esquerda', parte: 'escape', medida: 'maximo', em: [TU.x + TU.raio, yTopo, TU.z + TU.raio], toleranciaMm: 0.5 }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    const T = this.PARAMS; const TU = T.tubo; const { fim, dir } = derivar(T).caminho;"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "    return [{ nome: 'escape, em cima, na frente e à esquerda', parte: 'escape', medida: 'maximo', em: [TU.x + TU.raio, fim[1] + TU.raio * Math.abs(dir[2]), TU.z + TU.raio], toleranciaMm: 0.5 }];"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes escape",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az50.png",
+      "peca-tresquartos-rasante-az140.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}

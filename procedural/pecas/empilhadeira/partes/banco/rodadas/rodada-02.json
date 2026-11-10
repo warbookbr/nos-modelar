@@ -1,0 +1,712 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/banco",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "assento",
+        "tipo": "superficie",
+        "onde": "topo e laterais da almofada",
+        "sentido": "segmentado",
+        "evidencia": "Referência cima e lado: balde com bolsters laterais levantados. Modelo, tresquartos e topo: laje de topo plano, sem contorno. Esta leitura é de forma e não de acabamento."
+      },
+      {
+        "parte": "assento",
+        "tipo": "uniao",
+        "onde": "base do assento, do canto da frente até o meio",
+        "sentido": "afastado",
+        "evidencia": "Vista direita montada: fresta clara e fina entre a base da almofada e a tampa do motor, que não aparece na ponta de trás."
+      },
+      {
+        "parte": "encosto",
+        "tipo": "superficie",
+        "onde": "cantos de cima da costa e quina entre lateral e curva da frente",
+        "sentido": "anguloso",
+        "evidencia": "Vistas frontal e traseira (orto): cantos de cima em chanfro reto, sem o raio de 60. Isométrica: a quina da lateral com a curva da frente é viva."
+      },
+      {
+        "parte": "encosto",
+        "tipo": "superficie",
+        "onde": "faces laterais do encosto, de cima a baixo",
+        "sentido": "facetado",
+        "evidencia": "Vista lado, luz az30, e tresquartos az250: a face lateral mostra facetas triangulares e vincos diagonais onde o painel devia ser liso."
+      }
+    ],
+    "observacao": "Silhueta lateral, cor e posição estão certas, mas o modelo é um banco de blocos lisos e as laterais do encosto têm facetas que o alvo não tem."
+  },
+  "partes": [
+    {
+      "nome": "assento",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "encosto",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a almofada subdividida entrava 2,6 mm na tampa no nariz, porque a reta entre dois laços passa abaixo do bojo da tampa: a base dos laços sobe 1,5 vez esse bojo",
+    "a face plana do lado do encosto sai com triângulos de sombra na luz rasante, que suaviza a 30 graus fixos e ignora o liso da receita",
+    "o relato do modelador trouxe quatro pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 2, cantos de cima do encosto em chanfro: atribuido ao modelador, vai a rodada 3",
+    "rodada 2, facetas nas laterais do encosto na luz rasante: atribuido a ferramenta, que suaviza a 30 graus fixos e ignora o liso da receita",
+    "rodada 2, fresta sob o assento: e a folga de 0,45 a 0,5 mm com que a peca foi posta sobre a tampa; atribuido ao plano da montagem, que nao mede assento plano",
+    "rodada 2, assento sem abas de balde: o rascunho aprovado nao as tem; atribuido ao plano, fica para a pessoa"
+  ],
+  "notaDePassagem": "A almofada é uma gaiola de laços em z, subdividida em dois níveis, com laço no nó -950 para a porta. Onde a tampa faz bojo entre laços, a base sobe 1,5 vez o bojo; o vão mínimo à tampa é 0,45 mm. A subdivisão encolhe a frente 1,2 mm, e o ponto da frente tem tolerância de 1,5. O encosto avançou 45 mm para o pé assentar na almofada, e a frente dele é uma curva Catmull-Rom pelos pontos da lateral.",
+  "receita": {
+    "sha256": "sha256:6748cffb3f7000eb87fc5196b6a6a39661c931e805412d9171dbb74dc876df01",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 29,
+      "acrescentadas": 94,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "import { gaiolaPorLacos } from '../../../../../nucleo/gaiola-por-lacos.js';"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  /* O ASSENTO. A almofada de z -1.210 a -725 com o topo em 1.143, 500 mm de largura, os cantos de 40 mm de lado e de 60 em planta; a"
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "     seção de frente com o fundo em 980 e cantos de 40. A planta e a seção vão 5 mm além da silhueta em z, e a planta de 960 a 1.150 em"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "     y, por fora da almofada (no rascunho ela começava em 990, acima da base nova na frente). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* O ASSENTO. A almofada de z -1.210 a -725 com o topo em 1.143 e 500 mm de largura, uma gaiola de laços ao longo de z subdividida em"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     dois níveis, que arredonda os cantos e as bordas de uma vez (no rascunho, três extrusões cruzadas, de cantos de 40 mm de lado e 60"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     em planta, que deixavam quina com chanfro e vinco onde os arredondados se encontravam). Cada laço é o retângulo da seção, com"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     pontos a 40 mm de cada canto e, em cima e embaixo, a cada 42 mm no máximo; os laços vão por igual, a 40 mm no máximo, com um laço"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "     no nó de z -950 da base, o do apoio. Onde a tampa faz bojo entre dois laços, a base deles sobe 1,5 vez o que a tampa passa da reta"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "     entre eles (`bojo`): sem isso a almofada subdividida entrava 2,6 mm na tampa no nariz, de z -775 a -745. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": "    z: [-1210, -725], topo: 1143, meia: 250, cantoDeLado: 40, cantoEmPlanta: 60,"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": "    topoDosCantos: { de: 1060, acimaDe: 1100 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "    secao: { fundo: 980, canto: 40, z: [-1215, -720] },"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": "    planta: { y: [960, 1150] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "    z: [-1210, -725], topo: 1143, meia: 250, canto: 40, passo: 40, passoNaLargura: 42, lacoNoApoio: -950, bojo: 1.5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "     a costa quase reta (688 a 690); o pé sobre a almofada, de z -1.245 a -1.120 em y 1.135, e a costa até z -1.252 em 1.160. 480 mm de"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "     largura, os cantos de 60 na seção de trás, de y 1.110 a 1.510, cruzada de z -1.300 a -1.000. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "     a costa quase reta (688 a 690); o pé sobre a almofada em y 1.135, e a costa até 1.160. 480 mm de largura, os cantos de 60 na seção"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "     de trás, de y 1.110 a 1.510. A frente e o canto de cima passam por uma curva (Catmull-Rom) pelos pontos da lateral, com 8 trechos"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "     entre cada dois: no rascunho eram seis retas. O encosto inteiro vem 45 mm para a frente do rascunho (o pé de z -1.245 a -1.120 passa"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "     a -1.200 a -1.075), para o pé assentar na almofada, que acaba em -1.210 com o canto redondo: no rascunho um terço dele ficava em"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "     balanço atrás dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    trechosDaCurva: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    avanco: 45,"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "/* a curva Catmull-Rom uniforme pelos pontos, com n trechos entre cada dois, das pontas repetidas */"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "function curva(pts, n) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  const P = [pts[0], ...pts, pts[pts.length - 1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const saida = [pts[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  for (let i = 1; i < P.length - 2; i += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    for (let k = 1; k <= n; k += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "      const t = k / n; const t2 = t * t; const t3 = t2 * t;"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "      saida.push([0, 1].map((e) => 0.5 * (2 * P[i][e] + (-P[i - 1][e] + P[i + 1][e]) * t + (2 * P[i - 1][e] - 5 * P[i][e] + 4 * P[i + 1][e] - P[i + 2][e]) * t2"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "        + (-P[i - 1][e] + 3 * P[i][e] - 3 * P[i + 1][e] + P[i + 2][e]) * t3)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  return saida;"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "const interpolar = (tabela, v) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const t = [...tabela].sort((a, b) => a[0] - b[0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  if (v <= t[0][0]) return t[0][1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  for (let i = 1; i < t.length; i += 1) if (v <= t[i][0]) return t[i - 1][1] + (t[i][1] - t[i - 1][1]) * (v - t[i - 1][0]) / (t[i][0] - t[i - 1][0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  return t[t.length - 1][1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "};"
+        },
+        {
+          "tipo": "-",
+          "linha": 70,
+          "texto": "/** Os perfis e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "/** Os laços do assento, os perfis do encosto e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "  const A = T.assento; const E = T.encosto;"
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "  /* o assento de lado: a base sobre a tampa, de trás para a frente, e os dois cantos de cima */"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  const A = T.assento; const E = T.encosto; const c = A.canto;"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  /* o assento: os laços em z, cada um o retângulo da seção com a base sobre a tampa */"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "  const ladoAssento = [...base, ...arredondado(A.z[0], A.topoDosCantos.de, A.z[1], A.topo, A.cantoDeLado).filter(([, y]) => y > A.topoDosCantos.acimaDe)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "  const plantaAssento = arredondado(-A.meia, A.z[0], A.meia, A.z[1], A.cantoEmPlanta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 78,
+          "texto": "  const secaoAssento = arredondado(-A.meia, A.secao.fundo, A.meia, A.topo, A.secao.canto);"
+        },
+        {
+          "tipo": "-",
+          "linha": 79,
+          "texto": "  /* o encosto de lado */"
+        },
+        {
+          "tipo": "-",
+          "linha": 80,
+          "texto": "  const ladoEncosto = [[E.pe.z[0], E.pe.y], [E.pe.z[1], E.pe.y], ...E.frente.map(([z, y]) => [ZL(z), YL(y)]), ...E.costa.map(([z, y]) => [ZL(z), YL(y)]),"
+        },
+        {
+          "tipo": "-",
+          "linha": 81,
+          "texto": "    [E.costaEm.z, YL(E.costaEm.py)], E.peDeTras];"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const [z0, z1] = A.z;"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  const marcos = [z0, A.lacoNoApoio, z1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  const em = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  marcos.forEach((z, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    if (i > 0) { const de = marcos[i - 1]; const n = Math.ceil((z - de) / A.passo); for (let k = 1; k < n; k += 1) em.push(de + (z - de) * k / n); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    em.push(z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  /* a base de cada laço: a da tampa no plano dele e, onde a tampa faz bojo entre dois laços (o nariz, de z -800 a -725), erguida o"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "     tanto que ela passa acima da reta entre os dois, vezes o fator, para a superfície subdividida não descer nela */"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  const ybs = em.map((z) => interpolar(base, z));"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  for (let i = 1; i < em.length; i += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    let d = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    for (let z = em[i - 1]; z <= em[i]; z += 1) d = Math.max(d, interpolar(base, z) - (ybs[i - 1] + (ybs[i] - ybs[i - 1]) * (z - em[i - 1]) / (em[i] - em[i - 1])));"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    if (d > 0) { ybs[i - 1] += d * A.bojo; ybs[i] += d * A.bojo; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const w = A.meia; const yt = A.topo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  const nl = Math.ceil(2 * (w - c) / A.passoNaLargura);"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const xs = [w, ...Array.from({ length: nl + 1 }, (_, k) => (w - c) - 2 * (w - c) * k / nl), -w];"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const lacos = em.map((z, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    const yb = ybs[i];"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "    return { em: z, trechos: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "      dir: [[w, yb], [w, yb + c], [w, yt - c], [w, yt]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "      topo: xs.map((x) => [x, yt]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "      esq: [[-w, yt], [-w, yt - c], [-w, yb + c], [-w, yb]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "      baixo: [...xs].reverse().map((x) => [x, yb]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  /* o encosto de lado, 45 mm à frente do rascunho, com a frente e o canto de cima em curva */"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  const av = (p) => [p[0] + E.avanco, p[1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const daFrente = curva([[E.pe.z[1], E.pe.y], ...E.frente.map(([z, y]) => [ZL(z), YL(y)]), ...E.costa.map(([z, y]) => [ZL(z), YL(y)])], E.trechosDaCurva);"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const ladoEncosto = [[E.pe.z[0], E.pe.y], ...daFrente, [E.costaEm.z, YL(E.costaEm.py)], E.peDeTras].map(av);"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "  return { ladoAssento, plantaAssento, secaoAssento, ladoEncosto, secaoEncosto, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  return { lacos, ladoEncosto, secaoEncosto, portas };"
+        },
+        {
+          "tipo": "-",
+          "linha": 93,
+          "texto": "  const { extX, extY, extZ, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  const { extX, extZ, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "  const A = T.assento; const E = T.encosto;"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "  /* ASSENTO: a silhueta de lado extrudada em x, cruzada com a planta extrudada em y e com a seção de frente extrudada em z */"
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "  const assento = cruzar(extX(D.ladoAssento, -A.meia, A.meia), extY(D.plantaAssento, A.planta.y[0], A.planta.y[1]), extZ(D.secaoAssento, A.secao.z[0], A.secao.z[1]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  const E = T.encosto;"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  /* ASSENTO: a gaiola de laços em z, tampada nas pontas, subdividida em dois níveis */"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  const g = gaiolaPorLacos({ nome: 'assento', eixo: 'z', tampa: { de: 'dir', ate: 'esq' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    trechos: [{ nome: 'dir', pontos: 4 }, { nome: 'topo', pontos: D.lacos[0].trechos.topo.length }, { nome: 'esq', pontos: 4 }, { nome: 'baixo', pontos: D.lacos[0].trechos.baixo.length }], lacos: D.lacos });"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  Object.assign(estado.topo, g.pontosMm);"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  estado.origem += 1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  estado.passos.push(['subdivisao', { origemId: estado.origem, ...g.passo, niveis: 2 }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  const assento = { origem: { op: 'subdivisao', id: estado.origem } };"
+        },
+        {
+          "tipo": "-",
+          "linha": 100,
+          "texto": "  const encosto = cruzar(extX(D.ladoEncosto, -E.meia, E.meia), extZ(D.secaoEncosto, E.secao.z[0], E.secao.z[1]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  const encosto = cruzar(extX(D.ladoEncosto, -E.meia, E.meia), extZ(D.secaoEncosto, E.secao.z[0] + E.avanco, E.secao.z[1] + E.avanco));"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "/** Os pontos nomeados da gaiola do assento, em metro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "export function gerarTopo(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  montarBanco(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  return Object.fromEntries(Object.entries(estado.topo).map(([nome, p]) => [nome, p.map(m)]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 121,
+          "texto": "  { par: ['assento', 'encosto'], motivo: 'o pé do encosto, em y 1.135 de z -1.245 a -1.120, entra 8 mm na almofada, que tem o topo em 1.143' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  { par: ['assento', 'encosto'], motivo: 'o pé do encosto, em y 1.135 de z -1.200 a -1.075, entra 8 mm na almofada, que tem o topo em 1.143' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 127,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "  get TOPO() { return { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z', ...gerarTopo(this.PARAMS) }; },"
+        },
+        {
+          "tipo": "-",
+          "linha": 133,
+          "texto": "      { nome: 'assento', forma: 'a almofada escura de 500 mm de largura, de z -725 a -1.210, com o topo em 1.143, cantos de 40 mm de lado e de 60 em planta, e a base que segue a face de cima da tampa do motor', tecnica: 'silhueta lateral extrudada em x, cruzada com a planta extrudada em y e com a seção de frente extrudada em z' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 134,
+          "texto": "      { nome: 'encosto', forma: 'o encosto escuro de 480 mm, atrás da almofada e sobre ela, de 1.135 a 1.505 mm, com a frente curva e a costa quase reta, cantos de 60 na seção de trás', tecnica: 'silhueta lateral extrudada em x, cruzada com a seção de trás extrudada em z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "      { nome: 'assento', forma: 'a almofada escura de 500 mm de largura, de z -725 a -1.210, com o topo em 1.143, cantos e bordas arredondados como estofado, e a base que segue a face de cima da tampa do motor', tecnica: 'gaiola de laços em z (gaiolaPorLacos), tampada nas pontas, subdividida em dois níveis' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "      { nome: 'encosto', forma: 'o encosto escuro de 480 mm, com o pé assentado na almofada, de 1.135 a 1.505 mm, com a frente em curva contínua e a costa quase reta, cantos de 60 na seção de trás', tecnica: 'silhueta lateral com a frente em curva Catmull-Rom extrudada em x, cruzada com a seção de trás extrudada em z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 203,
+          "texto": "      'a almofada com quina ou chanfro nos cantos, ou a frente do encosto em polígono',"
+        },
+        {
+          "tipo": "+",
+          "linha": 205,
+          "texto": "    lataria: { partes: ['assento'] },"
+        },
+        {
+          "tipo": "-",
+          "linha": 148,
+          "texto": "      { nome: 'assento, em cima, na frente e à esquerda', parte: 'assento', medida: 'maximo', em: [A.meia, A.topo, A.z[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 212,
+          "texto": "      /* a subdivisão encolhe a tampa da frente da gaiola 1,2 mm em z; o topo e o lado são planos e ficam onde estão */"
+        },
+        {
+          "tipo": "+",
+          "linha": 213,
+          "texto": "      { nome: 'assento, em cima, na frente e à esquerda', parte: 'assento', medida: 'maximo', em: [A.meia, A.topo, A.z[1]], toleranciaMm: 1.5 },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes assento",
+    "imagens": [
+      "peca-frente-rasante-az300.png",
+      "peca-frente-rasante-az30.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az250.png",
+      "peca-tresquartos-rasante-az340.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}

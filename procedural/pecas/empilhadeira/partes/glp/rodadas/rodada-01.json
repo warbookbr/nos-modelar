@@ -1,0 +1,911 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/glp",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "berco",
+        "tipo": "superficie",
+        "onde": "borda inferior da chapa, perto do canto +z",
+        "sentido": "segmentado",
+        "evidencia": "Vistas direita e esquerda do berço e rasante de lado: a borda curva da chapa passa abaixo do retângulo dos apoios e termina num degrau de poucos pixels."
+      },
+      {
+        "parte": "cilindroGlp",
+        "tipo": "superficie",
+        "onde": "as duas cúpulas, nas extremidades do cilindro",
+        "sentido": "segmentado",
+        "evidencia": "Vistas frontal, superior, esquerda, traseira e rasante da frente mostram a cúpula em degraus planos. Em tras.ia.png e cima.ia.png ela é abaulada e contínua."
+      }
+    ],
+    "observacao": "A peça está na posição, na orientação e na cor certas e sem critério de reprovação visível, mas as cúpulas em degrau e a válvula centrada e sem proteção afastam a silhueta das pontas de tras.ia.png."
+  },
+  "partes": [
+    {
+      "nome": "berco",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cilindroGlp",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cintas",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o descrever, o conferir-pontos e o guarda:acervo passaram com a face degenerada; só o exportador OBJ do vistas:superficie a recusou, e o processo só a pegaria no pacote do crítico",
+    "o relato do modelador trouxe quatro pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 1, cupulas em degraus e degrau na borda da chapa do berco: atribuidos ao modelador, vao a rodada 2",
+    "a face degenerada do berco passou por descrever, conferir-pontos e guarda:acervo e so foi recusada na exportacao das vistas de superficie; o processo so a pega em peca que vai ao critico"
+  ],
+  "notaDePassagem": "O círculo do cilindro é tirado do berço depois de os apoios se unirem à chapa. Tirado de cada apoio antes da união, as diagonais da face de lado do apoio cruzavam a face de cima da chapa e a enchiam de vértices em fila, o que dava triângulo sem área no OBJ. A forma é a mesma de antes.",
+  "receita": {
+    "sha256": "sha256:7dec92f2b81123739783d349f0c0e90801f66437c0509e3f68519496d3bd37f4",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 166,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * peça rígida sobre o contrapeso."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do volante (fatia 7 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 7"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com duas exceções: os círculos com 96 lados (no"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * rascunho, 48 e 24), e a chapa do berço, que no rascunho era reta de 1.146 a 1.162 e entrava 3,5 mm na tampa do capô; aqui ela segue a"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * face de cima da tampa como a malha da carcaça a tem, de lado, 0,5 mm acima dela, com os mesmos 16 mm de espessura. O berço tomba para"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * trás no alinhamento; a montagem v5 não tem articulação entre instâncias, e ele fica na pose de transporte. O rascunho chama"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * `montarGlp` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). O cilindro: de trás, cinza claro das colunas 450 a 618 (675 mm) e das linhas 190 a 270 (320"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * mm); de cima, das colunas 820 a 900 (324 mm de diâmetro, centro em z -1.841) e das linhas 185 a 375 (731 mm, centro em x -69, com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * válvula do lado -x); de lado (região `cilindro`), centro em y 1.359. A ficha dá Ø 320 x 700. Adotado: Ø 320, 700 do fim da cúpula ao"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * fim da válvula, centro em z -1.840, y 1.345 e x 30, com a cúpula do lado da válvula mais larga. As cintas: de trás, as faixas escuras"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * nas colunas 497 a 510 e 553 a 565; duas de 40 mm, a 120 mm do meio, só pela metade de cima."
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * O ENCAIXE. A origem é a da máquina. A montagem põe o GLP pela porta `naTampa` (o plano horizontal da base da chapa no nó do apoio, com"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * a normal para baixo) na porta `apoioDoGlp` da carcaça, com o afastamento de 0,5 mm da folga, e a pose sai identidade."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e a porta em mm; `montarGlp` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "import { TABELA as CARCACA, apoiosDoPosto } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "import { ferramentas, interpolar } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  /* As cores do rascunho: o cinza claro do cilindro (vistas de cima e de trás), o escuro das cintas e o cinza do berço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  cores: { gas: '#b4b8ba', cinta: CARCACA.cores.escuro, berco: CARCACA.cores.cinza },"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* Lados dos círculos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* O CILINDRO: o corpo de raio 160 de x -270 a 320 (a partir do centro em x 30: de -300 a +290), a cúpula do lado +x de raio 125 de"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     +280 a +315, a do lado da válvula de raio 135 de -345 a -290, e a válvula de raio 35 de -385 a -335. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  cilindro: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "    centro: { x: 30, y: 1345, z: -1840 }, raio: 160,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "    corpo: [-300, 290],"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "    cupulas: [{ raio: 125, x: [280, 315] }, { raio: 135, x: [-345, -290] }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "    valvula: { raio: 35, x: [-385, -335] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  /* AS CINTAS: duas, a 120 mm do meio do cilindro, de 40 mm, do raio 159 (1 mm dentro do corpo) ao 170, só pela metade de cima (cruzadas"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "     com o bloco de y 1.250 a 1.600 e 300 mm para cada lado em z); o corte do miolo sai 5 mm além da cinta de cada lado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  cintas: { aoMeio: 120, meia: 20, raio: [159, 170], alemNoCorte: 5, bloco: { y: [1250, 1600], emZ: 300 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  /* O BERÇO: a chapa de 520 mm em x (260 para cada lado do centro do cilindro), de 300 em z, com 16 mm de espessura, sobre a face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "     cima da tampa do capô; e dois apoios sob as cintas, de 50 mm em x, de 350 em z, de 1.150 a 1.262, entalhados pelo círculo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "     cilindro (o corte sai 5 mm além de cada lado e vem depois de os apoios se unirem à chapa). A base da chapa: a face de cima da"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "     tampa da carcaça, o mais alto dela de x -235 a 295, medido na malha a cada 1 mm de z por sonda vertical (2026-11-10) e"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "     simplificado a 0,3 mm (o desvio da reta para cima dela fica em 0,1 mm), com o nó de z -1.840 no ponto do apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "     montagem. Sob os apoios, o mais alto da face é 1.149,5. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  berco: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    chapa: { meia: 260, emZ: 150, espessura: 16 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    base: [[-1685, 1149.3], [-1740, 1149.5], [-1821, 1149.1], [-1840, 1148.7], [-1893, 1147.7], [-1945, 1145.3], [-1981, 1142.3], [-1995, 1140.3]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    folga: 0.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    apoios: { meia: 25, emZ: 175, y: [1150, 1262], alemNoCorte: 5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "const circulo = (cu, cv, r, n) => Array.from({ length: n }, (_, k) => [cu + r * Math.cos(2 * Math.PI * k / n), cv + r * Math.sin(2 * Math.PI * k / n)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "const retangulo = (u0, v0, u1, v1) => [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "/** O perfil de lado da chapa do berço e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const CG = T.cilindro.centro; const B = T.berco; const CH = B.chapa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  /* a chapa de lado: a base sobre a tampa, de trás para a frente, os nós da medida dentro dela e as duas pontas, e o topo 16 mm acima */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const base = [...B.base].sort((a, b) => a[0] - b[0]).map(([z, y]) => [z, y + B.folga]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const z0 = CG.z - CH.emZ; const z1 = CG.z + CH.emZ;"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const naBase = (z) => interpolar(base, z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const fundo = [[z0, naBase(z0)], ...base.filter(([z]) => z > z0 && z < z1), [z1, naBase(z1)]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const ladoChapa = [...fundo, ...[...fundo].reverse().map(([z, y]) => [z, y + CH.espessura])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const apoio = apoiosDoPosto(CARCACA).glp;"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    naTampa: { forma: 'plano', papel: 'apoia', ponto: apoio.ponto.map((v, k) => v + apoio.normal[k] * B.folga), normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  return { ladoChapa, xCintas: [CG.x - T.cintas.aoMeio, CG.x + T.cintas.aoMeio], portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "/** Monta o cilindro, as cintas e o berço no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem da"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": " *  chapa do berço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "export function montarGlp(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  const { extX, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const cruzar = (...s) => booleana('intersectar', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const CI = T.cilindro; const CG = CI.centro; const n = T.lados;"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const tubo = (r, [x0, x1]) => extX(circulo(CG.z, CG.y, r, n), CG.x + x0, CG.x + x1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  /* CILINDRO: o corpo, as duas cúpulas e a válvula, círculos extrudados em x */"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  parte('cilindroGlp', unir(tubo(CI.raio, CI.corpo), ...CI.cupulas.map((c) => tubo(c.raio, c.x)), tubo(CI.valvula.raio, CI.valvula.x)), T.cores.gas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  /* CINTAS: o anel de cada uma, cruzado com o bloco da metade de cima */"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  const CT = T.cintas;"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  const cinta = (xc) => cruzar("
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    cortar(extX(circulo(CG.z, CG.y, CT.raio[1], n), xc - CT.meia, xc + CT.meia), extX(circulo(CG.z, CG.y, CT.raio[0], n), xc - CT.meia - CT.alemNoCorte, xc + CT.meia + CT.alemNoCorte)),"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    extX(retangulo(CG.z - CT.bloco.emZ, CT.bloco.y[0], CG.z + CT.bloco.emZ, CT.bloco.y[1]), xc - CT.meia - CT.alemNoCorte, xc + CT.meia + CT.alemNoCorte));"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  parte('cintas', unir(...D.xCintas.map(cinta)), T.cores.cinta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  /* BERÇO: a chapa sobre a tampa e os dois apoios sob as cintas, com o entalhe do círculo do cilindro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const B = T.berco; const AP = B.apoios;"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  const chapa = extX(D.ladoChapa, CG.x - B.chapa.meia, CG.x + B.chapa.meia);"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  /* os apoios unidos à chapa primeiro, e o círculo do cilindro tirado depois do conjunto: tirado de cada apoio antes da união, o leque"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "     dos vértices do arco na face de lado dele cruzava a face de cima da chapa e a enchia de vértices em fila, de triângulo sem área */"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const apoios = D.xCintas.map((xc) => extX(retangulo(CG.z - AP.emZ, AP.y[0], CG.z + AP.emZ, AP.y[1]), xc - AP.meia, xc + AP.meia));"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const entalhes = D.xCintas.map((xc) => extX(circulo(CG.z, CG.y, CI.raio, n), xc - AP.meia - AP.alemNoCorte, xc + AP.meia + AP.alemNoCorte));"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  parte('berco', cortar(unir(chapa, ...apoios), ...entalhes), T.cores.berco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  return { chapa };"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "/* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta do apoio. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const { chapa } = montarGlp(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  return [...forma, ['publicarPorta', { id: 'naTampa', de: chapa.origem, interface: Object.fromEntries(Object.entries(portas.naTampa).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  { par: ['berco', 'cilindroGlp'], motivo: 'o topo de cada apoio do berço é o círculo do cilindro, de raio 160, e o recebe por baixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  { par: ['berco', 'cintas'], motivo: 'as cintas, de y 1.250 para cima, passam pelo vão dos apoios, que sobem a 1.262' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  { par: ['cilindroGlp', 'cintas'], motivo: 'a face de dentro das cintas, de raio 159, fica 1 mm dentro do corpo do cilindro, de raio 160' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  meta: { nome: 'empilhadeira/glp', desc: 'cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    objeto: 'o cilindro de GLP de uma empilhadeira de contrapeso de 2,5 t, de Ø 320 por 700 mm, deitado de través sobre a tampa do capô, preso por duas cintas num berço, numa peça rígida',"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    referencias: ['../../referencias/tras.ia.png', '../../referencias/cima.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    escala: { medida: 'comprimento do cilindro de GLP, do fim da cúpula ao fim da válvula (ficha da classe)', milimetros: 700 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "      { nome: 'berco', forma: 'o berço cinza: a chapa de 520 por 300 mm e 16 de espessura que segue a face de cima da tampa do capô, e dois apoios de 50 mm sob as cintas, que sobem a 1.262 e recebem o cilindro pelo círculo dele', tecnica: 'silhueta lateral extrudada em x, unida aos retângulos dos apoios extrudados em x, menos o círculo do cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "      { nome: 'cilindroGlp', forma: 'o cilindro cinza claro de Ø 320, deitado de través em z -1.840 e y 1.345, com as duas cúpulas e a válvula do lado direito (-x)', tecnica: 'círculos de 96 lados extrudados em x, unidos' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "      { nome: 'cintas', forma: 'duas cintas escuras de 40 mm, a 120 mm do meio do cilindro, que o abraçam pela metade de cima', tecnica: 'anel de 96 lados extrudado em x cruzado com o bloco da metade de cima' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "      'o cilindro de GLP sem berço, solto dele, ou entrando na tampa do capô',"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "      'o cilindro deitado ao comprido, ou fora do meio da largura do capô',"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "      'as cintas soltas do cilindro, ou fora dos apoios do berço',"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "      'a válvula do lado esquerdo (+x), do lado oposto ao escape',"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "      'cor trocada: o cilindro laranja ou escuro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm: o cilindro com a válvula e o topo das cintas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "    const T = this.PARAMS; const CI = T.cilindro; const CG = CI.centro; const CT = T.cintas; const xc = derivar(T).xCintas;"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "      { nome: 'válvula, embaixo e atrás', parte: 'cilindroGlp', medida: 'minimo', em: [CG.x + CI.valvula.x[0], CG.y - CI.raio, CG.z - CI.raio], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "      { nome: 'cúpula da esquerda, em cima e na frente', parte: 'cilindroGlp', medida: 'maximo', em: [CG.x + CI.cupulas[0].x[1], CG.y + CI.raio, CG.z + CI.raio], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "      { nome: 'cinta da esquerda, em cima', parte: 'cintas', medida: 'maximo', em: [xc[1] + CT.meia, CG.y + CT.raio[1], CG.z + CT.raio[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[7], PASSOS[21], PASSOS[31]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az30.png",
+      "peca-tresquartos-rasante-az120.png"
+    ]
+  }
+}
