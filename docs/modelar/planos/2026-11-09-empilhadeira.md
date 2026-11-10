@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/casamento-da-vista.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/casamento-da-vista.test.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/conferir-vistas.test.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/vista-rapida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 
@@ -140,6 +140,21 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   vinco; a correção da conta muda peças aceitas e está no backlog.
 - **T6.** Um comando por rodada (`conferir:vistas`) que encadeia T1 a T4 e a
   leitura para todas as vistas com referência, e a entrada nas skills.
+- **T7.** `vista:rapida`: a imagem sombreada do rascunho tirada da malha, sem
+  navegador, para a rodada de conferência não esperar 60 s por vista; a imagem
+  que vai à pessoa continua saindo da bancada.
+- **T8.** Resposta do crítico estruturada (o atributo, o que a referência tem e
+  o que o modelo tem), com a rodada que afirma da referência o oposto da
+  anterior acusada como contradição (item 11).
+- **T9, depois da junção com a main.** No módulo do esboço, que é território do
+  plano de ferramentas de conferência e de vista: a opção só de passos crus
+  montada uma vez em vez de duas, e o contato declarado nos passos crus, para o
+  relato de contatos voltar a servir.
+- **Levantadas e não começadas** (agente de planejamento, 2026-11-10): a parte
+  fina que acompanha a planta em `lacosPelasVistas`, o degrau ou sulco por
+  contorno sobre a superfície (plano próprio, encosta no de costuras), a causa
+  dita na recusa da `aberturaPorContorno` e a quina implícita na compensação
+  (BACKLOG).
 - **Adiado.** A entrada pela receita de peça (`PLANO.referencias` com vista e
   caixa) encosta no território do plano de ferramentas de conferência e de
   vista; fica para ele ou para quando a pessoa passar o arquivo.
