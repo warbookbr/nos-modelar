@@ -49,8 +49,10 @@ export function baseDaVista(vista) {
 /**
  * Projeta as faces na vista e guarda, por pixel, a parte (0 é o fundo), a profundidade em mm e a normal da face mais próxima.
  * @param {Array<{ pts: number[][], parte: number }>} faces  polígonos convexos em mm, com o índice da parte a partir de 1
+ * @param {{ u0: number, u1: number, v0: number, v1: number }} [caixa]  o quadro a usar, em mm na base da vista; sem ele vale a caixa
+ *   projetada das próprias faces. Com ele, faces diferentes rasterizadas no mesmo quadro caem nos mesmos pixels (sobra:partes).
  */
-export function rasterizar(faces, vista, largura = 1200) {
+export function rasterizar(faces, vista, largura = 1200, caixa = null) {
   const { olhar, direita, cima } = baseDaVista(vista);
   let u0 = Infinity; let u1 = -Infinity; let v0 = Infinity; let v1 = -Infinity;
   const proj = faces.map((f) => f.pts.map((p) => {
@@ -58,6 +60,7 @@ export function rasterizar(faces, vista, largura = 1200) {
     if (u < u0) u0 = u; if (u > u1) u1 = u; if (v < v0) v0 = v; if (v > v1) v1 = v;
     return [u, v, dot(p, olhar)];
   }));
+  if (caixa) ({ u0, u1, v0, v1 } = caixa);
   if (!faces.length || !(u1 > u0) || !(v1 > v0)) throw new Error('a malha não tem área nesta vista');
   const mmPorPx = (u1 - u0) / largura;
   const altura = Math.max(1, Math.round((v1 - v0) / mmPorPx));
