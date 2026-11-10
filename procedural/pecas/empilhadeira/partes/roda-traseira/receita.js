@@ -65,7 +65,9 @@ export { MATERIAIS, PARTES };
 export const derivar = (T = TABELA) => derivarDaRoda(T, ID);
 
 /** Os PASSOS, em metro: a roda da família e o sombreamento de cada parte. */
-export const gerarPassos = (T = TABELA) => gerarPassosDaRoda(T, ID);
+export function gerarPassos(T = TABELA) {
+  return gerarPassosDaRoda(T, ID);
+}
 
 /** Monta uma roda traseira no estado { passos, topo, origem } da máquina inteira, em mm (ver `montarRodaDianteira`). */
 export const montarRodaTraseira = (estado, opcoes, T = TABELA) => montarRodaDianteira(estado, opcoes, T, ID);
