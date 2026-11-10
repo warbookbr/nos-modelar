@@ -102,18 +102,22 @@ function tira(x0, x1, meia, de, ate) {
 }
 
 /* perfis da vista de trás, com o centro na coluna 536 */
-const CAPO = [[401, 140], [398, 145], [394, 148], [370, 148], [350, 147], [334, 146], [330, 145], [326, 142], [322, 140], [314, 139],
-  [306, 138], [298, 137], [294, 135], [290, 131], [286, 127], [283, 119], [281, 106]];
-const TAMPA = [[318, 100], [314, 101.5], [284, 101.5], [279, 100], [276, 96], [274, 88], [272, 76]];
-const VAO_GRADE = [[361, 70], [360, 80], [358, 87], [354, 92], [350, 94], [342, 96], [334, 98], [326, 99], [318, 101], [312, 101]];
+/* o capô: o canto de baixo quase vivo, o degrau do flanco entre as linhas 330 e 326 e o ombro chanfrado, com o topo plano a 117 px */
+const CAPO = [[401, 143], [398, 146], [394, 148], [370, 148], [350, 147], [334, 146], [330, 145], [326, 142], [322, 140], [314, 139],
+  [306, 138], [298, 136], [290, 131], [286, 127], [283, 121], [281.9, 117]];
+const TAMPA = [[318, 100], [314, 101.5], [284, 101.5], [278, 100], [275, 96], [273, 90], [272, 84]];
+const VAO_GRADE = [[361.5, 58], [361, 70], [360, 79], [358.5, 85.5], [356.5, 89.5], [354, 92], [350, 94], [342, 96], [334, 98], [326, 99], [318, 101], [306, 101]];
+/* os furos começam sob a aba da tampa (linha 313) e têm o canto de baixo de fora redondo, como o vão */
 const FUROS_GRADE = [
-  [[-70, 320], [70, 320], [65.5, 336], [-65.5, 336]],
-  [[-64.5, 340], [64.5, 340], [60, 358], [-60, 358]],
-  [[74, 319], [97, 319], [91, 350], [86, 356], [66, 356]],
-  [[-74, 319], [-97, 319], [-91, 350], [-86, 356], [-66, 356]],
+  [[-71.5, 313], [71.5, 313], [65.5, 336], [-65.5, 336]],
+  [[-64.5, 339.5], [64.5, 339.5], [60, 358], [-60, 358]],
+  [[75, 313], [98, 313], [96.5, 334], [94, 346], [91, 352], [87, 355.5], [82, 357.5], [66, 357.5]],
+  [[-75, 313], [-98, 313], [-96.5, 334], [-94, 346], [-91, 352], [-87, 355.5], [-82, 357.5], [-66, 357.5]],
 ];
-const CONTRA = [[505, 92], [503, 98], [499, 100.5], [486, 101], [478, 103], [470, 105], [462, 107.5], [454, 110.5], [446, 114],
-  [438, 119], [430, 125.5], [424, 131], [419, 137], [417, 141], [415, 143.5], [400, 143.5]];
+/* o contrapeso: o arco côncavo da roda e a faixa de cima reta, de 143,5 px, da linha 416 à 400. O alargamento que a referência
+   mostra ao pé (111 px nas linhas 494 a 502) é a sombra do chão: com ele as linhas do modelo passavam 10 px por fora do corpo. */
+const CONTRA = [[505.5, 92], [503.5, 98], [499, 100.5], [486, 101], [478, 103], [470, 105], [462, 107.5], [454, 110.5],
+  [446, 114], [438, 119], [430, 125.5], [424, 131], [418.5, 137], [416.5, 143.5], [400, 143.5]];
 const PONTA_DO_CAPO = 2172;  // o extremo de trás da silhueta do capô, no bico
 const TOPO_CAPO = 1112;      // os ombros do capô, na linha 282 da vista de trás
 const TOPO_CONTRA = 645;     // o contrapeso acaba reto, 12 mm para dentro do capô, e a divisa fica fechada; a cunha que sobe atrás fica de fora
@@ -136,10 +140,17 @@ const secaoDoMeio = ([z, y]) => (z > 1970 && y >= 800 ? [Math.min(z + recuoDaPla
 export const VISTAS_DO_CAPO = {
   lado: lado('capo', ([z, y]) => secaoDoMeio([z, y > 1100 ? TOPO_CAPO : y])),
   perfil: perfil(CAPO), planta: plantaTraseira(meiaCapo, 1400),
-  estacoes: [632.5, 650, 666, 720, 790, 850, 910, 980, 1030, 1075, 1100, TOPO_CAPO],
+  estacoes: [632.5, 650, 666, 720, 790, 850, 905, 918, 934, 950, 1010, 1047, 1079, 1100, TOPO_CAPO],
 };
-let capo = corpo('capo', VISTAS_DO_CAPO, QUINAS);
-capo = booleana('subtrair', [capo, extZ(simetrico(VAO.map(([y, w]) => [y, w + 1])), -1950, -2300)]);
+/* a borda de baixo viva, como a divisa da referência, e o topo do ombro com quina */
+const VINCOS_DO_CAPO = { vincos: [...QUINAS.vincos, { nome: 'base', laco: 'primeiro', nitidez: 'viva' }, { nome: 'ombro', laco: 'ultimo', nitidez: 0.6 }] };
+let capo = corpo('capo', VISTAS_DO_CAPO, VINCOS_DO_CAPO);
+/* a borda em volta do vão: um degrau de BORDA_MM de fundo e BORDA px de largura, que acompanha a superfície do capô. Sai do vão
+   alargado menos o mesmo capô recuado BORDA_MM. */
+const BORDA = 5; const BORDA_MM = 16;
+const recuado = corpo('capoRecuado', { ...VISTAS_DO_CAPO, lado: VISTAS_DO_CAPO.lado.map(([c, a]) => [c < -1900 ? c + BORDA_MM : c, a]) }, VINCOS_DO_CAPO);
+const vaoAlargado = extZ(simetrico(VAO.map(([y, w]) => [y > 345 ? y + BORDA : y, w + BORDA])), -1950, -2300);
+capo = booleana('subtrair', [capo, booleana('subtrair', [vaoAlargado, recuado]), extZ(simetrico(VAO.map(([y, w]) => [y, w + 1])), -1950, -2300)]);
 parte('capo', capo, LARANJA);
 
 /* grade: a moldura cinza em U apoiada na rampa do vão (de z 2058 a y 980 até z 2110 a y 812, na lateral), e o fundo escuro -------- */
@@ -167,17 +178,31 @@ const meiaContra = 143.5 * MM;
 let contra = corpo('contrapeso', {
   lado: lado('contrapeso', ([z, y]) => [z > 2100 && y > 600 ? 2150 : z, y > 620 || (z > 2100 && y > 600) ? TOPO_CONTRA : (y < 245 ? 221 : y)]),
   perfil: perfil(CONTRA), planta: plantaTraseira(meiaContra, 1700),
-  estacoes: [221.5, 250, 285, 329, 393, 424, 442, 507, 540, 572, 600, TOPO_CONTRA],
-}, QUINAS);
-const RASGO = { x0: -46, x1: 46, y0: 422, y1: 405, fundo: 90 };
-const NICHO = { x0: -27, x1: 27, y0: 479, y1: 453, fundo: 95 };
-const REBAIXOS = [{ x0: 105, x1: 118, y0: 415, y1: 404, fundo: 60 }, { x0: -118, x1: -105, y0: 415, y1: 404, fundo: 60 }, { x0: 26, x1: 46, y0: 500, y1: 487, fundo: 45 }];
-const corte = (v, de, ate) => extY(tira(v.x0 * MM, v.x1 * MM, meiaContra, de, ate), H(v.y0), H(v.y1));
-contra = booleana('subtrair', [contra, ...[RASGO, NICHO, ...REBAIXOS].map((v) => corte(v, v.fundo, -80))]);
+  estacoes: [221.5, 232, 250, 285, 329, 393, 424, 442, 507, 540, 558, 571, 600, 626, TOPO_CONTRA],
+}, { vincos: [...QUINAS.vincos, { nome: 'faixa', laco: 'e11', nitidez: 'viva' }] });
+/* os rebaixos, em px da vista de trás com x medido do centro (+ é o +x do modelo, a esquerda de quem olha de trás): o contorno de
+   cantos redondos é cortado ao longo de z, do fundo do rebaixo para fora, a partir da borda da planta naquele x */
+function arredondado(x0, x1, y0, y1, r) {
+  const pts = [];
+  for (const [cx, cy, a0] of [[x1 - r, y1 + r, 270], [x1 - r, y0 - r, 0], [x0 + r, y0 - r, 90], [x0 + r, y1 + r, 180]]) {
+    for (let k = 0; k <= 4; k += 1) { const a = (a0 + 22.5 * k) * Math.PI / 180; pts.push([(cx + r * Math.cos(a)) * MM, H(cy + r * Math.sin(a))]); }
+  }
+  return pts;
+}
+const meiaLua = (cx, base, r) => Array.from({ length: 13 }, (_, k) => [(cx + r * Math.cos(Math.PI * k / 12)) * MM, H(base - r * Math.sin(Math.PI * k / 12))]);
+const REBAIXOS = {
+  rasgo: { contorno: arredondado(-46, 46, 422, 403, 5), x: 0, fundo: 90, escuro: true },
+  nicho: { contorno: arredondado(-27, 27, 479, 453, 5), x: 0, fundo: 95, escuro: true },
+  rebaixoEsq: { contorno: arredondado(105, 118, 415, 404, 2), x: 111.5, fundo: 45 },
+  rebaixoDir: { contorno: arredondado(-118, -105, 415, 404, 2), x: -111.5, fundo: 45 },
+  meiaLua: { contorno: [...meiaLua(36, 506, 9), [27 * MM, H(512)], [45 * MM, H(512)]], x: 36, fundo: 200 },   // a base recua 130 mm ali
+};
+const cortar = (v, de, ate) => { const z = zDaTraseira(v.x * MM, meiaContra); return extZ(v.contorno, z + de, ate === null ? -2300 : z + ate); };
+contra = booleana('subtrair', [contra, ...Object.values(REBAIXOS).map((v) => cortar(v, v.fundo, null))]);
 parte('contrapeso', contra, CINZA);
-parte('fundoRasgo', corte(RASGO, RASGO.fundo, RASGO.fundo - 12), ESCURO);
-parte('fundoNicho', corte(NICHO, NICHO.fundo, NICHO.fundo - 12), ESCURO);
-parte('pino', extY([[-10, -2152], [10, -2152], [10, -2128], [-10, -2128]], H(479), H(453)), CINZA);
+parte('fundoRasgo', cortar(REBAIXOS.rasgo, REBAIXOS.rasgo.fundo, REBAIXOS.rasgo.fundo - 12), ESCURO);
+parte('fundoNicho', cortar(REBAIXOS.nicho, REBAIXOS.nicho.fundo, REBAIXOS.nicho.fundo - 12), ESCURO);
+parte('pino', extY([[-14, -2152], [14, -2152], [14, -2124], [-14, -2124]], H(479), H(453)), CINZA);
 parte('trinco', extY([[-30 * MM, -2186], [30 * MM, -2186], [30 * MM, -2150], [-30 * MM, -2150]], H(440), H(425)), CINZA);
 
 if (process.env.GIRAR) passos.push(['rotaciona', { eixo: 'y', graus: 180, pivo: [0, 600, -1830] }]);

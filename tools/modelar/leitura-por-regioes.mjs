@@ -217,9 +217,10 @@ export function montarLeitura(o) {
   const regioes = regioesDaGrade(L, A, o.grade ?? GRADE_PADRAO).map((r, i) => ({ ...r, folha: Math.floor(i / REGIOES_POR_FOLHA) + 1 }));
   /* o índice: as duas vistas pela metade, com a grade */
   const e = 0.5; const iw = Math.round(L * e); const ih = Math.round(A * e); const faixa = 40;
-  const indice = imagem(2 * iw + 30, ih + faixa);
+  const indice = imagem(vistas.length * (iw + 30) - 30, ih + faixa);
   escrever(indice, 'REF', 6, 9); escrever(indice, 'RASCUNHO', iw + 36, 9);
-  [ref, ras].forEach((im, k) => {
+  if (lin) escrever(indice, 'LINHAS', 2 * (iw + 30) + 6, 9);
+  vistas.forEach((im, k) => {
     const pequena = reamostrar(im, [0, 0, L, A], iw, ih);
     for (const r of regioes) {
       moldura(pequena, Math.round(r.x * e), Math.round(r.y * e), Math.round((r.x + r.largura) * e), Math.round((r.y + r.altura) * e), AZUL, 1);
