@@ -37,6 +37,27 @@
         "tipo": "peca",
         "ref": "empilhadeira/eixo-traseiro"
       }
+    },
+    {
+      "id": "torre",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/torre"
+      }
+    },
+    {
+      "id": "canalInterno",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/canal-interno"
+      }
+    },
+    {
+      "id": "cilindroElevacao",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/cilindro-elevacao"
+      }
     }
   ],
   "relacoes": [
@@ -63,7 +84,7 @@
             "mais": 0
           }
         },
-        "toleranciaNumerica": 1e-06
+        "toleranciaNumerica": 0.000001
       }
     },
     {
@@ -96,7 +117,7 @@
             "mais": 0
           }
         },
-        "toleranciaNumerica": 1e-06
+        "toleranciaNumerica": 0.000001
       }
     },
     {
@@ -129,7 +150,7 @@
             "mais": 0
           }
         },
-        "toleranciaNumerica": 1e-06
+        "toleranciaNumerica": 0.000001
       }
     },
     {
@@ -155,7 +176,92 @@
             "mais": 0
           }
         },
-        "toleranciaNumerica": 1e-06
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "olhalDireitoDaTorreNoEixo",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "pinoDaTorreDireito"
+      },
+      "movel": {
+        "caminho": [
+          "torre"
+        ],
+        "porta": "olhalDireito"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.002,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "olhalEsquerdoDaTorreNoEixo",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "pinoDaTorreEsquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "torre"
+        ],
+        "porta": "olhalEsquerdo"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.002,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "cilindroElevacaoNoAssento",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "torre"
+        ],
+        "porta": "assentoDoCilindro"
+      },
+      "movel": {
+        "caminho": [
+          "cilindroElevacao"
+        ],
+        "porta": "assento"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.03,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
       }
     }
   ],
@@ -164,7 +270,10 @@
     "eixoDianteiro",
     "rodaDianteiraEsquerda",
     "rodaDianteiraDireita",
-    "eixoTraseiro"
+    "eixoTraseiro",
+    "torre",
+    "canalInterno",
+    "cilindroElevacao"
   ],
   "vinculos": [
     {
@@ -237,6 +346,39 @@
       "em": {
         "instancia": "carcaca",
         "porta": "passagemDoEixoTraseiro"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "torreNoEixo",
+      "instancia": "torre",
+      "porta": "olhalDireito",
+      "em": {
+        "instancia": "eixoDianteiro",
+        "porta": "pinoDaTorreDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 142
+    },
+    {
+      "id": "canalInternoNaTorre",
+      "instancia": "canalInterno",
+      "porta": "guiaNoExterno",
+      "em": {
+        "instancia": "torre",
+        "porta": "guiaDoCanalInterno"
+      },
+      "unidade": "mm",
+      "afastamento": 2
+    },
+    {
+      "id": "cilindroElevacaoNaTorre",
+      "instancia": "cilindroElevacao",
+      "porta": "assento",
+      "em": {
+        "instancia": "torre",
+        "porta": "assentoDoCilindro"
       },
       "unidade": "mm",
       "afastamento": 0

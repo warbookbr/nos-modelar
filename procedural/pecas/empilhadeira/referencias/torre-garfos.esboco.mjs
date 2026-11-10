@@ -3,6 +3,12 @@
  * inclinação, as correntes, a placa porta-garfos, a grade de carga e os dois garfos. Rodado sozinho, monta a carcaça inteira de
  * `carcaca.esboco.mjs` mais estas partes (com EIXOS=1, também os eixos e as rodas de `eixos-rodas.esboco.mjs`, para ver o pé no eixo).
  *
+ * A PRIMEIRA METADE MORA NAS RECEITAS DA ETAPA (2026-11-10): os pés e os canais externos em `../partes/torre/receita.js`
+ * (`montarTorre`), os canais internos em `../partes/canal-interno/receita.js` (`montarCanalInterno`) e o cilindro de elevação em
+ * `../partes/cilindro-elevacao/receita.js` (`montarCilindroElevacao`), a forma deste rascunho com 96 lados nos círculos. As medidas
+ * delas abaixo ficam como registro da fonte; quem as usa são as receitas. Os cilindros de inclinação, a placa, a grade, os garfos e as
+ * correntes continuam aqui.
+ *
  * Eixos do modelo: x lateral (+x é a esquerda de quem dirige), y altura com o chão em 0, z comprimento com a frente em +z e o eixo
  * dianteiro em z 0, y 352,5.
  *
@@ -55,17 +61,24 @@
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a máquina 180 graus para os três quartos de trás. */
 import carcaca from './carcaca.esboco.mjs';
 import { ferramentas, CINZA, ESCURO } from './carcaca-traseira.esboco.mjs';
+import { montarTorre, TABELA as TABELA_TORRE, derivar as derivarTorre } from '../partes/torre/receita.js';
+import { montarCanalInterno, TABELA as TABELA_INTERNO, derivar as derivarInterno } from '../partes/canal-interno/receita.js';
+import { montarCilindroElevacao } from '../partes/cilindro-elevacao/receita.js';
 
 const PRETO = '#26282b';         // garfos, placa e grade: o quase preto da vista de frente (escuro mais claro que o fundo)
 const ACO = '#b4b8bc';           // as hastes cromadas (cinza claro na vista de cima, colunas 364 a 375)
 const LADOS = 40;
 
-/* as medidas adotadas, em mm */
+/* as medidas adotadas, em mm. A torre, o canal interno e o cilindro de elevação moram nas receitas da etapa (2026-11-10):
+   `../partes/torre/receita.js` (`montarTorre`: os pés e os canais externos), `../partes/canal-interno/receita.js`
+   (`montarCanalInterno`) e `../partes/cilindro-elevacao/receita.js` (`montarCilindroElevacao`), a forma deste rascunho levada para
+   lá sem mudança de medida, com 96 lados nos círculos; TORRE abaixo é lida delas, para as partes que ficam aqui. */
+const DI = derivarInterno();
 export const TORRE = {
-  tras: 100, frente: 372,                 // fundo dos canais externos (z)
-  externo: { x: [261, 310], alma: 20, aba: 20, y: [150, 2100] },
-  interno: { x: [198, 288], alma: 20, aba: 20, z: [124, 348], y: [260, 2100] },
-  pivo: { y: 352.5, z: 0 },               // o centro do eixo dianteiro, em torno do qual a torre inclina
+  tras: TABELA_TORRE.tras, frente: TABELA_TORRE.frente,   // fundo dos canais externos (z)
+  externo: TABELA_TORRE.externo,
+  interno: { x: [TABELA_INTERNO.dentro, DI.fora], alma: TABELA_INTERNO.alma, aba: TABELA_INTERNO.aba, z: DI.z, y: DI.y },
+  pivo: derivarTorre().pivo,              // o centro do eixo dianteiro, em torno do qual a torre inclina
 };
 export const CARRO = { z: [430, 480], x: 500, barraBaixo: [170, 240], barraCima: [540, 640], montante: [140, 195] };
 export const GARFO = { centro: 280, largura: 100, espessura: 40, comprimento: 1070, chao: 50, altura: 650, face: 520 };
@@ -75,7 +88,6 @@ export const INCLINACAO = { x: 355, y: 860, camisa: [-150, 15], haste: [15, 60],
 export function montarTorreGarfos(estado) {
   const { extX, extY, extZ, booleana, parte } = ferramentas(estado);
   const unir = (...s) => booleana('unir', s);
-  const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);
   const cruzar = (...s) => booleana('intersectar', s);
   const novo = () => { estado.origem += 1; return estado.origem; };
   /* a cópia do outro lado, pelo espelho em x = 0 (a peça que se repete é feita uma vez) */
@@ -87,57 +99,19 @@ export function montarTorreGarfos(estado) {
   const par = (sel) => unir(sel, espelho(sel));
   const circulo = (cx, cy, r, n = LADOS) => Array.from({ length: n }, (_, k) => [cx + r * Math.cos(2 * Math.PI * k / n), cy + r * Math.sin(2 * Math.PI * k / n)]);
   const caixaY = (x0, x1, z0, z1, y0, y1) => extY([[x0, z0], [x1, z0], [x1, z1], [x0, z1]], y0, y1);
-  const T = TORRE; const E = T.externo; const I = T.interno;
+  const I = TORRE.interno;
 
-  /* PÉ DA TORRE ------------------------------------------------------------------------------------------------------------------
-     O olhal que abraça o tubo do eixo dianteiro (Ø 150 em `eixos-rodas`, de 190 a 404 mm do centro) e a chapa que desce à frente até a
-     travessa de baixo dos canais externos. Fica por dentro das chapas do chassi (x 266 a 327), de 215 a 262 mm: por fora delas a frente
-     das laterais e o poço da roda ocupam o lugar. É o pé de trás que a carcaca-lado mostra descendo a z 145 (aqui, até a face de trás
-     da travessa, z 100). O furo de raio 77 é o assento no tubo de raio 75, com 2 mm de folga (com raio 75 as facetas do furo e do tubo se cruzavam); o olhal tem raio 95 para não alcançar o canal interno (z 124).
-     Contato: o furo no tubo do eixo (pino) e a face z 100 na travessa de baixo. */
-  const P = T.pivo;
-  const chapaDoPe = [[-30, 266], [T.tras, E.y[0]], [T.tras, 215], [70, 300]];
-  const pe = cortar(unir(extX(circulo(P.z, P.y, 95), 215, 262), extX(chapaDoPe, 215, 262)), extX(circulo(P.z, P.y, 77), 200, 280));
-  parte('peTorre', par(pe), CINZA);
+  /* PÉ DA TORRE E CANAIS EXTERNOS: a receita da etapa (`../partes/torre/receita.js`), no referencial da máquina. O olhal abraça o
+     tubo do eixo dianteiro (raio 75) com 2 mm de folga, de 215 a 262 mm do centro; o canal externo em U com as travessas e a orelha
+     do cilindro de inclinação. */
+  montarTorre(estado);
 
-  /* CANAIS EXTERNOS --------------------------------------------------------------------------------------------------------------
-     Perfil em U de pé, aberto para dentro: a alma do lado de fora (x 290 a 310) e as duas abas de 20 mm na frente e atrás, de x 261 a
-     310 (a frente: canal externo de 13-14 px, 49 mm na escala da torre). De y 150 (lateral 140) a 2.100: de frente o externo e o
-     interno chegam juntos ao topo (rodada 1, A2 e A3: com o externo 60 mm abaixo aparecia um degrau que a referência não tem).
-     Travessas: chapas atrás (z 100 a 120, entre as abas de trás) em y 1.150-1.220 e 2.030-2.100, e a de baixo, de fundo, de z 100 a
-     220 e y 150 a 210, que é o assento do cilindro de elevação (o carro passa à frente dela, de z 235 em diante). */
-  const uExterno = [[E.x[0], T.tras], [E.x[1], T.tras], [E.x[1], T.frente], [E.x[0], T.frente], [E.x[0], T.frente - E.aba],
-    [E.x[1] - E.alma, T.frente - E.aba], [E.x[1] - E.alma, T.tras + E.aba], [E.x[0], T.tras + E.aba]];
-  const canalExterno = extY(uExterno, E.y[0], E.y[1]);
-  const travessas = [
-    caixaY(-E.x[1] + 1, E.x[1] - 1, T.tras, T.tras + E.aba, 1150, 1220),
-    caixaY(-E.x[1] + 1, E.x[1] - 1, T.tras, T.tras + E.aba, 2030, E.y[1]),
-    caixaY(-E.x[1] + 1, E.x[1] - 1, T.tras, 220, E.y[0], 210),
-  ];
-  /* a orelha do cilindro de inclinação: o bloco preso à alma por fora (face x 310), de z 60 a 160, y 830 a 890, até x 400; a haste
-     encosta na face de trás dele (z 60). É a cabeça em C da carcaca-lado, de y 760 a 1.010, reduzida ao que segura o pino. */
-  const orelha = caixaY(E.x[1], INCLINACAO.x + 45, 60, 160, INCLINACAO.y - 30, INCLINACAO.y + 30);
-  parte('canaisExternos', unir(par(unir(canalExterno, orelha)), ...travessas), CINZA);
+  /* CANAIS INTERNOS: a receita da etapa (`../partes/canal-interno/receita.js`), recolhidos, com o topo no da torre. */
+  montarCanalInterno(estado);
 
-  /* CANAIS INTERNOS --------------------------------------------------------------------------------------------------------------
-     Perfil em U aberto para dentro, encaixado no U do externo: a alma de x 268 a 288 corre entre as abas do externo (z 120 a 352), e
-     as abas de 20 mm, em z 124-144 e 328-348, vão de x 198 a 288. De frente aparece de 198 a 261, ao lado do externo (canal interno
-     de 15 px). De y 260 a 2.100 (o topo da torre recolhida). A travessa de cima, entre as almas, de y 2.030 a 2.100 e z 124 a 350, leva
-     as polias das correntes na frente. */
-  const uInterno = [[I.x[0], I.z[0]], [I.x[1], I.z[0]], [I.x[1], I.z[1]], [I.x[0], I.z[1]], [I.x[0], I.z[1] - I.aba],
-    [I.x[1] - I.alma, I.z[1] - I.aba], [I.x[1] - I.alma, I.z[0] + I.aba], [I.x[0], I.z[0] + I.aba]];
-  const travessaInterna = caixaY(-I.x[1] + 1, I.x[1] - 1, I.z[0], 350, 2030, I.y[1]);
-  parte('canaisInternos', unir(par(extY(uInterno, I.y[0], I.y[1])), travessaInterna), CINZA);
-
-  /* CILINDRO DE ELEVAÇÃO ---------------------------------------------------------------------------------------------------------
-     Um, no centro (vista de frente, colunas 535 a 550), entre as travessas de trás e o carro: x 0, z 190 (a 175 a camisa entrava 5 mm no bojo do diferencial de `eixos-rodas`, Ø 300 até z 150). Na vista de frente ele acaba
-     a uns 1.400 mm, com a cabeça e duas correntes de cada lado dela (a 60 mm do centro) que descem ao carro, e acima dele o vão entre
-     os canais é aberto: é o cilindro de elevação livre, que sobe o carro antes do canal interno (rodada 1, A2, A3 e B3: com a haste até
-     o topo da torre aparecia uma barra clara onde a referência é vazia). Camisa Ø 60 sentada na travessa de baixo (y 210) até 1.050,
-     haste Ø 36 até 1.400 e a cabeça de 160 mm, de 1.400 a 1.440, de z 160 a 250. */
-  parte('cilindroElevacao', extY(circulo(0, 190, 30), 210, 1050), ESCURO);
-  parte('hasteElevacao', extY(circulo(0, 190, 18), 1050, 1400), ACO);
-  parte('cabecaElevacao', caixaY(-80, 80, 160, 250, 1400, 1440), CINZA);
+  /* CILINDRO DE ELEVAÇÃO: a receita da etapa (`../partes/cilindro-elevacao/receita.js`), com o fundo da camisa no assento da torre,
+     sobre a travessa de baixo (a porta `assentoDoCilindro`). */
+  montarCilindroElevacao(estado, undefined, derivarTorre().portas.assentoDoCilindro.centro);
 
   /* CILINDROS DE INCLINAÇÃO ------------------------------------------------------------------------------------------------------
      Deitados ao longo de z em x 355, y 860, como na carcaca-lado (de z -36 a 75 em y 812 a 912). A camisa de Ø 90 vai de z -150 a 15 (mais atrás ela sairia por cima da descida do painel, que a z -260 está a 861 mm):

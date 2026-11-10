@@ -48,6 +48,11 @@ export const TABELA = {
   cubo: { raioDoFlange: 110, face: 463, raioDaTampa: 50, ateATampa: 516 },
   /* O assento de cada lado, em [z, y] com y do chão (mm), na espessura da chapa recuada 4 mm de cada face. */
   assento: { perfil: [[30, 380], [72, 380], [72, 432.2], [60.5, 428.5], [30, 459.5]], recuoDaChapa: 4 },
+  /* O trecho do tubo, de cada lado, onde o olhal do pé da torre o abraça e a torre inclina (de 215 a 262 mm do centro, por dentro
+     das chapas do chassi, como no rascunho `torre-garfos.esboco.mjs`). Não muda a malha: só as portas `pinoDaTorreEsquerdo` e
+     `pinoDaTorreDireito`, que saem do plano da ponta do tubo (o único anel de vértices perto do trecho) com o intervalo dele. A
+     receita da torre lê daqui a largura do olhal. */
+  apoioDaTorre: { de: 215, ate: 262 },
 };
 
 const m = (mm) => mm / 1000;
@@ -76,6 +81,9 @@ export function derivar(T = TABELA) {
     passagemNoChassi: { forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], centro: [-parede, 0, 0], raio: TU.raio, inicio: 0, fim: T.entreAsParedes, referencia: [0, 1, 0] },
     cuboEsquerdo: { forma: 'anel', papel: 'ocupa', eixo: [-1, 0, 0], centro: [CU.face, 0, 0], raioInterno: CU.raioDaTampa, raioExterno: CU.raioDoFlange, inicio: 0, fim: CU.face - TU.ate },
     cuboDireito: { forma: 'anel', papel: 'ocupa', eixo: [1, 0, 0], centro: [-CU.face, 0, 0], raioInterno: CU.raioDaTampa, raioExterno: CU.raioDoFlange, inicio: 0, fim: CU.face - TU.ate },
+    /* o pino de cada olhal da torre: do plano da ponta do tubo, o intervalo de `apoioDaTorre` para dentro */
+    pinoDaTorreEsquerdo: { forma: 'cilindro', papel: 'externa', eixo: [-1, 0, 0], centro: [TU.ate, 0, 0], raio: TU.raio, inicio: TU.ate - T.apoioDaTorre.ate, fim: TU.ate - T.apoioDaTorre.de, referencia: [0, 1, 0] },
+    pinoDaTorreDireito: { forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], centro: [-TU.ate, 0, 0], raio: TU.raio, inicio: TU.ate - T.apoioDaTorre.ate, fim: TU.ate - T.apoioDaTorre.de, referencia: [0, 1, 0] },
   };
   return { perfilDoEixo, perfilDoCubo, assento, xDoAssento, portas };
 }
@@ -118,14 +126,14 @@ const MEDIDAS = { lathe: ['perfil', 'em'], extrusao: ['perfil', 'em', 'altura'] 
 const MEDIDAS_DA_PORTA = ['centro', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim'];
 const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
 
-/** Os PASSOS, em metro: a forma e, no fim, as três portas. */
+/** Os PASSOS, em metro: a forma e, no fim, as cinco portas. */
 export function gerarPassos(T = TABELA) {
   const estado = { passos: [], topo: {}, origem: 0 };
   const { tubo, cuboE, cuboD } = montarEixoDianteiro(estado, T);
   const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);
   const { portas } = derivar(T);
   const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
-  return [...forma, porta('passagemNoChassi', tubo), porta('cuboEsquerdo', cuboE), porta('cuboDireito', cuboD)];
+  return [...forma, porta('passagemNoChassi', tubo), porta('cuboEsquerdo', cuboE), porta('cuboDireito', cuboD), porta('pinoDaTorreEsquerdo', tubo), porta('pinoDaTorreDireito', tubo)];
 }
 
 export const CONTATOS = [
