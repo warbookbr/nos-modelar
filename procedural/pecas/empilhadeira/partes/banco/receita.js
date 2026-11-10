@@ -46,8 +46,11 @@ export const TABELA = {
   },
 
   /* O ENCOSTO: de lado, da linha 256 (px 649 a 682) à 186 (px 681 a 685) da lateral, a frente curva (px 641 na linha 226 e 662 na 196) e
-     a costa quase reta (688 a 690); o pé sobre a almofada em y 1.135, e a costa até 1.160. 480 mm de largura, os cantos de 60 na seção
-     de trás, de y 1.110 a 1.510. A frente e o canto de cima passam por uma curva (Catmull-Rom) pelos pontos da lateral, com 8 trechos
+     a costa quase reta (688 a 690); o pé sobre a almofada em y 1.135, e a costa até 1.160. 480 mm de largura. É uma gaiola de laços em
+     x, cada laço a silhueta de lado, a 60 mm um do outro, com os das pontas encolhidos em volta do meio do pé (0,85 na face de lado e
+     0,96 a 20 mm dela), subdividida em dois níveis: ela arredonda os cantos de cima e a quina da lateral com a frente (no rascunho, a silhueta extrudada cruzada com a seção de
+     trás de cantos de 60, que deixava os cantos de cima em chanfro e a quina viva). A silhueta tem o pé com 6 trechos e a costa
+     reamostrada com os pontos da frente, que a tampa da gaiola liga dois a dois. A frente e o canto de cima passam por uma curva (Catmull-Rom) pelos pontos da lateral, com 8 trechos
      entre cada dois: no rascunho eram seis retas. O encosto inteiro vem 45 mm para a frente do rascunho (o pé de z -1.245 a -1.120 passa
      a -1.200 a -1.075), para o pé assentar na almofada, que acaba em -1.210 com o canto redondo: no rascunho um terço dele ficava em
      balanço atrás dela. */
@@ -57,21 +60,15 @@ export const TABELA = {
     costa: [[685, 188], [690, 200]],
     costaEm: { z: -1255, py: 240 },
     peDeTras: [-1252, 1160],
-    meia: 240, secao: { y: [1110, 1510], canto: 60, z: [-1300, -1000] },
+    meia: 240, passoEmX: 60, trechosDoPe: 6,
+    /* as pontas da gaiola: [distância da face de lado, escala da silhueta] */
+    pontas: [[0, 0.85], [20, 0.96], [60, 1]],
     trechosDaCurva: 8,
     avanco: 45,
   },
 };
 
 const m = (mm) => mm / 1000;
-/* o retângulo de cantos redondos, de raio r, com 6 segmentos por canto */
-function arredondado(u0, v0, u1, v1, r) {
-  const pts = [];
-  for (const [cu, cv, a0] of [[u1 - r, v0 + r, -90], [u1 - r, v1 - r, 0], [u0 + r, v1 - r, 90], [u0 + r, v0 + r, 180]]) {
-    for (let k = 0; k <= 6; k += 1) { const a = (a0 + 15 * k) * Math.PI / 180; pts.push([cu + r * Math.cos(a), cv + r * Math.sin(a)]); }
-  }
-  return pts;
-}
 /* a curva Catmull-Rom uniforme pelos pontos, com n trechos entre cada dois, das pontas repetidas */
 function curva(pts, n) {
   const P = [pts[0], ...pts, pts[pts.length - 1]];
@@ -129,20 +126,42 @@ export function derivar(T = TABELA) {
   const av = (p) => [p[0] + E.avanco, p[1]];
   const daFrente = curva([[E.pe.z[1], E.pe.y], ...E.frente.map(([z, y]) => [ZL(z), YL(y)]), ...E.costa.map(([z, y]) => [ZL(z), YL(y)])], E.trechosDaCurva);
   const ladoEncosto = [[E.pe.z[0], E.pe.y], ...daFrente, [E.costaEm.z, YL(E.costaEm.py)], E.peDeTras].map(av);
-  const secaoEncosto = arredondado(-E.meia, E.secao.y[0], E.meia, E.secao.y[1], E.secao.canto);
+  /* os trechos da silhueta: o pé (de trás para a frente), a frente (até o último ponto da frente), o topo (até o primeiro da costa) e a
+     costa (até o pé de trás), reamostrada por comprimento com o mesmo número de pontos da frente */
+  const nFrente = (E.frente.length) * E.trechosDaCurva + 1;
+  const sil = daFrente.map(av);
+  const frente = sil.slice(0, nFrente);
+  const topo = sil.slice(nFrente - 1, nFrente + E.trechosDaCurva);
+  const costaBruta = [...sil.slice(nFrente - 1 + E.trechosDaCurva), av([E.costaEm.z, YL(E.costaEm.py)]), av(E.peDeTras), av([E.pe.z[0], E.pe.y])];
+  const acum = [0]; for (let i = 1; i < costaBruta.length; i += 1) acum.push(acum[i - 1] + Math.hypot(costaBruta[i][0] - costaBruta[i - 1][0], costaBruta[i][1] - costaBruta[i - 1][1]));
+  const costa = Array.from({ length: nFrente }, (_, k) => {
+    const d = acum[acum.length - 1] * k / (nFrente - 1); let i = 1; while (i < acum.length - 1 && acum[i] < d) i += 1;
+    const t = (d - acum[i - 1]) / (acum[i] - acum[i - 1]); return [0, 1].map((e) => costaBruta[i - 1][e] + (costaBruta[i][e] - costaBruta[i - 1][e]) * t);
+  });
+  const peA = av([E.pe.z[0], E.pe.y]); const peB = av([E.pe.z[1], E.pe.y]);
+  const pe = Array.from({ length: E.trechosDoPe + 1 }, (_, k) => [peA[0] + (peB[0] - peA[0]) * k / E.trechosDoPe, E.pe.y]);
+  /* os laços em x: nas pontas, a silhueta encolhida em volta do meio do pé (`pontas`, a distância da ponta e a escala), que dá aos cantos
+     de cima e às quinas da lateral o arredondado largo; no meio, a cada `passoEmX` */
+  const todos = [...pe, ...frente, ...topo, ...costa];
+  const zc = (Math.min(...todos.map(([z]) => z)) + Math.max(...todos.map(([z]) => z))) / 2;
+  const encolhe = (pts, k) => pts.map(([z, y]) => [zc + (z - zc) * k, E.pe.y + (y - E.pe.y) * k]);
+  const yz = (pts) => pts.map(([z, y]) => [y, z]);
+  const escalaEm = (x) => { const d = E.meia - Math.abs(x); const p = E.pontas.find(([dp]) => Math.abs(dp - d) < 1e-9); return p ? p[1] : 1; };
+  const xsEncosto = [...E.pontas.map(([d]) => -E.meia + d), ...Array.from({ length: Math.floor((E.meia - E.pontas.at(-1)[0]) / E.passoEmX) }, (_, k) => -E.meia + E.pontas.at(-1)[0] + E.passoEmX * (k + 1))]
+    .filter((x) => x < 0);
+  const emX = [...xsEncosto, 0, ...[...xsEncosto].reverse().map((x) => -x)];
+  const lacosEncosto = emX.map((x) => { const k = escalaEm(x); return { em: x, trechos: { pe: yz(encolhe(pe, k)), frente: yz(encolhe(frente, k)), topo: yz(encolhe(topo, k)), costa: yz(encolhe(costa, k)) } }; });
   const apoio = apoiosDoPosto(CARCACA).banco;
   const portas = {
     naTampaDoMotor: { forma: 'plano', papel: 'apoia', ponto: apoio.ponto.map((v, k) => v + apoio.normal[k] * A.folga), normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },
   };
-  return { lacos, ladoEncosto, secaoEncosto, portas };
+  return { lacos, ladoEncosto, lacosEncosto, portas };
 }
 
 /** Monta o banco no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem do assento. */
 export function montarBanco(estado, T = TABELA) {
   const D = derivar(T);
-  const { extX, extZ, booleana, parte } = ferramentas(estado);
-  const cruzar = (...s) => booleana('intersectar', s);
-  const E = T.encosto;
+  const { parte } = ferramentas(estado);
   /* ASSENTO: a gaiola de laços em z, tampada nas pontas, subdividida em dois níveis */
   const g = gaiolaPorLacos({ nome: 'assento', eixo: 'z', tampa: { de: 'dir', ate: 'esq' },
     trechos: [{ nome: 'dir', pontos: 4 }, { nome: 'topo', pontos: D.lacos[0].trechos.topo.length }, { nome: 'esq', pontos: 4 }, { nome: 'baixo', pontos: D.lacos[0].trechos.baixo.length }], lacos: D.lacos });
@@ -151,9 +170,14 @@ export function montarBanco(estado, T = TABELA) {
   estado.passos.push(['subdivisao', { origemId: estado.origem, ...g.passo, niveis: 2 }]);
   const assento = { origem: { op: 'subdivisao', id: estado.origem } };
   parte('assento', assento, T.cores.estofado);
-  /* ENCOSTO: a silhueta de lado extrudada em x, cruzada com a seção de trás extrudada em z */
-  const encosto = cruzar(extX(D.ladoEncosto, -E.meia, E.meia), extZ(D.secaoEncosto, E.secao.z[0] + E.avanco, E.secao.z[1] + E.avanco));
-  parte('encosto', encosto, T.cores.estofado);
+  /* ENCOSTO: a gaiola de laços em x, cada um a silhueta de lado, tampada nas pontas, subdividida em dois níveis */
+  const L0 = D.lacosEncosto[0].trechos;
+  const ge = gaiolaPorLacos({ nome: 'encosto', eixo: 'x', tampa: { de: 'pe', ate: 'topo' },
+    trechos: [{ nome: 'pe', pontos: L0.pe.length }, { nome: 'frente', pontos: L0.frente.length }, { nome: 'topo', pontos: L0.topo.length }, { nome: 'costa', pontos: L0.costa.length }], lacos: D.lacosEncosto });
+  Object.assign(estado.topo, ge.pontosMm);
+  estado.origem += 1;
+  estado.passos.push(['subdivisao', { origemId: estado.origem, ...ge.passo, niveis: 2 }]);
+  parte('encosto', { origem: { op: 'subdivisao', id: estado.origem } }, T.cores.estofado);
   return { assento };
 }
 
@@ -193,7 +217,7 @@ const receita = {
     escala: { medida: 'largura do assento (vista de cima, linhas 232 a 365)', milimetros: 500 },
     partes: [
       { nome: 'assento', forma: 'a almofada escura de 500 mm de largura, de z -725 a -1.210, com o topo em 1.143, cantos e bordas arredondados como estofado, e a base que segue a face de cima da tampa do motor', tecnica: 'gaiola de laços em z (gaiolaPorLacos), tampada nas pontas, subdividida em dois níveis' },
-      { nome: 'encosto', forma: 'o encosto escuro de 480 mm, com o pé assentado na almofada, de 1.135 a 1.505 mm, com a frente em curva contínua e a costa quase reta, cantos de 60 na seção de trás', tecnica: 'silhueta lateral com a frente em curva Catmull-Rom extrudada em x, cruzada com a seção de trás extrudada em z' },
+      { nome: 'encosto', forma: 'o encosto escuro de 480 mm, com o pé assentado na almofada, de 1.135 a 1.500 mm, com a frente em curva contínua, a costa quase reta e os cantos e a quina da lateral arredondados', tecnica: 'gaiola de laços em x (gaiolaPorLacos), cada laço a silhueta de lado com a frente em curva Catmull-Rom, tampada nas pontas, subdividida em dois níveis' },
     ],
     criteriosDeReprovacao: [
       'o banco solto da tampa do motor, ou entrando nela',
@@ -202,7 +226,7 @@ const receita = {
       'cor trocada: o estofado laranja ou cinza claro',
       'a almofada com quina ou chanfro nos cantos, ou a frente do encosto em polígono',
     ],
-    lataria: { partes: ['assento'] },
+    lataria: { partes: ['assento', 'encosto'] },
   },
   contatos: CONTATOS,
   /* Os extremos que a TABELA fixa, em mm: o topo e a frente do assento e o topo do encosto. A base segue a tampa e fica com as vistas. */
@@ -211,7 +235,8 @@ const receita = {
     return [
       /* a subdivisão encolhe a tampa da frente da gaiola 1,2 mm em z; o topo e o lado são planos e ficam onde estão */
       { nome: 'assento, em cima, na frente e à esquerda', parte: 'assento', medida: 'maximo', em: [A.meia, A.topo, A.z[1]], toleranciaMm: 1.5 },
-      { nome: 'encosto, em cima, na frente e à esquerda', parte: 'encosto', medida: 'maximo', em: [E.meia, Math.max(...ladoEncosto.map(([, y]) => y)), Math.max(...ladoEncosto.map(([z]) => z))], toleranciaMm: 0.5 },
+      /* a subdivisão encolhe a tampa da ponta da gaiola do encosto 1,5 mm em x */
+      { nome: 'encosto, em cima, na frente e à esquerda', parte: 'encosto', medida: 'maximo', em: [E.meia, Math.max(...ladoEncosto.map(([, y]) => y)), Math.max(...ladoEncosto.map(([z]) => z))], toleranciaMm: 2 },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },

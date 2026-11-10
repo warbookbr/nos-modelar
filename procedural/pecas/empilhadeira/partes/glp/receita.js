@@ -29,12 +29,15 @@ export const TABELA = {
   /* Lados dos círculos. */
   lados: 96,
 
-  /* O CILINDRO: o corpo de raio 160 de x -270 a 320 (a partir do centro em x 30: de -300 a +290), a cúpula do lado +x de raio 125 de
-     +280 a +315, a do lado da válvula de raio 135 de -345 a -290, e a válvula de raio 35 de -385 a -335. */
+  /* O CILINDRO: uma revolução em x pelo centro em x 30, com o corpo de raio 160 de -290 a +280 (a partir do centro) e as duas cúpulas
+     abauladas, meias elipses que fecham no eixo: a do lado +x até +315 e a do lado da válvula até -345, as pontas do rascunho; e a
+     válvula de raio 35 de -385 a -335. No rascunho as cúpulas eram dois discos (raio 125 de +280 a +315 e 135 de -345 a -290), em
+     degrau. Cada cúpula tem 16 trechos no perfil. */
   cilindro: {
     centro: { x: 30, y: 1345, z: -1840 }, raio: 160,
-    corpo: [-300, 290],
-    cupulas: [{ raio: 125, x: [280, 315] }, { raio: 135, x: [-345, -290] }],
+    corpo: [-290, 280],
+    pontas: [-345, 315],
+    trechosDaCupula: 16,
     valvula: { raio: 35, x: [-385, -335] },
   },
 
@@ -42,15 +45,17 @@ export const TABELA = {
      com o bloco de y 1.250 a 1.600 e 300 mm para cada lado em z); o corte do miolo sai 5 mm além da cinta de cada lado. */
   cintas: { aoMeio: 120, meia: 20, raio: [159, 170], alemNoCorte: 5, bloco: { y: [1250, 1600], emZ: 300 } },
 
-  /* O BERÇO: a chapa de 520 mm em x (260 para cada lado do centro do cilindro), de 300 em z, com 16 mm de espessura, sobre a face de
-     cima da tampa do capô; e dois apoios sob as cintas, de 50 mm em x, de 350 em z, de 1.150 a 1.262, entalhados pelo círculo do
+  /* O BERÇO: a chapa de 520 mm em x (260 para cada lado do centro do cilindro), de 350 em z, o comprimento dos apoios, com 16 mm de
+     espessura, sobre a face de cima da tampa do capô (no rascunho, 300 em z: os apoios passavam 25 mm de cada ponta dela com o fundo
+     reto, e a chapa curva descia abaixo deles, em degrau); e dois apoios sob as cintas, de 50 mm em x, de 350 em z, de 1.150 a 1.262, entalhados pelo círculo do
      cilindro (o corte sai 5 mm além de cada lado e vem depois de os apoios se unirem à chapa). A base da chapa: a face de cima da
      tampa da carcaça, o mais alto dela de x -235 a 295, medido na malha a cada 1 mm de z por sonda vertical (2026-11-10) e
-     simplificado a 0,3 mm (o desvio da reta para cima dela fica em 0,1 mm), com o nó de z -1.840 no ponto do apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na
-     montagem. Sob os apoios, o mais alto da face é 1.149,5. */
+     simplificado a 0,3 mm (o desvio da reta para cima dela fica em 0,1 mm), de z -1.660 a -2.020, com o nó de z -1.840 no ponto do
+     apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na montagem. Sob os apoios, o mais alto da face é 1.149,5. */
   berco: {
-    chapa: { meia: 260, emZ: 150, espessura: 16 },
-    base: [[-1685, 1149.3], [-1740, 1149.5], [-1821, 1149.1], [-1840, 1148.7], [-1893, 1147.7], [-1945, 1145.3], [-1981, 1142.3], [-1995, 1140.3]],
+    chapa: { meia: 260, emZ: 175, espessura: 16 },
+    base: [[-1660, 1149.1], [-1740, 1149.5], [-1821, 1149.1], [-1840, 1148.7], [-1893, 1147.7], [-1945, 1145.3], [-1981, 1142.3], [-2007, 1138.5],
+      [-2020, 1135.7]],
     folga: 0.5,
     apoios: { meia: 25, emZ: 175, y: [1150, 1262], alemNoCorte: 5 },
   },
@@ -73,7 +78,11 @@ export function derivar(T = TABELA) {
   const portas = {
     naTampa: { forma: 'plano', papel: 'apoia', ponto: apoio.ponto.map((v, k) => v + apoio.normal[k] * B.folga), normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },
   };
-  return { ladoChapa, xCintas: [CG.x - T.cintas.aoMeio, CG.x + T.cintas.aoMeio], portas };
+  /* o perfil da revolução do cilindro, [raio, x a partir do centro], de ponta a ponta: as meias elipses das cúpulas e o corpo */
+  const CI = T.cilindro; const nc = CI.trechosDaCupula;
+  const cupula = (de, ponta) => Array.from({ length: nc + 1 }, (_, k) => { const a = (Math.PI / 2) * k / nc; return [k === nc ? 0 : CI.raio * Math.cos(a), de + (ponta - de) * Math.sin(a)]; });
+  const perfilGas = [...cupula(CI.corpo[0], CI.pontas[0]).reverse(), ...cupula(CI.corpo[1], CI.pontas[1])];
+  return { ladoChapa, perfilGas, xCintas: [CG.x - T.cintas.aoMeio, CG.x + T.cintas.aoMeio], portas };
 }
 
 /** Monta o cilindro, as cintas e o berço no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem da
@@ -86,9 +95,13 @@ export function montarGlp(estado, T = TABELA) {
   const cruzar = (...s) => booleana('intersectar', s);
   const CI = T.cilindro; const CG = CI.centro; const n = T.lados;
   const tubo = (r, [x0, x1]) => extX(circulo(CG.z, CG.y, r, n), CG.x + x0, CG.x + x1);
+  /* a revolução em x do cilindro com as cúpulas */
+  estado.origem += 1;
+  estado.passos.push(['lathe', { origemId: estado.origem, eixo: 'x', lados: n, perfil: D.perfilGas, em: [CG.x, CG.y, CG.z] }]);
+  const gas = { origem: { op: 'lathe', id: estado.origem } };
 
   /* CILINDRO: o corpo, as duas cúpulas e a válvula, círculos extrudados em x */
-  parte('cilindroGlp', unir(tubo(CI.raio, CI.corpo), ...CI.cupulas.map((c) => tubo(c.raio, c.x)), tubo(CI.valvula.raio, CI.valvula.x)), T.cores.gas);
+  parte('cilindroGlp', unir(gas, tubo(CI.valvula.raio, CI.valvula.x)), T.cores.gas);
 
   /* CINTAS: o anel de cada uma, cruzado com o bloco da metade de cima */
   const CT = T.cintas;
@@ -103,13 +116,21 @@ export function montarGlp(estado, T = TABELA) {
   /* os apoios unidos à chapa primeiro, e o círculo do cilindro tirado depois do conjunto: tirado de cada apoio antes da união, o leque
      dos vértices do arco na face de lado dele cruzava a face de cima da chapa e a enchia de vértices em fila, de triângulo sem área */
   const apoios = D.xCintas.map((xc) => extX(retangulo(CG.z - AP.emZ, AP.y[0], CG.z + AP.emZ, AP.y[1]), xc - AP.meia, xc + AP.meia));
-  const entalhes = D.xCintas.map((xc) => extX(circulo(CG.z, CG.y, CI.raio, n), xc - AP.meia - AP.alemNoCorte, xc + AP.meia + AP.alemNoCorte));
+  /* o entalhe é o círculo do cilindro sem o arredondamento de 0,1 mm das outras extrusões, para cair nos vértices da revolução, que
+     não arredonda: arredondado, ele deixava a revolução entrar até 0,05 mm no apoio. O perfil vai como `extX` o grava, em [-y, z],
+     anti-horário. */
+  const entalhe = (x0, x1) => {
+    estado.origem += 1;
+    estado.passos.push(['extrusao', { origemId: estado.origem, eixo: 'x', altura: x1 - x0, perfil: [...circulo(CG.z, CG.y, CI.raio, n)].reverse().map(([z, y]) => [-y, z]), em: [x0, 0, 0] }]);
+    return { origem: { op: 'extrusao', id: estado.origem } };
+  };
+  const entalhes = D.xCintas.map((xc) => entalhe(xc - AP.meia - AP.alemNoCorte, xc + AP.meia + AP.alemNoCorte));
   parte('berco', cortar(unir(chapa, ...apoios), ...entalhes), T.cores.berco);
   return { chapa };
 }
 
 /* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */
-const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };
+const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], lathe: ['perfil', 'em'] };
 const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];
 const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
 
@@ -137,8 +158,8 @@ const receita = {
     referencias: ['../../referencias/tras.ia.png', '../../referencias/cima.ia.png'],
     escala: { medida: 'comprimento do cilindro de GLP, do fim da cúpula ao fim da válvula (ficha da classe)', milimetros: 700 },
     partes: [
-      { nome: 'berco', forma: 'o berço cinza: a chapa de 520 por 300 mm e 16 de espessura que segue a face de cima da tampa do capô, e dois apoios de 50 mm sob as cintas, que sobem a 1.262 e recebem o cilindro pelo círculo dele', tecnica: 'silhueta lateral extrudada em x, unida aos retângulos dos apoios extrudados em x, menos o círculo do cilindro' },
-      { nome: 'cilindroGlp', forma: 'o cilindro cinza claro de Ø 320, deitado de través em z -1.840 e y 1.345, com as duas cúpulas e a válvula do lado direito (-x)', tecnica: 'círculos de 96 lados extrudados em x, unidos' },
+      { nome: 'berco', forma: 'o berço cinza: a chapa de 520 por 350 mm e 16 de espessura que segue a face de cima da tampa do capô, e dois apoios de 50 mm sob as cintas, que sobem a 1.262 e recebem o cilindro pelo círculo dele', tecnica: 'silhueta lateral extrudada em x, unida aos retângulos dos apoios extrudados em x, menos o círculo do cilindro' },
+      { nome: 'cilindroGlp', forma: 'o cilindro cinza claro de Ø 320, deitado de través em z -1.840 e y 1.345, com as duas cúpulas abauladas e contínuas e a válvula do lado direito (-x)', tecnica: 'revolução em x (lathe de 96 lados) do perfil do corpo com as meias elipses das cúpulas, unida à válvula, círculo extrudado em x' },
       { nome: 'cintas', forma: 'duas cintas escuras de 40 mm, a 120 mm do meio do cilindro, que o abraçam pela metade de cima', tecnica: 'anel de 96 lados extrudado em x cruzado com o bloco da metade de cima' },
     ],
     criteriosDeReprovacao: [
@@ -147,6 +168,7 @@ const receita = {
       'as cintas soltas do cilindro, ou fora dos apoios do berço',
       'a válvula do lado esquerdo (+x), do lado oposto ao escape',
       'cor trocada: o cilindro laranja ou escuro',
+      'as cúpulas em degraus ou discos planos, ou a chapa do berço em degrau sob os apoios',
     ],
   },
   contatos: CONTATOS,
@@ -155,7 +177,7 @@ const receita = {
     const T = this.PARAMS; const CI = T.cilindro; const CG = CI.centro; const CT = T.cintas; const xc = derivar(T).xCintas;
     return [
       { nome: 'válvula, embaixo e atrás', parte: 'cilindroGlp', medida: 'minimo', em: [CG.x + CI.valvula.x[0], CG.y - CI.raio, CG.z - CI.raio], toleranciaMm: 0.5 },
-      { nome: 'cúpula da esquerda, em cima e na frente', parte: 'cilindroGlp', medida: 'maximo', em: [CG.x + CI.cupulas[0].x[1], CG.y + CI.raio, CG.z + CI.raio], toleranciaMm: 0.5 },
+      { nome: 'cúpula da esquerda, em cima e na frente', parte: 'cilindroGlp', medida: 'maximo', em: [CG.x + CI.pontas[1], CG.y + CI.raio, CG.z + CI.raio], toleranciaMm: 0.5 },
       { nome: 'cinta da esquerda, em cima', parte: 'cintas', medida: 'maximo', em: [xc[1] + CT.meia, CG.y + CT.raio[1], CG.z + CT.raio[1]], toleranciaMm: 0.5 },
     ];
   },
