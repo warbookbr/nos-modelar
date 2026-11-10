@@ -111,15 +111,19 @@ export async function lerArquivoDeEsboco(caminho) {
   return JSON.parse(readFileSync(abs, 'utf8'));
 }
 
-/** Monta as receitas das opções, com o relato de contatos de cada uma. Devolve `{ vista, paineis, recusas }`; com recusa, `paineis` fica vazio. */
-export function montarOpcoes(esboco, { nome = 'esboco', perto = PERTO_MM } = {}) {
+/**
+ * Monta as receitas das opções, com o relato de contatos de cada uma. Devolve `{ vista, paineis, recusas }`; com recusa, `paineis` fica vazio.
+ * Com `relato: false` o relato de contatos não é calculado e o campo `contatos` de cada painel sai `null`; o resto do painel sai
+ * idêntico. Serve às ferramentas que só usam a receita e o neutro, porque o relato é a parte mais cara da montagem.
+ */
+export function montarOpcoes(esboco, { nome = 'esboco', perto = PERTO_MM, relato = true } = {}) {
   const lido = lerEsboco(esboco);
   if (lido.recusas.length) return { vista: lido.vista, paineis: [], recusas: lido.recusas, formato: lido.formato };
   const paineis = []; const recusas = [];
   lido.opcoes.forEach((o, i) => {
     try {
       const r = receitaDaOpcao(o, { nome: `${nome}-${i + 1}` });
-      const contatos = relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto, contatos: r.contatos });
+      const contatos = relato === false ? null : relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto, contatos: r.contatos });
       paineis.push({ titulo: o.titulo ?? `opção ${i + 1}`, nota: o.nota ?? '', receita: r.receita, neutro: r.neutro, partes: r.partes, facesSemParte: r.facesSemParte, formas: r.formas, contatos });
     } catch (e) {
       if (!(e instanceof RecusaDoEsboco)) throw e;

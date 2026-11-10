@@ -154,8 +154,9 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   vez em vez de duas, e o contato declarado nos passos crus (`contatos` da
   opção, com a relação e o motivo). A medição mostrou que o tempo da montagem
   não estava ali: 48 dos 54 s são o relato de contatos.
-- **T10.** `montarOpcoes` sem o relato de contatos para as ferramentas de
-  conferência, que não o usam.
+- **T10, entregue.** `montarOpcoes` com `relato: false` para as ferramentas de
+  conferência, que não usam o relato de contatos: as linhas de uma vista da
+  carcaça foram de 57,6 para 4,8 s, e a rodada completa de 110 para 60 s.
 - **Levantadas e não começadas** (agente de planejamento, 2026-11-10): a parte
   fina que acompanha a planta em `lacosPelasVistas`, o degrau ou sulco por
   contorno sobre a superfície (plano próprio, encosta no de costuras), a causa

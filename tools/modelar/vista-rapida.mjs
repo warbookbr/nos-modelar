@@ -275,7 +275,7 @@ export async function executar(argv) {
   const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
   const t0 = performance.now();
   let montado;
-  try { montado = montarOpcoes(await lerArquivoDeEsboco(resolve(a.arquivo)), { nome: basename(a.arquivo) }); } catch (e) {
+  try { montado = montarOpcoes(await lerArquivoDeEsboco(resolve(a.arquivo)), { nome: basename(a.arquivo), relato: false }); } catch (e) {
     if (e?.code === 'ENOENT' || e?.code === 'ERR_MODULE_NOT_FOUND') return { codigo: 2, stdout: '', stderr: `vista:rapida: não achei ${a.arquivo}\n` };
     if (e instanceof SyntaxError) return { codigo: 1, stdout: '', stderr: `vista:rapida: o esboço não se lê: ${e.message}\n` };
     throw e;

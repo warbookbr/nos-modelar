@@ -83,14 +83,16 @@ const INCL = (-279.2 + 12.9) / (1831.6 - 800.7);                       // dz/dy 
 const zFrente = (y) => -12.9 + INCL * (y - 800.7);                      // a borda da frente da coluna da frente
 const zEixoFrente = (y) => zFrente(y) - 36;
 const PE_FRENTE = 788;          // o pé da coluna da frente: a face de cima da aba do paralama (792 mm na carcaça), 4 mm dentro
-/* O teto. O topo do quadro na lateral fica na linha 42 (y 2.123), sem as lanternas, que sobem à linha 36 (2.149); a ficha dá 2.150 de
-   altura do protetor e a vista de trás, na escala da largura, 2.097. Adotado: o topo do quadro a 2.120 e as lanternas até 2.145. O
-   perfil do teto tem 90 mm de lado (a lateral mostra de 42 a 78, 155 mm, que somam o perfil e a grade vista de lado; ver o relato). */
-const TOPO = 2120; const ALTURA_PERFIL = 90; const Y_TETO = TOPO - ALTURA_PERFIL / 2;
+/* O teto. O topo do quadro na lateral fica na linha 39,5 (y 2.135), sem as lanternas, que sobem à linha 36 (2.149); a ficha dá 2.150
+   de altura do protetor e a vista de trás, na escala da largura, 2.097. Adotado: o topo do quadro a 2.135 e as lanternas até 2.150.
+   As travessas têm 70 mm de altura (de trás, a travessa de trás ocupa as linhas 42 a 58, 64 mm, e de frente a da frente, 36 a 48). O
+   perfil de lado do teto é mais fundo: na lateral ele desce até a linha 80 (y 1.980), 155 mm, com a quina de dentro da frente num
+   arco largo até a coluna (px 578 na linha 81, 533 na 84, 519 na 90, 511 na 96, 504 na 102 e 499 na 111). */
+const TOPO = 2135; const ALTURA_PERFIL = 70; const Y_TETO = TOPO - 45;
 /* O fim de trás do teto: a borda de trás da coluna de trás na lateral vai a px 720 na linha 50 (z -1.396); de cima a travessa de trás
-   fica nas colunas 757 a 770 (z -1.423 a -1.476). Adotado -1.440 na face de trás da travessa. A frente do teto, pela lateral: a
+   fica nas colunas 757 a 770 (z -1.423 a -1.476); adotado -1.425 na face de trás da travessa. A frente do teto, pela lateral: a
    borda da frente na linha 50 fica no px 489 (z -405); de cima o quadro plano começa na coluna 497 (z -368). */
-const TRAS_TETO = -1440;
+const TRAS_TETO = -1425;
 /* As larguras (meia largura por fora). Trás: as colunas de trás vão de 406 a 665 na linha 270 (520 mm) e de 418 a 653 no alto, linha
    48 (474 mm); de frente, a coluna da frente vai de 412 a 690 na linha 340 (477 mm) e de 426 a 678 na 145 (432 mm). A ficha dá 960 de
    largura do protetor (480). Adotado: o teto com 480 por fora e 55 de perfil; a coluna de trás com o pé de 460 a 516, dentro da face
@@ -118,8 +120,11 @@ export function montarProtetorPosto(estado) {
   const caminho = caminhoComCurvas([[zEixoFrente(PE_FRENTE), PE_FRENTE], [zEixoFrente(Y_TETO), Y_TETO], [-1300, Y_TETO]], [60]);
   const ladoFrente = faixa(caminho, 35);
   const secaoFrente = (s) => { const p = [[X_PE_FRENTE[0], PE_FRENTE - 20], [X_PE_FRENTE[1], PE_FRENTE - 20], [X_TETO[1], Y_JUNTA], [X_TETO[1], TOPO + 5], [X_TETO[0], TOPO + 5], [X_TETO[0], Y_JUNTA]]; return s > 0 ? p : espelhoX(p).reverse(); };
-  /* O perfil de lado do teto, de 90 mm, da dobra até a coluna de trás. */
-  const perfilTeto = retangulo(-1300, TOPO - ALTURA_PERFIL, zEixoFrente(Y_TETO) - 60, TOPO);
+  /* O perfil de lado do teto, da dobra até a coluna de trás, pelo contorno da lateral (ver as medidas do teto): a borda de baixo com a
+     quina de dentro em arco, o topo com o canto de fora redondo (px 490 na linha 48, 503 na 45, 523 na 42 e 537 na 39,5). */
+  const perfilTeto = [[ZL(678), YL(80)], [ZL(578), YL(81)], [ZL(533), YL(84)], [ZL(525), YL(87)], [ZL(519), YL(90)], [ZL(514), YL(93)],
+    [ZL(511), YL(96)], [ZL(504), YL(102)], [ZL(499), YL(111)], [zFrente(YL(111)) - 5, YL(111)], [ZL(478), YL(75)], [ZL(486), YL(60)],
+    [ZL(490), YL(50)], [ZL(503), YL(45)], [ZL(523), TOPO - 8], [ZL(537), TOPO], [ZL(678), TOPO]];
   /* A coluna de trás, uma chapa larga de lado que se afina para cima (na lateral, a borda de trás vai de px 749 na linha 275 a 726 na
      95 e 720 na 50; a da frente, de 690 na 260 a 678 na 95), apoiada na face de cima das colunas cinza da carcaça (y 1.143 a 1.154, de
      z -1.269 a -1.508). O canto de cima e de trás é redondo, com 40 mm. */
@@ -141,10 +146,10 @@ export function montarProtetorPosto(estado) {
 
   /* A grade do teto: seis barras ao comprido, nas linhas 185, 220, 255, 290, 325 e 360 da vista de cima (35 px, 135 mm, entre elas) e
      nas colunas 464 a 603 da de trás (27 px, 108 mm); adotado 120 mm, simétricas. Duas barras atravessadas, nas colunas 607 e 645 da
-     vista de cima (z -814 e -969). Barras de 30 mm, de 2.080 a 2.115 mm, apoiadas nas travessas e no perfil do teto. */
+     vista de cima (z -814 e -969). Barras de 30 mm, de 2.095 a 2.130 mm, apoiadas nas travessas e no perfil do teto. */
   const Z_GRADE = [zDobra - 75, TRAS_TETO + 70];
-  const barras = [60, 180, 300].flatMap((x) => [x, -x]).map((x) => extX(retangulo(Z_GRADE[1], 2080, Z_GRADE[0], 2115), x - 15, x + 15));
-  const atravessadas = [-814, -969].map((z) => extX(retangulo(z - 15, 2080, z + 15, 2115), -X_TETO[0] - 1, X_TETO[0] + 1));
+  const barras = [60, 180, 300].flatMap((x) => [x, -x]).map((x) => extX(retangulo(Z_GRADE[1], TOPO - 40, Z_GRADE[0], TOPO - 5), x - 15, x + 15));
+  const atravessadas = [-814, -969].map((z) => extX(retangulo(z - 15, TOPO - 40, z + 15, TOPO - 5), -X_TETO[0] - 1, X_TETO[0] + 1));
   parte('gradeTeto', unir(...barras, ...atravessadas), CINZA_PROTETOR);
 
   /* As luzes de trabalho: na lateral, px 437 a 462 nas linhas 84 a 130 (z -181 a -288, y 1.745 a 1.943), à frente da coluna da
@@ -153,8 +158,9 @@ export function montarProtetorPosto(estado) {
   const ladoLuz = [[zFrente(1750) - 3, 1750], [zFrente(1940) - 3, 1940], [zFrente(1940) + 90, 1940], [zFrente(1750) + 90, 1750]];
   parte('luzesTrabalho', unir(...lados((s) => extX(ladoLuz, ...emX(s, [415, 505])))), ESCURO);
   /* As lanternas do alto, na face de trás da travessa de trás: de trás, linhas 44 a 57, colunas 434 a 485 e 586 a 631 (205 a 410 mm
-     do centro); de lado, px 720 a 736 nas linhas 36 a 68 (até 2.149 mm). */
-  parte('lanternas', unir(...lados((s) => extX(retangulo(TRAS_TETO - 18, 2045, TRAS_TETO + 2, 2145), ...emX(s, [205, 410])))), VERMELHO);
+     do centro), dentro da altura da travessa (a primeira rodada as pôs acima dela, e de trás sobravam por cima); de lado, px 720 a
+     736 nas linhas 36 a 68. */
+  parte('lanternas', unir(...lados((s) => extX(retangulo(TRAS_TETO - 18, TOPO - 60, TRAS_TETO + 2, TOPO - 5), ...emX(s, [205, 410])))), VERMELHO);
   /* O espelho, do lado esquerdo (+x): na lateral px 484 a 501 nas linhas 117 a 155 (z -382 a -455, y 1.637 a 1.801); de trás,
      colunas 430 a 447 (356 a 426 mm). Preso à face de trás da coluna da frente por um braço. */
   parte('espelho', unir(extX(retangulo(-455, 1640, -385, 1800), 356, 426),
@@ -231,8 +237,9 @@ export function montarProtetorPosto(estado) {
      claro das colunas 450 a 618 (675 mm) e das linhas 190 a 270 (320 mm), centrado; de cima, das colunas 820 a 900 (z -1.679 a -2.003:
      324 mm de diâmetro, centro em z -1.841) e das linhas 185 a 375 (731 mm, centro em x -69, com a válvula do lado -x); de lado (região
      `cilindro`), centro em y 1.359. TABELA: 320 x 700. Adotado: 320 mm de diâmetro, 700 do fim da cúpula ao fim da válvula, centro em z
-     -1.840, y 1.345 e x -35. */
-  const CG = { x: -35, y: 1345, z: -1840, r: 160 };
+     -1.840, y 1.345 e x -10 (a vista de trás o dá centrado e a de cima, 69 mm para -x; na primeira rodada, com -35, ele saía
+     deslocado de trás). */
+  const CG = { x: -10, y: 1345, z: -1840, r: 160 };
   const corpoGas = unir(
     extX(circulo(CG.z, CG.y, CG.r, 48), CG.x - 300, CG.x + 290),
     extX(circulo(CG.z, CG.y, 125, 48), CG.x + 280, CG.x + 315),

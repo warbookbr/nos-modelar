@@ -173,7 +173,7 @@ export async function executar(argv) {
     const largura = valor('largura') === null ? 1200 : Number(valor('largura'));
     if (!Number.isInteger(largura) || largura < 16) throw new ErroDaSobra('--largura espera um inteiro a partir de 16');
     const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
-    const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo) });
+    const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo), relato: false });
     if (montado.recusas?.length) throw new ErroDaSobra(`o esboço foi recusado:\n${montado.recusas.map((r) => `- ${r.motivo ?? r}`).join('\n')}`);
     const n = Number(valor('opcao') ?? 1);
     const painel = montado.paineis[n - 1];

@@ -1,0 +1,187 @@
+{
+ "objeto": "uma empilhadeira sem a torre, sem os garfos e sem as rodas: a carcaça, o protetor do operador (quatro colunas, teto em grade, luzes e lanternas), o banco, a coluna de direção com o volante, os pedais, as alavancas, o cilindro de gás deitado atrás com o berço e as cintas, e o escape",
+ "cores": {
+  "laranja": "#e2641e",
+  "cinza": "#6b7074",
+  "escuro": "#1e2022",
+  "claro": "#b4b8ba",
+  "vermelho": "#c0302a"
+ },
+ "partes": {
+  "chassi": "cinza",
+  "paralamas": "laranja",
+  "laterais": "laranja",
+  "furo": "escuro",
+  "piso": "cinza",
+  "degraus": "cinza",
+  "painel": "escuro",
+  "tampaMotor": "cinza",
+  "colunas": "cinza",
+  "pocoTraseiro": "escuro",
+  "capo": "laranja",
+  "tampa": "cinza",
+  "grade": "cinza",
+  "fundoGrade": "escuro",
+  "contrapeso": "cinza",
+  "fundoRasgo": "escuro",
+  "fundoNicho": "escuro",
+  "pino": "cinza",
+  "trinco": "cinza",
+  "tapete": "escuro",
+  "tunel": "escuro",
+  "protetor": "cinza",
+  "gradeTeto": "cinza",
+  "luzesTrabalho": "escuro",
+  "lanternas": "vermelho",
+  "espelho": "escuro",
+  "alcas": "escuro",
+  "assento": "escuro",
+  "encosto": "escuro",
+  "colunaDirecao": "escuro",
+  "volante": "escuro",
+  "pedais": "escuro",
+  "alavancas": "escuro",
+  "cilindroGlp": "claro",
+  "cintas": "escuro",
+  "berco": "cinza",
+  "escape": "escuro"
+ },
+ "dentro": {
+  "grade": "capo",
+  "fundoGrade": "capo",
+  "furo": "laterais",
+  "tunel": "laterais",
+  "gradeTeto": "protetor"
+ },
+ "vistasDaSobra": [
+  "superior",
+  "direita"
+ ],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {
+  "traseira": {
+   "referencia": "tras.ia.png",
+   "caixaRef": [
+    385,
+    40,
+    688,
+    527
+   ],
+   "ignorar": [
+    [
+     370,
+     400,
+     440,
+     545
+    ],
+    [
+     630,
+     400,
+     705,
+     545
+    ],
+    [
+     455,
+     84,
+     618,
+     188
+    ]
+   ],
+   "fora": "a torre com as correntes e o carro, que aparecem entre as colunas do protetor acima do cilindro de gás; o eixo traseiro, as rodas e os pneus dos lados e embaixo do contrapeso; a sombra no chão",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de trás"
+  },
+  "frontal": {
+   "referencia": "frente.ia.png",
+   "caixaRef": [
+    368,
+    34,
+    722,
+    495
+   ],
+   "ignorar": [
+    [
+     455,
+     34,
+     632,
+     495
+    ],
+    [
+     410,
+     240,
+     665,
+     495
+    ],
+    [
+     355,
+     365,
+     440,
+     495
+    ],
+    [
+     650,
+     365,
+     735,
+     495
+    ]
+   ],
+   "fora": "a torre inteira (os canais, as correntes, o cilindro de elevação, o carro porta-garfos com a grade de carga e os garfos), que cobre o meio da vista de alto a baixo, e as rodas dianteiras",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de frente"
+  },
+  "superior": {
+   "referencia": "cima.ia.png",
+   "girar": 270,
+   "caixaRef": [
+    138,
+    78,
+    458,
+    664
+   ],
+   "ignorar": [
+    [
+     118,
+     540,
+     142,
+     671
+    ],
+    [
+     450,
+     540,
+     474,
+     671
+    ],
+    [
+     118,
+     150,
+     143,
+     270
+    ],
+    [
+     450,
+     150,
+     472,
+     270
+    ],
+    [
+     175,
+     628,
+     420,
+     664
+    ]
+   ],
+   "fora": "os pneus que aparecem dos lados e o alto da torre com o carro, embaixo, à frente do painel",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
+  }
+ }
+}

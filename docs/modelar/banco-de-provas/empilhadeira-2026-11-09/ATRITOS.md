@@ -122,6 +122,10 @@ processo o teria pego sozinho e o destino.
    as medidas e a leitura de todas as vistas declaradas numa config, e `npm run vista:rapida` desenha a vista
    sombreada da malha, sem navegador, em 1 a 2 s. A montagem em dobro do esboço só de passos crus, achada no
    levantamento, fica para depois da junção com a main, por estar no território de outro plano.
+   Feita a correção da montagem em dobro, a medição por etapa mostrou que ela custava 3 s: 48 dos 54 s da montagem da
+   carcaça eram o relato de contatos, que `montarOpcoes` calculava sempre e as ferramentas de conferência nunca
+   liam. Com `relato: false` nelas, as linhas de uma vista foram de 57,6 para 4,8 s e a rodada completa de 110 para
+   60 s. O levantamento tinha apontado a causa errada por estimativa; só a medição por etapa mostrou a certa.
 14. **A carcaça inteira mostrou o que a camada de conferência ainda não fazia.** Montada por um agente com as
    ferramentas da traseira, em quatro vistas: a vista de cima de IA tem a frente à esquerda e a da bancada a põe
    embaixo, e a config não girava a referência; um comentário mal fechado engoliu duas partes do módulo e a rodada

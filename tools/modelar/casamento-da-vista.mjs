@@ -314,7 +314,7 @@ export async function executar(argv) {
     const fundo = valor('fundo') ? lerCor(valor('fundo'), '--fundo') : FUNDO_PADRAO;
     const referencia = dePng(readFileSync(resolve(valor('referencia'))));
     const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
-    const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo) });
+    const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo), relato: false });
     if (montado.recusas?.length) return { codigo: 1, stdout: '', stderr: `casamento:vista: o esboço foi recusado:\n${montado.recusas.map((r) => `- ${r}`).join('\n')}\n` };
     const opcao = Number(valor('opcao') ?? 1); const painel = montado.paineis[opcao - 1];
     if (!painel) throw new ErroDoCasamento(`o esboço tem ${montado.paineis.length} opções e veio --opcao=${valor('opcao')}`);

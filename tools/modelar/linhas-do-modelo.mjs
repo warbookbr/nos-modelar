@@ -147,7 +147,7 @@ export async function executar(argv) {
   if (argv.includes('--ajuda') || argv.includes('--help') || !arquivo) return { codigo: arquivo ? 0 : (argv.length ? 2 : 0), stdout: `${AJUDA}\n`, stderr: '' };
   if (!valor('vista') || !valor('saida')) return { codigo: 2, stdout: '', stderr: 'linhas:modelo: faltam --vista e --saida\n' };
   const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
-  const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo) });
+  const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo), relato: false });
   if (montado.recusas?.length) return { codigo: 1, stdout: '', stderr: `linhas:modelo: o esboço foi recusado:\n${montado.recusas.map((r) => `- ${r}`).join('\n')}\n` };
   const painel = montado.paineis[Number(valor('opcao') ?? 1) - 1];
   if (!painel) return { codigo: 2, stdout: '', stderr: `linhas:modelo: o esboço tem ${montado.paineis.length} opções\n` };
