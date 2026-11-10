@@ -1,0 +1,275 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/protetor",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "quadro",
+        "tipo": "espessura",
+        "onde": "colunas de trás, de cima a baixo",
+        "sentido": "maior",
+        "evidencia": "Vista direita: a coluna de trás é uma placa de cerca de 3 vezes a largura da coluna da frente. No alvo (tras.ia, frente.ia) é um tubo fino, quase vertical."
+      },
+      {
+        "parte": "quadro",
+        "tipo": "espessura",
+        "onde": "sob a dobra da coluna da frente, junto ao perfil do teto",
+        "sentido": "maior",
+        "evidencia": "Direita (x 400–490, y 540–600): inchaço curvo em lâmina sob a dobra. O alvo tem tubo e trilho separados, sem esse volume."
+      },
+      {
+        "parte": "quadro",
+        "tipo": "posicao",
+        "onde": "colunas de trás, pés e meio da altura",
+        "sentido": "externa",
+        "evidencia": "Frontal e traseira: as colunas de trás abrem até x 293–806, mais largas que o teto (310–790). No alvo ficam alinhadas com o teto."
+      },
+      {
+        "parte": "quadro",
+        "tipo": "superficie",
+        "onde": "contorno da coluna de trás, trecho médio",
+        "sentido": "segmentado",
+        "evidencia": "Direita e esquerda: o contorno da coluna de trás quebra em degraus de polilinha em y≈570, 640 e 730, onde o alvo mostra coluna reta e contínua."
+      }
+    ],
+    "observacao": "A forma geral e as cores batem com o alvo; o que se afasta é a coluna de trás, uma placa larga e facetada onde o alvo tem tubo, e o inchaço sob a dobra da coluna da frente."
+  },
+  "partes": [
+    {
+      "nome": "quadro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "gradeTeto",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzesTrabalho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "espelho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternas",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o degrau e o toco vinham do rascunho aprovado, e nenhuma medida da peça os apontava; só o crítico, pela vista de lado",
+    "o arco medido da lateral não encontra a coluna (o alvo tem a alça ali, da fatia 7); a concordância teve de ficar acima do espelho, e o espaço entre os dois é estreito",
+    "rodada 2, coluna de tras em placa larga, facetada e aberta para fora do teto: a largura de lado vem dos contornos da lateral, a fonte de medida, e a forma e a do rascunho aprovado; atribuido ao plano, vai a pessoa pela imagem",
+    "rodada 2, volume curvo sob a dobra da frente: e a concordancia que tirou o toco da rodada 1; fica para a pessoa julgar pela imagem",
+    "dois criticos compararam a vista de lado do modelo com as referencias de frente e de tras, onde a coluna e fina; o pedido nao diz qual referencia vale para cada vista"
+  ],
+  "notaDePassagem": "Travessa da frente cruzada com a silhueta do perfil, para seguir o canto redondo de cima. O arco de dentro troca os dois últimos pontos por uma Bézier até a face de trás da coluna em y 1.790, 5 mm dentro do tubo, acima do espelho (y 1.800). O nível 0 e o perfil 1 mm além do tubo ficam, porque resolvem a face que o OBJ recusava e o triângulo sem área.",
+  "receita": {
+    "sha256": "sha256:f6c587788ea9b2613ce5b76f613172f49f2dd22e7d9aefd22c8df02987e18109",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 6,
+      "acrescentadas": 27,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 59,
+          "texto": "     até a coluna de trás, pelo contorno da lateral em px: a borda de baixo com a quina de dentro da frente em arco, 5 mm à frente da"
+        },
+        {
+          "tipo": "-",
+          "linha": 60,
+          "texto": "     borda da coluna, e o topo com o canto de fora redondo, de px 523 a 8 mm do topo a 537 no topo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "     até a coluna de trás, pelo contorno da lateral em px: a borda de baixo com a quina de dentro da frente em arco, e o topo com o"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "     canto de fora redondo, de px 523 a 8 mm do topo a 537 no topo. O arco de dentro, que na lateral acaba no px 499 (y 1.826) 98 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "     atrás da coluna, troca os dois últimos pontos por uma curva (Bézier cúbica, `concordancia`) que sai na direção do arco e chega à"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "     face de trás da coluna da frente em y 1.790, na direção dela e 5 mm dentro do tubo, sempre acima do espelho (y 1.800 atrás de z"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "     -385): no rascunho ele voltava à coluna por um corte reto em y 1.826, o toco sob a dobra. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": "      aFrenteDaBorda: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "      concordancia: { trocaOsUltimos: 2, ate: 1790, dentroDoTubo: 5, alca: [40, 40], pontos: 10 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 160,
+          "texto": "  const ultimoBaixo = PF.baixo[PF.baixo.length - 1];"
+        },
+        {
+          "tipo": "-",
+          "linha": 161,
+          "texto": "  const perfilTeto = [...PF.baixo.map(([z, y]) => [ZL(z), YL(y)]), [zFrente(YL(ultimoBaixo[1])) - PF.aFrenteDaBorda, YL(ultimoBaixo[1])],"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "  /* a concordância do arco de dentro com a face de trás da coluna da frente: do fim do arco, na direção dele, à face de trás, na"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "     direção da coluna; depois o contorno entra no eixo do tubo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  const CC = PF.concordancia;"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  const baixo = PF.baixo.slice(0, PF.baixo.length - CC.trocaOsUltimos).map(([z, y]) => [ZL(z), YL(y)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  const unit = ([a, b]) => { const l = Math.hypot(a, b); return [a / l, b / l]; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  const P0 = baixo[baixo.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "  const d0 = unit([P0[0] - baixo[baixo.length - 2][0], P0[1] - baixo[baixo.length - 2][1]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  const meiaFundo = C.secao.lado / 2 * Math.hypot(1, INCL);              // a meia espessura do tubo medida em z"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  const P3 = [zEixoFrente(CC.ate) - meiaFundo + CC.dentroDoTubo, CC.ate];"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  const subir = unit([INCL, 1]);                                         // a direção da coluna, para cima"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  const P1 = [P0[0] + d0[0] * CC.alca[0], P0[1] + d0[1] * CC.alca[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  const P2 = [P3[0] + subir[0] * CC.alca[1], P3[1] + subir[1] * CC.alca[1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  const concordancia = Array.from({ length: CC.pontos }, (_, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "    const t = (k + 1) / CC.pontos; const u = 1 - t;"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "    return [0, 1].map((e) => u ** 3 * P0[e] + 3 * u * u * t * P1[e] + 3 * u * t * t * P2[e] + t ** 3 * P3[e]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  const perfilTeto = [...baixo, ...concordancia, [zEixoFrente(CC.ate), CC.ate],"
+        },
+        {
+          "tipo": "-",
+          "linha": 229,
+          "texto": "  const travessas = [extX(retangulo(D.zDobra - TE.travessas.frente[0], TOPO - TE.alturaDoPerfil, D.zDobra - TE.travessas.frente[1], TOPO), -xTravessa, xTravessa),"
+        },
+        {
+          "tipo": "+",
+          "linha": 247,
+          "texto": "  /* a travessa da frente cruzada com a silhueta do perfil, para acompanhar o canto redondo de cima dele: caixa até o topo, ela saía"
+        },
+        {
+          "tipo": "+",
+          "linha": 248,
+          "texto": "     acima do canto, o degrau na cota do teto junto à dobra */"
+        },
+        {
+          "tipo": "+",
+          "linha": 249,
+          "texto": "  const travessas = [cruzar(extX(retangulo(D.zDobra - TE.travessas.frente[0], TOPO - TE.alturaDoPerfil, D.zDobra - TE.travessas.frente[1], TOPO), -xTravessa, xTravessa),"
+        },
+        {
+          "tipo": "+",
+          "linha": 250,
+          "texto": "    extX(D.perfilTeto, -xTravessa, xTravessa)),"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes quadro",
+    "imagens": [
+      "peca-frente-rasante-az240.png",
+      "peca-frente-rasante-az330.png",
+      "peca-lado-rasante-az70.png",
+      "peca-lado-rasante-az160.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}
