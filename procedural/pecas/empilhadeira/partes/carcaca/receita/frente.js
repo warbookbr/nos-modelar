@@ -15,7 +15,7 @@ const espelhoX = (xy) => xy.map(([x, y]) => [-x, y]);         // o mesmo perfil 
 
 /** Monta a carcaça inteira no estado e devolve as medidas que as outras frentes da máquina usam. */
 export function montarCarcaca(estado, T, contornos) {
-  const { extX, extY, extZ, booleana, parte, corpo } = ferramentas(estado);
+  const { extX, extY, extZ, booleana, parte, corpo, arredondar, nomear } = ferramentas(estado);
   const unir = (...s) => booleana('unir', s);
   const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);
   const cruzar = (...s) => booleana('intersectar', s);
@@ -55,7 +55,9 @@ export function montarCarcaca(estado, T, contornos) {
 
   /* chassi: as duas chapas com a silhueta lateral, até a frente delas, e a travessa da frente entre as chapas */
   const CH = T.chassi;
-  const chapas = lado(contornos.chassi);
+  const ALMA = -CH.ateAFrente.z[1] + CH.almaDaFrente.espessura;
+  const { zy: chapas } = ladoSuave(contornos.chassi, CH.arcos,
+    ([z, y]) => (z < ALMA && y > CH.almaDaFrente.y[0] && y < CH.almaDaFrente.y[1] ? [ALMA, y] : [z, y]));
   const ateAFrente = extZ(CH.ateAFrente.secao, CH.ateAFrente.z[0], CH.ateAFrente.z[1]);
   const chassi = unir(
     cruzar(unir(extX(chapas, PLACA[0], PLACA[1]), extX(chapas, -PLACA[1], -PLACA[0])), ateAFrente),
@@ -95,15 +97,24 @@ export function montarCarcaca(estado, T, contornos) {
     extZ(s > 0 ? PERFIL_FRENTE : espelhoX(PERFIL_FRENTE), LA.comprimentoDaFrente[0], LA.comprimentoDaFrente[1]),
   ));
   const plantaLateral = [[W.lateralFrente, -LA.planta[0]], [W.lateralTras, -LA.planta[1]], [-W.lateralTras, -LA.planta[1]], [-W.lateralFrente, -LA.planta[0]]];
-  const peLateral = [...LA.pe, ...espelhoX([...LA.pe].reverse())];
+  const PB = LA.peDeBaixo;
+  const peDeBaixo = Array.from({ length: PB.trechos + 1 }, (_, k) => {
+    const t = k / PB.trechos;
+    return [0, 1].map((e) => (1 - t) ** 2 * PB.de[e] + 2 * t * (1 - t) * PB.quina[e] + t ** 2 * PB.ate[e]);
+  });
+  const PE = [...LA.pe, ...peDeBaixo];
+  const peLateral = [...PE, ...espelhoX([...PE].reverse())];
   const AJ = LA.ajusteDoArco;
   const { zy: ladoLateral, circulos: [ARCO_TRAS] } = ladoSuave(contornos.lateral, LA.arcosDoCorpo,
     ([z, y]) => {
       if (z > AJ.pe.z[0] && z < AJ.pe.z[1] && y > AJ.pe.y[0] && y <= AJ.pe.y[1]) return [[z, y], AJ.pe.para];
       return z >= AJ.traseira.zDe && y > AJ.traseira.yAcima ? [LA.planta[1], y] : [z, y];
     });
-  const meio = cruzar(extX(ladoLateral, -LA.meiaLarguraBruta, LA.meiaLarguraBruta), extY(plantaLateral, LA.alturaDaPlanta[0], LA.alturaDaPlanta[1]),
+  const meioVivo = cruzar(extX(ladoLateral, -LA.meiaLarguraBruta, LA.meiaLarguraBruta), extY(plantaLateral, LA.alturaDaPlanta[0], LA.alturaDaPlanta[1]),
     extZ(peLateral, LA.comprimentoDoMeio[0], LA.comprimentoDoMeio[1]));
+  /* a borda de cima quebrada; o corpo do meio e a concordância seguem juntos, pelo nome da parte, para a união com a frente */
+  const BC = LA.bordaDeCima;
+  const meio = nomear('laterais', meioVivo, arredondar(meioVivo, { raio: BC.raio, paineis: BC.paineis, arestas: 'convexas', regiao: BC.regiao }));
   const aro = extX(lado(contornos.aroTraseiro), -W.lateralTras, W.lateralTras);
   const POCO_DE = LA.pocoTraseiroDe;
   const pocoTras = [extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), POCO_DE, FORA), extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), -FORA, -POCO_DE)];

@@ -61,6 +61,15 @@ export const TABELA = {
     ateAFrente: { secao: [[-400, 0], [400, 0], [400, 1300], [-400, 1300]], z: [-2000, 100] },
     travessa: [[9, 600], [34, 600], [34, 690], [9, 690]],
     travessaAlemDasChapas: 5,
+    /* A silhueta das chapas com dois trechos curvos trocados pelo círculo ajustado ao contorno: o arco em volta do cubo (centro (24,
+       369), raio 124, desvio de 6 mm) até 305 mm de altura, de onde o fundo do vão sobe reto (levado até 338 mm, o arco deixava
+       triângulo sem área na face da frente das chapas), e a frente do pescoço (centro (-232, 657), raio 221, desvio de 7 mm);
+       simplificados eles saíam em facetas e dentes. O teto do vão, de (-87, 438) a (2, 525), fica como medido: o assento do eixo
+       dianteiro (etapa dos eixos) sobe até 0,5 mm dos vértices dele, e o círculo da volta do pescoço o atravessava. */
+    arcos: [{ de: [94.21, 261.51], ate: [-80.82, 304.86] }, { de: [-36.4, 545.73], ate: [-10.17, 690.25] }],
+    /* O vão do cubo chega a 0 a 2 mm do fim da frente das chapas (100 mm à frente do eixo) entre 338 e 426 mm de altura, e ali a
+       chapa partia em duas, com a emenda à vista no meio dela. O fundo do vão fica 12 mm atrás do fim da frente, e a chapa é inteira. */
+    almaDaFrente: { espessura: 12, y: [300, 440] },
   },
 
   /* PARALAMAS. A aba é chapa de 37 mm (a lateral dá y 755 a 792), da silhueta lateral cruzada com a planta: o canto da frente de fora,
@@ -97,9 +106,19 @@ export const TABELA = {
     planta: [400, 1540],
     alturaDaPlanta: [150, 1000],
     comprimentoDoMeio: [-1550, -390],
-    pe: [[560, 1000], [572, 934], [588, 902], [600, 870], [600, 340], [579, 312], [569, 305], [562, 295], [555, 277],
-      [548, 260], [538, 226], [518, 185]],
+    pe: [[560, 1000], [572, 934], [588, 902], [600, 870]],
+    /* O canto de baixo do pé, de frente: os pontos medidos (600 a 340, 579 a 312, 569 a 305, 562 a 295, 555 a 277, 548 a 260, 538 a
+       226, 518 a 185) davam a quina a 340 mm e degraus de 10 a 20 graus abaixo dela, e de lado a faixa sob a quina lia peça escura
+       separada. Ele é a curva de segundo grau que sai vertical de 600 mm a 450 de altura, tem o canto medido (600, 340) por ponto de
+       controle e chega na direção dele à ponta de baixo (518, 185): fica a até 6 mm dos pontos medidos abaixo da quina e a 16,5 mm
+       dentro da quina, e de lado a sombra desce aos poucos, sem vinco. */
+    peDeBaixo: { de: [600, 450], quina: [600, 340], ate: [518, 185], trechos: 12 },
     ajusteDoArco: { pe: { z: [1480, 1500], y: [605, 625], para: [1540, 629] }, traseira: { zDe: 1495, yAcima: 625 } },
+    /* A borda de cima do corpo, do degrau à diagonal que sobe até as colunas, é quebrada com raio de 25 mm: na lateral de caráter ela
+       tem o brilho de uma borda virada de 3 a 5 px (13 a 21 mm), e viva ela lia plana. A caixa pega só essa borda, dos dois lados, de
+       z -435 (atrás da frente em volta da roda) a -1230, 8 mm antes da quina da diagonal em z -1238 (y 896), onde o pé começa a
+       recolher com o capô; passando dela a concordância deixava lasca. */
+    bordaDeCima: { raio: 22, paineis: 24, regiao: { min: [-700, 440, -1230], max: [700, 890, -435] } },
     /* O poço da roda traseira é o círculo do arco, cortado de 360 mm para fora, por dentro do pé do contrapeso (92 px de meia largura na
        vista de trás, 371 mm): entre ele e o pneu a traseira do corpo aparecia de trás como tira laranja, onde a referência é escura. */
     pocoTraseiroDe: 360,
@@ -193,6 +212,13 @@ export const TABELA = {
       vaoAcimaDaGrade: [[281, 101.5], [268, 101.5]],
       secaoDoMeio: { zDe: 1970, yDe: 800, alemDoBico: 20 },
       bordaDoVaoPx: 5, fundoDaBorda: 16, recuoDaBordaAte: 1900, bordaDeBaixoAbaixoDe: 345, fundoDoVao: -1760,
+      /* A quina de cima do bico, sob o vão. De lado a silhueta descia em dois degraus: o bico a z 2163 até 770 mm, a borda rebaixada a
+         2147 até 791 e, acima da soleira, o flanco a 2078 a 2096, porque a planta já recuou 32 mm na ponta da soleira (234 mm do
+         centro). Na lateral de caráter o bico entra no flanco por uma curva só, de 77 mm de fundo em 43 mm de altura. A quina sai por
+         subtrair, a 400 mm do centro para cada lado, do que fica atrás da curva em S (derivada nula nas duas pontas) de z 2172 a 735
+         mm de altura a z 2081 a 805, e de z 2081 até 830: o bico e o flanco mantêm a medida, e só a quina e a borda de baixo do vão
+         saem. */
+      quinaDaSoleira: { y: [735, 805], z: [2172, 2081], ate: 830, meia: 400, trechos: 16 },
       /* a borda de baixo com raio pequeno (viva demais com o vinco inteiro, redonda demais sem ele) e o ombro com quina */
       nitidezDaBase: 0.5, nitidezDoOmbro: 0.6,
     },
@@ -255,8 +281,9 @@ const m = (mm) => mm / 1000;
 
 /* Os campos de medida de cada operação que a carcaça usa: neles todo número é milímetro. Os outros campos (origem, eixo, sólidos,
    seleção, cor, ângulo do liso, os nomes dos vértices da gaiola) passam como estão. */
-const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], subdivisao: ['vertices', 'espessura'] };
-const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], subdivisao: ['vertices', 'espessura'], arredondarCostura: ['raio', 'regiao'] };
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro)
+  : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, w]) => [k, emMetro(w)])) : v);
 
 const derivadas = new WeakMap();
 /** Os passos da carcaça em mm e os pontos nomeados das gaiolas (o TOPO), calculados da tabela; o mesmo cálculo que o rascunho usa. */

@@ -66,6 +66,17 @@ export function ferramentas(estado) {
   function parte(nome, sel, cor) {
     estado.passos.push(['parte', { nome, sel }], ['pincel', { modo: 'face', sel, cor }], ['liso', { sel, angulo: 35 }]);
   }
+  /* a borda de uma booleana arredondada pelo `arredondarCostura`, com os campos dele em mm; a concordância é origem própria, e
+     `nomear` junta as duas sob o nome da parte para a booleana seguinte citar o sólido inteiro por `grupo` */
+  function arredondar(de, args) {
+    estado.origem += 1;
+    estado.passos.push(['arredondarCostura', { origemId: estado.origem, de: de.origem, ...args }]);
+    return { origem: { op: 'arredondarCostura', id: estado.origem } };
+  }
+  function nomear(nome, ...sels) {
+    for (const sel of sels) estado.passos.push(['parte', { nome, sel }]);
+    return { grupo: nome };
+  }
   /** O corpo de `lacosPelasVistas`, subdividido. Sem `compensar`: nestes laços ela passou de 10 a 30 mm do pedido e ondulou o capô. */
   function corpo(nome, vistas, extra = {}) {
     const { meiaPlanta, avisos, ...lacos } = lacosPelasVistas(vistas);
@@ -75,5 +86,5 @@ export function ferramentas(estado) {
     estado.passos.push(['subdivisao', { origemId: estado.origem, ...g.passo, niveis: 2 }]);
     return { origem: { op: 'subdivisao', id: estado.origem } };
   }
-  return { extrusao, extX, extY, extZ, booleana, parte, corpo };
+  return { extrusao, extX, extY, extZ, booleana, parte, corpo, arredondar, nomear };
 }

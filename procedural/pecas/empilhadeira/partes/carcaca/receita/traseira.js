@@ -62,7 +62,15 @@ export function montarTraseira(estado, T, contornos, { pocoDaRoda = null } = {})
   const FUNDO_DO_VAO = C.fundoDoVao;
   const recuado = corpo('capoRecuado', { ...D.vistasDoCapo, lado: D.vistasDoCapo.lado.map(([c, a]) => [c < -C.recuoDaBordaAte ? c + BORDA_MM : c, a]) }, VINCOS_DO_CAPO);
   const vaoAlargado = extZ(simetrico(VAO.map(([y, w]) => [y > C.bordaDeBaixoAbaixoDe ? y + BORDA : y, w + BORDA])), FUNDO_DO_VAO, R.alemDaTraseira);
-  capo = booleana('subtrair', [capo, booleana('subtrair', [vaoAlargado, recuado]), extZ(simetrico(VAO.map(([y, w]) => [y, w + 1])), FUNDO_DO_VAO, R.alemDaTraseira)]);
+  /* a quina do bico sob o vão, tirada atrás da curva em S da silhueta lateral */
+  const QS = C.quinaDaSoleira;
+  const curvaDaQuina = Array.from({ length: QS.trechos + 1 }, (_, k) => {
+    const t = k / QS.trechos;
+    return [QS.z[0] - (QS.z[0] - QS.z[1]) * (3 * t * t - 2 * t * t * t), QS.y[0] + (QS.y[1] - QS.y[0]) * t];
+  });
+  const alem = -R.alemDaTraseira;
+  const quina = extrusaoX([[alem, QS.y[0]], ...curvaDaQuina, [QS.z[1], QS.ate], [alem, QS.ate]].map(([z, y]) => [-z, y]), -QS.meia, QS.meia);
+  capo = booleana('subtrair', [capo, booleana('subtrair', [vaoAlargado, recuado]), extZ(simetrico(VAO.map(([y, w]) => [y, w + 1])), FUNDO_DO_VAO, R.alemDaTraseira), quina]);
   parte('capo', capo, COR.laranja);
 
   /* grade: a moldura cinza em U apoiada na rampa do vão, que acompanha a curva da planta do capô, e o fundo escuro */
