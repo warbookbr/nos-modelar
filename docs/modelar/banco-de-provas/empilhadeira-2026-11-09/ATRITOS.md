@@ -122,3 +122,13 @@ processo o teria pego sozinho e o destino.
    as medidas e a leitura de todas as vistas declaradas numa config, e `npm run vista:rapida` desenha a vista
    sombreada da malha, sem navegador, em 1 a 2 s. A montagem em dobro do esboço só de passos crus, achada no
    levantamento, fica para depois da junção com a main, por estar no território de outro plano.
+14. **A carcaça inteira mostrou o que a camada de conferência ainda não fazia.** Montada por um agente com as
+   ferramentas da traseira, em quatro vistas: a vista de cima de IA tem a frente à esquerda e a da bancada a põe
+   embaixo, e a config não girava a referência; um comentário mal fechado engoliu duas partes do módulo e a rodada
+   seguiu sem elas, porque a config ainda não as declarava; cada rodada numa pasta nova recomeçava a numeração e a
+   checagem de contradição não via a anterior; e as caixas da frente das laterais, uma de cada lado, não cabiam em
+   `lacosPelasVistas`, que supunha a planta centrada. O processo pegou os quatro, pelo relato de quem montou.
+   Destino: a vista da config aceita `girar` e `espelhar`; a parte declarada que a opção não tem é recusa, numa linha
+   com as que faltam; `--rodadas-de` leva as rodadas registradas a uma pasta nova, e o resumo diz para usar a mesma;
+   `lacosPelasVistas` aceita `centro`, com saída idêntica quando ele é zero. Ficou sem destino a ocultação na
+   `sobra:partes`, que é do desenho dela: os degraus escondidos pelo piso deram 20 mm de sobra.

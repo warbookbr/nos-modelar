@@ -15,10 +15,12 @@
  *   estacoes: [a, ...] as alturas dos laços, em crescente; a primeira e a última são levadas para dentro da silhueta.
  *   pontos: quantos pontos têm o início e o fim de cada laço (padrão 9), e pontosDoLado, quantos tem cada lado (padrão 4).
  *   espessuraMinima: o menor comprimento do lado do laço, em mm (padrão 2); no laço curto os recuos encolhem por igual até caber.
+ *   centro: a lateral do eixo de simetria do corpo, em mm (padrão 0); a planta é lida em torno dela, o perfil continua sendo a
+ *     meia largura e os laços saem deslocados; a planta que não é simétrica em torno dela entra em `avisos` com a medida.
  *   cantos: 'acompanham' (padrão) leva a ponta inteira da planta à silhueta, e o degrau da silhueta dá a volta com a mesma
  *     profundidade; 'fixos' deixa os cantos da planta onde estão e encolhe o recuo da ponta na altura em que a silhueta fica aquém
  *     do extremo dela, e o degrau some para os lados. extremos: { inicio?, fim? } troca o extremo a que 'fixos' se refere.
- * devolve: { trechos, lacos, tampa, meiaPlanta, avisos }, com os trechos `inicio`, `direita`, `fim` e `esquerda`; o ponto do laço é
+ * devolve: { trechos, lacos, tampa, meiaPlanta, avisos }, com meiaPlanta medida do centro e os trechos `inicio`, `direita`, `fim` e `esquerda`; o ponto do laço é
  *   [l, c], o que em `gaiolaPorLacos` de eixo y é [x, z].
  * exemplo:
  *   lacosPelasVistas({ lado: [[0, 0], [600, 0], [640, 300], [560, 500], [0, 500]], perfil: [[0, 480], [380, 500], [500, 420]],
@@ -28,7 +30,7 @@
  * FIM DA FICHA
  *
  * Função pura, sem Three.js e sem domínio. EM CADA ALTURA a silhueta de lado dá o intervalo [c0, c1] do comprimento, o perfil dá a
- * meia largura w, e o laço é a planta recortada em |l| <= w com a ponta do início levada a c0 e a do fim a c1: a borda do início
+ * meia largura w, e o laço é a planta recortada em |l - centro| <= w com a ponta do início levada a c0 e a do fim a c1: a borda do início
  * fica em c0 + recuoDoInicio(l) e a do fim em c1 - recuoDoFim(l), onde o recuo é o que a planta mede naquela lateral. O perfil da
  * ponta que a silhueta de lado traz (o canto arredondado, o degrau de um bico, a rampa) vale então em toda a largura, deslocado
  * pela curva da planta, em vez de valer só onde a planta chega ao extremo.
@@ -54,6 +56,8 @@
  * menos de três pontos são recusados com a medida. */
 
 const erro = (texto) => { throw new Error(`lacosPelasVistas: ${texto}`); };
+/* a diferença, em mm, entre o quanto a planta vai para cada lado do centro a partir da qual ela entra em `avisos` */
+const TOLERANCIA_DA_SIMETRIA = 0.5;
 const br = (n) => String(Math.round(n * 1000) / 1000).replace('.', ',');
 
 /* os cruzamentos de uma reta `coordenada[eixo] = valor` com as arestas do polígono, na outra coordenada, em crescente */
@@ -90,7 +94,7 @@ const poligonoValido = (p, nome) => {
 
 /**
  * Os laços horizontais de um corpo visto de lado, de frente ou de trás e de cima, para `gaiolaPorLacos`.
- * @param {{ lado: number[][], perfil: number[][], planta: number[][], estacoes: number[], pontos?: number, pontosDoLado?: number, espessuraMinima?: number, cantos?: 'acompanham' | 'fixos', extremos?: { inicio?: number, fim?: number } }} o
+ * @param {{ lado: number[][], perfil: number[][], planta: number[][], estacoes: number[], pontos?: number, pontosDoLado?: number, espessuraMinima?: number, centro?: number, cantos?: 'acompanham' | 'fixos', extremos?: { inicio?: number, fim?: number } }} o
  */
 export function lacosPelasVistas(o) {
   if (o == null || typeof o !== 'object') erro('espera { lado, perfil, planta, estacoes }');
@@ -112,6 +116,10 @@ export function lacosPelasVistas(o) {
   if (!Number.isInteger(pontosDoLado) || pontosDoLado < 2) erro('pontosDoLado precisa ser um inteiro a partir de 2');
   const espessura = o.espessuraMinima ?? 2;
   if (!(espessura > 0)) erro('espessuraMinima precisa ser maior que zero');
+  const centro = o.centro ?? 0;
+  if (!Number.isFinite(centro)) erro('centro precisa ser um número, a lateral do eixo de simetria em mm');
+  /* a lateral absoluta de uma lateral medida do centro; com centro 0 o número passa intacto, e a saída é a de antes */
+  const naPlanta = (l) => (centro === 0 ? l : centro + l);
 
   const alturas = o.lado.map((p) => p[1]);
   const aMin = Math.min(...alturas);
@@ -120,14 +128,21 @@ export function lacosPelasVistas(o) {
   const cs = o.planta.map((p) => p[1]);
   const cMin = Math.min(...cs);
   const cMax = Math.max(...cs);
-  const meiaPlanta = Math.max(...o.planta.map((p) => Math.abs(p[0])));
+  const meiaPlanta = Math.max(...o.planta.map((p) => Math.abs(p[0] - centro)));
   const folgaDaPlanta = meiaPlanta * 1e-6;
+  const avisos = [];
+  /* a simetria em torno do centro: o quanto a planta vai para cada lado dele */
+  const paraDireita = Math.max(...o.planta.map((p) => p[0])) - centro;
+  const paraEsquerda = centro - Math.min(...o.planta.map((p) => p[0]));
+  if (Math.abs(paraDireita - paraEsquerda) > TOLERANCIA_DA_SIMETRIA) {
+    avisos.push(`a planta não é simétrica em torno do centro ${br(centro)} mm: vai ${br(paraDireita)} mm para um lado e ${br(paraEsquerda)} mm para o outro (o meio dela está em ${br(centro + (paraDireita - paraEsquerda) / 2)} mm); o laço vai do centro para os dois lados com a meia largura do perfil, e do lado mais curto a ponta fica a da borda da planta`);
+  }
 
-  /* o recuo de cada ponta da planta na lateral l */
+  /* o recuo de cada ponta da planta na lateral l, medida do centro; fora da planta vale o da borda dela daquele lado */
   const recuos = (l) => {
-    const dentro = Math.max(-meiaPlanta + folgaDaPlanta, Math.min(meiaPlanta - folgaDaPlanta, l));
-    const cortes = cruzamentos(o.planta, 0, dentro);
-    if (cortes.length < 2) erro(`a planta não tem borda na lateral ${br(l)} mm`);
+    const dentro = Math.max(-paraEsquerda + folgaDaPlanta, Math.min(paraDireita - folgaDaPlanta, l));
+    const cortes = cruzamentos(o.planta, 0, naPlanta(dentro));
+    if (cortes.length < 2) erro(`a planta não tem borda na lateral ${br(naPlanta(l))} mm`);
     return { inicio: cortes[0] - cMin, fim: cMax - cortes[cortes.length - 1] };
   };
 
@@ -140,7 +155,6 @@ export function lacosPelasVistas(o) {
   /* o fator do recuo de uma ponta quando os cantos são fixos: d é quanto a silhueta fica aquém do extremo naquela altura */
   const fator = (d, R) => (cantos === 'fixos' && R > 0 ? Math.max(0, 1 - Math.max(0, d) / R) : 1);
 
-  const avisos = [];
   const lacos = o.estacoes.map((a, r) => {
     if (a < aMin - folga || a > aMax + folga) erro(`a estação ${br(a)} mm está fora da silhueta de lado, que vai de ${br(aMin)} a ${br(aMax)} mm`);
     const corte = Math.max(aMin + folga, Math.min(aMax - folga, a));
@@ -164,8 +178,8 @@ export function lacosPelasVistas(o) {
     if (k < 1) avisos.push(`na altura ${br(a)} mm o intervalo (${br(c1 - c0)} mm) é curto para os recuos da planta (${br(soma)} mm), que encolheram a ${br(k * 100)}%`);
     const N = 24;
     const ls = Array.from({ length: N + 1 }, (_, i) => -w + (2 * w * i) / N);
-    const inicio = ls.map((l) => [l, c0 + k * fI * recuos(l).inicio]);
-    const fim = ls.map((l) => [l, c1 - k * fF * recuos(l).fim]).reverse();
+    const inicio = ls.map((l) => [naPlanta(l), c0 + k * fI * recuos(l).inicio]);
+    const fim = ls.map((l) => [naPlanta(l), c1 - k * fF * recuos(l).fim]).reverse();
     return {
       nome: `e${r}`,
       em: a,

@@ -36,19 +36,28 @@
  *                               "fora": "o eixo e as rodas", "grade": [4, 3], "visto": "de trás" } } }
  * Opcionais: "fundo" (#rrggbb da referência), "largura" (px do raster e das vistas rápidas, 1200), "toleranciaMm" (do casamento,
  * 12, também por vista) e "tresQuartos" (true; false não grava as quatro vistas de três quartos). O valor de "dentro" é uma parte ou
- * uma lista delas.
+ * uma lista delas. Por vista, "girar" (0, 90, 180 ou 270 graus no sentido horário, padrão 0) e "espelhar" (true para o espelho
+ * horizontal depois do giro, padrão false) acertam a referência que veio noutra orientação, como a vista de cima gerada com a frente à
+ * esquerda, que a bancada põe embaixo: a imagem é girada e espelhada em memória antes de tudo, e "caixaRef" e "ignorar" valem na
+ * imagem já girada. Toda parte de "partes" tem de existir na opção montada e toda parte da opção tem de ter classe; a parte que
+ * sumiu da opção (um comentário mal fechado no módulo engoliu o piso e o tapete) é recusada com a lista das que faltam.
+ *
+ * A MESMA PASTA A CADA RODADA. O número da rodada registrada e a checagem de contradição com a rodada anterior saem de
+ * `<saida>/<vista>/rodadas/`; numa pasta nova a numeração recomeça em 01 e a checagem não vê nada. A rodada seguinte usa então a
+ * mesma pasta (as imagens são regravadas e `rodadas/` se acumula), ou `--rodadas-de=<pasta de uma conferência anterior>`, que copia
+ * para a pasta nova as `rodadas/` de cada vista que ainda não as tem.
  *
  * USO
  *   npm run conferir:vistas -- <esboço> --config=<json> --saida=<pasta> [--opcao=1] [--captura=rapida|bancada|nenhuma]
- *     [--vistas=traseira,superior]
+ *     [--vistas=traseira,superior] [--rodadas-de=<pasta>]
  *   npm run conferir:vistas -- --saida=<pasta> --registrar=<vista>:<respostas.json>
  * O primeiro roda a rodada; o segundo repassa as respostas do crítico ao registro da leitura daquela vista. `--sem-captura` vale como
  * `--captura=nenhuma`. Sai 0 quando a rodada rodou, 2 em config ou argumento ruim, e 1 quando o esboço é recusado ou o registro recusa a rodada. */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
-import { GRADE_PADRAO, dePng, executar as executarLeitura, gravarLeitura, montarLeitura, paraPng, regioesDaGrade } from './leitura-por-regioes.mjs';
+import { GRADE_PADRAO, dePng, imagem, executar as executarLeitura, gravarLeitura, montarLeitura, paraPng, regioesDaGrade } from './leitura-por-regioes.mjs';
 import { desenharLinhas, facesDoNeutro } from './linhas-do-modelo.mjs';
 import { LARGURA_PADRAO, TOLERANCIA_PADRAO_MM, desenharCasamento, medirCasamento, paraJson as casamentoParaJson } from './casamento-da-vista.mjs';
 import { TOLERANCIA_MM as TOLERANCIA_DA_SOBRA, VISTAS_PADRAO as VISTAS_DA_SOBRA, desenharSobra, sobraEntrePartes } from './sobra-entre-partes.mjs';
@@ -58,6 +67,7 @@ import { coresDasPartes, facesDaOpcao, rasterSombreado } from './vista-rapida.mj
 export const FORMATO = 'modelar.conferir-vistas@1';
 export const TENTATIVAS_DE_CAPTURA = 2;
 export const CAPTURAS = Object.freeze(['rapida', 'bancada', 'nenhuma']);
+export const GIROS = Object.freeze([0, 90, 180, 270]);
 /* os três quartos: a direção da isométrica da bancada com os sinais de x (direita) e z (frente) trocados, a mesma elevação */
 const [ISO_X, ISO_Y, ISO_Z] = VISTAS_BANCADA.isometrica.direcao;
 export const TRES_QUARTOS = Object.freeze([
@@ -70,6 +80,34 @@ const BRANCO = [255, 255, 255];
 
 export class ErroDaConferencia extends Error {
   constructor(mensagem, codigo = 2) { super(mensagem); this.name = 'ErroDaConferencia'; this.codigo = codigo; }
+}
+
+/* --- a referência girada ------------------------------------------------------------------------------------------------------ */
+/** A imagem (no formato de `dePng`) girada de `graus` no sentido horário, um de `GIROS`; com 0 devolve a mesma imagem. */
+export function girarImagem(im, graus) {
+  if (!GIROS.includes(graus)) throw new ErroDaConferencia(`girar espera ${GIROS.join(', ')} e veio ${JSON.stringify(graus)}`);
+  if (graus === 0) return im;
+  const { largura: L, altura: A } = im;
+  const deitada = graus !== 180;
+  const nova = imagem(deitada ? A : L, deitada ? L : A);
+  /* o pixel (x, y) da imagem girada vem do pixel (sx, sy) da original */
+  const origem = { 90: (x, y) => [y, A - 1 - x], 180: (x, y) => [L - 1 - x, A - 1 - y], 270: (x, y) => [L - 1 - y, x] }[graus];
+  for (let y = 0; y < nova.altura; y += 1) for (let x = 0; x < nova.largura; x += 1) {
+    const [sx, sy] = origem(x, y);
+    const i = (sy * L + sx) * 3; const j = (y * nova.largura + x) * 3;
+    nova.dados[j] = im.dados[i]; nova.dados[j + 1] = im.dados[i + 1]; nova.dados[j + 2] = im.dados[i + 2];
+  }
+  return nova;
+}
+
+/** A imagem espelhada na horizontal: a coluna x vai para largura - 1 - x. */
+export function espelharImagem(im) {
+  const nova = imagem(im.largura, im.altura);
+  for (let y = 0; y < im.altura; y += 1) for (let x = 0; x < im.largura; x += 1) {
+    const i = (y * im.largura + x) * 3; const j = (y * im.largura + (im.largura - 1 - x)) * 3;
+    nova.dados[j] = im.dados[i]; nova.dados[j + 1] = im.dados[i + 1]; nova.dados[j + 2] = im.dados[i + 2];
+  }
+  return nova;
 }
 
 /* --- a config ------------------------------------------------------------------------------------------------------------------- */
@@ -134,9 +172,18 @@ export function lerConfig(config, pastaDaConfig, { vistasPedidas = null } = {}) 
       if (!caminho) recusa(`${campo}.referencia`, 'falta o caminho da imagem de referência');
       else if (!existsSync(caminho)) recusa(`${campo}.referencia`, `${caminho} não existe`);
       else { try { referencia = dePng(readFileSync(caminho)); } catch (e) { recusa(`${campo}.referencia`, `${caminho} não é um PNG legível (${e.message})`); } }
+      const girar = v.girar ?? 0;
+      const giroValido = GIROS.includes(girar);
+      if (!giroValido) recusa(`${campo}.girar`, `espera ${GIROS.join(', ')} (graus no sentido horário) e veio ${JSON.stringify(v.girar)}`);
+      const espelhar = v.espelhar ?? false;
+      if (typeof espelhar !== 'boolean') recusa(`${campo}.espelhar`, `espera true ou false e veio ${JSON.stringify(v.espelhar)}`);
+      if (referencia && giroValido && typeof espelhar === 'boolean') {
+        referencia = girarImagem(referencia, girar);
+        if (espelhar) referencia = espelharImagem(referencia);
+      } else if (!giroValido || typeof espelhar !== 'boolean') referencia = null;
       if (!quatro(v.caixaRef) || !(v.caixaRef[2] > v.caixaRef[0] && v.caixaRef[3] > v.caixaRef[1])) recusa(`${campo}.caixaRef`, 'espera [x0, y0, x1, y1] com x1 > x0 e y1 > y0');
       else if (referencia && (v.caixaRef[0] < 0 || v.caixaRef[1] < 0 || v.caixaRef[2] > referencia.largura || v.caixaRef[3] > referencia.altura)) {
-        recusa(`${campo}.caixaRef`, `${v.caixaRef.join(',')} está fora da imagem de ${referencia.largura} x ${referencia.altura} px`);
+        recusa(`${campo}.caixaRef`, `${v.caixaRef.join(',')} está fora da imagem de ${referencia.largura} x ${referencia.altura} px${girar || espelhar ? ` (já ${textoDoGiro(girar, espelhar)})` : ''}`);
       }
       const ignorar = v.ignorar ?? [];
       if (!Array.isArray(ignorar) || ignorar.some((r) => !quatro(r))) recusa(`${campo}.ignorar`, 'espera uma lista de [x0, y0, x1, y1]');
@@ -146,17 +193,24 @@ export function lerConfig(config, pastaDaConfig, { vistasPedidas = null } = {}) 
       for (const t of ['fora', 'visto']) if (v[t] !== undefined && typeof v[t] !== 'string') recusa(`${campo}.${t}`, 'precisa ser um texto');
       const tol = v.toleranciaMm ?? toleranciaMm;
       if (!(Number.isFinite(tol) && tol >= 0)) recusa(`${campo}.toleranciaMm`, 'espera um número não negativo');
-      vistas.push({ nome, referencia, caminhoDaReferencia: caminho, textoDaReferencia: v.referencia, caixaRef: v.caixaRef, ignorar, grade, fora: v.fora ?? null, visto: v.visto ?? null, toleranciaMm: tol });
+      vistas.push({ nome, referencia, caminhoDaReferencia: caminho, textoDaReferencia: v.referencia, girar, espelhar, caixaRef: v.caixaRef, ignorar, grade, fora: v.fora ?? null, visto: v.visto ?? null, toleranciaMm: tol });
     }
   }
   if (recusas.length) throw new ErroDaConferencia(`a config foi recusada:\n${recusas.map((r) => `- ${r}`).join('\n')}`);
   return { objeto: config.objeto ?? null, cores: config.cores, classes, fundo, largura, partes, pares, vistasDaSobra, toleranciaDaSobraMm, tresQuartos, vistas };
 }
 
-/** Confere as partes da config contra as da opção montada: parte que a opção não tem, parte sem classe e par de `dentro` sem parte. */
+/* o giro de uma vista em palavras, para o resumo e as recusas */
+const textoDoGiro = (girar, espelhar) => [girar ? `girada ${girar} graus no sentido horário` : null, espelhar ? `espelhada na horizontal${girar ? ' depois do giro' : ''}` : null].filter(Boolean).join(' e ');
+
+/**
+ * Confere as partes da config contra as da opção montada, nos dois sentidos: a parte declarada em `partes` que a opção não tem (a que
+ * um comentário mal fechado no módulo engoliu) e a parte da opção sem classe; e o par de `dentro` sem parte.
+ */
 export function conferirPartes(cfg, partesDaOpcao) {
   const recusas = [];
-  for (const p of Object.keys(cfg.partes)) if (!partesDaOpcao.includes(p)) recusas.push(`partes.${p}: a opção não tem esta parte; as partes dela são ${partesDaOpcao.join(', ')}`);
+  const sumidas = Object.keys(cfg.partes).filter((p) => !partesDaOpcao.includes(p));
+  if (sumidas.length) recusas.push(`partes: a opção montada não tem ${sumidas.length === 1 ? 'a parte' : 'as partes'} ${sumidas.join(', ')}, que a config declara; as partes da opção são ${partesDaOpcao.join(', ') || 'nenhuma'}`);
   const semClasse = partesDaOpcao.filter((p) => cfg.partes[p] === undefined);
   if (semClasse.length) recusas.push(`partes: falta a classe de ${semClasse.join(', ')}`);
   for (const [a, b] of cfg.pares) for (const p of [a, b]) if (!partesDaOpcao.includes(p)) recusas.push(`dentro.${a}: a parte "${p}" não existe na opção (${partesDaOpcao.join(', ')})`);
@@ -195,6 +249,11 @@ function capturarRapida(facesRapidas, direcao, largura, saida) {
   } catch (e) { return { imagem: null, motivo: `a vista rápida falhou (${String(e?.message ?? e).split('\n')[0]})` }; }
 }
 
+/* a frase do cabeçalho e do fim do resumo sobre a pasta da rodada seguinte */
+const MESMA_PASTA = (pasta) => `A rodada seguinte usa a mesma pasta (${pasta}): as imagens são regravadas e rodadas/ de cada vista se acumula, de onde saem o número da rodada registrada e a checagem de contradição com a anterior; numa pasta nova, passe --rodadas-de=${pasta}.`;
+/* os arquivos de rodada de uma pasta rodadas/, em ordem */
+const rodadasEm = (dir) => (existsSync(dir) ? readdirSync(dir).filter((f) => /^rodada-\d+\.json$/.test(f)).sort() : []);
+
 const ORIGEM_DA_CAPTURA = {
   rapida: 'da vista rápida (vista-rapida.mjs), desenhada da malha sem navegador, com luz e material simplificados',
   bancada: 'da bancada pelo navegador, com a cor dos materiais e a luz dela',
@@ -222,7 +281,7 @@ function frasesDaRegiao(r) {
  * A rodada. `deps` troca a leitura, a montagem e a captura (o teste conta as montagens e roda sem navegador).
  * @returns {Promise<{ resumo: object, gravados: string[], linhas: string[] }>}
  */
-export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: modo = 'rapida' }, deps = {}) {
+export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: modo = 'rapida', rodadasDe = null }, deps = {}) {
   if (!CAPTURAS.includes(modo)) throw new ErroDaConferencia(`--captura espera ${CAPTURAS.join(', ')} e veio "${modo}"`);
   const nucleo = deps.lerArquivoDeEsboco && deps.montarOpcoes && (modo !== 'bancada' || deps.capturarLadoALado) ? null : await import('./esboco-nucleo.mjs');
   const lerArquivo = deps.lerArquivoDeEsboco ?? nucleo.lerArquivoDeEsboco;
@@ -242,7 +301,25 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
   const rel = (p) => relative(pasta, p).replaceAll('\\', '/');
   const resumo = { formato: FORMATO, esboco: arquivo, opcao, titulo: painel.titulo, nota: 'o número ordena as regiões e informa; quem aprova forma é a pessoa', captura: modo, vistas: {}, tresQuartos: [], sobras: [] };
   const md = [`# Conferência das vistas`, '',
-    `Esboço ${arquivo}, opção ${opcao} (${painel.titulo}), montada uma vez para a rodada inteira. O número ordena as regiões e diz onde olhar primeiro; quem aprova forma é a pessoa.`, ''];
+    `Esboço ${arquivo}, opção ${opcao} (${painel.titulo}), montada uma vez para a rodada inteira. O número ordena as regiões e diz onde olhar primeiro; quem aprova forma é a pessoa.`, '',
+    MESMA_PASTA(pasta), ''];
+  /* as rodadas de uma conferência anterior, copiadas antes da leitura, que tira delas as aceitas do pedido */
+  if (rodadasDe) {
+    const copiadas = [];
+    for (const v of cfg.vistas) {
+      const de = join(resolve(rodadasDe), v.nome, 'rodadas'); const para = join(pasta, v.nome, 'rodadas');
+      if (resolve(de) === resolve(para) || !existsSync(de) || rodadasEm(para).length) continue;
+      const nomes = rodadasEm(de);
+      if (!nomes.length) continue;
+      mkdirSync(para, { recursive: true });
+      for (const f of nomes) cpSync(join(de, f), join(para, f));
+      copiadas.push({ vista: v.nome, rodadas: nomes.length });
+    }
+    resumo.rodadasDe = { pasta: rodadasDe, copiadas };
+    md.push(copiadas.length
+      ? `As rodadas registradas vieram de ${resolve(rodadasDe)}: ${copiadas.map((c) => `${c.rodadas} da vista ${c.vista}`).join(', ')}.`
+      : `Nenhuma rodada veio de ${resolve(rodadasDe)}: lá não havia rodadas das vistas desta conferência, ou a pasta nova já tinha as suas.`, '');
+  }
 
   for (const v of cfg.vistas) {
     const dir = join(pasta, v.nome); mkdirSync(dir, { recursive: true });
@@ -272,11 +349,13 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
     resumo.vistas[v.nome] = {
       proporcao: { referencia: arredonda(m.proporcao.referencia, 4), modelo: arredonda(m.proporcao.modelo, 4) },
       captura: captura.imagem ? { feita: true, origem: modo, arquivo: rel(arq.captura) } : { feita: false, motivo: captura.motivo },
+      ...(v.girar || v.espelhar ? { giro: { girar: v.girar, espelhar: v.espelhar } } : {}),
       ordem, ignoradas: m.ignoradas,
       regioes: acima.map((r) => ({ nome: r.nome, nota: r.nota, troca: r.troca, linhaSemBorda: r.linhaSemBorda, bordaSemLinha: r.bordaSemLinha })),
       arquivos: { linhas: rel(arq.linhas), casamento: rel(arq.casamento), casamentoJson: rel(arq.casamentoJson), pedido: rel(arq.pedido), indice: rel(join(dir, 'indice.png')) },
     };
     md.push(`## Vista ${v.nome}`, '',
+      ...(v.girar || v.espelhar ? [`A referência ${v.textoDaReferencia} foi ${textoDoGiro(v.girar, v.espelhar)} antes da medida, e a caixa e o ignorado valem na imagem já girada.`] : []),
       `Altura sobre largura: referência ${m.proporcao.referencia.toFixed(3)}, modelo ${m.proporcao.modelo.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%). Tolerância das linhas ${m.toleranciaMm} mm, ${m.mmPorPx.toFixed(2)} mm por px.`,
       captura.imagem ? `O rascunho com luz está em ${arq.captura}; ele saiu ${ORIGEM_DA_CAPTURA[modo]}.` : `A leitura saiu sem o rascunho com luz: ${captura.motivo}. O desenho das linhas ocupa o lugar dele no painel do rascunho.`,
       ...(m.ignoradas.length ? [`Regiões inteiras no ignorado, fora da conta: ${m.ignoradas.join(', ')}.`] : []), '',
@@ -317,6 +396,7 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
     const passam = r.filter((x) => x.sobra).length;
     linhas.push(`sobra: ${passam ? `${passam} de ${r.length} passam` : `nenhum dos ${r.length} passa`} da tolerância de ${cfg.toleranciaDaSobraMm} mm`);
   }
+  md.push('## A rodada seguinte', '', MESMA_PASTA(pasta));
   writeFileSync(join(pasta, 'resumo.md'), `${md.join('\n').trimEnd()}\n`);
   writeFileSync(join(pasta, 'resumo.json'), `${JSON.stringify(resumo, null, 1)}\n`);
   gravados.push(join(pasta, 'resumo.md'), join(pasta, 'resumo.json'));
@@ -325,7 +405,7 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
 
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
 const AJUDA = `npm run conferir:vistas -- <esboço> --config=<json> --saida=<pasta> [--opcao=1] [--captura=rapida|bancada|nenhuma]
-    [--vistas=traseira,superior]
+    [--vistas=traseira,superior] [--rodadas-de=<pasta>]
 npm run conferir:vistas -- --saida=<pasta> --registrar=<vista>:<respostas.json>
 
 Monta a opção do esboço uma vez e, para cada vista da config, grava em <saida>/<vista>/ as linhas do modelo, o casamento com a
@@ -333,8 +413,9 @@ referência, a captura com luz e a leitura por regiões, com a ordem sugerida da
 vistas de três quartos em <saida>/tres-quartos/ (que "tresQuartos": false desliga) e a sobra entre as partes de "dentro". Grava
 resumo.md e resumo.json em --saida. A captura sai da vista rápida, sem navegador (rapida, o padrão), da bancada pelo navegador
 (bancada) ou não sai (nenhuma, ou --sem-captura), e então as linhas ocupam o lugar dela. A config declara cores, partes, dentro, vistasDaSobra,
-toleranciaDaSobraMm e vistas (referencia, caixaRef, ignorar, fora, grade, visto), com caminhos relativos a ela. O número ordena e
-informa; quem aprova forma é a pessoa. --registrar repassa as respostas ao registro da leitura daquela vista.`;
+toleranciaDaSobraMm e vistas (referencia, girar, espelhar, caixaRef, ignorar, fora, grade, visto), com caminhos relativos a ela. O
+número ordena e informa; quem aprova forma é a pessoa. --registrar repassa as respostas ao registro da leitura daquela vista. A rodada
+seguinte usa a mesma pasta, onde rodadas/ se acumula; --rodadas-de copia para uma pasta nova as rodadas/ de uma conferência anterior.`;
 
 export async function executar(argv, deps = {}) {
   const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };
@@ -364,9 +445,11 @@ export async function executar(argv, deps = {}) {
     if (!CAPTURAS.includes(captura)) throw new ErroDaConferencia(`--captura espera ${CAPTURAS.join(', ')} e veio "${captura}"`);
     if (argv.includes('--sem-captura') && captura !== 'nenhuma') throw new ErroDaConferencia(`--sem-captura contradiz --captura=${captura}`);
     const vistasPedidas = valor('vistas') ? valor('vistas').split(',').map((s) => s.trim()).filter(Boolean) : null;
+    const rodadasDe = valor('rodadas-de');
+    if (rodadasDe !== null && (!rodadasDe || !existsSync(resolve(rodadasDe)))) throw new ErroDaConferencia(`--rodadas-de: a pasta "${rodadasDe}" não existe`);
     const cfg = lerConfig(bruta, dirname(caminhoDaConfig), { vistasPedidas });
     const t0 = performance.now();
-    const r = await conferirVistas({ arquivo, cfg, saida, opcao, captura }, deps);
+    const r = await conferirVistas({ arquivo, cfg, saida, opcao, captura, rodadasDe }, deps);
     const total = (performance.now() - t0) / 1000;
     return { codigo: 0, stdout: `${['conferência das vistas: o número ordena e informa; quem aprova forma é a pessoa.', ...r.linhas, `tempo: ${total.toFixed(1)} s, dos quais ${r.tempoDaMontagem.toFixed(1)} s de montagem`, 'gravado:', ...r.gravados.map((g) => `  ${g}`)].join('\n')}\n`, stderr: '' };
   } catch (erro) {

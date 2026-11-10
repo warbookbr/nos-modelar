@@ -1,5 +1,6 @@
 /* lacos-pelas-vistas.test.mjs — os laços tirados de três vistas: a ponta acompanha a planta em toda altura, a gaiola por laços os aceita e
    as entradas que não dão laço são recusadas com a medida. */
+import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { gaiolaPorLacos } from './gaiola-por-lacos.js';
 import { lacosPelasVistas } from './lacos-pelas-vistas.js';
@@ -88,6 +89,40 @@ describe('lacosPelasVistas', () => {
     const aba = r.lacos[0].trechos;
     expect(aba.direita[1][1] - aba.direita[0][1]).toBeCloseTo(2, 3);
     expect(Math.min(...aba.fim.map((p) => p[1]))).toBeGreaterThan(540);
+  });
+
+  it('com centro 0 a saída é idêntica à de antes, byte a byte, e o corpo deslocado dá os mesmos laços somados do centro', () => {
+    /* o sha256 do JSON da saída, tirado do código anterior ao campo centro, com os mesmos casos (o terceiro tem aviso de perfil) */
+    const ANTES = ['a7ab0986ece6d1cf', 'c1d41ad8e14c6bb5', '4dada21f8d90cbc6'];
+    const resumo = (r) => createHash('sha256').update(JSON.stringify(r)).digest('hex').slice(0, 16);
+    [{}, { cantos: 'fixos', perfil: [[0, 500], [500, 500]] }, { perfil: [[0, 600], [500, 600]] }].forEach((mais, i) => {
+      expect(resumo(lacosPelasVistas(vistas(mais)))).toBe(ANTES[i]);
+      expect(resumo(lacosPelasVistas(vistas({ ...mais, centro: 0 })))).toBe(ANTES[i]);
+      const deslocado = lacosPelasVistas(vistas({ ...mais, centro: 400, planta: PLANTA.map(([l, c]) => [l + 400, c]) }));
+      const base = lacosPelasVistas(vistas(mais));
+      expect(deslocado.avisos).toEqual(base.avisos);
+      expect(deslocado.meiaPlanta).toBe(base.meiaPlanta);
+      expect(deslocado.trechos).toEqual(base.trechos);
+      deslocado.lacos.forEach((laco, r) => {
+        for (const n of ['inicio', 'direita', 'fim', 'esquerda']) {
+          const esperado = base.lacos[r].trechos[n];
+          laco.trechos[n].forEach(([l, c], i) => { expect(l).toBeCloseTo(esperado[i][0] + 400, 9); expect(c).toBeCloseTo(esperado[i][1], 9); });
+        }
+      });
+    });
+    expect(() => lacosPelasVistas(vistas({ centro: 'meio' }))).toThrow('centro precisa ser um número');
+  });
+
+  it('a planta que não é simétrica em torno do centro declarado vai aos avisos com a medida', () => {
+    /* a planta deslocada 20 mm sem declarar o centro: vai 520 mm para um lado e 480 para o outro */
+    const r = lacosPelasVistas(vistas({ planta: PLANTA.map(([l, c]) => [l + 20, c]) }));
+    expect(r.avisos).toEqual(['a planta não é simétrica em torno do centro 0 mm: vai 520 mm para um lado e 480 mm para o outro (o meio dela está em 20 mm); o laço vai do centro para os dois lados com a meia largura do perfil, e do lado mais curto a ponta fica a da borda da planta']);
+    expect(r.meiaPlanta).toBe(520);
+    /* o centro declarado a 30 mm do meio da planta */
+    const torto = lacosPelasVistas(vistas({ centro: 430, planta: PLANTA.map(([l, c]) => [l + 400, c]) }));
+    expect(torto.avisos[0]).toContain('em torno do centro 430 mm: vai 470 mm para um lado e 530 mm para o outro (o meio dela está em 400 mm)');
+    /* a planta simétrica não avisa, com o centro em qualquer lugar */
+    expect(lacosPelasVistas(vistas({ centro: -250, planta: PLANTA.map(([l, c]) => [l - 250, c]) })).avisos).toEqual([]);
   });
 
   it('recusa com a medida o que não dá laço', () => {

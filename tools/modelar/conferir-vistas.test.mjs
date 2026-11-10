@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lerArquivoDeEsboco, montarOpcoes } from './esboco-nucleo.mjs';
 import { dePng, imagem, paraPng } from './leitura-por-regioes.mjs';
-import { executar } from './conferir-vistas.mjs';
+import { espelharImagem, executar, girarImagem } from './conferir-vistas.mjs';
 
 const LARANJA = [226, 100, 30]; const CINZA = [107, 112, 116];
 const pasta = mkdtempSync(join(tmpdir(), 'conferir-vistas-'));
@@ -185,7 +185,7 @@ describe('conferir vistas', () => {
     };
     const vista = CONFIG.vistas.frontal;
     await recusa('r-vista', { ...CONFIG, vistas: { lateral: vista } }, 'vistas.lateral: a vista "lateral" não existe na bancada');
-    await recusa('r-parte', { ...CONFIG, partes: { ...CONFIG.partes, capo: 'laranja' } }, 'partes.capo: a opção não tem esta parte; as partes dela são esq, dir');
+    await recusa('r-parte', { ...CONFIG, partes: { ...CONFIG.partes, capo: 'laranja' } }, 'partes: a opção montada não tem a parte capo, que a config declara; as partes da opção são esq, dir');
     await recusa('r-sem-classe', { ...CONFIG, partes: { esq: 'laranja' } }, 'partes: falta a classe de dir');
     await recusa('r-classe', { ...CONFIG, partes: { esq: 'laranja', dir: 'verde' } }, 'partes.dir: a classe "verde" não está em cores (laranja, cinza)');
     await recusa('r-referencia', { ...CONFIG, vistas: { frontal: { ...vista, referencia: 'nao-tem.png' } } }, 'vistas.frontal.referencia:');
@@ -200,5 +200,102 @@ describe('conferir vistas', () => {
     expect((await executar([esboco, `--config=${join(pasta, 'nao-tem.json')}`, `--saida=${pasta}`])).codigo).toBe(2);
     expect((await rodar('r-opcao', CONFIG, ['--opcao=2'])).stderr).toContain('o esboço tem 1 opções');
     expect((await executar(['--ajuda'])).stdout).toContain('npm run conferir:vistas');
+  });
+
+  it('a referência deitada com "girar": 90 dá o mesmo casamento e a mesma leitura que a mesma referência em pé', async () => {
+    /* a deitada é a ref.png girada 90 graus no sentido anti-horário, montada aqui pixel a pixel: (x, y) da deitada é (219 - y, x) da em pé */
+    const emPe = dePng(readFileSync(join(pasta, 'ref.png')));
+    const deitada = imagem(emPe.altura, emPe.largura);
+    for (let y = 0; y < deitada.altura; y += 1) for (let x = 0; x < deitada.largura; x += 1) {
+      const i = (x * emPe.largura + (emPe.largura - 1 - y)) * 3; deitada.dados.set(emPe.dados.subarray(i, i + 3), (y * deitada.largura + x) * 3);
+    }
+    writeFileSync(join(pasta, 'ref-deitada.png'), paraPng(deitada));
+    expect(Buffer.from(girarImagem(deitada, 90).dados).equals(Buffer.from(emPe.dados))).toBe(true);
+    expect(Buffer.from(girarImagem(girarImagem(girarImagem(deitada, 180), 270), 0).dados).equals(Buffer.from(emPe.dados))).toBe(true);
+    const girada = { ...CONFIG, vistas: { frontal: { ...CONFIG.vistas.frontal, referencia: 'ref-deitada.png', girar: 90 } } };
+    expect((await rodarPadrao('em-pe')).codigo).toBe(0);
+    const r = await rodarPadrao('girada', girada);
+    expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
+    const um = JSON.parse(readFileSync(join(pasta, 'em-pe', 'resumo.json'), 'utf8')).vistas.frontal;
+    const dois = JSON.parse(readFileSync(join(pasta, 'girada', 'resumo.json'), 'utf8')).vistas.frontal;
+    expect(dois.giro).toEqual({ girar: 90, espelhar: false }); expect(um.giro).toBeUndefined();
+    for (const k of ['proporcao', 'ordem', 'regioes', 'ignoradas']) expect(dois[k], k).toEqual(um[k]);
+    expect(dois.regioes.length).toBeGreaterThan(0);
+    const semRef = (arq) => { const j = JSON.parse(readFileSync(arq, 'utf8')); delete j.referencia; return j; };
+    for (const f of ['casamento.json', 'leitura.json']) expect(semRef(join(pasta, 'girada', 'frontal', f)), f).toEqual(semRef(join(pasta, 'em-pe', 'frontal', f)));
+    for (const f of ['casamento.png', 'indice.png', 'folha-01.png']) expect(readFileSync(join(pasta, 'girada', 'frontal', f)).equals(readFileSync(join(pasta, 'em-pe', 'frontal', f))), f).toBe(true);
+    expect(readFileSync(join(pasta, 'girada', 'resumo.md'), 'utf8')).toContain('A referência ref-deitada.png foi girada 90 graus no sentido horário antes da medida');
+    expect(readFileSync(join(pasta, 'em-pe', 'resumo.md'), 'utf8')).not.toContain('graus no sentido horário');
+  });
+
+  it('"espelhar" troca os lados da referência, e giro ou espelho fora da lista é recusado com o campo e o motivo', async () => {
+    const im = dePng(readFileSync(join(pasta, 'ref-tras.png')));
+    const espelho = espelharImagem(im);
+    expect([...espelho.dados.subarray((50 * 220 + 20) * 3, (50 * 220 + 20) * 3 + 3)]).toEqual(LARANJA);
+    expect([...im.dados.subarray((50 * 220 + 20) * 3, (50 * 220 + 20) * 3 + 3)]).toEqual(CINZA);
+    /* de frente o laranja fica à esquerda: a referência de trás, com o laranja à direita, não casa, e espelhada casa inteira */
+    const tras = { referencia: 'ref-tras.png', caixaRef: [10, 10, 210, 110], grade: [2, 2] };
+    expect((await rodar('sem-espelho', { ...CONFIG, vistas: { frontal: tras } })).codigo).toBe(0);
+    expect(JSON.parse(readFileSync(join(pasta, 'sem-espelho', 'resumo.json'), 'utf8')).vistas.frontal.regioes.length).toBeGreaterThan(0);
+    expect((await rodar('espelho', { ...CONFIG, vistas: { frontal: { ...tras, espelhar: true } } })).codigo).toBe(0);
+    const v = JSON.parse(readFileSync(join(pasta, 'espelho', 'resumo.json'), 'utf8')).vistas.frontal;
+    expect(v.regioes).toEqual([]); expect(v.giro).toEqual({ girar: 0, espelhar: true });
+    expect(readFileSync(join(pasta, 'espelho', 'resumo.md'), 'utf8')).toContain('foi espelhada na horizontal antes da medida');
+    const vista = CONFIG.vistas.frontal;
+    for (const [nome, extra, trecho] of [
+      ['r-girar', { girar: 45 }, 'vistas.frontal.girar: espera 0, 90, 180, 270 (graus no sentido horário) e veio 45'],
+      ['r-girar-texto', { girar: '90' }, 'vistas.frontal.girar: espera 0, 90, 180, 270 (graus no sentido horário) e veio "90"'],
+      ['r-espelhar', { espelhar: 'sim' }, 'vistas.frontal.espelhar: espera true ou false e veio "sim"'],
+      /* a caixa vale na imagem girada: de pé a caixa cabe, deitada (120 x 220 px) ela sai da imagem */
+      ['r-caixa-girada', { girar: 90 }, 'vistas.frontal.caixaRef: 10,10,210,110 está fora da imagem de 120 x 220 px (já girada 90 graus no sentido horário)'],
+    ]) {
+      const r = await rodar(nome, { ...CONFIG, vistas: { frontal: { ...vista, ...extra } } });
+      expect(r.codigo, nome).toBe(2); expect(r.stderr, nome).toContain(trecho);
+    }
+  });
+
+  it('a parte que a config declara e a opção montada não tem é recusada com as que faltam e as da opção, e o contrário também', async () => {
+    /* o piso e o tapete que um comentário mal fechado engoliu: declarados na config, ausentes da opção */
+    const sumiu = await rodar('r-sumiu', { ...CONFIG, partes: { ...CONFIG.partes, piso: 'cinza', tapete: 'laranja' } });
+    expect(sumiu.codigo).toBe(2);
+    expect(sumiu.stderr).toContain('partes: a opção montada não tem as partes piso, tapete, que a config declara; as partes da opção são esq, dir');
+    expect(existsSync(join(pasta, 'r-sumiu', 'resumo.md'))).toBe(false);
+    /* a parte da opção sem classe na config */
+    const semClasse = await rodar('r-sem-classe-2', { ...CONFIG, partes: { dir: 'cinza' }, dentro: undefined });
+    expect(semClasse.codigo).toBe(2); expect(semClasse.stderr).toContain('partes: falta a classe de esq');
+    /* os dois sentidos juntos saem na mesma recusa */
+    const ambos = await rodar('r-ambos', { ...CONFIG, partes: { esq: 'laranja', piso: 'cinza' }, dentro: undefined });
+    expect(ambos.stderr).toContain('não tem a parte piso'); expect(ambos.stderr).toContain('falta a classe de dir');
+  });
+
+  it('diz que a rodada seguinte usa a mesma pasta, e --rodadas-de leva as rodadas a uma pasta nova, onde a seguinte sai com o número 02', async () => {
+    const dupla = { ...CONFIG, vistas: { ...CONFIG.vistas, traseira: { referencia: 'ref-tras.png', caixaRef: [10, 10, 210, 110] } } };
+    expect((await rodar('primeira', dupla, ['--vistas=traseira'])).codigo).toBe(0);
+    const md = readFileSync(join(pasta, 'primeira', 'resumo.md'), 'utf8');
+    const frase = `A rodada seguinte usa a mesma pasta (${join(pasta, 'primeira')}): as imagens são regravadas e rodadas/ de cada vista se acumula`;
+    expect(md.split(frase).length - 1).toBe(2);
+    expect(md.trimEnd().split('\n').at(-1)).toContain(frase);
+    const nomes = JSON.parse(readFileSync(join(pasta, 'primeira', 'traseira', 'leitura.json'), 'utf8')).regioes.map((x) => x.nome);
+    const respostas = join(pasta, 'respostas-rodadas.json');
+    writeFileSync(respostas, JSON.stringify({ regioes: Object.fromEntries(nomes.map((n) => [n, { igual: true }])) }));
+    expect((await executar([`--saida=${join(pasta, 'primeira')}`, `--registrar=traseira:${respostas}`])).stdout).toContain('rodada 1:');
+    /* a pasta nova sem --rodadas-de recomeça em 01; com ela, a seguinte é a 02 */
+    expect((await rodar('nova-sem', dupla, ['--vistas=traseira'])).codigo).toBe(0);
+    expect((await executar([`--saida=${join(pasta, 'nova-sem')}`, `--registrar=traseira:${respostas}`])).stdout).toContain('rodada 1:');
+    const r = await rodar('nova', dupla, ['--vistas=traseira', `--rodadas-de=${join(pasta, 'primeira')}`]);
+    expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
+    expect(readFileSync(join(pasta, 'nova', 'traseira', 'rodadas', 'rodada-01.json')).equals(readFileSync(join(pasta, 'primeira', 'traseira', 'rodadas', 'rodada-01.json')))).toBe(true);
+    const resumo = JSON.parse(readFileSync(join(pasta, 'nova', 'resumo.json'), 'utf8'));
+    expect(resumo.rodadasDe).toEqual({ pasta: join(pasta, 'primeira'), copiadas: [{ vista: 'traseira', rodadas: 1 }] });
+    expect(readFileSync(join(pasta, 'nova', 'resumo.md'), 'utf8')).toContain(`As rodadas registradas vieram de ${join(pasta, 'primeira')}: 1 da vista traseira.`);
+    const seguinte = await executar([`--saida=${join(pasta, 'nova')}`, `--registrar=traseira:${respostas}`]);
+    expect(seguinte.codigo).toBe(0); expect(seguinte.stdout).toContain('rodada 2:');
+    expect(existsSync(join(pasta, 'nova', 'traseira', 'rodadas', 'rodada-02.json'))).toBe(true);
+    /* a pasta que já tem rodadas não recebe as da outra, e a pasta que não existe é recusada */
+    expect((await rodar('nova', dupla, ['--vistas=traseira', `--rodadas-de=${join(pasta, 'nova-sem')}`])).codigo).toBe(0);
+    expect(readdirSync(join(pasta, 'nova', 'traseira', 'rodadas')).sort()).toEqual(['rodada-01.json', 'rodada-02.json']);
+    expect(JSON.parse(readFileSync(join(pasta, 'nova', 'resumo.json'), 'utf8')).rodadasDe.copiadas).toEqual([]);
+    const ruim = await rodar('nova-ruim', dupla, [`--rodadas-de=${join(pasta, 'nao-tem')}`]);
+    expect(ruim.codigo).toBe(2); expect(ruim.stderr).toContain('--rodadas-de: a pasta');
   });
 });
