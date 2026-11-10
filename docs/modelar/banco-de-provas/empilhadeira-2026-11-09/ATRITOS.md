@@ -92,3 +92,11 @@ processo o teria pego sozinho e o destino.
    dizer o tipo (`forma` ou `detalhe`), o comando conta as duas em separado e só manda corrigir a de forma; o pedido
    diz que região certa leva `igual` e `--fora` escreve nele o que não é da peça. A conferência de cada diferença de
    forma contra as linhas é de quem conduz, e o que ficar aceito leva o motivo.
+12. **A moldura da grade e a aba da tampa sobravam para fora do laranja nos cantos.** O capô acompanha a curva da planta
+   e a moldura tinha voltado a ser reta de lado a lado (extrusão cruzada com a rampa), e a aba da tampa, com 23 a 80 mm
+   de fundo, caía no laço curto de `lacosPelasVistas`, em que o recuo da planta encolhe até caber. De trás as duas
+   estavam no lugar, e as leituras da vista de trás não viam nada; a pessoa viu nos três quartos. Destino: a moldura e
+   o fundo saem de `lacosPelasVistas` com a planta do capô, como blocos fundos, e a face de dentro da aba foi levada
+   para dentro do capô, para o laço não ficar curto. O processo não pegaria: a leitura por regiões confere uma vista
+   por vez, e o que avança ou recua para o observador só aparece na vista vizinha. Toda parte lida numa vista passa a
+   ser lida também na vista de cima ou de lado, pelas linhas do modelo, antes de ir à pessoa.

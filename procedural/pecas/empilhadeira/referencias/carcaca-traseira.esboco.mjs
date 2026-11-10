@@ -148,18 +148,22 @@ let capo = corpo('capo', VISTAS_DO_CAPO, VINCOS_DO_CAPO);
 /* a borda em volta do vão: um degrau de BORDA_MM de fundo e BORDA px de largura, que acompanha a superfície do capô. Sai do vão
    alargado menos o mesmo capô recuado BORDA_MM. */
 const BORDA = 5; const BORDA_MM = 16;
+/* o vão vai até z 1760: o fundo escuro da grade acompanha a curva e, nos cantos, fica a z 1887, atrás de um vão mais raso */
+const FUNDO_DO_VAO = -1760;
 const recuado = corpo('capoRecuado', { ...VISTAS_DO_CAPO, lado: VISTAS_DO_CAPO.lado.map(([c, a]) => [c < -1900 ? c + BORDA_MM : c, a]) }, VINCOS_DO_CAPO);
-const vaoAlargado = extZ(simetrico(VAO.map(([y, w]) => [y > 345 ? y + BORDA : y, w + BORDA])), -1950, -2300);
-capo = booleana('subtrair', [capo, booleana('subtrair', [vaoAlargado, recuado]), extZ(simetrico(VAO.map(([y, w]) => [y, w + 1])), -1950, -2300)]);
+const vaoAlargado = extZ(simetrico(VAO.map(([y, w]) => [y > 345 ? y + BORDA : y, w + BORDA])), FUNDO_DO_VAO, -2300);
+capo = booleana('subtrair', [capo, booleana('subtrair', [vaoAlargado, recuado]), extZ(simetrico(VAO.map(([y, w]) => [y, w + 1])), FUNDO_DO_VAO, -2300)]);
 parte('capo', capo, LARANJA);
 
-/* grade: a moldura cinza em U apoiada na rampa do vão (de z 2058 a y 980 até z 2110 a y 812, na lateral), e o fundo escuro -------- */
+/* grade: a moldura cinza em U apoiada na rampa do vão (de z 2058 a y 980 até z 2110 a y 812, na lateral), e o fundo escuro.
+   A moldura acompanha a curva da planta do capô, como o laranja: reta de lado a lado, ela sobrava para fora dele nos cantos das
+   lanternas (a pessoa viu nos três quartos). É um bloco fundo, de que só a face de trás aparece, para o laço não ficar curto. */
 const rampa = (de, ate) => [[-(2052 + de), 990], [-(2052 + ate), 990], [-(2112 + ate), 795], [-(2112 + de), 795]];
-const u = simetrico(VAO_GRADE);
-const placa = (de, ate) => booleana('intersectar', [extZ(u, -1900, -2300), extX(rampa(de, ate), -450, 450)]);
-const furos = FUROS_GRADE.map((f) => extZ(f.map(([x, y]) => [x * MM, H(y)]), -1900, -2300));
-parte('grade', booleana('subtrair', [placa(-40, 14), ...furos]), CINZA_CLARO);
-parte('fundoGrade', placa(-95, -70), ESCURO);
+const placa = (nome, ate) => corpo(nome, { lado: rampa(-320, ate), perfil: perfil([[363, 58], ...VAO_GRADE]), planta: plantaTraseira(meiaCapo, 1400),
+  estacoes: [796, 806, 820, 850, 900, 950, 989] }, QUINAS);
+const furos = FUROS_GRADE.map((f) => extZ(f.map(([x, y]) => [x * MM, H(y)]), -1700, -2300));
+parte('grade', booleana('subtrair', [placa('grade', 14), ...furos]), CINZA_CLARO);
+parte('fundoGrade', placa('fundoGrade', -70), ESCURO);
 
 /* tampa: o painel central com a aba de trás ------------------------------------------------------------------------------------ */
 const meiaTampa = 101.5 * MM;
@@ -167,7 +171,9 @@ const bordaDaTampa = [0, 0.25, 0.5, 0.7, 0.85, 0.95, 1].map((f) => [f, 2142 - 75
 const plantaDaTampa = [[meiaTampa, -1490], ...[...bordaDaTampa].reverse().map(([f, z]) => [meiaTampa * f, -z]),
   ...bordaDaTampa.slice(1).map(([f, z]) => [-meiaTampa * f, -z]), [-meiaTampa, -1490]];
 const tampa = corpo('tampa', {
-  lado: lado('tampa', ([z, y]) => [z, y > 1140 ? 1150 : (y > 1100 && y < 1125 ? TOPO_CAPO : y)]),
+  /* a face de dentro da aba vai a z 1850, escondida no capô: com a aba de 23 a 80 mm de fundo o laço ficava curto, o recuo da planta
+     encolhia e a aba saía quase reta, sobrando para fora do laranja nos cantos */
+  lado: lado('tampa', ([z, y]) => [z > 1970 && z < 2065 && y < 1125 ? 1850 : z, y > 1140 ? 1150 : (y > 1100 && y < 1125 ? TOPO_CAPO : y)]),
   perfil: perfil(TAMPA), planta: plantaDaTampa,
   estacoes: [985, 1000, 1050, 1090, 1107, 1117, 1135, 1150],
 }, QUINAS);
