@@ -2,6 +2,11 @@
  * dois cubos, o eixo traseiro direcional com a viga, as mangas, os cubos e a barra de direção, e as quatro rodas (pneu e aro), sobre
  * a carcaça de `carcaca.esboco.mjs`. Rodado sozinho, monta a carcaça inteira mais estas partes.
  *
+ * A METADE DIANTEIRA MORA NAS RECEITAS DA ETAPA (2026-11-10): o eixo dianteiro com os cubos em `../partes/eixo-dianteiro/receita.js`
+ * (`montarEixoDianteiro`, a forma deste rascunho levada para lá sem mudança) e a roda dianteira em `../partes/roda-dianteira/receita.js`
+ * (`montarRodaDianteira`, pela família roda-pneu, com o ombro de 9 mm da família no lugar do arredondado deste rascunho). As medidas
+ * da metade dianteira abaixo ficam como registro da fonte; quem as usa são as receitas. A metade traseira continua aqui.
+ *
  * Eixos do modelo: x lateral (+x é a esquerda de quem dirige), y altura com o chão em 0, z comprimento com a frente em +z; o eixo
  * dianteiro em z 0 e o traseiro em z -1700.
  *
@@ -35,6 +40,8 @@
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a máquina 180 graus para os três quartos de trás. */
 import carcaca, { RODAS } from './carcaca.esboco.mjs';
 import { ferramentas, CINZA, CINZA_CLARO, ESCURO } from './carcaca-traseira.esboco.mjs';
+import { montarEixoDianteiro } from '../partes/eixo-dianteiro/receita.js';
+import { montarRodaDianteira, TABELA as RODA_DIANTEIRA } from '../partes/roda-dianteira/receita.js';
 
 const PRETO_PNEU = '#1a1b1d';
 const LADOS = 48;
@@ -42,9 +49,8 @@ const LADOS = 48;
 /* as rodas e os cubos, em mm (x é a distância ao centro da máquina) */
 /* o diâmetro e a posição de cada pneu vêm de `RODAS` da carcaça, que corta os poços por elas (a decisão da máquina inteira, de
    2026-11-10: a dianteira de 417 a 667 mm, a traseira de 445 a 653; ALINHAMENTO.md); o aro e o disco são daqui */
-export const RODA_D = { ...RODAS.dianteira, aro: 160, disco: [463, 478], furo: 55 };
+export const RODA_D = { ...RODAS.dianteira, aro: RODA_DIANTEIRA.diametroDoAro / 2 };
 export const RODA_T = { ...RODAS.traseira, aro: 120, disco: [550, 565], furo: 55 };
-const CHAPA = [266, 327];         // as chapas do chassi em x (PLACA de carcaca.esboco.mjs)
 
 /* A seção do pneu em [raio, a], com a de 0 (face de dentro) a b (face de fora): o talão no aro, o flanco abaulado e o ombro
    arredondado (raio de cerca de 55 mm) até a banda plana. A seção é a mesma nas duas rodas, levada ao raio de cada uma. */
@@ -84,29 +90,23 @@ export function montarEixosRodas(estado) {
   const par = (sel) => unir(sel, espelho(sel));
   const circulo = (cx, cy, r, n = 32) => Array.from({ length: n }, (_, k) => [cx + r * Math.cos(2 * Math.PI * k / n), cy + r * Math.sin(2 * Math.PI * k / n)]);
 
-  /* RODAS ------------------------------------------------------------------------------------------------------------------- */
-  for (const [nome, R] of [['Dianteiros', RODA_D], ['Traseiros', RODA_T]]) {
+  /* RODAS DIANTEIRAS: a receita da etapa (`../partes/roda-dianteira/receita.js`, família roda-pneu), uma de cada lado, com o meio do
+     pneu no meio da banda de `RODAS.dianteira`; o pneu e as partes de aço com os nomes deste rascunho */
+  const D = RODA_D;
+  const meioDaBanda = D.xDentro + D.banda / 2;
+  for (const lado of [1, -1]) {
+    montarRodaDianteira(estado, { centro: [lado * meioDaBanda, D.y, D.z], lado, nomes: { pneu: 'pneusDianteiros', aro: 'arosDianteiros', cubo: 'arosDianteiros', disco: 'arosDianteiros' } });
+  }
+  /* RODAS TRASEIRAS ---------------------------------------------------------------------------------------------------------- */
+  for (const [nome, R] of [['Traseiros', RODA_T]]) {
     const pneu = secaoDoPneu(R.raio, R.aro, R.banda).map(([r, a]) => [r, R.xDentro + a]);
     const aro = secaoDoAro(R.aro, R.banda, R.disco[0] - R.xDentro, R.disco[1] - R.xDentro, R.furo).map(([r, a]) => [r, R.xDentro + a]);
     parte(`pneus${nome}`, par(torno(pneu, R.y, R.z)), PRETO_PNEU);
     parte(`aros${nome}`, par(torno(aro, R.y, R.z)), CINZA_CLARO);
   }
 
-  /* EIXO DIANTEIRO ---------------------------------------------------------------------------------------------------------- */
-  /* a carcaça do eixo: o tubo de Ø 150 de flange a flange (404 mm) e o bojo do diferencial no meio. Passa pelo entalhe das chapas
-     do chassi (o contorno lateral `chassi` contorna o cubo: parede da frente em z 98 a 100, de y 338 a 426, e o teto do entalhe pelos
-     vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8)). O assento de cada lado, na espessura da chapa (266 a 327 mm, 4 mm para dentro de cada face), sobe do tubo até 0,5 mm desse
-     teto: é a face pela qual o eixo se apoia no chassi. Rente ao teto, a face inclinada coincidente saía no relato de contatos como
-     travessia (com a profundidade da caixa, 76 mm); com 0,5 mm sai como folga. */
-  const D = RODA_D;
-  const assento = [[30, 380], [72, 380], [72, 432.2], [60.5, 428.5], [30, 459.5]];
-  parte('eixoDianteiro', unir(
-    torno([[0, -404], [75, -404], [75, -190], [150, -120], [150, 120], [75, 190], [75, 404], [0, 404]], D.y, D.z),
-    extX(assento, CHAPA[0] + 4, CHAPA[1] - 4), extX(assento, -CHAPA[1] + 4, -CHAPA[0] - 4),
-  ), ESCURO);
-  /* o cubo: o flange de Ø 220 de 404 a 463 mm (o disco da roda assenta na face de fora dele) e a tampa de Ø 100 até 516 mm, que
-     passa pelo furo do disco */
-  parte('cubosDianteiros', par(torno([[0, 404], [110, 404], [110, D.disco[0]], [50, D.disco[0]], [50, 516], [0, 516]], D.y, D.z)), CINZA);
+  /* EIXO DIANTEIRO: a receita da etapa (`../partes/eixo-dianteiro/receita.js`), com a origem dela no centro do cubo dianteiro */
+  montarEixoDianteiro(estado, undefined, [0, D.y, D.z]);
 
   /* EIXO TRASEIRO ----------------------------------------------------------------------------------------------------------- */
   const T = RODA_T;

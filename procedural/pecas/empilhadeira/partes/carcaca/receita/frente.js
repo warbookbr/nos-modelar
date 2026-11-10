@@ -125,7 +125,10 @@ export function montarCarcaca(estado, T, contornos) {
   const PS = LA.peSobOContrapeso;
   const xT = T.rodas.traseira.xDentro;
   const peSobOContrapeso = extZ([[-xT, PS.y[0]], [xT, PS.y[0]], [xT, PS.y[1]], [-xT, PS.y[1]]], PS.z[0], PS.z[1]);
-  const laterais = cortar(unir(meio, ...frentes, aro), ...pocos(POCO_D), ...pocoTras, extX(FURO, FU.corte[0], FU.corte[1]), extZ(TUNEL, TU.z[0], TU.z[1]), peSobOContrapeso);
+  /* os dois cortes dos poços dianteiros ficam guardados na ordem em que nascem (o esquerdo, +x, e o direito): a parede de dentro de
+     cada poço é a face de onde a receita publica a passagem do eixo dianteiro, sem passo novo nem mudança de id */
+  let cortesDosPocos;
+  const laterais = cortar(unir(meio, ...frentes, aro), ...(cortesDosPocos = pocos(POCO_D)), ...pocoTras, extX(FURO, FU.corte[0], FU.corte[1]), extZ(TUNEL, TU.z[0], TU.z[1]), peSobOContrapeso);
   parte('laterais', laterais, COR.laranja);
   parte('furo', extX(FURO, FU.fundo[0], FU.fundo[1]), COR.escuro);
   parte('tunel', extZ(TUNEL, TU.z[0], TU.fundoAte), COR.escuro);
@@ -196,5 +199,5 @@ export function montarCarcaca(estado, T, contornos) {
   /* a traseira: capô, grade, tampa e contrapeso, com o poço da roda traseira no contrapeso */
   const RT = T.rodas.traseira;
   montarTraseira(estado, T, contornos, { pocoDaRoda: { z: RT.z, y: RT.y, r: RT.raio + T.folgaDoPoco, de: RT.xDentro - T.folgaDoPoco } });
-  return { PLACA, ABA, COLUNAS: W.colunas };
+  return { PLACA, ABA, COLUNAS: W.colunas, POCO_D, cortesDosPocos };
 }

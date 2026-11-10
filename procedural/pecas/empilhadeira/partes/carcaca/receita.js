@@ -18,8 +18,8 @@
  * comprimento com a frente em +z: o eixo dianteiro em z 0 e a traseira em z -2.186.
  *
  * A cadeia: a TABELA em mm; `derivar` monta os passos em mm (os módulos de `receita/`, que o rascunho da máquina inteira também usa);
- * `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. A forma não publica porta: as etapas
- * seguintes (eixos e rodas, torre, protetor, posto) ainda não têm receita. */
+ * `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só, e acrescenta no fim as portas de
+ * `portasDaCarcaca`, que não mudam a malha: hoje a passagem do eixo dianteiro entre as paredes dos poços (etapa do eixo dianteiro). */
 import { montarCarcaca } from './receita/frente.js';
 import { CONTORNOS_DA_LATERAL } from './receita/contornos-da-lateral.js';
 
@@ -304,9 +304,28 @@ export function montarCarcacaEmMm(estado, T = TABELA) {
   return montarCarcaca(estado, T, T.contornos);
 }
 
-/** Os PASSOS, em metro. */
+/** As portas da carcaça, em mm, publicadas depois de todos os passos de forma (não mudam a malha nem os ids).
+ *
+ *  passagemDoEixoDianteiro — cilindro interno no eixo dos cubos dianteiros (y e z de `rodas.dianteira`), com o raio do poço (o pneu
+ *  mais a folga), da parede de dentro do poço direito (x = -(xDentro - folga), a face que o corte do poço deixa na lateral) até a do
+ *  esquerdo: `fim` é a distância entre as duas paredes. É por ela que o eixo dianteiro entra na montagem: o vínculo leva a distância à
+ *  receita do eixo e a posição põe o tubo dele no mesmo eixo, com o giro pela `referencia` para cima. */
+export function portasDaCarcaca(T = TABELA) {
+  const { POCO_D, cortesDosPocos } = derivar(T).medidas;
+  return [
+    ['publicarPorta', {
+      id: 'passagemDoEixoDianteiro', de: { ...cortesDosPocos[1].origem, tampa: 'topo' },
+      interface: { forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], centro: [-POCO_D.de, POCO_D.y, POCO_D.z], raio: POCO_D.r, inicio: 0, fim: 2 * POCO_D.de, referencia: [0, 1, 0] },
+    }],
+  ];
+}
+const MEDIDAS_DA_PORTA = ['centro', 'raio', 'inicio', 'fim'];
+const portaEmMetro = ([op, { interface: I, ...resto }]) => [op, { ...resto, interface: Object.fromEntries(Object.entries(I).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
+
+/** Os PASSOS, em metro: os de forma e, no fim, as portas. */
 export function gerarPassos(T = TABELA) {
-  return derivar(T).passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);
+  const forma = derivar(T).passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);
+  return [...forma, ...portasDaCarcaca(T).map(portaEmMetro)];
 }
 
 /** Os pontos nomeados das gaiolas, em metro. */

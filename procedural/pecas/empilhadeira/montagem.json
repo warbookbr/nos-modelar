@@ -9,12 +9,203 @@
         "tipo": "peca",
         "ref": "empilhadeira/carcaca"
       }
+    },
+    {
+      "id": "eixoDianteiro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/eixo-dianteiro"
+      }
+    },
+    {
+      "id": "rodaDianteiraEsquerda",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-dianteira"
+      }
+    },
+    {
+      "id": "rodaDianteiraDireita",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-dianteira"
+      }
     }
   ],
-  "relacoes": [],
-  "etapas": [
-    "carcaca"
+  "relacoes": [
+    {
+      "id": "eixoNaPassagemDosPocos",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "passagemNoChassi"
+      },
+      "movel": {
+        "caminho": [
+          "carcaca"
+        ],
+        "porta": "passagemDoEixoDianteiro"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.3175,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    },
+    {
+      "id": "rodaDianteiraEsquerdaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaDianteiraEsquerda"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "cuboEsquerdo"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.045,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    },
+    {
+      "id": "rodaDianteiraDireitaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaDianteiraDireita"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "cuboDireito"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.045,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    }
   ],
-  "vinculos": [],
-  "posicoes": []
+  "etapas": [
+    "carcaca",
+    "eixoDianteiro",
+    "rodaDianteiraEsquerda",
+    "rodaDianteiraDireita"
+  ],
+  "vinculos": [
+    {
+      "id": "eixoEntreAsParedesDosPocos",
+      "alvo": {
+        "instancia": "eixoDianteiro",
+        "param": "entreAsParedes"
+      },
+      "de": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoDianteiro",
+        "medida": "fim"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    }
+  ],
+  "posicoes": [
+    {
+      "id": "eixoNaCarcaca",
+      "instancia": "eixoDianteiro",
+      "porta": "passagemNoChassi",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoDianteiro"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodaDianteiraEsquerdaNoCubo",
+      "instancia": "rodaDianteiraEsquerda",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoDianteiro",
+        "porta": "cuboEsquerdo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodaDianteiraDireitaNoCubo",
+      "instancia": "rodaDianteiraDireita",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoDianteiro",
+        "porta": "cuboDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    }
+  ],
+  "apoioNoChao": {
+    "plano": {
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "altura": 0
+    },
+    "toleranciaNumerica": 0.0005,
+    "apoiam": [
+      {
+        "caminho": [
+          "rodaDianteiraDireita"
+        ],
+        "parte": "pneu"
+      },
+      {
+        "caminho": [
+          "rodaDianteiraEsquerda"
+        ],
+        "parte": "pneu"
+      }
+    ]
+  }
 }
