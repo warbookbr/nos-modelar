@@ -18,7 +18,7 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a peça 180 graus para os três quartos de trás. */
 import {
-  ferramentas, montarTraseira, lado, LARANJA, CINZA_CLARO, CINZA, ESCURO,
+  ferramentas, montarTraseira, lado, LARANJA, CINZA, ESCURO,
 } from './carcaca-traseira.esboco.mjs';
 
 const ESCURO_PISO = '#34383c';   // o tapete do piso: cinza escuro, mais claro que o fundo da grade
@@ -63,8 +63,9 @@ parte('chassi', chassi, CINZA);
 
 /* paralamas: as duas abas e a faixa da frente. A aba é chapa de 37 mm (a lateral dá y 755 a 792): sai da silhueta lateral cruzada
    com a planta, e o canto da frente de fora, redondo na vista de cima (colunas 354 a 366 até a linha 135), tem raio 40 mm; o de
-   dentro, 15 mm. A faixa da frente fica a 42-74 mm à frente do eixo (colunas 388-396) e desce de 776 a 657 mm (linhas 360-384 da
-   vista de frente); vai até 330 mm para encostar nas abas. */
+   dentro, 15 mm. A faixa da frente desce de 776 a 657 mm (linhas 360-384 da vista de frente) e vai até 330 mm para encostar nas
+   abas. A vista de cima a põe 42-74 mm à frente do eixo (colunas 388-396), mas aí ela aparecia na lateral sob a aba, onde a referência
+   não tem nada (leitura da direita, rodada 1, B1); vale a lateral, e ela fica 13-45 mm atrás do eixo, atrás da frente das laterais. */
 const plantaAba = (s) => {
   const [a, b] = ABA; const zf = 188; const zt = -140;
   const p = [[a, zt], [b, zt], ...arco(b - 40, zf - 40, 40, 0, 90), ...arco(a + 15, zf - 15, 15, 90, 180)];
@@ -72,7 +73,7 @@ const plantaAba = (s) => {
 };
 const ladoAba = lado('paralama');
 const abas = [1, -1].map((s) => cruzar(extX(ladoAba, s > 0 ? ABA[0] - 1 : -ABA[1] - 1, s > 0 ? ABA[1] + 1 : -ABA[0] + 1), extY(plantaAba(s), 700, 840)));
-const faixa = extX([[42, 657], [74, 657], [74, 776], [42, 776]], -330, 330);
+const faixa = extX(L([[13, 657], [45, 657], [45, 776], [13, 776]]), -330, 330);
 parte('paralamas', unir(...abas, faixa), LARANJA);
 
 /* laterais: o corpo laranja do meio, a frente em volta da roda dianteira e o arco da roda traseira, numa malha só.
@@ -85,7 +86,10 @@ const frentes = [1, -1].map((s) => cruzar(
   extZ(s > 0 ? PERFIL_FRENTE : espelhoX(PERFIL_FRENTE), -460, 60),
 ));
 const plantaLateral = [[LATERAL_FRENTE, -400], [LATERAL_TRAS, -1520], [-LATERAL_TRAS, -1520], [-LATERAL_FRENTE, -400]];
-const meio = cruzar(extX(lado('lateral'), -620, 620), extY(plantaLateral, 150, 1000));
+/* o pé do corpo com o chanfro da caixa da frente (538 mm a 226 de altura): de frente o pé reto, a 583 mm, aparecia por fora e
+   abaixo da caixa, onde a referência não tem nada (leitura de frente, rodada 1, C1 e C4) */
+const PE_LATERAL = [[-600, 1000], [600, 1000], [600, 330], [538, 226], [518, 185], [-518, 185], [-538, 226], [-600, 330]];
+const meio = cruzar(extX(lado('lateral'), -620, 620), extY(plantaLateral, 150, 1000), extZ(PE_LATERAL, -1530, -390));
 const aro = extX(lado('aroTraseiro'), -LATERAL_TRAS, LATERAL_TRAS);
 /* o furo da tampa de combustível, só do lado +x: a elipse da lateral (z 1299-1450, y 704-882), 35 mm de fundo, com o fundo escuro */
 const FURO = circulo(-1375, 793, 1, 32).map(([z, y]) => [-1375 + (z + 1375) * 75, 793 + (y - 793) * 89]);
@@ -109,29 +113,38 @@ const painel = corpo('painel', {
     [-376, -404], [-440, -380], [-470, -345], [-488, -300], [-496, -250]],
   estacoes: [760, 764, 775, 800, 830, 860, 890, 905, 915],
 }, { vincos: [{ nome: 'base', laco: 'primeiro', nitidez: 'viva' }] });
-parte('painel', painel, CINZA);
+/* escuro como o tapete: a vista de cima o mostra escuro, com só a borda cinza (leitura de cima, rodada 1, C1 a C4), e a lateral também */
+parte('painel', painel, ESCURO_PISO);
 
 /* tampa do motor: a base do banco. Lateral `tampaMotor` sem o entalhe de trás (ali entra a coluna). Planta da vista de cima: o
    nariz redondo da frente, medido nas colunas 562 a 590 (meia largura de 52, 68, 85, 97, 103, 105,5, 111,5, 115,5, 120, 123,5 e 133
-   px de 2 em 2 px até 4 em 4 px), e a meia largura de 507 mm (linhas 161 a 428) daí para trás. De frente o topo tem o ombro redondo. */
+   px de 2 em 2 px até 4 em 4 px), e a meia largura de 507 mm (linhas 161 a 428) daí para trás. De frente o topo tem o ombro redondo.
+   A silhueta é a do contorno lateral com estas mudanças, da leitura da direita na rodada 1: o canto de cima da frente segue os pontos
+   do contorno (714, 968) e (730, 988), com laços a cada 15-25 mm ali, para não arredondar além da referência (A2); o pé desce 20 mm
+   para dentro do piso, para a subdivisão não abrir vão sob a frente (B2); e o encosto vai para trás até z 1335, dentro das colunas,
+   porque a divisa que a lateral mostra entre o encosto e a coluna é a frente da coluna, e com o encosto curto a subdivisão o
+   recolhia e a coluna aparecia à frente dele, em gancho (A3). */
 const NARIZ = [[0, 200], [8, 258], [16, 323], [24, 369], [32, 391], [40, 401], [56, 424], [73, 439], [89, 456], [105, 469], [130, 495], [160, 507]];
 const FRENTE_TM = -667; const TRAS_TM = -1335;
 const ladoNariz = NARIZ.map(([dz, w]) => [w, FRENTE_TM - dz]);
 const tampaMotor = corpo('tampaMotor', {
-  lado: L([[667, 769], [732, 734], [1044, 735], [1266, 906], [1290, 960], [1325, 1042], [1272, 1072], [1111, 1009], [745, 997], [672, 909]]),
-  perfil: [[734, 507], [960, 507], [1010, 495], [1050, 470], [1072, 440]],
+  lado: L([[667, 749], [732, 714], [1044, 715], [1238, 896], [1335, 915], [1335, 1060], [1272, 1072], [1230, 1052], [1172, 1026], [1111, 1009],
+    [789, 1002], [745, 997], [730, 988], [714, 968], [672, 909]]),
+  perfil: [[714, 507], [960, 507], [1010, 495], [1050, 470], [1072, 440]],
   planta: [[507, TRAS_TM], ...[...ladoNariz].reverse(), ...ladoNariz.slice(1).map(([x, z]) => [-x, z]), [-507, TRAS_TM]],
-  estacoes: [736, 745, 760, 790, 830, 870, 910, 950, 980, 997, 1010, 1025, 1040, 1055, 1068],
+  estacoes: [716, 730, 750, 780, 820, 860, 900, 930, 955, 975, 990, 1000, 1006, 1015, 1030, 1045, 1058, 1068],
 }, { vincos: [{ nome: 'base', laco: 'primeiro', nitidez: 'viva' },
   { nome: 'trasDir', entre: ['inicio', 'direita'], nitidez: 'viva' }, { nome: 'trasEsq', entre: ['esquerda', 'inicio'], nitidez: 'viva' }] });
-parte('tampaMotor', tampaMotor, CINZA_CLARO);
+/* cinza médio, o mesmo das colunas: assim nas vistas de cima e de frente (leituras da rodada 1, B2-B3 de cima e A2-A3 de frente) */
+parte('tampaMotor', tampaMotor, CINZA);
 
 /* colunas: o bloco atrás da tampa do motor, com a silhueta lateral `coluna` e a largura das colunas na vista de cima */
 parte('colunas', extX(lado('coluna'), -COLUNAS, COLUNAS), CINZA);
 
 /* o fundo do poço traseiro, escuro, entre as rodas de trás (lateral `pocoTraseiro`, z 1342-1645; na largura do protótipo, 360 mm
-   x 596,4/511) */
-parte('pocoTraseiro', extX(L([[1342, 240], [1342, 625], [1645, 625], [1645, 240]]), -420, 420), ESCURO);
+   x 596,4/511). Desce só até o pé do arco (y 428): abaixo dele a referência mostra a suspensão, que é de outra fatia, e o fundo
+   escuro até o chão aparecia na lateral (leitura da direita, rodada 1, C3). */
+parte('pocoTraseiro', extX(L([[1342, 428], [1342, 625], [1645, 625], [1645, 428]]), -420, 420), ESCURO);
 
 /* a traseira: capô, grade, tampa e contrapeso, do módulo dela */
 montarTraseira(estado);

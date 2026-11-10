@@ -143,10 +143,12 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   referência declaradas numa config; a skill `esbocar-opcoes` passa a citá-lo.
 - **T7, entregue.** `vista:rapida`: a imagem sombreada do rascunho tirada da
   malha, sem navegador, em 1 a 2 s por vista contra 60 s da captura; a imagem
-  que vai à pessoa continua saindo da bancada. Falta `conferir:vistas` usá-la.
-- **T8.** Resposta do crítico estruturada (o atributo, o que a referência tem e
-  o que o modelo tem), com a rodada que afirma da referência o oposto da
-  anterior acusada como contradição (item 11).
+  que vai à pessoa continua saindo da bancada. `conferir:vistas` a usa por
+  padrão e grava quatro vistas de três quartos por rodada (item 12).
+- **T8, entregue.** Resposta do crítico em campos (o atributo, o que a
+  referência tem e o que o modelo tem), com a rodada que afirma da referência
+  o oposto da anterior acusada como contradição, que quem conduz decide (item
+  11). A comparação é por palavras e não conhece sinônimo.
 - **T9, depois da junção com a main.** No módulo do esboço, que é território do
   plano de ferramentas de conferência e de vista: a opção só de passos crus
   montada uma vez em vez de duas, e o contato declarado nos passos crus, para o

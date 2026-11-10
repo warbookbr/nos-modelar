@@ -15,7 +15,7 @@
  * duas caixas sai no relato: como cada eixo é ajustado em separado, a desproporção do objeto inteiro só aparece nesse número.
  *
  * AS RODADAS. `--registrar=<respostas.json>` confere que toda região da grade tem resposta, `{ "igual": true }` ou
- * `{ "diferencas": ["forma: onde e o quê", "detalhe: ...", ...] }`, e grava `rodadas/rodada-NN.json`; região sem resposta, resposta vazia ou nome que não é
+ * `{ "diferencas": [{ "tipo": "forma", ... }, "detalhe: onde e o quê", ...] }`, e grava `rodadas/rodada-NN.json`; região sem resposta, resposta vazia ou nome que não é
  * da grade recusam a rodada com a lista. `aceitas: { "B1": ["..."] }` guarda a diferença que quem conduz decidiu não corrigir (o eixo
  * que não é da peça, o detalhe que fica para outra fatia), com o motivo, e o pedido seguinte a repete ao crítico naquela região.
  *
@@ -24,6 +24,31 @@
  * depois abaulado). Por isso cada diferença diz o tipo: `forma` (contorno, proporção, divisa entre materiais, volume) é o que quem
  * conduz confere contra as linhas do modelo e corrige; `detalhe` (friso, botão, relevo, grade) vai em lista à fatia de detalhe. O
  * pedido diz que região certa leva `igual`, e `--fora` escreve nele o que aparece na referência e não é da peça.
+ *
+ * A DIFERENÇA EM CAMPOS. Com frases livres, o que uma rodada diz não se compara com o que a outra disse. Por isso o pedido pede cada
+ * diferença como objeto, `{ "tipo": "forma" | "detalhe", "onde": "embaixo, à esquerda", "atributo": "canto de baixo do laranja",
+ * "referencia": "abaulado", "modelo": "vivo" }`, em que `atributo` nomeia a coisa (uma borda, um canto, uma divisa, uma largura) e
+ * `referencia` e `modelo` dizem como ela é em cada um. Os cinco campos são texto não vazio de até `LIMITE_DO_CAMPO` caracteres, o
+ * `tipo` é da lista `TIPOS`, e campo a mais ou a menos recusa a rodada com a região e o campo. A frase antiga, que começa por
+ * `forma:` ou `detalhe:`, continua aceita como antes, e o registro conta quantas diferenças vieram de cada jeito.
+ *
+ * A CONTRADIÇÃO ENTRE RODADAS. O rascunho muda de uma rodada para a outra; a referência não. No registro, cada diferença em campos é
+ * comparada com a última diferença em campos sobre o mesmo atributo, na mesma região, das rodadas anteriores da pasta; se o que a
+ * rodada nova diz da referência difere do que a anterior dizia, a rodada grava `contradicoes: [{ regiao, atributo, antes, agora,
+ * rodadaAnterior }]`, o comando as lista e a próxima ação manda quem conduz olhar a folha daquela região e decidir qual das duas
+ * leituras vale, em `aceitas` ou em `decididas: { "<região>": [{ "atributo", "vale", "motivo" }] }` nas respostas seguintes. A
+ * ferramenta só acusa e não escolhe porque não sabe o que a referência mostra: escolher a mais nova, a mais repetida ou a que bate com
+ * o rascunho seria julgar a forma por quem falou por último ou mais vezes, e quem sabe é quem olha a folha. A contradição não recusa a
+ * rodada, porque as outras regiões dela continuam valendo. Um atributo decidido numa região (em `decididas` desta rodada ou de uma
+ * anterior, ou numa frase de `aceitas` daquela região que contém todas as palavras significativas dele) não volta a ser acusado ali;
+ * para reabrir, quem conduz tira a decisão.
+ *
+ * A REGRA DE COMPARAÇÃO. Dois textos (dois atributos, ou duas leituras da referência) são o mesmo quando têm o mesmo conjunto de
+ * palavras significativas: o texto vai a minúsculas, perde os acentos e a pontuação, é cortado em palavras e perde as de `VAZIAS`
+ * (artigos, preposições e suas contrações, `e`, `ou`, `que`). Assim "O canto de baixo do Laranja" é o mesmo atributo que "canto de
+ * baixo, laranja", e "Vivo" é a mesma leitura que "vivo". A regra não conhece sinônimo, plural nem flexão: "canto inferior do
+ * laranja" não cruza com "canto de baixo do laranja" (a contradição entre os dois passa), e "redondo" contra "arredondado" é acusado
+ * como contradição sem ser. O primeiro limite deixa passar; o segundo custa uma decisão de quem conduz e nada mais.
  *
  * AS LINHAS DO MODELO. A linha suave dentro de uma cor (um friso, uma onda) o crítico toma por luz: a listra do capô passou. Com
  * `--linhas=<png>`, o desenho de `npm run linhas:modelo` (o contorno, a divisa, a quina e a dobra, tirados da malha na mesma vista)
@@ -49,6 +74,11 @@ export const AMPLIACAO = 8;       // px da folha por px da referência
 export const REGIOES_POR_FOLHA = 3;
 export const LIMITE_DA_FRASE = 240;
 export const TIPOS = Object.freeze(['forma', 'detalhe']);
+export const LIMITE_DO_CAMPO = 80; // caracteres de cada campo da diferença em objeto: poucas palavras, não uma frase
+export const CAMPOS_DA_DIFERENCA = Object.freeze(['tipo', 'onde', 'atributo', 'referencia', 'modelo']);
+/* as palavras que não contam na comparação de atributo e de leitura, já sem acento */
+export const VAZIAS = Object.freeze(new Set(['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na',
+  'nos', 'nas', 'num', 'numa', 'ao', 'aos', 'com', 'por', 'pelo', 'pela', 'pelos', 'pelas', 'para', 'pra', 'e', 'ou', 'que']));
 const LETRAS = 'ABCDEFGHIJKL';
 const AZUL = [0, 90, 255]; const PRETO = [20, 20, 20]; const BRANCO = [255, 255, 255];
 
@@ -284,12 +314,16 @@ ${linhas ? `4. No painel LINHAS: cada linha colorida do modelo tem debaixo dela 
 Responda com um JSON e nada mais, com TODAS as regiões:
 
 \`\`\`json
-{ "regioes": { "${nomes[0]}": { "igual": true }, "${nomes[1] ?? nomes[0]}": { "diferencas": ["forma: em cima, à direita, o canto do vão é redondo na referência e chanfrado no rascunho"] } },
+{ "regioes": { "${nomes[0]}": { "igual": true }, "${nomes[1] ?? nomes[0]}": { "diferencas": [
+    { "tipo": "forma", "onde": "em cima, à direita", "atributo": "canto do vão", "referencia": "redondo", "modelo": "chanfrado" } ] } },
   "graves": ["as três diferenças mais graves da vista inteira, uma frase cada"] }
 \`\`\`
 
-Cada diferença é uma frase de até ${LIMITE_DA_FRASE} caracteres que começa por \`forma:\` ou \`detalhe:\` e diz ONDE na região (em cima, embaixo,
-à esquerda, à direita, no centro) e O QUE difere. \`forma\` é o contorno, a proporção, a posição e a forma da divisa entre materiais e
+Cada diferença é um objeto com os cinco campos, cada um com até ${LIMITE_DO_CAMPO} caracteres: \`tipo\` é \`forma\` ou \`detalhe\`; \`onde\` diz o
+lugar na região (em cima, embaixo, à esquerda, à direita, no centro); \`atributo\` nomeia a coisa que difere (uma borda, um canto, uma
+divisa, uma largura), sempre com o mesmo nome para a mesma coisa; \`referencia\` e \`modelo\` dizem, em poucas palavras, como ela é em
+cada um. \`referencia\` e \`modelo\` vão separados porque a referência não muda de uma rodada para a outra, e o que você diz dela é
+comparado com o que se disse nas rodadas anteriores. \`forma\` é o contorno, a proporção, a posição e a forma da divisa entre materiais e
 o volume de uma parte; \`detalhe\` é o que cabe dentro de uma parte sem mudar o contorno dela: friso, botão, relevo, grade, furo. Liste só
 o que você vê com segurança, as de forma primeiro, no máximo três por região; a região sem diferença leva \`{ "igual": true }\`, e
 é isso que se espera de uma região certa.
@@ -311,18 +345,89 @@ export function conferirRespostas(regioes, respostas) {
     if (r.igual === true && (lista == null || lista.length === 0)) { iguais.push(nome); continue; }
     if (!Array.isArray(lista) || lista.length === 0) { recusas.push(`a região ${nome} não diz "igual": true nem lista diferenças`); continue; }
     if (r.igual === true) { recusas.push(`a região ${nome} diz "igual": true e lista diferenças`); continue; }
-    const ruim = lista.find((d) => typeof d !== 'string' || !d.trim() || d.length > LIMITE_DA_FRASE);
+    const frases = lista.filter((d) => !ehObjeto(d));
+    const ruim = frases.find((d) => typeof d !== 'string' || !d.trim() || d.length > LIMITE_DA_FRASE);
     if (ruim !== undefined) { recusas.push(`a região ${nome} tem uma diferença vazia ou com mais de ${LIMITE_DA_FRASE} caracteres`); continue; }
-    const semTipo = lista.find((d) => !TIPOS.some((t) => d.startsWith(`${t}:`)));
+    const semTipo = frases.find((d) => !TIPOS.some((t) => d.startsWith(`${t}:`)));
     if (semTipo !== undefined) { recusas.push(`a região ${nome} tem uma diferença que não começa por ${TIPOS.map((t) => `"${t}:"`).join(' ou ')}`); continue; }
+    const erroDoObjeto = lista.map((d, i) => (ehObjeto(d) ? erroDaDiferenca(d, nome, i + 1) : null)).find(Boolean);
+    if (erroDoObjeto) { recusas.push(erroDoObjeto); continue; }
     comDiferenca.push(nome); diferencas += lista.length;
-    for (const t of TIPOS) porTipo[t] += lista.filter((d) => d.startsWith(`${t}:`)).length;
+    for (const t of TIPOS) porTipo[t] += lista.filter((d) => tipoDa(d) === t).length;
   }
   for (const [n, v] of Object.entries(respostas.aceitas ?? {})) {
     if (!nomes.has(n)) recusas.push(`"aceitas" cita a região "${n}", que não é da grade`);
     else if (!Array.isArray(v) || v.some((d) => typeof d !== 'string' || !d.trim())) recusas.push(`"aceitas" da região ${n} precisa ser uma lista de frases com o motivo`);
   }
+  const decididas = respostas.decididas ?? {};
+  if (typeof decididas !== 'object' || Array.isArray(decididas)) recusas.push('"decididas" precisa ser { "<região>": [{ "atributo", "vale", "motivo" }] }');
+  else for (const [n, v] of Object.entries(decididas)) {
+    if (!nomes.has(n)) { recusas.push(`"decididas" cita a região "${n}", que não é da grade`); continue; }
+    if (!Array.isArray(v)) { recusas.push(`"decididas" da região ${n} precisa ser uma lista de { "atributo", "vale", "motivo" }`); continue; }
+    v.forEach((d, i) => {
+      const falta = ['atributo', 'vale', 'motivo'].find((c) => !ehObjeto(d) || typeof d[c] !== 'string' || !d[c].trim());
+      if (falta) recusas.push(`"decididas" da região ${n}, item ${i + 1}: o campo "${falta}" precisa ser texto não vazio`);
+    });
+  }
   return { recusas, iguais, comDiferenca, diferencas, porTipo };
+}
+
+const ehObjeto = (d) => d != null && typeof d === 'object' && !Array.isArray(d);
+/** O tipo de uma diferença, em frase (`forma: ...`) ou em objeto. */
+export const tipoDa = (d) => (ehObjeto(d) ? d.tipo : TIPOS.find((t) => String(d).startsWith(`${t}:`)));
+/** A primeira coisa errada de uma diferença em objeto, com a região e o campo, ou null. */
+function erroDaDiferenca(d, regiao, indice) {
+  const aqui = `a região ${regiao}, diferença ${indice}`;
+  const sobra = Object.keys(d).find((c) => !CAMPOS_DA_DIFERENCA.includes(c));
+  if (sobra) return `${aqui}: o campo "${sobra}" não é do formato (${CAMPOS_DA_DIFERENCA.join(', ')})`;
+  for (const c of CAMPOS_DA_DIFERENCA) {
+    if (d[c] == null) return `${aqui}: falta o campo "${c}"`;
+    if (typeof d[c] !== 'string' || !d[c].trim()) return `${aqui}: o campo "${c}" precisa ser texto não vazio`;
+    if (d[c].length > LIMITE_DO_CAMPO) return `${aqui}: o campo "${c}" passa de ${LIMITE_DO_CAMPO} caracteres`;
+  }
+  if (!TIPOS.includes(d.tipo)) return `${aqui}: o campo "tipo" vale "${d.tipo}" e precisa ser ${TIPOS.map((t) => `"${t}"`).join(' ou ')}`;
+  return null;
+}
+
+/** As palavras significativas de um texto: minúsculas, sem acento nem pontuação, sem as de `VAZIAS`. Ver A REGRA DE COMPARAÇÃO. */
+export function palavras(texto) {
+  const p = String(texto).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').split(/[^a-z0-9]+/).filter((w) => w && !VAZIAS.has(w));
+  return new Set(p);
+}
+/** Dois textos dizem o mesmo quando têm o mesmo conjunto de palavras significativas, e nenhum deles fica vazio. */
+export function mesmoTexto(a, b) {
+  const x = palavras(a); const y = palavras(b);
+  return x.size > 0 && x.size === y.size && [...x].every((w) => y.has(w));
+}
+const contemTexto = (frase, atributo) => { const f = palavras(frase); const a = palavras(atributo); return a.size > 0 && [...a].every((w) => f.has(w)); };
+
+/**
+ * As contradições de uma rodada nova contra as anteriores: para cada diferença em objeto, a última diferença em objeto sobre o mesmo
+ * atributo na mesma região, nas rodadas anteriores (da mais nova para a mais velha), e a contradição quando o que elas dizem da
+ * referência difere. O atributo decidido naquela região, em `decididas` ou em `aceitas`, desta rodada ou de uma anterior, não é acusado.
+ * @param {{ regioes: object, aceitas?: object, decididas?: object }} respostas  as respostas da rodada nova, já conferidas
+ * @param {{ numero: number, regioes: object, aceitas?: object, decididas?: object }[]} anteriores  as rodadas gravadas, em ordem
+ * @returns {{ regiao: string, atributo: string, antes: string, agora: string, rodadaAnterior: number }[]}
+ */
+export function acharContradicoes(respostas, anteriores) {
+  const todas = [...anteriores, respostas];
+  const decidido = (regiao, atributo) => todas.some((r) => (r.decididas?.[regiao] ?? []).some((d) => mesmoTexto(d.atributo, atributo))
+    || (r.aceitas?.[regiao] ?? []).some((f) => contemTexto(f, atributo)));
+  const contradicoes = [];
+  for (const [regiao, resposta] of Object.entries(respostas.regioes ?? {})) {
+    for (const d of (resposta.diferencas ?? []).filter(ehObjeto)) {
+      if (decidido(regiao, d.atributo)) continue;
+      let anterior = null;
+      for (let k = anteriores.length - 1; k >= 0 && !anterior; k -= 1) {
+        const achada = (anteriores[k].regioes?.[regiao]?.diferencas ?? []).filter(ehObjeto).find((x) => mesmoTexto(x.atributo, d.atributo));
+        if (achada) anterior = { numero: anteriores[k].numero, referencia: achada.referencia };
+      }
+      if (anterior && !mesmoTexto(anterior.referencia, d.referencia)) {
+        contradicoes.push({ regiao, atributo: d.atributo, antes: anterior.referencia, agora: d.referencia, rodadaAnterior: anterior.numero });
+      }
+    }
+  }
+  return contradicoes;
 }
 
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
@@ -332,7 +437,8 @@ const AJUDA = `npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x
 npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
 
 Corta a referência e a captura do rascunho na mesma grade e grava indice.png, folha-NN.png, pedido.md e leitura.json.
---registrar confere que toda região tem resposta e grava rodadas/rodada-NN.json.`;
+--registrar confere que toda região tem resposta, grava rodadas/rodada-NN.json e acusa o que a rodada diz da referência ao contrário
+de uma rodada anterior, na mesma região e sobre o mesmo atributo.`;
 
 const numeros = (texto, n, nome) => {
   const v = String(texto).split(',').map(Number);
@@ -344,6 +450,9 @@ const ultimaRodada = (pasta) => {
   const nomes = existsSync(dir) ? readdirSync(dir).filter((f) => /^rodada-\d+\.json$/.test(f)).sort() : [];
   return { dir, numero: nomes.length, ultima: nomes.length ? JSON.parse(readFileSync(join(dir, nomes[nomes.length - 1]), 'utf8')) : null };
 };
+/* as rodadas gravadas na pasta, em ordem, cada uma com o número tirado do nome do arquivo */
+const rodadasAnteriores = (dir) => (existsSync(dir) ? readdirSync(dir).filter((f) => /^rodada-\d+\.json$/.test(f)).sort() : [])
+  .map((f) => ({ ...JSON.parse(readFileSync(join(dir, f), 'utf8')), numero: Number(/\d+/.exec(f)[0]) }));
 
 /**
  * Grava a leitura montada por `montarLeitura` na pasta: `indice.png`, `folha-NN.png`, `pedido.md` (com as aceitas da última rodada
@@ -372,12 +481,22 @@ export function executar(argv) {
       const r = conferirRespostas(leitura.regioes, respostas);
       if (r.recusas.length) return { codigo: 1, stdout: '', stderr: `rodada recusada:\n${r.recusas.map((x) => `- ${x}`).join('\n')}\n` };
       const { dir, numero } = ultimaRodada(pasta);
+      const anteriores = rodadasAnteriores(dir);
+      const contradicoes = acharContradicoes(respostas, anteriores);
+      const dadas = r.comDiferenca.flatMap((n) => respostas.regioes[n].diferencas);
+      const estruturadas = dadas.filter(ehObjeto).length; const emFrase = dadas.length - estruturadas;
       mkdirSync(dir, { recursive: true });
       const arquivo = join(dir, `rodada-${String(numero + 1).padStart(2, '0')}.json`);
-      writeFileSync(arquivo, `${JSON.stringify({ formato: 'modelar.leitura-por-regioes.rodada@1', captura: leitura.captura, iguais: r.iguais, comDiferenca: r.comDiferenca, diferencas: r.diferencas, porTipo: r.porTipo, regioes: respostas.regioes, graves: respostas.graves ?? [], aceitas: respostas.aceitas ?? {} }, null, 1)}\n`);
-      const linhas = r.comDiferenca.flatMap((n) => respostas.regioes[n].diferencas.map((d) => `  ${n}: ${d}`));
-      const proxima = r.porTipo.forma ? 'confira cada diferença de forma contra as linhas do modelo, corrija ou aceite com o motivo em "aceitas", e rode a leitura de novo sobre a captura nova' : (r.diferencas ? 'só restam detalhes: leve a imagem à pessoa com a lista deles' : 'nenhuma diferença: leve a imagem à pessoa');
-      return { codigo: 0, stdout: `rodada ${numero + 1}: ${r.iguais.length} regiões iguais, ${r.comDiferenca.length} com diferença, ${r.porTipo.forma} de forma e ${r.porTipo.detalhe} de detalhe\n${linhas.join('\n')}${linhas.length ? '\n' : ''}próxima ação: ${proxima}\n${arquivo}\n`, stderr: '' };
+      writeFileSync(arquivo, `${JSON.stringify({ formato: 'modelar.leitura-por-regioes.rodada@1', captura: leitura.captura, iguais: r.iguais, comDiferenca: r.comDiferenca, diferencas: r.diferencas, porTipo: r.porTipo, estruturadas, emFrase, regioes: respostas.regioes, graves: respostas.graves ?? [], aceitas: respostas.aceitas ?? {}, decididas: respostas.decididas ?? {}, contradicoes }, null, 1)}\n`);
+      const linhas = r.comDiferenca.flatMap((n) => respostas.regioes[n].diferencas.map((d) => `  ${n}: ${ehObjeto(d) ? `${d.tipo}: ${d.onde}, ${d.atributo}: ${d.referencia} na referência, ${d.modelo} no rascunho` : d}`));
+      const folhaDe = (n) => String(leitura.regioes.find((x) => x.nome === n)?.folha ?? 1).padStart(2, '0');
+      const linhasDaContradicao = contradicoes.map((c) => `  ${c.regiao} (folha-${folhaDe(c.regiao)}.png), ${c.atributo}: a rodada ${c.rodadaAnterior} disse "${c.antes}" da referência e esta diz "${c.agora}"`);
+      const corrigir = r.porTipo.forma ? 'confira cada diferença de forma contra as linhas do modelo, corrija ou aceite com o motivo em "aceitas", e rode a leitura de novo sobre a captura nova' : (r.diferencas ? 'só restam detalhes: leve a imagem à pessoa com a lista deles' : 'nenhuma diferença: leve a imagem à pessoa');
+      const proxima = contradicoes.length
+        ? `antes de corrigir, olhe a folha de cada região com contradição (${[...new Set(contradicoes.map((c) => `${c.regiao} na folha-${folhaDe(c.regiao)}.png`))].join(', ')}) e decida qual das duas leituras da referência vale, registrando nas respostas da rodada seguinte em "aceitas" ou em "decididas": { "<região>": [{ "atributo", "vale", "motivo" }] }; depois, ${corrigir}`
+        : corrigir;
+      const contra = contradicoes.length ? `contradições com rodadas anteriores sobre a referência: ${contradicoes.length}\n${linhasDaContradicao.join('\n')}\n` : '';
+      return { codigo: 0, stdout: `rodada ${numero + 1}: ${r.iguais.length} regiões iguais, ${r.comDiferenca.length} com diferença, ${r.porTipo.forma} de forma e ${r.porTipo.detalhe} de detalhe; ${estruturadas} em campos e ${emFrase} em frase\n${linhas.join('\n')}${linhas.length ? '\n' : ''}${contra}próxima ação: ${proxima}\n${arquivo}\n`, stderr: '' };
     }
     for (const n of ['referencia', 'caixa-ref', 'captura']) if (!valor(n)) throw new ErroDaLeitura(`falta --${n}`);
     const grade = valor('grade') ? valor('grade').split('x').map(Number) : GRADE_PADRAO;

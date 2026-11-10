@@ -98,6 +98,11 @@ processo o teria pego sozinho e o destino.
    dizer o tipo (`forma` ou `detalhe`), o comando conta as duas em separado e só manda corrigir a de forma; o pedido
    diz que região certa leva `igual` e `--fora` escreve nele o que não é da peça. A conferência de cada diferença de
    forma contra as linhas é de quem conduz, e o que ficar aceito leva o motivo.
+   Depois a diferença passou a poder vir em campos (o atributo, como ele é na referência, como é no modelo), e o
+   registro acusa a contradição: a referência não muda entre rodadas, e a rodada que diz dela o oposto da anterior,
+   na mesma região e sobre o mesmo atributo, sai listada para quem conduz decidir. O canto de baixo do laranja da
+   região B1, passado a campos, é acusado. A comparação é por palavras: "canto inferior" não cruza com "canto de
+   baixo", e essa contradição passaria.
 12. **A moldura da grade e a aba da tampa sobravam para fora do laranja nos cantos.** O capô acompanha a curva da planta
    e a moldura tinha voltado a ser reta de lado a lado (extrusão cruzada com a rampa), e a aba da tampa, com 23 a 80 mm
    de fundo, caía no laço curto de `lacosPelasVistas`, em que o recuo da planta encolhe até caber. De trás as duas

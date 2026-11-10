@@ -1,11 +1,12 @@
 /* conferir-vistas.test.mjs — a rodada de conferência sobre uma cena sintética, sem navegador: dois cubos de cores diferentes lado a
-   lado, uma referência em PNG com as mesmas duas cores e a divisa deslocada, a config e a rodada com --sem-captura. */
+   lado, uma referência em PNG com as mesmas duas cores e a divisa deslocada, a config e a rodada, com a captura pela vista rápida (o
+   padrão) e sem captura. */
 import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lerArquivoDeEsboco, montarOpcoes } from './esboco-nucleo.mjs';
-import { imagem, paraPng } from './leitura-por-regioes.mjs';
+import { dePng, imagem, paraPng } from './leitura-por-regioes.mjs';
 import { executar } from './conferir-vistas.mjs';
 
 const LARANJA = [226, 100, 30]; const CINZA = [107, 112, 116];
@@ -36,6 +37,11 @@ function contando() {
   return { conta, deps: { lerArquivoDeEsboco, montarOpcoes: (...a) => { conta.montagens += 1; return montarOpcoes(...a); } } };
 }
 const rodar = (saida, cfg = CONFIG, extra = [], deps = undefined) => executar([esboco, `--config=${config(`${saida}.json`, cfg)}`, `--saida=${join(pasta, saida)}`, '--sem-captura', ...extra], deps);
+/* a rodada com o padrão; a captura pela bancada, se fosse chamada, derrubaria o teste */
+const semNavegador = () => { const conta = { bancada: 0 }; return { conta, deps: { lerArquivoDeEsboco, montarOpcoes, capturarLadoALado: () => { conta.bancada += 1; throw new Error('o navegador não pode ser chamado'); } } }; };
+const rodarPadrao = (saida, cfg = CONFIG, extra = [], deps = semNavegador().deps) => executar([esboco, `--config=${config(`${saida}.json`, cfg)}`, `--saida=${join(pasta, saida)}`, ...extra], deps);
+const lerArvore = (dir) => Object.fromEntries(readdirSync(dir, { recursive: true }).sort().filter((f) => /\.(png|json|md)$/.test(f)).map((f) => [f, readFileSync(join(dir, f)).toString('base64')]));
+const TRES = ['frente-direita', 'frente-esquerda', 'tras-direita', 'tras-esquerda'];
 
 describe('conferir vistas', () => {
   it('monta a opção uma vez, grava os arquivos de cada vista e põe em primeiro a região da divisa deslocada', async () => {
@@ -87,12 +93,72 @@ describe('conferir vistas', () => {
     expect(existsSync(join(pasta, 'sobra-folga', 'sobra'))).toBe(false);
   });
 
-  it('a saída é igual a cada execução', async () => {
-    const ler = (dir) => Object.fromEntries(readdirSync(dir, { recursive: true }).sort().filter((f) => /\.(png|json|md)$/.test(f)).map((f) => [f, readFileSync(join(dir, f)).toString('base64')]));
-    await rodar('repetida'); const um = ler(join(pasta, 'repetida'));
-    await rodar('repetida'); const dois = ler(join(pasta, 'repetida'));
-    expect(Object.keys(um).length).toBeGreaterThan(10);
+  it('a saída é igual a cada execução, com o padrão e sem captura', async () => {
+    await rodarPadrao('repetida'); const um = lerArvore(join(pasta, 'repetida'));
+    await rodarPadrao('repetida'); const dois = lerArvore(join(pasta, 'repetida'));
+    expect(Object.keys(um)).toContain('frontal/captura.png'); expect(Object.keys(um)).toContain('tres-quartos/tras-esquerda.png');
     expect(dois).toEqual(um);
+    await rodar('repetida-sem'); const tres = lerArvore(join(pasta, 'repetida-sem'));
+    await rodar('repetida-sem'); expect(lerArvore(join(pasta, 'repetida-sem'))).toEqual(tres);
+    expect(Object.keys(tres).length).toBeGreaterThan(10);
+  });
+
+  it('por padrão tira a captura de cada vista da vista rápida, sem navegador, e a leitura a aceita', async () => {
+    const { conta, deps } = semNavegador();
+    const dupla = { ...CONFIG, vistas: { ...CONFIG.vistas, traseira: { referencia: 'ref-tras.png', caixaRef: [10, 10, 210, 110], grade: [2, 2] } } };
+    const r = await rodarPadrao('rapida', dupla, [], deps);
+    expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
+    expect(conta.bancada).toBe(0);
+    const resumo = JSON.parse(readFileSync(join(pasta, 'rapida', 'resumo.json'), 'utf8'));
+    expect(resumo.captura).toBe('rapida');
+    const md = readFileSync(join(pasta, 'rapida', 'resumo.md'), 'utf8');
+    for (const v of ['frontal', 'traseira']) {
+      const dir = join(pasta, 'rapida', v);
+      const captura = dePng(readFileSync(join(dir, 'captura.png')));
+      const linhas = dePng(readFileSync(join(dir, 'linhas.png')));
+      expect(captura.largura).toBe(CONFIG.largura);
+      expect(Buffer.from(captura.dados).equals(Buffer.from(linhas.dados))).toBe(false);
+      expect(resumo.vistas[v].captura).toEqual({ feita: true, origem: 'rapida', arquivo: `${v}/captura.png` });
+      /* a leitura leu a captura, e não o desenho das linhas, e achou nela o objeto com a proporção dos cubos (100 por 200 mm) */
+      const leitura = JSON.parse(readFileSync(join(dir, 'leitura.json'), 'utf8'));
+      expect(leitura.captura).toBe(`${v}/captura.png`);
+      expect(leitura.proporcao.rascunho).toBeCloseTo(0.5, 1);
+      expect(readFileSync(join(dir, 'pedido.md'), 'utf8')).not.toContain('não houve captura com luz');
+      expect(md).toContain(`O rascunho com luz está em ${join(dir, 'captura.png')}; ele saiu da vista rápida`);
+    }
+    expect(md).not.toContain('sem o rascunho com luz');
+    expect(r.stdout).toContain('vista frontal: com captura (rapida)');
+    expect(r.stdout).toMatch(/tempo: \d+\.\d s, dos quais \d+\.\d s de montagem/);
+  });
+
+  it('grava as quatro vistas de três quartos e as cita no resumo, e "tresQuartos": false as desliga', async () => {
+    expect((await rodarPadrao('tres')).codigo).toBe(0);
+    const md = readFileSync(join(pasta, 'tres', 'resumo.md'), 'utf8');
+    const resumo = JSON.parse(readFileSync(join(pasta, 'tres', 'resumo.json'), 'utf8'));
+    expect(resumo.tresQuartos.map((t) => t.nome)).toEqual(TRES);
+    expect(md).toContain('só aparece na vista vizinha');
+    const imagens = TRES.map((n) => { const arq = join(pasta, 'tres', 'tres-quartos', `${n}.png`); expect(md).toContain(arq); return readFileSync(arq).toString('base64'); });
+    /* de frente pela direita e de trás pela esquerda os dois cubos trocam de lado: as quatro imagens são diferentes */
+    expect(new Set(imagens).size).toBe(4);
+    expect((await rodarPadrao('tres-nao', { ...CONFIG, tresQuartos: false })).codigo).toBe(0);
+    expect(existsSync(join(pasta, 'tres-nao', 'tres-quartos'))).toBe(false);
+    expect(readFileSync(join(pasta, 'tres-nao', 'resumo.md'), 'utf8')).not.toContain('Três quartos');
+    expect(JSON.parse(readFileSync(join(pasta, 'tres-nao', 'resumo.json'), 'utf8')).tresQuartos).toEqual([]);
+    const ruim = await rodarPadrao('tres-ruim', { ...CONFIG, tresQuartos: 'sim' });
+    expect(ruim.codigo).toBe(2); expect(ruim.stderr).toContain('tresQuartos: espera true ou false');
+  });
+
+  it('--captura=nenhuma e --sem-captura dão o mesmo, e valor ruim de --captura é recusado', async () => {
+    const cfg = config('nenhuma.json', CONFIG); const saida = join(pasta, 'nenhuma');
+    expect((await executar([esboco, `--config=${cfg}`, `--saida=${saida}`, '--captura=nenhuma'])).codigo).toBe(0);
+    const um = lerArvore(saida);
+    expect(Object.keys(um).some((f) => f.endsWith('captura.png'))).toBe(false);
+    expect((await executar([esboco, `--config=${cfg}`, `--saida=${saida}`, '--sem-captura'])).codigo).toBe(0);
+    expect(lerArvore(saida)).toEqual(um);
+    expect(JSON.parse(readFileSync(join(saida, 'resumo.json'), 'utf8')).vistas.frontal.captura).toEqual({ feita: false, motivo: 'a rodada pediu --captura=nenhuma' });
+    const ruim = await executar([esboco, `--config=${cfg}`, `--saida=${saida}`, '--captura=chromium']);
+    expect(ruim.codigo).toBe(2); expect(ruim.stderr).toContain('--captura espera rapida, bancada, nenhuma e veio "chromium"');
+    expect((await executar([esboco, `--config=${cfg}`, `--saida=${saida}`, '--captura=rapida', '--sem-captura'])).codigo).toBe(2);
   });
 
   it('filtra as vistas e repassa o registro à leitura da vista', async () => {
