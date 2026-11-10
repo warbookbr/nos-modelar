@@ -100,3 +100,7 @@ processo o teria pego sozinho e o destino.
    para dentro do capô, para o laço não ficar curto. O processo não pegaria: a leitura por regiões confere uma vista
    por vez, e o que avança ou recua para o observador só aparece na vista vizinha. Toda parte lida numa vista passa a
    ser lida também na vista de cima ou de lado, pelas linhas do modelo, antes de ir à pessoa.
+   Em seguida entrou `npm run sobra:partes` (`tools/modelar/sobra-entre-partes.mjs`), que mede em cada vista quanto de
+   uma parte aparece fora do contorno da que a contém: na traseira antiga dá 29,4 mm da moldura na vista de cima, e na
+   corrigida, zero. Na mesma rodada acusou 40,7 mm da moldura para trás do capô na vista de lado, que ninguém tinha
+   visto (a referência mostra até uns 25 mm), e a ponta de baixo da rampa da grade foi recuada.

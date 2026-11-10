@@ -132,8 +132,9 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
 - **T3.** Casamento de linhas: a distância de cada linha do modelo à divisa de
   classes mais próxima da referência, e a divisa sem linha; confirma ou derruba
   por número a diferença de forma do crítico.
-- **T4.** `sobra:partes`: quanto de uma parte aparece fora do contorno da parte
-  que a contém em cada vista, com a relação declarada por quem conduz (item 12).
+- **T4, entregue.** `sobra:partes`: quanto de uma parte aparece fora do contorno
+  da parte que a contém em cada vista, com a relação declarada por quem conduz
+  (item 12). Na traseira antiga acusa 29,4 mm da moldura na vista de cima.
 - **T5.** Aviso em `gaiolaPorLacos` quando `compensar` leva a superfície além do
   pedido (item 8): mudança de núcleo, sem mudar malha.
 - **T6.** Um comando por rodada (`conferir:vistas`) que encadeia T1 a T4 e a
