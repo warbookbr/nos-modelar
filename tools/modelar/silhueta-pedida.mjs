@@ -12,13 +12,15 @@
  * comprimento, e o fim, no maior); e as pontas nos cantos, nas laterais centro ± f vezes a meia largura pedida para cada f de
  * `--laterais` (padrão 0,0.9, em que 0 é o centro). O desvio da ponta é a distância do ponto pedido à seção, e não só ao longo do
  * comprimento, que no canto da planta cresceria com a inclinação dela. Sai o pior desvio, com a faixa e a medida em que ele está.
+ * O desvio para dentro maior que `--recorte` mm (padrão 50) é um recorte (um vão, um rebaixo cortado depois do corpo): sai à parte,
+ * em blocos de faixas seguidas com a lateral e a profundidade, e fica fora do pior, para não esconder o encolhimento da malha.
  * A primeira e a última estação costumam cair no arredondamento dos vincos da subdivisão; `--de` e `--ate` tiram as pontas.
  *
- * O LIMITE. Mede o corpo contra o que foi pedido às três vistas, e o que se cortou depois dele (um vão, um rebaixo) conta como
- * desvio onde corta. O número diz onde olhar; não aprova forma, que quem aprova é a pessoa.
+ * O LIMITE. Mede o corpo contra o que foi pedido às três vistas. O corte raso, mais raso que `--recorte`, não se separa do
+ * encolhimento e entra no pior; o encolhimento mais fundo que ele seria tomado por recorte. O número diz onde olhar; não aprova forma, que quem aprova é a pessoa.
  *
  * Uso: node tools/modelar/silhueta-pedida.mjs --esboco <arquivo.esboco.mjs> --parte <nome> --vistas <export> [--opcao 1] [--eixo y]
- *        [--passo 10] [--de <mm>] [--ate <mm>] [--laterais 0,0.9] [--saida <arquivo.json>]
+ *        [--passo 10] [--de <mm>] [--ate <mm>] [--laterais 0,0.9] [--recorte 50] [--saida <arquivo.json>]
  * O esboço é o módulo do `esboco:nucleo`, e `--vistas` é o nome do objeto que ele exporta e passa a `lacosPelasVistas`. Sai 0 com a
  * medida, e 2 em argumento ruim ou esboço recusado. */
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -34,6 +36,7 @@ export class ErroDaSilhueta extends Error {
 const EIXOS = { x: [0, [1, 2]], y: [1, [0, 2]], z: [2, [0, 1]] };
 export const PASSO_PADRAO = 10;
 export const LATERAIS_PADRAO = Object.freeze([0, 0.9]);
+export const RECORTE_PADRAO = 50;
 const br = (n, casas = 1) => (Number.isFinite(n) ? n.toFixed(casas).replace('.', ',') : '—');
 
 /** Os segmentos [[l, c], [l, c]] da seção das faces pelo plano em que a coordenada `eixo` vale `h`. */
@@ -128,10 +131,11 @@ function medirFaixa(segmentos, laco, centro, laterais) {
  * @param {object} vistas  o objeto passado a `lacosPelasVistas` (lado, perfil, planta, estacoes e as opções dele)
  * @returns {{ faixas: Array<{ altura, medidas }>, pior: { altura, medida, lateral, pedido, medido, desvio } | null, piorPorMedida, semMalha: number[] }}
  */
-export function silhuetaPedida(faces, vistas, { eixo = 'y', passo = PASSO_PADRAO, de = null, ate = null, laterais = LATERAIS_PADRAO } = {}) {
+export function silhuetaPedida(faces, vistas, { eixo = 'y', passo = PASSO_PADRAO, de = null, ate = null, laterais = LATERAIS_PADRAO, recorte = RECORTE_PADRAO } = {}) {
   if (!EIXOS[eixo]) throw new ErroDaSilhueta(`eixo é x, y ou z, e veio ${JSON.stringify(eixo)}`);
   if (!(passo > 0)) throw new ErroDaSilhueta('o passo precisa ser maior que zero');
   if (!Array.isArray(laterais) || !laterais.length || !laterais.every((f) => f >= 0 && f < 1)) throw new ErroDaSilhueta('as laterais são frações da meia largura, de 0 (o centro) até menos que 1');
+  if (!(recorte > 0)) throw new ErroDaSilhueta('o recorte precisa ser maior que zero, em mm');
   if (!faces.length) throw new ErroDaSilhueta('a parte não tem faces');
   const est = vistas?.estacoes;
   if (!Array.isArray(est) || est.length < 2) throw new ErroDaSilhueta('as vistas precisam das estacoes, como em lacosPelasVistas');
@@ -146,16 +150,33 @@ export function silhuetaPedida(faces, vistas, { eixo = 'y', passo = PASSO_PADRAO
   pedido.lacos.forEach((laco, i) => {
     const segmentos = secao(faces, eixo, alturas[i]);
     if (!segmentos.length) { semMalha.push(alturas[i]); return; }
-    faixas.push({ altura: alturas[i], medidas: medirFaixa(segmentos, laco, centro, laterais) });
+    const medidas = medirFaixa(segmentos, laco, centro, laterais).map((m) => ({ ...m, recorte: m.desvio !== null && m.desvio < -recorte }));
+    faixas.push({ altura: alturas[i], medidas });
   });
   let pior = null; const piorPorMedida = {};
   for (const f of faixas) for (const m of f.medidas) {
-    if (m.desvio === null || m.pedido === null) continue;
+    if (m.desvio === null || m.pedido === null || m.recorte) continue;
     const item = { altura: f.altura, ...m };
     if (!pior || Math.abs(m.desvio) > Math.abs(pior.desvio)) pior = item;
     if (!piorPorMedida[m.medida] || Math.abs(m.desvio) > Math.abs(piorPorMedida[m.medida].desvio)) piorPorMedida[m.medida] = item;
   }
-  return { eixo, passo, de: a0, ate: a1, laterais, centro, faixas, pior, piorPorMedida, semMalha, avisosDoPedido: pedido.avisos };
+  /* os recortes de cada medida em faixas seguidas viram um bloco: as alturas, a lateral e a profundidade do mais fundo */
+  const recortes = []; const aberto = {};
+  faixas.forEach((f, i) => {
+    for (const m of f.medidas) {
+      const bloco = aberto[m.medida];
+      if (!m.recorte) { delete aberto[m.medida]; continue; }
+      if (bloco && bloco.indice === i - 1) {
+        bloco.ate = f.altura; bloco.indice = i; bloco.faixas += 1;
+        if (-m.desvio > bloco.profundidade) Object.assign(bloco, { profundidade: -m.desvio, lateral: m.lateral, altura: f.altura });
+      } else {
+        const novo = { medida: m.medida, de: f.altura, ate: f.altura, faixas: 1, lateral: m.lateral, altura: f.altura, profundidade: -m.desvio, indice: i };
+        recortes.push(novo); aberto[m.medida] = novo;
+      }
+    }
+  });
+  for (const b of recortes) delete b.indice;
+  return { eixo, passo, de: a0, ate: a1, laterais, centro, recorte, faixas, pior, piorPorMedida, recortes, semMalha, avisosDoPedido: pedido.avisos };
 }
 
 /** O texto curto: o pior desvio, o pior de cada medida e as faixas em que a malha não chega. */
@@ -166,16 +187,21 @@ export function relatar(r, titulo = '') {
   saida.push(`${r.faixas.length} faixas de ${br(r.de)} a ${br(r.ate)} mm no eixo ${r.eixo}, a cada ${br(r.passo)} mm; desvio positivo para fora do pedido`);
   saida.push(r.pior ? `pior: ${linha(r.pior)}` : 'pior: nenhuma medida');
   for (const m of Object.values(r.piorPorMedida)) saida.push(`  ${linha(m)}`);
+  if (r.recortes.length) {
+    saida.push(`recortes (para dentro mais de ${br(r.recorte, 0)} mm, fora do pior): ${r.recortes.length}`);
+    for (const b of r.recortes) saida.push(`  ${b.medida}${b.lateral === null ? '' : ` (lateral ${br(b.lateral, 0)})`}, de ${br(b.de)} a ${br(b.ate)} mm (${b.faixas} faixas): até ${br(b.profundidade)} mm, na altura ${br(b.altura)}`);
+  }
   if (r.semMalha.length) saida.push(`sem malha em ${r.semMalha.length} faixas: ${r.semMalha.map((a) => br(a)).join(', ')} mm`);
   return `${saida.join('\n')}\n`;
 }
 
 const AJUDA = `node tools/modelar/silhueta-pedida.mjs --esboco <arquivo.esboco.mjs> --parte <nome> --vistas <export>
-    [--opcao 1] [--eixo y] [--passo ${PASSO_PADRAO}] [--de <mm>] [--ate <mm>] [--laterais ${LATERAIS_PADRAO.join(',')}] [--saida <arquivo.json>]
+    [--opcao 1] [--eixo y] [--passo ${PASSO_PADRAO}] [--de <mm>] [--ate <mm>] [--laterais ${LATERAIS_PADRAO.join(',')}] [--recorte ${RECORTE_PADRAO}] [--saida <arquivo.json>]
 
 Corta a malha da parte por faixa de altura e compara cada seção com o laço que lacosPelasVistas dá para as vistas exportadas pelo
 módulo: a meia largura de cada lado, as duas pontas no centro e as pontas nas laterais (centro ± f vezes a meia largura). Sai o
-pior desvio em mm, positivo para fora, com a faixa e a medida. O que se cortou depois do corpo conta como desvio. O número informa,
+pior desvio em mm, positivo para fora, com a faixa e a medida. O desvio para dentro maior que o recorte sai à parte, como corte feito
+depois do corpo, e fica fora do pior. O número informa,
 não aprova forma.`;
 
 /* os argumentos como --nome valor ou --nome=valor */
@@ -220,7 +246,7 @@ export async function executar(argv) {
     if (!painel.partes.includes(a.parte)) throw new ErroDaSilhueta(`a parte "${a.parte}" não existe na opção (${painel.partes.join(', ')})`);
     const faces = facesDaOpcao(painel.neutro).filter((f) => f.parte === a.parte);
     const r = silhuetaPedida(faces, vistas, {
-      eixo: a.eixo ?? 'y', passo: numero('passo', PASSO_PADRAO), de: numero('de', null), ate: numero('ate', null), laterais: a.laterais === undefined ? [...LATERAIS_PADRAO] : a.laterais.split(',').map(Number),
+      eixo: a.eixo ?? 'y', passo: numero('passo', PASSO_PADRAO), de: numero('de', null), ate: numero('ate', null), laterais: a.laterais === undefined ? [...LATERAIS_PADRAO] : a.laterais.split(',').map(Number), recorte: numero('recorte', RECORTE_PADRAO),
     });
     const resultado = { esboco: a.esboco, parte: a.parte, vistas: a.vistas, opcao: n, faces: faces.length, ...r };
     let fim = '';

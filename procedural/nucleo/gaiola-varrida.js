@@ -11,7 +11,7 @@
  *   quadro: { u: [x, y, z] } ou { v: [x, y, z] }, com virar? para trocar o sinal do outro eixo; a seção vive no plano que a tangente atravessa.
  *   secao: [[u, v] | { u, v, nome? }, ...] as linhas da superfície, de pelo menos duas, cada uma um ponto da seção.
  *   fechada: true fecha a seção: faces também entre a última linha e a primeira (tubo); pede três linhas e recusa `fora`.
- *   tampas: true põe uma face em cada ponta do trilho (só com fechada); a malha sai fechada, com a normal para fora pelo volume.
+ *   tampas: true põe uma face plana em cada ponta (só com fechada), com vinco vivo no aro; 'redondas', sem o vinco. Normal pelo volume.
  *   estacoes: marcos { em } | { fracao } | { plano: { eixo, valor } } | { cilindro: { eixo, por, raio } }, com { entre: n } ou { passo: mm } entre eles.
  *   fora: [x, y, z] ou { centro, semEixo? }: o lado para onde a chapa olha, que decide a normal das faces (não vale com fechada).
  *   vincos: [{ linha, nitidez }] vinco ao longo de uma linha da seção.
@@ -88,7 +88,9 @@
  *
  * A SEÇÃO FECHADA E AS TAMPAS. `fechada: true` liga a última linha à primeira, e a superfície vira um tubo de seção qualquer (pelo
  * menos três linhas, a última diferente da primeira); `remover` não alcança a célula de volta, entre a última linha e a primeira.
- * `tampas: true` põe nas duas pontas a face de todas as linhas da estação, e por isso só vale com `fechada`. Com a seção fechada a
+ * `tampas: true` põe nas duas pontas a face de todas as linhas da estação, e por isso só vale com `fechada`; o aro de cada tampa sai
+ * nos `vincos` como vinco vivo fechado (`${nome}_tampa_0` e `${nome}_tampa_1`), e a ponta fica plana e no lugar depois da subdivisão.
+ * `tampas: 'redondas'` põe as mesmas faces sem o vinco, e a subdivisão arredonda e encurta a ponta. Com a seção fechada a
  * orientação não vem de `fora`, que então é recusado: as faces do tubo e as duas tampas (postas na conta mesmo sem `tampas`) fecham um
  * volume, e as faces saem no sentido em que o volume assinado dá positivo, com a normal para fora; o volume zero grita. Sem `fechada` e
  * sem `tampas` a saída é a mesma de antes delas, byte a byte. */
@@ -362,8 +364,10 @@ export function gaiolaVarrida(definicao) {
   if (definicao.quadro === undefined) falha('quadro é obrigatório: { u: [x, y, z] } ou { v: [x, y, z] }');
   if (definicao.secao === undefined) falha('secao é obrigatória: a lista das linhas [u, v]');
   if (definicao.estacoes === undefined) falha('estacoes é obrigatória: os marcos e as divisões entre eles');
-  for (const k of ['fechada', 'tampas']) if (definicao[k] !== undefined && typeof definicao[k] !== 'boolean') falha(`${k} precisa ser true ou false, e veio ${mostra(definicao[k])}`);
-  const fechada = definicao.fechada === true; const tampas = definicao.tampas === true;
+  if (definicao.fechada !== undefined && typeof definicao.fechada !== 'boolean') falha(`fechada precisa ser true ou false, e veio ${mostra(definicao.fechada)}`);
+  if (definicao.tampas !== undefined && typeof definicao.tampas !== 'boolean' && definicao.tampas !== 'redondas') falha(`tampas precisa ser true, false ou 'redondas', e veio ${mostra(definicao.tampas)}`);
+  const fechada = definicao.fechada === true; const tampas = definicao.tampas === true || definicao.tampas === 'redondas';
+  const tampasPlanas = definicao.tampas === true;
   if (tampas && !fechada) falha('tampas pede fechada: true; a tampa é a face de todas as linhas da estação, e só a seção fechada tem contorno para ela');
   if (fechada && definicao.fora !== undefined) falha('fora não vale com fechada: a seção fechada orienta as faces pelo volume, para fora');
   if (!fechada && definicao.fora === undefined) falha('fora é obrigatório: o lado da normal das faces, [x, y, z] ou { centro }');
@@ -542,6 +546,12 @@ export function gaiolaVarrida(definicao) {
         if (arestas.get(chv(todos[i], todos[i + 1])) === 2) corrida.push(todos[i + 1]); else { fechar(); corrida = [todos[i + 1]]; }
       }
       fechar();
+    });
+  }
+  if (tampasPlanas) {
+    [0, nEst - 1].forEach((i, q) => {
+      const aro = Array.from({ length: nLinhas }, (_, j) => nomeDe(i, j));
+      vincos.push({ nome: `${nome}_tampa_${q}`, pontos: [...aro, aro[0]], nitidez: 'viva' });
     });
   }
 

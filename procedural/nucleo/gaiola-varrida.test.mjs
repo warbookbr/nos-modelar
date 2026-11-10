@@ -295,11 +295,30 @@ describe('o tubo de seção fechada com tampas', () => {
     expect(aberto.faces).toEqual(g.faces.slice(0, aberto.faces.length));
     expect(aberto.faces).toHaveLength(g.faces.length - 2);
     const vivo = gaiolaVarrida(tubo({ vincos: ['a', 'b', 'c', 'd'].map((linha) => ({ linha, nitidez: 'viva' })) }));
-    expect(vivo.vincos.map((v) => v.pontos.length)).toEqual([0, 1, 2, 3].map(() => vivo.estacoes.length));
+    expect(vivo.vincos.map((v) => v.pontos.length)).toEqual([...[0, 1, 2, 3].map(() => vivo.estacoes.length), 5, 5]);
     const neutro = entrega(vivo, { niveis: 2 });
     const faces = [...neutro.F.values()].map((f) => f.vs);
     expect(usoDasArestas(faces)).toEqual([2]);
     expect(volumeAssinado(faces, (k) => neutro.V.get(k))).toBeGreaterThan(0);
+  });
+
+  it('com tampas: true o aro de cada tampa é vinco vivo, e a subdivisão deixa as pontas no lugar; redondas encurta', () => {
+    expect(g.vincos.map((v) => [v.nome, v.pontos.length, v.nitidez])).toEqual([['tubo_tampa_0', 5, 'viva'], ['tubo_tampa_1', 5, 'viva']]);
+    const redondas = gaiolaVarrida(tubo({ tampas: 'redondas' }));
+    expect(redondas.faces).toEqual(g.faces);
+    expect(redondas.vincos).toEqual([]);
+    /* as pontas medidas ao longo do trilho: a de baixo pelo menor y (o trilho sobe em +y desde y 0) e a do fim pelo menor z (ele
+       corre em -z até z -460) */
+    const pontas = (gg) => {
+      const ps = [...entrega(gg, { niveis: 2 }).V.values()].map((p) => p.map((x) => x * MM));
+      return [Math.min(...ps.map((p) => p[1])), Math.min(...ps.map((p) => p[2]))];
+    };
+    const [baixo, fim] = pontas(g);
+    expect(Math.abs(baixo - 0)).toBeLessThan(1);
+    expect(Math.abs(fim + 460)).toBeLessThan(1);
+    const [baixoR, fimR] = pontas(redondas);
+    expect(baixoR).toBeGreaterThan(1);
+    expect(fimR).toBeGreaterThan(-460 + 1);
   });
 
   it('mesma definição, mesma saída, byte a byte', () => {
@@ -414,6 +433,8 @@ describe('o dado ruim grita com o campo', () => {
     diz({ ...semFora, secao: [[0, 0], [10, 0], [20, 0]], fechada: true, tampas: true }, /a seção fechada não encerra volume/);
     diz(regua({ secao: quadrado, fechada: true }), /fora não vale com fechada/);
     diz(regua({ fechada: 'sim' }), /fechada precisa ser true ou false, e veio "sim"/);
+    diz({ ...semFora, secao: quadrado, fechada: true, tampas: 'planas' }, /tampas precisa ser true, false ou 'redondas', e veio "planas"/);
+    diz({ ...semFora, secao: quadrado, tampas: 'redondas' }, /tampas pede fechada: true/);
     diz(semFora, /fora é obrigatório/);
   });
 });
