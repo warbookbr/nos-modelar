@@ -1,0 +1,695 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/correntes",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Quatro fitas escuras no lugar certo, sem travessia nem ponta no ar; só falta a textura de elos do alvo, e lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "correntes",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a cabeça do cilindro de elevação não tinha porta; ganhou a porta plana cabeca sem mudar a malha",
+    "o pedido fala em duas correntes da cabeça ao carro e o rascunho tem quatro fitas; ficaram as quatro",
+    "o relato do modelador trouxe quatro pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao"
+  ],
+  "notaDePassagem": "Referencial da máquina, posta pela face de trás das fitas do cilindro na porta cabeca. Todas as alturas e faces vêm das receitas do canal interno, do cilindro, da torre e do carro. As fitas do canal ficam por serem as que a vista de frente mostra.",
+  "receita": {
+    "sha256": "sha256:5c35a76da370a461f223cf52c64596a6975e23c6cf7cd07f497d6d609ba26102",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 128,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/correntes — as correntes de elevação da torre da empilhadeira, na pose de transporte: as duas do cilindro de"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * elevação, da cabeça dele à travessa do carro, e as duas do canal interno, da travessa de cima dele ao topo dos montantes do carro,"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * numa peça."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Etapa da montagem `../../montagem.json` depois dos garfos (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 4"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * das partes do `../../ALINHAMENTO.md`, segunda metade da torre). A forma é a do rascunho que a pessoa aprovou por imagem em"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * `montarCorrentes` daqui. As quatro fitas são as do rascunho: as duas do cilindro, que levam o carro na elevação livre, e as duas do"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * canal, que a vista de frente mostra à frente dos canais."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). A vista de frente (`frente.ia.png`) mostra as correntes nas colunas 497 a 503 e 585 a 593,"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * a 149 mm do centro, descendo à frente dos canais até a placa: a fita de 15 x 12 mm de x 143 a 158, de pé na frente da travessa de"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * cima do canal interno (a face da frente dela, z 350) até o topo dos montantes do carro (y 640). As do cilindro, de 12 x 12 mm em x 54"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * a 66, descem da face da frente da cabeça do cilindro de elevação (z 250) até a travessa do carro (y 640), dos dois lados da cabeça,"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * que a vista de frente mostra com uma corrente de cada lado. As faces e as alturas de onde elas saem e onde chegam vêm das receitas"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * do canal interno, do cilindro de elevação, da torre e do carro."
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * O ENCAIXE. A origem é a da máquina, a mesma da torre: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * esquerda de quem dirige e a frente em +z. A montagem põe as correntes na cabeça do cilindro pela porta `naCabeca` (o plano da face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * trás das correntes do cilindro, no meio da cabeça) sobre a porta `cabeca` do cilindro de elevação (a face da frente da cabeça)."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * AS JUNTAS QUE A MONTAGEM AINDA NÃO TEM. As correntes passam pelas polias da cabeça e da travessa do canal e o carro sobe o dobro do"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * que a cabeça e o canal sobem (2:1, no rascunho); a montagem v5 não tem articulação nem plano sobre plano medido (ela mede encaixe"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * cilíndrico e assento anular), e a posição sai das duas faces planas, sem relação medida. A corrente não tem elos: é a fita do rascunho."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula as caixas e a porta em mm; `montarCorrentes` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * { passos, topo, origem } (o mesmo que o rascunho da máquina usa); `gerarPassos` converte para metro com `m()`, campo de medida a"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "import { derivar as derivarTorre } from '../../torre/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "import { TABELA as INTERNO, derivar as derivarInterno } from '../../canal-interno/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "import { TABELA as CILINDRO } from '../../cilindro-elevacao/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "import { TABELA as CARRO } from '../../carro/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* A cor do rascunho: o escuro da carcaça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  cores: { corrente: CARCACA.cores.escuro },"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* As do canal: de x 143 a 158, 12 mm de fundo à frente da travessa de cima do canal interno. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  doCanal: { x: [143, 158], fundo: 12 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  /* As do cilindro: de x 54 a 66, 12 mm de fundo à frente da cabeça do cilindro de elevação. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  doCilindro: { x: [54, 66], fundo: 12 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "/** As caixas e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  const [, yAssento, zAssento] = derivarTorre().portas.assentoDoCilindro.centro;"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* a cabeça do cilindro de elevação, no referencial da máquina: a face da frente e as alturas de baixo e de cima */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  const cabeca = { z: zAssento + CILINDRO.cabeca.z[1], y: [yAssento + CILINDRO.haste.ate, yAssento + CILINDRO.haste.ate + CILINDRO.cabeca.altura] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const doCanal = { x: T.doCanal.x, z: [INTERNO.travessa.frente, INTERNO.travessa.frente + T.doCanal.fundo], y: [CARRO.barraCima[1], derivarInterno().y[1]] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  const doCilindro = { x: T.doCilindro.x, z: [cabeca.z, cabeca.z + T.doCilindro.fundo], y: [CARRO.travessa.y[1], cabeca.y[1]] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    naCabeca: { forma: 'plano', papel: 'apoia', ponto: [0, (cabeca.y[0] + cabeca.y[1]) / 2, cabeca.z], normal: [0, 0, -1], extensao: [2 * T.doCilindro.x[1], cabeca.y[1] - cabeca.y[0]], referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  return { cabeca, doCanal, doCilindro, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "/** Monta as correntes no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem da porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "export function montarCorrentes(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const { extY, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const novo = () => { estado.origem += 1; return estado.origem; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const espelho = (sel) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    estado.passos.push(['espelha', { origemId: id, eixo: 'x', pos: 0, derivaDe: sel.origem, sel: { origem: sel.origem } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    return { origem: { op: 'espelha', id, de: sel.origem } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const par = (sel) => unir(sel, espelho(sel));"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const caixaY = ({ x, z, y }) => extY([[x[0], z[0]], [x[1], z[0]], [x[1], z[1]], [x[0], z[1]]], y[0], y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const doCanal = caixaY(D.doCanal);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const ladoDoCanal = par(doCanal);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const doCilindro = caixaY(D.doCilindro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  parte('correntes', unir(ladoDoCanal, par(doCilindro)), T.cores.corrente);"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  return { doCilindro };"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], espelha: ['pos'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta da cabeça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const { doCilindro } = montarCorrentes(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  return [...forma, porta('naCabeca', doCilindro)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "/* Uma parte só: as quatro fitas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "export const CONTATOS = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  meta: { nome: 'empilhadeira/correntes', desc: 'correntes de elevação da torre da empilhadeira: duas da cabeça do cilindro de elevação ao carro e duas da travessa do canal interno ao carro, na pose de transporte' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z; na pose de transporte' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    objeto: 'as correntes de elevação da torre duplex de uma empilhadeira de 2,5 t, com o carro embaixo, na pose de transporte: as do cilindro de elevação livre e as do canal interno, de pé, até o carro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    referencias: ['../../referencias/frente.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "    escala: { medida: 'comprimento das correntes do canal, da travessa de cima do canal interno ao topo dos montantes do carro', milimetros: 1460 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "      { nome: 'correntes', forma: 'quatro fitas escuras de pé: duas de 15 x 12 mm em x 143 a 158 de cada lado, de y 640 a 2.100, na frente da travessa do canal interno (z 350), e duas de 12 x 12 mm em x 54 a 66, de y 640 a 1.440, na frente da cabeça do cilindro (z 250)', tecnica: 'caixas extrudadas em y, cada uma unida ao espelho dela, e os dois pares unidos' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      'as correntes soltas do carro, da cabeça do cilindro ou da travessa do canal interno',"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      'as correntes atravessando os canais, o cilindro ou a grade',"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "      'as correntes fora do centro da largura, ou grossas como uma barra',"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "      'cor trocada: as correntes claras ou laranja',"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    const D = derivar(this.PARAMS);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "      { nome: 'topo da frente das correntes do canal', parte: 'correntes', medida: 'maximo', em: [D.doCanal.x[1], D.doCanal.y[1], D.doCanal.z[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "      { nome: 'pé de trás das correntes do cilindro', parte: 'correntes', medida: 'minimo', em: [-D.doCanal.x[1], D.doCilindro.y[0], D.doCilindro.z[0]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[9]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az240.png",
+      "peca-tresquartos-rasante-az330.png"
+    ]
+  }
+}

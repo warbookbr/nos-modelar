@@ -1,0 +1,714 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/garfo",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 9,
+    "defeitos": [],
+    "observacao": "Garfo em L escuro, com afinação de ponta, folga de cerca de 50 mm ao chão e encosto na face das barras conferindo com a referência. Sem defeito estrutural; lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "garfo",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a montagem v5 não mede plano sobre plano: o garfo pendurado na barra vai só por posição",
+    "o relato do modelador trouxe quatro pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao"
+  ],
+  "notaDePassagem": "Uma parte, porque haste, calcanhar e lâmina são um corpo só no rascunho: o L de lado cruzado com a planta. A origem fica atrás da haste, no pé da lâmina, e os dois lados são a mesma peça transladada. A altura do gancho vem do meio da barra de cima do carro menos os 50 mm do chão.",
+  "receita": {
+    "sha256": "sha256:8c8e3f7a60498968e6be84251b99c950716abe9a1efd93db3ca4c8c621dd13a9",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 132,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/garfo — um garfo da empilhadeira, em L: a haste de pé, que pendura na face da frente das barras do carro, o calcanhar"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * e a lâmina de 1.070 x 100 x 40, que afina na ponta, numa peça rígida. Uma receita, duas instâncias na montagem (a esquerda e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * direita, a 280 mm do centro)."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do carro (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 4"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * das partes do `../../ALINHAMENTO.md`, segunda metade da torre). A forma é a do rascunho que a pessoa aprovou por imagem em"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * `montarGarfo` daqui, uma vez de cada lado. Mudou só a construção: o garfo de cada lado é a mesma peça transladada, no lugar do"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * espelho do esquerdo, porque ele é simétrico na própria largura."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). A lâmina de 1.070 x 100 x 40 é a da TABELA do alinhamento (a ficha; a lateral dá 947 e 55"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * de espessura, a vista de cima 830). A haste tem a espessura da lâmina e sobe a 600 mm do pé da lâmina, 10 mm acima da barra de"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * cima do carro (lateral: o carro e a haste até 1.236 com a grade). A ponta afina: de lado, nos últimos 200 mm, de 40 a 12 mm; de"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * cima, nos últimos 60, de 100 a 70 (lateral: a lâmina afina na ponta). Na pose de transporte a face de baixo da lâmina fica a 50 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * do chão (os garfos abaixados do ALINHAMENTO), e é essa altura que dá o ponto do gancho na barra de cima."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * A TÉCNICA. A vista de lado (o L com a ponta afinada) extrudada na largura e cruzada com a vista de cima (o retângulo com a ponta"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * estreita) extrudada na altura, por `intersectar`. A vista de cima passa 1 mm do L atrás e na ponta, e 50 mm acima e abaixo dele,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * para o corte não ter faces coincidentes."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * O ENCAIXE. A origem é o meio da face de trás da haste, no pé (a face de baixo da lâmina); y para cima, +x à esquerda de quem dirige"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * e a ponta em +z. A montagem pendura o garfo no carro pela porta `gancho` (a face de trás da haste, na altura do meio da barra de cima"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * do carro) sobre a porta `apoioDoGarfoEsquerdo` ou `apoioDoGarfoDireito` do carro (a face da frente da barra de cima, no centro do"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * garfo)."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * A JUNTA QUE A MONTAGEM AINDA NÃO TEM. O garfo desliza ao longo da barra para mudar a distância entre os dois, e sobe com o carro; a"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * montagem v5 não mede plano sobre plano (ela mede encaixe cilíndrico e assento anular), e a posição sai das duas faces planas, sem"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * relação medida."
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e a porta em mm; `montarGarfo` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * { passos, topo, origem }, com `em` levando a origem ao lugar dela (o rascunho da máquina a põe no carro); `gerarPassos` converte para"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "import { TABELA as CARRO } from '../../carro/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* A cor do rascunho: o quase preto do carro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  cores: { preto: CARRO.cores.preto },"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* A lâmina: 100 de largura, 40 de espessura e 1.070 da face da haste à ponta; a haste tem a espessura da lâmina e sobe a 600. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  largura: 100,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  espessura: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  comprimento: 1070,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  altura: 600,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  /* A ponta afinada: de lado, nos últimos 200 mm, até 12 mm; de cima, nos últimos 60, até 70 de largura. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  ponta: { deLado: 200, espessura: 12, deCima: 60, largura: 70 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* A face de baixo da lâmina na pose de transporte, do chão, para a altura do gancho na barra de cima do carro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  chao: 50,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* Quanto a vista de cima passa do L: 1 mm atrás e na ponta, 50 acima e abaixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  alem: { z: 1, y: 50 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "/** Os perfis e a porta, em mm, no referencial do garfo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  const L = T.espessura + T.comprimento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  const P = T.ponta; const a = T.largura / 2; const b = P.largura / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  /* o L de lado, em [z, y]: a lâmina com a ponta afinada e a haste de pé atrás */"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  const lado = [[0, 0], [L, 0], [L, P.espessura], [L - P.deLado, T.espessura], [T.espessura, T.espessura], [T.espessura, T.altura], [0, T.altura]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  /* a planta, em [x, z]: o retângulo com a ponta estreita */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  const planta = [[-a, -T.alem.z], [a, -T.alem.z], [a, L - P.deCima], [b, L + T.alem.z], [-b, L + T.alem.z], [-a, L - P.deCima]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  /* o gancho: a face de trás da haste, na altura do meio da barra de cima do carro com o pé da lâmina a `chao` do chão */"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const yDoGancho = (CARRO.barraCima[0] + CARRO.barraCima[1]) / 2 - T.chao;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    gancho: { forma: 'plano', papel: 'apoia', ponto: [0, yDoGancho, 0], normal: [0, 0, -1], extensao: [T.largura, T.altura], referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  return { L, lado, planta, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "/** Monta um garfo no estado { passos, topo, origem }, em mm, com a origem levada a `em`, e devolve a origem da porta. `nomes` troca o"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": " *  nome da parte (o rascunho da máquina mantém o dele). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "export function montarGarfo(estado, T = TABELA, em = [0, 0, 0], nomes = {}) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const { extX, extY, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const [ex, ey, ez] = em;"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const lado = D.lado.map(([z, y]) => [z + ez, y + ey]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  const planta = D.planta.map(([x, z]) => [x + ex, z + ez]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const garfo = booleana('intersectar', [extX(lado, ex - T.largura / 2, ex + T.largura / 2), extY(planta, ey - T.alem.y, ey + T.altura + T.alem.y)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  parte(nomes.garfo ?? 'garfo', garfo, T.cores.preto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  return { garfo };"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta do gancho. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  const { garfo } = montarGarfo(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  return [...forma, porta('gancho', garfo)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "/* Uma parte só: a haste, o calcanhar e a lâmina são um corpo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "export const CONTATOS = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  meta: { nome: 'empilhadeira/garfo', desc: 'garfo da empilhadeira em L: a haste que pendura no carro, o calcanhar e a lâmina de 1.070 x 100 x 40 com a ponta afinada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  TOPO: { origem: 'meio da face de trás da haste, no pé da lâmina; y para cima, +x à esquerda de quem dirige e a ponta em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    objeto: 'um garfo de uma empilhadeira de 2,5 t, pendurado no carro porta-garfos, abaixado na pose de transporte: a haste de pé, o calcanhar e a lâmina com a ponta afinada',"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png', '../../referencias/lateral.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    escala: { medida: 'comprimento da lâmina, da face da haste à ponta (TABELA do alinhamento, a ficha)', milimetros: 1070 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      { nome: 'garfo', forma: 'L quase preto de 100 mm de largura: haste de 40 mm de pé até 600 mm, calcanhar em canto vivo e lâmina de 1.070 x 40 que afina na ponta, de lado de 40 a 12 mm nos últimos 200 e de cima de 100 a 70 nos últimos 60', tecnica: 'o L de lado extrudado em x cruzado com a planta extrudada em y, por intersectar' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "      'o garfo fora do carro, solto da face da frente das barras',"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "      'a lâmina atravessando o chão, ou alta demais para a pose de transporte (a face de baixo a 50 mm do chão)',"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "      'a lâmina curta ou fina demais para 2,5 t, ou sem afinar na ponta',"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "      'o garfo cruzando o pneu dianteiro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "      'cor trocada: o garfo laranja ou cinza claro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "    const T = this.PARAMS; const L = T.espessura + T.comprimento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "      { nome: 'topo da haste e ponta da lâmina', parte: 'garfo', medida: 'maximo', em: [T.largura / 2, T.altura, L], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "      { nome: 'pé de trás do garfo', parte: 'garfo', medida: 'minimo', em: [-T.largura / 2, 0, 0], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[5]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az290.png",
+      "peca-frente-rasante-az20.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}
