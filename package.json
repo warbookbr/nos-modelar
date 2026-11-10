@@ -122,6 +122,7 @@
     "linhas:modelo": "node tools/modelar/linhas-do-modelo.mjs",
     "perfil:cor": "node tools/modelar/perfil-por-cor.mjs",
     "sobra:partes": "node tools/modelar/sobra-entre-partes.mjs",
+    "casamento:vista": "node tools/modelar/casamento-da-vista.mjs",
     "esboco:nucleo": "node tools/modelar/esboco-nucleo.mjs",
     "variantes": "node tools/modelar/variantes.mjs",
     "contorno:prancha": "node tools/modelar/prancha/prancha-dos-contornos.mjs",

@@ -166,7 +166,9 @@ export function montarTraseira(estado) {
   /* grade: a moldura cinza em U apoiada na rampa do vão (de z 2058 a y 980 até z 2110 a y 812, na lateral), e o fundo escuro.
      A moldura acompanha a curva da planta do capô, como o laranja: reta de lado a lado, ela sobrava para fora dele nos cantos das
      lanternas (a pessoa viu nos três quartos). É um bloco fundo, de que só a face de trás aparece, para o laço não ficar curto. */
-  const rampa = (de, ate) => [[-(2052 + de), 990], [-(2052 + ate), 990], [-(2112 + ate), 795], [-(2112 + de), 795]];
+  /* a ponta de baixo fica a z 2094 e não a 2112: o teto PONTA_DO_CAPO - 6 de `secaoDoMeio` deixa a face do capô 20 mm aquém ali, e a
+     moldura passava 40,7 mm para trás do laranja na vista da direita (medido com `sobra-entre-partes`, grade em capo) */
+  const rampa = (de, ate) => [[-(2052 + de), 990], [-(2052 + ate), 990], [-(2094 + ate), 795], [-(2094 + de), 795]];
   const placa = (nome, ate) => corpo(nome, { lado: rampa(-320, ate), perfil: perfil([[363, 58], ...VAO_GRADE]), planta: plantaTraseira(meiaCapo, 1400),
     estacoes: [796, 806, 820, 850, 900, 950, 989] }, QUINAS);
   const furos = FUROS_GRADE.map((f) => extZ(f.map(([x, y]) => [x * MM, H(y)]), -1700, -2300));

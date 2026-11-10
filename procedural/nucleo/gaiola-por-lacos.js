@@ -22,6 +22,8 @@
  *   medidas: [{ trecho | entre, laco?, peso? }] cota nos pontos marcados; em todos os pontos é recusado.
  *   compensar: true | { trechos, lacos?, pontas? } move os pontos para a superfície limite passar por eles: o arco de r sai com r.
  *     Em peça nova, declare-o nos trechos de canto e de curva (decisão da pessoa, 2026-11-05). pontas move também a lâmina de ponta.
+ *     Onde a superfície entre os pontos de um laço sai do contorno mais de TOLERANCIA_DA_COMPENSACAO_MM além do que saía sem compensar (o
+ *     canto sem vinco, a quina de uma planta em polígono), sai o aviso `compensacaoPassa` com o trecho, o laço e o desvio.
  *   grupos: [{ nome, lacos?: [de, ate], trechos? | unir: [{ lacos?, trechos? }] }] faces para parte; vai em passo.grupos, em pontos.
  * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe(laco, trecho, k), lacos, trechos, avisos, compensacao? }.
  * exemplo:
@@ -120,6 +122,15 @@
  * e os pontos de normal no eixo dela andam também ao longo do eixo, e saem do plano do laço: o fundo do disco chega a -78 mm.
  * `alvosMm` guarda os pontos declarados, e `compensacao` o número de pontos movidos, o maior deslocamento e o maior resíduo, em mm.
  * Na peça em L o canto de 32 mm sai com 31,8 mm no corte, e na dobra em U as curvas de 40 e 24 mm saem com 40,1 e 24,0.
+ * A superfície passa pelos pontos movidos, mas entre eles não há promessa: num laço de contorno em polígono (a planta de um capô, com
+ * as quinas da largura sem vinco), o ponto da quina anda até 59 mm para fora para o limite passar por ele, e a curva lisa que o liga aos
+ * vizinhos sai 11,5 mm da lateral reta, em toda altura, com o passo de 120 mm entre pontos; com metade do passo, 4,6, e com a quina em
+ * `cantos`, zero. É a interpolação por ponto de um contorno com quina, e não um erro da conta. Por isso, depois de compensar, a gaiola é
+ * refinada um nível e a linha de cada laço (os pontos dela e o meio de cada segmento) é levada ao limite, com e sem a compensação;
+ * o quanto o ponto com ela fica fora do contorno declarado, menos o que já ficava sem ela, acima de TOLERANCIA_DA_COMPENSACAO_MM, dá o
+ * aviso `compensacaoPassa`, um por trecho, com o pior laço, o desvio em mm e quantos laços passam. A conta não muda a gaiola, mede no
+ * plano do laço (o deslocamento ao longo do eixo fica de fora) e subestima o pico, que fica entre os pontos dela (11,5 contra 13,9 mm
+ * na malha de nível 3); entre laços, a onda depois de um degrau da silhueta já existe sem compensar e não entra no aviso.
  *
  * OS GRUPOS. `grupos` lista conjuntos de pontos por faixa de laços e por trecho (ou a união de vários, em `unir`) e `passo.grupos`
  * leva os nomes ao passo `subdivisao`, que toma por do grupo a face da gaiola com todos os pontos nele e publica as faces refinadas
@@ -143,7 +154,8 @@ export const PASSOS_DA_COMPENSACAO = 8;
 export const LIMITE_DE_FACE_FINA_NA_GAIOLA = 0.005;
 export const INCLINACAO_MINIMA_DA_COMPENSACAO = 0.5;
 /* A compensação avisa quando leva a superfície, entre os pontos de um laço, mais que isto (em mm) além do pedido, descontado o que ela já
-   passava sem compensar (A COMPENSAÇÃO). TOLERANCIA_PROVISORIA */
+   passava sem compensar (A COMPENSAÇÃO). Nas peças de teste em que a compensação é a da casa o acréscimo maior é de 1,36 mm (o L de
+   190 mm), e 0,21 na dobra em U, 0,8 na coluna, 0,87 e 0,49 nos tubos; no corpo de planta em polígono que ela ondulou, 11,5 mm. */
 export const TOLERANCIA_DA_COMPENSACAO_MM = 2;
 
 const EIXOS = { x: 0, y: 1, z: 2 };

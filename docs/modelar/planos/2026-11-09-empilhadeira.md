@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/casamento-da-vista.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 
@@ -127,16 +127,17 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
 - **T1, entregue.** `perfil:cor`: a referência reduzida às cores declaradas, com
   os trechos de cada cor por linha e a meia largura por altura; a classificação
   (`classificar` de `perfil-por-cor.mjs`) é a que as fatias seguintes usam.
-- **T2.** Cor chapada da malha contra as classes da referência, por região: a
-  fração de classe trocada ordena as regiões da leitura.
-- **T3.** Casamento de linhas: a distância de cada linha do modelo à divisa de
-  classes mais próxima da referência, e a divisa sem linha; confirma ou derruba
-  por número a diferença de forma do crítico.
+- **T2 e T3, entregues.** `casamento:vista`: por região, a fração de pixels com
+  a cor de material trocada (a cor chapada de cada parte, tirada da malha) e a
+  distância de cada linha de contorno e de divisa do modelo à divisa de classes
+  mais próxima da referência, nos dois sentidos; a nota ordena as regiões.
 - **T4, entregue.** `sobra:partes`: quanto de uma parte aparece fora do contorno
   da parte que a contém em cada vista, com a relação declarada por quem conduz
   (item 12). Na traseira antiga acusa 29,4 mm da moldura na vista de cima.
-- **T5.** Aviso em `gaiolaPorLacos` quando `compensar` leva a superfície além do
-  pedido (item 8): mudança de núcleo, sem mudar malha.
+- **T5, entregue.** Aviso `compensacaoPassa` em `gaiolaPorLacos` quando
+  `compensar` leva a superfície mais de 2 mm além do contorno declarado (item
+  8): mudança de núcleo, sem mudar malha. A causa é a quina do contorno sem
+  vinco; a correção da conta muda peças aceitas e está no backlog.
 - **T6.** Um comando por rodada (`conferir:vistas`) que encadeia T1 a T4 e a
   leitura para todas as vistas com referência, e a entrada nas skills.
 - **Adiado.** A entrada pela receita de peça (`PLANO.referencias` com vista e

@@ -59,6 +59,12 @@ processo o teria pego sozinho e o destino.
    saiu de `compensar` com um laço a cada 20 a 40 mm (largura no pedido, ponta 5 mm para dentro, cor a 75%), e o
    limite está escrito no cabeçalho de `lacos-pelas-vistas.js`. A medida por faixa de altura foi feita em script
    solto; entra no backlog junto da comparação por cor.
+   A causa, achada depois num corpo sintético: a compensação move cada ponto da gaiola para a superfície passar por
+   ele, e o ponto da quina do contorno (um canto de 90 graus sem vinco, entre a ponta e a lateral) anda até 59 mm para
+   fora; a curva que o liga aos vizinhos sai 11,5 mm da lateral reta, e os vizinhos oscilam. Com a quina em `cantos`
+   o excesso vai a zero. `gaiolaPorLacos` passou a avisar (`compensacaoPassa`) quando a compensação leva a superfície
+   mais de 2 mm além do contorno declarado, com o trecho, o laço e o desvio; nos casos da casa o maior acréscimo é
+   1,36 mm. O degrau entre laços, que já dá 13 mm sem compensar, o aviso não cobre.
 9. **O bico do capô dava a volta inteira e deixava uma listra no laranja.** Com a ponta da planta levada inteira à
    silhueta, o degrau do bico (55 mm na lateral) corria de um lado ao outro com a mesma profundidade, e de trás aparecia
    como uma listra horizontal que a referência não tem: nela o bico morre nos cantos. A comparação por cor não vê
