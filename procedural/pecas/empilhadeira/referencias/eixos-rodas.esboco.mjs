@@ -39,8 +39,9 @@ const PRETO_PNEU = '#1a1b1d';
 const LADOS = 48;
 
 /* as rodas e os cubos, em mm (x é a distância ao centro da máquina) */
-export const RODA_D = { y: 352.5, z: 0, raio: 352.5, xDentro: 459, banda: 210, aro: 172, disco: [463, 478], furo: 55 };
-export const RODA_T = { y: 284, z: -1700, raio: 284, xDentro: 440, banda: 210, aro: 150, disco: [500, 515], furo: 55 };
+export const RODA_D = { y: 352.5, z: 0, raio: 352.5, xDentro: 459, banda: 210, aro: 160, disco: [463, 478], furo: 55 };
+export const RODA_T = { y: 284, z: -1700, raio: 284, xDentro: 497, banda: 158, aro: 120, disco: [550, 565], furo: 55 };
+const CHAPA = [266, 327];         // as chapas do chassi em x (PLACA de carcaca.esboco.mjs)
 
 /* A seção do pneu em [raio, a], com a de 0 (face de dentro) a b (face de fora): o talão no aro, o flanco abaulado e o ombro
    arredondado (raio de cerca de 55 mm) até a banda plana. A seção é a mesma nas duas rodas, levada ao raio de cada uma. */
@@ -90,33 +91,44 @@ export function montarEixosRodas(estado) {
 
   /* EIXO DIANTEIRO ---------------------------------------------------------------------------------------------------------- */
   /* a carcaça do eixo: o tubo de Ø 150 de flange a flange (404 mm) e o bojo do diferencial no meio. Passa pelo entalhe das chapas
-     do chassi (lateral `cuboDianteiro`, de y 249 a 532 e z -211 a 100), onde se apoia. */
+     do chassi (o contorno lateral `chassi` contorna o cubo: parede da frente em z 98 a 100, de y 338 a 426, e o teto do entalhe pelos
+     vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8)). O assento de cada lado, na espessura da chapa (266 a 327 mm), sobe do tubo até esse
+     teto: é a face pela qual o eixo se apoia no chassi. */
   const D = RODA_D;
-  parte('eixoDianteiro', torno([[0, -404], [75, -404], [75, -190], [150, -120], [150, 120], [75, 190], [75, 404], [0, 404]], D.y, D.z), ESCURO);
+  const assento = [[30, 380], [72, 380], [72, 432.7], [60.5, 429], [30, 460]];
+  parte('eixoDianteiro', unir(
+    torno([[0, -404], [75, -404], [75, -190], [150, -120], [150, 120], [75, 190], [75, 404], [0, 404]], D.y, D.z),
+    extX(assento, CHAPA[0], CHAPA[1]), extX(assento, -CHAPA[1], -CHAPA[0]),
+  ), ESCURO);
   /* o cubo: o flange de Ø 220 de 404 a 463 mm (o disco da roda assenta na face de fora dele) e a tampa de Ø 100 até 516 mm, que
      passa pelo furo do disco */
   parte('cubosDianteiros', par(torno([[0, 404], [110, 404], [110, D.disco[0]], [50, D.disco[0]], [50, 516], [0, 516]], D.y, D.z)), CINZA);
 
   /* EIXO TRASEIRO ----------------------------------------------------------------------------------------------------------- */
   const T = RODA_T;
-  const PINO_X = 400;                  // o pino vertical da manga (o eixo do esterço), por dentro do pneu (440)
-  /* a viga: seção de 120 x 100 mm, de pino a pino, com o olhal do pino de articulação no meio (cilindro ao longo de z, Ø 140) */
+  const PINO_X = 400;                  // o pino vertical da manga (o eixo do esterço), por dentro do pneu
+  /* a viga: seção de 120 x 100 mm, de pino a pino (a ponta encosta no pino da manga), com o olhal do pino de articulação no meio
+     (cilindro ao longo de z, Ø 140, de z -1810 a -1590) */
   const viga = unir(
-    extX([[T.z + 60, T.y - 50], [T.z - 60, T.y - 50], [T.z - 60, T.y + 50], [T.z + 60, T.y + 50]], -PINO_X + 30, PINO_X - 30),
+    extX([[T.z + 60, T.y - 50], [T.z - 60, T.y - 50], [T.z - 60, T.y + 50], [T.z + 60, T.y + 50]], -PINO_X + 40, PINO_X - 40),
     extZ(circulo(0, T.y, 70), T.z - 110, T.z + 110),
   );
   parte('eixoTraseiro', viga, ESCURO);
-  /* a manga: o pino vertical (Ø 80, de 190 a 380 mm), o garfo que o abraça na ponta da viga, a ponta de eixo até o cubo e o braço
-     que leva à barra de direção, à frente da viga */
+  /* o suporte do pino de articulação: o bloco que desce do fundo do poço traseiro da carcaça (a face de baixo dele, a 428 mm, de z
+     -1342 a -1645) até o topo do olhal (354 mm), à frente da viga. É por ele que o eixo traseiro se prende na carcaça. */
+  parte('suporteTraseiro', extZ([[-90, T.y + 70], [90, T.y + 70], [90, 428], [-90, 428]], -1640, -1595), CINZA);
+  /* a manga: o pino vertical (Ø 80, de 189 a 379 mm), a ponta de eixo até o cubo e o braço que leva à barra de direção, à frente
+     da viga */
   const manga = unir(
     extY(circulo(PINO_X, T.z, 40), T.y - 95, T.y + 95),
-    torno([[0, PINO_X], [45, PINO_X], [45, 470], [0, 470]], T.y, T.z),
-    extY([[PINO_X - 25, T.z + 20], [PINO_X + 20, T.z + 20], [PINO_X + 20, T.z + 150], [PINO_X - 25, T.z + 150]], T.y - 20, T.y + 20),
+    torno([[0, PINO_X], [45, PINO_X], [45, 480], [0, 480]], T.y, T.z),
+    extY([[PINO_X - 25, T.z + 20], [PINO_X + 20, T.z + 20], [PINO_X + 20, T.z + 165], [PINO_X - 25, T.z + 165]], T.y - 20, T.y + 20),
   );
   parte('mangas', par(manga), ESCURO);
-  parte('cubosTraseiros', par(torno([[0, 470], [90, 470], [90, T.disco[0]], [50, T.disco[0]], [50, 575], [0, 575]], T.y, T.z)), CINZA);
-  /* a barra de direção: tubo de Ø 44 de braço a braço, 130 mm à frente do eixo */
-  parte('barraDirecao', torno([[0, -PINO_X + 10], [22, -PINO_X + 10], [22, PINO_X - 10], [0, PINO_X - 10]], T.y, T.z + 130), CINZA);
+  /* o cubo: o flange de Ø 170 de 480 mm até o disco da roda e a tampa de Ø 100 até 625 mm */
+  parte('cubosTraseiros', par(torno([[0, 480], [85, 480], [85, T.disco[0]], [50, T.disco[0]], [50, 625], [0, 625]], T.y, T.z)), CINZA);
+  /* a barra de direção: tubo de Ø 44 de braço a braço (encosta na face de dentro de cada braço, a 375 mm), 140 mm à frente do eixo */
+  parte('barraDirecao', torno([[0, -PINO_X + 25], [22, -PINO_X + 25], [22, PINO_X - 25], [0, PINO_X - 25]], T.y, T.z + 140), CINZA);
 
   return { RODA_D, RODA_T };
 }

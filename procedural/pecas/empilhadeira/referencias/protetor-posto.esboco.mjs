@@ -154,9 +154,11 @@ export function montarProtetorPosto(estado) {
 
   /* As luzes de trabalho: na lateral, px 437 a 462 nas linhas 84 a 130 (z -181 a -288, y 1.745 a 1.943), à frente da coluna da
      frente; de frente, colunas 415 a 440 e 663 a 690 nas linhas 84 a 126, sobre a coluna. Uma caixa de 90 mm de largura e de lado,
-     de 1.750 a 1.940, com a face de trás na face da frente da coluna (inclinada como ela). */
+     de 1.750 a 1.940, com a face de trás na face da frente da coluna (inclinada como ela), de 445 a 530 mm: centrada na borda de fora
+     da coluna, que ali vai de 433 a 489 mm. Na primeira rodada, de 415 a 505, ela ficava sobre a coluna de frente; na segunda, de 470
+     a 555, passava toda para fora e aparecia de trás, onde a referência a esconde atrás da coluna de trás. */
   const ladoLuz = [[zFrente(1750) - 3, 1750], [zFrente(1940) - 3, 1940], [zFrente(1940) + 90, 1940], [zFrente(1750) + 90, 1750]];
-  parte('luzesTrabalho', unir(...lados((s) => extX(ladoLuz, ...emX(s, [415, 505])))), ESCURO);
+  parte('luzesTrabalho', unir(...lados((s) => extX(ladoLuz, ...emX(s, [445, 530])))), ESCURO);
   /* As lanternas do alto, na face de trás da travessa de trás: de trás, linhas 44 a 57, colunas 434 a 485 e 586 a 631 (205 a 410 mm
      do centro), dentro da altura da travessa (a primeira rodada as pôs acima dela, e de trás sobravam por cima); de lado, px 720 a
      736 nas linhas 36 a 68. */
@@ -237,14 +239,14 @@ export function montarProtetorPosto(estado) {
      claro das colunas 450 a 618 (675 mm) e das linhas 190 a 270 (320 mm), centrado; de cima, das colunas 820 a 900 (z -1.679 a -2.003:
      324 mm de diâmetro, centro em z -1.841) e das linhas 185 a 375 (731 mm, centro em x -69, com a válvula do lado -x); de lado (região
      `cilindro`), centro em y 1.359. TABELA: 320 x 700. Adotado: 320 mm de diâmetro, 700 do fim da cúpula ao fim da válvula, centro em z
-     -1.840, y 1.345 e x -10 (a vista de trás o dá centrado e a de cima, 69 mm para -x; na primeira rodada, com -35, ele saía
-     deslocado de trás). */
-  const CG = { x: -10, y: 1345, z: -1840, r: 160 };
+     -1.840, y 1.345 e x 30 (o conjunto, da cúpula à válvula, centrado em x -10), com a cúpula do lado da válvula larga (raio 135, de trás ela ocupa 75 px de 340) (a vista de trás o dá centrado e a de cima, 69 mm para -x; com o centro do corpo em -35 e em -10 ele
+     saía de trás 45 a 50 mm para o lado do escape). */
+  const CG = { x: 30, y: 1345, z: -1840, r: 160 };
   const corpoGas = unir(
     extX(circulo(CG.z, CG.y, CG.r, 48), CG.x - 300, CG.x + 290),
     extX(circulo(CG.z, CG.y, 125, 48), CG.x + 280, CG.x + 315),
-    extX(circulo(CG.z, CG.y, 125, 48), CG.x - 325, CG.x - 290),
-    extX(circulo(CG.z, CG.y, 35, 24), CG.x - 380, CG.x - 315),
+    extX(circulo(CG.z, CG.y, 135, 48), CG.x - 345, CG.x - 290),
+    extX(circulo(CG.z, CG.y, 35, 24), CG.x - 385, CG.x - 335),
   );
   parte('cilindroGlp', corpoGas, CLARO);
   /* As cintas: de trás, as faixas escuras nas colunas 497 a 510 e 553 a 565; de cima, nas linhas 255 e 317. Adotado: duas, a 120 mm do
@@ -262,10 +264,12 @@ export function montarProtetorPosto(estado) {
 
   /* O escape, atrás da coluna de trás do lado direito (-x): na lateral px 742 a 766 (z -1.490 a -1.593) da linha 272 (y 1.135, a tampa
      do capô) à 98 (y 1.882), e a ponta curva para trás até a linha 58 (y 2.055, px 750 a 772); de trás, colunas 623 a 640 (350 a 418
-     mm). Um tubo de 90 mm de pé na face de cima da tampa, de 1.148 a 1.990, e a ponta de 100 mm inclinada 35 graus para trás. */
-  const escape = extY(circulo(-370, -1545, 45, 32), 1146, 1990);
-  const ponta = extY(circulo(-370, -1545, 40, 32), 1950, 2070);
-  girarX(ponta, -35, [-370, 1960, -1545]);
+     mm). Um tubo de 90 mm de pé na face de cima da tampa, de 1.148 a 1.990, e a ponta de 100 mm inclinada 35 graus para trás. O eixo
+     fica em x -355 e z -1.567: em -370 e -1.545 o pé saía 14 mm da tampa vista de cima, pela frente dela (z -1.512) e pelo lado
+     (409 mm), medido com `sobra:partes` (escape em tampa). */
+  const escape = extY(circulo(-355, -1567, 45, 32), 1146, 1990);
+  const ponta = extY(circulo(-355, -1567, 40, 32), 1950, 2070);
+  girarX(ponta, -35, [-355, 1960, -1567]);
   parte('escape', unir(escape, ponta), ESCURO);
 }
 

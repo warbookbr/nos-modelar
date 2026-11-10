@@ -63,13 +63,13 @@ const LADOS = 40;
 /* as medidas adotadas, em mm */
 export const TORRE = {
   tras: 100, frente: 372,                 // fundo dos canais externos (z)
-  externo: { x: [261, 310], alma: 20, aba: 20, y: [150, 2040] },
+  externo: { x: [261, 310], alma: 20, aba: 20, y: [150, 2100] },
   interno: { x: [198, 288], alma: 20, aba: 20, z: [124, 348], y: [260, 2100] },
   pivo: { y: 352.5, z: 0 },               // o centro do eixo dianteiro, em torno do qual a torre inclina
 };
 export const CARRO = { z: [430, 480], x: 500, barraBaixo: [170, 240], barraCima: [540, 640], montante: [140, 195] };
 export const GARFO = { centro: 280, largura: 100, espessura: 40, comprimento: 1070, chao: 50, altura: 650, face: 520 };
-export const INCLINACAO = { x: 355, y: 860, camisa: [-260, 15], haste: [15, 60], rCamisa: 45, rHaste: 22 };
+export const INCLINACAO = { x: 355, y: 860, camisa: [-150, 15], haste: [15, 60], rCamisa: 45, rHaste: 22 };
 
 /** Monta a torre e os garfos no estado { passos, topo, origem } da carcaça e devolve as medidas usadas. */
 export function montarTorreGarfos(estado) {
@@ -102,15 +102,16 @@ export function montarTorreGarfos(estado) {
 
   /* CANAIS EXTERNOS --------------------------------------------------------------------------------------------------------------
      Perfil em U de pé, aberto para dentro: a alma do lado de fora (x 290 a 310) e as duas abas de 20 mm na frente e atrás, de x 261 a
-     310 (a frente: canal externo de 13-14 px, 49 mm na escala da torre). De y 150 (lateral 140) a 2.040, 60 mm abaixo do interno.
-     Travessas: chapas atrás (z 100 a 120, entre as abas de trás) em y 1.150-1.220 e 1.970-2.040, e a de baixo, de fundo, de z 100 a
+     310 (a frente: canal externo de 13-14 px, 49 mm na escala da torre). De y 150 (lateral 140) a 2.100: de frente o externo e o
+     interno chegam juntos ao topo (rodada 1, A2 e A3: com o externo 60 mm abaixo aparecia um degrau que a referência não tem).
+     Travessas: chapas atrás (z 100 a 120, entre as abas de trás) em y 1.150-1.220 e 2.030-2.100, e a de baixo, de fundo, de z 100 a
      220 e y 150 a 210, que é o assento do cilindro de elevação (o carro passa à frente dela, de z 235 em diante). */
   const uExterno = [[E.x[0], T.tras], [E.x[1], T.tras], [E.x[1], T.frente], [E.x[0], T.frente], [E.x[0], T.frente - E.aba],
     [E.x[1] - E.alma, T.frente - E.aba], [E.x[1] - E.alma, T.tras + E.aba], [E.x[0], T.tras + E.aba]];
   const canalExterno = extY(uExterno, E.y[0], E.y[1]);
   const travessas = [
     caixaY(-E.x[1] + 1, E.x[1] - 1, T.tras, T.tras + E.aba, 1150, 1220),
-    caixaY(-E.x[1] + 1, E.x[1] - 1, T.tras, T.tras + E.aba, 1970, E.y[1]),
+    caixaY(-E.x[1] + 1, E.x[1] - 1, T.tras, T.tras + E.aba, 2030, E.y[1]),
     caixaY(-E.x[1] + 1, E.x[1] - 1, T.tras, 220, E.y[0], 210),
   ];
   /* a orelha do cilindro de inclinação: o bloco preso à alma por fora (face x 310), de z 60 a 160, y 830 a 890, até x 400; a haste
@@ -122,21 +123,25 @@ export function montarTorreGarfos(estado) {
      Perfil em U aberto para dentro, encaixado no U do externo: a alma de x 268 a 288 corre entre as abas do externo (z 120 a 352), e
      as abas de 20 mm, em z 124-144 e 328-348, vão de x 198 a 288. De frente aparece de 198 a 261, ao lado do externo (canal interno
      de 15 px). De y 260 a 2.100 (o topo da torre recolhida). A travessa de cima, entre as almas, de y 2.030 a 2.100 e z 124 a 350, leva
-     as polias das correntes na frente e recebe a haste do cilindro de elevação por baixo. */
+     as polias das correntes na frente. */
   const uInterno = [[I.x[0], I.z[0]], [I.x[1], I.z[0]], [I.x[1], I.z[1]], [I.x[0], I.z[1]], [I.x[0], I.z[1] - I.aba],
     [I.x[1] - I.alma, I.z[1] - I.aba], [I.x[1] - I.alma, I.z[0] + I.aba], [I.x[0], I.z[0] + I.aba]];
   const travessaInterna = caixaY(-I.x[1] + 1, I.x[1] - 1, I.z[0], 350, 2030, I.y[1]);
   parte('canaisInternos', unir(par(extY(uInterno, I.y[0], I.y[1])), travessaInterna), CINZA);
 
   /* CILINDRO DE ELEVAÇÃO ---------------------------------------------------------------------------------------------------------
-     Um, no centro (vista de frente, colunas 535 a 550), entre as travessas de trás e o carro: x 0, z 175. Camisa Ø 90 sentada na
-     travessa de baixo (y 210) até 1.300; haste Ø 50 até a travessa de cima do interno (2.030). */
-  parte('cilindroElevacao', extY(circulo(0, 175, 45), 210, 1300), ESCURO);
-  parte('hasteElevacao', extY(circulo(0, 175, 25), 1300, 2030), ACO);
+     Um, no centro (vista de frente, colunas 535 a 550), entre as travessas de trás e o carro: x 0, z 175. Na vista de frente ele acaba
+     a uns 1.400 mm, com a cabeça e duas correntes de cada lado dela (a 60 mm do centro) que descem ao carro, e acima dele o vão entre
+     os canais é aberto: é o cilindro de elevação livre, que sobe o carro antes do canal interno (rodada 1, A2, A3 e B3: com a haste até
+     o topo da torre aparecia uma barra clara onde a referência é vazia). Camisa Ø 60 sentada na travessa de baixo (y 210) até 1.050,
+     haste Ø 36 até 1.400 e a cabeça de 160 mm, de 1.400 a 1.440, de z 145 a 250. */
+  parte('cilindroElevacao', extY(circulo(0, 175, 30), 210, 1050), ESCURO);
+  parte('hasteElevacao', extY(circulo(0, 175, 18), 1050, 1400), ACO);
+  parte('cabecaElevacao', caixaY(-80, 80, 145, 250, 1400, 1440), CINZA);
 
   /* CILINDROS DE INCLINAÇÃO ------------------------------------------------------------------------------------------------------
-     Deitados ao longo de z em x 355, y 860, como na carcaca-lado (de z -36 a 75 em y 812 a 912). A camisa de Ø 90 vai de z -260 a 15:
-     a carcaça não tem o rebaixo no painel e ela fica dentro dele, de z -260 a 0 (o relato diz a medida que o painel teria de ter). A
+     Deitados ao longo de z em x 355, y 860, como na carcaca-lado (de z -36 a 75 em y 812 a 912). A camisa de Ø 90 vai de z -150 a 15 (mais atrás ela sairia por cima da descida do painel, que a z -260 está a 861 mm):
+     a carcaça não tem o rebaixo no painel e ela fica dentro dele, de z -150 a 0 (o relato diz a medida que o painel teria de ter). A
      haste de Ø 44 vai de 15 a 60, até a orelha do canal externo. */
   const C = INCLINACAO;
   parte('cilindrosInclinacao', par(extZ(circulo(C.x, C.y, C.rCamisa), C.camisa[0], C.camisa[1])), CINZA);
@@ -145,11 +150,15 @@ export function montarTorreGarfos(estado) {
   /* PLACA PORTA-GARFOS (o carro) -------------------------------------------------------------------------------------------------
      As duas barras de 1.000 mm à frente da torre (z 430 a 480): a de baixo de y 170 a 240 e a de cima de 540 a 640 (frente, linhas
      480-497 e 388-415, com os garfos embaixo). Os dois montantes de trás, de x 140 a 195, z 235 a 430, levam as barras aos canais
-     internos: correm por dentro deles (face de dentro do interno em x 198, 3 mm de folga) e no topo prendem as correntes. */
+     internos: correm por dentro deles (face de dentro do interno em x 198, 3 mm de folga) e no topo prendem as correntes. A
+     travessa de trás entre eles (z 235 a 300, y 590 a 640) prende as correntes do cilindro. As chapas das pontas, de x 470 a 500, ligam
+     as duas barras: de frente o quadro escuro desce dos dois lados até a barra de baixo (rodada 1, C1 e C4). */
   const K = CARRO;
   const barras = [caixaY(-K.x, K.x, K.z[0], K.z[1], ...K.barraBaixo), caixaY(-K.x, K.x, K.z[0], K.z[1], ...K.barraCima)];
   const montante = caixaY(K.montante[0], K.montante[1], 235, K.z[0], K.barraBaixo[0], K.barraCima[1]);
-  parte('placaGarfos', unir(...barras, par(montante)), PRETO);
+  const ponta2 = caixaY(K.x - 30, K.x, K.z[0], K.z[1], K.barraBaixo[1], K.barraCima[0]);
+  const travessaDoCarro = caixaY(-K.montante[1] + 1, K.montante[1] - 1, 235, 300, 590, K.barraCima[1]);
+  parte('placaGarfos', unir(...barras, par(unir(montante, ponta2)), travessaDoCarro), PRETO);
 
   /* GRADE DE CARGA: o quadro de 1.000 sobre a barra de cima (face y 640), de z 445 a 480, com os montantes de 30 mm, a barra de cima
      de 1.200 a 1.230 e a do meio de 890 a 910 (frente: topo na linha 247, barra do meio na 347). */
@@ -167,7 +176,8 @@ export function montarTorreGarfos(estado) {
 
   /* CORRENTES: uma fita de 15 x 12 mm de cada lado, em x 143 a 158 (149 mm do centro na frente), de pé na frente da travessa de cima
      do interno (face z 350) até o topo dos montantes do carro (y 640). Na referência elas descem à frente dos canais até a placa. */
-  parte('correntes', par(caixaY(143, 158, 350, 362, K.barraCima[1], I.y[1])), ESCURO);
+  /* e as do cilindro: 12 x 12 mm em x 54 a 66, na frente da cabeça (face z 250) até a travessa do carro (y 640) */
+  parte('correntes', unir(par(caixaY(143, 158, 350, 362, K.barraCima[1], I.y[1])), par(caixaY(54, 66, 250, 262, K.barraCima[1], 1440))), ESCURO);
 
   return { TORRE, CARRO, GARFO, INCLINACAO };
 }
