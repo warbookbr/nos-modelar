@@ -1,0 +1,1086 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/eixo-traseiro",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/carcaca-tras.ia.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "mangas",
+        "tipo": "espessura",
+        "onde": "região do pino-mestre e da ponta de eixo, em volta do cubo",
+        "sentido": "menor",
+        "evidencia": "Na carcaça-tras.ia o cubo tem um volume de fundição escuro maior que o pino. No modelo, mangas isométrica e inferior montada mostram só pino Ø80 nu e ponta fina. Confiança baixa, referência de IA."
+      }
+    ],
+    "observacao": "As cinco partes têm a forma prometida e nenhum critério de reprovação aparece nas vistas; o que fica é falta de caráter de fundição, e as rodas traseiras não aparecem para conferir o cruzamento com o contrapeso."
+  },
+  "partes": [
+    {
+      "nome": "eixoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mangas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cubosTraseiros",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "barraDirecao",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a montagem v5 so aceita encaixaCilindrico e assentaAnular: o suporte assenta plano sob o fundo do poco, e a junta virou passagem coaxial pelos pocos com folga de 279 mm",
+    "a carcaca nao publica o fundo do poco traseiro: a altura do suporte importa pocoTraseiro.fundo e rodas.traseira da TABELA da carcaca, fora da montagem",
+    "porta em origem cujas faces o unir consome vira orfao, e porta citando o unir pega o raio do pino-mestre: a ponta de eixo ficou corpo proprio sem uniao",
+    "porta publicada de uma origem espelha resolveu o centro do lado errado (1030 mm do plano): o cubo direito virou revolucao propria",
+    "malha:conferir reprova face-fina nas duas pecas de eixo, e nenhum dos comandos da etapa cobra isso",
+    "rodada 1, manga sem volume de fundicao: o critico deu confianca baixa e a referencia e imagem de IA, que vale como carater; atribuido ao plano, que promete pino, ponta de eixo e braco; fica como detalhe para a pessoa decidir"
+  ],
+  "notaDePassagem": "Pinos-mestres em x = +-400, z = 0, verticais de y -95 a 95 no referencial do eixo, que fica no cubo traseiro, em y 284 e z -1700 da carcaca. O pino de articulacao e o eixo z pelo centro do olhal. A porta passagemNoChassi sai da ponta esquerda, no anel colinear em x = entreAsParedes/2, que o vinculo traz da carcaca. As portas cuboTraseiroEsquerdo e cuboTraseiroDireito ficam na face do flange, em x = +-550, prontas para as rodas traseiras. Olhal e pino-mestre com 96 lados, como as revolucoes.",
+  "receita": {
+    "sha256": "sha256:a3008990e5a02b820eae9118f8ae0b18afb4c48e849d4330ce2faca47dd8749f",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 202,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/eixo-traseiro — o eixo traseiro direcional da empilhadeira: a viga de 120 x 100 mm com o olhal do pino de articulação"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * no meio, o suporte desse pino, que sobe até o fundo do poço traseiro da carcaça, as duas mangas que esterçam (o pino-mestre"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * vertical, a ponta de eixo e o braço de direção), os dois cubos (flange de Ø 170 e tampa de Ø 100) e a barra de direção de braço a"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * braço, numa peça rígida na pose de rodas retas."
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * Terceira peça da montagem `../../montagem.json` (fatia 3 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 3 das"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * partes do `../../ALINHAMENTO.md`). A forma é a metade traseira do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * (`../../referencias/eixos-rodas.esboco.mjs`), levada para cá sem mudança de forma; o rascunho passou a chamar `montarEixoTraseiro`"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * daqui, de modo que a geometria tem uma fonte só. Nenhuma medida mudou; mudaram três coisas de construção: as revoluções e os círculos"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * extrudados (olhal e pino-mestre) com 96 lados no lugar de 48 e 32, um anel colinear nas pontas de eixo para a porta, e a ponta de"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * eixo como corpo próprio da parte `mangas`, sem união com o pino-mestre (ver `montarEixoTraseiro`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). A vista de trás da carcaça (`carcaca-tras.ia.png`, 4,03 mm/px): a tampa cinza do cubo nas"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * colunas 365 a 379, Ø 89 nas linhas 457 a 479, levada a Ø 100, e o cubo escuro de Ø 177 nas linhas 445 a 489, levado a Ø 170; a ponta"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * da tampa a 625 mm, dentro do aro. O disco da roda traseira fica a 550 mm, onde o flange acaba. A lateral da carcaça"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * (`carcaca-lado.ia.png`) mostra só o pino vertical da manga sobre o cubo (coluna 782, linhas 395 a 440); a viga, as mangas e a barra"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * não aparecem inteiras em nenhuma vista, e as seções delas são de caráter. O pino-mestre fica a 400 mm, por dentro do pneu traseiro"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * (de 445 a 653, `rodas.traseira` da carcaça). O suporte sobe do topo do olhal até o fundo do poço traseiro da carcaça"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * (`pocoTraseiro.fundo`, a 428 mm do chão), que a carcaça não publica como porta: a altura vem do chão em mm, como no rascunho, e cai"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * no referencial do eixo pela altura do cubo traseiro de `rodas` da carcaça."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * O ENCAIXE. A origem é o centro do eixo, no meio da máquina, sobre o eixo dos cubos; y para cima, +x à esquerda de quem dirige e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * frente em +z. A montagem põe o eixo na carcaça pela porta `passagemNoChassi` (a ponta de eixo da manga esquerda no eixo do poço da"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * roda traseira, que a carcaça publica como `passagemDoEixoTraseiro`), e o vínculo `entreAsParedes` traz a distância entre as paredes"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * dos dois poços, onde a ponta de eixo leva um anel de vértices para a porta ter plano na malha. As rodas traseiras, de uma etapa"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * seguinte, assentam nas portas `cuboTraseiroEsquerdo` e `cuboTraseiroDireito`, a face de fora do flange."
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * AS JUNTAS QUE A MONTAGEM AINDA NÃO TEM. A viga gira em torno do pino de articulação (o eixo z pelo centro do olhal) contra o suporte,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * e cada manga esterça em torno do pino-mestre dela (o eixo vertical em x = ±400, z = 0, de y -95 a 95); a montagem v5 não tem"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * articulação entre instâncias, e as cinco partes ficam numa peça na pose de transporte."
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e as portas em mm; `montarEixoTraseiro` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": " * { passos, topo, origem } (o mesmo que o rascunho da máquina usa, com `em` levando a origem ao lugar dela); `gerarPassos` converte"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": " * para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* A distância entre as paredes de dentro dos dois poços traseiros do contrapeso da carcaça (2 x 405). Vem da porta"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "     `passagemDoEixoTraseiro` pelo vínculo da montagem; este valor só vale para ver a peça sozinha. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  entreAsParedes: 810,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* As cores do rascunho: o escuro da viga e das mangas, o cinza do suporte, dos cubos e da barra (as da carcaça). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  cores: { eixo: CARCACA.cores.escuro, aco: CARCACA.cores.cinza },"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  /* Lados das revoluções e dos círculos extrudados. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* A viga: seção de 120 (em z) por 100 mm (em y), de -360 a 360 mm, onde a ponta encosta no pino-mestre; o olhal do pino de"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "     articulação é um cilindro de Ø 140 ao longo de z, de -110 a 110 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  viga: { meiaProfundidade: 60, meiaAltura: 50, ate: 360 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  olhal: { raio: 70, meioComprimento: 110 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* O suporte do pino de articulação: o bloco de 180 mm de largura que sobe do topo do olhal até o fundo do poço traseiro, de z 60 a"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "     105 mm (à frente da viga). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  suporte: { meiaLargura: 90, z: [60, 105] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  /* A manga de cada lado: o pino-mestre de Ø 80 em x 400 (de y -95 a 95), a ponta de eixo de Ø 90 de 400 a 480 mm e o braço de direção,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "     de x 375 a 420, z 20 a 165 e y -20 a 20. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  manga: { pinoX: 400, raioDoPino: 40, meiaAlturaDoPino: 95, raioDaPonta: 45, pontaAte: 480, braco: { x: [375, 420], z: [20, 165], meiaAltura: 20 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  /* O cubo de cada lado: o flange de Ø 170 de 480 a 550 mm (a face de fora recebe a roda) e a tampa de Ø 100 até 625. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  cubo: { raioDoFlange: 85, face: 550, raioDaTampa: 50, ateATampa: 625 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  /* A barra de direção: tubo de Ø 44 de braço a braço (até a face de dentro de cada braço, a 375 mm), 140 mm à frente do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  barra: { raio: 22, z: 140 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "const r1 = (v) => Math.round(v * 10) / 10;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "/** Os perfis e as portas, em mm, no referencial do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const { viga: V, olhal: O, suporte: S, manga: M, cubo: CU, barra: B } = T;"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const parede = T.entreAsParedes / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const circulo = (cx, cy, r) => Array.from({ length: T.lados }, (_, k) => [cx + r * Math.cos(2 * Math.PI * k / T.lados), cy + r * Math.sin(2 * Math.PI * k / T.lados)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  /* o suporte vai do topo do olhal ao fundo do poço traseiro da carcaça, levado do chão ao eixo pela altura do cubo traseiro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const topoDoSuporte = CARCACA.pocoTraseiro.fundo[0][1] - CARCACA.rodas.traseira.y;"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  /* a seção da viga em [z, y] e as seções do suporte em [x, y] e do braço em [x, z] */"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const secaoDaViga = [[V.meiaProfundidade, -V.meiaAltura], [-V.meiaProfundidade, -V.meiaAltura], [-V.meiaProfundidade, V.meiaAltura], [V.meiaProfundidade, V.meiaAltura]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const secaoDoSuporte = [[-S.meiaLargura, O.raio], [S.meiaLargura, O.raio], [S.meiaLargura, topoDoSuporte], [-S.meiaLargura, topoDoSuporte]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const secaoDoBraco = [[M.braco.x[0], M.braco.z[0]], [M.braco.x[1], M.braco.z[0]], [M.braco.x[1], M.braco.z[1]], [M.braco.x[0], M.braco.z[1]]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  /* a ponta de eixo e o cubo em [raio, x], de cada lado (s = 1 à esquerda); o do lado direito é o espelho em x, com a ordem invertida"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "     para a revolução manter a face de fora para fora. O anel da ponta em x = parede é colinear e não muda a forma: é o plano da porta"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "     da passagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  const doLado = (p, s) => { const q = p.map(([r, x]) => [r, s * x]); return s > 0 ? q : q.reverse(); };"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  const perfilDaPonta = (s) => doLado([[0, M.pinoX], [M.raioDaPonta, M.pinoX], [M.raioDaPonta, parede], [M.raioDaPonta, M.pontaAte], [0, M.pontaAte]], s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  const perfilDoCubo = (s) => doLado([[0, M.pontaAte], [CU.raioDoFlange, M.pontaAte], [CU.raioDoFlange, CU.face], [CU.raioDaTampa, CU.face], [CU.raioDaTampa, CU.ateATampa], [0, CU.ateATampa]], s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const xDaBarra = M.braco.x[0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  const perfilDaBarra = [[0, -xDaBarra], [B.raio, -xDaBarra], [B.raio, xDaBarra], [0, xDaBarra]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    passagemNoChassi: { forma: 'cilindro', papel: 'externa', eixo: [-1, 0, 0], centro: [parede, 0, 0], raio: M.raioDaPonta, inicio: 0, fim: T.entreAsParedes, referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    cuboTraseiroEsquerdo: { forma: 'anel', papel: 'ocupa', eixo: [-1, 0, 0], centro: [CU.face, 0, 0], raioInterno: CU.raioDaTampa, raioExterno: CU.raioDoFlange, inicio: 0, fim: CU.face - M.pontaAte },"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    cuboTraseiroDireito: { forma: 'anel', papel: 'ocupa', eixo: [1, 0, 0], centro: [-CU.face, 0, 0], raioInterno: CU.raioDaTampa, raioExterno: CU.raioDoFlange, inicio: 0, fim: CU.face - M.pontaAte },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  return { circulo, topoDoSuporte, secaoDaViga, secaoDoSuporte, secaoDoBraco, perfilDaPonta, perfilDoCubo, perfilDaBarra, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "/** Monta o eixo traseiro no estado { passos, topo, origem }, em mm, com a origem do eixo levada a `em`, e devolve as origens das"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": " *  partes e das portas. O rascunho da máquina inteira chama esta função com o centro do cubo traseiro da carcaça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "export function montarEixoTraseiro(estado, T = TABELA, em = [0, 0, 0]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  const { extX, extY, extZ, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  const [ex, ey, ez] = em;"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  const novo = () => { estado.origem += 1; return estado.origem; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  /* revolução em torno de x: o perfil é [raio, x] e `em` leva o eixo a [ex, y, z] */"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const torno = (perfil, y, z) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    estado.passos.push(['lathe', { origemId: id, perfil: perfil.map(([r, x]) => [r1(r), r1(x + ex)]), eixo: 'x', lados: T.lados, em: [0, r1(y + ey), r1(z + ez)] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "    return { origem: { op: 'lathe', id } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  /* a cópia do outro lado, pelo espelho no plano do meio da máquina */"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  const espelho = (sel) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    estado.passos.push(['espelha', { origemId: id, eixo: 'x', pos: r1(ex), derivaDe: sel.origem, sel: { origem: sel.origem } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    return { origem: { op: 'espelha', id, de: sel.origem } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  const par = (sel) => unir(sel, espelho(sel));"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  const { viga: V, olhal: O, suporte: S, manga: M, barra: B } = T;"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  const zy = (p) => p.map(([z, y]) => [z + ez, y + ey]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  const xy = (p) => p.map(([x, y]) => [x + ex, y + ey]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const xz = (p) => p.map(([x, z]) => [x + ex, z + ez]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  /* a viga com o olhal no meio */"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const viga = unir(extX(zy(D.secaoDaViga), -V.ate + ex, V.ate + ex), extZ(xy(D.circulo(0, 0, O.raio)), -O.meioComprimento + ez, O.meioComprimento + ez));"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  parte('eixoTraseiro', viga, T.cores.eixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  parte('suporteTraseiro', extZ(xy(D.secaoDoSuporte), S.z[0] + ez, S.z[1] + ez), T.cores.aco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  /* a manga esquerda: o pino-mestre unido ao braço, e a direita é o espelho deles; a ponta de eixo de cada lado é corpo próprio da"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "     mesma parte, que entra no pino sem união: unida, a face de dentro dela some no pino e a porta da passagem, que sai dela, fica sem"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "     face (o núcleo recusa porta em face consumida) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  const manga = unir("
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    extY(xz(D.circulo(M.pinoX, 0, M.raioDoPino)), -M.meiaAlturaDoPino + ey, M.meiaAlturaDoPino + ey),"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "    extY(xz(D.secaoDoBraco), -M.braco.meiaAltura + ey, M.braco.meiaAltura + ey),"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  );"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  parte('mangas', par(manga), T.cores.eixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const ponta = torno(D.perfilDaPonta(1), 0, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const pontaD = torno(D.perfilDaPonta(-1), 0, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  parte('mangas', ponta, T.cores.eixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  parte('mangas', pontaD, T.cores.eixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  const cuboE = torno(D.perfilDoCubo(1), 0, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  const cuboD = torno(D.perfilDoCubo(-1), 0, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  parte('cubosTraseiros', unir(cuboE, cuboD), T.cores.aco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  parte('barraDirecao', torno(D.perfilDaBarra, 0, B.z), T.cores.aco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  return { viga, ponta, manga, cuboE, cuboD };"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "/* Os campos de medida de cada operação deste eixo e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "const MEDIDAS = { lathe: ['perfil', 'em'], extrusao: ['perfil', 'em', 'altura'], espelha: ['pos'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, as três portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  const { ponta, cuboE, cuboD } = montarEixoTraseiro(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  return [...forma, porta('passagemNoChassi', ponta), porta('cuboTraseiroEsquerdo', cuboE), porta('cuboTraseiroDireito', cuboD)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  { par: ['eixoTraseiro', 'suporteTraseiro'], motivo: 'o topo do olhal, a 70 mm do eixo, toca a face de baixo do suporte do pino de articulação' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  { par: ['eixoTraseiro', 'mangas'], motivo: 'a ponta da viga, a 360 mm do centro, encosta no pino-mestre de cada manga' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  { par: ['cubosTraseiros', 'mangas'], motivo: 'a ponta de eixo de cada manga acaba a 480 mm, onde a face de dentro do flange do cubo começa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  { par: ['barraDirecao', 'mangas'], motivo: 'cada ponta da barra de direção, a 375 mm, encosta na face de dentro do braço da manga' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  meta: { nome: 'empilhadeira/eixo-traseiro', desc: 'eixo traseiro direcional da empilhadeira: viga com olhal de articulação e suporte, as duas mangas com pino-mestre e braço, os cubos e a barra de direção' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  TOPO: { origem: 'centro do eixo, no meio da máquina, sobre o eixo dos cubos traseiros; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "    objeto: 'eixo traseiro direcional de empilhadeira de 2,5 t, articulado no meio sob o contrapeso: a viga com o olhal e o suporte do pino de articulação, as mangas que esterçam, os cubos e a barra de direção, rodas retas',"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "    referencias: ['../../referencias/carcaca-tras.ia.png', '../../referencias/carcaca-lado.ia.png', '../../referencias/tras.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "    escala: { medida: 'distância entre as faces de fora dos dois flanges dos cubos traseiros (o assento das rodas traseiras)', milimetros: 1100 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "      { nome: 'eixoTraseiro', forma: 'viga escura de seção 120 (em z) por 100 mm (em y) de -360 a 360 mm, com o olhal do pino de articulação no meio: cilindro de Ø 140 ao longo de z, de -110 a 110 mm', tecnica: 'seção retangular extrudada em x unida ao círculo de 96 lados extrudado em z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "      { nome: 'suporteTraseiro', forma: 'bloco cinza de 180 mm de largura, de z 60 a 105 mm, que sobe do topo do olhal (70 mm acima do eixo) até o fundo do poço traseiro da carcaça (428 mm do chão)', tecnica: 'seção retangular em x e y extrudada em z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "      { nome: 'mangas', forma: 'de cada lado, a manga escura: o pino-mestre vertical de Ø 80 em x 400, de 95 mm abaixo a 95 acima do eixo, a ponta de eixo de Ø 90 de 400 a 480 mm e o braço de direção de x 375 a 420, z 20 a 165 e 40 mm de altura, à frente do eixo', tecnica: 'círculo de 96 lados extrudado em y, revolução em torno de x (96 lados) e retângulo extrudado em y, unidos; a direita é o espelho da esquerda' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "      { nome: 'cubosTraseiros', forma: 'de cada lado, o flange cinza de Ø 170 de 480 a 550 mm do centro e a tampa de Ø 100 de 550 a 625', tecnica: 'revolução em torno de x (96 lados) e o espelho dela, unidos' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "      { nome: 'barraDirecao', forma: 'tubo cinza de Ø 44 de -375 a 375 mm, 140 mm à frente do eixo, de braço a braço das mangas', tecnica: 'revolução em torno de x (96 lados)' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "      'os cubos fora do eixo dos poços traseiros da carcaça, ou as rodas que eles levam cruzando o contrapeso',"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "      'o suporte do pino de articulação sem tocar o fundo do poço traseiro, ou atravessando-o',"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "      'manga sem o pino-mestre vertical por dentro do pneu, ou sem o braço que leva à barra de direção',"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "      'a barra de direção solta dos braços, ou atrás do eixo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "      'cor trocada: a viga e as mangas cinza, ou o suporte, os cubos e a barra escuros',"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm: a ponta da tampa de cada lado, o topo do suporte e a frente da barra. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    const T = this.PARAMS; const CU = T.cubo; const S = T.suporte; const B = T.barra;"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "    const topo = CARCACA.pocoTraseiro.fundo[0][1] - CARCACA.rodas.traseira.y;"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "      { nome: 'ponta da tampa do cubo esquerdo', parte: 'cubosTraseiros', medida: 'maximo', em: [CU.ateATampa, CU.raioDoFlange, CU.raioDoFlange], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "      { nome: 'ponta da tampa do cubo direito', parte: 'cubosTraseiros', medida: 'minimo', em: [-CU.ateATampa, -CU.raioDoFlange, -CU.raioDoFlange], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "      { nome: 'topo do suporte, sob o fundo do poço traseiro', parte: 'suporteTraseiro', medida: 'maximo', em: [S.meiaLargura, topo, S.z[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "      { nome: 'frente da barra de direção', parte: 'barraDirecao', medida: 'maximo', em: [T.manga.braco.x[0], B.raio, B.z + B.raio], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": ""
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[5], PASSOS[17], PASSOS[31]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az90.png",
+      "peca-lado-rasante-az0.png",
+      "peca-lado-rasante-az90.png",
+      "peca-topo-rasante-az10.png",
+      "peca-topo-rasante-az100.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}
