@@ -12,11 +12,18 @@
  * a silhueta da continente (centro a centro de pixel, pela transformada de distância exata). A ocultação não entra: cada parte é
  * projetada sozinha, e a parte que fica escondida atrás da outra conta como se estivesse à vista.
  *
+ * A SILHUETA É A REAL, COM OS FUROS. A continente é a máscara dos pixels que as faces dela cobrem, sem fechar furo nenhum: o anel visto
+ * pelo eixo, a moldura vazada vista de frente e o pneu visto de lado têm o vão vazio, e a parte que cai no vão sobra, com a distância
+ * até a borda do vão. Isso é medida e não defeito: a grade do teto dentro do quadro do protetor, de cima, e o aro dentro do pneu, de
+ * lado, sobram (ATRITOS da empilhadeira, itens 16 e 18). O par que só se mede numa vista em que a continente é cheia declara as
+ * vistas dele: `{ par: 'grade:capo', vistas: ['superior'] }`, ou `grade:capo@superior+direita` no texto de `--dentro`; o par sem
+ * vistas próprias usa as de `--vistas`.
+ *
  * O LIMITE. A parte que fica legitimamente fora numa vista dá sobra ali: a tampa que sobe 40 mm acima do capô, vista de trás, sobra
  * 40 mm, e isso é a forma, não um defeito. Por isso as vistas (`--vistas`) e a tolerância (`--tolerancia-mm`) são de quem conduz,
  * escolhidas para o par, e o número informa onde olhar; ele não aprova forma, que quem aprova é a pessoa.
  *
- * Uso: npm run sobra:partes -- <esboço> --dentro=grade:capo,fundoGrade:capo [--opcao=1] [--vistas=superior,direita,traseira,frontal]
+ * Uso: npm run sobra:partes -- <esboço> --dentro=grade:capo,fundoGrade:capo@superior [--opcao=1] [--vistas=superior,direita,traseira,frontal]
  *        [--tolerancia-mm=3] [--largura=1200] [--saida=<pasta>]
  * O arquivo é o do `esboco:nucleo` (.esboco.json ou módulo). Sai 1 se algum par passa da tolerância em alguma vista, 0 se nenhum, e 2
  * em argumento ruim ou esboço recusado. Com `--saida`, grava `<vista>-<contida>-em-<continente>.png`: a continente em cinza claro, a
@@ -107,11 +114,34 @@ export function medirSobra(contida, continente) {
 }
 
 /**
- * A sobra de cada par em cada vista.
+ * Os pares normalizados: cada item é `[contida, continente]`, o texto `"contida:continente"` (com `@vista+vista` opcional) ou
+ * `{ par: "contida:continente", vistas?: [...] }` (ou `{ contida, continente, vistas? }`). Devolve `{ contida, continente, vistas }`,
+ * com `vistas` nulo quando o par usa as vistas gerais.
+ */
+export function normalizarPares(pares) {
+  if (!Array.isArray(pares)) throw new ErroDaSobra('os pares precisam ser uma lista');
+  return pares.map((p) => {
+    let contida; let continente; let vistas = null;
+    if (Array.isArray(p)) [contida, continente] = p;
+    else if (typeof p === 'string') ({ contida, continente, vistas } = lerPares(p)[0]);
+    else if (p && typeof p === 'object') {
+      if (typeof p.par === 'string') { const m = lerPares(p.par)[0]; contida = m.contida; continente = m.continente; if (m.vistas) vistas = m.vistas; } else ({ contida, continente } = p);
+      if (p.vistas !== undefined) vistas = p.vistas;
+    }
+    if (typeof contida !== 'string' || !contida || typeof continente !== 'string' || !continente) throw new ErroDaSobra(`o par ${JSON.stringify(p)} não diz a contida e a continente`);
+    if (contida === continente) throw new ErroDaSobra(`o par "${contida}:${continente}" põe a parte dentro dela mesma`);
+    if (vistas !== null && (!Array.isArray(vistas) || !vistas.length || vistas.some((v) => typeof v !== 'string'))) throw new ErroDaSobra(`o par "${contida}:${continente}" espera vistas numa lista de nomes e veio ${JSON.stringify(vistas)}`);
+    return { contida, continente, vistas: vistas ? [...vistas] : null };
+  });
+}
+
+/**
+ * A sobra de cada par em cada vista dele.
  * @param {Array<{ pts: number[][], parte: number }>} faces  as faces do modelo inteiro, em mm, com o índice da parte a partir de 1
  * @param {string[]} partes  os nomes, na ordem dos índices
- * @param {Array<[string, string]>} pares  [contida, continente]
+ * @param {Array} pares  como `normalizarPares` aceita; o par com vistas próprias só é medido nelas, e o sem, nas de `vistas`
  * @returns {Array<{ vista, contida, continente, pixels, areaMm2, maxMm, mmPorPx, sobra: boolean, contidaSil, continenteSil, mascara }>}
+ *   por vista (as gerais na ordem dada, depois as próprias dos pares na ordem em que aparecem) e, dentro dela, na ordem dos pares
  */
 export function sobraEntrePartes(faces, partes, pares, { vistas = VISTAS_PADRAO, toleranciaMm = TOLERANCIA_MM, largura = 1200 } = {}) {
   const indice = (nome) => {
@@ -119,18 +149,23 @@ export function sobraEntrePartes(faces, partes, pares, { vistas = VISTAS_PADRAO,
     if (i < 0) throw new ErroDaSobra(`a parte "${nome}" não existe na opção (${partes.join(', ')})`);
     return i + 1;
   };
-  const idx = pares.map(([a, b]) => [indice(a), indice(b)]);
-  for (const v of vistas) if (!VISTAS_BANCADA[v]) throw new ErroDaSobra(`vista "${v}" não existe na bancada (${Object.keys(VISTAS_BANCADA).join(', ')})`);
+  const lista = normalizarPares(pares);
+  const idx = lista.map(({ contida, continente }) => [indice(contida), indice(continente)]);
+  const todas = [...new Set([...vistas, ...lista.flatMap((p) => p.vistas ?? [])])];
+  for (const v of todas) if (!VISTAS_BANCADA[v]) throw new ErroDaSobra(`vista "${v}" não existe na bancada (${Object.keys(VISTAS_BANCADA).join(', ')})`);
   const saida = [];
-  for (const vista of vistas) {
+  for (const vista of todas) {
+    const doPar = lista.map((p, k) => k).filter((k) => (lista[k].vistas ?? vistas).includes(vista));
+    if (!doPar.length) continue;
     const quadro = quadroDaVista(faces, vista);
     const cache = new Map();
     const sil = (p) => { if (!cache.has(p)) cache.set(p, silhuetaDaParte(faces, p, vista, largura, quadro)); return cache.get(p); };
-    pares.forEach(([contida, continente], k) => {
+    for (const k of doPar) {
+      const { contida, continente } = lista[k];
       const a = sil(idx[k][0]); const b = sil(idx[k][1]);
       const m = medirSobra(a, b);
       saida.push({ vista, contida, continente, pixels: m.pixels, areaMm2: m.areaMm2, maxMm: m.maxMm, mmPorPx: a.mmPorPx, sobra: m.maxMm > toleranciaMm, contidaSil: a, continenteSil: b, mascara: m.sobra });
-    });
+    }
   }
   return saida;
 }
@@ -145,21 +180,26 @@ export function desenharSobra({ contidaSil, continenteSil, mascara }) {
   return im;
 }
 
-/** Os pares de `--dentro`: "a:b,c:d" vira [["a","b"],["c","d"]]. */
+/** Os pares de `--dentro`: "a:b,c:d@superior+direita" vira [{ contida: "a", continente: "b", vistas: null }, { contida: "c", continente: "d", vistas: ["superior", "direita"] }]. */
 export function lerPares(texto) {
-  const pares = String(texto ?? '').split(',').filter((s) => s.trim()).map((s) => s.split(':').map((x) => x.trim()));
-  if (!pares.length || pares.some((p) => p.length !== 2 || !p[0] || !p[1])) throw new ErroDaSobra('--dentro espera pares "contida:continente" separados por vírgula');
-  const mesmo = pares.find(([a, b]) => a === b);
-  if (mesmo) throw new ErroDaSobra(`o par "${mesmo[0]}:${mesmo[1]}" põe a parte dentro dela mesma`);
-  return pares;
+  const itens = String(texto ?? '').split(',').filter((s) => s.trim()).map((s) => {
+    const [par, vistas] = s.split('@');
+    const [contida, continente, ...resto] = par.split(':').map((x) => x.trim());
+    return { contida, continente, resto, vistas: vistas === undefined ? null : vistas.split('+').map((v) => v.trim()).filter(Boolean) };
+  });
+  if (!itens.length || itens.some((p) => !p.contida || !p.continente || p.resto.length || (p.vistas && !p.vistas.length))) throw new ErroDaSobra('--dentro espera pares "contida:continente", com "@vista+vista" opcional, separados por vírgula');
+  const mesmo = itens.find((p) => p.contida === p.continente);
+  if (mesmo) throw new ErroDaSobra(`o par "${mesmo.contida}:${mesmo.continente}" põe a parte dentro dela mesma`);
+  return itens.map(({ contida, continente, vistas }) => ({ contida, continente, vistas }));
 }
 
-const AJUDA = `npm run sobra:partes -- <esboço> --dentro=contida:continente[,...] [--opcao=1] [--vistas=${VISTAS_PADRAO.join(',')}]
+const AJUDA = `npm run sobra:partes -- <esboço> --dentro=contida:continente[@vista+vista][,...] [--opcao=1] [--vistas=${VISTAS_PADRAO.join(',')}]
     [--tolerancia-mm=${TOLERANCIA_MM}] [--largura=1200] [--saida=<pasta>]
 
 Projeta cada parte do par sozinha, na mesma câmera e no mesmo quadro, e mede o quanto a contida sai da silhueta da continente: a
-área em mm² e a maior distância em mm. Sai 1 se algum par passa da tolerância em alguma vista. A parte que fica fora de propósito
-numa vista dá sobra nela; escolha as vistas e a tolerância do par. O número informa, não aprova forma.`;
+área em mm² e a maior distância em mm. A silhueta da continente é a real, com os furos: a parte no vão de um anel sobra. Sai 1 se
+algum par passa da tolerância em alguma vista. A parte que fica fora de propósito numa vista dá sobra nela; escolha as vistas do par
+(@vista+vista, ou --vistas para todos) e a tolerância. O número informa, não aprova forma.`;
 
 export async function executar(argv) {
   const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };

@@ -15,6 +15,14 @@
  * sai no relato, porque a desproporção do objeto inteiro só aparece nela. `--ignorar` são retângulos em px da referência com o que
  * aparece nela e não é da peça; os pixels deles ficam fora de toda conta e nenhuma divisa que encosta neles vale como borda.
  *
+ * DUAS ESCALAS DECLARADAS. A imagem de IA pode ter a altura numa escala e a largura noutra (a vista de frente da empilhadeira tem
+ * 4,25 mm por px na altura e 3,395 na largura, ATRITOS itens 15 e 19), e o ajuste de caixa a caixa esconde a diferença de altura
+ * entre o modelo e a referência dentro do esticamento. Com `escalaVertical` (`--escala-vertical`), os mm por px da altura da
+ * referência sobre os da largura, a largura continua levada da caixa à caixa, e a altura passa a ter a escala da largura vezes esse
+ * fator, com a base da caixa da referência na base do modelo (a peça assenta no chão): a referência pode então passar da altura do
+ * raster ou não chegar a ela, e o que falta vira fundo. A proporção da referência sai já em mm, multiplicada pelo fator, e a da caixa
+ * em px sai ao lado. Sem o campo, o ajuste é o de caixa a caixa.
+ *
  * MEDIDA 1, CLASSE TROCADA. O mapa de troca marca o pixel em que a classe do modelo (a classe declarada da parte dele, ou fundo)
  * difere da classe da referência. Para a franja do desalinhamento de um ou dois pixels não contar, o mapa passa por uma abertura
  * (erosão de `EROSAO_PX` px seguida de dilatação do mesmo tamanho, com elemento quadrado): some o que a erosão apaga, e a mancha que
@@ -35,7 +43,7 @@
  * USO
  *   npm run casamento:vista -- <esboço> --vista=<vista> --referencia=<png> --caixa-ref=x0,y0,x1,y1 --cores=nome:#rrggbb,...
  *     --partes=parte:classe,... [--opcao=1] [--fundo=#ffffff] [--ignorar=x0,y0,x1,y1;x0,y0,x1,y1] [--grade=4x3]
- *     [--tolerancia-mm=12] [--largura=1200] [--saida=<pasta>]
+ *     [--tolerancia-mm=12] [--largura=1200] [--escala-vertical=1.25] [--saida=<pasta>]
  * Grava `casamento.json` (`modelar.casamento-da-vista@1`) e `casamento.png`: a referência clareada, a troca em magenta translúcido,
  * as linhas de contorno e divisa do modelo em verde onde casam e em vermelho onde passam da tolerância, a borda da referência sem
  * linha em azul, os retângulos ignorados em cinza e a grade com o nome das regiões. */
@@ -131,9 +139,20 @@ export function bordaDasClasses(classe, L, A, fora) {
 const arredonda = (v, casas = 2) => (v === null || !Number.isFinite(v) ? null : Number(v.toFixed(casas)));
 
 /**
+ * O retângulo da referência, em px dela, que cobre o raster de L x A: a caixa inteira sem `escalaVertical`; com ele, a largura da
+ * caixa e, da base da caixa para cima, a altura que o raster tem na escala da largura dividida pelo fator.
+ */
+export function quadroDaReferencia([rx0, ry0, rx1, ry1], L, A, escalaVertical = null) {
+  if (escalaVertical === null || escalaVertical === undefined) return [rx0, ry0, rx1, ry1];
+  const altura = (A * (rx1 - rx0)) / L / escalaVertical;
+  return [rx0, ry1 - altura, rx1, ry1];
+}
+
+/**
  * Mede o casamento do modelo com a referência numa vista.
  * @param {{ faces: object[], partes: string[], classeDaParte: Record<string, string>, vista: string, largura?: number,
- *   referencia, caixaRef: number[], classes: object[], fundo?: number[], ignorar?: number[][], grade?: number[], toleranciaMm?: number }} o
+ *   referencia, caixaRef: number[], classes: object[], fundo?: number[], ignorar?: number[][], grade?: number[], toleranciaMm?: number,
+ *   escalaVertical?: number }} o
  *   `faces` no formato de `facesDoNeutro` (o índice 1 é `partes[0]`), `referencia` no formato de `dePng`, `classes` de `lerClasses`
  */
 export function medirCasamento(o) {
@@ -144,6 +163,8 @@ export function medirCasamento(o) {
   if (!o.caixaRef.every(Number.isFinite) || !(rx1 > rx0 && ry1 > ry0) || rx0 < 0 || ry0 < 0 || rx1 > o.referencia.largura || ry1 > o.referencia.altura) {
     throw new ErroDoCasamento(`--caixa-ref ${o.caixaRef.join(',')} não cabe na referência de ${o.referencia.largura} x ${o.referencia.altura} px`);
   }
+  const ev = o.escalaVertical ?? null;
+  if (ev !== null && !(Number.isFinite(ev) && ev > 0)) throw new ErroDoCasamento(`--escala-vertical espera um número maior que zero e veio ${o.escalaVertical}`);
   /* a classe de cada parte; parte sem classe, ou com classe que não está em --cores, é recusa */
   const nomesDasClasses = classes.map((c) => c.nome);
   for (const [p, c] of Object.entries(classeDaParte)) {
@@ -164,14 +185,17 @@ export function medirCasamento(o) {
     if (k >= indiceDaParte.length) throw new ErroDoCasamento(`a malha tem faces sem parte nomeada; as partes da opção são ${partes.join(', ')}`);
     modelo[i] = indiceDaParte[k];
   }
-  /* a referência: a caixa reamostrada para o raster, cada eixo com a sua escala, e classificada */
-  const ref = reamostrar(o.referencia, o.caixaRef, L, A, fundo);
+  /* a referência: a caixa reamostrada para o raster, cada eixo com a sua escala, e classificada; com escalaVertical, o trecho da
+     referência que cobre o raster, com a base na base e a altura pela escala da largura vezes o fator */
+  const quadroRef = quadroDaReferencia(o.caixaRef, L, A, ev);
+  const qy0 = quadroRef[1];
+  const ref = reamostrar(o.referencia, quadroRef, L, A, fundo);
   const referencia = classificarCaixa(ref, [0, 0, L, A], classes, fundo);
-  const fx = L / (rx1 - rx0); const fy = A / (ry1 - ry0);
+  const fx = L / (rx1 - rx0); const fy = A / (quadroRef[3] - qy0);
   const fora = new Uint8Array(L * A);
   for (const [a, b, c, d] of o.ignorar ?? []) {
     const xa = Math.max(0, Math.round((a - rx0) * fx)); const xb = Math.min(L, Math.round((c - rx0) * fx));
-    const ya = Math.max(0, Math.round((b - ry0) * fy)); const yb = Math.min(A, Math.round((d - ry0) * fy));
+    const ya = Math.max(0, Math.round((b - qy0) * fy)); const yb = Math.min(A, Math.round((d - qy0) * fy));
     for (let y = ya; y < yb; y += 1) for (let x = xa; x < xb; x += 1) fora[y * L + x] = 1;
   }
   /* medida 1 */
@@ -222,8 +246,8 @@ export function medirCasamento(o) {
   }
   regioes.sort((a, b) => b.nota - a.nota);   // a ordenação do JavaScript é estável: o empate fica na ordem da grade
   return {
-    largura: L, altura: A, mmPorPx, toleranciaMm: tol, grade, regioes, ignoradas,
-    proporcao: { referencia: (ry1 - ry0) / (rx1 - rx0), modelo: A / L },
+    largura: L, altura: A, mmPorPx, toleranciaMm: tol, grade, regioes, ignoradas, escalaVertical: ev, quadroRef,
+    proporcao: { referencia: ((ry1 - ry0) * (ev ?? 1)) / (rx1 - rx0), modelo: A / L, ...(ev !== null ? { caixaEmPx: (ry1 - ry0) / (rx1 - rx0) } : {}) },
     mapas: { ref, troca, linhas, linhaDoModelo, borda, ateBorda, ateLinha, fora },
   };
 }
@@ -257,7 +281,8 @@ export function paraJson(m, origem = {}) {
     formato: FORMATO, ...origem, largura: m.largura, altura: m.altura, mmPorPx: arredonda(m.mmPorPx, 4), toleranciaMm: m.toleranciaMm,
     erosaoPx: EROSAO_PX, grade: m.grade,
     nota: 'troca% + 100 x (px de linha sem borda fora + px de borda sem linha fora) / (px de linha + px de borda julgados)',
-    proporcao: { referencia: arredonda(m.proporcao.referencia, 4), modelo: arredonda(m.proporcao.modelo, 4) },
+    proporcao: { referencia: arredonda(m.proporcao.referencia, 4), modelo: arredonda(m.proporcao.modelo, 4), ...(m.escalaVertical !== null ? { caixaEmPx: arredonda(m.proporcao.caixaEmPx, 4) } : {}) },
+    ...(m.escalaVertical !== null ? { escalaVertical: m.escalaVertical, quadroRef: m.quadroRef.map((v) => arredonda(v, 1)) } : {}),
     regioes: m.regioes, ignoradas: m.ignoradas,
   };
 }
@@ -273,11 +298,13 @@ export function relato(m) {
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
 const AJUDA = `npm run casamento:vista -- <esboço> --vista=<vista> --referencia=<png> --caixa-ref=x0,y0,x1,y1 --cores=nome:#rrggbb,...
     --partes=parte:classe,... [--opcao=1] [--fundo=#ffffff] [--ignorar=x0,y0,x1,y1;x0,y0,x1,y1] [--grade=4x3]
-    [--tolerancia-mm=${TOLERANCIA_PADRAO_MM}] [--largura=${LARGURA_PADRAO}] [--saida=<pasta>]
+    [--tolerancia-mm=${TOLERANCIA_PADRAO_MM}] [--largura=${LARGURA_PADRAO}] [--escala-vertical=<mm por px da altura sobre os da largura>]
+    [--saida=<pasta>]
 
 Mede, por região da grade, a fração de classe de material trocada entre o modelo (cor chapada pela parte, tirada da malha) e a
 referência (classificada por cor), e a distância de cada linha de contorno e divisa do modelo à divisa de classes da referência, e
-o contrário. Grava casamento.json e casamento.png em --saida. O número ordena as regiões e informa; não aprova forma.`;
+o contrário. Com --escala-vertical, a altura da referência tem a escala da largura vezes o fator, com a base na base do modelo, em
+vez de ir de caixa a caixa. Grava casamento.json e casamento.png em --saida. O número ordena as regiões e informa; não aprova forma.`;
 
 const numeros = (texto, n, nome) => {
   const v = String(texto).split(',').map((s) => Number(s.trim()));
@@ -312,6 +339,8 @@ export async function executar(argv) {
     const largura = valor('largura') === null ? LARGURA_PADRAO : Number(valor('largura'));
     if (!Number.isInteger(largura) || largura < 16) throw new ErroDoCasamento(`--largura espera um inteiro de pelo menos 16 e veio "${valor('largura')}"`);
     const fundo = valor('fundo') ? lerCor(valor('fundo'), '--fundo') : FUNDO_PADRAO;
+    const escalaVertical = valor('escala-vertical') === null ? null : Number(valor('escala-vertical'));
+    if (escalaVertical !== null && !(Number.isFinite(escalaVertical) && escalaVertical > 0)) throw new ErroDoCasamento(`--escala-vertical espera um número maior que zero e veio "${valor('escala-vertical')}"`);
     const referencia = dePng(readFileSync(resolve(valor('referencia'))));
     const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
     const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo), relato: false });
@@ -320,7 +349,7 @@ export async function executar(argv) {
     if (!painel) throw new ErroDoCasamento(`o esboço tem ${montado.paineis.length} opções e veio --opcao=${valor('opcao')}`);
     let m;
     try {
-      m = medirCasamento({ faces: facesDoNeutro(painel.neutro, painel.partes), partes: painel.partes, classeDaParte, vista: valor('vista'), largura, referencia, caixaRef, classes, fundo, ignorar, grade, toleranciaMm });
+      m = medirCasamento({ faces: facesDoNeutro(painel.neutro, painel.partes), partes: painel.partes, classeDaParte, vista: valor('vista'), largura, referencia, caixaRef, classes, fundo, ignorar, grade, toleranciaMm, escalaVertical });
     } catch (erro) {
       if (/não existe na bancada|não tem área|grade .* fora do aceito/.test(erro?.message ?? '')) throw new ErroDoCasamento(erro.message);
       throw erro;
@@ -337,6 +366,7 @@ export async function executar(argv) {
     const cabeca = [
       `casamento da vista ${valor('vista')}: o número ordena as regiões e confirma ou derruba uma diferença; não aprova forma, quem aprova é a pessoa.`,
       `${m.largura} x ${m.altura} px, ${m.mmPorPx.toFixed(2)} mm por px, tolerância ${m.toleranciaMm} mm; altura sobre largura: referência ${m.proporcao.referencia.toFixed(3)}, modelo ${m.proporcao.modelo.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)`,
+      ...(m.escalaVertical !== null ? [`duas escalas: a altura da referência tem ${m.escalaVertical} vez os mm por px da largura (a caixa em px dá ${m.proporcao.caixaEmPx.toFixed(3)}), com a base na base do modelo`] : []),
       ...(m.ignoradas.length ? [`regiões inteiras no ignorado, fora da conta: ${m.ignoradas.join(', ')}`] : []),
     ];
     return { codigo: 0, stdout: `${[...cabeca, ...relato(m), ...(gravados.length ? gravados : ['nada gravado: use --saida=<pasta>'])].join('\n')}\n`, stderr: '' };

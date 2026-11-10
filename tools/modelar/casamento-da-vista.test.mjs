@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { imagem, paraPng, regioesDaGrade } from './leitura-por-regioes.mjs';
 import { lerClasses } from './perfil-por-cor.mjs';
-import { abertura, desenharCasamento, executar, medirCasamento, paraJson, transformadaDeDistancia } from './casamento-da-vista.mjs';
+import { abertura, desenharCasamento, executar, medirCasamento, paraJson, quadroDaReferencia, transformadaDeDistancia } from './casamento-da-vista.mjs';
 
 const LARANJA = [226, 100, 30]; const CINZA = [107, 112, 116];
 const classes = lerClasses('laranja:#e2641e,cinza:#6b7074');
@@ -86,6 +86,35 @@ describe('casamento da vista', () => {
     expect(fora.regioes).toHaveLength(9);
   });
 
+  it('com escalaVertical a altura da referência tem a escala da largura vezes o fator, com a base na base', () => {
+    /* a referência desenhada com 1 mm por px na largura e 1,25 na altura: os 100 mm de altura viram 80 px, de y = 30 a 110 */
+    const desenho = (alturaPx) => {
+      const im = imagem(220, 150);
+      for (let y = 110 - alturaPx; y < 110; y += 1) for (let x = 10; x < 210; x += 1) im.dados.set(x < 110 ? LARANJA : CINZA, (y * 220 + x) * 3);
+      return im;
+    };
+    expect(quadroDaReferencia([10, 30, 210, 110], 200, 100)).toEqual([10, 30, 210, 110]);
+    expect(quadroDaReferencia([10, 30, 210, 110], 200, 100, 1.25)).toEqual([10, 30, 210, 110]);
+    expect(quadroDaReferencia([10, 46, 210, 110], 200, 100, 1.25)).toEqual([10, 30, 210, 110]);
+    const certa = medir({ referencia: desenho(80), caixaRef: [10, 30, 210, 110], escalaVertical: 1.25 });
+    expect(certa.proporcao.referencia).toBeCloseTo(0.5, 6); expect(certa.proporcao.caixaEmPx).toBeCloseTo(0.4, 6);
+    for (const r of certa.regioes) expect(r.troca.fracao).toBe(0);
+    /* a referência com 64 px, 80 mm na escala declarada: o modelo passa 20 mm por cima, e a troca está na faixa de cima; caixa a
+       caixa, a mesma referência é esticada até o modelo e não troca nada */
+    const baixa = medir({ referencia: desenho(64), caixaRef: [10, 46, 210, 110], escalaVertical: 1.25 });
+    const trocados = baixa.mapas.troca.reduce((s, v) => s + v, 0);
+    expect(Math.abs(trocados - 200 * 20) / (200 * 20)).toBeLessThan(0.05);
+    for (let y = 22; y < 100; y += 1) for (let x = 0; x < 200; x += 1) expect(baixa.mapas.troca[y * 200 + x]).toBe(0);
+    for (const r of medir({ referencia: desenho(64), caixaRef: [10, 46, 210, 110] }).regioes) expect(r.troca.fracao).toBe(0);
+    /* o ignorado vale nos px da referência, no quadro já corrigido: a faixa de cima dela (y 30 a 46) cobre a troca */
+    const ignorada = medir({ referencia: desenho(64), caixaRef: [10, 46, 210, 110], escalaVertical: 1.25, ignorar: [[0, 25, 220, 47]] });
+    for (const r of ignorada.regioes) expect(r.troca.fracao).toBe(0);
+    /* sem o campo o JSON é o de hoje, e com ele diz o fator e o quadro */
+    expect(paraJson(medir({ referencia: referencia(100) }))).not.toHaveProperty('escalaVertical');
+    expect(paraJson(baixa)).toMatchObject({ escalaVertical: 1.25, quadroRef: [10, 30, 210, 110] });
+    expect(() => medir({ referencia: referencia(100), escalaVertical: 0 })).toThrow('maior que zero');
+  });
+
   it('a saída é igual a cada execução', () => {
     const um = medir({ referencia: referencia(110) }); const dois = medir({ referencia: referencia(110) });
     expect(JSON.stringify(paraJson(um))).toBe(JSON.stringify(paraJson(dois)));
@@ -114,7 +143,9 @@ describe('casamento da vista', () => {
     expect((await executar([...args, '--partes=base:laranja,topo:cinza', '--opcao=3'])).codigo).toBe(2);
     const r = await executar([...args, '--partes=base:laranja,topo:cinza', `--saida=${pasta}`]);
     expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
-    expect(r.stdout).toContain('não aprova forma');
+    expect(r.stdout).toContain('não aprova forma'); expect(r.stdout).not.toContain('duas escalas');
+    expect((await executar([...args, '--partes=base:laranja,topo:cinza', '--escala-vertical=1.25'])).stdout).toContain('duas escalas');
+    expect((await executar([...args, '--partes=base:laranja,topo:cinza', '--escala-vertical=-1'])).codigo).toBe(2);
     const json = JSON.parse(readFileSync(join(pasta, 'casamento.json'), 'utf8'));
     expect(json.formato).toBe('modelar.casamento-da-vista@1');
     expect(json.regioes.map((x) => x.nome).sort()).toEqual(['A1', 'A2', 'B1', 'B2']);

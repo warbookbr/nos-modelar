@@ -244,6 +244,11 @@ inteira foi montada num módulo só, de sessenta partes, com as pendências entr
 as partes resolvidas na carcaça e a TABELA do alinhamento com a medida adotada
 e a fonte de cada linha. As fatias T9 a T14 foram entregues.
 
+A pessoa viu a máquina inteira em rascunho no mesmo dia e disse "O resultado
+esta muito bom sim, pode prosseguir normalmente". Com isso o rascunho fecha e
+começam as receitas, uma etapa por vez, pela carcaça. A lateral e a ficha
+ficam como fonte de medida, e as outras vistas de IA como caráter da forma.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.

@@ -69,15 +69,20 @@
   "berco": "cinza",
   "escape": "escuro"
  },
- "dentro": {
-  "grade": "capo",
-  "fundoGrade": "capo",
-  "furo": "laterais",
-  "tunel": "laterais",
-  "cilindroElevacao": "canaisExternos",
-  "hasteElevacao": "canaisExternos",
-  "gradeTeto": "protetor"
- },
+ "dentro": [
+  "grade:capo",
+  "fundoGrade:capo",
+  "furo:laterais",
+  "tunel:laterais",
+  "cilindroElevacao:canaisExternos",
+  "hasteElevacao:canaisExternos",
+  {
+   "par": "gradeTeto:protetor",
+   "vistas": [
+    "direita"
+   ]
+  }
+ ],
  "vistasDaSobra": [
   "superior",
   "direita"
@@ -97,7 +102,8 @@
     4,
     3
    ],
-   "visto": "de frente"
+   "visto": "de frente",
+   "escalaVertical": 1.252
   },
   "traseira": {
    "referencia": "tras.ia.png",
@@ -129,6 +135,89 @@
     4
    ],
    "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
+  },
+  "direita": {
+   "contornos": "lateral.contornos.json",
+   "escala": 0.968109,
+   "ancora": {
+    "contorno": [
+     200.5,
+     -190
+    ],
+    "modelo": [
+     0,
+     0,
+     0
+    ]
+   },
+   "partes": {
+    "rodaDianteira": [
+     "pneusDianteiros",
+     "arosDianteiros",
+     "cubosDianteiros"
+    ],
+    "rodaTraseira": [
+     "pneusTraseiros",
+     "arosTraseiros",
+     "cubosTraseiros"
+    ],
+    "torre": [
+     "peTorre",
+     "canaisExternos",
+     "canaisInternos",
+     "cilindroElevacao",
+     "hasteElevacao",
+     "cabecaElevacao",
+     "correntes"
+    ],
+    "garfos": [
+     "garfos",
+     "placaGarfos",
+     "gradeCarga"
+    ],
+    "inclinacao": [
+     "cilindrosInclinacao",
+     "hastesInclinacao"
+    ],
+    "protetor": [
+     "protetor",
+     "gradeTeto",
+     "alcas"
+    ],
+    "luzes": [
+     "luzesTrabalho",
+     "lanternas"
+    ],
+    "espelho": "espelho",
+    "banco": [
+     "assento",
+     "encosto"
+    ],
+    "encosto": "tampaMotor",
+    "volante": [
+     "volante",
+     "colunaDirecao"
+    ],
+    "pedais": "pedais",
+    "cilindro": [
+     "cilindroGlp",
+     "cintas",
+     "berco"
+    ],
+    "escape": "escape",
+    "capo": "capo",
+    "tampa": "tampa",
+    "contrapeso": "contrapeso",
+    "lateral": "laterais",
+    "paralama": "paralamas",
+    "pocoTraseiro": "pocoTraseiro",
+    "furo": "furo"
+   },
+   "ignorarRegioes": [
+    "sombra"
+   ],
+   "visto": "da direita, frente à esquerda",
+   "fora": "a sombra no chão"
   }
  }
 }
