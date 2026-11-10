@@ -31,7 +31,8 @@
  "dentro": {
   "grade": "capo",
   "fundoGrade": "capo",
-  "furo": "laterais"
+  "furo": "laterais",
+  "tunel": "laterais"
  },
  "vistasDaSobra": [
   "superior",
@@ -42,7 +43,7 @@
   "direita": {
    "referencia": "carcaca-lado.ia.png",
    "caixaRef": [
-    344,
+    350,
     269,
     903,
     494
@@ -151,7 +152,7 @@
     138,
     78,
     458,
-    671
+    664
    ],
    "ignorar": [
     [

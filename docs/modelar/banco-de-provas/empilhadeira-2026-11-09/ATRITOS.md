@@ -132,3 +132,13 @@ processo o teria pego sozinho e o destino.
    com as que faltam; `--rodadas-de` leva as rodadas registradas a uma pasta nova, e o resumo diz para usar a mesma;
    `lacosPelasVistas` aceita `centro`, com saída idêntica quando ele é zero. Ficou sem destino a ocultação na
    `sobra:partes`, que é do desenho dela: os degraus escondidos pelo piso deram 20 mm de sobra.
+15. **A rodada de correção da carcaça, com quatro críticos sem contexto, deixou o que falta medir.** Dos catorze itens
+   de forma triados das quatro leituras, nove foram corrigidos, três não eram da peça ou eram detalhe, e dois ficaram
+   com o motivo (a aba do paralama, que as vistas de cima e de frente dão com 606 mm e a de trás não mostra, e a
+   faixa laranja sob o contrapeso, porque a lateral desce a 191 mm e as vistas de frente e de trás param em 226). O
+   processo pegou sozinho o pino escuro que saía abaixo do corpo, pela proporção da vista; a aba da tampa solta, os
+   arcos facetados e o bloco ao lado do contrapeso só apareceram pelo crítico ou pelos três quartos. Ficou sem
+   ferramenta: a vista de IA com altura e largura em escalas diferentes (a de frente, 27%), que o casamento trata com
+   uma escala só; o arco de contorno, que a simplificação de 6 mm faceta e hoje é ajustado dentro do módulo; o
+   encolhimento de 10 a 15 mm da silhueta nos degraus de um corpo subdividido sem compensar, que nada mede; e um
+   lugar para registrar a medida que duas vistas dão diferente. Vão ao backlog.

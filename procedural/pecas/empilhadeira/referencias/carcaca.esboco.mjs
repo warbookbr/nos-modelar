@@ -113,7 +113,7 @@ const DEGRAU = 568;             // o cinza dos degraus: linhas 151 e 450, coluna
 const COLUNAS = 516;            // as colunas, pela vista de trás (cinza das colunas 408 a 664 nas linhas 274-280, 4,03 mm/px); a de cima
                                 // dava 545 (linhas 148-152 e 437, colunas 700-768), mas a largura vale a de trás
 const POCO_D = { z: 0, y: 352.5, r: 392, de: 414 };     // pneu dianteiro com 40 mm de folga; de 355 mm do protótipo x 596,4/511
-const POCO_T = { z: -1700, y: 284, r: 312, de: 432 };   // traseiro; de 370 mm do protótipo x 596,4/511
+/* o pneu traseiro com 40 mm de folga (z -1700, y 284, raio 312, de 432 mm para fora) cabe no poço do arco da lateral, mais abaixo */
 
 const pocos = (p) => [extX(circulo(p.z, p.y, p.r), p.de, 720), extX(circulo(p.z, p.y, p.r), -720, -p.de)];
 
@@ -194,7 +194,10 @@ const aro = extX(lado('aroTraseiro'), -LATERAL_TRAS, LATERAL_TRAS);
    40 mm de folga). Cortado só no círculo do pneu, sobrava entre ele e o arco um anel laranja de 50 a 80 mm, que de lado deixava o arco
    quase reto (o aro, rente à lateral, cobria a curva acima de 428 mm) e de trás aparecia como um bloco laranja com degrau ao lado do
    contrapeso (leituras da direita, C3, e de trás, C1 e C4, rodada 4) */
-const pocoTras = [extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), POCO_T.de, 720), extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), -720, -POCO_T.de)];
+/* de 360 mm para fora, por dentro do pé do contrapeso (92 px de meia largura na vista de trás, 371 mm): entre ele e 432 mm a traseira
+   do corpo aparecia de trás como uma tira laranja ao lado do contrapeso, onde a referência é escura (linhas 446 a 486) */
+const POCO_DE = 360;
+const pocoTras = [extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), POCO_DE, 720), extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), -720, -POCO_DE)];
 /* o vão sob o piso entre as chapas do chassi: de frente a referência é escura entre os montantes do pé da torre, das linhas 392 a 476
    (621 a 260 mm), sob a faixa laranja; o corpo cheio mostrava ali a frente laranja dele (leitura de frente, rodada 4, C2 e C3). O vão
    vai de 195 a 472 mm (acima disso fica o piso; abaixo, o pé do corpo, a 191 na lateral), na largura entre as chapas, até z -1100,
@@ -282,15 +285,17 @@ parte('colunas', extX(lado('coluna', ([z, y]) => (z >= 1485 && y < 1125 ? [1525,
 /* o fundo do poço traseiro, escuro, entre as rodas de trás (lateral `pocoTraseiro`, z 1342-1645; na largura do protótipo, 360 mm
    x 596,4/511). Desce só até o pé do arco (y 428): abaixo dele a referência mostra a suspensão, que é de outra fatia, e o fundo
    escuro até o chão aparecia na lateral (leitura da direita, rodada 1, C3). */
-/* e o forro do poço da roda: uma casca escura de 15 mm por dentro do arco da lateral, de 432 a 590 mm, entre z 1300 e 1545 e de 191 a
+/* e o forro do poço da roda: uma casca escura de 15 mm por dentro do arco da lateral, de 360 a 590 mm, entre z 1300 e 1545 e de 191 a
    640 mm. Sem ela, de trás aparecia ao lado do contrapeso a parede da frente do poço, laranja, onde a referência é escura (o pneu, que
    fica de fora, e o fundo do poço em sombra; leitura de trás, rodada 4, C1 e C4); de lado ela é a beira escura de dentro do arco, que
-   a referência mostra marrom escura (B3). */
+   a referência mostra marrom escura (B3). Ele segue a seção do corpo (peLateral), para não sair por baixo do canto redondo dele de
+   frente e de trás. */
 const anel = [...circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2] + 1)];
 const anelDentro = circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2] - 15);
 const caixaDoForro = () => extZ([[-600, 191], [600, 191], [600, 640], [-600, 640]], -1545, -1300);
-const forro = [1, -1].map((s) => cruzar(cortar(extX(anel, s > 0 ? POCO_T.de : -590, s > 0 ? 590 : -POCO_T.de),
-  extX(anelDentro, s > 0 ? POCO_T.de - 1 : -591, s > 0 ? 591 : -POCO_T.de + 1)), caixaDoForro()));
+const forro = [1, -1].map((s) => cruzar(cortar(extX(anel, s > 0 ? POCO_DE : -590, s > 0 ? 590 : -POCO_DE),
+  extX(anelDentro, s > 0 ? POCO_DE - 1 : -591, s > 0 ? 591 : -POCO_DE + 1)), caixaDoForro(),
+  extZ(peLateral, -1550, -1290)));
 parte('pocoTraseiro', unir(extX(L([[1342, 428], [1342, 625], [1645, 625], [1645, 428]]), -420, 420), ...forro), ESCURO);
 
 /* a traseira: capô, grade, tampa e contrapeso, do módulo dela */
