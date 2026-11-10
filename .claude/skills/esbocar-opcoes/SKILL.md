@@ -61,7 +61,8 @@ comum caiu em cada captura) e que nada foi cortado pelo quadro. Quando a
 escolha é de medida, meça a malha (`--so-montar` dá a caixa; `npm run descrever`
 dá o resto) em vez de confiar na imagem.
 Rascunho que segue uma vista de referência: antes de mostrar, rode
-`npm run leitura:regioes` e leve o `pedido.md` a um crítico.
+`npm run linhas:modelo` e `npm run leitura:regioes` e leve o `pedido.md` a um
+crítico.
 
 ## Como mostrar
 

@@ -19,12 +19,14 @@
  * da grade recusam a rodada com a lista. `aceitas: { "B1": ["..."] }` guarda a diferença que quem conduz decidiu não corrigir (o eixo
  * que não é da peça, o detalhe que fica para outra fatia), com o motivo, e o pedido seguinte a repete ao crítico naquela região.
  *
- * O QUE ELE NÃO VÊ. A linha suave dentro de uma cor (um friso, uma onda) o crítico toma por luz: a listra do capô passou. Isso pede as
- * linhas do modelo tiradas da malha e postas sobre a referência, que este comando ainda não faz.
+ * AS LINHAS DO MODELO. A linha suave dentro de uma cor (um friso, uma onda) o crítico toma por luz: a listra do capô passou. Com
+ * `--linhas=<png>`, o desenho de `npm run linhas:modelo` (o contorno, a divisa, a quina e a dobra, tirados da malha na mesma vista)
+ * entra como terceiro painel de cada região, sobre a referência clareada, e o pedido pergunta de cada linha se ela existe lá.
  *
  * USO
  *   npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
  *     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="a traseira de uma máquina, vista de trás"]
+ *     [--linhas=<png>]
  *   npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
  *
  * `--caixa-ref` é a caixa do que é modelado, em px da referência (sem o que aparece nela e não é da peça). `--painel` é o retângulo
@@ -183,7 +185,7 @@ export function regioesDaGrade(largura, altura, [colunas, linhas] = GRADE_PADRAO
 
 /**
  * Monta a leitura: as duas vistas na mesma grade.
- * @param {{ referencia, captura, caixaRef: number[], painel?: number[], fundo?: number[], grade?: number[], margem?: number }} o  as imagens no formato de `dePng`
+ * @param {{ referencia, captura, caixaRef: number[], painel?: number[], fundo?: number[], grade?: number[], margem?: number, linhas? }} o  as imagens no formato de `dePng`; `linhas` é o desenho de `linhas:modelo`
  * @returns {{ indice, folhas: object[], regioes: object[], proporcao: { referencia: number, rascunho: number }, caixaDaCaptura: number[], painel: number[] }}
  */
 export function montarLeitura(o) {
@@ -200,6 +202,18 @@ export function montarLeitura(o) {
   const L = (rx1 - rx0 + 2 * margem) * AMPLIACAO; const A = (ry1 - ry0 + 2 * margem) * AMPLIACAO;
   const ref = reamostrar(o.referencia, [rx0 - margem, ry0 - margem, rx1 + margem, ry1 + margem], L, A);
   const ras = reamostrar(o.captura, [caixa[0] - margem * fx, caixa[1] - margem * fy, caixa[2] + margem * fx, caixa[3] + margem * fy], L, A, fundo);
+  /* as linhas do modelo, que ocupam a caixa do objeto inteira, sobre a referência clareada */
+  let lin = null;
+  if (o.linhas) {
+    lin = imagem(L, A);
+    for (let i = 0; i < lin.dados.length; i += 1) lin.dados[i] = Math.round(ref.dados[i] * 0.4 + 255 * 0.6);
+    const m = margem * AMPLIACAO; const lw = L - 2 * m; const lh = A - 2 * m;
+    for (let y = 0; y < lh; y += 1) for (let x = 0; x < lw; x += 1) {
+      const c = pixel(o.linhas, Math.min(o.linhas.largura - 1, Math.floor((x / lw) * o.linhas.largura)), Math.min(o.linhas.altura - 1, Math.floor((y / lh) * o.linhas.altura)));
+      if (c[0] + c[1] + c[2] < 720) { const d = ((y + m) * L + x + m) * 3; lin.dados[d] = c[0]; lin.dados[d + 1] = c[1]; lin.dados[d + 2] = c[2]; }
+    }
+  }
+  const vistas = lin ? [ref, ras, lin] : [ref, ras];
   const regioes = regioesDaGrade(L, A, o.grade ?? GRADE_PADRAO).map((r, i) => ({ ...r, folha: Math.floor(i / REGIOES_POR_FOLHA) + 1 }));
   /* o índice: as duas vistas pela metade, com a grade */
   const e = 0.5; const iw = Math.round(L * e); const ih = Math.round(A * e); const faixa = 40;
@@ -218,24 +232,25 @@ export function montarLeitura(o) {
   for (let k = 0; k < regioes.length; k += REGIOES_POR_FOLHA) {
     const grupo = regioes.slice(k, k + REGIOES_POR_FOLHA);
     const pw = grupo[0].largura; const ph = grupo[0].altura;
-    const folha = imagem(2 * pw + 50, grupo.length * (ph + faixa + 10) + 10);
+    const folha = imagem(vistas.length * (pw + 30) - 10, grupo.length * (ph + faixa + 10) + 10);
     grupo.forEach((r, j) => {
       const y = j * (ph + faixa + 10) + 10;
       escrever(folha, r.nome, 10, y + 6, AZUL, 4); escrever(folha, 'REF', 110, y + 9); escrever(folha, 'RASCUNHO', pw + 40, y + 9);
-      [ref, ras].forEach((im, lado) => colar(folha, reamostrar(im, [r.x, r.y, r.x + r.largura, r.y + r.altura], pw, ph), 10 + lado * (pw + 30), y + faixa));
+      if (lin) escrever(folha, 'LINHAS', 2 * pw + 70, y + 9);
+      vistas.forEach((im, lado) => colar(folha, reamostrar(im, [r.x, r.y, r.x + r.largura, r.y + r.altura], pw, ph), 10 + lado * (pw + 30), y + faixa));
     });
     folhas.push(folha);
   }
   const paraRef = (r) => [rx0 - margem + r.x / AMPLIACAO, ry0 - margem + r.y / AMPLIACAO, rx0 - margem + (r.x + r.largura) / AMPLIACAO, ry0 - margem + (r.y + r.altura) / AMPLIACAO].map((v) => Math.round(v));
   return {
-    indice, folhas, painel, caixaDaCaptura: caixa,
+    indice, folhas, painel, caixaDaCaptura: caixa, comLinhas: Boolean(lin),
     regioes: regioes.map((r) => ({ nome: r.nome, folha: r.folha, caixaRef: paraRef(r) })),
     proporcao: { referencia: (ry1 - ry0) / (rx1 - rx0), rascunho: (caixa[3] - caixa[1]) / (caixa[2] - caixa[0]) },
   };
 }
 
 /** O pedido ao crítico: as folhas, as perguntas de cada região e o formato da resposta. */
-export function pedido({ pasta, regioes, folhas, objeto, aceitas = {} }) {
+export function pedido({ pasta, regioes, folhas, objeto, aceitas = {}, linhas = false }) {
   const nomes = regioes.map((r) => r.nome);
   const jaAceitas = Object.entries(aceitas).filter(([, v]) => v.length);
   return `# Leitura por regiões
@@ -245,14 +260,18 @@ conhece a história da construção e não supõe nada além do que vê.
 
 Abra com Read, nesta ordem: \`${join(pasta, 'indice.png')}\` (as duas vistas inteiras com a grade; a referência à esquerda e o
 rascunho à direita) e depois ${Array.from({ length: folhas }, (_, i) => `\`${join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`)}\``).join(', ')}.
-Cada folha traz ${REGIOES_POR_FOLHA} regiões ampliadas, a referência à esquerda e o rascunho à direita, no mesmo recorte e na mesma escala.
+Cada folha traz ${REGIOES_POR_FOLHA} regiões ampliadas, a referência à esquerda e o rascunho à direita, no mesmo recorte e na mesma escala.${linhas ? `
+O terceiro painel, LINHAS, é a referência clareada com as linhas que o MODELO tem, tiradas da geometria dele e não da luz: em
+vermelho o contorno e a divisa entre partes, em azul a quina e o degrau, em verde a dobra fechada da superfície.` : ''}
 
 Para CADA região (${nomes[0]} a ${nomes[nomes.length - 1]}), olhando só a forma (ignore brilho, sombra, textura e acabamento):
 
 1. Onde é cada cor ou material na referência e onde é no rascunho: as divisas estão no mesmo lugar e têm a mesma forma?
 2. Há linha, borda, degrau, friso ou quina que existe na referência e falta no rascunho? E que existe no rascunho e não na referência?
 3. Cantos e contornos: redondo contra reto, côncavo contra convexo, largura e proporção.
-${jaAceitas.length ? `\nJá aceito por quem conduz, e que você não repete:\n${jaAceitas.map(([n, v]) => `- ${n}: ${v.join('; ')}`).join('\n')}\n` : ''}
+${linhas ? `4. No painel LINHAS: cada linha colorida do modelo tem debaixo dela uma linha, borda ou mudança de forma da referência? Diga cada
+   linha do modelo que passa onde a referência é lisa, e cada linha da referência que não tem linha do modelo perto.
+` : ''}${jaAceitas.length ? `\nJá aceito por quem conduz, e que você não repete:\n${jaAceitas.map(([n, v]) => `- ${n}: ${v.join('; ')}`).join('\n')}\n` : ''}
 Responda com um JSON e nada mais, com TODAS as regiões:
 
 \`\`\`json
@@ -294,6 +313,7 @@ export function conferirRespostas(regioes, respostas) {
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
 const AJUDA = `npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="<o que é e de onde é visto>"]
+    [--linhas=<png de linhas:modelo>]
 npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
 
 Corta a referência e a captura do rascunho na mesma grade e grava indice.png, folha-NN.png, pedido.md e leitura.json.
@@ -338,12 +358,13 @@ export function executar(argv) {
       referencia: dePng(readFileSync(resolve(valor('referencia')))), captura: dePng(readFileSync(resolve(valor('captura')))),
       caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), painel: valor('painel') ? numeros(valor('painel'), 4, '--painel') : undefined,
       fundo: cor ? [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16)) : undefined, grade, margem: valor('margem') ? Number(valor('margem')) : undefined,
+      linhas: valor('linhas') ? dePng(readFileSync(resolve(valor('linhas')))) : undefined,
     });
     mkdirSync(pasta, { recursive: true });
     writeFileSync(join(pasta, 'indice.png'), paraPng(r.indice));
     r.folhas.forEach((f, i) => writeFileSync(join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`), paraPng(f)));
     const { ultima } = ultimaRodada(pasta);
-    writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto: valor('objeto'), aceitas: ultima?.aceitas ?? {} }));
+    writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto: valor('objeto'), aceitas: ultima?.aceitas ?? {}, linhas: r.comLinhas }));
     writeFileSync(join(pasta, 'leitura.json'), `${JSON.stringify({ formato: 'modelar.leitura-por-regioes@1', referencia: valor('referencia'), captura: valor('captura'), caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), painel: r.painel, caixaDaCaptura: r.caixaDaCaptura, grade, proporcao: { referencia: Number(r.proporcao.referencia.toFixed(4)), rascunho: Number(r.proporcao.rascunho.toFixed(4)) }, regioes: r.regioes }, null, 1)}\n`);
     const desvio = (r.proporcao.rascunho / r.proporcao.referencia - 1) * 100;
     return { codigo: 0, stdout: `${r.regioes.length} regiões em ${r.folhas.length} folhas, em ${pasta}\naltura sobre largura: referência ${r.proporcao.referencia.toFixed(3)}, rascunho ${r.proporcao.rascunho.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)\npedido ao crítico: ${join(pasta, 'pedido.md')}\n`, stderr: '' };

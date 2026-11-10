@@ -79,5 +79,7 @@ processo o teria pego sozinho e o destino.
    crítico sem a história, com as doze regiões dos rascunhos antigos, achou a tampa larga, a divisa em arco e a borda
    do vão, e mais uma dezena de diferenças que ninguém tinha listado; a listra do capô ele tomou por sombra. Destino:
    `npm run leitura:regioes` (`tools/modelar/leitura-por-regioes.mjs`) corta as duas vistas na mesma grade, escreve o
-   pedido do crítico e recusa a rodada em que alguma região ficou sem resposta; a linha suave dentro de uma cor fica
-   para as linhas do modelo tiradas da malha, no backlog.
+   pedido do crítico e recusa a rodada em que alguma região ficou sem resposta. Para a linha suave dentro de uma cor,
+   `npm run linhas:modelo` (`tools/modelar/linhas-do-modelo.mjs`) tira da malha o contorno, a divisa entre partes, a
+   quina e a dobra fechada, na mesma vista, e a leitura as põe sobre a referência como terceiro painel de cada região
+   (`--linhas`), com a pergunta de cada linha no pedido.

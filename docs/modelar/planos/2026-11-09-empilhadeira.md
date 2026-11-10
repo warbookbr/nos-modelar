@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 

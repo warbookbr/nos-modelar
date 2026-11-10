@@ -64,6 +64,22 @@ describe('leitura por regiões', () => {
     expect(corEm(errado, 10 + pw + 30 + noQuadrado[0], noQuadrado[1])).toEqual(LARANJA);
   });
 
+  it('com o desenho das linhas do modelo, cada região ganha o terceiro painel e o pedido pergunta por elas', () => {
+    /* o desenho ocupa a caixa do objeto: uma linha vermelha vertical a um quarto da largura */
+    const linhas = imagem(200, 120);
+    retangulo(linhas, [50, 0, 52, 120], [220, 0, 40]);
+    const sem = montarLeitura({ referencia: referencia(), captura: captura(), caixaRef: [30, 20, 130, 80], grade: [2, 2], margem: 5 });
+    const com = montarLeitura({ referencia: referencia(), captura: captura(), caixaRef: [30, 20, 130, 80], grade: [2, 2], margem: 5, linhas });
+    expect(sem.comLinhas).toBe(false); expect(com.comLinhas).toBe(true);
+    const pw = (sem.folhas[0].largura - 50) / 2;
+    expect(com.folhas[0].largura).toBe(3 * pw + 80);
+    /* na região A1, a linha cai a (5 + 25) px da referência da borda esquerda da vista: no terceiro painel há vermelho nessa coluna */
+    const x = 10 + 2 * (pw + 30) + 30 * 8 + 4; const y = 10 + 40 + 100;
+    expect(corEm(com.folhas[0], x, y)).toEqual([220, 0, 40]);
+    expect(pedido({ pasta: '/p', regioes: com.regioes, folhas: 2, linhas: true })).toContain('4. No painel LINHAS');
+    expect(pedido({ pasta: '/p', regioes: com.regioes, folhas: 2 })).not.toContain('LINHAS');
+  });
+
   it('a proporção do objeto inteiro sai no relato, porque cada eixo é ajustado em separado', () => {
     const largo = imagem(480, 400, FUNDO_DO_PAINEL);
     retangulo(largo, [100, 100, 340, 220], LARANJA);

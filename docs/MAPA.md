@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1753 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1755 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2633,6 +2633,8 @@
 - `leitura-por-regioes.test.mjs` — leitura-por-regioes.test.mjs — a leitura por regiões: a captura alinhada à caixa da referência, a grade que cobre a vista inteira, as folhas iguais a cada ex…
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
+- `linhas-do-modelo.mjs` — linhas-do-modelo.mjs — as linhas que o modelo tem numa vista, tiradas da malha e não de uma imagem com luz.
+- `linhas-do-modelo.test.mjs` — linhas-do-modelo.test.mjs — as linhas tiradas da malha: o contorno, a divisa entre partes, a quina do degrau e a dobra fechada saem; a curva larga não sai.
 - `mapa-da-receita.mjs` — mapa-da-receita.mjs — o mapa de uma receita do acervo, para ler só o trecho que se precisa.
 - `mapa-da-receita.test.mjs` — mapa-da-receita.test.mjs — o mapa de toda receita do acervo sai sem erro, cada linha citada tem o nome dito e a saída cabe numa tela
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
