@@ -23,6 +23,10 @@ export const TESTES_LENTOS = [
   'tools/modelar/dobras-aceitas-reguas.test.mjs',
   'tools/fixtures/aberturas-em-teste/chapa-grande.test.ts',
   'tools/fixtures/aberturas-em-teste/vizinhanca.test.ts',
+  /* 2026-11-10: no CI os dois rodam sozinhos a 12,4 a 13,9 s, acima do teto de 12, e reprovaram a bateria rápida em dois envios de
+     três no mesmo dia sem mudança neles; na máquina local levam 8,7 e 11,7 s */
+  'tools/fixtures/aberturas-em-teste/superficies.test.ts',
+  'modulos/textura/tests/mapas.test.js',
   'procedural/nucleo/operacoes/abertura-por-contorno.test.ts',
   'src/bancada/sessao/montagem-em-dados-acervo.test.js',
   'modulos/exportador-cad/tests/exportador-cad.test.js',
