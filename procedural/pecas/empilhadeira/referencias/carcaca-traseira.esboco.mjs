@@ -148,7 +148,7 @@ const meiaDoVao = (y) => interpolar(perfil(VAO), y);
    descia em degraus (leitura da direita, rodada 4, A4 e B4). */
 const BORDA_DO_VAO_PX = 5;
 const secaoDoMeio = ([z, y]) => (z > 1970 && y >= 800
-  ? [Math.min(z + recuoDaPlanta((meiaDoVao(y) + BORDA_DO_VAO_PX) * MM), PONTA_DO_CAPO + 20), y] : [z, y]);
+  ? [Math.min(z + recuoDaPlanta(meiaDoVao(y) + BORDA_DO_VAO_PX * MM), PONTA_DO_CAPO + 20), y] : [z, y]);
 export const VISTAS_DO_CAPO = {
   lado: lado('capo', ([z, y]) => secaoDoMeio([z, y > 1100 ? TOPO_CAPO : y])),
   perfil: perfil(CAPO), planta: plantaTraseira(meiaCapo, 1400),

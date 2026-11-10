@@ -197,8 +197,9 @@ const aro = extX(lado('aroTraseiro'), -LATERAL_TRAS, LATERAL_TRAS);
 const pocoTras = [extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), POCO_T.de, 720), extX(circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2]), -720, -POCO_T.de)];
 /* o vão sob o piso entre as chapas do chassi: de frente a referência é escura entre os montantes do pé da torre, das linhas 392 a 476
    (621 a 260 mm), sob a faixa laranja; o corpo cheio mostrava ali a frente laranja dele (leitura de frente, rodada 4, C2 e C3). O vão
-   vai de 150 a 472 mm (acima disso fica o piso), na largura entre as chapas, até z -1100, com o fundo escuro. */
-const TUNEL = [[-262, 150], [262, 150], [262, 472], [-262, 472]];
+   vai de 195 a 472 mm (acima disso fica o piso; abaixo, o pé do corpo, a 191 na lateral), na largura entre as chapas, até z -1100,
+   com o fundo escuro. */
+const TUNEL = [[-262, 195], [262, 195], [262, 472], [-262, 472]];
 /* o furo da tampa de combustível, só do lado +x: a elipse da lateral (z 1299-1450, y 704-882), 35 mm de fundo, com o fundo escuro */
 const FURO = circulo(-1375, 793, 1, 32).map(([z, y]) => [-1375 + (z + 1375) * 75, 793 + (y - 793) * 89]);
 const laterais = cortar(unir(meio, ...frentes, aro), ...pocos(POCO_D), ...pocoTras, extX(FURO, 560, 720), extZ(TUNEL, -1100, -300));
@@ -281,7 +282,16 @@ parte('colunas', extX(lado('coluna', ([z, y]) => (z >= 1485 && y < 1125 ? [1525,
 /* o fundo do poço traseiro, escuro, entre as rodas de trás (lateral `pocoTraseiro`, z 1342-1645; na largura do protótipo, 360 mm
    x 596,4/511). Desce só até o pé do arco (y 428): abaixo dele a referência mostra a suspensão, que é de outra fatia, e o fundo
    escuro até o chão aparecia na lateral (leitura da direita, rodada 1, C3). */
-parte('pocoTraseiro', extX(L([[1342, 428], [1342, 625], [1645, 625], [1645, 428]]), -420, 420), ESCURO);
+/* e o forro do poço da roda: uma casca escura de 15 mm por dentro do arco da lateral, de 432 a 590 mm, entre z 1300 e 1545 e de 191 a
+   640 mm. Sem ela, de trás aparecia ao lado do contrapeso a parede da frente do poço, laranja, onde a referência é escura (o pneu, que
+   fica de fora, e o fundo do poço em sombra; leitura de trás, rodada 4, C1 e C4); de lado ela é a beira escura de dentro do arco, que
+   a referência mostra marrom escura (B3). */
+const anel = [...circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2] + 1)];
+const anelDentro = circulo(-ARCO_TRAS[0], ARCO_TRAS[1], ARCO_TRAS[2] - 15);
+const caixaDoForro = () => extZ([[-600, 191], [600, 191], [600, 640], [-600, 640]], -1545, -1300);
+const forro = [1, -1].map((s) => cruzar(cortar(extX(anel, s > 0 ? POCO_T.de : -590, s > 0 ? 590 : -POCO_T.de),
+  extX(anelDentro, s > 0 ? POCO_T.de - 1 : -591, s > 0 ? 591 : -POCO_T.de + 1)), caixaDoForro()));
+parte('pocoTraseiro', unir(extX(L([[1342, 428], [1342, 625], [1645, 625], [1645, 428]]), -420, 420), ...forro), ESCURO);
 
 /* a traseira: capô, grade, tampa e contrapeso, do módulo dela */
 montarTraseira(estado);

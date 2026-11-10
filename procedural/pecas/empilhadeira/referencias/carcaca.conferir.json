@@ -25,7 +25,8 @@
   "fundoNicho": "escuro",
   "pino": "cinza",
   "trinco": "cinza",
-  "tapete": "escuro"
+  "tapete": "escuro",
+  "tunel": "escuro"
  },
  "dentro": {
   "grade": "capo",
@@ -72,7 +73,7 @@
      494
     ]
    ],
-   "fora": "a torre na frente, a coluna de direção, o cubo dianteiro e a suspensão com o cubo traseiro",
+   "fora": "a torre (as duas hastes inclinadas) com o pé dela, a coluna de direção, as rodas, os cubos dianteiro e traseiro, os eixos e a suspensão traseira",
    "grade": [
     4,
     3
@@ -107,7 +108,7 @@
      480
     ]
    ],
-   "fora": "o pé da torre com o suporte da inclinação, o eixo com os cubos e o diferencial",
+   "fora": "o pé da torre com o suporte da inclinação (o quadro cinza do meio e os montantes cinza largos que descem até a base), o eixo dianteiro com os cubos e o diferencial, as rodas",
    "grade": [
     4,
     3
@@ -136,12 +137,54 @@
      511
     ]
    ],
-   "fora": "o eixo e as rodas escuras embaixo, dos lados do contrapeso",
+   "fora": "o eixo traseiro, as rodas e os pneus escuros dos lados e embaixo do contrapeso, e a sombra no chão",
    "grade": [
     4,
     3
    ],
    "visto": "de trás"
+  },
+  "superior": {
+   "referencia": "carcaca-cima.ia.png",
+   "girar": 270,
+   "caixaRef": [
+    138,
+    78,
+    458,
+    671
+   ],
+   "ignorar": [
+    [
+     118,
+     540,
+     142,
+     671
+    ],
+    [
+     450,
+     540,
+     474,
+     671
+    ],
+    [
+     118,
+     150,
+     143,
+     270
+    ],
+    [
+     450,
+     150,
+     472,
+     270
+    ]
+   ],
+   "fora": "os pneus que aparecem dos lados",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
   }
  }
 }

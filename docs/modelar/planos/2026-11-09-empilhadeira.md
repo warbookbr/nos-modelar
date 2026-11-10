@@ -189,6 +189,12 @@ ela vai ao backlog e a pessoa decide.
 Aberto em 2026-11-09 com as três vistas de IA, a lateral de outubro e o
 alinhamento da carcaça, e o pedido de trabalho autônomo.
 
+Em 2026-11-10 a traseira da carcaça ficou em rascunho pelas três vistas, com
+duas rodadas de leitura por regiões, e a carcaça inteira em rascunho de vinte
+partes, conferida em quatro vistas; as fatias de ferramenta T0 a T8 foram
+entregues. O ramo foi junto à main pelo CI no mesmo dia (commit `9a7beaf8`),
+com o teto de planos ativos em seis.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
