@@ -44,7 +44,7 @@ export const TABELA = {
 
   /* O BERÇO: a chapa de 520 mm em x (260 para cada lado do centro do cilindro), de 300 em z, com 16 mm de espessura, sobre a face de
      cima da tampa do capô; e dois apoios sob as cintas, de 50 mm em x, de 350 em z, de 1.150 a 1.262, entalhados pelo círculo do
-     cilindro (o mesmo polígono de 96 lados dele, no contorno de lado). A base da chapa: a face de cima da tampa da carcaça, o mais alto dela de x -235 a
+     cilindro (o corte sai 5 mm além de cada lado, e é feito depois de os apoios se unirem à chapa). A base da chapa: a face de cima da tampa da carcaça, o mais alto dela de x -235 a
      295, medido na malha a cada 1 mm de z por sonda vertical (2026-11-10) e simplificado a 0,3 mm (o desvio da reta para cima dela fica
      em 0,1 mm), com o nó de z -1.840 no ponto do apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na
      montagem. Sob os apoios, o mais alto da face é 1.149,5. */
@@ -52,7 +52,7 @@ export const TABELA = {
     chapa: { meia: 260, emZ: 150, espessura: 16 },
     base: [[-1685, 1149.3], [-1740, 1149.5], [-1821, 1149.1], [-1840, 1148.7], [-1893, 1147.7], [-1945, 1145.3], [-1981, 1142.3], [-1995, 1140.3]],
     folga: 0.5,
-    apoios: { meia: 25, emZ: 175, y: [1150, 1262] },
+    apoios: { meia: 25, emZ: 175, y: [1150, 1262], alemNoCorte: 5 },
   },
 };
 
@@ -69,20 +69,11 @@ export function derivar(T = TABELA) {
   const naBase = (z) => interpolar(base, z);
   const fundo = [[z0, naBase(z0)], ...base.filter(([z]) => z > z0 && z < z1), [z1, naBase(z1)]];
   const ladoChapa = [...fundo, ...[...fundo].reverse().map(([z, y]) => [z, y + CH.espessura])];
-  /* cada apoio de lado: o retângulo com o entalhe do círculo do cilindro (o mesmo polígono de 96 lados dele), como um contorno só; o
-     corte por subtrair deixava na face de lado o leque dos vértices do arco, e as diagonais dele, cruzadas com a face de cima da
-     chapa na união, enchiam essa face de vértices em fila, de triângulo sem área */
-  const AP = B.apoios; const CI = T.cilindro;
-  const anel = circulo(CG.z, CG.y, CI.raio, T.lados);
-  const cruzaTopo = anel.map((a, i) => [a, anel[(i + 1) % anel.length]]).filter(([a, b]) => (a[1] - AP.y[1]) * (b[1] - AP.y[1]) < 0)
-    .map(([a, b]) => [a[0] + (b[0] - a[0]) * (AP.y[1] - a[1]) / (b[1] - a[1]), AP.y[1]]).sort((a, b) => b[0] - a[0]);
-  const arco = anel.filter(([, y]) => y < AP.y[1]).sort((a, b) => b[0] - a[0]);
-  const ladoApoio = [[CG.z - AP.emZ, AP.y[0]], [CG.z + AP.emZ, AP.y[0]], [CG.z + AP.emZ, AP.y[1]], cruzaTopo[0], ...arco, cruzaTopo[cruzaTopo.length - 1], [CG.z - AP.emZ, AP.y[1]]];
   const apoio = apoiosDoPosto(CARCACA).glp;
   const portas = {
     naTampa: { forma: 'plano', papel: 'apoia', ponto: apoio.ponto.map((v, k) => v + apoio.normal[k] * B.folga), normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },
   };
-  return { ladoChapa, ladoApoio, xCintas: [CG.x - T.cintas.aoMeio, CG.x + T.cintas.aoMeio], portas };
+  return { ladoChapa, xCintas: [CG.x - T.cintas.aoMeio, CG.x + T.cintas.aoMeio], portas };
 }
 
 /** Monta o cilindro, as cintas e o berço no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem da
@@ -109,8 +100,11 @@ export function montarGlp(estado, T = TABELA) {
   /* BERÇO: a chapa sobre a tampa e os dois apoios sob as cintas, com o entalhe do círculo do cilindro */
   const B = T.berco; const AP = B.apoios;
   const chapa = extX(D.ladoChapa, CG.x - B.chapa.meia, CG.x + B.chapa.meia);
-  const apoios = D.xCintas.map((xc) => extX(D.ladoApoio, xc - AP.meia, xc + AP.meia));
-  parte('berco', unir(chapa, ...apoios), T.cores.berco);
+  /* os apoios unidos à chapa primeiro, e o círculo do cilindro tirado depois do conjunto: tirado de cada apoio antes da união, o leque
+     dos vértices do arco na face de lado dele cruzava a face de cima da chapa e a enchia de vértices em fila, de triângulo sem área */
+  const apoios = D.xCintas.map((xc) => extX(retangulo(CG.z - AP.emZ, AP.y[0], CG.z + AP.emZ, AP.y[1]), xc - AP.meia, xc + AP.meia));
+  const entalhes = D.xCintas.map((xc) => extX(circulo(CG.z, CG.y, CI.raio, n), xc - AP.meia - AP.alemNoCorte, xc + AP.meia + AP.alemNoCorte));
+  parte('berco', cortar(unir(chapa, ...apoios), ...entalhes), T.cores.berco);
   return { chapa };
 }
 
@@ -143,7 +137,7 @@ const receita = {
     referencias: ['../../referencias/tras.ia.png', '../../referencias/cima.ia.png'],
     escala: { medida: 'comprimento do cilindro de GLP, do fim da cúpula ao fim da válvula (ficha da classe)', milimetros: 700 },
     partes: [
-      { nome: 'berco', forma: 'o berço cinza: a chapa de 520 por 300 mm e 16 de espessura que segue a face de cima da tampa do capô, e dois apoios de 50 mm sob as cintas, que sobem a 1.262 e recebem o cilindro pelo círculo dele', tecnica: 'silhueta lateral extrudada em x, unida aos apoios: o retângulo com o entalhe do círculo do cilindro, de lado, extrudado em x' },
+      { nome: 'berco', forma: 'o berço cinza: a chapa de 520 por 300 mm e 16 de espessura que segue a face de cima da tampa do capô, e dois apoios de 50 mm sob as cintas, que sobem a 1.262 e recebem o cilindro pelo círculo dele', tecnica: 'silhueta lateral extrudada em x, unida aos retângulos dos apoios extrudados em x, menos o círculo do cilindro' },
       { nome: 'cilindroGlp', forma: 'o cilindro cinza claro de Ø 320, deitado de través em z -1.840 e y 1.345, com as duas cúpulas e a válvula do lado direito (-x)', tecnica: 'círculos de 96 lados extrudados em x, unidos' },
       { nome: 'cintas', forma: 'duas cintas escuras de 40 mm, a 120 mm do meio do cilindro, que o abraçam pela metade de cima', tecnica: 'anel de 96 lados extrudado em x cruzado com o bloco da metade de cima' },
     ],
