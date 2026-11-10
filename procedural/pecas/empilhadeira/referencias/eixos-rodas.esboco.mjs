@@ -95,7 +95,7 @@ export function montarEixosRodas(estado) {
      vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8)). O assento de cada lado, na espessura da chapa (266 a 327 mm, 4 mm para dentro de cada face), sobe do tubo até esse
      teto: é a face pela qual o eixo se apoia no chassi. */
   const D = RODA_D;
-  const assento = [[30, 380], [72, 380], [72, 432.7], [60.5, 429], [30, 460]];
+  const assento = [[30, 380], [72, 380], [72, 432.2], [60.5, 428.5], [30, 459.5]];
   parte('eixoDianteiro', unir(
     torno([[0, -404], [75, -404], [75, -190], [150, -120], [150, 120], [75, 190], [75, 404], [0, 404]], D.y, D.z),
     extX(assento, CHAPA[0] + 4, CHAPA[1] - 4), extX(assento, -CHAPA[1] + 4, -CHAPA[0] - 4),

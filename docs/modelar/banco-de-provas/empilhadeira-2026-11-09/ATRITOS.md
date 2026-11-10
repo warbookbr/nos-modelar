@@ -146,3 +146,13 @@ processo o teria pego sozinho e o destino.
    uma escala só; o arco de contorno, que a simplificação de 6 mm faceta e hoje é ajustado dentro do módulo; o
    encolhimento de 10 a 15 mm da silhueta nos degraus de um corpo subdividido sem compensar, que nada mede; e um
    lugar para registrar a medida que duas vistas dão diferente. Vão ao backlog.
+16. **O rascunho do protetor, do posto e dos acessórios mostrou cinco faltas nas ferramentas.** Dezesseis partes sobre
+   a carcaça, em três rodadas registradas. `conferir:vistas` não aceita uma vista sem imagem, e a lateral da máquina
+   inteira, que só existe em contornos, foi comparada por script solto. `sobra:partes` toma a silhueta de um quadro
+   vazado por cheia (a grade do teto dentro do quadro do protetor deu 411 mm de sobra falsa de cima) e aplica as
+   mesmas vistas a todos os pares. O esboço não tem varredura de seção ao longo de um caminho, e as colunas saíram de
+   uma faixa extrudada cruzada com a seção de frente. O relato de contatos chama de travessia o assento apoiado na
+   face curva da tampa do motor. E o registro da leitura pede `aceitas` em frases e `decididas` em objetos, e uma
+   rodada foi recusada por isso. O processo pegou os cinco, pelo relato de quem montou. Vão ao backlog. A carcaça
+   também ficou devendo: as colunas da frente do protetor caem por fora do painel, e a vista de frente as põe por
+   dentro; para isso o painel teria no máximo 415 mm de meia largura junto ao eixo dianteiro.
