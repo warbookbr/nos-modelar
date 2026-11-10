@@ -92,13 +92,13 @@ export function montarEixosRodas(estado) {
   /* EIXO DIANTEIRO ---------------------------------------------------------------------------------------------------------- */
   /* a carcaça do eixo: o tubo de Ø 150 de flange a flange (404 mm) e o bojo do diferencial no meio. Passa pelo entalhe das chapas
      do chassi (o contorno lateral `chassi` contorna o cubo: parede da frente em z 98 a 100, de y 338 a 426, e o teto do entalhe pelos
-     vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8)). O assento de cada lado, na espessura da chapa (266 a 327 mm), sobe do tubo até esse
+     vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8)). O assento de cada lado, na espessura da chapa (266 a 327 mm, 4 mm para dentro de cada face), sobe do tubo até esse
      teto: é a face pela qual o eixo se apoia no chassi. */
   const D = RODA_D;
   const assento = [[30, 380], [72, 380], [72, 432.7], [60.5, 429], [30, 460]];
   parte('eixoDianteiro', unir(
     torno([[0, -404], [75, -404], [75, -190], [150, -120], [150, 120], [75, 190], [75, 404], [0, 404]], D.y, D.z),
-    extX(assento, CHAPA[0], CHAPA[1]), extX(assento, -CHAPA[1], -CHAPA[0]),
+    extX(assento, CHAPA[0] + 4, CHAPA[1] - 4), extX(assento, -CHAPA[1] + 4, -CHAPA[0] - 4),
   ), ESCURO);
   /* o cubo: o flange de Ø 220 de 404 a 463 mm (o disco da roda assenta na face de fora dele) e a tampa de Ø 100 até 516 mm, que
      passa pelo furo do disco */

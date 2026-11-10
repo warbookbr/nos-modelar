@@ -93,11 +93,11 @@ export function montarTorreGarfos(estado) {
      O olhal que abraça o tubo do eixo dianteiro (Ø 150 em `eixos-rodas`, de 190 a 404 mm do centro) e a chapa que desce à frente até a
      travessa de baixo dos canais externos. Fica por dentro das chapas do chassi (x 266 a 327), de 215 a 262 mm: por fora delas a frente
      das laterais e o poço da roda ocupam o lugar. É o pé de trás que a carcaca-lado mostra descendo a z 145 (aqui, até a face de trás
-     da travessa, z 100). O furo de raio 75 é o assento no tubo; o olhal tem raio 95 para não alcançar o canal interno (z 124).
+     da travessa, z 100). O furo de raio 77 é o assento no tubo de raio 75, com 2 mm de folga (com raio 75 as facetas do furo e do tubo se cruzavam); o olhal tem raio 95 para não alcançar o canal interno (z 124).
      Contato: o furo no tubo do eixo (pino) e a face z 100 na travessa de baixo. */
   const P = T.pivo;
   const chapaDoPe = [[-30, 266], [T.tras, E.y[0]], [T.tras, 215], [70, 300]];
-  const pe = cortar(unir(extX(circulo(P.z, P.y, 95), 215, 262), extX(chapaDoPe, 215, 262)), extX(circulo(P.z, P.y, 75), 200, 280));
+  const pe = cortar(unir(extX(circulo(P.z, P.y, 95), 215, 262), extX(chapaDoPe, 215, 262)), extX(circulo(P.z, P.y, 77), 200, 280));
   parte('peTorre', par(pe), CINZA);
 
   /* CANAIS EXTERNOS --------------------------------------------------------------------------------------------------------------
@@ -130,14 +130,14 @@ export function montarTorreGarfos(estado) {
   parte('canaisInternos', unir(par(extY(uInterno, I.y[0], I.y[1])), travessaInterna), CINZA);
 
   /* CILINDRO DE ELEVAÇÃO ---------------------------------------------------------------------------------------------------------
-     Um, no centro (vista de frente, colunas 535 a 550), entre as travessas de trás e o carro: x 0, z 175. Na vista de frente ele acaba
+     Um, no centro (vista de frente, colunas 535 a 550), entre as travessas de trás e o carro: x 0, z 190 (a 175 a camisa entrava 5 mm no bojo do diferencial de `eixos-rodas`, Ø 300 até z 150). Na vista de frente ele acaba
      a uns 1.400 mm, com a cabeça e duas correntes de cada lado dela (a 60 mm do centro) que descem ao carro, e acima dele o vão entre
      os canais é aberto: é o cilindro de elevação livre, que sobe o carro antes do canal interno (rodada 1, A2, A3 e B3: com a haste até
      o topo da torre aparecia uma barra clara onde a referência é vazia). Camisa Ø 60 sentada na travessa de baixo (y 210) até 1.050,
-     haste Ø 36 até 1.400 e a cabeça de 160 mm, de 1.400 a 1.440, de z 145 a 250. */
-  parte('cilindroElevacao', extY(circulo(0, 175, 30), 210, 1050), ESCURO);
-  parte('hasteElevacao', extY(circulo(0, 175, 18), 1050, 1400), ACO);
-  parte('cabecaElevacao', caixaY(-80, 80, 145, 250, 1400, 1440), CINZA);
+     haste Ø 36 até 1.400 e a cabeça de 160 mm, de 1.400 a 1.440, de z 160 a 250. */
+  parte('cilindroElevacao', extY(circulo(0, 190, 30), 210, 1050), ESCURO);
+  parte('hasteElevacao', extY(circulo(0, 190, 18), 1050, 1400), ACO);
+  parte('cabecaElevacao', caixaY(-80, 80, 160, 250, 1400, 1440), CINZA);
 
   /* CILINDROS DE INCLINAÇÃO ------------------------------------------------------------------------------------------------------
      Deitados ao longo de z em x 355, y 860, como na carcaca-lado (de z -36 a 75 em y 812 a 912). A camisa de Ø 90 vai de z -150 a 15 (mais atrás ela sairia por cima da descida do painel, que a z -260 está a 861 mm):
