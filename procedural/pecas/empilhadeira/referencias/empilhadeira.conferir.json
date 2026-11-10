@@ -1,0 +1,134 @@
+{
+ "objeto": "uma empilhadeira de contrapeso inteira: carcaça laranja e cinza com o contrapeso atrás, quatro rodas, a torre com os canais, as correntes, a placa e a grade de carga e os dois garfos na frente, o protetor do operador com o teto em grade, o banco, o volante e o cilindro de gás deitado atrás",
+ "cores": {
+  "laranja": "#e2641e",
+  "cinza": "#6b7074",
+  "escuro": "#1e2022",
+  "claro": "#b4b8ba",
+  "vermelho": "#c0302a"
+ },
+ "partes": {
+  "chassi": "cinza",
+  "paralamas": "laranja",
+  "laterais": "laranja",
+  "furo": "escuro",
+  "tunel": "escuro",
+  "painel": "escuro",
+  "piso": "cinza",
+  "tapete": "escuro",
+  "degraus": "cinza",
+  "tampaMotor": "cinza",
+  "colunas": "cinza",
+  "pocoTraseiro": "escuro",
+  "capo": "laranja",
+  "grade": "cinza",
+  "fundoGrade": "escuro",
+  "tampa": "cinza",
+  "contrapeso": "cinza",
+  "fundoRasgo": "escuro",
+  "fundoNicho": "escuro",
+  "pino": "cinza",
+  "trinco": "cinza",
+  "pneusDianteiros": "escuro",
+  "arosDianteiros": "claro",
+  "pneusTraseiros": "escuro",
+  "arosTraseiros": "claro",
+  "eixoDianteiro": "escuro",
+  "cubosDianteiros": "cinza",
+  "eixoTraseiro": "escuro",
+  "suporteTraseiro": "cinza",
+  "mangas": "escuro",
+  "cubosTraseiros": "cinza",
+  "barraDirecao": "cinza",
+  "peTorre": "cinza",
+  "canaisExternos": "cinza",
+  "canaisInternos": "cinza",
+  "cilindroElevacao": "escuro",
+  "hasteElevacao": "claro",
+  "cabecaElevacao": "cinza",
+  "cilindrosInclinacao": "cinza",
+  "hastesInclinacao": "claro",
+  "placaGarfos": "escuro",
+  "gradeCarga": "escuro",
+  "garfos": "escuro",
+  "correntes": "escuro",
+  "protetor": "cinza",
+  "gradeTeto": "cinza",
+  "luzesTrabalho": "escuro",
+  "lanternas": "vermelho",
+  "espelho": "escuro",
+  "alcas": "escuro",
+  "assento": "escuro",
+  "encosto": "escuro",
+  "colunaDirecao": "escuro",
+  "volante": "escuro",
+  "pedais": "escuro",
+  "alavancas": "escuro",
+  "cilindroGlp": "claro",
+  "cintas": "escuro",
+  "berco": "cinza",
+  "escape": "escuro"
+ },
+ "dentro": {
+  "grade": "capo",
+  "fundoGrade": "capo",
+  "furo": "laterais",
+  "tunel": "laterais",
+  "cilindroElevacao": "canaisExternos",
+  "hasteElevacao": "canaisExternos",
+  "gradeTeto": "protetor"
+ },
+ "vistasDaSobra": [
+  "superior",
+  "direita"
+ ],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {
+  "frontal": {
+   "referencia": "frente.ia.png",
+   "caixaRef": [
+    360,
+    34,
+    731,
+    545
+   ],
+   "fora": "a sombra no chão",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de frente"
+  },
+  "traseira": {
+   "referencia": "tras.ia.png",
+   "caixaRef": [
+    372,
+    37,
+    701,
+    540
+   ],
+   "fora": "a sombra no chão",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de trás"
+  },
+  "superior": {
+   "referencia": "cima.ia.png",
+   "girar": 270,
+   "caixaRef": [
+    118,
+    79,
+    474,
+    966
+   ],
+   "fora": "nada: a vista de cima mostra a máquina inteira",
+   "grade": [
+    4,
+    4
+   ],
+   "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
+  }
+ }
+}

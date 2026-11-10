@@ -96,11 +96,13 @@ const TRAS_TETO = -1425;
 /* As larguras (meia largura por fora). Trás: as colunas de trás vão de 406 a 665 na linha 270 (520 mm) e de 418 a 653 no alto, linha
    48 (474 mm); de frente, a coluna da frente vai de 412 a 690 na linha 340 (477 mm) e de 426 a 678 na 145 (432 mm). A ficha dá 960 de
    largura do protetor (480). Adotado: o teto com 480 por fora e 55 de perfil; a coluna de trás com o pé de 460 a 516, dentro da face
-   de cima das colunas cinza da carcaça (516); a coluna da frente com o pé de 500 a 556, por fora do painel da carcaça (496 de meia
-   largura), porque a vista de frente a põe de 420 a 477, por dentro dele (ver o relato). */
+   de cima das colunas cinza da carcaça (516); a coluna da frente com o pé de 455 a 512 e o alto na largura do teto, 32 mm para dentro,
+   como a vista de frente a inclina (leitura de frente da máquina inteira, rodada 1, B1 e B4), sobre a aba do
+   paralama; o painel da carcaça recolhe os cantos da frente a 415 mm de z 10 a -90 para dar lugar a ele (até a integração da máquina
+   inteira o pé ficava de 500 a 556, por fora do painel de 496). */
 const X_TETO = [425, 480];
 const X_PE_TRAS = [460, 516];
-const X_PE_FRENTE = [500, 556];
+const X_PE_FRENTE = [455, 512];
 const Y_JUNTA = 1990;   // a altura em que as colunas acabam de se inclinar para dentro e entram no perfil do teto
 
 export function montarProtetorPosto(estado) {
@@ -173,7 +175,7 @@ export function montarProtetorPosto(estado) {
   const zAlca = (y) => zEixoFrente(y) - 35 - 75;
   const ladoAlca = faixa([[zAlca(alcaY[0]), alcaY[0]], [zAlca(alcaY[1]), alcaY[1]]], 15);
   const bracos = alcaY.map((y) => [[zAlca(y) + 10, y - 15], [zEixoFrente(y), y - 15], [zEixoFrente(y), y + 15], [zAlca(y) + 10, y + 15]]);
-  const xAlca = [465, 500];
+  const xAlca = [450, 485];   // dentro da largura da coluna, que com o pé de 455 a 512 vai de 440 a 500 ali
   parte('alcas', unir(...lados((s) => unir(extX(ladoAlca, ...emX(s, xAlca)), ...bracos.map((b) => extX(b, ...emX(s, xAlca)))))), ESCURO);
 
   /* --- posto do operador ---------------------------------------------------------------------------------------------------------- */

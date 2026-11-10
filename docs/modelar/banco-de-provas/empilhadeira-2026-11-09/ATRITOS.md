@@ -171,3 +171,15 @@ processo o teria pego sozinho e o destino.
    pneu, que de lado é um anel, e acusa o aro e o cubo como fora dele; o relato de contatos deu 76 mm de travessia
    num toque rente que cruzava 0,01 mm, que é a medida da caixa e não a da travessia; e cada sonda de interferência
    remontava a carcaça, 50 s por consulta, o que a montagem sem relato já resolveu. O processo pegou todos.
+19. **A máquina inteira em rascunho fechou as pendências entre as partes e mostrou que as vistas de IA não têm uma
+   escala só.** Sessenta partes num módulo que chama a montagem da carcaça e as três frentes sobre o mesmo estado
+   (`empilhadeira.esboco.mjs`, [três quartos](maquina-inteira-tres-quartos.png) e
+   [lado](maquina-inteira-lado.png)). As colunas do protetor foram para dentro do painel, o painel e o piso ganharam o
+   rebaixo do cilindro de inclinação, os poços das rodas e o contrapeso passaram a caber os pneus, e as medidas das
+   rodas ficaram num objeto só, que a carcaça exporta e os eixos leem. A vista de frente tem a altura 25% maior que a
+   largura na mesma escala, e a de trás encolhe em 0,90 o que está longe: a medida adotada e a fonte de cada linha
+   estão na TABELA do `ALINHAMENTO.md`, com as divergências numa seção própria. Quatro faltas de ferramenta se
+   repetiram: a relação de contato sem pino em furo com folga, o relato que chama de travessia o par de sólido
+   inconclusivo com as caixas sobrepostas, a `conferir:vistas` sem a vista só de contornos, e o casamento com uma
+   escala por vista. O processo pegou as pendências pelos relatos das frentes; a escala dupla da vista de frente só
+   apareceu na comparação entre vistas feita à mão, e falta o campo que a registre na configuração da conferência.

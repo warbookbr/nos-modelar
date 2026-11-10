@@ -21,7 +21,7 @@ import {
   ferramentas, montarTraseira, lado, simplifica, REGIOES, LARANJA, CINZA, ESCURO,
 } from './carcaca-traseira.esboco.mjs';
 
-const ESCURO_PISO = '#34383c';
+const ESCURO_PISO = '#34383c';   // o tapete do piso: cinza escuro, mais claro que o fundo da grade
 
 /* AS RODAS, uma medida por roda (a decisão da máquina inteira, pendência c; ALINHAMENTO.md, "Divergências entre as fontes"). x é a
    distância ao centro da máquina. Diâmetro: a dianteira com 705 (TABELA, 7.00-12; a lateral de outubro dá 714 na escala dela e 691 na
@@ -37,7 +37,7 @@ export const RODAS = {
   dianteira: { y: 352.5, z: 0, raio: 352.5, xDentro: 417, banda: 250 },
   traseira: { y: 284, z: -1700, raio: 284, xDentro: 445, banda: 208 },
 };
-const FOLGA_DO_POCO = 40;   // o tapete do piso: cinza escuro, mais claro que o fundo da grade
+const FOLGA_DO_POCO = 40;
 const L = (pts) => pts.map(([z, y]) => [-z, y]);             // ponto da lateral [z para trás, y] -> [z do modelo, y]
 const espelhoX = (xy) => xy.map(([x, y]) => [-x, y]);         // o mesmo perfil do outro lado
 /* círculo de 96 lados: arco de roda e arco do contorno lateral saem com pelo menos 64 lados por volta */
@@ -225,7 +225,12 @@ export function montarCarcaca(estado) {
   const TUNEL = [[-262, 195], [262, 195], [262, 472], [-262, 472]];
   /* o furo da tampa de combustível, só do lado +x: a elipse da lateral (z 1299-1450, y 704-882), 35 mm de fundo, com o fundo escuro */
   const FURO = circulo(-1375, 793, 1, 32).map(([z, y]) => [-1375 + (z + 1375) * 75, 793 + (y - 793) * 89]);
-  const laterais = cortar(unir(meio, ...frentes, aro), ...pocos(POCO_D), ...pocoTras, extX(FURO, 560, 720), extZ(TUNEL, -1100, -300));
+  /* o pé das laterais sob o contrapeso: de trás, entre os pneus traseiros, o corpo descia a 191 mm e o contrapeso a 221, e aparecia uma
+     tira laranja sob ele, onde a vista de trás é cinza até o chão (leitura de trás da máquina inteira, rodada 1, C2 e C3; era a
+     pendência do item 15 dos ATRITOS). O pé baixo da lateral vai de z -420 a -1330, e de trás ele aparece inteiro sob o contrapeso: por
+     dentro dos pneus traseiros (445 mm) o pé sobe a 221 nesse trecho todo; por fora, que é o que a lateral vê, fica a 191. */
+  const peSobOContrapeso = extZ([[-RODAS.traseira.xDentro, 150], [RODAS.traseira.xDentro, 150], [RODAS.traseira.xDentro, 221], [-RODAS.traseira.xDentro, 221]], -1600, -380);
+  const laterais = cortar(unir(meio, ...frentes, aro), ...pocos(POCO_D), ...pocoTras, extX(FURO, 560, 720), extZ(TUNEL, -1100, -300), peSobOContrapeso);
   parte('laterais', laterais, LARANJA);
   parte('furo', extX(FURO, 545, 561), ESCURO);
   parte('tunel', extZ(TUNEL, -1100, -1088), ESCURO);
@@ -274,10 +279,11 @@ export function montarCarcaca(estado) {
     estacoes: [760, 764, 775, 800, 830, 860, 890, 905, 915],
   }, { vincos: [{ nome: 'base', laco: 'primeiro', nitidez: 'viva' }] });
   /* escuro como o tapete: a vista de cima o mostra escuro, com só a borda cinza (leitura de cima, rodada 1, C1 a C4), e a lateral também */
-  /* Os cantos da frente recolhidos a 415 mm de z 10 a -90 (pendência a): ali passam os pés das colunas da frente do protetor, que a vista
+  /* Os cantos da frente recolhidos a 415 mm de z 10 a -130 (pendência a; a coluna, inclinada 14,5 graus para trás, chega a z -114 na face
+     de cima do painel, 915 mm): ali passam os pés das colunas da frente do protetor, que a vista
      de frente da máquina põe de 420 a 477 mm (colunas 412 a 431 e 660 a 679 nas linhas 300 a 345, 3,395 mm/px pela aba); a vista de
      cima da carcaça isolada mede a moldura com 496 até z -60, mas na da máquina inteira essa quina fica sob o pé da coluna. */
-  const cantos = [1, -1].map((s) => extY([[415, 10], [560, 10], [560, -90], [415, -90]].map(([x, z]) => [s * x, z]), 700, 1000));
+  const cantos = [1, -1].map((s) => extY([[415, 10], [560, 10], [560, -130], [415, -130]].map(([x, z]) => [s * x, z]), 700, 1000));
   parte('painel', cortar(painel, ...rebaixos, ...cantos), ESCURO_PISO);
 
   /* tampa do motor: a base do banco. Lateral `tampaMotor` sem o entalhe de trás (ali entra a coluna). Planta da vista de cima: o

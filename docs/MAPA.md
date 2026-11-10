@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1804 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1805 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1528,6 +1528,7 @@
 - `carcaca-traseira.esboco.mjs` — carcaca-traseira.esboco.mjs — o rascunho da traseira da carcaça (capô, tampa, grade e contrapeso) pelas três vistas.
 - `carcaca.esboco.mjs` — carcaca.esboco.mjs — o rascunho da carcaça inteira da empilhadeira: chassi, laterais, paralamas, piso, painel, tampa do motor, colunas e a traseira de `carca…
 - `eixos-rodas.esboco.mjs` — eixos-rodas.esboco.mjs — o rascunho dos eixos e das rodas da empilhadeira (fatia 3): o eixo dianteiro motriz com o diferencial e os dois cubos, o eixo trasei…
+- `empilhadeira.esboco.mjs` — empilhadeira.esboco.mjs — o rascunho da máquina inteira: a carcaça (`carcaca.esboco.mjs`, com a traseira de `carcaca-traseira.esboco.mjs`), os eixos e as rod…
 - `protetor-posto.esboco.mjs` — protetor-posto.esboco.mjs — o rascunho do protetor do operador, do posto do operador e dos acessórios da empilhadeira (fatias 5, 6 e 7 do plano), montado sob…
 - `torre-garfos.esboco.mjs` — torre-garfos.esboco.mjs — o rascunho da torre e dos garfos da empilhadeira (fatia 4): o pé da torre no eixo dianteiro, os dois canais externos com as travess…
 

@@ -231,6 +231,12 @@ partes, conferida em quatro vistas; as fatias de ferramenta T0 a T8 foram
 entregues. O ramo foi junto à main pelo CI no mesmo dia (commit `9a7beaf8`),
 com o teto de planos ativos em seis.
 
+No mesmo dia as três frentes ficaram em rascunho sobre a carcaça e a máquina
+inteira foi montada num módulo só, de sessenta partes, com as pendências entre
+as partes resolvidas na carcaça e a TABELA do alinhamento com a medida adotada
+e a fonte de cada linha. As fatias T9 a T11 foram entregues, e a T13 e a T14
+têm o núcleo pronto.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
