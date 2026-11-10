@@ -1,0 +1,120 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/eixo-dianteiro",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/carcaca-frente.ia.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "cubosDianteiros",
+        "tipo": "superficie",
+        "onde": "tampa e flange, ponta externa de cada lado",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica isolada: discos lisos com pino reto. Referência (carcaca-lado e carcaca-frente): cubo escuro volumoso com porca grande, sem degrau seco."
+      },
+      {
+        "parte": "eixoDianteiro",
+        "tipo": "uniao",
+        "onde": "assentos em x=±270..323, topo do bloco sobre o tubo",
+        "sentido": "afastado",
+        "evidencia": "Isométrica e frontal da peça isolada: bloco de uns 30 mm acima do tubo. Isométrica montada: espaço entre tubo e entalhe da chapa. Contato com o teto não aparece."
+      }
+    ],
+    "observacao": "Conjunto coerente em proporção e cor, mas assento sem contato verificável com o chassi e cubo simplificado; cruzamento roda/paralama e a maior parte das rasantes não foram avaliados."
+  },
+  "partes": [
+    {
+      "nome": "eixoDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cubosDianteiros",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "rodada 2, assento sem contato visivel: mesma atribuicao da rodada 1, a ferramenta; o perfil segue o teto do entalhe e a junta medida passa, e o pacote nao tem vista em corte no plano da chapa",
+    "rodada 2, cubo liso sem porca: atribuido ao plano; o PLANO promete flange e tampa, e a referencia de IA mostra a roda inteira, que e a etapa seguinte",
+    "o relato do modelador desta rodada veio em prosa, junto com a etapa do eixo traseiro, e a rodada foi montada a mao por quem conduz, com o veredito tirado da transcricao do critico sem edicao"
+  ],
+  "notaDePassagem": "O defeito facetado pedia mais lados na revolucao: so lados mudou, de 48 para 96, e a caixa das duas partes ficou identica. O assento ficou como estava, porque os dois defeitos dele foram atribuidos a ferramenta.",
+  "receita": {
+    "sha256": "sha256:a1505f49333e13811fce84782d19914454ea4eb501a54d1906b04748457bd95c",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 4,
+      "acrescentadas": 5,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": "  /* Lados das revoluções, os do rascunho aprovado. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": "  lados: 48,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  /* Lados das revoluções: 96, para o contorno do tubo, do bojo e dos flanges não ler como polígono (rodada 1 do crítico, que viu os"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "     48 do rascunho na silhueta). Múltiplo de 4, o que mantém os extremos em y e z sobre o raio. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "-",
+          "linha": 143,
+          "texto": "      { nome: 'eixoDianteiro', forma: 'tubo escuro de Ø 150 de -404 a 404 mm com o bojo do diferencial de Ø 300 (de -120 a 120, em cone até 190) e, de cada lado, o assento de 270 a 323 mm que sobe do tubo até 0,5 mm do teto do entalhe do chassi', tecnica: 'revolução em torno de x (48 lados) unida aos dois assentos extrudados em x' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 144,
+          "texto": "      { nome: 'cubosDianteiros', forma: 'de cada lado, o flange cinza de Ø 220 de 404 a 463 mm do centro e a tampa de Ø 100 de 463 a 516', tecnica: 'revolução em torno de x (48 lados), uma por lado, unidas' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "      { nome: 'eixoDianteiro', forma: 'tubo escuro de Ø 150 de -404 a 404 mm com o bojo do diferencial de Ø 300 (de -120 a 120, em cone até 190) e, de cada lado, o assento de 270 a 323 mm que sobe do tubo até 0,5 mm do teto do entalhe do chassi', tecnica: 'revolução em torno de x (96 lados) unida aos dois assentos extrudados em x' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "      { nome: 'cubosDianteiros', forma: 'de cada lado, o flange cinza de Ø 220 de 404 a 463 mm do centro e a tampa de Ø 100 de 463 a 516', tecnica: 'revolução em torno de x (96 lados), uma por lado, unidas' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[6], PASSOS[12]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az30.png",
+      "peca-tresquartos-rasante-az120.png"
+    ]
+  }
+}
