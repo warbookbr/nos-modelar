@@ -194,3 +194,11 @@ processo o teria pego sozinho e o destino.
    parametros`, que não terminou em 300 s com a TABELA em listas de contorno, e a montagem v5, que recusa nomear a
    etapa que ainda não tem receita. O processo pegou os três pela recusa da própria ferramenta; nenhum teste cobria a
    booleana sobre face com quebra de sombra, e agora cobre.
+21. **O envio da receita da carcaça levou três execuções do CI para chegar à main, sem defeito no código.** A primeira
+   reprovou por tempo em dois lugares: dois arquivos da bateria rápida a 12,4 e 12,5 s sozinhos, contra o teto de 12,
+   e a razão de tempo do vão na cúpula 4,5% acima do limite (na máquina local a mesma razão dá 1,5 contra o limite de
+   3). A segunda reprovou na guarda de gesto, em que o arquivo salvo não chegou em 15 s, e a nova tentativa do mesmo
+   job passou nela e reprovou na guarda da imagem de referência; a terceira passou. Nenhum dos quatro testes está em
+   arquivo que o ramo mudou. O processo não distingue a carga da máquina do defeito nesses quatro: a bateria rápida já
+   separa os dois casos quando o arquivo roda sozinho abaixo do teto, e falta o mesmo cuidado no teste de razão de
+   tempo e nas esperas fixas das guardas da bancada, que são de outros planos e ficam aqui como pedido.

@@ -198,6 +198,9 @@ export function montarCarcaca(estado, T, contornos) {
 
   /* a traseira: capô, grade, tampa e contrapeso, com o poço da roda traseira no contrapeso */
   const RT = T.rodas.traseira;
-  montarTraseira(estado, T, contornos, { pocoDaRoda: { z: RT.z, y: RT.y, r: RT.raio + T.folgaDoPoco, de: RT.xDentro - T.folgaDoPoco } });
-  return { PLACA, ABA, COLUNAS: W.colunas, POCO_D, cortesDosPocos };
+  const POCO_T = { z: RT.z, y: RT.y, r: RT.raio + T.folgaDoPoco, de: RT.xDentro - T.folgaDoPoco };
+  /* os dois cortes dos poços traseiros no contrapeso (o esquerdo, +x, e o direito), guardados como os da frente: a parede de dentro do
+     esquerdo é a face de onde a receita publica a passagem do eixo traseiro */
+  const { pocos: cortesDosPocosTraseiros } = montarTraseira(estado, T, contornos, { pocoDaRoda: POCO_T });
+  return { PLACA, ABA, COLUNAS: W.colunas, POCO_D, cortesDosPocos, POCO_T, cortesDosPocosTraseiros };
 }

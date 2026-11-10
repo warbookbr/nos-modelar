@@ -30,6 +30,13 @@
         "tipo": "peca",
         "ref": "empilhadeira/roda-dianteira"
       }
+    },
+    {
+      "id": "eixoTraseiro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/eixo-traseiro"
+      }
     }
   ],
   "relacoes": [
@@ -124,13 +131,40 @@
         },
         "toleranciaNumerica": 1e-06
       }
+    },
+    {
+      "id": "eixoTraseiroNaPassagemDosPocos",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoTraseiro"
+        ],
+        "porta": "passagemNoChassi"
+      },
+      "movel": {
+        "caminho": [
+          "carcaca"
+        ],
+        "porta": "passagemDoEixoTraseiro"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.279,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
     }
   ],
   "etapas": [
     "carcaca",
     "eixoDianteiro",
     "rodaDianteiraEsquerda",
-    "rodaDianteiraDireita"
+    "rodaDianteiraDireita",
+    "eixoTraseiro"
   ],
   "vinculos": [
     {
@@ -142,6 +176,20 @@
       "de": {
         "instancia": "carcaca",
         "porta": "passagemDoEixoDianteiro",
+        "medida": "fim"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "eixoTraseiroEntreAsParedesDosPocos",
+      "alvo": {
+        "instancia": "eixoTraseiro",
+        "param": "entreAsParedes"
+      },
+      "de": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoTraseiro",
         "medida": "fim"
       },
       "unidade": "mm",
@@ -178,6 +226,17 @@
       "em": {
         "instancia": "eixoDianteiro",
         "porta": "cuboDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "eixoTraseiroNaCarcaca",
+      "instancia": "eixoTraseiro",
+      "porta": "passagemNoChassi",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoTraseiro"
       },
       "unidade": "mm",
       "afastamento": 0

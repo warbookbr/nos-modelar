@@ -35,8 +35,9 @@ export const TABELA = {
   entreAsParedes: 754,
   /* As cores do rascunho: o escuro do eixo e o cinza do cubo (as da carcaça). */
   cores: { eixo: CARCACA.cores.escuro, cubo: CARCACA.cores.cinza },
-  /* Lados das revoluções, os do rascunho aprovado. */
-  lados: 48,
+  /* Lados das revoluções: 96, para o contorno do tubo, do bojo e dos flanges não ler como polígono (rodada 1 do crítico, que viu os
+     48 do rascunho na silhueta). Múltiplo de 4, o que mantém os extremos em y e z sobre o raio. */
+  lados: 96,
   /* O sombreamento suave, com a quina acima deste ângulo nítida (o da carcaça). */
   anguloDoLiso: 35,
   /* O tubo do eixo, de Ø 150, de um flange ao outro (o flange começa a 404 mm do centro). */
@@ -140,8 +141,8 @@ const receita = {
     referencias: ['../../referencias/carcaca-frente.ia.png', '../../referencias/carcaca-lado.ia.png', '../../referencias/frente.ia.png'],
     escala: { medida: 'distância entre as faces de fora dos dois flanges dos cubos (bitola do assento das rodas)', milimetros: 926 },
     partes: [
-      { nome: 'eixoDianteiro', forma: 'tubo escuro de Ø 150 de -404 a 404 mm com o bojo do diferencial de Ø 300 (de -120 a 120, em cone até 190) e, de cada lado, o assento de 270 a 323 mm que sobe do tubo até 0,5 mm do teto do entalhe do chassi', tecnica: 'revolução em torno de x (48 lados) unida aos dois assentos extrudados em x' },
-      { nome: 'cubosDianteiros', forma: 'de cada lado, o flange cinza de Ø 220 de 404 a 463 mm do centro e a tampa de Ø 100 de 463 a 516', tecnica: 'revolução em torno de x (48 lados), uma por lado, unidas' },
+      { nome: 'eixoDianteiro', forma: 'tubo escuro de Ø 150 de -404 a 404 mm com o bojo do diferencial de Ø 300 (de -120 a 120, em cone até 190) e, de cada lado, o assento de 270 a 323 mm que sobe do tubo até 0,5 mm do teto do entalhe do chassi', tecnica: 'revolução em torno de x (96 lados) unida aos dois assentos extrudados em x' },
+      { nome: 'cubosDianteiros', forma: 'de cada lado, o flange cinza de Ø 220 de 404 a 463 mm do centro e a tampa de Ø 100 de 463 a 516', tecnica: 'revolução em torno de x (96 lados), uma por lado, unidas' },
     ],
     criteriosDeReprovacao: [
       'o eixo fora do eixo dos poços dianteiros da carcaça, ou as rodas que ele leva cruzando o poço ou a aba do paralama',

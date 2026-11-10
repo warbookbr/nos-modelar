@@ -134,5 +134,5 @@ export function montarTraseira(estado, T, contornos, { pocoDaRoda = null } = {})
   parte('pino', extY([[-PI.meia, -PI.z[0]], [PI.meia, -PI.z[0]], [PI.meia, -PI.z[1]], [-PI.meia, -PI.z[1]]], H(PI.linhas[0]), H(PI.linhas[1])), COR.cinza);
   const TR = CP.trinco;
   parte('trinco', extY([[-TR.meiaPx * MM, -TR.z[0]], [TR.meiaPx * MM, -TR.z[0]], [TR.meiaPx * MM, -TR.z[1]], [-TR.meiaPx * MM, -TR.z[1]]], H(TR.linhas[0]), H(TR.linhas[1])), COR.cinza);
-  return { meiaCapo, meiaTampa, meiaContra };
+  return { meiaCapo, meiaTampa, meiaContra, pocos };
 }

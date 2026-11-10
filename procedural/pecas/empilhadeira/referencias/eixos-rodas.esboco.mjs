@@ -5,7 +5,9 @@
  * A METADE DIANTEIRA MORA NAS RECEITAS DA ETAPA (2026-11-10): o eixo dianteiro com os cubos em `../partes/eixo-dianteiro/receita.js`
  * (`montarEixoDianteiro`, a forma deste rascunho levada para lá sem mudança) e a roda dianteira em `../partes/roda-dianteira/receita.js`
  * (`montarRodaDianteira`, pela família roda-pneu, com o ombro de 9 mm da família no lugar do arredondado deste rascunho). As medidas
- * da metade dianteira abaixo ficam como registro da fonte; quem as usa são as receitas. A metade traseira continua aqui.
+ * da metade dianteira abaixo ficam como registro da fonte; quem as usa são as receitas. O eixo traseiro direcional também mora na
+ * receita da etapa (`../partes/eixo-traseiro/receita.js`, `montarEixoTraseiro`, a forma deste rascunho com 96 lados); as rodas traseiras
+ * continuam aqui.
  *
  * Eixos do modelo: x lateral (+x é a esquerda de quem dirige), y altura com o chão em 0, z comprimento com a frente em +z; o eixo
  * dianteiro em z 0 e o traseiro em z -1700.
@@ -39,8 +41,9 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a máquina 180 graus para os três quartos de trás. */
 import carcaca, { RODAS } from './carcaca.esboco.mjs';
-import { ferramentas, CINZA, CINZA_CLARO, ESCURO } from './carcaca-traseira.esboco.mjs';
+import { ferramentas, CINZA_CLARO } from './carcaca-traseira.esboco.mjs';
 import { montarEixoDianteiro } from '../partes/eixo-dianteiro/receita.js';
+import { montarEixoTraseiro } from '../partes/eixo-traseiro/receita.js';
 import { montarRodaDianteira, TABELA as RODA_DIANTEIRA } from '../partes/roda-dianteira/receita.js';
 
 const PRETO_PNEU = '#1a1b1d';
@@ -72,7 +75,7 @@ function secaoDoAro(aro, b, d0, d1, furo) {
 
 /** Monta os eixos e as rodas no estado { passos, topo, origem } da carcaça e devolve as medidas usadas. */
 export function montarEixosRodas(estado) {
-  const { extX, extY, extZ, booleana, parte } = ferramentas(estado);
+  const { booleana, parte } = ferramentas(estado);
   const unir = (...s) => booleana('unir', s);
   const novo = () => { estado.origem += 1; return estado.origem; };
   /* revolução em torno de x: o perfil é [raio, x] e `em` leva o eixo a [0, y, z] */
@@ -88,7 +91,6 @@ export function montarEixosRodas(estado) {
     return { origem: { op: 'espelha', id, de: sel.origem } };
   }
   const par = (sel) => unir(sel, espelho(sel));
-  const circulo = (cx, cy, r, n = 32) => Array.from({ length: n }, (_, k) => [cx + r * Math.cos(2 * Math.PI * k / n), cy + r * Math.sin(2 * Math.PI * k / n)]);
 
   /* RODAS DIANTEIRAS: a receita da etapa (`../partes/roda-dianteira/receita.js`, família roda-pneu), uma de cada lado, com o meio do
      pneu no meio da banda de `RODAS.dianteira`; o pneu e as partes de aço com os nomes deste rascunho */
@@ -108,31 +110,8 @@ export function montarEixosRodas(estado) {
   /* EIXO DIANTEIRO: a receita da etapa (`../partes/eixo-dianteiro/receita.js`), com a origem dela no centro do cubo dianteiro */
   montarEixoDianteiro(estado, undefined, [0, D.y, D.z]);
 
-  /* EIXO TRASEIRO ----------------------------------------------------------------------------------------------------------- */
-  const T = RODA_T;
-  const PINO_X = 400;                  // o pino vertical da manga (o eixo do esterço), por dentro do pneu
-  /* a viga: seção de 120 x 100 mm, de pino a pino (a ponta encosta no pino da manga), com o olhal do pino de articulação no meio
-     (cilindro ao longo de z, Ø 140, de z -1810 a -1590) */
-  const viga = unir(
-    extX([[T.z + 60, T.y - 50], [T.z - 60, T.y - 50], [T.z - 60, T.y + 50], [T.z + 60, T.y + 50]], -PINO_X + 40, PINO_X - 40),
-    extZ(circulo(0, T.y, 70), T.z - 110, T.z + 110),
-  );
-  parte('eixoTraseiro', viga, ESCURO);
-  /* o suporte do pino de articulação: o bloco que desce do fundo do poço traseiro da carcaça (a face de baixo dele, a 428 mm, de z
-     -1342 a -1645) até o topo do olhal (354 mm), à frente da viga. É por ele que o eixo traseiro se prende na carcaça. */
-  parte('suporteTraseiro', extZ([[-90, T.y + 70], [90, T.y + 70], [90, 428], [-90, 428]], -1640, -1595), CINZA);
-  /* a manga: o pino vertical (Ø 80, de 189 a 379 mm), a ponta de eixo até o cubo e o braço que leva à barra de direção, à frente
-     da viga */
-  const manga = unir(
-    extY(circulo(PINO_X, T.z, 40), T.y - 95, T.y + 95),
-    torno([[0, PINO_X], [45, PINO_X], [45, 480], [0, 480]], T.y, T.z),
-    extY([[PINO_X - 25, T.z + 20], [PINO_X + 20, T.z + 20], [PINO_X + 20, T.z + 165], [PINO_X - 25, T.z + 165]], T.y - 20, T.y + 20),
-  );
-  parte('mangas', par(manga), ESCURO);
-  /* o cubo: o flange de Ø 170 de 480 mm até o disco da roda e a tampa de Ø 100 até 625 mm */
-  parte('cubosTraseiros', par(torno([[0, 480], [85, 480], [85, T.disco[0]], [50, T.disco[0]], [50, 625], [0, 625]], T.y, T.z)), CINZA);
-  /* a barra de direção: tubo de Ø 44 de braço a braço (encosta na face de dentro de cada braço, a 375 mm), 140 mm à frente do eixo */
-  parte('barraDirecao', torno([[0, -PINO_X + 25], [22, -PINO_X + 25], [22, PINO_X - 25], [0, PINO_X - 25]], T.y, T.z + 140), CINZA);
+  /* EIXO TRASEIRO: a receita da etapa (`../partes/eixo-traseiro/receita.js`), com a origem dela no centro do cubo traseiro */
+  montarEixoTraseiro(estado, undefined, [0, RODA_T.y, RODA_T.z]);
 
   return { RODA_D, RODA_T };
 }

@@ -309,13 +309,23 @@ export function montarCarcacaEmMm(estado, T = TABELA) {
  *  passagemDoEixoDianteiro — cilindro interno no eixo dos cubos dianteiros (y e z de `rodas.dianteira`), com o raio do poço (o pneu
  *  mais a folga), da parede de dentro do poço direito (x = -(xDentro - folga), a face que o corte do poço deixa na lateral) até a do
  *  esquerdo: `fim` é a distância entre as duas paredes. É por ela que o eixo dianteiro entra na montagem: o vínculo leva a distância à
- *  receita do eixo e a posição põe o tubo dele no mesmo eixo, com o giro pela `referencia` para cima. */
+ *  receita do eixo e a posição põe o tubo dele no mesmo eixo, com o giro pela `referencia` para cima.
+ *
+ *  passagemDoEixoTraseiro — o mesmo no eixo dos cubos traseiros (y e z de `rodas.traseira`), com o raio do poço que o contrapeso corta
+ *  para a roda traseira, da parede de dentro do poço esquerdo (x = xDentro - folga, a face de começo do corte, que fica no contrapeso)
+ *  até a do direito, com o eixo para -x. A montagem põe o eixo traseiro por ela: as pontas de eixo das mangas no eixo dos poços. O
+ *  suporte do pino de articulação do eixo encosta sob o fundo do poço traseiro (`pocoTraseiro.fundo`), que não vira porta porque a
+ *  montagem não mede plano sobre plano. */
 export function portasDaCarcaca(T = TABELA) {
-  const { POCO_D, cortesDosPocos } = derivar(T).medidas;
+  const { POCO_D, cortesDosPocos, POCO_T, cortesDosPocosTraseiros } = derivar(T).medidas;
   return [
     ['publicarPorta', {
       id: 'passagemDoEixoDianteiro', de: { ...cortesDosPocos[1].origem, tampa: 'topo' },
       interface: { forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], centro: [-POCO_D.de, POCO_D.y, POCO_D.z], raio: POCO_D.r, inicio: 0, fim: 2 * POCO_D.de, referencia: [0, 1, 0] },
+    }],
+    ['publicarPorta', {
+      id: 'passagemDoEixoTraseiro', de: { ...cortesDosPocosTraseiros[0].origem, tampa: 'fundo' },
+      interface: { forma: 'cilindro', papel: 'interna', eixo: [-1, 0, 0], centro: [POCO_T.de, POCO_T.y, POCO_T.z], raio: POCO_T.r, inicio: 0, fim: 2 * POCO_T.de, referencia: [0, 1, 0] },
     }],
   ];
 }
