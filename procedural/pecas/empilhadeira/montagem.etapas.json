@@ -71,7 +71,7 @@
     },
     {
       "instancia": "rodaDianteiraEsquerda",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "rodaDianteiraEsquerdaGiraNoCubo",
@@ -116,11 +116,19 @@
           }
         }
       ],
-      "forma": "sha256:90404fcf110c3022e70d65a235205559d2d42b53d7b73facb94d012b3845ba4c"
+      "forma": "sha256:ca034175a3ed82135b592949d832df6b4d5564d8487cde38dcc10c1d9cb3eaee",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 2.",
+          "pneu: uniao em metade de dentro da banda, na altura do eixo, e topo do pneu sob a aba do paralama"
+        ],
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "rodaDianteiraDireita",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "rodaDianteiraDireitaGiraNoCubo",
@@ -165,11 +173,19 @@
           }
         }
       ],
-      "forma": "sha256:90404fcf110c3022e70d65a235205559d2d42b53d7b73facb94d012b3845ba4c"
+      "forma": "sha256:ca034175a3ed82135b592949d832df6b4d5564d8487cde38dcc10c1d9cb3eaee",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 2.",
+          "pneu: uniao em metade de dentro da banda, na altura do eixo, e topo do pneu sob a aba do paralama"
+        ],
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "eixoTraseiro",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "eixoTraseiroNaPassagemDosPocos",
@@ -205,11 +221,135 @@
           }
         }
       ],
-      "forma": "sha256:77ab664e65c2ae807523bdfbd3c8d7601f52ff0a810b8a420b6ae7a59b773d48"
+      "forma": "sha256:77ab664e65c2ae807523bdfbd3c8d7601f52ff0a810b8a420b6ae7a59b773d48",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
+          "mangas: espessura em região do pino-mestre e da ponta de eixo, em volta do cubo"
+        ],
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "rodaTraseiraEsquerda",
+      "estado": "fixa",
+      "juntas": [
+        {
+          "relacao": "rodaTraseiraEsquerdaGiraNoCubo",
+          "com": "eixoTraseiro",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.017000000000000008,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.017,
+              "maximo": 0.017,
+              "nominal": 0.017,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "forma": "sha256:9dc2c12579cd2aa8328f0c20645eef093fb137d0aba07452906e7fa2f19ebbed",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 2.",
+          "pneu: superficie em ombro, crista iluminada no alto e cantos da silhueta alto-direito e baixo-esquerdo",
+          "pneu: uniao em face de dentro do pneu, alto-direito, junto à lateral da carcaça"
+        ],
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "rodaTraseiraDireita",
+      "estado": "fixa",
+      "juntas": [
+        {
+          "relacao": "rodaTraseiraDireitaGiraNoCubo",
+          "com": "eixoTraseiro",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.017000000000000008,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.017,
+              "maximo": 0.017,
+              "nominal": 0.017,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "forma": "sha256:9dc2c12579cd2aa8328f0c20645eef093fb137d0aba07452906e7fa2f19ebbed",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 2.",
+          "pneu: superficie em ombro, crista iluminada no alto e cantos da silhueta alto-direito e baixo-esquerdo",
+          "pneu: uniao em face de dentro do pneu, alto-direito, junto à lateral da carcaça"
+        ],
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "torre",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "olhalDireitoDaTorreNoEixo",
@@ -278,17 +418,25 @@
           }
         }
       ],
-      "forma": "sha256:94ee09130db5a9014afd556d47bbff68511909c62ac6997840b51cad35f153b2"
+      "forma": "sha256:94ee09130db5a9014afd556d47bbff68511909c62ac6997840b51cad35f153b2",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "canalInterno",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:6457fc9d0f3dcdbeb879ffc6a45455bd52cd5de1d725cfadb16371619b8f1313"
+      "forma": "sha256:6457fc9d0f3dcdbeb879ffc6a45455bd52cd5de1d725cfadb16371619b8f1313",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "cilindroElevacao",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "cilindroElevacaoNoAssento",
@@ -333,7 +481,219 @@
           }
         }
       ],
-      "forma": "sha256:b0bcbbc25e06342ca9b9b9fd7be9add6697be40aa49cde2ebd23c5ba13c84bff"
+      "forma": "sha256:b0bcbbc25e06342ca9b9b9fd7be9add6697be40aa49cde2ebd23c5ba13c84bff",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "carro",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:59c948d41def9eab24c9321bbd4ee281d4278fb20aaa20eb1b4f694513f97889",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 1.",
+          "gradeCarga: superficie em montantes e barras do quadro, em todas as arestas",
+          "placaGarfos: uniao em montantes traseiros, trecho que entra na torre (z 235 a 353)"
+        ],
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "garfoEsquerdo",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:f3876ba405217c03b0d7c8a533d3cae9f57cea42cc18f606e3bb428e2f4cf41e",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "garfoDireito",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:f3876ba405217c03b0d7c8a533d3cae9f57cea42cc18f606e3bb428e2f4cf41e",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "correntes",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:6c78f2ed86087a4918ba0aefbe94d05c62a5de7ae7bb2e4455af1ffa0b9fbce4",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "cilindroInclinacaoEsquerdo",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:06cc82bd33c9195937307108e7fbac4e0d10b5d4a0d40161184b2ff121a06e9c",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 1.",
+          "cilindroInclinacao: uniao em fundo da camisa, onde entra na parede escura da carcaça",
+          "hasteInclinacao: uniao em ponta da haste, no encontro com a orelha da torre"
+        ],
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "cilindroInclinacaoDireito",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:06cc82bd33c9195937307108e7fbac4e0d10b5d4a0d40161184b2ff121a06e9c",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 1.",
+          "cilindroInclinacao: uniao em fundo da camisa, onde entra na parede escura da carcaça",
+          "hasteInclinacao: uniao em ponta da haste, no encontro com a orelha da torre"
+        ],
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "protetor",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:a4c4f3f8a2ac0fdc59beb021bbb65f8ed3fd625e0716e9ee02a0e8f53ca3930d",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 4 defeito(s) apontado(s) na rodada 2.",
+          "quadro: espessura em colunas de trás, de cima a baixo",
+          "quadro: espessura em sob a dobra da coluna da frente, junto ao perfil do teto",
+          "quadro: posicao em colunas de trás, pés e meio da altura",
+          "quadro: superficie em contorno da coluna de trás, trecho médio"
+        ],
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "banco",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:77270e1ee7b00b0483e4c0cdfba318be073435459dacad699a56214d3209044b",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 4 defeito(s) apontado(s) na rodada 3.",
+          "assento: espessura em corpo da almofada, vista de lado",
+          "assento: superficie em canto inferior da extremidade da frente da almofada",
+          "assento: uniao em base da almofada, extremidade da frente, sobre a tampa do motor",
+          "encosto: superficie em quina do topo traseiro do encosto"
+        ],
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "colunaDirecao",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:d444583a228e9960bf6e7e64eb391cabcfea8b562f0c6e995bdb98a9cf04b475",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "volante",
+      "estado": "fixa",
+      "juntas": [
+        {
+          "relacao": "volanteGiraNaColuna",
+          "com": "colunaDirecao",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 0.9999999999999998,
+            "descentro": 2.08173169767389e-17,
+            "folgaRadial": 0.0005000000000000004,
+            "folgaRadialMinima": 0.0005,
+            "folgaRadialMaxima": 0.0005,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "especificacaoFolgaRadial": {
+              "minimo": 0.0005,
+              "maximo": 0.0005,
+              "nominal": 0.0005,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "inicioReferencia": 1.3936820070938032,
+            "fimReferencia": 1.408682007093803,
+            "inicioMovel": 1.3936820070938034,
+            "fimMovel": 1.4091820070938035,
+            "sobraInicio": -2.220446049250313e-16,
+            "sobraFim": 0.000500000000000389,
+            "sobreposicaoAxial": 0.01499999999999968,
+            "separacaoAxial": 0
+          }
+        }
+      ],
+      "forma": "sha256:328410e539439813e7d3871526b482a71d8f3bb03962b43fe82aeea457727bc9",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
+          "volante: superficie em seção do aro e encontros raio-aro"
+        ],
+        "analise": "feita"
+      }
+    },
+    {
+      "instancia": "glp",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:8ce30fcd40ead68d88aa22ef94b280ff9341e2c501d8b77590b04ba5aac6632c",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 4 defeito(s) apontado(s) na rodada 2.",
+          "cilindroGlp: ausencia em colar e conexões da válvula, extremidade -x",
+          "cilindroGlp: superficie em transição entre cúpula e corpo, sobretudo no lado da válvula",
+          "cintas: ausencia em fivela e tensor nas cintas",
+          "cintas: uniao em borda interna de cada cinta, junto ao corpo do cilindro"
+        ],
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "escape",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:c99bd78f8c980bcc7b51d1f7af0e46a547bacf2272b7c14c488963dcb867d441",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 2.",
+          "escape: ausencia em fuste, entre o pé e o cotovelo"
+        ],
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "alca",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:14a26291c734abf368fe965f66fb31517da6c2d854ea84a395e9458d801dbd23",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "ausente"
+      }
     }
   ]
 }
