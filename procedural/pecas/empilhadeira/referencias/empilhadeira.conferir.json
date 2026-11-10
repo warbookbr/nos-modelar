@@ -52,7 +52,7 @@
   "gradeCarga": "escuro",
   "garfos": "escuro",
   "correntes": "escuro",
-  "protetor": "cinza",
+  "quadro": "cinza",
   "gradeTeto": "cinza",
   "luzesTrabalho": "escuro",
   "lanternas": "vermelho",
@@ -77,7 +77,7 @@
   "cilindroElevacao:canaisExternos",
   "hasteElevacao:canaisExternos",
   {
-   "par": "gradeTeto:protetor",
+   "par": "gradeTeto:quadro",
    "vistas": [
     "direita"
    ]
@@ -179,7 +179,7 @@
      "hastesInclinacao"
     ],
     "protetor": [
-     "protetor",
+     "quadro",
      "gradeTeto",
      "alcas"
     ],
