@@ -148,7 +148,9 @@ const receita = {
       'a alça fora da largura da coluna, ou não paralela a ela',
       'uma alça só, ou as duas do mesmo lado',
       'cor trocada: a alça laranja ou cinza claro',
+      'o tubo de seção quadrada, ou o canto entre braço e tubo em quina ou chanfro em vez de curva',
     ],
+    lataria: { partes: ['alcas'] },
   },
   contatos: CONTATOS,
   /* O extremo de baixo, de trás e da direita, em mm: em x o raio do tubo da direita, e em y e z o da gaiola da direita. */

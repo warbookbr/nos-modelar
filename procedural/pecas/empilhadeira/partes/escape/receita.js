@@ -22,6 +22,7 @@
  * { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */
 import { TABELA as CARCACA, apoiosDoPosto } from '../carcaca/receita.js';
 import { ferramentas } from '../carcaca/receita/ferramentas.js';
+import { gaiolaVarrida } from '../../../../nucleo/gaiola-varrida.js';
 
 export const TABELA = {
   /* A cor do rascunho: o escuro da carcaça. */
@@ -29,10 +30,11 @@ export const TABELA = {
   /* Lados dos círculos. */
   lados: 96,
 
-  /* O TUBO de raio 45 com o eixo em x -355 e z -1.567, do corte do pé até 1.990; a ponta de raio 40, de 1.950 a 2.070, inclinada 35
-     graus para trás no pivô do eixo em 1.960. */
-  tubo: { x: -355, z: -1567, raio: 45, ate: 1990 },
-  ponta: { raio: 40, y: [1950, 2070], graus: -35, pivoY: 1960 },
+  /* O TUBO de raio 45, um trilho só: de pé com o eixo em x -355 e z -1.567, do corte do pé até o pivô em 1.960, onde vira 35 graus para
+     trás numa curva de raio 100, e a ponta reta até 110 mm do pivô, ao longo dela (o fim da ponta do rascunho, que ia de 1.950 a 2.070
+     girada no pivô). No rascunho a ponta era outro cilindro, de raio 40, nascendo dentro do topo reto do tubo, em degrau; a seção agora
+     é a mesma do tubo, de 96 lados. Estações a cada 100 mm no tubo, 16 na curva e 4 na ponta. */
+  tubo: { x: -355, z: -1567, raio: 45, pivoY: 1960, graus: 35, raioDaCurva: 100, ponta: 110, estacoes: { passo: 100, naCurva: 16, naPonta: 4 } },
 
   /* O PÉ: a face de cima da tampa do capô sob o tubo, medida na malha da carcaça por sonda vertical (2026-11-10), a cada 1 mm, na caixa
      do pé (x -405 a -305, z -1.617 a -1.517), simplificada a 0,3 mm (o desvio da reta para cima dela fica em 0,2 mm): `frente` é o mais
@@ -47,7 +49,6 @@ export const TABELA = {
 };
 
 const m = (mm) => mm / 1000;
-const circulo = (cu, cv, r, n) => Array.from({ length: n }, (_, k) => [cu + r * Math.cos(2 * Math.PI * k / n), cv + r * Math.sin(2 * Math.PI * k / n)]);
 
 /** Os perfis do corte do pé e a porta, em mm, no referencial da máquina. */
 export function derivar(T = TABELA) {
@@ -56,34 +57,51 @@ export function derivar(T = TABELA) {
     const p = [...nos].sort((a, b) => a[0] - b[0]).map(([u, y]) => [u, y + P.folga]);
     return [[p[0][0], P.de], [p[p.length - 1][0], P.de], ...[...p].reverse()];
   };
+  /* o trilho do tubo: a reta de pé, a curva que vira para trás (-z) e a reta da ponta */
+  const TU = T.tubo; const a = TU.graus * Math.PI / 180; const R = TU.raioDaCurva;
+  const t = R * Math.tan(a / 2);
+  const dir = [0, Math.cos(a), -Math.sin(a)];
+  const pivo = [TU.x, TU.pivoY, TU.z];
+  const inicio = [TU.x, P.de + P.folga, TU.z];
+  const a0 = [TU.x, TU.pivoY - t, TU.z]; const a1 = pivo.map((v, k) => v + dir[k] * t); const fim = pivo.map((v, k) => v + dir[k] * TU.ponta);
+  const centro = [TU.x, TU.pivoY - t, TU.z - R];
+  /* o sentido do giro em torno de x que leva a0 a a1 (a regra do arco do trilho) */
+  const rad = [0, a0[1] - centro[1], a0[2] - centro[2]]; const kr = [0, -rad[2], rad[1]];
+  const ponto = (th) => [TU.x, centro[1] + rad[1] * Math.cos(th) + kr[1] * Math.sin(th), centro[2] + rad[2] * Math.cos(th) + kr[2] * Math.sin(th)];
+  const graus = Math.hypot(...ponto(a).map((v, k) => v - a1[k])) < 1e-6 ? TU.graus : -TU.graus;
+  const L = [a0[1] - inicio[1], R * a];
+  const caminho = { trilho: [{ reta: { de: inicio, ate: a0 } }, { arco: { centro, eixo: [1, 0, 0], de: a0, graus } }, { reta: { de: a1, ate: fim } }], marcos: [L[0], L[0] + L[1]], fim, dir };
+  const secao = Array.from({ length: T.lados }, (_, k) => ({ u: TU.raio * Math.cos(2 * Math.PI * k / T.lados), v: TU.raio * Math.sin(2 * Math.PI * k / T.lados), nome: `l${k}` }));
   const apoio = apoiosDoPosto(CARCACA).escape;
   const portas = {
     naTampa: { forma: 'plano', papel: 'apoia', ponto: apoio.ponto.map((v, k) => v + apoio.normal[k] * P.folga), normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },
   };
-  return { sobFrente: abaixo(P.frente), sobLado: abaixo(P.lado), portas };
+  return { sobFrente: abaixo(P.frente), sobLado: abaixo(P.lado), caminho, secao, portas };
 }
 
 /** Monta o escape no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem dele. */
 export function montarEscape(estado, T = TABELA) {
   const D = derivar(T);
-  const { extX, extY, extZ, booleana, parte } = ferramentas(estado);
-  const unir = (...s) => booleana('unir', s);
+  const { extX, extZ, booleana, parte } = ferramentas(estado);
   const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);
   const cruzar = (...s) => booleana('intersectar', s);
-  const TU = T.tubo; const PO = T.ponta; const P = T.pe; const n = T.lados;
+  const P = T.pe; const E = T.tubo.estacoes; const { trilho, marcos } = D.caminho;
   const xs = P.frente.map(([x]) => x); const zs = P.lado.map(([z]) => z);
-  /* o tubo, menos o que fica abaixo das duas superfícies do pé ao mesmo tempo; a ponta girada no pivô */
-  const tubo = cortar(extY(circulo(TU.x, TU.z, TU.raio, n), P.de + P.folga, TU.ate),
-    cruzar(extZ(D.sobFrente, Math.min(...zs), Math.max(...zs)), extX(D.sobLado, Math.min(...xs), Math.max(...xs))));
-  const ponta = extY(circulo(TU.x, TU.z, PO.raio, n), PO.y[0], PO.y[1]);
-  estado.passos.push(['rotaciona', { eixo: 'x', graus: PO.graus, pivo: [TU.x, PO.pivoY, TU.z], sel: ponta }]);
-  const escape = unir(tubo, ponta);
+  /* o tubo varrido, fechado e tampado, pelo passo `subdivisao` sem nível, menos o que fica abaixo das duas superfícies do pé ao mesmo
+     tempo */
+  const g = gaiolaVarrida({ nome: 'escape', trilho, quadro: { u: [1, 0, 0] }, secao: D.secao, fechada: true, tampas: true,
+    estacoes: [{ fracao: 0 }, { passo: E.passo }, { em: marcos[0] }, { entre: E.naCurva }, { em: marcos[1] }, { entre: E.naPonta }, { fracao: 1 }] });
+  Object.assign(estado.topo, Object.fromEntries(g.posicoes));
+  estado.origem += 1;
+  estado.passos.push(['subdivisao', { origemId: estado.origem, vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: 0 }]);
+  const tubo = { origem: { op: 'subdivisao', id: estado.origem } };
+  const escape = cortar(tubo, cruzar(extZ(D.sobFrente, Math.min(...zs), Math.max(...zs)), extX(D.sobLado, Math.min(...xs), Math.max(...xs))));
   parte('escape', escape, T.cores.escuro);
   return { escape };
 }
 
 /* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */
-const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], rotaciona: ['pivo'] };
+const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };
 const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];
 const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
 
@@ -96,32 +114,40 @@ export function gerarPassos(T = TABELA) {
   return [...forma, ['publicarPorta', { id: 'naTampa', de: escape.origem, interface: Object.fromEntries(Object.entries(portas.naTampa).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]];
 }
 
+/** Os pontos nomeados da gaiola do tubo, em metro. */
+export function gerarTopo(T = TABELA) {
+  const estado = { passos: [], topo: {}, origem: 0 };
+  montarEscape(estado, T);
+  return Object.fromEntries(Object.entries(estado.topo).map(([nome, p]) => [nome, p.map(m)]));
+}
+
 export const CONTATOS = [];
 
 const receita = {
   meta: { nome: 'empilhadeira/escape', desc: 'tubo de escape da empilhadeira, de pé na tampa do capô atrás da coluna de trás direita do protetor, com a ponta curva para trás' },
   PARAMS: TABELA,
-  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },
+  get TOPO() { return { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z', ...gerarTopo(this.PARAMS) }; },
   PLANO: {
     objeto: 'o tubo de escape de uma empilhadeira de contrapeso de 2,5 t a GLP, de 90 mm, de pé na tampa do capô atrás da coluna de trás direita do protetor, com a ponta inclinada para trás até 2.070 mm',
     referencias: ['../../referencias/tras.ia.png', '../../referencias/cima.ia.png'],
     escala: { medida: 'topo do escape (TABELA do alinhamento, rascunho; lateral, linha 58)', milimetros: 2070 },
     partes: [
-      { nome: 'escape', forma: 'o tubo escuro de 90 mm de pé em x -355 e z -1.567, do pé na tampa do capô a 1.990, e a ponta de 80 mm inclinada 35 graus para trás até 2.070', tecnica: 'círculos de 96 lados extrudados em y; o pé cortado pelas duas superfícies da face da tampa (perfis de frente e de lado extrudados, cruzados); a ponta girada em torno de x e unida' },
+      { nome: 'escape', forma: 'o tubo escuro de 90 mm de pé em x -355 e z -1.567, do pé na tampa do capô ao pivô em 1.960, curva contínua de raio 100 que o vira 35 graus para trás e a ponta reta até 2.076', tecnica: 'gaiolaVarrida de seção redonda de 96 lados (reta, arco, reta), fechada e tampada; o pé cortado pelas duas superfícies da face da tampa (perfis de frente e de lado extrudados, cruzados)' },
     ],
     criteriosDeReprovacao: [
       'o escape solto da tampa do capô, ou entrando nela',
+      'o cotovelo em degrau ou em corte reto, em vez da curva contínua do tubo',
       'o escape do lado esquerdo (+x), ou cruzando a coluna de trás do protetor',
       'a ponta inclinada para a frente, ou o escape abaixo de 2.000 mm',
       'cor trocada: o escape laranja ou cinza claro',
     ],
+    lataria: { partes: ['escape'] },
   },
   contatos: CONTATOS,
-  /* O extremo de cima, da frente e da esquerda: o tubo na largura e na frente, e o canto de cima da tampa da ponta girada, em mm. */
+  /* O extremo de cima, da frente e da esquerda, em mm: o tubo na largura e na frente, e o canto de cima da tampa da ponta. */
   get PONTOS() {
-    const T = this.PARAMS; const TU = T.tubo; const PO = T.ponta; const a = PO.graus * Math.PI / 180;
-    const yTopo = PO.pivoY + (PO.y[1] - PO.pivoY) * Math.cos(a) + PO.raio * Math.abs(Math.sin(a));
-    return [{ nome: 'escape, em cima, na frente e à esquerda', parte: 'escape', medida: 'maximo', em: [TU.x + TU.raio, yTopo, TU.z + TU.raio], toleranciaMm: 0.5 }];
+    const T = this.PARAMS; const TU = T.tubo; const { fim, dir } = derivar(T).caminho;
+    return [{ nome: 'escape, em cima, na frente e à esquerda', parte: 'escape', medida: 'maximo', em: [TU.x + TU.raio, fim[1] + TU.raio * Math.abs(dir[2]), TU.z + TU.raio], toleranciaMm: 0.5 }];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
