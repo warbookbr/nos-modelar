@@ -934,9 +934,39 @@ export function criarOperacoesBooleanas(servicos) {
     // ---- daqui em diante nada pode falhar: aplica ----
     for (const v of provisorios) addV(st, definitivo.get(v), posNova.get(v));
     const faces = [...mantidas];
+    /* a quebra de sombra (`face.quebras`, o vinco vivo da subdivisão) é uma aresta da face de entrada. O corte apaga ou
+       reparte essa aresta, e o par de ids antigo ficava apontando vértice que não existe mais. Cada pedaço fica com os
+       trechos da aresta original que continuam na borda dele, com os vértices dele; as posições das pontas são lidas
+       aqui, antes de o passo apagar os vértices que saem. */
+    const pontasDasQuebras = new Map();
+    for (const fid of new Set([...cortadas.map((c) => c[0]), ...pedacosNovos.filter((c) => !c[2]).map((c) => c[0])])) {
+      const q = st.F.get(fid)?.quebras;
+      if (!Array.isArray(q) || !q.length) continue;
+      pontasDasQuebras.set(fid, q.filter(([a, b]) => st.V.has(a) && st.V.has(b)).map(([a, b]) => [st.V.get(a), st.V.get(b)]));
+    }
+    const sobreOTrecho = (p, [a, b]) => {
+      const ab = sub(b, a), ap = sub(p, a), t = ponto(ap, ab) / (ponto(ab, ab) || 1);
+      if (t < -1e-9 || t > 1 + 1e-9) return false;
+      const d = sub(ap, [ab[0] * t, ab[1] * t, ab[2] * t]);
+      return ponto(d, d) <= 1e-14;
+    };
+    const quebrasDoPedaco = (fid, vs) => {
+      const pontas = pontasDasQuebras.get(fid);
+      if (!pontas?.length) return [];
+      const saem = [];
+      vs.forEach((v, k) => {
+        const w = vs[(k + 1) % vs.length];
+        if (v === w) return;
+        const pv = st.V.get(v), pw = st.V.get(w);
+        if (pontas.some((trecho) => sobreOTrecho(pv, trecho) && sobreOTrecho(pw, trecho))) saem.push([v, w]);
+      });
+      return saem;
+    };
+    const porQuebras = (f, quebras) => { if (quebras.length) f.quebras = quebras; else delete f.quebras; };
     for (const [fid, P] of cortadas) {
       const f = st.F.get(fid);
       f.vs = P.map(idFinal); f.tinta = [];
+      if (f.quebras) porQuebras(f, quebrasDoPedaco(fid, f.vs));
       faces.push(fid);
     }
     const facesAux = [], pedacosDeEntrada = [];
@@ -954,6 +984,7 @@ export function criarOperacoesBooleanas(servicos) {
       const nf = st.F.get(id);
       nf.cor = f.cor; nf.material = f.material; nf.parte = f.parte; nf.liso = f.liso; nf.solido = f.solido;
       if (aux && extra.liso != null) nf.liso = extra.liso;
+      if (!aux) porQuebras(nf, quebrasDoPedaco(fid, nf.vs));
       if (st.parteAtribuidaEm?.has(fid)) st.parteAtribuidaEm.set(id, st.parteAtribuidaEm.get(fid));
       (st.pedacosDe ??= new Map()).set(id, fid);
       faces.push(id);
