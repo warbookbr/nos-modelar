@@ -1,0 +1,681 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/cilindro-elevacao",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Proporções, cores, centralização e assentamento na travessa batem; cabeça e topo da camisa são lisos, sem a roldana e o ressalto da referência, e as vistas não mostram a profundidade em relação ao bojo do diferencial."
+  },
+  "partes": [
+    {
+      "nome": "cilindroElevacao",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "hasteElevacao",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cabecaElevacao",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a família cilindro-hidraulico não cobre o cilindro de elevação livre: exige olhal nas duas pontas, eixo em x e 32 lados fixos, e não tem fundo plano nem cabeça em caixa",
+    "o relato do modelador trouxe tres pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao"
+  ],
+  "notaDePassagem": "Receita por operações, com origem no centro do fundo da camisa; a montagem a põe no assento da torre (0, 210, 190). A porta é só o assento; a cabeça, onde as correntes se prendem, ainda não tem porta e fica para a etapa das correntes.",
+  "receita": {
+    "sha256": "sha256:e7136ed60668121c8baa5392c6940aaa805b60097ef11da97ee8dd183e9e25d7",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 126,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * sentada na travessa de baixo da torre, a haste de Ø 36 e a cabeça de 160 mm, onde as correntes do carro se prendem, numa peça na"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * pose recolhida."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do canal interno (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * item 4 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * `montarCilindroElevacao` daqui. Mudou só a construção: os círculos com 96 lados no lugar de 40."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * POR QUE NÃO A FAMÍLIA `cilindro-hidraulico`. A família faz o cilindro de dupla ação com olhal nas duas pontas (a camisa fechada atrás"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * por um pescoço e um olhal, a haste com o terminal e outro olhal), a camisa oca com a cabeça e o êmbolo dentro, o eixo em x e 32"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * lados fixos. O cilindro do rascunho não tem olhal: a camisa assenta pelo fundo plano na travessa e a haste acaba numa cabeça em"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * caixa, mais larga que a camisa, que leva as correntes. Faltam à família a fixação por fundo plano, o terminal em cabeça (travessa)"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * e o número de lados; com ela o cilindro teria dois olhais que a referência não mostra."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). A vista de frente (`frente.ia.png`) mostra um cilindro só, no centro (colunas 535 a 550), que"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * acaba a uns 1.400 mm do chão com a cabeça e duas correntes de cada lado dela, e o vão aberto acima (é o cilindro de elevação livre,"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * que sobe o carro antes do canal interno: rodada 1 do rascunho, A2, A3 e B3). A vista de cima mostra dois cilindros lado a lado, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * vale a de frente. A camisa de Ø 60 vai do assento, a 210 mm do chão, a 1.050; a haste de Ø 36 até 1.400; a cabeça, de 1.400 a 1.440,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * vai de x -80 a 80 e de 30 mm atrás a 60 mm à frente do eixo do cilindro."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * O ENCAIXE. A origem é o centro do fundo da camisa; y para cima, +x à esquerda de quem dirige e a frente em +z. A montagem põe o"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * cilindro na torre pela porta `assento` (o fundo da camisa) sobre a porta `assentoDoCilindro` da torre (o disco do assento, rente à"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * face de cima da travessa de baixo), e a relação mede o assento anular."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * A JUNTA QUE A MONTAGEM AINDA NÃO TEM. A haste e a cabeça sobem ao longo do eixo da camisa (o curso do rascunho é o do carro antes do"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * canal interno); a montagem v5 não tem articulação entre instâncias, e as três partes ficam numa peça, recolhidas."
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e a porta em mm; `montarCilindroElevacao` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * { passos, topo, origem }, com `em` levando a origem ao lugar dela (o rascunho da máquina a põe no assento da torre);"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  /* As cores do rascunho: a camisa escura, a haste cromada e a cabeça cinza. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  cores: { camisa: CARCACA.cores.escuro, haste: '#b4b8bc', cabeca: CARCACA.cores.cinza },"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  /* Lados dos círculos extrudados. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* A camisa: Ø 60, do fundo a 840 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  camisa: { raio: 30, altura: 840 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* A haste: Ø 36, do topo da camisa a 1.190 mm do fundo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  haste: { raio: 18, ate: 1190 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  /* A cabeça: a caixa de 160 mm de largura e 40 de altura no topo da haste, de 30 mm atrás a 60 mm à frente do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  cabeca: { meiaLargura: 80, z: [-30, 60], altura: 40 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "/** Os perfis e a porta, em mm, no referencial do cilindro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const circulo = (r) => Array.from({ length: T.lados }, (_, k) => [r * Math.cos(2 * Math.PI * k / T.lados), r * Math.sin(2 * Math.PI * k / T.lados)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    assento: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: 0, raioExterno: T.camisa.raio, inicio: 0, fim: T.camisa.altura },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  return { circulo, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "/** Monta o cilindro no estado { passos, topo, origem }, em mm, com a origem levada a `em`, e devolve a origem da porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "export function montarCilindroElevacao(estado, T = TABELA, em = [0, 0, 0]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const { extY, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const [ex, ey, ez] = em;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const xz = (p) => p.map(([x, z]) => [x + ex, z + ez]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const C = T.camisa; const H = T.haste; const K = T.cabeca;"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const camisa = extY(xz(D.circulo(C.raio)), ey, C.altura + ey);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  parte('cilindroElevacao', camisa, T.cores.camisa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  parte('hasteElevacao', extY(xz(D.circulo(H.raio)), C.altura + ey, H.ate + ey), T.cores.haste);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const caixa = [[-K.meiaLargura, K.z[0]], [K.meiaLargura, K.z[0]], [K.meiaLargura, K.z[1]], [-K.meiaLargura, K.z[1]]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  parte('cabecaElevacao', extY(xz(caixa), H.ate + ey, H.ate + K.altura + ey), T.cores.cabeca);"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  return { camisa };"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'raioInterno', 'raioExterno', 'inicio', 'fim'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta do assento. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  const { camisa } = montarCilindroElevacao(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  return [...forma, porta('assento', camisa)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  { par: ['cilindroElevacao', 'hasteElevacao'], motivo: 'a haste sai da face de cima da camisa, a 840 mm do fundo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  { par: ['cabecaElevacao', 'hasteElevacao'], motivo: 'a face de baixo da cabeça assenta na ponta da haste, a 1.190 mm do fundo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  meta: { nome: 'empilhadeira/cilindro-elevacao', desc: 'cilindro de elevação livre da torre da empilhadeira: camisa de Ø 60 sentada na travessa de baixo, haste de Ø 36 e a cabeça das correntes, recolhido' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  TOPO: { origem: 'centro do fundo da camisa; y para cima ao longo do eixo do cilindro, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    objeto: 'o cilindro de elevação livre, no centro da torre de uma empilhadeira de 2,5 t, entre os canais: camisa, haste e cabeça das correntes, recolhido',"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    escala: { medida: 'altura do cilindro recolhido, do fundo da camisa ao topo da cabeça', milimetros: 1230 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "      { nome: 'cilindroElevacao', forma: 'a camisa escura de Ø 60, de pé, do fundo plano a 840 mm', tecnica: 'círculo de 96 lados extrudado em y' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "      { nome: 'hasteElevacao', forma: 'a haste cromada de Ø 36, do topo da camisa a 1.190 mm do fundo', tecnica: 'círculo de 96 lados extrudado em y' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "      { nome: 'cabecaElevacao', forma: 'a cabeça cinza em caixa de 160 mm de largura, 40 de altura e 90 de fundo (30 atrás e 60 à frente do eixo), sobre a ponta da haste', tecnica: 'retângulo extrudado em y' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "      'o cilindro fora do centro da largura da torre, ou cruzando a travessa de baixo ou o bojo do diferencial',"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "      'a camisa sem assentar na travessa de baixo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      'a haste tão grossa quanto a camisa, ou a cabeça mais estreita que ela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      'cor trocada: a camisa clara ou a haste escura',"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    const T = this.PARAMS; const K = T.cabeca; const C = T.camisa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "      { nome: 'fundo da camisa', parte: 'cilindroElevacao', medida: 'minimo', em: [-C.raio, 0, -C.raio], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "      { nome: 'topo da cabeça', parte: 'cabecaElevacao', medida: 'maximo', em: [K.meiaLargura, T.haste.ate + K.altura, K.z[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
