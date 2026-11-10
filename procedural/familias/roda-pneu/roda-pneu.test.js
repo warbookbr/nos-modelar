@@ -88,7 +88,9 @@ function medidasDoPneu(v) {
   const w = v.larguraPneu * D;
   const xm = w / 2;
   const xb = (v.banda === 0 || v.banda === 3 ? v.larguraAro * w : w) / 2;
-  const ch = Math.min((v.banda === 2 ? FRACAO_DO_CHANFRO_DA_RODA_SEM_PNEU : FRACAO_DO_CHANFRO) * flanco, CHANFRO_MAXIMO_DO_OMBRO_MM, FRACAO_DO_CHANFRO_NA_LARGURA * w);
+  const ch = v.ombroDoPneu > 0
+    ? v.ombroDoPneu * flanco
+    : Math.min((v.banda === 2 ? FRACAO_DO_CHANFRO_DA_RODA_SEM_PNEU : FRACAO_DO_CHANFRO) * flanco, CHANFRO_MAXIMO_DO_OMBRO_MM, FRACAO_DO_CHANFRO_NA_LARGURA * w);
   return { D, hf, R, rA, flanco, w, xm, xb, ch };
 }
 function volumeDoPneu(v) {

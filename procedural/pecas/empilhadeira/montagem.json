@@ -39,6 +39,20 @@
       }
     },
     {
+      "id": "rodaTraseiraEsquerda",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-traseira"
+      }
+    },
+    {
+      "id": "rodaTraseiraDireita",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-traseira"
+      }
+    },
+    {
       "id": "torre",
       "alvo": {
         "tipo": "peca",
@@ -180,6 +194,72 @@
       }
     },
     {
+      "id": "rodaTraseiraEsquerdaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaTraseiraEsquerda"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoTraseiro"
+        ],
+        "porta": "cuboTraseiroEsquerdo"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.017,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "rodaTraseiraDireitaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaTraseiraDireita"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoTraseiro"
+        ],
+        "porta": "cuboTraseiroDireito"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.017,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
       "id": "olhalDireitoDaTorreNoEixo",
       "tipo": "encaixaCilindrico",
       "referencia": {
@@ -271,6 +351,8 @@
     "rodaDianteiraEsquerda",
     "rodaDianteiraDireita",
     "eixoTraseiro",
+    "rodaTraseiraEsquerda",
+    "rodaTraseiraDireita",
     "torre",
     "canalInterno",
     "cilindroElevacao"
@@ -351,6 +433,28 @@
       "afastamento": 0
     },
     {
+      "id": "rodaTraseiraEsquerdaNoCubo",
+      "instancia": "rodaTraseiraEsquerda",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoTraseiro",
+        "porta": "cuboTraseiroEsquerdo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodaTraseiraDireitaNoCubo",
+      "instancia": "rodaTraseiraDireita",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoTraseiro",
+        "porta": "cuboTraseiroDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
       "id": "torreNoEixo",
       "instancia": "torre",
       "porta": "olhalDireito",
@@ -404,6 +508,18 @@
       {
         "caminho": [
           "rodaDianteiraEsquerda"
+        ],
+        "parte": "pneu"
+      },
+      {
+        "caminho": [
+          "rodaTraseiraDireita"
+        ],
+        "parte": "pneu"
+      },
+      {
+        "caminho": [
+          "rodaTraseiraEsquerda"
         ],
         "parte": "pneu"
       }

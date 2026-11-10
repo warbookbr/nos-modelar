@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1814 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1827 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1524,6 +1524,14 @@
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
 
+## procedural/pecas/empilhadeira/partes/canal-interno/
+
+- `receita.js` — empilhadeira/canal-interno — o canal interno da torre da empilhadeira: os dois canais em U, abertos para dentro, que correm dentro dos canais externos da tor…
+
+## procedural/pecas/empilhadeira/partes/canal-interno/rodadas/
+
+- `receita-01.js` — empilhadeira/canal-interno — o canal interno da torre da empilhadeira: os dois canais em U, abertos para dentro, que correm dentro dos canais externos da tor…
+
 ## procedural/pecas/empilhadeira/partes/carcaca/
 
 - `receita.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
@@ -1540,6 +1548,47 @@
 - `receita-01.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
 - `receita-02.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
 - `receita-03.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
+
+## procedural/pecas/empilhadeira/partes/cilindro-elevacao/
+
+- `receita.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## procedural/pecas/empilhadeira/partes/cilindro-elevacao/rodadas/
+
+- `receita-01.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## procedural/pecas/empilhadeira/partes/eixo-dianteiro/
+
+- `receita.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
+
+## procedural/pecas/empilhadeira/partes/eixo-dianteiro/rodadas/
+
+- `receita-01.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
+- `receita-02.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
+
+## procedural/pecas/empilhadeira/partes/eixo-traseiro/
+
+- `receita.js` — empilhadeira/eixo-traseiro — o eixo traseiro direcional da empilhadeira: a viga de 120 x 100 mm com o olhal do pino de articulação no meio, o suporte desse p…
+
+## procedural/pecas/empilhadeira/partes/eixo-traseiro/rodadas/
+
+- `receita-01.js` — empilhadeira/eixo-traseiro — o eixo traseiro direcional da empilhadeira: a viga de 120 x 100 mm com o olhal do pino de articulação no meio, o suporte desse p…
+
+## procedural/pecas/empilhadeira/partes/roda-dianteira/
+
+- `receita.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
+
+## procedural/pecas/empilhadeira/partes/roda-traseira/
+
+- `receita.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
+
+## procedural/pecas/empilhadeira/partes/torre/
+
+- `receita.js` — empilhadeira/torre — a parte fixa da torre da empilhadeira: os dois canais externos em U, abertos para dentro, com as três travessas de trás e a orelha do ci…
+
+## procedural/pecas/empilhadeira/partes/torre/rodadas/
+
+- `receita-01.js` — empilhadeira/torre — a parte fixa da torre da empilhadeira: os dois canais externos em U, abertos para dentro, com as três travessas de trás e a orelha do ci…
 
 ## procedural/pecas/empilhadeira/referencias/
 

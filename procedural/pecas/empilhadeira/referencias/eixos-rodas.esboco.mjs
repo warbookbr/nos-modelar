@@ -4,10 +4,11 @@
  *
  * A METADE DIANTEIRA MORA NAS RECEITAS DA ETAPA (2026-11-10): o eixo dianteiro com os cubos em `../partes/eixo-dianteiro/receita.js`
  * (`montarEixoDianteiro`, a forma deste rascunho levada para lá sem mudança) e a roda dianteira em `../partes/roda-dianteira/receita.js`
- * (`montarRodaDianteira`, pela família roda-pneu, com o ombro de 9 mm da família no lugar do arredondado deste rascunho). As medidas
- * da metade dianteira abaixo ficam como registro da fonte; quem as usa são as receitas. O eixo traseiro direcional também mora na
- * receita da etapa (`../partes/eixo-traseiro/receita.js`, `montarEixoTraseiro`, a forma deste rascunho com 96 lados); as rodas traseiras
- * continuam aqui.
+ * (`montarRodaDianteira`, pela família roda-pneu). As medidas da metade dianteira abaixo ficam como registro da fonte; quem as usa são
+ * as receitas. O eixo traseiro direcional também mora na receita da etapa (`../partes/eixo-traseiro/receita.js`, `montarEixoTraseiro`,
+ * a forma deste rascunho com 96 lados), e as rodas traseiras também (`../partes/roda-traseira/receita.js`, `montarRodaTraseira`, pela
+ * família). As duas rodas saem com o ombro largo da família, o arco de 62 mm que reproduz o ombro arredondado que este rascunho
+ * desenhava à mão (2026-11-10): a seção à mão, de antes, está no histórico deste arquivo.
  *
  * Eixos do modelo: x lateral (+x é a esquerda de quem dirige), y altura com o chão em 0, z comprimento com a frente em +z; o eixo
  * dianteiro em z 0 e o traseiro em z -1700.
@@ -41,57 +42,19 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a máquina 180 graus para os três quartos de trás. */
 import carcaca, { RODAS } from './carcaca.esboco.mjs';
-import { ferramentas, CINZA_CLARO } from './carcaca-traseira.esboco.mjs';
 import { montarEixoDianteiro } from '../partes/eixo-dianteiro/receita.js';
 import { montarEixoTraseiro } from '../partes/eixo-traseiro/receita.js';
 import { montarRodaDianteira, TABELA as RODA_DIANTEIRA } from '../partes/roda-dianteira/receita.js';
-
-const PRETO_PNEU = '#1a1b1d';
-const LADOS = 48;
+import { montarRodaTraseira, TABELA as RODA_TRASEIRA } from '../partes/roda-traseira/receita.js';
 
 /* as rodas e os cubos, em mm (x é a distância ao centro da máquina) */
 /* o diâmetro e a posição de cada pneu vêm de `RODAS` da carcaça, que corta os poços por elas (a decisão da máquina inteira, de
-   2026-11-10: a dianteira de 417 a 667 mm, a traseira de 445 a 653; ALINHAMENTO.md); o aro e o disco são daqui */
+   2026-11-10: a dianteira de 417 a 667 mm, a traseira de 445 a 653; ALINHAMENTO.md); o aro é o das receitas */
 export const RODA_D = { ...RODAS.dianteira, aro: RODA_DIANTEIRA.diametroDoAro / 2 };
-export const RODA_T = { ...RODAS.traseira, aro: 120, disco: [550, 565], furo: 55 };
-
-/* A seção do pneu em [raio, a], com a de 0 (face de dentro) a b (face de fora): o talão no aro, o flanco abaulado e o ombro
-   arredondado (raio de cerca de 55 mm) até a banda plana. A seção é a mesma nas duas rodas, levada ao raio de cada uma. */
-function secaoDoPneu(R, aro, b) {
-  const h = R - aro;                                   // altura do flanco
-  const f = (t) => aro + h * t;                        // a fração t da altura do flanco
-  const lado = [[aro, 16], [f(0.04), 6], [f(0.17), 1.5], [f(0.45), 0], [f(0.7), 3], [f(0.82), 10], [f(0.9), 20], [f(0.95), 32],
-    [f(0.985), 46], [R, 62]];
-  const espelho = [...lado].reverse().map(([r, a]) => [r, b - a]);
-  return [...lado, ...espelho, lado[0]];
-}
-
-/* O aro com o disco, em [raio, a]: a calha do aro de `aro - 18` a `aro`, de 8 mm a b - 8, e o disco com o furo do cubo entre d0 e d1. */
-function secaoDoAro(aro, b, d0, d1, furo) {
-  const c = aro - 18;
-  if (d0 <= 8) return [[furo, d0], [aro, d0], [aro, b - 8], [c, b - 8], [c, d1], [furo, d1], [furo, d0]];
-  return [[furo, d0], [c, d0], [c, 8], [aro, 8], [aro, b - 8], [c, b - 8], [c, d1], [furo, d1], [furo, d0]];
-}
+export const RODA_T = { ...RODAS.traseira, aro: RODA_TRASEIRA.diametroDoAro / 2 };
 
 /** Monta os eixos e as rodas no estado { passos, topo, origem } da carcaça e devolve as medidas usadas. */
 export function montarEixosRodas(estado) {
-  const { booleana, parte } = ferramentas(estado);
-  const unir = (...s) => booleana('unir', s);
-  const novo = () => { estado.origem += 1; return estado.origem; };
-  /* revolução em torno de x: o perfil é [raio, x] e `em` leva o eixo a [0, y, z] */
-  function torno(perfil, y, z) {
-    const id = novo();
-    estado.passos.push(['lathe', { origemId: id, perfil: perfil.map(([r, a]) => [Math.round(r * 10) / 10, Math.round(a * 10) / 10]), eixo: 'x', lados: LADOS, em: [0, y, z] }]);
-    return { origem: { op: 'lathe', id } };
-  }
-  /* a cópia do outro lado, pelo espelho em x = 0 */
-  function espelho(sel) {
-    const id = novo();
-    estado.passos.push(['espelha', { origemId: id, eixo: 'x', pos: 0, derivaDe: sel.origem, sel: { origem: sel.origem } }]);
-    return { origem: { op: 'espelha', id, de: sel.origem } };
-  }
-  const par = (sel) => unir(sel, espelho(sel));
-
   /* RODAS DIANTEIRAS: a receita da etapa (`../partes/roda-dianteira/receita.js`, família roda-pneu), uma de cada lado, com o meio do
      pneu no meio da banda de `RODAS.dianteira`; o pneu e as partes de aço com os nomes deste rascunho */
   const D = RODA_D;
@@ -99,12 +62,12 @@ export function montarEixosRodas(estado) {
   for (const lado of [1, -1]) {
     montarRodaDianteira(estado, { centro: [lado * meioDaBanda, D.y, D.z], lado, nomes: { pneu: 'pneusDianteiros', aro: 'arosDianteiros', cubo: 'arosDianteiros', disco: 'arosDianteiros' } });
   }
-  /* RODAS TRASEIRAS ---------------------------------------------------------------------------------------------------------- */
-  for (const [nome, R] of [['Traseiros', RODA_T]]) {
-    const pneu = secaoDoPneu(R.raio, R.aro, R.banda).map(([r, a]) => [r, R.xDentro + a]);
-    const aro = secaoDoAro(R.aro, R.banda, R.disco[0] - R.xDentro, R.disco[1] - R.xDentro, R.furo).map(([r, a]) => [r, R.xDentro + a]);
-    parte(`pneus${nome}`, par(torno(pneu, R.y, R.z)), PRETO_PNEU);
-    parte(`aros${nome}`, par(torno(aro, R.y, R.z)), CINZA_CLARO);
+  /* RODAS TRASEIRAS: a receita da etapa (`../partes/roda-traseira/receita.js`, família roda-pneu), uma de cada lado, com o meio do
+     pneu no meio da banda de `RODAS.traseira` */
+  const T = RODA_T;
+  const meioDaBandaTraseira = T.xDentro + T.banda / 2;
+  for (const lado of [1, -1]) {
+    montarRodaTraseira(estado, { centro: [lado * meioDaBandaTraseira, T.y, T.z], lado, nomes: { pneu: 'pneusTraseiros', aro: 'arosTraseiros', cubo: 'arosTraseiros', disco: 'arosTraseiros' } });
   }
 
   /* EIXO DIANTEIRO: a receita da etapa (`../partes/eixo-dianteiro/receita.js`), com a origem dela no centro do cubo dianteiro */
