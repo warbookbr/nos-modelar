@@ -158,8 +158,8 @@ export const VISTAS_DO_CAPO = {
 const VINCOS_DO_CAPO = { vincos: [...QUINAS.vincos, { nome: 'base', laco: 'primeiro', nitidez: 0.5 }, { nome: 'ombro', laco: 'ultimo', nitidez: 0.6 }] };
 /** Monta a traseira (capô, grade, fundo da grade, tampa, contrapeso e os rebaixos) no estado { passos, topo, origem } e devolve as
  *  meias larguras usadas. */
-export function montarTraseira(estado) {
-  const { extY, extZ, booleana, parte, corpo } = ferramentas(estado);
+export function montarTraseira(estado, { pocoDaRoda = null } = {}) {
+  const { extX: extrusaoX, extY, extZ, booleana, parte, corpo } = ferramentas(estado);
   let capo = corpo('capo', VISTAS_DO_CAPO, VINCOS_DO_CAPO);
   /* a borda em volta do vão: um degrau de BORDA_MM de fundo e BORDA px de largura, que acompanha a superfície do capô. Sai do vão
      alargado menos o mesmo capô recuado BORDA_MM. */
@@ -222,7 +222,13 @@ export function montarTraseira(estado) {
     meiaLua: { contorno: [...meiaLua(36, 506, 9), [27 * MM, H(512)], [45 * MM, H(512)]], x: 36, fundo: 200 },   // a base recua 130 mm ali
   };
   const cortar = (v, de, ate) => { const z = zDaTraseira(v.x * MM, meiaContra); return extZ(v.contorno, z + de, ate === null ? -2300 : z + ate); };
-  contra = booleana('subtrair', [contra, ...Object.values(REBAIXOS).map((v) => cortar(v, v.fundo, null))]);
+  /* o poço da roda traseira, quando a carcaça monta as rodas: o cilindro do pneu com a folga, do lado de dentro dele para fora; atrás
+     de z -2024 ele não chega, e a silhueta de trás fica a mesma */
+  const pocos = !pocoDaRoda ? [] : [1, -1].map((s) => {
+    const p = pocoDaRoda; const c = Array.from({ length: 96 }, (_, k) => [p.z + p.r * Math.cos(2 * Math.PI * k / 96), p.y + p.r * Math.sin(2 * Math.PI * k / 96)]);
+    return extrusaoX(c, s > 0 ? p.de : -720, s > 0 ? 720 : -p.de);
+  });
+  contra = booleana('subtrair', [contra, ...Object.values(REBAIXOS).map((v) => cortar(v, v.fundo, null)), ...pocos]);
   parte('contrapeso', contra, CINZA);
   parte('fundoRasgo', cortar(REBAIXOS.rasgo, REBAIXOS.rasgo.fundo, REBAIXOS.rasgo.fundo - 12), ESCURO);
   parte('fundoNicho', cortar(REBAIXOS.nicho, REBAIXOS.nicho.fundo, REBAIXOS.nicho.fundo - 12), ESCURO);

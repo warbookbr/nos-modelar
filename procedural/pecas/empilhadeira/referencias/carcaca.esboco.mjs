@@ -21,7 +21,23 @@ import {
   ferramentas, montarTraseira, lado, simplifica, REGIOES, LARANJA, CINZA, ESCURO,
 } from './carcaca-traseira.esboco.mjs';
 
-const ESCURO_PISO = '#34383c';   // o tapete do piso: cinza escuro, mais claro que o fundo da grade
+const ESCURO_PISO = '#34383c';
+
+/* AS RODAS, uma medida por roda (a decisão da máquina inteira, pendência c; ALINHAMENTO.md, "Divergências entre as fontes"). x é a
+   distância ao centro da máquina. Diâmetro: a dianteira com 705 (TABELA, 7.00-12; a lateral de outubro dá 714 na escala dela e 691 na
+   da carcaça, pelo círculo ajustado ao contorno `rodaDianteira`; o cubo da carcaça fica a 352,5); a traseira com 568, o dobro da
+   altura do cubo traseiro da carcaça (284, âncora de `carcaca-lado`), entre a lateral (577 na escala dela, 558 na da carcaça) e a
+   TABELA (545, 6.00-9); a razão traseira/dianteira fica em 0,81 e a lateral dá 0,81.
+   Largura: a borda de fora da dianteira a 667 mm (vista de cima da máquina, linhas 120 e 471, 3,80 mm/px; a ficha na escala da carcaça
+   dá 1.150 x 596,4/511 / 2 = 671; a vista de frente, 623, pela aba a 3,395 mm/px, e vale a de cima, que concorda com a ficha) e a
+   banda com 250 (a vista de frente dá 265, colunas 362 a 440; a vista de trás dá 250 na traseira); a traseira de 445 a 653 (borda de
+   fora na vista de trás, colunas 374 e 698 a 4,03 mm/px, e na de cima, 646 a 650; a ficha na escala dá 654), com a banda da dianteira
+   na razão da TABELA, 250 x 150/180 = 208. Os poços cortam a 40 mm de folga do pneu, pelo lado de dentro e em volta. */
+export const RODAS = {
+  dianteira: { y: 352.5, z: 0, raio: 352.5, xDentro: 417, banda: 250 },
+  traseira: { y: 284, z: -1700, raio: 284, xDentro: 445, banda: 208 },
+};
+const FOLGA_DO_POCO = 40;   // o tapete do piso: cinza escuro, mais claro que o fundo da grade
 const L = (pts) => pts.map(([z, y]) => [-z, y]);             // ponto da lateral [z para trás, y] -> [z do modelo, y]
 const espelhoX = (xy) => xy.map(([x, y]) => [-x, y]);         // o mesmo perfil do outro lado
 /* círculo de 96 lados: arco de roda e arco do contorno lateral saem com pelo menos 64 lados por volta */
@@ -114,7 +130,9 @@ export function montarCarcaca(estado) {
   const DEGRAU = 568;             // o cinza dos degraus: linhas 151 e 450, colunas 504-560
   const COLUNAS = 516;            // as colunas, pela vista de trás (cinza das colunas 408 a 664 nas linhas 274-280, 4,03 mm/px); a de cima
                                   // dava 545 (linhas 148-152 e 437, colunas 700-768), mas a largura vale a de trás
-  const POCO_D = { z: 0, y: 352.5, r: 392, de: 414 };     // pneu dianteiro com 40 mm de folga; de 355 mm do protótipo x 596,4/511
+  /* o poço do pneu dianteiro, com 40 mm de folga em volta e por dentro (de 414 para 377 mm, para a banda de 250) */
+  const RD = RODAS.dianteira;
+  const POCO_D = { z: RD.z, y: RD.y, r: RD.raio + FOLGA_DO_POCO, de: RD.xDentro - FOLGA_DO_POCO };
   /* o pneu traseiro com 40 mm de folga (z -1700, y 284, raio 312, de 432 mm para fora) cabe no poço do arco da lateral, mais abaixo */
 
   const pocos = (p) => [extX(circulo(p.z, p.y, p.r), p.de, 720), extX(circulo(p.z, p.y, p.r), -720, -p.de)];
@@ -222,7 +240,13 @@ export function montarCarcaca(estado) {
   /* O contorno do piso tem um ressalto a 793 mm em z 378, sob a borda de trás do painel; de cima ele aparecia como uma barra cinza de
      45 mm atravessada entre o tapete e o painel, onde a referência é escura de ponta a ponta (vista de cima girada, linha 510: escuro de
      200 a 410; leitura de cima, rodada 4, C2 e C3). O ressalto desce ao piso, 766 mm, e o tapete passa por baixo do painel. */
-  parte('piso', extX(lado('piso', ([z, y]) => (z > 330 && z < 460 && y > 766 ? [z, 766] : [z, y])), -TAPETE, TAPETE), CINZA);
+  /* O rebaixo dos cilindros de inclinação da torre (pendência b): a camisa de Ø 90 em x 355, y 860, de z -150 a 15
+     (`torre-garfos.esboco.mjs`) entrava no painel e no piso. A caixa de x 305 a 405, y 810 a 910 e z 10 a -160 sai dos dois, com 5 mm
+     de folga em volta da camisa e 10 mm atrás do fundo dela. A carcaca-lado mostra o cilindro entrando no painel (z -36 a 75, y 812 a
+     912), e a vista de frente da máquina, o vão escuro dele ao lado da torre (colunas 439 a 461 nas linhas 300 a 345). */
+  const rebaixos = [1, -1].map((s) => extX([[10, 810], [-160, 810], [-160, 910], [10, 910]], s > 0 ? 305 : -405, s > 0 ? 405 : -305));
+  const rebaixosDoPiso = [1, -1].map((s) => extX([[10, 810], [-160, 810], [-160, 910], [10, 910]], s > 0 ? 305 : -405, s > 0 ? 405 : -305));
+  parte('piso', cortar(extX(lado('piso', ([z, y]) => (z > 330 && z < 460 && y > 766 ? [z, 766] : [z, y])), -TAPETE, TAPETE), ...rebaixosDoPiso), CINZA);
   parte('tapete', extX(L([[340, 760], [667, 765], [667, 775], [340, 770]]), -TAPETE + 5, TAPETE - 5), ESCURO_PISO);
   const degrau = L([[431, 300], [431, 490], [719, 500], [719, 300]]);
   const rampa = L([[700, 300], [700, 500], [719, 500], [1238, 908], [1238, 300]]);
@@ -250,7 +274,11 @@ export function montarCarcaca(estado) {
     estacoes: [760, 764, 775, 800, 830, 860, 890, 905, 915],
   }, { vincos: [{ nome: 'base', laco: 'primeiro', nitidez: 'viva' }] });
   /* escuro como o tapete: a vista de cima o mostra escuro, com só a borda cinza (leitura de cima, rodada 1, C1 a C4), e a lateral também */
-  parte('painel', painel, ESCURO_PISO);
+  /* Os cantos da frente recolhidos a 415 mm de z 10 a -90 (pendência a): ali passam os pés das colunas da frente do protetor, que a vista
+     de frente da máquina põe de 420 a 477 mm (colunas 412 a 431 e 660 a 679 nas linhas 300 a 345, 3,395 mm/px pela aba); a vista de
+     cima da carcaça isolada mede a moldura com 496 até z -60, mas na da máquina inteira essa quina fica sob o pé da coluna. */
+  const cantos = [1, -1].map((s) => extY([[415, 10], [560, 10], [560, -90], [415, -90]].map(([x, z]) => [s * x, z]), 700, 1000));
+  parte('painel', cortar(painel, ...rebaixos, ...cantos), ESCURO_PISO);
 
   /* tampa do motor: a base do banco. Lateral `tampaMotor` sem o entalhe de trás (ali entra a coluna). Planta da vista de cima: o
      nariz redondo da frente, medido nas colunas 562 a 590 (meia largura de 52, 68, 85, 97, 103, 105,5, 111,5, 115,5, 120, 123,5 e 133
@@ -301,7 +329,10 @@ export function montarCarcaca(estado) {
   parte('pocoTraseiro', unir(extX(L([[1342, 428], [1342, 625], [1645, 625], [1645, 428]]), -420, 420), ...forro), ESCURO);
 
   /* a traseira: capô, grade, tampa e contrapeso, do módulo dela */
-  montarTraseira(estado);
+  /* o contrapeso com o poço da roda traseira: o pneu de 568 mm cabe com 40 mm de folga (pendência c); sem ele o contrapeso, a 492 mm
+     do centro a 495 de altura, entrava no disco da roda */
+  const RT = RODAS.traseira;
+  montarTraseira(estado, { pocoDaRoda: { z: RT.z, y: RT.y, r: RT.raio + FOLGA_DO_POCO, de: RT.xDentro - FOLGA_DO_POCO } });
   return { PLACA, ABA, COLUNAS };
 }
 

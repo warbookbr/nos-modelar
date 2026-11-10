@@ -157,14 +157,13 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
 - **T10, entregue.** `montarOpcoes` com `relato: false` para as ferramentas de
   conferência, que não usam o relato de contatos: as linhas de uma vista da
   carcaça foram de 57,6 para 4,8 s, e a rodada completa de 110 para 60 s.
-- **T11, a fazer.** `npm run silhueta:pedida` mede a malha de uma parte contra
-  o lado, o perfil e a planta pedidos, por faixa de altura: meia largura, as
-  duas pontas no centro e o recuo nos cantos, com o pior desvio. Cria
-  `tools/modelar/silhueta-pedida.mjs`, o teste e o script no `package.json`; lê
-  o esboço, a parte e o objeto que o módulo exporta para `lacosPelasVistas`.
-  Prova: a caixa dá zero, e o corpo do teste de laços deslocado 7 mm dá 7
-  (±0,5). Pronto: no capô da traseira repete a medida do item 8 dos atritos, 10
-  a 15 mm nos degraus sem `compensar` e 10 a 30 com.
+- **T11, entregue.** `npm run silhueta:pedida` mede a malha de uma parte
+  contra o lado, o perfil e a planta pedidos a `lacosPelasVistas`, por faixa de
+  altura: a meia largura e as pontas no centro e junto do canto, com o pior
+  desvio. O desvio para dentro maior que `--recorte` (50 mm por padrão) sai num
+  bloco à parte, porque é vão cortado depois e não encolhimento. No capô da
+  traseira, sem `compensar`: 3,6 mm na meia largura, 10 a 15 mm junto do canto,
+  18,3 no centro abaixo do vão e 29,5 no degrau da soleira.
 - **T12, a fazer.** `lacosPelasVistas` aceita `curto: 'encolhe' (padrão) |
   'fim' | 'inicio'`; com 'fim', no laço curto o fim fica com o recuo inteiro da
   planta e o início é a mesma curva, recuada do comprimento do intervalo. Muda
@@ -173,7 +172,7 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   sem aviso. Pronto: aba da tampa e moldura com a espessura real, sem bloco
   escondido, e `sobra:partes` até 3 mm na vista de cima (a moldura reta dava
   29,4 mm).
-- **T13, a fazer.** `contornoComArcos(anel, { tolerancia, arcos })` em
+- **T13, núcleo entregue; falta a troca na carcaça.** `contornoComArcos(anel, { tolerancia, arcos })` em
   `procedural/nucleo/arcos-do-contorno.js`, com teste e ficha: simplifica o
   anel (6 mm por padrão), troca cada trecho `{ de, ate }` pelo círculo ajustado
   a 96 lados por volta e devolve os pontos, os círculos com o desvio, os
@@ -181,9 +180,9 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   declarado. Prova: arco de 386 mm com ruído de 0,5 mm sai com o raio a 1 mm.
   Pronto: `ladoSuave` sai da carcaça com a malha idêntica e o aviso aponta os
   arcos facetados da traseira.
-- **T14, a fazer.** `gaiolaVarrida` aceita `fechada: true` (a seção volta da
+- **T14, núcleo entregue; falta a troca no protetor.** `gaiolaVarrida` aceita `fechada: true` (a seção volta da
   última linha à primeira) e `tampas: true` (uma face em cada ponta, com a
-  orientação pelo volume); sem eles a saída é a de hoje, byte a byte, que o
+  orientação pelo volume e o aro em vinco, ou `'redondas'` sem ele); sem eles a saída é a de hoje, byte a byte, que o
   furgão usa. O perfil em U já existe (seção aberta, `espessura` do passo e
   `arco` no trilho) e só ganha teste. Muda `gaiola-varrida.js`, o teste e
   `protetor-posto.esboco.mjs`. Prova: tubo quadrado em L com dobra fecha, com
