@@ -196,6 +196,17 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   (a 50 mm de passo a face de dentro caía a 66). A coluna de trás continua em
   extrusões cruzadas: é chapa de seção variável, que a varredura de seção
   constante não faz.
+- **T15, entregue.** `conferir:vistas` aceita a vista que só tem contornos por
+  parte (`contornos` no lugar de `referencia`, com escala, âncora e o mapa das
+  partes): dá a sobreposição, a caixa com a diferença por lado e o maior
+  afastamento, por parte e do conjunto. A lateral da máquina inteira entrou na
+  conferência com 85,7% de sobreposição.
+- **T16, entregue e não aplicada.** O casamento aceita `escalaVertical` na
+  vista. Na vista de frente da máquina o fator de 1,252 piorou a troca de
+  classe de 38,3 para 40,0%: a distorção dela é de perspectiva, e não de duas
+  escalas, e a vista segue valendo só como caráter da forma.
+- **T17, entregue.** `sobra:partes` aceita as vistas por par, que é o que tira
+  a sobra falsa da peça vazada vista de lado; a silhueta já contava os furos.
 - **Plano próprio, em rascunho.** O degrau, o sulco e a borda rebaixada sobre a
   superfície estão em
   [rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md), que espera um
