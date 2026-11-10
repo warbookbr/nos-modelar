@@ -300,6 +300,21 @@ describe('a rodada lida dos arquivos dos agentes', () => {
     expect(() => textoFinalDoAssistente(readFileSync(vazia, 'utf8'), { arquivo: vazia })).toThrow(/não tem nenhum texto do assistente/);
   });
 
+  it('o relato entregue pela ferramenta de devolução, sem bloco de texto, vale como o último texto do agente', () => {
+    const relato = 'Li as vistas.\n\n```json\n{ "alvo": "a.png", "nota": 6, "defeitos": [] }\n```';
+    const linhas = [
+      { type: 'user', message: { role: 'user', content: 'pedido' } },
+      { type: 'assistant', message: { id: 'm1', role: 'assistant', content: [{ type: 'text', text: 'Vou abrir as imagens.' }] } },
+      { type: 'assistant', message: { id: 'm2', role: 'assistant', content: [{ type: 'tool_use', name: 'Read', input: { file_path: 'a.png' } }] } },
+      { type: 'assistant', message: { id: 'm3', role: 'assistant', content: [{ type: 'tool_use', name: 'SubagentHandback', input: { message: relato } }] } },
+      { type: 'user', message: { role: 'user', content: [{ type: 'tool_result', content: 'ok' }] } },
+    ];
+    const arquivo = escrever('critico-devolucao.jsonl', `${linhas.map((l) => JSON.stringify(l)).join('\n')}\n`);
+    const lido = textoFinalDoAssistente(readFileSync(arquivo, 'utf8'), { arquivo });
+    expect(lido.formato).toBe('transcrição');
+    expect(ultimoBlocoJson(lido.texto)).toEqual({ alvo: 'a.png', nota: 6, defeitos: [] });
+  });
+
   it('o bloco que não é JSON válido é recusado com o arquivo', () => {
     const quebrado = escrever('modelador-quebrado.txt', 'Conferi.\n\n```json\n{ "partes": [ }\n```\n');
     expect(() => entradaDosArquivos({ modelador: quebrado })).toThrow(new RegExp(`${quebrado}: o último bloco .*não é JSON válido`));

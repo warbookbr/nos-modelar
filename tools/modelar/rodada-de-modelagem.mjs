@@ -361,7 +361,14 @@ const linhasJson = (conteudo) => {
 const textosDaMensagem = (mensagem) => {
   const c = mensagem?.content;
   if (typeof c === 'string') return [c];
-  return Array.isArray(c) ? c.filter((b) => b?.type === 'text' && typeof b.text === 'string').map((b) => b.text) : [];
+  if (!Array.isArray(c)) return [];
+  /* o agente em segundo plano pode entregar a resposta pela ferramenta de devolução (`SubagentHandback`), sem bloco de texto:
+     o relato dele está em `input.message` da chamada, e vale como o texto da resposta */
+  return c.flatMap((bl) => {
+    if (bl?.type === 'text' && typeof bl.text === 'string') return [bl.text];
+    if (bl?.type === 'tool_use' && bl.name === 'SubagentHandback' && typeof bl.input?.message === 'string') return [bl.input.message];
+    return [];
+  });
 };
 
 /**
