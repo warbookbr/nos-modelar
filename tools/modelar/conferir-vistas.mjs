@@ -399,8 +399,8 @@ function traco(im, xa, ya, xb, yb, cor, espessura = 2) {
 
 /**
  * O desenho da vista só de contornos: o modelo na cor da classe de cada parte, clareada, com o contorno e a divisa dele em cinza
- * escuro, e por cima o contorno de cada parte do arquivo, na cor da paleta as mapeadas (com o nome) e em cinza as que só entram no
- * conjunto.
+ * escuro, e por cima o contorno de cada parte do arquivo, na cor da paleta as mapeadas (com o número dela na ordem de "partes", que
+ * o resumo repete, porque a fonte do desenho não tem todas as letras) e em cinza as que só entram no conjunto.
  */
 export function desenharContornos(m, { partes, classeDaParte, cores, mapeadas }) {
   const { largura: L, altura: A, raster: r } = m;
@@ -424,7 +424,7 @@ export function desenharContornos(m, { partes, classeDaParte, cores, mapeadas })
     if (!m.poligonosEmPx[n]) continue;
     let xa = Infinity; let ya = Infinity;
     for (const p of m.poligonosEmPx[n]) for (const [x, y] of p) { if (y < ya || (y === ya && x < xa)) { ya = y; xa = x; } }
-    escrever(im, n, Math.max(0, Math.round(xa)), Math.max(0, Math.round(ya) - 14), corDe(n), 2);
+    escrever(im, String(mapeadas.indexOf(n) + 1), Math.max(0, Math.round(xa)), Math.max(0, Math.round(ya) - 16), corDe(n), 2);
   }
   return im;
 }
@@ -577,7 +577,8 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
       const c = medirContornos({ faces, partes: painel.partes, vista: v.nome, largura: cfg.largura, v });
       const arq = { desenho: join(dir, 'contornos.png'), json: join(dir, 'contornos.json') };
       writeFileSync(arq.desenho, paraPng(desenharContornos(c, { partes: painel.partes, classeDaParte: cfg.partes, cores: cfg.cores, mapeadas: Object.keys(v.partes) })));
-      const partesJson = Object.fromEntries(Object.entries(c.partes).map(([n, x]) => [n, { partes: x.partes, ...medidaParaJson(x) }]));
+      const partesJson = Object.fromEntries(Object.entries(c.partes).map(([n, x], k) => [n, { numero: k + 1, partes: x.partes, ...medidaParaJson(x) }]));
+      const numero = Object.fromEntries(Object.keys(c.partes).map((n, k) => [n, k + 1]));
       const dados = {
         tipo: 'contornos', contornos: v.textoDosContornos, escala: v.escala, ancora: v.ancora, espelhar: v.espelhar, ignorarRegioes: v.ignorarRegioes,
         mmPorPx: arredonda(c.mmPorPx, 3), eixos: c.eixos, conjunto: medidaParaJson(c.conjunto), partes: partesJson,
@@ -591,7 +592,7 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
         `A referência desta vista é o arquivo de contornos ${v.textoDosContornos}, sem imagem: não há casamento, captura nem pedido ao crítico. O contorno foi levado ao modelo na escala ${v.escala} (mm do modelo por mm do contorno), com o ponto ${v.ancora.contorno.join(', ')} do contorno no ponto ${v.ancora.modelo.join(', ')} do modelo${v.espelhar ? ', espelhado na horizontal' : ''}; ${c.mmPorPx.toFixed(2)} mm por px, eixo horizontal da imagem ${c.eixos.horizontal} e vertical ${c.eixos.vertical}. A silhueta do modelo é a visível na vista.${v.ignorarRegioes.length ? ` Fora do conjunto: ${v.ignorarRegioes.join(', ')}.` : ''}`, '',
         `O conjunto, todas as partes do modelo contra as do arquivo: ${fraseDosContornos(c.conjunto)}`, '',
         'Por parte, na ordem do maior afastamento:', '',
-        ...ordem.map(([n, x]) => `- ${n} (${x.partes.join(', ')}): ${fraseDosContornos(x)}`), '',
+        ...ordem.map(([n, x]) => `- ${n} (número ${numero[n]} no desenho; ${x.partes.join(', ')}): ${fraseDosContornos(x)}`), '',
         `O desenho, o modelo com os contornos por cima, está em ${arq.desenho}.`, '');
       linhas.push(`vista ${v.nome}: só de contornos; sobreposição do conjunto ${pct(c.conjunto.sobreposicao)}; os três maiores afastamentos: ${ordem.slice(0, 3).map(([n, x]) => `${n} ${x.afastamento ? `${x.afastamento.maior.mm.toFixed(0)} mm` : 'sem pixel'}`).join(', ')}`);
       continue;
