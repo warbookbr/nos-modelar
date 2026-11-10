@@ -60,6 +60,7 @@ export const TESTES_LENTOS = [
   'tools/modelar/calibracao-do-critico.test.mjs',
   'tools/modelar/capturar-montagem.test.ts',
   'tools/modelar/cilindro-hidraulico-aprovacao.test.mjs',
+  'tools/modelar/conferir-vistas.test.mjs',
   'tools/modelar/familia.test.mjs',
   'tools/modelar/forma-do-esboco.test.mjs',
   'tools/modelar/guardas/abre-na-bancada.test.mjs',
