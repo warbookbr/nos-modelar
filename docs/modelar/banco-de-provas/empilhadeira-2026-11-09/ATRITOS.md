@@ -183,3 +183,14 @@ processo o teria pego sozinho e o destino.
    inconclusivo com as caixas sobrepostas, a `conferir:vistas` sem a vista só de contornos, e o casamento com uma
    escala por vista. O processo pegou as pendências pelos relatos das frentes; a escala dupla da vista de frente só
    apareceu na comparação entre vistas feita à mão, e falta o campo que a registre na configuração da conferência.
+20. **A primeira receita, a da carcaça, parou em três ferramentas antes de chegar ao crítico.** A malha da receita é a
+   do rascunho aprovado, e a medição passou na primeira vez. O registro das etapas quebrava ao ler a peça: a booleana
+   sobre o corpo subdividido com vinco vivo deixava em `face.quebras` pares de vértices que o corte apagou (cinquenta
+   na carcaça). A correção ficou na booleana, que passa a dar a cada pedaço os trechos da aresta original que continuam
+   na borda dele, com teste, e a guarda do acervo não mudou em nenhuma das 65 peças. A captura da montagem falhava
+   neste contêiner porque o navegador pedia o ícone da página e o servidor respondia 404, e a mensagem não dizia a
+   causa: o visor declara ícone vazio e o erro traz o texto e o endereço. O registro da rodada não lia o relato que o
+   agente entrega pela ferramenta de devolução, sem bloco de texto, e passou a ler. Ficaram abertos o `npm run
+   parametros`, que não terminou em 300 s com a TABELA em listas de contorno, e a montagem v5, que recusa nomear a
+   etapa que ainda não tem receita. O processo pegou os três pela recusa da própria ferramenta; nenhum teste cobria a
+   booleana sobre face com quebra de sombra, e agora cobre.
