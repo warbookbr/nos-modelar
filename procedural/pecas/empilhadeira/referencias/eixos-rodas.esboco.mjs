@@ -16,11 +16,9 @@
  *   120 e à 471 (meia largura de 667 mm) e o traseiro à 125 e à 467 nas colunas 776 a 856 (650 mm). A vista de trás (`tras.ia.png`,
  *   4,03 mm/px pelo capô, centro na coluna 536) dá o traseiro de 374 a 436 na linha 500 (653 a 403 mm). A vista de frente
  *   (`frente.ia.png`, 3,395 mm/px pela aba, 357 px de 366 a 723) dá o dianteiro de 362 a 439 (620 a 358 mm).
- *   As vistas dão o pneu com 250 a 265 mm de banda; o poço da carcaça corta de 414 mm para fora na frente e o fundo do poço traseiro
- *   ocupa até 420 mm, e com essa banda o pneu entraria na carcaça. Vale a banda da TABELA na proporção das larguras da carcaça
- *   (180 x 596,4/511 = 210 mm) na dianteira, de 459 a 669 mm do centro (45 mm de folga até o poço, a 414). Atrás, o contrapeso
- *   da carcaça chega a 492 mm dentro do disco da roda (y 495, z -1897), e a traseira vai de 497 a 655 mm (158 mm, perto dos 150 do
- *   6.00-9 da TABELA sem escala), com o pneu de fora 5 mm além dos 650 da vista de cima.
+ *   As vistas dão o pneu com 250 a 265 mm de banda. Na integração da máquina inteira (2026-11-10) a carcaça passou a cortar os poços
+ *   pela roda (`RODAS` de `carcaca.esboco.mjs`, 40 mm de folga): a dianteira vai de 417 a 667 mm (banda de 250) e a traseira de 445 a
+ *   653 (banda de 208, a da dianteira na razão 150/180 da TABELA), com o poço do contrapeso cortado de 405 mm para fora.
  *   Cubos e eixo dianteiro: a vista de frente da carcaça (`carcaca-frente.ia.png`, 3,385 mm/px, centro na coluna 545,5, altura
  *   4,296 mm/px): a tampa cinza do cubo nas colunas 393 a 408 (516 a 463 mm), Ø 90 (linhas 442 a 462); o flange escuro nas 408 a 425
  *   (463 a 404 mm), Ø 220 (linhas 425 a 476); o tubo do eixo Ø 150 (linhas 432 a 467 nas colunas 430 a 445). A lateral da carcaça
@@ -35,15 +33,17 @@
  *   lateral da carcaça mostra só o pino vertical da manga sobre o cubo, coluna 782, linhas 395 a 440); as seções são de caráter.
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a máquina 180 graus para os três quartos de trás. */
-import carcaca from './carcaca.esboco.mjs';
+import carcaca, { RODAS } from './carcaca.esboco.mjs';
 import { ferramentas, CINZA, CINZA_CLARO, ESCURO } from './carcaca-traseira.esboco.mjs';
 
 const PRETO_PNEU = '#1a1b1d';
 const LADOS = 48;
 
 /* as rodas e os cubos, em mm (x é a distância ao centro da máquina) */
-export const RODA_D = { y: 352.5, z: 0, raio: 352.5, xDentro: 459, banda: 210, aro: 160, disco: [463, 478], furo: 55 };
-export const RODA_T = { y: 284, z: -1700, raio: 284, xDentro: 497, banda: 158, aro: 120, disco: [550, 565], furo: 55 };
+/* o diâmetro e a posição de cada pneu vêm de `RODAS` da carcaça, que corta os poços por elas (a decisão da máquina inteira, de
+   2026-11-10: a dianteira de 417 a 667 mm, a traseira de 445 a 653; ALINHAMENTO.md); o aro e o disco são daqui */
+export const RODA_D = { ...RODAS.dianteira, aro: 160, disco: [463, 478], furo: 55 };
+export const RODA_T = { ...RODAS.traseira, aro: 120, disco: [550, 565], furo: 55 };
 const CHAPA = [266, 327];         // as chapas do chassi em x (PLACA de carcaca.esboco.mjs)
 
 /* A seção do pneu em [raio, a], com a de 0 (face de dentro) a b (face de fora): o talão no aro, o flanco abaulado e o ombro
