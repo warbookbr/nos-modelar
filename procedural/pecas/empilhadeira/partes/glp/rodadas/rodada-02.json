@@ -1,0 +1,376 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/glp",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "cilindroGlp",
+        "tipo": "ausencia",
+        "onde": "colar e conexões da válvula, extremidade -x",
+        "sentido": "faltando",
+        "evidencia": "tras.ia.png mostra conjunto de válvula com colar e conexões; no modelo (frontal, superior) é só um toco cilíndrico liso."
+      },
+      {
+        "parte": "cilindroGlp",
+        "tipo": "superficie",
+        "onde": "transição entre cúpula e corpo, sobretudo no lado da válvula",
+        "sentido": "anguloso",
+        "evidencia": "Frontal e traseira: a cúpula é rasa e a passagem para o corpo é um canto marcado; a referência é mais arredondada."
+      },
+      {
+        "parte": "cintas",
+        "tipo": "ausencia",
+        "onde": "fivela e tensor nas cintas",
+        "sentido": "faltando",
+        "evidencia": "cima.ia.png mostra fivela e tensor nas cintas, junto à extremidade inferior delas; no modelo (direita, isometrica) são anéis lisos."
+      },
+      {
+        "parte": "cintas",
+        "tipo": "uniao",
+        "onde": "borda interna de cada cinta, junto ao corpo do cilindro",
+        "sentido": "afastado",
+        "evidencia": "Luz rasante tresquartos az20 e topo az120: fresta escura e fina ao lado das duas cintas, no lado iluminado. Na vista direita aparece como filete preto na borda."
+      }
+    ],
+    "observacao": "A forma e a posição do conjunto batem com a referência e nenhum critério de reprovação foi disparado; as diferenças são de detalhe (fivela, válvula, arredondado das cúpulas, fresta das cintas)."
+  },
+  "partes": [
+    {
+      "nome": "berco",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cilindroGlp",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cintas",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o lathe recusa como perfil aberto a ponta com raio 6e-15 que o cosseno de 90 graus dá; foi preciso zerar o polo à mão",
+    "o descrever dá berço e cilindro como interpenetra, embora a sonda mostre o entalhe no círculo do cilindro, sem folga e sem entrar",
+    "o relato do modelador trouxe duas pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 2, fivela das cintas e colar da valvula: o rascunho aprovado nao os tem; atribuidos ao plano, ficam como detalhe para a pessoa",
+    "rodada 2, cupula rasa e fresta ao lado das cintas na luz rasante: ficam abertos como detalhe de superficie, para a pessoa decidir"
+  ],
+  "notaDePassagem": "O cilindro é uma revolução em x: o corpo de raio 160 e as cúpulas em meia elipse até as pontas do rascunho, mais a válvula extrudada. O entalhe dos apoios é uma extrusão sem o arredondamento de 0,1 mm, para cair nos vértices da revolução. A chapa vai de -1.665 a -2.015, como os apoios, com a base medida na tampa até -2.020.",
+  "receita": {
+    "sha256": "sha256:98b994827ec757d6ba86ff0fef281b645c93219ab735d66317649b796cc3efca",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 17,
+      "acrescentadas": 39,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "  /* O CILINDRO: o corpo de raio 160 de x -270 a 320 (a partir do centro em x 30: de -300 a +290), a cúpula do lado +x de raio 125 de"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "     +280 a +315, a do lado da válvula de raio 135 de -345 a -290, e a válvula de raio 35 de -385 a -335. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* O CILINDRO: uma revolução em x pelo centro em x 30, com o corpo de raio 160 de -290 a +280 (a partir do centro) e as duas cúpulas"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     abauladas, meias elipses que fecham no eixo: a do lado +x até +315 e a do lado da válvula até -345, as pontas do rascunho; e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     válvula de raio 35 de -385 a -335. No rascunho as cúpulas eram dois discos (raio 125 de +280 a +315 e 135 de -345 a -290), em"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     degrau. Cada cúpula tem 16 trechos no perfil. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": "    corpo: [-300, 290],"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "    cupulas: [{ raio: 125, x: [280, 315] }, { raio: 135, x: [-345, -290] }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "    corpo: [-290, 280],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "    pontas: [-345, 315],"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "    trechosDaCupula: 16,"
+        },
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": "  /* O BERÇO: a chapa de 520 mm em x (260 para cada lado do centro do cilindro), de 300 em z, com 16 mm de espessura, sobre a face de"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "     cima da tampa do capô; e dois apoios sob as cintas, de 50 mm em x, de 350 em z, de 1.150 a 1.262, entalhados pelo círculo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* O BERÇO: a chapa de 520 mm em x (260 para cada lado do centro do cilindro), de 350 em z, o comprimento dos apoios, com 16 mm de"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "     espessura, sobre a face de cima da tampa do capô (no rascunho, 300 em z: os apoios passavam 25 mm de cada ponta dela com o fundo"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "     reto, e a chapa curva descia abaixo deles, em degrau); e dois apoios sob as cintas, de 50 mm em x, de 350 em z, de 1.150 a 1.262, entalhados pelo círculo do"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "     simplificado a 0,3 mm (o desvio da reta para cima dela fica em 0,1 mm), com o nó de z -1.840 no ponto do apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "     montagem. Sob os apoios, o mais alto da face é 1.149,5. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "     simplificado a 0,3 mm (o desvio da reta para cima dela fica em 0,1 mm), de z -1.660 a -2.020, com o nó de z -1.840 no ponto do"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "     apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na montagem. Sob os apoios, o mais alto da face é 1.149,5. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "    chapa: { meia: 260, emZ: 150, espessura: 16 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "    base: [[-1685, 1149.3], [-1740, 1149.5], [-1821, 1149.1], [-1840, 1148.7], [-1893, 1147.7], [-1945, 1145.3], [-1981, 1142.3], [-1995, 1140.3]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    chapa: { meia: 260, emZ: 175, espessura: 16 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    base: [[-1660, 1149.1], [-1740, 1149.5], [-1821, 1149.1], [-1840, 1148.7], [-1893, 1147.7], [-1945, 1145.3], [-1981, 1142.3], [-2007, 1138.5],"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "      [-2020, 1135.7]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "  return { ladoChapa, xCintas: [CG.x - T.cintas.aoMeio, CG.x + T.cintas.aoMeio], portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  /* o perfil da revolução do cilindro, [raio, x a partir do centro], de ponta a ponta: as meias elipses das cúpulas e o corpo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const CI = T.cilindro; const nc = CI.trechosDaCupula;"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  const cupula = (de, ponta) => Array.from({ length: nc + 1 }, (_, k) => { const a = (Math.PI / 2) * k / nc; return [k === nc ? 0 : CI.raio * Math.cos(a), de + (ponta - de) * Math.sin(a)]; });"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const perfilGas = [...cupula(CI.corpo[0], CI.pontas[0]).reverse(), ...cupula(CI.corpo[1], CI.pontas[1])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  return { ladoChapa, perfilGas, xCintas: [CG.x - T.cintas.aoMeio, CG.x + T.cintas.aoMeio], portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  /* a revolução em x do cilindro com as cúpulas */"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  estado.origem += 1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  estado.passos.push(['lathe', { origemId: estado.origem, eixo: 'x', lados: n, perfil: D.perfilGas, em: [CG.x, CG.y, CG.z] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const gas = { origem: { op: 'lathe', id: estado.origem } };"
+        },
+        {
+          "tipo": "-",
+          "linha": 91,
+          "texto": "  parte('cilindroGlp', unir(tubo(CI.raio, CI.corpo), ...CI.cupulas.map((c) => tubo(c.raio, c.x)), tubo(CI.valvula.raio, CI.valvula.x)), T.cores.gas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  parte('cilindroGlp', unir(gas, tubo(CI.valvula.raio, CI.valvula.x)), T.cores.gas);"
+        },
+        {
+          "tipo": "-",
+          "linha": 106,
+          "texto": "  const entalhes = D.xCintas.map((xc) => extX(circulo(CG.z, CG.y, CI.raio, n), xc - AP.meia - AP.alemNoCorte, xc + AP.meia + AP.alemNoCorte));"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  /* o entalhe é o círculo do cilindro sem o arredondamento de 0,1 mm das outras extrusões, para cair nos vértices da revolução, que"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "     não arredonda: arredondado, ele deixava a revolução entrar até 0,05 mm no apoio. O perfil vai como `extX` o grava, em [-y, z],"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "     anti-horário. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const entalhe = (x0, x1) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    estado.origem += 1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    estado.passos.push(['extrusao', { origemId: estado.origem, eixo: 'x', altura: x1 - x0, perfil: [...circulo(CG.z, CG.y, CI.raio, n)].reverse().map(([z, y]) => [-y, z]), em: [x0, 0, 0] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    return { origem: { op: 'extrusao', id: estado.origem } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  const entalhes = D.xCintas.map((xc) => entalhe(xc - AP.meia - AP.alemNoCorte, xc + AP.meia + AP.alemNoCorte));"
+        },
+        {
+          "tipo": "-",
+          "linha": 112,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], lathe: ['perfil', 'em'] };"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "      { nome: 'berco', forma: 'o berço cinza: a chapa de 520 por 300 mm e 16 de espessura que segue a face de cima da tampa do capô, e dois apoios de 50 mm sob as cintas, que sobem a 1.262 e recebem o cilindro pelo círculo dele', tecnica: 'silhueta lateral extrudada em x, unida aos retângulos dos apoios extrudados em x, menos o círculo do cilindro' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 141,
+          "texto": "      { nome: 'cilindroGlp', forma: 'o cilindro cinza claro de Ø 320, deitado de través em z -1.840 e y 1.345, com as duas cúpulas e a válvula do lado direito (-x)', tecnica: 'círculos de 96 lados extrudados em x, unidos' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "      { nome: 'berco', forma: 'o berço cinza: a chapa de 520 por 350 mm e 16 de espessura que segue a face de cima da tampa do capô, e dois apoios de 50 mm sob as cintas, que sobem a 1.262 e recebem o cilindro pelo círculo dele', tecnica: 'silhueta lateral extrudada em x, unida aos retângulos dos apoios extrudados em x, menos o círculo do cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "      { nome: 'cilindroGlp', forma: 'o cilindro cinza claro de Ø 320, deitado de través em z -1.840 e y 1.345, com as duas cúpulas abauladas e contínuas e a válvula do lado direito (-x)', tecnica: 'revolução em x (lathe de 96 lados) do perfil do corpo com as meias elipses das cúpulas, unida à válvula, círculo extrudado em x' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "      'as cúpulas em degraus ou discos planos, ou a chapa do berço em degrau sob os apoios',"
+        },
+        {
+          "tipo": "-",
+          "linha": 158,
+          "texto": "      { nome: 'cúpula da esquerda, em cima e na frente', parte: 'cilindroGlp', medida: 'maximo', em: [CG.x + CI.cupulas[0].x[1], CG.y + CI.raio, CG.z + CI.raio], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "      { nome: 'cúpula da esquerda, em cima e na frente', parte: 'cilindroGlp', medida: 'maximo', em: [CG.x + CI.pontas[1], CG.y + CI.raio, CG.z + CI.raio], toleranciaMm: 0.5 },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[5], PASSOS[19], PASSOS[29]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az20.png",
+      "peca-frente-rasante-az110.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az110.png"
+    ]
+  }
+}

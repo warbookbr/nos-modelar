@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1854 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1860 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1532,6 +1532,7 @@
 ## procedural/pecas/empilhadeira/partes/alca/rodadas/
 
 - `receita-01.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
+- `receita-02.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
 
 ## procedural/pecas/empilhadeira/partes/banco/
 
@@ -1540,6 +1541,8 @@
 ## procedural/pecas/empilhadeira/partes/banco/rodadas/
 
 - `receita-01.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+- `receita-02.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+- `receita-03.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
 
 ## procedural/pecas/empilhadeira/partes/canal-interno/
 
@@ -1630,6 +1633,7 @@
 ## procedural/pecas/empilhadeira/partes/escape/rodadas/
 
 - `receita-01.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
+- `receita-02.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
 
 ## procedural/pecas/empilhadeira/partes/garfo/
 
@@ -1642,6 +1646,11 @@
 ## procedural/pecas/empilhadeira/partes/glp/
 
 - `receita.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
+
+## procedural/pecas/empilhadeira/partes/glp/rodadas/
+
+- `receita-01.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
+- `receita-02.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
 
 ## procedural/pecas/empilhadeira/partes/protetor/
 
