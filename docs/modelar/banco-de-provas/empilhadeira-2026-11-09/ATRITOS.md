@@ -65,3 +65,9 @@ processo o teria pego sozinho e o destino.
    listra dentro de uma cor; a pessoa perguntou o que era. Destino: `lacosPelasVistas` ganhou `cantos: 'fixos'`, que
    deixa os cantos da planta no lugar e encolhe o recuo da ponta na altura em que a silhueta fica aquém do extremo, e
    `extremos`, para o corpo menor que acompanha um maior (a grade); o laranja foi a 85% de coincidência.
+   A listra enfraqueceu no centro e continuou nos lados, e a pessoa a apontou de novo, rente ao pé da grade. A leitura
+   do degrau estava errada: ele não é do laranja, é a soleira do vão da grade. Acima da soleira, o que a lateral vê de
+   mais recuado é a borda do vão, que fica aquém da ponta pelo recuo da planta naquela largura (55 a 95 mm, o tamanho
+   do degrau). A seção do meio do capô passou a ser a silhueta lateral mais esse recuo, sem degrau, com o vão cortando
+   da soleira ao topo, e a lateral do rascunho continua mostrando o degrau, agora pelo vão. O processo não pegaria:
+   silhueta lateral de casco com vão no meio não é a seção do meio, e isso entra como pergunta ao ler a lateral.

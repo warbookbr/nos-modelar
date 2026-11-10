@@ -52,6 +52,7 @@ function extrusao(eixo, perfil, em, altura) {
   passos.push(['extrusao', { origemId: origem, eixo, altura: r1(altura), perfil: p, em: em.map(r1) }]);
   return { origem: { op: 'extrusao', id: origem } };
 }
+const extX = (zy, x0, x1) => extrusao('x', zy.map(([z, y]) => [-y, z]), [x0, 0, 0], x1 - x0);
 const extY = (xz, y0, y1) => extrusao('y', xz, [0, y0, 0], y1 - y0);
 const extZ = (xy, z0, z1) => extrusao('z', xy.map(([x, y]) => [x, -y]), [0, 0, Math.min(z0, z1)], Math.abs(z1 - z0));
 function booleana(op, solidos) {
@@ -117,27 +118,37 @@ const PONTA_DO_CAPO = 2172;  // o extremo de trás da silhueta do capô, no bico
 const TOPO_CAPO = 1112;      // os ombros do capô, na linha 282 da vista de trás
 const TOPO_CONTRA = 645;     // o contrapeso acaba reto, 12 mm para dentro do capô, e a divisa fica fechada; a cunha que sobe atrás fica de fora
 
-/* capô: o casco laranja, com o vão da grade ------------------------------------------------------------------------------------ */
+/* capô: o casco laranja, com o vão da grade ------------------------------------------------------------------------------------
+   O degrau que a lateral mostra acima do bico não é do laranja: é a soleira do vão da grade. Acima dela, o que a lateral vê de mais
+   recuado é a borda do vão, que fica aquém da ponta pelo recuo da planta naquela largura (55 a 95 mm). A seção do meio do capô é
+   então a silhueta lateral mais esse recuo, sem degrau, e o vão é que a corta. */
 const meiaCapo = 148 * MM;
+const recuoDaPlanta = (x) => FIM + zDaTraseira(x, meiaCapo);
+const interpolar = (tabela, v) => {
+  if (v <= tabela[0][0]) return tabela[0][1];
+  for (let i = 1; i < tabela.length; i += 1) if (v <= tabela[i][0]) return tabela[i - 1][1] + (tabela[i][1] - tabela[i - 1][1]) * (v - tabela[i - 1][0]) / (tabela[i][0] - tabela[i - 1][0]);
+  return tabela[tabela.length - 1][1];
+};
+/* o vão vai da soleira da grade ao topo: sob a tampa o capô é aberto, e a aba dela cobre a traseira */
+const VAO = [...VAO_GRADE, [281, 101.5], [268, 101.5]];
+const meiaDoVao = (y) => interpolar(perfil(VAO), y);
+const secaoDoMeio = ([z, y]) => (z > 1970 && y >= 800 ? [Math.min(z + recuoDaPlanta(meiaDoVao(y)), PONTA_DO_CAPO - 6), y] : [z, y]);
 export const VISTAS_DO_CAPO = {
-  lado: lado('capo', ([z, y]) => [z, y > 1100 ? TOPO_CAPO : y]),
+  lado: lado('capo', ([z, y]) => secaoDoMeio([z, y > 1100 ? TOPO_CAPO : y])),
   perfil: perfil(CAPO), planta: plantaTraseira(meiaCapo, 1400),
-  estacoes: [632.5, 650, 666, 700, 740, 780, 800, 812, 825, 860, 900, 940, 980, 1020, 1060, 1085, 1100, TOPO_CAPO],
-  cantos: 'fixos',
+  estacoes: [632.5, 650, 666, 720, 790, 850, 910, 980, 1030, 1075, 1100, TOPO_CAPO],
 };
 let capo = corpo('capo', VISTAS_DO_CAPO, QUINAS);
-capo = booleana('subtrair', [capo, extZ(simetrico(VAO_GRADE.map(([y, w]) => [y, w + 1])), -1950, -2300)]);
+capo = booleana('subtrair', [capo, extZ(simetrico(VAO.map(([y, w]) => [y, w + 1])), -1950, -2300)]);
 parte('capo', capo, LARANJA);
 
-/* grade: a moldura cinza em U apoiada na rampa de trás do capô, acompanhando a planta, e o fundo escuro ------------------------ */
-/* a placa é um bloco fundo (300 mm para dentro), para as duas faces não se cruzarem no laço curto: só a face de trás aparece */
+/* grade: a moldura cinza em U apoiada na rampa do vão (de z 2058 a y 980 até z 2110 a y 812, na lateral), e o fundo escuro -------- */
 const rampa = (de, ate) => [[-(2052 + de), 990], [-(2052 + ate), 990], [-(2112 + ate), 795], [-(2112 + de), 795]];
-const perfilDoVao = perfil([[362, 70], ...VAO_GRADE]);
-const placa = (nome, de, ate) => corpo(nome, { lado: rampa(de, ate), perfil: perfilDoVao, planta: plantaTraseira(meiaCapo, 1400),
-  estacoes: [796, 805, 815, 840, 900, 960, 989], cantos: 'fixos', extremos: { inicio: -PONTA_DO_CAPO } }, QUINAS);
+const u = simetrico(VAO_GRADE);
+const placa = (de, ate) => booleana('intersectar', [extZ(u, -1900, -2300), extX(rampa(de, ate), -450, 450)]);
 const furos = FUROS_GRADE.map((f) => extZ(f.map(([x, y]) => [x * MM, H(y)]), -1900, -2300));
-parte('grade', booleana('subtrair', [placa('grade', -300, 14), ...furos]), CINZA_CLARO);
-parte('fundoGrade', placa('fundoGrade', -320, -70), ESCURO);
+parte('grade', booleana('subtrair', [placa(-40, 14), ...furos]), CINZA_CLARO);
+parte('fundoGrade', placa(-95, -70), ESCURO);
 
 /* tampa: o painel central com a aba de trás ------------------------------------------------------------------------------------ */
 const meiaTampa = 101.5 * MM;
