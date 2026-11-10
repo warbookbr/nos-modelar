@@ -1,0 +1,205 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/roda-traseira",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "pneu",
+        "tipo": "superficie",
+        "onde": "ombro, crista iluminada no alto e cantos da silhueta alto-direito e baixo-esquerdo",
+        "sentido": "anguloso",
+        "evidencia": "Rasante tresquartos az30: degrau escuro na crista do ombro. Rasante lado az120: dois cantos retos na silhueta. A forma pede curva contínua."
+      },
+      {
+        "parte": "pneu",
+        "tipo": "uniao",
+        "onde": "face de dentro do pneu, alto-direito, junto à lateral da carcaça",
+        "sentido": "atravessando",
+        "evidencia": "Vista traseira montada: a borda da carcaça passa sobre o alto do pneu. Isométrica montada: fresta preta fina entre pneu e carcaça. Pode ser contato ou entrada; as vistas não decidem."
+      }
+    ],
+    "observacao": "Proporção e partes batem com o prometido; a dúvida é o encontro do pneu com a carcaça e a sombra do ombro, e a banda lisa é mais simples que a esculpida da referência."
+  },
+  "partes": [
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cubo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "disco",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a chapa entra até o meio da parede do cubo (61,5 mm) e tapava os furos de Ø 10 em 124; os furos agora são de Ø 6 em 115,5, a 0,75 mm da chapa",
+    "rodada 2, pneu encostando ou entrando na carcaca: a auditoria de intersecoes da montagem nao acha par entre as rodas e a carcaca; atribuido a ferramenta, as vistas montadas nao decidem profundidade",
+    "rodada 2, degrau de sombra na crista do ombro: fica aberto como detalhe de superficie para a pessoa julgar pela imagem"
+  ],
+  "notaDePassagem": "revisar: medição passa, rodada 2 a julgar",
+  "receita": {
+    "sha256": "sha256:18110ad083eddb8728bdd66fa7f7e14851f17b1822b73f1fd751f19763765246",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 10,
+      "acrescentadas": 14,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 16,
+          "texto": " * do aro. Os seis furos de Ø 10 no círculo de 124 são de caráter, no que cabe entre o furo central e a borda do cubo. O assento da roda"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * do aro. Os seis furos de Ø 6 no círculo de 115,5 são de caráter, no que cabe entre o furo central e a borda de dentro da chapa do"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * disco: a chapa entra até o meio da parede do cubo, no raio de 61,5 mm, e com os furos de Ø 10 no círculo de 124 (rodada 1) ela tapava"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * de 61,5 a 67 mm de cada furo; agora o furo vai de 54,75 a 60,75 mm e passa livre, a 0,75 mm da chapa e a 1,75 mm do furo central. O assento da roda"
+        },
+        {
+          "tipo": "-",
+          "linha": 19,
+          "texto": " * 1 a 16). O ombro é o ombro largo da dianteira, o arco de 62 mm do rascunho (a até 1,6 mm da seção dele levada a este raio), que é"
+        },
+        {
+          "tipo": "-",
+          "linha": 20,
+          "texto": " * também quase o máximo que a banda de 208 aceita (30%, 62,4 mm: `ombro-cabe-na-banda`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * 1 a 16). O ombro é o da dianteira, a curva do ombro largo da família com 62 mm na largura (a até 3,0 mm da seção do rascunho"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * levada a este raio), que é também quase o máximo que a banda de 208 aceita (30%, 62,4 mm: `ombro-cabe-na-banda`), e o pneu tem 192"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * lados, como o da dianteira."
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": "  /* a roda de chapa: o disco de 15 mm, o cubo de Ø 140 e 30 mm com o furo de Ø 106 e seis furos de Ø 10 no círculo de 124 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  /* a roda de chapa: o disco de 15 mm, o cubo de Ø 140 e 30 mm com o furo de Ø 106 e seis furos de Ø 6 no círculo de 115,5, por"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "     dentro da borda de dentro da chapa (61,5 mm), para os furos passarem de lado a lado à vista */"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "  circuloDosFuros: 124,"
+        },
+        {
+          "tipo": "-",
+          "linha": 47,
+          "texto": "  diametroDoFuro: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  circuloDosFuros: 115.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  diametroDoFuro: 6,"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "  /* a forma do pneu: o ombro largo em arco, de 62 mm de raio (o do rascunho, o mesmo da dianteira), e 96 lados */"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  /* a forma do pneu: o ombro largo em curva, de 62 mm na largura (o do rascunho, o mesmo da dianteira), e 192 lados */"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "  ladosDoPneu: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  ladosDoPneu: 192,"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "      { nome: 'pneu', forma: 'pneu preto de Ø 568 e 208 mm de banda, banda lisa, ombro largo em arco de 62 mm e flanco com bojo, do talão de Ø 240 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 96 lados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "      { nome: 'pneu', forma: 'pneu preto de Ø 568 e 208 mm de banda, banda lisa, flanco em curva até o bojo e ombro largo em curva de 62 mm até a banda, sem quina, do talão de Ø 240 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 192 lados' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 89,
+          "texto": "      { nome: 'cubo', forma: 'anel cinza de Ø 140 e 30 mm, com o furo de Ø 106 e seis furos de Ø 10, cuja face de dentro fica 1 mm por fora do meio do pneu', tecnica: 'família roda-pneu: revolução do anel menos o furo central e os seis furos repetidos em volta do eixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "      { nome: 'cubo', forma: 'anel cinza de Ø 140 e 30 mm, com o furo de Ø 106 e seis furos de Ø 6 livres da chapa, cuja face de dentro fica 1 mm por fora do meio do pneu', tecnica: 'família roda-pneu: revolução do anel menos o furo central e os seis furos repetidos em volta do eixo' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[24]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az30.png",
+      "peca-tresquartos-rasante-az120.png"
+    ]
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/roda-dianteira",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "pneu",
+        "tipo": "uniao",
+        "onde": "metade de dentro da banda, na altura do eixo, e topo do pneu sob a aba do paralama",
+        "sentido": "atravessando",
+        "evidencia": "Frontal montada: bloco laranja da carcaça cobre o pneu em x455-675, y335-720. Isométrica montada: aba do paralama corta o topo do pneu em x490-515, y170. Referência mostra pneu à frente."
+      }
+    ],
+    "observacao": "A roda isolada tem as quatro partes prometidas e superfície contínua; o defeito está na relação com a carcaça (profundidade a confirmar) e no flanco plano sem bojo."
+  },
+  "partes": [
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cubo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "disco",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o ombro largo saía em 3 facetas de 30° e o flanco como parede reta: a família ganhou a curva sem quina (composição -ombro-largo), que só vale com ombroDoPneu e ombroRedondo juntos",
+    "1104 composições: o registro passa de 1,1 s a 1,5 s",
+    "rodada 2, pneu atravessando a carcaca ou a aba: a auditoria de intersecoes da montagem nao acha par entre as rodas e a carcaca; atribuido a ferramenta, as vistas montadas nao decidem profundidade, como o proprio critico disse",
+    "rodada 2, flanco sem bojo marcado: a familia nao tem parametro de bojo; o lado do pneu virou curva unica do talao a banda; fica para a pessoa julgar pela imagem"
+  ],
+  "notaDePassagem": "revisar: medição passa, rodada 2 a julgar",
+  "receita": {
+    "sha256": "sha256:bc30300cd2e4d885f612984fdf98a959f6edb2a5c6149adbd3f63f8cc7c04df4",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 7,
+      "acrescentadas": 9,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 18,
+          "texto": " * O ombro do pneu é o ombro largo da família (`ombroDoPneu`, a fração do flanco, aprovado pela pessoa em 2026-11-10): o arco de 62 mm"
+        },
+        {
+          "tipo": "-",
+          "linha": 19,
+          "texto": " * de raio, que é o vão axial do ombro do rascunho (de 0 a 62 mm da face, na seção que o rascunho dá às duas rodas) e o arco que mais"
+        },
+        {
+          "tipo": "-",
+          "linha": 20,
+          "texto": " * se aproxima dele, a até 3,3 mm de cada ponto da seção do rascunho (o de 55 ficaria a 5,6 mm). O que a família não faz, e por isso"
+        },
+        {
+          "tipo": "-",
+          "linha": 21,
+          "texto": " * fica diferente do rascunho: o flanco vai reto do bojo ao ombro, e a revolução tem 96 lados no lugar de 48."
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * O ombro do pneu é o ombro largo da família (`ombroDoPneu`, a fração do flanco, aprovado pela pessoa em 2026-11-10) com o ombro"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * redondo: a seção do lado é a curva do ombro largo da família, o flanco em parábola do talão ao bojo e a superelipse do bojo à banda,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * de 62 mm na largura, que é o vão axial do ombro do rascunho (de 0 a 62 mm da face, na seção que o rascunho dá às duas rodas); ela"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * fica a até 3,1 mm da seção do rascunho do bojo à banda. Na rodada 1 o ombro era um arco de três facetas e o flanco uma parede"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * reta, com quina entre os dois. A revolução do pneu tem 192 lados (o máximo da família): com 96, a luz rasante serrilhava a borda"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * de cima e a sombra do aro no flanco."
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "  /* a forma do pneu: o ombro largo em arco, de 62 mm de raio (o do rascunho), e 96 lados */"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* a forma do pneu: o ombro largo em curva, de 62 mm na largura (o do rascunho), e 192 lados */"
+        },
+        {
+          "tipo": "-",
+          "linha": 56,
+          "texto": "  ladosDoPneu: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  ladosDoPneu: 192,"
+        },
+        {
+          "tipo": "-",
+          "linha": 163,
+          "texto": "      { nome: 'pneu', forma: 'pneu preto de Ø 705 e 250 mm de banda, banda lisa, ombro largo em arco de 62 mm e flanco com bojo, do talão de Ø 320 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 96 lados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "      { nome: 'pneu', forma: 'pneu preto de Ø 705 e 250 mm de banda, banda lisa, flanco em curva até o bojo e ombro largo em curva de 62 mm até a banda, sem quina, do talão de Ø 320 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 192 lados' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[24]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az30.png",
+      "peca-tresquartos-rasante-az120.png"
+    ]
+  }
+}
