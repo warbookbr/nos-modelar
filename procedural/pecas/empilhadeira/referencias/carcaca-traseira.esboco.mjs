@@ -231,3 +231,5 @@ export default {
   vista: 'traseira',
   opcoes: [{ titulo: 'traseira pelas três vistas', nota: `capô com ${Math.round(2 * meiaCapo)} mm de largura`, passos, topo }],
 };
+
+export { REGIOES, LARANJA, CINZA_CLARO, CINZA, ESCURO, simplifica, lado, area, r1, interpolar };
