@@ -56,13 +56,15 @@ export const TABELA = {
      fim de trás na face de trás da travessa de trás em z -1.425 e a meia largura do perfil de 425 a 480, a do tubo da coluna da frente;
      o perfil extrudado sai 1 mm além do tubo de cada lado, porque rente a ele as faces das duas se cruzavam no mesmo plano e a face de
      baixo da travessa da frente ficava com vértices em fila dos dois lados, de triângulo sem área. O perfil de lado, da dobra
-     até a coluna de trás, pelo contorno da lateral em px: a borda de baixo com a quina de dentro da frente em arco, 5 mm à frente da
-     borda da coluna, e o topo com o canto de fora redondo, de px 523 a 8 mm do topo a 537 no topo. */
+     até a coluna de trás, pelo contorno da lateral em px: a borda de baixo com a quina de dentro da frente em arco, e o topo com o
+     canto de fora redondo, de px 523 a 8 mm do topo a 537 no topo. O arco de dentro, que na lateral acaba no px 499 (y 1.826) 98 mm
+     atrás da coluna, desce numa curva (Bézier cúbica, `concordancia`) até a face de trás da coluna da frente em y 1.760, chegando na
+     direção dela e 5 mm dentro do tubo: no rascunho ele voltava à coluna por um corte reto em y 1.826, o toco sob a dobra. */
   teto: {
     topo: 2135, alturaDoPerfil: 70, eixoAbaixoDoTopo: 45, tras: -1425, x: [425, 480],
     perfil: {
       baixo: [[678, 80], [578, 81], [533, 84], [525, 87], [519, 90], [514, 93], [511, 96], [504, 102], [499, 111]],
-      aFrenteDaBorda: 5,
+      concordancia: { ate: 1760, dentroDoTubo: 5, alca: [25, 45], pontos: 8 },
       alemDoTubo: 1,
       frente: [[478, 75], [486, 60], [490, 50], [503, 45]],
       canto: { px: 523, abaixoDoTopo: 8 },
@@ -157,8 +159,23 @@ export function derivar(T = TABELA) {
 
   /* o perfil de lado do teto, da dobra até a coluna de trás */
   const PF = TE.perfil;
-  const ultimoBaixo = PF.baixo[PF.baixo.length - 1];
-  const perfilTeto = [...PF.baixo.map(([z, y]) => [ZL(z), YL(y)]), [zFrente(YL(ultimoBaixo[1])) - PF.aFrenteDaBorda, YL(ultimoBaixo[1])],
+  /* a concordância do arco de dentro com a face de trás da coluna da frente: do fim do arco, na direção dele, à face de trás, na
+     direção da coluna; depois o contorno entra no eixo do tubo */
+  const CC = PF.concordancia;
+  const baixo = PF.baixo.map(([z, y]) => [ZL(z), YL(y)]);
+  const unit = ([a, b]) => { const l = Math.hypot(a, b); return [a / l, b / l]; };
+  const P0 = baixo[baixo.length - 1];
+  const d0 = unit([P0[0] - baixo[baixo.length - 2][0], P0[1] - baixo[baixo.length - 2][1]]);
+  const meiaFundo = C.secao.lado / 2 * Math.hypot(1, INCL);              // a meia espessura do tubo medida em z
+  const P3 = [zEixoFrente(CC.ate) - meiaFundo + CC.dentroDoTubo, CC.ate];
+  const subir = unit([INCL, 1]);                                         // a direção da coluna, para cima
+  const P1 = [P0[0] + d0[0] * CC.alca[0], P0[1] + d0[1] * CC.alca[0]];
+  const P2 = [P3[0] + subir[0] * CC.alca[1], P3[1] + subir[1] * CC.alca[1]];
+  const concordancia = Array.from({ length: CC.pontos }, (_, k) => {
+    const t = (k + 1) / CC.pontos; const u = 1 - t;
+    return [0, 1].map((e) => u ** 3 * P0[e] + 3 * u * u * t * P1[e] + 3 * u * t * t * P2[e] + t ** 3 * P3[e]);
+  });
+  const perfilTeto = [...baixo, ...concordancia, [zEixoFrente(CC.ate), CC.ate],
     ...PF.frente.map(([z, y]) => [ZL(z), YL(y)]), [ZL(PF.canto.px), TOPO - PF.canto.abaixoDoTopo], [ZL(PF.topo[0]), TOPO], [ZL(PF.topo[1]), TOPO]];
 
   /* a coluna de trás: a silhueta de lado e a seção de trás de cada lado */
@@ -226,7 +243,10 @@ export function montarProtetor(estado, T = TABELA) {
     return cortes[`peTras${lado}`];
   });
   const xTravessa = TE.x[0] + TE.travessas.alem;
-  const travessas = [extX(retangulo(D.zDobra - TE.travessas.frente[0], TOPO - TE.alturaDoPerfil, D.zDobra - TE.travessas.frente[1], TOPO), -xTravessa, xTravessa),
+  /* a travessa da frente cruzada com a silhueta do perfil, para acompanhar o canto redondo de cima dele: caixa até o topo, ela saía
+     acima do canto, o degrau na cota do teto junto à dobra */
+  const travessas = [cruzar(extX(retangulo(D.zDobra - TE.travessas.frente[0], TOPO - TE.alturaDoPerfil, D.zDobra - TE.travessas.frente[1], TOPO), -xTravessa, xTravessa),
+    extX(D.perfilTeto, -xTravessa, xTravessa)),
     extX(retangulo(TE.tras, TOPO - TE.alturaDoPerfil, TE.tras + TE.travessas.tras, TOPO), -xTravessa, xTravessa)];
   parte('quadro', unir(...quadros, ...travessas), T.cores.aco);
 
