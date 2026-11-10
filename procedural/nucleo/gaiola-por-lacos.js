@@ -124,7 +124,7 @@
  * OS GRUPOS. `grupos` lista conjuntos de pontos por faixa de laços e por trecho (ou a união de vários, em `unir`) e `passo.grupos`
  * leva os nomes ao passo `subdivisao`, que toma por do grupo a face da gaiola com todos os pontos nele e publica as faces refinadas
  * como `parte` da origem: `parte` recorta o disco e o cilindro pela gaiola, e não por caixa. */
-import { limitesDaGaiola, nitidezDoVinco } from './subdivisao.js';
+import { limitesDaGaiola, nitidezDoVinco, refinarGaiola } from './subdivisao.js';
 
 /* nitidezDoVinco('viva') */
 const NITIDEZ_INFINITA_DO_VINCO = nitidezDoVinco('viva');
@@ -142,6 +142,9 @@ export const PASSOS_DA_COMPENSACAO = 8;
    malha final, e a subdivisão mantém a razão da gaiola até uns 70%, de modo que o aviso fica com folga. */
 export const LIMITE_DE_FACE_FINA_NA_GAIOLA = 0.005;
 export const INCLINACAO_MINIMA_DA_COMPENSACAO = 0.5;
+/* A compensação avisa quando leva a superfície, entre os pontos de um laço, mais que isto (em mm) além do pedido, descontado o que ela já
+   passava sem compensar (A COMPENSAÇÃO). TOLERANCIA_PROVISORIA */
+export const TOLERANCIA_DA_COMPENSACAO_MM = 2;
 
 const EIXOS = { x: 0, y: 1, z: 2 };
 const citar = (x) => `'${x}'`;
@@ -191,6 +194,36 @@ function volumeComSinal(faces, P) {
     v += a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0]);
   }
   return v / 6;
+}
+
+/* a distância do ponto [u, v] ao contorno fechado, positiva fora dele e negativa dentro (pela paridade dos cruzamentos) */
+function distanciaParaFora(contorno, p) {
+  let d = Infinity; let dentro = false;
+  for (let k = 0; k < contorno.length; k++) {
+    const a = contorno[k]; const b = contorno[(k + 1) % contorno.length];
+    const dx = b[0] - a[0]; const dy = b[1] - a[1]; const q = dx * dx + dy * dy;
+    const t = q > 0 ? Math.min(1, Math.max(0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / q)) : 0;
+    d = Math.min(d, Math.hypot(p[0] - a[0] - dx * t, p[1] - a[1] - dy * t));
+    if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < a[0] + ((p[1] - a[1]) * dx) / dy) dentro = !dentro;
+  }
+  return dentro ? -d : d;
+}
+
+/* A linha de cada laço na gaiola refinada um nível: entre dois pontos seguidos da volta entra o ponto de aresta que o refino pôs entre eles (o
+   único vizinho dos dois), de modo que a linha tem os pontos da gaiola e os do meio de cada segmento. `cadeias` é, por laço, [{ i, trecho }];
+   devolve as cadeias refinadas no mesmo formato e `limites(vertices)`, os pontos limite da gaiola de mesma topologia com esses vértices,
+   refinada do mesmo modo (o refino mantém o índice dos pontos e numera os novos pela topologia). */
+function linhasDosLacosRefinadas(gaiola, cadeias) {
+  const refinada = refinarGaiola(gaiola);
+  const viz = refinada.vertices.map(() => []);
+  for (const f of refinada.faces) f.forEach((a, k) => { const b = f[(k + 1) % f.length]; viz[a].push(b); viz[b].push(a); });
+  const linhas = cadeias.map((c) => c.flatMap((x, k) => {
+    const y = c[(k + 1) % c.length];
+    const meio = viz[x.i].find((v) => viz[y.i].includes(v));
+    return meio === undefined ? [x] : [x, { i: meio, trecho: x.trecho }];
+  }));
+  const limites = (vertices) => limitesDaGaiola(vertices === gaiola.vertices ? refinada : refinarGaiola({ ...gaiola, vertices }));
+  return { linhas, limites };
 }
 
 function lerTrechos(trechos) {
@@ -963,6 +996,43 @@ export function gaiolaPorLacos(o = {}) {
     const deslocamentos = lista.map((i) => Math.hypot(...sub3(V[i], alvo[i]))).filter((x) => x > 0);
     nomes.forEach((k, i) => { pontosMm[k] = V[i]; });
     compensacao = { pontos: deslocamentos.length, maiorDeslocamentoMm: Number(Math.max(0, ...deslocamentos).toFixed(3)), residuoMm: Number(residuo.toFixed(3)) };
+    /* a conferência: a superfície limite ao longo de cada laço, nos pontos da gaiola e no meio de cada segmento, com e sem a compensação, contra
+       o contorno declarado; o que a compensação leva além do pedido é o quanto o ponto com ela passa do contorno, menos o que ele já passava sem */
+    const trechoDe = (q) => { let i = trechos.length - 1; while (inicio[i] > q) i--; return trechos[i].nome; };
+    const cadeias = rs.map((r) => {
+      const c = [];
+      for (let q = 0; q < N; q++) { const i = indice.get(nm(r, q)); if (c[c.length - 1]?.i !== i) c.push({ i, trecho: trechoDe(q) }); }
+      if (c.length > 1 && c[0].i === c[c.length - 1].i) c.pop();
+      return c;
+    });
+    const gaiola = (vertices) => ({ vertices, faces: fIdx, vincos: vincosIdx, cantos: cantosIdx });
+    const { linhas, limites } = linhasDosLacosRefinadas(gaiola(V), cadeias);
+    const noPlano = (p) => [p[outros[0]], p[outros[1]]];
+    const contornos = rs.map((r) => (lamina[r] ? [] : lacos[r].polilinhas.flatMap((p) => p.slice(0, -1))));
+    const Lcom = limites(V);
+    /* só os pontos que passam da tolerância com a compensação pedem a gaiola sem ela, que custa outro refino */
+    const candidatos = rs.flatMap((r) => (contornos[r].length < 3 ? [] : linhas[r].map((x) => ({ r, ...x, dCom: distanciaParaFora(contornos[r], noPlano(Lcom[x.i])) }))))
+      .filter((x) => x.dCom > TOLERANCIA_DA_COMPENSACAO_MM);
+    const Lsem = candidatos.length ? limites(alvo) : null;
+    const porTrecho = new Map();
+    for (const { r, i, trecho, dCom } of candidatos) {
+      const dSem = Math.max(0, distanciaParaFora(contornos[r], noPlano(Lsem[i])));
+      const acima = dCom - dSem;
+      if (!(acima > TOLERANCIA_DA_COMPENSACAO_MM)) continue;
+      const t = porTrecho.get(trecho) ?? { acima: -Infinity, lacos: new Set() };
+      t.lacos.add(r);
+      if (acima > t.acima) Object.assign(t, { acima, dCom, dSem, r });
+      porTrecho.set(trecho, t);
+    }
+    for (const { nome } of trechos) {
+      const t = porTrecho.get(nome);
+      if (!t) continue;
+      const l = lacos[t.r];
+      avisos.push({
+        ref: 'compensacaoPassa', trecho: nome, laco: l.nome, desvioMm: Number(t.dCom.toFixed(2)), semCompensarMm: Number(t.dSem.toFixed(2)), lacos: t.lacos.size,
+        texto: `com compensar, a superfície passa ${br(t.dCom, 1)} mm do pedido entre os pontos do trecho ${citar(nome)} no laço ${citar(l.nome)} (${o.eixo} = ${br(l.em)} mm), contra ${br(t.dSem, 1)} mm sem compensar, e passa de ${br(TOLERANCIA_DA_COMPENSACAO_MM)} mm além disso em ${t.lacos.size} ${t.lacos.size === 1 ? 'laço' : 'laços'}; a compensação faz a superfície passar pelos pontos, e perto de um ponto em que o laço dobra de repente (um canto sem vinco, a quina de uma planta em polígono) a curva lisa entre eles sai do contorno; marque o canto em cantos, dê mais pontos ao trecho (com metade do passo, o desvio cai à metade), compense só os trechos de arco que não acabam num canto (compensar: { trechos }), ou tire compensar`,
+      });
+    }
   }
 
   const pontos = {};
