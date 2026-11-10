@@ -345,6 +345,20 @@ const ultimaRodada = (pasta) => {
   return { dir, numero: nomes.length, ultima: nomes.length ? JSON.parse(readFileSync(join(dir, nomes[nomes.length - 1]), 'utf8')) : null };
 };
 
+/**
+ * Grava a leitura montada por `montarLeitura` na pasta: `indice.png`, `folha-NN.png`, `pedido.md` (com as aceitas da última rodada
+ * da pasta) e `leitura.json`. `referencia` e `captura` são os caminhos como vão no JSON. Devolve o caminho do pedido.
+ */
+export function gravarLeitura(pasta, r, { referencia, captura, caixaRef, grade, objeto = null, fora = null }) {
+  mkdirSync(pasta, { recursive: true });
+  writeFileSync(join(pasta, 'indice.png'), paraPng(r.indice));
+  r.folhas.forEach((f, i) => writeFileSync(join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`), paraPng(f)));
+  const { ultima } = ultimaRodada(pasta);
+  writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto, aceitas: ultima?.aceitas ?? {}, linhas: r.comLinhas, fora }));
+  writeFileSync(join(pasta, 'leitura.json'), `${JSON.stringify({ formato: 'modelar.leitura-por-regioes@1', referencia, captura, caixaRef, painel: r.painel, caixaDaCaptura: r.caixaDaCaptura, grade, proporcao: { referencia: Number(r.proporcao.referencia.toFixed(4)), rascunho: Number(r.proporcao.rascunho.toFixed(4)) }, regioes: r.regioes }, null, 1)}\n`);
+  return join(pasta, 'pedido.md');
+}
+
 export function executar(argv) {
   const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };
   if (argv.includes('--ajuda') || argv.includes('--help') || argv.length === 0) return { codigo: 0, stdout: `${AJUDA}\n`, stderr: '' };
@@ -375,12 +389,7 @@ export function executar(argv) {
       fundo: cor ? [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16)) : undefined, grade, margem: valor('margem') ? Number(valor('margem')) : undefined,
       linhas: valor('linhas') ? dePng(readFileSync(resolve(valor('linhas')))) : undefined,
     });
-    mkdirSync(pasta, { recursive: true });
-    writeFileSync(join(pasta, 'indice.png'), paraPng(r.indice));
-    r.folhas.forEach((f, i) => writeFileSync(join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`), paraPng(f)));
-    const { ultima } = ultimaRodada(pasta);
-    writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto: valor('objeto'), aceitas: ultima?.aceitas ?? {}, linhas: r.comLinhas, fora: valor('fora') }));
-    writeFileSync(join(pasta, 'leitura.json'), `${JSON.stringify({ formato: 'modelar.leitura-por-regioes@1', referencia: valor('referencia'), captura: valor('captura'), caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), painel: r.painel, caixaDaCaptura: r.caixaDaCaptura, grade, proporcao: { referencia: Number(r.proporcao.referencia.toFixed(4)), rascunho: Number(r.proporcao.rascunho.toFixed(4)) }, regioes: r.regioes }, null, 1)}\n`);
+    gravarLeitura(pasta, r, { referencia: valor('referencia'), captura: valor('captura'), caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), grade, objeto: valor('objeto'), fora: valor('fora') });
     const desvio = (r.proporcao.rascunho / r.proporcao.referencia - 1) * 100;
     return { codigo: 0, stdout: `${r.regioes.length} regiões em ${r.folhas.length} folhas, em ${pasta}\naltura sobre largura: referência ${r.proporcao.referencia.toFixed(3)}, rascunho ${r.proporcao.rascunho.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)\npedido ao crítico: ${join(pasta, 'pedido.md')}\n`, stderr: '' };
   } catch (erro) {
