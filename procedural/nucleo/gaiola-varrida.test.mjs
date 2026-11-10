@@ -4,6 +4,7 @@
  * A prova é numérica: posição de cada ponto contra a conta feita à mão, raio a cada ponto do arco, altura das pontas, o máximo e o limite
  * da borda rolada contra a fórmula escrita no teste, normais para fora e mesma saída byte a byte. As peças são as de
  * `fixtures/varredura-prova.js`. */
+import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { ErroGaiolaVarrida, gaiolaVarrida } from './gaiola-varrida.js';
 import { nucleo } from './entrada.js';
@@ -19,6 +20,18 @@ const normal = (g, f) => {
   const c = ps.reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4, a[2] + p[2] / 4], [0, 0, 0]);
   return { n, c };
 };
+/* a soma das arestas: quantas faces cada aresta tem, e o volume assinado (mm³ na gaiola, m³ no neutro) */
+const usoDasArestas = (faces) => {
+  const m = new Map();
+  for (const f of faces) f.forEach((a, k) => { const b = f[(k + 1) % f.length]; const c = a < b ? `${a}|${b}` : `${b}|${a}`; m.set(c, (m.get(c) ?? 0) + 1); });
+  return [...new Set(m.values())].sort();
+};
+const volumeAssinado = (faces, ponto) => faces.reduce((v, f) => {
+  const a = ponto(f[0]);
+  for (let k = 1; k + 1 < f.length; k++) { const b = ponto(f[k]); const c = ponto(f[k + 1]); v += (a[0] * (b[1] * c[2] - b[2] * c[1]) + a[1] * (b[2] * c[0] - b[0] * c[2]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6; }
+  return v;
+}, 0);
+const assinatura = (g) => createHash('sha256').update(JSON.stringify({ ...g, posicoes: [...g.posicoes] })).digest('hex');
 const entrega = (g, extra = {}) => nucleo([['subdivisao', { vertices: g.vertices, faces: g.faces, vincos: g.vincos, cantos: g.cantos, niveis: 1, ...extra }]], {}, g.pontos);
 
 describe('a régua varrida em reta', () => {
@@ -230,6 +243,104 @@ describe('os recortes, os vincos e a escala', () => {
   });
 });
 
+describe('sem fechada e sem tampas a saída é a de antes delas', () => {
+  /* as assinaturas foram tiradas da gaiolaVarrida antes de fechada e tampas existirem: o furgão usa a saída aberta */
+  it('a régua com vinco, o friso cortado e a saia com topo aberto dão as mesmas assinaturas, byte a byte', () => {
+    expect(assinatura(gaiolaVarrida(regua({ vincos: [{ linha: 'meio', nitidez: 'viva' }] })))).toBe('002c1a545f19aaa2a8f04b380cff883164119574ef05eba44c087be8418567fc');
+    expect(assinatura(gaiolaVarrida(friso()))).toBe('852df2088f6c511c2109b9f2f6296d70c34294a87d8d6dca78618213c1a009fd');
+    expect(assinatura(gaiolaVarrida(saia({}, { topoAberto: true })))).toBe('0854b5c16b7cb5fb05d4afc7cfb2527333bfc818072c8ac9017e58d55c99d445');
+    expect(JSON.stringify(gaiolaVarrida(regua({ fechada: false, tampas: false })))).toBe(JSON.stringify(gaiolaVarrida(regua())));
+  });
+});
+
+describe('o tubo de seção fechada com tampas', () => {
+  /* um tubo de seção quadrada de 70 mm varrido por um L com dobra de raio 60 mm: sobe 500 mm, dobra 90 graus e corre 400 mm em -z */
+  const L = [{ reta: { de: [0, 0, 0], ate: [0, 500, 0] } }, { arco: { centro: [0, 500, -60], eixo: [1, 0, 0], de: [0, 500, 0], graus: -90 } }, { reta: { de: [0, 560, -60], ate: [0, 560, -460] } }];
+  const tubo = (extra = {}) => ({
+    nome: 'tubo', trilho: L, quadro: { u: [1, 0, 0] },
+    secao: [{ u: -35, v: -35, nome: 'a' }, { u: 35, v: -35, nome: 'b' }, { u: 35, v: 35, nome: 'c' }, { u: -35, v: 35, nome: 'd' }],
+    fechada: true, tampas: true, estacoes: [{ fracao: 0 }, { passo: 25 }, { fracao: 1 }], ...extra,
+  });
+  const g = gaiolaVarrida(tubo());
+
+  it('fecha: toda aresta fica em duas faces, o volume assinado é positivo e dá a seção vezes o comprimento do eixo', () => {
+    expect(g.comprimento).toBeCloseTo(500 + (Math.PI / 2) * 60 + 400, 9);
+    expect(usoDasArestas(g.faces)).toEqual([2]);
+    const v = volumeAssinado(g.faces, (n) => g.posicoes.get(n));
+    expect(v).toBeGreaterThan(0);
+    /* na dobra o quadrado gira em volta do eixo, e o volume de um tubo dobrado é a área vezes o comprimento do eixo (Pappus); a dobra
+       em cordas tira um pouco, menos de 0,5 % */
+    expect(Math.abs(v / (70 * 70 * g.comprimento) - 1)).toBeLessThan(0.005);
+    expect(g.faces).toHaveLength(4 * (g.estacoes.length - 1) + 2);
+  });
+
+  it('a seção tem 70 mm em toda estação, nas duas direções', () => {
+    g.estacoes.forEach((_, i) => {
+      const p = (j) => g.posicoes.get(g.nomeDe(i, j));
+      const d = (a, b) => Math.hypot(...p(a).map((x, k) => x - p(b)[k]));
+      expect(d(0, 1)).toBeCloseTo(70, 9);
+      expect(d(1, 2)).toBeCloseTo(70, 9);
+      expect(d(0, 2)).toBeCloseTo(70 * Math.SQRT2, 9);
+    });
+  });
+
+  it('a seção dada no sentido contrário sai com as normais para fora do mesmo jeito', () => {
+    const contra = gaiolaVarrida(tubo({ secao: [...tubo().secao].reverse() }));
+    expect(usoDasArestas(contra.faces)).toEqual([2]);
+    expect(volumeAssinado(contra.faces, (n) => contra.posicoes.get(n))).toBeCloseTo(volumeAssinado(g.faces, (n) => g.posicoes.get(n)), 6);
+  });
+
+  it('sem tampas é o tubo aberto nas pontas, com as mesmas faces do lado, e com vincos nas quinas o passo subdivisao fecha', () => {
+    const aberto = gaiolaVarrida(tubo({ tampas: false }));
+    expect(aberto.faces).toEqual(g.faces.slice(0, aberto.faces.length));
+    expect(aberto.faces).toHaveLength(g.faces.length - 2);
+    const vivo = gaiolaVarrida(tubo({ vincos: ['a', 'b', 'c', 'd'].map((linha) => ({ linha, nitidez: 'viva' })) }));
+    expect(vivo.vincos.map((v) => v.pontos.length)).toEqual([0, 1, 2, 3].map(() => vivo.estacoes.length));
+    const neutro = entrega(vivo, { niveis: 2 });
+    const faces = [...neutro.F.values()].map((f) => f.vs);
+    expect(usoDasArestas(faces)).toEqual([2]);
+    expect(volumeAssinado(faces, (k) => neutro.V.get(k))).toBeGreaterThan(0);
+  });
+
+  it('mesma definição, mesma saída, byte a byte', () => {
+    expect(assinatura(gaiolaVarrida(tubo()))).toBe(assinatura(g));
+  });
+});
+
+describe('o perfil em U, de seção aberta, com espessura no passo e arco no trilho', () => {
+  /* um U de 60 por 40 mm, boca para baixo, varrido por uma reta de 300 mm e um quarto de volta de raio 200 mm */
+  const u = gaiolaVarrida({
+    nome: 'perfilU',
+    trilho: [{ reta: { de: [0, 0, 0], ate: [0, 0, 300] } }, { arco: { centro: [200, 0, 300], eixo: [0, 1, 0], de: [0, 0, 300], graus: 90 } }],
+    quadro: { v: [0, 1, 0] },
+    secao: [{ u: -30, v: 0, nome: 'abaEsq' }, { u: -30, v: 40, nome: 'quinaEsq' }, { u: 30, v: 40, nome: 'quinaDir' }, { u: 30, v: 0, nome: 'abaDir' }],
+    estacoes: [{ fracao: 0 }, { passo: 20 }, { fracao: 1 }],
+    fora: [0, 1, 0],
+    vincos: [{ linha: 'quinaEsq', nitidez: 'viva' }, { linha: 'quinaDir', nitidez: 'viva' }],
+  });
+
+  it('a gaiola é a faixa aberta de três células, com as abas no raio pedido em toda a curva', () => {
+    expect(u.comprimento).toBeCloseTo(300 + (Math.PI / 2) * 200, 9);
+    expect(u.estacoes).toHaveLength(Math.ceil(u.comprimento / 20 - 1e-9) + 1);
+    expect(u.faces).toHaveLength(3 * (u.estacoes.length - 1));
+    expect(usoDasArestas(u.faces)).toEqual([1, 2]);
+    const ultimo = u.estacoes.length - 1;
+    /* no fim do arco a tangente é +x, e as abas ficam a 30 mm do centro do trilho em z */
+    expect(perto(u.posicoes.get(u.nomeDe(ultimo, 0)), [200, 0, 470], 1e-6) || perto(u.posicoes.get(u.nomeDe(ultimo, 0)), [200, 0, 530], 1e-6)).toBe(true);
+    u.estacoes.forEach((e, i) => {
+      if (e.s[0] <= 300) return;
+      [0, 3].forEach((j) => { const p = u.posicoes.get(u.nomeDe(i, j)); expect(Math.hypot(p[0] - 200, p[2] - 300)).toBeCloseTo(j === 0 ? 230 : 170, 6); });
+    });
+  });
+
+  it('com espessura no passo subdivisao vira sólido fechado, com toda aresta em duas faces', () => {
+    const neutro = entrega(u, { espessura: 0.003 });
+    const faces = [...neutro.F.values()].map((f) => f.vs);
+    expect(usoDasArestas(faces)).toEqual([2]);
+    expect(faces.length).toBeGreaterThan(u.faces.length * 4 * 2);
+  });
+});
+
 describe('o dado ruim grita com o campo', () => {
   const diz = (def, trecho) => {
     const e = grito(() => gaiolaVarrida(def));
@@ -291,5 +402,18 @@ describe('o dado ruim grita com o campo', () => {
     diz(regua({ vincos: [{ linha: 'topo', nitidez: 1 }] }), /vincos\[0\]\.linha precisa ser o nome de uma linha da seção/);
     diz(regua({ vincos: [{ linha: 'baixo', nitidez: 2 }] }), /vincos\[0\]\.nitidez precisa ser de 0 a 1, ou 'viva'/);
     diz(regua({ fora: { centro: [0, 0, 0], semEixo: 'q' } }), /fora\.semEixo precisa ser/);
+  });
+
+  it('fechada e tampas', () => {
+    const { fora, ...semFora } = regua();
+    const quadrado = [[0, 0], [10, 0], [10, 10], [0, 10]];
+    diz(regua({ tampas: true }), /tampas pede fechada: true/);
+    diz({ ...semFora, secao: quadrado, tampas: true, fechada: false }, /tampas pede fechada: true/);
+    diz({ ...semFora, secao: [[0, 0], [10, 0]], fechada: true }, /a seção fechada precisa de pelo menos três linhas, e veio com 2/);
+    diz({ ...semFora, secao: [[0, 0], [10, 0], [10, 10], [0, 0]], fechada: true }, /secao\[3\] repete o ponto de secao\[0\]/);
+    diz({ ...semFora, secao: [[0, 0], [10, 0], [20, 0]], fechada: true, tampas: true }, /a seção fechada não encerra volume/);
+    diz(regua({ secao: quadrado, fechada: true }), /fora não vale com fechada/);
+    diz(regua({ fechada: 'sim' }), /fechada precisa ser true ou false, e veio "sim"/);
+    diz(semFora, /fora é obrigatório/);
   });
 });

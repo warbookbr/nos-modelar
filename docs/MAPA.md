@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1800 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1804 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -973,6 +973,8 @@
 
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
+- `arcos-do-contorno.js` — arcos-do-contorno.js — o anel de pontos 2D simplificado, com os trechos curvos declarados trocados pelo círculo ajustado
+- `arcos-do-contorno.test.mjs` — arcos-do-contorno.test.mjs — o anel simplificado com os arcos declarados no círculo ajustado: o raio sai do ruído, o anel sem arco volta igual, os trechos dã…
 - `arrumacao.test.mjs` — arrumacao.test.mjs — segura a arrumação do plano "o núcleo mora num lugar só" (2026-09-22). Antes dele, os testes do núcleo moravam espalhados por `tools/` e…
 - `artefatos.js` — artefatos.js — contrato neutro e procedência determinística da execução procedural.
 - `artefatos.test.mjs` — artefatos-procedencia.test.mjs — prova o artefato neutro e a origem das entidades finais.
@@ -2764,6 +2766,8 @@
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
 - `silhueta-da-superficie.mjs` — silhueta-da-superficie.mjs — extensão de uma malha de triângulos em fatias ao longo de um eixo, medida na SUPERFÍCIE e não nos vértices.
 - `silhueta-da-superficie.test.mjs` — Teto grande: uma placa y = 1 de z = 0 a z = 10 em dois triângulos, só com vértices nas pontas.
+- `silhueta-pedida.mjs` — silhueta-pedida.mjs — quanto a malha de uma parte se afasta do corpo pedido a `lacosPelasVistas`, faixa por faixa de altura.
+- `silhueta-pedida.test.mjs` — silhueta-pedida.test.mjs — a malha de um corpo de `lacosPelasVistas` contra o que foi pedido, faixa por faixa de altura: a gaiola sem subdivisão dá desvio ze…
 - `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
 - `sobra-entre-partes.mjs` — sobra-entre-partes.mjs — quanto de uma parte aparece fora do contorno da parte que a contém, vista por vista.
 - `sobra-entre-partes.test.mjs` — sobra-entre-partes.test.mjs — a placa reta que passa do corpo em arco nos cantos sobra na vista de cima, com a distância conhecida; a placa encurtada para de…
