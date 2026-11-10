@@ -149,10 +149,13 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   referência tem e o que o modelo tem), com a rodada que afirma da referência
   o oposto da anterior acusada como contradição, que quem conduz decide (item
   11). A comparação é por palavras e não conhece sinônimo.
-- **T9, depois da junção com a main.** No módulo do esboço, que é território do
-  plano de ferramentas de conferência e de vista: a opção só de passos crus
-  montada uma vez em vez de duas, e o contato declarado nos passos crus, para o
-  relato de contatos voltar a servir.
+- **T9, entregue.** No módulo do esboço, que é território do plano de
+  ferramentas de conferência e de vista: a opção só de passos crus montada uma
+  vez em vez de duas, e o contato declarado nos passos crus (`contatos` da
+  opção, com a relação e o motivo). A medição mostrou que o tempo da montagem
+  não estava ali: 48 dos 54 s são o relato de contatos.
+- **T10.** `montarOpcoes` sem o relato de contatos para as ferramentas de
+  conferência, que não o usam.
 - **Levantadas e não começadas** (agente de planejamento, 2026-11-10): a parte
   fina que acompanha a planta em `lacosPelasVistas`, o degrau ou sulco por
   contorno sobre a superfície (plano próprio, encosta no de costuras), a causa

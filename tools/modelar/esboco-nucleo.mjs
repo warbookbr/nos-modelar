@@ -75,6 +75,8 @@ uma gaiola, e a posição sai da malha das outras, sem conta:
   repete: { total, d } | { total, eixo, graus|volta, pivo }    o arranja do núcleo
   espelha: "x" | { eixo, pos | em: "corpo" }                     o espelha do núcleo
   contato: { "corpo": "atravessa" }  a relação esperada ("encosta", "atravessa", "folga"); o encosta declara a dele
+Na opção, "contatos": [{ "par": ["capo", "tampa"], "relacao": "atravessa", "motivo": "..." }] declara o de qualquer par de
+partes, as dos passos crus inclusive, e o motivo sai no relato.
 A âncora é "centro" ou lados de eixos distintos ("+y", "+y-z", "-x+y+z") da caixa da forma. Exemplo, a cabeça de uma guitarra
 girando 12 graus para trás na junta com o braço, sobre um corpo de contorno por spline (no eixo z o perfil [u, v] vai a (x, -y),
 e o giro de 180 graus em x o põe como desenhado):
@@ -117,7 +119,7 @@ export function montarOpcoes(esboco, { nome = 'esboco', perto = PERTO_MM } = {})
   lido.opcoes.forEach((o, i) => {
     try {
       const r = receitaDaOpcao(o, { nome: `${nome}-${i + 1}` });
-      const contatos = relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto });
+      const contatos = relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto, contatos: r.contatos });
       paineis.push({ titulo: o.titulo ?? `opção ${i + 1}`, nota: o.nota ?? '', receita: r.receita, neutro: r.neutro, partes: r.partes, facesSemParte: r.facesSemParte, formas: r.formas, contatos });
     } catch (e) {
       if (!(e instanceof RecusaDoEsboco)) throw e;

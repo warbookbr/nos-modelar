@@ -59,11 +59,12 @@ export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolera
   const faltam = [];
   for (const [k, e] of esperado) {
     const [a, b] = k.split('|');
-    const motivo = e.motivo ?? null;
-    if (!nomes.has(a) || !nomes.has(b)) { faltam.push({ a, b, esperado: e.rel, dado: 'a forma não está na opção', motivo }); continue; }
+    /* o motivo só entra quando a opção o declarou, e o objeto do `contato` da forma fica como era */
+    const motivo = e.motivo ? { motivo: e.motivo } : {};
+    if (!nomes.has(a) || !nomes.has(b)) { faltam.push({ a, b, esperado: e.rel, dado: 'a forma não está na opção', ...motivo }); continue; }
     const p = pares.find((q) => chave(q.a, q.b) === k);
-    if (e.rel === 'conflito') faltam.push({ a, b, esperado: 'conflito', dado: `${e.de[0].por} declara ${e.de[0].rel} e ${e.de[1].por}, ${e.de[1].rel}`, motivo });
-    else if (p && p.tipo !== e.rel) faltam.push({ a, b, esperado: e.rel, dado: p.tipo === 'folga' && p.mm !== null ? `folga de ${fmt(p.mm)} mm pelo eixo ${p.eixo}` : p.tipo, motivo });
+    if (e.rel === 'conflito') faltam.push({ a, b, esperado: 'conflito', dado: `${e.de[0].por} declara ${e.de[0].rel} e ${e.de[1].por}, ${e.de[1].rel}`, ...motivo });
+    else if (p && p.tipo !== e.rel) faltam.push({ a, b, esperado: e.rel, dado: p.tipo, ...motivo });
   }
   return { tolerancia, perto, pares, encostam, atravessam, folgas, longe, naoDeclaradas, faltam };
 }
@@ -82,6 +83,11 @@ export function textoDoRelato(r, { recuo = '    ' } = {}) {
   for (const p of r.folgas) linhas.push(`folga      ${p.a} e ${p.b}: ${p.mm === null ? 'as caixas se sobrepõem e os sólidos não se tocam' : `${fmt(p.mm)} mm pelo eixo ${p.eixo}`}${marca(p)}`);
   if (!r.atravessam.length) linhas.push('nenhuma travessia');
   if (r.longe) linhas.push(`${r.longe} par(es) a mais de ${r.perto} mm um do outro`);
-  for (const f of r.faltam) linhas.push(`ESPERADO E NÃO DADO: ${f.a} e ${f.b}, esperado ${f.esperado}, dado ${f.dado}${f.motivo ? ` (declarado: ${f.motivo})` : ''}`);
+  for (const f of r.faltam) {
+    /* a folga dada vem com a distância, que o par longe demais para a lista de folgas não mostra em outro lugar */
+    const p = r.pares.find((q) => (q.a === f.a && q.b === f.b) || (q.a === f.b && q.b === f.a));
+    const dado = f.dado === 'folga' && p?.mm !== null && p?.mm !== undefined ? `folga de ${fmt(p.mm)} mm pelo eixo ${p.eixo}` : f.dado;
+    linhas.push(`ESPERADO E NÃO DADO: ${f.a} e ${f.b}, esperado ${f.esperado}, dado ${dado}${f.motivo ? ` (declarado: ${f.motivo})` : ''}`);
+  }
   return linhas.map((l) => `${recuo}${l}`).join('\n');
 }
