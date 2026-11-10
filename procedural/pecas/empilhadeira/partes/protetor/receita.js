@@ -58,13 +58,14 @@ export const TABELA = {
      baixo da travessa da frente ficava com vértices em fila dos dois lados, de triângulo sem área. O perfil de lado, da dobra
      até a coluna de trás, pelo contorno da lateral em px: a borda de baixo com a quina de dentro da frente em arco, e o topo com o
      canto de fora redondo, de px 523 a 8 mm do topo a 537 no topo. O arco de dentro, que na lateral acaba no px 499 (y 1.826) 98 mm
-     atrás da coluna, desce numa curva (Bézier cúbica, `concordancia`) até a face de trás da coluna da frente em y 1.760, chegando na
-     direção dela e 5 mm dentro do tubo: no rascunho ele voltava à coluna por um corte reto em y 1.826, o toco sob a dobra. */
+     atrás da coluna, troca os dois últimos pontos por uma curva (Bézier cúbica, `concordancia`) que sai na direção do arco e chega à
+     face de trás da coluna da frente em y 1.790, na direção dela e 5 mm dentro do tubo, sempre acima do espelho (y 1.800 atrás de z
+     -385): no rascunho ele voltava à coluna por um corte reto em y 1.826, o toco sob a dobra. */
   teto: {
     topo: 2135, alturaDoPerfil: 70, eixoAbaixoDoTopo: 45, tras: -1425, x: [425, 480],
     perfil: {
       baixo: [[678, 80], [578, 81], [533, 84], [525, 87], [519, 90], [514, 93], [511, 96], [504, 102], [499, 111]],
-      concordancia: { ate: 1760, dentroDoTubo: 5, alca: [25, 45], pontos: 8 },
+      concordancia: { trocaOsUltimos: 2, ate: 1790, dentroDoTubo: 5, alca: [40, 40], pontos: 10 },
       alemDoTubo: 1,
       frente: [[478, 75], [486, 60], [490, 50], [503, 45]],
       canto: { px: 523, abaixoDoTopo: 8 },
@@ -162,7 +163,7 @@ export function derivar(T = TABELA) {
   /* a concordância do arco de dentro com a face de trás da coluna da frente: do fim do arco, na direção dele, à face de trás, na
      direção da coluna; depois o contorno entra no eixo do tubo */
   const CC = PF.concordancia;
-  const baixo = PF.baixo.map(([z, y]) => [ZL(z), YL(y)]);
+  const baixo = PF.baixo.slice(0, PF.baixo.length - CC.trocaOsUltimos).map(([z, y]) => [ZL(z), YL(y)]);
   const unit = ([a, b]) => { const l = Math.hypot(a, b); return [a / l, b / l]; };
   const P0 = baixo[baixo.length - 1];
   const d0 = unit([P0[0] - baixo[baixo.length - 2][0], P0[1] - baixo[baixo.length - 2][1]]);
