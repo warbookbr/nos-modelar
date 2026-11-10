@@ -1,5 +1,5 @@
 /* planos.test.mjs — prova que o gate recusa plano grande, estados inválidos,
-   índice divergente, plano parado que o índice não liga, mais de cinco planos ativos, ativo sem território e territórios sobrepostos. */
+   índice divergente, plano parado que o índice não liga, mais de seis planos ativos, ativo sem território e territórios sobrepostos. */
 import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -40,21 +40,21 @@ describe('gate dos planos curtos', () => {
     expect(conferirPlanos({ pasta }).problemas).toEqual([]);
   });
 
-  it('aceita cinco planos ativos de territórios separados, e o território que espera aprovação', () => {
-    const nomes = ['a', 'b', 'c', 'd', 'e'].map((x) => `2026-08-02-${x}.md`);
-    const pasta = ambiente(lista(...nomes));
-    nomes.slice(0, 4).forEach((n) => gravar(pasta, n, 'ativo'));
-    gravar(pasta, nomes[4], 'ativo', 4, 'nenhum (aguarda aprovação)');
-    const r = conferirPlanos({ pasta });
-    expect(r.problemas).toEqual([]);
-    expect(r.ativos).toHaveLength(5);
-  });
-
-  it('recusa seis planos ativos', () => {
+  it('aceita seis planos ativos de territórios separados, e o território que espera aprovação', () => {
     const nomes = ['a', 'b', 'c', 'd', 'e', 'f'].map((x) => `2026-08-02-${x}.md`);
     const pasta = ambiente(lista(...nomes));
+    nomes.slice(0, 5).forEach((n) => gravar(pasta, n, 'ativo'));
+    gravar(pasta, nomes[5], 'ativo', 5, 'nenhum (aguarda aprovação)');
+    const r = conferirPlanos({ pasta });
+    expect(r.problemas).toEqual([]);
+    expect(r.ativos).toHaveLength(6);
+  });
+
+  it('recusa sete planos ativos', () => {
+    const nomes = ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((x) => `2026-08-02-${x}.md`);
+    const pasta = ambiente(lista(...nomes));
     nomes.forEach((n) => gravar(pasta, n, 'ativo'));
-    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/6 planos ativos; o máximo é 5/);
+    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/7 planos ativos; o máximo é 6/);
   });
 
   it('recusa plano ativo sem a linha de território', () => {

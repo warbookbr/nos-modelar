@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`
+**Território:** `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`
 
 **Responsável:** a IA da sessão do furgão, com as decisões técnicas delegadas pela pessoa em 2026-11-09 ("é basicamente uma
 frente autônoma sua"); a pessoa é a crítica por imagem: recebe, com um resumo curto do que olhar, as peças do acervo que mudarem, e a forma de
@@ -12,6 +12,16 @@ peça continua sendo dela.
 
 Em 2026-11-09 a pessoa passou a este plano `booleanas.js`, `geradores-avancados.js` e `guarda-acervo.mjs`, que eram do plano
 do [braço](2026-09-26-as-partes-do-braco.md); eles voltam a ele quando este fechar, se o braço ainda precisar.
+
+A fatia 1 (2026-11-09) pôs as três réguas em `tools/modelar/reguas-de-malha/` e uma peça de prova por defeito em
+`tools/fixtures/costuras-e-furos/`. Números de hoje: dentes no fim que afina, 24 pontas em 18 trechos (a peça limpa da união de
+tubos tem 4 e 4, o bico legítimo onde o arredondamento some, e é a referência, e não zero); face degenerada, 1 no cotovelo de
+195 mm; frente rente à tampa, 4 arestas soltas; muitos lados, 1 órfão do `arredondarCostura` com 216 a 232 lados (192 fecha
+hoje, e a peça usa 224); `subtrair` sem corte, nenhum aviso; `furo` na tampa do `lathe`, recusado por 144 faces de entrada;
+`furo` em face plana, 341 triângulos finos. Os dois braços numa carcaça curva não reproduziram nem na forma reduzida nem no
+esboço inteiro, e saem do plano. No acervo, 0 faces degeneradas em 66 peças, pontas de serra só nas 5 peças do braço com
+costura, e 17.098 triângulos finos, a maior parte de leques em tampas e contornos; o plano corrige os do `furo`, e os outros
+ficam medidos como aviso.
 
 ## Problema observado
 
@@ -70,7 +80,7 @@ inverte a medida. Toda correção é geral, na operação, e a peça que já usa
 ## Fatias
 
 1. As três réguas e as peças de prova de todos os defeitos, com os números de antes.
-2. O fim do arredondamento que afina, e os dois braços numa carcaça curva.
+2. O fim do arredondamento que afina.
 3. O `unir`: face degenerada, tangência à tampa e muitos lados; o aviso do `subtrair`; a recusa no `guarda:acervo`.
 4. O `furo`: a tampa do `lathe` e a face refeita em anéis.
 5. Fechamento: auditoria do braço, peças do acervo que mudaram, imagem à pessoa, aviso à sessão do braço.

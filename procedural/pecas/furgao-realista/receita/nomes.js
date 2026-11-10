@@ -11,14 +11,16 @@ export const PARTES_DA_RODA = ['pneu', 'aro', 'cubo', 'disco'];
 export const SUFIXOS_DAS_RODAS = ['DianteiroEsquerdo', 'DianteiroDireito', 'TraseiroEsquerdo', 'TraseiroDireito'];
 export const RODAS = SUFIXOS_DAS_RODAS.map((sufixo) => PARTES_DA_RODA.map((parte) => `${parte}${sufixo}`));
 export const FORROS = SUFIXOS_DAS_RODAS.map((sufixo) => `forroArco${sufixo}`);
-export const ABAS_DOS_VAOS = ['abaVaoParaBrisa', 'abaVaoPortaCabineEsquerda', 'abaVaoPortaCabineDireita', 'abaVaoPortaTraseiraEsquerda', 'abaVaoPortaTraseiraDireita'];
+export const ABAS_DOS_VAOS = ['abaVaoParaBrisa', 'abaVaoPortaCabineEsquerda', 'abaVaoPortaCabineDireita', 'abaVaoPortaTraseiraEsquerda', 'abaVaoPortaTraseiraDireita', 'abaVaoTrianguloCabineEsquerda', 'abaVaoTrianguloCabineDireita'];
 export const ABAS_DOS_ARCOS = ['abaArcoDianteiroEsquerdo', 'abaArcoDianteiroDireito', 'abaArcoTraseiroEsquerdo', 'abaArcoTraseiroDireito'];
 export const SAIAS = ['saiaPresaEsquerda', 'saiaPresaDireita', 'saiaPortaCabineEsquerda', 'saiaPortaCabineDireita', 'saiaPortaCorrer'];
 export const MOLDURAS = ['molduraArcoDianteiroEsquerdo', 'molduraArcoDianteiroDireito', 'molduraArcoTraseiroEsquerdo', 'molduraArcoTraseiroDireito'];
 export const PARACHOQUES = ['parachoqueDianteiro', 'parachoqueTraseiro'];
 export const PLASTICOS = [...SAIAS, ...MOLDURAS, ...PARACHOQUES];
-export const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroPortaTraseiraEsquerda', 'vidroPortaTraseiraDireita'];
-export const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita'];
+export const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroPortaTraseiraEsquerda', 'vidroPortaTraseiraDireita', 'vidroTrianguloCabineEsquerda', 'vidroTrianguloCabineDireita'];
+export const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita', 'borrachaTrianguloCabineEsquerda', 'borrachaTrianguloCabineDireita'];
+/** Os quatro vidros da janela da cabine (o triângulo fixo e o vidro da porta, de cada lado), que são vãos pelo contorno, e não da gaiola. */
+export const JANELAS_DA_CABINE = ['vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroTrianguloCabineEsquerda', 'vidroTrianguloCabineDireita'];
 /** As quatro faixas da lente da lanterna de trás, de cima para baixo (freio, ré, pisca e neblina), e a lanterna de cada lado como a lista das suas partes de lente. */
 export const FAIXAS_DA_LANTERNA = ['Freio', 'Re', 'Pisca', 'Neblina'];
 export const LANTERNAS = ['Esquerda', 'Direita'].flatMap((lado) => FAIXAS_DA_LANTERNA.map((faixa) => `lanterna${faixa}${lado}`));

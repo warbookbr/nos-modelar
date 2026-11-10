@@ -48,6 +48,12 @@ Cada ferramenta nasce de um atrito relatado, com o comando que o reproduz, e é 
 - o limite de texto do PLANO conferido no normalizador, onde o `guarda:acervo` já passa;
 - a cor por forma no esboço, e o esboço rodando na cópia isolada sem cópia manual;
 - o `etapas-da-montagem` gravando os campos sempre na mesma ordem e só quando o conteúdo muda.
+- uma régua da regularidade de uma crista ao longo dela, que ache o nó onde uma coluna da gaiola morre: no canto de cima da
+  coluna do para-brisa do furgão (2026-11-09) o realce faz um gancho que a pessoa vê, e a `vinco-oculto`, que dá só posição e
+  ângulo médio da cadeia inteira, não o acusa; e uma vista de perto só da chapa, sem rodar a receita inteira.
+- um aviso no `descrever` para cada `aberturaPorContorno` que cai na booleana da chapa inteira, com o motivo do registro
+  (`vizinhanca.motivo`) e o tempo do passo: a janela da cabine do furgão (2026-11-09) pôs quatro vãos nesse caminho, a
+  receita foi de 118 s a 207 s, e só o CI acusou, depois do envio, pelos tetos de tempo.
 
 ## Excluído
 

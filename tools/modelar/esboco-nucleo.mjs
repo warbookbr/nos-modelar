@@ -87,7 +87,7 @@ ${EXEMPLO}
   --perto <mm>       até que folga o relato lista o par (padrão ${PERTO_MM})
   --saida <png>      onde gravar a imagem (padrão: tools/bancadas/out/esboco-nucleo-<nome>.png)
   --largura <px>     a largura de cada painel na imagem (padrão 640, ou 420 com --vistas)
-  --sem-cores        a cor dos materiais, em vez de uma cor por parte
+  --sem-cores        a cor dos materiais, em vez de uma cor por parte; vale sozinho quando alguma forma declara cor
   --so-montar        monta, confere e imprime os números e o relato, e não abre a bancada
   --ajuda            esta mensagem
 
@@ -323,7 +323,7 @@ async function principal(argv) {
   const vista = valor('--vista') ?? r.vista ?? 'isometrica';
   const saida = resolve(valor('--saida') ?? join(REPO, 'tools/bancadas/out', `esboco-nucleo-${nome}.png`));
   const res = await capturarLadoALado({
-    paineis, vista, vistas, saida, titulo: `${nome}: ${paineis.length} opções pelo núcleo`, largura: valor('--largura') === null ? null : Number(valor('--largura')), cores: !argv.includes('--sem-cores'),
+    paineis, vista, vistas, saida, titulo: `${nome}: ${paineis.length} opções pelo núcleo`, largura: valor('--largura') === null ? null : Number(valor('--largura')), cores: !argv.includes('--sem-cores') && !r.paineis.some((p) => (p.formas ?? []).some((f) => f.cor)),
     rodape: `Mesma câmera em todas as opções${vistas ? ', vista a vista' : `: vista ${vista}`}, ortográfica, centrada na caixa que junta as opções. Cada opção é uma receita do núcleo capturada na bancada (npm run esboco:nucleo).`,
     logger: (t) => console.log(`  ${t}`),
   });

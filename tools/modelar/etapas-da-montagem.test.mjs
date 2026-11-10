@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
-import { auditarEtapas, descreverAuditoria, estadoDasEtapas, fixar, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import { arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
 import { receitaComParametros } from './peca-com-parametros.mjs';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
@@ -375,5 +375,26 @@ describe('a auditoria da montagem construída (--auditar)', () => {
     const caminho = escreverCarro();
     await auditarEtapas(caminho, { receitas: CUBO });
     expect(() => readFileSync(caminho.replace(/\.json$/, '.etapas.json'))).toThrow();
+  });
+});
+
+describe('o registro só se grava quando muda', () => {
+  it('a mesma etapa com os campos em outra ordem dá o mesmo arquivo, e regravar sem mudança não toca nele', () => {
+    const registro = { formato: 'f', versao: 1, montagem: 'm', etapas: [{ reaberturas: [], aceite: { por: 'pessoa' }, estado: 'fixa', instancia: 'base', juntas: [] }] };
+    expect(gravarRegistro(arquivo, registro)).toBe(true);
+    const texto = readFileSync(arquivoDoRegistro(arquivo), 'utf8');
+    expect(texto.indexOf('"instancia"')).toBeLessThan(texto.indexOf('"aceite"'));
+    expect(texto.indexOf('"aceite"')).toBeLessThan(texto.indexOf('"reaberturas"'));
+    const trocado = { ...registro, etapas: [{ instancia: 'base', estado: 'fixa', juntas: [], aceite: { por: 'pessoa' }, reaberturas: [] }] };
+    expect(gravarRegistro(arquivo, trocado)).toBe(false);
+    expect(readFileSync(arquivoDoRegistro(arquivo), 'utf8')).toBe(texto);
+  });
+
+  it('ler o estado pela linha de comando não grava o registro', async () => {
+    const antes = '{"marca":"o arquivo que a leitura não pode tocar"}\n';
+    writeFileSync(arquivoDoRegistro(arquivo), antes);
+    const r = await comoCLI([arquivo]).catch((erro) => ({ erro }));
+    expect(readFileSync(arquivoDoRegistro(arquivo), 'utf8')).toBe(antes);
+    expect(r).toBeDefined();
   });
 });

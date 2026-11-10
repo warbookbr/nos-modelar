@@ -287,6 +287,11 @@ export async function descreverPecaReutilizavel({
   /* AS REFERÊNCIAS DO PLANO EXISTEM, ANTES DE EXECUTAR. O `alvo.md` ausente só aparecia na `vistas:critica`, depois de a forma estar
      pronta. O plano inválido segue para a mensagem própria dele mais abaixo, e a receita entregue já carregada não tem pasta para
      resolver caminho relativo, então só a lida do disco é conferida. */
+  /* O PLANO INVÁLIDO TAMBÉM, ANTES DE EXECUTAR. O campo de texto acima de 240 caracteres só era recusado depois de a receita rodar,
+     e no furgão realista isso custava 3 minutos por tentativa (2026-11-09); a mesma mensagem de mais abaixo sai agora antes. */
+  if (!semVeredito && receita.PLANO !== undefined) {
+    try { normalizarPlanoDeModelagem(receita.PLANO); } catch (erro) { return falha(`PLANO DE MODELAGEM INVÁLIDO\n  ${erro.message}`); }
+  }
   if (!semVeredito && caminhoReceita) {
     let planoDeReferencias = null;
     try { planoDeReferencias = normalizarPlanoDeModelagem(receita.PLANO); } catch { planoDeReferencias = null; }

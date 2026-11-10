@@ -198,6 +198,18 @@ describe('descrever-partes — régua headless', () => {
     expect(resultado.stdout).toContain('partes: 1   faces: 6');
   });
 
+  it('o plano inválido é recusado antes de a receita rodar', async () => {
+    /* o passo é de uma operação que não existe: se a receita rodasse, a mensagem seria a dela, e não a do plano */
+    const modulo = {
+      PLANO: { objeto: 'x'.repeat(300), referencias: [], escala: { medida: 'lado', milimetros: 1000 }, partes: [{ nome: 'corpo', forma: 'um cubo de um metro de lado', tecnica: 'cubo do catálogo, inteiro' }], criteriosDeReprovacao: ['a peça não é um cubo de um metro'] },
+      PASSOS: [['operacaoQueNaoExiste', {}]],
+    };
+    const resultado = await descreverPecaReutilizavel({ peca: 'fixture', modulo });
+    expect(resultado.ok).toBe(false);
+    expect(resultado.stderr).toContain('PLANO DE MODELAGEM INVÁLIDO');
+    expect(resultado.stderr).toContain('240');
+  });
+
   it('o serviço reutilizável mede composição com registro explícito', async () => {
     const composicao = {
       formato: FORMATO_COMPOSICAO_PROCEDURAL,

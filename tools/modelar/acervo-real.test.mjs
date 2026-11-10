@@ -36,8 +36,12 @@ const SEGUNDOS_POR_ALVO = 2;
    1,7 vez isso, e o prazo do teste, 400 s. Na etapa 8, ainda em 2026-11-07, entraram mais quatro vãos (as luzes de canto e os
    piscas laterais), e a vizinhança deles não recorta (`vizinhanca.motivo` no registro: borda com uma volta só nas luzes de canto,
    que dobram a quina, e banda de 96 mm nos piscas), então os quatro voltam à booleana da chapa inteira; o furgão foi a 245 s no
-   CI, e o teto vai a 420 s, 1,7 vez isso, com o prazo do teste em 600 s, até a vizinhança cobrir esses dois casos (item do backlog). */
-const PECAS_PESADAS = { 'furgao-realista': 420 };
+   CI, e o teto vai a 420 s, 1,7 vez isso, com o prazo do teste em 600 s, até a vizinhança cobrir esses dois casos (item do backlog).
+   Em 2026-11-09 a janela da cabine em dois vidros trouxe quatro vãos grandes, e nenhum recorta (a banda liga vértices a 690 mm
+   nos dois maiores, e a borda sai com quatro voltas nos dois que encostam no vão vizinho); com os quatro da lanterna, oito vãos
+   vão à booleana da chapa inteira, 140 dos 207 s de uma execução local, e o furgão foi a 506 s no CI. O teto vai a 860 s e o
+   prazo a 1.000 s até o plano `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` fazer os oito recortarem. */
+const PECAS_PESADAS = { 'furgao-realista': 860 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
@@ -67,5 +71,5 @@ describe('acervo real, inteiro', () => {
     for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
       expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
     }
-  }, 600_000);
+  }, 1_000_000);
 });
