@@ -1,6 +1,6 @@
 /* empilhadeira/volante — o volante da empilhadeira: o aro, o cubo e os três raios, que giram em torno da coluna de direção.
  *
- * Etapa da montagem `../../montagem.json` depois da coluna de direção (fatia 6 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois da coluna de direção (fatia 6 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 6 das partes do `../../ALINHAMENTO.md`, onde "o volante gira em torno da coluna"). A forma é a do rascunho que a pessoa aprovou
  * por imagem em 2026-11-10 (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com duas exceções: os
  * círculos com 96 lados (no rascunho, 64 no aro e 32 no cubo), e o furo do cubo, que o rascunho não tinha (o eixo da coluna entrava no

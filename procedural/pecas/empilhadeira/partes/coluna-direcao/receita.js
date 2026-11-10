@@ -1,7 +1,7 @@
 /* empilhadeira/coluna-direcao — a coluna de direção da empilhadeira, que sai do painel inclinada para trás até o cubo do volante, com
  * os pedais na rampa do painel e as alavancas do sistema hidráulico na face de cima dele, numa peça rígida.
  *
- * Etapa da montagem `../../montagem.json` depois do banco (fatia 6 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 6 das
+ * Etapa da montagem `../../montagem.json` depois do banco (fatia 6 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 6 das
  * partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com três exceções de encaixe: o pé da coluna,
  * que no rascunho descia a 880 mm e entrava no painel e no piso, é cortado 0,5 mm acima da face de cima do painel; a haste de cada

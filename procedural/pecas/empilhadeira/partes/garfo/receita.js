@@ -2,7 +2,7 @@
  * e a lâmina de 1.070 x 100 x 40, que afina na ponta, numa peça rígida. Uma receita, duas instâncias na montagem (a esquerda e a
  * direita, a 280 mm do centro).
  *
- * Etapa da montagem `../../montagem.json` depois do carro (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 4
+ * Etapa da montagem `../../montagem.json` depois do carro (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 4
  * das partes do `../../ALINHAMENTO.md`, segunda metade da torre). A forma é a do rascunho que a pessoa aprovou por imagem em
  * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar
  * `montarGarfo` daqui, uma vez de cada lado. Mudou só a construção: o garfo de cada lado é a mesma peça transladada, no lugar do

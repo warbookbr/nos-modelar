@@ -1,7 +1,7 @@
 /* empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do
  * protetor, com a ponta curva para trás, numa peça rígida.
  *
- * Etapa da montagem `../../montagem.json` depois do GLP (fatia 7 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 7 das
+ * Etapa da montagem `../../montagem.json` depois do GLP (fatia 7 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 7 das
  * partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com duas exceções: os círculos com 96 lados (no
  * rascunho, 32), e o pé, que no rascunho era reto em 1.146 e entrava 3,5 mm na tampa; aqui ele é cortado pela face de cima da tampa

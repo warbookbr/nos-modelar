@@ -1,8 +1,8 @@
 # Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
 
-**Estado:** pronto
+**Estado:** ativo
 
-**Território:** nenhum (declara ao ativar, fatia por fatia)
+**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`
 
 **Responsável:** a IA da sessão que o ativar conduz e mede; a pessoa decide a
 ordem das fatias e julga forma por imagem.
@@ -130,11 +130,13 @@ por peça do primeiro objeto de prova não ficar abaixo do da empilhadeira, o
 roteiro para antes do segundo objeto e a ordem das fatias é revista com a
 pessoa.
 
-## O que falta para ativar
+## Ativação
 
-Os seis lugares de plano ativo estão ocupados. A pessoa aprovou este plano em
-2026-11-10 para ficar à espera, e ele passa a ativo quando o da empilhadeira
-fechar, com o território das fatias 0 e 1 declarado nesse momento.
+Ativo desde 2026-11-10, quando o plano da empilhadeira fechou e a pessoa disse
+"ok, pode fechar e ativar o plano do núcleo". O território é o das fatias 0 e
+1. O pedido do crítico e a vista em corte ficam em arquivos do plano das partes
+do braço e do de ferramentas de conferência e de vista, e entram combinados com
+eles, como a seção de riscos diz.
 
 ## Fechamento
 

@@ -1,7 +1,7 @@
 /* empilhadeira/torre — a parte fixa da torre da empilhadeira: os dois canais externos em U, abertos para dentro, com as três travessas
  * de trás e a orelha do cilindro de inclinação, e os dois pés com o olhal que abraça o tubo do eixo dianteiro, numa peça rígida.
  *
- * Etapa da montagem `../../montagem.json` depois do eixo traseiro (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois do eixo traseiro (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 4 das partes do `../../ALINHAMENTO.md`, primeira metade). A forma é a do rascunho que a pessoa aprovou por imagem em
  * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar
  * `montarTorre` daqui, de modo que a geometria tem uma fonte só. Mudaram três coisas de construção: os círculos do olhal com 96 lados

@@ -1,7 +1,7 @@
 /* empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa
  * peça rígida sobre o contrapeso.
  *
- * Etapa da montagem `../../montagem.json` depois do volante (fatia 7 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 7
+ * Etapa da montagem `../../montagem.json` depois do volante (fatia 7 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 7
  * das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com duas exceções: os círculos com 96 lados (no
  * rascunho, 48 e 24), e a chapa do berço, que no rascunho era reta de 1.146 a 1.162 e entrava 3,5 mm na tampa do capô; aqui ela segue a

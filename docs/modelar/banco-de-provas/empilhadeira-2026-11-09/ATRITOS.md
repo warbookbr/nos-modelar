@@ -1,6 +1,6 @@
 # Empilhadeira — atritos
 
-Plano: [`2026-11-09-empilhadeira.md`](../../planos/2026-11-09-empilhadeira.md). Cada atrito diz como se reproduz, se o
+Plano: [`2026-11-09-empilhadeira.md`](../../planos/encerrados/2026-11-09-empilhadeira.md). Cada atrito diz como se reproduz, se o
 processo o teria pego sozinho e o destino.
 
 1. **O teste do esboço contava as opções de peça por número exato.** Cada esboço novo numa pasta de peça quebrava

@@ -3,7 +3,7 @@
  * vertical, a ponta de eixo e o braço de direção), os dois cubos (flange de Ø 170 e tampa de Ø 100) e a barra de direção de braço a
  * braço, numa peça rígida na pose de rodas retas.
  *
- * Terceira peça da montagem `../../montagem.json` (fatia 3 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 3 das
+ * Terceira peça da montagem `../../montagem.json` (fatia 3 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 3 das
  * partes do `../../ALINHAMENTO.md`). A forma é a metade traseira do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/eixos-rodas.esboco.mjs`), levada para cá sem mudança de forma; o rascunho passou a chamar `montarEixoTraseiro`
  * daqui, de modo que a geometria tem uma fonte só. Nenhuma medida mudou; mudaram três coisas de construção: as revoluções e os círculos

@@ -1,7 +1,7 @@
 /* empilhadeira/canal-interno — o canal interno da torre da empilhadeira: os dois canais em U, abertos para dentro, que correm dentro
  * dos canais externos da torre, e a travessa de cima entre eles, que leva as polias das correntes, numa peça rígida.
  *
- * Etapa da montagem `../../montagem.json` depois da torre (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 4
+ * Etapa da montagem `../../montagem.json` depois da torre (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 4
  * das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar `montarCanalInterno`
  * daqui, de modo que a geometria tem uma fonte só.

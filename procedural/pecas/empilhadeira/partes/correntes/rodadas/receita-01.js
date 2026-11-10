@@ -2,7 +2,7 @@
  * elevação, da cabeça dele à travessa do carro, e as duas do canal interno, da travessa de cima dele ao topo dos montantes do carro,
  * numa peça.
  *
- * Etapa da montagem `../../montagem.json` depois dos garfos (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 4
+ * Etapa da montagem `../../montagem.json` depois dos garfos (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 4
  * das partes do `../../ALINHAMENTO.md`, segunda metade da torre). A forma é a do rascunho que a pessoa aprovou por imagem em
  * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar
  * `montarCorrentes` daqui. As quatro fitas são as do rascunho: as duas do cilindro, que levam o carro na elevação livre, e as duas do

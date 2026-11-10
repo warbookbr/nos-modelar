@@ -2,7 +2,7 @@
  * das pontas, os dois montantes de trás que correm por dentro dos canais internos e a travessa das correntes do cilindro) com a grade
  * de carga em cima, que sobem juntas, numa peça rígida.
  *
- * Etapa da montagem `../../montagem.json` depois do cilindro de elevação (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois do cilindro de elevação (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 4 das partes do `../../ALINHAMENTO.md`, segunda metade da torre). A forma é a do rascunho que a pessoa aprovou por imagem em
  * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar
  * `montarCarro` daqui, de modo que a geometria tem uma fonte só.

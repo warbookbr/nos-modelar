@@ -2,7 +2,7 @@
  * sentada na travessa de baixo da torre, a haste de Ø 36 e a cabeça de 160 mm, onde as correntes do carro se prendem, numa peça na
  * pose recolhida.
  *
- * Etapa da montagem `../../montagem.json` depois do canal interno (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois do canal interno (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 4 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar
  * `montarCilindroElevacao` daqui. Mudou só a construção: os círculos com 96 lados no lugar de 40.

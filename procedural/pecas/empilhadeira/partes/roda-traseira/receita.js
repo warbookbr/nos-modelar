@@ -2,7 +2,7 @@
  * Ø 568 e banda de 208 mm no aro de 9 polegadas (talão em Ø 240), com a roda de chapa de aço de seis furos. Uma receita, duas
  * instâncias na montagem (a esquerda e a direita, esta girada meia volta), como a dianteira.
  *
- * Etapa da montagem `../../montagem.json` depois do eixo traseiro (fatia 3 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois do eixo traseiro (fatia 3 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 2 das partes do `../../ALINHAMENTO.md`). O rascunho aprovado pela pessoa em 2026-11-10 (`../../referencias/eixos-rodas.esboco.mjs`)
  * desenhava a roda à mão, com a mesma seção de pneu da dianteira levada ao raio dela; ela passa a sair da família pela mesma cadeia da
  * roda dianteira (`../roda-dianteira/receita.js`: `derivar`, `gerarPassos` e `montarRodaDianteira`, que recebem a TABELA), e o

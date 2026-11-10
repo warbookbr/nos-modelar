@@ -1,7 +1,7 @@
 /* empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os
  * degraus, painel, tampa do motor, colunas, poço traseiro e a traseira (capô, grade, tampa e contrapeso), numa peça rígida.
  *
- * Primeira etapa da montagem `../../montagem.json` (fatias 1 e 2 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`). O
+ * Primeira etapa da montagem `../../montagem.json` (fatias 1 e 2 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`). O
  * combinado está em `../../ALINHAMENTO.md` ("Carcaça" e "Divergências entre as fontes"); a forma é a do rascunho que a pessoa aprovou
  * por imagem em 2026-11-10, e esta receita é a dona dela: os rascunhos `../../referencias/carcaca.esboco.mjs`,
  * `carcaca-traseira.esboco.mjs` e `empilhadeira.esboco.mjs` montam a carcaça chamando `montarCarcacaEmMm` daqui.

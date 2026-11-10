@@ -1,6 +1,6 @@
 /* empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
  *
- * Etapa da montagem `../../montagem.json` depois do protetor (fatia 6 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 6
+ * Etapa da montagem `../../montagem.json` depois do protetor (fatia 6 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 6
  * das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com uma exceção: a base do assento. No rascunho
  * ela seguia uma reta tirada do contorno da lateral e entrava até 20 mm na tampa do motor; aqui ela segue a face de cima da tampa como a

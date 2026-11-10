@@ -1,6 +1,6 @@
 # Empilhadeira inteira, da carcaça aos garfos, por partes plugadas numa montagem
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/casamento-da-vista.test.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/conferir-vistas.test.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/vista-rapida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `procedural/nucleo/arcos-do-contorno.js`, `procedural/nucleo/arcos-do-contorno.test.mjs`, `tools/modelar/silhueta-pedida.mjs`, `tools/modelar/silhueta-pedida.test.mjs`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`
 
@@ -209,7 +209,7 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   a sobra falsa da peça vazada vista de lado; a silhueta já contava os furos.
 - **Plano próprio, em rascunho.** O degrau, o sulco e a borda rebaixada sobre a
   superfície estão em
-  [rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md), que espera um
+  [rebaixo por contorno](../2026-11-10-rebaixo-por-contorno.md), que espera um
   lugar de plano ativo.
 - **Levantadas e não começadas.** A causa dita na recusa da
   `aberturaPorContorno` e a quina implícita na compensação (BACKLOG).
@@ -270,4 +270,28 @@ elevação.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-10. A empilhadeira está no acervo como montagem de
+dezenove receitas em `procedural/pecas/empilhadeira/partes/`, com as vinte e
+três etapas de `montagem.json` fixas pelo aceite da pessoa. A auditoria final
+verificou 253 pares, sem cruzamento e sem inconclusivo, e nenhuma peça passa
+abaixo do chão. A pessoa aceitou as vistas finais ao lado das referências
+(`final-vistas-com-as-referencias.png` no banco de provas) com as palavras "ok,
+pode fechar e ativar o plano do núcleo". Os gates passaram, e o CI juntou à
+main cada envio, o último da máquina inteira em receita no commit `175681b4`.
+
+O gate de saída ficou cumprido com duas ressalvas, as duas aceitas pela pessoa.
+As juntas que giram não são medidas com curso: a montagem só mede encaixe
+cilíndrico e assento anular, e a inclinação, a elevação, o esterço e o giro das
+rodas ficaram na pose de transporte. E catorze etapas foram fixas por aceite
+humano com defeitos abertos, cada um atribuído no registro da rodada.
+
+As fatias de ferramenta T0 a T17 foram entregues, com a correção da booleana
+sobre corpo subdividido, a opção de ombro largo na família `roda-pneu` e as
+correções da captura da montagem e do registro da rodada. Voltam ao backlog ou
+seguem em plano próprio: as juntas na montagem, a vista em corte e a referência
+por vista no pacote do crítico, a varredura de seção variável, a família de
+cilindro hidráulico e a leitura de referência, todas no roteiro do plano
+[núcleo para qualquer mecanismo](../2026-11-10-nucleo-para-qualquer-mecanismo.md);
+o [rebaixo por contorno](../2026-11-10-rebaixo-por-contorno.md), em rascunho; e
+as três questões de forma que a pessoa decidiu manter (colunas de trás do
+protetor em chapa, assento sem abas, grade de carga e volante em aresta viva).

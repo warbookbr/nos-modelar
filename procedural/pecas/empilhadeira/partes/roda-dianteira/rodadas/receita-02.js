@@ -2,7 +2,7 @@
  * banda de 250 mm (o 7.00-12 da ficha da classe 2,5 t, alargado pela vista de cima e pela de frente), no aro de 12 polegadas, com a
  * roda de chapa de aço de seis furos. Uma receita, duas instâncias na montagem (a esquerda e a direita, esta girada meia volta).
  *
- * Etapa da montagem `../../montagem.json` depois do eixo dianteiro (fatia 3 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois do eixo dianteiro (fatia 3 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 2 das partes do `../../ALINHAMENTO.md`). O rascunho aprovado pela pessoa em 2026-11-10 (`../../referencias/eixos-rodas.esboco.mjs`)
  * desenhava a roda à mão; ela passou a sair da família, como o plano pede ("Família `roda-pneu`: USAR DIRETO"), e o rascunho chama
  * `montarRodaDianteira` daqui.

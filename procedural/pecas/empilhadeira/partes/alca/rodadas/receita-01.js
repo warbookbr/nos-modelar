@@ -1,7 +1,7 @@
 /* empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa
  * ao protetor.
  *
- * Etapa da montagem `../../montagem.json` depois do escape (fatia 7 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, com os
+ * Etapa da montagem `../../montagem.json` depois do escape (fatia 7 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, com os
  * acessórios do item 7 das partes do `../../ALINHAMENTO.md`). A alça é rígida com o protetor e só toca nele; o protetor está com o crítico
  * e não a recebe, e a alça vira esta peça, presa a ele por posição. A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com uma exceção: os braços, que no rascunho

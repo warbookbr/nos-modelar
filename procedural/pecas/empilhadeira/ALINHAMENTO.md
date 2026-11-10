@@ -1,6 +1,6 @@
 # Empilhadeira — alinhamento
 
-Plano: [`docs/modelar/planos/2026-11-09-empilhadeira.md`](../../../docs/modelar/planos/2026-11-09-empilhadeira.md).
+Plano: [`docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`](../../../docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md).
 Decidido pela IA que conduz, por delegação da pessoa em 2026-11-09; cada decisão
 de forma passa pela crítica visual dela antes de a etapa ficar fixa.
 

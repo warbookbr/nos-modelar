@@ -1,7 +1,7 @@
 /* empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto,
  * as luzes de trabalho, o espelho e as lanternas do alto, numa peça rígida.
  *
- * Etapa da montagem `../../montagem.json` depois das peças da torre (fatia 5 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois das peças da torre (fatia 5 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 5 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10
  * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar `montarProtetor`
  * daqui, de modo que a geometria tem uma fonte só. A alça de acesso, presa atrás da coluna da frente, fica no rascunho: o plano a põe

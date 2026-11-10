@@ -2,7 +2,7 @@
  * a camisa de Ø 90, que entra no rebaixo do painel da carcaça, e a haste de Ø 44, cuja ponta encosta na orelha do canal externo da
  * torre, numa peça na pose de transporte (a torre de pé). Uma receita, duas instâncias na montagem (a esquerda e a direita).
  *
- * Etapa da montagem `../../montagem.json` depois das correntes (fatia 4 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`,
+ * Etapa da montagem `../../montagem.json` depois das correntes (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,
  * item 4 das partes do `../../ALINHAMENTO.md`, segunda metade da torre). A forma é a do rascunho que a pessoa aprovou por imagem em
  * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar
  * `montarCilindroInclinacao` daqui, uma vez de cada lado. Mudou só a construção: os círculos com 96 lados no lugar de 40, e o cilindro
