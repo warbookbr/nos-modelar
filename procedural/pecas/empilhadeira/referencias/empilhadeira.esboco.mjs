@@ -65,24 +65,26 @@ const FOLGAS = [
   ['placaGarfos', 'pneusDianteiros', 'a placa porta-garfos fica 77,5 mm à frente da banda dos pneus dianteiros, sem tocá-los'],
   ['canaisInternos', 'placaGarfos', 'os montantes do carro correm a 3 mm da ponta das abas dos canais internos, sem tocá-las'],
   ['canaisExternos', 'placaGarfos', 'os montantes do carro passam 15 mm à frente da travessa de baixo dos canais externos, e as barras 58 mm à frente dos canais'],
+  /* o posto e os acessórios (as receitas das fatias 6 e 7, 2026-11-10): o que encostava entrando na carcaça e no protetor acaba na face
+     que o recebe, a 0,5 mm dela (0,1 a 0,2 mm nos braços da alça), e o volante tem o furo do eixo da coluna */
+  ['alavancas', 'painel', 'as hastes das alavancas nascem 0,5 mm acima da face de cima do painel'],
+  ['alcas', 'quadro', 'os braços da alça acabam a 0,1 a 0,2 mm da borda de trás do protetor'],
+  ['assento', 'tampaMotor', 'a base do assento segue a face de cima da tampa do motor, 0,5 mm acima dela'],
+  ['berco', 'tampa', 'a chapa do berço segue a face de cima da tampa do capô, 0,5 mm acima dela'],
+  ['colunaDirecao', 'painel', 'o pé da coluna de direção é cortado no plano de 915 mm, 0,3 mm acima da face de cima do painel'],
+  ['colunaDirecao', 'piso', 'o pé da coluna de direção fica acima do painel, longe do piso'],
+  ['colunaDirecao', 'volante', 'o eixo da coluna fica no furo do cubo do volante, com 0,5 mm de folga em volta e no topo'],
+  ['escape', 'tampa', 'o pé do escape segue a face de cima da tampa do capô, 0,5 mm acima dela'],
+  ['painel', 'pedais', 'as hastes dos pedais nascem 0,5 mm acima da rampa do painel'],
 ];
 /* AS FRENTES sobre a carcaça e entre si */
 const DAS_FRENTES = [
-  ['alavancas', 'painel', 'as hastes das alavancas saem da face de cima do painel'],
-  ['alcas', 'quadro', 'os braços da alça entram na coluna da frente'],
   ['assento', 'encosto', 'o encosto assenta na almofada'],
-  ['assento', 'tampaMotor', 'a base do assento segue a face curva da tampa do motor'],
   ['berco', 'cintas', 'as cintas passam pelos apoios do berço'],
-  ['berco', 'tampa', 'a chapa do berço assenta na tampa do capô'],
   ['cilindroGlp', 'cintas', 'as cintas abraçam o cilindro'],
-  ['colunaDirecao', 'painel', 'a coluna de direção sai de dentro do painel'],
-  ['colunaDirecao', 'piso', 'o pé da coluna de direção fica no corpo do piso sob o painel'],
-  ['colunaDirecao', 'volante', 'o eixo da coluna entra no cubo do volante'],
-  ['escape', 'tampa', 'o pé do escape assenta na tampa do capô'],
   ['gradeTeto', 'quadro', 'as barras da grade se apoiam nas travessas do teto'],
   ['lanternas', 'quadro', 'as lanternas ficam na face de trás da travessa'],
   ['luzesTrabalho', 'quadro', 'as luzes ficam presas na face da frente da coluna'],
-  ['painel', 'pedais', 'as hastes dos pedais saem da rampa do painel'],
   ['espelho', 'quadro', 'o braço do espelho entra 5 mm na face de trás da coluna da frente'],
 ];
 /* os pés do protetor (a receita da etapa) cortados pelo plano do apoio: assentam face sobre face, sem entrar na carcaça */

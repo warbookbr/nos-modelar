@@ -111,6 +111,10 @@ export const TABELA = {
   /* OS CORTES DOS PÉS pelo plano do apoio: o bloco que tira o que fica abaixo da face de cima da aba e das colunas, ao longo da aresta
      de cima delas (a mesma da carcaça), 150 mm de fundo, e 30 mm além do pé de cada lado em x. */
   corteDosPes: { fundo: 150, alem: 30 },
+
+  /* O APOIO DA ALÇA DE ACESSO (fatia 7, `../alca/receita.js`), só para a porta (não muda a malha): o plano da face de trás da coluna da
+     frente esquerda, no meio do trecho que recebe os braços da alça, de y 1.180 a 1.820 e de x 450 a 485 (os do rascunho). */
+  apoioDaAlca: { y: [1180, 1820], x: [450, 485] },
 };
 
 const m = (mm) => mm / 1000;
@@ -200,7 +204,14 @@ export function derivar(T = TABELA) {
     }
   }
   const zDobra = zEixoFrente(Y_TETO);
-  return { APOIOS, corte, portas, ZL, YL, zFrente, zEixoFrente, TOPO, Y_TETO, zDobra, trilhoDaColunaFrente, secaoColuna, perfilTeto, ladoTras, secaoTras };
+  /* a face de trás da coluna da frente, de lado: a reta paralela ao eixo, meia seção atrás dele, medida na horizontal; e a normal dela,
+     para trás e para baixo, em [x, y, z] */
+  const nTras = Math.hypot(1, INCL);
+  const zTrasFrente = (y) => zEixoFrente(y) - (C.secao.lado / 2) * nTras;
+  const AA = T.apoioDaAlca; const yAlca = (AA.y[0] + AA.y[1]) / 2;
+  portas.apoioDaAlcaEsquerda = { forma: 'plano', papel: 'recebe', ponto: [(AA.x[0] + AA.x[1]) / 2, yAlca, zTrasFrente(yAlca)], normal: [0, INCL / nTras, -1 / nTras],
+    extensao: [AA.x[1] - AA.x[0], (AA.y[1] - AA.y[0]) * nTras], referencia: [1, 0, 0] };
+  return { APOIOS, corte, portas, ZL, YL, zFrente, zEixoFrente, zTrasFrente, INCL, TOPO, Y_TETO, zDobra, trilhoDaColunaFrente, secaoColuna, perfilTeto, ladoTras, secaoTras };
 }
 
 /** Monta o protetor no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve as origens das portas. */
@@ -288,7 +299,9 @@ export function gerarPassos(T = TABELA) {
   const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);
   const { portas } = derivar(T);
   const porta = (id) => ['publicarPorta', { id, de: { ...cortes[id].origem, costura: true }, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
-  return [...forma, ...['peFrenteEsquerdo', 'peFrenteDireito', 'peTrasEsquerdo', 'peTrasDireito'].map(porta)];
+  /* o apoio da alça sai do quadro esquerdo depois dos cortes, que leva a coluna da frente desse lado */
+  const apoioDaAlca = ['publicarPorta', { id: 'apoioDaAlcaEsquerda', de: cortes.peTrasEsquerdo.origem, interface: Object.fromEntries(Object.entries(portas.apoioDaAlcaEsquerda).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
+  return [...forma, ...['peFrenteEsquerdo', 'peFrenteDireito', 'peTrasEsquerdo', 'peTrasDireito'].map(porta), apoioDaAlca];
 }
 
 /** Os pontos nomeados da gaiola das colunas da frente, em metro. */

@@ -121,6 +121,48 @@
         "tipo": "peca",
         "ref": "empilhadeira/protetor"
       }
+    },
+    {
+      "id": "banco",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/banco"
+      }
+    },
+    {
+      "id": "colunaDirecao",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/coluna-direcao"
+      }
+    },
+    {
+      "id": "volante",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/volante"
+      }
+    },
+    {
+      "id": "glp",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/glp"
+      }
+    },
+    {
+      "id": "escape",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/escape"
+      }
+    },
+    {
+      "id": "alca",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/alca"
+      }
     }
   ],
   "relacoes": [
@@ -392,6 +434,32 @@
         },
         "toleranciaNumerica": 0.000001
       }
+    },
+    {
+      "id": "volanteGiraNaColuna",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "colunaDirecao"
+        ],
+        "porta": "eixoDoVolante"
+      },
+      "movel": {
+        "caminho": [
+          "volante"
+        ],
+        "porta": "cubo"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.0005,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
     }
   ],
   "etapas": [
@@ -411,7 +479,13 @@
     "correntes",
     "cilindroInclinacaoEsquerdo",
     "cilindroInclinacaoDireito",
-    "protetor"
+    "protetor",
+    "banco",
+    "colunaDirecao",
+    "volante",
+    "glp",
+    "escape",
+    "alca"
   ],
   "vinculos": [
     {
@@ -441,6 +515,20 @@
       },
       "unidade": "mm",
       "acrescimo": 0
+    },
+    {
+      "id": "volanteNoEixoDaColuna",
+      "alvo": {
+        "instancia": "volante",
+        "param": "raioDoFuro"
+      },
+      "de": {
+        "instancia": "colunaDirecao",
+        "porta": "eixoDoVolante",
+        "medida": "raio"
+      },
+      "unidade": "mm",
+      "acrescimo": 0.5
     }
   ],
   "posicoes": [
@@ -619,6 +707,72 @@
       },
       "unidade": "mm",
       "afastamento": 0
+    },
+    {
+      "id": "bancoNaTampaDoMotor",
+      "instancia": "banco",
+      "porta": "naTampaDoMotor",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoBanco"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "colunaDirecaoNoPainel",
+      "instancia": "colunaDirecao",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDaColunaDeDirecao"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "volanteNoEixoDaColuna",
+      "instancia": "volante",
+      "porta": "cubo",
+      "em": {
+        "instancia": "colunaDirecao",
+        "porta": "eixoDoVolante"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "glpNaTampa",
+      "instancia": "glp",
+      "porta": "naTampa",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoGlp"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "escapeNaTampa",
+      "instancia": "escape",
+      "porta": "naTampa",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoEscape"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "alcaNaColunaDoProtetor",
+      "instancia": "alca",
+      "porta": "bracoEsquerdo",
+      "em": {
+        "instancia": "protetor",
+        "porta": "apoioDaAlcaEsquerda"
+      },
+      "unidade": "mm",
+      "afastamento": 0.2
     }
   ],
   "auditoriaIntersecoes": {

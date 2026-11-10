@@ -189,6 +189,17 @@ export const TABELA = {
      só); os de trás, na face de cima das colunas, nos 56 mm da borda de fora delas (de 460 a 516 mm, pela vista de trás). */
   apoiosDoProtetor: { tras: { naBorda: 56 } },
 
+  /* OS APOIOS DO POSTO E DOS ACESSÓRIOS (fatias 6 e 7), só para as portas (não mudam a malha): o plano de referência horizontal em que
+     cada peça se põe, com o ponto [x, y, z] no meio da pegada dela (a do rascunho `protetor-posto.esboco.mjs`) e a altura da face de
+     cima da parte que a recebe, medida na malha desta carcaça por sonda vertical em 2026-11-10 (o mais alto da face naquele ponto). A
+     face é curva (parte de laços subdividida): o plano é a referência da pose, e o contato de cada peça é medido pela forma dela. */
+  apoiosDoPosto: {
+    banco: { parte: 'tampaMotor', ponto: [0, 1012.9, -950], extensao: [500, 485] },
+    colunaDirecao: { parte: 'painel', ponto: [0, 914.6, -110], extensao: [110, 110] },
+    glp: { parte: 'tampa', ponto: [30, 1148.7, -1840], extensao: [520, 300] },
+    escape: { parte: 'tampa', ponto: [-355, 1146.3, -1567], extensao: [90, 90] },
+  },
+
   /* POÇO TRASEIRO. O fundo escuro entre as rodas de trás (lateral z 1342-1645, até o pé do arco, y 428 a 625, 420 mm de meia largura) e
      o forro: uma casca escura de 15 mm por dentro do arco das laterais, de 360 a 590 mm, entre z 1300 e 1545 e de 191 a 640 mm, com a
      seção do pé das laterais. */
@@ -325,7 +336,10 @@ export function montarCarcacaEmMm(estado, T = TABELA) {
  *
  *  apoioDoProtetorFrenteEsquerdo, apoioDoProtetorFrenteDireito, apoioDoProtetorTrasEsquerdo, apoioDoProtetorTrasDireito — os planos
  *  que recebem os pés do protetor (`apoiosDoProtetor`): a face de cima de cada aba do paralama, no recolhimento do painel, e a face de
- *  cima das colunas, na borda de fora. A montagem põe o protetor por um deles; os outros três ficam conferidos pela forma. */
+ *  cima das colunas, na borda de fora. A montagem põe o protetor por um deles; os outros três ficam conferidos pela forma.
+ *
+ *  apoioDoBanco, apoioDaColunaDeDirecao, apoioDoGlp, apoioDoEscape — os planos de referência das peças do posto e dos acessórios
+ *  (`apoiosDoPosto`), na face de cima da tampa do motor, do painel e da tampa do capô. */
 export function portasDaCarcaca(T = TABELA) {
   const { POCO_D, cortesDosPocos, POCO_T, cortesDosPocosTraseiros } = derivar(T).medidas;
   return [
@@ -338,7 +352,22 @@ export function portasDaCarcaca(T = TABELA) {
       interface: { forma: 'cilindro', papel: 'interna', eixo: [-1, 0, 0], centro: [POCO_T.de, POCO_T.y, POCO_T.z], raio: POCO_T.r, inicio: 0, fim: 2 * POCO_T.de, referencia: [0, 1, 0] },
     }],
     ...apoiosDoProtetorComoPortas(T),
+    ...apoiosDoPostoComoPortas(T),
   ];
+}
+
+/** Os apoios do posto e dos acessórios, em mm: o plano horizontal de cada um, com a normal para cima. A peça que se põe nele publica a
+ *  porta do mesmo ponto com a normal para baixo, e a pose sai da posição por porta. */
+export function apoiosDoPosto(T = TABELA) {
+  return Object.fromEntries(Object.entries(T.apoiosDoPosto).map(([nome, a]) => [nome, { ...a, normal: [0, 1, 0], referencia: [1, 0, 0] }]));
+}
+const ID_DO_APOIO_DO_POSTO = { banco: 'apoioDoBanco', colunaDirecao: 'apoioDaColunaDeDirecao', glp: 'apoioDoGlp', escape: 'apoioDoEscape' };
+/* cada porta sai da origem da parte que a recebe, achada pelo passo `parte` dela */
+function apoiosDoPostoComoPortas(T) {
+  const passos = derivar(T).passos;
+  const origemDa = (nome) => passos.find(([op, a]) => op === 'parte' && a.nome === nome)[1].sel.origem;
+  return Object.entries(apoiosDoPosto(T)).map(([nome, a]) => ['publicarPorta', { id: ID_DO_APOIO_DO_POSTO[nome], de: origemDa(a.parte),
+    interface: { forma: 'plano', papel: 'recebe', ponto: a.ponto, normal: a.normal, extensao: a.extensao, referencia: a.referencia } }]);
 }
 /** Os quatro apoios dos pés do protetor, em mm: a aresta de cima da silhueta lateral que dá a face (os dois pontos [z, y] como a
  *  extrusão os grava), a faixa em x, o ponto no meio do apoio, a normal da face e a extensão. Da aba do paralama sai a face de z -144,5
