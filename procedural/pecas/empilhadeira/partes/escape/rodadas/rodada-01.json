@@ -1,0 +1,721 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/escape",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "escape",
+        "tipo": "ausencia",
+        "onde": "trecho superior do tubo, proteção perfurada",
+        "sentido": "faltando",
+        "evidencia": "tras.ia.png mostra tela ou grelha perfurada sobre o tubo à direita, e cima.ia mostra o escape com proteção. O modelo, em todas as vistas, é cilindro preto liso, sem perfuração."
+      },
+      {
+        "parte": "escape",
+        "tipo": "superficie",
+        "onde": "cotovelo, encontro do tubo vertical com a ponta inclinada",
+        "sentido": "anguloso",
+        "evidencia": "Direita isolada e tresquartos az10: corte reto no topo do tubo e a ponta nasce dentro dele, com degrau, crescente e filete escuro. Lê como dois cilindros empilhados e não como curva."
+      }
+    ],
+    "observacao": "Posição, cor, altura, sentido e ângulo da ponta batem com a referência e com os critérios de reprovação; o que afasta do alvo é a emenda em degrau e o tubo liso sem a proteção perfurada."
+  },
+  "partes": [
+    {
+      "nome": "escape",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o pé está na borda redonda da tampa, que desce 24 mm de lado e 13 na frente: o corte é o mais baixo de dois perfis medidos (frente e lado) para ficar rente sem cruzar",
+    "o relato do modelador trouxe seis pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 1, cotovelo em degrau: atribuido ao modelador, vai a rodada 2",
+    "rodada 1, protecao perfurada: o rascunho aprovado nao a tem; atribuido ao plano, fica como detalhe para a pessoa"
+  ],
+  "notaDePassagem": "O pé é o tubo menos o cruzamento de duas extrusões: abaixo do perfil de frente (o mais alto da tampa em cada x) e abaixo do perfil de lado (o mais alto em cada z), os dois medidos na malha e 0,5 mm acima. O corte fica no mais baixo dos dois, sempre acima da tampa. A posição tem afastamento 0,5.",
+  "receita": {
+    "sha256": "sha256:7d410eba331e3033f1b8b35fd18a1409219e61a58ce70cd9c2ec1b05dc86f56d",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 130,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * protetor, com a ponta curva para trás, numa peça rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do GLP (fatia 7 do plano `docs/modelar/planos/2026-11-09-empilhadeira.md`, item 7 das"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com duas exceções: os círculos com 96 lados (no"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * rascunho, 32), e o pé, que no rascunho era reto em 1.146 e entrava 3,5 mm na tampa; aqui ele é cortado pela face de cima da tampa"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * como a malha da carcaça a tem, 0,5 mm acima dela. A tampa é curva nas duas direções sob o pé (a borda de fora dela desce 24 mm e a da"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * frente, 13), e o corte é o mais baixo de duas superfícies: a de frente, o mais alto da face em cada x, e a de lado, o mais alto em"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * cada z, cada uma acima da face. O rascunho chama `montarEscape` daqui. A alça de acesso, rígida com o protetor e sem tocar o escape,"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * é a peça `../alca/receita.js`."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). Na lateral, px 742 a 766 (z -1.490 a -1.593) da linha 272 (y 1.135, a tampa do capô) à 98 (y"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * 1.882), e a ponta curva para trás até a linha 58 (y 2.055, px 750 a 772); de trás, colunas 623 a 640 (350 a 418 mm). Um tubo de 90 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * até 1.990 e a ponta de 80 mm, de 1.950 a 2.070, inclinada 35 graus para trás no pivô em 1.960. O eixo fica em x -355 e z -1.567: em"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * -370 e -1.545 o pé saía 14 mm da tampa vista de cima."
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * O ENCAIXE. A origem é a da máquina. A montagem põe o escape pela porta `naTampa` (o plano horizontal do corte do pé no ponto do apoio,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * com a normal para baixo) na porta `apoioDoEscape` da carcaça, com o afastamento de 0,5 mm da folga, e a pose sai identidade."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e a porta em mm; `montarEscape` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "import { TABELA as CARCACA, apoiosDoPosto } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  /* A cor do rascunho: o escuro da carcaça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  cores: { escuro: CARCACA.cores.escuro },"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* Lados dos círculos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* O TUBO de raio 45 com o eixo em x -355 e z -1.567, do corte do pé até 1.990; a ponta de raio 40, de 1.950 a 2.070, inclinada 35"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     graus para trás no pivô do eixo em 1.960. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  tubo: { x: -355, z: -1567, raio: 45, ate: 1990 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  ponta: { raio: 40, y: [1950, 2070], graus: -35, pivoY: 1960 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* O PÉ: a face de cima da tampa do capô sob o tubo, medida na malha da carcaça por sonda vertical (2026-11-10), a cada 1 mm, na caixa"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "     do pé (x -405 a -305, z -1.617 a -1.517), simplificada a 0,3 mm (o desvio da reta para cima dela fica em 0,2 mm): `frente` é o mais"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "     alto da face em cada x, `lado` o mais alto em cada z; o corte tira o que fica abaixo das duas mais a folga, de y 1.050 para cima. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  pe: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "    frente: [[-405, 1116.5], [-402, 1122], [-399, 1126], [-394, 1130.7], [-389, 1134.3], [-381, 1138.5], [-371, 1142.3], [-361, 1145.1],"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "      [-348, 1147.2], [-332, 1148.1], [-305, 1148.3]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "    lado: [[-1617, 1148.3], [-1587, 1147.5], [-1550, 1145.2], [-1529, 1142.1], [-1520, 1138.7], [-1517, 1135.3]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "    folga: 0.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    de: 1050,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "const circulo = (cu, cv, r, n) => Array.from({ length: n }, (_, k) => [cu + r * Math.cos(2 * Math.PI * k / n), cv + r * Math.sin(2 * Math.PI * k / n)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "/** Os perfis do corte do pé e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  const P = T.pe;"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  const abaixo = (nos) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    const p = [...nos].sort((a, b) => a[0] - b[0]).map(([u, y]) => [u, y + P.folga]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    return [[p[0][0], P.de], [p[p.length - 1][0], P.de], ...[...p].reverse()];"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  const apoio = apoiosDoPosto(CARCACA).escape;"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    naTampa: { forma: 'plano', papel: 'apoia', ponto: apoio.ponto.map((v, k) => v + apoio.normal[k] * P.folga), normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  return { sobFrente: abaixo(P.frente), sobLado: abaixo(P.lado), portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "/** Monta o escape no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "export function montarEscape(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const { extX, extY, extZ, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const cruzar = (...s) => booleana('intersectar', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const TU = T.tubo; const PO = T.ponta; const P = T.pe; const n = T.lados;"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const xs = P.frente.map(([x]) => x); const zs = P.lado.map(([z]) => z);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  /* o tubo, menos o que fica abaixo das duas superfícies do pé ao mesmo tempo; a ponta girada no pivô */"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const tubo = cortar(extY(circulo(TU.x, TU.z, TU.raio, n), P.de + P.folga, TU.ate),"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    cruzar(extZ(D.sobFrente, Math.min(...zs), Math.max(...zs)), extX(D.sobLado, Math.min(...xs), Math.max(...xs))));"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const ponta = extY(circulo(TU.x, TU.z, PO.raio, n), PO.y[0], PO.y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  estado.passos.push(['rotaciona', { eixo: 'x', graus: PO.graus, pivo: [TU.x, PO.pivoY, TU.z], sel: ponta }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  const escape = unir(tubo, ponta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  parte('escape', escape, T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  return { escape };"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "/* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], rotaciona: ['pivo'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta do apoio. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const { escape } = montarEscape(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  return [...forma, ['publicarPorta', { id: 'naTampa', de: escape.origem, interface: Object.fromEntries(Object.entries(portas.naTampa).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "export const CONTATOS = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  meta: { nome: 'empilhadeira/escape', desc: 'tubo de escape da empilhadeira, de pé na tampa do capô atrás da coluna de trás direita do protetor, com a ponta curva para trás' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    objeto: 'o tubo de escape de uma empilhadeira de contrapeso de 2,5 t a GLP, de 90 mm, de pé na tampa do capô atrás da coluna de trás direita do protetor, com a ponta inclinada para trás até 2.070 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    referencias: ['../../referencias/tras.ia.png', '../../referencias/cima.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    escala: { medida: 'topo do escape (TABELA do alinhamento, rascunho; lateral, linha 58)', milimetros: 2070 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      { nome: 'escape', forma: 'o tubo escuro de 90 mm de pé em x -355 e z -1.567, do pé na tampa do capô a 1.990, e a ponta de 80 mm inclinada 35 graus para trás até 2.070', tecnica: 'círculos de 96 lados extrudados em y; o pé cortado pelas duas superfícies da face da tampa (perfis de frente e de lado extrudados, cruzados); a ponta girada em torno de x e unida' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "      'o escape solto da tampa do capô, ou entrando nela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "      'o escape do lado esquerdo (+x), ou cruzando a coluna de trás do protetor',"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "      'a ponta inclinada para a frente, ou o escape abaixo de 2.000 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "      'cor trocada: o escape laranja ou cinza claro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  /* O extremo de cima, da frente e da esquerda: o tubo na largura e na frente, e o canto de cima da tampa da ponta girada, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "    const T = this.PARAMS; const TU = T.tubo; const PO = T.ponta; const a = PO.graus * Math.PI / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    const yTopo = PO.pivoY + (PO.y[1] - PO.pivoY) * Math.cos(a) + PO.raio * Math.abs(Math.sin(a));"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    return [{ nome: 'escape, em cima, na frente e à esquerda', parte: 'escape', medida: 'maximo', em: [TU.x + TU.raio, yTopo, TU.z + TU.raio], toleranciaMm: 0.5 }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[10]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az10.png",
+      "peca-tresquartos-rasante-az100.png"
+    ]
+  }
+}
