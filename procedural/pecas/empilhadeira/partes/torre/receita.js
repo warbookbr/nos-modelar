@@ -22,7 +22,8 @@
  * dirige e a frente em +z; o centro do eixo dianteiro fica em y 352,5 e z 0 (`rodas.dianteira` da carcaça). A montagem põe a torre no
  * eixo pela porta `olhalDireito` (o furo do olhal direito, no pino `pinoDaTorreDireito` do eixo), e a relação de cada lado mede o furo
  * no tubo pelo encaixe cilíndrico. A torre publica também a guia do canal interno (`guiaDoCanalInterno`, a face de dentro da alma do
- * canal externo esquerdo) e o assento do cilindro de elevação (`assentoDoCilindro`).
+ * canal externo esquerdo), o assento do cilindro de elevação (`assentoDoCilindro`) e a face de trás de cada orelha (`orelhaEsquerda` e
+ * `orelhaDireita`), onde a ponta da haste do cilindro de inclinação encosta; as portas das orelhas não mudam a malha.
  *
  * A JUNTA QUE A MONTAGEM AINDA NÃO TEM. A torre inclina em torno do eixo x que passa pelo centro do eixo dianteiro (6 graus para a
  * frente e 12 para trás, no rascunho); a montagem v5 não tem articulação entre instâncias, e a torre fica de pé, na pose de
@@ -74,11 +75,16 @@ export function derivar(T = TABELA) {
   const chapaDoPe = [T.pe.chapa[0], [T.tras, E.y[0]], [T.tras, T.pe.fimNaTravessa], T.pe.chapa[1]];
   const faceDaGuia = E.x[1] - E.alma;
   const yAssento = T.travessas.baixo.y;
+  const O = T.orelha;
+  const orelha = (s) => ({ forma: 'plano', papel: 'recebe', ponto: [s * (E.x[1] + O.ate) / 2, (O.y[0] + O.y[1]) / 2, O.z[0]], normal: [0, 0, -1], extensao: [O.ate - E.x[1], O.y[1] - O.y[0]], referencia: [0, 1, 0] });
   const portas = {
     olhalEsquerdo: { forma: 'cilindro', papel: 'interna', eixo: [-1, 0, 0], centro: [pe.x[1], pivo.y, pivo.z], raio: pe.raioDoFuro, inicio: 0, fim: pe.x[1] - pe.x[0], referencia: [0, 1, 0] },
     olhalDireito: { forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], centro: [-pe.x[1], pivo.y, pivo.z], raio: pe.raioDoFuro, inicio: 0, fim: pe.x[1] - pe.x[0], referencia: [0, 1, 0] },
     guiaDoCanalInterno: { forma: 'plano', papel: 'recebe', ponto: [faceDaGuia, E.y[1], (T.tras + T.frente) / 2], normal: [-1, 0, 0], extensao: [T.frente - T.tras - 2 * E.aba, E.y[1] - E.y[0]], referencia: [0, 1, 0] },
     assentoDoCilindro: { forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: [0, yAssento, T.assento.z], raioInterno: 0, raioExterno: T.assento.raio, inicio: -T.assento.profundidade, fim: 0 },
+    /* a face de trás de cada orelha, no meio dela, onde a ponta da haste do cilindro de inclinação encosta */
+    orelhaEsquerda: orelha(1),
+    orelhaDireita: orelha(-1),
   };
   return { pivo, pe, circulo, uExterno, chapaDoPe, portas };
 }
@@ -118,12 +124,13 @@ export function montarTorre(estado, T = TABELA) {
     caixaY(-meia, meia, T.tras, T.tras + E.aba, R.topo[0], E.y[1]),
     caixaY(-meia, meia, T.tras, R.baixo.z, E.y[0], R.baixo.y),
   ];
-  parte('canaisExternos', unir(par(unir(canalExterno, orelha)), ...travessas), T.cores.aco);
+  const lados = par(unir(canalExterno, orelha));
+  parte('canaisExternos', unir(lados, ...travessas), T.cores.aco);
   /* o assento do cilindro: corpo próprio dentro da travessa de baixo, rente à face de cima, sem união (unido, a face dele some) */
   const A = T.assento;
   const assento = extY(D.circulo(0, A.z, A.raio), R.baixo.y - A.profundidade, R.baixo.y);
   parte('canaisExternos', assento, T.cores.aco);
-  return { furoEsquerdo: furos[1], furoDireito: furos[-1], canalExterno, assento };
+  return { furoEsquerdo: furos[1], furoDireito: furos[-1], canalExterno, assento, lados };
 }
 
 /* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */
@@ -131,16 +138,18 @@ const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], espelha: ['pos'] };
 const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];
 const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
 
-/** Os PASSOS, em metro: a forma e, no fim, as quatro portas. */
+/** Os PASSOS, em metro: a forma e, no fim, as seis portas. */
 export function gerarPassos(T = TABELA) {
   const estado = { passos: [], topo: {}, origem: 0 };
-  const { furoEsquerdo, furoDireito, canalExterno, assento } = montarTorre(estado, T);
+  const { furoEsquerdo, furoDireito, canalExterno, assento, lados } = montarTorre(estado, T);
   const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);
   const { portas } = derivar(T);
   /* a parede do furo: as laterais do cortador (as tampas dele foram consumidas pelo corte) */
   const paredeDo = (furo) => ({ origem: { ...furo.origem, lado: { passo: 1, fase: 0 } } });
   const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
-  return [...forma, porta('olhalEsquerdo', paredeDo(furoEsquerdo)), porta('olhalDireito', paredeDo(furoDireito)), porta('guiaDoCanalInterno', canalExterno), porta('assentoDoCilindro', assento)];
+  return [...forma, porta('olhalEsquerdo', paredeDo(furoEsquerdo)), porta('olhalDireito', paredeDo(furoDireito)), porta('guiaDoCanalInterno', canalExterno), porta('assentoDoCilindro', assento),
+    /* as orelhas saem da união dos dois lados, e não do espelho: a porta de uma origem espelhada leva a mão espelhada */
+    porta('orelhaEsquerda', lados), porta('orelhaDireita', lados)];
 }
 
 export const CONTATOS = [

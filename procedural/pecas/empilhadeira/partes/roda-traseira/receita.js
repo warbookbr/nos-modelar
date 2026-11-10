@@ -13,11 +13,14 @@
  * barril tem 192 mm de largura, 8 mm de cada lado para dentro da banda, como na dianteira. O cubo da roda assenta, pela face de dentro,
  * na face de fora do flange do cubo do eixo traseiro (Ø 170, a 550 mm); ele tem Ø 140, o maior que a família aceita num aro de Ø 240
  * com 18 mm de parede (`cubo-cabe-no-aro`), e o furo de Ø 106 por onde passa a tampa de Ø 100 do eixo, que vai até 625 mm e fica dentro
- * do aro. Os seis furos de Ø 10 no círculo de 124 são de caráter, no que cabe entre o furo central e a borda do cubo. O assento da roda
+ * do aro. Os seis furos de Ø 6 no círculo de 115,5 são de caráter, no que cabe entre o furo central e a borda de dentro da chapa do
+ * disco: a chapa entra até o meio da parede do cubo, no raio de 61,5 mm, e com os furos de Ø 10 no círculo de 124 (rodada 1) ela tapava
+ * de 61,5 a 67 mm de cada furo; agora o furo vai de 54,75 a 60,75 mm e passa livre, a 0,75 mm da chapa e a 1,75 mm do furo central. O assento da roda
  * (a distância da face de dentro do cubo ao plano do meio do pneu, para dentro) é 445 + 208/2 - 550 = -1 mm: a face do flange fica
  * 1 mm por fora do meio do pneu, e o disco de 15 mm sai do meio do cubo, de 8,5 a 23,5 mm por fora do meio do pneu (o rascunho o punha de
- * 1 a 16). O ombro é o ombro largo da dianteira, o arco de 62 mm do rascunho (a até 1,6 mm da seção dele levada a este raio), que é
- * também quase o máximo que a banda de 208 aceita (30%, 62,4 mm: `ombro-cabe-na-banda`).
+ * 1 a 16). O ombro é o da dianteira, a curva do ombro largo da família com 62 mm na largura (a até 3,0 mm da seção do rascunho
+ * levada a este raio), que é também quase o máximo que a banda de 208 aceita (30%, 62,4 mm: `ombro-cabe-na-banda`), e o pneu tem 192
+ * lados, como o da dianteira.
  *
  * A cadeia: a TABELA em mm; `derivar` da dianteira leva as medidas aos parâmetros da família e a chama com o id desta roda;
  * `gerarPassos` expande a chamada, que já sai em metro, e acrescenta o sombreamento de cada parte. `montarRodaTraseira` escreve a mesma
@@ -37,20 +40,21 @@ export const TABELA = {
   diametroDoAro: 240,
   larguraDoAro: RODA.banda - 16,
   paredeDoAro: 18,
-  /* a roda de chapa: o disco de 15 mm, o cubo de Ø 140 e 30 mm com o furo de Ø 106 e seis furos de Ø 10 no círculo de 124 */
+  /* a roda de chapa: o disco de 15 mm, o cubo de Ø 140 e 30 mm com o furo de Ø 106 e seis furos de Ø 6 no círculo de 115,5, por
+     dentro da borda de dentro da chapa (61,5 mm), para os furos passarem de lado a lado à vista */
   disco: 15,
   diametroDoCubo: 140,
   larguraDoCubo: 30,
   furoCentral: 106,
   furos: 6,
-  circuloDosFuros: 124,
-  diametroDoFuro: 10,
+  circuloDosFuros: 115.5,
+  diametroDoFuro: 6,
   /* o assento da roda: a face de dentro do cubo fica a esta distância do plano do meio do pneu, para dentro (negativo: por fora) */
   assento: RODA.xDentro + RODA.banda / 2 - EIXO.cubo.face,
-  /* a forma do pneu: o ombro largo em arco, de 62 mm de raio (o do rascunho, o mesmo da dianteira), e 96 lados */
+  /* a forma do pneu: o ombro largo em curva, de 62 mm na largura (o do rascunho, o mesmo da dianteira), e 192 lados */
   ombroRedondo: 1,
   ombro: 62,
-  ladosDoPneu: 96,
+  ladosDoPneu: 192,
   /* o sombreamento suave, com a quina acima deste ângulo nítida (o do eixo e da carcaça) */
   anguloDoLiso: 35,
 };
@@ -84,9 +88,9 @@ const receita = {
     escala: { medida: 'diâmetro do pneu traseiro (o raio é a altura do cubo traseiro da carcaça)', milimetros: 568 },
     familiaProcedural: 'roda-pneu',
     partes: [
-      { nome: 'pneu', forma: 'pneu preto de Ø 568 e 208 mm de banda, banda lisa, ombro largo em arco de 62 mm e flanco com bojo, do talão de Ø 240 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 96 lados' },
+      { nome: 'pneu', forma: 'pneu preto de Ø 568 e 208 mm de banda, banda lisa, flanco em curva até o bojo e ombro largo em curva de 62 mm até a banda, sem quina, do talão de Ø 240 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 192 lados' },
       { nome: 'aro', forma: 'barril cinza do aro de 9 polegadas, de 18 mm de parede e 192 mm de largura, que o talão do pneu abraça', tecnica: 'família roda-pneu: revolução em torno de x de um tubo' },
-      { nome: 'cubo', forma: 'anel cinza de Ø 140 e 30 mm, com o furo de Ø 106 e seis furos de Ø 10, cuja face de dentro fica 1 mm por fora do meio do pneu', tecnica: 'família roda-pneu: revolução do anel menos o furo central e os seis furos repetidos em volta do eixo' },
+      { nome: 'cubo', forma: 'anel cinza de Ø 140 e 30 mm, com o furo de Ø 106 e seis furos de Ø 6 livres da chapa, cuja face de dentro fica 1 mm por fora do meio do pneu', tecnica: 'família roda-pneu: revolução do anel menos o furo central e os seis furos repetidos em volta do eixo' },
       { nome: 'disco', forma: 'chapa cinza de 15 mm do cubo ao aro, perto do meio do pneu', tecnica: 'família roda-pneu, tipo 0: revolução em torno de x de um anel' },
     ],
     criteriosDeReprovacao: [

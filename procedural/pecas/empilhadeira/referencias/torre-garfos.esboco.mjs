@@ -3,11 +3,14 @@
  * inclinação, as correntes, a placa porta-garfos, a grade de carga e os dois garfos. Rodado sozinho, monta a carcaça inteira de
  * `carcaca.esboco.mjs` mais estas partes (com EIXOS=1, também os eixos e as rodas de `eixos-rodas.esboco.mjs`, para ver o pé no eixo).
  *
- * A PRIMEIRA METADE MORA NAS RECEITAS DA ETAPA (2026-11-10): os pés e os canais externos em `../partes/torre/receita.js`
- * (`montarTorre`), os canais internos em `../partes/canal-interno/receita.js` (`montarCanalInterno`) e o cilindro de elevação em
- * `../partes/cilindro-elevacao/receita.js` (`montarCilindroElevacao`), a forma deste rascunho com 96 lados nos círculos. As medidas
- * delas abaixo ficam como registro da fonte; quem as usa são as receitas. Os cilindros de inclinação, a placa, a grade, os garfos e as
- * correntes continuam aqui.
+ * A TORRE INTEIRA MORA NAS RECEITAS DA ETAPA (2026-11-10). A primeira metade: os pés e os canais externos em
+ * `../partes/torre/receita.js` (`montarTorre`), os canais internos em `../partes/canal-interno/receita.js` (`montarCanalInterno`) e o
+ * cilindro de elevação em `../partes/cilindro-elevacao/receita.js` (`montarCilindroElevacao`). A segunda: a placa e a grade em
+ * `../partes/carro/receita.js` (`montarCarro`), cada garfo em `../partes/garfo/receita.js` (`montarGarfo`), as correntes em
+ * `../partes/correntes/receita.js` (`montarCorrentes`) e cada cilindro de inclinação em `../partes/cilindro-inclinacao/receita.js`
+ * (`montarCilindroInclinacao`). A forma é a deste rascunho, com 96 lados nos círculos, e o garfo e o cilindro de inclinação de cada
+ * lado postos pelas portas das receitas no lugar do espelho. As medidas abaixo ficam como registro da fonte; quem as usa são as
+ * receitas, e este módulo só as chama sobre o estado da máquina.
  *
  * Eixos do modelo: x lateral (+x é a esquerda de quem dirige), y altura com o chão em 0, z comprimento com a frente em +z e o eixo
  * dianteiro em z 0, y 352,5.
@@ -60,19 +63,17 @@
  *
  * `GIRAR=1 npm run esboco:nucleo -- <este arquivo> --vista isometrica` gira a máquina 180 graus para os três quartos de trás. */
 import carcaca from './carcaca.esboco.mjs';
-import { ferramentas, CINZA, ESCURO } from './carcaca-traseira.esboco.mjs';
 import { montarTorre, TABELA as TABELA_TORRE, derivar as derivarTorre } from '../partes/torre/receita.js';
 import { montarCanalInterno, TABELA as TABELA_INTERNO, derivar as derivarInterno } from '../partes/canal-interno/receita.js';
 import { montarCilindroElevacao } from '../partes/cilindro-elevacao/receita.js';
+import { montarCarro, TABELA as CARRO, derivar as derivarCarro } from '../partes/carro/receita.js';
+import { montarGarfo, TABELA as GARFO, derivar as derivarGarfo } from '../partes/garfo/receita.js';
+import { montarCorrentes } from '../partes/correntes/receita.js';
+import { montarCilindroInclinacao, TABELA as INCLINACAO, derivar as derivarInclinacao } from '../partes/cilindro-inclinacao/receita.js';
 
-const PRETO = '#26282b';         // garfos, placa e grade: o quase preto da vista de frente (escuro mais claro que o fundo)
-const ACO = '#b4b8bc';           // as hastes cromadas (cinza claro na vista de cima, colunas 364 a 375)
-const LADOS = 40;
 
-/* as medidas adotadas, em mm. A torre, o canal interno e o cilindro de elevação moram nas receitas da etapa (2026-11-10):
-   `../partes/torre/receita.js` (`montarTorre`: os pés e os canais externos), `../partes/canal-interno/receita.js`
-   (`montarCanalInterno`) e `../partes/cilindro-elevacao/receita.js` (`montarCilindroElevacao`), a forma deste rascunho levada para
-   lá sem mudança de medida, com 96 lados nos círculos; TORRE abaixo é lida delas, para as partes que ficam aqui. */
+/* as medidas adotadas, em mm, lidas das receitas da etapa (2026-11-10), onde a forma deste rascunho foi levada sem mudança de medida:
+   TORRE resume a torre e o canal interno, e CARRO, GARFO e INCLINACAO são as TABELAS do carro, do garfo e do cilindro de inclinação. */
 const DI = derivarInterno();
 export const TORRE = {
   tras: TABELA_TORRE.tras, frente: TABELA_TORRE.frente,   // fundo dos canais externos (z)
@@ -80,27 +81,10 @@ export const TORRE = {
   interno: { x: [TABELA_INTERNO.dentro, DI.fora], alma: TABELA_INTERNO.alma, aba: TABELA_INTERNO.aba, z: DI.z, y: DI.y },
   pivo: derivarTorre().pivo,              // o centro do eixo dianteiro, em torno do qual a torre inclina
 };
-export const CARRO = { z: [430, 480], x: 500, barraBaixo: [170, 240], barraCima: [540, 640], montante: [140, 195] };
-export const GARFO = { centro: 280, largura: 100, espessura: 40, comprimento: 1070, chao: 50, altura: 650, face: 520 };
-export const INCLINACAO = { x: 355, y: 860, camisa: [-150, 15], haste: [15, 60], rCamisa: 45, rHaste: 22 };
+export { CARRO, GARFO, INCLINACAO };
 
 /** Monta a torre e os garfos no estado { passos, topo, origem } da carcaça e devolve as medidas usadas. */
 export function montarTorreGarfos(estado) {
-  const { extX, extY, extZ, booleana, parte } = ferramentas(estado);
-  const unir = (...s) => booleana('unir', s);
-  const cruzar = (...s) => booleana('intersectar', s);
-  const novo = () => { estado.origem += 1; return estado.origem; };
-  /* a cópia do outro lado, pelo espelho em x = 0 (a peça que se repete é feita uma vez) */
-  function espelho(sel) {
-    const id = novo();
-    estado.passos.push(['espelha', { origemId: id, eixo: 'x', pos: 0, derivaDe: sel.origem, sel: { origem: sel.origem } }]);
-    return { origem: { op: 'espelha', id, de: sel.origem } };
-  }
-  const par = (sel) => unir(sel, espelho(sel));
-  const circulo = (cx, cy, r, n = LADOS) => Array.from({ length: n }, (_, k) => [cx + r * Math.cos(2 * Math.PI * k / n), cy + r * Math.sin(2 * Math.PI * k / n)]);
-  const caixaY = (x0, x1, z0, z1, y0, y1) => extY([[x0, z0], [x1, z0], [x1, z1], [x0, z1]], y0, y1);
-  const I = TORRE.interno;
-
   /* PÉ DA TORRE E CANAIS EXTERNOS: a receita da etapa (`../partes/torre/receita.js`), no referencial da máquina. O olhal abraça o
      tubo do eixo dianteiro (raio 75) com 2 mm de folga, de 215 a 262 mm do centro; o canal externo em U com as travessas e a orelha
      do cilindro de inclinação. */
@@ -113,45 +97,28 @@ export function montarTorreGarfos(estado) {
      sobre a travessa de baixo (a porta `assentoDoCilindro`). */
   montarCilindroElevacao(estado, undefined, derivarTorre().portas.assentoDoCilindro.centro);
 
-  /* CILINDROS DE INCLINAÇÃO ------------------------------------------------------------------------------------------------------
-     Deitados ao longo de z em x 355, y 860, como na carcaca-lado (de z -36 a 75 em y 812 a 912). A camisa de Ø 90 vai de z -150 a 15 (mais atrás ela sairia por cima da descida do painel, que a z -260 está a 861 mm):
-     a carcaça não tem o rebaixo no painel e ela fica dentro dele, de z -150 a 0 (o relato diz a medida que o painel teria de ter). A
-     haste de Ø 44 vai de 15 a 60, até a orelha do canal externo. */
-  const C = INCLINACAO;
-  parte('cilindrosInclinacao', par(extZ(circulo(C.x, C.y, C.rCamisa), C.camisa[0], C.camisa[1])), CINZA);
-  parte('hastesInclinacao', par(extZ(circulo(C.x, C.y, C.rHaste), C.haste[0], C.haste[1])), ACO);
+  /* CILINDROS DE INCLINAÇÃO: a receita da etapa (`../partes/cilindro-inclinacao/receita.js`), um de cada lado, com a ponta da haste na
+     face de trás da orelha da torre (as portas `orelhaEsquerda` e `orelhaDireita`) e a camisa no rebaixo do painel da carcaça. */
+  const portasDaTorre = derivarTorre().portas;
+  const naOrelha = derivarInclinacao().portas.naOrelha.ponto;
+  for (const lado of ['orelhaEsquerda', 'orelhaDireita']) {
+    const em = portasDaTorre[lado].ponto.map((c, k) => c - naOrelha[k]);
+    montarCilindroInclinacao(estado, undefined, em, { camisa: 'cilindrosInclinacao', haste: 'hastesInclinacao' });
+  }
 
-  /* PLACA PORTA-GARFOS (o carro) -------------------------------------------------------------------------------------------------
-     As duas barras de 1.000 mm à frente da torre (z 430 a 480): a de baixo de y 170 a 240 e a de cima de 540 a 640 (frente, linhas
-     480-497 e 388-415, com os garfos embaixo). Os dois montantes de trás, de x 140 a 195, z 235 a 430, levam as barras aos canais
-     internos: correm por dentro deles (face de dentro do interno em x 198, 3 mm de folga) e no topo prendem as correntes. A
-     travessa de trás entre eles (z 235 a 300, y 590 a 640) prende as correntes do cilindro. As chapas das pontas, de x 470 a 500, ligam
-     as duas barras: de frente o quadro escuro desce dos dois lados até a barra de baixo (rodada 1, C1 e C4). */
-  const K = CARRO;
-  const barras = [caixaY(-K.x, K.x, K.z[0], K.z[1], ...K.barraBaixo), caixaY(-K.x, K.x, K.z[0], K.z[1], ...K.barraCima)];
-  const montante = caixaY(K.montante[0], K.montante[1], 235, K.z[0], K.barraBaixo[0], K.barraCima[1]);
-  const ponta2 = caixaY(K.x - 30, K.x, K.z[0], K.z[1], K.barraBaixo[1], K.barraCima[0]);
-  const travessaDoCarro = caixaY(-K.montante[1] + 1, K.montante[1] - 1, 235, 300, 590, K.barraCima[1]);
-  parte('placaGarfos', unir(...barras, par(unir(montante, ponta2)), travessaDoCarro), PRETO);
+  /* PLACA PORTA-GARFOS E GRADE DE CARGA: a receita da etapa (`../partes/carro/receita.js`), embaixo, no referencial da máquina. */
+  montarCarro(estado);
 
-  /* GRADE DE CARGA: o quadro de 1.000 sobre a barra de cima (face y 640), de z 445 a 480, com os montantes de 30 mm, a barra de cima
-     de 1.200 a 1.230 e a do meio de 890 a 910 (frente: topo na linha 247, barra do meio na 347). */
-  const lateralDaGrade = caixaY(K.x - 30, K.x, 445, K.z[1], K.barraCima[1], 1230);
-  parte('gradeCarga', unir(par(lateralDaGrade), caixaY(-K.x + 1, K.x - 1, 445, K.z[1], 1200, 1230), caixaY(-K.x + 1, K.x - 1, 445, K.z[1], 890, 910)), PRETO);
+  /* GARFOS: a receita da etapa (`../partes/garfo/receita.js`), um de cada lado, com a face de trás da haste na face da frente da barra
+     de cima do carro (as portas `apoioDoGarfoEsquerdo` e `apoioDoGarfoDireito`) e a face de baixo da lâmina a 50 mm do chão. */
+  const portasDoCarro = derivarCarro().portas;
+  const gancho = derivarGarfo().portas.gancho.ponto;
+  for (const lado of ['apoioDoGarfoEsquerdo', 'apoioDoGarfoDireito']) {
+    montarGarfo(estado, undefined, portasDoCarro[lado].ponto.map((c, k) => c - gancho[k]), { garfo: 'garfos' });
+  }
 
-  /* GARFOS: em L, a haste de 40 mm de pé contra a face das barras (z 480) e a lâmina de 1.070 x 100 x 40 com a face de baixo a 50 mm
-     do chão. A lâmina afina na ponta: de lado, nos últimos 200 mm, desce de 40 a 12 mm; de cima, nos últimos 60, de 100 a 70. */
-  const G = GARFO; const ponta = G.face + G.comprimento;
-  const ladoDoGarfo = [[K.z[1], G.chao], [ponta, G.chao], [ponta, G.chao + 12], [ponta - 200, G.chao + G.espessura],
-    [G.face, G.chao + G.espessura], [G.face, G.altura], [K.z[1], G.altura]];
-  const x0 = G.centro - G.largura / 2; const x1 = G.centro + G.largura / 2;
-  const plantaDoGarfo = [[x0, K.z[1] - 1], [x1, K.z[1] - 1], [x1, ponta - 60], [x1 - 15, ponta + 1], [x0 + 15, ponta + 1], [x0, ponta - 60]];
-  parte('garfos', par(cruzar(extX(ladoDoGarfo, x0, x1), extY(plantaDoGarfo, 0, 700))), PRETO);
-
-  /* CORRENTES: uma fita de 15 x 12 mm de cada lado, em x 143 a 158 (149 mm do centro na frente), de pé na frente da travessa de cima
-     do interno (face z 350) até o topo dos montantes do carro (y 640). Na referência elas descem à frente dos canais até a placa. */
-  /* e as do cilindro: 12 x 12 mm em x 54 a 66, na frente da cabeça (face z 250) até a travessa do carro (y 640) */
-  parte('correntes', unir(par(caixaY(143, 158, 350, 362, K.barraCima[1], I.y[1])), par(caixaY(54, 66, 250, 262, K.barraCima[1], 1440))), ESCURO);
+  /* CORRENTES: a receita da etapa (`../partes/correntes/receita.js`), da cabeça do cilindro e da travessa do canal interno ao carro. */
+  montarCorrentes(estado);
 
   return { TORRE, CARRO, GARFO, INCLINACAO };
 }

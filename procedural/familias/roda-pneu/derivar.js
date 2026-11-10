@@ -41,14 +41,22 @@
 
    O OMBRO LARGO. `ombroDoPneu` maior que zero troca o chanfro limitado (a fração do flanco, até 9 mm e até 30% da largura) pela
    fração pedida do flanco, sem o teto de 9 mm: o pneu industrial alto, de ombro de dezenas de milímetros. Convive com
-   `ombroRedondo` (o arco passa a ter o raio do ombro largo). O máximo do contrato (0,6 do flanco) deixa o ombro acima do bojo, e a
+   `ombroRedondo`: com os dois, a seção do lado é uma curva só, sem quina, que é a do pneu industrial alto (a curva do ombro largo,
+   abaixo). O máximo do contrato (0,6 do flanco) deixa o ombro acima do bojo, e a
    restrição `ombro-cabe-na-banda` recusa, com as duas medidas em mm, o ombro que passa de 30% da largura da banda. Com o ombro
    acima de 10 mm o chanfro sai da faixa em que a conferência da porta do assento procura o raio, e a porta passa a declarar como
    raio externo o raio que a face plana de dentro alcança (`raioDaFaceDoAssento`, o raio do ombro); sem o ombro largo, ou com
    friso (a parede de dentro é plana até o friso), ele é o raio do friso, como sempre. Com 0 a roda é a de antes.
 
+   A CURVA DO OMBRO LARGO (`ombroDoPneu` maior que zero com `ombroRedondo` 1, composição de sufixo `-ombro-largo`). O lado do pneu sai
+   do talão em curva até o bojo, a largura máxima, onde chega na vertical (uma parábola em `PONTOS_DO_FLANCO` + 1 segmentos), e do bojo
+   à banda num quarto de superelipse de expoente `EXPOENTE_DO_OMBRO_LARGO` e `SEGMENTOS_DO_OMBRO_LARGO` segmentos, de semieixo radial do
+   bojo ao raio do pneu e axial do ombro, tangente ao flanco no bojo e à banda no fim: sem quina entre o flanco e o ombro. Do lado do
+   friso a superelipse não existe e os pontos dela ficam sobre a parede reta. A face de dentro deixa de ter parte plana no plano da porta, e o raio
+   externo da porta do assento é o maior raio da seção a até `FAIXA_DA_PORTA_MM` do plano, que é onde a conferência da porta o procura.
+
    Puro e determinístico: nenhuma leitura de relógio, de sorteio ou de arquivo. */
-import { LADOS_DO_PNEU, escalaresDaRoda, idDaRoda, nomeDoNoDoAro, nomeDoNoDoCubo } from './composicoes.js';
+import { EXPOENTE_DO_OMBRO_LARGO, LADOS_DO_PNEU, PONTOS_DO_FLANCO, SEGMENTOS_DO_OMBRO_LARGO, escalaresDaRoda, nomesDoOmbroLargo, idDaRoda, nomeDoNoDoAro, nomeDoNoDoCubo } from './composicoes.js';
 
 const MM = 0.001;
 export const ALTURA_DO_BOJO = 0.35;
@@ -60,6 +68,8 @@ export const ESPESSURA_DO_FRISO = 1.2;
 export const TALUDE_DO_FRISO = 0.6;
 export const FOLGA_DA_FERRAMENTA = 0.1;
 export const FOLGA_DO_PRISMA_DO_SULCO = 0.05;
+/* a faixa em torno do plano da porta em que a conferência da porta mede o raio (`FAIXA_DO_RAIO` de `porta-confere-forma.js`, 10 mm) */
+export const FAIXA_DA_PORTA_MM = 10;
 /* posição de nó em metro, arredondada a 0,1 nm: tira o ruído da última casa de seno e cosseno do hash da geometria */
 const arredondar = (valor) => Math.round(valor * 1e10) / 1e10;
 
@@ -186,7 +196,33 @@ export function derivar({
     });
   }
   const redondo = ombroRedondo > 0;
-  if (redondo) {
+  const curva = redondo && ombroLargo;
+  if (curva) {
+    /* [raio, x] do lado esquerdo (-x); o direito é o espelho, sempre com a elipse */
+    const raioDoBojo = raioDoAssento + ALTURA_DO_BOJO * flanco;
+    const flancoEm = (k) => {
+      const t = k / (PONTOS_DO_FLANCO + 1);
+      return [raioDoAssento + t * (raioDoBojo - raioDoAssento), -meiaLargura + (meiaLargura - meiaLarguraDoAro) * (1 - t) ** 2];
+    };
+    const elipseEm = (k) => {
+      const a = (k / SEGMENTOS_DO_OMBRO_LARGO) * (Math.PI / 2);
+      const e = 2 / EXPOENTE_DO_OMBRO_LARGO;
+      return [raioDoBojo + (raioDoPneu - raioDoBojo) * Math.sin(a) ** e, -meiaLargura + chanfro - chanfro * Math.cos(a) ** e];
+    };
+    const naParede = (k) => [raioDoBojo + (k / SEGMENTOS_DO_OMBRO_LARGO) * (raioDoFriso - raioDoBojo), -meiaLargura];
+    const nomes = nomesDoOmbroLargo();
+    const pontos = {};
+    for (let k = 1; k <= PONTOS_DO_FLANCO; k++) { pontos[`FE${k}`] = flancoEm(k); pontos[`FD${k}`] = [flancoEm(k)[0], -flancoEm(k)[1]]; }
+    for (let k = 1; k < SEGMENTOS_DO_OMBRO_LARGO; k++) {
+      pontos[`OE${k}`] = comFriso ? naParede(k) : elipseEm(k);
+      pontos[`OD${k}`] = [elipseEm(k)[0], -elipseEm(k)[1]];
+    }
+    for (const [chave, [raio, x]] of Object.entries(pontos)) Object.assign(todos, { [nomes.raio(chave)]: mm(raio), [nomes.x(chave)]: mm(x) });
+    /* o raio da porta: o maior raio da seção do lado esquerdo a até a faixa do plano dela */
+    const doLado = [[raioDoAssento, -meiaLarguraDoAro], [raioDoBojo, -meiaLargura], [raioDoFriso, inicioDaBandaEsquerda],
+      ...Object.entries(pontos).filter(([chave]) => chave.includes('E')).map(([, ponto]) => ponto)];
+    todos.raioDaFaceDoAssento = mm(Math.max(...doLado.filter(([, x]) => x + meiaLargura <= FAIXA_DA_PORTA_MM).map(([raio]) => raio)));
+  } else if (redondo) {
     /* o arco de quarto de círculo de raio `chanfro`, de (raioDoPneu - chanfro, -meiaLargura) a (raioDoPneu, -meiaLargura + chanfro) à esquerda, nos ângulos de 30 e 60 graus */
     const noArco = (graus, lado) => {
       const a = (graus * Math.PI) / 180;
@@ -201,14 +237,14 @@ export function derivar({
       raioDoOmbroD1: mm(d1[0]), xDoOmbroD1: mm(d1[1]), raioDoOmbroD2: mm(d2[0]), xDoOmbroD2: mm(d2[1]),
     });
   }
-  const argumentos = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo: redondo }).map((nome) => [nome, todos[nome]]));
+  const argumentos = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo: redondo, ombroLargo: curva }).map((nome) => [nome, todos[nome]]));
   argumentos.ladosDoPneu = ladosDoPneu;
   argumentos.furos = furosDeFixacao;
   argumentos.materialDoPneu = banda === 2 ? 'aco' : 'borracha';
   if (sulcada) argumentos.sulcos = sulcos;
   if (circular) argumentos.sulcosCirculares = sulcosCirculares;
   if (ventilada) argumentos.furosDeVentilacao = furosDeVentilacao;
-  if (tipo === 0) return { composicao: idDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo: redondo }), argumentos };
+  if (tipo === 0) return { composicao: idDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo: redondo, ombroLargo: curva }), argumentos };
 
   /* os raios */
   const maciço = paredeDoRaio === 0;
@@ -226,5 +262,5 @@ export function derivar({
     argumentos[nomeDoNoDoCubo(k)] = noEm(xDoCubo, raioDoNoDoCubo, k * passo);
     argumentos[nomeDoNoDoAro(k)] = noEm(xDoAro, raioDoNoDoAro, k * passo + sentido * cruzamento * passo);
   }
-  return { composicao: idDaRoda({ tipo, raios, maciço, sulcada, circular, ombroRedondo: redondo }), argumentos };
+  return { composicao: idDaRoda({ tipo, raios, maciço, sulcada, circular, ombroRedondo: redondo, ombroLargo: curva }), argumentos };
 }

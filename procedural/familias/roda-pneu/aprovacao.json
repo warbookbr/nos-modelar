@@ -207,7 +207,7 @@
           "sulcosCirculares": 8,
           "tipo": 2
         },
-        "hash": "sha256:bac1e228ecf788b7af80aab385c4cd52579af9da7ea648c15c51160bd81d5fa4",
+        "hash": "sha256:d8438473e9199eea85bbc246e031796ad72f2161192fb3b465ad7d8f4c50828a",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
@@ -837,7 +837,7 @@
           "espessuraDisco": 0.02128,
           "furosDeFixacao": 6,
           "furosDeVentilacao": 0,
-          "ladosDoPneu": 96,
+          "ladosDoPneu": 192,
           "larguraAro": 0.936,
           "larguraCubo": 0.04255,
           "larguraDoSulco": 0.45,
@@ -854,7 +854,7 @@
           "sulcosCirculares": 0,
           "tipo": 0
         },
-        "hash": "sha256:bc3c3894e8a25c8256b467dc822e44809f15c835611680cb6c8ce4fcaa6d91e8",
+        "hash": "sha256:727ca77e2bd30e4ee6503c33c6c277156737a7ba8e86fc00d6191c3ebf0c0ff0",
         "medidas": []
       },
       "furgao-235-65-r16": {

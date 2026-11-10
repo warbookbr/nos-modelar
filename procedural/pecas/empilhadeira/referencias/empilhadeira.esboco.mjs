@@ -51,11 +51,20 @@ const DA_CARCACA = [
   ['piso', 'tampaMotor', 'o pé da tampa do motor desce 20 mm no piso'],
   ['piso', 'tapete', 'o tapete é a chapa de cima do piso'],
 ];
-/* as que não se tocam: a moldura da grade e a aba da tampa têm a espessura real (fatia T12) e não são mais blocos fundos dentro do capô */
-const FOLGAS_DA_CARCACA = [
+/* as que não se tocam: a moldura da grade e a aba da tampa têm a espessura real (fatia T12) e não são mais blocos fundos dentro do capô;
+   e o carro porta-garfos, que corre à frente e por dentro dos canais e passa à frente dos pneus dianteiros. As três do carro eram dadas
+   como travessia pela caixa, com o sólido inconclusivo, enquanto a placa do rascunho tinha as quinas das chapas das pontas abertas; a
+   receita do carro (2026-11-10) fecha a malha e o sólido as decide como folga. */
+const FOLGAS = [
   ['capo', 'grade', 'a moldura da grade fica no vão do capô, sem tocar a borda dele'],
   ['fundoGrade', 'tampa', 'a aba da tampa passa sobre o fundo da grade, sem tocá-lo'],
   ['grade', 'tampa', 'a aba da tampa passa sobre a moldura, sem tocá-la'],
+  /* a placa porta-garfos e os pneus dianteiros: as caixas se cruzam de x 417 a 500 e o sólido não decide; a face de trás das barras do
+     carro (z 430) fica a 77,5 mm à frente da banda do pneu (z 352,5, no raio do pneu sobre o cubo), de x 479 a 500 onde a banda tem o
+     raio inteiro, e os montantes do carro (x 140 a 195) ficam por dentro dos pneus */
+  ['placaGarfos', 'pneusDianteiros', 'a placa porta-garfos fica 77,5 mm à frente da banda dos pneus dianteiros, sem tocá-los'],
+  ['canaisInternos', 'placaGarfos', 'os montantes do carro correm a 3 mm da ponta das abas dos canais internos, sem tocá-las'],
+  ['canaisExternos', 'placaGarfos', 'os montantes do carro passam 15 mm à frente da travessa de baixo dos canais externos, e as barras 58 mm à frente dos canais'],
 ];
 /* AS FRENTES sobre a carcaça e entre si */
 const DAS_FRENTES = [
@@ -77,10 +86,6 @@ const DAS_FRENTES = [
   ['painel', 'pedais', 'as hastes dos pedais saem da rampa do painel'],
   ['paralamas', 'protetor', 'os pés da frente do protetor assentam na aba do paralama'],
   ['espelho', 'protetor', 'o braço do espelho entra 5 mm na face de trás da coluna da frente'],
-  /* os dois abaixo são folga no desenho (os montantes do carro correm a 3 mm da face de dentro dos canais internos); o relato os dá
-     como travessia pela caixa, com o sólido inconclusivo, e a declaração diz isso */
-  ['canaisExternos', 'placaGarfos', 'folga de desenho dada como travessia pela caixa: o carro corre à frente e dentro dos canais'],
-  ['canaisInternos', 'placaGarfos', 'folga de desenho dada como travessia pela caixa: os montantes correm a 3 mm dos canais internos'],
 ];
 
 export default {
@@ -91,6 +96,6 @@ export default {
     nota: 'rascunho das fatias 1 a 7, com as pendências entre as partes acertadas na carcaça',
     passos: estado.passos,
     topo: estado.topo,
-    contatos: [...[...DA_CARCACA, ...DAS_FRENTES].map(([a, b, m]) => atravessa(a, b, m)), ...FOLGAS_DA_CARCACA.map(([a, b, motivo]) => ({ par: [a, b], relacao: 'folga', motivo }))],
+    contatos: [...[...DA_CARCACA, ...DAS_FRENTES].map(([a, b, m]) => atravessa(a, b, m)), ...FOLGAS.map(([a, b, motivo]) => ({ par: [a, b], relacao: 'folga', motivo }))],
   }],
 };

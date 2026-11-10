@@ -72,6 +72,48 @@
         "tipo": "peca",
         "ref": "empilhadeira/cilindro-elevacao"
       }
+    },
+    {
+      "id": "carro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/carro"
+      }
+    },
+    {
+      "id": "garfoEsquerdo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/garfo"
+      }
+    },
+    {
+      "id": "garfoDireito",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/garfo"
+      }
+    },
+    {
+      "id": "correntes",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/correntes"
+      }
+    },
+    {
+      "id": "cilindroInclinacaoEsquerdo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/cilindro-inclinacao"
+      }
+    },
+    {
+      "id": "cilindroInclinacaoDireito",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/cilindro-inclinacao"
+      }
     }
   ],
   "relacoes": [
@@ -355,7 +397,13 @@
     "rodaTraseiraDireita",
     "torre",
     "canalInterno",
-    "cilindroElevacao"
+    "cilindroElevacao",
+    "carro",
+    "garfoEsquerdo",
+    "garfoDireito",
+    "correntes",
+    "cilindroInclinacaoEsquerdo",
+    "cilindroInclinacaoDireito"
   ],
   "vinculos": [
     {
@@ -486,8 +534,107 @@
       },
       "unidade": "mm",
       "afastamento": 0
+    },
+    {
+      "id": "carroNoCanalInterno",
+      "instancia": "carro",
+      "porta": "guiaNoInterno",
+      "em": {
+        "instancia": "canalInterno",
+        "porta": "guiaDoCarro"
+      },
+      "unidade": "mm",
+      "afastamento": 3
+    },
+    {
+      "id": "garfoEsquerdoNoCarro",
+      "instancia": "garfoEsquerdo",
+      "porta": "gancho",
+      "em": {
+        "instancia": "carro",
+        "porta": "apoioDoGarfoEsquerdo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "garfoDireitoNoCarro",
+      "instancia": "garfoDireito",
+      "porta": "gancho",
+      "em": {
+        "instancia": "carro",
+        "porta": "apoioDoGarfoDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "correntesNaCabeca",
+      "instancia": "correntes",
+      "porta": "naCabeca",
+      "em": {
+        "instancia": "cilindroElevacao",
+        "porta": "cabeca"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "cilindroInclinacaoEsquerdoNaOrelha",
+      "instancia": "cilindroInclinacaoEsquerdo",
+      "porta": "naOrelha",
+      "em": {
+        "instancia": "torre",
+        "porta": "orelhaEsquerda"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "cilindroInclinacaoDireitoNaOrelha",
+      "instancia": "cilindroInclinacaoDireito",
+      "porta": "naOrelha",
+      "em": {
+        "instancia": "torre",
+        "porta": "orelhaDireita"
+      },
+      "unidade": "mm",
+      "afastamento": 0
     }
   ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-9,
+    "expectativas": [
+      {
+        "id": "garfoEsquerdoPenduradoNoCarro",
+        "a": {
+          "caminho": [
+            "carro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfoEsquerdo"
+          ]
+        },
+        "motivo": "a face de trás da haste do garfo esquerdo assenta na face da frente das duas barras do carro, em z 480, face sobre face; as arestas das barras correm sobre a face da haste no plano comum, e a auditoria as dá como cruzamento de superfícies sem profundidade"
+      },
+      {
+        "id": "garfoDireitoPenduradoNoCarro",
+        "a": {
+          "caminho": [
+            "carro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfoDireito"
+          ]
+        },
+        "motivo": "a face de trás da haste do garfo direito assenta na face da frente das duas barras do carro, em z 480, face sobre face; as arestas das barras correm sobre a face da haste no plano comum, e a auditoria as dá como cruzamento de superfícies sem profundidade"
+      }
+    ]
+  },
   "apoioNoChao": {
     "plano": {
       "normal": [

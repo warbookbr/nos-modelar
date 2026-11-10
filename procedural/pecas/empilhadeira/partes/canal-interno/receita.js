@@ -17,7 +17,9 @@
  * O ENCAIXE. A origem é a da máquina, a mesma da torre: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à
  * esquerda de quem dirige e a frente em +z; a peça está recolhida, com o topo no topo da torre. A montagem põe o canal interno na
  * torre pela porta `guiaNoExterno` (a face de fora da alma do canal interno esquerdo) sobre a porta `guiaDoCanalInterno` da torre (a
- * face de dentro da alma do canal externo esquerdo), afastada da folga lateral.
+ * face de dentro da alma do canal externo esquerdo), afastada da folga lateral. O carro porta-garfos corre por dentro dele, e a porta
+ * `guiaDoCarro` (a ponta da aba da frente do canal esquerdo, em x 198, na altura do pé do canal) recebe a face de fora do montante
+ * esquerdo do carro; ela não muda a malha.
  *
  * A JUNTA QUE A MONTAGEM AINDA NÃO TEM. O canal interno sobe na vertical dentro do externo (até 1.475 mm, no rascunho); a montagem v5
  * não tem articulação nem guia linear medida (ela mede encaixe cilíndrico e assento anular), e a posição sai das duas faces planas,
@@ -57,6 +59,8 @@ export function derivar(T = TABELA) {
     [fora - T.alma, z[1] - T.aba], [fora - T.alma, z[0] + T.aba], [T.dentro, z[0] + T.aba]];
   const portas = {
     guiaNoExterno: { forma: 'plano', papel: 'apoia', ponto: [fora, y[1], (z[0] + z[1]) / 2], normal: [1, 0, 0], extensao: [z[1] - z[0], y[1] - y[0]], referencia: [0, 1, 0] },
+    /* a guia do carro: a ponta da aba da frente do canal esquerdo (x `dentro`), no meio da aba e na altura do pé do canal */
+    guiaDoCarro: { forma: 'plano', papel: 'recebe', ponto: [T.dentro, y[0], z[1] - T.aba / 2], normal: [-1, 0, 0], extensao: [T.aba, y[1] - y[0]], referencia: [0, 1, 0] },
   };
   return { fora, z, y, uInterno, portas };
 }
@@ -85,14 +89,14 @@ const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], espelha: ['pos'] };
 const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
 const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
 
-/** Os PASSOS, em metro: a forma e, no fim, a porta da guia. */
+/** Os PASSOS, em metro: a forma e, no fim, as portas das duas guias, a do canal externo e a do carro. */
 export function gerarPassos(T = TABELA) {
   const estado = { passos: [], topo: {}, origem: 0 };
   const { canal } = montarCanalInterno(estado, T);
   const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);
   const { portas } = derivar(T);
   const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
-  return [...forma, porta('guiaNoExterno', canal)];
+  return [...forma, porta('guiaNoExterno', canal), porta('guiaDoCarro', canal)];
 }
 
 /* Uma parte só: os dois canais e a travessa são um corpo. */

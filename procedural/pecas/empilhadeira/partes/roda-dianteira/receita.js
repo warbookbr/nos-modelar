@@ -15,10 +15,12 @@
  * "offset" da roda), tirado do pneu da carcaça (417 + 250/2 = 542) e da face do flange do eixo (463): 79 mm. A família o recebe como
  * `desvio`, a fração da folga do aro que o disco ocupa.
  *
- * O ombro do pneu é o ombro largo da família (`ombroDoPneu`, a fração do flanco, aprovado pela pessoa em 2026-11-10): o arco de 62 mm
- * de raio, que é o vão axial do ombro do rascunho (de 0 a 62 mm da face, na seção que o rascunho dá às duas rodas) e o arco que mais
- * se aproxima dele, a até 3,3 mm de cada ponto da seção do rascunho (o de 55 ficaria a 5,6 mm). O que a família não faz, e por isso
- * fica diferente do rascunho: o flanco vai reto do bojo ao ombro, e a revolução tem 96 lados no lugar de 48.
+ * O ombro do pneu é o ombro largo da família (`ombroDoPneu`, a fração do flanco, aprovado pela pessoa em 2026-11-10) com o ombro
+ * redondo: a seção do lado é a curva do ombro largo da família, o flanco em parábola do talão ao bojo e a superelipse do bojo à banda,
+ * de 62 mm na largura, que é o vão axial do ombro do rascunho (de 0 a 62 mm da face, na seção que o rascunho dá às duas rodas); ela
+ * fica a até 3,1 mm da seção do rascunho do bojo à banda. Na rodada 1 o ombro era um arco de três facetas e o flanco uma parede
+ * reta, com quina entre os dois. A revolução do pneu tem 192 lados (o máximo da família): com 96, a luz rasante serrilhava a borda
+ * de cima e a sombra do aro no flanco.
  *
  * A cadeia: a TABELA em mm; `derivar` leva as medidas aos parâmetros da família (em proporção do diâmetro) e chama a família;
  * `gerarPassos` expande a chamada, que já sai em metro, e acrescenta o sombreamento de cada parte. `montarRodaDianteira` escreve a
@@ -50,10 +52,10 @@ export const TABELA = {
   /* o assento da roda: a face de dentro do cubo fica a esta distância do plano do meio do pneu, para dentro (o pneu de 417 a 667 mm
      da carcaça e a face do flange do eixo) */
   assento: RODA.xDentro + RODA.banda / 2 - EIXO.cubo.face,
-  /* a forma do pneu: o ombro largo em arco, de 62 mm de raio (o do rascunho), e 96 lados */
+  /* a forma do pneu: o ombro largo em curva, de 62 mm na largura (o do rascunho), e 192 lados */
   ombroRedondo: 1,
   ombro: 62,
-  ladosDoPneu: 96,
+  ladosDoPneu: 192,
   /* o sombreamento suave, com a quina acima deste ângulo nítida (o do eixo e da carcaça) */
   anguloDoLiso: 35,
 };
@@ -160,7 +162,7 @@ const receita = {
     escala: { medida: 'diâmetro do pneu (7.00-12 da ficha da classe 2,5 t)', milimetros: 705 },
     familiaProcedural: 'roda-pneu',
     partes: [
-      { nome: 'pneu', forma: 'pneu preto de Ø 705 e 250 mm de banda, banda lisa, ombro largo em arco de 62 mm e flanco com bojo, do talão de Ø 320 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 96 lados' },
+      { nome: 'pneu', forma: 'pneu preto de Ø 705 e 250 mm de banda, banda lisa, flanco em curva até o bojo e ombro largo em curva de 62 mm até a banda, sem quina, do talão de Ø 320 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 192 lados' },
       { nome: 'aro', forma: 'barril cinza do aro de 12 polegadas, de 18 mm de parede e 234 mm de largura, que o talão do pneu abraça', tecnica: 'família roda-pneu: revolução em torno de x de um tubo' },
       { nome: 'cubo', forma: 'anel cinza de Ø 200 e 30 mm, com o furo de Ø 110 e seis furos de Ø 14, cuja face de dentro fica 79 mm para dentro do meio do pneu', tecnica: 'família roda-pneu: revolução do anel menos o furo central e os seis furos repetidos em volta do eixo' },
       { nome: 'disco', forma: 'chapa cinza de 15 mm do cubo ao aro, recuada para dentro do pneu', tecnica: 'família roda-pneu, tipo 0: revolução em torno de x de um anel' },

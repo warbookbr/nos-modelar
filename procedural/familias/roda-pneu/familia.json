@@ -690,7 +690,7 @@
       }
     },
     "empilhadeira-700-12": {
-      "descricao": "roda motriz de empilhadeira com pneu pneumático industrial 7.00-12 (705 mm): banda larga e alta num aro pequeno de doze polegadas, ombro largo em arco de 62 mm e roda de chapa de seis furos recuada para dentro",
+      "descricao": "roda motriz de empilhadeira com pneu pneumático industrial 7.00-12 (705 mm): banda larga e alta num aro pequeno de doze polegadas, flanco em curva até o bojo e ombro largo em curva de 62 mm até a banda, e roda de chapa de seis furos recuada para dentro",
       "parametros": {
         "diametroPneu": 705,
         "larguraPneu": 0.3546,
@@ -708,7 +708,8 @@
         "diametroFuro": 0.01986,
         "desvio": -0.5845,
         "ombroRedondo": 1,
-        "ombroDoPneu": 0.3221
+        "ombroDoPneu": 0.3221,
+        "ladosDoPneu": 192
       }
     }
   }

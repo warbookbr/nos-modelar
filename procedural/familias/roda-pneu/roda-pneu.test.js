@@ -15,9 +15,9 @@ import { FAMILIAS, ErroChamadaDeFamilia, chamar, criarRegistroDeFamilias } from 
 import { RODA_PNEU } from './index.js';
 import {
   ALTURA_DO_BOJO, CHANFRO_MAXIMO_DO_OMBRO_MM, ESPESSURA_DO_FRISO, FRACAO_DO_CHANFRO, FRACAO_DO_CHANFRO_DA_RODA_SEM_PNEU, FRACAO_DO_CHANFRO_NA_LARGURA,
-  TALUDE_DO_FRISO,
+  TALUDE_DO_FRISO, FAIXA_DA_PORTA_MM,
 } from './derivar.js';
-import { DENSIDADE_DO_ACO, LADOS_DA_RODA, LADOS_DO_FURO, LADOS_DO_RAIO, MAXIMO_DE_RAIOS, MINIMO_DE_RAIOS, faixasDoPneu } from './composicoes.js';
+import { DENSIDADE_DO_ACO, LADOS_DA_RODA, LADOS_DO_FURO, LADOS_DO_RAIO, MAXIMO_DE_RAIOS, MINIMO_DE_RAIOS, EXPOENTE_DO_OMBRO_LARGO, PONTOS_DO_FLANCO, SEGMENTOS_DO_OMBRO_LARGO, faixasDoPneu } from './composicoes.js';
 
 const registro = criarRegistroDeFamilias({ familias: [RODA_PNEU] });
 const MATERIAIS = {
@@ -481,6 +481,7 @@ describe('a forma do pneu: os lados em volta e o ombro redondo', () => {
   it('as faixas do pneu: o flanco são cinco segmentos e a banda o resto, com ou sem o ombro redondo', () => {
     expect(faixasDoPneu()).toEqual({ flancos: [0, 1, 7, 8, 9], banda: [2, 3, 4, 5, 6] });
     expect(faixasDoPneu({ ombroRedondo: true })).toEqual({ flancos: [0, 1, 11, 12, 13], banda: [2, 3, 4, 5, 6, 7, 8, 9, 10] });
+    expect(faixasDoPneu({ ombroRedondo: true, ombroLargo: true })).toEqual({ flancos: [0, 1, 2, 3, 31, 32, 33, 34, 35], banda: Array.from({ length: 27 }, (_, k) => k + 4) });
   });
 });
 
@@ -530,7 +531,7 @@ describe('o ombro largo: a fração do flanco sem o teto de 9 mm, para o pneu in
     const bojo = rA + ALTURA_DO_BOJO * flanco;
     const passo = (2 * xm - 2 * c) / 6;
     const secao = [[rA, -xb], [bojo, -xm], [R - c, -xm], [R, -xm + c], [R, -xm + c + passo], [R, -xm + c + 2 * passo], [R, xm - c], [R - c, xm], [bojo, xm], [rA, xb]];
-    expect(volumeDaParte(neutro, 'pneu')).toBeCloseTo(volumeDaRevolucao(secao, LADOS_DA_RODA), 0);
+    expect(volumeDaParte(neutro, 'pneu')).toBeCloseTo(volumeDaRevolucao(secao, v.ladosDoPneu), 0);
   });
 
   it('a porta do assento declara o raio que a face plana de dentro alcança, o do ombro, e a malha a confere; com friso segue o do friso', () => {
@@ -539,7 +540,10 @@ describe('o ombro largo: a fração do flanco sem o teto de 9 mm, para o pneu in
     for (const parametros of [largo, { ...largo, ombroRedondo: 1 }]) {
       const { neutro } = rodar(parametros);
       const assento = portasPublicadas(neutro).find(({ id }) => id === 'assento-do-pneu').interface;
-      expect(assento.raioExterno / MM).toBeCloseTo(R - v.ombroDoPneu * flanco, 9);
+      /* sem o arco, a face plana vai do bojo ao ombro; com a curva, vale o maior raio da seção a até 10 mm do plano */
+      const naFaixa = verticesDaParte(neutro, 'pneu').filter(([x]) => x - assento.centro[0] / MM <= FAIXA_DA_PORTA_MM + 1e-9);
+      const esperado = parametros.ombroRedondo ? Math.max(...naFaixa.map(raioDe)) : R - v.ombroDoPneu * flanco;
+      expect(assento.raioExterno / MM).toBeCloseTo(esperado, 6);
       expect(conferirPortasNaForma(neutro)).toEqual([]);
     }
     const trem = { perfil: 'trem', ombroDoPneu: 0.3 };
@@ -548,14 +552,37 @@ describe('o ombro largo: a fração do flanco sem o teto de 9 mm, para o pneu in
     expect(conferirPortasNaForma(neutro)).toEqual([]);
   });
 
-  it('convive com o ombro redondo: o arco de três segmentos tem o raio do ombro largo', () => {
+  it('com o ombro redondo, o lado é uma curva só: o flanco em parábola do talão ao bojo e um quarto de superelipse do bojo à banda, sem quina', () => {
     const v = completo({ perfil: 'empilhadeira-700-12' });
-    const { R, xm, flanco } = medidasDoPneu(v);
+    const { R, rA, xm, xb, flanco } = medidasDoPneu(v);
     const c = v.ombroDoPneu * flanco;
+    const rb = rA + ALTURA_DO_BOJO * flanco;
     const { neutro } = rodar({ perfil: 'empilhadeira-700-12' });
-    const noArco = verticesDaParte(neutro, 'pneu').filter(([x, ...yz]) => x < -xm + c - 1e-6 && Math.hypot(...yz) > R - c + 1e-6 && Math.hypot(...yz) < R - 1e-6);
-    expect(noArco.length).toBe(2 * LADOS_DA_RODA);
-    for (const [x, y, z] of noArco) expect(Math.hypot(x + xm - c, Math.hypot(y, z) - (R - c))).toBeCloseTo(c, 5);
+    expect(chamar(RODA_PNEU, 'roda', { perfil: 'empilhadeira-700-12' }).composicao).toBe('roda-pneu.disco-lisa-ombro-largo');
+    expect(caixasPorParte(neutro).caixas.get('pneu').corpos).toBe(1);
+    const vs = verticesDaParte(neutro, 'pneu');
+    /* a superelipse: os pontos entre o bojo e a banda, dos dois lados, satisfazem |(r - rb) / (R - rb)|^n + |(|x| - (xm - c)) / c|^n = 1 */
+    const naElipse = vs.filter(([x, ...yz]) => Math.abs(x) > xm - c + 1e-6 && raioDe([0, ...yz]) > rb + 1e-6 && raioDe([0, ...yz]) < R - 1e-6);
+    expect(naElipse.length).toBe(2 * (SEGMENTOS_DO_OMBRO_LARGO - 1) * v.ladosDoPneu);
+    const n = EXPOENTE_DO_OMBRO_LARGO;
+    for (const [x, ...yz] of naElipse) expect(((raioDe([0, ...yz]) - rb) / (R - rb)) ** n + Math.abs((Math.abs(x) - (xm - c)) / c) ** n).toBeCloseTo(1, 9);
+    /* o flanco: os pontos entre o talão e o bojo ficam por dentro da largura máxima, na parábola que chega ao bojo na vertical */
+    const noFlanco = vs.filter(([, ...yz]) => raioDe([0, ...yz]) > rA + 1e-6 && raioDe([0, ...yz]) < rb - 1e-6);
+    expect(noFlanco.length).toBe(2 * PONTOS_DO_FLANCO * v.ladosDoPneu);
+    for (const [x, ...yz] of noFlanco) {
+      const t = (raioDe([0, ...yz]) - rA) / (rb - rA);
+      expect(xm - Math.abs(x)).toBeCloseTo((xm - xb) * (1 - t) ** 2, 9);
+    }
+    /* sem quina: o maior ângulo entre dois segmentos vizinhos da seção, do talão à banda */
+    const secao = [...new Map(vs.filter(([x, y, z]) => x < 0 && Math.abs(z) < 1e-9 && y > 0).map(([x, y]) => [`${x.toFixed(6)}`, [y, x]])).values()]
+      .filter(([r]) => r <= R + 1e-9 && r >= rA - 1e-9).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    let maior = 0;
+    for (let k = 1; k < secao.length - 1; k++) {
+      const u = [secao[k][0] - secao[k - 1][0], secao[k][1] - secao[k - 1][1]];
+      const w = [secao[k + 1][0] - secao[k][0], secao[k + 1][1] - secao[k][1]];
+      maior = Math.max(maior, Math.abs(Math.atan2(u[0] * w[1] - u[1] * w[0], u[0] * w[0] + u[1] * w[1])) * 180 / Math.PI);
+    }
+    expect(maior).toBeLessThan(15);
   });
 
   it('o ombro que passa de 30% da banda é recusado com as duas medidas em mm, e o que passa de 0,6 do flanco pela faixa', () => {
@@ -885,7 +912,7 @@ describe('os perfis: o nome e o diâmetro bastam, e o chamador sobrescreve só o
     const esperadas = {
       carro: 'roda-pneu.disco-lisa', bicicleta: 'roda-pneu.flanges-macico-32-lisa', 'carrinho-de-mao': 'roda-pneu.disco-lisa', rodizio: 'roda-pneu.disco-lisa',
       trator: 'roda-pneu.disco-sulcada', trem: 'roda-pneu.disco-lisa', carroca: 'roda-pneu.raiada-macico-12-lisa',
-      'furgao-235-65-r16': 'roda-pneu.disco-lisa-circ-vent', 'empilhadeira-700-12': 'roda-pneu.disco-lisa-ombro',
+      'furgao-235-65-r16': 'roda-pneu.disco-lisa-circ-vent', 'empilhadeira-700-12': 'roda-pneu.disco-lisa-ombro-largo',
     };
     for (const nome of NOMES_DOS_PERFIS) {
       expect(chamar(RODA_PNEU, 'roda', { perfil: nome }).composicao).toBe(esperadas[nome]);

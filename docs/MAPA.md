@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1827 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1833 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1549,6 +1549,10 @@
 - `receita-02.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
 - `receita-03.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
 
+## procedural/pecas/empilhadeira/partes/carro/
+
+- `receita.js` — empilhadeira/carro — o carro porta-garfos da torre da empilhadeira: a placa (as duas barras de 1.000 mm à frente da torre, as chapas das pontas, os dois mont…
+
 ## procedural/pecas/empilhadeira/partes/cilindro-elevacao/
 
 - `receita.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
@@ -1556,6 +1560,14 @@
 ## procedural/pecas/empilhadeira/partes/cilindro-elevacao/rodadas/
 
 - `receita-01.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## procedural/pecas/empilhadeira/partes/cilindro-inclinacao/
+
+- `receita.js` — empilhadeira/cilindro-inclinacao — um cilindro de inclinação da torre da empilhadeira, deitado ao longo do comprimento da máquina: a camisa de Ø 90, que entr…
+
+## procedural/pecas/empilhadeira/partes/correntes/
+
+- `receita.js` — empilhadeira/correntes — as correntes de elevação da torre da empilhadeira, na pose de transporte: as duas do cilindro de elevação, da cabeça dele à travessa…
 
 ## procedural/pecas/empilhadeira/partes/eixo-dianteiro/
 
@@ -1574,13 +1586,25 @@
 
 - `receita-01.js` — empilhadeira/eixo-traseiro — o eixo traseiro direcional da empilhadeira: a viga de 120 x 100 mm com o olhal do pino de articulação no meio, o suporte desse p…
 
+## procedural/pecas/empilhadeira/partes/garfo/
+
+- `receita.js` — empilhadeira/garfo — um garfo da empilhadeira, em L: a haste de pé, que pendura na face da frente das barras do carro, o calcanhar e a lâmina de 1.070 x 100 …
+
 ## procedural/pecas/empilhadeira/partes/roda-dianteira/
 
 - `receita.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
 
+## procedural/pecas/empilhadeira/partes/roda-dianteira/rodadas/
+
+- `receita-01.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
+
 ## procedural/pecas/empilhadeira/partes/roda-traseira/
 
 - `receita.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
+
+## procedural/pecas/empilhadeira/partes/roda-traseira/rodadas/
+
+- `receita-01.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
 
 ## procedural/pecas/empilhadeira/partes/torre/
 

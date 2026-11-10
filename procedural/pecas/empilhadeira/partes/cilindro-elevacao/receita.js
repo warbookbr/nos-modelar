@@ -21,7 +21,8 @@
  *
  * O ENCAIXE. A origem é o centro do fundo da camisa; y para cima, +x à esquerda de quem dirige e a frente em +z. A montagem põe o
  * cilindro na torre pela porta `assento` (o fundo da camisa) sobre a porta `assentoDoCilindro` da torre (o disco do assento, rente à
- * face de cima da travessa de baixo), e a relação mede o assento anular.
+ * face de cima da travessa de baixo), e a relação mede o assento anular. As correntes do carro encostam na face da frente da cabeça,
+ * que a porta `cabeca` publica (o meio dela, em plano); ela não muda a malha.
  *
  * A JUNTA QUE A MONTAGEM AINDA NÃO TEM. A haste e a cabeça sobem ao longo do eixo da camisa (o curso do rascunho é o do carro antes do
  * canal interno); a montagem v5 não tem articulação entre instâncias, e as três partes ficam numa peça, recolhidas.
@@ -52,11 +53,13 @@ export function derivar(T = TABELA) {
   const circulo = (r) => Array.from({ length: T.lados }, (_, k) => [r * Math.cos(2 * Math.PI * k / T.lados), r * Math.sin(2 * Math.PI * k / T.lados)]);
   const portas = {
     assento: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: 0, raioExterno: T.camisa.raio, inicio: 0, fim: T.camisa.altura },
+    /* a face da frente da cabeça, onde as correntes do carro se prendem: o meio dela */
+    cabeca: { forma: 'plano', papel: 'recebe', ponto: [0, T.haste.ate + T.cabeca.altura / 2, T.cabeca.z[1]], normal: [0, 0, 1], extensao: [2 * T.cabeca.meiaLargura, T.cabeca.altura], referencia: [0, 1, 0] },
   };
   return { circulo, portas };
 }
 
-/** Monta o cilindro no estado { passos, topo, origem }, em mm, com a origem levada a `em`, e devolve a origem da porta. */
+/** Monta o cilindro no estado { passos, topo, origem }, em mm, com a origem levada a `em`, e devolve as origens das portas. */
 export function montarCilindroElevacao(estado, T = TABELA, em = [0, 0, 0]) {
   const D = derivar(T);
   const { extY, parte } = ferramentas(estado);
@@ -67,22 +70,23 @@ export function montarCilindroElevacao(estado, T = TABELA, em = [0, 0, 0]) {
   parte('cilindroElevacao', camisa, T.cores.camisa);
   parte('hasteElevacao', extY(xz(D.circulo(H.raio)), C.altura + ey, H.ate + ey), T.cores.haste);
   const caixa = [[-K.meiaLargura, K.z[0]], [K.meiaLargura, K.z[0]], [K.meiaLargura, K.z[1]], [-K.meiaLargura, K.z[1]]];
-  parte('cabecaElevacao', extY(xz(caixa), H.ate + ey, H.ate + K.altura + ey), T.cores.cabeca);
-  return { camisa };
+  const cabeca = extY(xz(caixa), H.ate + ey, H.ate + K.altura + ey);
+  parte('cabecaElevacao', cabeca, T.cores.cabeca);
+  return { camisa, cabeca };
 }
 
 const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };
-const MEDIDAS_DA_PORTA = ['centro', 'raioInterno', 'raioExterno', 'inicio', 'fim'];
+const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];
 const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
 
-/** Os PASSOS, em metro: a forma e, no fim, a porta do assento. */
+/** Os PASSOS, em metro: a forma e, no fim, as portas do assento e da cabeça. */
 export function gerarPassos(T = TABELA) {
   const estado = { passos: [], topo: {}, origem: 0 };
-  const { camisa } = montarCilindroElevacao(estado, T);
+  const { camisa, cabeca } = montarCilindroElevacao(estado, T);
   const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);
   const { portas } = derivar(T);
   const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
-  return [...forma, porta('assento', camisa)];
+  return [...forma, porta('assento', camisa), porta('cabeca', cabeca)];
 }
 
 export const CONTATOS = [
