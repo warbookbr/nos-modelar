@@ -16,13 +16,14 @@ writeFileSync(esboco, JSON.stringify({ opcoes: [{ titulo: 'dois cubos', formas: 
   { id: 'esq', op: 'cubo', args: { larg: 100, alt: 100, prof: 40 }, centro: [-50, 0, 0] },
   { id: 'dir', op: 'cubo', args: { larg: 100, alt: 100, prof: 40 }, centro: [50, 0, 0] }] }] }));
 /* a referência: 220 x 120 px, o objeto na caixa 10,10,210,110, o laranja até x = 10 + divisa (a do modelo está em 100) */
-function referencia(nome, divisa) {
+function referencia(nome, divisa, [antes, depois] = [LARANJA, CINZA]) {
   const im = imagem(220, 120);
-  for (let y = 10; y < 110; y += 1) for (let x = 10; x < 210; x += 1) im.dados.set(x < 10 + divisa ? LARANJA : CINZA, (y * 220 + x) * 3);
+  for (let y = 10; y < 110; y += 1) for (let x = 10; x < 210; x += 1) im.dados.set(x < 10 + divisa ? antes : depois, (y * 220 + x) * 3);
   writeFileSync(join(pasta, nome), paraPng(im));
 }
 referencia('ref.png', 120);
-referencia('ref-igual.png', 100);
+/* de trás o laranja fica à direita */
+referencia('ref-tras.png', 100, [CINZA, LARANJA]);
 const CONFIG = {
   objeto: 'dois blocos', cores: { laranja: '#e2641e', cinza: '#6b7074' }, partes: { esq: 'laranja', dir: 'cinza' },
   dentro: { esq: 'dir' }, vistasDaSobra: ['superior'], toleranciaDaSobraMm: 3, largura: 200,
@@ -39,7 +40,7 @@ const rodar = (saida, cfg = CONFIG, extra = [], deps = undefined) => executar([e
 describe('conferir vistas', () => {
   it('monta a opção uma vez, grava os arquivos de cada vista e põe em primeiro a região da divisa deslocada', async () => {
     const { conta, deps } = contando();
-    const dupla = { ...CONFIG, vistas: { ...CONFIG.vistas, traseira: { referencia: 'ref-igual.png', caixaRef: [10, 10, 210, 110], grade: [2, 2] } } };
+    const dupla = { ...CONFIG, vistas: { ...CONFIG.vistas, traseira: { referencia: 'ref-tras.png', caixaRef: [10, 10, 210, 110], grade: [2, 2] } } };
     const r = await rodar('rodada', dupla, [], deps);
     expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
     expect(conta.montagens).toBe(1);
@@ -95,7 +96,7 @@ describe('conferir vistas', () => {
   });
 
   it('filtra as vistas e repassa o registro à leitura da vista', async () => {
-    const dupla = { ...CONFIG, vistas: { ...CONFIG.vistas, traseira: { referencia: 'ref-igual.png', caixaRef: [10, 10, 210, 110] } } };
+    const dupla = { ...CONFIG, vistas: { ...CONFIG.vistas, traseira: { referencia: 'ref-tras.png', caixaRef: [10, 10, 210, 110] } } };
     expect((await rodar('filtro', dupla, ['--vistas=traseira'])).codigo).toBe(0);
     expect(existsSync(join(pasta, 'filtro', 'traseira', 'pedido.md'))).toBe(true);
     expect(existsSync(join(pasta, 'filtro', 'frontal'))).toBe(false);

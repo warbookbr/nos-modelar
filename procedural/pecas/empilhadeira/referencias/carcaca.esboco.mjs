@@ -45,7 +45,8 @@ const LATERAL_FRENTE = 583;     // o corpo laranja: linhas 147 e 454 nas colunas
 const LATERAL_TRAS = 595;       // linhas 141 e 454 nas colunas 700-770 (z 1190-1500)
 const TAPETE = 400;             // o escuro do piso: linhas 199-200 a 410-412, colunas 504-560
 const DEGRAU = 568;             // o cinza dos degraus: linhas 151 e 450, colunas 504-560
-const COLUNAS = 545;            // o cinza das colunas: linhas 148-152 e 437, colunas 700-768
+const COLUNAS = 516;            // as colunas, pela vista de trás (cinza das colunas 408 a 664 nas linhas 274-280, 4,03 mm/px); a de cima
+                                // dava 545 (linhas 148-152 e 437, colunas 700-768), mas a largura vale a de trás
 const POCO_D = { z: 0, y: 352.5, r: 392, de: 414 };     // pneu dianteiro com 40 mm de folga; de 355 mm do protótipo x 596,4/511
 const POCO_T = { z: -1700, y: 284, r: 312, de: 432 };   // traseiro; de 370 mm do protótipo x 596,4/511
 

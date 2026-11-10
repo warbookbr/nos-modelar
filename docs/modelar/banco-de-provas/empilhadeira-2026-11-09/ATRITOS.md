@@ -110,3 +110,10 @@ processo o teria pego sozinho e o destino.
    uma parte aparece fora do contorno da que a contém: na traseira antiga dá 29,4 mm da moldura na vista de cima, e na
    corrigida, zero. Na mesma rodada acusou 40,7 mm da moldura para trás do capô na vista de lado, que ninguém tinha
    visto (a referência mostra até uns 25 mm), e a ponta de baixo da rampa da grade foi recuada.
+13. **A rodada de conferência custava minutos, quase todos de espera.** Cada comando montava o esboço de novo (50 s
+   na traseira) e cada vista com luz saía da bancada pelo navegador (60 s, com falha de vez em quando); as bandeiras
+   de cor, de parte e de caixa se repetiam à mão em quatro comandos. O processo pegava, pelo tempo, e quem conduzia
+   passou a rodar menos vistas do que devia (item 12). Destino: `npm run conferir:vistas` monta a opção uma vez e roda
+   as medidas e a leitura de todas as vistas declaradas numa config, e `npm run vista:rapida` desenha a vista
+   sombreada da malha, sem navegador, em 1 a 2 s. A montagem em dobro do esboço só de passos crus, achada no
+   levantamento, fica para depois da junção com a main, por estar no território de outro plano.

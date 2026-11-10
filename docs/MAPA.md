@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1755 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1766 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1520,6 +1520,7 @@
 ## procedural/pecas/empilhadeira/referencias/
 
 - `carcaca-traseira.esboco.mjs` — carcaca-traseira.esboco.mjs — o rascunho da traseira da carcaça (capô, tampa, grade e contrapeso) pelas três vistas.
+- `carcaca.esboco.mjs` — carcaca.esboco.mjs — o rascunho da carcaça inteira da empilhadeira: chassi, laterais, paralamas, piso, painel, tampa do motor, colunas e a traseira de `carca…
 
 ## procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/
 
@@ -2549,6 +2550,8 @@
 - `capacidade.test.mjs` — capacidade.test.mjs — a ficha de cada capacidade de gaiola: recortada do cabeçalho, em até 60 linhas, com os campos no código e o exemplo executável
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
+- `casamento-da-vista.mjs` — casamento-da-vista.mjs — duas medidas do modelo contra a imagem de referência numa vista, as duas tiradas da malha e não de uma captura com luz: quanto de ca…
+- `casamento-da-vista.test.mjs` — casamento-da-vista.test.mjs — o casamento do modelo com a referência numa vista, sobre uma cena sintética: duas partes lado a lado, uma laranja e uma cinza, …
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `cilindro-hidraulico-aprovacao.test.mjs` — cilindro-hidraulico-aprovacao.test.mjs — a aprovação mecânica de uma família que gera montagem: o curso da articulação é conferido contra as malhas da camisa…
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro]`.
@@ -2563,6 +2566,8 @@
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação, face de área nula, face fina, face …
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
+- `conferir-vistas.mjs` — conferir-vistas.mjs — a rodada inteira de conferência de um rascunho contra as imagens de referência num comando só: o esboço é montado uma vez, e para cada …
+- `conferir-vistas.test.mjs` — conferir-vistas.test.mjs — a rodada de conferência sobre uma cena sintética, sem navegador: dois cubos de cores diferentes lado a lado, uma referência em PNG…
 - `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
@@ -2672,6 +2677,8 @@
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
 - `pedidos-da-pessoa.mjs` — pedidos-da-pessoa.mjs — registra os pedidos de alteração da pessoa e conta quantos foram por etapa.
+- `perfil-por-cor.mjs` — perfil-por-cor.mjs — os pixels de uma vista classificados pela cor do material e, linha a linha, os trechos de cada cor e a meia largura de cada uma em cada …
+- `perfil-por-cor.test.mjs` — perfil-por-cor.test.mjs — o perfil por cor: os trechos de cada classe numa linha, a meia largura de uma classe em cada altura, a classificação que aguenta a …
 - `perguntas-da-peca.mjs` — perguntas-da-peca.mjs — as perguntas de forma que o brief do crítico de uma peça traz depois do pacote de imagens.
 - `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
 - `perguntas-do-alinhamento.mjs` — perguntas-do-alinhamento.mjs — as perguntas do alinhamento da família declarada, filtradas pelas partes.
@@ -2705,6 +2712,8 @@
 - `silhueta-da-superficie.mjs` — silhueta-da-superficie.mjs — extensão de uma malha de triângulos em fatias ao longo de um eixo, medida na SUPERFÍCIE e não nos vértices.
 - `silhueta-da-superficie.test.mjs` — Teto grande: uma placa y = 1 de z = 0 a z = 10 em dois triângulos, só com vértices nas pontas.
 - `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
+- `sobra-entre-partes.mjs` — sobra-entre-partes.mjs — quanto de uma parte aparece fora do contorno da parte que a contém, vista por vista.
+- `sobra-entre-partes.test.mjs` — sobra-entre-partes.test.mjs — a placa reta que passa do corpo em arco nos cantos sobra na vista de cima, com a distância conhecida; a placa encurtada para de…
 - `sobreposicao-de-cortes.mjs` — sobreposicao-de-cortes.mjs — os cortes planos do modelo sobre os do sólido do esboço que a receita refina, numa imagem por eixo.
 - `sobreposicao-de-cortes.test.mjs` — sobreposicao-de-cortes.test.mjs — os cortes do modelo sobre os do sólido do esboço: o corte de uma malha, o desvio entre as duas linhas, o desenho e, de pont…
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
@@ -2728,6 +2737,8 @@
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
+- `vista-rapida.mjs` — vista-rapida.mjs — a imagem sombreada de uma opção de esboço numa vista, tirada da malha em JavaScript, sem navegador.
+- `vista-rapida.test.mjs` — um paralelepípedo de quadriláteros com a normal para fora, em mm
 - `vistas-da-receita.mjs` — vistas-da-receita.mjs — a folha de seis vistas de uma receita `.js` do acervo, cada parte com uma cor, para olhar a forma e a divisão em partes.
 - `vistas-da-receita.test.mjs` — Testes de vistas-da-receita.mjs: os polígonos da receita em milímetro com as partes na ordem de aparição e a folha de seis vistas pela linha de comando.
 - `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram.

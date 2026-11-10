@@ -138,11 +138,12 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
   `compensar` leva a superfície mais de 2 mm além do contorno declarado (item
   8): mudança de núcleo, sem mudar malha. A causa é a quina do contorno sem
   vinco; a correção da conta muda peças aceitas e está no backlog.
-- **T6.** Um comando por rodada (`conferir:vistas`) que encadeia T1 a T4 e a
-  leitura para todas as vistas com referência, e a entrada nas skills.
-- **T7.** `vista:rapida`: a imagem sombreada do rascunho tirada da malha, sem
-  navegador, para a rodada de conferência não esperar 60 s por vista; a imagem
-  que vai à pessoa continua saindo da bancada.
+- **T6, entregue.** `conferir:vistas`: um comando por rodada, com a opção
+  montada uma vez e as medidas de T2 a T4 e a leitura para todas as vistas com
+  referência declaradas numa config; a skill `esbocar-opcoes` passa a citá-lo.
+- **T7, entregue.** `vista:rapida`: a imagem sombreada do rascunho tirada da
+  malha, sem navegador, em 1 a 2 s por vista contra 60 s da captura; a imagem
+  que vai à pessoa continua saindo da bancada. Falta `conferir:vistas` usá-la.
 - **T8.** Resposta do crítico estruturada (o atributo, o que a referência tem e
   o que o modelo tem), com a rodada que afirma da referência o oposto da
   anterior acusada como contradição (item 11).
