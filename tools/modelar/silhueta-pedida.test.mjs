@@ -47,11 +47,13 @@ describe('silhuetaPedida', () => {
   });
 
   it('o recorte fundo sai à parte e não esconde o deslocamento de 7 mm', () => {
-    /* um rasgo de 200 mm na ponta do fim, no centro, entre as alturas 200 e 260: as faces que cruzam a faixa ali recuam 200 mm */
-    const faces = facesDaGaiola(CORPO, [0, 0, 7]).map((f) => ({
+    /* um rasgo de 200 mm na ponta do fim, no centro, entre as alturas 200 e 260: os pontos da gaiola ali recuam 200 mm, com laços
+       a 5 mm de cada lado para a rampa não cair numa faixa */
+    const comRasgo = { ...CORPO, estacoes: [...CORPO.estacoes, 195, 200, 260, 265].sort((x, y) => x - y) };
+    const faces = facesDaGaiola(comRasgo, [0, 0, 7]).map((f) => ({
       pts: f.pts.map((p) => (p[1] >= 200 && p[1] <= 260 && Math.abs(p[0]) < 150 && p[2] > 500 ? [p[0], p[1], p[2] - 200] : p)),
     }));
-    const r = silhuetaPedida(faces, CORPO);
+    const r = silhuetaPedida(faces, comRasgo);
     expect(Math.abs(Math.abs(r.pior.desvio) - 7)).toBeLessThan(0.5);
     const rasgo = r.recortes.find((b) => b.medida === 'fim no centro');
     expect(rasgo).toBeDefined();
@@ -61,7 +63,7 @@ describe('silhuetaPedida', () => {
     expect(rasgo.lateral).toBe(0);
     for (const f of r.faixas) for (const m of f.medidas) expect(m.recorte).toBe(m.desvio !== null && m.desvio < -50);
     /* com o limite acima do rasgo ele volta ao pior */
-    expect(silhuetaPedida(faces, CORPO, { recorte: 500 }).pior.desvio).toBeLessThan(-150);
+    expect(silhuetaPedida(faces, comRasgo, { recorte: 500 }).pior.desvio).toBeLessThan(-150);
   });
 
   it('a seção corta cada face que atravessa o plano uma vez e devolve [l, c]', () => {
