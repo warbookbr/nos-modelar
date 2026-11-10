@@ -44,9 +44,9 @@ export const TABELA = {
 
   /* O BERÇO: a chapa de 520 mm em x (260 para cada lado do centro do cilindro), de 300 em z, com 16 mm de espessura, sobre a face de
      cima da tampa do capô; e dois apoios sob as cintas, de 50 mm em x, de 350 em z, de 1.150 a 1.262, entalhados pelo círculo do
-     cilindro (o corte sai 5 mm além de cada lado, e é feito depois de os apoios se unirem à chapa). A base da chapa: a face de cima da tampa da carcaça, o mais alto dela de x -235 a
-     295, medido na malha a cada 1 mm de z por sonda vertical (2026-11-10) e simplificado a 0,3 mm (o desvio da reta para cima dela fica
-     em 0,1 mm), com o nó de z -1.840 no ponto do apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na
+     cilindro (o corte sai 5 mm além de cada lado e vem depois de os apoios se unirem à chapa). A base da chapa: a face de cima da
+     tampa da carcaça, o mais alto dela de x -235 a 295, medido na malha a cada 1 mm de z por sonda vertical (2026-11-10) e
+     simplificado a 0,3 mm (o desvio da reta para cima dela fica em 0,1 mm), com o nó de z -1.840 no ponto do apoio do GLP da carcaça, mais a folga, que é também o afastamento da posição na
      montagem. Sob os apoios, o mais alto da face é 1.149,5. */
   berco: {
     chapa: { meia: 260, emZ: 150, espessura: 16 },

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1839 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1854 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -531,6 +531,7 @@
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
 - `2026-11-09-empilhadeira.md` — Empilhadeira inteira, da carcaça aos garfos, por partes plugadas numa montagem
 - `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
+- `2026-11-10-nucleo-para-qualquer-mecanismo.md` — Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -1524,6 +1525,22 @@
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
 
+## procedural/pecas/empilhadeira/partes/alca/
+
+- `receita.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
+
+## procedural/pecas/empilhadeira/partes/alca/rodadas/
+
+- `receita-01.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
+
+## procedural/pecas/empilhadeira/partes/banco/
+
+- `receita.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+
+## procedural/pecas/empilhadeira/partes/banco/rodadas/
+
+- `receita-01.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+
 ## procedural/pecas/empilhadeira/partes/canal-interno/
 
 - `receita.js` — empilhadeira/canal-interno — o canal interno da torre da empilhadeira: os dois canais em U, abertos para dentro, que correm dentro dos canais externos da tor…
@@ -1573,6 +1590,14 @@
 
 - `receita-01.js` — empilhadeira/cilindro-inclinacao — um cilindro de inclinação da torre da empilhadeira, deitado ao longo do comprimento da máquina: a camisa de Ø 90, que entr…
 
+## procedural/pecas/empilhadeira/partes/coluna-direcao/
+
+- `receita.js` — empilhadeira/coluna-direcao — a coluna de direção da empilhadeira, que sai do painel inclinada para trás até o cubo do volante, com os pedais na rampa do pai…
+
+## procedural/pecas/empilhadeira/partes/coluna-direcao/rodadas/
+
+- `receita-01.js` — empilhadeira/coluna-direcao — a coluna de direção da empilhadeira, que sai do painel inclinada para trás até o cubo do volante, com os pedais na rampa do pai…
+
 ## procedural/pecas/empilhadeira/partes/correntes/
 
 - `receita.js` — empilhadeira/correntes — as correntes de elevação da torre da empilhadeira, na pose de transporte: as duas do cilindro de elevação, da cabeça dele à travessa…
@@ -1598,6 +1623,14 @@
 
 - `receita-01.js` — empilhadeira/eixo-traseiro — o eixo traseiro direcional da empilhadeira: a viga de 120 x 100 mm com o olhal do pino de articulação no meio, o suporte desse p…
 
+## procedural/pecas/empilhadeira/partes/escape/
+
+- `receita.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
+
+## procedural/pecas/empilhadeira/partes/escape/rodadas/
+
+- `receita-01.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
+
 ## procedural/pecas/empilhadeira/partes/garfo/
 
 - `receita.js` — empilhadeira/garfo — um garfo da empilhadeira, em L: a haste de pé, que pendura na face da frente das barras do carro, o calcanhar e a lâmina de 1.070 x 100 …
@@ -1605,6 +1638,19 @@
 ## procedural/pecas/empilhadeira/partes/garfo/rodadas/
 
 - `receita-01.js` — empilhadeira/garfo — um garfo da empilhadeira, em L: a haste de pé, que pendura na face da frente das barras do carro, o calcanhar e a lâmina de 1.070 x 100 …
+
+## procedural/pecas/empilhadeira/partes/glp/
+
+- `receita.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
+
+## procedural/pecas/empilhadeira/partes/protetor/
+
+- `receita.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
+
+## procedural/pecas/empilhadeira/partes/protetor/rodadas/
+
+- `receita-01.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
+- `receita-02.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
 
 ## procedural/pecas/empilhadeira/partes/roda-dianteira/
 
@@ -1631,6 +1677,14 @@
 ## procedural/pecas/empilhadeira/partes/torre/rodadas/
 
 - `receita-01.js` — empilhadeira/torre — a parte fixa da torre da empilhadeira: os dois canais externos em U, abertos para dentro, com as três travessas de trás e a orelha do ci…
+
+## procedural/pecas/empilhadeira/partes/volante/
+
+- `receita.js` — empilhadeira/volante — o volante da empilhadeira: o aro, o cubo e os três raios, que giram em torno da coluna de direção.
+
+## procedural/pecas/empilhadeira/partes/volante/rodadas/
+
+- `receita-01.js` — empilhadeira/volante — o volante da empilhadeira: o aro, o cubo e os três raios, que giram em torno da coluna de direção.
 
 ## procedural/pecas/empilhadeira/referencias/
 
