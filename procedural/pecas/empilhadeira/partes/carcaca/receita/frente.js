@@ -184,7 +184,9 @@ export function montarCarcaca(estado, T, contornos) {
 
   /* colunas: o bloco atrás da tampa do motor, com a borda de trás dentro do capô */
   const CO = T.colunas;
-  parte('colunas', extX(lado(contornos.coluna, ([z, y]) => (z >= CO.trasDe && y < CO.abaixoDe ? [CO.tras, y] : [z, y])), -W.colunas, W.colunas), COR.cinza);
+  const ladoColunas = lado(contornos.coluna, ([z, y]) => (z >= CO.trasDe && y < CO.abaixoDe ? [CO.tras, y] : [z, y]));
+  const colunas = extX(ladoColunas, -W.colunas, W.colunas);
+  parte('colunas', colunas, COR.cinza);
 
   /* o fundo escuro do poço traseiro e o forro de 15 mm por dentro do arco da roda traseira */
   const PT = T.pocoTraseiro;
@@ -202,5 +204,7 @@ export function montarCarcaca(estado, T, contornos) {
   /* os dois cortes dos poços traseiros no contrapeso (o esquerdo, +x, e o direito), guardados como os da frente: a parede de dentro do
      esquerdo é a face de onde a receita publica a passagem do eixo traseiro */
   const { pocos: cortesDosPocosTraseiros } = montarTraseira(estado, T, contornos, { pocoDaRoda: POCO_T });
-  return { PLACA, ABA, COLUNAS: W.colunas, POCO_D, cortesDosPocos, POCO_T, cortesDosPocosTraseiros };
+  /* as abas (a esquerda, +x, e a direita) e as colunas, com a silhueta lateral de cada uma: a face de cima delas recebe os pés do
+     protetor, e a receita publica as portas dos apoios daí, sem passo novo */
+  return { PLACA, ABA, COLUNAS: W.colunas, POCO_D, cortesDosPocos, POCO_T, cortesDosPocosTraseiros, abas, ladoAba, colunas, ladoColunas };
 }

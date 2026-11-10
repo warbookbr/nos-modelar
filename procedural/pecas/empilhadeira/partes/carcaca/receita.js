@@ -22,6 +22,7 @@
  * `portasDaCarcaca`, que não mudam a malha: hoje a passagem do eixo dianteiro entre as paredes dos poços (etapa do eixo dianteiro). */
 import { montarCarcaca } from './receita/frente.js';
 import { CONTORNOS_DA_LATERAL } from './receita/contornos-da-lateral.js';
+import { r1 } from './receita/ferramentas.js';
 
 export const TABELA = {
   /* As cores, por parte, do rascunho aprovado: laranja da lataria, dois cinzas, o escuro dos fundos e o cinza escuro do tapete. */
@@ -183,6 +184,11 @@ export const TABELA = {
      1525, dentro dele. */
   colunas: { trasDe: 1485, abaixoDe: 1125, tras: 1525 },
 
+  /* OS APOIOS DO PROTETOR, só para as portas (não mudam a malha). Os pés da frente assentam na face de cima da aba do paralama, no
+     recolhimento dos cantos do painel (`painel.cantos`, de 415 mm à ponta da aba e de z -130 a 0, onde a face de cima da aba é um plano
+     só); os de trás, na face de cima das colunas, nos 56 mm da borda de fora delas (de 460 a 516 mm, pela vista de trás). */
+  apoiosDoProtetor: { tras: { naBorda: 56 } },
+
   /* POÇO TRASEIRO. O fundo escuro entre as rodas de trás (lateral z 1342-1645, até o pé do arco, y 428 a 625, 420 mm de meia largura) e
      o forro: uma casca escura de 15 mm por dentro do arco das laterais, de 360 a 590 mm, entre z 1300 e 1545 e de 191 a 640 mm, com a
      seção do pé das laterais. */
@@ -315,7 +321,11 @@ export function montarCarcacaEmMm(estado, T = TABELA) {
  *  para a roda traseira, da parede de dentro do poço esquerdo (x = xDentro - folga, a face de começo do corte, que fica no contrapeso)
  *  até a do direito, com o eixo para -x. A montagem põe o eixo traseiro por ela: as pontas de eixo das mangas no eixo dos poços. O
  *  suporte do pino de articulação do eixo encosta sob o fundo do poço traseiro (`pocoTraseiro.fundo`), que não vira porta porque a
- *  montagem não mede plano sobre plano. */
+ *  montagem não mede plano sobre plano.
+ *
+ *  apoioDoProtetorFrenteEsquerdo, apoioDoProtetorFrenteDireito, apoioDoProtetorTrasEsquerdo, apoioDoProtetorTrasDireito — os planos
+ *  que recebem os pés do protetor (`apoiosDoProtetor`): a face de cima de cada aba do paralama, no recolhimento do painel, e a face de
+ *  cima das colunas, na borda de fora. A montagem põe o protetor por um deles; os outros três ficam conferidos pela forma. */
 export function portasDaCarcaca(T = TABELA) {
   const { POCO_D, cortesDosPocos, POCO_T, cortesDosPocosTraseiros } = derivar(T).medidas;
   return [
@@ -327,9 +337,57 @@ export function portasDaCarcaca(T = TABELA) {
       id: 'passagemDoEixoTraseiro', de: { ...cortesDosPocosTraseiros[0].origem, tampa: 'fundo' },
       interface: { forma: 'cilindro', papel: 'interna', eixo: [-1, 0, 0], centro: [POCO_T.de, POCO_T.y, POCO_T.z], raio: POCO_T.r, inicio: 0, fim: 2 * POCO_T.de, referencia: [0, 1, 0] },
     }],
+    ...apoiosDoProtetorComoPortas(T),
   ];
 }
-const MEDIDAS_DA_PORTA = ['centro', 'raio', 'inicio', 'fim'];
+/** Os quatro apoios dos pés do protetor, em mm: a aresta de cima da silhueta lateral que dá a face (os dois pontos [z, y] como a
+ *  extrusão os grava), a faixa em x, o ponto no meio do apoio, a normal da face e a extensão. Da aba do paralama sai a face de z -144,5
+ *  a 0 (a planta corta em z -140), e das colunas a face de cima delas, inclinada 3,3 graus para trás. */
+export function apoiosDoProtetor(T = TABELA) {
+  const { ladoAba, ladoColunas } = derivar(T).medidas;
+  /* o vértice como `ferramentas` o grava: o perfil da extrusão em x é [-y, z] arredondado a 0,1 mm */
+  const gravado = ([z, y]) => [r1(z), -r1(-y)];
+  const arestaDeCima = (contorno, z) => {
+    const p = contorno.map(gravado);
+    let melhor = null;
+    p.forEach((a, i) => {
+      const b = p[(i + 1) % p.length];
+      if (a[0] === b[0] || (a[0] - z) * (b[0] - z) > 0) return;
+      const y = a[1] + (b[1] - a[1]) * (z - a[0]) / (b[0] - a[0]);
+      if (!melhor || y > melhor.y) melhor = { y, aresta: a[0] < b[0] ? [a, b] : [b, a] };
+    });
+    return melhor.aresta;
+  };
+  const apoio = (aresta, [x0, x1], [z0, z1]) => {
+    const [[za, ya], [zb, yb]] = aresta;
+    const naFace = (z) => ya + (yb - ya) * (z - za) / (zb - za);
+    const zm = (z0 + z1) / 2;
+    const n = Math.hypot(zb - za, yb - ya);
+    return { aresta, x: [x0, x1], z: [z0, z1], ponto: [(x0 + x1) / 2, naFace(zm), zm], normal: [0, (zb - za) / n, -(yb - ya) / n],
+      extensao: [x1 - x0, (z1 - z0) * n / (zb - za)] };
+  };
+  const CA = T.painel.cantos; const W = T.larguras;
+  const frente = arestaDeCima(ladoAba, (CA.z[1] + 0) / 2);
+  const zFrente = [Math.max(CA.z[1], frente[0][0]), Math.min(0, frente[1][0])];
+  const tras = arestaDeCima(ladoColunas, -(T.colunas.trasDe + T.colunas.tras) / 2);
+  const xTras = [W.colunas - T.apoiosDoProtetor.tras.naBorda, W.colunas];
+  const espelhoX = (a) => ({ ...a, x: [-a.x[1], -a.x[0]], ponto: [-a.ponto[0], a.ponto[1], a.ponto[2]] });
+  const frenteEsquerdo = apoio(frente, [CA.x[0], W.aba[1]], zFrente);
+  const trasEsquerdo = apoio(tras, xTras, [tras[0][0], tras[1][0]]);
+  return { frenteEsquerdo, frenteDireito: espelhoX(frenteEsquerdo), trasEsquerdo, trasDireito: espelhoX(trasEsquerdo) };
+}
+
+/* as portas dos apoios do protetor; a de cada aba sai da origem dela, e as de trás das colunas, que são uma extrusão só */
+function apoiosDoProtetorComoPortas(T) {
+  const { abas, colunas } = derivar(T).medidas;
+  const A = apoiosDoProtetor(T);
+  const porta = (id, de, a) => ['publicarPorta', { id, de: de.origem,
+    interface: { forma: 'plano', papel: 'recebe', ponto: a.ponto, normal: a.normal, extensao: a.extensao, referencia: [1, 0, 0] } }];
+  return [porta('apoioDoProtetorFrenteEsquerdo', abas[0], A.frenteEsquerdo), porta('apoioDoProtetorFrenteDireito', abas[1], A.frenteDireito),
+    porta('apoioDoProtetorTrasEsquerdo', colunas, A.trasEsquerdo), porta('apoioDoProtetorTrasDireito', colunas, A.trasDireito)];
+}
+
+const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'inicio', 'fim', 'extensao'];
 const portaEmMetro = ([op, { interface: I, ...resto }]) => [op, { ...resto, interface: Object.fromEntries(Object.entries(I).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];
 
 /** Os PASSOS, em metro: os de forma e, no fim, as portas. */
