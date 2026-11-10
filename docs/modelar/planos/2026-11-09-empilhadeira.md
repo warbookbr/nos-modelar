@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/casamento-da-vista.test.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/conferir-vistas.test.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/vista-rapida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`
+**Território:** `procedural/pecas/empilhadeira/`, `docs/modelar/banco-de-provas/empilhadeira-2026-11-09/`, `procedural/nucleo/lacos-pelas-vistas.js`, `procedural/nucleo/lacos-pelas-vistas.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/linhas-do-modelo.test.mjs`, `tools/modelar/perfil-por-cor.mjs`, `tools/modelar/perfil-por-cor.test.mjs`, `tools/modelar/sobra-entre-partes.mjs`, `tools/modelar/sobra-entre-partes.test.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/casamento-da-vista.test.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/conferir-vistas.test.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/vista-rapida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `procedural/nucleo/arcos-do-contorno.js`, `procedural/nucleo/arcos-do-contorno.test.mjs`, `tools/modelar/silhueta-pedida.mjs`, `tools/modelar/silhueta-pedida.test.mjs`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`
 
 **Responsável:** Tiago (crítica visual e aceite) e a IA da sessão (condução, medidas, segmentação, despacho e implementação)
 
@@ -157,11 +157,44 @@ origem estão em `ATRITOS.md`, itens 6 a 12. Nenhuma fatia aprova forma por núm
 - **T10, entregue.** `montarOpcoes` com `relato: false` para as ferramentas de
   conferência, que não usam o relato de contatos: as linhas de uma vista da
   carcaça foram de 57,6 para 4,8 s, e a rodada completa de 110 para 60 s.
-- **Levantadas e não começadas** (agente de planejamento, 2026-11-10): a parte
-  fina que acompanha a planta em `lacosPelasVistas`, o degrau ou sulco por
-  contorno sobre a superfície (plano próprio, encosta no de costuras), a causa
-  dita na recusa da `aberturaPorContorno` e a quina implícita na compensação
-  (BACKLOG).
+- **T11, a fazer.** `npm run silhueta:pedida` mede a malha de uma parte contra
+  o lado, o perfil e a planta pedidos, por faixa de altura: meia largura, as
+  duas pontas no centro e o recuo nos cantos, com o pior desvio. Cria
+  `tools/modelar/silhueta-pedida.mjs`, o teste e o script no `package.json`; lê
+  o esboço, a parte e o objeto que o módulo exporta para `lacosPelasVistas`.
+  Prova: a caixa dá zero, e o corpo do teste de laços deslocado 7 mm dá 7
+  (±0,5). Pronto: no capô da traseira repete a medida do item 8 dos atritos, 10
+  a 15 mm nos degraus sem `compensar` e 10 a 30 com.
+- **T12, a fazer.** `lacosPelasVistas` aceita `curto: 'encolhe' (padrão) |
+  'fim' | 'inicio'`; com 'fim', no laço curto o fim fica com o recuo inteiro da
+  planta e o início é a mesma curva, recuada do comprimento do intervalo. Muda
+  `lacos-pelas-vistas.js`, o teste e `carcaca-traseira.esboco.mjs`; o padrão dá
+  a saída de hoje. Prova: a aba de 60 mm do teste mede 60 em toda a lateral,
+  sem aviso. Pronto: aba da tampa e moldura com a espessura real, sem bloco
+  escondido, e `sobra:partes` até 3 mm na vista de cima (a moldura reta dava
+  29,4 mm).
+- **T13, a fazer.** `contornoComArcos(anel, { tolerancia, arcos })` em
+  `procedural/nucleo/arcos-do-contorno.js`, com teste e ficha: simplifica o
+  anel (6 mm por padrão), troca cada trecho `{ de, ate }` pelo círculo ajustado
+  a 96 lados por volta e devolve os pontos, os círculos com o desvio, os
+  trechos com `arco` para a `extrusao` e um aviso por arco facetado não
+  declarado. Prova: arco de 386 mm com ruído de 0,5 mm sai com o raio a 1 mm.
+  Pronto: `ladoSuave` sai da carcaça com a malha idêntica e o aviso aponta os
+  arcos facetados da traseira.
+- **T14, a fazer.** `gaiolaVarrida` aceita `fechada: true` (a seção volta da
+  última linha à primeira) e `tampas: true` (uma face em cada ponta, com a
+  orientação pelo volume); sem eles a saída é a de hoje, byte a byte, que o
+  furgão usa. O perfil em U já existe (seção aberta, `espessura` do passo e
+  `arco` no trilho) e só ganha teste. Muda `gaiola-varrida.js`, o teste e
+  `protetor-posto.esboco.mjs`. Prova: tubo quadrado em L com dobra fecha, com
+  toda aresta em duas faces. Pronto: a coluna da frente sai num passo, com a
+  seção de 70 mm a 1 mm em toda estação, no lugar de extrusões cruzadas.
+- **Plano próprio, em rascunho.** O degrau, o sulco e a borda rebaixada sobre a
+  superfície estão em
+  [rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md), que espera um
+  lugar de plano ativo.
+- **Levantadas e não começadas.** A causa dita na recusa da
+  `aberturaPorContorno` e a quina implícita na compensação (BACKLOG).
 - **Adiado.** A entrada pela receita de peça (`PLANO.referencias` com vista e
   caixa) encosta no território do plano de ferramentas de conferência e de
   vista; fica para ele ou para quando a pessoa passar o arquivo.
@@ -185,7 +218,7 @@ A carcaça é a parte de maior risco: corpo moldado com dois arcos de roda e o
 capô alto. Se a gaiola não fechar a silhueta em três rodadas, a carcaça volta à
 pessoa com as opções (gaiola, extrusão com arredondamento, subdivisão). Para
 também se uma correção geral pedir mudança em peça de outro plano, ou se as
-cinco vagas de plano ativo impedirem abrir o plano de uma correção grande: aí
+seis vagas de plano ativo impedirem abrir o plano de uma correção grande: aí
 ela vai ao backlog e a pessoa decide.
 
 ## Andamento
