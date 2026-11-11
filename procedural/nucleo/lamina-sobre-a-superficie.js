@@ -19,6 +19,8 @@
 
 const GRAUS = 180 / Math.PI;
 const GIRO_LISO = 8;
+/* na curva 3D as estações já são adensadas até a normal girar menos que GIRO_LISO (ou o passo chegar a um décimo da largura); só a dobra mais viva que isto, entre duas estações coladas, vira uma estação só */
+const GIRO_DA_CURVA = 25;
 const RASANTE = 0.17;
 
 const erro = (texto) => { throw new Error(`paineisPorVaos: ${texto}`); };
@@ -37,7 +39,7 @@ const giro = (n1, n2) => Math.acos(Math.max(-1, Math.min(1, dot(n1, n2)))) * GRA
  * parede dos dois trechos dá a direção e a profundidade da seção nela, de modo que a lâmina atravessa a quina côncava ou convexa numa varredura só. A espessura lida
  * junto da quina corre ao longo da outra face: vale no máximo 1,2 vez a mediana lida na linha. Serve às duas entradas, a linha da vista e a curva 3D.
  */
-function fundirQuinas(todas, fechada, nome) {
+function fundirQuinas(todas, fechada, nome, limite = GIRO_LISO) {
   let quinas = 0;
   const lista = [];
   for (let i = 0; i < todas.length; i += 1) {
@@ -46,7 +48,7 @@ function fundirQuinas(todas, fechada, nome) {
     const prox = todas[j];
     const tem = (fechada || j !== 0) && s.real && prox.real;
     const g = tem ? giro(s.n, prox.n) : 0;
-    if (g > GIRO_LISO) {
+    if (g > limite) {
       if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
       quinas += 1;
       lista.push({ c: mul(soma(s.c, prox.c), 0.5), n: unit(soma(s.n, prox.n)), esp: Math.max(s.esp ?? 0, prox.esp ?? 0) || null, mIn: s.mOut, mOut: s.mOut });
@@ -179,6 +181,32 @@ function lateraisDaCurva(lista, fechada) {
     if (!tIn || !tOut) erro('a curva tem dois pontos iguais sobre a chapa');
     s.mIn = cruz(s.n, tIn); s.mOut = cruz(s.n, tOut); s.cima = s.n;
   });
+  /* o raio local da chapa ao longo da curva: o giro da normal por mm de curva, numa base de 2 mm para cada lado. Normal que gira no sentido da curva é filete convexo (o centro
+     fica do lado de dentro da chapa), no sentido contrário é côncavo */
+  const cum = [0];
+  for (let i = 1; i < N; i += 1) cum.push(cum[i - 1] + norma(sub(lista[i].c, lista[i - 1].c)));
+  const total = cum[N - 1] + (fechada ? norma(sub(lista[0].c, lista[N - 1].c)) : 0);
+  const BASE = 2;
+  const alvo = (i, sinal) => {
+    let j = i;
+    for (let passos = 0; passos < N; passos += 1) {
+      const k = fechada ? (((j + sinal) % N) + N) % N : j + sinal;
+      if (k < 0 || k >= N) return null;
+      j = k;
+      const d = Math.abs(cum[j] - cum[i]);
+      if ((fechada ? Math.min(d, total - d) : d) >= BASE) return j;
+    }
+    return null;
+  };
+  lista.forEach((s, i) => {
+    const a = alvo(i, -1); const b = alvo(i, 1);
+    if (a == null || b == null) return;
+    const t = unit(sub(lista[b].c, lista[a].c));
+    const ds = norma(sub(lista[b].c, lista[a].c));
+    if (!t || !(ds > 0)) return;
+    const dnds = dot(sub(lista[b].n, lista[a].n), t) / ds;
+    if (dnds > 1e-3) s.raioFundo = 1 / dnds; else if (dnds < -1e-3) s.raioTopo = -1 / dnds;
+  });
 }
 
 /**
@@ -247,7 +275,7 @@ export function projetarCurva(o) {
     const prox = fechada ? densa[(i + 1) % densa.length] : densa[i + 1];
     if (prox) todas.push(...refinar(densa[i], prox, 0));
   }
-  const { lista, quinas } = fundirQuinas(todas, fechada, nome);
+  const { lista, quinas } = fundirQuinas(todas, fechada, nome, GIRO_DA_CURVA);
   lateraisDaCurva(lista, fechada);
   return { segmentos: [lista], fechadaInteira: fechada, quinas, inclinacaoMaxima: 0, semChapa: 0, desvioMaximo: R3(desvioMaximo), podadas };
 }
@@ -318,11 +346,17 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
       const soma2 = unit(soma(sA, sB));
       L = unit(cruz(sA, sB));
       if (L && dot(L, cimaDe) < 0) L = mul(L, -1);
-      if (!L || dot(L, nm) < 0.17) L = soma2 ? unit(sub(cimaDe, mul(soma2, dot(cimaDe, soma2)))) ?? nm : nm;
+      /* na curva 3D os laterais de dois trechos quase paralelos dão uma interseção de planos mal condicionada (o ruído da normal a inclina por dezenas de graus, e a profundidade, dividida
+         pelo cosseno, cresce); a seção fica então perpendicular à média dos laterais e olha para a normal da estação */
+      if (!L || s.cima || dot(L, nm) < 0.17) L = soma2 ? unit(sub(cimaDe, mul(soma2, dot(cimaDe, soma2)))) ?? nm : nm;
     }
     const cos = Math.max(Math.min(dot(L, A.n), dot(L, B.n)), 0.17);
-    const fundo = (profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura) / cos;
-    return { acima: soma(X0, mul(L, topo / cos)), abaixo: sub(X0, mul(L, fundo)), X0 };
+    /* numa quina arredondada de raio R, a seção funda demais passa do centro do filete e as estações vizinhas se cruzam embaixo (e a alta demais, no filete côncavo, em cima): o fundo e o topo
+       ficam abaixo de 3/4 do raio local (só a curva 3D mede o raio, em `raioFundo` e `raioTopo`), sem ficar acima da espessura lida mais 0,3 mm */
+    let fundoBase = profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura;
+    if (s.raioFundo) fundoBase = Math.min(fundoBase, Math.max(0.75 * s.raioFundo, (s.esp ?? 0) + 0.3));
+    const topoDe = s.raioTopo ? Math.min(topo, Math.max(0.75 * s.raioTopo, 0.3)) : topo;
+    return { acima: soma(X0, mul(L, topoDe / cos)), abaixo: sub(X0, mul(L, fundoBase / cos)), X0 };
   };
   const vertices = [];
   const faces = [];

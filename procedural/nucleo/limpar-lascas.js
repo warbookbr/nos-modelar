@@ -62,18 +62,63 @@ function distanciaEntreRetas(a, b, c, d) {
 }
 
 const mesmoLiso = (x, y) => (x ?? null) === (y ?? null);
+/** A distância de um ponto ao triângulo (o ponto mais próximo, de Ericson); no triângulo sem área, ao menor dos três lados. */
+function distanciaAoTriangulo(p, A, B, C) {
+  const ab = sub(B, A); const ac = sub(C, A); const ap = sub(p, A);
+  const d1 = dot(ab, ap); const d2 = dot(ac, ap);
+  if (d1 <= 0 && d2 <= 0) return norma(ap);
+  const bp = sub(p, B); const d3 = dot(ab, bp); const d4 = dot(ac, bp);
+  if (d3 >= 0 && d4 <= d3) return norma(bp);
+  const vc = d1 * d4 - d3 * d2;
+  if (vc <= 0 && d1 >= 0 && d3 <= 0) { const t = d1 / (d1 - d3); return norma(sub(p, [A[0] + ab[0] * t, A[1] + ab[1] * t, A[2] + ab[2] * t])); }
+  const cp = sub(p, C); const d5 = dot(ab, cp); const d6 = dot(ac, cp);
+  if (d6 >= 0 && d5 <= d6) return norma(cp);
+  const vb = d5 * d2 - d1 * d6;
+  if (vb <= 0 && d2 >= 0 && d6 <= 0) { const t = d2 / (d2 - d6); return norma(sub(p, [A[0] + ac[0] * t, A[1] + ac[1] * t, A[2] + ac[2] * t])); }
+  const va = d3 * d6 - d5 * d4;
+  if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) { const t = (d4 - d3) / ((d4 - d3) + (d5 - d6)); const bc = sub(C, B); return norma(sub(p, [B[0] + bc[0] * t, B[1] + bc[1] * t, B[2] + bc[2] * t])); }
+  const soma = va + vb + vc;
+  if (!(soma > 0)) return Math.min(distanciaAoSegmento(p, A, B), distanciaAoSegmento(p, B, C), distanciaAoSegmento(p, C, A));
+  const v = vb / soma; const w = vc / soma;
+  return norma(sub(p, [A[0] + ab[0] * v + ac[0] * w, A[1] + ab[1] * v + ac[1] * w, A[2] + ab[2] * v + ac[2] * w]));
+}
+function distanciaAoSegmento(p, A, B) {
+  const ab = sub(B, A); const m = dot(ab, ab);
+  const t = m > 0 ? Math.max(0, Math.min(1, dot(sub(p, A), ab) / m)) : 0;
+  return norma(sub(p, [A[0] + ab[0] * t, A[1] + ab[1] * t, A[2] + ab[2] * t]));
+}
+
+/** O maior afastamento entre dois remendos de polígonos convexos (a superfície de antes e a de depois, com a mesma borda), nos dois
+ *  sentidos, medido nos cantos, nos pontos médios das arestas e no centro de cada polígono. Os planos de referência limitam o ponto
+ *  novo; este limita a superfície, que o braço de uma face estreita pode inclinar muito mais que o ponto. */
+function desvioEntreRemendos(antes, depois) {
+  const triangulos = (poligonos) => poligonos.flatMap((P) => { const T = []; for (let k = 1; k + 1 < P.length; k += 1) T.push([P[0], P[k], P[k + 1]]); return T; });
+  const amostras = (poligonos) => poligonos.flatMap((P) => {
+    const m = P.length; const c = [0, 0, 0];
+    const S = P.map((q, k) => { c[0] += q[0] / m; c[1] += q[1] / m; c[2] += q[2] / m; const r = P[(k + 1) % m]; return [(q[0] + r[0]) / 2, (q[1] + r[1]) / 2, (q[2] + r[2]) / 2]; });
+    return [...P, ...S, c];
+  });
+  const sentido = (de, para) => {
+    let m = 0;
+    for (const p of amostras(de)) { let d = Infinity; for (const [A, B, C] of para) d = Math.min(d, distanciaAoTriangulo(p, A, B, C)); m = Math.max(m, d); }
+    return m;
+  };
+  const tA = triangulos(antes); const tD = triangulos(depois);
+  return Math.max(sentido(antes, tD), sentido(depois, tA));
+}
+
 const igualAtributos = (f, g) => (f.parte ?? null) === (g.parte ?? null) && (f.material ?? null) === (g.material ?? null) && (f.cor ?? null) === (g.cor ?? null)
   && mesmoLiso(f.liso, g.liso) && (f.solido ?? null) === (g.solido ?? null);
 
 /**
  * @param {{ V: Map<number, number[]>, F: Map<number, { vs: number[], parte?: any, tinta?: any[], quebras?: any[] }> }} malha
- * @param {{ selecao?: Iterable<number>, tolerancia: number, limite?: number, passadas?: number }} opcoes
+ * @param {{ selecao?: Iterable<number>, tolerancia: number, limite?: number, passadas?: number, trilha?: object[] | null }} opcoes
  *   `selecao`: as faces que podem sumir ou trocar de diagonal (padrão: todas); `tolerancia`: o quanto a superfície pode sair do lugar,
  *   na unidade da malha; `limite`: a razão abaixo da qual a face é lasca (padrão 0,003).
  * @returns {{ vertices: Map<number, number[]>, verticesRemovidos: Set<number>, fusoes: Map<number, number>, faces: Map<number, number[]>, facesRemovidas: Set<number>,
  *   relatorio: { selecionadas: number, finasAntes: number, finasDepois: number, colapsos: number, trocas: number, desvioMaximo: number, restantes: { face: number, razao: number, arestaCurta: number, recusas: string[] }[] } }}
  */
-export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMITE_DE_FACE_FINA, passadas = 16 } = {}) {
+export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMITE_DE_FACE_FINA, passadas = 16, trilha = null, maxOperacoes = Infinity } = {}) {
   if (!(Number.isFinite(tolerancia) && tolerancia > 0)) throw new Error('limparLascas: a tolerância é um número positivo, na unidade da malha');
   if (!(Number.isFinite(limite) && limite > 0 && limite < 0.5)) throw new Error('limparLascas: o limite de lasca é um número entre 0 e 0,5');
   const { V, F } = malha;
@@ -165,7 +210,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     const m1 = newell([pa, pd, pc]); const m2 = newell([pd, pb, pc]);
     const ref = [n1[0] + n2[0], n1[1] + n2[1], n1[2] + n2[2]];
     if (!(dot(m1, ref) > 0 && dot(m2, ref) > 0)) return no('troca: o par não é convexo');
-    const desvio = distanciaEntreRetas(pa, pb, pc, pd);
+    const desvio = desvioEntreRemendos([[pa, pb, pc], [pb, pa, pd]], [[pa, pd, pc], [pd, pb, pc]]);
     if (desvio > tolerancia) return no('troca: o par não é plano dentro da tolerância');
     const antes = Math.min(razaoDeFace([pa, pb, pc]), razaoDeFace([pb, pa, pd]));
     const depois = Math.min(razaoDeFace([pa, pd, pc]), razaoDeFace([pd, pb, pc]));
@@ -178,6 +223,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     facesMudadas.add(f1); facesMudadas.add(f2);
     desvioMaximo = Math.max(desvioMaximo, desvio);
     trocas += 1;
+    trilha?.push({ tipo: 'troca', faces: [f1, f2], vertices: [a, b, c, d], desvio });
     return true;
   }
 
@@ -202,40 +248,48 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     if (faltam < 3) return no('colapso: deixaria vértice de valência 2');
     for (const fid of doVertice) if (!mesmos.has(fid) && bloqueada(fid)) return no('colapso: face com tinta em volta');
 
-    /* a posição: o ponto que menos se afasta dos planos das faces boas (a ordem decide o empate) */
+    /* a posição: do que cabe nos planos das faces boas, a que menos sai deles; e a vizinhança depois da fusão confere: nenhuma face
+       vira, nenhuma face boa vira lasca, nenhuma lasca piora, e a superfície nova fica a no máximo a tolerância da de antes */
     const referencia = uniao(a, b);
     const pa = pos(a); const pb = pos(b);
-    const candidatos = [pa, pb, [(pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2, (pa[2] + pb[2]) / 2]];
-    let melhor = null;
-    for (const p of candidatos) {
-      const custo = referencia.length ? custoEm(referencia, p) : Math.max(dist(p, pa), dist(p, pb));
-      if (melhor === null || custo < melhor.custo - 1e-15) melhor = { p, custo };
+    const candidatos = [pa, pb, [(pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2, (pa[2] + pb[2]) / 2]]
+      .map((p, k) => ({ p, k, custo: referencia.length ? custoEm(referencia, p) : Math.max(dist(p, pa), dist(p, pb)) }))
+      .filter((c) => c.custo <= tolerancia)
+      .sort((u, v) => u.custo - v.custo || u.k - v.k);
+    if (!candidatos.length) return no('colapso: passaria da tolerância');
+    const antigas = [...doVertice].sort((u, v) => u - v);
+    let melhor = null; let novas = null;
+    for (const candidato of candidatos) {
+      const tentativa = new Map();
+      let finasAntesDoColapso = 0; let finasDepoisDoColapso = 0;
+      let recusa = null;
+      for (const fid of antigas) {
+        const l = vs.get(fid);
+        const antigos = pontos(l);
+        if (razaoDeFace(antigos) < limite) finasAntesDoColapso += 1;
+        if (mesmos.has(fid) || recusa) continue;
+        const nova = [];
+        for (const v of l) { const w = v === b ? a : v; if (nova[nova.length - 1] !== w) nova.push(w); }
+        if (nova.length > 1 && nova[0] === nova[nova.length - 1]) nova.pop();
+        if (nova.length < 3 || new Set(nova).size !== nova.length) { recusa = 'colapso: uma face em volta degeneraria'; continue; }
+        const depois = nova.map((v) => (v === a ? candidato.p : pos(v)));
+        const nAntes = newell(antigos); const nDepois = newell(depois);
+        const mA = norma(nAntes); const mD = norma(nDepois);
+        const qAntes = razaoDeFace(antigos); const qDepois = razaoDeFace(depois);
+        if (mA > 0 && mD > 0 && dot(nAntes, nDepois) / (mA * mD) < (qAntes >= limite ? 0.5 : 0)) recusa = 'colapso: viraria uma face em volta';
+        else if (qAntes >= limite && qDepois < limite) recusa = 'colapso: criaria outra lasca';
+        else if (qAntes < limite && qDepois < qAntes * 0.8) recusa = 'colapso: afinaria uma lasca vizinha';
+        else { if (qDepois < limite) finasDepoisDoColapso += 1; tentativa.set(fid, nova); }
+      }
+      if (recusa) { no(recusa); continue; }
+      /* o colapso só vale se tira lasca: mover a superfície para deixar a mesma lasca não é limpeza */
+      if (!(finasDepoisDoColapso < finasAntesDoColapso)) { no('colapso: não tira lasca'); continue; }
+      const desvio = desvioEntreRemendos(antigas.map((fid) => pontos(vs.get(fid))), [...tentativa].map(([, nova]) => nova.map((v) => (v === a ? candidato.p : pos(v)))));
+      if (desvio > tolerancia) { no('colapso: a superfície passaria da tolerância'); continue; }
+      melhor = { p: candidato.p, custo: Math.max(candidato.custo, desvio) }; novas = tentativa;
+      break;
     }
-    if (melhor.custo > tolerancia) return no('colapso: passaria da tolerância');
-    /* a vizinhança depois da fusão: nenhuma face vira, nenhuma face boa vira lasca, nenhuma lasca piora */
-    const novas = new Map();
-    let finasAntesDoColapso = 0; let finasDepoisDoColapso = 0;
-    for (const fid of doVertice) {
-      const l = vs.get(fid);
-      const antigos = pontos(l);
-      if (razaoDeFace(antigos) < limite) finasAntesDoColapso += 1;
-      if (mesmos.has(fid)) continue;
-      const lista = [];
-      for (const v of l) { const w = v === b ? a : v; if (lista[lista.length - 1] !== w) lista.push(w); }
-      if (lista.length > 1 && lista[0] === lista[lista.length - 1]) lista.pop();
-      if (lista.length < 3 || new Set(lista).size !== lista.length) return no('colapso: uma face em volta degeneraria');
-      const depois = lista.map((v) => (v === a ? melhor.p : pos(v)));
-      const nAntes = newell(antigos); const nDepois = newell(depois);
-      const mA = norma(nAntes); const mD = norma(nDepois);
-      const qAntes = razaoDeFace(antigos); const qDepois = razaoDeFace(depois);
-      if (mA > 0 && mD > 0 && dot(nAntes, nDepois) / (mA * mD) < (qAntes >= limite ? 0.5 : 0)) return no('colapso: viraria uma face em volta');
-      if (qAntes >= limite && qDepois < limite) return no('colapso: criaria outra lasca');
-      if (qAntes < limite && qDepois < qAntes * 0.8) return no('colapso: afinaria uma lasca vizinha');
-      if (qDepois < limite) finasDepoisDoColapso += 1;
-      novas.set(fid, lista);
-    }
-    /* o colapso só vale se tira lasca: mover a superfície para deixar a mesma lasca não é limpeza */
-    if (!(finasDepoisDoColapso < finasAntesDoColapso)) return no('colapso: não tira lasca');
+    if (!melhor) return false;
     /* aplicado */
     for (const fid of lista) {
       if (!mesmos.has(fid)) continue;
@@ -255,6 +309,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     verticesRemovidos.add(b); fusoes.set(b, a);
     desvioMaximo = Math.max(desvioMaximo, melhor.custo);
     colapsos += 1;
+    trilha?.push({ tipo: 'colapso', faces: lista, vertices: [a, b], desvio: melhor.custo });
     return true;
   }
 
@@ -290,13 +345,16 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     if (!(razaoDeFace(pj) >= limite)) return no('fusão: a face resultante continua lasca');
     for (const v of l) if (!junta.includes(v)) return no('fusão: canto perdido');
     for (const v of l) { let restam = 0; for (const x of vf.get(v) ?? []) if (x !== fid) restam += 1; if (restam < 3) return no('fusão: deixaria vértice de valência 2'); }
+    const desvioDaFusao = desvioEntreRemendos([pontos(l), pg], [pj]);
+    if (desvioDaFusao > tolerancia) return no('fusão: a superfície passaria da tolerância');
     for (const v of l) tirarDe(v, fid);
     vs.delete(fid); facesRemovidas.add(fid); facesMudadas.delete(fid);
     const pt = F.get(fid).parte; if (pt != null) contagemDeParte.set(pt, contagemDeParte.get(pt) - 1);
     vs.set(g, junta); facesMudadas.add(g);
     for (const v of junta) poeEm(v, g);
-    desvioMaximo = Math.max(desvioMaximo, fora);
+    desvioMaximo = Math.max(desvioMaximo, desvioDaFusao);
     absorcoes += 1;
+    trilha?.push({ tipo: 'absorcao', faces: [fid, g], vertices: [...l], desvio: desvioDaFusao });
     return true;
   }
 
@@ -320,6 +378,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
   for (let passada = 0; passada < passadas; passada += 1) {
     let andou = false;
     for (const { fid } of finas()) {
+      if (colapsos + trocas + absorcoes >= maxOperacoes) break;
       if (!vs.has(fid) || !(razaoDeFace(pontos(vs.get(fid))) < limite)) continue;
       const arestas = arestasPorTamanho(fid);
       let feito = false;

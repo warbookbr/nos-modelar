@@ -456,9 +456,13 @@ um plano perpendicular ao vinco, com `retasPor: { de, ate }` quando as faces
 são abauladas. A relação foi medida de 20 a 150 graus de dobra e vale com a
 quina lisa; a quina que é cota medida perde o raio, e a saída traz `raios` (o
 raio esperado por vinco e por ponto) e os avisos `raioNaoCabe`,
-`vincosDisputamApoio` e `quinaMedida`, entre outros. `gaiolaPorLacos` e
-`gaiolaPorRede` ainda não aceitam `raio`; `npm run capacidade -- apoioDoVinco`
-dá a ficha da conta.
+`vincosDisputamApoio` e `quinaMedida`, entre outros. O vinco do passo `subdivisao` traz o
+`raio` pedido (campo opcional, em metro como as medidas do passo, número, `{ de, ate }` ou lista), junto da
+nitidez 0, sem efeito na geometria: fica no conteúdo salvo para `npm run raio:aresta` (que o lê como pedido,
+sem `--pedido`) e para a ondulação, que trata a faixa entre os apoios como feição. A `gaiolaPorLacos` também
+aceita `raio` nos vincos de `trecho`, `entre` e `laco`, e põe os apoios depois da compensação e antes da
+conferência da espessura, que refina a gaiola com eles. A `gaiolaPorRede` ainda não aceita `raio`;
+`npm run capacidade -- apoioDoVinco` dá a ficha da conta.
 `cantos: ['quina']` fixa o ponto como canto vivo, o vinco de vértice 1 do
 Blender. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é espelhada
 antes de subdividir para a costura sair lisa, com os vincos e cantos

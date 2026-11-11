@@ -248,13 +248,11 @@ function linhasDeVao() {
   const deCima = (nome, z) => ({ nome, eixo: 'y', pontos: [[-xT, z], [xT, z]], ...DE_CIMA });
   const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => descendoAParede(z, yInicio, ABAIXO, PONTA / 2).flatMap((pontos, k) => dosDoisLados({ nome: `${nome}${k + 1}`, eixo: 'x', pontos }));
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
-  const VISTA = new Set((process.env.VISTA ?? '').split(',')); /* TEMPORARIO */
-  const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, VISTA.has('furos') ? { alcance: lado === '+' ? [2000, 2300] : [-2300, -2000], dentro: 'descarta' } : { ...SUPERFICIE, lado, dentro: 'descarta' });
+  const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [
     /* os planos de corte: a frente, a traseira e o fim do capô e do para-lama */
-    deCima('frente', T.zFrente), ...deLado('frenteDaParede', T.zFrente),
-    deCima('tras', T.zTras), ...deLado('trasDaParede', T.zTras),
-    deCima('peDoParaBrisa', T.zCapo), ...deLado('fimDoParaLama', T.zCapo),
+    ...(process.env.PLANOS === 'superficie' ? [deCima('frente', T.zFrente), ...deLado('frenteDaParede', T.zFrente), deCima('tras', T.zTras), ...deLado('trasDaParede', T.zTras), deCima('peDoParaBrisa', T.zCapo), ...deLado('fimDoParaLama', T.zCapo)]
+      : [{ nome: 'frente', eixo: 'x', pontos: [[T.zFrente, 1100], [T.zFrente, ABAIXO]] }, { nome: 'tras', eixo: 'x', pontos: [[T.zTras, 1100], [T.zTras, ABAIXO]] }, { nome: 'fimDoParaLama', eixo: 'x', pontos: [[T.zCapo, yC + PONTA], [T.zCapo, ABAIXO]] }]), /* TEMPORARIO */
     deCima('peDoVidroTraseiro', T.zTampa),
     /* a linha de cintura, de lado e através do carro (modo vista): o pé das colunas A e C fica no degrau do ombro. Onde ela encontra
        a linha de uma coluna, que é de outro modo e não fecha canto com ela, passa até a borda de fora do vão da coluna */
@@ -267,7 +265,7 @@ function linhasDeVao() {
     ...dosDoisLados({ nome: 'colunaC', eixo: 'x', pontos: [[T.zLateral, yT], [T.zLateral, yC + PONTA]] }),
     /* abaixo da cintura: o fim da porta traseira, que sai pela borda de baixo da chapa, e a soleira */
     ...deLado('fimDaPortaTraseira', T.zLateral, yC - PONTA),
-    ...(VISTA.has('soleira') ? [{ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }] : dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] })),
+    ...dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }),
     ...dosDoisLados(fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO)),
     ...dosDoisLados(fechada('janelaTraseira', 'x', VIDRO_TRASEIRO_DA_PORTA)),
     ...dosDoisLados(fechada('janelaDaVigia', 'x', T.vigia)),
@@ -281,8 +279,8 @@ function linhasDeVao() {
   ];
   for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) {
     /* o capô e a tampa contra o para-lama e a lateral: em T sobre os planos de corte */
-    L.push({ nome: `capo${lado}`, eixo: 'y', pontos: [[s * T.xCapo, T.zCapo], [s * T.xCapo, T.zFrente]], ...(VISTA.has('cima') ? { alcance: [900, 1200] } : DE_CIMA) });
-    L.push({ nome: `tampa${lado}`, eixo: 'y', pontos: [[s * T.xTampa, T.zTampa], [s * T.xTampa, T.zTras]], ...(VISTA.has('cima') ? { alcance: [900, 1200] } : DE_CIMA) });
+    L.push({ nome: `capo${lado}`, eixo: 'y', pontos: [[s * T.xCapo, T.zCapo], [s * T.xCapo, T.zFrente]], ...DE_CIMA });
+    L.push({ nome: `tampa${lado}`, eixo: 'y', pontos: [[s * T.xTampa, T.zTampa], [s * T.xTampa, T.zTras]], ...DE_CIMA });
     L.push(furo(`vaoDoFarol${lado}`, '+', FAROL(s)), furo(`vaoDaLanterna${lado}`, '-', LANTERNA(s)));
     L.push(furo(`furoDoSuporteDianteiro${lado}`, '+', FURO(s, SUPORTE.frente)), furo(`furoDoSuporteTraseiro${lado}`, '-', FURO(s, SUPORTE.tras, SUPORTE.xTras)));
   }
@@ -484,9 +482,14 @@ if (MODO === 'explodida') {
 
 /* ---- os contatos esperados ---- */
 const par = (a, b, relacao, motivo) => ({ par: [a, b], relacao, motivo });
-/* o vão entre dois painéis da mesma chapa, que `npm run vao:partes` confere: o ajudante dá de 4,0 a 4,1 mm ao longo da chapa, e a linha
-   desenhada numa vista que atravessa uma face inclinada na outra chega a 4,2 */
-const vao = (a, b, motivo = 'vão de 4 mm entre painéis da mesma chapa', esperada = 4.1, tolerancia = 0.1) => ({ par: [a, b], relacao: 'folga', motivo, folga: { esperada, tolerancia } });
+/* O vão entre dois painéis da mesma chapa, que `npm run vao:partes` confere: a lâmina do modo superfície dá de 4,0 a 4,1 mm, com as
+   duas bordas no mesmo plano (degrau até 0,3 mm). Os cantos em que dois painéis se encontram em faces diferentes declaram o degrau. */
+const vao = (a, b, motivo = 'vão de 4 mm entre painéis da mesma chapa', esperada = 4.1, tolerancia = 0.1, degrau = 0.3) => ({ par: [a, b], relacao: 'folga', motivo, folga: { esperada, tolerancia, degrau } });
+/* a folga de desenho entre duas partes que não são painéis da mesma chapa: o valor medido e a tolerância, sem degrau */
+const folga = (a, b, esperada, tolerancia, motivo) => ({ par: [a, b], relacao: 'folga', motivo, folga: { esperada, tolerancia } });
+/* as partes que ficam soltas de propósito no rascunho, com o que as prenderia */
+export const APOIA = [];
+const apoia = (parte, motivo) => APOIA.push({ parte, motivo });
 export const CONTATOS = [];
 const SOLDA = 'membros do chassi soldados um no outro';
 for (const L of ['Dir', 'Esq']) {
@@ -594,5 +597,6 @@ export default {
     passos: estado.passos,
     topo: estado.topo,
     contatos: MODO === 'inteiro' ? CONTATOS : [],
+    apoia: MODO === 'inteiro' ? APOIA : [],
   }],
 };

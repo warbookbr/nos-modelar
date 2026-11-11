@@ -5,6 +5,8 @@
  * achado está mais perto que o anel seguinte (ou quando o anel passa de `limite`). O custo de uma consulta é o das poucas células de
  * vizinhança, e não o número de faces da malha. Empate de distância (até 1e-12): a face de menor id, e nela o primeiro triângulo.
  *
+ * O resultado traz também os três vértices do triângulo achado e as coordenadas baricêntricas do ponto nele, para quem interpola uma grandeza dos vértices (a normal).
+ *
  * Quem lê: `paineisPorVaos` com `linhas[i].curva`, que leva cada ponto da curva à pele da chapa. */
 import { triangularFace } from './triangulacao-face.js';
 
@@ -30,11 +32,21 @@ export function pontoNoTriangulo(p, A, B, C) {
   return [A[0] + ab[0] * v + ac[0] * w, A[1] + ab[1] * v + ac[1] * w, A[2] + ab[2] * v + ac[2] * w];
 }
 
+/** As coordenadas baricêntricas [u, v, w] do ponto `q`, do plano do triângulo [A, B, C], em A, B e C. */
+export function baricentro(q, A, B, C) {
+  const v0 = sub(B, A); const v1 = sub(C, A); const v2 = sub(q, A);
+  const d00 = dot(v0, v0); const d01 = dot(v0, v1); const d11 = dot(v1, v1); const d20 = dot(v2, v0); const d21 = dot(v2, v1);
+  const den = d00 * d11 - d01 * d01;
+  if (Math.abs(den) < 1e-30) return [1, 0, 0];
+  const v = (d11 * d20 - d01 * d21) / den; const w = (d00 * d21 - d01 * d20) / den;
+  return [1 - v - w, v, w];
+}
+
 /**
  * @param {Map<number, number[]>} V vértices por id
  * @param {Map<number, { vs: number[] }>} F faces por id
  * @param {number[]} ids as faces que entram
- * @returns {{ maisProximo: (p: number[], limite?: number) => ({ face: number, ponto: number[], distancia: number } | null), triangulos: number }}
+ * @returns {{ maisProximo: (p: number[], limite?: number) => ({ face: number, ponto: number[], distancia: number, vertices: number[], baricentro: number[] } | null), triangulos: number }}
  */
 export function prepararPontoNaMalha(V, F, ids) {
   const tris = [];
@@ -42,7 +54,7 @@ export function prepararPontoNaMalha(V, F, ids) {
     const f = F.get(id);
     const pts = f.vs.map((v) => V.get(v));
     if (pts.length < 3 || pts.some((p) => !p)) continue;
-    for (const [i, j, k] of triangularFace(pts)) tris.push({ face: id, a: pts[i], b: pts[j], c: pts[k] });
+    for (const [i, j, k] of triangularFace(pts)) tris.push({ face: id, a: pts[i], b: pts[j], c: pts[k], vs: [f.vs[i], f.vs[j], f.vs[k]] });
   }
   if (!tris.length) return { maisProximo: () => null, triangulos: 0 };
   const lo = [Infinity, Infinity, Infinity]; const hi = [-Infinity, -Infinity, -Infinity];
@@ -92,7 +104,7 @@ export function prepararPontoNaMalha(V, F, ids) {
           const T = tris[n];
           const q = pontoNoTriangulo(p, T.a, T.b, T.c);
           const d = Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
-          if (!melhor || d < melhor.distancia - 1e-12 || (Math.abs(d - melhor.distancia) <= 1e-12 && T.face < melhor.face)) melhor = { face: T.face, ponto: q, distancia: d };
+          if (!melhor || d < melhor.distancia - 1e-12 || (Math.abs(d - melhor.distancia) <= 1e-12 && T.face < melhor.face)) melhor = { face: T.face, ponto: q, distancia: d, vertices: T.vs, baricentro: baricentro(q, T.a, T.b, T.c) };
         }
       }
     }

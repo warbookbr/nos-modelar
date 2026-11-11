@@ -484,12 +484,16 @@ function paineisPorVaosBruto(o) {
      (a quina viva não entra na média), pesadas pelo inverso da distância do toque ao canto; a normal crua de cada face da malha varia alguns graus de uma face à outra e
      entortaria a parede da lâmina de uma estação à seguinte */
   let vizinhas = null;
-  const normalSuave = (face, ponto) => {
-    const { V, F } = leitura.st;
+  const vizinhasDe = () => {
     if (!vizinhas) {
       vizinhas = new Map();
-      for (const f of F.values()) for (const v of f.vs) { if (!vizinhas.has(v)) vizinhas.set(v, []); vizinhas.get(v).push(f.id); }
+      for (const f of leitura.st.F.values()) for (const v of f.vs) { if (!vizinhas.has(v)) vizinhas.set(v, []); vizinhas.get(v).push(f.id); }
     }
+    return vizinhas;
+  };
+  const normalSuave = (face, ponto) => {
+    const { V, F } = leitura.st;
+    vizinhasDe();
     const n0 = normalDaFace(V, F.get(face).vs);
     let acc = [0, 0, 0];
     for (const v of F.get(face).vs) {
@@ -525,8 +529,21 @@ function paineisPorVaosBruto(o) {
       const r = peleDaChapa().maisProximo(q, limite);
       if (!r) return null;
       const { V, F } = leitura.st;
-      let nm = normalSuave(r.face, r.ponto);
+      /* a normal da curva é a interpolação, pelas coordenadas baricêntricas do toque, das normais alisadas dos três vértices do triângulo (a de cada vértice, a média das faces que o
+         dividem e giram menos que 25 graus da face tocada): varia sem salto de uma face da malha à vizinha, e a seção da lâmina gira por igual numa quina arredondada */
       const n0 = normalDaFace(V, F.get(r.face).vs);
+      let nm = [0, 0, 0];
+      r.vertices.forEach((v, k) => {
+        let soma3 = [0, 0, 0];
+        for (const id of vizinhasDe().get(v)) {
+          const ni = normalDaFace(V, F.get(id).vs);
+          if (ni[0] * n0[0] + ni[1] * n0[1] + ni[2] * n0[2] >= 0.9063) soma3 = [soma3[0] + ni[0], soma3[1] + ni[1], soma3[2] + ni[2]];
+        }
+        const L = Math.hypot(...soma3) || 1;
+        nm = [nm[0] + (r.baricentro[k] * soma3[0]) / L, nm[1] + (r.baricentro[k] * soma3[1]) / L, nm[2] + (r.baricentro[k] * soma3[2]) / L];
+      });
+      const Ln = Math.hypot(...nm);
+      nm = Ln > 1e-9 ? nm.map((x) => x / Ln) : n0;
       if (nm[0] * n0[0] + nm[1] * n0[1] + nm[2] * n0[2] < 0) nm = nm.map((x) => -x);
       let esp = null;
       if (interna) { const d = interna.maisProximo(r.ponto, 8 * o.vao); esp = d ? d.distancia : null; } else {

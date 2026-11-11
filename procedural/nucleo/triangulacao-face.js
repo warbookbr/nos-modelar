@@ -96,7 +96,49 @@ export function triangularSemDegenerado(pts, degenerado = null) {
   const zero = dele(0);
   if (serve(zero, false)) return zero;
   for (let c = 1; c < n; c++) { const t = dele(c); if (serve(t, true)) return t; }
-  return orelhas(pts, nm, eDegenerado);
+  return orelhas(pts, nm, eDegenerado) ?? porSubcadeias(pts, nm, eDegenerado);
+}
+
+/* O MAIOR PORTE DA FACE EM TIRA. A face fina cujos cantos ficam colineares nos dois lados (a parede de 1 mm de um corte, com dezenas de
+   cantos em cada borda) não tem leque nem orelha sem triângulo de área nula: um leque cobre só uma das duas cadeias, e a orelha de três
+   cantos da mesma cadeia é nula. A triangulação existe e é o zigue-zague entre as duas cadeias. A busca é a programação dinâmica sobre os
+   cantos em ordem: o trecho [i, j] fecha quando algum k dá o triângulo (i, k, j) de área positiva sobre a normal da face e fora do critério
+   de degenerado, com os trechos [i, k] e [k, j] fechados; com todos os triângulos de giro positivo a cobertura é a do polígono (a soma
+   dos giros é o número de voltas da borda), sem sobreposição. Entre as que fecham, fica a de menor soma da razão (soma dos lados ao
+   quadrado) / área, e o empate vai para o menor k. Só roda quando o leque, o leque de outro canto e as orelhas falharam, e por isso as
+   faces que hoje triangulam saem iguais. Custa n³, e faces de mais de LIMITE_DA_PROGRAMACAO_DINAMICA cantos ficam sem ela. */
+export const LIMITE_DA_PROGRAMACAO_DINAMICA = 300;
+function porSubcadeias(pts, nm, degenerado) {
+  const n = pts.length;
+  if (n < 4 || n > LIMITE_DA_PROGRAMACAO_DINAMICA) return null;
+  const custo = new Float64Array(n * n).fill(Infinity);
+  const melhorK = new Int32Array(n * n).fill(-1);
+  for (let i = 0; i + 1 < n; i++) custo[i * n + i + 1] = 0;
+  for (let d = 2; d < n; d++) {
+    for (let i = 0; i + d < n; i++) {
+      const j = i + d;
+      for (let k = i + 1; k < j; k++) {
+        const resto = custo[i * n + k] + custo[k * n + j];
+        if (!(resto < Infinity)) continue;
+        const [a, b, c] = [pts[i], pts[k], pts[j]];
+        const g = cruz(sub(b, a), sub(c, a));
+        if (!(dot(g, nm) > 0) || degenerado(a, b, c)) continue;
+        const u = sub(b, a), v = sub(c, b), w = sub(a, c);
+        const total = resto + (dot(u, u) + dot(v, v) + dot(w, w)) / (Math.hypot(...g) / 2);
+        if (total < custo[i * n + j] * (1 - 1e-9)) { custo[i * n + j] = total; melhorK[i * n + j] = k; }
+      }
+    }
+  }
+  if (!(custo[n - 1] < Infinity)) return null;
+  const saida = []; const pilha = [[0, n - 1]];
+  while (pilha.length) {
+    const [i, j] = pilha.pop();
+    if (j - i < 2) continue;
+    const k = melhorK[i * n + j];
+    saida.push([i, k, j]);
+    pilha.push([k, j], [i, k]);
+  }
+  return saida;
 }
 
 /* igual a triangularFace, mas devolve null quando a face é pequena ou côncava

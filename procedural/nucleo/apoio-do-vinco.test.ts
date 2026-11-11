@@ -10,6 +10,8 @@ import { NIVEIS_RECOMENDADOS, anguloDaDobra, apoioDoVinco, perfilDoApoio, raioDo
 // @ts-expect-error — núcleo em JavaScript.
 import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
 // @ts-expect-error — núcleo em JavaScript.
+import { gaiolaPorLacos } from './gaiola-por-lacos.js';
+// @ts-expect-error — núcleo em JavaScript.
 import { nitidezDoVinco, subdividirCatmullClark } from './subdivisao.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { nucleo } from './entrada.js';
@@ -300,6 +302,57 @@ describe('o raio pedido chega ao conteúdo salvo', () => {
     expect(m[0]).toEqual({ nome: 'q', pontos: ['a', 'b'], nitidez: 0, raio: 0.006 });
     expect(m[1].raio).toEqual({ de: 0.006, ate: 0.003 });
     expect(m[2]).toEqual(v[2]);
+  });
+});
+
+describe('gaiolaPorLacos: o vinco com raio', () => {
+  /* barra de seção 100 por 100 ao longo de x, três laços; as outras três quinas da seção são vivas, e a de baixo com a da frente leva o raio */
+  const trechos = [{ nome: 'baixo', pontos: 3 }, { nome: 'frente', pontos: 3 }, { nome: 'cima', pontos: 3 }, { nome: 'tras', pontos: 3 }];
+  const laco = (em: number) => ({ em, trechos: { baixo: [[0, 0], [0, 100]], frente: [[0, 100], [100, 100]], cima: [[100, 100], [100, 0]], tras: [[100, 0], [0, 0]] } });
+  const barra = (raio: unknown, extra: Record<string, unknown> = {}) => gaiolaPorLacos({
+    nome: 'barra', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' }, trechos, lacos: [0, 200, 400].map(laco),
+    vincos: [{ nome: 'quina', entre: ['baixo', 'frente'], ...(raio != null ? { raio } : { nitidez: 0.5 }) },
+      { nome: 'q2', entre: ['frente', 'cima'], nitidez: 'viva' }, { nome: 'q3', entre: ['cima', 'tras'], nitidez: 'viva' }, { nome: 'q4', entre: ['tras', 'baixo'], nitidez: 'viva' }], ...extra,
+  });
+  const perfilEmX = (g: any, niveis: number, x0: number): P2[] => {
+    const nomes: string[] = g.passo.vertices; const idx = new Map(nomes.map((n, i) => [n, i]));
+    const vincos = g.passo.vincos.filter((v: any) => v.nitidez !== 0).flatMap((v: any) => v.pontos.slice(0, -1).map((a: string, k: number) => [idx.get(a), idx.get(v.pontos[k + 1]), nitidezDoVinco(v.nitidez)]));
+    const m = subdividirCatmullClark({ vertices: nomes.map((n) => g.pontosMm[n]), faces: g.passo.faces.map((f: string[]) => f.map((n) => idx.get(n))), vincos, niveis });
+    /* a quina de baixo com a frente fica em (y 0, z 100): o corte é o da vizinhança dela, com z contado a partir dela */
+    return m.vertices.filter((p: number[]) => Math.abs(p[0] - x0) < 1e-6 && p[1] >= -1e-6 && p[2] <= 100 + 1e-6 && p[1] <= 40 && p[2] >= 60)
+      .map((p: number[]) => [p[1], 100 - p[2]] as P2).sort((a: P2, b: P2) => (a[0] - a[1]) - (b[0] - b[1]));
+  };
+  it('o raio vira apoio, sai no passo em metro com nitidez 0, a malha fecha e o raio medido na seção do meio é o pedido', () => {
+    const g = barra(4);
+    expect(g.raios[0].vinco).toBe('quina');
+    expect(g.raios[0].raioEsperado.minimo).toBeCloseTo(4, 2);
+    expect(g.passo.vincos.find((v: any) => v.nome === 'quina')).toMatchObject({ nitidez: 0, raio: 0.004 });
+    expect(g.passo.vertices.length).toBeGreaterThan(3 * 8);
+    const r = nucleo([['subdivisao', { origemId: 1, ...g.passo, niveis: 2 }]], {}, g.pontos);
+    expect(r.V.size).toBeGreaterThan(0);
+    for (const n of [3, 4]) {
+      const medido = raioDoFilete(perfilEmX(g, n, 200)).raio as number;
+      expect(Math.abs(medido / 4 - 1), `nível ${n}`).toBeLessThan(0.1);
+    }
+  });
+  it('a aresta fica com duas faces, uma em cada sentido, como a gaiola de hoje', () => {
+    const g = barra(4);
+    const conta = new Map<string, number>();
+    for (const f of g.passo.faces) f.forEach((a: string, k: number) => { const c = `${a}|${f[(k + 1) % f.length]}`; conta.set(c, (conta.get(c) ?? 0) + 1); });
+    for (const [c, n] of conta) { const [a, b] = c.split('|'); expect(n).toBe(1); expect(conta.has(`${b}|${a}`), c).toBe(true); }
+  });
+  it('sem raio a saída é a de hoje: o vinco só leva nome, pontos e nitidez, sem `raios`, e raio com nitidez ou esvai é recusado', () => {
+    const g = barra(null);
+    expect(g.raios).toBeUndefined();
+    expect(Object.keys(g.passo.vincos[0]).sort()).toEqual(['nitidez', 'nome', 'pontos']);
+    expect(g.passo.vertices).toHaveLength(3 * 8);
+    expect(() => gaiolaPorLacos({ nome: 'b', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' }, trechos, lacos: [0, 200].map(laco), vincos: [{ nome: 'q', entre: ['baixo', 'frente'], raio: 3, nitidez: 0.5 }] })).toThrow(/raio e nitidez/);
+  });
+  it('a espessura confere a gaiola com os apoios sem quebrar, e o raio por estação ({ de, ate }) segue o pedido', () => {
+    const g = barra(4, { espessura: 1 });
+    expect(g.espessura).toBeTruthy();
+    const f = barra({ de: 6, ate: 3 });
+    expect(f.raios[0].raioEsperado.minimo).toBeCloseTo(3, 2); expect(f.raios[0].raioEsperado.maximo).toBeCloseTo(6, 2);
   });
 });
 
