@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.familia@1",
   "id": "roda-pneu",
-  "versao": "2.1.0",
+  "versao": "2.2.0",
   "nivel": "componente",
   "parametros": {
     "diametroPneu": {
@@ -259,6 +259,14 @@
       "minimo": 0,
       "maximo": 1,
       "medio": 0
+    },
+    "ombroDoPneu": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 0.6,
+      "medio": 0
     }
   },
   "restricoes": [
@@ -441,6 +449,11 @@
       "id": "ventilacao-furos-vizinhos-separados",
       "expressao": "max(0, 1 - tipo) * min(furosDeVentilacao, 1) * diametroCirculoDeVentilacao * sin(180 / max(3, furosDeVentilacao)) >= max(0, 1 - tipo) * min(furosDeVentilacao, 1) * diametroFuroDeVentilacao * 1.5",
       "motivo": "os furos de ventilação vizinhos se encostam"
+    },
+    {
+      "id": "ombro-cabe-na-banda",
+      "expressao": "ombroDoPneu * diametroPneu * (0.5 - alturaDoFriso - diametroAro / 2) <= 0.3 * larguraPneu * diametroPneu",
+      "motivo": "o ombro largo, em mm (o lado esquerdo), passa de 30% da largura da banda (o direito, em mm), e a banda plana entre os dois ombros fica com menos de 40% da largura"
     }
   ],
   "portas": [
@@ -674,6 +687,29 @@
         "furosDeVentilacao": 5,
         "diametroCirculoDeVentilacao": 0.39,
         "diametroFuroDeVentilacao": 0.07
+      }
+    },
+    "empilhadeira-700-12": {
+      "descricao": "roda motriz de empilhadeira com pneu pneumático industrial 7.00-12 (705 mm): banda larga e alta num aro pequeno de doze polegadas, flanco em curva até o bojo e ombro largo em curva de 62 mm até a banda, e roda de chapa de seis furos recuada para dentro",
+      "parametros": {
+        "diametroPneu": 705,
+        "larguraPneu": 0.3546,
+        "diametroAro": 0.4539,
+        "larguraAro": 0.936,
+        "paredeDoAro": 0.02553,
+        "banda": 0,
+        "tipo": 0,
+        "espessuraDisco": 0.02128,
+        "larguraCubo": 0.04255,
+        "diametroCubo": 0.2837,
+        "diametroFuroCentral": 0.156,
+        "furosDeFixacao": 6,
+        "diametroCirculoFuros": 0.1872,
+        "diametroFuro": 0.01986,
+        "desvio": -0.5845,
+        "ombroRedondo": 1,
+        "ombroDoPneu": 0.3221,
+        "ladosDoPneu": 192
       }
     }
   }

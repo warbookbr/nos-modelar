@@ -50,11 +50,12 @@ function contarLinhas(texto) {
    e plano que ninguém lê não governa nada. */
 const TETO_DE_LINHAS = 300;
 
-/* CONTRATO DE PLANOS ATIVOS (2026-11-03): até MAXIMO_DE_ATIVOS planos `ativo` ao mesmo tempo, cada um com a linha
+/* CONTRATO DE PLANOS ATIVOS (2026-11-03; o teto foi de 5 a 6 em 2026-11-10, com duas sessões em paralelo e um plano novo de
+   cada uma sobre a mesma base): até MAXIMO_DE_ATIVOS planos `ativo` ao mesmo tempo, cada um com a linha
    `**Território:**` logo abaixo do Estado, com os caminhos que ele muda (pasta terminada em `/` ou arquivo, entre
    crases e separados por vírgula) ou `nenhum (aguarda aprovação)`. Dois planos ativos não podem ter caminhos em que um
    é prefixo do outro. Os caminhos de CAMINHOS_COMPARTILHADOS pertencem a todos e ficam fora dessa conta. */
-export const MAXIMO_DE_ATIVOS = 5;
+export const MAXIMO_DE_ATIVOS = 6;
 export const CAMINHOS_COMPARTILHADOS = [
   'docs/modelar/planos/',
   'docs/MAPA.md',

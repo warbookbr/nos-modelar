@@ -12,7 +12,7 @@ import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
-import { acaoDaPeca, ajustarImportsDaCopia, entradaDosArquivos, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -300,6 +300,21 @@ describe('a rodada lida dos arquivos dos agentes', () => {
     expect(() => textoFinalDoAssistente(readFileSync(vazia, 'utf8'), { arquivo: vazia })).toThrow(/não tem nenhum texto do assistente/);
   });
 
+  it('o relato entregue pela ferramenta de devolução, sem bloco de texto, vale como o último texto do agente', () => {
+    const relato = 'Li as vistas.\n\n```json\n{ "alvo": "a.png", "nota": 6, "defeitos": [] }\n```';
+    const linhas = [
+      { type: 'user', message: { role: 'user', content: 'pedido' } },
+      { type: 'assistant', message: { id: 'm1', role: 'assistant', content: [{ type: 'text', text: 'Vou abrir as imagens.' }] } },
+      { type: 'assistant', message: { id: 'm2', role: 'assistant', content: [{ type: 'tool_use', name: 'Read', input: { file_path: 'a.png' } }] } },
+      { type: 'assistant', message: { id: 'm3', role: 'assistant', content: [{ type: 'tool_use', name: 'SubagentHandback', input: { message: relato } }] } },
+      { type: 'user', message: { role: 'user', content: [{ type: 'tool_result', content: 'ok' }] } },
+    ];
+    const arquivo = escrever('critico-devolucao.jsonl', `${linhas.map((l) => JSON.stringify(l)).join('\n')}\n`);
+    const lido = textoFinalDoAssistente(readFileSync(arquivo, 'utf8'), { arquivo });
+    expect(lido.formato).toBe('transcrição');
+    expect(ultimoBlocoJson(lido.texto)).toEqual({ alvo: 'a.png', nota: 6, defeitos: [] });
+  });
+
   it('o bloco que não é JSON válido é recusado com o arquivo', () => {
     const quebrado = escrever('modelador-quebrado.txt', 'Conferi.\n\n```json\n{ "partes": [ }\n```\n');
     expect(() => entradaDosArquivos({ modelador: quebrado })).toThrow(new RegExp(`${quebrado}: o último bloco .*não é JSON válido`));
@@ -402,5 +417,91 @@ describe('o alvo do veredito fica no repositório', async () => {
   it('recusa o alvo em pasta que o CI não tem', () => {
     expect(() => alvoDoRepositorio('/repo/tools/bancadas/out/critica-x/vista.png', raiz)).toThrow(/não é um arquivo do repositório/);
     expect(() => alvoDoRepositorio('/fora/imagem.png', raiz)).toThrow(/não é um arquivo do repositório/);
+  });
+});
+
+describe('o relato de várias peças num texto só', () => {
+  const bloco = (objeto) => `\`\`\`json\n${JSON.stringify(objeto)}\n\`\`\``;
+  const relato = [
+    'Entreguei três peças.', '', '**banco**:', bloco({ partes: [{ nome: 'assento', confere: true }] }), '',
+    '`roda-traseira`', bloco({ partes: [{ nome: 'aro', confere: true }] }), '', '## carcaca:', bloco({ partes: [{ nome: 'chassi', confere: true }] }),
+  ].join('\n');
+
+  it('escolhe o bloco precedido do nome da peça, tolerando crases, negrito, título e dois-pontos', () => {
+    expect(blocoDaPeca(relato, 'empilhadeira/banco').partes[0].nome).toBe('assento');
+    expect(blocoDaPeca(relato, 'empilhadeira/roda-traseira').partes[0].nome).toBe('aro');
+    expect(blocoDaPeca(relato, 'carcaca').partes[0].nome).toBe('chassi');
+  });
+
+  it('com um bloco só, ou com vários sem nome, vale o último; com nomes e nenhum da peça, recusa dizendo os nomes', () => {
+    expect(blocoDaPeca(`texto\n\nbanco\n${bloco({ a: 1 })}`, 'obj/outra')).toEqual({ a: 1 });
+    expect(blocoDaPeca(`citei o anterior\n${bloco({ a: 1 })}\n\na resposta é esta\n${bloco({ a: 2 })}`, 'obj/outra')).toEqual({ a: 2 });
+    expect(() => blocoDaPeca(relato, 'empilhadeira/garfo', { arquivo: 'm.txt', papel: 'modelador' }))
+      .toThrow(/^m\.txt: o texto do modelador tem 3 blocos .*nenhum nomeado 'garfo'; os nomes achados são 'banco', 'roda-traseira', 'carcaca'/);
+  });
+
+  it('normaliza o confere em texto e o atrito em frase única sem perder o dado', () => {
+    expect(normalizarRelatoDoModelador({
+      partes: [{ nome: 'a', confere: 'sim, com o raio de 8 mm' }, { nome: 'b', confere: 'não: falta a aba' }, { nome: 'c', confere: 'sim' }, { nome: 'd', confere: true }],
+      atrito: 'a família não aceita o ombro largo',
+    })).toEqual({
+      partes: [{ nome: 'a', confere: true, observacao: 'sim, com o raio de 8 mm' }, { nome: 'b', confere: false, observacao: 'não: falta a aba' },
+        { nome: 'c', confere: true }, { nome: 'd', confere: true }],
+      atrito: ['a família não aceita o ombro largo'],
+    });
+  });
+
+  it('a entrada dos arquivos usa o bloco da peça e passa na validação depois de normalizar', () => {
+    const arquivo = join(area, 'modelador-varias.txt');
+    writeFileSync(arquivo, `${relato}\n\nbanco\n${bloco({ partes: [{ nome: 'encosto', confere: 'sim, sem abas' }], atrito: 'uma frase só' })}\n`, 'utf8');
+    const entrada = entradaDosArquivos({ modelador: arquivo, peca: 'empilhadeira/banco' });
+    expect(entrada.partes).toEqual([{ nome: 'encosto', confere: true, observacao: 'sim, sem abas' }]);
+    expect(entrada.atrito).toEqual(['uma frase só']);
+    expect(() => entradaDosArquivos({ modelador: arquivo, peca: 'empilhadeira/volante' })).toThrow(/nenhum nomeado 'volante'/);
+  });
+});
+
+describe('a data da rodada', () => {
+  it('grava a data e a hora do registro em ISO e UTC, e a rodada antiga sem data continua lida', () => {
+    const pasta = join(area, 'datada');
+    const { rodada } = gravarRodada('datada', { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' } }, { pasta, receitaTexto: null, agora: () => '2026-11-11T12:00:00.000Z' });
+    expect(rodada.registradaEm).toBe('2026-11-11T12:00:00.000Z');
+    const segunda = gravarRodada('datada', { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' } }, { pasta, receitaTexto: null }).rodada;
+    expect(segunda.registradaEm).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    writeFileSync(join(pasta, 'rodada-03.json'), JSON.stringify({ ...segunda, numero: 3, registradaEm: undefined }), 'utf8');
+    expect(lerRodadas('datada', { pasta }).map((r) => r.registradaEm ?? null)).toEqual(['2026-11-11T12:00:00.000Z', segunda.registradaEm, null]);
+  });
+});
+
+describe('a contradição e a repetição entre rodadas', () => {
+  const defeito = (parte, tipo, sentido, onde, evidencia = 'na vista lateral a linha do alvo passa por fora') => ({ parte, tipo, sentido, onde, evidencia });
+  const rodada = (numero, defeitos, atrito = []) => ({ numero, medidas: { passou: true }, veredito: { nota: 6, defeitos }, atrito });
+
+  it('acusa o sentido oposto na mesma parte e no mesmo lugar, e a repetição do que foi atribuído ao plano', () => {
+    const rodadas = [
+      rodada(1, [defeito('pino', 'comprimento', 'maior', 'ponta de cima do pino'), defeito('base', 'uniao', 'afastado', 'borda de baixo da base, sobre a tampa', 'fresta escura sob a borda')],
+        ['rodada 1, fresta sob a borda da base: e a folga de 0,5 mm; atribuido ao plano da montagem']),
+      rodada(2, [defeito('pino', 'comprimento', 'menor', 'ponta de cima do pino'), defeito('base', 'uniao', 'afastado', 'borda de baixo da base, lado da frente'),
+        defeito('pino', 'espessura', 'menor', 'meio do pino'), defeito('aba', 'comprimento', 'menor', 'ponta de cima')]),
+    ];
+    const achados = contradicoesEntreRodadas(rodadas);
+    expect(achados).toEqual([
+      { caso: 'contradicao', rodada: 2, rodadaAnterior: 1, parte: 'pino', agora: 'comprimento menor em ponta de cima do pino', antes: 'comprimento maior em ponta de cima do pino' },
+      { caso: 'repeticao', rodada: 2, rodadaAnterior: 1, parte: 'base', agora: 'uniao afastado em borda de baixo da base, lado da frente',
+        antes: rodadas[0].atrito[0], atribuicao: 'plano' },
+    ]);
+    const resumo = resumoDoLaco('obj/peca', { rodadas, decisao: { acao: 'modelar', motivo: 'x', medicao: null } });
+    expect(resumo).toContain('contradições e repetições:');
+    expect(resumo).toContain('rodada 2, pino: "comprimento menor em ponta de cima do pino" contradiz a rodada 1');
+    expect(resumo).toContain('repete o que a rodada 1 atribuiu ao plano');
+  });
+
+  it('não acusa nada com uma rodada só, nem a repetição do que foi atribuído ao modelador, nem o lugar diferente', () => {
+    expect(contradicoesEntreRodadas([rodada(1, [defeito('pino', 'comprimento', 'maior', 'ponta')])])).toEqual([]);
+    expect(contradicoesEntreRodadas([
+      rodada(1, [defeito('base', 'uniao', 'afastado', 'borda de baixo da base', 'fresta escura sob a borda')], ['rodada 1, fresta sob a borda da base: atribuido ao modelador']),
+      rodada(2, [defeito('base', 'uniao', 'afastado', 'borda de baixo da base'), defeito('pino', 'comprimento', 'menor', 'raiz junto ao furo')]),
+    ])).toEqual([]);
+    expect(resumoDoLaco('obj/peca', { rodadas: [], decisao: { acao: 'modelar', motivo: 'x', medicao: null } })).not.toContain('contradições');
   });
 });

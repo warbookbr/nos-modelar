@@ -43,13 +43,23 @@ export const LADOS_DO_PNEU = LADOS_DA_RODA;
 /* O ombro redondo (`ombroRedondo` 1) troca o chanfro reto de cada ombro por um arco de quarto de círculo, de raio igual ao chanfro, em três segmentos (dois anéis
    a mais por ombro). Poucos anéis de propósito: a normal suave (`liso`) da peça esconde os gomos que sobram. */
 export const SEGMENTOS_DO_OMBRO_REDONDO = 3;
+/* A curva do ombro largo (`ombroDoPneu` com `ombroRedondo`, composição `-ombro-largo`): a superelipse do bojo à banda em doze
+   segmentos (no pneu da empilhadeira, a maior quina entre dois deles é de 13 graus, abaixo do ângulo do `liso` de qualquer receita) e
+   o flanco do talão ao bojo em quatro. O ombro largo tem dezenas de milímetros, e os três segmentos do ombro redondo, feitos para o
+   chanfro de 9 mm, saíam como facetas retas. O expoente 2,5 é o que mais se aproxima da seção que o rascunho da empilhadeira desenhava
+   à mão (a até 3,1 mm dela, contra 8,3 mm da elipse de expoente 2). */
+export const SEGMENTOS_DO_OMBRO_LARGO = 12;
+export const EXPOENTE_DO_OMBRO_LARGO = 2.5;
+export const PONTOS_DO_FLANCO = 3;
+/** Os nomes dos escalares de um ponto da curva do ombro largo: `FE1` é o primeiro ponto do flanco esquerdo, `OD3` o terceiro da elipse direita. */
+export const nomesDoOmbroLargo = () => ({ raio: (chave) => `raioDaCurva${chave}`, x: (chave) => `xDaCurva${chave}` });
 export const LADOS_DO_FURO = 24;
 
 /** O id da composição: o cubo (`tipo` 0, 1 ou 2), o perfil e o número de raios das raiadas, a banda lisa ou sulcada, o sufixo
     `-circ` da banda com sulcos ao longo da volta e o `-vent` da chapa com a volta de furos de ventilação. As composições sem as
     duas melhorias têm o id e a malha de antes delas. */
-export function idDaRoda({ tipo, raios = 0, maciço = false, sulcada = false, circular = false, ventilada = false, ombroRedondo = false }) {
-  const banda = `${sulcada ? 'sulcada' : 'lisa'}${circular ? '-circ' : ''}${ombroRedondo ? '-ombro' : ''}`;
+export function idDaRoda({ tipo, raios = 0, maciço = false, sulcada = false, circular = false, ventilada = false, ombroRedondo = false, ombroLargo = false }) {
+  const banda = `${sulcada ? 'sulcada' : 'lisa'}${circular ? '-circ' : ''}${ombroRedondo ? (ombroLargo ? '-ombro-largo' : '-ombro') : ''}`;
   if (tipo === 0) return `roda-pneu.disco-${banda}${ventilada ? '-vent' : ''}`;
   return `roda-pneu.${tipo === 1 ? 'raiada' : 'flanges'}-${maciço ? 'macico' : 'tubo'}-${raios}-${banda}`;
 }
@@ -59,7 +69,7 @@ const p = (nome) => ({ parametro: nome });
 /* os parâmetros escalares (metro), por grupo, e os inteiros */
 const DA_BANDA = [
   'raioDoAssento', 'raioDoBojo', 'raioDoOmbro', 'raioDoPneu', 'raioDoFriso', 'inicioDaLargura', 'meiaLargura', 'inicioDoAro',
-  'meiaLarguraDoAro', 'inicioDaBandaEsquerda', 'fimDoFriso', 'fimDoTalude', 'fimDaBanda', 'raioInternoDoAro',
+  'meiaLarguraDoAro', 'inicioDaBandaEsquerda', 'fimDoFriso', 'fimDoTalude', 'fimDaBanda', 'raioInternoDoAro', 'raioDaFaceDoAssento',
 ];
 const DO_CUBO = ['raioDoFuroCentral', 'raioDoCubo', 'inicioDoCubo', 'fimDoCubo'];
 const DAS_FLANGES = ['raioDaFlange', 'inicioDoMiolo', 'fimDoMiolo'];
@@ -78,14 +88,19 @@ const DOS_SULCOS_CIRCULARES = [
 const DO_OMBRO_REDONDO = [
   'raioDoOmbroE1', 'xDoOmbroE1', 'raioDoOmbroE2', 'xDoOmbroE2', 'raioDoOmbroD1', 'xDoOmbroD1', 'raioDoOmbroD2', 'xDoOmbroD2',
 ];
+const CHAVES_DA_CURVA = (lado) => [
+  ...Array.from({ length: PONTOS_DO_FLANCO }, (_, k) => `F${lado}${k + 1}`),
+  ...Array.from({ length: SEGMENTOS_DO_OMBRO_LARGO - 1 }, (_, k) => `O${lado}${k + 1}`),
+];
+const DA_CURVA = ['E', 'D'].flatMap((lado) => CHAVES_DA_CURVA(lado)).flatMap((chave) => [nomesDoOmbroLargo().raio(chave), nomesDoOmbroLargo().x(chave)]);
 const DO_RELEVO = ['larguraDaFerramentaDoSulco', 'alturaDaFerramentaDoSulco', 'larguraDoPrismaDoSulco', 'baseDaFerramentaDoSulco', 'passoDoSulco'];
 
 /** Os escalares (metro) que o `derivar` entrega a cada composição, por forma de cubo e por banda. Exportado para o `derivar`. */
-export function escalaresDaRoda({ tipo, sulcada, circular = false, ventilada = false, ombroRedondo = false }) {
+export function escalaresDaRoda({ tipo, sulcada, circular = false, ventilada = false, ombroRedondo = false, ombroLargo = false }) {
   return [
     ...DA_BANDA, ...DO_CUBO, ...(tipo === 2 ? DAS_FLANGES : []), ...DOS_FUROS, ...(tipo === 0 ? DA_CHAPA : []),
     ...(tipo > 0 ? ['diametroDoRaio'] : []), ...(sulcada ? DO_RELEVO : []), ...(circular ? DOS_SULCOS_CIRCULARES : []),
-    ...(ventilada ? DA_VENTILACAO : []), ...(ombroRedondo ? DO_OMBRO_REDONDO : []),
+    ...(ventilada ? DA_VENTILACAO : []), ...(ombroRedondo ? (ombroLargo ? DA_CURVA : DO_OMBRO_REDONDO) : []),
   ];
 }
 
@@ -110,7 +125,9 @@ const parteDe = (id, nome, origem) => ({ id: `parte-${id}`, operacao: 'parte', a
 const materialDe = (id, usa, origem) => ({ id: `material-${id}`, operacao: 'material', argumentos: { usa, sel: { origem } } });
 const solidoDe = (id, origem) => ({ id: `solido-${id}`, operacao: 'solido', argumentos: { sel: { origem } } });
 
-/* as três portas, as mesmas em todas as variantes: o anel do assento no pneu, o anel do furo central e o círculo de furos no cubo */
+/* as três portas, as mesmas em todas as variantes: o anel do assento no pneu, o anel do furo central e o círculo de furos no cubo. O raio
+   externo do assento é o que a face plana de dentro do pneu alcança: o do friso, ou o do ombro quando o ombro largo passa da faixa
+   em que a conferência da porta mede o raio (`derivar`) */
 function portasDaRoda(pneu) {
   return [
     {
@@ -119,7 +136,7 @@ function portasDaRoda(pneu) {
         id: 'assento-do-pneu', de: pneu,
         interface: {
           forma: 'anel', papel: 'ocupa', eixo: [-1, 0, 0], centro: [p('inicioDaLargura'), 0, 0],
-          raioInterno: p('raioDoAssento'), raioExterno: p('raioDoFriso'), inicio: p('inicioDaPortaDoPneu'), fim: 0,
+          raioInterno: p('raioDoAssento'), raioExterno: p('raioDaFaceDoAssento'), inicio: p('inicioDaPortaDoPneu'), fim: 0,
         },
       },
     },
@@ -167,10 +184,32 @@ const PERFIL_DO_PNEU_COM_OMBRO_REDONDO = [
   ...PERFIL_DO_PNEU.slice(7),
 ];
 
+/* a seção da curva do ombro largo: o talão, o flanco em curva, o bojo, a elipse até a banda (ou a parede do friso), a banda, e o
+   espelho do outro lado, de volta ao talão */
+const ponto = (chave) => [p(nomesDoOmbroLargo().raio(chave)), p(nomesDoOmbroLargo().x(chave))];
+const PERFIL_DO_PNEU_COM_OMBRO_LARGO = [
+  PERFIL_DO_PNEU[0],
+  ...Array.from({ length: PONTOS_DO_FLANCO }, (_, k) => ponto(`FE${k + 1}`)),
+  PERFIL_DO_PNEU[1],
+  ...Array.from({ length: SEGMENTOS_DO_OMBRO_LARGO - 1 }, (_, k) => ponto(`OE${k + 1}`)),
+  ...PERFIL_DO_PNEU.slice(3, 7),
+  ...Array.from({ length: SEGMENTOS_DO_OMBRO_LARGO - 1 }, (_, k) => ponto(`OD${SEGMENTOS_DO_OMBRO_LARGO - 1 - k}`)),
+  PERFIL_DO_PNEU[8],
+  ...Array.from({ length: PONTOS_DO_FLANCO }, (_, k) => ponto(`FD${PONTOS_DO_FLANCO - k}`)),
+  ...PERFIL_DO_PNEU.slice(9),
+];
+
 /** Os segmentos (faixas) da lathe da seção do pneu, por região, para a peça que quiser um material no flanco e outro na banda: `flancos` são a parede que sobe do
  *  assento ao bojo, a parede do bojo ao ombro e o assento de dentro, dos dois lados; `banda` é o ombro, a banda e o ombro do outro lado. Sem friso, o ombro e a banda
  *  são uma só região de pele. A lathe é a de id `BASE_DO_PNEU` quando há relevo e a `PNEU` quando não há. */
-export function faixasDoPneu({ ombroRedondo = false } = {}) {
+export function faixasDoPneu({ ombroRedondo = false, ombroLargo = false } = {}) {
+  if (ombroRedondo && ombroLargo) {
+    /* o flanco é a curva do talão ao bojo de cada lado e o assento de dentro; a elipse e a banda são a banda */
+    const lado = PONTOS_DO_FLANCO + 1;
+    const total = 2 * lado + 2 * SEGMENTOS_DO_OMBRO_LARGO + 4;
+    const flancos = [...Array.from({ length: lado }, (_, k) => k), ...Array.from({ length: lado }, (_, k) => total - 1 - lado + k), total - 1];
+    return { flancos, banda: Array.from({ length: total }, (_, k) => k).filter((k) => !flancos.includes(k)) };
+  }
   const arco = ombroRedondo ? SEGMENTOS_DO_OMBRO_REDONDO - 1 : 0;
   const total = 10 + 2 * arco;
   const flancos = [0, 1, total - 3, total - 2, total - 1];
@@ -178,9 +217,9 @@ export function faixasDoPneu({ ombroRedondo = false } = {}) {
   return { flancos, banda };
 }
 
-function nosDoPneu({ sulcada, circular, ombroRedondo }) {
+function nosDoPneu({ sulcada, circular, ombroRedondo, ombroLargo }) {
   const relevo = sulcada || circular;
-  const perfil = ombroRedondo ? PERFIL_DO_PNEU_COM_OMBRO_REDONDO : PERFIL_DO_PNEU;
+  const perfil = ombroRedondo ? (ombroLargo ? PERFIL_DO_PNEU_COM_OMBRO_LARGO : PERFIL_DO_PNEU_COM_OMBRO_REDONDO) : PERFIL_DO_PNEU;
   const revolucao = (origemId) => ({
     id: relevo ? 'revolucao-pneu-base' : 'revolucao-pneu', operacao: 'lathe',
     argumentos: { origemId, eixo: 'x', lados: p('ladosDoPneu'), perfil },
@@ -306,8 +345,8 @@ const NOS_DA_VENTILACAO = [
 export const nomeDoNoDoCubo = (k) => `noDoCubo${k}`;
 export const nomeDoNoDoAro = (k) => `noDoAro${k}`;
 
-function parametrosDa({ tipo, raios, maciço, sulcada, circular, ventilada, ombroRedondo }) {
-  const parametros = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo }).map((nome) => [nome, { tipo: 'numero' }]));
+function parametrosDa({ tipo, raios, maciço, sulcada, circular, ventilada, ombroRedondo, ombroLargo }) {
+  const parametros = Object.fromEntries(escalaresDaRoda({ tipo, sulcada, circular, ventilada, ombroRedondo, ombroLargo }).map((nome) => [nome, { tipo: 'numero' }]));
   if (circular) parametros.sulcosCirculares = { tipo: 'inteiro' };
   if (ventilada) parametros.furosDeVentilacao = { tipo: 'inteiro' };
   parametros.furos = { tipo: 'inteiro' };
@@ -352,19 +391,19 @@ function nosDosRaios({ raios, maciço }) {
   ];
 }
 
-function comporRoda({ tipo, raios = 0, maciço = false, sulcada = false, circular = false, ventilada = false, ombroRedondo = false }) {
+function comporRoda({ tipo, raios = 0, maciço = false, sulcada = false, circular = false, ventilada = false, ombroRedondo = false, ombroLargo = false }) {
   const pneu = sulcada || circular ? PNEU_SULCADO : PNEU;
   const chapa = ventilada ? CHAPA_VENTILADA : CHAPA;
   return Object.freeze({
     formato: FORMATO_COMPOSICAO_PROCEDURAL,
-    id: idDaRoda({ tipo, raios, maciço, sulcada, circular, ventilada, ombroRedondo }),
+    id: idDaRoda({ tipo, raios, maciço, sulcada, circular, ventilada, ombroRedondo, ombroLargo }),
     versao: '2.0.0',
-    parametros: parametrosDa({ tipo, raios, maciço, sulcada, circular, ventilada, ombroRedondo }),
+    parametros: parametrosDa({ tipo, raios, maciço, sulcada, circular, ventilada, ombroRedondo, ombroLargo }),
     artefatos: { entra: [], sai: [MALHA, PARTE, PORTA] },
     nos: [
       ...(tipo > 0 ? nosDosRaios({ raios, maciço }) : []),
       ...nosDoCubo(tipo),
-      ...nosDoPneu({ sulcada, circular, ombroRedondo }),
+      ...nosDoPneu({ sulcada, circular, ombroRedondo, ombroLargo }),
       NO_DO_ARO,
       ...(tipo === 0 ? [NO_DA_CHAPA, ...(ventilada ? NOS_DA_VENTILACAO : [])] : []),
       parteDe('pneu', 'pneu', pneu), materialDe('pneu', p('materialDoPneu'), pneu), solidoDe('pneu', pneu),
@@ -380,7 +419,7 @@ const RAIOS = (de, ate, passo = 1) => Array.from({ length: Math.floor((ate - de)
 const BANDAS = [
   { sulcada: false, circular: false }, { sulcada: true, circular: false }, { sulcada: false, circular: true }, { sulcada: true, circular: true },
 ];
-const SEM_E_COM_OMBRO_REDONDO = [{ ombroRedondo: false }, { ombroRedondo: true }];
+const SEM_E_COM_OMBRO_REDONDO = [{ ombroRedondo: false }, { ombroRedondo: true }, { ombroRedondo: true, ombroLargo: true }];
 const COMBINACOES = SEM_E_COM_OMBRO_REDONDO.flatMap((ombro) => [
   ...BANDAS.flatMap((banda) => [false, true].map((ventilada) => ({ tipo: 0, ...banda, ventilada, ...ombro }))),
   ...BANDAS.flatMap((banda) => [false, true].flatMap((maciço) => [

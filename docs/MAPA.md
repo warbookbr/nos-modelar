@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1781 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1875 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -296,6 +296,11 @@
 
 - `roteiro.md` — Roteiro da análise
 
+## docs/modelar/banco-de-provas/empilhadeira-2026-11-09/
+
+- `ATRITOS.md` — Empilhadeira — atritos
+- `CUSTO-POR-PECA.md` — Custo por peça da empilhadeira
+
 ## docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/
 
 - `README.md` — Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2, 3 e 5
@@ -526,6 +531,8 @@
 - `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` — Abertura na vizinhança de todo vão: o vão grande e o vão junto de outro também recortam só o trecho dele
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
 - `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
+- `2026-11-10-nucleo-para-qualquer-mecanismo.md` — Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
+- `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -674,6 +681,7 @@
 - `2026-11-08-materiais-realistas.md` — Materiais realistas e exportação glTF
 - `2026-11-08-trecho-que-some-entre-lacos.md` — Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
 - `2026-11-08-uniao-de-tubos-com-arredondamento.md` — União de dois tubos com arredondamento: o tubo em pé redondo até a base, cruzado por um tubo deitado afastado
+- `2026-11-09-empilhadeira.md` — Empilhadeira inteira, da carcaça aos garfos, por partes plugadas numa montagem
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -758,7 +766,9 @@
 ## modulos/esboco-nucleo/tests/
 
 - `atalho.test.js` — atalho.test.js — o atalho de posição do esboço 2.0, em mm: centro, sobre, ponta, desloca e rotacao resolvidos pela caixa da malha que o núcleo gerou, as form…
+- `contatos-declarados.test.js` — contatos-declarados.test.js — a opção só de passos crus executada uma vez, com o mesmo neutro do caminho de antes, e o contato declarado na opção (`contatos`…
 - `leitor.test.js` — leitor.test.js — o leitor dos esboços antigos: cada `.esboco.json` versionado abre no esboço 2.0 ou é recusado com o motivo, as treze opções de forma de peça…
+- `montar-sem-relato.test.js` — montar-sem-relato.test.js — `montarOpcoes` com `relato: false` não calcula o relato de contatos e devolve o mesmo neutro, as mesmas partes e o resto do paine…
 - `posicao.test.js` — posicao.test.js — a fatia 5 do esboço 2.0: a posição sem conta (âncora, encosta até a malha tocar, alinha, pivô do giro), a cópia pelo arranja e pelo espelha…
 - `variantes.test.js` — variantes.test.js — o gate 2 do plano esboço pelo núcleo: a cópia de prova da mesa com três variantes declaradas dá, na variante com o valor aceito, a mesma …
 
@@ -965,6 +975,8 @@
 
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
+- `arcos-do-contorno.js` — arcos-do-contorno.js — o anel de pontos 2D simplificado, com os trechos curvos declarados trocados pelo círculo ajustado
+- `arcos-do-contorno.test.mjs` — arcos-do-contorno.test.mjs — o anel simplificado com os arcos declarados no círculo ajustado: o raio sai do ruído, o anel sem arco volta igual, os trechos dã…
 - `arrumacao.test.mjs` — arrumacao.test.mjs — segura a arrumação do plano "o núcleo mora num lugar só" (2026-09-22). Antes dele, os testes do núcleo moravam espalhados por `tools/` e…
 - `artefatos.js` — artefatos.js — contrato neutro e procedência determinística da execução procedural.
 - `artefatos.test.mjs` — artefatos-procedencia.test.mjs — prova o artefato neutro e a origem das entidades finais.
@@ -1019,6 +1031,8 @@
 - `gaiola-por-rede.test.mjs` — gaiola-por-rede.test.mjs — o ajudante que monta a gaiola da subdivisão por uma rede de curvas nomeadas e os retalhos que elas fecham
 - `gaiola-varrida.js` — gaiola-varrida.js — a gaiola de uma superfície varrida: uma seção dada ao longo de um trilho dado, com estações, alargamento e recortes
 - `gaiola-varrida.test.mjs` — gaiola-varrida.test.mjs — a gaiola varrida: uma régua em reta, um friso em arco com as pontas cortadas numa altura, uma seção com borda rolada e alargamento,…
+- `lacos-pelas-vistas.js` — lacos-pelas-vistas.js — os laços de `gaiolaPorLacos` tirados de três vistas: a silhueta de lado, a largura por altura e a planta
+- `lacos-pelas-vistas.test.mjs` — lacos-pelas-vistas.test.mjs — os laços tirados de três vistas: a ponta acompanha a planta em toda altura, a gaiola por laços os aceita e as entradas que não …
 - `lacunas.js` — lacunas.js — diagnóstico e planejamento estrutural puros sobre o catálogo. Não executa receita, não grava disco e não decide promoção de capacidade.
 - `lacunas.test.mjs` — lacunas-capacidade.test.mjs — R08: diagnóstico persistível e busca estrutural.
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
@@ -1099,6 +1113,7 @@
 - `aviso-de-degrau.test.ts` — aviso-de-degrau.test.ts — o arredondamento que termina em degrau não passa mais calado.
 - `booleana-casca-raspada.test.ts` — booleana-casca-raspada.test.ts — o canto solto que a booleana deixava quando o corte cruza a casca de um loft (achado na rodada das asas do avião, em 2026-10…
 - `booleana-faces-fundidas.test.ts` — booleana-faces-fundidas.test.ts — fatia 10 do plano "Ajustes no núcleo dos veículos" (docs/modelar/planos/encerrados/2026-10-21-ajustes-no- nucleo-dos-veicul…
+- `booleana-quebras-de-sombra.test.ts` — booleana-quebras-de-sombra.test.ts — defeito achado na carcaça da empilhadeira em 2026-11-10: a booleana sobre um corpo subdividido com vinco vivo deixava em…
 - `booleanas-carga.test.ts` — booleanas-carga.test.ts — fatia 5 do plano "União de sólidos". O núcleo carrega a Manifold sozinho, por await no topo de `manifold.js`: quem só importa a fac…
 - `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
@@ -1508,6 +1523,193 @@
 ## procedural/pecas/carro-taxi/referencias/
 
 - `alvo.md` — Alvo: carro-taxi
+
+## procedural/pecas/empilhadeira/
+
+- `ALINHAMENTO.md` — Empilhadeira — alinhamento
+
+## procedural/pecas/empilhadeira/partes/alca/
+
+- `receita.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
+
+## procedural/pecas/empilhadeira/partes/alca/rodadas/
+
+- `receita-01.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
+- `receita-02.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
+
+## procedural/pecas/empilhadeira/partes/banco/
+
+- `receita.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+
+## procedural/pecas/empilhadeira/partes/banco/rodadas/
+
+- `receita-01.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+- `receita-02.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+- `receita-03.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
+
+## procedural/pecas/empilhadeira/partes/canal-interno/
+
+- `receita.js` — empilhadeira/canal-interno — o canal interno da torre da empilhadeira: os dois canais em U, abertos para dentro, que correm dentro dos canais externos da tor…
+
+## procedural/pecas/empilhadeira/partes/canal-interno/rodadas/
+
+- `receita-01.js` — empilhadeira/canal-interno — o canal interno da torre da empilhadeira: os dois canais em U, abertos para dentro, que correm dentro dos canais externos da tor…
+
+## procedural/pecas/empilhadeira/partes/carcaca/
+
+- `receita.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
+
+## procedural/pecas/empilhadeira/partes/carcaca/receita/
+
+- `contornos-da-lateral.js` — empilhadeira/carcaca, receita/contornos-da-lateral.js — o contorno em mm de cada parte da carcaça na vista lateral de caráter (`../../../referencias/carcaca-…
+- `ferramentas.js` — empilhadeira/carcaca, receita/ferramentas.js — as ferramentas que escrevem os passos da carcaça em milímetro num estado { passos, topo, origem }, e o contorn…
+- `frente.js` — empilhadeira/carcaca, receita/frente.js — a carcaça inteira em mm num estado { passos, topo, origem }: chassi, paralamas, laterais (com o furo da tampa de co…
+- `traseira.js` — empilhadeira/carcaca, receita/traseira.js — a traseira da carcaça: capô, grade, fundo da grade, tampa, contrapeso, os rebaixos dele, o pino e o trinco, escri…
+
+## procedural/pecas/empilhadeira/partes/carcaca/rodadas/
+
+- `receita-01.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
+- `receita-02.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
+- `receita-03.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
+
+## procedural/pecas/empilhadeira/partes/carro/
+
+- `receita.js` — empilhadeira/carro — o carro porta-garfos da torre da empilhadeira: a placa (as duas barras de 1.000 mm à frente da torre, as chapas das pontas, os dois mont…
+
+## procedural/pecas/empilhadeira/partes/carro/rodadas/
+
+- `receita-01.js` — empilhadeira/carro — o carro porta-garfos da torre da empilhadeira: a placa (as duas barras de 1.000 mm à frente da torre, as chapas das pontas, os dois mont…
+
+## procedural/pecas/empilhadeira/partes/cilindro-elevacao/
+
+- `receita.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## procedural/pecas/empilhadeira/partes/cilindro-elevacao/rodadas/
+
+- `receita-01.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## procedural/pecas/empilhadeira/partes/cilindro-inclinacao/
+
+- `receita.js` — empilhadeira/cilindro-inclinacao — um cilindro de inclinação da torre da empilhadeira, deitado ao longo do comprimento da máquina: a camisa de Ø 90, que entr…
+
+## procedural/pecas/empilhadeira/partes/cilindro-inclinacao/rodadas/
+
+- `receita-01.js` — empilhadeira/cilindro-inclinacao — um cilindro de inclinação da torre da empilhadeira, deitado ao longo do comprimento da máquina: a camisa de Ø 90, que entr…
+
+## procedural/pecas/empilhadeira/partes/coluna-direcao/
+
+- `receita.js` — empilhadeira/coluna-direcao — a coluna de direção da empilhadeira, que sai do painel inclinada para trás até o cubo do volante, com os pedais na rampa do pai…
+
+## procedural/pecas/empilhadeira/partes/coluna-direcao/rodadas/
+
+- `receita-01.js` — empilhadeira/coluna-direcao — a coluna de direção da empilhadeira, que sai do painel inclinada para trás até o cubo do volante, com os pedais na rampa do pai…
+
+## procedural/pecas/empilhadeira/partes/correntes/
+
+- `receita.js` — empilhadeira/correntes — as correntes de elevação da torre da empilhadeira, na pose de transporte: as duas do cilindro de elevação, da cabeça dele à travessa…
+
+## procedural/pecas/empilhadeira/partes/correntes/rodadas/
+
+- `receita-01.js` — empilhadeira/correntes — as correntes de elevação da torre da empilhadeira, na pose de transporte: as duas do cilindro de elevação, da cabeça dele à travessa…
+
+## procedural/pecas/empilhadeira/partes/eixo-dianteiro/
+
+- `receita.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
+
+## procedural/pecas/empilhadeira/partes/eixo-dianteiro/rodadas/
+
+- `receita-01.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
+- `receita-02.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
+
+## procedural/pecas/empilhadeira/partes/eixo-traseiro/
+
+- `receita.js` — empilhadeira/eixo-traseiro — o eixo traseiro direcional da empilhadeira: a viga de 120 x 100 mm com o olhal do pino de articulação no meio, o suporte desse p…
+
+## procedural/pecas/empilhadeira/partes/eixo-traseiro/rodadas/
+
+- `receita-01.js` — empilhadeira/eixo-traseiro — o eixo traseiro direcional da empilhadeira: a viga de 120 x 100 mm com o olhal do pino de articulação no meio, o suporte desse p…
+
+## procedural/pecas/empilhadeira/partes/escape/
+
+- `receita.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
+
+## procedural/pecas/empilhadeira/partes/escape/rodadas/
+
+- `receita-01.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
+- `receita-02.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
+
+## procedural/pecas/empilhadeira/partes/garfo/
+
+- `receita.js` — empilhadeira/garfo — um garfo da empilhadeira, em L: a haste de pé, que pendura na face da frente das barras do carro, o calcanhar e a lâmina de 1.070 x 100 …
+
+## procedural/pecas/empilhadeira/partes/garfo/rodadas/
+
+- `receita-01.js` — empilhadeira/garfo — um garfo da empilhadeira, em L: a haste de pé, que pendura na face da frente das barras do carro, o calcanhar e a lâmina de 1.070 x 100 …
+
+## procedural/pecas/empilhadeira/partes/glp/
+
+- `receita.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
+
+## procedural/pecas/empilhadeira/partes/glp/rodadas/
+
+- `receita-01.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
+- `receita-02.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
+
+## procedural/pecas/empilhadeira/partes/protetor/
+
+- `receita.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
+
+## procedural/pecas/empilhadeira/partes/protetor/rodadas/
+
+- `receita-01.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
+- `receita-02.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
+
+## procedural/pecas/empilhadeira/partes/roda-dianteira/
+
+- `receita.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
+
+## procedural/pecas/empilhadeira/partes/roda-dianteira/rodadas/
+
+- `receita-01.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
+- `receita-02.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
+
+## procedural/pecas/empilhadeira/partes/roda-traseira/
+
+- `receita.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
+
+## procedural/pecas/empilhadeira/partes/roda-traseira/rodadas/
+
+- `receita-01.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
+- `receita-02.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
+
+## procedural/pecas/empilhadeira/partes/torre/
+
+- `receita.js` — empilhadeira/torre — a parte fixa da torre da empilhadeira: os dois canais externos em U, abertos para dentro, com as três travessas de trás e a orelha do ci…
+
+## procedural/pecas/empilhadeira/partes/torre/rodadas/
+
+- `receita-01.js` — empilhadeira/torre — a parte fixa da torre da empilhadeira: os dois canais externos em U, abertos para dentro, com as três travessas de trás e a orelha do ci…
+
+## procedural/pecas/empilhadeira/partes/volante/
+
+- `receita.js` — empilhadeira/volante — o volante da empilhadeira: o aro, o cubo e os três raios, que giram em torno da coluna de direção.
+
+## procedural/pecas/empilhadeira/partes/volante/rodadas/
+
+- `receita-01.js` — empilhadeira/volante — o volante da empilhadeira: o aro, o cubo e os três raios, que giram em torno da coluna de direção.
+
+## procedural/pecas/empilhadeira/referencias/
+
+- `carcaca-traseira.esboco.mjs` — carcaca-traseira.esboco.mjs — o rascunho da traseira da carcaça (capô, tampa, grade e contrapeso) sozinha, sem o poço da roda.
+- `carcaca.esboco.mjs` — carcaca.esboco.mjs — o rascunho da carcaça inteira da empilhadeira: chassi, laterais, paralamas, piso, painel, tampa do motor, colunas e a traseira, para o e…
+- `eixos-rodas.esboco.mjs` — eixos-rodas.esboco.mjs — o rascunho dos eixos e das rodas da empilhadeira (fatia 3): o eixo dianteiro motriz com o diferencial e os dois cubos, o eixo trasei…
+- `empilhadeira.esboco.mjs` — empilhadeira.esboco.mjs — o rascunho da máquina inteira: a carcaça (`carcaca.esboco.mjs`, com a traseira de `carcaca-traseira.esboco.mjs`), os eixos e as rod…
+- `protetor-posto.esboco.mjs` — protetor-posto.esboco.mjs — o rascunho do protetor do operador, do posto do operador e dos acessórios da empilhadeira (fatias 5, 6 e 7 do plano), montado sob…
+- `torre-garfos.esboco.mjs` — torre-garfos.esboco.mjs — o rascunho da torre e dos garfos da empilhadeira (fatia 4): o pé da torre no eixo dianteiro, os dois canais externos com as travess…
+
+## procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.pacote/
+
+- `roteiro.md` — Roteiro da análise
 
 ## procedural/pecas/freezer-horizontal/
 
@@ -2462,7 +2664,7 @@
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `marcadores-de-conflito.test.mjs` — marcadores-de-conflito.test.mjs — nenhum arquivo rastreado guarda marcador de conflito de junção. Em 2026-10-28 uma junção deixou o plano ativo com os marcad…
 - `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem sobreposição, e que nenhum plano executivo ultrapassa o…
-- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de cinco planos ativos…
+- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de seis planos ativos,…
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
@@ -2582,6 +2784,8 @@
 - `capacidade.test.mjs` — capacidade.test.mjs — a ficha de cada capacidade de gaiola: recortada do cabeçalho, em até 60 linhas, com os campos no código e o exemplo executável
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
+- `casamento-da-vista.mjs` — casamento-da-vista.mjs — duas medidas do modelo contra a imagem de referência numa vista, as duas tiradas da malha e não de uma captura com luz: quanto de ca…
+- `casamento-da-vista.test.mjs` — casamento-da-vista.test.mjs — o casamento do modelo com a referência numa vista, sobre uma cena sintética: duas partes lado a lado, uma laranja e uma cinza, …
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `cilindro-hidraulico-aprovacao.test.mjs` — cilindro-hidraulico-aprovacao.test.mjs — a aprovação mecânica de uma família que gera montagem: o curso da articulação é conferido contra as malhas da camisa…
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro]`.
@@ -2596,12 +2800,16 @@
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação, face de área nula, face fina, face …
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
+- `conferir-vistas.mjs` — conferir-vistas.mjs — a rodada inteira de conferência de um rascunho contra as imagens de referência num comando só: o esboço é montado uma vez, e para cada …
+- `conferir-vistas.test.mjs` — conferir-vistas.test.mjs — a rodada de conferência sobre uma cena sintética, sem navegador: dois cubos de cores diferentes lado a lado, uma referência em PNG…
 - `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `contorno-da-peca.mjs` — contorno-da-peca.mjs — o contorno por parte no veredito da peça.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
+- `custo-por-peca.mjs` — custo-por-peca.mjs — a tabela de custo de cada peça de um objeto, lida dos registros de rodada e do registro das etapas.
+- `custo-por-peca.test.mjs` — custo-por-peca.test.mjs — os números da tabela de custo numa fixture de duas peças, a rodada incompleta e a saída estável.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
 - `derivar-catalogo-montagens.test.ts` — Prova catálogo global confinado às raízes explicitamente resolvidas.
@@ -2646,6 +2854,8 @@
 - `familia.test.mjs` — familia.test.mjs — o comando `npm run familia -- aprovar <id>` e o gate `familias:check`.
 - `ferramentas-por-objeto.mjs` — Gera docs/modelar/FERRAMENTAS-POR-OBJETO.md a partir de docs/modelar/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE-OBJET…
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
+- `fluxo-do-objeto.mjs` — fluxo-do-objeto.mjs — em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora.
+- `fluxo-do-objeto.test.mjs` — fluxo-do-objeto.test.mjs — o passo do objeto e o próximo comando de cada peça, em fixtures montadas num diretório temporário, sem executar receita nenhuma.
 - `folha-comparativa.mjs` — folha-comparativa.mjs — a fonte e a receita lado a lado, nas MESMAS câmeras e na MESMA escala, e a vista de diferença que marca onde a receita sobra ou falta.
 - `folha-comparativa.test.mjs` — Testes de folha-comparativa.mjs: as câmeras são as de modelo-de-referencia, a receita igual à fonte não deixa sobra nem falta, e a cabine mais estreita ou o …
 - `fonte-sintetica.mjs` — fonte-sintetica.mjs — monta, no Node e sem navegador, um `partes.json` no formato de `modelo-de-referencia.mjs` a partir dos triângulos de uma receita.
@@ -2662,8 +2872,12 @@
 - `lados-das-vistas.mjs` — lados-das-vistas.mjs — de que lado cada vista olha, em texto, para o brief do crítico cego.
 - `lasca.mjs` — lasca.mjs — lista cada face fina de uma receita: a parte, a razão, os cantos em milímetro e o passo que criou a face.
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
+- `leitura-por-regioes.mjs` — leitura-por-regioes.mjs — a vista de referência e a captura do rascunho cortadas na mesma grade, região por região, ampliadas lado a lado, com a resposta de …
+- `leitura-por-regioes.test.mjs` — leitura-por-regioes.test.mjs — a leitura por regiões: a captura alinhada à caixa da referência, a grade que cobre a vista inteira, as folhas iguais a cada ex…
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
+- `linhas-do-modelo.mjs` — linhas-do-modelo.mjs — as linhas que o modelo tem numa vista, tiradas da malha e não de uma imagem com luz.
+- `linhas-do-modelo.test.mjs` — linhas-do-modelo.test.mjs — as linhas tiradas da malha: o contorno, a divisa entre partes, a quina do degrau e a dobra fechada saem; a curva larga não sai.
 - `mapa-da-receita.mjs` — mapa-da-receita.mjs — o mapa de uma receita do acervo, para ler só o trecho que se precisa.
 - `mapa-da-receita.test.mjs` — mapa-da-receita.test.mjs — o mapa de toda receita do acervo sai sem erro, cada linha citada tem o nome dito e a saída cabe numa tela
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
@@ -2677,6 +2891,7 @@
 - `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.
 - `montagem-da-familia.mjs` — montagem-da-familia.mjs — a montagem v5 que uma família de objeto gera, conferida pela aprovação mecânica.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `navegador.mjs` — navegador.mjs — os argumentos e o lançamento do Chromium sem tela que as capturas da bancada, do esboço e do contorno usam.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `objeto.mjs` — objeto.mjs — em que etapa do fluxo um objeto está, e o que vem a seguir.
 - `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.
@@ -2700,6 +2915,8 @@
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
 - `pedidos-da-pessoa.mjs` — pedidos-da-pessoa.mjs — registra os pedidos de alteração da pessoa e conta quantos foram por etapa.
+- `perfil-por-cor.mjs` — perfil-por-cor.mjs — os pixels de uma vista classificados pela cor do material e, linha a linha, os trechos de cada cor e a meia largura de cada uma em cada …
+- `perfil-por-cor.test.mjs` — perfil-por-cor.test.mjs — o perfil por cor: os trechos de cada classe numa linha, a meia largura de uma classe em cada altura, a classificação que aguenta a …
 - `perguntas-da-peca.mjs` — perguntas-da-peca.mjs — as perguntas de forma que o brief do crítico de uma peça traz depois do pacote de imagens.
 - `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
 - `perguntas-do-alinhamento.mjs` — perguntas-do-alinhamento.mjs — as perguntas do alinhamento da família declarada, filtradas pelas partes.
@@ -2732,7 +2949,11 @@
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
 - `silhueta-da-superficie.mjs` — silhueta-da-superficie.mjs — extensão de uma malha de triângulos em fatias ao longo de um eixo, medida na SUPERFÍCIE e não nos vértices.
 - `silhueta-da-superficie.test.mjs` — Teto grande: uma placa y = 1 de z = 0 a z = 10 em dois triângulos, só com vértices nas pontas.
+- `silhueta-pedida.mjs` — silhueta-pedida.mjs — quanto a malha de uma parte se afasta do corpo pedido a `lacosPelasVistas`, faixa por faixa de altura.
+- `silhueta-pedida.test.mjs` — silhueta-pedida.test.mjs — a malha de um corpo de `lacosPelasVistas` contra o que foi pedido, faixa por faixa de altura: a gaiola sem subdivisão dá desvio ze…
 - `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
+- `sobra-entre-partes.mjs` — sobra-entre-partes.mjs — quanto de uma parte aparece fora do contorno da parte que a contém, vista por vista.
+- `sobra-entre-partes.test.mjs` — sobra-entre-partes.test.mjs — a placa reta que passa do corpo em arco nos cantos sobra na vista de cima, com a distância conhecida; a placa encurtada para de…
 - `sobreposicao-de-cortes.mjs` — sobreposicao-de-cortes.mjs — os cortes planos do modelo sobre os do sólido do esboço que a receita refina, numa imagem por eixo.
 - `sobreposicao-de-cortes.test.mjs` — sobreposicao-de-cortes.test.mjs — os cortes do modelo sobre os do sólido do esboço: o corte de uma malha, o desvio entre as duas linhas, o desenho e, de pont…
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
@@ -2756,6 +2977,8 @@
 - `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
+- `vista-rapida.mjs` — vista-rapida.mjs — a imagem sombreada de uma opção de esboço numa vista, tirada da malha em JavaScript, sem navegador.
+- `vista-rapida.test.mjs` — um paralelepípedo de quadriláteros com a normal para fora, em mm
 - `vistas-da-receita.mjs` — vistas-da-receita.mjs — a folha de seis vistas de uma receita `.js` do acervo, cada parte com uma cor, para olhar a forma e a divisão em partes.
 - `vistas-da-receita.test.mjs` — Testes de vistas-da-receita.mjs: os polígonos da receita em milímetro com as partes na ordem de aparição e a folha de seis vistas pela linha de comando.
 - `vistas-de-passos.mjs` — vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram.

@@ -68,7 +68,10 @@ describe('familias:check', () => {
     expect(r.stderr).toBe('');
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/^familias:check ok — /);
-  });
+    /* 420 s: o comando confere as sete famílias de ponta a ponta. Em 2026-11-10 a `roda-pneu` ganhou a opção de ombro largo e o perfil
+       da empilhadeira, a conferência foi de 34 para 42 s na máquina local, e no CI o arquivo levou 207 s, acima dos 180 s do teto
+       geral dos testes */
+  }, 420000);
 });
 
 describe('npm run familia -- aprovar', () => {

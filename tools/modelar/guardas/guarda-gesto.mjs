@@ -114,7 +114,9 @@ try {
   ok('depois de mover a parte, o botão de salvar aparece e fica ativo',
     !depois.desativado && !depois.rodapeEscondido, JSON.stringify(depois));
 
-  const baixado = pagina.waitForEvent('download', { timeout: 15000 }).catch(() => null);
+  /* 45 s: com 15 s o arquivo não chegou em dois de quatro envios do mesmo dia (2026-11-10), com as outras guardas rodando ao
+     lado, e chegou nas novas tentativas sem mudança no código */
+  const baixado = pagina.waitForEvent('download', { timeout: 45000 }).catch(() => null);
   await pagina.click('#btnSalvarAjusteDeJunta');
   const arquivo = await baixado;
   ok('clicar em salvar baixa um arquivo', Boolean(arquivo));

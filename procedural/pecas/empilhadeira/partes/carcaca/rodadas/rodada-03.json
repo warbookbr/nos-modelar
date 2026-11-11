@@ -1,0 +1,228 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/carcaca",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "colunas",
+        "tipo": "superficie",
+        "onde": "laje atrás da tampa do motor",
+        "sentido": "anguloso",
+        "evidencia": "isometrica e tresquartos: laje de arestas vivas, sem raio, sobre a tampa arredondada; o alvo mostra volume mais suave."
+      },
+      {
+        "parte": "contrapeso",
+        "tipo": "uniao",
+        "onde": "borda de cima do contrapeso sob a borda de baixo do capô",
+        "sentido": "afastado",
+        "evidencia": "vistas direita e esquerda: faixa clara entre capô e contrapeso (direita x 740-810, y 725-735); no alvo lado o contrapeso encosta sob o capô."
+      },
+      {
+        "parte": "laterais",
+        "tipo": "superficie",
+        "onde": "painel da rampa diagonal e anel do arco da roda dianteira",
+        "sentido": "facetado",
+        "evidencia": "lado az30 e az120: diagonais de triangulação cruzam a rampa (x 690-870) e fatias triangulares no arco (x 150-370); o alvo mostra chapa contínua."
+      },
+      {
+        "parte": "pocoTraseiro",
+        "tipo": "ausencia",
+        "onde": "poço atrás do arco da lateral, onde o alvo mostra eixo e roda",
+        "sentido": "faltando",
+        "evidencia": "direita e esquerda: bloco preto retangular solto (direita x 635-693, y 735-780) sem eixo nem roda; alvo lado mostra eixo e roda traseira ali."
+      }
+    ],
+    "observacao": "Lê como carcaça de empilhadeira e a silhueta lateral bate, mas capô e contrapeso estão separados, o poço traseiro está vazio e a chapa da lateral mostra triangulação na luz rasante."
+  },
+  "partes": [
+    {
+      "nome": "chassi",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laterais",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "furo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tunel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paralamas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piso",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tapete",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "degraus",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaMotor",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "colunas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pocoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "grade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoGrade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "contrapeso",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoRasgo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoNicho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pino",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "trinco",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "lacosPelasVistas so faz lacos horizontais; um topo quase plano e inclinado vira degraus, e nada avisa a distancia em planta entre lacos vizinhos",
+    "cantos 'fixos' resolvia a ponta dos lacos curtos do encosto mas achatava o nariz redondo da frente; nao ha opcao por ponta (so inicio ou fim)",
+    "vistas:superficie da so a curvatura global da peca no json, sem valor por parte; nao da para medir a tampaMotor antes e depois",
+    "forro do pocoTraseiro: 15 mm escuros na frente do fundo escuro nao aparecem de lado; o pedido ao critico nao traz a medida, e o processo nao pegaria isso sozinho",
+    "rodada 3, fresta capo-contrapeso: medido, o contrapeso sobe 11,9 mm por dentro do capo e de lado o fundo so aparece num entalhe de 45 mm no contorno de tras; atribuido ao critico, que leu o ombro iluminado como fresta",
+    "rodada 3, poco traseiro vazio e colunas em laje: atribuidos ao plano, como na rodada 2; o alvo mostra eixo, roda e protetor, de etapas seguintes",
+    "rodada 3, triangulacao da lateral na luz rasante: atribuido a ferramenta; vistas:superficie suaviza a 30 graus fixos e ignora o liso da receita",
+    "tres rodadas com nota 6 e defeitos diferentes em cada uma: o laco nao converge por nota nesta peca, e o aceite da etapa vai a pessoa com a lista do que ficou aberto"
+  ],
+  "notaDePassagem": "tampaMotor: as estacoes acabam em 1060 e pulam de 1000 para 1030 porque, no banco quase plano, laco a cada 6 mm com a frente andando 200 mm dava degraus, e o laco estreito de 1068 dobrava a borda de trás. A tampa ficou 8 mm mais baixa. vincoDeTras esvai de 1000 a 1045 e cantoDeTras de 40 mm arredonda o canto de trás em planta. cantos 'fixos' foi testado e achatou o nariz, entao ficou o padrao. pocoTraseiro nao mudou: o forro de 15 mm, de x 360 a 590, ja existe.",
+  "receita": {
+    "sha256": "sha256:5467ce77a929411004d58c9a2cac3290dc6ff75534fa3fcaa4f3036af499efa1",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 2,
+      "acrescentadas": 5,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 173,
+          "texto": "    lado: [[667, 749], [732, 714], [1044, 715], [1238, 896], [1335, 915], [1335, 1060], [1272, 1072], [1230, 1052], [1172, 1026], [1111, 1009],"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "    lado: [[667, 749], [732, 714], [1044, 715], [1238, 896], [1335, 915], [1335, 1035], [1325, 1056], [1300, 1069], [1272, 1072], [1230, 1052], [1172, 1026], [1111, 1009],"
+        },
+        {
+          "tipo": "-",
+          "linha": 176,
+          "texto": "    estacoes: [716, 730, 750, 780, 820, 860, 900, 930, 955, 975, 990, 1000, 1006, 1015, 1030, 1045, 1058, 1068],"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "    estacoes: [716, 730, 750, 780, 820, 860, 900, 930, 955, 975, 990, 1000, 1030, 1045, 1060],"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "    /* sem laço entre 1000 e 1030 nem acima de 1060: no banco quase plano eles viravam degraus e, no alto, a lâmina de trás dobrava */"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    vincoDeTras: { nitidez: 1, esvai: [1000, 1045] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    cantoDeTras: 40,"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes capo, contrapeso, painel, tampa, tampaMotor",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}

@@ -47,7 +47,12 @@ natural.
 2. **As imagens** viram `referencias`, com a vista de cada uma. Sem imagem, o
    alvo é a descrição funcional do passo 1, e isso fica escrito.
 3. **A medida que dá a escala** vira `escala`: uma medida real em milímetros
-   que todo o resto herda.
+   que todo o resto herda. Com mais de uma vista, meça em cada uma a razão
+   entre as medidas da tabela que ela mostra (largura sobre comprimento, altura
+   sobre largura) antes de modelar: imagem gerada por IA erra a proporção entre
+   vistas, e a da empilhadeira dava a carcaça uns 25% mais larga que a ficha.
+   Divergência acima de 5% vai à pessoa, com a medida da tabela como
+   recomendação.
 4. **As partes** viram `partes`, com nome em letras e dígitos, igual ao do
    passo `parte` da receita.
 5. **O grau de realismo.** Diga o que vê e ofereça duas opções concretas:

@@ -75,6 +75,8 @@ uma gaiola, e a posição sai da malha das outras, sem conta:
   repete: { total, d } | { total, eixo, graus|volta, pivo }    o arranja do núcleo
   espelha: "x" | { eixo, pos | em: "corpo" }                     o espelha do núcleo
   contato: { "corpo": "atravessa" }  a relação esperada ("encosta", "atravessa", "folga"); o encosta declara a dele
+Na opção, "contatos": [{ "par": ["capo", "tampa"], "relacao": "atravessa", "motivo": "..." }] declara o de qualquer par de
+partes, as dos passos crus inclusive, e o motivo sai no relato.
 A âncora é "centro" ou lados de eixos distintos ("+y", "+y-z", "-x+y+z") da caixa da forma. Exemplo, a cabeça de uma guitarra
 girando 12 graus para trás na junta com o braço, sobre um corpo de contorno por spline (no eixo z o perfil [u, v] vai a (x, -y),
 e o giro de 180 graus em x o põe como desenhado):
@@ -109,15 +111,19 @@ export async function lerArquivoDeEsboco(caminho) {
   return JSON.parse(readFileSync(abs, 'utf8'));
 }
 
-/** Monta as receitas das opções, com o relato de contatos de cada uma. Devolve `{ vista, paineis, recusas }`; com recusa, `paineis` fica vazio. */
-export function montarOpcoes(esboco, { nome = 'esboco', perto = PERTO_MM } = {}) {
+/**
+ * Monta as receitas das opções, com o relato de contatos de cada uma. Devolve `{ vista, paineis, recusas }`; com recusa, `paineis` fica vazio.
+ * Com `relato: false` o relato de contatos não é calculado e o campo `contatos` de cada painel sai `null`; o resto do painel sai
+ * idêntico. Serve às ferramentas que só usam a receita e o neutro, porque o relato é a parte mais cara da montagem.
+ */
+export function montarOpcoes(esboco, { nome = 'esboco', perto = PERTO_MM, relato = true } = {}) {
   const lido = lerEsboco(esboco);
   if (lido.recusas.length) return { vista: lido.vista, paineis: [], recusas: lido.recusas, formato: lido.formato };
   const paineis = []; const recusas = [];
   lido.opcoes.forEach((o, i) => {
     try {
       const r = receitaDaOpcao(o, { nome: `${nome}-${i + 1}` });
-      const contatos = relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto });
+      const contatos = relato === false ? null : relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto, contatos: r.contatos });
       paineis.push({ titulo: o.titulo ?? `opção ${i + 1}`, nota: o.nota ?? '', receita: r.receita, neutro: r.neutro, partes: r.partes, facesSemParte: r.facesSemParte, formas: r.formas, contatos });
     } catch (e) {
       if (!(e instanceof RecusaDoEsboco)) throw e;

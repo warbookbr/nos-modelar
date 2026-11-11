@@ -4,12 +4,15 @@
    peças de teste do plano, com as medidas contra o ombro feito à mão, estão em `tools/fixtures/solido-por-lacos/`. A ficha é a do
    comando `capacidade`, recortada do cabeçalho e conferida aqui pelo mesmo `lerFicha`. Os campos `encolhe` (trecho que vai a um ponto
    numa faixa de laços) e `esvai` (nitidez do vinco que cai a zero numa faixa) têm a seção própria no fim, com a prova de que sem eles a
-   gaiola das peças de teste é a de antes. */
+   gaiola das peças de teste é a de antes, e o aviso `compensacaoPassa` (a compensação que leva a superfície além do pedido entre os pontos
+   de um laço) tem a dele, com o corpo de planta em polígono que avisa e os arcos da casa que não avisam. */
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
-import { DISTANCIA_MINIMA_ENTRE_PLANOS_MM, RAZAO_MAXIMA_DE_AMOSTRAGEM, gaiolaPorLacos } from './gaiola-por-lacos.js';
+import { DISTANCIA_MINIMA_ENTRE_PLANOS_MM, RAZAO_MAXIMA_DE_AMOSTRAGEM, TOLERANCIA_DA_COMPENSACAO_MM, gaiolaPorLacos } from './gaiola-por-lacos.js';
+// @ts-expect-error — núcleo em JavaScript.
+import { lacosPelasVistas } from './lacos-pelas-vistas.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { nucleo } from './entrada.js';
 // @ts-expect-error — ferramenta em JavaScript.
@@ -19,7 +22,7 @@ import { derivar as derivarL } from '../../tools/fixtures/solido-por-lacos/forma
 // @ts-expect-error — peça de teste em JavaScript.
 import { derivar as derivarColuna } from '../../tools/fixtures/solido-por-lacos/coluna-forma.js';
 // @ts-expect-error — peça de teste em JavaScript.
-import { derivar as derivarDobra } from '../../tools/fixtures/solido-por-lacos/dobra-em-u.js';
+import { TABELA as TABELA_DA_DOBRA, derivar as derivarDobra } from '../../tools/fixtures/solido-por-lacos/dobra-em-u.js';
 
 type Uv = [number, number];
 const trechosDaBarra = [{ nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: 3 }, { nome: 'cima', pontos: 2 }, { nome: 'tras', pontos: 3 }];
@@ -618,5 +621,63 @@ describe('gaiolaPorLacos: a costura de pontos que coincidem sem serem vizinhos (
     expect(grito(() => ampulheta({ une: [['baixo', 'baixo']] }))).toMatch(/une\[0\] precisa ser um par de dois trechos diferentes/);
     expect(grito(() => ampulheta({ une: [] }))).toMatch(/une precisa ser lista não vazia de pares/);
     expect(grito(() => ampulheta({ une: [['frente', 'tras']] }))).toMatch(/une\[0\] une os trechos 'frente' e 'tras', mas nenhum ponto de um coincide com um do outro/);
+  });
+});
+
+describe('gaiolaPorLacos: o aviso de quando a compensação leva a superfície além do pedido (compensacaoPassa)', () => {
+  /* um corpo de laços horizontais tirado das vistas, sem domínio: a planta arredonda o fim com quinas de polígono, a largura (480 mm) é
+     constante e a silhueta de lado tem um degrau de 50 mm entre 200 e 220 de altura; um laço a cada 30 mm */
+  const LADO = [[0, 0], [600, 0], [600, 200], [550, 220], [550, 500], [0, 500]];
+  const PLANTA = [[-500, 0], [500, 0], [500, 440], [300, 600], [0, 640], [-300, 600], [-500, 440]];
+  const { meiaPlanta: _m, avisos: _a, ...doCorpo } = lacosPelasVistas({ lado: LADO, perfil: [[0, 480], [500, 480]], planta: PLANTA, estacoes: [...Array.from({ length: 17 }, (_, k) => k * 30), 500] });
+  const corpo = (compensar: unknown) => gaiolaPorLacos({ nome: 'capo', eixo: 'y', ...doCorpo, compensar });
+  const doAviso = (g: any) => g.avisos.filter((a: any) => a.ref === 'compensacaoPassa');
+  /* a gaiola sem os avisos novos, tirada com o arquivo de antes do aviso: a conta não muda pontos, alvos, passo nem compensação */
+  const assinatura = (g: any) => createHash('sha256').update(JSON.stringify({ passo: g.passo, pontos: g.pontos, pontosMm: g.pontosMm, alvosMm: g.alvosMm, lacos: g.lacos, compensacao: g.compensacao ?? null, avisos: g.avisos.filter((a: any) => a.ref !== 'compensacaoPassa') })).digest('hex').slice(0, 16);
+
+  it('com compensar, o corpo de planta em polígono avisa em cada trecho, com o laço e o desvio medido entre os pontos', () => {
+    const g = corpo(true);
+    const avisos = doAviso(g);
+    expect(avisos.map((a: any) => a.trecho)).toEqual(['inicio', 'direita', 'fim', 'esquerda']);
+    const lado = avisos.find((a: any) => a.trecho === 'direita');
+    /* a lateral reta sai 11,5 mm (a malha de nível 3 mostra 13,9), junto da quina da largura, que andou 59 mm para fora */
+    expect(lado.desvioMm).toBeCloseTo(11.53, 1);
+    expect(lado.semCompensarMm).toBe(0);
+    expect(lado.laco).toBe('e2');
+    expect(lado.lacos).toBe(16);
+    expect(g.compensacao.maiorDeslocamentoMm).toBeGreaterThan(50);
+    expect(lado.texto).toMatch(/passa 11,5 mm do pedido entre os pontos do trecho 'direita' no laço 'e2' \(y = 60 mm\)/);
+    expect(lado.texto).toMatch(/marque o canto em cantos/);
+    for (const a of avisos) expect(a.desvioMm - a.semCompensarMm).toBeGreaterThan(TOLERANCIA_DA_COMPENSACAO_MM);
+    /* com as quinas em cantos, a lateral deixa de avisar; fica o fim, cuja planta tem quinas entre os pontos */
+    const comCantos = gaiolaPorLacos({ nome: 'capo', eixo: 'y', ...doCorpo, compensar: true, cantos: [['inicio', 'direita'], ['direita', 'fim'], ['fim', 'esquerda'], ['esquerda', 'inicio']].map((entre) => ({ entre })) });
+    expect(doAviso(comCantos).map((a: any) => a.trecho)).toEqual(['fim']);
+  });
+
+  it('sem compensar, o mesmo corpo não avisa', () => {
+    expect(doAviso(corpo(false))).toEqual([]);
+    expect(doAviso(corpo(undefined))).toEqual([]);
+  });
+
+  it('o arco de cota com compensar não avisa: o cilindro, a dobra em U e a coluna sobre o disco', () => {
+    const quarto = (k: number) => Array.from({ length: 33 }, (_, j) => { const t = (Math.PI / 2) * (k + j / 32); return [30 * Math.cos(t), 30 * Math.sin(t)] as Uv; });
+    for (const pontos of [2, 3, 9]) {
+      const g = gaiolaPorLacos({
+        nome: 'c', eixo: 'x', tampa: { de: 'q0', ate: 'q2' }, compensar: true, trechos: [0, 1, 2, 3].map((k) => ({ nome: `q${k}`, pontos })),
+        lacos: [0, 20, 40, 60, 80].map((em) => ({ em, trechos: Object.fromEntries([0, 1, 2, 3].map((k) => [`q${k}`, quarto(k)])) })),
+        vincos: [{ nome: 'a', laco: 'primeiro', nitidez: 'viva' }, { nome: 'b', laco: 'ultimo', nitidez: 'viva' }],
+      });
+      expect(doAviso(g)).toEqual([]);
+    }
+    expect(doAviso(derivarDobra({ ...TABELA_DA_DOBRA, compensarCurva: true }))).toEqual([]);
+    const coluna = derivarColuna();
+    expect(coluna.compensacao.pontos).toBeGreaterThan(1000);
+    expect(doAviso(coluna)).toEqual([]);
+  });
+
+  it('a conta não muda a gaiola: a saída com e sem compensar é a de antes do aviso, e a mesma a cada chamada', () => {
+    expect(assinatura(corpo(true))).toBe('9c3e63fcd194c00d');
+    expect(assinatura(corpo(false))).toBe('061e65c31a3c96d6');
+    expect(JSON.stringify(corpo(true).avisos)).toBe(JSON.stringify(corpo(true).avisos));
   });
 });

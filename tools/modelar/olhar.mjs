@@ -16,6 +16,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { lancarChromium } from './navegador.mjs';
 
 const [saida, ...entradas] = process.argv.slice(2);
 if (!saida || !entradas.length) {
@@ -44,7 +45,7 @@ const html = `<!doctype html><meta charset="utf-8">
 ${pecas.map((p) => `<div class="peca">${p.svg}<div class="rotulo">${p.nome}</div></div>`).join('\n')}
 </div>`;
 
-const navegador = await chromium.launch();
+const navegador = await lancarChromium(chromium);
 const pagina = await navegador.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 2 });
 await pagina.setContent(html, { waitUntil: 'load' });
 

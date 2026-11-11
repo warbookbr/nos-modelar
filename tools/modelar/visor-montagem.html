@@ -1,6 +1,9 @@
 <!doctype html>
 <!-- visor-montagem.html — superfície privada para evidência visual de montagem. -->
 <meta charset="utf-8">
+<!-- o ícone vazio evita o pedido de /favicon.ico: o navegador mais novo o faz, o servidor responde 404 e a captura lia o erro de
+     console desse pedido como falha do visor -->
+<link rel="icon" href="data:,">
 <!-- sem a margem de 8 px do corpo e com o canvas em bloco, a imagem sai deslocada e perde 8 px embaixo e à direita, e o quadro de uma peça
      enquadrada de perto perderia a borda dela -->
 <style>body { margin: 0; } canvas { display: block; }</style>

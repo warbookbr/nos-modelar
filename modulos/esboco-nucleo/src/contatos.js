@@ -8,7 +8,8 @@
  * sólido diz que as formas não se tocam. A tolerância padrão é de 0,001 mm, e a folga entra no relato até `perto` mm.
  *
  * O ESPERADO. Cada forma declara em `contato: { "<id>": "encosta" | "atravessa" | "folga" }` a relação que espera com outra, e o
- * `encosta: { id, lado }` declara a dele. Uma travessia que nenhuma das duas declarou é "não declarada", e uma relação declarada
+ * `encosta: { id, lado }` declara a dele; a opção declara em `contatos: [{ par, relacao, motivo }]` a de qualquer par de partes,
+ * inclusive as de passos crus, que não têm onde declarar, e o motivo sai no relato. Uma travessia que nenhuma das duas declarou é "não declarada", e uma relação declarada
  * que a malha não dá é "esperada e não dada": as duas listas são o que o modo estrito recusa. Núcleo puro. */
 import { descreverPeca } from '../../../src/autoria/descrever-partes.js';
 import { MM } from './milimetro.js';
@@ -22,19 +23,21 @@ const fmt = (x) => (Math.round(x * 1000) / 1000).toFixed(3).replace('.', ',');
  * O relato de contatos de uma opção montada.
  * @param {object} neutro   o neutro da opção (metro)
  * @param {Array<{id, contato}>} formas  as formas da opção, com o contato esperado
- * @param {{ perto?: number, tolerancia?: number }} [o]  `perto` em mm; `tolerancia` em metro
+ * @param {{ perto?: number, tolerancia?: number, contatos?: Array<{par, relacao, motivo}> }} [o]  `perto` em mm; `tolerancia` em
+ *   metro; `contatos`, os declarados na opção (o `contatos` que `receitaDaOpcao` devolve)
  * @returns {{ pares: Array, encostam: Array, atravessam: Array, folgas: Array, longe: number, naoDeclaradas: Array, faltam: Array }}
  */
-export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolerancia = TOLERANCIA_DO_RELATO_M } = {}) {
+export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolerancia = TOLERANCIA_DO_RELATO_M, contatos = [] } = {}) {
   const d = descreverPeca(neutro, { tolerancia });
   const esperado = new Map();
   const chave = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
-  for (const f of formas) for (const [outra, rel] of Object.entries(f.contato ?? {})) {
-    const k = chave(f.id, outra);
+  const declarar = (k, rel, por, motivo = null) => {
     const antes = esperado.get(k);
-    if (antes && antes.rel !== rel) esperado.set(k, { rel: 'conflito', de: [antes, { rel, por: f.id }] });
-    else esperado.set(k, { rel, por: f.id });
-  }
+    if (antes && antes.rel !== rel) esperado.set(k, { rel: 'conflito', de: [antes, { rel, por }], motivo: antes.motivo ?? motivo });
+    else esperado.set(k, { rel, por, motivo: antes?.motivo ?? motivo });
+  };
+  for (const f of formas) for (const [outra, rel] of Object.entries(f.contato ?? {})) declarar(chave(f.id, outra), rel, f.id);
+  for (const c of contatos) declarar(chave(c.par[0], c.par[1]), c.relacao, 'a opção', c.motivo);
   const pares = d.relacoes.map((r) => {
     const tipo = NOME_DA_RELACAO[r.tipo];
     const e = esperado.get(chave(r.a, r.b)) ?? null;
@@ -44,6 +47,7 @@ export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolera
       solido: r.solido ?? null,
       esperado: e?.rel ?? null,
       confere: e ? e.rel === tipo : null,
+      motivo: e?.motivo ?? null,
     };
   });
   const encostam = pares.filter((p) => p.tipo === 'encosta');
@@ -55,10 +59,12 @@ export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolera
   const faltam = [];
   for (const [k, e] of esperado) {
     const [a, b] = k.split('|');
-    if (!nomes.has(a) || !nomes.has(b)) { faltam.push({ a, b, esperado: e.rel, dado: 'a forma não está na opção' }); continue; }
+    /* o motivo só entra quando a opção o declarou, e o objeto do `contato` da forma fica como era */
+    const motivo = e.motivo ? { motivo: e.motivo } : {};
+    if (!nomes.has(a) || !nomes.has(b)) { faltam.push({ a, b, esperado: e.rel, dado: 'a forma não está na opção', ...motivo }); continue; }
     const p = pares.find((q) => chave(q.a, q.b) === k);
-    if (e.rel === 'conflito') faltam.push({ a, b, esperado: 'conflito', dado: `${e.de[0].por} declara ${e.de[0].rel} e ${e.de[1].por}, ${e.de[1].rel}` });
-    else if (p && p.tipo !== e.rel) faltam.push({ a, b, esperado: e.rel, dado: p.tipo });
+    if (e.rel === 'conflito') faltam.push({ a, b, esperado: 'conflito', dado: `${e.de[0].por} declara ${e.de[0].rel} e ${e.de[1].por}, ${e.de[1].rel}`, ...motivo });
+    else if (p && p.tipo !== e.rel) faltam.push({ a, b, esperado: e.rel, dado: p.tipo, ...motivo });
   }
   return { tolerancia, perto, pares, encostam, atravessam, folgas, longe, naoDeclaradas, faltam };
 }
@@ -66,16 +72,22 @@ export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolera
 /** O relato em linhas de texto, uma por relação que importa. */
 export function textoDoRelato(r, { recuo = '    ' } = {}) {
   const linhas = [];
-  const marca = (p) => (p.esperado === null ? '' : p.confere ? ` (esperado: ${p.esperado})` : ` (esperado: ${p.esperado}, NÃO CONFERE)`);
+  const porque = (p) => (p.motivo ? `: ${p.motivo}` : '');
+  const marca = (p) => (p.esperado === null ? '' : p.confere ? ` (esperado: ${p.esperado}${porque(p)})` : ` (esperado: ${p.esperado}, NÃO CONFERE)`);
   for (const p of r.encostam) linhas.push(`encosta    ${p.a} e ${p.b}${marca(p)}`);
   for (const p of r.atravessam) {
     const quanto = p.mm === null ? 'sem profundidade medida' : `${fmt(p.mm)} mm pelo eixo ${p.eixo}`;
     const solido = p.solido && p.solido !== 'interpenetram' ? `, sólido ${p.solido}` : '';
-    linhas.push(`atravessa  ${p.a} e ${p.b}: ${quanto}${solido}${p.esperado === 'atravessa' ? ' (declarada)' : ' (NÃO DECLARADA)'}`);
+    linhas.push(`atravessa  ${p.a} e ${p.b}: ${quanto}${solido}${p.esperado === 'atravessa' ? ` (declarada${porque(p)})` : ' (NÃO DECLARADA)'}`);
   }
   for (const p of r.folgas) linhas.push(`folga      ${p.a} e ${p.b}: ${p.mm === null ? 'as caixas se sobrepõem e os sólidos não se tocam' : `${fmt(p.mm)} mm pelo eixo ${p.eixo}`}${marca(p)}`);
   if (!r.atravessam.length) linhas.push('nenhuma travessia');
   if (r.longe) linhas.push(`${r.longe} par(es) a mais de ${r.perto} mm um do outro`);
-  for (const f of r.faltam) linhas.push(`ESPERADO E NÃO DADO: ${f.a} e ${f.b}, esperado ${f.esperado}, dado ${f.dado}`);
+  for (const f of r.faltam) {
+    /* a folga dada vem com a distância, que o par longe demais para a lista de folgas não mostra em outro lugar */
+    const p = r.pares.find((q) => (q.a === f.a && q.b === f.b) || (q.a === f.b && q.b === f.a));
+    const dado = f.dado === 'folga' && p?.mm !== null && p?.mm !== undefined ? `folga de ${fmt(p.mm)} mm pelo eixo ${p.eixo}` : f.dado;
+    linhas.push(`ESPERADO E NÃO DADO: ${f.a} e ${f.b}, esperado ${f.esperado}, dado ${dado}${f.motivo ? ` (declarado: ${f.motivo})` : ''}`);
+  }
   return linhas.map((l) => `${recuo}${l}`).join('\n');
 }

@@ -150,7 +150,8 @@ resposta com um bloco ```json com `partes`, `atrito` e `notaDePassagem`; o
 crítico fecha com o veredito em bloco ```json. Cada arquivo pode ser o texto
 colado ou a transcrição JSONL que o harness grava para o agente em segundo
 plano, e o comando reconhece o formato sozinho. Dele sai o último bloco ```json
-do último texto do assistente:
+do último texto do assistente; no relato de várias peças, o bloco precedido de
+uma linha só com o nome da peça que se registra:
 
 ```bash
 node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar \

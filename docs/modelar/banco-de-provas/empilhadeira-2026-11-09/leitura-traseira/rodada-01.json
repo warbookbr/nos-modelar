@@ -1,0 +1,123 @@
+{
+ "formato": "modelar.leitura-por-regioes.rodada@1",
+ "captura": "/tmp/claude-0/-home-user-nos-modelar/a45881b0-884a-5495-8d79-e44b78fae420/scratchpad/carc/t8.png",
+ "iguais": [],
+ "comDiferenca": [
+  "A1",
+  "A2",
+  "A3",
+  "A4",
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "C1",
+  "C2",
+  "C3",
+  "C4"
+ ],
+ "diferencas": 28,
+ "regioes": {
+  "A1": {
+   "diferencas": [
+    "em cima, à esquerda: o ombro da referência tem topo quase plano e inclinado, com quina; no rascunho é um arco redondo e largo",
+    "no centro: a tampa da referência tem borda chanfrada que desce até o vão; no rascunho o canto é muito redondo e a emenda com o laranja é reta",
+    "embaixo, à direita: o vão da referência é arredondado, com moldura fina que acompanha o laranja; no rascunho é anguloso, com moldura grossa e reta"
+   ]
+  },
+  "A2": {
+   "diferencas": [
+    "em cima: a tampa da referência tem friso e ondulação suave; no rascunho é lisa, com sombra reta na base",
+    "embaixo: as travessas da grade são delgadas na referência e grossas no rascunho"
+   ]
+  },
+  "A3": {
+   "diferencas": [
+    "em cima: a tampa da referência tem friso e leve elevação central; no rascunho é lisa",
+    "à direita: a diagonal da grade é curta e ligada à moldura na referência; no rascunho é uma barra longa e mais inclinada"
+   ]
+  },
+  "A4": {
+   "diferencas": [
+    "em cima, à direita: o ombro da referência tem topo chanfrado e quina; no rascunho é arredondado e mais alto, e a tampa termina em canto redondo em vez de quina com face lateral",
+    "à direita: o flanco da referência tem um degrau perto do meio e depois desce reto; no rascunho a curva é contínua",
+    "embaixo, à esquerda: a moldura do vão é fina e arredondada na referência, grossa e angulosa no rascunho"
+   ]
+  },
+  "B1": {
+   "diferencas": [
+    "em cima, à direita: o vão tem borda laranja arredondada na referência; no rascunho é um recorte anguloso com moldura cinza grossa",
+    "embaixo: a borda de baixo do laranja termina em canto vivo sobre a faixa cinza na referência; no rascunho o canto é bem redondo",
+    "embaixo: a faixa cinza da referência é reta, com friso duplo e um rebaixo retangular; no rascunho a ponta é redonda e desce em curva côncava, sem friso"
+   ]
+  },
+  "B2": {
+   "diferencas": [
+    "em cima: o laranja da referência tem um canal côncavo sob o vão; no rascunho é uma faixa lisa de topo reto",
+    "embaixo: o rasgo escuro da referência é arredondado, com saliências em degrau; no rascunho é um retângulo de cantos vivos, mais baixo"
+   ]
+  },
+  "B3": {
+   "diferencas": [
+    "embaixo: o rasgo da referência tem canto arredondado, degrau e moldura, e uma tampa pequena logo abaixo; no rascunho é um retângulo sem moldura e a peça de baixo é um bloco chapado"
+   ]
+  },
+  "B4": {
+   "diferencas": [
+    "em cima, à esquerda: o vão da referência é arredondado, com contorno laranja suave; no rascunho é anguloso",
+    "no centro: o flanco laranja da referência tem uma quina vertical perto da borda direita; no rascunho é liso",
+    "embaixo: a faixa cinza da referência é reta, com friso duplo; no rascunho a ponta é redonda e desce em curva côncava"
+   ]
+  },
+  "C1": {
+   "diferencas": [
+    "à esquerda: o arco da roda da referência tem borda mais vertical e recuada; no rascunho é uma curva côncava larga e contínua",
+    "embaixo: a base da referência é larga e de canto suave; no rascunho a perna é mais estreita"
+   ]
+  },
+  "C2": {
+   "diferencas": [
+    "no centro: o nicho da referência tem moldura em relevo, cantos arredondados e uma barra vertical; no rascunho são dois retângulos de cantos vivos, mais estreitos",
+    "embaixo: a referência tem um recorte em meia-lua na borda de baixo; no rascunho há um retângulo chapado",
+    "em cima: a referência tem um degrau com moldura; no rascunho há blocos retangulares chapados"
+   ]
+  },
+  "C3": {
+   "diferencas": [
+    "à esquerda: o nicho da referência tem moldura arredondada e barra central grossa; no rascunho a barra é fina e os cantos são vivos",
+    "em cima: o degrau da referência tem canto arredondado; no rascunho é um retângulo plano"
+   ]
+  },
+  "C4": {
+   "diferencas": [
+    "à esquerda: o arco da roda da referência é mais vertical e recuado; no rascunho é côncavo, largo e diagonal, e o cinza entra mais para dentro",
+    "embaixo: o canto da referência é largo e suave; no rascunho o pé é mais estreito"
+   ]
+  }
+ },
+ "graves": [
+  "os vãos e as molduras são angulosos e grossos no rascunho e arredondados e finos na referência, com o laranja contornando o vão",
+  "a faixa de cima do contrapeso é reta, com friso duplo, na referência, e de ponta redonda no rascunho; o canto de baixo do laranja é vivo na referência",
+  "os ombros do capô têm topo chanfrado, quina e degrau no flanco na referência, e arco liso no rascunho"
+ ],
+ "aceitas": {
+  "A2": [
+   "a grade fina e as peças dentro do vão ficam para a fatia de detalhe"
+  ],
+  "A3": [
+   "a grade fina e as peças dentro do vão ficam para a fatia de detalhe"
+  ],
+  "C1": [
+   "o laranja atrás do arco é a lateral da carcaça, que não entra neste rascunho da traseira; o eixo não é da carcaça"
+  ],
+  "C4": [
+   "o laranja atrás do arco é a lateral da carcaça, que não entra neste rascunho da traseira; o eixo não é da carcaça"
+  ],
+  "B1": [
+   "o laranja atrás da faixa cinza é a lateral da carcaça"
+  ],
+  "B4": [
+   "o laranja atrás da faixa cinza é a lateral da carcaça"
+  ]
+ }
+}

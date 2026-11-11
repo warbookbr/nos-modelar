@@ -1,0 +1,928 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/eixo-dianteiro",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/carcaca-frente.ia.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "eixoDianteiro",
+        "tipo": "comprimento",
+        "onde": "extremidade superior dos dois assentos, em cima do tubo, entre o bojo e o flange",
+        "sentido": "menor",
+        "evidencia": "Vista frontal e isométrica da parte: o assento é um bloco de uns 28 mm acima do tubo. Na frontal montada ele não toca chapa nem teto de entalhe. A altura prometida é até 0,5 mm do teto."
+      },
+      {
+        "parte": "eixoDianteiro",
+        "tipo": "posicao",
+        "onde": "assentos sobre o tubo, lado +z",
+        "sentido": "adiantada",
+        "evidencia": "Vista direita da parte: o bloco fica à esquerda do centro (+z), perto de 10 a 11 horas, e não sobre o tubo. Perfil com topo inclinado em vez de retângulo. Confiança média."
+      },
+      {
+        "parte": "eixoDianteiro",
+        "tipo": "superficie",
+        "onde": "silhueta circular do tubo, do bojo e dos flanges",
+        "sentido": "facetado",
+        "evidencia": "Vistas direita e de lado em luz rasante: o contorno circular lê como polígono de 48 lados, com cantos visíveis na borda. Detalhe de acabamento."
+      }
+    ],
+    "observacao": "Cores, bitola e posição do bojo entre as chapas conferem. O eixo contra os poços e a aba do paralama não aparece nas vistas, e o alvo só dá caráter, não medida."
+  },
+  "partes": [
+    {
+      "nome": "eixoDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cubosDianteiros",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "familia roda-pneu limita o ombro a 9 mm (CHANFRO_MAXIMO_DO_OMBRO_MM) e faz o flanco reto: o pneu industrial alto de 705 sai em bloco, contra o ombro de ~55 mm do rascunho aprovado",
+    "desvio da familia vai so ate -0,6: para o offset de 79 mm foi preciso um cubo de 30 mm; com cubo mais estreito ou aro de 234 o disco nao chegava ao flange",
+    "porta anel nao aceita referencia, e a porta eixo da familia nao a traz: a roda direita entra com giroDefinido false",
+    "montagem v5 nao tem articulacao entre instancias: a junta de rotacao da roda virou assentaAnular coaxial, sem curso conferido",
+    "carcaca nao publica o entalhe do chassi: os assentos do eixo importam larguras e altura da TABELA da carcaca, fora da montagem",
+    "a familia sai em metro e o esboco e em mm, sem passo de escala: a roda precisou de conversao propria para o rascunho",
+    "rodada 1, assento curto e deslocado: o perfil do assento segue o teto inclinado do entalhe do chassi (z 30 a 72, ate y 459,5) e a junta medida passa; atribuido a ferramenta, a vista montada nao mostra o entalhe",
+    "rodada 1, contorno em 48 lados: atribuido ao modelador, vai a rodada 2",
+    "o processo nao pegaria o assento sozinho: falta ao pacote a vista em corte no plano da chapa, onde o encaixe aparece"
+  ],
+  "notaDePassagem": "Porta da carcaca na parede do poco direito (tampa do corte, x -377), da parede a parede; o vinculo leva 754 ao eixo, que poe um anel colinear no tubo para a porta. Rodas pela porta eixo da familia no flange (463); o offset 79 sai de xDentro+banda/2 menos a face do flange, entao o pneu cai em 417..667. Furos de fixacao no circulo de 132 para nao ficarem sob o disco. A metade traseira do rascunho segue manual.",
+  "receita": {
+    "sha256": "sha256:6a3efa75980df1d730b8989ec68e211fdc203b8454937790c44c6c6c33d385c7",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 168,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * diferencial no meio e os dois assentos que sobem até o teto do entalhe das chapas do chassi, e os dois cubos (o flange de Ø 220,"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * onde a roda assenta, e a tampa de Ø 100, que passa pelo furo do disco da roda), numa peça rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Segunda etapa da montagem `../../montagem.json` (fatia 3 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 2 das"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * (`../../referencias/eixos-rodas.esboco.mjs`), levada para cá sem mudança de forma; o rascunho passou a chamar `montarEixoDianteiro`"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * daqui, de modo que a geometria tem uma fonte só."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho, que as tirou das vistas da carcaça isolada). A vista de frente da carcaça"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * (`carcaca-frente.ia.png`, 3,385 mm/px na largura e 4,296 na altura): a tampa cinza do cubo nas colunas 393 a 408 (516 a 463 mm),"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * Ø 90 nas linhas 442 a 462, levada a Ø 100; o flange escuro nas colunas 408 a 425 (463 a 404 mm), Ø 220 nas linhas 425 a 476; o tubo"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * de Ø 150 nas linhas 432 a 467. A lateral da carcaça (`carcaca-lado.ia.png`, 4,28 mm/px) confere o flange (223 mm) e a tampa (111)."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * O diferencial é o tambor escuro entre as chapas na vista de frente (colunas 510 a 580), atrás do pé da torre: um bojo de Ø 300 de"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * -120 a 120 mm, que é caráter e não medida. O assento de cada lado ocupa a espessura da chapa do chassi (de `larguras.chapas` da"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * carcaça, 4 mm para dentro de cada face) e sobe do tubo até 0,5 mm do teto do entalhe das chapas (o contorno lateral `chassi` da"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * carcaça: a parede da frente em z 98 a 100 e o teto pelos vértices (87,3, 437,6), (60,5, 429) e (27,3, 462,8), em mm do chão);"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * rente ao teto, a face inclinada coincidente saía como travessia no relato de contatos."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * O ENCAIXE. A origem é o centro do eixo, no meio da máquina; y para cima, +x à esquerda de quem dirige e a frente em +z. A montagem"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * põe o eixo na carcaça pela porta `passagemNoChassi` (o tubo na passagem entre as paredes dos dois poços dianteiros, que a carcaça"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * publica como `passagemDoEixoDianteiro`), e o vínculo `entreAsParedes` traz a distância entre as paredes, onde o tubo leva um anel"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * de vértices para a porta ter plano na malha. As rodas assentam nas portas `cuboEsquerdo` e `cuboDireito`, a face de fora do flange."
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * Os assentos dependem do entalhe das chapas, que a carcaça não publica como porta: a altura vem do chão em mm, como no rascunho, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * cai no referencial do eixo pela altura do cubo dianteiro de `rodas` da carcaça."
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e as portas em mm; `montarEixoDianteiro` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * { passos, topo, origem } (o mesmo que o rascunho da máquina usa, com `em` levando a origem ao lugar dela); `gerarPassos` converte"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* A distância entre as paredes de dentro dos dois poços dianteiros da carcaça (2 x 377). Vem da porta `passagemDoEixoDianteiro`"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     pelo vínculo da montagem; este valor só vale para ver a peça sozinha. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  entreAsParedes: 754,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  /* As cores do rascunho: o escuro do eixo e o cinza do cubo (as da carcaça). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  cores: { eixo: CARCACA.cores.escuro, cubo: CARCACA.cores.cinza },"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  /* Lados das revoluções, os do rascunho aprovado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  lados: 48,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* O sombreamento suave, com a quina acima deste ângulo nítida (o da carcaça). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  anguloDoLiso: 35,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* O tubo do eixo, de Ø 150, de um flange ao outro (o flange começa a 404 mm do centro). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  tubo: { raio: 75, ate: 404 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  /* O bojo do diferencial: Ø 300 de -120 a 120 mm, afinando em cone até o tubo a 190. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  diferencial: { raio: 150, meio: 120, ateOTubo: 190 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* O cubo de cada lado: o flange de Ø 220 de 404 a 463 mm (a face de fora recebe a roda) e a tampa de Ø 100 até 516. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  cubo: { raioDoFlange: 110, face: 463, raioDaTampa: 50, ateATampa: 516 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* O assento de cada lado, em [z, y] com y do chão (mm), na espessura da chapa recuada 4 mm de cada face. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  assento: { perfil: [[30, 380], [72, 380], [72, 432.2], [60.5, 428.5], [30, 459.5]], recuoDaChapa: 4 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "const r1 = (v) => Math.round(v * 10) / 10;"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "/** Os perfis e as portas, em mm, no referencial do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  const { tubo: TU, diferencial: DI, cubo: CU } = T;"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  const parede = T.entreAsParedes / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  /* o tubo com o bojo; o anel em ± parede é colinear com o tubo e não muda a forma: é o plano da porta da passagem */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  const perfilDoEixo = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    [0, -TU.ate], [TU.raio, -TU.ate], [TU.raio, -parede], [TU.raio, -DI.ateOTubo], [DI.raio, -DI.meio],"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    [DI.raio, DI.meio], [TU.raio, DI.ateOTubo], [TU.raio, parede], [TU.raio, TU.ate], [0, TU.ate],"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  /* o do lado direito é o espelho em x, com a ordem invertida para a revolução manter a face de fora para fora */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const perfilDoCubo = (s) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    const p = [[0, TU.ate], [CU.raioDoFlange, TU.ate], [CU.raioDoFlange, CU.face], [CU.raioDaTampa, CU.face],"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "      [CU.raioDaTampa, CU.ateATampa], [0, CU.ateATampa]].map(([r, x]) => [r, s * x]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    return s > 0 ? p : p.reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const yDoCubo = CARCACA.rodas.dianteira.y;"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const [c0, c1] = CARCACA.larguras.chapas;"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const assento = T.assento.perfil.map(([z, y]) => [z, y - yDoCubo]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const xDoAssento = [c0 + T.assento.recuoDaChapa, c1 - T.assento.recuoDaChapa];"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    passagemNoChassi: { forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], centro: [-parede, 0, 0], raio: TU.raio, inicio: 0, fim: T.entreAsParedes, referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    cuboEsquerdo: { forma: 'anel', papel: 'ocupa', eixo: [-1, 0, 0], centro: [CU.face, 0, 0], raioInterno: CU.raioDaTampa, raioExterno: CU.raioDoFlange, inicio: 0, fim: CU.face - TU.ate },"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    cuboDireito: { forma: 'anel', papel: 'ocupa', eixo: [1, 0, 0], centro: [-CU.face, 0, 0], raioInterno: CU.raioDaTampa, raioExterno: CU.raioDoFlange, inicio: 0, fim: CU.face - TU.ate },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  return { perfilDoEixo, perfilDoCubo, assento, xDoAssento, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "/** Monta o eixo dianteiro no estado { passos, topo, origem }, em mm, com a origem do eixo levada a `em`, e devolve as origens das"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": " *  partes e das portas. O rascunho da máquina inteira chama esta função com o centro do cubo dianteiro da carcaça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "export function montarEixoDianteiro(estado, T = TABELA, em = [0, 0, 0]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const novo = () => { estado.origem += 1; return estado.origem; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const torno = (perfil) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    estado.passos.push(['lathe', { origemId: id, perfil: perfil.map(([r, x]) => [r1(r), r1(x)]), eixo: 'x', lados: T.lados, em: em.map(r1) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    return { origem: { op: 'lathe', id } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  /* o assento [z, y] extrudado em x de x0 a x1: o perfil da `extrusao` em x é [-y, z] e a altura corre em +x */"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const assento = (x0, x1) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    let perfil = D.assento.map(([z, y]) => [r1(-(y + em[1])), r1(z + em[2])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    const area = perfil.reduce((s, q, i) => s + q[0] * perfil[(i + 1) % perfil.length][1] - perfil[(i + 1) % perfil.length][0] * q[1], 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    if (area < 0) perfil = perfil.reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    estado.passos.push(['extrusao', { origemId: id, eixo: 'x', altura: r1(x1 - x0), perfil, em: [r1(x0 + em[0]), 0, 0] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    return { origem: { op: 'extrusao', id } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const unir = (...solidos) => { const id = novo(); estado.passos.push(['unir', { origemId: id, solidos }]); return { origem: { op: 'unir', id } }; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  const parte = (nome, sel, cor) => estado.passos.push(['parte', { nome, sel }], ['pincel', { modo: 'face', sel, cor }], ['liso', { sel, angulo: T.anguloDoLiso }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const [a0, a1] = D.xDoAssento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const tubo = torno(D.perfilDoEixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const eixo = unir(tubo, assento(a0, a1), assento(-a1, -a0));"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  parte('eixoDianteiro', eixo, T.cores.eixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  const cuboE = torno(D.perfilDoCubo(1));"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  const cuboD = torno(D.perfilDoCubo(-1));"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  const cubos = unir(cuboE, cuboD);"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  parte('cubosDianteiros', cubos, T.cores.cubo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  return { tubo, eixo, cuboE, cuboD, cubos };"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "/* Os campos de medida de cada operação deste eixo e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "const MEDIDAS = { lathe: ['perfil', 'em'], extrusao: ['perfil', 'em', 'altura'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, as três portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const { tubo, cuboE, cuboD } = montarEixoDianteiro(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  return [...forma, porta('passagemNoChassi', tubo), porta('cuboEsquerdo', cuboE), porta('cuboDireito', cuboD)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  { par: ['cubosDianteiros', 'eixoDianteiro'], motivo: 'a face de dentro de cada flange encosta na ponta do tubo, a 404 mm do centro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  meta: { nome: 'empilhadeira/eixo-dianteiro', desc: 'eixo dianteiro motriz da empilhadeira: tubo de Ø 150 com o bojo do diferencial e os assentos no chassi, e os dois cubos com flange e tampa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  TOPO: { origem: 'centro do eixo, no meio da máquina, sobre o eixo dos cubos; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    objeto: 'eixo dianteiro motriz de empilhadeira de contrapeso de 2,5 t: o tubo com o diferencial, preso sob as chapas do chassi, e os dois cubos onde as rodas dianteiras giram',"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    referencias: ['../../referencias/carcaca-frente.ia.png', '../../referencias/carcaca-lado.ia.png', '../../referencias/frente.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    escala: { medida: 'distância entre as faces de fora dos dois flanges dos cubos (bitola do assento das rodas)', milimetros: 926 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "      { nome: 'eixoDianteiro', forma: 'tubo escuro de Ø 150 de -404 a 404 mm com o bojo do diferencial de Ø 300 (de -120 a 120, em cone até 190) e, de cada lado, o assento de 270 a 323 mm que sobe do tubo até 0,5 mm do teto do entalhe do chassi', tecnica: 'revolução em torno de x (48 lados) unida aos dois assentos extrudados em x' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "      { nome: 'cubosDianteiros', forma: 'de cada lado, o flange cinza de Ø 220 de 404 a 463 mm do centro e a tampa de Ø 100 de 463 a 516', tecnica: 'revolução em torno de x (48 lados), uma por lado, unidas' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "      'o eixo fora do eixo dos poços dianteiros da carcaça, ou as rodas que ele leva cruzando o poço ou a aba do paralama',"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "      'o assento atravessando o teto do entalhe das chapas do chassi, ou o tubo cruzando as chapas',"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "      'cubo sem o flange largo onde a roda assenta, ou sem a tampa saindo pelo furo do disco da roda',"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "      'o bojo do diferencial fora do meio, entre as chapas do chassi',"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "      'cor trocada: o tubo cinza ou o cubo escuro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm: a ponta da tampa de cada lado e o fundo do bojo do diferencial. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "    const T = this.PARAMS; const CU = T.cubo; const DI = T.diferencial;"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "      { nome: 'ponta da tampa do cubo esquerdo', parte: 'cubosDianteiros', medida: 'maximo', em: [CU.ateATampa, CU.raioDoFlange, CU.raioDoFlange], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "      { nome: 'ponta da tampa do cubo direito', parte: 'cubosDianteiros', medida: 'minimo', em: [-CU.ateATampa, -CU.raioDoFlange, -CU.raioDoFlange], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "      { nome: 'fundo do bojo do diferencial', parte: 'eixoDianteiro', medida: 'minimo', em: [-T.tubo.ate, -DI.raio, -DI.raio], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[6], PASSOS[12]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az110.png"
+    ]
+  }
+}

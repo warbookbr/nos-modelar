@@ -1,0 +1,1199 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/carcaca",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/carcaca-lado.ia.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "capo",
+        "tipo": "superficie",
+        "onde": "canto traseiro inferior, lado direito",
+        "sentido": "segmentado",
+        "evidencia": "Direita e montado direita: perto de x 1050-1090, y 400-520 a borda sai em degraus. O alvo tem canto liso e contínuo."
+      },
+      {
+        "parte": "chassi",
+        "tipo": "superficie",
+        "onde": "contorno das duas chapas e emenda no meio",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica do chassi e montado: contorno poligonal serrilhado e linha de emenda no meio de cada chapa."
+      },
+      {
+        "parte": "laterais",
+        "tipo": "superficie",
+        "onde": "borda diagonal entre o arco dianteiro e a coluna",
+        "sentido": "anguloso",
+        "evidencia": "Montado direita: a diagonal sobe em reta e plana. No alvo de lado o painel laranja é cheio e convexo."
+      },
+      {
+        "parte": "laterais",
+        "tipo": "superficie",
+        "onde": "corte atrás do arco traseiro, perto de x 760-870, y 520-600",
+        "sentido": "anguloso",
+        "evidencia": "Montado direita: caixa preta de bordas retas fora do arco. O alvo mostra eixo e roda naquele lugar."
+      },
+      {
+        "parte": "laterais",
+        "tipo": "uniao",
+        "onde": "faixa escura inferior sob o corpo laranja",
+        "sentido": "afastado",
+        "evidencia": "Montado direita e rasante az20: a tira escura de baixo lê como peça separada, sem a borda arredondada contínua do alvo."
+      }
+    ],
+    "observacao": "Conjunto lê como carcaça de empilhadeira 2,5 t e as vinte partes estão todas presentes. Faltam suavidade e abaulamento da lataria lateral e dos cantos. Não conferi o lado esquerdo do furo, o arame nem as rasantes que não abri."
+  },
+  "partes": [
+    {
+      "nome": "chassi",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laterais",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "furo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tunel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paralamas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "piso",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tapete",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "degraus",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaMotor",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "colunas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pocoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "grade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoGrade",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "contrapeso",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoRasgo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundoNicho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pino",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "trinco",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "npm run etapas quebra em assinaturaDaForma: o subtrair sobre a gaiola subdividida deixa face.quebras com vertices que nao existem (painel 8, grade 4, contrapeso 38)",
+    "o formato v5 recusa instancia sem receita, e a montagem nao pode nomear as etapas seguintes antes de elas terem receita",
+    "npm run parametros nao terminou em 300 s com a TABELA em listas de contornos",
+    "o esboco 2.0 e em mm e a receita em metro: os passos saem em mm e a receita converte perfil, em, altura e os pontos da gaiola",
+    "a booleana sobre o corpo subdividido deixava quebras de sombra com vertices apagados e o registro das etapas quebrava; corrigido no nucleo com teste",
+    "a captura da montagem falhava por um 404 do icone da pagina e a mensagem nao dizia a causa; corrigidos o visor e a mensagem",
+    "o registro nao lia o relato entregue pela ferramenta de devolucao do agente; corrigido no leitor da transcricao"
+  ],
+  "notaDePassagem": "A forma ficou igual a do rascunho aprovado, sem redesenho; cada medida esta na TABELA com a fonte, e os rascunhos chamam montarCarcacaEmMm. A carcaca nao publica porta: a etapa de eixos e rodas precisa que eu publique antes o furo dos cubos e a travessa dos pinos. As medidas das rodas e dos pocos estao em TABELA.rodas e folgaDoPoco.",
+  "receita": {
+    "sha256": "sha256:f58a78c16c308aebf6a5803fdfd3aa8b3fd1fa835ef4ffdc3099847617981cb8",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 387,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * degraus, painel, tampa do motor, colunas, poço traseiro e a traseira (capô, grade, tampa e contrapeso), numa peça rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Primeira etapa da montagem `../../montagem.json` (fatias 1 e 2 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`). O"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * combinado está em `../../ALINHAMENTO.md` (\"Carcaça\" e \"Divergências entre as fontes\"); a forma é a do rascunho que a pessoa aprovou"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * por imagem em 2026-11-10, e esta receita é a dona dela: os rascunhos `../../referencias/carcaca.esboco.mjs`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * `carcaca-traseira.esboco.mjs` e `empilhadeira.esboco.mjs` montam a carcaça chamando `montarCarcacaEmMm` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * DE ONDE VEM CADA MEDIDA. Comprimento e altura: o contorno de cada parte na lateral de caráter (`receita/contornos-da-lateral.js`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * 4,282 mm/px pelos cubos), com z da lateral para trás; o modelo tem a frente em +z, e todo ponto [z, y] da lateral entra como"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * [-z, y]. Largura: a vista de cima (`carcaca-cima.ia.png`), medida por cor coluna a coluna, na escala do capô da vista de trás (313"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * px para 1.193 mm, 3,80 mm/px); o comprimento da vista de cima foi levado à lateral por z = -188 + (coluna - 360) x 4,058. Perfil de"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * frente: a vista de frente (`carcaca-frente.ia.png`), com a altura pela lateral e a largura pela de cima (3,385 mm/px). A traseira:"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * a vista de trás (`carcaca-tras.ia.png`, 4,03 mm/px pelo topo da tampa a 1.152 mm na linha 272). As vistas de IA valem como"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * caráter da forma; a medida está nesta TABELA."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * Eixos: x lateral (+x é a esquerda de quem dirige, o lado do furo da tampa de combustível), y para cima com o chão em y 0, z"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * comprimento com a frente em +z: o eixo dianteiro em z 0 e a traseira em z -2.186."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` monta os passos em mm (os módulos de `receita/`, que o rascunho da máquina inteira também usa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. A forma não publica porta: as etapas"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * seguintes (eixos e rodas, torre, protetor, posto) ainda não têm receita. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "import { montarCarcaca } from '.././receita/frente.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "import { CONTORNOS_DA_LATERAL } from '.././receita/contornos-da-lateral.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  /* As cores, por parte, do rascunho aprovado: laranja da lataria, dois cinzas, o escuro dos fundos e o cinza escuro do tapete. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  cores: { laranja: '#e2641e', cinzaClaro: '#73797d', cinza: '#565b60', escuro: '#1c1e20', escuroPiso: '#34383c' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* Círculo de 96 lados: arco de roda e arco do contorno lateral saem com pelo menos 64 lados por volta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  ladosDoCirculo: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  /* Até onde, em x, vão os cortes que atravessam a carcaça para fora, e em z os que saem por trás. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  alemDoLado: 720,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  /* AS RODAS, uma medida por roda (ALINHAMENTO.md, \"Divergências entre as fontes\"); x é a distância ao centro da máquina. A dianteira"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     com Ø 705 (ficha, 7.00-12; o cubo da carcaça a 352,5), de 417 a 667 mm (borda de fora pela vista de cima da máquina, banda de 250"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "     pela vista de frente e de trás). A traseira com Ø 568, o dobro da altura do cubo traseiro da carcaça (284), de 445 a 653 mm, com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "     banda da dianteira na razão da ficha, 250 x 150/180 = 208. As rodas são da etapa seguinte; aqui elas dão os poços. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  rodas: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "    dianteira: { y: 352.5, z: 0, raio: 352.5, xDentro: 417, banda: 250 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "    traseira: { y: 284, z: -1700, raio: 284, xDentro: 445, banda: 208 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* Os poços cortam a 40 mm de folga do pneu, pelo lado de dentro e em volta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  folgaDoPoco: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  /* As meias larguras da vista de cima (entre parênteses, as linhas e colunas dela, em px). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  larguras: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "    chapas: [266, 327],        // chapas do chassi: cinza nas linhas 211-230 e 367-381, colunas 380-404"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    aba: [327, 606],           // aba do paralama: laranja 135-210 e 382-454, colunas 366-400"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "    lateralFrente: 583,        // o corpo laranja: linhas 147 e 454 nas colunas 504-560 (z 400-660)"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "    lateralTras: 595,          // linhas 141 e 454 nas colunas 700-770 (z 1190-1500)"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "    tapete: 400,               // o escuro do piso: linhas 199-200 a 410-412, colunas 504-560"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    degrau: 568,               // o cinza dos degraus: linhas 151 e 450, colunas 504-560"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    colunas: 516,              // pela vista de trás (cinza das colunas 408 a 664, 4,03 mm/px); a de cima dava 545"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  /* CHASSI. As chapas acabam a 100 mm à frente do eixo: na vista de cima não há cinza entre os paralamas dali em diante, e a silhueta"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "     lateral das chapas à frente disso está dentro do pé da torre, que é de outra etapa. A travessa da frente, vista de cima entre as"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "     chapas nas colunas 398-404, vai de 9 a 34 mm à frente do eixo, 5 mm além das chapas de cada lado; com 98 mm de comprimento ela"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "     aparecia de cima como uma barra grossa onde a referência tem uma linha fina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  chassi: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    ateAFrente: { secao: [[-400, 0], [400, 0], [400, 1300], [-400, 1300]], z: [-2000, 100] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    travessa: [[9, 600], [34, 600], [34, 690], [9, 690]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    travessaAlemDasChapas: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  /* PARALAMAS. A aba é chapa de 37 mm (a lateral dá y 755 a 792), da silhueta lateral cruzada com a planta: o canto da frente de fora,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "     redondo na vista de cima (colunas 354 a 366 até a linha 135), tem raio 40 mm, e o de dentro 15; a planta vai de z -140 a 188. De"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "     frente a ponta de fora é redonda (179 px de meia largura só na linha 356 da vista de frente): a seção leva a ponta em meio círculo"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "     da espessura dela, de x 300 para fora, de y 700 a 850 e de z -460 a 300. A faixa da frente desce de 776 a 657 mm (linhas 360-384 da"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "     vista de frente), até 330 mm para encostar nas abas, 13 a 45 mm atrás do eixo, pela lateral. A beira é uma tira de 37 mm ao longo"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "     do arco de fora da frente das laterais, de z 140 a 345 e de 579 a 598 mm: na vista de cima o laranja vai à meia largura de 598 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "     até a coluna 489, z 335. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  paralamas: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    frenteDaAba: 188, trasDaAba: -140, cantoDeFora: 40, cantoDeDentro: 15,"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    chapa: [755, 792],"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    secao: [300, 700, 850],"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    alturaDaPlanta: [700, 840],"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    comprimentoDaSecao: [-460, 300],"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    faixa: [[13, 657], [45, 657], [45, 776], [13, 776]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    meiaFaixa: 330,"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    beira: { de: [140, 776], ate: [345, 600], meio: [250, 740], x: [579, 598] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  /* LATERAIS. A frente (`frenteLateral` da lateral) com os dois arcos trocados pelo círculo ajustado ao contorno: o de fora, de cima"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "     para trás (centro (62, 397), raio 386, desvio de 1,6 mm), e o da roda até a altura do cubo (centro (33, 352), raio 191, desvio de"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "     8 mm). De frente a borda de fora é quase vertical (579 a 569 mm) e o canto de baixo é redondo (166 a 159 px nas linhas 468 a 484):"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "     `perfilDaFrente`, de x 538 para fora, de z -460 a 60. O corpo do meio vai a z -1540, 36 mm dentro do capô (rente a ele a subdivisão"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "     do capô abria fresta), com a planta de 583 mm em z -400 a 595 em z -1540, de y 150 a 1000 e de z -1550 a -390. O pé do corpo, de"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "     frente e de trás, é `pe`: em cima a borda recolhe com o capô (588 mm a 902 de altura, 572 a 934 na vista de trás). O arco da roda"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "     traseira é um círculo (centro (1766, 296), raio 425, desvio de 2 a 4 mm); o pé do arco segue reto para trás a 629 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  laterais: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    arcosDaFrente: [{ de: [150, 775], ate: [418, 545] }, { de: [90, 532], ate: [231, 354] }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "    arcosDoCorpo: [{ de: [1338, 277], ate: [1492, 620] }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    perfilDaFrente: [[538, 150], [538, 226], [548, 260], [555, 277], [562, 295], [569, 312], [579, 741], [579, 800]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    comprimentoDaFrente: [-460, 60],"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    meiaLarguraBruta: 620,"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    planta: [400, 1540],"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    alturaDaPlanta: [150, 1000],"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    comprimentoDoMeio: [-1550, -390],"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    pe: [[560, 1000], [572, 934], [588, 902], [600, 870], [600, 340], [579, 312], [569, 305], [562, 295], [555, 277],"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "      [548, 260], [538, 226], [518, 185]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    ajusteDoArco: { pe: { z: [1480, 1500], y: [605, 625], para: [1540, 629] }, traseira: { zDe: 1495, yAcima: 625 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    /* O poço da roda traseira é o círculo do arco, cortado de 360 mm para fora, por dentro do pé do contrapeso (92 px de meia largura na"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "       vista de trás, 371 mm): entre ele e o pneu a traseira do corpo aparecia de trás como tira laranja, onde a referência é escura. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    pocoTraseiroDe: 360,"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    /* O vão sob o piso entre as chapas: de frente a referência é escura das linhas 392 a 476 (621 a 260 mm); o vão vai de 195 a 472 mm,"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "       até z -1100, com o fundo escuro de 12 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    tunel: { meia: 262, y: [195, 472], z: [-1100, -300], fundoAte: -1088 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    /* O furo da tampa de combustível, só do lado +x: a elipse da lateral (z 1299-1450, y 704-882), 35 mm de fundo, com o fundo escuro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    furo: { centro: [1375, 793], semieixos: [75, 89], lados: 32, corte: [560, 720], fundo: [545, 561] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    /* De trás, entre os pneus traseiros, o pé das laterais aparecia como tira laranja sob o contrapeso; por dentro dos pneus o pé sobe a"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "       221 mm de z -1600 a -380, e por fora, que é o que a lateral vê, fica a 191. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    peSobOContrapeso: { y: [150, 221], z: [-1600, -380] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  /* PISO. O corpo cinza com a silhueta lateral do piso (765 mm), sem o ressalto a 793 mm sob a borda de trás do painel, que de cima"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "     aparecia como barra cinza onde a referência é escura: ele desce a 766 mm de z 330 a 460. O tapete escuro é uma chapa de 10 mm de z"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "     340 a 667, 5 mm por dentro do corpo. Os degraus: o piso do degrau a 490 mm de z 431 a 719, e daí uma rampa 12 mm acima da borda"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "     diagonal da lateral até z 1238, com a planta da vista de cima (528 mm de z -690 a -880, 492 de -905 a -1250). O rebaixo dos"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "     cilindros de inclinação da torre (Ø 90 em x 355, y 860, de z -150 a 15) sai do piso e do painel com 5 mm de folga em volta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  piso: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "    ressalto: { z: [330, 460], y: 766 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    tapete: [[340, 760], [667, 765], [667, 775], [340, 770]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    recuoDoTapete: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    degrau: [[431, 300], [431, 490], [719, 500], [719, 300]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    rampa: [[700, 300], [700, 500], [719, 500], [1238, 908], [1238, 300]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "    plantaDaRampa: [[528, -690], [528, -880], [492, -905], [492, -1250]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "    meiaDaRampaBruta: 530,"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "    alturaDaRampa: [280, 950],"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "    rebaixoDosCilindros: { x: [305, 405], y: [810, 910], z: [10, -160] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  /* PAINEL. O anteparo inclinado pela lateral sem a coluna de direção: a frente reta em z 0-36 de 760 a 915 mm, o topo sob a coluna e"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "     a descida até o piso em z 404. A planta recolhe para trás como o laranja da frente das laterais na vista de cima girada (496 mm na"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "     frente, 391 em z -311, 376 em z -404). Os cantos da frente recolhem a 415 mm de z 10 a -130: ali passam os pés da frente do"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "     protetor, de 455 a 512 mm (ALINHAMENTO.md, pés da frente do protetor). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  painel: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    lado: [[0, 760], [0, 915], [181, 915], [404, 763], [404, 760]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    perfil: [[760, 496], [900, 496], [915, 484]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    planta: [[496, 0], [496, -60], [488, -110], [482, -150], [467, -190], [440, -210], [407, -230], [395, -271], [391, -311],"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "      [386, -370], [376, -404]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    estacoes: [760, 764, 775, 800, 830, 860, 890, 905, 915],"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "    cantos: { x: [415, 560], z: [10, -130], y: [700, 1000] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  /* TAMPA DO MOTOR. A base do banco: a lateral `tampaMotor` sem o entalhe de trás, com o canto de cima da frente pelos pontos do contorno"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "     (714, 968) e (730, 988), o pé 20 mm dentro do piso e o encosto até z 1335, dentro das colunas. A planta: o nariz redondo da frente"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "     (colunas 562 a 590 da vista de cima, [recuo, meia largura]), 507 mm no fim dele e daí o recolhimento até 475 (linhas 165-428 na"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "     coluna 620 a 172-422 na 690). De frente o topo tem o ombro redondo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  tampaMotor: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "    frente: 667, tras: 1335,"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "    nariz: [[0, 200], [8, 258], [16, 323], [24, 369], [32, 391], [40, 401], [56, 424], [73, 439], [89, 456], [105, 469], [130, 495], [160, 507]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    recolhe: [[500, -867], [488, -908], [483, -1030], [475, -1151]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "    lado: [[667, 749], [732, 714], [1044, 715], [1238, 896], [1335, 915], [1335, 1060], [1272, 1072], [1230, 1052], [1172, 1026], [1111, 1009],"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "      [789, 1002], [745, 997], [730, 988], [714, 968], [672, 909]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "    perfil: [[714, 507], [960, 507], [1010, 495], [1050, 470], [1072, 440]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "    estacoes: [716, 730, 750, 780, 820, 860, 900, 930, 955, 975, 990, 1000, 1006, 1015, 1030, 1045, 1058, 1068],"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  /* COLUNAS. O bloco atrás da tampa do motor, com a silhueta lateral `coluna`; abaixo do topo do capô (1125 mm) a borda de trás vai a z"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "     1525, dentro dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  colunas: { trasDe: 1485, abaixoDe: 1125, tras: 1525 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  /* POÇO TRASEIRO. O fundo escuro entre as rodas de trás (lateral z 1342-1645, até o pé do arco, y 428 a 625, 420 mm de meia largura) e"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "     o forro: uma casca escura de 15 mm por dentro do arco das laterais, de 360 a 590 mm, entre z 1300 e 1545 e de 191 a 640 mm, com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "     seção do pé das laterais. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  pocoTraseiro: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "    fundo: [[1342, 428], [1342, 625], [1645, 625], [1645, 428]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "    meiaDoFundo: 420,"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "    forro: 15, forroAte: 590,"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "    caixa: { meia: 600, y: [191, 640], z: [-1545, -1300] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "    secaoDoForro: [-1550, -1290],"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  /* A TRASEIRA, pela vista de trás: (linha em px, meia largura em px) de baixo para cima, com o centro na coluna 536. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  traseira: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "    vista: { mmPorPx: 4.03, topo: 1152, linhaDoTopo: 272 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    fim: 2178,"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    alemDaTraseira: -2300,"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "    /* a curva da traseira na vista de cima: (recuo a partir da ponta, fração da meia largura) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "    arredondamento: [[233, 1], [221, 0.98], [205, 0.969], [189, 0.945], [173, 0.916], [157, 0.885], [141, 0.84], [125, 0.785], [109, 0.728],"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "      [93, 0.669], [77, 0.609], [61, 0.538], [45, 0.462], [29, 0.366], [13, 0.256], [0, 0.129]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "    /* O capô: o canto de baixo quase vivo, o degrau do flanco entre as linhas 330 e 326 e o ombro chanfrado, com o topo plano a 117 px."
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "       Os ombros a 1.112 mm (linha 282); o extremo de trás da silhueta, no bico, a z 2172. O degrau que a lateral mostra acima do bico é a"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "       soleira do vão da grade: a seção do meio (z além de 1970, y de 800 para cima) é a silhueta lateral mais o recuo da planta na"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "       largura do vão mais a borda (5 px), até 20 mm além do bico. A borda rebaixada em volta do vão tem 16 mm de fundo, do capô recuado"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "       atrás de z 1900; o vão vai até z 1760, e acima da linha 345 a borda sobe com ele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "    capo: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "      meiaPx: 148, frentePlanta: 1400, topo: 1112, pontaDoBico: 2172, ombroAcimaDe: 1100,"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "      perfil: [[401, 143], [398, 146], [394, 148], [370, 148], [350, 147], [334, 146], [330, 145], [326, 142], [322, 140], [314, 139],"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "        [306, 138], [298, 136], [290, 131], [286, 127], [283, 121], [281.9, 117]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "      estacoes: [632.5, 650, 666, 720, 790, 850, 905, 918, 934, 950, 1010, 1047, 1079, 1100, 1112],"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "      vaoAcimaDaGrade: [[281, 101.5], [268, 101.5]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "      secaoDoMeio: { zDe: 1970, yDe: 800, alemDoBico: 20 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "      bordaDoVaoPx: 5, fundoDaBorda: 16, recuoDaBordaAte: 1900, bordaDeBaixoAbaixoDe: 345, fundoDoVao: -1760,"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "      /* a borda de baixo com raio pequeno (viva demais com o vinco inteiro, redonda demais sem ele) e o ombro com quina */"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "      nitidezDaBase: 0.5, nitidezDoOmbro: 0.6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "    },"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "    /* A grade: a moldura cinza em U apoiada na rampa do vão (de z 2052 a y 990 até z 2094 a y 795, na lateral), com a espessura real, de"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "       70 mm à frente da rampa a 14 mm atrás dela, e o fundo escuro de 320 a 70 mm à frente; laços com menos de 60 mm de lado são curtos."
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes capo, contrapeso, painel, tampa, tampaMotor",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az20.png",
+      "peca-lado-rasante-az110.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+ "objeto": "a traseira de uma máquina",
+ "cores": { "laranja": "#e2641e", "cinza": "#6b7074", "escuro": "#1e2022" },
+ "partes": {
+  "capo": "laranja", "tampa": "cinza", "grade": "cinza", "fundoGrade": "escuro", "contrapeso": "cinza",
+  "fundoRasgo": "escuro", "fundoNicho": "escuro", "pino": "cinza", "trinco": "cinza"
+ },
+ "dentro": { "grade": "capo", "fundoGrade": "capo" },
+ "vistasDaSobra": ["superior", "direita"],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {
+  "traseira": {
+   "referencia": "carcaca-tras.ia.png",
+   "caixaRef": [388, 272, 685, 506],
+   "ignorar": [[388, 424, 432, 506], [644, 424, 685, 506]],
+   "fora": "o eixo e as rodas escuras embaixo, o laranja atrás do arco da roda e a peça escura atrás do topo",
+   "grade": [4, 3],
+   "visto": "de trás"
+  }
+ }
+}

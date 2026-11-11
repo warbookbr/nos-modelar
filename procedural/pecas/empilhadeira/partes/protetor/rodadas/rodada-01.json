@@ -1,0 +1,1111 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/protetor",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "quadro",
+        "tipo": "espessura",
+        "onde": "coluna de trás, de cima a baixo",
+        "sentido": "maior",
+        "evidencia": "Vistas lado e direita: a coluna de trás tem cerca de 230 mm de largura e lê como painel. Em tras.ia e frente.ia as colunas de trás são tubos esbeltos."
+      },
+      {
+        "parte": "quadro",
+        "tipo": "espessura",
+        "onde": "perfil lateral do teto, entre a dobra da frente e a coluna de trás",
+        "sentido": "maior",
+        "evidencia": "Vistas lado e direita: o perfil do teto tem cerca de 175 mm de altura, com recorte côncavo embaixo. Em cima.ia os trilhos laterais do teto são tubos finos."
+      },
+      {
+        "parte": "quadro",
+        "tipo": "superficie",
+        "onde": "contorno da coluna de trás, dobras a cerca de um terço e dois terços da altura",
+        "sentido": "segmentado",
+        "evidencia": "Vistas lado, direita e traseira em arame e luz rasante: o contorno da coluna é uma poligonal de três retas com dobras visíveis, e a referência mostra um tubo contínuo."
+      },
+      {
+        "parte": "quadro",
+        "tipo": "superficie",
+        "onde": "dobra da frente: degrau pequeno na cota do teto e toco com corte reto sob a dobra",
+        "sentido": "anguloso",
+        "evidencia": "Vista direita e montado direita: um degrau no topo junto à dobra e um toco de corte horizontal sob ela. A dobra da referência é contínua."
+      }
+    ],
+    "observacao": "Peça completa e no lugar nos seis critérios de reprovação; o desvio é de proporção, com painel largo onde o alvo tem tubo, e a chapa não tem amassado nem ondulação."
+  },
+  "partes": [
+    {
+      "nome": "quadro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "gradeTeto",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "luzesTrabalho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "espelho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternas",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "porta de plano num bloco de corte por extrusao: o lado que vira a face cortada tem indice instavel (0 num pe, 3 no outro); usei costura:true do subtrair",
+    "triangularSemDegenerado nao serve face convexa com vertices colineares nos quatro lados (corte de tubo subdividido) e o OBJ da luz rasante recusa; contornei com niveis 0",
+    "uniao de faces coplanares (tubo e perfil em x 425/480) deixou fila de vertices e triangulo sem area; o rascunho aprovado ja tinha, nada o acusava antes do vistas:superficie",
+    "a montagem v5 so aceita uma posicao por instancia; os outros tres pes nao sao medidos, so a auditoria de intersecoes os confere",
+    "rodada 1, coluna de tras e perfil do teto em chapa larga e contorno em tres retas: e a forma do rascunho que a pessoa aprovou por imagem; a referencia de IA mostra tubo mais fino; atribuido ao plano, fica para a pessoa decidir",
+    "rodada 1, degrau na cota do teto e toco de corte reto na dobra da frente: atribuido ao modelador, vai a rodada 2"
+  ],
+  "notaDePassagem": "Referencial da maquina, pose identidade: a porta do pe traseiro esquerdo usa o ponto e a normal do apoio da carcaca (apoiosDoProtetor), afastamento 0. Os planos de apoio vem da aresta de cima da silhueta da aba e das colunas, com os vertices como a extrusao os grava (r1), para o corte ficar coplanar com a carcaca. Cada pe nasce abaixo do apoio e e cortado. Tubo com niveis 0 e perfil 1 mm alem do tubo pela triangulacao. Alca fica no rascunho (fatia 7).",
+  "receita": {
+    "sha256": "sha256:be08315f37ae86420ce218c819d47577b70fe96747273899bcd30254ea32ae49",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 332,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto,"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * as luzes de trabalho, o espelho e as lanternas do alto, numa peça rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa da montagem `../../montagem.json` depois das peças da torre (fatia 5 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * item 5 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar `montarProtetor`"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * daqui, de modo que a geometria tem uma fonte só. A alça de acesso, presa atrás da coluna da frente, fica no rascunho: o plano a põe"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * na fatia 7, com os acessórios."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho, que as tirou das vistas; as contas de cada número estão no cabeçalho dele). A lateral de"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * `lateral.contornos.json` entra na escala da carcaça pela calibração `lateral` da TABELA, em px da imagem dela: z = -(px - 349,8) x"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * 4,2955 + 194,1 e y = (493,6 - py) x 4,2955 + 183,9. A coluna da frente sai da borda da frente dela na lateral, uma reta de 14,5 graus"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * para trás, com o eixo 36 mm atrás da borda; o topo do quadro a 2.135 (a ficha dá 2.150 de altura com as lanternas); o teto com 480"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * mm de meia largura por fora e 55 de perfil (a ficha dá 960 de largura); a coluna de trás, uma chapa larga de lado que se afina para"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * cima, pela lateral; as larguras pela vista de trás e pela de frente."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * O ENCAIXE. A origem é a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * dirige e a frente em +z. Os pés da frente assentam na face de cima da aba do paralama da carcaça, no recolhimento dos cantos do"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * painel, e os de trás na face de cima das colunas da carcaça. A montagem v5 não mede plano sobre plano: ela põe o protetor pela"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * porta `peTrasEsquerdo` na porta `apoioDoProtetorTrasEsquerdo` da carcaça, e os outros três pés vão pela mesma pose rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis, o trilho da coluna da frente e as portas em mm; `montarProtetor` escreve os"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * passos em mm num estado { passos, topo, origem } (o mesmo que o rascunho da máquina usa); `gerarPassos` converte para metro com"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * `m()`, campo de medida a campo de medida, num lugar só, e `gerarTopo` os pontos nomeados da gaiola da coluna da frente. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "import { TABELA as CARCACA, apoiosDoProtetor } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "import { gaiolaVarrida } from '../../../../../nucleo/gaiola-varrida.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* As cores do rascunho: o cinza das colunas da carcaça, o escuro dos fundos e o vermelho das lanternas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  cores: { aco: CARCACA.cores.cinza, escuro: CARCACA.cores.escuro, vermelho: '#c0302a' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* A lateral da máquina inteira levada à carcaça: o px da imagem em mm, z para a frente e y para cima. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  lateral: { mmPorPx: 4.2955, z: { px: 349.8, mm: 194.1 }, y: { px: 493.6, mm: 183.9 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  /* A COLUNA DA FRENTE, um tubo de 55 mm em x por 70 de lado, de quinas vivas. A borda da frente dela na lateral passa por [z, y]"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "     (-12,9, 800,7) e (-279,2, 1.831,6), px 398 na linha 350 e px 460 na linha 110; o eixo fica 36 mm atrás da borda. De frente o pé vai"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "     de 455 a 512 mm em y 768, e o tubo se inclina para dentro até o meio do teto em y 1.990, segue no plano do teto até a dobra de raio"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "     60 e corre no alto até z -1.300. Estações a cada 50 mm nas retas e dez na dobra. O pé nasce 20 mm abaixo do apoio na aba do"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "     paralama, na mesma reta, e o plano da face de cima da aba o corta: no rascunho o fim do tubo, perpendicular a ele, entrava na aba"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "     atrás e ficava acima dela na frente. A gaiola vai sem nível de subdivisão (no rascunho, 2): com as quinas vivas a seção já é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "     retângulo e a dobra já segue o arco pelas dez estações, e subdividida ela punha três vértices no meio de cada lado da face do"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "     corte do pé, que nenhum leque nem orelha da triangulação serve (o OBJ da luz rasante a recusa). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  coluna: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "    borda: [[-12.9, 800.7], [-279.2, 1831.6]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    recuoDoEixo: 36,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "    secao: { x: 55, lado: 70 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "    pe: { abaixoDoApoio: 20, larguraEm: 768, x: [455, 512] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    juntaY: 1990,"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "    raioDaDobra: 60,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "    fimNoAlto: -1300,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "    estacoes: { passo: 50, naDobra: 10 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    niveis: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* O TETO. O topo do quadro a 2.135 (lateral, linha 39,5), o eixo do perfil 45 mm abaixo dele, as travessas de 70 mm de altura, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "     fim de trás na face de trás da travessa de trás em z -1.425 e a meia largura do perfil de 425 a 480, a do tubo da coluna da frente;"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "     o perfil extrudado sai 1 mm além do tubo de cada lado, porque rente a ele as faces das duas se cruzavam no mesmo plano e a face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "     baixo da travessa da frente ficava com vértices em fila dos dois lados, de triângulo sem área. O perfil de lado, da dobra"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "     até a coluna de trás, pelo contorno da lateral em px: a borda de baixo com a quina de dentro da frente em arco, 5 mm à frente da"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "     borda da coluna, e o topo com o canto de fora redondo, de px 523 a 8 mm do topo a 537 no topo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  teto: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    topo: 2135, alturaDoPerfil: 70, eixoAbaixoDoTopo: 45, tras: -1425, x: [425, 480],"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    perfil: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "      baixo: [[678, 80], [578, 81], [533, 84], [525, 87], [519, 90], [514, 93], [511, 96], [504, 102], [499, 111]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "      aFrenteDaBorda: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "      alemDoTubo: 1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "      frente: [[478, 75], [486, 60], [490, 50], [503, 45]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "      canto: { px: 523, abaixoDoTopo: 8 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "      topo: [537, 678],"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    },"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    /* as travessas: a da frente sobre a dobra, de 80 a 5 mm atrás do eixo dela, e a de trás, de 75 mm, que leva as lanternas; 1 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "       além da face de dentro do perfil */"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    travessas: { frente: [80, 5], tras: 75, alem: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  /* A COLUNA DE TRÁS, chapa larga de lado que se afina para cima, pela lateral em px: a borda de trás (px 741 a 722) e a da frente"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "     (px 678 a 690), o canto de cima e de trás redondo de 40 mm e o topo até z -1.215. O pé, de z -1.272 a -1.505, desce a 1.138 e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "     plano da face de cima das colunas da carcaça o corta (no rascunho ele entrava de 3 a 16 mm nelas); de trás, ela vai do apoio na"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "     borda das colunas (de 460 a 516 mm, `apoiosDoProtetor` da carcaça) à largura do teto em y 1.990 (`teto.x`), e a seção de trás"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "     sobe 5 mm acima do topo. A silhueta vai em x de 380 a 600 e a seção em z de -1.600 a -1.100, cruzadas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  colunaTras: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    pe: { z: [-1272, -1505], y: 1138 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    tras: [[741, 200], [732, 140], [726, 95], [722, 65]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    canto: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    topoAte: -1215,"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    frente: [[678, 95], [681, 140], [689, 200], [690, 260]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    secao: { y: 1120, sobreOTopo: 5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    silhuetaEmX: [380, 600],"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    secaoEmZ: [-1600, -1100],"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  /* A GRADE DO TETO: seis barras ao comprido a 60, 180 e 300 mm do centro, de 30 mm, e duas atravessadas em z -814 e -969, de 2.095 a"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "     2.130 mm (40 a 5 abaixo do topo), apoiadas nas travessas: de 75 mm atrás do eixo da dobra a 70 mm à frente do fim de trás. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  grade: { barras: [60, 180, 300], largura: 30, atravessadas: [-814, -969], abaixoDoTopo: [40, 5], frente: 75, tras: 70 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  /* AS LUZES DE TRABALHO: na lateral, z -181 a -288 e y 1.745 a 1.943, à frente da coluna; uma caixa de 90 mm de lado de 1.750 a 1.940,"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "     com a face de trás 3 mm dentro da face da frente da coluna (inclinada como ela), de 445 a 530 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  luzes: { y: [1750, 1940], dentroDaColuna: 3, fundo: 90, x: [445, 530] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  /* AS LANTERNAS DO ALTO, na face de trás da travessa de trás: de 18 mm atrás a 2 mm dentro dela, de 60 a 5 mm abaixo do topo, de 205"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "     a 410 mm do centro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  lanternas: { z: [-18, 2], abaixoDoTopo: [60, 5], x: [205, 410] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  /* O ESPELHO, do lado esquerdo (+x): o vidro de z -455 a -385, y 1.640 a 1.800 e x 356 a 426, e o braço de z -395 até 66 mm atrás da"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "     borda da frente da coluna em y 1.720, de y 1.705 a 1.730 e x 400 a 440. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  espelho: { z: [-455, -385], y: [1640, 1800], x: [356, 426], braco: { z: -395, atras: 66, em: 1720, y: [1705, 1730], x: [400, 440] } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  /* OS CORTES DOS PÉS pelo plano do apoio: o bloco que tira o que fica abaixo da face de cima da aba e das colunas, ao longo da aresta"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "     de cima delas (a mesma da carcaça), 150 mm de fundo, e 30 mm além do pé de cada lado em x. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  corteDosPes: { fundo: 150, alem: 30 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "const retangulo = (u0, v0, u1, v1) => [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "const espelhoX = (xy) => xy.map(([x, y]) => [-x, y]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "/** Os perfis, o trilho da coluna da frente e as portas, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const L = T.lateral;"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  const ZL = (px) => -(px - L.z.px) * L.mmPorPx + L.z.mm;"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  const YL = (py) => (L.y.px - py) * L.mmPorPx + L.y.mm;"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const C = T.coluna; const TE = T.teto; const CT = T.colunaTras;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const APOIOS = apoiosDoProtetor(CARCACA);"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const yPe = APOIOS.frenteEsquerdo.ponto[1] - C.pe.abaixoDoApoio;"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  const [[zb0, yb0], [zb1, yb1]] = C.borda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  const INCL = (zb1 - zb0) / (yb1 - yb0);                       // dz/dy da coluna da frente: -0,258"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  const zFrente = (y) => zb0 + INCL * (y - yb0);                // a borda da frente da coluna da frente"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  const zEixoFrente = (y) => zFrente(y) - C.recuoDoEixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  const TOPO = TE.topo; const Y_TETO = TOPO - TE.eixoAbaixoDoTopo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  /* o trilho da coluna da frente, do lado s (1 é +x), e o comprimento até o começo e o fim da dobra */"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  function trilhoDaColunaFrente(s) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    const r = C.raioDaDobra;"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    const yLarg = C.pe.larguraEm;"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    const meio = (y) => { const f = (y - yLarg) / (C.juntaY - yLarg); return ((C.pe.x[0] + C.pe.x[1]) * (1 - f) + (TE.x[0] + TE.x[1]) * f) / 2; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    const x = s * (TE.x[0] + TE.x[1]) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    const B = [zEixoFrente(Y_TETO), Y_TETO]; const Cc = [C.fimNoAlto, Y_TETO];"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    const u1 = [B[0] - zEixoFrente(yPe), B[1] - yPe]; const l1 = Math.hypot(...u1); u1[0] /= l1; u1[1] /= l1;"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    const u2 = [Cc[0] - B[0], Cc[1] - B[1]]; const l2 = Math.hypot(...u2); u2[0] /= l2; u2[1] /= l2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    const giro = Math.atan2(u1[0] * u2[1] - u1[1] * u2[0], u1[0] * u2[0] + u1[1] * u2[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    const t = r * Math.tan(Math.abs(giro) / 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    const ini = [B[0] - u1[0] * t, B[1] - u1[1] * t]; const fim = [B[0] + u2[0] * t, B[1] + u2[1] * t];"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "    const sg = Math.sign(giro); const n1 = [-u1[1] * sg, u1[0] * sg]; const cen = [ini[0] + n1[0] * r, ini[1] + n1[1] * r];"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "    const P = ([z, y]) => [x, y, z];"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "    /* o giro no plano (z, y) de ângulo `giro` é, em torno do eixo x, o giro de -giro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    const pe = [s * meio(yPe), yPe, zEixoFrente(yPe)]; const junta = P([zEixoFrente(C.juntaY), C.juntaY]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    const dist = (a, b) => Math.hypot(...a.map((v, k) => v - b[k]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    const s0 = dist(pe, junta) + dist(junta, P(ini));"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "      trilho: [{ reta: { de: pe, ate: junta } }, { reta: { de: junta, ate: P(ini) } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "        { arco: { centro: P(cen), eixo: [1, 0, 0], de: P(ini), graus: -giro * 180 / Math.PI } }, { reta: { de: P(fim), ate: P(Cc) } }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "      dobra: [s0, s0 + r * Math.abs(giro)],"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    };"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  const hx = C.secao.x / 2; const hl = C.secao.lado / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  const secaoColuna = [{ u: -hx, v: -hl, nome: 'a' }, { u: hx, v: -hl, nome: 'b' }, { u: hx, v: hl, nome: 'c' }, { u: -hx, v: hl, nome: 'd' }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  /* o perfil de lado do teto, da dobra até a coluna de trás */"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  const PF = TE.perfil;"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  const ultimoBaixo = PF.baixo[PF.baixo.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  const perfilTeto = [...PF.baixo.map(([z, y]) => [ZL(z), YL(y)]), [zFrente(YL(ultimoBaixo[1])) - PF.aFrenteDaBorda, YL(ultimoBaixo[1])],"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    ...PF.frente.map(([z, y]) => [ZL(z), YL(y)]), [ZL(PF.canto.px), TOPO - PF.canto.abaixoDoTopo], [ZL(PF.topo[0]), TOPO], [ZL(PF.topo[1]), TOPO]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  /* a coluna de trás: a silhueta de lado e a seção de trás de cada lado */"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  const ladoTras = [[CT.pe.z[0], CT.pe.y], [CT.pe.z[1], CT.pe.y], ...CT.tras.map(([z, y]) => [ZL(z), YL(y)]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "    ...Array.from({ length: 7 }, (_, k) => { const a = Math.PI + Math.PI / 2 * k / 6; return [TE.tras + CT.canto + CT.canto * Math.cos(a), TOPO - CT.canto - CT.canto * Math.sin(a)]; }),"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "    [CT.topoAte, TOPO], ...CT.frente.map(([z, y]) => [ZL(z), YL(y)])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  const secaoTras = (s) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "    const xPe = APOIOS.trasEsquerdo.x;"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "    const p = [[xPe[0], CT.secao.y], [xPe[1], CT.secao.y], [TE.x[1], C.juntaY], [TE.x[1], TOPO + CT.secao.sobreOTopo], [TE.x[0], TOPO + CT.secao.sobreOTopo], [TE.x[0], C.juntaY]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "    return s > 0 ? p : espelhoX(p).reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  /* o bloco do corte de cada pé, em [z, y] da lateral: a aresta de cima do apoio e o fundo abaixo dela */"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  const corte = ({ aresta: [[za, ya], [zb, yb]] }) => [[za, ya], [zb, yb], [zb, yb - T.corteDosPes.fundo], [za, ya - T.corteDosPes.fundo]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  /* as portas dos pés: o plano do apoio, com a normal para baixo; o ponto é o do apoio da carcaça, que fica no plano */"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const portas = {};"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  for (const lado of ['Esquerdo', 'Direito']) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    for (const [onde, extensao] of [['Frente', [C.secao.x, C.secao.lado]], ['Tras', [APOIOS.trasEsquerdo.x[1] - APOIOS.trasEsquerdo.x[0], Math.abs(CT.pe.z[1] - CT.pe.z[0])]]]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "      const a = APOIOS[`${onde.toLowerCase()}${lado}`];"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "      portas[`pe${onde}${lado}`] = { forma: 'plano', papel: 'apoia', ponto: a.ponto, normal: a.normal.map((v) => (v === 0 ? 0 : -v)), extensao, referencia: [1, 0, 0] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "  const zDobra = zEixoFrente(Y_TETO);"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "  return { APOIOS, corte, portas, ZL, YL, zFrente, zEixoFrente, TOPO, Y_TETO, zDobra, trilhoDaColunaFrente, secaoColuna, perfilTeto, ladoTras, secaoTras };"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "/** Monta o protetor no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve as origens das portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "export function montarProtetor(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  const { extX, extZ, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "  const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  const cruzar = (...s) => booleana('intersectar', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  const lados = (fn) => [1, -1].map(fn);"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "  const emX = (s, [a, b]) => (s > 0 ? [a, b] : [-b, -a]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  const TE = T.teto; const C = T.coluna; const CT = T.colunaTras; const TOPO = D.TOPO;"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "  /* o tubo da seção da coluna pelo trilho, fechado e tampado, pelo passo `subdivisao` sem nível: a cada 50 mm nas retas e dez"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "     estações na dobra, para que a face de dentro siga o arco */"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes quadro",
+    "imagens": [
+      "peca-frente-rasante-az270.png",
+      "peca-frente-rasante-az0.png",
+      "peca-lado-rasante-az70.png",
+      "peca-lado-rasante-az160.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  }
+}

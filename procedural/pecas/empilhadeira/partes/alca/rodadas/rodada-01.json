@@ -1,0 +1,776 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/alca",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 4,
+    "defeitos": [
+      {
+        "parte": "alcas",
+        "tipo": "comprimento",
+        "onde": "braços de baixo e de cima, lado da coluna",
+        "sentido": "menor",
+        "evidencia": "Vista direita: os dois braços são tocos curtos junto ao tubo, sem chegar à face de trás da coluna; a alça parece solta."
+      },
+      {
+        "parte": "alcas",
+        "tipo": "superficie",
+        "onde": "corpo do tubo, ao longo de toda a altura",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica e superior mostram prisma de seção quadrada com arestas vivas; a referência mostra tubo redondo."
+      },
+      {
+        "parte": "alcas",
+        "tipo": "superficie",
+        "onde": "extremidade superior, braço de cima",
+        "sentido": "anguloso",
+        "evidencia": "Vista direita, topo: chanfro e aba pequena, sem equivalente na referência, no lugar de curva contínua do tubo."
+      },
+      {
+        "parte": "alcas",
+        "tipo": "uniao",
+        "onde": "braços e coluna da frente do protetor",
+        "sentido": "afastado",
+        "evidencia": "Direita isolada e isométrica: tocos terminam no ar. Nas vistas do conjunto não identifico a alça ligada à coluna."
+      }
+    ],
+    "observacao": "Modelo sem alvo medido: a referência é imagem de IA em outra escala. A leitura é de caráter. Posição lateral, cor e dualidade conferem, mas a forma é de barra quadrada solta."
+  },
+  "partes": [
+    {
+      "nome": "alcas",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o protetor ganhou a concordância da dobra durante o trabalho e o braço de cima passou a cruzá-lo 19 mm: o fim dele passou a vir do perfilTeto do protetor",
+    "o protetor, que está com o crítico, precisou da porta apoioDaAlcaEsquerda (sem mudar a malha)",
+    "o relato do modelador trouxe seis pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 1, secao quadrada onde o plano promete tubo de 30 mm, e ponta de cima com chanfro e aba: atribuidos ao modelador, vao a rodada 2",
+    "rodada 1, bracos curtos e alca solta: a receita poe o fim de cada braco a 0,2 mm da face de tras da coluna; atribuido a ferramenta, a alca nao aparece nas vistas montadas que o critico abriu; o modelador confere a medida na rodada 2"
+  ],
+  "notaDePassagem": "A alça é peça própria presa ao protetor por posição, com afastamento 0,2 na normal da face de trás da coluna da frente. O fim de cada braço é a borda de trás do protetor (a face da coluna ou, no de cima, a concordância do perfil do teto), 0,2 mm atrás dela na normal. Tudo vem do derivar do protetor (zTrasFrente, perfilTeto), então acompanha as mudanças dele.",
+  "receita": {
+    "sha256": "sha256:91ed6cda4585c78fc403e8f194f0190c127123f54c661b7591fc3340b9476348",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 138,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * ao protetor."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do escape (fatia 7 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, com os"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * acessórios do item 7 das partes do `../../ALINHAMENTO.md`). A alça é rígida com o protetor e só toca nele; o protetor está com o crítico"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * e não a recebe, e a alça vira esta peça, presa a ele por posição. A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com uma exceção: os braços, que no rascunho"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * iam até o eixo da coluna e entravam 35 mm nela, acabam na borda de trás do protetor: a face de trás da coluna e, no braço de cima, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * contorno da concordância que o perfil do teto ganhou depois do rascunho (de y 1.790 para cima), 0,2 mm atrás dela. O rascunho chama"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * `montarAlca` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). Na lateral a coluna da frente engrossa das linhas 265 a 110 (y 1.166 a 1.831) até px 486 na"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * linha 140, 60 mm atrás da face de trás dela: um tubo de 30 mm paralelo à coluna, 110 mm atrás do eixo dela, de y 1.180 a 1.820, com"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * dois braços de 30 mm até ela, de x 450 a 485, dentro da largura da coluna (que vai de 440 a 500 ali). A coluna, o eixo e a face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * trás dela são os da receita do protetor (`derivar`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * O ENCAIXE. A origem é a da máquina. A montagem põe a alça pela porta `bracoEsquerdo` (o plano do fim dos braços, paralelo à face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * trás da coluna da frente esquerda, com a normal para a frente) na porta `apoioDaAlcaEsquerda` do protetor, com o afastamento de 0,2"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * mm da folga, e a pose sai identidade; a alça direita vai na mesma pose rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e a porta em mm; `montarAlca` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "import { derivar as derivarProtetor } from '../../protetor/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  /* A cor do rascunho: o escuro da carcaça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  cores: { escuro: CARCACA.cores.escuro },"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* O tubo de 30 mm, 110 mm atrás do eixo da coluna da frente (35 da meia seção dela e 75 de vão), de y 1.180 a 1.820; os braços de 30"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "     mm de altura em cada ponta, de 10 mm dentro do tubo à face de trás da coluna; de x 450 a 485, um de cada lado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  alca: { y: [1180, 1820], atrasDoEixo: 110, meia: 15, dentroDoTubo: 10, x: [450, 485] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* O fim de cada braço: a borda de trás do protetor na altura dele, de lado, 0,2 mm atrás dela na normal da face de trás da coluna"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     (0,207 na horizontal; com o arredondamento de 0,1 mm dos vértices das extrusões, de 0,16 a 0,26). A borda é a face de trás da coluna da frente e, onde o perfil do teto desce atrás dela (a"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     concordância da dobra, de y 1.790 para cima), o contorno desse perfil. A margem é também o afastamento da posição na montagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  fimDoBraco: { margem: 0.2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "/** A faixa de largura 2h em volta do caminho [z, y]: a seção constante de um tubo ao longo dele, vista de lado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "function faixa(caminho, h) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  const esq = []; const dir = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  caminho.forEach((p, i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    const a = caminho[Math.max(0, i - 1)]; const b = caminho[Math.min(caminho.length - 1, i + 1)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "    const t = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(...t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "    const n = [-t[1] / l, t[0] / l];"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    esq.push([p[0] + n[0] * h, p[1] + n[1] * h]); dir.push([p[0] - n[0] * h, p[1] - n[1] * h]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  return [...esq, ...dir.reverse()];"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "/** Os perfis de lado e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  const P = derivarProtetor();"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  const A = T.alca;"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  const zAlca = (y) => P.zEixoFrente(y) - A.atrasDoEixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  const ladoTubo = faixa(A.y.map((y) => [zAlca(y), y]), A.meia);"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  /* a margem medida na normal da face de trás da coluna, levada à horizontal */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  const recebe = P.portas.apoioDaAlcaEsquerda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  const margemEmZ = T.fimDoBraco.margem / Math.abs(recebe.normal[2]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  /* a borda de trás do protetor na altura y, de lado: a face de trás da coluna ou, mais atrás dela, o contorno do perfil do teto */"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const arestas = P.perfilTeto.map((a, i) => [a, P.perfilTeto[(i + 1) % P.perfilTeto.length]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const noPerfil = (y) => arestas.filter(([a, b]) => (a[1] - y) * (b[1] - y) <= 0 && a[1] !== b[1]).map(([a, b]) => a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const borda = (y) => Math.min(P.zTrasFrente(y), ...noPerfil(y));"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  /* os pontos do fim do braço de y0 a y1: as pontas, os vértices do perfil entre elas e onde o perfil cruza a face da coluna */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const fimDoBraco = (y0, y1) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    const ys = new Set([y0, y1, ...P.perfilTeto.map(([, y]) => y).filter((y) => y > y0 && y < y1)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    for (const [a, b] of arestas) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "      const fa = a[0] - P.zTrasFrente(a[1]); const fb = b[0] - P.zTrasFrente(b[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "      if (fa * fb < 0) { const t = fa / (fa - fb); const y = a[1] + (b[1] - a[1]) * t; if (y > y0 && y < y1) ys.add(y); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    return [...ys].sort((p, q) => p - q).map((y) => [borda(y) - margemEmZ, y]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const bracos = A.y.map((y) => [[zAlca(y) + A.dentroDoTubo, y - A.meia], ...fimDoBraco(y - A.meia, y + A.meia), [zAlca(y) + A.dentroDoTubo, y + A.meia]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    bracoEsquerdo: { forma: 'plano', papel: 'apoia', ponto: recebe.ponto.map((v, k) => v + recebe.normal[k] * T.fimDoBraco.margem), normal: recebe.normal.map((v) => (v === 0 ? 0 : -v)), extensao: recebe.extensao, referencia: recebe.referencia },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  return { ladoTubo, bracos, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "/** Monta as duas alças no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem delas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "export function montarAlca(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  const { extX, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const emX = (s, [a, b]) => (s > 0 ? [a, b] : [-b, -a]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  /* de cada lado, o tubo e os dois braços de lado, extrudados em x */"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const alcas = unir(...[1, -1].map((s) => unir(extX(D.ladoTubo, ...emX(s, T.alca.x)), ...D.bracos.map((b) => extX(b, ...emX(s, T.alca.x))))));"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  parte('alcas', alcas, T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  return { alcas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "/* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta do braço esquerdo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  const { alcas } = montarAlca(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  return [...forma, ['publicarPorta', { id: 'bracoEsquerdo', de: alcas.origem, interface: Object.fromEntries(Object.entries(portas.bracoEsquerdo).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "export const CONTATOS = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  meta: { nome: 'empilhadeira/alca', desc: 'as duas alças de acesso da empilhadeira, atrás das colunas da frente do protetor do operador' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    objeto: 'as alças de acesso de uma empilhadeira de contrapeso de 2,5 t: um tubo de 30 mm atrás de cada coluna da frente do protetor, paralelo a ela, preso por dois braços, numa peça rígida presa ao protetor',"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    escala: { medida: 'altura da alça, do braço de baixo ao de cima (rascunho, pela lateral)', milimetros: 670 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "      { nome: 'alcas', forma: 'de cada lado, um tubo escuro de 30 mm paralelo à coluna da frente, 110 mm atrás do eixo dela, de y 1.180 a 1.820, com dois braços de 30 mm até a face de trás dela, de x 450 a 485', tecnica: 'faixa lateral e quadriláteros extrudados em x, unidos, de cada lado' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "      'a alça solta da coluna da frente do protetor, ou entrando nela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "      'a alça fora da largura da coluna, ou não paralela a ela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "      'uma alça só, ou as duas do mesmo lado',"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "      'cor trocada: a alça laranja ou cinza claro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  /* O extremo de baixo, de trás e da direita: o braço de baixo e o canto de baixo do tubo da direita, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    const T = this.PARAMS; const { ladoTubo } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    return [{ nome: 'alça da direita, embaixo e atrás', parte: 'alcas', medida: 'minimo', em: [-T.alca.x[1], T.alca.y[0] - T.alca.meia, Math.min(...ladoTubo.map(([z]) => z))], toleranciaMm: 0.5 }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[11]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az310.png",
+      "peca-frente-rasante-az40.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az110.png"
+    ]
+  }
+}

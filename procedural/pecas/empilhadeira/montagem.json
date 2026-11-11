@@ -1,0 +1,848 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "empilhadeira",
+  "instancias": [
+    {
+      "id": "carcaca",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/carcaca"
+      }
+    },
+    {
+      "id": "eixoDianteiro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/eixo-dianteiro"
+      }
+    },
+    {
+      "id": "rodaDianteiraEsquerda",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-dianteira"
+      }
+    },
+    {
+      "id": "rodaDianteiraDireita",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-dianteira"
+      }
+    },
+    {
+      "id": "eixoTraseiro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/eixo-traseiro"
+      }
+    },
+    {
+      "id": "rodaTraseiraEsquerda",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-traseira"
+      }
+    },
+    {
+      "id": "rodaTraseiraDireita",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/roda-traseira"
+      }
+    },
+    {
+      "id": "torre",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/torre"
+      }
+    },
+    {
+      "id": "canalInterno",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/canal-interno"
+      }
+    },
+    {
+      "id": "cilindroElevacao",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/cilindro-elevacao"
+      }
+    },
+    {
+      "id": "carro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/carro"
+      }
+    },
+    {
+      "id": "garfoEsquerdo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/garfo"
+      }
+    },
+    {
+      "id": "garfoDireito",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/garfo"
+      }
+    },
+    {
+      "id": "correntes",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/correntes"
+      }
+    },
+    {
+      "id": "cilindroInclinacaoEsquerdo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/cilindro-inclinacao"
+      }
+    },
+    {
+      "id": "cilindroInclinacaoDireito",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/cilindro-inclinacao"
+      }
+    },
+    {
+      "id": "protetor",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/protetor"
+      }
+    },
+    {
+      "id": "banco",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/banco"
+      }
+    },
+    {
+      "id": "colunaDirecao",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/coluna-direcao"
+      }
+    },
+    {
+      "id": "volante",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/volante"
+      }
+    },
+    {
+      "id": "glp",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/glp"
+      }
+    },
+    {
+      "id": "escape",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/escape"
+      }
+    },
+    {
+      "id": "alca",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "empilhadeira/alca"
+      }
+    }
+  ],
+  "relacoes": [
+    {
+      "id": "eixoNaPassagemDosPocos",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "passagemNoChassi"
+      },
+      "movel": {
+        "caminho": [
+          "carcaca"
+        ],
+        "porta": "passagemDoEixoDianteiro"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.3175,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "rodaDianteiraEsquerdaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaDianteiraEsquerda"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "cuboEsquerdo"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.045,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "rodaDianteiraDireitaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaDianteiraDireita"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "cuboDireito"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.045,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "eixoTraseiroNaPassagemDosPocos",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoTraseiro"
+        ],
+        "porta": "passagemNoChassi"
+      },
+      "movel": {
+        "caminho": [
+          "carcaca"
+        ],
+        "porta": "passagemDoEixoTraseiro"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.279,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "rodaTraseiraEsquerdaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaTraseiraEsquerda"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoTraseiro"
+        ],
+        "porta": "cuboTraseiroEsquerdo"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.017,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "rodaTraseiraDireitaGiraNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "rodaTraseiraDireita"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "eixoTraseiro"
+        ],
+        "porta": "cuboTraseiroDireito"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.017,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "olhalDireitoDaTorreNoEixo",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "pinoDaTorreDireito"
+      },
+      "movel": {
+        "caminho": [
+          "torre"
+        ],
+        "porta": "olhalDireito"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.002,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "olhalEsquerdoDaTorreNoEixo",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "eixoDianteiro"
+        ],
+        "porta": "pinoDaTorreEsquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "torre"
+        ],
+        "porta": "olhalEsquerdo"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.002,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "cilindroElevacaoNoAssento",
+      "tipo": "assentaAnular",
+      "referencia": {
+        "caminho": [
+          "torre"
+        ],
+        "porta": "assentoDoCilindro"
+      },
+      "movel": {
+        "caminho": [
+          "cilindroElevacao"
+        ],
+        "porta": "assento"
+      },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.03,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "volanteGiraNaColuna",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "colunaDirecao"
+        ],
+        "porta": "eixoDoVolante"
+      },
+      "movel": {
+        "caminho": [
+          "volante"
+        ],
+        "porta": "cubo"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.0005,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ],
+  "etapas": [
+    "carcaca",
+    "eixoDianteiro",
+    "rodaDianteiraEsquerda",
+    "rodaDianteiraDireita",
+    "eixoTraseiro",
+    "rodaTraseiraEsquerda",
+    "rodaTraseiraDireita",
+    "torre",
+    "canalInterno",
+    "cilindroElevacao",
+    "carro",
+    "garfoEsquerdo",
+    "garfoDireito",
+    "correntes",
+    "cilindroInclinacaoEsquerdo",
+    "cilindroInclinacaoDireito",
+    "protetor",
+    "banco",
+    "colunaDirecao",
+    "volante",
+    "glp",
+    "escape",
+    "alca"
+  ],
+  "vinculos": [
+    {
+      "id": "eixoEntreAsParedesDosPocos",
+      "alvo": {
+        "instancia": "eixoDianteiro",
+        "param": "entreAsParedes"
+      },
+      "de": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoDianteiro",
+        "medida": "fim"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "eixoTraseiroEntreAsParedesDosPocos",
+      "alvo": {
+        "instancia": "eixoTraseiro",
+        "param": "entreAsParedes"
+      },
+      "de": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoTraseiro",
+        "medida": "fim"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "volanteNoEixoDaColuna",
+      "alvo": {
+        "instancia": "volante",
+        "param": "raioDoFuro"
+      },
+      "de": {
+        "instancia": "colunaDirecao",
+        "porta": "eixoDoVolante",
+        "medida": "raio"
+      },
+      "unidade": "mm",
+      "acrescimo": 0.5
+    }
+  ],
+  "posicoes": [
+    {
+      "id": "eixoNaCarcaca",
+      "instancia": "eixoDianteiro",
+      "porta": "passagemNoChassi",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoDianteiro"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodaDianteiraEsquerdaNoCubo",
+      "instancia": "rodaDianteiraEsquerda",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoDianteiro",
+        "porta": "cuboEsquerdo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodaDianteiraDireitaNoCubo",
+      "instancia": "rodaDianteiraDireita",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoDianteiro",
+        "porta": "cuboDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "eixoTraseiroNaCarcaca",
+      "instancia": "eixoTraseiro",
+      "porta": "passagemNoChassi",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "passagemDoEixoTraseiro"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodaTraseiraEsquerdaNoCubo",
+      "instancia": "rodaTraseiraEsquerda",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoTraseiro",
+        "porta": "cuboTraseiroEsquerdo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodaTraseiraDireitaNoCubo",
+      "instancia": "rodaTraseiraDireita",
+      "porta": "eixo",
+      "em": {
+        "instancia": "eixoTraseiro",
+        "porta": "cuboTraseiroDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "torreNoEixo",
+      "instancia": "torre",
+      "porta": "olhalDireito",
+      "em": {
+        "instancia": "eixoDianteiro",
+        "porta": "pinoDaTorreDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 142
+    },
+    {
+      "id": "canalInternoNaTorre",
+      "instancia": "canalInterno",
+      "porta": "guiaNoExterno",
+      "em": {
+        "instancia": "torre",
+        "porta": "guiaDoCanalInterno"
+      },
+      "unidade": "mm",
+      "afastamento": 2
+    },
+    {
+      "id": "cilindroElevacaoNaTorre",
+      "instancia": "cilindroElevacao",
+      "porta": "assento",
+      "em": {
+        "instancia": "torre",
+        "porta": "assentoDoCilindro"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "carroNoCanalInterno",
+      "instancia": "carro",
+      "porta": "guiaNoInterno",
+      "em": {
+        "instancia": "canalInterno",
+        "porta": "guiaDoCarro"
+      },
+      "unidade": "mm",
+      "afastamento": 3
+    },
+    {
+      "id": "garfoEsquerdoNoCarro",
+      "instancia": "garfoEsquerdo",
+      "porta": "gancho",
+      "em": {
+        "instancia": "carro",
+        "porta": "apoioDoGarfoEsquerdo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "garfoDireitoNoCarro",
+      "instancia": "garfoDireito",
+      "porta": "gancho",
+      "em": {
+        "instancia": "carro",
+        "porta": "apoioDoGarfoDireito"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "correntesNaCabeca",
+      "instancia": "correntes",
+      "porta": "naCabeca",
+      "em": {
+        "instancia": "cilindroElevacao",
+        "porta": "cabeca"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "cilindroInclinacaoEsquerdoNaOrelha",
+      "instancia": "cilindroInclinacaoEsquerdo",
+      "porta": "naOrelha",
+      "em": {
+        "instancia": "torre",
+        "porta": "orelhaEsquerda"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "cilindroInclinacaoDireitoNaOrelha",
+      "instancia": "cilindroInclinacaoDireito",
+      "porta": "naOrelha",
+      "em": {
+        "instancia": "torre",
+        "porta": "orelhaDireita"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "protetorNasColunas",
+      "instancia": "protetor",
+      "porta": "peTrasEsquerdo",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoProtetorTrasEsquerdo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "bancoNaTampaDoMotor",
+      "instancia": "banco",
+      "porta": "naTampaDoMotor",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoBanco"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "colunaDirecaoNoPainel",
+      "instancia": "colunaDirecao",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDaColunaDeDirecao"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "volanteNoEixoDaColuna",
+      "instancia": "volante",
+      "porta": "cubo",
+      "em": {
+        "instancia": "colunaDirecao",
+        "porta": "eixoDoVolante"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "glpNaTampa",
+      "instancia": "glp",
+      "porta": "naTampa",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoGlp"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "escapeNaTampa",
+      "instancia": "escape",
+      "porta": "naTampa",
+      "em": {
+        "instancia": "carcaca",
+        "porta": "apoioDoEscape"
+      },
+      "unidade": "mm",
+      "afastamento": 0.5
+    },
+    {
+      "id": "alcaNaColunaDoProtetor",
+      "instancia": "alca",
+      "porta": "bracoEsquerdo",
+      "em": {
+        "instancia": "protetor",
+        "porta": "apoioDaAlcaEsquerda"
+      },
+      "unidade": "mm",
+      "afastamento": 0.2
+    }
+  ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-9,
+    "expectativas": [
+      {
+        "id": "garfoEsquerdoPenduradoNoCarro",
+        "a": {
+          "caminho": [
+            "carro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfoEsquerdo"
+          ]
+        },
+        "motivo": "a face de trás da haste do garfo esquerdo assenta na face da frente das duas barras do carro, em z 480, face sobre face; as arestas das barras correm sobre a face da haste no plano comum, e a auditoria as dá como cruzamento de superfícies sem profundidade"
+      },
+      {
+        "id": "garfoDireitoPenduradoNoCarro",
+        "a": {
+          "caminho": [
+            "carro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfoDireito"
+          ]
+        },
+        "motivo": "a face de trás da haste do garfo direito assenta na face da frente das duas barras do carro, em z 480, face sobre face; as arestas das barras correm sobre a face da haste no plano comum, e a auditoria as dá como cruzamento de superfícies sem profundidade"
+      }
+    ]
+  },
+  "apoioNoChao": {
+    "plano": {
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "altura": 0
+    },
+    "toleranciaNumerica": 0.0005,
+    "apoiam": [
+      {
+        "caminho": [
+          "rodaDianteiraDireita"
+        ],
+        "parte": "pneu"
+      },
+      {
+        "caminho": [
+          "rodaDianteiraEsquerda"
+        ],
+        "parte": "pneu"
+      },
+      {
+        "caminho": [
+          "rodaTraseiraDireita"
+        ],
+        "parte": "pneu"
+      },
+      {
+        "caminho": [
+          "rodaTraseiraEsquerda"
+        ],
+        "parte": "pneu"
+      }
+    ]
+  }
+}

@@ -1,0 +1,93 @@
+{
+ "objeto": "a torre e os garfos de uma empilhadeira (canais externos e internos, cilindros de elevação e de inclinação, correntes, placa porta-garfos, grade de carga e garfos) sobre a carcaça",
+ "cores": {
+  "laranja": "#e2641e",
+  "cinza": "#6b7074",
+  "escuro": "#1e2022"
+ },
+ "partes": {
+  "chassi": "cinza",
+  "paralamas": "laranja",
+  "laterais": "laranja",
+  "furo": "escuro",
+  "piso": "cinza",
+  "degraus": "cinza",
+  "painel": "escuro",
+  "tampaMotor": "cinza",
+  "colunas": "cinza",
+  "pocoTraseiro": "escuro",
+  "capo": "laranja",
+  "tampa": "cinza",
+  "grade": "cinza",
+  "fundoGrade": "escuro",
+  "contrapeso": "cinza",
+  "fundoRasgo": "escuro",
+  "fundoNicho": "escuro",
+  "pino": "cinza",
+  "trinco": "cinza",
+  "tapete": "escuro",
+  "tunel": "escuro",
+  "peTorre": "cinza",
+  "canaisExternos": "cinza",
+  "canaisInternos": "cinza",
+  "cilindroElevacao": "escuro",
+  "hasteElevacao": "cinza",
+  "cabecaElevacao": "cinza",
+  "cilindrosInclinacao": "cinza",
+  "hastesInclinacao": "cinza",
+  "placaGarfos": "escuro",
+  "gradeCarga": "escuro",
+  "garfos": "escuro",
+  "correntes": "escuro"
+ },
+ "dentro": {
+  "cilindroElevacao": "canaisExternos",
+  "hasteElevacao": "canaisExternos",
+  "cilindrosInclinacao": "painel"
+ },
+ "vistasDaSobra": [
+  "superior",
+  "direita"
+ ],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {
+  "frontal": {
+   "referencia": "frente.ia.png",
+   "caixaRef": [366, 38, 724, 521],
+   "ignorar": [
+    [405, 38, 458, 245],
+    [632, 38, 700, 245],
+    [362, 365, 436, 533],
+    [664, 365, 728, 533]
+   ],
+   "fora": "o protetor do operador (as duas colunas inclinadas dos lados, o teto em grade e as luzes de trabalho nos cantos de cima), o banco, o volante e o cilindro de GLP que aparecem atrás da torre, as rodas e os pneus dos lados, e o eixo dianteiro com o diferencial atrás da placa",
+   "grade": [4, 3],
+   "visto": "de frente"
+  },
+  "superior": {
+   "referencia": "cima.ia.png",
+   "girar": 270,
+   "caixaRef": [135, 79, 455, 964],
+   "ignorar": [
+    [118, 540, 142, 671],
+    [450, 540, 474, 671],
+    [118, 150, 143, 270],
+    [450, 150, 472, 270]
+   ],
+   "fora": "o protetor do operador (o teto em grade, as colunas e as luzes), o banco, o volante, a coluna de direção, o cilindro de GLP com o berço, o escape e os pneus que aparecem dos lados",
+   "grade": [4, 3],
+   "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
+  },
+  "traseira": {
+   "referencia": "tras.ia.png",
+   "caixaRef": [386, 37, 687, 545],
+   "ignorar": [
+    [386, 424, 432, 545],
+    [644, 424, 687, 545]
+   ],
+   "fora": "o protetor do operador (as colunas, o teto e as lanternas de cima), o espelho, o escape, o cilindro de GLP com as cintas, o eixo traseiro, as rodas e a sombra no chão",
+   "grade": [4, 3],
+   "visto": "de trás"
+  }
+ }
+}

@@ -1,9 +1,9 @@
 {
   "formato": "mecanifica.aprovacao-da-familia@1",
   "familia": "roda-pneu",
-  "versao": "2.1.0",
+  "versao": "2.2.0",
   "mecanica": {
-    "data": "2026-11-08",
+    "data": "2026-11-10",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -30,6 +30,7 @@
           "larguraDoSulco": 0.15,
           "larguraDoSulcoCircular": 0.1,
           "larguraPneu": 0.03,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.004,
           "paredeDoRaio": 0,
@@ -68,6 +69,7 @@
           "larguraDoSulco": 0.4,
           "larguraDoSulcoCircular": 0.25,
           "larguraPneu": 0.2,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.02,
           "paredeDoRaio": 0.3,
@@ -194,6 +196,7 @@
           "larguraDoSulco": 0.7,
           "larguraDoSulcoCircular": 0.5,
           "larguraPneu": 0.8,
+          "ombroDoPneu": 0.6,
           "ombroRedondo": 1,
           "paredeDoAro": 0.1,
           "paredeDoRaio": 0.45,
@@ -204,7 +207,7 @@
           "sulcosCirculares": 8,
           "tipo": 2
         },
-        "hash": "sha256:61c6e2b8df3c33510222b300b59fba180b032c739c3862155b2b891bbfba2162",
+        "hash": "sha256:d8438473e9199eea85bbc246e031796ad72f2161192fb3b465ad7d8f4c50828a",
         "medidas": [
           {
             "ferramenta": "estruturaDeBarras",
@@ -377,7 +380,7 @@
       }
     },
     "varredura": {
-      "sondas": 64,
+      "sondas": 66,
       "recusasDeclaradas": [
         {
           "ponto": "banda=3",
@@ -410,6 +413,10 @@
         {
           "ponto": "larguraCubo=0.3",
           "restricao": "cubo-dentro-da-tolerancia-do-esboco"
+        },
+        {
+          "ponto": "ombroDoPneu=0.6",
+          "restricao": "ombro-cabe-na-banda"
         }
       ]
     },
@@ -444,6 +451,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.0466,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.025,
           "paredeDoRaio": 0,
@@ -650,6 +658,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.25,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.012,
           "paredeDoRaio": 0,
@@ -688,6 +697,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.324,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.006,
           "paredeDoRaio": 0,
@@ -726,6 +736,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.058,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.05,
           "paredeDoRaio": 0,
@@ -807,6 +818,45 @@
           }
         ]
       },
+      "empilhadeira-700-12": {
+        "parametros": {
+          "alturaDoFriso": 0,
+          "banda": 0,
+          "cruzamento": 0,
+          "desvio": -0.5845,
+          "diametroAro": 0.4539,
+          "diametroCirculoDeVentilacao": 0.44,
+          "diametroCirculoFuros": 0.1872,
+          "diametroCubo": 0.2837,
+          "diametroFlange": 0.34,
+          "diametroFuro": 0.01986,
+          "diametroFuroCentral": 0.156,
+          "diametroFuroDeVentilacao": 0.07,
+          "diametroPneu": 705,
+          "diametroRaio": 0.005,
+          "espessuraDisco": 0.02128,
+          "furosDeFixacao": 6,
+          "furosDeVentilacao": 0,
+          "ladosDoPneu": 192,
+          "larguraAro": 0.936,
+          "larguraCubo": 0.04255,
+          "larguraDoSulco": 0.45,
+          "larguraDoSulcoCircular": 0.2,
+          "larguraPneu": 0.3546,
+          "ombroDoPneu": 0.3221,
+          "ombroRedondo": 1,
+          "paredeDoAro": 0.02553,
+          "paredeDoRaio": 0,
+          "profundidadeDoSulco": 0.2,
+          "profundidadeDoSulcoCircular": 0.1,
+          "raios": 12,
+          "sulcos": 0,
+          "sulcosCirculares": 0,
+          "tipo": 0
+        },
+        "hash": "sha256:727ca77e2bd30e4ee6503c33c6c277156737a7ba8e86fc00d6191c3ebf0c0ff0",
+        "medidas": []
+      },
       "furgao-235-65-r16": {
         "parametros": {
           "alturaDoFriso": 0,
@@ -832,6 +882,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.33,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.005,
           "paredeDoRaio": 0,
@@ -870,6 +921,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.3,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.04,
           "paredeDoRaio": 0,
@@ -908,6 +960,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.27,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.008,
           "paredeDoRaio": 0,
@@ -946,6 +999,7 @@
           "larguraDoSulco": 0.45,
           "larguraDoSulcoCircular": 0.2,
           "larguraPneu": 0.14,
+          "ombroDoPneu": 0,
           "ombroRedondo": 0,
           "paredeDoAro": 0.03,
           "paredeDoRaio": 0,
@@ -961,7 +1015,7 @@
       }
     },
     "escalasDosPerfis": {
-      "sondas": 16,
+      "sondas": 18,
       "recusasDeclaradas": [
         {
           "ponto": "bicicleta: diametroPneu=50",

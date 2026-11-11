@@ -1,0 +1,987 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/torre",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Nao achei defeito estrutural: canais em U abertos para dentro, travessas, olhais no eixo e cor cinza batem; o disco do assento do cilindro nao aparece nas vistas e a lista vazia nao e aprovacao."
+  },
+  "partes": [
+    {
+      "nome": "canaisExternos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "peTorre",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a porta de anel confere o raio pela face inteira da origem; o assento na travessa pediu um disco escondido só para dar face à porta",
+    "o eixo não tinha anel de vértices no trecho do olhal: as portas do pino saem da ponta do tubo e a posição pede afastamento de 142 mm digitado",
+    "porta de cilindro num cortador pede lado {passo:1,fase:0}; sem ele cita a tampa consumida pelo corte",
+    "anel não aceita referencia, e o giro em torno do eixo do assento fica indefinido",
+    "o relato do modelador trouxe tres pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao"
+  ],
+  "notaDePassagem": "Referencial da máquina, origem no chão sob o eixo dianteiro, então a pose sai identidade. Pés sem espelho para as portas dos furos saírem do lado certo. A largura do olhal vem de apoioDaTorre do eixo. A orelha usa a posição dos cilindros de inclinação do rascunho; se eles mudarem na próxima etapa, mude a orelha aqui.",
+  "receita": {
+    "sha256": "sha256:89523e553b970756b15d01883c180e20ff4a985842ac3f2b6966572bd2c7c7a8",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 185,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/torre — a parte fixa da torre da empilhadeira: os dois canais externos em U, abertos para dentro, com as três travessas"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * de trás e a orelha do cilindro de inclinação, e os dois pés com o olhal que abraça o tubo do eixo dianteiro, numa peça rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do eixo traseiro (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * item 4 das partes do `../../ALINHAMENTO.md`, primeira metade). A forma é a do rascunho que a pessoa aprovou por imagem em"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * `montarTorre` daqui, de modo que a geometria tem uma fonte só. Mudaram três coisas de construção: os círculos do olhal com 96 lados"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * no lugar de 40; cada pé feito do seu lado, sem espelho, porque a porta publicada de uma origem espelhada resolve o centro do lado"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * errado (atrito do eixo traseiro); e o assento do cilindro de elevação, um disco de Ø 60 e 10 mm dentro da travessa de baixo, rente"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * à face de cima dela, que não aparece e dá à porta `assentoDoCilindro` uma face do tamanho do pé do cilindro (a face de cima da"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * travessa inteira vai a 320 mm do centro do assento, e a porta de anel confere o raio pela face)."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho, que as tirou das vistas; as contas de cada número estão no cabeçalho dele). A altura de 2.100"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * é a da TABELA do alinhamento (a lateral dá 2.085); a face da frente dos canais em z 372 (lateral 364 a 379, carcaca-lado 370); a"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * largura externa de 620, por dentro da aba do paralama da carcaça (x 327), que a vista de cima e a de frente cercam (706 e 555); o"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * fundo de z 100 a 372, com a face de trás encostada nas chapas do chassi, que vão até z 100. O pé fica por dentro das chapas do"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * chassi (x 266 a 327), de 215 a 262 mm (o trecho `apoioDaTorre` do eixo dianteiro), com o olhal de raio 95 e o furo de raio 77 no"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * tubo de raio 75 do eixo (2 mm de folga), e a chapa dele desce à frente até a travessa de baixo (o pé de trás da carcaca-lado). A"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * orelha do cilindro de inclinação é a cabeça em C da carcaca-lado reduzida ao bloco que segura o pino, em x 310 a 400, y 830 a 890."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * O ENCAIXE. A origem é a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * dirige e a frente em +z; o centro do eixo dianteiro fica em y 352,5 e z 0 (`rodas.dianteira` da carcaça). A montagem põe a torre no"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * eixo pela porta `olhalDireito` (o furo do olhal direito, no pino `pinoDaTorreDireito` do eixo), e a relação de cada lado mede o furo"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * no tubo pelo encaixe cilíndrico. A torre publica também a guia do canal interno (`guiaDoCanalInterno`, a face de dentro da alma do"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * canal externo esquerdo) e o assento do cilindro de elevação (`assentoDoCilindro`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * A JUNTA QUE A MONTAGEM AINDA NÃO TEM. A torre inclina em torno do eixo x que passa pelo centro do eixo dianteiro (6 graus para a"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " * frente e 12 para trás, no rascunho); a montagem v5 não tem articulação entre instâncias, e a torre fica de pé, na pose de"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * transporte."
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e as portas em mm; `montarTorre` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": " * { passos, topo, origem } (o mesmo que o rascunho da máquina usa); `gerarPassos` converte para metro com `m()`, campo de medida a campo"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": " * de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "import { TABELA as EIXO } from '../../eixo-dianteiro/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* As cores do rascunho: o cinza da carcaça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  cores: { aco: CARCACA.cores.cinza },"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  /* Lados dos círculos extrudados (o olhal, o furo e o assento). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  /* O fundo dos canais externos, em z: a face de trás encosta nas chapas do chassi (z 100) e a da frente fica em z 372. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  tras: 100,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  frente: 372,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* O canal externo de cada lado: o U de x 261 a 310, com a alma de 20 mm por fora (x 290 a 310) e as abas de 20 mm na frente e atrás,"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "     de y 150 a 2.100. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  externo: { x: [261, 310], alma: 20, aba: 20, y: [150, 2100] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  /* As travessas de trás, entre as abas de trás (z 100 a 120), e a de baixo, de fundo (z 100 a 220, y 150 a 210), que é o assento do"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "     cilindro de elevação; todas param 1 mm antes da face de fora das almas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  travessas: { meio: [1150, 1220], topo: [2030, 2100], baixo: { z: 220, y: 210 }, recuo: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  /* A orelha do cilindro de inclinação, presa à face de fora da alma: de z 60 a 160, y 830 a 890, até x 400. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  orelha: { z: [60, 160], y: [830, 890], ate: 400 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  /* O pé de cada lado: o olhal de raio 95 em volta do centro do eixo dianteiro, o furo com 2 mm de folga no tubo do eixo, e a chapa"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "     que desce à frente até a travessa de baixo, em [z, y] (os dois pontos de z `tras` são o fundo da travessa e o fim dela no pé)."
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "     O cortador do furo passa 15 mm por dentro e 18 por fora do olhal. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  pe: { raioDoOlhal: 95, folgaDoFuro: 2, chapa: [[-30, 266], [70, 300]], fimNaTravessa: 215, alemDoOlhal: [15, 18] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  /* O assento do cilindro de elevação: o pé dele, de Ø 60, no centro da largura e em z 190 (a 175 a camisa entrava 5 mm no bojo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "     diferencial), sobre a travessa de baixo; o disco dentro da travessa tem 10 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  assento: { z: 190, raio: 30, profundidade: 10 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "/** Os perfis e as portas, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const E = T.externo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const pivo = { y: CARCACA.rodas.dianteira.y, z: CARCACA.rodas.dianteira.z };"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const pe = { x: [EIXO.apoioDaTorre.de, EIXO.apoioDaTorre.ate], raioDoFuro: EIXO.tubo.raio + T.pe.folgaDoFuro };"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const circulo = (cx, cy, r) => Array.from({ length: T.lados }, (_, k) => [cx + r * Math.cos(2 * Math.PI * k / T.lados), cy + r * Math.sin(2 * Math.PI * k / T.lados)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  /* o U do canal externo esquerdo em [x, z], aberto para dentro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const uExterno = [[E.x[0], T.tras], [E.x[1], T.tras], [E.x[1], T.frente], [E.x[0], T.frente], [E.x[0], T.frente - E.aba],"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    [E.x[1] - E.alma, T.frente - E.aba], [E.x[1] - E.alma, T.tras + E.aba], [E.x[0], T.tras + E.aba]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const chapaDoPe = [T.pe.chapa[0], [T.tras, E.y[0]], [T.tras, T.pe.fimNaTravessa], T.pe.chapa[1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const faceDaGuia = E.x[1] - E.alma;"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const yAssento = T.travessas.baixo.y;"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    olhalEsquerdo: { forma: 'cilindro', papel: 'interna', eixo: [-1, 0, 0], centro: [pe.x[1], pivo.y, pivo.z], raio: pe.raioDoFuro, inicio: 0, fim: pe.x[1] - pe.x[0], referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    olhalDireito: { forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], centro: [-pe.x[1], pivo.y, pivo.z], raio: pe.raioDoFuro, inicio: 0, fim: pe.x[1] - pe.x[0], referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    guiaDoCanalInterno: { forma: 'plano', papel: 'recebe', ponto: [faceDaGuia, E.y[1], (T.tras + T.frente) / 2], normal: [-1, 0, 0], extensao: [T.frente - T.tras - 2 * E.aba, E.y[1] - E.y[0]], referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    assentoDoCilindro: { forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: [0, yAssento, T.assento.z], raioInterno: 0, raioExterno: T.assento.raio, inicio: -T.assento.profundidade, fim: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  return { pivo, pe, circulo, uExterno, chapaDoPe, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "/** Monta a torre no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve as origens das portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "export function montarTorre(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const { extX, extY, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const novo = () => { estado.origem += 1; return estado.origem; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  /* a cópia do outro lado, pelo espelho em x = 0 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  const espelho = (sel) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    estado.passos.push(['espelha', { origemId: id, eixo: 'x', pos: 0, derivaDe: sel.origem, sel: { origem: sel.origem } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    return { origem: { op: 'espelha', id, de: sel.origem } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  const par = (sel) => unir(sel, espelho(sel));"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  const caixaY = (x0, x1, z0, z1, y0, y1) => extY([[x0, z0], [x1, z0], [x1, z1], [x0, z1]], y0, y1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const E = T.externo; const R = T.travessas; const O = T.orelha; const P = D.pivo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  /* PÉS: de cada lado o olhal unido à chapa, menos o furo; cada um feito do seu lado, para a porta do furo sair do lado certo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const furos = {};"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  for (const s of [1, -1]) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    const [a, b] = s > 0 ? D.pe.x : [-D.pe.x[1], -D.pe.x[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    const [c0, c1] = s > 0 ? [D.pe.x[0] - T.pe.alemDoOlhal[0], D.pe.x[1] + T.pe.alemDoOlhal[1]] : [-D.pe.x[1] - T.pe.alemDoOlhal[1], -D.pe.x[0] + T.pe.alemDoOlhal[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    furos[s] = extX(D.circulo(P.z, P.y, D.pe.raioDoFuro), c0, c1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    parte('peTorre', cortar(unir(extX(D.circulo(P.z, P.y, T.pe.raioDoOlhal), a, b), extX(D.chapaDoPe, a, b)), furos[s]), T.cores.aco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  /* CANAIS EXTERNOS: o U de pé com a orelha, o espelho, e as três travessas de trás */"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  const canalExterno = extY(D.uExterno, E.y[0], E.y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  const orelha = caixaY(E.x[1], O.ate, O.z[0], O.z[1], O.y[0], O.y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  const meia = E.x[1] - R.recuo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const travessas = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    caixaY(-meia, meia, T.tras, T.tras + E.aba, ...R.meio),"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    caixaY(-meia, meia, T.tras, T.tras + E.aba, R.topo[0], E.y[1]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    caixaY(-meia, meia, T.tras, R.baixo.z, E.y[0], R.baixo.y),"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  parte('canaisExternos', unir(par(unir(canalExterno, orelha)), ...travessas), T.cores.aco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  /* o assento do cilindro: corpo próprio dentro da travessa de baixo, rente à face de cima, sem união (unido, a face dele some) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const A = T.assento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const assento = extY(D.circulo(0, A.z, A.raio), R.baixo.y - A.profundidade, R.baixo.y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  parte('canaisExternos', assento, T.cores.aco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  return { furoEsquerdo: furos[1], furoDireito: furos[-1], canalExterno, assento };"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "/* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], espelha: ['pos'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, as quatro portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  const { furoEsquerdo, furoDireito, canalExterno, assento } = montarTorre(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  /* a parede do furo: as laterais do cortador (as tampas dele foram consumidas pelo corte) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  const paredeDo = (furo) => ({ origem: { ...furo.origem, lado: { passo: 1, fase: 0 } } });"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  return [...forma, porta('olhalEsquerdo', paredeDo(furoEsquerdo)), porta('olhalDireito', paredeDo(furoDireito)), porta('guiaDoCanalInterno', canalExterno), porta('assentoDoCilindro', assento)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  { par: ['canaisExternos', 'peTorre'], motivo: 'a face da frente da chapa de cada pé, em z 100 e de y 150 a 215, encosta na face de trás da travessa de baixo e do canal externo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  meta: { nome: 'empilhadeira/torre', desc: 'torre da empilhadeira, a parte presa ao eixo: os dois canais externos em U com as travessas e a orelha do cilindro de inclinação, e os dois pés com o olhal no tubo do eixo dianteiro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "    objeto: 'a torre duplex de 3 m de uma empilhadeira de contrapeso de 2,5 t, na parte que inclina presa ao eixo dianteiro: os canais externos com as travessas e os pés com o olhal, de pé, na pose de transporte',"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "    referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png', '../../referencias/carcaca-lado.ia.png', '../../referencias/carcaca-frente.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "    escala: { medida: 'altura da torre abaixada (TABELA do alinhamento)', milimetros: 2100 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "      { nome: 'canaisExternos', forma: 'dois canais em U cinza de pé, y 150 a 2.100, x 261 a 310 e z 100 a 372, abertos para dentro; travessas de trás em y 1.150 e 2.030 e a de baixo até z 220; a orelha por fora da alma, x 310 a 400, y 830 a 890', tecnica: 'U extrudado em y unido à orelha e ao espelho dele, unido às três travessas extrudadas em y; o disco de Ø 60 do assento do cilindro dentro da travessa de baixo, rente à face de cima' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "      { nome: 'peTorre', forma: 'de cada lado, de x 215 a 262, o olhal de raio 95 no centro do eixo dianteiro (y 352,5, z 0) com o furo de raio 77, unido à chapa que desce à frente até a face de trás da travessa de baixo, em z 100', tecnica: 'círculo de 96 lados e chapa extrudados em x, unidos, menos o círculo do furo extrudado em x; um de cada lado, sem espelho' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "      'a torre baixa ou fina demais para uma empilhadeira de 2,5 t, ou fora da vertical na pose de transporte',"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "      'o olhal do pé fora do eixo do tubo do eixo dianteiro, ou o furo cruzando o tubo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "      'o canal externo atravessando a aba do paralama ou as chapas do chassi',"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "      'o canal sem o U aberto para dentro onde o canal interno corre, ou sem as travessas de trás',"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "      'cor trocada: a torre laranja ou escura',"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm: o topo dos canais e a orelha, o pé dos canais e o olhal. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "    const T = this.PARAMS; const E = T.externo; const P = derivar(T).pivo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "      { nome: 'topo da frente dos canais, com a orelha', parte: 'canaisExternos', medida: 'maximo', em: [T.orelha.ate, E.y[1], T.frente], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "      { nome: 'pé de trás dos canais, com a orelha', parte: 'canaisExternos', medida: 'minimo', em: [-T.orelha.ate, E.y[0], T.orelha.z[0]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "      { nome: 'topo do olhal do pé esquerdo', parte: 'peTorre', medida: 'maximo', em: [EIXO.apoioDaTorre.ate, P.y + T.pe.raioDoOlhal, T.tras], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "      { nome: 'fundo do olhal do pé direito', parte: 'peTorre', medida: 'minimo', em: [-EIXO.apoioDaTorre.ate, E.y[0], P.z - T.pe.raioDoOlhal], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[7], PASSOS[15], PASSOS[27]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az70.png",
+      "peca-tresquartos-rasante-az160.png"
+    ]
+  }
+}

@@ -6,6 +6,7 @@
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
+import { lancarChromium } from './navegador.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 /* Montagens aceitam o mesmo conjunto ortográfico da bancada. A revisão
@@ -215,9 +216,7 @@ export async function capturarMontagem({
     const carregarPlaywright = dependencias.carregarPlaywright
       ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);
     const playwright = await carregarPlaywright();
-    browser = await playwright.chromium.launch({
-      args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
-    });
+    browser = await lancarChromium(playwright.chromium);
     garantirPrazo();
     const altura = alturaPedida ?? Math.round(largura * 9 / 16);
     const page = await browser.newPage({ viewport: { width: largura, height: altura }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });
@@ -225,6 +224,12 @@ export async function capturarMontagem({
     page.on('pageerror', (erro) => errosPagina.push(erro.message));
     page.on('console', (mensagem) => {
       if (mensagem.type() === 'error') errosPagina.push(mensagem.text());
+    });
+    /* o erro de console de um recurso que faltou não diz qual: o endereço vem da resposta. A resposta ruim sozinha não reprova a
+       captura (só o erro de página ou de console reprova, como antes); ela entra na mensagem para dizer a causa. */
+    const respostasRuins = [];
+    page.on('response', (resposta) => {
+      if (resposta.status() >= 400) respostasRuins.push(`${resposta.status()} em ${resposta.url()}`);
     });
     const porta = vite.httpServer.address().port;
     await page.goto(`http://127.0.0.1:${porta}/nos-modelar/tools/modelar/visor-montagem.html`, { waitUntil: 'load' });
@@ -252,7 +257,7 @@ export async function capturarMontagem({
         enquadramento: metadados.enquadramento,
       });
     }
-    if (errosPagina.length > 0) throw new ErroCapturaMontagem('falha-visor', 'o visor privado relatou erro durante a captura.');
+    if (errosPagina.length > 0) throw new ErroCapturaMontagem('falha-visor', `o visor privado relatou erro durante a captura: ${[...errosPagina, ...respostasRuins].slice(0, 4).map((e) => String(e).slice(0, 300)).join(' | ')}${errosPagina.length + respostasRuins.length > 4 ? ` (e mais ${errosPagina.length + respostasRuins.length - 4})` : ''}`);
     return {
       ok: true,
       codigo: 0,

@@ -1,0 +1,708 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/volante",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/cima.ia.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "volante",
+        "tipo": "superficie",
+        "onde": "seção do aro e encontros raio-aro",
+        "sentido": "anguloso",
+        "evidencia": "Tresquartos az40 e isométrica isolada: aro e raios em arestas vivas de caixa, sem raio de concordância. A referência não resolve o volante, então o achado é de acabamento."
+      }
+    ],
+    "observacao": "Volante escuro, centrado no eixo da coluna, perpendicular a ela, de tamanho certo e com a forma prometida; a referência mostra o volante pequeno demais para julgar a seção do aro."
+  },
+  "partes": [
+    {
+      "nome": "volante",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a montagem v5 não gira instância: a junta do volante é só medida parada, sem curso",
+    "o relato do modelador trouxe seis pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 1, aro e raios em aresta viva: e a forma do rascunho aprovado e o proprio critico deu como acabamento; atribuido ao plano, fica para a pessoa decidir"
+  ],
+  "notaDePassagem": "Este volante é o do rascunho com 96 lados e o furo do eixo. O raio do furo, raioDoFuro, vem do vínculo volanteNoEixoDaColuna (22 + 0,5). O fundo do furo fica 0,5 mm acima do topo do eixo, e a porta cubo tem o centro nesse fundo, por isso a posição tem afastamento 0,5. O giro e o pivô vêm do derivar da coluna.",
+  "receita": {
+    "sha256": "sha256:36948b39dfb367d00e68025b7519749a8e79e518a07b7fe4cebeab8490901ab2",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 129,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/volante — o volante da empilhadeira: o aro, o cubo e os três raios, que giram em torno da coluna de direção."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Etapa da montagem `../../montagem.json` depois da coluna de direção (fatia 6 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * item 6 das partes do `../../ALINHAMENTO.md`, onde \"o volante gira em torno da coluna\"). A forma é a do rascunho que a pessoa aprovou"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * por imagem em 2026-11-10 (`../../referencias/protetor-posto.esboco.mjs`), levada para cá sem mudança de medida, com duas exceções: os"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * círculos com 96 lados (no rascunho, 64 no aro e 32 no cubo), e o furo do cubo, que o rascunho não tinha (o eixo da coluna entrava no"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * cubo maciço) e que aqui recebe o eixo com folga. O rascunho chama `montarVolante` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). De lado (região `volante` da lateral) o aro é uma barra inclinada 35 graus sobre a horizontal,"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * com o centro em z -473 e y 1.410 e 330 mm de corda; a TABELA do alinhamento não traz o diâmetro do volante, e o rascunho adotou 340."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * O volante é montado de pé, no plano perpendicular à coluna de pé, e girado como ela (`derivar` da coluna de direção)."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * A JUNTA. O volante gira em torno do eixo da coluna: o furo do cubo (`cubo`, cilindro interno) abraça o trecho do eixo que a coluna"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * publica (`eixoDoVolante`, cilindro externo de raio 22). O raio do furo vem da porta da coluna pelo vínculo da montagem, com 0,5 mm de"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * folga radial; o fundo do furo fica 0,5 mm acima do topo do eixo. As duas portas têm o centro no fim do trecho (o fundo do furo e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * topo do eixo) e o trecho para trás dele. A montagem põe o volante pela porta `cubo` na `eixoDoVolante`, no mesmo eixo, com o"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * afastamento de 0,5 mm da folga do fundo, e a relação `encaixaCilindrico` mede o encaixe."
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e a porta em mm; `montarVolante` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "import { TABELA as COLUNA, derivar as derivarColuna } from '../../coluna-direcao/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  /* O raio do furo do cubo: o do eixo da coluna (22) mais 0,5 mm de folga, pelo vínculo `volanteNoEixoDaColuna` da montagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  raioDoFuro: 22.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  /* A cor do rascunho: o escuro da carcaça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  cores: { escuro: CARCACA.cores.escuro },"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* Lados dos círculos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* O aro de 340 mm, de raio 145 a 170 e 30 mm de altura; o cubo de raio 45 e 50 mm de altura; três raios de 24 mm de largura e 16 de"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     altura, de 40 a 155 mm do centro, a 90, 210 e 330 graus. Tudo em torno do meio do cubo, na coluna de pé. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  aro: { raio: [145, 170], meia: 15, alemNoCorte: 5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  cubo: { raio: 45, meia: 25 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  raios: { angulos: [90, 210, 330], meiaLargura: 12, de: 40, ate: 155, meia: 8 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* O furo do cubo: do pé do cubo até 0,5 mm acima do topo do eixo, que acaba 10 mm abaixo do meio do cubo; o cortador sai 5 mm abaixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "     do pé. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  furo: { folgaNoTopo: 0.5, abaixoDoPe: 5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "const circulo = (cu, cv, r, n) => Array.from({ length: n }, (_, k) => [cu + r * Math.cos(2 * Math.PI * k / n), cv + r * Math.sin(2 * Math.PI * k / n)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "/** O giro (o da coluna), o topo do furo e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  const DC = derivarColuna();"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  const C = COLUNA.coluna;"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  const zc = C.saida.z; const yCubo = DC.yCubo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  const pe = yCubo - T.cubo.meia;"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  const topoDoFuro = yCubo - C.eixo.abaixoDoCubo + T.furo.folgaNoTopo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  /* o furo: o centro no fundo dele, e o trecho do pé do cubo ao fundo, para trás do centro, como a porta do eixo da coluna */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    cubo: { forma: 'cilindro', papel: 'interna', eixo: DC.eixoDaColuna, centro: DC.girar([0, topoDoFuro, zc]), raio: T.raioDoFuro, inicio: -(topoDoFuro - pe), fim: 0, referencia: [1, 0, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  return { DC, zc, yCubo, pe, topoDoFuro, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "/** Monta o volante no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem do furo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "export function montarVolante(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const { extY, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const cortar = (a, ...s) => booleana('subtrair', [a, ...s]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const { zc, yCubo } = D; const n = T.lados;"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  /* o aro (o anel), o cubo e os raios, de pé no meio do cubo; o furo; e o giro da coluna */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const AR = T.aro;"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const aro = cortar(extY(circulo(0, zc, AR.raio[1], n), yCubo - AR.meia, yCubo + AR.meia), extY(circulo(0, zc, AR.raio[0], n), yCubo - AR.meia - AR.alemNoCorte, yCubo + AR.meia + AR.alemNoCorte));"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const cubo = extY(circulo(0, zc, T.cubo.raio, n), D.pe, yCubo + T.cubo.meia);"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const R = T.raios;"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const raios = R.angulos.map((a) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    const c = Math.cos(a * Math.PI / 180); const s = Math.sin(a * Math.PI / 180);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    return extY([[-R.meiaLargura, R.de], [R.meiaLargura, R.de], [R.meiaLargura, R.ate], [-R.meiaLargura, R.ate]].map(([u, v]) => [u * c - v * s, zc + u * s + v * c]), yCubo - R.meia, yCubo + R.meia);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const furo = extY(circulo(0, zc, T.raioDoFuro, n), D.pe - T.furo.abaixoDoPe, D.topoDoFuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const volante = cortar(unir(aro, cubo, ...raios), furo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  estado.passos.push(['rotaciona', { eixo: 'x', graus: D.DC.graus, pivo: D.DC.pivo, sel: volante }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  parte('volante', volante, T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  return { furo };"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "/* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], rotaciona: ['pivo'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "const MEDIDAS_DA_PORTA = ['centro', 'ponto', 'raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta do furo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  const { furo } = montarVolante(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  /* a parede do furo: as laterais do cortador (as tampas dele foram consumidas pelo corte) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  return [...forma, ['publicarPorta', { id: 'cubo', de: { ...furo.origem, lado: { passo: 1, fase: 0 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    interface: Object.fromEntries(Object.entries(portas.cubo).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "export const CONTATOS = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  meta: { nome: 'empilhadeira/volante', desc: 'volante da empilhadeira: o aro, o cubo e os três raios, que giram em torno do eixo da coluna de direção' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    objeto: 'o volante de uma empilhadeira de contrapeso de 2,5 t, de 340 mm, no alto da coluna de direção e perpendicular a ela, que gira em torno do eixo dela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    referencias: ['../../referencias/cima.ia.png', '../../referencias/tras.ia.png', '../../referencias/frente.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    escala: { medida: 'diâmetro do aro do volante (rascunho; a lateral dá 330 de corda)', milimetros: 340 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      { nome: 'volante', forma: 'o volante escuro de 340 mm: o aro de 25 mm de largura e 30 de altura, o cubo de 90 mm com o furo do eixo, e três raios de 24 mm a 90, 210 e 330 graus, perpendicular à coluna, com o centro em z -479 e y 1.408', tecnica: 'anel e círculos de 96 lados e retângulos extrudados em y, unidos, menos o furo, girados em torno de x como a coluna' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "      'o volante fora do eixo da coluna, ou não perpendicular a ela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "      'o eixo da coluna cruzando o cubo, ou o volante solto do eixo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "      'o volante do tamanho errado: o aro com menos de 300 mm ou mais de 400',"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "      'cor trocada: o volante laranja ou cinza claro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  /* O extremo de cima, de trás e da esquerda do aro girado: o raio de fora e a meia altura dele, no plano da coluna, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "    const T = this.PARAMS; const D = derivar(T); const [, ay, az] = D.DC.eixoDaColuna;"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "    const [cx, cy, cz] = D.DC.girar([0, D.yCubo, D.zc]); const r = T.aro.raio[1]; const h = T.aro.meia;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    return [{ nome: 'aro, em cima, na frente e à esquerda', parte: 'volante', medida: 'maximo', em: [cx + r, cy + r * Math.abs(az) + h * Math.abs(ay), cz + r * Math.abs(ay) + h * Math.abs(az)], toleranciaMm: 0.5 }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[13]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az10.png",
+      "peca-lado-rasante-az100.png",
+      "peca-topo-rasante-az10.png",
+      "peca-topo-rasante-az100.png",
+      "peca-tresquartos-rasante-az40.png",
+      "peca-tresquartos-rasante-az130.png"
+    ]
+  }
+}

@@ -35,7 +35,10 @@
  * cita a origem do gerador, e a do `cilindro` são só as laterais: o cilindro repetido é a `extrusao` de `{ circulo }`.
  *
  * O CONTATO ESPERADO. `contato: { "<id>": "encosta" | "atravessa" | "folga" }` declara a relação esperada com outra forma, que o
- * relato de contatos (`contatos.js`) confere; `encosta` declara a dele.
+ * relato de contatos (`contatos.js`) confere; `encosta` declara a dele. A parte de passo cru não tem onde declarar, e por isso a opção
+ * aceita `contatos: [{ par: ["capo", "tampa"], relacao: "encosta" | "atravessa" | "folga", motivo: "..." }]`, o mesmo vocabulário,
+ * para qualquer par de partes da malha, de passo cru ou de forma: o relato o confere como confere o `contato` da forma, e mostra o
+ * motivo. O par cuja parte não existe na malha da opção é recusado.
  *
  * TUDO PELA MALHA QUE O NÚCLEO GEROU. A forma é executada sozinha pelo executor, já girada, e a caixa e a malha dela são as que o
  * atalho lê. A forma vira parte por `parte` com a seleção da origem do gerador, e anda por `transladar`, gira por `rotaciona`, se
@@ -44,8 +47,12 @@
  * cujas faces não ficam todas na parte, a que cita forma inexistente, a referência circular, os dois modos de posição juntos, o
  * campo desconhecido, a forma que não toca a outra e o gerador que o núcleo recusa.
  *
+ * A OPÇÃO SÓ DE PASSOS CRUS é executada uma vez: sem formas, a receita final é a dos próprios passos crus, e a execução que acha as
+ * partes dos crus para o atalho não tem a quem servir.
+ *
  * Núcleo puro: nenhum relógio, nenhum sorteio, nenhuma leitura de arquivo. `receitaDaOpcao(opcao)` devolve `{ receita, neutro,
- * partes, facesSemParte, formas }`, com a receita pronta para o executor e a bancada, e a caixa de cada forma em mm. */
+ * partes, facesSemParte, formas, contatos }`, com a receita pronta para o executor e a bancada, a caixa de cada forma em mm e os
+ * contatos declarados na opção. */
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { gaiolaPorLacos } from '../../../procedural/nucleo/gaiola-por-lacos.js';
 import { gaiolaPorEstacoes } from '../../../procedural/nucleo/gaiola-por-estacoes.js';
@@ -65,7 +72,8 @@ const CORES_POR_NOME = Object.freeze({
   amarelo: '#d8b43a', laranja: '#d97a2b', roxo: '#7a55a8',
 });
 const CHAVES_DA_FORMA = new Set(['id', 'op', 'args', 'ajudante', 'subdivisao', 'centro', 'por', 'sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'rotacao', 'repete', 'espelha', 'contato', 'oculto', 'cor', 'rotulo']);
-const CHAVES_DA_OPCAO = new Set(['titulo', 'nota', 'passos', 'topo', 'aliases', 'formas', 'legendas']);
+const CHAVES_DA_OPCAO = new Set(['titulo', 'nota', 'passos', 'topo', 'aliases', 'formas', 'legendas', 'contatos']);
+const CHAVES_DO_CONTATO = new Set(['par', 'relacao', 'motivo']);
 export const RELACOES = Object.freeze(['encosta', 'atravessa', 'folga']);
 /* a primeira origem livre do atalho: os passos crus usam as menores, e o atalho conta daqui para cima */
 const ORIGEM_DO_ATALHO = 1000;
@@ -80,9 +88,14 @@ export function caixaDaMalha(neutro, parte = null) {
   return caixaDosPontos(malhaDoNeutro(neutro, parte).pts);
 }
 
+/* quantas vezes o executor rodou, só para o teste contar as execuções de uma opção */
+let execucoes = 0;
+export const execucoesDoNucleo = () => execucoes;
+
 /** Executa uma receita pequena e devolve o neutro, ou recusa com os gritos do núcleo. */
 function executar(receita, onde) {
   let neutro;
+  execucoes += 1;
   try { ({ neutro } = executarReceita(receita)); } catch (erro) { recusar(`o núcleo recusou: ${String(erro.message).split('\n')[0]}`, onde); }
   if (neutro.orfaos?.length) recusar(`o núcleo recusou: ${neutro.orfaos.slice(0, 3).map((o) => `${o.op} ${o.ref ?? ''}: ${o.motivo}`.replace(/ +/g, ' ')).join('; ')}`, onde);
   return neutro;
@@ -116,6 +129,26 @@ function lerReferencia(texto, padrao, onde) {
   const lados = lerSufixo(sufixo);
   if (!lados) recusar(`a âncora "${sufixo}" de "${texto}" não existe: é "centro" ou de um a três lados de eixos distintos, como "+y" ou "+y-z"`, onde);
   return { id, lados, sufixo };
+}
+
+/** Os contatos declarados na opção, conferidos no formato: `[{ par: [a, b], relacao, motivo }]`, com o par uma vez só. */
+function lerContatosDaOpcao(lista, rotulo) {
+  if (lista === undefined) return [];
+  if (!Array.isArray(lista)) recusar('"contatos" é uma lista de { par: ["<parte>", "<parte>"], relacao, motivo }', rotulo);
+  const vistos = new Set();
+  return lista.map((c, i) => {
+    const onde = `${rotulo}, contatos[${i}]`;
+    if (!c || typeof c !== 'object' || Array.isArray(c)) recusar('o contato é { par: ["<parte>", "<parte>"], relacao, motivo }', onde);
+    for (const k of Object.keys(c)) if (!CHAVES_DO_CONTATO.has(k)) recusar(`campo "${k}" não existe no contato (aceitos: ${[...CHAVES_DO_CONTATO].join(', ')})`, onde);
+    const { par, relacao, motivo } = c;
+    if (!Array.isArray(par) || par.length !== 2 || !par.every((n) => typeof n === 'string' && n) || par[0] === par[1]) recusar('"par" são os nomes de duas partes diferentes', onde);
+    if (!RELACOES.includes(relacao)) recusar(`"relacao" é ${RELACOES.join(', ')} (veio ${JSON.stringify(relacao)})`, onde);
+    if (typeof motivo !== 'string' || !motivo.trim()) recusar('"motivo" é o texto que diz por que as duas partes têm essa relação', onde);
+    const chave = [...par].sort().join('|');
+    if (vistos.has(chave)) recusar(`o par ${par[0]} e ${par[1]} já foi declarado`, onde);
+    vistos.add(chave);
+    return { par: [...par], relacao, motivo };
+  });
 }
 
 /** Os passos que geram a forma (em metro), na origem do gerador, e o TOPO que ela acrescenta. */
@@ -164,6 +197,7 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
   });
   const topo = Object.fromEntries(Object.entries(opcao.topo ?? {}).map(([k, p]) => [k, pontoEmMetro(p)]));
   const aliases = opcao.aliases ?? [];
+  const contatos = lerContatosDaOpcao(opcao.contatos, rotulo);
 
   const porId = new Map();
   for (const f of formas) {
@@ -180,7 +214,8 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
 
   /* as partes dos passos crus, citáveis pelo nome */
   const doCru = new Map();
-  if (crus.length) {
+  /* sem formas, ninguém cita parte de passo cru, e a execução final, que é a dos mesmos passos, basta */
+  if (crus.length && formas.length) {
     const n = executar({ meta: { nome: 'passos-crus' }, PASSOS: crus, ...(Object.keys(topo).length ? { TOPO: topo } : {}), ...(aliases.length ? { ALIASES: aliases } : {}) }, `${rotulo}, passos crus`);
     for (const parte of new Set([...n.F.values()].map((face) => face.parte).filter(Boolean))) {
       if (porId.has(parte)) recusar(`a forma "${parte}" tem o nome de uma parte dos passos crus`, rotulo);
@@ -369,7 +404,7 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
   }
   const receita = { meta: { nome: nome ?? (opcao.titulo ?? 'opcao') }, PASSOS, ...(Object.keys(MATERIAIS).length ? { MATERIAIS } : {}), ...(Object.keys(topo).length ? { TOPO: topo } : {}), ...(aliases.length ? { ALIASES: aliases } : {}) };
   /* a receita inteira passa pelo executor, que é a conferência final: o que o núcleo não faz volta aqui com o motivo */
-  const neutro = executar(receita, rotulo);
+  const neutro = executar(receita, formas.length ? rotulo : `${rotulo}, passos crus`);
   for (const id of partes) {
     const prevista = prontas.get(id).caixa; const naMalha = caixaDaMalha(neutro, id);
     const dif = naMalha ? Math.max(...[0, 1, 2].flatMap((k) => [Math.abs(prevista.min[k] - naMalha.min[k]), Math.abs(prevista.max[k] - naMalha.max[k])])) : Infinity;
@@ -378,8 +413,9 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
   const nomes = new Set(partes);
   let facesSemParte = 0;
   for (const face of neutro.F.values()) { if (face.parte) nomes.add(face.parte); else facesSemParte += 1; }
+  for (const c of contatos) for (const n of c.par) if (!nomes.has(n)) recusar(`"contatos" cita a parte "${n}", que não está na malha desta opção (partes: ${[...nomes].join(', ')})`, rotulo);
   return {
-    receita, neutro, partes: [...nomes], facesSemParte,
+    receita, neutro, partes: [...nomes], facesSemParte, contatos,
     formas: formas.map((f) => ({ id: f.id, oculto: f.oculto === true, caixa: emMm(prontas.get(f.id).caixa), cor: f.cor ?? null, rotulo: f.rotulo ?? null, contato: { ...(f.contato ?? {}), ...(f.encosta !== undefined ? { [lerLado(f.encosta, 'encosta', '').id]: 'encosta' } : {}) } })),
   };
 }

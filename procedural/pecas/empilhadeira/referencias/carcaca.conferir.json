@@ -1,0 +1,191 @@
+{
+ "objeto": "a carcaça de uma empilhadeira (corpo, piso, painel, tampa do motor, colunas e traseira)",
+ "cores": {
+  "laranja": "#e2641e",
+  "cinza": "#6b7074",
+  "escuro": "#1e2022"
+ },
+ "partes": {
+  "chassi": "cinza",
+  "paralamas": "laranja",
+  "laterais": "laranja",
+  "furo": "escuro",
+  "piso": "cinza",
+  "degraus": "cinza",
+  "painel": "escuro",
+  "tampaMotor": "cinza",
+  "colunas": "cinza",
+  "pocoTraseiro": "escuro",
+  "capo": "laranja",
+  "tampa": "cinza",
+  "grade": "cinza",
+  "fundoGrade": "escuro",
+  "contrapeso": "cinza",
+  "fundoRasgo": "escuro",
+  "fundoNicho": "escuro",
+  "pino": "cinza",
+  "trinco": "cinza",
+  "tapete": "escuro",
+  "tunel": "escuro"
+ },
+ "dentro": {
+  "grade": "capo",
+  "fundoGrade": "capo",
+  "furo": "laterais",
+  "tunel": "laterais"
+ },
+ "vistasDaSobra": [
+  "superior",
+  "direita"
+ ],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {
+  "direita": {
+   "referencia": "carcaca-lado.ia.png",
+   "caixaRef": [
+    350,
+    269,
+    903,
+    494
+   ],
+   "ignorar": [
+    [
+     344,
+     269,
+     392,
+     425
+    ],
+    [
+     395,
+     269,
+     450,
+     345
+    ],
+    [
+     358,
+     405,
+     445,
+     494
+    ],
+    [
+     700,
+     425,
+     800,
+     494
+    ]
+   ],
+   "fora": "a torre (as duas hastes inclinadas) com o pé dela, a coluna de direção, as rodas, os cubos dianteiro e traseiro, os eixos e a suspensão traseira",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "do lado esquerdo da máquina, frente à esquerda"
+  },
+  "frontal": {
+   "referencia": "carcaca-frente.ia.png",
+   "caixaRef": [
+    366,
+    268,
+    725,
+    493
+   ],
+   "ignorar": [
+    [
+     440,
+     300,
+     650,
+     493
+    ],
+    [
+     378,
+     425,
+     470,
+     480
+    ],
+    [
+     620,
+     425,
+     712,
+     480
+    ]
+   ],
+   "fora": "o pé da torre com o suporte da inclinação (o quadro cinza do meio e os montantes cinza largos que descem até a base), o eixo dianteiro com os cubos e o diferencial, as rodas",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de frente"
+  },
+  "traseira": {
+   "referencia": "carcaca-tras.ia.png",
+   "caixaRef": [
+    386,
+    271,
+    687,
+    511
+   ],
+   "ignorar": [
+    [
+     386,
+     424,
+     432,
+     511
+    ],
+    [
+     644,
+     424,
+     687,
+     511
+    ]
+   ],
+   "fora": "o eixo traseiro, as rodas e os pneus escuros dos lados e embaixo do contrapeso, e a sombra no chão",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de trás"
+  },
+  "superior": {
+   "referencia": "carcaca-cima.ia.png",
+   "girar": 270,
+   "caixaRef": [
+    138,
+    78,
+    458,
+    664
+   ],
+   "ignorar": [
+    [
+     118,
+     540,
+     142,
+     671
+    ],
+    [
+     450,
+     540,
+     474,
+     671
+    ],
+    [
+     118,
+     150,
+     143,
+     270
+    ],
+    [
+     450,
+     150,
+     472,
+     270
+    ]
+   ],
+   "fora": "os pneus que aparecem dos lados",
+   "grade": [
+    4,
+    3
+   ],
+   "visto": "de cima, frente embaixo (a referência é girada 270 graus no sentido horário)"
+  }
+ }
+}

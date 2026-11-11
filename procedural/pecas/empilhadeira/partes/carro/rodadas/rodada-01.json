@@ -1,0 +1,897 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/carro",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "gradeCarga",
+        "tipo": "superficie",
+        "onde": "montantes e barras do quadro, em todas as arestas",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica da parte e tresquartos rasante: o quadro é só caixa de aresta viva, e a grade da referência frente.ia.png é tubo de cantos arredondados."
+      },
+      {
+        "parte": "placaGarfos",
+        "tipo": "uniao",
+        "onde": "montantes traseiros, trecho que entra na torre (z 235 a 353)",
+        "sentido": "afastado",
+        "evidencia": "Na frontal montada os montantes ficam a cerca de 4 px da face interna das hastes da torre. Nas vistas superior e direita montadas somem atrás dela, e nenhuma vista mostra a entrada no canal. Não confirmado."
+      }
+    ],
+    "observacao": "Estrutura, centro, largura e cor batem com a referência. Ficou sem confirmação visual o posicionamento dos montantes nos canais, e a superfície é só caixa de aresta viva."
+  },
+  "partes": [
+    {
+      "nome": "placaGarfos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "gradeCarga",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a placa do rascunho tinha as chapas das pontas encostadas face a face nas barras e a união deixava 24 arestas abertas; o descrever dava o contato com a grade como não acontecido",
+    "a auditoria da montagem dá a face de trás da haste sobre a face das barras como interpenetração sem profundidade, e o par pediu expectativa",
+    "o relato do modelador trouxe quatro pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao",
+    "rodada 1, montantes sem entrada visivel no canal: o proprio critico deu como nao confirmado; a receita poe os montantes a 3 mm da aba do canal interno e a auditoria nao acha intersecao; atribuido a ferramenta, falta a vista em corte",
+    "rodada 1, grade em caixa de aresta viva: a forma e a do rascunho que a pessoa aprovou; atribuido ao plano, fica como detalhe para ela decidir"
+  ],
+  "notaDePassagem": "Referencial da máquina, pose identidade. As chapas das pontas entram 1 mm nas barras para a malha fechar. O montante sai da ponta da aba do canal interno menos a folga de 3 mm, e a guia fica na altura do pé do canal. Os garfos penduram na face da frente da barra de cima, a 280 mm do centro.",
+  "receita": {
+    "sha256": "sha256:cc622ad5026eef4b9066cd244716b6802d5d2b524dc67cba0d5a97e0ee7db46c",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 164,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/carro — o carro porta-garfos da torre da empilhadeira: a placa (as duas barras de 1.000 mm à frente da torre, as chapas"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * das pontas, os dois montantes de trás que correm por dentro dos canais internos e a travessa das correntes do cilindro) com a grade"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * de carga em cima, que sobem juntas, numa peça rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do cilindro de elevação (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * item 4 das partes do `../../ALINHAMENTO.md`, segunda metade da torre). A forma é a do rascunho que a pessoa aprovou por imagem em"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * 2026-11-10 (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * `montarCarro` daqui, de modo que a geometria tem uma fonte só."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho, que as tirou das vistas). A largura de 1.000 é a da TABELA do alinhamento (classe II; a vista"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * de frente dá 836 e a de cima 920). As barras ficam à frente da torre, de z 430 a 480: a de baixo de y 170 a 240 e a de cima de 540"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * a 640 (vista de frente, linhas 480 a 497 e 388 a 415, com os garfos embaixo). As chapas das pontas, de 30 mm, ligam as duas barras"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * (de frente o quadro escuro desce dos dois lados até a barra de baixo). Os montantes de trás, de 55 mm de largura, vão de z 235 à"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * face de trás das barras e correm por dentro dos canais internos, a 3 mm da ponta das abas deles (x 198); a travessa entre eles, de"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * z 235 a 300 e y 590 a 640, recebe as correntes do cilindro de elevação. A grade de carga é o quadro de 1.000 sobre a barra de cima,"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * de z 445 a 480, com os montantes de 30 mm, a barra de cima de 1.200 a 1.230 e a do meio de 890 a 910 (vista de frente: topo na"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * linha 247, barra do meio na 347; lateral 1.236)."
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * O ENCAIXE. A origem é a da máquina, a mesma da torre: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * esquerda de quem dirige e a frente em +z; o carro está embaixo, na pose de transporte. A montagem põe o carro no canal interno pela"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * porta `guiaNoInterno` (a face de fora do montante esquerdo) sobre a porta `guiaDoCarro` do canal interno (a ponta da aba da frente"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * do canal esquerdo), afastada da folga; o ponto das duas fica na altura do pé do canal interno. Os garfos penduram nas portas"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * `apoioDoGarfoEsquerdo` e `apoioDoGarfoDireito`, a face da frente da barra de cima no centro de cada garfo."
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * AS JUNTAS QUE A MONTAGEM AINDA NÃO TEM. O carro sobe na vertical pelos canais internos (2.950 mm no rascunho, o dobro do canal pelas"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * correntes); a montagem v5 não tem guia linear medida nem plano sobre plano (ela mede encaixe cilíndrico e assento anular), e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * posição sai das duas faces planas, sem relação medida."
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula as caixas e as portas em mm; `montarCarro` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": " * { passos, topo, origem } (o mesmo que o rascunho da máquina usa); `gerarPassos` converte para metro com `m()`, campo de medida a"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": " * campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "import { TABELA as INTERNO, derivar as derivarInterno } from '../../canal-interno/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  /* A cor do rascunho: o quase preto da vista de frente (escuro mais claro que o fundo), da placa, da grade e dos garfos. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  cores: { preto: '#26282b' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  /* A meia largura da placa e da grade (1.000 mm). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  meia: 500,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* O fundo das barras, em z: a face de trás e a da frente, onde os garfos penduram. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  z: [430, 480],"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* As duas barras, em y. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  barraBaixo: [170, 240],"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  barraCima: [540, 640],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  /* As chapas das pontas, entre as barras, de 30 mm na ponta; entram 1 mm em cada barra, para a união não deixar as arestas da"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "     divisa abertas (encostadas face a face, as quinas da chapa ficavam com uma face só). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  ponta: { largura: 30, entra: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* Os montantes de trás: 55 mm de largura, a 3 mm da ponta das abas do canal interno, de z 235 à face de trás das barras. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  montante: { largura: 55, folga: 3, tras: 235 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* A travessa das correntes do cilindro, entre os montantes, 1 mm por dentro da face de fora deles. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  travessa: { z: [235, 300], y: [590, 640], recuo: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  /* A grade de carga sobre a barra de cima: o fundo, os montantes de 30 mm, a barra de cima e a do meio; as barras param 1 mm por"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "     dentro da meia largura. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  grade: { z: 445, montante: 30, topo: 1230, barraCima: 30, barraMeio: [890, 910], recuo: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* O centro de cada garfo, a meia distância dos dois (560 entre centros, vista de frente na escala da carcaça). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  garfo: 280,"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "/** As caixas e as portas, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const DI = derivarInterno();"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  /* a face de fora do montante esquerdo, a 3 mm da ponta das abas do canal interno */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const fora = INTERNO.dentro - T.montante.folga;"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const montante = { x: [fora - T.montante.largura, fora], z: [T.montante.tras, T.z[0]], y: [T.barraBaixo[0], T.barraCima[1]] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  /* o ponto da guia: a ponta da aba da frente do canal interno, na altura do pé dele (o carro embaixo, na pose de transporte) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const zDaAba = DI.z[1] - INTERNO.aba / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const yDoApoio = (T.barraCima[0] + T.barraCima[1]) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const apoio = (x) => ({ forma: 'plano', papel: 'recebe', ponto: [x, yDoApoio, T.z[1]], normal: [0, 0, 1], extensao: [2 * T.meia, T.barraCima[1] - T.barraCima[0]], referencia: [0, 1, 0] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    guiaNoInterno: { forma: 'plano', papel: 'apoia', ponto: [fora, INTERNO.pe, zDaAba], normal: [1, 0, 0], extensao: [montante.z[1] - montante.z[0], montante.y[1] - montante.y[0]], referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    apoioDoGarfoEsquerdo: apoio(T.garfo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    apoioDoGarfoDireito: apoio(-T.garfo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  return { fora, montante, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "/** Monta o carro no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve as origens das portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "export function montarCarro(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const { extY, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const novo = () => { estado.origem += 1; return estado.origem; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  /* a cópia do outro lado, pelo espelho em x = 0 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const espelho = (sel) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    estado.passos.push(['espelha', { origemId: id, eixo: 'x', pos: 0, derivaDe: sel.origem, sel: { origem: sel.origem } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    return { origem: { op: 'espelha', id, de: sel.origem } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const par = (sel) => unir(sel, espelho(sel));"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const caixaY = (x0, x1, z0, z1, y0, y1) => extY([[x0, z0], [x1, z0], [x1, z1], [x0, z1]], y0, y1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const W = T.meia; const M = D.montante; const R = T.travessa; const G = T.grade;"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  /* PLACA: as duas barras, o montante e a chapa da ponta de cada lado (o esquerdo e o espelho dele) e a travessa das correntes */"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  const barraBaixo = caixaY(-W, W, T.z[0], T.z[1], ...T.barraBaixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  const barraCima = caixaY(-W, W, T.z[0], T.z[1], ...T.barraCima);"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  const montante = caixaY(M.x[0], M.x[1], M.z[0], M.z[1], M.y[0], M.y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  const ponta = caixaY(W - T.ponta.largura, W, T.z[0], T.z[1], T.barraBaixo[1] - T.ponta.entra, T.barraCima[0] + T.ponta.entra);"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  const travessa = caixaY(-M.x[1] + R.recuo, M.x[1] - R.recuo, R.z[0], R.z[1], R.y[0], R.y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  parte('placaGarfos', unir(barraBaixo, barraCima, par(unir(montante, ponta)), travessa), T.cores.preto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  /* GRADE: os montantes de cada lado sobre a barra de cima, a barra de cima e a do meio */"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const lateral = caixaY(W - G.montante, W, G.z, T.z[1], T.barraCima[1], G.topo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const barras = [caixaY(-W + G.recuo, W - G.recuo, G.z, T.z[1], G.topo - G.barraCima, G.topo), caixaY(-W + G.recuo, W - G.recuo, G.z, T.z[1], ...G.barraMeio)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  parte('gradeCarga', unir(par(lateral), ...barras), T.cores.preto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  return { montante, barraCima };"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "/* Os campos de medida de cada operação e das portas: neles todo número é milímetro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], espelha: ['pos'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, as três portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const { montante, barraCima } = montarCarro(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  return [...forma, porta('guiaNoInterno', montante), porta('apoioDoGarfoEsquerdo', barraCima), porta('apoioDoGarfoDireito', barraCima)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  { par: ['gradeCarga', 'placaGarfos'], motivo: 'os montantes da grade assentam na face de cima da barra de cima da placa, em y 640, de x 470 a 500 de cada lado' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  meta: { nome: 'empilhadeira/carro', desc: 'carro porta-garfos da empilhadeira: a placa de 1.000 mm com as duas barras, os montantes que correm nos canais internos e a travessa das correntes, e a grade de carga em cima' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z; embaixo, na pose de transporte' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    objeto: 'o carro porta-garfos da torre duplex de uma empilhadeira de 2,5 t, com a grade de carga, embaixo, na pose de transporte: a placa à frente da torre, os montantes que correm por dentro dos canais internos e a grade sobre a placa',"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    escala: { medida: 'largura do carro porta-garfos (TABELA do alinhamento, classe II)', milimetros: 1000 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "      { nome: 'placaGarfos', forma: 'placa quase preta de 1.000 mm em z 430 a 480: barras em y 170 a 240 e 540 a 640, chapas de 30 mm nas pontas, montantes em x 140 a 195 e z 235 a 430, de y 170 a 640, e a travessa entre eles em z 235 a 300, y 590 a 640', tecnica: 'caixas extrudadas em y: as duas barras, o montante unido à chapa da ponta e o espelho dele, e a travessa, unidos' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "      { nome: 'gradeCarga', forma: 'o quadro quase preto de 1.000 mm sobre a barra de cima, de z 445 a 480, com os montantes de 30 mm nas pontas, de y 640 a 1.230, a barra de cima de 1.200 a 1.230 e a do meio de 890 a 910', tecnica: 'caixas extrudadas em y: o montante e o espelho dele unidos às duas barras' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "      'o carro fora do centro da largura, ou mais estreito que a torre',"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "      'os montantes de trás cruzando os canais internos ou fora deles',"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "      'a grade solta da placa, ou mais estreita que ela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "      'o carro alto demais para a pose de transporte, com os garfos fora do chão',"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "      'cor trocada: o carro laranja ou cinza claro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "    const T = this.PARAMS; const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "      { nome: 'canto de cima da frente da placa', parte: 'placaGarfos', medida: 'maximo', em: [T.meia, T.barraCima[1], T.z[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "      { nome: 'canto de baixo de trás da placa, nos montantes', parte: 'placaGarfos', medida: 'minimo', em: [-T.meia, T.barraBaixo[0], D.montante.z[0]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "      { nome: 'topo da grade', parte: 'gradeCarga', medida: 'maximo', em: [T.meia, T.grade.topo, T.z[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "      { nome: 'pé da grade', parte: 'gradeCarga', medida: 'minimo', em: [-T.meia, T.barraCima[1], T.grade.z], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[11], PASSOS[20]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az90.png",
+      "peca-lado-rasante-az180.png",
+      "peca-topo-rasante-az40.png",
+      "peca-topo-rasante-az130.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png"
+    ]
+  }
+}

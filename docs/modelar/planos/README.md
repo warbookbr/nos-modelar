@@ -5,10 +5,11 @@
 **Planos ativos:**
 
 1. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: a etapa 8, com a frente e a lanterna traseira aprovadas e uma rodada de acabamento (moldura do arco, grade, aro da luz de canto, pé do para-brisa), os acabamentos que restam da etapa 7 e a etapa de materiais, sobre o plano dos materiais realistas.
-2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/vistas-para-critica.mjs`, `src/autoria/porta-confere-forma.js`. Em aberto: o exportador que lê a montagem (fatia 2), com as escolhas, o .blend, a página de importação e as normais, e a limpeza dos contornos do braço superior.
+2. [as partes do braço](2026-09-26-as-partes-do-braco.md). Território: `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `src/autoria/porta-confere-forma.js`. Em aberto: o exportador que lê a montagem (fatia 2), com as escolhas, o .blend, a página de importação e as normais, e a limpeza dos contornos do braço superior.
 3. [costuras e furos limpos](2026-11-09-costuras-e-furos-limpos.md). Território: `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`. Em aberto: a fatia 1, as réguas e as peças de prova.
 4. [ferramentas de conferência e de vista](2026-11-09-ferramentas-de-conferencia-e-vista.md). Território: `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`. Em aberto: a fatia 1, a dobra aceita pela cadeia inteira.
 5. [abertura na vizinhança de todo vão](2026-11-09-abertura-na-vizinhanca-de-todo-vao.md). Território: `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `tools/fixtures/aberturas-em-teste/`, `tools/modelar/acervo-real.test.mjs`, `tools/modelar/guardas/abre-na-bancada.test.mjs`, `tools/modelar/guardas/guarda-tempo-do-descrever.mjs`. Em aberto: a fatia 1, as peças de prova dos três motivos.
+6. [núcleo para qualquer mecanismo](2026-11-10-nucleo-para-qualquer-mecanismo.md). Território: `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`. Em aberto: a fatia 1, o fluxo único; a fatia 0 foi entregue.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
@@ -24,7 +25,9 @@ A lista está em ordem de prioridade. A ordem desempata quando dois planos preci
 receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10-16, com as oito peças no núcleo, a montagem
 auditada e o avião aprovado pela pessoa; a picape, o braço robótico, o carrinho de mão e a empilhadeira vêm em seguida, na ordem
 que a pessoa escolher. [As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14, e o código delas saiu em 2026-10-25.
-Em rascunho: [ferramenta de material](2026-11-08-ferramenta-de-material.md), para ver um material em segundos, compor relevos e reaproveitar materiais por nome; pode ser ativado, porque o plano dos materiais realistas fechou.
+A [empilhadeira](encerrados/2026-11-09-empilhadeira.md) fechou em 2026-11-10, com dezenove receitas e as vinte e três etapas da montagem fixas pela pessoa; o sucessor é o plano do núcleo para qualquer mecanismo.
+
+Em rascunho: [ferramenta de material](2026-11-08-ferramenta-de-material.md), para ver um material em segundos, compor relevos e reaproveitar materiais por nome; pode ser ativado, porque o plano dos materiais realistas fechou. [Rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md), para o degrau, o sulco e a borda rebaixada sobre a superfície de um corpo, com a borda no raio pedido; espera um lugar de plano ativo.
 
 A crônica dos planos concluídos, cancelados e congelados, com a tabela de concluídos e a abertura em curso, saiu deste índice e está em [`encerrados/README.md`](encerrados/README.md), na seção de crônica. Os congelados que ainda contam têm pasta própria em [`congelados/`](congelados/README.md).
 
@@ -65,7 +68,7 @@ Todo plano curto deve declarar:
 7. resultado, decisão e caminho de encerramento.
 
 Estados aceitos nos planos executivos datados: `rascunho`, `pronto`, `ativo`,
-`concluído` e `cancelado`. Até 5 planos podem estar `ativo` ao mesmo tempo, cada um com território declarado (seção abaixo).
+`concluído` e `cancelado`. Até 6 planos podem estar `ativo` ao mesmo tempo, cada um com território declarado (seção abaixo); eram 5 até 2026-11-10, quando duas sessões em paralelo abriram cada uma um plano sobre a mesma base e a pessoa deixou a decisão com quem conduzia.
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
 Um plano só fica ativo quando tem objetivo, escopo, gates, território, critério de

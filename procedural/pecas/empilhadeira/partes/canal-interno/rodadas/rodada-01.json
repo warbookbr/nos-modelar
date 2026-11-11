@@ -1,0 +1,714 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/canal-interno",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/frente.ia.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "A forma bate com o prometido e com a referência frontal, sem defeito estrutural. A lista vazia não é aprovação, e o critério do topo do interno contra o do externo não pôde ser conferido nas vistas."
+  },
+  "partes": [
+    {
+      "nome": "canaisInternos",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a montagem v5 só mede encaixe cilíndrico e assento anular: a guia vertical do canal interno não tem relação medida, só posição por face plana",
+    "o relato do modelador trouxe tres pecas num texto so, e a rodada foi montada por quem conduz com o bloco desta peca e o veredito do critico sem edicao"
+  ],
+  "notaDePassagem": "As medidas saem da TABELA da torre com as folgas de 2 mm na alma e 4 mm em cada aba, o que reproduz o rascunho (x 198 a 288, z 124 a 348). A posição põe a face da alma do canal esquerdo na face da alma do externo, afastada 2 mm. O afastamento da montagem repete folga.alma.",
+  "receita": {
+    "sha256": "sha256:8430c7b34167128c6d6f188423c3aa48d8f8de946aa06f0cf02ea8039df8f8f2",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 132,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/canal-interno — o canal interno da torre da empilhadeira: os dois canais em U, abertos para dentro, que correm dentro"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * dos canais externos da torre, e a travessa de cima entre eles, que leva as polias das correntes, numa peça rígida."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa da montagem `../../montagem.json` depois da torre (fatia 4 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`, item 4"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa aprovou por imagem em 2026-11-10"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * (`../../referencias/torre-garfos.esboco.mjs`), levada para cá sem mudança de medida; o rascunho passou a chamar `montarCanalInterno`"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * daqui, de modo que a geometria tem uma fonte só."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * DE ONDE VEM CADA MEDIDA (do rascunho). A vista de frente (`frente.ia.png`) mostra o canal interno de 15 px ao lado do externo, das"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * colunas 477 a 491 e 598 a 611, com o externo e o interno chegando juntos ao topo da torre recolhida (rodada 1 do rascunho, A2 e A3:"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * com o externo 60 mm abaixo aparecia um degrau que a referência não tem). O U do interno se encaixa no U do externo: a alma, de 20 mm,"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * corre entre as abas do externo com 2 mm de folga para a alma dele e 4 mm para cada aba, e as abas de 20 mm vão para dentro até x"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * 198, de modo que de frente o interno aparece de 198 a 261, ao lado do externo. Essas folgas e as medidas do externo são da TABELA"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * da torre, de onde esta receita as tira; o pé do interno fica em y 260 e a travessa de cima vai de y 2.030 ao topo, com a frente em"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * z 350, onde as correntes descem."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * O ENCAIXE. A origem é a da máquina, a mesma da torre: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * esquerda de quem dirige e a frente em +z; a peça está recolhida, com o topo no topo da torre. A montagem põe o canal interno na"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * torre pela porta `guiaNoExterno` (a face de fora da alma do canal interno esquerdo) sobre a porta `guiaDoCanalInterno` da torre (a"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * face de dentro da alma do canal externo esquerdo), afastada da folga lateral."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * A JUNTA QUE A MONTAGEM AINDA NÃO TEM. O canal interno sobe na vertical dentro do externo (até 1.475 mm, no rascunho); a montagem v5"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * não tem articulação nem guia linear medida (ela mede encaixe cilíndrico e assento anular), e a posição sai das duas faces planas,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * sem relação medida."
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os perfis e a porta em mm; `montarCanalInterno` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": " * { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "import { TABELA as TORRE } from '../../torre/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "import { ferramentas } from '../../carcaca/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* A cor do rascunho: o cinza da torre. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  cores: { aco: TORRE.cores.aco },"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  /* As folgas para o canal externo: da alma do interno à alma do externo, e de cada aba do interno à aba do externo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  folga: { alma: 2, aba: 4 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  /* A seção do U: alma e abas de 20 mm, e a aba vai para dentro até x 198. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  alma: 20,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  aba: 20,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  dentro: 198,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* O pé do canal, em y; o topo é o da torre. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  pe: 260,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* A travessa de cima, entre as almas: 70 mm de altura no topo, de trás das abas de trás até z 350, e 1 mm antes da face de fora das"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "     almas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  travessa: { altura: 70, frente: 350, recuo: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "/** O perfil e a porta, em mm, no referencial da máquina. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  const E = TORRE.externo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const fora = E.x[1] - E.alma - T.folga.alma;"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  const z = [TORRE.tras + E.aba + T.folga.aba, TORRE.frente - E.aba - T.folga.aba];"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  const y = [T.pe, E.y[1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* o U do canal interno esquerdo em [x, z], aberto para dentro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  const uInterno = [[T.dentro, z[0]], [fora, z[0]], [fora, z[1]], [T.dentro, z[1]], [T.dentro, z[1] - T.aba],"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    [fora - T.alma, z[1] - T.aba], [fora - T.alma, z[0] + T.aba], [T.dentro, z[0] + T.aba]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    guiaNoExterno: { forma: 'plano', papel: 'apoia', ponto: [fora, y[1], (z[0] + z[1]) / 2], normal: [1, 0, 0], extensao: [z[1] - z[0], y[1] - y[0]], referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  return { fora, z, y, uInterno, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "/** Monta o canal interno no estado { passos, topo, origem }, em mm, no referencial da máquina, e devolve a origem da porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "export function montarCanalInterno(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const { extY, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const unir = (...s) => booleana('unir', s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const novo = () => { estado.origem += 1; return estado.origem; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const espelho = (sel) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    const id = novo();"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    estado.passos.push(['espelha', { origemId: id, eixo: 'x', pos: 0, derivaDe: sel.origem, sel: { origem: sel.origem } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    return { origem: { op: 'espelha', id, de: sel.origem } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const par = (sel) => unir(sel, espelho(sel));"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const R = T.travessa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  const meia = D.fora - R.recuo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const canal = extY(D.uInterno, D.y[0], D.y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  const travessa = extY([[-meia, D.z[0]], [meia, D.z[0]], [meia, R.frente], [-meia, R.frente]], D.y[1] - R.altura, D.y[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  parte('canaisInternos', unir(par(canal), travessa), T.cores.aco);"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  return { canal };"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "const MEDIDAS = { extrusao: ['perfil', 'em', 'altura'], espelha: ['pos'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta da guia. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const { canal } = montarCanalInterno(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const forma = estado.passos.map(([op, args]) => [op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMetro(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  const porta = (id, de) => ['publicarPorta', { id, de: de.origem, interface: Object.fromEntries(Object.entries(portas[id]).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  return [...forma, porta('guiaNoExterno', canal)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "/* Uma parte só: os dois canais e a travessa são um corpo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "export const CONTATOS = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  meta: { nome: 'empilhadeira/canal-interno', desc: 'canal interno da torre da empilhadeira: dois canais em U abertos para dentro, que correm dentro dos externos, e a travessa de cima' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  TOPO: { origem: 'a da máquina: o chão sob o centro do eixo dianteiro, no meio da largura; y para cima, +x à esquerda de quem dirige e a frente em +z; recolhido' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    objeto: 'o canal interno da torre duplex de 3 m de uma empilhadeira de 2,5 t: os dois canais que sobem dentro dos externos, com a travessa de cima, recolhido',"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    escala: { medida: 'altura do canal interno recolhido, do pé ao topo da torre', milimetros: 1840 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      { nome: 'canaisInternos', forma: 'dois canais em U cinza de pé, de y 260 a 2.100, de x 198 a 288 e z 124 a 348 de cada lado, abertos para dentro, com a alma entre as abas do canal externo, e a travessa de cima entre as almas, de y 2.030 a 2.100 e z 124 a 350', tecnica: 'U extrudado em y e o espelho dele, unidos à travessa extrudada em y' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "      'o canal interno cruzando o canal externo, ou fora do U dele',"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "      'o topo do interno fora do topo do externo, na torre recolhida',"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "      'o canal sem o U aberto para dentro, ou sem a travessa de cima',"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "      'cor trocada: o canal laranja ou escuro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "    const D = derivar(this.PARAMS);"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "      { nome: 'topo da frente do canal esquerdo', parte: 'canaisInternos', medida: 'maximo', em: [D.fora, D.y[1], this.PARAMS.travessa.frente], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "      { nome: 'pé de trás do canal direito', parte: 'canaisInternos', medida: 'minimo', em: [-D.fora, D.y[0], D.z[0]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[7]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az240.png",
+      "peca-tresquartos-rasante-az330.png"
+    ]
+  }
+}

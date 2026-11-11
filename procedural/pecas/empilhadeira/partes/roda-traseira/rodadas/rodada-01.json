@@ -1,0 +1,687 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "empilhadeira/roda-traseira",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/empilhadeira/referencias/tras.ia.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "disco",
+        "tipo": "uniao",
+        "onde": "face do disco sobre os furos de fixação do cubo",
+        "sentido": "atravessando",
+        "evidencia": "Em direita-orto e no montado esquerda os furos do cubo aparecem só como fatias na borda do furo central. A chapa parece tapar os seis furos, que deviam estar livres."
+      },
+      {
+        "parte": "pneu",
+        "tipo": "ausencia",
+        "onde": "relevo da banda",
+        "sentido": "faltando",
+        "evidencia": "tras.ia.png mostra pneus com garras na banda. O modelo tem banda lisa, conforme o plano. É só divergência com a referência."
+      },
+      {
+        "parte": "pneu",
+        "tipo": "superficie",
+        "onde": "flanco, do talão à banda",
+        "sentido": "anguloso",
+        "evidencia": "Em frontal-orto o flanco é uma parede reta e vertical entre o talão e o ombro, sem o bojo prometido."
+      },
+      {
+        "parte": "pneu",
+        "tipo": "superficie",
+        "onde": "ombro, cantos superior e inferior do perfil",
+        "sentido": "facetado",
+        "evidencia": "Em frontal-orto o arco largo de 62 mm aparece como três facetas retas, canto chanfrado de bloco. O arco prometido é contínuo."
+      },
+      {
+        "parte": "rodaTraseiraEsquerda",
+        "tipo": "posicao",
+        "onde": "conjunto da roda, metade interna do pneu",
+        "sentido": "interna",
+        "evidencia": "Na traseira e na superior do montado, a carcaça cobre a metade interna do pneu, que deveria ficar fora do contrapeso como em tras.ia.png. Pode cruzar a lateral da carcaça."
+      }
+    ],
+    "observacao": "A roda tem proporções certas, mas lê como bloco liso e fica coberta pelo contrapeso, não de fora como na referência; o pneu perde o ombro arredondado e o bojo."
+  },
+  "partes": [
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": "Ø 568 x 208, de 445 a 653 mm, ombro em arco de 62 mm, toca y 0"
+    },
+    {
+      "nome": "aro",
+      "confere": true,
+      "observacao": "Ø 240, 18 mm de parede, 192 de largura"
+    },
+    {
+      "nome": "cubo",
+      "confere": true,
+      "observacao": "Ø 140 x 30, furo de Ø 106 por onde passa a tampa de Ø 100, assenta no flange a 550 mm"
+    },
+    {
+      "nome": "disco",
+      "confere": true,
+      "observacao": "chapa de 15 mm, de 8,5 a 23,5 mm do meio do pneu"
+    }
+  ],
+  "atrito": [
+    "o cubo não passa de Ø 145 num aro de Ø 240, então fica menor que o flange de Ø 170; o ombro de 62 está perto do máximo de 62,4 mm da banda",
+    "rodada 1, roda coberta pelo contrapeso: atribuido ao plano; a borda de fora em 653 mm vem de tres fontes da TABELA e a medicao nao acha cruzamento com a carcaca; a referencia de tras mostra a roda mais para fora",
+    "rodada 1, banda lisa: atribuido ao plano, que promete banda lisa",
+    "rodada 1, ombro em tres facetas, flanco sem bojo e disco sobre os furos: atribuidos ao modelador e a familia, vao a rodada 2"
+  ],
+  "notaDePassagem": "revisar: medição passa, sem rodada",
+  "receita": {
+    "sha256": "sha256:2a04b6d1e81a1e077f26fe03c9ce94a27cd0634af6cb830274ea05e47bf61d12",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 116,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * Ø 568 e banda de 208 mm no aro de 9 polegadas (talão em Ø 240), com a roda de chapa de aço de seis furos. Uma receita, duas"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * instâncias na montagem (a esquerda e a direita, esta girada meia volta), como a dianteira."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Etapa da montagem `../../montagem.json` depois do eixo traseiro (fatia 3 do plano `docs/modelar/planos/encerrados/2026-11-09-empilhadeira.md`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * item 2 das partes do `../../ALINHAMENTO.md`). O rascunho aprovado pela pessoa em 2026-11-10 (`../../referencias/eixos-rodas.esboco.mjs`)"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * desenhava a roda à mão, com a mesma seção de pneu da dianteira levada ao raio dela; ela passa a sair da família pela mesma cadeia da"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * roda dianteira (`../roda-dianteira/receita.js`: `derivar`, `gerarPassos` e `montarRodaDianteira`, que recebem a TABELA), e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * rascunho chama `montarRodaTraseira` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * DE ONDE VEM CADA MEDIDA. O diâmetro e a banda do pneu são os de `rodas.traseira` da carcaça, que corta os poços por eles (Ø 568,"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * de 445 a 653 mm do centro da máquina). O aro de 9 polegadas (raio do talão de 120 mm) e o barril de 18 mm são os do rascunho; o"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * barril tem 192 mm de largura, 8 mm de cada lado para dentro da banda, como na dianteira. O cubo da roda assenta, pela face de dentro,"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * na face de fora do flange do cubo do eixo traseiro (Ø 170, a 550 mm); ele tem Ø 140, o maior que a família aceita num aro de Ø 240"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * com 18 mm de parede (`cubo-cabe-no-aro`), e o furo de Ø 106 por onde passa a tampa de Ø 100 do eixo, que vai até 625 mm e fica dentro"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * do aro. Os seis furos de Ø 10 no círculo de 124 são de caráter, no que cabe entre o furo central e a borda do cubo. O assento da roda"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * (a distância da face de dentro do cubo ao plano do meio do pneu, para dentro) é 445 + 208/2 - 550 = -1 mm: a face do flange fica"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * 1 mm por fora do meio do pneu, e o disco de 15 mm sai do meio do cubo, de 8,5 a 23,5 mm por fora do meio do pneu (o rascunho o punha de"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * 1 a 16). O ombro é o ombro largo da dianteira, o arco de 62 mm do rascunho (a até 1,6 mm da seção dele levada a este raio), que é"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * também quase o máximo que a banda de 208 aceita (30%, 62,4 mm: `ombro-cabe-na-banda`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` da dianteira leva as medidas aos parâmetros da família e a chama com o id desta roda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * `gerarPassos` expande a chamada, que já sai em metro, e acrescenta o sombreamento de cada parte. `montarRodaTraseira` escreve a mesma"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * roda em mm no estado da máquina inteira, para o rascunho. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "import { TABELA as CARCACA } from '../../carcaca/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "import { TABELA as EIXO } from '../../eixo-traseiro/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "import { MATERIAIS, PARTES, derivar as derivarDaRoda, gerarPassos as gerarPassosDaRoda, montarRodaDianteira } from '../../roda-dianteira/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "const RODA = CARCACA.rodas.traseira;"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "const ID = 'roda-traseira';"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* o pneu: o diâmetro e a banda da carcaça */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  diametroDoPneu: 2 * RODA.raio,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  banda: RODA.banda,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  /* o aro de 9 polegadas: o talão em Ø 240, o barril de 18 mm de parede e 192 mm de largura (8 mm de cada lado para dentro da banda) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  diametroDoAro: 240,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  larguraDoAro: RODA.banda - 16,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  paredeDoAro: 18,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* a roda de chapa: o disco de 15 mm, o cubo de Ø 140 e 30 mm com o furo de Ø 106 e seis furos de Ø 10 no círculo de 124 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  disco: 15,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  diametroDoCubo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  larguraDoCubo: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  furoCentral: 106,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  furos: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  circuloDosFuros: 124,"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  diametroDoFuro: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* o assento da roda: a face de dentro do cubo fica a esta distância do plano do meio do pneu, para dentro (negativo: por fora) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  assento: RODA.xDentro + RODA.banda / 2 - EIXO.cubo.face,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* a forma do pneu: o ombro largo em arco, de 62 mm de raio (o do rascunho, o mesmo da dianteira), e 96 lados */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  ombroRedondo: 1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  ombro: 62,"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  ladosDoPneu: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  /* o sombreamento suave, com a quina acima deste ângulo nítida (o do eixo e da carcaça) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  anguloDoLiso: 35,"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "export { MATERIAIS, PARTES };"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "/** A chamada da família `roda-pneu` com as medidas da TABELA. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "export const derivar = (T = TABELA) => derivarDaRoda(T, ID);"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "/** Os PASSOS, em metro: a roda da família e o sombreamento de cada parte. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "export const gerarPassos = (T = TABELA) => gerarPassosDaRoda(T, ID);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "/** Monta uma roda traseira no estado { passos, topo, origem } da máquina inteira, em mm (ver `montarRodaDianteira`). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "export const montarRodaTraseira = (estado, opcoes, T = TABELA) => montarRodaDianteira(estado, opcoes, T, ID);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "/* Os pares que a família põe em contato por desenho. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  { par: ['aro', 'pneu'], motivo: 'o talão do pneu assenta no barril do aro, no raio de 120 mm' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  { par: ['aro', 'disco'], motivo: 'a borda de fora do disco entra até o meio da parede do aro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  { par: ['cubo', 'disco'], motivo: 'a borda de dentro do disco entra até o meio da parede do cubo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  meta: { nome: 'empilhadeira/roda-traseira', desc: 'roda traseira da empilhadeira pela família roda-pneu: pneu pneumático de Ø 568 e banda de 208 no aro de 9 polegadas, roda de chapa de seis furos' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  TOPO: { origem: 'centro do pneu; y para cima, o eixo da roda em x, o lado de fora em +x e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    objeto: 'roda traseira direcional de empilhadeira de contrapeso de 2,5 t: pneu pneumático industrial alto e largo num aro pequeno de aço, presa ao cubo da manga do eixo traseiro, onde gira',"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    referencias: ['../../referencias/tras.ia.png', '../../referencias/cima.ia.png', '../../referencias/carcaca-tras.ia.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    escala: { medida: 'diâmetro do pneu traseiro (o raio é a altura do cubo traseiro da carcaça)', milimetros: 568 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    familiaProcedural: 'roda-pneu',"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "      { nome: 'pneu', forma: 'pneu preto de Ø 568 e 208 mm de banda, banda lisa, ombro largo em arco de 62 mm e flanco com bojo, do talão de Ø 240 à banda', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 96 lados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "      { nome: 'aro', forma: 'barril cinza do aro de 9 polegadas, de 18 mm de parede e 192 mm de largura, que o talão do pneu abraça', tecnica: 'família roda-pneu: revolução em torno de x de um tubo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "      { nome: 'cubo', forma: 'anel cinza de Ø 140 e 30 mm, com o furo de Ø 106 e seis furos de Ø 10, cuja face de dentro fica 1 mm por fora do meio do pneu', tecnica: 'família roda-pneu: revolução do anel menos o furo central e os seis furos repetidos em volta do eixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "      { nome: 'disco', forma: 'chapa cinza de 15 mm do cubo ao aro, perto do meio do pneu', tecnica: 'família roda-pneu, tipo 0: revolução em torno de x de um anel' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "      'o pneu fora de Ø 568 por 208 mm de banda, ou o aro grande demais para um pneu industrial alto',"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "      'a roda fora do chão, ou cruzando o poço do contrapeso ou a lateral da carcaça',"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "      'a roda fora do eixo do cubo, ou com o cubo dela sem assentar na face do flange do cubo traseiro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "      'a tampa do cubo do eixo sem passar pelo furo do cubo da roda, ou saindo do aro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "      'o ombro do pneu em canto vivo, de bloco, no lugar do arco largo do rascunho',"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  /* o pneu, o aro e o disco são anéis; o cubo tem o furo central e os seis de fixação */"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  formas: { pneu: 'anel', aro: 'anel', disco: 'anel', cubo: { furos: 1 + TABELA.furos } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm: o pneu inteiro e a face de dentro do cubo, onde a roda assenta no flange do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    const T = this.PARAMS; const R = T.diametroDoPneu / 2; const C = T.diametroDoCubo / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "      { nome: 'borda de fora e topo do pneu', parte: 'pneu', medida: 'maximo', em: [T.banda / 2, R, R], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "      { nome: 'borda de dentro e fundo do pneu', parte: 'pneu', medida: 'minimo', em: [-T.banda / 2, -R, -R], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      { nome: 'face de dentro do cubo da roda', parte: 'cubo', medida: 'minimo', em: [-T.assento, -C, -C], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[24]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az30.png",
+      "peca-tresquartos-rasante-az120.png"
+    ]
+  }
+}

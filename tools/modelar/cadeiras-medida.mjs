@@ -18,6 +18,7 @@ import { geometriaDaCadeira } from '../../procedural/familias/cadeira/geometria.
 import { criarRegistroDeFamilias } from '../../procedural/familias/index.js';
 import { chanfroDoEsboco, receitaParaEsboco, volumeDaPeca } from './receita-externa.mjs';
 import { caixasDoEsboco } from './esboco-para-passos.mjs';
+import { lancarChromium } from './navegador.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const PASTA_DAS_RECEITAS = join(AQUI, 'fixtures', 'receita-externa-cadeiras');
@@ -281,7 +282,7 @@ section p{margin:0 0 4px;color:#444}
 
 async function gerarPrancha(saida) {
   const { chromium } = await import('playwright');
-  const navegador = await chromium.launch();
+  const navegador = await lancarChromium(chromium);
   const pagina = await navegador.newPage({ viewport: { width: 1500, height: 900 }, deviceScaleFactor: 1.5 });
   await pagina.setContent(htmlDaPrancha(), { waitUntil: 'load' });
   await pagina.locator('#prancha').screenshot({ path: saida });

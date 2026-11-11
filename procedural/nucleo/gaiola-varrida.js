@@ -10,8 +10,10 @@
  *   trilho: [{ reta: { de, ate } }, { arco: { centro, eixo, de, graus } }, ...] contíguos, ou { pontos: [[x, y, z], ...] }.
  *   quadro: { u: [x, y, z] } ou { v: [x, y, z] }, com virar? para trocar o sinal do outro eixo; a seção vive no plano que a tangente atravessa.
  *   secao: [[u, v] | { u, v, nome? }, ...] as linhas da superfície, de pelo menos duas, cada uma um ponto da seção.
+ *   fechada: true fecha a seção: faces também entre a última linha e a primeira (tubo); pede três linhas e recusa `fora`.
+ *   tampas: true põe uma face plana em cada ponta (só com fechada), com vinco vivo no aro; 'redondas', sem o vinco. Normal pelo volume.
  *   estacoes: marcos { em } | { fracao } | { plano: { eixo, valor } } | { cilindro: { eixo, por, raio } }, com { entre: n } ou { passo: mm } entre eles.
- *   fora: [x, y, z] ou { centro, semEixo? }: o lado para onde a chapa olha, que decide a normal das faces.
+ *   fora: [x, y, z] ou { centro, semEixo? }: o lado para onde a chapa olha, que decide a normal das faces (não vale com fechada).
  *   vincos: [{ linha, nitidez }] vinco ao longo de uma linha da seção.
  *   remover: [{ estacoes: [marcoA, marcoB], linhas: [linhaA, linhaB] }] tira as células entre os marcos e as linhas citados.
  *   alargamento: { campo: { cilindro }, perfil: [[d, u], ...], topoAberto?, rolada? } segunda superfície que alarga a seção em volta de um cilindro.
@@ -34,8 +36,9 @@
  *     trilho,                    [{ reta: { de, ate } }, { arco: { centro, eixo, de, graus } }, ...] contíguos, ou { pontos: [[x, y, z], ...] }
  *     quadro,                    { u: [x, y, z] } ou { v: [x, y, z] }, e virar?: true
  *     secao,                     [[u, v] | { u, v, nome? }, ...]  as linhas, de pelo menos duas
+ *     fechada?, tampas?,         true: a seção volta da última linha à primeira; uma face em cada ponta (só com fechada)
  *     estacoes,                  [marco, { entre: n } | { passo: mm, linha? }, marco, ...]
- *     fora,                      [x, y, z] ou { centro: [x, y, z], semEixo?: 'x' | 'y' | 'z' }
+ *     fora,                      [x, y, z] ou { centro: [x, y, z], semEixo?: 'x' | 'y' | 'z' }; sem ele com fechada
  *     vincos?,                   [{ linha: nome, nitidez: 0 a 1 | 'viva' }]
  *     remover?,                  [{ estacoes: [marcoA, marcoB], linhas: [linhaA, linhaB] }]
  *     alargamento?,              { campo: { cilindro }, perfil: [[d, u], ...], topoAberto?, rolada?: { abaixoDe, razao } } ou uma lista deles
@@ -81,14 +84,23 @@
  *
  * A ORIENTAÇÃO. As faces saem com a normal para o lado de `fora`: o vetor, ou, com `centro`, a direção do centro à face (com
  * `semEixo`, sem aquele componente), decidido pela soma dos sinais sobre a malha toda; a soma zero (uma seção cujas faces olham metade
- * para cada lado do vetor) grita, porque então `fora` não diz nada. Mesma definição, mesma saída, byte a byte. */
+ * para cada lado do vetor) grita, porque então `fora` não diz nada. Mesma definição, mesma saída, byte a byte.
+ *
+ * A SEÇÃO FECHADA E AS TAMPAS. `fechada: true` liga a última linha à primeira, e a superfície vira um tubo de seção qualquer (pelo
+ * menos três linhas, a última diferente da primeira); `remover` não alcança a célula de volta, entre a última linha e a primeira.
+ * `tampas: true` põe nas duas pontas a face de todas as linhas da estação, e por isso só vale com `fechada`; o aro de cada tampa sai
+ * nos `vincos` como vinco vivo fechado (`${nome}_tampa_0` e `${nome}_tampa_1`), e a ponta fica plana e no lugar depois da subdivisão.
+ * `tampas: 'redondas'` põe as mesmas faces sem o vinco, e a subdivisão arredonda e encurta a ponta. Com a seção fechada a
+ * orientação não vem de `fora`, que então é recusado: as faces do tubo e as duas tampas (postas na conta mesmo sem `tampas`) fecham um
+ * volume, e as faces saem no sentido em que o volume assinado dá positivo, com a normal para fora; o volume zero grita. Sem `fechada` e
+ * sem `tampas` a saída é a mesma de antes delas, byte a byte. */
 
 const EPS = 1e-9;
 const MM = 1000;
 const AMOSTRA_MM = 1;
 const AMOSTRAS_MAXIMAS = 20000;
 const GRAUS = Math.PI / 180;
-const CAMPOS = ['nome', 'trilho', 'quadro', 'secao', 'estacoes', 'fora', 'vincos', 'remover', 'alargamento'];
+const CAMPOS = ['nome', 'trilho', 'quadro', 'secao', 'fechada', 'tampas', 'estacoes', 'fora', 'vincos', 'remover', 'alargamento'];
 
 export class ErroGaiolaVarrida extends Error {
   constructor(mensagem) { super(`gaiolaVarrida: ${mensagem}`); this.name = 'ErroGaiolaVarrida'; }
@@ -352,12 +364,20 @@ export function gaiolaVarrida(definicao) {
   if (definicao.quadro === undefined) falha('quadro é obrigatório: { u: [x, y, z] } ou { v: [x, y, z] }');
   if (definicao.secao === undefined) falha('secao é obrigatória: a lista das linhas [u, v]');
   if (definicao.estacoes === undefined) falha('estacoes é obrigatória: os marcos e as divisões entre eles');
-  if (definicao.fora === undefined) falha('fora é obrigatório: o lado da normal das faces, [x, y, z] ou { centro }');
+  if (definicao.fechada !== undefined && typeof definicao.fechada !== 'boolean') falha(`fechada precisa ser true ou false, e veio ${mostra(definicao.fechada)}`);
+  if (definicao.tampas !== undefined && typeof definicao.tampas !== 'boolean' && definicao.tampas !== 'redondas') falha(`tampas precisa ser true, false ou 'redondas', e veio ${mostra(definicao.tampas)}`);
+  const fechada = definicao.fechada === true; const tampas = definicao.tampas === true || definicao.tampas === 'redondas';
+  const tampasPlanas = definicao.tampas === true;
+  if (tampas && !fechada) falha('tampas pede fechada: true; a tampa é a face de todas as linhas da estação, e só a seção fechada tem contorno para ela');
+  if (fechada && definicao.fora !== undefined) falha('fora não vale com fechada: a seção fechada orienta as faces pelo volume, para fora');
+  if (!fechada && definicao.fora === undefined) falha('fora é obrigatório: o lado da normal das faces, [x, y, z] ou { centro }');
   const trilho = lerTrilho(definicao.trilho);
   const quadro = lerQuadro(definicao.quadro);
   const linhas = lerSecao(definicao.secao);
   const itens = lerEstacoes(definicao.estacoes);
-  const dicaDeFora = lerFora(definicao.fora);
+  if (fechada && linhas.length < 3) falha(`a seção fechada precisa de pelo menos três linhas, e veio com ${linhas.length}`);
+  if (fechada && Math.hypot(linhas.at(-1).u - linhas[0].u, linhas.at(-1).v - linhas[0].v) < EPS) falha(`secao[${linhas.length - 1}] repete o ponto de secao[0]: na seção fechada a volta da última linha à primeira já é feita, sem repetir o ponto`);
+  const dicaDeFora = fechada ? null : lerFora(definicao.fora);
   const alarg = definicao.alargamento === undefined ? [] : (Array.isArray(definicao.alargamento) ? definicao.alargamento : [definicao.alargamento]).map((a, k) => lerAlargamento(a, linhas, Array.isArray(definicao.alargamento) ? `alargamento[${k}]` : 'alargamento'));
   const nLinhas = linhas.length; const L = trilho.comprimento;
 
@@ -471,14 +491,30 @@ export function gaiolaVarrida(definicao) {
 
   /* as faces, para o lado de fora */
   let faces = [];
+  const celulas = fechada ? nLinhas : nLinhas - 1;
   for (let i = 0; i + 1 < nEst; i++) {
-    for (let j = 0; j + 1 < nLinhas; j++) {
-      if (!removida(i, j)) faces.push([nomeDe(i, j), nomeDe(i + 1, j), nomeDe(i + 1, j + 1), nomeDe(i, j + 1)]);
+    for (let j = 0; j < celulas; j++) {
+      const k = (j + 1) % nLinhas;
+      if (!removida(i, j)) faces.push([nomeDe(i, j), nomeDe(i + 1, j), nomeDe(i + 1, k), nomeDe(i, k)]);
     }
   }
   if (!faces.length) falha('os recortes tiram todas as faces da superfície');
-  let placar = 0;
-  for (const f of faces) {
+  if (fechada) {
+    /* as tampas no sentido das faces do tubo, que passam na ponta de baixo de (0, j + 1) a (0, j) e na de cima de (último, j) a
+       (último, j + 1): cada tampa percorre a aresta no sentido contrário */
+    const ponta = (i) => Array.from({ length: nLinhas }, (_, j) => nomeDe(i, j));
+    const tampaDe = [ponta(0), ponta(nEst - 1).reverse()];
+    const volume = [...faces, ...tampaDe].reduce((v, f) => {
+      const a = pos.get(f[0]);
+      for (let k = 1; k + 1 < f.length; k++) v += dot(a, cruz(pos.get(f[k]), pos.get(f[k + 1]))) / 6;
+      return v;
+    }, 0);
+    if (!(Math.abs(volume) > EPS)) falha(`a seção fechada não encerra volume ao longo do trilho (${volume} mm³): a seção precisa ter área`);
+    if (tampas) faces.push(...tampaDe);
+    if (volume < 0) faces = faces.map((f) => [...f].reverse());
+  }
+  let placar = fechada ? 1 : 0;
+  for (const f of fechada ? [] : faces) {
     const ps = f.map((n) => pos.get(n)); let n = [0, 0, 0];
     ps.forEach((p, k) => {
       const q = ps[(k + 1) % ps.length];
@@ -510,6 +546,12 @@ export function gaiolaVarrida(definicao) {
         if (arestas.get(chv(todos[i], todos[i + 1])) === 2) corrida.push(todos[i + 1]); else { fechar(); corrida = [todos[i + 1]]; }
       }
       fechar();
+    });
+  }
+  if (tampasPlanas) {
+    [0, nEst - 1].forEach((i, q) => {
+      const aro = Array.from({ length: nLinhas }, (_, j) => nomeDe(i, j));
+      vincos.push({ nome: `${nome}_tampa_${q}`, pontos: [...aro, aro[0]], nitidez: 'viva' });
     });
   }
 
