@@ -205,13 +205,104 @@ export { referenciasDoPlano };
 const lista = (itens) => itens.map((item) => `- ${item}`);
 const mm = (n) => String(n).replace('.', ',');
 
-/* O olho de uma imagem de referência: o do lado que o nome do arquivo diz (lateral, frontal, topo), com a vista do esboço que olha do
-   mesmo lado que ela, ou nada quando o nome não diz. */
-function olhoDaReferencia(caminho, orientacao) {
-  const vista = vistaDoNome(caminho);
-  if (!['frontal', 'lateral', 'superior'].includes(vista)) return null;
-  const nome = vistaDoMesmoOlho(vista, orientacao).vista;
-  return linhaDaVista(nome, orientacao).slice(nome.length + 2);
+/* ---------- a referência que vale para cada vista ---------- */
+
+/* O lado de onde uma referência olha, pelo nome do arquivo: as palavras do nome, sem acento, em que cada lado tem os nomes que o
+   acervo usa (`frente.ia.png`, `carcaca-lado.ia.png`, `tras.ia.png`, `cima.ia.png`). Nome com dois lados, ou com nenhum, não diz. O
+   crítico do protetor comparou a vista de lado com as fotos de frente e de trás, porque o pedido listava as referências sem dizer de
+   que lado cada uma olha nem qual vale para cada vista do modelo. */
+export const LADOS_DA_REFERENCIA = Object.freeze({
+  frontal: 'frontal', frente: 'frontal', traseira: 'traseira', traseiro: 'traseira', tras: 'traseira', lateral: 'lateral', lado: 'lateral',
+  superior: 'superior', topo: 'superior', cima: 'superior', inferior: 'inferior', baixo: 'inferior',
+});
+/* os lados que só a declaração dá: direita e esquerda pelo nome confundiriam o lado do objeto com o da vista */
+export const LADOS_DECLARAVEIS = Object.freeze(['frontal', 'traseira', 'lateral', 'direita', 'esquerda', 'superior', 'inferior', 'isometrica']);
+const semAcento = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** O lado de uma referência pelo nome do arquivo (um de `LADOS_DA_REFERENCIA`), ou null. */
+export function ladoDoNome(caminho) {
+  const achados = new Set(semAcento(basename(String(caminho))).split(/[^a-z]+/).map((p) => LADOS_DA_REFERENCIA[p]).filter(Boolean));
+  return achados.size === 1 ? [...achados][0] : null;
+}
+
+const BANCADA_DA_VISTA_DO_ESBOCO = Object.freeze(Object.fromEntries(Object.entries(VISTA_DO_ESBOCO).map(([b, e]) => [e, b])));
+const OPOSTA_DA_BANCADA = Object.freeze({ frontal: 'traseira', traseira: 'frontal', direita: 'esquerda', esquerda: 'direita', superior: 'inferior', inferior: 'superior' });
+
+/** As vistas do modelo que olham do mesmo lado que a referência de `lado`, `{ mesma, oposta }` em nomes da bancada, com a orientação
+ *  do esboço quando há: a frente do objeto em -z põe a referência de frente na vista traseira da bancada. */
+export function vistasDaReferencia(lado, orientacao = null) {
+  let mesma;
+  if (lado === 'frontal' || lado === 'traseira') {
+    const frente = BANCADA_DA_VISTA_DO_ESBOCO[vistaDoMesmoOlho('frontal', orientacao).vista];
+    mesma = lado === 'frontal' ? frente : OPOSTA_DA_BANCADA[frente];
+  } else if (lado === 'lateral') {
+    mesma = BANCADA_DA_VISTA_DO_ESBOCO[vistaDoMesmoOlho('lateral', orientacao).vista];
+  } else if (LADOS_DECLARAVEIS.includes(lado)) {
+    mesma = lado;
+  } else {
+    return null;
+  }
+  return { mesma, oposta: OPOSTA_DA_BANCADA[mesma] ?? null };
+}
+
+/* O olho de uma imagem de referência: o lado que ela declara ou que o nome diz, com o texto da vista do modelo que olha do mesmo lado,
+   ou nada quando nenhum dos dois diz. */
+function olhoDaReferencia({ caminho, lado = null }, orientacao) {
+  const vistas = vistasDaReferencia(lado ?? ladoDoNome(caminho), orientacao);
+  return vistas ? ladoDaVista(vistas.mesma, orientacao) : null;
+}
+
+/**
+ * Para cada vista do modelo em `vistas`, as referências que olham do mesmo lado e as que olham do lado oposto, e os contornos em mm
+ * que medem aquele lado: `[{ vista, mesmas: [nome], opostas: [nome], contornos: [{ arquivo, deImagem }] }]`. `referencias` são
+ * `{ caminho, lado? }`; `contornos` são `{ arquivo, lado, deImagem }`.
+ */
+export function referenciasPorVista(vistas, referencias, contornos = [], orientacao = null) {
+  const lados = referencias.map((r) => ({ nome: basename(r.caminho), vistas: vistasDaReferencia(r.lado ?? ladoDoNome(r.caminho), orientacao) }));
+  const deContorno = contornos.map((c) => ({ ...c, vistas: vistasDaReferencia(c.lado, orientacao) })).filter((c) => c.vistas);
+  return vistas.map((vista) => ({
+    vista,
+    mesmas: lados.filter((l) => l.vistas?.mesma === vista).map((l) => l.nome),
+    opostas: lados.filter((l) => l.vistas?.oposta === vista).map((l) => l.nome),
+    contornos: deContorno.filter((c) => c.vistas.mesma === vista || (c.lado === 'lateral' && c.vistas.oposta === vista))
+      .map(({ arquivo, deImagem }) => ({ arquivo, deImagem })),
+  }));
+}
+
+function linhaDaReferenciaPorVista({ vista, mesmas, opostas, contornos }) {
+  const nomes = (l) => l.map((n) => `\`${n}\``).join(', ');
+  const partes = [];
+  if (mesmas.length) partes.push(`compare com ${nomes(mesmas)}`);
+  if (opostas.length) partes.push(`${nomes(opostas)} ${opostas.length > 1 ? 'olham' : 'olha'} do lado oposto e vale${opostas.length > 1 ? 'm' : ''} só para o contorno, espelhado, e não para o que só existe de um lado`);
+  if (!mesmas.length && !opostas.length) partes.push('nenhuma referência olha deste lado; não compare esta vista com as referências de outro lado');
+  for (const { arquivo, deImagem } of contornos) {
+    partes.push(`a medida deste lado vem dos contornos em mm de \`${basename(arquivo)}\`${deImagem ? `, tirados de \`${basename(deImagem)}\`` : ', tirados de uma imagem de lado que não está no pacote'}, e não da proporção de uma imagem`);
+  }
+  return `${vista}: ${partes.join('; ')}.`;
+}
+
+/** Os contornos em mm que medem um lado do objeto: os citados no plano (`*.contornos.json`), os que acompanham uma imagem citada (o
+ *  mesmo nome, com `.contornos.json` no lugar da extensão) e, na pasta das imagens citadas, os que não acompanham imagem nenhuma e
+ *  dizem o lado no nome. `citadas` são os caminhos absolutos que o plano cita e que não são imagem. Devolve `[{ arquivo, lado, deImagem }]`. */
+export function contornosDasReferencias({ imagens = [], citadas = [], existe = existsSync, listar = readdirSync } = {}) {
+  const achados = new Map();
+  const juntar = (arquivo, lado, deImagem) => { if (lado && !achados.has(arquivo)) achados.set(arquivo, { arquivo, lado, deImagem }); };
+  for (const arquivo of citadas) if (arquivo.endsWith('.contornos.json')) juntar(arquivo, ladoDoNome(arquivo), null);
+  for (const imagem of imagens) {
+    const irmao = imagem.replace(/\.[a-z0-9]+$/i, '.contornos.json');
+    if (irmao !== imagem && existe(irmao)) juntar(irmao, ladoDoNome(imagem), imagem);
+  }
+  for (const pasta of [...new Set(imagens.map((i) => dirname(i)))].sort()) {
+    let nomes;
+    try { nomes = listar(pasta); } catch { continue; }
+    for (const nome of [...nomes].map(String).sort()) {
+      if (!nome.endsWith('.contornos.json')) continue;
+      const base = join(pasta, nome.slice(0, -'.contornos.json'.length));
+      if (['.png', '.jpg', '.jpeg', '.webp'].some((ext) => existe(`${base}${ext}`))) continue;
+      juntar(join(pasta, nome), ladoDoNome(nome), null);
+    }
+  }
+  return [...achados.values()];
 }
 
 /**
@@ -222,9 +313,11 @@ function olhoDaReferencia(caminho, orientacao) {
  * do conjunto `{ arquivo, vista }` e `arame` as da malha `{ arquivo, vista, tipo }`; `montado` é `{ instancia, imagens: [{ arquivo,
  * vista }] }` ou null; `sobreposicao` é `{ arquivos, notas }` ou null; `partes` são `{ nome, imagens: [{ arquivo, vista }] }` na ordem do
  * plano; `perguntas` as perguntas específicas da peça; `superficie` é `{ rasante: [{ arquivo, vista, azimute, iluminada }], curvatura: [{ arquivo,
- * vista }] }` na peça de lataria, ou null.
+ * vista }] }` na peça de lataria, ou null; `contornos` os contornos em mm de um lado (`contornosDasReferencias`); `encaixes` os cortes nos
+ * encaixes com as vizinhas (`cortesDosEncaixes`); `anteriores` os pontos de rodadas anteriores que quem conduz atribuiu ao plano, às
+ * ferramentas ou ao crítico (`pontosJaAtribuidos`).
  */
-export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null }) {
+export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, contornos = [], encaixes = [], anteriores = [] }) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -264,15 +357,22 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
         ? 'O objeto real, em outra escala que o modelo e sem a divisão em partes. A nota não é contra elas: elas servem à pergunta de forma sobre onde o alvo difere da referência real, mais abaixo.'
         : 'O objeto real, em outra escala que o modelo e sem a divisão em partes.',
       '',
-      ...lista(referencias.map(({ caminho }) => {
-        const olho = olhoDaReferencia(caminho, orientacao);
-        return `${basename(caminho)}: ${caminho}${olho ? ` (o olho da imagem: ${olho})` : ''}`;
+      ...lista(referencias.map((referencia) => {
+        const olho = olhoDaReferencia(referencia, orientacao);
+        return `${basename(referencia.caminho)}: ${referencia.caminho}${olho ? ` (o olho da imagem: ${olho})` : ''}`;
       })),
     );
   } else {
     L.push('O plano não cita imagem de referência.');
   }
   L.push('');
+  if (referencias.length || contornos.length) {
+    L.push(
+      'A referência que vale para cada vista do modelo. Compare cada vista só com a referência que olha do mesmo lado: a imagem de outro '
+      + 'lado mostra outro contorno, e a largura de uma vista de frente não é o comprimento de uma vista de lado.', '',
+      ...lista(referenciasPorVista(vistasDoPedido, referencias, contornos, orientacao).map(linhaDaReferenciaPorVista)), '',
+    );
+  }
 
   L.push(
     '## Modelo', '',
@@ -293,6 +393,8 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       ...lista(montado.imagens.map(imagem)), '',
     );
   }
+
+  if (encaixes.length) L.push(...secaoDosEncaixes(encaixes));
 
   if (sobreposicao) {
     L.push(
@@ -321,6 +423,8 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
 
   const bloco = blocoDasPerguntas(perguntas);
   if (bloco) L.push('## Perguntas', '', bloco, '');
+
+  if (anteriores.length) L.push(...secaoDosAnteriores(anteriores));
 
   L.push('## Veredito', '', `No veredito em JSON, \`onde\`, \`evidencia\` e \`observacao\` têm até ${LIMITE_DO_VEREDITO} caracteres cada, porque o registro recusa o mais longo; o detalhe vai no texto da resposta.`, '');
   return `${L.join('\n')}`;

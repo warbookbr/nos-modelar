@@ -17,6 +17,9 @@
  * O FECHO. A peça fecha pelo crítico quando a última rodada não tem defeito; com defeito na última e aceite no registro das etapas,
  * foi fixa por aceite humano; sem aceite, fica aberta. Os defeitos abertos são os da última rodada quando ela não fecha.
  *
+ * A DATA. A rodada gravada desde a fatia 1 do plano traz `registradaEm` (ISO, UTC); as antigas não trazem data e continuam lidas. A
+ * tabela dá a primeira e a última data de cada peça e do objeto quando existem, e `-` ou "sem data" quando não.
+ *
  * Uso: npm run custo:peca -- <pasta do objeto> [--json] [--saida=<arquivo.json>]
  * Sem opção imprime a tabela em texto; `--json` imprime o JSON; `--saida` grava o JSON no arquivo e imprime a tabela. Sai 2 em
  * argumento ruim ou pasta sem rodadas. */
@@ -179,6 +182,8 @@ function resumir(pecas) {
     fechos: ordenado(fechos),
     defeitosAbertos: pecas.reduce((s, p) => s + p.defeitosAbertos, 0),
     atribuicoes: somar(pecas.map((p) => p.atribuicoes)),
+    primeiraData: pecas.map((p) => p.primeiraRodada).filter(Boolean).sort()[0] ?? null,
+    ultimaData: pecas.map((p) => p.ultimaRodada).filter(Boolean).sort().at(-1) ?? null,
   };
 }
 
@@ -209,6 +214,7 @@ export function emTexto(custo) {
     `notas finais: ${pares(r.notasFinais)}`,
     `fecho: ${pares(r.fechos)}; defeitos abertos na última rodada: ${r.defeitosAbertos}`,
     `atribuições: ${ATRIBUICOES.map((a) => `${a} ${r.atribuicoes[a]}`).join(', ')}`,
+    r.primeiraData ? `datas das rodadas: ${r.primeiraData} a ${r.ultimaData}` : 'datas das rodadas: sem data registrada',
   ].join('\n');
 }
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1863 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1865 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2849,6 +2849,8 @@
 - `familia.test.mjs` — familia.test.mjs — o comando `npm run familia -- aprovar <id>` e o gate `familias:check`.
 - `ferramentas-por-objeto.mjs` — Gera docs/modelar/FERRAMENTAS-POR-OBJETO.md a partir de docs/modelar/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIAS-DE-OBJET…
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
+- `fluxo-do-objeto.mjs` — fluxo-do-objeto.mjs — em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora.
+- `fluxo-do-objeto.test.mjs` — fluxo-do-objeto.test.mjs — o passo do objeto e o próximo comando de cada peça, em fixtures montadas num diretório temporário, sem executar receita nenhuma.
 - `folha-comparativa.mjs` — folha-comparativa.mjs — a fonte e a receita lado a lado, nas MESMAS câmeras e na MESMA escala, e a vista de diferença que marca onde a receita sobra ou falta.
 - `folha-comparativa.test.mjs` — Testes de folha-comparativa.mjs: as câmeras são as de modelo-de-referencia, a receita igual à fonte não deixa sobra nem falta, e a cabine mais estreita ou o …
 - `fonte-sintetica.mjs` — fonte-sintetica.mjs — monta, no Node e sem navegador, um `partes.json` no formato de `modelo-de-referencia.mjs` a partir dos triângulos de uma receita.

@@ -17,7 +17,7 @@ function rodada(pasta, peca, numero, campos) {
 }
 
 const objeto = join(raiz, 'objeto');
-rodada(objeto, 'simples', 1, { veredito: { nota: 8, defeitos: [] }, atrito: ['nada a registrar'], data: '2026-11-01T10:00:00Z' });
+rodada(objeto, 'simples', 1, { veredito: { nota: 8, defeitos: [] }, atrito: ['nada a registrar'], registradaEm: '2026-11-01T10:00:00.000Z' });
 rodada(objeto, 'dificil', 1, {
   veredito: { nota: 6, defeitos: defeitos(4) },
   atrito: ['rodada 1, cantos em quina: atribuidos ao modelador, vao a rodada 2', 'rodada 1, abas: atribuido ao plano, fica para a pessoa'],
@@ -55,7 +55,9 @@ describe('custo por peça', () => {
     expect(c.resumo).toEqual({
       pecas: 2, rodadas: 4, mediaDeRodadas: 2, fecharamNaPrimeira: 1, notasFinais: { 7: 1, 8: 1 },
       fechos: { aceite: 1, critico: 1 }, defeitosAbertos: 2, atribuicoes: { modelador: 2, plano: 1, ferramenta: 1, critico: 1, familia: 1 },
+      primeiraData: '2026-11-01', ultimaData: '2026-11-03',
     });
+    expect(emTexto(c)).toContain('datas das rodadas: 2026-11-01 a 2026-11-03');
   });
 
   it('não inventa atribuição sem palavra-chave', () => {
@@ -75,6 +77,9 @@ describe('custo por peça', () => {
       defeitosAceitos: null, primeiraRodada: null, ilegiveis: [2] });
     expect(c.resumo.notasFinais).toEqual({ 'sem nota': 1 });
     expect(emTexto(c)).toContain('sem veredito');
+    /* a rodada antiga, sem data, continua lida, e o resumo diz que não há data */
+    expect(c.resumo).toMatchObject({ primeiraData: null, ultimaData: null });
+    expect(emTexto(c)).toContain('datas das rodadas: sem data registrada');
   });
 
   it('a mesma entrada dá a mesma saída, e pasta sem rodada é recusada', () => {

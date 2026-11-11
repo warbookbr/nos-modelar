@@ -22,7 +22,13 @@
  * custou frase de atrito acima do limite, risco de editar o veredito sem querer e a conferência por parte reescrita de prosa para
  * JSON. Na forma `--modelador <arquivo> --critico <arquivo>` o comando pega o último bloco ```json do último texto do assistente em
  * cada arquivo (texto puro, ou a transcrição JSONL que o harness grava para um agente em segundo plano): o do crítico entra como
- * `veredito`, sem mudar nada, e o do modelador traz `partes`, `atrito` e `notaDePassagem`. As validações são as de sempre.
+ * `veredito`, sem mudar nada, e o do modelador traz `partes`, `atrito` e `notaDePassagem`. As validações são as de sempre. O relato de
+ * um modelador que entregou várias peças num texto só não se reparte mais à mão: o bloco da peça é o precedido de uma linha com o nome
+ * dela (`blocoDaPeca`), e o `confere` em texto e o `atrito` em frase única entram no formato sem perder o dado.
+ *
+ * A RODADA GRAVADA TRAZ A DATA (`registradaEm`, ISO em UTC), e `--acao` acusa, na seção "contradições e repetições", o defeito da última
+ * rodada com o sentido oposto ao de uma anterior no mesmo lugar, ou repetido depois de atribuído ao plano, à ferramenta ou ao crítico
+ * (`contradicoesEntreRodadas`, que o pedido do crítico também usa).
  *
  * A PEÇA DE LATARIA NÃO FECHA SEM A LUZ RASANTE E A CURVATURA DA LATARIA. Por decisão da pessoa em 2026-10-30, o pacote do crítico
  * da peça de chapa de superfície livre (`src/autoria/lataria.js`) leva as duas vistas, que mostram o amassado largo e raso que as
@@ -53,6 +59,7 @@ import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/aut
 import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { comandoDoPacote, pastaDaRodada, superficieDaPeca, superficieDoPacote } from './vistas-de-superficie.mjs';
+import { palavras } from './leitura-por-regioes.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -114,7 +121,7 @@ const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).
 export function gravarRodada(
   peca,
   { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie },
-  { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca) } = {},
+  { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), agora = () => new Date().toISOString() } = {},
 ) {
   exigirNome(peca);
   const anteriores = lerRodadas(peca, { pasta });
@@ -131,9 +138,12 @@ export function gravarRodada(
       diferenca: diferencaDeTexto(anterior, ajustarImportsDaCopia(receitaTexto)),
     };
   }
-  const rodada = registrarRodada({
-    peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita, superficie,
-  });
+  /* A DATA DO REGISTRO, em ISO e UTC. A linha de base do custo por peça (2026-11-10) não tinha como dizer quanto tempo uma peça levou,
+     porque nenhuma rodada guardava quando foi gravada. A data é metadado do registro, e não entra em nada que a forma da peça leia. */
+  const rodada = {
+    ...registrarRodada({ peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita, superficie }),
+    registradaEm: agora(),
+  };
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
   /* Rodada gravada não é reescrita. O registro é evidência do que aconteceu, e
@@ -402,21 +412,87 @@ export function ultimoBlocoJson(texto, { arquivo = 'entrada', papel = 'agente' }
   }
 }
 
-const lerAgente = (arquivo, papel) => {
+const CERCA_JSON = /^[ \t]*```json[ \t]*\r?\n([\s\S]*?)^[ \t]*```[ \t]*$/gm;
+
+/* A linha que nomeia o bloco seguinte: só o nome, com crases, negrito, título ou marcador de lista em volta e dois-pontos no fim
+   tolerados (`banco`, **roda-traseira**:, ## carcaca). O nome com objeto (`empilhadeira/banco`) vale pelo último segmento. */
+const nomeDaLinha = (linha) => {
+  const limpo = String(linha).trim().replace(/^(?:#+|[-*+]|\d+[.)])\s+/, '').replace(/[*_`]/g, '').replace(/:\s*$/, '').trim().toLowerCase();
+  return /^[a-z0-9][a-z0-9-]*(\/[a-z0-9][a-z0-9-]*)*$/.test(limpo) ? limpo.split('/').pop() : null;
+};
+
+/**
+ * Os blocos ```json do texto, em ordem, cada um com o nome da linha não vazia logo antes dele (`null` quando essa linha não é só um
+ * nome). `json` é o texto do bloco, ainda sem ler.
+ */
+export function blocosJson(texto) {
+  return [...String(texto).matchAll(CERCA_JSON)].map((m) => {
+    const antes = texto.slice(0, m.index).split('\n').map((l) => l.trim()).filter(Boolean);
+    return { nome: antes.length ? nomeDaLinha(antes[antes.length - 1]) : null, json: m[1] };
+  });
+}
+
+/**
+ * O bloco do relato que é da peça. O modelador que entregou várias peças num texto só põe, antes do bloco de cada uma, uma linha com o
+ * nome dela; quem conduz repartia esse texto à mão. Com um bloco só, ou com vários e nenhum nomeado, vale o último (`ultimoBlocoJson`);
+ * com algum nomeado para a peça (o último segmento de `<objeto>/<peça>`), vale o último desses; com nomes e nenhum da peça, recusa
+ * dizendo os nomes que achou.
+ */
+export function blocoDaPeca(texto, peca, { arquivo = 'entrada', papel = 'agente' } = {}) {
+  const blocos = blocosJson(texto);
+  const nome = peca ? String(peca).split('/').pop() : null;
+  if (blocos.length <= 1 || !nome) return ultimoBlocoJson(texto, { arquivo, papel });
+  const nomes = [...new Set(blocos.map((b) => b.nome).filter(Boolean))];
+  if (nomes.length === 0) return ultimoBlocoJson(texto, { arquivo, papel });
+  const daPeca = blocos.filter((b) => b.nome === nome);
+  if (daPeca.length === 0) {
+    throw new Error(`${arquivo}: o texto do ${papel} tem ${blocos.length} blocos \`\`\`json e nenhum nomeado '${nome}'; os nomes achados são `
+      + `${nomes.map((n) => `'${n}'`).join(', ')}. Ponha antes do bloco desta peça uma linha só com o nome dela.`);
+  }
+  try { return JSON.parse(daPeca[daPeca.length - 1].json); } catch (erro) {
+    throw new Error(`${arquivo}: o bloco \`\`\`json '${nome}' do ${papel} não é JSON válido (${erro.message}).`);
+  }
+}
+
+const lerAgente = (arquivo, papel, peca = null) => {
   let conteudo;
   try { conteudo = readFileSync(arquivo, 'utf8'); } catch (erro) { throw new Error(`${arquivo}: não consegui ler o arquivo do ${papel} (${erro.code ?? erro.message}).`); }
   const { texto } = textoFinalDoAssistente(conteudo, { arquivo });
-  return ultimoBlocoJson(texto, { arquivo, papel });
+  return peca ? blocoDaPeca(texto, peca, { arquivo, papel }) : ultimoBlocoJson(texto, { arquivo, papel });
 };
+
+const NEGA = /^\s*(n[aã]o|false|no)\b/i;
+const AFIRMA_SO = /^\s*(sim|true|yes|ok|confere)\s*[.!]?\s*$/i;
+
+/**
+ * O que os modeladores erraram no formato sem errar o dado, posto no formato: `partes[].confere` em texto vira booleano, com o texto
+ * em `observacao` (o que começa por "não" vira `false`, o resto `true`; "sim" sozinho não vira observação), e `atrito` em texto único
+ * vira lista de um item. O resto passa como veio, para a validação de sempre recusar.
+ */
+export function normalizarRelatoDoModelador(bloco) {
+  if (!bloco || typeof bloco !== 'object' || Array.isArray(bloco)) return bloco;
+  const saida = { ...bloco };
+  if (typeof saida.atrito === 'string') saida.atrito = saida.atrito.trim() ? [saida.atrito] : [];
+  if (Array.isArray(saida.partes)) {
+    saida.partes = saida.partes.map((p) => {
+      if (!p || typeof p !== 'object' || typeof p.confere !== 'string') return p;
+      const texto = p.confere.trim();
+      const observacao = [AFIRMA_SO.test(texto) ? '' : texto, String(p.observacao ?? '').trim()].filter(Boolean).join('; ');
+      return { ...p, confere: !NEGA.test(texto), ...(observacao ? { observacao } : {}) };
+    });
+  }
+  return saida;
+}
 
 /**
  * A entrada da rodada montada dos arquivos do modelador e do crítico, mais o atrito de quem conduz. O veredito é o bloco do crítico
  * como veio. As validações são as de `registrarRodada`, rodadas aqui antes de medir, e o erro diz de qual arquivo (ou de qual
- * `--atrito`) e de qual campo veio o problema. Sem `critico` a entrada não tem veredito, que é o caso da receita reprovada.
+ * `--atrito`) e de qual campo veio o problema. Sem `critico` a entrada não tem veredito, que é o caso da receita reprovada. Com `peca`, o
+ * bloco do modelador é o nomeado para ela (`blocoDaPeca`), e o relato passa por `normalizarRelatoDoModelador`.
  */
-export function entradaDosArquivos({ modelador, critico = null, atrito = [] }) {
+export function entradaDosArquivos({ modelador, critico = null, atrito = [], peca = null }) {
   if (!modelador) throw new Error('falta --modelador <arquivo>: `partes` e `notaDePassagem` vêm do que o modelador devolveu.');
-  const doModelador = lerAgente(modelador, 'modelador');
+  const doModelador = normalizarRelatoDoModelador(lerAgente(modelador, 'modelador', peca));
   if (!doModelador || typeof doModelador !== 'object' || Array.isArray(doModelador)) {
     throw new Error(`${modelador}: o bloco \`\`\`json do modelador precisa ser um objeto com ${ENTRADA_DO_MODELADOR.map((c) => `'${c}'`).join(', ')}.`);
   }
@@ -488,7 +564,7 @@ async function comoCLI(argv) {
     }
     const entrada = doArquivo
       ? JSON.parse(readFileSync(opcoes.registrar, 'utf8'))
-      : entradaDosArquivos({ modelador: opcoes.modelador, critico: opcoes.critico, atrito: opcoes.atrito });
+      : entradaDosArquivos({ modelador: opcoes.modelador, critico: opcoes.critico, atrito: opcoes.atrito, peca });
     const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada, { pacote: opcoes.pacote ?? null });
     const decisao = await acaoDaPeca(peca, { medir: async () => medicao });
     return {
@@ -505,9 +581,95 @@ async function comoCLI(argv) {
   return { codigo: 0, texto: resumoDoLaco(peca, { rodadas, decisao }) };
 }
 
+/* ---- a contradição e a repetição entre rodadas ---- */
+
+/* Os sentidos que dizem o contrário um do outro, no vocabulário fechado do veredito (`sobrando` não é sentido de hoje e fica para o dia
+   em que entrar). */
+export const SENTIDOS_OPOSTOS = Object.freeze({
+  maior: 'menor', menor: 'maior', adiantada: 'atrasada', atrasada: 'adiantada', alta: 'baixa', baixa: 'alta',
+  interna: 'externa', externa: 'interna', faltando: 'sobrando', sobrando: 'faltando', afastado: 'atravessando', atravessando: 'afastado',
+});
+/* As atribuições que dizem que o defeito não era do modelador: quem conduz decidiu que o conserto não está na receita. */
+const ATRIBUICOES_DE_FORA = new Set(['plano', 'ferramenta', 'critico']);
+const ATRIBUIDO = /atribuid[oa]s?\s+(?:ao|aos|a|as|à|às)\s+([a-z]+)/;
+const semAcento = (t) => String(t).normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const RUIDO_DO_ATRITO = new Set(['rodada', 'fica', 'ficam', 'vai', 'vao', 'sem', 'nao', 'mm']);
+const comuns = (x, y) => [...x].filter((w) => y.has(w)).length;
+const termos = (texto) => new Set([...palavras(texto)].filter((w) => !RUIDO_DO_ATRITO.has(w) && !/^\d+$/.test(w)));
+
+/** Dois `onde` falam do mesmo lugar quando dividem duas palavras significativas, ou ao menos metade das do mais curto. */
+export function mesmoLugar(a, b) {
+  const x = palavras(a); const y = palavras(b);
+  const menor = Math.min(x.size, y.size);
+  return menor > 0 && (comuns(x, y) >= 2 || comuns(x, y) * 2 >= menor);
+}
+
+const textoDoDefeito = (d) => `${d.tipo} ${d.sentido} em ${d.onde}`;
+
+/* As frases de atrito que atribuem defeito de uma rodada ao plano, à ferramenta ou ao crítico, com a rodada de que falam ("rodada 2,
+   ..." no começo da frase, ou a própria rodada que a gravou) e as palavras do que descrevem (o trecho antes de "atribuído"). */
+function atribuicoesDeFora(rodadas) {
+  const achadas = [];
+  for (const r of rodadas) {
+    for (const frase of r.atrito ?? []) {
+      if (typeof frase !== 'string') continue;
+      const limpa = semAcento(frase);
+      const m = ATRIBUIDO.exec(limpa);
+      if (!m || !ATRIBUICOES_DE_FORA.has(m[1])) continue;
+      const da = /^\s*rodada\s+(\d+)\b/.exec(limpa);
+      achadas.push({ numero: da ? Number(da[1]) : r.numero, a: m[1], frase, termos: termos(limpa.slice(0, m.index)) });
+    }
+  }
+  return achadas;
+}
+
+/**
+ * O que a rodada mais recente com veredito diz ao contrário de uma anterior, ou repete do que uma anterior deu como não sendo do
+ * modelador. Contradição: defeito na mesma parte, do mesmo tipo e no mesmo lugar (`mesmoLugar`) que um defeito de rodada anterior, com o
+ * sentido oposto (`SENTIDOS_OPOSTOS`). Repetição: defeito na mesma parte, do mesmo tipo, com o mesmo sentido e no mesmo lugar que um de
+ * rodada anterior que uma frase de atrito atribuiu ao plano, à ferramenta ou ao crítico; a frase fala do defeito quando divide com a
+ * parte, o lugar, o sentido e a evidência dele ao menos duas palavras. Devolve, da rodada anterior mais recente para a mais antiga,
+ * `{ caso, rodada, rodadaAnterior, parte, agora, antes, atribuicao? }`, com os dois textos; o pedido do crítico usa a mesma lista.
+ */
+export function contradicoesEntreRodadas(rodadas) {
+  const julgadas = (rodadas ?? []).filter((r) => Array.isArray(r?.veredito?.defeitos));
+  if (julgadas.length < 2) return [];
+  const ultima = julgadas[julgadas.length - 1];
+  const anteriores = julgadas.slice(0, -1).reverse();
+  const deFora = atribuicoesDeFora((rodadas ?? []).filter((r) => r.numero < ultima.numero));
+  const achados = [];
+  for (const d of ultima.veredito.defeitos) {
+    for (const r of anteriores) {
+      for (const e of r.veredito.defeitos) {
+        if (e.parte !== d.parte || e.tipo !== d.tipo || !mesmoLugar(e.onde, d.onde)) continue;
+        if (SENTIDOS_OPOSTOS[e.sentido] === d.sentido) {
+          achados.push({ caso: 'contradicao', rodada: ultima.numero, rodadaAnterior: r.numero, parte: d.parte, agora: textoDoDefeito(d), antes: textoDoDefeito(e) });
+          continue;
+        }
+        if (e.sentido !== d.sentido) continue;
+        const doDefeito = termos(`${e.parte} ${e.onde} ${e.sentido} ${e.evidencia ?? ''}`);
+        const frase = deFora.find((f) => f.numero === r.numero && comuns(f.termos, doDefeito) >= 2);
+        if (frase) {
+          achados.push({ caso: 'repeticao', rodada: ultima.numero, rodadaAnterior: r.numero, parte: d.parte, agora: textoDoDefeito(d), antes: frase.frase, atribuicao: frase.a });
+        }
+      }
+    }
+  }
+  return achados;
+}
+
+/** A seção "contradições e repetições" do resumo do laço, vazia quando não há nenhuma. */
+export function secaoDeContradicoes(achados) {
+  if (!achados.length) return '';
+  return `\ncontradições e repetições:\n${achados.map((c) => (c.caso === 'contradicao'
+    ? `  rodada ${c.rodada}, ${c.parte}: "${c.agora}" contradiz a rodada ${c.rodadaAnterior}, "${c.antes}"`
+    : `  rodada ${c.rodada}, ${c.parte}: "${c.agora}" repete o que a rodada ${c.rodadaAnterior} atribuiu ao ${c.atribuicao}, "${c.antes}"`)).join('\n')}`;
+}
+
 /**
  * O resumo do laço que `--acao` imprime: as rodadas, a medição da receita atual, os avisos dela (a dispensa de `PLANO.lataria`, com o
- * motivo), a próxima ação e os defeitos em aberto. `decisao` é o que `acaoDaPeca` devolve.
+ * motivo), a próxima ação, os defeitos em aberto e as contradições e repetições da última rodada (`contradicoesEntreRodadas`). `decisao`
+ * é o que `acaoDaPeca` devolve.
  */
 export function resumoDoLaco(peca, { rodadas, decisao }) {
   const abertos = defeitosAbertos(rodadas);
@@ -517,7 +679,8 @@ export function resumoDoLaco(peca, { rodadas, decisao }) {
     + `próxima ação: ${decisao.acao} — ${decisao.motivo}\n`
     + (abertos.length
       ? `defeitos em aberto:\n${abertos.map((d) => `  ${d.parte}: ${d.tipo} ${d.sentido} em ${d.onde}`).join('\n')}`
-      : 'defeitos em aberto: nenhum.');
+      : 'defeitos em aberto: nenhum.')
+    + secaoDeContradicoes(contradicoesEntreRodadas(rodadas));
 }
 
 if (process.argv[1] && process.argv[1].endsWith('rodada-de-modelagem.mjs')) {
