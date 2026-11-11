@@ -263,8 +263,8 @@ function linhasDeVao() {
   const L = [
     /* os planos de corte que atravessam o carro, a frente, a traseira e o fim do capô e do para-lama: uma linha de lado em modo vista,
        que corta a face de cima e as duas paredes, com a lâmina compensada pela parede inclinada na planta. Com
-       `SEDAN_PLANOS=superficie` cada plano vira a linha de cima e três de lado por parede, que montam e deixam o relato de contatos
-       com 17 recusas (ATRITOS, terceira etapa) */
+       `SEDAN_PLANOS=superficie` cada plano vira a linha de cima e três de lado por parede, que montam, com a lâmina alargada a 4,09
+       mm, e deixam o relato de contatos com recusas (ATRITOS, terceira etapa) */
     ...(PLANOS === 'superficie'
       ? [deCima('frente', T.zFrente), ...deLado('frenteDaParede', T.zFrente), deCima('tras', T.zTras), ...deLado('trasDaParede', T.zTras), deCima('peDoParaBrisa', T.zCapo), ...deLado('fimDoParaLama', T.zCapo)]
       : [aoMeio('frente', T.zFrente, ACIMA), aoMeio('tras', T.zTras, ACIMA), aoMeio('fimDoParaLama', T.zCapo, yC + PONTA)]),

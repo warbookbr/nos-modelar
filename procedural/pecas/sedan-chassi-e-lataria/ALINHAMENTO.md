@@ -120,7 +120,8 @@ superfície de carroceria, que é definição comum deles e não peça.
 2. `rodas`: quatro rodas de pneu, aro, disco e cubo, pela família
    `procedural/familias/roda-pneu/`, perfil `carro`, com o diâmetro de 728 e a
    largura de 205 passados como parâmetro (o perfil traz 632, de um 205/55
-   R16), postas por `instanciaDeFamilia`, uma chamada por roda. São 16 partes.
+   R16), postas por `instanciaDeFamilia` numa chamada com as quatro poses. São
+   16 partes.
 3. `soleiras`: a chapa que veste a soleira do chassi sob as portas, uma de
    cada lado.
 4. `laterais-traseiras`: de cada lado, a chapa do arco de trás, do fim da porta
@@ -207,7 +208,7 @@ montantes e a soleira. Peça solta no ar na etapa de receita.
 
 A referência tem duas janelas por lado, uma longa e uma curta atrás, que é
 proporção de duas portas, e o pedido é de quatro. O rascunho põe a linha entre
-as portas em z -45 e acaba a porta traseira em z -777, à frente do arco; a
+as portas em z -45 e acaba a porta traseira em z -760, à frente do arco; a
 janela curta vira vigia fixa na coluna C. A recomendação é manter as quatro
 portas assim.
 
@@ -248,25 +249,31 @@ apoio de cada um e a aba das portas, do capô e da tampa na etapa de receita.
 opção, com 83 partes nomeadas: 34 do chassi, 16 das rodas, 15 painéis de chapa,
 8 vidros e 10 acabamentos. Os 15 painéis e os 8 vidros saem de uma superfície
 só, montada uma vez: a carroceria inteira é uma chapa fechada de 1 mm, e
-`paineisPorVaos`, do núcleo, a parte por 28 linhas de vão desenhadas nas vistas
+`paineisPorVaos`, do núcleo, a parte por 44 linhas de vão desenhadas nas vistas
 de cima, de lado e de frente, num corte só, e nomeia cada painel pelo ponto
-visto dele. `SEDAN=chassi` monta só o chassi com as rodas, `SEDAN=explodida`
-afasta os painéis, e `SEDAN_CORES=reais` troca a cor por painel pela do objeto.
-A primeira versão do rascunho, que montava a chapa 23 vezes, e a comparação das
-duas estão no `ATRITOS.md`.
+visto dele. Das 44 linhas, 36 vão no modo superfície, em que a parede do corte
+é normal à chapa, e 8 no modo vista, em que a lâmina atravessa o carro: os três
+planos de corte, a cintura, a linha entre as portas e os arcos de roda. O
+interior da casca, que apara os membros do chassi, é construído uma vez por
+espessura e copiado no lugar. `SEDAN=chassi` monta só o chassi com as rodas,
+`SEDAN=explodida` afasta os painéis, `SEDAN_CORES=reais` troca a cor por painel
+pela do objeto, e `SEDAN_PLANOS=superficie` troca os três planos de corte por
+linhas de superfície. As duas versões anteriores do rascunho e a comparação das
+três estão no `ATRITOS.md`.
 
-Medido em 2026-11-11. A caixa do conjunto vai de x -986 a 986, y 0 a 1.523 e z
--2.200 a 2.198. O rascunho tem 562 passos e monta em pouco mais de 2 s. No modo estrito
-do relato de contatos nada atravessa sem estar declarado; 64 pares encostam e
-63 atravessam por desenho. `npm run vao:partes`, com os vãos declarados em cada
-par, dá o vão da face de fora entre 4,02 e 4,18 mm em todos os pares de chapa
-e de vidro, com mediana de 4,08 a 4,14 mm, o para-brisa e o vidro traseiro
-incluídos; o capô e o para-lama ficam a 5,6 mm do pé da cabine e a tampa a 5,0
-mm, por desenho. O comando sai com 1 por cinco pares que o `ATRITOS.md`
-explica: dois em que o mínimo cai a 3,97 mm num ponto da quina de baixo e três
-que ele dá como travessia com o vão medido em 4,08 mm. A menor distância entre
-os dois sólidos é menor que o vão da face de fora onde a chapa é inclinada em
-relação à vista do corte: 3,45 mm no para-brisa.
+Medido em 2026-11-11, sobre o núcleo do commit `4c6bcf35`. A caixa do conjunto
+vai de x -986 a 986, y 0 a 1.523 e z -2.200 a 2.198. O rascunho tem 427 passos,
+carrega em 18 s e monta em 11 s. No modo estrito do relato de contatos nada
+atravessa sem estar declarado; 64 pares encostam e 63 atravessam por desenho,
+iguais dos dois lados. `npm run vao:partes`, com o vão, o degrau e as folgas de
+desenho declarados em cada par e as 13 partes soltas de propósito declaradas em
+`apoia`, dá o vão da face de fora entre 4,00 e 4,16 mm em todos os pares de
+chapa e de vidro, e a menor distância entre os dois sólidos entre 4,00 e 4,08
+mm, o para-brisa e o vidro traseiro incluídos; o capô e o para-lama ficam a 5,6
+mm do pé da cabine e a tampa a 5,0 mm, por desenho. Com `--esperado=4
+--tolerancia=0.2 --soltas=recusar` o comando sai com 0. Com `--folga3d=3.8` sai
+com 1 por onze pares do chassi e das rodas cuja folga de desenho, declarada, é
+menor que 3,8 mm, o que o `ATRITOS.md` explica.
 
 `referencias/sedan-chassi-e-lataria.conferir.json` confere as vistas de lado,
 de cima e de frente contra os contornos da fonte, com o chassi fora da conta. A

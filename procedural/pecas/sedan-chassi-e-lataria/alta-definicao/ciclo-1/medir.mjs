@@ -12,7 +12,7 @@
  * Uso: node medir.mjs <caminho.esboco.mjs> [--z=1700,1500] [--quina=cintura|ombro] */
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { receitaDaOpcao } from '../../../../modulos/esboco-nucleo/src/opcao.js';
+import { receitaDaOpcao } from '../../../../../modulos/esboco-nucleo/src/opcao.js';
 
 const arquivo = process.argv[2];
 const arg = (n, d) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? `=${d}`).split('=')[1];

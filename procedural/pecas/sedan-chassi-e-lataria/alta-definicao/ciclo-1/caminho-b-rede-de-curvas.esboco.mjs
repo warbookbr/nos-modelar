@@ -5,7 +5,7 @@
  * curvas da cintura e do ombro, que age sobre a face que o `passo` da rede dá.
  *
  * `HD_NC` e `HD_NO` trocam a nitidez da cintura e do ombro; `HD_PASSO` o espaçamento da rede; `HD_NIVEIS` os níveis. */
-import { gaiolaPorRede } from '../../../nucleo/gaiola-por-rede.js';
+import { gaiolaPorRede } from '../../../../nucleo/gaiola-por-rede.js';
 import { T, yFundo, noLado, naCintura, noTopo, noArco, R_ARCO, esbocoDoCaminho } from './alvo.mjs';
 
 const NITIDEZ_DA_CINTURA = Number(process.env.HD_NC ?? 0.4);
