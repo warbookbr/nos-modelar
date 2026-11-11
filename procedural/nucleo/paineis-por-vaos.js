@@ -10,6 +10,7 @@
  *   linhas: [{ nome?, eixo, pontos, fechada?, alcance?, lado?, dentro?, alem? }] o meio do vão em cada vista; `alcance` [min, max] limita a lâmina no eixo da vista (a linha de um lado do corpo não corta o outro); `lado` '+' ou '-' é de onde se lê a chapa (padrão o lado do alcance); `fechada` fecha a volta e o pedaço de dentro é um painel, ou some com `dentro: 'descarta'`; a volta menor que o vão é recusada; `alem` (mm, não negativo) alonga as pontas da linha aberta.
  *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos. O passo `parte` sai com `onde.conexo` { de, dir, ate }: `ate` é a distância lida mais uma folga, e o núcleo recusa a receita salva cuja semente passou a cair num vão.
  *   modo: 'vista' (padrão: a lâmina é a extrusão da linha ao longo do eixo da vista, a que corta toda camada do raio, com o vão compensado pela inclinação) ou 'superficie' (a linha é projetada na chapa e a lâmina é varrida sobre ela, de paredes normais à chapa: a folga 3D é o vão em qualquer inclinação, a linha atravessa dobras, a ponta que sai da borda não alarga e duas pontas que se encontram fecham em esquadria; corta só a primeira camada lida do `lado`, até `profundidade` mm abaixo da pele, padrão a espessura lida mais meio vão); vale por linha em `linhas[i].modo`.
+ *   limpar: as faces finas do corte saem por `limparLascas` depois do `subtrair` (true: 0,01 mm; { tolerancia } em mm; false: não emite); padrão ligado nas linhas por superfície e por curva, desligado no modo vista; `medidas.lascasAntes` e `lascasRestantes` contam as faces finas.
  *   origemId: o primeiro origemId livre (padrão: o maior dos passos da chapa mais um); o ajudante usa dali em diante e devolve `proximoId`.
  *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido; folgaAbaixoDe: o aviso `folgaEstreita` quando a lâmina fica abaixo disso, em mm (padrão metade do vão); saida: 'mm' ou 'metro'; conferir: false não executa o corte (só a chapa, uma vez; o `ate` sai da chapa de antes) e avisa `naoConferiu`; medirTempo: true põe em medidas.tempos o tempo de cada etapa; medirFolga: true mede a folga 3D também no modo vista (no modo superfície ela é sempre medida).
  * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos } com medidas { vaoPedido, inclinacaoMaxima, fatorMinimo, folgaMinima, paineis, paineisAchados, sementesSemPainel, pedacosSemNome, pedacos, execucoes } e avisos { ref, texto }; o resultado é memorizado pela entrada (memoria-de-pura), então a receita que o chama a cada leitura paga a conta uma vez.
@@ -46,6 +47,7 @@ import { alongar, bordasSeCruzam, bordasSeCruzamNaCurva, linhaPertoDeSiMesma, pr
 import { prepararPontoNaMalha } from './ponto-na-malha.js';
 import { pedacosConexos, prepararRaios } from './selecao-geometrica.js';
 import { triangularFace } from './triangulacao-face.js';
+import { analisarTopologia } from './topologia.js';
 
 const erro = (texto) => { throw new Error(`paineisPorVaos: ${texto}`); };
 const br = (n) => String(Math.round(n * 1000) / 1000).replace('.', ',');
@@ -200,6 +202,7 @@ function emMetro(r) {
   r.passos = r.passos.map(([op, a]) => {
     if (op === 'extrusao') return [op, { ...a, altura: mm(a.altura), em: mm(a.em), perfil: mm(a.perfil) }];
     if (op === 'subdivisao') return [op, { ...a, vertices: mm(a.vertices) }];
+    if (op === 'limparLascas') return [op, { ...a, tolerancia: mm(a.tolerancia) }];
     if (op === 'parte' && a.sel?.onde?.conexo) {
       const c = a.sel.onde.conexo;
       return [op, { ...a, sel: { ...a.sel, onde: { conexo: { ...c, de: mm(c.de), ...(c.ate != null ? { ate: mm(c.ate) } : {}) } } } }];
@@ -248,6 +251,9 @@ function paineisPorVaosBruto(o) {
   for (const [nomeDoModo, m] of [['modo', o.modo], ...o.linhas.map((l, i) => [`o modo da linha '${l?.nome ?? `linha${i}`}'`, l?.modo])]) {
     if (m != null && m !== 'vista' && m !== 'superficie') erro(`${nomeDoModo} é 'vista' (a lâmina é a extrusão da linha ao longo do eixo da vista) ou 'superficie' (a lâmina é varrida sobre a chapa, com as paredes normais a ela)`);
   }
+  /* limpar: as faces finas que o corte deixa saem pela operação `limparLascas`, depois do `subtrair` e antes dos `parte`. Padrão: ligado onde há lâmina por superfície ou por curva, desligado no modo vista
+     (para os passos de quem já usa o modo vista não mudarem); `true` usa a tolerância de 0,01 mm, `{ tolerancia }` (mm) escolhe e `false` não emite */
+  if (o.limpar != null && typeof o.limpar !== 'boolean' && !(typeof o.limpar === 'object' && Number.isFinite(o.limpar.tolerancia) && o.limpar.tolerancia > 0)) erro(`limpar é true, false ou { tolerancia } em mm maior que zero (recebido ${JSON.stringify(o.limpar)})`);
   const sementesPerdidas = o.sementesPerdidas ?? 'recusa';
   if (sementesPerdidas !== 'recusa' && sementesPerdidas !== 'avisa') erro("sementesPerdidas é 'recusa' ou 'avisa'");
   const passosDaChapa = chapa.passos ?? null;
@@ -677,6 +683,8 @@ function paineisPorVaosBruto(o) {
   const idDoCorte = proximo; proximo += 1;
   let corte = ['subtrair', { origemId: idDoCorte, solidos: [{ origem: chapa.origem }, ...ferramentas.map((origem) => ({ origem }))] }];
   const origemDoCorte = { op: 'subtrair', id: idDoCorte };
+  const toleranciaDaLimpeza = o.limpar === false ? null : o.limpar != null && typeof o.limpar === 'object' ? o.limpar.tolerancia : o.limpar === true || pendentes.length ? 0.01 : null;
+  const limpa = toleranciaDaLimpeza == null ? [] : [['limparLascas', { sel: { origem: origemDoCorte }, tolerancia: toleranciaDaLimpeza }]];
 
   /* ---- as sementes: de onde o raio sai, e para onde vai ---- */
   const semente = (p) => {
@@ -692,7 +700,7 @@ function paineisPorVaosBruto(o) {
   /* os passos `parte`: com `ate` (a distância lida mais uma folga) quando o ajudante leu a chapa */
   const montarPassos = () => {
     const passosDasPartes = partes.map((p) => ['parte', { nome: p.nome, sel: { origem: origemDoCorte, onde: { conexo: { de: p.de, dir: p.dir, ...(p.ate != null ? { ate: p.ate } : {}) } } } }]);
-    return [...(chapa.emitir === false ? [] : (passosDaChapa ?? [])), ...passosDeCorte, corte, ...passosDasPartes];
+    return [...(chapa.emitir === false ? [] : (passosDaChapa ?? [])), ...passosDeCorte, corte, ...limpa, ...passosDasPartes];
   };
   const passos = montarPassos();
 
@@ -722,7 +730,7 @@ function paineisPorVaosBruto(o) {
     if (o.medirTempo === true) medidas.tempos = tempos;
     return saida;
   }
-  const executar = () => { const t0 = performance.now(); const r = nucleo([...passosDaChapa, ...passosDeCorte, corte], parametros, topo); cronometra('executarCorte', t0); return r; };
+  const executar = () => { const t0 = performance.now(); const r = nucleo([...passosDaChapa, ...passosDeCorte, corte, ...limpa], parametros, topo); cronometra('executarCorte', t0); return r; };
   const tCorte = performance.now();
   let executado = executar();
   if (executado.orfaos.length) {
@@ -742,7 +750,6 @@ function paineisPorVaosBruto(o) {
   let folgaMedida = pendentes.length || o.medirFolga === true ? medirFolga() : null;
   cronometra('medirFolga', tFolga);
   let ajustes = 0;
-  if (process.env.DBG_CURVA) console.error('DBG folga inicial', folgaMedida);
   if (pendentes.length && folgaMedida != null) {
     while (ajustes < 3 && (folgaMedida < o.vao || folgaMedida > o.vao * 1.05)) {
       const fator = Math.max(0.5, Math.min(2, (o.vao * 1.01) / folgaMedida));
@@ -752,7 +759,6 @@ function paineisPorVaosBruto(o) {
       executado = executar();
       if (executado.orfaos.length) erro(`o corte foi recusado pelo núcleo depois de corrigir a largura da lâmina para ${br(larguraDaSuperficie)} mm: ${executado.orfaos.slice(0, 2).map((x) => x.motivo).join('; ')}`);
       folgaMedida = medirFolga() ?? folgaMedida;
-      if (process.env.DBG_CURVA) console.error('DBG folga ajuste', ajustes, larguraDaSuperficie, folgaMedida);
       ajustes += 1;
     }
     medidas.execucoes += ajustes;
@@ -761,6 +767,13 @@ function paineisPorVaosBruto(o) {
   }
   if (folgaMedida != null) { medidas.folgaMedida = r3(folgaMedida); if (pendentes.length) medidas.folgaMinima = r3(folgaMedida); }
   if (curvas.length) medidas.curvas = curvas;
+  if (limpa.length) {
+    /* as faces finas do corte, antes e depois da limpeza: a de antes sai de uma execução a mais, sem o passo */
+    const finas = (st) => analisarTopologia({ vertices: st.V, faces: st.F }).achados.filter((x) => x.codigo === 'face-fina').length;
+    const sem = nucleo([...passosDaChapa, ...passosDeCorte, corte], parametros, topo);
+    medidas.lascasAntes = finas(sem); medidas.lascasRestantes = finas(executado);
+    medidas.execucoes += 1;
+  }
   const ids = [...executado.F.keys()];
   const grupos = pedacosConexos(executado.F, ids);
   medidas.pedacos = grupos.length;

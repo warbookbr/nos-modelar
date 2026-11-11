@@ -22,7 +22,7 @@ const SEMPRE_LIVRES = new Set(['origemId', 'id', 'faces', 'nome', 'pai', 'substi
   'solidos', 'usa', 'cor', 'vista', 'lente', 'niveis', 'borda', 'simetria', 'pesoPadrao', 'lado', 'liso', 'quebraNosVincos', 'lados', 'segmentos',
   'segmentosArco', 'segmentosSpline', 'segmentosCurva', 'aneis', 'seg', 'orientacao', 'direcao', 'de', 'saida', 'aresta', 'chapa', 'superficie',
   'tampa', 'linha', 'ponta', 'paineis', 'cadeia', 'vincos', 'cantos', 'medidas', 'v', 'f', 'face', 'a', 'b', 'para', 'interface', 'rotulo', 'angulo',
-  'divisoes', 'estacoes', 'expoenteSecao']);
+  'divisoes', 'estacoes', 'expoenteSecao', 'limite']);
 const SELECOES = new Set(['sel', 'referencia', 'selPara']);
 
 /** Os campos de medida de cada operação. */
@@ -51,6 +51,7 @@ export const TABELA_DE_MEDIDAS = Object.freeze({
   aberturaPorContorno: ['contorno', 'recuoDaLente'],
   arredondarCostura: ['raio', 'raioMinimo', 'afinarPontas', 'regiao', 'aparar'],
   friso: ['perfil', 'fechamento', 'aba'],
+  limparLascas: ['tolerancia'],
 });
 
 const temNumero = (v) => (typeof v === 'number' ? true : Array.isArray(v) ? v.some(temNumero) : v && typeof v === 'object' ? Object.values(v).some(temNumero) : false);

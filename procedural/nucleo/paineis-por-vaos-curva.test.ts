@@ -206,6 +206,24 @@ describe('determinismo, unidade e entradas', () => {
   });
 });
 
+describe('limpar: as faces finas do corte', () => {
+  it('ligada por padrão na curva: o vão e as áreas não mudam, e a conta das faces finas sai nas medidas; `false` não emite o passo', () => {
+    const L = chapaEmL({ raio: { de: 6, ate: 3 } });
+    const { curva } = curvaDaGaiola(L.gaiola, { estacao: 2.43, de: 'a', ate: 'b' });
+    const entrada = { chapa: L.chapa, vao: 4, linhas: [{ nome: 'p', curva, alem: 20 }], paineis: DOIS };
+    const com = paineisPorVaos(entrada);
+    const sem = paineisPorVaos({ ...entrada, limpar: false });
+    expect(com.passos.some((p: any) => p[0] === 'limparLascas')).toBe(true);
+    expect(sem.passos.some((p: any) => p[0] === 'limparLascas')).toBe(false);
+    expect(com.medidas.lascasRestantes).toBeLessThanOrEqual(com.medidas.lascasAntes);
+    expect(com.medidas.lascasAntes).toBeGreaterThan(0);
+    expect(sem.medidas.lascasAntes).toBeUndefined();
+    expect(Math.abs(com.medidas.folgaMedida - sem.medidas.folgaMedida)).toBeLessThanOrEqual(0.01);
+    expect(com.medidas.paineis.map((p: any) => Math.round(p.area))).toEqual(sem.medidas.paineis.map((p: any) => Math.round(p.area)));
+    expect(grito(() => paineisPorVaos({ ...entrada, limpar: { tolerancia: -1 } }))).toMatch(/limpar é true, false ou/);
+  });
+});
+
 describe('a linha continuada de uma vista a outra', () => {
   it('um trecho visto de cima e outro visto de lado, com a emenda na quina, dão a curva que sobe a quina', () => {
     const L = chapaEmL({ raio: 6 });

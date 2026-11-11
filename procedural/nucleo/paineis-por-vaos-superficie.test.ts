@@ -234,7 +234,7 @@ describe('modo superficie: a dobra convexa não deixa migalha', () => {
       expect(g.medidas.pedacosSemNome).toEqual([]);
       const st = nucleo(g.passos, {}, {});
       expect(st.orfaos).toEqual([]);
-      /* faces finas: a quina viva de 90 graus em 3 mm sai limpa; nas outras três o modo superfície deixa de 4 a 96 faces que `analisarTopologia` reprova (o modo vista, zero): pendência registrada */
+      /* faces finas: a quina viva de 90 graus em 3 mm sai limpa; a dobra de 140 graus e as concordâncias de raio 3 e 5 já trazem as faces finas da chapa de entrada (4, 48 e 48 antes do corte), e o modo vista dá o mesmo: não são do modo superfície */
       if (nome.startsWith('quina viva de 90')) expect(finas(st)).toBe(0);
       expect(g.medidas.folgaMedida).toBeGreaterThanOrEqual(4 - 1e-3);
       expect(g.medidas.folgaMedida).toBeLessThanOrEqual(4 * 1.05);

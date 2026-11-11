@@ -45,3 +45,21 @@ describe('o conversor de mm para metro e o conexo', () => {
     expect(JSON.parse(b)).toEqual(JSON.parse(a).map(([op, args]) => [op, args]));
   });
 });
+
+describe('o conversor e o passo limparLascas', () => {
+  it('converte a tolerância (medida), deixa o limite (razão) e a seleção como estão, e recusa o campo que a tabela não conhece', () => {
+    const [op, a] = passoEmMetro(['limparLascas', { sel: { origem: { op: 'subtrair', id: 3 } }, tolerancia: 0.01, limite: 0.2 }]);
+    expect(op).toBe('limparLascas');
+    expect(a).toEqual({ sel: { origem: { op: 'subtrair', id: 3 } }, tolerancia: 0.00001, limite: 0.2 });
+    expect(() => passoEmMetro(['limparLascas', { sel: { tudo: true }, tolerancia: 0.01, raio: 2 }])).toThrow(RecusaDoEsboco);
+  });
+  it('o passo que paineisPorVaos emite em mm, passado pelo conversor, é o que sai com saida metro, e o corte limpo parte a chapa como o outro', () => {
+    const mm = paineisPorVaos({ ...ENTRADA, modo: 'superficie', chapa: { ...PLACA, emitir: false }, areaMinima: 100 });
+    const metro = paineisPorVaos({ ...ENTRADA, modo: 'superficie', saida: 'metro' });
+    const limpa = mm.passos.find((p) => p[0] === 'limparLascas');
+    expect(limpa[1].tolerancia).toBe(0.01);
+    expect(metro.passos).toEqual(mm.passos.map((p) => passoEmMetro(p)));
+    expect(metro.passos.find((p) => p[0] === 'limparLascas')[1].tolerancia).toBe(0.00001);
+    expect(paineisPorVaos({ ...ENTRADA, saida: 'metro' }).passos.some((p) => p[0] === 'limparLascas')).toBe(false);
+  });
+});
