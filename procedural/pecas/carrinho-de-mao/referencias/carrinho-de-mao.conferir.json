@@ -1,0 +1,26 @@
+{
+ "objeto": "um carrinho de mão de obra de uma roda: a caçamba de chapa estampada de uns 60 L com a borda virada, o chassi de tubo redondo escuro com os dois braços, as manoplas, os dois pés em trapézio e o garfo, e a roda de pneu preto com o aro claro na frente",
+ "cores": {
+  "chapa": "#c9662c",
+  "escuro": "#2a2d30",
+  "pneu": "#151617",
+  "aro": "#c4c8cb"
+ },
+ "partes": {
+  "cacamba": "chapa",
+  "borda": "chapa",
+  "chassi": "escuro",
+  "manoplas": "escuro",
+  "calcos": "escuro",
+  "pneu": "pneu",
+  "aro": "aro",
+  "eixo": "escuro"
+ },
+ "dentro": [
+  { "par": "aro:pneu", "vistas": ["direita"] },
+  { "par": "calcos:cacamba", "vistas": ["superior"] }
+ ],
+ "vistasDaSobra": ["superior", "direita"],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {}
+}
