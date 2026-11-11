@@ -19,11 +19,14 @@
  * impressão do texto da receita: com o texto igual ao da última rodada, vale a medição que ela gravou; com o texto mudado, a medição é
  * presumida aprovada e a ação diz que não mediu. `--medir` mede cada peça de verdade, pela `acaoDaPeca` de `--acao`.
  *
+ * O OBJETO NOVO. O primeiro passo de um objeto vem antes de a pasta existir: a pasta que ainda não existe, ou está vazia, dentro de
+ * `procedural/pecas/` está no passo 1, com o que criar. Fora do acervo, a pasta tem de existir; o caminho que é arquivo é recusado.
+ *
  * Uso: npm run fluxo:objeto -- <pasta do objeto ou nome> [--json] [--medir]
- * Sai 2 em argumento ruim ou pasta que não existe. */
+ * Sai 2 em argumento ruim, caminho que é arquivo, ou pasta que não existe fora de procedural/pecas/. */
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { basename, join, relative, resolve } from 'node:path';
+import { basename, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { acaoDaReceita, defeitosAbertos } from '../../src/autoria/laco-de-modelagem.js';
 import { proximaEtapa } from '../../src/autoria/etapas-de-construcao.js';
@@ -155,9 +158,13 @@ function proximoDaPeca(p, etapas) {
  * O fluxo do objeto: o estado de cada passo, as peças com a ação e o próximo comando, as etapas e o passo em que o objeto está.
  * `medir(ref)` mede uma peça de verdade (a `acaoDaPeca` de `--acao`); sem ele a ação sai de `acaoSemMedir`.
  */
-export async function fluxoDoObjeto(pastaDoObjeto, { medir = null } = {}) {
+export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACERVO } = {}) {
   const pasta = resolve(pastaDoObjeto);
-  if (!ehPasta(pasta)) throw new Error(`${pastaDoObjeto}: não é pasta de objeto.`);
+  const raizDoAcervo = resolve(acervo);
+  const esperado = `espera-se a pasta de um objeto, existente ou a criar em ${rel(raizDoAcervo)}/<objeto>/`;
+  if (existsSync(pasta) && !statSync(pasta).isDirectory()) throw new Error(`${pastaDoObjeto}: é um arquivo; ${esperado}.`);
+  const existe = existsSync(pasta);
+  if (!existe && !pasta.startsWith(raizDoAcervo + sep)) throw new Error(`${pastaDoObjeto}: a pasta não existe e está fora de ${rel(raizDoAcervo)}/; ${esperado}.`);
   const objeto = basename(pasta);
   const alinhamento = lerAlinhamento(pasta);
   const referencias = lerReferencias(pasta);
@@ -210,9 +217,9 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null } = {}) {
   const inicio = comReceita ? 3 : 0;
   const indice = fechado ? 5 : passos.findIndex((s, i) => i >= inicio && !s.feito);
   const atual = indice < 0 ? 5 : indice;
-  const comandos = comandosDoPasso(atual, { pasta, rascunho, etapas, pecas });
+  const comandos = comandosDoPasso(atual, { pasta, existe, rascunho, etapas, pecas });
   return {
-    formato: 'modelar.fluxo-do-objeto', versao: 1, objeto, pasta: rel(pasta),
+    formato: 'modelar.fluxo-do-objeto', versao: 1, objeto, pasta: rel(pasta), existe,
     passo: { numero: atual + 1, nome: PASSOS[atual] },
     passos: passos.map((s, i) => ({ numero: i + 1, ...s })),
     pecas,
@@ -220,18 +227,39 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null } = {}) {
   };
 }
 
-function comandosDoPasso(atual, { pasta, rascunho, etapas, pecas }) {
+/* O comando de ver o rascunho e o de conferi-lo, com os argumentos na forma que `esboco:nucleo` e `conferir:vistas` leem. */
+const verEsboco = (arquivo) => `npm run esboco:nucleo -- ${arquivo} --vista <v> --saida <png> --sem-cores`;
+const conferirEsboco = (esboco, config) => `npm run conferir:vistas -- ${esboco} --config=${config} --saida=<pasta> --captura=rapida`;
+
+function comandosDoPasso(atual, { pasta, existe, rascunho, etapas, pecas }) {
   const p = rel(pasta);
+  const rascunhoNovo = `depois, o rascunho em ${p}/referencias/<nome>.esboco.mjs, pelas formas do esboço 2.0 (skill esbocar-opcoes), visto vista a vista com ${verEsboco(`${p}/referencias/<nome>.esboco.mjs`)}`;
   switch (PASSOS[atual]) {
-    case 'alinhamento': return ['conduzir o alinhamento com a pessoa (skill alinhar-modelagem) e escrever ALINHAMENTO.md com a tabela de medidas e as partes'];
-    case 'referencias': return [`pôr as imagens em ${p}/referencias/ e tirar os contornos (skill contorno-da-imagem; npm run contorno)`];
+    case 'alinhamento': return [
+      ...(existe ? [] : [`criar a pasta ${p}/`]),
+      `conduzir o alinhamento com a pessoa (skill alinhar-modelagem) e escrever ${p}/ALINHAMENTO.md com o objeto e o recorte dele, as referências com a vista de cada uma, a medida da escala, a tabela de medidas (seção "Medidas") com a fonte de cada medida, a seção "Partes" com a ordem de montagem, as juntas com o eixo e o curso de cada movimento, os pares que se tocam e o que reprova o objeto`,
+      `criar ${p}/referencias/ com as imagens de referência, uma por vista e sem marca nem logotipo`,
+      rascunhoNovo,
+    ];
+    case 'referencias': return [
+      `pôr em ${p}/referencias/ as imagens de referência, uma por vista e sem marca nem logotipo; o contorno por parte, quando a conferência pedir, sai pela skill contorno-da-imagem (npm run contorno)`,
+      rascunhoNovo,
+    ];
     case 'rascunho': return rascunho.esbocos.length
-      ? rascunho.semConferencia.map((e) => `npm run conferir:vistas -- ${p}/referencias/${e} --config=${p}/referencias/${e.replace(/\.esboco\.(mjs|json)$/, '')}.conferir.json --saida=<pasta>`)
-      : ['escrever o rascunho em referencias/<nome>.esboco.mjs (skill esbocar-opcoes) e a config de conferência em <nome>.conferir.json'];
+      ? rascunho.semConferencia.flatMap((e) => {
+        const config = `${p}/referencias/${e.replace(/\.esboco\.(mjs|json)$/, '')}.conferir.json`;
+        return [
+          `escrever ${config} com "objeto", "cores", "partes" (a classe de cor de cada parte do esboço) e "vistas" (a referência de cada vista, com "caixaRef"); o formato está no cabeçalho de tools/modelar/conferir-vistas.mjs`,
+          `${conferirEsboco(`${p}/referencias/${e}`, config)}, e levar cada pedido.md da saída a um crítico`,
+        ];
+      })
+      : [rascunhoNovo.replace(/^depois, /, 'escrever ')];
     case 'receitas': case 'montagem': {
       const daPeca = pecas.filter((x) => x.proximo).map((x) => x.proximo);
       if (daPeca.length) return daPeca;
-      if (pecas.length === 0) return [`despachar o modelador (skill criar-peca) com o PLANO do ALINHAMENTO.md, para ${p}/partes/<peça>/receita.js`];
+      if (pecas.length === 0) return [
+        `levar o rascunho conferido à receita, uma peça por vez: npm run comecar -- modelar/peca/nova, e despachar o modelador (skill criar-peca) com o PLANO do ALINHAMENTO.md para ${p}/partes/<peça>/receita.js`,
+      ];
       if (!etapas) return [`escrever ${p}/montagem.json com as instâncias e as etapas (skill auditar-montagem)`];
       return [`npm run etapas -- ${rel(etapas.arquivo)}`];
     }
@@ -263,7 +291,7 @@ export function emTexto(f) {
 }
 
 /** A linha de comando: devolve `{ codigo, texto }` sem sair do processo. */
-export async function rodar(args) {
+export async function rodar(args, { acervo = ACERVO } = {}) {
   const posicionais = args.filter((a) => !a.startsWith('--'));
   const opcoes = args.filter((a) => a.startsWith('--'));
   const desconhecida = opcoes.find((o) => o !== '--json' && o !== '--medir');
@@ -271,10 +299,11 @@ export async function rodar(args) {
     return { codigo: 2, texto: `uso: fluxo-do-objeto.mjs <pasta do objeto ou nome> [--json] [--medir]${desconhecida ? ` (opção desconhecida: ${desconhecida})` : ''}` };
   }
   const alvo = posicionais[0];
-  const pasta = ehPasta(alvo) ? alvo : ehPasta(join(ACERVO, alvo)) ? join(ACERVO, alvo) : alvo;
+  /* o nome solto (sem barra) é o do acervo, exista a pasta ou não */
+  const pasta = existsSync(alvo) ? alvo : ehPasta(join(acervo, alvo)) || !/[\\/]/.test(alvo) ? join(acervo, alvo) : alvo;
   const medir = opcoes.includes('--medir') ? (ref, opcoesDaPeca) => acaoDaPeca(ref, opcoesDaPeca) : null;
   let fluxo;
-  try { fluxo = await fluxoDoObjeto(pasta, { medir }); } catch (erro) { return { codigo: 2, texto: `fluxo-do-objeto: ${erro.message}` }; }
+  try { fluxo = await fluxoDoObjeto(pasta, { medir, acervo }); } catch (erro) { return { codigo: 2, texto: `fluxo-do-objeto: ${erro.message}` }; }
   return { codigo: 0, texto: opcoes.includes('--json') ? JSON.stringify(fluxo, null, 2) : emTexto(fluxo) };
 }
 

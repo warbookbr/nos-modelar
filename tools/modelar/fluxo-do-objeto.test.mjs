@@ -46,11 +46,72 @@ describe('o passo do objeto antes das receitas', () => {
     escrever(join(pasta, 'referencias', 'corpo.esboco.mjs'), 'export default {};\n');
     f = await fluxoDoObjeto(pasta);
     expect(f.passos[2].falta[0]).toMatch(/a conferência do rascunho/);
-    expect(f.comandos[0]).toMatch(/^npm run conferir:vistas -- .*corpo\.esboco\.mjs --config=.*corpo\.conferir\.json/);
+    expect(f.comandos[0]).toMatch(/^escrever .*corpo\.conferir\.json com "objeto", "cores", "partes"/);
+    expect(f.comandos[1]).toMatch(/^npm run conferir:vistas -- \S*corpo\.esboco\.mjs --config=\S*corpo\.conferir\.json --saida=<pasta> --captura=rapida,/);
     escrever(join(pasta, 'referencias', 'corpo.conferir.json'), '{}\n');
     f = await fluxoDoObjeto(pasta);
     expect(f.passo.nome).toBe('receitas');
     expect(f.passos[3].falta[0]).toMatch(/as receitas/);
+    expect(f.comandos).toHaveLength(1);
+    expect(f.comandos[0]).toMatch(/^levar o rascunho conferido à receita, uma peça por vez: npm run comecar -- modelar\/peca\/nova, .*skill criar-peca/);
+  });
+});
+
+describe('o objeto novo, antes de a pasta existir', () => {
+  const acervo = join(raiz, 'acervo');
+  mkdirSync(acervo, { recursive: true });
+  const json = async (args) => { const r = await rodar([...args, '--json'], { acervo }); expect(r.codigo).toBe(0); return JSON.parse(r.texto); };
+  const doAlinhamento = (f) => {
+    expect(f.passo).toEqual({ numero: 1, nome: 'alinhamento' });
+    expect(f.comandos.find((c) => c.includes('skill alinhar-modelagem'))).toMatch(/ALINHAMENTO\.md com o objeto .*escala.*tabela de medidas.*fonte de cada medida.*"Partes" com a ordem de montagem.*juntas.*o que reprova/);
+    expect(f.comandos.some((c) => /^criar \S*\/referencias\/ /.test(c))).toBe(true);
+    expect(f.comandos.at(-1)).toMatch(/skill esbocar-opcoes.*npm run esboco:nucleo -- \S*\.esboco\.mjs --vista <v> --saida <png> --sem-cores$/);
+  };
+
+  it('a pasta inexistente no acervo, pelo nome ou pelo caminho, é o passo 1 com o que criar', async () => {
+    const pelo = await json(['carrinho']);
+    doAlinhamento(pelo);
+    expect(pelo).toMatchObject({ objeto: 'carrinho', existe: false, pecas: [] });
+    expect(pelo.comandos[0]).toMatch(/^criar a pasta \S*carrinho\/$/);
+    expect(await json([join(acervo, 'carrinho')])).toEqual(pelo);
+    expect(emTexto(pelo).split('\n')[0]).toMatch(/passo 1 de 6, alinhamento$/);
+  });
+
+  it('a pasta vazia é o passo 1 sem pedir para criá-la', async () => {
+    mkdirSync(join(acervo, 'vazio'));
+    const f = await json(['vazio']);
+    doAlinhamento(f);
+    expect(f.existe).toBe(true);
+    expect(f.comandos.some((c) => c.startsWith('criar a pasta'))).toBe(false);
+  });
+
+  it('só com o alinhamento pede as referências e o rascunho, com o comando de vê-lo', async () => {
+    escrever(join(acervo, 'alinhado', 'ALINHAMENTO.md'), ALINHAMENTO);
+    const f = await json(['alinhado']);
+    expect(f.passo).toEqual({ numero: 2, nome: 'referencias' });
+    expect(f.comandos[0]).toMatch(/referencias\/ as imagens de referência/);
+    expect(f.comandos[1]).toMatch(/npm run esboco:nucleo -- \S*alinhado\/referencias\/<nome>\.esboco\.mjs --vista <v> --saida <png> --sem-cores$/);
+  });
+
+  it('o rascunho sem conferência diz como criar a config e conferir', async () => {
+    const pasta = join(acervo, 'rascunhado');
+    escrever(join(pasta, 'ALINHAMENTO.md'), ALINHAMENTO);
+    escrever(join(pasta, 'referencias', 'lado.png'), 'png');
+    escrever(join(pasta, 'referencias', 'rascunhado.esboco.mjs'), 'export default {};\n');
+    const f = await json(['rascunhado']);
+    expect(f.passo).toEqual({ numero: 3, nome: 'rascunho' });
+    expect(f.comandos[0]).toMatch(/^escrever \S*rascunhado\/referencias\/rascunhado\.conferir\.json /);
+    expect(f.comandos[1]).toMatch(/^npm run conferir:vistas -- \S*rascunhado\.esboco\.mjs --config=\S*rascunhado\.conferir\.json --saida=<pasta> --captura=rapida/);
+  });
+
+  it('recusa o caminho que é arquivo e a pasta inexistente fora do acervo, dizendo o que espera', async () => {
+    const arquivo = join(acervo, 'alinhado', 'ALINHAMENTO.md');
+    const r1 = await rodar([arquivo], { acervo });
+    expect(r1.codigo).toBe(2);
+    expect(r1.texto).toMatch(/é um arquivo; espera-se a pasta de um objeto/);
+    const r2 = await rodar([join(raiz, 'fora', 'nada')], { acervo });
+    expect(r2.codigo).toBe(2);
+    expect(r2.texto).toMatch(/a pasta não existe e está fora de .*espera-se a pasta de um objeto, existente ou a criar em .*\/<objeto>\//);
   });
 });
 
