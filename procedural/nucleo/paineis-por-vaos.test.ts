@@ -18,7 +18,7 @@ type V3 = [number, number, number];
 const TAN38 = Math.tan((38 * Math.PI) / 180);
 const grito = (fn: () => unknown) => { try { fn(); } catch (e) { return (e as Error).message; } throw new Error('não gritou'); };
 
-/* a caixa de chapa: o perfil (z, y) extrudado ao longo de x entre -200 e 200, de 1 mm, aberta embaixo; o tampo é plano de z 0 a 300 e
+/* a caixa de chapa: o perfil (z, y) extrudado ao longo de x entre -200 e 200, de 1 mm, aberta embaixo e nas duas pontas; o tampo é plano de z 0 a 300 e
    desce a 38 graus da horizontal de z 300 a 600, onde fecha numa parede de 65,6 mm de altura */
 const Y_FIM = 300 - 300 * TAN38;
 const PERFIL: [number, number][] = [[0, 0], [600, 0], [600, Y_FIM], [300, 300], [0, 300]];
@@ -28,7 +28,7 @@ const prismaX = (id: number, pol: [number, number][], x0: number, x1: number, de
 }];
 const CAIXA = [
   prismaX(1, PERFIL, -200, 200),
-  prismaX(2, [[0, -5], [600, -5], [600, Y_FIM], [300, 300], [0, 300]], -199, 199, 1),
+  prismaX(2, [[0, -5], [600, -5], [600, Y_FIM], [300, 300], [0, 300]], -201, 201, 1),
   ['subtrair', { origemId: 3, solidos: [{ origem: { op: 'extrusao', id: 1 } }, { origem: { op: 'extrusao', id: 2 } }] }],
 ];
 const ORIGEM_CAIXA = { op: 'subtrair', id: 3 };
