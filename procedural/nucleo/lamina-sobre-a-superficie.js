@@ -102,28 +102,28 @@ export function projetarLinha(o) {
      É uma lâmina só, sem duas varreduras que dividam parede: a seção do meio cobre sob a quina a espessura das duas faces, côncava ou convexa */
   let inclinacaoMaxima = 0;
   let quinas = 0;
-  const lista = [];
-  todas.forEach((s, i) => {
+  const lista = todas.map((s) => ({ c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut, ds: 1 }));
+  todas.forEach((s) => {
     const cos = Math.abs(dot(s.n, [0, 1, 2].map((e) => (e === eixoIdx ? 1 : 0))));
     if (cos < RASANTE) {
       erro(`a chapa fica a ${br(Math.acos(Math.min(1, cos)) * GRAUS)} graus da vista no ponto [${br(s.q[0])}, ${br(s.q[1])}] da linha '${nome}' (raio rasante): desenhe essa linha na vista em que a chapa aparece de frente`);
     }
     inclinacaoMaxima = Math.max(inclinacaoMaxima, Math.acos(Math.min(1, cos)) * GRAUS);
-    lista.push({ c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut });
-    const prox = fechada ? todas[(i + 1) % todas.length] : todas[i + 1];
-    if (prox && s.real && prox.real) {
-      const g = giro(s.n, prox.n);
-      if (g > GIRO_LISO) {
-        if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
-        quinas += 1;
-        const meio = unit(soma(s.n, prox.n));
-        lista.push({ c: mul(soma(s.c, prox.c), 0.5), n: meio, esp: Math.max(s.esp ?? 0, prox.esp ?? 0) || null, ds: Math.min(3, 1 / Math.max(dot(meio, s.n), 1e-6)), mIn: s.mOut, mOut: s.mOut });
-      }
-    }
   });
-  /* a espessura lida na própria quina corre ao longo da outra face: vale no máximo três vezes a menor lida na linha */
-  const lidas = lista.map((s) => s.esp).filter((x) => x != null);
-  if (lidas.length) { const teto = 3 * Math.min(...lidas); for (const s of lista) s.esp = s.esp == null ? null : Math.min(s.esp, teto); }
+  /* a espessura lida junto da quina corre ao longo da outra face: vale no máximo 1,2 vez a mediana lida na linha */
+  const lidas = lista.map((s) => s.esp).filter((x) => x != null).sort((x, y) => x - y);
+  if (lidas.length) { const teto = 1.2 * lidas[Math.floor(lidas.length / 2)]; for (const s of lista) s.esp = s.esp == null ? null : Math.min(s.esp, teto); }
+  /* a dobra viva que sobrou entre duas estações coladas só é contada: as seções da lâmina são verticais (acompanham a direção da vista), e por isso a
+     varredura passa a quina, côncava ou convexa, sem girar a seção nem fazer parede dobrada */
+  for (let i = 0; i < todas.length; i += 1) {
+    const j = (i + 1) % todas.length;
+    if (!fechada && j === 0) continue;
+    if (!(todas[i].real && todas[j].real)) continue;
+    const g = giro(todas[i].n, todas[j].n);
+    if (g <= GIRO_LISO) continue;
+    if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
+    quinas += 1;
+  }
   const segmentos = [lista];
   return { segmentos, fechadaInteira: fechada, quinas, inclinacaoMaxima, semChapa };
 }
@@ -157,7 +157,7 @@ export function alongar(estacoes, fim, ext) {
  * O sólido da lâmina: vértices e triângulos de um passo `subdivisao` de niveis 0.
  * @returns {{ vertices: number[][], faces: number[][], pontosDeDentro: number[][] | null }}
  */
-export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome }) {
+export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome, cima }) {
   const est = estacoes.filter((s, i) => i === 0 || norma(sub(s.c, estacoes[i - 1].c)) > 1e-6);
   if (fechada && est.length > 1 && norma(sub(est[0].c, est[est.length - 1].c)) <= 1e-6) est.pop();
   if (est.length < 2) erro(`a linha '${nome}' ficou com menos de duas estações sobre a chapa`);
@@ -165,7 +165,12 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
   if (lat.some((l) => !l)) erro(`a linha '${nome}' volta sobre si mesma sobre a chapa (um trecho some contra o vizinho); afaste os pontos`);
   const h = largura / 2;
   const topo = 0.25 * largura;
-  const fundoDe = (s) => (profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura);
+  /* a profundidade medida ao longo da seção vertical: a pedida (ou lida) pela normal, dividida pelo cosseno entre a normal da chapa e a seção */
+  const secaoDe = (s, sm) => {
+    const u = unit(sub(cima, mul(sm, dot(cima, sm)))) ?? cima;
+    return { u, cos: Math.max(Math.abs(dot(s.n, u)), 0.17) };
+  };
+  const fundoDe = (s, cos) => (profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura) / cos;
   const vertices = [];
   const faces = [];
   const N = est.length;
@@ -178,7 +183,7 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     const sinal = area(L) >= area(R) ? 1 : -1;
     dentro = sinal === 1 ? R : L;
     const borda = sinal === 1 ? L : R;
-    borda.forEach((p, i) => { const s = est[i]; const u = unit(sub(s.n, mul(lat[i].sm, dot(s.n, lat[i].sm)))) ?? s.n; vertices.push(soma(p, mul(u, topo)), sub(p, mul(u, fundoDe(s)))); });
+    borda.forEach((p, i) => { const s = est[i]; const { u, cos } = secaoDe(s, lat[i].sm); vertices.push(soma(p, mul(u, topo / cos)), sub(p, mul(u, fundoDe(s, cos)))); });
     for (let i = 0; i < N; i += 1) {
       const j = (i + 1) % N;
       faces.push([2 * i, 2 * j, 2 * j + 1], [2 * i, 2 * j + 1, 2 * i + 1]);
@@ -189,10 +194,10 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     est.forEach((s, i) => {
       const { sm, k } = lat[i];
       const off = mul(sm, h * k);
-      /* a direção da profundidade é a normal tirada da componente lateral: as paredes ficam planas e normais ao lado, e a folga entre elas é a largura */
-      const u = unit(sub(s.n, mul(sm, dot(s.n, sm)))) ?? s.n;
-      const cima = mul(u, topo * (s.ds ?? 1)); const baixo = mul(u, fundoDe(s) * (s.ds ?? 1));
-      vertices.push(soma(soma(s.c, off), cima), sub(soma(s.c, cima), off), sub(sub(s.c, baixo), off), sub(soma(s.c, off), baixo));
+      /* a seção é vertical (a direção da vista tirada da componente lateral): a parede é o plano normal ao lado, que contém a normal da chapa, e a folga entre as paredes é a largura */
+      const { u, cos } = secaoDe(s, sm);
+      const acima = mul(u, topo / cos); const baixo = mul(u, fundoDe(s, cos));
+      vertices.push(soma(soma(s.c, off), acima), sub(soma(s.c, acima), off), sub(sub(s.c, baixo), off), sub(soma(s.c, off), baixo));
     });
     const lim = fechada ? N : N - 1;
     for (let i = 0; i < lim; i += 1) {

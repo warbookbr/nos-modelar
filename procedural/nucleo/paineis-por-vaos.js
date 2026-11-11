@@ -438,7 +438,7 @@ function paineisPorVaosBruto(o) {
         erro(`a linha '${nome}' não corta a chapa: nenhum dos pontos dela tem chapa na vista ${eixo}, de ${br(alcance[0])} a ${br(alcance[1])} mm; confira o eixo da vista, a ordem dos pontos ([${eixo === 'x' ? 'z, y' : eixo === 'y' ? 'x, z' : 'x, y'}]), o alcance e a unidade (mm)`);
       }
       inclinacaoMaxima = Math.max(inclinacaoMaxima, proj.inclinacaoMaxima);
-      return { ...pd, ...proj };
+      return { ...pd, ...proj, cima: dirv.map((x) => -x) };
     });
     /* onde a ponta de uma linha aberta encontra a ponta de outra, as duas passam meia largura: o canto de duas lâminas fecha em esquadria */
     const pontas = [];
@@ -452,14 +452,13 @@ function paineisPorVaosBruto(o) {
     for (const p of aAlongar) { const segs = lidas[p.i].segmentos; alongar(segs[p.fim ? segs.length - 1 : 0], p.fim, largura / 2); }
     for (const ln of lidas) {
       const { l, nome, segmentos, fechadaInteira, quinas } = ln;
-      if (l.dentro === 'descarta' && quinas > 0) erro(`o furo '${nome}' atravessa ${quinas} dobra(s) viva(s) da chapa: o furo é uma lâmina só e não dobra; desenhe-o numa face, ou use a volta com painel (sem descarta) e descarte o pedaço`);
       if (l.fechada && l.dentro !== 'descarta' && fechadaInteira) {
         if (voltaMenorQueOVao(segmentos[0], largura)) {
           erro(`a volta '${nome}' é menor que o vão: a lâmina de ${br(largura)} mm de largura, por dentro, passa do outro lado da volta e deixaria uma ilha fantasma; faça a volta maior que o vão, ou use dentro: 'descarta' para só furar a chapa`);
         }
       }
       for (const estacoes of segmentos) {
-        const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome });
+        const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima });
         passosDeCorte.push(['subdivisao', { origemId: proximo, vertices: varrido.vertices, faces: varrido.faces, niveis: 0 }]);
         ferramentas.push({ op: 'subdivisao', id: proximo });
         proximo += 1;
