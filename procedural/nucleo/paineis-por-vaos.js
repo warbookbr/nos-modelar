@@ -8,6 +8,7 @@
  *   chapa: { passos, origem, emitir?, parametros?, pontos? } os passos (em mm) que constroem SÓ a chapa e a origem { op, id } dela; com `passos` o ajudante a executa em tempo de autoria (normais, sementes, conferência) e `emitir: false` não os devolve; sem `passos`, dê `normal` e `origemId`, e o aviso `semLeitura` diz que nada foi conferido; `parametros` e `pontos` são o PARAMS e o TOPO que os passos citam.
  *   vao: a largura do vão DA PELE, ao longo da chapa, em mm; a lâmina é estreitada onde a chapa é inclinada em relação à linha, pela normal local lida da chapa. A folga entre as paredes do corte é a largura da lâmina (menor que o vão na chapa inclinada) e sai em `medidas.folgaMinima`.
  *   linhas: [{ nome?, eixo, pontos, fechada?, alcance?, lado?, dentro?, alem? }] o meio do vão em cada vista; `alcance` [min, max] limita a lâmina no eixo da vista (a linha de um lado do corpo não corta o outro); `lado` '+' ou '-' é de onde se lê a chapa (padrão o lado do alcance); `fechada` fecha a volta e o pedaço de dentro é um painel, ou some com `dentro: 'descarta'`; a volta menor que o vão é recusada; `alem` (mm, não negativo) alonga as pontas da linha aberta.
+ *   linhas[i].separa: false declara a linha que não precisa separar os dois lados dela (um rasgo, uma ponta que para na chapa); sem ele, com `conferir`, cada linha prova que os pontos a meia lâmina mais 0,15 vão de cada lado, sobre a pele, caem em pedaços diferentes (a volta: o de dentro e o de fora), e a que não prova recusa com o ponto da ponte; `medidas.separacao` traz, por linha, os pares provados e o ponto da ponte.
  *   linhas[i].curva: [[x, y, z], ...] (mm, aberta ou fechada) no lugar de eixo e pontos: a linha de vão como curva 3D sobre a chapa, que sobe a quina arredondada onde a linha de uma vista é recusada. Cada ponto vai à pele de fora pelo ponto mais próximo (a tolerância é `distanciaDaCurva`, padrão 3 vãos), a lâmina é varrida como no modo superfície, e `curvaDaGaiola` tira a curva da gaiola (estação, coluna, fração). `alem` pode ser [início, fim]; a curva que sai da chapa sem `alem`, ou que não corta a chapa em dois pedaços, é recusada. `linhas[i].vistas: [{ eixo, pontos, lado? }]` continua a linha de uma vista a outra pela emenda.
  *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos. O passo `parte` sai com `onde.conexo` { de, dir, ate }: `ate` é a distância lida mais uma folga, e o núcleo recusa a receita salva cuja semente passou a cair num vão.
  *   modo: 'vista' (padrão: a lâmina é a extrusão da linha ao longo do eixo da vista, a que corta toda camada do raio, com o vão compensado pela inclinação) ou 'superficie' (a linha é projetada na chapa e a lâmina é varrida sobre ela, de paredes normais à chapa: a folga 3D é o vão em qualquer inclinação, a linha atravessa dobras, a ponta que sai da borda não alarga e duas pontas que se encontram fecham em esquadria; corta só a primeira camada lida do `lado`, até `profundidade` mm abaixo da pele, padrão a espessura lida mais meio vão); vale por linha em `linhas[i].modo`.
@@ -296,6 +297,7 @@ function paineisPorVaosBruto(o) {
     if (porCurva(l) && Array.isArray(l.alem)) {
       if (!(l.alem.length === 2 && l.alem.every((x) => Number.isFinite(x) && x >= 0))) erro(`alem da curva '${nome}' é um número de mm a partir de zero, ou [no início, no fim] (recebido ${JSON.stringify(l.alem)})`);
     } else if (l.alem != null && !(Number.isFinite(l.alem) && l.alem >= 0)) erro(`alem da linha '${nome}' precisa ser um número de mm a partir de zero (recebido ${JSON.stringify(l.alem)})`);
+    if (l.separa != null && typeof l.separa !== 'boolean') erro(`separa da linha '${nome}' é true ou false (recebido ${JSON.stringify(l.separa)})`);
     if (l.dentro === 'descarta' && !l.fechada) erro(`dentro: 'descarta' só vale para linha fechada ('${nome}' é aberta)`);
     if (nomesDeLinha.has(nome)) erro(`duas linhas se chamam '${nome}'`);
     nomesDeLinha.add(nome);
@@ -446,7 +448,7 @@ function paineisPorVaosBruto(o) {
       erro(`a linha '${nome}' não corta a chapa: nenhum dos ${total} pontos dela tem chapa na vista ${eixo}, de ${br(alcance[0])} a ${br(alcance[1])} mm; confira o eixo da vista, a ordem dos pontos ([${eixo === 'x' ? 'z, y' : eixo === 'y' ? 'x, z' : 'x, y'}]), o alcance e a unidade (mm)`);
     }
 
-    linhasDeVista.push({ nome, fechada: !!l.fechada, descarta: l.dentro === 'descarta', eixo, alcance, lado, trechos });
+    linhasDeVista.push({ nome, fechada: !!l.fechada, descarta: l.dentro === 'descarta' || l.separa === false, eixo, alcance, lado, trechos });
     const folgaDaLinha = o.vao * (1 + margem) * fatorDaLinha;
     if (camadas > 0) aviso('camadasInclinadas', `o raio da vista ${eixo} toca, na linha '${nome}', camadas da chapa de inclinação diferente (o fator da lâmina difere até ${br(camadas)}): a lâmina vale a primeira camada, e o vão das outras sai fora do pedido; limite o alcance a uma camada ou corte em duas linhas`);
 
@@ -869,6 +871,30 @@ function paineisPorVaosBruto(o) {
   if (grupos.length <= pedacosDaChapa && !o.linhas.some((l) => l.dentro === 'descarta')) {
     aviso('semSeparacao', `o corte deixou ${grupos.length} pedaço(s), os mesmos que a chapa tinha: nenhuma linha a separou; confira se alguma vai de borda a borda (ou fecha uma volta) no alcance dado`);
   }
+  const tConferencia = performance.now();
+  const raiosDepois = prepararRaios(executado.V, executado.F, ids);
+  const dicaDaProfundidade = pendentes.length ? ` (modo 'superficie': a lâmina desce só até ${br(Math.max(...(o.profundidade != null ? [o.profundidade] : [2 * o.vao])))} mm abaixo da pele quando a espessura não pôde ser lida, ou a espessura lida mais meio vão; se a chapa é mais grossa que ${br(8 * o.vao)} mm, dê profundidade maior que a espessura e não atravessa a chapa de outro modo)` : '';
+  const dono = new Map();
+  const perdidas = [];
+  o.paineis.forEach((p, i) => {
+    const { de, dir } = partes[i];
+    const antes = leitura.raios.primeiro(de, dir);
+    const depois = raiosDepois.primeiro(de, dir);
+    const descricao = `${p.eixo} [${br(p.ponto[0])}, ${br(p.ponto[1])}]${p.lado === '-' ? ' vista do lado -' : ''}`;
+    let motivo = null;
+    if (!antes) motivo = `o ponto ${descricao} cai fora da chapa: o raio da vista ${p.eixo} não toca nenhuma face dela`;
+    else if (!depois || Math.abs(depois.t - antes.t) > FOLGA_DA_SEMENTE) motivo = `o ponto ${descricao} cai num vão (ou numa abertura que a chapa já tem): a chapa de antes do corte aparece a ${br(antes.t)} mm do raio e a de depois, ${depois ? `a ${br(depois.t)} mm` : 'em lugar nenhum'}`;
+    if (motivo) {
+      if (sementesPerdidas === 'recusa') erro(`o painel '${p.nome}' não achou pedaço: ${motivo}; mova o ponto para dentro do pedaço que o painel deve ser`);
+      perdidas.push(p.nome); aviso('sementeSemPainel', `o painel '${p.nome}' não achou pedaço: ${motivo}`);
+      return;
+    }
+    const g = pedacoDe.get(depois.face);
+    if (dono.has(g)) erro(`os painéis '${dono.get(g)}' e '${p.nome}' caem no mesmo pedaço (a semente de '${p.nome}' é ${descricao}); mova uma das sementes para o pedaço dela, ou confira a linha que devia separá-los${dicaDaProfundidade}`);
+    dono.set(g, p.nome);
+    partes[i].ate = r3(depois.t + o.vao / 4);
+  });
+  if (folgaMinima < folgaAbaixoDe) aviso('folgaEstreita', `a folga entre as paredes do corte cai a ${br(folgaMinima)} mm (a lâmina, e não o vão da pele, que é ${br(o.vao)} mm): a chapa é muito inclinada em relação à linha; desenhe a linha numa vista mais de frente, ou baixe folgaAbaixoDe se essa folga serve`);
   /* CADA LINHA PROVA QUE SEPARA. O número de pedaços da chapa inteira não diz qual linha separou: uma curva que para no meio da chapa passa sem aviso quando outra linha separa. Em estações ao longo de cada linha, o ponto a meia lâmina mais
      0,15 vão de cada lado, sobre a pele, tem de cair em pedaços diferentes (na linha fechada, o de dentro e o de fora são pedaços diferentes). O ponto que cai num vão, numa abertura ou fora da chapa não conta; a linha sem nenhum par contado
      avisa que não foi provada. O que recusa traz a linha e o ponto da ponte. */
@@ -907,7 +933,7 @@ function paineisPorVaosBruto(o) {
       pares.push({ nome: v.nome, fechada: v.fechada, lista });
     }
     for (const ln of lidasDeSuperficie) {
-      if (ln.l.dentro === 'descarta') continue;
+      if (ln.l.dentro === 'descarta' || ln.l.separa === false) continue;
       const h = larguraDaSuperficie / 2 + 0.15 * o.vao;
       const lista = [];
       for (const estacoes of ln.segmentos) {
@@ -933,30 +959,6 @@ function paineisPorVaosBruto(o) {
     }
     medidas.separacao = provasDeSeparacao;
   }
-  const tConferencia = performance.now();
-  const raiosDepois = prepararRaios(executado.V, executado.F, ids);
-  const dicaDaProfundidade = pendentes.length ? ` (modo 'superficie': a lâmina desce só até ${br(Math.max(...(o.profundidade != null ? [o.profundidade] : [2 * o.vao])))} mm abaixo da pele quando a espessura não pôde ser lida, ou a espessura lida mais meio vão; se a chapa é mais grossa que ${br(8 * o.vao)} mm, dê profundidade maior que a espessura e não atravessa a chapa de outro modo)` : '';
-  const dono = new Map();
-  const perdidas = [];
-  o.paineis.forEach((p, i) => {
-    const { de, dir } = partes[i];
-    const antes = leitura.raios.primeiro(de, dir);
-    const depois = raiosDepois.primeiro(de, dir);
-    const descricao = `${p.eixo} [${br(p.ponto[0])}, ${br(p.ponto[1])}]${p.lado === '-' ? ' vista do lado -' : ''}`;
-    let motivo = null;
-    if (!antes) motivo = `o ponto ${descricao} cai fora da chapa: o raio da vista ${p.eixo} não toca nenhuma face dela`;
-    else if (!depois || Math.abs(depois.t - antes.t) > FOLGA_DA_SEMENTE) motivo = `o ponto ${descricao} cai num vão (ou numa abertura que a chapa já tem): a chapa de antes do corte aparece a ${br(antes.t)} mm do raio e a de depois, ${depois ? `a ${br(depois.t)} mm` : 'em lugar nenhum'}`;
-    if (motivo) {
-      if (sementesPerdidas === 'recusa') erro(`o painel '${p.nome}' não achou pedaço: ${motivo}; mova o ponto para dentro do pedaço que o painel deve ser`);
-      perdidas.push(p.nome); aviso('sementeSemPainel', `o painel '${p.nome}' não achou pedaço: ${motivo}`);
-      return;
-    }
-    const g = pedacoDe.get(depois.face);
-    if (dono.has(g)) erro(`os painéis '${dono.get(g)}' e '${p.nome}' caem no mesmo pedaço (a semente de '${p.nome}' é ${descricao}); mova uma das sementes para o pedaço dela, ou confira a linha que devia separá-los${dicaDaProfundidade}`);
-    dono.set(g, p.nome);
-    partes[i].ate = r3(depois.t + o.vao / 4);
-  });
-  if (folgaMinima < folgaAbaixoDe) aviso('folgaEstreita', `a folga entre as paredes do corte cai a ${br(folgaMinima)} mm (a lâmina, e não o vão da pele, que é ${br(o.vao)} mm): a chapa é muito inclinada em relação à linha; desenhe a linha numa vista mais de frente, ou baixe folgaAbaixoDe se essa folga serve`);
   saida.passos = montarPassos();
   saida.partes = partes.map((p) => ({ nome: p.nome, origem: origemDoCorte, de: p.de, dir: p.dir, ate: p.ate ?? null }));
   medidas.sementesSemPainel = perdidas;

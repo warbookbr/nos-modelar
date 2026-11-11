@@ -48,7 +48,25 @@ export function criarOperacoesLimparLascas({ grita, resolverSelecao }) {
           if (pares.length) f.quebras = pares; else delete f.quebras;
         }
       }
-      for (const fid of res.facesRemovidas) st.F.delete(fid);
+      /* a face que sai fica registrada como consumida por este passo: a citação posterior pela origem do gerador diz que o passo a desfez, e não que ela "foi removida" */
+      for (const fid of res.facesRemovidas) { st.F.delete(fid); st.consumidas.set(fid, { passo: i, op: OP }); }
+      /* o vértice que some deixa o que tinha no que fica: o peso de esqueleto (por osso, o maior dos dois) e o registro de fusão, que o replay e a conferência de pesos leem */
+      const fundidos = new Map();
+      for (const v of res.verticesRemovidos) {
+        let para = res.fusoes.get(v);
+        while (para != null && res.fusoes.has(para)) para = res.fusoes.get(para);
+        if (para == null) continue;
+        if (!fundidos.has(para)) fundidos.set(para, []);
+        fundidos.get(para).push(v);
+        const pv = st.pesos.get(v);
+        if (pv?.size) {
+          let pk = st.pesos.get(para);
+          if (!pk) { pk = new Map(); st.pesos.set(para, pk); }
+          for (const [osso, peso] of [...pv].sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0))) pk.set(osso, Math.max(pk.get(osso) ?? 0, peso));
+        }
+        st.pesos.delete(v);
+      }
+      for (const [para, de] of [...fundidos].sort((x, y) => x[0] - y[0])) st.merges.push({ de: de.sort((x, y) => x - y), para });
       for (const v of res.verticesRemovidos) st.V.delete(v);
       /* as origens que citam o que sumiu: o par de vértices da costura segue a fusão, e o dono da face que saiu deixa a lista */
       for (const registros of st.origens.values()) {
@@ -65,6 +83,12 @@ export function criarOperacoesLimparLascas({ grita, resolverSelecao }) {
             reg.arestas = novas.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
           }
           if (reg.donos && typeof reg.donos === 'object') for (const fid of res.facesRemovidas) delete reg.donos[fid];
+          /* a lista de faces do gerador deixa de ter a que sumiu: a citação da origem inteira (a união) segue valendo sem a lasca, e só a citação explícita da face diz que o passo a desfez */
+          const tira = (lista) => lista.filter((x) => !(Number.isSafeInteger(x) && res.facesRemovidas.has(x)));
+          for (const [k, v] of Object.entries(reg)) {
+            if (Array.isArray(v) && v.length && v.every(Number.isSafeInteger)) reg[k] = tira(v);
+            else if (v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Map) && k !== 'donos') for (const [k2, w] of Object.entries(v)) if (Array.isArray(w) && w.length && w.every(Number.isSafeInteger)) v[k2] = tira(w);
+          }
         }
       }
       if (relatorio.finasDepois > 0) {

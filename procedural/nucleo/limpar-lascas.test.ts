@@ -338,3 +338,32 @@ describe('limparLascas: o tempo', () => {
     expect(semPar(aplicar(m, r))).toBe(0);
   });
 });
+
+/* O passo no estado: o peso do vértice que some passa ao que fica, o registro de fusão entra em `merges`, e a face desfeita fica em `consumidas` (a citação explícita diz que o passo a desfez e a da origem inteira segue valendo). */
+describe('limparLascas no estado: pesos, fusões e consumo', () => {
+  const E = { ossos: [{ nome: 'o' }, { nome: 'p' }] };
+  const rodar = (passos: any[]) => nucleo(passos, {}, {}, {}, E, [], {});
+  const V = [[0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0], [0, 0, 1], [10, 0, 1], [10, 10, 1], [0, 10, 1], [0.01, 0, 1]];
+  const F = [[0, 3, 2, 1], [0, 1, 5, 8, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7], [7, 4, 8], [7, 8, 5], [7, 5, 6]];
+  const S = ['subdivisao', { origemId: 1, vertices: V, faces: F, niveis: 0 }];
+  const L = ['limparLascas', { sel: { tudo: true }, tolerancia: 0.05 }];
+  const base = rodar([S]);
+  const vid = [...base.V.keys()] as number[];
+
+  it('o vértice que some deixa o peso no que fica (o maior por osso) e o registro de fusão', () => {
+    const st = rodar([S, ['pesar', { osso: 'o', peso: 1, sel: { v: [vid[8]] } }], ['pesar', { osso: 'p', peso: 0.5, sel: { v: [vid[4]] } }], ['pesar', { osso: 'o', peso: 0.25, sel: { v: [vid[4]] } }], L]);
+    expect(st.orfaos).toEqual([]);
+    expect(st.V.has(vid[8])).toBe(false);
+    expect(st.pesos.has(vid[8])).toBe(false);
+    expect([...st.pesos.get(vid[4])].sort()).toEqual([['o', 1], ['p', 0.5]]);
+    expect(st.merges).toEqual([{ de: [vid[8]], para: vid[4] }]);
+  });
+
+  it('a face desfeita entra em consumidas: a citação explícita diz que o passo a desfez, e a origem inteira segue valendo', () => {
+    const ids = [...base.F.keys()] as number[];
+    const st = rodar([S, L]);
+    const sumiu = ids.filter((f) => !st.F.has(f));
+    expect(sumiu).toHaveLength(1);
+    expect(rodar([S, L, ['liso', { sel: { origem: { op: 'subdivisao', id: 1 } } }]]).orfaos).toEqual([]);
+  });
+});

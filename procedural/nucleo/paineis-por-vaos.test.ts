@@ -176,7 +176,7 @@ describe('paineisPorVaos: linha fechada, alcance e as recusas', () => {
 
   it('o alcance limita a lâmina: a linha do lado direito não corta o esquerdo', () => {
     /* a caixa vista de cima: a linha em x de 0 a 300 só corta o lado direito do tampo */
-    const g = paineisPorVaos({ ...base, linhas: [LINHAS_CAIXA[0], { nome: 'lado', eixo: 'z', pontos: [[0, 295], [0, -5]], alcance: [-1, 1] }], paineis: [{ nome: 'a', eixo: 'y', ponto: [0, 75] }, { nome: 'b', eixo: 'y', ponto: [0, 225] }] });
+    const g = paineisPorVaos({ ...base, linhas: [LINHAS_CAIXA[0], { nome: 'lado', eixo: 'z', pontos: [[0, 295], [0, -5]], alcance: [-1, 1], separa: false }], paineis: [{ nome: 'a', eixo: 'y', ponto: [0, 75] }, { nome: 'b', eixo: 'y', ponto: [0, 225] }] });
     expect(g.medidas.paineisAchados).toBe(2);
     const corte = g.passos.find((p: any) => p[1]?.origemId === g.origemDoCorte.id);
     expect(corte[1].solidos).toHaveLength(3);

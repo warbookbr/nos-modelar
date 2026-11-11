@@ -820,6 +820,7 @@ function contratoFaces(op) {
    quem a citava quase sempre quer o substituto. */
 function conferirConsumo(st, fid, contexto) {
   const c = st.consumidas?.get(fid);
+  if (c?.op === 'limparLascas') return `${contexto} foi desfeita pelo limparLascas do passo ${c.passo} (era uma face fina, fundida à vizinha); cite a origem inteira, que segue valendo sem ela`;
   return c ? `${contexto} foi consumida pelo ${c.op} do passo ${c.passo} — a face virou a borda do corte; cite a origem que o corte publicou (ou una as duas num alias)` : null;
 }
 function consumoDe(st, fid) {

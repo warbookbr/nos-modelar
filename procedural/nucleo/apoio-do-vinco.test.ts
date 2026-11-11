@@ -483,3 +483,44 @@ describe('(e) o caso real: a cintura a 6 mm e o ombro a 3 mm, contra os 18 e 2,7
     expect(porVinco.cintura.colunas).toBeGreaterThanOrEqual(2); expect(porVinco.ombro.colunas).toBeGreaterThanOrEqual(3);
   });
 });
+
+/* O raio que o passo guarda é o realizado: o `raioNaoCabe` grava o que a malha tem, o vinco sem apoio não grava nenhum, o passo recusa raio com nitidez, e o perfil com NaN diz que há valor inválido. */
+describe('o raio gravado no vinco do passo', () => {
+  const colunas = [{ nome: 'a', em: [-0.04, 0.04] }, { nome: 'q', em: [0.04, 0.04] }, { nome: 'b', em: [0.04, -0.04] }];
+  const gaiola = (vinco: any) => gaiolaPorEstacoes({ eixo: 'z', virar: true, niveis: 3, estacoes: [0, 1, 2, 3, 4].map((i) => ({ nome: `e${i}`, em: i * 0.02, colunas })), vincos: [vinco] });
+
+  it('o raio que cabe sai como foi pedido, e o `raios` da saída traz o gravado ao lado do pedido e do esperado', () => {
+    const g = gaiola({ nome: 'quina', coluna: 'q', raio: 6 });
+    expect(g.passo.vincos[0].raio).toBeCloseTo(0.006, 12);
+    expect(g.raios[0].gravado).toBe(6);
+    expect(g.raios[0].raioPedido).toEqual({ minimo: 6, maximo: 6 });
+    expect(g.raios[0].raioEsperado.minimo).toBeGreaterThan(5);
+  });
+
+  it('raio de 60 num braço de 40: o aviso diz o que cabe e o passo guarda o mesmo valor, e não o pedido', () => {
+    const g = gaiola({ nome: 'quina', coluna: 'q', raio: 60 });
+    const aviso = g.avisos.find((a: any) => a.ref === 'raioNaoCabe');
+    expect(aviso.raioMaximo).toBeCloseTo(42.97, 2);
+    expect(g.passo.vincos[0].raio * 1000).toBeCloseTo(aviso.raioMaximo, 2);
+    expect(g.raios[0].gravado).toBeCloseTo(aviso.raioMaximo, 2);
+  });
+
+  it('o vinco sem duas faces fica sem apoio e sem raio no passo', () => {
+    const g = gaiola({ nome: 'quina', coluna: 'a', raio: 6 });
+    expect(g.avisos.map((a: any) => a.ref)).toContain('vincoSemDuasFaces');
+    expect(g.passo.vincos[0]).toEqual({ nome: 'quina', pontos: ['e0_a', 'e1_a', 'e2_a', 'e3_a', 'e4_a'], nitidez: 0 });
+  });
+
+  it('o passo subdivisao recusa raio junto de nitidez diferente de 0, e raio com a nitidez 0 passa', () => {
+    const g = gaiola({ nome: 'quina', coluna: 'q', raio: 6 });
+    const roda = (vinco: any) => nucleo([['subdivisao', { origemId: 1, ...g.passo, vincos: [{ ...g.passo.vincos[0], ...vinco }], niveis: 3 }]], {}, g.pontos);
+    expect(roda({}).orfaos).toEqual([]);
+    expect(roda({ nitidez: 1 }).orfaos[0].motivo).toMatch(/declara raio e nitidez 1/);
+    expect(roda({ nitidez: 'viva' }).orfaos[0].motivo).toMatch(/declara raio e nitidez 'viva'/);
+  });
+
+  it('raioDoFilete com NaN no perfil diz que há valor inválido, e não "perfil curto demais"', () => {
+    expect(raioDoFilete([[0, 0], [1, NaN], [2, 0], [3, 1], [4, 2]]).motivo).toMatch(/valor inválido/);
+    expect(raioDoFilete([[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]).motivo).toMatch(/curto demais|sem dobra/);
+  });
+});

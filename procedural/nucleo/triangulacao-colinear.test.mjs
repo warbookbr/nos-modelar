@@ -96,3 +96,41 @@ describe('face em tira com cantos colineares nos dois lados', () => {
     }
   });
 });
+
+/* A tira de duas cadeias reamostrada: a passagem linear não tem limite de cantos. A tira real de 38 cantos, com cada borda reamostrada em m cantos, triangula com
+   2m-2 triângulos de giro positivo, fora do critério de degenerado, e a cobertura é a área do polígono; 302 e 1.000 cantos passam, e o tempo cabe em frações de segundo. */
+describe('face em tira de muitos cantos, sem limite de cantos', () => {
+  const tira = JSON.parse(readFileSync(new URL('../../tools/modelar/fixtures/tira-de-corte-colinear.json', import.meta.url), 'utf8'));
+  const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cruz3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const reamostrar = (m) => {
+    const h = tira.length / 2; const A = tira.slice(0, h); const B = tira.slice(h);
+    const re = (C) => Array.from({ length: m }, (_, k) => { const t = (k / (m - 1)) * (C.length - 1); const i = Math.min(C.length - 2, Math.floor(t)); const f = t - i; return C[i].map((x, e) => x + (C[i + 1][e] - x) * f); });
+    return [...re(A), ...re(B)];
+  };
+  it.each([151, 500])('%i cantos por borda: triângulos todos de giro positivo, a área do polígono e menos de 2 s', (m) => {
+    const P = reamostrar(m);
+    const t0 = performance.now();
+    const T = triangularSemDegenerado(P);
+    const ms = performance.now() - t0;
+    expect(T).not.toBeNull();
+    expect(T).toHaveLength(2 * m - 2);
+    const nm = P.reduce((s, p, i) => { const q = P[(i + 1) % P.length]; const c = cruz3(p, q); return [s[0] + c[0], s[1] + c[1], s[2] + c[2]]; }, [0, 0, 0]);
+    let soma = 0;
+    for (const [i, j, k] of T) {
+      const g = cruz3(sub3(P[j], P[i]), sub3(P[k], P[i]));
+      expect(g[0] * nm[0] + g[1] * nm[1] + g[2] * nm[2]).toBeGreaterThan(0);
+      soma += Math.hypot(...g) / 2;
+    }
+    expect(soma).toBeCloseTo(Math.hypot(...nm) / 2, 8);
+    expect(ms).toBeLessThan(2000);
+  });
+  it('a tira alinhada de 302 cantos (a que a programação dinâmica recusava acima de 300) triangula', () => {
+    const P = [];
+    for (let i = 0; i < 151; i++) P.push([i, 0, 0]);
+    for (let i = 150; i >= 0; i--) P.push([i, 1, 0]);
+    const T = triangularSemDegenerado(P);
+    expect(P).toHaveLength(302);
+    expect(T).toHaveLength(300);
+  });
+});

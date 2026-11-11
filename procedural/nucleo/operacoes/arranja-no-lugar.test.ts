@@ -106,3 +106,29 @@ describe('arranja linear com coincidente: true', () => {
     });
   });
 });
+
+/* Dois restos da cópia no lugar: a citação de uma parte da fonte que sumiu por `apagaFace` (e não por booleana) resolve pela cópia viva; e o aviso de casca dupla só vale para a cópia que
+   continua em cima da fonte e que nenhum passo usou. */
+describe('arranja coincidente: a fonte que perde a face e o aviso de casca dupla', () => {
+  const CUBO = ['cubo', { origemId: 1, larg: 40, alt: 30, prof: 30 }];
+  const ARR = (extra: object = {}) => ['arranja', { modo: 'linear', total: 3, origemId: 2, derivaDe: { op: 'cubo', id: 1 }, sel: { origem: { op: 'cubo', id: 1 } }, nomes: ['u1', 'u2'], coincidente: true, ...extra }];
+  const u = (nome: string, de: object = { op: 'cubo', id: 1 }) => ({ op: 'arranja', id: 2, de, nome });
+  const avisos = (st: any) => st.avisos.filter((a: any) => a.ref === 'copiaNoLugarSemUso').map((a: any) => a.nome);
+
+  it('a face da fonte apagada por apagaFace: citar a mesma face da cópia resolve, sem dizer que foi removida', () => {
+    const st = rodar([CUBO, ARR(), ['apagaFace', { sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }],
+      ['transladar', { d: [0, 5, 0], sel: { origem: u('u1', { op: 'cubo', id: 1, face: 'topo' }) } }]]);
+    expect(st.orfaos).toEqual([]);
+    const ys = [...st.V.values()].map((p: number[]) => p[1]);
+    expect(Math.max(...ys)).toBeGreaterThan(Math.max(...[...rodar([CUBO]).V.values()].map((p: number[]) => p[1])));
+  });
+
+  it('a cópia transladada, a nomeada por parte e a usada como fonte de outra cópia não avisam; a que ficou em cima da fonte avisa', () => {
+    expect(avisos(rodar([CUBO, ARR({ total: 2, nomes: ['u1'] })]))).toEqual(['u1']);
+    expect(avisos(rodar([CUBO, ARR({ total: 2, nomes: ['u1'] }), ['transladar', { d: [100, 0, 0], sel: { origem: u('u1') } }]]))).toEqual([]);
+    expect(avisos(rodar([CUBO, ARR({ total: 2, nomes: ['u1'] }), ['parte', { nome: 'x', sel: { origem: u('u1') } }]]))).toEqual([]);
+    const deCopia = ['arranja', { modo: 'linear', total: 2, origemId: 3, derivaDe: u('u1'), sel: { origem: u('u1') }, nomes: ['w1'], coincidente: true }];
+    const st = rodar([CUBO, ARR({ total: 2, nomes: ['u1'] }), deCopia, ['transladar', { d: [100, 0, 0], sel: { origem: { op: 'arranja', id: 3, de: u('u1'), nome: 'w1' } } }]]);
+    expect(avisos(st)).toEqual([]);
+  });
+});
