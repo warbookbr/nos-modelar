@@ -16,7 +16,9 @@
  *   segmentos: máximo de segmentos por quarto de volta nos arcos dos cantos (par, padrão 4).
  *   camadas: de uma a quatro camadas de faces da grade que o anel troca com recuo 0.
  *   arredondar: true contorna os cantos das voltas com arco, em vez de esquadria (com recuo 0).
- * devolve: em `aneis[nome]` da saída de gaiolaPorEstacoes: { vao, fechada, voltas, costuras, borda, extraordinarios }.
+ *   lente: { folga, sobra, espessura } mm, só com recuo e relevo negativo na volta 1: a chapa atrás do rebaixo, a caixa da abertura mais `sobra` de cada lado, `folga` atrás do plano dela.
+ * devolve: em `aneis[nome]` da saída de gaiolaPorEstacoes: { vao, fechada, voltas, costuras, borda, extraordinarios, lente? }; os avisos do anel entram em `avisos` da gaiola
+ *   (`relevoEmGradeLarga`, `lenteEmAberturaNaoRetangular`).
  * exemplo:
  *   gaiolaPorEstacoes({ eixo: 'z', virar: true, vaos: [{ nome: 'janela', estacoes: ['e1', 'e5'], colunas: ['c1', 'c5'] }],
  *     aneis: [{ nome: 'janela', vao: 'janela', recuo: 95, voltas: 2, largura: 10 }],
@@ -104,6 +106,8 @@
 const MM = 1000;
 const MARGEM = 1e-4;
 const MAIOR_RAZAO = 2.5;
+/* a razão entre a aresta da grade em volta do vão e o raio do anel, acima da qual o anel com relevo avisa (medida no farol do sedã e na chapa plana de prova) */
+export const RAZAO_MAXIMA_DA_GRADE_COM_RELEVO = 6;
 const UNIFORME = 0.05;
 const citar = (n) => `'${n}'`;
 const lista = (nomes) => nomes.map(citar).join(', ');
@@ -125,7 +129,7 @@ export function lerAneis(aneis, vaos) {
   if (!Array.isArray(aneis)) falha('aneis precisa ser lista de { nome, vao, recuo, voltas, largura, raio?, relevo? }');
   const nomes = new Set(); const dosVaos = new Set();
   return aneis.map((a, n) => {
-    exigirCampos(a, ['nome', 'vao', 'recuo', 'voltas', 'largura', 'larguras', 'raio', 'raios', 'relevo', 'segmentos', 'cantoGraus', 'camadas', 'arredondar'], `o anel ${n}`);
+    exigirCampos(a, ['nome', 'vao', 'recuo', 'voltas', 'largura', 'larguras', 'raio', 'raios', 'relevo', 'segmentos', 'cantoGraus', 'camadas', 'arredondar', 'lente'], `o anel ${n}`);
     if (typeof a.nome !== 'string' || !a.nome) falha(`o anel ${n} precisa de nome (texto não vazio)`);
     const nome = a.nome;
     if (nomes.has(nome)) falha(`o nome de anel ${citar(nome)} aparece mais de uma vez`);
@@ -184,7 +188,14 @@ export function lerAneis(aneis, vaos) {
     for (const [lado, valor] of Object.entries(lados ?? (recuo !== null && !fora ? { '': recuo } : {}))) {
       if (!(valor > ate)) falha(`o anel ${citar(nome)} recua ${valor} mm da borda do vão${lado ? ` no lado ${citar(lado)}` : ''} e as ${voltas} voltas ocupam ${ate} mm da abertura; o recuo precisa passar disso, para sobrar a transição até a grade. Aumente o recuo, ou declare recuo: 0 para a abertura ser a própria borda do vão e as voltas crescerem para fora, sobre a grade`);
     }
-    return { nome, vao: a.vao, recuo, lados, fora, voltas, larguras, raio, raios, relevo, segmentos, cantoGraus, camadas, arredondar };
+    let lente = null;
+    if (a.lente != null) {
+      const l = a.lente;
+      if (!l || typeof l !== 'object' || Array.isArray(l) || !Object.keys(l).every((k) => ['folga', 'sobra', 'espessura'].includes(k)) || !(Number.isFinite(l.folga) && l.folga >= 0) || !(Number.isFinite(l.sobra) && l.sobra > 0) || !(Number.isFinite(l.espessura) && l.espessura > 0)) falha(`o anel ${citar(nome)} precisa de lente: { folga, sobra, espessura } em mm (folga de zero em diante, sobra e espessura maiores que zero), a folga da lente atrás da abertura, quanto ela passa da abertura para cada lado e a espessura dela`);
+      if (fora || !(relevo[0] < 0)) falha(`o anel ${citar(nome)} pede lente, que é a do rebaixo: precisa de recuo maior que zero e de relevo negativo na volta 1 (a abertura fica atrás da pele), e veio relevo ${relevo[0]} na volta 1${fora ? ' com recuo 0' : ''}`);
+      lente = { folga: l.folga, sobra: l.sobra, espessura: l.espessura };
+    }
+    return { nome, vao: a.vao, recuo, lados, fora, voltas, larguras, raio, raios, relevo, segmentos, cantoGraus, camadas, arredondar, lente };
   });
 }
 
@@ -1097,8 +1108,44 @@ function construirUm(anel, borda, contexto, consumidas, semSugestao = false) {
   const voltas = Array.from({ length: anel.voltas }, (_, k) => (fora && k === 0 ? [...nomes] : nomesDosLacos[lacos.findIndex((l) => l.volta === k + 1)]));
   const costuras = lacos.map((l, k) => (l.volta ? null : nomesDosLacos[k])).filter(Boolean).reverse();
   const primeira = voltas[0];
+  /* O RELEVO E A GRADE LARGA: o rebaixo por relevo pede estações em volta do vão a poucos raios uma da outra (ver `relevoEmGradeLarga`). */
+  const avisos = [];
+  const raiosPositivos = raiosDosCantos.filter((r) => r > 0);
+  if (!fora && anel.relevo.some((x) => x !== 0) && raiosPositivos.length) {
+    const raioMenor = Math.min(...raiosPositivos); const espMm = quadro.espacamento * MM; const razao = espMm / raioMenor;
+    if (razao > RAZAO_MAXIMA_DA_GRADE_COM_RELEVO) {
+      const largura = anel.larguras.reduce((s, x) => s + x, 0);
+      avisos.push({
+        ref: 'relevoEmGradeLarga', anel: anel.nome, espacamentoMm: Number(espMm.toFixed(1)), raioMm: raioMenor, razao: Number(razao.toFixed(2)), limite: RAZAO_MAXIMA_DA_GRADE_COM_RELEVO,
+        texto: `o anel ${citar(anel.nome)} tem relevo e raio de ${raioMenor} mm nos cantos, e as arestas da grade em volta do vão ${citar(anel.vao)} medem ${espMm.toFixed(1).replace('.', ',')} mm, ${razao.toFixed(1).replace('.', ',')} vezes o raio, acima de ${RAZAO_MAXIMA_DA_GRADE_COM_RELEVO}: nessa razão a faixa de recuo em que a transição fecha cai a 2 mm ou menos (medido na chapa plana de prova: raio 9 mm a 100 mm de grade, raio 18 mm a 140 mm), e o rebaixo do farol do sedã dobrou sobre si nos cantos com a grade a 140 mm e só montou com ela a 45 a 50 mm; ponha estações e colunas em volta do vão a no máximo ${(RAZAO_MAXIMA_DA_GRADE_COM_RELEVO / 2).toFixed(0)} raios (${(raioMenor * RAZAO_MAXIMA_DA_GRADE_COM_RELEVO / 2).toFixed(0)} mm) uma da outra, ou peça raio maior (${(Math.ceil(espMm / RAZAO_MAXIMA_DA_GRADE_COM_RELEVO * 10) / 10).toFixed(1).replace('.', ',')} mm ou mais para essa grade); as voltas e a transição ocupam ${largura} mm da abertura`,
+      });
+    }
+  }
+  /* A LENTE DO REBAIXO: a caixa da abertura (a volta 1) mais `sobra` mm de cada lado, num plano `folga` mm atrás do plano da abertura, em grade de 3 por 3 pontos, a chapa
+     que o passo `subdivisao` engrossa e que a receita põe atrás do rebaixo (o farol, o visor). */
+  let lente = null;
+  if (anel.lente) {
+    const L = primeira.map((n) => local(pontos[n]));
+    const xs = L.map((q) => q[0]); const ys = L.map((q) => q[1]);
+    const S = anel.lente.sobra / MM; const x0 = Math.min(...xs) - S; const x1 = Math.max(...xs) + S; const y0 = Math.min(...ys) - S; const y1 = Math.max(...ys) + S;
+    const z = L.reduce((t, q) => t + q[2], 0) / L.length - anel.lente.folga / MM;
+    const grade = [0, 1, 2].map((i) => [0, 1, 2].map((j) => {
+      const lx = x0 + ((x1 - x0) * i) / 2; const ly = y0 + ((y1 - y0) * j) / 2;
+      return [o[0] + lx * e1[0] + ly * e2[0] + z * N[0], o[1] + lx * e1[1] + ly * e2[1] + z * N[1], o[2] + lx * e1[2] + ly * e2[2] + z * N[2]];
+    }));
+    const nomeDe = (i, j) => `${anel.nome}_lente_${i}_${j}`;
+    const lp = {}; for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) lp[nomeDe(i, j)] = grade[i][j];
+    const lf = []; for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) lf.push([nomeDe(i, j), nomeDe(i + 1, j), nomeDe(i + 1, j + 1), nomeDe(i, j + 1)]);
+    const area = Math.abs(sinal(L)); const caixa = (x1 - x0 - 2 * S) * (y1 - y0 - 2 * S);
+    const enche = caixa > 0 ? area / caixa : 0;
+    if (enche < 0.9) avisos.push({ ref: 'lenteEmAberturaNaoRetangular', anel: anel.nome, preenchimento: Number(enche.toFixed(3)), texto: `a lente do anel ${citar(anel.nome)} é a caixa da abertura, e a abertura enche só ${(100 * enche).toFixed(0)}% dela: a lente passa da abertura nos cantos recortados; use uma lente própria para essa forma` });
+    lente = {
+      pontos: lp, passo: { vertices: Object.keys(lp), faces: lf, cantos: [0, 2].flatMap((i) => [0, 1, 2].map((j) => nomeDe(i, j))) }, espessuraMm: anel.lente.espessura,
+      aberturaMm: { largura: Number(((x1 - x0 - 2 * S) * MM).toFixed(2)), altura: Number(((y1 - y0 - 2 * S) * MM).toFixed(2)) }, folgaMm: anel.lente.folga, sobraMm: anel.lente.sobra, preenchimento: Number(enche.toFixed(3)),
+    };
+  }
   return {
-    pontos, voltas, costuras, faces: facesNovas, fechada,
+    pontos, voltas, costuras, faces: facesNovas, fechada, avisos, ...(lente ? { lente } : {}),
     borda: fechada ? [...primeira, primeira[0]] : [...primeira],
     ancoras: fora ? [...nomes] : noPlano[0].map((q) => nomes[q.ancora]),
     grade: grade ?? [],

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1936 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1941 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -443,6 +443,7 @@
 - `CICLO-1.md` — Sedã em alta definição, ciclo 1: o corpo de baixo e o capô por dois caminhos
 - `CICLO-2.md` — Sedã em alta definição, ciclo 2: o corpo de baixo e o capô pelo caminho A, com as ferramentas novas
 - `CICLO-3.md` — Sedã em alta definição, ciclo 3: o andar de cima sobre o de baixo
+- `CICLO-4.md` — Sedã em alta definição, ciclo 4: a cabine sem contornos, e a frente e a traseira até o eixo
 
 ## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
 
@@ -1032,6 +1033,7 @@
 - `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
 - `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
 - `gaiola-aneis-gota.test.mjs` — gaiola-aneis-gota.test.mjs — os anéis de gaiola no vão real de uma carroceria: a gota estreita, o recuo por lado e a abertura que é a própria borda
+- `gaiola-aneis-rebaixo.test.mjs` — gaiola-aneis-rebaixo.test.mjs — o rebaixo por relevo de anel: a faixa de recuo que monta numa chapa plana de grade uniforme (os números do guia), o aviso de …
 - `gaiola-aneis.js` — gaiola-aneis.js — anéis de gaiola em volta de um vão, opção da gaiola por estações
 - `gaiola-aneis.test.mjs` — gaiola-aneis.test.mjs — os anéis de gaiola em volta de um vão e de um arco, na chapa curva desenhada por código
 - `gaiola-captura.js` — gaiola-captura.js — a captura das gaiolas montadas durante uma chamada
@@ -1075,6 +1077,8 @@
 - `moldura-do-vao.js` — moldura-do-vao.js — a conferência geral da moldura em volta de um vão de uma chapa.
 - `moldura-do-vao.test.mjs` — moldura-do-vao.test.mjs — a conferência geral da moldura em volta de um vão, sobre faixas desenhadas à mão no plano.
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
+- `normal-da-gaiola.js` — normal-da-gaiola.js — confere para onde olha a normal das faces de uma gaiola, e avisa quando ela olha para dentro
+- `normal-da-gaiola.test.ts` — normal-da-gaiola.test.ts — o aviso de normal ao contrário: `fora` declarado em gaiolaPorEstacoes e o volume da gaiola fechada. Fixtures sem domínio: um paine…
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `operador-das-medidas.test.mjs` — operador-das-medidas.test.mjs — a gaiola ajustada pelas medidas vista como transformação linear da declarada.
 - `paineis-por-vaos-curva.test.ts` — paineis-por-vaos-curva.test.ts — a linha de vão dada como curva 3D sobre a chapa (`linhas[i].curva`), que sobe a quina arredondada. A chapa é a de `fixtures/…
@@ -1983,6 +1987,7 @@
 - `andar-de-cima.esboco.mjs` — andar-de-cima.esboco.mjs: o terceiro ciclo de alta definição do sedã. O andar de baixo do segundo ciclo (o corpo de baixo do lado direito e a metade direita …
 - `caminho-a-gaiola-da-casca.esboco.mjs` — caminho-a-gaiola-da-casca.esboco.mjs: o segundo ciclo de alta definição do sedã, pelo caminho A (a grade de estações por colunas). O trecho é o corpo de baix…
 - `exportar-trecho.mjs` — exportar-trecho.mjs: grava em OBJ, em metro, as partes pedidas de um esboço ou de uma receita, para a vista de três quartos lado a lado deste ciclo. `npm run…
+- `frente-e-traseira.esboco.mjs` — frente-e-traseira.esboco.mjs: o quarto ciclo de alta definição do sedã. O lado direito inteiro, até o eixo de simetria: os dois andares de `andar-de-cima.esb…
 
 ## procedural/pecas/sedan-chassi-e-lataria/alta-definicao/ciclo-1/
 

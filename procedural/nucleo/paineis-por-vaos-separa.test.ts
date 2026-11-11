@@ -51,6 +51,14 @@ describe('cada linha prova que separa', () => {
     expect(sem.avisos.map((a: any) => a.ref)).toContain('naoConferiu');
   });
 
+  it('a linha oblíqua que passa da borda com `alem` grande não acusa ponte fora da chapa: o par da ponta alongada cai fora da pele e não conta', () => {
+    /* a 45 graus da borda z = 200, a ponta alongada em 30 mm tem o ponto de cada lado levado à borda, os dois do mesmo lado da linha (antes: ponte em z 204, além da borda) */
+    const oblicua = (alem: number) => paineisPorVaos({ chapa: C, vao: 4, linhas: [{ nome: 'obliqua', curva: reta(-120, -200, 200, 200), alem }], paineis: [{ nome: 'a', eixo: 'y', ponto: [-150, 100] }, { nome: 'b', eixo: 'y', ponto: [150, -100] }] });
+    const pares = [6, 20, 30, 60].map((alem) => { const g = oblicua(alem); expect(g.medidas.separacao[0].ponte, `alem ${alem}`).toBeNull(); return g.medidas.separacao[0].pares; });
+    expect(new Set(pares).size).toBe(1);
+    expect(pares[0]).toBeGreaterThan(20);
+  });
+
   it('a curva que corre sobre a borda da chapa é recusada, e a que a cruza é aceita', () => {
     const msg = grito(() => paineisPorVaos({ chapa: C, vao: 4, linhas: [{ nome: 'rente', curva: reta(-199, -150, -199, 150), alem: 0 }], paineis: [A, B] }));
     expect(msg).toMatch(/a curva 'rente' corre sobre a borda da chapa por \d+/);

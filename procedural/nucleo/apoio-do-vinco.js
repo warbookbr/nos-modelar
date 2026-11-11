@@ -422,7 +422,10 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
       /* a dobra é a do corte perpendicular ao vinco: as arestas de saída, sem a componente na tangente, são as direções das duas faces */
       const noCorte = (viz) => { const w = sub3(pontos[viz], pontos[n]); const c = w[0] * tangente[0] + w[1] * tangente[1] + w[2] * tangente[2]; return [pontos[n][0] + w[0] - c * tangente[0], pontos[n][1] + w[1] - c * tangente[1], pontos[n][2] + w[2] - c * tangente[2]]; };
       const angulo = anguloDaDobra(noCorte(e), pontos[n], noCorte(d));
-      return { vinco: v.nome, ponto: n, e, d, angulo, tangente, senoE: senoDaAresta(pontos[n], pontos[e], tangente), senoD: senoDaAresta(pontos[n], pontos[d], tangente),
+      /* com `esquadro` a distância é perpendicular a cada aresta da linha que toca o ponto, e não à tangente média: no canto de 90 graus do contorno de uma
+         tampa a aresta de saída é a diagonal, e o apoio vai a raiz de dois vezes mais longe ao longo dela para ficar à distância pedida das duas arestas */
+      const seno = (viz) => (v.esquadro ? Math.max(Math.min(...dirs.map((dir) => senoDaAresta(pontos[n], pontos[viz], dir))), SENO_MINIMO) : senoDaAresta(pontos[n], pontos[viz], tangente));
+      return { vinco: v.nome, ponto: n, e, d, angulo, tangente, senoE: seno(e), senoD: seno(d),
         comprimentoE: dist3(pontos[e], pontos[n]) * unidade, comprimentoD: dist3(pontos[d], pontos[n]) * unidade, raioPedido: raios[k], apoio: 0, raio: 0 };
     });
     lidos.push({ vinco: v.nome, fechada, nomes, arestas, pts, pedido: v.raio });

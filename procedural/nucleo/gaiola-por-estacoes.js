@@ -18,6 +18,8 @@
  *   leitura: true | { peso?, erro?, inclinacao?, estrito? } declara que as cotas vêm de imagem, com erro.
  *   simetria: 'x' declara a metade x >= 0, que o passo espelha antes de subdividir.
  *   virar: true inverte a ordem dos vértices de cada face, virando a normal.
+ *   fora: [x, y, z] declara o lado para onde a chapa olha, e a montagem confere: se a normal média das faces olha para o lado contrário, sai o aviso `normalContrariaAoFora`
+ *     (cosseno e parte da área contra ele) e a chapa não é virada sozinha; `virar` é que a vira. A gaiola fechada (cada aresta em duas faces) avisa `normalParaDentro` se a normal olha para dentro do volume.
  *   prefixo: texto posto na frente do nome de todo ponto.
  *   curvas: [{ nome, colunas: [{ nome, fracao }] }] colunas a frações fixas de uma curva de seção (gaiola-interpolada.js).
  *   interpolar: { passo? } preenche as estações sem colunas pelas estações-chave (gaiola-interpolada.js).
@@ -148,6 +150,7 @@ import { capturarGaiolas, registrarGaiola } from './gaiola-captura.js';
 import { chaveDaColuna, entradasDaDefinicao, expandirEstacoes } from './gaiola-interpolada.js';
 import { construirAneis, extraordinarios, lerAneis } from './gaiola-aneis.js';
 import { inserirApoiosNosVincos } from './apoio-do-vinco.js';
+import { conferirNormalDaGaiola } from './normal-da-gaiola.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const TOLERANCIA_DA_COSTURA = 1e-9;
@@ -666,6 +669,14 @@ function marcar(seletores, campo, lidas, vertices, citavel, chaves, aneis, leitu
 
 export { capturarGaiolas };
 
+/* a lente do anel sai com o prefixo da gaiola nos nomes dos pontos, como os demais pontos dela */
+function lenteComPrefixo(l, prefixo) {
+  if (!prefixo) return l;
+  const nome = (n) => `${prefixo}${n}`;
+  return { ...l, pontos: Object.fromEntries(Object.entries(l.pontos).map(([n, p]) => [nome(n), p])),
+    passo: { vertices: l.passo.vertices.map(nome), faces: l.passo.faces.map((f) => f.map(nome)), cantos: l.passo.cantos.map(nome) } };
+}
+
 /**
  * gaiolaPorEstacoes({ eixo, estacoes, regioes, vaos, aneis, vincos, cantos, medidas, leitura, simetria, virar, prefixo, curvas, interpolar })
  *   -> { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, origens, entradas, estrutura, estacoes?, aneis?, avisos? }
@@ -673,17 +684,18 @@ export { capturarGaiolas };
  * simetria? }, tudo em nomes de ponto. `regioes` dá, para cada região, os nomes dos pontos dela, na ordem dos pontos.
  * `bordaDoVao(vao)` devolve os nomes dos pontos da borda do vão, em sequência ao longo das arestas da gaiola, com o
  * primeiro repetido no fim quando a borda volta sobre si: a linha que o friso (e a aba dele) segue; no vão com anel, a volta 1 dele.
- * Com `aneis`, `aneis[nome]` dá { vao, fechada, voltas, costuras, borda, extraordinarios }: os nomes dos pontos de cada volta e da transição,
+ * Com `aneis`, `aneis[nome]` dá { vao, fechada, voltas, costuras, borda, extraordinarios, lente? }: os nomes dos pontos de cada volta e da transição,
  * a volta 1 e os vértices extraordinários { ponto, valencia, borda }. Com `interpolar`, `estacoes` lista { nome, em, tipo } de cada estação, com tipo 'chave', 'interpolada' (declarada sem
  * colunas), 'gerada' (pelo passo) ou 'parcial'.
  */
 export function gaiolaPorEstacoes(definicao) {
-  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'aneis', 'vincos', 'cantos', 'medidas', 'leitura', 'simetria', 'virar', 'prefixo', 'curvas', 'interpolar', 'niveis'], 'a definição da gaiola');
+  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'aneis', 'vincos', 'cantos', 'medidas', 'leitura', 'simetria', 'virar', 'fora', 'prefixo', 'curvas', 'interpolar', 'niveis'], 'a definição da gaiola');
   const { simetria = null, virar = false, prefixo = '' } = definicao;
   const E = lerEixo(definicao.eixo);
   const leitura = lerLeitura(definicao.leitura);
   if (simetria !== null && simetria !== 'x') falha("simetria só aceita 'x'");
   if (typeof virar !== 'boolean') falha('virar precisa ser true ou false');
+  if (definicao.fora != null && !(Array.isArray(definicao.fora) && definicao.fora.length === 3 && definicao.fora.every(Number.isFinite) && definicao.fora.some((x) => x !== 0))) falha(`fora precisa ser [x, y, z], a direção para onde a chapa olha, e veio ${JSON.stringify(definicao.fora)}`);
   if (typeof prefixo !== 'string') falha('prefixo precisa ser texto');
   const regioes = lerRegioes(definicao.regioes);
   const expandida = definicao.curvas != null || definicao.interpolar != null
@@ -922,10 +934,16 @@ export function gaiolaPorEstacoes(definicao) {
   if (raios) saida.raios = raios;
   if (avisosDoApoio.length) avisos = [...(avisos ?? []), ...avisosDoApoio.map((a) => ({ ref: a.nome, texto: a.motivo, ...a }))];
   if (aneis) {
+    const doAnel = [...aneis.porNome.values()].flatMap((a) => a.avisos ?? []);
+    if (doAnel.length) avisos = [...(avisos ?? []), ...doAnel];
     saida.aneis = Object.fromEntries([...aneis.porNome.values()].map((a) => [a.anel.nome, {
+      ...(a.lente ? { lente: lenteComPrefixo(a.lente, prefixo) } : {}),
       vao: a.vao, fechada: a.fechada, ...(a.anel.fora ? { fora: true, camadas: a.camadas, grade: [...a.grade] } : {}), voltas: a.voltas.map((v) => [...v]), costuras: a.costuras.map((v) => [...v]), borda: [...a.borda], extraordinarios: extraordinariosDosAneis[a.anel.nome],
     }]));
   }
+  /* a normal: o aviso de nome próprio, para o `fora` declarado e para a gaiola fechada com a normal para dentro (normal-da-gaiola.js) */
+  const normal = conferirNormalDaGaiola({ pontos, faces: passo.faces, fora: definicao.fora ?? null, corrige: virar ? 'tire `virar: true`' : 'ponha `virar: true` (ou troque o sentido das colunas)' });
+  if (normal.avisos.length) avisos = [...(avisos ?? []), ...normal.avisos];
   if (avisos) saida.avisos = avisos;
   if (chaves) saida.estacoes = lidas.map((e) => ({ nome: e.nome, em: e.em, tipo: expandida.tipos.get(e.nome) }));
   registrarGaiola(saida);

@@ -28,6 +28,10 @@
  * a cadeia entre duas colunas declaradas vizinhas é a coluna, os apoios dela, os apoios da outra, e a outra. A linha passa por elas todas, e a quina sobe sobre o filete.
  * A fração entre duas colunas é contada em trechos da cadeia (uma fração de 0,5 numa cadeia de 3 trechos cai no meio do segundo).
  *
+ * A COLUNA QUE TERMINA NO MEIO DA GRADE. A linha ao longo de uma coluna vai até a última estação em que a coluna existe: `ate` é a estação em que a coluna termina (`termina: true`)
+ * ou em que ela se funde na estação seguinte (`de` com dois nomes), e o último ponto é a estação dela, o canto de trás da célula anterior. Pedir uma estação além dela
+ * continua recusado ('existem em ... e não ambas em ...').
+ *
  * O QUE RECUSA, com os nomes: a estação ou a coluna que não existe, a face da gaiola entre duas colunas que não é de quatro cantos (a transição de colunas, uma fusão ou
  * divisão), duas estações vizinhas em que a coluna não existe ou não é vizinha da mesma, e cadeias com número de apoios diferente entre elas. A curva é a da malha refinada,
  * e não a da superfície limite exata; com `niveis` igual ao do passo da chapa ela cai na malha. */
@@ -312,11 +316,15 @@ function linhaAoLongoDaColuna(S, G, pedido, onde) {
     celulas.set(k, r);
     return r;
   };
+  const pontoEm = (U, k) => { const { c, v } = daCelula(k); const [fu, fv] = c.ponto(U - k, v); return avaliar(S, c.fi, fu, fv); };
   const pontos = valores.map((U) => {
     const k = Math.min(Math.max(0, Math.floor(U + EPS)), n - 2);
-    const { c, v } = daCelula(k);
-    const [fu, fv] = c.ponto(U - k, v);
-    return avaliar(S, c.fi, fu, fv);
+    try { return pontoEm(U, k); } catch (e) {
+      /* a coluna termina ou se funde nesta estação (o fim da linha, ou o pé dela no meio da grade): a célula depois da estação não tem a coluna, e o ponto é o canto de
+         trás da célula anterior, que é a própria estação */
+      if (k >= 1 && Math.abs(U - k) < EPS) { try { return pontoEm(U, k - 1); } catch { /* o erro de antes é o que vale */ } }
+      throw e;
+    }
   });
   return { pontos, fechada: false };
 }

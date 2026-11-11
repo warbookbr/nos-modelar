@@ -26,6 +26,8 @@ atravessam a chapa. Nenhuma operação rebaixa a uma profundidade:
 `aberturaPorContorno` atravessa, `friso` soma sólido e `subtrair` pede a
 ferramenta desenhada à mão.
 
+O `relevo` de um anel da `gaiolaPorEstacoes` já cobre o rebaixo com a abertura (o farol do sedã, com a lente como saída do anel, na receita de `modelar-carroceria.md`); só o rebaixo por contorno resolveria o de fundo fechado, como a maçaneta e a placa.
+
 ## Resultado
 
 O ajudante `rebaixoPorContorno` devolve os passos que rebaixam, numa vista, a

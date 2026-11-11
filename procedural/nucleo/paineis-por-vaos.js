@@ -896,7 +896,7 @@ function paineisPorVaosBruto(o) {
   });
   if (folgaMinima < folgaAbaixoDe) aviso('folgaEstreita', `a folga entre as paredes do corte cai a ${br(folgaMinima)} mm (a lâmina, e não o vão da pele, que é ${br(o.vao)} mm): a chapa é muito inclinada em relação à linha; desenhe a linha numa vista mais de frente, ou baixe folgaAbaixoDe se essa folga serve`);
   /* CADA LINHA PROVA QUE SEPARA. O número de pedaços da chapa inteira não diz qual linha separou: uma curva que para no meio da chapa passa sem aviso quando outra linha separa. Em estações ao longo de cada linha, o ponto a meia lâmina mais
-     0,15 vão de cada lado, sobre a pele, tem de cair em pedaços diferentes (na linha fechada, o de dentro e o de fora são pedaços diferentes). O ponto que cai num vão, numa abertura ou fora da chapa não conta; a linha sem nenhum par contado
+     0,15 vão de cada lado, sobre a pele, tem de cair em pedaços diferentes (na linha fechada, o de dentro e o de fora são pedaços diferentes). O ponto que cai num vão, numa abertura ou fora da chapa não conta (na curva, o par só vale com os dois pontos a menos de um vão da pele, e o segmento que toca a ponta alongada por `alem` não entra: ali os dois pontos caem fora da borda e são levados ao mesmo lado dela); a linha sem nenhum par contado
      avisa que não foi provada. O que recusa traz a linha e o ponto da ponte. */
   const provasDeSeparacao = [];
   {
@@ -939,8 +939,12 @@ function paineisPorVaosBruto(o) {
       for (const estacoes of ln.segmentos) {
         for (const x of amostrasLaterais(estacoes, !!ln.l.fechada && ln.fechadaInteira, h)) {
           if (ln.curva) {
-            const ra = naPeleDaCurva(x.a, 4 * o.vao); const rb = naPeleDaCurva(x.b, 4 * o.vao);
-            lista.push({ c: x.c, a: ra?.c ?? null, b: rb?.c ?? null });
+            /* o par só vale com os dois pontos sobre a pele: a ponta alongada passa da borda, e ali o ponto de cada lado cai fora da chapa e é levado à mesma
+               borda (uma ponte que não existe); o segmento que toca uma estação alongada, e o ponto que a pele mais próxima deixa a mais de um vão, saem */
+            const alongado = estacoes[x.i].alongada || estacoes[(x.i + 1) % estacoes.length].alongada;
+            const ra = alongado ? null : naPeleDaCurva(x.a, 4 * o.vao); const rb = alongado ? null : naPeleDaCurva(x.b, 4 * o.vao);
+            const sobre = (r) => (r && r.d <= o.vao ? r.c : null);
+            lista.push({ c: x.c, a: sobre(ra), b: sobre(rb) });
           } else {
             const cima = ln.cima;
             const sobe = (p) => { const e = cima.findIndex((w) => Math.abs(w) > 0.5); const [lo, hi] = leitura.caixa[e]; const de = p.map((w, k) => (k === e ? (cima[e] > 0 ? hi + afasta(e) : lo - afasta(e)) : w)); const dd = cima.map((w) => -w); const t = leitura.raios.primeiro(de, dd); return t ? [0, 1, 2].map((k) => de[k] + dd[k] * t.t) : null; };

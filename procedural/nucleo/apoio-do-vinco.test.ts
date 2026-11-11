@@ -17,6 +17,8 @@ import { nitidezDoVinco, subdividirCatmullClark } from './subdivisao.js';
 import { nucleo } from './entrada.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { analisarTopologia } from './topologia.js';
+// @ts-expect-error — ferramenta em JavaScript.
+import { ondulacaoDaReceita } from '../../tools/modelar/ondulacao-da-superficie.mjs';
 // @ts-expect-error — conversor do esboço em JavaScript.
 import { argsEmMetro } from '../../modulos/esboco-nucleo/src/milimetro.js';
 
@@ -718,5 +720,85 @@ describe('(h) a quina ao longo de uma estação que termina na quina ao longo de
       { nome: 'um', pontos: ['p-2_2_2', 'p-1_2_2', 'p0_2_2'], raio: 6 }, { nome: 'dois', pontos: ['p-1_2_2', 'p0_2_2', 'p1_2_2'], raio: 6 }] });
     expect(dobrada.avisos.map((a: any) => a.nome)).toContain('vincoCruzaOutroComRaio');
     expect(dobrada.aplicados).toEqual(['um']);
+  });
+});
+
+/* ---- (i) as quinas que se cruzam na gaiola por laços: o vinco do laço da ponta ---- */
+/* Uma barra de 330 por 72 mm de seção ao longo de x, como o para-choque do sedã: as quatro quinas dos trechos com raio (8 mm na frente e em cima, 3 mm atrás e em baixo) e o
+   vinco do laço da ponta, nas duas pontas, com raio 8. Os laços ficam a 60 mm da ponta ou mais, que é a distância que o apoio do raio pede (4 raios). */
+describe('(i) gaiolaPorLacos: o vinco do laço da ponta cruza as quinas dos trechos, e o raio sai o pedido até o canto', () => {
+  const A = 330; const B = 72;
+  const lacoDe = (em: number) => ({ em, trechos: { baixo: [[0, 0], [0, B / 2], [0, B]], frente: [[0, B], [A / 3, B], [(2 * A) / 3, B], [A, B]], cima: [[A, B], [A, B / 2], [A, 0]], tras: [[A, 0], [(2 * A) / 3, 0], [A / 3, 0], [0, 0]] } });
+  const XS = [0, 60, 160, 320, 480, 580, 640];
+  const barra = (vincos: any[], extra: Record<string, unknown> = {}) => gaiolaPorLacos({ nome: 'barra', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' },
+    trechos: [{ nome: 'baixo', pontos: 3 }, { nome: 'frente', pontos: 4 }, { nome: 'cima', pontos: 3 }, { nome: 'tras', pontos: 4 }], lacos: XS.map(lacoDe), vincos, ...extra });
+  const quinas = [{ nome: 'q1', entre: ['frente', 'cima'], raio: 8 }, { nome: 'q2', entre: ['baixo', 'frente'], raio: 8 }, { nome: 'q3', entre: ['cima', 'tras'], raio: 3 }, { nome: 'q4', entre: ['tras', 'baixo'], raio: 3 }];
+  const pontas = [{ nome: 'ponta', laco: 'primeiro', raio: 8 }, { nome: 'pontaB', laco: 'ultimo', raio: 8 }];
+  const g = barra([...quinas, ...pontas]);
+  const nomes: string[] = g.passo.vertices; const idx = new Map(nomes.map((n, i) => [n, i]));
+  const malha = (niveis: number) => subdividirCatmullClark({ vertices: nomes.map((n) => g.pontosMm[n]), faces: g.passo.faces.map((f: string[]) => f.map((n) => idx.get(n))), vincos: [], niveis });
+  const cortar = (m: any, eixo: number, c0: number, filtro: (p: number[]) => boolean) => {
+    const pts: number[][] = [];
+    for (const f of m.faces) for (let q = 0; q < f.length; q++) {
+      const a = m.vertices[f[q]], b = m.vertices[f[(q + 1) % f.length]]; const da = a[eixo] - c0, db = b[eixo] - c0;
+      if ((da < 0) === (db < 0)) continue;
+      const t = da / (da - db); const p = [0, 1, 2].map((d) => a[d] + t * (b[d] - a[d]));
+      if (filtro(p) && !pts.some((w) => Math.hypot(w[0] - p[0], w[1] - p[1], w[2] - p[2]) < 1e-7)) pts.push(p);
+    }
+    return pts;
+  };
+  it('antes, o vinco do laço da ponta ficava sem apoio (apoioAmbiguo); agora ele e as quinas montam sem aviso de recusa, com a tampa refeita e declarada', () => {
+    expect((g.avisos ?? []).map((a: any) => a.ref).filter((r: string) => r !== 'planosDesiguais')).toEqual([]);
+    expect(g.aneisDaTampa.map((t: any) => t.laco)).toEqual(['l0', 'l6']);
+    expect(g.aneisDaTampa[0].recuoMm).toBeGreaterThan(20);
+    expect(g.raios.map((r: any) => [r.vinco, r.gravado])).toEqual([['q1', 8], ['q2', 8], ['q3', 3], ['q4', 3], ['ponta', 8], ['pontaB', 8]]);
+    for (const v of ['ponta', 'pontaB']) expect(g.passo.vincos.find((x: any) => x.nome === v)).toMatchObject({ nitidez: 0, raio: 0.008 });
+    /* a gaiola fecha: cada aresta em duas faces, uma em cada sentido */
+    const dirigidas = new Map<string, number>();
+    for (const f of g.passo.faces) f.forEach((a: string, k: number) => { const c = `${a}>${f[(k + 1) % f.length]}`; dirigidas.set(c, (dirigidas.get(c) ?? 0) + 1); });
+    for (const [c, n] of dirigidas) { const [a, b] = c.split('>'); expect(n, c).toBe(1); expect(dirigidas.has(`${b}>${a}`), c).toBe(true); }
+    /* cada vinco segue só arestas da gaiola nova, com os pontos que o outro pôs nele */
+    for (const v of g.passo.vincos) for (let k = 0; k + 1 < v.pontos.length; k++) expect(dirigidas.has(`${v.pontos[k]}>${v.pontos[k + 1]}`) || dirigidas.has(`${v.pontos[k + 1]}>${v.pontos[k]}`), `${v.nome} ${v.pontos[k]}`).toBe(true);
+  });
+  it('o raio da ponta (8 mm), medido na face da frente e na de baixo até 5 mm do canto, é o pedido a 10%, e o das quinas dos trechos também', () => {
+    const m = malha(4);
+    for (const dc of [100, 60, 40, 20, 10, 5]) {
+      /* a aresta da tampa com a face da frente (z = 72): o corte y = const, de z = 25 até a tampa e de x = 0 a 70 */
+      const frente = cortar(m, 1, A - dc, (p) => p[0] < 70 && p[2] > 25).map((p) => [p[0], p[2]]).sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
+      expect(Math.abs((raioDoFilete(frente).raio as number) / 8 - 1), `frente, a ${dc} mm do canto`).toBeLessThan(0.1);
+    }
+    for (const dz of [30, 20, 10]) {
+      /* a aresta da tampa com a face de baixo (y = 0): o corte z = const */
+      const baixo = cortar(m, 2, B - dz, (p) => p[0] < 70 && p[1] > -1 && p[1] < 70).map((p) => [p[0], p[1]]).sort((a, b) => (a[0] - a[1]) - (b[0] - b[1]));
+      expect(Math.abs((raioDoFilete(baixo).raio as number) / 8 - 1), `baixo, a ${dz} mm do canto`).toBeLessThan(0.1);
+    }
+    for (const x0 of [200, 100, 50, 30, 20, 10, 5]) {
+      const quina = cortar(m, 0, x0 + 0.01, (p) => p[1] > A - 60 && p[2] > B - 60).map((p) => [p[1], p[2]]).sort((a, b) => (a[0] - a[1]) - (b[0] - b[1]));
+      expect(Math.abs((raioDoFilete(quina).raio as number) / 8 - 1), `quina de cima, a ${x0} mm da ponta`).toBeLessThan(0.1);
+    }
+  });
+  it('sem falha de ondulação e sem face fina: a malha entregue pelo passo não tem lasca nem órfão, e a superfície ondula menos de 0,3 mm fora das feições', () => {
+    const receita = { PARAMS: {}, TOPO: g.pontos, PASSOS: [['subdivisao', { origemId: 1, ...g.passo, niveis: 3, borda: 'cantos' }], ['parte', { nome: 'barra', sel: { origem: { op: 'subdivisao', id: 1 } } }]] };
+    const o = ondulacaoDaReceita(receita);
+    expect(o.falhas).toBe(0);
+    expect(o.foraDasFeicoes).toBe(0);
+    const r = nucleo([['subdivisao', { origemId: 1, ...g.passo, niveis: 3 }]], {}, g.pontos);
+    expect(r.orfaos).toEqual([]);
+    expect(analisarTopologia({ vertices: r.V, faces: r.F }).achados.filter((a: any) => a.codigo === 'face-fina')).toEqual([]);
+  });
+  it('a espessura e os grupos conhecem os pontos da volta recuada, e a mesma chamada dá a mesma gaiola', () => {
+    const e = barra([...quinas, pontas[0]], { espessura: 2, grupos: [{ nome: 'ponta', lacos: ['l0', 'l1'] }] });
+    expect(e.espessura).toBeTruthy();
+    expect(e.passo.grupos[0].pontos.some((n: string) => n.endsWith('_dentro'))).toBe(true);
+    expect(JSON.stringify(barra([...quinas, ...pontas]))).toBe(JSON.stringify(barra([...quinas, ...pontas])));
+  });
+  it('a tampa fina demais para o apoio dá raioNaoCabe com o raio que cabe, e o vinco da ponta sem raio continua o de hoje', () => {
+    const fina = gaiolaPorLacos({ nome: 'f', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' }, trechos: [{ nome: 'baixo', pontos: 3 }, { nome: 'frente', pontos: 4 }, { nome: 'cima', pontos: 3 }, { nome: 'tras', pontos: 4 }],
+      lacos: [0, 160, 320].map((em) => ({ em, trechos: { baixo: [[0, 0], [0, 5], [0, 10]], frente: [[0, 10], [110, 10], [220, 10], [330, 10]], cima: [[330, 10], [330, 5], [330, 0]], tras: [[330, 0], [220, 0], [110, 0], [0, 0]] } })),
+      vincos: [{ nome: 'ponta', laco: 'primeiro', raio: 8 }] });
+    expect(fina.avisos.map((a: any) => a.ref)).toContain('raioNaoCabe');
+    const viva = barra([{ nome: 'ponta', laco: 'primeiro', nitidez: 'viva' }]);
+    expect(viva.raios).toBeUndefined(); expect(viva.aneisDaTampa).toBeUndefined();
+    expect(viva.passo.vertices.some((n: string) => n.endsWith('_dentro'))).toBe(false);
   });
 });

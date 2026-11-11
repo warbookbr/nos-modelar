@@ -6,6 +6,8 @@ import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
 import { curvaDaGaiola } from './curva-da-gaiola.js';
 // @ts-expect-error — núcleo em JavaScript.
+import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
+// @ts-expect-error — núcleo em JavaScript.
 import { gaiolaPorLacos } from './gaiola-por-lacos.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { chapaEmL } from './fixtures/chapa-em-l-prova.js';
@@ -138,5 +140,45 @@ describe('curvaDaGaiola: gaiola por laços', () => {
     expect(parte.curva[parte.curva.length - 1][0]).toBeGreaterThan(60); expect(parte.curva[parte.curva.length - 1][0]).toBeLessThan(90);
     expect(grito(() => curvaDaGaiola(barra, { estacao: 1 }))).toMatch(/`estacao` é da gaiola de estações/);
     expect(grito(() => curvaDaGaiola(barra, { laco: 'lx' }))).toMatch(/laço 'lx' não existe/);
+  });
+});
+
+/* ---- a coluna que termina no meio da grade ---- */
+/* Oito estações ao longo de z (a lateral de uma cabine que some): na penúltima a quina e o meio se fundem numa coluna só (`qm`, `de: ['meio', 'quina']`), e na última o pé e ela
+   se fundem de novo. A coluna `quina` existe de e0 a e5; `termina` é o outro jeito de a coluna acabar, e o teste dele está logo abaixo. */
+describe('curvaDaGaiola: a linha ao longo de uma coluna vai até a estação em que ela termina ou se funde', () => {
+  const X = 0.4; const alturas = [0.3, 0.3, 0.24, 0.18, 0.12, 0.06, 0.03, 0]; const n = alturas.length;
+  const lateral = (h: number, i: number) => {
+    const c: any[] = [];
+    if (i < n - 2) c.push({ nome: 'pe', em: [X, 0] }, { nome: 'meio', em: [X, h / 2] }, { nome: 'quina', em: [X, h] });
+    else if (i === n - 2) c.push({ nome: 'pe', em: [X, 0] }, { nome: 'qm', de: ['meio', 'quina'], em: [X, h * 0.75] });
+    else c.push({ nome: 'p', de: ['pe', 'qm'], em: [X, 0] });
+    return [...c, { nome: 'topo', em: [0.2, h] }, { nome: 'centro', em: [0, h] }];
+  };
+  const fusao = gaiolaPorEstacoes({ eixo: 'z', niveis: 2, estacoes: alturas.map((h, i) => ({ nome: `e${i}`, em: i * 0.1, colunas: lateral(h, i) })) });
+  it('até a estação em que a coluna se funde: o último ponto é o da estação (o mesmo de uma linha ao longo da estação e5), e a curva anda do pé da primeira estação à quina da e5 (a superfície de subdivisão da ponta fica 2 mm antes do ponto da gaiola)', () => {
+    const r = curvaDaGaiola(fusao, { coluna: 'quina', de: 'e0', ate: 'e5' }, { niveis: 2 });
+    const fim = r.curva[r.curva.length - 1];
+    expect(Math.abs(fim[2] - 500)).toBeLessThan(2.5);
+    expect(Math.abs(r.curva[0][2])).toBeLessThan(2.5);
+    const naEstacao = curvaDaGaiola(fusao, { estacao: 'e5', de: 'meio', ate: 'quina' }, { niveis: 2 }).curva;
+    expect(Math.hypot(...[0, 1, 2].map((e) => fim[e] - naEstacao[naEstacao.length - 1][e]))).toBeLessThan(1e-6);
+    /* sem o fim da linha no meio da grade o resultado é o de antes: a linha a uma estação antes termina nela, e os pontos até lá são os mesmos */
+    const antes = curvaDaGaiola(fusao, { coluna: 'quina', de: 'e0', ate: 'e4' }, { niveis: 2 }).curva;
+    expect(r.curva.slice(0, antes.length)).toEqual(antes);
+    expect(r.curva.length).toBeGreaterThan(antes.length);
+  });
+  it('a estação além da coluna continua recusada, com os nomes', () => {
+    expect(grito(() => curvaDaGaiola(fusao, { coluna: 'quina', de: 'e0', ate: 'e6' }, { niveis: 2 }))).toMatch(/'quina' e 'topo' existem em 'e5' e não ambas em 'e6'/);
+  });
+  it('a coluna com `termina: true` no meio da grade chega à estação em que termina, também para o outro sentido (de e1 a e0 invertido)', () => {
+    const est = (nome: string, z: number, cols: any[]) => ({ nome, em: z, colunas: cols.map(([c, x, extra]: any) => ({ nome: c, em: [x, 0], ...(extra ?? {}) })) });
+    const g = gaiolaPorEstacoes({ eixo: 'z', niveis: 2, estacoes: [
+      est('e0', 0, [['a', 0], ['b', 0.1], ['c', 0.2], ['d', 0.3]]), est('e1', 0.1, [['a', 0], ['b', 0.1], ['c', 0.2, { termina: true }], ['d', 0.3, { termina: true }]]),
+      est('e2', 0.2, [['a', 0], ['b', 0.1]]), est('e3', 0.3, [['a', 0], ['b', 0.1]])] });
+    const ida = curvaDaGaiola(g, { coluna: 'c', de: 'e0', ate: 'e1' }, { niveis: 2 }).curva;
+    expect(ida[ida.length - 1][2]).toBeCloseTo(100, 6);
+    const volta = curvaDaGaiola(g, { coluna: 'c', de: 'e1', ate: 'e0' }, { niveis: 2 }).curva;
+    expect(volta[0][2]).toBeCloseTo(100, 6); expect(volta[volta.length - 1][2]).toBeCloseTo(0, 6);
   });
 });
