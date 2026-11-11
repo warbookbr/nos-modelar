@@ -862,9 +862,9 @@ describe('gaiolaPorLacos: o passo denso entre laços', () => {
     const a = denso[0];
     expect(a.lacos).toEqual(['e2', 'e3']);
     expect(a.razao).toBeCloseTo(1.9, 1);
-    expect(a.passoMm).toBeCloseTo(9.9, 1);
+    expect(a.passoMm).toBeCloseTo(9.96, 1);
     expect(a.distanciaMm).toBeCloseTo(5.2, 1);
-    expect(a.texto).toMatch(/no trecho 'direita' os pontos ficam a 9,9 mm.*laços 'e2' e 'e3' a 5,2 mm, razão 1,9, abaixo de 3/);
+    expect(a.texto).toMatch(/no trecho 'direita' os pontos ficam a 10 mm.*laços 'e2' e 'e3' a 5,2 mm, razão 1,9, abaixo de 3/);
     expect(a.texto).toMatch(/baixe os pontos desse trecho de 25 para \d+ ou menos, ou espace os laços/);
     expect(RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS).toBe(3);
     expect(doPasso(cacamba(9))).toEqual([]);
@@ -887,7 +887,7 @@ describe('gaiolaPorLacos: o passo denso entre laços', () => {
   });
 
   it('laços a distâncias parecidas não avisam, por densos que sejam os pontos', () => {
-    const uniformes = LACOS_DA_CACAMBA.map(([, w, a, b], r) => [284.5 + r * 5, w, a, b]);
+    const uniformes = LACOS_DA_CACAMBA.map((_, r) => [284.5 + r * 5, 233, -621, -331]);
     expect(doPasso(cacamba(25, 33, uniformes))).toEqual([]);
   });
 });

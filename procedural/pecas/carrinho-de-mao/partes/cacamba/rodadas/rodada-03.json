@@ -1,0 +1,385 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/cacamba",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: cima.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "cacamba",
+        "tipo": "angulo",
+        "onde": "paredes laterais da boca, em planta, do trecho de trás até a frente",
+        "sentido": "menor",
+        "evidencia": "Vista superior: laterais paralelas até cerca de 2/3 do comprimento e depois semicírculo. Em cima.png as laterais convergem desde o fundo e a frente é um arredondado mais fechado."
+      }
+    ],
+    "observacao": "Perfil lateral, fundo plano, borda e tirantes batem e a chapa está limpa na luz rasante; só o contorno em planta se afasta da referência. Vistas por parte e luz rasante de frente e lado não foram abertas."
+  },
+  "partes": [
+    {
+      "nome": "cacamba",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tirantes",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "lacosPelasVistas amostra frente e traseira em 25 pontos uniformes na lateral: arco tangente ao lado reto dá facetas e estrias",
+    "gaiolaPorLacos com tampa esquerda/direita põe o primeiro degrau a 1 ou 2 mm do lado reto quando o contorno é de arcos tangentes: face de 11 pontos em lasca, origem da escama da dobra",
+    "49 pontos por trecho deram 2 faces finas nos tirantes por corte booleano; 41 dá zero; 57 a 65 dão lascas na própria casca",
+    "defeito 1 (laterais paralelas e frente em semicírculo, onde a foto converge aos poucos) veio do pedido de quem conduz na rodada 3, que mandou retas e arcos sem dizer que a frente afina; atribuição: plano",
+    "os defeitos de superfície da rodada 2 (boca facetada e escama na dobra) fecharam; a causa da escama era a tampa em escada entre os lados, que o ajudante não avisa; atribuição: núcleo",
+    "o número de pontos por trecho que dá zero faces finas é estreito (41 dá zero, 49 dá 2, 57 dá várias); atribuição: núcleo, gaiolaPorLacos frágil à amostragem"
+  ],
+  "notaDePassagem": "A boca é retas e arcos tangentes (traseira reta, cantos r 150, lados 313, frente em meia volta de raio 313), com o raio dos cantos em 150, e não uns 90: com 90 a sobreposição de cima caía de 91,7 para 89,9%, com 150 fica em 91,1%. A tampa do fundo é a escada entre inicio e fim, e não entre os lados, porque o primeiro degrau a 1 ou 2 mm do lado reto dava a lasca que parecia escama na dobra. 41 pontos por trecho e 9 por lado é o que dá zero lascas, incluindo os tirantes.",
+  "receita": {
+    "sha256": "sha256:e35db55b9cc5c7608a0de5e4cdc46418a240f2d6462624222d0309b3f40d5e5a",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 16,
+      "acrescentadas": 44,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": "    /* A silhueta de lado em [z, y], sem os dois pontos do fundo: as paredes retas, sem barriga, do fundo à boca em y 462 (a boca de z"
+        },
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": "       -810 a 24): a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": "    lado: [[24, 462], [-810, 462]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 43,
+          "texto": "    /* A meia largura por altura, acima do fundo: a parede do lado reta até 313 na boca. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": "    perfil: [[462, 313]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": "    /* A meia planta da boca pela vista de cima: 313 de z -260 a -650, os cantos de trás arredondados e a frente afinando até a ponta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "    planta: [[0, 24], [80, 14], [116, 0], [158, -20], [203, -50], [234, -80], [266, -120], [288, -160], [303, -200], [313, -260],"
+        },
+        {
+          "tipo": "-",
+          "linha": 47,
+          "texto": "      [313, -650], [306, -700], [290, -740], [262, -775], [225, -795], [180, -805], [0, -810]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "    /* A silhueta de lado em [z, y] sai da boca (`boca.frente` e `boca.tras`): as paredes retas, sem barriga, do fundo à boca em y"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "       462: a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "    alturaDaBoca: 462,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "    /* A PLANTA DA BOCA (linha \"planta da boca\"), em retas e arcos tangentes: a traseira reta em z -810, os dois cantos de trás de"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "       raio 150 (com 90 a sobreposição com a silhueta de cima caía de 91,7 para 89,9%, e com 150 fica em 91,1: a polilinha da foto"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "       tem o canto desse raio), os lados retos na meia largura de 313 e a frente em arco de meia volta, de raio igual à meia largura, até a ponta em"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "       z 24 (o arco de raio 313 centrado em z -289 cai a poucos mm da polilinha da foto de cima). As junções são tangentes, e cada arco"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "       é amostrado a `passoAngular` graus. A meia largura da parede é a da boca. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 150, passoAngular: 2 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "    pontos: 49, pontosDoLado: 9,"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    pontos: 41, pontosDoLado: 9,"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "/** O contorno da boca em retas e arcos tangentes, em [x, z]: os quatro trechos de `lacosPelasVistas` (`inicio` a traseira, de -x a +x;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": " *  `direita`, o lado de +x, de trás para a frente; `fim` a frente, de +x a -x; `esquerda`, o lado de -x, de frente para trás) e o anel"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": " *  inteiro. Os cantos de trás têm o raio dado, a frente é o arco de meia volta de raio igual à meia largura, e os lados e a traseira"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": " *  são retas: cada junção é tangente. Cada arco é amostrado a `passoAngular` graus. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "export function contornoDaBoca(B) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const w = B.meiaLargura; const r = B.raioDosCantos; const zf = B.frente - w; const zt = B.tras + r;"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  if (!(r > 0 && r < w && zt < zf)) throw new Error(`caçamba: boca de raio ${r} não cabe na meia largura ${w} e no comprimento ${B.frente - B.tras}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const arco = (cx, cz, raio, de, ate) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    const n = Math.max(1, Math.ceil(Math.abs(ate - de) / B.passoAngular));"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    return Array.from({ length: n + 1 }, (_, k) => { const t = (de + (ate - de) * k / n) * Math.PI / 180; return [cx + raio * Math.cos(t), cz + raio * Math.sin(t)]; });"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const inicio = [...arco(-w + r, zt, r, 180, 270), ...arco(w - r, zt, r, 270, 360)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const direita = [[w, zt], [w, zf]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const fim = arco(0, zf, w, 0, 180);"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  const esquerda = [[-w, zf], [-w, zt]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  return { trechos: { inicio, direita, fim, esquerda }, anel: [...inicio, ...direita.slice(1), ...fim.slice(1), ...esquerda.slice(1, -1)] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "  const [frente, tras] = [C.lado[0], C.lado[C.lado.length - 1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const B = C.boca;"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  const lado = [[B.frente, C.alturaDaBoca], [B.tras, C.alturaDaBoca]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  const perfil = [[C.alturaDaBoca, B.meiaLargura]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  const [frente, tras] = lado;"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "  const noLado = dobra([F.meiaLargura, yFundo], [C.perfil[C.perfil.length - 1][1], C.perfil[C.perfil.length - 1][0]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  const noLado = dobra([F.meiaLargura, yFundo], [perfil[0][1], perfil[0][0]]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 79,
+          "texto": "    lado: [atras[0], ...naFrente, ...C.lado, ...atras.slice(1).reverse()],"
+        },
+        {
+          "tipo": "-",
+          "linha": 80,
+          "texto": "    perfil: [...noLado.map(([u, y]) => [y, u]), ...C.perfil],"
+        },
+        {
+          "tipo": "-",
+          "linha": 81,
+          "texto": "    planta: [...C.planta, ...C.planta.slice(1, -1).reverse().map(([x, z]) => [-x, z])],"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    lado: [atras[0], ...naFrente, ...lado, ...atras.slice(1).reverse()],"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    perfil: [...noLado.map(([u, y]) => [y, u]), ...perfil],"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    planta: contornoDaBoca(B).anel,"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "    boca: contornoDaBoca(B).trechos,"
+        },
+        {
+          "tipo": "-",
+          "linha": 103,
+          "texto": "  const boca = lacos.lacos[lacos.lacos.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  /* a forma da boca é o contorno em retas e arcos, e não a polilinha que `lacosPelasVistas` tira da planta: ela amostra a frente e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "     traseira em passos iguais na lateral, e onde o arco encosta no lado reto um passo cobre dezenas de mm no comprimento (facetas) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  const boca = { trechos: vistas.boca };"
+        },
+        {
+          "tipo": "-",
+          "linha": 114,
+          "texto": "  return { ...lacos, lacos: reduzidos };"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  /* a tampa do fundo é a escada de degraus de lado a lado, entre a traseira e a frente: os degraus ficam na mesma altura de z dos dois"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "     lados (a boca é simétrica) e a primeira e a última face são as faixas da traseira e da frente. Entre os lados, o primeiro degrau"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "     ficaria a 1 ou 2 mm do lado reto, que o arco tangente deixa quase paralelo a ele, e a face de 11 pontos sairia em lasca */"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  return { ...lacos, tampa: { de: 'inicio', ate: 'fim' }, lacos: reduzidos };"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes cacamba",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-el20-topo-rasante-az30.png",
+      "peca-el20-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az200.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T04:37:05.776Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
