@@ -49,6 +49,7 @@
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
  *
  * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] */
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -68,7 +69,7 @@ import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
-  LADO_DA_VISTA_DE_SUPERFICIE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, exigirLuzNaSuperficie, gravarManifesto, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
+  LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
   superficieDaPeca, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
@@ -449,7 +450,7 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
 
 /* A seção da superfície da peça de lataria. As vistas do Blender têm nomes e lados próprios (`vistas_padrao` de `tools/blender/comum.py`),
    ditos aqui pelos eixos, e não pelos da bancada. */
-function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
+function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [] }) {
   const vistas = Object.keys(LADO_DA_VISTA_DE_SUPERFICIE).filter((v) => [...rasante, ...curvatura].some((i) => i.vista === v));
   const grau = (n) => `${String(n).replace('.', ',')} graus`;
   /* a faixa dos vincos que a forma desenha sai em ocre e fora da escala (`curvatura-da-lataria.py --vincos`): o crítico precisa saber
@@ -463,7 +464,8 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
     + 'escolhidas em cada vista para a luz cair no lado da peça que a câmera vê. O painel '
     + 'liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. '
     + 'A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.', '',
-    ...lista(rasante.map(({ arquivo, vista, azimute }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima): ${arquivo}`)), '',
+    ...lista(rasante.map(({ arquivo, vista, azimute, elevacao }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima)${elevacao ? `, com a luz a ${grau(elevacao)} do plano da imagem, mais alta que nas outras, porque a luz mais baixa não alcançava a peça nesta vista` : ''}: ${arquivo}`)), '',
+    ...semLuz.flatMap(({ texto }) => [`Sem imagem: ${texto}`, '']),
   ];
   /* A peça de emenda sombreada leva só a luz rasante: o que ela mostra é a sombra suave que sobe sobre o encontro de dois sólidos
      fundidos, com degrau, quina ou risco que o sombreamento esconde nas vistas de Modelo. */
@@ -1318,9 +1320,16 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pra
   }
 
   const sobreposicao = declarado ? await dep.sobreposicaoDeCortes({ peca, saida: pasta }) : null;
-  const superficie = lataria.luzRasante ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
-  /* a imagem de luz rasante quase toda escura não chega ao crítico: a luz que não alcança a chapa não mostra relevo nenhum */
-  if (superficie) exigirLuzNaSuperficie(peca, superficie);
+  const geradas = lataria.luzRasante ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
+  /* a imagem de luz rasante quase toda escura não chega ao crítico, mas não derruba o pacote: a vista é tentada de novo com a luz mais
+     alta, e a que nenhuma elevação salva sai do pedido com a frase que diz por quê; só sem nenhuma imagem de luz rasante o pacote é recusado */
+  let superficie = geradas;
+  if (geradas) {
+    const tentar = dep.luzMaisAlta ?? ((opcoes) => luzMaisAltaDaVista({ ...opcoes, obj: geradas.obj, pasta, blender }));
+    const decidida = await luzRasanteDoPacote(peca, geradas, { tentar });
+    superficie = decidida.superficie;
+    for (const { texto } of superficie.semLuz ?? []) avisos.push(texto);
+  }
 
   const orientacao = dados?.orientacao ?? null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);
@@ -1352,6 +1361,78 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pra
   return {
     peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos,
   };
+}
+
+/* ---------- a luz rasante que não alcança a peça ---------- */
+
+/** As elevações, em graus sobre o plano da imagem, que a vista escura tenta depois da padrão de 10; 45 é o máximo que o `luz-rasante.py` aceita. */
+export const ELEVACOES_DA_LUZ_RASANTE = Object.freeze([20, 30, 45]);
+export const ELEVACAO_PADRAO_DA_LUZ = 10;
+
+const pct = (f) => `${(100 * f).toFixed(1).replace('.', ',')} %`;
+
+/** Separa as imagens de luz rasante em `{ aceitas, escuras }` pelo limiar: a sem fração medida conta como escura. */
+export function decidirLuzRasante(rasante, limiar = LIMIAR_DA_LUZ_RASANTE) {
+  const escuras = imagensEscuras(rasante, limiar);
+  return { aceitas: rasante.filter((i) => !escuras.includes(i)), escuras };
+}
+
+/** A primeira das `candidatas` (`[{ elevacao, iluminada }]`, na ordem em que a luz sobe) com a peça iluminada no limiar, ou null. */
+export function primeiraQuePassa(candidatas, limiar = LIMIAR_DA_LUZ_RASANTE) {
+  return candidatas.find((c) => typeof c.iluminada === 'number' && c.iluminada >= limiar) ?? null;
+}
+
+/**
+ * Decide a luz rasante do pacote. Cada imagem abaixo do limiar é tentada de novo, na mesma vista e no mesmo azimute, com a luz em cada
+ * elevação de `ELEVACOES_DA_LUZ_RASANTE`, e fica a primeira que passa, com a elevação dita (`elevacao`). A que nenhuma elevação salva sai
+ * do pacote, e `semLuz` diz qual vista ficou sem ela e por quê. Com nenhuma imagem de luz rasante restante, recusa como antes
+ * (`exigirLuzNaSuperficie`). `tentar({ vista, azimutes, graus })` devolve `[{ azimute, arquivo, iluminada }]`; é injetável no teste.
+ * Devolve `{ superficie, semLuz }`, a superfície sem as imagens que caíram.
+ */
+export async function luzRasanteDoPacote(peca, superficie, { tentar, limiar = LIMIAR_DA_LUZ_RASANTE, elevacoes = ELEVACOES_DA_LUZ_RASANTE } = {}) {
+  const { escuras } = decidirLuzRasante(superficie.rasante, limiar);
+  if (!escuras.length) return { superficie, semLuz: [] };
+  const trocas = new Map();
+  const melhor = new Map();
+  for (const vista of new Set(escuras.map((i) => i.vista))) {
+    let faltam = escuras.filter((i) => i.vista === vista);
+    for (const graus of elevacoes) {
+      if (!faltam.length) break;
+      const feitas = await tentar({ vista, azimutes: faltam.map((i) => i.azimute), graus });
+      for (const original of faltam) {
+        const nova = feitas.find((f) => f.azimute === original.azimute);
+        if (!nova) continue;
+        if (typeof nova.iluminada === 'number') melhor.set(original, Math.max(melhor.get(original) ?? 0, nova.iluminada));
+        const passou = primeiraQuePassa([{ elevacao: graus, iluminada: nova.iluminada }], limiar);
+        if (passou) trocas.set(original, { ...original, arquivo: nova.arquivo, iluminada: nova.iluminada, elevacao: graus });
+      }
+      faltam = faltam.filter((i) => !trocas.has(i));
+    }
+  }
+  const semLuz = escuras.filter((i) => !trocas.has(i)).map((i) => {
+    const antes = typeof i.iluminada === 'number' ? `${pct(i.iluminada)} da peça iluminada a ${ELEVACAO_PADRAO_DA_LUZ} graus de elevação` : `sem fração iluminada medida a ${ELEVACAO_PADRAO_DA_LUZ} graus de elevação`;
+    const depois = melhor.has(i) ? `${pct(melhor.get(i))} no melhor de ${elevacoes.join(', ')} graus` : `sem medida em ${elevacoes.join(', ')} graus`;
+    return {
+      vista: i.vista,
+      azimute: i.azimute,
+      texto: `a vista ${i.vista} ficou sem a luz rasante a ${String(i.azimute).replace('.', ',')} graus de azimute: a luz não alcança a peça por esse lado (${antes}; ${depois}, abaixo do limiar de ${pct(limiar)}), o que é próprio de uma forma côncava ou aberta para a câmera, e a imagem saiu do pedido.`,
+    };
+  });
+  const rasante = superficie.rasante.filter((i) => !semLuz.some((s) => s.vista === i.vista && s.azimute === i.azimute)).map((i) => trocas.get(i) ?? i);
+  if (!rasante.length) exigirLuzNaSuperficie(peca, superficie, limiar);
+  return { superficie: { ...superficie, rasante, ...(semLuz.length ? { semLuz } : {}) }, semLuz };
+}
+
+/** Roda de novo o `luz-rasante.py` numa vista, nos azimutes dados e a `graus` de elevação, sobre a malha já exportada de `obj`. */
+export function luzMaisAltaDaVista({ obj, pasta, blender, vista, azimutes, graus, executar = spawnSync }) {
+  const prefixo = join(resolve(pasta), PASTA_DA_SUPERFICIE, `peca-el${graus}-`);
+  const r = executar(blender, ['-b', '--factory-startup', '--python', join(REPO, 'tools/blender/luz-rasante.py'), '--',
+    '--malha', obj, '--saida', prefixo, '--vista', vista, '--rasante-graus', String(graus), '--azimutes', azimutes.join(',')], { encoding: 'utf8', maxBuffer: 256 << 20 });
+  if (r.error || r.status !== 0) {
+    throw new Error(`o Blender (${blender}) não refez a luz rasante da vista ${vista} a ${graus} graus: ${r.error?.message ?? `${r.stdout ?? ''}\n${r.stderr ?? ''}`.trim().split('\n').slice(-8).join('\n')}`);
+  }
+  return JSON.parse(readFileSync(`${prefixo}rasante.json`, 'utf8')).imagens
+    .map((i) => ({ azimute: i.azimute, arquivo: i.arquivos.malha, iluminada: i.iluminacao?.fracao ?? null }));
 }
 
 /* Captura que não produziu arquivo recusa alto. A bancada devolve `ok:false` e
