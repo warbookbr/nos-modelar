@@ -89,7 +89,7 @@ proporção da foto de lado ou de cima, na escala adotada, lidas nos contornos;
 | pés | tubo de Ø 22, V de z -305 a -580 no eixo do braço, fundo no chão em z -551, x 177 do centro (a média dos topos, que seguem o braço) | lado: pernas de perto e de longe, no plano do meio |
 | travessas dos pés | chapa de 40 × 6, nos topos das pernas, sob os braços (face de cima em y 250); a de trás tem 412 de comprimento e a da frente 345 (razão 1,20, antes 1,04) | desenho de linha: 77 contra 95 px entre os eixos dos braços, a olho; baixo (caráter); rascunho |
 | boca da caçamba | 820 × 626 (652 com a borda), de z 24 a -810, em y 462 | cima: 824 × 628; lado: boca de 15 a -812, em 430 a 471 |
-| planta da boca | 313 de meia largura de z -260 a -650, cantos de trás de raio uns 90, frente afinando em curva até a ponta | cima |
+| planta da boca | em retas e arcos tangentes: traseira reta em z -810, cantos de trás de raio 150, lados retos de 313 de meia largura de z -660 a -289, frente em arco de meia volta (raio 313) até a ponta em z 24 | cima (a polilinha da foto cai a poucos mm do arco; o raio de 150 dos cantos é o que a polilinha tem, e com 90 a sobreposição de cima caía 1,8 ponto) |
 | fundo da caçamba | y 284,5, de z -715 a -170, meia largura 150 | lado (fundo entre 250 e 290); baixo (o fundo entre os braços); rascunho: 2,5 acima dos braços |
 | parede da frente | sobe do fundo em z -170 à boca em z 24 | lado |
 | parede de trás | sobe do fundo em z -715 à boca em z -810 | lado |

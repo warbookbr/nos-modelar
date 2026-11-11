@@ -41,10 +41,11 @@ export const TABELA = {
        462: a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */
     alturaDaBoca: 462,
     /* A PLANTA DA BOCA (linha "planta da boca"), em retas e arcos tangentes: a traseira reta em z -810, os dois cantos de trás de
-       raio 90, os lados retos na meia largura de 313 e a frente em arco de meia volta, de raio igual à meia largura, até a ponta em
+       raio 150 (com 90 a sobreposição com a silhueta de cima caía de 91,7 para 89,9%, e com 150 fica em 91,1: a polilinha da foto
+       tem o canto desse raio), os lados retos na meia largura de 313 e a frente em arco de meia volta, de raio igual à meia largura, até a ponta em
        z 24 (o arco de raio 313 centrado em z -289 cai a poucos mm da polilinha da foto de cima). As junções são tangentes, e cada arco
        é amostrado a `passoAngular` graus. A meia largura da parede é a da boca. */
-    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 90, passoAngular: 2 },
+    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 150, passoAngular: 2 },
     /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço: 49 no início e no fim (a frente e a trás, com os
        cantos), que tira o facetado dos cantos, e 9 em cada lado reto; com mais de 11 no lado a dobra do fundo dá lascas (medido: 25 deu
        70 faces finas em x ±186, 9 e 11 deram zero). */
