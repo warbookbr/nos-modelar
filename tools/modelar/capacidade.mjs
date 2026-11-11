@@ -29,6 +29,8 @@ export const CAPACIDADES = Object.freeze({
   paineisPorVaos: { arquivo: 'procedural/nucleo/paineis-por-vaos.js', funcao: 'paineisPorVaos', de: 'procedural/nucleo/paineis-por-vaos.js' },
   vaoEntrePartes: { arquivo: 'tools/modelar/vao-entre-partes.mjs', funcao: 'vaoEntrePartes', de: 'tools/modelar/vao-entre-partes.mjs' },
   instanciaDeFamilia: { arquivo: 'tools/modelar/instancia-de-familia.mjs', funcao: 'instanciaDeFamilia', de: 'tools/modelar/instancia-de-familia.mjs' },
+  raioDaAresta: { arquivo: 'tools/modelar/raio-da-aresta.mjs', funcao: 'medirPerfil', de: 'tools/modelar/raio-da-aresta.mjs' },
+  ondulacaoDaSuperficie: { arquivo: 'tools/modelar/ondulacao-da-superficie.mjs', funcao: 'ondulacaoDaReceita', de: 'tools/modelar/ondulacao-da-superficie.mjs' },
   apoioDoVinco: { arquivo: 'procedural/nucleo/apoio-do-vinco.js', funcao: 'apoioDoVinco', de: 'procedural/nucleo/apoio-do-vinco.js' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
 });

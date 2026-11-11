@@ -42,7 +42,8 @@
 import { nucleo } from './entrada.js';
 import { memoizarPura } from './memoria-de-pura.js';
 import { normalDaFace } from './nucleo.js';
-import { alongar, bordasSeCruzam, linhaPertoDeSiMesma, projetarLinha, varrer, voltaMenorQueOVao } from './lamina-sobre-a-superficie.js';
+import { alongar, bordasSeCruzam, bordasSeCruzamNaCurva, linhaPertoDeSiMesma, projetarCurva, projetarLinha, varrer, voltaMenorQueOVao } from './lamina-sobre-a-superficie.js';
+import { prepararPontoNaMalha } from './ponto-na-malha.js';
 import { pedacosConexos, prepararRaios } from './selecao-geometrica.js';
 import { triangularFace } from './triangulacao-face.js';
 
@@ -239,14 +240,17 @@ function paineisPorVaosBruto(o) {
   validaProfundidade(o.profundidade, 'da chamada');
   o.linhas.forEach((l, i) => validaProfundidade(l?.profundidade, `da linha '${l?.nome ?? `linha${i}`}'`));
   const modoGeral = o.modo ?? 'vista';
+  const porCurva = (l) => l != null && l.curva !== undefined;
+  if (o.distanciaDaCurva != null && !(Number.isFinite(o.distanciaDaCurva) && o.distanciaDaCurva > 0)) erro(`distanciaDaCurva precisa ser um número de mm maior que zero (recebido ${JSON.stringify(o.distanciaDaCurva)})`);
+  const distanciaDaCurva = o.distanciaDaCurva ?? 3 * o.vao;
   for (const [nomeDoModo, m] of [['modo', o.modo], ...o.linhas.map((l, i) => [`o modo da linha '${l?.nome ?? `linha${i}`}'`, l?.modo])]) {
     if (m != null && m !== 'vista' && m !== 'superficie') erro(`${nomeDoModo} é 'vista' (a lâmina é a extrusão da linha ao longo do eixo da vista) ou 'superficie' (a lâmina é varrida sobre a chapa, com as paredes normais a ela)`);
   }
   const sementesPerdidas = o.sementesPerdidas ?? 'recusa';
   if (sementesPerdidas !== 'recusa' && sementesPerdidas !== 'avisa') erro("sementesPerdidas é 'recusa' ou 'avisa'");
   const passosDaChapa = chapa.passos ?? null;
-  if ((modoGeral === 'superficie' || o.linhas.some((l) => l?.modo === 'superficie')) && (!passosDaChapa || o.normal)) {
-    erro("o modo 'superficie' precisa dos passos da chapa (chapa.passos) para projetar a linha nela, e não combina com `normal`");
+  if ((modoGeral === 'superficie' || o.linhas.some((l) => l?.modo === 'superficie' || porCurva(l))) && (!passosDaChapa || o.normal)) {
+    erro("o modo 'superficie' (e a linha por `curva`) precisa dos passos da chapa (chapa.passos) para levar a linha à chapa, e não combina com `normal`");
   }
   const parametros = chapa.parametros ?? {};
   const topo = chapa.pontos ?? {};
@@ -257,13 +261,23 @@ function paineisPorVaosBruto(o) {
   const nomesDeLinha = new Set();
   o.linhas.forEach((l, i) => {
     const nome = l?.nome ?? `linha${i}`;
-    if (!l || !Object.hasOwn(INDICE, l.eixo)) erro(`a linha '${nome}' precisa de eixo 'x', 'y' ou 'z' (o eixo da vista em que foi desenhada)`);
-    if (!Array.isArray(l.pontos) || l.pontos.length < 2 || !l.pontos.every((q) => Array.isArray(q) && q.length === 2 && q.every(Number.isFinite))) {
-      erro(`a linha '${nome}' precisa de pelo menos dois pontos [a, b] em mm no plano da vista ${l.eixo}`);
+    if (porCurva(l)) {
+      if (l.pontos != null || l.eixo != null) erro(`a linha '${nome}' dá \`curva\` (pontos 3D sobre a chapa) e também \`${l.pontos != null ? 'pontos' : 'eixo'}\` (a linha de uma vista); escolha uma`);
+      if (l.modo != null && l.modo !== 'superficie') erro(`a linha '${nome}' dá \`curva\`, que só vale no modo 'superficie' (recebido '${l.modo}')`);
+      if (l.alcance != null || l.lado != null) erro(`a linha '${nome}' dá \`curva\`: \`alcance\` e \`lado\` são da linha de uma vista e não valem nela (a curva já está sobre a chapa)`);
+      if (!Array.isArray(l.curva) || l.curva.length < 2 || !l.curva.every((q) => Array.isArray(q) && q.length === 3 && q.every(Number.isFinite))) {
+        erro(`a linha '${nome}' precisa de \`curva\` com pelo menos dois pontos [x, y, z] em mm sobre a chapa`);
+      }
+      if (l.fechada && l.curva.length < 3) erro(`a curva fechada '${nome}' precisa de pelo menos três pontos`);
+    } else {
+      if (!l || !Object.hasOwn(INDICE, l.eixo)) erro(`a linha '${nome}' precisa de eixo 'x', 'y' ou 'z' (o eixo da vista em que foi desenhada), ou de \`curva\` (pontos 3D sobre a chapa)`);
+      if (!Array.isArray(l.pontos) || l.pontos.length < 2 || !l.pontos.every((q) => Array.isArray(q) && q.length === 2 && q.every(Number.isFinite))) {
+        erro(`a linha '${nome}' precisa de pelo menos dois pontos [a, b] em mm no plano da vista ${l.eixo}`);
+      }
+      if (l.fechada && l.pontos.length < 3) erro(`a linha fechada '${nome}' precisa de pelo menos três pontos`);
     }
-    if (l.fechada && l.pontos.length < 3) erro(`a linha fechada '${nome}' precisa de pelo menos três pontos`);
-    if (l.alcance != null && !(Array.isArray(l.alcance) && l.alcance.length === 2 && l.alcance.every(Number.isFinite) && l.alcance[0] < l.alcance[1])) erro(`o alcance da linha '${nome}' precisa ser [min, max] no eixo ${l.eixo}, com min menor que max`);
-    if (l.lado != null && l.lado !== '+' && l.lado !== '-') erro(`o lado da linha '${nome}' é '+' ou '-'`);
+    if (!porCurva(l) && l.alcance != null && !(Array.isArray(l.alcance) && l.alcance.length === 2 && l.alcance.every(Number.isFinite) && l.alcance[0] < l.alcance[1])) erro(`o alcance da linha '${nome}' precisa ser [min, max] no eixo ${l.eixo}, com min menor que max`);
+    if (!porCurva(l) && l.lado != null && l.lado !== '+' && l.lado !== '-') erro(`o lado da linha '${nome}' é '+' ou '-'`);
     if (l.dentro != null && l.dentro !== 'painel' && l.dentro !== 'descarta') erro(`dentro da linha '${nome}' é 'painel' ou 'descarta'`);
     if (l.alem != null && !(Number.isFinite(l.alem) && l.alem >= 0)) erro(`alem da linha '${nome}' precisa ser um número de mm a partir de zero (recebido ${JSON.stringify(l.alem)})`);
     if (l.dentro === 'descarta' && !l.fechada) erro(`dentro: 'descarta' só vale para linha fechada ('${nome}' é aberta)`);
@@ -286,19 +300,27 @@ function paineisPorVaosBruto(o) {
   /* ---- a chapa executada uma vez, para ler normais, caixa e sementes ---- */
   let leitura = null;
   if (passosDaChapa) {
-    const marca = [...passosDaChapa, ['parte', { nome: '__chapa__', sel: { origem: chapa.origem } }]];
+    /* a linha por `curva` leva o ponto à pele de FORA da chapa: numa `subdivisao` com espessura a origem publica as partes externa, interna e borda, e as três nomeiam as faces */
+    const doPasso = chapa.origem.op === 'subdivisao' ? passosDaChapa.find((p) => Array.isArray(p) && p[0] === 'subdivisao' && p[1]?.origemId === chapa.origem.id) : null;
+    const separaPele = o.linhas.some((l) => porCurva(l)) && doPasso?.[1]?.espessura != null;
+    const marca = [...passosDaChapa, ...(separaPele
+      ? ['externa', 'interna', 'borda'].map((parte) => ['parte', { nome: `__${parte}__`, sel: { origem: { ...chapa.origem, parte } } }])
+      : [['parte', { nome: '__chapa__', sel: { origem: chapa.origem } }]])];
     let t0 = performance.now();
     const st = nucleo(marca, parametros, topo);
     cronometra('executarChapa', t0);
     if (st.orfaos.length) erro(`os passos da chapa foram recusados pelo núcleo: ${st.orfaos.slice(0, 3).map((x) => x.motivo).join('; ')}`);
-    const daChapa = [...st.F.values()].filter((f) => f.parte === '__chapa__').map((f) => f.id);
+    const nomesDaChapa = separaPele ? new Set(['__externa__', '__interna__', '__borda__']) : new Set(['__chapa__']);
+    const daChapa = [...st.F.values()].filter((f) => nomesDaChapa.has(f.parte)).map((f) => f.id);
     if (!daChapa.length) erro(`a origem ${chapa.origem.op}:${chapa.origem.id} não tem face nenhuma depois dos passos da chapa`);
     if (daChapa.length !== st.F.size) erro(`os passos da chapa deixam ${st.F.size - daChapa.length} face(s) fora da origem ${chapa.origem.op}:${chapa.origem.id}; passe só os passos que constroem a chapa`);
     const todos = [...st.V.values()];
     /* por laço, e não por espalhamento: Math.min(...lista) estoura a pilha com mais de uns 120 mil elementos (uma chapa grande tem mais vértices que isso) */
     const caixa = [0, 1, 2].map((e) => { let lo = Infinity; let hi = -Infinity; for (const p of todos) { if (p[e] < lo) lo = p[e]; if (p[e] > hi) hi = p[e]; } return [lo, hi]; });
     t0 = performance.now();
-    leitura = { st, raios: prepararRaios(st.V, st.F, daChapa), caixa, passos: passosDaChapa.length };
+    leitura = { st, raios: prepararRaios(st.V, st.F, daChapa), caixa, passos: passosDaChapa.length, ids: daChapa,
+      externa: separaPele ? [...st.F.values()].filter((f) => f.parte === '__externa__').map((f) => f.id) : null,
+      interna: separaPele ? [...st.F.values()].filter((f) => f.parte === '__interna__').map((f) => f.id) : null };
     cronometra('prepararRaios', t0);
     if (Math.max(...caixa.map(([lo, hi]) => hi - lo)) < 20) aviso('unidadeSuspeita', `a chapa mede no máximo ${br(Math.max(...caixa.map(([lo, hi]) => hi - lo)))} unidades: a entrada é em mm (vao, linhas, sementes e os passos da chapa); se a chapa foi escrita em metro, escreva-a em mm e peça saida: 'metro'`);
   } else if (!o.normal) {
@@ -336,11 +358,13 @@ function paineisPorVaosBruto(o) {
   /* as ferramentas do `subtrair`: a extrusão de cada linha aberta ou descartada, e o anel de cada linha fechada */
   const ferramentas = [];
   const pendentes = [];
+  const curvas = [];
   let gerarSuperficie = null; let larguraDaSuperficie = 0; let inicioDaSuperficie = 0; let inicioDasFerramentas = 0;
   for (let li = 0; li < o.linhas.length; li += 1) {
     const l = o.linhas[li];
     const nome = l.nome ?? `linha${li}`;
     const eixo = l.eixo;
+    if (porCurva(l)) { pendentes.push({ l, nome, curva: true, P: l.curva }); continue; }
     const e = EIXO[eixo];
     const alcance = l.alcance ?? (leitura ? [leitura.caixa[e][0] - afasta(e), leitura.caixa[e][1] + afasta(e)] : null);
     if (!alcance) erro(`a linha '${nome}' precisa de alcance: sem os passos da chapa o ajudante não sabe até onde a lâmina vai no eixo ${eixo}`);
@@ -486,7 +510,44 @@ function paineisPorVaosBruto(o) {
   /* as linhas em modo 'superficie': projetadas na chapa, alongadas onde duas pontas se encontram, e varridas */
   if (pendentes.length) {
     const largura = o.vao * (1 + (o.margem ?? MARGEM_DA_SUPERFICIE));
+    /* a pele de fora e a de dentro da chapa, para a curva 3D: a grade do ponto mais próximo se monta uma vez, só com as faces da parte `externa` (a pele de fora de uma
+       `subdivisao` com espessura), e senão com todas as faces da chapa */
+    let pele = null; let interna = null;
+    const peleDaChapa = () => {
+      if (pele) return pele;
+      pele = prepararPontoNaMalha(leitura.st.V, leitura.st.F, leitura.externa ?? leitura.ids);
+      if (leitura.interna) interna = prepararPontoNaMalha(leitura.st.V, leitura.st.F, leitura.interna);
+      return pele;
+    };
+    /* o ponto da curva levado à pele: o ponto mais próximo, a normal alisada como no modo superfície, voltada para fora (o lado da normal da face), e a espessura lida
+       (a distância à pele de dentro, ou o próximo toque do raio ao longo da normal) */
+    const naPele = (q, limite) => {
+      const r = peleDaChapa().maisProximo(q, limite);
+      if (!r) return null;
+      const { V, F } = leitura.st;
+      let nm = normalSuave(r.face, r.ponto);
+      const n0 = normalDaFace(V, F.get(r.face).vs);
+      if (nm[0] * n0[0] + nm[1] * n0[1] + nm[2] * n0[2] < 0) nm = nm.map((x) => -x);
+      let esp = null;
+      if (interna) { const d = interna.maisProximo(r.ponto, 8 * o.vao); esp = d ? d.distancia : null; } else {
+        const eps = 1e-4 * Math.max(...leitura.caixa.map(([a0, a1]) => a1 - a0));
+        const baixo = leitura.raios.primeiro(r.ponto.map((x, k) => x - nm[k] * eps), nm.map((x) => -x));
+        esp = baixo && baixo.t + eps <= 8 * o.vao ? baixo.t + eps : null;
+      }
+      return { c: r.ponto, n: nm, esp, d: r.distancia };
+    };
     const lidas = pendentes.map((pd) => {
+      if (pd.curva) {
+        const { l, nome, P } = pd;
+        const proj = projetarCurva({ projetar: naPele, pontos: P, fechada: !!l.fechada, amostragem, largura, nome, alem: l.alem ?? 0, tolerancia: distanciaDaCurva });
+        const profPedida = l.profundidade ?? o.profundidade ?? null;
+        const espLida = Math.max(0, ...proj.segmentos.flat().map((st) => st.esp ?? 0));
+        if (profPedida != null && espLida > 0 && profPedida <= espLida) {
+          erro(`a profundidade ${br(profPedida)} mm da linha '${nome}' não atravessa a chapa: a espessura lida na linha chega a ${br(espLida)} mm; dê uma profundidade maior que a espessura, ou tire a opção para a lâmina descer a espessura lida mais meio vão`);
+        }
+        curvas.push({ nome, estacoes: proj.segmentos[0].length, quinas: proj.quinas, desvioMaximo: proj.desvioMaximo, podadas: proj.podadas });
+        return { ...pd, ...proj, cima: null };
+      }
       const { l, nome, eixo, e, alcance, lado, P } = pd;
       const dirv = [0, 0, 0]; dirv[e] = lado === '-' ? 1 : -1;
       const [lo, hi] = leitura.caixa[e];
@@ -533,6 +594,12 @@ function paineisPorVaosBruto(o) {
     const longe = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
     const aAlongar = pontas.filter((p) => pontas.some((q) => q.i !== p.i && longe(p.c, q.c) <= 0.5 * o.vao));
     for (const p of aAlongar) { const segs = lidas[p.i].segmentos; alongar(segs[p.fim ? segs.length - 1 : 0], p.fim, largura / 2); }
+    /* a curva aberta com `alem`: as duas pontas passam `alem` mm adiante, no plano tangente, e a lâmina vai além da borda da chapa */
+    lidas.forEach((ln) => {
+      const alem = ln.l.alem ?? 0;
+      if (!ln.curva || ln.l.fechada || !(alem > 0)) return;
+      alongar(ln.segmentos[0], false, alem); alongar(ln.segmentos[0], true, alem);
+    });
     for (const ln of lidas) {
       const { l, nome, segmentos, fechadaInteira } = ln;
       if (l.fechada && l.dentro !== 'descarta' && fechadaInteira) {
@@ -541,7 +608,7 @@ function paineisPorVaosBruto(o) {
         }
       }
       for (const estacoes of segmentos) {
-        const cruza = bordasSeCruzam(estacoes, !!l.fechada && fechadaInteira, largura, ln.e);
+        const cruza = ln.curva ? bordasSeCruzamNaCurva(estacoes, !!l.fechada && fechadaInteira, largura) : bordasSeCruzam(estacoes, !!l.fechada && fechadaInteira, largura, ln.e);
         if (cruza === 'aberta') erro(`a lâmina da linha '${nome}' se cruza (canto muito fechado ou pontos muito juntos para a largura ${br(largura)} mm); abra o canto ou afaste os pontos`);
         if (cruza === 'volta') erro(`a lâmina da volta '${nome}' se cruza por dentro ou por fora: algum trecho dela é mais estreito que o vão (${br(largura)} mm de lâmina) ou o canto é fechado demais, e a lâmina deixaria uma ilha fantasma; alargue o trecho, abra o canto, ou use dentro: 'descarta' para só furar a chapa`);
       }
@@ -555,7 +622,7 @@ function paineisPorVaosBruto(o) {
       for (const ln of lidas) {
         const { l, nome, segmentos, fechadaInteira } = ln;
         for (const estacoes of segmentos) {
-          const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima });
+          const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima, areaPorNorma: !!ln.curva });
           passos.push(['subdivisao', { origemId: id, vertices: varrido.vertices, faces: varrido.faces, niveis: 0 }]);
           ferr.push({ op: 'subdivisao', id });
           id += 1;
@@ -654,6 +721,7 @@ function paineisPorVaosBruto(o) {
     if (folgaMedida < o.vao * 0.998) aviso('folgaAbaixoDoVao', `a folga 3D medida entre os pedaços é ${br(folgaMedida)} mm, abaixo do vão pedido de ${br(o.vao)} mm, mesmo depois de ${ajustes} correção(ões) da largura da lâmina (${br(larguraDaSuperficie)} mm): a chapa curva demais junto da linha; afaste a linha da curva, divida-a ou aceite a folga`);
   }
   if (folgaMedida != null) { medidas.folgaMedida = r3(folgaMedida); if (pendentes.length) medidas.folgaMinima = r3(folgaMedida); }
+  if (curvas.length) medidas.curvas = curvas;
   const ids = [...executado.F.keys()];
   const grupos = pedacosConexos(executado.F, ids);
   medidas.pedacos = grupos.length;
@@ -669,6 +737,9 @@ function paineisPorVaosBruto(o) {
     return s + Math.hypot(nx, ny, nz) / 2;
   }, 0);
   const pedacosDaChapa = pedacosConexos(leitura.st.F, [...leitura.st.F.keys()]).length;
+  if (grupos.length <= pedacosDaChapa && !o.linhas.some((l) => l.dentro === 'descarta') && curvas.length) {
+    erro(`o corte das linhas por curva deixou ${grupos.length} pedaço(s), os mesmos que a chapa tinha: nenhuma curva a separou em dois pedaços; a curva aberta precisa ir de borda a borda (termine-a na borda e dê \`alem\` para a ponta passar dela, e com isso a lâmina não deixa ponte) e a fechada precisa fechar a volta`);
+  }
   if (grupos.length <= pedacosDaChapa && !o.linhas.some((l) => l.dentro === 'descarta')) {
     aviso('semSeparacao', `o corte deixou ${grupos.length} pedaço(s), os mesmos que a chapa tinha: nenhuma linha a separou; confira se alguma vai de borda a borda (ou fecha uma volta) no alcance dado`);
   }

@@ -2,6 +2,24 @@
 /* ondulacao-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita ondula, salta ou dobra fora dos
  * vincos declarados, e diz quanto (em milímetro) e quais pontos nomeados da gaiola mexer.
  *
+ * FICHA ondulacaoDaSuperficie
+ * serve: achar a ondulação, o calombo, a emenda e a face virada da superfície de subdivisão de uma receita, de um esboço 2.0 ou de uma montagem,
+ *   em mm e sem referência externa, com os pontos nomeados da gaiola que mais pesam em cada falha (`npm run ondulacao`).
+ * quando: depois de montar a gaiola, em toda peça de superfície lisa; lê a chapa antes do corte em painéis quando há corte depois, e a quina por
+ *   colunas de apoio (vinco de nitidez 0, ou com `raio`) conta como feição, em `junto`, e não como falha; para o raio da quina use `raio:aresta`.
+ * unidades: a receita entra em metro; a saída, em mm.
+ * campos:
+ *   limiarMm: o desvio acima do qual o vértice semeia uma falha, em mm (0,3).
+ *   raio: o raio do ajuste local, em espaçamentos da gaiola (3).
+ *   zonaDeclarada: a distância, em espaçamentos, de um vinco, borda ou canto declarados em que a falha vai para `junto` (1).
+ *   emendaGraus: o ângulo, em graus, a partir do qual a aresta fora de vinco é emenda (2).
+ *   viradaGraus: o ângulo, em graus, entre as normais de duas faces vizinhas a partir do qual a face é virada (90).
+ *   passo: o passo da receita em que a superfície é lida (padrão: o último que ainda tem a gaiola, dito em `leitura`).
+ * exemplo:
+ *   ondulacaoDaReceita({ PARAMS: {}, TOPO: Object.fromEntries(Array.from({ length: 16 }, (_, k) => [`p${k}`, [(k % 4) * 0.1, 0, Math.floor(k / 4) * 0.1]])), PASSOS: [['subdivisao', { vertices: Array.from({ length: 16 }, (_, k) => `p${k}`), faces: Array.from({ length: 9 }, (_, k) => { const i = (k % 3) + 4 * Math.floor(k / 3); return [`p${i}`, `p${i + 4}`, `p${i + 5}`, `p${i + 1}`]; }), niveis: 2 }]] }).falhas === 0
+ * peça: procedural/pecas/sedan-chassi-e-lataria/alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs
+ * FIM DA FICHA
+ *
  * POR QUE ELE EXISTE. A zebra e as listras de reflexo mostram a ondulação à pessoa, mas a IA que lê uma imagem de listras
  * não sabe dizer de quantos milímetros é o defeito nem que ponto da gaiola o causa. Esta ferramenta lê a própria malha que
  * a receita entrega, sem referência externa, e devolve cada falha com posição, amplitude, extensão e os nomes dos pontos

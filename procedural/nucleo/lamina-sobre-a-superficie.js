@@ -33,6 +33,33 @@ const unit = (a) => { const L = norma(a); return L > 0 ? mul(a, 1 / L) : null; }
 const giro = (n1, n2) => Math.acos(Math.max(-1, Math.min(1, dot(n1, n2)))) * GRAUS;
 
 /**
+ * A dobra viva que sobrou entre duas estações coladas (giro maior que 8 graus) vira UMA estação: o ponto médio, de normal a bissetriz; o encontro dos planos de
+ * parede dos dois trechos dá a direção e a profundidade da seção nela, de modo que a lâmina atravessa a quina côncava ou convexa numa varredura só. A espessura lida
+ * junto da quina corre ao longo da outra face: vale no máximo 1,2 vez a mediana lida na linha. Serve às duas entradas, a linha da vista e a curva 3D.
+ */
+function fundirQuinas(todas, fechada, nome) {
+  let quinas = 0;
+  const lista = [];
+  for (let i = 0; i < todas.length; i += 1) {
+    const s = todas[i];
+    const j = (i + 1) % todas.length;
+    const prox = todas[j];
+    const tem = (fechada || j !== 0) && s.real && prox.real;
+    const g = tem ? giro(s.n, prox.n) : 0;
+    if (g > GIRO_LISO) {
+      if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
+      quinas += 1;
+      lista.push({ c: mul(soma(s.c, prox.c), 0.5), n: unit(soma(s.n, prox.n)), esp: Math.max(s.esp ?? 0, prox.esp ?? 0) || null, mIn: s.mOut, mOut: s.mOut });
+      i += 1;
+    } else lista.push({ c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut });
+  }
+  /* a espessura lida junto da quina corre ao longo da outra face: vale no máximo 1,2 vez a mediana lida na linha */
+  const lidas = lista.map((s) => s.esp).filter((x) => x != null).sort((x, y) => x - y);
+  if (lidas.length) { const teto = 1.2 * lidas[Math.floor(lidas.length / 2)]; for (const s of lista) s.esp = s.esp == null ? null : Math.min(s.esp, teto); }
+  return { lista, quinas };
+}
+
+/**
  * Projeta a polilinha 2D da vista na chapa.
  * @param {{ ler: (a: number, b: number) => ({ c: number[], n: number[], esp: number | null } | null), plano: (a: number, b: number, v: any) => number[] | null,
  *   pontos: number[][], fechada: boolean, amostragem: number, largura: number, eixoIdx: number, indices: number[], nome: string }} o
@@ -101,7 +128,6 @@ export function projetarLinha(o) {
   /* a dobra viva que sobrou entre duas estações coladas ganha uma seção do meio: o ponto médio, de normal a bissetriz e profundidade alongada por 1 / cos do meio giro.
      É uma lâmina só, sem duas varreduras que dividam parede: a seção do meio cobre sob a quina a espessura das duas faces, côncava ou convexa */
   let inclinacaoMaxima = 0;
-  let quinas = 0;
   todas.forEach((s) => {
     const cos = Math.abs(dot(s.n, [0, 1, 2].map((e) => (e === eixoIdx ? 1 : 0))));
     if (cos < RASANTE) {
@@ -109,25 +135,7 @@ export function projetarLinha(o) {
     }
     inclinacaoMaxima = Math.max(inclinacaoMaxima, Math.acos(Math.min(1, cos)) * GRAUS);
   });
-  /* a dobra viva que sobrou entre duas estações coladas vira UMA estação: o ponto médio, de normal a bissetriz; o encontro dos planos de parede dos dois trechos dá a
-     direção e a profundidade da seção nela, de modo que a lâmina atravessa a quina côncava ou convexa numa varredura só */
-  const lista = [];
-  for (let i = 0; i < todas.length; i += 1) {
-    const s = todas[i];
-    const j = (i + 1) % todas.length;
-    const prox = todas[j];
-    const tem = (fechada || j !== 0) && s.real && prox.real;
-    const g = tem ? giro(s.n, prox.n) : 0;
-    if (g > GIRO_LISO) {
-      if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
-      quinas += 1;
-      lista.push({ c: mul(soma(s.c, prox.c), 0.5), n: unit(soma(s.n, prox.n)), esp: Math.max(s.esp ?? 0, prox.esp ?? 0) || null, mIn: s.mOut, mOut: s.mOut });
-      i += 1;
-    } else lista.push({ c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut });
-  }
-  /* a espessura lida junto da quina corre ao longo da outra face: vale no máximo 1,2 vez a mediana lida na linha */
-  const lidas = lista.map((s) => s.esp).filter((x) => x != null).sort((x, y) => x - y);
-  if (lidas.length) { const teto = 1.2 * lidas[Math.floor(lidas.length / 2)]; for (const s of lista) s.esp = s.esp == null ? null : Math.min(s.esp, teto); }
+  const { lista, quinas } = fundirQuinas(todas, fechada, nome);
   const segmentos = [lista];
   return { segmentos, fechadaInteira: fechada, quinas, inclinacaoMaxima, semChapa };
 }
@@ -153,15 +161,123 @@ export function alongar(estacoes, fim, ext) {
   let e = unit(sub(a.c, b.c));
   if (!e) return;
   e = unit(sub(e, mul(a.n, dot(e, a.n)))) ?? e;
-  const nova = { c: soma(a.c, mul(e, ext)), n: a.n, esp: a.esp, mIn: fim ? a.mOut : a.mIn, mOut: fim ? a.mOut : a.mIn };
+  const nova = { c: soma(a.c, mul(e, ext)), n: a.n, esp: a.esp, mIn: fim ? a.mOut : a.mIn, mOut: fim ? a.mOut : a.mIn, cima: a.cima };
   if (fim) estacoes.push(nova); else estacoes.unshift(nova);
+}
+
+const R3 = (v) => Math.round(v * 1e6) / 1e6;
+
+/** Os laterais de cada estação de uma curva 3D: o perpendicular da curva no plano tangente da chapa, antes e depois da estação. */
+function lateraisDaCurva(lista, fechada) {
+  const N = lista.length;
+  const tang = (a, b) => unit(sub(b.c, a.c));
+  lista.forEach((s, i) => {
+    const ant = fechada ? lista[(i + N - 1) % N] : lista[i - 1];
+    const dep = fechada ? lista[(i + 1) % N] : lista[i + 1];
+    const tIn = ant ? tang(ant, s) : tang(s, dep);
+    const tOut = dep ? tang(s, dep) : tIn;
+    if (!tIn || !tOut) erro('a curva tem dois pontos iguais sobre a chapa');
+    s.mIn = cruz(s.n, tIn); s.mOut = cruz(s.n, tOut); s.cima = s.n;
+  });
+}
+
+/**
+ * Leva a curva 3D à chapa: cada ponto vai à pele pelo ponto mais próximo (`projetar`), a curva é reamostrada a cada `amostragem` mm (cada ponto novo também vai à pele),
+ * o trecho entre duas estações cuja normal gira mais de 8 graus é bipartido até a normal girar menos, e a dobra viva que sobra vira uma estação só, como na linha da vista.
+ * Não há eixo de vista: a seção da lâmina olha, em cada estação, para a normal da chapa.
+ * @param {{ projetar: (q: number[], limite: number) => ({ c: number[], n: number[], esp: number | null, d: number } | null), pontos: number[][], fechada: boolean,
+ *   amostragem: number, largura: number, nome: string, alem?: number, tolerancia: number }} o
+ * @returns {{ segmentos: any[][], fechadaInteira: boolean, quinas: number, inclinacaoMaxima: number, semChapa: number, desvioMaximo: number, podadas: number }}
+ */
+export function projetarCurva(o) {
+  const { projetar, pontos, fechada, amostragem, largura, nome, tolerancia } = o;
+  const alem = o.alem ?? 0;
+  const pt = (q) => `[${q.map((x) => br(x)).join(', ')}]`;
+  const lidos = pontos.map((q) => ({ q, v: projetar(q, tolerancia) }));
+  if (lidos.every((x) => !x.v)) erro(`a curva '${nome}' não corta a chapa: nenhum dos ${pontos.length} pontos dela fica a menos de ${br(tolerancia)} mm da pele da chapa; confira a unidade (mm) e se a curva é desta chapa (a opção distanciaDaCurva muda a tolerância)`);
+  let ini = 0; let fim = lidos.length - 1;
+  if (!fechada) { while (!lidos[ini].v) ini += 1; while (!lidos[fim].v) fim -= 1; }
+  const podadas = ini + (lidos.length - 1 - fim);
+  if (podadas && !(alem > 0)) {
+    const k = ini > 0 ? 0 : lidos.length - 1;
+    erro(`a curva '${nome}' sai da chapa: o ponto ${k} ${pt(lidos[k].q)} fica a mais de ${br(tolerancia)} mm da pele, e ${podadas === 1 ? 'a ponta além dele' : `as ${podadas} pontas além dele`} não tem chapa; termine a curva na borda e dê \`alem\` (mm) para a ponta passar dela, ou traga o ponto para a chapa`);
+  }
+  const uteis = lidos.slice(ini, fim + 1);
+  uteis.forEach((x, k) => { if (!x.v) erro(`a curva '${nome}' tem o ponto ${ini + k} ${pt(x.q)} a mais de ${br(tolerancia)} mm da pele, no meio da curva: ela sai da chapa e volta (uma abertura, ou a curva fora do lugar); leve o ponto à chapa ou parta a curva`); });
+  let desvioMaximo = 0;
+  const base = [];
+  const minimo = 0.2 * largura;
+  const dist = (a, b) => norma(sub(a.c, b.c));
+  uteis.forEach((x, k) => {
+    desvioMaximo = Math.max(desvioMaximo, x.v.d);
+    const s = { c: x.v.c, n: x.v.n, esp: x.v.esp, real: true };
+    const ult = base[base.length - 1];
+    if (ult && dist(ult, s) < minimo) { if (k === uteis.length - 1 && base.length > 1) base[base.length - 1] = s; return; }
+    base.push(s);
+  });
+  if (fechada && base.length > 1 && dist(base[0], base[base.length - 1]) < minimo) base.pop();
+  if (base.length < 2) erro(`a curva '${nome}' ficou com menos de dois pontos distintos sobre a chapa`);
+  /* os trechos longos ganham pontos, cada um levado à pele */
+  const densa = [];
+  const N = base.length;
+  for (let i = 0; i < N; i += 1) {
+    const a = base[i]; const b = base[(i + 1) % N];
+    densa.push(a);
+    if (!fechada && i === N - 1) break;
+    const M = Math.ceil(dist(a, b) / amostragem);
+    for (let m = 1; m < M; m += 1) {
+      const q = mul(soma(mul(a.c, 1 - m / M), mul(b.c, m / M)), 1);
+      const v = projetar(q, tolerancia);
+      if (!v) erro(`a curva '${nome}' passa a mais de ${br(tolerancia)} mm da pele entre dois pontos dela, perto de ${pt(q)}: a corda sai da chapa; ponha mais pontos`);
+      desvioMaximo = Math.max(desvioMaximo, v.d);
+      densa.push({ c: v.c, n: v.n, esp: v.esp, real: true });
+    }
+  }
+  /* a bipartição entre duas estações de normal muito diferente */
+  const refinar = (A, B, prof) => {
+    if (giro(A.n, B.n) <= GIRO_LISO || prof >= 10 || dist(A, B) <= 0.1 * largura) return [];
+    const v = projetar(mul(soma(A.c, B.c), 0.5), tolerancia);
+    if (!v) return [];
+    const M = { c: v.c, n: v.n, esp: v.esp, real: true };
+    return [...refinar(A, M, prof + 1), M, ...refinar(M, B, prof + 1)];
+  };
+  const todas = [];
+  for (let i = 0; i < densa.length; i += 1) {
+    todas.push(densa[i]);
+    const prox = fechada ? densa[(i + 1) % densa.length] : densa[i + 1];
+    if (prox) todas.push(...refinar(densa[i], prox, 0));
+  }
+  const { lista, quinas } = fundirQuinas(todas, fechada, nome);
+  lateraisDaCurva(lista, fechada);
+  return { segmentos: [lista], fechadaInteira: fechada, quinas, inclinacaoMaxima: 0, semChapa: 0, desvioMaximo: R3(desvioMaximo), podadas };
+}
+
+/**
+ * As bordas da lâmina de uma curva 3D se cruzam? Sem eixo de vista não há projeção que dê o polígono; uma borda se cruza quando algum trecho dela corre contra a curva
+ * (o canto mais fechado que meia largura, ou a volta menor que o vão). Devolve 'aberta', 'volta' ou null.
+ */
+export function bordasSeCruzamNaCurva(estacoes, fechada, largura) {
+  const lat = lateraisDe(estacoes);
+  if (lat.some((l) => !l)) return fechada ? 'volta' : 'aberta';
+  const N = estacoes.length;
+  const h = largura / 2;
+  const lado = (sinal) => estacoes.map((s, i) => soma(s.c, mul(lat[i].sm, sinal * h * lat[i].k)));
+  const nSeg = fechada ? N : N - 1;
+  for (const sinal of [1, -1]) {
+    const B = lado(sinal);
+    for (let i = 0; i < nSeg; i += 1) {
+      const j = (i + 1) % N;
+      if (dot(sub(estacoes[j].c, estacoes[i].c), sub(B[j], B[i])) < 0) return fechada ? 'volta' : 'aberta';
+    }
+  }
+  return null;
 }
 
 /**
  * O sólido da lâmina: vértices e triângulos de um passo `subdivisao` de niveis 0.
  * @returns {{ vertices: number[][], faces: number[][], pontosDeDentro: number[][] | null }}
  */
-export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome, cima }) {
+export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome, cima, areaPorNorma = false }) {
   const est = estacoes.filter((s, i) => i === 0 || norma(sub(s.c, estacoes[i - 1].c)) > 1e-6);
   if (fechada && est.length > 1 && norma(sub(est[0].c, est[est.length - 1].c)) <= 1e-6) est.pop();
   if (est.length < 2) erro(`a linha '${nome}' ficou com menos de duas estações sobre a chapa`);
@@ -190,17 +306,19 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     const g = dot(sA, sB);
     const nm = unit(soma(A.n, B.n)) ?? A.n;
     const s = est[i];
+    /* a direção de cima: a da vista, ou, na curva 3D, a normal de cada estação (cada uma olha para fora da chapa onde está) */
+    const cimaDe = s.cima ?? cima;
     let X0; let L;
     if (g > 0.9999) {
       X0 = soma(s.c, mul(sB, h));
       /* a seção vertical: a direção da vista tirada da componente lateral. Seções de normais diferentes numa quina girariam uma contra a outra e dobrariam a lâmina sobre si */
-      L = unit(sub(cima, mul(sB, dot(cima, sB)))) ?? nm;
+      L = unit(sub(cimaDe, mul(sB, dot(cimaDe, sB)))) ?? nm;
     } else {
       X0 = soma(s.c, mul(soma(sA, sB), h / (1 + g)));
       const soma2 = unit(soma(sA, sB));
       L = unit(cruz(sA, sB));
-      if (L && dot(L, cima) < 0) L = mul(L, -1);
-      if (!L || dot(L, nm) < 0.17) L = soma2 ? unit(sub(cima, mul(soma2, dot(cima, soma2)))) ?? nm : nm;
+      if (L && dot(L, cimaDe) < 0) L = mul(L, -1);
+      if (!L || dot(L, nm) < 0.17) L = soma2 ? unit(sub(cimaDe, mul(soma2, dot(cimaDe, soma2)))) ?? nm : nm;
     }
     const cos = Math.max(Math.min(dot(L, A.n), dot(L, B.n)), 0.17);
     const fundo = (profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura) / cos;
@@ -212,7 +330,7 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     /* o furo: o prisma da borda de fora; o lado de fora é o de maior área vista da normal média */
     const lado = (sinal) => est.map((s, i) => doLado(i, sinal));
     const L = lado(1); const R = lado(-1);
-    const area = (pts) => { let t = [0, 0, 0]; pts.forEach((p, i) => { t = soma(t, cruz(p.X0, pts[(i + 1) % pts.length].X0)); }); return Math.abs(dot(t, est[0].n)); };
+    const area = (pts) => { let t = [0, 0, 0]; pts.forEach((p, i) => { t = soma(t, cruz(p.X0, pts[(i + 1) % pts.length].X0)); }); return areaPorNorma ? norma(t) : Math.abs(dot(t, est[0].n)); };
     const borda = area(L) >= area(R) ? L : R;
     borda.forEach((q) => vertices.push(q.acima, q.abaixo));
     for (let i = 0; i < N; i += 1) faces.push([2 * i, 2 * ((i + 1) % N), 2 * ((i + 1) % N) + 1, 2 * i + 1]);

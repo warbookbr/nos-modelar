@@ -26,6 +26,7 @@ import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
 import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
 import { criarOperacoesAberturaPorContorno } from './operacoes/abertura-por-contorno.js';
+import { criarOperacoesLimparLascas } from './operacoes/limpar-lascas.js';
 import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
 import { lerOnde, resolverOnde } from './selecao-geometrica.js';
 import earcut from 'earcut';
@@ -2937,6 +2938,7 @@ const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idD
 const operacoesSubdivisao = criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem });
 const operacoesFriso = criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem });
 const operacoesAberturaPorContorno = criarOperacoesAberturaPorContorno({ BLOCO, FAIXA_ESTENDIDA, BASE_ESTENDIDA, idDoPasso, grita, addV, addF, registraOrigem, resolverSelecao, textoDeclaracoes, subtrair: operacoesBooleanas.subtrair, manifoldCarregada, erroDaCargaDaManifold });
+const operacoesLimparLascas = criarOperacoesLimparLascas({ grita, resolverSelecao });
 /* As operações de atributo escrevem só nas faces que `resolverAlvosF` devolve; o despacho lê essas faces de `st.alvosF` para
    saber quais conferir no retrato (ver `ESCRITA_DAS_OPERACOES`). */
 function resolverAlvosFRastreado(st, a, op, i, opcoes) {
@@ -2959,6 +2961,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesSubdivisao,
   ...operacoesFriso,
   ...operacoesAberturaPorContorno,
+  ...operacoesLimparLascas,
 };
 
 /* Configuração explícita do módulo que preserva os nomes curtos das receitas.
@@ -2970,7 +2973,7 @@ const NOMES_DAS_OPERACOES = [
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
   'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao', 'friso',
-  'aberturaPorContorno',
+  'aberturaPorContorno', 'limparLascas',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 

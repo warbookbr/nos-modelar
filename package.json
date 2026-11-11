@@ -91,6 +91,7 @@
     "malha:lascas": "node tools/modelar/lasca.mjs",
     "retrato:acervo": "node tools/modelar/retrato-do-acervo.mjs",
     "ondulacao": "node tools/modelar/ondulacao-da-superficie.mjs",
+    "raio:aresta": "node tools/modelar/raio-da-aresta.mjs",
     "alisar": "node tools/modelar/alisar-a-superficie.mjs",
     "vincos-das-linhas": "node tools/modelar/vincos-das-linhas.mjs",
     "olhar": "node tools/modelar/olhar.mjs",

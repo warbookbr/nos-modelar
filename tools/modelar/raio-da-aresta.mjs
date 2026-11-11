@@ -1,6 +1,23 @@
 #!/usr/bin/env node
 /* raio-da-aresta.mjs — mede o raio de cada aresta de caráter de uma peça, sobre a malha final.
  *
+ * FICHA raioDaAresta
+ * serve: medir o raio do filete de cada aresta de caráter de uma receita, de um esboço 2.0 ou de uma montagem, em mm e sobre a malha final (a quina
+ *   arredondada de uma lataria, a dobra de uma chapa), por cortes perpendiculares à aresta, com o ângulo da dobra e o ponto do pior desvio.
+ * quando: a aresta tem raio pedido e o critério é "dentro de 20% do pedido" (`npm run raio:aresta`, que sai 1 quando foge); para a ondulação
+ *   da superfície use `npm run ondulacao`, que trata a quina por colunas de apoio como feição, e para o vão entre painéis `vao:partes`.
+ * unidades: `perfil` são pontos 2D `[x, y]` em mm, de uma face à outra; o raio sai em mm.
+ * campos:
+ *   perfil: a polilinha do corte, de uma face à outra, entre as retas das duas faces; sai raioMm (o do filete, definição do núcleo), curvaturaMm (o menor raio de curvatura), divergencia, anguloGraus e natureza.
+ *   cadaMm: (de medirAresta) o espaçamento dos cortes ao longo da aresta, em mm (50).
+ *   janelaMm: (de medirAresta) até onde da aresta o corte entra no perfil, em mm (40).
+ *   pedidoMm: (de medirAresta) o raio pedido, em mm; cada corte a mais de `tolerancia` dele é `foraDoPedido`.
+ *   tolerancia: (de medirAresta) a fração do pedido que ainda cabe (0,2).
+ * exemplo:
+ *   medirPerfil([...[-24, -16].map((x) => [x, 0]), ...Array.from({ length: 9 }, (_, k) => [-8 + 8 * Math.cos(-Math.PI / 2 + (k * Math.PI) / 16), 8 + 8 * Math.sin(-Math.PI / 2 + (k * Math.PI) / 16)]), ...[16, 24].map((y) => [0, y])]).natureza === 'arco'
+ * peça: procedural/pecas/sedan-chassi-e-lataria/alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs
+ * FIM DA FICHA
+ *
  * POR QUE ELE EXISTE. O raio de uma quina de lataria é a diferença entre a chapa que reflete uma faixa de luz e a que reflete uma
  * linha, e o critério do plano é o raio dentro de 20% do pedido. Nenhuma ferramenta o media: o ciclo 1 do sedã em alta definição
  * escreveu um script próprio, que dava duas respostas para a mesma malha (5,8 e 9,7 mm), porque o raio de um perfil que a
@@ -38,7 +55,6 @@ export const JANELA_PADRAO_MM = 40;
 export const TOLERANCIA_PADRAO = 0.2;
 export const RAIO_DA_QUINA_VIVA_MM = 0.25;
 export const LIMITE_DA_DIVERGENCIA = 0.25;
-export const DISTANCIA_MAXIMA_DO_PERFIL_MM = 5;
 export const ANGULO_MINIMO_DA_DOBRA_GRAUS = 2;
 const PELE_MINIMA = 0.3;
 const MM = 1000;
@@ -151,7 +167,7 @@ export function menorRaioDeCurvatura(perfil) {
     const a = perfil[i - 1]; const b = perfil[i]; const c = perfil[i + 1];
     const ab = Math.hypot(b[0] - a[0], b[1] - a[1]); const bc = Math.hypot(c[0] - b[0], c[1] - b[1]); const ca = Math.hypot(a[0] - c[0], a[1] - c[1]);
     const area2 = Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
-    if (!(ab > 1e-9 && bc > 1e-9) || area2 / (ab * bc) < 1e-4) continue;
+    if (!(ab > 0.01 && bc > 0.01) || area2 / (ab * bc) < 1e-4) continue;
     const r = (ab * bc * ca) / (2 * area2);
     if (!melhor || r < melhor.raio) melhor = { raio: r, segmento: Math.min(ab, bc) };
   }
@@ -167,6 +183,10 @@ export function menorRaioDeCurvatura(perfil) {
 export function medirPerfil(perfil) {
   const f = raioDoFilete(perfil);
   const c = menorRaioDeCurvatura(perfil);
+  /* o perfil que não sai das duas retas das faces é a quina viva: o raio é zero */
+  if (f.raio === null && f.angulo >= ANGULO_MINIMO_DA_DOBRA_GRAUS && /não sai das retas/.test(f.motivo ?? '')) {
+    return { raioMm: 0, curvaturaMm: arred(c?.raio ?? null), divergencia: null, anguloGraus: arred(f.angulo, 1), natureza: 'viva', erroMm: null, razaoDoErro: null, segmentoMm: arred(c?.segmento ?? null), motivo: null };
+  }
   /* a dobra de menos de 2 graus não tem raio que se leia: o filete de 0,3 grau dá milhares de mm e não diz nada da aresta */
   if (f.raio === null || f.raio === undefined || f.angulo < ANGULO_MINIMO_DA_DOBRA_GRAUS) {
     return { raioMm: null, curvaturaMm: arred(c?.raio ?? null), divergencia: null, anguloGraus: arred(f.angulo ?? null, 1), natureza: f.angulo === 0 || f.angulo < ANGULO_MINIMO_DA_DOBRA_GRAUS ? 'plana' : 'sem-medida', erroMm: null, razaoDoErro: null, segmentoMm: arred(c?.segmento ?? null), motivo: f.motivo ?? null };
@@ -206,7 +226,7 @@ export function medirAresta(malha, linha, { cadaMm = CADA_PADRAO_MM, janelaMm = 
     const perfil = perfilNoCorte(malha, { q: a.q, t: a.t, janelaMm, pele: linha.peles?.[a.segmento] ?? null });
     const base = { posicaoMm: a.q.map((x) => arred(x * MM, 1)), sMm: arred(a.s, 1) };
     if (!perfil) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: 'o plano do corte não toca a malha a menos da janela' };
-    if (perfil.distanciaMm > DISTANCIA_MAXIMA_DO_PERFIL_MM) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: `o perfil passa a ${arred(perfil.distanciaMm, 1)} mm da aresta (mais de ${DISTANCIA_MAXIMA_DO_PERFIL_MM} mm): a malha não está onde a gaiola diz` };
+    if (perfil.distanciaMm > janelaMm / 2) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: `o perfil passa a ${arred(perfil.distanciaMm, 1)} mm da aresta (mais de metade da janela, ${janelaMm / 2} mm): a malha não está onde a linha diz` };
     const m = medirPerfil(perfil.pontos2d);
     const fora = pedidoMm !== null && m.natureza !== 'plana' && (m.raioMm === null || Math.abs(m.raioMm - pedidoMm) > tolerancia * pedidoMm);
     return { ...base, pontosDoPerfil: perfil.pontos2d.length, ...m, ...(pedidoMm !== null ? { desvioDoPedido: m.raioMm === null ? null : arred((m.raioMm - pedidoMm) / pedidoMm, 3), foraDoPedido: fora } : {}) };
@@ -248,7 +268,9 @@ export function linhasDosVincos(entrada) {
   (entrada.PASSOS ?? []).forEach((passo, i) => {
     const args = argumentosDe(passo);
     if (operacaoDe(passo) !== 'subdivisao' || !Array.isArray(args.vincos) || !args.vincos.length) return;
-    const resolvida = gaiolaDoPasso(args, { vec, num });
+    let resolvida = gaiolaDoPasso(args, { vec, num });
+    /* o campo `raio` do vinco (mm) é do ajudante de gaiola; enquanto o passo `subdivisao` o recusar por campo desconhecido, a gaiola é lida sem ele */
+    if (resolvida.erro && /campo desconhecido 'raio'/.test(resolvida.erro[1])) resolvida = gaiolaDoPasso({ ...args, vincos: args.vincos.map(({ raio, ...resto }) => resto) }, { vec, num });
     if (resolvida.erro) throw new ErroDeEntrada(`o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
     const { gaiola, declarados } = resolvida;
     const indice = new Map(declarados.map((d, k) => [d, k]).filter(([d]) => typeof d === 'string'));

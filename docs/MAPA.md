@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1916 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1926 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1006,6 +1006,7 @@
 - `concordancia-por-ponto.test.ts` — concordancia-por-ponto.test.ts — A-35: cada curva de um mesmo passo pode declarar seu próprio custo sem obrigar todas as outras a usarem o maior.
 - `contorno.js` — contorno.js — contorno 2D puro: retângulo de cantos arredondados, recuo por meia-esquadria, área com sinal e convexidade.
 - `contorno.test.mjs` — contorno.test.mjs — retângulo arredondado, recuo por meia-esquadria, área e convexidade do contorno 2D.
+- `curva-da-gaiola.js` — curva-da-gaiola.js — a curva sobre a superfície de uma gaiola, tirada dela sem digitar coordenada
 - `curva2d.js` — curva2d.js — contorno 2D escrito por trechos (reto, arco, arco tangente, concordância e spline), puro.
 - `curva2d.test.mjs` — curva2d.test.mjs — contorno 2D por trechos (reto, arco, arco tangente, concordância e spline).
 - `entrada.js` — oficina.js — fachada pública compatível do motor procedural. A implementação é separada por responsabilidade; esta entrada preserva o contrato usado por rece…
@@ -1055,6 +1056,7 @@
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
 - `lamina-sobre-a-superficie.js` — lamina-sobre-a-superficie.js — a lâmina de vão varrida sobre a superfície de uma chapa, com a seção perpendicular a ela
 - `limpar-contorno.test.mjs` — limpar-contorno.test.mjs — `limparContorno`: tira ponto repetido e, se pedido, ponto colinear, sem mexer na entrada.
+- `limpar-lascas.js` — limpar-lascas.js — o cálculo da limpeza de lascas depois de uma booleana: função pura sobre vértices e faces, sem passo, sem Manifold e sem domínio de objeto…
 - `linha-de-base-do-furo.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
 - `linha-de-base-do-nucleo.mjs` — Corpus sintético da R00. Cada caso dá uma entrada mínima e independente a uma capacidade do núcleo; ele congela o resultado observável, não a sua implementaç…
 - `linha-de-base-do-nucleo.test.mjs` — Guarda determinismo e compatibilidade da linha de base R00 do núcleo.
@@ -1077,6 +1079,7 @@
 - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
 - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
+- `ponto-na-malha.js` — ponto-na-malha.js — o ponto mais próximo de uma malha de triângulos, com grade espacial
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `rastreio-do-retrato.test.ts` — rastreio-do-retrato.test.ts — o atalho do retrato da procedência devolve exatamente a procedência da conta completa.
@@ -1154,6 +1157,7 @@
 - `geradores-faixa-estendida.test.ts` — geradores-faixa-estendida.test.ts — o lathe e o loft passam do bloco de 1000 ids do passo e seguem na faixa estendida, como o cilindro, o cone e o arranja já…
 - `lathe-aberto.test.ts` — lathe-aberto.test.ts — o `lathe` em modo polilinha cujo perfil não toca o eixo nas duas pontas nem volta ao primeiro ponto.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.
+- `limpar-lascas.js` — limpar-lascas.js (operação) — `limparLascas`: tira de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície…
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
 - `perfis.js` — perfis.js — `extrusao`: um perfil 2D com furos e deslocamento de contorno vira um sólido prismático.
@@ -2933,6 +2937,7 @@
 - `dobras-aceitas-reguas.test.mjs` — dobras-aceitas-reguas.test.mjs — `PLANO.dobrasAceitas` nas duas réguas de superfície e no `descrever`: a aba da técnica de hoje (`tubos-hoje.js`) sai como 4 …
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `entrada-de-medida.mjs` — entrada-de-medida.mjs — o resolvedor de entrada das ferramentas de medida: o que o `vao:partes` já lia (esboço 2.0, receita ou montagem persistida) numa funç…
+- `entrada-de-medida.test.mjs` — entrada-de-medida.test.mjs — o resolvedor comum das ferramentas de medida e as quatro que passaram a ler esboço 2.0 (ondulação, lascas, vistas de superfície …
 - `esboco-alinhar-caixas.mjs` — esboco-alinhar-caixas.mjs — alinha as caixas de um esboço onde a receita de origem as deixou desencontradas por pouco. Núcleo puro: recebe as formas resolvid…
 - `esboco-alinhar-caixas.test.mjs` — O alinhamento das caixas de um esboço: simetria, colunas, degrau, contato e folga, com o limite de cada regra, e as onze cadeiras convertem com o alinhamento…
 - `esboco-nucleo.mjs` — esboco-nucleo.mjs — o esboço 2.0: as opções de forma de um esboço saem das operações do núcleo, cada uma montada como receita em memória e capturada na banca…
@@ -3008,6 +3013,7 @@
 - `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
 - `ombro-uniao.test.ts` — ombro-uniao.test.ts — a rodada do ombro do plano "União de sólidos": a união e o arredondamento sobre superfícies CURVAS facetadas. A fixture (`fixtures/fixt…
 - `ondulacao-aneis.test.mjs` — ondulacao-aneis.test.mjs — a leitura de ondulação da chapa com anéis de gaiola em volta de um vão e de um arco
+- `ondulacao-corte-e-quina.test.mjs` — ondulacao-corte-e-quina.test.mjs — a ondulação sobre a chapa depois do corte em painéis (a superfície é lida no último passo que ainda tem a gaiola, dito na …
 - `ondulacao-da-superficie.mjs` — ondulacao-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita ondula, salta ou dobra fora dos vincos declarados, e diz quanto (em milímet…
 - `ondulacao-da-superficie.test.mjs` — ondulacao-da-superficie.test.mjs — a ferramenta de ondulação endereçada sobre a chapa desenhada por código.
 - `ondulacao-gota.test.mjs` — ondulacao-gota.test.mjs — a leitura de ondulação das chapas com anel no vão real: a gota estreita e o vão aberto pelas colunas que terminam e começam
@@ -3032,6 +3038,8 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
+- `raio-da-aresta.mjs` — raio-da-aresta.mjs — mede o raio de cada aresta de caráter de uma peça, sobre a malha final.
+- `raio-da-aresta.test.mjs` — raio-da-aresta.test.mjs — a medida do raio de uma aresta sobre a malha final, com a verdade conhecida: o cilindro de raio dado entre dois planos (a 90 e a 12…
 - `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Modelar, e o ca…
 - `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `reduzir-em-paralelo.mjs` — reduzir-em-paralelo.mjs — `reduzirPorMedia` numa thread à parte, para a captura seguinte não esperar a redução da anterior.
@@ -3102,6 +3110,8 @@
 - `alisar-prova.js` — alisar-prova.js — a chapa desenhada por código para o teste da ferramenta de alisamento.
 - `alisar-rede-prova-casos.mjs` — alisar-rede-prova-casos.mjs — os casos independentes do teste do alisamento sobre a rede, rodados em processo à parte.
 - `alisar-rede-prova.js` — alisar-rede-prova.js — a chapa lateral por rede de curvas, com os pontos-chave na TABELA, para o teste do alisamento sobre a rede.
+- `dobra-por-apoio.esboco.mjs` — dobra-por-apoio.esboco.mjs — a chapa em V com colunas de apoio como esboço 2.0 em arquivo, para os testes das ferramentas de medida que leem o rascunho de um…
+- `dobra-por-apoio.mjs` — dobra-por-apoio.mjs — as fixtures sem domínio das ferramentas de raio, de ondulação e de entrada: uma chapa dobrada por colunas de apoio e a malha de um cili…
 - `fixture-cubo-material.js` — fixture-cubo-material.js — caixa com todas as faces em um material declarado, para a exportação OBJ com texturas.
 - `fixture-cubo.js` — fixture-cubo.js — receita procedural de teste para exportação CAD/STEP.
 - `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.
