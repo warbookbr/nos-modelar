@@ -100,10 +100,19 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    atribuições, 19 foram ao plano, 10 ao modelador, 8 à ferramenta e 2 ao
    crítico. O avião dá 2,75 rodadas por peça e o braço 6, pelo mesmo comando.
    Nenhum registro traz data, e gravá-la entra na fatia 1.
-1. **Fluxo único.** O comando que diz o próximo passo de um objeto, da
-   referência à etapa fixa; o registro que aceita o relato de várias peças; no
-   pedido do crítico, a referência por vista, a vista em corte e a contradição
-   entre rodadas. Saída: os itens 2 e 3 do gate.
+1. **Fluxo único, ferramentas entregues em 2026-11-11; falta a peça de prova.**
+   `npm run fluxo:objeto` diz em que passo o objeto está e o próximo comando,
+   da referência à etapa fixa. O registro da rodada escolhe o relato de cada
+   peça num texto com várias, grava a data e mostra contradições e repetições
+   entre rodadas. O pedido ao crítico diz a referência que vale para cada
+   vista, traz até quatro vistas em corte no plano dos encaixes, com a folga
+   escrita, e lista o que rodadas anteriores atribuíram ao plano, à ferramenta
+   ou ao crítico. Prova: o eixo dianteiro da empilhadeira, que dois críticos
+   leram com nota 6 e o assento como defeito, recebeu nota 8 sem defeito de um
+   crítico sem contexto com o pacote novo, que leu no
+   [corte](../banco-de-provas/empilhadeira-2026-11-09/corte-do-assento-do-eixo-dianteiro.png)
+   a folga de 0,35 mm sob o teto do entalhe. Falta o item 2 do gate: uma peça
+   nova simples levada da referência à etapa fixa só pelo comando de fluxo.
 2. **Juntas na montagem** (plano próprio). Assento plano, guia prismática e
    articulação com eixo e curso entre instâncias, e a etapa nomeada antes de
    ter receita. Pergunta: a montagem mede o que hoje vai por posição? Saída:
