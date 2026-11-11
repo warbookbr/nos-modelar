@@ -18,6 +18,8 @@
   "travessas": "escuro",
   "pneu": "preto",
   "aro": "aro",
+  "cubo": "aro",
+  "disco": "aro",
   "eixo": "escuro"
  },
  "dentro": [
@@ -71,6 +73,8 @@
     "lado.roda": [
      "pneu",
      "aro",
+     "cubo",
+     "disco",
      "eixo"
     ]
    },

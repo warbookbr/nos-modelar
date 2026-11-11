@@ -27,20 +27,22 @@ export const TABELA = {
   /* As cores do rascunho: o azul da caçamba e da borda e o escuro dos tirantes. */
   cores: { azul: CHASSI.cores.azul, escuro: CHASSI.cores.escuro },
   cacamba: {
-    /* O FUNDO (linha "fundo da caçamba"): de z -715 a -170, com 150 de meia largura, assentado 2,5 mm acima da face de cima dos braços
-       (com 0,5 mm o relato de contatos do rascunho dava travessia que a malha não tem). */
-    fundo: { z: [-715, -170], meiaLargura: 150, assento: 2.5 },
-    /* A silhueta de lado em [z, y], do fundo à boca em y 462 (a boca de z -810 a 24), sem os dois pontos do fundo: a parede da frente
-       sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */
-    lado: [[-140, 290], [-115, 305], [-95, 322], [-70, 350], [-40, 392], [-10, 432], [24, 462], [-810, 462],
-      [-790, 420], [-775, 385], [-745, 320], [-728, 296]],
-    /* A meia largura por altura, acima do fundo, até 313 na boca. */
-    perfil: [[292, 190], [306, 222], [340, 260], [400, 295], [462, 313]],
+    /* O FUNDO (linha "fundo da caçamba"): o painel plano da chapa estampada, de z -715 a -170, com 205 de meia largura atrás (a planta
+       da boca reduzida a 0,65, e por isso mais estreito na frente), assentado 2,5 mm acima da face de cima dos braços, que correm sob
+       ele (com 0,5 mm o relato de contatos do rascunho dava travessia que a malha não tem). A dobra entre o fundo e cada parede é o
+       arco de raio curto de chapa estampada, tangente aos dois, na silhueta de lado e na meia largura, com os laços da dobra a estas
+       alturas acima do fundo; o fundo e a meia largura são o encontro das retas, antes do arco. */
+    fundo: { z: [-715, -170], meiaLargura: 205, assento: 2.5, raioDaDobra: 35, pontosDaDobra: 8, lacosDaDobra: [2.5, 5, 8, 12] },
+    /* A silhueta de lado em [z, y], sem os dois pontos do fundo: as paredes retas, sem barriga, do fundo à boca em y 462 (a boca de z
+       -810 a 24): a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */
+    lado: [[24, 462], [-810, 462]],
+    /* A meia largura por altura, acima do fundo: a parede do lado reta até 313 na boca. */
+    perfil: [[462, 313]],
     /* A meia planta da boca pela vista de cima: 313 de z -260 a -650, os cantos de trás arredondados e a frente afinando até a ponta. */
     planta: [[0, 24], [80, 14], [116, 0], [158, -20], [203, -50], [234, -80], [266, -120], [288, -160], [303, -200], [313, -260],
       [313, -650], [306, -700], [290, -740], [262, -775], [225, -795], [180, -805], [0, -810]],
-    /* As alturas dos laços acima do fundo, e os pontos de cada laço. */
-    estacoes: [290, 298, 310, 326, 346, 370, 396, 422, 444, 462],
+    /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço. */
+    estacoes: [330, 380, 430, 462],
     pontos: 33, pontosDoLado: 25,
     /* CHAPA E BORDA (linha "chapa e borda"): chapa de 1,5 mm; borda virada de Ø 16, 5 mm para fora da boca e 2 abaixo dela. */
     espessura: 1.5,
@@ -56,11 +58,22 @@ export function derivar(T = TABELA) {
   const C = T.cacamba;
   const apoio = derivarChassi(CHASSI).portas.apoioDaCacamba;
   const yFundo = apoio.ponto[1] + C.fundo.assento;
+  /* a dobra: o arco de raio R tangente ao fundo e à parede, do canto P (u para fora, y para cima) à parede que sobe a Q */
+  const F = C.fundo;
+  const dobra = (P, Q) => {
+    const a = Math.atan2(Q[1] - P[1], Q[0] - P[0]); const t = F.raioDaDobra * Math.tan(a / 2);
+    const c = [P[0] - t, P[1] + F.raioDaDobra];
+    return Array.from({ length: F.pontosDaDobra + 1 }, (_, k) => { const f = a * k / F.pontosDaDobra; return [c[0] + F.raioDaDobra * Math.sin(f), c[1] - F.raioDaDobra * Math.cos(f)]; });
+  };
+  const [frente, tras] = [C.lado[0], C.lado[C.lado.length - 1]];
+  const naFrente = dobra([F.z[1], yFundo], frente);
+  const atras = dobra([-F.z[0], yFundo], [-tras[0], tras[1]]).map(([u, y]) => [-u, y]);
+  const noLado = dobra([F.meiaLargura, yFundo], [C.perfil[C.perfil.length - 1][1], C.perfil[C.perfil.length - 1][0]]);
   const vistas = {
-    lado: [[C.fundo.z[0], yFundo], [C.fundo.z[1], yFundo], ...C.lado],
-    perfil: [[yFundo, C.fundo.meiaLargura], ...C.perfil],
+    lado: [atras[0], ...naFrente, ...C.lado, ...atras.slice(1).reverse()],
+    perfil: [...noLado.map(([u, y]) => [y, u]), ...C.perfil],
     planta: [...C.planta, ...C.planta.slice(1, -1).reverse().map(([x, z]) => [-x, z])],
-    estacoes: [yFundo, ...C.estacoes],
+    estacoes: [yFundo, ...F.lacosDaDobra.map((d) => yFundo + d), ...C.estacoes],
     pontos: C.pontos, pontosDoLado: C.pontosDoLado,
   };
   /* a ponta de baixo dos tirantes, no eixo do tubo do laço reto (o último ponto da polilinha do chassi) */
@@ -73,11 +86,26 @@ export function derivar(T = TABELA) {
   return { yFundo, vistas, tirantes, portas };
 }
 
-/* os laços da caçamba pelas três vistas */
+/* Os laços da caçamba: a estrutura (os trechos, a tampa do fundo e a volta da boca) é a de `lacosPelasVistas` pelas três vistas, e
+   cada laço abaixo da boca é a volta da boca reduzida para a meia largura e o comprimento da silhueta naquela altura (a lateral pela
+   razão das meias larguras, o comprimento levado da boca ao intervalo da silhueta). `lacosPelasVistas` recorta a planta na meia
+   largura, o que dá ao fundo plano quinas vivas nos lados; reduzida, a planta dá ao fundo os cantos largos da boca, menores, e a
+   frente mais estreita, como o fundo estampado das referências. */
 function lacosDaCacamba(vistas) {
   const { meiaPlanta, avisos, ...lacos } = lacosPelasVistas(vistas);
   if (avisos.length) throw new Error(`caçamba: ${avisos.map((a) => JSON.stringify(a)).join('; ')}`);
-  return lacos;
+  const boca = lacos.lacos[lacos.lacos.length - 1];
+  const pontos = Object.values(boca.trechos).flat();
+  const bl = Math.max(...pontos.map((p) => Math.abs(p[0])));
+  const [b0, b1] = [Math.min(...pontos.map((p) => p[1])), Math.max(...pontos.map((p) => p[1]))];
+  const reduzidos = lacos.lacos.map((laco) => {
+    const ps = Object.values(laco.trechos).flat();
+    const l = Math.max(...ps.map((p) => Math.abs(p[0])));
+    const [c0, c1] = [Math.min(...ps.map((p) => p[1])), Math.max(...ps.map((p) => p[1]))];
+    const leva = ([x, z]) => [x * l / bl, c0 + (z - b0) * (c1 - c0) / (b1 - b0)];
+    return { ...laco, trechos: Object.fromEntries(Object.entries(boca.trechos).map(([nome, pts]) => [nome, pts.map(leva)])) };
+  });
+  return { ...lacos, lacos: reduzidos };
 }
 
 /** A caçamba no estado { passos, topo, origem }, em mm: a casca aberta em cima, com a espessura da chapa, a borda virada em volta da

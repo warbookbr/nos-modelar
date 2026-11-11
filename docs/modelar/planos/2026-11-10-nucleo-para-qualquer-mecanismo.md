@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`
+**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`
 
 **Responsável:** a IA da sessão que o ativar conduz e mede; a pessoa decide a
 ordem das fatias e julga forma por imagem.
@@ -179,6 +179,15 @@ os seis lugares de plano ativo ocupados e os arquivos livres desde que o plano
 da empilhadeira fechou, a metade de tubo e chapa da fatia 4 é feita dentro
 deste plano, antes das receitas do carrinho, que passam a ser a prova dela. A
 escala do carrinho fica pelo pneu de 340 mm, como recomendado.
+
+Ainda em 2026-11-11 a pessoa pediu um teste em paralelo: saber se o projeto dá
+à IA o que ela precisa para modelar bem o chassi e a lataria de um carro, com o
+sedã vermelho do acervo (`carro-sedan-classico`) como referência. O teste é um
+diagnóstico e não implementa nada no núcleo. Um objeto novo,
+`sedan-chassi-e-lataria`, é levado pelo fluxo com a lataria em painéis de chapa
+separados por vão, apoiados num chassi com contato medido, e cada dificuldade
+entra em `ATRITOS.md` do banco de provas com a atribuição. A saída é a lista do
+que falta ao projeto para carro, que alimenta as fatias 4 e 6.
 
 ## Fechamento
 
