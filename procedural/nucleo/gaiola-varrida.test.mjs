@@ -438,3 +438,172 @@ describe('o dado ruim grita com o campo', () => {
     diz(semFora, /fora é obrigatório/);
   });
 });
+
+/* ------------------------------------------------------------------ o trilho com raios e o quadro que acompanha */
+
+/* o trilho escrito à mão, sem a função: as retas e os arcos tangentes de cada canto, e as amostras dele a cada 0,25 mm com a tangente */
+const vsub = (a, b) => a.map((v, k) => v - b[k]); const vsom = (a, b) => a.map((v, k) => v + b[k]); const vesc = (a, k) => a.map((v) => v * k);
+const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const vcruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const vnor = (a) => Math.hypot(...a); const vunit = (a) => vesc(a, 1 / vnor(a));
+function aMao(pontos, R) {
+  const trechos = []; let atual = pontos[0];
+  for (let i = 1; i + 1 < pontos.length; i++) {
+    const P = pontos[i]; const d1 = vunit(vsub(P, pontos[i - 1])); const d2 = vunit(vsub(pontos[i + 1], P));
+    const th = Math.acos(vdot(d1, d2)); const t = R * Math.tan(th / 2); const T1 = vsub(P, vesc(d1, t));
+    trechos.push({ reta: { de: atual, ate: T1 } });
+    const n = vunit(vcruz(d1, d2));
+    trechos.push({ arco: { centro: vsom(T1, vesc(vunit(vcruz(n, d1)), R)), eixo: n, de: T1, graus: th * 180 / Math.PI } });
+    atual = vsom(P, vesc(d2, t));
+  }
+  trechos.push({ reta: { de: atual, ate: pontos.at(-1) } });
+  return trechos;
+}
+function amostrar(trechos) {
+  const S = [];
+  for (const { reta, arco } of trechos) {
+    if (reta) {
+      const d = vsub(reta.ate, reta.de); const n = Math.ceil(vnor(d) / 0.25); const t = vunit(d);
+      for (let k = 0; k <= n; k++) S.push({ p: vsom(reta.de, vesc(d, k / n)), t });
+    } else {
+      const k = vunit(arco.eixo); const r0 = vsub(arco.de, arco.centro); const giro = arco.graus * Math.PI / 180;
+      const n = Math.ceil(Math.abs(giro) * vnor(r0) / 0.25);
+      for (let q = 0; q <= n; q++) {
+        const th = giro * q / n; const r = vsom(vesc(r0, Math.cos(th)), vesc(vcruz(k, r0), Math.sin(th)));
+        S.push({ p: vsom(arco.centro, r), t: vunit(vesc(vcruz(k, r), Math.sign(giro))) });
+      }
+    }
+  }
+  return S;
+}
+const maisPerto = (S, q) => { let b = Infinity; let bi = 0; S.forEach((a, k) => { const d = (q[0] - a.p[0]) ** 2 + (q[1] - a.p[1]) ** 2 + (q[2] - a.p[2]) ** 2; if (d < b) { b = d; bi = k; } }); return { d: Math.sqrt(b), k: bi }; };
+const circulo = (r, n) => Array.from({ length: n }, (_, k) => ({ u: r * Math.cos(2 * Math.PI * k / n), v: r * Math.sin(2 * Math.PI * k / n), nome: `l${k}` }));
+/* a seção no corte reto do trilho, em cada estação: l0-l12 e l6-l18, as duas direções perpendiculares do círculo de 24 lados, projetadas
+   no plano normal à tangente do trilho à mão no centro do anel */
+function corteReto(g, S) {
+  return g.estacoes.map((_, i) => {
+    const anel = Array.from({ length: 24 }, (__, j) => g.posicoes.get(g.nomeDe(i, j)));
+    const c = anel.reduce((a, p) => vsom(a, vesc(p, 1 / 24)), [0, 0, 0]);
+    const { t } = S[maisPerto(S, c).k];
+    const no = (a, b) => { const w = vsub(a, b); return vnor(vsub(w, vesc(t, vdot(w, t)))); };
+    return [no(anel[0], anel[12]), no(anel[6], anel[18])];
+  });
+}
+
+describe('o tubo redondo num trilho de pontos com raio nos cantos, subindo em rampa', () => {
+  /* um tubo de Ø 32 que corre 400 mm em z, sobe em rampa 150 mm em 250 de z, e corre em x e z no alto; cantos de raio 60 */
+  const pontos = [[0, 0, 0], [0, 0, 400], [0, 150, 650], [200, 150, 900]];
+  const S = amostrar(aMao(pontos, 60));
+  const tubo = (quadro) => gaiolaVarrida({ nome: 'tubo', trilho: { pontos, raios: 60 }, quadro, secao: circulo(16, 24), fechada: true, tampas: true, estacoes: { passo: 40 } });
+
+  it("com quadro.modo 'acompanha' a seção mede 32 mm nas duas direções em toda estação, e a malha fecha antes e depois de niveis 2", () => {
+    const g = tubo({ u: [0, 1, 0], modo: 'acompanha' });
+    expect(g.avisos).toBeUndefined();
+    expect(usoDasArestas(g.faces)).toEqual([2]);
+    for (const [a, b] of corteReto(g, S)) { expect(Math.abs(a - 32)).toBeLessThan(0.01); expect(Math.abs(b - 32)).toBeLessThan(0.01); }
+    /* depois de niveis 2 cada ponto fora das tampas fica a 16 mm do trilho, a 0,5: o diâmetro em qualquer direção do corte, 32 a 1 mm */
+    const neutro = entrega(g, { niveis: 2 });
+    const ps = [...neutro.V.values()].map((p) => p.map((x) => x * MM));
+    const raios = ps.map((q) => maisPerto(S, q)).filter(({ k }) => k > 1 && k < S.length - 2).map(({ d }) => d);
+    expect(raios.length).toBeGreaterThan(ps.length * 0.9);
+    expect(2 * Math.min(...raios)).toBeGreaterThan(31);
+    expect(2 * Math.max(...raios)).toBeLessThan(33);
+    expect(usoDasArestas([...neutro.F.values()].map((f) => f.vs))).toEqual([2]);
+  });
+
+  it('com o quadro fixo, o de hoje, a seção achata na rampa e a gaiola devolve o aviso com o trecho e a medida, sem mudar a malha', () => {
+    const g = tubo({ u: [0, 1, 0] });
+    const razao = Math.sqrt(1 - (150 / Math.hypot(150, 250)) ** 2);
+    const menor = Math.min(...corteReto(g, S).flat());
+    expect(menor).toBeCloseTo(32 * razao, 2);
+    expect(g.avisos).toHaveLength(1);
+    const [a] = g.avisos;
+    expect(a).toMatchObject({ tipo: 'secao-achatada', eixo: 'u', tamanho: 32 });
+    expect(a.razao).toBeCloseTo(razao, 6);
+    expect(a.medida).toBeCloseTo(32 * razao, 6);
+    expect(a.mensagem).toMatch(/32 mm de seção medem 27\.44 mm no corte reto/);
+    /* o trecho do aviso é a rampa, com o pedaço dos dois arcos em que a tangente já se inclinou: começa no primeiro arco e acaba no
+       segundo */
+    const th1 = Math.acos(250 / Math.hypot(150, 250)); const t1 = 60 * Math.tan(th1 / 2);
+    const d2 = vunit([200, 0, 250]); const th2 = Math.acos(vdot(vunit([0, 150, 250]), d2)); const t2 = 60 * Math.tan(th2 / 2);
+    const rampa = [400 - t1 + 60 * th1, 400 - t1 + 60 * th1 + Math.hypot(150, 250) - t1 - t2];
+    expect(a.de).toBeGreaterThan(400 - t1); expect(a.de).toBeLessThanOrEqual(rampa[0]);
+    expect(a.ate).toBeGreaterThanOrEqual(rampa[1]); expect(a.ate).toBeLessThan(rampa[1] + 60 * th2);
+    expect(assinatura(gaiolaVarrida({ nome: 'tubo', trilho: { pontos, raios: 60 }, quadro: { u: [0, 1, 0], modo: 'fixo' }, secao: circulo(16, 24), fechada: true, tampas: true, estacoes: { passo: 40 } }))).toBe(assinatura(g));
+  });
+
+  it("o eixo fixo v também acompanha, e 'acompanha' sem subida dá a mesma malha do quadro fixo, a 1e-9 mm", () => {
+    const g = tubo({ v: [0, 1, 0], modo: 'acompanha', virar: true });
+    for (const [a, b] of corteReto(g, S)) { expect(a).toBeCloseTo(32, 2); expect(b).toBeCloseTo(32, 2); }
+    const plano = (quadro) => gaiolaVarrida({ nome: 'p', trilho: { pontos: [[0, 0, 0], [0, 0, 400], [300, 0, 700]], raios: 80 }, quadro, secao: circulo(16, 24), fechada: true, tampas: true, estacoes: { passo: 40 } });
+    const fixo = plano({ u: [0, 1, 0] }); const leva = plano({ u: [0, 1, 0], modo: 'acompanha' });
+    expect(leva.vertices).toEqual(fixo.vertices); expect(leva.faces).toEqual(fixo.faces);
+    for (const n of fixo.vertices) expect(perto(leva.posicoes.get(n), fixo.posicoes.get(n), 1e-9)).toBe(true);
+  });
+});
+
+describe('o trilho { pontos, raios }', () => {
+  it('dá os mesmos pontos que as retas e o arco escritos à mão: o L com raio 60', () => {
+    const base = { nome: 'L', quadro: { u: [1, 0, 0] }, secao: [{ u: -35, v: -35 }, { u: 35, v: -35 }, { u: 35, v: 35 }, { u: -35, v: 35 }], fechada: true, tampas: true };
+    const aMaoL = [{ reta: { de: [0, 0, 0], ate: [0, 500, 0] } }, { arco: { centro: [0, 500, -60], eixo: [1, 0, 0], de: [0, 500, 0], graus: -90 } }, { reta: { de: [0, 560, -60], ate: [0, 560, -460] } }];
+    const dobra = [500, 500 + 30 * Math.PI];
+    const lista = [{ fracao: 0 }, { passo: 25 }, { em: dobra[0] }, { entre: 12 }, { em: dobra[1] }, { passo: 25 }, { fracao: 1 }];
+    const mao = gaiolaVarrida({ ...base, trilho: aMaoL, estacoes: lista });
+    const pontos = { pontos: [[0, 0, 0], [0, 560, 0], [0, 560, -460]], raios: [60] };
+    for (const estacoes of [lista, { passo: 25 }]) {
+      const g = gaiolaVarrida({ ...base, trilho: pontos, estacoes });
+      expect(g.vertices).toEqual(mao.vertices); expect(g.faces).toEqual(mao.faces);
+      expect(g.comprimento).toBeCloseTo(mao.comprimento, 9);
+      for (const n of mao.vertices) expect(perto(g.posicoes.get(n), mao.posicoes.get(n), 1e-9)).toBe(true);
+    }
+    /* as estações automáticas põem 12 no arco de 90 graus (7,5 graus cada, e a flecha de 0,15 mm pede 8,1) e o passo nas retas; graus e
+       flecha mudam o número */
+    expect(gaiolaVarrida({ ...base, trilho: pontos, estacoes: { passo: 25 } }).estacoes).toHaveLength(20 + 12 + 16 + 1);
+    expect(gaiolaVarrida({ ...base, trilho: pontos, estacoes: { passo: 25, graus: 15, flecha: 1 } }).estacoes).toHaveLength(20 + 6 + 16 + 1);
+    expect(gaiolaVarrida({ ...base, trilho: pontos, estacoes: { passo: 25, graus: 45, flecha: 60 * (1 - Math.cos(Math.PI / 32)) } }).estacoes).toHaveLength(20 + 8 + 16 + 1);
+  });
+
+  it('raio 0 é canto vivo, um número vale para todos os cantos, e sem raios é a polilinha de antes, byte a byte', () => {
+    const regua3 = (trilho) => gaiolaVarrida(regua({ trilho, estacoes: [{ fracao: 0 }, { passo: 100 }, { fracao: 1 }] }));
+    const p = [[0, 0, 0], [0, 0, 500], [0, 0, 1000]];
+    expect(assinatura(regua3({ pontos: p, raios: 0 }))).toBe(assinatura(regua3({ pontos: p })));
+    const dois = [[0, 0, 0], [0, 0, 400], [300, 0, 700], [300, 0, 1200]];
+    expect(assinatura(regua3({ pontos: dois, raios: 50 }))).toBe(assinatura(regua3({ pontos: dois, raios: [50, 50] })));
+    const vivo = gaiolaVarrida(regua({ trilho: { pontos: dois, raios: [0, 50] }, estacoes: { passo: 100 } }));
+    expect(vivo.estacoes.some((e) => Math.abs(e.s[0] - 400) < 1e-9)).toBe(true);
+  });
+
+  it('o laço fechado volta ao começo sem ponta: toda aresta em duas faces, e a seção fica redonda mesmo com o laço torto', () => {
+    const torto = [[0, 0, 0], [400, 0, 0], [400, 200, 400], [0, 0, 400]];
+    const g = gaiolaVarrida({ nome: 'laco', trilho: { pontos: torto, raios: 60, fechado: true }, quadro: { u: [0, 1, 0], modo: 'acompanha' }, secao: circulo(16, 24), fechada: true, estacoes: { passo: 40 } });
+    expect(usoDasArestas(g.faces)).toEqual([2]);
+    expect(g.vertices).toHaveLength(24 * (g.estacoes.length - 1));
+    expect(volumeAssinado(g.faces, (n) => g.posicoes.get(n))).toBeGreaterThan(0);
+    /* a torção do laço se reparte pelo trilho: o anel de cada estação continua no plano normal, de 32 mm nas duas direções */
+    g.estacoes.slice(0, -1).forEach((_, i) => {
+      const anel = Array.from({ length: 24 }, (__, j) => g.posicoes.get(g.nomeDe(i, j)));
+      expect(vnor(vsub(anel[0], anel[12]))).toBeCloseTo(32, 9);
+      expect(vdot(vsub(anel[0], anel[12]), vsub(anel[6], anel[18]))).toBeCloseTo(0, 6);
+    });
+    expect(usoDasArestas([...entrega(g, { niveis: 1 }).F.values()].map((f) => f.vs))).toEqual([2]);
+  });
+
+  it('o raio que não cabe é recusado com a medida, e os campos ruins com o campo', () => {
+    const diz = (trilho, trecho, extra = {}) => {
+      const e = grito(() => gaiolaVarrida(regua({ trilho, estacoes: { passo: 100 }, ...extra })));
+      expect(e).toBeInstanceOf(ErroGaiolaVarrida); expect(e.message).toMatch(trecho);
+    };
+    diz({ pontos: [[0, 0, 0], [0, 0, 100], [100, 0, 100]], raios: 150 }, /o raio não cabe no trecho de trilho\.pontos\[0\] a trilho\.pontos\[1\]: o trecho mede 100 mm e os arcos pedem 150 mm \(o raio 150 em pontos\[1\] corta 150 mm dele, e o maior que cabe ali com o outro como está é 100 mm\)/);
+    diz({ pontos: [[0, 0, 0], [0, 0, 100], [100, 0, 100], [100, 0, 0]], raios: [60, 60] }, /o trecho mede 100 mm e os arcos pedem 120 mm .*o maior que cabe ali com o outro como está é 40 mm/);
+    diz({ pontos: [[0, 0, 0], [0, 0, 100], [100, 0, 100]], raios: [10, 10] }, /trilho\.raios tem 2 raios e o trilho tem 1 cantos/);
+    diz({ pontos: [[0, 0, 0], [0, 0, 100], [100, 0, 100]], raios: -1 }, /trilho\.raios\[0\] é -1/);
+    diz({ pontos: [[0, 0, 0], [0, 0, 100], [0, 0, 0]], raios: 10 }, /volta para trás/);
+    diz({ pontos: [[0, 0, 0], [0, 0, 100]], fechado: 'sim' }, /trilho\.fechado precisa ser true ou false/);
+    diz({ pontos: [[0, 0, 0], [0, 0, 100]], cantos: 1 }, /trilho tem campo desconhecido 'cantos'/);
+    diz({ pontos: [[0, 0, 0], [0, 0, 1000]] }, /quadro\.modo precisa ser 'fixo' ou 'acompanha', e veio "solto"/, { quadro: { u: [1, 0, 0], modo: 'solto' } });
+    diz({ pontos: [[0, 0, 0], [0, 0, 1000]] }, /estacoes tem campo desconhecido 'entre'/, { estacoes: { passo: 10, entre: 3 } });
+    const quadrado = { pontos: [[0, 0, 0], [400, 0, 0], [400, 0, 400], [0, 0, 400]], raios: 50, fechado: true };
+    const e = grito(() => gaiolaVarrida({ nome: 'q', trilho: quadrado, quadro: { u: [0, 1, 0] }, secao: circulo(16, 8), fechada: true, tampas: true, estacoes: { passo: 40 } }));
+    expect(e.message).toMatch(/tampas não vale com o trilho fechado/);
+  });
+});
