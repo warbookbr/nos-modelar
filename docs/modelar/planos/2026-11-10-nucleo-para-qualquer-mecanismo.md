@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`
+**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`
 
 **Responsável:** a IA da sessão que o ativar conduz e mede; a pessoa decide a
 ordem das fatias e julga forma por imagem.
@@ -143,6 +143,10 @@ Ativo desde 2026-11-10, quando o plano da empilhadeira fechou e a pessoa disse
 1. O pedido do crítico e a vista em corte ficam em arquivos do plano das partes
 do braço e do de ferramentas de conferência e de vista, e entram combinados com
 eles, como a seção de riscos diz.
+
+Em 2026-11-11 a pessoa mandou seguir com a fatia 1, e `vistas-para-critica.mjs`
+passou do plano das partes do braço a este durante a fatia; ele volta àquele
+território quando ela fechar.
 
 ## Fechamento
 
