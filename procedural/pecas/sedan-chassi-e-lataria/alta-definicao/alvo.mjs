@@ -108,3 +108,46 @@ export const PAINEIS = [
 export const CORES = { capo: '#d9483b', paraLamaDir: '#2e86c1', portaDianteiraDir: '#27ae60', portaTraseiraDir: '#f1c40f', lateralTraseiraDir: '#c0392b', soleiraDir: '#7f8c8d', labioDianteiro: '#1b4f72', labioTraseiro: '#7b241c' };
 export const VIZINHOS = [['capo', 'paraLamaDir'], ['paraLamaDir', 'portaDianteiraDir'], ['portaDianteiraDir', 'portaTraseiraDir'], ['portaTraseiraDir', 'lateralTraseiraDir'],
   ['portaDianteiraDir', 'soleiraDir'], ['portaTraseiraDir', 'soleiraDir'], ['paraLamaDir', 'soleiraDir'], ['lateralTraseiraDir', 'soleiraDir']];
+
+/* ---- o andar de cima (ciclo 3) ----
+ * A cabine do rascunho, com a cintura do andar de baixo como fronteira: o peitoril de cima começa 4 mm para dentro da borda da faixa
+ * de baixo (x 820), no mesmo plano dela, e é ali o vão entre as portas e o teto. Do rascunho vêm o perfil lateral da cabine (o para-
+ * brisa, o teto em y 1523 e o vidro traseiro), a lateral que fecha 143 mm em 623 de altura, a faixa das janelas (y 1075 a 1420), as
+ * pontas das janelas e as larguras das colunas. A estufa sai 44 mm mais estreita que no rascunho, porque assenta para dentro da faixa
+ * de baixo. Eixos e unidades como acima. */
+export const C = {
+  xBase: T.xCapo + 60 - T.vao,   /* a borda do peitoril de cima, 4 mm para dentro da faixa de baixo */
+  xPe: T.xCapo + 60 - T.vao - 12, /* o pé da lateral da cabine: 12 mm de peitoril */
+  inclinacao: 143 / 623,        /* a lateral fecha para dentro com a altura (rascunho) */
+  zFrente: 703, zTras: -1294.6, /* as pontas da cabine, onde a lateral tem 40 mm de altura; à frente e atrás fica o vão do tampão */
+  zPeDoParaBrisa: 738, zTopoDoParaBrisa: 276.2, yTeto: 1523, zTopoDoVidroTraseiro: -1072.3, zPeDoVidroTraseiro: -1312.9,
+  arcoDoTeto: 5,                /* flecha do teto ao comprido */
+  flecha: 8,                    /* flecha do teto, do para-brisa e do vidro traseiro na largura */
+  janela: { y0: 1075, y1: 1420 }, /* a faixa das janelas no rascunho */
+  peitorilDaJanela: 74,          /* da cintura ao pé da janela */
+  quadroDeCima: 103,            /* do topo da janela à quina do teto */
+  colunaA: 70,                  /* a largura da coluna A vista de frente, e a do vão do vidro traseiro até a quina */
+  pontasDasJanelas: { dianteira: [554.7, 5], traseira: [-95, -710], vigia: [-852, -1218] },
+  paraBrisa: { y0: 1075, y1: 1425 }, vidroTraseiro: { y0: 1110, y1: 1420 },
+  raioDaQuina: 4,               /* a quina da lateral com o teto: coluna A, calha do teto e coluna C */
+  raioDoPe: 3,                  /* o pé da lateral da cabine sobre o peitoril */
+  raioDoTopo: 15,               /* as quinas do teto com o para-brisa e com o vidro traseiro */
+  vidro: { espessura: 4, recuo: 0.8, sobra: 12 },
+  moldura: { largura: 14, altura: 3 },
+};
+const KPB = (C.yTeto - 1001) / (C.zPeDoParaBrisa - C.zTopoDoParaBrisa);
+const KVT = (C.yTeto - 1001) / (C.zTopoDoVidroTraseiro - C.zPeDoVidroTraseiro);
+/** A altura da quina da cabine (o alto da lateral) em z: o para-brisa, o teto com a flecha ao comprido, o vidro traseiro. */
+export function yQuina(z) {
+  if (z >= C.zTopoDoParaBrisa) return 1001 + (C.zPeDoParaBrisa - z) * KPB;
+  if (z <= C.zTopoDoVidroTraseiro) return 1001 + (z - C.zPeDoVidroTraseiro) * KVT;
+  const m = (C.zTopoDoParaBrisa + C.zTopoDoVidroTraseiro) / 2; const h = (C.zTopoDoParaBrisa - C.zTopoDoVidroTraseiro) / 2;
+  return C.yTeto + C.arcoDoTeto * (1 - ((z - m) / h) ** 2);
+}
+/** A lateral da cabine: a meia largura na altura y. */
+export const xCabine = (y) => C.xPe - C.inclinacao * (y - 1001);
+/** O topo da cabine (para-brisa, teto, vidro traseiro) em (x, z), com a flecha na largura. */
+export function yTopoDaCabine(x, z) { const xq = xCabine(yQuina(z)); return yQuina(z) + C.flecha * (1 - (x / xq) ** 2); }
+/** O z em que o topo, no plano do para-brisa ou do vidro traseiro, chega à altura y (sem a flecha). */
+export const zDoParaBrisa = (y) => C.zPeDoParaBrisa - (y - 1001) / KPB;
+export const zDoVidroTraseiro = (y) => C.zPeDoVidroTraseiro + (y - 1001) / KVT;

@@ -17,7 +17,9 @@ sc.render.resolution_x = L; sc.render.resolution_y = H; sc.render.film_transpare
 mundo = bpy.data.worlds.new('m'); sc.world = mundo; mundo.use_nodes = True
 mundo.node_tree.nodes['Background'].inputs[0].default_value = (0.82, 0.84, 0.86, 1); mundo.node_tree.nodes['Background'].inputs[1].default_value = 0.55
 mat = bpy.data.materials.new('pintura'); mat.use_nodes = True
-b = mat.node_tree.nodes['Principled BSDF']; b.inputs['Base Color'].default_value = (0.55, 0.08, 0.06, 1); b.inputs['Roughness'].default_value = 0.28; b.inputs['Metallic'].default_value = 0.0
+b = mat.node_tree.nodes['Principled BSDF']; b.inputs['Base Color'].default_value = (0.55, 0.08, 0.06, 1)
+# o vidro e a moldura escuros, pelo nome do objeto
+mat_esc = bpy.data.materials.new('escuro'); mat_esc.use_nodes = True; be = mat_esc.node_tree.nodes['Principled BSDF']; be.inputs['Base Color'].default_value = (0.03, 0.035, 0.04, 1); be.inputs['Roughness'].default_value = 0.12; b.inputs['Roughness'].default_value = 0.28; b.inputs['Metallic'].default_value = 0.0
 sol = bpy.data.objects.new('sol', bpy.data.lights.new('sol', 'SUN')); sol.data.energy = 3.2; sol.data.angle = math.radians(8)
 sc.collection.objects.link(sol); sol.rotation_euler = Vector((0.45, -0.75, 0.30)).normalized().to_track_quat('Z', 'Y').to_euler()
 cam = bpy.data.objects.new('cam', bpy.data.cameras.new('cam')); cam.data.type = 'ORTHO'; sc.collection.objects.link(cam); sc.camera = cam
@@ -29,7 +31,7 @@ for titulo, obj in pares:
     bpy.ops.wm.obj_import(filepath=obj, forward_axis='NEGATIVE_Z', up_axis='Y')
     novos = [o for o in bpy.data.objects if o not in antes]
     for o in novos:
-        o.data.materials.clear(); o.data.materials.append(mat)
+        o.data.materials.clear(); o.data.materials.append(mat_esc if any(k in o.name for k in ('vidro', 'Vidro', 'vigia', 'Vigia', 'paraBrisa', 'ParaBrisa', 'moldura')) else mat)
         bpy.context.view_layer.objects.active = o
         o.select_set(True)
         bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.mesh.remove_doubles(threshold=1e-6); bpy.ops.object.mode_set(mode='OBJECT')
