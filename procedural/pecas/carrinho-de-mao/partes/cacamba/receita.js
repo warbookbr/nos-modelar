@@ -174,7 +174,7 @@ export function montarCacamba(estado, T = TABELA) {
   const cacamba = nova('subdivisao', { ...g.passo, niveis: 2, espessura: C.espessura });
   parte('cacamba', cacamba, T.cores.azul);
   /* a borda: a boca (o limite da subdivisão do último laço, (p0 + 4p1 + p2) / 6), para fora e abaixo; a volta começa no meio da boca
-     de trás, onde a reta continua, para a emenda do tubo ficar sem quina */
+     de trás, onde a reta continua; o trilho é fechado (`fechado: true`), e por isso o tubo não tem emenda nem tampas */
   const volta = g.bocas.fim.pontos.slice(0, -1).map((p) => g.pontosMm[p]);
   const meioDeTras = Math.floor((C.pontos - 1) / 2);
   const boca = [...volta.slice(meioDeTras), ...volta.slice(0, meioDeTras)];
@@ -232,7 +232,7 @@ const receita = {
     escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },
     partes: [
       { nome: 'cacamba', forma: 'casca azul de chapa de 1,5 mm aberta em cima, boca de 820 × 626 em y 462; fundo plano em y 284,5 de cantos largos, mais estreito na frente, dobra de raio 35 até paredes retas', tecnica: 'volta da boca reduzida em cada laço, dobra em arco na silhueta, numa gaiolaPorLacos com a boca aberta, passo subdivisao de 2 níveis com espessura' },
-      { nome: 'borda', forma: 'a borda azul virada para fora em toda a volta da boca, um tubo de Ø 16, 5 mm para fora da boca e 2 abaixo dela', tecnica: 'gaiolaVarrida de seção redonda de 16 lados ao longo do limite da boca, fechada e tampada' },
+      { nome: 'borda', forma: 'a borda azul virada para fora em toda a volta da boca, um tubo de Ø 16, 5 mm para fora da boca e 2 abaixo dela', tecnica: 'gaiolaVarrida de seção redonda de 16 lados num trilho fechado ao longo do limite da boca, sem começo, fim nem tampas' },
       { nome: 'tirantes', forma: 'duas barras escuras de Ø 10, de cada lado, do eixo do tubo do laço em z 32 à frente da caçamba, acabando 0,3 mm antes da face de fora dela', tecnica: 'gaiolaVarrida de seção redonda de 12 lados numa reta, unidas, menos o corpo fechado da caçamba descido 0,3 mm' },
     ],
     criteriosDeReprovacao: [

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1899 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1906 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1046,6 +1046,7 @@
 - `lacunas.js` — lacunas.js — diagnóstico e planejamento estrutural puros sobre o catálogo. Não executa receita, não grava disco e não decide promoção de capacidade.
 - `lacunas.test.mjs` — lacunas-capacidade.test.mjs — R08: diagnóstico persistível e busca estrutural.
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
+- `lamina-sobre-a-superficie.js` — lamina-sobre-a-superficie.js — a lâmina de vão varrida sobre a superfície de uma chapa, com a seção perpendicular a ela
 - `limpar-contorno.test.mjs` — limpar-contorno.test.mjs — `limparContorno`: tira ponto repetido e, se pedido, ponto colinear, sem mexer na entrada.
 - `linha-de-base-do-furo.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
 - `linha-de-base-do-nucleo.mjs` — Corpus sintético da R00. Cada caso dá uma entrada mínima e independente a uma capacidade do núcleo; ele congela o resultado observável, não a sua implementaç…
@@ -1062,6 +1063,7 @@
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `operador-das-medidas.test.mjs` — operador-das-medidas.test.mjs — a gaiola ajustada pelas medidas vista como transformação linear da declarada.
+- `paineis-por-vaos-superficie.test.ts` — paineis-por-vaos-superficie.test.ts — o modo `superficie` de `paineisPorVaos`: a lâmina varrida sobre a chapa, com as paredes normais a ela. Mede, em fixture…
 - `paineis-por-vaos.js` — paineis-por-vaos.js — uma chapa partida em painéis por linhas de vão desenhadas em vistas, com o vão medido ao longo da chapa
 - `paineis-por-vaos.test.ts` — paineis-por-vaos.test.ts — o ajudante `paineisPorVaos` em peças de teste sem domínio: uma caixa de chapa de 1 mm com uma face a 38 graus da vista, cortada po…
 - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
@@ -1088,6 +1090,7 @@
 - `triangulacao-colinear.test.mjs` — triangulacao-colinear.test.mjs — face com canto colinear não sai em triângulo de área nula. O polígono com um canto no meio de uma aresta é válido (a boolean…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
+- `zz.test.ts` — @ts-expect-error
 
 ## procedural/nucleo/fixtures/
 
@@ -1451,6 +1454,7 @@
 - `receita-01.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 - `receita-02.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 - `receita-03.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
+- `receita-04.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 
 ## procedural/pecas/carrinho-de-mao/partes/chassi/
 
@@ -1951,6 +1955,12 @@
 ## procedural/pecas/sedan-chassi-e-lataria/
 
 - `ALINHAMENTO.md` — Sedã em chassi e lataria: alinhamento
+
+## procedural/pecas/sedan-chassi-e-lataria/alta-definicao/
+
+- `alvo.mjs` — alvo.mjs: o alvo comum dos dois caminhos do primeiro ciclo de alta definição do sedã (fatia 4c do plano do núcleo para qualquer mecanismo). O trecho é o corp…
+- `caminho-a-gaiola-da-casca.receita.js` — caminho-a-gaiola-da-casca.receita.js: o caminho A do primeiro ciclo de alta definição do sedã. A casca facetada vira gaiola de subdivisão: as estações são os…
+- `medir.mjs` — medir.mjs: o que o primeiro ciclo de alta definição mede e nenhuma ferramenta do repositório dá: o tempo de montagem, o número de faces por parte e o raio da…
 
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/
 

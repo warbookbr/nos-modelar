@@ -14,10 +14,14 @@
  *   vizinho: a distância máxima, em mm, em que duas partes são vizinhas (3 vezes o esperado, ou 15).
  *   passo: o espaçamento das amostras ao longo das arestas vivas, em mm (2).
  *   lado: 'fora' (o padrão) mede só a borda da face que olha para longe do centro do modelo; 'todos' mede as duas faces de cada chapa.
- *   toque: até quantos mm duas partes se tocam, e um par assim sai como `toca`, sem vão (0,05).
+ *   por: 'p05' (o padrão) ou 'minimo': a faixa esperada vale para o percentil 5 e o 95 do vão, ou para o mínimo e o máximo.
+ *   linhaMinima: o comprimento de linha, em mm, abaixo do qual um mínimo fora da faixa é um ponto isolado (10).
+ *   folga3d: a menor distância 3D aceita entre os sólidos do par de folga, em mm.
+ *   relacoes: [{ a, b, tipo }] com tipo toca, atravessa ou folga, vindo do relato de contatos; vale no lugar da regra própria.
+ *   toque: até quantos mm duas partes se tocam, e um par assim sai como `toca`, sem vão (0,001, a tolerância do relato de contatos).
  *   pares: [[a, b], ...] mede só esses pares, vizinhos ou não.
  *   partes: prefixos ou nomes; só os pares entre partes do subconjunto saem.
- *   folgas: { "a|b": { esperada, tolerancia } } o esperado de cada par, que vale no lugar do geral.
+ *   folgas: { "a|b": { esperada, tolerancia, degrau? } } o esperado de cada par, que vale no lugar do geral.
  *   apoia: { parte: motivo } a parte solta de propósito, que não conta em `soltas`.
  * exemplo:
  *   vaoEntrePartes([{ pts: [[0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0]], parte: 'a' }, { pts: [[14, 0, 0], [24, 0, 0], [24, 10, 0], [14, 10, 0]], parte: 'b' }], { esperado: 4 }).pares[0].vao.min === 4
@@ -42,18 +46,23 @@
  * mais próxima e a distância saem de vértices e amostras de aresta, e por isso a distância vale até o passo. A parte contida inteira
  * dentro de outra, sem tocar a superfície, também sai solta.
  *
- * O LIMITE. O número informa onde olhar; quem aprova forma é a pessoa. Superfície arredondada, sem aresta viva, não dá amostra. A
- * montagem (`mecanifica.montagem`) fica fora: a entrada é um esboço, uma receita ou uma lista de faces.
+ * O LIMITE. O número informa onde olhar; quem aprova forma é a pessoa. Superfície arredondada, sem aresta viva, não dá amostra. 
  *
- * Uso: npm run vao:partes -- <esboço|receita> [--opcao=1] [--esperado=4] [--tolerancia=0.2] [--degrau=1] [--par=a:b]...
- *        [--partes=porta,teto] [--vizinho=15] [--passo=2] [--toque=0.05] [--soltas=recusar] [--apoia=parte:motivo]... [--linhas=40] [--json]
+ * Cada par traz também `distancia3d`, a menor distância 3D entre os dois sólidos (por vértice e amostra de aresta, até o passo), porque numa
+ * chapa inclinada cortada pela vista as paredes do corte ficam mais perto que o vão da pele.
+ * A relação de cada par (toca, atravessa, folga) e a lista de soltas vêm de `descreverPeca`, a medida do relato de contatos do esboço, quando a
+ * entrada tem malha neutra; a regra própria por aresta só vale para faces soltas. Por padrão o vão é conferido pelo p05 e o p95, e o mínimo
+ * isolado sai marcado.
+ *
+ * Uso: npm run vao:partes -- <esboço|receita|montagem> [--opcao=1] [--esperado=4] [--tolerancia=0.2] [--degrau=1] [--par=a:b]...
+ *        [--partes=porta,teto] [--vizinho=15] [--passo=2] [--toque=0.001] [--por=p05|minimo] [--folga3d=<mm>] [--soltas=recusar] [--apoia=parte:motivo]... [--linhas=40] [--json]
  * Sai 0 sem par fora da faixa, 1 com par fora da faixa ou, em `--soltas=recusar`, com parte solta, e 2 em argumento ruim. */
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const PASSO_MM = 2;
-export const TOQUE_MM = 0.05;
+export const TOQUE_MM = 0.001;
 export const TOLERANCIA_MM = 0.2;
 export const VIZINHO_PADRAO_MM = 15;
 export const ANGULO_VIVO_GRAUS = 30;
@@ -143,7 +152,8 @@ export function maisProximo(parte, p, limite = Infinity) {
         const i = ord[t];
         const c = pontoNoTriangulo(p, ponto3(parte.tri, i, 0), ponto3(parte.tri, i, 1), ponto3(parte.tri, i, 2));
         const d = sub(p, c); const d2 = dot(d, d);
-        if (d2 <= melhor) { melhor = d2; q = c; }
+        /* o empate escolhe o ponto de menor coordenada, para a ordem das faces não mudar o ponto */
+        if (d2 < melhor - 1e-9 || (d2 <= melhor + 1e-9 && (q === null || c[0] - q[0] || c[1] - q[1] || c[2] - q[2]) && (q === null || c[0] < q[0] || (c[0] === q[0] && (c[1] < q[1] || (c[1] === q[1] && c[2] < q[2])))))) { melhor = Math.min(melhor, d2); q = c; }
       }
     } else {
       const el = distCaixa2(p, nos[no.l].b); const er = distCaixa2(p, nos[no.r].b);
@@ -300,7 +310,7 @@ const pt = (p) => p.map((x) => arred(x, 1));
 
 /* O comprimento da linha comum: a soma dos passos dividida pela quantidade de linhas paralelas. As linhas se contam pelas amostras em
    volta de cada uma, num raio R (uma linha dá 2R/passo, k linhas dão k vezes isso), e vale o terceiro quartil, que as pontas não puxam. */
-function comprimentoDaLinha(valem, raio) {
+function comprimentoDaLinha(valem, raio, linhasDadas = null) {
   const g = { celula: raio, mapa: new Map() };
   for (const s of valem) {
     const k = `${Math.floor(s.p[0] / raio)},${Math.floor(s.p[1] / raio)},${Math.floor(s.p[2] / raio)}`;
@@ -315,9 +325,8 @@ function comprimentoDaLinha(valem, raio) {
     k.push((n * s.ds) / (2 * raio)); soma += s.ds;
   }
   k.sort((x, y) => x - y);
-  const linhas = Math.max(1, Math.round(percentil(k, 0.75)));
-  const total = soma / linhas;
-  return total;
+  const linhas = linhasDadas ?? Math.max(1, Math.round(percentil(k, 0.75)));
+  return { total: soma / linhas, linhas };
 }
 
 /* --- o par --------------------------------------------------------------------------------------------------------------------- */
@@ -344,7 +353,10 @@ export function distanciaEntre(A, B, limite = Infinity) {
     for (const p of [...X.vertices, ...X.amostras.map((s) => s.p)]) {
       if (distCaixa2(p, Y.caixa) > melhor * melhor) continue;
       const r = maisProximo(Y, p, melhor);
-      if (r && r.d <= melhor) { melhor = r.d; onde = meio(p, r.q); }
+      if (r && r.d <= melhor + 1e-9) {
+        const m = meio(p, r.q);
+        if (onde === null || r.d < melhor - 1e-9 || m[0] < onde[0] || (m[0] === onde[0] && (m[1] < onde[1] || (m[1] === onde[1] && m[2] < onde[2])))) { melhor = Math.min(melhor, r.d); onde = m; }
+      }
     }
   }
   return onde ? { d: melhor, em: onde } : null;
@@ -413,20 +425,23 @@ export function medirPar(A, B, { vizinho = VIZINHO_PADRAO_MM, toque = TOQUE_MM, 
   const dasArestas = todasAsArestas.some((x) => x.fora) ? todasAsArestas.filter((x) => x.fora) : todasAsArestas;
   const usadas = dasArestas.length ? dasArestas : todas.filter((x) => x.mutua).length ? todas.filter((x) => x.mutua) : todas;
   const ds = usadas.map((x) => x.vao).sort((a, b) => a - b);
-  const acha = (cmp) => usadas.reduce((m, x) => (cmp(x.vao, m.vao) ? x : m), usadas[0]);
+  /* o empate de vão desempata pela posição, para a ordem das faces na entrada não mudar o ponto dito */
+  const antes = (x, m) => x.p[0] - m.p[0] || x.p[1] - m.p[1] || x.p[2] - m.p[2] || x.e[0] - m.e[0] || x.e[1] - m.e[1] || x.e[2] - m.e[2];
+  const acha = (cmp) => usadas.reduce((m, x) => (cmp(x.vao, m.vao) || (x.vao === m.vao && antes(x, m) < 0) ? x : m), usadas[0]);
   const menor = usadas.length ? acha((a, b) => a < b) : null;
   const maior = usadas.length ? acha((a, b) => a > b) : null;
   const vao = usadas.length ? {
-    min: arred(ds[0]), mediana: arred(mediana(ds)), p90: arred(percentil(ds, 0.9)), max: arred(ds[ds.length - 1]),
+    min: arred(ds[0]), p05: arred(percentil(ds, 0.05)), mediana: arred(mediana(ds)), p90: arred(percentil(ds, 0.9)), p95: arred(percentil(ds, 0.95)), max: arred(ds[ds.length - 1]),
     emMin: pt(meio(menor.p, menor.e)), emMax: pt(meio(maior.p, maior.e)),
   } : null;
   const raio = Math.max(6, 2 * (vao?.mediana ?? 0) + 4);
-  const linhaMm = usadas.length ? comprimentoDaLinha(usadas.map((x) => ({ p: x.p, ds: x.s.ds })), raio) : 0;
+  const medidaDaLinha = usadas.length ? comprimentoDaLinha(usadas.map((x) => ({ p: x.p, ds: x.s.ds })), raio) : { total: 0, linhas: 1 };
+  const linhaMm = medidaDaLinha.total;
   const desn = usadas.filter((x) => x.degrau !== null).sort((a, b) => a.degrau - b.degrau);
   const pior = desn[desn.length - 1];
   const degrau = desn.length ? { mediana: arred(mediana(desn.map((x) => x.degrau))), max: arred(pior.degrau), em: pt(meio(pior.p, pior.e)), amostras: desn.length } : null;
   const tipo = contato === 'atravessa' ? 'atravessa' : contato === 'toca' || (vao && vao.min <= toque) ? 'toca' : 'folga';
-  return { amostras: usadas.length, deArestaAAresta: dasArestas.length > 0, vao, linhaMm: arred(linhaMm, 1), degrau, tipo };
+  return { amostras: usadas.length, deArestaAAresta: dasArestas.length > 0, vao, linhaMm: arred(linhaMm, 1), degrau, tipo, dasAmostras: usadas.map((x) => ({ vao: x.vao, p: x.p, ds: x.s.ds })), linhasParalelas: medidaDaLinha.linhas };
 }
 
 /* --- a medição de uma peça inteira --------------------------------------------------------------------------------------------- */
@@ -447,12 +462,17 @@ export function vaoEntrePartes(faces, o = {}) {
   const vizinho = o.vizinho ?? (esperado ? FOLGA_DE_VIZINHO * esperado : VIZINHO_PADRAO_MM);
   const folgas = o.folgas ?? {};
   const apoia = o.apoia ?? {};
+  const por = o.por ?? 'p05';
+  if (!['p05', 'minimo'].includes(por)) throw new ErroDoVao('por espera minimo ou p05');
+  const linhaMinima = o.linhaMinima ?? 10;
+  const folga3d = o.folga3d ?? null;
+  const dadas = new Map((o.relacoes ?? []).map((r) => [chaveDoPar(r.a, r.b), r.tipo]));
   for (const [nome, v] of Object.entries({ tolerancia, toque, passo, vizinho })) if (!(Number.isFinite(v) && v >= 0)) throw new ErroDoVao(`${nome} espera um número de mm a partir de zero`);
   if (esperado !== null && !(Number.isFinite(esperado) && esperado > 0)) throw new ErroDoVao('esperado espera um número de mm maior que zero');
   const porNome = new Map();
   for (const f of faces) if (f.parte) { if (!porNome.has(f.parte)) porNome.set(f.parte, []); porNome.get(f.parte).push(f); }
   const partes = new Map([...porNome].map(([n, fs]) => [n, prepararParte(n, fs, { passo })]));
-  const nomes = [...partes.keys()];
+  const nomes = [...partes.keys()].sort();
   if (o.lado !== undefined && !['fora', 'todos'].includes(o.lado)) throw new ErroDoVao('lado espera fora ou todos');
   /* o lado de fora de uma chapa é o que olha para longe do centro da caixa do modelo; sem ele, valem as duas faces */
   let centro = null;
@@ -474,7 +494,10 @@ export function vaoEntrePartes(faces, o = {}) {
     const gap = folgaDeCaixas(A.caixa, B.caixa);
     const escolhido = selecionado(A.nome, B.nome);
     const explicito = escolhidos?.has(chaveDoPar(A.nome, B.nome));
-    if (gap <= toque) {
+    if (dadas.size) {
+      const t = dadas.get(chaveDoPar(A.nome, B.nome));
+      if (t === 'toca' || t === 'atravessa') { ligadas.add(A.nome); ligadas.add(B.nome); contatos.set(chaveDoPar(A.nome, B.nome), t); }
+    } else if (gap <= toque) {
       const c = contatoEntre(A, B, toque);
       if (c) { ligadas.add(A.nome); ligadas.add(B.nome); contatos.set(chaveDoPar(A.nome, B.nome), c); }
     }
@@ -482,6 +505,11 @@ export function vaoEntrePartes(faces, o = {}) {
     let alcance = vizinho;
     if (explicito && gap > vizinho) alcance = (distanciaEntre(A, B)?.d ?? gap) + vizinho;
     const m = medirPar(A, B, { vizinho: alcance, toque, centro });
+    const dado = contatos.get(chaveDoPar(A.nome, B.nome)) ?? (dadas.size ? 'folga' : null);
+    const feita = dadas.get(chaveDoPar(A.nome, B.nome));
+    if (!m && (feita === 'toca' || feita === 'atravessa')) { pares.push({ a: A.nome, b: B.nome, tipo: feita, amostras: 0, vao: null, linhaMm: 0, degrau: null, distancia3d: { min: 0, em: null } }); continue; }
+    if (m && dadas.size) m.tipo = dado === 'folga' ? 'folga' : dado;
+    if (m) m.distancia3d = (() => { if (m.tipo !== 'folga') return { min: 0, em: m.vao ? m.vao.emMin : null }; const d3 = distanciaEntre(A, B, alcance); return d3 ? { min: arred(d3.d), em: pt(d3.em) } : null; })();
     if (!m) { if (explicito) pares.push({ a: A.nome, b: B.nome, tipo: 'longe', amostras: 0, vao: null, linhaMm: 0, degrau: null }); continue; }
     pares.push({ a: A.nome, b: B.nome, ...m });
   }
@@ -490,17 +518,29 @@ export function vaoEntrePartes(faces, o = {}) {
     const d = folgas[chaveDoPar(p.a, p.b)] ?? folgas[`${p.a}|${p.b}`] ?? null;
     const esp = d ? d.esperada : (p.tipo === 'folga' || escolhidos ? esperado : null);
     const tol = d ? d.tolerancia : tolerancia;
+    const degrauMax = d?.degrau ?? o.degrau ?? null;
+    const amostras = p.dasAmostras ?? []; const linhasParalelas = p.linhasParalelas ?? 1; delete p.dasAmostras; delete p.linhasParalelas;
     p.fora = [];
     if (esp !== null && esp !== undefined) {
       p.esperada = esp; p.tolerancia = tol;
       if (!p.vao) p.fora.push({ motivo: 'sem vizinhança dentro do alcance', mm: null, em: null });
       else if (p.tipo === 'toca' || p.tipo === 'atravessa') p.fora.push({ motivo: `${p.tipo === 'toca' ? 'toca' : 'atravessa'}, sem vão`, mm: 0, em: p.vao.emMin });
       else {
-        if (p.vao.min < esp - tol) p.fora.push({ motivo: 'vão abaixo do esperado', mm: p.vao.min, em: p.vao.emMin });
-        if (p.vao.max > esp + tol) p.fora.push({ motivo: 'vão acima do esperado', mm: p.vao.max, em: p.vao.emMax });
+        const baixo = por === 'p05' ? p.vao.p05 : p.vao.min; const alto = por === 'p05' ? p.vao.p95 : p.vao.max;
+        const nome = por === 'p05' ? ['p05', 'p95'] : ['mínimo', 'máximo'];
+        if (baixo < esp - tol) p.fora.push({ motivo: `vão abaixo do esperado (${nome[0]})`, mm: baixo, em: p.vao.emMin });
+        if (alto > esp + tol) p.fora.push({ motivo: `vão acima do esperado (${nome[1]})`, mm: alto, em: p.vao.emMax });
+        /* o mínimo fora da faixa vindo de um trecho curto da linha é um ponto de quina, e a saída diz */
+        const abaixo = amostras.filter((x) => x.vao < esp - tol); const acima = amostras.filter((x) => x.vao > esp + tol);
+        const trecho = (l) => (l.length ? arred(comprimentoDaLinha(l, Math.max(6, 2 * p.vao.mediana + 4), linhasParalelas).total, 1) : 0);
+        const iso = [];
+        if (abaixo.length && trecho(abaixo) < linhaMinima) iso.push({ lado: 'mínimo', mm: p.vao.min, linhaMm: trecho(abaixo), em: p.vao.emMin });
+        if (acima.length && trecho(acima) < linhaMinima) iso.push({ lado: 'máximo', mm: p.vao.max, linhaMm: trecho(acima), em: p.vao.emMax });
+        if (iso.length) p.isolado = iso;
       }
+      if (folga3d !== null && p.tipo === 'folga' && p.distancia3d && p.distancia3d.min < folga3d) p.fora.push({ motivo: 'distância 3D entre os sólidos abaixo do mínimo', mm: p.distancia3d.min, em: p.distancia3d.em });
     }
-    if (o.degrau !== undefined && o.degrau !== null && p.degrau && p.degrau.max > o.degrau) p.fora.push({ motivo: 'degrau acima do aceito', mm: p.degrau.max, em: p.degrau.em });
+    if (degrauMax !== null && p.degrau && p.degrau.max > degrauMax) p.fora.push({ motivo: 'degrau acima do aceito', mm: p.degrau.max, em: p.degrau.em });
     const desvio = p.vao && p.esperada !== undefined ? Math.max(Math.abs(p.vao.min - p.esperada), Math.abs(p.vao.max - p.esperada)) : (p.vao?.max ?? 0);
     p.desvio = arred(desvio);
   }
@@ -526,7 +566,7 @@ export function vaoEntrePartes(faces, o = {}) {
   const naoDeclaradas = soltas.filter((s) => !s.apoia);
   return {
     pares, soltas,
-    resumo: { partes: nomes.length, pares: pares.length, fora: pares.filter((p) => p.fora.length).length, soltas: soltas.length, soltasSemApoio: naoDeclaradas.length, esperado, tolerancia, degrau: o.degrau ?? null, vizinho, passo, toque },
+    resumo: { partes: nomes.length, pares: pares.length, fora: pares.filter((p) => p.fora.length).length, soltas: soltas.length, soltasSemApoio: naoDeclaradas.length, esperado, tolerancia, degrau: o.degrau ?? null, por, folga3d, linhaMinima, vizinho, passo, toque },
   };
 }
 
@@ -536,7 +576,35 @@ export function facesPorNome(neutro) {
   return [...neutro.F.values()].filter((f) => f.parte).sort((a, b) => a.id - b.id).map((f) => ({ pts: f.vs.map((v) => neutro.V.get(v).map((c) => c * 1000)), parte: f.parte }));
 }
 
-/** A entrada de um arquivo: `{ faces, folgas, origem }`. Esboço (.esboco.json ou módulo) ou receita; a montagem é recusada. */
+/** Os pares de folga declarados e as partes apoiadas de uma receita: `FOLGAS: [{ par, esperada, tolerancia, degrau? }]` e `APOIA: { parte: motivo }`. */
+function declaracoesDaReceita(receita) {
+  const folgas = {};
+  for (const [i, f] of (receita.FOLGAS ?? []).entries()) {
+    if (!Array.isArray(f?.par) || f.par.length !== 2 || !Number.isFinite(f.esperada) || !(f.esperada > 0) || !Number.isFinite(f.tolerancia) || f.tolerancia < 0 || (f.degrau !== undefined && !(Number.isFinite(f.degrau) && f.degrau >= 0))) throw new ErroDoVao(`FOLGAS[${i}] espera { par: [a, b], esperada, tolerancia, degrau? } em mm`);
+    folgas[chaveDoPar(f.par[0], f.par[1])] = { esperada: f.esperada, tolerancia: f.tolerancia, ...(f.degrau !== undefined ? { degrau: f.degrau } : {}) };
+  }
+  const apoia = receita.APOIA ?? {};
+  if (!apoia || typeof apoia !== 'object' || Array.isArray(apoia) || Object.values(apoia).some((m) => typeof m !== 'string' || !m.trim())) throw new ErroDoVao('APOIA espera { parte: motivo } com o motivo em texto');
+  return { folgas, apoia: { ...apoia } };
+}
+
+/* as instâncias de peça de uma montagem resolvida, em mm e no mundo: cada uma é uma parte, com o caminho por nome */
+function facesDaMontagem(resolvida) {
+  const faces = [];
+  const visita = (m) => {
+    for (const inst of m.instancias) {
+      if (inst.alvo.tipo !== 'peca') { visita(inst.montagem); continue; }
+      const { rotacao, deslocamento, escala = 1 } = inst.poseMundo;
+      const neutro = inst.definicao.neutro; const nome = inst.caminho.join('/');
+      const mundo = (v) => { const p = neutro.V.get(v); return [0, 1, 2].map((k) => (escala * (rotacao[k][0] * p[0] + rotacao[k][1] * p[1] + rotacao[k][2] * p[2]) + deslocamento[k]) * 1000); };
+      for (const f of [...neutro.F.values()].sort((x, y) => x.id - y.id)) faces.push({ pts: f.vs.map(mundo), parte: nome });
+    }
+  };
+  visita(resolvida);
+  return faces;
+}
+
+/** A entrada de um arquivo: `{ faces, folgas, apoia, neutro, origem }`. Esboço (.esboco.json ou módulo), receita ou montagem persistida. */
 export async function lerEntrada(arquivo, { opcao = 1 } = {}) {
   let abs = resolve(arquivo);
   const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
@@ -545,13 +613,22 @@ export async function lerEntrada(arquivo, { opcao = 1 } = {}) {
     try { const { resolverCaminhoReceita } = await import('./resolver-caminho-receita.mjs'); abs = resolverCaminhoReceita(arquivo); } catch { throw new ErroDoVao(`${arquivo} não existe, nem como esboço nem como receita`); }
   }
   if (/\.(mjs|js)$/.test(abs)) { const { importarReceita } = await import('./importar-receita.mjs'); modulo = await importarReceita(abs); } else json = JSON.parse(readFileSync(abs, 'utf8'));
-  if (json?.formato === 'mecanifica.montagem') throw new ErroDoVao('a entrada é uma montagem (mecanifica.montagem), que este comando não resolve; passe o esboço ou a receita da peça');
+  if (json?.formato === 'mecanifica.montagem') {
+    const { lerMontagemPersistida } = await import('../../src/autoria/ler-montagem-persistida.js');
+    const { resolverMontagemPersistida } = await import('../../src/autoria/resolver-montagem-persistida.js');
+    const { receitasDaMontagem } = await import('./etapas-da-montagem.mjs');
+    const { carregadoresDeReceitas } = await import('./peca-com-parametros.mjs');
+    let resolvida;
+    try { resolvida = await resolverMontagemPersistida(json, carregadoresDeReceitas(await receitasDaMontagem(lerMontagemPersistida(json)))); } catch (e) { throw new ErroDoVao(`a montagem não resolve: ${e.message}`); }
+    return { faces: facesDaMontagem(resolvida), folgas: {}, apoia: {}, neutro: null, origem: `montagem ${basename(abs)}` };
+  }
   const { receitaDoModulo } = await import('./importar-receita.mjs');
   const receita = modulo ? receitaDoModulo(modulo) : null;
   const ehReceita = receita && (Array.isArray(receita.PASSOS) || Array.isArray(receita.CHAMADAS_COMPOSICOES)) && !Array.isArray(receita.opcoes);
   if (ehReceita) {
     const { executarReceita } = await import('../../src/autoria/executar-receita.js');
-    return { faces: facesPorNome(executarReceita(receita).neutro), folgas: {}, origem: `receita ${basename(abs)}` };
+    const { neutro } = executarReceita(receita);
+    return { faces: facesPorNome(neutro), ...declaracoesDaReceita(receita), neutro, origem: `receita ${basename(abs)}` };
   }
   const esboco = modulo ? (modulo.default ?? modulo.ESBOCO) : json;
   if (!esboco) throw new ErroDoVao(`${arquivo} não exporta o esboço como default nem é uma receita`);
@@ -561,7 +638,15 @@ export async function lerEntrada(arquivo, { opcao = 1 } = {}) {
   if (!painel) throw new ErroDoVao(`o esboço tem ${montado.paineis.length} opções e veio --opcao=${opcao}`);
   const folgas = {};
   for (const c of painel.contatosDeclarados ?? []) if (c.folga) folgas[chaveDoPar(c.par[0], c.par[1])] = c.folga;
-  return { faces: facesPorNome(painel.neutro), folgas, origem: `esboço ${basename(abs)}, opção ${opcao}` };
+  const apoia = Object.fromEntries((painel.apoiaDeclarada ?? []).map((a) => [a.parte, a.motivo]));
+  return { faces: facesPorNome(painel.neutro), folgas, apoia, neutro: painel.neutro, origem: `esboço ${basename(abs)}, opção ${opcao}` };
+}
+
+/** A relação de cada par de partes que o relato de contatos dá (`descreverPeca` sobre o neutro, a mesma medida): `[{ a, b, tipo }]` com toca, atravessa ou folga. */
+export async function relacoesDoNeutro(neutro, toqueMm = TOQUE_MM) {
+  const { descreverPeca } = await import('../../src/autoria/descrever-partes.js');
+  const nomes = { encosta: 'toca', interpenetra: 'atravessa', folga: 'folga' };
+  return descreverPeca(neutro, { tolerancia: toqueMm / 1000 }).relacoes.map((r) => ({ a: r.a, b: r.b, tipo: nomes[r.tipo] }));
 }
 
 const virgula = (x, c = 2) => (x === null || x === undefined ? '-' : x.toFixed(c).replace('.', ','));
@@ -571,15 +656,17 @@ const ptTxt = (p) => (p ? `(${p.map((x) => virgula(x, 0)).join(' ')})` : '-');
 export function linhaDoPar(p) {
   const v = p.vao;
   const esperado = p.esperada !== undefined ? ` esp ${virgula(p.esperada, 1)}±${virgula(p.tolerancia, 2)}` : '';
-  const vao = v ? `vão mín ${virgula(v.min, 3)} med ${virgula(v.mediana)} p90 ${virgula(v.p90)} máx ${virgula(v.max)}` : `vão -`;
+  const vao = v ? `vão mín ${virgula(v.min, 3)} p05 ${virgula(v.p05, 3)} med ${virgula(v.mediana)} p95 ${virgula(v.p95)} máx ${virgula(v.max)}` : `vão -`;
   const deg = p.degrau ? ` degrau med ${virgula(p.degrau.mediana)} máx ${virgula(p.degrau.max)}` : '';
   const onde = v && p.tipo === 'folga' ? ` mín em ${ptTxt(v.emMin)} máx em ${ptTxt(v.emMax)}` : '';
+  const d3 = p.distancia3d && p.tipo === 'folga' ? ` 3D mín ${virgula(p.distancia3d.min, 3)} em ${ptTxt(p.distancia3d.em)}` : '';
+  const iso = (p.isolado ?? []).map((i) => ` [${i.lado} isolado: ${virgula(i.linhaMm, 0)} mm de linha fora da faixa]`).join('');
   const marca = p.fora.length ? `  FORA: ${p.fora.map((f) => `${f.motivo}${f.mm !== null ? ` ${virgula(f.mm, 3)} em ${ptTxt(f.em)}` : ''}`).join('; ')}` : '';
-  return `${p.a}:${p.b} [${p.tipo}] ${vao}${deg} linha ${Math.round(p.linhaMm)} mm${esperado}${onde}${marca}`;
+  return `${p.a}:${p.b} [${p.tipo}] ${vao}${d3}${deg}${iso} linha ${Math.round(p.linhaMm)} mm${esperado}${onde}${marca}`;
 }
 
 const AJUDA = `npm run vao:partes -- <esboço|receita> [--opcao=1] [--esperado=<mm>] [--tolerancia=${TOLERANCIA_MM}] [--degrau=<mm>] [--par=a:b]...
-    [--partes=<prefixo|nome>,...] [--vizinho=<mm>] [--passo=${PASSO_MM}] [--toque=${TOQUE_MM}] [--lado=fora|todos] [--soltas=recusar] [--apoia=<parte>:<motivo>]...
+    [--partes=<prefixo|nome>,...] [--vizinho=<mm>] [--passo=${PASSO_MM}] [--toque=${TOQUE_MM}] [--lado=fora|todos] [--por=p05|minimo] [--linha-minima=10] [--folga3d=<mm>] [--soltas=recusar] [--apoia=<parte>:<motivo>]...
     [--linhas=40] [--json]
 
 Mede, sobre a malha, o vão (da borda de uma parte à borda da outra, ao longo da linha comum: mínimo, mediana, p90, máximo, com o ponto do
@@ -587,7 +674,10 @@ mínimo e do máximo em mm) e o degrau (o desnível entre as duas superfícies d
 --vizinho mm (3 vezes o esperado, ou ${VIZINHO_PADRAO_MM}). Uma linha por par, do pior ao melhor; --linhas=0 mostra todos. Com --esperado, sai 1 e marca FORA o par
 de folga cujo vão sai de esperado ± tolerância; o par declarado na opção do esboço com folga: { esperada, tolerancia } usa o dele. O par
 que toca ou atravessa não tem vão. Lista sempre as partes soltas, as que não tocam nem atravessam outra; --soltas=recusar sai 1 com
-uma, e --apoia declara a que é solta de propósito. Uma montagem não é entrada.`;
+uma, e --apoia declara a que é solta de propósito. A entrada é um esboço, uma receita ou uma montagem persistida (cada instância de peça é uma parte).
+--por=p05 (padrão) confere o percentil 5 e o 95 do vão contra a faixa; --por=minimo, o mínimo e o máximo. O mínimo ou o máximo fora da
+faixa por menos de --linha-minima mm de linha sai marcado como isolado (ponto de quina). --folga3d dá a menor distância 3D aceita entre os
+sólidos. Esboço: contatos com folga: { esperada, tolerancia, degrau } e apoia: [{ parte, motivo }]; receita: FOLGAS e APOIA.`;
 
 export async function executar(argv) {
   const valores = (nome) => argv.filter((x) => x.startsWith(`--${nome}=`)).map((x) => x.slice(nome.length + 3));
@@ -602,9 +692,12 @@ export async function executar(argv) {
     const soltas = valor('soltas');
     if (soltas !== null && !['recusar', 'listar'].includes(soltas)) throw new ErroDoVao('--soltas espera recusar ou listar');
     const entrada = await lerEntrada(arquivo, { opcao: Number(valor('opcao') ?? 1) });
+    const toque = numero('toque');
+    const relacoes = entrada.neutro ? await relacoesDoNeutro(entrada.neutro, toque ?? TOQUE_MM) : undefined;
     const r = vaoEntrePartes(entrada.faces, {
-      esperado: numero('esperado'), tolerancia: numero('tolerancia'), degrau: numero('degrau'), vizinho: numero('vizinho'), passo: numero('passo'), toque: numero('toque'), lado: valor('lado') ?? undefined,
-      pares: pares.length ? pares : undefined, partes: valor('partes') ? valor('partes').split(',').map((s) => s.trim()).filter(Boolean) : undefined, folgas: entrada.folgas, apoia,
+      relacoes, por: valor('por') ?? undefined, folga3d: numero('folga3d'), linhaMinima: numero('linha-minima'),
+      esperado: numero('esperado'), tolerancia: numero('tolerancia'), degrau: numero('degrau'), vizinho: numero('vizinho'), passo: numero('passo'), toque, lado: valor('lado') ?? undefined,
+      pares: pares.length ? pares : undefined, partes: valor('partes') ? valor('partes').split(',').map((s) => s.trim()).filter(Boolean) : undefined, folgas: entrada.folgas, apoia: { ...entrada.apoia, ...apoia },
     });
     for (const n of Object.keys(apoia)) if (!r.soltas.some((s) => s.parte === n) && !entrada.faces.some((f) => f.parte === n)) throw new ErroDoVao(`--apoia cita a parte "${n}", que não existe`);
     const recusaSoltas = soltas === 'recusar' && r.resumo.soltasSemApoio > 0;

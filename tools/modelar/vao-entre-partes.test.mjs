@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CAPACIDADES, executar as fichas } from './capacidade.mjs';
+import { lerArquivoDeEsboco, montarOpcoes } from './esboco-nucleo.mjs';
 import { ErroDoVao, executar, linhaDoPar, vaoEntrePartes } from './vao-entre-partes.mjs';
 
 const add = (a, b, k = 1) => a.map((x, i) => x + b[i] * k);
@@ -96,7 +97,7 @@ describe('a faixa esperada', () => {
     expect(par(faces, { esperado: 4.5, tolerancia: 0.1 }).fora).toEqual([]);
     const f = par(faces, { esperado: 4, tolerancia: 0.1 }).fora;
     expect(f).toHaveLength(1);
-    expect(f[0]).toMatchObject({ motivo: 'vão acima do esperado', mm: 4.5 });
+    expect(f[0]).toMatchObject({ motivo: 'vão acima do esperado (p95)', mm: 4.5 });
     expect(f[0].em).toHaveLength(3);
     const r = vaoEntrePartes(faces, { esperado: 4, tolerancia: 0.1 });
     expect(r.resumo.fora).toBe(1);
@@ -165,7 +166,7 @@ describe('o comando', () => {
     expect(certo.stdout).toMatch(/partes soltas \(3\): c a 140,00 mm de a; a a 4,00 mm de b; b a 4,00 mm de a/);
     const errado = await executar([gravar(esboco({ esperada: 5, tolerancia: 0.1 }))]);
     expect(errado.codigo).toBe(1);
-    expect(errado.stdout).toContain('FORA: vão abaixo do esperado 4,000 em (');
+    expect(errado.stdout).toContain('FORA: vão abaixo do esperado (p05) 4,000 em (');
   });
 
   it('--soltas=recusar sai 1 com solta, e --apoia a libera; --json traz os números', async () => {
@@ -187,7 +188,113 @@ describe('o comando', () => {
     writeFileSync(m, JSON.stringify({ formato: 'mecanifica.montagem', versao: 5, id: 'x', instancias: [] }));
     const r = await executar([m]);
     expect(r.codigo).toBe(2);
-    expect(r.stderr).toMatch(/montagem/);
+    expect(r.stderr).toMatch(/montagem não resolve/);
+  });
+});
+
+describe('a segunda leva', () => {
+  const gravar = (e, nome = 'x.esboco.json') => { const f = join(mkdtempSync(join(tmpdir(), 'vao-')), nome); writeFileSync(f, JSON.stringify(e)); return f; };
+  const cubo = (id, larg, centro, extra = {}) => ({ id, op: 'cubo', args: { larg, alt: 100, prof: 20 }, centro, ...extra });
+  /* a e b a 4 mm, b e c encostados, d atravessando c, e solto no ar */
+  const quatro = (extra = {}) => ({ opcoes: [{ titulo: 'quatro', formas: [cubo('a', 100, [0, 0, 0]), cubo('b', 100, [104, 0, 0]), cubo('c', 100, [204, 0, 0]), cubo('d', 100, [260, 0, 0]), cubo('e', 40, [0, 300, 0])], ...extra }] });
+
+  it('a mesma entrada dá a mesma saída byte a byte, em duas rodadas e com as faces em outra ordem', async () => {
+    const arq = gravar(quatro());
+    const um = (await executar([arq, '--esperado=4', '--linhas=0', '--json'])).stdout;
+    expect((await executar([arq, '--esperado=4', '--linhas=0', '--json'])).stdout).toBe(um);
+    const faces = [...duasChapas({ giro: 38 }), ...chapa('c', [300, 0, 0], X, Y, Z, MEDIDA)];
+    const a = JSON.stringify(vaoEntrePartes(faces, { esperado: 4 }));
+    expect(JSON.stringify(vaoEntrePartes([...faces].reverse(), { esperado: 4 }))).toBe(a);
+    expect(JSON.stringify(vaoEntrePartes(faces, { esperado: 4 }))).toBe(a);
+  });
+
+  it('a classificação toca, atravessa ou folga é a do relato de contatos do esboço', async () => {
+    const arq = gravar(quatro());
+    const relato = montarOpcoes(await lerArquivoDeEsboco(arq), { nome: 'x' }).paineis[0].contatos;
+    const chave = (a, b) => [a, b].sort().join('|');
+    const esperado = new Map([...relato.encostam.map((p) => [chave(p.a, p.b), 'toca']), ...relato.atravessam.map((p) => [chave(p.a, p.b), 'atravessa'])]);
+    const j = JSON.parse((await executar([arq, '--linhas=0', '--json', '--vizinho=400'])).stdout);
+    expect(esperado.size).toBeGreaterThan(1);
+    for (const p of j.pares) expect(p.tipo, `${p.a}:${p.b}`).toBe(esperado.get(chave(p.a, p.b)) ?? 'folga');
+    expect(j.pares.map((p) => p.tipo)).toEqual(expect.arrayContaining(['toca', 'atravessa', 'folga']));
+    /* a parte que o relato dá como ligada não é solta */
+    expect(j.soltas.map((x) => x.parte).sort()).toEqual(['a', 'e']);
+  });
+
+  it('a menor distância 3D entre os sólidos sai à parte: com a parede do corte paralela ao eixo ela é 4,18 e o vão da pele, 5,08', () => {
+    const r = (38 * Math.PI) / 180; const u = [Math.cos(r), -Math.sin(r)]; const n = [Math.sin(r), Math.cos(r)]; const e = 1.5;
+    const secao = (s0) => {
+      const T0 = [s0 * u[0], s0 * u[1]]; const T1 = [(s0 + 100) * u[0], (s0 + 100) * u[1]];
+      const fora = (T) => [T[0] + e * n[0] - e * Math.tan(r) * u[0], T[1] + e * n[1] - e * Math.tan(r) * u[1]];
+      return [T0, T1, fora(T1), fora(T0)];
+    };
+    const extrude = (parte, q) => {
+      const pt = ([x, z], y) => [x, y, z];
+      return [...q.map((c, i) => ({ pts: [pt(c, 0), pt(q[(i + 1) % 4], 0), pt(q[(i + 1) % 4], 100), pt(c, 100)], parte })), { pts: q.map((c) => pt(c, 0)), parte }, { pts: [...q].reverse().map((c) => pt(c, 100)), parte }];
+    };
+    const faces = [...extrude('a', secao(0)), ...extrude('b', secao(100 + 4 / Math.cos(r)))];
+    const p = par(faces, { esperado: 5.08, tolerancia: 0.2, folga3d: 4.3 });
+    expect(p.vao.mediana).toBeCloseTo(5.076, 2);
+    /* as duas paredes ficam a 4 mm, mas deslocadas de 4 tg 38 menos a altura delas, e o canto de uma ao da outra é 4,18 */
+    expect(p.distancia3d.min).toBeCloseTo(4.18, 1);
+    expect(p.distancia3d.em).toHaveLength(3);
+    expect(p.fora.map((f) => f.motivo)).toEqual(['distância 3D entre os sólidos abaixo do mínimo']);
+    expect(par(faces, { esperado: 5.08, tolerancia: 0.2, folga3d: 4.1 }).fora).toEqual([]);
+    expect(linhaDoPar(p)).toContain('3D mín 4,18');
+  });
+
+  it('o mínimo vindo de um ponto de quina sai marcado como isolado, e --por=p05 o aceita enquanto minimo o recusa', () => {
+    const med = [100, 300, 1.5];
+    const dente = chapa('b', [103.2, 100, 0], X, Y, Z, [0.8, 5, 1.5]);
+    const faces = [...chapa('a', [0, 0, 0], X, Y, Z, med), ...chapa('b', [104, 0, 0], X, Y, Z, med), ...dente];
+    const pelo = (por) => par(faces, { esperado: 4, tolerancia: 0.2, por });
+    const m = pelo('minimo');
+    expect(m.vao.min).toBeCloseTo(3.2, 1); expect(m.vao.p05).toBeGreaterThan(3.95);
+    expect(m.fora.map((f) => f.motivo)).toEqual(['vão abaixo do esperado (mínimo)']);
+    expect(m.isolado).toEqual([expect.objectContaining({ lado: 'mínimo' })]);
+    expect(m.isolado[0].linhaMm).toBeLessThan(10);
+    expect(linhaDoPar(m)).toContain('mínimo isolado');
+    const q = pelo('p05');
+    expect(q.fora).toEqual([]); expect(q.isolado).toHaveLength(1);
+    expect(pelo(undefined).fora).toEqual([]);
+    expect(() => vaoEntrePartes(faces, { por: 'x' })).toThrow(/por espera/);
+    /* um trecho longo abaixo da faixa não é isolado */
+    expect(par(duasChapas({ vao: 3.5 }), { esperado: 4, tolerancia: 0.2 }).isolado).toBeUndefined();
+  });
+
+  it('o degrau aceito vale por par, no contato do esboço, e o apoia da opção declara a parte solta', async () => {
+    const dois = (folga, apoia) => ({ opcoes: [{ titulo: 'dois', formas: [cubo('a', 100, [0, 0, 0]), cubo('b', 100, [104, 0, 1.5]), cubo('e', 40, [0, 300, 0])],
+      contatos: [{ par: ['a', 'b'], relacao: 'folga', motivo: 'vão de projeto', folga }], ...(apoia ? { apoia } : {}) }] });
+    const folga = (degrau) => ({ esperada: 4, tolerancia: 0.2, degrau });
+    const quanto = async (e, extra = []) => executar([gravar(e), '--degrau=0.1', ...extra]);
+    /* o degrau do par (1,5 mm de recuo) vale no lugar do geral de 0,1 */
+    expect((await quanto(dois(folga(2)))).stdout).not.toContain('degrau acima do aceito');
+    expect((await quanto(dois(folga(0.5)))).stdout).toContain('degrau acima do aceito');
+    /* a solta declarada na opção não conta para --soltas=recusar */
+    expect((await quanto(dois(folga(2)), ['--soltas=recusar'])).codigo).toBe(1);
+    const r = await quanto(dois(folga(2), [{ parte: 'e', motivo: 'pendurada no teto' }, { parte: 'a', motivo: 'solta no vão' }, { parte: 'b', motivo: 'solta no vão' }]), ['--soltas=recusar']);
+    expect(r.codigo).toBe(0); expect(r.stdout).toContain('e a 200,00 mm de a [apoia: pendurada no teto]');
+  });
+
+  it('a receita declara FOLGAS e APOIA, e a montagem persistida é uma entrada', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'vao-'));
+    const receita = join(dir, 'receita.mjs');
+    const cuboCru = (id, nome, x) => [['cubo', { origemId: id, larg: 100, alt: 100, prof: 20 }], ['transladar', { d: [x, 0, 0], sel: { origem: { op: 'cubo', id } } }], ['parte', { nome, sel: { origem: { op: 'cubo', id } } }]];
+    const passos = [...cuboCru(1, 'a', 0), ...cuboCru(2, 'b', 104)];
+    writeFileSync(receita, `export default ${JSON.stringify({ meta: { nome: 'r' }, PASSOS: passos.map(([op, a]) => [op, op === 'cubo' ? { ...a, larg: 0.1, alt: 0.1, prof: 0.02 } : op === 'transladar' ? { ...a, d: a.d.map((v) => v / 1000) } : a]), FOLGAS: [{ par: ['a', 'b'], esperada: 4, tolerancia: 0.1 }], APOIA: { a: 'solta no vão', b: 'solta no vão' } })};\n`);
+    const r = await executar([receita, '--soltas=recusar']);
+    expect(r.stderr).toBe('');
+    expect(r.stdout).toMatch(/a:b \[folga\] vão mín 4,000/);
+    expect(r.stdout).toContain('[apoia: solta no vão]');
+    expect(r.codigo).toBe(0);
+    const mal = join(dir, 'mal.mjs');
+    writeFileSync(mal, `export default { meta: { nome: 'r' }, PASSOS: [], FOLGAS: [{ par: ['a'] }] };\n`);
+    expect((await executar([mal])).codigo).toBe(2);
+    /* a montagem persistida do carrinho de mão: cada instância de peça é uma parte */
+    const m = await executar(['procedural/pecas/carrinho-de-mao/montagem.json', '--json']);
+    expect(m.stderr).toBe('');
+    const j = JSON.parse(m.stdout);
+    expect(j.origem).toMatch(/montagem/); expect(j.resumo.partes).toBe(4);
   });
 });
 
