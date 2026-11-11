@@ -255,10 +255,10 @@ function linhasDeVao() {
     deCima('tras', T.zTras), ...deLado('trasDaParede', T.zTras),
     deCima('peDoParaBrisa', T.zCapo), ...deLado('fimDoParaLama', T.zCapo),
     deCima('peDoVidroTraseiro', T.zTampa),
-    /* a linha de cintura, de lado e através do carro (modo vista): o pé das colunas A e C fica no degrau do ombro, e a linha acaba na
-       borda de fora dos vãos que encontra (`alem` de meio vão) */
-    { nome: 'cinturaDaFrente', eixo: 'x', pontos: [[T.zCapo, yC], [zPorta(yC), yC]], alem: G },
-    { nome: 'cinturaDeTras', eixo: 'x', pontos: [[T.zLateral, yC], [T.zTampa, yC]], alem: G },
+    /* a linha de cintura, de lado e através do carro (modo vista): o pé das colunas A e C fica no degrau do ombro. Onde ela encontra
+       a linha de uma coluna, que é de outro modo e não fecha canto com ela, passa até a borda de fora do vão da coluna */
+    { nome: 'cinturaDaFrente', eixo: 'x', pontos: [[T.zCapo, yC], [zPorta(yC) - T.vao, yC]] },
+    { nome: 'cinturaDeTras', eixo: 'x', pontos: [[T.zLateral + G, yC], [T.zTampa - G, yC]] },
     { nome: 'entrePortas', eixo: 'x', pontos: [[T.zPortas, T.ySoleira], [T.zPortas, yT]] },
     /* o contorno das portas acima da cintura, na parede da cabine: três linhas por lado, com os cantos fechados pelo ajudante */
     ...dosDoisLados({ nome: 'colunaA', eixo: 'x', pontos: [[zPorta(yC + PONTA), yC + PONTA], [zPorta(yT), yT]] }),
