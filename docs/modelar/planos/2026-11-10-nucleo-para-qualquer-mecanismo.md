@@ -222,14 +222,11 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    com essas ferramentas, levou o mesmo trecho a nenhuma falha de ondulação
    (máximo de 0,29 mm, eram 3,61), à cintura com 5,8 mm para 6 pedidos e ao
    vão entre 4,04 e 4,16 mm, com o lábio do arco de roda.
-   Ferramentas de medida do ciclo 2 corrigidas depois, no mesmo plano: o
-   `vao:partes` já não toma a parede do corte por pele nem estende o plano da
-   face de uma quina arredondada pelo vão (os dois pares que ele reprovava, de
-   4,08 e 4,06 mm de degrau, saem com 0,05 e 0,03 mm); o `raio:aresta` tira a
-   janela do raio pedido de cada corte (2,5 vezes, de 6 a 40 mm) e lê o raio
-   por estação do vinco (a cintura mede 5,8 mm para 6 e o ombro tem 53 de 53
-   cortes de pedido até 10 mm dentro de 20%); e a montagem do esboço fica em
-   cache por assinatura do conteúdo, reaproveitada pelas medidas.
+   Depois, as medidas do ciclo 2 foram corrigidas: `vao:partes` não toma mais
+   a parede do corte por pele (os dois pares que ele reprovava saem com degrau
+   de 0,05 e 0,03 mm), `raio:aresta` tira a janela do raio pedido de cada
+   corte, e a montagem do esboço fica em cache, o que leva uma rodada de
+   medidas de 4 minutos a 42 s.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.
