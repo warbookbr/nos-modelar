@@ -26,8 +26,8 @@
  *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa. amostragem: passo, em mm, da leitura da normal ao longo da linha
  *     (padrão 40). areaMinima: área, em mm², abaixo da qual um pedaço é lasca e entra em `avisos` (padrão 100).
  *     sementesPerdidas: 'recusa' (padrão) ou 'avisa' para a semente que cai fora da chapa ou num vão.
- * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos }, com `medidas` { vaoPedido, inclinacaoMaxima (graus entre a
- *   normal da chapa e o eixo da vista), fatorMinimo (a razão entre a lâmina e o vão), paineis, paineisAchados, sementesSemPainel,
+ * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos }, com `medidas` { vaoPedido, inclinacaoMaxima (graus de inclinação da
+ *   chapa em relação à lâmina, que é acos(f) abaixo; 38 numa chapa a 38 graus da vista), fatorMinimo (a razão entre a lâmina e o vão), paineis, paineisAchados, sementesSemPainel,
  *   pedacosSemNome, pedacos, execucoes }; os avisos são { ref, texto }.
  * exemplo:
  *   paineisPorVaos({ chapa: { passos: casca, origem: { op: 'subtrair', id: 4 } }, vao: 4,
@@ -62,7 +62,6 @@ const r3 = (v) => Math.round(v * 1000) / 1000;
 const INDICE = { x: [2, 1], y: [0, 2], z: [0, 1] };
 const EIXO = { x: 0, y: 1, z: 2 };
 const FATOR_MINIMO = 0.17;
-const TOLERANCIA_DO_FATOR = 0.005;
 const FOLGA_DA_SEMENTE = 0.01;
 const FOLGA_DO_ALCANCE = 1e-3;
 const GRAUS = 180 / Math.PI;
@@ -237,9 +236,9 @@ export function paineisPorVaos(o) {
           const m3 = ponto3(eixo, m[0], m[1], 0);
           const nm_m = nm[0] * m3[0] + nm[1] * m3[1] + nm[2] * m3[2];
           f = Math.sqrt(Math.max(0, 1 - nm_m * nm_m));
-          const tilt = Math.acos(Math.min(1, Math.abs(nm[e]))) * GRAUS;
+          const tilt = Math.acos(Math.min(1, f)) * GRAUS;
           inclinacaoMaxima = Math.max(inclinacaoMaxima, tilt);
-          if (f < FATOR_MINIMO) erro(`a chapa fica a ${br(tilt)} graus da vista ${eixo} no ponto [${br(q[0])}, ${br(q[1])}] da linha '${nome}': a lâmina precisaria de ${br(f * o.vao)} mm de largura no plano para dar ${br(o.vao)} mm ao longo da chapa; desenhe essa linha na vista em que a chapa aparece de frente`);
+          if (f < FATOR_MINIMO) erro(`a chapa fica inclinada ${br(tilt)} graus em relação à lâmina no ponto [${br(q[0])}, ${br(q[1])}] da linha '${nome}' (vista ${eixo}): a lâmina precisaria de ${br(f * o.vao)} mm de largura no plano para dar ${br(o.vao)} mm ao longo da chapa; desenhe essa linha na vista em que a chapa aparece de frente`);
           fatorMinimo = Math.min(fatorMinimo, f);
         } else sem += 1;
         amostras.push({ q, h: (o.vao * f) / 2, achou: !!nm });

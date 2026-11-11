@@ -182,6 +182,33 @@ export function segmentoAtravessa(parte, p0, p1) {
   return false;
 }
 
+/* A triangulação de um polígono plano, côncavo ou não, por corte de orelhas no plano dele: [[i, j, k], ...] sobre os índices dos pontos. */
+function triangularPoligono(pts, n) {
+  const m = pts.length;
+  if (m === 3) return [[0, 1, 2]];
+  const ax = n.map(Math.abs); const d = ax[0] >= ax[1] && ax[0] >= ax[2] ? 0 : ax[1] >= ax[2] ? 1 : 2;
+  const [i, j] = d === 0 ? [1, 2] : d === 1 ? [2, 0] : [0, 1];
+  const P = pts.map((p) => [p[i], p[j]]);
+  let area = 0;
+  for (let k = 0; k < m; k += 1) area += P[k][0] * P[(k + 1) % m][1] - P[(k + 1) % m][0] * P[k][1];
+  const sg = area >= 0 ? 1 : -1;
+  const lado = (a, b, c) => ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) * sg;
+  const idx = [...Array(m).keys()]; const out = [];
+  while (idx.length > 3) {
+    let cortou = false;
+    for (let k = 0; k < idx.length && !cortou; k += 1) {
+      const a = idx[(k + idx.length - 1) % idx.length]; const b = idx[k]; const c = idx[(k + 1) % idx.length];
+      if (lado(P[a], P[b], P[c]) <= 1e-9) continue;
+      const dentro = idx.some((q) => q !== a && q !== b && q !== c && lado(P[a], P[b], P[q]) > 1e-9 && lado(P[b], P[c], P[q]) > 1e-9 && lado(P[c], P[a], P[q]) > 1e-9);
+      if (dentro) continue;
+      out.push([a, b, c]); idx.splice(k, 1); cortou = true;
+    }
+    if (!cortou) { out.push([idx[idx.length - 1], idx[0], idx[1]]); idx.shift(); }
+  }
+  out.push([idx[0], idx[1], idx[2]]);
+  return out;
+}
+
 const chaveDoVertice = (p) => `${Math.round(p[0] * 1000)},${Math.round(p[1] * 1000)},${Math.round(p[2] * 1000)}`;
 
 /**
@@ -222,7 +249,7 @@ export function prepararParte(nome, faces, { passo = PASSO_MM, angulo = ANGULO_V
     if (vol < 0) for (const pol of poligonos) pol.n = [-pol.n[0], -pol.n[1], -pol.n[2]];
   }
   const triangulos = [];
-  for (const pol of poligonos) for (let i = 1; i + 1 < pol.ids.length; i += 1) triangulos.push(verts[pol.ids[0]], verts[pol.ids[i]], verts[pol.ids[i + 1]]);
+  for (const pol of poligonos) for (const [a, b, c] of triangularPoligono(pol.ids.map((k) => verts[k]), pol.n)) triangulos.push(verts[pol.ids[a]], verts[pol.ids[b]], verts[pol.ids[c]]);
   const nTri = triangulos.length / 3;
   const tri = new Float64Array(nTri * 9);
   triangulos.forEach((p, i) => { tri[i * 3] = p[0]; tri[i * 3 + 1] = p[1]; tri[i * 3 + 2] = p[2]; });
