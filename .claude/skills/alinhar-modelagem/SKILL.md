@@ -53,8 +53,14 @@ natural.
    vistas, e a da empilhadeira dava a carcaça uns 25% mais larga que a ficha.
    Divergência acima de 5% vai à pessoa, com a medida da tabela como
    recomendação.
-4. **As partes** viram `partes`, com nome em letras e dígitos, igual ao do
-   passo `parte` da receita.
+4. **As partes** viram `partes`. No `ALINHAMENTO.md` cada item da lista de
+   partes é uma peça, e o nome dele é o da pasta `partes/<peça>/`, em letras
+   minúsculas, dígitos e hífen (`laterais-traseiras`). As partes nomeadas de
+   dentro da peça, em camelCase e iguais às do passo `parte` da receita
+   (`paraLamaDir`), vêm depois, na descrição do item. O que várias peças
+   dividem, como a superfície e as linhas de vão de uma lataria, é definição
+   comum e não peça: mora em `partes/_comum/`, e o alinhamento o diz numa frase
+   fora da lista.
 5. **O grau de realismo.** Diga o que vê e ofereça duas opções concretas:
    silhueta com volumes simples, ou todos os corpos com aresta trabalhada. A
    técnica de cada parte tem de corresponder à escolha.
@@ -90,6 +96,24 @@ geral curto do mesmo comando. As regras moram em
 `procedural/criterios/<família>.json`: uma regra nova que a pessoa pedir depois
 de ver as imagens entra lá, e o pedido é registrado com
 `node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos <arquivo.json>`.
+
+## Quando não há pessoa na rodada
+
+O agente despachado não faz a rodada de perguntas, e o alinhamento que ele
+escreve não vale como aprovado. Ele escreve o `ALINHAMENTO.md` inteiro com a
+tabela, as partes e o que reprova, e põe cada escolha que a referência não
+decide na seção `## Decisões que dependem da pessoa`, um parágrafo por decisão,
+com a recomendação dele. Não escreve a seção `## Aceite`. `npm run fluxo:objeto`
+lê isso como alinhamento proposto, aguardando a pessoa, lista as decisões e não
+manda criar receita; o mesmo vale para o rascunho.
+
+Só conta como aceite a linha da seção `## Aceite` com a data e as palavras da
+pessoa, escrita por quem conduziu a rodada com ela (`- alinhamento: aceito pela
+pessoa em AAAA-MM-DD, "..."` e `- rascunho: ...`), ou a delegação escrita por
+ela, registrada na mesma seção (`- delegação: pela pessoa em AAAA-MM-DD, "..."`,
+que vale para os dois). A sessão que recebe a delegação registra a linha com as
+palavras que a pessoa usou; o agente despachado não cria aceite, mesmo que o
+brief diga que a pessoa vai concordar.
 
 ## Fechando a rodada
 

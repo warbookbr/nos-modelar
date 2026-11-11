@@ -369,6 +369,10 @@
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
+          "arquivo": "docs/modelar/modelar-veiculo-em-chassi-e-lataria.md",
+          "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
+        },
+        {
           "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
         }
@@ -485,6 +489,10 @@
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
+          "arquivo": "docs/modelar/modelar-veiculo-em-chassi-e-lataria.md",
+          "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
+        },
+        {
           "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
         }
@@ -599,6 +607,10 @@
         {
           "arquivo": "docs/modelar/modelar-carroceria.md",
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
+        },
+        {
+          "arquivo": "docs/modelar/modelar-veiculo-em-chassi-e-lataria.md",
+          "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
           "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",

@@ -17,7 +17,7 @@ o que se lê antes de começar é o que o roteiro diz.
 
 | se a tarefa é | skill | contrato |
 | --- | --- | --- |
-| conduzir um objeto de várias partes, da imagem à montagem | `npm run objeto` e as skills de cada etapa | [`FLUXO-DO-OBJETO.md`](FLUXO-DO-OBJETO.md) |
+| conduzir um objeto de várias partes, da imagem à montagem | `npm run fluxo:objeto` (e `npm run objeto` nas referências com mapa e prancha) e as skills de cada passo | [`FLUXO-DO-OBJETO.md`](FLUXO-DO-OBJETO.md) |
 | combinar o que modelar, antes do primeiro passo | `alinhar-modelagem` | a própria skill; um caso respondido em [`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](RODADA-DE-ALINHAMENTO-EXEMPLO.md) |
 | criar ou refinar uma peça | `criar-peca` | [`AUTORIA-DE-PECA.md`](AUTORIA-DE-PECA.md), [`GUIA-AUTORIA-IA.md`](GUIA-AUTORIA-IA.md), [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md), [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) |
 | conferir uma peça pronta | `auditar-peca` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |

@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-/* objeto.mjs — em que etapa do fluxo um objeto está, e o que vem a seguir.
+/* objeto.mjs — o estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir.
  *
- * O fluxo tem cinco etapas, na ordem em que o objeto é produzido: alinhamento,
- * mapear as partes, prancha, modelagem por etapa e aceite. Cada uma deixa
- * arquivo na pasta do objeto, e esta ferramenta lê o estado do disco, como
- * `rodada-de-modelagem --acao` faz para uma peça. O contrato está em
- * `docs/modelar/usar/FLUXO-DO-OBJETO.md`.
+ * O caminho do objeto tem seis passos e o comando dele é `npm run fluxo:objeto` (`fluxo-do-objeto.mjs`), que diz o passo e o próximo
+ * comando de cada peça. Este comando é o do passo 2 (as referências) quando elas têm contorno por parte: lê do disco o alinhamento, o
+ * mapa de partes e a prancha de cada imagem, e a modelagem e o aceite das etapas, como `rodada-de-modelagem --acao` faz para uma peça.
+ * O contrato está em `docs/modelar/usar/FLUXO-DO-OBJETO.md`.
  *
  * Também lista o pacote de referência que o modelador e o crítico recebem,
  * nesta ordem: a imagem de referência, a prancha limpa e o mapa de partes

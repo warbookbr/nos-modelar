@@ -28,13 +28,14 @@ export const CAPACIDADES = Object.freeze({
   lacosPelasVistas: { arquivo: 'procedural/nucleo/lacos-pelas-vistas.js', funcao: 'lacosPelasVistas', de: 'procedural/nucleo/lacos-pelas-vistas.js' },
   paineisPorVaos: { arquivo: 'procedural/nucleo/paineis-por-vaos.js', funcao: 'paineisPorVaos', de: 'procedural/nucleo/paineis-por-vaos.js' },
   vaoEntrePartes: { arquivo: 'tools/modelar/vao-entre-partes.mjs', funcao: 'vaoEntrePartes', de: 'tools/modelar/vao-entre-partes.mjs' },
+  instanciaDeFamilia: { arquivo: 'tools/modelar/instancia-de-familia.mjs', funcao: 'instanciaDeFamilia', de: 'tools/modelar/instancia-de-familia.mjs' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
 });
 
 export const LIMITE_DE_LINHAS = 60;
 
 const AJUDA = `npm run capacidade [-- <nome>]  (node tools/modelar/capacidade.mjs)
-Sem nome, lista as capacidades de gaiola com uma linha cada. Com o nome, imprime a ficha: para que serve, quando usar em vez das outras,
+Sem nome, lista as capacidades (de gaiola, de painel, de vão e de instância de família) com uma linha cada. Com o nome, imprime a ficha: para que serve, quando usar em vez das outras,
 os campos com uma linha cada, o exemplo mínimo e uma peça do acervo que a usa. A ficha é recortada do comentário de cabeçalho do arquivo
 da capacidade, e não existe em outro lugar.
 `;

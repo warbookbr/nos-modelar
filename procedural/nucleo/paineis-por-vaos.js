@@ -2,21 +2,21 @@
  *
  * FICHA paineisPorVaos
  * serve: dividir uma chapa já feita em painéis separados por linhas de vão, com o vão constante ao longo da chapa, cada painel uma parte nomeada pelo ponto visto dele e a chapa montada uma vez.
- * quando: capô, para-lamas, portas, teto e tampa de um carro, tampas e portinholas de uma máquina, qualquer carenagem que a referência mostra em peças com frestas. `aberturaPorContorno` com `lente` tira um pedaço rente à pele e não aceita linha que sai pela borda; aqui o vão é entre painéis vizinhos da mesma chapa e a linha pode sair pela borda dela.
- * unidades: tudo em mm, na unidade da chapa. A linha é desenhada numa vista ortogonal: eixo 'x' (pontos [z, y]), 'y' ([x, z]) ou 'z' ([x, y]), o mesmo plano de `extrusao` com o mesmo eixo.
+ * quando: capô, portas, tampas, teto e para-lamas de uma carenagem, portinholas e tampas de uma máquina, qualquer chapa que a referência mostra em painéis com frestas. `aberturaPorContorno` com `lente` tira um pedaço rente à pele e não aceita linha que sai pela borda; aqui o vão é entre painéis vizinhos da mesma chapa e a linha pode sair pela borda dela.
+ * unidades: ENTRADA em mm, como `gaiolaPorLacos` e `gaiolaVarrida` (a chapa.passos também, executada como vem). SAÍDA: `saida: 'mm'` (padrão) devolve os passos em mm, para o esboço, cujo conversor os passa a metro (ele converte `onde.conexo.de` e `ate`); `saida: 'metro'` devolve os passos do corte e das partes em metro, para a receita, sem os passos da chapa (ela já os tem em metro). A linha é desenhada numa vista ortogonal: eixo 'x' (pontos [z, y]), 'y' ([x, z]) ou 'z' ([x, y]), o mesmo plano de `extrusao` com o mesmo eixo.
  * campos:
- *   chapa: { passos, origem, emitir?, parametros?, pontos? } os passos que constroem SÓ a chapa e a origem { op, id } dela; com `passos` o ajudante a executa uma vez em tempo de autoria (normais, sementes, conferência) e `emitir: false` não os devolve; sem `passos`, dê `normal` e `origemId`, e o aviso `semLeitura` diz que nada foi conferido; `parametros` e `pontos` são o PARAMS e o TOPO que os passos citam.
- *   vao: a largura do vão AO LONGO DA CHAPA, em mm; a lâmina é estreitada onde a chapa é inclinada em relação à linha, pela normal local lida da chapa.
- *   linhas: [{ nome?, eixo, pontos, fechada?, alcance?, lado?, dentro?, alem? }] o meio do vão em cada vista; `alcance` [min, max] limita a lâmina no eixo da vista (a linha de um lado do carro não corta o outro); `lado` '+' ou '-' é de onde se lê a chapa (padrão o lado do alcance); `fechada` fecha a volta e o pedaço de dentro é um painel, ou some com `dentro: 'descarta'`; `alem` alonga as pontas da linha aberta.
- *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos.
+ *   chapa: { passos, origem, emitir?, parametros?, pontos? } os passos (em mm) que constroem SÓ a chapa e a origem { op, id } dela; com `passos` o ajudante a executa em tempo de autoria (normais, sementes, conferência) e `emitir: false` não os devolve; sem `passos`, dê `normal` e `origemId`, e o aviso `semLeitura` diz que nada foi conferido; `parametros` e `pontos` são o PARAMS e o TOPO que os passos citam.
+ *   vao: a largura do vão DA PELE, ao longo da chapa, em mm; a lâmina é estreitada onde a chapa é inclinada em relação à linha, pela normal local lida da chapa. A folga entre as paredes do corte é a largura da lâmina (menor que o vão na chapa inclinada) e sai em `medidas.folgaMinima`.
+ *   linhas: [{ nome?, eixo, pontos, fechada?, alcance?, lado?, dentro?, alem? }] o meio do vão em cada vista; `alcance` [min, max] limita a lâmina no eixo da vista (a linha de um lado do corpo não corta o outro); `lado` '+' ou '-' é de onde se lê a chapa (padrão o lado do alcance); `fechada` fecha a volta e o pedaço de dentro é um painel, ou some com `dentro: 'descarta'`; a volta menor que o vão é recusada; `alem` (mm, não negativo) alonga as pontas da linha aberta.
+ *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos. O passo `parte` sai com `onde.conexo` { de, dir, ate }: `ate` é a distância lida mais uma folga, e o núcleo recusa a receita salva cuja semente passou a cair num vão.
  *   origemId: o primeiro origemId livre (padrão: o maior dos passos da chapa mais um); o ajudante usa dali em diante e devolve `proximoId`.
- *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido: o vão sai entre `vao` e `vao` mais 2% (4,0 a 4,1 para 4).
- * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos } com medidas { vaoPedido, inclinacaoMaxima, fatorMinimo, paineis, paineisAchados, sementesSemPainel, pedacosSemNome, pedacos, execucoes } e avisos { ref, texto }.
+ *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido; folgaAbaixoDe: o aviso `folgaEstreita` quando a lâmina fica abaixo disso, em mm (padrão metade do vão); saida: 'mm' ou 'metro'.
+ * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos } com medidas { vaoPedido, inclinacaoMaxima, fatorMinimo, folgaMinima, paineis, paineisAchados, sementesSemPainel, pedacosSemNome, pedacos, execucoes } e avisos { ref, texto }; o resultado é memorizado pela entrada (memoria-de-pura), então a receita que o chama a cada leitura paga a conta uma vez.
  * exemplo:
  *   paineisPorVaos({ chapa: { passos: [['cubo', { origemId: 1, larg: 600, alt: 1, prof: 400 }]], origem: { op: 'cubo', id: 1 } }, vao: 4,
  *     linhas: [{ eixo: 'y', pontos: [[0, -300], [0, 300]] }],
  *     paineis: [{ nome: 'esquerda', eixo: 'y', ponto: [-150, 0] }, { nome: 'direita', eixo: 'y', ponto: [150, 0] }] })
- * peça: procedural/nucleo/paineis-por-vaos.test.ts (a caixa de chapa com uma face a 38 graus da vista e a cuba de subdivisão; o rascunho do sedã que o pediu está em procedural/pecas/sedan-chassi-e-lataria/).
+ * peça: procedural/nucleo/paineis-por-vaos.test.ts (a caixa de chapa com uma face a 38 graus da vista e a cuba de subdivisão).
  * FIM DA FICHA
  *
  * A LÂMINA. Cada linha vira um prisma da largura do vão, extrudado ao longo do eixo da vista, e todos entram juntos no `subtrair` da chapa: a
@@ -29,12 +29,15 @@
  * lê a normal da chapa executada pelo raio da vista, amostra a linha a cada `amostragem` mm e funde os pontos que a reta já dá. Onde a
  * chapa fica a mais de 80 graus da vista (f abaixo de 0,17), a linha é recusada: escolha a vista de frente dela.
  *
- * O QUE ELE CONFERE, antes de entregar os passos, com a chapa executada uma vez a mais e o corte executado uma vez: a linha que não encontra a chapa,
+ * A LEITURA DA NORMAL vê todas as camadas que o raio da vista toca dentro do alcance, porque a lâmina corta todas; a primeira dá a largura, e se outra tem fator diferente por mais de 0,03 o aviso `camadasInclinadas` manda limitar o alcance ou cortar em duas linhas.
+ *
+ * O QUE ELE CONFERE, antes de entregar os passos, com a chapa executada uma vez a mais e o corte executado uma vez: a linha que não encontra a chapa, a volta fechada menor que o vão e a lâmina que se cruza,
  * a semente que cai fora dela ou num vão (o raio vê a chapa de antes e a de depois do corte e precisa da mesma distância), duas sementes no
  * mesmo pedaço, o corte que não separou nada e o `subtrair` que o núcleo recusa. Pedaço sem nome e lasca saem em `avisos`.
  * Os pedaços nomeados saem pelo critério `onde.conexo` de `sel`, que o núcleo resolve na execução; o ajudante só escreve os passos.
  * A semente não pode cair numa abertura que a chapa já tem: o raio passaria por ela e nomearia o pedaço do outro lado. */
 import { nucleo } from './entrada.js';
+import { memoizarPura } from './memoria-de-pura.js';
 import { normalDaFace } from './nucleo.js';
 import { pedacosConexos, prepararRaios } from './selecao-geometrica.js';
 
@@ -47,13 +50,14 @@ const EIXO = { x: 0, y: 1, z: 2 };
 const FATOR_MINIMO = 0.17;
 const FOLGA_DA_SEMENTE = 0.01;
 const FOLGA_DO_ALCANCE = 1e-3;
+const TOLERANCIA_DAS_CAMADAS = 0.03;
 const GRAUS = 180 / Math.PI;
 
 const area2d = (l) => l.reduce((s, [a, b], i) => { const [c, d] = l[(i + 1) % l.length]; return s + (a * d - c * b); }, 0) / 2;
 const anti = (l) => (area2d(l) < 0 ? [...l].reverse() : l);
 const ponto3 = (eixo, a, b, c) => { const p = [0, 0, 0]; p[INDICE[eixo][0]] = a; p[INDICE[eixo][1]] = b; p[EIXO[eixo]] = c; return p; };
 
-/** O prisma de um polígono na vista: o mesmo plano e a mesma ordem de `extrusao` que a receita do sedã usa. */
+/** O prisma de um polígono na vista: o mesmo plano e a mesma ordem de `extrusao`. */
 function prismaDe(eixo, pol, a0, a1, origemId) {
   const perfil = anti(eixo === 'x' ? pol.map(([z, y]) => [-y, z]) : eixo === 'z' ? pol.map(([x, y]) => [x, -y]) : pol);
   const em = eixo === 'x' ? [a0, 0, 0] : eixo === 'z' ? [0, 0, a0] : [0, a0, 0];
@@ -90,12 +94,54 @@ function cruzar(p, t, q, u) {
   return [p[0] + t[0] * s, p[1] + t[1] * s];
 }
 
+/** O polígono tem duas arestas não vizinhas que se cruzam? */
+function seCruza(pol) {
+  const n = pol.length;
+  const lado = (a, b, c) => Math.sign(cruz2([b[0] - a[0], b[1] - a[1]], [c[0] - a[0], c[1] - a[1]]));
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 2; j < n; j += 1) {
+      if (i === 0 && j === n - 1) continue;
+      const [a, b, c, d] = [pol[i], pol[(i + 1) % n], pol[j], pol[(j + 1) % n]];
+      if (lado(a, b, c) * lado(a, b, d) < 0 && lado(c, d, a) * lado(c, d, b) < 0) return true;
+    }
+  }
+  return false;
+}
+
+/** A menor distância do ponto à poligonal fechada. */
+function distanciaAoContorno(p, pol) {
+  let m = Infinity;
+  for (let i = 0; i < pol.length; i += 1) {
+    const a = pol[i]; const b = pol[(i + 1) % pol.length];
+    const d = [b[0] - a[0], b[1] - a[1]];
+    const L2 = d[0] * d[0] + d[1] * d[1];
+    const t = L2 > 0 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * d[0] + (p[1] - a[1]) * d[1]) / L2)) : 0;
+    m = Math.min(m, Math.hypot(p[0] - a[0] - d[0] * t, p[1] - a[1] - d[1] * t));
+  }
+  return m;
+}
+
+/** Os passos do corte e das partes em metro: extrusao (altura, em, perfil) e o conexo (de, ate); dir é só direção. */
+function emMetro(r) {
+  const mm = (v) => (Array.isArray(v) ? v.map(mm) : typeof v === 'number' ? v / 1000 : v);
+  r.passos = r.passos.map(([op, a]) => {
+    if (op === 'extrusao') return [op, { ...a, altura: mm(a.altura), em: mm(a.em), perfil: mm(a.perfil) }];
+    if (op === 'parte' && a.sel?.onde?.conexo) {
+      const c = a.sel.onde.conexo;
+      return [op, { ...a, sel: { ...a.sel, onde: { conexo: { ...c, de: mm(c.de), ...(c.ate != null ? { ate: mm(c.ate) } : {}) } } } }];
+    }
+    return [op, a];
+  });
+  for (const p of r.partes) { p.de = mm(p.de); if (p.ate != null) p.ate = mm(p.ate); }
+  return r;
+}
+
 /**
  * Chapa partida em painéis por linhas de vão desenhadas em vistas ortogonais.
  * @param {{ chapa: { passos?: any[], origem: { op: string, id: number }, emitir?: boolean, parametros?: object, pontos?: object }, vao: number,
  *   linhas: any[], paineis: any[], origemId?: number, normal?: Function, amostragem?: number, areaMinima?: number, margem?: number, sementesPerdidas?: 'recusa' | 'avisa' }} o
  */
-export function paineisPorVaos(o) {
+function paineisPorVaosBruto(o) {
   if (o == null || typeof o !== 'object') erro('espera { chapa, vao, linhas, paineis }');
   const { chapa } = o;
   if (!chapa || typeof chapa !== 'object' || !chapa.origem || typeof chapa.origem.op !== 'string' || !Number.isSafeInteger(chapa.origem.id)) {
@@ -104,9 +150,14 @@ export function paineisPorVaos(o) {
   if (!(o.vao > 0) || !Number.isFinite(o.vao)) erro(`vao precisa ser maior que zero, em mm (recebido ${o.vao})`);
   if (!Array.isArray(o.linhas) || !o.linhas.length) erro('linhas precisa ter ao menos uma linha de vão');
   if (!Array.isArray(o.paineis) || !o.paineis.length) erro('paineis precisa ter ao menos um painel { nome, eixo, ponto }');
+  const saidaEm = o.saida ?? 'mm';
+  if (saidaEm !== 'mm') erro("saida é 'mm' ou 'metro' (a de metro é tratada por quem chama)");
   const amostragem = o.amostragem ?? 40;
   if (!(amostragem > 0)) erro('amostragem precisa ser maior que zero, em mm');
   const areaMinima = o.areaMinima ?? 100;
+  if (!(Number.isFinite(areaMinima) && areaMinima >= 0)) erro(`areaMinima precisa ser um número de mm² a partir de zero (recebido ${o.areaMinima})`);
+  const folgaAbaixoDe = o.folgaAbaixoDe ?? o.vao / 2;
+  if (!(Number.isFinite(folgaAbaixoDe) && folgaAbaixoDe >= 0)) erro(`folgaAbaixoDe precisa ser um número de mm a partir de zero (recebido ${o.folgaAbaixoDe})`);
   const margem = o.margem ?? 0.02;
   if (!(margem >= 0 && margem < 0.5)) erro('margem precisa estar de 0 a 0,5 (a fração a mais da lâmina; padrão 0,02)');
   const sementesPerdidas = o.sementesPerdidas ?? 'recusa';
@@ -129,6 +180,7 @@ export function paineisPorVaos(o) {
     if (l.alcance != null && !(Array.isArray(l.alcance) && l.alcance.length === 2 && l.alcance.every(Number.isFinite) && l.alcance[0] < l.alcance[1])) erro(`o alcance da linha '${nome}' precisa ser [min, max] no eixo ${l.eixo}, com min menor que max`);
     if (l.lado != null && l.lado !== '+' && l.lado !== '-') erro(`o lado da linha '${nome}' é '+' ou '-'`);
     if (l.dentro != null && l.dentro !== 'painel' && l.dentro !== 'descarta') erro(`dentro da linha '${nome}' é 'painel' ou 'descarta'`);
+    if (l.alem != null && !(Number.isFinite(l.alem) && l.alem >= 0)) erro(`alem da linha '${nome}' precisa ser um número de mm a partir de zero (recebido ${JSON.stringify(l.alem)})`);
     if (l.dentro === 'descarta' && !l.fechada) erro(`dentro: 'descarta' só vale para linha fechada ('${nome}' é aberta)`);
     if (nomesDeLinha.has(nome)) erro(`duas linhas se chamam '${nome}'`);
     nomesDeLinha.add(nome);
@@ -158,6 +210,7 @@ export function paineisPorVaos(o) {
     const todos = [...st.V.values()];
     const caixa = [0, 1, 2].map((e) => [Math.min(...todos.map((p) => p[e])), Math.max(...todos.map((p) => p[e]))]);
     leitura = { st, raios: prepararRaios(st.V, st.F, daChapa), caixa, passos: passosDaChapa.length };
+    if (Math.max(...caixa.map(([lo, hi]) => hi - lo)) < 20) aviso('unidadeSuspeita', `a chapa mede no máximo ${br(Math.max(...caixa.map(([lo, hi]) => hi - lo)))} unidades: a entrada é em mm (vao, linhas, sementes e os passos da chapa); se a chapa foi escrita em metro, escreva-a em mm e peça saida: 'metro'`);
   } else if (!o.normal) {
     aviso('semLeitura', 'a chapa veio sem passos: o ajudante não leu a normal nem conferiu o corte, e o vão sai medido no plano da vista (dê chapa.passos ou normal para compensar a inclinação)');
   }
@@ -167,26 +220,29 @@ export function paineisPorVaos(o) {
   if (!Number.isSafeInteger(proximo) || proximo < 1) erro('origemId precisa ser um inteiro positivo');
   const primeiroId = proximo;
 
-  /* a normal da chapa no ponto da vista, ou null onde a chapa não tem face */
-  const normalEm = (eixo, a, b, alcance, lado) => {
+  /* a folga do raio em volta da caixa: uma fração dela, e não uma medida fixa */
+  const afasta = (e) => Math.max(0.05 * (leitura.caixa[e][1] - leitura.caixa[e][0]), 1e-3);
+
+  /* as normais da chapa no ponto da vista, da primeira camada que o raio toca à última, dentro do alcance; [] onde não há face */
+  const normaisEm = (eixo, a, b, alcance, lado) => {
     if (o.normal) {
       const n = o.normal(ponto3(eixo, a, b, alcance ? (alcance[0] + alcance[1]) / 2 : 0), eixo);
-      return Array.isArray(n) && n.length === 3 && n.every(Number.isFinite) && Math.hypot(...n) > 0 ? n.map((x) => x / Math.hypot(...n)) : null;
+      return Array.isArray(n) && n.length === 3 && n.every(Number.isFinite) && Math.hypot(...n) > 0 ? [n.map((x) => x / Math.hypot(...n))] : [];
     }
-    if (!leitura) return null;
+    if (!leitura) return [];
     const e = EIXO[eixo];
     const [lo, hi] = leitura.caixa[e];
     const dir = [0, 0, 0]; dir[e] = lado === '-' ? 1 : -1;
-    const de = ponto3(eixo, a, b, lado === '-' ? lo - 1 : hi + 1);
-    const acertos = alcance ? leitura.raios.todos(de, dir).filter((h) => { const c = de[e] + dir[e] * h.t; return c >= alcance[0] - FOLGA_DO_ALCANCE && c <= alcance[1] + FOLGA_DO_ALCANCE; }) : leitura.raios.todos(de, dir).slice(0, 1);
-    if (!acertos.length) return null;
-    return normalDaFace(leitura.st.V, leitura.st.F.get(acertos[0].face).vs);
+    const de = ponto3(eixo, a, b, lado === '-' ? lo - afasta(e) : hi + afasta(e));
+    const acertos = leitura.raios.todos(de, dir).filter((h) => { const c = de[e] + dir[e] * h.t; return c >= alcance[0] - FOLGA_DO_ALCANCE && c <= alcance[1] + FOLGA_DO_ALCANCE; });
+    return acertos.map((h) => normalDaFace(leitura.st.V, leitura.st.F.get(h.face).vs));
   };
 
   /* ---- as lâminas ---- */
   const passosDeCorte = [];
   let inclinacaoMaxima = 0;
   let fatorMinimo = 1;
+  let folgaMinima = Infinity;
   /* as ferramentas do `subtrair`: a extrusão de cada linha aberta ou descartada, e o anel de cada linha fechada */
   const ferramentas = [];
   for (let li = 0; li < o.linhas.length; li += 1) {
@@ -194,7 +250,7 @@ export function paineisPorVaos(o) {
     const nome = l.nome ?? `linha${li}`;
     const eixo = l.eixo;
     const e = EIXO[eixo];
-    const alcance = l.alcance ?? (leitura ? [leitura.caixa[e][0] - 1, leitura.caixa[e][1] + 1] : null);
+    const alcance = l.alcance ?? (leitura ? [leitura.caixa[e][0] - afasta(e), leitura.caixa[e][1] + afasta(e)] : null);
     if (!alcance) erro(`a linha '${nome}' precisa de alcance: sem os passos da chapa o ajudante não sabe até onde a lâmina vai no eixo ${eixo}`);
     const lado = l.lado ?? (l.alcance && leitura ? ((l.alcance[0] + l.alcance[1]) / 2 >= (leitura.caixa[e][0] + leitura.caixa[e][1]) / 2 ? '+' : '-') : '+');
     const P = pontosDaLinha(l.pontos, !!l.fechada, l.alem ?? 0);
@@ -203,7 +259,7 @@ export function paineisPorVaos(o) {
 
     /* os pontos amostrados de cada trecho: { p, k (o trecho), h (a meia lâmina) } */
     const trechos = [];
-    let sem = 0; let total = 0;
+    let sem = 0; let total = 0; let camadas = 0; let fatorDaLinha = 1;
     for (let k = 0; k < nSeg; k += 1) {
       const A = P[k]; const B = P[(k + 1) % n];
       const t = unit(A, B);
@@ -215,17 +271,23 @@ export function paineisPorVaos(o) {
       for (let j = 0; j <= M; j += 1) {
         const q = [A[0] + (B[0] - A[0]) * (j / M), A[1] + (B[1] - A[1]) * (j / M)];
         total += 1;
-        const nm = normalEm(eixo, q[0], q[1], alcance, lado);
+        const nms = normaisEm(eixo, q[0], q[1], alcance, lado);
+        const m3 = ponto3(eixo, m[0], m[1], 0);
+        const fatorDe = (nm) => { const c = nm[0] * m3[0] + nm[1] * m3[1] + nm[2] * m3[2]; return Math.sqrt(Math.max(0, 1 - c * c)); };
         let f = 1;
-        if (nm) {
-          const m3 = ponto3(eixo, m[0], m[1], 0);
-          const nm_m = nm[0] * m3[0] + nm[1] * m3[1] + nm[2] * m3[2];
-          f = Math.sqrt(Math.max(0, 1 - nm_m * nm_m));
+        if (nms.length) {
+          f = fatorDe(nms[0]);
           const tilt = Math.acos(Math.min(1, f)) * GRAUS;
           inclinacaoMaxima = Math.max(inclinacaoMaxima, tilt);
           if (f < FATOR_MINIMO) erro(`a chapa fica inclinada ${br(tilt)} graus em relação à lâmina no ponto [${br(q[0])}, ${br(q[1])}] da linha '${nome}' (vista ${eixo}): a lâmina precisaria de ${br(f * o.vao)} mm de largura no plano para dar ${br(o.vao)} mm ao longo da chapa; desenhe essa linha na vista em que a chapa aparece de frente`);
           fatorMinimo = Math.min(fatorMinimo, f);
+          fatorDaLinha = Math.min(fatorDaLinha, f);
+          for (const outra of nms.slice(1)) {
+            const fo = fatorDe(outra);
+            if (Math.abs(fo - f) > TOLERANCIA_DAS_CAMADAS) camadas = Math.max(camadas, Math.abs(fo - f));
+          }
         } else sem += 1;
+        folgaMinima = Math.min(folgaMinima, o.vao * f * (1 + margem));
         amostras.push({ q, h: (o.vao * f * (1 + margem)) / 2 });
       }
       /* funde o que a reta já dá: o ponto fica só quando a meia lâmina sai do que as pontas dão por mais de 0,005 mm */
@@ -243,6 +305,9 @@ export function paineisPorVaos(o) {
     if (leitura && !o.normal && sem === total) {
       erro(`a linha '${nome}' não corta a chapa: nenhum dos ${total} pontos dela tem chapa na vista ${eixo}, de ${br(alcance[0])} a ${br(alcance[1])} mm; confira o eixo da vista, a ordem dos pontos ([${eixo === 'x' ? 'z, y' : eixo === 'y' ? 'x, z' : 'x, y'}]), o alcance e a unidade (mm)`);
     }
+
+    const folgaDaLinha = o.vao * (1 + margem) * fatorDaLinha;
+    if (camadas > 0) aviso('camadasInclinadas', `o raio da vista ${eixo} toca, na linha '${nome}', camadas da chapa de inclinação diferente (o fator da lâmina difere até ${br(camadas)}): a lâmina vale a primeira camada, e o vão das outras sai fora do pedido; limite o alcance a uma camada ou corte em duas linhas`);
 
     /* o contorno de cada lado: a esquadria nos cantos entre trechos, de pontas retas nas pontas */
     const lado2 = (sinal) => {
@@ -275,6 +340,12 @@ export function paineisPorVaos(o) {
     const dir = lado2(-1).map(([a, b]) => [r3(a), r3(b)]);
     if (l.fechada) {
       const [fora, dentro] = Math.abs(area2d(esq)) >= Math.abs(area2d(dir)) ? [esq, dir] : [dir, esq];
+      const original = area2d(l.pontos);
+      if (seCruza(fora)) erro(`a lâmina da volta '${nome}' se cruza por fora (cantos muito fechados ou pontos muito juntos); abra os cantos ou afaste os pontos`);
+      if (l.dentro !== 'descarta' && (Math.sign(area2d(dentro)) !== Math.sign(original) || Math.abs(area2d(dentro)) >= Math.abs(original) || seCruza(dentro)
+        || dentro.some((q) => distanciaAoContorno(q, l.pontos) < 0.9 * (folgaDaLinha / (1 + margem)) / 2))) {
+        erro(`a volta '${nome}' é menor que o vão: a lâmina de ${br(folgaDaLinha)} mm de largura, por dentro, passa do outro lado da volta e deixaria uma ilha fantasma; faça a volta maior que o vão, ou use dentro: 'descarta' para só furar a chapa`);
+      }
       if (l.dentro === 'descarta') {
         passosDeCorte.push(prismaDe(eixo, fora, alcance[0], alcance[1], proximo)); ferramentas.push({ op: 'extrusao', id: proximo }); proximo += 1;
       } else {
@@ -285,6 +356,7 @@ export function paineisPorVaos(o) {
         proximo += 3;
       }
     } else {
+      if (seCruza([...esq, ...[...dir].reverse()])) erro(`a lâmina da linha '${nome}' se cruza (canto muito fechado ou pontos muito juntos para a largura ${br(folgaDaLinha)} mm); abra o canto ou afaste os pontos`);
       passosDeCorte.push(prismaDe(eixo, [...esq, ...[...dir].reverse()], alcance[0], alcance[1], proximo)); ferramentas.push({ op: 'extrusao', id: proximo }); proximo += 1;
     }
   }
@@ -297,21 +369,29 @@ export function paineisPorVaos(o) {
     const e = EIXO[p.eixo];
     const lado = p.lado ?? '+';
     const caixa = leitura ? leitura.caixa[e] : [-1e4, 1e4];
-    const de = ponto3(p.eixo, p.ponto[0], p.ponto[1], lado === '-' ? Math.floor(caixa[0]) - 10 : Math.ceil(caixa[1]) + 10);
+    const fora = leitura ? afasta(e) : 10;
+    const de = ponto3(p.eixo, p.ponto[0], p.ponto[1], r3(lado === '-' ? caixa[0] - fora : caixa[1] + fora));
     const dir = [0, 0, 0]; dir[e] = lado === '-' ? 1 : -1;
     return { de, dir };
   };
   const partes = o.paineis.map((p) => ({ nome: p.nome, ...semente(p) }));
-  const passosDasPartes = partes.map((p) => ['parte', { nome: p.nome, sel: { origem: origemDoCorte, onde: { conexo: { de: p.de, dir: p.dir } } } }]);
-  const passos = [...(chapa.emitir === false ? [] : (passosDaChapa ?? [])), ...passosDeCorte, corte, ...passosDasPartes];
+  /* os passos `parte`: com `ate` (a distância lida mais uma folga) quando o ajudante leu a chapa */
+  const montarPassos = () => {
+    const passosDasPartes = partes.map((p) => ['parte', { nome: p.nome, sel: { origem: origemDoCorte, onde: { conexo: { de: p.de, dir: p.dir, ...(p.ate != null ? { ate: p.ate } : {}) } } } }]);
+    return [...(chapa.emitir === false ? [] : (passosDaChapa ?? [])), ...passosDeCorte, corte, ...passosDasPartes];
+  };
+  const passos = montarPassos();
 
   /* ---- o corte executado uma vez, e a conferência ---- */
   const medidas = {
-    vaoPedido: o.vao, inclinacaoMaxima: r3(inclinacaoMaxima), fatorMinimo: r3(fatorMinimo), paineis: [], paineisAchados: 0,
+    vaoPedido: o.vao, inclinacaoMaxima: r3(inclinacaoMaxima), fatorMinimo: r3(fatorMinimo), folgaMinima: r3(folgaMinima), paineis: [], paineisAchados: 0,
     sementesSemPainel: [], pedacosSemNome: [], pedacos: 0, execucoes: leitura ? 2 : 0,
   };
   const saida = { passos, partes: partes.map((p) => ({ nome: p.nome, origem: origemDoCorte, de: p.de, dir: p.dir })), origemDoCorte, proximoId: proximo, primeiroId, medidas, avisos };
-  if (!leitura) return saida;
+  if (!leitura) {
+    if (folgaMinima < folgaAbaixoDe) aviso('folgaEstreita', `a folga entre as paredes do corte cai a ${br(folgaMinima)} mm (a lâmina, e não o vão da pele)`);
+    return saida;
+  }
 
   const executado = nucleo([...passosDaChapa, ...passosDeCorte, corte], parametros, topo);
   if (executado.orfaos.length) {
@@ -354,7 +434,11 @@ export function paineisPorVaos(o) {
     const g = pedacoDe.get(depois.face);
     if (dono.has(g)) erro(`os painéis '${dono.get(g)}' e '${p.nome}' caem no mesmo pedaço (a semente de '${p.nome}' é ${descricao}); mova uma das sementes para o pedaço dela, ou confira a linha que devia separá-los`);
     dono.set(g, p.nome);
+    partes[i].ate = r3(depois.t + o.vao / 4);
   });
+  if (folgaMinima < folgaAbaixoDe) aviso('folgaEstreita', `a folga entre as paredes do corte cai a ${br(folgaMinima)} mm (a lâmina, e não o vão da pele, que é ${br(o.vao)} mm): a chapa é muito inclinada em relação à linha; desenhe a linha numa vista mais de frente, ou baixe folgaAbaixoDe se essa folga serve`);
+  saida.passos = montarPassos();
+  saida.partes = partes.map((p) => ({ nome: p.nome, origem: origemDoCorte, de: p.de, dir: p.dir, ate: p.ate ?? null }));
   medidas.sementesSemPainel = perdidas;
   medidas.paineis = [...dono].map(([g, nome]) => ({ nome, faces: grupos[g].length, area: r3(areaDe(grupos[g])) }));
   medidas.paineisAchados = medidas.paineis.length;
@@ -369,4 +453,18 @@ export function paineisPorVaos(o) {
     if (area < areaMinima) aviso('lasca', `o pedaço${dono.has(gi) ? ` '${dono.get(gi)}'` : ` perto de [${centro.map(br).join(', ')}]`} tem ${br(area)} mm², menos que areaMinima (${br(areaMinima)}): é uma lasca do corte; afaste a linha da borda ou do canto que a gera`);
   });
   return saida;
+}
+
+const paineisMemorizados = memoizarPura(paineisPorVaosBruto, { tamanho: 4 });
+
+/** Chapa partida em painéis por linhas de vão: a ficha está no cabeçalho. */
+export function paineisPorVaos(o) {
+  if (o == null || typeof o !== 'object') erro('espera { chapa, vao, linhas, paineis }');
+  const { saida, ...entrada } = o;
+  if (saida != null && saida !== 'mm' && saida !== 'metro') erro("saida é 'mm' ou 'metro'");
+  if (saida === 'metro') {
+    if (entrada.chapa?.emitir === true) erro("com saida: 'metro' os passos da chapa não são devolvidos (a receita já os tem em metro); tire chapa.emitir ou use saida: 'mm'");
+    return emMetro(paineisMemorizados({ ...entrada, chapa: { ...entrada.chapa, emitir: false } }));
+  }
+  return paineisMemorizados(entrada);
 }

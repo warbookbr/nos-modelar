@@ -16,11 +16,15 @@
      extremo  {eixo:'x'|'y'|'z', lado:'max'|'min', tol?}: o elemento cujo CENTRO (média dos cantos da face, ponto médio
               da aresta) está no maior ou menor valor do eixo entre os candidatos, e os que ficam a até `tol` dele
               (padrão 1e-6, em unidades do mundo).
-     conexo   {de:[x,y,z], dir:[x,y,z]}: só de face. O pedaço conexo (faces ligadas por aresta, entre as candidatas que
+     conexo   {de:[x,y,z], dir:[x,y,z], ate?}: só de face. O pedaço conexo (faces ligadas por aresta, entre as candidatas que
               sobraram dos critérios acima) que contém a primeira face que o raio de `de` na direção `dir` toca. É a
               semente de um pedaço: depois de uma booleana que parte uma chapa em várias, o ponto visto de uma vista
               nomeia o pedaço sem citar id. O raio que não toca nenhuma candidata grita, dizendo que a semente caiu fora
               ou num vão. Empate de distância vai para a face de menor id.
+              `ate` é a distância máxima de `de` ao primeiro toque, na unidade do mundo: a semente salva guarda onde viu a chapa,
+              e se a chapa ou a linha mudarem a ponto de o raio atravessar um vão e tocar a camada de trás, o primeiro toque passa
+              de `ate` e a seleção grita em vez de nomear o pedaço errado. `de` e `ate` são medidas (o conversor de mm para metro
+              converte as duas); `dir` é só direção.
 
    Uma aresta é a ligação entre dois cantos consecutivos de uma face, identificada pelo par de vértices (ordenado). Ela
    pertence à base quando alguma face vizinha está na base. A saída é determinística: faces por id e arestas pelo par
@@ -121,7 +125,7 @@ export function lerOnde(st, onde) {
 
   if (onde.conexo != null) {
     const c = onde.conexo;
-    if (!ehObjeto(c) || Object.keys(c).some((k) => k !== 'de' && k !== 'dir') || c.de == null || c.dir == null) return { erro: `conexo precisa ser {de:[x,y,z], dir:[x,y,z]}: o ponto de onde o raio sai e a direção dele` };
+    if (!ehObjeto(c) || Object.keys(c).some((k) => k !== 'de' && k !== 'dir' && k !== 'ate') || c.de == null || c.dir == null) return { erro: `conexo precisa ser {de:[x,y,z], dir:[x,y,z], ate?}: o ponto de onde o raio sai, a direção dele e, se quiser, a distância máxima do primeiro toque` };
     if (r.alvo !== 'face') return { erro: `conexo escolhe o pedaço de faces ligadas por aresta e só vale para alvo 'face'` };
     const vetor = (valor, campo) => {
       let v;
@@ -135,7 +139,13 @@ export function lerOnde(st, onde) {
     if (dir.erro) return dir;
     const len = Math.hypot(...dir.v);
     if (!(len > 1e-9)) return { erro: `conexo.dir não pode ser o vetor nulo` };
-    r.conexo = { de: de.v, dir: dir.v.map((x) => x / len) };
+    r.conexo = { de: de.v, dir: dir.v.map((x) => x / len), ate: null };
+    if (c.ate != null) {
+      const ate = lerNumero(st, c.ate, 'conexo.ate');
+      if (ate.erro) return ate;
+      if (!(ate.valor > 0)) return { erro: `conexo.ate precisa ser maior que zero; recebido ${ate.valor}` };
+      r.conexo.ate = ate.valor;
+    }
   }
 
   if (!r.tipo && !r.normal && !r.extremo && !r.conexo) return { erro: `informe ao menos um critério entre tipo, normal, extremo e conexo (alvo e angulo sozinhos não escolhem nada)` };
@@ -228,6 +238,9 @@ export function resolverOnde(st, onde, base, normalDaFace) {
     const acerto = raios.primeiro(onde.conexo.de, onde.conexo.dir);
     if (!acerto) {
       return { erro: `seleção onde vazia: o raio de [${onde.conexo.de.join(', ')}] na direção [${onde.conexo.dir.map((x) => Math.round(x * 1e6) / 1e6).join(', ')}] não toca nenhuma das ${itens.length} face(s) candidata(s) (${funil.join(' → ')}); a semente cai fora da peça ou num vão, e o ponto precisa estar na vista de um pedaço, com o raio vindo de fora dele` };
+    }
+    if (onde.conexo.ate != null && acerto.t > onde.conexo.ate) {
+      return { erro: `seleção onde recusada: o primeiro toque do raio de [${onde.conexo.de.join(', ')}] está a ${Math.round(acerto.t * 1e6) / 1e6}, além de ate (${onde.conexo.ate}): a semente passou por um vão ou a chapa mudou desde que ela foi lida, e o raio tocaria a camada de trás; leve a semente para dentro do pedaço (ou reescreva o ate)` };
     }
     itens = componenteDe(F, itens, acerto.face);
     funil.push(`${itens.length} no pedaço da face ${acerto.face}`);

@@ -279,15 +279,7 @@ function lataria() {
   const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(),
     paineis: P.map(([nome, eixo, ponto, , lado]) => ({ nome, eixo, ponto, ...(lado ? { lado } : {}) })) });
   MEDIDAS_DOS_PAINEIS = { medidas: g.medidas, avisos: g.avisos };
-  /* o esboço 2.0 é em mm e recusa `onde` com número (ATRITOS, segunda etapa, item 1): o ponto e o rumo do raio de cada semente vão
-     ao topo, que o esboço converte, e a parte os cita por nome */
-  for (const [op, args] of g.passos) {
-    const raio = op === 'parte' ? args.sel?.onde?.conexo : null;
-    if (!raio) { estado.passos.push([op, args]); continue; }
-    estado.topo[`semente_${args.nome}`] = raio.de;
-    estado.topo[`rumo_${args.nome}`] = raio.dir;
-    estado.passos.push([op, { ...args, sel: { ...args.sel, onde: { conexo: { de: `semente_${args.nome}`, dir: `rumo_${args.nome}` } } } }]);
-  }
+  estado.passos.push(...g.passos);
   estado.origem = g.proximoId - 1;
   for (const [nome, , , corDaParte] of P) {
     const cor = corDe(nome, corDaParte);
@@ -317,7 +309,10 @@ function lataria() {
 
 /* ---- o chassi ---- */
 /** O sólido aparado pelo interior da chapa: acaba na face de dentro dela. */
-const aparar = (origem, esp = T.chapa) => bool('intersectar', [origem, bool('unir', interior(esp))]);
+/* O encosto fica meio micrômetro aquém da chapa, dentro da tolerância de 0,001 mm do relato: com as duas faces no mesmo plano, vindas
+   de booleanas diferentes, o ruído numérico fazia um lado do carro sair como encosta e o outro como travessia. */
+const ENCOSTO = 0.0005;
+const aparar = (origem, esp = T.chapa + ENCOSTO) => bool('intersectar', [origem, bool('unir', interior(esp))]);
 
 function chassi() {
   const A = T.assoalho; const L = T.longarina; const C = T.caixaDeRoda;
@@ -354,8 +349,14 @@ function chassi() {
     parte(`montanteA${lado}`, aparar(caixa(...x(800, 1000), 460, 1040, 600, T.zCapo + 6)), OCRE);
     /* os montantes B e C partem de x 700 para chegar ao teto, que em y 1523 tem 730 de meia largura */
     parte(`montanteB${lado}`, aparar(caixa(...x(700, 1000), 460, 1530, -75, -15)), OCRE);
-    /* o montante C tem um pé estreito à frente do pneu, que desce até a soleira do chassi por trás da linha de vão da porta */
-    parte(`montanteC${lado}`, aparar(bool('unir', [caixa(...x(700, 1000), 560, 1530, -835, T.zLateral + 6), caixa(...x(804, 1000), 460, 562, T.zLateral - 8, T.zLateral + 6)])), OCRE);
+    /* o montante C encosta na lateral traseira acima de y 895, onde ela é o plano x 860, e fica 4 mm por dentro da porta traseira, num
+       batente que passa da linha de vão: o encosto do montante na porta saía como encosta de um lado do carro e como travessia do
+       outro (ATRITOS, segunda etapa). O pé estreito desce à frente do pneu até a soleira do chassi */
+    const zB = T.zLateral - 3;
+    parte(`montanteC${lado}`, bool('unir', [
+      aparar(bool('unir', [caixa(...x(700, 1000), 895, 1530, -835, zB + 0.5), caixa(...x(700, 856), 560, 897, -835, T.zLateral + 6), caixa(...x(804, 856), 460, 562, T.zLateral - 8, T.zLateral + 6)])),
+      aparar(caixa(...x(700, 1000), 895, 1530, zB, T.zLateral + 6), T.chapa + 4),
+    ]), OCRE);
     /* o reforço da cintura corre por dentro do pé da coluna C, do montante C à travessa de trás da cabine */
     parte(`reforcoDaCintura${lado}`, aparar(caixa(...x(700, 1000), 940, 1040, -1295, -830)), OCRE);
     parte(`longarinaSuperior${lado}`, caixa(...x(600, 638.5), 700, 780, 701.5, 1841.5), AZUL);
@@ -461,7 +462,7 @@ for (const L of ['Dir', 'Esq']) {
     par(`lateralTraseira${L}`, 'anteparoTraseiro', 'encosta', 'a lateral traseira assenta na ponta do anteparo'),
     par('teto', `montanteA${L}`, 'encosta', 'o pé da coluna A assenta no topo do montante A'),
     par(`paraLama${L}`, `montanteA${L}`, 'encosta', 'a borda de trás do para-lama assenta no montante A'),
-    par(`portaTraseira${L}`, `montanteC${L}`, 'encosta', 'a porta traseira fecha contra o montante C, onde fica a fechadura'),
+    par(`portaTraseira${L}`, `montanteC${L}`, 'folga', 'a porta traseira fecha contra o batente do montante C, que fica 4 mm por dentro dela; a borracha fica fora do rascunho'),
     par(`portaDianteira${L}`, `soleiraDoChassi${L}`, 'encosta', 'a borda de baixo da porta fecha contra a soleira do chassi'),
     par(`portaTraseira${L}`, `soleiraDoChassi${L}`, 'encosta', 'a borda de baixo da porta fecha contra a soleira do chassi'),
     par('teto', `reforcoDaCintura${L}`, 'encosta', 'o pé da coluna C assenta no reforço da cintura'),

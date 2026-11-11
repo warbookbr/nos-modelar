@@ -68,7 +68,7 @@ const normalDe = (st: any, vs: number[]): V3 => {
 function peleDeFora(st: any, nome: string, visto: V3) {
   const tris: V3[][] = [];
   for (const f of st.F.values()) {
-    if (f.parte !== nome || dot(normalDe(st, f.vs), visto) < 0.9) continue;
+    if (f.parte !== nome || dot(normalDe(st, f.vs), visto) < 0.97) continue;
     const p = f.vs.map((v: number) => st.V.get(v) as V3);
     for (let k = 1; k + 1 < p.length; k++) tris.push([p[0], p[k], p[k + 1]]);
   }
@@ -275,7 +275,142 @@ describe('paineisPorVaos: a ficha', () => {
     for (const campo of ['chapa', 'vao', 'linhas', 'paineis', 'origemId', 'normal']) expect(ficha.campos).toContain(campo);
   });
 
-  it('o exemplo da ficha roda sobre a caixa de teste', () => {
-    expect(ficha.exemplo).toContain('paineisPorVaos(');
+  it('o exemplo da ficha executa e dá dois painéis', () => {
+    const r = new Function('paineisPorVaos', `return ${ficha.exemplo}`)(paineisPorVaos);
+    expect(r.medidas.paineisAchados).toBe(2);
+    expect(r.avisos).toEqual([]);
+    expect(nucleo(r.passos, {}, {}).orfaos).toEqual([]);
+  });
+
+  it('o ajudante não cita veículo: o núcleo não conhece outro domínio de objeto', () => {
+    expect(fonte).not.toMatch(/carro|sed[ãa]|ve[íi]culo/i);
+  });
+});
+
+/* ---- a revisão adversarial: unidade, semente salva, camadas, folga, volta pequena, memória e entradas ---- */
+const rad = Math.PI / 180;
+const PLACA = { passos: [['cubo', { origemId: 1, larg: 600, alt: 1, prof: 400 }]], origem: { op: 'cubo', id: 1 } };
+const DOIS = { linhas: [{ eixo: 'y', pontos: [[0, -300], [0, 300]] }], paineis: [{ nome: 'e', eixo: 'y', ponto: [-150, 0] }, { nome: 'd', eixo: 'y', ponto: [150, 0] }] };
+/* uma chapa plana de espessura T inclinada de `ang` graus, de 400 de comprimento, extrudada em x */
+const inclinada = (id: number, T: number, ang: number) => {
+  const c = Math.cos(ang * rad); const s = Math.sin(ang * rad); const L = 400;
+  const pol: [number, number][] = [[0, 0], [L * c, L * s], [L * c - T * s, L * s + T * c], [-T * s, T * c]];
+  return ['extrusao', { origemId: id, eixo: 'x', altura: 400, em: [-200, 0, 0], perfil: [...pol].reverse().map(([z, y]) => [-y, z]) }];
+};
+
+describe('paineisPorVaos: unidade (entrada em mm, saída em mm ou em metro)', () => {
+  it("saida: 'metro' devolve a lâmina e as partes em metro, sem os passos da chapa, e a receita em metro monta as mesmas partes", () => {
+    const mm = paineisPorVaos({ chapa: PLACA, vao: 4, ...DOIS });
+    const m = paineisPorVaos({ chapa: PLACA, vao: 4, ...DOIS, saida: 'metro' });
+    expect(m.passos).toHaveLength(mm.passos.length - PLACA.passos.length);
+    const lamina = m.passos[0][1].perfil.map((p: number[]) => p[0]);
+    expect(Math.max(...lamina) - Math.min(...lamina)).toBeCloseTo(0.00408, 7);
+    const conexo = m.passos.at(-1)[1].sel.onde.conexo;
+    expect(conexo.de[1]).toBeCloseTo(0.00105, 6);
+    expect(conexo.ate).toBeGreaterThan(0);
+    expect(conexo.ate).toBeLessThan(1);
+    const emM = [['cubo', { origemId: 1, larg: 0.6, alt: 0.001, prof: 0.4 }], ...m.passos];
+    const a = nucleo(mm.passos, {}, {}); const b = nucleo(emM, {}, {});
+    expect(b.orfaos).toEqual([]);
+    const faces = (st: any, nome: string) => [...st.F.values()].filter((f: any) => f.parte === nome).length;
+    for (const nome of ['e', 'd']) expect(faces(b, nome), nome).toBe(faces(a, nome));
+    expect(m.partes[0].de[1]).toBeCloseTo(mm.partes[0].de[1] / 1000, 9);
+  });
+
+  it('recusa emitir a chapa em metro e avisa quando a chapa parece escrita em metro', () => {
+    expect(grito(() => paineisPorVaos({ chapa: { ...PLACA, emitir: true }, vao: 4, ...DOIS, saida: 'metro' }))).toMatch(/passos da chapa não são devolvidos/);
+    expect(grito(() => paineisPorVaos({ chapa: PLACA, vao: 4, ...DOIS, saida: 'km' }))).toMatch(/saida é 'mm' ou 'metro'/);
+    const emMetro = paineisPorVaos({ chapa: { passos: [['cubo', { origemId: 1, larg: 0.6, alt: 0.001, prof: 0.4 }]], origem: PLACA.origem }, vao: 0.004, amostragem: 0.04, areaMinima: 1e-4,
+      linhas: [{ eixo: 'y', pontos: [[0, -0.3], [0, 0.3]] }], paineis: [{ nome: 'e', eixo: 'y', ponto: [-0.15, 0] }, { nome: 'd', eixo: 'y', ponto: [0.15, 0] }] });
+    expect(emMetro.avisos.map((a: any) => a.ref)).toContain('unidadeSuspeita');
+  });
+});
+
+describe('paineisPorVaos: a semente salva se confere na execução (conexo.ate)', () => {
+  const CH = [['cubo', { origemId: 1, larg: 600, alt: 1, prof: 400, em: [0, 100.5, 0] }], ['cubo', { origemId: 2, larg: 600, alt: 1, prof: 400, em: [0, 0.5, 0] }],
+    ['unir', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }] }]];
+  const g = paineisPorVaos({ chapa: { passos: CH, origem: { op: 'unir', id: 3 } }, vao: 4, linhas: [{ eixo: 'y', pontos: [[0, -300], [0, 300]], alcance: [90, 110] }], paineis: DOIS.paineis });
+
+  it('o passo parte sai com ate, e o `de` fica afastado da caixa por uma fração dela', () => {
+    const c = g.passos.at(-1)[1].sel.onde.conexo;
+    expect(c.ate).toBeGreaterThan(0);
+    expect(c.de[1]).toBeCloseTo(101.5 + 0.05 * 101, 0);
+    expect(nucleo(g.passos, {}, {}).orfaos).toEqual([]);
+  });
+
+  it('a linha movida na receita faz a semente cair no vão, e o núcleo recusa em vez de nomear a camada de trás', () => {
+    const passos = structuredClone(g.passos);
+    const lam = passos.find((p: any) => p[0] === 'extrusao' && p[1].origemId === 4);
+    lam[1].perfil = lam[1].perfil.map(([a, b]: number[]) => [a + 150, b]);
+    const st = nucleo(passos, {}, {});
+    expect(st.orfaos.map((o: any) => o.motivo).join('|')).toMatch(/além de ate \(.*\): a semente passou por um vão ou a chapa mudou/);
+  });
+});
+
+describe('paineisPorVaos: camadas, folga e volta pequena', () => {
+  it('duas camadas no alcance com inclinação diferente avisam, e a folga da lâmina sai nas medidas', () => {
+    const CH = [['cubo', { origemId: 1, larg: 400, alt: 1, prof: 400, em: [0, 600, 200] }], inclinada(2, 1, 50), ['unir', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'extrusao', id: 2 } }] }]];
+    const g = paineisPorVaos({ chapa: { passos: CH, origem: { op: 'unir', id: 3 } }, vao: 4, linhas: [{ eixo: 'y', pontos: [[-300, 150], [300, 150]] }],
+      paineis: [{ nome: 'ta', eixo: 'y', ponto: [0, 80] }, { nome: 'tb', eixo: 'y', ponto: [0, 250] }, { nome: 'ia', eixo: 'y', ponto: [0, 80], lado: '-' }, { nome: 'ib', eixo: 'y', ponto: [0, 230], lado: '-' }] });
+    const aviso = g.avisos.find((a: any) => a.ref === 'camadasInclinadas');
+    expect(aviso.texto).toMatch(/limite o alcance a uma camada ou corte em duas linhas/);
+    expect(g.medidas.folgaMinima).toBeCloseTo(4 * 1.02, 2);
+    /* com o alcance limitado a uma camada o aviso some */
+    const so = paineisPorVaos({ chapa: { passos: CH, origem: { op: 'unir', id: 3 } }, vao: 4, linhas: [{ eixo: 'y', pontos: [[-300, 150], [300, 150]], alcance: [500, 700] }], paineis: [{ nome: 'ta', eixo: 'y', ponto: [0, 80] }, { nome: 'tb', eixo: 'y', ponto: [0, 250] }] });
+    expect(so.avisos.map((a: any) => a.ref)).not.toContain('camadasInclinadas');
+  });
+
+  it('chapa a 75 graus com a linha quase paralela à inclinação: a folga entre as paredes cai e avisa', () => {
+    const ang = 75; const giro = 85; const d = [Math.sin(giro * rad), Math.cos(giro * rad)]; const zc = (400 * Math.cos(ang * rad)) / 2;
+    const g = paineisPorVaos({ chapa: { passos: [inclinada(1, 1, ang)], origem: { op: 'extrusao', id: 1 } }, vao: 4, linhas: [{ eixo: 'y', pontos: [[-500 * d[0], zc - 500 * d[1]], [500 * d[0], zc + 500 * d[1]]] }],
+      paineis: [{ nome: 'a', eixo: 'y', ponto: [-0.4 * zc * d[1], zc + 0.4 * zc * d[0]] }, { nome: 'b', eixo: 'y', ponto: [0.4 * zc * d[1], zc - 0.4 * zc * d[0]] }] });
+    expect(g.medidas.folgaMinima).toBeLessThan(2);
+    const aviso = g.avisos.find((a: any) => a.ref === 'folgaEstreita');
+    expect(aviso.texto).toMatch(/a lâmina, e não o vão da pele/);
+    const sem = paineisPorVaos({ chapa: { passos: [inclinada(1, 1, ang)], origem: { op: 'extrusao', id: 1 } }, vao: 4, folgaAbaixoDe: 0.5, linhas: g.passos ? [{ eixo: 'y', pontos: [[-500 * d[0], zc - 500 * d[1]], [500 * d[0], zc + 500 * d[1]]] }] : [],
+      paineis: [{ nome: 'a', eixo: 'y', ponto: [-0.4 * zc * d[1], zc + 0.4 * zc * d[0]] }, { nome: 'b', eixo: 'y', ponto: [0.4 * zc * d[1], zc - 0.4 * zc * d[0]] }] });
+    expect(sem.avisos.map((a: any) => a.ref)).not.toContain('folgaEstreita');
+  });
+
+  it('a volta fechada menor que o vão recusa, em vez de deixar uma ilha fantasma; o furo (descarta) continua valendo', () => {
+    const quadrado = [[-1.5, -1.5], [1.5, -1.5], [1.5, 1.5], [-1.5, 1.5]];
+    const com = (extra: object) => () => paineisPorVaos({ chapa: PLACA, vao: 4, linhas: [{ nome: 'q', eixo: 'y', fechada: true, pontos: quadrado, ...extra }], paineis: [{ nome: 'fora', eixo: 'y', ponto: [100, 100] }] });
+    expect(grito(com({}))).toMatch(/a volta 'q' é menor que o vão/);
+    const fina = [[-1.5, -50], [1.5, -50], [1.5, 50], [-1.5, 50]];
+    expect(grito(() => paineisPorVaos({ chapa: PLACA, vao: 4, linhas: [{ nome: 'fina', eixo: 'y', fechada: true, pontos: fina }], paineis: [{ nome: 'fora', eixo: 'y', ponto: [100, 100] }] }))).toMatch(/a volta 'fina' é menor que o vão/);
+    const furo = com({ dentro: 'descarta' })();
+    expect(furo.medidas.pedacos).toBe(1);
+    expect(nucleo(furo.passos, {}, {}).orfaos).toEqual([]);
+  });
+
+  it('a lâmina que se cruza (canto fechado demais para a largura) recusa com a causa', () => {
+    expect(grito(() => paineisPorVaos({ chapa: PLACA, vao: 4, linhas: [{ nome: 'grampo', eixo: 'y', pontos: [[-100, 0], [100, 0.5], [-100, 1]] }], paineis: [{ nome: 'a', eixo: 'y', ponto: [200, 100] }] }))).toMatch(/a lâmina da linha 'grampo' se cruza/);
+  });
+});
+
+describe('paineisPorVaos: entradas inválidas e memória', () => {
+  it('recusa alem negativo ou não numérico e areaMinima inválida', () => {
+    const com = (linha: object, extra: object = {}) => () => paineisPorVaos({ chapa: PLACA, vao: 4, ...DOIS, linhas: [{ ...DOIS.linhas[0], ...linha }], ...extra });
+    expect(grito(com({ alem: -5 }))).toMatch(/alem da linha 'linha0' precisa ser um número de mm a partir de zero/);
+    expect(grito(com({ alem: 'x' }))).toMatch(/alem da linha/);
+    expect(grito(com({}, { areaMinima: -1 }))).toMatch(/areaMinima precisa ser um número/);
+    expect(grito(com({}, { areaMinima: 'x' }))).toMatch(/areaMinima precisa ser um número/);
+    expect(grito(com({}, { folgaAbaixoDe: -1 }))).toMatch(/folgaAbaixoDe precisa ser/);
+  });
+
+  it('a mesma entrada devolve o resultado da memória, copiado, e custa uma fração da primeira', () => {
+    const cuba = paineisPorVaos; void cuba;
+    const entrada = () => ({ chapa: { passos: CAIXA, origem: ORIGEM_CAIXA }, vao: 4, linhas: LINHAS_CAIXA, paineis: PAINEIS_CAIXA, margem: 0.0213 });
+    const t0 = performance.now(); const a = paineisPorVaos(entrada()); const primeira = performance.now() - t0;
+    const t1 = performance.now(); const b = paineisPorVaos(entrada()); const segunda = performance.now() - t1;
+    expect(JSON.stringify(b)).toBe(JSON.stringify(a));
+    expect(segunda).toBeLessThan(primeira / 5);
+    b.passos.length = 0; b.medidas.pedacos = -1;
+    const c = paineisPorVaos(entrada());
+    expect(JSON.stringify(c)).toBe(JSON.stringify(a));
+    process.stdout.write(`[memória] primeira chamada ${primeira.toFixed(1)} ms, repetida ${segunda.toFixed(2)} ms\n`);
+    /* a função de normal desliga a memória: roda de novo e dá o mesmo */
+    const n = () => paineisPorVaos({ ...entrada(), normal: () => null });
+    expect(JSON.stringify(n().passos)).toBe(JSON.stringify(n().passos));
   });
 });

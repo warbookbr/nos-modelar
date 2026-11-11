@@ -71,6 +71,15 @@ function selecao(v, onde) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
   return Object.fromEntries(Object.entries(v).map(([k, x]) => {
     if (k === 'regiao') return [k, medida(x, `${onde}.regiao`)];
+    if (k === 'onde' && x && typeof x === 'object' && x.conexo != null) {
+      /* conexo: `de` e `ate` são medidas e `dir` é só direção; o resto de `onde`, com número, segue recusado */
+      const { conexo, ...resto } = x;
+      if (temNumero(resto)) throw new RecusaDoEsboco('o filtro "onde" com número não é convertido para metro; selecione por grupo, origem ou região', `${onde}.onde`);
+      const c = { ...conexo };
+      if (c.de != null) c.de = medida(c.de, `${onde}.onde.conexo.de`);
+      if (c.ate != null) c.ate = medida(c.ate, `${onde}.onde.conexo.ate`);
+      return [k, { ...resto, conexo: c }];
+    }
     if (k === 'onde' && temNumero(x)) throw new RecusaDoEsboco('o filtro "onde" com número não é convertido para metro; selecione por grupo, origem ou região', `${onde}.onde`);
     return [k, x];
   }));

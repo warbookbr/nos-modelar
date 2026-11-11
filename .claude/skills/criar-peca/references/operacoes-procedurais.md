@@ -71,7 +71,7 @@ que sobraram dos anteriores:
   face que o raio de `de` na direção `dir` toca. É a semente de um pedaço: depois
   de uma booleana que parte uma chapa em várias, o ponto visto de uma vista nomeia
   o pedaço sem citar id (`['parte', { nome: 'capo', sel: { origem: CORTE, onde:
-  { conexo: { de: [0, 2000, 900], dir: [0, -1, 0] } } } }]`). Raio que não toca
+  { conexo: { de: [0, 2000, 900], dir: [0, -1, 0], ate: 1100 } } } }]`). `ate` (opcional) é a distância máxima do primeiro toque: a semente salva que passa a cair num vão toca a camada de trás, e com `ate` a seleção grita em vez de nomear o pedaço errado; `de` e `ate` são medidas (o conversor de mm do esboço as converte) e `dir` só direção. Raio que não toca
   face grita (semente fora da peça ou num vão); empate de distância vai para a
   face de menor id.
 
@@ -924,7 +924,7 @@ A chapa de prova da rede é `procedural/nucleo/fixtures/gaiola-por-rede-prova.js
 
 ### Chapa em painéis com vão: `paineisPorVaos`
 
-Capô, para-lamas, portas, teto e tampa de uma carroceria, ou as tampas de uma máquina, são painéis de chapa de uma superfície só, separados por frestas. `paineisPorVaos`, de `procedural/nucleo/paineis-por-vaos.js` (`npm run capacidade -- paineisPorVaos` dá a ficha; `npm run capacidade -- painel` acha por palavra), recebe a chapa já feita (os passos que a constroem e a origem dela: a casca facetada de sólido de fora menos o recuado, ou `subdivisao` com `espessura`), as linhas de vão, cada uma desenhada numa vista ortogonal (eixo, pontos em mm no plano dela, aberta ou fechada, com `alcance` no eixo da vista para a linha de um lado do carro não cortar o outro), a largura do vão e o nome de cada painel por um ponto visto da vista dele. A chapa é construída uma vez: o ajudante devolve uma lâmina por linha, um `subtrair` só e uma `parte` por painel (com `onde.conexo`, acima), e não os 23 montes da chapa que o rascunho do sedã usou.
+Capô, para-lamas, portas, teto e tampa de uma carroceria, ou as tampas de uma máquina, são painéis de chapa de uma superfície só, separados por frestas. `paineisPorVaos`, de `procedural/nucleo/paineis-por-vaos.js` (entrada em mm; `saida: 'mm'` para o esboço, `saida: 'metro'` para a receita) (`npm run capacidade -- paineisPorVaos` dá a ficha; `npm run capacidade -- painel` acha por palavra), recebe a chapa já feita (os passos que a constroem e a origem dela: a casca facetada de sólido de fora menos o recuado, ou `subdivisao` com `espessura`), as linhas de vão, cada uma desenhada numa vista ortogonal (eixo, pontos em mm no plano dela, aberta ou fechada, com `alcance` no eixo da vista para a linha de um lado do carro não cortar o outro), a largura do vão e o nome de cada painel por um ponto visto da vista dele. A chapa é construída uma vez: o ajudante devolve uma lâmina por linha, um `subtrair` só e uma `parte` por painel (com `onde.conexo`, acima), e não uma montagem da chapa por painel.
 
 ```js
 const g = paineisPorVaos({ chapa: { passos: CASCA, origem: { op: 'subtrair', id: 40 } }, vao: 4,

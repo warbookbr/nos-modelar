@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
-import { DISTANCIA_MINIMA_ENTRE_PLANOS_MM, RAZAO_MAXIMA_DE_AMOSTRAGEM, TOLERANCIA_DA_COMPENSACAO_MM, gaiolaPorLacos } from './gaiola-por-lacos.js';
+import { DISTANCIA_MINIMA_ENTRE_PLANOS_MM, RAZAO_MAXIMA_DE_AMOSTRAGEM, RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS, TOLERANCIA_DA_COMPENSACAO_MM, gaiolaPorLacos } from './gaiola-por-lacos.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { lacosPelasVistas } from './lacos-pelas-vistas.js';
 // @ts-expect-error — núcleo em JavaScript.
@@ -823,5 +823,71 @@ describe('gaiolaPorLacos: a casca aberta (aberta) e a conferência da espessura 
     const lamina = gaiolaPorLacos({ ...barra(), lacos: [lacoDaBarra(0, 30, 0), lacoDaBarra(50), lacoDaBarra(100)] });
     expect(lamina.passo.faces.length).toBeGreaterThan(0);
     expect(grito(() => gaiolaPorLacos({ ...barra(), aberta: 'inicio', lacos: [lacoDaBarra(0, 30, 0), lacoDaBarra(50), lacoDaBarra(100)] }))).toMatch(/área zero.*não tem boca/);
+  });
+});
+
+/* O PASSO DENSO ENTRE LAÇOS. A caçamba do carrinho de mão, com 25 pontos nos lados retos (e 33 nos arcos da frente e de trás), deu 70
+   faces finas na malha subdividida, na dobra do fundo, sem aviso algum: com 9 pontos deram zero. Os laços abaixo copiam os valores da
+   caçamba (a altura de cada laço, a meia largura e o trecho em z dos lados retos), sem o domínio dela: a pilha de cinco laços a 2,5 a 4
+   mm da dobra do fundo e os quatro da parede, a 33 a 50 mm. A gaiola em si não tem face fina; o que mede é a razão entre o passo dos
+   pontos ao longo do lado e a menor distância entre laços vizinhos (a malha subdividida, medida com `lasca`: razão 5,7 e 3,8, zero
+   faces finas; 2,9, 12; 2,3, 30; 1,9, 68). */
+describe('gaiolaPorLacos: o passo denso entre laços', () => {
+  const LACOS_DA_CACAMBA = [
+    // [altura em y, meia largura, z do começo do lado reto, z do fim]
+    [284.5, 185.3, -596, -357], [287, 198.3, -604, -353], [289.5, 203.3, -607, -352], [292.5, 207.5, -610, -350], [296.5, 212, -612, -349],
+    [330, 233, -621, -331], [380, 263, -632, -304], [430, 294, -643, -277], [462, 313, -650, -260],
+  ];
+  /* os arcos de trás (de -x a +x, abaulado para trás) e da frente (de +x a -x, abaulado para a frente) */
+  const arco = (w: number, z: number, sentido: number, pontos: number): Uv[] => Array.from({ length: pontos }, (_, k) => {
+    const t = Math.PI * (k / (pontos - 1));
+    return [-sentido * w * Math.cos(t), z + sentido * 0.4 * w * Math.sin(t)] as Uv;
+  });
+  const cacamba = (pontosDoLado: number, pontos = 33, valores = LACOS_DA_CACAMBA) => gaiolaPorLacos({
+    nome: 'cacamba', eixo: 'y', tampa: { de: 'esquerda', ate: 'direita' }, aberta: 'fim', espessura: 1.5,
+    trechos: [{ nome: 'inicio', pontos }, { nome: 'direita', pontos: pontosDoLado }, { nome: 'fim', pontos }, { nome: 'esquerda', pontos: pontosDoLado }],
+    lacos: valores.map(([em, w, a, b], r) => ({
+      nome: `e${r}`, em,
+      trechos: {
+        inicio: arco(w, a, -1, pontos).map(([x, z]) => [-x, z] as Uv),
+        direita: [[w, a], [w, b]], fim: arco(w, b, 1, pontos).map(([x, z]) => [-x, z] as Uv), esquerda: [[-w, b], [-w, a]],
+      },
+    })),
+  });
+  const doPasso = (g: any) => g.avisos.filter((a: any) => a.ref === 'passoDensoEntreLacos');
+
+  it('avisa com 25 pontos no lado, com o trecho, os laços, a razão medida e o que mudar, e não avisa com 9', () => {
+    const denso = doPasso(cacamba(25));
+    expect(denso.map((a: any) => a.trecho).sort()).toEqual(['direita', 'esquerda']);
+    const a = denso[0];
+    expect(a.lacos).toEqual(['e2', 'e3']);
+    expect(a.razao).toBeCloseTo(1.9, 1);
+    expect(a.passoMm).toBeCloseTo(9.9, 1);
+    expect(a.distanciaMm).toBeCloseTo(5.2, 1);
+    expect(a.texto).toMatch(/no trecho 'direita' os pontos ficam a 9,9 mm.*laços 'e2' e 'e3' a 5,2 mm, razão 1,9, abaixo de 3/);
+    expect(a.texto).toMatch(/baixe os pontos desse trecho de 25 para \d+ ou menos, ou espace os laços/);
+    expect(RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS).toBe(3);
+    expect(doPasso(cacamba(9))).toEqual([]);
+    expect(doPasso(cacamba(13))).toEqual([]);
+    expect(doPasso(cacamba(17)).length).toBe(2);
+  });
+
+  it('o ponto que o aviso sugere já não avisa', () => {
+    const quantos = Number(/de 25 para (\d+) ou menos/.exec(doPasso(cacamba(25))[0].texto)![1]);
+    expect(doPasso(cacamba(quantos))).toEqual([]);
+  });
+
+  it('o aviso só acrescenta a entrada: os pontos, a malha e os outros avisos são os mesmos de antes', () => {
+    const g = cacamba(25);
+    const sem = { ...g, avisos: g.avisos.filter((a: any) => a.ref !== 'passoDensoEntreLacos') };
+    expect(sem.avisos.map((a: any) => a.ref)).not.toContain('passoDensoEntreLacos');
+    const outro = cacamba(25, 33);
+    expect(JSON.stringify(outro.passo)).toBe(JSON.stringify(g.passo));
+    expect(JSON.stringify(outro.pontosMm)).toBe(JSON.stringify(g.pontosMm));
+  });
+
+  it('laços a distâncias parecidas não avisam, por densos que sejam os pontos', () => {
+    const uniformes = LACOS_DA_CACAMBA.map(([, w, a, b], r) => [284.5 + r * 5, w, a, b]);
+    expect(doPasso(cacamba(25, 33, uniformes))).toEqual([]);
   });
 });

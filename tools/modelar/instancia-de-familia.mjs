@@ -12,7 +12,7 @@
  *   base: o maior id já usado no estado ou na receita; os ids da instância somam a base (padrão 0) e `origem` devolve o maior id depois dela.
  *   unidade: 'm' (padrão) ou 'mm'; em mm só as operações com medida conhecida passam, e a outra é recusada pelo nome.
  *   pose: { posicao: [x, y, z], giro } na unidade de saída; `giro` é { eixo, graus, pivo? } ou uma lista deles, aplicados antes da posição, em torno do pivô (padrão a origem da família); as portas publicadas antes da pose a seguem.
- *   materiais: { usa: '#cor' } troca cada passo `material` por um `pincel` com a cor; sem ele os passos `material` ficam como a família os emite (a receita com MATERIAIS).
+ *   materiais: { usa: '#cor' } troca cada passo `material` por um `pincel` com a cor; `false` tira os passos `material` (o chamador pinta pelo nome da parte); sem ele ficam como a família os emite (a receita com MATERIAIS).
  *   liso: { angulo } (ou o número) acrescenta o passo `liso` de cada parte depois da pose.
  *   emitirPartes: false não emite os passos `parte` (o chamador nomeia com o próprio ajudante, a partir de `partes`); padrão true.
  *   portas: true mantém os passos `publicarPorta` (padrão em 'm'); em 'mm' ficam fora.
@@ -161,6 +161,7 @@ export function instanciaDeFamilia({
       passos.push([op, { ...args, ...(args.id !== undefined ? { id: novo } : { nome: novo }), ...(args.interface ? { interface: posarInterface(args.interface, rotacoes, pose?.posicao) } : {}) }]);
       continue;
     }
+    if (op === 'material' && materiais === false) continue;
     if (op === 'material' && materiais) { passos.push(['pincel', { modo: 'face', sel: args.sel, cor: cor(args.usa) }]); continue; }
     if (op === 'parte') {
       const nome = renomear(args.nome);

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1888 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1896 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -120,6 +120,7 @@
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão do Modelar
 - `modelar-carroceria.md` — Modelar carroceria de chapa contínua
+- `modelar-veiculo-em-chassi-e-lataria.md` — Modelar um veículo em chassi e lataria
 - `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
 ## docs/modelar/banco-de-provas/
@@ -774,6 +775,7 @@
 ## modulos/esboco-nucleo/tests/
 
 - `atalho.test.js` — atalho.test.js — o atalho de posição do esboço 2.0, em mm: centro, sobre, ponta, desloca e rotacao resolvidos pela caixa da malha que o núcleo gerou, as form…
+- `conexo-em-metro.test.js` — conexo-em-metro.test.js — o conversor de mm para metro do esboço e os passos `parte` com `onde.conexo` que `paineisPorVaos` devolve: `de` e `ate` são medidas…
 - `contatos-declarados.test.js` — contatos-declarados.test.js — a opção só de passos crus executada uma vez, com o mesmo neutro do caminho de antes, e o contato declarado na opção (`contatos`…
 - `leitor.test.js` — leitor.test.js — o leitor dos esboços antigos: cada `.esboco.json` versionado abre no esboço 2.0 ou é recusado com o motivo, as treze opções de forma de peça…
 - `montar-sem-relato.test.js` — montar-sem-relato.test.js — `montarOpcoes` com `relato: false` não calcula o relato de contatos e devolve o mesmo neutro, as mesmas partes e o resto do paine…
@@ -2506,6 +2508,22 @@
 - `receita.js` — subtrair-que-nao-corta/receita.js — peça de prova do defeito "um `subtrair` que não corta nada passa calado" (plano "costuras e furos limpos"): um bloco de 1…
 - `subtrair-que-nao-corta.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte o número marcado.
 
+## tools/fixtures/faces-finas/
+
+- `receita-de-prova.js` — receita-de-prova.js — a receita de prova da contagem de faces finas da medição da rodada.
+
+## tools/fixtures/faces-finas/fina/
+
+- `receita.js` — **SEM CABEÇALHO**
+
+## tools/fixtures/faces-finas/fina-de-lataria/
+
+- `receita.js` — **SEM CABEÇALHO**
+
+## tools/fixtures/faces-finas/sem-fina/
+
+- `receita.js` — **SEM CABEÇALHO**
+
 ## tools/fixtures/familia-chamavel/
 
 - `composicoes.js` — Fixture de teste: as duas composições da família `tubo-de-prova`, uma barra maciça e um tubo de parede. Quem a usa é `procedural/familias/familias.test.js` e…
@@ -2929,6 +2947,8 @@
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
+- `instancia-de-familia.mjs` — instancia-de-familia.mjs — uma instância de família procedural por uma chamada, em passos prontos para um esboço 2.0 ou uma receita.
+- `instancia-de-familia.test.mjs` — instancia-de-familia.test.mjs — a instância de família por uma chamada reproduz a roda do carrinho de mão: os passos em mm do estado do rascunho (`montarRoda…
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `lados-das-vistas.mjs` — lados-das-vistas.mjs — de que lado cada vista olha, em texto, para o brief do crítico cego.
 - `lasca.mjs` — lasca.mjs — lista cada face fina de uma receita: a parte, a razão, os cantos em milímetro e o passo que criou a face.
@@ -2954,7 +2974,7 @@
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `navegador.mjs` — navegador.mjs — os argumentos e o lançamento do Chromium sem tela que as capturas da bancada, do esboço e do contorno usam.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
-- `objeto.mjs` — objeto.mjs — em que etapa do fluxo um objeto está, e o que vem a seguir.
+- `objeto.mjs` — objeto.mjs — o estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir.
 - `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.

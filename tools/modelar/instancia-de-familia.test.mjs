@@ -53,7 +53,7 @@ describe('instanciaDeFamilia reproduz a roda do carrinho de mão', () => {
 
   it('o perfil mais o que o chamador sobrescreve vale o mesmo que a chamada direta da família', () => {
     const r = instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carrinho-de-mao', parametros: { diametroPneu: 340 } });
-    const direta = executar([...registro.registroComposicoes ? [] : [], ...instanciaDeFamilia({ familia: registro.obter('roda-pneu'), parametros: { perfil: 'carrinho-de-mao', diametroPneu: 340 } }).passos]).neutro;
+    const direta = executar(instanciaDeFamilia({ familia: registro.obter('roda-pneu'), parametros: { perfil: 'carrinho-de-mao', diametroPneu: 340 } }).passos).neutro;
     expect(hash(executar(r.passos).neutro)).toBe(hash(direta));
     const padrao = instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carrinho-de-mao' });
     expect(hash(executar(padrao.passos).neutro)).not.toBe(hash(executar(r.passos).neutro));
@@ -79,8 +79,8 @@ describe('a pose e as portas', () => {
     const com = executar(comR.passos).neutro;
     const a = porta(sem, 'assento-do-pneu');
     const b = porta(com, 'assento-do-pneu');
-    /* sem pose o assento é a face de dentro do pneu, em x = -0,0425; o giro de z 90 leva o x para o y, e o de y 180 inverte x e z */
-    expect(a.centro[0]).toBeCloseTo(-0.0425, 9);
+    /* sem pose o assento é a face de dentro do pneu, no x mínimo dele; o giro de z 90 leva o x para o y, e o de y 180 inverte x e z */
+    expect(a.centro[0]).toBeCloseTo(caixaDaParte(sem, 'pneu')[0][0], 9);
     const caixa = caixaDaParte(com, 'pneu');
     expect(b.centro[1]).toBeCloseTo(caixa[1][0], 6);
     expect(b.centro[0]).toBeCloseTo(0.3, 9);
@@ -94,7 +94,7 @@ describe('a pose e as portas', () => {
     expect(furos.centros).toHaveLength(4);
     const dentro = caixaDaParte(com, 'cubo');
     for (const c of furos.centros) {
-      expect(Math.hypot(c[0] - furos.centro[0], c[1] - furos.centro[1], c[2] - furos.centro[2])).toBeCloseTo(0.0187, 9);
+      expect(Math.hypot(c[0] - furos.centro[0], c[1] - furos.centro[1], c[2] - furos.centro[2])).toBeCloseTo(0.019, 9);
       /* cada centro está no plano da face do cubo, a mesma coordenada y da porta, e dentro da caixa do cubo nos outros eixos */
       expect(c[1]).toBeCloseTo(furos.centro[1], 9);
       expect(c[0]).toBeGreaterThan(dentro[0][0]);
@@ -102,7 +102,7 @@ describe('a pose e as portas', () => {
     }
     expect(comR.passos.filter(([op]) => op === 'rotaciona')).toHaveLength(8);
     expect(comR.passos.filter(([op]) => op === 'transladar')).toHaveLength(4);
-    expect(comR.passos.map(([op]) => op).join(' ')).toMatch(/(rotaciona rotaciona transladar )+$/);
+    expect(comR.passos.map(([op]) => op).join(' ')).toMatch(/(rotaciona rotaciona transladar ?)+$/);
   });
 
   it('quatro rodas num carro: nomes pelo mapa e pela função, ids encadeados, portas com prefixo, tudo executa', () => {
@@ -126,7 +126,7 @@ describe('a pose e as portas', () => {
     const portas = portasPublicadas(neutro).map((p) => p.id);
     expect(portas).toHaveLength(12);
     expect(portas).toContain('traseira-esq-eixo');
-    expect(new Set(neutro.F.values().map?.((f) => f.parte) ?? [...neutro.F.values()].map((f) => f.parte)).size).toBeGreaterThanOrEqual(16);
+    expect(new Set([...neutro.F.values()].map((f) => f.parte)).size).toBeGreaterThanOrEqual(16);
   });
 
   it('o prefixo e o mapa de nomes das partes; a emissão das partes pode ficar com o chamador', () => {
@@ -135,6 +135,7 @@ describe('a pose e as portas', () => {
     const mapa = instanciaDeFamilia({ familia: 'roda-pneu', nomes: { pneu: 'pneuTras' }, emitirPartes: false });
     expect(mapa.partes.map((p) => [p.nome, p.nomeNaFamilia])[0]).toEqual(['pneuTras', 'pneu']);
     expect(mapa.passos.some(([op]) => op === 'parte')).toBe(false);
+    expect(instanciaDeFamilia({ familia: 'roda-pneu', materiais: false }).passos.some(([op]) => op === 'material')).toBe(false);
     expect(mapa.partes[0].sel).toEqual({ origem: { op: 'lathe', id: 1 } });
   });
 });

@@ -183,6 +183,11 @@ export const PASSOS_DA_COMPENSACAO = 8;
 /* A gaiola avisa a face cuja área é menos que isto da maior aresta ao quadrado. O `analisarTopologia` reprova a lasca abaixo de 0,003 na
    malha final, e a subdivisão mantém a razão da gaiola até uns 70%, de modo que o aviso fica com folga. */
 export const LIMITE_DE_FACE_FINA_NA_GAIOLA = 0.005;
+/* A razão mínima entre o passo dos pontos ao longo de um trecho reto e a menor distância entre laços vizinhos nele. Abaixo dela, com a
+   gaiola subdividida, a dobra entre planos próximos deixa um leque de faces finas sem que a gaiola tenha uma face fina sequer. Medido na
+   caçamba do carrinho de mão (lados retos, laços a 5,2 mm na dobra do fundo): razão 5,7 e 3,8 deram zero faces finas, 2,9 deu 12, 2,3
+   deu 30 e 1,9 deu 68; com os laços da dobra a 7,7 mm, 3,9 e 2,6 deram zero, 1,9 deu 8 e 1,3 deu 40. */
+export const RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS = 3;
 export const INCLINACAO_MINIMA_DA_COMPENSACAO = 0.5;
 /* A compensação avisa quando leva a superfície, entre os pontos de um laço, mais que isto (em mm) além do pedido, descontado o que ela já
    passava sem compensar (A COMPENSAÇÃO). Nas peças de teste em que a compensação é a da casa o acréscimo maior é de 1,36 mm (o L de
@@ -967,6 +972,44 @@ export function gaiolaPorLacos(o = {}) {
       });
     }
   }
+
+  /* o passo dos pontos num trecho reto da tampa contra a distância entre laços vizinhos: a subdivisão da gaiola deixa leque de faces
+     finas na dobra quando os pontos ao longo do trecho são muito mais densos que os laços empilhados (a gaiola em si não tem face fina, e o aviso de
+     faces finas abaixo não o vê) */
+  trechos.forEach((t, i) => {
+    /* o leque nasce nos degraus da tampa, que parte dos dois trechos `tampa.de` e `tampa.ate` */
+    if (abertos.size === 2 || o.tampa == null || (t.nome !== o.tampa.de && t.nome !== o.tampa.ate)) return;
+    const qs = []; for (let q = inicio[i]; ; q = (q + 1) % N) { qs.push(q); if (q === fimDe(i)) break; }
+    if (qs.length < 4 || R < 3) return;
+    const reto = uv.every((volta) => {
+      const a = volta[qs[0]]; const b = volta[qs[qs.length - 1]]; const comp = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      return comp > TOLERANCIA_DE_FUSAO_MM && qs.every((q) => Math.abs((b[0] - a[0]) * (volta[q][1] - a[1]) - (b[1] - a[1]) * (volta[q][0] - a[0])) / comp <= 1e-3 * comp);
+    });
+    if (!reto) return;
+    let passo = null; let perto = null; let longe = 0;
+    uv.forEach((volta, r) => {
+      const a = volta[qs[0]]; const b = volta[qs[qs.length - 1]];
+      const s = Math.hypot(b[0] - a[0], b[1] - a[1]) / (qs.length - 1);
+      if (s > TOLERANCIA_DE_FUSAO_MM && (passo === null || s < passo)) passo = s;
+      if (r + 1 >= R) return;
+      const meio = qs[qs.length >> 1]; const c = uv[r + 1][meio]; const m = volta[meio];
+      const d = Math.hypot(c[0] - m[0], c[1] - m[1], lacos[r + 1].em - lacos[r].em);
+      if (d > TOLERANCIA_DE_FUSAO_MM && (perto === null || d < perto.d)) perto = { d, de: lacos[r].nome, ate: lacos[r + 1].nome };
+      if (d > longe) longe = d;
+    });
+    if (passo === null || perto === null) return;
+    const razao = passo / perto.d;
+    /* laços a distâncias parecidas dão células de proporção comum e a subdivisão não deixa leque; o leque vem do degrau entre a pilha de
+       laços próximos e os laços afastados (a dobra e a parede), então só o degrau de RAZAO_MAXIMA_DE_AMOSTRAGEM vezes ou mais conta */
+    if (razao >= RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS || longe < RAZAO_MAXIMA_DE_AMOSTRAGEM * perto.d) return;
+    const comprimento = passo * (qs.length - 1);
+    const pontosCabem = Math.max(2, Math.floor(comprimento / (RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS * perto.d)) + 1);
+    if (process.env.SCAN_PASSO) console.error('SCAN', t.nome, razao.toFixed(2));
+    avisos.push({
+      ref: 'passoDensoEntreLacos', trecho: t.nome, lacos: [perto.de, perto.ate], razao: Number(razao.toFixed(2)), passoMm: Number(passo.toFixed(2)), distanciaMm: Number(perto.d.toFixed(2)),
+      texto: `no trecho ${citar(t.nome)} os pontos ficam a ${br(passo, 1)} mm uns dos outros ao longo do laço e os laços ${citar(perto.de)} e ${citar(perto.ate)} a ${br(perto.d, 1)} mm, razão ${br(razao, 1)}, abaixo de ${RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS}; a gaiola não tem face fina, mas a subdivisão deixa um leque delas na dobra entre os laços próximos (na caçamba do carrinho de mão, razão 3,8 deu zero, 2,9 deu 12 e 1,9 deu 68), então baixe os pontos desse trecho de ${t.pontos} para ${pontosCabem} ou menos, ou espace os laços`,
+    });
+  });
 
   /* faces finas: área / (maior aresta)^2, a razão que o `analisarTopologia` chama de lasca, abaixo do limite da gaiola; o trecho que
      some entre dois planos deixa um leque delas */

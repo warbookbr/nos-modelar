@@ -396,6 +396,34 @@ describe('onde.conexo: o pedaço conexo que o raio toca', () => {
     expect(pedaco(1.5).ids).toEqual(pedaco(1.5).ids);
   });
 
+  it('ate guarda a distância do primeiro toque: a semente que passa por um vão e toca a camada de trás grita', () => {
+    /* duas placas de 1 de espessura, uma sobre a outra, com 10 de distância, cortadas em x = 0 só a de cima */
+    const DUAS = [
+      ['cubo', { origemId: 1, larg: 10, alt: 1, prof: 4, em: [0, 10, 0] }],
+      ['cubo', { origemId: 2, larg: 10, alt: 1, prof: 4 }],
+      ['unir', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }] }],
+      ['cubo', { origemId: 4, larg: 1, alt: 3, prof: 6, em: [0, 9.5, 0] }],
+      ['subtrair', { origemId: 5, solidos: [{ origem: { op: 'unir', id: 3 } }, { origem: { op: 'cubo', id: 4 } }] }],
+    ];
+    const com = (x, ate) => rodar([...DUAS, ['parte', { nome: 'p', sel: { origem: { op: 'subtrair', id: 5 }, onde: { conexo: { de: [x, 20, 0], dir: [0, -1, 0], ...(ate == null ? {} : { ate }) } } } }]]);
+    /* sobre a placa de cima, o primeiro toque está a 20 - 11 = 9 */
+    expect(com(-3, 10).orfaos).toEqual([]);
+    expect(com(-3).orfaos).toEqual([]);
+    /* no vão, o raio atravessa e tocaria a placa de baixo (a 19): sem ate nomeia a placa errada em silêncio, com ate grita */
+    expect(com(0.1).orfaos.length).toBe(0);
+    const grito = com(0.1, 10).orfaos.map((o) => o.motivo).join('|');
+    expect(grito).toMatch(/o primeiro toque do raio de \[0.1, 20, 0\] está a 19, além de ate \(10\)/);
+    expect(grito).toMatch(/a semente passou por um vão ou a chapa mudou/);
+  });
+
+  it('ate precisa ser um número maior que zero', () => {
+    const l = (ate) => lerOnde(leitor(rodar(PLACA)), { conexo: { de: [0, 0, 0], dir: [0, 1, 0], ate } }).erro;
+    expect(l(0)).toMatch(/conexo.ate precisa ser maior que zero/);
+    expect(l(-2)).toMatch(/conexo.ate precisa ser maior que zero/);
+    expect(l('x')).toMatch(/conexo.ate/);
+    expect(l(5)).toBeUndefined();
+  });
+
   it('recusa a chave mal formada ou em seleção de aresta', () => {
     expect(lerOnde(leitor(rodar(PLACA)), { conexo: { de: [0, 0, 0] } }).erro).toMatch(/conexo precisa ser/);
     expect(lerOnde(leitor(rodar(PLACA)), { alvo: 'aresta', conexo: { de: [0, 0, 0], dir: [0, 1, 0] } }).erro).toMatch(/só vale para alvo 'face'/);
