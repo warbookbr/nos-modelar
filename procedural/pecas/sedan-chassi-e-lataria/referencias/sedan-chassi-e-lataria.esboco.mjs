@@ -274,7 +274,15 @@ function lataria() {
   const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(),
     paineis: P.map(([nome, eixo, ponto, , lado]) => ({ nome, eixo, ponto, ...(lado ? { lado } : {}) })) });
   MEDIDAS_DOS_PAINEIS = { medidas: g.medidas, avisos: g.avisos };
-  estado.passos.push(...g.passos);
+  /* o esboço 2.0 é em mm e recusa `onde` com número (ATRITOS, segunda etapa, item 1): o ponto e o rumo do raio de cada semente vão
+     ao topo, que o esboço converte, e a parte os cita por nome */
+  for (const [op, args] of g.passos) {
+    const raio = op === 'parte' ? args.sel?.onde?.conexo : null;
+    if (!raio) { estado.passos.push([op, args]); continue; }
+    estado.topo[`semente_${args.nome}`] = raio.de;
+    estado.topo[`rumo_${args.nome}`] = raio.dir;
+    estado.passos.push([op, { ...args, sel: { ...args.sel, onde: { conexo: { de: `semente_${args.nome}`, dir: `rumo_${args.nome}` } } } }]);
+  }
   estado.origem = g.proximoId - 1;
   for (const [nome, , , corDaParte] of P) {
     const cor = corDe(nome, corDaParte);
