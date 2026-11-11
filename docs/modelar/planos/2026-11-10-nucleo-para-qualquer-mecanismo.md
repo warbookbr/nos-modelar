@@ -122,7 +122,7 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    escala de cada uma, a medida adotada com a fonte e o conflito acusado antes
    de modelar. Saída: os 25% da vista de frente da empilhadeira saem da
    ferramenta, sem comparação à mão.
-4a. **Tubo dobrado e chapa fina, neste plano, a fazer.** Na `gaiolaVarrida`, o
+4a. **Tubo dobrado e chapa fina, neste plano; ajudantes entregues em 2026-11-11, falta a prova nas receitas.** Na `gaiolaVarrida`, o
    trilho em polilinha com raio nos cantos e o quadro que mantém a seção
    perpendicular ao caminho nas subidas; na `gaiolaPorLacos`, a casca aberta
    com espessura de chapa. Vêm dos itens 6 a 9 dos atritos do carrinho de mão.
@@ -130,6 +130,13 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    ajudante, com o tubo de seção redonda a 1 mm em toda estação e a chapa na
    espessura pedida, e as saídas de hoje dos dois ajudantes ficam idênticas
    sem as opções novas.
+   Entregue: o trilho `{ pontos, raios, fechado }`, o quadro `modo:
+   'acompanha'`, o aviso da seção achatada no modo fixo e as estações por
+   ângulo e flecha, na varredura; `aberta`, `bocas` e a conferência de
+   `espessura` com o aviso `cantoApertado`, nos laços. No tubo do chassi do
+   carrinho a seção ia a 26,8 mm na subida da manopla e fica em 32,0; a caçamba
+   sai com a mesma malha e a chapa de 1,5 mm, sem apagar face à mão. A guarda do
+   acervo não mudou em nenhuma das 83 peças.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.
