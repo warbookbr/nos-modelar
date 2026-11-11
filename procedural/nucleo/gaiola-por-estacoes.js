@@ -97,6 +97,14 @@
  *         `quinaMedida` (a quina é cota medida e a superfície passaria por ela), `anguloForaDaCalibragem` (menos de 20 ou mais de 150 graus),
  *         `apoioAmbiguo`, `vincoSemDuasFaces`, `vincoCruzaOutroComRaio`, `vincoSemDobra`, `filetePoucoSegmentado`, `niveisAbaixoDoRecomendado`
  *         (estes dois pedem `niveis` na definição). Não se combina com `nitidez` no mesmo vinco.
+ *         A DISTÂNCIA É PERPENDICULAR AO VINCO, sobre a face: a quina que corta as estações na diagonal (a coluna de uma cabine inclinada) realiza o
+ *         raio pedido (`raio: 4` dá 4 mm a 0, 20, 40 e 60 graus), e o passo guarda o pedido. A dobra é a do corte perpendicular ao vinco.
+ *         VINCOS QUE SE ENCONTRAM. Dois vincos com raio podem dividir um ponto: o vinco ao longo de uma estação termina na quina da cabine
+ *         (`{ estacao, de: 'centro', ate: 'quina', raio: 15 }` junto de `{ coluna: 'quina', raio: 4 }`), e as quinas de um canto de caixa chegam ao
+ *         mesmo vértice. Cada um põe os apoios sobre as arestas de saída, mesmo que sejam a linha do outro, a face que tem as duas linhas no vértice
+ *         ganha a grade do canto (pontos `canto${face}_${vértice}_${i}_${j}`), a linha do vinco no passo ganha os pontos que o outro pôs nela e a
+ *         subdivisão dá o canto de cubo arredondado; dois vincos não dividem uma aresta (`vincoCruzaOutroComRaio`). A lateral que some numa ponta
+ *         (o pé da coluna A) fecha com colunas que se fundem por `de`, e não pede opção nova (ver `a ponta em que a lateral some` no teste).
  * cantos e medidas: listas de { estacao?, coluna? }; só a estação marca a estação inteira, só a coluna marca a coluna
  *         inteira, e os dois marcam um ponto. A medida aceita `peso` (número maior que zero ou nome de PARAMS), e os
  *         pontos dela saem como { ponto, peso }, a cota que a superfície aproxima sem passar; sem peso, a cota é exata.

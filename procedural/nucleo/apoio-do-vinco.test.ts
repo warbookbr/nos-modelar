@@ -6,7 +6,7 @@
    e os avisos pelo nome. O corte é perpendicular ao vinco, sobre a malha subdividida. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
-import { NIVEIS_RECOMENDADOS, anguloDaDobra, apoioDoVinco, perfilDoApoio, raioDoFilete, raioPeloApoio, tabelaDeCalibragem } from './apoio-do-vinco.js';
+import { NIVEIS_RECOMENDADOS, anguloDaDobra, apoioDoVinco, inserirApoiosNosVincos, perfilDoApoio, raioDoFilete, raioPeloApoio, tabelaDeCalibragem } from './apoio-do-vinco.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
 // @ts-expect-error — núcleo em JavaScript.
@@ -15,6 +15,8 @@ import { gaiolaPorLacos } from './gaiola-por-lacos.js';
 import { nitidezDoVinco, subdividirCatmullClark } from './subdivisao.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { nucleo } from './entrada.js';
+// @ts-expect-error — núcleo em JavaScript.
+import { analisarTopologia } from './topologia.js';
 // @ts-expect-error — conversor do esboço em JavaScript.
 import { argsEmMetro } from '../../modulos/esboco-nucleo/src/milimetro.js';
 
@@ -522,5 +524,199 @@ describe('o raio gravado no vinco do passo', () => {
   it('raioDoFilete com NaN no perfil diz que há valor inválido, e não "perfil curto demais"', () => {
     expect(raioDoFilete([[0, 0], [1, NaN], [2, 0], [3, 1], [4, 2]]).motivo).toMatch(/valor inválido/);
     expect(raioDoFilete([[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]).motivo).toMatch(/curto demais|sem dobra/);
+  });
+});
+
+/* ---- (f) a quina oblíqua ---- */
+/* Duas faces planas que se dobram a 90 graus numa quina ao longo de z, com as estações inclinadas `theta` graus em relação ao plano perpendicular à quina
+   (a coluna A de uma cabine corta as estações de z constante na diagonal): o ponto de cada coluna anda ao longo de z na proporção da posição em x. A face
+   de trás corta a quina a 90 - theta graus, e a da frente, também. */
+function cruzetaObliqua({ theta, raio }: { theta: number; raio: number }) {
+  const tg = Math.tan(rad(theta)); const ds = [0.5, 0.3, 0.1];
+  const colunas: { nome: string; em: [number, number, number] }[] = [
+    ...ds.map((d) => ({ nome: `a${Math.round(d * 1000)}`, em: [-d, 0, -d * tg] as [number, number, number] })),
+    { nome: 'quina', em: [0, 0, 0] },
+    ...[...ds].reverse().map((d) => ({ nome: `b${Math.round(d * 1000)}`, em: [0, d, d * tg] as [number, number, number] }))];
+  const estacoes = [-0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6].map((z, k) => ({ nome: `z${k}`, em: z, colunas }));
+  return gaiolaPorEstacoes({ eixo: 'z', estacoes, vincos: [{ nome: 'quina', coluna: 'quina', raio }], niveis: 3 });
+}
+
+describe('(f) a quina oblíqua: a distância do apoio é medida perpendicular ao vinco, e o raio sai o pedido', () => {
+  for (const theta of [0, 20, 40, 60]) for (const raio of [4, 8]) {
+    it(`a quina corta as estações a ${theta} graus, com raio ${raio} mm: o corte perpendicular mede o pedido a 10%, e o passo guarda o pedido`, () => {
+      const g = cruzetaObliqua({ theta, raio });
+      /* o corte z = const é perpendicular à quina (que corre ao longo de z), e não ao plano da estação */
+      for (const z0 of [-0.3, 0.05, 0.3]) {
+        const m = medir(g, 4, 90, z0 * 1000 + 0.01);
+        expect(Math.abs(m / raio - 1), `z = ${z0}`).toBeLessThan(0.1);
+      }
+      /* o que o ajudante leu: a dobra do corte perpendicular (90, e não a do ângulo entre as arestas inclinadas) e o seno da aresta com a quina */
+      const ponto = g.raios[0].pontos[3];
+      expect(ponto.angulo).toBeCloseTo(90, 6);
+      expect(ponto.seno[0]).toBeCloseTo(Math.cos(rad(theta)), 6);
+      expect(g.raios[0].raioEsperado.minimo).toBeCloseTo(raio, 1);
+      expect(g.passo.vincos[0].raio).toBeCloseTo(raio / 1000, 12);
+      expect((g.avisos ?? []).map((a: any) => a.ref)).not.toContain('raioNaoCabe');
+    });
+  }
+  it('a 60 graus o apoio vai a 1/cos(60) = 2 vezes mais longe ao longo da aresta, e o apoio perpendicular é o mesmo da quina reta', () => {
+    const reta = cruzetaObliqua({ theta: 0, raio: 4 }); const obliqua = cruzetaObliqua({ theta: 60, raio: 4 });
+    expect(obliqua.raios[0].pontos[3].apoio).toBeCloseTo(reta.raios[0].pontos[3].apoio, 9);
+    const aoLongo = (g: any) => { const o = g.origens[Object.keys(g.origens).find((n) => /^quina_apoio1_z3_quina_z3_a100$/.test(n))!]; return o.distanciaNaAresta; };
+    expect(aoLongo(obliqua) / aoLongo(reta)).toBeCloseTo(2, 6);
+  });
+});
+
+/* ---- (g) as quinas que se encontram ---- */
+/* Uma caixa de meia aresta `lado` mm com cada face em n por n quadrados e as doze quinas como vincos de raio `raio`; os oito cantos são o encontro de três. */
+function caixa({ raio, lado = 200, n = 2, quais, raioDe }: { raio: number; lado?: number; n?: number; quais?: number[]; raioDe?: (i: number) => number }) {
+  const pontos: Record<string, number[]> = {}; const nome = (c: number[]) => `p${c.join('_')}`; const passo = lado / n;
+  const faces: string[][] = [];
+  for (const ax of [0, 1, 2]) for (const sg of [-1, 1]) {
+    const u = (ax + 1) % 3, v = (ax + 2) % 3;
+    const P = (i: number, j: number) => { const c = [0, 0, 0]; c[ax] = sg * n; c[u] = i; c[v] = j; return c; };
+    for (let i = -n; i < n; i++) for (let j = -n; j < n; j++) {
+      const q = [P(i, j), P(i + 1, j), P(i + 1, j + 1), P(i, j + 1)]; if (sg < 0) q.reverse();
+      for (const c of q) pontos[nome(c)] = c.map((x) => (x * passo) / 1000);
+      faces.push(q.map(nome));
+    }
+  }
+  const vincos: { nome: string; pontos: string[]; raio: number }[] = [];
+  for (const ax of [0, 1, 2]) for (const s1 of [-1, 1]) for (const s2 of [-1, 1]) {
+    const u = (ax + 1) % 3, v = (ax + 2) % 3; const linha: string[] = [];
+    for (let t = -n; t <= n; t++) { const c = [0, 0, 0]; c[ax] = t; c[u] = s1 * n; c[v] = s2 * n; linha.push(nome(c)); }
+    vincos.push({ nome: `v${ax}_${s1}_${s2}`, pontos: linha, raio: raioDe ? raioDe(vincos.length) : raio });
+  }
+  const r = inserirApoiosNosVincos({ pontos, faces, vincos: quais ? quais.map((i) => vincos[i]) : vincos, unidade: 1000, niveis: 3 });
+  return { ...r, todos: { ...pontos, ...r.pontos } as Record<string, number[]> };
+}
+function malhaDaCaixa(c: any, niveis: number) {
+  const nomes = Object.keys(c.todos); const idx = new Map(nomes.map((n, i) => [n, i]));
+  return subdividirCatmullClark({ vertices: nomes.map((n) => c.todos[n].map((x: number) => x * 1000)), faces: c.faces.map((f: string[]) => f.map((n) => idx.get(n))), vincos: [], niveis });
+}
+/* o raio da quina ao longo do eixo `ax` na quina +,+ (as faces u = lado e v = lado), no corte perpendicular em `c0` (mm) */
+function raioDaQuinaDaCaixa(m: any, ax: number, c0: number, lado = 200) {
+  const u = (ax + 1) % 3, v = (ax + 2) % 3; const pts: P2[] = [];
+  for (const f of m.faces) for (let q = 0; q < f.length; q++) {
+    const A = m.vertices[f[q]], B = m.vertices[f[(q + 1) % f.length]]; const da = A[ax] - c0, db = B[ax] - c0;
+    if ((da < 0) === (db < 0)) continue;
+    const t = da / (da - db); const p: P2 = [A[u] + t * (B[u] - A[u]), A[v] + t * (B[v] - A[v])];
+    if (p[0] > lado - 40 && p[1] > lado - 40 && !pts.some((w) => Math.hypot(w[0] - p[0], w[1] - p[1]) < 1e-7)) pts.push(p);
+  }
+  pts.sort((a, b) => (a[0] - a[1]) - (b[0] - b[1]));
+  return raioDoFilete(pts).raio as number;
+}
+
+describe('(g) as quinas com raio que se encontram: o canto de uma caixa, onde três quinas arredondadas se encontram', () => {
+  for (const raio of [6, 12]) {
+    it(`raio ${raio} mm nas doze quinas: o raio medido ao longo das três até 10 mm do canto é o pedido a 10%, e o canto é o de um cubo arredondado`, () => {
+      const c = caixa({ raio });
+      expect(c.avisos.map((a: any) => a.nome)).toEqual([]);
+      const m = malhaDaCaixa(c, 4);
+      const medidos: number[] = [];
+      for (const ax of [0, 1, 2]) for (const d of [200, 100, 50, 30, 20, 10]) {
+        /* d mm do canto (200, 200, 200): o corte em 200 - d ao longo do eixo */
+        const r = raioDaQuinaDaCaixa(m, ax, 200 - d + 0.01);
+        medidos.push(r);
+        expect(Math.abs(r / raio - 1), `eixo ${ax}, a ${d} mm do canto`).toBeLessThan(0.1);
+      }
+      expect(Math.max(...medidos) - Math.min(...medidos)).toBeLessThan(0.06 * raio);
+      /* o canto de um cubo arredondado: o ponto da malha mais perto do canto vivo fica a raio × (raiz de 3 − 1) dele, ao 10% */
+      const perto = Math.min(...m.vertices.map((p: number[]) => Math.hypot(200 - p[0], 200 - p[1], 200 - p[2])));
+      expect(Math.abs(perto / (raio * (Math.sqrt(3) - 1)) - 1)).toBeLessThan(0.1);
+    });
+  }
+  it('a gaiola dos apoios fecha: toda aresta tem duas faces em sentidos opostos, as faces são de quatro lados e cada um dos oito cantos tem a grade em três faces', () => {
+    const c = caixa({ raio: 6 });
+    const dirigidas = new Map<string, number>();
+    for (const f of c.faces) f.forEach((a: string, k: number) => { const k2 = `${a}>${f[(k + 1) % f.length]}`; dirigidas.set(k2, (dirigidas.get(k2) ?? 0) + 1); });
+    for (const [k, n] of dirigidas) { const [a, b] = k.split('>'); expect(n, k).toBe(1); expect(dirigidas.has(`${b}>${a}`), k).toBe(true); }
+    expect(new Set(c.faces.map((f: string[]) => f.length))).toEqual(new Set([4]));
+    /* a linha de cada vinco segue só arestas da gaiola nova */
+    for (const v of Object.values(c.linhas) as string[][]) for (let k = 0; k + 1 < v.length; k++) expect(dirigidas.has(`${v[k]}>${v[k + 1]}`) || dirigidas.has(`${v[k + 1]}>${v[k]}`)).toBe(true);
+    const doCanto = Object.values(c.origens).filter((o: any) => o.tipo === 'canto') as any[];
+    expect(new Set(doCanto.map((o) => o.ponto)).size).toBe(8);
+    for (const ponto of new Set(doCanto.map((o) => o.ponto))) expect(new Set(doCanto.filter((o) => o.ponto === ponto).map((o) => o.face)).size).toBe(3);
+  });
+  it('sem falha de ondulação no canto e sem face fina: a normal não dá salto no canto maior que o da quina reta, e nenhuma face da malha é lasca', () => {
+    const c = caixa({ raio: 6 });
+    const m = malhaDaCaixa(c, 3);
+    const normal = (f: number[]) => { const n = [0, 0, 0]; for (let k = 0; k < f.length; k++) { const a = m.vertices[f[k]], b = m.vertices[f[(k + 1) % f.length]]; n[0] += (a[1] - b[1]) * (a[2] + b[2]); n[1] += (a[2] - b[2]) * (a[0] + b[0]); n[2] += (a[0] - b[0]) * (a[1] + b[1]); } const l = Math.hypot(n[0], n[1], n[2]); return n.map((x) => x / l); };
+    const normais = m.faces.map(normal); const porAresta = new Map<string, number[]>();
+    m.faces.forEach((f: number[], i: number) => f.forEach((a, k) => { const b = f[(k + 1) % f.length]; const key = a < b ? `${a},${b}` : `${b},${a}`; (porAresta.get(key) ?? porAresta.set(key, []).get(key)!).push(i); }));
+    const centro = (f: number[]) => f.reduce((s, v) => [s[0] + m.vertices[v][0] / f.length, s[1] + m.vertices[v][1] / f.length, s[2] + m.vertices[v][2] / f.length], [0, 0, 0]);
+    let noCanto = 0, naQuina = 0;
+    for (const [, fs] of porAresta) {
+      if (fs.length !== 2) continue;
+      const c0 = centro(m.faces[fs[0]]); const jump = (Math.acos(Math.max(-1, Math.min(1, normais[fs[0]].reduce((s: number, x: number, k: number) => s + x * normais[fs[1]][k], 0)))) * 180) / Math.PI;
+      const longe = [0, 1, 2].filter((k) => Math.abs(c0[k]) > 200 - 30).length;
+      if (longe === 3) noCanto = Math.max(noCanto, jump); else if (longe === 2 && Math.abs(c0[0]) < 100 + 1 && Math.abs(c0[1] + c0[2]) < 1e9) naQuina = Math.max(naQuina, jump);
+    }
+    expect(noCanto).toBeGreaterThan(0);
+    expect(noCanto).toBeLessThanOrEqual(naQuina * 1.3);
+    /* sem face fina: a malha entregue pelo passo, com a espessura da chapa, não tem lasca */
+    const nomes = Object.keys(c.todos);
+    const neutro = nucleo([['subdivisao', { origemId: 1, vertices: nomes, faces: c.faces, vincos: [], niveis: 2 }]], {}, c.todos);
+    expect(neutro.orfaos).toEqual([]);
+    expect(analisarTopologia({ vertices: neutro.V, faces: neutro.F }).achados.filter((a: any) => a.codigo === 'face-fina')).toEqual([]);
+  });
+  it('três quinas de raios diferentes (6, 8 e 10 mm) no mesmo canto também fecham, e cada uma mede o seu a 10% a 50 mm do canto ou mais (a 30 mm, a 20%: a transição entre raios diferentes leva uns três raios)', () => {
+    const raios = [6, 8, 10];
+    const c = caixa({ raio: 6, quais: [3, 7, 11], raioDe: (i) => raios[Math.floor(i / 4)] });
+    expect(c.avisos.map((a: any) => a.nome)).toEqual([]);
+    const m = malhaDaCaixa(c, 4);
+    for (const ax of [0, 1, 2]) for (const d of [100, 50, 30]) expect(Math.abs(raioDaQuinaDaCaixa(m, ax, 200 - d + 0.01) / raios[ax] - 1), `eixo ${ax}, a ${d} mm`).toBeLessThan(d >= 50 ? 0.1 : 0.2);
+  });
+});
+
+/* ---- (h) a quina do teto que termina na quina da cabine ---- */
+describe('(h) a quina ao longo de uma estação que termina na quina ao longo de uma coluna: o canto do teto', () => {
+  /* a seção em x, y com o teto a y(z) (plano até z = 0,3 e a 25 graus depois) e a lateral que desce da quina: a quina corre ao longo de z (e dobra em z = 0,3),
+     e a quina da estação z = 0,3, do alto da coluna `a500` até a quina, é a de um teto que vira para-brisa */
+  const k = Math.tan(rad(25)); const zs = [-0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
+  const yDe = (z: number) => -k * Math.max(0, z - 0.3);
+  const montar = (rQuina: number, rTopo: number) => gaiolaPorEstacoes({ eixo: 'z', niveis: 3,
+    estacoes: zs.map((z, i) => { const y = yDe(z); return { nome: `e${i}`, em: z, colunas: [
+      ...[0.5, 0.3, 0.1].map((d) => ({ nome: `a${d * 1000}`, em: [-d, y] })), { nome: 'quina', em: [0, y] }, ...[0.1, 0.3, 0.5].map((d) => ({ nome: `b${d * 1000}`, em: [0, y - d] }))] }; }),
+    vincos: [{ nome: 'quina', coluna: 'quina', raio: rQuina }, { nome: 'topo', estacao: 'e7', de: 'a500', ate: 'quina', raio: rTopo }] });
+  const cortar = (m: any, eixo: number, c0: number, filtro: (p: number[]) => boolean) => {
+    const pts: number[][] = [];
+    for (const f of m.faces) for (let q = 0; q < f.length; q++) {
+      const A = m.vertices[f[q]], B = m.vertices[f[(q + 1) % f.length]]; const da = A[eixo] - c0, db = B[eixo] - c0;
+      if ((da < 0) === (db < 0)) continue;
+      const t = da / (da - db); const p = [0, 1, 2].map((d) => A[d] + t * (B[d] - A[d]));
+      if (filtro(p) && !pts.some((w) => Math.hypot(w[0] - p[0], w[1] - p[1], w[2] - p[2]) < 1e-7)) pts.push(p);
+    }
+    return pts;
+  };
+  it('o vinco da estação chega à quina (a linha dele segue as arestas que os apoios da quina criaram), sem recusa nem aviso, e as duas medem o pedido até o canto', () => {
+    const g = montar(4, 15);
+    expect(g.avisos ?? []).toEqual([]);
+    const linhaDoTopo = g.passo.vincos.find((v: any) => v.nome === 'topo').pontos;
+    expect(linhaDoTopo[linhaDoTopo.length - 1]).toBe('e7_quina');
+    expect(linhaDoTopo.some((n: string) => n.startsWith('quina_apoio1_'))).toBe(true);
+    /* a linha da quina também ganha os pontos que o apoio do teto pôs nela, e continua sequência de arestas da gaiola */
+    const arestas = new Set<string>(); for (const f of g.passo.faces) f.forEach((a: string, i: number) => arestas.add(`${a}>${f[(i + 1) % f.length]}`));
+    for (const v of g.passo.vincos) for (let i = 0; i + 1 < v.pontos.length; i++) expect(arestas.has(`${v.pontos[i]}>${v.pontos[i + 1]}`) || arestas.has(`${v.pontos[i + 1]}>${v.pontos[i]}`), `${v.nome}: ${v.pontos[i]}`).toBe(true);
+    const nomes = g.passo.vertices; const idx = new Map(nomes.map((n: string, i: number) => [n, i]));
+    const m = subdividirCatmullClark({ vertices: nomes.map((n: string) => g.pontos[n].map((x: number) => x * 1000)), faces: g.passo.faces.map((f: string[]) => f.map((n) => idx.get(n))), vincos: [], niveis: 4 });
+    /* o teto: o corte x = const, em (z, y), a 15, 25 e 100 mm do canto (x = 0) */
+    for (const x0 of [-300, -100, -60, -25, -15]) {
+      const perfil = cortar(m, 0, x0 + 0.01, (q) => Math.abs(q[2] - 300) < 120).map((q) => [q[2], q[1]]).sort((a, b) => a[0] - b[0]);
+      expect(Math.abs((raioDoFilete(perfil).raio as number) / 15 - 1), `a ${-x0} mm do canto`).toBeLessThan(0.1);
+    }
+    /* a quina da cabine, antes do canto (z até 200) e depois dele, a 25 mm ou mais */
+    for (const z0 of [-300, -100, 100, 200]) {
+      const perfil = cortar(m, 2, z0 + 0.01, (q) => q[0] > -60 && q[1] > yDe(z0 / 1000) * 1000 - 60).map((q) => [q[0], q[1]]).sort((a, b) => (a[0] - a[1]) - (b[0] - b[1]));
+      expect(Math.abs((raioDoFilete(perfil).raio as number) / 4 - 1), `z = ${z0}`).toBeLessThan(0.1);
+    }
+  });
+  it('é determinística, e o vinco do canto que corre sobre a aresta de outro é recusado com aviso', () => {
+    expect(JSON.stringify(montar(4, 15))).toBe(JSON.stringify(montar(4, 15)));
+    const c = caixa({ raio: 6, quais: [0] });
+    const dobrada = inserirApoiosNosVincos({ pontos: c.todos, faces: c.faces, unidade: 1000, vincos: [
+      { nome: 'um', pontos: ['p-2_2_2', 'p-1_2_2', 'p0_2_2'], raio: 6 }, { nome: 'dois', pontos: ['p-1_2_2', 'p0_2_2', 'p1_2_2'], raio: 6 }] });
+    expect(dobrada.avisos.map((a: any) => a.nome)).toContain('vincoCruzaOutroComRaio');
+    expect(dobrada.aplicados).toEqual(['um']);
   });
 });

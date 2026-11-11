@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:0bae44b6cf93886ba56390ad7deb431c146bf528b2a1010c3d7d1ca261d327c0",
+  "assinatura": "sha256:456cd46e49f06c8bd61c9c607a54cbf49ffb795bc721a5b6034b09a86192cf30",
   "total": 41,
   "operacoes": [
     {
@@ -2146,6 +2146,20 @@
                 }
               ],
               "description": "Perfil [u, v] em metros: v pela normal, com v = 0 na linha, e u para a esquerda de quem segue a linha; lista de pontos, {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno}. Na chapa com espessura, a parte de v negativo entra nela, menos que a espessura."
+            },
+            "refinar": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Só sobre a superficie de um passo subdivisao: níveis a mais, de 0 (padrão) a 4, em que a linha segue a curva da borda livre da superfície limite. A linha de hoje passa pelos vértices da malha da chapa, e o canto arredondado de um vão sai em poucos segmentos retos (a 2 níveis, cerca de 25 graus entre trechos num canto de janela); com `refinar: 2` a linha é a B-spline da borda refinada mais 2 níveis, com os mesmos pontos e normais interpolados pela mesma regra (os cantos declarados e as pontas da linha aberta ficam fixos). Só serve à borda livre de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao), e a linha segue a malha que o passo entregou, pose incluída."
             },
             "aba": {
               "type": "object",

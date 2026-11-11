@@ -28,6 +28,13 @@
    faixas se cortam no plano que passa pelo ponto da linha, pela normal e pelo encontro das duas bordas de fora (a meia-esquadria
    de faixas de larguras diferentes), e a junta é um anel só, soldado às duas.
 
+   O REFINO DA BORDA. A linha que passa pelos vértices da malha da chapa faz do canto arredondado de um vão uns poucos segmentos retos (a 2 níveis,
+   uns 25 graus entre trechos). `refinar: k` (de 0, o padrão, a 4) segue a curva da borda livre da superfície limite k níveis além dos da chapa: a borda de
+   Catmull-Clark é a B-spline cúbica dos vértices dela, e cada nível põe um ponto no meio de cada trecho e leva cada ponto de dentro a (a + 6 b + c) / 8, com os
+   cantos declarados (`cantos` do passo) e as pontas da linha aberta fixos; os pontos e as normais passam pela mesma conta. O giro entre segmentos cai pela
+   metade a cada nível, a linha é a borda da malha de `niveis + k` níveis da mesma gaiola, e o friso continua seguindo a malha entregue, pose incluída. Só vale
+   na borda livre de um vão ou do contorno (`bordaDoVao`); aresta de duas faces na linha grita. Sem a opção a saída é a de antes.
+
    A BORDA DE UMA ABERTURA. Com `superficie: { op: 'aberturaPorContorno', id }`, a linha é a borda de fora do vão que aquele passo
    abriu, inteira e fechada (`linha: { nome }`, sem pontos), e a normal é a da pele em volta de cada ponto (`bordaDaAbertura`).
    A borda tem os pontos que o corte deixou, alguns a frações de milímetro de um canto vivo; o ponto que deixa um trecho mais

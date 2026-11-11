@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1933 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1936 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -442,6 +442,7 @@
 
 - `CICLO-1.md` — Sedã em alta definição, ciclo 1: o corpo de baixo e o capô por dois caminhos
 - `CICLO-2.md` — Sedã em alta definição, ciclo 2: o corpo de baixo e o capô pelo caminho A, com as ferramentas novas
+- `CICLO-3.md` — Sedã em alta definição, ciclo 3: o andar de cima sobre o de baixo
 
 ## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
 
@@ -1027,6 +1028,7 @@
 - `friso-aba.test.mjs` — friso-aba.test.mjs — a aba que dobra a borda livre de um vão (fatia 25, item 6 do plano da carroceria por subdivisão). A chapa de referência dobra uns 90 gra…
 - `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão (e o da aba da fatia 25): na chapa curva com vão de `f…
 - `friso-largura-variavel.test.mjs` — friso-largura-variavel.test.mjs — o friso com a largura (e o ângulo da aba) como função da posição ao longo da linha, por pontos nomeados, e o canto vivo em …
+- `friso-refinar.test.mjs` — friso-refinar.test.mjs — a moldura que segue a curva da borda do vão na superfície limite (fatia 4c do plano do núcleo para qualquer mecanismo, atrito 4 do c…
 - `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
 - `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
 - `gaiola-aneis-gota.test.mjs` — gaiola-aneis-gota.test.mjs — os anéis de gaiola no vão real de uma carroceria: a gota estreita, o recuo por lado e a abertura que é a própria borda
@@ -1978,6 +1980,7 @@
 ## procedural/pecas/sedan-chassi-e-lataria/alta-definicao/
 
 - `alvo.mjs` — alvo.mjs: o alvo do segundo ciclo de alta definição do sedã (fatia 4c do plano do núcleo para qualquer mecanismo). O trecho é o do primeiro ciclo: o corpo de…
+- `andar-de-cima.esboco.mjs` — andar-de-cima.esboco.mjs: o terceiro ciclo de alta definição do sedã. O andar de baixo do segundo ciclo (o corpo de baixo do lado direito e a metade direita …
 - `caminho-a-gaiola-da-casca.esboco.mjs` — caminho-a-gaiola-da-casca.esboco.mjs: o segundo ciclo de alta definição do sedã, pelo caminho A (a grade de estações por colunas). O trecho é o corpo de baix…
 - `exportar-trecho.mjs` — exportar-trecho.mjs: grava em OBJ, em metro, as partes pedidas de um esboço ou de uma receita, para a vista de três quartos lado a lado deste ciclo. `npm run…
 

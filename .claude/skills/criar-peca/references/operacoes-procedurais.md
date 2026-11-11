@@ -463,6 +463,30 @@ sem `--pedido`) e para a ondulação, que trata a faixa entre os apoios como fei
 aceita `raio` nos vincos de `trecho`, `entre` e `laco`, e põe os apoios depois da compensação e antes da
 conferência da espessura, que refina a gaiola com eles. A `gaiolaPorRede` ainda não aceita `raio`;
 `npm run capacidade -- apoioDoVinco` dá a ficha da conta.
+
+O raio pedido é o do corte perpendicular ao vinco, mesmo quando as estações o
+cortam na diagonal: a coluna de uma cabine inclinada, ou a quina do capô com a
+frente. O ajudante lê a dobra no plano perpendicular ao vinco e mede a
+distância do apoio perpendicular a ele, sobre a face (a distância ao longo da
+aresta é a perpendicular dividida pelo seno do ângulo entre a aresta e o vinco),
+e por isso `raio: 4` realiza 4 mm numa quina que corta as estações a 0, 20, 40
+ou 60 graus, sem a compensação por estação que o ciclo 3 do sedã fez à mão (o
+passo guarda o pedido, e `raio:aresta` o confere sem ressalva). Duas quinas com
+raio podem se encontrar num ponto da gaiola, e cada uma põe os apoios dela sobre
+as arestas que saem dele, mesmo que sejam a linha da outra: o vinco ao longo de
+uma estação que termina na quina da cabine (`de: 'centro', ate: 'quina'`, no
+canto do teto) e as três quinas de um canto de caixa são o caso. Numa face que
+tem as duas linhas no mesmo vértice, o canto é uma grade de células entre as
+colunas de um vinco e as do outro, e a superfície de subdivisão faz dele o canto
+de um cubo arredondado (o ponto da malha mais perto do canto vivo fica a
+raio × (raiz de 3 − 1) dele); apoios de dois vincos no mesmo ponto, à mesma
+distância (dois raios iguais), são um ponto só. A linha do vinco no passo ganha
+os pontos que o outro vinco pôs sobre ela, para continuar sequência de arestas
+da gaiola nova, e a face de apoio da quina que o outro vinco atravessa se divide
+em quadriláteros entre os pontos dele. Os dois vincos não podem dividir uma
+aresta (`vincoCruzaOutroComRaio`: o segundo fica sem apoio), e perto do canto,
+numa extensão de uns três raios, o raio realizado se afasta do pedido quando os
+dois raios diferem (6 e 10 mm: de 17% a 30 mm do canto, dentro de 10% a 50).
 `cantos: ['quina']` fixa o ponto como canto vivo, o vinco de vértice 1 do
 Blender. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é espelhada
 antes de subdividir para a costura sair lisa, com os vincos e cantos
@@ -535,6 +559,21 @@ cruzam, a primeira ou a última coluna sem ligação e face de mais de cinco
 lados), o vão que deixa ponto sem face, o vinco sobre aresta que a fusão ou o
 vão tirou, o ponto com x < 0 na simetria e a aresta no plano x = 0 com duas
 faces.
+
+A ponta em que a lateral some, como o pé da coluna A de uma cabine, onde a
+lateral desce com o para-brisa até altura zero e a quina encontra o peitoril, se
+fecha com `de`, sem opção nova: com as estações de z constante, as colunas da
+lateral ficariam todas no mesmo ponto da última estação, com faces degeneradas, e
+o passo recusa a espessura ("a superfície se dobra sobre si"). Funda as colunas
+duas a duas nas duas últimas estações: na penúltima, `{ nome: 'qm', de: ['meio',
+'quina'], em: [x, 0.75 * h] }` junto do `pe`; na última, `{ nome: 'p', de: ['pe',
+'qm'], em: [x, 0] }`, uma coluna só no pé. As fusões fecham triângulos, a chapa
+sai com espessura sem face fina nem órfão, e o vinco com `nitidez` ou `raio` segue
+a coluna até a última estação em que ela existe (a penúltima a funde; o aviso
+`apoioMaiorQueMetadeDaFace` diz que a quina já é mais curta que o apoio ali). A
+fixture está em `gaiola-por-estacoes.test.mjs` ("a ponta em que a lateral some");
+acabar a chapa onde a lateral ainda tem 40 mm deixa um vão aberto no lugar da
+ponta, e não é preciso.
 
 Para adensar só um trecho, como uma borda enrolada ou a volta de um friso na
 ponta de um vão, declare uma região e marque com `regiao` as estações parciais
@@ -965,7 +1004,7 @@ Dois modos de lâmina. `modo: 'vista'` (padrão) extruda a linha ao longo do eix
 
 Linha de vão como curva 3D, para a quina arredondada: `linhas[i].curva: [[x, y, z], ...]` (mm, aberta ou fechada) no lugar de `eixo` e `pontos`. A linha desenhada numa vista não sobe uma quina arredondada (a porta que cruza a quina da cintura, o capô que desce pela quina da frente): o modo vista recusa ("inclinada 89 graus") ou deixa degrau, e o modo superfície recusa ("raio rasante"), porque o raio da vista fica tangente à chapa. Na curva cada ponto vai à pele de fora pelo ponto mais próximo da malha (grade espacial; `distanciaDaCurva`, padrão 3 vãos, recusa o ponto longe, com o número dele), a normal é a interpolação das normais alisadas dos vértices do triângulo, a curva é reamostrada e bipartida onde a normal gira, e a lâmina é varrida com as paredes normais à chapa e as mesmas conferências do modo superfície (autointerseção, proximidade de si mesma, folga medida e corrigida, profundidade; o fundo e o topo da seção encolhem onde o filete é fechado, para as seções vizinhas não se cruzarem). A curva aberta termina na borda e dá `alem` (mm, ou [início, fim]) para a ponta passar dela, e a que sai da chapa sem `alem`, ou que não separa a chapa em dois pedaços, é recusada com o ponto. Duas curvas em T, em L e a janela fechada que cruza a quina funcionam como no modo superfície; `medidas.curvas` traz as estações e o desvio da curva à pele. `linhas[i].vistas: [{ eixo, pontos, lado? }]` continua a linha de uma vista à outra: cada trecho vai à chapa pelo raio da vista dele e a emenda é bipartida sobre a quina. Em `procedural/nucleo/paineis-por-vaos-curva.test.ts`, na chapa em L de `procedural/nucleo/fixtures/chapa-em-l-prova.js`, a folga medida fica em 4,02 mm (4,01 a 4,03 com o raio que afina de 6 a 3 mm) ao longo da curva, quina incluída, com degrau 0 onde o raio é constante.
 
-`curvaDaGaiola`, de `procedural/nucleo/curva-da-gaiola.js` (`npm run capacidade -- curvaDaGaiola`), tira a curva da gaiola sem coordenada: `curvaDaGaiola(gaiola, { estacao: 7.4, de: 'soleira', ate: 'teto' })` devolve `{ curva, fechada }` em mm, sobre a malha refinada da `subdivisao` (use os mesmos `niveis` e `borda` da chapa: `{ niveis, borda: 'cantos' }`; `unidade: 'mm'` para a gaiola escrita em mm). A estação se dá por nome, índice fracionário (7,4 é 0,4 do caminho da 7 à 8), `{ em }` ou `{ entre: [a, b], fracao }`; `{ coluna: 'cintura', de, ate }` anda ao longo de uma coluna (estações com fração nas pontas), `{ coluna: { entre: ['a', 'b'], fracao } }` fica entre duas, e na gaiola por laços `laco` e a coluna `trecho.k` fazem o mesmo, com a volta fechada. As colunas de apoio do raio em mm entram na linha. A curva é a da subdivisão, que aproxima os pontos da gaiola: sem `medidas` a linha de índice 5 não cai em z = 690 se as estações vizinhas não são equidistantes (cerca de 8 mm no sedã), e a posição de projeto se dá por pontos da curva, ou por `medidas` na gaiola.
+`curvaDaGaiola`, de `procedural/nucleo/curva-da-gaiola.js` (`npm run capacidade -- curvaDaGaiola`), tira a curva da gaiola sem coordenada: `curvaDaGaiola(gaiola, { estacao: 7.4, de: 'soleira', ate: 'teto' })` devolve `{ curva, fechada }` em mm, sobre a malha refinada da `subdivisao` (use os mesmos `niveis` e `borda` da chapa: `{ niveis, borda: 'cantos' }`; `unidade: 'mm'` para a gaiola escrita em mm). A estação se dá por nome, índice fracionário (7,4 é 0,4 do caminho da 7 à 8), `{ em }` ou `{ entre: [a, b], fracao }`; `{ borda: 'janela' }` dá a borda inteira de um vão (a de `bordaDoVao`) nos níveis da malha, fechada na janela e aberta no vão de borda livre, e com `niveis` maior que o da chapa é a curva da borda da superfície limite mais refinada; `{ coluna: 'cintura', de, ate }` anda ao longo de uma coluna (estações com fração nas pontas), `{ coluna: { entre: ['a', 'b'], fracao } }` fica entre duas, e na gaiola por laços `laco` e a coluna `trecho.k` fazem o mesmo, com a volta fechada. As colunas de apoio do raio em mm entram na linha. A curva é a da subdivisão, que aproxima os pontos da gaiola: sem `medidas` a linha de índice 5 não cai em z = 690 se as estações vizinhas não são equidistantes (cerca de 8 mm no sedã), e a posição de projeto se dá por pontos da curva, ou por `medidas` na gaiola.
 
 `limpar` (padrão ligado nas linhas por superfície e por curva, desligado no modo vista): o passo `limparLascas` entra depois do `subtrair` e antes dos `parte`, com a tolerância de 0,01 mm (`true`, ou `{ tolerancia }`); `medidas.lascasAntes` e `lascasRestantes` contam as faces finas do corte.
 
@@ -1089,6 +1128,13 @@ Com `perfil`, só `largura` vale, e é a extensão em u do perfil: o perfil de e
 O degrau de largura vale só num canto vivo, a partir de 10 graus de giro da linha (`GIRO_MINIMO_DO_DEGRAU`, em `procedural/nucleo/friso.js`), e as duas faixas se cortam na meia-esquadria: o plano que passa pelo ponto da linha, pela normal e pelo encontro das duas bordas de fora, que com larguras iguais é o plano bissetor de sempre. Cada ponto do perfil cai nesse plano no mesmo lugar visto de uma faixa e da outra, e por isso a junta tem um anel só, soldado às duas faixas, sem entalhe, furo nem face côncava; o deslocamento do anel ao longo da tangente bissetora é u × (largura antes − largura depois) / (2 sen φ), com φ a metade do giro. Grita com o nome e o ponto: campo desconhecido, ponto que não está na linha ou passa mais de uma vez, valor ou degrau malformado, `valor` junto de `antes` e `depois`, degrau na ponta da linha aberta, degrau numa linha que segue reta ou vira menos de 10 graus (`a largura muda em degrau neste ponto, e a linha só vira 8 graus`), degrau na aba e ponto de degrau no plano de simetria. Na simetria em `x` a cópia espelhada leva a mesma variação, e na linha emendada pela imagem o ponto espelhado troca `antes` e `depois`, porque a linha o percorre ao contrário.
 
 A chapa de prova da moldura de largura variável é `procedural/nucleo/fixtures/friso-prova.js`. A conferência de malha com triangulação acusa `face-torta`, como o tubo da mesma chapa. Sem `variacao` o friso sai bit a bit como antes: o teste confere o hash do neutro dos três passos de prova anteriores a esta opção. A prova está em `procedural/nucleo/friso-largura-variavel.test.mjs`, e o contato declarado da moldura com a chapa em `friso-contato.test.mjs`.
+
+O `friso` sobre a borda de um vão passa pelos vértices da malha que a chapa entregou, e o canto arredondado de uma janela sai em poucos segmentos retos (a 2
+níveis, uns 25 graus entre trechos). `refinar: 2` (de 0, o padrão, a 4) faz a linha seguir a curva da borda livre da superfície limite, dois níveis além
+dos da chapa: a B-spline da borda refinada, com os pontos e as normais passando pela mesma conta, e os cantos declarados e as pontas da linha aberta fixos. O giro
+entre segmentos vizinhos cai de 28 para 7 graus numa janela de faces de 50 mm (14 com `refinar: 1`; cada nível divide por dois), a linha é a borda da malha de
+`niveis + refinar` níveis da mesma gaiola a 1e-9 m, e a moldura continua assentada na chapa e no vidro (os contatos `atravessa` do sedã saem os mesmos). Só vale
+na borda livre de um vão ou do contorno, pelos nomes da gaiola (`bordaDoVao`), e recusa com o motivo a linha com aresta de duas faces; sem a opção o friso sai bit a bit como antes.
 
 ### A moldura em volta de um vão: `vaos` da receita
 

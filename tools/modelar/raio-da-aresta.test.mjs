@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { perfilDoApoio, raioDoFilete } from '../../procedural/nucleo/apoio-do-vinco.js';
+import { gaiolaPorEstacoes } from '../../procedural/nucleo/gaiola-por-estacoes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { CAPACIDADES, executar as fichas } from './capacidade.mjs';
 import { JANELA_FATOR, JANELA_PISO_MM, JANELA_TETO_MM, amostrasDaLinha, executar, janelaDoPedido, linhaDaAresta, linhasDosVincos, medirAresta, medirLinhas, medirPerfil, menorRaioDeCurvatura, pedidoAoLongoDaLinha, prepararMalha } from './raio-da-aresta.mjs';
@@ -244,5 +245,26 @@ describe('o comando', () => {
     expect(r.stderr).toMatch(/--aresta=x,y,z:x,y,z ou --automatico/);
     expect(CAPACIDADES.raioDaAresta.arquivo).toBe('tools/modelar/raio-da-aresta.mjs');
     for (const termo of ['raio', 'aresta', 'filete', 'esboço']) expect((await fichas([termo])).stdout).toContain('raioDaAresta');
+  });
+});
+
+/* A quina que corta as estações na diagonal (a coluna A de uma cabine): o ajudante põe o apoio à distância perpendicular ao vinco, e o comando corta pelo
+   plano perpendicular ao vinco 3D, e não pelo da estação; com o pedido de projeto direto, sem compensação, o raio medido é o pedido. */
+describe('a quina oblíqua medida pelo comando', () => {
+  const receitaObliqua = (theta, raio) => {
+    const tg = Math.tan((theta * Math.PI) / 180); const ds = [0.5, 0.3, 0.1];
+    const colunas = [...ds.map((d) => ({ nome: `a${d * 1000}`, em: [-d, 0, -d * tg] })), { nome: 'quina', em: [0, 0, 0] }, ...[...ds].reverse().map((d) => ({ nome: `b${d * 1000}`, em: [0, d, d * tg] }))];
+    const g = gaiolaPorEstacoes({ eixo: 'z', estacoes: [-0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6].map((z, k) => ({ nome: `z${k}`, em: z, colunas })), vincos: [{ nome: 'quina', coluna: 'quina', raio }], niveis: 3 });
+    return { PARAMS: {}, TOPO: g.pontos, PASSOS: [['subdivisao', { origemId: 1, ...g.passo, niveis: 3, borda: 'cantos' }], ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }]] };
+  };
+  it.each([[0, 4], [20, 8], [40, 4], [60, 8]])('a quina a %i graus das estações, raio %i mm: nenhum corte foge do pedido a 20%, e o raio mediano é o pedido a 5%', (theta, raio) => {
+    const { neutro, entrada } = executarReceita(receitaObliqua(theta, raio));
+    const linhas = linhasDosVincos(entrada);
+    const [aresta] = medirLinhas(neutro, linhas, { pedidos: {} }).arestas;
+    expect(aresta).toMatchObject({ pedidoMm: raio, foraDoPedido: 0, sobPedido: true });
+    expect(Math.abs(aresta.raioMm.mediano - raio) / raio).toBeLessThan(0.05);
+    expect(aresta.anguloDaDobraGraus.mediano).toBeCloseTo(90, 0);
+    /* o corte é pela perpendicular à quina (a tangente é z), qualquer que seja a inclinação da estação */
+    for (const a of amostrasDaLinha(linhas[0].pontos, 50).amostras) { expect(a.t[2]).toBeCloseTo(1, 9); expect(Math.hypot(a.t[0], a.t[1])).toBeLessThan(1e-9); }
   });
 });

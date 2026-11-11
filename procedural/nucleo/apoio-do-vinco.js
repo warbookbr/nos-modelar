@@ -13,6 +13,8 @@
  *   niveis: níveis da subdivisão, para o aviso de arco com poucos segmentos.
  *   colunas: colunas de apoio por lado (colunasDeApoio dá o número que mantém a razão entre colunas em 4).
  * devolve: { cabe, apoio, nitidez: 0, raio, colunas, razao, distancias, avisos }; raioDoFilete(perfil) mede um corte da malha.
+ *   inserirApoiosNosVincos(...) põe as colunas na gaiola: a distância é perpendicular ao vinco, sobre a face (a quina que corta as estações na diagonal realiza o
+ *   raio pedido), e dois vincos com raio podem se encontrar num ponto (o canto de uma caixa, o canto do teto), com a grade do canto entre as colunas deles.
  * exemplo:
  *   apoioDoVinco({ angulo: 90, raio: 6, vizinho: 100 })
  * peça: procedural/pecas/sedan-chassi-e-lataria/alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs
