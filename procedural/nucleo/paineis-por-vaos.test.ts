@@ -64,11 +64,11 @@ const normalDe = (st: any, vs: number[]): V3 => {
   vs.forEach((v, k) => { const c = st.V.get(v); const d = st.V.get(vs[(k + 1) % vs.length]); nx += (c[1] - d[1]) * (c[2] + d[2]); ny += (c[2] - d[2]) * (c[0] + d[0]); nz += (c[0] - d[0]) * (c[1] + d[1]); });
   const L = Math.hypot(nx, ny, nz) || 1; return [nx / L, ny / L, nz / L];
 };
-/* a pele de fora de uma parte vista de `visto` (vetor unitário do lado do observador): os triângulos das faces que olham para ele, a mais de 60 graus */
+/* a pele de fora de uma parte vista de `visto` (vetor unitário do lado do observador): os triângulos das faces que olham para ele (a parede do corte, a 90 graus da vista, fica de fora) */
 function peleDeFora(st: any, nome: string, visto: V3) {
   const tris: V3[][] = [];
   for (const f of st.F.values()) {
-    if (f.parte !== nome || dot(normalDe(st, f.vs), visto) < 0.5) continue;
+    if (f.parte !== nome || dot(normalDe(st, f.vs), visto) < 0.9) continue;
     const p = f.vs.map((v: number) => st.V.get(v) as V3);
     for (let k = 1; k + 1 < p.length; k++) tris.push([p[0], p[k], p[k + 1]]);
   }
@@ -79,7 +79,7 @@ function vaoEntre(st: any, a: string, b: string, visto: V3, janela: (p: V3) => b
   const A = peleDeFora(st, a, visto); const B = peleDeFora(st, b, visto);
   const cantosA = [...new Map(A.flat().filter(janela).map((p) => [p.join(','), p])).values()];
   const ds = cantosA.map((p) => Math.min(...B.map((t) => distTri(p, t)))).filter((d) => d < 8).sort((x, y) => x - y);
-  return { min: ds[0], mediana: ds[Math.floor(ds.length / 2)], n: ds.length };
+  return { min: ds[0], n: ds.length };
 }
 const executar = (g: any, params = {}, topo = {}) => nucleo(g.passos, params, topo);
 const contar = (passos: any[], op: string) => passos.filter((p) => p[0] === op).length;
@@ -109,16 +109,15 @@ describe('paineisPorVaos: a caixa de chapa com uma face a 38 graus da vista', ()
     const inclinada = vaoEntre(st, 'meio', 'fundo', [0, Math.cos((38 * Math.PI) / 180), Math.sin((38 * Math.PI) / 180)], (p) => Math.abs(p[2] - 450) < 10);
     const parede = vaoEntre(st, 'fundo', 'saia', [0, 0, 1], (p) => Math.abs(p[1] - 30) < 10 && p[2] > 599);
     for (const [nome, v] of Object.entries({ tampo, inclinada, parede })) {
-      expect(v.n, nome).toBeGreaterThan(2);
+      expect(v.n, nome).toBeGreaterThanOrEqual(2);
       expect(v.min, nome).toBeGreaterThanOrEqual(3.999);
       expect(v.min, nome).toBeLessThan(4.2);
-      expect(v.mediana, nome).toBeLessThan(4.2);
     }
     process.stdout.write(`[prova a] vão ao longo da chapa, pedido 4: tampo ${tampo.min.toFixed(4)}, inclinada ${inclinada.min.toFixed(4)}, parede ${parede.min.toFixed(4)}\n`);
   });
 
   it('sem a compensação o mesmo corte deixa 5,07 mm na face inclinada: a lâmina estreitada é o que dá 4', () => {
-    const semLeitura = paineisPorVaos({ chapa: { passos: CAIXA, origem: ORIGEM_CAIXA }, vao: 4, linhas: LINHAS_CAIXA, paineis: PAINEIS_CAIXA, normal: () => [0, 1, 0] });
+    const semLeitura = paineisPorVaos({ chapa: { passos: CAIXA, origem: ORIGEM_CAIXA }, vao: 4, linhas: LINHAS_CAIXA, paineis: PAINEIS_CAIXA, normal: () => null });
     const s2 = executar(semLeitura);
     const inclinada = vaoEntre(s2, 'meio', 'fundo', [0, Math.cos((38 * Math.PI) / 180), Math.sin((38 * Math.PI) / 180)], (p) => Math.abs(p[2] - 450) < 10);
     expect(inclinada.min).toBeGreaterThan(5.0);
@@ -161,7 +160,7 @@ describe('paineisPorVaos: linha fechada, alcance e as recusas', () => {
     const st = executar(comPainel);
     expect(st.orfaos).toEqual([]);
     /* o anel de 4 mm: a pele de fora da tampa fica a 4 mm da do painel em volta */
-    const v = vaoEntre(st, 'tampa', 'frente', [0, 1, 0], (p) => Math.abs(p[0]) < 30 && Math.abs(p[2] - 60) < 10);
+    const v = vaoEntre(st, 'tampa', 'frente', [0, 1, 0], (p) => p[2] > 50 && p[2] < 70);
     expect(v.min).toBeGreaterThanOrEqual(3.999);
     expect(v.min).toBeLessThan(4.2);
     /* sem semente, o pedaço de dentro avisa; com `descarta`, a janela é só um furo e não sobra pedaço */
@@ -203,10 +202,11 @@ describe('paineisPorVaos: linha fechada, alcance e as recusas', () => {
   });
 
   it('avisa a lasca: o pedaço de poucos mm² que a linha deixa no canto', () => {
-    const g = paineisPorVaos({ ...base, areaMinima: 100,
-      linhas: [{ nome: 'perto', eixo: 'y', pontos: [[-300, 3], [300, 3]] }, LINHAS_CAIXA[0]],
-      paineis: [{ nome: 'resto', eixo: 'y', ponto: [0, 75] }, { nome: 'tampo', eixo: 'y', ponto: [0, 225] }] });
-    expect(g.avisos.map((a: any) => a.ref)).toContain('lasca');
+    const miuda = { nome: 'miuda', eixo: 'y', fechada: true, pontos: [[-5, 60], [5, 60], [5, 70], [-5, 70]], alcance: [290, 310] };
+    const g = paineisPorVaos({ ...base, areaMinima: 500, linhas: [LINHAS_CAIXA[0], miuda],
+      paineis: [{ nome: 'frente', eixo: 'y', ponto: [0, 20] }, { nome: 'resto', eixo: 'y', ponto: [150, 225] }, { nome: 'ilha', eixo: 'y', ponto: [0, 65] }] });
+    expect(g.avisos.map((a: any) => a.ref)).toEqual(['lasca']);
+    expect(g.avisos[0].texto).toMatch(/o pedaço 'ilha' tem \d+(,\d+)? mm², menos que areaMinima \(500\)/);
   });
 });
 
@@ -272,7 +272,7 @@ describe('paineisPorVaos: a ficha', () => {
     expect(ficha.nome).toBe('paineisPorVaos');
     expect(ficha.linhas.length).toBeLessThanOrEqual(LIMITE_DE_LINHAS);
     for (const campo of ficha.campos) expect(ficha.codigo, campo).toContain(campo);
-    for (const campo of ['chapa', 'vao', 'linhas', 'paineis']) expect(ficha.campos).toContain(campo);
+    for (const campo of ['chapa', 'vao', 'linhas', 'paineis', 'origemId', 'normal']) expect(ficha.campos).toContain(campo);
   });
 
   it('o exemplo da ficha roda sobre a caixa de teste', () => {

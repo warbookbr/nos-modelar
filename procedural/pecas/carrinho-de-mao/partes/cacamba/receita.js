@@ -37,19 +37,19 @@ export const TABELA = {
        arco de raio curto de chapa estampada, tangente aos dois, na silhueta de lado e na meia largura, com os laços da dobra a estas
        alturas acima do fundo; o fundo e a meia largura são o encontro das retas, antes do arco. */
     fundo: { z: [-715, -170], meiaLargura: 205, assento: 2.5, raioDaDobra: 35, pontosDaDobra: 8, lacosDaDobra: [2.5, 5, 8, 12] },
-    /* A silhueta de lado em [z, y], sem os dois pontos do fundo: as paredes retas, sem barriga, do fundo à boca em y 462 (a boca de z
-       -810 a 24): a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */
-    lado: [[24, 462], [-810, 462]],
-    /* A meia largura por altura, acima do fundo: a parede do lado reta até 313 na boca. */
-    perfil: [[462, 313]],
-    /* A meia planta da boca pela vista de cima: 313 de z -260 a -650, os cantos de trás arredondados e a frente afinando até a ponta. */
-    planta: [[0, 24], [80, 14], [116, 0], [158, -20], [203, -50], [234, -80], [266, -120], [288, -160], [303, -200], [313, -260],
-      [313, -650], [306, -700], [290, -740], [262, -775], [225, -795], [180, -805], [0, -810]],
+    /* A silhueta de lado em [z, y] sai da boca (`boca.frente` e `boca.tras`): as paredes retas, sem barriga, do fundo à boca em y
+       462: a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */
+    alturaDaBoca: 462,
+    /* A PLANTA DA BOCA (linha "planta da boca"), em retas e arcos tangentes: a traseira reta em z -810, os dois cantos de trás de
+       raio 90, os lados retos na meia largura de 313 e a frente em arco de meia volta, de raio igual à meia largura, até a ponta em
+       z 24 (o arco de raio 313 centrado em z -289 cai a poucos mm da polilinha da foto de cima). As junções são tangentes, e cada arco
+       é amostrado a `passoAngular` graus. A meia largura da parede é a da boca. */
+    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 90, passoAngular: 2 },
     /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço: 49 no início e no fim (a frente e a trás, com os
        cantos), que tira o facetado dos cantos, e 9 em cada lado reto; com mais de 11 no lado a dobra do fundo dá lascas (medido: 25 deu
        70 faces finas em x ±186, 9 e 11 deram zero). */
     estacoes: [330, 380, 430, 462],
-    pontos: 49, pontosDoLado: 9,
+    pontos: 73, pontosDoLado: 9,
     /* CHAPA E BORDA (linha "chapa e borda"): chapa de 1,5 mm; borda virada de Ø 16, 5 mm para fora da boca e 2 abaixo dela. */
     espessura: 1.5,
     borda: { raio: 8, paraFora: 5, abaixo: 2, lados: 16 },
@@ -58,6 +58,24 @@ export const TABELA = {
      em [110, 440, -60], cortada pela face de fora dela 0,3 mm antes (o assento). */
   tirantes: { raio: 5, z: 32, para: [110, 440, -60], assento: 0.3, lados: 12, passo: 30 },
 };
+
+/** O contorno da boca em retas e arcos tangentes, em [x, z]: os quatro trechos de `lacosPelasVistas` (`inicio` a traseira, de -x a +x;
+ *  `direita`, o lado de +x, de trás para a frente; `fim` a frente, de +x a -x; `esquerda`, o lado de -x, de frente para trás) e o anel
+ *  inteiro. Os cantos de trás têm o raio dado, a frente é o arco de meia volta de raio igual à meia largura, e os lados e a traseira
+ *  são retas: cada junção é tangente. Cada arco é amostrado a `passoAngular` graus. */
+export function contornoDaBoca(B) {
+  const w = B.meiaLargura; const r = B.raioDosCantos; const zf = B.frente - w; const zt = B.tras + r;
+  if (!(r > 0 && r < w && zt < zf)) throw new Error(`caçamba: boca de raio ${r} não cabe na meia largura ${w} e no comprimento ${B.frente - B.tras}`);
+  const arco = (cx, cz, raio, de, ate) => {
+    const n = Math.max(1, Math.ceil(Math.abs(ate - de) / B.passoAngular));
+    return Array.from({ length: n + 1 }, (_, k) => { const t = (de + (ate - de) * k / n) * Math.PI / 180; return [cx + raio * Math.cos(t), cz + raio * Math.sin(t)]; });
+  };
+  const inicio = [...arco(-w + r, zt, r, 180, 270), ...arco(w - r, zt, r, 270, 360)];
+  const direita = [[w, zt], [w, zf]];
+  const fim = arco(0, zf, w, 0, 180);
+  const esquerda = [[-w, zf], [-w, zt]];
+  return { trechos: { inicio, direita, fim, esquerda }, anel: [...inicio, ...direita.slice(1), ...fim.slice(1), ...esquerda.slice(1, -1)] };
+}
 
 /** As três vistas da caçamba, os tirantes e a porta, em mm. */
 export function derivar(T = TABELA) {
@@ -71,14 +89,18 @@ export function derivar(T = TABELA) {
     const c = [P[0] - t, P[1] + F.raioDaDobra];
     return Array.from({ length: F.pontosDaDobra + 1 }, (_, k) => { const f = a * k / F.pontosDaDobra; return [c[0] + F.raioDaDobra * Math.sin(f), c[1] - F.raioDaDobra * Math.cos(f)]; });
   };
-  const [frente, tras] = [C.lado[0], C.lado[C.lado.length - 1]];
+  const B = C.boca;
+  const lado = [[B.frente, C.alturaDaBoca], [B.tras, C.alturaDaBoca]];
+  const perfil = [[C.alturaDaBoca, B.meiaLargura]];
+  const [frente, tras] = lado;
   const naFrente = dobra([F.z[1], yFundo], frente);
   const atras = dobra([-F.z[0], yFundo], [-tras[0], tras[1]]).map(([u, y]) => [-u, y]);
-  const noLado = dobra([F.meiaLargura, yFundo], [C.perfil[C.perfil.length - 1][1], C.perfil[C.perfil.length - 1][0]]);
+  const noLado = dobra([F.meiaLargura, yFundo], [perfil[0][1], perfil[0][0]]);
   const vistas = {
-    lado: [atras[0], ...naFrente, ...C.lado, ...atras.slice(1).reverse()],
-    perfil: [...noLado.map(([u, y]) => [y, u]), ...C.perfil],
-    planta: [...C.planta, ...C.planta.slice(1, -1).reverse().map(([x, z]) => [-x, z])],
+    lado: [atras[0], ...naFrente, ...lado, ...atras.slice(1).reverse()],
+    perfil: [...noLado.map(([u, y]) => [y, u]), ...perfil],
+    planta: contornoDaBoca(B).anel,
+    boca: contornoDaBoca(B).trechos,
     estacoes: [yFundo, ...F.lacosDaDobra.map((d) => yFundo + d), ...C.estacoes],
     pontos: C.pontos, pontosDoLado: C.pontosDoLado,
   };
@@ -100,7 +122,9 @@ export function derivar(T = TABELA) {
 function lacosDaCacamba(vistas) {
   const { meiaPlanta, avisos, ...lacos } = lacosPelasVistas(vistas);
   if (avisos.length) throw new Error(`caçamba: ${avisos.map((a) => JSON.stringify(a)).join('; ')}`);
-  const boca = lacos.lacos[lacos.lacos.length - 1];
+  /* a forma da boca é o contorno em retas e arcos, e não a polilinha que `lacosPelasVistas` tira da planta: ela amostra a frente e a
+     traseira em passos iguais na lateral, e onde o arco encosta no lado reto um passo cobre dezenas de mm no comprimento (facetas) */
+  const boca = { trechos: vistas.boca };
   const pontos = Object.values(boca.trechos).flat();
   const bl = Math.max(...pontos.map((p) => Math.abs(p[0])));
   const [b0, b1] = [Math.min(...pontos.map((p) => p[1])), Math.max(...pontos.map((p) => p[1]))];

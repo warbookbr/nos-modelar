@@ -81,12 +81,13 @@ proporção da foto de lado ou de cima, na escala adotada, lidas nos contornos;
 | tubo do chassi | Ø 32 | cima: 32; típica adotada de 28 a 32 |
 | laço | eixo do tubo a 95 do centro, reto de z -45 a 116, canto da frente de raio 94 | cima: 96 de meia largura |
 | altura do laço | eixo do tubo em y 195 | rascunho: 25 acima do eixo da roda, pelos mancais sob o tubo; lado: no plano do meio, uns 20 abaixo |
-| braço sob a caçamba | eixo do tubo em y 266, x de 160 (z -170) a 175 (z -770) | lado: 240 a 270 no plano do meio; baixo: 164 do centro |
-| subida e manopla | dobra em z -1.080 (y 475, x 250), ponta em z -1.300 (y 515, x 262) | lado: 488 em z -1.098, 515 no fim; cima: 256 do centro nas pontas |
+| braço sob a caçamba | eixo do tubo em y 266, de z -170 a -770 | lado: 240 a 270 no plano do meio |
+| abertura dos braços | em planta, reta contínua da meia largura 143,8 em z -170 a 282,3 em z -1.300: x 160 em z -305, 194 em z -580, 217 em z -770 | desenho de linha em planta (2026-11-11): 44,5 px em 180 e 69 px em 380, 3,83 mm/px pelo comprimento do chassi; baixo (164 do centro sob a caçamba) e cima (256 nas pontas) são fotos em perspectiva e valem menos |
+| subida e manopla | dobra em z -1.080 (y 475, x 255), ponta em z -1.300 (y 515, x 282), os dois na reta da planta | lado: 488 em z -1.098, 515 no fim; x pela abertura dos braços |
 | manoplas | punho de Ø 38 nos últimos 110, o topo a 535 do chão | desenho de linha (caráter); típica adotada |
 | mancais | bloco sob cada lado do laço, x de 79 a 111, y de 158 a 195, 36 no comprimento | baixo e cima (caráter); rascunho |
-| pés | tubo de Ø 22, V de z -305 a -580 no eixo do braço, fundo no chão em z -502, x 166 do centro | lado: pernas de perto e de longe, no plano do meio |
-| travessas dos pés | chapa de 40 × 6, nos topos das pernas, sob os braços (face de cima em y 250) | baixo e desenho de linha (caráter); rascunho |
+| pés | tubo de Ø 22, V de z -305 a -580 no eixo do braço, fundo no chão em z -551, x 177 do centro (a média dos topos, que seguem o braço) | lado: pernas de perto e de longe, no plano do meio |
+| travessas dos pés | chapa de 40 × 6, nos topos das pernas, sob os braços (face de cima em y 250); a de trás tem 412 de comprimento e a da frente 345 (razão 1,20, antes 1,04) | desenho de linha: 77 contra 95 px entre os eixos dos braços, a olho; baixo (caráter); rascunho |
 | boca da caçamba | 820 × 626 (652 com a borda), de z 24 a -810, em y 462 | cima: 824 × 628; lado: boca de 15 a -812, em 430 a 471 |
 | planta da boca | 313 de meia largura de z -260 a -650, cantos de trás de raio uns 90, frente afinando em curva até a ponta | cima |
 | fundo da caçamba | y 284,5, de z -715 a -170, meia largura 150 | lado (fundo entre 250 e 290); baixo (o fundo entre os braços); rascunho: 2,5 acima dos braços |

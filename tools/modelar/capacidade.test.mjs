@@ -23,6 +23,15 @@ describe('capacidade: a ficha é recortada do cabeçalho do código', () => {
     expect(r.stderr).toContain(nomes[0]);
   });
 
+  it('uma palavra que não é nome acha as capacidades que a citam em serve ou quando', () => {
+    for (const busca of [['painel'], ['linha de vão'], ['capô'], ['porta']]) {
+      const r = executar(busca);
+      expect(r.codigo, busca.join(' ')).toBe(0);
+      expect(r.stdout, busca.join(' ')).toContain('paineisPorVaos');
+    }
+    expect(executar(['xyzxyz']).codigo).toBe(2);
+  });
+
   it('--ajuda descreve o uso', () => {
     expect(executar(['--ajuda']).stdout).toContain('npm run capacidade');
   });

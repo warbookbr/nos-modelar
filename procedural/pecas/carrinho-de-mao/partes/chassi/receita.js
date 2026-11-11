@@ -30,12 +30,18 @@ export const TABELA = {
   /* TUBO DO CHASSI (linha "tubo do chassi"): Ø 32, 24 lados, estações a cada 40 mm nas retas. */
   tubo: { raio: 16, lados: 24, passo: 40 },
   /* A polilinha do eixo do tubo, do lado +x, da ponta da manopla ao canto da frente do laço (o outro lado é o espelho): a manopla até
-     z -1.300 (y 515, x 262), a dobra de cima da subida, o braço sob a caçamba (y 266, x 175 a 160, de z -770 a -170), a rampa, o laço
-     reto (y 195, x 95) e o canto da frente em z 210 (a ponta de fora do laço em z 226). O raio de cada canto, na mesma ordem; o da
-     frente é quase a meia largura do laço, que fica com 2 mm de reta. */
+     z -1.300 (y 515), a dobra de cima da subida (y 475, z -1.080), o braço sob a caçamba (y 266, de z -770 a -170), a rampa, o laço
+     reto (y 195, x 95) e o canto da frente em z 210 (a ponta de fora do laço em z 226). O x dos quatro primeiros pontos é `null`: vem
+     da reta da planta (`abertura`), e não de um número digitado em cada ponto. O raio de cada canto, na mesma ordem; o da frente é
+     quase a meia largura do laço, que fica com 2 mm de reta. */
   chassi: {
-    pontos: [[262, 515, -1300], [250, 475, -1080], [175, 266, -770], [160, 266, -170], [95, 195, -45], [95, 195, 210]],
+    pontos: [[null, 515, -1300], [null, 475, -1080], [null, 266, -770], [null, 266, -170], [95, 195, -45], [95, 195, 210]],
     raios: [120, 150, 120, 100, 94],
+    /* A PLANTA DOS BRAÇOS (linha "abertura dos braços"): no desenho de linha do chassi em planta, a meia largura do eixo do tubo
+       cresce em reta do fim da rampa à manopla (44,5 px em 180 e 69 px em 380 no desenho, de 400 px para os 1.532 mm do chassi,
+       3,83 mm/px; a reta lida dá 143,8 mm em z -170 e 282,3 mm em z -1.300). Os pontos do braço, a subida e a manopla ficam todos
+       nessa reta, e os pés, as travessas e o apoio da caçamba seguem o x dela. */
+    abertura: { z: [-170, -1300], x: [143.8, 282.3] },
   },
   /* MANOPLA (linha "manoplas"): punho de borracha de Ø 38 nos últimos 110 mm do tubo, passando 6 mm da ponta dele; estações a cada 30. */
   manopla: { raio: 19, comprimento: 110, alem: 6, lados: 24, passo: 30 },
@@ -47,15 +53,26 @@ export const TABELA = {
   eixo: { raio: 8, meio: 120, y: 170, z: 0, lados: 24, assento: 102 },
 };
 
+/** O x do eixo do braço, do lado +x, em z: a reta da planta dos braços, da `abertura` da TABELA. */
+export function xDoBraco(T, z) {
+  const { z: [z0, z1], x: [x0, x1] } = T.chassi.abertura;
+  return x0 + (x1 - x0) * (z - z0) / (z1 - z0);
+}
+
+/** Os pontos da polilinha do chassi, do lado +x, com o x dos que estão na reta da planta dos braços (os de x `null`) calculado. */
+export function pontosDoChassi(T) {
+  return T.chassi.pontos.map(([x, y, z]) => [x ?? xDoBraco(T, z), y, z]);
+}
+
 /** O x, o y e o z do eixo do braço reto (do terceiro ao quarto ponto da polilinha) em z, do lado +x. */
 export function noBraco(T, z) {
-  const [a, b] = [T.chassi.pontos[2], T.chassi.pontos[3]];
+  const [a, b] = [pontosDoChassi(T)[2], pontosDoChassi(T)[3]];
   return lerp(a, b, (z - a[2]) / (b[2] - a[2]));
 }
 
 /** O trilho do tubo inteiro, as manoplas, os mancais, o eixo e as portas, em mm. */
 export function derivar(T = TABELA) {
-  const CH = T.chassi;
+  const CH = { ...T.chassi, pontos: pontosDoChassi(T) };
   /* o tubo vai da ponta de uma manopla à da outra pelo laço: o lado +x e o espelho dele, de trás para a frente; os raios são os dez
      cantos de dentro, os do lado +x e os mesmos na ordem inversa */
   const outro = [...CH.pontos].reverse().map(([x, y, z]) => [-x, y, z]);
@@ -129,11 +146,11 @@ const receita = {
   PARAMS: TABELA,
   get TOPO() { return { origem: 'o chão sob o centro do eixo da roda, no meio da largura; y para cima, x lateral e a frente (a roda) em +z', ...gerarTopo(this.PARAMS) }; },
   PLANO: {
-    objeto: 'chassi de carrinho de mão de obra de 60 L: um tubo de aço redondo de Ø 32 dobrado, com o laço em U em volta da roda, os braços sob a caçamba e as manoplas com punho, mais os mancais e o eixo',
+    objeto: 'chassi de carrinho de mão de obra de 60 L: tubo de aço redondo de Ø 32 dobrado, com laço em U em volta da roda, braços sob a caçamba e manoplas com punho, mancais e eixo; as travessas entre os braços são a parte `travessas` da peça `pes`',
     referencias: ['../../referencias/carrinho-de-mao.contornos.json'],
     escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },
     partes: [
-      { nome: 'chassi', forma: 'um tubo redondo azul de Ø 32, de uma manopla à outra: laço em U em volta da roda com a ponta em z 226, rampas, braços retos em y 266 sob a caçamba, subida e manoplas abertas, dobras em curva', tecnica: 'gaiolaVarrida de seção redonda de 24 lados num trilho de pontos com raio por canto, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },
+      { nome: 'chassi', forma: 'um tubo redondo azul de Ø 32, de uma manopla à outra: laço em U em volta da roda (ponta em z 226), rampas, braços em y 266 sob a caçamba, subida e manoplas; em planta os braços abrem em reta, de 144 em z -170 a 282 em z -1.300', tecnica: 'gaiolaVarrida de seção redonda de 24 lados num trilho de pontos com raio por canto, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },
       { nome: 'manoplas', forma: 'punho preto de borracha de Ø 38 nos últimos 110 mm de cada manopla, passando 6 mm da ponta do tubo', tecnica: 'gaiolaVarrida de seção redonda de 24 lados numa reta, fechada e tampada, um de cada lado' },
       { nome: 'mancais', forma: 'bloco escuro sob cada lado do laço, de x 79 a 111, y 158 a 195 e 36 mm no comprimento, centrado no eixo da roda', tecnica: 'extrusão em y de um retângulo, um de cada lado' },
       { nome: 'eixo', forma: 'barra escura de Ø 16 de x -120 a 120, em y 170 e z 0, atravessando os dois mancais', tecnica: 'revolução em torno de x de 24 lados' },

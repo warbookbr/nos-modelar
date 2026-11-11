@@ -66,6 +66,14 @@ que sobraram dos anteriores:
 - `extremo:{eixo:'x'|'y'|'z', lado:'max'|'min', tol?}`: o elemento cujo centro
   (média dos cantos da face, ponto médio da aresta) está no maior ou menor valor
   do eixo, e os que ficam a até `tol` dele (padrão 1e-6, em unidades do mundo).
+- `conexo:{de:[x,y,z], dir:[x,y,z]}`: só de face. O pedaço conexo (faces ligadas
+  por aresta, entre as que sobraram dos critérios acima) que contém a primeira
+  face que o raio de `de` na direção `dir` toca. É a semente de um pedaço: depois
+  de uma booleana que parte uma chapa em várias, o ponto visto de uma vista nomeia
+  o pedaço sem citar id (`['parte', { nome: 'capo', sel: { origem: CORTE, onde:
+  { conexo: { de: [0, 2000, 900], dir: [0, -1, 0] } } } }]`). Raio que não toca
+  face grita (semente fora da peça ou num vão); empate de distância vai para a
+  face de menor id.
 
 ```js
 // a face de cima da caixa 1, e só dela (a caixa 2 tem outra face de cima)
@@ -913,6 +921,20 @@ O interior de um retalho de quatro lados é a interpolação transfinita de Coon
 A curva pode ser `vinco` (nitidez de 0 a 1 ou `'viva'`, que vira vinco nomeado ao longo de todas as arestas dela) e pode levar `peso` ou `exata: true`. As curvas e os pontos de dentro entram em `medidas` (curva exata por padrão, interior com o peso 1 de `interior`), e `leitura: true` faz a cota da curva sem peso ganhar o peso da leitura, com aviso dos pontos-chave mais perto do que o erro sustenta, como na gaiola por estações. O canto vivo da borda (desvio de direção acima de `anguloDeCanto`, 35 graus) sai sozinho em `passo.cantos`. A moldura é um `friso` com `linha: { nome, pontos: rede.linha('janela') }`, e a linha da curva fechada repete o primeiro ponto no fim. Três coisas gritam ou avisam com o nome: o canto quase reto ou agudo que dobra o preenchimento de Coons (`cantoQuaseReto`, `cantoAgudo`, ou grito se uma face dobra), o arco que vira mais de 22,5 graus numa divisão só (`curvaturaConcentrada`, que pede um nó onde a curvatura muda, como a emenda de um arco com uma reta) e o espaçamento que salta de um arco ao vizinho mais de três vezes (`gradacaoBrusca`).
 
 A chapa de prova da rede é `procedural/nucleo/fixtures/gaiola-por-rede-prova.js`. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/modelar/ondulacao-rede.test.mjs`.
+
+### Chapa em painéis com vão: `paineisPorVaos`
+
+Capô, para-lamas, portas, teto e tampa de uma carroceria, ou as tampas de uma máquina, são painéis de chapa de uma superfície só, separados por frestas. `paineisPorVaos`, de `procedural/nucleo/paineis-por-vaos.js` (`npm run capacidade -- paineisPorVaos` dá a ficha; `npm run capacidade -- painel` acha por palavra), recebe a chapa já feita (os passos que a constroem e a origem dela: a casca facetada de sólido de fora menos o recuado, ou `subdivisao` com `espessura`), as linhas de vão, cada uma desenhada numa vista ortogonal (eixo, pontos em mm no plano dela, aberta ou fechada, com `alcance` no eixo da vista para a linha de um lado do carro não cortar o outro), a largura do vão e o nome de cada painel por um ponto visto da vista dele. A chapa é construída uma vez: o ajudante devolve uma lâmina por linha, um `subtrair` só e uma `parte` por painel (com `onde.conexo`, acima), e não os 23 montes da chapa que o rascunho do sedã usou.
+
+```js
+const g = paineisPorVaos({ chapa: { passos: CASCA, origem: { op: 'subtrair', id: 40 } }, vao: 4,
+  linhas: [{ eixo: 'y', pontos: [[-900, 690], [900, 690]] },                              // capô contra a cabine, vista de cima: [x, z]
+           { eixo: 'x', pontos: [[690, 1100], [690, 300]], alcance: [600, 1100] }],        // só o lado direito: [z, y]
+  paineis: [{ nome: 'capo', eixo: 'y', ponto: [0, 1200] }, { nome: 'paraLamaDir', eixo: 'x', ponto: [1500, 700] }] });
+// passos: [...g.passos]  (os da chapa vêm junto; chapa.emitir: false os deixa com a receita)
+```
+
+O vão é medido ao longo da chapa, e não no plano da vista: a lâmina mede `vao * sqrt(1 - (n . m)^2)`, com `n` a normal da chapa executada no ponto da linha e `m` a perpendicular da linha na vista (a chapa a 38 graus da vista pede uma lâmina de 3,15 mm para 4 mm), mais 2% (`margem`) para o vão não ficar abaixo do pedido. Chapa a mais de 80 graus da lâmina recusa: desenhe a linha na vista de frente dela. Linha fechada dentro de um painel dá o pedaço de dentro como painel próprio, ou o descarta com `dentro: 'descarta'`. O ajudante recusa a linha que não encontra a chapa, a semente que cai fora ou num vão, duas sementes no mesmo pedaço e o corte que o núcleo recusa, e avisa pedaço sem nome e lasca (`areaMinima`). Cada linha corta a chapa de lado a lado no alcance dado; a semente não pode cair numa abertura que a chapa já tem.
 
 ### Superfície varrida: `gaiolaVarrida`
 

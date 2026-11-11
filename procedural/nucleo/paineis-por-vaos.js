@@ -1,39 +1,22 @@
 /* paineis-por-vaos.js — uma chapa partida em painéis por linhas de vão desenhadas em vistas, com o vão medido ao longo da chapa
  *
  * FICHA paineisPorVaos
- * serve: dividir uma chapa já feita (a casca facetada de um corpo, ou uma `subdivisao` com `espessura`) em painéis de chapa separados
- *   por um vão de largura constante, cada painel como parte nomeada, sem montar a chapa de novo para cada painel: a chapa entra uma vez,
- *   todas as lâminas de vão saem num `subtrair` só, e cada pedaço é nomeado pelo ponto que se vê dele.
- * quando: capô, para-lamas, portas, teto e tampa de um carro, tampas e portinholas de uma máquina, qualquer carenagem que a referência
- *   mostra em peças com frestas. Para uma abertura que vira peça rente à pele (a lente), `aberturaPorContorno`; aqui o vão é entre painéis
- *   vizinhos da mesma chapa, e a linha pode sair pela borda dela.
- * unidades: tudo em mm, na mesma unidade da chapa. A linha é desenhada numa vista ortogonal: eixo 'x' (pontos [z, y]), 'y' (pontos [x, z])
- *   ou 'z' (pontos [x, y]), o mesmo plano de `extrusao` com o mesmo eixo.
+ * serve: dividir uma chapa já feita em painéis separados por linhas de vão, com o vão constante ao longo da chapa, cada painel uma parte nomeada pelo ponto visto dele e a chapa montada uma vez.
+ * quando: capô, para-lamas, portas, teto e tampa de um carro, tampas e portinholas de uma máquina, qualquer carenagem que a referência mostra em peças com frestas. `aberturaPorContorno` com `lente` tira um pedaço rente à pele e não aceita linha que sai pela borda; aqui o vão é entre painéis vizinhos da mesma chapa e a linha pode sair pela borda dela.
+ * unidades: tudo em mm, na unidade da chapa. A linha é desenhada numa vista ortogonal: eixo 'x' (pontos [z, y]), 'y' ([x, z]) ou 'z' ([x, y]), o mesmo plano de `extrusao` com o mesmo eixo.
  * campos:
- *   chapa: { passos, origem, emitir?, parametros?, pontos? } os passos que constroem SÓ a chapa e a origem `{ op, id }` dela. Com `passos`
- *     o ajudante executa a chapa uma vez, em tempo de autoria, para ler a normal de cada ponto das linhas, achar as sementes e conferir o
- *     corte; `emitir: false` não os devolve (a receita já os tem). Sem `passos` (só `origem`), não há leitura: dê `normal` ou aceite o
- *     vão medido no plano da vista, e o aviso `semLeitura` diz isso. `parametros` e `pontos` são o PARAMS e o TOPO que os passos citam.
- *   vao: a largura do vão ao longo da chapa, em mm. A lâmina é estreitada onde a chapa é inclinada em relação à vista, pela normal local.
- *   linhas: [{ nome?, eixo, pontos, fechada?, alcance?, lado?, dentro?, alem? }] o meio do vão. `alcance: [min, max]` limita a lâmina ao
- *     intervalo do eixo da vista, para a linha de um lado do carro não cortar o outro; `lado` ('+' ou '-') é de onde se lê a chapa
- *     (padrão: o lado do alcance); `fechada` fecha a volta, e o pedaço de dentro é um painel próprio, ou some com `dentro: 'descarta'`
- *     (a janela, a tampa de combustível); `alem` alonga as duas pontas da linha aberta, em mm (padrão 0: a ponta passa da borda da chapa
- *     ou para no meio de outra linha, e quem desenha a põe lá).
- *   paineis: [{ nome, eixo, ponto: [a, b], lado? }] o painel é o pedaço que contém o ponto visto daquela vista (o primeiro que o raio
- *     vindo do `lado` toca; padrão '+'). Nomes e pontos são distintos.
- *   origemId: o primeiro `origemId` livre (padrão: o maior dos passos da chapa mais um); o ajudante usa de `origemId` em diante.
- *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa. amostragem: passo, em mm, da leitura da normal ao longo da linha
- *     (padrão 40). areaMinima: área, em mm², abaixo da qual um pedaço é lasca e entra em `avisos` (padrão 100).
- *     sementesPerdidas: 'recusa' (padrão) ou 'avisa' para a semente que cai fora da chapa ou num vão.
- * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos }, com `medidas` { vaoPedido, inclinacaoMaxima (graus de inclinação da
- *   chapa em relação à lâmina, que é acos(f) abaixo; 38 numa chapa a 38 graus da vista), fatorMinimo (a razão entre a lâmina e o vão), paineis, paineisAchados, sementesSemPainel,
- *   pedacosSemNome, pedacos, execucoes }; os avisos são { ref, texto }.
+ *   chapa: { passos, origem, emitir?, parametros?, pontos? } os passos que constroem SÓ a chapa e a origem { op, id } dela; com `passos` o ajudante a executa uma vez em tempo de autoria (normais, sementes, conferência) e `emitir: false` não os devolve; sem `passos`, dê `normal` e `origemId`, e o aviso `semLeitura` diz que nada foi conferido; `parametros` e `pontos` são o PARAMS e o TOPO que os passos citam.
+ *   vao: a largura do vão AO LONGO DA CHAPA, em mm; a lâmina é estreitada onde a chapa é inclinada em relação à linha, pela normal local lida da chapa.
+ *   linhas: [{ nome?, eixo, pontos, fechada?, alcance?, lado?, dentro?, alem? }] o meio do vão em cada vista; `alcance` [min, max] limita a lâmina no eixo da vista (a linha de um lado do carro não corta o outro); `lado` '+' ou '-' é de onde se lê a chapa (padrão o lado do alcance); `fechada` fecha a volta e o pedaço de dentro é um painel, ou some com `dentro: 'descarta'`; `alem` alonga as pontas da linha aberta.
+ *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos.
+ *   origemId: o primeiro origemId livre (padrão: o maior dos passos da chapa mais um); o ajudante usa dali em diante e devolve `proximoId`.
+ *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido: o vão sai entre `vao` e `vao` mais 2% (4,0 a 4,1 para 4).
+ * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos } com medidas { vaoPedido, inclinacaoMaxima, fatorMinimo, paineis, paineisAchados, sementesSemPainel, pedacosSemNome, pedacos, execucoes } e avisos { ref, texto }.
  * exemplo:
- *   paineisPorVaos({ chapa: { passos: casca, origem: { op: 'subtrair', id: 4 } }, vao: 4,
- *     linhas: [{ eixo: 'y', pontos: [[-900, 690], [900, 690]] }, { eixo: 'x', pontos: [[690, 1100], [690, 300]], alcance: [600, 1100] }],
- *     paineis: [{ nome: 'capo', eixo: 'y', ponto: [0, 1200] }, { nome: 'cabine', eixo: 'y', ponto: [0, 0] }] })
- * peça: procedural/pecas/sedan-chassi-e-lataria/ (o rascunho que a pediu; o teste prova a chapa plana a 38 graus e a de subdivisão).
+ *   paineisPorVaos({ chapa: { passos: [['cubo', { origemId: 1, larg: 600, alt: 1, prof: 400 }]], origem: { op: 'cubo', id: 1 } }, vao: 4,
+ *     linhas: [{ eixo: 'y', pontos: [[0, -300], [0, 300]] }],
+ *     paineis: [{ nome: 'esquerda', eixo: 'y', ponto: [-150, 0] }, { nome: 'direita', eixo: 'y', ponto: [150, 0] }] })
+ * peça: procedural/nucleo/paineis-por-vaos.test.ts (a caixa de chapa com uma face a 38 graus da vista e a cuba de subdivisão; o rascunho do sedã que o pediu está em procedural/pecas/sedan-chassi-e-lataria/).
  * FIM DA FICHA
  *
  * A LÂMINA. Cada linha vira um prisma da largura do vão, extrudado ao longo do eixo da vista, e todos entram juntos no `subtrair` da chapa: a
@@ -110,7 +93,7 @@ function cruzar(p, t, q, u) {
 /**
  * Chapa partida em painéis por linhas de vão desenhadas em vistas ortogonais.
  * @param {{ chapa: { passos?: any[], origem: { op: string, id: number }, emitir?: boolean, parametros?: object, pontos?: object }, vao: number,
- *   linhas: any[], paineis: any[], origemId?: number, normal?: Function, amostragem?: number, areaMinima?: number, sementesPerdidas?: 'recusa' | 'avisa' }} o
+ *   linhas: any[], paineis: any[], origemId?: number, normal?: Function, amostragem?: number, areaMinima?: number, margem?: number, sementesPerdidas?: 'recusa' | 'avisa' }} o
  */
 export function paineisPorVaos(o) {
   if (o == null || typeof o !== 'object') erro('espera { chapa, vao, linhas, paineis }');
@@ -124,6 +107,8 @@ export function paineisPorVaos(o) {
   const amostragem = o.amostragem ?? 40;
   if (!(amostragem > 0)) erro('amostragem precisa ser maior que zero, em mm');
   const areaMinima = o.areaMinima ?? 100;
+  const margem = o.margem ?? 0.02;
+  if (!(margem >= 0 && margem < 0.5)) erro('margem precisa estar de 0 a 0,5 (a fração a mais da lâmina; padrão 0,02)');
   const sementesPerdidas = o.sementesPerdidas ?? 'recusa';
   if (sementesPerdidas !== 'recusa' && sementesPerdidas !== 'avisa') erro("sementesPerdidas é 'recusa' ou 'avisa'");
   const passosDaChapa = chapa.passos ?? null;
@@ -241,7 +226,7 @@ export function paineisPorVaos(o) {
           if (f < FATOR_MINIMO) erro(`a chapa fica inclinada ${br(tilt)} graus em relação à lâmina no ponto [${br(q[0])}, ${br(q[1])}] da linha '${nome}' (vista ${eixo}): a lâmina precisaria de ${br(f * o.vao)} mm de largura no plano para dar ${br(o.vao)} mm ao longo da chapa; desenhe essa linha na vista em que a chapa aparece de frente`);
           fatorMinimo = Math.min(fatorMinimo, f);
         } else sem += 1;
-        amostras.push({ q, h: (o.vao * f) / 2, achou: !!nm });
+        amostras.push({ q, h: (o.vao * f * (1 + margem)) / 2 });
       }
       /* funde o que a reta já dá: o ponto fica só quando a meia lâmina sai do que as pontas dão por mais de 0,005 mm */
       const mantidos = [0];
@@ -258,7 +243,6 @@ export function paineisPorVaos(o) {
     if (leitura && !o.normal && sem === total) {
       erro(`a linha '${nome}' não corta a chapa: nenhum dos ${total} pontos dela tem chapa na vista ${eixo}, de ${br(alcance[0])} a ${br(alcance[1])} mm; confira o eixo da vista, a ordem dos pontos ([${eixo === 'x' ? 'z, y' : eixo === 'y' ? 'x, z' : 'x, y'}]), o alcance e a unidade (mm)`);
     }
-    if (sem > 0) aviso('linhaForaDaChapa', `${sem} dos ${total} pontos da linha '${nome}' não têm chapa na vista ${eixo} (a linha sai pela borda ou passa por uma abertura); neles a lâmina vale o vão inteiro`);
 
     /* o contorno de cada lado: a esquadria nos cantos entre trechos, de pontas retas nas pontas */
     const lado2 = (sinal) => {

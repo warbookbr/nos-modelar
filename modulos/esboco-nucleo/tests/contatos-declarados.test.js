@@ -80,4 +80,22 @@ describe('o contato declarado na opção', () => {
     expect(recusa({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'tampa'], relacao: 'atravessa', motivo: 'x', lado: '+x' }] })).toMatch(/campo "lado"/);
     expect(recusa({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'tampa'], relacao: 'atravessa', motivo: 'x' }, { par: ['tampa', 'capo'], relacao: 'folga', motivo: 'y' }] })).toMatch(/já foi declarado/);
   });
+
+  it('a relação folga aceita folga: { esperada, tolerancia }, que sai nos contatos da receita e não muda o relato', () => {
+    const folga = { esperada: 30, tolerancia: 0.2 };
+    const com = receitaDaOpcao({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto', folga }] });
+    expect(com.contatos).toEqual([{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto', folga }]);
+    const sem = receitaDaOpcao({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto' }] });
+    expect(sem.contatos).toEqual([{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto' }]);
+    expect(relatoDeContatos(com.neutro, com.formas, { contatos: com.contatos })).toEqual(relatoDeContatos(sem.neutro, sem.formas, { contatos: sem.contatos }));
+  });
+
+  it('recusa a folga fora do formato ou com outra relação', () => {
+    const com = (relacao, folga) => recusa({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'pino'], relacao, motivo: 'x', folga }] });
+    expect(com('encosta', { esperada: 4, tolerancia: 0.1 })).toMatch(/"folga" só vale com "relacao": "folga"/);
+    expect(com('folga', { esperada: 0, tolerancia: 0.1 })).toMatch(/"folga.esperada"/);
+    expect(com('folga', { esperada: 4, tolerancia: -1 })).toMatch(/"folga.tolerancia"/);
+    expect(com('folga', { esperada: 4, tolerancia: 0.1, lado: 1 })).toMatch(/"folga" é \{ esperada, tolerancia \}/);
+    expect(com('folga', 4)).toMatch(/"folga" é \{ esperada, tolerancia \}/);
+  });
 });

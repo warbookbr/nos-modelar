@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1868 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1888 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -431,6 +431,10 @@
 
 - `RESULTADO.md` — Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)
 - `sonda-passos.mjs` — sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha execut…
+
+## docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/
+
+- `ATRITOS.md` — Sedã em chassi e lataria: atritos do alinhamento e do rascunho
 
 ## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
 
@@ -1056,6 +1060,8 @@
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `operador-das-medidas.test.mjs` — operador-das-medidas.test.mjs — a gaiola ajustada pelas medidas vista como transformação linear da declarada.
+- `paineis-por-vaos.js` — paineis-por-vaos.js — uma chapa partida em painéis por linhas de vão desenhadas em vistas, com o vão medido ao longo da chapa
+- `paineis-por-vaos.test.ts` — paineis-por-vaos.test.ts — o ajudante `paineisPorVaos` em peças de teste sem domínio: uma caixa de chapa de 1 mm com uma face a 38 graus da vista, cortada po…
 - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
 - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
@@ -1433,6 +1439,45 @@
 ## procedural/pecas/carrinho-de-mao/
 
 - `ALINHAMENTO.md` — Carrinho de mão: alinhamento
+
+## procedural/pecas/carrinho-de-mao/partes/cacamba/
+
+- `receita.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
+
+## procedural/pecas/carrinho-de-mao/partes/cacamba/rodadas/
+
+- `receita-01.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
+- `receita-02.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
+
+## procedural/pecas/carrinho-de-mao/partes/chassi/
+
+- `receita.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
+
+## procedural/pecas/carrinho-de-mao/partes/chassi/receita/
+
+- `ferramentas.js` — carrinho-de-mao/chassi, receita/ferramentas.js — as ferramentas que escrevem os passos das peças do carrinho de mão em milímetro num estado { passos, topo, o…
+
+## procedural/pecas/carrinho-de-mao/partes/chassi/rodadas/
+
+- `receita-01.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
+- `receita-02.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
+
+## procedural/pecas/carrinho-de-mao/partes/pes/
+
+- `receita.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
+
+## procedural/pecas/carrinho-de-mao/partes/pes/rodadas/
+
+- `receita-01.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
+- `receita-02.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
+
+## procedural/pecas/carrinho-de-mao/partes/roda/
+
+- `receita.js` — carrinho-de-mao/roda — a roda do carrinho de mão pela família `roda-pneu`, perfil `carrinho-de-mao`: o pneu 3.25-8 de Ø 340 e 85 mm de banda, com ombros redo…
+
+## procedural/pecas/carrinho-de-mao/partes/roda/rodadas/
+
+- `receita-01.js` — carrinho-de-mao/roda — a roda do carrinho de mão pela família `roda-pneu`, perfil `carrinho-de-mao`: o pneu 3.25-8 de Ø 340 e 85 mm de banda, com ombros redo…
 
 ## procedural/pecas/carrinho-de-mao/referencias/
 
@@ -1897,6 +1942,15 @@
 ## procedural/pecas/poltrona-vime-roxa/referencias/
 
 - `alvo.md` — Alvo da poltrona de vime
+
+## procedural/pecas/sedan-chassi-e-lataria/
+
+- `ALINHAMENTO.md` — Sedã em chassi e lataria: alinhamento
+
+## procedural/pecas/sedan-chassi-e-lataria/referencias/
+
+- `derivar-contornos.mjs` — derivar-contornos.mjs: escreve `sedan-chassi-e-lataria.contornos.json` (mecanifica.contornos@1) a partir das silhuetas em fatias de `procedural/pecas/carro-s…
+- `sedan-chassi-e-lataria.esboco.mjs` — sedan-chassi-e-lataria.esboco.mjs: o rascunho do sedã vermelho do acervo refeito como um carro é construído, um chassi (plataforma com assoalho, longarinas, …
 
 ## procedural/pecas/suporte-tubo/
 
@@ -2969,6 +3023,8 @@
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `uso.mjs` — uso.mjs — registro local do que a IA pede às ferramentas de entrada, e o resumo dele: `npm run uso`.
 - `uso.test.mjs` — uso.test.mjs — o registro de uso: grava uma linha por pedido de ajuda, de roteiro e por recusa; resume o que a IA mais pede e o que não encontra; nunca quebr…
+- `vao-entre-partes.mjs` — vao-entre-partes.mjs — o vão e o degrau entre partes vizinhas, medidos sobre a malha, e a lista das partes soltas.
+- `vao-entre-partes.test.mjs` — vao-entre-partes.test.mjs — o vão e o degrau entre chapas planas com a medida conhecida (coplanares, com degrau, inclinadas a 38 graus, com vão de 4 a 5 mm),…
 - `variantes.mjs` — variantes.mjs — as variantes de uma receita lado a lado: a receita rodada com cada troca de valores da TABELA que ela declara em `VARIANTES`, capturada na ba…
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.

@@ -13,6 +13,7 @@
  *   degrau: o desnível máximo aceito, em mm; o par que passa dele entra em `fora`.
  *   vizinho: a distância máxima, em mm, em que duas partes são vizinhas (3 vezes o esperado, ou 15).
  *   passo: o espaçamento das amostras ao longo das arestas vivas, em mm (2).
+ *   lado: 'fora' (o padrão) mede só a borda da face que olha para longe do centro do modelo; 'todos' mede as duas faces de cada chapa.
  *   toque: até quantos mm duas partes se tocam, e um par assim sai como `toca`, sem vão (0,05).
  *   pares: [[a, b], ...] mede só esses pares, vizinhos ou não.
  *   partes: prefixos ou nomes; só os pares entre partes do subconjunto saem.
@@ -28,12 +29,14 @@
  * encostam em nada. Quem fez o rascunho mediu o vão com um script próprio, fora do repositório. Este é o script, com o degrau.
  *
  * COMO MEDE. As arestas vivas de cada parte (as de ângulo entre faces acima de ANGULO_VIVO_GRAUS e as de borda aberta) são amostradas
- * a cada `passo` mm. Para cada amostra de uma parte acha-se o ponto mais próximo da superfície da outra, dentro de `vizinho`; a medida
- * só vale quando a volta fecha, isto é, quando nenhum ponto da primeira parte fica mais perto desse ponto do que a amostra (a face
- * de lado de uma chapa em frente à de lado da outra, e não a quina de uma que olha a face de cima da outra). O vão é essa distância,
- * e o ponto é o meio do segmento. O comprimento da linha comum é a soma dos passos das amostras que valem, dividida pela quantidade
+ * a cada `passo` mm. Para cada amostra de uma parte acha-se, dentro de `vizinho`, a aresta viva da outra que olha para o mesmo lado
+ * (a borda da face de fora com a borda da face de fora), e o ponto exato dela mais perto da amostra. O vão é a distância entre os dois
+ * no plano da face de fora da outra, e o ponto é o meio do segmento. A medida só vale quando a volta fecha, isto é, quando a aresta da
+ * outra parte também tem essa amostra como a mais próxima (a borda de uma chapa em frente à da outra, e não a quina de uma que olha a
+ * ponta da outra). Numa chapa inclinada cortada com parede paralela ao eixo e não normal à chapa, o vão ao longo dela passa do que a
+ * parede mostra: é esse que sai. O comprimento da linha comum é a soma dos passos das amostras que valem, dividida pela quantidade
  * de linhas paralelas em volta de cada uma (uma chapa tem uma aresta viva em cada face de fora). O degrau é, em cada amostra, a
- * distância dela ao plano da face de fora da outra parte, tirado da aresta viva mais próxima que olha para o mesmo lado.
+ * distância dela ao plano da face de fora da outra parte, que passa pelo ponto da aresta que mediu o vão.
  *
  * PARTE SOLTA é a que, em toda outra parte, fica a mais de `toque` mm da superfície e não a atravessa por aresta nenhuma. A parte
  * mais próxima e a distância saem de vértices e amostras de aresta, e por isso a distância vale até o passo. A parte contida inteira
@@ -263,7 +266,7 @@ export function prepararParte(nome, faces, { passo = PASSO_MM, angulo = ANGULO_V
     if (e.faces.length === 2 && dot(n1, n2) >= cosVivo) continue;
     const pa = verts[e.a]; const pb = verts[e.b]; const len = comp(sub(pb, pa));
     const n = Math.max(1, Math.ceil(len / passo));
-    for (let k = 0; k < n; k += 1) amostras.push({ p: mais(pa, sub(pb, pa), (k + 0.5) / n), n1, n2, ds: len / n });
+    for (let k = 0; k < n; k += 1) amostras.push({ p: mais(pa, sub(pb, pa), (k + 0.5) / n), n1, n2, ds: len / n, a: pa, b: pb });
   }
   return { nome, caixa: nTri ? caixa : [0, 0, 0, 0, 0, 0], tri, nTri, arvore: nTri ? construirArvore(tri, nTri) : { nos: [{ b: [0, 0, 0, 0, 0, 0], l: -1, r: -1, i0: 0, i1: 0 }], ord: [] }, vertices: verts, arestas, amostras, fechada, grade: null };
 }
@@ -295,8 +298,8 @@ const percentil = (v, q) => v[Math.min(v.length - 1, Math.floor(q * v.length))];
 const arred = (x, c = 3) => Number(x.toFixed(c));
 const pt = (p) => p.map((x) => arred(x, 1));
 
-/* O comprimento da linha comum: a soma dos passos, cada um dividido pelas amostras vizinhas em um raio R (uma linha dá 2R/passo
-   amostras em volta, k linhas paralelas dão k vezes isso); cada amostra vale então 2R sobre as que tem em volta. */
+/* O comprimento da linha comum: a soma dos passos dividida pela quantidade de linhas paralelas. As linhas se contam pelas amostras em
+   volta de cada uma, num raio R (uma linha dá 2R/passo, k linhas dão k vezes isso), e vale o terceiro quartil, que as pontas não puxam. */
 function comprimentoDaLinha(valem, raio) {
   const g = { celula: raio, mapa: new Map() };
   for (const s of valem) {
@@ -304,12 +307,16 @@ function comprimentoDaLinha(valem, raio) {
     if (!g.mapa.has(k)) g.mapa.set(k, []);
     g.mapa.get(k).push(s);
   }
-  let total = 0;
+  const k = [];
+  let soma = 0;
   for (const s of valem) {
     let n = 0;
     vizinhasNaGrade(g, s.p, raio, (o) => { if (comp(sub(o.p, s.p)) <= raio) n += 1; });
-    total += (2 * raio) / n;
+    k.push((n * s.ds) / (2 * raio)); soma += s.ds;
   }
+  k.sort((x, y) => x - y);
+  const linhas = Math.max(1, Math.round(percentil(k, 0.75)));
+  const total = soma / linhas;
   return total;
 }
 
@@ -343,60 +350,83 @@ export function distanciaEntre(A, B, limite = Infinity) {
   return onde ? { d: melhor, em: onde } : null;
 }
 
+/* o ponto do segmento a b mais perto de p */
+function pontoNoSegmento(p, a, b) {
+  const ab = sub(b, a); const t = Math.max(0, Math.min(1, dot(sub(p, a), ab) / Math.max(dot(ab, ab), 1e-18)));
+  return mais(a, ab, t);
+}
+
+/* a normal da aresta que olha para o mesmo lado que `nX`: a de maior cosseno, e só vale acima de 0,7; sem sinal quando uma das
+   duas arestas tem uma face só (a chapa sem espessura não diz qual é o lado de fora) */
+function normalDoMesmoLado(nX, assinada, o) {
+  let melhor = null; let mc = 0.7;
+  for (const nY of [o.n1, o.n2]) {
+    if (!nY) continue;
+    const c = assinada && o.n2 ? dot(nX, nY) : Math.abs(dot(nX, nY));
+    if (c > mc) { mc = c; melhor = nY; }
+  }
+  return melhor;
+}
+
+/* o ponto de aresta viva de Y mais perto de p, entre as que olham para o lado de `nX`, a até `raio`: { e, nY, d } */
+function arestaDoMesmoLado(Y, p, nX, assinada, raio, celula) {
+  let melhor = null; let md = raio;
+  vizinhasNaGrade(gradeDe(Y, celula), p, raio, (o) => {
+    const nY = normalDoMesmoLado(nX, assinada, o);
+    if (!nY) return;
+    const e = pontoNoSegmento(p, o.a, o.b); const d = comp(sub(e, p));
+    if (d <= md) { md = d; melhor = { e, nY, d }; }
+  });
+  return melhor;
+}
+
 /**
- * Mede o vão e o degrau entre duas partes. As amostras são as arestas vivas de cada uma, e só valem as de volta fechada.
+ * Mede o vão e o degrau entre duas partes. A amostra é um ponto de aresta viva de uma parte; o vão dela é a distância, no plano da
+ * face de fora da outra, ao ponto da aresta viva da outra que olha para o mesmo lado, e o degrau é o desnível entre esses dois
+ * planos. Só valem as amostras de volta fechada: a aresta da outra parte também tem a amostra como a mais próxima.
  * @returns {null | { amostras, vao, linhaMm, degrau, tipo }}  `null` quando nenhuma amostra fica a até `vizinho` mm
  */
-export function medirPar(A, B, { vizinho = VIZINHO_PADRAO_MM, toque = TOQUE_MM } = {}) {
+export function medirPar(A, B, { vizinho = VIZINHO_PADRAO_MM, toque = TOQUE_MM, centro = null } = {}) {
   const todas = [];
+  const celula = vizinho * 1.5 + 2;
   for (const [X, Y] of [[A, B], [B, A]]) {
     for (const s of X.amostras) {
       if (!dentroDaCaixa(s.p, Y.caixa, vizinho)) continue;
       const r = maisProximo(Y, s.p, vizinho);
       if (!r) continue;
-      const tol = 0.05 + 0.01 * r.d;
-      const mutua = r.d <= toque || !maisProximo(X, r.q, r.d - tol);
-      todas.push({ d: r.d, p: s.p, q: r.q, s, X, Y, mutua });
+      if (r.d <= toque) { todas.push({ vao: r.d, degrau: 0, p: s.p, e: r.q, s, mutua: true, aresta: false }); continue; }
+      const u = unit(sub(r.q, s.p));
+      const nX = s.n2 && Math.abs(dot(s.n2, u)) < Math.abs(dot(s.n1, u)) ? s.n2 : s.n1;
+      const assinada = !!s.n2;
+      const c = arestaDoMesmoLado(Y, s.p, nX, assinada, r.d * 1.5 + 2, celula);
+      if (!c) { todas.push({ vao: r.d, degrau: null, p: s.p, e: r.q, s, mutua: !maisProximo(X, r.q, r.d - (0.05 + 0.01 * r.d)), aresta: false }); continue; }
+      const delta = sub(c.e, s.p); const degrau = Math.abs(dot(delta, c.nY));
+      const vao = Math.sqrt(Math.max(0, dot(delta, delta) - degrau * degrau));
+      const volta = arestaDoMesmoLado(X, c.e, c.nY, assinada, c.d - (0.05 + 0.01 * c.d), celula);
+      todas.push({ vao, degrau, p: s.p, e: c.e, s, mutua: !volta, aresta: true, fora: centro === null || !s.n2 || dot(nX, sub(s.p, centro)) > 0 });
     }
   }
   const contato = contatoEntre(A, B, toque);
   if (!todas.length && !contato) return null;
-  const valem = todas.filter((x) => x.mutua);
-  const usadas = valem.length ? valem : todas;
-  const ds = usadas.map((x) => x.d).sort((a, b) => a - b);
-  const pior = (cmp) => usadas.reduce((m, x) => (cmp(x.d, m.d) ? x : m), usadas[0]);
-  const menor = usadas.length ? pior((a, b) => a < b) : null;
-  const maior = usadas.length ? pior((a, b) => a > b) : null;
+  /* a medida de aresta contra aresta vale; sem nenhuma, a distância à superfície */
+  const todasAsArestas = todas.filter((x) => x.aresta && x.mutua);
+  const dasArestas = todasAsArestas.some((x) => x.fora) ? todasAsArestas.filter((x) => x.fora) : todasAsArestas;
+  const usadas = dasArestas.length ? dasArestas : todas.filter((x) => x.mutua).length ? todas.filter((x) => x.mutua) : todas;
+  const ds = usadas.map((x) => x.vao).sort((a, b) => a - b);
+  const acha = (cmp) => usadas.reduce((m, x) => (cmp(x.vao, m.vao) ? x : m), usadas[0]);
+  const menor = usadas.length ? acha((a, b) => a < b) : null;
+  const maior = usadas.length ? acha((a, b) => a > b) : null;
   const vao = usadas.length ? {
     min: arred(ds[0]), mediana: arred(mediana(ds)), p90: arred(percentil(ds, 0.9)), max: arred(ds[ds.length - 1]),
-    emMin: pt(meio(menor.p, menor.q)), emMax: pt(meio(maior.p, maior.q)),
+    emMin: pt(meio(menor.p, menor.e)), emMax: pt(meio(maior.p, maior.e)),
   } : null;
   const raio = Math.max(6, 2 * (vao?.mediana ?? 0) + 4);
   const linhaMm = usadas.length ? comprimentoDaLinha(usadas.map((x) => ({ p: x.p, ds: x.s.ds })), raio) : 0;
-  /* o degrau: a distância da amostra ao plano de fora da outra parte, tirado da aresta viva mais próxima que olha para o mesmo lado */
-  const desniveis = [];
-  for (const x of usadas) {
-    if (x.d <= 1e-9) continue;
-    const u = unit(sub(x.q, x.p));
-    const nX = x.s.n2 && Math.abs(dot(x.s.n2, u)) < Math.abs(dot(x.s.n1, u)) ? x.s.n2 : x.s.n1;
-    const grade = gradeDe(x.Y, Math.max(vizinho, 2));
-    let melhor = null; let melhorD = x.d * 1.5 + 2;
-    vizinhasNaGrade(grade, x.p, melhorD, (o) => {
-      const dd = comp(sub(o.p, x.p));
-      if (dd > melhorD) return;
-      for (const nY of [o.n1, o.n2]) {
-        if (!nY) continue;
-        const c = dot(nX, nY);
-        const mesmoLado = x.s.n2 && o.n2 ? c > 0.7 : Math.abs(c) > 0.7;
-        if (mesmoLado && Math.abs(dot(nY, u)) < 0.7) { melhorD = dd; melhor = { o, nY }; }
-      }
-    });
-    if (melhor) desniveis.push({ v: Math.abs(dot(sub(x.p, melhor.o.p), melhor.nY)), em: meio(x.p, melhor.o.p) });
-  }
-  desniveis.sort((a, b) => a.v - b.v);
-  const degrau = desniveis.length ? { mediana: arred(mediana(desniveis.map((d) => d.v))), max: arred(desniveis[desniveis.length - 1].v), em: pt(desniveis[desniveis.length - 1].em), amostras: desniveis.length } : null;
+  const desn = usadas.filter((x) => x.degrau !== null).sort((a, b) => a.degrau - b.degrau);
+  const pior = desn[desn.length - 1];
+  const degrau = desn.length ? { mediana: arred(mediana(desn.map((x) => x.degrau))), max: arred(pior.degrau), em: pt(meio(pior.p, pior.e)), amostras: desn.length } : null;
   const tipo = contato === 'atravessa' ? 'atravessa' : contato === 'toca' || (vao && vao.min <= toque) ? 'toca' : 'folga';
-  return { amostras: usadas.length, deFaceAFace: valem.length > 0, vao, linhaMm: arred(linhaMm, 1), degrau, tipo };
+  return { amostras: usadas.length, deArestaAAresta: dasArestas.length > 0, vao, linhaMm: arred(linhaMm, 1), degrau, tipo };
 }
 
 /* --- a medição de uma peça inteira --------------------------------------------------------------------------------------------- */
@@ -406,7 +436,7 @@ const casa = (nome, filtros) => filtros.some((f) => nome === f || nome.startsWit
 /**
  * O vão e o degrau de cada par de partes vizinhas e as partes soltas.
  * @param {Array<{ pts: number[][], parte: string }>} faces  em mm; a face sem `parte` fica fora
- * @param {object} [o]  esperado, tolerancia, degrau, vizinho, passo, toque, pares, partes, folgas, apoia (ver a ficha)
+ * @param {object} [o]  esperado, tolerancia, degrau, vizinho, passo, toque, lado, pares, partes, folgas, apoia (ver a ficha)
  * @returns {{ pares: Array, soltas: Array, resumo: object }}  `pares` do pior para o melhor
  */
 export function vaoEntrePartes(faces, o = {}) {
@@ -423,6 +453,14 @@ export function vaoEntrePartes(faces, o = {}) {
   for (const f of faces) if (f.parte) { if (!porNome.has(f.parte)) porNome.set(f.parte, []); porNome.get(f.parte).push(f); }
   const partes = new Map([...porNome].map(([n, fs]) => [n, prepararParte(n, fs, { passo })]));
   const nomes = [...partes.keys()];
+  if (o.lado !== undefined && !['fora', 'todos'].includes(o.lado)) throw new ErroDoVao('lado espera fora ou todos');
+  /* o lado de fora de uma chapa é o que olha para longe do centro da caixa do modelo; sem ele, valem as duas faces */
+  let centro = null;
+  if ((o.lado ?? 'fora') === 'fora') {
+    const c = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+    for (const p of partes.values()) for (let k = 0; k < 3; k += 1) { c[k] = Math.min(c[k], p.caixa[k]); c[k + 3] = Math.max(c[k + 3], p.caixa[k + 3]); }
+    centro = [0, 1, 2].map((k) => (c[k] + c[k + 3]) / 2);
+  }
   for (const par of o.pares ?? []) for (const n of par) if (!partes.has(n)) throw new ErroDoVao(`a parte "${n}" não existe (${nomes.join(', ')})`);
   const filtros = o.partes ? [...o.partes] : null;
   if (filtros) for (const f of filtros) if (!nomes.some((n) => casa(n, [f]))) throw new ErroDoVao(`o prefixo ou nome "${f}" de --partes não casa com nenhuma parte`);
@@ -443,7 +481,7 @@ export function vaoEntrePartes(faces, o = {}) {
     if (!escolhido || (gap > vizinho && !explicito)) continue;
     let alcance = vizinho;
     if (explicito && gap > vizinho) alcance = (distanciaEntre(A, B)?.d ?? gap) + vizinho;
-    const m = medirPar(A, B, { vizinho: alcance, toque });
+    const m = medirPar(A, B, { vizinho: alcance, toque, centro });
     if (!m) { if (explicito) pares.push({ a: A.nome, b: B.nome, tipo: 'longe', amostras: 0, vao: null, linhaMm: 0, degrau: null }); continue; }
     pares.push({ a: A.nome, b: B.nome, ...m });
   }
@@ -541,7 +579,7 @@ export function linhaDoPar(p) {
 }
 
 const AJUDA = `npm run vao:partes -- <esboço|receita> [--opcao=1] [--esperado=<mm>] [--tolerancia=${TOLERANCIA_MM}] [--degrau=<mm>] [--par=a:b]...
-    [--partes=<prefixo|nome>,...] [--vizinho=<mm>] [--passo=${PASSO_MM}] [--toque=${TOQUE_MM}] [--soltas=recusar] [--apoia=<parte>:<motivo>]...
+    [--partes=<prefixo|nome>,...] [--vizinho=<mm>] [--passo=${PASSO_MM}] [--toque=${TOQUE_MM}] [--lado=fora|todos] [--soltas=recusar] [--apoia=<parte>:<motivo>]...
     [--linhas=40] [--json]
 
 Mede, sobre a malha, o vão (da borda de uma parte à borda da outra, ao longo da linha comum: mínimo, mediana, p90, máximo, com o ponto do
@@ -565,7 +603,7 @@ export async function executar(argv) {
     if (soltas !== null && !['recusar', 'listar'].includes(soltas)) throw new ErroDoVao('--soltas espera recusar ou listar');
     const entrada = await lerEntrada(arquivo, { opcao: Number(valor('opcao') ?? 1) });
     const r = vaoEntrePartes(entrada.faces, {
-      esperado: numero('esperado'), tolerancia: numero('tolerancia'), degrau: numero('degrau'), vizinho: numero('vizinho'), passo: numero('passo'), toque: numero('toque'),
+      esperado: numero('esperado'), tolerancia: numero('tolerancia'), degrau: numero('degrau'), vizinho: numero('vizinho'), passo: numero('passo'), toque: numero('toque'), lado: valor('lado') ?? undefined,
       pares: pares.length ? pares : undefined, partes: valor('partes') ? valor('partes').split(',').map((s) => s.trim()).filter(Boolean) : undefined, folgas: entrada.folgas, apoia,
     });
     for (const n of Object.keys(apoia)) if (!r.soltas.some((s) => s.parte === n) && !entrada.faces.some((f) => f.parte === n)) throw new ErroDoVao(`--apoia cita a parte "${n}", que não existe`);

@@ -19,7 +19,7 @@ const tipos = Object.freeze({
   origemId: { type: 'integer', minimum: 0, description: 'Identidade semântica escolhida pelo autor; não é índice de passo.' },
   idLegado: { type: 'integer', minimum: 0, description: 'Base posicional legada. Prefira origemId para identidade persistida.' },
   origem: { type: 'object', description: 'Origem estrutural semântica publicada por uma operação anterior.' },
-  selecao: { type: 'object', description: 'Seleção semântica por tudo, origem, alias, grupo, região ou ids legados aceitos; onde filtra por propriedade geométrica (normal, extremo, tipo).' },
+  selecao: { type: 'object', description: 'Seleção semântica por tudo, origem, alias, grupo, região ou ids legados aceitos; onde filtra por propriedade geométrica (normal, extremo, tipo) ou escolhe o pedaço conexo que um raio toca (conexo).' },
   listaInteiros: { type: 'array', items: { type: 'integer' } },
   listaTextos: { type: 'array', items: { type: 'string', minLength: 1 } },
   lista: { type: 'array' },

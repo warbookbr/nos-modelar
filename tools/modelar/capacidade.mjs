@@ -26,6 +26,8 @@ export const CAPACIDADES = Object.freeze({
   gaiolaAneis: { arquivo: 'procedural/nucleo/gaiola-aneis.js', funcao: 'gaiolaPorEstacoes', de: ESTACOES },
   gaiolaPorLacos: { arquivo: 'procedural/nucleo/gaiola-por-lacos.js', funcao: 'gaiolaPorLacos', de: 'procedural/nucleo/gaiola-por-lacos.js' },
   lacosPelasVistas: { arquivo: 'procedural/nucleo/lacos-pelas-vistas.js', funcao: 'lacosPelasVistas', de: 'procedural/nucleo/lacos-pelas-vistas.js' },
+  paineisPorVaos: { arquivo: 'procedural/nucleo/paineis-por-vaos.js', funcao: 'paineisPorVaos', de: 'procedural/nucleo/paineis-por-vaos.js' },
+  vaoEntrePartes: { arquivo: 'tools/modelar/vao-entre-partes.mjs', funcao: 'vaoEntrePartes', de: 'tools/modelar/vao-entre-partes.mjs' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
 });
 
@@ -68,6 +70,8 @@ function fichaDe(nome) {
   return lerFicha(readFileSync(resolve(REPO, CAPACIDADES[nome].arquivo), 'utf8'));
 }
 
+const semAcento = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 const listar = () => Object.keys(CAPACIDADES).map((n) => `${n.padEnd(20)} ${fichaDe(n)?.serve ?? '(sem ficha)'}`).join('\n');
 
 export function executar(args) {
@@ -75,6 +79,16 @@ export function executar(args) {
   const nome = args.find((a) => !a.startsWith('--'));
   if (!nome) return { codigo: 0, stdout: `${listar()}\n`, stderr: '' };
   const achado = Object.keys(CAPACIDADES).find((n) => n.toLowerCase() === nome.toLowerCase());
+  if (!achado) {
+    /* a palavra que não é nome: as capacidades cuja ficha a cita em `serve` ou `quando` (painel, vão, linha de vão, porta, capô) */
+    const palavras = semAcento(args.filter((a) => !a.startsWith('--')).join(' ')).split(/\s+/).filter((w) => w.length >= 3);
+    const citam = Object.keys(CAPACIDADES).filter((n) => {
+      const f = fichaDe(n);
+      const texto = semAcento((f?.linhas ?? []).filter((l) => l.startsWith('serve: ') || l.startsWith('quando: ')).join(' '));
+      return palavras.length > 0 && palavras.every((w) => texto.includes(w));
+    });
+    if (citam.length) return { codigo: 0, stdout: `'${nome}' não é o nome de uma capacidade; as que a citam:\n${citam.map((n) => `${n.padEnd(20)} ${fichaDe(n).serve}`).join('\n')}\n`, stderr: '' };
+  }
   if (!achado) return { codigo: 2, stdout: '', stderr: `capacidade '${nome}' não existe; as que existem:\n${listar()}\n` };
   const ficha = fichaDe(achado);
   if (!ficha) return { codigo: 2, stdout: '', stderr: `${CAPACIDADES[achado].arquivo} não tem o trecho FICHA ... FIM DA FICHA no comentário de cabeçalho\n` };

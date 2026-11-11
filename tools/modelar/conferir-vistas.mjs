@@ -53,10 +53,14 @@
  * [x, y, z] }, o ponto do contorno e o ponto do modelo que caem no mesmo lugar da vista; padrão a origem nos dois) e "espelhar"
  * (true para o contorno desenhado olhando para o outro lado). "partes" mapeia cada parte do arquivo que se mede (ou várias juntas por
  * "+", como "lateral+piso", quando o arquivo divide o que o modelo tem numa parte só) para uma parte do modelo ou uma lista delas, e
- * "ignorarRegioes" tira partes do arquivo do conjunto (a sombra). Para cada parte mapeada e para o
+ * "ignorarRegioes" tira partes do arquivo do conjunto (a sombra), e "foraDaConta": [{ "partes": [...], "motivo": "..." }] tira partes do
+ * MODELO da silhueta e da conta, as que a referência não tem (o chassi sob a lataria), com o motivo no resumo. Para cada parte mapeada e para o
  * conjunto (todas as partes do modelo contra as do arquivo menos as ignoradas) sai, na silhueta visível do modelo na vista: a
  * sobreposição (interseção sobre união), a caixa em mm nos eixos do modelo com a diferença por lado da imagem (positiva quando o
- * modelo passa da referência para fora) e o maior afastamento entre os dois contornos, de um contorno até o outro, com a posição.
+ * modelo passa da referência para fora), a sobra e a falta (a área do modelo fora da referência e a da referência fora do modelo, em mm² e
+ * em parte da área da referência) e o maior afastamento entre os dois contornos, de um contorno até o outro, com a posição. O afastamento
+ * mede só o contorno de fora da silhueta. Os furos da silhueta do modelo mais estreitos que "fendaMm" (20 mm por padrão, por vista) saem à
+ * parte, no conjunto, como lista de fendas com posição, largura e comprimento: a junta de 4 mm entre portas por onde se vê o outro lado.
  * Grava `<vista>/contornos.png`, o modelo na cor da classe com os contornos por cima, e `<vista>/contornos.json`. Essa vista não tem
  * casamento, captura nem pedido ao crítico, que não tem imagem para comparar.
  *
@@ -239,6 +243,8 @@ const textoDoGiro = (girar, espelhar) => [girar ? `girada ${girar} graus no sent
 
 /* --- a vista só de contornos ------------------------------------------------------------------------------------------------- */
 export const FORMATO_DOS_CONTORNOS = 'mecanifica.contornos@1';
+/* a largura, em mm, até a qual um furo da silhueta do modelo é fenda: a de uma junta entre painéis, por onde se vê o outro lado */
+export const FENDA_MAXIMA_MM = 20;
 const PALETA_DOS_CONTORNOS = [[0, 90, 255], [220, 0, 40], [0, 150, 60], [200, 0, 200], [255, 130, 0], [0, 170, 190], [120, 60, 0], [90, 0, 200], [150, 150, 0], [255, 0, 120]];
 const CINZA_DO_CONTORNO = [150, 150, 150];
 const par = (v) => Array.isArray(v) && v.length === 2 && v.every(Number.isFinite);
@@ -285,10 +291,20 @@ function lerVistaDeContornos(v, campo, pastaDaConfig, recusa) {
   if (!Array.isArray(ignorarRegioes) || ignorarRegioes.some((x) => typeof x !== 'string')) r(`${campo}.ignorarRegioes`, 'espera uma lista de partes do arquivo');
   else if (regioes) for (const x of ignorarRegioes) if (!regioes[x]) r(`${campo}.ignorarRegioes`, `o arquivo não tem a parte "${x}"`);
   if (regioes && Array.isArray(ignorarRegioes)) for (const x of ignorarRegioes) if (Object.keys(partes).some((k) => k.split('+').map((y) => y.trim()).includes(x))) r(`${campo}.ignorarRegioes`, `a parte "${x}" está em "partes" e no ignorado`);
+  /* as partes do modelo que a referência não tem (o chassi sob a lataria): saem da silhueta do modelo e da conta, cada grupo com o motivo */
+  const foraDaConta = v.foraDaConta ?? [];
+  if (!Array.isArray(foraDaConta)) r(`${campo}.foraDaConta`, 'espera uma lista de { partes: [...], motivo }');
+  else foraDaConta.forEach((g, i) => {
+    const onde = `${campo}.foraDaConta[${i}]`;
+    if (!ehObjeto(g) || !Array.isArray(g.partes) || !g.partes.length || g.partes.some((x) => typeof x !== 'string' || !x)) r(onde, 'espera { partes: [nome, ...], motivo } com pelo menos uma parte');
+    else if (typeof g.motivo !== 'string' || !g.motivo.trim()) r(`${onde}.motivo`, 'espera o texto que diz por que a referência não tem essas partes');
+  });
+  const fendaMm = v.fendaMm ?? FENDA_MAXIMA_MM;
+  if (!(Number.isFinite(fendaMm) && fendaMm > 0)) r(`${campo}.fendaMm`, `espera a largura máxima de uma fenda, em mm, maior que zero (veio ${JSON.stringify(v.fendaMm)})`);
   for (const t of ['fora', 'visto']) if (v[t] !== undefined && typeof v[t] !== 'string') r(`${campo}.${t}`, 'precisa ser um texto');
   for (const c of ['caixaRef', 'ignorar', 'girar', 'grade', 'escalaVertical']) if (v[c] !== undefined) r(`${campo}.${c}`, 'não vale numa vista só de contornos, que não tem imagem');
   if (antes.length) return null;
-  return { caminhoDosContornos: caminho, textoDosContornos: v.contornos, regioes, escala, ancora: { contorno: [...ancora.contorno], modelo: [...ancora.modelo] }, espelhar, partes, ignorarRegioes: [...ignorarRegioes] };
+  return { caminhoDosContornos: caminho, textoDosContornos: v.contornos, regioes, escala, ancora: { contorno: [...ancora.contorno], modelo: [...ancora.modelo] }, espelhar, partes, ignorarRegioes: [...ignorarRegioes], foraDaConta: foraDaConta.map((g) => ({ partes: [...g.partes], motivo: g.motivo })), fendaMm };
 }
 
 /** A máscara de um polígono em px (pares [x, y]), pelo centro de cada pixel e pela regra par-ímpar, somada a `mascara`. */
@@ -310,6 +326,32 @@ export function preencherPoligono(mascara, L, A, pts) {
   return mascara;
 }
 
+/**
+ * Os furos de uma máscara: o fundo que não alcança a moldura da imagem. Devolve `{ cheia, furos }`, a máscara com os furos preenchidos e a
+ * lista de furos, cada um com os índices dos pixels dele.
+ */
+export function furosDaMascara(m, L, A) {
+  const visto = new Uint8Array(L * A); const pilha = [];
+  const empurra = (i) => { if (!m[i] && !visto[i]) { visto[i] = 1; pilha.push(i); } };
+  for (let x = 0; x < L; x += 1) { empurra(x); empurra((A - 1) * L + x); }
+  for (let y = 0; y < A; y += 1) { empurra(y * L); empurra(y * L + L - 1); }
+  while (pilha.length) {
+    const i = pilha.pop(); const x = i % L; const y = (i - x) / L;
+    if (x > 0) empurra(i - 1); if (x < L - 1) empurra(i + 1); if (y > 0) empurra(i - L); if (y < A - 1) empurra(i + L);
+  }
+  const cheia = Uint8Array.from(m); const furos = [];
+  for (let i = 0; i < m.length; i += 1) {
+    if (m[i] || visto[i] || cheia[i]) continue;
+    const fila = [i]; const pixels = []; cheia[i] = 1;
+    while (fila.length) {
+      const j = fila.pop(); pixels.push(j); const x = j % L; const y = (j - x) / L;
+      for (const k of [x > 0 ? j - 1 : -1, x < L - 1 ? j + 1 : -1, y > 0 ? j - L : -1, y < A - 1 ? j + L : -1]) if (k >= 0 && !m[k] && !cheia[k]) { cheia[k] = 1; fila.push(k); }
+    }
+    furos.push(pixels);
+  }
+  return { cheia, furos };
+}
+
 /* o eixo do modelo que uma direção da vista segue, com o sinal: (0, 0, -1) é "-z"; a direção oblíqua fica sem eixo */
 function eixoDaDirecao(d) {
   const i = d.findIndex((c) => Math.abs(c) > 0.999);
@@ -320,8 +362,12 @@ function eixoDaDirecao(d) {
  * A comparação da silhueta do modelo com a das partes de um arquivo de contornos, numa vista. `faces` no formato de `facesDoNeutro`,
  * `partes` os nomes da opção, `v` a vista lida de "contornos". Devolve as medidas do conjunto e de cada parte mapeada, e o raster.
  */
-export function medirContornos({ faces, partes, vista, largura, v }) {
+export function medirContornos({ faces: todasAsFaces, partes, vista, largura, v }) {
   const { direita, cima } = baseDaVista(vista);
+  /* as partes fora da conta não entram na silhueta: sem o chassi atrás, a junta entre dois painéis é um furo e não o chassi cinza */
+  const foraDaConta = new Set((v.foraDaConta ?? []).flatMap((g) => g.partes));
+  const indiceDasFora = new Set(partes.map((n, i) => (foraDaConta.has(n) ? i + 1 : 0)).filter(Boolean));
+  const faces = indiceDasFora.size ? todasAsFaces.filter((f) => !indiceDasFora.has(f.parte)) : todasAsFaces;
   const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   const ua = dot(v.ancora.modelo, direita); const va = dot(v.ancora.modelo, cima);
   const sx = v.espelhar ? -1 : 1; const [cx, cy] = v.ancora.contorno;
@@ -342,17 +388,41 @@ export function medirContornos({ faces, partes, vista, largura, v }) {
   /* do pixel ao ponto do modelo nos eixos dele */
   const nosEixos = (u, w) => ({ [eh?.nome ?? 'u']: (eh?.sinal ?? 1) * u, [ev?.nome ?? 'v']: (ev?.sinal ?? 1) * w });
   const intervalo = (a, b, e) => (e && e.sinal < 0 ? [-b, -a] : [a, b]);
-  const medir = (mod, ref) => {
+  /* os furos estreitos da silhueta do modelo, por onde se vê o outro lado: posição, largura e comprimento em mm; o furo mais largo só se conta */
+  const fendasDoModelo = (mod) => {
+    const { furos } = furosDaMascara(mod, L, A);
+    if (!furos.length) return { estreitas: [], largas: 0, limiteMm: v.fendaMm ?? FENDA_MAXIMA_MM };
+    const d2 = distanciaAoConjunto(mod, L, A);
+    const limiteMm = v.fendaMm ?? FENDA_MAXIMA_MM; const estreitas = []; let largas = 0;
+    for (const pixels of furos) {
+      let rmax = 0; let sx = 0; let sy = 0; let x0 = L; let x1 = -1; let y0 = A; let y1 = -1;
+      for (const i of pixels) {
+        const x = i % L; const y = (i - x) / L;
+        if (d2[i] > rmax) rmax = d2[i];
+        sx += x; sy += y; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      }
+      /* a largura é a maior entre a dobra da maior distância ao modelo e a área sobre o comprimento, a que a junta reta dá certo */
+      const comprimentoMm = Math.max(x1 - x0 + 1, y1 - y0 + 1) * mm; const areaMm2 = pixels.length * mm * mm;
+      const larguraMm = Math.max(Math.max(1, 2 * Math.sqrt(rmax) - 1) * mm, areaMm2 / comprimentoMm);
+      if (larguraMm > limiteMm) { largas += 1; continue; }
+      estreitas.push({ em: nosEixos(quadro.u0 + (sx / pixels.length + 0.5) * mm, quadro.v1 - (sy / pixels.length + 0.5) * mm), larguraMm, comprimentoMm, areaMm2 });
+    }
+    estreitas.sort((a, b) => b.comprimentoMm - a.comprimentoMm);
+    return { estreitas, largas, limiteMm };
+  };
+  const medir = (mod, ref, { comFendas = false } = {}) => {
     let inter = 0; let uni = 0; let x0 = L; let x1 = -1; let y0 = A; let y1 = -1;
     const caixa = (m) => { let a = L; let b = -1; let c = A; let d = -1; for (let i = 0; i < m.length; i += 1) if (m[i]) { const x = i % L; const y = (i - x) / L; if (x < a) a = x; if (x > b) b = x; if (y < c) c = y; if (y > d) d = y; } return b < 0 ? null : [a, c, b, d]; };
-    for (let i = 0; i < mod.length; i += 1) { if (mod[i] && ref[i]) inter += 1; if (mod[i] || ref[i]) uni += 1; }
+    let nSobra = 0; let nFalta = 0;
+    for (let i = 0; i < mod.length; i += 1) { if (mod[i] && ref[i]) inter += 1; if (mod[i] || ref[i]) uni += 1; if (mod[i] && !ref[i]) nSobra += 1; if (ref[i] && !mod[i]) nFalta += 1; }
     const cm = caixa(mod); const cr = caixa(ref);
     const emMm = (c) => (c ? { u0: quadro.u0 + c[0] * mm, u1: quadro.u0 + (c[2] + 1) * mm, v0: quadro.v1 - (c[3] + 1) * mm, v1: quadro.v1 - c[1] * mm } : null);
     const bm = emMm(cm); const br = emMm(cr);
     const caixaNosEixos = (b) => (b ? { [eh?.nome ?? 'u']: intervalo(b.u0, b.u1, eh), [ev?.nome ?? 'v']: intervalo(b.v0, b.v1, ev) } : null);
-    const sai = { sobreposicao: uni ? inter / uni : 0, areaModeloMm2: 0, areaReferenciaMm2: 0, caixaModelo: caixaNosEixos(bm), caixaReferencia: caixaNosEixos(br), lados: null, afastamento: null };
+    const sai = { sobreposicao: uni ? inter / uni : 0, sobraMm2: (nSobra) * mm * mm, faltaMm2: nFalta * mm * mm, areaModeloMm2: 0, areaReferenciaMm2: 0, caixaModelo: caixaNosEixos(bm), caixaReferencia: caixaNosEixos(br), lados: null, afastamento: null };
     let nm = 0; let nr = 0; for (let i = 0; i < mod.length; i += 1) { nm += mod[i]; nr += ref[i]; }
     sai.areaModeloMm2 = nm * mm * mm; sai.areaReferenciaMm2 = nr * mm * mm;
+    if (comFendas) sai.fendas = fendasDoModelo(mod);
     if (!bm || !br) return sai;
     sai.lados = { esquerda: br.u0 - bm.u0, direita: bm.u1 - br.u1, baixo: br.v0 - bm.v0, cima: bm.v1 - br.v1 };
     /* o afastamento, no recorte que cobre as duas caixas: a borda de cada uma até a borda da outra */
@@ -367,7 +437,8 @@ export function medirContornos({ faces, partes, vista, largura, v }) {
       }
       return b;
     };
-    const em = borda(mod); const er = borda(ref);
+    /* o afastamento mede só o contorno de fora da silhueta: o furo do modelo (a junta entre painéis) sai nas fendas, e o da referência (a janela) não conta */
+    const em = borda(furosDaMascara(mod, L, A).cheia); const er = borda(furosDaMascara(ref, L, A).cheia);
     const longe = (de, ate) => {
       const d2 = distanciaAoConjunto(ate, l, a); let max = -1; let onde = 0;
       for (let i = 0; i < de.length; i += 1) if (de[i] && d2[i] > max) { max = d2[i]; onde = i; }
@@ -382,7 +453,7 @@ export function medirContornos({ faces, partes, vista, largura, v }) {
   const mascaraDoModelo = (nomes) => { const ks = new Set(nomes.map((n) => indice.get(n))); const m = new Uint8Array(L * A); for (let i = 0; i < m.length; i += 1) if (ks.has(r.parte[i])) m[i] = 1; return m; };
   const todasDoModelo = new Uint8Array(L * A); for (let i = 0; i < todasDoModelo.length; i += 1) if (r.parte[i]) todasDoModelo[i] = 1;
   const entram = Object.keys(poligonos).filter((n) => !ignoradas.has(n));
-  const conjunto = medir(todasDoModelo, mascaraDe(entram));
+  const conjunto = medir(todasDoModelo, mascaraDe(entram), { comFendas: true });
   const porParte = Object.fromEntries(Object.entries(v.partes).map(([regiao, lista]) => [regiao, { partes: lista, ...medir(mascaraDoModelo(lista), mascaraDe(regiao.split('+').map((x) => x.trim()))) }]));
   return { largura: L, altura: A, mmPorPx: mm, quadro, eixos, conjunto, partes: porParte, raster: r, poligonosEmPx: Object.fromEntries(entram.map((n) => [n, poligonos[n].map((p) => p.map(emPx))])) };
 }
@@ -439,10 +510,24 @@ function medidaParaJson(x) {
   const r1 = (o) => (o ? Object.fromEntries(Object.entries(o).map(([k, w]) => [k, Array.isArray(w) ? w.map(um) : um(w)])) : null);
   const ponto = (a) => (a ? { mm: arredonda(a.mm, 1), em: r1(a.em), ...(a.de ? { de: a.de } : {}) } : null);
   return {
-    sobreposicao: arredonda(x.sobreposicao, 4), areaModeloMm2: Math.round(x.areaModeloMm2), areaReferenciaMm2: Math.round(x.areaReferenciaMm2),
+    sobreposicao: arredonda(x.sobreposicao, 4),
+    sobraMm2: Math.round(x.sobraMm2), sobraDaReferencia: arredonda(x.areaReferenciaMm2 ? x.sobraMm2 / x.areaReferenciaMm2 : 0, 4),
+    faltaMm2: Math.round(x.faltaMm2), faltaDaReferencia: arredonda(x.areaReferenciaMm2 ? x.faltaMm2 / x.areaReferenciaMm2 : 0, 4),
+    areaModeloMm2: Math.round(x.areaModeloMm2), areaReferenciaMm2: Math.round(x.areaReferenciaMm2),
     caixaModelo: r1(x.caixaModelo), caixaReferencia: r1(x.caixaReferencia), lados: r1(x.lados),
     afastamento: x.afastamento ? { maior: ponto(x.afastamento.maior), doModelo: ponto(x.afastamento.doModelo), daReferencia: ponto(x.afastamento.daReferencia) } : null,
+    ...(x.fendas ? { fendas: { limiteMm: x.fendas.limiteMm, largas: x.fendas.largas, estreitas: x.fendas.estreitas.map((f) => ({ em: r1(f.em), larguraMm: arredonda(f.larguraMm, 1), comprimentoMm: Math.round(f.comprimentoMm), areaMm2: Math.round(f.areaMm2) })) } } : {}),
   };
+}
+
+/* a frase das fendas do conjunto: quantas, e as maiores com a posição e a largura */
+function fraseDasFendas(f) {
+  if (!f) return '';
+  const n0 = (w) => `${Math.round(w) || 0}`;
+  const onde = (o) => Object.entries(o).map(([e, w]) => `${e} ${n0(w)}`).join(', ');
+  if (!f.estreitas.length) return `Nenhuma fenda de até ${f.limiteMm} mm na silhueta do modelo${f.largas ? `; ${f.largas} furo(s) mais largo(s)` : ''}.`;
+  const maiores = f.estreitas.slice(0, 5).map((x) => `${n0(x.comprimentoMm)} mm de comprimento e ${x.larguraMm.toFixed(1)} mm de largura em ${onde(x.em)}`);
+  return `${f.estreitas.length} fenda(s) de até ${f.limiteMm} mm na silhueta do modelo, por onde se vê o outro lado${f.largas ? ` (e ${f.largas} furo(s) mais largo(s))` : ''}; as ${Math.min(5, f.estreitas.length)} mais compridas: ${maiores.join('; ')}.`;
 }
 
 /* a frase de uma medida de contornos para o resumo */
@@ -453,7 +538,8 @@ function fraseDosContornos(x) {
   const onde = (o) => Object.entries(o).map(([e, w]) => `${e} ${n0(w)}`).join(', ');
   if (!x.caixaModelo || !x.caixaReferencia) return `sobreposição ${pct(x.sobreposicao)}; ${x.caixaModelo ? 'a referência' : 'o modelo'} não tem pixel nesta vista.`;
   const a = x.afastamento.maior;
-  return `sobreposição ${pct(x.sobreposicao)}; caixa do modelo ${caixa(x.caixaModelo)} e da referência ${caixa(x.caixaReferencia)} mm, o modelo passa ${mm(x.lados.esquerda)} à esquerda, ${mm(x.lados.direita)} à direita, ${mm(x.lados.baixo)} embaixo e ${mm(x.lados.cima)} em cima; maior afastamento ${a.mm.toFixed(0)} mm em ${onde(a.em)}, ${a.de === 'modelo' ? 'do contorno do modelo até o da referência' : 'do contorno da referência até o do modelo'}.`;
+  const area = (m2, f) => `${Math.round(m2)} mm² (${pct(x.areaReferenciaMm2 ? f : 0)} da área da referência)`;
+  return `sobreposição ${pct(x.sobreposicao)}, sobra ${area(x.sobraMm2, x.areaReferenciaMm2 ? x.sobraMm2 / x.areaReferenciaMm2 : 0)} e falta ${area(x.faltaMm2, x.areaReferenciaMm2 ? x.faltaMm2 / x.areaReferenciaMm2 : 0)}; caixa do modelo ${caixa(x.caixaModelo)} e da referência ${caixa(x.caixaReferencia)} mm, o modelo passa ${mm(x.lados.esquerda)} à esquerda, ${mm(x.lados.direita)} à direita, ${mm(x.lados.baixo)} embaixo e ${mm(x.lados.cima)} em cima; maior afastamento ${a.mm.toFixed(0)} mm em ${onde(a.em)}, ${a.de === 'modelo' ? 'do contorno do modelo até o da referência' : 'do contorno da referência até o do modelo'} (só o contorno de fora da silhueta).`;
 }
 
 /**
@@ -469,6 +555,10 @@ export function conferirPartes(cfg, partesDaOpcao) {
   for (const { contida, continente } of cfg.pares) for (const p of [contida, continente]) if (!partesDaOpcao.includes(p)) recusas.push(`dentro.${contida}: a parte "${p}" não existe na opção (${partesDaOpcao.join(', ')})`);
   for (const v of cfg.vistas) if (v.tipo === 'contornos') {
     for (const [regiao, lista] of Object.entries(v.partes)) for (const p of lista) if (!partesDaOpcao.includes(p)) recusas.push(`vistas.${v.nome}.partes.${regiao}: a parte "${p}" não existe na opção (${partesDaOpcao.join(', ')})`);
+    for (const g of v.foraDaConta ?? []) for (const p of g.partes) {
+      if (!partesDaOpcao.includes(p)) recusas.push(`vistas.${v.nome}.foraDaConta: a parte "${p}" não existe na opção (${partesDaOpcao.join(', ')})`);
+      else if (Object.values(v.partes).some((l) => l.includes(p))) recusas.push(`vistas.${v.nome}.foraDaConta: a parte "${p}" está em "partes" e fora da conta`);
+    }
   }
   if (recusas.length) throw new ErroDaConferencia(`a config foi recusada:\n${[...new Set(recusas)].map((r) => `- ${r}`).join('\n')}`);
 }
@@ -586,7 +676,7 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
       const partesJson = Object.fromEntries(Object.entries(c.partes).map(([n, x], k) => [n, { numero: k + 1, partes: x.partes, ...medidaParaJson(x) }]));
       const numero = Object.fromEntries(Object.keys(c.partes).map((n, k) => [n, k + 1]));
       const dados = {
-        tipo: 'contornos', contornos: v.textoDosContornos, escala: v.escala, ancora: v.ancora, espelhar: v.espelhar, ignorarRegioes: v.ignorarRegioes,
+        tipo: 'contornos', contornos: v.textoDosContornos, escala: v.escala, ancora: v.ancora, espelhar: v.espelhar, ignorarRegioes: v.ignorarRegioes, foraDaConta: v.foraDaConta,
         mmPorPx: arredonda(c.mmPorPx, 3), eixos: c.eixos, conjunto: medidaParaJson(c.conjunto), partes: partesJson,
         arquivos: { contornos: rel(arq.desenho), json: rel(arq.json) },
       };
@@ -596,11 +686,13 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
       const ordem = Object.entries(c.partes).sort((a, b) => (b[1].afastamento?.maior.mm ?? Infinity) - (a[1].afastamento?.maior.mm ?? Infinity));
       md.push(`## Vista ${v.nome}, só de contornos`, '',
         `A referência desta vista é o arquivo de contornos ${v.textoDosContornos}, sem imagem: não há casamento, captura nem pedido ao crítico. O contorno foi levado ao modelo na escala ${v.escala} (mm do modelo por mm do contorno), com o ponto ${v.ancora.contorno.join(', ')} do contorno no ponto ${v.ancora.modelo.join(', ')} do modelo${v.espelhar ? ', espelhado na horizontal' : ''}; ${c.mmPorPx.toFixed(2)} mm por px, eixo horizontal da imagem ${c.eixos.horizontal} e vertical ${c.eixos.vertical}. A silhueta do modelo é a visível na vista.${v.ignorarRegioes.length ? ` Fora do conjunto: ${v.ignorarRegioes.join(', ')}.` : ''}`, '',
+        ...(v.foraDaConta.length ? [`Fora da conta, sem entrar na silhueta do modelo: ${v.foraDaConta.map((g) => `${g.partes.join(', ')} (${g.motivo})`).join('; ')}.`] : []),
         `O conjunto, todas as partes do modelo contra as do arquivo: ${fraseDosContornos(c.conjunto)}`, '',
+        fraseDasFendas(c.conjunto.fendas), '',
         'Por parte, na ordem do maior afastamento:', '',
         ...ordem.map(([n, x]) => `- ${n} (número ${numero[n]} no desenho; ${x.partes.join(', ')}): ${fraseDosContornos(x)}`), '',
         `O desenho, o modelo com os contornos por cima, está em ${arq.desenho}.`, '');
-      linhas.push(`vista ${v.nome}: só de contornos; sobreposição do conjunto ${pct(c.conjunto.sobreposicao)}; os três maiores afastamentos: ${ordem.slice(0, 3).map(([n, x]) => `${n} ${x.afastamento ? `${x.afastamento.maior.mm.toFixed(0)} mm` : 'sem pixel'}`).join(', ')}`);
+      linhas.push(`vista ${v.nome}: só de contornos; sobreposição do conjunto ${pct(c.conjunto.sobreposicao)}, sobra ${pct(c.conjunto.areaReferenciaMm2 ? c.conjunto.sobraMm2 / c.conjunto.areaReferenciaMm2 : 0)} e falta ${pct(c.conjunto.areaReferenciaMm2 ? c.conjunto.faltaMm2 / c.conjunto.areaReferenciaMm2 : 0)} da referência, ${c.conjunto.fendas.estreitas.length} fenda(s); os três maiores afastamentos: ${ordem.slice(0, 3).map(([n, x]) => `${n} ${x.afastamento ? `${x.afastamento.maior.mm.toFixed(0)} mm` : 'sem pixel'}`).join(', ')}`);
       continue;
     }
     const m = medirCasamento({ faces, partes: painel.partes, classeDaParte: cfg.partes, vista: v.nome, largura: cfg.largura, referencia: v.referencia, caixaRef: v.caixaRef, classes: cfg.classes, fundo: cfg.fundo, ignorar: v.ignorar, grade: v.grade, toleranciaMm: v.toleranciaMm, escalaVertical: v.escalaVertical });
