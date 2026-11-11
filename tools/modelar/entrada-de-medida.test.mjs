@@ -113,7 +113,7 @@ describe('as quatro ferramentas leem o esboço direto', () => {
   });
 });
 
-describe('a face de corte que a exportação não triangula', () => {
+describe('a face que a exportação não triangula', () => {
   /* a parede de 1 mm de um corte, com 19 vértices da chapa nos dois lados (as coordenadas são as da malha do caminho A do sedã em modo vista) */
   const pontos = JSON.parse(readFileSync(join(AQUI, 'fixtures/tira-de-corte-colinear.json'), 'utf8'));
   const malha = () => {
@@ -123,10 +123,18 @@ describe('a face de corte que a exportação não triangula', () => {
     return { V, F };
   };
 
-  it('a validação recusa a face (a tira tem área, mas o leque e as orelhas não a triangulam), e a ferramenta a pula e a lista', () => {
-    const { puladas, neutro } = semFaceSemArea(malha());
-    expect(puladas).toEqual([{ face: 1, parte: 'parede', vertices: 38, motivo: 'Face tem triângulo sem área (altura abaixo da tolerância).' }]);
-    expect(neutro.F.size).toBe(1);
+  it('a tira de corte com cantos colineares passa: o triangulador a resolve pela passagem em tira (triangulacao-colinear.test.mjs)', () => {
+    const r = semFaceSemArea(malha());
+    expect(r.puladas).toEqual([]);
+  });
+
+  it('a face que de fato tem triângulo sem área é pulada e listada', () => {
+    const m = malha();
+    m.V.set(600, [0, 0, 0]); m.V.set(601, [1, 0, 0]); m.V.set(602, [2, 0, 0]);
+    m.F.set(3, { id: 3, vs: [600, 601, 602], parte: 'degenerada' });
+    const { puladas, neutro } = semFaceSemArea(m);
+    expect(puladas.map((p) => [p.face, p.parte, p.vertices])).toEqual([[3, 'degenerada', 3]]);
+    expect(neutro.F.has(3)).toBe(false);
   });
 
   it('a malha sem face assim passa como estava', () => {

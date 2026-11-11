@@ -10,8 +10,11 @@
  *   opcoes: { niveis? (3), borda? ('suave', ou a do passo), unidade? ('metro') } os níveis e a borda do passo `subdivisao` que a chapa usa, para a curva cair na malha dela.
  * devolve: { curva: [[x, y, z], ...], fechada, celulas }.
  * exemplo:
- *   const g = gaiolaPorEstacoes({ eixo: 'z', estacoes: [...], vincos: [{ nome: 'cintura', coluna: 'cintura', raio: 6 }] });
- *   curvaDaGaiola(g, { estacao: 7.4, de: 'soleira', ate: 'teto' }).curva   // a linha da porta, subindo a quina
+ *   curvaDaGaiola(gaiolaPorLacos({ nome: 'barra', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' },
+ *     trechos: [{ nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: 3 }, { nome: 'cima', pontos: 2 }, { nome: 'tras', pontos: 3 }],
+ *     lacos: [0, 50, 100].map((em) => ({ em, trechos: { baixo: [[0, 0], [0, 40]], frente: [[0, 40], [15, 40], [30, 40]],
+ *       cima: [[30, 40], [30, 0]], tras: [[30, 0], [15, 0], [0, 0]] } })) }), { laco: 1.5, de: 'frente', ate: 'cima' }).curva
+ *   // numa gaiola por estações, a linha da porta que sobe a quina: curvaDaGaiola(g, { estacao: 7.4, de: 'soleira', ate: 'teto' })
  * peça: procedural/nucleo/curva-da-gaiola.test.ts (a chapa em L de quina de raio 6 e de raio 3, em estação fracionária).
  * FIM DA FICHA
  *

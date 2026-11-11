@@ -16,7 +16,8 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const ESTACOES = 'procedural/nucleo/gaiola-por-estacoes.js';
 
-/* arquivo: onde está o comentário com a ficha; funcao e de: a função que o exemplo chama e o arquivo que a exporta. As opções de
+/* arquivo: onde está o comentário com a ficha; funcao e de: a função que o exemplo chama e o arquivo que a exporta; usa: as outras funções
+   que o exemplo chama, pelo nome e pelo arquivo que as exporta (o ajudante que lê a saída de outro ajudante). As opções de
    gaiolaPorEstacoes (interpolada, anéis) têm ficha própria, mas o exemplo delas chama gaiolaPorEstacoes. */
 export const CAPACIDADES = Object.freeze({
   gaiolaPorEstacoes: { arquivo: ESTACOES, funcao: 'gaiolaPorEstacoes', de: ESTACOES },
@@ -27,7 +28,7 @@ export const CAPACIDADES = Object.freeze({
   gaiolaPorLacos: { arquivo: 'procedural/nucleo/gaiola-por-lacos.js', funcao: 'gaiolaPorLacos', de: 'procedural/nucleo/gaiola-por-lacos.js' },
   lacosPelasVistas: { arquivo: 'procedural/nucleo/lacos-pelas-vistas.js', funcao: 'lacosPelasVistas', de: 'procedural/nucleo/lacos-pelas-vistas.js' },
   paineisPorVaos: { arquivo: 'procedural/nucleo/paineis-por-vaos.js', funcao: 'paineisPorVaos', de: 'procedural/nucleo/paineis-por-vaos.js' },
-  curvaDaGaiola: { arquivo: 'procedural/nucleo/curva-da-gaiola.js', funcao: 'curvaDaGaiola', de: 'procedural/nucleo/curva-da-gaiola.js' },
+  curvaDaGaiola: { arquivo: 'procedural/nucleo/curva-da-gaiola.js', funcao: 'curvaDaGaiola', de: 'procedural/nucleo/curva-da-gaiola.js', usa: { gaiolaPorLacos: 'procedural/nucleo/gaiola-por-lacos.js' } },
   vaoEntrePartes: { arquivo: 'tools/modelar/vao-entre-partes.mjs', funcao: 'vaoEntrePartes', de: 'tools/modelar/vao-entre-partes.mjs' },
   instanciaDeFamilia: { arquivo: 'tools/modelar/instancia-de-familia.mjs', funcao: 'instanciaDeFamilia', de: 'tools/modelar/instancia-de-familia.mjs' },
   raioDaAresta: { arquivo: 'tools/modelar/raio-da-aresta.mjs', funcao: 'medirPerfil', de: 'tools/modelar/raio-da-aresta.mjs' },

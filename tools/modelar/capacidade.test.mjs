@@ -67,7 +67,9 @@ describe('capacidade: a ficha é recortada do cabeçalho do código', () => {
         const modulo = await import(resolve(REPO, CAPACIDADES[nome].de));
         const funcao = modulo[CAPACIDADES[nome].funcao];
         expect(typeof funcao).toBe('function');
-        const r = new Function(CAPACIDADES[nome].funcao, `return ${ficha.exemplo}`)(funcao);
+        const usa = Object.entries(CAPACIDADES[nome].usa ?? {});
+        const outras = await Promise.all(usa.map(async ([f, de]) => (await import(resolve(REPO, de)))[f]));
+        const r = new Function(CAPACIDADES[nome].funcao, ...usa.map(([f]) => f), `return ${ficha.exemplo}`)(funcao, ...outras);
         expect(r).toBeTruthy();
       });
     });
