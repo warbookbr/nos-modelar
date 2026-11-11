@@ -1177,8 +1177,9 @@ export function criarOperacoesAberturaPorContorno(servicos) {
   };
   const proximoLocal = (ids, i, exceto = null) => { let m = -1; for (const id of ids) { if (exceto?.has(id)) continue; const k = localDe(i, id); if (k != null && k > m) m = k; } return m + 1; };
 
-  const ops = {
-  aberturaPorContorno(st, a, i, chapaInteiraPor = null) {
+  /* `chapaInteiraPor` é só da rede: o motivo com que o vão, recusado no trecho recortado, é refeito na chapa inteira. A operação
+     publicada tem a assinatura de todas, `(st, a, i)`. */
+  function abrir(st, a, i, chapaInteiraPor = null) {
     if (a.origemId == null) return grita(st, i, OP, 'origemId', `${OP} é sempre estrutural: origemId é obrigatório (a chapa cortada, a parede e a borda do vão são citadas por ele)`);
     if (!Number.isSafeInteger(a.origemId) || a.origemId < 0) return grita(st, i, OP, 'origemId', 'origemId precisa ser inteiro não-negativo');
     const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
@@ -1378,7 +1379,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
         const recusa = st.orfaos[antesDoCorte].motivo;
         st.orfaos.length = antesDoCorte;
         tirarPrisma();
-        return ops.aberturaPorContorno(st, a, i, `a booleana recusou o trecho recortado (${recusa.slice(0, 160)}), e o vão foi refeito na chapa inteira`);
+        return abrir(st, a, i, `a booleana recusou o trecho recortado (${recusa.slice(0, 160)}), e o vão foi refeito na chapa inteira`);
       }
       for (const o of st.orfaos.slice(antesDoCorte)) { o.op = OP; o.ref = o.ref === 'solidos' || o.ref === 'solidos[0]' ? 'chapa' : o.ref; o.motivo = `o corte da chapa pela booleana recusou: ${o.motivo}`; }
       tirarPrisma();
@@ -1541,9 +1542,11 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
       limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes, escopoDasFinas: recortada ? 'trecho' : 'chapa' },
     });
-  },
+  }
+
+  return {
+  aberturaPorContorno(st, a, i) { return abrir(st, a, i); },
   };
-  return ops;
 }
 
 /** bordaDaAbertura(st, origem) -> { pontos, normais, faces, cadeia, espessura, passo } | { erro }
