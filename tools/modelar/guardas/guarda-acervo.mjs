@@ -47,7 +47,11 @@ export function pecasDoAcervo(pasta = ACERVO, { base = pasta } = {}) {
      isso, medir um acervo de ensaio devolvia caminho com `../..` até a pasta
      temporária, e o teste que prova a pasta da peça era impossível de escrever. */
   const achadas = [];
-  for (const entrada of readdirSync(pasta, { withFileTypes: true })) {
+  /* a pasta que some no meio da varredura (a peça temporária de um teste que roda ao mesmo tempo, em 2026-11-11 no CI) não é
+     peça do acervo: a varredura segue sem ela, em vez de cair com ENOENT */
+  let entradas;
+  try { entradas = readdirSync(pasta, { withFileTypes: true }); } catch (e) { if (e?.code === 'ENOENT' && pasta !== base) return achadas; throw e; }
+  for (const entrada of entradas) {
     const caminho = join(pasta, entrada.name);
     if (entrada.isDirectory()) {
       const porta = ENTRADAS_DE_PASTA.find((nome) => existsSync(join(caminho, nome)));
