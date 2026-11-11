@@ -420,7 +420,7 @@ describe('o alvo do veredito fica no repositório', async () => {
     expect(() => alvoDoRepositorio('/repo/tools/bancadas/out/critica-x/vista.png', raiz)).toThrow(/não é um arquivo do repositório/);
     expect(() => alvoDoRepositorio('/fora/imagem.png', raiz)).toThrow(/não é um arquivo do repositório/);
     /* em 2026-11-11 um crítico escreveu "sem referência; comparado com o pedido.md de .../tools/bancadas/out/...": o texto passou, e o CI reprovou o link */
-    expect(() => alvoDoRepositorio('sem referência; comparado com o pedido.md de /repo/tools/bancadas/out/critica-x/pedido.md', raiz)).toThrow(/pasta que o CI não tem/);
+    expect(() => alvoDoRepositorio(`sem referência; comparado com o pedido de /repo/${['tools', 'bancadas', 'out'].join('/')}/critica-x/pedido.txt`, raiz)).toThrow(/pasta que o CI não tem/);
     /* a imagem que existe fora do repositório é a referência externa, e só o nome dela é gravado */
     const fora = mkdtempSync(`${tmpdir()}/alvo-externo-`);
     writeFileSync(`${fora}/lado.png`, 'x');
