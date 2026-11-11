@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1907 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1910 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -261,6 +261,7 @@
 ## docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/
 
 - `ATRITOS.md` — Carrinho de mão: atritos do alinhamento e do rascunho (2026-11-11)
+- `CUSTO-POR-PECA.md` — Custo por peça do carrinho de mão
 
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
@@ -1455,6 +1456,7 @@
 - `receita-02.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 - `receita-03.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 - `receita-04.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
+- `receita-05.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 
 ## procedural/pecas/carrinho-de-mao/partes/chassi/
 
@@ -1961,6 +1963,7 @@
 - `alvo.mjs` — alvo.mjs: o alvo comum dos dois caminhos do primeiro ciclo de alta definição do sedã (fatia 4c do plano do núcleo para qualquer mecanismo). O trecho é o corp…
 - `caminho-a-gaiola-da-casca.receita.js` — caminho-a-gaiola-da-casca.receita.js: o caminho A do primeiro ciclo de alta definição do sedã. A casca facetada vira gaiola de subdivisão: as estações são os…
 - `caminho-b-rede-de-curvas.receita.js` — caminho-b-rede-de-curvas.receita.js: o caminho B do primeiro ciclo de alta definição do sedã. A gaiola sai de `gaiolaPorRede`, com as curvas de feição desenh…
+- `exportar-trecho.mjs` — exportar-trecho.mjs: grava em OBJ, em metro, as partes pedidas de um esboço ou de uma receita, para a vista de três quartos lado a lado deste ciclo. `npm run…
 - `medir.mjs` — medir.mjs: o que o primeiro ciclo de alta definição mede e nenhuma ferramenta do repositório dá: o tempo de montagem, o número de faces por parte e o raio da…
 
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/
@@ -2528,15 +2531,15 @@
 
 ## tools/fixtures/faces-finas/fina/
 
-- `receita.js` — **SEM CABEÇALHO**
+- `receita.js` — receita.js — fixture da contagem de faces finas: chapa com uma face fina, sem declarar lataria.
 
 ## tools/fixtures/faces-finas/fina-de-lataria/
 
-- `receita.js` — **SEM CABEÇALHO**
+- `receita.js` — receita.js — fixture da contagem de faces finas: chapa de lataria com uma face fina, sem rodada registrada.
 
 ## tools/fixtures/faces-finas/sem-fina/
 
-- `receita.js` — **SEM CABEÇALHO**
+- `receita.js` — receita.js — fixture da contagem de faces finas: chapa sem nenhuma face fina.
 
 ## tools/fixtures/familia-chamavel/
 
