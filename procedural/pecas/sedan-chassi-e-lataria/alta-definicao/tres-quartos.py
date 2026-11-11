@@ -1,5 +1,5 @@
 # tres-quartos.py: a vista sombreada de três quartos de cada OBJ, com a mesma câmera ortográfica e a mesma luz, lado a lado numa imagem.
-# Uso: blender -b -P tres-quartos.py -- <saida.png> <titulo1>=<a.obj> <titulo2>=<b.obj> ... [--direcao=x,y,z] [--liso=graus] [--zoom=zc,yc,meia]
+# Uso: blender -b -P tres-quartos.py -- <saida.png> <titulo1>=<a.obj> <titulo2>=<b.obj> ... [--direcao=x,y,z] [--liso=graus] [--zoom=zc,yc,meia[,xc]]
 import bpy, sys, math
 from mathutils import Vector
 args = sys.argv[sys.argv.index('--') + 1:]
@@ -31,7 +31,7 @@ for titulo, obj in pares:
     bpy.ops.wm.obj_import(filepath=obj, forward_axis='NEGATIVE_Z', up_axis='Y')
     novos = [o for o in bpy.data.objects if o not in antes]
     for o in novos:
-        o.data.materials.clear(); o.data.materials.append(mat_esc if any(k in o.name for k in ('vidro', 'Vidro', 'vigia', 'Vigia', 'paraBrisa', 'ParaBrisa', 'moldura')) else mat)
+        o.data.materials.clear(); o.data.materials.append(mat_esc if any(k in o.name for k in ('vidro', 'Vidro', 'vigia', 'Vigia', 'paraBrisa', 'ParaBrisa', 'moldura', 'lente', 'lanterna', 'Lanterna', 'grade', 'Grade', 'farol', 'paraChoque')) else mat)
         bpy.context.view_layer.objects.active = o
         o.select_set(True)
         bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.mesh.remove_doubles(threshold=1e-6); bpy.ops.object.mode_set(mode='OBJECT')
@@ -43,8 +43,9 @@ for titulo, obj in pares:
 centro = sum(caixas, Vector()) / len(caixas)
 d = conv(direcao)
 if 'zoom' in op:
-    zc, yc, meia = [float(v) for v in op['zoom'].split(',')]
-    centro = conv(Vector((0.86, yc, zc))); escala = 2 * meia
+    nums = [float(v) for v in op['zoom'].split(',')]
+    zc, yc, meia = nums[:3]; xc = nums[3] if len(nums) > 3 else 0.86
+    centro = conv(Vector((xc, yc, zc))); escala = 2 * meia
 else:
     lado = d.cross(Vector((0, 0, 1))).normalized(); cima = lado.cross(d).normalized()
     escala = max(max(abs((p - centro).dot(lado)) for p in caixas) * 2, max(abs((p - centro).dot(cima)) for p in caixas) * 2 * L / H) * 1.06

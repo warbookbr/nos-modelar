@@ -26,11 +26,13 @@ const mm = (v) => v / 1000;
 
 /* ---- as estações da cabine ---- */
 const [w1a, w1b] = C.pontasDasJanelas.dianteira; const [w2a, w2b] = C.pontasDasJanelas.traseira; const [w3a, w3b] = C.pontasDasJanelas.vigia;
+/* as duas pontas: o pé do vidro traseiro e o do para-brisa, onde a lateral some; as duas estações vizinhas de cada ponta fundem (na
+   frente) e dividem (atrás) as colunas da lateral duas a duas */
 const NOMEADAS = [
-  ['tras', C.zTras], ['vtBaixo', zDoVidroTraseiro(C.vidroTraseiro.y0)], ['vigiaTras', w3b], ['vtAlto', zDoVidroTraseiro(C.vidroTraseiro.y1)],
+  ['tras', C.zTras], ['divideB', C.zTras + 12], ['divideA', C.zTras + 24], ['divideQ', C.zTras + 36], ['vtBaixo', zDoVidroTraseiro(C.vidroTraseiro.y0)], ['vigiaTras', w3b], ['vtAlto', zDoVidroTraseiro(C.vidroTraseiro.y1)],
   ['topoDoVidroTraseiro', C.zTopoDoVidroTraseiro], ['vigiaFrente', w3a], ['portaTraseiraTras', w2b], ['portaTraseiraFrente', w2a],
   ['portaDianteiraTras', w1b], ['topoDoParaBrisa', C.zTopoDoParaBrisa], ['pbAlto', zDoParaBrisa(C.paraBrisa.y1)], ['portaDianteiraFrente', w1a],
-  ['pbBaixo', zDoParaBrisa(C.paraBrisa.y0)], ['frente', C.zFrente],
+  ['pbBaixo', zDoParaBrisa(C.paraBrisa.y0)], ['fundeA', C.zFrente - 38], ['fundeB', C.zFrente - 18], ['frente', C.zFrente],
 ];
 /* entre duas nomeadas, estações de preenchimento a até 80 mm uma da outra */
 const ESTACOES = [];
@@ -51,12 +53,21 @@ function colunasDe(nome, z) {
   const yPe = topoY(C.xPe, z); const yQ = yQuina(z); const h = yQ - yPe;
   const yJb = yPe + Math.min(C.peitorilDaJanela, 0.36 * h); const yJa = yQ - Math.min(C.quadroDeCima, 0.5 * h);
   const xQ = xCabine(yQ);
+  const lado = (n, y, extra = {}) => ({ nome: n, em: [mm(xCabine(y)), mm(y)], ...extra });
+  /* a lateral, com a fusão nas duas pontas: na frente quina e topo da janela, depois com o pé da janela, depois com o pé; atrás o mesmo
+     na ordem inversa, como divisão */
+  const LATERAL = {
+    frente: [lado('p', yPe, { de: ['qb', 'pe'] })],
+    fundeB: [lado('qb', yPe + 0.5 * h, { de: ['qa', 'janelaBaixo'] }), lado('pe', yPe)],
+    fundeA: [lado('qa', yPe + 0.75 * h, { de: ['quina', 'janelaAlto'] }), lado('janelaBaixo', yJb), lado('pe', yPe)],
+    tras: [lado('p', yPe)],
+    divideB: [lado('qb', yPe + 0.5 * h, { de: ['p'] }), lado('pe', yPe, { de: ['p'] })],
+    divideA: [lado('qa', yPe + 0.75 * h, { de: ['qb'] }), lado('janelaBaixo', yJb, { de: ['qb'] }), lado('pe', yPe)],
+    divideQ: [lado('quina', yQ, { de: ['qa'] }), lado('janelaAlto', yJa, { de: ['qa'] }), lado('janelaBaixo', yJb), lado('pe', yPe)],
+  }[nome] ?? [lado('quina', yQ), lado('janelaAlto', yJa), lado('janelaBaixo', yJb), lado('pe', yPe)];
   const col = [
     { nome: 'base', em: [mm(C.xBase), mm(topoY(C.xBase, z))] },
-    { nome: 'pe', em: [mm(C.xPe), mm(yPe)] },
-    { nome: 'janelaBaixo', em: [mm(xCabine(yJb)), mm(yJb)] },
-    { nome: 'janelaAlto', em: [mm(xCabine(yJa)), mm(yJa)] },
-    { nome: 'quina', em: [mm(xQ), mm(yQ)] },
+    ...[...LATERAL].reverse(),
     ...DO_TOPO.map(([n, d]) => ({ nome: n, em: [mm(xQ - d), mm(yTopoDaCabine(xQ - d, z))] })),
     { nome: 'centro', em: [0, mm(yTopoDaCabine(0, z))] },
   ];
@@ -79,18 +90,11 @@ const vaos = [
   { nome: 'paraBrisa', estacoes: ['pbAlto', 'pbBaixo'], colunas: ['centro', 'borda'], livre: true },
   { nome: 'vidroTraseiro', estacoes: ['vtBaixo', 'vtAlto'], colunas: ['centro', 'borda'], livre: true },
 ];
-/* A quina da cabine corta as estações na diagonal na coluna A e na coluna C, e o ajudante põe os apoios no plano da estação: medido por
-   `raio:aresta`, o raio pedido de 4 mm saiu com 2,8 na coluna A e com 2,0 na coluna C (CICLO-3.md, atrito 2). O contorno é pedir em cada
-   estação o raio dividido pela razão medida em cada trecho, e deixar 4 mm nas duas estações das quinas do teto. `HD_QUINA=4` volta ao
-   raio único. */
-const RAZAO_MEDIDA = { colunaA: 0.70, colunaC: 0.50 };
-const RAIO_DA_QUINA = process.env.HD_QUINA ? Number(process.env.HD_QUINA)
-  : ESTACOES.map(({ z }) => (z > C.zTopoDoParaBrisa + 1e-6 ? C.raioDaQuina / RAZAO_MEDIDA.colunaA : z < C.zTopoDoVidroTraseiro - 1e-6 ? C.raioDaQuina / RAZAO_MEDIDA.colunaC : C.raioDaQuina));
 const vincos = [
   { nome: 'peDaCabine', coluna: 'pe', raio: C.raioDoPe },
-  { nome: 'quinaDaCabine', coluna: 'quina', raio: RAIO_DA_QUINA },
-  { nome: 'topoDoParaBrisa', estacao: 'topoDoParaBrisa', de: 'centro', ate: 'faixaDoTeto', raio: C.raioDoTopo },
-  { nome: 'topoDoVidroTraseiro', estacao: 'topoDoVidroTraseiro', de: 'centro', ate: 'faixaDoTeto', raio: C.raioDoTopo },
+  { nome: 'quinaDaCabine', coluna: 'quina', raio: C.raioDaQuina },
+  { nome: 'topoDoParaBrisa', estacao: 'topoDoParaBrisa', de: 'centro', ate: 'quina', raio: C.raioDoTopo },
+  { nome: 'topoDoVidroTraseiro', estacao: 'topoDoVidroTraseiro', de: 'centro', ate: 'quina', raio: C.raioDoTopo },
 ];
 const cantos = [['tras', 'base'], ['frente', 'base'], ['tras', 'centro'], ['frente', 'centro']].map(([estacao, coluna]) => ({ estacao, coluna }));
 export const CABINE = gaiolaPorEstacoes({ eixo: 'z', estacoes, vaos, vincos, cantos, niveis: NIVEIS, prefixo: 'cab_', virar: process.env.HD_VIRAR !== '0' });
@@ -154,7 +158,7 @@ for (const [nome, g, vao] of VIDROS) {
   const idV = id++; const idM = id++; const moldura = `moldura${nome[0].toUpperCase()}${nome.slice(1)}`;
   passos.push(['subdivisao', { origemId: idV, ...g.passo, niveis: 1, borda: 'cantos', espessura: C.vidro.espessura }],
     ['parte', { nome, sel: { origem: { op: 'subdivisao', id: idV } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'subdivisao', id: idV } }, cor: '#20262d' }],
-    ['friso', { origemId: idM, superficie: { op: 'subdivisao', id: ID_CABINE }, linha: { nome: moldura, pontos: CABINE.bordaDoVao(vao) }, perfil: MOLDURA }],
+    ['friso', { origemId: idM, superficie: { op: 'subdivisao', id: ID_CABINE }, linha: { nome: moldura, pontos: CABINE.bordaDoVao(vao) }, perfil: MOLDURA, refinar: 2 }],
     ['parte', { nome: moldura, sel: { origem: { op: 'friso', id: idM } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'friso', id: idM } }, cor: '#2c2f33' }]);
   contatos.push({ par: [nome, 'teto'], relacao: 'atravessa', motivo: 'o vidro passa 12 mm por baixo da borda do vão e é colado na chapa: a face de fora fica 0,2 mm dentro da pele de dentro' },
     { par: [moldura, 'teto'], relacao: 'atravessa', motivo: 'a moldura de borracha assenta na borda do vão e desce 0,9 mm na chapa' },

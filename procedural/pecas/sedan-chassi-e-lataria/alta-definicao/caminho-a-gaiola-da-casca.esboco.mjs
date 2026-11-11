@@ -18,7 +18,7 @@
 import { gaiolaPorEstacoes } from '../../../nucleo/gaiola-por-estacoes.js';
 import { curvaDaGaiola } from '../../../nucleo/curva-da-gaiola.js';
 import { paineisPorVaos } from '../../../nucleo/paineis-por-vaos.js';
-import { T, yTopo, yDaBorda, ladoX, topoY, ARCOS, PAINEIS, CORES, VIZINHOS } from './alvo.mjs';
+import { T, C, yTopo, yDaBorda, ladoX, topoY, ARCOS, PAINEIS, CORES, VIZINHOS } from './alvo.mjs';
 
 const NIVEIS = Number(process.env.HD_NIVEIS ?? 2);
 const COM_PAINEIS = process.env.HD_PAINEIS !== '0';
@@ -34,20 +34,26 @@ const FINO = process.env.HD_ARCO === 'fino';
 const DENTRO_DO_ARCO = FINO ? [8.2, 24.2, 52.2, 100.2, 175.2, 280.2] : [20.2, 55.2, 110.2, 190.2, 290.2];
 const FORA_DO_ARCO = FINO ? [8.8, 25.8, 57.8] : [20.8, 57.8];
 const [ARCO_TRAS, ARCO_FRENTE] = ARCOS;
-const NOMEADAS = new Map([[T.zTras, 'tras'], [T.zLateral, 'fimDaPorta'], [T.zPortas, 'entrePortas'], [T.zCapo, 'fimDoParaLama'], [T.zPeDoCapo, 'peDoCapo'], [T.zFrente, 'frente'],
+/* a borda de trás da cabine (o pé do vidro traseiro); a tampa do porta-malas começa 4 mm atrás dela */
+const C_TRAS = C.zPeDoVidroTraseiro;
+const NOMEADAS = new Map([[T.zTraseira, 'traseira'], [T.zBico, 'bico'], [C_TRAS - T.vao, 'peDaTampa'], [C_TRAS - T.vao - 33, 'antesDaTampa'], [T.zTras, 'tras'], [T.zLateral, 'fimDaPorta'], [T.zPortas, 'entrePortas'], [T.zCapo, 'fimDoParaLama'], [T.zPeDoCapo, 'peDoCapo'], [T.zFrente, 'frente'],
   [ARCO_TRAS[0], 'arcoDeTrasInicio'], [ARCO_TRAS[1], 'arcoDeTrasTopo'], [ARCO_TRAS[2], 'arcoDeTrasFim'],
   [ARCO_FRENTE[0], 'arcoDaFrenteInicio'], [ARCO_FRENTE[1], 'arcoDaFrenteTopo'], [ARCO_FRENTE[2], 'arcoDaFrenteFim']]);
 const doArco = ([z0, zc, z1]) => [z0, ...DENTRO_DO_ARCO.map((d) => z0 + d), zc, ...DENTRO_DO_ARCO.map((d) => z1 - d).reverse(), z1];
 const Z = [
-  T.zTras, -1890, -1790, ...FORA_DO_ARCO.map((d) => ARCO_TRAS[0] - d).reverse(), ...doArco(ARCO_TRAS),
+  T.zTraseira, -2055, -2027, T.zTras, -1890, -1790, ...FORA_DO_ARCO.map((d) => ARCO_TRAS[0] - d).reverse(), ...doArco(ARCO_TRAS),
   /* a linha do fim da porta fica a 20,8 mm da ponta do arco, e a estação seguinte à mesma distância dela */
   T.zLateral, 2 * T.zLateral - ARCO_TRAS[2], -700, -630, -520, -380,
   /* as vizinhas da linha entre as portas, a 175 mm dela */
   T.zPortas - 175, T.zPortas, T.zPortas + 175, 290, 440, 560,
   /* as vizinhas da linha do para-lama com a porta, a 52 mm dela; a da frente é o pé do capô */
   2 * T.zCapo - T.zPeDoCapo, T.zCapo, T.zPeDoCapo, ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[0] - d).reverse(), ...doArco(ARCO_FRENTE),
-  ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[2] + d), 1765, 1860, T.zFrente,
+  ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[2] + d), 1765, 1860, T.zFrente, 2032, 2070, 2098, T.zBico,
 ];
+/* a estação do pé da tampa e uma 15 mm antes dela: a linha de vão ao longo de uma coluna não chega à estação em que a coluna termina no
+   meio da grade (CICLO-4.md), e vai até a anterior, 33 mm antes, com a ponta passando 7 mm da borda; a 15 mm, a gradação das estações
+   (59, 15, 26 mm) deixava um calombo de 9,6 mm junto do ombro */
+Z.push(C_TRAS - T.vao, C_TRAS - T.vao - 33); Z.sort((a, b) => a - b);
 const nomeDaEstacao = (z) => NOMEADAS.get(z) ?? `z${z < 0 ? 'm' : ''}${Math.abs(Math.round(z))}`;
 
 /* ---- as colunas ---- */
@@ -68,14 +74,20 @@ function colunasDe(z) {
   const yb = yDaBorda(z);
   const colunas = DO_LADO.map(([nome, f]) => { const y = yb + f * (T.yOmbro - yb); return { nome, em: [mm(ladoX(z, y)), mm(y)] }; });
   colunas.push({ nome: 'ombro', em: [mm(ladoX(z, T.yOmbro)), mm(T.yOmbro)] }, { nome: 'cintura', em: [mm(ladoX(z, yTopo(z))), mm(yTopo(z))] });
-  colunas.push({ nome: 'faixa', em: [mm(X_DA_FAIXA), mm(topoY(X_DA_FAIXA, z))] });
-  /* o capô começa na estação do pé dele, que é borda: ali as colunas do capô declaram que começam */
-  if (z >= T.zPeDoCapo) for (const [nome, x] of DO_CAPO) colunas.push({ nome, em: [mm(x), mm(topoY(x, z))], ...(z === T.zPeDoCapo ? { comeca: true } : {}) });
+  /* onde a planta fecha o canto da frente, a faixa e as colunas do capô se afastam da quina junto com ela */
+  const xc = ladoX(z, yTopo(z)); const xFaixa = Math.min(X_DA_FAIXA, xc - 40); const xVao = Math.min(T.xCapo, xFaixa - 60);
+  colunas.push({ nome: 'faixa', em: [mm(xFaixa), mm(topoY(xFaixa, z))] });
+  /* o capô começa na estação do pé dele, e a tampa do porta-malas acaba na do pé dela: as duas são bordas, e as mesmas colunas servem às duas */
+  const comCapo = z >= T.zPeDoCapo - 1e-6; const comTampa = z <= C_TRAS - T.vao + 1e-6;
+  if (comCapo || comTampa) {
+    const xs = { vaoDoCapo: xVao, capoBorda: xVao - 60, capoMeio: 560, capoDentro: 300, centro: 0 };
+    for (const [nome] of DO_CAPO) colunas.push({ nome, em: [mm(xs[nome]), mm(topoY(xs[nome], z))], ...(Math.abs(z - T.zPeDoCapo) < 1e-6 ? { comeca: true } : {}), ...(Math.abs(z - (C_TRAS - T.vao)) < 1e-6 ? { termina: true } : {}) });
+  }
   return colunas;
 }
 const estacoes = Z.map((z) => ({ nome: nomeDaEstacao(z), em: mm(z), colunas: colunasDe(z) }));
 
-const cantos = [['tras', 'fundo'], ['tras', 'faixa'], ['frente', 'fundo'], ['frente', 'centro'], ['peDoCapo', 'centro'], ['peDoCapo', 'faixa'],
+const cantos = [['traseira', 'fundo'], ['traseira', 'centro'], ['bico', 'fundo'], ['bico', 'centro'], ['peDoCapo', 'centro'], ['peDoCapo', 'faixa'], ['peDaTampa', 'centro'], ['peDaTampa', 'faixa'],
   ['arcoDeTrasInicio', 'fundo'], ['arcoDeTrasFim', 'fundo'], ['arcoDaFrenteInicio', 'fundo'], ['arcoDaFrenteFim', 'fundo']].map(([estacao, coluna]) => ({ estacao, coluna }));
 
 /* ---- os vincos: o raio pedido em milímetro ---- */
@@ -113,7 +125,9 @@ export function linhasDeVao() {
   return [
     /* o para-lama com a porta: sobe a lateral, passa a quina da cintura, cruza a faixa de cima e sai pela borda de dentro dela */
     { nome: 'fimDoParaLama', curva: curva({ estacao: 'fimDoParaLama', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
-    { nome: 'capo', curva: curva({ coluna: 'vaoDoCapo', de: 'peDoCapo', ate: 'frente' }), alem: [30, 30] },
+    /* a ponta da frente passa só 6 mm da borda: com 30 mm a prova de separação acusa ponte num ponto da própria ponta, fora da chapa (CICLO-4.md) */
+    { nome: 'capo', curva: curva({ coluna: 'vaoDoCapo', de: 'peDoCapo', ate: 'bico' }), alem: [30, Number(process.env.HD_ALEM_CAPO ?? 6)] },
+    { nome: 'tampa', curva: curva({ coluna: 'vaoDoCapo', de: 'traseira', ate: 'antesDaTampa' }), alem: [6, 40] },
     { nome: 'entrePortas', curva: curva({ estacao: 'entrePortas', de: 'soleira', ate: 'faixa' }), alem: [0, 30] },
     { nome: 'fimDaPortaTraseira', curva: curva({ estacao: 'fimDaPorta', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
     { nome: 'soleira', curva: curva({ coluna: 'soleira', de: 'fimDaPorta', ate: 'fimDoParaLama' }) },

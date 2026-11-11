@@ -18,7 +18,8 @@ export const T = {
   ladoFundo: [[2122, 419], [-1581, 419], [-2087, 460]],
   meiaDaCabine: 860,
   roda: { raio: 364, zFrente: 1249, zTras: -1181, folgaDoArco: 40 },
-  zFrente: 1990, zTras: -2000, xCapo: 760, zCapo: 690, zPortas: -45, zLateral: -760, ySoleira: 470,
+  zFrente: 1990, zTras: -2000,
+  zBico: 2118, zTraseira: -2083, /* a borda da frente e a de trás da chapa de baixo (ciclo 4); o painel da frente e o de trás ficam 4 mm além */ xCapo: 760, zCapo: 690, zPortas: -45, zLateral: -760, ySoleira: 470,
   /* a borda de trás do capô, 52 mm à frente da linha do para-lama com a porta (no rascunho as duas ficam em z 690). É contorno: a linha de
      vão por curva que corre sobre a borda de uma faixa e acaba num canto de borda deixa uma ponte na pele de dentro, e o para-lama e a
      porta saem no mesmo pedaço (CICLO-2.md, atrito 1, em correção no núcleo). Com a borda adiante, a linha cruza a faixa e acaba em borda reta */
@@ -86,7 +87,13 @@ export function ladoX(z, y) {
   const t = Math.min(1, Math.max(0, (T.yOmbro - y) / (T.yOmbro - T.yAlargado)));
   const bojo = T.bojo * Math.max(0, 1 - ((y - 710) / 290) ** 2);
   /* a seção do alargado é uma cúbica, que chega à planta sem salto de curvatura (a parábola do primeiro ciclo dava calombo de 0,4 mm ali) */
-  return T.meiaDaCabine + alargamento(z) * (1 - (1 - t) ** 3) + bojo;
+  const x = T.meiaDaCabine + alargamento(z) * (1 - (1 - t) ** 3) + bojo;
+  /* na frente (ciclo 4) a planta do facetado fecha o canto para dentro da largura da cabine: além de z 1990 a lateral inteira fica dentro
+     da planta, pelo mínimo suave, misturado em 60 mm de z para não mexer no trecho já medido */
+  if (z <= 1990) return x;
+  const k = 6; const b = meia(z) + bojo; const suaveMin = -k * Math.log(Math.exp(-x / k) + Math.exp(-b / k));
+  const u = Math.min(1, (z - 1990) / 60); const w = u * u * (3 - 2 * u);
+  return x + w * (suaveMin - x);
 }
 /** A dobra do ombro em z, em graus: o ângulo entre a lateral de cima e a de baixo da quina. */
 export const dobraDoOmbro = (z) => (Math.atan((3 * Math.max(0, alargamento(z))) / (T.yOmbro - T.yAlargado)) * 180) / Math.PI;
@@ -104,10 +111,11 @@ export const PAINEIS = [
   { nome: 'portaTraseiraDir', eixo: 'x', ponto: [-400, 700], lado: '+' },
   { nome: 'lateralTraseiraDir', eixo: 'x', ponto: [-1850, 940], lado: '+' },
   { nome: 'soleiraDir', eixo: 'x', ponto: [0, 445], lado: '+' },
+  { nome: 'tampaDoPortaMalas', eixo: 'y', ponto: [300, -1700] },
 ];
-export const CORES = { capo: '#d9483b', paraLamaDir: '#2e86c1', portaDianteiraDir: '#27ae60', portaTraseiraDir: '#f1c40f', lateralTraseiraDir: '#c0392b', soleiraDir: '#7f8c8d', labioDianteiro: '#1b4f72', labioTraseiro: '#7b241c' };
+export const CORES = { capo: '#d9483b', paraLamaDir: '#2e86c1', portaDianteiraDir: '#27ae60', portaTraseiraDir: '#f1c40f', lateralTraseiraDir: '#c0392b', soleiraDir: '#7f8c8d', tampaDoPortaMalas: '#e08a2c', labioDianteiro: '#1b4f72', labioTraseiro: '#7b241c' };
 export const VIZINHOS = [['capo', 'paraLamaDir'], ['paraLamaDir', 'portaDianteiraDir'], ['portaDianteiraDir', 'portaTraseiraDir'], ['portaTraseiraDir', 'lateralTraseiraDir'],
-  ['portaDianteiraDir', 'soleiraDir'], ['portaTraseiraDir', 'soleiraDir'], ['paraLamaDir', 'soleiraDir'], ['lateralTraseiraDir', 'soleiraDir']];
+  ['portaDianteiraDir', 'soleiraDir'], ['portaTraseiraDir', 'soleiraDir'], ['paraLamaDir', 'soleiraDir'], ['lateralTraseiraDir', 'soleiraDir'], ['tampaDoPortaMalas', 'lateralTraseiraDir']];
 
 /* ---- o andar de cima (ciclo 3) ----
  * A cabine do rascunho, com a cintura do andar de baixo como fronteira: o peitoril de cima começa 4 mm para dentro da borda da faixa
@@ -119,7 +127,8 @@ export const C = {
   xBase: T.xCapo + 60 - T.vao,   /* a borda do peitoril de cima, 4 mm para dentro da faixa de baixo */
   xPe: T.xCapo + 60 - T.vao - 12, /* o pé da lateral da cabine: 12 mm de peitoril */
   inclinacao: 143 / 623,        /* a lateral fecha para dentro com a altura (rascunho) */
-  zFrente: 703, zTras: -1294.6, /* as pontas da cabine, onde a lateral tem 40 mm de altura; à frente e atrás fica o vão do tampão */
+  /* as pontas da cabine são o pé do para-brisa e o do vidro traseiro, onde a lateral some e as colunas se fundem (ciclo 4); no ciclo 3 a
+     cabine acabava onde a lateral tinha 40 mm, e ficava o vão do tampão */
   zPeDoParaBrisa: 738, zTopoDoParaBrisa: 276.2, yTeto: 1523, zTopoDoVidroTraseiro: -1072.3, zPeDoVidroTraseiro: -1312.9,
   arcoDoTeto: 5,                /* flecha do teto ao comprido */
   flecha: 8,                    /* flecha do teto, do para-brisa e do vidro traseiro na largura */
@@ -135,19 +144,23 @@ export const C = {
   vidro: { espessura: 4, recuo: 0.8, sobra: 12 },
   moldura: { largura: 14, altura: 3 },
 };
-const KPB = (C.yTeto - 1001) / (C.zPeDoParaBrisa - C.zTopoDoParaBrisa);
-const KVT = (C.yTeto - 1001) / (C.zTopoDoVidroTraseiro - C.zPeDoVidroTraseiro);
+C.zFrente = C.zPeDoParaBrisa; C.zTras = C.zPeDoVidroTraseiro;
+/* a altura do pé da lateral, na faixa de baixo: nas duas pontas o topo da cabine chega a ela, no mesmo plano do capô e da tampa */
+const Y_PE = topoY(C.xPe, C.zPeDoParaBrisa);
+const KPB = (C.yTeto - Y_PE) / (C.zPeDoParaBrisa - C.zTopoDoParaBrisa);
+const KVT = (C.yTeto - Y_PE) / (C.zTopoDoVidroTraseiro - C.zPeDoVidroTraseiro);
 /** A altura da quina da cabine (o alto da lateral) em z: o para-brisa, o teto com a flecha ao comprido, o vidro traseiro. */
 export function yQuina(z) {
-  if (z >= C.zTopoDoParaBrisa) return 1001 + (C.zPeDoParaBrisa - z) * KPB;
-  if (z <= C.zTopoDoVidroTraseiro) return 1001 + (z - C.zPeDoVidroTraseiro) * KVT;
+  if (z >= C.zTopoDoParaBrisa) return Y_PE + (C.zPeDoParaBrisa - z) * KPB;
+  if (z <= C.zTopoDoVidroTraseiro) return Y_PE + (z - C.zPeDoVidroTraseiro) * KVT;
   const m = (C.zTopoDoParaBrisa + C.zTopoDoVidroTraseiro) / 2; const h = (C.zTopoDoParaBrisa - C.zTopoDoVidroTraseiro) / 2;
   return C.yTeto + C.arcoDoTeto * (1 - ((z - m) / h) ** 2);
 }
 /** A lateral da cabine: a meia largura na altura y. */
 export const xCabine = (y) => C.xPe - C.inclinacao * (y - 1001);
-/** O topo da cabine (para-brisa, teto, vidro traseiro) em (x, z), com a flecha na largura. */
-export function yTopoDaCabine(x, z) { const xq = xCabine(yQuina(z)); return yQuina(z) + C.flecha * (1 - (x / xq) ** 2); }
+/** O topo da cabine (para-brisa, teto, vidro traseiro) em (x, z): a altura da quina mais a flecha do topo do andar de baixo na largura,
+ * de modo que nas duas pontas, onde a quina chega ao pé, o topo é o mesmo plano do capô e da tampa. */
+export function yTopoDaCabine(x, z) { const xq = xCabine(yQuina(z)); return yQuina(z) + topoY(x, z) - topoY(xq, z); }
 /** O z em que o topo, no plano do para-brisa ou do vidro traseiro, chega à altura y (sem a flecha). */
-export const zDoParaBrisa = (y) => C.zPeDoParaBrisa - (y - 1001) / KPB;
-export const zDoVidroTraseiro = (y) => C.zPeDoVidroTraseiro + (y - 1001) / KVT;
+export const zDoParaBrisa = (y) => C.zPeDoParaBrisa - (y - Y_PE) / KPB;
+export const zDoVidroTraseiro = (y) => C.zPeDoVidroTraseiro + (y - Y_PE) / KVT;
