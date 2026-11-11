@@ -247,7 +247,7 @@ function linhasDeVao() {
   ];
   for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) {
     L.push(furo(`vaoDoFarol${lado}`, 'z', FAROL(s), [2000, 2300]), furo(`vaoDaLanterna${lado}`, 'z', LANTERNA(s), [-2300, -2000]));
-    L.push(furo(`furoDoSuporteDianteiro${lado}`, 'z', FURO(s, SUPORTE.frente), [2000, 2300]), furo(`furoDoSuporteTraseiro${lado}`, 'z', FURO(s, SUPORTE.tras, SUPORTE.xTras), [-2300, -2000]));
+    L.push(furo(`furoDoSuporteDianteiro${lado}`, 'z', FURO(s, SUPORTE.frente), [2000, 2300]), furo(`furoDoSuporteTraseiro${lado}`, 'z', FURO(s, SUPORTE.tras, SUPORTE.xTras), [-2100, -2075]));
   }
   return L;
 }

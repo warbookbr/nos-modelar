@@ -1004,7 +1004,6 @@ export function gaiolaPorLacos(o = {}) {
     if (razao >= RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS || longe < RAZAO_MAXIMA_DE_AMOSTRAGEM * perto.d) return;
     const comprimento = passo * (qs.length - 1);
     const pontosCabem = Math.max(2, Math.floor(comprimento / (RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS * perto.d)) + 1);
-    if (process.env.SCAN_PASSO) console.error('SCAN', t.nome, razao.toFixed(2));
     avisos.push({
       ref: 'passoDensoEntreLacos', trecho: t.nome, lacos: [perto.de, perto.ate], razao: Number(razao.toFixed(2)), passoMm: Number(passo.toFixed(2)), distanciaMm: Number(perto.d.toFixed(2)),
       texto: `no trecho ${citar(t.nome)} os pontos ficam a ${br(passo, 1)} mm uns dos outros ao longo do laço e os laços ${citar(perto.de)} e ${citar(perto.ate)} a ${br(perto.d, 1)} mm, razão ${br(razao, 1)}, abaixo de ${RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS}; a gaiola não tem face fina, mas a subdivisão deixa um leque delas na dobra entre os laços próximos (na caçamba do carrinho de mão, razão 3,8 deu zero, 2,9 deu 12 e 1,9 deu 68), então baixe os pontos desse trecho de ${t.pontos} para ${pontosCabem} ou menos, ou espace os laços`,

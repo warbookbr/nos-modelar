@@ -84,11 +84,11 @@ valor proposto aqui, sem medida na referência.
 | arcos | raio 404, o do pneu mais 40 | acervo |
 | chapa | 1 | pedido (0,8 a 1) |
 | vão entre painéis | 4 | pedido |
-| vidro | 4 de espessura, com 4 de vão para a chapa | rascunho |
-| capô | de z 690 a 2.000, meia largura 760 | rascunho |
+| vidro | 1 de espessura, a da chapa de que ele é cortado, com 4 de vão para ela | rascunho |
+| capô | de z 690 a 1.990, meia largura 760 | rascunho |
 | tampa do porta-malas | de z -1.315 a -2.000, meia largura 740 | rascunho |
-| painéis dianteiro e traseiro | de z 2.000 à frente e de z -2.000 à traseira | rascunho |
-| portas | dianteira de z 690 a -45, traseira de z -45 a -777, de y 470 a 1.470; a borda da frente da dianteira, acima da cintura, 75 atrás do para-brisa | rascunho |
+| painéis dianteiro e traseiro | de z 1.990 à frente (10 atrás da quina da planta em z 2.000) e de z -2.000 à traseira | rascunho |
+| portas | dianteira de z 690 a -45, traseira de z -45 a -760 (21 à frente do arco), de y 470 a 1.470; a borda da frente da dianteira, acima da cintura, 75 atrás do para-brisa | rascunho |
 | soleira | de y 419 a 470 sob as portas | rascunho |
 | cintura | y 1.000: acima, o teto com as colunas | rascunho |
 | janelas | para-brisa de y 1.075 a 1.425; vidro traseiro de y 1.110 a 1.420; vidros das portas de y 1.075 a 1.420 com quadro de 50; vigia de z -852 a -1.195 | acervo para os vidros da frente e de trás e para a vigia; rascunho para os das portas |
@@ -98,7 +98,7 @@ valor proposto aqui, sem medida na referência.
 | longarinas | perfil de 80 por 100, a 420 do meio, em y 388 a 488 nas pontas e 298 a 398 sob a cabine | rascunho |
 | túnel | 240 de largura no pé, 150 no topo, 120 de altura | rascunho |
 | caixas de roda | chapa de 3 a 40 do pneu, parede de dentro a 637 do meio | rascunho |
-| montantes | A de z 600 a 696, B de z -75 a -15, C de z -835 a -771 | rascunho |
+| montantes | A de z 600 a 696, B de z -75 a -15, C de z -835 a -754 | rascunho |
 | eixos | Ø 60, em y 364 | rascunho |
 
 A prevalência é a da fonte para a caixa e as silhuetas, depois a leitura do
@@ -144,25 +144,25 @@ superfície de carroceria, que é definição comum deles e não peça.
 
 Cada painel apoia no chassi por dentro. O capô assenta no topo da parede
 corta-fogo atrás e no topo do suporte do radiador na frente. Cada para-lama
-assenta nesses dois, na caixa de roda pela borda do arco, no montante A pela
-borda de trás e na ponta da soleira do chassi. A chapa da soleira veste a
+assenta nesses dois, no montante A pela borda de trás e na ponta da soleira do
+chassi, e a borda da caixa de roda é soldada nele, meia espessura para dentro. A chapa da soleira veste a
 soleira do chassi e o pé dos montantes A e B. A porta dianteira fecha contra o
 montante A, onde ficam as dobradiças, contra o B e contra a soleira do chassi;
-a traseira, contra o B, onde ficam as dobradiças dela, contra o C e contra a
-soleira. A lateral traseira assenta no montante C, na caixa de roda, no reforço
-da cintura, na travessa de trás da cabine e na ponta do anteparo. O teto
+a traseira, contra o B, onde ficam as dobradiças dela, e contra a soleira, e
+fica a 4 mm do batente do montante C. A lateral traseira assenta no montante C,
+no reforço da cintura, na travessa de trás da cabine e na ponta do anteparo. O teto
 assenta nos montantes A, B e C, na travessa do painel pelo pé do para-brisa, na
 travessa de trás da cabine pelo pé do vidro traseiro e nos reforços da cintura
 pelo pé das colunas C. Os painéis dianteiro e traseiro assentam nas pontas das
 longarinas. A tampa do porta-malas assenta no topo do anteparo.
 
-Entre dois painéis vizinhos o vão é de 4 mm, medido no plano em que a linha de
-vão foi desenhada: capô e para-lama, capô e painel dianteiro, para-lama e
+Entre dois painéis vizinhos o vão é de 4 mm, medido ao longo da chapa pela
+face de fora: capô e para-lama, capô e painel dianteiro, para-lama e
 painel dianteiro, para-lama e porta dianteira, as duas portas, porta traseira e
 lateral traseira, cada porta e a soleira, cada porta e o teto, lateral traseira
 e tampa, lateral traseira e painel traseiro, tampa e painel traseiro. Na linha
 de cintura o teto fica 4 mm acima da lateral traseira, com o degrau de 10 mm do
-ombro entre os dois. O capô acaba 6 mm à frente do pé do para-brisa e a tampa
+ombro entre os dois. O capô acaba 5,6 mm à frente do pé do para-brisa e a tampa
 começa 5 mm atrás do pé do vidro traseiro. Cada vidro, farol, lanterna e a
 grade ficam no vão deles com 4 mm em toda a volta, e no rascunho não encostam
 em nada. Os para-choques ficam 4 mm à frente e atrás dos painéis, presos pelos
@@ -221,8 +221,9 @@ rever depois de a pessoa ver as imagens.
 A soleira sob as portas entrou como painel próprio, dois a mais que a lista do
 pedido, para a porta ter contra o que fechar embaixo. A recomendação é mantê-la.
 
-A chapa tem 1 mm, o vão 4 mm e o vidro 4 mm. A recomendação é ficar com esses
-valores.
+A chapa tem 1 mm e o vão 4 mm. O vidro, que no rascunho refeito é cortado da
+mesma chapa, ficou com 1 mm. A recomendação é ficar com a chapa e o vão e dar
+ao vidro 4 mm na etapa de receita, a partir de uma chapa própria.
 
 A superfície é facetada, como a fonte. A chapa lisa, com raio nas quinas e
 curvatura nos painéis, foi testada só no corpo de baixo e saiu ondulada pelas
@@ -245,29 +246,34 @@ apoio de cada um e a aba das portas, do capô e da tampa na etapa de receita.
 
 `referencias/sedan-chassi-e-lataria.esboco.mjs` monta o carro inteiro numa
 opção, com 83 partes nomeadas: 34 do chassi, 16 das rodas, 15 painéis de chapa,
-8 vidros e 10 acabamentos. Os 15 painéis saem de uma superfície só: a
-carroceria inteira é montada como uma chapa fechada de 1 mm, e cada painel é a
-interseção dela com a região que as linhas de vão delimitam, recuada 2 mm.
-`SEDAN=chassi` monta só o chassi com as rodas, `SEDAN=explodida` afasta os
-painéis, e `SEDAN_CORES=reais` troca a cor por painel pela do objeto.
+8 vidros e 10 acabamentos. Os 15 painéis e os 8 vidros saem de uma superfície
+só, montada uma vez: a carroceria inteira é uma chapa fechada de 1 mm, e
+`paineisPorVaos`, do núcleo, a parte por 28 linhas de vão desenhadas nas vistas
+de cima, de lado e de frente, num corte só, e nomeia cada painel pelo ponto
+visto dele. `SEDAN=chassi` monta só o chassi com as rodas, `SEDAN=explodida`
+afasta os painéis, e `SEDAN_CORES=reais` troca a cor por painel pela do objeto.
+A primeira versão do rascunho, que montava a chapa 23 vezes, e a comparação das
+duas estão no `ATRITOS.md`.
 
 Medido em 2026-11-11. A caixa do conjunto vai de x -986 a 986, y 0 a 1.523 e z
--2.200 a 2.198. No modo estrito do relato de contatos nada atravessa sem estar
-declarado; 70 pares encostam e 59 atravessam por desenho. O vão entre vizinhos,
-medido na malha da borda de um painel à do outro, tem mínimo de 4,000 mm e
-mediana de 4,00 a 4,06 mm nos onze pares de chapa; no para-brisa, que é
-inclinado e foi cortado pela vista de frente, o vão ao longo da chapa chega a
-5,07 mm em cima e embaixo, e no vidro traseiro, a 4,79 mm.
+-2.200 a 2.198. O rascunho tem 546 passos e monta em 3 a 4 s. No modo estrito
+do relato de contatos nada atravessa sem estar declarado; 64 pares encostam e
+63 atravessam por desenho. `npm run vao:partes`, com os vãos declarados em cada
+par, dá o vão da face de fora entre 4,02 e 4,18 mm em todos os pares de chapa
+e de vidro, com mediana de 4,08 a 4,14 mm, o para-brisa e o vidro traseiro
+incluídos; o capô e o para-lama ficam a 5,6 mm do pé da cabine e a tampa a 5,0
+mm, por desenho. O comando sai com 1 por cinco pares que o `ATRITOS.md`
+explica: dois em que o mínimo cai a 3,97 mm num ponto da quina de baixo e três
+que ele dá como travessia com o vão medido em 4,08 mm. A menor distância entre
+os dois sólidos é menor que o vão da face de fora onde a chapa é inclinada em
+relação à vista do corte: 3,45 mm no para-brisa.
 
 `referencias/sedan-chassi-e-lataria.conferir.json` confere as vistas de lado,
-de cima e de frente contra os contornos da fonte. A lataria com as rodas, sem o
-chassi, tem sobreposição de 92,8% de lado (sobra de 0,1% e falta de 7,1% da
-área da referência, a falta no vão entre o pneu e o arco e nos cantos que as
-fatias dão às rodas), 97,9% de cima (sobra de 0,4% e falta de 1,7%) e 97,0% de
-frente na carroceria (sobra de 0,2% e falta de 2,8%). O conjunto com o chassi
-tem 91,3% de lado (sobra de 5,2% e falta de 3,9%), 98,6% de cima (0,4% e 1,1%)
-e 92,2% de frente (6,6% e 1,7%); a sobra de lado e de frente é o chassi, que
-aparece abaixo da carroceria e que a fonte não tem.
+de cima e de frente contra os contornos da fonte, com o chassi fora da conta. A
+sobreposição é de 92,8% de lado (sobra de 0,1% e falta de 7,1% da área da
+referência, a falta no vão entre o pneu e o arco e nos cantos que as fatias dão
+às rodas), 98,2% de cima (sobra de 0,4% e falta de 1,5%) e 97,5% de frente
+(sobra de 0,3% e falta de 2,2%).
 
 As imagens para a pessoa estão em
 `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`.
