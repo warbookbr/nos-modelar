@@ -209,42 +209,52 @@ const FUNDO = T.lado.at(-1)[1];      /* a borda de baixo da chapa, do arco de tr
 const circulo = (zc, R, n = 48) => arco(zc, T.roda.raio, R, 0, 2 * Math.PI * (1 - 1 / n), n - 1);
 
 /* As linhas de vão, cada uma o meio do vão na vista em que foi desenhada: 'x' é a vista de lado ([z, y]), 'y' a de cima ([x, z]) e 'z'
-   a de frente ([x, y]). As de lado não têm alcance e cortam os dois lados do carro. */
+   a de frente ([x, y]). No modo superfície a lâmina é varrida sobre a chapa e corta só a camada vista do `lado`: a linha de lado vale
+   para um lado do carro, e `dosDoisLados` a escreve para os dois. No modo vista (o padrão) a lâmina atravessa o carro. */
+const SUPERFICIE = { modo: 'superficie' };
+const DE_CIMA = { ...SUPERFICIE, alcance: [900, 1200] };       /* só a face de cima do corpo; o teto da cabine fica acima do alcance */
+const dosDoisLados = (linha) => [{ ...linha, ...SUPERFICIE, nome: `${linha.nome}Dir`, lado: '+' }, { ...linha, ...SUPERFICIE, nome: `${linha.nome}Esq`, lado: '-' }];
 function linhasDeVao() {
   const yC = T.yCintura; const yT = T.yTopoDaPorta;
+  const ALEM = 1100; const ABAIXO = 300;     /* fora da chapa: a linha que sai pela borda segue o plano dela */
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
-  const furo = (nome, eixo, pontos, alcance) => fechada(nome, eixo, pontos, { alcance, dentro: 'descarta' });
+  const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [
-    /* de cima */
-    { nome: 'frente', eixo: 'y', pontos: [[-1100, T.zFrente], [1100, T.zFrente]] },
-    { nome: 'tras', eixo: 'y', pontos: [[-1100, T.zTras], [1100, T.zTras]] },
-    { nome: 'peDoParaBrisa', eixo: 'y', pontos: [[-1100, T.zCapo], [1100, T.zCapo]], alcance: [300, yC + 1] },
-    { nome: 'peDoVidroTraseiro', eixo: 'y', pontos: [[-1100, T.zTampa], [1100, T.zTampa]], alcance: [yC - G, yC + 1] },
-    { nome: 'capoDir', eixo: 'y', pontos: [[T.xCapo, T.zCapo], [T.xCapo, T.zFrente]], alcance: [900, 1200] },
-    { nome: 'capoEsq', eixo: 'y', pontos: [[-T.xCapo, T.zCapo], [-T.xCapo, T.zFrente]], alcance: [900, 1200] },
-    { nome: 'tampa', eixo: 'y', pontos: [[-T.xTampa, T.zTras], [-T.xTampa, T.zTampa], [T.xTampa, T.zTampa], [T.xTampa, T.zTras]], alcance: [900, 1200] },
-    /* de lado */
+    /* de cima, na face de cima do corpo: cada plano de corte do carro é esta linha mais a de lado, abaixo, que desce a parede */
+    { nome: 'frente', eixo: 'y', pontos: [[-ALEM, T.zFrente], [ALEM, T.zFrente]], ...DE_CIMA },
+    { nome: 'tras', eixo: 'y', pontos: [[-ALEM, T.zTras], [ALEM, T.zTras]], ...DE_CIMA },
+    { nome: 'peDoParaBrisa', eixo: 'y', pontos: [[-ALEM, T.zCapo], [ALEM, T.zCapo]], ...DE_CIMA },
+    { nome: 'peDoVidroTraseiro', eixo: 'y', pontos: [[-ALEM, T.zTampa], [ALEM, T.zTampa]], ...DE_CIMA },
+    /* de lado, através do carro (modo vista): o contorno das portas corre na linha de cintura, que é o degrau de 10 mm do ombro, de
+       perfil para a vista de lado, e a linha entre as portas o atravessa */
     { nome: 'contornoDasPortas', eixo: 'x', pontos: [[T.zCapo, yC], [zPorta(yC), yC], [zPorta(yT), yT], [T.zLateral, yT], [T.zLateral, yC], [T.zTampa, yC]] },
     { nome: 'entrePortas', eixo: 'x', pontos: [[T.zPortas, T.ySoleira], [T.zPortas, yT]] },
-    { nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] },
-    { nome: 'fimDaPortaTraseira', eixo: 'x', pontos: [[T.zLateral, yC], [T.zLateral, T.ySoleira]] },
-    /* o trecho que sai pela borda de baixo acaba meio milímetro antes dela e é alongado por `alem`: a amostra que cai fora da chapa
-       não tem normal, e a lâmina alargava de 4,08 a 4,23 mm nos últimos 40 mm (ATRITOS, segunda etapa) */
-    { nome: 'fimDaSoleira', eixo: 'x', pontos: [[T.zLateral, T.ySoleira], [T.zLateral, FUNDO + 0.5]], alem: 30 },
-    fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO),
-    fechada('janelaTraseira', 'x', VIDRO_TRASEIRO_DA_PORTA),
-    fechada('janelaDaVigia', 'x', T.vigia),
+    /* o arco de roda atravessa as dobras da planta, e o furo do modo superfície não dobra */
     fechada('arcoDianteiro', 'x', circulo(T.roda.zFrente, R_ARCO - G), { dentro: 'descarta' }),
     fechada('arcoTraseiro', 'x', circulo(T.roda.zTras, R_ARCO - G), { dentro: 'descarta' }),
-    /* de frente */
-    fechada('janelaDoParaBrisa', 'z', trapezio(T.paraBrisa), { alcance: [200, 800] }),
-    fechada('janelaDoVidroTraseiro', 'z', trapezio(T.vidroTraseiro), { alcance: [-1400, -900] }),
-    furo('vaoDaGrade', 'z', GRADE, [2000, 2300]),
+    /* de frente e de trás, na face que o `lado` vê */
+    fechada('janelaDoParaBrisa', 'z', trapezio(T.paraBrisa), { ...SUPERFICIE, lado: '+' }),
+    fechada('janelaDoVidroTraseiro', 'z', trapezio(T.vidroTraseiro), { ...SUPERFICIE, lado: '-' }),
+    furo('vaoDaGrade', '+', GRADE),
   ];
   for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) {
-    L.push(furo(`vaoDoFarol${lado}`, 'z', FAROL(s), [2000, 2300]), furo(`vaoDaLanterna${lado}`, 'z', LANTERNA(s), [-2300, -2000]));
-    L.push(furo(`furoDoSuporteDianteiro${lado}`, 'z', FURO(s, SUPORTE.frente), [2000, 2300]), furo(`furoDoSuporteTraseiro${lado}`, 'z', FURO(s, SUPORTE.tras, SUPORTE.xTras), [-2100, -2075]));
+    L.push({ nome: `capo${lado}`, eixo: 'y', pontos: [[s * T.xCapo, T.zCapo], [s * T.xCapo, T.zFrente]], ...DE_CIMA });
+    L.push({ nome: `tampa${lado}`, eixo: 'y', pontos: [[s * T.xTampa, T.zTampa], [s * T.xTampa, T.zTras]], ...DE_CIMA });
+    L.push(furo(`vaoDoFarol${lado}`, '+', FAROL(s)), furo(`vaoDaLanterna${lado}`, '-', LANTERNA(s)));
+    L.push(furo(`furoDoSuporteDianteiro${lado}`, '+', FURO(s, SUPORTE.frente)), furo(`furoDoSuporteTraseiro${lado}`, '-', FURO(s, SUPORTE.tras, SUPORTE.xTras)));
   }
+  /* de lado, na parede de cada lado: as paredes da frente, de trás, do para-lama e da porta traseira, a soleira e as janelas */
+  L.push(
+    ...dosDoisLados({ nome: 'frenteDaParede', eixo: 'x', pontos: [[T.zFrente, ALEM], [T.zFrente, ABAIXO]] }),
+    ...dosDoisLados({ nome: 'trasDaParede', eixo: 'x', pontos: [[T.zTras, ALEM], [T.zTras, ABAIXO]] }),
+    ...dosDoisLados({ nome: 'fimDoParaLama', eixo: 'x', pontos: [[T.zCapo, ALEM], [T.zCapo, ABAIXO]] }),
+    ...dosDoisLados({ nome: 'fimDaPortaTraseira', eixo: 'x', pontos: [[T.zLateral, yC], [T.zLateral, ABAIXO]] }),
+    ...dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }),
+    ...dosDoisLados(fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO)),
+    ...dosDoisLados(fechada('janelaTraseira', 'x', VIDRO_TRASEIRO_DA_PORTA)),
+    ...dosDoisLados(fechada('janelaDaVigia', 'x', T.vigia)),
+  );
+  if (process.env.SEM) { const sem = process.env.SEM.split(','); return L.filter((l) => !sem.some((n) => l.nome.startsWith(n))); } /* TEMPORARIO */
   return L;
 }
 

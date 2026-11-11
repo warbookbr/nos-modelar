@@ -119,8 +119,8 @@ export const FOLGAS = [['capo', 'paraLamaDir'], ['paraLamaDir', 'portaDianteiraD
 
 /** O esboço 2.0 de um caminho, em mm: a chapa de subdivisão com a espessura e, salvo com `HD_PAINEIS=0`, o corte em painéis.
  * `pontos` vem em mm (o `topo` da opção) e `passo` são os campos do passo `subdivisao` por nome. `HD_MODO` troca o modo da lâmina
- * de `paineisPorVaos` ('superficie', o padrão aqui, ou 'vista'). */
-export function esbocoDoCaminho({ titulo, nota, pontos, passo, niveis, arcos }) {
+ * de `paineisPorVaos` ('superficie', o padrão aqui, ou 'vista'). `extras` são passos a mais, em mm, postos depois da chapa e do corte. */
+export function esbocoDoCaminho({ titulo, nota, pontos, passo, niveis, arcos, extras = [] }) {
   const chapa = ['subdivisao', { origemId: 1, ...passo, niveis, borda: 'cantos', espessura: T.chapa }];
   const semPaineis = process.env.HD_PAINEIS === '0';
   const modo = process.env.HD_MODO ?? 'superficie';
@@ -133,6 +133,7 @@ export function esbocoDoCaminho({ titulo, nota, pontos, passo, niveis, arcos }) 
   } else {
     passos = [chapa, ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }]];
   }
+  passos.push(...extras);
   const esboco = {
     plano: 'Primeiro ciclo de alta definição do sedã: o corpo de baixo do lado direito e a metade direita do capô, em chapa de 1 mm com vão de 4 mm, como diagnóstico.',
     vista: 'isometrica',

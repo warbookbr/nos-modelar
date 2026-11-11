@@ -88,6 +88,11 @@ const rede = gaiolaPorRede({
 export const REDE = rede;
 /* a rede devolve os pontos em metro, como o TOPO de uma receita; o esboço e `paineisPorVaos` os querem em mm */
 const emMm = Object.fromEntries(Object.entries(rede.pontos).map(([k, p]) => [k, p.map((c) => c * 1000)]));
+/* a sonda do lábio do arco de roda (`HD_LABIO=1`): a aba do `friso` sobre a curva do arco dianteiro, que na rede é borda livre da chapa */
+const LABIO = process.env.HD_LABIO === '1' ? [
+  ['friso', { origemId: 900, superficie: { op: 'subdivisao', id: 1 }, linha: { nome: 'labioDoArcoDianteiro', pontos: rede.linha('arcoFrente') }, aba: { largura: 15, angulo: 90, raio: 3 } }],
+  ['parte', { nome: 'labioDoArcoDianteiro', sel: { origem: { op: 'friso', id: 900 } } }],
+] : [];
 const { esboco, medidas, avisos } = esbocoDoCaminho({
   titulo: 'caminho B: gaiola por rede de curvas',
   nota: 'curvas de feição sobre as linhas do carro facetado, arcos de roda como borda livre, raio pelo vinco das curvas',
@@ -95,6 +100,7 @@ const { esboco, medidas, avisos } = esbocoDoCaminho({
   passo: rede.passo,
   niveis: NIVEIS,
   arcos: false,
+  extras: LABIO,
 });
 export const MEDIDAS_DO_CORTE = medidas;
 export const AVISOS = { gaiola: rede.avisos, corte: avisos };
