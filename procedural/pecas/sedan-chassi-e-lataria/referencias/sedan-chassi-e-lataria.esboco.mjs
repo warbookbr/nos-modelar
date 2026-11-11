@@ -25,7 +25,7 @@
  * mm. As cores são uma por painel, para os vãos aparecerem; a cor do objeto real está no `.conferir.json`.
  *
  * `npm run esboco:nucleo -- <este arquivo> --so-montar` dá a caixa e o relato de contatos. `SEDAN=chassi` monta só o chassi com as
- * rodas, e `SEDAN=explodida` afasta os painéis do chassi. */
+ * rodas, `SEDAN=explodida` afasta os painéis do chassi, e `SEDAN_CORES=reais` pinta as partes com a cor do objeto real. */
 import { readFileSync } from 'node:fs';
 import { chamar, criarRegistroDeFamilias } from '../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../nucleo/composicoes.js';
@@ -156,7 +156,12 @@ function bool(op, origens) {
   estado.passos.push([op, { origemId: id, solidos: origens.map((origem) => ({ origem })) }]);
   return { op, id };
 }
-function parte(nome, origem, cor) {
+/* a cor do objeto real, por nome de parte, para o lado a lado com as vistas do acervo (`SEDAN_CORES=reais`) */
+const corReal = (n) => (/^pneu/.test(n) ? '#151617' : /^(aro|cubo|disco)/.test(n) ? '#8a8f94' : /^(paraBrisa|vidro|vigia)/.test(n) ? '#20262d'
+  : /^farol/.test(n) ? '#c9c4a6' : /^grade/.test(n) ? '#2c2f33' : /^lanterna/.test(n) ? '#5a1f1a'
+    : /^(capo|tampa|painel|paraLama|soleira(Dir|Esq)$|porta|lateral|teto|tomada|retrovisor|paraChoque)/.test(n) ? '#b23a2e' : '#4a5560');
+function parte(nome, origem, corDaParte) {
+  const cor = process.env.SEDAN_CORES === 'reais' ? corReal(nome) : corDaParte;
   estado.passos.push(['parte', { nome, sel: { origem } }], ['pincel', { modo: 'face', sel: { origem }, cor }]);
   PARTES.set(nome, origem);
   CORES[nome] = cor;
@@ -297,13 +302,21 @@ function chassi() {
   parte('suporteDoRadiador', aparar(caixa(-1000, 1000, 486, 1100, 1840, 1870)), CINZA);
   /* o anteparo fecha o porta-malas atrás do banco: uma parede entre as caixas de roda e uma faixa de lado a lado acima delas */
   parte('anteparoTraseiro', aparar(bool('unir', [caixa(-C.xParede - 1.5, C.xParede + 1.5, 490, 1100, -1360, -1340), caixa(-1000, 1000, 800, 1100, -1360, -1340)])), CINZA);
+  /* as travessas da linha de cintura, por dentro do pé do para-brisa e do pé do vidro traseiro, onde o teto com as colunas assenta */
+  parte('travessaDoPainel', aparar(caixa(-1000, 1000, 940, 1040, 660, 686)), OCRE);
+  parte('travessaDaCabine', aparar(caixa(-1000, 1000, 940, 1040, -1311, -1280)), OCRE);
   for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) {
     const x = (a, b) => (s > 0 ? [a, b] : [-b, -a]);
-    parte(`soleiraDoChassi${lado}`, aparar(caixa(...x(800, 1000), 380, 466, T.zLateral + 2, 701.5)), AZUL);
-    parte(`montanteA${lado}`, aparar(caixa(...x(800, 1000), 460, 1040, 640, 686)), OCRE);
+    /* a soleira do chassi sobe 6 mm acima da linha de vão da porta, e os montantes A e C passam 6 mm das linhas de vão das portas:
+       a borda da porta fecha contra eles e o vão não deixa ver através do carro */
+    parte(`soleiraDoChassi${lado}`, aparar(caixa(...x(800, 1000), 380, T.ySoleira + 6, T.zLateral + 2, 701.5)), AZUL);
+    parte(`montanteA${lado}`, aparar(caixa(...x(800, 1000), 460, 1040, 600, T.zCapo + 6)), OCRE);
     /* os montantes B e C partem de x 700 para chegar ao teto, que em y 1523 tem 730 de meia largura */
     parte(`montanteB${lado}`, aparar(caixa(...x(700, 1000), 460, 1530, -75, -15)), OCRE);
-    parte(`montanteC${lado}`, aparar(caixa(...x(700, 1000), 560, 1530, -835, -781)), OCRE);
+    /* o montante C tem um pé estreito à frente do pneu, que desce até a soleira do chassi por trás da linha de vão da porta */
+    parte(`montanteC${lado}`, aparar(bool('unir', [caixa(...x(700, 1000), 560, 1530, -835, T.zLateral + 6), caixa(...x(804, 1000), 460, 562, T.zLateral - 8, T.zLateral + 6)])), OCRE);
+    /* o reforço da cintura corre por dentro do pé da coluna C, do montante C à travessa de trás da cabine */
+    parte(`reforcoDaCintura${lado}`, aparar(caixa(...x(700, 1000), 940, 1040, -1295, -830)), OCRE);
     parte(`longarinaSuperior${lado}`, caixa(...x(600, 638.5), 700, 780, 701.5, 1841.5), AZUL);
     for (const [zc, ponta] of [[T.roda.zFrente, 'Dianteira'], [T.roda.zTras, 'Traseira']]) {
       const R = R_ARCO; const yb = T.lado.at(-1)[1]; const yc = T.roda.raio;
@@ -401,6 +414,15 @@ for (const L of ['Dir', 'Esq']) {
     par(`lateralTraseira${L}`, `caixaDeRodaTraseira${L}`, 'encosta', 'a borda do arco assenta na caixa de roda'),
     par(`lateralTraseira${L}`, 'anteparoTraseiro', 'encosta', 'a lateral traseira assenta na ponta do anteparo'),
     par('teto', `montanteA${L}`, 'encosta', 'o pé da coluna A assenta no topo do montante A'),
+    par(`paraLama${L}`, `montanteA${L}`, 'encosta', 'a borda de trás do para-lama assenta no montante A'),
+    par(`portaTraseira${L}`, `montanteC${L}`, 'encosta', 'a porta traseira fecha contra o montante C, onde fica a fechadura'),
+    par(`portaDianteira${L}`, `soleiraDoChassi${L}`, 'encosta', 'a borda de baixo da porta fecha contra a soleira do chassi'),
+    par(`portaTraseira${L}`, `soleiraDoChassi${L}`, 'encosta', 'a borda de baixo da porta fecha contra a soleira do chassi'),
+    par('teto', `reforcoDaCintura${L}`, 'encosta', 'o pé da coluna C assenta no reforço da cintura'),
+    par(`lateralTraseira${L}`, `reforcoDaCintura${L}`, 'encosta', 'a borda de cima da lateral traseira assenta no reforço da cintura'),
+    par(`lateralTraseira${L}`, 'travessaDaCabine', 'encosta', 'a lateral traseira assenta na ponta da travessa de trás da cabine'),
+    par(`reforcoDaCintura${L}`, `montanteC${L}`, 'atravessa', SOLDA), par(`reforcoDaCintura${L}`, 'travessaDaCabine', 'atravessa', SOLDA),
+    par(`montanteA${L}`, 'travessaDoPainel', 'atravessa', SOLDA),
     par('teto', `montanteB${L}`, 'encosta', 'o teto assenta no topo do montante B'),
     par('teto', `montanteC${L}`, 'encosta', 'a coluna C e o teto assentam no montante C'),
     par('painelDianteiro', `longarina${L}`, 'encosta', 'o painel dianteiro assenta na ponta da longarina'),
@@ -421,7 +443,7 @@ for (const L of ['Dir', 'Esq']) {
     par(`longarina${L}`, 'suporteDoRadiador', 'atravessa', SOLDA),
     par(`longarina${L}`, `suporteDoParaChoqueDianteiro${L}`, 'atravessa', 'o suporte sai de dentro da longarina'),
     par(`longarina${L}`, `suporteDoParaChoqueTraseiro${L}`, 'atravessa', 'o suporte sai de dentro da longarina'),
-    par(`montanteA${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA), par(`montanteB${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA),
+    par(`montanteA${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA), par(`montanteB${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA), par(`montanteC${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA),
     par('paraChoqueDianteiro', `suporteDoParaChoqueDianteiro${L}`, 'atravessa', 'o suporte entra 2 mm no para-choque'),
     par('paraChoqueTraseiro', `suporteDoParaChoqueTraseiro${L}`, 'atravessa', 'o suporte entra 2 mm no para-choque'),
     par(`portaDianteira${L}`, `retrovisor${L}`, 'atravessa', 'o pé do retrovisor entra na chapa da porta'),
@@ -451,6 +473,8 @@ CONTATOS.push(
   par('capo', 'suporteDoRadiador', 'encosta', 'a frente do capô assenta no topo do suporte do radiador'),
   par('capo', 'tomadaDeAr', 'encosta', 'a tomada de ar assenta sobre o capô'),
   par('tampaDoPortaMalas', 'anteparoTraseiro', 'encosta', 'a borda da frente da tampa assenta no topo do anteparo'),
+  par('teto', 'travessaDoPainel', 'encosta', 'o pé do para-brisa assenta na travessa do painel'),
+  par('teto', 'travessaDaCabine', 'encosta', 'o pé do vidro traseiro assenta na travessa de trás da cabine'),
   par('assoalho', 'tunel', 'encosta', 'o túnel assenta no assoalho'),
   par('assoalho', 'travessaCentral', 'encosta', 'o assoalho assenta na travessa'),
   par('assoalho', 'travessaTraseira', 'encosta', 'o assoalho de trás assenta na travessa'),

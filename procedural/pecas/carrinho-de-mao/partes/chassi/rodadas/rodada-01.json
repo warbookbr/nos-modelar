@@ -1,0 +1,897 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/chassi",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência, e o plano não cita nenhuma",
+    "nota": 9,
+    "defeitos": [],
+    "observacao": "Sem imagem de alvo, só comparei com a forma prometida: tubo único, laço largo, braços e manoplas espelhados, punhos, mancais e eixo no laço, sem defeito estrutural nas vistas abertas; lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "chassi",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "manoplas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancais",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixo",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o encaixaCilindrico exige o eixo dentro do furo; o eixo publica só o assento de 102 e a largura do cubo vem dele por vínculo",
+    "folga radial da relação é em metro e a escrita em mm reprovou sem dizer a unidade",
+    "crítico sem alvo: a foto fica fora do repositório e o pedido não tem como citá-la; atribuição: ferramenta (opção de referência externa em vistas:critica)",
+    "o crítico pôs o caminho do pedido em alvo e o registro recusou; o pedido sem referência não dizia o que escrever; atribuição: ferramenta",
+    "o crítico não abriu as vistas de luz rasante, que o pedido de peça de tubo traz sem necessidade; atribuição: ferramenta"
+  ],
+  "notaDePassagem": "Raios do lado -x espelhados na ordem certa e quadro acompanha (seção 32,0 em todo o tubo). Os planos dos braços em y 250 e 282 têm vértice exato e dão pose identidade aos pés e à caçamba; o assento do eixo (102) leva a largura do cubo à roda.",
+  "receita": {
+    "sha256": "sha256:23333d8f4240c803577903b51b28bfef83f691af9976b3935aac7afff4993b4b",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 164,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * manoplas, os dois mancais sob o laço e o eixo da roda, fixo neles; a base em que as outras três peças se prendem."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa 1 de 4 da montagem `../../montagem.json` (item 1 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * aprovou por imagem em 2026-11-11 (`../../referencias/carrinho-de-mao.esboco.mjs`, \"Sim a forma esta boa\"), na escala do pneu de 340"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * mm, levada para cá sem mudança de medida, com três mudanças de construção: o trilho do tubo é o `{ pontos, raios }` da `gaiolaVarrida`"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * (no rascunho, uma função própria fazia os arcos) com os raios do lado espelhado na ordem certa (o rascunho passava 11 raios para os"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * 10 cantos, e do lado -x os quatro cantos de trás do laço saíam com o raio do canto vizinho); o quadro do tubo acompanha o trilho, que"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * deixa a seção redonda na subida da manopla e na rampa do laço (com o quadro fixo do rascunho ela media 28 mm no lugar de 32); e as"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * estações são as do trilho (passo de 40 mm nas retas e a cada 7,5 graus nas curvas). O eixo, que o rascunho punha com a roda, é deste"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * chassi, porque não gira em relação a ele. O rascunho chama `montarChassi` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * DE ONDE VEM CADA MEDIDA: a TABELA do `../../ALINHAMENTO.md` (linhas \"tubo do chassi\", \"laço\", \"altura do laço\", \"braço sob a"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * caçamba\", \"subida e manopla\", \"manoplas\", \"mancais\", \"eixo\"), pelos contornos de `../../referencias/carrinho-de-mao.contornos.json`."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * AS PORTAS. A origem é a do carrinho, e o chassi é a base: a montagem o põe sem pose. `eixo` é o cilindro do assento da roda no"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * meio do eixo, por onde a roda entra (os vínculos levam o raio dele ao furo do cubo e o comprimento à largura do cubo, e a posição põe o furo no"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * mesmo eixo). `apoioDosPes` é"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * o plano da face de baixo dos braços, com a normal para baixo, onde as travessas dos pés assentam; `apoioDaCacamba`, o da face de"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * cima, com a normal para cima, onde o fundo da caçamba assenta. Os dois planos ficam no meio do braço reto, e a peça que se põe"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * neles publica a porta no mesmo x e z, com a normal oposta: a pose sai identidade."
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula o trilho, os raios e as portas em mm; `montarChassi` escreve os passos em mm num estado"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, campo de medida a campo de medida, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "import { ferramentas, esc, lerp, passosEmMetro, portaEmMetro, soma, sub, topoEmMetro, unit } from '.././receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  /* As cores do rascunho, uma por parte para a conferência; no objeto real o tubo é azul como a caçamba. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  cores: { azul: '#2f6fd1', escuro: '#2a2d30', preto: '#151617' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* TUBO DO CHASSI (linha \"tubo do chassi\"): Ø 32, 24 lados, estações a cada 40 mm nas retas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  tubo: { raio: 16, lados: 24, passo: 40 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* A polilinha do eixo do tubo, do lado +x, da ponta da manopla ao canto da frente do laço (o outro lado é o espelho): a manopla até"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     z -1.300 (y 515, x 262), a dobra de cima da subida, o braço sob a caçamba (y 266, x 175 a 160, de z -770 a -170), a rampa, o laço"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     reto (y 195, x 95) e o canto da frente em z 210 (a ponta de fora do laço em z 226). O raio de cada canto, na mesma ordem; o da"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     frente é quase a meia largura do laço, que fica com 2 mm de reta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  chassi: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "    pontos: [[262, 515, -1300], [250, 475, -1080], [175, 266, -770], [160, 266, -170], [95, 195, -45], [95, 195, 210]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "    raios: [120, 150, 120, 100, 94],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* MANOPLA (linha \"manoplas\"): punho de borracha de Ø 38 nos últimos 110 mm do tubo, passando 6 mm da ponta dele; estações a cada 30. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  manopla: { raio: 19, comprimento: 110, alem: 6, lados: 24, passo: 30 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* MANCAIS (linha \"mancais\"): um bloco sob cada lado do laço, no z do eixo, da face de baixo do eixo ao meio do tubo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  mancais: { x: [79, 111], y: [158, 195], meioComprimento: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  /* EIXO (linha \"eixo\"): Ø 16, de x -120 a 120, em y 170 (a roda de Ø 340 no chão) e z 0, fixo nos mancais. O assento é o trecho do"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "     meio em que o cubo da roda gira, centrado, que a porta `eixo` declara e o vínculo da montagem leva à largura do cubo: 102 mm, o"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "     cubo mais largo que a família da roda faz no pneu de 340 (o rascunho tinha 110), com 28 mm de folga de cada lado até os mancais. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  eixo: { raio: 8, meio: 120, y: 170, z: 0, lados: 24, assento: 102 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "/** O x, o y e o z do eixo do braço reto (do terceiro ao quarto ponto da polilinha) em z, do lado +x. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "export function noBraco(T, z) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const [a, b] = [T.chassi.pontos[2], T.chassi.pontos[3]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  return lerp(a, b, (z - a[2]) / (b[2] - a[2]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "/** O trilho do tubo inteiro, as manoplas, os mancais, o eixo e as portas, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  const CH = T.chassi;"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  /* o tubo vai da ponta de uma manopla à da outra pelo laço: o lado +x e o espelho dele, de trás para a frente; os raios são os dez"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "     cantos de dentro, os do lado +x e os mesmos na ordem inversa */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  const outro = [...CH.pontos].reverse().map(([x, y, z]) => [-x, y, z]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const trilho = { pontos: [...CH.pontos, ...outro], raios: [...CH.raios, ...[...CH.raios].reverse()] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  /* cada manopla: o punho na reta da manopla, da ponta para dentro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const manoplas = [1, -1].map((s) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    const [a, b] = [CH.pontos[0], CH.pontos[1]].map(([x, y, z]) => [s * x, y, z]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    const d = unit(sub(a, b));"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    return { s, de: sub(a, esc(d, T.manopla.comprimento)), ate: soma(a, esc(d, T.manopla.alem)) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const E = T.eixo; const MA = T.mancais;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const mancais = [MA.x, [-MA.x[1], -MA.x[0]]].map((x) => ({ x, y: MA.y, z: [E.z - MA.meioComprimento, E.z + MA.meioComprimento] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  /* os planos do braço, no meio do trecho reto */"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const zApoio = (CH.pontos[2][2] + CH.pontos[3][2]) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const meio = noBraco(T, zApoio);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const extensao = [2 * meio[0], Math.abs(CH.pontos[3][2] - CH.pontos[2][2])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    eixo: { forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], centro: [-E.assento / 2, E.y, E.z], raio: E.raio, inicio: 0, fim: E.assento, referencia: [0, 1, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    apoioDosPes: { forma: 'plano', papel: 'recebe', ponto: [0, meio[1] - T.tubo.raio, zApoio], normal: [0, -1, 0], extensao, referencia: [1, 0, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    apoioDaCacamba: { forma: 'plano', papel: 'recebe', ponto: [0, meio[1] + T.tubo.raio, zApoio], normal: [0, 1, 0], extensao, referencia: [1, 0, 0] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  return { trilho, manoplas, mancais, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "/** O chassi no estado { passos, topo, origem }, em mm: o tubo só, da ponta de uma manopla à da outra pelo laço da frente, os punhos,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": " *  os mancais e o eixo. Devolve as origens de onde saem as portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "export function montarChassi(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const { tubo, reta, bloco, lathe, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const chassi = tubo('chassi', D.trilho, T.tubo.raio, { lados: T.tubo.lados, estacoes: { passo: T.tubo.passo }, u: [0, 1, 0] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  parte('chassi', chassi, T.cores.azul);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  const M = T.manopla;"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  D.manoplas.forEach((mp, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    parte('manoplas', tubo(`manopla${mp.s > 0 ? 'E' : 'D'}`, reta(mp.de, mp.ate), M.raio, { lados: M.lados, estacoes: { passo: M.passo } }), T.cores.preto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "    const MA = D.mancais[k];"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    parte('mancais', bloco(MA.x, MA.y, MA.z), T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  const E = T.eixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  /* a barra, com uma volta de vértices em cada ponta do assento, onde a porta do eixo começa e acaba */"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  const eixo = lathe([[0, -E.meio], [E.raio, -E.meio], [E.raio, -E.assento / 2], [E.raio, E.assento / 2], [E.raio, E.meio], [0, E.meio]], [0, E.y, E.z], E.lados);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  parte('eixo', eixo, T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  return { chassi, eixo };"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, as portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const { chassi, eixo } = montarChassi(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  const { portas } = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  return [...passosEmMetro(estado.passos),"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    portaEmMetro('eixo', eixo.origem, portas.eixo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    portaEmMetro('apoioDosPes', chassi.origem, portas.apoioDosPes),"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    portaEmMetro('apoioDaCacamba', chassi.origem, portas.apoioDaCacamba)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "/** Os pontos nomeados das gaiolas dos tubos, em metro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "export function gerarTopo(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  montarChassi(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  return topoEmMetro(estado.topo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  { par: ['chassi', 'manoplas'], motivo: 'o punho de borracha veste a ponta do tubo nos últimos 110 mm de cada manopla' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  { par: ['chassi', 'mancais'], motivo: 'os mancais são presos sob o tubo do laço, do meio do tubo para baixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  { par: ['eixo', 'mancais'], motivo: 'o eixo atravessa os dois mancais e fica fixo neles' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  meta: { nome: 'carrinho-de-mao/chassi', desc: 'chassi do carrinho de mão de obra: tubo redondo único dobrado com o laço da roda, as manoplas com punho, os mancais e o eixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  get TOPO() { return { origem: 'o chão sob o centro do eixo da roda, no meio da largura; y para cima, x lateral e a frente (a roda) em +z', ...gerarTopo(this.PARAMS) }; },"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    objeto: 'chassi de carrinho de mão de obra de 60 L: um tubo de aço redondo de Ø 32 dobrado, com o laço em U em volta da roda, os braços sob a caçamba e as manoplas com punho, mais os mancais e o eixo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    referencias: ['../../referencias/carrinho-de-mao.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "      { nome: 'chassi', forma: 'um tubo redondo azul de Ø 32, de uma manopla à outra: laço em U em volta da roda com a ponta em z 226, rampas, braços retos em y 266 sob a caçamba, subida e manoplas abertas, dobras em curva', tecnica: 'gaiolaVarrida de seção redonda de 24 lados num trilho de pontos com raio por canto, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "      { nome: 'manoplas', forma: 'punho preto de borracha de Ø 38 nos últimos 110 mm de cada manopla, passando 6 mm da ponta do tubo', tecnica: 'gaiolaVarrida de seção redonda de 24 lados numa reta, fechada e tampada, um de cada lado' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "      { nome: 'mancais', forma: 'bloco escuro sob cada lado do laço, de x 79 a 111, y 158 a 195 e 36 mm no comprimento, centrado no eixo da roda', tecnica: 'extrusão em y de um retângulo, um de cada lado' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "      { nome: 'eixo', forma: 'barra escura de Ø 16 de x -120 a 120, em y 170 e z 0, atravessando os dois mancais', tecnica: 'revolução em torno de x de 24 lados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "      'o tubo de seção quadrada, achatada ou com dobra em quina',"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "      'o chassi em mais de um tubo, ou com garfo no lugar do laço em U em volta da roda',"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "      'o laço estreito demais para a roda de 85 mm de banda, ou os mancais e o eixo fora do laço',"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "      'as manoplas sem punho, ou o punho solto da ponta do tubo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "      'um lado do tubo diferente do espelho do outro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    lataria: { partes: ['chassi', 'manoplas'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  /* Os extremos que a TABELA fixa nos três eixos, em mm: o eixo e o mancal do lado +x. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    const T = this.PARAMS; const E = T.eixo; const MA = T.mancais;"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "      { nome: 'ponta +x do eixo, em cima', parte: 'eixo', medida: 'maximo', em: [E.meio, E.y + E.raio, E.z + E.raio], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "      { nome: 'ponta -x do eixo, embaixo', parte: 'eixo', medida: 'minimo', em: [-E.meio, E.y - E.raio, E.z - E.raio], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "      { nome: 'mancal +x, em cima e na frente', parte: 'mancais', medida: 'maximo', em: [MA.x[1], MA.y[1], E.z + MA.meioComprimento], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes chassi, manoplas",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az100.png",
+      "peca-tresquartos-rasante-az190.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T03:31:40.734Z"
+}

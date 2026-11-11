@@ -128,23 +128,23 @@ describe('o pacote do crítico de peça de lataria', () => {
     expect(JSON.parse(readFileSync(join(pasta, MANIFESTO_DO_PACOTE), 'utf8'))).toMatchObject({ peca: NAO_LATARIA, lataria: null, superficie: null });
   }, 60_000);
 
-  it('recusa a luz rasante quase toda escura, dizendo a imagem, a fração medida e o limiar, e não escreve o pedido', async () => {
+  it('a luz rasante quase toda escura não derruba o pacote: a imagem que a luz mais alta não salva sai do pedido, e sem nenhuma que passe ele é recusado', async () => {
     /* a vista de três quartos da carenagem de prova, com a luz de 30 graus, saía com 0,5 % da peça iluminada */
     const base = mkdtempSync(join(area, 'escura-'));
     const pasta = join(base, 'rodada');
     const superficie = superficieFalsa({ iluminada: (vista, azimute) => (vista === 'lado' && azimute === 30 ? 0.005 : 0.6) });
-    const gerar = () => vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar },
+    const tentadas = [];
+    const luzMaisAlta = async ({ vista, azimutes, graus }) => { tentadas.push(`${vista}@${graus}`); return azimutes.map((azimute) => ({ azimute, arquivo: 'x.png', iluminada: 0.01 })); };
+    const resultado = await vistasParaCritica(PECA, {
+      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar, luzMaisAlta },
     });
-    await expect(gerar()).rejects.toThrow(`a luz rasante de '${PECA}' saiu quase toda escura em uma imagem, e o pacote do crítico não leva imagem de superfície `
-      + `em que a luz não alcança a peça: ${join(pasta, 'superficie', 'peca-lado-rasante-az30.png')} (vista lado, luz a 30 graus) tem 0,5 % da peça iluminada, `
-      + 'abaixo do limiar de 25,0 %.');
-    expect(existsSync(join(pasta, 'pedido.md'))).toBe(false);
-    expect(existsSync(join(pasta, MANIFESTO_DO_PACOTE))).toBe(false);
-    /* a imagem sem a medida também não passa: o limiar não se confere sem ela */
+    expect(tentadas).toEqual(['lado@20', 'lado@30', 'lado@45']);
+    expect(resultado.superficie.rasante.map((i) => `${i.vista}-${i.azimute}`)).toEqual(['frente-30', 'frente-120', 'lado-120']);
+    expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain('Sem imagem: a vista lado ficou sem a luz rasante a 30 graus de azimute');
+    /* a imagem sem a medida também não passa: o limiar não se confere sem ela, e sem nenhuma imagem que passe o pacote é recusado */
     const semMedida = superficieFalsa({ iluminada: () => null });
     await expect(vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/b', vistasDeSuperficie: semMedida.gerar },
+      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/b', vistasDeSuperficie: semMedida.gerar, luzMaisAlta },
     })).rejects.toThrow(/saiu quase toda escura em 4 imagens.*peca-frente-rasante-az30\.png \(vista frente, luz a 30 graus\) não traz a fração iluminada medida, e o limiar é de 25,0 %/);
     expect(LIMIAR_DA_LUZ_RASANTE).toBe(0.25);
   }, 60_000);
