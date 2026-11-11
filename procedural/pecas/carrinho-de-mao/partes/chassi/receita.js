@@ -145,7 +145,7 @@ const receita = {
       'as manoplas sem punho, ou o punho solto da ponta do tubo',
       'um lado do tubo diferente do espelho do outro',
     ],
-    lataria: { partes: ['chassi', 'manoplas'] },
+    lataria: { dispensa: 'a peça é tubo redondo de aço com punhos, e não chapa de lataria: a luz rasante e a curvatura de superfície de lataria não se aplicam' },
   },
   contatos: CONTATOS,
   /* Os extremos que a TABELA fixa nos três eixos, em mm: o eixo e o mancal do lado +x. */

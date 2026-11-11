@@ -123,6 +123,7 @@
     "perfil:cor": "node tools/modelar/perfil-por-cor.mjs",
     "silhueta:pedida": "node tools/modelar/silhueta-pedida.mjs",
     "sobra:partes": "node tools/modelar/sobra-entre-partes.mjs",
+    "vao:partes": "node tools/modelar/vao-entre-partes.mjs",
     "casamento:vista": "node tools/modelar/casamento-da-vista.mjs",
     "conferir:vistas": "node tools/modelar/conferir-vistas.mjs",
     "custo:peca": "node tools/modelar/custo-por-peca.mjs",

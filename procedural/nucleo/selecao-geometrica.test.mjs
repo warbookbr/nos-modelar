@@ -358,3 +358,47 @@ describe('operações que aceitam a seleção nova', () => {
     expect(movidos.every(([, p]) => Math.abs(p[2] - 1.5) < 1e-12 && Math.abs(p[1] - 1.25) < 1e-12)).toBe(true);
   });
 });
+
+describe('onde.conexo: o pedaço conexo que o raio toca', () => {
+  /* uma placa de 10 por 1 por 4 partida em duas por um corte de 1 de largura em x = 0, e em três por um segundo corte em x = 3 */
+  const PLACA = [
+    ['cubo', { origemId: 1, larg: 10, alt: 1, prof: 4 }],
+    ['cubo', { origemId: 2, larg: 1, alt: 3, prof: 6, em: [0, -1, 0] }],
+    ['cubo', { origemId: 3, larg: 1, alt: 3, prof: 6, em: [3, -1, 0] }],
+    ['subtrair', { origemId: 9, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }, { origem: { op: 'cubo', id: 3 } }] }],
+  ];
+  const DE_SUBTRAIR = { op: 'subtrair', id: 9 };
+  const pedaco = (x, extra = {}) => facesDe(PLACA, { origem: DE_SUBTRAIR, onde: { conexo: { de: [x, 5, 0], dir: [0, -1, 0], ...extra } } });
+  const caixaDe = (n, ids) => {
+    const xs = ids.flatMap((id) => n.F.get(id).vs.map((v) => n.V.get(v)[0]));
+    return [Math.min(...xs), Math.max(...xs)];
+  };
+
+  it('escolhe cada um dos três pedaços pelo ponto visto de cima, sem citar id', () => {
+    const esq = pedaco(-3); const meio = pedaco(1.5); const dir = pedaco(4.5);
+    expect(esq.n.orfaos).toEqual([]);
+    expect(caixaDe(esq.n, esq.ids)).toEqual([-5, -0.5]);
+    expect(caixaDe(meio.n, meio.ids)).toEqual([0.5, 2.5]);
+    expect(caixaDe(dir.n, dir.ids)).toEqual([3.5, 5]);
+    expect(esq.ids.length + meio.ids.length + dir.ids.length).toBe(esq.n.F.size);
+  });
+
+  it('o raio que passa pelo corte e atravessa nada grita com a causa; o que vem de baixo acha a mesma peça pela outra face', () => {
+    const noVao = rodar([...PLACA, ['parte', { nome: 'a', sel: { origem: DE_SUBTRAIR, onde: { conexo: { de: [0, 5, 0], dir: [0, -1, 0] } } } }]]);
+    expect(noVao.orfaos.map((o) => o.motivo).join('|')).toMatch(/não toca nenhuma das \d+ face\(s\) candidata\(s\).*cai fora da peça ou num vão/);
+    const deBaixo = pedaco(-3, { de: [-3, -5, 0], dir: [0, 1, 0] });
+    expect(deBaixo.ids).toEqual(pedaco(-3).ids);
+  });
+
+  it('o pedaço é o conexo entre as candidatas: o filtro de outra chave vem antes e o resultado é o mesmo a cada rodada', () => {
+    const so = facesDe(PLACA, { origem: DE_SUBTRAIR, onde: { normal: { dir: [0, 1, 0], ate: 5 }, conexo: { de: [-3, 5, 0], dir: [0, -1, 0] } } });
+    expect(so.ids).toHaveLength(1);
+    expect(pedaco(1.5).ids).toEqual(pedaco(1.5).ids);
+  });
+
+  it('recusa a chave mal formada ou em seleção de aresta', () => {
+    expect(lerOnde(leitor(rodar(PLACA)), { conexo: { de: [0, 0, 0] } }).erro).toMatch(/conexo precisa ser/);
+    expect(lerOnde(leitor(rodar(PLACA)), { alvo: 'aresta', conexo: { de: [0, 0, 0], dir: [0, 1, 0] } }).erro).toMatch(/só vale para alvo 'face'/);
+    expect(lerOnde(leitor(rodar(PLACA)), { conexo: { de: [0, 0, 0], dir: [0, 0, 0] } }).erro).toMatch(/vetor nulo/);
+  });
+});

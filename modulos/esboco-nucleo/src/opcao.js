@@ -38,7 +38,8 @@
  * relato de contatos (`contatos.js`) confere; `encosta` declara a dele. A parte de passo cru não tem onde declarar, e por isso a opção
  * aceita `contatos: [{ par: ["capo", "tampa"], relacao: "encosta" | "atravessa" | "folga", motivo: "..." }]`, o mesmo vocabulário,
  * para qualquer par de partes da malha, de passo cru ou de forma: o relato o confere como confere o `contato` da forma, e mostra o
- * motivo. O par cuja parte não existe na malha da opção é recusado.
+ * motivo. O par cuja parte não existe na malha da opção é recusado. O contato `folga` aceita `folga: { esperada, tolerancia }`, em mm,
+ * que `npm run vao:partes` mede e confere par a par; o relato de contatos não o usa.
  *
  * TUDO PELA MALHA QUE O NÚCLEO GEROU. A forma é executada sozinha pelo executor, já girada, e a caixa e a malha dela são as que o
  * atalho lê. A forma vira parte por `parte` com a seleção da origem do gerador, e anda por `transladar`, gira por `rotaciona`, se
@@ -73,7 +74,7 @@ const CORES_POR_NOME = Object.freeze({
 });
 const CHAVES_DA_FORMA = new Set(['id', 'op', 'args', 'ajudante', 'subdivisao', 'centro', 'por', 'sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'rotacao', 'repete', 'espelha', 'contato', 'oculto', 'cor', 'rotulo']);
 const CHAVES_DA_OPCAO = new Set(['titulo', 'nota', 'passos', 'topo', 'aliases', 'formas', 'legendas', 'contatos']);
-const CHAVES_DO_CONTATO = new Set(['par', 'relacao', 'motivo']);
+const CHAVES_DO_CONTATO = new Set(['par', 'relacao', 'motivo', 'folga']);
 export const RELACOES = Object.freeze(['encosta', 'atravessa', 'folga']);
 /* a primeira origem livre do atalho: os passos crus usam as menores, e o atalho conta daqui para cima */
 const ORIGEM_DO_ATALHO = 1000;
@@ -131,7 +132,7 @@ function lerReferencia(texto, padrao, onde) {
   return { id, lados, sufixo };
 }
 
-/** Os contatos declarados na opção, conferidos no formato: `[{ par: [a, b], relacao, motivo }]`, com o par uma vez só. */
+/** Os contatos declarados na opção, conferidos no formato: `[{ par: [a, b], relacao, motivo, folga? }]`, com o par uma vez só. */
 function lerContatosDaOpcao(lista, rotulo) {
   if (lista === undefined) return [];
   if (!Array.isArray(lista)) recusar('"contatos" é uma lista de { par: ["<parte>", "<parte>"], relacao, motivo }', rotulo);
@@ -140,14 +141,21 @@ function lerContatosDaOpcao(lista, rotulo) {
     const onde = `${rotulo}, contatos[${i}]`;
     if (!c || typeof c !== 'object' || Array.isArray(c)) recusar('o contato é { par: ["<parte>", "<parte>"], relacao, motivo }', onde);
     for (const k of Object.keys(c)) if (!CHAVES_DO_CONTATO.has(k)) recusar(`campo "${k}" não existe no contato (aceitos: ${[...CHAVES_DO_CONTATO].join(', ')})`, onde);
-    const { par, relacao, motivo } = c;
+    const { par, relacao, motivo, folga } = c;
     if (!Array.isArray(par) || par.length !== 2 || !par.every((n) => typeof n === 'string' && n) || par[0] === par[1]) recusar('"par" são os nomes de duas partes diferentes', onde);
     if (!RELACOES.includes(relacao)) recusar(`"relacao" é ${RELACOES.join(', ')} (veio ${JSON.stringify(relacao)})`, onde);
     if (typeof motivo !== 'string' || !motivo.trim()) recusar('"motivo" é o texto que diz por que as duas partes têm essa relação', onde);
+    /* a folga esperada, em mm, que `npm run vao:partes` confere par a par; só a relação "folga" a tem */
+    if (folga !== undefined) {
+      if (relacao !== 'folga') recusar('"folga" só vale com "relacao": "folga"', onde);
+      if (!folga || typeof folga !== 'object' || Array.isArray(folga) || Object.keys(folga).some((k) => k !== 'esperada' && k !== 'tolerancia')) recusar('"folga" é { esperada, tolerancia } em mm', onde);
+      if (!(Number.isFinite(folga.esperada) && folga.esperada > 0)) recusar(`"folga.esperada" é um número de mm maior que zero (veio ${JSON.stringify(folga.esperada)})`, onde);
+      if (!(Number.isFinite(folga.tolerancia) && folga.tolerancia >= 0)) recusar(`"folga.tolerancia" é um número de mm a partir de zero (veio ${JSON.stringify(folga.tolerancia)})`, onde);
+    }
     const chave = [...par].sort().join('|');
     if (vistos.has(chave)) recusar(`o par ${par[0]} e ${par[1]} já foi declarado`, onde);
     vistos.add(chave);
-    return { par: [...par], relacao, motivo };
+    return { par: [...par], relacao, motivo, ...(folga ? { folga: { esperada: folga.esperada, tolerancia: folga.tolerancia } } : {}) };
   });
 }
 

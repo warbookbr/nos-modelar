@@ -96,12 +96,12 @@ const receita = {
   PARAMS: TABELA,
   get TOPO() { return { origem: 'a do carrinho: o chão sob o centro do eixo da roda, no meio da largura; y para cima, x lateral e a frente (a roda) em +z', ...gerarTopo(this.PARAMS) }; },
   PLANO: {
-    objeto: 'pés de carrinho de mão de obra: dois V de tubo redondo fino, um sob cada braço do chassi, com o fundo arredondado no chão, ligados por duas travessas de chapa chata aparafusadas sob os braços',
+    objeto: 'pés de carrinho de mão de obra: dois V de tubo redondo fino, um sob cada braço do chassi, com o fundo arredondado no chão, ligados por duas travessas de chapa chata aparafusadas sob os braços, abertas para trás (topo de trás mais fora)',
     referencias: ['../../referencias/carrinho-de-mao.contornos.json'],
     escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },
     partes: [
-      { nome: 'pes', forma: 'de cada lado um V de tubo redondo cinza de Ø 22, dos topos em z -305 e -580 no eixo do braço até o fundo arredondado em z -502, com a face de baixo no chão em y 0, a 166 do centro', tecnica: 'gaiolaVarrida de seção redonda de 16 lados num trilho de três pontos com o raio do fundo, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },
-      { nome: 'travessas', forma: 'duas chapas escuras de 40 × 6 de lado a lado, nos topos das pernas, com a face de cima em y 250, na face de baixo dos braços', tecnica: 'extrusão em y de um retângulo, uma em cada topo' },
+      { nome: 'pes', forma: 'de cada lado um V de tubo redondo cinza de Ø 22, dos topos em z -305 e -580 no eixo do braço até o fundo arredondado em z -502, com a face de baixo no chão em y 0, a 166 do centro; a ponta acima da travessa entra no tubo do braço', tecnica: 'gaiolaVarrida de seção redonda de 16 lados num trilho de três pontos com o raio do fundo, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },
+      { nome: 'travessas', forma: 'duas chapas escuras de 40 × 6 de lado a lado, nos topos das pernas, com a face de cima em y 250, na face de baixo dos braços; a de trás é mais comprida porque os braços abrem para trás', tecnica: 'extrusão em y de um retângulo, uma em cada topo' },
     ],
     criteriosDeReprovacao: [
       'o fundo dos dois pés fora do chão em y 0, ou um pé mais alto que o outro',

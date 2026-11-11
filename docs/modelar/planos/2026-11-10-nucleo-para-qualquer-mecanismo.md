@@ -214,6 +214,14 @@ você até o fim a partir de agora [...] não vou ter tempo para supervisionar n
 aprovar então deixo sobre sua tutoria". O aceite de forma dessas duas provas
 fica registrado como delegado, com essas palavras.
 
+Mais tarde no mesmo dia a pessoa definiu o passo seguinte do sedã: uma versão
+de alta definição feita a partir da atual, para ver quais ferramentas precisam
+melhorar para carro com superfície dura, com a IA da sessão no comando do ciclo
+de planejar, tentar, medir o que falta e melhorar ("você segue no comando,
+planeja a modelagem, vê o que o núcleo e o projeto têm, o que precisa melhorar,
+testem, tentem fazer, vão melhorando, deixando mais prático"). Ela entra depois
+da fatia 4b, como a prova da chapa lisa de carroceria que a 4b deixou de fora.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.

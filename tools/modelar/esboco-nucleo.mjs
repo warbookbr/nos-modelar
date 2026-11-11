@@ -124,7 +124,7 @@ export function montarOpcoes(esboco, { nome = 'esboco', perto = PERTO_MM, relato
     try {
       const r = receitaDaOpcao(o, { nome: `${nome}-${i + 1}` });
       const contatos = relato === false ? null : relatoDeContatos(r.neutro, r.formas.filter((f) => !f.oculto), { perto, contatos: r.contatos });
-      paineis.push({ titulo: o.titulo ?? `opção ${i + 1}`, nota: o.nota ?? '', receita: r.receita, neutro: r.neutro, partes: r.partes, facesSemParte: r.facesSemParte, formas: r.formas, contatos });
+      paineis.push({ titulo: o.titulo ?? `opção ${i + 1}`, nota: o.nota ?? '', receita: r.receita, neutro: r.neutro, partes: r.partes, facesSemParte: r.facesSemParte, formas: r.formas, contatos, contatosDeclarados: r.contatos });
     } catch (e) {
       if (!(e instanceof RecusaDoEsboco)) throw e;
       recusas.push({ opcao: o.titulo ?? `opção ${i + 1}`, forma: null, motivo: e.message });
