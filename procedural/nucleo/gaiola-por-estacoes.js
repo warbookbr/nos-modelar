@@ -865,9 +865,14 @@ export function gaiolaPorEstacoes(definicao) {
       if (medidos.length && apoios.aplicados.includes(v.nome)) avisosDoApoio.push({ nome: 'quinaMedida', vinco: v.nome, pontos: medidos, motivo: `${medidos.length} ponto(s) da quina do vinco ${v.nome} são cota medida (${medidos.slice(0, 3).join(', ')}): a superfície limite passaria pela quina viva, e o raio pedido some; tire a quina das medidas e meça as colunas de apoio ou as faces` });
     }
   }
-  /* o `raio` pedido segue no vinco do passo, em metro como o resto dele, junto da nitidez 0: o passo `subdivisao` o guarda sem efeito na geometria */
+  /* o raio REALIZADO segue no vinco do passo, em metro como o resto dele, junto da nitidez 0: o passo `subdivisao` o guarda sem efeito na geometria. O pedido que a malha não realizou (`raioNaoCabe`) sai pelo valor que ela tem, e o vinco sem apoio não leva raio */
   const emMetro = (r) => (typeof r === 'number' ? r / MM : Array.isArray(r) ? r.map((x) => x / MM) : { de: r.de / MM, ate: r.ate / MM });
-  const passo = { vertices: [...todosOsVertices], faces, vincos: vincos.map(({ nome, pontos: linha, nitidez, raio }) => (raio != null ? { nome, pontos: linha, nitidez, raio: emMetro(raio) } : { nome, pontos: linha, nitidez })) };
+  const gravadoDe = (nome, pedido) => { const r = raios?.find((x) => x.vinco === nome); return r ? r.gravado : null; };
+  const passo = { vertices: [...todosOsVertices], faces, vincos: vincos.map(({ nome, pontos: linha, nitidez, raio }) => {
+    /* o vinco que ficou sem apoio (aviso `vincoSemDuasFaces`, `apoioAmbiguo`, `vincoCruzaOutroComRaio`) não guarda raio: a malha não o tem */
+    const gravado = raio != null ? gravadoDe(nome, raio) : null;
+    return gravado != null ? { nome, pontos: linha, nitidez, raio: emMetro(gravado) } : { nome, pontos: linha, nitidez };
+  }) };
   if (cantos) passo.cantos = cantos;
   if (medidas) passo.medidas = medidas;
   if (simetria) passo.simetria = simetria;

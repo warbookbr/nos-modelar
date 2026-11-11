@@ -1946,8 +1946,34 @@ function faceUnicaEstrutural(st, origem, op, campo, i) {
    As faces consumidas voltam à malha como casca vazia só durante a chamada, e saem dela mesmo se o gerador gritar. */
 function resolverOrigemSemVida(st, origem) {
   const fantasmas = [];
-  for (const fid of st.consumidas.keys()) if (!st.F.has(fid)) { st.F.set(fid, { id: fid, vs: [] }); fantasmas.push(fid); }
+  const poe = (fid) => { if (Number.isSafeInteger(fid) && !st.F.has(fid)) { st.F.set(fid, { id: fid, vs: [] }); fantasmas.push(fid); } };
+  /* a face que a fonte perdeu por uma booleana (`consumidas`) ou por `apagaFace` e `limparLascas`: o registro do gerador da fonte ainda a conhece, e a cópia, viva, é a que a citação endereça */
+  for (const fid of st.consumidas.keys()) poe(fid);
+  for (const reg of st.origens.get(origem?.id) ?? []) {
+    for (const v of Object.values(reg)) {
+      if (Array.isArray(v)) v.forEach(poe);
+      else if (v && typeof v === 'object' && !(v instanceof Map)) for (const w of Object.values(v)) { if (Array.isArray(w)) w.forEach(poe); else poe(w); }
+    }
+  }
   try { return resolverOrigem(st, origem); } finally { for (const fid of fantasmas) st.F.delete(fid); }
+}
+
+/* Alguma outra cópia no lugar parte desta (`derivaDe` é o arranja `id`, a cópia inteira ou a de mesmo nome)? */
+function usadaComoFonte(st, id, nome, k) {
+  for (const registros of st.origens.values()) for (const r of registros) {
+    const d = r.op === 'arranja' ? r.derivaDe : null;
+    if (d && d.op === 'arranja' && d.id === id && (d.nome == null && d.copia == null ? true : d.nome != null ? d.nome === nome : d.copia === k)) return true;
+  }
+  return false;
+}
+/* A cópia ainda tem os vértices da fonte? Compara, face a face, as posições dos cantos; a fonte que sumiu não deixa casca dupla. */
+function aindaEmCimaDaFonte(st, mapa) {
+  const chave = (f) => f.vs.map((v) => (st.V.get(v) ?? []).map((x) => Math.round(x * 1e6)).join(',')).sort().join('|');
+  for (const [fonte, copia] of mapa) {
+    const A = st.F.get(fonte); const B = st.F.get(copia);
+    if (!A || !B || chave(A) !== chave(B)) return false;
+  }
+  return true;
 }
 
 function resolverPorta(st, nome) {
@@ -3689,7 +3715,9 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
       if (r.op !== 'arranja' || r.transformacao?.coincidente !== true) continue;
       r.copias.forEach((mapa, k) => {
         const copias = [...mapa.values()];
-        if (copias.length && !copias.some((f) => st.facesDeOperando?.has(f)) && copias.every((f) => st.F.has(f))) {
+        /* só vale a cópia que continua em cima da fonte (os mesmos vértices, com a fonte viva) e que nenhum passo usou: numa booleana, como fonte de outra cópia, com `parte`, nem transladada para longe */
+        if (copias.length && !copias.some((f) => st.facesDeOperando?.has(f)) && copias.every((f) => st.F.has(f))
+          && copias.every((f) => st.F.get(f).parte == null) && !usadaComoFonte(st, id, r.nomesDasCopias?.[k] ?? null, k) && aindaEmCimaDaFonte(st, mapa)) {
           const nome = r.nomesDasCopias?.[k];
           st.avisos.push({ passo: r.passo ?? null, op: 'arranja', ref: 'copiaNoLugarSemUso', origemId: id, copia: k, nome: nome ?? null,
             texto: `a cópia ${nome != null ? `'${nome}' ` : ''}(${k}) do arranja ${id} está no lugar e nenhum passo a consumiu: é uma casca dupla em cima da fonte; use-a numa booleana ou reduza o total` });

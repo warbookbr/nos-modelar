@@ -92,6 +92,7 @@ const comprimento = (p) => p.reduce((s, q, i) => (i ? s + norma(sub(q, p[i - 1])
  *  reta (fora do arredondamento e perto o bastante para a flecha não pesar). Sem dobra (menos de 0,05 grau) ou com o perfil curto demais, o raio é `null`. */
 export function raioDoFilete(perfil, { tolerancia = TOLERANCIA_DE_SAIDA_MM, fracaoDasPontas = FRACAO_DAS_PONTAS, retasPor = null } = {}) {
   if (!Array.isArray(perfil) || perfil.length < 4) return { raio: null, motivo: 'perfil com menos de 4 pontos' };
+  if (!perfil.every((p) => Array.isArray(p) && p.length >= 2 && p.every(Number.isFinite))) return { raio: null, motivo: 'o perfil tem valor inválido (NaN, infinito ou ponto que não é lista de números)' };
   /* as retas das faces vêm dos trechos das pontas (por comprimento de arco, sobre os pontos dados) */
   const total0 = comprimento(perfil);
   let acc = 0; const pontaA = [perfil[0]]; const pontaB = [perfil[perfil.length - 1]];
@@ -343,7 +344,7 @@ function raiosDoVinco(raio, nomes, pontos, fechada, nomeDoVinco) {
  * por interpolação linear até a coluna seguinte). Cada face que tem uma aresta da linha se divide em uma faixa estreita, entre a linha e
  * o apoio, e o resto; a aresta de que o apoio sai, em outra face que não segue o vinco, ganha o ponto de apoio (a face vira um lado
  * maior). A saída traz só os pontos novos em `pontos` (`${vinco}_apoio_${ponto}_${vizinho}`), a lista nova de faces, o raio esperado por
- * vinco em `raios` e os `avisos`, cada um com `nome`: `raioNaoCabe`, `vincosDisputamApoio`, `anguloForaDaCalibragem`,
+ * vinco em `raios` (com `gravado`, o raio que o passo guarda: o pedido onde o apoio coube, o realizado onde não) e os `avisos`, cada um com `nome`: `raioNaoCabe`, `vincosDisputamApoio`, `anguloForaDaCalibragem`,
  * `filetePoucoSegmentado`, `niveisAbaixoDoRecomendado`, `apoioMaiorQueMetadeDaFace`, `vincoSemDuasFaces`, `apoioAmbiguo`, `vincoCruzaOutroComRaio`, `vincoSemDobra`.
  * O vinco que não dá para apoiar fica sem apoio e sai em `avisos`; os demais seguem. O vinco aplicado leva nitidez 0 (ver `apoioDoVinco`).
  */
@@ -383,7 +384,7 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
       const angulo = anguloDaDobra(pontos[e], pontos[n], pontos[d]);
       return { ponto: n, e, d, angulo, comprimentoE: dist3(pontos[e], pontos[n]) * unidade, comprimentoD: dist3(pontos[d], pontos[n]) * unidade, raioPedido: raios[k], apoio: 0, raio: 0 };
     });
-    lidos.push({ vinco: v.nome, fechada, nomes, arestas, pts });
+    lidos.push({ vinco: v.nome, fechada, nomes, arestas, pts, pedido: v.raio });
   }
   /* a distância do apoio por ponto, com o número de colunas por vinco (a maior razão entre a face e o apoio decide) e três passadas, porque
      o apoio do outro lado de uma mesma aresta encurta a face da vizinha */
@@ -432,7 +433,10 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
     const baixos = L.pts.filter((p) => p.angulo < 1);
     if (baixos.length) avisos.push({ nome: 'vincoSemDobra', vinco: L.vinco, pontos: baixos.map((p) => p.ponto), motivo: `o vinco ${L.vinco} tem ${baixos.length} ponto(s) sem dobra (menos de 1 grau entre as faces); o apoio dele foi calculado para 1 grau e o raio ali não aparece na malha` });
     const rs = L.pts.map((p) => p.raio);
-    raios.push({ vinco: L.vinco, colunas: L.colunas, raioPedido: { minimo: Math.min(...L.pts.map((p) => p.raioPedido)), maximo: Math.max(...L.pts.map((p) => p.raioPedido)) },
+    /* o raio que o passo guarda no vinco: o pedido, quando o apoio coube em todos os pontos (a malha o realiza, dentro do erro da relação), e senão um por ponto, o pedido onde coube e o realizado onde não */
+    const porPonto = L.pts.map((p) => (p.cabe ? p.raioPedido : Math.round(p.raio * 1e6) / 1e6));
+    const gravado = L.pts.every((p) => p.cabe) ? L.pedido : porPonto.every((x) => x === porPonto[0]) ? porPonto[0] : porPonto;
+    raios.push({ vinco: L.vinco, colunas: L.colunas, gravado, raioPedido: { minimo: Math.min(...L.pts.map((p) => p.raioPedido)), maximo: Math.max(...L.pts.map((p) => p.raioPedido)) },
       raioEsperado: { minimo: Math.min(...rs), maximo: Math.max(...rs) },
       pontos: L.pts.map((p) => ({ ponto: p.ponto, angulo: p.angulo, apoio: p.apoio, distancias: p.distancias, raioPedido: p.raioPedido, raio: p.raio })) });
     aplicados.push(L.vinco);

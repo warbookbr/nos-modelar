@@ -1233,7 +1233,13 @@ export function gaiolaPorLacos(o = {}) {
   for (const k of nomes) pontos[k] = pontosMm[k].map((x) => x / 1000);
   /* o `raio` pedido segue no vinco do passo, em metro como o resto dele, junto da nitidez 0 */
   const emMetro = (r) => (typeof r === 'number' ? r / 1000 : Array.isArray(r) ? r.map((x) => x / 1000) : { de: r.de / 1000, ate: r.ate / 1000 });
-  const passo = { vertices: nomes, faces: orientadas, vincos: vincos.map((v) => (v.raio != null ? { ...v, raio: emMetro(v.raio) } : v)) };
+  const passo = { vertices: nomes, faces: orientadas, vincos: vincos.map((v) => {
+    if (v.raio == null) return v;
+    /* o raio REALIZADO: o vinco que ficou sem apoio não leva raio, e o que não coube leva o que a malha tem */
+    const gravado = raios?.find((x) => x.vinco === v.nome)?.gravado;
+    if (gravado == null) { const { raio: _sem, ...resto } = v; return resto; }
+    return { ...v, raio: emMetro(gravado) };
+  }) };
   if (cantos.length) passo.cantos = cantos;
   if (medidas) passo.medidas = medidas;
   if (grupos.length) passo.grupos = grupos;

@@ -325,7 +325,9 @@ function paineisPorVaosBruto(o) {
     let t0 = performance.now();
     const st = nucleo(marca, parametros, topo);
     cronometra('executarChapa', t0);
-    if (st.orfaos.length) erro(`os passos da chapa foram recusados pelo núcleo: ${st.orfaos.slice(0, 3).map((x) => x.motivo).join('; ')}`);
+    /* só os passos da chapa falam: os `parte` que o ajudante acrescentou citam uma origem que o passo recusado não criou, e esse eco não é causa */
+    const doAutor = st.orfaos.filter((x) => !(x.passo >= passosDaChapa.length));
+    if (st.orfaos.length) erro(`os passos da chapa foram recusados pelo núcleo: ${(doAutor.length ? doAutor : st.orfaos).slice(0, 3).map((x) => x.motivo).join('; ')}`);
     const nomesDaChapa = separaPele ? new Set(['__externa__', '__interna__', '__borda__']) : new Set(['__chapa__']);
     const daChapa = [...st.F.values()].filter((f) => nomesDaChapa.has(f.parte)).map((f) => f.id);
     if (!daChapa.length) erro(`a origem ${chapa.origem.op}:${chapa.origem.id} não tem face nenhuma depois dos passos da chapa`);
