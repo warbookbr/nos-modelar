@@ -169,7 +169,48 @@
     "frente.rodas"
    ],
    "visto": "da direita, a frente à esquerda; a silhueta da fonte em fatias de 91,7 mm ao longo do comprimento",
-   "fora": "o vão entre o pneu e o arco, que as fatias não separam; o conjunto inclui o chassi, que a fonte não tem, e a parte lado.carro mede só a lataria e as rodas"
+   "fora": "o vão entre o pneu e o arco, que as fatias não separam; o conjunto inclui o chassi, que a fonte não tem, e a parte lado.carro mede só a lataria e as rodas",
+   "foraDaConta": [
+    {
+     "partes": [
+      "assoalho",
+      "tunel",
+      "longarinaDir",
+      "longarinaEsq",
+      "travessaDianteira",
+      "travessaCentral",
+      "travessaTraseira",
+      "paredeCortaFogo",
+      "suporteDoRadiador",
+      "anteparoTraseiro",
+      "travessaDoPainel",
+      "travessaDaCabine",
+      "soleiraDoChassiDir",
+      "montanteADir",
+      "montanteBDir",
+      "montanteCDir",
+      "reforcoDaCinturaDir",
+      "longarinaSuperiorDir",
+      "caixaDeRodaDianteiraDir",
+      "caixaDeRodaTraseiraDir",
+      "suporteDoParaChoqueDianteiroDir",
+      "suporteDoParaChoqueTraseiroDir",
+      "soleiraDoChassiEsq",
+      "montanteAEsq",
+      "montanteBEsq",
+      "montanteCEsq",
+      "reforcoDaCinturaEsq",
+      "longarinaSuperiorEsq",
+      "caixaDeRodaDianteiraEsq",
+      "caixaDeRodaTraseiraEsq",
+      "suporteDoParaChoqueDianteiroEsq",
+      "suporteDoParaChoqueTraseiroEsq",
+      "eixoDianteiro",
+      "eixoTraseiro"
+     ],
+     "motivo": "a fonte de silhueta não tem chassi; sem ele a junta entre painéis aparece como fenda"
+    }
+   ]
   },
   "superior": {
    "contornos": "sedan-chassi-e-lataria.contornos.json",
@@ -244,7 +285,48 @@
     "frente.rodas"
    ],
    "visto": "de cima, a frente embaixo; a meia largura da fonte em fatias de 91,7 mm ao longo do comprimento",
-   "fora": "nada; o conjunto inclui o chassi, e a parte cima.carro mede só a lataria e as rodas"
+   "fora": "nada; o conjunto inclui o chassi, e a parte cima.carro mede só a lataria e as rodas",
+   "foraDaConta": [
+    {
+     "partes": [
+      "assoalho",
+      "tunel",
+      "longarinaDir",
+      "longarinaEsq",
+      "travessaDianteira",
+      "travessaCentral",
+      "travessaTraseira",
+      "paredeCortaFogo",
+      "suporteDoRadiador",
+      "anteparoTraseiro",
+      "travessaDoPainel",
+      "travessaDaCabine",
+      "soleiraDoChassiDir",
+      "montanteADir",
+      "montanteBDir",
+      "montanteCDir",
+      "reforcoDaCinturaDir",
+      "longarinaSuperiorDir",
+      "caixaDeRodaDianteiraDir",
+      "caixaDeRodaTraseiraDir",
+      "suporteDoParaChoqueDianteiroDir",
+      "suporteDoParaChoqueTraseiroDir",
+      "soleiraDoChassiEsq",
+      "montanteAEsq",
+      "montanteBEsq",
+      "montanteCEsq",
+      "reforcoDaCinturaEsq",
+      "longarinaSuperiorEsq",
+      "caixaDeRodaDianteiraEsq",
+      "caixaDeRodaTraseiraEsq",
+      "suporteDoParaChoqueDianteiroEsq",
+      "suporteDoParaChoqueTraseiroEsq",
+      "eixoDianteiro",
+      "eixoTraseiro"
+     ],
+     "motivo": "a fonte de silhueta não tem chassi; sem ele a junta entre painéis aparece como fenda"
+    }
+   ]
   },
   "frontal": {
    "contornos": "sedan-chassi-e-lataria.contornos.json",
@@ -320,7 +402,48 @@
     "cima.carro"
    ],
    "visto": "de frente; a meia largura da fonte em fatias de 63,5 mm de altura, da carroceria para cima, e os pneus abaixo dela",
-   "fora": "o que fica entre os pneus abaixo da carroceria (o chassi), que a fonte não tem"
+   "fora": "o que fica entre os pneus abaixo da carroceria (o chassi), que a fonte não tem",
+   "foraDaConta": [
+    {
+     "partes": [
+      "assoalho",
+      "tunel",
+      "longarinaDir",
+      "longarinaEsq",
+      "travessaDianteira",
+      "travessaCentral",
+      "travessaTraseira",
+      "paredeCortaFogo",
+      "suporteDoRadiador",
+      "anteparoTraseiro",
+      "travessaDoPainel",
+      "travessaDaCabine",
+      "soleiraDoChassiDir",
+      "montanteADir",
+      "montanteBDir",
+      "montanteCDir",
+      "reforcoDaCinturaDir",
+      "longarinaSuperiorDir",
+      "caixaDeRodaDianteiraDir",
+      "caixaDeRodaTraseiraDir",
+      "suporteDoParaChoqueDianteiroDir",
+      "suporteDoParaChoqueTraseiroDir",
+      "soleiraDoChassiEsq",
+      "montanteAEsq",
+      "montanteBEsq",
+      "montanteCEsq",
+      "reforcoDaCinturaEsq",
+      "longarinaSuperiorEsq",
+      "caixaDeRodaDianteiraEsq",
+      "caixaDeRodaTraseiraEsq",
+      "suporteDoParaChoqueDianteiroEsq",
+      "suporteDoParaChoqueTraseiroEsq",
+      "eixoDianteiro",
+      "eixoTraseiro"
+     ],
+     "motivo": "a fonte de silhueta não tem chassi; sem ele a junta entre painéis aparece como fenda"
+    }
+   ]
   }
  }
 }

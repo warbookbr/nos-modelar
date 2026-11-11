@@ -790,8 +790,8 @@ vistas de três quartos em <saida>/tres-quartos/ (que "tresQuartos": false desli
 resumo.md e resumo.json em --saida. A captura sai da vista rápida, sem navegador (rapida, o padrão), da bancada pelo navegador
 (bancada) ou não sai (nenhuma, ou --sem-captura), e então as linhas ocupam o lugar dela. A config declara cores, partes, dentro, vistasDaSobra,
 toleranciaDaSobraMm e vistas (referencia, girar, espelhar, caixaRef, ignorar, fora, grade, visto, escalaVertical), com caminhos
-relativos a ela; a vista com "contornos" no lugar de "referencia" (com escala, ancora, espelhar, partes e ignorarRegioes) mede a
-sobreposição, a caixa e o afastamento das silhuetas por parte, sem crítico, e "dentro" aceita pares com vistas próprias. O
+relativos a ela; a vista com "contornos" no lugar de "referencia" (com escala, ancora, espelhar, partes, ignorarRegioes, foraDaConta e fendaMm) mede a
+sobreposição, a sobra e a falta, a caixa e o afastamento do contorno de fora das silhuetas por parte, e as fendas do conjunto, sem crítico, e "dentro" aceita pares com vistas próprias. O
 número ordena e informa; quem aprova forma é a pessoa. --registrar repassa as respostas ao registro da leitura daquela vista. A rodada
 seguinte usa a mesma pasta, onde rodadas/ se acumula; --rodadas-de copia para uma pasta nova as rodadas/ de uma conferência anterior.`;
 

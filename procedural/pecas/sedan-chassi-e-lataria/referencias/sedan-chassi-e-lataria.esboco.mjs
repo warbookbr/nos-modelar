@@ -8,14 +8,15 @@
  * `fonte-vistas.png`. Os perfis da TABELA abaixo (lado, planta, seção, cabine, janelas, faróis, para-choques, rodas) são os números que
  * a receita do acervo leu dessa fonte, copiados para cá; a divisão em painéis, a espessura, os vãos e o chassi são deste rascunho.
  *
- * A LATARIA SAI DE UMA SUPERFÍCIE SÓ. `casca(esp, cortes)` monta a carroceria inteira como uma chapa fechada: o sólido de fora (o corpo
- * de baixo pela interseção dos prismas do perfil lateral, da planta e da seção, unido à cabine pela interseção do perfil lateral e da
- * seção dela) menos o mesmo sólido recuado da espessura (os perfis recuados pelo `deslocar` da `extrusao`, e o perfil lateral por
- * `recuar`, que deixa o fundo aberto), menos os cortes (arcos de roda, janelas, vãos dos faróis, da grade e das lanternas, furos dos
- * suportes dos para-choques). Cada painel é a interseção dessa casca com a REGIÃO dele: um prisma cujo contorno são as linhas de vão,
- * recuado 2 mm por `deslocar` para dentro, de modo que dois painéis vizinhos, que dividem a linha, ficam a 4 mm um do outro e sobre a
- * mesma superfície. O núcleo não copia um sólido nem parte um sólido em dois guardando os dois lados, e por isso a casca é montada de
- * novo para cada painel (ATRITOS, item 1). O vidro é a mesma construção com a casca de 4 mm e o contorno da janela recuado 2 mm.
+ * A LATARIA SAI DE UMA SUPERFÍCIE SÓ, MONTADA UMA VEZ. `casca(esp)` monta a carroceria inteira como uma chapa fechada: o sólido de fora
+ * (o corpo de baixo pela interseção dos prismas do perfil lateral, da planta e da seção, unido à cabine pela interseção do perfil lateral
+ * e da seção dela) menos o mesmo sólido recuado da espessura (os perfis recuados pelo `deslocar` da `extrusao`, e o perfil lateral por
+ * `recuar`, que deixa o fundo aberto). `paineisPorVaos`, do núcleo, parte essa chapa pelas LINHAS de vão, cada uma desenhada numa vista,
+ * num `subtrair` só, e nomeia cada painel pelo ponto visto dele (`LINHAS` e `PAINEIS`, em `lataria`). As linhas de lado não têm alcance e
+ * cortam os dois lados do carro; as de cima e as de frente têm o alcance que as limita à face delas. O arco de roda, os vãos dos faróis,
+ * da grade e das lanternas e os furos dos suportes são linhas fechadas com o pedaço de dentro descartado; cada janela é uma linha
+ * fechada cujo pedaço de dentro é o vidro, que por isso tem a espessura da chapa. O vão é medido ao longo da chapa: o ajudante estreita a
+ * lâmina onde a chapa é inclinada em relação à vista. A versão anterior, com a casca montada 23 vezes, está descrita no ATRITOS.
  *
  * O CHASSI é de caixas e extrusões. O membro que encosta por dentro na lataria (soleira, montante, parede corta-fogo, suporte do
  * radiador, anteparo traseiro, caixa de roda) é desenhado passando da chapa e aparado pela interseção com o interior da casca
@@ -29,12 +30,12 @@
 import { readFileSync } from 'node:fs';
 import { chamar, criarRegistroDeFamilias } from '../../../familias/index.js';
 import { expandirChamadasDeComposicao } from '../../../nucleo/composicoes.js';
+import { paineisPorVaos } from '../../../nucleo/paineis-por-vaos.js';
 
 export const TABELA = {
   /* escala: fonte-partes.json, comprimento de 4,4 m, de z -2200 a 2200 (com os para-choques), altura 1523, meia largura 986 nos retrovisores */
   chapa: 1,
   vao: 4,
-  vidro: 4,
 
   /* corpo de baixo: perfil lateral (z, y) sem os arcos, planta (z, meia largura) e seção (meia largura, y) com o alargamento dos para-lamas */
   lado: [[2122, 970], [1879, 1000], [-1421, 1000], [-2087, 972], [-2087, 460], [-1581, 419], [2122, 419]],
@@ -134,7 +135,7 @@ const retangulo = (u0, v0, u1, v1) => [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];
 const T = TABELA;
 const MODO = process.env.SEDAN ?? 'inteiro';
 const estado = { passos: [], topo: {}, origem: 0 };
-const PARTES = new Map();          /* nome -> origens, para a vista explodida */
+const PARTES = new Map();          /* nome -> seleção, para a vista explodida */
 const CORES = {};
 
 /** O prisma do polígono: no eixo x o polígono é (z, y), no z é (x, y), no y é (x, z); `deslocar` positivo é para fora. */
@@ -160,10 +161,11 @@ function bool(op, origens) {
 const corReal = (n) => (/^pneu/.test(n) ? '#151617' : /^(aro|cubo|disco)/.test(n) ? '#8a8f94' : /^(paraBrisa|vidro|vigia)/.test(n) ? '#20262d'
   : /^farol/.test(n) ? '#c9c4a6' : /^grade/.test(n) ? '#2c2f33' : /^lanterna/.test(n) ? '#5a1f1a'
     : /^(capo|tampa|painel|paraLama|soleira(Dir|Esq)$|porta|lateral|teto|tomada|retrovisor|paraChoque)/.test(n) ? '#b23a2e' : '#4a5560');
+const corDe = (nome, corDaParte) => (process.env.SEDAN_CORES === 'reais' ? corReal(nome) : corDaParte);
 function parte(nome, origem, corDaParte) {
-  const cor = process.env.SEDAN_CORES === 'reais' ? corReal(nome) : corDaParte;
+  const cor = corDe(nome, corDaParte);
   estado.passos.push(['parte', { nome, sel: { origem } }], ['pincel', { modo: 'face', sel: { origem }, cor }]);
-  PARTES.set(nome, origem);
+  PARTES.set(nome, { origem });
   CORES[nome] = cor;
 }
 /** O prisma do lado direito (x de x0 a x1) ou do esquerdo (o espelho). */
@@ -184,11 +186,11 @@ function interior(esp) {
   return [corpo, cab];
 }
 
-/** A carroceria inteira como uma chapa fechada de espessura `esp`, menos os cortes. */
-function casca(esp, cortes = []) {
+/** A carroceria inteira como uma chapa fechada de espessura `esp`. */
+function casca(esp) {
   const corpo = bool('intersectar', [prisma('x', T.lado, -1100, 1100), prisma('y', PLANTA, 300, 1100), prisma('z', SECAO, -2300, 2300)]);
   const cab = bool('intersectar', [prisma('x', T.cabine, -1100, 1100), prisma('z', CABINE_SECAO, -1400, 800)]);
-  return bool('subtrair', [bool('unir', [corpo, cab]), ...interior(esp), ...cortes()]);
+  return bool('subtrair', [bool('unir', [corpo, cab]), ...interior(esp)]);
 }
 
 /* os contornos das janelas, das portas e dos vãos da frente e de trás (o meio do vão) */
@@ -204,55 +206,81 @@ const FAROL = (s) => retangulo(s * T.farol.x0, T.farol.y0, s * T.farol.x1, T.far
 const GRADE = retangulo(-T.grade.meia, T.grade.y0, T.grade.meia, T.grade.y1);
 const LANTERNA = (s) => retangulo(s * T.lanterna.x0, T.lanterna.y0, s * T.lanterna.x1, T.lanterna.y1);
 const SUPORTE = { x0: 384, x1: 456, frente: [444, 486], tras: [462, 486] };
-const FURO = (s, [y0, y1]) => retangulo(s * (SUPORTE.x0 - 4), y0 - 4, s * (SUPORTE.x1 + 4), y1 + 4);
+const FURO = (s, [y0, y1]) => retangulo(s * (SUPORTE.x0 - G), y0 - G, s * (SUPORTE.x1 + G), y1 + G);
 const R_ARCO = T.roda.raio + T.roda.folgaDoArco;
 const circulo = (zc, R, n = 48) => arco(zc, T.roda.raio, R, 0, 2 * Math.PI * (1 - 1 / n), n - 1);
 
-/** Os cortes da chapa: arcos, janelas com o vão do vidro, vãos dos faróis, da grade e das lanternas, furos dos suportes. */
-function cortesDaChapa() {
-  const c = [prisma('x', circulo(T.roda.zFrente, R_ARCO), -1100, 1100), prisma('x', circulo(T.roda.zTras, R_ARCO), -1100, 1100)];
-  c.push(prisma('z', trapezio(T.paraBrisa), 200, 800, G), prisma('z', trapezio(T.vidroTraseiro), -1400, -900, G));
-  for (const s of [1, -1]) {
-    for (const pol of [VIDRO_DIANTEIRO, VIDRO_TRASEIRO_DA_PORTA, T.vigia]) c.push(prismaDoLado(s, pol, 600, 1100, G));
-    c.push(prisma('z', FAROL(s), 2000, 2300, G), prisma('z', LANTERNA(s), -2300, -2000, G));
-    c.push(prisma('z', FURO(s, SUPORTE.frente), 2000, 2300), prisma('z', FURO(s, SUPORTE.tras), -2300, -2000));
+/* As linhas de vão, cada uma o meio do vão na vista em que foi desenhada: 'x' é a vista de lado ([z, y]), 'y' a de cima ([x, z]) e 'z'
+   a de frente ([x, y]). As de lado não têm alcance e cortam os dois lados do carro. */
+function linhasDeVao() {
+  const yC = T.yCintura; const yT = T.yTopoDaPorta;
+  const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
+  const furo = (nome, eixo, pontos, alcance) => fechada(nome, eixo, pontos, { alcance, dentro: 'descarta' });
+  const L = [
+    /* de cima */
+    { nome: 'frente', eixo: 'y', pontos: [[-1100, T.zFrente], [1100, T.zFrente]] },
+    { nome: 'tras', eixo: 'y', pontos: [[-1100, T.zTras], [1100, T.zTras]] },
+    { nome: 'peDoParaBrisa', eixo: 'y', pontos: [[-1100, T.zCapo], [1100, T.zCapo]], alcance: [300, yC + 1] },
+    { nome: 'peDoVidroTraseiro', eixo: 'y', pontos: [[-1100, T.zTampa], [1100, T.zTampa]], alcance: [yC - G, yC + 1] },
+    { nome: 'capoDir', eixo: 'y', pontos: [[T.xCapo, T.zCapo], [T.xCapo, T.zFrente]], alcance: [900, 1200] },
+    { nome: 'capoEsq', eixo: 'y', pontos: [[-T.xCapo, T.zCapo], [-T.xCapo, T.zFrente]], alcance: [900, 1200] },
+    { nome: 'tampa', eixo: 'y', pontos: [[-T.xTampa, T.zTras], [-T.xTampa, T.zTampa], [T.xTampa, T.zTampa], [T.xTampa, T.zTras]], alcance: [900, 1200] },
+    /* de lado */
+    { nome: 'contornoDasPortas', eixo: 'x', pontos: [[T.zCapo, yC], [zPorta(yC), yC], [zPorta(yT), yT], [T.zLateral, yT], [T.zLateral, yC], [T.zTampa, yC]] },
+    { nome: 'entrePortas', eixo: 'x', pontos: [[T.zPortas, T.ySoleira], [T.zPortas, yT]] },
+    { nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] },
+    { nome: 'fimDaPortaTraseira', eixo: 'x', pontos: [[T.zLateral, yC], [T.zLateral, 380]] },
+    fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO),
+    fechada('janelaTraseira', 'x', VIDRO_TRASEIRO_DA_PORTA),
+    fechada('janelaDaVigia', 'x', T.vigia),
+    fechada('arcoDianteiro', 'x', circulo(T.roda.zFrente, R_ARCO - G), { dentro: 'descarta' }),
+    fechada('arcoTraseiro', 'x', circulo(T.roda.zTras, R_ARCO - G), { dentro: 'descarta' }),
+    /* de frente */
+    fechada('janelaDoParaBrisa', 'z', trapezio(T.paraBrisa), { alcance: [200, 800] }),
+    fechada('janelaDoVidroTraseiro', 'z', trapezio(T.vidroTraseiro), { alcance: [-1400, -900] }),
+    furo('vaoDaGrade', 'z', GRADE, [2000, 2300]),
+  ];
+  for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) {
+    L.push(furo(`vaoDoFarol${lado}`, 'z', FAROL(s), [2000, 2300]), furo(`vaoDaLanterna${lado}`, 'z', LANTERNA(s), [-2300, -2000]));
+    L.push(furo(`furoDoSuporteDianteiro${lado}`, 'z', FURO(s, SUPORTE.frente), [2000, 2300]), furo(`furoDoSuporteTraseiro${lado}`, 'z', FURO(s, SUPORTE.tras), [-2300, -2000]));
   }
-  c.push(prisma('z', GRADE, 2000, 2300, G));
-  return c;
+  return L;
 }
 
-/** Um painel: a casca cortada, só dentro da região (os prismas dados por quem chama, já recuados do meio vão). */
-function painel(nome, cor, regiao, tirar = () => []) {
-  const dentro = bool('intersectar', [casca(T.chapa, cortesDaChapa), regiao()]);
-  const fora = tirar();
-  parte(nome, fora.length ? bool('subtrair', [dentro, ...fora]) : dentro, cor);
-}
-/** Um vidro: a casca de 4 mm sem corte, só dentro do contorno da janela recuado do meio vão. */
-function vidro(nome, regiao) {
-  parte(nome, bool('intersectar', [casca(T.vidro, () => []), regiao()]), '#20262d');
+/* O ponto visto de cada painel e a cor dele: [nome, eixo, ponto, cor, lado]. Os dos dois lados têm o mesmo ponto, visto de + e de -. */
+function sementes() {
+  const P = [
+    ['capo', 'y', [300, 1000], '#d9483b'], ['tampaDoPortaMalas', 'y', [0, -1650], '#e08a2c'], ['teto', 'y', [0, -400], '#ec7063'],
+    ['painelDianteiro', 'z', [0, 600], '#8e44ad', '+'], ['painelTraseiro', 'z', [0, 600], '#16a085', '-'],
+    ['paraBrisa', 'z', [0, 1250], '#20262d', '+'], ['vidroTraseiro', 'z', [0, 1250], '#20262d', '-'],
+  ];
+  const DOS_LADOS = [
+    ['paraLama', [1400, 900], '#2e86c1', '#5dade2'], ['soleira', [0, 445], '#7f8c8d', '#95a5a6'], ['portaDianteira', [300, 700], '#27ae60', '#58d68d'],
+    ['portaTraseira', [-400, 700], '#f1c40f', '#f7dc6f'], ['lateralTraseira', [-1600, 900], '#c0392b', '#e6b0aa'],
+    ['vidroDianteiro', [200, 1250], '#20262d', '#20262d'], ['vidroTraseiroDaPorta', [-400, 1250], '#20262d', '#20262d'], ['vigia', [-950, 1250], '#20262d', '#20262d'],
+  ];
+  for (const [nome, ponto, corDir, corEsq] of DOS_LADOS) P.push([`${nome}Dir`, 'x', ponto, corDir, '+'], [`${nome}Esq`, 'x', ponto, corEsq, '-']);
+  return P;
 }
 
+export let MEDIDAS_DOS_PAINEIS = null;
 function lataria() {
   const LADOS = [[1, 'Dir'], [-1, 'Esq']];
-  painel('capo', '#d9483b', () => prisma('y', retangulo(-T.xCapo, T.zCapo, T.xCapo, T.zFrente), 900, 1200, -G));
-  painel('tampaDoPortaMalas', '#e08a2c', () => prisma('y', retangulo(-T.xTampa, T.zTras, T.xTampa, T.zTampa), 900, 1200, -G));
-  painel('painelDianteiro', '#8e44ad', () => prisma('y', retangulo(-1100, T.zFrente, 1100, 2400), 300, 1200, -G));
-  painel('painelTraseiro', '#16a085', () => prisma('y', retangulo(-1100, -2400, 1100, T.zTras), 300, 1200, -G));
-  for (const [s, lado] of LADOS) {
-    painel(`paraLama${lado}`, s > 0 ? '#2e86c1' : '#5dade2', () => prismaDoLado(s, retangulo(T.zCapo, 380, T.zFrente, 1100), T.xCapo + G, 1100, -G));
-    painel(`soleira${lado}`, s > 0 ? '#7f8c8d' : '#95a5a6', () => prismaDoLado(s, retangulo(T.zLateral, 380, T.zCapo, T.ySoleira), 700, 1100, -G));
-    painel(`portaDianteira${lado}`, s > 0 ? '#27ae60' : '#58d68d', () => prismaDoLado(s, PORTA_DIANTEIRA, 700, 1100, -G));
-    painel(`portaTraseira${lado}`, s > 0 ? '#f1c40f' : '#f7dc6f', () => prismaDoLado(s, PORTA_TRASEIRA, 700, 1100, -G));
-    painel(`lateralTraseira${lado}`, s > 0 ? '#c0392b' : '#e6b0aa', () => prismaDoLado(s, [[T.zLateral, 380], [T.zLateral, T.yCintura], [T.zTampa, T.yCintura], [T.zTampa, 1100], [T.zTras, 1100], [T.zTras, 380]], T.xTampa + G, 1100, -G));
-  }
-  painel('teto', '#ec7063', () => caixa(-1100, 1100, T.yCintura + G, 1700, -1400, 800), () => LADOS.flatMap(([s]) => [prismaDoLado(s, PORTA_DIANTEIRA, 600, 1100, G), prismaDoLado(s, PORTA_TRASEIRA, 600, 1100, G)]));
-
-  vidro('paraBrisa', () => prisma('z', trapezio(T.paraBrisa), 200, 800, -G));
-  vidro('vidroTraseiro', () => prisma('z', trapezio(T.vidroTraseiro), -1400, -900, -G));
-  for (const [s, lado] of LADOS) {
-    vidro(`vidroDianteiro${lado}`, () => prismaDoLado(s, VIDRO_DIANTEIRO, 600, 1100, -G));
-    vidro(`vidroTraseiroDaPorta${lado}`, () => prismaDoLado(s, VIDRO_TRASEIRO_DA_PORTA, 600, 1100, -G));
-    vidro(`vigia${lado}`, () => prismaDoLado(s, T.vigia, 600, 1100, -G));
+  /* a casca, montada uma vez: os passos dela saem do estado e vão ao ajudante, que os devolve com as lâminas, o corte e as partes */
+  const inicio = estado.passos.length;
+  const origem = casca(T.chapa);
+  const passosDaCasca = estado.passos.splice(inicio);
+  const P = sementes();
+  const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(),
+    paineis: P.map(([nome, eixo, ponto, , lado]) => ({ nome, eixo, ponto, ...(lado ? { lado } : {}) })) });
+  MEDIDAS_DOS_PAINEIS = { medidas: g.medidas, avisos: g.avisos };
+  estado.passos.push(...g.passos);
+  estado.origem = g.proximoId - 1;
+  for (const [nome, , , corDaParte] of P) {
+    const cor = corDe(nome, corDaParte);
+    estado.passos.push(['pincel', { modo: 'face', sel: { grupo: nome }, cor }]);
+    PARTES.set(nome, { grupo: nome });
+    CORES[nome] = cor;
   }
 
   /* o que se prende na lataria e não é chapa dela */
@@ -384,12 +412,12 @@ const AFASTA = [
   [/^(pneu|aro|cubo|disco)/, [330, 0, 0]],
 ];
 if (MODO === 'explodida') {
-  for (const [nome, origem] of PARTES) {
+  for (const [nome, sel] of PARTES) {
     const regra = AFASTA.find(([re]) => re.test(nome));
     if (!regra) continue;
     const [dx, dy, dz] = regra[1];
     const s = /Esq$/.test(nome) ? -1 : 1;
-    estado.passos.push(['transladar', { d: [/Dir$|Esq$/.test(nome) ? s * dx : 0, dy, dz], sel: { origem } }]);
+    estado.passos.push(['transladar', { d: [/Dir$|Esq$/.test(nome) ? s * dx : 0, dy, dz], sel }]);
   }
 }
 

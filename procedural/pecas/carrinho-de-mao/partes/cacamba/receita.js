@@ -49,7 +49,7 @@ export const TABELA = {
        cantos), que tira o facetado dos cantos, e 9 em cada lado reto; com mais de 11 no lado a dobra do fundo dá lascas (medido: 25 deu
        70 faces finas em x ±186, 9 e 11 deram zero). */
     estacoes: [330, 380, 430, 462],
-    pontos: 73, pontosDoLado: 9,
+    pontos: 41, pontosDoLado: 9,
     /* CHAPA E BORDA (linha "chapa e borda"): chapa de 1,5 mm; borda virada de Ø 16, 5 mm para fora da boca e 2 abaixo dela. */
     espessura: 1.5,
     borda: { raio: 8, paraFora: 5, abaixo: 2, lados: 16 },
@@ -135,7 +135,10 @@ function lacosDaCacamba(vistas) {
     const leva = ([x, z]) => [x * l / bl, c0 + (z - b0) * (c1 - c0) / (b1 - b0)];
     return { ...laco, trechos: Object.fromEntries(Object.entries(boca.trechos).map(([nome, pts]) => [nome, pts.map(leva)])) };
   });
-  return { ...lacos, lacos: reduzidos };
+  /* a tampa do fundo é a escada de degraus de lado a lado, entre a traseira e a frente: os degraus ficam na mesma altura de z dos dois
+     lados (a boca é simétrica) e a primeira e a última face são as faixas da traseira e da frente. Entre os lados, o primeiro degrau
+     ficaria a 1 ou 2 mm do lado reto, que o arco tangente deixa quase paralelo a ele, e a face de 11 pontos sairia em lasca */
+  return { ...lacos, tampa: { de: 'inicio', ate: 'fim' }, lacos: reduzidos };
 }
 
 /** A caçamba no estado { passos, topo, origem }, em mm: a casca aberta em cima, com a espessura da chapa, a borda virada em volta da
