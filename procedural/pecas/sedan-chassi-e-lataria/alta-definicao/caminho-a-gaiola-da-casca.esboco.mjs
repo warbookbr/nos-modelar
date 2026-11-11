@@ -28,10 +28,13 @@ const CONFERIR = process.env.HD_CONFERIR !== '0';
 /* ---- as estações ---- */
 /* as distâncias, a partir da ponta do arco, das estações de dentro dele (até o centro) e das de fora dele: o passo cresce menos de duas
    vezes de uma para a outra, porque na ponta o arco sobe quase a prumo */
-const DENTRO_DO_ARCO = [8.2, 24.2, 52.2, 100.2, 175.2, 280.2];
-const FORA_DO_ARCO = [8.8, 25.8, 57.8];
+/* `HD_ARCO=fino` começa a 8 mm da ponta: o arco sai mais redondo no pé, e a leitura de ondulação acusa três calombos de 0,4 mm na faixa de
+   apoio da cintura, onde as estações ficam a 8 mm umas das outras */
+const FINO = process.env.HD_ARCO === 'fino';
+const DENTRO_DO_ARCO = FINO ? [8.2, 24.2, 52.2, 100.2, 175.2, 280.2] : [20.2, 55.2, 110.2, 190.2, 290.2];
+const FORA_DO_ARCO = FINO ? [8.8, 25.8, 57.8] : [20.8, 57.8];
 const [ARCO_TRAS, ARCO_FRENTE] = ARCOS;
-const NOMEADAS = new Map([[T.zTras, 'tras'], [T.zLateral, 'fimDaPorta'], [T.zPortas, 'entrePortas'], [T.zCapo, 'peDoCapo'], [T.zFrente, 'frente'],
+const NOMEADAS = new Map([[T.zTras, 'tras'], [T.zLateral, 'fimDaPorta'], [T.zPortas, 'entrePortas'], [T.zCapo, 'fimDoParaLama'], [T.zPeDoCapo, 'peDoCapo'], [T.zFrente, 'frente'],
   [ARCO_TRAS[0], 'arcoDeTrasInicio'], [ARCO_TRAS[1], 'arcoDeTrasTopo'], [ARCO_TRAS[2], 'arcoDeTrasFim'],
   [ARCO_FRENTE[0], 'arcoDaFrenteInicio'], [ARCO_FRENTE[1], 'arcoDaFrenteTopo'], [ARCO_FRENTE[2], 'arcoDaFrenteFim']]);
 const doArco = ([z0, zc, z1]) => [z0, ...DENTRO_DO_ARCO.map((d) => z0 + d), zc, ...DENTRO_DO_ARCO.map((d) => z1 - d).reverse(), z1];
@@ -41,8 +44,8 @@ const Z = [
   T.zLateral, 2 * T.zLateral - ARCO_TRAS[2], -700, -630, -520, -380,
   /* as vizinhas da linha entre as portas, a 175 mm dela */
   T.zPortas - 175, T.zPortas, T.zPortas + 175, 290, 440, 560,
-  /* as vizinhas da linha do para-lama com a porta, a 52 mm dela */
-  T.zCapo - 52, T.zCapo, T.zCapo + 52, ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[0] - d).reverse(), ...doArco(ARCO_FRENTE),
+  /* as vizinhas da linha do para-lama com a porta, a 52 mm dela; a da frente é o pé do capô */
+  2 * T.zCapo - T.zPeDoCapo, T.zCapo, T.zPeDoCapo, ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[0] - d).reverse(), ...doArco(ARCO_FRENTE),
   ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[2] + d), 1765, 1860, T.zFrente,
 ];
 const nomeDaEstacao = (z) => NOMEADAS.get(z) ?? `z${z < 0 ? 'm' : ''}${Math.abs(Math.round(z))}`;
@@ -51,7 +54,10 @@ const nomeDaEstacao = (z) => NOMEADAS.get(z) ?? `z${z < 0 ? 'm' : ''}${Math.abs(
 /* as colunas da lateral abaixo do ombro, pela fração da altura entre a borda de baixo e o ombro. A soleira e as duas vizinhas ficam a 51 mm
    uma da outra onde a borda é o fundo (y 419), e a linha da soleira cai em y 470 */
 const H = T.yOmbro - T.ladoFundo[0][1];
-const DO_LADO = [['fundo', 0], ['soleira', 51 / H], ['saia', 102 / H], ['baixo', 191 / H], ['alargado', 281 / H], ['meioDoOmbro', 376 / H]];
+const DO_LADO = [['fundo', 0], ['soleira', 51 / H], ['saia', 102 / H], ['alargado', (T.yAlargado - T.ladoFundo[0][1]) / H],
+  /* entre a altura do alargado e o ombro a seção é curva, e as colunas ficam a 36 mm. Com três colunas a 71 mm (`HD_FLANCO=largo`) a
+     superfície, que fica para dentro dos pontos onde o passo é largo, deixa calombo de 0,3 a 0,6 mm ao lado da faixa de apoio do ombro */
+  ...(process.env.HD_FLANCO === 'largo' ? [['flancoBaixo', 257 / H], ['meioDoOmbro', 328 / H], ['flancoAlto', 400 / H]] : [1, 2, 3, 4, 5, 6, 7].map((k) => [`flanco${k}`, (186 + (285 * k) / 8) / H]))];
 /* a faixa de cima: 40 mm de topo depois da quina da cintura, no trecho inteiro. Atrás do pé do capô ela é o peitoril das portas e da lateral
    traseira, e é por ela que a quina da cintura existe no carro todo e que as linhas das portas a sobem */
 const X_DA_FAIXA = T.xCapo + 60;
@@ -64,7 +70,7 @@ function colunasDe(z) {
   colunas.push({ nome: 'ombro', em: [mm(ladoX(z, T.yOmbro)), mm(T.yOmbro)] }, { nome: 'cintura', em: [mm(ladoX(z, yTopo(z))), mm(yTopo(z))] });
   colunas.push({ nome: 'faixa', em: [mm(X_DA_FAIXA), mm(topoY(X_DA_FAIXA, z))] });
   /* o capô começa na estação do pé dele, que é borda: ali as colunas do capô declaram que começam */
-  if (z >= T.zCapo) for (const [nome, x] of DO_CAPO) colunas.push({ nome, em: [mm(x), mm(topoY(x, z))], ...(z === T.zCapo ? { comeca: true } : {}) });
+  if (z >= T.zPeDoCapo) for (const [nome, x] of DO_CAPO) colunas.push({ nome, em: [mm(x), mm(topoY(x, z))], ...(z === T.zPeDoCapo ? { comeca: true } : {}) });
   return colunas;
 }
 const estacoes = Z.map((z) => ({ nome: nomeDaEstacao(z), em: mm(z), colunas: colunasDe(z) }));
@@ -78,7 +84,10 @@ const cantos = [['tras', 'fundo'], ['tras', 'faixa'], ['frente', 'fundo'], ['fre
    do ombro em cada estação (`raios` da saída), e a segunda pede em cada ponto o raio que dá o apoio de `apoioDoOmbro` mm, pela relação
    medida do apoio com a dobra (apoio = 1,47 x raio x tangente de meia dobra). `HD_RAIO_DO_OMBRO=<mm>` volta ao raio único. */
 const FATOR_DO_APOIO = 1.47;
-const montar = (raioDoOmbro) => gaiolaPorEstacoes({ eixo: 'z', estacoes, cantos, niveis: NIVEIS,
+/* `HD_MEDIDAS=1` faz a superfície passar pelos pontos das colunas que não são quina nem apoio dela; fica como sonda, porque o capô sai com
+   uma ondulação de 23,7 mm junto da coluna que começa no pé dele */
+const MEDIDAS = process.env.HD_MEDIDAS === '1' ? [...DO_LADO.map(([nome]) => nome), 'faixa', ...DO_CAPO.map(([nome]) => nome)].map((coluna) => ({ coluna })) : undefined;
+const montar = (raioDoOmbro) => gaiolaPorEstacoes({ eixo: 'z', estacoes, cantos, niveis: NIVEIS, ...(MEDIDAS ? { medidas: MEDIDAS } : {}),
   vincos: [{ nome: 'cintura', coluna: 'cintura', raio: T.raioDaCintura }, { nome: 'ombro', coluna: 'ombro', raio: raioDoOmbro }] });
 const dobras = montar(T.raioMinimoDoOmbro).raios.find((r) => r.vinco === 'ombro').pontos.map((p) => p.angulo);
 if (dobras.length !== Z.length) throw new Error(`o ombro devia ter uma dobra por estação (${Z.length}), e a gaiola deu ${dobras.length}`);
@@ -98,14 +107,12 @@ const NA_CHAPA = { niveis: NIVEIS, borda: 'cantos' };
 const curva = (pedido) => curvaDaGaiola(GAIOLA, pedido, NA_CHAPA).curva;
 export function linhasDeVao() {
   return [
-    /* o para-lama com a porta: sobe a lateral, passa a quina da cintura e chega ao canto em que a borda de trás do capô encontra a da faixa.
-       A ponta passa do canto até dentro do vão do capô (62 mm): a curva que acaba na borda sem `alem` deixa ponte, e o para-lama e a porta
-       saem no mesmo pedaço. Com isso a borda de trás da faixa do para-lama recua 2 mm, a meia largura do vão */
-    { nome: 'fimDoParaLama', curva: curva({ estacao: 'peDoCapo', de: 'fundo', ate: 'faixa' }), alem: [30, X_DA_FAIXA - T.xCapo + T.vao / 2] },
+    /* o para-lama com a porta: sobe a lateral, passa a quina da cintura, cruza a faixa de cima e sai pela borda de dentro dela */
+    { nome: 'fimDoParaLama', curva: curva({ estacao: 'fimDoParaLama', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
     { nome: 'capo', curva: curva({ coluna: 'vaoDoCapo', de: 'peDoCapo', ate: 'frente' }), alem: [30, 30] },
     { nome: 'entrePortas', curva: curva({ estacao: 'entrePortas', de: 'soleira', ate: 'faixa' }), alem: [0, 30] },
     { nome: 'fimDaPortaTraseira', curva: curva({ estacao: 'fimDaPorta', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
-    { nome: 'soleira', curva: curva({ coluna: 'soleira', de: 'fimDaPorta', ate: 'peDoCapo' }) },
+    { nome: 'soleira', curva: curva({ coluna: 'soleira', de: 'fimDaPorta', ate: 'fimDoParaLama' }) },
   ];
 }
 
@@ -141,6 +148,9 @@ export default {
     nota: 'gaiolaPorEstacoes com raio em mm, linhas de vão por curvaDaGaiola, arco de roda como borda da grade e lábio por aba',
     passos,
     topo: pontos,
-    contatos: COM_PAINEIS ? VIZINHOS.map((par) => ({ par, relacao: 'folga', motivo: 'vão de 4 mm entre painéis da mesma chapa', folga: { esperada: 4.1, tolerancia: 0.1, degrau: 0.3 } })) : [],
+    contatos: COM_PAINEIS ? [
+      ...VIZINHOS.map((par) => ({ par, relacao: 'folga', motivo: 'vão de 4 mm entre painéis da mesma chapa', folga: { esperada: 4.1, tolerancia: 0.1, degrau: 0.3 } })),
+      ...(COM_LABIO ? [['labioDianteiro', 'paraLamaDir'], ['labioTraseiro', 'lateralTraseiraDir']].map((par) => ({ par, relacao: 'atravessa', motivo: 'o lábio nasce da borda do arco de roda e é a mesma chapa do painel, virada para dentro' })) : []),
+    ] : [],
   }],
 };

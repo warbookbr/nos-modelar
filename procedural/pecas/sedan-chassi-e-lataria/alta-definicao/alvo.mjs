@@ -19,12 +19,16 @@ export const T = {
   meiaDaCabine: 860,
   roda: { raio: 364, zFrente: 1249, zTras: -1181, folgaDoArco: 40 },
   zFrente: 1990, zTras: -2000, xCapo: 760, zCapo: 690, zPortas: -45, zLateral: -760, ySoleira: 470,
+  /* a borda de trás do capô, 52 mm à frente da linha do para-lama com a porta (no rascunho as duas ficam em z 690). É contorno: a linha de
+     vão por curva que corre sobre a borda de uma faixa e acaba num canto de borda deixa uma ponte na pele de dentro, e o para-lama e a
+     porta saem no mesmo pedaço (CICLO-2.md, atrito 1, em correção no núcleo). Com a borda adiante, a linha cruza a faixa e acaba em borda reta */
+  zPeDoCapo: 742,
   /* a planta: as pontas e os arcos são do rascunho, e as duas transições para a porta são deste ciclo */
   planta: [[2122, 770], [2060, 852], [2000, 872], [1700, 926], [1421, 934], [1146, 933], [950, 922], [800, 904], [650, 884], [500, 868], [380, 861], [260, 860],
     [-250, 860], [-380, 863], [-500, 872], [-650, 889], [-800, 908], [-1000, 923], [-1237, 928], [-1650, 911], [-1925, 888], [-2087, 880]],
   /* a forma da chapa lisa, como no primeiro ciclo */
   yOmbro: 890,          /* a quina do ombro: acima dela a lateral é a da cabine, abaixo dela o para-lama alarga até a planta */
-  yAlargado: 700,       /* a altura em que o alargamento do para-lama chega à planta */
+  yAlargado: 605,       /* a altura em que o alargamento do para-lama chega à planta; no primeiro ciclo era 700, com a seção em parábola */
   bojo: 6,              /* flecha da lateral na altura, em mm, com o máximo em y 710 */
   flechaDoCapo: 8,      /* flecha do topo na largura, em mm, com o máximo no meio do carro */
   raioDaCintura: 6,     /* raio pedido na quina do topo com a lateral (a linha de cintura, que na frente é o capô com o para-lama) */
@@ -81,10 +85,11 @@ export const alargamento = (z) => meia(z) - T.meiaDaCabine;
 export function ladoX(z, y) {
   const t = Math.min(1, Math.max(0, (T.yOmbro - y) / (T.yOmbro - T.yAlargado)));
   const bojo = T.bojo * Math.max(0, 1 - ((y - 710) / 290) ** 2);
-  return T.meiaDaCabine + alargamento(z) * (1 - (1 - t) ** 2) + bojo;
+  /* a seção do alargado é uma cúbica, que chega à planta sem salto de curvatura (a parábola do primeiro ciclo dava calombo de 0,4 mm ali) */
+  return T.meiaDaCabine + alargamento(z) * (1 - (1 - t) ** 3) + bojo;
 }
 /** A dobra do ombro em z, em graus: o ângulo entre a lateral de cima e a de baixo da quina. */
-export const dobraDoOmbro = (z) => (Math.atan((2 * Math.max(0, alargamento(z))) / (T.yOmbro - T.yAlargado)) * 180) / Math.PI;
+export const dobraDoOmbro = (z) => (Math.atan((3 * Math.max(0, alargamento(z))) / (T.yOmbro - T.yAlargado)) * 180) / Math.PI;
 /** O topo da frente: a altura em (x, z), com a flecha na largura. */
 export function topoY(x, z) {
   const xc = ladoX(z, yTopo(z));

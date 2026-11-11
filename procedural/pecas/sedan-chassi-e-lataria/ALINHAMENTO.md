@@ -261,9 +261,9 @@ pela do objeto, e `SEDAN_PLANOS=superficie` troca os três planos de corte por
 linhas de superfície. As duas versões anteriores do rascunho e a comparação das
 três estão no `ATRITOS.md`.
 
-Medido em 2026-11-11, sobre o núcleo do commit `4c6bcf35`. A caixa do conjunto
-vai de x -986 a 986, y 0 a 1.523 e z -2.200 a 2.198. O rascunho tem 427 passos,
-carrega em 18 s e monta em 11 s. No modo estrito do relato de contatos nada
+Medido em 2026-11-11, sobre o núcleo do commit `030d8430`. A caixa do conjunto
+vai de x -986 a 986, y 0 a 1.523 e z -2.200 a 2.198. O rascunho tem 428 passos,
+carrega em 20 s e monta em 9 s. No modo estrito do relato de contatos nada
 atravessa sem estar declarado; 64 pares encostam e 63 atravessam por desenho,
 iguais dos dois lados. `npm run vao:partes`, com o vão, o degrau e as folgas de
 desenho declarados em cada par e as 13 partes soltas de propósito declaradas em

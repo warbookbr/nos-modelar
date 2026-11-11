@@ -26,7 +26,11 @@ carro inteiro com uma cor por painel; `chassi-tres-quartos-frente.png` e
 `vaos-capo.png`, recortes ampliados em que o vão de 4 mm aparece;
 `lado-a-lado.png`, as vistas do acervo em cima e o rascunho nas cores do objeto
 embaixo; `experimento-chapa-lisa.png`, o corpo de baixo como chapa de
-subdivisão cortada em quatro painéis.
+subdivisão cortada em quatro painéis; `vaos-para-brisa-antes-depois.png`, a
+seção do vão de cima do para-brisa com a parede do corte no modo vista e no
+modo superfície; `vaos-cantos.png`, o canto da porta traseira com a lateral e a
+coluna C, antes e depois, e o pé da coluna A. Todas, menos a da chapa lisa,
+foram regeneradas na terceira etapa.
 
 ## Atritos
 
@@ -286,50 +290,67 @@ subdivisão cortada em quatro painéis.
 
 ## O que falta ao projeto para carro
 
-Em ordem de importância.
+Em ordem de importância, com o estado de cada item em 2026-11-11, depois da
+terceira etapa. Entregue quer dizer usado neste rascunho e medido; o que a
+entrega ainda não resolve está na seção da etapa correspondente.
 
 Primeiro, a operação que parte uma chapa de carroceria em painéis por linhas de
 vão, com o vão medido sobre a superfície e o corte pela normal (itens 1, 2, 3 e
-16). Na carroceria facetada a falta só encarece: o contorno por booleanas
-funciona e custa 23 montagens da casca e 1.171 passos. Na chapa inclinada ou
-curva ela impede o vão constante.
+16). Entregue para a carroceria facetada: `paineisPorVaos` monta a chapa uma
+vez, e no modo superfície a parede do corte é normal à chapa, de modo que o
+para-brisa passou de 3,45 para 4,00 mm entre as paredes. Continua faltando a
+linha que atravessa sozinha a dobra viva e o degrau: no ombro e na cintura
+deste carro ela exige um trecho por face ou volta ao modo vista (terceira
+etapa, itens 1, 2 e 7). A chapa de subdivisão com `grupos` (item 16) não foi
+testada aqui.
 
 Segundo, a medida do vão e do degrau entre painéis vizinhos e a da parte solta
-(itens 5 e 18). A falta impede cobrar o critério por gate: hoje o vão de um
-vidro na porta sai sem número, e o que afirmei veio de um script meu.
+(itens 5 e 18). Entregue: `npm run vao:partes` mede o vão da pele, a distância
+3D, o degrau e as partes soltas, lê o esperado e o degrau por par e o `apoia`
+da opção do esboço, e concorda com o relato de contatos. Continua faltando a
+distância 3D mínima por par e o degrau conferido sem a amostra isolada
+(terceira etapa, itens 10 e 11).
 
-Terceiro, a carroceria lisa de qualidade pelas vistas (item 4). A falta
-encarece muito: a chapa lisa existe e se deixa cortar, mas a que as três vistas
-dão ondula, e o caminho por estações ou por rede é o trabalho de várias rodadas
-que o guia descreve para uma chapa só.
+Terceiro, a carroceria lisa de qualidade pelas vistas (item 4). Continua
+faltando para este rascunho, que é facetado; é o trabalho da fatia 4c, nas
+subpastas `alta-definicao/`.
 
 Quarto, a referência de carro com linhas de painel, vista de trás e corte do
-chassi (item 6). A falta impede a fidelidade: toda divisão de painel e todo o
-chassi deste rascunho são proposta, sem medida.
+chassi (item 6). Continua faltando: toda divisão de painel e todo o chassi
+deste rascunho seguem sendo proposta, sem medida.
 
-Quinto, a instrução e os critérios de veículo em chassi e lataria (item 17). A
-falta encarece: a técnica de aparar o chassi pelo interior da casca e a ordem
-dos painéis tiveram de ser inventadas, e nenhuma regra de família fala de vão,
-apoio ou dobradiça.
+Quinto, a instrução e os critérios de veículo em chassi e lataria (item 17).
+Entregue em parte, pelo guia de chassi e lataria da fatia 4b. Continua
+faltando dizer nele em que vista e em que modo se desenha cada tipo de linha
+de vão, que foi o que mais custou na terceira etapa (item 2 dela).
 
 Sexto, o lugar da superfície comum no fluxo do objeto e o estado do alinhamento
-proposto por agente (itens 7, 8, 9 e 10). A falta encarece a etapa de receitas,
-porque quinze painéis não são quinze receitas independentes.
+proposto por agente (itens 7, 8, 9 e 10). Entregue na fatia 4b, com o aceite e
+o módulo comum no fluxo; não foi exercitado nesta etapa, que ficou no rascunho.
 
 Sétimo, a borda de chapa real, com aba, painel interno e apoio de vidro (item
-22), e a casca com faces abertas como operação (itens 14 e 15). A falta
-encarece e limita a aparência: de perto o painel é uma lâmina de corte reto.
+22), e a casca com faces abertas como operação (itens 14 e 15). Continua
+faltando: os painéis acabam em corte reto, os 8 vidros, os 2 faróis, a grade e
+as 2 lanternas seguem soltos, agora declarados em `apoia`, e a casca ainda é a
+subtração do sólido recuado com o `recuar` escrito no esboço.
 
-Oitavo, uma família de chassi ou de plataforma (item 17). A falta encarece: as
-34 partes do chassi são caixas e perfis escritos à mão, sem parâmetro de
-entre-eixos, bitola ou altura do assoalho.
+Oitavo, uma família de chassi ou de plataforma (item 17). Continua faltando:
+as 34 partes do chassi são caixas e perfis escritos à mão. A cópia no lugar
+tirou 141 passos do chassi sem mudar isso.
 
 Nono, a roda de carro na proporção da referência e a instância de família no
-esboço (item 13). A falta só incomoda.
+esboço (item 13). Entregue a instância: as quatro rodas saem de uma chamada,
+com a cor por parte. Continua faltando o perfil de carro com o pneu de 728 mm
+e o cubo saliente.
 
 Décimo, a imagem ampliada, o subconjunto de partes e a vista explodida (item
 20), a sobra e a falta na conferência (itens 11 e 12), o aviso de fenda (item
-19) e o alcance do `npm run capacidade` (item 21). A falta só incomoda.
+19) e o alcance do `npm run capacidade` (item 21). Entregues a sobra, a falta,
+as partes fora da conta e a lista de fendas na conferência, e a ficha do
+ajudante no `npm run capacidade`. Continuam faltando o recorte em mm e várias
+vistas de uma montagem só na vista rápida: as imagens desta pasta saíram de um
+script fora do repositório que monta uma vez, recorta por caixa e tira a seção
+por um plano.
 
 ## Segunda etapa: o rascunho refeito com paineisPorVaos
 
@@ -646,3 +667,367 @@ da lâmina e a folga entre as paredes devolvidas por linha, com a escolha entre
 garantir o vão da pele e o das paredes. O descarte com a borda sobre a linha e
 o contorno com arcos como entrada. E a seleção e a cor de cada painel no
 retorno, com o interior da chapa como origem para aparar o que encosta nela.
+
+## Terceira etapa: modo superfície e cópia no lugar
+
+Registro de 2026-11-11, depois de o núcleo ganhar o `modo: 'superficie'` do
+`paineisPorVaos`, o `arranja` com `coincidente`, a distância 3D, o degrau por
+par e o `apoia` no `npm run vao:partes`, e as várias poses e a cor por parte no
+`instanciaDeFamilia`. O esboço foi atualizado para usar as quatro coisas. O
+"antes" desta seção é o "depois" da segunda etapa, o esboço do commit
+`c3e7819c`, e as duas versões foram medidas uma depois da outra sobre o mesmo
+núcleo, o do commit `030d8430`, às 18h. O núcleo foi regravado várias vezes
+durante a etapa (item 16), e as medidas intermediárias, citadas nos itens com
+o commit, saíram de cópias congeladas dos commits `c3e7819c` e `4c6bcf35`.
+
+O que entrou no esboço. Das 44 linhas de vão, 36 vão no modo superfície: o
+para-brisa e o vidro traseiro, as seis janelas de lado, os nove furos da frente
+e de trás, as linhas do capô e da tampa, o pé do vidro traseiro, o contorno das
+portas acima da cintura, a soleira e o fim da porta traseira. Oito ficam no
+modo vista: os três planos de corte que atravessam o carro, as duas linhas de
+cintura, a linha entre as portas e os dois arcos de roda. O interior da casca é
+construído uma vez por espessura, três ao todo, e copiado no lugar para os 21
+membros. As quatro rodas saem de uma chamada. Os 8 vidros, os 2 faróis, a
+grade e as 2 lanternas estão em `apoia`, os 47 vãos da lataria têm o degrau
+aceito no par, e 33 folgas de desenho do chassi, das rodas e dos acabamentos
+têm o valor medido e a tolerância.
+
+A resposta à pergunta da etapa: o modo superfície resolve o que o item 2 da
+segunda etapa registrou, e a distância entre as paredes do corte fica entre
+4,00 e 4,08 mm em todos os pares de chapa e de vidro, contra 3,45 mm no
+para-brisa. Ele não é melhor em tudo, e por isso as linhas não foram todas
+trocadas: a montagem ficou quatro vezes mais lenta (item 4), a linha não
+atravessa sozinha a dobra viva do ombro deste carro (item 1), e os planos de
+corte em modo superfície deixaram o relato de contatos com recusas (item 2).
+O que o item 3 da segunda etapa registrou, o vão de 4,13 mm na parede cortada
+de cima, saiu por outra via: o plano de corte desenhado de lado, em modo
+vista, que dá 4,08 mm na pele e 4,02 mm entre as paredes.
+
+Os contornos da segunda etapa. A linha partida com `alem` na borda de baixo
+saiu: a linha de superfície sai pela borda em face inclinada sem alargar, com
+4,02 a 4,04 mm entre a lateral e a soleira, que tinham de 3,97 a 4,08. O alcance de 3
+mm do pé do vidro traseiro saiu: a linha é de cima, em modo superfície, com o
+alcance da face de cima. A linha da frente continua em z 1.990: em z 2.000,
+sobre a quina da planta, o vão entre o painel dianteiro e o para-lama mede de
+3,76 a 4,14 mm, com 3,87 mm entre os sólidos e degrau de 1,21 mm de um lado e
+1,14 do outro, porque as duas bordas ficam em faces 8 graus diferentes. A
+linha da porta traseira continua em z -760: em z -777 os números passam (de
+4,01 a 4,17 mm, 4,01 entre os sólidos), mas a lateral acaba numa ponta de 3,8
+mm entre a linha e o arco, que nenhuma medida acusa. O batente do montante C,
+a solda da caixa de roda e o encosto meio micrômetro aquém da chapa
+continuam, e esta etapa acrescentou cinco contornos, que estão nos itens 1,
+2, 5 e 6.
+
+| medida | antes | depois |
+|---|---|---|
+| passos do esboço | 562 | 428 (76%) |
+| passos da lataria (painéis, vidros e acabamentos) | 133 | 140 |
+| passos do chassi e das rodas | 429 | 288 (67%) |
+| passos por operação | extrusão 167, parte 83, pincel 83, interseção 68, cubo 38, união 32, lathe 20, sólido 16, translação 16, liso 16, subtração 11, rotação 8, arranja 4 | parte 83, pincel 83, extrusão 52, cubo 38, subdivisão 36, interseção 32, lathe 20, sólido 16, translação 16, liso 16, união 14, rotação 8, arranja 7, subtração 6, limparLascas 1 |
+| vezes que o interior da casca é montado | 21 | 3, com 18 cópias no lugar |
+| chamadas da família de roda | 4 | 1 |
+| linhas de vão | 28 | 44, 36 em modo superfície e 8 em modo vista |
+| linhas do esboço | 535 | 641 |
+| carga do módulo | 2,7 s | 19,9 s |
+| montagem da opção | 2,4 a 2,6 s | 8,9 a 9,5 s |
+| `esboco:nucleo --so-montar --estrito` | 6,9 s | 36,0 s |
+| `vao:partes` | 12,9 s | 42,3 s |
+| execuções do ajudante ao carregar | 2 | 3 |
+| faces da malha | 12.382 | 16.060 |
+| faces finas do corte | não contadas | 215 antes de `limparLascas` e 91 depois |
+| modo estrito | sai com 0; 64 encostam, 63 atravessam | sai com 0; 64 encostam, 63 atravessam |
+| pares Dir e Esq com relação diferente | 0 | 0 |
+| partes com malha diferente entre os lados | 12 | 12 |
+| partes soltas | 13, sem declaração | 13, todas em `apoia` |
+| `vao:partes --esperado=4 --tolerancia=0.2 --folga3d=3.8 --soltas=recusar` | sai com 1: 32 de 209 pares fora, 13 soltas sem apoio | sai com 1: 11 de 209 pares fora, todos pela distância 3D em pares do chassi e das rodas com folga declarada abaixo de 3,8 mm (item 10) |
+| o mesmo sem `--folga3d` | sai com 1 | sai com 0 |
+| o mesmo com `--folga3d=3.8` e `--partes` da lataria e dos vidros | sai com 1 | sai com 0, 47 pares |
+| conferência de lado | 92,8%, sobra 0,1%, falta 7,1%, 128 fendas | 92,8%, sobra 0,1%, falta 7,1%, 142 fendas |
+| conferência de cima | 98,2%, sobra 0,4%, falta 1,5%, 204 fendas | 98,2%, sobra 0,4%, falta 1,5%, 220 fendas |
+| conferência de frente | 97,5%, sobra 0,3%, falta 2,2%, 8 fendas | 97,5%, sobra 0,3%, falta 2,2%, 8 fendas |
+
+Os tempos dependem da carga da máquina, que outros agentes dividiam: sobre a
+cópia do commit `4c6bcf35`, às 14h, a carga foi de 3,8 e 17,7 s e a montagem
+de 3,5 e 11,0 s. As 12 partes com malha diferente entre os lados são as mesmas
+nas duas versões, e a diferença cresceu nos painéis: a lateral traseira tem
+240 faces de um lado e 253 do outro, e tinha 133 e 137.
+
+O vão da pele em cada par, em mm, como mínimo, mediana, percentil 90 e máximo,
+a menor distância 3D entre os dois sólidos e o maior degrau, por `npm run
+vao:partes`. Os pares do lado esquerdo repetem os do direito, salvo onde dito.
+
+| par | antes: vão | antes: 3D | antes: degrau | depois: vão | depois: 3D | depois: degrau |
+|---|---|---:|---:|---|---:|---:|
+| capô e para-lama | 4,08 / 4,08 / 4,08 / 4,08 | 4,08 | 0,00 | 4,02 / 4,02 / 4,02 / 4,02 | 4,02 | 0,00 |
+| capô e painel dianteiro | 4,08 / 4,08 / 4,08 / 4,08 | 4,05 | 0,00 | 4,11 / 4,11 / 4,11 / 4,11 | 4,08 | 0,00 |
+| para-lama e painel dianteiro | 4,04 / 4,13 / 4,13 / 4,13 (esquerdo: 4,02 a 4,13) | 4,05 | 0,62 | 4,01 / 4,08 / 4,11 / 4,11 | 4,02 | 0,57 |
+| para-lama e porta dianteira | 4,04 / 4,14 / 4,14 / 4,15 | 4,08 | 2,04 | 4,00 / 4,08 / 4,08 / 4,10 | 4,02 | 2,04 |
+| para-lama e soleira | 4,09 / 4,14 / 4,14 / 4,14 | 4,08 | 0,00 | 4,08 / 4,10 / 4,13 / 4,15 | 4,02 | 0,00 |
+| porta dianteira e porta traseira | 4,08 / 4,08 / 4,08 / 4,08 | 4,08 | 0,00 | 4,08 / 4,08 / 4,08 / 4,08 | 4,08 | 0,00 |
+| porta dianteira e soleira | 4,08 / 4,08 / 4,08 / 4,08 | 4,08 | 0,00 | 4,02 / 4,02 / 4,02 / 4,11 | 4,02 | 0,00 |
+| porta traseira e soleira | 4,08 / 4,08 / 4,08 / 4,09 | 4,08 | 0,00 | 4,02 / 4,02 / 4,02 / 4,02 | 4,02 | 0,00 |
+| porta traseira e lateral traseira | 4,03 / 4,08 / 4,08 / 4,18 | 3,93 | 2,04 | 4,01 / 4,03 / 4,04 / 4,14 | 4,01 | 2,04 |
+| lateral traseira e soleira | 3,97 / 4,08 / 4,08 / 4,08 | 3,93 | 0,00 | 4,02 / 4,04 / 4,04 / 4,04 | 4,02 | 0,00 |
+| lateral traseira e tampa | 4,08 / 4,08 / 4,08 / 4,08 | 4,08 | 0,00 | 4,02 / 4,02 / 4,02 / 4,02 | 4,02 | 0,00 |
+| lateral traseira e painel traseiro | 4,08 / 4,08 / 4,08 / 4,09 | 4,08 | 0,00 | 4,08 / 4,08 / 4,08 / 4,09 | 4,08 | 0,00 |
+| tampa e painel traseiro | 4,08 / 4,08 / 4,08 / 4,08 | 4,08 | 0,00 | 4,08 / 4,08 / 4,08 / 4,08 | 4,08 | 0,00 |
+| porta dianteira e teto | 4,08 / 4,08 / 4,08 / 4,12 | 3,98 | 0,00 | 4,02 / 4,02 / 4,02 / 4,02 | 4,02 | 0,00 |
+| porta traseira e teto | 4,08 / 4,08 / 4,08 / 4,08 | 3,98 | 0,00 | 4,01 / 4,02 / 4,02 / 4,08 (esquerdo: 4,02 a 4,11) | 4,01 | 0,00 |
+| lateral traseira e teto | 4,08 / 4,08 / 4,08 / 4,08 | 5,38 | 10,47 | 4,08 / 4,08 / 4,08 / 4,08 | 5,35 | 10,47 |
+| vidro e porta dianteira | 4,08 / 4,08 / 4,08 / 4,08 | 3,98 | 0,00 | 4,02 / 4,02 / 4,02 / 4,02 | 4,02 | 0,00 |
+| vidro e porta traseira | 4,08 / 4,08 / 4,08 / 4,08 | 3,98 | 0,00 | 4,02 / 4,02 / 4,02 / 4,02 | 4,02 | 0,00 |
+| vigia e teto | 4,08 / 4,08 / 4,08 / 4,08 | 3,98 | 0,00 | 4,02 / 4,02 / 4,02 / 4,02 | 4,02 | 0,00 |
+| para-brisa e teto | 4,08 / 4,08 / 4,08 / 4,10 | 3,45 | 0,00 | 4,01 / 4,04 / 4,06 / 4,10 | 4,00 | 0,00 |
+| vidro traseiro e teto | 4,08 / 4,08 / 4,08 / 4,09 | 3,75 | 0,00 | 4,01 / 4,03 / 4,03 / 4,05 | 4,00 | 0,00 |
+| capô e teto | 5,61 / 5,61 / 5,61 / 5,64 | 5,96 | 3,04 | 5,61 / 5,61 / 5,61 / 5,64 | 5,96 | 3,04 |
+| para-lama e teto | 5,61 / 5,61 / 5,61 / 5,63 | 5,96 | 3,04 | 5,61 / 5,61 / 5,61 / 5,63 | 5,96 | 3,04 |
+| tampa e teto | 4,98 / 4,98 / 4,98 / 5,02 | 5,38 | 3,04 | 4,95 / 4,95 / 4,95 / 4,98 | 5,36 | 3,04 |
+| farol e painel dianteiro | 4,04 / 4,04 / 4,04 / 4,18 | 4,04 | 4,00 | 4,01 / 4,01 / 4,01 / 4,15 | 4,01 | 4,00 |
+| grade e painel dianteiro | 4,04 / 4,04 / 4,04 / 4,04 | 4,04 | 0,00 | 4,01 / 4,01 / 4,01 / 4,01 | 4,01 | 0,00 |
+| lanterna e painel traseiro | 4,04 / 4,04 / 4,04 / 4,18 | 4,04 | 4,00 | 4,01 / 4,01 / 4,01 / 4,16 | 4,01 | 4,00 |
+
+Os onze pares que o comando pedido deixa fora são o montante C com a porta
+traseira, dos dois lados (3,00 mm entre os sólidos, com 4,5 mm de vão
+declarado), o anteparo com cada longarina, o assoalho com cada montante C e a
+travessa central com o túnel (2,00 mm, a espessura do assoalho ou a folga ao
+lado dele) e o disco com o pneu das quatro rodas (2,18 mm, da família).
+
+### O que as novidades ainda não resolvem ou atrapalham
+
+1. A linha de superfície não atravessa sozinha a dobra viva do ombro. Fato, em
+   quatro partes. A parede do corpo tem três faces de cima para baixo, a faixa
+   de cima, a faixa inclinada do ombro, a 38 graus, e a parede da planta. Com
+   a linha de dois pontos, no núcleo do commit `c3e7819c`, as estações a cada
+   40 mm pularam a faixa do ombro, que tem 17,5 mm de altura em z 1.990; as
+   duas estações vizinhas, em y 909 e y 871, tinham normais a 4,35 graus uma
+   da outra, abaixo dos 8 que pedem a bipartição, e a lâmina foi de uma à
+   outra em linha reta, por fora da chapa. O para-lama ficou preso ao painel
+   dianteiro por uma ponte, sem aviso, e a única notícia foi "os painéis
+   'painelDianteiro' e 'paraLamaDir' caem no mesmo pedaço". Com `amostragem:
+   20` a linha cortou e a carga do módulo foi a 78 s; com 10, passou de 5
+   minutos. Com um ponto da linha em cada face, a dobra é achada e a lâmina se
+   parte nela, e cada linha sozinha corta; duas juntas são recusadas pelo
+   núcleo, no commit `c3e7819c`, com "o resultado sairia aberto ou
+   não-manifold: 2 aresta(s) dirigida(s) sem par": o fim do para-lama com o
+   arco de roda, a parede de trás com a linha de cima dela, e o fim do
+   para-lama com o fim da porta traseira, que ficam a 1.450 mm um do outro. No
+   commit `4c6bcf35` a mesma recusa aparece com as linhas de um plano só, e
+   com o fim da porta traseira ela vem como "face(s) degenerada(s)" depois da
+   correção de largura. O que funcionou foi
+   partir a linha à mão em três, uma por face, com as pontas junto de cada
+   dobra, para o ajudante emendá-las. A distância da ponta à dobra foi
+   escolhida por tentativa: com 0,5 mm a emenda deixa no lado esquerdo um
+   dente que o `vao:partes` lê como vão de 0,22 mm e degrau de 4,02 mm numa
+   amostra; com 0,1, 0,25 e 0,375 mm o relato de contatos dá o anteparo
+   atravessando a lateral esquerda, a 600 mm da linha; com 0,75 mm os dois
+   passam. A linha continuada de uma vista a outra (`linhas[i].vistas`), que
+   chegou durante a etapa, foi testada no núcleo do commit `030d8430`: o fim
+   da porta traseira numa linha só é recusado com a mesma mensagem, o plano
+   da frente e o de trás são aceitos e não separam os painéis, e o fim do
+   para-lama é recusado "depois de corrigir a largura da lâmina para 8,04
+   mm". O menor caso: uma chapa com um degrau em Z de 17 mm de altura e 14 mm
+   de recuo, cortada por uma linha que o atravessa, mais uma segunda linha em
+   qualquer lugar. Atribuição: núcleo. O que resolveria: bipartir o trecho
+   também pela flecha, a distância do ponto lido no meio à corda entre as
+   duas estações; a booleana aceitar as duas lâminas que se encontram na
+   dobra; e a chapa com chanfro de 38 graus e degrau entre os testes do
+   ajudante.
+
+2. O plano de corte que atravessa o carro custa sete linhas em modo superfície
+   e sai pior que uma linha em modo vista. Fato: a frente, a traseira e o fim
+   do capô e do para-lama são planos que cortam a face de cima e as duas
+   paredes. Em modo superfície cada um é uma linha de cima e três de lado por
+   parede, pelo item 1. Com os três planos assim (`SEDAN_PLANOS=superficie`
+   no esboço), no núcleo do commit `4c6bcf35`, o esboço monta com 445 passos e
+   carrega em 35 a 43 s, a primeira folga medida fica abaixo do vão e o
+   ajudante alarga todas as lâminas de superfície para 4,09 mm, e o modo
+   estrito recusa: com as pontas a 0,5 mm da dobra, 17 recusas em 11 pares,
+   nove deles porque o para-lama esquerdo sai como "sólido inconclusivo" (a
+   malha dele é fechada, com uma face de área zero), mais a porta dianteira
+   direita atravessando o montante A e o vidro traseiro atravessando o teto;
+   com as pontas a 0,75 mm, só o vidro traseiro com o teto. O mesmo plano desenhado de lado, em modo vista, de cima da
+   face de cima até abaixo da borda, é uma linha, corta os dois lados e a
+   face de cima, e a lâmina é compensada pela parede inclinada na planta:
+   4,08 mm na pele e 4,02 entre as paredes, com o modo estrito em 0. A segunda
+   etapa tinha desenhado esses planos de cima, e por isso media 4,13 mm na
+   parede. Atribuição: núcleo e instrução. O que resolveria: o guia dizer que
+   o plano que atravessa o corpo se desenha na vista em que as paredes
+   aparecem de frente, em modo vista, e a linha por `vistas` cortar a dobra
+   viva.
+
+3. A correção da largura pela folga medida vale para todas as lâminas de
+   superfície, venha a folga de onde vier. Fato, no núcleo do commit
+   `4c6bcf35`: o ajudante mede a menor distância 3D entre quaisquer dois
+   pedaços e, se ela fica abaixo do vão, multiplica a largura das lâminas de
+   superfície e corta de novo, até três vezes. Com só o pé do vidro traseiro
+   em modo superfície e o para-brisa ainda em modo vista, com 3,45 mm entre
+   as paredes, a lâmina de superfície saiu com 6,46 mm depois de três
+   correções e cinco execuções, e os 3,45 mm continuaram. Com o canto do
+   item 6 a 3,27 mm, as lâminas foram a 7,58 mm e a carga a 83 s, com o aviso
+   `folgaAbaixoDoVao` dizendo "a chapa curva demais junto da linha", numa
+   chapa plana. Por isso, num esboço que mistura os modos, toda linha em modo
+   vista precisa dar pelo menos o vão entre as paredes, e foi o que levou o
+   contorno das portas e as janelas de lado para o modo superfície: na
+   parede da cabine, inclinada 12,9 graus, o modo vista dá 3,98 mm.
+   Atribuição: núcleo. O que resolveria: medir a folga por linha, entre os
+   pedaços que aquela lâmina separa, e corrigir só a largura dela; não
+   corrigir pela folga de uma linha em modo vista; e o aviso trazer o ponto e
+   os dois painéis.
+
+4. O corte com lâminas de superfície é dez vezes mais lento. Fato, com
+   `medirTempo`: com 57 lâminas de superfície, de 4.844 vértices e 6.764
+   faces, o `subtrair` do corte leva de 10 a 14 s por execução e a medida da
+   folga, de 4 a 5 s; o esboço todo em modo vista carrega em 2,7 s. Trocar os
+   furos, a soleira e as linhas do capô de volta para o modo vista, ficando
+   com 42 lâminas, não baixou o tempo, numa medida feita com outra montagem
+   em paralelo. No esboço final, com 36 lâminas, a
+   carga do módulo foi de 2,7 para 19,9 s, a montagem de 2,5 para 9,2 s, o
+   modo estrito de 6,9 para 36 s e o `vao:partes` de 12,9 para 42 s; a
+   conferência das três vistas levou 48 s e tinha levado 22. A opção
+   `conferir: false`, que chegou durante a etapa, não foi medida. Atribuição:
+   núcleo. O que resolveria: a lâmina sobre face plana com uma estação por
+   trecho reto, e saber por que o `subtrair` com ferramentas de triângulos
+   custa tanto.
+
+5. A linha em U é recusada no modo superfície. Fato, no menor caso: numa placa
+   de 600 por 400 mm, a linha de quatro pontos em U com 200 mm de boca é
+   aceita em modo vista e recusada em modo superfície, com "volta sobre si
+   mesma sobre a chapa" no commit `c3e7819c` e "a lâmina da linha se cruza
+   (canto muito fechado ou pontos muito juntos)" no `030d8430`. No primeiro
+   commit a linha em L também saía com a ponta de início enviesada a 45 graus
+   e 1,4 vez mais larga, porque a primeira estação da linha aberta tomava a
+   direção do último trecho; isso foi corrigido no segundo. No carro a tampa
+   do porta-malas, que era um U, virou duas retas em T sobre o pé do vidro
+   traseiro, e o contorno das portas acima da cintura virou três linhas por
+   lado. Atribuição: núcleo. O que resolveria: a linha aberta não fechar a
+   volta entre a última e a primeira estação.
+
+6. O canto entre uma linha em modo vista e uma em modo superfície não é
+   fechado nem conferido. Fato: a linha de cintura, em modo vista, encontra a
+   linha da coluna A, em modo superfície, no pé da coluna. Com as duas
+   acabando no mesmo ponto, a porta dianteira ficou a 3,27 mm do teto nesse
+   canto, e a notícia foi a largura de todas as lâminas ir a 7,58 mm (item
+   3). O `vao:partes` achou o ponto, em x 849, y 1.001, z 612. Contornei
+   levando a linha de cintura um vão além da linha da coluna A e até a borda
+   de fora do vão da coluna C. Atribuição: núcleo. O que resolveria: a emenda
+   de pontas valer entre os dois modos, ou a recusa dizer as duas linhas e o
+   ponto.
+
+7. O degrau de 10 mm da cintura só se corta em modo vista, e o item 6 da
+   segunda etapa continua. Fato: a vista de lado vê o degrau de perfil, e a
+   linha que o atravessa, como a que separa as duas portas, pediria em modo
+   superfície uma linha em cada parede e uma de cima sobre o degrau. As duas
+   linhas de cintura e a linha entre as portas ficaram em modo vista, sem
+   alcance, e a de cintura continua tirando 2 mm do pé do para-brisa e do
+   vidro traseiro em toda a largura: o capô segue a 5,6 mm do teto, com 3 mm
+   de degrau, e a tampa a 5,0 mm. Atribuição: núcleo. O que resolveria: o
+   `alcance` como lista de intervalos, pedido na segunda etapa, ou a linha
+   por `vistas` com um trecho de cima sobre o degrau.
+
+8. O furo em modo superfície sobre a dobra tem a documentação e o núcleo em
+   desacordo. Fato: `operacoes-procedurais.md` diz que o modo superfície
+   recusa o furo com `descarta` que atravessa dobra viva. No núcleo do commit
+   `030d8430` o arco de roda dianteiro, que cruza a quina de 15,7 graus da
+   planta, foi aceito como furo de superfície sem mensagem; não medi o
+   resultado. Os dois arcos ficaram em modo vista, em que uma linha corta os
+   dois lados. Atribuição: instrução, a conferir no núcleo. O que resolveria:
+   o teste do furo sobre a dobra viva e o texto de acordo com ele.
+
+9. A linha de superfície vale para um lado do carro, e a simetria continua
+   por conta do esboço. Fato: 14 linhas de lado são escritas duas vezes, com
+   `lado: '+'` e `lado: '-'`, por uma função do esboço, e as 16 sementes de
+   lado continuam em pares. As linhas de vão foram de 28 para 44. Atribuição:
+   núcleo. O que resolveria: `espelhar: 'x'` na linha e no painel, pedido no
+   item 8 da segunda etapa.
+
+10. A distância 3D mínima do `vao:partes` é uma só para todos os pares. Fato:
+    `--folga3d=3.8` vale também para o par com `folga` declarada, e reprova
+    os onze pares do chassi e das rodas cuja folga de desenho é menor que
+    isso, com o vão dentro do declarado. O comando pedido não sai com 0 com
+    o rascunho certo; sem `--folga3d`, ou com ele e só a lataria, sai.
+    Atribuição: ferramenta. O que resolveria: a distância 3D mínima no
+    `folga` do par, ou a geral valer só para o par sem folga declarada.
+
+11. O degrau é conferido pela maior amostra. Fato: o vão tem o percentil 5 e o
+    95 e a marca de mínimo isolado, e o degrau reprova o par pelo máximo. Uma
+    amostra na emenda do item 1 reprovou a lateral traseira esquerda com a
+    porta, com degrau de 4,02 mm, e a direita, de mesma geometria, passou
+    com 2,04 mm. Atribuição: ferramenta. O que resolveria: o degrau pelo
+    percentil 95, com o máximo isolado marcado como no vão.
+
+12. O relato de contatos muda com a malha, e não com a geometria. Fato: mudar
+    de 0,75 para 0,25 mm a distância da ponta de uma linha em z -760 fez o
+    anteparo, em z -1.350, passar de "encosta" a "atravessa" na lateral
+    esquerda, com a direita em "encosta". O "sólido inconclusivo" do item 2
+    saiu de uma malha fechada. É o item 12 da segunda etapa, que continua, e
+    o encosto meio micrômetro aquém da chapa não o evita. Atribuição:
+    ferramenta. O que resolveria: o relato dizer o ponto e o volume da
+    travessia, e o sólido fechado com face de área zero não sair como
+    inconclusivo.
+
+13. O corte de superfície deixa mais faces finas e mais faces. Fato: a malha
+    foi de 12.382 para 16.060 faces, a lateral traseira de 133 para 240, e o
+    ajudante conta 215 faces finas depois do corte, das quais `limparLascas`,
+    que chegou durante a etapa e fica ligada por padrão, tira 124 e deixa 91.
+    A normal alisada que orienta a parede da lâmina sai inclinada numa face
+    plana perto de uma quina: 7,9 graus na faixa de cima da parede, a 46 mm
+    da quina da frente. É a causa provável de a primeira folga medida do
+    item 2 ficar perto de 3,97 mm e pedir uma correção de largura; não a
+    isolei. Atribuição: núcleo. O que resolveria: a normal da face tocada
+    quando ela é plana, e a lâmina com as faces que a chapa pede.
+
+14. A cópia no lugar funciona, e o esboço ainda administra os usos. Fato: o
+    interior da casca passou de 21 montagens a 3, uma por espessura, com 18
+    cópias; o chassi e as rodas foram de 429 para 288 passos, com a mesma
+    malha em cada membro. O `total` do `arranja` precisa do número de usos,
+    que só se conhece depois de escrever o chassi, e o esboço guarda os
+    passos do interior, conta os usos e os insere no começo, em 21 linhas. Os
+    `origemId` fora de ordem foram aceitos. O aviso `copiaNoLugarSemUso`,
+    que chegou durante a etapa, não apareceu. Atribuição: núcleo. O que
+    resolveria: a booleana com a opção de manter a ferramenta, ou o
+    `paineisPorVaos` devolver o interior da chapa como origem de vários
+    cortes, pedido no item 16 da segunda etapa.
+
+15. As quatro rodas numa chamada e a cor por parte funcionam. Fato: uma
+    chamada com quatro poses e `cores` por nome de parte da família deu as
+    mesmas 16 partes e os mesmos passos, e a função das rodas foi de 18 para
+    14 linhas. Sobra
+    o que é da família: o disco fica a 2,18 mm do pneu, que o `vao:partes`
+    lista como folga, e o perfil `carro` continua sem o pneu de 728 mm e o
+    cubo saliente. Atribuição: família.
+
+16. O núcleo, o esboço e a pasta de rascunho mudaram sob a medição. Fato:
+    entre 12h45 e 14h18 o `paineis-por-vaos.js` e o
+    `lamina-sobre-a-superficie.js` foram regravados por outro agente em pelo
+    menos seis momentos, e a mesma chamada deu, em sequência, recusa do
+    núcleo, uma conferência nova ("passa a 0 mm dela mesma"), recusa "depois
+    de corrigir a largura da lâmina" e ponte entre painéis. Passei a medir
+    sobre cópias de um commit tiradas por `git archive`. O esboço, ainda sem
+    montar e com interruptores de teste, foi levado por onze commits de
+    outros agentes, do `679c4956` ao `0535e929`, o que repete o item 23 da
+    primeira etapa. A pasta de rascunho da sessão é
+    dividida pelos agentes despachados, e um `tempo.mjs` meu foi
+    sobrescrito por um de mesmo nome. Atribuição: instrução. O que
+    resolveria: o agente que mede receber o commit sobre o qual medir e uma
+    subpasta de rascunho própria, e o commit de trabalho em curso citar os
+    caminhos de quem o faz.
+
+### O que o tempo de autoria mostrou
+
+A troca do interior, das rodas e das declarações levou cerca de vinte minutos
+e funcionou na primeira montagem. A troca das linhas levou perto de duas
+horas, quase todas nos itens 1, 2, 3 e 6: achar por que o corte era recusado
+ou não separava pediu tirar uma linha por vez, a 20 s por tentativa, porque
+nenhuma das mensagens diz a linha nem o ponto. As declarações de folga e de
+degrau pediram duas rodadas do `vao:partes`, a 45 s cada.
+
+### O que eu mudaria depois desta etapa
+
+No ajudante, a ordem seria: a bipartição pela flecha e a booleana das lâminas
+na dobra viva, que são o que impede a linha de superfície de cruzar faces
+neste carro; a correção de largura por linha; a mensagem de recusa com a linha
+e o ponto; e a simetria. No `vao:partes`, a distância 3D mínima por par e o
+degrau pelo percentil. Na instrução, um quadro de qual vista e qual modo
+servem a cada linha de um carro facetado: de lado em modo vista o plano que
+atravessa o corpo e a linha sobre um degrau, e em modo superfície a linha
+fechada numa face inclinada e a linha que desce uma parede.

@@ -241,8 +241,8 @@ const circulo = (zc, R, n = 48) => arco(zc, T.roda.raio, R, 0, 2 * Math.PI * (1 
    a de frente ([x, y]). As linhas que ficam numa face só, ou em faces da mesma parede, vão no modo superfície: a lâmina é varrida
    sobre a chapa, com as paredes normais a ela, e corta só a camada vista do `lado`, de modo que a linha de lado vale para um lado do
    carro e `dosDoisLados` a escreve para os dois. Ficam no modo vista, em que a lâmina atravessa o carro, os três planos de corte, as
-   linhas que passam pelo degrau de 10 mm da cintura, que a vista de lado vê de perfil, e os arcos de roda, porque o furo do modo
-   superfície não atravessa dobra. */
+   linhas que passam pelo degrau de 10 mm da cintura, que a vista de lado vê de perfil, e os arcos de roda, que uma linha só corta
+   dos dois lados. */
 const SUPERFICIE = { modo: 'superficie' };
 const PLANOS = process.env.SEDAN_PLANOS ?? 'vista';
 const DE_CIMA = { ...SUPERFICIE, alcance: [900, 1200] };       /* só a face de cima do corpo; o teto da cabine fica acima do alcance */
@@ -258,11 +258,6 @@ function linhasDeVao() {
   const xT = T.secao.at(-1)[0] - PONTA;
   const deCima = (nome, z) => ({ nome, eixo: 'y', pontos: [[-xT, z], [xT, z]], ...DE_CIMA });
   const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => descendoAParede(z, yInicio, ABAIXO, 0.75 * PONTA).flatMap((pontos, k) => dosDoisLados({ nome: `${nome}${k + 1}`, eixo: 'x', pontos }));
-  /* TESTE: o plano de corte numa linha só, continuada de uma vista a outra: sobe a parede esquerda, atravessa a face de cima e desce a direita */
-  const FUNDO = T.lado.at(-1)[1];
-  const pontosDaParede = (z, yDeCima, yDeBaixo) => descendoAParede(z, yDeCima, yDeBaixo, PONTA).flat();
-  const yDoFundo = (z) => { const b = T.lado.slice(3); for (let i = 0; i + 1 < b.length; i += 1) { const [z0, y0] = b[i]; const [z1, y1] = b[i + 1]; if (z0 !== z1 && z >= Math.min(z0, z1) && z <= Math.max(z0, z1)) return y0 + ((y1 - y0) * (z - z0)) / (z1 - z0); } return FUNDO; };
-  const emVolta = (nome, z) => { const desce = pontosDaParede(z, yDoTopo(z) - PONTA, yDoFundo(z) + PONTA); return { nome, vistas: [{ eixo: 'x', lado: '-', pontos: [...desce].reverse() }, { eixo: 'y', pontos: [[-xT, z], [xT, z]] }, { eixo: 'x', lado: '+', pontos: desce }], alem: 30 }; };
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
   const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [
@@ -270,7 +265,7 @@ function linhasDeVao() {
        que corta a face de cima e as duas paredes, com a lâmina compensada pela parede inclinada na planta. Com
        `SEDAN_PLANOS=superficie` cada plano vira a linha de cima e três de lado por parede, que montam, com a lâmina alargada a 4,09
        mm, e deixam o relato de contatos com recusas (ATRITOS, terceira etapa) */
-    ...(PLANOS.startsWith('vistas') ? [...(PLANOS.includes('F') ? [emVolta('frente', T.zFrente)] : [aoMeio('frente', T.zFrente, ACIMA)]), ...(PLANOS.includes('T') ? [emVolta('tras', T.zTras)] : [aoMeio('tras', T.zTras, ACIMA)]), ...(PLANOS.includes('P') ? [emVolta('fimDoParaLama', T.zCapo)] : [aoMeio('fimDoParaLama', T.zCapo, yC + PONTA)])] : PLANOS === 'superficie'
+    ...(PLANOS === 'superficie'
       ? [deCima('frente', T.zFrente), ...deLado('frenteDaParede', T.zFrente), deCima('tras', T.zTras), ...deLado('trasDaParede', T.zTras), deCima('peDoParaBrisa', T.zCapo), ...deLado('fimDoParaLama', T.zCapo)]
       : [aoMeio('frente', T.zFrente, ACIMA), aoMeio('tras', T.zTras, ACIMA), aoMeio('fimDoParaLama', T.zCapo, yC + PONTA)]),
     deCima('peDoVidroTraseiro', T.zTampa),
@@ -284,12 +279,12 @@ function linhasDeVao() {
     ...dosDoisLados({ nome: 'topoDasPortas', eixo: 'x', pontos: [[zPorta(yT), yT], [T.zLateral, yT]] }),
     ...dosDoisLados({ nome: 'colunaC', eixo: 'x', pontos: [[T.zLateral, yT], [T.zLateral, yC + PONTA]] }),
     /* abaixo da cintura: o fim da porta traseira, que sai pela borda de baixo da chapa, e a soleira */
-    ...(process.env.SEDAN_PORTA === 'vistas' ? [['Dir', '+'], ['Esq', '-']].map(([n, lado]) => ({ nome: `fimDaPortaTraseira${n}`, vistas: [{ eixo: 'x', lado, pontos: pontosDaParede(T.zLateral, yC - PONTA, FUNDO + PONTA) }], alem: [0, 30] })) : deLado('fimDaPortaTraseira', T.zLateral, yC - PONTA)),
+    ...deLado('fimDaPortaTraseira', T.zLateral, yC - PONTA),
     ...dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }),
     ...dosDoisLados(fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO)),
     ...dosDoisLados(fechada('janelaTraseira', 'x', VIDRO_TRASEIRO_DA_PORTA)),
     ...dosDoisLados(fechada('janelaDaVigia', 'x', T.vigia)),
-    /* o arco de roda atravessa as dobras da planta, e fica no modo vista, que corta os dois lados */
+    /* o arco de roda fica no modo vista, que corta os dois lados numa linha */
     fechada('arcoDianteiro', 'x', circulo(T.roda.zFrente, R_ARCO - G), { dentro: 'descarta' }),
     fechada('arcoTraseiro', 'x', circulo(T.roda.zTras, R_ARCO - G), { dentro: 'descarta' }),
     /* de frente e de trás, na face que o `lado` vê */

@@ -96,7 +96,51 @@ export function triangularSemDegenerado(pts, degenerado = null) {
   const zero = dele(0);
   if (serve(zero, false)) return zero;
   for (let c = 1; c < n; c++) { const t = dele(c); if (serve(t, true)) return t; }
-  return orelhas(pts, nm, eDegenerado) ?? porSubcadeias(pts, nm, eDegenerado);
+  return orelhas(pts, nm, eDegenerado) ?? porTira(pts, nm, eDegenerado) ?? porSubcadeias(pts, nm, eDegenerado);
+}
+
+/* A TIRA DE DUAS CADEIAS EM PASSAGEM LINEAR. O polígono é a cadeia L (do canto s ao canto p) seguida da cadeia R (de volta, de s-1 a p+1); os
+   dois degraus das pontas são arestas do polígono, (L0, R0) e (Lm, Rq). O zigue-zague avança numa cadeia por vez a partir do degrau (L0, R0):
+   avançar L dá o triângulo (Li, Li+1, Rj), avançar R dá (Li, Rj+1, Rj), os dois com o giro do polígono, e fica o de menor razão
+   (soma dos lados ao quadrado) / área, com o empate em L. Cada triângulo tem de ter giro positivo sobre a normal e passar do critério de
+   degenerado, e a tira que falha num triângulo é descartada. Como todos os triângulos giram no sentido do polígono e as bordas são as do
+   polígono, a cobertura é a do polígono. Os cantos de partida e de chegada saem dos MAIORES_GIROS cantos de maior giro (as quinas da tira; os
+   cantos intermediários de uma borda reta quase não giram), em todas as combinações, e a de menor soma de razões fica. Custa n por
+   combinação, sem limite de cantos. */
+const MAIORES_GIROS = 8;
+function porTira(pts, nm, degenerado) {
+  const n = pts.length;
+  if (n < 4) return null;
+  const giro = pts.map((b, i) => {
+    const a = pts[(i + n - 1) % n], c = pts[(i + 1) % n];
+    const u = sub(b, a), v = sub(c, b);
+    const lu = Math.hypot(...u), lv = Math.hypot(...v);
+    return lu > 0 && lv > 0 ? Math.hypot(...cruz(u, v)) / (lu * lv) : 0;
+  });
+  const quinas = giro.map((g, i) => [g, i]).sort((x, y) => y[0] - x[0] || x[1] - y[1]).slice(0, MAIORES_GIROS).map(([, i]) => i).sort((a, b) => a - b);
+  let melhor = null, melhorCusto = Infinity;
+  for (const s of quinas) for (const p of quinas) {
+    const m = (p - s + n) % n;                      // L tem m+1 cantos e R tem n-m-1
+    if (m < 1 || n - m - 1 < 2) continue;
+    const q = n - m - 2;                            // índice do último canto de R
+    if (q < 0) continue;
+    const L = (i) => (s + i) % n, R = (j) => (((s - 1 - j) % n) + n) % n;
+    const triangulos = []; let custo = 0, i = 0, j = 0, ok = true;
+    const avalia = (a, b, c) => {
+      const g = cruz(sub(pts[b], pts[a]), sub(pts[c], pts[a]));
+      if (!(dot(g, nm) > 0) || degenerado(pts[a], pts[b], pts[c])) return Infinity;
+      const u = sub(pts[b], pts[a]), v = sub(pts[c], pts[b]), w = sub(pts[a], pts[c]);
+      return (dot(u, u) + dot(v, v) + dot(w, w)) / (Math.hypot(...g) / 2);
+    };
+    while (i < m || j < q) {
+      const cl = i < m ? avalia(L(i), L(i + 1), R(j)) : Infinity;
+      const cr = j < q ? avalia(L(i), R(j + 1), R(j)) : Infinity;
+      if (cl === Infinity && cr === Infinity) { ok = false; break; }
+      if (cl <= cr) { triangulos.push([L(i), L(i + 1), R(j)]); custo += cl; i++; } else { triangulos.push([L(i), R(j + 1), R(j)]); custo += cr; j++; }
+    }
+    if (ok && custo < melhorCusto * (1 - 1e-9)) { melhor = triangulos; melhorCusto = custo; }
+  }
+  return melhor;
 }
 
 /* O MAIOR PORTE DA FACE EM TIRA. A face fina cujos cantos ficam colineares nos dois lados (a parede de 1 mm de um corte, com dezenas de
@@ -106,7 +150,8 @@ export function triangularSemDegenerado(pts, degenerado = null) {
    de degenerado, com os trechos [i, k] e [k, j] fechados; com todos os triângulos de giro positivo a cobertura é a do polígono (a soma
    dos giros é o número de voltas da borda), sem sobreposição. Entre as que fecham, fica a de menor soma da razão (soma dos lados ao
    quadrado) / área, e o empate vai para o menor k. Só roda quando o leque, o leque de outro canto e as orelhas falharam, e por isso as
-   faces que hoje triangulam saem iguais. Custa n³, e faces de mais de LIMITE_DA_PROGRAMACAO_DINAMICA cantos ficam sem ela. */
+   faces que hoje triangulam saem iguais. Custa n³, e faces de mais de LIMITE_DA_PROGRAMACAO_DINAMICA cantos ficam sem ela; a tira de
+   duas cadeias passa antes por `porTira`, linear, sem limite de cantos. */
 export const LIMITE_DA_PROGRAMACAO_DINAMICA = 300;
 function porSubcadeias(pts, nm, degenerado) {
   const n = pts.length;

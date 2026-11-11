@@ -163,7 +163,7 @@ export function alongar(estacoes, fim, ext) {
   let e = unit(sub(a.c, b.c));
   if (!e) return;
   e = unit(sub(e, mul(a.n, dot(e, a.n)))) ?? e;
-  const nova = { c: soma(a.c, mul(e, ext)), n: a.n, esp: a.esp, mIn: fim ? a.mOut : a.mIn, mOut: fim ? a.mOut : a.mIn, cima: a.cima };
+  const nova = { c: soma(a.c, mul(e, ext)), n: a.n, esp: a.esp, mIn: fim ? a.mOut : a.mIn, mOut: fim ? a.mOut : a.mIn, cima: a.cima, alongada: true };
   if (fim) estacoes.push(nova); else estacoes.unshift(nova);
 }
 
@@ -280,7 +280,7 @@ export function bordasSeCruzamNaCurva(estacoes, fechada, largura) {
  * O sólido da lâmina: vértices e triângulos de um passo `subdivisao` de niveis 0.
  * @returns {{ vertices: number[][], faces: number[][], pontosDeDentro: number[][] | null }}
  */
-export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome, cima, areaPorNorma = false }) {
+export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome, cima, areaPorNorma = false, alemDaPele = null }) {
   const est = estacoes.filter((s, i) => i === 0 || norma(sub(s.c, estacoes[i - 1].c)) > 1e-6);
   if (fechada && est.length > 1 && norma(sub(est[0].c, est[est.length - 1].c)) <= 1e-6) est.pop();
   if (est.length < 2) erro(`a linha '${nome}' ficou com menos de duas estações sobre a chapa`);
@@ -351,6 +351,54 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     const cos = Math.max(Math.min(dot(L, A.n), dot(L, B.n)), 0.17);
     return { acima: soma(X0, mul(L, altura[i] / cos)), abaixo: sub(X0, mul(L, profundidadeDe[i] / cos)), X0 };
   };
+  /* O FUNDO CONTRA A PELE DE DENTRO. Na curva 3D, num canto da chapa onde a normal gira muito de uma estação à vizinha, a seção encolhida (espessura lida mais 0,3 mm) deixa a corda do fundo, entre dois cantos de baixo,
+     sobre a pele de dentro ou antes dela: a lâmina não atravessa a chapa ali e sobra uma ponte. Com `alemDaPele(ponto, paraBaixo)` (o ponto está além da pele de dentro, do lado de fora do material), os cantos de baixo e quatro pontos
+     de cada corda, nos dois lados, têm de ficar além dela; onde não ficam, a profundidade das duas estações cresce 25% por rodada, até a espessura lida mais duas larguras, e sem chegar lá a lâmina é recusada com o ponto. Só vale
+     onde a espessura foi lida nas duas estações e a profundidade não foi pedida (a pedida é do autor, e a conferida contra a espessura lida já existe). */
+  if (process.env.DBG) console.error('DBG entra', nome, !!alemDaPele, profundidade, est.every((s) => s.cima));
+  if (alemDaPele && !process.env.NOFUNDO && profundidade == null && est.every((s) => s.cima)) {
+    const teto = est.map((s) => (s.esp ?? 0) + 2 * largura);
+    const baixos = () => [1, -1].map((sinal) => est.map((_, i) => doLado(i, sinal).abaixo));
+    const furos = () => {
+      const achados = [];
+      const B = baixos();
+      for (const lado of B) {
+        for (let i = 0; i < nSeg; i += 1) {
+          const j = (i + 1) % N;
+          if (est[i].esp == null || est[j].esp == null) continue;
+          for (const u of (i === nSeg - 1 && !fechada ? [0, 0.25, 0.5, 0.75, 1] : [0, 0.25, 0.5, 0.75])) {
+            const q = soma(mul(lado[i], 1 - u), mul(lado[j], u));
+            const baixo = unit(mul(soma(mul(est[i].n, 1 - u), mul(est[j].n, u)), -1)) ?? mul(est[i].n, -1);
+            if (!alemDaPele(q, baixo)) achados.push({ i, j, q });
+          }
+        }
+      }
+      return achados;
+    };
+    /* a seção mais funda não pode cruzar a vizinha: o ponto de baixo anda ao menos 2% do que a curva anda (sem inverter) */
+    const cruzam = () => {
+      const B = baixos();
+      for (const lado of B) for (let i = 0; i < nSeg; i += 1) {
+        const j = (i + 1) % N;
+        const t = sub(est[j].c, est[i].c);
+        if (dot(sub(lado[j], lado[i]), t) < 0.02 * dot(t, t)) return true;
+      }
+      return false;
+    };
+    let ruins = furos();
+    for (let rodada = 0; rodada < 12 && ruins.length; rodada += 1) {
+      const antes = [...profundidadeDe];
+      let mexeu = false;
+      for (const { i, j } of ruins) for (const k of [i, j]) { const novo = Math.min(profundidadeDe[k] * 1.25, teto[k]); if (novo > profundidadeDe[k]) { profundidadeDe[k] = novo; mexeu = true; } }
+      if (!mexeu) break;
+      if (cruzam()) { antes.forEach((x, k) => { profundidadeDe[k] = x; }); break; }
+      ruins = furos();
+    }
+    if (ruins.length) {
+      const { i, j, q } = ruins[0];
+      erro(`a lâmina da linha '${nome}' não atravessou a chapa perto de [${q.map(br).join(', ')}] (entre as estações ${i} e ${j}, cuja normal gira ${br(giro(est[i].n, est[j].n))} graus): o fundo dela fica sobre a pele de dentro, ou antes dela, mesmo na profundidade máxima de ${br(teto[i])} mm, e deixaria uma ponte; afaste a linha do canto ou da borda da chapa, ou parta a linha dos dois lados do canto`);
+    }
+  }
   const vertices = [];
   const faces = [];
   if (descarta) {
@@ -384,6 +432,25 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
   const saida = volume < 0 ? faces.map((f) => [...f].reverse()) : faces;
   const r5 = (v) => Math.round(v * 1e5) / 1e5;
   return { vertices: vertices.map((p) => p.map(r5)), faces: saida, dentro: null, estacoes: est };
+}
+
+/**
+ * Os pares de pontos de cada lado da linha, para provar que ela separa: no meio de cada trecho entre estações, o ponto a `h` mm de cada lado, no plano tangente e
+ * perpendicular ao trecho. `c` é o meio do trecho e `n` a normal da chapa nele. Quem chama leva cada ponto à pele e vê se caem em pedaços diferentes.
+ */
+export function amostrasLaterais(estacoes, fechada, h) {
+  const N = estacoes.length;
+  const nSeg = fechada ? N : N - 1;
+  const saida = [];
+  for (let i = 0; i < nSeg; i += 1) {
+    const A = estacoes[i]; const B = estacoes[(i + 1) % N];
+    const n = unit(soma(A.n, B.n)); const t = unit(sub(B.c, A.c));
+    const sm = n && t ? unit(cruz(n, t)) : null;
+    if (!sm) continue;
+    const c = mul(soma(A.c, B.c), 0.5);
+    saida.push({ i, c, n, a: soma(c, mul(sm, h)), b: sub(c, mul(sm, h)) });
+  }
+  return saida;
 }
 
 /** A volta fechada cujo contorno de dentro, deslocado meia largura, inverte algum trecho (a volta é menor que o vão): a lâmina o deixaria como ilha. */
