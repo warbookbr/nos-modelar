@@ -106,7 +106,7 @@ import { idDoPasso } from '../../procedural/nucleo/nucleo.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
 import { capturarGaiolas } from '../../procedural/nucleo/gaiola-por-estacoes.js';
 import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
-import { ErroDeEntrada, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
+import { ErroDeEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 export const PADROES = Object.freeze({ limiarMm: 0.3, raio: 3, zonaDeclarada: 1, emendaGraus: 2, viradaGraus: 90 });
 const MM = 1000;
@@ -805,8 +805,9 @@ export function ondulacaoDaReceita(receita, opcoes = {}) {
 function lerOpcoes(args) {
   const o = {};
   const nomes = { 'limiar-mm': 'limiarMm', raio: 'raio', zona: 'zonaDeclarada', 'emenda-graus': 'emendaGraus', 'virada-graus': 'viradaGraus' };
-  let opcao = 1;
+  let opcao = 1; let cache = true;
   for (const a of args) {
+    if (a === '--sem-cache') { cache = false; continue; }
     const m = /^--([a-z-]+)=(.+)$/.exec(a);
     if (m?.[1] === 'passo') {
       const n = Number(m[2]); if (!Number.isInteger(n) || n < 0) throw new Error(`ondulacao: ${a} precisa ser o índice do passo, inteiro a partir de 0`);
@@ -817,22 +818,24 @@ function lerOpcoes(args) {
     const x = Number(m[2]); if (!(x > 0)) throw new Error(`ondulacao: ${a} precisa ser número maior que zero`);
     o[nomes[m[1]]] = x;
   }
-  return { opcoes: o, opcao };
+  return { opcoes: o, opcao, cache };
 }
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/modelar/ondulacao-da-superficie.mjs <receita | esboço> [--opcao=<n>] [--passo=<n>] [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90]\n'); return 2; }
-  const { opcoes, opcao } = lerOpcoes(resto);
+  if (!alvo) { process.stderr.write('uso: node tools/modelar/ondulacao-da-superficie.mjs <receita | esboço> [--opcao=<n>] [--passo=<n>] [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90] [--sem-cache]\n'); return 2; }
+  const { opcoes, opcao, cache } = lerOpcoes(resto);
   let entrada;
-  try { entrada = await lerEntradaDeMedida(alvo, { opcao, montagem: true }); } catch (erro) {
+  try { entrada = await lerEntradaDeMedida(alvo, { opcao, montagem: true, cache }); } catch (erro) {
     if (erro instanceof ErroDeEntrada) { process.stderr.write(`ondulacao: ${erro.message}\n`); return 2; }
     throw erro;
   }
+  const executada = entrada.tipo === 'montagem' ? null : entrada.executar();
+  process.stderr.write(avisoDeCache(entrada, 'ondulacao'));
   /* uma peça (receita ou esboço) ou, numa montagem, cada peça com a superfície dela */
   const pecas = entrada.tipo === 'montagem'
     ? entrada.partes.map((p) => ({ peca: `${alvo}:${p.nome}`, resultado: ondulacaoDaReceita(p.receita, opcoes) }))
-    : [{ peca: alvo, resultado: ondulacaoDaReceita(entrada.receita, { ...opcoes, executada: entrada.executar() }) }];
+    : [{ peca: alvo, resultado: ondulacaoDaReceita(entrada.receita, { ...opcoes, executada }) }];
   for (const { peca, resultado } of pecas) process.stderr.write(`ondulacao: ${peca}${entrada.tipo === 'esboco' ? ` (${entrada.origem})` : ''}\n${resultado.leitura.map((l) => `  ${l}`).join('\n')}\n`);
   const saida = pecas.length === 1 && entrada.tipo !== 'montagem'
     ? { peca: alvo, ...(entrada.tipo === 'esboco' ? { esboco: entrada.origem } : {}), ...pecas[0].resultado }

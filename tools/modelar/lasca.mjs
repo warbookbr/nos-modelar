@@ -17,7 +17,7 @@ import { pathToFileURL } from 'node:url';
 import { analisarTopologia, LIMITE_DE_FACE_FINA } from '../../procedural/nucleo/topologia.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { lerArgumentos } from './argumentos.mjs';
-import { ErroDeEntrada, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
+import { ErroDeEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 const MM = 1000;
 const arredondar = (valor) => Math.round(valor * MM * 1000) / 1000;
@@ -96,7 +96,7 @@ export async function comoCLI(argv) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['limite', 'opcao'],
-      bandeiras: ['json'],
+      bandeiras: ['json', 'sem-cache'],
       posicional: { nome: 'a receita', obrigatorio: true },
     });
   } catch (erro) {
@@ -107,15 +107,17 @@ export async function comoCLI(argv) {
   if (!(limite > 0)) return uso(`--limite precisa ser um número positivo, recebi '${textoDoLimite}'.`);
   let entrada;
   try {
-    entrada = await lerEntradaDeMedida(lido.posicional, { opcao: opcaoDaLinha(lido.opcao('opcao')) });
+    entrada = await lerEntradaDeMedida(lido.posicional, { opcao: opcaoDaLinha(lido.opcao('opcao')), cache: !lido.bandeira('sem-cache') });
   } catch (erro) {
     if (erro instanceof ErroDeEntrada) return uso(erro.message);
     throw erro;
   }
+  const pecas0 = entrada.tipo === 'montagem' ? null : entrada.executar();
+  process.stderr.write(avisoDeCache(entrada, 'malha:lascas'));
   /* uma peça (receita ou esboço) ou, numa montagem, cada peça com o nome dela */
   const pecas = entrada.tipo === 'montagem'
     ? entrada.partes.map((p) => ({ nome: `${lido.posicional}:${p.nome}`, resultado: lascasDaReceita(p.receita, { limite }) }))
-    : [{ nome: lido.posicional, resultado: lascasDaReceita(entrada.receita, { limite, executada: entrada.executar() }) }];
+    : [{ nome: lido.posicional, resultado: lascasDaReceita(entrada.receita, { limite, executada: pecas0 }) }];
   const total = pecas.reduce((n, p) => n + p.resultado.lascas.length, 0);
   if (lido.bandeira('json')) {
     const saida = pecas.length === 1 && entrada.tipo !== 'montagem'

@@ -7,7 +7,7 @@ import { separarCorpos } from '../../modulos/exportador-cad/src/separar-corpos.j
 import { normalizarMaterial } from '../../src/autoria/material-da-receita.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita } from './importar-receita.mjs';
-import { lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
+import { avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(AQUI, '../..');
@@ -118,6 +118,8 @@ export function parseArgs(args = process.argv.slice(2)) {
       opcoes.tolerancia = parseFloat(arg.slice('--tolerancia='.length));
     } else if (arg.startsWith('--escala=')) {
       opcoes.escala = parseFloat(arg.slice('--escala='.length));
+    } else if (arg === '--sem-cache') {
+      opcoes.semCache = true;
     } else if (arg === '--sobrescrever') {
       opcoes.sobrescrever = true;
     } else if (arg === '--exigir-fechado') {
@@ -141,7 +143,7 @@ export function parseArgs(args = process.argv.slice(2)) {
   return opcoes;
 }
 
-export async function carregarReceita(caminhoArquivo, { opcao = 1 } = {}) {
+export async function carregarReceita(caminhoArquivo, { opcao = 1, semCache = false } = {}) {
   if (!caminhoArquivo) {
     throw new Error('Caminho do arquivo da receita é obrigatório. Use --arquivo=<caminho>.');
   }
@@ -163,9 +165,10 @@ export async function carregarReceita(caminhoArquivo, { opcao = 1 } = {}) {
   /* O rascunho de um objeto é um esboço 2.0 (`.esboco.mjs` ou `.esboco.json`): o resolvedor comum das ferramentas de medida monta a
      opção escolhida e entrega a receita dela, com o neutro já executado. */
   const doEsboco = async () => {
-    const lida = await lerEntradaDeMedida(caminhoAbsoluto, { opcao, montagem: false });
+    const lida = await lerEntradaDeMedida(caminhoAbsoluto, { opcao, montagem: false, cache: !semCache });
     if (lida.tipo !== 'esboco') return { receita: lida.receita, nome: nomePadrao, caminhoAbsoluto };
     const { neutro } = lida.executar();
+    process.stderr.write(avisoDeCache(lida, 'exportar:obj'));
     return { receita: lida.receita, nome: lida.nome.replace(/\.esboco\.(mjs|js|json)$/, '').replace(/\.(mjs|js|json)$/, ''), caminhoAbsoluto, neutro, origem: lida.origem };
   };
   if (/\.json$/.test(caminhoAbsoluto)) return doEsboco();
@@ -238,7 +241,7 @@ export async function exportarArquivoObj(opcoesArg) {
 
   const escala = resolverEscalaPadrao(unidade, escalaInformada);
   /* `carregada` é o `{ receita, nome, neutro? }` que quem chama já leu (as vistas de superfície), para não montar a peça duas vezes */
-  const { receita, nome, neutro: jaExecutado } = carregada ?? await carregarReceita(arquivo, { opcao });
+  const { receita, nome, neutro: jaExecutado } = carregada ?? await carregarReceita(arquivo, { opcao, semCache: opcoesArg.semCache });
   let neutro = jaExecutado ?? executarReceita(receita).neutro;
   conferirSemOrfaos(nome, neutro.orfaos);
   let facesPuladas = [];
@@ -345,6 +348,7 @@ async function main() {
       process.stderr.write('  --com-textura           Gera as imagens dos materiais e o .mtl ao lado do .obj (exige modulos/textura)\n');
       process.stderr.write('  --somente-validar       Apenas valida a receita e malha sem gravar\n');
       process.stderr.write('  --opcao=<n>             Com um esboço 2.0 (.esboco.mjs ou .esboco.json), a opção a exportar (padrão 1)\n');
+      process.stderr.write('  --sem-cache             Monta o esboço ou a receita de novo, sem ler a montagem guardada em tmp/cache-de-medida/\n');
       process.stderr.write('  --pular-face-sem-area   Pula, com aviso e a lista das faces, a face que não se triangula sem triângulo de área nula\n');
       process.stderr.write('  --diagnostico=json      Emite diagnóstico detalhado em JSON no stdout\n');
       process.exit(1);

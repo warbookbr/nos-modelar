@@ -10,7 +10,9 @@
  * campos:
  *   perfil: a polilinha do corte, de uma face à outra, entre as retas das duas faces; sai raioMm (o do filete, definição do núcleo), curvaturaMm (o menor raio de curvatura), divergencia, anguloGraus e natureza.
  *   cadaMm: (de medirAresta) o espaçamento dos cortes ao longo da aresta, em mm (50).
- *   janelaMm: (de medirAresta) até onde da aresta o corte entra no perfil, em mm (40).
+ *   janelaMm: (de medirAresta) até onde da aresta o corte entra no perfil, em mm; sem ela sai do pedido de cada corte (2,5 vezes o raio pedido, de 6 a 40 mm) e, sem pedido, 40.
+ *   fatorDaJanela: (de medirAresta) as vezes o raio pedido que dão a janela automática (2,5).
+ *   pedidoEm: (da linha) o raio pedido, em mm, em função da posição ao longo dela; vem do `raio` do vinco dado como `{ de, ate }` ou como lista de um raio por ponto.
  *   pedidoMm: (de medirAresta) o raio pedido, em mm; cada corte a mais de `tolerancia` dele é `foraDoPedido`.
  *   tolerancia: (de medirAresta) a fração do pedido que ainda cabe (0,2).
  * exemplo:
@@ -26,7 +28,7 @@
  * perfil entre os pontos de tangência.
  *
  * COMO MEDE. A malha final é cortada por planos perpendiculares à aresta, a cada `--cada` mm (50 por padrão), e em cada corte o
- * perfil é a polilinha da interseção a até `--janela` mm da aresta (40 por padrão), da pele que olha para o lado da normal das faces
+ * perfil é a polilinha da interseção a até a janela da aresta, da pele que olha para o lado da normal das faces
  * da gaiola (a malha de espessura tem duas peles, e o raio pedido é o da de fora). O raio do corte é o do filete. Sai também, como
  * coluna secundária, o menor raio de curvatura do perfil (o círculo por três pontos seguidos): num arco as duas medidas coincidem, e a
  * que passa de `LIMITE_DA_DIVERGENCIA` de diferença diz que a quina não é arco (a rampa de uma subdivisão não é circular), e então o
@@ -37,21 +39,29 @@
  * declarou (só leitura dele). O raio pedido vem do campo `raio` (metro, como as medidas do passo) do vinco, quando a receita ou o esboço o declaram, ou de
  * `--pedido=<nome>:<mm>`, repetível. Sai com 1 quando algum corte foge do pedido por mais de `--tolerancia` (fração, 0,2 por padrão).
  *
+ * A JANELA. A medida do raio muda com a janela: numa quina de 90 graus de 6 mm ela dá 4,2 com 8 mm e 5,8 com 40; numa quina de 27 graus de 3 mm, 3,2 com 8 mm e 0,1 (quina viva) com 40, porque a janela larga põe no perfil a curva dos flancos. Por isso a janela sai do raio pedido de cada
+ * corte, `JANELA_FATOR` (2,5) vezes ele, entre `JANELA_PISO_MM` (6) e `JANELA_TETO_MM` (40), e a saída diz a usada em cada vinco; sem pedido vale 40, e `--janela=<mm>` impõe uma só a todos.
+ * O PEDIDO POR PONTO. O `raio` do vinco no passo é um número, `{ de, ate }` (linear no comprimento da linha) ou uma lista com um raio por ponto da linha (metro); o pedido de cada
+ * corte é o interpolado na posição dele ao longo da linha, e `--pedido=<nome>:<mm>` o substitui por um número só. O resumo traz `pedidoMm` como número ou `{ minimo, maximo }`.
+ *
  * A ENTRADA é receita, esboço 2.0 (`--opcao`) ou montagem persistida, pelo resolvedor comum das ferramentas de medida.
  *
  *   node tools/modelar/raio-da-aresta.mjs <receita | esboço | montagem> [--opcao=<n>] [--vinco=<nome>] [--aresta=x,y,z:x,y,z] [--automatico]
- *        [--cada=50] [--janela=40] [--pedido=<nome>:<mm>]... [--tolerancia=0.2] [--json]
+ *        [--cada=50] [--janela=<mm>] [--pedido=<nome>:<mm>]... [--tolerancia=0.2] [--sem-cache] [--json]
  *
  * Mesma entrada, mesma saída: nenhuma conta depende de relógio nem de acaso. */
 import { pathToFileURL } from 'node:url';
 import { raioDoFilete } from '../../procedural/nucleo/apoio-do-vinco.js';
 import { criarResolverNumerico } from '../../procedural/nucleo/expressoes.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
-import { ErroDeEntrada, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
+import { ErroDeEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 import { lerArgumentos } from './argumentos.mjs';
 
 export const CADA_PADRAO_MM = 50;
 export const JANELA_PADRAO_MM = 40;
+export const JANELA_FATOR = 2.5;
+export const JANELA_PISO_MM = 6;
+export const JANELA_TETO_MM = 40;
 export const TOLERANCIA_PADRAO = 0.2;
 export const RAIO_DA_QUINA_VIVA_MM = 0.25;
 export const LIMITE_DA_DIVERGENCIA = 0.25;
@@ -216,37 +226,67 @@ export function amostrasDaLinha(pontos, cadaMm = CADA_PADRAO_MM) {
   return { amostras: saida, comprimentoMm: total };
 }
 
+/** A janela de um corte que pede o raio `pedidoMm`: `JANELA_FATOR` vezes o pedido, entre `JANELA_PISO_MM` e `JANELA_TETO_MM`; sem pedido, o teto (40 mm). */
+export function janelaDoPedido(pedidoMm, fator = JANELA_FATOR) {
+  if (pedidoMm === null || pedidoMm === undefined || !(pedidoMm > 0)) return JANELA_PADRAO_MM;
+  return Math.min(JANELA_TETO_MM, Math.max(JANELA_PISO_MM, fator * pedidoMm));
+}
+
 /**
- * medirAresta(malha, linha, opcoes) mede o raio ao longo de uma aresta. `linha` é `{ nome, pontos, peles? }`: os pontos em metro e, por trecho da
- * polilinha, a normal da pele medida (ou null). Com `pedidoMm`, cada corte é comparado a ele (`tolerancia`, fração). Devolve os cortes e o resumo.
+ * O pedido (mm) ao longo da linha, em função da posição `s` (mm) sobre ela: a interpolação linear dos valores dados nas posições `posicoesMm`.
+ * Serve ao `{ de, ate }` (duas posições, as pontas) e à lista com um raio por ponto da linha.
  */
-export function medirAresta(malha, linha, { cadaMm = CADA_PADRAO_MM, janelaMm = JANELA_PADRAO_MM, pedidoMm = null, tolerancia = TOLERANCIA_PADRAO } = {}) {
+export function pedidoAoLongoDaLinha(posicoesMm, valoresMm) {
+  return (s) => {
+    if (s <= posicoesMm[0]) return valoresMm[0];
+    for (let k = 1; k < posicoesMm.length; k++) {
+      if (s <= posicoesMm[k]) { const d = posicoesMm[k] - posicoesMm[k - 1]; const u = d > 0 ? (s - posicoesMm[k - 1]) / d : 0; return valoresMm[k - 1] + (valoresMm[k] - valoresMm[k - 1]) * u; }
+    }
+    return valoresMm[valoresMm.length - 1];
+  };
+}
+
+/**
+ * medirAresta(malha, linha, opcoes) mede o raio ao longo de uma aresta. `linha` é `{ nome, pontos, peles?, pedidoMm?, pedidoEm? }`: os pontos em metro, por trecho da
+ * polilinha a normal da pele medida (ou null), e o pedido: um número (`pedidoMm`) ou uma função da posição `s` em mm (`pedidoEm`, o raio por estação). A janela de cada
+ * corte sai do pedido dele (`janelaDoPedido`), e `janelaMm` das opções a impõe a todos. Com pedido, cada corte é comparado ao do ponto dele (`tolerancia`, fração).
+ * Devolve os cortes e o resumo, com a janela usada.
+ */
+export function medirAresta(malha, linha, { cadaMm = CADA_PADRAO_MM, janelaMm: janelaImposta = null, fatorDaJanela = JANELA_FATOR, pedidoMm: pedidoDado = null, tolerancia = TOLERANCIA_PADRAO } = {}) {
   const { amostras, comprimentoMm } = amostrasDaLinha(linha.pontos, cadaMm);
+  const imposta = janelaImposta !== null && janelaImposta !== undefined;
+  const pedidoEm = linha.pedidoEm ?? (pedidoDado !== null ? () => pedidoDado : null);
   const cortes = amostras.map((a) => {
-    const perfil = perfilNoCorte(malha, { q: a.q, t: a.t, janelaMm, pele: linha.peles?.[a.segmento] ?? null });
-    const base = { posicaoMm: a.q.map((x) => arred(x * MM, 1)), sMm: arred(a.s, 1) };
+    const pedido = pedidoEm ? pedidoEm(a.s) : null;
+    const janela = imposta ? janelaImposta : janelaDoPedido(pedido, fatorDaJanela);
+    const perfil = perfilNoCorte(malha, { q: a.q, t: a.t, janelaMm: janela, pele: linha.peles?.[a.segmento] ?? null });
+    const base = { posicaoMm: a.q.map((x) => arred(x * MM, 1)), sMm: arred(a.s, 1), janelaMm: arred(janela, 1), ...(pedido !== null ? { pedidoMm: arred(pedido, 3) } : {}) };
     if (!perfil) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: 'o plano do corte não toca a malha a menos da janela' };
-    if (perfil.distanciaMm > janelaMm / 2) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: `o perfil passa a ${arred(perfil.distanciaMm, 1)} mm da aresta (mais de metade da janela, ${janelaMm / 2} mm): a malha não está onde a linha diz` };
+    if (perfil.distanciaMm > janela / 2) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: `o perfil passa a ${arred(perfil.distanciaMm, 1)} mm da aresta (mais de metade da janela, ${arred(janela / 2, 1)} mm): a malha não está onde a linha diz` };
     const m = medirPerfil(perfil.pontos2d);
-    const fora = pedidoMm !== null && m.natureza !== 'plana' && (m.raioMm === null || Math.abs(m.raioMm - pedidoMm) > tolerancia * pedidoMm);
-    return { ...base, pontosDoPerfil: perfil.pontos2d.length, ...m, ...(pedidoMm !== null ? { desvioDoPedido: m.raioMm === null ? null : arred((m.raioMm - pedidoMm) / pedidoMm, 3), foraDoPedido: fora } : {}) };
+    const fora = pedido !== null && m.natureza !== 'plana' && (m.raioMm === null || Math.abs(m.raioMm - pedido) > tolerancia * pedido);
+    return { ...base, pontosDoPerfil: perfil.pontos2d.length, ...m, ...(pedido !== null ? { desvioDoPedido: m.raioMm === null ? null : arred((m.raioMm - pedido) / pedido, 3), foraDoPedido: fora } : {}) };
   });
   const medidos = cortes.filter((c) => c.raioMm !== null);
   const raios = medidos.map((c) => c.raioMm); const curv = medidos.map((c) => c.curvaturaMm).filter((x) => x !== null);
-  const alvo = pedidoMm ?? mediana(raios);
-  const pior = medidos.length ? medidos.reduce((m, c) => (Math.abs(c.raioMm - alvo) > Math.abs(m.raioMm - alvo) ? c : m), medidos[0]) : null;
+  const pedidos = pedidoEm ? cortes.map((c) => c.pedidoMm) : [];
+  const variavel = pedidos.length > 0 && Math.min(...pedidos) !== Math.max(...pedidos);
+  const referencia = (c) => (pedidoEm ? c.pedidoMm : mediana(raios));
+  const pior = medidos.length ? medidos.reduce((m, c) => (Math.abs(c.raioMm - referencia(c)) / referencia(c) > Math.abs(m.raioMm - referencia(m)) / referencia(m) ? c : m), medidos[0]) : null;
   const naturezas = {};
   for (const c of cortes) naturezas[c.natureza] = (naturezas[c.natureza] ?? 0) + 1;
   const angulos = medidos.map((c) => c.anguloGraus).filter((x) => x !== null);
-  const foraDoPedido = pedidoMm === null ? null : cortes.filter((c) => c.foraDoPedido).length;
+  const foraDoPedido = pedidoEm ? cortes.filter((c) => c.foraDoPedido).length : null;
+  const janelas = cortes.map((c) => c.janelaMm);
   return {
     nome: linha.nome, comprimentoMm: arred(comprimentoMm, 1), cortes: cortes.length, medidos: medidos.length,
+    janelaMm: { minimo: Math.min(...janelas), maximo: Math.max(...janelas), imposta },
     raioMm: { minimo: arred(Math.min(...raios)), mediano: arred(mediana(raios)), maximo: arred(Math.max(...raios)) },
     curvaturaMm: curv.length ? { minimo: arred(Math.min(...curv)), mediano: arred(mediana(curv)), maximo: arred(Math.max(...curv)) } : null,
     anguloDaDobraGraus: angulos.length ? { minimo: arred(Math.min(...angulos), 1), mediano: arred(mediana(angulos), 1), maximo: arred(Math.max(...angulos), 1) } : null,
     naturezas,
-    piorDesvio: pior ? { posicaoMm: pior.posicaoMm, raioMm: pior.raioMm, referenciaMm: arred(alvo), diferenca: arred(pior.raioMm - alvo) } : null,
-    ...(pedidoMm !== null ? { pedidoMm, tolerancia, foraDoPedido, semDobra: naturezas.plana ?? 0, sobPedido: foraDoPedido === 0 && medidos.length > 0 } : {}),
+    piorDesvio: pior ? { posicaoMm: pior.posicaoMm, raioMm: pior.raioMm, referenciaMm: arred(referencia(pior)), diferenca: arred(pior.raioMm - referencia(pior)) } : null,
+    ...(pedidoEm ? { pedidoMm: variavel ? { minimo: Math.min(...pedidos), maximo: Math.max(...pedidos) } : pedidos[0], pedidoPorPonto: variavel, tolerancia, foraDoPedido, semDobra: naturezas.plana ?? 0, sobPedido: foraDoPedido === 0 && medidos.length > 0 } : {}),
     porCorte: cortes,
   };
 }
@@ -283,10 +323,21 @@ export function linhasDosVincos(entrada) {
         const soma = fs.reduce((s, f) => { const n = unit(newell(f.map((j) => gaiola.vertices[j]))); return [s[0] + n[0], s[1] + n[1], s[2] + n[2]]; }, [0, 0, 0]);
         peles.push(fs.length && norma(soma) > 1e-9 ? unit(soma) : null);
       }
-      let pedidoMm = null;
-      /* o `raio` do vinco do passo está em metro, como as medidas do passo; o pedido por estação ({ de, ate } ou lista) não dá um pedido só */
-      if (typeof v.raio === 'number' || typeof v.raio === 'string') { pedidoMm = Number(num(v.raio)) * MM; if (!(pedidoMm > 0)) throw new ErroDeEntrada(`o vinco '${v.nome}' declara raio ${v.raio}; o raio é um número maior que zero`); }
-      linhas.push({ nome: v.nome, passo: i, pontos: ids.map((k) => gaiola.vertices[k]), peles, pedidoMm });
+      let pedidoMm = null; let pedidoEm = null;
+      const pontos = ids.map((k) => gaiola.vertices[k]);
+      /* o `raio` do vinco do passo está em metro, como as medidas do passo: um número, `{ de, ate }` (linear no comprimento da linha) ou uma lista com um
+         raio por ponto da linha; os dois últimos dão o pedido de cada corte pela posição dele ao longo da linha */
+      const positivo = (x, o) => { const mm = Number(num(x)) * MM; if (!(mm > 0)) throw new ErroDeEntrada(`o vinco '${v.nome}' declara raio ${JSON.stringify(o)}; o raio é um número maior que zero`); return mm; };
+      if (typeof v.raio === 'number' || typeof v.raio === 'string') pedidoMm = positivo(v.raio, v.raio);
+      else if (v.raio && typeof v.raio === 'object') {
+        const acc = [0];
+        for (let k = 1; k < pontos.length; k++) acc.push(acc[k - 1] + norma(sub(pontos[k], pontos[k - 1])) * MM);
+        if (Array.isArray(v.raio)) {
+          if (v.raio.length !== pontos.length) throw new ErroDeEntrada(`o vinco '${v.nome}' declara ${v.raio.length} raios para ${pontos.length} pontos; a lista tem um raio por ponto da linha`);
+          pedidoEm = pedidoAoLongoDaLinha(acc, v.raio.map((x) => positivo(x, v.raio)));
+        } else pedidoEm = pedidoAoLongoDaLinha([0, acc[acc.length - 1]], [positivo(v.raio.de, v.raio), positivo(v.raio.ate, v.raio)]);
+      }
+      linhas.push({ nome: v.nome, passo: i, pontos, peles, pedidoMm, ...(pedidoEm ? { pedidoEm } : {}) });
     }
   });
   return linhas;
@@ -323,7 +374,7 @@ export function linhaDaAresta(texto) {
 /** Mede as linhas de uma peça (`neutro` final, em metro): `{ arestas, avisos }`. */
 export function medirLinhas(neutro, linhas, { cadaMm, janelaMm, pedidos = {}, tolerancia = TOLERANCIA_PADRAO } = {}) {
   const malha = prepararMalha(neutro);
-  const arestas = linhas.map((l) => ({ passo: l.passo, ...medirAresta(malha, l, { cadaMm, janelaMm, tolerancia, pedidoMm: pedidos[l.nome] ?? l.pedidoMm ?? null }), origemDoPedido: pedidos[l.nome] !== undefined ? '--pedido' : l.pedidoMm !== null ? 'raio do vinco' : null }));
+  const arestas = linhas.map((l) => ({ passo: l.passo, ...medirAresta(malha, pedidos[l.nome] !== undefined ? { ...l, pedidoEm: null } : l, { cadaMm, janelaMm, tolerancia, pedidoMm: pedidos[l.nome] ?? l.pedidoMm ?? null }), origemDoPedido: pedidos[l.nome] !== undefined ? '--pedido' : l.pedidoMm !== null || l.pedidoEm ? 'raio do vinco' : null }));
   return { arestas };
 }
 
@@ -333,13 +384,14 @@ const virgula = (x, c = 1) => (x === null || x === undefined ? '-' : Number(x).t
 const faixa = (r, c = 1) => (r ? `${virgula(r.minimo, c)} / ${virgula(r.mediano, c)} / ${virgula(r.maximo, c)}` : '-');
 
 function textoDaAresta(a) {
-  const linhas = [`${a.nome}${a.passo !== null ? ` (passo ${a.passo})` : ''}: ${a.medidos} de ${a.cortes} cortes medidos em ${virgula(a.comprimentoMm, 0)} mm`];
+  const janela = a.janelaMm.minimo === a.janelaMm.maximo ? `${virgula(a.janelaMm.minimo)}` : `${virgula(a.janelaMm.minimo)} a ${virgula(a.janelaMm.maximo)}`;
+  const linhas = [`${a.nome}${a.passo !== null ? ` (passo ${a.passo})` : ''}: ${a.medidos} de ${a.cortes} cortes medidos em ${virgula(a.comprimentoMm, 0)} mm, janela de ${janela} mm${a.janelaMm.imposta ? ' (imposta por --janela)' : a.pedidoMm === undefined ? ' (sem pedido: a padrão)' : ` (${virgula(JANELA_FATOR)} vezes o pedido, entre ${JANELA_PISO_MM} e ${JANELA_TETO_MM})`}`];
   if (a.medidos) {
     linhas.push(`  raio do filete (mín / mediano / máx): ${faixa(a.raioMm)} mm; menor raio de curvatura: ${faixa(a.curvaturaMm)} mm; dobra de ${faixa(a.anguloDaDobraGraus)} graus`);
     linhas.push(`  natureza dos cortes: ${Object.entries(a.naturezas).map(([k, v]) => `${v} ${k}`).join(', ')}${a.naturezas['nao-arco'] ? ' (o perfil não é arco: o raio do filete é o do arco que melhor o cobre, e o menor raio de curvatura diverge dele)' : ''}${a.naturezas.viva ? ' (quina viva: o raio é menor que 0,25 mm)' : ''}`);
-    if (a.piorDesvio) linhas.push(`  pior desvio de ${virgula(a.piorDesvio.referenciaMm)} mm${a.pedidoMm === undefined ? ' (a mediana)' : ' (o pedido)'}: raio ${virgula(a.piorDesvio.raioMm)} mm em [${a.piorDesvio.posicaoMm.join('; ')}]`);
+    if (a.piorDesvio) linhas.push(`  pior desvio de ${virgula(a.piorDesvio.referenciaMm)} mm${a.pedidoMm === undefined ? ' (a mediana)' : ' (o pedido do ponto)'}: raio ${virgula(a.piorDesvio.raioMm)} mm em [${a.piorDesvio.posicaoMm.join('; ')}]`);
   }
-  if (a.pedidoMm !== undefined) linhas.push(`  pedido ${virgula(a.pedidoMm)} mm (${a.origemDoPedido}), tolerância de ${virgula(a.tolerancia * 100, 0)}%: ${a.foraDoPedido} de ${a.cortes} cortes fora${a.sobPedido ? '; dentro do pedido' : '; FORA DO PEDIDO'}`);
+  if (a.pedidoMm !== undefined) linhas.push(`  pedido ${typeof a.pedidoMm === 'object' ? `de ${virgula(a.pedidoMm.minimo)} a ${virgula(a.pedidoMm.maximo)} mm, por ponto` : `${virgula(a.pedidoMm)} mm`} (${a.origemDoPedido}), tolerância de ${virgula(a.tolerancia * 100, 0)}%: ${a.foraDoPedido} de ${a.cortes} cortes fora${a.sobPedido ? '; dentro do pedido' : '; FORA DO PEDIDO'}`);
   const semMedida = a.porCorte.filter((c) => c.raioMm === null && c.natureza !== 'plana');
   if (a.semDobra) linhas.push(`  ${a.semDobra} corte(s) sem dobra (menos de 2 graus): sem raio que se leia, fora da conta do pedido`);
   if (semMedida.length) linhas.push(`  sem medida: ${semMedida.length} (${[...new Set(semMedida.map((c) => c.motivo ?? c.natureza))].join('; ')})`);
@@ -364,11 +416,11 @@ export async function executar(argv) {
   try {
     const { pedidos, resto } = lerPedidos(argv);
     let lido;
-    try { lido = lerArgumentos(resto, { opcoes: ['opcao', 'aresta', 'cada', 'janela', 'tolerancia', 'vinco'], bandeiras: ['json', 'automatico'], posicional: { nome: 'a receita, o esboço ou a montagem', obrigatorio: true } }); } catch (e) { throw new ErroDeEntrada(e.message); }
+    try { lido = lerArgumentos(resto, { opcoes: ['opcao', 'aresta', 'cada', 'janela', 'tolerancia', 'vinco'], bandeiras: ['json', 'automatico', 'sem-cache'], posicional: { nome: 'a receita, o esboço ou a montagem', obrigatorio: true } }); } catch (e) { throw new ErroDeEntrada(e.message); }
     const numero = (nome, padrao) => { const t = lido.opcao(nome); if (t === null) return padrao; const x = Number(t); if (!(x > 0)) throw new ErroDeEntrada(`--${nome} espera um número maior que zero, e veio '${t}'`); return x; };
-    const cadaMm = numero('cada', CADA_PADRAO_MM); const janelaMm = numero('janela', JANELA_PADRAO_MM); const tolerancia = numero('tolerancia', TOLERANCIA_PADRAO);
+    const cadaMm = numero('cada', CADA_PADRAO_MM); const janelaMm = numero('janela', null); const tolerancia = numero('tolerancia', TOLERANCIA_PADRAO);
     const alvo = lido.posicional;
-    const entrada = await lerEntradaDeMedida(alvo, { opcao: opcaoDaLinha(lido.opcao('opcao')), montagem: true });
+    const entrada = await lerEntradaDeMedida(alvo, { opcao: opcaoDaLinha(lido.opcao('opcao')), montagem: true, cache: !lido.bandeira('sem-cache') });
     const pecas = entrada.tipo === 'montagem' ? entrada.partes.map((p) => ({ nome: p.nome, receita: p.receita, executada: null })) : [{ nome: alvo, receita: entrada.receita, executada: entrada.executar() }];
     const resultados = [];
     for (const p of pecas) {
@@ -393,11 +445,11 @@ export async function executar(argv) {
     const fora = comPedido.filter((a) => !a.sobPedido);
     const codigo = fora.length ? 1 : 0;
     const saida = { entrada: entrada.origem, cadaMm, janelaMm, ...(comPedido.length ? { tolerancia, foraDoPedido: fora.map((a) => a.nome) } : {}), pecas: resultados.map((r) => ({ peca: r.peca, arestas: r.arestas })) };
-    if (lido.bandeira('json')) return { codigo, stdout: `${JSON.stringify(saida, null, 2)}\n`, stderr: '' };
-    const cabeca = `raio:aresta — ${entrada.origem}; corte a cada ${cadaMm} mm, janela de ${janelaMm} mm; o raio é o do filete (núcleo), com o menor raio de curvatura ao lado\n`;
+    if (lido.bandeira('json')) return { codigo, stdout: `${JSON.stringify(saida, null, 2)}\n`, stderr: avisoDeCache(entrada, 'raio:aresta') };
+    const cabeca = `raio:aresta — ${entrada.origem}; corte a cada ${cadaMm} mm, janela ${janelaMm !== null ? `imposta de ${janelaMm} mm` : 'tirada do raio pedido de cada vinco (a usada vai em cada um)'}; o raio é o do filete (núcleo), com o menor raio de curvatura ao lado\n`;
     const corpo = resultados.map((r) => `${resultados.length > 1 ? `[${r.peca}]\n` : ''}${r.arestas.map(textoDaAresta).join('\n')}`).join('\n');
     const rodape = comPedido.length ? `\n${fora.length ? `${fora.length} de ${comPedido.length} arestas com pedido fogem dele por mais de ${virgula(tolerancia * 100, 0)}%: ${fora.map((a) => a.nome).join(', ')}` : `as ${comPedido.length} arestas com pedido estão dentro de ${virgula(tolerancia * 100, 0)}%`}\n` : '\n';
-    return { codigo, stdout: `${cabeca}${corpo}${rodape}`, stderr: '' };
+    return { codigo, stdout: `${cabeca}${corpo}${rodape}`, stderr: avisoDeCache(entrada, 'raio:aresta') };
   } catch (erro) {
     if (erro instanceof ErroDeEntrada || erro?.code === 'ENOENT') return { codigo: 2, stdout: '', stderr: `raio:aresta: ${erro.message}\n` };
     throw erro;

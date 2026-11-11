@@ -1,12 +1,12 @@
 /* entrada-de-medida.test.mjs — o resolvedor comum das ferramentas de medida e as quatro que passaram a ler esboço 2.0 (ondulação, lascas,
  * vistas de superfície e exportação em OBJ), mais a face de corte que a exportação não triangula. Sem domínio: a chapa em V com colunas de apoio. */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ErroDeEntrada, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
+import { ErroDeEntrada, assinaturaDaEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 import { exportarArquivoObj, semFaceSemArea } from './exportar-obj.mjs';
 import { comoCLI as lascas } from './lasca.mjs';
 import { vistasDeSuperficie } from './vistas-de-superficie.mjs';
@@ -60,6 +60,72 @@ describe('o resolvedor de entrada', () => {
     expect(opcaoDaLinha('2')).toBe(2);
     expect(() => opcaoDaLinha('0')).toThrow(/--opcao espera um inteiro/);
     expect(() => opcaoDaLinha('a')).toThrow(/--opcao espera um inteiro/);
+  });
+});
+
+describe('o cache da montagem', () => {
+  /* o esboço de um cubo cuja largura vem de um módulo importado: dentro do repositório (tmp/, ignorado pelo git), porque a assinatura segue só o que é do repositório */
+  const pasta = join(REPO, 'tmp', `teste-de-cache-${process.pid}`);
+  const cache = join(pasta, 'cache');
+  const largura = (e) => Math.max(...[...e.executar().neutro.V.values()].map((v) => v[0])) * 2000;
+  const escrever = (larg) => {
+    writeFileSync(join(pasta, 'numero.mjs'), `export const LARG = ${larg};\n`);
+    writeFileSync(join(pasta, 'x.esboco.mjs'), `import { LARG } from './numero.mjs';\nexport default { opcoes: [{ titulo: 'cubo', formas: [{ id: 'a', op: 'cubo', args: { larg: LARG, alt: 100, prof: 20 }, centro: [0, 0, 0] }] }] };\n`);
+  };
+  const ler = (o = {}) => lerEntradaDeMedida(join(pasta, 'x.esboco.mjs'), { pastaDoCache: cache, ...o });
+  const limpar = () => rmSync(pasta, { recursive: true, force: true });
+
+  it('a primeira leitura monta e guarda, a segunda lê o guardado, e as duas dão a mesma malha; --sem-cache monta de novo', async () => {
+    limpar(); mkdirSync(pasta, { recursive: true });
+    try {
+      escrever(100);
+      const a = await ler();
+      expect(a.doCache).toBe(false);
+      expect(readdirSync(cache).filter((f) => f.endsWith('.v8'))).toHaveLength(1);
+      const b = await ler();
+      expect(b.doCache).toBe(true);
+      expect(avisoDeCache(b, 'medida')).toMatch(/montagem lida do cache.*--sem-cache/);
+      expect(avisoDeCache(a, 'medida')).toBe('');
+      expect(b.executar().neutro.F.size).toBe(a.executar().neutro.F.size);
+      expect(largura(b)).toBeCloseTo(100, 3);
+      expect(b.origem).toBe(a.origem);
+      expect(b.receita.PASSOS).toEqual(a.receita.PASSOS);
+      const sem = await ler({ cache: false });
+      expect(sem.doCache).toBe(false);
+    } finally { limpar(); }
+  });
+
+  it('um número mudado no esboço, ou no módulo que ele importa, nunca lê o cache velho', async () => {
+    limpar(); mkdirSync(pasta, { recursive: true });
+    try {
+      escrever(100);
+      expect(largura(await ler())).toBeCloseTo(100, 3);
+      expect((await ler()).doCache).toBe(true);
+      /* o módulo importado muda, o esboço não (o número novo só aparece em outro processo, porque o carregador do Node guarda o módulo importado; o cache, em todo caso, não é lido) */
+      escrever(140);
+      expect((await ler()).doCache).toBe(false);
+      expect((await ler()).doCache).toBe(true);
+      /* o próprio esboço muda */
+      writeFileSync(join(pasta, 'x.esboco.mjs'), readFileSync(join(pasta, 'x.esboco.mjs'), 'utf8').replace('alt: 100', 'alt: 90'));
+      const altura = await ler();
+      expect(altura.doCache).toBe(false);
+      expect(Math.max(...[...altura.executar().neutro.V.values()].map((v) => v[1])) * 2000).toBeCloseTo(90, 3);
+    } finally { limpar(); }
+  });
+
+  it('a assinatura muda com o arquivo da entrada e com o que ele importa, e só com eles', () => {
+    limpar(); mkdirSync(pasta, { recursive: true });
+    try {
+      escrever(100);
+      const alvo = join(pasta, 'x.esboco.mjs');
+      const base = assinaturaDaEntrada(alvo);
+      expect(assinaturaDaEntrada(alvo)).toEqual(base);
+      writeFileSync(join(pasta, 'outro.mjs'), 'export const NAO_IMPORTADO = 1;\n');
+      expect(assinaturaDaEntrada(alvo).chave).toBe(base.chave);
+      escrever(101);
+      expect(assinaturaDaEntrada(alvo).chave).not.toBe(base.chave);
+      expect(base.arquivos).toBeGreaterThan(20);
+    } finally { limpar(); }
   });
 });
 

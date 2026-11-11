@@ -34,8 +34,13 @@ function distanciaAoSegmento(p, a, b) {
  * Com `comIds`, cada item leva também `ids: [[a, b], ...]`, os ids dos vértices do estado neutro nas pontas de cada segmento, na
  * ordem de `segmentos`: a bancada refaz a curvatura depois de cada edição, que move os vértices sem mudar os ids, e com eles tira
  * os segmentos da malha editada sem subdividir a gaiola de novo.
+ *
+ * Com `comQuinasPorApoio`, o vinco declarado com nitidez 0 (a quina arredondada pelas colunas de apoio, que o ajudante de gaiola põe quando o vinco pede `raio`)
+ * entra também, com `viva: false`: a faixa entre as duas colunas de apoio é a feição que a forma pediu, e a curvatura de 160 a 330 1/m dela estica a escala e deixa a
+ * lataria inteira em branco. O núcleo só segue a linhagem do vinco de nitidez maior que zero, e por isso a marca roda o mesmo refino com uma nitidez desprezível
+ * nesses vincos (a mesma conta de `npm run ondulacao`). Sem a opção a lista é a de sempre, que a bancada usa.
  */
-export function vincosDaMalha(receita, executada = executarReceita(receita), { comIds = false } = {}) {
+export function vincosDaMalha(receita, executada = executarReceita(receita), { comIds = false, comQuinasPorApoio = false } = {}) {
   const { entrada, neutro } = executada;
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
   const { num } = criarResolverNumerico(dict);
@@ -60,9 +65,18 @@ export function vincosDaMalha(receita, executada = executarReceita(receita), { c
       }
     }
     const r = subdividirCatmullClark({ ...gaiola, niveis: Math.trunc(num(args.niveis ?? 2)), borda: args.borda ?? 'suave', aoLimite: args.medidas != null, comVincos: true });
+    let vincosDoRefino = r.vincos;
+    const quinas = comQuinasPorApoio ? gaiola.vincos.filter(([, , x]) => !(x > 0)) : [];
+    if (quinas.length) {
+      const eQuina = new Set(quinas.map(([a, b]) => chaveDaAresta(a, b)));
+      const nivel = Math.trunc(num(args.niveis ?? 2));
+      const marca = subdividirCatmullClark({ ...gaiola, vincos: gaiola.vincos.map(([a, b, x]) => [a, b, eQuina.has(chaveDaAresta(a, b)) && !(x > 0) ? 1e-6 : x]), niveis: nivel, borda: args.borda ?? 'suave', aoLimite: false, comVincos: true });
+      const ja = new Set(r.vincos.map(([a, b]) => chaveDaAresta(a, b)));
+      vincosDoRefino = [...r.vincos, ...marca.vincos.filter(([a, b]) => !ja.has(chaveDaAresta(a, b))).map(([a, b]) => [a, b, false])];
+    }
     const porNome = new Map();
     const vistas = new Set();
-    for (const [a, b, viva] of r.vincos) {
+    for (const [a, b, viva] of vincosDoRefino) {
       const chave = chaveDaAresta(a, b);
       if (vistas.has(chave)) continue;
       vistas.add(chave);

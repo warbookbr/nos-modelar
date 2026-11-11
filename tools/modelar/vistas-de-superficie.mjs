@@ -42,7 +42,7 @@ import { vincosDaMalha } from '../../src/autoria/vincos-da-malha.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { doAmbiente } from '../ambiente.mjs';
 import { lerArgumentos } from './argumentos.mjs';
-import { lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
+import { avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const BLENDER_TOOLS = join(REPO, 'tools/blender');
@@ -187,9 +187,9 @@ function rodarBlender(blender, script, args, executar) {
  * ou null quando a peça não tem vinco declarado ou a opção está desligada. `executar` troca o `spawnSync` no teste.
  */
 export async function vistasDeSuperficie(peca, {
-  pasta, blender = doAmbiente('BLENDER'), lataria = null, faixaDosVincos = true, faixaMm = null, executar = spawnSync, opcao = 1,
+  pasta, blender = doAmbiente('BLENDER'), lataria = null, faixaDosVincos = true, faixaMm = null, executar = spawnSync, opcao = 1, entrada = null,
 } = {}) {
-  const lida = await lerEntradaDeMedida(peca, { opcao, montagem: false });
+  const lida = entrada ?? await lerEntradaDeMedida(peca, { opcao, montagem: false });
   const decidida = lataria ?? await latariaDaPeca(peca, { entrada: lida });
   /* A curvatura é da lataria. A peça de emenda sombreada leva só a luz rasante, e a peça que não leva nenhuma das duas (chamada pela
      linha de comando para olhar) recebe as duas, como sempre. */
@@ -212,7 +212,7 @@ export async function vistasDeSuperficie(peca, {
   if (!partes) partes = comCurvatura ? partesDaLataria((await receitaExecutada()).neutro) : [];
   const argsDaFaixa = [];
   if (faixaDosVincos && comCurvatura) {
-    const vincos = vincosDaMalha(null, await receitaExecutada());
+    const vincos = vincosDaMalha(null, await receitaExecutada(), { comQuinasPorApoio: true });
     if (vincos.length) {
       const arquivo = join(destino, 'vincos.json');
       writeFileSync(arquivo, `${JSON.stringify({ vincos })}\n`, 'utf8');
@@ -299,9 +299,9 @@ export function superficieDoPacote(peca, { pasta, sha256 }) {
 async function principal(argv) {
   let lido;
   try {
-    lido = lerArgumentos(argv.slice(2), { opcoes: ['saida', 'faixa-mm', 'opcao'], bandeiras: ['sem-faixa-dos-vincos'], posicional: { nome: 'a peça', obrigatorio: true } });
+    lido = lerArgumentos(argv.slice(2), { opcoes: ['saida', 'faixa-mm', 'opcao'], bandeiras: ['sem-faixa-dos-vincos', 'sem-cache'], posicional: { nome: 'a peça', obrigatorio: true } });
   } catch (erro) {
-    process.stderr.write(`uso: MODELAR_BLENDER=<blender> node tools/modelar/vistas-de-superficie.mjs <peça> [--opcao=<n>] [--saida=<pasta>] [--faixa-mm=<mm> | --sem-faixa-dos-vincos]\n${erro.message}\n`);
+    process.stderr.write(`uso: MODELAR_BLENDER=<blender> node tools/modelar/vistas-de-superficie.mjs <peça> [--opcao=<n>] [--saida=<pasta>] [--faixa-mm=<mm> | --sem-faixa-dos-vincos] [--sem-cache]\n${erro.message}\n`);
     return 2;
   }
   const peca = lido.posicional;
@@ -311,8 +311,11 @@ async function principal(argv) {
   if (faixaMm != null && !(faixaMm > 0)) throw new Error(`--faixa-mm precisa ser número maior que zero, e veio '${lido.opcao('faixa-mm')}'`);
   if (faixaMm != null && !faixaDosVincos) throw new Error('--faixa-mm e --sem-faixa-dos-vincos juntas: a largura só vale com a faixa');
   const opcao = opcaoDaLinha(lido.opcao('opcao'));
-  const lataria = await latariaDaPeca(peca, { opcao });
-  const feitas = await vistasDeSuperficie(peca, { pasta, lataria, faixaDosVincos, faixaMm, opcao });
+  const entrada = await lerEntradaDeMedida(peca, { opcao, montagem: false, cache: !lido.bandeira('sem-cache') });
+  entrada.executar?.();
+  process.stderr.write(avisoDeCache(entrada, 'vistas:superficie'));
+  const lataria = await latariaDaPeca(peca, { opcao, entrada });
+  const feitas = await vistasDeSuperficie(peca, { pasta, lataria, faixaDosVincos, faixaMm, opcao, entrada });
   const { faixa } = feitas;
   const linhas = [
     `vistas:superficie — ${peca}`,

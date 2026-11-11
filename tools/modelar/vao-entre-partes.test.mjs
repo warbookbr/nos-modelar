@@ -298,6 +298,45 @@ describe('a segunda leva', () => {
   });
 });
 
+describe('a pele de fora e a parede do corte', () => {
+  /* o perfil no plano (z, h), com h a direção da normal da pele, extrudado em y por 100 mm; a parede do corte de cada chapa é a face em z */
+  const extrudado = (parte, perfil) => {
+    const pt = ([z, h], y) => [h, y, z];
+    const area = perfil.reduce((a, c, i) => { const d = perfil[(i + 1) % perfil.length]; return a + c[0] * d[1] - d[0] * c[1]; }, 0);
+    const q = area > 0 ? perfil : [...perfil].reverse();
+    const lados = q.map((c, i) => { const d = q[(i + 1) % q.length]; return { pts: [pt(c, 0), pt(d, 0), pt(d, 100), pt(c, 100)], parte }; });
+    return [...lados, { pts: q.map((c) => pt(c, 0)), parte }, { pts: [...q].reverse().map((c) => pt(c, 100)), parte }];
+  };
+  const chapaA = [[-20, 0], [0, 0], [0, -1], [-20, -1]];
+
+  it('a lasca entre duas paredes de corte (duas faces de costas, uma sobre a outra) não é pele: o degrau é 0 e o vão 4, e não o contrário', () => {
+    /* uma aleta de área nula sobre a parede de a: as arestas dela têm uma face de cada lado da parede, as duas normais ao longo do vão */
+    const aleta = [{ pts: [[100, 40, 0.2], [100, 45, 1.2], [100, 50, 0.2]], parte: 'a' }, { pts: [[100, 40, 0.2], [100, 50, 0.2], [100, 45, 1.2]], parte: 'a' }];
+    const p = par([...duasChapas(), ...aleta], { esperado: 4, lado: 'todos' });
+    expect(p.vao.min).toBeCloseTo(4, 2);
+    expect(p.degrau.max).toBeLessThan(0.05);
+    expect(p.fora).toEqual([]);
+  });
+
+  it('a quina arredondada que desce a 22 graus junto da parede de b não dá degrau: b tem a pele a 0 na parede e o vão é 4', () => {
+    /* a e b nivelados na parede (degrau 0); a borda de b cai em rampa de 22 graus logo depois, e o plano dessa rampa, estendido por 4 mm
+       até a borda de a, passaria a 1,5 mm dela */
+    const chapaB = [[4, 0], [8, -1.6], [24, -1.6], [24, -2.6], [8, -2.6], [4, -1]];
+    const p = par([...extrudado('a', chapaA), ...extrudado('b', chapaB)], { esperado: 4, degrau: 0.3 });
+    expect(p.tipo).toBe('folga');
+    expect(p.vao.min).toBeCloseTo(4, 1); expect(p.vao.max).toBeCloseTo(4, 1);
+    expect(p.degrau.max).toBeLessThan(0.1);
+    expect(p.fora).toEqual([]);
+  });
+
+  it('o degrau de verdade continua medido nessa mesma quina: b 0,5 mm abaixo de a na parede dá 0,5', () => {
+    const chapaB = [[4, -0.5], [8, -2.1], [24, -2.1], [24, -3.1], [8, -3.1], [4, -1.5]];
+    const p = par([...extrudado('a', chapaA), ...extrudado('b', chapaB)], { esperado: 4, degrau: 0.3 });
+    expect(p.degrau.max).toBeGreaterThan(0.4); expect(p.degrau.max).toBeLessThan(0.6);
+    expect(p.fora.map((f) => f.motivo)).toEqual(['degrau acima do aceito']);
+  });
+});
+
 describe('a ficha', () => {
   it('a capacidade vaoEntrePartes se acha por vão, folga, degrau, painel e parte solta', () => {
     expect(CAPACIDADES.vaoEntrePartes).toBeDefined();

@@ -365,6 +365,21 @@ print(json.dumps({'H': float(H[c]), 'fora': fora, 'dentro': dentro, 'croma_fora'
 
 /* ---------- a dispensa de PLANO.lataria ---------- */
 
+describe('a quina por colunas de apoio na faixa dos vincos', () => {
+  it('o vinco de nitidez 0 entra só com comQuinasPorApoio, e sem a opção a lista é a de sempre', async () => {
+    const { executarReceita } = await import('../../src/autoria/executar-receita.js');
+    const { receitaDaDobra } = await import('./fixtures/dobra-por-apoio.mjs');
+    const { vincosDaMalha } = await import('../../src/autoria/vincos-da-malha.js');
+    const executada = executarReceita(receitaDaDobra({ angulo: 90, apoio: 6, vizinho: 40 }));
+    expect(vincosDaMalha(null, executada)).toEqual([]);
+    const quinas = vincosDaMalha(null, executada, { comQuinasPorApoio: true });
+    expect(quinas.map((v) => [v.nome, v.viva])).toEqual([['quina', false]]);
+    /* a faixa entre as duas colunas de apoio, nas 8 estações da chapa, a 6 mm da quina de cada lado e em todos os níveis do refino */
+    expect(quinas[0].segmentos.length).toBeGreaterThan(30);
+    for (const [p, q] of quinas[0].segmentos) for (const v of [p, q]) expect(Math.hypot(v[0], v[1]) * 1000).toBeLessThan(7);
+  });
+});
+
 describe('a dispensa de PLANO.lataria', () => {
   const MOTIVO = 'é um estofado de espuma, e não chapa de lataria';
   const dispensada = { ...provaDeLataria, PLANO: { ...provaDeLataria.PLANO, lataria: { dispensa: MOTIVO } } };

@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { perfilDoApoio, raioDoFilete } from '../../procedural/nucleo/apoio-do-vinco.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { CAPACIDADES, executar as fichas } from './capacidade.mjs';
-import { amostrasDaLinha, executar, linhaDaAresta, linhasDosVincos, medirAresta, medirLinhas, medirPerfil, menorRaioDeCurvatura, prepararMalha } from './raio-da-aresta.mjs';
+import { JANELA_FATOR, JANELA_PISO_MM, JANELA_TETO_MM, amostrasDaLinha, executar, janelaDoPedido, linhaDaAresta, linhasDosVincos, medirAresta, medirLinhas, medirPerfil, menorRaioDeCurvatura, pedidoAoLongoDaLinha, prepararMalha } from './raio-da-aresta.mjs';
 import { malhaDoCilindro, receitaDaDobra } from './fixtures/dobra-por-apoio.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -100,6 +100,66 @@ describe('os cortes sobre a linha', () => {
     const r = medirAresta(prepararMalha(malhaDoCilindro({ raio: 8, angulo: 90 })), { nome: 'longe', pontos: [[0.2, 0.2, 0], [0.2, 0.2, 0.3]] }, { cadaMm: 100 });
     expect(r.medidos).toBe(0);
     expect(r.porCorte[0].natureza).toBe('sem-corte');
+  });
+});
+
+describe('a janela do corte e o pedido por ponto', () => {
+  const feita = () => executarReceita(receitaDaDobra({ angulo: 90, apoio: 6, vizinho: 40 }));
+
+  it('a janela sai do pedido: 2,5 vezes o raio, entre o piso de 6 mm e o teto de 40, e a padrão sem pedido', () => {
+    expect(JANELA_FATOR).toBe(2.5);
+    expect(janelaDoPedido(6)).toBe(15);
+    expect(janelaDoPedido(1)).toBe(JANELA_PISO_MM);
+    expect(janelaDoPedido(80)).toBe(JANELA_TETO_MM);
+    expect(janelaDoPedido(null)).toBe(40);
+  });
+
+  it('com o pedido de 3,7 mm a janela automática é de 9,3 mm e mede dentro de 20%; a de 4 mm impostas foge, e a de 40 mm mede outro número', () => {
+    const { neutro, entrada } = feita();
+    const malha = prepararMalha(neutro); const [linha] = linhasDosVincos(entrada);
+    const auto = medirAresta(malha, linha, { pedidoMm: 3.7 });
+    expect(auto.janelaMm).toEqual({ minimo: 9.3, maximo: 9.3, imposta: false });
+    expect(auto).toMatchObject({ foraDoPedido: 0, sobPedido: true });
+    expect(auto.porCorte.every((c) => c.janelaMm === 9.3)).toBe(true);
+    const curta = medirAresta(malha, linha, { pedidoMm: 3.7, janelaMm: 4 });
+    expect(curta.janelaMm).toMatchObject({ minimo: 4, imposta: true });
+    expect(curta.foraDoPedido).toBeGreaterThan(0);
+    expect(medirAresta(malha, linha, { pedidoMm: 3.7, janelaMm: 40 }).raioMm.mediano).not.toBe(auto.raioMm.mediano);
+  });
+
+  it('o raio por estação ({ de, ate } ou uma lista) é o pedido de cada corte, e a janela acompanha', () => {
+    const { neutro, entrada } = feita();
+    const malha = prepararMalha(neutro);
+    const vinco = entrada.PASSOS[0][1].vincos[0];
+    vinco.raio = { de: 0.0037, ate: 0.0074 };
+    const rampa = medirAresta(malha, linhasDosVincos(entrada)[0], {});
+    expect(rampa.pedidoMm).toEqual({ minimo: 3.816, maximo: 7.284 });
+    expect(rampa.porCorte[0]).toMatchObject({ pedidoMm: 3.816, janelaMm: 9.5, foraDoPedido: false });
+    expect(rampa.porCorte[15]).toMatchObject({ pedidoMm: 7.284, janelaMm: 18.2, foraDoPedido: true });
+    expect(rampa.janelaMm).toMatchObject({ minimo: 9.5, maximo: 18.2, imposta: false });
+    /* a lista com um raio por ponto (nove estações): 3,7 até a quinta, 7,4 depois; cada corte é comparado ao do ponto dele */
+    vinco.raio = [0.0037, 0.0037, 0.0037, 0.0037, 0.0037, 0.0074, 0.0074, 0.0074, 0.0074];
+    const lista = medirAresta(malha, linhasDosVincos(entrada)[0], {});
+    expect(lista.porCorte.slice(0, 6).every((c) => c.pedidoMm === 3.7 && !c.foraDoPedido)).toBe(true);
+    expect(lista.porCorte.slice(-6).every((c) => c.pedidoMm === 7.4 && c.foraDoPedido)).toBe(true);
+    expect(lista).toMatchObject({ pedidoPorPonto: true, sobPedido: false });
+    vinco.raio = [0.0037, 0.0037];
+    expect(() => linhasDosVincos(entrada)).toThrow(/não resolve a gaiola.*raio/);
+  });
+
+  it('a interpolação do pedido segura as pontas e liga os pontos em linha reta', () => {
+    const f = pedidoAoLongoDaLinha([0, 100, 300], [2, 4, 8]);
+    expect([f(-5), f(0), f(50), f(100), f(200), f(300), f(999)]).toEqual([2, 2, 3, 4, 6, 8, 8]);
+  });
+
+  it('o comando diz a janela de cada vinco, e --janela a impõe', async () => {
+    const receita = gravarReceita('janela.mjs', receitaDaDobra({ angulo: 90, apoio: 6, vizinho: 40 }));
+    const auto = await executar([receita, '--pedido=quina:3.7']);
+    expect(auto.stdout).toMatch(/quina \(passo 0\): 16 de 16 cortes medidos em 800 mm, janela de 9,3 mm \(2,5 vezes o pedido, entre 6 e 40\)/);
+    expect(auto.stdout).toMatch(/janela tirada do raio pedido de cada vinco/);
+    const imposta = await executar([receita, '--pedido=quina:3.7', '--janela=4', '--json']);
+    expect(JSON.parse(imposta.stdout)).toMatchObject({ janelaMm: 4, pecas: [{ arestas: [{ janelaMm: { minimo: 4, maximo: 4, imposta: true } }] }] });
+    expect(imposta.codigo).toBe(1);
   });
 });
 

@@ -42,6 +42,13 @@
  * de linhas paralelas em volta de cada uma (uma chapa tem uma aresta viva em cada face de fora). O degrau é, em cada amostra, a
  * distância dela ao plano da face de fora da outra parte, que passa pelo ponto da aresta que mediu o vão.
  *
+ * A PELE E A PAREDE DO CORTE. A aresta viva de uma amostra tem duas faces, e a pele é a que corre ao longo da direção do vão (a de normal mais perpendicular a ela); se
+ * a menos paralela das duas ainda tem normal a menos de 32 graus da direção do vão (cosseno acima de 0,85), as duas são parede de corte, como numa lasca entre duas
+ * paredes, e a amostra não mede vão nem degrau. O degrau é o menor dos desníveis pela normal de cada pele: numa quina arredondada a face da borda de uma parte pode
+ * estar a 20 ou 30 graus da pele da outra, e o plano dela, estendido por 4 mm, erra por mais que o degrau; a mesma amostra medida do outro lado dá o plano certo.
+ *
+ * A MONTAGEM EM CACHE. A montagem do esboço ou da receita fica em `tmp/cache-de-medida/`, por assinatura do conteúdo (`entrada-de-medida.mjs`), e `--sem-cache` monta de novo.
+ *
  * PARTE SOLTA é a que, em toda outra parte, fica a mais de `toque` mm da superfície e não a atravessa por aresta nenhuma. A parte
  * mais próxima e a distância saem de vértices e amostras de aresta, e por isso a distância vale até o passo. A parte contida inteira
  * dentro de outra, sem tocar a superfície, também sai solta.
@@ -55,7 +62,7 @@
  * isolado sai marcado.
  *
  * Uso: npm run vao:partes -- <esboço|receita|montagem> [--opcao=1] [--esperado=4] [--tolerancia=0.2] [--degrau=1] [--par=a:b]...
- *        [--partes=porta,teto] [--vizinho=15] [--passo=2] [--toque=0.001] [--por=p05|minimo] [--folga3d=<mm>] [--soltas=recusar] [--apoia=parte:motivo]... [--linhas=40] [--json]
+ *        [--partes=porta,teto] [--vizinho=15] [--passo=2] [--toque=0.001] [--por=p05|minimo] [--folga3d=<mm>] [--soltas=recusar] [--apoia=parte:motivo]... [--linhas=40] [--json] [--sem-cache]
  * Sai 0 sem par fora da faixa, 1 com par fora da faixa ou, em `--soltas=recusar`, com parte solta, e 2 em argumento ruim. */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -66,6 +73,8 @@ export const TOLERANCIA_MM = 0.2;
 export const VIZINHO_PADRAO_MM = 15;
 export const ANGULO_VIVO_GRAUS = 30;
 const FOLGA_DE_VIZINHO = 3;
+/* a face cuja normal tem mais que isso (cosseno) da direção para a outra parte é parede do corte, e não pele */
+const COSSENO_DA_PAREDE = 0.85;
 
 export class ErroDoVao extends Error {
   constructor(mensagem) { super(mensagem); this.name = 'ErroDoVao'; }
@@ -409,9 +418,13 @@ export function medirPar(A, B, { vizinho = VIZINHO_PADRAO_MM, toque = TOQUE_MM, 
       const u = unit(sub(r.q, s.p));
       const nX = s.n2 && Math.abs(dot(s.n2, u)) < Math.abs(dot(s.n1, u)) ? s.n2 : s.n1;
       const assinada = !!s.n2;
-      const c = arestaDoMesmoLado(Y, s.p, nX, assinada, r.d * 1.5 + 2, celula);
+      /* a pele é a face que corre ao longo da direção do vão: se a menos paralela das duas ainda olha para a outra parte, a aresta é a de
+         duas paredes de corte (a lasca entre elas, ou o fim de uma aresta) e não tem pele de fora; ela não mede vão nem degrau */
+      const c = Math.abs(dot(nX, u)) > COSSENO_DA_PAREDE ? null : arestaDoMesmoLado(Y, s.p, nX, assinada, r.d * 1.5 + 2, celula);
       if (!c) { todas.push({ vao: r.d, degrau: null, p: s.p, e: r.q, s, mutua: !maisProximo(X, r.q, r.d - (0.05 + 0.01 * r.d)), aresta: false }); continue; }
-      const delta = sub(c.e, s.p); const degrau = Math.abs(dot(delta, c.nY));
+      /* o desnível pela normal de cada pele, e vale o menor: numa quina arredondada a face da borda de uma parte pode estar a 30 graus da pele
+         da outra, e o plano dela, estendido pelo vão, erra por mais que o degrau; a mesma amostra medida do outro lado dá o plano certo */
+      const delta = sub(c.e, s.p); const degrau = Math.min(Math.abs(dot(delta, c.nY)), Math.abs(dot(delta, nX)));
       const vao = Math.sqrt(Math.max(0, dot(delta, delta) - degrau * degrau));
       const volta = arestaDoMesmoLado(X, c.e, c.nY, assinada, c.d - (0.05 + 0.01 * c.d), celula);
       todas.push({ vao, degrau, p: s.p, e: c.e, s, mutua: !volta, aresta: true, fora: centro === null || !s.n2 || dot(nX, sub(s.p, centro)) > 0 });
@@ -605,27 +618,27 @@ function facesDaMontagem(resolvida) {
 
 /** A entrada de um arquivo: `{ faces, folgas, apoia, neutro, origem }`. Esboço (.esboco.json ou módulo), receita ou montagem persistida,
  *  lidos pelo resolvedor comum das ferramentas de medida (`entrada-de-medida.mjs`). */
-export async function lerEntrada(arquivo, { opcao = 1 } = {}) {
-  const { lerEntradaDeMedida, ErroDeEntrada } = await import('./entrada-de-medida.mjs');
+export async function lerEntrada(arquivo, { opcao = 1, cache = true } = {}) {
+  const { lerEntradaDeMedida, ErroDeEntrada, avisoDeCache } = await import('./entrada-de-medida.mjs');
   let lida;
-  try { lida = await lerEntradaDeMedida(arquivo, { opcao }); } catch (e) { throw e instanceof ErroDeEntrada ? new ErroDoVao(e.message) : e; }
+  try { lida = await lerEntradaDeMedida(arquivo, { opcao, cache }); } catch (e) { throw e instanceof ErroDeEntrada ? new ErroDoVao(e.message) : e; }
   if (lida.tipo === 'montagem') {
     const { lerMontagemPersistida } = await import('../../src/autoria/ler-montagem-persistida.js');
     const { resolverMontagemPersistida } = await import('../../src/autoria/resolver-montagem-persistida.js');
     const { carregadoresDeReceitas } = await import('./peca-com-parametros.mjs');
     let resolvida;
     try { resolvida = await resolverMontagemPersistida(lida.dado, carregadoresDeReceitas(Object.fromEntries(lida.partes.map((p) => [p.nome, p.receita])))); } catch (e) { throw new ErroDoVao(`a montagem não resolve: ${e.message}`); }
-    return { faces: facesDaMontagem(resolvida), folgas: {}, apoia: {}, neutro: null, origem: lida.origem };
+    return { faces: facesDaMontagem(resolvida), folgas: {}, apoia: {}, neutro: null, origem: lida.origem, aviso: avisoDeCache(lida, 'vao:partes') };
   }
   if (lida.tipo === 'receita') {
     const { neutro } = lida.executar();
-    return { faces: facesPorNome(neutro), ...declaracoesDaReceita(lida.receita), neutro, origem: lida.origem };
+    return { faces: facesPorNome(neutro), ...declaracoesDaReceita(lida.receita), neutro, origem: lida.origem, aviso: avisoDeCache(lida, 'vao:partes') };
   }
   const { painel } = lida;
   const folgas = {};
   for (const c of painel.contatosDeclarados ?? []) if (c.folga) folgas[chaveDoPar(c.par[0], c.par[1])] = c.folga;
   const apoia = Object.fromEntries((painel.apoiaDeclarada ?? []).map((a) => [a.parte, a.motivo]));
-  return { faces: facesPorNome(painel.neutro), folgas, apoia, neutro: painel.neutro, origem: lida.origem };
+  return { faces: facesPorNome(painel.neutro), folgas, apoia, neutro: painel.neutro, origem: lida.origem, aviso: avisoDeCache(lida, 'vao:partes') };
 }
 
 /** A relação de cada par de partes que o relato de contatos dá (`descreverPeca` sobre o neutro, a mesma medida): `[{ a, b, tipo }]` com toca, atravessa ou folga. */
@@ -653,7 +666,7 @@ export function linhaDoPar(p) {
 
 const AJUDA = `npm run vao:partes -- <esboço|receita> [--opcao=1] [--esperado=<mm>] [--tolerancia=${TOLERANCIA_MM}] [--degrau=<mm>] [--par=a:b]...
     [--partes=<prefixo|nome>,...] [--vizinho=<mm>] [--passo=${PASSO_MM}] [--toque=${TOQUE_MM}] [--lado=fora|todos] [--por=p05|minimo] [--linha-minima=10] [--folga3d=<mm>] [--soltas=recusar] [--apoia=<parte>:<motivo>]...
-    [--linhas=40] [--json]
+    [--linhas=40] [--json] [--sem-cache]
 
 Mede, sobre a malha, o vão (da borda de uma parte à borda da outra, ao longo da linha comum: mínimo, mediana, p90, máximo, com o ponto do
 mínimo e do máximo em mm) e o degrau (o desnível entre as duas superfícies de fora) de cada par de partes vizinhas, o par a menos de
@@ -663,7 +676,7 @@ que toca ou atravessa não tem vão. Lista sempre as partes soltas, as que não 
 uma, e --apoia declara a que é solta de propósito. A entrada é um esboço, uma receita ou uma montagem persistida (cada instância de peça é uma parte).
 --por=p05 (padrão) confere o percentil 5 e o 95 do vão contra a faixa; --por=minimo, o mínimo e o máximo. O mínimo ou o máximo fora da
 faixa por menos de --linha-minima mm de linha sai marcado como isolado (ponto de quina). --folga3d dá a menor distância 3D aceita entre os
-sólidos. Esboço: contatos com folga: { esperada, tolerancia, degrau } e apoia: [{ parte, motivo }]; receita: FOLGAS e APOIA.`;
+sólidos. A montagem do esboço fica em tmp/cache-de-medida/ e as outras medidas a reaproveitam (a saída diz "montagem do cache"); --sem-cache monta de novo. Esboço: contatos com folga: { esperada, tolerancia, degrau } e apoia: [{ parte, motivo }]; receita: FOLGAS e APOIA.`;
 
 export async function executar(argv) {
   const valores = (nome) => argv.filter((x) => x.startsWith(`--${nome}=`)).map((x) => x.slice(nome.length + 3));
@@ -677,7 +690,7 @@ export async function executar(argv) {
     for (const t of valores('apoia')) { const i = t.indexOf(':'); if (i <= 0 || !t.slice(i + 1).trim()) throw new ErroDoVao('--apoia espera "<parte>:<motivo>"'); apoia[t.slice(0, i).trim()] = t.slice(i + 1).trim(); }
     const soltas = valor('soltas');
     if (soltas !== null && !['recusar', 'listar'].includes(soltas)) throw new ErroDoVao('--soltas espera recusar ou listar');
-    const entrada = await lerEntrada(arquivo, { opcao: Number(valor('opcao') ?? 1) });
+    const entrada = await lerEntrada(arquivo, { opcao: Number(valor('opcao') ?? 1), cache: !argv.includes('--sem-cache') });
     const toque = numero('toque');
     const relacoes = entrada.neutro ? await relacoesDoNeutro(entrada.neutro, toque ?? TOQUE_MM) : undefined;
     const r = vaoEntrePartes(entrada.faces, {
@@ -688,7 +701,7 @@ export async function executar(argv) {
     for (const n of Object.keys(apoia)) if (!r.soltas.some((s) => s.parte === n) && !entrada.faces.some((f) => f.parte === n)) throw new ErroDoVao(`--apoia cita a parte "${n}", que não existe`);
     const recusaSoltas = soltas === 'recusar' && r.resumo.soltasSemApoio > 0;
     const codigo = r.resumo.fora || recusaSoltas ? 1 : 0;
-    if (argv.includes('--json')) return { codigo, stdout: `${JSON.stringify({ formato: 'modelar.vao-entre-partes@1', origem: entrada.origem, ...r }, null, 1)}\n`, stderr: '' };
+    if (argv.includes('--json')) return { codigo, stdout: `${JSON.stringify({ formato: 'modelar.vao-entre-partes@1', origem: entrada.origem, ...r }, null, 1)}\n`, stderr: entrada.aviso };
     const limite = numero('linhas') ?? 40;
     const mostrar = limite > 0 ? r.pares.slice(0, limite) : r.pares;
     const out = [`${entrada.origem}: ${r.resumo.partes} partes, ${r.resumo.pares} pares vizinhos a até ${virgula(r.resumo.vizinho, 1)} mm, ${r.resumo.fora} fora da faixa${r.resumo.esperado ? ` (${virgula(r.resumo.esperado, 1)} ± ${virgula(r.resumo.tolerancia, 2)} mm)` : ''}`];
@@ -696,7 +709,7 @@ export async function executar(argv) {
     if (mostrar.length < r.pares.length) out.push(`... mais ${r.pares.length - mostrar.length} pares (--linhas=0 mostra todos; ${r.pares.slice(mostrar.length).filter((p) => p.tipo !== 'folga').length} deles tocam ou atravessam)`);
     out.push(r.soltas.length ? `partes soltas (${r.soltas.length}): ${r.soltas.map((s) => `${s.parte} a ${virgula(s.distanciaMm, 2)} mm de ${s.maisProxima ?? '-'}${s.apoia ? ` [apoia: ${s.apoia}]` : ''}`).join('; ')}` : 'nenhuma parte solta');
     if (recusaSoltas) out.push(`--soltas=recusar: ${r.resumo.soltasSemApoio} parte(s) solta(s) sem --apoia`);
-    return { codigo, stdout: `${out.join('\n')}\n`, stderr: '' };
+    return { codigo, stdout: `${out.join('\n')}\n`, stderr: entrada.aviso };
   } catch (erro) {
     if (erro instanceof ErroDoVao || erro?.code === 'ENOENT' || erro instanceof SyntaxError) return { codigo: 2, stdout: '', stderr: `vao:partes: ${erro.message}\n` };
     throw erro;
