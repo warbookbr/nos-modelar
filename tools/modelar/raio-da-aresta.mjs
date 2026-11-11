@@ -39,6 +39,7 @@ export const TOLERANCIA_PADRAO = 0.2;
 export const RAIO_DA_QUINA_VIVA_MM = 0.25;
 export const LIMITE_DA_DIVERGENCIA = 0.25;
 export const DISTANCIA_MAXIMA_DO_PERFIL_MM = 5;
+export const ANGULO_MINIMO_DA_DOBRA_GRAUS = 2;
 const PELE_MINIMA = 0.3;
 const MM = 1000;
 
@@ -161,13 +162,14 @@ export function menorRaioDeCurvatura(perfil) {
  * medirPerfil(perfil2d) -> `{ raioMm, curvaturaMm, divergencia, anguloGraus, natureza, erroMm, razaoDoErro, segmentoMm, motivo }`. `raioMm` é o do filete
  * (`raioDoFilete`, a definição do núcleo); `curvaturaMm` é o menor raio de curvatura do perfil, e `divergencia` a diferença relativa dos dois. `natureza`
  * é `arco` (as duas medidas concordam), `nao-arco` (divergem por mais de `LIMITE_DA_DIVERGENCIA`), `viva` (raio abaixo de `RAIO_DA_QUINA_VIVA_MM`),
- * `plana` (sem dobra) ou `sem-medida` (perfil curto demais ou que não sai das retas das faces).
+ * `plana` (dobra de menos de `ANGULO_MINIMO_DA_DOBRA_GRAUS`, 2, sem raio que se leia) ou `sem-medida` (perfil curto demais ou que não sai das retas das faces).
  */
 export function medirPerfil(perfil) {
   const f = raioDoFilete(perfil);
   const c = menorRaioDeCurvatura(perfil);
-  if (f.raio === null || f.raio === undefined) {
-    return { raioMm: null, curvaturaMm: arred(c?.raio ?? null), divergencia: null, anguloGraus: arred(f.angulo ?? null, 1), natureza: f.angulo === 0 ? 'plana' : 'sem-medida', erroMm: null, razaoDoErro: null, segmentoMm: arred(c?.segmento ?? null), motivo: f.motivo ?? null };
+  /* a dobra de menos de 2 graus não tem raio que se leia: o filete de 0,3 grau dá milhares de mm e não diz nada da aresta */
+  if (f.raio === null || f.raio === undefined || f.angulo < ANGULO_MINIMO_DA_DOBRA_GRAUS) {
+    return { raioMm: null, curvaturaMm: arred(c?.raio ?? null), divergencia: null, anguloGraus: arred(f.angulo ?? null, 1), natureza: f.angulo === 0 || f.angulo < ANGULO_MINIMO_DA_DOBRA_GRAUS ? 'plana' : 'sem-medida', erroMm: null, razaoDoErro: null, segmentoMm: arred(c?.segmento ?? null), motivo: f.motivo ?? null };
   }
   const divergencia = c ? Math.abs(f.raio - c.raio) / Math.max(f.raio, c.raio) : null;
   const natureza = f.raio < RAIO_DA_QUINA_VIVA_MM ? 'viva' : divergencia !== null && divergencia > LIMITE_DA_DIVERGENCIA ? 'nao-arco' : 'arco';
@@ -206,7 +208,7 @@ export function medirAresta(malha, linha, { cadaMm = CADA_PADRAO_MM, janelaMm = 
     if (!perfil) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: 'o plano do corte não toca a malha a menos da janela' };
     if (perfil.distanciaMm > DISTANCIA_MAXIMA_DO_PERFIL_MM) return { ...base, raioMm: null, natureza: 'sem-corte', motivo: `o perfil passa a ${arred(perfil.distanciaMm, 1)} mm da aresta (mais de ${DISTANCIA_MAXIMA_DO_PERFIL_MM} mm): a malha não está onde a gaiola diz` };
     const m = medirPerfil(perfil.pontos2d);
-    const fora = pedidoMm !== null && (m.raioMm === null || Math.abs(m.raioMm - pedidoMm) > tolerancia * pedidoMm);
+    const fora = pedidoMm !== null && m.natureza !== 'plana' && (m.raioMm === null || Math.abs(m.raioMm - pedidoMm) > tolerancia * pedidoMm);
     return { ...base, pontosDoPerfil: perfil.pontos2d.length, ...m, ...(pedidoMm !== null ? { desvioDoPedido: m.raioMm === null ? null : arred((m.raioMm - pedidoMm) / pedidoMm, 3), foraDoPedido: fora } : {}) };
   });
   const medidos = cortes.filter((c) => c.raioMm !== null);
@@ -224,7 +226,7 @@ export function medirAresta(malha, linha, { cadaMm = CADA_PADRAO_MM, janelaMm = 
     anguloDaDobraGraus: angulos.length ? { minimo: arred(Math.min(...angulos), 1), mediano: arred(mediana(angulos), 1), maximo: arred(Math.max(...angulos), 1) } : null,
     naturezas,
     piorDesvio: pior ? { posicaoMm: pior.posicaoMm, raioMm: pior.raioMm, referenciaMm: arred(alvo), diferenca: arred(pior.raioMm - alvo) } : null,
-    ...(pedidoMm !== null ? { pedidoMm, tolerancia, foraDoPedido, sobPedido: foraDoPedido === 0 && medidos.length > 0 } : {}),
+    ...(pedidoMm !== null ? { pedidoMm, tolerancia, foraDoPedido, semDobra: naturezas.plana ?? 0, sobPedido: foraDoPedido === 0 && medidos.length > 0 } : {}),
     porCorte: cortes,
   };
 }
@@ -317,7 +319,8 @@ function textoDaAresta(a) {
     if (a.piorDesvio) linhas.push(`  pior desvio de ${virgula(a.piorDesvio.referenciaMm)} mm${a.pedidoMm === undefined ? ' (a mediana)' : ' (o pedido)'}: raio ${virgula(a.piorDesvio.raioMm)} mm em [${a.piorDesvio.posicaoMm.join('; ')}]`);
   }
   if (a.pedidoMm !== undefined) linhas.push(`  pedido ${virgula(a.pedidoMm)} mm (${a.origemDoPedido}), tolerância de ${virgula(a.tolerancia * 100, 0)}%: ${a.foraDoPedido} de ${a.cortes} cortes fora${a.sobPedido ? '; dentro do pedido' : '; FORA DO PEDIDO'}`);
-  const semMedida = a.porCorte.filter((c) => c.raioMm === null);
+  const semMedida = a.porCorte.filter((c) => c.raioMm === null && c.natureza !== 'plana');
+  if (a.semDobra) linhas.push(`  ${a.semDobra} corte(s) sem dobra (menos de 2 graus): sem raio que se leia, fora da conta do pedido`);
   if (semMedida.length) linhas.push(`  sem medida: ${semMedida.length} (${[...new Set(semMedida.map((c) => c.motivo ?? c.natureza))].join('; ')})`);
   return linhas.join('\n');
 }
