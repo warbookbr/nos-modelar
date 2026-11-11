@@ -180,3 +180,9 @@ mesmo dia a pessoa deixou a condução do carrinho e o aceite da forma com a IA
 da sessão, até o fim ("não vou ter tempo para supervisionar nem aprovar então
 deixo sobre sua tutoria"). A roda sai da família `roda-pneu` no limite que ela
 aceita: cubo de 102 mm, ombro de 25,5 mm, aro sem abas e cubo com furos.
+
+## Aceite
+
+- alinhamento: aceito pela pessoa em 2026-11-11, "Pode ser o carrinho de mão sim"
+- rascunho: aceito pela pessoa em 2026-11-11, "Sim a forma esta boa"
+- delegação: pela pessoa em 2026-11-11, "deixo esse trabalho de maneira autonoma para você até o fim a partir de agora, tanto o carrinho de mão quando esse do carro, não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria"

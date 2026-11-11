@@ -12,7 +12,7 @@
  * (o corpo de baixo pela interseção dos prismas do perfil lateral, da planta e da seção, unido à cabine pela interseção do perfil lateral
  * e da seção dela) menos o mesmo sólido recuado da espessura (os perfis recuados pelo `deslocar` da `extrusao`, e o perfil lateral por
  * `recuar`, que deixa o fundo aberto). `paineisPorVaos`, do núcleo, parte essa chapa pelas LINHAS de vão, cada uma desenhada numa vista,
- * num `subtrair` só, e nomeia cada painel pelo ponto visto dele (`LINHAS` e `PAINEIS`, em `lataria`). As linhas de lado não têm alcance e
+ * num `subtrair` só, e nomeia cada painel pelo ponto visto dele (`linhasDeVao` e `sementes`, antes de `lataria`). As linhas de lado não têm alcance e
  * cortam os dois lados do carro; as de cima e as de frente têm o alcance que as limita à face delas. O arco de roda, os vãos dos faróis,
  * da grade e das lanternas e os furos dos suportes são linhas fechadas com o pedaço de dentro descartado; cada janela é uma linha
  * fechada cujo pedaço de dentro é o vidro, que por isso tem a espessura da chapa. O vão é medido ao longo da chapa: o ajudante estreita a
@@ -194,8 +194,6 @@ function casca(esp) {
 /* os contornos das janelas, das portas e dos vãos da frente e de trás (o meio do vão) */
 const G = T.vao / 2;
 const zPorta = (y) => zParaBrisa(y) - T.recuoDaColunaA;
-const PORTA_DIANTEIRA = [[T.zCapo, T.ySoleira], [T.zCapo, T.yCintura], [zPorta(T.yCintura), T.yCintura], [zPorta(T.yTopoDaPorta), T.yTopoDaPorta], [T.zPortas, T.yTopoDaPorta], [T.zPortas, T.ySoleira]];
-const PORTA_TRASEIRA = retangulo(T.zLateral, T.ySoleira, T.zPortas, T.yTopoDaPorta);
 const Q = T.quadroDaPorta;
 const VIDRO_DIANTEIRO = [[zPorta(T.janelaY0) - Q - 10, T.janelaY0], [zPorta(T.janelaY1) - Q - 10, T.janelaY1], [T.zPortas + Q, T.janelaY1], [T.zPortas + Q, T.janelaY0]];
 const VIDRO_TRASEIRO_DA_PORTA = retangulo(T.zLateral + Q, T.janelaY0, T.zPortas - Q, T.janelaY1);

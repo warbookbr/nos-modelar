@@ -120,7 +120,7 @@ superfície de carroceria, que é definição comum deles e não peça.
 2. `rodas`: quatro rodas de pneu, aro, disco e cubo, pela família
    `procedural/familias/roda-pneu/`, perfil `carro`, com o diâmetro de 728 e a
    largura de 205 passados como parâmetro (o perfil traz 632, de um 205/55
-   R16). São 16 partes.
+   R16), postas por `instanciaDeFamilia`, uma chamada por roda. São 16 partes.
 3. `soleiras`: a chapa que veste a soleira do chassi sob as portas, uma de
    cada lado.
 4. `laterais-traseiras`: de cada lado, a chapa do arco de trás, do fim da porta
@@ -256,7 +256,7 @@ A primeira versão do rascunho, que montava a chapa 23 vezes, e a comparação d
 duas estão no `ATRITOS.md`.
 
 Medido em 2026-11-11. A caixa do conjunto vai de x -986 a 986, y 0 a 1.523 e z
--2.200 a 2.198. O rascunho tem 546 passos e monta em 3 a 4 s. No modo estrito
+-2.200 a 2.198. O rascunho tem 562 passos e monta em pouco mais de 2 s. No modo estrito
 do relato de contatos nada atravessa sem estar declarado; 64 pares encostam e
 63 atravessam por desenho. `npm run vao:partes`, com os vãos declarados em cada
 par, dá o vão da face de fora entre 4,02 e 4,18 mm em todos os pares de chapa
@@ -277,3 +277,10 @@ referência, a falta no vão entre o pneu e o arco e nos cantos que as fatias d�
 
 As imagens para a pessoa estão em
 `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`.
+
+## Aceite
+
+- delegação: pela pessoa em 2026-11-11, "deixo esse trabalho de maneira autonoma para você até o fim a partir de agora, tanto o carrinho de mão quando esse do carro, não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria"
+
+As oito decisões da seção "Decisões que dependem da pessoa" ficam com a
+recomendação escrita em cada uma, tomadas por quem conduz sob essa delegação.
