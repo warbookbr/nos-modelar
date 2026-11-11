@@ -145,7 +145,7 @@ const DADOS = {
   plano: PLANO,
   orientacao: ORIENTACAO,
   alvo: { imagem: '/p/alvo/bloco-unidade-motor-composta.png', unidade: 'motor' },
-  referencias: [{ caminho: '/r/lateral.png' }, { caminho: '/r/sem-lado.png' }],
+  referencias: [{ caminho: '/r/lateral.png' }, { caminho: '/r/foto.png' }],
   modelo: [
     { arquivo: '/o/m-isometrica.png', vista: 'isometrica' }, { arquivo: '/o/m-frontal.png', vista: 'frontal' }, { arquivo: '/o/m-direita.png', vista: 'direita' },
   ],
@@ -226,7 +226,7 @@ describe('o pedido ao crítico', () => {
   it('a referência com o lado no nome diz de onde a imagem olha, e a sem lado só o caminho', () => {
     const refs = pedido.slice(pedido.indexOf('## Referências'), pedido.indexOf('## Modelo'));
     expect(refs).toContain('- lateral.png: /r/lateral.png (o olho da imagem: olha de -x e vê o lado esquerdo');
-    expect(refs).toContain('- sem-lado.png: /r/sem-lado.png\n');
+    expect(refs).toContain('- foto.png: /r/foto.png\n');
     expect(refs).toContain('A nota não é contra elas');
   });
 
@@ -440,6 +440,7 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     const pasta = join(base, 'rodada');
     const bancada = bancadaFalsa(base, PECA);
     const pedidosDeEtapas = [];
+    const pedidosDeCortes = [];
     const { esbocoDeclarado } = await import('./forma-do-esboco.mjs');
     const declarado = await esbocoDeclarado(PECA);
     const ids = Object.values(declarado.ligadas).flatMap((v) => (Array.isArray(v) ? v : v.formas));
@@ -449,13 +450,21 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
         olharBancada: bancada.fazer,
         sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
         olharEtapas: async (arquivo, opcoes) => { pedidosDeEtapas.push({ arquivo, opcoes }); return olharEtapas(arquivo, opcoes); },
+        /* os cortes resolvem a montagem inteira; aqui um gravador diz a quem foram pedidos */
+        cortesDosEncaixes: async (pedido) => {
+          pedidosDeCortes.push(pedido);
+          const arquivo = join(pedido.pasta, `corte-${pedido.montagem.instancia}-fuselagem.png`);
+          writeFileSync(arquivo, 'corte');
+          return { cortes: [{ arquivo, vizinha: 'fuselagem', origens: ['posição motorNaFuselagem'], folgaMm: 0.5, folgaNoCorteMm: 0.5, cruzam: false, plano: 'x = 1,0 mm, visto de +x (direita da imagem -z, cima +y)', declarado: false }], aviso: null };
+        },
+        rodadasAnteriores: () => [],
       },
     });
-    return { pasta, resultado, pedidosDeEtapas, ids };
+    return { pasta, resultado, pedidosDeEtapas, pedidosDeCortes, ids };
   }
 
   it('pede as vistas montadas com o quadro na instância, na pasta da rodada, e põe no pedido o que o enquadramento diz', async () => {
-    const { pasta, resultado, pedidosDeEtapas } = await montar(async (arquivo, opcoes) => {
+    const { pasta, resultado, pedidosDeEtapas, pedidosDeCortes } = await montar(async (arquivo, opcoes) => {
       const arquivos = opcoes.vistas.map((vista) => { const a = join(opcoes.saida, `etapas-aviao-${vista}-orto-foco-motor.png`); writeFileSync(a, vista); return a; });
       return { construidas: ['fuselagem', 'motor'], arquivos, enquadramentos: opcoes.vistas.map((vista) => ({ vista, largura: 0.61, altura: 0.833, cortado: false })), foco: ['motor'] };
     });
@@ -468,6 +477,13 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     expect(montado).toContain('com a peça `motor` no centro do quadro');
     for (const vista of VISTAS_MONTADAS) expect(montado).toContain(`- ${vista}: ${join(pasta, `etapas-aviao-${vista}-orto-foco-motor.png`)}`);
     expect(resultado.montada.instancia).toBe('motor');
+    /* os cortes nos encaixes são pedidos para a instância, na pasta da rodada, e o pedido os lista depois do montado */
+    expect(pedidosDeCortes).toHaveLength(1);
+    expect(pedidosDeCortes[0]).toMatchObject({ pasta, montagem: { instancia: 'motor' }, cortesDeclarados: [] });
+    expect(titulos(pedido)).toContain('Encaixes em corte');
+    expect(titulos(pedido).indexOf('Encaixes em corte')).toBe(titulos(pedido).indexOf('Montado') + 1);
+    expect(pedido).toContain(`- com \`fuselagem\` (posição motorNaFuselagem): folga de 0,50 mm no corte, 0,50 mm entre as malhas; plano x = 1,0 mm, visto de +x (direita da imagem -z, cima +y): ${join(pasta, 'corte-motor-fuselagem.png')}`);
+    expect(resultado.encaixes).toHaveLength(1);
   }, 60_000);
 
   it('a unidade do alvo é a das formas ligadas, e o alvo é a composta guardada dela', async () => {
@@ -512,5 +528,241 @@ describe('partes novas no pedido', () => {
     expect(novasDeclaradas({ REFINA: { novas: { casulo: 'a pessoa pediu o casulo da referência' } } }))
       .toEqual([{ parte: 'casulo', texto: 'parte nova, que o alvo não tem; motivo: a pessoa pediu o casulo da referência' }]);
     expect(novasDeclaradas({ REFINA: {} })).toEqual([]);
+  });
+});
+
+/* ---------- a referência que vale para cada vista ---------- */
+
+describe('a referência que vale para cada vista do modelo', () => {
+  const VISTAS = ['isometrica', 'frontal', 'direita', 'esquerda', 'traseira', 'superior'];
+  const modelo = VISTAS.map((vista) => ({ arquivo: `/o/m-${vista}.png`, vista }));
+  const referencias = [{ caminho: '/r/frente.ia.png' }, { caminho: '/r/tras.ia.png' }, { caminho: '/r/cima.ia.png' }];
+  const trecho = (pedido) => pedido.slice(pedido.indexOf('A referência que vale para cada vista'), pedido.indexOf('## Modelo'));
+
+  it('o lado de uma referência sai das palavras do nome, e nome com dois lados ou nenhum não diz', async () => {
+    const { ladoDoNome } = await import('./vistas-para-critica.mjs');
+    expect(['frente.ia.png', 'carcaca-tras.ia.png', 'carcaca-lado.ia.png', 'cima.ia.png', 'Vista_Lateral.png', 'topo.jpg'].map(ladoDoNome))
+      .toEqual(['frontal', 'traseira', 'lateral', 'superior', 'lateral', 'superior']);
+    expect(['maquete.png', 'frente-e-tras.png', 'bilateral.png'].map(ladoDoNome)).toEqual([null, null, null]);
+  });
+
+  it('cada vista diz a referência do mesmo lado, a do lado oposto só para o contorno, e a vista de lado sem referência de lado não se compara com as de frente e de trás', () => {
+    const texto = trecho(montarPedido({ peca: 'x/y', referencias, modelo }));
+    expect(texto).toContain('Compare cada vista só com a referência que olha do mesmo lado');
+    expect(texto).toContain('- frontal: compare com `frente.ia.png`; `tras.ia.png` olha do lado oposto e vale só para o contorno, espelhado');
+    expect(texto).toContain('- traseira: compare com `tras.ia.png`; `frente.ia.png` olha do lado oposto');
+    expect(texto).toContain('- superior: compare com `cima.ia.png`.');
+    expect(texto).toContain('- direita: nenhuma referência olha deste lado; não compare esta vista com as referências de outro lado.');
+    expect(texto).toContain('- isometrica: nenhuma referência olha deste lado; use esta vista para a forma em volume');
+  });
+
+  it('a referência de lado vale para a vista de lado, e a orientação do esboço põe a de frente na vista que olha a frente do objeto', () => {
+    const texto = trecho(montarPedido({ peca: 'x/y', orientacao: ORIENTACAO, referencias: [...referencias, { caminho: '/r/lado.png' }], modelo }));
+    expect(texto).toContain('- esquerda: compare com `lado.png`.');
+    expect(texto).toContain('- direita: `lado.png` olha do lado oposto');
+    /* a frente do objeto em -z: a foto de frente é a da vista traseira da bancada */
+    expect(texto).toContain('- traseira: compare com `frente.ia.png`');
+  });
+
+  it('o lado declarado vale mais que o nome', () => {
+    const texto = trecho(montarPedido({ peca: 'x/y', referencias: [{ caminho: '/r/foto-1.png', lado: 'direita' }], modelo }));
+    expect(texto).toContain('- direita: compare com `foto-1.png`.');
+    expect(montarPedido({ peca: 'x/y', referencias: [{ caminho: '/r/foto-1.png', lado: 'direita' }], modelo })).toContain('foto-1.png: /r/foto-1.png (o olho da imagem: olha de +x');
+  });
+
+  it('com contornos em mm de um lado, o pedido diz que a medida daquele lado vem deles', () => {
+    const contornos = [{ arquivo: '/r/lateral.contornos.json', lado: 'lateral', deImagem: null }];
+    const texto = trecho(montarPedido({ peca: 'x/y', referencias, contornos, modelo }));
+    expect(texto).toContain('- direita: nenhuma imagem do pacote olha deste lado, e a referência dele são os contornos em mm de `lateral.contornos.json`, tirados de uma imagem deste lado que não vai no pacote: a medida deste lado vem deles, e não da proporção de uma imagem; não compare esta vista com as imagens de outro lado.');
+    const comImagem = trecho(montarPedido({
+      peca: 'x/y', referencias: [{ caminho: '/r/carcaca-lado.ia.png' }], contornos: [{ arquivo: '/r/carcaca-lado.ia.contornos.json', lado: 'lateral', deImagem: '/r/carcaca-lado.ia.png' }], modelo,
+    }));
+    expect(comImagem).toContain('- esquerda: compare com `carcaca-lado.ia.png`; a medida deste lado vem dos contornos em mm de `carcaca-lado.ia.contornos.json`, tirados de `carcaca-lado.ia.png`, e não da proporção da imagem.');
+  });
+
+  it('os contornos são os citados, os que acompanham uma imagem citada e os sem imagem na pasta das imagens, com o lado no nome', async () => {
+    const { contornosDasReferencias } = await import('./vistas-para-critica.mjs');
+    const pasta = mkdtempSync(join(area, 'refs-'));
+    for (const nome of ['carcaca-lado.ia.png', 'carcaca-lado.ia.contornos.json', 'lateral.contornos.json', 'cima.ia.png', 'frente.ia.png', 'frente.ia.contornos.json', 'maquete.contornos.json']) writeFileSync(join(pasta, nome), '{}');
+    const outra = mkdtempSync(join(area, 'citada-'));
+    writeFileSync(join(outra, 'topo.contornos.json'), '{}');
+    const achados = contornosDasReferencias({ imagens: [join(pasta, 'carcaca-lado.ia.png'), join(pasta, 'cima.ia.png')], citadas: [join(outra, 'topo.contornos.json')] });
+    expect(achados).toEqual([
+      { arquivo: join(outra, 'topo.contornos.json'), lado: 'superior', deImagem: null },
+      { arquivo: join(pasta, 'carcaca-lado.ia.contornos.json'), lado: 'lateral', deImagem: join(pasta, 'carcaca-lado.ia.png') },
+      { arquivo: join(pasta, 'lateral.contornos.json'), lado: 'lateral', deImagem: null },
+    ]);
+  });
+
+  it('CRITICA declara o lado de uma referência e o plano de um corte, e recusa o que não entende', async () => {
+    const { lerCritica } = await import('./vistas-para-critica.mjs');
+    expect(lerCritica(undefined)).toEqual({ referencias: {}, cortes: [] });
+    const corte = { vizinha: 'carcaca', ponto: [0, 400, 50], normal: [1, 0, 0], motivo: 'o plano da chapa do chassi' };
+    expect(lerCritica({ referencias: { 'foto.png': 'lateral' }, cortes: [corte] })).toEqual({ referencias: { 'foto.png': 'lateral' }, cortes: [corte] });
+    expect(() => lerCritica({ referencias: { 'foto.png': 'de lado' } })).toThrow(/lado 'de lado' desconhecido/);
+    expect(() => lerCritica({ cortes: [{ ...corte, normal: [0, 0, 0] }] })).toThrow(/normal' não nula/);
+    expect(() => lerCritica({ cortes: [{ ...corte, motivo: 'x' }] })).toThrow(/motivo/);
+    expect(() => lerCritica({ outra: 1 })).toThrow(/campo desconhecido 'outra'/);
+  });
+});
+
+/* ---------- os pontos que rodadas anteriores já atribuíram ---------- */
+
+describe('os pontos já atribuídos em rodadas anteriores', () => {
+  const RODADAS = [
+    { numero: 2, atrito: [
+      'rodada 2, cubo liso sem porca: atribuido ao plano; o PLANO promete flange e tampa',
+      'o relato do modelador desta rodada veio em prosa, e a rodada foi montada a mao',
+    ] },
+    { numero: 1, atrito: [
+      'rodada 1, assento curto e deslocado: a junta medida passa; atribuido a ferramenta, a vista montada nao mostra o entalhe',
+      'rodada 1, contorno em 48 lados: atribuido ao modelador, vai a rodada 2',
+      'rodada 1, pino ausente no nicho: atribuído ao crítico',
+      'familia roda-pneu limita o ombro a 9 mm',
+      { nao: 'texto' },
+    ] },
+  ];
+
+  it('levam só as frases atribuídas ao plano, à ferramenta ou ao crítico, na ordem das rodadas, e nada do que o modelador mudou', async () => {
+    const { pontosJaAtribuidos } = await import('./vistas-para-critica.mjs');
+    expect(pontosJaAtribuidos(RODADAS)).toEqual([
+      { numero: 1, atribuicoes: ['ferramenta'], texto: RODADAS[1].atrito[0] },
+      { numero: 1, atribuicoes: ['critico'], texto: RODADAS[1].atrito[2] },
+      { numero: 2, atribuicoes: ['plano'], texto: RODADAS[0].atrito[0] },
+    ]);
+    expect(pontosJaAtribuidos([])).toEqual([]);
+  });
+
+  it('o pedido os lista numa seção curta antes do veredito, pede evidência nova para repetir e não traz a frase do modelador', async () => {
+    const { pontosJaAtribuidos } = await import('./vistas-para-critica.mjs');
+    const pedido = montarPedido({ ...DADOS, anteriores: pontosJaAtribuidos(RODADAS) });
+    expect(titulos(pedido).slice(-2)).toEqual(['Pontos já atribuídos', 'Veredito']);
+    const secao = pedido.slice(pedido.indexOf('## Pontos já atribuídos'), pedido.indexOf('## Veredito'));
+    expect(secao).toContain('Não os repita como defeito sem evidência nova numa imagem deste pacote');
+    expect(secao).toContain('- rodada 1, atribuído à ferramenta: assento curto e deslocado: a junta medida passa; atribuido a ferramenta, a vista montada nao mostra o entalhe');
+    expect(secao).toContain('- rodada 1, atribuído ao crítico: pino ausente no nicho: atribuído ao crítico');
+    expect(secao).toContain('- rodada 2, atribuído ao plano: cubo liso sem porca');
+    expect(secao).not.toMatch(/48 lados|modelador|ombro/);
+    expect(montarPedido(DADOS)).not.toContain('## Pontos já atribuídos');
+  });
+
+  it('os registros saem da pasta das rodadas, e o ilegível fica fora', async () => {
+    const { rodadasDaPasta } = await import('./vistas-para-critica.mjs');
+    const pasta = mkdtempSync(join(area, 'rodadas-'));
+    writeFileSync(join(pasta, 'rodada-01.json'), JSON.stringify({ numero: 1, atrito: ['a'] }));
+    writeFileSync(join(pasta, 'rodada-02.json'), '{ quebrado');
+    writeFileSync(join(pasta, 'receita-01.js'), '');
+    expect(rodadasDaPasta(pasta)).toEqual([{ numero: 1, atrito: ['a'] }]);
+    expect(rodadasDaPasta(join(pasta, 'nao-existe'))).toEqual([]);
+  });
+});
+
+/* ---------- a vista em corte nos encaixes ---------- */
+
+/* Uma caixa fechada como peça neutra, em metro: seis faces quadradas, com as normais para fora. */
+function caixaNeutra([x0, y0, z0], [x1, y1, z1], parte = 'corpo') {
+  const v = [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0], [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]];
+  const faces = [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [2, 3, 7, 6], [1, 2, 6, 5], [0, 4, 7, 3]];
+  return { V: new Map(v.map((p, i) => [i, p])), F: new Map(faces.map((vs, i) => [i, { id: i, vs, parte }])) };
+}
+const POSE = { rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [0, 0, 0] };
+const folha = (id, neutro, pose = POSE) => ({ caminho: [id], neutro, pose });
+
+describe('a vista em corte nos encaixes', () => {
+  /* a peça, um bloco de 100 mm, e uma tampa 0,5 mm acima dela; uma viga ao lado, a 40 mm, longe do alcance; um pino que entra 2 mm */
+  const bloco = caixaNeutra([0, 0, 0], [0.1, 0.1, 0.1]);
+  const tampa = caixaNeutra([0, 0.1005, 0], [0.1, 0.12, 0.1]);
+  const viga = caixaNeutra([0.14, 0, 0], [0.2, 0.1, 0.1]);
+  const pino = caixaNeutra([0.04, -0.03, 0.04], [0.06, 0.002, 0.06]);
+
+  it('os dois pontos mais próximos dão a folga, e o plano contém a direção entre eles no plano de eixo mais perto', async () => {
+    const { maisPerto, planoDoEncaixe, triangulosNoMundo, textoDoPlano } = await import('./vistas-para-critica.mjs');
+    const perto = maisPerto(triangulosNoMundo(bloco, POSE), triangulosNoMundo(tampa, POSE));
+    expect(perto.folgaMm).toBeCloseTo(0.5, 6);
+    expect(perto.naPeca[1]).toBeCloseTo(100, 6);
+    expect(perto.naVizinha[1]).toBeCloseTo(100.5, 6);
+    const plano = planoDoEncaixe(perto);
+    expect(plano.eixo).toBe('x');
+    expect(plano.ponto[1]).toBeCloseTo(100.25, 6);
+    expect(textoDoPlano(plano)).toMatch(/^x = \d+,\d mm, visto de \+x \(direita da imagem -z, cima \+y\)$/);
+    expect(maisPerto(triangulosNoMundo(bloco, POSE), triangulosNoMundo(viga, POSE))).toBeNull();
+  });
+
+  it('a direção oblíqua dá um plano oblíquo que a contém', async () => {
+    const { planoDoEncaixe } = await import('./vistas-para-critica.mjs');
+    const plano = planoDoEncaixe({ folgaMm: 1, naPeca: [0, 0, 0], naVizinha: [Math.SQRT1_2, Math.SQRT1_2, 0], normal: [0, 1, 0] });
+    /* z é o eixo mais perpendicular à direção, e o plano de normal z já a contém */
+    expect(plano.eixo).toBe('z');
+    const torto = planoDoEncaixe({ folgaMm: 1, naPeca: [0, 0, 0], naVizinha: [0.6, 0.6, 0.529], normal: [0, 1, 0] });
+    expect(torto.eixo).toBeNull();
+    const d = [0.6, 0.6, 0.529];
+    expect(Math.abs(torto.normal.reduce((s, c, i) => s + c * d[i], 0))).toBeLessThan(1e-9);
+  });
+
+  it('o corte dá a folga entre as duas seções, e a peça que entra na outra sai como cruzamento', async () => {
+    const { planoDoEncaixe, planoQueCorta, maisPerto, triangulosNoMundo } = await import('./vistas-para-critica.mjs');
+    const A = triangulosNoMundo(bloco, POSE);
+    const T = triangulosNoMundo(tampa, POSE);
+    const { folga, daPeca, daVizinha } = planoQueCorta(planoDoEncaixe(maisPerto(A, T)), A, T, 50);
+    expect(daPeca.length).toBeGreaterThan(0);
+    expect(daVizinha.length).toBeGreaterThan(0);
+    expect(folga.cruzam).toBe(false);
+    expect(folga.folgaMm).toBeCloseTo(0.5, 6);
+    /* o pino fura a face de baixo do bloco: a aresta dele cruza a face, e a folga é zero */
+    const P = triangulosNoMundo(pino, POSE);
+    const perto = maisPerto(A, P);
+    expect(perto.folgaMm).toBe(0);
+    expect(planoQueCorta(planoDoEncaixe(perto), A, P, 50).folga).toMatchObject({ cruzam: true, folgaMm: 0 });
+  });
+
+  it('os encaixes são as vizinhas declaradas ou ao alcance, os de menor folga primeiro e no máximo quatro, com o plano declarado quando há', async () => {
+    const { encaixesDaPeca, vizinhasDeclaradas } = await import('./vistas-para-critica.mjs');
+    const dado = {
+      relacoes: [{ id: 'pinoNoBloco', tipo: 'encaixaCilindrico', referencia: { caminho: ['bloco'] }, movel: { caminho: ['pino'] } }],
+      posicoes: [{ id: 'tampaNoBloco', instancia: 'tampa', em: { instancia: 'bloco' } }, { id: 'vigaNoChao', instancia: 'viga', em: { instancia: 'chao' } }],
+      vinculos: [{ id: 'larguraDaTampa', alvo: { instancia: 'tampa' }, de: { instancia: 'bloco' } }],
+      auditoriaIntersecoes: { expectativas: [{ id: 'pinoEntra', a: { caminho: ['pino'] }, b: { caminho: ['bloco'] } }] },
+    };
+    const declaradas = vizinhasDeclaradas(dado, 'bloco');
+    expect([...declaradas.entries()]).toEqual([
+      ['pino', ['relação pinoNoBloco (encaixaCilindrico)', 'contato declarado pinoEntra']],
+      ['tampa', ['posição tampaNoBloco', 'vínculo larguraDaTampa']],
+    ]);
+    const folhas = [folha('bloco', bloco), folha('tampa', tampa), folha('viga', viga), folha('pino', pino), folha('lado', caixaNeutra([0.1 + 0.003, 0, 0], [0.13, 0.05, 0.05]))];
+    const encaixes = encaixesDaPeca({ folhas, instancia: 'bloco', declaradas });
+    expect(encaixes.map((e) => [e.vizinha, Number(e.folgaMm.toFixed(3))])).toEqual([['pino', 0], ['tampa', 0.5], ['lado', 3]]);
+    expect(encaixes[2].origens).toEqual(['a menos de 25 mm, sem declaração na montagem']);
+    expect(encaixesDaPeca({ folhas, instancia: 'bloco', declaradas, limite: 2 })).toHaveLength(2);
+    /* o plano declarado manda: um corte em z pela tampa */
+    const [declarado] = encaixesDaPeca({ folhas: folhas.slice(0, 2), instancia: 'bloco', cortesDeclarados: [{ vizinha: 'tampa', ponto: [50, 100, 50], normal: [0, 0, 1], motivo: 'o plano do meio da tampa' }] });
+    expect(declarado).toMatchObject({ vizinha: 'tampa', declarado: true, plano: { eixo: 'z' } });
+    expect(declarado.folga.folgaMm).toBeCloseTo(0.5, 6);
+  });
+
+  it('a imagem do corte é um PNG com a peça e a vizinha em cores diferentes', async () => {
+    const { encaixesDaPeca, imagemDoCorte, COR_DA_PECA, COR_DA_VIZINHA } = await import('./vistas-para-critica.mjs');
+    const { dePng } = await import('./leitura-por-regioes.mjs');
+    const [e] = encaixesDaPeca({ folhas: [folha('bloco', bloco), folha('tampa', tampa)], instancia: 'bloco' });
+    const png = imagemDoCorte({ peca: 'bloco', vizinha: 'tampa', plano: e.plano, daPeca: e.daPeca, daVizinha: e.daVizinha, folga: e.folga, folgaMm: e.folgaMm });
+    const im = dePng(png);
+    const conta = (cor) => { let n = 0; for (let i = 0; i < im.dados.length; i += 3) if (im.dados[i] === cor[0] && im.dados[i + 1] === cor[1] && im.dados[i + 2] === cor[2]) n++; return n; };
+    expect(conta(COR_DA_PECA.fundo)).toBeGreaterThan(10_000);
+    expect(conta(COR_DA_VIZINHA.fundo)).toBeGreaterThan(10_000);
+    /* o mesmo corte dá os mesmos bytes */
+    expect(imagemDoCorte({ peca: 'bloco', vizinha: 'tampa', plano: e.plano, daPeca: e.daPeca, daVizinha: e.daVizinha, folga: e.folga, folgaMm: e.folgaMm })).toEqual(png);
+  });
+
+  it('o pedido lista cada corte com a vizinha, de onde veio a declaração, a folga e o plano, e diz o que a imagem mostra', () => {
+    const encaixes = [
+      { arquivo: '/p/corte-bloco-tampa.png', vizinha: 'tampa', origens: ['posição tampaNoBloco'], folgaMm: 0.354, folgaNoCorteMm: 0.354, cruzam: false, plano: 'x = 50,0 mm, visto de +x (direita da imagem -z, cima +y)', declarado: false },
+      { arquivo: '/p/corte-bloco-pino.png', vizinha: 'pino', origens: ['contato declarado pinoEntra'], folgaMm: 0, folgaNoCorteMm: 0, cruzam: true, plano: 'z = 50,0 mm, visto de +z (direita da imagem +x, cima +y)', declarado: true },
+    ];
+    const pedido = montarPedido({ ...DADOS, encaixes });
+    expect(titulos(pedido)).toEqual(['Objeto', 'Alvo', 'Referências', 'Modelo', 'Montado', 'Encaixes em corte', 'Sobreposição', 'Partes', 'Critérios de reprovação', 'Perguntas', 'Veredito']);
+    const secao = pedido.slice(pedido.indexOf('## Encaixes em corte'), pedido.indexOf('## Sobreposição'));
+    expect(secao).toContain('As vistas montadas não decidem a profundidade de um encaixe');
+    expect(secao).toContain('a peça em laranja, a vizinha em azul, roxo onde as duas se cruzam');
+    expect(secao).toContain('- com `tampa` (posição tampaNoBloco): folga de 0,35 mm no corte, 0,35 mm entre as malhas; plano x = 50,0 mm, visto de +x (direita da imagem -z, cima +y): /p/corte-bloco-tampa.png');
+    expect(secao).toContain('- com `pino` (contato declarado pinoEntra): as duas se cruzam ou se tocam no corte, 0,00 mm entre as malhas; plano z = 50,0 mm, visto de +z (direita da imagem +x, cima +y), declarado: /p/corte-bloco-pino.png');
   });
 });
