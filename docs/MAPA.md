@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1865 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1868 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -256,6 +256,10 @@
 ## docs/modelar/banco-de-provas/cadeiras-2026-10-19/
 
 - `medidas.md` — Cadeira: regras construtivas e medida de proporção contra o alvo
+
+## docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/
+
+- `ATRITOS.md` — Carrinho de mão: atritos do alinhamento e do rascunho (2026-11-11)
 
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
@@ -1425,6 +1429,14 @@
 ## procedural/pecas/carenagem-de-prova/referencias/
 
 - `alvo.md` — Alvo da carenagem de prova
+
+## procedural/pecas/carrinho-de-mao/
+
+- `ALINHAMENTO.md` — Carrinho de mão: alinhamento
+
+## procedural/pecas/carrinho-de-mao/referencias/
+
+- `carrinho-de-mao.esboco.mjs` — carrinho-de-mao.esboco.mjs: o rascunho do carrinho de mão de obra inteiro, de uma roda, pelas referências da pessoa (2026-11-11): o chassi num tubo só dobrad…
 
 ## procedural/pecas/carro-corrida/
 
