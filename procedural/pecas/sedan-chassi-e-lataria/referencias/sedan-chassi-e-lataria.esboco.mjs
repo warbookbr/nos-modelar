@@ -212,6 +212,21 @@ function yDoTopo(z) {
   for (let i = 0; i + 1 < topo.length; i += 1) { const [z0, y0] = topo[i]; const [z1, y1] = topo[i + 1]; if (z <= z0 && z >= z1) return y0 + ((y1 - y0) * (z0 - z)) / (z0 - z1); }
   throw new Error(`yDoTopo: z ${z} fica fora do corpo`);
 }
+/** A meia largura da planta em z. */
+function xDaPlanta(z) {
+  for (let i = 0; i + 1 < T.planta.length; i += 1) { const [z0, x0] = T.planta[i]; const [z1, x1] = T.planta[i + 1]; if (z <= z0 && z >= z1) return x0 + ((x1 - x0) * (z0 - z)) / (z0 - z1); }
+  throw new Error(`xDaPlanta: z ${z} fica fora do corpo`);
+}
+/** A linha de lado que desce a parede do corpo em z. A parede tem três faces, a de cima, a faixa inclinada do ombro e a da planta, e a
+ *  linha ganha um ponto em cada uma junto das duas dobras: a lâmina só se parte na dobra que duas estações vizinhas enxergam, e a faixa
+ *  do ombro, mais estreita que a amostragem, passava sem estação (ATRITOS, terceira etapa). */
+function descendoAParede(z, yInicio, yFim) {
+  const [xDeCima, yDaDobra] = T.secao[2]; const [xDeBaixo, yDeBaixo] = T.secao[1];
+  const x = Math.min(xDaPlanta(z), xDeBaixo);
+  if (x <= xDeCima) return [[z, yInicio], [z, yFim]];
+  const yDaFaixa = yDaDobra - ((x - xDeCima) * (yDaDobra - yDeBaixo)) / (xDeBaixo - xDeCima);
+  return [[z, yInicio], [z, yDaDobra + 1], [z, (yDaDobra + yDaFaixa) / 2], [z, yDaFaixa - 1], [z, yFim]];
+}
 const circulo = (zc, R, n = 48) => arco(zc, T.roda.raio, R, 0, 2 * Math.PI * (1 - 1 / n), n - 1);
 
 /* As linhas de vão, cada uma o meio do vão na vista em que foi desenhada: 'x' é a vista de lado ([z, y]), 'y' a de cima ([x, z]) e 'z'
@@ -228,7 +243,7 @@ function linhasDeVao() {
   const PONTA = 1;
   const xT = T.secao.at(-1)[0] - PONTA;
   const deCima = (nome, z) => ({ nome, eixo: 'y', pontos: [[-xT, z], [xT, z]], ...DE_CIMA });
-  const deLado = (nome, z) => dosDoisLados({ nome, eixo: 'x', pontos: [[z, yDoTopo(z) - PONTA], [z, ABAIXO]] });
+  const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => dosDoisLados({ nome, eixo: 'x', pontos: descendoAParede(z, yInicio, ABAIXO) });
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
   const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [
@@ -255,7 +270,7 @@ function linhasDeVao() {
   /* de lado, na parede de cada lado: as paredes da frente, de trás, do para-lama e da porta traseira, a soleira e as janelas */
   L.push(
     ...deLado('frenteDaParede', T.zFrente), ...deLado('trasDaParede', T.zTras), ...deLado('fimDoParaLama', T.zCapo),
-    ...dosDoisLados({ nome: 'fimDaPortaTraseira', eixo: 'x', pontos: [[T.zLateral, yC], [T.zLateral, ABAIXO]] }),
+    ...deLado('fimDaPortaTraseira', T.zLateral, yC),
     ...dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }),
     ...dosDoisLados(fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO)),
     ...dosDoisLados(fechada('janelaTraseira', 'x', VIDRO_TRASEIRO_DA_PORTA)),

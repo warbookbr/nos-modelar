@@ -6,7 +6,7 @@
    e os avisos pelo nome. O corte é perpendicular ao vinco, sobre a malha subdividida. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
-import { NIVEIS_RECOMENDADOS, anguloDaDobra, apoioDoVinco, inserirApoiosNosVincos, perfilDoApoio, raioDoFilete, raioPeloApoio, tabelaDeCalibragem } from './apoio-do-vinco.js';
+import { NIVEIS_RECOMENDADOS, anguloDaDobra, apoioDoVinco, perfilDoApoio, raioDoFilete, raioPeloApoio, tabelaDeCalibragem } from './apoio-do-vinco.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
 // @ts-expect-error — núcleo em JavaScript.
