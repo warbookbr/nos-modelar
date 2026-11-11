@@ -45,7 +45,7 @@
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve, sep } from 'node:path';
+import { basename, dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LIMITE_DE_RODADAS, acaoDaReceita, defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
@@ -297,10 +297,14 @@ const PASTAS_FORA_DO_REPOSITORIO = ['tools/bancadas/out/', 'tmp/', '.claude/work
    `tools/bancadas/out/`, e outro o da prancha dentro da pasta de trabalho de um agente; os dois entraram na rodada gravada, e a
    conferência de referências do CI, que roda sem essas pastas, reprovou. O alvo que é caminho absoluto vira caminho relativo à raiz
    (o de uma pasta de trabalho de agente, ao arquivo de mesmo nome no repositório), e o que cai fora do repositório ou não existe é
-   recusado; o texto que não é caminho, como "sem alvo: ...", passa como está. */
+   recusado; o texto que não é caminho, como "sem alvo: ...", passa como está. A imagem que existe fora do repositório é a
+   referência externa de `vistas:critica --referencia` e fica só com o nome. */
 export function alvoDoRepositorio(alvo, raiz = RAIZ_DO_REPOSITORIO) {
   if (typeof alvo !== 'string' || !alvo.startsWith('/')) return alvo;
   let relativo = alvo.startsWith(raiz + sep) ? alvo.slice(raiz.length + 1) : null;
+  /* a referência externa (`vistas:critica --referencia`), que a regra do repositório manda ficar fora dele, entra só pelo nome:
+     o caminho de fora não é gravado, e a rodada diz que o alvo existiu e qual foi */
+  if (!relativo && /\.(png|jpe?g|webp)$/i.test(alvo) && existsSync(alvo)) return `referência externa, fora do repositório: ${basename(alvo)}`;
   if (relativo?.startsWith('.claude/worktrees/')) relativo = relativo.split('/').slice(3).join('/');
   if (!relativo || PASTAS_FORA_DO_REPOSITORIO.some((p) => relativo.startsWith(p)) || !existsSync(join(raiz, relativo))) {
     throw new Error(`o alvo do veredito (${alvo}) não é um arquivo do repositório; a rodada gravada não pode citar caminho que o CI não tem. `

@@ -410,6 +410,8 @@ describe('a impressão da forma e os afastamentos declarados', () => {
 
 describe('o alvo do veredito fica no repositório', async () => {
   const { alvoDoRepositorio } = await import('./rodada-de-modelagem.mjs');
+  const { mkdtempSync, writeFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
   const raiz = '/repo';
   it('passa texto que não é caminho e torna relativo o caminho absoluto, inclusive o de pasta de trabalho de agente', () => {
     expect(alvoDoRepositorio('sem alvo: o plano não cita imagem', raiz)).toBe('sem alvo: o plano não cita imagem');
@@ -417,6 +419,10 @@ describe('o alvo do veredito fica no repositório', async () => {
   it('recusa o alvo em pasta que o CI não tem', () => {
     expect(() => alvoDoRepositorio('/repo/tools/bancadas/out/critica-x/vista.png', raiz)).toThrow(/não é um arquivo do repositório/);
     expect(() => alvoDoRepositorio('/fora/imagem.png', raiz)).toThrow(/não é um arquivo do repositório/);
+    /* a imagem que existe fora do repositório é a referência externa, e só o nome dela é gravado */
+    const fora = mkdtempSync(`${tmpdir()}/alvo-externo-`);
+    writeFileSync(`${fora}/lado.png`, 'x');
+    expect(alvoDoRepositorio(`${fora}/lado.png`, raiz)).toBe('referência externa, fora do repositório: lado.png');
   });
 });
 
