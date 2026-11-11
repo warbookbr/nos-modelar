@@ -47,7 +47,7 @@ export const TABELA = {
       [313, -650], [306, -700], [290, -740], [262, -775], [225, -795], [180, -805], [0, -810]],
     /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço. */
     estacoes: [330, 380, 430, 462],
-    pontos: 33, pontosDoLado: 25,
+    pontos: 41, pontosDoLado: 15,
     /* CHAPA E BORDA (linha "chapa e borda"): chapa de 1,5 mm; borda virada de Ø 16, 5 mm para fora da boca e 2 abaixo dela. */
     espessura: 1.5,
     borda: { raio: 8, paraFora: 5, abaixo: 2, lados: 16 },

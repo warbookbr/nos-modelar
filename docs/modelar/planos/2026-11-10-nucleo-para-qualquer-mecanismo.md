@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`
+**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`, `procedural/nucleo/paineis-por-vaos.js`, `procedural/nucleo/paineis-por-vaos.test.ts`, `tools/modelar/vao-entre-partes.mjs`, `tools/modelar/vao-entre-partes.test.mjs`
 
 **Responsável:** a IA da sessão que o ativar conduz e mede; a pessoa decide a
 ordem das fatias e julga forma por imagem.
@@ -137,6 +137,23 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    carrinho a seção ia a 26,8 mm na subida da manopla e fica em 32,0; a caçamba
    sai com a mesma malha e a chapa de 1,5 mm, sem apagar face à mão. A guarda do
    acervo não mudou em nenhuma das 83 peças.
+4b. **Lataria em painéis, neste plano, aberta em 2026-11-11 pelo diagnóstico do sedã.**
+   O rascunho do sedã saiu em 35 minutos com 83 partes e os quinze painéis de
+   uma casca só, com vão de 4,00 mm, mas a casca foi montada 23 vezes (1.171
+   passos), o vão cresce a 5,07 mm no para-brisa inclinado, e o vão foi medido
+   por um script fora do repositório
+   ([`ATRITOS.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/ATRITOS.md)).
+   Entram, nesta ordem: o ajudante que parte uma chapa em painéis por linhas de
+   vão desenhadas numa vista, com a largura do vão medida ao longo da chapa e
+   cada painel nomeado, sem remontar a chapa; o comando que mede o vão e o
+   degrau entre partes vizinhas e lista a parte solta; a instância de família
+   num esboço ou numa receita por uma chamada; a sobra e a falta na saída da
+   conferência de vistas; e o guia de veículo em chassi e lataria, com o lugar
+   do módulo comum do objeto no fluxo. Saída: o rascunho do sedã refeito com o
+   ajudante, em menos de um terço dos passos, com o vão entre 4,0 e 4,2 mm em
+   todos os pares, o para-brisa e o vidro traseiro incluídos, medido pelo
+   comando novo. Ficam fora, para a fatia 4: a chapa lisa de carroceria inteira
+   com qualidade de superfície e a borda de chapa com aba.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.
