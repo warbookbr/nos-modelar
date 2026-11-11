@@ -104,18 +104,27 @@ export function topoY(x, z) {
 }
 
 /* os painéis: o ponto visto de cada um, a cor e os pares de vizinhos que `npm run vao:partes` confere */
-export const PAINEIS = [
-  { nome: 'capo', eixo: 'y', ponto: [300, 1300] },
+/* ciclo 5: o carro inteiro. A chapa sai das duas metades pela simetria da gaiola, e os painéis do lado esquerdo são os do direito com
+   `Esq` no lugar de `Dir`, vistos de -x */
+const esquerdo = (n) => n.replace(/Dir$/, 'Esq');
+const PAINEIS_DO_LADO = [
   { nome: 'paraLamaDir', eixo: 'x', ponto: [1850, 940], lado: '+' },
   { nome: 'portaDianteiraDir', eixo: 'x', ponto: [300, 700], lado: '+' },
   { nome: 'portaTraseiraDir', eixo: 'x', ponto: [-400, 700], lado: '+' },
   { nome: 'lateralTraseiraDir', eixo: 'x', ponto: [-1850, 940], lado: '+' },
   { nome: 'soleiraDir', eixo: 'x', ponto: [0, 445], lado: '+' },
+];
+export const PAINEIS = [
+  { nome: 'capo', eixo: 'y', ponto: [300, 1300] },
+  ...PAINEIS_DO_LADO, ...PAINEIS_DO_LADO.map((p) => ({ ...p, nome: esquerdo(p.nome), lado: '-' })),
   { nome: 'tampaDoPortaMalas', eixo: 'y', ponto: [300, -1700] },
 ];
-export const CORES = { capo: '#d9483b', paraLamaDir: '#2e86c1', portaDianteiraDir: '#27ae60', portaTraseiraDir: '#f1c40f', lateralTraseiraDir: '#c0392b', soleiraDir: '#7f8c8d', tampaDoPortaMalas: '#e08a2c', labioDianteiro: '#1b4f72', labioTraseiro: '#7b241c' };
-export const VIZINHOS = [['capo', 'paraLamaDir'], ['paraLamaDir', 'portaDianteiraDir'], ['portaDianteiraDir', 'portaTraseiraDir'], ['portaTraseiraDir', 'lateralTraseiraDir'],
+const CORES_DO_LADO = { paraLamaDir: '#2e86c1', portaDianteiraDir: '#27ae60', portaTraseiraDir: '#f1c40f', lateralTraseiraDir: '#c0392b', soleiraDir: '#7f8c8d' };
+export const CORES = { capo: '#d9483b', ...CORES_DO_LADO, ...Object.fromEntries(Object.entries(CORES_DO_LADO).map(([n, c]) => [esquerdo(n), c])), tampaDoPortaMalas: '#e08a2c', labioDianteiro: '#1b4f72', labioTraseiro: '#7b241c' };
+const VIZINHOS_DO_LADO = [['capo', 'paraLamaDir'], ['paraLamaDir', 'portaDianteiraDir'], ['portaDianteiraDir', 'portaTraseiraDir'], ['portaTraseiraDir', 'lateralTraseiraDir'],
   ['portaDianteiraDir', 'soleiraDir'], ['portaTraseiraDir', 'soleiraDir'], ['paraLamaDir', 'soleiraDir'], ['lateralTraseiraDir', 'soleiraDir'], ['tampaDoPortaMalas', 'lateralTraseiraDir']];
+export const VIZINHOS = [...VIZINHOS_DO_LADO, ...VIZINHOS_DO_LADO.map((par) => par.map(esquerdo))];
+export const LADOS = ['Dir', 'Esq'];
 
 /* ---- o andar de cima (ciclo 3) ----
  * A cabine do rascunho, com a cintura do andar de baixo como fronteira: o peitoril de cima começa 4 mm para dentro da borda da faixa

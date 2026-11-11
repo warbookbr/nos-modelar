@@ -72,7 +72,7 @@ export const PAINEL_DA_FRENTE = painel({
   colunasY: [['fundo', 430], ['meio', 545], ['sob', 625], ['faixa', 685], ['farolBaixo', fa.y[0]], ['farolAlto', fa.y[1]], ['topo', 0]],
   estacoesX: [['eixo', 0], ['g1', 95], ['g2', 190], ['gradeFim', gr.x], ['farolIni', fa.x[0]], ...[355, 405, 455, 505, 555, 605, 655, 705].map((x, k) => [`f${k + 1}`, x]), ['farolFim', fa.x[1]], ['borda', 760]],
   vaos: [{ nome: 'grade', estacoes: ['eixo', 'gradeFim'], colunas: ['farolBaixo', 'farolAlto'] }, { nome: 'farol', estacoes: ['farolIni', 'farolFim'], colunas: ['farolBaixo', 'farolAlto'] }],
-  aneis: [{ nome: 'farol', vao: 'farol', recuo: fa.recuo, voltas: fa.voltas, largura: fa.largura, raio: fa.raio, relevo: fa.relevo }],
+  aneis: [{ nome: 'farol', vao: 'farol', recuo: fa.recuo, voltas: fa.voltas, largura: fa.largura, raio: fa.raio, relevo: fa.relevo, lente: { folga: F.lente.recuo, sobra: F.lente.sobra, espessura: F.lente.espessura } }],
   /* os cantos da borda do painel e os dois cantos da grade no fim dela; sem eles a subdivisão arredonda o canto do vão no tamanho da face */
   cantos: [{ estacao: 'eixo', coluna: 'fundo' }, { estacao: 'borda', coluna: 'fundo' }, { estacao: 'eixo', coluna: 'topo' }, { estacao: 'borda', coluna: 'topo' },
     { estacao: 'gradeFim', coluna: 'farolBaixo' }, { estacao: 'gradeFim', coluna: 'farolAlto' }],

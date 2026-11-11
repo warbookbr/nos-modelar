@@ -17,7 +17,8 @@
  *
  * `HD_CONFERIR=0` tira o corte de conferência dos painéis de baixo, para iterar; `HD_CABINE=so` monta só a cabine com os vidros. */
 import { gaiolaPorEstacoes } from '../../../nucleo/gaiola-por-estacoes.js';
-import baixo from './caminho-a-gaiola-da-casca.esboco.mjs';
+import baixo, { SIMETRIA } from './caminho-a-gaiola-da-casca.esboco.mjs';
+import { espelharGaiola } from './espelho.mjs';
 import { T, C, topoY, yQuina, xCabine, yTopoDaCabine, zDoParaBrisa, zDoVidroTraseiro } from './alvo.mjs';
 
 const NIVEIS = 2;
@@ -97,7 +98,7 @@ const vincos = [
   { nome: 'topoDoVidroTraseiro', estacao: 'topoDoVidroTraseiro', de: 'centro', ate: 'quina', raio: C.raioDoTopo },
 ];
 const cantos = [['tras', 'base'], ['frente', 'base'], ['tras', 'centro'], ['frente', 'centro']].map(([estacao, coluna]) => ({ estacao, coluna }));
-export const CABINE = gaiolaPorEstacoes({ eixo: 'z', estacoes, vaos, vincos, cantos, niveis: NIVEIS, prefixo: 'cab_', virar: process.env.HD_VIRAR !== '0' });
+export const CABINE = gaiolaPorEstacoes({ eixo: 'z', estacoes, vaos, vincos, cantos, niveis: NIVEIS, prefixo: 'cab_', virar: process.env.HD_VIRAR !== '0', ...SIMETRIA });
 
 /* ---- os vidros: chapas de 4 mm, a face de fora 0,8 mm para dentro da pele, passando 12 mm da borda do vão ---- */
 /* a pele da cabine em (u, z): na lateral u é a altura y, no topo u é a meia largura x; o ponto recua pela normal dela */
@@ -129,7 +130,8 @@ function vidroDoTopo(nome, de, ate) {
     pts[3][0] = 0;
     return { nome: `s${i}`, em: mm(z), colunas: pts.map((p, k) => ({ nome: `c${k}`, em: [mm(p[0]), mm(p[1]), mm(p[2] - z)] })) };
   });
-  return gaiolaPorEstacoes({ eixo: 'z', estacoes: est, cantos: [{ estacao: est[0].nome }, { estacao: est.at(-1).nome }], prefixo: `${nome}_`, virar: process.env.HD_VIRAR_VIDRO === '1' });
+  /* o para-brisa e o vidro traseiro vão de um lado ao outro: a coluna c3 fica no eixo e a simetria faz a outra metade */
+  return gaiolaPorEstacoes({ eixo: 'z', estacoes: est, cantos: [{ estacao: est[0].nome }, { estacao: est.at(-1).nome }], prefixo: `${nome}_`, virar: process.env.HD_VIRAR_VIDRO === '1', ...SIMETRIA });
 }
 export const VIDROS = [
   ['vidroDianteiroDir', vidroLateral('vidroDianteiroDir', 'portaDianteiraTras', 'portaDianteiraFrente'), 'janelaDianteira'],
@@ -153,19 +155,31 @@ passos.push(['subdivisao', { origemId: ID_CABINE, ...comRaioEmMm(CABINE.passo), 
   ['parte', { nome: 'teto', sel: { origem: { op: 'subdivisao', id: ID_CABINE } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'subdivisao', id: ID_CABINE } }, cor: '#ec7063' }]);
 const MOLDURA = { retangulo: { largura: C.moldura.largura, profundidade: C.moldura.altura + 0.9, centro: [0, (C.moldura.altura - 0.9) / 2] } };
 const contatos = SO_CABINE ? [] : [...opBaixo.contatos];
+const vidro = (nome, passo, pontosMm) => {
+  Object.assign(topo, pontosMm);
+  const idV = id++;
+  passos.push(['subdivisao', { origemId: idV, ...passo, niveis: 1, borda: 'cantos', espessura: C.vidro.espessura }],
+    ['parte', { nome, sel: { origem: { op: 'subdivisao', id: idV } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'subdivisao', id: idV } }, cor: '#20262d' }]);
+  contatos.push({ par: [nome, 'teto'], relacao: 'atravessa', motivo: 'o vidro passa 12 mm por baixo da borda do vão e é colado na chapa: a face de fora fica 0,2 mm dentro da pele de dentro' });
+};
+export const MOLDURAS = [];
 for (const [nome, g, vao] of VIDROS) {
-  Object.assign(topo, emMm(g.pontos));
-  const idV = id++; const idM = id++; const moldura = `moldura${nome[0].toUpperCase()}${nome.slice(1)}`;
-  passos.push(['subdivisao', { origemId: idV, ...g.passo, niveis: 1, borda: 'cantos', espessura: C.vidro.espessura }],
-    ['parte', { nome, sel: { origem: { op: 'subdivisao', id: idV } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'subdivisao', id: idV } }, cor: '#20262d' }],
-    ['friso', { origemId: idM, superficie: { op: 'subdivisao', id: ID_CABINE }, linha: { nome: moldura, pontos: CABINE.bordaDoVao(vao) }, perfil: MOLDURA, refinar: 2 }],
+  const doLado = /Dir$/.test(nome);
+  vidro(nome, g.passo, emMm(g.pontos));
+  /* o vidro da porta e a vigia do lado esquerdo: a cópia espelhada da gaiola */
+  const nomeEsq = nome.replace(/Dir$/, 'Esq');
+  if (doLado && SIMETRIA.simetria) { const e = espelharGaiola({ pontosMm: emMm(g.pontos), passo: g.passo }, (n) => n.replace(/Dir_/, 'Esq_')); vidro(nomeEsq, e.passo, e.pontos); }
+  /* a moldura: na chapa com simetria o friso ganha a cópia espelhada na mesma parte (a do para-brisa e a do vidro traseiro, que tocam o
+     eixo nas duas pontas, viram uma volta só), e por isso o nome dela não leva o lado */
+  const idM = id++; const base = nome.replace(/Dir$/, ''); const moldura = `moldura${base[0].toUpperCase()}${base.slice(1)}`;
+  MOLDURAS.push(moldura);
+  passos.push(['friso', { origemId: idM, superficie: { op: 'subdivisao', id: ID_CABINE }, linha: { nome: moldura, pontos: CABINE.bordaDoVao(vao) }, perfil: MOLDURA, refinar: 2 }],
     ['parte', { nome: moldura, sel: { origem: { op: 'friso', id: idM } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'friso', id: idM } }, cor: '#2c2f33' }]);
-  contatos.push({ par: [nome, 'teto'], relacao: 'atravessa', motivo: 'o vidro passa 12 mm por baixo da borda do vão e é colado na chapa: a face de fora fica 0,2 mm dentro da pele de dentro' },
-    { par: [moldura, 'teto'], relacao: 'atravessa', motivo: 'a moldura de borracha assenta na borda do vão e desce 0,9 mm na chapa' },
-    { par: [moldura, nome], relacao: 'atravessa', motivo: 'a moldura assenta no vidro: o pé dela desce 0,1 mm abaixo da face de fora do vidro' });
+  contatos.push({ par: [moldura, 'teto'], relacao: 'atravessa', motivo: 'a moldura de borracha assenta na borda do vão e desce 0,9 mm na chapa' });
+  for (const v of doLado && SIMETRIA.simetria ? [nome, nomeEsq] : [nome]) contatos.push({ par: [moldura, v], relacao: 'atravessa', motivo: 'a moldura assenta no vidro: o pé dela desce 0,1 mm abaixo da face de fora do vidro' });
 }
 if (!SO_CABINE) {
-  for (const p of ['paraLamaDir', 'portaDianteiraDir', 'portaTraseiraDir', 'lateralTraseiraDir']) {
+  for (const p of ['paraLama', 'portaDianteira', 'portaTraseira', 'lateralTraseira'].flatMap((n) => (SIMETRIA.simetria ? [`${n}Dir`, `${n}Esq`] : [`${n}Dir`]))) {
     contatos.push({ par: [p, 'teto'], relacao: 'folga', motivo: 'vão de 4 mm na cintura, entre o peitoril de baixo e o de cima', folga: { esperada: 4.1, tolerancia: 0.1, degrau: 0.3 } });
   }
 }

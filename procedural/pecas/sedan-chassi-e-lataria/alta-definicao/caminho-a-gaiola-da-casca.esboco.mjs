@@ -18,6 +18,7 @@
 import { gaiolaPorEstacoes } from '../../../nucleo/gaiola-por-estacoes.js';
 import { curvaDaGaiola } from '../../../nucleo/curva-da-gaiola.js';
 import { paineisPorVaos } from '../../../nucleo/paineis-por-vaos.js';
+import { espelharLinha } from './espelho.mjs';
 import { T, C, yTopo, yDaBorda, ladoX, topoY, ARCOS, PAINEIS, CORES, VIZINHOS } from './alvo.mjs';
 
 const NIVEIS = Number(process.env.HD_NIVEIS ?? 2);
@@ -100,7 +101,9 @@ const APOIO_DO_OMBRO = Number(process.env.HD_APOIO_OMBRO ?? T.apoioDoOmbro);
 /* `HD_MEDIDAS=1` faz a superfície passar pelos pontos das colunas que não são quina nem apoio dela; fica como sonda, porque o capô sai com
    uma ondulação de 23,7 mm junto da coluna que começa no pé dele */
 const MEDIDAS = process.env.HD_MEDIDAS === '1' ? [...DO_LADO.map(([nome]) => nome), 'faixa', ...DO_CAPO.map(([nome]) => nome)].map((coluna) => ({ coluna })) : undefined;
-const montar = (raioDoOmbro) => gaiolaPorEstacoes({ eixo: 'z', estacoes, cantos, niveis: NIVEIS, ...(MEDIDAS ? { medidas: MEDIDAS } : {}),
+/* ciclo 5: a gaiola é a metade x >= 0 do carro inteiro, e o passo a espelha antes de subdividir */
+export const SIMETRIA = process.env.HD_SIMETRIA === '0' ? {} : { simetria: 'x' };
+const montar = (raioDoOmbro) => gaiolaPorEstacoes({ eixo: 'z', estacoes, cantos, niveis: NIVEIS, ...SIMETRIA, ...(MEDIDAS ? { medidas: MEDIDAS } : {}),
   vincos: [{ nome: 'cintura', coluna: 'cintura', raio: T.raioDaCintura }, { nome: 'ombro', coluna: 'ombro', raio: raioDoOmbro }] });
 const dobras = montar(T.raioMinimoDoOmbro).raios.find((r) => r.vinco === 'ombro').pontos.map((p) => p.angulo);
 if (dobras.length !== Z.length) throw new Error(`o ombro devia ter uma dobra por estação (${Z.length}), e a gaiola deu ${dobras.length}`);
@@ -109,7 +112,7 @@ export const RAIO_DO_OMBRO = process.env.HD_RAIO_DO_OMBRO ? Number(process.env.H
 
 export const GAIOLA = montar(RAIO_DO_OMBRO);
 /* a definição da gaiola, para as sondas que a remontam com outra opção (a dos anéis no arco, no CICLO-2.md) */
-export const DEFINICAO = { eixo: 'z', estacoes, cantos, niveis: NIVEIS,
+export const DEFINICAO = { eixo: 'z', estacoes, cantos, niveis: NIVEIS, ...SIMETRIA,
   vincos: [{ nome: 'cintura', coluna: 'cintura', raio: T.raioDaCintura }, { nome: 'ombro', coluna: 'ombro', raio: RAIO_DO_OMBRO }] };
 
 /* ---- do metro da gaiola ao milímetro do esboço ---- */
@@ -120,9 +123,10 @@ const chapa = ['subdivisao', { origemId: 1, ...passo, niveis: NIVEIS, borda: 'ca
 
 /* ---- as linhas de vão, tiradas da gaiola ---- */
 const NA_CHAPA = { niveis: NIVEIS, borda: 'cantos' };
+/* a curva da metade direita: na gaiola com simetria a curva sai da metade declarada */
 const curva = (pedido) => curvaDaGaiola(GAIOLA, pedido, NA_CHAPA).curva;
 export function linhasDeVao() {
-  return [
+  const direitas = [
     /* o para-lama com a porta: sobe a lateral, passa a quina da cintura, cruza a faixa de cima e sai pela borda de dentro dela */
     { nome: 'fimDoParaLama', curva: curva({ estacao: 'fimDoParaLama', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
     /* a ponta da frente passa só 6 mm da borda: com 30 mm a prova de separação acusa ponte num ponto da própria ponta, fora da chapa (CICLO-4.md) */
@@ -132,6 +136,8 @@ export function linhasDeVao() {
     { nome: 'fimDaPortaTraseira', curva: curva({ estacao: 'fimDaPorta', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
     { nome: 'soleira', curva: curva({ coluna: 'soleira', de: 'fimDaPorta', ate: 'fimDoParaLama' }) },
   ];
+  /* o lado esquerdo: a mesma curva com x trocado de sinal (a chapa é simétrica, e a curva da metade cai na imagem) */
+  return SIMETRIA.simetria ? [...direitas, ...direitas.map((l) => ({ ...l, nome: `${l.nome}Esq`, curva: espelharLinha(l.curva) }))] : direitas;
 }
 
 /* ---- o esboço ---- */
@@ -168,7 +174,8 @@ export default {
     topo: pontos,
     contatos: COM_PAINEIS ? [
       ...VIZINHOS.map((par) => ({ par, relacao: 'folga', motivo: 'vão de 4 mm entre painéis da mesma chapa', folga: { esperada: 4.1, tolerancia: 0.1, degrau: 0.3 } })),
-      ...(COM_LABIO ? [['labioDianteiro', 'paraLamaDir'], ['labioTraseiro', 'lateralTraseiraDir']].map((par) => ({ par, relacao: 'atravessa', motivo: 'o lábio nasce da borda do arco de roda e é a mesma chapa do painel, virada para dentro' })) : []),
+      /* o friso sobre a chapa com simetria ganha a cópia espelhada na mesma parte: o lábio de cada arco é uma parte com os dois lados */
+      ...(COM_LABIO ? [['labioDianteiro', 'paraLamaDir'], ['labioTraseiro', 'lateralTraseiraDir'], ['labioDianteiro', 'paraLamaEsq'], ['labioTraseiro', 'lateralTraseiraEsq']].map((par) => ({ par, relacao: 'atravessa', motivo: 'o lábio nasce da borda do arco de roda e é a mesma chapa do painel, virada para dentro' })) : []),
     ] : [],
   }],
 };
