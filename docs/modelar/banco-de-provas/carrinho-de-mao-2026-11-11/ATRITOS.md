@@ -152,3 +152,9 @@ desenho de referência são de terceiros e ficaram fora do repositório.
    trechos do laço do fundo, com raio local de 4 a 16 mm, acima da chapa de 1,5 mm; o menor que passou é o
    arco de 35 mm. O processo pegou, pela recusa, mas o aviso dá o raio local acima da espessura e diz que
    "não chega" a ela, sem dizer o limite que de fato usa.
+
+22. O crítico da roda escreveu no alvo do veredito um texto livre com o caminho do pedido em
+   `tools/bancadas/out/`, e o registro aceitou, porque só recusava alvo que começa por barra. A
+   conferência de links passou na máquina de quem conduz, onde o arquivo existe, e reprovou no CI. O
+   processo não pegou antes do envio; hoje o registro recusa também o texto livre que cita uma pasta
+   fora do repositório, com teste em `tools/modelar/rodada-de-modelagem.test.mjs`.
