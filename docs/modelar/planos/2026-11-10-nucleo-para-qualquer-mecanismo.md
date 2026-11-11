@@ -189,6 +189,14 @@ separados por vão, apoiados num chassi com contato medido, e cada dificuldade
 entra em `ATRITOS.md` do banco de provas com a atribuição. A saída é a lista do
 que falta ao projeto para carro, que alimenta as fatias 4 e 6.
 
+Na sequência a pessoa disse que, terminado o diagnóstico do sedã, a IA da
+sessão analisa e implementa as melhorias que fariam diferença para a modelagem,
+no núcleo ou nas ferramentas, e deixou o carrinho e o sedã com ela até o fim,
+sem supervisão nem aprovação: "deixo esse trabalho de maneira autonoma para
+você até o fim a partir de agora [...] não vou ter tempo para supervisionar nem
+aprovar então deixo sobre sua tutoria". O aceite de forma dessas duas provas
+fica registrado como delegado, com essas palavras.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.

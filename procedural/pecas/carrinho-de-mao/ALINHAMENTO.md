@@ -142,7 +142,8 @@ folga para os tubos, os mancais e a caçamba.
 ## Grau de realismo
 
 Tubo redondo com as dobras em curva de raio, sem quina; caçamba moldada com o
-fundo e as paredes em curva e a borda virada; pneu com ombros redondos e aro
+fundo plano marcado, ligado às paredes por uma dobra de raio 35, e a borda
+virada; pneu com ombros redondos e aro
 de chapa com o cubo; mancais e travessas como blocos e chapas. Sem parafusos,
 furos de fixação nem o relevo do pneu no rascunho.
 
@@ -151,8 +152,8 @@ furos de fixação nem o relevo do pneu no rascunho.
 O carrinho que não se apoia em três pontos (a roda e o fundo dos dois pés no
 chão em y 0); a caçamba que cruza o chassi; a roda que cruza a caçamba, o laço
 ou os mancais; o tubo de seção quadrada ou com dobra em quina; o chassi em mais
-de um tubo, ou com garfo no lugar do laço; a caçamba de fundo plano em caixa,
-ou mais estreita atrás que na frente; peça solta no ar.
+de um tubo, ou com garfo no lugar do laço; a caçamba em caixa, de paredes a prumo e
+fundo em quina viva, ou mais estreita atrás que na frente; peça solta no ar.
 
 ## Rascunho
 
@@ -166,3 +167,15 @@ dois pés em y 0,1, em z -502 e a 166 do centro; a caixa do conjunto vai de x
 é de 79% no conjunto, 88% na caçamba, 79% na roda, 30% no chassi e 17% nos
 pés, que na foto são duas pernas afastadas pela perspectiva, e com a de cima,
 92% na caçamba.
+
+## Decisões das receitas
+
+Em 2026-11-11 a pessoa pediu para trazer o esboço de outubro que ela achou
+promissor (`docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/`), e dele
+veio o fundo plano marcado da caçamba, no lugar do fundo em curva do rascunho.
+A dobra do fundo tem raio 35, o menor que a conferência de espessura aceita com
+a chapa de 1,5 mm, e o volume estimado passou de 61,8 para cerca de 56 L. No
+mesmo dia a pessoa deixou a condução do carrinho e o aceite da forma com a IA
+da sessão, até o fim ("não vou ter tempo para supervisionar nem aprovar então
+deixo sobre sua tutoria"). A roda sai da família `roda-pneu` no limite que ela
+aceita: cubo de 102 mm, ombro de 25,5 mm, aro sem abas e cubo com furos.

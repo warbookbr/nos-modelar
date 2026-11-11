@@ -96,3 +96,59 @@ desenho de referência são de terceiros e ficaram fora do repositório.
    com a recomendação de manter o pneu. O processo não pegaria sozinho: a comparação da tabela do
    pedido com os contornos foi feita à mão, e falta à vista de contornos a conferência das medidas da
    TABELA, além da silhueta.
+
+14. O `fluxo:objeto`, antes das receitas, mandou "despachar o modelador (skill criar-peca) com o PLANO do
+   ALINHAMENTO.md", mas o `ALINHAMENTO.md` não tem `PLANO`: tem a tabela, as partes e o que reprova, e o
+   `PLANO` de cada peça teve de ser escrito a partir dele. A resposta também não disse que a montagem
+   (passo 5) é escrita junto das receitas, porque a peça depois da primeira precisa dela para passar no
+   `guarda:referencial` (a roda, com a origem no centro do pneu, reprovava "abaixo do chão" até a
+   `montagem.json` existir, e a regra que a solta está só no código da guarda). O processo não pegou:
+   falta ao passo 4 do fluxo a frase de onde sai o `PLANO` e a ordem receita e montagem.
+
+15. Com as quatro receitas medidas, o `fluxo:objeto` deu o passo 4 como "falta chassi (revisar)" e, em
+   "agora", mandou rodar `vistas:critica` e despachar o crítico das quatro peças ao mesmo tempo, com o
+   passo 5 dizendo "próxima chassi" e a skill do laço dizendo uma etapa por vez; também imprime "(sem
+   medir; confirme com --acao)" ao lado de uma ação que só sai medindo. O processo não pegou: o "agora"
+   lista todas as peças em `revisar` sem olhar a ordem das etapas.
+
+16. A família `roda-pneu` publica o furo do cubo só como anel (`eixo`, para `assentaAnular`), e o
+   encaixe cilíndrico da roda no eixo pediu uma porta `cilindro` interna que a receita acrescenta, saindo
+   da parede do furo (a última faixa da revolução do cubo); a porta de cilindro que sai da origem do cubo
+   inteiro reprova o raio, porque a face do plano dela é o anel até o raio de fora. O `encaixaCilindrico`
+   também exige que o intervalo do eixo fique dentro do furo (`intervalo-axial-fora`), o que obrigou o
+   eixo do chassi a publicar só o assento da roda, e não a barra inteira, e a largura do cubo a vir dele
+   por vínculo. A folga radial da relação é em metro, e a escrita em mm reprovou sem dizer a unidade. O
+   processo pegou, pela reprovação da junta, mas nenhum documento diz essas três coisas.
+
+17. A família `roda-pneu` não cobre o rascunho em três pontos: o cubo vai até 0,3 do diâmetro (102 mm, o
+   rascunho tinha 110), o ombro até 30% da banda (25,5 mm, o rascunho tinha 26,5) e o aro é um barril reto,
+   sem as abas que seguram o talão; e ela sempre fura o cubo (de 3 a 12 furos), que o rascunho não tinha.
+   A receita ficou nos limites dela. O processo pegou, pela recusa da família.
+
+18. O relato de contatos do esboço (a medida do `descrever`, tolerância de 1 µm) deu "atravessa" entre a
+   caçamba de cuba e o chassi novo, com o fundo a 2,5 mm dos braços: um vértice do tubo em [-171,9; 282;
+   -643,6] saiu "dentro" da casca, que está a 7 mm dele, e a auditoria da montagem (1e-9) e o teste
+   exato em 1e-9 deram as duas separadas. É o item 11 de novo, agora com 2,5 mm de folga; sumiu quando a
+   caçamba mudou. O processo não pegaria: o relato não diz qual ponto achou dentro.
+
+19. O `vistas:critica` recusa o pacote da caçamba, nas duas formas dela: a luz rasante de cima ilumina
+   13% a 17% da peça, porque a borda e as paredes fazem sombra dentro da cuba aberta, abaixo do limiar de
+   25%. A peça côncava aberta para cima não tem azimute que acenda o fundo com a luz rasante. O processo
+   pegou, pela recusa; falta à ferramenta a vista de luz rasante que entra na cuba, e o pacote oficial
+   não sai até isso mudar.
+
+20. A caçamba do rascunho de outubro (`docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/`) existia
+   no repositório e não foi consultada quando o rascunho de novembro foi feito, por decisão de quem
+   conduz; a pessoa teve de apontá-la ("era genuinamente bom"). Ela tinha o que as fotos mostram e o
+   rascunho novo perdeu: o fundo plano, de contorno próprio, separado das paredes por uma dobra nítida, e
+   as paredes quase planas. A receita trouxe isso de volta. O processo não pegaria: nem o
+   `fluxo:objeto` nem a skill de alinhamento procuram rascunho anterior do mesmo objeto no banco de
+   provas.
+
+21. Ao trazer o fundo plano, `lacosPelasVistas` recorta a planta na meia largura do laço, e o laço do
+   fundo saiu com quinas vivas dos lados, que a espessura recusou (`cantoApertado`); a receita reduz a
+   volta da boca para cada laço. Com a dobra entre o fundo e as paredes, o vinco no laço do fundo, de
+   qualquer nitidez, e os arcos de raio 10 a 30 mm foram recusados pelo `cantoApertado` nas emendas dos
+   trechos do laço do fundo, com raio local de 4 a 16 mm, acima da chapa de 1,5 mm; o menor que passou é o
+   arco de 35 mm. O processo pegou, pela recusa, mas o aviso dá o raio local acima da espessura e diz que
+   "não chega" a ela, sem dizer o limite que de fato usa.

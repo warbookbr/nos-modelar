@@ -2,8 +2,12 @@
  * afinando arredondada para a frente, com a borda virada para fora em toda a volta da boca e os dois tirantes que descem da frente
  * dela até o laço do chassi, numa peça aparafusada nos braços.
  *
- * Etapa 3 de 4 da montagem `../../montagem.json` (item 3 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa
- * aprovou por imagem em 2026-11-11 (`../../referencias/carrinho-de-mao.esboco.mjs`), levada para cá sem mudança de medida, com três
+ * Etapa 3 de 4 da montagem `../../montagem.json` (item 3 das partes do `../../ALINHAMENTO.md`). A planta da boca, a profundidade, a
+ * chapa e a borda são as do rascunho que a pessoa aprovou por imagem em 2026-11-11 (`../../referencias/carrinho-de-mao.esboco.mjs`).
+ * A seção não é a dele: a pessoa pediu em 2026-11-11 a caçamba do rascunho de outubro
+ * (`docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/`), que lê como chapa estampada, e no lugar da cuba de curvatura contínua
+ * a caçamba tem o fundo plano, de contorno próprio (a volta da boca reduzida, de cantos largos e mais estreito na frente), a dobra de
+ * raio curto entre ele e as paredes e as paredes retas, sem barriga, até a boca, como as fotos de cima e de baixo mostram. Há ainda três
  * mudanças de construção: a boca sai aberta da própria gaiola (`aberta: 'fim'`, no rascunho as faces da tampa de cima eram tiradas
  * pelo nome), e a volta da boca para a borda vem de `bocas.fim`; a gaiola confere o raio dos cantos contra a espessura da chapa; e o
  * fundo da caçamba sai da face de cima dos braços do chassi mais o assento de 2,5 mm (no rascunho, o número 284,5 digitado). O tubo da
@@ -178,12 +182,12 @@ const receita = {
     referencias: ['../../referencias/carrinho-de-mao.contornos.json'],
     escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },
     partes: [
-      { nome: 'cacamba', forma: 'casca azul de chapa de 1,5 mm aberta em cima, boca de 820 × 626 em y 462, fundo em curva em y 284,5 de z -715 a -170, mais larga atrás com cantos redondos e afinando arredondada à frente', tecnica: 'laços pelas três vistas (lacosPelasVistas) numa gaiolaPorLacos com a boca aberta, passo subdivisao de 2 níveis com espessura' },
+      { nome: 'cacamba', forma: 'casca azul de chapa de 1,5 mm aberta em cima, boca de 820 × 626 em y 462; fundo plano em y 284,5 de cantos largos, mais estreito na frente, dobra de raio 35 até paredes retas', tecnica: 'volta da boca reduzida em cada laço, dobra em arco na silhueta, numa gaiolaPorLacos com a boca aberta, passo subdivisao de 2 níveis com espessura' },
       { nome: 'borda', forma: 'a borda azul virada para fora em toda a volta da boca, um tubo de Ø 16, 5 mm para fora da boca e 2 abaixo dela', tecnica: 'gaiolaVarrida de seção redonda de 16 lados ao longo do limite da boca, fechada e tampada' },
       { nome: 'tirantes', forma: 'duas barras escuras de Ø 10, de cada lado, do eixo do tubo do laço em z 32 à frente da caçamba, acabando 0,3 mm antes da face de fora dela', tecnica: 'gaiolaVarrida de seção redonda de 12 lados numa reta, unidas, menos o corpo fechado da caçamba descido 0,3 mm' },
     ],
     criteriosDeReprovacao: [
-      'a caçamba de fundo plano em caixa, ou mais estreita atrás que na frente',
+      'a caçamba de cuba redonda sem o fundo plano marcado, de fundo em caixa de quina viva, ou mais estreita atrás que na frente',
       'a boca sem a borda virada, ou a borda solta da beira da boca',
       'a caçamba cruzando o chassi, ou solta acima dos braços além do assento de 2,5 mm',
       'os tirantes atravessando a chapa da caçamba ou soltos do laço',
