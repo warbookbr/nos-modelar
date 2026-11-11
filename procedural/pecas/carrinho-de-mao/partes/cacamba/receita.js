@@ -41,16 +41,18 @@ export const TABELA = {
        462: a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */
     alturaDaBoca: 462,
     /* A PLANTA DA BOCA (linha "planta da boca"), em retas e arcos tangentes: a traseira reta em z -810, os dois cantos de trás de
-       raio 150 (com 90 a sobreposição com a silhueta de cima caía de 91,7 para 89,9%, e com 150 fica em 91,1: a polilinha da foto
-       tem o canto desse raio), os lados retos na meia largura de 313 e a frente em arco de meia volta, de raio igual à meia largura, até a ponta em
-       z 24 (o arco de raio 313 centrado em z -289 cai a poucos mm da polilinha da foto de cima). As junções são tangentes, e cada arco
-       é amostrado a `passoAngular` graus. A meia largura da parede é a da boca. */
-    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 150, passoAngular: 2 },
+       raio 150 (a polilinha da foto tem o canto desse raio), os lados retos e paralelos na meia largura de 313 até z -333 (a metade de
+       trás), o flanco em arco de raio 380 convergindo, o canto da frente de raio 75 e a frente em arco muito aberto, de raio 390, até
+       z 24: a frente fica achatada e estreita, e não um semicírculo (os lados paralelos até dois terços e a ponta pontuda de um
+       semicírculo de raio 313 davam 91,1% de sobreposição com a silhueta de cima; estes raios, achados por busca contra o contorno da
+       foto levado à escala de lado, dão mais). O ponto em que o lado reto acaba (z -333) sai da tangência dos arcos, e não é digitado.
+       Cada arco é amostrado a `passoAngular` graus. A meia largura da parede é a da boca. */
+    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 150, raioDoFlanco: 380, raioDoCantoDaFrente: 75, xDoCantoDaFrente: 62, raioDaFrente: 390, passoAngular: 2 },
     /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço: 49 no início e no fim (a frente e a trás, com os
        cantos), que tira o facetado dos cantos, e 9 em cada lado reto; com mais de 11 no lado a dobra do fundo dá lascas (medido: 25 deu
        70 faces finas em x ±186, 9 e 11 deram zero). */
     estacoes: [330, 380, 430, 462],
-    pontos: 41, pontosDoLado: 9,
+    pontos: 45, pontosDoLado: 9,
     /* CHAPA E BORDA (linha "chapa e borda"): chapa de 1,5 mm; borda virada de Ø 16, 5 mm para fora da boca e 2 abaixo dela. */
     espessura: 1.5,
     borda: { raio: 8, paraFora: 5, abaixo: 2, lados: 16 },
@@ -62,20 +64,36 @@ export const TABELA = {
 
 /** O contorno da boca em retas e arcos tangentes, em [x, z]: os quatro trechos de `lacosPelasVistas` (`inicio` a traseira, de -x a +x;
  *  `direita`, o lado de +x, de trás para a frente; `fim` a frente, de +x a -x; `esquerda`, o lado de -x, de frente para trás) e o anel
- *  inteiro. Os cantos de trás têm o raio dado, a frente é o arco de meia volta de raio igual à meia largura, e os lados e a traseira
- *  são retas: cada junção é tangente. Cada arco é amostrado a `passoAngular` graus. */
+ *  inteiro. De trás para a frente, no lado de +x: traseira reta, canto de trás (raio `raioDosCantos`), lado reto, flanco em arco
+ *  (`raioDoFlanco`) que converge, canto da frente (`raioDoCantoDaFrente`, de centro em x `xDoCantoDaFrente`) e frente em arco muito
+ *  aberto (`raioDaFrente`, de centro no eixo) até a ponta em z `frente`. Cada junção é tangente: o canto da frente é tangente por
+ *  dentro à frente e ao flanco, e o z em que o lado reto acaba sai daí. Cada arco é amostrado a `passoAngular` graus. */
 export function contornoDaBoca(B) {
-  const w = B.meiaLargura; const r = B.raioDosCantos; const zf = B.frente - w; const zt = B.tras + r;
-  if (!(r > 0 && r < w && zt < zf)) throw new Error(`caçamba: boca de raio ${r} não cabe na meia largura ${w} e no comprimento ${B.frente - B.tras}`);
+  const w = B.meiaLargura; const rb = B.raioDosCantos; const zt = B.tras + rb;
+  const Rf = B.raioDoFlanco; const rc = B.raioDoCantoDaFrente; const a = B.xDoCantoDaFrente; const Rr = B.raioDaFrente;
+  const dFrente = Rr - rc; const dFlanco = Rf - rc;
+  if (!(rb > 0 && rb < w && rc > 0 && rc < Rf && rc < Rr && Math.abs(a) < dFrente && Math.abs(w - Rf - a) < dFlanco)) {
+    throw new Error('caçamba: os raios da boca não fecham tangentes (o canto da frente precisa caber por dentro da frente e do flanco)');
+  }
+  const centroFrente = [0, B.frente - Rr];
+  const c2 = [a, centroFrente[1] + Math.sqrt(dFrente * dFrente - a * a)];
+  const zLado = c2[1] - Math.sqrt(dFlanco * dFlanco - (w - Rf - a) ** 2);
+  const c1 = [w - Rf, zLado];
+  const tFlanco = Math.atan2(c2[1] - c1[1], c2[0] - c1[0]);
+  const tFrente = Math.atan2(c2[1] - centroFrente[1], c2[0] - centroFrente[0]);
+  if (!(zLado > zt && tFlanco < tFrente)) throw new Error(`caçamba: a boca não cabe no comprimento (o lado reto acabaria em z ${zLado.toFixed(1)}, e o canto de trás acaba em ${zt})`);
   const arco = (cx, cz, raio, de, ate) => {
-    const n = Math.max(1, Math.ceil(Math.abs(ate - de) / B.passoAngular));
-    return Array.from({ length: n + 1 }, (_, k) => { const t = (de + (ate - de) * k / n) * Math.PI / 180; return [cx + raio * Math.cos(t), cz + raio * Math.sin(t)]; });
+    const n = Math.max(1, Math.ceil(Math.abs(ate - de) * 180 / Math.PI / B.passoAngular));
+    return Array.from({ length: n + 1 }, (_, k) => { const t = de + (ate - de) * k / n; return [cx + raio * Math.cos(t), cz + raio * Math.sin(t)]; });
   };
-  const inicio = [...arco(-w + r, zt, r, 180, 270), ...arco(w - r, zt, r, 270, 360)];
-  const direita = [[w, zt], [w, zf]];
-  const fim = arco(0, zf, w, 0, 180);
-  const esquerda = [[-w, zf], [-w, zt]];
-  return { trechos: { inicio, direita, fim, esquerda }, anel: [...inicio, ...direita.slice(1), ...fim.slice(1), ...esquerda.slice(1, -1)] };
+  const h = Math.PI / 2;
+  const frenteDireita = [...arco(c1[0], c1[1], Rf, 0, tFlanco), ...arco(c2[0], c2[1], rc, tFlanco, tFrente).slice(1), ...arco(centroFrente[0], centroFrente[1], Rr, tFrente, h).slice(1)];
+  const espelho = (ps) => ps.map(([x, z]) => [-x, z]).reverse();
+  const inicio = [...arco(-w + rb, zt, rb, 2 * h, 3 * h), ...arco(w - rb, zt, rb, 3 * h, 4 * h)];
+  const direita = [[w, zt], [w, zLado]];
+  const fim = [...frenteDireita, ...espelho(frenteDireita).slice(1)];
+  const esquerda = [[-w, zLado], [-w, zt]];
+  return { zLado, trechos: { inicio, direita, fim, esquerda }, anel: [...inicio, ...direita.slice(1), ...fim.slice(1), ...esquerda.slice(1, -1)] };
 }
 
 /** As três vistas da caçamba, os tirantes e a porta, em mm. */

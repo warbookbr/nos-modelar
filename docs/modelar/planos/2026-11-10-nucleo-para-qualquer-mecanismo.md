@@ -154,6 +154,27 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    todos os pares, o para-brisa e o vidro traseiro incluídos, medido pelo
    comando novo. Ficam fora, para a fatia 4: a chapa lisa de carroceria inteira
    com qualidade de superfície e a borda de chapa com aba.
+4c. **Sedã em alta definição, neste plano, pedido pela pessoa em 2026-11-11; entra quando a 4b fechar.**
+   Pergunta: partindo do sedã facetado em painéis, o projeto leva uma IA a uma
+   carroceria de superfície dura em alta definição, e o que falta para isso?
+   O sedã é um carro de caixa: os painéis são quase planos, com pouca flecha, e
+   a qualidade está na aresta com raio controlado, no vão com borda virada, no
+   lábio do arco de roda e nos rebaixos de farol, maçaneta e grade. O que o
+   projeto já mediu: a chapa lisa por rede de curvas chegou a nota 7 no trecho
+   inteiro e 5 nos detalhes de borda, o raio de dobra só se controla pela
+   nitidez do vinco, que depende do tamanho da face, o painel sai sem aba, e o
+   rebaixo não existe. Método, em ciclos curtos: uma tentativa de um agente
+   sobre uma parte do carro com o que existe, a medida do que saiu, a melhoria
+   geral que a tentativa pedir, e a mesma parte refeita. Primeiro ciclo: o
+   corpo de baixo e o capô, pelos dois caminhos em disputa, que são a casca
+   facetada usada como gaiola de subdivisão com vinco por aresta, e a gaiola
+   por rede de curvas sobre as linhas do carro facetado. Critérios medidos de
+   cada ciclo: nenhuma falha de `npm run ondulacao` fora das junções
+   declaradas, nenhuma face fina, raio das arestas de caráter dentro de 20% do
+   pedido, vão de 4,0 a 4,2 mm e degrau até 0,3 mm por `npm run vao:partes`, e
+   a nota do crítico sem contexto com luz rasante e curvatura. Saída: o sedã
+   inteiro em alta definição com as etapas fixas, e a lista do que foi
+   melhorado e do que ficou para plano próprio.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.

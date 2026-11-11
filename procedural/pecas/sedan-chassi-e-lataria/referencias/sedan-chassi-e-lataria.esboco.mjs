@@ -27,9 +27,7 @@
  *
  * `npm run esboco:nucleo -- <este arquivo> --so-montar` dá a caixa e o relato de contatos. `SEDAN=chassi` monta só o chassi com as
  * rodas, `SEDAN=explodida` afasta os painéis do chassi, e `SEDAN_CORES=reais` pinta as partes com a cor do objeto real. */
-import { readFileSync } from 'node:fs';
-import { chamar, criarRegistroDeFamilias } from '../../../familias/index.js';
-import { expandirChamadasDeComposicao } from '../../../nucleo/composicoes.js';
+import { instanciaDeFamilia } from '../../../../tools/modelar/instancia-de-familia.mjs';
 import { paineisPorVaos } from '../../../nucleo/paineis-por-vaos.js';
 
 export const TABELA = {
@@ -380,36 +378,22 @@ function chassi() {
 }
 
 /* ---- as rodas, pela família roda-pneu ---- */
-const MEDIDAS_DA_FAMILIA = { lathe: ['perfil', 'em'], cubo: ['larg', 'alt', 'prof', 'em'], arranja: ['d', 'pivo'] };
-const emMm = (v) => (typeof v === 'number' ? Math.round(v * 1e7) / 1e4 : Array.isArray(v) ? v.map(emMm) : v);
-const comBase = (v, base) => {
-  if (Array.isArray(v)) return v.map((x) => comBase(x, base));
-  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === 'origemId' || (k === 'id' && typeof v.op === 'string') ? x + base : comBase(x, base)]));
-  return v;
-};
 export const PERFIL_DA_RODA = 'carro';
 function rodas() {
-  const familia = JSON.parse(readFileSync(new URL('../../../familias/roda-pneu/familia.json', import.meta.url), 'utf8'));
-  const registro = criarRegistroDeFamilias();
   /* o perfil `carro` é um 205/55 R16 de 632 mm; a fonte tem o pneu de 728 por 205, e o resto do perfil vai em proporção */
-  const parametros = { ...familia.perfis[PERFIL_DA_RODA].parametros, diametroPneu: 2 * T.roda.raio, larguraPneu: T.roda.largura / (2 * T.roda.raio) };
-  const daFamilia = expandirChamadasDeComposicao(registro.registroComposicoes, [chamar(registro.obter('roda-pneu'), 'roda', parametros)]).passos;
+  const parametros = { diametroPneu: 2 * T.roda.raio, larguraPneu: T.roda.largura / (2 * T.roda.raio) };
   const COR = { pneu: '#151617', aro: '#9aa0a6', cubo: '#7d8389', disco: '#b4b9be' };
   for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) for (const [zc, ponta] of [[T.roda.zFrente, 'Dianteira'], [T.roda.zTras, 'Traseira']]) {
-    const base = estado.origem; let maior = 0; const nomeadas = [];
-    for (const passo of daFamilia) {
-      const [op, args] = comBase(passo, base);
-      if (op === 'publicarPorta' || op === 'material' || op === 'solido') continue;
-      if (Number.isFinite(args.origemId)) maior = Math.max(maior, args.origemId);
-      if (op === 'parte') { nomeadas.push([args.nome, args.sel.origem]); continue; }
-      estado.passos.push([op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS_DA_FAMILIA[op] ?? []).includes(k) ? emMm(v) : v]))]);
-    }
-    estado.origem = Math.max(estado.origem, maior);
-    for (const [nome, origem] of nomeadas) {
-      if (s < 0) estado.passos.push(['rotaciona', { eixo: 'y', graus: 180, pivo: [0, 0, 0], sel: { origem } }]);
-      estado.passos.push(['transladar', { d: [s * T.roda.xCentro, T.roda.raio, zc], sel: { origem } }]);
-      parte(`${nome}${ponta}${lado}`, origem, COR[nome]);
-      estado.passos.push(['liso', { sel: { origem }, angulo: 35 }]);
+    const r = instanciaDeFamilia({ familia: 'roda-pneu', perfil: PERFIL_DA_RODA, parametros, nomes: (nome) => `${nome}${ponta}${lado}`, base: estado.origem,
+      unidade: 'mm', portas: false, materiais: false, liso: 35,
+      pose: { posicao: [s * T.roda.xCentro, T.roda.raio, zc], ...(s < 0 ? { giro: { eixo: 'y', graus: 180 } } : {}) } });
+    estado.passos.push(...r.passos);
+    estado.origem = r.origem;
+    for (const { nome, nomeNaFamilia, sel } of r.partes) {
+      const cor = corDe(nome, COR[nomeNaFamilia]);
+      estado.passos.push(['pincel', { modo: 'face', sel, cor }]);
+      PARTES.set(nome, sel);
+      CORES[nome] = cor;
     }
   }
 }
