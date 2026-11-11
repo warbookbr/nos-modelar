@@ -5,14 +5,18 @@
  * (0,003). A booleana as deixa onde o corte passa a centésimos de milímetro de um vértice da malha ou quase sobre uma aresta dela:
  * um triângulo de uma aresta curta e duas longas (a ponta), ou de três cantos quase alinhados (a lâmina).
  *
- * O QUE ELE FAZ, e só isto, nesta ordem, até nenhuma lasca sair mais:
- *   1. TROCA a diagonal do par de triângulos em volta da aresta maior da lasca, quando o par é quase plano, tem os mesmos atributos
- *      e a troca melhora a pior razão do par (não move vértice nenhum);
- *   2. COLAPSA a aresta curta da lasca (o vértice de menor id fica e recebe a posição de um dos dois ou o meio), quando a aresta é
- *      interior (duas faces), a vizinhança continua uma malha fechada, nenhuma face fica virada, nenhuma face boa vira lasca, nenhuma
- *      parte perde a última face e a posição nova fica a no máximo `tolerancia` dos planos das faces boas que o vértice tinha.
- * Os planos de referência são os da malha DE ENTRADA, e o vértice que absorve o outro herda os dois conjuntos: duas fusões seguidas
- * nunca somam o desvio, e a tolerância vale contra a malha original.
+ * O QUE ELE FAZ, e só isto, nesta ordem para cada lasca, em passadas até nenhuma sair mais (a pior razão primeiro, depois o id):
+ *   1. TROCA a diagonal do par de triângulos em volta da aresta maior da lasca (a ponta de apice quase sobre a aresta), quando o par tem
+ *      os mesmos atributos, é convexo e quase plano e a troca tira lasca; não move vértice;
+ *   2. COLAPSA uma aresta da lasca, da menor para a maior: o vértice de menor id fica, na posição (a dele, a do outro ou o meio) que
+ *      menos sai dos planos das faces boas que os dois tinham;
+ *   3. JUNTA a lasca à face vizinha, que ganha o apice como canto, quando o resultado continua convexo e deixa de ser lasca.
+ * Cada movimento só vale com a aresta interior (duas faces), a vizinhança ainda uma malha fechada (condição de ligação), nenhuma face
+ * virada, nenhuma face boa virando lasca, nenhuma parte perdendo a última face, e DUAS medidas da superfície: o ponto novo a no máximo
+ * `tolerancia` dos planos de ENTRADA das faces boas em volta (o vértice que absorve o outro herda os dois conjuntos, e fusões em cadeia
+ * não somam), e o remendo novo a no máximo `tolerancia` do remendo de antes, nos dois sentidos, medido nos cantos, nos pontos médios e
+ * no centro das faces. A segunda existe porque o ponto pode estar sobre os planos e a face estreita ao lado girar em volta dele: um
+ * colapso de 2 mm numa tira de 0,1 mm moveu a superfície 16 µm com o ponto a 4 µm dos planos.
  *
  * O QUE ELE NÃO FAZ. Não cria vértice nem face, não mexe em face fora da seleção (ela só acompanha o vértice que se move), não toca
  * face com tinta e não desfaz a lasca que nasce da entrada (a tira de 0,2 mm de uma concordância de raio 3 que já era fina na

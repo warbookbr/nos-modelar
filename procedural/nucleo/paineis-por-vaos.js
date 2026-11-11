@@ -240,9 +240,11 @@ function paineisPorVaosBruto(o) {
   validaProfundidade(o.profundidade, 'da chamada');
   o.linhas.forEach((l, i) => validaProfundidade(l?.profundidade, `da linha '${l?.nome ?? `linha${i}`}'`));
   const modoGeral = o.modo ?? 'vista';
-  const porCurva = (l) => l != null && l.curva !== undefined;
+  const porCurva = (l) => l != null && (l.curva !== undefined || l.vistas !== undefined);
   if (o.distanciaDaCurva != null && !(Number.isFinite(o.distanciaDaCurva) && o.distanciaDaCurva > 0)) erro(`distanciaDaCurva precisa ser um número de mm maior que zero (recebido ${JSON.stringify(o.distanciaDaCurva)})`);
   const distanciaDaCurva = o.distanciaDaCurva ?? 3 * o.vao;
+  /* o `alem` da curva aberta: um número para as duas pontas, ou [no início, no fim] */
+  const alemDa = (l) => (Array.isArray(l.alem) ? l.alem : [l.alem ?? 0, l.alem ?? 0]);
   for (const [nomeDoModo, m] of [['modo', o.modo], ...o.linhas.map((l, i) => [`o modo da linha '${l?.nome ?? `linha${i}`}'`, l?.modo])]) {
     if (m != null && m !== 'vista' && m !== 'superficie') erro(`${nomeDoModo} é 'vista' (a lâmina é a extrusão da linha ao longo do eixo da vista) ou 'superficie' (a lâmina é varrida sobre a chapa, com as paredes normais a ela)`);
   }
@@ -262,13 +264,18 @@ function paineisPorVaosBruto(o) {
   o.linhas.forEach((l, i) => {
     const nome = l?.nome ?? `linha${i}`;
     if (porCurva(l)) {
-      if (l.pontos != null || l.eixo != null) erro(`a linha '${nome}' dá \`curva\` (pontos 3D sobre a chapa) e também \`${l.pontos != null ? 'pontos' : 'eixo'}\` (a linha de uma vista); escolha uma`);
+      if (l.pontos != null || l.eixo != null || (l.curva !== undefined && l.vistas !== undefined)) erro(`a linha '${nome}' dá \`${l.vistas !== undefined ? 'vistas' : 'curva'}\` e também \`${l.curva !== undefined && l.vistas !== undefined ? 'curva' : l.pontos != null ? 'pontos' : 'eixo'}\`; escolha uma entrada: a curva 3D, as vistas continuadas, ou a linha de uma vista`);
       if (l.modo != null && l.modo !== 'superficie') erro(`a linha '${nome}' dá \`curva\`, que só vale no modo 'superficie' (recebido '${l.modo}')`);
       if (l.alcance != null || l.lado != null) erro(`a linha '${nome}' dá \`curva\`: \`alcance\` e \`lado\` são da linha de uma vista e não valem nela (a curva já está sobre a chapa)`);
-      if (!Array.isArray(l.curva) || l.curva.length < 2 || !l.curva.every((q) => Array.isArray(q) && q.length === 3 && q.every(Number.isFinite))) {
+      if (l.vistas !== undefined) {
+        const ok = Array.isArray(l.vistas) && l.vistas.length >= 1 && l.vistas.every((v) => v && Object.hasOwn(INDICE, v.eixo) && Array.isArray(v.pontos) && v.pontos.length >= 1
+          && v.pontos.every((q) => Array.isArray(q) && q.length === 2 && q.every(Number.isFinite)) && (v.lado == null || v.lado === '+' || v.lado === '-'));
+        if (!ok || l.vistas.reduce((t, v) => t + v.pontos.length, 0) < 2) erro(`a linha '${nome}' precisa de \`vistas\`: lista de { eixo, pontos: [[a, b], ...], lado? } com pelo menos dois pontos no total, cada trecho na vista dele; um trecho acaba onde o seguinte começa`);
+      } else if (!Array.isArray(l.curva) || l.curva.length < 2 || !l.curva.every((q) => Array.isArray(q) && q.length === 3 && q.every(Number.isFinite))) {
         erro(`a linha '${nome}' precisa de \`curva\` com pelo menos dois pontos [x, y, z] em mm sobre a chapa`);
       }
-      if (l.fechada && l.curva.length < 3) erro(`a curva fechada '${nome}' precisa de pelo menos três pontos`);
+      const nPontos = l.vistas !== undefined ? l.vistas.reduce((t, v) => t + v.pontos.length, 0) : l.curva.length;
+      if (l.fechada && nPontos < 3) erro(`a curva fechada '${nome}' precisa de pelo menos três pontos`);
     } else {
       if (!l || !Object.hasOwn(INDICE, l.eixo)) erro(`a linha '${nome}' precisa de eixo 'x', 'y' ou 'z' (o eixo da vista em que foi desenhada), ou de \`curva\` (pontos 3D sobre a chapa)`);
       if (!Array.isArray(l.pontos) || l.pontos.length < 2 || !l.pontos.every((q) => Array.isArray(q) && q.length === 2 && q.every(Number.isFinite))) {
@@ -279,7 +286,9 @@ function paineisPorVaosBruto(o) {
     if (!porCurva(l) && l.alcance != null && !(Array.isArray(l.alcance) && l.alcance.length === 2 && l.alcance.every(Number.isFinite) && l.alcance[0] < l.alcance[1])) erro(`o alcance da linha '${nome}' precisa ser [min, max] no eixo ${l.eixo}, com min menor que max`);
     if (!porCurva(l) && l.lado != null && l.lado !== '+' && l.lado !== '-') erro(`o lado da linha '${nome}' é '+' ou '-'`);
     if (l.dentro != null && l.dentro !== 'painel' && l.dentro !== 'descarta') erro(`dentro da linha '${nome}' é 'painel' ou 'descarta'`);
-    if (l.alem != null && !(Number.isFinite(l.alem) && l.alem >= 0)) erro(`alem da linha '${nome}' precisa ser um número de mm a partir de zero (recebido ${JSON.stringify(l.alem)})`);
+    if (porCurva(l) && Array.isArray(l.alem)) {
+      if (!(l.alem.length === 2 && l.alem.every((x) => Number.isFinite(x) && x >= 0))) erro(`alem da curva '${nome}' é um número de mm a partir de zero, ou [no início, no fim] (recebido ${JSON.stringify(l.alem)})`);
+    } else if (l.alem != null && !(Number.isFinite(l.alem) && l.alem >= 0)) erro(`alem da linha '${nome}' precisa ser um número de mm a partir de zero (recebido ${JSON.stringify(l.alem)})`);
     if (l.dentro === 'descarta' && !l.fechada) erro(`dentro: 'descarta' só vale para linha fechada ('${nome}' é aberta)`);
     if (nomesDeLinha.has(nome)) erro(`duas linhas se chamam '${nome}'`);
     nomesDeLinha.add(nome);
@@ -364,7 +373,7 @@ function paineisPorVaosBruto(o) {
     const l = o.linhas[li];
     const nome = l.nome ?? `linha${li}`;
     const eixo = l.eixo;
-    if (porCurva(l)) { pendentes.push({ l, nome, curva: true, P: l.curva }); continue; }
+    if (porCurva(l)) { pendentes.push({ l, nome, curva: true }); continue; }
     const e = EIXO[eixo];
     const alcance = l.alcance ?? (leitura ? [leitura.caixa[e][0] - afasta(e), leitura.caixa[e][1] + afasta(e)] : null);
     if (!alcance) erro(`a linha '${nome}' precisa de alcance: sem os passos da chapa o ajudante não sabe até onde a lâmina vai no eixo ${eixo}`);
@@ -555,8 +564,18 @@ function paineisPorVaosBruto(o) {
     };
     const lidas = pendentes.map((pd) => {
       if (pd.curva) {
-        const { l, nome, P } = pd;
-        const proj = projetarCurva({ projetar: naPele, pontos: P, fechada: !!l.fechada, amostragem, largura, nome, alem: l.alem ?? 0, tolerancia: distanciaDaCurva });
+        const { l, nome } = pd;
+        /* a linha continuada de uma vista a outra: cada trecho vai à chapa pelo raio da vista dele (a primeira camada tocada), e a emenda entre dois trechos é uma corda que
+           `projetarCurva` leva à pele, ponto a ponto, onde a normal gira */
+        const P = l.vistas !== undefined ? l.vistas.flatMap((v, iv) => v.pontos.map((q, k) => {
+          const e = EIXO[v.eixo]; const [lo, hi] = leitura.caixa[e];
+          const dirv = [0, 0, 0]; dirv[e] = v.lado === '-' ? 1 : -1;
+          const de = ponto3(v.eixo, q[0], q[1], v.lado === '-' ? lo - afasta(e) : hi + afasta(e));
+          const acerto = leitura.raios.primeiro(de, dirv);
+          if (!acerto) erro(`o ponto ${k} [${br(q[0])}, ${br(q[1])}] do trecho ${iv} (vista ${v.eixo}) da linha '${nome}' não toca a chapa: o raio da vista não acha face; confira o eixo, a ordem dos pontos e a unidade (mm)`);
+          return [0, 1, 2].map((c) => de[c] + dirv[c] * acerto.t);
+        })) : l.curva;
+        const proj = projetarCurva({ projetar: naPele, pontos: P, fechada: !!l.fechada, amostragem, largura, nome, alem: alemDa(l), tolerancia: distanciaDaCurva });
         const profPedida = l.profundidade ?? o.profundidade ?? null;
         const espLida = Math.max(0, ...proj.segmentos.flat().map((st) => st.esp ?? 0));
         if (profPedida != null && espLida > 0 && profPedida <= espLida) {
@@ -613,9 +632,10 @@ function paineisPorVaosBruto(o) {
     for (const p of aAlongar) { const segs = lidas[p.i].segmentos; alongar(segs[p.fim ? segs.length - 1 : 0], p.fim, largura / 2); }
     /* a curva aberta com `alem`: as duas pontas passam `alem` mm adiante, no plano tangente, e a lâmina vai além da borda da chapa */
     lidas.forEach((ln) => {
-      const alem = ln.l.alem ?? 0;
-      if (!ln.curva || ln.l.fechada || !(alem > 0)) return;
-      alongar(ln.segmentos[0], false, alem); alongar(ln.segmentos[0], true, alem);
+      if (!ln.curva || ln.l.fechada) return;
+      const [antes, depois] = alemDa(ln.l);
+      if (antes > 0) alongar(ln.segmentos[0], false, antes);
+      if (depois > 0) alongar(ln.segmentos[0], true, depois);
     });
     for (const ln of lidas) {
       const { l, nome, segmentos, fechadaInteira } = ln;
@@ -722,6 +742,7 @@ function paineisPorVaosBruto(o) {
   let folgaMedida = pendentes.length || o.medirFolga === true ? medirFolga() : null;
   cronometra('medirFolga', tFolga);
   let ajustes = 0;
+  if (process.env.DBG_CURVA) console.error('DBG folga inicial', folgaMedida);
   if (pendentes.length && folgaMedida != null) {
     while (ajustes < 3 && (folgaMedida < o.vao || folgaMedida > o.vao * 1.05)) {
       const fator = Math.max(0.5, Math.min(2, (o.vao * 1.01) / folgaMedida));
@@ -731,6 +752,7 @@ function paineisPorVaosBruto(o) {
       executado = executar();
       if (executado.orfaos.length) erro(`o corte foi recusado pelo núcleo depois de corrigir a largura da lâmina para ${br(larguraDaSuperficie)} mm: ${executado.orfaos.slice(0, 2).map((x) => x.motivo).join('; ')}`);
       folgaMedida = medirFolga() ?? folgaMedida;
+      if (process.env.DBG_CURVA) console.error('DBG folga ajuste', ajustes, larguraDaSuperficie, folgaMedida);
       ajustes += 1;
     }
     medidas.execucoes += ajustes;

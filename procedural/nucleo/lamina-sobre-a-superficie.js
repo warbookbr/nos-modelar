@@ -181,54 +181,29 @@ function lateraisDaCurva(lista, fechada) {
     if (!tIn || !tOut) erro('a curva tem dois pontos iguais sobre a chapa');
     s.mIn = cruz(s.n, tIn); s.mOut = cruz(s.n, tOut); s.cima = s.n;
   });
-  /* o raio local da chapa ao longo da curva: o giro da normal por mm de curva, numa base de 2 mm para cada lado. Normal que gira no sentido da curva é filete convexo (o centro
-     fica do lado de dentro da chapa), no sentido contrário é côncavo */
-  const cum = [0];
-  for (let i = 1; i < N; i += 1) cum.push(cum[i - 1] + norma(sub(lista[i].c, lista[i - 1].c)));
-  const total = cum[N - 1] + (fechada ? norma(sub(lista[0].c, lista[N - 1].c)) : 0);
-  const BASE = 2;
-  const alvo = (i, sinal) => {
-    let j = i;
-    for (let passos = 0; passos < N; passos += 1) {
-      const k = fechada ? (((j + sinal) % N) + N) % N : j + sinal;
-      if (k < 0 || k >= N) return null;
-      j = k;
-      const d = Math.abs(cum[j] - cum[i]);
-      if ((fechada ? Math.min(d, total - d) : d) >= BASE) return j;
-    }
-    return null;
-  };
-  lista.forEach((s, i) => {
-    const a = alvo(i, -1); const b = alvo(i, 1);
-    if (a == null || b == null) return;
-    const t = unit(sub(lista[b].c, lista[a].c));
-    const ds = norma(sub(lista[b].c, lista[a].c));
-    if (!t || !(ds > 0)) return;
-    const dnds = dot(sub(lista[b].n, lista[a].n), t) / ds;
-    if (dnds > 1e-3) s.raioFundo = 1 / dnds; else if (dnds < -1e-3) s.raioTopo = -1 / dnds;
-  });
 }
 
 /**
  * Leva a curva 3D à chapa: cada ponto vai à pele pelo ponto mais próximo (`projetar`), a curva é reamostrada a cada `amostragem` mm (cada ponto novo também vai à pele),
- * o trecho entre duas estações cuja normal gira mais de 8 graus é bipartido até a normal girar menos, e a dobra viva que sobra vira uma estação só, como na linha da vista.
- * Não há eixo de vista: a seção da lâmina olha, em cada estação, para a normal da chapa.
+ * o trecho entre duas estações cuja normal gira mais de 8 graus é bipartido até a normal girar menos (ou o passo chegar a um décimo da largura), e a dobra viva que sobra vira uma
+ * estação só, como na linha da vista. Não há eixo de vista: a seção da lâmina olha, em cada estação, para a normal da chapa.
  * @param {{ projetar: (q: number[], limite: number) => ({ c: number[], n: number[], esp: number | null, d: number } | null), pontos: number[][], fechada: boolean,
- *   amostragem: number, largura: number, nome: string, alem?: number, tolerancia: number }} o
+ *   amostragem: number, largura: number, nome: string, alem?: [number, number], tolerancia: number }} o
  * @returns {{ segmentos: any[][], fechadaInteira: boolean, quinas: number, inclinacaoMaxima: number, semChapa: number, desvioMaximo: number, podadas: number }}
  */
 export function projetarCurva(o) {
   const { projetar, pontos, fechada, amostragem, largura, nome, tolerancia } = o;
-  const alem = o.alem ?? 0;
+  const alem = o.alem ?? [0, 0];
   const pt = (q) => `[${q.map((x) => br(x)).join(', ')}]`;
   const lidos = pontos.map((q) => ({ q, v: projetar(q, tolerancia) }));
   if (lidos.every((x) => !x.v)) erro(`a curva '${nome}' não corta a chapa: nenhum dos ${pontos.length} pontos dela fica a menos de ${br(tolerancia)} mm da pele da chapa; confira a unidade (mm) e se a curva é desta chapa (a opção distanciaDaCurva muda a tolerância)`);
   let ini = 0; let fim = lidos.length - 1;
   if (!fechada) { while (!lidos[ini].v) ini += 1; while (!lidos[fim].v) fim -= 1; }
   const podadas = ini + (lidos.length - 1 - fim);
-  if (podadas && !(alem > 0)) {
-    const k = ini > 0 ? 0 : lidos.length - 1;
-    erro(`a curva '${nome}' sai da chapa: o ponto ${k} ${pt(lidos[k].q)} fica a mais de ${br(tolerancia)} mm da pele, e ${podadas === 1 ? 'a ponta além dele' : `as ${podadas} pontas além dele`} não tem chapa; termine a curva na borda e dê \`alem\` (mm) para a ponta passar dela, ou traga o ponto para a chapa`);
+  for (const [k, cortadas, dada] of [[0, ini, alem[0]], [lidos.length - 1, lidos.length - 1 - fim, alem[1]]]) {
+    if (cortadas && !(dada > 0)) {
+      erro(`a curva '${nome}' sai da chapa pela ponta ${k === 0 ? 'inicial' : 'final'}: o ponto ${k} ${pt(lidos[k].q)} fica a mais de ${br(tolerancia)} mm da pele, e ${cortadas === 1 ? 'a ponta além dele' : `as ${cortadas} pontas além dele`} não tem chapa; termine a curva na borda e dê \`alem\` (mm) para a ponta passar dela, ou traga o ponto para a chapa`);
+    }
   }
   const uteis = lidos.slice(ini, fim + 1);
   uteis.forEach((x, k) => { if (!x.v) erro(`a curva '${nome}' tem o ponto ${ini + k} ${pt(x.q)} a mais de ${br(tolerancia)} mm da pele, no meio da curva: ela sai da chapa e volta (uma abertura, ou a curva fora do lugar); leve o ponto à chapa ou parta a curva`); });
@@ -254,7 +229,7 @@ export function projetarCurva(o) {
     if (!fechada && i === N - 1) break;
     const M = Math.ceil(dist(a, b) / amostragem);
     for (let m = 1; m < M; m += 1) {
-      const q = mul(soma(mul(a.c, 1 - m / M), mul(b.c, m / M)), 1);
+      const q = soma(mul(a.c, 1 - m / M), mul(b.c, m / M));
       const v = projetar(q, tolerancia);
       if (!v) erro(`a curva '${nome}' passa a mais de ${br(tolerancia)} mm da pele entre dois pontos dela, perto de ${pt(q)}: a corda sai da chapa; ponha mais pontos`);
       desvioMaximo = Math.max(desvioMaximo, v.d);
@@ -277,7 +252,7 @@ export function projetarCurva(o) {
   }
   const { lista, quinas } = fundirQuinas(todas, fechada, nome, GIRO_DA_CURVA);
   lateraisDaCurva(lista, fechada);
-  return { segmentos: [lista], fechadaInteira: fechada, quinas, inclinacaoMaxima: 0, semChapa: 0, desvioMaximo: R3(desvioMaximo), podadas };
+  return { segmentos: [lista], fechadaInteira: fechada, quinas, inclinacaoMaxima: 0, semChapa: 0, desvioMaximo: Math.round(desvioMaximo * 1e6) / 1e6, podadas };
 }
 
 /**
@@ -324,6 +299,29 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     if (dot(sk, a.mOut) < 0) sk = mul(sk, -1);
     seg.push({ n: nk, s: sk });
   }
+  /* a altura acima da pele e a profundidade abaixo dela de cada estação. Na curva 3D, numa quina arredondada de raio R, a seção funda demais passa do centro do filete e as seções
+     vizinhas se cruzam embaixo (a alta demais, no filete côncavo, em cima): onde o ponto de baixo (ou o de cima) de duas estações vizinhas anda menos que 30% do que a curva anda, as
+     duas ficam 20% menos fundas (ou altas), até o ponto andar, sem passar da espessura lida mais 0,3 mm (ou de 0,3 mm acima da pele) */
+  const altura = est.map(() => topo);
+  const profundidadeDe = est.map((s) => (profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura));
+  if (est.every((s) => s.cima)) {
+    const regular = (dist, sinal, minimo) => {
+      for (let rodada = 0; rodada < 16; rodada += 1) {
+        let mexeu = false;
+        for (let i = 0; i < nSeg; i += 1) {
+          const j = (i + 1) % N;
+          const t = sub(est[j].c, est[i].c);
+          const Pa = soma(est[i].c, mul(est[i].cima, sinal * dist[i])); const Pb = soma(est[j].c, mul(est[j].cima, sinal * dist[j]));
+          if (dot(sub(Pb, Pa), t) >= 0.3 * dot(t, t)) continue;
+          for (const k of [i, j]) { const novo = Math.max(minimo(k), dist[k] * 0.8); if (novo < dist[k]) { dist[k] = novo; mexeu = true; } }
+        }
+        if (!mexeu) break;
+      }
+    };
+    const inicial = [...profundidadeDe];
+    regular(profundidadeDe, -1, (k) => Math.min(inicial[k], (est[k].esp ?? 0) + 0.3));
+    regular(altura, 1, () => Math.min(topo, 0.3));
+  }
   /* os dois pontos de uma estação num lado (em cima e embaixo da pele): na quina entre dois trechos, o encontro dos dois planos de parede (a esquadria em 3D); a linha de
      encontro dá a direção da profundidade, e a profundidade vale a espessura lida (ou a pedida) dividida pelo cosseno entre essa direção e a normal de cada face */
   const doLado = (i, sinal) => {
@@ -351,12 +349,7 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
       if (!L || s.cima || dot(L, nm) < 0.17) L = soma2 ? unit(sub(cimaDe, mul(soma2, dot(cimaDe, soma2)))) ?? nm : nm;
     }
     const cos = Math.max(Math.min(dot(L, A.n), dot(L, B.n)), 0.17);
-    /* numa quina arredondada de raio R, a seção funda demais passa do centro do filete e as estações vizinhas se cruzam embaixo (e a alta demais, no filete côncavo, em cima): o fundo e o topo
-       ficam abaixo de 3/4 do raio local (só a curva 3D mede o raio, em `raioFundo` e `raioTopo`), sem ficar acima da espessura lida mais 0,3 mm */
-    let fundoBase = profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura;
-    if (s.raioFundo) fundoBase = Math.min(fundoBase, Math.max(0.75 * s.raioFundo, (s.esp ?? 0) + 0.3));
-    const topoDe = s.raioTopo ? Math.min(topo, Math.max(0.75 * s.raioTopo, 0.3)) : topo;
-    return { acima: soma(X0, mul(L, topoDe / cos)), abaixo: sub(X0, mul(L, fundoBase / cos)), X0 };
+    return { acima: soma(X0, mul(L, altura[i] / cos)), abaixo: sub(X0, mul(L, profundidadeDe[i] / cos)), X0 };
   };
   const vertices = [];
   const faces = [];
@@ -469,12 +462,13 @@ export function linhaPertoDeSiMesma(estacoes, fechada, largura) {
   const cum = [0];
   for (let i = 1; i <= nSeg; i += 1) cum.push(cum[i - 1] + norma(sub(c[i % N], c[i - 1])));
   const total = cum[nSeg];
-  const arco = (x, y) => { const d = Math.abs(x - y); return fechada ? Math.min(d, total - d) : d; };
+  /* o arco entre os trechos i e j (i < j) é o vão entre eles ao longo da curva, indo de i a j ou, na fechada, dando a volta pela emenda (do fim de j ao começo de i) */
+  const arco = (i, j) => { const direto = cum[j] - cum[i + 1]; return fechada ? Math.min(direto, total - (cum[j + 1] - cum[i])) : direto; };
   let menor = null;
   for (let i = 0; i < nSeg; i += 1) {
     for (let j = i + 2; j < nSeg; j += 1) {
       if (fechada && i === 0 && j === nSeg - 1) continue;
-      if (arco(cum[i + 1], cum[j]) < 2 * largura) continue;
+      if (arco(i, j) < 2 * largura) continue;
       const d = distanciaEntreSegmentos(c[i], c[(i + 1) % N], c[j], c[(j + 1) % N]);
       if (d < largura * 0.99 && (menor == null || d < menor)) menor = d;
     }

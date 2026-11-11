@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1926 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1927 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1057,6 +1057,7 @@
 - `lamina-sobre-a-superficie.js` — lamina-sobre-a-superficie.js — a lâmina de vão varrida sobre a superfície de uma chapa, com a seção perpendicular a ela
 - `limpar-contorno.test.mjs` — limpar-contorno.test.mjs — `limparContorno`: tira ponto repetido e, se pedido, ponto colinear, sem mexer na entrada.
 - `limpar-lascas.js` — limpar-lascas.js — o cálculo da limpeza de lascas depois de uma booleana: função pura sobre vértices e faces, sem passo, sem Manifold e sem domínio de objeto…
+- `limpar-lascas.test.ts` — limpar-lascas.test.ts — `limparLascas`: a limpeza das faces finas que uma booleana deixa. Mede, em fixtures sem domínio de objeto: (a) o cálculo puro, na pon…
 - `linha-de-base-do-furo.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
 - `linha-de-base-do-nucleo.mjs` — Corpus sintético da R00. Cada caso dá uma entrada mínima e independente a uma capacidade do núcleo; ele congela o resultado observável, não a sua implementaç…
 - `linha-de-base-do-nucleo.test.mjs` — Guarda determinismo e compatibilidade da linha de base R00 do núcleo.

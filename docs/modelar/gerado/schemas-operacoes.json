@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:4ec741dd34e2c63e22b7975346a787969823fa740842cd5487881912e9e0c8d4",
+  "assinatura": "sha256:0bae44b6cf93886ba56390ad7deb431c146bf528b2a1010c3d7d1ca261d327c0",
   "total": 41,
   "operacoes": [
     {
@@ -2937,7 +2937,7 @@
       "nome": "limparLascas",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Tirar de uma seleção as faces finas (área / maior aresta² abaixo de 0,003) que uma booleana deixou, trocando a diagonal, colapsando a aresta curta ou juntando a lasca à vizinha, sem criar vértice nem face e sem mover a superfície além da tolerância.",
+        "intencao": "Tirar de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície além da tolerância.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.limparLascas@1",
@@ -2950,7 +2950,7 @@
           "properties": {
             "sel": {
               "type": "object",
-              "description": "As faces que a limpeza pode tirar ou trocar de diagonal, por exemplo { origem: { op: 'subtrair', id } } logo depois da booleana, ou { tudo: true }. Faces de fora da seleção só acompanham o vértice que se move."
+              "description": "As faces a limpar, em geral { origem: { op: 'subtrair', id } } logo depois da booleana."
             },
             "tolerancia": {
               "anyOf": [
@@ -2964,7 +2964,7 @@
                   "type": "array"
                 }
               ],
-              "description": "O quanto a superfície pode sair do lugar, na unidade da peça: 0,00001 numa receita em metro (10 µm), 0,01 num esboço em mm. Vale contra a malha de ENTRADA do passo, e fusões em cadeia não somam desvio."
+              "description": "O quanto a superfície pode sair do lugar, na unidade da peça (0,00001 numa receita em metro)."
             },
             "limite": {
               "anyOf": [
@@ -2978,7 +2978,7 @@
                   "type": "array"
                 }
               ],
-              "description": "A razão área / maior aresta² abaixo da qual a face é lasca; o padrão, 0,003, é o do gate de malha."
+              "description": "Razão área / maior aresta² abaixo da qual a face é lasca; padrão 0,003."
             }
           }
         },
@@ -3044,18 +3044,16 @@
           "ALIASES": []
         },
         "precondicoes": [
-          "Vem depois da booleana (ou do arredondarCostura) cujas faces a seleção cita; a malha de entrada é fechada ou, onde há borda aberta, a aresta de borda fica como está."
+          "Vem depois da booleana ou do arredondarCostura cujas faces a seleção cita."
         ],
         "limites": [
-          "Só tira a lasca que sai dentro da tolerância e deixa a malha fechada, sem face virada, sem lasca nova e sem parte sem face; o resto fica e vai para o aviso lascasRestantes, com a contagem e as primeiras faces.",
-          "A lasca que já vinha da entrada (a tira de 0,2 mm de uma concordância de raio 3, a tampa de 1 mm por 585 mm de uma chapa fina) não é do corte e só muda onde nasceu: a tolerância não a alcança, e refinar a entrada é do passo que a gerou.",
-          "Não cria vértice nem face e não renumera: a face que sai some da seleção e das listas da origem da booleana (a citação explícita pelo id dela deixa de achar a face), o vértice que sai deixa o par da costura (arestas) no vértice que ficou, e a face com tinta fica como está.",
-          "Colapsar e juntar mexem em faces de fora da seleção só pelo vértice que se move; o vão entre painéis e a folga da lâmina mudam no máximo a tolerância."
+          "Troca a diagonal, colapsa a aresta curta ou junta a lasca à vizinha, só dentro da tolerância e com a malha fechada; a que ficar vai para o aviso lascasRestantes.",
+          "Não desfaz a lasca que já vinha da entrada (a tira de 0,2 mm de uma concordância de raio 3): ela é do passo da chapa."
         ],
         "diagnosticos": [
           {
             "quando": "O aviso lascasRestantes diz que ficaram faces finas.",
-            "acao": "Rode npm run malha:lascas na receita: a lista traz a face, a parte, a razão e o passo que a criou; a que vem do passo da chapa se corrige nele, e a que é do corte pede tolerância maior ou outro vão."
+            "acao": "Rode npm run malha:lascas na receita: a lista traz a parte e o passo de cada uma."
           }
         ]
       }

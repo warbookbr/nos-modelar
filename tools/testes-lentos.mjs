@@ -38,6 +38,7 @@ export const TESTES_LENTOS = [
   'procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js',
   'procedural/nucleo/friso-contato.test.mjs',
   'procedural/nucleo/paineis-por-vaos-grande.test.ts',
+  'procedural/nucleo/limpar-lascas.test.ts',
   'procedural/nucleo/gaiola-por-rede-contato.test.mjs',
   'procedural/nucleo/operacoes/arredondar-costura-convexa.test.ts',
   'procedural/nucleo/operacoes/arredondar-costura-tubos-altos.test.ts',

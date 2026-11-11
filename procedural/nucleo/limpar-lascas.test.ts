@@ -38,7 +38,7 @@ const triangulos = (m: Malha) => {
   for (const f of m.F.values()) { const p = f.vs.map((v) => m.V.get(v) as V3); for (let k = 1; k + 1 < p.length; k++) T.push([p[0], p[k], p[k + 1]]); }
   return T;
 };
-/** A distância máxima entre duas malhas, nos dois sentidos, nos vértices e nos pontos médios das arestas (grade de células de `cel`). */
+/** A distância máxima entre duas malhas, nos dois sentidos, nos vértices e nos pontos médios das arestas das faces que mudaram (grade de células de `cel`). */
 function hausdorff(a: Malha, b: Malha, cel = 8) {
   const grade = (T: V3[][]) => {
     const g = new Map<string, number[]>();
@@ -48,14 +48,19 @@ function hausdorff(a: Malha, b: Malha, cel = 8) {
     });
     return g;
   };
-  const amostras = (m: Malha) => {
-    const S: V3[] = [...m.V.values()];
-    for (const f of m.F.values()) for (let k = 0; k < f.vs.length; k++) { const p = m.V.get(f.vs[k]) as V3; const q = m.V.get(f.vs[(k + 1) % f.vs.length]) as V3; S.push([(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2]); }
+  const chave = (m: Malha, vs: number[]) => vs.map((v) => (m.V.get(v) as V3).join(',')).join(';');
+  const amostrasDasMudadas = (m: Malha, outra: Malha) => {
+    const iguais = new Set([...outra.F.values()].map((f) => chave(outra, f.vs)));
+    const S: V3[] = [];
+    for (const f of m.F.values()) {
+      if (iguais.has(chave(m, f.vs))) continue;
+      for (let k = 0; k < f.vs.length; k++) { const p = m.V.get(f.vs[k]) as V3; const q = m.V.get(f.vs[(k + 1) % f.vs.length]) as V3; S.push(p, [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2]); }
+    }
     return S;
   };
   const sentido = (de: Malha, para: Malha) => {
     const T = triangulos(para); const G = grade(T); let m = 0;
-    for (const p of amostras(de)) {
+    for (const p of amostrasDasMudadas(de, para)) {
       const c = p.map((x) => Math.floor(x / cel)); let melhor = Infinity; const vistos = new Set<number>();
       for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) for (let k = -1; k <= 1; k++) for (const t of G.get(`${c[0] + i},${c[1] + j},${c[2] + k}`) ?? []) { if (vistos.has(t)) continue; vistos.add(t); melhor = Math.min(melhor, distTri(p, T[t])); }
       m = Math.max(m, melhor === Infinity ? 99 : melhor);
@@ -103,7 +108,7 @@ function facesViradas(antes: Malha, depois: Malha) {
 }
 
 /* ---- (a) o cálculo puro, numa chapa fechada de 10 x 10 x 1 feita à mão ---- */
-function chapaComLasca(tipo: 'ponta' | 'lamina'): Malha {
+function chapaComLasca(tipo: 'ponta' | 'lamina', alto = 0): Malha {
   const V = new Map<number, V3>([[0, [0, 0, 0]], [1, [10, 0, 0]], [2, [10, 10, 0]], [3, [0, 10, 0]], [4, [0, 0, 1]], [5, [10, 0, 1]], [6, [10, 10, 1]], [7, [0, 10, 1]]]);
   const F = new Map<number, { vs: number[]; parte: string }>();
   const poe = (vs: number[]) => F.set(F.size, { vs, parte: 'chapa' });
@@ -115,7 +120,7 @@ function chapaComLasca(tipo: 'ponta' | 'lamina'): Malha {
     poe([7, 4, 8]); poe([7, 8, 5]); poe([7, 5, 6]);
   } else {
     /* um ponto a 0,0021 da diagonal do topo, dentro do triângulo de cima: o triângulo da diagonal sai com a altura de 2 µm */
-    V.set(8, [5, 5.003, 1]);
+    V.set(8, [5, 5.003, 1 + alto]);
     poe([0, 1, 5, 4]); poe([1, 2, 6, 5]); poe([2, 3, 7, 6]); poe([3, 0, 4, 7]);
     poe([4, 5, 6]); poe([4, 6, 8]); poe([6, 7, 8]); poe([7, 4, 8]);
   }
@@ -142,18 +147,21 @@ describe('limparLascas: o cálculo puro', () => {
     });
   }
   it('uma tolerância menor que o que a lasca pede deixa a face como está e diz por quê', () => {
-    const m = chapaComLasca('lamina');
-    const r = limparLascas(m, { tolerancia: 1e-4 });
+    /* o ponto 5 µm acima do plano do topo: a troca da diagonal move a superfície até 2,5 µm */
+    const m = chapaComLasca('lamina', 0.005);
+    const r = limparLascas(m, { tolerancia: 1e-3 });
     expect(r.relatorio.finasDepois).toBe(1);
     expect(r.relatorio.restantes[0].recusas.join(' ')).toMatch(/tolerância/);
     expect(aplicar(m, r).V.size).toBe(m.V.size);
+    expect(limparLascas(m, { tolerancia: 0.01 }).relatorio.finasDepois).toBe(0);
   });
   it('não toca face fora da seleção nem a que tem tinta, e a parte não perde a última face', () => {
     const m = chapaComLasca('ponta');
     const so = limparLascas(m, { tolerancia: 0.01, selecao: [0, 1, 2, 3, 4] });
-    expect(so.relatorio.finasDepois).toBe(1);
-    const tinta = chapaComLasca('ponta'); (tinta.F.get(4) as any).tinta = [{ x: 1 }];
-    expect(limparLascas(tinta, { tolerancia: 0.01 }).relatorio.finasDepois).toBe(1);
+    expect(so.relatorio.finasAntes).toBe(0);
+    expect(finas(aplicar(m, so))).toBe(1);
+    const tinta = chapaComLasca('ponta'); (tinta.F.get(5) as any).tinta = [{ x: 1 }];
+    expect(limparLascas(tinta, { tolerancia: 0.01 }).relatorio.restantes.map((x: any) => x.face)).toEqual([5]);
   });
   it('recusa a tolerância que não é número positivo e o limite fora de 0 a 0,5', () => {
     const m = chapaComLasca('ponta');
@@ -219,7 +227,8 @@ describe('limparLascas: o corte em modo superfície do paineisPorVaos', () => {
     const m = copia(st);
     const a = limparLascas(m, { tolerancia: 0.01 });
     const b = limparLascas(copia(st), { tolerancia: 0.01 });
-    const texto = (r: any) => JSON.stringify({ v: [...r.vertices], rv: [...r.verticesRemovidos], f: [...r.faces], rf: [...r.facesRemovidas], u: [...r.fusoes] });
+    const ord = (m: Map<number, unknown>) => [...m].sort((x, y) => x[0] - y[0]);
+    const texto = (r: any) => JSON.stringify({ v: ord(r.vertices), rv: [...r.verticesRemovidos].sort((x: number, y: number) => x - y), f: ord(r.faces), rf: [...r.facesRemovidas].sort((x: number, y: number) => x - y), u: ord(r.fusoes) });
     expect(texto(a)).toBe(texto(b));
     const embaralhada: Malha = { V: new Map([...m.V].reverse()), F: new Map([...m.F].reverse()) };
     expect(texto(limparLascas(embaralhada, { tolerancia: 0.01 }))).toBe(texto(a));
@@ -289,7 +298,7 @@ describe('limparLascas: a operação no passo', () => {
   it('a origem da booleana segue citável, e o par da costura acompanha a fusão', () => {
     const g = paineisPorVaos({ chapa: casca((x: number, z: number) => (x * x - z * z) / 300), vao: 4, linhas: JANELA, paineis: PJ, modo: 'superficie' });
     const passos = comLimpeza(g);
-    const com = nucleo([...passos, ['solido', { sel: { origem: g.origemDoCorte, costura: true } }]], {}, {});
+    const com = nucleo([...passos, ['solido', { sel: { origem: { ...g.origemDoCorte, costura: true } } }]], {}, {});
     expect(com.orfaos).toEqual([]);
     expect(new Set([...com.F.values()].map((f: any) => f.parte)).size).toBe(2);
   });
@@ -297,25 +306,34 @@ describe('limparLascas: a operação no passo', () => {
 
 /* ---- (e) o tempo numa chapa de 54 mil faces ---- */
 describe('limparLascas: o tempo', () => {
-  it('numa chapa de subdivisão de 54 mil faces com lascas semeadas, a limpeza leva poucos segundos', () => {
-    const st = nucleo(casca((x: number, z: number) => -(x * x + z * z) / 300, 21, 3).passos, {}, {});
-    const m = copia(st);
+  it('numa chapa de subdivisão de 52 mil faces sem lasca, a varredura leva menos de 3 s', () => {
+    const m = copia(nucleo(casca((x: number, z: number) => -(x * x + z * z) / 300, 21, 3).passos, {}, {}));
     expect(m.F.size).toBeGreaterThan(50000);
-    expect(m.F.size).toBeLessThan(60000);
-    /* semeia até 40 lascas: o terceiro canto de uma face quad vem para a vertical do segundo, a 1 µm */
-    const ids = [...m.F.keys()].filter((_, k) => k % 1300 === 7).slice(0, 40);
-    let semeadas = 0;
-    for (const id of ids) {
-      const vs = m.F.get(id)!.vs; if (vs.length !== 4) continue;
-      const b = m.V.get(vs[1]) as V3; const c = m.V.get(vs[2]) as V3;
-      m.V.set(vs[2], [b[0] + 1e-3, c[1], c[2]] as V3);
-      semeadas++;
-    }
-    expect(semeadas).toBeGreaterThan(0);
     const t0 = performance.now();
     const r = limparLascas(m, { tolerancia: 0.01 });
     const ms = performance.now() - t0;
-    process.stdout.write(`[chapa de ${m.F.size} faces] limpeza ${ms.toFixed(0)} ms, faces finas ${r.relatorio.finasAntes} -> ${r.relatorio.finasDepois}, colapsos ${r.relatorio.colapsos}, trocas ${r.relatorio.trocas}, absorções ${r.relatorio.absorcoes}\n`);
+    process.stdout.write(`[chapa de subdivisão de ${m.F.size} faces] limpeza ${ms.toFixed(0)} ms, sem lasca\n`);
+    expect(r.relatorio.finasAntes).toBe(0);
+    expect(ms).toBeLessThan(3000);
+  });
+  it('em 54 mil faces de lajes com uma lasca a cada oito ou nove (6.400, de uma lâmina ou de uma ponta), a limpeza leva menos de 5 s e as desfaz', () => {
+    const V = new Map<number, V3>(); const F = new Map<number, { vs: number[]; parte: string }>();
+    let nv = 0; let nf = 0;
+    for (let k = 0; k < 6400; k++) {
+      const lajes = chapaComLasca(k % 2 ? 'ponta' : 'lamina');
+      const base = nv; const dx = (k % 100) * 20; const dy = Math.floor(k / 100) * 20;
+      for (const [id, p] of lajes.V) V.set(base + id, [p[0] + dx, p[1] + dy, p[2]]);
+      nv += lajes.V.size;
+      for (const f of lajes.F.values()) F.set(nf++, { vs: f.vs.map((v) => base + v), parte: `laje${k}` });
+    }
+    expect(F.size).toBeGreaterThan(50000);
+    const m: Malha = { V, F };
+    const t0 = performance.now();
+    const r = limparLascas(m, { tolerancia: 0.01 });
+    const ms = performance.now() - t0;
+    process.stdout.write(`[${F.size} faces, ${r.relatorio.finasAntes} lascas] limpeza ${ms.toFixed(0)} ms, faces finas ${r.relatorio.finasAntes} -> ${r.relatorio.finasDepois}, colapsos ${r.relatorio.colapsos}, trocas ${r.relatorio.trocas}\n`);
+    expect(r.relatorio.finasAntes).toBe(6400);
+    expect(r.relatorio.finasDepois).toBe(0);
     expect(ms).toBeLessThan(5000);
     expect(semPar(aplicar(m, r))).toBe(0);
   });

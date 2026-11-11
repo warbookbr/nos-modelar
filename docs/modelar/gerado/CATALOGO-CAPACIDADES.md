@@ -2,7 +2,7 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:4ec741dd34e2c63e22b7975346a787969823fa740842cd5487881912e9e0c8d4`.
+Assinatura do registro: `sha256:0bae44b6cf93886ba56390ad7deb431c146bf528b2a1010c3d7d1ca261d327c0`.
 
 Há 41 operações em 1 módulo(s).
 
@@ -29,7 +29,7 @@ Há 41 operações em 1 módulo(s).
 | `inflate` | Construir volume fechado pelo cruzamento de uma silhueta lateral e uma planta. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.inflate@1` |
 | `intersectar` | Manter só o volume comum a todos os sólidos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.intersectar@1` |
 | `lathe` | Revolucionar perfil [raio,y] em torno de um eixo. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.lathe@1` |
-| `limparLascas` | Tirar de uma seleção as faces finas (área / maior aresta² abaixo de 0,003) que uma booleana deixou, trocando a diagonal, colapsando a aresta curta ou juntando a lasca à vizinha, sem criar vértice nem face e sem mover a superfície além da tolerância. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.limparLascas@1` |
+| `limparLascas` | Tirar de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície além da tolerância. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.limparLascas@1` |
 | `liso` | Marcar faces para sombreamento liso. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.liso@1` |
 | `loft` | Conectar seções ao longo de um caminho 3D. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.loft@1` |
 | `material` | Associar faces a um material declarado em MATERIAIS. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.material@1` |

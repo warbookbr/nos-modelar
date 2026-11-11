@@ -41,7 +41,8 @@
     "pesar",
     "subdivisao",
     "friso",
-    "aberturaPorContorno"
+    "aberturaPorContorno",
+    "limparLascas"
   ],
   "casos": [
     {
@@ -442,6 +443,16 @@
       "hashCanonico": "10759ad75590d0aa1ca7dedbe1fafbef55dae4a318c2c81fb09633b2bfeb6d48",
       "vertices": 194,
       "faces": 212,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/limparLascas",
+      "operacoes": [
+        "limparLascas"
+      ],
+      "hashCanonico": "4e4176f1c5fd846853d39cca2733055d56feea7c8ab870c22e9b448b39ad643c",
+      "vertices": 14,
+      "faces": 12,
       "diagnosticos": 0
     }
   ]

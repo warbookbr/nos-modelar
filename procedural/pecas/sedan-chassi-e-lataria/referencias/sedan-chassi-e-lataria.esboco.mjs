@@ -12,21 +12,28 @@
  * (o corpo de baixo pela interseção dos prismas do perfil lateral, da planta e da seção, unido à cabine pela interseção do perfil lateral
  * e da seção dela) menos o mesmo sólido recuado da espessura (os perfis recuados pelo `deslocar` da `extrusao`, e o perfil lateral por
  * `recuar`, que deixa o fundo aberto). `paineisPorVaos`, do núcleo, parte essa chapa pelas LINHAS de vão, cada uma desenhada numa vista,
- * num `subtrair` só, e nomeia cada painel pelo ponto visto dele (`linhasDeVao` e `sementes`, antes de `lataria`). As linhas de lado não têm alcance e
- * cortam os dois lados do carro; as de cima e as de frente têm o alcance que as limita à face delas. O arco de roda, os vãos dos faróis,
- * da grade e das lanternas e os furos dos suportes são linhas fechadas com o pedaço de dentro descartado; cada janela é uma linha
- * fechada cujo pedaço de dentro é o vidro, que por isso tem a espessura da chapa. O vão é medido ao longo da chapa: o ajudante estreita a
- * lâmina onde a chapa é inclinada em relação à vista. A versão anterior, com a casca montada 23 vezes, está descrita no ATRITOS.
+ * num `subtrair` só, e nomeia cada painel pelo ponto visto dele (`linhasDeVao` e `sementes`, antes de `lataria`). A linha que fica numa
+ * face só, ou em faces da mesma parede, vai no modo superfície, com a lâmina varrida sobre a chapa e as paredes do corte normais a ela:
+ * os vidros, os furos da frente e de trás, as linhas do capô e da tampa, o contorno das portas acima da cintura, a soleira e o fim da
+ * porta traseira. Essa linha corta só a camada vista do `lado`, e a de lado é escrita para os dois lados do carro. Os três planos de
+ * corte que atravessam o carro, a linha de cintura e a linha entre as portas, que passam pelo degrau do ombro, e os arcos de roda vão no
+ * modo vista, em que a lâmina atravessa o carro. O arco de roda, os vãos dos faróis, da grade e das lanternas e os furos dos suportes
+ * são linhas fechadas com o pedaço de dentro descartado; cada janela é uma linha fechada cujo pedaço de dentro é o vidro, que por isso
+ * tem a espessura da chapa. As duas versões anteriores e o que o modo superfície ainda não resolve estão no ATRITOS.
  *
  * O CHASSI é de caixas e extrusões. O membro que encosta por dentro na lataria (soleira, montante, parede corta-fogo, suporte do
- * radiador, anteparo traseiro, caixa de roda) é desenhado passando da chapa e aparado pela interseção com o interior da casca
- * (`interior()`), e por isso acaba na face de dentro da chapa.
+ * radiador, anteparo traseiro, caixa de roda) é desenhado passando da chapa e aparado pela interseção com o interior da casca, e por
+ * isso acaba na face de dentro da chapa. O interior é construído uma vez por espessura e copiado no lugar para cada membro (`arranja`
+ * com `coincidente`). As quatro rodas saem de uma chamada de `instanciaDeFamilia`.
  *
  * Eixos: x lateral (a direita do carro em +x), y altura com o chão em 0, z comprimento com a frente em +z, centrado em x e z. Tudo em
  * mm. As cores são uma por painel, para os vãos aparecerem; a cor do objeto real está no `.conferir.json`.
  *
- * `npm run esboco:nucleo -- <este arquivo> --so-montar` dá a caixa e o relato de contatos. `SEDAN=chassi` monta só o chassi com as
- * rodas, `SEDAN=explodida` afasta os painéis do chassi, e `SEDAN_CORES=reais` pinta as partes com a cor do objeto real. */
+ * `npm run esboco:nucleo -- <este arquivo> --so-montar` dá a caixa e o relato de contatos, e `npm run vao:partes -- <este arquivo>
+ * --esperado=4 --tolerancia=0.2` mede o vão e o degrau de cada par, com as folgas de desenho e as partes soltas de propósito declaradas
+ * na opção (`CONTATOS` e `APOIA`). `SEDAN=chassi` monta só o chassi com as rodas, `SEDAN=explodida` afasta os painéis do chassi,
+ * `SEDAN_CORES=reais` pinta as partes com a cor do objeto real, e `SEDAN_PLANOS=superficie` troca os três planos de corte por linhas de
+ * superfície, para reproduzir o que o ATRITOS registra delas. */
 import { instanciaDeFamilia } from '../../../../tools/modelar/instancia-de-familia.mjs';
 import { paineisPorVaos } from '../../../nucleo/paineis-por-vaos.js';
 
@@ -205,7 +212,6 @@ const LANTERNA = (s) => retangulo(s * T.lanterna.x0, T.lanterna.y0, s * T.lanter
 const SUPORTE = { x0: 384, x1: 456, frente: [444, 486], tras: [462, 486], xTras: [404, 436] };
 const FURO = (s, [y0, y1], [x0, x1] = [SUPORTE.x0, SUPORTE.x1]) => retangulo(s * (x0 - G), y0 - G, s * (x1 + G), y1 + G);
 const R_ARCO = T.roda.raio + T.roda.folgaDoArco;
-const FUNDO = T.lado.at(-1)[1];      /* a borda de baixo da chapa, do arco de trás à frente */
 /** A altura da face de cima do corpo em z, pelo perfil lateral. */
 function yDoTopo(z) {
   const topo = T.lado.slice(0, 4);
@@ -219,7 +225,8 @@ function xDaPlanta(z) {
 }
 /** Os trechos da linha de lado que desce a parede do corpo em z, um por face: a faixa de cima, a faixa inclinada do ombro e a parede da
  *  planta. Cada trecho acaba a `ponta` mm da dobra, e o ajudante alonga as duas pontas que se encontram e fecha o canto. Uma linha só,
- *  atravessando as duas dobras, o núcleo recusa (ATRITOS, terceira etapa). */
+ *  atravessando as duas dobras, o núcleo recusa, e com as pontas a 0,5 mm da dobra a emenda deixou um dente no lado esquerdo do carro
+ *  (ATRITOS, terceira etapa). */
 function descendoAParede(z, yInicio, yFim, ponta) {
   const [xDeCima, yDaDobra] = T.secao[2]; const [xDeBaixo, yDeBaixo] = T.secao[1];
   const x = Math.min(xDaPlanta(z), xDeBaixo);
@@ -230,29 +237,36 @@ function descendoAParede(z, yInicio, yFim, ponta) {
 const circulo = (zc, R, n = 48) => arco(zc, T.roda.raio, R, 0, 2 * Math.PI * (1 - 1 / n), n - 1);
 
 /* As linhas de vão, cada uma o meio do vão na vista em que foi desenhada: 'x' é a vista de lado ([z, y]), 'y' a de cima ([x, z]) e 'z'
-   a de frente ([x, y]). Quase todas vão no modo superfície: a lâmina é varrida sobre a chapa, com as paredes normais a ela, e corta só
-   a camada vista do `lado`, de modo que a linha de lado vale para um lado do carro e `dosDoisLados` a escreve para os dois. Ficam no
-   modo vista, em que a lâmina atravessa o carro, as linhas que passam pelo degrau de 10 mm da cintura, que a vista de lado vê de
-   perfil, e os arcos de roda, porque o furo do modo superfície não atravessa dobra. */
+   a de frente ([x, y]). As linhas que ficam numa face só, ou em faces da mesma parede, vão no modo superfície: a lâmina é varrida
+   sobre a chapa, com as paredes normais a ela, e corta só a camada vista do `lado`, de modo que a linha de lado vale para um lado do
+   carro e `dosDoisLados` a escreve para os dois. Ficam no modo vista, em que a lâmina atravessa o carro, os três planos de corte, as
+   linhas que passam pelo degrau de 10 mm da cintura, que a vista de lado vê de perfil, e os arcos de roda, porque o furo do modo
+   superfície não atravessa dobra. */
 const SUPERFICIE = { modo: 'superficie' };
+const PLANOS = process.env.SEDAN_PLANOS ?? 'vista';
 const DE_CIMA = { ...SUPERFICIE, alcance: [900, 1200] };       /* só a face de cima do corpo; o teto da cabine fica acima do alcance */
 const dosDoisLados = (linha) => [{ ...linha, ...SUPERFICIE, nome: `${linha.nome}Dir`, lado: '+' }, { ...linha, ...SUPERFICIE, nome: `${linha.nome}Esq`, lado: '-' }];
 function linhasDeVao() {
   const yC = T.yCintura; const yT = T.yTopoDaPorta;
-  const ABAIXO = 300;                        /* abaixo da borda de baixo da chapa: a linha que sai pela borda segue o plano dela */
+  const ABAIXO = 300; const ACIMA = 1100;    /* abaixo da borda de baixo da chapa e acima da face de cima do corpo: a linha sai pela borda */
+  const aoMeio = (nome, z, yInicio) => ({ nome, eixo: 'x', pontos: [[z, yInicio], [z, ABAIXO]] });
   /* A linha não dobra a aresta viva entre duas faces: cada face tem a sua, na vista em que aparece, as pontas acabam a PONTA mm da
      aresta, e o ajudante alonga as duas que se encontram e fecha o canto. O plano de corte que atravessa o carro é a linha de cima,
      na face de cima, e a de lado em cada parede, esta em um trecho por face da parede (`descendoAParede`). */
   const PONTA = 1;
   const xT = T.secao.at(-1)[0] - PONTA;
   const deCima = (nome, z) => ({ nome, eixo: 'y', pontos: [[-xT, z], [xT, z]], ...DE_CIMA });
-  const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => descendoAParede(z, yInicio, ABAIXO, PONTA / 2).flatMap((pontos, k) => dosDoisLados({ nome: `${nome}${k + 1}`, eixo: 'x', pontos }));
+  const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => descendoAParede(z, yInicio, ABAIXO, PONTA / 4).flatMap((pontos, k) => dosDoisLados({ nome: `${nome}${k + 1}`, eixo: 'x', pontos }));
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
   const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [
-    /* os planos de corte: a frente, a traseira e o fim do capô e do para-lama */
-    ...(process.env.PLANOS === 'superficie' ? [deCima('frente', T.zFrente), ...deLado('frenteDaParede', T.zFrente), deCima('tras', T.zTras), ...deLado('trasDaParede', T.zTras), deCima('peDoParaBrisa', T.zCapo), ...deLado('fimDoParaLama', T.zCapo)]
-      : [{ nome: 'frente', eixo: 'x', pontos: [[T.zFrente, 1100], [T.zFrente, ABAIXO]] }, { nome: 'tras', eixo: 'x', pontos: [[T.zTras, 1100], [T.zTras, ABAIXO]] }, { nome: 'fimDoParaLama', eixo: 'x', pontos: [[T.zCapo, yC + PONTA], [T.zCapo, ABAIXO]] }]), /* TEMPORARIO */
+    /* os planos de corte que atravessam o carro, a frente, a traseira e o fim do capô e do para-lama: uma linha de lado em modo vista,
+       que corta a face de cima e as duas paredes, com a lâmina compensada pela parede inclinada na planta. Com
+       `SEDAN_PLANOS=superficie` cada plano vira a linha de cima e três de lado por parede, que montam e deixam o relato de contatos
+       com 17 recusas (ATRITOS, terceira etapa) */
+    ...(PLANOS === 'superficie'
+      ? [deCima('frente', T.zFrente), ...deLado('frenteDaParede', T.zFrente), deCima('tras', T.zTras), ...deLado('trasDaParede', T.zTras), deCima('peDoParaBrisa', T.zCapo), ...deLado('fimDoParaLama', T.zCapo)]
+      : [aoMeio('frente', T.zFrente, ACIMA), aoMeio('tras', T.zTras, ACIMA), aoMeio('fimDoParaLama', T.zCapo, yC + PONTA)]),
     deCima('peDoVidroTraseiro', T.zTampa),
     /* a linha de cintura, de lado e através do carro (modo vista): o pé das colunas A e C fica no degrau do ombro. Onde ela encontra
        a linha de uma coluna, que é de outro modo e não fecha canto com ela, passa até a borda de fora do vão da coluna */
@@ -284,7 +298,6 @@ function linhasDeVao() {
     L.push(furo(`vaoDoFarol${lado}`, '+', FAROL(s)), furo(`vaoDaLanterna${lado}`, '-', LANTERNA(s)));
     L.push(furo(`furoDoSuporteDianteiro${lado}`, '+', FURO(s, SUPORTE.frente)), furo(`furoDoSuporteTraseiro${lado}`, '-', FURO(s, SUPORTE.tras, SUPORTE.xTras)));
   }
-  if (process.env.SEM) { const sem = process.env.SEM.split(','); return L.filter((l) => !sem.some((n) => l.nome.startsWith(n))); } /* TEMPORARIO */
   return L;
 }
 
@@ -311,8 +324,8 @@ function lataria() {
   const inicio = estado.passos.length;
   const origem = casca(T.chapa);
   const passosDaCasca = estado.passos.splice(inicio);
-  const P = sementes().filter(([nome]) => !(process.env.SEM_PAINEL ?? '').split(',').includes(nome)); /* TEMPORARIO */
-  const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(), medirTempo: !!process.env.TEMPO, /* TEMPORARIO */
+  const P = sementes();
+  const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(),
     paineis: P.map(([nome, eixo, ponto, , lado]) => ({ nome, eixo, ponto, ...(lado ? { lado } : {}) })) });
   MEDIDAS_DOS_PAINEIS = { medidas: g.medidas, avisos: g.avisos };
   estado.passos.push(...g.passos);
@@ -510,7 +523,7 @@ for (const L of ['Dir', 'Esq']) {
     par(`lateralTraseira${L}`, 'anteparoTraseiro', 'encosta', 'a lateral traseira assenta na ponta do anteparo'),
     par('teto', `montanteA${L}`, 'encosta', 'o pé da coluna A assenta no topo do montante A'),
     par(`paraLama${L}`, `montanteA${L}`, 'encosta', 'a borda de trás do para-lama assenta no montante A'),
-    par(`portaTraseira${L}`, `montanteC${L}`, 'folga', 'a porta traseira fecha contra o batente do montante C, que fica 4 mm por dentro dela; a borracha fica fora do rascunho'),
+    folga(`portaTraseira${L}`, `montanteC${L}`, 4.5, 0.15, 'a porta traseira fecha contra o batente do montante C, que fica 4 mm por dentro dela; a borracha fica fora do rascunho'),
     par(`portaDianteira${L}`, `soleiraDoChassi${L}`, 'encosta', 'a borda de baixo da porta fecha contra a soleira do chassi'),
     par(`portaTraseira${L}`, `soleiraDoChassi${L}`, 'encosta', 'a borda de baixo da porta fecha contra a soleira do chassi'),
     par('teto', `reforcoDaCintura${L}`, 'encosta', 'o pé da coluna C assenta no reforço da cintura'),
@@ -543,25 +556,44 @@ for (const L of ['Dir', 'Esq']) {
     par('paraChoqueTraseiro', `suporteDoParaChoqueTraseiro${L}`, 'atravessa', 'o suporte entra 2 mm no para-choque'),
     par(`portaDianteira${L}`, `retrovisor${L}`, 'atravessa', 'o pé do retrovisor entra na chapa da porta'),
     /* os vãos da lataria */
-    vao('capo', `paraLama${L}`), vao(`paraLama${L}`, `portaDianteira${L}`), vao(`portaDianteira${L}`, `portaTraseira${L}`),
-    vao(`portaTraseira${L}`, `lateralTraseira${L}`), vao(`portaDianteira${L}`, `soleira${L}`), vao(`portaTraseira${L}`, `soleira${L}`),
+    vao('capo', `paraLama${L}`), vao(`portaDianteira${L}`, `portaTraseira${L}`),
+    vao(`paraLama${L}`, `portaDianteira${L}`, 'vão de 4 mm; na aba do ombro a porta fica 2 mm para dentro do para-lama, num ponto', 4.1, 0.1, 2.1),
+    vao(`portaTraseira${L}`, `lateralTraseira${L}`, 'vão de 4 mm; na aba do ombro a porta fica 2 mm para dentro da lateral, num ponto', 4.1, 0.1, 2.1),
+    vao(`portaDianteira${L}`, `soleira${L}`), vao(`portaTraseira${L}`, `soleira${L}`),
     vao(`paraLama${L}`, `soleira${L}`), vao(`lateralTraseira${L}`, `soleira${L}`),
-    vao(`lateralTraseira${L}`, 'tampaDoPortaMalas'), vao(`lateralTraseira${L}`, 'painelTraseiro'), vao(`paraLama${L}`, 'painelDianteiro'),
+    vao(`lateralTraseira${L}`, 'tampaDoPortaMalas'), vao(`lateralTraseira${L}`, 'painelTraseiro'),
+    vao(`paraLama${L}`, 'painelDianteiro', 'vão de 4 mm; a dobra do ombro cruza o vão em diagonal e deixa as duas bordas 0,6 mm fora de plano num ponto', 4.1, 0.1, 0.6),
     vao(`portaDianteira${L}`, 'teto'), vao(`portaTraseira${L}`, 'teto'),
-    vao(`lateralTraseira${L}`, 'teto', 'vão de 4 mm na linha de cintura, com o degrau de 10 mm do ombro entre a coluna C e a lateral'),
-    vao(`paraLama${L}`, 'teto', 'o para-lama acaba 5,6 mm à frente do pé da coluna A, que fica 2 mm acima dele', 5.6, 0.2),
+    vao(`lateralTraseira${L}`, 'teto', 'vão de 4 mm na linha de cintura, com o degrau de 10 mm do ombro entre a coluna C e a lateral', 4.1, 0.1, 10.5),
+    vao(`paraLama${L}`, 'teto', 'o para-lama acaba 5,6 mm à frente do pé da coluna A, que fica 2 mm acima dele', 5.6, 0.2, 3.1),
     vao(`vidroDianteiro${L}`, `portaDianteira${L}`, 'o vidro fica no vão da janela, 4 mm em toda a volta; a canaleta fica fora do rascunho'),
     vao(`vidroTraseiroDaPorta${L}`, `portaTraseira${L}`, 'o vidro fica no vão da janela, 4 mm em toda a volta; a canaleta fica fora do rascunho'),
     vao(`vigia${L}`, 'teto', 'o vidro fica no vão da coluna C, 4 mm em toda a volta; a borracha fica fora do rascunho'),
-    vao(`farol${L}`, 'painelDianteiro', 'o farol fica no vão do painel, 4 mm em toda a volta; a fixação fica fora do rascunho'),
-    vao(`lanterna${L}`, 'painelTraseiro', 'a lanterna fica no vão do painel, 4 mm em toda a volta; a fixação fica fora do rascunho'),
+    vao(`farol${L}`, 'painelDianteiro', 'o farol fica no vão do painel, 4 mm em toda a volta, com a lente 4 mm à frente dele; a fixação fica fora do rascunho', 4.1, 0.1, 4.1),
+    vao(`lanterna${L}`, 'painelTraseiro', 'a lanterna fica no vão do painel, 4 mm em toda a volta, com a lente 4 mm atrás dele; a fixação fica fora do rascunho', 4.1, 0.1, 4.1),
+    /* as folgas de desenho do chassi e dos acabamentos */
+    folga(`farol${L}`, 'paraChoqueDianteiro', 12, 0.2, 'o para-choque passa 12 mm abaixo do farol'),
+    folga(`paraLama${L}`, 'travessaDoPainel', 6.1, 0.15, 'a travessa do painel fica 6 mm atrás da borda do para-lama, sob o pé da coluna A'),
+    folga('anteparoTraseiro', `longarina${L}`, 2, 0.1, 'a chapa do assoalho, de 2 mm, fica entre o anteparo e a longarina'),
+    folga('assoalho', `montanteC${L}`, 2, 0.1, 'o pé do montante C fica 2 mm ao lado da beira do assoalho'),
+    folga(`longarina${L}`, 'paraChoqueDianteiro', 5.05, 0.15, 'o para-choque fica 4 mm à frente do painel, de 1 mm, que assenta na ponta da longarina'),
+    folga(`longarina${L}`, 'paraChoqueTraseiro', 5.05, 0.15, 'o para-choque fica 4 mm atrás do painel, de 1 mm, que assenta na ponta da longarina'),
+    folga(`lateralTraseira${L}`, `soleiraDoChassi${L}`, 4.4, 0.15, 'a soleira do chassi acaba 4,4 mm à frente da borda da lateral traseira'),
+    folga('painelDianteiro', `suporteDoParaChoqueDianteiro${L}`, 4.1, 0.15, 'o suporte passa pelo furo do painel com 4 mm de folga em volta'),
+    folga('painelTraseiro', `suporteDoParaChoqueTraseiro${L}`, 4.1, 0.15, 'o suporte passa pelo furo do painel com 4 mm de folga em volta'),
   );
+  apoia(`vidroDianteiro${L}`, 'o vidro da porta corre na canaleta do quadro, que fica fora do rascunho');
+  apoia(`vidroTraseiroDaPorta${L}`, 'o vidro da porta corre na canaleta do quadro, que fica fora do rascunho');
+  apoia(`vigia${L}`, 'a vigia é presa pela borracha do vão da coluna C, que fica fora do rascunho');
+  apoia(`farol${L}`, 'o farol é preso por trás no suporte do radiador; a fixação fica fora do rascunho');
+  apoia(`lanterna${L}`, 'a lanterna é presa por trás no painel traseiro; a fixação fica fora do rascunho');
   for (const P of ['Dianteira', 'Traseira']) {
     CONTATOS.push(
       par(`aro${P}${L}`, `pneu${P}${L}`, 'encosta', 'o talão do pneu assenta no aro (família roda-pneu)'),
       par(`aro${P}${L}`, `disco${P}${L}`, 'atravessa', 'a borda do disco entra na parede do aro (família roda-pneu)'),
       par(`cubo${P}${L}`, `disco${P}${L}`, 'atravessa', 'a borda de dentro do disco entra no cubo (família roda-pneu)'),
-      par(`cubo${P}${L}`, P === 'Dianteira' ? 'eixoDianteiro' : 'eixoTraseiro', 'folga', 'o cubo gira no eixo, com 8,6 mm de folga no raio'),
+      folga(`cubo${P}${L}`, P === 'Dianteira' ? 'eixoDianteiro' : 'eixoTraseiro', 8.65, 0.15, 'o cubo gira no eixo, com 8,6 mm de folga no raio'),
+      folga(`disco${P}${L}`, `pneu${P}${L}`, 2.2, 0.1, 'a borda do disco fica a 2,2 mm do talão do pneu (família roda-pneu)'),
     );
   }
 }
@@ -578,14 +610,20 @@ CONTATOS.push(
   par('assoalho', 'anteparoTraseiro', 'encosta', 'o anteparo nasce do assoalho de trás'),
   par('assoalho', 'paredeCortaFogo', 'atravessa', SOLDA),
   vao('capo', 'painelDianteiro'), vao('tampaDoPortaMalas', 'painelTraseiro'),
-  vao('capo', 'teto', 'o capô acaba 5,6 mm à frente do pé do para-brisa, que fica 2 mm acima dele', 5.6, 0.2),
-  vao('tampaDoPortaMalas', 'teto', 'a tampa começa 5 mm atrás do pé do vidro traseiro, que fica 2 mm acima dela', 5.0, 0.2),
+  vao('capo', 'teto', 'o capô acaba 5,6 mm à frente do pé do para-brisa, que fica 2 mm acima dele', 5.6, 0.2, 3.1),
+  vao('tampaDoPortaMalas', 'teto', 'a tampa começa 5 mm atrás do pé do vidro traseiro, que fica 2 mm acima dela', 5.0, 0.2, 3.1),
   vao('paraBrisa', 'teto', 'o vidro fica no vão, 4 mm em toda a volta; a borracha fica fora do rascunho'),
   vao('vidroTraseiro', 'teto', 'o vidro fica no vão, 4 mm em toda a volta; a borracha fica fora do rascunho'),
   vao('grade', 'painelDianteiro', 'a grade fica no vão do painel, 4 mm em toda a volta; a fixação fica fora do rascunho'),
-  par('painelDianteiro', 'paraChoqueDianteiro', 'folga', 'o para-choque fica 4 mm à frente do painel, preso pelos suportes'),
-  par('painelTraseiro', 'paraChoqueTraseiro', 'folga', 'o para-choque fica 4 mm atrás do painel, preso pelos suportes'),
+  folga('painelDianteiro', 'paraChoqueDianteiro', 4, 0.2, 'o para-choque fica 4 mm à frente do painel, preso pelos suportes'),
+  folga('painelTraseiro', 'paraChoqueTraseiro', 3.9, 0.25, 'o para-choque fica 4 mm atrás do painel, preso pelos suportes, e 3,75 mm na faixa inclinada de baixo'),
+  folga('capo', 'travessaDoPainel', 6.1, 0.15, 'a travessa do painel fica 6 mm atrás da borda do capô, sob o pé do para-brisa'),
+  folga('tampaDoPortaMalas', 'travessaDaCabine', 6.05, 0.15, 'a travessa de trás da cabine fica 6 mm à frente da borda da tampa, sob o pé do vidro traseiro'),
+  folga('travessaCentral', 'tunel', 2, 0.1, 'a chapa do assoalho, de 2 mm, fica entre o túnel e a travessa'),
 );
+apoia('paraBrisa', 'o para-brisa é colado no vão do teto; a borracha fica fora do rascunho');
+apoia('vidroTraseiro', 'o vidro traseiro é colado no vão do teto; a borracha fica fora do rascunho');
+apoia('grade', 'a grade é presa por trás no suporte do radiador; a fixação fica fora do rascunho');
 
 export const CORES_DAS_PARTES = CORES;
 export default {

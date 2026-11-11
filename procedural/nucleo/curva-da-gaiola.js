@@ -140,7 +140,7 @@ function gradeDeEstacoes(gaiola) {
   });
   const fechaU = gaiola.estrutura.definicao?.eixo?.fechada === true;
   return {
-    tipo: 'estações', unidade: 'estação', linhas, fechaU, fechaV: false,
+    tipo: 'estações', unidade: 'estação', plural: 'estações', linhas, fechaU, fechaV: false,
     cadeia: (linha, ja, jb) => { const a = linha.pontos[ja]; const b = linha.pontos[jb]; return [a, ...apoiosDe(a, b), ...apoiosDe(b, a).reverse(), b]; },
   };
 }
@@ -161,7 +161,7 @@ function gradeDeLacos(gaiola) {
     if (pontos.length > 1 && pontos[0] === pontos[pontos.length - 1]) { pontos.pop(); colunas.pop(); }
     return { nome: l.nome, em: l.em, colunas, pontos, indice: new Map(colunas.map((c, k) => [c, k])) };
   });
-  return { tipo: 'laços', unidade: 'laço', linhas, fechaU: false, fechaV: true, cadeia: (linha, ja, jb) => [linha.pontos[ja], linha.pontos[jb]] };
+  return { tipo: 'laços', unidade: 'laço', plural: 'laços', linhas, fechaU: false, fechaV: true, cadeia: (linha, ja, jb) => [linha.pontos[ja], linha.pontos[jb]] };
 }
 
 function gradeDe(gaiola) {
@@ -182,14 +182,14 @@ function posicaoDaLinha(G, ref, onde) {
   else if (ref && typeof ref === 'object' && Number.isFinite(ref.em)) {
     const e = G.linhas.map((l) => l.em);
     let k = -1; for (let j = 0; j + 1 < n; j += 1) if (ref.em >= e[j] - EPS && ref.em <= e[j + 1] + EPS) { k = j; break; }
-    if (k < 0) erro(`${onde}: em = ${ref.em} cai fora das ${G.unidade}s (de ${e[0]} a ${e[n - 1]})`);
+    if (k < 0) erro(`${onde}: em = ${ref.em} cai fora das ${G.plural} (de ${e[0]} a ${e[n - 1]})`);
     x = k + (e[k + 1] === e[k] ? 0 : (ref.em - e[k]) / (e[k + 1] - e[k]));
   } else if (ref && typeof ref === 'object' && Array.isArray(ref.entre) && ref.entre.length === 2 && Number.isFinite(ref.fracao)) {
     const a = porNome(ref.entre[0]); const b = porNome(ref.entre[1]);
-    if (!(b === a + 1 || (G.fechaU && a === n - 1 && b === 0))) erro(`${onde}: ${citar(ref.entre[0])} e ${citar(ref.entre[1])} não são ${G.unidade}s vizinhas, nessa ordem`);
+    if (!(b === a + 1 || (G.fechaU && a === n - 1 && b === 0))) erro(`${onde}: ${citar(ref.entre[0])} e ${citar(ref.entre[1])} não são ${G.plural} vizinhas, nessa ordem`);
     x = a + ref.fracao;
   } else erro(`${onde}: a ${G.unidade} se dá por nome, índice (7 ou 7,4), { em } ou { entre: [a, b], fracao } (recebido ${JSON.stringify(ref)})`);
-  if (!(x >= -EPS && x <= n - 1 + EPS) && !G.fechaU) erro(`${onde}: o índice ${x} cai fora das ${G.unidade}s (de 0 a ${n - 1})`);
+  if (!(x >= -EPS && x <= n - 1 + EPS) && !G.fechaU) erro(`${onde}: o índice ${x} cai fora das ${G.plural} (de 0 a ${n - 1})`);
   let i = Math.floor(x + EPS); let t = x - i; if (t < EPS) t = 0;
   if (i > n - 1) { i = n - 1; t = 0; }
   void nomeDe;
@@ -221,11 +221,21 @@ function juntar(pontos) {
 function linhaAoLongoDaLinha(S, G, pedido, onde) {
   const ref = pedido.estacao ?? pedido.laco;
   const n = G.linhas.length;
-  let { i, t } = posicaoDaLinha(G, ref, onde);
-  let ia = i; let ib = (i + 1) % n; let u = t;
-  if (t === 0 && i === n - 1 && !G.fechaU) { ia = n - 2; ib = n - 1; u = 1; }
+  const { i, t } = posicaoDaLinha(G, ref, onde);
   if (n < 2) erro(`${onde}: a gaiola tem uma ${G.unidade} só`);
-  const A = G.linhas[ia]; const B = G.linhas[ib];
+  /* a linha numa estação inteira pede as células de um dos dois lados dela: o da frente (u = 0) e, se a coluna não segue para lá (a chapa acaba na estação, ou a coluna começa nela),
+     o de trás (u = 1) */
+  const frente = (i + 1) % n; const tras = (i + n - 1) % n;
+  if (t === 0 && (i > 0 || G.fechaU) && (i < n - 1 || G.fechaU)) {
+    try { return linhaEntreBruta(S, G, pedido, onde, i, frente, false, 0); } catch (e) { try { return linhaEntreBruta(S, G, pedido, onde, i, tras, true, 1); } catch { throw e; } }
+  }
+  if (t === 0 && i === n - 1 && !G.fechaU) return linhaEntreBruta(S, G, pedido, onde, i, tras, true, 1);
+  return linhaEntreBruta(S, G, pedido, onde, i, frente, false, t);
+}
+
+/** A linha entre a estação de referência `iRef` (de onde vêm os nomes das colunas) e a vizinha `iOut`, que fica atrás dela (`atras`) ou à frente, no ponto u da célula. */
+function linhaEntreBruta(S, G, pedido, onde, iRef, iOut, atras, u) {
+  const A = G.linhas[iRef]; const B = G.linhas[iOut];
   const m = A.colunas.length;
   /* as colunas entre `de` e `ate`, na ordem da linha A; no laço a volta fecha, e sem `de` nem `ate` a linha é a volta inteira */
   const de = pedido.de == null ? 0 : indiceDaColuna(A, pedido.de, `${onde} (de)`);
@@ -250,7 +260,7 @@ function linhaAoLongoDaLinha(S, G, pedido, onde) {
     const cadA = G.cadeia(A, ja, jb); const cadB = G.cadeia(B, kja, kjb);
     if (cadA.length !== cadB.length) erro(`${onde}: entre as colunas ${citar(A.colunas[ja])} e ${citar(A.colunas[jb])} a ${G.unidade} ${citar(A.nome)} tem ${cadA.length - 2} coluna(s) de apoio e ${citar(B.nome)} tem ${cadB.length - 2}`);
     for (let k = 0; k + 1 < cadA.length; k += 1) {
-      const c = celula(S, [cadA[k], cadB[k], cadB[k + 1], cadA[k + 1]], `${onde}, entre ${citar(A.nome)} e ${citar(B.nome)}`);
+      const c = celula(S, atras ? [cadB[k], cadA[k], cadA[k + 1], cadB[k + 1]] : [cadA[k], cadB[k], cadB[k + 1], cadA[k + 1]], `${onde}, entre ${citar(A.nome)} e ${citar(B.nome)}`);
       for (let r = k === 0 && s === 0 ? 0 : 1; r <= S.lado; r += 1) {
         const [fu, fv] = c.ponto(u, r / S.lado);
         pontos.push(avaliar(S, c.fi, fu, fv));
@@ -273,15 +283,18 @@ function linhaAoLongoDaColuna(S, G, pedido, onde) {
     return { ja: j - 1, jb: j, f: 1 };
   };
   if (entre && !(Number.isFinite(entre.fracao) && entre.fracao >= 0 && entre.fracao <= 1)) erro(`${onde}: a fração entre colunas vai de 0 a 1 (recebido ${JSON.stringify(entre.fracao)})`);
-  const de = pedido.de == null ? 0 : posicaoDaLinha(G, pedido.de, `${onde} (de)`).i;
-  const ate = pedido.ate == null ? n - 1 : posicaoDaLinha(G, pedido.ate, `${onde} (ate)`).i;
-  const passo = Math.sign(ate - de) || 1;
-  const sequencia = [];
-  for (let i = de; ; i += passo) { sequencia.push(i); if (i === ate) break; }
-  if (sequencia.length < 2) erro(`${onde}: a linha ao longo da coluna precisa de duas ${G.unidade}s ou mais (de ${citar(G.linhas[de].nome)} a ${citar(G.linhas[ate].nome)})`);
-  const pontos = [];
-  for (let s = 0; s + 1 < sequencia.length; s += 1) {
-    const A = G.linhas[sequencia[s]]; const B = G.linhas[sequencia[s + 1]];
+  /* a linha corre do parâmetro U0 ao U1 (índice de estação, com fração): nos inteiros e nos nós da grade das folhas, de cada intervalo entre duas estações */
+  const posicao = (r, padrao, quem) => { if (r == null) return padrao; const { i, t } = posicaoDaLinha(G, r, `${onde} (${quem})`); return i + t; };
+  const U0 = posicao(pedido.de, 0, 'de'); const U1 = posicao(pedido.ate, n - 1, 'ate');
+  if (Math.abs(U1 - U0) < EPS) erro(`${onde}: de e ate são a mesma ${G.unidade}; a linha precisa de duas ${G.plural} ou mais`);
+  const L = S.lado;
+  const nos = [];
+  for (let k = Math.floor(Math.min(U0, U1) * L + EPS) + 1; k / L < Math.max(U0, U1) - EPS; k += 1) nos.push(k / L);
+  const valores = U1 > U0 ? [U0, ...nos, U1] : [U0, ...nos.reverse(), U1];
+  const celulas = new Map();
+  const daCelula = (k) => {
+    if (celulas.has(k)) return celulas.get(k);
+    const A = G.linhas[k]; const B = G.linhas[k + 1];
     const ia = intervalo(A);
     const nomeA = A.colunas[ia.ja]; const nomeB = A.colunas[ia.jb];
     const kja = B.indice.get(nomeA); const kjb = B.indice.get(nomeB);
@@ -289,13 +302,17 @@ function linhaAoLongoDaColuna(S, G, pedido, onde) {
     const cadA = G.cadeia(A, ia.ja, ia.jb); const cadB = G.cadeia(B, kja, kjb);
     if (cadA.length !== cadB.length) erro(`${onde}: entre as colunas ${citar(nomeA)} e ${citar(nomeB)} a ${G.unidade} ${citar(A.nome)} tem ${cadA.length - 2} coluna(s) de apoio e ${citar(B.nome)} tem ${cadB.length - 2}`);
     const trechos = cadA.length - 1;
-    const x = ia.f * trechos; const k = Math.min(trechos - 1, Math.floor(x + EPS)); const v = x - k;
-    const c = celula(S, [cadA[k], cadB[k], cadB[k + 1], cadA[k + 1]], `${onde}, entre ${citar(A.nome)} e ${citar(B.nome)}`);
-    for (let r = s === 0 ? 0 : 1; r <= S.lado; r += 1) {
-      const [fu, fv] = c.ponto(r / S.lado, v);
-      pontos.push(avaliar(S, c.fi, fu, fv));
-    }
-  }
+    const x = ia.f * trechos; const j = Math.min(trechos - 1, Math.floor(x + EPS));
+    const r = { c: celula(S, [cadA[j], cadB[j], cadB[j + 1], cadA[j + 1]], `${onde}, entre ${citar(A.nome)} e ${citar(B.nome)}`), v: x - j };
+    celulas.set(k, r);
+    return r;
+  };
+  const pontos = valores.map((U) => {
+    const k = Math.min(Math.max(0, Math.floor(U + EPS)), n - 2);
+    const { c, v } = daCelula(k);
+    const [fu, fv] = c.ponto(U - k, v);
+    return avaliar(S, c.fi, fu, fv);
+  });
   return { pontos, fechada: false };
 }
 

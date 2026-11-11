@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:4ec741dd34e2c63e22b7975346a787969823fa740842cd5487881912e9e0c8d4",
+  "assinatura": "sha256:0bae44b6cf93886ba56390ad7deb431c146bf528b2a1010c3d7d1ca261d327c0",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -661,7 +661,7 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Tirar de uma seleção as faces finas (área / maior aresta² abaixo de 0,003) que uma booleana deixou, trocando a diagonal, colapsando a aresta curta ou juntando a lasca à vizinha, sem criar vértice nem face e sem mover a superfície além da tolerância.",
+            "intencao": "Tirar de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície além da tolerância.",
             "schema": "mecanifica.argumentos.limparLascas@1",
             "obrigatorios": [
               "sel",
@@ -1893,7 +1893,7 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Tirar de uma seleção as faces finas (área / maior aresta² abaixo de 0,003) que uma booleana deixou, trocando a diagonal, colapsando a aresta curta ou juntando a lasca à vizinha, sem criar vértice nem face e sem mover a superfície além da tolerância.",
+        "intencao": "Tirar de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície além da tolerância.",
         "schema": "mecanifica.argumentos.limparLascas@1",
         "obrigatorios": [
           "sel",
