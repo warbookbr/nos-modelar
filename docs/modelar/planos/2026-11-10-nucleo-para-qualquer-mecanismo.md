@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`
+**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`
 
 **Responsável:** a IA da sessão que o ativar conduz e mede; a pessoa decide a
 ordem das fatias e julga forma por imagem.
@@ -122,6 +122,14 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    escala de cada uma, a medida adotada com a fonte e o conflito acusado antes
    de modelar. Saída: os 25% da vista de frente da empilhadeira saem da
    ferramenta, sem comparação à mão.
+4a. **Tubo dobrado e chapa fina, neste plano, a fazer.** Na `gaiolaVarrida`, o
+   trilho em polilinha com raio nos cantos e o quadro que mantém a seção
+   perpendicular ao caminho nas subidas; na `gaiolaPorLacos`, a casca aberta
+   com espessura de chapa. Vêm dos itens 6 a 9 dos atritos do carrinho de mão.
+   Saída: o chassi, os pés e a caçamba do carrinho saem cada um de um passo do
+   ajudante, com o tubo de seção redonda a 1 mm em toda estação e a chapa na
+   espessura pedida, e as saídas de hoje dos dois ajudantes ficam idênticas
+   sem as opções novas.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.
@@ -156,6 +164,14 @@ eles, como a seção de riscos diz.
 Em 2026-11-11 a pessoa mandou seguir com a fatia 1, e `vistas-para-critica.mjs`
 passou do plano das partes do braço a este durante a fatia; ele volta àquele
 território quando ela fechar.
+
+No mesmo dia a pessoa escolheu o carrinho de mão como a peça de prova da fatia
+1, aprovou o rascunho dele por imagem ("Sim a forma esta boa") e perguntou
+quando entram as três faltas de tubo dobrado e chapa fina que ele mostrou. Com
+os seis lugares de plano ativo ocupados e os arquivos livres desde que o plano
+da empilhadeira fechou, a metade de tubo e chapa da fatia 4 é feita dentro
+deste plano, antes das receitas do carrinho, que passam a ser a prova dela. A
+escala do carrinho fica pelo pneu de 340 mm, como recomendado.
 
 ## Fechamento
 
