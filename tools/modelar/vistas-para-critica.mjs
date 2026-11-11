@@ -1022,7 +1022,17 @@ export function encaixesDaPeca({ folhas, instancia, declaradas = new Map(), cort
     if (!perto && !declarado) continue;
     const origens = [...(declaradas.get(topo) ?? [])];
     if (!origens.length) origens.push(`a menos de ${alcance} mm, sem declaração na montagem`);
-    const { plano, daPeca, daVizinha, folga } = planoQueCorta(declarado ? planoPelaNormal(declarado.ponto, declarado.normal) : planoDoEncaixe(perto), A, B, Math.max(2 * alcance, 4 * (perto?.folgaMm ?? 0)));
+    const raio = Math.max(2 * alcance, 4 * (perto?.folgaMm ?? 0));
+    let { plano, daPeca, daVizinha, folga } = planoQueCorta(declarado ? planoPelaNormal(declarado.ponto, declarado.normal) : planoDoEncaixe(perto), A, B, raio);
+    /* o contato achado por uma aresta que fura a outra peça pode dar um plano que não passa no contato: tenta os três planos de eixo
+       pelo ponto, e fica o primeiro em que as duas se cruzam ou se tocam */
+    if (!declarado && perto.folgaMm <= FOLGA_DE_CONTATO_MM && !folga?.cruzam) {
+      for (const k of [0, 1, 2]) {
+        const e = [0, 0, 0]; e[k] = 1;
+        const outra = planoQueCorta(planoPelaNormal(perto.naPeca, e, k), A, B, raio);
+        if (outra.folga?.cruzam) { ({ plano, daPeca, daVizinha, folga } = outra); break; }
+      }
+    }
     const folgaMm = perto?.folgaMm ?? folga?.folgaMm ?? null;
     if (folgaMm === null) continue;
     encaixes.push({ vizinha: nome, origens, folgaMm, plano, daPeca, daVizinha, folga, declarado: Boolean(declarado) });
