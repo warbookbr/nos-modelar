@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:87eaaef255764e14a15d642d973357cdb8d12455744a4f395c2bf1cff9a94039",
+  "assinatura": "sha256:d276dcb2042f4328f4de2d05fcf5d3c3cc498309bd384c2db5c2a35a587b9328",
   "total": 40,
   "operacoes": [
     {
@@ -461,6 +461,10 @@
                 "minLength": 1
               },
               "description": "Um nome por cópia, total-1."
+            },
+            "coincidente": {
+              "type": "boolean",
+              "description": "true: modo linear sem d, a cópia NO LUGAR do sólido (geometria coincidente declarada), para servir de ferramenta ou de alvo de mais de uma booleana, que consome o sólido que recebe; cada cópia é um uso, e citá-la depois de consumida grita."
             }
           }
         },
@@ -513,7 +517,8 @@
           "Modo estrutural requer origemId, derivaDe e seleção da origem completa."
         ],
         "limites": [
-          "Repetição radial é UMA descrição: seis abas de maça saem de um arranja radial com volta 360 e total 6. Descrever seis abas à mão é seis lugares para errar. Nomeie as cópias, porque posição não é identidade."
+          "Repetição radial é UMA descrição: seis abas de maça saem de um arranja radial com volta 360 e total 6. Descrever seis abas à mão é seis lugares para errar. Nomeie as cópias, porque posição não é identidade.",
+          "Com coincidente: true o modo linear duplica o sólido no lugar, sem d: um sólido construído uma vez (o interior de uma casca, uma ferramenta de corte) serve a quantas booleanas pedirem, uma cópia por uso, com total = usos (a fonte é o primeiro) e nomes para citar cada cópia."
         ],
         "diagnosticos": []
       }

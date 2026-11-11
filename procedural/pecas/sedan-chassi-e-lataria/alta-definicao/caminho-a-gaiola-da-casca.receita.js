@@ -7,16 +7,16 @@
  * `HD_NC` e `HD_NO` trocam a nitidez da cintura e do ombro para a calibragem do raio; `HD_NIVEIS` troca os níveis. */
 import { T, yFundo, yTopo, noLado, naCintura, noTopo, receitaDoCaminho } from './alvo.mjs';
 
-const NITIDEZ_DA_CINTURA = Number(process.env.HD_NC ?? 0);
-const NITIDEZ_DO_OMBRO = Number(process.env.HD_NO ?? 0);
+const NITIDEZ_DA_CINTURA = Number(process.env.HD_NC ?? 0.15);
+const NITIDEZ_DO_OMBRO = Number(process.env.HD_NO ?? 0.15);
 const NIVEIS = Number(process.env.HD_NIVEIS ?? 3);
 /* colunas de apoio a `d` mm de cada lado da quina (0 para não ter): a face junto do vinco passa a ter `d` mm, e a nitidez age sobre ela */
-const APOIO_DA_CINTURA = Number(process.env.HD_APOIO_C ?? 15.5);
+const APOIO_DA_CINTURA = Number(process.env.HD_APOIO_C ?? 18);
 const APOIO_DO_OMBRO = Number(process.env.HD_APOIO_O ?? 2.75);
 
 /* as estações: os vértices da planta dentro do trecho, o corte da frente e o de trás, o pé do capô, e as de preenchimento */
-const ESTACOES = [1990, 1700, 1421, 1146, 871, 690, 560, 300, 0, -280, -560, -700, -800, -1018, -1237, -1443, -1650, -1825, -2000];
-const I_CAPO = ESTACOES.indexOf(T.zCapo);
+const ESTACOES = [1990, 1700, 1421, 1146, 871, T.zPeDoCapo, 560, 300, 0, -280, -560, -700, -800, -1018, -1237, -1443, -1650, -1825, -2000];
+const I_CAPO = ESTACOES.indexOf(T.zPeDoCapo);
 const DO_LADO = ['fundo', 'baixo', 'alargado', 'meioDoOmbro', ...(APOIO_DO_OMBRO ? ['ombroAbaixo'] : []), 'ombro', ...(APOIO_DO_OMBRO ? ['ombroAcima'] : []),
   ...(APOIO_DA_CINTURA ? ['cinturaAbaixo'] : []), 'cintura'];
 const DO_TOPO = [...(APOIO_DA_CINTURA ? ['cinturaAcima'] : []), 'vaoDoCapo', 'meioDoCapo', 'centro'];

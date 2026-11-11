@@ -154,9 +154,18 @@ export function criarOperacoesEstruturais(servicos) {
       if (a.pivo != null) pivo = st.vec(a.pivo);
     } else {
       if (a.eixo != null || a.volta != null || a.graus != null || a.pivo != null) return grita(st, i, 'arranja', 'eixo/volta/graus/pivo', "modo 'linear' usa só d (eixo, volta, graus e pivo são do modo 'radial')");
-      if (a.d == null) return grita(st, i, 'arranja', 'd', "modo 'linear' exige d:[x,y,z], o deslocamento de UMA instância");
-      d = st.vec(a.d);
-      if (d[0] === 0 && d[1] === 0 && d[2] === 0) return grita(st, i, 'arranja', 'd', 'd nulo põe todas as cópias em cima da fonte — geometria coincidente; nenhuma cópia foi criada');
+      if (a.coincidente != null && a.coincidente !== true) return grita(st, i, 'arranja', 'coincidente', `coincidente só aceita o literal true; recebido ${JSON.stringify(a.coincidente)}`);
+      if (a.coincidente === true) {
+        /* A CÓPIA NO LUGAR: o mesmo sólido duplicado sem deslocamento, para servir de ferramenta ou de alvo de mais de uma booleana (que consome o sólido
+           que recebe). Cada cópia é UM uso: depois que a booleana a consome, citá-la de novo grita como qualquer face consumida. Só no modo linear, só com
+           d ausente ou nulo, e declarada: sem `coincidente`, d nulo segue recusado, porque cópia em cima da fonte sem querer é erro de digitação. */
+        d = a.d == null ? [0, 0, 0] : st.vec(a.d);
+        if (d[0] !== 0 || d[1] !== 0 || d[2] !== 0) return grita(st, i, 'arranja', 'coincidente', 'coincidente: true duplica o sólido NO LUGAR e não combina com d diferente de zero; tire coincidente (cópia deslocada) ou tire d (cópia no lugar)');
+      } else {
+        if (a.d == null) return grita(st, i, 'arranja', 'd', "modo 'linear' exige d:[x,y,z], o deslocamento de UMA instância");
+        d = st.vec(a.d);
+        if (d[0] === 0 && d[1] === 0 && d[2] === 0) return grita(st, i, 'arranja', 'd', 'd nulo põe todas as cópias em cima da fonte — geometria coincidente; nenhuma cópia foi criada (para duplicar o sólido no lugar de propósito, como ferramenta de mais de uma booleana, declare coincidente: true)');
+      }
     }
 
     // ---- identidade estrutural: obrigatória, e conferida ANTES de tocar na malha ----
@@ -228,7 +237,7 @@ export function criarOperacoesEstruturais(servicos) {
       nomesDasCopias,
       transformacao: modo === 'radial'
         ? { modo, eixo: ax, passoGraus, pivo: pivo.slice() }
-        : { modo, d: d.slice() },
+        : { modo, d: d.slice(), ...(a.coincidente === true ? { coincidente: true } : {}) },
     });
   },
 

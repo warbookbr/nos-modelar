@@ -414,3 +414,47 @@ describe('paineisPorVaos: entradas inválidas e memória', () => {
     expect(JSON.stringify(n().passos)).toBe(JSON.stringify(n().passos));
   });
 });
+
+describe('paineisPorVaos: simetria das bordas', () => {
+  /* a distância da pele de um painel, espelhada em x, à pele do outro: o maior desvio dos vértices, nos dois sentidos */
+  const triangulosDe = (st: any, nome: string) => {
+    const t: V3[][] = [];
+    for (const f of st.F.values()) { if (f.parte !== nome) continue; const p = f.vs.map((v: number) => st.V.get(v) as V3); for (let k = 1; k + 1 < p.length; k++) t.push([p[0], p[k], p[k + 1]]); }
+    return t;
+  };
+  const desvioEspelhado = (st: any, a: string, b: string) => {
+    let pior = 0;
+    for (const [de, para] of [[a, b], [b, a]]) {
+      const alvo = triangulosDe(st, para);
+      for (const tri of triangulosDe(st, de)) for (const p of tri) pior = Math.max(pior, Math.min(...alvo.map((u) => distTri([-p[0], p[1], p[2]], u))));
+    }
+    return pior;
+  };
+  /* o telhado de duas águas simétrico em x, extrudado em z, de 1 mm */
+  const TELHADO = ['extrusao', { origemId: 1, eixo: 'z', altura: 800, em: [0, 0, -400], perfil: ([[-300, 0], [0, 150], [300, 0], [300, -1.2], [0, 148.8], [-300, -1.2]] as [number, number][]).map(([x, y]) => [x, -y]).reverse() }];
+
+  for (const modo of ['vista', 'superficie']) {
+    it(`modo ${modo}: duas linhas espelhadas dão painéis cujas peles são espelho uma da outra a menos de 0,01 mm`, () => {
+      const g = paineisPorVaos({
+        chapa: { passos: [TELHADO], origem: { op: 'extrusao', id: 1 } }, vao: 4, modo,
+        linhas: [{ nome: 'dir', eixo: 'y', pontos: [[120, -500], [120, 500]] }, { nome: 'esq', eixo: 'y', pontos: [[-120, 500], [-120, -500]] }],
+        paineis: [{ nome: 'cd', eixo: 'y', ponto: [200, 0] }, { nome: 'ce', eixo: 'y', ponto: [-200, 0] }, { nome: 'meio', eixo: 'y', ponto: [0, 0] }],
+      });
+      const st = nucleo(g.passos, {}, {});
+      expect(st.orfaos).toEqual([]);
+      expect(desvioEspelhado(st, 'cd', 'ce')).toBeLessThan(0.01);
+    });
+  }
+
+  it('um subtrair e um intersectar de sólidos espelhados, sem o ajudante, dão vértices espelhados a menos de 0,01 mm', () => {
+    const corpo = ['cubo', { origemId: 1, larg: 600, alt: 3, prof: 400 }];
+    const ferramenta = (x: number) => ['cubo', { origemId: 2, larg: 40, alt: 10, prof: 600, em: [x, -3, 0] }];
+    const rodar = (op: string, x: number) => nucleo([corpo, ferramenta(x), [op, { origemId: 4, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }] }]], {}, {});
+    for (const op of ['subtrair', 'intersectar']) {
+      const dir = [...rodar(op, 150).V.values()].map((p: number[]) => p); const esq = [...rodar(op, -150).V.values()].map((p: number[]) => p);
+      expect(esq.length).toBe(dir.length);
+      const pior = Math.max(...dir.map((p: number[]) => Math.min(...esq.map((q: number[]) => Math.hypot(q[0] + p[0], q[1] - p[1], q[2] - p[2])))));
+      expect(pior, op).toBeLessThan(0.01);
+    }
+  });
+});

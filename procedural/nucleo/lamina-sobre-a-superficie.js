@@ -35,22 +35,33 @@ const giro = (n1, n2) => Math.acos(Math.max(-1, Math.min(1, dot(n1, n2)))) * GRA
 /**
  * Projeta a polilinha 2D da vista na chapa.
  * @param {{ ler: (a: number, b: number) => ({ c: number[], n: number[], esp: number | null } | null), plano: (a: number, b: number, v: any) => number[] | null,
- *   pontos: number[][], fechada: boolean, amostragem: number, largura: number, eixoIdx: number, nome: string }} o
+ *   pontos: number[][], fechada: boolean, amostragem: number, largura: number, eixoIdx: number, indices: number[], nome: string }} o
  * @returns {{ segmentos: { c: number[], n: number[], esp: number | null }[][], fechadaInteira: boolean, quinas: number, inclinacaoMaxima: number, semChapa: number }}
  */
 export function projetarLinha(o) {
   const { ler, plano, pontos, fechada, amostragem, largura, eixoIdx, nome } = o;
+  const [ia, ib] = o.indices;
+  const perp3 = (u, v) => { const r = [0, 0, 0]; r[ia] = u; r[ib] = v; return r; };
   const n = pontos.length;
   const nSeg = fechada ? n : n - 1;
   /* a lista densa de pontos 2D, com a marca dos que são vértices da linha */
   const densos = [];
+  /* o perpendicular da linha no plano da vista, de cada trecho, como vetor 3D: a direção lateral da lâmina, antes de ir ao plano tangente */
+  const perpendicular = (A, B) => {
+    const L = Math.hypot(B[0] - A[0], B[1] - A[1]);
+    if (!(L > 0)) erro(`a linha '${nome}' tem dois pontos iguais em [${br(A[0])}, ${br(A[1])}]`);
+    return perp3(-(B[1] - A[1]) / L, (B[0] - A[0]) / L);
+  };
   for (let k = 0; k < nSeg; k += 1) {
     const A = pontos[k]; const B = pontos[(k + 1) % n];
+    const m = perpendicular(A, B);
     const M = Math.max(1, Math.ceil(Math.hypot(B[0] - A[0], B[1] - A[1]) / amostragem));
-    for (let j = 0; j < M; j += 1) densos.push([A[0] + (B[0] - A[0]) * (j / M), A[1] + (B[1] - A[1]) * (j / M)]);
+    for (let j = 0; j < M; j += 1) densos.push({ q: [A[0] + (B[0] - A[0]) * (j / M), A[1] + (B[1] - A[1]) * (j / M)], mOut: m, mIn: j === 0 ? null : m });
   }
-  if (!fechada) densos.push([...pontos[n - 1]]);
-  const lidos = densos.map((q) => ({ q, v: ler(q[0], q[1]) }));
+  if (!fechada) densos.push({ q: [...pontos[n - 1]], mOut: densos[densos.length - 1].mOut, mIn: densos[densos.length - 1].mOut });
+  /* a marca de entrada do vértice da linha é a saída do trecho anterior */
+  densos.forEach((d, i) => { if (!d.mIn) d.mIn = (densos[(i + densos.length - 1) % densos.length]).mOut; });
+  const lidos = densos.map((d) => ({ q: d.q, mIn: d.mIn, mOut: d.mOut, v: ler(d.q[0], d.q[1]) }));
   if (lidos.every((s) => !s.v)) return { segmentos: [], fechadaInteira: false, quinas: 0, inclinacaoMaxima: 0, semChapa: lidos.length };
   let semChapa = 0;
   /* a estação sem chapa herda o plano da válida mais próxima, no mesmo raio da vista */
@@ -64,12 +75,12 @@ export function projetarLinha(o) {
     return null;
   };
   const cheias = lidos.map((s, i) => {
-    if (s.v) return { q: s.q, ...s.v, real: true };
+    if (s.v) return { q: s.q, ...s.v, real: true, mIn: s.mIn, mOut: s.mOut };
     semChapa += 1;
     const v = proximaValida(i);
     const c = plano(s.q[0], s.q[1], v);
-    if (!c) erro(`a linha '${nome}' sai da chapa num ponto em que a chapa mais próxima é rasante à vista: desenhe essa linha na vista em que a chapa aparece de frente`);
-    return { q: s.q, c, n: v.n, esp: v.esp, real: false };
+    if (!c) erro(`a linha '${nome}' sai da chapa num ponto em que a chapa mais próxima é rasante à vista (raio rasante): desenhe essa linha na vista em que a chapa aparece de frente`);
+    return { q: s.q, c, n: v.n, esp: v.esp, real: false, mIn: s.mIn, mOut: s.mOut };
   });
   /* a bipartição entre duas estações reais de normal muito diferente */
   const refinar = (A, B, prof) => {
@@ -78,7 +89,7 @@ export function projetarLinha(o) {
     const q = [(A.q[0] + B.q[0]) / 2, (A.q[1] + B.q[1]) / 2];
     const v = ler(q[0], q[1]);
     if (!v) return [];
-    const M = { q, ...v, real: true };
+    const M = { q, ...v, real: true, mIn: A.mOut, mOut: A.mOut };
     return [...refinar(A, M, prof + 1), M, ...refinar(M, B, prof + 1)];
   };
   const todas = [];
@@ -104,7 +115,7 @@ export function projetarLinha(o) {
         cortes.push(i);
       }
     }
-    return { c: s.c, n: s.n, esp: s.esp };
+    return { c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut };
   });
   /* a espessura lida na própria quina corre ao longo da outra face: vale no máximo três vezes a menor lida na linha */
   const lidas = lista.map((s) => s.esp).filter((x) => x != null);
@@ -130,7 +141,8 @@ export function projetarLinha(o) {
     const nm = unit(soma(a.n, b.n)) ?? a.n;
     const t = lado === 'antes' ? rumo(i, -1) : rumo(i + 1, 1);
     const folga = mul(t ?? [0, 0, 0], (lado === 'antes' ? 1 : -1) * (largura / 30));
-    return { c: soma(meio(i), folga), n: nm, esp: Math.max(a.esp ?? 0, b.esp ?? 0) || null, ds: Math.min(3, 1 / Math.max(dot(nm, a.n), 1e-6)) };
+    const ref = lado === 'antes' ? a : b;
+    return { c: soma(meio(i), folga), n: nm, esp: Math.max(a.esp ?? 0, b.esp ?? 0) || null, ds: Math.min(3, 1 / Math.max(dot(nm, a.n), 1e-6)), mIn: ref.mOut, mOut: ref.mOut };
   };
   if (!cortes.length) segmentos.push(lista);
   else if (!fechada) {
@@ -153,39 +165,16 @@ export function projetarLinha(o) {
   return { segmentos, fechadaInteira: fechada && !cortes.length, quinas: cortes.length, inclinacaoMaxima, semChapa };
 }
 
-/** Os dois pontos de borda de uma estação: o lado + e o lado - da lâmina, pela esquadria dos trechos vizinhos. */
-function lateraisDe(est, fechada, minimo) {
-  const N = est.length;
-  const arestas = [];
-  const limite = fechada ? N : N - 1;
-  for (let i = 0; i < limite; i += 1) {
-    const a = est[i]; const b = est[(i + 1) % N];
-    const e = sub(b.c, a.c);
-    const nm = unit(soma(a.n, b.n)) ?? a.n;
-    arestas.push(norma(e) < minimo ? { e: null, s: null } : { e: unit(e), s: unit(cruz(nm, e)) });
-  }
-  /* a aresta curta demais (as duas estações coladas de uma quina) herda o vetor lateral da vizinha longa mais próxima: a direção dela não é confiável */
-  const completas = arestas.map((a, i) => {
-    if (a.s) return a;
-    for (let d = 1; d < arestas.length; d += 1) {
-      for (const j of [i - d, i + d]) {
-        const jj = fechada ? ((j % arestas.length) + arestas.length) % arestas.length : j;
-        if (jj >= 0 && jj < arestas.length && arestas[jj].s) return arestas[jj];
-      }
-    }
-    return a;
-  });
-  arestas.splice(0, arestas.length, ...completas);
-  return est.map((s, i) => {
-    const antes = fechada ? arestas[(i + N - 1) % N] : arestas[i - 1];
-    const depois = fechada ? arestas[i % N] : arestas[i];
-    const um = antes ?? depois;
-    const outro = depois ?? antes;
-    if (!um.s || !outro.s) return null;
-    const sm = unit(soma(um.s, outro.s));
+/** O vetor lateral de cada estação: o perpendicular da linha no plano da vista, levado ao plano tangente da chapa, com a esquadria nos cantos. */
+function lateraisDe(est) {
+  const lado = (m, n) => unit(sub(m, mul(n, dot(m, n))));
+  return est.map((s) => {
+    const sIn = lado(s.mIn, s.n); const sOut = lado(s.mOut, s.n);
+    if (!sIn || !sOut) return null;
+    const sm = unit(soma(sIn, sOut));
     if (!sm) return null;
-    const k = 1 / Math.max(Math.min(dot(sm, um.s), dot(sm, outro.s)), 0.25);
-    return { sm, k, e: (antes ?? depois).e };
+    const k = 1 / Math.max(Math.min(dot(sm, sIn), dot(sm, sOut)), 0.25);
+    return { sm, k };
   });
 }
 
@@ -197,7 +186,7 @@ export function alongar(estacoes, fim, ext) {
   let e = unit(sub(a.c, b.c));
   if (!e) return;
   e = unit(sub(e, mul(a.n, dot(e, a.n)))) ?? e;
-  const nova = { c: soma(a.c, mul(e, ext)), n: a.n, esp: a.esp };
+  const nova = { c: soma(a.c, mul(e, ext)), n: a.n, esp: a.esp, mIn: fim ? a.mOut : a.mIn, mOut: fim ? a.mOut : a.mIn };
   if (fim) estacoes.push(nova); else estacoes.unshift(nova);
 }
 
@@ -209,7 +198,7 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
   const est = estacoes.filter((s, i) => i === 0 || norma(sub(s.c, estacoes[i - 1].c)) > 1e-6);
   if (fechada && est.length > 1 && norma(sub(est[0].c, est[est.length - 1].c)) <= 1e-6) est.pop();
   if (est.length < 2) erro(`a linha '${nome}' ficou com menos de duas estações sobre a chapa`);
-  const lat = lateraisDe(est, fechada, 0.15 * largura);
+  const lat = lateraisDe(est);
   if (lat.some((l) => !l)) erro(`a linha '${nome}' volta sobre si mesma sobre a chapa (um trecho some contra o vizinho); afaste os pontos`);
   const h = largura / 2;
   const topo = 0.25 * largura;
@@ -226,18 +215,20 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     const sinal = area(L) >= area(R) ? 1 : -1;
     dentro = sinal === 1 ? R : L;
     const borda = sinal === 1 ? L : R;
-    borda.forEach((p, i) => { const s = est[i]; vertices.push(soma(p, mul(s.n, topo)), sub(p, mul(s.n, fundoDe(s)))); });
+    borda.forEach((p, i) => { const s = est[i]; const u = unit(sub(s.n, mul(lat[i].sm, dot(s.n, lat[i].sm)))) ?? s.n; vertices.push(soma(p, mul(u, topo)), sub(p, mul(u, fundoDe(s)))); });
     for (let i = 0; i < N; i += 1) {
       const j = (i + 1) % N;
       faces.push([2 * i, 2 * j, 2 * j + 1], [2 * i, 2 * j + 1, 2 * i + 1]);
     }
     const capa = (k) => Array.from({ length: N }, (_, i) => 2 * i + k);
-    faces.push(capa(0), capa(1).reverse());
+    faces.push(capa(0).reverse(), capa(1));
   } else {
     est.forEach((s, i) => {
       const { sm, k } = lat[i];
       const off = mul(sm, h * k);
-      const cima = mul(s.n, topo * (s.ds ?? 1)); const baixo = mul(s.n, fundoDe(s) * (s.ds ?? 1));
+      /* a direção da profundidade é a normal tirada da componente lateral: as paredes ficam planas e normais ao lado, e a folga entre elas é a largura */
+      const u = unit(sub(s.n, mul(sm, dot(s.n, sm)))) ?? s.n;
+      const cima = mul(u, topo * (s.ds ?? 1)); const baixo = mul(u, fundoDe(s) * (s.ds ?? 1));
       vertices.push(soma(soma(s.c, off), cima), sub(soma(s.c, cima), off), sub(sub(s.c, baixo), off), sub(soma(s.c, off), baixo));
     });
     const lim = fechada ? N : N - 1;
@@ -259,21 +250,19 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
   return { vertices: vertices.map((p) => p.map(r4)), faces: saida, dentro, estacoes: est };
 }
 
-/** A volta fechada de estações em que duas partes distantes ao longo dela ficam a menos de `largura` uma da outra: por dentro, a lâmina a inverte. */
-export function voltaMenorQueOVao(centro, largura) {
-  const N = centro.length;
-  const cum = [0];
-  for (let i = 1; i <= N; i += 1) cum.push(cum[i - 1] + norma(sub(centro[i % N], centro[i - 1])));
-  const total = cum[N];
-  const arco = (a, b) => { const d = Math.abs(a - b); return Math.min(d, total - d); };
+/** A volta fechada cujo contorno de dentro, deslocado meia largura, inverte algum trecho (a volta é menor que o vão): a lâmina o deixaria como ilha. */
+export function voltaMenorQueOVao(estacoes, largura) {
+  const lat = lateraisDe(estacoes);
+  if (lat.some((l) => !l)) return true;
+  const N = estacoes.length;
+  const h = largura / 2;
+  const area = (pts) => { let t = [0, 0, 0]; pts.forEach((p, i) => { t = soma(t, cruz(p, pts[(i + 1) % pts.length])); }); return Math.abs(dot(t, estacoes[0].n)); };
+  const lado = (sinal) => estacoes.map((s, i) => soma(s.c, mul(lat[i].sm, sinal * h * lat[i].k)));
+  const A = lado(1); const B = lado(-1);
+  const dentro = area(A) <= area(B) ? A : B;
   for (let i = 0; i < N; i += 1) {
-    for (let j = 0; j < N; j += 1) {
-      const A = centro[j]; const B = centro[(j + 1) % N];
-      if (arco(cum[i], cum[j]) < 2 * largura || arco(cum[i], cum[j + 1]) < 2 * largura) continue;
-      const d = sub(B, A); const L2 = dot(d, d);
-      const t = L2 > 0 ? Math.max(0, Math.min(1, dot(sub(centro[i], A), d) / L2)) : 0;
-      if (norma(sub(centro[i], soma(A, mul(d, t)))) < largura * 0.99) return true;
-    }
+    const j = (i + 1) % N;
+    if (dot(sub(estacoes[j].c, estacoes[i].c), sub(dentro[j], dentro[i])) < 0) return true;
   }
   return false;
 }

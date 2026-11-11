@@ -23,6 +23,8 @@ export const T = {
   roda: { raio: 364, zFrente: 1249, zTras: -1181, folgaDoArco: 40 },
   zFrente: 1990, zTras: -2000, xCapo: 760, zCapo: 690, zPortas: -45, zLateral: -760, ySoleira: 470,
   /* deste ciclo */
+  zPeDoCapo: 693,       /* a borda de trás do topo da frente, 1 mm além da lâmina do vão do para-lama com a porta (z 688 a 692): com a borda em 690 a lâmina
+                           desenhada na vista de lado cortava a quina arredondada da cintura de topo, a 89 graus, e o ajudante recusava a linha */
   yOmbro: 890,          /* a quina do ombro: acima dela a lateral é a da cabine, abaixo dela o para-lama alarga até a planta */
   yAlargado: 700,       /* a altura em que o alargamento do para-lama chega à planta */
   bojo: 6,              /* flecha da lateral na altura, em mm, com o máximo em y 710 */
@@ -31,15 +33,31 @@ export const T = {
   raioDoOmbro: 3,       /* raio pedido na quina do ombro do para-lama */
 };
 
-const interp = (tabela, z) => {
+/* A tabela do rascunho é uma polilinha, com quina em cada vértice (a planta dobra onde o alargamento do para-lama começa). O alvo de alta
+   definição passa pelos mesmos vértices com tangente contínua: a cúbica monótona de Fritsch e Carlson, que não ultrapassa os vértices. */
+function suave(tabela) {
   const t = [...tabela].sort((a, b) => a[0] - b[0]);
-  if (z <= t[0][0]) return t[0][1];
-  for (let i = 1; i < t.length; i++) if (z <= t[i][0]) { const [z0, v0] = t[i - 1]; const [z1, v1] = t[i]; return v0 + ((v1 - v0) * (z - z0)) / (z1 - z0); }
-  return t.at(-1)[1];
-};
-export const yTopo = (z) => interp(T.ladoTopo, z);
-export const yFundo = (z) => interp(T.ladoFundo, z);
-export const meia = (z) => interp(T.planta, z);
+  const n = t.length;
+  const h = []; const d = [];
+  for (let i = 0; i + 1 < n; i++) { h.push(t[i + 1][0] - t[i][0]); d.push((t[i + 1][1] - t[i][1]) / h[i]); }
+  const m = t.map((_, i) => {
+    if (i === 0) return d[0];
+    if (i === n - 1) return d[n - 2];
+    if (d[i - 1] * d[i] <= 0) return 0;
+    const w1 = 2 * h[i] + h[i - 1]; const w2 = h[i] + 2 * h[i - 1];
+    return (w1 + w2) / (w1 / d[i - 1] + w2 / d[i]);
+  });
+  return (z) => {
+    if (z <= t[0][0]) return t[0][1];
+    if (z >= t[n - 1][0]) return t[n - 1][1];
+    let i = 0; while (z > t[i + 1][0]) i++;
+    const u = (z - t[i][0]) / h[i]; const u2 = u * u; const u3 = u2 * u;
+    return (2 * u3 - 3 * u2 + 1) * t[i][1] + (u3 - 2 * u2 + u) * h[i] * m[i] + (-2 * u3 + 3 * u2) * t[i + 1][1] + (u3 - u2) * h[i] * m[i + 1];
+  };
+}
+export const yTopo = suave(T.ladoTopo);
+export const yFundo = suave(T.ladoFundo);
+export const meia = suave(T.planta);
 export const R_ARCO = T.roda.raio + T.roda.folgaDoArco;
 
 /** A lateral: a meia largura em (z, y). */
@@ -71,7 +89,7 @@ const circulo = (zc, R, n = 48) => Array.from({ length: n }, (_, k) => { const a
 export function linhasDeVao({ arcos }) {
   const L = [
     /* de cima ([x, z]): o capô contra a faixa de cima do para-lama */
-    { nome: 'capo', eixo: 'y', pontos: [[T.xCapo, T.zCapo + 0.5], [T.xCapo, T.zFrente - 0.5]], alcance: [900, 1200], alem: 30 },
+    { nome: 'capo', eixo: 'y', pontos: [[T.xCapo, T.zPeDoCapo + 0.5], [T.xCapo, T.zFrente - 0.5]], alcance: [900, 1200], alem: 30 },
     /* de lado ([z, y]); o alcance em x começa dentro do vão do capô, para a lâmina não entalhar o capô */
     { nome: 'fimDoParaLama', eixo: 'x', pontos: [[T.zCapo, 1040], [T.zCapo, yFundo(T.zCapo) - 40]], alcance: [T.xCapo - 1, 1100] },
     { nome: 'entrePortas', eixo: 'x', pontos: [[T.zPortas, T.ySoleira], [T.zPortas, 1040]] },

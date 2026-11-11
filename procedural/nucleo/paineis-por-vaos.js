@@ -9,6 +9,7 @@
  *   vao: a largura do vão DA PELE, ao longo da chapa, em mm; a lâmina é estreitada onde a chapa é inclinada em relação à linha, pela normal local lida da chapa. A folga entre as paredes do corte é a largura da lâmina (menor que o vão na chapa inclinada) e sai em `medidas.folgaMinima`.
  *   linhas: [{ nome?, eixo, pontos, fechada?, alcance?, lado?, dentro?, alem? }] o meio do vão em cada vista; `alcance` [min, max] limita a lâmina no eixo da vista (a linha de um lado do corpo não corta o outro); `lado` '+' ou '-' é de onde se lê a chapa (padrão o lado do alcance); `fechada` fecha a volta e o pedaço de dentro é um painel, ou some com `dentro: 'descarta'`; a volta menor que o vão é recusada; `alem` (mm, não negativo) alonga as pontas da linha aberta.
  *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos. O passo `parte` sai com `onde.conexo` { de, dir, ate }: `ate` é a distância lida mais uma folga, e o núcleo recusa a receita salva cuja semente passou a cair num vão.
+ *   modo: 'vista' (padrão: a lâmina é a extrusão da linha ao longo do eixo da vista, a que corta toda camada do raio, com o vão compensado pela inclinação) ou 'superficie' (a linha é projetada na chapa e a lâmina é varrida sobre ela, de paredes normais à chapa: a folga 3D é o vão em qualquer inclinação, a linha atravessa dobras, a ponta que sai da borda não alarga e duas pontas que se encontram fecham em esquadria; corta só a primeira camada lida do `lado`, até `profundidade` mm abaixo da pele, padrão a espessura lida mais meio vão); vale por linha em `linhas[i].modo`.
  *   origemId: o primeiro origemId livre (padrão: o maior dos passos da chapa mais um); o ajudante usa dali em diante e devolve `proximoId`.
  *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido; folgaAbaixoDe: o aviso `folgaEstreita` quando a lâmina fica abaixo disso, em mm (padrão metade do vão); saida: 'mm' ou 'metro'.
  * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos } com medidas { vaoPedido, inclinacaoMaxima, fatorMinimo, folgaMinima, paineis, paineisAchados, sementesSemPainel, pedacosSemNome, pedacos, execucoes } e avisos { ref, texto }; o resultado é memorizado pela entrada (memoria-de-pura), então a receita que o chama a cada leitura paga a conta uma vez.
@@ -19,7 +20,9 @@
  * peça: procedural/nucleo/paineis-por-vaos.test.ts (a caixa de chapa com uma face a 38 graus da vista e a cuba de subdivisão).
  * FIM DA FICHA
  *
- * A LÂMINA. Cada linha vira um prisma da largura do vão, extrudado ao longo do eixo da vista, e todos entram juntos no `subtrair` da chapa: a
+ * O MODO SUPERFICIE está em `lamina-sobre-a-superficie.js`: a lâmina sai como passo `subdivisao` de niveis 0 (vértices e triângulos, em mm como o resto) e o `subtrair` a trata como qualquer sólido; margem padrão 0,5%.
+ *
+ * A LÂMINA (modo vista). Cada linha vira um prisma da largura do vão, extrudado ao longo do eixo da vista, e todos entram juntos no `subtrair` da chapa: a
  * parede do corte é paralela ao eixo da vista, e com chapa de 1 mm a direção dela não pesa. A linha fechada com pedaço de dentro vira um
  * anel (o prisma de fora menos o de dentro); com `dentro: 'descarta'`, o prisma inteiro. Os cantos da linha são em esquadria.
  *
@@ -375,6 +378,33 @@ function paineisPorVaosBruto(o) {
       passosDeCorte.push(prismaDe(eixo, [...esq, ...[...dir].reverse()], alcance[0], alcance[1], proximo)); ferramentas.push({ op: 'extrusao', id: proximo }); proximo += 1;
     }
   }
+  /* a normal da chapa no ponto do toque, alisada: a de cada canto da face é a média das normais das faces que o dividem e que giram menos que 25 graus da face tocada
+     (a quina viva não entra na média), pesadas pelo inverso da distância do toque ao canto; a normal crua de cada face da malha varia alguns graus de uma face à outra e
+     entortaria a parede da lâmina de uma estação à seguinte */
+  let vizinhas = null;
+  const normalSuave = (face, ponto) => {
+    const { V, F } = leitura.st;
+    if (!vizinhas) {
+      vizinhas = new Map();
+      for (const f of F.values()) for (const v of f.vs) { if (!vizinhas.has(v)) vizinhas.set(v, []); vizinhas.get(v).push(f.id); }
+    }
+    const n0 = normalDaFace(V, F.get(face).vs);
+    let acc = [0, 0, 0];
+    for (const v of F.get(face).vs) {
+      const p = V.get(v);
+      const w = 1 / (Math.hypot(p[0] - ponto[0], p[1] - ponto[1], p[2] - ponto[2]) + 1e-6);
+      let soma3 = [0, 0, 0];
+      for (const id of vizinhas.get(v)) {
+        const ni = normalDaFace(V, F.get(id).vs);
+        if (ni[0] * n0[0] + ni[1] * n0[1] + ni[2] * n0[2] >= 0.9063) soma3 = [soma3[0] + ni[0], soma3[1] + ni[1], soma3[2] + ni[2]];
+      }
+      const L = Math.hypot(...soma3) || 1;
+      acc = [acc[0] + (w * soma3[0]) / L, acc[1] + (w * soma3[1]) / L, acc[2] + (w * soma3[2]) / L];
+    }
+    const L = Math.hypot(...acc);
+    return L > 0 ? acc.map((x) => x / L) : n0;
+  };
+
   /* as linhas em modo 'superficie': projetadas na chapa, alongadas onde duas pontas se encontram, e varridas */
   if (pendentes.length) {
     const largura = o.vao * (1 + (o.margem ?? MARGEM_DA_SUPERFICIE));
@@ -388,7 +418,7 @@ function paineisPorVaosBruto(o) {
         const acertos = leitura.raios.todos(de, dirv).filter((h) => { const c = de[e] + dirv[e] * h.t; return c >= alcance[0] - FOLGA_DO_ALCANCE && c <= alcance[1] + FOLGA_DO_ALCANCE; });
         if (!acertos.length) return null;
         const c = [0, 1, 2].map((k) => de[k] + dirv[k] * acertos[0].t);
-        let nm = normalDaFace(leitura.st.V, leitura.st.F.get(acertos[0].face).vs);
+        let nm = normalSuave(acertos[0].face, c);
         if (nm[0] * dirv[0] + nm[1] * dirv[1] + nm[2] * dirv[2] > 0) nm = nm.map((x) => -x);
         const eps = 1e-4 * Math.max(...leitura.caixa.map(([a0, a1]) => a1 - a0));
         const p0 = c.map((x, k) => x - nm[k] * eps);
@@ -403,7 +433,7 @@ function paineisPorVaosBruto(o) {
         const s2 = ((v.c[0] - p0[0]) * v.n[0] + (v.c[1] - p0[1]) * v.n[1] + (v.c[2] - p0[2]) * v.n[2]) / den;
         return [0, 1, 2].map((k) => p0[k] + dirv[k] * s2);
       };
-      const proj = projetarLinha({ ler, plano, pontos: P, fechada: !!l.fechada, amostragem, largura, eixoIdx: e, nome });
+      const proj = projetarLinha({ ler, plano, pontos: P, fechada: !!l.fechada, amostragem, largura, eixoIdx: e, indices: INDICE[eixo], nome });
       if (!proj.segmentos.length) {
         erro(`a linha '${nome}' não corta a chapa: nenhum dos pontos dela tem chapa na vista ${eixo}, de ${br(alcance[0])} a ${br(alcance[1])} mm; confira o eixo da vista, a ordem dos pontos ([${eixo === 'x' ? 'z, y' : eixo === 'y' ? 'x, z' : 'x, y'}]), o alcance e a unidade (mm)`);
       }
@@ -423,10 +453,9 @@ function paineisPorVaosBruto(o) {
     for (const ln of lidas) {
       const { l, nome, segmentos, fechadaInteira, quinas } = ln;
       if (l.dentro === 'descarta' && quinas > 0) erro(`o furo '${nome}' atravessa ${quinas} dobra(s) viva(s) da chapa: o furo é uma lâmina só e não dobra; desenhe-o numa face, ou use a volta com painel (sem descarta) e descarte o pedaço`);
-      if (l.fechada && l.dentro !== 'descarta') {
-        const centro = segmentos.flat().map((s) => s.c);
-        if (voltaMenorQueOVao(centro, largura)) {
-          erro(`a volta '${nome}' é menor que o vão: duas partes dela ficam a menos de ${br(largura)} mm uma da outra, e a lâmina de ${br(largura)} mm de largura, por dentro, passa do outro lado da volta e deixaria uma ilha fantasma; faça a volta maior que o vão, ou use dentro: 'descarta' para só furar a chapa`);
+      if (l.fechada && l.dentro !== 'descarta' && fechadaInteira) {
+        if (voltaMenorQueOVao(segmentos[0], largura)) {
+          erro(`a volta '${nome}' é menor que o vão: a lâmina de ${br(largura)} mm de largura, por dentro, passa do outro lado da volta e deixaria uma ilha fantasma; faça a volta maior que o vão, ou use dentro: 'descarta' para só furar a chapa`);
         }
       }
       for (const estacoes of segmentos) {

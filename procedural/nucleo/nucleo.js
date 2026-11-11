@@ -1337,7 +1337,8 @@ const CONTRATOS_ORIGEM = {
       return fonte.erro ? `arranja exige de estrutural válido: ${fonte.erro}` : null;
     },
     resolver(st, registro, origem) {
-      const fonte = resolverOrigem(st, origem.de);
+      /* a cópia no lugar (`coincidente`) não precisa da fonte viva: a fonte é o primeiro uso e a booleana que a consome não pode apagar a citação das cópias */
+      const fonte = registro.transformacao?.coincidente ? { faces: [...registro.copias[0].keys()] } : resolverOrigem(st, origem.de);
       if (fonte.erro) return { erro: `de da origem arranja:${origem.id} não resolve: ${fonte.erro}` };
       const nCopias = registro.copias.length;
       let indices;

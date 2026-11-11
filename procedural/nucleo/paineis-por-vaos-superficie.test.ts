@@ -36,7 +36,7 @@ function folga3d(st: any, a: string, b: string) {
   const A = triangulos(st, a); const B = triangulos(st, b);
   const cantos = (T: V3[][]) => [...new Map(T.flat().map((p) => [p.join(','), p])).values()];
   let m = Infinity;
-  for (const p of cantos(A)) for (const t of B) { const d = distTri(p, t); if (d < m) { m = d; if (process.env.DBG) process.stdout.write(`pt ${p.map((x) => x.toFixed(2))} d ${d.toFixed(3)}\n`); } }
+  for (const p of cantos(A)) for (const t of B) { const d = distTri(p, t); if (d < m) { m = d; } }
   for (const p of cantos(B)) for (const t of A) m = Math.min(m, distTri(p, t));
   return m;
 }
@@ -108,7 +108,7 @@ describe('modo superficie: dobras', () => {
     expect(st.orfaos).toEqual([]);
     expect(pedacos(st)).toBe(2);
     const f = folga3d(st, 'a', 'b');
-    process.stdout.write(`DBGF ${f}\n`);
+   
     expect(Math.abs(f - 4) / 4).toBeLessThan(0.02);
     process.stdout.write(`[dobra suave de subdivisão, 1 mm] folga 3D ${f.toFixed(3)}; inclinação lida ${g.medidas.inclinacaoMaxima}\n`);
   });
