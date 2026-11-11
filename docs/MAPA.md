@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1896 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1899 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1450,6 +1450,7 @@
 
 - `receita-01.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 - `receita-02.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
+- `receita-03.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 
 ## procedural/pecas/carrinho-de-mao/partes/chassi/
 
@@ -1463,6 +1464,7 @@
 
 - `receita-01.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
 - `receita-02.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
+- `receita-03.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
 
 ## procedural/pecas/carrinho-de-mao/partes/pes/
 
@@ -1472,6 +1474,7 @@
 
 - `receita-01.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
 - `receita-02.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
+- `receita-03.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
 
 ## procedural/pecas/carrinho-de-mao/partes/roda/
 

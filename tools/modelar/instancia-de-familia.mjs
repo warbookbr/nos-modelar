@@ -3,7 +3,7 @@
  * FICHA instanciaDeFamilia
  * serve: pôr uma família (roda-pneu, dobradiça, cadeira e as outras de procedural/familias/) numa receita ou num esboço como uma instância, ou várias (as quatro rodas de um carro), por uma chamada: escolhe o perfil, sobrescreve parâmetros, nomeia as partes, soma uma base aos ids, converte de metro para a unidade de saída e põe a instância na pose (posição e giro), com as portas que a família publica.
  * quando: o esboço 2.0 ou a receita precisa de uma peça que a família já sabe fazer. Em vez de copiar a expansão de composição, a conversão de metro para mm, a soma da base aos ids e o renome das partes (o que a roda do carrinho de mão e o rascunho do sedã fizeram, o do sedã quatro vezes), chame esta função uma vez por instância.
- * unidades: a família emite em metro. `unidade: 'm'` entrega os passos como saem (a receita); `unidade: 'mm'` converte as medidas dos passos (o esboço 2.0), e a pose vai na unidade de saída. As portas só saem em `unidade: 'm'`, a do contrato de portas.
+ * unidades: a família emite em metro. `unidade: 'm'` entrega os passos como saem (a receita); `unidade: 'mm'` converte as medidas dos passos e das portas (o esboço 2.0), e a pose vai na unidade de saída.
  * campos:
  *   familia: o id da família ('roda-pneu') ou a família carregada por definirFamilia.
  *   perfil: o perfil da família (o de familia.json) que preenche os parâmetros; sem ele valem os padrões.
@@ -12,16 +12,20 @@
  *   base: o maior id já usado no estado ou na receita; os ids da instância somam a base (padrão 0) e `origem` devolve o maior id depois dela.
  *   unidade: 'm' (padrão) ou 'mm'; em mm só as operações com medida conhecida passam, e a outra é recusada pelo nome.
  *   pose: { posicao: [x, y, z], giro } na unidade de saída; `giro` é { eixo, graus, pivo? } ou uma lista deles, aplicados antes da posição, em torno do pivô (padrão a origem da família); as portas publicadas antes da pose a seguem.
+ *   poses: [{ pose, nomes, portaPrefixo? }] várias instâncias numa chamada (as quatro rodas), cada uma com os campos da primeira e os ids encadeados; devolve também `instancias` e `instancia` em cada parte.
+ *   cores: { pneu: '#cor' } pinta cada parte pelo nome dela na família (um `pincel` por parte, o formato do esboço 2.0); materiaisPorParte: { pneu: 'borracha' } dá um passo `material` por parte (o formato da receita com MATERIAIS).
  *   materiais: { usa: '#cor' } troca cada passo `material` por um `pincel` com a cor; `false` tira os passos `material` (o chamador pinta pelo nome da parte); sem ele ficam como a família os emite (a receita com MATERIAIS).
  *   liso: { angulo } (ou o número) acrescenta o passo `liso` de cada parte depois da pose.
  *   emitirPartes: false não emite os passos `parte` (o chamador nomeia com o próprio ajudante, a partir de `partes`); padrão true.
- *   portas: true mantém os passos `publicarPorta` (padrão em 'm'); em 'mm' ficam fora.
+ *   portas: true mantém os passos `publicarPorta`, na unidade de saída e na pose (padrão em 'm'); em 'mm' ficam fora, a menos que peça.
  *   portaPrefixo: o prefixo do id das portas ('dianteira-dir' dá dianteira-dir-eixo), para várias instâncias na mesma receita.
  *   id: o id da chamada da família (padrão 'instancia').
  *   registro: o registro de criarRegistroDeFamilias (padrão o das famílias do produto).
  * devolve: { passos, partes, portas, origem } com partes [{ nome, nomeNaFamilia, sel }], portas os ids publicados e origem o maior id usado, para a próxima instância.
  * exemplo:
- *   instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carrinho-de-mao', parametros: { diametroPneu: 340 }, nomes: 'esquerda', base: 20, unidade: 'mm', portas: false, pose: { posicao: [300, 170, 0], giro: { eixo: 'y', graus: 180 } } })
+ *   instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carro', unidade: 'mm', cores: { pneu: '#151617', aro: '#9aa0a6' }, materiais: false, liso: 35,
+ *     poses: [['Dir', 1, 1249], ['Esq', -1, 1249], ['Dir', 1, -1181], ['Esq', -1, -1181]].map(([lado, s, z]) => ({ nomes: (n) => n + lado + (z > 0 ? 'Frente' : 'Tras'),
+ *       pose: { posicao: [s * 807.5, 364, z], ...(s < 0 ? { giro: { eixo: 'y', graus: 180 } } : {}) } })) }).partes.length === 16
  * peça: procedural/pecas/carrinho-de-mao/partes/roda/receita.js (a roda do carrinho de mão, que copiava estas linhas; a de `montarRoda` sai idêntica por esta chamada).
  * FIM DA FICHA
  *
@@ -115,20 +119,29 @@ function posarInterface(interfaceDeclarada, rotacoes, posicao) {
   return feita;
 }
 
+/* Os campos de comprimento (escalares e pontos) de uma interface de porta, que a família emite em metro. */
+const COMPRIMENTOS = ['raio', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'diametro', 'profundidade', 'passo', 'comprimento', 'altura', 'largura'];
+const PONTOS = ['centro', 'ponto', 'origem'];
+function interfaceEmMm(i) {
+  if (Array.isArray(i)) return i.map(interfaceEmMm);
+  if (!i || typeof i !== 'object') return i;
+  return Object.fromEntries(Object.entries(i).map(([k, v]) => [k, COMPRIMENTOS.includes(k) && typeof v === 'number' ? emMm(v)
+    : (PONTOS.includes(k) && Array.isArray(v)) || k === 'centros' ? emMm(v) : typeof v === 'object' ? interfaceEmMm(v) : v]));
+}
+
 const giros = (giro) => (giro === undefined || giro === null ? [] : Array.isArray(giro) ? giro : [giro]);
 
 /**
  * Os passos de uma instância da família, na ordem: os da família (ids somados à base, medidas na unidade de saída, partes renomeadas), e por
  * parte o giro, a posição e o `liso`. Ver a FICHA acima para os campos.
  */
-export function instanciaDeFamilia({
-  familia, perfil = null, parametros = {}, nomes = null, base = 0, unidade = 'm', pose = null, materiais, liso = null,
+function umaInstancia({
+  familia, perfil = null, parametros = {}, nomes = null, base = 0, unidade = 'm', pose = null, materiais, cores = null, materiaisPorParte = null, liso = null,
   emitirPartes = true, portas, portaPrefixo = null, id = 'instancia', registro = criarRegistroDeFamilias(),
 } = {}) {
   if (unidade !== 'm' && unidade !== 'mm') erro(`unidade '${unidade}' não é 'm' nem 'mm'`);
   if (!Number.isFinite(base) || base < 0) erro(`base ${base} não é um id (número de 0 para cima)`);
   const comPortas = portas ?? unidade === 'm';
-  if (comPortas && unidade === 'mm') erro("as portas são em metro, a unidade do contrato de portas; use unidade 'm' numa receita, ou portas: false num esboço em mm");
   const carregada = typeof familia === 'string' ? registro.obter(familia) : familia;
   if (!carregada?.contrato) erro('familia é o id de uma família registrada ou a família carregada por definirFamilia');
   const chamada = chamar(carregada, id, { ...(perfil ? { perfil } : {}), ...parametros });
@@ -158,7 +171,7 @@ export function instanciaDeFamilia({
       const nome = args.id ?? args.nome;
       const novo = portaPrefixo ? `${portaPrefixo}-${nome}` : nome;
       publicadas.push(novo);
-      passos.push([op, { ...args, ...(args.id !== undefined ? { id: novo } : { nome: novo }), ...(args.interface ? { interface: posarInterface(args.interface, rotacoes, pose?.posicao) } : {}) }]);
+      passos.push([op, { ...args, ...(args.id !== undefined ? { id: novo } : { nome: novo }), ...(args.interface ? { interface: posarInterface(unidade === 'mm' ? interfaceEmMm(args.interface) : args.interface, rotacoes, pose?.posicao) } : {}) }]);
       continue;
     }
     if (op === 'material' && materiais === false) continue;
@@ -177,10 +190,32 @@ export function instanciaDeFamilia({
     passos.push([op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, campos.includes(k) ? emMm(v) : v]))]);
   }
   const angulo = typeof liso === 'number' ? liso : liso?.angulo;
-  for (const { sel } of partes) {
+  for (const [mapa, rotulo] of [[cores, 'cores'], [materiaisPorParte, 'materiaisPorParte']]) {
+    const fora = Object.keys(mapa ?? {}).filter((n) => !existentes.includes(n));
+    if (fora.length) erro(`${rotulo} cita ${fora.map((n) => `'${n}'`).join(', ')}, que a família não nomeia; as partes dela são ${existentes.join(', ')}`);
+  }
+  for (const { sel, nomeNaFamilia } of partes) {
     for (const g of rotacoes) passos.push(['rotaciona', { eixo: g.eixo, graus: g.graus, pivo: g.pivo ?? [0, 0, 0], sel }]);
     if (pose?.posicao) passos.push(['transladar', { d: pose.posicao, sel }]);
     if (angulo !== undefined && angulo !== null) passos.push(['liso', { sel, angulo }]);
+    if (cores?.[nomeNaFamilia]) passos.push(['pincel', { modo: 'face', sel, cor: cores[nomeNaFamilia] }]);
+    if (materiaisPorParte?.[nomeNaFamilia]) passos.push(['material', { usa: materiaisPorParte[nomeNaFamilia], sel }]);
   }
   return { passos, partes, portas: publicadas, origem: maior };
+}
+
+/** Uma instância da família, ou várias (`poses`): cada `{ pose, nomes, portaPrefixo? }` é uma instância com os mesmos campos da primeira, ids encadeados. */
+export function instanciaDeFamilia({ poses, ...comum } = {}) {
+  if (poses === undefined) return umaInstancia(comum);
+  if (!Array.isArray(poses) || !poses.length) erro('poses é uma lista não vazia de { pose, nomes, portaPrefixo? }');
+  const saida = { passos: [], partes: [], portas: [], origem: comum.base ?? 0, instancias: [] };
+  poses.forEach((p, i) => {
+    const r = umaInstancia({ ...comum, ...p, base: saida.origem });
+    saida.passos.push(...r.passos);
+    saida.partes.push(...r.partes.map((x) => ({ ...x, instancia: i })));
+    saida.portas.push(...r.portas);
+    saida.instancias.push({ partes: r.partes.map((x) => x.nome), portas: r.portas, origem: r.origem });
+    saida.origem = r.origem;
+  });
+  return saida;
 }

@@ -140,11 +140,50 @@ describe('a pose e as portas', () => {
   });
 });
 
+describe('poses, cor por parte e portas em mm', () => {
+  const quatro = ['DirF', 'EsqF', 'DirT', 'EsqT'].map((n, i) => ({ nomes: (p) => p + n, pose: { posicao: [(i % 2 ? -1 : 1) * 0.8, 0.364, i < 2 ? 1.2 : -1.2], ...(i % 2 ? { giro: { eixo: 'y', graus: 180 } } : {}) } }));
+  it('as quatro rodas saem de uma chamada, igual a quatro chamadas encadeadas', () => {
+    const junto = instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carro', poses: quatro, portaPrefixo: 'r' });
+    let base = 0;
+    const separado = quatro.map((q, i) => { const r = instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carro', base, portaPrefixo: 'r', ...q }); base = r.origem; return r; });
+    expect(junto.passos).toEqual(separado.flatMap((r) => r.passos));
+    expect(junto.origem).toBe(base);
+    expect(junto.partes).toHaveLength(16);
+    expect(junto.partes.map((p) => p.instancia).slice(4, 8)).toEqual([1, 1, 1, 1]);
+    expect(junto.instancias.map((i) => i.partes[0])).toEqual(['pneuDirF', 'pneuEsqF', 'pneuDirT', 'pneuEsqT']);
+    expect(() => instanciaDeFamilia({ familia: 'roda-pneu', poses: [] })).toThrow(/poses/);
+  });
+
+  it('a cor e o material por parte saem na chamada, pelo nome da parte na família, e a parte que não existe é recusada', () => {
+    const r = instanciaDeFamilia({ familia: 'roda-pneu', materiais: false, cores: { pneu: '#111111', aro: '#999999' }, materiaisPorParte: { disco: 'aco' } });
+    const pincel = r.passos.filter(([op]) => op === 'pincel');
+    expect(pincel.map(([, a]) => a.cor)).toEqual(['#111111', '#999999']);
+    expect(pincel[0][1]).toMatchObject({ modo: 'face', sel: r.partes[0].sel });
+    expect(r.passos.filter(([op]) => op === 'material')).toEqual([['material', { usa: 'aco', sel: r.partes[3].sel }]]);
+    expect(() => instanciaDeFamilia({ familia: 'roda-pneu', cores: { rodinha: '#000' } })).toThrow(/cores cita 'rodinha'/);
+  });
+
+  it('as portas em mm saem convertidas e na pose: iguais às de metro vezes mil', () => {
+    const pose = (k) => ({ posicao: [0.3 * k, 0.17 * k, -0.5 * k], giro: [{ eixo: 'z', graus: 90 }, { eixo: 'y', graus: 180 }] });
+    const m = instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carrinho-de-mao', pose: pose(1) });
+    const mm = instanciaDeFamilia({ familia: 'roda-pneu', perfil: 'carrinho-de-mao', unidade: 'mm', portas: true, pose: pose(1000) });
+    const portas = (r) => r.passos.filter(([op]) => op === 'publicarPorta').map(([, a]) => a);
+    expect(portas(mm).map((p) => p.id)).toEqual(portas(m).map((p) => p.id));
+    for (const [i, a] of portas(m).entries()) {
+      const b = portas(mm)[i];
+      for (const k of ['raioInterno', 'raioExterno', 'inicio', 'fim', 'diametro', 'profundidade']) if (a.interface[k] !== undefined) expect(b.interface[k]).toBeCloseTo(a.interface[k] * 1000, 3);
+      if (a.interface.centro) a.interface.centro.forEach((x, j) => expect(b.interface.centro[j]).toBeCloseTo(x * 1000, 3));
+      if (a.interface.centros) a.interface.centros.flat().forEach((x, j) => expect(b.interface.centros.flat()[j]).toBeCloseTo(x * 1000, 3));
+      if (a.interface.eixo) expect(b.interface.eixo).toEqual(a.interface.eixo);
+    }
+    expect(portas(mm).find((p) => p.id === 'furos-de-fixacao').interface.centros).toHaveLength(4);
+  });
+});
+
 describe('as recusas dizem o que está errado', () => {
   it('nome, unidade, porta em mm, operação sem medida conhecida e pose', () => {
     expect(() => instanciaDeFamilia({ familia: 'roda-pneu', nomes: { rodinha: 'x' } })).toThrow(/cita 'rodinha'.*as partes dela são pneu, aro, cubo, disco/);
     expect(() => instanciaDeFamilia({ familia: 'roda-pneu', unidade: 'cm' })).toThrow(/unidade 'cm'/);
-    expect(() => instanciaDeFamilia({ familia: 'roda-pneu', unidade: 'mm', portas: true })).toThrow(/portas são em metro/);
     expect(() => instanciaDeFamilia({ familia: 'dobradica', unidade: 'mm' })).toThrow(/a operação 'chapaDobrada' .* não tem as medidas em milímetro/);
     expect(() => instanciaDeFamilia({ familia: 'roda-pneu', pose: { giro: { eixo: 'w', graus: 1 } } })).toThrow(/giro/);
     expect(() => instanciaDeFamilia({ familia: 'roda-pneu', pose: { posicao: [1, 2] } })).toThrow(/pose\.posicao/);
