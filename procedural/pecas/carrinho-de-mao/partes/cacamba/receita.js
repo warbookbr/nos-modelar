@@ -187,10 +187,11 @@ export function montarCacamba(estado, T = TABELA) {
     if (dot(nn, sub(p, meio)) < 0) nn = esc(nn, -1);
     return [p[0] + nn[0] * BO.paraFora, cy, p[2] + nn[2] * BO.paraFora];
   });
-  const pontos = [...fora, fora[0]]; const estacoes = [{ fracao: 0 }]; let s = 0;
-  for (let k = 1; k < pontos.length - 1; k += 1) { s += norma(sub(pontos[k], pontos[k - 1])); estacoes.push({ entre: 1 }, { em: s }); }
+  /* o trilho é fechado, sem começo nem fim nem tampas: uma estação em cada ponto da boca e uma entre cada par, e a última volta à primeira */
+  const estacoes = [{ fracao: 0 }]; let s = 0;
+  for (let k = 1; k < fora.length; k += 1) { s += norma(sub(fora[k], fora[k - 1])); estacoes.push({ entre: 1 }, { em: s }); }
   estacoes.push({ entre: 1 }, { fracao: 1 });
-  parte('borda', tubo('borda', { pontos }, BO.raio, { lados: BO.lados, estacoes, u: [0, 1, 0] }), T.cores.azul);
+  parte('borda', tubo('borda', { pontos: fora, fechado: true }, BO.raio, { lados: BO.lados, estacoes, u: [0, 1, 0], tampas: false }), T.cores.azul);
   /* os tirantes: do laço do chassi para dentro da caçamba, menos o corpo fechado dela (a gaiola com a tampa, subdividida como a
      casca e descida o assento), que os corta na face de fora dela */
   const TI = T.tirantes;
