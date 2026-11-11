@@ -1,11 +1,11 @@
-/* caminho-a-gaiola-da-casca.receita.js: o caminho A do primeiro ciclo de alta definição do sedã. A casca facetada vira gaiola de
+/* caminho-a-gaiola-da-casca.esboco.mjs: o caminho A do primeiro ciclo de alta definição do sedã. A casca facetada vira gaiola de
  * subdivisão: as estações são os vértices da planta do rascunho (mais as que a graduação do passo pede), as colunas são as arestas da
  * seção (o fundo, o alargado, o ombro, a cintura, o vão do capô, o meio do carro) mais uma coluna de meio em cada painel para a flecha,
  * e o raio das arestas de caráter sai da nitidez do vinco na coluna da cintura e na do ombro. A gaiola é escrita à mão como grade de
  * quadriláteros por nome, sem ajudante, e não tem medidas: a superfície aproxima os pontos. Os arcos de roda são abertos pelo corte.
  *
  * `HD_NC` e `HD_NO` trocam a nitidez da cintura e do ombro para a calibragem do raio; `HD_NIVEIS` troca os níveis. */
-import { T, yFundo, yTopo, noLado, naCintura, noTopo, receitaDoCaminho } from './alvo.mjs';
+import { T, yFundo, yTopo, noLado, naCintura, noTopo, esbocoDoCaminho } from './alvo.mjs';
 
 const NITIDEZ_DA_CINTURA = Number(process.env.HD_NC ?? 0.15);
 const NITIDEZ_DO_OMBRO = Number(process.env.HD_NO ?? 0.15);
@@ -37,11 +37,10 @@ for (let i = 0; i + 1 < ESTACOES.length; i++) {
 const coluna = (c, de = 0, ate = ESTACOES.length - 1) => Array.from({ length: ate - de + 1 }, (_, k) => nome(de + k, c));
 const ultima = ESTACOES.length - 1;
 
-const emMetro = Object.fromEntries(Object.entries(pontos).map(([k, p]) => [k, p.map((v) => v / 1000)]));
-const receita = receitaDoCaminho({
-  nome: 'sedan-alta-definicao-caminho-a',
-  desc: 'corpo de baixo direito e capô do sedã em alta definição, pela gaiola tirada das tabelas da casca facetada, com vinco por aresta',
-  pontos: emMetro,
+const { esboco, medidas, avisos } = esbocoDoCaminho({
+  titulo: 'caminho A: gaiola tirada da casca facetada',
+  nota: 'grade de estações da planta por colunas da seção, com colunas de apoio junto das quinas e vinco por aresta',
+  pontos,
   passo: {
     vertices: Object.keys(pontos),
     faces,
@@ -55,4 +54,6 @@ const receita = receitaDoCaminho({
   niveis: NIVEIS,
   arcos: true,
 });
-export default receita;
+export const MEDIDAS_DO_CORTE = medidas;
+export const AVISOS = { gaiola: [], corte: avisos };
+export default esboco;

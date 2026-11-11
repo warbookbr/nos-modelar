@@ -1,4 +1,4 @@
-/* caminho-b-rede-de-curvas.receita.js: o caminho B do primeiro ciclo de alta definição do sedã. A gaiola sai de `gaiolaPorRede`, com as
+/* caminho-b-rede-de-curvas.esboco.mjs: o caminho B do primeiro ciclo de alta definição do sedã. A gaiola sai de `gaiolaPorRede`, com as
  * curvas de feição desenhadas sobre as linhas do carro facetado: a cintura, o ombro do para-lama, o fundo (a borda de baixo, onde
  * fica a soleira), os dois arcos de roda, a frente e a traseira do trecho, e o contorno do topo da frente. Os pontos-chave são
  * amostras do alvo comum (`alvo.mjs`). Os arcos de roda são borda livre da chapa, e não corte. O raio das quinas sai do `vinco` das
@@ -6,7 +6,7 @@
  *
  * `HD_NC` e `HD_NO` trocam a nitidez da cintura e do ombro; `HD_PASSO` o espaçamento da rede; `HD_NIVEIS` os níveis. */
 import { gaiolaPorRede } from '../../../nucleo/gaiola-por-rede.js';
-import { T, yFundo, noLado, naCintura, noTopo, noArco, R_ARCO, receitaDoCaminho } from './alvo.mjs';
+import { T, yFundo, noLado, naCintura, noTopo, noArco, R_ARCO, esbocoDoCaminho } from './alvo.mjs';
 
 const NITIDEZ_DA_CINTURA = Number(process.env.HD_NC ?? 0.4);
 const NITIDEZ_DO_OMBRO = Number(process.env.HD_NO ?? 0.69);
@@ -86,13 +86,16 @@ const rede = gaiolaPorRede({
 });
 
 export const REDE = rede;
-const receita = receitaDoCaminho({
-  nome: 'sedan-alta-definicao-caminho-b',
-  desc: 'corpo de baixo direito e capô do sedã em alta definição, pela gaiola por rede de curvas sobre as linhas do carro facetado',
-  pontos: rede.pontos,
+/* a rede devolve os pontos em metro, como o TOPO de uma receita; o esboço e `paineisPorVaos` os querem em mm */
+const emMm = Object.fromEntries(Object.entries(rede.pontos).map(([k, p]) => [k, p.map((c) => c * 1000)]));
+const { esboco, medidas, avisos } = esbocoDoCaminho({
+  titulo: 'caminho B: gaiola por rede de curvas',
+  nota: 'curvas de feição sobre as linhas do carro facetado, arcos de roda como borda livre, raio pelo vinco das curvas',
+  pontos: emMm,
   passo: rede.passo,
   niveis: NIVEIS,
   arcos: false,
-  avisos: rede.avisos,
 });
-export default receita;
+export const MEDIDAS_DO_CORTE = medidas;
+export const AVISOS = { gaiola: rede.avisos, corte: avisos };
+export default esboco;

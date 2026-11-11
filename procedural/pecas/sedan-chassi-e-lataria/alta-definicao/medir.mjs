@@ -9,18 +9,18 @@
  * Sai também o menor raio de curvatura da polilinha (círculo por três pontos seguidos), que na malha de nível N é limitado pelo
  * tamanho do segmento. Só entram as faces cuja normal olha para fora (a face de fora da chapa).
  *
- * Uso: node medir.mjs <receita.js> [--z=1700,1500] [--quina=cintura|ombro] */
+ * Uso: node medir.mjs <caminho.esboco.mjs> [--z=1700,1500] [--quina=cintura|ombro] */
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { executarReceita } from '../../../../src/autoria/executar-receita.js';
+import { receitaDaOpcao } from '../../../../modulos/esboco-nucleo/src/opcao.js';
 
 const arquivo = process.argv[2];
 const arg = (n, d) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? `=${d}`).split('=')[1];
 const t0 = performance.now();
 const modulo = await import(pathToFileURL(resolve(arquivo)).href);
-const receita = modulo.default;
 const t1 = performance.now();
-const { neutro } = executarReceita(receita, {});
+let neutro;
+try { ({ neutro } = receitaDaOpcao(modulo.default.opcoes[0], { nome: 'medir' })); } catch (e) { console.log(JSON.stringify({ arquivo, recusa: e.message })); process.exit(1); }
 const t2 = performance.now();
 
 const V = (id) => neutro.V.get(id).map((c) => c * 1000);
@@ -102,12 +102,12 @@ function raioNaQuina(z, quina, longe0, longe1) {
 const zs = arg('z', '1800,1500,1100,800').split(',').map(Number);
 const saida = {
   arquivo,
-  tempoMs: { importar: Math.round(t1 - t0), executar: Math.round(t2 - t1), total: Math.round(t2 - t0) },
+  tempoMs: { importar: Math.round(t1 - t0), montar: Math.round(t2 - t1), total: Math.round(t2 - t0) },
   faces: { total: faces.length, porLados: lados, porParte },
   vertices: neutro.V.size,
   reclamacoesDaExecucao: neutro.orfaos ?? [],
-  avisos: receita.AVISOS,
-  medidasDoCorte: receita.MEDIDAS_DO_CORTE,
+  avisos: modulo.AVISOS,
+  medidasDoCorte: modulo.MEDIDAS_DO_CORTE,
   raioDaCintura: zs.filter((z) => z > 700).map((z) => raioNaQuina(z, [860, 1000], 30, 80)),
   raioDoOmbro: zs.map((z) => raioNaQuina(z, [866, 890], 25, 70)),
 };

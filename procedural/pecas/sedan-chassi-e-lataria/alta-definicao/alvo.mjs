@@ -23,7 +23,7 @@ export const T = {
   roda: { raio: 364, zFrente: 1249, zTras: -1181, folgaDoArco: 40 },
   zFrente: 1990, zTras: -2000, xCapo: 760, zCapo: 690, zPortas: -45, zLateral: -760, ySoleira: 470,
   /* deste ciclo */
-  zPeDoCapo: 693,       /* a borda de trás do topo da frente, 1 mm além da lâmina do vão do para-lama com a porta (z 688 a 692): com a borda em 690 a lâmina
+  zPeDoCapo: Number(process.env.HD_ZPE ?? 693),       /* a borda de trás do topo da frente, 1 mm além da lâmina do vão do para-lama com a porta (z 688 a 692): com a borda em 690 a lâmina
                            desenhada na vista de lado cortava a quina arredondada da cintura de topo, a 89 graus, e o ajudante recusava a linha */
   yOmbro: 890,          /* a quina do ombro: acima dela a lateral é a da cabine, abaixo dela o para-lama alarga até a planta */
   yAlargado: 700,       /* a altura em que o alargamento do para-lama chega à planta */
@@ -97,8 +97,9 @@ export function linhasDeVao({ arcos }) {
     { nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] },
   ];
   if (arcos) {
-    L.push({ nome: 'arcoDianteiro', eixo: 'x', pontos: circulo(T.roda.zFrente, R_ARCO - G), fechada: true, dentro: 'descarta' });
-    L.push({ nome: 'arcoTraseiro', eixo: 'x', pontos: circulo(T.roda.zTras, R_ARCO - G), fechada: true, dentro: 'descarta' });
+    /* o furo fica no modo vista: no modo superfície a volta fechada com `dentro: 'descarta'` deixou o disco de dentro como pedaço sem nome */
+    L.push({ nome: 'arcoDianteiro', eixo: 'x', pontos: circulo(T.roda.zFrente, R_ARCO - G), fechada: true, dentro: 'descarta', modo: 'vista' });
+    L.push({ nome: 'arcoTraseiro', eixo: 'x', pontos: circulo(T.roda.zTras, R_ARCO - G), fechada: true, dentro: 'descarta', modo: 'vista' });
   }
   return L;
 }
@@ -116,31 +117,27 @@ export const FOLGAS = [['capo', 'paraLamaDir'], ['paraLamaDir', 'portaDianteiraD
   ['portaDianteiraDir', 'soleiraDir'], ['portaTraseiraDir', 'soleiraDir'], ['paraLamaDir', 'soleiraDir'], ['lateralTraseiraDir', 'soleiraDir']]
   .map((par) => ({ par, esperada: 4.1, tolerancia: 0.1, degrau: 0.3 }));
 
-/** A receita de um caminho: a chapa de subdivisão com a espessura e, salvo com `HD_PAINEIS=0`, o corte em painéis.
- * `pontos` vem em metro (como `TOPO`) e `passo` são os campos do passo `subdivisao` por nome. `paineisPorVaos` quer a chapa em mm, e
- * por isso o passo vai duas vezes: em mm com os pontos em mm para o ajudante ler a chapa, e em metro na receita. */
-export function receitaDoCaminho({ nome, desc, pontos, passo, niveis, arcos, avisos = [] }) {
-  const SUB = { origemId: 1, ...passo, niveis, borda: 'cantos' };
-  const PASSOS = [['subdivisao', { ...SUB, espessura: T.chapa / 1000 }]];
+/** O esboço 2.0 de um caminho, em mm: a chapa de subdivisão com a espessura e, salvo com `HD_PAINEIS=0`, o corte em painéis.
+ * `pontos` vem em mm (o `topo` da opção) e `passo` são os campos do passo `subdivisao` por nome. `HD_MODO` troca o modo da lâmina
+ * de `paineisPorVaos` ('superficie', o padrão aqui, ou 'vista'). */
+export function esbocoDoCaminho({ titulo, nota, pontos, passo, niveis, arcos }) {
+  const chapa = ['subdivisao', { origemId: 1, ...passo, niveis, borda: 'cantos', espessura: T.chapa }];
   const semPaineis = process.env.HD_PAINEIS === '0';
-  let medidas = null; let avisosDoCorte = [];
+  const modo = process.env.HD_MODO ?? 'superficie';
+  let passos; let medidas = null; let avisos = [];
   if (!semPaineis) {
-    const emMm = Object.fromEntries(Object.entries(pontos).map(([k, p]) => [k, p.map((c) => c * 1000)]));
-    const g = paineisPorVaos({ chapa: { passos: [['subdivisao', { ...SUB, espessura: T.chapa }]], origem: { op: 'subdivisao', id: 1 }, pontos: emMm },
-      vao: T.vao, linhas: linhasDeVao({ arcos }), paineis: PAINEIS, saida: 'metro' });
-    PASSOS.push(...g.passos);
-    for (const p of PAINEIS) PASSOS.push(['pincel', { modo: 'face', sel: { grupo: p.nome }, cor: CORES[p.nome] }]);
-    medidas = g.medidas; avisosDoCorte = g.avisos;
+    const g = paineisPorVaos({ chapa: { passos: [chapa], origem: { op: 'subdivisao', id: 1 }, pontos }, vao: T.vao, modo, linhas: linhasDeVao({ arcos }), paineis: PAINEIS });
+    passos = [...g.passos];
+    for (const p of PAINEIS) passos.push(['pincel', { modo: 'face', sel: { grupo: p.nome }, cor: CORES[p.nome] }]);
+    medidas = g.medidas; avisos = g.avisos;
   } else {
-    PASSOS.push(['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }]);
+    passos = [chapa, ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }]];
   }
-  return {
-    meta: { nome, desc },
-    PARAMS: {},
-    TOPO: { origem: 'eixos do rascunho do sedã: x lateral, y altura com o chão em 0, z comprimento com a frente em +z', ...pontos },
-    PASSOS,
-    FOLGAS: semPaineis ? [] : FOLGAS,
-    AVISOS: { gaiola: avisos, corte: avisosDoCorte },
-    MEDIDAS_DO_CORTE: medidas,
+  const esboco = {
+    plano: 'Primeiro ciclo de alta definição do sedã: o corpo de baixo do lado direito e a metade direita do capô, em chapa de 1 mm com vão de 4 mm, como diagnóstico.',
+    vista: 'isometrica',
+    opcoes: [{ titulo, nota, passos, topo: pontos,
+      contatos: semPaineis ? [] : FOLGAS.map(({ par, esperada, tolerancia, degrau }) => ({ par, relacao: 'folga', motivo: 'vão de 4 mm entre painéis da mesma chapa', folga: { esperada, tolerancia, degrau } })) }],
   };
+  return { esboco, medidas, avisos };
 }
