@@ -45,9 +45,11 @@ export const TABELA = {
     /* A meia planta da boca pela vista de cima: 313 de z -260 a -650, os cantos de trás arredondados e a frente afinando até a ponta. */
     planta: [[0, 24], [80, 14], [116, 0], [158, -20], [203, -50], [234, -80], [266, -120], [288, -160], [303, -200], [313, -260],
       [313, -650], [306, -700], [290, -740], [262, -775], [225, -795], [180, -805], [0, -810]],
-    /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço. */
+    /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço: 49 no início e no fim (a frente e a trás, com os
+       cantos), que tira o facetado dos cantos, e 9 em cada lado reto; com mais de 11 no lado a dobra do fundo dá lascas (medido: 25 deu
+       70 faces finas em x ±186, 9 e 11 deram zero). */
     estacoes: [330, 380, 430, 462],
-    pontos: 41, pontosDoLado: 15,
+    pontos: 49, pontosDoLado: 9,
     /* CHAPA E BORDA (linha "chapa e borda"): chapa de 1,5 mm; borda virada de Ø 16, 5 mm para fora da boca e 2 abaixo dela. */
     espessura: 1.5,
     borda: { raio: 8, paraFora: 5, abaixo: 2, lados: 16 },
