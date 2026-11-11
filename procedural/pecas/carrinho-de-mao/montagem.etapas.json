@@ -1,0 +1,85 @@
+{
+  "formato": "mecanifica.registro-de-etapas",
+  "versao": 2,
+  "montagem": "carrinho-de-mao",
+  "etapas": [
+    {
+      "instancia": "chassi",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:e1b2cc7c900646860595c03736c046f4db11b922f8e2ad2ed135c6aa42d7b75e",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "pes",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:dccedc2361c083f97502f658451ae034784842ddd5d6e59a791b3d3eb69cd807",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "cacamba",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:b5dcc8086a351302eecb5455dfcb0f1af86e360f9d7467b9a569ce6ed31087d3",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "roda",
+      "estado": "fixa",
+      "juntas": [
+        {
+          "relacao": "rodaGiraNoEixo",
+          "com": "chassi",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "folgaRadial": 0.004,
+            "folgaRadialMinima": 0.004,
+            "folgaRadialMaxima": 0.004,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "especificacaoFolgaRadial": {
+              "minimo": 0.004,
+              "maximo": 0.004,
+              "nominal": 0.004,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "inicioReferencia": -0.051,
+            "fimReferencia": 0.051,
+            "inicioMovel": -0.051,
+            "fimMovel": 0.05100000000000001,
+            "sobraInicio": 0,
+            "sobraFim": 1.3877787807814457e-17,
+            "sobreposicaoAxial": 0.102,
+            "separacaoAxial": 0
+          }
+        }
+      ],
+      "forma": "sha256:8aab261fb58ccac3cf271a02b49535aac58a167b6aaebc083a53acbc1c19eb7f",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos; o furo do disco menor que o cubo vem da família roda-pneu e fica aceito",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
+          "disco: uniao em furo central do disco, na coroa em volta do cubo"
+        ],
+        "analise": "feita"
+      }
+    }
+  ]
+}

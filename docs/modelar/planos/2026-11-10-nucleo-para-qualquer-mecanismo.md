@@ -100,7 +100,7 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    atribuições, 19 foram ao plano, 10 ao modelador, 8 à ferramenta e 2 ao
    crítico. O avião dá 2,75 rodadas por peça e o braço 6, pelo mesmo comando.
    Nenhum registro traz data, e gravá-la entra na fatia 1.
-1. **Fluxo único, ferramentas entregues em 2026-11-11; falta a peça de prova.**
+1. **Fluxo único, entregue em 2026-11-11, com a peça de prova.**
    `npm run fluxo:objeto` diz em que passo o objeto está e o próximo comando,
    da referência à etapa fixa. O registro da rodada escolhe o relato de cada
    peça num texto com várias, grava a data e mostra contradições e repetições
@@ -111,8 +111,19 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    leram com nota 6 e o assento como defeito, recebeu nota 8 sem defeito de um
    crítico sem contexto com o pacote novo, que leu no
    [corte](../banco-de-provas/empilhadeira-2026-11-09/corte-do-assento-do-eixo-dianteiro.png)
-   a folga de 0,35 mm sob o teto do entalhe. Falta o item 2 do gate: uma peça
-   nova simples levada da referência à etapa fixa só pelo comando de fluxo.
+   a folga de 0,35 mm sob o teto do entalhe. A peça de prova é o carrinho de mão:
+   quatro peças da referência à etapa fixa pelo comando de fluxo, em 12
+   rodadas, as quatro com nota 8, três fechadas pelo crítico sem defeito e a
+   roda por aceite, com um defeito que vem da família. O custo foi de 3
+   rodadas por peça contra 1,58 da empilhadeira, e a
+   [tabela](../banco-de-provas/carrinho-de-mao-2026-11-11/CUSTO-POR-PECA.md)
+   explica a diferença: o crítico passou a ter a foto como referência e achou
+   erro de fidelidade que antes ficava aberto por aceite. As dificuldades estão
+   em [`ATRITOS.md`](../banco-de-provas/carrinho-de-mao-2026-11-11/ATRITOS.md)
+   e nos registros de rodada, e viraram no mesmo dia: a referência externa no
+   pedido do crítico, a peça côncava e a vista tapada no pacote, a contagem de
+   faces finas na medição, o julgamento que vale quando só o texto muda, e o
+   aceite e o módulo comum no fluxo do objeto.
 2. **Juntas na montagem** (plano próprio). Assento plano, guia prismática e
    articulação com eixo e curso entre instâncias, e a etapa nomeada antes de
    ter receita. Pergunta: a montagem mede o que hoje vai por posição? Saída:
@@ -122,7 +133,7 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    escala de cada uma, a medida adotada com a fonte e o conflito acusado antes
    de modelar. Saída: os 25% da vista de frente da empilhadeira saem da
    ferramenta, sem comparação à mão.
-4a. **Tubo dobrado e chapa fina, neste plano; ajudantes entregues em 2026-11-11, falta a prova nas receitas.** Na `gaiolaVarrida`, o
+4a. **Tubo dobrado e chapa fina, neste plano, entregue em 2026-11-11 com a prova nas receitas do carrinho.** Na `gaiolaVarrida`, o
    trilho em polilinha com raio nos cantos e o quadro que mantém a seção
    perpendicular ao caminho nas subidas; na `gaiolaPorLacos`, a casca aberta
    com espessura de chapa. Vêm dos itens 6 a 9 dos atritos do carrinho de mão.
@@ -137,6 +148,12 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    carrinho a seção ia a 26,8 mm na subida da manopla e fica em 32,0; a caçamba
    sai com a mesma malha e a chapa de 1,5 mm, sem apagar face à mão. A guarda do
    acervo não mudou em nenhuma das 83 peças.
+   Nas receitas, o chassi sai de uma `gaiolaVarrida` com o tubo de 32,0 mm nas
+   146 estações, os pés e a borda da caçamba de outras, a borda em trilho
+   fechado sem emenda, e a caçamba de uma `gaiolaPorLacos` aberta com a chapa de
+   1,5 mm. Ficou conhecida uma fragilidade: a casca por laços ganha ou perde
+   faces finas conforme o número de pontos por trecho, e o aviso que entrou é
+   empírico.
 4b. **Lataria em painéis, neste plano, aberta em 2026-11-11 pelo diagnóstico do sedã.**
    O rascunho do sedã saiu em 35 minutos com 83 partes e os quinze painéis de
    uma casca só, com vão de 4,00 mm, mas a casca foi montada 23 vezes (1.171

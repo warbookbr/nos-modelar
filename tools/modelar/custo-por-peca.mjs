@@ -40,10 +40,17 @@ const kebab = (s) => String(s).replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCas
 export function contarAtribuicoes(atrito) {
   const conta = Object.fromEntries(ATRIBUICOES.map((a) => [a, 0]));
   if (!Array.isArray(atrito)) return conta;
-  const padrao = /atribuid[oa]s?\s+(?:ao|aos|a|as)\s+([a-z]+)/g;
+  /* as duas escritas que quem conduz usou: "atribuído ao plano" e "atribuição: plano". O núcleo conta como ferramenta, que é a
+     ferramenta geral, e a instrução (de skill, de roteiro ou de despacho) conta como plano. */
+  const padrao = /atribuid[oa]s?\s+(?:ao|aos|a|as)\s+([a-z]+)|atribuicao:\s*(?:(?:ao|aos|a|as|do|da)\s+)?([a-z]+)/g;
+  const SINONIMO = { nucleo: 'ferramenta', instrucao: 'plano' };
   for (const frase of atrito) {
     if (typeof frase !== 'string') continue;
-    for (const m of semAcento(frase).matchAll(padrao)) if (m[1] in conta) conta[m[1]] += 1;
+    for (const m of semAcento(frase).matchAll(padrao)) {
+      const palavra = m[1] ?? m[2];
+      const chave = SINONIMO[palavra] ?? palavra;
+      if (chave in conta) conta[chave] += 1;
+    }
   }
   return conta;
 }

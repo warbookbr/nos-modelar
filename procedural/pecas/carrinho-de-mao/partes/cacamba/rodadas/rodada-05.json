@@ -1,0 +1,130 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/cacamba",
+  "numero": 5,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: lado.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Sem achado estrutural nas imagens abertas: boca em D, fundo plano, borda contínua e tirantes presos conferem com a referência; só os cantos traseiros têm raio um pouco maior que o dela. Lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "cacamba",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tirantes",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "vistas:critica falhou uma vez por 'Execution context was destroyed' na captura do Playwright; repetir o comando resolveu",
+    "o defeito 1 da rodada 4 (entalhe na borda) fechou com o trilho fechado da gaiolaVarrida, que a receita não usava; atribuição: modelador",
+    "o defeito 2 da rodada 4 (degrau no canto) era o canto de planta de raio 150 visto de lado; a malha é monotônica; atribuição: crítico",
+    "o assento sobre os braços mede 2,51 mm, como declarado; vao:partes com a montagem junta as partes de cada peça e não mede esse assento; atribuição: ferramenta"
+  ],
+  "notaDePassagem": "A borda é um trilho fechado (fechado: true, sem tampas, estação final em fracao 1), e a emenda do meio da traseira some na rasante e na curvatura. O degrau do canto de trás não é da gaiola: os laços da dobra recuam sem salto e o perfil da malha é monotônico; é o canto de planta de raio 150 visto de lado e de cima. O assento medido é de 2,51 mm (fundo da caçamba em y 284,513, topo do tubo em 282,0), igual ao declarado.",
+  "receita": {
+    "sha256": "sha256:97dc40297edf9e9b77423e4f21ec32ff78d42294629003f44a4725bb3c54c6d1",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 5,
+      "acrescentadas": 6,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 177,
+          "texto": "     de trás, onde a reta continua, para a emenda do tubo ficar sem quina */"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "     de trás, onde a reta continua; o trilho é fechado (`fechado: true`), e por isso o tubo não tem emenda nem tampas */"
+        },
+        {
+          "tipo": "-",
+          "linha": 190,
+          "texto": "  const pontos = [...fora, fora[0]]; const estacoes = [{ fracao: 0 }]; let s = 0;"
+        },
+        {
+          "tipo": "-",
+          "linha": 191,
+          "texto": "  for (let k = 1; k < pontos.length - 1; k += 1) { s += norma(sub(pontos[k], pontos[k - 1])); estacoes.push({ entre: 1 }, { em: s }); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  /* o trilho é fechado, sem começo nem fim nem tampas: uma estação em cada ponto da boca e uma entre cada par, e a última volta à primeira */"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  const estacoes = [{ fracao: 0 }]; let s = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  for (let k = 1; k < fora.length; k += 1) { s += norma(sub(fora[k], fora[k - 1])); estacoes.push({ entre: 1 }, { em: s }); }"
+        },
+        {
+          "tipo": "-",
+          "linha": 193,
+          "texto": "  parte('borda', tubo('borda', { pontos }, BO.raio, { lados: BO.lados, estacoes, u: [0, 1, 0] }), T.cores.azul);"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  parte('borda', tubo('borda', { pontos: fora, fechado: true }, BO.raio, { lados: BO.lados, estacoes, u: [0, 1, 0], tampas: false }), T.cores.azul);"
+        },
+        {
+          "tipo": "-",
+          "linha": 234,
+          "texto": "      { nome: 'borda', forma: 'a borda azul virada para fora em toda a volta da boca, um tubo de Ø 16, 5 mm para fora da boca e 2 abaixo dela', tecnica: 'gaiolaVarrida de seção redonda de 16 lados ao longo do limite da boca, fechada e tampada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 235,
+          "texto": "      { nome: 'borda', forma: 'a borda azul virada para fora em toda a volta da boca, um tubo de Ø 16, 5 mm para fora da boca e 2 abaixo dela', tecnica: 'gaiolaVarrida de seção redonda de 16 lados num trilho fechado ao longo do limite da boca, sem começo, fim nem tampas' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes cacamba",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-el20-topo-rasante-az30.png",
+      "peca-el20-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az200.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T05:08:25.587Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
