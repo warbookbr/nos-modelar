@@ -702,7 +702,6 @@ function paineisPorVaosBruto(o) {
       }
     };
     conferirLaminas(largura);
-    if (process.env.DBG) for (const ln of lidas) console.error('DBG linha', ln.nome, 'curva', !!ln.curva, 'est', ln.segmentos.map(x=>x.length), 'borda', leitura.borda?.length, 'interna', leitura.interna?.length, 'alem', !!foraDoMaterial);
     /* a curva que corre sobre a borda da chapa: a lâmina de uma linha que segue a borda a menos de meia largura dela sai pela quina o tempo todo, e o fundo dela passa pela pele de dentro de um lado e de outro; só o cruzamento da borda é aceito */
     if (leitura.borda?.length) {
       const nasBordas = prepararPontoNaMalha(leitura.st.V, leitura.st.F, leitura.borda);
@@ -716,7 +715,7 @@ function paineisPorVaosBruto(o) {
             const passo = Math.hypot(B.c[0] - A.c[0], B.c[1] - A.c[1], B.c[2] - A.c[2]);
             if (perto) { seguido += passo; if (seguido > arco) { arco = seguido; onde = A.c; } } else seguido = 0;
           }
-          if (arco > 3 * largura && !process.env.SEMBORDA) {
+          if (arco > 3 * largura) {
             erro(`a curva '${ln.nome}' corre sobre a borda da chapa por ${br(arco)} mm seguidos (perto de [${onde.map(br).join(', ')}], a menos de ${br(largura / 2 + 0.5)} mm dela): a lâmina sai pela quina da chapa e o fundo dela cruza a pele de dentro, e o corte deixaria ponte; afaste a curva da borda, ou use a borda como linha de corte da própria chapa`);
           }
         }

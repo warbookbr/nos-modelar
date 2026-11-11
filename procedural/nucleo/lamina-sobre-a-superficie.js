@@ -355,8 +355,7 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
      sobre a pele de dentro ou antes dela: a lâmina não atravessa a chapa ali e sobra uma ponte. Com `alemDaPele(ponto, paraBaixo)` (o ponto está além da pele de dentro, do lado de fora do material), os cantos de baixo e quatro pontos
      de cada corda, nos dois lados, têm de ficar além dela; onde não ficam, a profundidade das duas estações cresce 25% por rodada, até a espessura lida mais duas larguras, e sem chegar lá a lâmina é recusada com o ponto. Só vale
      onde a espessura foi lida nas duas estações e a profundidade não foi pedida (a pedida é do autor, e a conferida contra a espessura lida já existe). */
-  if (process.env.DBG) console.error('DBG entra', nome, !!alemDaPele, profundidade, est.every((s) => s.cima));
-  if (alemDaPele && !process.env.NOFUNDO && profundidade == null && est.every((s) => s.cima)) {
+  if (alemDaPele && profundidade == null && est.every((s) => s.cima)) {
     const teto = est.map((s) => (s.esp ?? 0) + 2 * largura);
     const baixos = () => [1, -1].map((sinal) => est.map((_, i) => doLado(i, sinal).abaixo));
     const furos = () => {
