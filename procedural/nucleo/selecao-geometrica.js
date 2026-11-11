@@ -228,7 +228,8 @@ export function resolverOnde(st, onde, base, normalDaFace) {
   if (onde.extremo && itens.length) {
     const e = EIXOS[onde.extremo.eixo], sinal = onde.extremo.lado === 'max' ? 1 : -1;
     const valor = (item) => sinal * centro(item)[e];
-    const melhor = Math.max(...itens.map(valor));
+    let melhor = -Infinity;
+    for (const item of itens) melhor = Math.max(melhor, valor(item));
     itens = itens.filter((item) => valor(item) >= melhor - onde.extremo.tol);
     funil.push(`${itens.length} após extremo`);
   }

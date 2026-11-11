@@ -7,7 +7,7 @@
  * `subdivisao` de `niveis: 0` (vértices e triângulos), que o `subtrair` do núcleo aceita como qualquer sólido fechado.
  *
  * AS ESTAÇÕES. A linha é amostrada a cada `amostragem` mm; entre duas estações cuja normal gira mais de 8 graus o trecho é bipartido até a
- * normal girar menos que isso (ou o trecho medir menos que um décimo da largura), e a dobra viva que sobra (giro maior que 8 graus entre duas
+ * normal girar menos que isso (3 graus: a corda entre duas estações fica a menos de 0,3 mm da chapa em 40 mm) (ou o trecho medir menos que um décimo da largura), e a dobra viva que sobra (giro maior que 8 graus entre duas
  * estações coladas) parte a lâmina em duas, uma varrida sobre cada face, que se encontram na quina e cobrem juntas a espessura sob ela. Os cantos da
  * linha são em esquadria, pelo vetor lateral de cada trecho. Onde o raio não toca a chapa (a linha sai pela borda, ou passa por uma
  * abertura) a estação usa o plano da estação válida mais próxima, tocado pelo mesmo raio da vista: a lâmina segue a chapa além da borda,
@@ -102,7 +102,6 @@ export function projetarLinha(o) {
      É uma lâmina só, sem duas varreduras que dividam parede: a seção do meio cobre sob a quina a espessura das duas faces, côncava ou convexa */
   let inclinacaoMaxima = 0;
   let quinas = 0;
-  const lista = todas.map((s) => ({ c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut, ds: 1 }));
   todas.forEach((s) => {
     const cos = Math.abs(dot(s.n, [0, 1, 2].map((e) => (e === eixoIdx ? 1 : 0))));
     if (cos < RASANTE) {
@@ -110,20 +109,25 @@ export function projetarLinha(o) {
     }
     inclinacaoMaxima = Math.max(inclinacaoMaxima, Math.acos(Math.min(1, cos)) * GRAUS);
   });
+  /* a dobra viva que sobrou entre duas estações coladas vira UMA estação: o ponto médio, de normal a bissetriz; o encontro dos planos de parede dos dois trechos dá a
+     direção e a profundidade da seção nela, de modo que a lâmina atravessa a quina côncava ou convexa numa varredura só */
+  const lista = [];
+  for (let i = 0; i < todas.length; i += 1) {
+    const s = todas[i];
+    const j = (i + 1) % todas.length;
+    const prox = todas[j];
+    const tem = (fechada || j !== 0) && s.real && prox.real;
+    const g = tem ? giro(s.n, prox.n) : 0;
+    if (g > GIRO_LISO) {
+      if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
+      quinas += 1;
+      lista.push({ c: mul(soma(s.c, prox.c), 0.5), n: unit(soma(s.n, prox.n)), esp: Math.max(s.esp ?? 0, prox.esp ?? 0) || null, mIn: s.mOut, mOut: s.mOut });
+      i += 1;
+    } else lista.push({ c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut });
+  }
   /* a espessura lida junto da quina corre ao longo da outra face: vale no máximo 1,2 vez a mediana lida na linha */
   const lidas = lista.map((s) => s.esp).filter((x) => x != null).sort((x, y) => x - y);
   if (lidas.length) { const teto = 1.2 * lidas[Math.floor(lidas.length / 2)]; for (const s of lista) s.esp = s.esp == null ? null : Math.min(s.esp, teto); }
-  /* a dobra viva que sobrou entre duas estações coladas só é contada: as seções da lâmina são verticais (acompanham a direção da vista), e por isso a
-     varredura passa a quina, côncava ou convexa, sem girar a seção nem fazer parede dobrada */
-  for (let i = 0; i < todas.length; i += 1) {
-    const j = (i + 1) % todas.length;
-    if (!fechada && j === 0) continue;
-    if (!(todas[i].real && todas[j].real)) continue;
-    const g = giro(todas[i].n, todas[j].n);
-    if (g <= GIRO_LISO) continue;
-    if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
-    quinas += 1;
-  }
   const segmentos = [lista];
   return { segmentos, fechadaInteira: fechada, quinas, inclinacaoMaxima, semChapa };
 }
@@ -161,61 +165,80 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
   const est = estacoes.filter((s, i) => i === 0 || norma(sub(s.c, estacoes[i - 1].c)) > 1e-6);
   if (fechada && est.length > 1 && norma(sub(est[0].c, est[est.length - 1].c)) <= 1e-6) est.pop();
   if (est.length < 2) erro(`a linha '${nome}' ficou com menos de duas estações sobre a chapa`);
-  const lat = lateraisDe(est);
-  if (lat.some((l) => !l)) erro(`a linha '${nome}' volta sobre si mesma sobre a chapa (um trecho some contra o vizinho); afaste os pontos`);
+  const N = est.length;
+  const nSeg = fechada ? N : N - 1;
   const h = largura / 2;
-  const topo = 0.25 * largura;
-  /* a profundidade medida ao longo da seção vertical: a pedida (ou lida) pela normal, dividida pelo cosseno entre a normal da chapa e a seção */
-  const secaoDe = (s, sm) => {
-    const u = unit(sub(cima, mul(sm, dot(cima, sm)))) ?? cima;
-    return { u, cos: Math.max(Math.abs(dot(s.n, u)), 0.17) };
+  const topo = 0.5 * largura;
+  /* cada trecho tem o seu plano de parede, que contém o trecho e a normal da chapa: o lateral é normal aos dois, e a parede de cada lado é um plano só */
+  const seg = [];
+  for (let k = 0; k < nSeg; k += 1) {
+    const a = est[k]; const b = est[(k + 1) % N];
+    const e = sub(b.c, a.c);
+    const nk = unit(soma(a.n, b.n)) ?? a.n;
+    let sk = unit(cruz(nk, e));
+    if (!sk) erro(`a linha '${nome}' volta sobre si mesma sobre a chapa (um trecho some contra o vizinho); afaste os pontos`);
+    if (dot(sk, a.mOut) < 0) sk = mul(sk, -1);
+    seg.push({ n: nk, s: sk });
+  }
+  /* os dois pontos de uma estação num lado (em cima e embaixo da pele): na quina entre dois trechos, o encontro dos dois planos de parede (a esquadria em 3D); a linha de
+     encontro dá a direção da profundidade, e a profundidade vale a espessura lida (ou a pedida) dividida pelo cosseno entre essa direção e a normal de cada face */
+  const doLado = (i, sinal) => {
+    const antes = fechada ? seg[(i + N - 1) % N] : seg[i - 1];
+    const depois = fechada ? seg[i % N] : seg[i];
+    const A = antes ?? depois; const B = depois ?? antes;
+    const sA = mul(A.s, sinal); const sB = mul(B.s, sinal);
+    const g = dot(sA, sB);
+    const nm = unit(soma(A.n, B.n)) ?? A.n;
+    const s = est[i];
+    let X0; let L;
+    if (g > 0.9999) {
+      X0 = soma(s.c, mul(sB, h));
+      /* a seção vertical: a direção da vista tirada da componente lateral. Seções de normais diferentes numa quina girariam uma contra a outra e dobrariam a lâmina sobre si */
+      L = unit(sub(cima, mul(sB, dot(cima, sB)))) ?? nm;
+    } else {
+      X0 = soma(s.c, mul(soma(sA, sB), h / (1 + g)));
+      const soma2 = unit(soma(sA, sB));
+      L = unit(cruz(sA, sB));
+      if (L && dot(L, cima) < 0) L = mul(L, -1);
+      if (!L || dot(L, nm) < 0.17) L = soma2 ? unit(sub(cima, mul(soma2, dot(cima, soma2)))) ?? nm : nm;
+    }
+    const cos = Math.max(Math.min(dot(L, A.n), dot(L, B.n)), 0.17);
+    const fundo = (profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura) / cos;
+    return { acima: soma(X0, mul(L, topo / cos)), abaixo: sub(X0, mul(L, fundo)), X0 };
   };
-  const fundoDe = (s, cos) => (profundidade != null ? profundidade : s.esp != null ? s.esp + 0.5 * largura : 2 * largura) / cos;
   const vertices = [];
   const faces = [];
-  const N = est.length;
-  let dentro = null;
   if (descarta) {
-    /* o furo: o prisma da borda de fora; o lado de fora é o de maior área vista de cima da normal média */
-    const lado = (sinal) => est.map((s, i) => soma(s.c, mul(lat[i].sm, sinal * h * lat[i].k)));
-    const area = (pts) => { let t = [0, 0, 0]; pts.forEach((p, i) => { t = soma(t, cruz(p, pts[(i + 1) % pts.length])); }); return Math.abs(dot(t, est[0].n)); };
+    /* o furo: o prisma da borda de fora; o lado de fora é o de maior área vista da normal média */
+    const lado = (sinal) => est.map((s, i) => doLado(i, sinal));
     const L = lado(1); const R = lado(-1);
-    const sinal = area(L) >= area(R) ? 1 : -1;
-    dentro = sinal === 1 ? R : L;
-    const borda = sinal === 1 ? L : R;
-    borda.forEach((p, i) => { const s = est[i]; const { u, cos } = secaoDe(s, lat[i].sm); vertices.push(soma(p, mul(u, topo / cos)), sub(p, mul(u, fundoDe(s, cos)))); });
-    for (let i = 0; i < N; i += 1) {
-      const j = (i + 1) % N;
-      faces.push([2 * i, 2 * j, 2 * j + 1], [2 * i, 2 * j + 1, 2 * i + 1]);
-    }
+    const area = (pts) => { let t = [0, 0, 0]; pts.forEach((p, i) => { t = soma(t, cruz(p.X0, pts[(i + 1) % pts.length].X0)); }); return Math.abs(dot(t, est[0].n)); };
+    const borda = area(L) >= area(R) ? L : R;
+    borda.forEach((q) => vertices.push(q.acima, q.abaixo));
+    for (let i = 0; i < N; i += 1) faces.push([2 * i, 2 * ((i + 1) % N), 2 * ((i + 1) % N) + 1, 2 * i + 1]);
     const capa = (k) => Array.from({ length: N }, (_, i) => 2 * i + k);
     faces.push(capa(0).reverse(), capa(1));
   } else {
-    est.forEach((s, i) => {
-      const { sm, k } = lat[i];
-      const off = mul(sm, h * k);
-      /* a seção é vertical (a direção da vista tirada da componente lateral): a parede é o plano normal ao lado, que contém a normal da chapa, e a folga entre as paredes é a largura */
-      const { u, cos } = secaoDe(s, sm);
-      const acima = mul(u, topo / cos); const baixo = mul(u, fundoDe(s, cos));
-      vertices.push(soma(soma(s.c, off), acima), sub(soma(s.c, acima), off), sub(sub(s.c, baixo), off), sub(soma(s.c, off), baixo));
+    est.forEach((_, i) => {
+      const l = doLado(i, 1); const r = doLado(i, -1);
+      vertices.push(l.acima, r.acima, r.abaixo, l.abaixo);
     });
-    const lim = fechada ? N : N - 1;
-    for (let i = 0; i < lim; i += 1) {
+    for (let i = 0; i < nSeg; i += 1) {
       const j = (i + 1) % N;
       for (let a = 0; a < 4; a += 1) {
         const b = (a + 1) % 4;
-        faces.push([4 * i + a, 4 * i + b, 4 * j + b], [4 * i + a, 4 * j + b, 4 * j + a]);
+        if (a === 1 || a === 3) faces.push([4 * i + a, 4 * i + b, 4 * j + b, 4 * j + a]);
+        else faces.push([4 * i + a, 4 * i + b, 4 * j + b], [4 * i + a, 4 * j + b, 4 * j + a]);
       }
     }
     if (!fechada) faces.push([3, 2, 1, 0], [4 * (N - 1), 4 * (N - 1) + 1, 4 * (N - 1) + 2, 4 * (N - 1) + 3]);
-    if (fechada) dentro = est.map((s, i) => sub(s.c, mul(lat[i].sm, h * lat[i].k)));
   }
   /* de fora: o volume com sinal manda no sentido das faces */
   let volume = 0;
   for (const f of faces) for (let k = 1; k + 1 < f.length; k += 1) volume += dot(vertices[f[0]], cruz(vertices[f[k]], vertices[f[k + 1]])) / 6;
   const saida = volume < 0 ? faces.map((f) => [...f].reverse()) : faces;
-  const r4 = (v) => Math.round(v * 1e4) / 1e4;
-  return { vertices: vertices.map((p) => p.map(r4)), faces: saida, dentro, estacoes: est };
+  const r5 = (v) => Math.round(v * 1e5) / 1e5;
+  return { vertices: vertices.map((p) => p.map(r5)), faces: saida, dentro: null, estacoes: est };
 }
 
 /** A volta fechada cujo contorno de dentro, deslocado meia largura, inverte algum trecho (a volta é menor que o vão): a lâmina o deixaria como ilha. */
@@ -233,4 +256,76 @@ export function voltaMenorQueOVao(estacoes, largura) {
     if (dot(sub(estacoes[j].c, estacoes[i].c), sub(dentro[j], dentro[i])) < 0) return true;
   }
   return false;
+}
+
+const cruz2 = (a, b) => a[0] * b[1] - a[1] * b[0];
+/** O polígono 2D tem duas arestas não vizinhas que se cruzam? */
+export function seCruza2d(pol) {
+  const n = pol.length;
+  const lado = (a, b, c) => Math.sign(cruz2([b[0] - a[0], b[1] - a[1]], [c[0] - a[0], c[1] - a[1]]));
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 2; j < n; j += 1) {
+      if (i === 0 && j === n - 1) continue;
+      const [a, b, c, d] = [pol[i], pol[(i + 1) % n], pol[j], pol[(j + 1) % n]];
+      if (lado(a, b, c) * lado(a, b, d) < 0 && lado(c, d, a) * lado(c, d, b) < 0) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * As bordas da lâmina, vistas de cima da vista (a coordenada do eixo da vista descartada), cruzam-se? Na linha aberta, o polígono de uma borda e a outra de volta;
+ * na volta fechada, cada borda é um anel. Devolve 'aberta', 'volta' ou null.
+ */
+export function bordasSeCruzam(estacoes, fechada, largura, eixoIdx) {
+  const lat = lateraisDe(estacoes);
+  if (lat.some((l) => !l)) return fechada ? 'volta' : 'aberta';
+  const h = largura / 2;
+  const proj = (p) => p.filter((_, k) => k !== eixoIdx);
+  const lado2 = (sinal) => estacoes.map((s, i) => proj(soma(s.c, mul(lat[i].sm, sinal * h * lat[i].k))));
+  const L = lado2(1); const R = lado2(-1);
+  if (fechada) return seCruza2d(L) || seCruza2d(R) ? 'volta' : null;
+  return seCruza2d([...L, ...[...R].reverse()]) ? 'aberta' : null;
+}
+
+/** A menor distância entre dois segmentos 3D. */
+function distanciaEntreSegmentos(p1, q1, p2, q2) {
+  const d1 = sub(q1, p1); const d2 = sub(q2, p2); const r = sub(p1, p2);
+  const a = dot(d1, d1); const e = dot(d2, d2); const f = dot(d2, r);
+  let s; let t;
+  if (a <= 1e-12 && e <= 1e-12) return norma(r);
+  if (a <= 1e-12) { s = 0; t = Math.max(0, Math.min(1, f / e)); } else {
+    const c = dot(d1, r);
+    if (e <= 1e-12) { t = 0; s = Math.max(0, Math.min(1, -c / a)); } else {
+      const b = dot(d1, d2); const den = a * e - b * b;
+      s = den > 1e-12 ? Math.max(0, Math.min(1, (b * f - c * e) / den)) : 0;
+      t = (b * s + f) / e;
+      if (t < 0) { t = 0; s = Math.max(0, Math.min(1, -c / a)); } else if (t > 1) { t = 1; s = Math.max(0, Math.min(1, (b - c) / a)); }
+    }
+  }
+  return norma(sub(soma(p1, mul(d1, s)), soma(p2, mul(d2, t))));
+}
+
+/**
+ * A linha passa a menos de `largura` dela mesma, num trecho distante ao longo dela (separado por mais de duas larguras de arco): a lâmina de um trecho invade a
+ * do outro, o contorno de um lado se cruza e sobra ilha ou fresta. Devolve a menor distância achada, ou null.
+ */
+export function linhaPertoDeSiMesma(estacoes, fechada, largura) {
+  const N = estacoes.length;
+  const c = estacoes.map((s) => s.c);
+  const nSeg = fechada ? N : N - 1;
+  const cum = [0];
+  for (let i = 1; i <= nSeg; i += 1) cum.push(cum[i - 1] + norma(sub(c[i % N], c[i - 1])));
+  const total = cum[nSeg];
+  const arco = (x, y) => { const d = Math.abs(x - y); return fechada ? Math.min(d, total - d) : d; };
+  let menor = null;
+  for (let i = 0; i < nSeg; i += 1) {
+    for (let j = i + 2; j < nSeg; j += 1) {
+      if (fechada && i === 0 && j === nSeg - 1) continue;
+      if (arco(cum[i + 1], cum[j]) < 2 * largura) continue;
+      const d = distanciaEntreSegmentos(c[i], c[(i + 1) % N], c[j], c[(j + 1) % N]);
+      if (d < largura * 0.99 && (menor == null || d < menor)) menor = d;
+    }
+  }
+  return menor;
 }

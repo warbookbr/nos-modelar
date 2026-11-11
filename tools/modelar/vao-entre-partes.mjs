@@ -57,8 +57,7 @@
  * Uso: npm run vao:partes -- <esboço|receita|montagem> [--opcao=1] [--esperado=4] [--tolerancia=0.2] [--degrau=1] [--par=a:b]...
  *        [--partes=porta,teto] [--vizinho=15] [--passo=2] [--toque=0.001] [--por=p05|minimo] [--folga3d=<mm>] [--soltas=recusar] [--apoia=parte:motivo]... [--linhas=40] [--json]
  * Sai 0 sem par fora da faixa, 1 com par fora da faixa ou, em `--soltas=recusar`, com parte solta, e 2 em argumento ruim. */
-import { existsSync, readFileSync } from 'node:fs';
-import { basename, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const PASSO_MM = 2;
@@ -604,42 +603,29 @@ function facesDaMontagem(resolvida) {
   return faces;
 }
 
-/** A entrada de um arquivo: `{ faces, folgas, apoia, neutro, origem }`. Esboço (.esboco.json ou módulo), receita ou montagem persistida. */
+/** A entrada de um arquivo: `{ faces, folgas, apoia, neutro, origem }`. Esboço (.esboco.json ou módulo), receita ou montagem persistida,
+ *  lidos pelo resolvedor comum das ferramentas de medida (`entrada-de-medida.mjs`). */
 export async function lerEntrada(arquivo, { opcao = 1 } = {}) {
-  let abs = resolve(arquivo);
-  const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
-  let modulo = null; let json = null;
-  if (!existsSync(abs)) {
-    try { const { resolverCaminhoReceita } = await import('./resolver-caminho-receita.mjs'); abs = resolverCaminhoReceita(arquivo); } catch { throw new ErroDoVao(`${arquivo} não existe, nem como esboço nem como receita`); }
-  }
-  if (/\.(mjs|js)$/.test(abs)) { const { importarReceita } = await import('./importar-receita.mjs'); modulo = await importarReceita(abs); } else json = JSON.parse(readFileSync(abs, 'utf8'));
-  if (json?.formato === 'mecanifica.montagem') {
+  const { lerEntradaDeMedida, ErroDeEntrada } = await import('./entrada-de-medida.mjs');
+  let lida;
+  try { lida = await lerEntradaDeMedida(arquivo, { opcao }); } catch (e) { throw e instanceof ErroDeEntrada ? new ErroDoVao(e.message) : e; }
+  if (lida.tipo === 'montagem') {
     const { lerMontagemPersistida } = await import('../../src/autoria/ler-montagem-persistida.js');
     const { resolverMontagemPersistida } = await import('../../src/autoria/resolver-montagem-persistida.js');
-    const { receitasDaMontagem } = await import('./etapas-da-montagem.mjs');
     const { carregadoresDeReceitas } = await import('./peca-com-parametros.mjs');
     let resolvida;
-    try { resolvida = await resolverMontagemPersistida(json, carregadoresDeReceitas(await receitasDaMontagem(lerMontagemPersistida(json)))); } catch (e) { throw new ErroDoVao(`a montagem não resolve: ${e.message}`); }
-    return { faces: facesDaMontagem(resolvida), folgas: {}, apoia: {}, neutro: null, origem: `montagem ${basename(abs)}` };
+    try { resolvida = await resolverMontagemPersistida(lida.dado, carregadoresDeReceitas(Object.fromEntries(lida.partes.map((p) => [p.nome, p.receita])))); } catch (e) { throw new ErroDoVao(`a montagem não resolve: ${e.message}`); }
+    return { faces: facesDaMontagem(resolvida), folgas: {}, apoia: {}, neutro: null, origem: lida.origem };
   }
-  const { receitaDoModulo } = await import('./importar-receita.mjs');
-  const receita = modulo ? receitaDoModulo(modulo) : null;
-  const ehReceita = receita && (Array.isArray(receita.PASSOS) || Array.isArray(receita.CHAMADAS_COMPOSICOES)) && !Array.isArray(receita.opcoes);
-  if (ehReceita) {
-    const { executarReceita } = await import('../../src/autoria/executar-receita.js');
-    const { neutro } = executarReceita(receita);
-    return { faces: facesPorNome(neutro), ...declaracoesDaReceita(receita), neutro, origem: `receita ${basename(abs)}` };
+  if (lida.tipo === 'receita') {
+    const { neutro } = lida.executar();
+    return { faces: facesPorNome(neutro), ...declaracoesDaReceita(lida.receita), neutro, origem: lida.origem };
   }
-  const esboco = modulo ? (modulo.default ?? modulo.ESBOCO) : json;
-  if (!esboco) throw new ErroDoVao(`${arquivo} não exporta o esboço como default nem é uma receita`);
-  const montado = montarOpcoes(esboco, { nome: basename(abs), relato: false });
-  if (montado.recusas?.length) throw new ErroDoVao(`o esboço foi recusado:\n${montado.recusas.map((r) => `- ${r.motivo ?? r}`).join('\n')}`);
-  const painel = montado.paineis[opcao - 1];
-  if (!painel) throw new ErroDoVao(`o esboço tem ${montado.paineis.length} opções e veio --opcao=${opcao}`);
+  const { painel } = lida;
   const folgas = {};
   for (const c of painel.contatosDeclarados ?? []) if (c.folga) folgas[chaveDoPar(c.par[0], c.par[1])] = c.folga;
   const apoia = Object.fromEntries((painel.apoiaDeclarada ?? []).map((a) => [a.parte, a.motivo]));
-  return { faces: facesPorNome(painel.neutro), folgas, apoia, neutro: painel.neutro, origem: `esboço ${basename(abs)}, opção ${opcao}` };
+  return { faces: facesPorNome(painel.neutro), folgas, apoia, neutro: painel.neutro, origem: lida.origem };
 }
 
 /** A relação de cada par de partes que o relato de contatos dá (`descreverPeca` sobre o neutro, a mesma medida): `[{ a, b, tipo }]` com toca, atravessa ou folga. */

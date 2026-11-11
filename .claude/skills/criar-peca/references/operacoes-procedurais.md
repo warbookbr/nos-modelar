@@ -438,6 +438,27 @@ vincadas, o meio da aresta fica na superfície limite como num filete de
 nitidez só arredonda a forma toda. Vinco ou canto por índice grita com a forma
 nomeada; par de pontos do vinco que não é aresta da gaiola, ponto que não está
 na gaiola, nome de vinco repetido e aresta em dois vincos gritam com os nomes.
+
+O raio em milímetro de uma aresta de caráter não se pede pela nitidez, que só
+o entrega com a face e os níveis certos (a mesma quina de 90 graus dá 0,16 mm
+no nível 3, 3,88 no 4 e 5,91 no 5). Na `gaiolaPorEstacoes` o vinco aceita
+`raio` no lugar da `nitidez`: `{ nome: 'linhaDeCintura', coluna: 'cintura',
+raio: 6 }`, ou `raio: { de: 6, ate: 3 }` para a quina que afina ao longo da
+linha, ou uma lista com um raio por ponto. O ajudante lê a dobra em cada ponto
+da linha, calcula a distância das colunas de apoio (`apoioDoVinco`, de
+`procedural/nucleo/apoio-do-vinco.js`) e as põe sobre as duas arestas da gaiola
+que saem do ponto, com mais de uma coluna por lado, em gradação, quando a face
+da gaiola é bem maior que o apoio; o vinco sai com nitidez 0 e o raio da malha
+independe dos níveis (3% abaixo do pedido no nível 2, menos de 1% do 3 em
+diante). O raio é o do filete: o arco de círculo tangente às duas faces que
+melhor cobre o perfil, e `raioDoFilete(perfil)` o mede num corte da malha por
+um plano perpendicular ao vinco, com `retasPor: { de, ate }` quando as faces
+são abauladas. A relação foi medida de 20 a 150 graus de dobra e vale com a
+quina lisa; a quina que é cota medida perde o raio, e a saída traz `raios` (o
+raio esperado por vinco e por ponto) e os avisos `raioNaoCabe`,
+`vincosDisputamApoio` e `quinaMedida`, entre outros. `gaiolaPorLacos` e
+`gaiolaPorRede` ainda não aceitam `raio`; `npm run capacidade -- apoioDoVinco`
+dá a ficha da conta.
 `cantos: ['quina']` fixa o ponto como canto vivo, o vinco de vértice 1 do
 Blender. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é espelhada
 antes de subdividir para a costura sair lisa, com os vincos e cantos

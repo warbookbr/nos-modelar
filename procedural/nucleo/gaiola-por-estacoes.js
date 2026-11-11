@@ -12,7 +12,7 @@
  *   regioes: [{ nome, estacoes: [de, ate], colunas: [de, ate] }] adensa só um trecho, com estações e colunas parciais.
  *   vaos: [{ nome, estacoes, colunas, livre? }] tira as faces entre duas estações e duas colunas; bordaDoVao(nome) dá a borda.
  *   aneis: [{ nome, vao, recuo, voltas, largura }] laços de arestas em volta de um vão (detalhe em gaiola-aneis.js).
- *   vincos: [{ nome, coluna | estacao, de?, ate?, nitidez }] vinco ao longo de uma coluna ou de uma estação.
+ *   vincos: [{ nome, coluna | estacao, de?, ate?, nitidez | raio }] vinco ao longo de uma coluna ou de uma estação; `raio` em mm no lugar da nitidez.
  *   cantos: lista de { estacao?, coluna? } cujos pontos ficam vivos; só a estação ou só a coluna marca a linha inteira.
  *   medidas: lista de { estacao?, coluna?, peso? } cujos pontos a superfície limite atravessa (com peso, só aproxima).
  *   leitura: true | { peso?, erro?, inclinacao?, estrito? } declara que as cotas vêm de imagem, com erro.
@@ -21,7 +21,8 @@
  *   prefixo: texto posto na frente do nome de todo ponto.
  *   curvas: [{ nome, colunas: [{ nome, fracao }] }] colunas a frações fixas de uma curva de seção (gaiola-interpolada.js).
  *   interpolar: { passo? } preenche as estações sem colunas pelas estações-chave (gaiola-interpolada.js).
- * devolve: { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, origens, entradas, estrutura, aneis?, avisos? }.
+ *   niveis: os níveis que o passo `subdivisao` vai usar; só serve ao aviso de arco com poucos segmentos de um vinco com `raio`.
+ * devolve: { pontos, passo, ponto(estacao, coluna), bordaDoVao(vao), regioes, origens, entradas, estrutura, aneis?, raios?, avisos? }.
  * exemplo:
  *   gaiolaPorEstacoes({ eixo: 'z', simetria: 'x',
  *     estacoes: [
@@ -85,6 +86,17 @@
  * vincos: { nome, coluna, de?, ate?, nitidez } segue uma coluna de uma estação a outra (por padrão, por todas as
  *         estações em que ela existe, e no anel fechado volta ao primeiro ponto); { nome, estacao, de?, ate?, nitidez }
  *         segue uma estação de uma coluna a outra. A nitidez passa ao passo como veio: de 0 a 1, 'viva' ou nome de PARAMS.
+ *         O RAIO EM MM. `raio` no lugar de `nitidez` pede o raio do filete da aresta (a definição e a relação estão em `apoio-do-vinco.js`):
+ *         `raio: 6`, `{ de: 6, ate: 3 }` (linear no comprimento da linha) ou uma lista de um raio por ponto da linha. O ajudante lê a dobra em
+ *         cada ponto da linha (o ângulo entre as duas arestas da gaiola que saem dele, uma de cada lado), calcula a distância das colunas de
+ *         apoio e as põe sobre essas arestas, de cada lado do vinco, com uma gradação quando a face da gaiola é bem maior que o apoio
+ *         (colunas a a·qʲ da quina, q em torno de 4), e o vinco sai com nitidez 0. O resultado independe dos níveis: a malha mostra o raio da
+ *         superfície limite, com 3% a menos no nível 2 e menos de 1% a partir do 3. `raios` da saída dá, por vinco, o raio pedido e o esperado
+ *         e, por ponto, a dobra, as distâncias do apoio e o raio. Avisos (`ref` = nome): `raioNaoCabe` (o apoio passaria da coluna vizinha;
+ *         o apoio fica em 90% da face e o raio esperado é o que cabe), `vincosDisputamApoio` (dois vincos pedem apoio sobre a mesma aresta),
+ *         `quinaMedida` (a quina é cota medida e a superfície passaria por ela), `anguloForaDaCalibragem` (menos de 20 ou mais de 150 graus),
+ *         `apoioAmbiguo`, `vincoSemDuasFaces`, `vincoCruzaOutroComRaio`, `vincoSemDobra`, `filetePoucoSegmentado`, `niveisAbaixoDoRecomendado`
+ *         (estes dois pedem `niveis` na definição). Não se combina com `nitidez` no mesmo vinco.
  * cantos e medidas: listas de { estacao?, coluna? }; só a estação marca a estação inteira, só a coluna marca a coluna
  *         inteira, e os dois marcam um ponto. A medida aceita `peso` (número maior que zero ou nome de PARAMS), e os
  *         pontos dela saem como { ponto, peso }, a cota que a superfície aproxima sem passar; sem peso, a cota é exata.
@@ -127,6 +139,7 @@
 import { capturarGaiolas, registrarGaiola } from './gaiola-captura.js';
 import { chaveDaColuna, entradasDaDefinicao, expandirEstacoes } from './gaiola-interpolada.js';
 import { construirAneis, extraordinarios, lerAneis } from './gaiola-aneis.js';
+import { inserirApoiosNosVincos } from './apoio-do-vinco.js';
 
 const EIXOS = ['x', 'y', 'z'];
 const TOLERANCIA_DA_COSTURA = 1e-9;
@@ -527,16 +540,18 @@ function lerVincos(vincos, lidas, arestas, fechada, citavel, aneis) {
   if (!Array.isArray(vincos)) falha('vincos precisa ser lista de vincos nomeados');
   const nomes = new Set();
   return vincos.map((v, n) => {
-    exigirCampos(v, ['nome', 'coluna', 'estacao', 'anel', 'volta', 'de', 'ate', 'nitidez'], `o vinco ${n}`);
+    exigirCampos(v, ['nome', 'coluna', 'estacao', 'anel', 'volta', 'de', 'ate', 'nitidez', 'raio'], `o vinco ${n}`);
     const nome = exigirNome(v.nome, `o vinco ${n}`);
     if (nomes.has(nome)) falha(`o nome de vinco ${citar(nome)} aparece mais de uma vez`);
     nomes.add(nome);
-    const ok = v.nitidez === 'viva' || (typeof v.nitidez === 'string' && v.nitidez) || (typeof v.nitidez === 'number' && v.nitidez >= 0 && v.nitidez <= 1);
+    if (v.raio != null && v.nitidez != null) falha(`o vinco ${citar(nome)} declara raio e nitidez; o raio em mm decide a nitidez (as colunas de apoio fazem o arredondamento), então declare só um dos dois`);
+    const ok = v.raio != null || v.nitidez === 'viva' || (typeof v.nitidez === 'string' && v.nitidez) || (typeof v.nitidez === 'number' && v.nitidez >= 0 && v.nitidez <= 1);
     if (!ok) falha(`o vinco ${citar(nome)} precisa de nitidez de 0 a 1, 'viva' ou nome de PARAMS`);
     const pontos = linhaDoVinco(v, nome, lidas, fechada, citavel, aneis);
     for (let k = 0; k + 1 < pontos.length; k++) {
       if (!arestas.has(chave(pontos[k], pontos[k + 1]))) falha(`o vinco ${citar(nome)} liga ${citar(pontos[k])} a ${citar(pontos[k + 1])}, que não formam aresta da gaiola (um vão, uma fusão ou uma divisão tirou essa aresta${aneis && [...aneis.porNome.values()].some((a) => a.anel.fora) ? '; e um anel de recuo 0 troca a faixa de faces em volta do seu vão, com as arestas dela' : ''})`);
     }
+    if (v.raio != null) return { nome, pontos, nitidez: 0, raio: v.raio };
     return { nome, pontos, nitidez: v.nitidez };
   });
 }
@@ -655,7 +670,7 @@ export { capturarGaiolas };
  * colunas), 'gerada' (pelo passo) ou 'parcial'.
  */
 export function gaiolaPorEstacoes(definicao) {
-  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'aneis', 'vincos', 'cantos', 'medidas', 'leitura', 'simetria', 'virar', 'prefixo', 'curvas', 'interpolar'], 'a definição da gaiola');
+  exigirCampos(definicao, ['eixo', 'estacoes', 'regioes', 'vaos', 'aneis', 'vincos', 'cantos', 'medidas', 'leitura', 'simetria', 'virar', 'prefixo', 'curvas', 'interpolar', 'niveis'], 'a definição da gaiola');
   const { simetria = null, virar = false, prefixo = '' } = definicao;
   const E = lerEixo(definicao.eixo);
   const leitura = lerLeitura(definicao.leitura);
@@ -710,7 +725,7 @@ export function gaiolaPorEstacoes(definicao) {
     falha(`${soltos.length === 1 ? 'o ponto' : 'os pontos'} ${lista(soltos)} não pertencem a nenhuma face`);
   }
 
-  const faces = ficam.map((f) => (virar ? [...f.nomes].reverse() : [...f.nomes]));
+  let faces = ficam.map((f) => (virar ? [...f.nomes].reverse() : [...f.nomes]));
   const arestas = new Map();
   for (const f of faces) for (let k = 0; k < f.length; k++) { const c = chave(f[k], f[(k + 1) % f.length]); arestas.set(c, (arestas.get(c) ?? 0) + 1); }
 
@@ -833,7 +848,24 @@ export function gaiolaPorEstacoes(definicao) {
     avisos = avisosDeEstacoesProximas(doEixo, E, leitura);
     if (leitura.estrito && avisos.length) falha(`a leitura é estrita e ${avisos.length === 1 ? 'um par de estações-chave está' : `${avisos.length} pares de estações-chave estão`} mais perto do que o erro de leitura sustenta: ${avisos.map((a) => a.texto).join('; ')}`);
   }
-  const passo = { vertices: [...todosOsVertices], faces, vincos };
+  /* o raio em mm de um vinco vira colunas de apoio (apoio-do-vinco.js); a gaiola ganha os pontos e as faces delas */
+  let raios = null; let apoios = null; const avisosDoApoio = [];
+  const comRaio = vincos.filter((v) => v.raio != null);
+  if (comRaio.length) {
+    apoios = inserirApoiosNosVincos({ pontos, faces, vincos: comRaio, unidade: MM, niveis: definicao.niveis });
+    faces = apoios.faces;
+    for (const [n, q] of Object.entries(apoios.pontos)) {
+      if (n in pontos) falha(`o ponto ${citar(n)} do apoio do vinco já é ponto da gaiola; renomeie o vinco`);
+      pontos[n] = q; todosOsVertices.push(n);
+    }
+    raios = apoios.raios; avisosDoApoio.push(...apoios.avisos);
+    const medidosNoPasso = new Set((medidas ?? []).map((m) => (typeof m === 'string' ? m : m.ponto)));
+    for (const v of comRaio) {
+      const medidos = v.pontos.filter((p) => medidosNoPasso.has(p));
+      if (medidos.length && apoios.aplicados.includes(v.nome)) avisosDoApoio.push({ nome: 'quinaMedida', vinco: v.nome, pontos: medidos, motivo: `${medidos.length} ponto(s) da quina do vinco ${v.nome} são cota medida (${medidos.slice(0, 3).join(', ')}): a superfície limite passaria pela quina viva, e o raio pedido some; tire a quina das medidas e meça as colunas de apoio ou as faces` });
+    }
+  }
+  const passo = { vertices: [...todosOsVertices], faces, vincos: vincos.map(({ nome, pontos: linha, nitidez }) => ({ nome, pontos: linha, nitidez })) };
   if (cantos) passo.cantos = cantos;
   if (medidas) passo.medidas = medidas;
   if (simetria) passo.simetria = simetria;
@@ -868,7 +900,10 @@ export function gaiolaPorEstacoes(definicao) {
     definicao: demais,
     estacoes: lidas.map((S) => ({ nome: S.nome, em: S.em, regiao: S.regiao, colunas: S.colunas.map((c) => [c.nome, c.de, c.comeca, c.termina, c.regiao]) })),
   };
+  if (apoios) Object.assign(origens, apoios.origens);
   const saida = { pontos, passo, ponto, bordaDoVao, regioes: porRegiao, origens, entradas: entradasDaDefinicao(definicao.estacoes), estrutura };
+  if (raios) saida.raios = raios;
+  if (avisosDoApoio.length) avisos = [...(avisos ?? []), ...avisosDoApoio.map((a) => ({ ref: a.nome, texto: a.motivo, ...a }))];
   if (aneis) {
     saida.aneis = Object.fromEntries([...aneis.porNome.values()].map((a) => [a.anel.nome, {
       vao: a.vao, fechada: a.fechada, ...(a.anel.fora ? { fora: true, camadas: a.camadas, grade: [...a.grade] } : {}), voltas: a.voltas.map((v) => [...v]), costuras: a.costuras.map((v) => [...v]), borda: [...a.borda], extraordinarios: extraordinariosDosAneis[a.anel.nome],

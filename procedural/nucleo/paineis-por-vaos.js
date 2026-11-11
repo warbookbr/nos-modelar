@@ -11,7 +11,7 @@
  *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos. O passo `parte` sai com `onde.conexo` { de, dir, ate }: `ate` é a distância lida mais uma folga, e o núcleo recusa a receita salva cuja semente passou a cair num vão.
  *   modo: 'vista' (padrão: a lâmina é a extrusão da linha ao longo do eixo da vista, a que corta toda camada do raio, com o vão compensado pela inclinação) ou 'superficie' (a linha é projetada na chapa e a lâmina é varrida sobre ela, de paredes normais à chapa: a folga 3D é o vão em qualquer inclinação, a linha atravessa dobras, a ponta que sai da borda não alarga e duas pontas que se encontram fecham em esquadria; corta só a primeira camada lida do `lado`, até `profundidade` mm abaixo da pele, padrão a espessura lida mais meio vão); vale por linha em `linhas[i].modo`.
  *   origemId: o primeiro origemId livre (padrão: o maior dos passos da chapa mais um); o ajudante usa dali em diante e devolve `proximoId`.
- *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido; folgaAbaixoDe: o aviso `folgaEstreita` quando a lâmina fica abaixo disso, em mm (padrão metade do vão); saida: 'mm' ou 'metro'.
+ *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido; folgaAbaixoDe: o aviso `folgaEstreita` quando a lâmina fica abaixo disso, em mm (padrão metade do vão); saida: 'mm' ou 'metro'; conferir: false não executa o corte (só a chapa, uma vez; o `ate` sai da chapa de antes) e avisa `naoConferiu`; medirTempo: true põe em medidas.tempos o tempo de cada etapa; medirFolga: true mede a folga 3D também no modo vista (no modo superfície ela é sempre medida).
  * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos } com medidas { vaoPedido, inclinacaoMaxima, fatorMinimo, folgaMinima, paineis, paineisAchados, sementesSemPainel, pedacosSemNome, pedacos, execucoes } e avisos { ref, texto }; o resultado é memorizado pela entrada (memoria-de-pura), então a receita que o chama a cada leitura paga a conta uma vez.
  * exemplo:
  *   paineisPorVaos({ chapa: { passos: [['cubo', { origemId: 1, larg: 600, alt: 1, prof: 400 }]], origem: { op: 'cubo', id: 1 } }, vao: 4,
@@ -42,8 +42,9 @@
 import { nucleo } from './entrada.js';
 import { memoizarPura } from './memoria-de-pura.js';
 import { normalDaFace } from './nucleo.js';
-import { alongar, projetarLinha, varrer, voltaMenorQueOVao } from './lamina-sobre-a-superficie.js';
+import { alongar, bordasSeCruzam, linhaPertoDeSiMesma, projetarLinha, varrer, voltaMenorQueOVao } from './lamina-sobre-a-superficie.js';
 import { pedacosConexos, prepararRaios } from './selecao-geometrica.js';
+import { triangularFace } from './triangulacao-face.js';
 
 const erro = (texto) => { throw new Error(`paineisPorVaos: ${texto}`); };
 const br = (n) => String(Math.round(n * 1000) / 1000).replace('.', ',');
@@ -126,6 +127,72 @@ function distanciaAoContorno(p, pol) {
   return m;
 }
 
+/** A distância do ponto ao triângulo. */
+function distanciaAoTriangulo(p, [A, B, C]) {
+  const sb = (u, v) => [u[0] - v[0], u[1] - v[1], u[2] - v[2]];
+  const dt = (u, v) => u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+  const ab = sb(B, A); const ac = sb(C, A); const ap = sb(p, A);
+  const d1 = dt(ab, ap); const d2 = dt(ac, ap);
+  const ate = (q) => Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+  if (d1 <= 0 && d2 <= 0) return ate(A);
+  const bp = sb(p, B); const d3 = dt(ab, bp); const d4 = dt(ac, bp);
+  if (d3 >= 0 && d4 <= d3) return ate(B);
+  const vc = d1 * d4 - d3 * d2;
+  if (vc <= 0 && d1 >= 0 && d3 <= 0) { const t = d1 / (d1 - d3); return ate([A[0] + ab[0] * t, A[1] + ab[1] * t, A[2] + ab[2] * t]); }
+  const cp = sb(p, C); const d5 = dt(ab, cp); const d6 = dt(ac, cp);
+  if (d6 >= 0 && d5 <= d6) return ate(C);
+  const vb = d5 * d2 - d1 * d6;
+  if (vb <= 0 && d2 >= 0 && d6 <= 0) { const t = d2 / (d2 - d6); return ate([A[0] + ac[0] * t, A[1] + ac[1] * t, A[2] + ac[2] * t]); }
+  const va = d3 * d6 - d5 * d4;
+  if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) { const t = (d4 - d3) / (d4 - d3 + d5 - d6); return ate([B[0] + (C[0] - B[0]) * t, B[1] + (C[1] - B[1]) * t, B[2] + (C[2] - B[2]) * t]); }
+  const den = 1 / (va + vb + vc); const v = vb * den; const w = vc * den;
+  return ate([A[0] + ab[0] * v + ac[0] * w, A[1] + ab[1] * v + ac[1] * w, A[2] + ab[2] * v + ac[2] * w]);
+}
+
+/**
+ * A folga medida no resultado do corte: a menor distância 3D entre os vértices que o corte criou e os triângulos de OUTRO pedaço, entre pedaços a menos de `alcance`.
+ * Os triângulos entram numa grade de células de `alcance`, e cada vértice olha as 27 células em volta. Devolve null quando nenhum par fica perto.
+ */
+function folgaEntrePedacos(executado, verticesDeAntes, grupos, pedacoDe, alcance) {
+  const celula = (p) => p.map((x) => Math.floor(x / alcance));
+  const chave = (c) => `${c[0]},${c[1]},${c[2]}`;
+  const grade = new Map();
+  for (const f of executado.F.values()) {
+    const pts = f.vs.map((v) => executado.V.get(v));
+    const g = pedacoDe.get(f.id);
+    for (const [i, j, k] of triangularFace(pts)) {
+      const T = [pts[i], pts[j], pts[k]];
+      const lo = celula([0, 1, 2].map((e) => Math.min(T[0][e], T[1][e], T[2][e])));
+      const hi = celula([0, 1, 2].map((e) => Math.max(T[0][e], T[1][e], T[2][e])));
+      for (let x = lo[0]; x <= hi[0]; x += 1) for (let y = lo[1]; y <= hi[1]; y += 1) for (let z = lo[2]; z <= hi[2]; z += 1) {
+        const c = chave([x, y, z]);
+        if (!grade.has(c)) grade.set(c, []);
+        grade.get(c).push({ T, g });
+      }
+    }
+  }
+  let menor = null;
+  const vistos = new Set();
+  for (const f of executado.F.values()) {
+    const g = pedacoDe.get(f.id);
+    for (const v of f.vs) {
+      if (verticesDeAntes.has(v) || vistos.has(`${v}:${g}`)) continue;
+      vistos.add(`${v}:${g}`);
+      const p = executado.V.get(v);
+      const c = celula(p);
+      for (let x = c[0] - 1; x <= c[0] + 1; x += 1) for (let y = c[1] - 1; y <= c[1] + 1; y += 1) for (let z = c[2] - 1; z <= c[2] + 1; z += 1) {
+        for (const t of grade.get(chave([x, y, z])) ?? []) {
+          if (t.g === g) continue;
+          const d = distanciaAoTriangulo(p, t.T);
+          if (d < alcance && (menor == null || d < menor)) menor = d;
+        }
+      }
+    }
+  }
+  void grupos;
+  return menor;
+}
+
 /** Os passos do corte e das partes em metro: extrusao (altura, em, perfil) e o conexo (de, ate); dir é só direção. */
 function emMetro(r) {
   const mm = (v) => (Array.isArray(v) ? v.map(mm) : typeof v === 'number' ? v / 1000 : v);
@@ -148,6 +215,8 @@ function emMetro(r) {
  *   linhas: any[], paineis: any[], origemId?: number, normal?: Function, amostragem?: number, areaMinima?: number, margem?: number, sementesPerdidas?: 'recusa' | 'avisa' }} o
  */
 function paineisPorVaosBruto(o) {
+  const tempos = {};
+  const cronometra = (nome, de) => { tempos[nome] = Math.round(((tempos[nome] ?? 0) + performance.now() - de) * 10) / 10; };
   if (o == null || typeof o !== 'object') erro('espera { chapa, vao, linhas, paineis }');
   const { chapa } = o;
   if (!chapa || typeof chapa !== 'object' || !chapa.origem || typeof chapa.origem.op !== 'string' || !Number.isSafeInteger(chapa.origem.id)) {
@@ -166,6 +235,9 @@ function paineisPorVaosBruto(o) {
   if (!(Number.isFinite(folgaAbaixoDe) && folgaAbaixoDe >= 0)) erro(`folgaAbaixoDe precisa ser um número de mm a partir de zero (recebido ${o.folgaAbaixoDe})`);
   const margem = o.margem ?? 0.02;
   if (!(margem >= 0 && margem < 0.5)) erro('margem precisa estar de 0 a 0,5 (a fração a mais da lâmina; padrão 0,02)');
+  const validaProfundidade = (v, quem) => { if (v != null && !(Number.isFinite(v) && v > 0)) erro(`profundidade ${quem} precisa ser um número de mm maior que zero, a profundidade da lâmina abaixo da pele (recebido ${JSON.stringify(v)})`); };
+  validaProfundidade(o.profundidade, 'da chamada');
+  o.linhas.forEach((l, i) => validaProfundidade(l?.profundidade, `da linha '${l?.nome ?? `linha${i}`}'`));
   const modoGeral = o.modo ?? 'vista';
   for (const [nomeDoModo, m] of [['modo', o.modo], ...o.linhas.map((l, i) => [`o modo da linha '${l?.nome ?? `linha${i}`}'`, l?.modo])]) {
     if (m != null && m !== 'vista' && m !== 'superficie') erro(`${nomeDoModo} é 'vista' (a lâmina é a extrusão da linha ao longo do eixo da vista) ou 'superficie' (a lâmina é varrida sobre a chapa, com as paredes normais a ela)`);
@@ -215,14 +287,19 @@ function paineisPorVaosBruto(o) {
   let leitura = null;
   if (passosDaChapa) {
     const marca = [...passosDaChapa, ['parte', { nome: '__chapa__', sel: { origem: chapa.origem } }]];
+    let t0 = performance.now();
     const st = nucleo(marca, parametros, topo);
+    cronometra('executarChapa', t0);
     if (st.orfaos.length) erro(`os passos da chapa foram recusados pelo núcleo: ${st.orfaos.slice(0, 3).map((x) => x.motivo).join('; ')}`);
     const daChapa = [...st.F.values()].filter((f) => f.parte === '__chapa__').map((f) => f.id);
     if (!daChapa.length) erro(`a origem ${chapa.origem.op}:${chapa.origem.id} não tem face nenhuma depois dos passos da chapa`);
     if (daChapa.length !== st.F.size) erro(`os passos da chapa deixam ${st.F.size - daChapa.length} face(s) fora da origem ${chapa.origem.op}:${chapa.origem.id}; passe só os passos que constroem a chapa`);
     const todos = [...st.V.values()];
-    const caixa = [0, 1, 2].map((e) => [Math.min(...todos.map((p) => p[e])), Math.max(...todos.map((p) => p[e]))]);
+    /* por laço, e não por espalhamento: Math.min(...lista) estoura a pilha com mais de uns 120 mil elementos (uma chapa grande tem mais vértices que isso) */
+    const caixa = [0, 1, 2].map((e) => { let lo = Infinity; let hi = -Infinity; for (const p of todos) { if (p[e] < lo) lo = p[e]; if (p[e] > hi) hi = p[e]; } return [lo, hi]; });
+    t0 = performance.now();
     leitura = { st, raios: prepararRaios(st.V, st.F, daChapa), caixa, passos: passosDaChapa.length };
+    cronometra('prepararRaios', t0);
     if (Math.max(...caixa.map(([lo, hi]) => hi - lo)) < 20) aviso('unidadeSuspeita', `a chapa mede no máximo ${br(Math.max(...caixa.map(([lo, hi]) => hi - lo)))} unidades: a entrada é em mm (vao, linhas, sementes e os passos da chapa); se a chapa foi escrita em metro, escreva-a em mm e peça saida: 'metro'`);
   } else if (!o.normal) {
     aviso('semLeitura', 'a chapa veio sem passos: o ajudante não leu a normal nem conferiu o corte, e o vão sai medido no plano da vista (dê chapa.passos ou normal para compensar a inclinação)');
@@ -259,6 +336,7 @@ function paineisPorVaosBruto(o) {
   /* as ferramentas do `subtrair`: a extrusão de cada linha aberta ou descartada, e o anel de cada linha fechada */
   const ferramentas = [];
   const pendentes = [];
+  let gerarSuperficie = null; let larguraDaSuperficie = 0; let inicioDaSuperficie = 0; let inicioDasFerramentas = 0;
   for (let li = 0; li < o.linhas.length; li += 1) {
     const l = o.linhas[li];
     const nome = l.nome ?? `linha${li}`;
@@ -423,7 +501,7 @@ function paineisPorVaosBruto(o) {
         const eps = 1e-4 * Math.max(...leitura.caixa.map(([a0, a1]) => a1 - a0));
         const p0 = c.map((x, k) => x - nm[k] * eps);
         const baixo = leitura.raios.todos(p0, nm.map((x) => -x))[0];
-        const esp = baixo && baixo.t + eps <= 5 * o.vao ? baixo.t + eps : null;
+        const esp = baixo && baixo.t + eps <= 8 * o.vao ? baixo.t + eps : null;
         return { c, n: nm, esp };
       };
       const plano = (a, b, v) => {
@@ -438,6 +516,11 @@ function paineisPorVaosBruto(o) {
         erro(`a linha '${nome}' não corta a chapa: nenhum dos pontos dela tem chapa na vista ${eixo}, de ${br(alcance[0])} a ${br(alcance[1])} mm; confira o eixo da vista, a ordem dos pontos ([${eixo === 'x' ? 'z, y' : eixo === 'y' ? 'x, z' : 'x, y'}]), o alcance e a unidade (mm)`);
       }
       inclinacaoMaxima = Math.max(inclinacaoMaxima, proj.inclinacaoMaxima);
+      const profPedida = l.profundidade ?? o.profundidade ?? null;
+      const espLida = Math.max(0, ...proj.segmentos.flat().map((st) => st.esp ?? 0));
+      if (profPedida != null && espLida > 0 && profPedida <= espLida) {
+        erro(`a profundidade ${br(profPedida)} mm da linha '${nome}' não atravessa a chapa: a espessura lida na linha chega a ${br(espLida)} mm; dê uma profundidade maior que a espessura, ou tire a opção para a lâmina descer a espessura lida mais meio vão`);
+      }
       return { ...pd, ...proj, cima: dirv.map((x) => -x) };
     });
     /* onde a ponta de uma linha aberta encontra a ponta de outra, as duas passam meia largura: o canto de duas lâminas fecha em esquadria */
@@ -451,23 +534,44 @@ function paineisPorVaosBruto(o) {
     const aAlongar = pontas.filter((p) => pontas.some((q) => q.i !== p.i && longe(p.c, q.c) <= 0.5 * o.vao));
     for (const p of aAlongar) { const segs = lidas[p.i].segmentos; alongar(segs[p.fim ? segs.length - 1 : 0], p.fim, largura / 2); }
     for (const ln of lidas) {
-      const { l, nome, segmentos, fechadaInteira, quinas } = ln;
+      const { l, nome, segmentos, fechadaInteira } = ln;
       if (l.fechada && l.dentro !== 'descarta' && fechadaInteira) {
         if (voltaMenorQueOVao(segmentos[0], largura)) {
           erro(`a volta '${nome}' é menor que o vão: a lâmina de ${br(largura)} mm de largura, por dentro, passa do outro lado da volta e deixaria uma ilha fantasma; faça a volta maior que o vão, ou use dentro: 'descarta' para só furar a chapa`);
         }
       }
       for (const estacoes of segmentos) {
-        const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima });
-        passosDeCorte.push(['subdivisao', { origemId: proximo, vertices: varrido.vertices, faces: varrido.faces, niveis: 0 }]);
-        ferramentas.push({ op: 'subdivisao', id: proximo });
-        proximo += 1;
+        const cruza = bordasSeCruzam(estacoes, !!l.fechada && fechadaInteira, largura, ln.e);
+        if (cruza === 'aberta') erro(`a lâmina da linha '${nome}' se cruza (canto muito fechado ou pontos muito juntos para a largura ${br(largura)} mm); abra o canto ou afaste os pontos`);
+        if (cruza === 'volta') erro(`a lâmina da volta '${nome}' se cruza por dentro ou por fora: algum trecho dela é mais estreito que o vão (${br(largura)} mm de lâmina) ou o canto é fechado demais, e a lâmina deixaria uma ilha fantasma; alargue o trecho, abra o canto, ou use dentro: 'descarta' para só furar a chapa`);
       }
-      folgaMinima = Math.min(folgaMinima, largura);
+      const perto = linhaPertoDeSiMesma(segmentos[0], !!l.fechada && fechadaInteira, largura);
+      if (perto != null) erro(`a linha '${nome}' passa a ${br(perto)} mm dela mesma, menos que a lâmina de ${br(largura)} mm: o vão de um trecho invade o do outro (um gargalo, um grampo ou uma volta estreita) e deixaria ilha ou fresta; alargue o trecho para mais que o vão, ou parta a linha`);
     }
+    /* os sólidos das lâminas, de uma largura dada: os ids são os mesmos em toda largura, e o ajudante regera as lâminas com a largura corrigida pela folga medida */
+    const idBase = proximo;
+    gerarSuperficie = (larguraDe) => {
+      const passos = []; const ferr = []; let id = idBase;
+      for (const ln of lidas) {
+        const { l, nome, segmentos, fechadaInteira } = ln;
+        for (const estacoes of segmentos) {
+          const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima });
+          passos.push(['subdivisao', { origemId: id, vertices: varrido.vertices, faces: varrido.faces, niveis: 0 }]);
+          ferr.push({ op: 'subdivisao', id });
+          id += 1;
+        }
+      }
+      return { passos, ferr, fim: id };
+    };
+    larguraDaSuperficie = largura;
+    const g0 = gerarSuperficie(largura);
+    inicioDaSuperficie = passosDeCorte.length; inicioDasFerramentas = ferramentas.length;
+    passosDeCorte.push(...g0.passos); ferramentas.push(...g0.ferr);
+    proximo = g0.fim;
+    folgaMinima = Math.min(folgaMinima, largura);
   }
   const idDoCorte = proximo; proximo += 1;
-  const corte = ['subtrair', { origemId: idDoCorte, solidos: [{ origem: chapa.origem }, ...ferramentas.map((origem) => ({ origem }))] }];
+  let corte = ['subtrair', { origemId: idDoCorte, solidos: [{ origem: chapa.origem }, ...ferramentas.map((origem) => ({ origem }))] }];
   const origemDoCorte = { op: 'subtrair', id: idDoCorte };
 
   /* ---- as sementes: de onde o raio sai, e para onde vai ---- */
@@ -499,10 +603,57 @@ function paineisPorVaosBruto(o) {
     return saida;
   }
 
-  const executado = nucleo([...passosDaChapa, ...passosDeCorte, corte], parametros, topo);
+  if (o.conferir === false) {
+    /* sem a conferência: nenhum corte é executado. O `ate` de cada semente sai da chapa de antes, e nada confirma que o corte parte a chapa, que as sementes caem em pedaços distintos
+       nem a folga; o aviso diz isso */
+    o.paineis.forEach((p, i) => {
+      const antes = leitura.raios.primeiro(partes[i].de, partes[i].dir);
+      if (!antes) erro(`o painel '${p.nome}' não achou pedaço: o ponto ${p.eixo} [${br(p.ponto[0])}, ${br(p.ponto[1])}] cai fora da chapa: o raio da vista ${p.eixo} não toca nenhuma face dela; mova o ponto para dentro do pedaço que o painel deve ser`);
+      partes[i].ate = r3(antes.t + o.vao / 4);
+    });
+    aviso('naoConferiu', 'conferir: false: o corte não foi executado; nada confirma que as linhas partem a chapa, que as sementes caem em pedaços distintos e que a folga é a pedida. As sementes valem pela chapa de antes do corte, e o núcleo as confere na execução (conexo.ate)');
+    saida.passos = montarPassos();
+    saida.partes = partes.map((p) => ({ nome: p.nome, origem: origemDoCorte, de: p.de, dir: p.dir, ate: p.ate ?? null }));
+    medidas.execucoes = 1;
+    if (o.medirTempo === true) medidas.tempos = tempos;
+    return saida;
+  }
+  const executar = () => { const t0 = performance.now(); const r = nucleo([...passosDaChapa, ...passosDeCorte, corte], parametros, topo); cronometra('executarCorte', t0); return r; };
+  const tCorte = performance.now();
+  let executado = executar();
   if (executado.orfaos.length) {
     erro(`o corte foi recusado pelo núcleo: ${executado.orfaos.slice(0, 3).map((x) => x.motivo).join('; ')}. Confira se alguma linha deixa a chapa sem pedaço, se o polígono da lâmina se cruza (pontos muito juntos num canto fechado) e se a chapa é um sólido fechado`);
   }
+  /* a folga medida no resultado: a menor distância 3D entre pedaços diferentes, junto do corte. No modo superfície a largura da lâmina é corrigida por ela, até a folga ficar
+     entre o vão e 1,05 vez o vão (a curvatura transversal da chapa estreita a folga, e a lâmina de parede normal só garante o vão onde a chapa é plana na seção) */
+  const verticesDeAntes = new Set(leitura.st.V.keys());
+  const medirFolga = () => {
+    const idsX = [...executado.F.keys()];
+    const gruposX = pedacosConexos(executado.F, idsX);
+    const dono = new Map();
+    gruposX.forEach((g, gi) => g.forEach((id) => dono.set(id, gi)));
+    return folgaEntrePedacos(executado, verticesDeAntes, gruposX, dono, 3 * o.vao);
+  };
+  const tFolga = performance.now();
+  let folgaMedida = pendentes.length || o.medirFolga === true ? medirFolga() : null;
+  cronometra('medirFolga', tFolga);
+  let ajustes = 0;
+  if (pendentes.length && folgaMedida != null) {
+    while (ajustes < 3 && (folgaMedida < o.vao || folgaMedida > o.vao * 1.05)) {
+      const fator = Math.max(0.5, Math.min(2, (o.vao * 1.01) / folgaMedida));
+      larguraDaSuperficie *= fator;
+      const g = gerarSuperficie(larguraDaSuperficie);
+      passosDeCorte.splice(inicioDaSuperficie, g.passos.length, ...g.passos);
+      executado = executar();
+      if (executado.orfaos.length) erro(`o corte foi recusado pelo núcleo depois de corrigir a largura da lâmina para ${br(larguraDaSuperficie)} mm: ${executado.orfaos.slice(0, 2).map((x) => x.motivo).join('; ')}`);
+      folgaMedida = medirFolga() ?? folgaMedida;
+      ajustes += 1;
+    }
+    medidas.execucoes += ajustes;
+    medidas.larguraDaLamina = r3(larguraDaSuperficie);
+    if (folgaMedida < o.vao * 0.998) aviso('folgaAbaixoDoVao', `a folga 3D medida entre os pedaços é ${br(folgaMedida)} mm, abaixo do vão pedido de ${br(o.vao)} mm, mesmo depois de ${ajustes} correção(ões) da largura da lâmina (${br(larguraDaSuperficie)} mm): a chapa curva demais junto da linha; afaste a linha da curva, divida-a ou aceite a folga`);
+  }
+  if (folgaMedida != null) { medidas.folgaMedida = r3(folgaMedida); if (pendentes.length) medidas.folgaMinima = r3(folgaMedida); }
   const ids = [...executado.F.keys()];
   const grupos = pedacosConexos(executado.F, ids);
   medidas.pedacos = grupos.length;
@@ -521,7 +672,9 @@ function paineisPorVaosBruto(o) {
   if (grupos.length <= pedacosDaChapa && !o.linhas.some((l) => l.dentro === 'descarta')) {
     aviso('semSeparacao', `o corte deixou ${grupos.length} pedaço(s), os mesmos que a chapa tinha: nenhuma linha a separou; confira se alguma vai de borda a borda (ou fecha uma volta) no alcance dado`);
   }
+  const tConferencia = performance.now();
   const raiosDepois = prepararRaios(executado.V, executado.F, ids);
+  const dicaDaProfundidade = pendentes.length ? ` (modo 'superficie': a lâmina desce só até ${br(Math.max(...(o.profundidade != null ? [o.profundidade] : [2 * o.vao])))} mm abaixo da pele quando a espessura não pôde ser lida, ou a espessura lida mais meio vão; se a chapa é mais grossa que ${br(8 * o.vao)} mm, dê profundidade maior que a espessura e não atravessa a chapa de outro modo)` : '';
   const dono = new Map();
   const perdidas = [];
   o.paineis.forEach((p, i) => {
@@ -538,7 +691,7 @@ function paineisPorVaosBruto(o) {
       return;
     }
     const g = pedacoDe.get(depois.face);
-    if (dono.has(g)) erro(`os painéis '${dono.get(g)}' e '${p.nome}' caem no mesmo pedaço (a semente de '${p.nome}' é ${descricao}); mova uma das sementes para o pedaço dela, ou confira a linha que devia separá-los`);
+    if (dono.has(g)) erro(`os painéis '${dono.get(g)}' e '${p.nome}' caem no mesmo pedaço (a semente de '${p.nome}' é ${descricao}); mova uma das sementes para o pedaço dela, ou confira a linha que devia separá-los${dicaDaProfundidade}`);
     dono.set(g, p.nome);
     partes[i].ate = r3(depois.t + o.vao / 4);
   });
@@ -558,6 +711,9 @@ function paineisPorVaosBruto(o) {
     }
     if (area < areaMinima) aviso('lasca', `o pedaço${dono.has(gi) ? ` '${dono.get(gi)}'` : ` perto de [${centro.map(br).join(', ')}]`} tem ${br(area)} mm², menos que areaMinima (${br(areaMinima)}): é uma lasca do corte; afaste a linha da borda ou do canto que a gera`);
   });
+  cronometra('conferencia', tConferencia);
+  void tCorte;
+  if (o.medirTempo === true) medidas.tempos = tempos;
   return saida;
 }
 

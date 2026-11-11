@@ -206,6 +206,12 @@ const SUPORTE = { x0: 384, x1: 456, frente: [444, 486], tras: [462, 486], xTras:
 const FURO = (s, [y0, y1], [x0, x1] = [SUPORTE.x0, SUPORTE.x1]) => retangulo(s * (x0 - G), y0 - G, s * (x1 + G), y1 + G);
 const R_ARCO = T.roda.raio + T.roda.folgaDoArco;
 const FUNDO = T.lado.at(-1)[1];      /* a borda de baixo da chapa, do arco de trás à frente */
+/** A altura da face de cima do corpo em z, pelo perfil lateral. */
+function yDoTopo(z) {
+  const topo = T.lado.slice(0, 4);
+  for (let i = 0; i + 1 < topo.length; i += 1) { const [z0, y0] = topo[i]; const [z1, y1] = topo[i + 1]; if (z <= z0 && z >= z1) return y0 + ((y1 - y0) * (z0 - z)) / (z0 - z1); }
+  throw new Error(`yDoTopo: z ${z} fica fora do corpo`);
+}
 const circulo = (zc, R, n = 48) => arco(zc, T.roda.raio, R, 0, 2 * Math.PI * (1 - 1 / n), n - 1);
 
 /* As linhas de vão, cada uma o meio do vão na vista em que foi desenhada: 'x' é a vista de lado ([z, y]), 'y' a de cima ([x, z]) e 'z'
@@ -216,15 +222,18 @@ const DE_CIMA = { ...SUPERFICIE, alcance: [900, 1200] };       /* só a face de 
 const dosDoisLados = (linha) => [{ ...linha, ...SUPERFICIE, nome: `${linha.nome}Dir`, lado: '+' }, { ...linha, ...SUPERFICIE, nome: `${linha.nome}Esq`, lado: '-' }];
 function linhasDeVao() {
   const yC = T.yCintura; const yT = T.yTopoDaPorta;
-  const ALEM = 1100; const ABAIXO = 300;     /* fora da chapa: a linha que sai pela borda segue o plano dela */
+  const ABAIXO = 300;                        /* abaixo da borda de baixo da chapa: a linha que sai pela borda segue o plano dela */
+  /* o plano de corte que atravessa o carro é uma linha de cima, na face de cima, e uma de lado em cada parede; as pontas acabam a
+     PONTA mm da aresta em que as duas faces se encontram, e o ajudante alonga as duas e fecha o canto */
+  const PONTA = 1;
+  const xT = T.secao.at(-1)[0] - PONTA;
+  const deCima = (nome, z) => ({ nome, eixo: 'y', pontos: [[-xT, z], [xT, z]], ...DE_CIMA });
+  const deLado = (nome, z) => dosDoisLados({ nome, eixo: 'x', pontos: [[z, yDoTopo(z) - PONTA], [z, ABAIXO]] });
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
   const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [
     /* de cima, na face de cima do corpo: cada plano de corte do carro é esta linha mais a de lado, abaixo, que desce a parede */
-    { nome: 'frente', eixo: 'y', pontos: [[-ALEM, T.zFrente], [ALEM, T.zFrente]], ...DE_CIMA },
-    { nome: 'tras', eixo: 'y', pontos: [[-ALEM, T.zTras], [ALEM, T.zTras]], ...DE_CIMA },
-    { nome: 'peDoParaBrisa', eixo: 'y', pontos: [[-ALEM, T.zCapo], [ALEM, T.zCapo]], ...DE_CIMA },
-    { nome: 'peDoVidroTraseiro', eixo: 'y', pontos: [[-ALEM, T.zTampa], [ALEM, T.zTampa]], ...DE_CIMA },
+    deCima('frente', T.zFrente), deCima('tras', T.zTras), deCima('peDoParaBrisa', T.zCapo), deCima('peDoVidroTraseiro', T.zTampa),
     /* de lado, através do carro (modo vista): o contorno das portas corre na linha de cintura, que é o degrau de 10 mm do ombro, de
        perfil para a vista de lado, e a linha entre as portas o atravessa */
     { nome: 'contornoDasPortas', eixo: 'x', pontos: [[T.zCapo, yC], [zPorta(yC), yC], [zPorta(yT), yT], [T.zLateral, yT], [T.zLateral, yC], [T.zTampa, yC]] },
@@ -245,9 +254,7 @@ function linhasDeVao() {
   }
   /* de lado, na parede de cada lado: as paredes da frente, de trás, do para-lama e da porta traseira, a soleira e as janelas */
   L.push(
-    ...dosDoisLados({ nome: 'frenteDaParede', eixo: 'x', pontos: [[T.zFrente, ALEM], [T.zFrente, ABAIXO]] }),
-    ...dosDoisLados({ nome: 'trasDaParede', eixo: 'x', pontos: [[T.zTras, ALEM], [T.zTras, ABAIXO]] }),
-    ...dosDoisLados({ nome: 'fimDoParaLama', eixo: 'x', pontos: [[T.zCapo, ALEM], [T.zCapo, ABAIXO]] }),
+    ...deLado('frenteDaParede', T.zFrente), ...deLado('trasDaParede', T.zTras), ...deLado('fimDoParaLama', T.zCapo),
     ...dosDoisLados({ nome: 'fimDaPortaTraseira', eixo: 'x', pontos: [[T.zLateral, yC], [T.zLateral, ABAIXO]] }),
     ...dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }),
     ...dosDoisLados(fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO)),
@@ -281,8 +288,8 @@ function lataria() {
   const inicio = estado.passos.length;
   const origem = casca(T.chapa);
   const passosDaCasca = estado.passos.splice(inicio);
-  const P = sementes();
-  const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(),
+  const P = sementes().filter(([nome]) => !(process.env.SEM_PAINEL ?? '').split(',').includes(nome)); /* TEMPORARIO */
+  const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(), amostragem: Number(process.env.AMOSTRAGEM ?? 40),
     paineis: P.map(([nome, eixo, ponto, , lado]) => ({ nome, eixo, ponto, ...(lado ? { lado } : {}) })) });
   MEDIDAS_DOS_PAINEIS = { medidas: g.medidas, avisos: g.avisos };
   estado.passos.push(...g.passos);
@@ -318,10 +325,34 @@ function lataria() {
 /* O encosto fica meio micrômetro aquém da chapa, dentro da tolerância de 0,001 mm do relato: com as duas faces no mesmo plano, vindas
    de booleanas diferentes, o ruído numérico fazia um lado do carro sair como encosta e o outro como travessia. */
 const ENCOSTO = 0.0005;
-const aparar = (origem, esp = T.chapa + ENCOSTO) => bool('intersectar', [origem, bool('unir', interior(esp))]);
+/* O interior é construído uma vez por espessura e copiado no lugar (`arranja` com `coincidente`): a interseção consome o que recebe, e
+   cada `aparar` gasta um uso, a fonte no primeiro e uma cópia nomeada em cada um dos seguintes. Os passos do interior e o `arranja`, que
+   precisa do total de usos, entram no começo do chassi depois de ele ser escrito (`emitirInteriores`). */
+const INTERIORES = new Map();
+function usoDoInterior(esp) {
+  let it = INTERIORES.get(esp);
+  if (!it) {
+    const inicio = estado.passos.length;
+    const fonte = bool('unir', interior(esp));
+    it = { passos: estado.passos.splice(inicio), fonte, idDasCopias: ++estado.origem, usos: 0 };
+    INTERIORES.set(esp, it);
+  }
+  it.usos += 1;
+  return it.usos === 1 ? it.fonte : { op: 'arranja', id: it.idDasCopias, de: it.fonte, nome: `uso${it.usos}` };
+}
+function emitirInteriores(posicao) {
+  const passos = [];
+  for (const it of INTERIORES.values()) {
+    passos.push(...it.passos);
+    if (it.usos > 1) passos.push(['arranja', { modo: 'linear', total: it.usos, coincidente: true, origemId: it.idDasCopias, derivaDe: it.fonte, sel: { origem: it.fonte }, nomes: Array.from({ length: it.usos - 1 }, (_, k) => `uso${k + 2}`) }]);
+  }
+  estado.passos.splice(posicao, 0, ...passos);
+}
+const aparar = (origem, esp = T.chapa + ENCOSTO) => bool('intersectar', [origem, usoDoInterior(esp)]);
 
 function chassi() {
   const A = T.assoalho; const L = T.longarina; const C = T.caixaDeRoda;
+  const comeco = estado.passos.length;
   const AZUL = '#34495e'; const CINZA = '#7b8794'; const CLARO = '#aeb6bf'; const OCRE = '#b9770e';
 
   /* assoalho: a chapa da cabine, com a rampa dos pés e o degrau de trás, e a do porta-malas, mais estreita, entre as caixas de roda */
@@ -383,6 +414,7 @@ function chassi() {
     estado.passos.push(['extrusao', { origemId: id, eixo: 'x', altura: 2 * T.eixoMeia, em: [-T.eixoMeia, 0, 0], perfil: { circulo: { raio: T.eixoRaio, centro: [-T.roda.raio, zc] } }, segmentosArco: 8 }]);
     parte(`eixo${ponta}`, { op: 'extrusao', id }, '#566573');
   }
+  emitirInteriores(comeco);
 }
 
 /* ---- as rodas, pela família roda-pneu ---- */
@@ -391,19 +423,15 @@ function rodas() {
   /* o perfil `carro` é um 205/55 R16 de 632 mm; a fonte tem o pneu de 728 por 205, e o resto do perfil vai em proporção */
   const parametros = { diametroPneu: 2 * T.roda.raio, larguraPneu: T.roda.largura / (2 * T.roda.raio) };
   const COR = { pneu: '#151617', aro: '#9aa0a6', cubo: '#7d8389', disco: '#b4b9be' };
+  const cores = Object.fromEntries(Object.entries(COR).map(([nome, cor]) => [nome, corDe(nome, cor)]));
+  const poses = [];
   for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) for (const [zc, ponta] of [[T.roda.zFrente, 'Dianteira'], [T.roda.zTras, 'Traseira']]) {
-    const r = instanciaDeFamilia({ familia: 'roda-pneu', perfil: PERFIL_DA_RODA, parametros, nomes: (nome) => `${nome}${ponta}${lado}`, base: estado.origem,
-      unidade: 'mm', portas: false, materiais: false, liso: 35,
-      pose: { posicao: [s * T.roda.xCentro, T.roda.raio, zc], ...(s < 0 ? { giro: { eixo: 'y', graus: 180 } } : {}) } });
-    estado.passos.push(...r.passos);
-    estado.origem = r.origem;
-    for (const { nome, nomeNaFamilia, sel } of r.partes) {
-      const cor = corDe(nome, COR[nomeNaFamilia]);
-      estado.passos.push(['pincel', { modo: 'face', sel, cor }]);
-      PARTES.set(nome, sel);
-      CORES[nome] = cor;
-    }
+    poses.push({ nomes: (nome) => `${nome}${ponta}${lado}`, pose: { posicao: [s * T.roda.xCentro, T.roda.raio, zc], ...(s < 0 ? { giro: { eixo: 'y', graus: 180 } } : {}) } });
   }
+  const r = instanciaDeFamilia({ familia: 'roda-pneu', perfil: PERFIL_DA_RODA, parametros, base: estado.origem, unidade: 'mm', materiais: false, cores, liso: 35, poses });
+  estado.passos.push(...r.passos);
+  estado.origem = r.origem;
+  for (const { nome, nomeNaFamilia, sel } of r.partes) { PARTES.set(nome, sel); CORES[nome] = cores[nomeNaFamilia]; }
 }
 
 chassi();

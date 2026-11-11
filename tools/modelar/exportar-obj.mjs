@@ -2,11 +2,12 @@
 import { existsSync, mkdirSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { exportarObj, resolverEscalaPadrao, validarMalhaObj, validarOpcoes } from '../../modulos/exportador-obj/src/index.js';
+import { ErroExportacaoObj, exportarObj, resolverEscalaPadrao, validarMalhaObj, validarOpcoes } from '../../modulos/exportador-obj/src/index.js';
 import { separarCorpos } from '../../modulos/exportador-cad/src/separar-corpos.js';
 import { normalizarMaterial } from '../../src/autoria/material-da-receita.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita } from './importar-receita.mjs';
+import { lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(AQUI, '../..');
@@ -102,6 +103,8 @@ export function parseArgs(args = process.argv.slice(2)) {
     somenteValidar: false,
     exigirFechado: false,
     comTextura: false,
+    opcao: 1,
+    pularFaceSemArea: false,
   };
 
   for (const arg of args) {
@@ -121,6 +124,10 @@ export function parseArgs(args = process.argv.slice(2)) {
       opcoes.exigirFechado = true;
     } else if (arg === '--com-textura') {
       opcoes.comTextura = true;
+    } else if (arg === '--pular-face-sem-area') {
+      opcoes.pularFaceSemArea = true;
+    } else if (arg.startsWith('--opcao=')) {
+      opcoes.opcao = opcaoDaLinha(arg.slice('--opcao='.length).trim());
     } else if (arg === '--diagnostico=json') {
       opcoes.diagnosticoJson = true;
     } else if (arg === '--somente-validar') {
@@ -134,7 +141,7 @@ export function parseArgs(args = process.argv.slice(2)) {
   return opcoes;
 }
 
-export async function carregarReceita(caminhoArquivo) {
+export async function carregarReceita(caminhoArquivo, { opcao = 1 } = {}) {
   if (!caminhoArquivo) {
     throw new Error('Caminho do arquivo da receita é obrigatório. Use --arquivo=<caminho>.');
   }
@@ -152,6 +159,17 @@ export async function carregarReceita(caminhoArquivo) {
     throw new Error(`Arquivo da receita não encontrado: ${caminhoAbsoluto}`);
   }
 
+  const nomePadrao = basename(caminhoAbsoluto, extname(caminhoAbsoluto));
+  /* O rascunho de um objeto é um esboço 2.0 (`.esboco.mjs` ou `.esboco.json`): o resolvedor comum das ferramentas de medida monta a
+     opção escolhida e entrega a receita dela, com o neutro já executado. */
+  const doEsboco = async () => {
+    const lida = await lerEntradaDeMedida(caminhoAbsoluto, { opcao, montagem: false });
+    if (lida.tipo !== 'esboco') return { receita: lida.receita, nome: nomePadrao, caminhoAbsoluto };
+    const { neutro } = lida.executar();
+    return { receita: lida.receita, nome: lida.nome.replace(/\.esboco\.(mjs|js|json)$/, '').replace(/\.(mjs|js|json)$/, ''), caminhoAbsoluto, neutro, origem: lida.origem };
+  };
+  if (/\.json$/.test(caminhoAbsoluto)) return doEsboco();
+
   const mod = await importarReceita(caminhoAbsoluto);
   /* A exportação default da receita traz o conjunto inteiro (PASSOS, MATERIAIS, ALIASES); uma peça que também exporta PASSOS nomeado
      perdia o MATERIAIS quando o módulo inteiro era escolhido, e o passo `material` ficava órfão. */
@@ -162,15 +180,42 @@ export async function carregarReceita(caminhoArquivo) {
         : Object.values(mod).find((v) => v && (Array.isArray(v.PASSOS) || Array.isArray(v.CHAMADAS_COMPOSICOES))));
 
   if (!receita) {
+    if (mod.default && typeof mod.default === 'object') return doEsboco();
     throw new Error(`O módulo '${caminhoArquivo}' não exporta PASSOS nem CHAMADAS_COMPOSICOES.`);
   }
 
-  const nomePadrao = basename(caminhoAbsoluto, extname(caminhoAbsoluto));
   const nome = (typeof receita.meta?.nome === 'string' && receita.meta.nome.trim().length > 0)
     ? receita.meta.nome.trim()
     : nomePadrao;
 
   return { receita, nome, caminhoAbsoluto };
+}
+
+const LIMITE_DE_FACES_PULADAS = 200;
+
+/* A malha sem as faces que a exportação não consegue triangular sem triângulo de área nula (`face-degenerada`), e a lista delas:
+   `[{ face, parte, vertices, motivo }]`. O leque e as orelhas de `triangularSemDegenerado` não acham triangulação numa tira fina com
+   vários cantos colineares nos dois lados (a parede de um corte de 1 mm, com os vértices da chapa nos dois lados), embora a face tenha
+   área; pular a face deixa um furo nessa tira e a imagem não a mostra. Passa de `LIMITE_DE_FACES_PULADAS`, a malha não é a de uma
+   lasca de corte e a recusa volta como estava. */
+export function semFaceSemArea(neutro, tolerancia = 0.001) {
+  const F = new Map(neutro.F);
+  /* o neutro pode ser de classe, com métodos que a exportação chama: a cópia leva o protótipo e troca só as faces */
+  const semFaces = () => Object.assign(Object.create(Object.getPrototypeOf(neutro)), neutro, { F });
+  const puladas = [];
+  for (;;) {
+    try {
+      validarMalhaObj(semFaces(), { tolerancia });
+      return { neutro: puladas.length ? semFaces() : neutro, puladas };
+    } catch (erro) {
+      const alvo = erro instanceof ErroExportacaoObj && erro.codigo === 'face-degenerada' ? erro.detalhes?.face : undefined;
+      const chave = alvo === undefined ? undefined : [...F.keys()].find((k) => (F.get(k)?.id ?? k) === alvo);
+      if (chave === undefined || puladas.length >= LIMITE_DE_FACES_PULADAS) throw erro;
+      const face = F.get(chave);
+      puladas.push({ face: alvo, parte: face.parte ?? null, vertices: face.vs.length, motivo: erro.message });
+      F.delete(chave);
+    }
+  }
 }
 
 export async function exportarArquivoObj(opcoesArg) {
@@ -186,12 +231,18 @@ export async function exportarArquivoObj(opcoesArg) {
     exigirFechado = false,
     comTextura = false,
     moduloTextura,
+    opcao = 1,
+    pularFaceSemArea = false,
+    carregada = null,
   } = opcoesArg;
 
   const escala = resolverEscalaPadrao(unidade, escalaInformada);
-  const { receita, nome } = await carregarReceita(arquivo);
-  const { neutro } = executarReceita(receita);
+  /* `carregada` é o `{ receita, nome, neutro? }` que quem chama já leu (as vistas de superfície), para não montar a peça duas vezes */
+  const { receita, nome, neutro: jaExecutado } = carregada ?? await carregarReceita(arquivo, { opcao });
+  let neutro = jaExecutado ?? executarReceita(receita).neutro;
   conferirSemOrfaos(nome, neutro.orfaos);
+  let facesPuladas = [];
+  if (pularFaceSemArea) ({ neutro, puladas: facesPuladas } = semFaceSemArea(neutro, tolerancia));
 
   const nomeNormalizado = nome.replace(/[^a-zA-Z0-9_-]/g, '_');
   const normalizadas = validarOpcoes({
@@ -215,7 +266,7 @@ export async function exportarArquivoObj(opcoesArg) {
       facesOriginais: malha.faces.length,
       corpos: corpos.map((c) => ({ nome: c.nome, faces: c.faces.length })),
     };
-    return { diagnostico, somenteValidar: true };
+    return { diagnostico: { ...diagnostico, ...(facesPuladas.length ? { facesPuladas } : {}) }, somenteValidar: true };
   }
 
   const caminhoSaida = saida
@@ -277,6 +328,7 @@ export async function exportarArquivoObj(opcoesArg) {
     arquivosTextura: [...(caminhoMtl ? [relative(REPO, caminhoMtl)] : []), ...imagens.map((i) => relative(REPO, join(pastaDestino, i.arquivo)))],
     diagnostico: resultado.diagnostico,
     diagnosticoJson,
+    facesPuladas,
   };
 }
 
@@ -292,11 +344,18 @@ async function main() {
       process.stderr.write('  --sobrescrever          Sobrescreve arquivo de destino existente\n');
       process.stderr.write('  --com-textura           Gera as imagens dos materiais e o .mtl ao lado do .obj (exige modulos/textura)\n');
       process.stderr.write('  --somente-validar       Apenas valida a receita e malha sem gravar\n');
+      process.stderr.write('  --opcao=<n>             Com um esboço 2.0 (.esboco.mjs ou .esboco.json), a opção a exportar (padrão 1)\n');
+      process.stderr.write('  --pular-face-sem-area   Pula, com aviso e a lista das faces, a face que não se triangula sem triângulo de área nula\n');
       process.stderr.write('  --diagnostico=json      Emite diagnóstico detalhado em JSON no stdout\n');
       process.exit(1);
     }
 
     const res = await exportarArquivoObj(opcoes);
+
+    if (res.facesPuladas?.length || res.diagnostico?.facesPuladas?.length) {
+      const puladas = res.facesPuladas?.length ? res.facesPuladas : res.diagnostico.facesPuladas;
+      process.stderr.write(`Aviso: ${puladas.length} face(s) sem triangulação válida ficaram fora do arquivo: ${puladas.map((f) => `${f.face} (${f.parte ?? 'sem parte'}, ${f.vertices} cantos)`).join(', ')}\n`);
+    }
 
     if (opcoes.somenteValidar) {
       if (opcoes.diagnosticoJson) {
