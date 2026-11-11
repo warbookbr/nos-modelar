@@ -22,7 +22,7 @@ const SEMPRE_LIVRES = new Set(['origemId', 'id', 'faces', 'nome', 'pai', 'substi
   'solidos', 'usa', 'cor', 'vista', 'lente', 'niveis', 'borda', 'simetria', 'pesoPadrao', 'lado', 'liso', 'quebraNosVincos', 'lados', 'segmentos',
   'segmentosArco', 'segmentosSpline', 'segmentosCurva', 'aneis', 'seg', 'orientacao', 'direcao', 'de', 'saida', 'aresta', 'chapa', 'superficie',
   'tampa', 'linha', 'ponta', 'paineis', 'cadeia', 'vincos', 'cantos', 'medidas', 'v', 'f', 'face', 'a', 'b', 'para', 'interface', 'rotulo', 'angulo',
-  'divisoes', 'estacoes', 'expoenteSecao', 'limite']);
+  'divisoes', 'estacoes', 'expoenteSecao', 'limite', 'refinar']);
 const SELECOES = new Set(['sel', 'referencia', 'selPara']);
 
 /** Os campos de medida de cada operação. */

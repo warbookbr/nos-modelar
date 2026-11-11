@@ -46,6 +46,7 @@ const EXEMPLO_DE_ABA = "aba: { largura: 0.02, angulo: 90, raio: 0.003 }";
 const EXEMPLO_DE_LINHA = "{ nome: 'frisoDaPorta', pontos: ['a', 'b', 'c'] }";
 const EXEMPLO_DE_VARIACAO = "variacao: { largura: [{ ponto: 'a', valor: 0.02 }, { ponto: 'b', antes: 0.02, depois: 0.01 }] }";
 const citar = (nome) => `'${nome}'`;
+const chaveDaAresta = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
 const iguais = (p, q) => (typeof p === 'string' || typeof q === 'string' ? p === q : Array.isArray(p) && Array.isArray(q) && p.length === q.length && p.every((x, k) => x === q[k]));
 
 /* Normal de Newell de uma face por posições, com o comprimento igual ao dobro da área. */
@@ -153,6 +154,33 @@ export function afinarNosCantos(c, perfil) {
   return { ...c, pontos, normais, nomeDoIndice };
 }
 
+/** Níveis a mais de refino que `friso.refinar` aceita. */
+export const REFINO_MAXIMO_DO_FRISO = 4;
+
+/* O refino da curva da borda livre da superfície limite: a borda de uma chapa de Catmull-Clark é uma B-spline cúbica uniforme dos vértices dela,
+   e cada nível a mais de subdivisão põe um ponto no meio de cada trecho e leva cada ponto de dentro a (a + 6 b + c) / 8, com os cantos declarados
+   (e as pontas da linha aberta) fixos. Os pontos e as normais passam pela mesma conta, e o ponto original de índice j vai ao índice j * 2^k. */
+function refinarBorda(pontos, normais, fechada, agudos, niveis) {
+  let P = pontos.map((p) => [...p]); let N = normais.map((p) => [...p]); let A = new Set(agudos);
+  const comb = (xs, ws) => [0, 1, 2].map((d) => xs.reduce((s, x, k) => s + ws[k] * x[d], 0));
+  for (let r = 0; r < niveis; r++) {
+    const n = P.length; const nP = []; const nN = []; const nA = new Set();
+    const ponto = (L, i) => {
+      const fixo = A.has(i) || (!fechada && (i === 0 || i === n - 1));
+      if (fixo) return [...L[i]];
+      return comb([L[(i + n - 1) % n], L[i], L[(i + 1) % n]], [1 / 8, 6 / 8, 1 / 8]);
+    };
+    const trechos = fechada ? n : n - 1;
+    for (let i = 0; i < n; i++) {
+      if (A.has(i)) nA.add(nP.length);
+      nP.push(ponto(P, i)); nN.push(ponto(N, i));
+      if (i < trechos) { const j = (i + 1) % n; nP.push(comb([P[i], P[j]], [0.5, 0.5])); nN.push(comb([N[i], N[j]], [0.5, 0.5])); }
+    }
+    P = nP; N = nN; A = nA;
+  }
+  return { pontos: P, normais: N };
+}
+
 export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem }) {
   /* A superfície: o passo `subdivisao` que a origem cita, já executado. Devolve { passo, args } ou { erro }. */
   function passoDaSuperficie(st, origem) {
@@ -185,6 +213,8 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       faces = espelhada.faces; imagem = espelhada.imagem; nVertices = espelhada.vertices.length;
     }
     const niveis = Math.trunc(st.num(args.niveis ?? 2));
+    const refino = a.refinar == null ? 0 : st.num(a.refinar);
+    if (!Number.isInteger(refino) || refino < 0 || refino > REFINO_MAXIMO_DO_FRISO) return { erro: ['refinar', `refinar é o número de níveis a mais de refino da curva da borda, inteiro de 0 a ${REFINO_MAXIMO_DO_FRISO}, e veio ${JSON.stringify(a.refinar)}`] };
     /* a gaiola que a conferência da moldura relê: os nomes, as faces por índice, os níveis e a imagem da simetria (uma vez por passo) */
     const gaiolaDaChapa = (st.superficiesDosFrisos ??= new Map()).get(passo) ?? { passo, indiceDoNome, faces, nVertices, niveis, simetria: args.simetria ?? null, imagem };
     st.superficiesDosFrisos.set(passo, gaiolaDaChapa);
@@ -221,7 +251,22 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         }
         pontos.push(p); normais.push(n);
       }
-      const nomeDoIndice = (j) => nomeDoPonto(c.cadeia[Math.min(c.cadeia.length - 1, Math.round(j / passoDaCadeia))]);
+      /* refinar: a linha segue a curva da borda livre da superfície limite, k níveis além dos da chapa */
+      let passoDaLinha = passoDaCadeia;
+      if (refino > 0) {
+        const contagem = new Map();
+        for (const f of faces) for (let q = 0; q < f.length; q++) { const k = chaveDaAresta(f[q], f[(q + 1) % f.length]); contagem.set(k, (contagem.get(k) ?? 0) + 1); }
+        for (let q = 0; q + 1 < c.cadeia.length; q++) {
+          if (contagem.get(chaveDaAresta(c.cadeia[q], c.cadeia[q + 1])) !== 1) return { erro: ['refinar', `refinar segue a borda livre da chapa (a regra da borda de Catmull-Clark), e na linha ${citar(a.linha.nome)} o trecho de ${nomeDoPonto(c.cadeia[q])} a ${nomeDoPonto(c.cadeia[q + 1])} não é borda livre; use a borda de um vão (bordaDoVao da gaiola) ou do contorno, ou tire refinar`] };
+        }
+        const cantos = new Set(args.cantos ?? []);
+        const agudos = [];
+        indices.forEach((v, q) => { if (q % passoDaCadeia === 0) { const nome = c.cadeia[q / passoDaCadeia] < declarados.length ? declarados[c.cadeia[q / passoDaCadeia]] : declarados[imagem.indexOf(c.cadeia[q / passoDaCadeia])]; if (cantos.has(nome)) agudos.push(q); } });
+        const r2 = refinarBorda(pontos, normais, c.fechada, agudos, refino);
+        pontos.splice(0, pontos.length, ...r2.pontos); normais.splice(0, normais.length, ...r2.normais);
+        passoDaLinha = passoDaCadeia * 2 ** refino;
+      }
+      const nomeDoIndice = (j) => nomeDoPonto(c.cadeia[Math.min(c.cadeia.length - 1, Math.round(j / passoDaLinha))]);
       /* a aba precisa saber de que lado da linha a chapa fica: a linha é borda livre, e a chapa é o lado da face que a tem */
       let lado = null;
       if (a.aba != null) {
@@ -241,7 +286,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         inverte: v >= declarados.length,
         noPlano: imagem !== null && v < declarados.length && imagem[v] === v,
       }));
-      lista.push({ pontos, normais, fechada: c.fechada, espelhada: c.espelhada, lado, nomeDoIndice, nomes: c.fechada ? nomes.slice(0, -1) : nomes, passo: passoDaCadeia });
+      lista.push({ pontos, normais, fechada: c.fechada, espelhada: c.espelhada, lado, nomeDoIndice, nomes: c.fechada ? nomes.slice(0, -1) : nomes, passo: passoDaLinha });
     }
     let espessura = null;
     if (args.espessura != null) espessura = st.num(args.espessura);
@@ -359,6 +404,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       if (linha.pontos != null) return grita(st, i, 'friso', 'linha', `sobre a abertura ${a.superficie.id} a linha ${citar(linha.nome)} é a borda de fora do vão inteira, e não leva pontos; escreva só { nome: ${citar(linha.nome)} }`);
       if (a.variacao != null) return grita(st, i, 'friso', 'variacao', 'a variacao cita pontos nomeados da linha, e a borda de uma abertura por contorno não tem nomes; tire variacao');
     } else if (!Array.isArray(linha.pontos) || linha.pontos.length < 2) return grita(st, i, 'friso', 'linha', `a linha ${citar(linha.nome)} precisa de dois pontos ou mais; repita o primeiro no fim para fechar a volta`);
+    if (a.refinar != null && (daAbertura || !a.superficie || a.superficie.op !== 'subdivisao')) return grita(st, i, 'friso', 'refinar', 'refinar segue a curva da borda livre da superfície limite de um passo subdivisao: cite superficie: { op: \'subdivisao\', id } e a borda de um vão pelos nomes da gaiola');
     const fechada = daAbertura || (linha.pontos.length > 2 && iguais(linha.pontos[0], linha.pontos[linha.pontos.length - 1]));
     if (!daAbertura && fechada && linha.pontos.length < 4) return grita(st, i, 'friso', 'linha', `a volta ${citar(linha.nome)} precisa de três pontos distintos ou mais`);
     /* pontas: 'aberta' tampa o perfil plano, 'fechada' encolhe o perfil até um ponto; a volta não tem ponta */

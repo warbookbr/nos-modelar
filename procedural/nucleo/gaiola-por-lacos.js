@@ -1152,6 +1152,7 @@ export function gaiolaPorLacos(o = {}) {
   if (comRaio.length) {
     const ap = inserirApoiosNosVincos({ pontos: pontosMm, faces: orientadas, vincos: comRaio, unidade: 1 });
     orientadas = ap.faces;
+    for (const v of vincos) if (ap.linhas[v.nome]) v.pontos = ap.linhas[v.nome];
     for (const [n, q] of Object.entries(ap.pontos)) { pontosMm[n] = q; alvosMm[n] = [...q]; apoioDe.set(n, ap.origens[n]); }
     nomes = Object.keys(pontosMm); indice = new Map(nomes.map((n, k) => [n, k]));
     fIdx = orientadas.map((f) => f.map((v) => indice.get(v)));

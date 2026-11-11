@@ -7,6 +7,7 @@
  * campos:
  *   estacao | laco: a posição da linha: o nome, o índice (7 ou 7,4: a estação 7 e 0,4 do caminho até a 8), { em } (a posição no eixo) ou { entre: [a, b], fracao }; com `de` e `ate`, as colunas entre as quais a linha corre (nome, índice, ou { trecho, k } nos laços); sem eles, a estação inteira (no laço, a volta fechada).
  *   coluna: a coluna (nome, ou { entre: [a, b], fracao } para uma posição entre duas colunas); `de` e `ate` são as estações entre as quais a linha corre (padrão: todas).
+ *   borda: o nome de um vão da gaiola de estações: a borda dele (bordaDoVao) nos níveis da malha, fechada quando o vão é janela e aberta quando é vão de borda livre; sem `de` nem `ate`.
  *   opcoes: { niveis? (3), borda? ('suave', ou a do passo), unidade? ('metro') } os níveis e a borda do passo `subdivisao` que a chapa usa, para a curva cair na malha dela.
  * devolve: { curva: [[x, y, z], ...], fechada, celulas }.
  * exemplo:
@@ -32,6 +33,7 @@
  * e não a da superfície limite exata; com `niveis` igual ao do passo da chapa ela cai na malha. */
 import { subdividirCatmullClark } from './subdivisao.js';
 import { gaiolaDoPasso } from './operacoes/subdivisao.js';
+import { cadeiaRefinada } from './friso.js';
 
 const erro = (texto) => { throw new Error(`curvaDaGaiola: ${texto}`); };
 const citar = (x) => (typeof x === 'string' ? `'${x}'` : JSON.stringify(x));
@@ -319,17 +321,37 @@ function linhaAoLongoDaColuna(S, G, pedido, onde) {
   return { pontos, fechada: false };
 }
 
+/** A borda de um vão: os pontos da gaiola de `bordaDoVao(nome)` levados aos níveis da malha, pela mesma cadeia que o friso segue. */
+function linhaDaBorda(S, gaiola, pedido, onde) {
+  if (typeof gaiola.bordaDoVao !== 'function') erro(`${onde}: a gaiola não traz \`bordaDoVao\`; \`borda\` é da gaiola de estações`);
+  const nomes = gaiola.bordaDoVao(pedido.borda);
+  const indice = nomes.map((n) => { const k = S.indiceDoNome.get(n); if (k === undefined) erro(`${onde}: o ponto ${citar(n)} da borda não é ponto nomeado da gaiola`); return k; });
+  let r;
+  try { r = cadeiaRefinada(S.gaiola.faces, S.gaiola.vertices.length, S.niveis, indice); } catch (e) { erro(`${onde}: ${e.message}`); }
+  const fechada = indice.length > 2 && indice[0] === indice[indice.length - 1];
+  return { pontos: r.cadeia.map((v) => S.malha.vertices[v].map((x) => x)), fechada };
+}
+
 /**
  * A curva sobre a superfície da gaiola, em mm.
  * @param {any} gaiola o que `gaiolaPorEstacoes` ou `gaiolaPorLacos` devolve
- * @param {{ estacao?: any, laco?: any, coluna?: any, de?: any, ate?: any }} pedido
+ * @param {{ estacao?: any, laco?: any, coluna?: any, borda?: string, de?: any, ate?: any }} pedido
  * @param {{ niveis?: number, borda?: string, unidade?: 'metro' | 'mm' }} [opcoes]
  * @returns {{ curva: number[][], fechada: boolean, celulas: number }}
  */
 export function curvaDaGaiola(gaiola, pedido, opcoes = {}) {
-  if (!pedido || typeof pedido !== 'object') erro('espera o pedido { estacao | laco | coluna, de?, ate? }');
-  const dadas = ['estacao', 'laco', 'coluna'].filter((k) => pedido[k] !== undefined);
-  if (dadas.length !== 1) erro(`o pedido dá uma de estacao, laco ou coluna (recebido ${dadas.length ? dadas.join(' e ') : 'nenhuma'})`);
+  if (!pedido || typeof pedido !== 'object') erro('espera o pedido { estacao | laco | coluna, de?, ate? } ou { borda: nome do vão }');
+  const dadas = ['estacao', 'laco', 'coluna', 'borda'].filter((k) => pedido[k] !== undefined);
+  if (dadas.length !== 1) erro(`o pedido dá uma de estacao, laco, coluna ou borda (recebido ${dadas.length ? dadas.join(' e ') : 'nenhuma'})`);
+  if (dadas[0] === 'borda') {
+    if (typeof pedido.borda !== 'string' || !pedido.borda) erro(`\`borda\` é o nome de um vão da gaiola (recebido ${JSON.stringify(pedido.borda)})`);
+    if (pedido.de !== undefined || pedido.ate !== undefined) erro('`borda` dá a borda inteira do vão, sem `de` nem `ate`');
+    const SB = superficieDe(gaiola, opcoes);
+    const rb = linhaDaBorda(SB, gaiola, pedido, `o pedido borda ${citar(pedido.borda)}`);
+    let c = juntar(rb.pontos);
+    if (rb.fechada && c.length > 1) { const a = c[0]; const b = c[c.length - 1]; if (Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) < 1e-6) c = c.slice(0, -1); }
+    return { curva: c, fechada: rb.fechada, celulas: SB.gaiola.faces.length };
+  }
   const G = gradeDe(gaiola);
   if (dadas[0] === 'estacao' && G.tipo !== 'estações') erro('`estacao` é da gaiola de estações; na de laços use `laco`');
   if (dadas[0] === 'laco' && G.tipo !== 'laços') erro('`laco` é da gaiola de laços; na de estações use `estacao`');
