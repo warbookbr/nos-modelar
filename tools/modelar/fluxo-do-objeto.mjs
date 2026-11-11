@@ -103,7 +103,8 @@ export function lerRascunho(pasta, { conferencia = null } = {}) {
   const conferencias = esbocos.filter((e) => !semConferencia.includes(e)).map((e) => {
     const base = e.replace(BASE_DO_ESBOCO, '');
     const resumo = resumos.find((r) => basename(r.dados.esboco) === e) ?? null;
-    const sobras = (resumo?.dados.sobras ?? []).filter((x) => x.passa === false);
+    /* `passa` é o do resumo da conferência: a sobra passa da tolerância, isto é, fica acima dela */
+    const sobras = (resumo?.dados.sobras ?? []).filter((x) => x.passa === true);
     const comando = conferirEsboco(`${p}/${e}`, `${p}/${base}.conferir.json`, saidaDe(base));
     return { esboco: e, config: `${base}.conferir.json`, resumo: resumo ? rel(resumo.arquivo) : null, rodada: Boolean(resumo), sobrasAcima: sobras.length, comando,
       ...(resumo ? {} : { estado: 'configurada, não rodada' }), sobras: sobras.map((x) => `${x.contida} em ${x.continente} na vista ${x.vista} (${x.maxMm} mm)`) };

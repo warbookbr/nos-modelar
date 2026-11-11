@@ -158,12 +158,14 @@ describe('os passos fora de ordem e a conferência rodada', () => {
     expect(f.passos[2]).toMatchObject({ estado: 'ressalva', feito: true, conferencias: [{ rodada: false, estado: 'configurada, não rodada', resumo: null }] });
     expect(f.passos[2].ressalvas[0]).toMatch(/configurada, não rodada; rodar com npm run conferir:vistas -- \S*conferido\.esboco\.mjs --config=\S*conferido\.conferir\.json --saida=\S*conferido\/conferencia\/conferido --captura=rapida$/);
     expect(emTexto(f)).toMatch(/3\. rascunho: feito, com ressalva: a conferência de conferido\.esboco\.mjs está configurada, não rodada/);
-    escrever(join(pasta, 'conferencia', 'conferido', 'resumo.json'), resumo('procedural/pecas/conferido/referencias/conferido.esboco.mjs'));
+    /* sobra dentro da tolerância: `passa: false` no resumo (não passa da tolerância) */
+    escrever(join(pasta, 'conferencia', 'conferido', 'resumo.json'), resumo('procedural/pecas/conferido/referencias/conferido.esboco.mjs',
+      [{ vista: 'superior', contida: 'mancais', continente: 'chassi', maxMm: 0.5, areaMm2: 4, passa: false }]));
     f = await json(['conferido']);
     expect(f.passos[2]).toMatchObject({ estado: 'feito', ressalvas: [], conferencias: [{ rodada: true, sobrasAcima: 0 }] });
     expect(f.passos[2].conferencias[0].resumo).toMatch(/conferido\/conferencia\/conferido\/resumo\.json$/);
     const fora = join(raiz, 'saida-fora');
-    escrever(join(fora, 'resumo.json'), resumo('x/conferido.esboco.mjs', [{ vista: 'superior', contida: 'eixo', continente: 'chassi', maxMm: 7.5, passa: false }]));
+    escrever(join(fora, 'resumo.json'), resumo('x/conferido.esboco.mjs', [{ vista: 'superior', contida: 'eixo', continente: 'chassi', maxMm: 7.5, passa: true }, { vista: 'superior', contida: 'travessas', continente: 'cacamba', maxMm: 0, passa: false }]));
     f = await json(['conferido', `--conferencia=${fora}`]);
     expect(f.passos[2].estado).toBe('ressalva');
     expect(f.passos[2].ressalvas[0]).toMatch(/1 sobra\(s\) acima da tolerância: eixo em chassi na vista superior \(7\.5 mm\)/);
