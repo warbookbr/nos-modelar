@@ -91,7 +91,9 @@ export function argsEmMetro(op, args, onde = `passo "${op}"`) {
   const medidas = TABELA_DE_MEDIDAS[op] ?? [];
   const saida = {};
   for (const [k, v] of Object.entries(args)) {
-    if (medidas.includes(k)) saida[k] = medida(v, `${onde}.${k}`);
+    /* o `raio` pedido de um vinco do passo `subdivisao` é medida; o resto do vinco (nome, pontos, nitidez) passa */
+    if (op === 'subdivisao' && k === 'vincos' && Array.isArray(v)) saida[k] = v.map((x) => (x && typeof x === 'object' && x.raio != null ? { ...x, raio: medida(x.raio, `${onde}.vincos.raio`) } : x));
+    else if (medidas.includes(k)) saida[k] = medida(v, `${onde}.${k}`);
     else if (SELECOES.has(k)) saida[k] = selecao(v, `${onde}.${k}`);
     else if (SEMPRE_LIVRES.has(k) || !temNumero(v)) saida[k] = v;
     else {

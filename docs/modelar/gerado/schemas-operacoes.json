@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:d276dcb2042f4328f4de2d05fcf5d3c3cc498309bd384c2db5c2a35a587b9328",
-  "total": 40,
+  "assinatura": "sha256:4ec741dd34e2c63e22b7975346a787969823fa740842cd5487881912e9e0c8d4",
+  "total": 41,
   "operacoes": [
     {
       "id": "mecanifica.operacao.aberturaPorContorno",
@@ -2933,6 +2933,134 @@
       }
     },
     {
+      "id": "mecanifica.operacao.limparLascas",
+      "nome": "limparLascas",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Tirar de uma seleção as faces finas (área / maior aresta² abaixo de 0,003) que uma booleana deixou, trocando a diagonal, colapsando a aresta curta ou juntando a lasca à vizinha, sem criar vértice nem face e sem mover a superfície além da tolerância.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.limparLascas@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sel",
+            "tolerancia"
+          ],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "As faces que a limpeza pode tirar ou trocar de diagonal, por exemplo { origem: { op: 'subtrair', id } } logo depois da booleana, ou { tudo: true }. Faces de fora da seleção só acompanham o vértice que se move."
+            },
+            "tolerancia": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "O quanto a superfície pode sair do lugar, na unidade da peça: 0,00001 numa receita em metro (10 µm), 0,01 num esboço em mm. Vale contra a malha de ENTRADA do passo, e fusões em cadeia não somam desvio."
+            },
+            "limite": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "A razão área / maior aresta² abaixo da qual a face é lasca; o padrão, 0,003, é o do gate de malha."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "lado": 1
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "lado": 1,
+                "em": [
+                  0.5,
+                  0.5,
+                  0.5
+                ]
+              }
+            ],
+            [
+              "subtrair",
+              {
+                "origemId": 9,
+                "solidos": [
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 1
+                    }
+                  },
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 2
+                    }
+                  }
+                ]
+              }
+            ],
+            [
+              "limparLascas",
+              {
+                "sel": {
+                  "origem": {
+                    "op": "subtrair",
+                    "id": 9
+                  }
+                },
+                "tolerancia": 0.00001
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Vem depois da booleana (ou do arredondarCostura) cujas faces a seleção cita; a malha de entrada é fechada ou, onde há borda aberta, a aresta de borda fica como está."
+        ],
+        "limites": [
+          "Só tira a lasca que sai dentro da tolerância e deixa a malha fechada, sem face virada, sem lasca nova e sem parte sem face; o resto fica e vai para o aviso lascasRestantes, com a contagem e as primeiras faces.",
+          "A lasca que já vinha da entrada (a tira de 0,2 mm de uma concordância de raio 3, a tampa de 1 mm por 585 mm de uma chapa fina) não é do corte e só muda onde nasceu: a tolerância não a alcança, e refinar a entrada é do passo que a gerou.",
+          "Não cria vértice nem face e não renumera: a face que sai some da seleção e das listas da origem da booleana (a citação explícita pelo id dela deixa de achar a face), o vértice que sai deixa o par da costura (arestas) no vértice que ficou, e a face com tinta fica como está.",
+          "Colapsar e juntar mexem em faces de fora da seleção só pelo vértice que se move; o vão entre painéis e a folga da lâmina mudam no máximo a tolerância."
+        ],
+        "diagnosticos": [
+          {
+            "quando": "O aviso lascasRestantes diz que ficaram faces finas.",
+            "acao": "Rode npm run malha:lascas na receita: a lista traz a face, a parte, a razão e o passo que a criou; a que vem do passo da chapa se corrige nele, e a que é do corte pede tolerância maior ou outro vão."
+          }
+        ]
+      }
+    },
+    {
       "id": "mecanifica.operacao.liso",
       "nome": "liso",
       "uso": {
@@ -4269,7 +4397,7 @@
             },
             "vincos": {
               "type": "array",
-              "description": "Vincos nomeados {nome, pontos, nitidez}: pontos é a sequência de nomes de ponto ao longo das arestas da gaiola (repita o primeiro no fim para fechar), e nitidez vai de 0 (liso) a 1 (vivo), ou 'viva'; a nitidez n vira 10 n² níveis de Catmull-Clark, como o vinco do Blender."
+              "description": "Vincos nomeados {nome, pontos, nitidez, raio?}: pontos é a sequência de nomes de ponto ao longo das arestas da gaiola (repita o primeiro no fim para fechar), e nitidez vai de 0 (liso) a 1 (vivo), ou 'viva'; a nitidez n vira 10 n² níveis de Catmull-Clark, como o vinco do Blender. `raio` (opcional, em metro: número, { de, ate } ou um por ponto) é o raio pedido que as colunas de apoio da gaiola realizam; não muda a geometria e fica salvo para a medida do raio."
             },
             "cantos": {
               "type": "array",

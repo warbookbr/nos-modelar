@@ -865,7 +865,9 @@ export function gaiolaPorEstacoes(definicao) {
       if (medidos.length && apoios.aplicados.includes(v.nome)) avisosDoApoio.push({ nome: 'quinaMedida', vinco: v.nome, pontos: medidos, motivo: `${medidos.length} ponto(s) da quina do vinco ${v.nome} são cota medida (${medidos.slice(0, 3).join(', ')}): a superfície limite passaria pela quina viva, e o raio pedido some; tire a quina das medidas e meça as colunas de apoio ou as faces` });
     }
   }
-  const passo = { vertices: [...todosOsVertices], faces, vincos: vincos.map(({ nome, pontos: linha, nitidez }) => ({ nome, pontos: linha, nitidez })) };
+  /* o `raio` pedido segue no vinco do passo, em metro como o resto dele, junto da nitidez 0: o passo `subdivisao` o guarda sem efeito na geometria */
+  const emMetro = (r) => (typeof r === 'number' ? r / MM : Array.isArray(r) ? r.map((x) => x / MM) : { de: r.de / MM, ate: r.ate / MM });
+  const passo = { vertices: [...todosOsVertices], faces, vincos: vincos.map(({ nome, pontos: linha, nitidez, raio }) => (raio != null ? { nome, pontos: linha, nitidez, raio: emMetro(raio) } : { nome, pontos: linha, nitidez })) };
   if (cantos) passo.cantos = cantos;
   if (medidas) passo.medidas = medidas;
   if (simetria) passo.simetria = simetria;

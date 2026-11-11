@@ -129,7 +129,7 @@ describe('o comando', () => {
 
   it('o raio que o próprio vinco declara vale sem --pedido', () => {
     const { neutro, entrada } = executarReceita(receitaDaDobra({ angulo: 90, apoio: 6, vizinho: 40 }));
-    entrada.PASSOS[0][1].vincos[0].raio = 6;
+    entrada.PASSOS[0][1].vincos[0].raio = 0.006;
     const [aresta] = medirLinhas(neutro, linhasDosVincos(entrada), { pedidos: {} }).arestas;
     expect(aresta).toMatchObject({ pedidoMm: 6, origemDoPedido: 'raio do vinco', sobPedido: false });
     expect(medirLinhas(neutro, linhasDosVincos(entrada), { pedidos: { quina: 3.7 } }).arestas[0]).toMatchObject({ pedidoMm: 3.7, origemDoPedido: '--pedido', sobPedido: true });

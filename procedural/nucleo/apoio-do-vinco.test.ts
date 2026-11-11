@@ -13,6 +13,8 @@ import { gaiolaPorEstacoes } from './gaiola-por-estacoes.js';
 import { nitidezDoVinco, subdividirCatmullClark } from './subdivisao.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { nucleo } from './entrada.js';
+// @ts-expect-error — conversor do esboço em JavaScript.
+import { argsEmMetro } from '../../modulos/esboco-nucleo/src/milimetro.js';
 
 type P2 = [number, number];
 const rad = (g: number) => (g * Math.PI) / 180;
@@ -267,6 +269,37 @@ describe('os avisos do ajudante, pelo nome', () => {
     expect([...conta.values()].every((n) => n <= 2)).toBe(true);
     const m = subdividirCatmullClark({ vertices: g.passo.vertices.map((n: string) => g.pontos[n].map((x: number) => x * 1000)), faces: g.passo.faces.map((f: string[]) => f.map((n) => g.passo.vertices.indexOf(n))), vincos: [], niveis: 2 });
     expect(m.faces.length).toBeGreaterThan(0);
+  });
+});
+
+describe('o raio pedido chega ao conteúdo salvo', () => {
+  const pontosDe = (g: any) => g.pontos;
+  it('o vinco do passo traz o raio em metro junto da nitidez 0, e o passo subdivisao o aceita sem mudar a geometria', () => {
+    const g = cruzeta({ angulo: 90, raio: 6 });
+    expect(g.passo.vincos[0]).toMatchObject({ nome: 'quina', nitidez: 0, raio: 0.006 });
+    const com = nucleo([['subdivisao', { origemId: 1, ...g.passo, niveis: 2 }]], {}, pontosDe(g));
+    const sem = nucleo([['subdivisao', { origemId: 1, ...g.passo, vincos: g.passo.vincos.map(({ raio, ...v }: any) => v), niveis: 2 }]], {}, pontosDe(g));
+    expect(JSON.stringify([...com.V.entries()])).toBe(JSON.stringify([...sem.V.entries()]));
+    expect(com.F.size).toBe(sem.F.size);
+    const porEstacao = cruzeta({ angulo: 90, raio: { de: 6, ate: 3 } });
+    expect(porEstacao.passo.vincos[0].raio).toEqual({ de: 0.006, ate: 0.003 });
+    expect(nucleo([['subdivisao', { origemId: 1, ...porEstacao.passo, niveis: 1 }]], {}, pontosDe(porEstacao)).V.size).toBeGreaterThan(0);
+  });
+  it('o passo recusa raio que não é número positivo, forma por estação inválida ou lista de tamanho errado', () => {
+    const g = cruzeta({ angulo: 90, raio: 6 });
+    for (const raio of [-1, 0, { de: 1 }, [0.006, 0.005], { de: 1, ate: 2, extra: 3 }]) {
+      const passo = { ...g.passo, vincos: [{ ...g.passo.vincos[0], raio }] };
+      const neutro = nucleo([['subdivisao', { origemId: 1, ...passo, niveis: 1 }]], {}, pontosDe(g));
+      expect(neutro.V.size, JSON.stringify(raio)).toBe(0);
+      expect(neutro.orfaos[0].motivo, JSON.stringify(raio)).toMatch(/raio/);
+    }
+  });
+  it('o conversor do esboço divide o raio do vinco por mil e deixa o resto do vinco', () => {
+    const v = [{ nome: 'q', pontos: ['a', 'b'], nitidez: 0, raio: 6 }, { nome: 'r', pontos: ['a', 'b'], nitidez: 0, raio: { de: 6, ate: 3 } }, { nome: 's', pontos: ['a', 'b'], nitidez: 'viva' }];
+    const m = argsEmMetro('subdivisao', { origemId: 1, niveis: 2, vincos: v }).vincos;
+    expect(m[0]).toEqual({ nome: 'q', pontos: ['a', 'b'], nitidez: 0, raio: 0.006 });
+    expect(m[1].raio).toEqual({ de: 0.006, ate: 0.003 });
+    expect(m[2]).toEqual(v[2]);
   });
 });
 

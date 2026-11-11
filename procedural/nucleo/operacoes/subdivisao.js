@@ -56,8 +56,17 @@ function vincosPorNome(lista, indiceDoNome, faces, st) {
     if (Array.isArray(v)) return { erro: `vinco por índice de aresta não é aceito, porque índice não é identidade; declare o vinco pelos pontos nomeados da gaiola, como ${EXEMPLO_DE_VINCO}, com nitidez de 0 a 1 ou 'viva'` };
     if (!v || typeof v !== 'object') return { erro: `cada vinco precisa ser objeto como ${EXEMPLO_DE_VINCO}` };
     if (typeof v.nome !== 'string' || !v.nome) return { erro: `cada vinco precisa de nome, como ${EXEMPLO_DE_VINCO}` };
-    const extra = Object.keys(v).filter((k) => !['nome', 'pontos', 'nitidez'].includes(k));
-    if (extra.length) return { erro: `o vinco ${citar(v.nome)} tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome, pontos e nitidez` };
+    const extra = Object.keys(v).filter((k) => !['nome', 'pontos', 'nitidez', 'raio'].includes(k));
+    if (extra.length) return { erro: `o vinco ${citar(v.nome)} tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome, pontos, nitidez e, opcional, raio` };
+    /* `raio` é a declaração do raio pedido (em metro, como as medidas do passo): um número, { de, ate } ou uma lista com um número por ponto da linha.
+       Não muda a geometria: quem o realiza são as colunas de apoio que o ajudante de gaiola pôs; ele fica no conteúdo salvo para a medida e a ondulação lerem. */
+    if (v.raio != null) {
+      const positivo = (x) => { try { const n = st.num(x); return Number.isFinite(n) && n > 0; } catch { return false; } };
+      const forma = v.raio;
+      const ok = typeof forma === 'object' && !Array.isArray(forma) ? positivo(forma.de) && positivo(forma.ate) && Object.keys(forma).every((k) => k === 'de' || k === 'ate')
+        : Array.isArray(forma) ? forma.length === v.pontos?.length - (v.pontos?.length > 2 && v.pontos[0] === v.pontos[v.pontos.length - 1] ? 1 : 0) && forma.every(positivo) : positivo(forma);
+      if (!ok) return { erro: `o vinco ${citar(v.nome)} tem raio ${JSON.stringify(forma)}; o raio é um número maior que zero, { de, ate } ou uma lista com um número por ponto da linha` };
+    }
     if (nomes.has(v.nome)) return { erro: `o nome de vinco ${citar(v.nome)} aparece mais de uma vez` };
     nomes.add(v.nome);
     if (!Array.isArray(v.pontos) || v.pontos.length < 2 || v.pontos.some((p) => typeof p !== 'string')) return { erro: `o vinco ${citar(v.nome)} precisa de pontos: lista de dois ou mais nomes de ponto da gaiola, em sequência ao longo das arestas` };

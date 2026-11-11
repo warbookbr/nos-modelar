@@ -2,9 +2,9 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:d276dcb2042f4328f4de2d05fcf5d3c3cc498309bd384c2db5c2a35a587b9328`.
+Assinatura do registro: `sha256:4ec741dd34e2c63e22b7975346a787969823fa740842cd5487881912e9e0c8d4`.
 
-Há 40 operações em 1 módulo(s).
+Há 41 operações em 1 módulo(s).
 
 | operação | intenção | entra/sai | interfaces | custo | schema |
 |---|---|---|---|---:|---|
@@ -29,6 +29,7 @@ Há 40 operações em 1 módulo(s).
 | `inflate` | Construir volume fechado pelo cruzamento de uma silhueta lateral e uma planta. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.inflate@1` |
 | `intersectar` | Manter só o volume comum a todos os sólidos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.intersectar@1` |
 | `lathe` | Revolucionar perfil [raio,y] em torno de um eixo. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.lathe@1` |
+| `limparLascas` | Tirar de uma seleção as faces finas (área / maior aresta² abaixo de 0,003) que uma booleana deixou, trocando a diagonal, colapsando a aresta curta ou juntando a lasca à vizinha, sem criar vértice nem face e sem mover a superfície além da tolerância. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.limparLascas@1` |
 | `liso` | Marcar faces para sombreamento liso. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.liso@1` |
 | `loft` | Conectar seções ao longo de um caminho 3D. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.loft@1` |
 | `material` | Associar faces a um material declarado em MATERIAIS. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.material@1` |

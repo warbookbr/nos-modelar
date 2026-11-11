@@ -34,7 +34,7 @@
  *
  * QUAL ARESTA. Cada vinco nomeado dos passos `subdivisao` (a linha dos pontos da gaiola que ele cita); com `--aresta=x,y,z:x,y,z`, o
  * trecho entre dois pontos em mm; com `--automatico`, as cadeias de crista que `vinco:oculto` acha na superfície e que a receita não
- * declarou (só leitura dele). O raio pedido vem do campo `raio` (mm) do vinco, quando a receita ou o esboço o declaram, ou de
+ * declarou (só leitura dele). O raio pedido vem do campo `raio` (metro, como as medidas do passo) do vinco, quando a receita ou o esboço o declaram, ou de
  * `--pedido=<nome>:<mm>`, repetível. Sai com 1 quando algum corte foge do pedido por mais de `--tolerancia` (fração, 0,2 por padrão).
  *
  * A ENTRADA é receita, esboço 2.0 (`--opcao`) ou montagem persistida, pelo resolvedor comum das ferramentas de medida.
@@ -258,7 +258,7 @@ const argumentosDe = (passo) => (Array.isArray(passo) ? passo[1] ?? {} : passo ?
 
 /**
  * Os vincos nomeados dos passos `subdivisao` como linhas medíveis: `[{ nome, passo, pontos, peles, pedidoMm }]`, com os pontos da gaiola em metro, a normal média
- * das faces da gaiola de cada trecho (a pele medida) e o campo `raio` (mm) que o vinco declara, quando declara. O vinco de nitidez 0 entra como os demais.
+ * das faces da gaiola de cada trecho (a pele medida) e o campo `raio` (metro) que o vinco declara, quando declara. O vinco de nitidez 0 entra como os demais.
  */
 export function linhasDosVincos(entrada) {
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
@@ -268,9 +268,7 @@ export function linhasDosVincos(entrada) {
   (entrada.PASSOS ?? []).forEach((passo, i) => {
     const args = argumentosDe(passo);
     if (operacaoDe(passo) !== 'subdivisao' || !Array.isArray(args.vincos) || !args.vincos.length) return;
-    let resolvida = gaiolaDoPasso(args, { vec, num });
-    /* o campo `raio` do vinco (mm) é do ajudante de gaiola; enquanto o passo `subdivisao` o recusar por campo desconhecido, a gaiola é lida sem ele */
-    if (resolvida.erro && /campo desconhecido 'raio'/.test(resolvida.erro[1])) resolvida = gaiolaDoPasso({ ...args, vincos: args.vincos.map(({ raio, ...resto }) => resto) }, { vec, num });
+    const resolvida = gaiolaDoPasso(args, { vec, num });
     if (resolvida.erro) throw new ErroDeEntrada(`o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
     const { gaiola, declarados } = resolvida;
     const indice = new Map(declarados.map((d, k) => [d, k]).filter(([d]) => typeof d === 'string'));
@@ -286,7 +284,8 @@ export function linhasDosVincos(entrada) {
         peles.push(fs.length && norma(soma) > 1e-9 ? unit(soma) : null);
       }
       let pedidoMm = null;
-      if (v.raio !== undefined && v.raio !== null) { pedidoMm = Number(num(v.raio)); if (!(pedidoMm > 0)) throw new ErroDeEntrada(`o vinco '${v.nome}' declara raio ${v.raio}; o raio é um número de mm maior que zero`); }
+      /* o `raio` do vinco do passo está em metro, como as medidas do passo; o pedido por estação ({ de, ate } ou lista) não dá um pedido só */
+      if (typeof v.raio === 'number' || typeof v.raio === 'string') { pedidoMm = Number(num(v.raio)) * MM; if (!(pedidoMm > 0)) throw new ErroDeEntrada(`o vinco '${v.nome}' declara raio ${v.raio}; o raio é um número maior que zero`); }
       linhas.push({ nome: v.nome, passo: i, pontos: ids.map((k) => gaiola.vertices[k]), peles, pedidoMm });
     }
   });

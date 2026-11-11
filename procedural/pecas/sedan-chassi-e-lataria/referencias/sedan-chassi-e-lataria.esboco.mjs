@@ -248,7 +248,8 @@ function linhasDeVao() {
   const deCima = (nome, z) => ({ nome, eixo: 'y', pontos: [[-xT, z], [xT, z]], ...DE_CIMA });
   const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => descendoAParede(z, yInicio, ABAIXO, PONTA / 2).flatMap((pontos, k) => dosDoisLados({ nome: `${nome}${k + 1}`, eixo: 'x', pontos }));
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
-  const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
+  const VISTA = new Set((process.env.VISTA ?? '').split(',')); /* TEMPORARIO */
+  const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, VISTA.has('furos') ? { alcance: lado === '+' ? [2000, 2300] : [-2300, -2000], dentro: 'descarta' } : { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [
     /* os planos de corte: a frente, a traseira e o fim do capô e do para-lama */
     deCima('frente', T.zFrente), ...deLado('frenteDaParede', T.zFrente),
@@ -266,7 +267,7 @@ function linhasDeVao() {
     ...dosDoisLados({ nome: 'colunaC', eixo: 'x', pontos: [[T.zLateral, yT], [T.zLateral, yC + PONTA]] }),
     /* abaixo da cintura: o fim da porta traseira, que sai pela borda de baixo da chapa, e a soleira */
     ...deLado('fimDaPortaTraseira', T.zLateral, yC - PONTA),
-    ...dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }),
+    ...(VISTA.has('soleira') ? [{ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] }] : dosDoisLados({ nome: 'soleira', eixo: 'x', pontos: [[T.zCapo, T.ySoleira], [T.zLateral, T.ySoleira]] })),
     ...dosDoisLados(fechada('janelaDianteira', 'x', VIDRO_DIANTEIRO)),
     ...dosDoisLados(fechada('janelaTraseira', 'x', VIDRO_TRASEIRO_DA_PORTA)),
     ...dosDoisLados(fechada('janelaDaVigia', 'x', T.vigia)),
@@ -280,8 +281,8 @@ function linhasDeVao() {
   ];
   for (const [s, lado] of [[1, 'Dir'], [-1, 'Esq']]) {
     /* o capô e a tampa contra o para-lama e a lateral: em T sobre os planos de corte */
-    L.push({ nome: `capo${lado}`, eixo: 'y', pontos: [[s * T.xCapo, T.zCapo], [s * T.xCapo, T.zFrente]], ...DE_CIMA });
-    L.push({ nome: `tampa${lado}`, eixo: 'y', pontos: [[s * T.xTampa, T.zTampa], [s * T.xTampa, T.zTras]], ...DE_CIMA });
+    L.push({ nome: `capo${lado}`, eixo: 'y', pontos: [[s * T.xCapo, T.zCapo], [s * T.xCapo, T.zFrente]], ...(VISTA.has('cima') ? { alcance: [900, 1200] } : DE_CIMA) });
+    L.push({ nome: `tampa${lado}`, eixo: 'y', pontos: [[s * T.xTampa, T.zTampa], [s * T.xTampa, T.zTras]], ...(VISTA.has('cima') ? { alcance: [900, 1200] } : DE_CIMA) });
     L.push(furo(`vaoDoFarol${lado}`, '+', FAROL(s)), furo(`vaoDaLanterna${lado}`, '-', LANTERNA(s)));
     L.push(furo(`furoDoSuporteDianteiro${lado}`, '+', FURO(s, SUPORTE.frente)), furo(`furoDoSuporteTraseiro${lado}`, '-', FURO(s, SUPORTE.tras, SUPORTE.xTras)));
   }
@@ -313,7 +314,7 @@ function lataria() {
   const origem = casca(T.chapa);
   const passosDaCasca = estado.passos.splice(inicio);
   const P = sementes().filter(([nome]) => !(process.env.SEM_PAINEL ?? '').split(',').includes(nome)); /* TEMPORARIO */
-  const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(), amostragem: Number(process.env.AMOSTRAGEM ?? 40),
+  const g = paineisPorVaos({ chapa: { passos: passosDaCasca, origem }, vao: T.vao, linhas: linhasDeVao(), medirTempo: !!process.env.TEMPO, /* TEMPORARIO */
     paineis: P.map(([nome, eixo, ponto, , lado]) => ({ nome, eixo, ponto, ...(lado ? { lado } : {}) })) });
   MEDIDAS_DOS_PAINEIS = { medidas: g.medidas, avisos: g.avisos };
   estado.passos.push(...g.passos);
