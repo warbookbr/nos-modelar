@@ -225,7 +225,8 @@ function xDaPlanta(z) {
 }
 /** Os trechos da linha de lado que desce a parede do corpo em z, um por face: a faixa de cima, a faixa inclinada do ombro e a parede da
  *  planta. Cada trecho acaba a `ponta` mm da dobra, e o ajudante alonga as duas pontas que se encontram e fecha o canto. Uma linha só,
- *  atravessando as duas dobras, o núcleo recusa, e com as pontas a 0,5 mm da dobra a emenda deixou um dente no lado esquerdo do carro
+ *  atravessando as duas dobras, o núcleo recusa. A distância da ponta à dobra foi escolhida por tentativa: com 0,5 mm a emenda deixa
+ *  um dente no lado esquerdo do carro, e com 0,1, 0,25 e 0,375 mm o relato de contatos dá o anteparo atravessando a lateral esquerda
  *  (ATRITOS, terceira etapa). */
 function descendoAParede(z, yInicio, yFim, ponta) {
   const [xDeCima, yDaDobra] = T.secao[2]; const [xDeBaixo, yDeBaixo] = T.secao[1];
@@ -256,7 +257,7 @@ function linhasDeVao() {
   const PONTA = 1;
   const xT = T.secao.at(-1)[0] - PONTA;
   const deCima = (nome, z) => ({ nome, eixo: 'y', pontos: [[-xT, z], [xT, z]], ...DE_CIMA });
-  const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => descendoAParede(z, yInicio, ABAIXO, PONTA / 4).flatMap((pontos, k) => dosDoisLados({ nome: `${nome}${k + 1}`, eixo: 'x', pontos }));
+  const deLado = (nome, z, yInicio = yDoTopo(z) - PONTA) => descendoAParede(z, yInicio, ABAIXO, 0.75 * PONTA).flatMap((pontos, k) => dosDoisLados({ nome: `${nome}${k + 1}`, eixo: 'x', pontos }));
   const fechada = (nome, eixo, pontos, extra = {}) => ({ nome, eixo, pontos, fechada: true, ...extra });
   const furo = (nome, lado, pontos) => fechada(nome, 'z', pontos, { ...SUPERFICIE, lado, dentro: 'descarta' });
   const L = [

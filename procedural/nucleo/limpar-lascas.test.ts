@@ -202,7 +202,7 @@ describe('limparLascas: o corte em modo superfície do paineisPorVaos', () => {
     ['sela com janela', (x: number, z: number) => (x * x - z * z) / 300, JANELA, PJ],
   ] as [string, any, any, any][]) {
     it(`${nome}: zero faces finas, malha fechada, superfície e folga no lugar, sem perder parte`, () => {
-      const g = paineisPorVaos({ chapa: casca(f), vao: 4, linhas, paineis, modo: 'superficie' });
+      const g = paineisPorVaos({ chapa: casca(f), vao: 4, linhas, paineis, modo: 'superficie', limpar: false });
       const sem = nucleo(g.passos, {}, {});
       const com = nucleo(comLimpeza(g), {}, {});
       expect(sem.orfaos).toEqual([]);

@@ -27,6 +27,7 @@ export const CAPACIDADES = Object.freeze({
   gaiolaPorLacos: { arquivo: 'procedural/nucleo/gaiola-por-lacos.js', funcao: 'gaiolaPorLacos', de: 'procedural/nucleo/gaiola-por-lacos.js' },
   lacosPelasVistas: { arquivo: 'procedural/nucleo/lacos-pelas-vistas.js', funcao: 'lacosPelasVistas', de: 'procedural/nucleo/lacos-pelas-vistas.js' },
   paineisPorVaos: { arquivo: 'procedural/nucleo/paineis-por-vaos.js', funcao: 'paineisPorVaos', de: 'procedural/nucleo/paineis-por-vaos.js' },
+  curvaDaGaiola: { arquivo: 'procedural/nucleo/curva-da-gaiola.js', funcao: 'curvaDaGaiola', de: 'procedural/nucleo/curva-da-gaiola.js' },
   vaoEntrePartes: { arquivo: 'tools/modelar/vao-entre-partes.mjs', funcao: 'vaoEntrePartes', de: 'tools/modelar/vao-entre-partes.mjs' },
   instanciaDeFamilia: { arquivo: 'tools/modelar/instancia-de-familia.mjs', funcao: 'instanciaDeFamilia', de: 'tools/modelar/instancia-de-familia.mjs' },
   raioDaAresta: { arquivo: 'tools/modelar/raio-da-aresta.mjs', funcao: 'medirPerfil', de: 'tools/modelar/raio-da-aresta.mjs' },

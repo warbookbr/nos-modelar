@@ -2,7 +2,7 @@
  *
  * FICHA curvaDaGaiola
  * serve: tirar da gaiola de `gaiolaPorEstacoes` ou de `gaiolaPorLacos` a polilinha, em mm, que corre sobre a superfície da subdivisão ao longo de uma estação (ou laço), de uma coluna, ou entre duas colunas numa estação, também numa posição fracionária entre duas estações ou colunas; é a entrada `linhas[i].curva` de `paineisPorVaos`.
- * quando: a linha de vão, de uma porta, de uma janela ou de um filete que precisa subir uma quina arredondada, onde a linha desenhada numa vista é recusada ou degrau; a curva sai da gaiola e acompanha a superfície, sem coordenada escrita à mão.
+ * quando: a linha de vão, de uma porta, de uma janela ou de um filete que precisa subir uma quina arredondada, onde a linha desenhada numa vista é recusada ou deixa degrau; a curva sai da gaiola e acompanha a superfície, sem coordenada escrita à mão.
  * unidades: SAÍDA em mm. `gaiolaPorLacos` entra em mm (`pontosMm`); `gaiolaPorEstacoes` entra em metro (`pontos`), e `unidade: 'mm'` diz que os pontos já estão em mm (uma gaiola escrita à mão em mm).
  * campos:
  *   estacao | laco: a posição da linha: o nome, o índice (7 ou 7,4: a estação 7 e 0,4 do caminho até a 8), { em } (a posição no eixo) ou { entre: [a, b], fracao }; com `de` e `ate`, as colunas entre as quais a linha corre (nome, índice, ou { trecho, k } nos laços); sem eles, a estação inteira (no laço, a volta fechada).
