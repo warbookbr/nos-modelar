@@ -214,4 +214,13 @@ processo o teria pego sozinho e o destino.
    isso está no roteiro do plano [núcleo para qualquer mecanismo](../../planos/2026-11-10-nucleo-para-qualquer-mecanismo.md),
    nas fatias 1, 4 e 5. O processo pegou a face degenerada e os defeitos de forma pelo crítico; não pegou sozinho as
    leituras erradas de encaixe, que só a medida de quem conduz desfez.
+23. **A opção nova da família de roda custou tempo a dois testes que os gates locais não rodam.** O envio do fechamento
+   reprovou no CI em dois testes lentos. A conferência das sete famílias foi de 34 para 42 s na máquina local com a
+   opção de ombro largo e o perfil da empilhadeira, e no CI o arquivo dela levou 207 s, acima dos 180 s do teto geral:
+   o teste ganhou um teto próprio de 420 s. O furgão realista levou 868 s nas duas execuções, contra o teto próprio de
+   860: medido aqui antes e depois das mudanças desta sessão, ele dá 160 a 180 s antes e 164 depois, dentro da
+   variação da máquina, então o teto dele é que está a 1% do tempo real e fica como pedido ao plano dono do teste. A
+   mesma medida mostrou que a correção da booleana tirou a quebra de sombra de dez faces do furgão (18.552 para
+   18.542 de 253.481), as que apontavam aresta que o corte tinha apagado; a guarda do acervo e as etapas do acervo
+   passam com isso. O processo não pegou o tempo antes do envio porque os testes lentos só rodam inteiros no CI.
 
