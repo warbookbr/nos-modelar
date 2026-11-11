@@ -143,6 +143,7 @@ export function criarOperacoesEstruturais(servicos) {
       ax = indiceDeAxi(a.eixo);
       if (ax < 0) return grita(st, i, 'arranja', a.eixo, `eixo '${a.eixo}' desconhecido (só 'x'/'y'/'z')`);
       if (a.d != null) return grita(st, i, 'arranja', 'd', "modo 'radial' não usa d (deslocamento é do modo 'linear')");
+      if (a.coincidente != null) return grita(st, i, 'arranja', 'coincidente', "coincidente é do modo 'linear' (a cópia no lugar, sem deslocamento); o modo 'radial' gira cada cópia e não tem cópia no lugar");
       const temVolta = a.volta != null, temGraus = a.graus != null;
       if (temVolta && temGraus) return grita(st, i, 'arranja', 'volta+graus', "volta e graus dizem coisas diferentes (volta = o arco FECHADO da coleção, passo = volta/total; graus = o passo entre instâncias consecutivas) — declare exatamente uma");
       if (!temVolta && !temGraus) return grita(st, i, 'arranja', 'volta+graus', "modo 'radial' exige volta (arco fechado, passo = volta/total) ou graus (passo entre instâncias consecutivas) — exatamente uma");

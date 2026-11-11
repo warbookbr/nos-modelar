@@ -227,6 +227,9 @@ export function criarOperacoesBooleanas(servicos) {
       }
       operandos.push(faces);
     }
+    /* as faces que uma booleana recebeu como operando: o aviso da cópia no lugar que ninguém usou lê este conjunto */
+    const usadas = (st.facesDeOperando ??= new Set());
+    for (const faces of operandos) for (const f of faces) usadas.add(f);
     return nucleoBooleano(st, i, op, wasm, a.origemId, operandos, null);
   }
 

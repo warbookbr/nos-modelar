@@ -98,71 +98,34 @@ export function projetarLinha(o) {
     const prox = fechada ? cheias[(i + 1) % cheias.length] : cheias[i + 1];
     if (prox) todas.push(...refinar(cheias[i], prox, 0));
   }
-  /* a dobra viva que sobrou entre duas estações coladas parte a lâmina: cada face tem a sua, e as duas se encontram na quina */
+  /* a dobra viva que sobrou entre duas estações coladas ganha uma seção do meio: o ponto médio, de normal a bissetriz e profundidade alongada por 1 / cos do meio giro.
+     É uma lâmina só, sem duas varreduras que dividam parede: a seção do meio cobre sob a quina a espessura das duas faces, côncava ou convexa */
   let inclinacaoMaxima = 0;
-  const cortes = [];
-  const lista = todas.map((s, i) => {
+  let quinas = 0;
+  const lista = [];
+  todas.forEach((s, i) => {
     const cos = Math.abs(dot(s.n, [0, 1, 2].map((e) => (e === eixoIdx ? 1 : 0))));
     if (cos < RASANTE) {
       erro(`a chapa fica a ${br(Math.acos(Math.min(1, cos)) * GRAUS)} graus da vista no ponto [${br(s.q[0])}, ${br(s.q[1])}] da linha '${nome}' (raio rasante): desenhe essa linha na vista em que a chapa aparece de frente`);
     }
     inclinacaoMaxima = Math.max(inclinacaoMaxima, Math.acos(Math.min(1, cos)) * GRAUS);
+    lista.push({ c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut });
     const prox = fechada ? todas[(i + 1) % todas.length] : todas[i + 1];
     if (prox && s.real && prox.real) {
       const g = giro(s.n, prox.n);
       if (g > GIRO_LISO) {
         if (g > 150) erro(`a chapa dobra ${br(g)} graus sobre a linha '${nome}': a dobra é mais fechada que a largura da lâmina e a lâmina não a atravessa; divida a linha dos dois lados da dobra`);
-        cortes.push(i);
+        quinas += 1;
+        const meio = unit(soma(s.n, prox.n));
+        lista.push({ c: mul(soma(s.c, prox.c), 0.5), n: meio, esp: Math.max(s.esp ?? 0, prox.esp ?? 0) || null, ds: Math.min(3, 1 / Math.max(dot(meio, s.n), 1e-6)), mIn: s.mOut, mOut: s.mOut });
       }
     }
-    return { c: s.c, n: s.n, esp: s.esp, mIn: s.mIn, mOut: s.mOut };
   });
   /* a espessura lida na própria quina corre ao longo da outra face: vale no máximo três vezes a menor lida na linha */
   const lidas = lista.map((s) => s.esp).filter((x) => x != null);
   if (lidas.length) { const teto = 3 * Math.min(...lidas); for (const s of lista) s.esp = s.esp == null ? null : Math.min(s.esp, teto); }
-  /* os segmentos: de uma quina à seguinte; as duas lâminas acabam na mesma seção, no ponto médio entre a última estação de uma face e a primeira da outra, de normal a bissetriz e
-     profundidade alongada por 1 / cos do meio giro: a quina côncava e a convexa ficam cobertas, sem fresta sob a chapa */
-  const segmentos = [];
-  const N = lista.length;
-  const meio = (i) => mul(soma(lista[i % N].c, lista[(i + 1) % N].c), 0.5);
-  /* o rumo da linha antes e depois da quina, lido nas estações distantes meia largura (as coladas à quina não dão rumo) */
-  const rumo = (i, passo) => {
-    const ref = lista[((i % N) + N) % N];
-    for (let k = 1; k < N; k += 1) {
-      const outra = lista[(((i + passo * k) % N) + N) % N];
-      if (norma(sub(outra.c, ref.c)) >= 0.5 * largura) return unit(sub(passo > 0 ? outra.c : ref.c, passo > 0 ? ref.c : outra.c));
-      if (!fechada && (i + passo * k <= 0 || i + passo * k >= N - 1)) return unit(sub(passo > 0 ? outra.c : ref.c, passo > 0 ? ref.c : outra.c));
-    }
-    return null;
-  };
-  /* a seção da quina: a mesma para as duas lâminas, mas cada uma passa dela um trinta avos da largura, para os dois sólidos se sobreporem e não dividirem a face */
-  const ponta = (i, lado) => {
-    const a = lista[i % N]; const b = lista[(i + 1) % N];
-    const nm = unit(soma(a.n, b.n)) ?? a.n;
-    const t = lado === 'antes' ? rumo(i, -1) : rumo(i + 1, 1);
-    const folga = mul(t ?? [0, 0, 0], (lado === 'antes' ? 1 : -1) * (largura / 30));
-    const ref = lado === 'antes' ? a : b;
-    return { c: soma(meio(i), folga), n: nm, esp: Math.max(a.esp ?? 0, b.esp ?? 0) || null, ds: Math.min(3, 1 / Math.max(dot(nm, a.n), 1e-6)), mIn: ref.mOut, mOut: ref.mOut };
-  };
-  if (!cortes.length) segmentos.push(lista);
-  else if (!fechada) {
-    let inicio = 0;
-    let comeco = null;
-    for (const c of cortes) {
-      segmentos.push([...(comeco ? [comeco] : []), ...lista.slice(inicio, c + 1), ponta(c, 'antes')]);
-      comeco = ponta(c, 'depois'); inicio = c + 1;
-    }
-    segmentos.push([comeco, ...lista.slice(inicio)]);
-  } else {
-    for (let k = 0; k < cortes.length; k += 1) {
-      const de = (cortes[k] + 1) % N; const ate = cortes[(k + 1) % cortes.length];
-      const seg = [ponta(cortes[k], 'depois')];
-      for (let i = de; ; i = (i + 1) % N) { seg.push(lista[i]); if (i === ate) break; }
-      seg.push(ponta(ate, 'antes'));
-      segmentos.push(seg);
-    }
-  }
-  return { segmentos, fechadaInteira: fechada && !cortes.length, quinas: cortes.length, inclinacaoMaxima, semChapa };
+  const segmentos = [lista];
+  return { segmentos, fechadaInteira: fechada, quinas, inclinacaoMaxima, semChapa };
 }
 
 /** O vetor lateral de cada estação: o perpendicular da linha no plano da vista, levado ao plano tangente da chapa, com a esquadria nos cantos. */

@@ -61,4 +61,48 @@ describe('arranja linear com coincidente: true', () => {
     expect(st.orfaos.length).toBeGreaterThan(0);
     expect(st.orfaos.map((o: any) => o.motivo).join('|')).toMatch(/consumida/);
   });
+
+  describe('a citação de uma parte da cópia, a pertinência, o aviso da cópia sem uso e o modo radial', () => {
+    const CUBO = ['cubo', { origemId: 1, larg: 40, alt: 30, prof: 30 }];
+    const ARR = (extra: object = {}) => ['arranja', { modo: 'linear', total: 2, origemId: 2, derivaDe: { op: 'cubo', id: 1 }, sel: { origem: { op: 'cubo', id: 1 } }, nomes: ['u1'], coincidente: true, ...extra }];
+    const sobe = (de: any) => ['transladar', { d: [0, 5, 0], sel: { origem: { op: 'arranja', id: 2, de, nome: 'u1' } } }];
+    const movidos = (antes: any, depois: any) => [...depois.V.keys()].filter((k: number) => antes.V.has(k) && depois.V.get(k)[1] !== antes.V.get(k)[1]).length;
+
+    it('citar só a face de cima da cópia move 4 vértices, com a fonte viva e com a fonte consumida; a cópia inteira move 8', () => {
+      const base = rodar([CUBO, ARR()]);
+      expect(movidos(base, rodar([CUBO, ARR(), sobe({ op: 'cubo', id: 1, face: 'topo' })]))).toBe(4);
+      expect(movidos(base, rodar([CUBO, ARR(), sobe({ op: 'cubo', id: 1 })]))).toBe(8);
+      /* a fonte consumida por uma booleana: a face de cima da cópia segue citável pelo registro do gerador */
+      const consumida = [CUBO, ARR(), barra(0), dentro(0, { op: 'cubo', id: 1 })];
+      const antes = rodar(consumida);
+      const depois = rodar([...consumida, sobe({ op: 'cubo', id: 1, face: 'topo' })]);
+      expect(depois.orfaos).toEqual([]);
+      expect(movidos(antes, depois)).toBe(4);
+    });
+
+    it('um `de` de outra primitiva é recusado pela pertinência, com a fonte viva e consumida', () => {
+      const cilindro = ['cilindro', { origemId: 7, raio: 5, altura: 5, lados: 8, em: [300, 0, 0] }];
+      const alheio = { op: 'cilindro', id: 7 };
+      for (const antes of [[], [barra(0), dentro(0, { op: 'cubo', id: 1 })]]) {
+        const st = rodar([CUBO, cilindro, ARR(), ...antes, sobe(alheio)]);
+        expect(st.orfaos.map((o: any) => o.motivo).join('|')).toMatch(/não pertence à fonte da origem arranja:2/);
+      }
+    });
+
+    it('a cópia no lugar que nenhum passo usa avisa, e a usada não avisa', () => {
+      const sem = rodar([CUBO, ARR()]);
+      expect(sem.avisos.map((a: any) => a.ref)).toEqual(['copiaNoLugarSemUso']);
+      expect(sem.avisos[0].texto).toMatch(/casca dupla em cima da fonte/);
+      const usada = rodar([CUBO, ARR(), barra(0), dentro(0, { op: 'cubo', id: 1 }), barra(1), dentro(1, { op: 'arranja', id: 2, de: { op: 'cubo', id: 1 }, nome: 'u1' })]);
+      expect(usada.avisos.map((a: any) => a.ref)).not.toContain('copiaNoLugarSemUso');
+    });
+
+    it("coincidente no modo radial é recusado, e o arranja deslocado não muda", () => {
+      const st = rodar([CUBO, ['arranja', { modo: 'radial', total: 3, eixo: 'y', volta: 360, pivo: [100, 0, 0], coincidente: true, origemId: 2, derivaDe: { op: 'cubo', id: 1 }, sel: { origem: { op: 'cubo', id: 1 } } }]]);
+      expect(st.orfaos.map((o: any) => o.motivo).join('|')).toMatch(/coincidente é do modo 'linear'/);
+      const deslocado = rodar([CUBO, ARR({ coincidente: undefined, d: [100, 0, 0] })]);
+      expect(deslocado.orfaos).toEqual([]);
+      expect(deslocado.avisos).toEqual([]);
+    });
+  });
 });

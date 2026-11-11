@@ -1337,8 +1337,13 @@ const CONTRATOS_ORIGEM = {
       return fonte.erro ? `arranja exige de estrutural válido: ${fonte.erro}` : null;
     },
     resolver(st, registro, origem) {
-      /* a cópia no lugar (`coincidente`) não precisa da fonte viva: a fonte é o primeiro uso e a booleana que a consome não pode apagar a citação das cópias */
-      const fonte = registro.transformacao?.coincidente ? { faces: [...registro.copias[0].keys()] } : resolverOrigem(st, origem.de);
+      /* a cópia no lugar (`coincidente`) não precisa da fonte viva: a fonte é o primeiro uso e a booleana que a consome não pode apagar a citação das cópias.
+         `de` igual ao da declaração é a cópia inteira; `de` que aponta uma parte da fonte (a face de cima) resolve pelo registro do gerador mesmo com a fonte
+         consumida; e `de` de outra primitiva cai na pertinência, abaixo, como no arranjo deslocado */
+      const coincidente = registro.transformacao?.coincidente === true;
+      const fonte = !coincidente ? resolverOrigem(st, origem.de)
+        : origensIguais(origem.de, registro.derivaDe) ? { faces: [...registro.copias[0].keys()] }
+          : resolverOrigemSemVida(st, origem.de);
       if (fonte.erro) return { erro: `de da origem arranja:${origem.id} não resolve: ${fonte.erro}` };
       const nCopias = registro.copias.length;
       let indices;
@@ -1934,6 +1939,14 @@ function faceUnicaEstrutural(st, origem, op, campo, i) {
   const faces = [...new Set(r.faces)];
   if (faces.length !== 1) { grita(st, i, op, campo, `${campo} precisa resolver para EXATAMENTE uma face: ${JSON.stringify(origem)} resolveu para ${faces.length} (${faces.slice(0, 8).join(', ')}${faces.length > 8 ? ', …' : ''})`); return null; }
   return faces[0];
+}
+
+/* A origem resolvida como se as faces consumidas ainda vivessem: serve à citação de uma parte da fonte de uma cópia no lugar, depois de a booleana consumir a fonte.
+   As faces consumidas voltam à malha como casca vazia só durante a chamada, e saem dela mesmo se o gerador gritar. */
+function resolverOrigemSemVida(st, origem) {
+  const fantasmas = [];
+  for (const fid of st.consumidas.keys()) if (!st.F.has(fid)) { st.F.set(fid, { id: fid, vs: [] }); fantasmas.push(fid); }
+  try { return resolverOrigem(st, origem); } finally { for (const fid of fantasmas) st.F.delete(fid); }
 }
 
 function resolverPorta(st, nome) {
@@ -3667,6 +3680,20 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     });
   });
   aplicarHierarquiaDasPartes(st);
+  /* a cópia no lugar que nenhum passo consumiu nem mexeu é uma casca dupla em cima da fonte */
+  for (const [id, registros] of st.origens) {
+    for (const r of registros) {
+      if (r.op !== 'arranja' || r.transformacao?.coincidente !== true) continue;
+      r.copias.forEach((mapa, k) => {
+        const copias = [...mapa.values()];
+        if (copias.length && !copias.some((f) => st.facesDeOperando?.has(f)) && copias.every((f) => st.F.has(f))) {
+          const nome = r.nomesDasCopias?.[k];
+          st.avisos.push({ passo: r.passo ?? null, op: 'arranja', ref: 'copiaNoLugarSemUso', origemId: id, copia: k, nome: nome ?? null,
+            texto: `a cópia ${nome != null ? `'${nome}' ` : ''}(${k}) do arranja ${id} está no lugar e nenhum passo a consumiu: é uma casca dupla em cima da fonte; use-a numa booleana ou reduza o total` });
+        }
+      });
+    }
+  }
 
   /* `materiais` faz parte do estado neutro: a face só guarda o NOME, mas uma
      revisão sem o dicionário não conseguiria dizer se uma alteração de cor ou

@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`, `procedural/nucleo/paineis-por-vaos.js`, `procedural/nucleo/paineis-por-vaos.test.ts`, `tools/modelar/vao-entre-partes.mjs`, `tools/modelar/vao-entre-partes.test.mjs`
+**Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`, `procedural/nucleo/paineis-por-vaos.js`, `procedural/nucleo/paineis-por-vaos.test.ts`, `tools/modelar/vao-entre-partes.mjs`, `tools/modelar/vao-entre-partes.test.mjs`, `procedural/nucleo/lamina-sobre-a-superficie.js`, `procedural/nucleo/paineis-por-vaos-superficie.test.ts`, `tools/modelar/instancia-de-familia.mjs`, `tools/modelar/instancia-de-familia.test.mjs`, `procedural/nucleo/apoio-do-vinco.js`, `procedural/nucleo/apoio-do-vinco.test.ts`, `tools/modelar/raio-da-aresta.mjs`, `tools/modelar/raio-da-aresta.test.mjs`
 
 **Responsável:** a IA da sessão que o ativar conduz e mede; a pessoa decide a
 ordem das fatias e julga forma por imagem.
@@ -192,6 +192,19 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    a nota do crítico sem contexto com luz rasante e curvatura. Saída: o sedã
    inteiro em alta definição com as etapas fixas, e a lista do que foi
    melhorado e do que ficou para plano próprio.
+   Ciclo 1, de 2026-11-11, sobre o corpo de baixo de um lado e o capô
+   ([`CICLO-1.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-1.md)):
+   a grade de estações com colunas de apoio junto das quinas ganhou da rede de
+   curvas, com um terço das faces e do tempo, a luz rasante limpa e o raio da
+   cintura a 9% do pedido; a rede ondulou de 1,9 a 3,5 mm em volta dos arcos.
+   Nenhum dos dois caminhos cumpriu os critérios. O ciclo pediu, e entram
+   agora: o raio em milímetro no vinco, convertido em colunas de apoio e
+   conferido na saída; o comando que mede o raio de uma aresta nomeada, com a
+   definição escrita; as medidas de superfície lendo o esboço 2.0 e a chapa já
+   cortada; a linha de vão dada por uma curva sobre a chapa, que sobe a quina
+   arredondada onde a linha de vista é recusada; e a borda do painel com aba.
+   Ficam para o ciclo seguinte de modelagem o lábio do arco de roda, e para
+   plano próprio o rebaixo de farol, maçaneta e grade.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.
