@@ -171,6 +171,18 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    todos os pares, o para-brisa e o vidro traseiro incluídos, medido pelo
    comando novo. Ficam fora, para a fatia 4: a chapa lisa de carroceria inteira
    com qualidade de superfície e a borda de chapa com aba.
+   Entregue em 2026-11-11, depois de três revisões adversariais: o rascunho do
+   sedã refeito tem a lataria em 140 passos (eram 782), o vão da pele entre
+   4,00 e 4,17 mm e a distância entre os sólidos de 4,00 a 4,02 mm em todos os
+   pares de chapa e de vidro, o para-brisa e o vidro traseiro incluídos, medidos
+   por `npm run vao:partes`. O ajudante ganhou o corte que segue a superfície e
+   o que segue uma curva sobre a chapa, a prova de que cada linha separa, a
+   limpeza das faces finas depois do corte e a cópia de sólido no lugar; a
+   instância de família saiu por uma chamada, e o fluxo do objeto ganhou o
+   aceite e o módulo comum. O que ainda custa está na terceira etapa dos
+   [atritos](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/ATRITOS.md):
+   a linha de superfície que atravessa uma dobra viva pede três linhas, e o
+   corte com lâminas de superfície leva de 10 a 14 s.
 4c. **Sedã em alta definição, neste plano, pedido pela pessoa em 2026-11-11; entra quando a 4b fechar.**
    Pergunta: partindo do sedã facetado em painéis, o projeto leva uma IA a uma
    carroceria de superfície dura em alta definição, e o que falta para isso?
