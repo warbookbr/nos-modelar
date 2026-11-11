@@ -217,6 +217,11 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    arredondada onde a linha de vista é recusada; e a borda do painel com aba.
    Ficam para o ciclo seguinte de modelagem o lábio do arco de roda, e para
    plano próprio o rebaixo de farol, maçaneta e grade.
+   O ciclo 2
+   ([`CICLO-2.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-2.md)),
+   com essas ferramentas, levou o mesmo trecho a nenhuma falha de ondulação
+   (máximo de 0,29 mm, eram 3,61), à cintura com 5,8 mm para 6 pedidos e ao
+   vão entre 4,04 e 4,16 mm, com o lábio do arco de roda.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.

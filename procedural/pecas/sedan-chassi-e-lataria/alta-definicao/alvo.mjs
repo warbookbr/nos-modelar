@@ -33,8 +33,8 @@ export const T = {
   flechaDoCapo: 8,      /* flecha do topo na largura, em mm, com o máximo no meio do carro */
   raioDaCintura: 6,     /* raio pedido na quina do topo com a lateral (a linha de cintura, que na frente é o capô com o para-lama) */
   /* a quina do ombro é rasa (de 34 graus de dobra onde o para-lama mais alarga a zero nas portas). O raio dela é pedido pela distância do
-     apoio, que fica constante: o raio é de 9 mm onde a dobra é maior e cresce à medida que a dobra some, e a quina morre sem acabar */
-  apoioDoOmbro: 4,
+     apoio, que fica constante: o raio é de 3 mm onde a dobra passa de 30 graus e cresce à medida que a dobra some, e a quina morre sem acabar */
+  apoioDoOmbro: 1.2,
   raioMinimoDoOmbro: 3,
   /* o lábio do arco de roda: a chapa vira para dentro em volta do arco */
   labio: { largura: 14, raio: 4, angulo: 90 },

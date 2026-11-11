@@ -373,6 +373,11 @@ const PASTAS_FORA_DO_REPOSITORIO = ['tools/bancadas/out/', 'tmp/', '.claude/work
    recusado; o texto que não é caminho, como "sem alvo: ...", passa como está. A imagem que existe fora do repositório é a
    referência externa de `vistas:critica --referencia` e fica só com o nome. */
 export function alvoDoRepositorio(alvo, raiz = RAIZ_DO_REPOSITORIO) {
+  if (typeof alvo === 'string' && !alvo.startsWith('/') && PASTAS_FORA_DO_REPOSITORIO.some((p) => alvo.includes(p))) {
+    /* o texto livre que cita um arquivo de pasta fora do repositório: a conferência de links do CI o lê como referência e reprova */
+    throw new Error(`o alvo do veredito (${alvo}) cita um arquivo de pasta que o CI não tem (${PASTAS_FORA_DO_REPOSITORIO.join(', ')}). `
+      + 'Peça ao crítico o alvo de verdade ou "sem alvo: <motivo>" sem caminho.');
+  }
   if (typeof alvo !== 'string' || !alvo.startsWith('/')) return alvo;
   let relativo = alvo.startsWith(raiz + sep) ? alvo.slice(raiz.length + 1) : null;
   /* a referência externa (`vistas:critica --referencia`), que a regra do repositório manda ficar fora dele, entra só pelo nome:

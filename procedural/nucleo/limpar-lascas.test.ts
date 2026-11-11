@@ -334,7 +334,7 @@ describe('limparLascas: o tempo', () => {
     process.stdout.write(`[${F.size} faces, ${r.relatorio.finasAntes} lascas] limpeza ${ms.toFixed(0)} ms, faces finas ${r.relatorio.finasAntes} -> ${r.relatorio.finasDepois}, colapsos ${r.relatorio.colapsos}, trocas ${r.relatorio.trocas}\n`);
     expect(r.relatorio.finasAntes).toBe(6400);
     expect(r.relatorio.finasDepois).toBe(0);
-    expect(ms).toBeLessThan(5000);
+    expect(ms).toBeLessThan(15000); /* 0,7 s aqui, 5,2 s no CI com a máquina dividida: o teto pega a limpeza quadrática, não a carga */
     expect(semPar(aplicar(m, r))).toBe(0);
   });
 });

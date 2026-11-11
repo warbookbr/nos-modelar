@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1932 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1933 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -441,6 +441,7 @@
 ## docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/
 
 - `CICLO-1.md` — Sedã em alta definição, ciclo 1: o corpo de baixo e o capô por dois caminhos
+- `CICLO-2.md` — Sedã em alta definição, ciclo 2: o corpo de baixo e o capô pelo caminho A, com as ferramentas novas
 
 ## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
 

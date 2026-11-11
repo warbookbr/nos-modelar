@@ -3,8 +3,8 @@
  * e o lábio dos dois arcos de roda. O alvo está em `alvo.mjs`, e a versão do primeiro ciclo, escrita à mão, em `ciclo-1/`.
  *
  * A GAIOLA sai de `gaiolaPorEstacoes`, com as estações ao longo de z e as colunas da seção, da borda de baixo à cintura, mais 40 mm de
- * faixa de cima no trecho inteiro e, do pé do capô para a frente, o capô até o meio do carro. Cada ponto é uma amostra do alvo, sem medidas. O raio das duas quinas de caráter é pedido em
- * milímetro no vinco (`raio`), e o ajudante põe as colunas de apoio. O arco de roda é borda da chapa: a coluna `fundo` sobe pelo arco e
+ * faixa de cima no trecho inteiro e, do pé do capô para a frente, o capô até o meio do carro. Cada ponto é uma amostra do alvo, sem
+ * medidas. O raio das duas quinas de caráter é pedido em milímetro no vinco (`raio`), e o ajudante põe as colunas de apoio. O arco de roda é borda da chapa: a coluna `fundo` sobe pelo arco e
  * as colunas abaixo do ombro se apertam acima dele, amostrando a mesma lateral.
  *
  * AS LINHAS DE VÃO saem da gaiola por `curvaDaGaiola`, sem coordenada: uma estação para cada linha vertical e uma coluna para a soleira e
@@ -18,7 +18,7 @@
 import { gaiolaPorEstacoes } from '../../../nucleo/gaiola-por-estacoes.js';
 import { curvaDaGaiola } from '../../../nucleo/curva-da-gaiola.js';
 import { paineisPorVaos } from '../../../nucleo/paineis-por-vaos.js';
-import { T, yTopo, yDaBorda, ladoX, topoY, dobraDoOmbro, ARCOS, PAINEIS, CORES, VIZINHOS } from './alvo.mjs';
+import { T, yTopo, yDaBorda, ladoX, topoY, ARCOS, PAINEIS, CORES, VIZINHOS } from './alvo.mjs';
 
 const NIVEIS = Number(process.env.HD_NIVEIS ?? 2);
 const COM_PAINEIS = process.env.HD_PAINEIS !== '0';
@@ -84,6 +84,7 @@ const cantos = [['tras', 'fundo'], ['tras', 'faixa'], ['frente', 'fundo'], ['fre
    do ombro em cada estação (`raios` da saída), e a segunda pede em cada ponto o raio que dá o apoio de `apoioDoOmbro` mm, pela relação
    medida do apoio com a dobra (apoio = 1,47 x raio x tangente de meia dobra). `HD_RAIO_DO_OMBRO=<mm>` volta ao raio único. */
 const FATOR_DO_APOIO = 1.47;
+const APOIO_DO_OMBRO = Number(process.env.HD_APOIO_OMBRO ?? T.apoioDoOmbro);
 /* `HD_MEDIDAS=1` faz a superfície passar pelos pontos das colunas que não são quina nem apoio dela; fica como sonda, porque o capô sai com
    uma ondulação de 23,7 mm junto da coluna que começa no pé dele */
 const MEDIDAS = process.env.HD_MEDIDAS === '1' ? [...DO_LADO.map(([nome]) => nome), 'faixa', ...DO_CAPO.map(([nome]) => nome)].map((coluna) => ({ coluna })) : undefined;
@@ -92,9 +93,12 @@ const montar = (raioDoOmbro) => gaiolaPorEstacoes({ eixo: 'z', estacoes, cantos,
 const dobras = montar(T.raioMinimoDoOmbro).raios.find((r) => r.vinco === 'ombro').pontos.map((p) => p.angulo);
 if (dobras.length !== Z.length) throw new Error(`o ombro devia ter uma dobra por estação (${Z.length}), e a gaiola deu ${dobras.length}`);
 export const RAIO_DO_OMBRO = process.env.HD_RAIO_DO_OMBRO ? Number(process.env.HD_RAIO_DO_OMBRO)
-  : dobras.map((graus) => Math.round(Math.min(400, Math.max(T.raioMinimoDoOmbro, T.apoioDoOmbro / (FATOR_DO_APOIO * Math.tan((Math.max(graus, 0.5) * Math.PI) / 360)))) * 100) / 100);
+  : dobras.map((graus) => Math.round(Math.min(400, Math.max(T.raioMinimoDoOmbro, APOIO_DO_OMBRO / (FATOR_DO_APOIO * Math.tan((Math.max(graus, 0.5) * Math.PI) / 360)))) * 100) / 100);
 
 export const GAIOLA = montar(RAIO_DO_OMBRO);
+/* a definição da gaiola, para as sondas que a remontam com outra opção (a dos anéis no arco, no CICLO-2.md) */
+export const DEFINICAO = { eixo: 'z', estacoes, cantos, niveis: NIVEIS,
+  vincos: [{ nome: 'cintura', coluna: 'cintura', raio: T.raioDaCintura }, { nome: 'ombro', coluna: 'ombro', raio: RAIO_DO_OMBRO }] };
 
 /* ---- do metro da gaiola ao milímetro do esboço ---- */
 const emMm = (r) => (typeof r === 'number' ? r * 1000 : Array.isArray(r) ? r.map(emMm) : r && typeof r === 'object' ? Object.fromEntries(Object.entries(r).map(([k, v]) => [k, emMm(v)])) : r);

@@ -15,6 +15,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const TESTES_LENTOS = [
+  'tools/modelar/ondulacao-corte-e-quina.test.mjs',
+  'procedural/nucleo/paineis-por-vaos-curva.test.ts',
+  'procedural/nucleo/paineis-por-vaos-superficie.test.ts',
+  'procedural/nucleo/paineis-por-vaos-separa.test.ts',
   'tools/modelar/guardas/etapas-do-acervo.test.mjs',
   'tools/fixtures/solido-por-lacos/solido-por-lacos.test.ts',
   'tools/fixtures/solido-por-lacos/tubos.test.ts',
