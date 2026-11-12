@@ -13,7 +13,8 @@
  * O RELATO DE CONTATOS. A cada rodada, para cada opção, sai em texto quem encosta, quem atravessa e com quanto, e a folga entre as
  * formas que ficam perto (`relatoDeContatos` de `modulos/esboco-nucleo/src/contatos.js`, a medida do `descrever` sobre o neutro
  * da opção), com o que cada forma declarou esperar. Com `--estrito` o comando sai com erro, antes da captura, quando há travessia
- * não declarada ou relação declarada que a malha não dá.
+ * não declarada, relação declarada que a malha não dá ou par de partes Dir e Esq (imagem uma da outra) que mede diferente: o relato
+ * lista o último como ASSIMÉTRICO, com os dois vereditos.
  *
  * A MESMA CÂMERA. A bancada encaixa cada peça no estúdio na escala dela, e a câmera automática enquadra cada uma por conta própria;
  * duas opções de tamanhos diferentes sairiam em escalas diferentes. Aqui a câmera é uma só por vista, ortográfica, na direção da
@@ -85,7 +86,7 @@ ${EXEMPLO}
   --vista <v>        isometrica, frontal, traseira, direita, esquerda, superior ou inferior (padrão: a do esboço)
   --vistas <v1,v2>   um painel por vista, cada opção numa linha (por exemplo isometrica,direita,frontal)
   --rotulos          um número sobre cada forma e a legenda embaixo da opção (ou "rotulos": true no esboço); --sem-rotulos tira
-  --estrito          sai com erro, antes da captura, se houver travessia não declarada ou contato declarado que não se dá
+  --estrito          sai com erro, antes da captura, se houver travessia não declarada, contato declarado que não se dá ou par Dir/Esq que mede diferente
   --perto <mm>       até que folga o relato lista o par (padrão ${PERTO_MM})
   --saida <png>      onde gravar a imagem (padrão: tools/bancadas/out/esboco-nucleo-<nome>.png)
   --largura <px>     a largura de cada painel na imagem (padrão 640, ou 420 com --vistas)
