@@ -329,9 +329,20 @@ const partesDaAgua = (nome) => [
     : 'chapa de fibrocimento ondulado de 6 mm, gomo de 177 mm e onda de 51 mm, uma malha só para as duas fileiras de 2,60 m, de 11 m ao longo da cumeeira, a 15 graus, sobre as terças e terminando na cumeeira',
   tecnica: 'uma extrusão do contorno da onda ao longo da inclinação, girada e levada à origem da água' },
 ];
-const planoDaCasa = () => {
-  const comTelhas = AGUAS.filter((n) => n !== TABELA.aguaDosPaineis);
-  return {
+const comTelhas = AGUAS.filter((n) => n !== TABELA.aguaDosPaineis);
+
+/* Ilhas: a vizinha e o cômodo da extensão ficam afastados da casa maior (a calha de 15 cm e o corredor aberto). */
+const ILHAS = [
+  { contem: 'paredesVizinha', motivo: 'a casa vizinha fica a uma calha de 15 cm da beirada da casa maior, com a extensão atrás dela, e não toca a parede da casa maior' },
+  { contem: 'paredesExtensao', motivo: 'o cômodo da extensão fica do outro lado do corredor aberto, a 2,4 m da parede da casa maior, e não a toca; só o telhado da extensão passa por baixo da beirada' },
+];
+
+const receita = {
+  meta: { nome: 'instalacao-solar/casa', desc: 'a casa maior de duas águas, a extensão baixa à esquerda e a casa vizinha de telhado metálico, em volumes simples, com as terças e as telhas de cada água menos a que recebe os painéis' },
+  PARAMS: TABELA,
+  MATERIAIS,
+  TOPO: { origem: 'centro do piso da casa maior; y para cima, chão em y = 0, a frente em -x e o fundo em +x, a esquerda de quem olha a frente em -z; a cumeeira ao longo de x' },
+  PLANO: {
     objeto: 'a casa maior de duas águas com a cumeeira de 11 m da frente ao fundo, a extensão baixa à esquerda por baixo da beirada e a casa vizinha de telhado metálico, em volumes simples',
     referencias: ['../../referencias/kit.md'],
     escala: { medida: 'cumeeira da casa maior, da frente ao fundo', milimetros: 11000 },
@@ -353,27 +364,13 @@ const planoDaCasa = () => {
       'água de fibrocimento sem apoio de terça embaixo, ou telha de fibrocimento lisa, sem a onda de 177 mm',
       'terça ou telha na água que recebe os painéis (a peça telhado é quem as traz)',
       'parede atravessando o telhado, ou telhas e terças de uma água entrando nas da outra',
-      'extensão que não passa por baixo da beirada da água esquerda da casa maior, ou menos inclinada que a casa maior',
+      'extensão que não passa por baixo da beirada da água esquerda da casa maior, ou tão ou mais inclinada que a casa maior',
       'extensão invadindo a casa vizinha ou a casa maior, ou corredor fechado por parede',
       'telhado metálico da vizinha sem onda fina, ou vizinha de cumeeira fora da direção frente-fundo',
       'porta de água faltando em alguma das águas de fibrocimento (esquerda, direita e extensão)',
       'qualquer parte abaixo do chão (y negativo)',
     ],
-  };
-};
-
-/* Ilhas: a vizinha e o cômodo da extensão ficam afastados da casa maior (a calha de 15 cm e o corredor aberto). */
-const ILHAS = [
-  { contem: 'paredesVizinha', motivo: 'a casa vizinha fica a uma calha de 15 cm da beirada da casa maior, com a extensão atrás dela, e não toca a parede da casa maior' },
-  { contem: 'paredesExtensao', motivo: 'o cômodo da extensão fica do outro lado do corredor aberto, a 2,4 m da parede da casa maior, e não a toca; só o telhado da extensão passa por baixo da beirada' },
-];
-
-const receita = {
-  meta: { nome: 'instalacao-solar/casa', desc: 'a casa maior de duas águas, a extensão baixa à esquerda e a casa vizinha de telhado metálico, em volumes simples, com as terças e as telhas de cada água menos a que recebe os painéis' },
-  PARAMS: TABELA,
-  MATERIAIS,
-  TOPO: { origem: 'centro do piso da casa maior; y para cima, chão em y = 0, a frente em -x e o fundo em +x, a esquerda de quem olha a frente em -z; a cumeeira ao longo de x' },
-  PLANO: planoDaCasa(),
+  },
   ilhas: ILHAS,
   contatos: [
     { par: ['paredesCasaMaior', 'empenaFrenteCasaMaior'], motivo: 'a empena da frente assenta no topo da parede da casa maior' },
