@@ -249,8 +249,12 @@ export function regularidadeDaSuperficie(sup, opcoes = {}) {
   return { opcoes: o, cadeias, achados, rebaixados };
 }
 /** A superfície de cada passo `subdivisao` da receita, com a régua rodada nela: `{ passo, cadeias, achados, _sup }`. `executada` é `{ entrada, neutro }`. */
+export const MOTIVO_DO_NIVEL_ZERO = 'gaiola sem subdivisão (niveis 0): a aresta viva é a forma, e não crista de superfície a medir';
+/** A gaiola de `niveis` 0 (a faixa do forro de um vão, a lâmina de um corte) sai com `pulado` e sem cadeia: a ondulação da superfície pula a mesma gaiola pelo mesmo motivo. */
 export function regularidadeDaReceita(receita, opcoes = {}, executada = null) {
-  return superficiesDaReceita(receita, executada).map((sup) => ({ passo: sup.passo, ...regularidadeDaSuperficie(sup, opcoes), _sup: sup }));
+  return superficiesDaReceita(receita, executada).map((sup) => (sup.niveis === 0
+    ? { passo: sup.passo, pulado: MOTIVO_DO_NIVEL_ZERO, opcoes, cadeias: [], achados: [], rebaixados: [], _sup: sup }
+    : { passo: sup.passo, ...regularidadeDaSuperficie(sup, opcoes), _sup: sup }));
 }
 
 export function textoDoAchado(a) {
@@ -379,6 +383,7 @@ export async function executar(argv) {
     linhas.push('regularidade da crista: a régua aponta onde olhar; quem diz se é defeito é a pessoa, pela imagem.');
     const todos = []; const rebaixados = [];
     for (const r of resultados) {
+      if (r.pulado) { linhas.push(`passo ${r.passo} (subdivisao): não medido, ${r.pulado}`); continue; }
       linhas.push(`passo ${r.passo} (subdivisao): ${r.cadeias.length} cadeia(s) de crista, ${r.achados.length} ponto(s) de variação brusca acusado(s)${r.rebaixados.length ? `, ${r.rebaixados.length} rebaixado(s) a provável desenho` : ''}`);
       for (const c of r.cadeias) linhas.push(`  cadeia ${c.indice + 1} da parte ${c.parte ?? 'sem parte'}: ${n1(c.comprimentoMm)} mm, ${c.arestas} arestas, de [${c.pontasMm[0].join('; ')}] a [${c.pontasMm[1].join('; ')}] mm, diedro de ${n1(c.diedroGraus.min)} a ${n1(c.diedroGraus.max)} graus`);
       r.achados.forEach((x) => todos.push({ passo: r.passo, achado: x, r }));

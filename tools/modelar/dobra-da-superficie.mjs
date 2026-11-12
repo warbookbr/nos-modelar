@@ -77,7 +77,7 @@ export function superficiesDaReceita(receita, executada = null) {
     const origem = gaiola.vertices.map((_, k) => k);
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
     const nomeDe = (j) => { const d = declarados[origem[j]]; return typeof d === 'string' ? d : null; };
-    lista.push({ passo: i, vertices, faces, facesTiradas: r.faces.length - faces.length, vincos: r.vincos, partes, gaiola, nomeDe });
+    lista.push({ passo: i, niveis, vertices, faces, facesTiradas: r.faces.length - faces.length, vincos: r.vincos, partes, gaiola, nomeDe });
   });
   return lista;
 }

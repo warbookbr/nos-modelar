@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { imagemDoAchado, lerArgumentos, regularidadeDaSuperficie, textoDoAchado } from './regularidade-da-crista.mjs';
+import { MOTIVO_DO_NIVEL_ZERO, imagemDoAchado, lerArgumentos, regularidadeDaReceita, regularidadeDaSuperficie, textoDoAchado } from './regularidade-da-crista.mjs';
 import { ErroDoModelo } from './modelo-aberto.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -272,5 +272,23 @@ describe('os rebaixamentos a provável desenho: cada regra geral, e o caso parec
     const r = regularidadeDaSuperficie(cristaSintetica({ saltos: [{ estacao: 9, diedro: 32 }, { estacao: 21, diedro: 32 }] }));
     expect(textoDoAchado(r.rebaixados[0])).toContain('provável desenho (repeticao)');
     expect(textoDoAchado(r.rebaixados[0])).toContain('a régua só aponta o lugar');
+  });
+});
+
+describe('a gaiola sem subdivisão não é crista de superfície', () => {
+  /* uma faixa dobrada a 90 graus ao longo de z, de seis estações a 20 mm: com `niveis` 0 é a forma do forro de um vão, e com `niveis` 1 é superfície */
+  const receita = (niveis) => {
+    const TOPO = {}; const faces = [];
+    for (let i = 0; i < 6; i += 1) { TOPO[`a${i}`] = [0.03, 0, i * 0.02]; TOPO[`b${i}`] = [0, 0, i * 0.02]; TOPO[`c${i}`] = [0, 0.03, i * 0.02]; }
+    for (let i = 0; i < 5; i += 1) faces.push([`a${i}`, `b${i}`, `b${i + 1}`, `a${i + 1}`], [`b${i}`, `c${i}`, `c${i + 1}`, `b${i + 1}`]);
+    return { PARAMS: {}, TOPO, PASSOS: [['subdivisao', { vertices: Object.keys(TOPO), faces, niveis, parte: 'faixa' }]] };
+  };
+  it('com niveis 0 o passo sai pulado, com o motivo e sem cadeia nem achado; com niveis 1 a mesma gaiola é medida', () => {
+    const [zero] = regularidadeDaReceita(receita(0));
+    expect(zero.pulado).toBe(MOTIVO_DO_NIVEL_ZERO);
+    expect(zero.cadeias).toEqual([]); expect(zero.achados).toEqual([]); expect(zero.rebaixados).toEqual([]);
+    const [um] = regularidadeDaReceita(receita(1));
+    expect(um.pulado).toBeUndefined();
+    expect(Array.isArray(um.cadeias)).toBe(true);
   });
 });
