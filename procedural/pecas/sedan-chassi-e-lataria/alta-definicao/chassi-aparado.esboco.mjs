@@ -45,9 +45,16 @@ const PASSOS = passos.filter((p) => !(ehPrisma(p) && prismas.has(p[1].origemId))
    chapa alisada) já não se declara; o relato diz o que a malha dá */
 const apoios = new Set(original.contatos.filter((c) => c.relacao === 'folga' && String(c.motivo).includes('apoio: o membro, reaparado')).map((c) => c.par.join('|')));
 const rasos = new Set(original.contatos.filter((c) => c.relacao === 'atravessa' && String(c.motivo).startsWith('o membro, reaparado pela seção')).map((c) => c.par.join('|')));
+/* os apoios cujo vão de borda a borda o `vao:partes` mede em 0,5 mm (p05 de 0,499 a 0,500, p95 de até 0,504, nos dois lados): o teto sobre os montantes A, B e C e sobre a
+   travessa do painel. Nos outros o aparar dá a folga de 0,5 mm entre as peles (distância 3D de 0,46 a 0,5), mas a borda do membro fica a mais que isso da borda da chapa
+   (de 2 a 12 mm), e a faixa larga do rascunho continua */
+const MEDIDOS_EM_MEIO_MM = new Set(['montanteA', 'montanteB', 'montanteC'].flatMap((m) => ['Dir', 'Esq'].map((L) => `teto|${m}${L}`)).concat(['teto|travessaDoPainel']));
 const contatos = original.contatos.filter((c) => !rasos.has(c.par.join('|'))).map((c) => (apoios.has(c.par.join('|'))
-  ? { ...c, folga: { esperada: FOLGA, tolerancia: Number(process.env.HD_TOLERANCIA ?? 0.5) }, motivo: `apoio: o membro, aparado pelo lado de dentro da chapa a ${FOLGA} mm da pele de dentro, e a cola de estrutura entre os dois fica fora do esboço` }
+  ? { ...c, folga: { esperada: FOLGA, tolerancia: MEDIDOS_EM_MEIO_MM.has(c.par.join('|')) ? 0.05 : Number(process.env.HD_TOLERANCIA ?? 0.5) }, motivo: `apoio: o membro, aparado pelo lado de dentro da chapa a ${FOLGA} mm da pele de dentro, e a cola de estrutura entre os dois fica fora do esboço` }
   : c));
+/* a travessa da cabine acaba em z -1311, o plano do corte do teto com a tampa do porta-malas, e o canto dela toca a parede do corte do teto em 8 pares de triângulos de
+   até 7 mm (as duas peles ficam a 0,47 mm uma da outra, e nenhuma aresta de uma atravessa a outra): a medida de contatos a chama de travessia pelo encontro de superfícies */
+contatos.push({ par: ['teto', 'travessaDaCabine'], relacao: 'atravessa', motivo: 'o fim da travessa, em z -1311, fica no plano do corte do teto com a tampa, e o canto dela toca a parede do corte do teto (as peles ficam a 0,47 mm, sem aresta que atravesse)' });
 
 export { PASSOS };
 export default {
