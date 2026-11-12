@@ -38,6 +38,7 @@ export const LISO_PADRAO = 35;
 export const LARGURA_PADRAO = 900;
 export const MARGEM_PADRAO = 0.08;
 export const SUPERAMOSTRAGEM = 2;
+export const LEGENDA_MAXIMA = 12;
 export const CINZA = '#8c8c8c';
 /* a luz, no espaço da câmera: pesos sobre a direita, o cima e o "para o observador" */
 export const LUZ = Object.freeze({ direita: -0.45, cima: 0.75, frente: 0.5, difusa: 0.68, ambiente: 0.32 });
@@ -315,7 +316,9 @@ export async function executar(argv) {
   writeFileSync(`${saida}.rapida.json`, `${JSON.stringify({ formato: 'modelar.vista-rapida@1', alvo: a.arquivo, origem: montado.origem, vista: a.vista, direcao: a.direcao, recorteMm: a.recorte, atePasso: a.atePasso, largura: r.largura, altura: r.altura, painel: [0, 0, r.largura, r.altura], fundo: FUNDO_DO_PAINEL, mmPorPx: Number(r.mmPorPx.toFixed(4)), quadroMm: r.caixa }, null, 1)}\n`);
   const t2 = performance.now();
   const cores = coresDasPartes(painel.neutro, painel.partes, a.cores);
-  const legenda = Object.entries(cores).map(([n, c]) => `${n} ${c.cor} (${c.origem}${c.cores > 1 ? `, ${c.cores} cores` : ''})`).join(', ');
+  /* uma peça de receita tem uma centena de partes: a legenda mostra as primeiras e conta as outras */
+  const itens = Object.entries(cores).map(([n, c]) => `${n} ${c.cor} (${c.origem}${c.cores > 1 ? `, ${c.cores} cores` : ''})`);
+  const legenda = itens.length > LEGENDA_MAXIMA ? `${itens.slice(0, LEGENDA_MAXIMA).join(', ')}, e mais ${itens.length - LEGENDA_MAXIMA} partes` : itens.join(', ');
   return {
     codigo: 0,
     stdout: `${resumoDaAbertura(montado) ? `${resumoDaAbertura(montado)}\n` : ''}${r.largura} x ${r.altura} px, ${r.mmPorPx.toFixed(2)} mm por px${a.recorte ? ` (recorte ${a.recorte.min.join(', ')} a ${a.recorte.max.join(', ')} mm)` : ''}\ncores: ${legenda}\nmontagem ${((t1 - t0) / 1000).toFixed(1)} s, desenho ${((t2 - t1) / 1000).toFixed(1)} s\n${saida}\n`,
