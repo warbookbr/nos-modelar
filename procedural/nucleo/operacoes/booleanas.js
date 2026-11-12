@@ -957,6 +957,14 @@ export function criarOperacoesBooleanas(servicos) {
     // ---- daqui em diante nada pode falhar: aplica ----
     for (const v of provisorios) addV(st, definitivo.get(v), posNova.get(v));
     const faces = [...mantidas];
+    /* Dois cantos coincidentes de operandos diferentes (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do
+       outro) entraram na Manifold como um só, o representante, e os pedaços cortados saem com ele. A face mantida que ainda aponta o outro id deixava
+       um furo de quatro arestas soltas em volta: ela passa ao representante, sem mudar de número de cantos. O outro id sai com a limpeza abaixo. */
+    for (const fid of mantidas) {
+      const f = st.F.get(fid);
+      const rep = f.vs.map((v) => repDe.get(v) ?? v);
+      if (rep.some((v, k) => v !== f.vs[k]) && new Set(rep).size === f.vs.length) f.vs = rep;
+    }
     /* a quebra de sombra (`face.quebras`, o vinco vivo da subdivisão) é uma aresta da face de entrada. O corte apaga ou
        reparte essa aresta, e o par de ids antigo ficava apontando vértice que não existe mais. Cada pedaço fica com os
        trechos da aresta original que continuam na borda dele, com os vértices dele; as posições das pontas são lidas
