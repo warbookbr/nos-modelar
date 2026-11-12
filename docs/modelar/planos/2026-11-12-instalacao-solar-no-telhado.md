@@ -74,16 +74,20 @@ conferir, e entra na receita marcado assim.
   trilho teria 4,80 m. A montagem mostra as duas e a escolha é da pessoa.
 - Fileira: cerca de 4,33 m de painéis com folgas de 2 cm, e cerca de 4,39 m com a junção de grampos de ponta lado a lado; a
   conferir contra o trilho de 4,55 m.
-- Telhado: telha ondulada de fibrocimento de 6 mm, no padrão da norma (gomo de 177 mm, telha de 1,10 m de largura e 1,05 m
-  útil, comprimentos de 1,22 a 3,66 m, sobreposição de 14 cm, ou 20 cm em pouca inclinação). Pelas fotos e pela medida da
-  pessoa (2026-11-12): a casa maior tem a cumeeira da frente ao fundo, com 11 m (cerca de dez telhas e meia por fileira), e uma
-  água para cada lado, cada uma com duas fileiras de telhas; do lado esquerdo de quem olha a frente, a casa vizinha de telhado
-  metálico ocupa a parte da frente, com uma calha entre as duas, e atrás dela a água esquerda continua, por baixo da beirada,
-  numa extensão menos inclinada, de duas fileiras, que cobre um corredor aberto e um cômodo até a calha da beirada. As fotos
-  mostram uma fileira de parafusos junto da ponta de baixo de cada fileira de telhas, cerca de um a cada quatro gomos, o que dá
-  uma peça de madeira sob cada sobreposição e sob a beirada. Com essas peças a mais de 90 cm uma da outra, os dois trilhos não
-  caem os dois sobre madeira: a montagem mostra isso, e as saídas (madeira a mais, ou outra disposição dos trilhos) são da
-  pessoa. A inclinação entra como 15 graus na casa maior e menos na extensão, a confirmar.
+- Telhado: telha ondulada de fibrocimento de 6 mm, no padrão da norma (gomo de 177 mm, sobreposição de 14 cm, ou 20 cm em pouca inclinação). Medida da
+  pessoa (2026-11-12, de trena, aproximada, igual em todas as fileiras): telha de 2,60 m de comprimento por 1,12 m de largura (os padrões vizinhos são
+  2,44 m e 1,10 m). Pelas fotos e pela medida da pessoa: a casa maior tem a cumeeira da frente ao fundo, com 11 m (real, cerca de dez telhas e meia por
+  fileira), e uma água para cada lado, cada uma com duas fileiras de telhas; a largura da frente é de 8 a 9 m (real, aproximada) e a receita a faz sair das
+  duas fileiras (2 x 2600 - 140 = 5060 mm ao longo da inclinação de 15 graus, menos o beiral de 0,5 m, dá cerca de 8,8 m); do lado esquerdo de quem olha a
+  frente, a casa vizinha de telhado metálico ocupa a parte da frente, com uma calha entre as duas, e atrás dela a água esquerda continua, por baixo da
+  beirada, numa extensão menos inclinada (8 graus, estimada), de duas fileiras, que cobre um corredor aberto e um cômodo até a calha da beirada. Cada fileira
+  tem uma terça na ponta de baixo, uma no meio da telha (a telha de 2,60 m pede apoio no meio, o que bate com a linha de parafusos no meio da telha na foto de
+  cima) e uma na sobreposição ou na cumeeira, com a linha de parafusos sobre cada uma, na 2ª e na 5ª crista de cada telha (um a cada 3 gomos, 531 mm): cinco
+  terças por água, a 1220 e 1240 mm uma da outra. As peças verticais (caibros ou tesouras) não aparecem nas fotos e ficam fora até a pessoa mandar foto de
+  dentro. A linha A de hastes cai sobre a terça da sobreposição e a B (a 900 mm) a 320 mm da terça do meio da fileira de cima, de modo que os dois trilhos
+  não caem os dois sobre madeira: a montagem mostra isso, e as saídas (madeira a mais, trilhos a 1220 ou 1240 mm, uma terça cada, ou outra disposição) são da
+  pessoa. A casa em volumes simples fica em `instalacao-solar/casa`, com a água dos painéis (`aguaDosPaineis`, esquerda por padrão, a confirmar) sem telhas nem
+  terças, porque a peça `telhado` as traz.
 - Perfil (medida real, 2026-11-12): 1350 mm de comprimento, seção de 45 mm de altura por 30 mm de largura, paredes de uns 2 mm. Vista
   de ponta: canal em T aberto em cima com as duas abas finas, uma face lateral inteira estriada em frisos horizontais (a que
   encosta no suporte em L) com um rasgo lateral para a porca do parafuso do L, aba larga embaixo com a borda virada para cima e
@@ -102,7 +106,7 @@ conferir, e entra na receita marcado assim.
   duas asas curtas sobre as molduras e um pescoço curto entre os painéis (cerca de 20 mm), com o parafuso allen pelo centro e uma porca
   deslizante no canal em T. A emenda (6) é uma barra estriada de cerca de 150 mm (a confirmar) que entra no canal em T dos dois perfis,
   com dois parafusos allen por cima, um de cada lado da junta.
-- Pendentes da pessoa: em qual água vão os painéis, a largura da frente da casa maior e da extensão, a altura das paredes, o
+- Pendentes da pessoa: em qual água vão os painéis, a largura da frente da casa maior (8 a 9 m, aproximada) e a da extensão, a altura das paredes, o
   madeiramento visto por dentro (foto ou medida da distância entre as peças), e as medidas finas dos grampos e da emenda.
 
 ## Gate de saída

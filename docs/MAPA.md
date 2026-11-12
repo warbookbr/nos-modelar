@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1964 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1965 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1880,6 +1880,10 @@
 
 - `conferencias.mjs` — instalacao-solar/conferencias — as conferências de medida da obra, sobre a montagem resolvida `montagem.json`.
 - `conferencias.test.mjs` — instalacao-solar/conferencias.test — fixa, com os valores provisórios do telhado e do kit, o que a montagem da instalação solar mede.
+
+## procedural/pecas/instalacao-solar/partes/casa/
+
+- `receita.js` — instalacao-solar/casa — a casa onde vai a instalação solar, em volumes simples: a casa maior, a extensão da esquerda e a casa vizinha de telhado metálico, co…
 
 ## procedural/pecas/instalacao-solar/partes/emenda/
 
