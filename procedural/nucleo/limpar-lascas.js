@@ -344,11 +344,19 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     const pj = pontos(junta);
     for (let i = 0; i < pj.length; i += 1) {
       const e1 = sub(pj[i], pj[(i + pj.length - 1) % pj.length]); const e2 = sub(pj[(i + 1) % pj.length], pj[i]);
-      if (dot(cruz(e1, e2), u) < -1e-9 * norma(e1) * norma(e2)) return no('fusão: a face resultante não é convexa');
+      if (dot(cruz(e1, e2), u) < -1e-9 * norma(e1) * norma(e2)) {
+        /* o canto que só recua do vizinho a menos que a tolerância (os cantos de uma face dobrada sobre si mesma, que o corte deixa
+           alinhados até o ruído) vale como alinhado: a altura dele sobre a reta dos dois vizinhos é o recuo, e a superfície nova é
+           conferida abaixo pelo desvio entre remendos */
+        const corda = norma(sub(pj[(i + 1) % pj.length], pj[(i + pj.length - 1) % pj.length]));
+        const recuo = corda > 0 ? norma(cruz(e1, e2)) / corda : Infinity;
+        if (!(recuo <= tolerancia)) return no('fusão: a face resultante não é convexa');
+      }
     }
     if (!(razaoDeFace(pj) >= limite)) return no('fusão: a face resultante continua lasca');
     for (const v of l) if (!junta.includes(v)) return no('fusão: canto perdido');
-    for (const v of l) { let restam = 0; for (const x of vf.get(v) ?? []) if (x !== fid) restam += 1; if (restam < 3) return no('fusão: deixaria vértice de valência 2'); }
+    /* o canto da lasca que a vizinha não tinha passa a ser dela: ela conta entre as faces que ficam em volta dele */
+    for (const v of l) { const restam = new Set([...(vf.get(v) ?? [])].filter((x) => x !== fid)); restam.add(g); if (restam.size < 3) return no('fusão: deixaria vértice de valência 2'); }
     const desvioDaFusao = desvioEntreRemendos([pontos(l), pg], [pj]);
     if (desvioDaFusao > tolerancia) return no('fusão: a superfície passaria da tolerância');
     for (const v of l) tirarDe(v, fid);

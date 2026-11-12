@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:456cd46e49f06c8bd61c9c607a54cbf49ffb795bc721a5b6034b09a86192cf30",
+  "assinatura": "sha256:c192bd11a16896d7ca4ad18989e8eb3abca86ea39c16594878dbe88a2decb54e",
   "total": 41,
   "operacoes": [
     {
@@ -4437,6 +4437,14 @@
               "type": "string",
               "minLength": 1,
               "description": "'suave' (padrão) ou 'cantos'."
+            },
+            "compartilha": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Nomes de ponto que esta gaiola divide de propósito com a de um passo `subdivisao` anterior. Sem a declaração, o nome que já é vértice de outro passo recusa o passo, porque duas gaiolas com o mesmo nome de ponto leem a mesma posição."
             },
             "simetria": {
               "type": "string",

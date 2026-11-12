@@ -348,9 +348,17 @@ quads com poucos pontos, a forma de modelar uma chapa contínua com dobras vivas
 Os campos são `vertices` (cada um o nome de um ponto de `PARAMS`, uma vez só,
 ou `[x,y,z]` anônimo), `faces` (os nomes de ponto de cada face, anti-horário
 visto de fora), `vincos`, `cantos` (nomes de ponto), `niveis` (0 a 6, padrão 2),
-`borda`, `simetria` e `medidas`. O catálogo e `descrever_capacidade` trazem o
+`borda`, `simetria`, `medidas` e `compartilha`. O catálogo e `descrever_capacidade` trazem o
 contrato completo. Escreva a gaiola por nomes: o índice de vértice na face só
 serve à gaiola anônima, e vinco e canto não aceitam índice.
+
+O nome de ponto vale uma posição só na peça. O ponto que já é vértice de um passo `subdivisao` e volta em outro para
+o segundo passo, com a mensagem nomeando os dois passos e a origem de cada um: duas gaiolas com o mesmo nome de ponto
+em lugares diferentes leem a mesma posição, e a última a gravar o nome leva a outra junto (os dois para-choques do
+sedã, com um espinho até z 99 e nenhuma recusa). Dê prefixos diferentes às gaiolas (`nome` do ajudante), ou declare
+`compartilha: ['ponto']` no segundo passo quando as duas dividem o ponto de propósito. Os pontos que a gaiola por laços
+cria no cruzamento da ponta com as quinas (`canto…` e `…_f…`) levam o `nome` da gaiola, e a lista de raios por ponto de um
+vinco acompanha a linha com esses pontos (o do cruzamento leva o valor interpolado entre os vizinhos).
 
 Sem `medidas`, a superfície aproxima a gaiola e não passa pelos pontos: cada
 medida da `TABELA` aplicada a um vértice sai encolhida, e o canto de borda não
@@ -1026,7 +1034,7 @@ Linha de vão como curva 3D, para a quina arredondada: `linhas[i].curva: [[x, y,
 
 `curvaDaGaiola`, de `procedural/nucleo/curva-da-gaiola.js` (`npm run capacidade -- curvaDaGaiola`), tira a curva da gaiola sem coordenada: `curvaDaGaiola(gaiola, { estacao: 7.4, de: 'soleira', ate: 'teto' })` devolve `{ curva, fechada }` em mm, sobre a malha refinada da `subdivisao` (use os mesmos `niveis` e `borda` da chapa: `{ niveis, borda: 'cantos' }`; `unidade: 'mm'` para a gaiola escrita em mm). A estação se dá por nome, índice fracionário (7,4 é 0,4 do caminho da 7 à 8), `{ em }` ou `{ entre: [a, b], fracao }`; `{ borda: 'janela' }` dá a borda inteira de um vão (a de `bordaDoVao`) nos níveis da malha, fechada na janela e aberta no vão de borda livre, e com `niveis` maior que o da chapa é a curva da borda da superfície limite mais refinada; `{ coluna: 'cintura', de, ate }` anda ao longo de uma coluna (estações com fração nas pontas), `{ coluna: { entre: ['a', 'b'], fracao } }` fica entre duas, e na gaiola por laços `laco` e a coluna `trecho.k` fazem o mesmo, com a volta fechada. As colunas de apoio do raio em mm entram na linha. A curva é a da subdivisão, que aproxima os pontos da gaiola: sem `medidas` a linha de índice 5 não cai em z = 690 se as estações vizinhas não são equidistantes (cerca de 8 mm no sedã), e a posição de projeto se dá por pontos da curva, ou por `medidas` na gaiola. A linha ao longo de uma coluna vai até a estação em que ela termina (`termina: true`) ou se funde na seguinte (`de` com dois nomes): `{ coluna: 'vaoDoCapo', de: 'traseira', ate: 'peDaTampa' }` chega à estação final, e não 33 mm antes; pedir uma estação além dela continua recusado (`existem em 'e5' e não ambas em 'e6'`).
 
-`limpar` (padrão ligado nas linhas por superfície e por curva, desligado no modo vista): o passo `limparLascas` entra depois do `subtrair` e antes dos `parte`, com a tolerância de 0,01 mm (`true`, ou `{ tolerancia }`); `medidas.lascasAntes` e `lascasRestantes` contam as faces finas do corte.
+`limpar` (padrão ligado nas linhas por superfície e por curva, desligado no modo vista): o passo `limparLascas` entra depois do `subtrair` e antes dos `parte`, com a tolerância de 0,01 mm (`true`, ou `{ tolerancia }`); `medidas.lascasAntes` e `lascasRestantes` contam as faces finas do corte. A face de cantos alinhados até o ruído (a face dobrada sobre si mesma, de cinco cantos na mesma reta, que o corte de vão por curva deixa a 2 mm de uma estação) sai por fusão com a vizinha, dentro da tolerância; a que ficar faz o relato de contatos dizer, no par com sólido inconclusivo, a parte e a face (`sólido inconclusivo (parte: parte.F[id]: face degenerada …)`).
 
 Uma ferramenta de corte (ou o interior de uma casca) que serve a mais de uma booleana, que consome o que recebe, constrói-se uma vez e se copia no lugar: `['arranja', { modo: 'linear', total: 5, coincidente: true, origemId: 2, derivaDe: { op: 'cubo', id: 1 }, sel: { origem: { op: 'cubo', id: 1 } }, nomes: ['u1', 'u2', 'u3', 'u4'] }]` deixa quatro cópias exatas do sólido, citáveis por `{ op: 'arranja', id: 2, de: { op: 'cubo', id: 1 }, nome: 'u1' }` mesmo depois de a fonte ser consumida; cada cópia é um uso.
 

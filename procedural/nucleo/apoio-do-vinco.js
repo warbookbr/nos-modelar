@@ -349,7 +349,7 @@ function senoDaAresta(origem, vizinho, tangente) {
 const TOLERANCIA_DE_FUSAO = 1e-5;
 
 /**
- * inserirApoiosNosVincos({ pontos, faces, vincos, unidade?, niveis? }) -> { pontos, faces, raios, avisos, origens, aplicados, linhas }
+ * inserirApoiosNosVincos({ pontos, faces, vincos, unidade?, niveis?, prefixo? }) -> { pontos, faces, raios, avisos, origens, aplicados, linhas }
  *
  * A gaiola tem `pontos` (nome -> [x, y, z], em `unidade` mm por unidade: 1000 se estão em metro), `faces` (listas de nomes, em ordem de
  * volta) e `vincos` `[{ nome, pontos: [nomes em sequência, fechada repetindo o primeiro], raio }]`, com `raio` em mm (número,
@@ -371,8 +371,8 @@ const TOLERANCIA_DE_FUSAO = 1e-5;
  * aresta, à mesma distância (dois raios iguais), são um ponto só. Os vincos não podem dividir uma aresta: o segundo fica sem apoio
  * (`vincoCruzaOutroComRaio`).
  *
- * A saída traz só os pontos novos em `pontos` (`${vinco}_apoio${coluna}_${ponto}_${vizinho}`, e `canto${face}_${vértice}_${i}_${j}`
- * para a grade do canto), a lista nova de faces, o raio esperado por vinco em `raios` (com `gravado`, o raio que o passo guarda: o pedido
+ * A saída traz só os pontos novos em `pontos` (`${vinco}_apoio${coluna}_${ponto}_${vizinho}`, e `${prefixo}canto${face}_${vértice}_${i}_${j}`
+ * para a grade do canto e `${prefixo}${vinco}_f${face}_${aresta}_${coluna}_${i}` para a ponte da ponta, com o `prefixo` que a gaiola passa: sem ele, duas gaiolas no mesmo esboço dão o mesmo nome aos pontos do canto), a lista nova de faces, o raio esperado por vinco em `raios` (com `gravado`, o raio que o passo guarda: o pedido
  * onde o apoio coube, o realizado onde não) e os `avisos`, cada um com `nome`: `raioNaoCabe`, `vincosDisputamApoio`,
  * `anguloForaDaCalibragem`, `filetePoucoSegmentado`, `niveisAbaixoDoRecomendado`, `apoioMaiorQueMetadeDaFace`, `vincoSemDuasFaces`,
  * `apoioAmbiguo`, `vincoCruzaOutroComRaio`, `vincoSemDobra`.
@@ -380,7 +380,7 @@ const TOLERANCIA_DE_FUSAO = 1e-5;
  * ponto novo, e a linha da quina passa por ele): a linha que o passo guarda é essa, para ser sequência de arestas da gaiola nova.
  * O vinco que não dá para apoiar fica sem apoio e sai em `avisos`; os demais seguem. O vinco aplicado leva nitidez 0 (ver `apoioDoVinco`).
  */
-export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niveis }) {
+export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niveis, prefixo = '' }) {
   const avisos = []; const aplicados = []; const donoDaAresta = new Map();
   const arestaFaces = new Map();
   faces.forEach((f, fi) => f.forEach((a, k) => { const c = chaveDaAresta(a, f[(k + 1) % f.length]); (arestaFaces.get(c) ?? arestaFaces.set(c, []).get(c)).push({ fi, k }); }));
@@ -543,7 +543,7 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
         for (let i = 1; i <= colP.length; i++) {
           const linhaI = [colP[i - 1]];
           for (let j = 1; j <= colN.length; j++) {
-            const nome = `canto${fi}_${k}_${i}_${j}`; const A = posicao(colP[i - 1]), B = posicao(colN[j - 1]), Q = posicao(a);
+            const nome = `${prefixo}canto${fi}_${k}_${i}_${j}`; const A = posicao(colP[i - 1]), B = posicao(colN[j - 1]), Q = posicao(a);
             novos[nome] = [A[0] + B[0] - Q[0], A[1] + B[1] - Q[1], A[2] + B[2] - Q[2]];
             origens[nome] = { tipo: 'canto', face: fi, ponto: a, vincos: [Lp, Ln] };
             linhaI.push(nome);
@@ -586,7 +586,7 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
         const cima = baixo.map((c, i) => {
           if (i === 0) return cu;
           if (i === baixo.length - 1) return cv;
-          const nome = `${L}_f${fi}_${k}_${j}_${i}`;
+          const nome = `${prefixo}${L}_f${fi}_${k}_${j}_${i}`;
           novos[nome] = [0, 1, 2].map((d) => Pu[d] + frac[i] * (Pv[d] - Pu[d]));
           origens[nome] = { tipo: 'ponte', face: fi, vinco: L, coluna: j, aresta: [u, v] };
           return nome;
@@ -626,6 +626,26 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
     const seq = [L.nomes[0]];
     for (const [u, w] of L.arestas) seq.push(...cadeia(u, w).slice(1));
     linhas[L.vinco] = seq;
+  }
+  /* O RAIO POR PONTO ACOMPANHA A LINHA. O raio guardado como lista tem um número por ponto da linha, e a linha de saída ganhou os pontos que o
+     outro vinco pôs nela (o cruzamento da ponta com as quinas): a lista fica com o do ponto de antes quando os dois vizinhos dela têm o mesmo
+     número, e com a interpolação pela distância ao longo da linha quando têm números diferentes, para o passo `subdivisao` ler um número por ponto. */
+  for (const r of raios) {
+    if (!Array.isArray(r.gravado)) continue;
+    const L = lidos.find((x) => x.vinco === r.vinco); const seq = linhas[r.vinco];
+    const lista = r.gravado; const indice = new Map(L.nomes.map((n, k) => [n, k]));
+    const fim = L.fechada ? seq.length - 1 : seq.length;
+    const saida = [];
+    for (let q = 0; q < fim; q++) {
+      if (indice.has(seq[q])) { saida.push(lista[indice.get(seq[q])]); continue; }
+      let a = q - 1; while (a >= 0 && !indice.has(seq[a])) a--;
+      let b = q + 1; while (b < seq.length && !indice.has(seq[b])) b++;
+      const va = lista[indice.get(seq[a])]; const vb = lista[indice.get(seq[b])];
+      let t = 0; let total = 0;
+      for (let k = a; k < b; k++) { const d = dist3(posicao(seq[k]), posicao(seq[k + 1])); total += d; if (k < q) t += d; }
+      saida.push(va === vb ? va : Math.round((va + (vb - va) * (total > 0 ? t / total : 0)) * 1e6) / 1e6);
+    }
+    r.gravado = saida;
   }
   return { pontos: novos, faces: saida, raios, avisos, origens, aplicados, linhas };
 }

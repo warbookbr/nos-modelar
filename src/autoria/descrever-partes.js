@@ -535,7 +535,8 @@ function solidosSobDemanda(neutro, memoria = null) {
     facesPorParte.get(face.parte).push(face);
   }
   const prontos = new Map();
-  return (nome) => {
+  const motivos = new Map();
+  const solidoDe = (nome) => {
     if (!prontos.has(nome)) {
       let solido = null;
       try {
@@ -546,11 +547,17 @@ function solidosSobDemanda(neutro, memoria = null) {
           for (const id of face.vs ?? []) if (!V.has(id)) V.set(id, neutro.V.get(id));
         }
         solido = solidoEmMemoria(memoria, neutro, nome, () => prepararSolido({ V, F }, undefined, nome));
-      } catch { solido = null; }
+      } catch (erro) { solido = null; motivos.set(nome, erro.message); }
       prontos.set(nome, solido);
     }
     return prontos.get(nome);
   };
+  /* o motivo de a parte não ter virado sólido, para o relato dizer qual face e por que em vez de só "inconclusivo" */
+  solidoDe.motivo = (nome) => {
+    const s = solidoDe(nome);
+    return s?.inconclusivo ? `${nome}: ${s.inconclusivo}` : motivos.get(nome) ? `${nome}: ${motivos.get(nome)}` : null;
+  };
+  return solidoDe;
 }
 
 /* A relação da caixa, corrigida pelo sólido quando a caixa diz `interpenetra`. */
@@ -566,6 +573,11 @@ function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia, memoria = nul
   }
   if (estado === 'encostam') return { ...relacao, tipo: 'encosta', distancia: 0, caixa, solido: estado };
   if (estado === 'separadas') return { ...relacao, tipo: 'folga', distancia: null, porEixo, caixa, solido: estado };
+  /* o par que a medida não decide diz por quê: a parte e o motivo (a face degenerada, a malha aberta) de cada sólido inconclusivo */
+  if (estado === 'inconclusivo') {
+    const motivos = [solidoDe.motivo?.(relacao.a), solidoDe.motivo?.(relacao.b)].filter(Boolean);
+    return { ...relacao, caixa, solido: estado, ...(motivos.length ? { motivoDoSolido: motivos } : {}) };
+  }
   return { ...relacao, caixa, solido: estado };
 }
 

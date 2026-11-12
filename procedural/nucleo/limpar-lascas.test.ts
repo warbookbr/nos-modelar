@@ -367,3 +367,35 @@ describe('limparLascas no estado: pesos, fusões e consumo', () => {
     expect(rodar([S, L, ['liso', { sel: { origem: { op: 'subdivisao', id: 1 } } }]]).orfaos).toEqual([]);
   });
 });
+
+/* A face dobrada sobre si mesma. O corte de vão por curva que passa a 2 mm de uma estação deixa, na parede do vão, uma face de cinco cantos
+   na mesma reta até o ruído (a lateral traseira do sedã, no fim da porta, na quina da cintura): área de 1e-4 mm² e razão de 7e-5. A vizinha
+   que a absorve ganha os cantos e fica com eles a décimos de micrômetro fora da reta, e a limpeza recusava a fusão por "não é convexa" e por
+   "valência 2" (o canto que passa à vizinha era contado sem ela). Os pontos e as seis faces são os do carro, em mm, com a tolerância de
+   0,01 mm que o corte usa. */
+describe('limparLascas: a face de cantos alinhados até o ruído', () => {
+  const P: V3[] = [[-857.859375, 997.826263, -762.03129], [-858.582467, 996.67288, -765.19033], [-857.859375, 997.826263, -765.19033], [-858.582075, 996.674374, -762.03129], [-858.805335, 995.822842, -762.03129], [-859.028578, 994.971375, -765.19033], [-857.377851, 998.117947, -762.03129], [-856.695029, 998.531568, -765.19033], [-856.695029, 998.531568, -762.03129], [-859.510979, 997.074456, -762.03129], [-859.763485, 996.111376, -762.03129], [-859.046316, 997.815625, -762.03129], [-858.158689, 997.348836, -762.03129], [-858.813819, 998.186476, -762.03129], [-857.946412, 997.687433, -762.03129], [-857.911492, 997.743132, -762.03129], [-858.638279, 998.466474, -762.03129], [-857.83106, 999.012575, -762.03129], [-858.580535, 998.558579, -762.03129]];
+  /* a face 9 é a dobrada: [3, 0, 15, 14, 12] */
+  const FACES = [[0, 1, 2], [3, 4, 5, 1], [6, 0, 2, 7, 8], [9, 10, 4, 3], [11, 9, 3, 12], [13, 11, 12, 14], [15, 16, 13, 14], [6, 17, 18, 16, 0], [15, 0, 16], [3, 0, 15, 14, 12], [0, 3, 1]];
+  const malha = (): Malha => ({
+    V: new Map(P.map((p, k) => [k, p] as [number, V3])),
+    F: new Map(FACES.map((vs, k) => [k, { vs, parte: 'chapa' }] as [number, { vs: number[]; parte: string }])),
+  });
+
+  it('a face de área quase nula some, absorvida pela vizinha, e a superfície sai do lugar menos que a tolerância', () => {
+    const m = malha();
+    expect(razaoDeFace(m.F.get(9)!.vs.map((v) => m.V.get(v)))).toBeLessThan(1e-3);
+    const r = limparLascas(m, { selecao: null, tolerancia: 0.01 });
+    expect(r.relatorio.finasAntes).toBe(1);
+    expect(r.relatorio.finasDepois).toBe(0);
+    expect(r.facesRemovidas.has(9)).toBe(true);
+    expect(r.relatorio.desvioMaximo).toBeLessThan(0.01);
+    for (const [, vs] of r.faces) expect(razaoDeFace((vs as number[]).map((v) => m.V.get(v)))).toBeGreaterThanOrEqual(0.003);
+  });
+
+  it('sem a tolerância que cobre o ruído ela fica, com o motivo', () => {
+    const r = limparLascas(malha(), { selecao: null, tolerancia: 1e-9 });
+    expect(r.relatorio.finasDepois).toBe(1);
+    expect(r.relatorio.restantes[0].recusas.length).toBeGreaterThan(0);
+  });
+});

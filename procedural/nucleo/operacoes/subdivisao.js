@@ -321,6 +321,22 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     const resolvida = gaiolaDoPasso(a, st);
     if (resolvida.erro) return grita(st, i, 'subdivisao', ...resolvida.erro);
     let { gaiola } = resolvida; const { declarados } = resolvida;
+    /* O PONTO QUE DOIS PASSOS GRAVAM. O nome de ponto vale um valor só no dicionário da peça: duas gaiolas que dão o mesmo nome a pontos de
+       lugares diferentes (dois ajudantes com o mesmo nome, ou o nome de um vinco) leem a mesma posição, e a última a gravar leva a outra junto
+       (os para-choques do sedã ganharam um espinho até z 99 sem recusa nenhuma). O ponto que já é vértice de um passo `subdivisao` anterior e
+       volta em outro sem `compartilha` para.  */
+    if (a.compartilha != null && !(Array.isArray(a.compartilha) && a.compartilha.every((n) => typeof n === 'string'))) return grita(st, i, 'subdivisao', 'compartilha', 'compartilha precisa ser lista de nomes de ponto que este passo divide de propósito com um passo anterior');
+    const compartilha = new Set(a.compartilha ?? []);
+    for (const nome of compartilha) if (!declarados.includes(nome)) return grita(st, i, 'subdivisao', 'compartilha', `compartilha cita o ponto ${citar(nome)}, que não é vértice deste passo`);
+    if (!st.pontosDaGaiola) st.pontosDaGaiola = new Map();
+    for (const nome of declarados) {
+      if (typeof nome !== 'string') continue;
+      const antes = st.pontosDaGaiola.get(nome);
+      if (antes && !compartilha.has(nome)) {
+        return grita(st, i, 'subdivisao', 'vertices', `o ponto ${citar(nome)} já é vértice do passo ${antes.passo} (subdivisao, origem ${antes.origemId ?? 'sem origemId'}) e volta no passo ${i} (origem ${a.origemId ?? 'sem origemId'}): os dois passos leem a mesma posição do ponto, e se as gaiolas são de lugares diferentes a última a gravar o nome leva a outra junto; dê nomes ou prefixos diferentes às duas, ou declare compartilha: [${citar(nome)}] no passo ${i} se a gaiola divide o ponto de propósito`);
+      }
+      if (!antes) st.pontosDaGaiola.set(nome, { passo: i, origemId: a.origemId ?? null });
+    }
     let espessura = null;
     if (a.espessura != null) {
       espessura = st.num(a.espessura);

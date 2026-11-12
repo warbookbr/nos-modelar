@@ -89,7 +89,11 @@ function triangulacaoDaFace(pontos, caminho, piso2 = EPS) {
   const eixo = normal.reduce((melhor, valor, indice) => (
     Math.abs(normal[indice]) > Math.abs(normal[melhor]) ? indice : melhor
   ), 0);
-  if (comprimento2(normal) <= piso2) throw new Error(`${caminho}: face degenerada não permite triangulação.`);
+  if (comprimento2(normal) <= piso2) {
+    /* o relato de contatos repete esta mensagem como motivo do sólido inconclusivo: a face, os cantos e a área dizem onde olhar */
+    const ponto = pontos[0].map((x) => Number(x.toPrecision(7)));
+    throw new Error(`${caminho}: face degenerada não permite triangulação (${pontos.length} cantos, área ${Number((Math.sqrt(comprimento2(normal)) / 2).toPrecision(3))} na unidade da peça, primeiro canto em ${JSON.stringify(ponto)}).`);
+  }
   const eixos = [[1, 2], [0, 2], [0, 1]][eixo];
   const plano = pontos.flatMap((ponto) => [ponto[eixos[0]], ponto[eixos[1]]]);
   /* Earcut já é dependência direta e neutra do projeto; esta é a mesma porta
@@ -156,6 +160,7 @@ export function prepararSolido(neutro, pose, rotulo) {
   const vizinhancaDosVertices = new Map();
   const verticesUsados = new Set();
   let invalida = null;
+  const donoDoTriangulo = new Map();
   const faces = [...neutro.F.values()].sort((a, b) => compararTexto(String(a.id), String(b.id)));
   for (const face of faces) {
     if (!Array.isArray(face.vs) || face.vs.length < 3) { invalida = 'face-sem-tres-vertices'; break; }
@@ -173,7 +178,7 @@ export function prepararSolido(neutro, pose, rotulo) {
       vizinhos.get(anterior).add(b);
       vizinhos.get(b).add(anterior);
     }
-    try { triangulos.push(...triangulacaoDaFace(pontos, `${nome}.F[${face.id}]`, piso2)); }
+    try { const novos = triangulacaoDaFace(pontos, `${nome}.F[${face.id}]`, piso2); for (const t of novos) donoDoTriangulo.set(t, { id: face.id, cantos: pontos.length }); triangulos.push(...novos); }
     catch (erro) { invalida = erro.message; break; }
   }
   if (invalida || triangulos.length === 0) return { rotulo, inconclusivo: invalida ?? 'malha-vazia' };
@@ -197,7 +202,12 @@ export function prepararSolido(neutro, pose, rotulo) {
     triangulos,
     caixa: caixaDosPontos([...vertices.values()]),
     fechada,
-    ...(degenerada ? { inconclusivo: 'triangulo-degenerado' } : {}),
+    ...(degenerada ? { inconclusivo: `triangulo-degenerado: ${(() => {
+      /* a face que deixou o triângulo sem área, para o relato dizer onde olhar */
+      const t = triangulos.find(([a, b, c]) => comprimento2(cross(sub(b, a), sub(c, a))) <= piso2);
+      const dono = donoDoTriangulo.get(t);
+      return dono ? `a face ${nome}.F[${dono.id}] tem ${dono.cantos} cantos e um triângulo de área nula (cantos alinhados ou repetidos)` : 'um triângulo de área nula';
+    })()}` } : {}),
     ...(fechada ? {} : { diagnosticoTopologia: 'malha-aberta-ou-nao-manifold' }),
   };
 }

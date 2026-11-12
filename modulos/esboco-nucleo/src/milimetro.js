@@ -19,7 +19,7 @@ const mm = (x) => x / MM;
 const NAO_MEDIDA = new Set(['angulo', 'lados', 'segmentos', 'segmentosArco', 'segmentosSpline', 'segmentosCurva', 'segmentosPorCanto', 'limite', 'peso', 'tangente']);
 /* campos que não são medida em operação nenhuma */
 const SEMPRE_LIVRES = new Set(['origemId', 'id', 'faces', 'nome', 'pai', 'substituir', 'eixo', 'graus', 'volta', 'total', 'modo', 'nomes', 'derivaDe',
-  'solidos', 'usa', 'cor', 'vista', 'lente', 'niveis', 'borda', 'simetria', 'pesoPadrao', 'lado', 'liso', 'quebraNosVincos', 'lados', 'segmentos',
+  'solidos', 'usa', 'cor', 'vista', 'lente', 'niveis', 'borda', 'simetria', 'pesoPadrao', 'lado', 'liso', 'quebraNosVincos', 'compartilha', 'lados', 'segmentos',
   'segmentosArco', 'segmentosSpline', 'segmentosCurva', 'aneis', 'seg', 'orientacao', 'direcao', 'de', 'saida', 'aresta', 'chapa', 'superficie',
   'tampa', 'linha', 'ponta', 'paineis', 'cadeia', 'vincos', 'cantos', 'medidas', 'v', 'f', 'face', 'a', 'b', 'para', 'interface', 'rotulo', 'angulo',
   'divisoes', 'estacoes', 'expoenteSecao', 'limite', 'refinar']);

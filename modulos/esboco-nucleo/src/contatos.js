@@ -45,6 +45,7 @@ export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolera
       a: r.a, b: r.b, tipo, eixo: r.eixo,
       mm: r.distancia === null || r.distancia === undefined ? null : r.distancia * MM,
       solido: r.solido ?? null,
+      ...(r.motivoDoSolido ? { motivoDoSolido: r.motivoDoSolido } : {}),
       esperado: e?.rel ?? null,
       confere: e ? e.rel === tipo : null,
       motivo: e?.motivo ?? null,
@@ -77,7 +78,7 @@ export function textoDoRelato(r, { recuo = '    ' } = {}) {
   for (const p of r.encostam) linhas.push(`encosta    ${p.a} e ${p.b}${marca(p)}`);
   for (const p of r.atravessam) {
     const quanto = p.mm === null ? 'sem profundidade medida' : `${fmt(p.mm)} mm pelo eixo ${p.eixo}`;
-    const solido = p.solido && p.solido !== 'interpenetram' ? `, sólido ${p.solido}` : '';
+    const solido = p.solido && p.solido !== 'interpenetram' ? `, sólido ${p.solido}${p.motivoDoSolido ? ` (${p.motivoDoSolido.join('; ')})` : ''}` : '';
     linhas.push(`atravessa  ${p.a} e ${p.b}: ${quanto}${solido}${p.esperado === 'atravessa' ? ` (declarada${porque(p)})` : ' (NÃO DECLARADA)'}`);
   }
   for (const p of r.folgas) linhas.push(`folga      ${p.a} e ${p.b}: ${p.mm === null ? 'as caixas se sobrepõem e os sólidos não se tocam' : `${fmt(p.mm)} mm pelo eixo ${p.eixo}`}${marca(p)}`);

@@ -792,6 +792,30 @@ describe('(i) gaiolaPorLacos: o vinco do laço da ponta cruza as quinas dos trec
     expect(e.passo.grupos[0].pontos.some((n: string) => n.endsWith('_dentro'))).toBe(true);
     expect(JSON.stringify(barra([...quinas, ...pontas]))).toBe(JSON.stringify(barra([...quinas, ...pontas])));
   });
+  it('os pontos que o cruzamento da ponta põe nas quinas levam o nome da gaiola, e duas gaiolas no mesmo esboço não dão o mesmo nome a nenhum ponto (ciclo 5 do sedã, atrito 2)', () => {
+    const cantos = nomes.filter((n) => /canto\d/.test(n));
+    expect(cantos.length).toBeGreaterThan(0);
+    for (const n of cantos) expect(n.startsWith('barra_'), n).toBe(true);
+    const outra = barra([...quinas, ...pontas], { nome: 'outra' });
+    const repetidos = outra.passo.vertices.filter((n: string) => g.passo.vertices.includes(n));
+    /* os apoios levam o nome do ponto de onde saem, que já tem o da gaiola */
+    expect(repetidos).toEqual([]);
+  });
+  it('o raio que o `raioNaoCabe` reduz, em lista por ponto, acompanha os pontos que o cruzamento da ponta pôs na linha da quina (atrito 1)', () => {
+    /* a quina de cima pede de 8 a 30 mm ao longo da barra: onde o apoio não cabe, o passo guarda o realizado ponto a ponto, e a linha tem
+       os dois pontos do cruzamento com a ponta além dos sete laços */
+    const gr = barra([{ nome: 'q1', entre: ['frente', 'cima'], raio: { de: 8, ate: 30 } }, ...quinas.slice(1), ...pontas]);
+    const q1 = gr.passo.vincos.find((v: any) => v.nome === 'q1');
+    expect(gr.avisos.map((a: any) => a.ref)).toContain('raioNaoCabe');
+    expect(Array.isArray(q1.raio)).toBe(true);
+    expect(q1.raio).toHaveLength(q1.pontos.length);
+    expect(q1.pontos.length).toBe(XS.length + 2);
+    /* o ponto do cruzamento fica entre o do laço e o do apoio: o valor dele está entre os dos vizinhos */
+    for (let k = 1; k + 1 < q1.raio.length; k++) expect(q1.raio[k]).toBeGreaterThanOrEqual(Math.min(q1.raio[k - 1], q1.raio[k + 1]) - 1e-9);
+    /* e o passo `subdivisao` aceita a lista, sem recusa de vinco */
+    const st = nucleo([['subdivisao', { origemId: 1, ...gr.passo, niveis: 2 }]], {}, gr.pontos);
+    expect(st.orfaos).toEqual([]);
+  });
   it('a tampa fina demais para o apoio dá raioNaoCabe com o raio que cabe, e o vinco da ponta sem raio continua o de hoje', () => {
     const fina = gaiolaPorLacos({ nome: 'f', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' }, trechos: [{ nome: 'baixo', pontos: 3 }, { nome: 'frente', pontos: 4 }, { nome: 'cima', pontos: 3 }, { nome: 'tras', pontos: 4 }],
       lacos: [0, 160, 320].map((em) => ({ em, trechos: { baixo: [[0, 0], [0, 5], [0, 10]], frente: [[0, 10], [110, 10], [220, 10], [330, 10]], cima: [[330, 10], [330, 5], [330, 0]], tras: [[330, 0], [220, 0], [110, 0], [0, 0]] } })),
