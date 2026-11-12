@@ -89,7 +89,7 @@ export const TABELA = {
   /* chassi */
   assoalho: { esp: 2, meia: 802, meiaTras: 638.5, perfil: [[700, 640], [600, 400], [-740, 400], [-775, 490], [-2000, 490]], zDegrau: -770 },
   tunel: [[-120, 400], [120, 400], [75, 520], [-75, 520]],
-  longarina: { x0: 380, x1: 460, altura: 100, eixo: [[2121, 438], [780, 438], [650, 348], [-720, 348], [-850, 438], [-2086, 438]] },
+  longarina: { x0: 380, x1: 460, altura: 100, eixo: [[2121, 438], [780, 438], [650, 348], [null, 348], [null, 438], [-2086, 438]] /* z nulo: a rampa de trás, derivada do degrau do assoalho em `chassi()` */ },
   caixaDeRoda: { esp: 3, xParede: 637, solda: 0.5 },
   eixoRaio: 30,
   eixoMeia: 870,
@@ -481,14 +481,18 @@ function chassi() {
   const iDegrau = A.perfil.findIndex(([z]) => z < A.zDegrau);
   const daCabine = [...A.perfil.slice(0, iDegrau + 1)];
   const deTras = [[A.zDegrau, A.perfil[iDegrau][1]], ...A.perfil.slice(iDegrau + 1)];
-  /* as estações caem fora do x de 380 a 460 das longarinas (cinco na cabine, em x ±481,6 e ±160,8, e três atrás, em ±212,8): o degrau do assoalho (z -740 a -775, de y 400 a 490) corta a rampa
-     da longarina (z -720 a -850, de y 398 a 488; a ponta do degrau entra até 21 mm nela), e a medida de contatos só vê a entrada pelos vértices; uma estação em x ±401 a mostrava e dava
-     `atravessa` onde o par se declara `encosta`. O defeito é do rascunho (ATRITOS), e não da estação */
-  parte('assoalho', bool('unir', [placaPorEstacoes(faixa(repartir(daCabine, 350), A.esp), -A.meia, A.meia, 5), placaPorEstacoes(faixa(repartir(deTras, 350), A.esp), -A.meiaTras, A.meiaTras, 3)]), CLARO);
+  /* quatro estações em cada chapa, como antes da rodada 2. A rampa de trás da longarina segue o degrau do assoalho (abaixo), e a chapa assenta nela em qualquer x: a rodada 2 pusera as
+     estações fora de x 380 a 460 porque o degrau (z -740 a -775, de y 400 a 490) cortava a rampa antiga da longarina (z -720 a -850), e a ponta dele entrava até 21 mm nela. */
+  parte('assoalho', bool('unir', [placaPorEstacoes(faixa(repartir(daCabine, 350), A.esp), -A.meia, A.meia, 4), placaPorEstacoes(faixa(repartir(deTras, 350), A.esp), -A.meiaTras, A.meiaTras, 4)]), CLARO);
   parte('tunel', prisma('z', T.tunel, -740, 620), CINZA);
 
-  /* longarinas: dois perfis fechados de 80 por 100, com o rebaixo sob a cabine, da face de dentro do painel dianteiro à do traseiro */
-  const perfilDaLongarina = faixa(L.eixo, L.altura, true);
+  /* longarinas: dois perfis fechados de 80 por 100, com o rebaixo sob a cabine, da face de dentro do painel dianteiro à do traseiro. A rampa de trás (as duas pontas de eixo sem z na tabela)
+     é derivada do degrau do assoalho: a face de cima da longarina em z do degrau é a de baixo da chapa, com a mesma inclinação e o mesmo comprimento. O eixo recua do canto do degrau pela folga
+     da quina em esquadria, (espessura da chapa + meia altura da longarina) vezes a tangente da metade do ângulo de dobra. */
+  const [zI, yI] = A.perfil[2]; const [zF, yF] = A.perfil[3];
+  const tg = Math.tan(Math.atan2(yF - yI, zI - zF) / 2); const zRampa = r3(zI - (A.esp + L.altura / 2) * tg);
+  const eixoDaLongarina = L.eixo.map(([z, y], k) => (z === null ? [k === 3 ? zRampa : r3(zRampa - (zI - zF)), y] : [z, y]));
+  const perfilDaLongarina = faixa(eixoDaLongarina, L.altura, true);
   parte('longarinaDir', prisma('x', perfilDaLongarina, L.x0, L.x1), AZUL);
   parte('longarinaEsq', prisma('x', perfilDaLongarina, -L.x1, -L.x0), AZUL);
   parte('travessaDianteira', caixa(-L.x1 - 2, L.x1 + 2, 388, 488, 1900, 1960), AZUL);
@@ -513,10 +517,11 @@ function chassi() {
     parte(`montanteB${lado}`, aparar(caixa(...x(700, 1000), 460, 1530, -75, -15)), OCRE);
     /* o montante C encosta na lateral traseira acima de y 895, onde ela é o plano x 860, e fica 4 mm por dentro da porta traseira, num
        batente que passa da linha de vão: o encosto do montante na porta saía como encosta de um lado do carro e como travessia do
-       outro (ATRITOS, segunda etapa). O pé estreito desce à frente do pneu até a soleira do chassi */
+       outro (ATRITOS, segunda etapa). O montante acaba em y 560, onde a lateral traseira vira o arco da roda: o pé estreito de 14 mm que descia à frente do pneu até a soleira do chassi saiu na rodada 3,
+       porque a lataria o mostrava como uma tira solta abaixo do corpo do montante */
     const zB = T.zLateral - 3;
     parte(`montanteC${lado}`, bool('unir', [
-      aparar(bool('unir', [caixa(...x(700, 1000), 895, 1530, -835, zB + 0.5), caixa(...x(700, 856), 560, 897, -835, T.zLateral + 6), caixa(...x(804, 856), 460, 562, T.zLateral - 8, T.zLateral + 6)])),
+      aparar(bool('unir', [caixa(...x(700, 1000), 895, 1530, -835, zB + 0.5), caixa(...x(700, 856), 560, 897, -835, T.zLateral + 6)])),
       aparar(caixa(...x(700, 1000), 895, 1530, zB, T.zLateral + 6), T.chapa + 4),
     ]), OCRE);
     /* o reforço da cintura corre por dentro do pé da coluna C, do montante C à travessa de trás da cabine */
@@ -644,7 +649,7 @@ for (const L of ['Dir', 'Esq']) {
     par(`longarina${L}`, 'suporteDoRadiador', 'atravessa', SOLDA),
     par(`longarina${L}`, `suporteDoParaChoqueDianteiro${L}`, 'atravessa', 'o suporte sai de dentro da longarina'),
     par(`longarina${L}`, `suporteDoParaChoqueTraseiro${L}`, 'atravessa', 'o suporte sai de dentro da longarina'),
-    par(`montanteA${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA), par(`montanteB${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA), par(`montanteC${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA),
+    par(`montanteA${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA), par(`montanteB${L}`, `soleiraDoChassi${L}`, 'atravessa', SOLDA),
     par('paraChoqueDianteiro', `suporteDoParaChoqueDianteiro${L}`, 'atravessa', 'o suporte entra 2 mm no para-choque'),
     par('paraChoqueTraseiro', `suporteDoParaChoqueTraseiro${L}`, 'atravessa', 'o suporte entra 2 mm no para-choque'),
     par(`portaDianteira${L}`, `retrovisor${L}`, 'atravessa', 'o pé do retrovisor entra na chapa da porta'),
@@ -668,7 +673,6 @@ for (const L of ['Dir', 'Esq']) {
     folga(`farol${L}`, 'paraChoqueDianteiro', 12, 0.2, 'o para-choque passa 12 mm abaixo do farol'),
     folga(`paraLama${L}`, 'travessaDoPainel', 6.1, 0.15, 'a travessa do painel fica 6 mm atrás da borda do para-lama, sob o pé da coluna A'),
     folga('anteparoTraseiro', `longarina${L}`, 2, 0.1, 'a chapa do assoalho, de 2 mm, fica entre o anteparo e a longarina'),
-    folga('assoalho', `montanteC${L}`, 2, 0.1, 'o pé do montante C fica 2 mm ao lado da beira do assoalho'),
     folga(`longarina${L}`, 'paraChoqueDianteiro', 5.05, 0.15, 'o para-choque fica 4 mm à frente do painel, de 1 mm, que assenta na ponta da longarina'),
     folga(`longarina${L}`, 'paraChoqueTraseiro', 5.05, 0.15, 'o para-choque fica 4 mm atrás do painel, de 1 mm, que assenta na ponta da longarina'),
     folga(`lateralTraseira${L}`, `soleiraDoChassi${L}`, 4.4, 0.15, 'a soleira do chassi acaba 4,4 mm à frente da borda da lateral traseira'),
