@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`
+**Território:** `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`
 
 **Responsável:** a IA da sessão do furgão, com as decisões técnicas delegadas pela pessoa em 2026-11-09 ("é basicamente uma
 frente autônoma sua"); a pessoa é a crítica por imagem: recebe, com um resumo curto do que olhar, as peças do acervo que mudarem, e a forma de
