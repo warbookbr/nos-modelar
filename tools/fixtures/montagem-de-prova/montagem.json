@@ -1,0 +1,10 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 1,
+  "id": "montagem-de-prova",
+  "instancias": [
+    { "id": "esquerda", "alvo": { "tipo": "peca", "ref": "peca-de-prova" } },
+    { "id": "direita", "alvo": { "tipo": "peca", "ref": "peca-de-prova" }, "pose": { "rotacao": [[0, 0, 1], [0, 1, 0], [-1, 0, 0]], "deslocamento": [2, 0.5, -1] } },
+    { "id": "materiais", "alvo": { "tipo": "peca", "ref": "materiais-de-prova" }, "pose": { "deslocamento": [0, 1, 0] } }
+  ]
+}

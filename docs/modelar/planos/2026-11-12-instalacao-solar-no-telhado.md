@@ -37,8 +37,8 @@ o caso achar faltando no núcleo vai ao backlog, salvo se bloquear o resultado.
   sobreposição das fileiras;
 - as peças do kit: haste rosca dupla de 250 mm com vedação, suporte em L, perfil de alumínio de 1,35 m, emenda, grampo
   intermediário e grampo de ponta de 30 a 35 mm e de 40 mm, com medidas típicas marcadas como a confirmar até a pessoa medir;
-- os quatro painéis em pé, lado a lado: três de 1812 × 1046 × 40 mm e um de 1722 × 1134 × 30 mm numa posição do meio, preso dos
-  dois lados por grampos de ponta, e os vizinhos dele por grampos de ponta de 40 mm;
+- os quatro painéis em pé, lado a lado: três de 1812 × 1046 × 40 mm e um de 1722 × 1134 × 30 mm numa das pontas, preso dos dois
+  lados por grampos de ponta, e o vizinho dele por grampos de ponta de 40 mm;
 - a montagem com as etapas na ordem da obra e as conferências: trilho sobre viga, haste dentro do trilho e na crista da onda,
   espaçamento das hastes, comprimento de trilho, folga entre painéis e posição dos trilhos em cada painel.
 
@@ -54,12 +54,14 @@ Do documento da pessoa (2026-11-11), sem marca nem modelo; o que está "a confir
 conferir, e entra na receita marcado assim.
 
 - Painéis: quatro, em pé, lado a lado numa fileira só, sobre duas linhas de trilho horizontais. Três de 1812 × 1046 mm com
-  moldura de 40 mm; um de 1722 × 1134 mm com moldura de 30 mm, numa das posições do meio, com um de 40 mm em cada ponta da fileira:
-  `[40] [40] [30] [40]`.
-- Grampos: entre os dois painéis de 40 mm vizinhos, um grampo intermediário em cada trilho; dos dois lados do painel de 30 mm,
-  grampos de ponta de 30 a 35 mm nele (os 4 do kit) e grampos de ponta de 40 mm nos vizinhos de 40 mm (4 dos 8 comprados); nas
-  duas pontas da fileira, grampos de ponta de 40 mm (os outros 4). Folga de cerca de 2 cm onde fica o grampo intermediário; onde
-  dois grampos de ponta ficam lado a lado, a folga é a dos dois, a medir na peça.
+  moldura de 40 mm; um de 1722 × 1134 mm com moldura de 30 mm numa das pontas da fileira, por decisão da pessoa em 2026-11-12
+  (com ele no meio seriam duas junções de grampos de ponta lado a lado, e a diferença de formato quebraria a fileira):
+  `[30] [40] [40] [40]`.
+- Grampos: o painel de 30 mm leva grampos de ponta de 30 a 35 mm dos dois lados (os 4 do kit), porque o grampo intermediário,
+  que aperta dois painéis com uma peça, não serve entre molduras de 40 e de 30 mm; o painel de 40 mm vizinho a ele leva grampos
+  de ponta de 40 mm nesse lado, e a outra ponta da fileira também (4 dos 8 comprados); entre os três painéis de 40 mm, um grampo
+  intermediário por trilho em cada junção (4 dos 6). Folga de cerca de 2 cm onde fica o grampo intermediário; onde dois grampos
+  de ponta ficam lado a lado, a folga é a dos dois, a medir na peça.
 - Trilhos: cada um a cerca de 45 cm das pontas dos painéis de 1812 mm, os dois a cerca de 90 cm um do outro; com os painéis
   centrados na fileira, no painel de 1722 mm eles ficam a cerca de 41 cm das pontas, a conferir na faixa de grampo permitida
   pelo fabricante dele. Os trilhos passam sobre as vigas de madeira, onde as hastes entram.
@@ -69,10 +71,18 @@ conferir, e entra na receita marcado assim.
 - Hastes: a cada 1,40 m, com a primeira e a última a 30 cm das pontas do trilho, furadas na parte alta da onda da telha e
   rosqueadas na viga. A conta não fecha: com o trilho em 4,55 m e quatro hastes, o espaçamento é de 1,32 m; com 1,40 m, o
   trilho teria 4,80 m. A montagem mostra as duas e a escolha é da pessoa.
-- Fileira: cerca de 4,33 m de painéis com folgas de 2 cm, e cerca de 4,45 m com os grampos de ponta lado a lado dos dois lados do
-  painel de 30 mm; a conferir contra o trilho de 4,55 m.
-- Pendentes da pessoa: a inclinação do telhado, a distância entre as vigas e quantas são da beirada à cumeeira, e as medidas do
-  perfil visto de ponta, do suporte em L e dos grampos.
+- Fileira: cerca de 4,33 m de painéis com folgas de 2 cm, e cerca de 4,39 m com a junção de grampos de ponta lado a lado; a
+  conferir contra o trilho de 4,55 m.
+- Telhado: telha ondulada de fibrocimento de 6 mm, no padrão da norma (gomo de 177 mm, telha de 1,10 m de largura e 1,05 m
+  útil, comprimentos de 1,22 a 3,66 m, sobreposição de 14 cm, ou 20 cm em pouca inclinação). A água tem duas fileiras de telhas
+  da beirada à cumeeira; as fotos da pessoa mostram uma fileira de parafusos junto da beirada e outra logo acima da sobreposição,
+  e nenhuma entre elas, o que dá uma viga na beirada, uma na sobreposição e uma na cumeeira, a cerca de um comprimento de telha
+  uma da outra. Com as vigas a mais de 90 cm, os dois trilhos não caem os dois sobre viga a 90 cm um do outro: a montagem mostra
+  isso, e as saídas (madeira a mais entre as vigas, ou outra disposição dos trilhos) são da pessoa. A água é bem maior que a
+  fileira de 4,45 m: 25 gomos (4,4 m) são só o trecho de uma das fotos, e a panorâmica mostra perto do dobro. A inclinação não
+  muda as contas e entra como 15 graus, a confirmar.
+- Pendentes da pessoa: a distância, medida descendo o telhado, entre a fileira de parafusos da beirada e a da sobreposição, o
+  comprimento da água ao longo da beirada, e as medidas do perfil visto de ponta, do suporte em L e dos grampos.
 
 ## Gate de saída
 

@@ -10,7 +10,8 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
-- [Abertura na vizinhança de todo vão](./2026-11-09-abertura-na-vizinhanca-de-todo-vao.md) foi concluído em 2026-11-12: o vão grande, o vão junto de outro e o vão que alcança o tubo de um vão vizinho também recortam só o trecho deles; os 19 vãos do furgão recortam, o furgão caiu de 506 s para 104 s no acervo do CI, os tetos de tempo voltaram a 1,7 vez o medido e a pessoa aprovou o furgão por imagem.
+- [As partes do braço](./2026-09-26-as-partes-do-braco.md) foi concluído em 2026-11-12: o braço robótico inteiro pelas receitas, com as doze etapas da montagem fixas pela pessoa, e exportado montado em glTF, uma parte por instância com a pose da montagem, conferido ao reabrir o arquivo e aprovado pela pessoa no Blender; a conferência por contorno da referência saiu por decisão dela e voltou ao backlog.
+- [Abertura na vizinhança de todo vão](./2026-11-09-abertura-na-vizinhanca-de-todo-vao.md) foi concluído em 2026-11-12: o vão grande, o vão junto de outro e o vão que alcança o tubo de um vão vizinho também recortam só o trecho deles; os 19 vãos do furgão recortam, o furgão caiu de 506 s para 104 a 188 s no acervo do CI, e os tetos de tempo saíram da maior de duas medidas e a pessoa aprovou o furgão por imagem.
 - [Abertura só na vizinhança do vão](./2026-11-06-abertura-so-na-vizinhanca.md) foi concluído em 2026-11-07: a booleana de cada vão vê só a vizinhança dele, fechada por uma banda; as sete aberturas do furgão caíram de 51 s para 3,7 s e a execução dele de 84 s para 30 s, com 55 de 56 peças do acervo iguais e o furgão aprovado por imagem.
 - [Abertura em qualquer direção](./2026-11-06-abertura-em-qualquer-direcao.md) foi concluído em 2026-11-06: a abertura aceita a vista por vetor e o vão que dobra a quina sai num vão só; a bateria de nove peças de teste mediu dois vãos vizinhos, vão na lente, contornos difíceis, vinco, borda, curvatura forte, corpos de várias camadas, outras gaiolas e uma chapa de 249 mil faces, com cada limite corrigido, recusado com a medida ou levado ao backlog.
 - [Limites do sólido por laços](./2026-11-05-limites-do-solido-por-lacos.md) foi concluído em 2026-11-06: a coluna do braço sai pelos laços cortados no eixo dela, sem contorno à mão, com o chanfro de 2 mm e o filete no declarado; quatro dos cinco limites foram corrigidos no ajudante, a cruz com espessura na tampa ficou como recusa, e a parte passou a ser separada pelos grupos de faces da gaiola.
@@ -409,7 +410,7 @@ rodada, com duas notas caindo de 9 para 8, aceitas pela pessoa. [As ferramentas
 de modelagem](2026-10-07-as-ferramentas-de-modelagem.md), congelado em
 2026-10-07 com a fatia 1 entregue, voltou como ativo, com a casca adiantada para a
 fatia 2 e o rascunho das [perguntas do
-crítico](2026-10-08-perguntas-do-critico-por-objeto.md) absorvido. [As partes do braço](../2026-09-26-as-partes-do-braco.md)
+crítico](2026-10-08-perguntas-do-critico-por-objeto.md) absorvido. [As partes do braço](2026-09-26-as-partes-do-braco.md)
 seguem congeladas.
 
 [O catálogo de famílias](2026-10-06-o-catalogo-de-familias.md) foi

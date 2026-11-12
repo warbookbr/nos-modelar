@@ -33,6 +33,7 @@ export const TESTES_LENTOS = [
   'modulos/textura/tests/mapas.test.js',
   'procedural/nucleo/operacoes/abertura-por-contorno.test.ts',
   'src/bancada/sessao/montagem-em-dados-acervo.test.js',
+  'tools/modelar/exportar-gltf-braco.test.mjs',
   'modulos/exportador-cad/tests/exportador-cad.test.js',
   'modulos/textura/tests/metal-tecido.test.js',
   'procedural/familias/cilindro-hidraulico/cilindro-hidraulico.test.js',

@@ -231,3 +231,12 @@ colinear nesse caso, como já faz na lasca do encaixe, e o que falta no
 processo é a guarda do acervo passar a contar triângulo sem área. Origem: a
 rodada 3 da coluna, em 2026-11-04, provada em
 `procedural/nucleo/operacoes/arredondar-costura-pontas.test.ts`.
+
+## Conferência de cada parte montada contra o contorno da referência
+
+O `conferir:referencia` por parte posicionada, que compara cada parte de uma montagem com o contorno dela no arquivo de
+contornos e reprova a parte fora da tolerância, saiu do plano das [partes do braço](encerrados/2026-09-26-as-partes-do-braco.md)
+por decisão da pessoa em 2026-11-12: lá as proporções foram mudadas de propósito em relação à imagem. Serve a objeto que siga a
+referência à risca. Ficam junto os dois achados herdados do rascunho do braço: a medida de junta do `conferir-pontos`, que toma
+o centro da sobreposição das caixas e erra quando uma parte entra pelo flanco da outra, e a conferência de que a técnica escrita
+no `PLANO` de cada parte foi a usada.

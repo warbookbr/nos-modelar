@@ -88,8 +88,10 @@ No furgão, em execução local, os oito vãos recortam (19 de 19 aberturas, nen
 Concluído em 2026-11-12, com o furgão aprovado pela pessoa por imagem. Os oito vãos que caíam na booleana da chapa inteira
 recortam só o trecho deles, e os 19 vãos do furgão recortam, sem `vizinhanca.motivo` no registro; a correção ficou em
 `abertura-por-contorno.js`, sem argumento novo na receita, e as quatro peças de prova recortam com o vão igual ao da chapa
-inteira. No CI de 2026-11-12 o furgão levou 104 s nas duas execuções do acervo, contra 506 s com a janela da cabine antes deste
-plano, e o `descrever` dele 104 s; o teto do acervo voltou a 180 s, 1,7 vez o medido, o da abertura na bancada voltou ao prazo
-padrão e o orçamento do `descrever` a 180 s. A triangulação mudou junto dos oito vãos, a menos de 0,07 mm da de antes, e a pessoa
+inteira. No CI de 2026-11-12 o furgão levou de 104 s a 188 s nas duas execuções do acervo, com a receita igual, contra 506 s
+com a janela da cabine antes deste plano, e o `descrever` dele 104 s. O teto do acervo foi a 180 s pela primeira medida e
+reprovou na seguinte: a máquina do CI varia quase o dobro, e o teto ficou em 320 s, 1,7 vez a maior medida, com o prazo de 600 s
+na abertura na bancada (266 s na mais lenta) e o orçamento do `descrever` em 180 s. Um teto de tempo sai de pelo menos duas
+medidas do CI. A triangulação mudou junto dos oito vãos, a menos de 0,07 mm da de antes, e a pessoa
 aprovou o furgão pelas vistas grandes da bancada em 2026-11-12, já com a janela nova da cabine. Revisão adversarial pediu a trava
 do controle de recorte e o teste do casamento das voltas, entregues antes do envio. Nada volta ao backlog.

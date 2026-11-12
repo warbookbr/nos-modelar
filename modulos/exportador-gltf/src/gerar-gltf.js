@@ -101,6 +101,13 @@ function normaisSuaves(faces) {
   return { chave, suaves, porVertice };
 }
 
+/* A pose da montagem ({ rotacao 3x3, deslocamento }, em metro) como a matriz do nó: o glTF a quer em 16 números, por coluna. */
+function matrizDoNo({ rotacao: r, deslocamento: d }) {
+  const m = [r[0][0], r[1][0], r[2][0], 0, r[0][1], r[1][1], r[2][1], 0, r[0][2], r[1][2], r[2][2], 0, d[0], d[1], d[2], 1].map(arredonda);
+  /* a identidade não se declara (o validador a recusa como aviso) */
+  return m.every((v, i) => v === (i % 5 === 0 ? 1 : 0)) ? null : m;
+}
+
 /* O pacote binário: cada pedaço alinhado em 4 bytes, na ordem em que é pedido. */
 class Pacote {
   constructor() { this.pedacos = []; this.tamanho = 0; this.vistas = []; }
@@ -171,7 +178,7 @@ function projecaoDoMaterial(def, posicoes, parte) {
  * @param {{nome?: string, neutro: object, materiais?: object, ambiente?: 'estudio'|'ceu'}} opcoes
  * @returns {{json: object, bin: Uint8Array, bytes: Uint8Array, diagnostico: object}}
  */
-export function gerarGltf({ nome = 'peca', neutro, materiais = {}, ambiente = 'estudio' }) {
+export function gerarGltf({ nome = 'peca', neutro, materiais = {}, ambiente = 'estudio', poses = null }) {
   if (!AMBIENTES.includes(ambiente)) {
     throw new ErroExportacaoGltf('ambiente-invalido', `Ambiente '${ambiente}' desconhecido. Aceitos: ${AMBIENTES.join(', ')}.`, { ambiente });
   }
@@ -382,7 +389,13 @@ export function gerarGltf({ nome = 'peca', neutro, materiais = {}, ambiente = 'e
     }
     meshes.push({ name: parte, primitives: primitivas });
     const pai = neutro.partes?.[parte]?.pai ?? null;
-    nodes.push({ name: parte, mesh: meshes.length - 1, ...(pai ? { extras: { pai } } : {}) });
+    const pose = poses?.get(parte);
+    nodes.push({
+      name: parte,
+      mesh: meshes.length - 1,
+      ...(pose && matrizDoNo(pose) ? { matrix: matrizDoNo(pose) } : {}),
+      ...(pai ? { extras: { pai } } : {}),
+    });
   }
 
   const bin = pacote.juntar();

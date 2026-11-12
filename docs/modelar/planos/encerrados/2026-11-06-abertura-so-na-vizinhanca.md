@@ -31,7 +31,7 @@ USAR DIRETO a booleana existente, a limpeza da costura e o retrato do acervo (`t
 ## Excluído
 
 - mudar a receita do furgão ou de qualquer peça;
-- mudar `procedural/nucleo/operacoes/booleanas.js`, que é território do [braço](../2026-09-26-as-partes-do-braco.md) no arredondamento da costura; se a solução pedir mudança nele, para e pede à pessoa que mude um dos territórios;
+- mudar `procedural/nucleo/operacoes/booleanas.js`, que é território do [braço](2026-09-26-as-partes-do-braco.md) no arredondamento da costura; se a solução pedir mudança nele, para e pede à pessoa que mude um dos territórios;
 - o custo do `descrever` e da medida de contato do furgão.
 
 ## Gate de saída
