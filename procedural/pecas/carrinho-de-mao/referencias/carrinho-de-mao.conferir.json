@@ -1,0 +1,126 @@
+{
+ "objeto": "um carrinho de mão de obra de uma roda: a caçamba de chapa estampada com a borda virada, mais larga atrás e afinando para a frente, o chassi num tubo só com o laço em U que contorna a roda por diante e os braços que sobem até as manoplas com punho de borracha, os pés em V de tubo mais fino com duas travessas de chapa, dois tirantes da frente da caçamba ao laço, e a roda de pneu preto com aro de chapa escuro",
+ "cores": {
+  "azul": "#2f6fd1",
+  "escuro": "#2a2d30",
+  "cinza": "#6b7178",
+  "preto": "#151617",
+  "aro": "#4a4f55"
+ },
+ "partes": {
+  "cacamba": "azul",
+  "borda": "azul",
+  "tirantes": "escuro",
+  "chassi": "azul",
+  "manoplas": "preto",
+  "mancais": "escuro",
+  "pes": "cinza",
+  "travessas": "escuro",
+  "pneu": "preto",
+  "aro": "aro",
+  "cubo": "aro",
+  "disco": "aro",
+  "eixo": "escuro"
+ },
+ "dentro": [
+  {
+   "par": "travessas:cacamba",
+   "vistas": [
+    "superior"
+   ]
+  },
+  {
+   "par": "mancais:chassi",
+   "vistas": [
+    "superior"
+   ]
+  }
+ ],
+ "vistasDaSobra": [
+  "superior",
+  "direita"
+ ],
+ "toleranciaDaSobraMm": 3,
+ "vistas": {
+  "direita": {
+   "contornos": "carrinho-de-mao.contornos.json",
+   "escala": 1,
+   "ancora": {
+    "contorno": [
+     0,
+     0
+    ],
+    "modelo": [
+     0,
+     0,
+     0
+    ]
+   },
+   "partes": {
+    "lado.cacamba": [
+     "cacamba",
+     "borda"
+    ],
+    "lado.chassi": [
+     "chassi",
+     "manoplas",
+     "mancais"
+    ],
+    "lado.pes": [
+     "pes",
+     "travessas"
+    ],
+    "lado.roda": [
+     "pneu",
+     "aro",
+     "cubo",
+     "disco",
+     "eixo"
+    ]
+   },
+   "ignorarRegioes": [
+    "cima.cacamba",
+    "cima.chassi",
+    "cima.bracos",
+    "cima.roda"
+   ],
+   "visto": "da direita, a roda à esquerda (foto de cima para baixo: a perna de longe aparece 80 px acima da de perto)",
+   "fora": "os tirantes, que a medida da foto não separou do chassi nem da caçamba"
+  },
+  "superior": {
+   "contornos": "carrinho-de-mao.contornos.json",
+   "escala": 1,
+   "ancora": {
+    "contorno": [
+     0,
+     0
+    ],
+    "modelo": [
+     0,
+     0,
+     0
+    ]
+   },
+   "partes": {
+    "cima.cacamba": [
+     "cacamba",
+     "borda"
+    ],
+    "cima.chassi": "chassi",
+    "cima.bracos": [
+     "chassi",
+     "manoplas"
+    ],
+    "cima.roda": "pneu"
+   },
+   "ignorarRegioes": [
+    "lado.cacamba",
+    "lado.chassi",
+    "lado.pes",
+    "lado.roda"
+   ],
+   "visto": "de cima, a roda embaixo; a boca da caçamba levada à da vista de lado, e o laço e as manoplas, que ficam mais baixos, sem essa correção",
+   "fora": "nada"
+  }
+ }
+}

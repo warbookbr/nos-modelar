@@ -1,0 +1,95 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/pes",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: lado.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Silhueta, chão, abertura para trás, posição sob os braços e encaixes batem com as referências; só há acabamento nos topos dos tubos que passam da chapa, sem defeito estrutural."
+  },
+  "partes": [
+    {
+      "nome": "cacamba",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tirantes",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "lacosPelasVistas amostra frente e traseira em 25 pontos uniformes na lateral: arco tangente ao lado reto dá facetas e estrias",
+    "gaiolaPorLacos com tampa esquerda/direita põe o primeiro degrau a 1 ou 2 mm do lado reto quando o contorno é de arcos tangentes: face de 11 pontos em lasca, origem da escama da dobra",
+    "49 pontos por trecho deram 2 faces finas nos tirantes por corte booleano; 41 dá zero; 57 a 65 dão lascas na própria casca",
+    "o defeito da rodada 2 (razão entre as travessas) fechou com a planta do chassi lida do desenho: de 1,04 para 1,20; a medida veio da vista inferior, que nenhuma conferência dava em número; atribuição: plano"
+  ],
+  "notaDePassagem": "A boca é retas e arcos tangentes (traseira reta, cantos r 150, lados 313, frente em meia volta de raio 313), com o raio dos cantos em 150, e não uns 90: com 90 a sobreposição de cima caía de 91,7 para 89,9%, com 150 fica em 91,1%. A tampa do fundo é a escada entre inicio e fim, e não entre os lados, porque o primeiro degrau a 1 ou 2 mm do lado reto dava a lasca que parecia escama na dobra. 41 pontos por trecho e 9 por lado é o que dá zero lascas, incluindo os tirantes.",
+  "receita": {
+    "sha256": "sha256:1d3557a7c6b93fc4bc14ae297604c007a1b286b3264fcb31d1de472f8d78495a",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 2,
+      "acrescentadas": 2,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 103,
+          "texto": "      { nome: 'pes', forma: 'de cada lado um V de tubo redondo cinza de Ø 22, dos topos em z -305 e -580 no eixo do braço até o fundo arredondado em z -502, com a face de baixo no chão em y 0, a 166 do centro; a ponta acima da travessa entra no tubo do braço', tecnica: 'gaiolaVarrida de seção redonda de 16 lados num trilho de três pontos com o raio do fundo, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "      { nome: 'travessas', forma: 'duas chapas escuras de 40 × 6 de lado a lado, nos topos das pernas, com a face de cima em y 250, na face de baixo dos braços; a de trás é mais comprida porque os braços abrem para trás', tecnica: 'extrusão em y de um retângulo, uma em cada topo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "      { nome: 'pes', forma: 'de cada lado um V de tubo redondo cinza de Ø 22, dos topos em z -305 e -580 no eixo do braço até o fundo arredondado em z -551, com a face de baixo no chão em y 0, a 177 do centro; a ponta acima da travessa entra no tubo do braço', tecnica: 'gaiolaVarrida de seção redonda de 16 lados num trilho de três pontos com o raio do fundo, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "      { nome: 'travessas', forma: 'duas chapas escuras de 40 × 6 de lado a lado, nos topos das pernas, com a face de cima em y 250, na face de baixo dos braços; a de trás é 20% mais comprida que a da frente (412 contra 345): os braços abrem em reta para trás', tecnica: 'extrusão em y de um retângulo, uma em cada topo' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes pes",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az60.png",
+      "peca-lado-rasante-az150.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T04:36:29.703Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

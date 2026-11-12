@@ -38,7 +38,9 @@
  * relato de contatos (`contatos.js`) confere; `encosta` declara a dele. A parte de passo cru não tem onde declarar, e por isso a opção
  * aceita `contatos: [{ par: ["capo", "tampa"], relacao: "encosta" | "atravessa" | "folga", motivo: "..." }]`, o mesmo vocabulário,
  * para qualquer par de partes da malha, de passo cru ou de forma: o relato o confere como confere o `contato` da forma, e mostra o
- * motivo. O par cuja parte não existe na malha da opção é recusado.
+ * motivo. O par cuja parte não existe na malha da opção é recusado. O contato `folga` aceita `folga: { esperada, tolerancia }`, em mm,
+ * que `npm run vao:partes` mede e confere par a par (com `degrau`, o desnível máximo do par); o relato de contatos não o usa. A opção aceita
+ * `apoia: [{ parte, motivo }]`, a parte solta de propósito, que o mesmo comando não lista como solta sem apoio.
  *
  * TUDO PELA MALHA QUE O NÚCLEO GEROU. A forma é executada sozinha pelo executor, já girada, e a caixa e a malha dela são as que o
  * atalho lê. A forma vira parte por `parte` com a seleção da origem do gerador, e anda por `transladar`, gira por `rotaciona`, se
@@ -72,8 +74,8 @@ const CORES_POR_NOME = Object.freeze({
   amarelo: '#d8b43a', laranja: '#d97a2b', roxo: '#7a55a8',
 });
 const CHAVES_DA_FORMA = new Set(['id', 'op', 'args', 'ajudante', 'subdivisao', 'centro', 'por', 'sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'rotacao', 'repete', 'espelha', 'contato', 'oculto', 'cor', 'rotulo']);
-const CHAVES_DA_OPCAO = new Set(['titulo', 'nota', 'passos', 'topo', 'aliases', 'formas', 'legendas', 'contatos']);
-const CHAVES_DO_CONTATO = new Set(['par', 'relacao', 'motivo']);
+const CHAVES_DA_OPCAO = new Set(['titulo', 'nota', 'passos', 'topo', 'aliases', 'formas', 'legendas', 'contatos', 'apoia']);
+const CHAVES_DO_CONTATO = new Set(['par', 'relacao', 'motivo', 'folga']);
 export const RELACOES = Object.freeze(['encosta', 'atravessa', 'folga']);
 /* a primeira origem livre do atalho: os passos crus usam as menores, e o atalho conta daqui para cima */
 const ORIGEM_DO_ATALHO = 1000;
@@ -131,7 +133,7 @@ function lerReferencia(texto, padrao, onde) {
   return { id, lados, sufixo };
 }
 
-/** Os contatos declarados na opção, conferidos no formato: `[{ par: [a, b], relacao, motivo }]`, com o par uma vez só. */
+/** Os contatos declarados na opção, conferidos no formato: `[{ par: [a, b], relacao, motivo, folga? }]`, com o par uma vez só. */
 function lerContatosDaOpcao(lista, rotulo) {
   if (lista === undefined) return [];
   if (!Array.isArray(lista)) recusar('"contatos" é uma lista de { par: ["<parte>", "<parte>"], relacao, motivo }', rotulo);
@@ -140,14 +142,38 @@ function lerContatosDaOpcao(lista, rotulo) {
     const onde = `${rotulo}, contatos[${i}]`;
     if (!c || typeof c !== 'object' || Array.isArray(c)) recusar('o contato é { par: ["<parte>", "<parte>"], relacao, motivo }', onde);
     for (const k of Object.keys(c)) if (!CHAVES_DO_CONTATO.has(k)) recusar(`campo "${k}" não existe no contato (aceitos: ${[...CHAVES_DO_CONTATO].join(', ')})`, onde);
-    const { par, relacao, motivo } = c;
+    const { par, relacao, motivo, folga } = c;
     if (!Array.isArray(par) || par.length !== 2 || !par.every((n) => typeof n === 'string' && n) || par[0] === par[1]) recusar('"par" são os nomes de duas partes diferentes', onde);
     if (!RELACOES.includes(relacao)) recusar(`"relacao" é ${RELACOES.join(', ')} (veio ${JSON.stringify(relacao)})`, onde);
     if (typeof motivo !== 'string' || !motivo.trim()) recusar('"motivo" é o texto que diz por que as duas partes têm essa relação', onde);
+    /* a folga esperada, em mm, que `npm run vao:partes` confere par a par; só a relação "folga" a tem */
+    if (folga !== undefined) {
+      if (relacao !== 'folga') recusar('"folga" só vale com "relacao": "folga"', onde);
+      if (!folga || typeof folga !== 'object' || Array.isArray(folga) || Object.keys(folga).some((k) => !['esperada', 'tolerancia', 'degrau'].includes(k))) recusar('"folga" é { esperada, tolerancia, degrau? } em mm', onde);
+      if (!(Number.isFinite(folga.esperada) && folga.esperada > 0)) recusar(`"folga.esperada" é um número de mm maior que zero (veio ${JSON.stringify(folga.esperada)})`, onde);
+      if (!(Number.isFinite(folga.tolerancia) && folga.tolerancia >= 0)) recusar(`"folga.tolerancia" é um número de mm a partir de zero (veio ${JSON.stringify(folga.tolerancia)})`, onde);
+      if (folga.degrau !== undefined && !(Number.isFinite(folga.degrau) && folga.degrau >= 0)) recusar(`"folga.degrau" é o desnível máximo em mm, a partir de zero (veio ${JSON.stringify(folga.degrau)})`, onde);
+    }
     const chave = [...par].sort().join('|');
     if (vistos.has(chave)) recusar(`o par ${par[0]} e ${par[1]} já foi declarado`, onde);
     vistos.add(chave);
-    return { par: [...par], relacao, motivo };
+    return { par: [...par], relacao, motivo, ...(folga ? { folga: { esperada: folga.esperada, tolerancia: folga.tolerancia, ...(folga.degrau !== undefined ? { degrau: folga.degrau } : {}) } } : {}) };
+  });
+}
+
+/** As partes soltas de propósito, `apoia: [{ parte, motivo }]`: o que `npm run vao:partes` não lista como solta sem apoio. */
+function lerApoiaDaOpcao(lista, rotulo) {
+  if (lista === undefined) return [];
+  if (!Array.isArray(lista)) recusar('"apoia" é uma lista de { parte, motivo }', rotulo);
+  const vistas = new Set();
+  return lista.map((a, i) => {
+    const onde = `${rotulo}, apoia[${i}]`;
+    if (!a || typeof a !== 'object' || Array.isArray(a) || Object.keys(a).some((k) => k !== 'parte' && k !== 'motivo')) recusar('o item de "apoia" é { parte, motivo }', onde);
+    if (typeof a.parte !== 'string' || !a.parte) recusar('"parte" é o nome da parte solta de propósito', onde);
+    if (typeof a.motivo !== 'string' || !a.motivo.trim()) recusar('"motivo" é o texto que diz em que a parte se apoia ou por que fica solta', onde);
+    if (vistas.has(a.parte)) recusar(`a parte ${a.parte} já foi declarada`, onde);
+    vistas.add(a.parte);
+    return { parte: a.parte, motivo: a.motivo };
   });
 }
 
@@ -198,6 +224,7 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
   const topo = Object.fromEntries(Object.entries(opcao.topo ?? {}).map(([k, p]) => [k, pontoEmMetro(p)]));
   const aliases = opcao.aliases ?? [];
   const contatos = lerContatosDaOpcao(opcao.contatos, rotulo);
+  const apoia = lerApoiaDaOpcao(opcao.apoia, rotulo);
 
   const porId = new Map();
   for (const f of formas) {
@@ -413,9 +440,10 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
   const nomes = new Set(partes);
   let facesSemParte = 0;
   for (const face of neutro.F.values()) { if (face.parte) nomes.add(face.parte); else facesSemParte += 1; }
+  for (const a of apoia) if (!nomes.has(a.parte)) recusar(`"apoia" cita a parte "${a.parte}", que não está na malha desta opção (partes: ${[...nomes].join(', ')})`, rotulo);
   for (const c of contatos) for (const n of c.par) if (!nomes.has(n)) recusar(`"contatos" cita a parte "${n}", que não está na malha desta opção (partes: ${[...nomes].join(', ')})`, rotulo);
   return {
-    receita, neutro, partes: [...nomes], facesSemParte, contatos,
+    receita, neutro, partes: [...nomes], facesSemParte, contatos, apoia,
     formas: formas.map((f) => ({ id: f.id, oculto: f.oculto === true, caixa: emMm(prontas.get(f.id).caixa), cor: f.cor ?? null, rotulo: f.rotulo ?? null, contato: { ...(f.contato ?? {}), ...(f.encosta !== undefined ? { [lerLado(f.encosta, 'encosta', '').id]: 'encosta' } : {}) } })),
   };
 }

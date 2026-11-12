@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:b9956bd0c855e7da074f5a53791b326bdcdb2a43357235201a57625813728646",
-  "total": 40,
+  "assinatura": "sha256:9ef2ae80d182473daa46fa783413782309a3a31b3f61981bbbc108739332270c",
+  "total": 41,
   "operacoes": [
     {
       "id": "mecanifica.operacao.aberturaPorContorno",
@@ -461,6 +461,10 @@
                 "minLength": 1
               },
               "description": "Um nome por cópia, total-1."
+            },
+            "coincidente": {
+              "type": "boolean",
+              "description": "true: modo linear sem d, a cópia NO LUGAR do sólido (geometria coincidente declarada), para servir de ferramenta ou de alvo de mais de uma booleana, que consome o sólido que recebe; cada cópia é um uso, e citá-la depois de consumida grita."
             }
           }
         },
@@ -513,7 +517,8 @@
           "Modo estrutural requer origemId, derivaDe e seleção da origem completa."
         ],
         "limites": [
-          "Repetição radial é UMA descrição: seis abas de maça saem de um arranja radial com volta 360 e total 6. Descrever seis abas à mão é seis lugares para errar. Nomeie as cópias, porque posição não é identidade."
+          "Repetição radial é UMA descrição: seis abas de maça saem de um arranja radial com volta 360 e total 6. Descrever seis abas à mão é seis lugares para errar. Nomeie as cópias, porque posição não é identidade.",
+          "Com coincidente: true o modo linear duplica o sólido no lugar, sem d: um sólido construído uma vez (o interior de uma casca, uma ferramenta de corte) serve a quantas booleanas pedirem, uma cópia por uso, com total = usos (a fonte é o primeiro) e nomes para citar cada cópia."
         ],
         "diagnosticos": []
       }
@@ -2931,6 +2936,132 @@
       }
     },
     {
+      "id": "mecanifica.operacao.limparLascas",
+      "nome": "limparLascas",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Tirar de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície além da tolerância.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.limparLascas@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sel",
+            "tolerancia"
+          ],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "As faces a limpar, em geral { origem: { op: 'subtrair', id } } logo depois da booleana."
+            },
+            "tolerancia": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "O quanto a superfície pode sair do lugar, na unidade da peça (0,00001 numa receita em metro)."
+            },
+            "limite": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Razão área / maior aresta² abaixo da qual a face é lasca; padrão 0,003."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "lado": 1
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "lado": 1,
+                "em": [
+                  0.5,
+                  0.5,
+                  0.5
+                ]
+              }
+            ],
+            [
+              "subtrair",
+              {
+                "origemId": 9,
+                "solidos": [
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 1
+                    }
+                  },
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 2
+                    }
+                  }
+                ]
+              }
+            ],
+            [
+              "limparLascas",
+              {
+                "sel": {
+                  "origem": {
+                    "op": "subtrair",
+                    "id": 9
+                  }
+                },
+                "tolerancia": 0.00001
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Vem depois da booleana ou do arredondarCostura cujas faces a seleção cita."
+        ],
+        "limites": [
+          "Troca a diagonal, colapsa a aresta curta ou junta a lasca à vizinha, só dentro da tolerância e com a malha fechada; a que ficar vai para o aviso lascasRestantes.",
+          "Não desfaz a lasca que já vinha da entrada (a tira de 0,2 mm de uma concordância de raio 3): ela é do passo da chapa."
+        ],
+        "diagnosticos": [
+          {
+            "quando": "O aviso lascasRestantes diz que ficaram faces finas.",
+            "acao": "Rode npm run malha:lascas na receita: a lista traz a parte e o passo de cada uma."
+          }
+        ]
+      }
+    },
+    {
       "id": "mecanifica.operacao.liso",
       "nome": "liso",
       "uso": {
@@ -4267,7 +4398,7 @@
             },
             "vincos": {
               "type": "array",
-              "description": "Vincos nomeados {nome, pontos, nitidez}: pontos é a sequência de nomes de ponto ao longo das arestas da gaiola (repita o primeiro no fim para fechar), e nitidez vai de 0 (liso) a 1 (vivo), ou 'viva'; a nitidez n vira 10 n² níveis de Catmull-Clark, como o vinco do Blender."
+              "description": "Vincos nomeados {nome, pontos, nitidez, raio?}: pontos é a sequência de nomes de ponto ao longo das arestas da gaiola (repita o primeiro no fim para fechar), e nitidez vai de 0 (liso) a 1 (vivo), ou 'viva'; a nitidez n vira 10 n² níveis de Catmull-Clark, como o vinco do Blender. `raio` (opcional, em metro: número, { de, ate } ou um por ponto) é o raio pedido que as colunas de apoio da gaiola realizam; não muda a geometria e fica salvo para a medida do raio."
             },
             "cantos": {
               "type": "array",

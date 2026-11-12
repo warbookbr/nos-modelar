@@ -104,7 +104,7 @@ crítico sem contar como a peça foi feita.
 **revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que grava as
 imagens e, na pasta da rodada (`tools/bancadas/out/critica-<peça>/`, ou a de `--saida=<pasta>`), o `pedido.md` pronto, tirado
 da receita: o texto do despacho do `critico-visual`. Não escreva o pedido à mão, nem copie caminho, promessa de parte ou critério
-do `PLANO`; mande o texto do `pedido.md` como está. Ele traz, nesta ordem, o objeto, o alvo, as referências, o modelo (as vistas
+do `PLANO`; mande o texto do `pedido.md` como está. Foto de terceiro não entra no repositório, e quem conduz a traz ao pedido com `--referencia=<caminho absoluto da imagem>[@<vista>]` (repetível, o caminho não é gravado). Ele traz, nesta ordem, o objeto, o alvo, as referências, o modelo (as vistas
 da peça sozinha e a malha em arame), as vistas montadas, a sobreposição dos cortes, cada parte com a forma e a técnica que o plano
 promete, os critérios de reprovação, as perguntas e o limite de 240 caracteres de `onde`, `evidencia` e `observacao` do veredito
 (o registro recusa o mais longo, e o detalhe vai no texto; a regra fica no despacho, e não no agente, que mudado pede a calibração

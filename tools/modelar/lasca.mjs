@@ -5,18 +5,19 @@
  * veio. A lista junta o que o núcleo já mede: a topologia dá a face e a razão (área / maior aresta²), a procedência dá o passo
  * que a produziu e a receita dá a operação e o `origemId` desse passo. Nada é escrito e nada é consertado.
  *
- *   node tools/modelar/lasca.mjs <receita> [--limite=0.003] [--json]
+ *   node tools/modelar/lasca.mjs <receita | esboço | montagem> [--opcao=<n>] [--limite=0.003] [--json]
+ *
+ * O arquivo é lido pelo resolvedor comum das ferramentas de medida (`entrada-de-medida.mjs`): receita, esboço 2.0 (`.esboco.mjs` ou
+ * `.esboco.json`, com `--opcao`, de 1) ou montagem persistida, em que cada peça sai com o seu nome.
  *
  * Sai com 1 quando há lasca, com 0 quando não há, e com 2 quando o comando foi mal usado.
  */
-import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { analisarTopologia, LIMITE_DE_FACE_FINA } from '../../procedural/nucleo/topologia.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { lerArgumentos } from './argumentos.mjs';
-import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { ErroDeEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 const MM = 1000;
 const arredondar = (valor) => Math.round(valor * MM * 1000) / 1000;
@@ -56,9 +57,10 @@ export function lascasDoNeutro(neutro, { passos = [], limite = LIMITE_DE_FACE_FI
     .sort((a, b) => a.face - b.face);
 }
 
-/** Executa uma receita já carregada (módulo ou objeto com PASSOS) e devolve as lascas dela. */
-export function lascasDaReceita(receita, { limite = LIMITE_DE_FACE_FINA, ...execucao } = {}) {
-  const { entrada, neutro } = executarReceita(receita, execucao);
+/** Executa uma receita já carregada (módulo ou objeto com PASSOS) e devolve as lascas dela. Com `executada` (`{ entrada, neutro }`),
+ *  usa a execução que quem chama já tem, sem montar a peça de novo. */
+export function lascasDaReceita(receita, { limite = LIMITE_DE_FACE_FINA, executada = null, ...execucao } = {}) {
+  const { entrada, neutro } = executada ?? executarReceita(receita, execucao);
   return { lascas: lascasDoNeutro(neutro, { passos: entrada.PASSOS, limite }), orfaos: neutro.orfaos ?? [] };
 }
 
@@ -85,7 +87,7 @@ export function formatarLascas(nome, { lascas, orfaos }, limite = LIMITE_DE_FACE
 }
 
 function uso(mensagem) {
-  process.stderr.write(`lasca: ${mensagem}\nuso: node tools/modelar/lasca.mjs <receita> [--limite=0.003] [--json]\n`);
+  process.stderr.write(`lasca: ${mensagem}\nuso: node tools/modelar/lasca.mjs <receita | esboço | montagem> [--opcao=<n>] [--limite=0.003] [--json]\n`);
   return 2;
 }
 
@@ -93,8 +95,8 @@ export async function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['limite'],
-      bandeiras: ['json'],
+      opcoes: ['limite', 'opcao'],
+      bandeiras: ['json', 'sem-cache'],
       posicional: { nome: 'a receita', obrigatorio: true },
     });
   } catch (erro) {
@@ -103,21 +105,30 @@ export async function comoCLI(argv) {
   const textoDoLimite = lido.opcao('limite');
   const limite = textoDoLimite === null ? LIMITE_DE_FACE_FINA : Number(textoDoLimite);
   if (!(limite > 0)) return uso(`--limite precisa ser um número positivo, recebi '${textoDoLimite}'.`);
-  let caminho;
+  let entrada;
   try {
-    caminho = resolverCaminhoReceita(lido.posicional);
+    entrada = await lerEntradaDeMedida(lido.posicional, { opcao: opcaoDaLinha(lido.opcao('opcao')), cache: !lido.bandeira('sem-cache') });
   } catch (erro) {
-    return uso(erro.message);
+    if (erro instanceof ErroDeEntrada) return uso(erro.message);
+    throw erro;
   }
-  if (!existsSync(caminho)) return uso(`receita não encontrada: ${lido.posicional}`);
-  const receita = receitaDoModulo(await importarReceita(caminho));
-  const resultado = lascasDaReceita(receita, { limite });
+  const pecas0 = entrada.tipo === 'montagem' ? null : entrada.executar();
+  process.stderr.write(avisoDeCache(entrada, 'malha:lascas'));
+  /* uma peça (receita ou esboço) ou, numa montagem, cada peça com o nome dela */
+  const pecas = entrada.tipo === 'montagem'
+    ? entrada.partes.map((p) => ({ nome: `${lido.posicional}:${p.nome}`, resultado: lascasDaReceita(p.receita, { limite }) }))
+    : [{ nome: lido.posicional, resultado: lascasDaReceita(entrada.receita, { limite, executada: pecas0 }) }];
+  const total = pecas.reduce((n, p) => n + p.resultado.lascas.length, 0);
   if (lido.bandeira('json')) {
-    process.stdout.write(`${JSON.stringify({ receita: lido.posicional, limite, ...resultado }, null, 2)}\n`);
+    const saida = pecas.length === 1 && entrada.tipo !== 'montagem'
+      ? { receita: lido.posicional, ...(entrada.tipo === 'esboco' ? { esboco: entrada.origem } : {}), limite, ...pecas[0].resultado }
+      : { montagem: lido.posicional, limite, pecas: pecas.map((p) => ({ peca: p.nome, ...p.resultado })) };
+    process.stdout.write(`${JSON.stringify(saida, null, 2)}\n`);
   } else {
-    process.stdout.write(`${formatarLascas(lido.posicional, resultado, limite)}\n`);
+    if (entrada.tipo === 'esboco') process.stdout.write(`${entrada.origem}\n`);
+    for (const p of pecas) process.stdout.write(`${formatarLascas(p.nome, p.resultado, limite)}\n`);
   }
-  return resultado.lascas.length ? 1 : 0;
+  return total ? 1 : 0;
 }
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {

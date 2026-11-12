@@ -26,6 +26,7 @@ import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
 import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
 import { criarOperacoesAberturaPorContorno } from './operacoes/abertura-por-contorno.js';
+import { criarOperacoesLimparLascas } from './operacoes/limpar-lascas.js';
 import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
 import { lerOnde, resolverOnde } from './selecao-geometrica.js';
 import earcut from 'earcut';
@@ -819,6 +820,7 @@ function contratoFaces(op) {
    quem a citava quase sempre quer o substituto. */
 function conferirConsumo(st, fid, contexto) {
   const c = st.consumidas?.get(fid);
+  if (c?.op === 'limparLascas') return `${contexto} foi desfeita pelo limparLascas do passo ${c.passo} (era uma face fina, fundida à vizinha); cite a origem inteira, que segue valendo sem ela`;
   return c ? `${contexto} foi consumida pelo ${c.op} do passo ${c.passo} — a face virou a borda do corte; cite a origem que o corte publicou (ou una as duas num alias)` : null;
 }
 function consumoDe(st, fid) {
@@ -1337,7 +1339,13 @@ const CONTRATOS_ORIGEM = {
       return fonte.erro ? `arranja exige de estrutural válido: ${fonte.erro}` : null;
     },
     resolver(st, registro, origem) {
-      const fonte = resolverOrigem(st, origem.de);
+      /* a cópia no lugar (`coincidente`) não precisa da fonte viva: a fonte é o primeiro uso e a booleana que a consome não pode apagar a citação das cópias.
+         `de` igual ao da declaração é a cópia inteira; `de` que aponta uma parte da fonte (a face de cima) resolve pelo registro do gerador mesmo com a fonte
+         consumida; e `de` de outra primitiva cai na pertinência, abaixo, como no arranjo deslocado */
+      const coincidente = registro.transformacao?.coincidente === true;
+      const fonte = !coincidente ? resolverOrigem(st, origem.de)
+        : origensIguais(origem.de, registro.derivaDe) ? { faces: [...registro.copias[0].keys()] }
+          : resolverOrigemSemVida(st, origem.de);
       if (fonte.erro) return { erro: `de da origem arranja:${origem.id} não resolve: ${fonte.erro}` };
       const nCopias = registro.copias.length;
       let indices;
@@ -1936,6 +1944,40 @@ function faceUnicaEstrutural(st, origem, op, campo, i) {
   const faces = [...new Set(r.faces)];
   if (faces.length !== 1) { grita(st, i, op, campo, `${campo} precisa resolver para EXATAMENTE uma face: ${JSON.stringify(origem)} resolveu para ${faces.length} (${faces.slice(0, 8).join(', ')}${faces.length > 8 ? ', …' : ''})`); return null; }
   return faces[0];
+}
+
+/* A origem resolvida como se as faces consumidas ainda vivessem: serve à citação de uma parte da fonte de uma cópia no lugar, depois de a booleana consumir a fonte.
+   As faces consumidas voltam à malha como casca vazia só durante a chamada, e saem dela mesmo se o gerador gritar. */
+function resolverOrigemSemVida(st, origem) {
+  const fantasmas = [];
+  const poe = (fid) => { if (Number.isSafeInteger(fid) && !st.F.has(fid)) { st.F.set(fid, { id: fid, vs: [] }); fantasmas.push(fid); } };
+  /* a face que a fonte perdeu por uma booleana (`consumidas`) ou por `apagaFace` e `limparLascas`: o registro do gerador da fonte ainda a conhece, e a cópia, viva, é a que a citação endereça */
+  for (const fid of st.consumidas.keys()) poe(fid);
+  for (const reg of st.origens.get(origem?.id) ?? []) {
+    for (const v of Object.values(reg)) {
+      if (Array.isArray(v)) v.forEach(poe);
+      else if (v && typeof v === 'object' && !(v instanceof Map)) for (const w of Object.values(v)) { if (Array.isArray(w)) w.forEach(poe); else poe(w); }
+    }
+  }
+  try { return resolverOrigem(st, origem); } finally { for (const fid of fantasmas) st.F.delete(fid); }
+}
+
+/* Alguma outra cópia no lugar parte desta (`derivaDe` é o arranja `id`, a cópia inteira ou a de mesmo nome)? */
+function usadaComoFonte(st, id, nome, k) {
+  for (const registros of st.origens.values()) for (const r of registros) {
+    const d = r.op === 'arranja' ? r.derivaDe : null;
+    if (d && d.op === 'arranja' && d.id === id && (d.nome == null && d.copia == null ? true : d.nome != null ? d.nome === nome : d.copia === k)) return true;
+  }
+  return false;
+}
+/* A cópia ainda tem os vértices da fonte? Compara, face a face, as posições dos cantos; a fonte que sumiu não deixa casca dupla. */
+function aindaEmCimaDaFonte(st, mapa) {
+  const chave = (f) => f.vs.map((v) => (st.V.get(v) ?? []).map((x) => Math.round(x * 1e6)).join(',')).sort().join('|');
+  for (const [fonte, copia] of mapa) {
+    const A = st.F.get(fonte); const B = st.F.get(copia);
+    if (!A || !B || chave(A) !== chave(B)) return false;
+  }
+  return true;
 }
 
 function resolverPorta(st, nome) {
@@ -2928,6 +2970,7 @@ const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idD
 const operacoesSubdivisao = criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem });
 const operacoesFriso = criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem, validarOrigem });
 const operacoesAberturaPorContorno = criarOperacoesAberturaPorContorno({ BLOCO, FAIXA_ESTENDIDA, BASE_ESTENDIDA, idDoPasso, grita, addV, addF, registraOrigem, resolverSelecao, textoDeclaracoes, subtrair: operacoesBooleanas.subtrair, manifoldCarregada, erroDaCargaDaManifold });
+const operacoesLimparLascas = criarOperacoesLimparLascas({ grita, resolverSelecao });
 /* As operações de atributo escrevem só nas faces que `resolverAlvosF` devolve; o despacho lê essas faces de `st.alvosF` para
    saber quais conferir no retrato (ver `ESCRITA_DAS_OPERACOES`). */
 function resolverAlvosFRastreado(st, a, op, i, opcoes) {
@@ -2950,6 +2993,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesSubdivisao,
   ...operacoesFriso,
   ...operacoesAberturaPorContorno,
+  ...operacoesLimparLascas,
 };
 
 /* Configuração explícita do módulo que preserva os nomes curtos das receitas.
@@ -2961,7 +3005,7 @@ const NOMES_DAS_OPERACOES = [
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
   'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao', 'friso',
-  'aberturaPorContorno',
+  'aberturaPorContorno', 'limparLascas',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 
@@ -3671,6 +3715,22 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     });
   });
   aplicarHierarquiaDasPartes(st);
+  /* a cópia no lugar que nenhum passo consumiu nem mexeu é uma casca dupla em cima da fonte */
+  for (const [id, registros] of st.origens) {
+    for (const r of registros) {
+      if (r.op !== 'arranja' || r.transformacao?.coincidente !== true) continue;
+      r.copias.forEach((mapa, k) => {
+        const copias = [...mapa.values()];
+        /* só vale a cópia que continua em cima da fonte (os mesmos vértices, com a fonte viva) e que nenhum passo usou: numa booleana, como fonte de outra cópia, com `parte`, nem transladada para longe */
+        if (copias.length && !copias.some((f) => st.facesDeOperando?.has(f)) && copias.every((f) => st.F.has(f))
+          && copias.every((f) => st.F.get(f).parte == null) && !usadaComoFonte(st, id, r.nomesDasCopias?.[k] ?? null, k) && aindaEmCimaDaFonte(st, mapa)) {
+          const nome = r.nomesDasCopias?.[k];
+          st.avisos.push({ passo: r.passo ?? null, op: 'arranja', ref: 'copiaNoLugarSemUso', origemId: id, copia: k, nome: nome ?? null,
+            texto: `a cópia ${nome != null ? `'${nome}' ` : ''}(${k}) do arranja ${id} está no lugar e nenhum passo a consumiu: é uma casca dupla em cima da fonte; use-a numa booleana ou reduza o total` });
+        }
+      });
+    }
+  }
 
   /* `materiais` faz parte do estado neutro: a face só guarda o NOME, mas uma
      revisão sem o dicionário não conseguiria dizer se uma alteração de cor ou

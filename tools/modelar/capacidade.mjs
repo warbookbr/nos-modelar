@@ -16,7 +16,8 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const ESTACOES = 'procedural/nucleo/gaiola-por-estacoes.js';
 
-/* arquivo: onde está o comentário com a ficha; funcao e de: a função que o exemplo chama e o arquivo que a exporta. As opções de
+/* arquivo: onde está o comentário com a ficha; funcao e de: a função que o exemplo chama e o arquivo que a exporta; usa: as outras funções
+   que o exemplo chama, pelo nome e pelo arquivo que as exporta (o ajudante que lê a saída de outro ajudante). As opções de
    gaiolaPorEstacoes (interpolada, anéis) têm ficha própria, mas o exemplo delas chama gaiolaPorEstacoes. */
 export const CAPACIDADES = Object.freeze({
   gaiolaPorEstacoes: { arquivo: ESTACOES, funcao: 'gaiolaPorEstacoes', de: ESTACOES },
@@ -26,13 +27,20 @@ export const CAPACIDADES = Object.freeze({
   gaiolaAneis: { arquivo: 'procedural/nucleo/gaiola-aneis.js', funcao: 'gaiolaPorEstacoes', de: ESTACOES },
   gaiolaPorLacos: { arquivo: 'procedural/nucleo/gaiola-por-lacos.js', funcao: 'gaiolaPorLacos', de: 'procedural/nucleo/gaiola-por-lacos.js' },
   lacosPelasVistas: { arquivo: 'procedural/nucleo/lacos-pelas-vistas.js', funcao: 'lacosPelasVistas', de: 'procedural/nucleo/lacos-pelas-vistas.js' },
+  paineisPorVaos: { arquivo: 'procedural/nucleo/paineis-por-vaos.js', funcao: 'paineisPorVaos', de: 'procedural/nucleo/paineis-por-vaos.js' },
+  curvaDaGaiola: { arquivo: 'procedural/nucleo/curva-da-gaiola.js', funcao: 'curvaDaGaiola', de: 'procedural/nucleo/curva-da-gaiola.js', usa: { gaiolaPorLacos: 'procedural/nucleo/gaiola-por-lacos.js' } },
+  vaoEntrePartes: { arquivo: 'tools/modelar/vao-entre-partes.mjs', funcao: 'vaoEntrePartes', de: 'tools/modelar/vao-entre-partes.mjs' },
+  instanciaDeFamilia: { arquivo: 'tools/modelar/instancia-de-familia.mjs', funcao: 'instanciaDeFamilia', de: 'tools/modelar/instancia-de-familia.mjs' },
+  raioDaAresta: { arquivo: 'tools/modelar/raio-da-aresta.mjs', funcao: 'medirPerfil', de: 'tools/modelar/raio-da-aresta.mjs' },
+  ondulacaoDaSuperficie: { arquivo: 'tools/modelar/ondulacao-da-superficie.mjs', funcao: 'ondulacaoDaReceita', de: 'tools/modelar/ondulacao-da-superficie.mjs' },
+  apoioDoVinco: { arquivo: 'procedural/nucleo/apoio-do-vinco.js', funcao: 'apoioDoVinco', de: 'procedural/nucleo/apoio-do-vinco.js' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
 });
 
 export const LIMITE_DE_LINHAS = 60;
 
 const AJUDA = `npm run capacidade [-- <nome>]  (node tools/modelar/capacidade.mjs)
-Sem nome, lista as capacidades de gaiola com uma linha cada. Com o nome, imprime a ficha: para que serve, quando usar em vez das outras,
+Sem nome, lista as capacidades (de gaiola, de painel, de vão e de instância de família) com uma linha cada. Com o nome, imprime a ficha: para que serve, quando usar em vez das outras,
 os campos com uma linha cada, o exemplo mínimo e uma peça do acervo que a usa. A ficha é recortada do comentário de cabeçalho do arquivo
 da capacidade, e não existe em outro lugar.
 `;
@@ -68,6 +76,8 @@ function fichaDe(nome) {
   return lerFicha(readFileSync(resolve(REPO, CAPACIDADES[nome].arquivo), 'utf8'));
 }
 
+const semAcento = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 const listar = () => Object.keys(CAPACIDADES).map((n) => `${n.padEnd(20)} ${fichaDe(n)?.serve ?? '(sem ficha)'}`).join('\n');
 
 export function executar(args) {
@@ -75,6 +85,16 @@ export function executar(args) {
   const nome = args.find((a) => !a.startsWith('--'));
   if (!nome) return { codigo: 0, stdout: `${listar()}\n`, stderr: '' };
   const achado = Object.keys(CAPACIDADES).find((n) => n.toLowerCase() === nome.toLowerCase());
+  if (!achado) {
+    /* a palavra que não é nome: as capacidades cuja ficha a cita em `serve` ou `quando` (painel, vão, linha de vão, porta, capô) */
+    const palavras = semAcento(args.filter((a) => !a.startsWith('--')).join(' ')).split(/\s+/).filter((w) => w.length >= 3);
+    const citam = Object.keys(CAPACIDADES).filter((n) => {
+      const f = fichaDe(n);
+      const texto = semAcento((f?.linhas ?? []).filter((l) => l.startsWith('serve: ') || l.startsWith('quando: ')).join(' '));
+      return palavras.length > 0 && palavras.every((w) => texto.includes(w));
+    });
+    if (citam.length) return { codigo: 0, stdout: `'${nome}' não é o nome de uma capacidade; as que a citam:\n${citam.map((n) => `${n.padEnd(20)} ${fichaDe(n).serve}`).join('\n')}\n`, stderr: '' };
+  }
   if (!achado) return { codigo: 2, stdout: '', stderr: `capacidade '${nome}' não existe; as que existem:\n${listar()}\n` };
   const ficha = fichaDe(achado);
   if (!ficha) return { codigo: 2, stdout: '', stderr: `${CAPACIDADES[achado].arquivo} não tem o trecho FICHA ... FIM DA FICHA no comentário de cabeçalho\n` };

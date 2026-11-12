@@ -27,20 +27,22 @@
  * `LIMIAR_DA_LUZ_RASANTE`, com a imagem, a fração e o limiar (`exigirLuzNaSuperficie`), e o registro da rodada recusa o pacote cujo
  * manifesto não traz a fração de cada imagem ou traz uma abaixo dele.
  *
- * Uso: MODELAR_BLENDER=<blender> node tools/modelar/vistas-de-superficie.mjs <peça> [--saida=<pasta>] [--faixa-mm=<mm> | --sem-faixa-dos-vincos] */
+ * A PEÇA pode ser receita ou esboço 2.0 (`.esboco.mjs` ou `.esboco.json`, com `--opcao`, de 1), lidos pelo resolvedor comum das ferramentas
+ * de medida (`entrada-de-medida.mjs`). A face que a exportação não triangula sem triângulo de área nula (a parede fina de um corte, com
+ * vários cantos colineares nos dois lados) não derruba mais as vistas: ela é pulada, e o aviso lista cada uma (`facesPuladas`).
+ *
+ * Uso: MODELAR_BLENDER=<blender> node tools/modelar/vistas-de-superficie.mjs <peça> [--opcao=<n>] [--saida=<pasta>] [--faixa-mm=<mm> | --sem-faixa-dos-vincos] */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { partesDaLataria, superficieDaReceita } from '../../src/autoria/lataria.js';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { vincosDaMalha } from '../../src/autoria/vincos-da-malha.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { doAmbiente } from '../ambiente.mjs';
 import { lerArgumentos } from './argumentos.mjs';
-import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const BLENDER_TOOLS = join(REPO, 'tools/blender');
@@ -105,11 +107,10 @@ export function superficieDaPeca(peca, receita, plano = null, opcoes = {}) {
 /**
  * O que a peça leva ao pacote, lido da receita do acervo: `superficieDaPeca` com o caminho da receita.
  */
-export async function latariaDaPeca(peca) {
-  const caminho = resolverCaminhoReceita(peca);
-  const receita = receitaDoModulo(await importarReceita(caminho));
-  const plano = normalizarPlanoDeModelagem(receita?.PLANO);
-  return { ...superficieDaPeca(peca, receita, plano), caminho };
+export async function latariaDaPeca(peca, { opcao = 1, entrada = null } = {}) {
+  const lida = entrada ?? await lerEntradaDeMedida(peca, { opcao, montagem: false });
+  const plano = normalizarPlanoDeModelagem(lida.receita?.PLANO);
+  return { ...superficieDaPeca(peca, lida.receita, plano), caminho: lida.abs };
 }
 
 /* ---------- a luz rasante quase toda escura ---------- */
@@ -186,9 +187,10 @@ function rodarBlender(blender, script, args, executar) {
  * ou null quando a peça não tem vinco declarado ou a opção está desligada. `executar` troca o `spawnSync` no teste.
  */
 export async function vistasDeSuperficie(peca, {
-  pasta, blender = doAmbiente('BLENDER'), lataria = null, faixaDosVincos = true, faixaMm = null, executar = spawnSync,
+  pasta, blender = doAmbiente('BLENDER'), lataria = null, faixaDosVincos = true, faixaMm = null, executar = spawnSync, opcao = 1, entrada = null,
 } = {}) {
-  const decidida = lataria ?? await latariaDaPeca(peca);
+  const lida = entrada ?? await lerEntradaDeMedida(peca, { opcao, montagem: false });
+  const decidida = lataria ?? await latariaDaPeca(peca, { entrada: lida });
   /* A curvatura é da lataria. A peça de emenda sombreada leva só a luz rasante, e a peça que não leva nenhuma das duas (chamada pela
      linha de comando para olhar) recebe as duas, como sempre. */
   const comCurvatura = decidida.lataria || !decidida.luzRasante;
@@ -196,20 +198,21 @@ export async function vistasDeSuperficie(peca, {
     throw new Error(decidida.luzRasante ? mensagemSemBlender(peca, decidida)
       : `as vistas de superfície saem do Blender, e MODELAR_BLENDER não aponta o executável: rode \`${comandoDasVistas(peca)}\`.`);
   }
-  const caminho = resolverCaminhoReceita(peca);
   const destino = join(resolve(pasta), PASTA_DA_SUPERFICIE);
   rmSync(destino, { recursive: true, force: true });
   mkdirSync(destino, { recursive: true });
   const obj = join(destino, 'peca.obj');
   const { exportarArquivoObj } = await import('./exportar-obj.mjs');
-  await exportarArquivoObj({ arquivo: caminho, saida: obj, sobrescrever: true });
+  /* a receita e a execução vêm da mesma leitura: o esboço de lataria monta em segundos, e montá-lo três vezes era o custo da rodada */
+  const receitaExecutada = async () => lida.executar();
+  const nomeDoObj = lida.nome.replace(/\.esboco\.(mjs|js|json)$/, '').replace(/\.(mjs|js|json)$/, '');
+  const exportada = await exportarArquivoObj({ carregada: { receita: lida.receita, nome: nomeDoObj, neutro: (await receitaExecutada()).neutro }, saida: obj, sobrescrever: true, pularFaceSemArea: true });
+  const facesPuladas = exportada.facesPuladas ?? [];
   let partes = decidida.partes ?? null;
-  let executada = null;
-  const receitaExecutada = async () => (executada ??= executarReceita(receitaDoModulo(await importarReceita(caminho))));
   if (!partes) partes = comCurvatura ? partesDaLataria((await receitaExecutada()).neutro) : [];
   const argsDaFaixa = [];
   if (faixaDosVincos && comCurvatura) {
-    const vincos = vincosDaMalha(null, await receitaExecutada());
+    const vincos = vincosDaMalha(null, await receitaExecutada(), { comQuinasPorApoio: true });
     if (vincos.length) {
       const arquivo = join(destino, 'vincos.json');
       writeFileSync(arquivo, `${JSON.stringify({ vincos })}\n`, 'utf8');
@@ -234,7 +237,7 @@ export async function vistasDeSuperficie(peca, {
   if (!rasante.length || (comCurvatura && !curvatura.length) || faltam.length) {
     throw new Error(`as vistas de superfície de '${peca}' não saíram inteiras (${rasante.length} da luz rasante, ${curvatura.length} da curvatura${faltam.length ? `; faltam ${faltam.join(', ')}` : ''}).`);
   }
-  return { obj, partes, rasante, curvatura, faixa };
+  return { obj, partes, rasante, curvatura, faixa, facesPuladas };
 }
 
 /* ---------- o manifesto do pacote ---------- */
@@ -296,9 +299,9 @@ export function superficieDoPacote(peca, { pasta, sha256 }) {
 async function principal(argv) {
   let lido;
   try {
-    lido = lerArgumentos(argv.slice(2), { opcoes: ['saida', 'faixa-mm'], bandeiras: ['sem-faixa-dos-vincos'], posicional: { nome: 'a peça', obrigatorio: true } });
+    lido = lerArgumentos(argv.slice(2), { opcoes: ['saida', 'faixa-mm', 'opcao'], bandeiras: ['sem-faixa-dos-vincos', 'sem-cache'], posicional: { nome: 'a peça', obrigatorio: true } });
   } catch (erro) {
-    process.stderr.write(`uso: MODELAR_BLENDER=<blender> node tools/modelar/vistas-de-superficie.mjs <peça> [--saida=<pasta>] [--faixa-mm=<mm> | --sem-faixa-dos-vincos]\n${erro.message}\n`);
+    process.stderr.write(`uso: MODELAR_BLENDER=<blender> node tools/modelar/vistas-de-superficie.mjs <peça> [--opcao=<n>] [--saida=<pasta>] [--faixa-mm=<mm> | --sem-faixa-dos-vincos] [--sem-cache]\n${erro.message}\n`);
     return 2;
   }
   const peca = lido.posicional;
@@ -307,8 +310,12 @@ async function principal(argv) {
   const faixaMm = lido.opcao('faixa-mm') == null ? null : Number(lido.opcao('faixa-mm'));
   if (faixaMm != null && !(faixaMm > 0)) throw new Error(`--faixa-mm precisa ser número maior que zero, e veio '${lido.opcao('faixa-mm')}'`);
   if (faixaMm != null && !faixaDosVincos) throw new Error('--faixa-mm e --sem-faixa-dos-vincos juntas: a largura só vale com a faixa');
-  const lataria = await latariaDaPeca(peca);
-  const feitas = await vistasDeSuperficie(peca, { pasta, lataria, faixaDosVincos, faixaMm });
+  const opcao = opcaoDaLinha(lido.opcao('opcao'));
+  const entrada = await lerEntradaDeMedida(peca, { opcao, montagem: false, cache: !lido.bandeira('sem-cache') });
+  entrada.executar?.();
+  process.stderr.write(avisoDeCache(entrada, 'vistas:superficie'));
+  const lataria = await latariaDaPeca(peca, { opcao, entrada });
+  const feitas = await vistasDeSuperficie(peca, { pasta, lataria, faixaDosVincos, faixaMm, opcao, entrada });
   const { faixa } = feitas;
   const linhas = [
     `vistas:superficie — ${peca}`,
@@ -319,6 +326,7 @@ async function principal(argv) {
     '', `LUZ RASANTE (fração da peça iluminada; o pacote do crítico recusa abaixo de ${porcento(LIMIAR_DA_LUZ_RASANTE)}):`,
     ...feitas.rasante.map((i) => `  ${i.arquivo} (${i.iluminada == null ? 'sem medida' : porcento(i.iluminada)}${imagensEscuras([i]).length ? ', QUASE TODA ESCURA' : ''})`),
     '', 'CURVATURA DA LATARIA:', ...feitas.curvatura.map((i) => `  ${i.arquivo}`),
+    ...(feitas.facesPuladas.length ? ['', `AVISO: ${feitas.facesPuladas.length} face(s) sem triangulação válida ficaram fora das imagens (a exportação não as tria sem triângulo de área nula; rode \`npm run -s malha:lascas -- ${peca}\` e \`npm run exportar:obj\` para vê-las): ${feitas.facesPuladas.map((f) => `${f.face} (${f.parte ?? 'sem parte'}, ${f.vertices} cantos)`).join(', ')}`] : []),
   ];
   process.stdout.write(`${linhas.join('\n')}\n`);
   return 0;

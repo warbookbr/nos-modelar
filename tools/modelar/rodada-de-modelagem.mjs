@@ -45,7 +45,7 @@
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve, sep } from 'node:path';
+import { basename, dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LIMITE_DE_RODADAS, acaoDaReceita, defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
@@ -60,6 +60,7 @@ import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { comandoDoPacote, pastaDaRodada, superficieDaPeca, superficieDoPacote } from './vistas-de-superficie.mjs';
 import { palavras } from './leitura-por-regioes.mjs';
+import { lascasDaReceita } from './lasca.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -120,7 +121,7 @@ const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).
 
 export function gravarRodada(
   peca,
-  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie },
+  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas },
   { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), agora = () => new Date().toISOString() } = {},
 ) {
   exigirNome(peca);
@@ -143,6 +144,8 @@ export function gravarRodada(
   const rodada = {
     ...registrarRodada({ peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita, superficie }),
     registradaEm: agora(),
+    /* a contagem de faces finas da malha medida (`facesFinasDaMalha`): a próxima medição da peça compara com ela */
+    ...(facesFinas ? { facesFinas } : {}),
   };
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
@@ -193,7 +196,7 @@ const luzDaMedicao = (medicao) => (medicao.luzRasante?.luzRasante ? medicao.luzR
  * lataria (`superficieDaReceita`), `luzRasante` se a peça leva a luz rasante ao pacote (lataria ou emenda sombreada) e `avisos` o que o resumo do laço mostra sem reprovar (a dispensa de `PLANO.lataria`, com o motivo).
  * Peça sem receita resolvível lança.
  */
-export async function medirReceita(peca) {
+export async function medirReceita(peca, { rodadas, pasta } = {}) {
   const caminho = resolverCaminhoReceita(peca);
   const texto = readFileSync(caminho, 'utf8');
   const sha256 = `sha256:${createHash('sha256').update(texto).digest('hex')}`;
@@ -210,13 +213,79 @@ export async function medirReceita(peca) {
     const pontos = conferirPontos(receita, { quem: peca });
     if (!pontos.ok) falhas.push(indentar(formatarPontos(pontos)));
   }
-  const passou = falhas.length === 0;
   /* o PLANO inválido já reprova no `descrever`; aqui ele só não declara a lataria, que então sai dos PASSOS */
   let plano = null;
   try { plano = normalizarPlanoDeModelagem(receita?.PLANO); } catch { plano = null; }
-  const { lataria, luzRasante, porque } = superficieDaPeca(peca, receita, plano);
   const avisos = [avisoDaDispensa(plano)].filter(Boolean);
-  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos };
+  const facesFinas = facesFinasDaMalha(receita);
+  if (facesFinas && facesFinas.total > 0) {
+    const anteriores = rodadas ?? lerRodadasSeHouver(peca);
+    const base = await baseDeFacesFinas(anteriores, pasta ?? pastaSeHouver(peca));
+    const veredito = vereditoDasFacesFinas(facesFinas, { base, anteriores, lataria: plano?.lataria?.partes?.length > 0, peca });
+    avisos.push(veredito.aviso);
+    if (veredito.reprova) falhas.push(veredito.reprova);
+  }
+  const passou = falhas.length === 0;
+  const { lataria, luzRasante, porque } = superficieDaPeca(peca, receita, plano);
+  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...(facesFinas ? { facesFinas } : {}) };
+}
+
+/* ---- as faces finas da malha ---- */
+
+/**
+ * As faces finas da malha que a receita produz, contadas por parte com a mesma régua de `lasca.mjs` (a topologia do núcleo: área /
+ * maior aresta² abaixo de `LIMITE_DE_FACE_FINA`): `{ total, porParte: { parte: n } }`. Receita que não executa sozinha devolve null.
+ */
+export function facesFinasDaMalha(receita) {
+  let lascas;
+  try { ({ lascas } = lascasDaReceita(receita)); } catch { return null; }
+  const porParte = {};
+  for (const l of lascas) porParte[l.parte ?? '(sem parte)'] = (porParte[l.parte ?? '(sem parte)'] ?? 0) + 1;
+  return { total: lascas.length, porParte };
+}
+
+const pastaSeHouver = (peca) => { try { return pastaDeRodadas(peca); } catch { return null; } };
+const lerRodadasSeHouver = (peca) => { try { return lerRodadas(peca); } catch { return []; } };
+
+/* A contagem da última rodada da peça: a que ela gravou, ou, nas rodadas de antes da contagem, a da cópia da receita que ela guardou. */
+async function baseDeFacesFinas(rodadas, pasta) {
+  const ultima = rodadas[rodadas.length - 1];
+  if (!ultima) return null;
+  if (ultima.facesFinas && Number.isInteger(ultima.facesFinas.total)) return ultima.facesFinas.total;
+  if (!pasta) return null;
+  const copia = copiaDaReceita(pasta, ultima.numero);
+  if (!existsSync(copia)) return null;
+  try { return facesFinasDaMalha(receitaDoModulo(await importarReceita(copia)))?.total ?? null; } catch { return null; }
+}
+
+/**
+ * O aviso das faces finas e, quando cabe, a reprovação. A peça antiga do acervo tem face fina aceita (a carcaça da empilhadeira, a torre),
+ * então a contagem sozinha não reprova: reprova a que cresce em relação à última rodada da peça (`base`), e a de peça sem rodada que
+ * declara chapa de lataria, que não tem face fina a aceitar.
+ */
+function vereditoDasFacesFinas({ total, porParte }, { base, anteriores, lataria, peca }) {
+  const onde = Object.entries(porParte).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([p, n]) => `${p}: ${n}`).join(', ');
+  const lista = `liste-as com \`npm run -s malha:lascas -- ${peca}\``;
+  const aviso = `${total} face(s) fina(s) na malha (${onde}); ${lista}.`;
+  if (base !== null && total > base) {
+    return { aviso, reprova: `faces finas cresceram: ${total} agora contra ${base} na última rodada (${onde}); ${lista} e tire as que a mudança criou.` };
+  }
+  if (anteriores.length === 0 && lataria) {
+    return { aviso, reprova: `peça nova de chapa de lataria com ${total} face(s) fina(s) (${onde}): lataria nova não tem face fina a aceitar; ${lista} e tire-as.` };
+  }
+  return { aviso };
+}
+
+/* O que do PLANO entra no pedido do crítico: o objeto, a escala, as referências, a forma de cada parte, os critérios e a família que escolhe
+   critérios e perguntas. `lataria` e `dobrasAceitas` são do texto e das réguas, e trocá-los não muda o que o crítico lê. O PLANO inválido
+   entra inteiro, como era. */
+export function planoQueOCriticoLe(plano) {
+  let normal;
+  try { normal = normalizarPlanoDeModelagem(plano); } catch { return plano ?? null; }
+  if (normal === null) return null;
+  const { lataria: _lataria, dobrasAceitas: _dobras, ...lido } = normal;
+  void _lataria; void _dobras;
+  return lido;
 }
 
 /**
@@ -240,7 +309,7 @@ export async function impressaoDaForma(caminho) {
   for (const [id, v] of neutro.V) hash.update(`v${id}:${v.join(',')};`);
   /* a face inteira, e não só os vértices: o liso, a cor, o material e a tinta mudam o que a imagem mostra */
   for (const [id, f] of neutro.F) hash.update(`f${id}:${JSON.stringify(f)};`);
-  hash.update(`plano:${JSON.stringify(receita.PLANO ?? null)}`);
+  hash.update(`plano:${JSON.stringify(planoQueOCriticoLe(receita.PLANO))}`);
   /* os afastamentos que o REFINA declara entram no pedido do crítico: a mesma malha com afastamento novo volta a ele, porque o crítico do
      trem do nariz mediu como defeito a descida decidida que o pedido ainda não dizia */
   const afastamentos = (receita.REFINA?.esboco ? normalizarEsbocoDoRefinamento(receita.REFINA.esboco).formas : [])
@@ -276,7 +345,11 @@ export async function acaoDaPeca(peca, {
     const [atual, julgada] = await Promise.all([impressaoDaForma(medicao.caminho), impressaoDaForma(copiaDaReceita(pasta, ultima.numero))]);
     if (atual !== null && atual === julgada) mesmaFormaDaRodada = ultima.numero;
   }
-  const decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite });
+  let decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite });
+  /* o julgamento da rodada vale: do texto só mudou o que a malha e o pedido do crítico (objeto, partes, critérios, referências) não leem */
+  if (mesmaFormaDaRodada && decisao.motivo.includes('mas produz a mesma malha')) {
+    decisao = { ...decisao, motivo: `${decisao.motivo} Só o texto mudou, e nada do que o crítico lê; o julgamento da rodada ${mesmaFormaDaRodada} vale.` };
+  }
   /* a peça de lataria só fecha com a luz rasante e a curvatura da lataria no pacote que o crítico julgou, e a de emenda sombreada com a luz rasante */
   if (decisao.acao === 'parar-fechou' && luzDaMedicao(medicao) && !ultima?.superficie) {
     const lataria = Boolean(medicao.lataria?.lataria);
@@ -297,10 +370,19 @@ const PASTAS_FORA_DO_REPOSITORIO = ['tools/bancadas/out/', 'tmp/', '.claude/work
    `tools/bancadas/out/`, e outro o da prancha dentro da pasta de trabalho de um agente; os dois entraram na rodada gravada, e a
    conferência de referências do CI, que roda sem essas pastas, reprovou. O alvo que é caminho absoluto vira caminho relativo à raiz
    (o de uma pasta de trabalho de agente, ao arquivo de mesmo nome no repositório), e o que cai fora do repositório ou não existe é
-   recusado; o texto que não é caminho, como "sem alvo: ...", passa como está. */
+   recusado; o texto que não é caminho, como "sem alvo: ...", passa como está. A imagem que existe fora do repositório é a
+   referência externa de `vistas:critica --referencia` e fica só com o nome. */
 export function alvoDoRepositorio(alvo, raiz = RAIZ_DO_REPOSITORIO) {
+  if (typeof alvo === 'string' && !alvo.startsWith('/') && PASTAS_FORA_DO_REPOSITORIO.some((p) => alvo.includes(p))) {
+    /* o texto livre que cita um arquivo de pasta fora do repositório: a conferência de links do CI o lê como referência e reprova */
+    throw new Error(`o alvo do veredito (${alvo}) cita um arquivo de pasta que o CI não tem (${PASTAS_FORA_DO_REPOSITORIO.join(', ')}). `
+      + 'Peça ao crítico o alvo de verdade ou "sem alvo: <motivo>" sem caminho.');
+  }
   if (typeof alvo !== 'string' || !alvo.startsWith('/')) return alvo;
   let relativo = alvo.startsWith(raiz + sep) ? alvo.slice(raiz.length + 1) : null;
+  /* a referência externa (`vistas:critica --referencia`), que a regra do repositório manda ficar fora dele, entra só pelo nome:
+     o caminho de fora não é gravado, e a rodada diz que o alvo existiu e qual foi */
+  if (!relativo && /\.(png|jpe?g|webp)$/i.test(alvo) && existsSync(alvo)) return `referência externa, fora do repositório: ${basename(alvo)}`;
   if (relativo?.startsWith('.claude/worktrees/')) relativo = relativo.split('/').slice(3).join('/');
   if (!relativo || PASTAS_FORA_DO_REPOSITORIO.some((p) => relativo.startsWith(p)) || !existsSync(join(raiz, relativo))) {
     throw new Error(`o alvo do veredito (${alvo}) não é um arquivo do repositório; a rodada gravada não pode citar caminho que o CI não tem. `
@@ -345,7 +427,7 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   /* `medidas` e `superficie` são da ferramenta, e o que a entrada declara deles sai */
   const { medidas: _declaradas, superficie: _declarada, ...resto } = entrada;
   void _declaradas; void _declarada;
-  const gravada = gravarRodada(peca, { ...resto, superficie, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
+  const gravada = gravarRodada(peca, { ...resto, superficie, facesFinas: medicao.facesFinas, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
   return { ...gravada, medicao };
 }
 

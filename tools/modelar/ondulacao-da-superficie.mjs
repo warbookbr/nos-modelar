@@ -2,6 +2,24 @@
 /* ondulacao-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita ondula, salta ou dobra fora dos
  * vincos declarados, e diz quanto (em milímetro) e quais pontos nomeados da gaiola mexer.
  *
+ * FICHA ondulacaoDaSuperficie
+ * serve: achar a ondulação, o calombo, a emenda e a face virada da superfície de subdivisão de uma receita, de um esboço 2.0 ou de uma montagem,
+ *   em mm e sem referência externa, com os pontos nomeados da gaiola que mais pesam em cada falha (`npm run ondulacao`).
+ * quando: depois de montar a gaiola, em toda peça de superfície lisa; lê a chapa antes do corte em painéis quando há corte depois, e a quina por
+ *   colunas de apoio (vinco de nitidez 0, ou com `raio`) conta como feição, em `junto`, e não como falha; para o raio da quina use `raio:aresta`.
+ * unidades: a receita entra em metro; a saída, em mm.
+ * campos:
+ *   limiarMm: o desvio acima do qual o vértice semeia uma falha, em mm (0,3).
+ *   raio: o raio do ajuste local, em espaçamentos da gaiola (3).
+ *   zonaDeclarada: a distância, em espaçamentos, de um vinco, borda ou canto declarados em que a falha vai para `junto` (1).
+ *   emendaGraus: o ângulo, em graus, a partir do qual a aresta fora de vinco é emenda (2).
+ *   viradaGraus: o ângulo, em graus, entre as normais de duas faces vizinhas a partir do qual a face é virada (90).
+ *   passo: o passo da receita em que a superfície é lida (padrão: o último que ainda tem a gaiola, dito em `leitura`).
+ * exemplo:
+ *   ondulacaoDaReceita({ PARAMS: {}, TOPO: Object.fromEntries(Array.from({ length: 16 }, (_, k) => [`p${k}`, [(k % 4) * 0.1, 0, Math.floor(k / 4) * 0.1]])), PASSOS: [['subdivisao', { vertices: Array.from({ length: 16 }, (_, k) => `p${k}`), faces: Array.from({ length: 9 }, (_, k) => { const i = (k % 3) + 4 * Math.floor(k / 3); return [`p${i}`, `p${i + 4}`, `p${i + 5}`, `p${i + 1}`]; }), niveis: 2 }]] }).falhas === 0
+ * peça: procedural/pecas/sedan-chassi-e-lataria/alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs
+ * FIM DA FICHA
+ *
  * POR QUE ELE EXISTE. A zebra e as listras de reflexo mostram a ondulação à pessoa, mas a IA que lê uma imagem de listras
  * não sabe dizer de quantos milímetros é o defeito nem que ponto da gaiola o causa. Esta ferramenta lê a própria malha que
  * a receita entrega, sem referência externa, e devolve cada falha com posição, amplitude, extensão e os nomes dos pontos
@@ -68,7 +86,18 @@
  *
  * Mesma receita, mesma saída: nenhuma conta depende de relógio, acaso ou ordem de mapa.
  *
- *   node tools/modelar/ondulacao-da-superficie.mjs <peça> [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90]
+ *   node tools/modelar/ondulacao-da-superficie.mjs <receita | esboço | montagem> [--opcao=<n>] [--passo=<n>] [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90]
+ *
+ * A ENTRADA é receita, esboço 2.0 (`.esboco.mjs` ou `.esboco.json`, com `--opcao`, de 1) ou montagem persistida (uma leitura por peça),
+ * pelo resolvedor comum das ferramentas de medida (`entrada-de-medida.mjs`).
+ *
+ * A CHAPA CORTADA. A malha que a receita entrega pode ser a da chapa depois de um corte em painéis, que tirou vértices da superfície de
+ * subdivisão; a ondulação é da superfície, e é lida então no último passo que ainda tem a gaiola, dito na saída (`leitura` e
+ * `medidoNoPasso`). `--passo=<n>` escolhe o passo em que ler, para todas as superfícies.
+ *
+ * A QUINA POR COLUNAS DE APOIO. O vinco declarado com nitidez 0 (a quina arredondada pela distância das colunas de apoio, que o
+ * ajudante de gaiola monta com `raio`) é feição: a faixa entre as duas colunas de apoio não conta como defeito, e a saída diz quantas
+ * falhas ficam fora das feições e quantas junto delas.
  */
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
@@ -77,8 +106,7 @@ import { idDoPasso } from '../../procedural/nucleo/nucleo.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
 import { capturarGaiolas } from '../../procedural/nucleo/gaiola-por-estacoes.js';
 import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
-import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { ErroDeEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 export const PADROES = Object.freeze({ limiarMm: 0.3, raio: 3, zonaDeclarada: 1, emendaGraus: 2, viradaGraus: 90 });
 const MM = 1000;
@@ -206,16 +234,19 @@ function curvaturas(c, escala) {
 
 /* ---- a superfície entregue por cada passo `subdivisao` ---- */
 
-/** superficiesDaReceita(receita) -> uma entrada por passo `subdivisao` executado, com a malha externa que o passo
- *  entregou (posições lidas do estado da receita), a gaiola de que ela saiu e o que é declarado nela. */
-export function superficiesDaReceita(receita) {
-  const { resultado: { entrada, neutro }, gaiolas } = capturarGaiolas(() => executarReceita(receita));
+const chaveDaAresta = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
+const operacaoDoPasso = (passo) => (Array.isArray(passo) ? passo[0] : passo?.op);
+
+/* A leitura da superfície de cada passo `subdivisao` sobre um estado já executado: `{ lista, faltou }`, com `faltou` a lista dos
+   passos `subdivisao` cujo vértice o estado não tem mais (um passo posterior o tirou). `ate` limita os passos lidos aos de índice
+   até ele. */
+function lerSuperficiesDoEstado(entrada, neutro, gaiolas, { ate = Infinity } = {}) {
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
   const { num } = criarResolverNumerico(dict);
   const vec = (a) => (typeof a === 'string' ? dict[a] : a).map(num);
-  const lista = [];
+  const lista = []; const faltou = [];
   entrada.PASSOS.forEach(([op, args = {}], i) => {
-    if (op !== 'subdivisao') return;
+    if (op !== 'subdivisao' || i > ate) return;
     const resolvida = gaiolaDoPasso(args, { vec, num });
     if (resolvida.erro) throw new Error(`ondulacao: o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
     const { gaiola, declarados, declaradaCheia, medidas } = resolvida;
@@ -223,11 +254,27 @@ export function superficiesDaReceita(receita) {
     const borda = args.borda ?? 'suave';
     const aoLimite = args.medidas != null;
     const r = subdividirCatmullClark({ ...gaiola, niveis, borda, aoLimite, comVincos: true });
-    const vertices = r.vertices.map((_, k) => {
+    const vertices = [];
+    for (let k = 0; k < r.vertices.length; k++) {
       const p = neutro.V.get(idDoPasso(i, k));
-      if (!p) throw new Error(`ondulacao: o vértice ${k} da superfície do passo ${i} não está na malha entregue; um passo posterior o tirou`);
-      return [...p];
-    });
+      if (!p) { faltou.push({ passo: i, vertice: k }); return; }
+      vertices.push([...p]);
+    }
+    /* A QUINA POR COLUNAS DE APOIO. O vinco declarado com nitidez 0 é a quina arredondada pela distância das colunas de apoio (a mesma
+       declaração do ajudante de gaiola, que com `raio` põe as colunas): a superfície limite não dobra nele, mas a faixa entre as duas
+       colunas de apoio é a feição que a forma pediu, e não defeito. As arestas da malha que descendem dele entram nos vincos da
+       leitura (a vizinhança do ajuste não as atravessa e a falha colada a elas vai para `junto`). O núcleo só segue a linhagem do vinco
+       de nitidez maior que zero, e por isso a marca roda o mesmo refino com uma nitidez desprezível (1e-6 nível) nesses vincos. */
+    const quinas = gaiola.vincos.filter(([, , x]) => !(x > 0));
+    let vincos = r.vincos; let arestasDeQuina = 0;
+    if (quinas.length) {
+      const eQuina = new Set(quinas.map(([a, b]) => chaveDaAresta(a, b)));
+      const marca = subdividirCatmullClark({ ...gaiola, vincos: gaiola.vincos.map(([a, b, x]) => [a, b, eQuina.has(chaveDaAresta(a, b)) && !(x > 0) ? 1e-6 : x]), niveis, borda, aoLimite: false, comVincos: true });
+      const ja = new Set(r.vincos.map(([a, b]) => chaveDaAresta(a, b)));
+      const novas = marca.vincos.filter(([a, b]) => !ja.has(chaveDaAresta(a, b)));
+      arestasDeQuina = novas.length;
+      vincos = [...r.vincos, ...novas];
+    }
     const origem = gaiola.vertices.map((_, k) => k);
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
     const nomeDe = (j) => { const d = declarados[origem[j]]; return typeof d === 'string' ? d : `[${vec(d).map((x) => arred(x * MM, 1)).join(', ')}]`; };
@@ -237,11 +284,70 @@ export function superficiesDaReceita(receita) {
     const origemDe = (j) => { const d = declarados[origem[j]]; return montada && typeof d === 'string' ? (montada.origens[d] ?? null) : null; };
     lista.push({
       passo: i, origemId: args.origemId ?? null, niveis, borda, aoLimite, simetria: args.simetria ?? null,
-      vertices, faces: r.faces, vincos: r.vincos, gaiola: { ...gaiola, borda }, calculados: r.vertices,
+      vertices, faces: r.faces, vincos, arestasDeQuina, gaiola: { ...gaiola, borda }, calculados: r.vertices,
       origem, nomeDe, origemDe, declarados, declaradaCheia, medidas, avisos: montada?.avisos ?? [],
     });
   });
-  return lista;
+  return { lista, faltou };
+}
+
+/* A receita executada até o passo `ate` (de 0), com as gaiolas que o núcleo montou nela. */
+function executadaAte(receita, ate) {
+  if (!Array.isArray(receita.PASSOS)) throw new Error('ondulacao: medir num passo anterior exige receita com PASSOS (a composição por chamadas não tem passo para cortar)');
+  const { resultado: { entrada, neutro }, gaiolas } = capturarGaiolas(() => executarReceita({ ...receita, PASSOS: receita.PASSOS.slice(0, ate + 1) }));
+  return { entrada, neutro, gaiolas };
+}
+
+/** superficiesDaReceita(receita, { passo, executada }) -> uma entrada por passo `subdivisao` executado, com a malha externa que o
+ *  passo entregou (posições lidas do estado da receita), a gaiola de que ela saiu e o que é declarado nela.
+ *
+ *  O PASSO MEDIDO. A malha que a receita entrega pode já ser outra (um corte em painéis tirou vértices da chapa), e a medida de
+ *  ondulação é a da superfície de subdivisão, que só existe antes do corte. Sem `passo`, a superfície é lida no estado final da
+ *  receita; a de que o estado final perdeu vértices é lida no último passo que ainda os tem (a busca sobe de passo em passo, dobrando
+ *  o salto, e acerta o último passo anterior ao que os tira), e cada entrada traz `medidoNoPasso` e `tiradoPeloPasso` (o passo e a
+ *  operação que os tiraram). Com `passo` (de 0), a escolha é explícita: toda superfície é lida no estado após esse passo, e é erro
+ *  que ele já não tenha os vértices de uma. `executada` é o `{ entrada, neutro }` do estado final, quando quem chama já o tem. */
+export function superficiesDaReceita(receita, { passo = null, executada = null } = {}) {
+  const memoria = new Map();
+  const lerAte = (ate) => {
+    if (!memoria.has(ate)) { const e = executadaAte(receita, ate); memoria.set(ate, { ...lerSuperficiesDoEstado(e.entrada, e.neutro, e.gaiolas, { ate }), entrada: e.entrada }); }
+    return memoria.get(ate);
+  };
+  if (passo !== null) {
+    const { lista, faltou, entrada } = lerAte(passo);
+    if (faltou.length) throw new Error(`ondulacao: o vértice ${faltou[0].vertice} da superfície do passo ${faltou[0].passo} não está na malha depois do passo ${passo}; um passo até ele o tirou`);
+    if (!lista.length) throw new Error(`ondulacao: nenhum passo subdivisao até o passo ${passo}`);
+    return lista.map((sup) => ({ ...sup, medidoNoPasso: passo, escolhaDoPasso: 'explícita', tiradoPeloPasso: null, passosDaReceita: entrada.PASSOS.length }));
+  }
+  const final = executada ? { entrada: executada.entrada, neutro: executada.neutro, gaiolas: [] } : (() => {
+    const { resultado: { entrada, neutro }, gaiolas } = capturarGaiolas(() => executarReceita(receita));
+    return { entrada, neutro, gaiolas };
+  })();
+  const { lista, faltou } = lerSuperficiesDoEstado(final.entrada, final.neutro, final.gaiolas);
+  const total = final.entrada.PASSOS.length;
+  const porPasso = new Map(lista.map((sup) => [sup.passo, { ...sup, medidoNoPasso: total - 1, escolhaDoPasso: 'final', tiradoPeloPasso: null, passosDaReceita: total }]));
+  const puladas = [];
+  for (const i of [...new Set(faltou.map((f) => f.passo))]) {
+    /* o passo `subdivisao` com `niveis` 0 é a gaiola posta como está (a lâmina de um vão, o gabarito de um corte), e não superfície de
+       subdivisão: a que o corte consumiu não tem o que medir, e a leitura a deixa fora, dizendo qual */
+    const niveisDe = Math.trunc(Number(final.entrada.PASSOS[i][1]?.niveis ?? 2));
+    if (niveisDe === 0) { puladas.push({ passo: i, motivo: 'gaiola sem subdivisão (niveis 0) que um passo posterior consumiu' }); continue; }
+    /* o último passo que ainda tem os vértices do passo `i`: salta de 1, 2, 4, ... passos e depois fecha o intervalo por bisseção */
+    const tem = (k) => lerAte(k).lista.some((sup) => sup.passo === i);
+    let bom = i; let ruim = null;
+    for (let salto = 1; ruim === null; salto *= 2) {
+      const k = Math.min(i + salto, total - 1);
+      if (k <= bom) { ruim = total; break; }
+      if (tem(k)) bom = k; else ruim = k;
+    }
+    while (ruim - bom > 1) { const m = Math.floor((bom + ruim) / 2); if (tem(m)) bom = m; else ruim = m; }
+    const lido = lerAte(bom).lista.find((sup) => sup.passo === i);
+    if (!lido) throw new Error(`ondulacao: o vértice ${faltou.find((f) => f.passo === i).vertice} da superfície do passo ${i} não está na malha entregue, nem logo depois do passo que a criou`);
+    porPasso.set(i, { ...lido, medidoNoPasso: bom, escolhaDoPasso: 'padrão', tiradoPeloPasso: ruim < total ? { passo: ruim, op: operacaoDoPasso(final.entrada.PASSOS[ruim]) } : null, passosDaReceita: total });
+  }
+  const saida = [...porPasso.keys()].sort((x, y) => x - y).map((i) => porPasso.get(i));
+  saida.puladas = puladas;
+  return saida;
 }
 
 /* ---- pesos da gaiola nos vértices de uma falha ---- */
@@ -662,10 +768,14 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
   return opcoes.devolverDesvios || operador ? { ...resumo, desvios: desvio, ...(operador ? { operador, espacamentos: h, amostra, foraDaZona: (v) => metadeDeclarada(v) && distFeicao(v) > o.zonaDeclarada * h[v] } : {}) } : resumo;
 }
 
-/** ondulacaoDaReceita(receita, opcoes) -> { opcoes, superficies: [...], falhas } */
+/** ondulacaoDaReceita(receita, opcoes) -> { opcoes, superficies: [...], falhas, foraDasFeicoes, juntoDasFeicoes, leitura }. `opcoes.passo` escolhe
+ *  o passo em que a superfície é lida e `opcoes.executada` é o estado final que quem chama já tem (ver `superficiesDaReceita`). */
 export function ondulacaoDaReceita(receita, opcoes = {}) {
-  const o = { ...PADROES, ...opcoes };
-  const superficies = superficiesDaReceita(receita).map((sup) => {
+  const { passo = null, executada = null, ...limiares } = opcoes;
+  const o = { ...PADROES, ...limiares };
+  const lidas = superficiesDaReceita(receita, { passo, executada });
+  const puladas = lidas.puladas ?? [];
+  const superficies = lidas.map((sup) => {
     const r = ondulacaoDaSuperficie(sup, o);
     const hs = []; const G = sup.gaiola;
     for (const f of G.faces) { let s = 0; for (let k = 0; k < f.length; k++) s += dist(G.vertices[f[k]], G.vertices[f[(k + 1) % f.length]]); hs.push(s / f.length); }
@@ -673,35 +783,64 @@ export function ondulacaoDaReceita(receita, opcoes = {}) {
     return {
       passo: sup.passo, origemId: sup.origemId, niveis: sup.niveis, vertices: sup.vertices.length, faces: sup.faces.length,
       pontosDaGaiola: G.vertices.length,
+      medidoNoPasso: sup.medidoNoPasso, escolhaDoPasso: sup.escolhaDoPasso, tiradoPeloPasso: sup.tiradoPeloPasso,
+      arestasDeQuinaDeclarada: sup.arestasDeQuina,
       facesViradas: r.falhas.reduce((n, f) => n + (f.tipo === 'faceVirada' ? f.facesViradas : 0), 0),
       avisosDaGaiola: sup.avisos,
       espacamentoDaGaiolaMm: { minimo: arred(hs[0] * MM, 1), mediana: arred(mediana(hs) * MM, 1), maximo: arred(hs[hs.length - 1] * MM, 1) },
       ...r,
     };
   });
-  return { opcoes: o, superficies, falhas: superficies.reduce((s, x) => s + x.falhas.length, 0) };
+  const foraDasFeicoes = superficies.reduce((s, x) => s + x.falhas.length, 0);
+  const juntoDasFeicoes = superficies.reduce((s, x) => s + x.junto.length, 0);
+  const leitura = [
+    ...superficies.map((x) => `superfície do passo ${x.passo}, lida no passo ${x.medidoNoPasso}${x.escolhaDoPasso === 'padrão' ? ` (o último passo que ainda tem a gaiola${x.tiradoPeloPasso ? `; o passo ${x.tiradoPeloPasso.passo}, ${x.tiradoPeloPasso.op}, tira vértices dela` : ''}; escolha outro com --passo=<n>)` : x.escolhaDoPasso === 'explícita' ? ' (escolha explícita)' : ' (a malha entregue)'}`
+      + `${x.arestasDeQuinaDeclarada ? `; ${x.arestasDeQuinaDeclarada} aresta(s) de quina por colunas de apoio (vinco de nitidez 0) tratadas como feição` : ''}`),
+    ...(puladas.length ? [`fora da leitura: ${puladas.map((x) => `passo ${x.passo} (${x.motivo})`).join('; ')}`] : []),
+    `${foraDasFeicoes} falha(s) fora das feições e ${juntoDasFeicoes} junto delas`,
+  ];
+  return { opcoes: o, superficies, ...(puladas.length ? { puladas } : {}), falhas: foraDasFeicoes, foraDasFeicoes, juntoDasFeicoes, leitura };
 }
 
 function lerOpcoes(args) {
   const o = {};
   const nomes = { 'limiar-mm': 'limiarMm', raio: 'raio', zona: 'zonaDeclarada', 'emenda-graus': 'emendaGraus', 'virada-graus': 'viradaGraus' };
+  let opcao = 1; let cache = true;
   for (const a of args) {
+    if (a === '--sem-cache') { cache = false; continue; }
     const m = /^--([a-z-]+)=(.+)$/.exec(a);
-    if (!m || !nomes[m[1]]) throw new Error(`ondulacao: opção desconhecida ${a}; as opções são ${Object.keys(nomes).map((k) => `--${k}=`).join(', ')}`);
+    if (m?.[1] === 'passo') {
+      const n = Number(m[2]); if (!Number.isInteger(n) || n < 0) throw new Error(`ondulacao: ${a} precisa ser o índice do passo, inteiro a partir de 0`);
+      o.passo = n; continue;
+    }
+    if (m?.[1] === 'opcao') { opcao = opcaoDaLinha(m[2]); continue; }
+    if (!m || !nomes[m[1]]) throw new Error(`ondulacao: opção desconhecida ${a}; as opções são ${[...Object.keys(nomes), 'passo', 'opcao'].map((k) => `--${k}=`).join(', ')}`);
     const x = Number(m[2]); if (!(x > 0)) throw new Error(`ondulacao: ${a} precisa ser número maior que zero`);
     o[nomes[m[1]]] = x;
   }
-  return o;
+  return { opcoes: o, opcao, cache };
 }
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/modelar/ondulacao-da-superficie.mjs <peça> [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90]\n'); return 2; }
-  const caminho = resolverCaminhoReceita(alvo);
-  if (!caminho) { process.stderr.write(`ondulacao: não achei a receita '${alvo}'.\n`); return 2; }
-  const receita = receitaDoModulo(await importarReceita(caminho));
-  const resultado = ondulacaoDaReceita(receita, lerOpcoes(resto));
-  process.stdout.write(`${JSON.stringify({ peca: alvo, ...resultado }, null, 2)}\n`);
+  if (!alvo) { process.stderr.write('uso: node tools/modelar/ondulacao-da-superficie.mjs <receita | esboço> [--opcao=<n>] [--passo=<n>] [--limiar-mm=0.3] [--raio=3] [--zona=1] [--emenda-graus=2] [--virada-graus=90] [--sem-cache]\n'); return 2; }
+  const { opcoes, opcao, cache } = lerOpcoes(resto);
+  let entrada;
+  try { entrada = await lerEntradaDeMedida(alvo, { opcao, montagem: true, cache }); } catch (erro) {
+    if (erro instanceof ErroDeEntrada) { process.stderr.write(`ondulacao: ${erro.message}\n`); return 2; }
+    throw erro;
+  }
+  const executada = entrada.tipo === 'montagem' ? null : entrada.executar();
+  process.stderr.write(avisoDeCache(entrada, 'ondulacao'));
+  /* uma peça (receita ou esboço) ou, numa montagem, cada peça com a superfície dela */
+  const pecas = entrada.tipo === 'montagem'
+    ? entrada.partes.map((p) => ({ peca: `${alvo}:${p.nome}`, resultado: ondulacaoDaReceita(p.receita, opcoes) }))
+    : [{ peca: alvo, resultado: ondulacaoDaReceita(entrada.receita, { ...opcoes, executada }) }];
+  for (const { peca, resultado } of pecas) process.stderr.write(`ondulacao: ${peca}${entrada.tipo === 'esboco' ? ` (${entrada.origem})` : ''}\n${resultado.leitura.map((l) => `  ${l}`).join('\n')}\n`);
+  const saida = pecas.length === 1 && entrada.tipo !== 'montagem'
+    ? { peca: alvo, ...(entrada.tipo === 'esboco' ? { esboco: entrada.origem } : {}), ...pecas[0].resultado }
+    : { montagem: alvo, pecas: pecas.map((p) => ({ peca: p.peca, ...p.resultado })), falhas: pecas.reduce((n, p) => n + p.resultado.falhas, 0) };
+  process.stdout.write(`${JSON.stringify(saida, null, 2)}\n`);
   return 0;
 }
 

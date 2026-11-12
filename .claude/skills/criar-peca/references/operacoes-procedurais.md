@@ -66,6 +66,14 @@ que sobraram dos anteriores:
 - `extremo:{eixo:'x'|'y'|'z', lado:'max'|'min', tol?}`: o elemento cujo centro
   (média dos cantos da face, ponto médio da aresta) está no maior ou menor valor
   do eixo, e os que ficam a até `tol` dele (padrão 1e-6, em unidades do mundo).
+- `conexo:{de:[x,y,z], dir:[x,y,z]}`: só de face. O pedaço conexo (faces ligadas
+  por aresta, entre as que sobraram dos critérios acima) que contém a primeira
+  face que o raio de `de` na direção `dir` toca. É a semente de um pedaço: depois
+  de uma booleana que parte uma chapa em várias, o ponto visto de uma vista nomeia
+  o pedaço sem citar id (`['parte', { nome: 'capo', sel: { origem: CORTE, onde:
+  { conexo: { de: [0, 2000, 900], dir: [0, -1, 0], ate: 1100 } } } }]`). `ate` (opcional) é a distância máxima do primeiro toque: a semente salva que passa a cair num vão toca a camada de trás, e com `ate` a seleção grita em vez de nomear o pedaço errado; `de` e `ate` são medidas (o conversor de mm do esboço as converte) e `dir` só direção. Raio que não toca
+  face grita (semente fora da peça ou num vão); empate de distância vai para a
+  face de menor id.
 
 ```js
 // a face de cima da caixa 1, e só dela (a caixa 2 tem outra face de cima)
@@ -430,6 +438,31 @@ vincadas, o meio da aresta fica na superfície limite como num filete de
 nitidez só arredonda a forma toda. Vinco ou canto por índice grita com a forma
 nomeada; par de pontos do vinco que não é aresta da gaiola, ponto que não está
 na gaiola, nome de vinco repetido e aresta em dois vincos gritam com os nomes.
+
+O raio em milímetro de uma aresta de caráter não se pede pela nitidez, que só
+o entrega com a face e os níveis certos (a mesma quina de 90 graus dá 0,16 mm
+no nível 3, 3,88 no 4 e 5,91 no 5). Na `gaiolaPorEstacoes` o vinco aceita
+`raio` no lugar da `nitidez`: `{ nome: 'linhaDeCintura', coluna: 'cintura',
+raio: 6 }`, ou `raio: { de: 6, ate: 3 }` para a quina que afina ao longo da
+linha, ou uma lista com um raio por ponto. O ajudante lê a dobra em cada ponto
+da linha, calcula a distância das colunas de apoio (`apoioDoVinco`, de
+`procedural/nucleo/apoio-do-vinco.js`) e as põe sobre as duas arestas da gaiola
+que saem do ponto, com mais de uma coluna por lado, em gradação, quando a face
+da gaiola é bem maior que o apoio; o vinco sai com nitidez 0 e o raio da malha
+independe dos níveis (3% abaixo do pedido no nível 2, menos de 1% do 3 em
+diante). O raio é o do filete: o arco de círculo tangente às duas faces que
+melhor cobre o perfil, e `raioDoFilete(perfil)` o mede num corte da malha por
+um plano perpendicular ao vinco, com `retasPor: { de, ate }` quando as faces
+são abauladas. A relação foi medida de 20 a 150 graus de dobra e vale com a
+quina lisa; a quina que é cota medida perde o raio, e a saída traz `raios` (o
+raio esperado por vinco e por ponto) e os avisos `raioNaoCabe`,
+`vincosDisputamApoio` e `quinaMedida`, entre outros. O vinco do passo `subdivisao` traz o
+`raio` pedido (campo opcional, em metro como as medidas do passo, número, `{ de, ate }` ou lista), junto da
+nitidez 0, sem efeito na geometria: fica no conteúdo salvo para `npm run raio:aresta` (que o lê como pedido,
+sem `--pedido`) e para a ondulação, que trata a faixa entre os apoios como feição. A `gaiolaPorLacos` também
+aceita `raio` nos vincos de `trecho`, `entre` e `laco`, e põe os apoios depois da compensação e antes da
+conferência da espessura, que refina a gaiola com eles. A `gaiolaPorRede` ainda não aceita `raio`;
+`npm run capacidade -- apoioDoVinco` dá a ficha da conta.
 `cantos: ['quina']` fixa o ponto como canto vivo, o vinco de vértice 1 do
 Blender. `simetria: 'x'` pede a gaiola da metade `x >= 0`, que é espelhada
 antes de subdividir para a costura sair lisa, com os vincos e cantos
@@ -913,6 +946,30 @@ O interior de um retalho de quatro lados é a interpolação transfinita de Coon
 A curva pode ser `vinco` (nitidez de 0 a 1 ou `'viva'`, que vira vinco nomeado ao longo de todas as arestas dela) e pode levar `peso` ou `exata: true`. As curvas e os pontos de dentro entram em `medidas` (curva exata por padrão, interior com o peso 1 de `interior`), e `leitura: true` faz a cota da curva sem peso ganhar o peso da leitura, com aviso dos pontos-chave mais perto do que o erro sustenta, como na gaiola por estações. O canto vivo da borda (desvio de direção acima de `anguloDeCanto`, 35 graus) sai sozinho em `passo.cantos`. A moldura é um `friso` com `linha: { nome, pontos: rede.linha('janela') }`, e a linha da curva fechada repete o primeiro ponto no fim. Três coisas gritam ou avisam com o nome: o canto quase reto ou agudo que dobra o preenchimento de Coons (`cantoQuaseReto`, `cantoAgudo`, ou grito se uma face dobra), o arco que vira mais de 22,5 graus numa divisão só (`curvaturaConcentrada`, que pede um nó onde a curvatura muda, como a emenda de um arco com uma reta) e o espaçamento que salta de um arco ao vizinho mais de três vezes (`gradacaoBrusca`).
 
 A chapa de prova da rede é `procedural/nucleo/fixtures/gaiola-por-rede-prova.js`. A receita pede, além das curvas, uma decisão por retalho (a lista de curvas dele), o `passo` e o `fora` da rede inteira, e nenhuma divisão nem canto. Os quatro nós que partem a janela onde a reta encosta no círculo são decisão de curva, e sem eles o `curvaturaConcentrada` os pede. As provas estão em `gaiola-por-rede.test.mjs`, `gaiola-por-rede-prova.test.mjs` e `tools/modelar/ondulacao-rede.test.mjs`.
+
+### Chapa em painéis com vão: `paineisPorVaos`
+
+Capô, para-lamas, portas, teto e tampa de uma carroceria, ou as tampas de uma máquina, são painéis de chapa de uma superfície só, separados por frestas. `paineisPorVaos`, de `procedural/nucleo/paineis-por-vaos.js` (entrada em mm; `saida: 'mm'` para o esboço, `saida: 'metro'` para a receita) (`npm run capacidade -- paineisPorVaos` dá a ficha; `npm run capacidade -- painel` acha por palavra), recebe a chapa já feita (os passos que a constroem e a origem dela: a casca facetada de sólido de fora menos o recuado, ou `subdivisao` com `espessura`), as linhas de vão, cada uma desenhada numa vista ortogonal (eixo, pontos em mm no plano dela, aberta ou fechada, com `alcance` no eixo da vista para a linha de um lado do carro não cortar o outro), a largura do vão e o nome de cada painel por um ponto visto da vista dele. A chapa é construída uma vez: o ajudante devolve uma lâmina por linha, um `subtrair` só e uma `parte` por painel (com `onde.conexo`, acima), e não uma montagem da chapa por painel.
+
+```js
+const g = paineisPorVaos({ chapa: { passos: CASCA, origem: { op: 'subtrair', id: 40 } }, vao: 4,
+  linhas: [{ eixo: 'y', pontos: [[-900, 690], [900, 690]] },                              // capô contra a cabine, vista de cima: [x, z]
+           { eixo: 'x', pontos: [[690, 1100], [690, 300]], alcance: [600, 1100] }],        // só o lado direito: [z, y]
+  paineis: [{ nome: 'capo', eixo: 'y', ponto: [0, 1200] }, { nome: 'paraLamaDir', eixo: 'x', ponto: [1500, 700] }] });
+// passos: [...g.passos]  (os da chapa vêm junto; chapa.emitir: false os deixa com a receita)
+```
+
+O vão é medido ao longo da chapa, e não no plano da vista: a lâmina mede `vao * sqrt(1 - (n . m)^2)`, com `n` a normal da chapa executada no ponto da linha e `m` a perpendicular da linha na vista (a chapa a 38 graus da vista pede uma lâmina de 3,15 mm para 4 mm), mais 2% (`margem`) para o vão não ficar abaixo do pedido. Chapa a mais de 80 graus da lâmina recusa: desenhe a linha na vista de frente dela. Linha fechada dentro de um painel dá o pedaço de dentro como painel próprio, ou o descarta com `dentro: 'descarta'`. O ajudante recusa a linha que não encontra a chapa, a semente que cai fora ou num vão, duas sementes no mesmo pedaço e o corte que o núcleo recusa, e avisa pedaço sem nome e lasca (`areaMinima`). Cada linha corta a chapa de lado a lado no alcance dado; a semente não pode cair numa abertura que a chapa já tem.
+
+Dois modos de lâmina. `modo: 'vista'` (padrão) extruda a linha ao longo do eixo da vista e compensa a largura pela inclinação: a parede do corte fica paralela ao eixo, e a folga entre as paredes é menor que o vão da pele (3,45 mm para 4,02 de pele numa chapa a 38 graus). `modo: 'superficie'` (por chamada ou por linha) projeta a linha na chapa pelos raios da vista e varre a lâmina sobre ela, com as paredes normais à chapa: a folga 3D é o vão em chapa a 0, 38 e 60 graus, a linha atravessa a dobra viva e a suave (a lâmina se parte na quina, as duas partes se encontram na seção bissetriz), a ponta que sai pela borda segue o plano da chapa sem alargar, e duas pontas de linhas que se encontram (também de vistas diferentes) passam meia largura e fecham o canto em esquadria (o L de duas linhas deixa 2,89 mm de dente no modo vista, e 4,02 no modo superfície). O modo superfície corta só a primeira camada lida do `lado`, e recusa o raio rasante, a dobra que dobra a lâmina sobre si e o furo (`descarta`) que atravessa dobra viva. Prefira-o para chapa fina com linha que cruza faces; o modo vista é o que corta todas as camadas do raio (a casca de um corpo fechado vista de lado, pelos dois lados).
+
+Linha de vão como curva 3D, para a quina arredondada: `linhas[i].curva: [[x, y, z], ...]` (mm, aberta ou fechada) no lugar de `eixo` e `pontos`. A linha desenhada numa vista não sobe uma quina arredondada (a porta que cruza a quina da cintura, o capô que desce pela quina da frente): o modo vista recusa ("inclinada 89 graus") ou deixa degrau, e o modo superfície recusa ("raio rasante"), porque o raio da vista fica tangente à chapa. Na curva cada ponto vai à pele de fora pelo ponto mais próximo da malha (grade espacial; `distanciaDaCurva`, padrão 3 vãos, recusa o ponto longe, com o número dele), a normal é a interpolação das normais alisadas dos vértices do triângulo, a curva é reamostrada e bipartida onde a normal gira, e a lâmina é varrida com as paredes normais à chapa e as mesmas conferências do modo superfície (autointerseção, proximidade de si mesma, folga medida e corrigida, profundidade; o fundo e o topo da seção encolhem onde o filete é fechado, para as seções vizinhas não se cruzarem). A curva aberta termina na borda e dá `alem` (mm, ou [início, fim]) para a ponta passar dela, e a que sai da chapa sem `alem`, ou que não separa a chapa em dois pedaços, é recusada com o ponto. Duas curvas em T, em L e a janela fechada que cruza a quina funcionam como no modo superfície; `medidas.curvas` traz as estações e o desvio da curva à pele. `linhas[i].vistas: [{ eixo, pontos, lado? }]` continua a linha de uma vista à outra: cada trecho vai à chapa pelo raio da vista dele e a emenda é bipartida sobre a quina. Em `procedural/nucleo/paineis-por-vaos-curva.test.ts`, na chapa em L de `procedural/nucleo/fixtures/chapa-em-l-prova.js`, a folga medida fica em 4,02 mm (4,01 a 4,03 com o raio que afina de 6 a 3 mm) ao longo da curva, quina incluída, com degrau 0 onde o raio é constante.
+
+`curvaDaGaiola`, de `procedural/nucleo/curva-da-gaiola.js` (`npm run capacidade -- curvaDaGaiola`), tira a curva da gaiola sem coordenada: `curvaDaGaiola(gaiola, { estacao: 7.4, de: 'soleira', ate: 'teto' })` devolve `{ curva, fechada }` em mm, sobre a malha refinada da `subdivisao` (use os mesmos `niveis` e `borda` da chapa: `{ niveis, borda: 'cantos' }`; `unidade: 'mm'` para a gaiola escrita em mm). A estação se dá por nome, índice fracionário (7,4 é 0,4 do caminho da 7 à 8), `{ em }` ou `{ entre: [a, b], fracao }`; `{ coluna: 'cintura', de, ate }` anda ao longo de uma coluna (estações com fração nas pontas), `{ coluna: { entre: ['a', 'b'], fracao } }` fica entre duas, e na gaiola por laços `laco` e a coluna `trecho.k` fazem o mesmo, com a volta fechada. As colunas de apoio do raio em mm entram na linha. A curva é a da subdivisão, que aproxima os pontos da gaiola: sem `medidas` a linha de índice 5 não cai em z = 690 se as estações vizinhas não são equidistantes (cerca de 8 mm no sedã), e a posição de projeto se dá por pontos da curva, ou por `medidas` na gaiola.
+
+`limpar` (padrão ligado nas linhas por superfície e por curva, desligado no modo vista): o passo `limparLascas` entra depois do `subtrair` e antes dos `parte`, com a tolerância de 0,01 mm (`true`, ou `{ tolerancia }`); `medidas.lascasAntes` e `lascasRestantes` contam as faces finas do corte.
+
+Uma ferramenta de corte (ou o interior de uma casca) que serve a mais de uma booleana, que consome o que recebe, constrói-se uma vez e se copia no lugar: `['arranja', { modo: 'linear', total: 5, coincidente: true, origemId: 2, derivaDe: { op: 'cubo', id: 1 }, sel: { origem: { op: 'cubo', id: 1 } }, nomes: ['u1', 'u2', 'u3', 'u4'] }]` deixa quatro cópias exatas do sólido, citáveis por `{ op: 'arranja', id: 2, de: { op: 'cubo', id: 1 }, nome: 'u1' }` mesmo depois de a fonte ser consumida; cada cópia é um uso.
 
 ### Superfície varrida: `gaiolaVarrida`
 

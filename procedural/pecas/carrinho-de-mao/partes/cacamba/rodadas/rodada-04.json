@@ -1,0 +1,359 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/cacamba",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: lado.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "borda",
+        "tipo": "superficie",
+        "onde": "centro da borda traseira, acima do fundo da vista de topo",
+        "sentido": "segmentado",
+        "evidencia": "peca-el20-topo-rasante-az30.png, topo central: entalhe na borda; a curvatura do topo mostra a mancha ocre no mesmo ponto. Em cima.png a borda é contínua ali."
+      },
+      {
+        "parte": "cacamba",
+        "tipo": "ausencia",
+        "onde": "face externa do fundo",
+        "sentido": "faltando",
+        "evidencia": "baixo.png mostra duas travessas com rebites e suportes laterais sob o fundo; a vista inferior do modelo não os tem. O brief não os prometeu."
+      },
+      {
+        "parte": "cacamba",
+        "tipo": "superficie",
+        "onde": "canto inferior traseiro, junto à dobra do fundo",
+        "sentido": "segmentado",
+        "evidencia": "peca-lado-rasante-az40.png, lado direito perto da base: degrau no contorno onde lado.png mostra o canto contínuo."
+      }
+    ],
+    "observacao": "Nenhum defeito estrutural: silhueta, fundo plano, borda e tirantes concordam com o alvo; a dúvida aberta é o assento sobre os braços (cerca de 5 mm na vista montada direita), que só um corte com o chassi nos braços decide."
+  },
+  "partes": [
+    {
+      "nome": "cacamba",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tirantes",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "gaiolaPorLacos reamostra por comprimento de arco: a face fina some ou volta conforme o número de pontos por trecho (41 deu 1, 45 deu zero), e só a medição diz qual",
+    "a sobreposição de cima só sai da conferência de 13 s; reproduzi o número com uma máscara própria (contorno mais 13 mm de borda contra a foto) para buscar os raios, e ela bateu com a conferência em 0,3 ponto",
+    "o defeito da rodada 3 (planta da boca) fechou com retas e arcos tangentes buscados contra o contorno: 92,1% de cima; atribuição: plano, corrigido",
+    "defeito 1 (entalhe no centro da borda de trás) fica onde o trilho fechado da borda começa e termina; atribuição: núcleo, a emenda da varredura fechada, a confirmar",
+    "defeito 2 (degrau no canto inferior traseiro, junto à dobra) é de superfície e pede a medida de malha; atribuição: a confirmar",
+    "defeito 3 (travessas e rebites sob o fundo) não foi prometido pelo plano; atribuição: plano, fora do escopo aceito"
+  ],
+  "notaDePassagem": "Planta da boca em retas e arcos tangentes: traseira reta, cantos de trás de raio 150, lados paralelos até z -333 (a metade de trás), flanco de raio 380, canto da frente de raio 75 e frente em arco de raio 390. Raios achados por busca contra o contorno de cima da foto na escala de lado, com a frente achatada como o crítico descreve: 92,1% de sobreposição de cima contra 91,7% da polilinha e 91,1% do semicírculo, e 85,2% de lado mantidos. A tampa do fundo é a escada entre inicio e fim, e 45 pontos por trecho dão zero faces finas, incluindo os tirantes.",
+  "receita": {
+    "sha256": "sha256:29e50d3e50c8f978cb23e10d46c959eede477c6227352960261ad065dd08e753",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 17,
+      "acrescentadas": 35,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": "       raio 150 (com 90 a sobreposição com a silhueta de cima caía de 91,7 para 89,9%, e com 150 fica em 91,1: a polilinha da foto"
+        },
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": "       tem o canto desse raio), os lados retos na meia largura de 313 e a frente em arco de meia volta, de raio igual à meia largura, até a ponta em"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "       z 24 (o arco de raio 313 centrado em z -289 cai a poucos mm da polilinha da foto de cima). As junções são tangentes, e cada arco"
+        },
+        {
+          "tipo": "-",
+          "linha": 47,
+          "texto": "       é amostrado a `passoAngular` graus. A meia largura da parede é a da boca. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 150, passoAngular: 2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "       raio 150 (a polilinha da foto tem o canto desse raio), os lados retos e paralelos na meia largura de 313 até z -333 (a metade de"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "       trás), o flanco em arco de raio 380 convergindo, o canto da frente de raio 75 e a frente em arco muito aberto, de raio 390, até"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "       z 24: a frente fica achatada e estreita, e não um semicírculo (os lados paralelos até dois terços e a ponta pontuda de um"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "       semicírculo de raio 313 davam 91,1% de sobreposição com a silhueta de cima; estes raios, achados por busca contra o contorno da"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "       foto levado à escala de lado, dão mais). O ponto em que o lado reto acaba (z -333) sai da tangência dos arcos, e não é digitado."
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "       Cada arco é amostrado a `passoAngular` graus. A meia largura da parede é a da boca. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "    boca: { meiaLargura: 313, frente: 24, tras: -810, raioDosCantos: 150, raioDoFlanco: 380, raioDoCantoDaFrente: 75, xDoCantoDaFrente: 62, raioDaFrente: 390, passoAngular: 2 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "    pontos: 41, pontosDoLado: 9,"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    pontos: 45, pontosDoLado: 9,"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": " *  inteiro. Os cantos de trás têm o raio dado, a frente é o arco de meia volta de raio igual à meia largura, e os lados e a traseira"
+        },
+        {
+          "tipo": "-",
+          "linha": 66,
+          "texto": " *  são retas: cada junção é tangente. Cada arco é amostrado a `passoAngular` graus. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": " *  inteiro. De trás para a frente, no lado de +x: traseira reta, canto de trás (raio `raioDosCantos`), lado reto, flanco em arco"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": " *  (`raioDoFlanco`) que converge, canto da frente (`raioDoCantoDaFrente`, de centro em x `xDoCantoDaFrente`) e frente em arco muito"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": " *  aberto (`raioDaFrente`, de centro no eixo) até a ponta em z `frente`. Cada junção é tangente: o canto da frente é tangente por"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": " *  dentro à frente e ao flanco, e o z em que o lado reto acaba sai daí. Cada arco é amostrado a `passoAngular` graus. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "  const w = B.meiaLargura; const r = B.raioDosCantos; const zf = B.frente - w; const zt = B.tras + r;"
+        },
+        {
+          "tipo": "-",
+          "linha": 69,
+          "texto": "  if (!(r > 0 && r < w && zt < zf)) throw new Error(`caçamba: boca de raio ${r} não cabe na meia largura ${w} e no comprimento ${B.frente - B.tras}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const w = B.meiaLargura; const rb = B.raioDosCantos; const zt = B.tras + rb;"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const Rf = B.raioDoFlanco; const rc = B.raioDoCantoDaFrente; const a = B.xDoCantoDaFrente; const Rr = B.raioDaFrente;"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const dFrente = Rr - rc; const dFlanco = Rf - rc;"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  if (!(rb > 0 && rb < w && rc > 0 && rc < Rf && rc < Rr && Math.abs(a) < dFrente && Math.abs(w - Rf - a) < dFlanco)) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    throw new Error('caçamba: os raios da boca não fecham tangentes (o canto da frente precisa caber por dentro da frente e do flanco)');"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const centroFrente = [0, B.frente - Rr];"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  const c2 = [a, centroFrente[1] + Math.sqrt(dFrente * dFrente - a * a)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  const zLado = c2[1] - Math.sqrt(dFlanco * dFlanco - (w - Rf - a) ** 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  const c1 = [w - Rf, zLado];"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const tFlanco = Math.atan2(c2[1] - c1[1], c2[0] - c1[0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  const tFrente = Math.atan2(c2[1] - centroFrente[1], c2[0] - centroFrente[0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  if (!(zLado > zt && tFlanco < tFrente)) throw new Error(`caçamba: a boca não cabe no comprimento (o lado reto acabaria em z ${zLado.toFixed(1)}, e o canto de trás acaba em ${zt})`);"
+        },
+        {
+          "tipo": "-",
+          "linha": 71,
+          "texto": "    const n = Math.max(1, Math.ceil(Math.abs(ate - de) / B.passoAngular));"
+        },
+        {
+          "tipo": "-",
+          "linha": 72,
+          "texto": "    return Array.from({ length: n + 1 }, (_, k) => { const t = (de + (ate - de) * k / n) * Math.PI / 180; return [cx + raio * Math.cos(t), cz + raio * Math.sin(t)]; });"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    const n = Math.max(1, Math.ceil(Math.abs(ate - de) * 180 / Math.PI / B.passoAngular));"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    return Array.from({ length: n + 1 }, (_, k) => { const t = de + (ate - de) * k / n; return [cx + raio * Math.cos(t), cz + raio * Math.sin(t)]; });"
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "  const inicio = [...arco(-w + r, zt, r, 180, 270), ...arco(w - r, zt, r, 270, 360)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 75,
+          "texto": "  const direita = [[w, zt], [w, zf]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "  const fim = arco(0, zf, w, 0, 180);"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "  const esquerda = [[-w, zf], [-w, zt]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 78,
+          "texto": "  return { trechos: { inicio, direita, fim, esquerda }, anel: [...inicio, ...direita.slice(1), ...fim.slice(1), ...esquerda.slice(1, -1)] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const h = Math.PI / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  const frenteDireita = [...arco(c1[0], c1[1], Rf, 0, tFlanco), ...arco(c2[0], c2[1], rc, tFlanco, tFrente).slice(1), ...arco(centroFrente[0], centroFrente[1], Rr, tFrente, h).slice(1)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const espelho = (ps) => ps.map(([x, z]) => [-x, z]).reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const inicio = [...arco(-w + rb, zt, rb, 2 * h, 3 * h), ...arco(w - rb, zt, rb, 3 * h, 4 * h)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const direita = [[w, zt], [w, zLado]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  const fim = [...frenteDireita, ...espelho(frenteDireita).slice(1)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  const esquerda = [[-w, zLado], [-w, zt]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  return { zLado, trechos: { inicio, direita, fim, esquerda }, anel: [...inicio, ...direita.slice(1), ...fim.slice(1), ...esquerda.slice(1, -1)] };"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes cacamba",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-el20-topo-rasante-az30.png",
+      "peca-el20-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az200.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T04:50:07.688Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

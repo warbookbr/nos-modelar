@@ -23,6 +23,15 @@ describe('capacidade: a ficha é recortada do cabeçalho do código', () => {
     expect(r.stderr).toContain(nomes[0]);
   });
 
+  it('uma palavra que não é nome acha as capacidades que a citam em serve ou quando', () => {
+    for (const busca of [['painel'], ['linha de vão'], ['capô'], ['porta']]) {
+      const r = executar(busca);
+      expect(r.codigo, busca.join(' ')).toBe(0);
+      expect(r.stdout, busca.join(' ')).toContain('paineisPorVaos');
+    }
+    expect(executar(['xyzxyz']).codigo).toBe(2);
+  });
+
   it('--ajuda descreve o uso', () => {
     expect(executar(['--ajuda']).stdout).toContain('npm run capacidade');
   });
@@ -58,7 +67,9 @@ describe('capacidade: a ficha é recortada do cabeçalho do código', () => {
         const modulo = await import(resolve(REPO, CAPACIDADES[nome].de));
         const funcao = modulo[CAPACIDADES[nome].funcao];
         expect(typeof funcao).toBe('function');
-        const r = new Function(CAPACIDADES[nome].funcao, `return ${ficha.exemplo}`)(funcao);
+        const usa = Object.entries(CAPACIDADES[nome].usa ?? {});
+        const outras = await Promise.all(usa.map(async ([f, de]) => (await import(resolve(REPO, de)))[f]));
+        const r = new Function(CAPACIDADES[nome].funcao, ...usa.map(([f]) => f), `return ${ficha.exemplo}`)(funcao, ...outras);
         expect(r).toBeTruthy();
       });
     });

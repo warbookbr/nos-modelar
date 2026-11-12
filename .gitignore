@@ -69,3 +69,7 @@ importados/
 
 # imagens de conferência do esboço (npm run esboco -- <arquivo> --analise): geradas, nunca versionadas
 **/referencias/*-analise/
+
+# Saída da conferência do rascunho de um objeto (`npm run conferir:vistas -- ... --saida=<objeto>/conferencia/<esboço>`),
+# que `fluxo:objeto` lê pelo resumo.json; regenerável e pesada, nunca versionada.
+procedural/pecas/*/conferencia/

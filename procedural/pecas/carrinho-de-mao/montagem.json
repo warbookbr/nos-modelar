@@ -1,0 +1,91 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "carrinho-de-mao",
+  "instancias": [
+    { "id": "chassi", "alvo": { "tipo": "peca", "ref": "carrinho-de-mao/chassi" } },
+    { "id": "pes", "alvo": { "tipo": "peca", "ref": "carrinho-de-mao/pes" } },
+    { "id": "cacamba", "alvo": { "tipo": "peca", "ref": "carrinho-de-mao/cacamba" } },
+    { "id": "roda", "alvo": { "tipo": "peca", "ref": "carrinho-de-mao/roda" } }
+  ],
+  "relacoes": [
+    {
+      "id": "rodaGiraNoEixo",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["chassi"], "porta": "eixo" },
+      "movel": { "caminho": ["roda"], "porta": "furoDoCubo" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.004, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ],
+  "etapas": ["chassi", "pes", "cacamba", "roda"],
+  "vinculos": [
+    {
+      "id": "furoDoCuboPeloEixo",
+      "alvo": { "instancia": "roda", "param": "raioDoFuroDoCubo" },
+      "de": { "instancia": "chassi", "porta": "eixo", "medida": "raio" },
+      "unidade": "mm",
+      "acrescimo": 4
+    },
+    {
+      "id": "cuboNoAssentoDoEixo",
+      "alvo": { "instancia": "roda", "param": "larguraDoCubo" },
+      "de": { "instancia": "chassi", "porta": "eixo", "medida": "fim" },
+      "unidade": "mm",
+      "acrescimo": 0
+    }
+  ],
+  "posicoes": [
+    {
+      "id": "pesSobOsBracos",
+      "instancia": "pes",
+      "porta": "noBraco",
+      "em": { "instancia": "chassi", "porta": "apoioDosPes" },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "cacambaSobreOsBracos",
+      "instancia": "cacamba",
+      "porta": "noBraco",
+      "em": { "instancia": "chassi", "porta": "apoioDaCacamba" },
+      "unidade": "mm",
+      "afastamento": 2.5
+    },
+    {
+      "id": "rodaNoEixo",
+      "instancia": "roda",
+      "porta": "furoDoCubo",
+      "em": { "instancia": "chassi", "porta": "eixo" },
+      "unidade": "mm",
+      "afastamento": 0
+    }
+  ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-9,
+    "expectativas": [
+      {
+        "id": "pesNaBracadeiraDoBraco",
+        "a": { "caminho": ["chassi"] },
+        "b": { "caminho": ["pes"] },
+        "motivo": "as pontas de cima dos V dos pés entram na braçadeira sob o braço, no eixo do tubo, e a face de cima das travessas assenta na de baixo dos braços em y 250"
+      },
+      {
+        "id": "tirantesPresosNoLaco",
+        "a": { "caminho": ["chassi"] },
+        "b": { "caminho": ["cacamba"] },
+        "motivo": "a ponta de baixo dos tirantes da caçamba é presa no tubo do laço, no eixo dele, em z 32; o fundo da caçamba fica 2,5 mm acima dos braços"
+      }
+    ]
+  },
+  "apoioNoChao": {
+    "plano": { "normal": [0, 1, 0], "altura": 0 },
+    "toleranciaNumerica": 0.0005,
+    "apoiam": [
+      { "caminho": ["roda"], "parte": "pneu" },
+      { "caminho": ["pes"], "parte": "pes" }
+    ]
+  }
+}

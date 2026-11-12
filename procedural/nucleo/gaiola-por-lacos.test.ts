@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
-import { DISTANCIA_MINIMA_ENTRE_PLANOS_MM, RAZAO_MAXIMA_DE_AMOSTRAGEM, TOLERANCIA_DA_COMPENSACAO_MM, gaiolaPorLacos } from './gaiola-por-lacos.js';
+import { DISTANCIA_MINIMA_ENTRE_PLANOS_MM, RAZAO_MAXIMA_DE_AMOSTRAGEM, RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS, TOLERANCIA_DA_COMPENSACAO_MM, gaiolaPorLacos } from './gaiola-por-lacos.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { lacosPelasVistas } from './lacos-pelas-vistas.js';
 // @ts-expect-error — núcleo em JavaScript.
@@ -679,5 +679,215 @@ describe('gaiolaPorLacos: o aviso de quando a compensação leva a superfície a
     expect(assinatura(corpo(true))).toBe('9c3e63fcd194c00d');
     expect(assinatura(corpo(false))).toBe('061e65c31a3c96d6');
     expect(JSON.stringify(corpo(true).avisos)).toBe(JSON.stringify(corpo(true).avisos));
+  });
+});
+
+describe('gaiolaPorLacos: a casca aberta (aberta) e a conferência da espessura da chapa (espessura)', () => {
+  /* a cuba: cinco laços em y, retângulos de cantos em arco de raio 10 que abrem para cima; `dir` e `esq` levam os dois arcos de cada lado */
+  const lacoDaCuba = (em: number, a: number, b: number, rc = 10, m = 6) => {
+    const arco = (cx: number, cz: number, a0: number) => Array.from({ length: m + 1 }, (_, k) => { const t = a0 + (Math.PI / 2) * k / m; return [cx + rc * Math.cos(t), cz + rc * Math.sin(t)]; });
+    return { em, trechos: {
+      baixo: [[-a + rc, -b], [a - rc, -b]], dir: [...arco(a - rc, -b + rc, -Math.PI / 2), ...arco(a - rc, b - rc, 0)],
+      cima: [[a - rc, b], [-a + rc, b]], esq: [...arco(-a + rc, b - rc, Math.PI / 2), ...arco(-a + rc, -b + rc, Math.PI)],
+    } };
+  };
+  const cuba = (extra: Record<string, unknown> = {}) => gaiolaPorLacos({
+    nome: 'cuba', eixo: 'y', tampa: { de: 'esq', ate: 'dir' },
+    trechos: [{ nome: 'baixo', pontos: 5 }, { nome: 'dir', pontos: 9 }, { nome: 'cima', pontos: 5 }, { nome: 'esq', pontos: 9 }],
+    lacos: [0, 15, 35, 60, 80].map((em, k) => lacoDaCuba(em, 60 + k * 4, 40 + k * 4)), ...extra,
+  });
+  /* o passo com a chapa, a face interna marcada como sólido para separar as duas peles */
+  const comChapa = (passo: any, pontos: any, t: number) => nucleo([['subdivisao', { origemId: 1, ...passo, niveis: 2, espessura: t }], ['solido', { sel: { origem: { op: 'subdivisao', id: 1, parte: 'interna' } } }]], {}, pontos);
+  const fechado = (st: any) => {
+    const conta = new Map<string, number>();
+    for (const f of st.F.values()) f.vs.forEach((a: number, k: number) => { const c = `${a}|${f.vs[(k + 1) % f.vs.length]}`; conta.set(c, (conta.get(c) ?? 0) + 1); });
+    let soltas = 0; let repetidas = 0;
+    for (const [c, n] of conta) { const [a, b] = c.split('|'); if (n > 1) repetidas++; if (!conta.has(`${b}|${a}`)) soltas++; }
+    const V = st.V.size; const E = conta.size / 2; const F = st.F.size;
+    return { soltas, repetidas, euler: V - E + F };
+  };
+  type V3 = [number, number, number];
+  /* a distância do ponto ao triângulo (a conta da região mais perto, de Ericson) */
+  const distTri = (p: V3, [A, B, C]: V3[]) => {
+    const s = (u: V3, v: V3): V3 => [u[0] - v[0], u[1] - v[1], u[2] - v[2]]; const d = (u: V3, v: V3) => u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+    const em = (o: V3, u: V3, t: number): V3 => [o[0] + u[0] * t, o[1] + u[1] * t, o[2] + u[2] * t];
+    const ab = s(B, A); const ac = s(C, A); const ap = s(p, A);
+    const d1 = d(ab, ap); const d2 = d(ac, ap); if (d1 <= 0 && d2 <= 0) return Math.hypot(...ap);
+    const bp = s(p, B); const d3 = d(ab, bp); const d4 = d(ac, bp); if (d3 >= 0 && d4 <= d3) return Math.hypot(...bp);
+    const vc = d1 * d4 - d3 * d2; if (vc <= 0 && d1 >= 0 && d3 <= 0) return Math.hypot(...s(p, em(A, ab, d1 / (d1 - d3))));
+    const cp = s(p, C); const d5 = d(ab, cp); const d6 = d(ac, cp); if (d6 >= 0 && d5 <= d6) return Math.hypot(...cp);
+    const vb = d5 * d2 - d1 * d6; if (vb <= 0 && d2 >= 0 && d6 <= 0) return Math.hypot(...s(p, em(A, ac, d2 / (d2 - d6))));
+    const va = d3 * d6 - d5 * d4; if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0) return Math.hypot(...s(p, em(B, s(C, B), (d4 - d3) / (d4 - d3 + d5 - d6))));
+    const den = 1 / (va + vb + vc); return Math.hypot(...s(p, em(em(A, ab, vb * den), ac, vc * den)));
+  };
+  /* de cada vértice da pele interna que o filtro escolhe até a pele externa: o menor e o maior */
+  const espessuras = (st: any, filtro: (p: V3) => boolean) => {
+    const faces = [...st.F.values()];
+    const tris = faces.filter((f: any) => !f.solido).flatMap((f: any) => f.vs.slice(1, -1).map((_: number, k: number) => [f.vs[0], f.vs[k + 1], f.vs[k + 2]].map((i: number) => st.V.get(i))));
+    const internos = [...new Set(faces.filter((f: any) => f.solido).flatMap((f: any) => f.vs))].map((i) => st.V.get(i)).filter(filtro);
+    const ds = internos.map((p: V3) => Math.min(...tris.map((t: V3[]) => distTri(p, t))));
+    return { n: ds.length, min: Math.min(...ds), max: Math.max(...ds), yInterno: Math.max(...[...new Set(faces.filter((f: any) => f.solido).flatMap((f: any) => f.vs))].map((i) => st.V.get(i)[1])) };
+  };
+
+  it('a cuba de cinco laços com a ponta de cima aberta e a chapa de 2 mm dá um sólido fechado, de 2 mm na parede e no fundo, com a boca aberta', () => {
+    const g = cuba({ aberta: 'fim', espessura: 2 });
+    expect(g.bocas.fim).toMatchObject({ laco: 'l4', em: 80 });
+    expect(g.bocas.fim.pontos).toHaveLength(2 * (4 + 8) + 1);
+    expect(g.bocas.fim.pontos[0]).toBe(g.bocas.fim.pontos[g.bocas.fim.pontos.length - 1]);
+    /* sem tampa em cima: nenhuma face só de pontos do último laço, e as arestas da boca ficam numa face só */
+    expect(g.passo.faces.some((f: string[]) => f.every((p) => p.startsWith('cuba_l4_')))).toBe(false);
+    expect(g.avisos.filter((a: any) => a.ref === 'cantoApertado')).toEqual([]);
+    const st = comChapa(g.passo, g.pontosMm, 2);
+    expect(st.orfaos).toEqual([]);
+    expect(fechado(st)).toEqual({ soltas: 0, repetidas: 0, euler: 2 });
+    const parede = espessuras(st, (p) => p[1] > 25 && p[1] < 70);
+    const fundo = espessuras(st, (p) => p[1] < 3 && Math.abs(p[0]) < 30 && Math.abs(p[2]) < 20);
+    expect(parede.n).toBeGreaterThan(50); expect(fundo.n).toBeGreaterThan(5);
+    for (const m of [parede, fundo]) { expect(Math.abs(m.min - 2)).toBeLessThan(0.2); expect(Math.abs(m.max - 2)).toBeLessThan(0.2); }
+    /* a boca: a pele interna sobe até a altura da borda (passa dela meia espessura, porque a parede abre para fora), e não fecha abaixo */
+    expect(parede.yInterno).toBeGreaterThanOrEqual(80);
+    expect(parede.yInterno).toBeLessThan(81);
+  });
+
+  it('a casca aberta é a gaiola fechada sem as faces da tampa daquela ponta, com a mesma orientação', () => {
+    const fechada = cuba(); const aberta = cuba({ aberta: 'fim' });
+    expect(aberta.passo.faces).toEqual(fechada.passo.faces.filter((f: string[]) => !f.every((p) => p.startsWith('cuba_l4_'))));
+    expect(aberta.pontosMm).toEqual(fechada.pontosMm);
+    const deBaixo = cuba({ aberta: 'inicio' });
+    expect(deBaixo.passo.faces).toEqual(fechada.passo.faces.filter((f: string[]) => !f.every((p) => p.startsWith('cuba_l0_'))));
+    expect(Object.keys(deBaixo.bocas)).toEqual(['inicio']);
+  });
+
+  it('sem aberta nem espessura a saída é a de antes, sem os campos novos', () => {
+    const g = gaiolaPorLacos(barra());
+    expect('bocas' in g).toBe(false); expect('espessura' in g).toBe(false);
+    expect(JSON.stringify(gaiolaPorLacos(barra({ aberta: undefined, espessura: undefined })).passo)).toBe(JSON.stringify(g.passo));
+  });
+
+  /* o tubo de seção quadrada de meia largura a, pontos por lado n, aberto nas duas pontas */
+  const quadrado = (em: number, a: number) => ({ em, trechos: { baixo: [[-a, -a], [a, -a]], dir: [[a, -a], [a, a]], cima: [[a, a], [-a, a]], esq: [[-a, a], [-a, -a]] } });
+  const tubo = (a: number, n: number, extra: Record<string, unknown> = {}) => gaiolaPorLacos({
+    nome: 'tubo', eixo: 'y', trechos: ['baixo', 'dir', 'cima', 'esq'].map((nome) => ({ nome, pontos: n })),
+    lacos: [0, 30, 60].map((em) => quadrado(em, a)), aberta: 'ambas', ...extra,
+  });
+
+  it('aberta ambas dá um tubo de parede: sem tampa e sem pedir tampa, e a chapa fecha num anel (característica de Euler zero)', () => {
+    const g = tubo(30, 3);
+    expect(Object.keys(g.bocas)).toEqual(['inicio', 'fim']);
+    expect(g.passo.faces).toHaveLength(2 * 8);
+    const st = comChapa(g.passo, g.pontosMm, 2);
+    expect(st.orfaos).toEqual([]);
+    expect(fechado(st)).toEqual({ soltas: 0, repetidas: 0, euler: 0 });
+  });
+
+  it('o canto apertado do laço sai como aviso com o laço, o ponto, o raio e o que fazer; o laço folgado não avisa, e a malha não muda', () => {
+    const apertado = tubo(6, 5, { espessura: 2 });
+    const avisos = apertado.avisos.filter((a: any) => a.ref === 'cantoApertado');
+    expect(avisos.map((a: any) => a.laco)).toEqual(['l0', 'l1', 'l2']);
+    expect(avisos[0]).toMatchObject({ ponto: 'tubo_l0_baixo0', trecho: 'baixo', direcao: 'noLaco', raioMm: 1.34, espessuraMm: 2 });
+    expect(avisos[0].texto).toMatch(/raio local de 1,34 mm.*faça o canto em arco.*ou use espessura menor/);
+    expect(apertado.espessura).toEqual({ espessuraMm: 2, niveis: 2, lado: 'contraNormal', raioMinimoMm: 1.34 });
+    /* o passo recusa a mesma chapa que o aviso prevê */
+    expect(comChapa(apertado.passo, apertado.pontosMm, 2).orfaos.map((x: any) => x.motivo).join()).toMatch(/passa do raio de curvatura local/);
+    expect(JSON.stringify(apertado.passo)).toBe(JSON.stringify(tubo(6, 5).passo));
+    const folgado = tubo(30, 3, { espessura: 2 });
+    expect(folgado.avisos).toEqual([]);
+    expect(folgado.espessura.raioMinimoMm).toBe(13.39);
+    /* a dobra entre o fundo e a parede da cuba, com a chapa mais grossa que ela, sai como dobra entre laços */
+    const dobra = cuba({ aberta: 'fim', espessura: 6 }).avisos.find((a: any) => a.ref === 'cantoApertado');
+    expect(dobra).toMatchObject({ laco: 'l0', direcao: 'entreLacos' });
+    expect(dobra.texto).toMatch(/laço a mais/);
+  });
+
+  it('o laço da boca serve a um vinco no passo subdivisao: a borda livre fica viva, no plano do laço, e a malha é a mesma', () => {
+    const g = cuba({ aberta: 'fim' });
+    const comVinco = { ...g.passo, vincos: [...g.passo.vincos, { nome: 'boca', pontos: g.bocas.fim.pontos, nitidez: 'viva' }] };
+    const pelaFicha = cuba({ aberta: 'fim', vincos: [{ nome: 'boca', laco: 'ultimo', nitidez: 'viva' }] });
+    expect(pelaFicha.passo.vincos).toEqual([{ nome: 'boca', pontos: g.bocas.fim.pontos, nitidez: 'viva' }]);
+    const a = nucleo([['subdivisao', { ...comVinco, niveis: 2 }]], {}, g.pontosMm);
+    const b = nucleo([['subdivisao', { ...g.passo, niveis: 2 }]], {}, g.pontosMm);
+    expect(a.orfaos).toEqual([]);
+    expect(JSON.stringify([...a.V.values()])).toBe(JSON.stringify([...b.V.values()]));
+    /* os vértices da borda livre (aresta numa face só) ficam todos no plano da boca */
+    const conta = new Map<string, number>();
+    for (const f of a.F.values()) f.vs.forEach((x: number, k: number) => { const y = f.vs[(k + 1) % f.vs.length]; const c = x < y ? `${x}|${y}` : `${y}|${x}`; conta.set(c, (conta.get(c) ?? 0) + 1); });
+    const daBorda = new Set([...conta].filter(([, n]) => n === 1).flatMap(([c]) => c.split('|').map(Number)));
+    expect(daBorda.size).toBe(4 * 24);
+    for (const v of daBorda) expect(Math.abs(a.V.get(v)[1] - 80)).toBeLessThan(1e-9);
+  });
+
+  it('recusa a ponta aberta que não existe, a lâmina aberta e a espessura que não é número', () => {
+    expect(grito(() => cuba({ aberta: 'cima' }))).toMatch(/aberta é 'inicio', 'fim', 'ambas'.*e veio "cima"/);
+    expect(grito(() => cuba({ espessura: -1 }))).toMatch(/espessura é a espessura da chapa em mm/);
+    expect(grito(() => cuba({ espessura: { valor: 2, niveis: 0 } }))).toMatch(/espessura.niveis/);
+    const lamina = gaiolaPorLacos({ ...barra(), lacos: [lacoDaBarra(0, 30, 0), lacoDaBarra(50), lacoDaBarra(100)] });
+    expect(lamina.passo.faces.length).toBeGreaterThan(0);
+    expect(grito(() => gaiolaPorLacos({ ...barra(), aberta: 'inicio', lacos: [lacoDaBarra(0, 30, 0), lacoDaBarra(50), lacoDaBarra(100)] }))).toMatch(/área zero.*não tem boca/);
+  });
+});
+
+/* O PASSO DENSO ENTRE LAÇOS. A caçamba do carrinho de mão, com 25 pontos nos lados retos (e 33 nos arcos da frente e de trás), deu 70
+   faces finas na malha subdividida, na dobra do fundo, sem aviso algum: com 9 pontos deram zero. Os laços abaixo copiam os valores da
+   caçamba (a altura de cada laço, a meia largura e o trecho em z dos lados retos), sem o domínio dela: a pilha de cinco laços a 2,5 a 4
+   mm da dobra do fundo e os quatro da parede, a 33 a 50 mm. A gaiola em si não tem face fina; o que mede é a razão entre o passo dos
+   pontos ao longo do lado e a menor distância entre laços vizinhos (a malha subdividida, medida com `lasca`: razão 5,7 e 3,8, zero
+   faces finas; 2,9, 12; 2,3, 30; 1,9, 68). */
+describe('gaiolaPorLacos: o passo denso entre laços', () => {
+  const LACOS_DA_CACAMBA = [
+    // [altura em y, meia largura, z do começo do lado reto, z do fim]
+    [284.5, 185.3, -596, -357], [287, 198.3, -604, -353], [289.5, 203.3, -607, -352], [292.5, 207.5, -610, -350], [296.5, 212, -612, -349],
+    [330, 233, -621, -331], [380, 263, -632, -304], [430, 294, -643, -277], [462, 313, -650, -260],
+  ];
+  /* os arcos de trás (de -x a +x, abaulado para trás) e da frente (de +x a -x, abaulado para a frente) */
+  const arco = (w: number, z: number, sentido: number, pontos: number): Uv[] => Array.from({ length: pontos }, (_, k) => {
+    const t = Math.PI * (k / (pontos - 1));
+    return [-sentido * w * Math.cos(t), z + sentido * 0.4 * w * Math.sin(t)] as Uv;
+  });
+  const cacamba = (pontosDoLado: number, pontos = 33, valores = LACOS_DA_CACAMBA) => gaiolaPorLacos({
+    nome: 'cacamba', eixo: 'y', tampa: { de: 'esquerda', ate: 'direita' }, aberta: 'fim', espessura: 1.5,
+    trechos: [{ nome: 'inicio', pontos }, { nome: 'direita', pontos: pontosDoLado }, { nome: 'fim', pontos }, { nome: 'esquerda', pontos: pontosDoLado }],
+    lacos: valores.map(([em, w, a, b], r) => ({
+      nome: `e${r}`, em,
+      trechos: {
+        inicio: arco(w, a, -1, pontos).map(([x, z]) => [-x, z] as Uv),
+        direita: [[w, a], [w, b]], fim: arco(w, b, 1, pontos).map(([x, z]) => [-x, z] as Uv), esquerda: [[-w, b], [-w, a]],
+      },
+    })),
+  });
+  const doPasso = (g: any) => g.avisos.filter((a: any) => a.ref === 'passoDensoEntreLacos');
+
+  it('avisa com 25 pontos no lado, com o trecho, os laços, a razão medida e o que mudar, e não avisa com 9', () => {
+    const denso = doPasso(cacamba(25));
+    expect(denso.map((a: any) => a.trecho).sort()).toEqual(['direita', 'esquerda']);
+    const a = denso[0];
+    expect(a.lacos).toEqual(['e2', 'e3']);
+    expect(a.razao).toBeCloseTo(1.9, 1);
+    expect(a.passoMm).toBeCloseTo(9.96, 1);
+    expect(a.distanciaMm).toBeCloseTo(5.2, 1);
+    expect(a.texto).toMatch(/no trecho 'direita' os pontos ficam a 10 mm.*laços 'e2' e 'e3' a 5,2 mm, razão 1,9, abaixo de 3/);
+    expect(a.texto).toMatch(/baixe os pontos desse trecho de 25 para \d+ ou menos, ou espace os laços/);
+    expect(RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS).toBe(3);
+    expect(doPasso(cacamba(9))).toEqual([]);
+    expect(doPasso(cacamba(13))).toEqual([]);
+    expect(doPasso(cacamba(17)).length).toBe(2);
+  });
+
+  it('o ponto que o aviso sugere já não avisa', () => {
+    const quantos = Number(/de 25 para (\d+) ou menos/.exec(doPasso(cacamba(25))[0].texto)![1]);
+    expect(doPasso(cacamba(quantos))).toEqual([]);
+  });
+
+  it('o aviso só acrescenta a entrada: os pontos, a malha e os outros avisos são os mesmos de antes', () => {
+    const g = cacamba(25);
+    const sem = { ...g, avisos: g.avisos.filter((a: any) => a.ref !== 'passoDensoEntreLacos') };
+    expect(sem.avisos.map((a: any) => a.ref)).not.toContain('passoDensoEntreLacos');
+    const outro = cacamba(25, 33);
+    expect(JSON.stringify(outro.passo)).toBe(JSON.stringify(g.passo));
+    expect(JSON.stringify(outro.pontosMm)).toBe(JSON.stringify(g.pontosMm));
+  });
+
+  it('laços a distâncias parecidas não avisam, por densos que sejam os pontos', () => {
+    const uniformes = LACOS_DA_CACAMBA.map((_, r) => [284.5 + r * 5, 233, -621, -331]);
+    expect(doPasso(cacamba(25, 33, uniformes))).toEqual([]);
   });
 });

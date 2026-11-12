@@ -89,3 +89,17 @@ describe('custo por peça', () => {
     expect(rodar([objeto, '--x']).codigo).toBe(2);
   });
 });
+
+describe('as duas escritas da atribuição', async () => {
+  const { contarAtribuicoes } = await import('./custo-por-peca.mjs');
+  it('conta "atribuição: plano" como "atribuído ao plano", com o núcleo na ferramenta e a instrução no plano', () => {
+    expect(contarAtribuicoes([
+      'defeito 1 segue os braços; atribuição: plano, que não diz isso ao crítico',
+      'emenda da varredura; atribuição: núcleo, a confirmar',
+      'sem MODELAR_BLENDER; atribuição: instrução de despacho',
+      'vem da família; atribuição: família',
+      'sem atribuição aqui',
+    ])).toEqual({ modelador: 0, plano: 2, ferramenta: 1, critico: 0, familia: 1 });
+  });
+});
+
