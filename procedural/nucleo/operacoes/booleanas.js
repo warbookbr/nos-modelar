@@ -350,6 +350,10 @@ export function criarOperacoesBooleanas(servicos) {
         : op === 'subtrair' ? 'a subtração não deixa nada da peça: o resultado é vazio e apagaria todas as faces das entradas'
           : 'a união saiu vazia');
     }
+    /* O subtrair (ou o intersectar) que não muda o sólido: o volume do resultado é o da peça (o primeiro sólido), a menos do erro de Float32. A ferramenta
+       não toca a peça, ou está inteira fora dela (no intersectar, a peça está inteira dentro das outras). O passo segue, e o aviso `semEfeito` diz qual. */
+    const volumeDaPeca = manifolds[0].volume();
+    const semEfeito = !extra && (op === 'subtrair' || op === 'intersectar') && Math.abs(volumeDaPeca - resultado.volume()) <= 1e-6 * Math.max(volumeDaPeca, 1e-30);
     const malha = resultado.getMesh();
     resultado.delete();
     const nP = malha.numProp, VP = malha.vertProperties, TV = malha.triVerts;
@@ -1040,6 +1044,11 @@ export function criarOperacoesBooleanas(servicos) {
       return vs.some((v, k) => { const w = vs[(k + 1) % vs.length]; return costuraFinal.has(v < w ? `${v}-${w}` : `${w}-${v}`); });
     });
     if (extra?.aoAplicar) extra.aoAplicar({ pedacosDeEntrada, consumidas: [...consumidas] });
+    if (semEfeito) {
+      st.avisos.push({ passo: i, op, ref: 'semEfeito', origemId, motivo: op === 'subtrair'
+        ? 'a subtração não muda o sólido: o volume do resultado é o da peça (sólido 0), então a ferramenta não a toca (ou só encosta nela); confira a posição e o tamanho da ferramenta'
+        : 'a interseção não muda o sólido: o volume do resultado é o da peça (sólido 0), então ela está inteira dentro dos outros; confira a posição e o tamanho dos sólidos' });
+    }
     registraOrigem(st, i, op, origemId, {
       faces: (extra ? facesAux : faces).sort((x, y) => x - y),
       costura: facesDaCostura.sort((x, y) => x - y),
