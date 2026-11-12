@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`
+**Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/conferir-vistas.mjs`
 
 **Responsável:** a IA da sessão do furgão, com as decisões técnicas delegadas pela pessoa em 2026-11-09; a pessoa é a
 crítica por imagem, com um resumo curto do que olhar.
@@ -54,6 +54,16 @@ Cada ferramenta nasce de um atrito relatado, com o comando que o reproduz, e é 
 - um aviso no `descrever` para cada `aberturaPorContorno` que cai na booleana da chapa inteira, com o motivo do registro
   (`vizinhanca.motivo`) e o tempo do passo: a janela da cabine do furgão (2026-11-09) pôs quatro vãos nesse caminho, a
   receita foi de 118 s a 207 s, e só o CI acusou, depois do envio, pelos tetos de tempo.
+- as ferramentas da empilhadeira (`linhas:modelo`, `vista:rapida`, `leitura:regioes`, `casamento:vista`, `conferir:vistas`)
+  abrindo receita de peça, e não só esboço, e recortando a região pedida em mm: no furgão (2026-11-11) a vista rápida da cabine
+  saiu em 11 s contra 4 a 15 min da bancada e as linhas da malha mostraram o degrau da porta, mas foi preciso um adaptador fora do
+  repositório para rodar a receita, e a leitura por regiões só cortou certo com o painel passado à mão;
+- a recusa silenciosa no `descrever` e no `guarda:acervo`: um passo que deixa `neutro.orfaos` (uma `aberturaPorContorno` cujo
+  contorno cruza a fresta de uma porta, no furgão em 2026-11-11) esvazia a chapa e o resto da cadeia, e o `descrever` só diz que a
+  peça não tem a parte; ele passa a imprimir cada órfão com o passo e o motivo, e a guarda a reprovar;
+- a bancada: o `--focar` com vista de lado põe a câmera dentro da peça quando as partes escolhidas são pequenas (a cabine do
+  furgão, 2026-11-12), a captura não diz em que passo está durante os minutos de carga, e uma captura recusada deixa o processo
+  antigo segurando a porta do servidor até o prazo dele; o `descrever` e o `guarda:acervo` também passam de dois minutos sem saída.
 
 ## Excluído
 
