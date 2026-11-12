@@ -38,8 +38,8 @@ describe('o acervo abre na bancada', () => {
     }
     expect(reprovadas, `peças que não abrem na bancada:\n${reprovadas.join('\n')}`).toEqual([]);
     /* o acervo inteiro levou 266 s no CI em 2026-11-12, e menos de 180 s na execução anterior com a mesma receita: a máquina do CI
-       varia quase o dobro, e o prazo padrão não cobre a mais lenta */
-  }, 600_000);
+       varia de duas a três vezes, e os retrovisores do furgão (2026-11-12) somam uns 29% à execução dele */
+  }, 900_000);
 
   it('cada montagem abre com todas as instâncias, sem aviso de "abriu sem"', async () => {
     const reprovadas = [];

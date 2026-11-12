@@ -1,6 +1,6 @@
 # As partes do braço
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/pecas/braco-robotico/`, `src/autoria/etapas-de-construcao.js`, `src/autoria/lataria.js`, `tools/modelar/vistas-de-superficie.mjs`, `tools/modelar/conferir-pontos.mjs`, `src/autoria/porta-confere-forma.js` na conferência da porta contra a forma, por decisão da pessoa em 2026-11-09
 
@@ -12,14 +12,14 @@ do braço com o braço inteiro fixo e as decisões técnicas delegadas pela pess
 **Repositório e base:** `warbookbr/nos-modelar`, base na main em 2026-09-26, descongelado sobre o ramo de trabalho de 2026-11-03.
 
 
-Em 2026-11-05, com o braço parado, a pessoa deixou que a ferramenta de vistas do crítico (`vistas-para-critica.mjs`) passe ao plano do [esboço pelo núcleo](encerrados/2026-11-05-esboco-pelo-nucleo.md) durante a migração do pacote do crítico; ela voltou a este território quando aquele plano fechou, em 2026-11-05.
-Em 2026-11-08 a pessoa passou `procedural/nucleo/operacoes/booleanas.js` ao plano da [união de tubos com arredondamento](encerrados/2026-11-08-uniao-de-tubos-com-arredondamento.md), que corrigiu o `arredondarCostura` onde o arredondamento chega à tampa plana de um tubo; ele voltou a este território quando aquele plano fechou, no mesmo dia, e o cotovelo é refeito com `unir` e `arredondarCostura`.
-Em 2026-11-09, com o braço inteiro fixo e a exportação por fazer, a pessoa passou `booleanas.js`, `geradores-avancados.js` e `guarda-acervo.mjs` ao plano das [costuras e furos limpos](2026-11-09-costuras-e-furos-limpos.md) e `etapas-da-montagem.mjs` ao das [ferramentas de conferência e de vista](2026-11-09-ferramentas-de-conferencia-e-vista.md); eles voltam a este território quando aqueles planos fecharem.
-Em 2026-11-11, com o braço ainda fixo, a pessoa mandou seguir com a fatia 1 do plano do [núcleo para qualquer mecanismo](2026-11-10-nucleo-para-qualquer-mecanismo.md), que muda o pedido ao crítico: `vistas-para-critica.mjs` passa a ele durante essa fatia e volta a este território quando ela fechar.
+Em 2026-11-05, com o braço parado, a pessoa deixou que a ferramenta de vistas do crítico (`vistas-para-critica.mjs`) passe ao plano do [esboço pelo núcleo](2026-11-05-esboco-pelo-nucleo.md) durante a migração do pacote do crítico; ela voltou a este território quando aquele plano fechou, em 2026-11-05.
+Em 2026-11-08 a pessoa passou `procedural/nucleo/operacoes/booleanas.js` ao plano da [união de tubos com arredondamento](2026-11-08-uniao-de-tubos-com-arredondamento.md), que corrigiu o `arredondarCostura` onde o arredondamento chega à tampa plana de um tubo; ele voltou a este território quando aquele plano fechou, no mesmo dia, e o cotovelo é refeito com `unir` e `arredondarCostura`.
+Em 2026-11-09, com o braço inteiro fixo e a exportação por fazer, a pessoa passou `booleanas.js`, `geradores-avancados.js` e `guarda-acervo.mjs` ao plano das [costuras e furos limpos](../2026-11-09-costuras-e-furos-limpos.md) e `etapas-da-montagem.mjs` ao das [ferramentas de conferência e de vista](../2026-11-09-ferramentas-de-conferencia-e-vista.md); eles voltam a este território quando aqueles planos fecharem.
+Em 2026-11-11, com o braço ainda fixo, a pessoa mandou seguir com a fatia 1 do plano do [núcleo para qualquer mecanismo](../2026-11-10-nucleo-para-qualquer-mecanismo.md), que muda o pedido ao crítico: `vistas-para-critica.mjs` passa a ele durante essa fatia e volta a este território quando ela fechar.
 
 ## Problema observado
 
-O plano [o braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou com
+O plano [o braço inteiro](2026-09-25-o-braco-inteiro.md) fechou com
 a porta conferida contra a forma, o contorno tirado da imagem e o fluxo do
 objeto escrito, mas o braço robótico ainda tem só base e anel da cintura
 fixos. O ombro será refeito pela vista frontal, as outras partes da rodada de
@@ -102,6 +102,8 @@ Em 2026-11-09 o cotovelo foi refeito como dois tubos unidos com arredondamento e
 
 Ainda em 2026-11-09 o colar do cotovelo saiu (não gira) e a coluna cresceu 25 mm; a coluna e o cotovelo viraram uma peça só, o braço superior, depois da correção do `arredondarCostura` no T com o tubo vertical alto; os tubos passaram a 190 mm, o diâmetro do anel do ombro; a conferência da porta contra a forma passou a medir a face que assenta (território estendido pela pessoa); e o punho entrou com as três juntas, a carcaça da junta 4 no antebraço, os anéis e elos de 135 mm e o flange de 154 mm com oito furos e um central. Todas as etapas até o elo da junta 5 estão fixas por aceite dela; o anel da junta 6 e o flange também, e o braço inteiro, da base ao flange, está fixo. A conferência de porta contra a forma, corrigida aqui, tirou da fila dois itens do backlog; os limites do núcleo que o braço mostrou e a outra sessão corrige estão no backlog (`unir` com tubo tangente à tampa, `unir` de `lathe` com 192 lados, face degenerada que só o visor recusa e a auditoria incompleta por ela, `furo` numa tampa de `lathe`, registro de etapas regravado a cada leitura). O braço montado foi exportado em OBJ por um script local, fora do repositório, a pedido da pessoa, para ela testar; o exportador que lê a montagem, da fatia 2, ainda não existe no repositório. Ficam a limpeza dos contornos do braço superior que a conferência antiga forçou e a fatia 2.
 
+Em 2026-11-12 a pessoa decidiu que o braço montado sai com as partes separadas num arquivo só, e sem `.blend`, porque o ambiente não tem Blender e o glTF é o formato que o Blender abre. `npm run exportar:gltf -- braco-robotico` grava `exportacoes/gltf/braco-robotico.glb` (fora do git): um nó por instância, com o nome dela, a malha da peça no referencial da peça e a pose de repouso da montagem na matriz do nó, pelo mesmo resolvedor que a bancada e a autoria usam. O arquivo reaberto tem as 12 caixas dentro de 0,01 mm das do resolvedor e passa no validador oficial sem aviso (`tools/modelar/exportar-gltf-braco.test.mjs`, lento, e a montagem de fixture em `modulos/exportador-gltf/tests/montagem.test.js`). Duas faces do antebraço e do braço que a triangulação não fecha (`face-degenerada`, o limite já conhecido do núcleo) são puladas na exportação e ditas na saída, como o `exportar:obj` faz. Falta a pessoa abrir o arquivo; o plano não fecha antes disso.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,
@@ -116,7 +118,7 @@ Ainda em 2026-11-09 o colar do cotovelo saiu (não gira) e a coluna cresceu 25 m
   posição de cada uma é decidido com a pessoa antes da fatia 5;
 - `conferir:referencia` por parte, comparando cada parte posicionada com o
   contorno dela no arquivo de contornos;
-- dois achados herdados do [rascunho do braço robótico](encerrados/2026-09-21-o-que-o-braco-robotico-achou.md), fechado em 2026-11-05: a medida de junta do `conferir-pontos`, que toma o centro da sobreposição das caixas e erra quando uma parte entra pelo flanco da outra, como no cotovelo; e a conferência de que a técnica escrita no `PLANO` de cada parte foi a usada, que hoje é só leitura do crítico.
+- dois achados herdados do [rascunho do braço robótico](2026-09-21-o-que-o-braco-robotico-achou.md), fechado em 2026-11-05: a medida de junta do `conferir-pontos`, que toma o centro da sobreposição das caixas e erra quando uma parte entra pelo flanco da outra, como no cotovelo; e a conferência de que a técnica escrita no `PLANO` de cada parte foi a usada, que hoje é só leitura do crítico.
 
 ## Excluído
 
@@ -168,7 +170,18 @@ o punho para e volta à pessoa.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-12. O braço robótico está inteiro pelas receitas, com as doze instâncias da montagem e todas as etapas fixas
+por aceite da pessoa, as cinco que a costura e o furo tocaram aceitas de novo em 2026-11-12 pelas vistas sólidas. Ele sai
+montado em glTF por `npm run exportar:gltf -- braco-robotico`, uma parte por instância com o nome dela e a pose da montagem no
+nó, sem `.blend` por decisão da pessoa; o teste reabre o arquivo gravado e confere a caixa de cada parte contra o resolvedor (até
+0,00002 mm), o validador oficial não acha erro, e a pessoa abriu o arquivo no Blender e aprovou. O gate 3, a conferência de
+cada parte posicionada contra o contorno da referência, saiu por decisão da pessoa em 2026-11-12: as proporções foram mudadas de
+propósito em relação à imagem, peça por peça e com aprovação dela, e a conferência reprovaria essas escolhas; ela volta ao
+backlog para objetos que sigam a referência à risca, com os dois achados herdados do rascunho (a medida de junta do
+`conferir-pontos` pelo flanco e a conferência da técnica escrita no `PLANO`). Duas faces sem área do braço e do antebraço,
+puladas na exportação, ficam com o plano das costuras e furos. `booleanas.js`, `geradores-avancados.js` e `guarda-acervo.mjs`
+seguem com o plano das costuras e furos, `etapas-da-montagem.mjs` com o das ferramentas de conferência e `vistas-para-critica.mjs`
+com o do núcleo para qualquer mecanismo, sem volta a este território.
 
 Em 2026-09-28 a pessoa comparou, em esboço, o ombro em pé e o deitado com o
 ombro de tambor já modelado, e escolheu voltar a ele: o anel do ombro tem o

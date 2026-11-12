@@ -11,7 +11,7 @@ peça continua sendo dela.
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-09, com o braço robótico inteiro fixo.
 
 Em 2026-11-09 a pessoa passou a este plano `booleanas.js`, `geradores-avancados.js` e `guarda-acervo.mjs`, que eram do plano
-do [braço](2026-09-26-as-partes-do-braco.md); eles voltam a ele quando este fechar, se o braço ainda precisar.
+do [braço](encerrados/2026-09-26-as-partes-do-braco.md); eles voltam a ele quando este fechar, se o braço ainda precisar.
 
 A fatia 1 (2026-11-09) pôs as três réguas em `tools/modelar/reguas-de-malha/` e uma peça de prova por defeito em
 `tools/fixtures/costuras-e-furos/`. Números de hoje: dentes no fim que afina, 24 pontas em 18 trechos (a peça limpa da união de
