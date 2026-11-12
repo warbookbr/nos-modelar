@@ -20,7 +20,7 @@
  *
  * Em 2026-11-09 a janela da cabine em dois vidros (253 mil faces) pôs oito vãos na booleana da chapa inteira, e o `descrever`
  * levou 202,8 s no CI; a lentidão é da execução da receita, e não do contato, e o plano
- * `docs/modelar/planos/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` a desfaz. O orçamento foi a 300 s até lá, e voltou a 180 s
+ * `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` a desfaz. O orçamento foi a 300 s até lá, e voltou a 180 s
  * com aquele plano, que fez os 19 vãos recortarem e levou a execução local de 207 s a 77 s.
  *
  * Mudar o orçamento pede uma medição nova, escrita aqui. Subir o número para a guarda passar é esconder a lentidão. */

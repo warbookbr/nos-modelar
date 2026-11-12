@@ -1,4 +1,4 @@
-/* controle-do-recorte.test.ts — a trava de `CONTROLE_DO_RECORTE` (plano `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`): o controle que
+/* controle-do-recorte.test.ts — a trava de `CONTROLE_DO_RECORTE` (plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`): o controle que
    desliga o recorte da vizinhança é de prova. Uma receita é JavaScript e importa o núcleo, e se o usasse a malha dela dependeria de um
    estado global; por isso nenhum arquivo do repositório o cita fora dos testes (`*.test.*`) e do módulo que o define. */
 import { execFileSync } from 'node:child_process';
