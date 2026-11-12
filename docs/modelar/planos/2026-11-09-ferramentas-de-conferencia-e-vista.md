@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/descrever-sem-calar.test.mjs`, `tools/fixtures/descrever-sem-calar/`, `tools/modelar/regularidade-da-crista.mjs`, `tools/modelar/regularidade-da-crista.test.mjs`, `tools/modelar/modelo-aberto.mjs`, `tools/modelar/modelo-aberto.test.mjs`, `tools/fixtures/vinco-da-coluna/`
+**Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/ativar-bancada.mjs`, `tools/modelar/ativar-bancada.test.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/descrever-sem-calar.test.mjs`, `tools/fixtures/descrever-sem-calar/`, `tools/modelar/regularidade-da-crista.mjs`, `tools/modelar/regularidade-da-crista.test.mjs`, `tools/modelar/modelo-aberto.mjs`, `tools/modelar/modelo-aberto.test.mjs`, `tools/fixtures/vinco-da-coluna/`
 
 **Responsável:** a IA da sessão do núcleo (ramo claude/relaxed-thompson-d0a7r4), por decisão da pessoa em 2026-11-12, com as
 decisões técnicas delegadas; a pessoa é a crítica por imagem, com um resumo curto do que olhar, e a forma de peça aceita
@@ -161,8 +161,13 @@ da imagem previa. Do que sobra dos 19 min, uns 15 são a carga da página e as 2
 `olhar-bancada.test.mjs` (a análise inteira com uma carga, a projeção, os quatro estados da medida, o cache por conteúdo e por
 `--sem-cache`, a recusa do zoom ambíguo pela CLI, a página sem ponte e `projetarPontos` com a câmera do three) e
 `analise-da-peca.test.mjs` (as duas sintaxes, as recusas, o recorte por caixa em mm e as opções de contatos), cada arquivo em menos
-de 5 s. Fica para depois: a ativação da peça (`ativar-bancada.mjs`) executa a receita só para a bancada e pode ler o mesmo cache; e
-a `--mirar` e a `--analise` ainda pagam a carga da página (uns 2 min no furgão) a cada comando.
+de 5 s. Fica para depois: a `--mirar` e a `--analise` ainda pagam a carga da página (uns 2 min no furgão) a cada comando. A ativação da
+peça (`ativar-bancada.mjs`) passou a ler a execução da receita do mesmo cache (`executarReceitaGuardada`, em `entrada-de-medida.mjs`,
+com a chave de sempre) e a medida de contatos a reusa quando a ativação acabou de gravá-la, de modo que a receita é executada uma vez só
+por captura; no furgão, carga da máquina de 5 a 9, a ativação caiu de 94 s e 134 s (execução mais gravação) para 10,6 s lida do cache
+(141 MB), e os contatos, na segunda parcela, de 50 a 67 s (só a medida, sem executar de novo) para 0,1 s; `--sem-cache` vale nas duas, e o
+relato diz "ativação: execução da receita lida do cache". Com `--perfil` a execução não passa pelo cache. As duas primeiras rodadas
+seguidas mediram de novo porque `limpar-lascas.js` do núcleo mudava entre elas.
 
 Fatia 4 (2026-11-12): três dos quatro itens já estavam no código quando a fatia abriu, e a fatia os provou em vez de refazê-los. O
 registro de etapas (`24f673f4`) já grava os campos na mesma ordem e só quando o texto muda, com teste, e ler o estado das

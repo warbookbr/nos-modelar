@@ -23,6 +23,7 @@ o que se lê antes de começar é o que o roteiro diz.
 | conferir uma peça pronta | `auditar-peca` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | conferir um conjunto montado | `auditar-montagem` | [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md) |
 | parar e analisar uma forma antes de declará-la pronta | `olhar-bancada --analise` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md) |
+| ver um ponto ou só a chapa de perto, provar malha idêntica, achar onde uma crista varia | `olhar-bancada --mirar`, `vista:rapida --ate-passo`, `malha:assinatura`, `crista:regularidade` | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura) |
 | mostrar à pessoa as opções de forma em disputa, lado a lado | `esbocar-opcoes` (`npm run esboco:nucleo`, `npm run variantes`) | [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#opções-de-forma) |
 | desenhar a prancha alvo | `desenhar-prancha` | [`CONTRATO-AUTORIA-PRANCHA.md`](CONTRATO-AUTORIA-PRANCHA.md) |
 | trazer de volta um ajuste feito na bancada | `absorver-ajuste-da-bancada` | [`AJUSTE-DA-BANCADA.md`](AJUSTE-DA-BANCADA.md) |

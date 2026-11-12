@@ -106,6 +106,8 @@ node tools/modelar/ativar-bancada.mjs --arquivo=procedural/pecas/<peca>/receita.
 node tools/modelar/olhar-bancada.mjs --vistas=direita,frontal,isometrica --saida=tmp/<peca>
 ```
 
+A captura executa a receita em Node para medir os contatos (uns 100 s no furgão) e guarda a medida em `tmp/cache-de-medida/`, com a chave no conteúdo da receita e do que ela importa; receita igual lê o cache, e `--sem-cache` mede de novo. `--sem-contatos` pula a medida quando só se quer a imagem, e o relato diz `NÃO medidos`, que é falta de medida e não falta de achado. O servidor da captura sobe sem canal de recarga, de modo que um arquivo editado por outro agente no meio da carga não derruba a página. A página aberta em cada comando custa uns 2 min no furgão; para ver um ponto use `--mirar=x,y,z` em vez de recortar a imagem inteira, e para a chapa sem navegador `npm run vista:rapida`, ambos em [`PARE-E-ANALISE.md`](PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura).
+
 ## Cache de módulo no servidor MCP
 
 O servidor MCP é um processo longo; o loader ESM do Node guarda todo módulo já

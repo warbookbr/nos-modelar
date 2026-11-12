@@ -101,6 +101,10 @@ refinamento, contatos e formas), e cada item sem referência diz `não conferido
   existe, e a linha da seção `REFERÊNCIA DA FORMA` traz a razão de cada parte. `npm run forma:esboco -- <peça>` (o `REFINA.esboco` da receita) ou `npm run forma:esboco -- <peça> --esboco=<arquivo> --mesmo-id`
   mede uma receita que não declara o campo, ligando cada parte à forma de mesmo id.
 
+O `descrever` escreve na saída de erro a etapa em que está e uma batida a cada 15 s com o passo e o total (o furgão leva uns 6 min, sem outra saída). Quando uma etapa seguinte recusa por causa de um passo anterior, a recusa traz o bloco `N ÓRFÃO(S), que costumam ser a causa`, com o passo e o motivo de cada um; e a abertura por contorno que cai na booleana da chapa inteira sai como `AVISO`, com o motivo da vizinhança e o tempo do passo, porque é ela que leva a receita de 100 a 200 s.
+
+Contra uma foto ou um desenho, no lugar do `conferir:referencia`, as ferramentas de vista aceitam a receita da peça pelo nome (`furgao-realista`, `braco-robotico/base`) ou o esboço: `npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --modelo=<peça> --vista=<vista> [--recorte=x0,y0,z0,x1,y1,z1]` tira a vista rápida e as linhas da malha no mesmo quadro e monta a leitura por regiões num comando só, e `casamento:vista` e `conferir:vistas` medem o objeto inteiro contra a referência inteira, sem recorte, porque uma caixa em mm cortaria o contorno do modelo numa borda que a referência não tem. As quatro aceitam `--ate-passo=N` para abrir a receita só até o passo N.
+
 O laço lê o mesmo veredito: `rodada-de-modelagem.mjs <peça> --acao` mede a receita atual (veredito, `guarda:acervo`,
 `guarda:referencial` e `conferir-pontos` quando há `PONTOS`) e devolve `modelar` enquanto a medição não passar; `--registrar` mede
 de novo e recusa o veredito do crítico quando ela reprovou.

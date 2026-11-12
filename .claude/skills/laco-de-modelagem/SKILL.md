@@ -47,7 +47,9 @@ basta: a pessoa não julga a altura de um anel sem vê-lo sobre a base. As vista
 montadas, em ortográfica, saem de
 `npm run etapas -- <montagem.json> --olhar` (com `--foco <instância>` o quadro fecha na caixa dela), e entram também
 no pacote do crítico, que `vistas:critica` já monta com o quadro na peça. A etapa só fica fixa com o aceite dela, e só
-depois disso a próxima começa. Etapa fixa que uma mudança anterior quebrou
+depois disso a próxima começa. Antes de mostrar, o modelador vê a chapa da etapa em segundos com `npm run vista:rapida -- <peça> --ate-passo=N`
+e um ponto de perto com `bancada --mirar=x,y,z`
+([`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura)). Etapa fixa que uma mudança anterior quebrou
 volta na frente de todas. O estado e a próxima etapa saem de:
 
 ```bash
