@@ -66,6 +66,23 @@ export function derivar(t = TABELA) {
   return { contorno, y0, y1, y2, Si, R: t.chaveDaCabeca / Math.sqrt(3) };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, de) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de, interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: as duas faces do corpo, que encostam nas molduras dos painéis vizinhos, na metade da altura da moldura. */
+export function portas(t = TABELA) {
+  const S = t.vaoEntrePaineis / 2 - t.folgaDoCorpo;
+  const y = t.apoio + t.alturaDaMoldura / 2;
+  const face = (x, papel) => ({ forma: 'plano', papel, ponto: [x, y, 0], normal: [Math.sign(x), 0, 0], extensao: [t.alturaDaMoldura, t.comprimento], referencia: [0, 1, 0] });
+  return { faceEsquerda: face(-S, 'apoia'), faceDireita: face(S, 'recebe') };
+}
+
 export function gerarPassos(t = TABELA) {
   const D = derivar(t);
   const passos = [];
@@ -84,6 +101,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['unir', { origemId: ID.parafuso, solidos: [alias(ID.haste), alias(ID.cabeca)] }]);
   const sel = { origem: { op: 'unir', id: ID.parafuso } };
   passos.push(['parte', { nome: 'parafuso', sel }], ['material', { usa: 'inox', sel }]);
+  publicar(passos, portas(t), { op: 'subtrair', id: ID.furado });
   return passos;
 }
 

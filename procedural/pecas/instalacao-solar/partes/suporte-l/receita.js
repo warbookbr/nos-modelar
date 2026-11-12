@@ -68,6 +68,24 @@ export function derivar(t = TABELA) {
   return { contorno, ro };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, de) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de, interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: o furo da haste na face de baixo da perna da haste, e a face de fora da perna do perfil, no centro do oblongo, onde o
+   perfil encosta. A referência é a perna da haste (+x) no primeiro caso e a subida da perna do perfil (+y) no segundo. */
+export function portas(t = TABELA) {
+  return {
+    naHaste: { forma: 'plano', papel: 'apoia', ponto: [t.centroDoFuroDaHaste, 0, 0], normal: [0, -1, 0], extensao: [t.furoDaHaste * 2, t.furoDaHaste * 2], referencia: [1, 0, 0] },
+    facePerfil: { forma: 'plano', papel: 'recebe', ponto: [0, t.oblongoCentro, 0], normal: [-1, 0, 0], extensao: [t.largura, t.oblongoComprimento], referencia: [0, 1, 0] },
+  };
+}
+
 export function gerarPassos(t = TABELA) {
   const { contorno } = derivar(t);
   const passos = [];
@@ -87,6 +105,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['subtrair', { origemId: ID.furado, solidos: [{ origem: { op: 'extrusao', id: ID.l } }, { alias: `cil${ID.furoHaste}` }, { origem: { op: 'extrusao', id: ID.oblongo } }] }]);
   const sel = { origem: { op: 'subtrair', id: ID.furado } };
   passos.push(['parte', { nome: 'corpo', sel }], ['material', { usa: 'aluminio', sel }]);
+  publicar(passos, portas(t), { op: 'subtrair', id: ID.furado });
   return passos;
 }
 

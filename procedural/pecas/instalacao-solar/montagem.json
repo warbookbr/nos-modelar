@@ -1,0 +1,924 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "instalacao-solar",
+  "instancias": [
+    {
+      "id": "telhado",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/telhado"
+      }
+    },
+    {
+      "id": "hasteA1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "hasteA2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "hasteA3",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "hasteA4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "hasteB1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "hasteB2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "hasteB3",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "hasteB4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/haste"
+      }
+    },
+    {
+      "id": "suporteA1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "suporteA2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "suporteA3",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "suporteA4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "suporteB1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "suporteB2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "suporteB3",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "suporteB4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/suporte-l"
+      }
+    },
+    {
+      "id": "perfilA1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "emendaA12",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/emenda"
+      }
+    },
+    {
+      "id": "perfilA2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "emendaA23",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/emenda"
+      }
+    },
+    {
+      "id": "perfilA3",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "emendaA34",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/emenda"
+      }
+    },
+    {
+      "id": "perfilA4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "perfilB1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "emendaB12",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/emenda"
+      }
+    },
+    {
+      "id": "perfilB2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "emendaB23",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/emenda"
+      }
+    },
+    {
+      "id": "perfilB3",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "emendaB34",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/emenda"
+      }
+    },
+    {
+      "id": "perfilB4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/perfil"
+      }
+    },
+    {
+      "id": "painel1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/painel-30"
+      }
+    },
+    {
+      "id": "pontaEsq30A",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-30"
+      }
+    },
+    {
+      "id": "ponta30J1A",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-30"
+      }
+    },
+    {
+      "id": "ponta40J1A",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-40"
+      }
+    },
+    {
+      "id": "pontaEsq30B",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-30"
+      }
+    },
+    {
+      "id": "ponta30J1B",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-30"
+      }
+    },
+    {
+      "id": "ponta40J1B",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-40"
+      }
+    },
+    {
+      "id": "painel2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/painel-40"
+      }
+    },
+    {
+      "id": "interJ2A",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-intermediario"
+      }
+    },
+    {
+      "id": "interJ2B",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-intermediario"
+      }
+    },
+    {
+      "id": "painel3",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/painel-40"
+      }
+    },
+    {
+      "id": "interJ3A",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-intermediario"
+      }
+    },
+    {
+      "id": "interJ3B",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-intermediario"
+      }
+    },
+    {
+      "id": "painel4",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/painel-40"
+      }
+    },
+    {
+      "id": "ponta40DirA",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-40"
+      }
+    },
+    {
+      "id": "ponta40DirB",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/grampo-ponta-40"
+      }
+    }
+  ],
+  "relacoes": [],
+  "etapas": [
+    "telhado",
+    "hasteA1",
+    "hasteA2",
+    "hasteA3",
+    "hasteA4",
+    "hasteB1",
+    "hasteB2",
+    "hasteB3",
+    "hasteB4",
+    "suporteA1",
+    "suporteA2",
+    "suporteA3",
+    "suporteA4",
+    "suporteB1",
+    "suporteB2",
+    "suporteB3",
+    "suporteB4",
+    "perfilA1",
+    "emendaA12",
+    "perfilA2",
+    "emendaA23",
+    "perfilA3",
+    "emendaA34",
+    "perfilA4",
+    "perfilB1",
+    "emendaB12",
+    "perfilB2",
+    "emendaB23",
+    "perfilB3",
+    "emendaB34",
+    "perfilB4",
+    "painel1",
+    "pontaEsq30A",
+    "ponta30J1A",
+    "ponta40J1A",
+    "pontaEsq30B",
+    "ponta30J1B",
+    "ponta40J1B",
+    "painel2",
+    "interJ2A",
+    "interJ2B",
+    "painel3",
+    "interJ3A",
+    "interJ3B",
+    "painel4",
+    "ponta40DirA",
+    "ponta40DirB"
+  ],
+  "vinculos": [
+    {
+      "id": "perfilA4CortadoNoTrilho",
+      "alvo": {
+        "instancia": "perfilA4",
+        "param": "comprimento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "trilho",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": -4050
+    },
+    {
+      "id": "perfilB4CortadoNoTrilho",
+      "alvo": {
+        "instancia": "perfilB4",
+        "param": "comprimento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "trilho",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": -4050
+    }
+  ],
+  "posicoes": [
+    {
+      "id": "hasteA1NoTelhado",
+      "instancia": "hasteA1",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteA1"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "hasteA2NoTelhado",
+      "instancia": "hasteA2",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteA2"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "hasteA3NoTelhado",
+      "instancia": "hasteA3",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteA3"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "hasteA4NoTelhado",
+      "instancia": "hasteA4",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteA4"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "hasteB1NoTelhado",
+      "instancia": "hasteB1",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteB1"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "hasteB2NoTelhado",
+      "instancia": "hasteB2",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteB2"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "hasteB3NoTelhado",
+      "instancia": "hasteB3",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteB3"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "hasteB4NoTelhado",
+      "instancia": "hasteB4",
+      "porta": "vedacao",
+      "em": {
+        "instancia": "telhado",
+        "porta": "hasteB4"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteA1NaHaste",
+      "instancia": "suporteA1",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteA1",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteA2NaHaste",
+      "instancia": "suporteA2",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteA2",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteA3NaHaste",
+      "instancia": "suporteA3",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteA3",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteA4NaHaste",
+      "instancia": "suporteA4",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteA4",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteB1NaHaste",
+      "instancia": "suporteB1",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteB1",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteB2NaHaste",
+      "instancia": "suporteB2",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteB2",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteB3NaHaste",
+      "instancia": "suporteB3",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteB3",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "suporteB4NaHaste",
+      "instancia": "suporteB4",
+      "porta": "naHaste",
+      "em": {
+        "instancia": "hasteB4",
+        "porta": "doSuporte"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "perfilA1NoSuporte",
+      "instancia": "perfilA1",
+      "porta": "lateral",
+      "em": {
+        "instancia": "suporteA1",
+        "porta": "facePerfil"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "emendaA12MetadeDentroDoPerfil1",
+      "instancia": "emendaA12",
+      "porta": "pontaA",
+      "em": {
+        "instancia": "perfilA1",
+        "porta": "fim"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "perfilA2NoMeioDaEmenda",
+      "instancia": "perfilA2",
+      "porta": "inicio",
+      "em": {
+        "instancia": "emendaA12",
+        "porta": "pontaB"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "emendaA23MetadeDentroDoPerfil2",
+      "instancia": "emendaA23",
+      "porta": "pontaA",
+      "em": {
+        "instancia": "perfilA2",
+        "porta": "fim"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "perfilA3NoMeioDaEmenda",
+      "instancia": "perfilA3",
+      "porta": "inicio",
+      "em": {
+        "instancia": "emendaA23",
+        "porta": "pontaB"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "emendaA34MetadeDentroDoPerfil3",
+      "instancia": "emendaA34",
+      "porta": "pontaA",
+      "em": {
+        "instancia": "perfilA3",
+        "porta": "fim"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "perfilA4NoMeioDaEmenda",
+      "instancia": "perfilA4",
+      "porta": "inicio",
+      "em": {
+        "instancia": "emendaA34",
+        "porta": "pontaB"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "perfilB1NoSuporte",
+      "instancia": "perfilB1",
+      "porta": "lateral",
+      "em": {
+        "instancia": "suporteB1",
+        "porta": "facePerfil"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "emendaB12MetadeDentroDoPerfil1",
+      "instancia": "emendaB12",
+      "porta": "pontaA",
+      "em": {
+        "instancia": "perfilB1",
+        "porta": "fim"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "perfilB2NoMeioDaEmenda",
+      "instancia": "perfilB2",
+      "porta": "inicio",
+      "em": {
+        "instancia": "emendaB12",
+        "porta": "pontaB"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "emendaB23MetadeDentroDoPerfil2",
+      "instancia": "emendaB23",
+      "porta": "pontaA",
+      "em": {
+        "instancia": "perfilB2",
+        "porta": "fim"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "perfilB3NoMeioDaEmenda",
+      "instancia": "perfilB3",
+      "porta": "inicio",
+      "em": {
+        "instancia": "emendaB23",
+        "porta": "pontaB"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "emendaB34MetadeDentroDoPerfil3",
+      "instancia": "emendaB34",
+      "porta": "pontaA",
+      "em": {
+        "instancia": "perfilB3",
+        "porta": "fim"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "perfilB4NoMeioDaEmenda",
+      "instancia": "perfilB4",
+      "porta": "inicio",
+      "em": {
+        "instancia": "emendaB34",
+        "porta": "pontaB"
+      },
+      "unidade": "mm",
+      "afastamento": -75
+    },
+    {
+      "id": "painel1SobreOTrilhoNaCrista",
+      "instancia": "painel1",
+      "porta": "noTrilho",
+      "em": {
+        "instancia": "telhado",
+        "porta": "painel1"
+      },
+      "unidade": "mm",
+      "afastamento": 89
+    },
+    {
+      "id": "pontaEsq30ANoPainel1",
+      "instancia": "pontaEsq30A",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "painel1",
+        "porta": "bordaEsquerdaA"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "ponta30J1ANoPainel1",
+      "instancia": "ponta30J1A",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "painel1",
+        "porta": "bordaDireitaA"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "ponta40J1ANaPonta30",
+      "instancia": "ponta40J1A",
+      "porta": "pontaDaAba",
+      "em": {
+        "instancia": "ponta30J1A",
+        "porta": "pontaDaAba"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "pontaEsq30BNoPainel1",
+      "instancia": "pontaEsq30B",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "painel1",
+        "porta": "bordaEsquerdaB"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "ponta30J1BNoPainel1",
+      "instancia": "ponta30J1B",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "painel1",
+        "porta": "bordaDireitaB"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "ponta40J1BNaPonta30",
+      "instancia": "ponta40J1B",
+      "porta": "pontaDaAba",
+      "em": {
+        "instancia": "ponta30J1B",
+        "porta": "pontaDaAba"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "painel2NoGrampoDeJ1",
+      "instancia": "painel2",
+      "porta": "bordaEsquerdaA",
+      "em": {
+        "instancia": "ponta40J1A",
+        "porta": "noPainel"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "interJ2ANoPainel2",
+      "instancia": "interJ2A",
+      "porta": "faceEsquerda",
+      "em": {
+        "instancia": "painel2",
+        "porta": "bordaDireitaA"
+      },
+      "unidade": "mm",
+      "afastamento": 1
+    },
+    {
+      "id": "interJ2BNoPainel2",
+      "instancia": "interJ2B",
+      "porta": "faceEsquerda",
+      "em": {
+        "instancia": "painel2",
+        "porta": "bordaDireitaB"
+      },
+      "unidade": "mm",
+      "afastamento": 1
+    },
+    {
+      "id": "painel3NoGrampoDeJ2",
+      "instancia": "painel3",
+      "porta": "bordaEsquerdaA",
+      "em": {
+        "instancia": "interJ2A",
+        "porta": "faceDireita"
+      },
+      "unidade": "mm",
+      "afastamento": 1
+    },
+    {
+      "id": "interJ3ANoPainel3",
+      "instancia": "interJ3A",
+      "porta": "faceEsquerda",
+      "em": {
+        "instancia": "painel3",
+        "porta": "bordaDireitaA"
+      },
+      "unidade": "mm",
+      "afastamento": 1
+    },
+    {
+      "id": "interJ3BNoPainel3",
+      "instancia": "interJ3B",
+      "porta": "faceEsquerda",
+      "em": {
+        "instancia": "painel3",
+        "porta": "bordaDireitaB"
+      },
+      "unidade": "mm",
+      "afastamento": 1
+    },
+    {
+      "id": "painel4NoGrampoDeJ3",
+      "instancia": "painel4",
+      "porta": "bordaEsquerdaA",
+      "em": {
+        "instancia": "interJ3A",
+        "porta": "faceDireita"
+      },
+      "unidade": "mm",
+      "afastamento": 1
+    },
+    {
+      "id": "ponta40DirANoPainel4",
+      "instancia": "ponta40DirA",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "painel4",
+        "porta": "bordaDireitaA"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "ponta40DirBNoPainel4",
+      "instancia": "ponta40DirB",
+      "porta": "noPainel",
+      "em": {
+        "instancia": "painel4",
+        "porta": "bordaDireitaB"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    }
+  ]
+}

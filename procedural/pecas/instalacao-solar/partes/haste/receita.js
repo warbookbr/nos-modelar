@@ -64,6 +64,25 @@ export function derivar(t = TABELA) {
   };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, deDe) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de: deDe[nome], interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: a borracha assenta no plano das cristas da telha (a haste entra 100 mm abaixo dele) e o suporte em L, na face de
+   cima da primeira porca. O giro em torno da haste é o da referência: +z local aponta a subida da água. */
+export function portas(t = TABELA) {
+  const D = derivar(t);
+  return {
+    vedacao: { forma: 'plano', papel: 'apoia', ponto: [0, t.alturaDaBorracha, 0], normal: [0, -1, 0], extensao: [2 * t.raioDaBorracha, 2 * t.raioDaBorracha], referencia: [0, 0, 1] },
+    doSuporte: { forma: 'plano', papel: 'recebe', ponto: [0, D.yPorcaBaixa + t.alturaDaPorca, 0], normal: [0, 1, 0], extensao: [2 * t.raioDaArruela, 2 * t.raioDaArruela], referencia: [0, 0, 1] },
+  };
+}
+
 export function gerarPassos(t = TABELA) {
   const D = derivar(t);
   const passos = [];
@@ -83,6 +102,8 @@ export function gerarPassos(t = TABELA) {
   anel(ID.arruela, 'arruela', D.yArruela, t.espessuraDaArruela, { circulo: { raio: m(t.raioDaArruela) } });
   anel(ID.porcaBaixa, 'porcaBaixa', D.yPorcaBaixa, t.alturaDaPorca, D.sextavado.map((p) => p.map(m)));
   anel(ID.porcaCima, 'porcaCima', D.yPorcaCima, t.alturaDaPorca, D.sextavado.map((p) => p.map(m)));
+  /* O plano de cada porta passa por vértices da origem dela: a borracha na face de baixo, a primeira porca na de cima. */
+  publicar(passos, portas(t), { vedacao: { op: 'lathe', id: ID.borracha }, doSuporte: { op: 'extrusao', id: ID.porcaBaixa } });
   return passos;
 }
 
