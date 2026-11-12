@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2006 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2008 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3138,6 +3138,7 @@
 - `medir-transcricao.mjs` — medir-transcricao.mjs — onde vão os tokens de um agente: `npm run medir:transcricao -- <transcrição.jsonl> [...]`.
 - `medir-transcricao.test.mjs` — medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem), cada resultado de ferramenta na etapa…
 - `modelo-aberto.mjs` — modelo-aberto.mjs — a entrada comum das ferramentas de vista: abre um esboço OU uma receita de peça e devolve a mesma estrutura.
+- `modelo-aberto.test.mjs` — modelo-aberto.test.mjs — as ferramentas de vista da empilhadeira abrindo receita de peça, e não só esboço (plano de conferência, fatia 6).
 - `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.
 - `montagem-da-familia.mjs` — montagem-da-familia.mjs — a montagem v5 que uma família de objeto gera, conferida pela aprovação mecânica.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
@@ -3186,6 +3187,7 @@
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
 - `regularidade-da-crista.mjs` — regularidade-da-crista.mjs — percorre cada crista da superfície de subdivisão e acusa onde o que ela mede varia de repente, com a posição em mm.
+- `regularidade-da-crista.test.mjs` — regularidade-da-crista.test.mjs — a régua da regularidade de uma crista ao longo dela (plano de conferência, fatia 6).
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
 - `repositorio-revalidacao.mjs` — repositorio-revalidacao.mjs — persistência R01 sobre o repositório transacional existente.

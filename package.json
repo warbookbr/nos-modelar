@@ -131,6 +131,7 @@
     "custo:peca": "node tools/modelar/custo-por-peca.mjs",
     "fluxo:objeto": "node tools/modelar/fluxo-do-objeto.mjs",
     "vista:rapida": "node tools/modelar/vista-rapida.mjs",
+    "crista:regularidade": "node tools/modelar/regularidade-da-crista.mjs",
     "esboco:nucleo": "node --import ./tools/modelar/resolucao-da-raiz.mjs tools/modelar/esboco-nucleo.mjs",
     "variantes": "node tools/modelar/variantes.mjs",
     "contorno:prancha": "node tools/modelar/prancha/prancha-dos-contornos.mjs",

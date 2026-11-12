@@ -28,16 +28,26 @@ const OP = 'limparLascas';
  *  sedã). `faces` fica na assinatura porque os dois chamadores a passam, e já não entra na conta. */
 export function areaMinimaDe(st, faces) {
   void faces;
-  const lo = [Infinity, Infinity, Infinity]; const hi = [-Infinity, -Infinity, -Infinity];
-  for (const p of st.V.values()) for (let k = 0; k < 3; k += 1) { if (p[k] < lo[k]) lo[k] = p[k]; if (p[k] > hi[k]) hi[k] = p[k]; }
-  if (!Number.isFinite(lo[0])) return 0;
-  const meia = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / 2;
+  const meia = diagonalDaPeca(st) / 2;
   return 4e-9 * meia * meia;
 }
+
+/** A diagonal da caixa de todo vértice que existe no estado: a escala da peça, que a medida de contatos usa para o piso de área da instância. 0 sem vértice. */
+export function diagonalDaPeca(st) {
+  const lo = [Infinity, Infinity, Infinity]; const hi = [-Infinity, -Infinity, -Infinity];
+  for (const p of st.V.values()) for (let k = 0; k < 3; k += 1) { if (p[k] < lo[k]) lo[k] = p[k]; if (p[k] > hi[k]) hi[k] = p[k]; }
+  return Number.isFinite(lo[0]) ? Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) : 0;
+}
+
+/** A tolerância do `aparar` é 6e-6 da diagonal do sólido aparado, e a de uma peça de membros pequenos (a travessa de 1,7 m numa lataria de 4,8 m) ficava em 10 µm quando o piso de área já
+ *  era o da peça de 4,8 m: o triângulo de 0,15 mm de aresta (área 3e-9 m², abaixo do piso de 5,7e-9 da instância) não saía sem 29 µm (atrito 11 do RECEITA.md do sedã). O `aparar` limpa com
+ *  o maior dos dois, e a medida da fatia é a mesma: no máximo 6e-6 da diagonal da peça. */
+const TOLERANCIA_RELATIVA_DO_APARAR = 6e-6;
 
 /** Limpa as faces `faces` do estado e aplica o resultado: o que `limparLascas` faz depois de ler a seleção, para a operação e para quem limpa dentro da sua
  *  (`aparar`). `op` é o nome do passo no aviso e na face consumida. */
 export function limparNoEstado(st, faces, { tolerancia, limite = LIMITE_DE_FACE_FINA, areaMinima = 0, i, op }) {
+  if (op === 'aparar') tolerancia = Math.max(tolerancia, TOLERANCIA_RELATIVA_DO_APARAR * diagonalDaPeca(st));
   const res = limparLascas({ V: st.V, F: st.F }, { selecao: faces, tolerancia, limite, areaMinima });
   const { relatorio } = res;
   if (relatorio.finasAntes === 0) return undefined;

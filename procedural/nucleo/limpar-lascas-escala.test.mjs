@@ -7,7 +7,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { limparLascas } from './limpar-lascas.js';
-import { areaMinimaDe } from './operacoes/limpar-lascas.js';
+import { areaMinimaDe, diagonalDaPeca, limparNoEstado } from './operacoes/limpar-lascas.js';
 
 const fx = JSON.parse(readFileSync(new URL('./fixtures/lasca-na-escala-da-peca.json', import.meta.url), 'utf8'));
 const malha = () => ({ V: new Map(fx.vertices.map((p, i) => [i, p])), F: new Map(fx.faces.map((f, i) => [i, { vs: [...f.vs], parte: f.parte }])) });
@@ -44,5 +44,35 @@ describe('o piso de área da limpeza é o da peça', () => {
     expect(com.relatorio.desvioMaximo).toBeLessThan(TOLERANCIA);
     for (const [f, vs] of com.faces) expect(area({ V: m.V, F: new Map([[f, { vs }]]) }, f)).toBeGreaterThan(0);
     expect(com.relatorio.finasDepois).toBeLessThan(sem.relatorio.finasDepois);
+  });
+});
+
+/* O `aparar` deriva a tolerância da limpeza da diagonal do sólido aparado (6e-6 dela): a travessa de 1,7 m dava 10 µm numa lataria de 4,8 m, e o triângulo de 0,15 mm de aresta
+   de um reforço (área 3e-9 m², abaixo do piso de 5,7e-9 da instância) ficava, com a recusa de "passaria da tolerância". A fixture é a vizinhança de duas voltas dele (26 faces). */
+describe('a tolerância de limpeza do aparar é a da peça', () => {
+  const fx2 = JSON.parse(readFileSync(new URL('./fixtures/lasca-na-tolerancia-da-peca.json', import.meta.url), 'utf8'));
+  /* o estado com a vizinhança e um vértice longe, que dá à peça a diagonal de 4,8 m sem tocar a vizinhança; nenhuma face a mais */
+  const estado = () => {
+    const V = new Map(fx2.vertices.map((p, i) => [i, p]));
+    V.set(10_000, [1.4, 0.2, 1.9]); V.set(10_001, [-0.6, 0.2, -2.7]);
+    return { V, F: new Map(fx2.faces.map((f, i) => [i, { vs: [...f.vs], parte: f.parte }])), pesos: new Map(), merges: [], consumidas: new Map(), origens: new Map(), avisos: [] };
+  };
+  const faces = (st) => new Set(st.F.keys());
+  const alvo = fx2.alvos[0];
+  const TOL_DA_TRAVESSA = 6e-6 * 1.72;
+
+  it('a diagonal da peça é a do estado inteiro', () => {
+    expect(diagonalDaPeca(estado())).toBeGreaterThan(4.7);
+    expect(diagonalDaPeca({ V: new Map() })).toBe(0);
+  });
+
+  it('o aparar limpa com o maior entre a tolerância do sólido e 6e-6 da diagonal da peça, e a face sai; o limparLascas com a tolerância dada não muda', () => {
+    const doAparar = estado();
+    limparNoEstado(doAparar, faces(doAparar), { tolerancia: TOL_DA_TRAVESSA, areaMinima: areaMinimaDe(doAparar), i: 0, op: 'aparar' });
+    expect(doAparar.F.has(alvo)).toBe(false);
+    const doLimpar = estado();
+    limparNoEstado(doLimpar, faces(doLimpar), { tolerancia: TOL_DA_TRAVESSA, areaMinima: areaMinimaDe(doLimpar), i: 0, op: 'limparLascas' });
+    expect(doLimpar.F.has(alvo)).toBe(true);
+    expect(doLimpar.avisos.some((a) => a.ref === 'lascasRestantes')).toBe(true);
   });
 });
