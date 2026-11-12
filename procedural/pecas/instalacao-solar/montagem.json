@@ -4,6 +4,13 @@
   "id": "instalacao-solar",
   "instancias": [
     {
+      "id": "casa",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/casa"
+      }
+    },
+    {
       "id": "telhado",
       "alvo": {
         "tipo": "peca",
@@ -335,6 +342,7 @@
   ],
   "relacoes": [],
   "etapas": [
+    "casa",
     "telhado",
     "hasteA1",
     "hasteA2",
@@ -384,6 +392,20 @@
     "ponta40DirB"
   ],
   "vinculos": [
+    {
+      "id": "telhadoNaCumeeiraDaCasa",
+      "alvo": {
+        "instancia": "telhado",
+        "param": "agua"
+      },
+      "de": {
+        "instancia": "casa",
+        "porta": "aguaEsquerda",
+        "medida": "largura"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
     {
       "id": "hasteA1AssentaNaCrista",
       "alvo": {
@@ -568,6 +590,17 @@
     }
   ],
   "posicoes": [
+    {
+      "id": "telhadoNaCasa",
+      "instancia": "telhado",
+      "porta": "assento",
+      "em": {
+        "instancia": "casa",
+        "porta": "aguaEsquerda"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
     {
       "id": "hasteA1NoTelhado",
       "instancia": "hasteA1",
@@ -764,7 +797,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -67
     },
     {
       "id": "perfilA2NoMeioDaEmenda",
@@ -775,7 +808,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -83
     },
     {
       "id": "emendaA23MetadeDentroDoPerfil2",
@@ -841,7 +874,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -67
     },
     {
       "id": "perfilB2NoMeioDaEmenda",
@@ -852,7 +885,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -83
     },
     {
       "id": "emendaB23MetadeDentroDoPerfil2",
@@ -1076,8 +1109,22 @@
     }
   ],
   "auditoriaIntersecoes": {
-    "toleranciaNumerica": 0.000001,
+    "toleranciaNumerica": 1e-06,
     "expectativas": [
+      {
+        "id": "telhadoAssentaNaCasa",
+        "a": {
+          "caminho": [
+            "casa"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "as terças do telhado assentam no plano da água esquerda da casa, que é o topo das empenas da frente e do fundo: faces coplanares que só se tocam, sem caibros nem tesouras entre elas (as peças verticais não aparecem nas fotos e não estão modelados)"
+      },
       {
         "id": "hasteA1AtravessaOTelhado",
         "a": {
@@ -1104,7 +1151,7 @@
             "suporteA1"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteA1EncostaNoperfilA1",
@@ -1118,7 +1165,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "hasteA2AtravessaOTelhado",
@@ -1146,7 +1193,7 @@
             "suporteA2"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteA2EncostaNoperfilA2",
@@ -1160,7 +1207,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "hasteA3AtravessaOTelhado",
@@ -1188,7 +1235,7 @@
             "suporteA3"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteA3EncostaNoperfilA3",
@@ -1202,7 +1249,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "hasteA4AtravessaOTelhado",
@@ -1230,7 +1277,7 @@
             "suporteA4"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteA4EncostaNoperfilA4",
@@ -1244,7 +1291,7 @@
             "perfilA4"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "hasteB1AtravessaOTelhado",
@@ -1272,7 +1319,7 @@
             "suporteB1"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteB1EncostaNoperfilB1",
@@ -1286,7 +1333,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "hasteB2AtravessaOTelhado",
@@ -1314,7 +1361,7 @@
             "suporteB2"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteB2EncostaNoperfilB2",
@@ -1328,7 +1375,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "hasteB3AtravessaOTelhado",
@@ -1356,7 +1403,7 @@
             "suporteB3"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteB3EncostaNoperfilB3",
@@ -1370,7 +1417,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "hasteB4AtravessaOTelhado",
@@ -1398,7 +1445,7 @@
             "suporteB4"
           ]
         },
-        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+        "motivo": "o pé do suporte em L, com a borracha por baixo, assenta na porca de apoio, e a arruela e a porca de cima o prendem"
       },
       {
         "id": "suporteB4EncostaNoperfilB4",
@@ -1412,7 +1459,7 @@
             "perfilB4"
           ]
         },
-        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+        "motivo": "a perna vertical do suporte em L encosta na face estriada do perfil, e o parafuso do oblongo leva a placa-porca ao rasgo lateral dele"
       },
       {
         "id": "perfilA1Com2",
@@ -1426,7 +1473,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
       },
       {
         "id": "perfilA2Com3",
@@ -1440,7 +1487,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
       },
       {
         "id": "perfilA3Com4",
@@ -1454,7 +1501,7 @@
             "perfilA4"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
       },
       {
         "id": "perfilB1Com2",
@@ -1468,7 +1515,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
       },
       {
         "id": "perfilB2Com3",
@@ -1482,7 +1529,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
       },
       {
         "id": "perfilB3Com4",
@@ -1496,7 +1543,7 @@
             "perfilB4"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
       },
       {
         "id": "pontaEsq30AAssentaNoperfilA1",
@@ -1510,7 +1557,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "ponta30J1AAssentaNoperfilA1",
@@ -1524,7 +1571,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "ponta40J1AAssentaNoperfilA1",
@@ -1538,7 +1585,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "pontaEsq30BAssentaNoperfilB1",
@@ -1552,7 +1599,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "ponta30J1BAssentaNoperfilB1",
@@ -1566,7 +1613,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "ponta40J1BAssentaNoperfilB1",
@@ -1580,7 +1627,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "interJ2AAssentaNoperfilA2",
@@ -1594,7 +1641,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "a porca de canal do grampo encosta sob as abas do canal em T do perfil, e o parafuso desce do alto, pelo vão entre os painéis, até ela"
       },
       {
         "id": "interJ2BAssentaNoperfilB2",
@@ -1608,7 +1655,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "a porca de canal do grampo encosta sob as abas do canal em T do perfil, e o parafuso desce do alto, pelo vão entre os painéis, até ela"
       },
       {
         "id": "interJ3AAssentaNoperfilA3",
@@ -1622,7 +1669,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "a porca de canal do grampo encosta sob as abas do canal em T do perfil, e o parafuso desce do alto, pelo vão entre os painéis, até ela"
       },
       {
         "id": "interJ3BAssentaNoperfilB3",
@@ -1636,7 +1683,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "a porca de canal do grampo encosta sob as abas do canal em T do perfil, e o parafuso desce do alto, pelo vão entre os painéis, até ela"
       },
       {
         "id": "ponta40DirAAssentaNoperfilA4",
@@ -1650,7 +1697,7 @@
             "perfilA4"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "ponta40DirBAssentaNoperfilB4",
@@ -1664,7 +1711,7 @@
             "perfilB4"
           ]
         },
-        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "pontaEsq30AApertapainel1",
@@ -1678,7 +1725,7 @@
             "painel1"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "pontaEsq30BApertapainel1",
@@ -1692,7 +1739,7 @@
             "painel1"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "ponta30J1AApertapainel1",
@@ -1706,7 +1753,7 @@
             "painel1"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "ponta30J1BApertapainel1",
@@ -1720,7 +1767,7 @@
             "painel1"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "ponta40J1AApertapainel2",
@@ -1734,7 +1781,7 @@
             "painel2"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "ponta40J1BApertapainel2",
@@ -1748,7 +1795,7 @@
             "painel2"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ2AApertapainel2",
@@ -1762,7 +1809,7 @@
             "painel2"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ2AApertapainel3",
@@ -1776,7 +1823,7 @@
             "painel3"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ2BApertapainel2",
@@ -1790,7 +1837,7 @@
             "painel2"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ2BApertapainel3",
@@ -1804,7 +1851,7 @@
             "painel3"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ3AApertapainel3",
@@ -1818,7 +1865,7 @@
             "painel3"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ3AApertapainel4",
@@ -1832,7 +1879,7 @@
             "painel4"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ3BApertapainel3",
@@ -1846,7 +1893,7 @@
             "painel3"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "interJ3BApertapainel4",
@@ -1860,7 +1907,7 @@
             "painel4"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "ponta40DirAApertapainel4",
@@ -1874,7 +1921,7 @@
             "painel4"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "ponta40DirBApertapainel4",
@@ -1888,7 +1935,7 @@
             "painel4"
           ]
         },
-        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e a aba de cima ou a tampa apoia no topo dela"
       },
       {
         "id": "ponta30J1AEPonta40J1A",
@@ -1930,7 +1977,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel1AssentaNoperfilB1",
@@ -1944,7 +1991,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel2AssentaNoperfilA1",
@@ -1958,7 +2005,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel2AssentaNoperfilA2",
@@ -1972,7 +2019,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel2AssentaNoperfilB1",
@@ -1986,7 +2033,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel2AssentaNoperfilB2",
@@ -2000,7 +2047,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel3AssentaNoperfilA2",
@@ -2014,7 +2061,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel3AssentaNoperfilA3",
@@ -2028,7 +2075,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel3AssentaNoperfilB2",
@@ -2042,7 +2089,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel3AssentaNoperfilB3",
@@ -2056,7 +2103,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel4AssentaNoperfilA3",
@@ -2070,7 +2117,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel4AssentaNoperfilA4",
@@ -2084,7 +2131,7 @@
             "perfilA4"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel4AssentaNoperfilB3",
@@ -2098,7 +2145,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
       },
       {
         "id": "painel4AssentaNoperfilB4",
@@ -2112,7 +2159,25 @@
             "perfilB4"
           ]
         },
-        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+      }
+    ]
+  },
+  "apoioNoChao": {
+    "plano": {
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "altura": 0
+    },
+    "toleranciaNumerica": 0.001,
+    "apoiam": [
+      {
+        "caminho": [
+          "casa"
+        ]
       }
     ]
   }

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2022 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2023 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1897,21 +1897,25 @@
 - `conferencias.mjs` — instalacao-solar/conferencias — as conferências de medida da obra, sobre a montagem resolvida `montagem.json`.
 - `conferencias.test.mjs` — instalacao-solar/conferencias.test — fixa, com os valores provisórios do telhado e do kit, o que a montagem da instalação solar mede.
 
+## procedural/pecas/instalacao-solar/partes/casa/
+
+- `receita.js` — instalacao-solar/casa — a casa onde vai a instalação solar, em volumes simples: a casa maior, a extensão da esquerda e a casa vizinha de telhado metálico, co…
+
 ## procedural/pecas/instalacao-solar/partes/emenda/
 
-- `receita.js` — instalacao-solar/emenda — a peça que entra dentro de dois perfis para uni-los, com dois parafusos.
+- `receita.js` — instalacao-solar/emenda — a barra estriada que entra no canal em T de dois perfis para uni-los, com dois parafusos allen.
 
 ## procedural/pecas/instalacao-solar/partes/grampo-intermediario/
 
-- `receita.js` — instalacao-solar/grampo-intermediario — o grampo em "ômega" que aperta as molduras de dois painéis vizinhos de 40 mm, com um parafuso.
+- `receita.js` — instalacao-solar/grampo-intermediario — a tampa estriada que aperta as molduras de dois painéis vizinhos de 40 mm, com parafuso allen e porca de canal.
 
 ## procedural/pecas/instalacao-solar/partes/grampo-ponta-30/
 
-- `receita.js` — instalacao-solar/grampo-ponta-30 — o grampo em "Z" de ponta para moldura de 30 a 35 mm, com um parafuso.
+- `receita.js` — instalacao-solar/grampo-ponta-30 — o grampo de ponta em "Z" para moldura de 30 a 35 mm, com parafuso allen e porca de canal.
 
 ## procedural/pecas/instalacao-solar/partes/grampo-ponta-40/
 
-- `receita.js` — instalacao-solar/grampo-ponta-40 — o grampo em "Z" de ponta para moldura de 40 mm, com um parafuso.
+- `receita.js` — instalacao-solar/grampo-ponta-40 — o grampo de ponta em "Z" para moldura de 40 mm, com parafuso allen e porca de canal.
 
 ## procedural/pecas/instalacao-solar/partes/haste/
 
@@ -1931,7 +1935,7 @@
 
 ## procedural/pecas/instalacao-solar/partes/suporte-l/
 
-- `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil.
+- `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil, com a borracha do pé e o parafuso do rasgo.
 
 ## procedural/pecas/instalacao-solar/partes/telhado/
 

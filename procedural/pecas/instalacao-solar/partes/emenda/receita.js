@@ -1,33 +1,37 @@
-/* instalacao-solar/emenda — a peça que entra dentro de dois perfis para uni-los, com dois parafusos.
+/* instalacao-solar/emenda — a barra estriada que entra no canal em T de dois perfis para uni-los, com dois parafusos allen.
  *
  * Peça avulsa do kit da instalação solar (plano `docs/modelar/planos/2026-11-12-instalacao-solar-no-telhado.md`): são 6 na obra,
- * 3 por linha de trilho. Metade do comprimento entra em cada perfil e os dois parafusos, um de cada lado do meio, a prendem nele.
+ * 3 por linha de trilho. Metade do comprimento entra no canal de cada perfil e os dois parafusos, um de cada lado do meio, a travam
+ * por cima: as cabeças ficam dentro do pescoço do canal, abaixo do topo do perfil.
  *
- * Referencial do acervo: Y para cima, o chão em y = 0 (a face de baixo do corpo), o corpo ao longo de x, de 0 a `comprimento`,
- * centrado em z. Os parafusos ficam em cima, com a cabeça sextavada de y = `altura` a `altura` + `cabeca`.
+ * Referencial do acervo: Y para cima, o chão em y = 0 (a face de baixo da barra), a barra ao longo de x, de 0 a `comprimento`,
+ * centrada em z. Os parafusos sobem de dentro da barra, com a cabeça de y = `altura` a `altura` + `cabeca`.
  *
- * MEDIDAS A CONFIRMAR (a pessoa ainda não mediu a emenda): o comprimento de 150 mm, a seção de 26 por 30 mm que cabe no vazio do
- * perfil (a tabela do `perfil` deixa 27 mm de largura útil entre os rasgos), a parede do tubo, o afastamento e a bitola dos parafusos.
+ * MEDIDAS A CONFIRMAR (a pessoa só deu a ordem de grandeza de 150 mm): o comprimento, a seção de 20 por 7 mm que cabe na câmara do T do
+ * perfil (22 mm de largura por 10 de altura sob as abas), os frisos do topo, o afastamento e a bitola (M5) dos parafusos.
  *
- * Técnica: o corpo é uma `extrusao` de eixo x de um tubo retangular, com dois furos de passagem abertos por `subtrair` de cilindros
- * em y; cada parafuso é um `unir` do corpo roscado (cilindro) e da cabeça sextavada (cilindro de seis lados). A haste do parafuso
- * passa pelo furo com folga de 0,2 mm e a cabeça assenta na face de cima do corpo.
+ * Técnica: a barra é uma `extrusao` de eixo x do contorno da seção (retângulo com frisos no topo), com dois furos de passagem abertos por
+ * `subtrair` de cilindros em y; cada parafuso é um `unir` da haste roscada (cilindro) e da cabeça allen, uma `extrusao` em y de um círculo
+ * com furo sextavado (o soquete da chave), a haste entrando na cabeça para fechar o fundo do soquete.
  */
 
 export const TABELA = {
-  /* A CONFIRMAR: comprimento e seção externa. */
+  /* A CONFIRMAR: comprimento e seção da barra. */
   comprimento: 150,
-  largura: 26,
-  altura: 30,
-  /* A CONFIRMAR: parede do tubo. */
-  parede: 4,
-  /* A CONFIRMAR: parafusos, a metade do afastamento entre eles, o raio da haste, a folga do furo e a cabeça. */
+  largura: 20,
+  altura: 7,
+  /* A CONFIRMAR: frisos do topo (crista, vale, fundura). */
+  frisoCrista: 1.5,
+  frisoVale: 1.5,
+  frisoFundura: 0.4,
+  /* A CONFIRMAR: parafusos allen M5, o afastamento entre eles, a folga do furo, o comprimento da haste, a cabeça (raio, altura e chave do soquete). */
   afastamentoDosParafusos: 90,
-  raioDoParafuso: 3,
+  raioDoParafuso: 2.5,
   folgaDoFuro: 0.2,
-  compDaHaste: 16,
-  raioDaCabeca: 5.8,
-  cabeca: 4,
+  compDaHaste: 7,
+  raioDaCabeca: 4.25,
+  cabeca: 3,
+  chaveDoSoquete: 4,
   ladosDoParafuso: 24,
 };
 
@@ -45,18 +49,30 @@ const cilindroInteiro = (id) => ({ unir: [
   { origem: { op: 'cilindro', id, tampa: 'fundo' } },
   { origem: { op: 'cilindro', id, tampa: 'topo' } },
 ] });
-export const ALIASES = [ID.furoA, ID.furoB, ID.hasteA, ID.cabecaA, ID.hasteB, ID.cabecaB].map((id) => [`cil${id}`, cilindroInteiro(id)]);
+export const ALIASES = [ID.furoA, ID.furoB, ID.hasteA, ID.hasteB].map((id) => [`cil${id}`, cilindroInteiro(id)]);
 const alias = (id) => ({ alias: `cil${id}` });
+
+/* Os frisos de uma face reta: de `a` a `b`, a crista no traçado, o vale `fundura` para o lado `dentro`. Começa na crista em `a`. */
+export function frisos(a, b, dentro, crista, vale, fundura) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const u = [(b[0] - a[0]) / len, (b[1] - a[1]) / len];
+  const em = (pos, prof = 0) => [a[0] + u[0] * pos + dentro[0] * prof, a[1] + u[1] * pos + dentro[1] * prof];
+  const pts = [a];
+  for (let pos = 0; pos + crista + vale < len - 0.2; pos += crista + vale) {
+    pts.push(em(pos + crista), em(pos + crista, fundura), em(pos + crista + vale, fundura), em(pos + crista + vale));
+  }
+  pts.push(b);
+  return pts;
+}
 
 export function derivar(t = TABELA) {
   const xs = [t.comprimento / 2 - t.afastamentoDosParafusos / 2, t.comprimento / 2 + t.afastamentoDosParafusos / 2];
-  return {
-    xs,
-    /* Em eixo x o ponto [u, v] vai para y = -u e z = v. */
-    tuboFora: { largura: t.altura, profundidade: t.largura, centro: [-t.altura / 2, 0] },
-    tuboVazio: { largura: t.altura - 2 * t.parede, profundidade: t.largura - 2 * t.parede, centro: [-t.altura / 2, 0] },
-    yDaHaste: t.altura - t.compDaHaste,
-  };
+  const W = t.largura / 2;
+  /* Contorno da seção em (z, y): a barra com os frisos no topo, de +z para -z. */
+  const zy = [[W, 0], [W, t.altura], ...frisos([W, t.altura], [-W, t.altura], [0, -1], t.frisoCrista, t.frisoVale, t.frisoFundura).slice(1), [-W, 0]];
+  const R = t.chaveDoSoquete / Math.sqrt(3);
+  const soquete = [0, 1, 2, 3, 4, 5].map((k) => [R * Math.cos((k * Math.PI) / 3), R * Math.sin((k * Math.PI) / 3)]);
+  return { xs, zy, soquete, yDaHaste: t.altura - t.compDaHaste };
 }
 
 
@@ -81,23 +97,27 @@ export function portas(t = TABELA) {
 export function gerarPassos(t = TABELA) {
   const D = derivar(t);
   const passos = [];
-  const ret = (r) => ({ retangulo: { largura: m(r.largura), profundidade: m(r.profundidade), centro: r.centro.map(m) } });
-  passos.push(['extrusao', { origemId: ID.corpo, eixo: 'x', altura: m(t.comprimento), perfil: ret(D.tuboFora), furos: [ret(D.tuboVazio)] }]);
-  /* Os furos de passagem: cilindros em y que atravessam a parede de cima. */
+  /* Em eixo x o ponto [u, v] vai para y = -u e z = v. */
+  passos.push(['extrusao', { origemId: ID.corpo, eixo: 'x', altura: m(t.comprimento), perfil: D.zy.map(([z, y]) => [m(-y), m(z)]) }]);
+  /* Os furos de passagem: cilindros em y que atravessam a barra. */
   const furos = [ID.furoA, ID.furoB];
   furos.forEach((id, k) => passos.push(['cilindro', {
-    origemId: id, raio: m(t.raioDoParafuso + t.folgaDoFuro), altura: m(t.compDaHaste + 2), lados: t.ladosDoParafuso,
-    em: [m(D.xs[k]), m(D.yDaHaste), 0],
+    origemId: id, raio: m(t.raioDoParafuso + t.folgaDoFuro), altura: m(t.altura + 2), lados: t.ladosDoParafuso,
+    em: [m(D.xs[k]), m(-1), 0],
   }]));
   passos.push(['subtrair', { origemId: ID.furado, solidos: [{ origem: { op: 'extrusao', id: ID.corpo } }, ...furos.map(alias)] }]);
   const corpo = { origem: { op: 'subtrair', id: ID.furado } };
   passos.push(['parte', { nome: 'corpo', sel: corpo }], ['material', { usa: 'aluminio', sel: corpo }]);
 
   [['A', ID.hasteA, ID.cabecaA, ID.parafusoA], ['B', ID.hasteB, ID.cabecaB, ID.parafusoB]].forEach(([letra, haste, cabeca, parafuso], k) => {
-    /* A haste entra 2 mm na cabeça, para o `unir` fechar um sólido só. */
-    passos.push(['cilindro', { origemId: haste, raio: m(t.raioDoParafuso), altura: m(t.compDaHaste + 2), lados: t.ladosDoParafuso, em: [m(D.xs[k]), m(D.yDaHaste), 0] }]);
-    passos.push(['cilindro', { origemId: cabeca, raio: m(t.raioDaCabeca), altura: m(t.cabeca), lados: 6, em: [m(D.xs[k]), m(t.altura), 0] }]);
-    passos.push(['unir', { origemId: parafuso, solidos: [alias(haste), alias(cabeca)] }]);
+    /* A haste sobe da base da barra e entra 1,5 mm na cabeça allen, para o `unir` fechar um sólido só e o soquete ter fundo. */
+    passos.push(['cilindro', { origemId: haste, raio: m(t.raioDoParafuso), altura: m(t.altura + t.cabeca / 2), lados: t.ladosDoParafuso, em: [m(D.xs[k]), 0, 0] }]);
+    passos.push(['extrusao', {
+      origemId: cabeca, altura: m(t.cabeca), segmentosArco: t.ladosDoParafuso / 4,
+      perfil: { circulo: { raio: m(t.raioDaCabeca), centro: [0, 0] } }, furos: [D.soquete.map(([u, v]) => [m(u), m(v)])],
+      em: [m(D.xs[k]), m(t.altura), 0],
+    }]);
+    passos.push(['unir', { origemId: parafuso, solidos: [alias(haste), { origem: { op: 'extrusao', id: cabeca } }] }]);
     const sel = { origem: { op: 'unir', id: parafuso } };
     passos.push(['parte', { nome: `parafuso${letra}`, sel }], ['material', { usa: 'inox', sel }]);
   });
@@ -106,32 +126,33 @@ export function gerarPassos(t = TABELA) {
 }
 
 const receita = {
-  meta: { nome: 'instalacao-solar/emenda', desc: 'emenda de alumínio de 150 mm que entra dentro de dois perfis para uni-los, com dois parafusos de cabeça sextavada' },
+  meta: { nome: 'instalacao-solar/emenda', desc: 'emenda de alumínio estriada de 150 mm que entra no canal em T de dois perfis para uni-los, com dois parafusos allen de travamento por cima' },
   PARAMS: TABELA,
   MATERIAIS,
   ALIASES,
-  TOPO: { origem: 'face de baixo do corpo, na ponta de x = 0, centrada em z; y para cima, o corpo ao longo de +x, os parafusos em cima' },
+  TOPO: { origem: 'face de baixo da barra, na ponta de x = 0, centrada em z; y para cima, a barra ao longo de +x, os parafusos em cima' },
   PLANO: {
-    objeto: 'emenda de alumínio de 150 mm que encaixa dentro de dois perfis de trilho para uni-los, com dois parafusos de inox',
+    objeto: 'emenda de alumínio estriada de 150 mm que entra no canal em T de dois perfis de trilho e os une, com dois parafusos allen de inox por cima',
     referencias: ['../../referencias/kit.md'],
     escala: { medida: 'comprimento da emenda', milimetros: 150 },
     partes: [
-      { nome: 'corpo', forma: 'tubo retangular de alumínio de 150 mm de comprimento, 26 mm de largura e 30 mm de altura, parede de 4 mm, vazado de ponta a ponta, com dois furos de passagem na parede de cima, 90 mm um do outro, simétricos em relação ao meio', tecnica: 'extrusão de eixo x de tubo retangular, furos por subtrair de cilindros em y' },
-      { nome: 'parafusoA', forma: 'parafuso de inox de 6 mm de diâmetro com cabeça sextavada de 4 mm, a haste de 16 mm descendo pelo furo do corpo, num lado do meio', tecnica: 'unir de cilindro (haste) e cilindro de seis lados (cabeça)' },
-      { nome: 'parafusoB', forma: 'segundo parafuso, igual ao primeiro, no outro lado do meio', tecnica: 'unir de cilindro (haste) e cilindro de seis lados (cabeça)' },
+      { nome: 'corpo', forma: 'barra maciça de alumínio de 150 mm, 20 mm de largura e 7 mm de altura, com frisos ao longo do topo e dois furos de passagem, 90 mm um do outro, simétricos em relação ao meio', tecnica: 'extrusão de eixo x do contorno com frisos, furos por subtrair de cilindros em y' },
+      { nome: 'parafusoA', forma: 'parafuso allen de inox M5: haste de 7 mm descendo pelo furo da barra e cabeça cilíndrica de 3 mm com soquete sextavado, num lado do meio', tecnica: 'unir de cilindro (haste) e extrusão de círculo com furo sextavado (cabeça)' },
+      { nome: 'parafusoB', forma: 'segundo parafuso allen, igual ao primeiro, no outro lado do meio', tecnica: 'unir de cilindro (haste) e extrusão de círculo com furo sextavado (cabeça)' },
     ],
     criteriosDeReprovacao: [
       'comprimento diferente de 150 mm',
-      'seção que não cabe no vazio do perfil (mais larga que 27 mm), ou maciça, sem o vazio',
-      'só um parafuso, ou parafusos fora dos furos do corpo',
-      'cabeça do parafuso redonda, e não sextavada',
-      'parafusos fora de posição simétrica em relação ao meio do corpo',
+      'seção que não cabe na câmara do T do perfil (mais larga que 22 mm ou mais alta que 10 mm), ou topo liso, sem frisos',
+      'só um parafuso, ou parafusos fora dos furos da barra',
+      'cabeça do parafuso sextavada por fora, e não cilíndrica com soquete sextavado (allen)',
+      'cabeça que passa de y = 10 mm (cabe no pescoço do canal sem passar do topo do perfil)',
+      'parafusos fora de posição simétrica em relação ao meio da barra',
       'qualquer parte abaixo do chão (y negativo)',
     ],
   },
   contatos: [
-    { par: ['corpo', 'parafusoA'], motivo: 'a cabeça do parafuso assenta na face de cima do corpo' },
-    { par: ['corpo', 'parafusoB'], motivo: 'a cabeça do parafuso assenta na face de cima do corpo' },
+    { par: ['corpo', 'parafusoA'], motivo: 'a cabeça do parafuso assenta na face de cima da barra' },
+    { par: ['corpo', 'parafusoB'], motivo: 'a cabeça do parafuso assenta na face de cima da barra' },
   ],
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };

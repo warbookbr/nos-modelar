@@ -33,8 +33,9 @@ o caso achar faltando no núcleo vai ao backlog, salvo se bloquear o resultado.
 
 - o alinhamento: objeto, escala, partes, contatos e critérios, com as medidas e quantidades da instalação e sem marca, modelo,
   dados pessoais ou parte elétrica; as fotos da pessoa e a imagem do catálogo do kit ficam fora do repositório;
-- o telhado de fibrocimento de cima, sem a casa: as vigas de madeira e as telhas onduladas na inclinação medida, com a
-  sobreposição das fileiras;
+- a casa em volumes simples, por decisão da pessoa em 2026-11-12, para o planejamento ter onde se apoiar: as paredes da casa
+  maior, da extensão e da casa vizinha de telhado metálico, o madeiramento do telhado onde as hastes entram, e as telhas onduladas
+  de cada água na inclinação dela, com a sobreposição das fileiras; o que a pessoa não mediu entra pelas fotos, marcado a confirmar;
 - as peças do kit: haste rosca dupla de 250 mm com vedação, suporte em L, perfil de alumínio de 1,35 m, emenda, grampo
   intermediário e grampo de ponta de 30 a 35 mm e de 40 mm, com medidas típicas marcadas como a confirmar até a pessoa medir;
 - os quatro painéis em pé, lado a lado: três de 1812 × 1046 × 40 mm e um de 1722 × 1134 × 30 mm numa das pontas, preso dos dois
@@ -45,7 +46,7 @@ o caso achar faltando no núcleo vai ao backlog, salvo se bloquear o resultado.
 ## Excluído
 
 - a parte elétrica, o inversor, a bateria, os cabos e a tela antigranizo;
-- a casa abaixo do telhado e o telhado metálico de baixo;
+- o interior da casa, portas, janelas e acabamento, e a estrutura da casa vizinha;
 - sombra e geração de energia.
 
 ## Medidas e quantidades da obra
@@ -73,16 +74,40 @@ conferir, e entra na receita marcado assim.
   trilho teria 4,80 m. A montagem mostra as duas e a escolha é da pessoa.
 - Fileira: cerca de 4,33 m de painéis com folgas de 2 cm, e cerca de 4,39 m com a junção de grampos de ponta lado a lado; a
   conferir contra o trilho de 4,55 m.
-- Telhado: telha ondulada de fibrocimento de 6 mm, no padrão da norma (gomo de 177 mm, telha de 1,10 m de largura e 1,05 m
-  útil, comprimentos de 1,22 a 3,66 m, sobreposição de 14 cm, ou 20 cm em pouca inclinação). A água tem duas fileiras de telhas
-  da beirada à cumeeira; as fotos da pessoa mostram uma fileira de parafusos junto da beirada e outra logo acima da sobreposição,
-  e nenhuma entre elas, o que dá uma viga na beirada, uma na sobreposição e uma na cumeeira, a cerca de um comprimento de telha
-  uma da outra. Com as vigas a mais de 90 cm, os dois trilhos não caem os dois sobre viga a 90 cm um do outro: a montagem mostra
-  isso, e as saídas (madeira a mais entre as vigas, ou outra disposição dos trilhos) são da pessoa. A água é bem maior que a
-  fileira de 4,45 m: 25 gomos (4,4 m) são só o trecho de uma das fotos, e a panorâmica mostra perto do dobro. A inclinação não
-  muda as contas e entra como 15 graus, a confirmar.
-- Pendentes da pessoa: a distância, medida descendo o telhado, entre a fileira de parafusos da beirada e a da sobreposição, o
-  comprimento da água ao longo da beirada, e as medidas do perfil visto de ponta, do suporte em L e dos grampos.
+- Telhado: telha ondulada de fibrocimento de 6 mm, no padrão da norma (gomo de 177 mm, sobreposição de 14 cm, ou 20 cm em pouca inclinação). Medida da
+  pessoa (2026-11-12, de trena, aproximada, igual em todas as fileiras): telha de 2,60 m de comprimento por 1,12 m de largura (os padrões vizinhos são
+  2,44 m e 1,10 m). Pelas fotos e pela medida da pessoa: a casa maior tem a cumeeira da frente ao fundo, com 11 m (real, cerca de dez telhas e meia por
+  fileira), e uma água para cada lado, cada uma com duas fileiras de telhas; a largura da frente é de 8 a 9 m (real, aproximada) e a receita a faz sair das
+  duas fileiras (2 x 2600 - 140 = 5060 mm ao longo da inclinação de 15 graus, menos o beiral de 0,5 m, dá cerca de 8,8 m); do lado esquerdo de quem olha a
+  frente, a casa vizinha de telhado metálico ocupa a parte da frente, com uma calha entre as duas, e atrás dela a água esquerda continua, por baixo da
+  beirada, numa extensão menos inclinada (8 graus, estimada), de duas fileiras, que cobre um corredor aberto e um cômodo até a calha da beirada. Cada fileira
+  tem uma terça na ponta de baixo, uma no meio da telha (a telha de 2,60 m pede apoio no meio, o que bate com a linha de parafusos no meio da telha na foto de
+  cima) e uma na sobreposição ou na cumeeira, com a linha de parafusos sobre cada uma, na 2ª e na 5ª crista de cada telha (um a cada 3 gomos, 531 mm): cinco
+  terças por água, a 1220 e 1240 mm uma da outra. As peças verticais (caibros ou tesouras) não aparecem nas fotos e ficam fora até a pessoa mandar foto de
+  dentro. A linha A de hastes cai sobre a terça da sobreposição e a B (a 900 mm) a 320 mm da terça do meio da fileira de cima, de modo que os dois trilhos
+  não caem os dois sobre madeira: a montagem mostra isso, e as saídas (madeira a mais, trilhos a 1220 ou 1240 mm, uma terça cada, ou outra disposição) são da
+  pessoa. A casa em volumes simples fica em `instalacao-solar/casa`, com a água dos painéis (`aguaDosPaineis`, esquerda por padrão, a confirmar) sem telhas nem
+  terças, porque a peça `telhado` as traz.
+- Perfil (medida real, 2026-11-12): 1350 mm de comprimento, seção de 45 mm de altura por 30 mm de largura, paredes de uns 2 mm. Vista
+  de ponta: canal em T aberto em cima com as duas abas finas, uma face lateral inteira estriada em frisos horizontais (a que
+  encosta no suporte em L) com um rasgo lateral para a porca do parafuso do L, aba larga embaixo com a borda virada para cima e
+  uma parede inclinada por dentro; a seção é oca e assimétrica. A confirmar: o pescoço de 10 mm, a câmara do T de 10 mm de altura,
+  o rasgo de 10 por 4 mm a 21 mm do fundo, os frisos e a borda da aba.
+- Suporte em L (medida real): 85 mm de altura total (a perna sobe 80 mm acima do pé de 5 mm), 50 mm de largura, pé com furo
+  redondo para a haste e borracha preta fina por baixo, perna com rasgo oblongo vertical no alto e parafuso allen com placa-porca
+  quadrada que corre no rasgo lateral do perfil, as duas faces da perna estriadas. A confirmar: o pé de 45 mm, a borracha de 1,5 mm, o
+  oblongo de 8,5 por 30 mm.
+- Cadeia da fixação: a haste sobe pela crista, passa pelo furo do pé do L entre a porca de apoio e a arruela com porca de cima, e a
+  ponta sobra de 15 a 20 mm; a perna do L encosta na face estriada do perfil e o parafuso do rasgo, na metade de cima do oblongo (a
+  confirmar), prende o perfil, que fica ao lado da haste com o topo acima do topo dela. A altura do perfil sai dessa cadeia.
+- Grampos, em forma (a pessoa mandou fotos; tamanhos a confirmar): o de ponta (4 de 30 a 35 mm; os 8 de 40 mm são iguais, só mais
+  altos) é um Z de alumínio com a aba de cima sobre a moldura, a parede até o perfil e um pé no topo dele; o parafuso allen desce na
+  vertical pela parte de cima, junto da parede, pelo corpo, até uma porca no canal em T. O intermediário (6) é uma tampa estriada com
+  duas asas curtas sobre as molduras e um pescoço curto entre os painéis (cerca de 20 mm), com o parafuso allen pelo centro e uma porca
+  deslizante no canal em T. A emenda (6) é uma barra estriada de cerca de 150 mm (a confirmar) que entra no canal em T dos dois perfis,
+  com dois parafusos allen por cima, um de cada lado da junta.
+- Pendentes da pessoa: em qual água vão os painéis, a largura da frente da casa maior (8 a 9 m, aproximada) e a da extensão, a altura das paredes, o
+  madeiramento visto por dentro (foto ou medida da distância entre as peças), e as medidas finas dos grampos e da emenda.
 
 ## Gate de saída
 
@@ -93,14 +118,14 @@ conferir, e entra na receita marcado assim.
 
 ## Fatias
 
-1. O alinhamento e o telhado com as vigas, com a inclinação e o espaçamento das vigas medidos pela pessoa.
+1. O alinhamento, a casa em volumes simples e o telhado com o madeiramento, pelas fotos e pelas medidas da pessoa.
 2. As peças do kit e os painéis.
 3. A montagem na ordem da obra e as conferências de medida.
 4. Fechamento.
 
 ## Riscos e parada
 
-Sem a distância entre as vigas e a inclinação, o telhado não sai; a fatia 1 espera essas duas medidas. Se uma conferência
+A casa e o madeiramento saem das fotos enquanto a pessoa não mede, e cada medida estimada fica marcada a confirmar. Se uma conferência
 mostrar que a instalação como planejada não cabe (trilho fora das vigas, haste fora da crista, grampo fora da faixa permitida
 pelo fabricante do painel), o achado vai à pessoa antes de qualquer ajuste, porque a decisão é da obra dela.
 
