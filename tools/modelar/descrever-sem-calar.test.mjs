@@ -68,19 +68,18 @@ describe('a abertura que cai na booleana da chapa inteira', () => {
 describe('o progresso', () => {
   it('entra na saída de erro por etapa e não muda a saída padrão', async () => {
     const linhas = [];
-    const comProgresso = await descreverPecaReutilizavel({ peca: `${PASTA}/chapa-inteira/receita`, modulo: chapaInteira, aoProgredir: (l) => linhas.push(l) });
-    const semProgresso = await descreverPecaReutilizavel({ peca: `${PASTA}/chapa-inteira/receita`, modulo: chapaInteira });
+    const comProgresso = await descreverPecaReutilizavel({ peca: `${PASTA}/orfao/receita`, modulo: orfao, aoProgredir: (l) => linhas.push(l) });
+    const semProgresso = await descreverPecaReutilizavel({ peca: `${PASTA}/orfao/receita`, modulo: orfao });
     expect(linhas.some((l) => /executando a receita \(3 passos\)/.test(l))).toBe(true);
     for (const etapa of ['medindo as partes', 'medindo os contatos', 'conferindo os vãos']) expect(linhas.some((l) => l.includes(etapa)), etapa).toBe(true);
     expect(linhas.every((l) => l.startsWith('descrever: ') && / s desde o começo$/.test(l))).toBe(true);
-    const semTempo = (t) => t.replace(/levou \d+(,\d)? s/g, 'levou X s');
-    expect(semTempo(comProgresso.stdout)).toBe(semTempo(semProgresso.stdout));
+    expect(comProgresso.stdout).toBe(semProgresso.stdout);
     expect(comProgresso.stderr).toBe(semProgresso.stderr);
   });
 
   it('bate no intervalo enquanto os passos rodam', async () => {
     const linhas = [];
-    await descreverPecaReutilizavel({ peca: `${PASTA}/chapa-inteira/receita`, modulo: chapaInteira, semVeredito: true, aoProgredir: (l) => linhas.push(l), intervaloDoProgressoMs: 1 });
+    await descreverPecaReutilizavel({ peca: `${PASTA}/orfao/receita`, modulo: orfao, aoProgredir: (l) => linhas.push(l), intervaloDoProgressoMs: 1 });
     expect(linhas.some((l) => /ainda executando a receita, no passo \d+ de 3/.test(l))).toBe(true);
   });
 });
