@@ -181,19 +181,24 @@ export function motivoDeFaceDegenerada(forma) {
 }
 
 /** O motivo da recusa quando a casca da forma não fecha (aresta que uma face só usa, ou que mais de duas usam), pelo mesmo critério do `npm run malha:conferir` e da aprovação da
-    família (`analisarTopologia`: `casca-aberta` e `aresta-nao-manifold`), ou null. Dispensa só as arestas das faces que um passo que declarou superfície aberta criou
-    (`lathe` com `superficie: true`, `subdivisao` sem `espessura`): a receita não leva campo novo. */
-export function motivoDeCascaAberta(forma, passos = []) {
-  const abertos = new Set();
-  passos.forEach((p, i) => { const [op, a] = p ?? []; if ((op === 'lathe' && a?.superficie === true) || (op === 'subdivisao' && a?.espessura == null)) abertos.add(i); });
-  const criador = new Map();
-  for (const [id, eventos] of forma.procedencia?.faces ?? []) criador.set(id, eventos?.[0]?.passo);
-  const daSuperficie = (id) => abertos.has(criador.get(id));
-  const achados = analisarTopologia({ vertices: forma.V, faces: forma.F }).achados
-    .filter((a) => (a.codigo === 'casca-aberta' || a.codigo === 'aresta-nao-manifold') && !(a.onde?.face != null ? daSuperficie(a.onde.face) : (a.onde?.faces ?? []).some(daSuperficie)));
+    família (`analisarTopologia`: `casca-aberta` e `aresta-nao-manifold`), ou null. Dispensa só a aresta que já era borda livre na saída do próprio passo que declarou
+    superfície aberta (`lathe` com `superficie: true`, `subdivisao` sem `espessura`), medida no estado logo depois daquele passo (`executar` roda o prefixo dos passos): a fresta
+    que um passo posterior abre, ou a de uma gaiola fechada que perde uma face, não é dispensada, e a `subdivisao` de gaiola fechada não tem borda nenhuma. A receita não leva campo novo. */
+export function motivoDeCascaAberta(forma, passos = [], executar = (prefixo) => nucleo(prefixo, {}, {}, {}, null, [])) {
+  const CODIGOS = ['casca-aberta', 'aresta-nao-manifold'];
+  const achadosDe = (f) => analisarTopologia({ vertices: f.V, faces: f.F }).achados.filter((a) => CODIGOS.includes(a.codigo));
+  const finais = achadosDe(forma);
+  if (!finais.length) return null;
+  const livres = new Set();
+  passos.forEach((p, i) => {
+    const [op, a] = p ?? [];
+    if (!((op === 'lathe' && a?.superficie === true) || (op === 'subdivisao' && a?.espessura == null))) return;
+    for (const x of achadosDe(executar(passos.slice(0, i + 1)))) if (x.onde?.aresta != null) livres.add(x.onde.aresta);
+  });
+  const achados = finais.filter((a) => !livres.has(a.onde?.aresta));
   if (!achados.length) return null;
   return `${achados.length} ARESTA(S) DE CASCA ABERTA OU NÃO-MANIFOLD\n${achados.slice(0, 8).map((a) => `  ${a.mensagem}`).join('\n')}`
-    + '\n  A casca da peça não fecha: o passo que a gerou deixou fresta. Corrija a operação; só o passo que declara superfície aberta (`lathe` com `superficie: true`, `subdivisao` sem `espessura`) fica dispensado.';
+    + '\n  A casca da peça não fecha: o passo que a gerou deixou fresta. Corrija a operação; só a borda livre que o próprio passo que declara superfície aberta (`lathe` com `superficie: true`, `subdivisao` sem `espessura`) deixou fica dispensada.';
 }
 
 /* Confere UMA peça e devolve o que ela reprovou e se ela espera a etapa. Cada peça é independente das outras (lê o próprio
@@ -281,7 +286,7 @@ export async function conferirPeca(peca) {
      exportação; a régua de malha usa o mesmo critério dele e a lista aqui, com a parte e os cantos de cada uma. */
   const degenerada = motivoDeFaceDegenerada(forma);
   if (degenerada) reprovadas.push({ peca, motivo: degenerada });
-  const aberta = motivoDeCascaAberta(forma, receita.PASSOS);
+  const aberta = motivoDeCascaAberta(forma, receita.PASSOS, (prefixo) => nucleo(prefixo, receita.PARAMS ?? {}, {}, {}, null, []));
   if (aberta) reprovadas.push({ peca, motivo: aberta });
   return { reprovadas, esperando };
 }
