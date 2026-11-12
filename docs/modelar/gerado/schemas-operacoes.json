@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:be3e371d8227814ba7bc9f0f0b90922921d5a0e16f7342081df9de37a5d414d7",
+  "assinatura": "sha256:33e789c8a40b06459b8e31c6d2c2277fc42de2cb9acbe4795e0dec9eb96d0920",
   "total": 42,
   "operacoes": [
     {
@@ -2989,7 +2989,8 @@
         "limites": [
           "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
           "Cite a costura com {op:'intersectar', id, costura:true}.",
-          "Resultado vazio grita."
+          "Resultado vazio grita.",
+          "Interseção que não muda o sólido (o volume do resultado é o do primeiro sólido, que está inteiro dentro dos outros) segue com o aviso semEfeito em neutro.avisos; a que corta o primeiro não avisa."
         ],
         "diagnosticos": []
       }
@@ -4880,7 +4881,8 @@
         "limites": [
           "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
           "Cite a costura com {op:'subtrair', id, costura:true}.",
-          "Resultado vazio grita."
+          "Resultado vazio grita.",
+          "Subtração que não muda o sólido (o volume do resultado é o da peça, a menos de 1e-6: a ferramenta está longe dela ou só encosta) segue, e o passo põe em neutro.avisos um aviso semEfeito com o motivo; o descrever o lista em AVISOS DO NÚCLEO. A que corta não avisa."
         ],
         "diagnosticos": []
       }
@@ -5041,7 +5043,8 @@
           "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
           "Cite a costura com {op:'unir', id, costura:true}.",
           "Resultado vazio grita.",
-          "O registro da costura (as arestas que o arredondarCostura lê) tem todas as arestas entre faces de sólidos diferentes, também onde a sopa de triângulos da Manifold parte um diedro em dois e o canto do meio é tirado por quase colinear: a aresta que o atravessa continua registrada, ligando os dois vizinhos. Sem isso o registro perdia esses trechos e o arredondarCostura fazia tubo curto com tampa nos restos (dentes no fim do arredondamento, face degenerada). A régua tools/modelar/reguas-de-malha/costura-registrada.mjs compara o registro com a costura geométrica."
+          "O registro da costura (as arestas que o arredondarCostura lê) tem todas as arestas entre faces de sólidos diferentes, também onde a sopa de triângulos da Manifold parte um diedro em dois e o canto do meio é tirado por quase colinear: a aresta que o atravessa continua registrada, ligando os dois vizinhos. Sem isso o registro perdia esses trechos e o arredondarCostura fazia tubo curto com tampa nos restos (dentes no fim do arredondamento, face degenerada). A régua tools/modelar/reguas-de-malha/costura-registrada.mjs compara o registro com a costura geométrica.",
+          "Dois cantos coincidentes de sólidos diferentes (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do outro, sem folga) entram na Manifold como um só: a face que a união mantém inteira passa a apontar o canto de menor id, o mesmo dos pedaços cortados, e não deixa mais aresta solta em volta (a peça de prova frente-rente-a-tampa media 4). O outro id sai da malha."
         ],
         "diagnosticos": []
       }

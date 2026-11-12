@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2024 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2027 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2647,6 +2647,11 @@
 - `medir.mjs` — medir.mjs — executa uma peça de prova de `tools/fixtures/costuras-e-furos/` e devolve os números das três réguas de malha mais a contagem de arestas soltas, …
 - `tubos-em-t.js` — tubos-em-t.js — o gerador das peças de prova de união de dois tubos do plano "costuras e furos limpos" (`docs/modelar/planos/2026-11-09-costuras-e-furos-limp…
 
+## tools/fixtures/costuras-e-furos/agulha-na-faceta-do-tubo/
+
+- `agulha-na-faceta-do-tubo.test.mjs` — Fixa o defeito de hoje (fatia 3 do plano "costuras e furos limpos"): origem das faces sem área que a exportação do braço pulou.
+- `receita.js` — agulha-na-faceta-do-tubo/receita.js — peça de prova do defeito "faces sem área que a exportação pulou" (plano "costuras e furos limpos"): três cilindros de 1…
+
 ## tools/fixtures/costuras-e-furos/dentes-no-fim-do-arredondamento/
 
 - `dentes-no-fim-do-arredondamento.test.mjs` — A fatia 1 do plano "costuras e furos limpos" fixou o defeito (24 pontas em 18 trechos); a causa era o registro da costura do `unir`, que perdia 9 trechos de …
@@ -2664,7 +2669,7 @@
 
 ## tools/fixtures/costuras-e-furos/frente-rente-a-tampa/
 
-- `frente-rente-a-tampa.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados.
+- `frente-rente-a-tampa.test.mjs` — A fatia 3 do plano "costuras e furos limpos" inverteu o defeito: o canto do aro de um tubo e o polo da tampa do outro coincidem, a face mantida passa ao cant…
 - `receita.js` — frente-rente-a-tampa/receita.js — peça de prova do defeito "o `unir` deixa uma fresta quando a frente de um tubo fica rente à tampa de outro" (plano "costura…
 
 ## tools/fixtures/costuras-e-furos/furo-em-face-plana/
@@ -2685,7 +2690,7 @@
 ## tools/fixtures/costuras-e-furos/subtrair-que-nao-corta/
 
 - `receita.js` — subtrair-que-nao-corta/receita.js — peça de prova do defeito "um `subtrair` que não corta nada passa calado" (plano "costuras e furos limpos"): um bloco de 1…
-- `subtrair-que-nao-corta.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte o número marcado.
+- `subtrair-que-nao-corta.test.mjs` — A fatia 3 do plano "costuras e furos limpos" inverteu o defeito: o subtrair (e o intersectar) que não muda o sólido avisa (`semEfeito`), e o que muda não avisa.
 
 ## tools/fixtures/descrever-sem-calar/
 
@@ -3379,6 +3384,7 @@
 - `face-degenerada.test.mjs` — face-degenerada.test.mjs — a régua acha exatamente o que o `adaptarThree` recusa como "é degenerada".
 - `face-torcida.mjs` — face-torcida.mjs — régua de malha: a face que se cruza e o triângulo virado (plano "costuras e furos limpos", refeitura do `furo` em anéis).
 - `face-torcida.test.mjs` — face-torcida.test.mjs — a régua acha a face em gravata e o triângulo virado, e deixa passar a face convexa e a face côncava boa; e a peça do caso do furo ceg…
+- `guarda-face-degenerada.test.mjs` — O `guarda:acervo` recusa a peça com face degenerada (plano "costuras e furos limpos", fatia 3), pelo mesmo critério da régua e do `adaptarThree`.
 - `reguas-de-malha.mjs` — reguas-de-malha.mjs — as réguas de malha juntas (plano "costuras e furos limpos", fatia 1; a de face torcida é exportada à parte, fora do conjunto medido): a…
 - `resumo-do-acervo.mjs` — resumo-do-acervo.mjs — roda as três réguas de malha sobre o acervo inteiro (`procedural/pecas/` e `tools/fixtures/acervo/`) e imprime uma tabela e, com `--js…
 - `serrilhado-da-costura.mjs` — serrilhado-da-costura.mjs — régua de malha: degraus e pontas de serra na linha onde as faces de um `arredondarCostura` encontram o resto do sólido (plano "co…
