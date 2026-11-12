@@ -17,8 +17,9 @@ const X_FACE = 40; // a face de fora da placa do esboço: o plano em que o relev
 const CENTRO_RELEVO = [60, 34]; // [y, z] do centro do relevo no esboço
 const Y_MEIO_QUADRO = 65; // y do meio do colchete: a escala do apoio gira em torno dele
 
-/** Contorno [a, b] de um polígono com cada canto concordado por um arco de raio `r` (um número ou um por vértice), `n` pontos por canto: o `arredondado` do esboço. */
-function arredondado(vertices, r, n = 8) {
+/** Contorno [a, b] de um polígono com cada canto concordado por um arco de raio `r` (um número ou um por vértice), `n` pontos por canto: o `arredondado` do esboço. `parte` é a fração de uma aresta que o arco de um canto
+ *  pode tomar: com 0,95 dois cantos de uma aresta curta se atravessam e o contorno volta sobre si mesmo; com 0,48 os arcos quase se encontram, sem se tocar. */
+function arredondado(vertices, r, n = 8, parte = 0.95) {
   const saida = [];
   const k = vertices.length;
   for (let i = 0; i < k; i += 1) {
@@ -29,7 +30,7 @@ function arredondado(vertices, r, n = 8) {
     const lu = Math.hypot(...u); const lv = Math.hypot(...v);
     const e1 = [u[0] / lu, u[1] / lu]; const e2 = [v[0] / lv, v[1] / lv];
     const alfa = Math.acos(Math.max(-1, Math.min(1, e1[0] * e2[0] + e1[1] * e2[1])));
-    const rr = Math.min(ri, 0.95 * Math.min(lu, lv) * Math.tan(alfa / 2));
+    const rr = Math.min(ri, parte * Math.min(lu, lv) * Math.tan(alfa / 2));
     const d = rr / Math.tan(alfa / 2);
     const mm = [e1[0] + e2[0], e1[1] + e2[1]]; const lm = Math.hypot(...mm);
     const c = [p[0] + (mm[0] / lm) * (rr / Math.sin(alfa / 2)), p[1] + (mm[1] / lm) * (rr / Math.sin(alfa / 2))];
@@ -67,7 +68,8 @@ export function passosDoRetrovisor(T, s, onde, inclinacao, base) {
 
   const secao = (z, sc) => {
     const v = trapezio(yBaixo, yTopo, 0).map(([x, y]) => [(x - cx) * sc, (y - cy) * sc]);
-    return { pos: [cx, cy, z], contorno: paraZ(arredondado(v, 40 + 55 * (1 - sc))).reverse() };
+    /* parte 0,48: nas últimas seções, bem encolhidas, o raio crescente tomaria mais que a aresta: com 0,95 o contorno se atravessava e as costas saíam com riscos */
+    return { pos: [cx, cy, z], contorno: paraZ(arredondado(v, 40 + 55 * (1 - sc), 8, 0.48)).reverse() };
   };
   const secoes = [secao(zF, 1), secao(zF + T.retrovisor_frente_reta, 1)];
   const passosCostas = T.retrovisor_secoes_costas; const expo = 3; const costas = prof - T.retrovisor_frente_reta;
