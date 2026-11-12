@@ -61,16 +61,16 @@ export function derivarJanelas(T, f) {
   const kFundo = (yPonta - T.janela_triangulo_pe_y) / (zPonta - zPe);
   const yFundo = (z) => T.janela_triangulo_pe_y + kFundo * (z - zPe);
   const zV = T.janela_retrovisor_tras_z;
-  const yCurva = T.janela_triangulo_curva_y;
+  /* o alto do triângulo: a coluninha e a borda da frente do vidro se cruzam logo em cima, e a curva aberta é o raio desse canto, sem trecho reto */
+  const yTopoT = (() => { const d = (y) => zColFrente(y) - zFrenteVidro(y); return 1000 + (0 - d(1000)) * 1000 / (d(2000) - d(1000)); })();
   const triangulo = [
     [zV, yFundo(zV)],
     [zColFrente(T.janela_triangulo_pe_y), T.janela_triangulo_pe_y],
-    [zColFrente(T.janela_triangulo_topo_y), T.janela_triangulo_topo_y],
-    [zFrenteVidro(yCurva), yCurva],
+    [zColFrente(yTopoT), yTopoT],
     [zV, yFrenteVidro(zV)],
   ];
-  const raiosTriangulo = [T.janela_raio, T.janela_raio, T.janela_raio, T.janela_raio_curva, T.janela_raio_frente];
-  const distTriangulo = [F, -D, F, F, -D];
+  const raiosTriangulo = [T.janela_raio, T.janela_raio, T.janela_raio_curva, T.janela_raio_frente];
+  const distTriangulo = [F, -D, F, -D];
 
   /* o raio do canto do vão: o da moldura menos a metade do recuo dos dois lados dele, no mínimo `janela_raio_minimo` */
   const raioDoVao = (raios, dists) => raios.map((r, k) => Math.max(T.janela_raio_minimo, r - (dists[k] + dists[(k + raios.length - 1) % raios.length]) / 2));
@@ -97,19 +97,43 @@ export function pontasDaBase(T, f) {
   return [[T.janela_retrovisor_ponta_z, T.janela_retrovisor_base_y], [zP, T.janela_retrovisor_base_y], [zP, yFrenteVidro(zP)]];
 }
 
-/** A peça preta da frente do triângulo, a base do retrovisor, de cada lado: um triângulo plano sobre a lateral, em milímetro [x, y, z]. A vertical de trás começa `janela_retrovisor_sobreposicao`
+/** A peça preta da frente do triângulo, a base do retrovisor, de cada lado: um triângulo sobre a lateral, em milímetro [x, y, z]. A vertical de trás começa `janela_retrovisor_sobreposicao`
  *  sobre a borracha do triângulo (que acaba `janela_borracha_dentro + janela_borracha_fora` depois da vertical do vidro), a ponta fica na base, e a borda da frente sai da borda do vidro e abre.
- *  A lateral é plana e inclinada ali, e os três pontos ficam sobre o plano dela, `janela_retrovisor_saida` para fora; como o plástico, a peça entra a `janela_retrovisor_espessura` menos
+ *  Os pontos da malha seguem a superfície da lateral e da quina (`superficie`), `janela_retrovisor_saida` para fora pela normal; como o plástico, a peça entra a `janela_retrovisor_espessura` menos
  *  essa saída na chapa. Devolve as partes no formato do plástico (`nome`, `vertices`, `faces`, `vincos`, `cantos`, `posicoes`), com a `espessura` própria. */
 export function derivarBasesDoRetrovisor(T, f) {
   const tri = pontasDaBase(T, f);
+  const N = T.janela_retrovisor_malha;
+  /* a superfície da lateral na altura y: plana e inclinada até o fim da lateral, e dali o arco da quina (raio da frente): o ponto da superfície em (z, y) e a normal de fora */
+  const superficie = (z, y) => {
+    const xS = f.xs(y); const rF = f.raioFrente(y); const zc = f.zF(y) - rF; const xc = xS - rF;
+    if (z <= zc) return { x: xS, n: [1, 0] };
+    const dz = Math.min(z - zc, rF);
+    const dx = Math.sqrt(rF * rF - dz * dz);
+    return { x: xc + dx, n: [dx / rF, dz / rF] };
+  };
+  /* a malha triangular do triângulo, em N partes por lado: os cantos têm uma face só, e a borda `cantos` os segura vivos */
+  const ponto = (a, b) => [0, 1].map((e) => tri[0][e] + (tri[1][e] - tri[0][e]) * a / N + (tri[2][e] - tri[0][e]) * b / N);
   return [['Esquerda', 'e', 1], ['Direita', 'd', -1]].map(([lado, suf, s]) => {
-    const nomes = tri.map((_, k) => `baseRetrovisor_${k}_${suf}`);
-    const posicoes = new Map(tri.map(([z, y], k) => [nomes[k], [s * (f.xs(y) + T.janela_retrovisor_saida), y, z]]));
-    /* a normal sai da lateral: +x no lado esquerdo e -x no direito */
-    const [a, b, c] = nomes.map((n) => posicoes.get(n));
-    const nx = (b[1] - a[1]) * (c[2] - a[2]) - (b[2] - a[2]) * (c[1] - a[1]);
-    const face = nx * s > 0 ? nomes : [...nomes].reverse();
-    return { nome: `baseRetrovisor${lado}`, vertices: [...nomes].sort(), faces: [face], vincos: [], cantos: [], espessura: T.janela_retrovisor_espessura, posicoes };
+    const nome = (a, b) => `baseRetrovisor_${a}_${b}_${suf}`;
+    const posicoes = new Map(); const faces = [];
+    for (let a = 0; a <= N; a += 1) {
+      for (let b = 0; a + b <= N; b += 1) {
+        const [z, y] = ponto(a, b); const { x, n } = superficie(z, y);
+        posicoes.set(nome(a, b), [s * (x + n[0] * T.janela_retrovisor_saida), y, z + n[1] * T.janela_retrovisor_saida]);
+      }
+    }
+    const horario = (t) => {
+      const [A, B, C] = t.map((v) => posicoes.get(v));
+      const nx = (B[1] - A[1]) * (C[2] - A[2]) - (B[2] - A[2]) * (C[1] - A[1]);
+      return nx * s > 0 ? t : [...t].reverse();
+    };
+    for (let a = 0; a < N; a += 1) {
+      for (let b = 0; a + b < N; b += 1) {
+        faces.push(horario([nome(a, b), nome(a + 1, b), nome(a, b + 1)]));
+        if (a + b + 2 <= N) faces.push(horario([nome(a + 1, b), nome(a + 1, b + 1), nome(a, b + 1)]));
+      }
+    }
+    return { nome: `baseRetrovisor${lado}`, vertices: [...posicoes.keys()].sort(), faces, vincos: [], cantos: [], espessura: T.janela_retrovisor_espessura, posicoes };
   });
 }

@@ -250,19 +250,18 @@ export const TABELA = {
   janela_frente_recuo: 150, // a borda da frente do triângulo é paralela ao para-brisa e fica 150 mm atrás dele, medidos na perpendicular
   janela_ponta_y: 1324, // a ponta do triângulo: onde a base dele encontra a borda da frente, abaixo e um pouco atrás do pé do para-brisa
   janela_triangulo_pe_y: 1346, // a base do triângulo, mais deitada que a do vidro grande, sai do pé da coluninha a esta altura
-  janela_triangulo_topo_y: 1925, // o alto do triângulo, na coluninha: não há trecho reto no alto, e dali a borda segue para a descida paralela ao para-brisa
-  janela_triangulo_curva_y: 1895, // a altura em que ela se junta à borda paralela ao para-brisa, numa curva aberta de `janela_raio_curva`
   janela_retrovisor_tras_z: 1486, // a vertical que fecha o triângulo na frente e a de trás da peça preta
   janela_retrovisor_sobreposicao: 6, // a peça preta começa 6 mm antes do fim da borracha do triângulo, que ela cobre
   janela_retrovisor_saida: 3, // a peça preta é uma placa 3 mm para fora da lateral, acima da borracha (2,2 mm), engrossada `janela_retrovisor_espessura` para dentro: entra 1 mm na chapa
   janela_retrovisor_espessura: 4,
+  janela_retrovisor_malha: 10, // a placa é uma malha de 10 por 10 partes por lado, para seguir a lateral e a quina
   janela_retrovisor_ponta_z: 1767, // a ponta da peça preta, na base dela: a borda da frente sai da borda do vidro e abre para a frente embaixo
   janela_retrovisor_base_y: 1313, // a base da peça: continua a base do triângulo, 25 mm abaixo dela, e é por onde a fresta da porta sai
   janela_segmentos_arco: 8, // por quarto de volta nos cantos dos vidros, para a borracha e a aba contornarem o canto sem facetas
   janela_raio: 8,
   janela_raio_pe_tras: 120, // o canto de baixo de trás do vidro grande, bem aberto
   janela_raio_topo_tras: 35,
-  janela_raio_curva: 150, // a curva aberta do alto do triângulo
+  janela_raio_curva: 24, // o canto do alto do triângulo, onde a coluninha encontra a borda paralela ao para-brisa (uns 30 graus): o alto vira para a descida ali, sem trecho reto; o arredondamento o encurta uns 65 mm; com menos de uns 20 mm a aba dobra em quadrilátero torcido
   janela_raio_frente: 20,
   janela_raio_minimo: 4,
   vidro_traseiro_base_y: 1700,
@@ -934,7 +933,7 @@ export function pontosDeclarados(T = TABELA) {
     /* a janela da cabine (2026-11-11): as extremidades da borracha de cada vão, que é a moldura de 20 mm do desenho, e as da peça preta; as cotas do desenho valem ±30 mm, e aqui a tolerância é a do arredondamento dos cantos */
     { nome: 'borracha do vidro grande, atrás e embaixo: a borda de trás da moldura em z 747, o pé dela na coluninha em y 1338', parte: 'borrachaPortaCabineEsquerda', medida: 'minimo', em: [f.xs(janela.grande[2][1]) - 2, janela.grande[0][1], janela.grande[2][0]], toleranciaMm: 8 },
     { nome: 'borracha do vidro grande, em cima e à frente: o alto da moldura em y 1966 e o fim dela sobre a coluninha, 12 mm além da borda do vão', parte: 'borrachaPortaCabineEsquerda', medida: 'maximo', em: [f.xs(janela.grande[0][1]) + 3, janela.grande[2][1], janela.grande[0][0] + T.janela_borracha_dentro + T.janela_borracha_fora], toleranciaMm: 8 },
-    { nome: 'borracha do triângulo, na frente: o fim dela sobre a tira da peça preta, na vertical de z 1486 mais 20 mm, e o alto na coluninha em y 1925', parte: 'borrachaTrianguloCabineEsquerda', medida: 'maximo', em: [f.xs(janela.triangulo[0][1]) + 3, janela.triangulo[2][1] + 6, T.janela_retrovisor_tras_z + T.janela_borracha_dentro + T.janela_borracha_fora], toleranciaMm: 8 },
+    { nome: 'borracha do triângulo, na frente: o fim dela sobre a tira da peça preta, na vertical de z 1486 mais 20 mm, e o alto na coluninha, a uns 1905 (a ponta de 30 graus arredondada de raio 24)', parte: 'borrachaTrianguloCabineEsquerda', medida: 'maximo', em: [f.xs(janela.triangulo[0][1]) + 3, janela.triangulo[2][1] - 57, T.janela_retrovisor_tras_z + T.janela_borracha_dentro + T.janela_borracha_fora], toleranciaMm: 8 },
     { nome: 'peça preta da base do retrovisor, atrás e embaixo: a vertical de trás (z 1500) na base em y 1313, 3 mm para fora da lateral e 4 mm de espessura', parte: 'baseRetrovisorEsquerda', medida: 'minimo', em: [f.xs(janela.peca[2][1]) + T.janela_retrovisor_saida - T.janela_retrovisor_espessura, T.janela_retrovisor_base_y, janela.peca[1][0]], toleranciaMm: 1 },
     { nome: 'peça preta da base do retrovisor, em cima e na frente: a ponta em z 1767 na base, e o alto da vertical de trás em y 1590', parte: 'baseRetrovisorEsquerda', medida: 'maximo', em: [f.xs(T.janela_retrovisor_base_y) + T.janela_retrovisor_saida, janela.peca[2][1], T.janela_retrovisor_ponta_z], toleranciaMm: 1 },
     { nome: 'boca da ponteira, embaixo, por dentro e atrás: o tubo de 55 mm a 180 mm do meio, com o topo no fundo do para-choque e a boca 50 mm atrás da face dele', parte: 'ponteiraEscapamento', medida: 'minimo', em: [ponteira.x - ponteira.raio, ponteira.y - ponteira.raio, ponteira.zBoca], toleranciaMm: tol },
