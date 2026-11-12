@@ -19,6 +19,27 @@ const registro = () => criarRegistroComposicoes({ resolverOperacao: REGISTRO_OPE
 ] });
 
 describe('composições procedurais — R06', () => {
+  it('o registro guarda cópia do que recebeu, devolve cópia em `resolver` e `listar`, e a assinatura e o manifesto não mudam com a cópia', () => {
+    const entrada = composicao('mecanifica.composicao.copia', { raio: { tipo: 'numero', padrao: 0.5 } }, [
+      { id: 'a', operacao: 'cilindro', argumentos: { origemId: 1, raio: { parametro: 'raio' }, altura: 1, lados: 8, folga: undefined, lista: [0, undefined, -0, [1, { x: undefined, y: 2 }]] } },
+    ]);
+    const r = criarRegistroComposicoes({ resolverOperacao: REGISTRO_OPERACOES.resolver, composicoes: [entrada] });
+    const antes = r.assinatura;
+    /* a cópia tem a semântica da ida e volta por JSON: chave indefinida some, elemento indefinido vira null, -0 vira 0 */
+    expect(r.resolver('mecanifica.composicao.copia').nos[0].argumentos.lista).toEqual([0, null, 0, [1, { y: 2 }]]);
+    expect(Object.is(r.resolver('mecanifica.composicao.copia').nos[0].argumentos.lista[2], -0)).toBe(false);
+    expect('folga' in r.resolver('mecanifica.composicao.copia').nos[0].argumentos).toBe(false);
+    entrada.nos[0].argumentos.altura = 99; entrada.parametros.raio.padrao = 9;
+    const lida = r.resolver('mecanifica.composicao.copia');
+    expect(lida.nos[0].argumentos.altura).toBe(1); expect(lida.parametros.raio.padrao).toBe(0.5);
+    lida.nos[0].argumentos.altura = 7;
+    expect(r.resolver('mecanifica.composicao.copia').nos[0].argumentos.altura).toBe(1);
+    expect(r.listar()[0].nos[0].argumentos.altura).toBe(1);
+    expect(Object.isFrozen(r.manifesto[0]) && Object.isFrozen(r.manifesto[0].nos[0].argumentos)).toBe(true);
+    expect(r.assinatura).toBe(antes);
+    expect(r.assinatura).toBe(JSON.stringify({ formato: FORMATO_COMPOSICAO_PROCEDURAL, composicoes: r.manifesto.map(({ id, versao, parametros, artefatos, nos }) => ({ id, versao, parametros, artefatos, nos })) }));
+  });
+
   it('mantém o serviço puro fora de Three.js, MCP e filesystem', () => {
     const fonte = readFileSync(new URL('./composicoes.js', import.meta.url), 'utf8');
     expect(fonte).not.toMatch(/from ['"](?:three|node:fs|node:path|@modelcontextprotocol)/);

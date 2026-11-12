@@ -50,6 +50,15 @@ describe('a aba do painel cortado', () => {
     expect(g.medidas.folgaMedida).toBeGreaterThanOrEqual(4 - 1e-6);
   });
 
+  it('com aba a limpeza do corte desfaz a face fina até a razão 0,004 (a perna passa rente à parede); sem aba o passo é o de antes, e `limpar.limite` troca o valor', () => {
+    const limpa = (g) => g.passos.find((p) => p[0] === 'limparLascas')[1];
+    expect(limpa(cortar()).limite).toBeUndefined();
+    expect(limpa(cortar({ aba: { largura: 12 } })).limite).toBe(0.004);
+    expect(limpa(cortar({ aba: { largura: 12 }, limpar: { tolerancia: 0.01, limite: 0.006 } })).limite).toBe(0.006);
+    expect(limpa(cortar({ limpar: { tolerancia: 0.02 } }))).toEqual({ sel: { origem: expect.any(Object) }, tolerancia: 0.02 });
+    expect(() => cortar({ limpar: { tolerancia: 0.01, limite: 0.9 } })).toThrow(/limite entre 0 e 0,5/);
+  });
+
   it('a perna inclinada a 60 graus, sem raio, tira o vão do chão e a saída é a mesma em duas chamadas', () => {
     const a = cortar({ aba: { largura: 14, angulo: 60 } });
     const b = cortar({ aba: { largura: 14, angulo: 60 } });

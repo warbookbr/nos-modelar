@@ -57,58 +57,103 @@ export function prepararPontoNaMalha(V, F, ids) {
     for (const [i, j, k] of triangularFace(pts)) tris.push({ face: id, a: pts[i], b: pts[j], c: pts[k], vs: [f.vs[i], f.vs[j], f.vs[k]] });
   }
   if (!tris.length) return { maisProximo: () => null, triangulos: 0 };
+  const N = tris.length;
+  const caixa = new Float64Array(6 * N);
   const lo = [Infinity, Infinity, Infinity]; const hi = [-Infinity, -Infinity, -Infinity];
   let extensao = 0;
-  for (const T of tris) {
-    const mn = [0, 1, 2].map((e) => Math.min(T.a[e], T.b[e], T.c[e])); const mx = [0, 1, 2].map((e) => Math.max(T.a[e], T.b[e], T.c[e]));
-    T.mn = mn; T.mx = mx;
-    for (let e = 0; e < 3; e += 1) { if (mn[e] < lo[e]) lo[e] = mn[e]; if (mx[e] > hi[e]) hi[e] = mx[e]; }
-    extensao += Math.max(mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]);
+  for (let n = 0; n < N; n += 1) {
+    const { a, b, c } = tris[n];
+    const o = 6 * n;
+    for (let e = 0; e < 3; e += 1) {
+      const x = a[e]; const y = b[e]; const z = c[e];
+      const mn = x < y ? (x < z ? x : z) : (y < z ? y : z); const mx = x > y ? (x > z ? x : z) : (y > z ? y : z);
+      caixa[o + e] = mn; caixa[o + 3 + e] = mx;
+      if (mn < lo[e]) lo[e] = mn;
+      if (mx > hi[e]) hi[e] = mx;
+    }
+    extensao += Math.max(caixa[o + 3] - caixa[o], caixa[o + 4] - caixa[o + 1], caixa[o + 5] - caixa[o + 2]);
   }
   const diagonal = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]);
-  const lado = Math.max(diagonal / 64, 1.5 * (extensao / tris.length), 1e-9);
+  /* a célula acompanha o triângulo típico (1,5 vez a extensão média), sem piso pela diagonal: numa chapa fina de malha miúda a célula de diagonal/64 guardava centenas de
+     triângulos por camada e toda consulta os percorria. O piso de diagonal/2048 limita só o número de células de uma malha de triângulos minúsculos. */
+  const lado = Math.max(diagonal / 2048, 1.5 * (extensao / N), 1e-9);
   const celula = (x, e) => Math.floor((x - lo[e]) / lado);
   const dim = [0, 1, 2].map((e) => celula(hi[e], e) + 1);
   const chave = (i, j, k) => (i * dim[1] + j) * dim[2] + k;
+  /* os triângulos que cobririam muitas células (um triângulo grande entre miúdos) não entram na grade: ficam numa lista que toda consulta olha, já com o descarte pela caixa */
   const grade = new Map();
-  tris.forEach((T, n) => {
-    const a = [0, 1, 2].map((e) => celula(T.mn[e], e)); const b = [0, 1, 2].map((e) => celula(T.mx[e], e));
-    for (let i = a[0]; i <= b[0]; i += 1) for (let j = a[1]; j <= b[1]; j += 1) for (let k = a[2]; k <= b[2]; k += 1) {
+  const grandes = [];
+  for (let n = 0; n < N; n += 1) {
+    const o = 6 * n;
+    const i0 = celula(caixa[o], 0); const j0 = celula(caixa[o + 1], 1); const k0 = celula(caixa[o + 2], 2);
+    const i1 = celula(caixa[o + 3], 0); const j1 = celula(caixa[o + 4], 1); const k1 = celula(caixa[o + 5], 2);
+    if ((i1 - i0 + 1) * (j1 - j0 + 1) * (k1 - k0 + 1) > 64) { grandes.push(n); continue; }
+    for (let i = i0; i <= i1; i += 1) for (let j = j0; j <= j1; j += 1) for (let k = k0; k <= k1; k += 1) {
       const c = chave(i, j, k);
       const l = grade.get(c);
       if (l) l.push(n); else grade.set(c, [n]);
     }
-  });
+  }
   const visto = new Int32Array(tris.length);
   let carimbo = 0;
+  /* o descarte pela caixa: a distância da caixa do triângulo ao ponto é um piso da distância ao triângulo; a margem de 1e-9 cobre a diferença de arredondamento entre a raiz e `hypot` */
+  const longeDemais = (n, p, melhor) => {
+    const o = 6 * n;
+    const dx = p[0] < caixa[o] ? caixa[o] - p[0] : p[0] > caixa[o + 3] ? p[0] - caixa[o + 3] : 0;
+    const dy = p[1] < caixa[o + 1] ? caixa[o + 1] - p[1] : p[1] > caixa[o + 4] ? p[1] - caixa[o + 4] : 0;
+    const dz = p[2] < caixa[o + 2] ? caixa[o + 2] - p[2] : p[2] > caixa[o + 5] ? p[2] - caixa[o + 5] : 0;
+    const lim = melhor.distancia + 1e-9;
+    return dx * dx + dy * dy + dz * dz > lim * lim;
+  };
   const maisProximo = (p, limite = Infinity) => {
     carimbo += 1;
+    let melhor = null;
+    /* um candidato vence se está mais perto, ou empata (1e-12) com a face de menor id e, na mesma face, o triângulo de menor índice: o resultado não depende da ordem da busca */
+    const tenta = (n) => {
+      if (visto[n] === carimbo) return;
+      visto[n] = carimbo;
+      if (melhor && longeDemais(n, p, melhor)) return;
+      const T = tris[n];
+      const q = pontoNoTriangulo(p, T.a, T.b, T.c);
+      const d = Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+      if (!melhor || d < melhor.distancia - 1e-12 || (Math.abs(d - melhor.distancia) <= 1e-12 && (T.face < melhor.face || (T.face === melhor.face && n < melhor.n)))) {
+        melhor = { face: T.face, ponto: q, distancia: d, vertices: T.vs, baricentro: baricentro(q, T.a, T.b, T.c), n };
+      }
+    };
+    for (const n of grandes) tenta(n);
     /* a célula do ponto, presa à grade: um ponto fora dela começa pelo anel mais perto */
     const c0 = [0, 1, 2].map((e) => celula(p[e], e));
     const presa = c0.map((c, e) => Math.min(dim[e] - 1, Math.max(0, c)));
     const kMax = Math.max(...[0, 1, 2].map((e) => Math.max(presa[e], dim[e] - 1 - presa[e])));
-    let melhor = null;
     for (let k = 0; k <= kMax; k += 1) {
       /* o que falta olhar está nos anéis de k em diante, a pelo menos (k - 1) células do ponto */
       if (melhor && melhor.distancia <= (k - 1) * lado) break;
       if ((k - 1) * lado > limite) break;
-      for (let di = -k; di <= k; di += 1) for (let dj = -k; dj <= k; dj += 1) for (let dk = -k; dk <= k; dk += 1) {
-        if (Math.max(Math.abs(di), Math.abs(dj), Math.abs(dk)) !== k) continue;
-        const i = presa[0] + di; const j = presa[1] + dj; const l = presa[2] + dk;
-        if (i < 0 || j < 0 || l < 0 || i >= dim[0] || j >= dim[1] || l >= dim[2]) continue;
-        const lista = grade.get(chave(i, j, l));
-        if (!lista) continue;
-        for (const n of lista) {
-          if (visto[n] === carimbo) continue;
-          visto[n] = carimbo;
-          const T = tris[n];
-          const q = pontoNoTriangulo(p, T.a, T.b, T.c);
-          const d = Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
-          if (!melhor || d < melhor.distancia - 1e-12 || (Math.abs(d - melhor.distancia) <= 1e-12 && T.face < melhor.face)) melhor = { face: T.face, ponto: q, distancia: d, vertices: T.vs, baricentro: baricentro(q, T.a, T.b, T.c) };
+      /* um anel maior que a grade inteira: olha todo triângulo da grade de uma vez */
+      if (24 * k * k + 2 > 4 * grade.size) {
+        for (const lista of grade.values()) for (const n of lista) tenta(n);
+        break;
+      }
+      for (let di = -k; di <= k; di += 1) {
+        const i = presa[0] + di;
+        if (i < 0 || i >= dim[0]) continue;
+        for (let dj = -k; dj <= k; dj += 1) {
+          const j = presa[1] + dj;
+          if (j < 0 || j >= dim[1]) continue;
+          /* no meio do anel só as duas faces em z; nas bordas em x ou y, a coluna inteira */
+          const passo = (Math.abs(di) === k || Math.abs(dj) === k) ? 1 : 2 * k;
+          for (let dk = -k; dk <= k; dk += passo || 1) {
+            const l = presa[2] + dk;
+            if (l < 0 || l >= dim[2]) continue;
+            const lista = grade.get(chave(i, j, l));
+            if (lista) for (const n of lista) tenta(n);
+          }
         }
       }
     }
-    return melhor && melhor.distancia <= limite ? melhor : null;
+    if (!melhor || melhor.distancia > limite) return null;
+    const { n, ...saida } = melhor; void n;
+    return saida;
   };
   return { maisProximo, triangulos: tris.length };
 }

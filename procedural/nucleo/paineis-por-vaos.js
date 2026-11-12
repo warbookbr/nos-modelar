@@ -12,7 +12,7 @@
  *   linhas[i].curva: [[x, y, z], ...] (mm, aberta ou fechada) no lugar de eixo e pontos: a linha de vão como curva 3D sobre a chapa, que sobe a quina arredondada onde a linha de uma vista é recusada. Cada ponto vai à pele de fora pelo ponto mais próximo (a tolerância é `distanciaDaCurva`, padrão 3 vãos), a lâmina é varrida como no modo superfície, e `curvaDaGaiola` tira a curva da gaiola (estação, coluna, fração). `alem` pode ser [início, fim]; a curva que sai da chapa sem `alem`, ou que não corta a chapa em dois pedaços, é recusada. `linhas[i].vistas: [{ eixo, pontos, lado? }]` continua a linha de uma vista a outra pela emenda.
  *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos. O passo `parte` sai com `onde.conexo` { de, dir, ate }: `ate` é a distância lida mais uma folga, e o núcleo recusa a receita salva cuja semente passou a cair num vão.
  *   modo: 'vista' (padrão: a lâmina é a extrusão da linha ao longo do eixo da vista, a que corta toda camada do raio, com o vão compensado pela inclinação) ou 'superficie' (a linha é projetada na chapa e a lâmina é varrida sobre ela, de paredes normais à chapa: a folga 3D é o vão em qualquer inclinação, a linha atravessa dobras, a ponta que sai da borda não alarga e duas pontas que se encontram fecham em esquadria; corta só a primeira camada lida do `lado`, até `profundidade` mm abaixo da pele, padrão a espessura lida mais meio vão); vale por linha em `linhas[i].modo`.
- *   limpar: as faces finas do corte saem por `limparLascas` depois do `subtrair` (true: 0,01 mm; { tolerancia } em mm; false: não emite); padrão ligado nas linhas por superfície e por curva, desligado no modo vista; `medidas.lascasAntes` e `lascasRestantes` contam as faces finas.
+ *   limpar: as faces finas do corte saem por `limparLascas` depois do `subtrair` (true: 0,01 mm; { tolerancia, limite? } em mm; false: não emite; com `aba` o limite da face fina sobe de 0,003 a 0,004); padrão ligado nas linhas por superfície e por curva, desligado no modo vista; `medidas.lascasAntes` e `lascasRestantes` contam as faces finas.
  *   aba: { largura, angulo?, raio?, espessura? } (mm; na chamada ou em `linhas[i].aba`, `false` desliga a linha; só nas linhas por superfície ou curva; padrão desligado, e então a saída não muda) a borda de cada painel cortado dobra para dentro com uma perna reta de `largura`, a `angulo` graus de giro da chapa (de 45 a 90, padrão 90: reta para baixo), com `raio` de filete no canto de dentro e a espessura lida na linha (ou `espessura`): o vão entre dois painéis ganha fundo sem o forro. A perna é um sólido varrido ao longo da linha, com a esquadria dos cantos, que recua um centésimo do vão da parede do corte e entra meia espessura na chapa; os passos acrescentam um `unir` depois do corte, e as partes saem dele (`origem` de cada parte, e `origemDoCorte` segue sendo o `subtrair`). A perna acaba a `largura` mais o vão de qualquer outra linha (a emenda em T, o canto): ali o vão fica sem perna, para ela não passar pelo vão da outra nem encostar na perna dela, e `avisos` e `medidas.aba` dizem quantos trechos ficaram assim. Mede-se com `npm run vao:partes -- <peça> --fundo=modelo`.
  *   origemId: o primeiro origemId livre (padrão: o maior dos passos da chapa mais um); o ajudante usa dali em diante e devolve `proximoId`.
  *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido; folgaAbaixoDe: o aviso `folgaEstreita` quando a lâmina fica abaixo disso, em mm (padrão metade do vão); saida: 'mm' ou 'metro'; conferir: false não executa o corte (só a chapa, uma vez; o `ate` sai da chapa de antes) e avisa `naoConferiu`; medirTempo: true põe em medidas.tempos o tempo de cada etapa; medirFolga: true mede a folga 3D também no modo vista (no modo superfície ela é sempre medida).
@@ -48,6 +48,9 @@ import { memoizarPura } from './memoria-de-pura.js';
 import { normalDaFace } from './nucleo.js';
 import { alongar, amostrasLaterais, bordasSeCruzam, bordasSeCruzamNaCurva, linhaPertoDeSiMesma, projetarCurva, projetarLinha, varrer, voltaMenorQueOVao } from './lamina-sobre-a-superficie.js';
 import { prepararPontoNaMalha } from './ponto-na-malha.js';
+
+/** A razão área / maior aresta² abaixo da qual a limpeza do corte desfaz a face quando há aba (a da lasca comum é 0,003). */
+const LIMITE_DA_LIMPEZA_COM_ABA = 0.004;
 import { pedacosConexos, prepararRaios } from './selecao-geometrica.js';
 import { triangularFace } from './triangulacao-face.js';
 import { analisarTopologia } from './topologia.js';
@@ -256,7 +259,7 @@ function paineisPorVaosBruto(o) {
   }
   /* limpar: as faces finas que o corte deixa saem pela operação `limparLascas`, depois do `subtrair` e antes dos `parte`. Padrão: ligado onde há lâmina por superfície ou por curva, desligado no modo vista
      (para os passos de quem já usa o modo vista não mudarem); `true` usa a tolerância de 0,01 mm, `{ tolerancia }` (mm) escolhe e `false` não emite */
-  if (o.limpar != null && typeof o.limpar !== 'boolean' && !(typeof o.limpar === 'object' && Number.isFinite(o.limpar.tolerancia) && o.limpar.tolerancia > 0)) erro(`limpar é true, false ou { tolerancia } em mm maior que zero (recebido ${JSON.stringify(o.limpar)})`);
+  if (o.limpar != null && typeof o.limpar !== 'boolean' && !(typeof o.limpar === 'object' && Number.isFinite(o.limpar.tolerancia) && o.limpar.tolerancia > 0 && (o.limpar.limite == null || (Number.isFinite(o.limpar.limite) && o.limpar.limite > 0 && o.limpar.limite < 0.5)))) erro(`limpar é true, false ou { tolerancia, limite? } em mm maior que zero, com limite entre 0 e 0,5 (recebido ${JSON.stringify(o.limpar)})`);
   /* aba: a perna que cada painel cortado dobra para dentro na borda do corte, de modo que o vão entre dois painéis tenha fundo sem o forro. Desligada por padrão; `aba` na chamada vale
      para toda linha por superfície ou por curva, e `linhas[i].aba` (ou `false`) a escolhe por linha. */
   const lerAba = (v, quem) => {
@@ -795,7 +798,11 @@ function paineisPorVaosBruto(o) {
   const uniaoDasAbas = idDaUniao == null ? [] : [['unir', { origemId: idDaUniao, solidos: [{ origem: origemDoCorte }, ...origensDasAbas.map((origem) => ({ origem }))] }]];
   const origemDasPartes = idDaUniao == null ? origemDoCorte : { op: 'unir', id: idDaUniao };
   const toleranciaDaLimpeza = o.limpar === false ? null : o.limpar != null && typeof o.limpar === 'object' ? o.limpar.tolerancia : o.limpar === true || pendentes.length ? 0.01 : null;
-  const limpa = toleranciaDaLimpeza == null ? [] : [['limparLascas', { sel: { origem: origemDoCorte }, tolerancia: toleranciaDaLimpeza }]];
+  /* com aba, a limpeza do corte também desfaz a face fina de proporção até LIMITE_DA_LIMPEZA_COM_ABA: a perna passa rente à parede do corte (a 1 centésimo do vão) e a booleana da união
+     corta a face fina da parede em pedaços sem área quando o plano da perna passa a poucos micrômetros do plano dela (um triângulo de 0,37 mm², de 0,067 por 11 mm, razão 0,0030 contra o 0,003 da lasca,
+     virava um pedaço colinear e a guarda da união recusava o passo). `limpar.limite` troca o valor. */
+  const limiteDaLimpeza = o.limpar != null && typeof o.limpar === 'object' && o.limpar.limite != null ? o.limpar.limite : origensDasAbas.length ? LIMITE_DA_LIMPEZA_COM_ABA : null;
+  const limpa = toleranciaDaLimpeza == null ? [] : [['limparLascas', { sel: { origem: origemDoCorte }, tolerancia: toleranciaDaLimpeza, ...(limiteDaLimpeza != null ? { limite: limiteDaLimpeza } : {}) }]];
 
   /* ---- as sementes: de onde o raio sai, e para onde vai ---- */
   const semente = (p) => {

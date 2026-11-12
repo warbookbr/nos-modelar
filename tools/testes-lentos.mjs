@@ -15,6 +15,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-12: roda as 101 receitas do acervo num processo só, 7,7 s com a máquina livre, e no CI de 2 a 3 vezes isso */
+  'tools/modelar/custo-de-importar-receita.test.mjs',
+  /* 2026-11-12: o sedã em cinco receitas faz cada importação custar 5,5 s, e estes dois, que percorrem o acervo, levam sozinhos 13,3 e 10,5 s com a máquina livre (de 18,1 e 15,6 s antes de baixar o custo das ferramentas gerais) */
+  'src/autoria/material-da-receita.acervo.test.js',
+  'tools/modelar/mapa-da-receita.test.mjs',
   'tools/modelar/ondulacao-corte-e-quina.test.mjs',
   'tools/modelar/raio-da-aresta.test.mjs',
   'modulos/esboco-nucleo/tests/leitor.test.js',

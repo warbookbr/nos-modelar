@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2008 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2011 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1103,6 +1103,7 @@
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
 - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
 - `ponto-na-malha.js` — ponto-na-malha.js — o ponto mais próximo de uma malha de triângulos, com grade espacial
+- `ponto-na-malha.test.mjs` — ponto-na-malha.test.mjs — o ponto mais próximo de uma malha, com a grade, dá o mesmo que a varredura de todos os triângulos.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `rastreio-do-retrato.test.ts` — rastreio-do-retrato.test.ts — o atalho do retrato da procedência devolve exatamente a procedência da conta completa.
@@ -3050,6 +3051,7 @@
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `contorno-da-peca.mjs` — contorno-da-peca.mjs — o contorno por parte no veredito da peça.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
+- `custo-de-importar-receita.test.mjs` — custo-de-importar-receita.test.mjs — nenhuma receita do acervo leva mais que o teto para ser importada e ter os passos gerados.
 - `custo-por-peca.mjs` — custo-por-peca.mjs — a tabela de custo de cada peça de um objeto, lida dos registros de rodada e do registro das etapas.
 - `custo-por-peca.test.mjs` — custo-por-peca.test.mjs — os números da tabela de custo numa fixture de duas peças, a rodada incompleta e a saída estável.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
@@ -3135,6 +3137,7 @@
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `medidas-da-fonte.mjs` — medidas-da-fonte.mjs — tira de `fonte-partes.json`, em milímetro, o ponto de partida das três vistas da carroceria: o perfil lateral, a planta, a seção front…
 - `medidas-da-fonte.test.mjs` — Testes de medidas-da-fonte.mjs sobre a fonte sintética da fixture de caixas: perfil, seção, planta, rodas, o trecho de receita que o núcleo executa e a recus…
+- `medir-importar-receita.mjs` — medir-importar-receita.mjs — o tempo de importar cada receita e gerar os passos dela, num processo novo.
 - `medir-transcricao.mjs` — medir-transcricao.mjs — onde vão os tokens de um agente: `npm run medir:transcricao -- <transcrição.jsonl> [...]`.
 - `medir-transcricao.test.mjs` — medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem), cada resultado de ferramenta na etapa…
 - `modelo-aberto.mjs` — modelo-aberto.mjs — a entrada comum das ferramentas de vista: abre um esboço OU uma receita de peça e devolve a mesma estrutura.

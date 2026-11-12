@@ -35,6 +35,8 @@ function leque(n) {
 /* pts: posições 3D dos cantos, em ordem. Devolve triplas de índices de pts,
    com o mesmo sentido de giro do polígono. */
 export function triangularFace(pts) {
+  /* o triângulo de área válida é a própria triangulação: o caminho curto devolve o que `triangularSemDegenerado` devolveria (o leque do canto 0), sem montar a conta da face */
+  if (pts.length === 3 && !degeneradoPorEscala(pts)(pts[0], pts[1], pts[2])) return [[0, 1, 2]];
   return triangularConvexa(pts) ?? triangularSemDegenerado(pts) ?? leque(pts.length);
 }
 
