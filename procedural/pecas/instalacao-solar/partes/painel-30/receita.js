@@ -7,10 +7,11 @@
  * `comprimento`, e o curto ao longo de z, de 0 a `largura`. O vidro fica rente ao topo da moldura, em y = `altura`. A obra põe o
  * painel em pé; a montagem o gira.
  *
- * Camadas, de cima para baixo: o vidro de 3,2 mm rente ao topo da moldura; a camada das células, de 0,4 mm, em grade de
- * `celulasEmX` por `celulasEmZ` (meias-células: as colunas estreitas ao longo do lado comprido); e a folha de trás, de 0,4 mm.
- * As duas últimas e o vidro assentam num degrau da moldura, e por baixo da folha de trás, no recesso da moldura, ficam a
- * caixa de junção preta e dois cabos curtos que saem dela ao longo de x.
+ * Camadas, de cima para baixo: o vidro de 3,2 mm rente ao topo da moldura; uma folga de `folgaEntreCamadas`; a camada das
+ * células, de 0,4 mm, em grade de `celulasEmX` por `celulasEmZ` (meias-células: as colunas estreitas ao longo do lado comprido);
+ * outra folga; e a folha de trás, de 0,4 mm, que assenta no degrau da moldura. As camadas não se tocam (a folga evita superfícies
+ * coincidentes, que a bancada mostra como manchas), e por baixo da folha de trás, no recesso da moldura, ficam a caixa de junção
+ * preta e dois cabos curtos que saem dela ao longo de x.
  *
  * MEDIDAS A CONFIRMAR (a pessoa ainda não mediu o painel por baixo): a espessura e a largura da aba, a espessura da parede da
  * moldura, o degrau do vidro, as camadas do laminado, a grade de células (6 × 18, típica nesta medida), a caixa de junção e os cabos.
@@ -38,6 +39,8 @@ export const TABELA = {
   vidro: 3.2,
   camadaDeCelulas: 0.4,
   folhaDeTras: 0.4,
+  /* A CONFIRMAR: folga entre o vidro e as células e entre as células e a folha de trás. */
+  folgaEntreCamadas: 0.5,
   /* A CONFIRMAR: a grade de células (6 × 18), a margem delas até a moldura e a fresta entre elas. */
   celulasEmX: 18,
   celulasEmZ: 6,
@@ -69,8 +72,8 @@ const ID = { parede: 100, aba: 101, degrau: 102, moldura: 103, vidro: 104, folha
 export function derivar(t = TABELA) {
   const topoDoVidro = t.altura;
   const baseDoVidro = topoDoVidro - t.vidro;
-  const baseDasCelulas = baseDoVidro - t.camadaDeCelulas;
-  const baseDaFolha = baseDasCelulas - t.folhaDeTras;
+  const baseDasCelulas = baseDoVidro - t.folgaEntreCamadas - t.camadaDeCelulas;
+  const baseDaFolha = baseDasCelulas - t.folgaEntreCamadas - t.folhaDeTras;
   const areaX = t.comprimento - 2 * t.margemDasCelulas;
   const areaZ = t.largura - 2 * t.margemDasCelulas;
   const passoX = areaX / t.celulasEmX;
@@ -156,7 +159,7 @@ const receita = {
     partes: [
       { nome: 'moldura', forma: 'moldura retangular de alumínio de 1722 por 1134 mm e 30 mm de altura: parede de 3 mm, aba de baixo de 30 mm para dentro e degrau interno onde assenta o laminado, quinas externas levemente arredondadas', tecnica: 'três anéis de extrusão em y (parede, aba, degrau) fundidos por unir' },
       { nome: 'vidro', forma: 'placa de vidro de 3,2 mm, transparente, rente ao topo da moldura (y igual à altura da moldura), de parede a parede', tecnica: 'extrusão retangular em y' },
-      { nome: 'celulas', forma: 'grade de 18 por 6 células azul-escuras de 0,4 mm sob o vidro, separadas por fresta de 2 mm, as colunas estreitas ao longo do lado comprido', tecnica: 'um cubo por célula, posições da derivar' },
+      { nome: 'celulas', forma: 'grade de 18 por 6 células azul-escuras de 0,4 mm sob o vidro, com folga clara acima e abaixo, separadas por fresta de 2 mm, as colunas estreitas ao longo do lado comprido', tecnica: 'um cubo por célula, posições da derivar' },
       { nome: 'fundo', forma: 'folha de trás clara de 0,4 mm sob as células, de parede a parede, assentada no degrau da moldura', tecnica: 'extrusão retangular em y' },
       { nome: 'caixaJuncao', forma: 'caixa preta de 110 por 22 por 65 mm colada sob a folha de trás, no meio do painel, dentro do recesso da moldura', tecnica: 'cubo' },
       { nome: 'caboA', forma: 'cabo preto curto, cilindro de 5 mm de diâmetro e 260 mm, saindo da caixa ao longo de +x, de um lado do meio', tecnica: 'cilindro de eixo x' },
@@ -176,12 +179,11 @@ const receita = {
   contatos: [
     { par: ['moldura', 'vidro'], motivo: 'o vidro enche o vão da moldura e encosta nas paredes dela' },
     { par: ['moldura', 'fundo'], motivo: 'a folha de trás assenta no degrau e encosta nas paredes' },
-    { par: ['vidro', 'celulas'], motivo: 'a camada das células fica colada sob o vidro' },
-    { par: ['celulas', 'fundo'], motivo: 'as células assentam na folha de trás' },
     { par: ['fundo', 'caixaJuncao'], motivo: 'a caixa é colada na face de baixo da folha de trás' },
     { par: ['caixaJuncao', 'caboA'], motivo: 'o cabo sai da face de +x da caixa' },
     { par: ['caixaJuncao', 'caboB'], motivo: 'o cabo sai da face de +x da caixa' },
   ],
+  ilhas: [{ contem: 'celulas', motivo: 'as células ficam entre o vidro e a folha de trás, com folga de cada lado para as camadas não coincidirem; na peça real o laminado as une' }],
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 

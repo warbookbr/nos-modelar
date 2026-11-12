@@ -38,7 +38,7 @@ export const TABELA = {
 };
 
 export const MATERIAIS = {
-  inox: { cor: '#9ea3a8', metalicidade: 0.95, aspereza: 0.25 },
+  inox: { cor: '#cfd3d7', metalicidade: 0.55, aspereza: 0.35 },
   borracha: { cor: '#1b1c1e', aspereza: 0.85 },
 };
 
