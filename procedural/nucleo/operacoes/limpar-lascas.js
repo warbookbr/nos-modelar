@@ -20,6 +20,86 @@ import { limparLascas } from '../limpar-lascas.js';
 
 const OP = 'limparLascas';
 
+
+/** A área abaixo da qual uma face é lasca mesmo bem proporcionada: o piso de área da medida de contatos (`contato-de-solidos.js`, 1e-9 vezes o quadrado da meia
+ *  diagonal da caixa do sólido) com margem de 4, sobre a caixa das faces da seleção. É a face que a medida não triangula. */
+export function areaMinimaDe(st, faces) {
+  const lo = [Infinity, Infinity, Infinity]; const hi = [-Infinity, -Infinity, -Infinity];
+  for (const fid of faces) { const f = st.F.get(fid); if (!f) continue; for (const v of f.vs) { const p = st.V.get(v); for (let k = 0; k < 3; k += 1) { if (p[k] < lo[k]) lo[k] = p[k]; if (p[k] > hi[k]) hi[k] = p[k]; } } }
+  if (!Number.isFinite(lo[0])) return 0;
+  const meia = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / 2;
+  return 4e-9 * meia * meia;
+}
+
+/** Limpa as faces `faces` do estado e aplica o resultado: o que `limparLascas` faz depois de ler a seleção, para a operação e para quem limpa dentro da sua
+ *  (`aparar`). `op` é o nome do passo no aviso e na face consumida. */
+export function limparNoEstado(st, faces, { tolerancia, limite = LIMITE_DE_FACE_FINA, areaMinima = 0, i, op }) {
+  const res = limparLascas({ V: st.V, F: st.F }, { selecao: faces, tolerancia, limite, areaMinima });
+  const { relatorio } = res;
+  if (relatorio.finasAntes === 0) return undefined;
+
+  for (const [v, p] of res.vertices) st.V.set(v, p);
+  const remapear = (v) => res.fusoes.get(v) ?? v;
+  for (const [fid, vs] of res.faces) {
+    const f = st.F.get(fid);
+    f.vs = vs;
+    if (Array.isArray(f.quebras)) {
+      const pares = f.quebras.map(([x, y]) => [remapear(x), remapear(y)]).filter(([x, y]) => x !== y && vs.includes(x) && vs.includes(y));
+      if (pares.length) f.quebras = pares; else delete f.quebras;
+    }
+  }
+  /* a face que sai fica registrada como consumida por este passo: a citação posterior pela origem do gerador diz que o passo a desfez, e não que ela "foi removida" */
+  for (const fid of res.facesRemovidas) { st.F.delete(fid); st.consumidas.set(fid, { passo: i, op }); }
+  /* o vértice que some deixa o que tinha no que fica: o peso de esqueleto (por osso, o maior dos dois) e o registro de fusão, que o replay e a conferência de pesos leem */
+  const fundidos = new Map();
+  for (const v of res.verticesRemovidos) {
+    let para = res.fusoes.get(v);
+    while (para != null && res.fusoes.has(para)) para = res.fusoes.get(para);
+    if (para == null) continue;
+    if (!fundidos.has(para)) fundidos.set(para, []);
+    fundidos.get(para).push(v);
+    const pv = st.pesos.get(v);
+    if (pv?.size) {
+      let pk = st.pesos.get(para);
+      if (!pk) { pk = new Map(); st.pesos.set(para, pk); }
+      for (const [osso, peso] of [...pv].sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0))) pk.set(osso, Math.max(pk.get(osso) ?? 0, peso));
+    }
+    st.pesos.delete(v);
+  }
+  for (const [para, de] of [...fundidos].sort((x, y) => x[0] - y[0])) st.merges.push({ de: de.sort((x, y) => x - y), para });
+  for (const v of res.verticesRemovidos) st.V.delete(v);
+  /* as origens que citam o que sumiu: o par de vértices da costura segue a fusão, e o dono da face que saiu deixa a lista */
+  for (const registros of st.origens.values()) {
+    for (const reg of registros) {
+      if (Array.isArray(reg.arestas) && reg.arestas.every((p) => Array.isArray(p) && p.length === 2)) {
+        const vistos = new Set(); const novas = [];
+        for (const [x, y] of reg.arestas) {
+          const p = [remapear(x), remapear(y)];
+          if (p[0] === p[1] || !st.V.has(p[0]) || !st.V.has(p[1])) continue;
+          if (p[0] > p[1]) p.reverse();
+          const chave = `${p[0]}-${p[1]}`;
+          if (!vistos.has(chave)) { vistos.add(chave); novas.push(p); }
+        }
+        reg.arestas = novas.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+      }
+      if (reg.donos && typeof reg.donos === 'object') for (const fid of res.facesRemovidas) delete reg.donos[fid];
+      /* a lista de faces do gerador deixa de ter a que sumiu: a citação da origem inteira (a união) segue valendo sem a lasca, e só a citação explícita da face diz que o passo a desfez */
+      const tira = (lista) => lista.filter((x) => !(Number.isSafeInteger(x) && res.facesRemovidas.has(x)));
+      for (const [k, v] of Object.entries(reg)) {
+        if (Array.isArray(v) && v.length && v.every(Number.isSafeInteger)) reg[k] = tira(v);
+        else if (v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Map) && k !== 'donos') for (const [k2, w] of Object.entries(v)) if (Array.isArray(w) && w.length && w.every(Number.isSafeInteger)) v[k2] = tira(w);
+      }
+    }
+  }
+  if (relatorio.finasDepois > 0) {
+    const maiorCurta = Math.max(...relatorio.restantes.map((x) => x.arestaCurta));
+    st.avisos.push({
+      passo: i, op, ref: 'lascasRestantes', restantes: relatorio.finasDepois, antes: relatorio.finasAntes, faces: relatorio.restantes.slice(0, 20).map((x) => x.face),
+      texto: `limparLascas desfez ${relatorio.finasAntes - relatorio.finasDepois} de ${relatorio.finasAntes} faces finas e deixou ${relatorio.finasDepois}: a aresta curta delas mede até ${maiorCurta} (unidade da peça) e desfazê-las pediria mover a superfície mais que a tolerância ${tolerancia}, ou virar a vizinhança; as que já vinham finas da entrada (chapa de tira estreita) só mudam na peça que as gerou`,
+    });
+  }
+}
+
 export function criarOperacoesLimparLascas({ grita, resolverSelecao }) {
   return {
   limparLascas(st, a, i) {
@@ -34,70 +114,9 @@ export function criarOperacoesLimparLascas({ grita, resolverSelecao }) {
     if (st.orfaos.length > antes) return undefined;
     if (!r.faces.size) return grita(st, i, OP, 'sel', 'a seleção não tem face nenhuma');
 
-    const res = limparLascas({ V: st.V, F: st.F }, { selecao: r.faces, tolerancia, limite });
-    const { relatorio } = res;
-    if (relatorio.finasAntes === 0) return undefined;
-
-    for (const [v, p] of res.vertices) st.V.set(v, p);
-    const remapear = (v) => res.fusoes.get(v) ?? v;
-    for (const [fid, vs] of res.faces) {
-      const f = st.F.get(fid);
-      f.vs = vs;
-      if (Array.isArray(f.quebras)) {
-        const pares = f.quebras.map(([x, y]) => [remapear(x), remapear(y)]).filter(([x, y]) => x !== y && vs.includes(x) && vs.includes(y));
-        if (pares.length) f.quebras = pares; else delete f.quebras;
-      }
-    }
-    /* a face que sai fica registrada como consumida por este passo: a citação posterior pela origem do gerador diz que o passo a desfez, e não que ela "foi removida" */
-    for (const fid of res.facesRemovidas) { st.F.delete(fid); st.consumidas.set(fid, { passo: i, op: OP }); }
-    /* o vértice que some deixa o que tinha no que fica: o peso de esqueleto (por osso, o maior dos dois) e o registro de fusão, que o replay e a conferência de pesos leem */
-    const fundidos = new Map();
-    for (const v of res.verticesRemovidos) {
-      let para = res.fusoes.get(v);
-      while (para != null && res.fusoes.has(para)) para = res.fusoes.get(para);
-      if (para == null) continue;
-      if (!fundidos.has(para)) fundidos.set(para, []);
-      fundidos.get(para).push(v);
-      const pv = st.pesos.get(v);
-      if (pv?.size) {
-        let pk = st.pesos.get(para);
-        if (!pk) { pk = new Map(); st.pesos.set(para, pk); }
-        for (const [osso, peso] of [...pv].sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0))) pk.set(osso, Math.max(pk.get(osso) ?? 0, peso));
-      }
-      st.pesos.delete(v);
-    }
-    for (const [para, de] of [...fundidos].sort((x, y) => x[0] - y[0])) st.merges.push({ de: de.sort((x, y) => x - y), para });
-    for (const v of res.verticesRemovidos) st.V.delete(v);
-    /* as origens que citam o que sumiu: o par de vértices da costura segue a fusão, e o dono da face que saiu deixa a lista */
-    for (const registros of st.origens.values()) {
-      for (const reg of registros) {
-        if (Array.isArray(reg.arestas) && reg.arestas.every((p) => Array.isArray(p) && p.length === 2)) {
-          const vistos = new Set(); const novas = [];
-          for (const [x, y] of reg.arestas) {
-            const p = [remapear(x), remapear(y)];
-            if (p[0] === p[1] || !st.V.has(p[0]) || !st.V.has(p[1])) continue;
-            if (p[0] > p[1]) p.reverse();
-            const chave = `${p[0]}-${p[1]}`;
-            if (!vistos.has(chave)) { vistos.add(chave); novas.push(p); }
-          }
-          reg.arestas = novas.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
-        }
-        if (reg.donos && typeof reg.donos === 'object') for (const fid of res.facesRemovidas) delete reg.donos[fid];
-        /* a lista de faces do gerador deixa de ter a que sumiu: a citação da origem inteira (a união) segue valendo sem a lasca, e só a citação explícita da face diz que o passo a desfez */
-        const tira = (lista) => lista.filter((x) => !(Number.isSafeInteger(x) && res.facesRemovidas.has(x)));
-        for (const [k, v] of Object.entries(reg)) {
-          if (Array.isArray(v) && v.length && v.every(Number.isSafeInteger)) reg[k] = tira(v);
-          else if (v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Map) && k !== 'donos') for (const [k2, w] of Object.entries(v)) if (Array.isArray(w) && w.length && w.every(Number.isSafeInteger)) v[k2] = tira(w);
-        }
-      }
-    }
-    if (relatorio.finasDepois > 0) {
-      const maiorCurta = Math.max(...relatorio.restantes.map((x) => x.arestaCurta));
-      st.avisos.push({
-        passo: i, op: OP, ref: 'lascasRestantes', restantes: relatorio.finasDepois, antes: relatorio.finasAntes, faces: relatorio.restantes.slice(0, 20).map((x) => x.face),
-        texto: `limparLascas desfez ${relatorio.finasAntes - relatorio.finasDepois} de ${relatorio.finasAntes} faces finas e deixou ${relatorio.finasDepois}: a aresta curta delas mede até ${maiorCurta} (unidade da peça) e desfazê-las pediria mover a superfície mais que a tolerância ${tolerancia}, ou virar a vizinhança; as que já vinham finas da entrada (chapa de tira estreita) só mudam na peça que as gerou`,
-      });
-    }
+    const areaMinima = a.areaMinima == null ? areaMinimaDe(st, r.faces) : st.num(a.areaMinima);
+    if (!(Number.isFinite(areaMinima) && areaMinima >= 0)) return grita(st, i, OP, 'areaMinima', `areaMinima precisa ser um número a partir de zero, na unidade da peça ao quadrado (padrão ${areaMinimaDe(st, r.faces)}), recebi ${JSON.stringify(a.areaMinima)}`);
+    limparNoEstado(st, r.faces, { tolerancia, limite, areaMinima, i, op: OP });
     return undefined;
   },
   };

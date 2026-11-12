@@ -122,9 +122,16 @@ const igualAtributos = (f, g) => (f.parte ?? null) === (g.parte ?? null) && (f.m
  * @returns {{ vertices: Map<number, number[]>, verticesRemovidos: Set<number>, fusoes: Map<number, number>, faces: Map<number, number[]>, facesRemovidas: Set<number>,
  *   relatorio: { selecionadas: number, finasAntes: number, finasDepois: number, colapsos: number, trocas: number, desvioMaximo: number, restantes: { face: number, razao: number, arestaCurta: number, recusas: string[] }[] } }}
  */
-export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMITE_DE_FACE_FINA, passadas = 16, trilha = null, maxOperacoes = Infinity } = {}) {
+export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMITE_DE_FACE_FINA, passadas = 16, trilha = null, maxOperacoes = Infinity, areaMinima = 0 } = {}) {
   if (!(Number.isFinite(tolerancia) && tolerancia > 0)) throw new Error('limparLascas: a tolerância é um número positivo, na unidade da malha');
   if (!(Number.isFinite(limite) && limite > 0 && limite < 0.5)) throw new Error('limparLascas: o limite de lasca é um número entre 0 e 0,5');
+  if (!(Number.isFinite(areaMinima) && areaMinima >= 0)) throw new Error('limparLascas: a área mínima é um número a partir de zero, na unidade da malha ao quadrado');
+  /* a razão de uma face, e a de uma face de área abaixo de `areaMinima` (a que a medida de contatos não triangula, por menor que seja a razão dela
+     com a maior aresta) vale metade do limite: ela é lasca mesmo com boa proporção */
+  const razao = (pontos) => {
+    const r = razaoDeFace(pontos);
+    return areaMinima > 0 && r >= limite && norma(newell(pontos)) / 2 < areaMinima ? limite / 2 : r;
+  };
   const { V, F } = malha;
   const vs = new Map(); const vf = new Map();
   for (const [fid, f] of F) {
@@ -143,7 +150,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
   const razaoOriginal = new Map();
   const boaOriginal = (fid) => {
     let r = razaoOriginal.get(fid);
-    if (r === undefined) { r = razaoDeFace(F.get(fid).vs.map((v) => V.get(v))); razaoOriginal.set(fid, r); }
+    if (r === undefined) { r = razao(F.get(fid).vs.map((v) => V.get(v))); razaoOriginal.set(fid, r); }
     return r >= limite;
   };
   const planos = new Map();
@@ -216,11 +223,11 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     if (!(dot(m1, ref) > 0 && dot(m2, ref) > 0)) return no('troca: o par não é convexo');
     const desvio = desvioEntreRemendos([[pa, pb, pc], [pb, pa, pd]], [[pa, pd, pc], [pd, pb, pc]]);
     if (desvio > tolerancia) return no('troca: o par não é plano dentro da tolerância');
-    const antes = Math.min(razaoDeFace([pa, pb, pc]), razaoDeFace([pb, pa, pd]));
-    const depois = Math.min(razaoDeFace([pa, pd, pc]), razaoDeFace([pd, pb, pc]));
+    const antes = Math.min(razao([pa, pb, pc]), razao([pb, pa, pd]));
+    const depois = Math.min(razao([pa, pd, pc]), razao([pd, pb, pc]));
     const finasDe = (...q) => q.filter((r) => r < limite).length;
-    const finasAntesDaTroca = finasDe(razaoDeFace([pa, pb, pc]), razaoDeFace([pb, pa, pd]));
-    const finasDepoisDaTroca = finasDe(razaoDeFace([pa, pd, pc]), razaoDeFace([pd, pb, pc]));
+    const finasAntesDaTroca = finasDe(razao([pa, pb, pc]), razao([pb, pa, pd]));
+    const finasDepoisDaTroca = finasDe(razao([pa, pd, pc]), razao([pd, pb, pc]));
     if (!(finasDepoisDaTroca < finasAntesDaTroca && depois > antes * 1.05 + EPS)) return no('troca: não melhora');
     vs.set(f1, [a, d, c]); vs.set(f2, [d, b, c]);
     tirarDe(b, f1); tirarDe(a, f2); poeEm(d, f1); poeEm(c, f2);
@@ -270,7 +277,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
       for (const fid of antigas) {
         const l = vs.get(fid);
         const antigos = pontos(l);
-        if (razaoDeFace(antigos) < limite) finasAntesDoColapso += 1;
+        if (razao(antigos) < limite) finasAntesDoColapso += 1;
         if (mesmos.has(fid) || recusa) continue;
         const nova = [];
         for (const v of l) { const w = v === b ? a : v; if (nova[nova.length - 1] !== w) nova.push(w); }
@@ -279,7 +286,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
         const depois = nova.map((v) => (v === a ? candidato.p : pos(v)));
         const nAntes = newell(antigos); const nDepois = newell(depois);
         const mA = norma(nAntes); const mD = norma(nDepois);
-        const qAntes = razaoDeFace(antigos); const qDepois = razaoDeFace(depois);
+        const qAntes = razao(antigos); const qDepois = razao(depois);
         if (mA > 0 && mD > 0 && dot(nAntes, nDepois) / (mA * mD) < (qAntes >= limite ? 0.5 : 0)) recusa = 'colapso: viraria uma face em volta';
         else if (qAntes >= limite && qDepois < limite) recusa = 'colapso: criaria outra lasca';
         else if (qAntes < limite && qDepois < qAntes * 0.8) recusa = 'colapso: afinaria uma lasca vizinha';
@@ -353,7 +360,10 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
         if (!(recuo <= tolerancia)) return no('fusão: a face resultante não é convexa');
       }
     }
-    if (!(razaoDeFace(pj) >= limite)) return no('fusão: a face resultante continua lasca');
+    /* a face de área abaixo da mínima pode ir para a vizinha mesmo que o resultado siga fino, desde que não fique pior que a vizinha era: o corte
+       deixa a fita de cantos alinhados que só a vizinha, também estreita, pode receber */
+    const aMinima = areaMinima > 0 && norma(newell(pontos(l))) / 2 < areaMinima;
+    if (!(razao(pj) >= limite) && !(aMinima && razao(pj) >= razao(pg) * 0.8)) return no('fusão: a face resultante continua lasca');
     for (const v of l) if (!junta.includes(v)) return no('fusão: canto perdido');
     /* o canto da lasca que a vizinha não tinha passa a ser dela: ela conta entre as faces que ficam em volta dele */
     for (const v of l) { const restam = new Set([...(vf.get(v) ?? [])].filter((x) => x !== fid)); restam.add(g); if (restam.size < 3) return no('fusão: deixaria vértice de valência 2'); }
@@ -379,7 +389,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     for (const fid of selecionadas) {
       const l = vs.get(fid);
       if (!l || new Set(l).size !== l.length) continue;
-      const r = razaoDeFace(pontos(l));
+      const r = razao(pontos(l));
       if (r < limite) lista.push({ fid, r });
     }
     return lista.sort((u, v) => u.r - v.r || u.fid - v.fid);
@@ -391,7 +401,7 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     let andou = false;
     for (const { fid } of finas()) {
       if (colapsos + trocas + absorcoes >= maxOperacoes) break;
-      if (!vs.has(fid) || !(razaoDeFace(pontos(vs.get(fid))) < limite)) continue;
+      if (!vs.has(fid) || !(razao(pontos(vs.get(fid))) < limite)) continue;
       const arestas = arestasPorTamanho(fid);
       let feito = false;
       const recusadas = new Set();

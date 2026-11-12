@@ -7,6 +7,7 @@
    0,2 mm da concordância, a tampa de 1 mm por 585 mm) e a limpeza não cria nenhuma nem acha como desfazer essas; (d) a operação no
    passo: recusas, o aviso das que ficam, a origem da booleana ainda resolvendo as duas partes depois, o par da costura que segue a
    fusão; e (e) o tempo numa chapa de 54 mil faces. */
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
 import { limparLascas, razaoDeFace } from './limpar-lascas.js';
@@ -399,3 +400,34 @@ describe('limparLascas: a face de cantos alinhados até o ruído', () => {
     expect(r.relatorio.restantes[0].recusas.length).toBeGreaterThan(0);
   });
 });
+
+/* (f) a face de área nula que o corte do `aparar` deixou no chassi do sedã (CICLO-5.md, atrito 4), com a vizinhança medida: a fita de 17 cantos alinhados,
+   de 4 mm por 0,00008 mm (área 3e-10 m²), e o triângulo de 0,015 mm de aresta, bem proporcionado e sem área para a medida de contatos triangular. A razão
+   área / maior aresta² não pega o segundo, e a fita só sai para a vizinha, também fina; com a área mínima, saem as duas. */
+describe('limparLascas: a face sem área para a medida de contatos', () => {
+  const fx = JSON.parse(readFileSync(new URL('./fixtures/lascas-do-aparar.json', import.meta.url), 'utf8'));
+  const malhaDoAparar = (): Malha => ({ V: new Map(fx.vertices.map((p: V3, i: number) => [i, p])), F: new Map(fx.faces.map((f: { vs: number[]; parte: string }, i: number) => [i, { vs: f.vs, parte: f.parte }])) });
+  const area = (m: Malha, f: number) => { const p = m.F.get(f)!.vs.map((v) => m.V.get(v)!); let nx = 0; let ny = 0; let nz = 0; for (let k = 0; k < p.length; k++) { const a = p[k]; const b = p[(k + 1) % p.length]; nx += (a[1] - b[1]) * (a[2] + b[2]); ny += (a[2] - b[2]) * (a[0] + b[0]); nz += (a[0] - b[0]) * (a[1] + b[1]); } return Math.hypot(nx, ny, nz) / 2; };
+  const AREA_MINIMA = 2.9e-9;
+
+  it('as duas faces da fixture têm área abaixo da mínima, e a fita tem 17 cantos', () => {
+    const m = malhaDoAparar();
+    expect(m.F.get(fx.alvos[0])!.vs.length).toBe(17);
+    for (const a of fx.alvos) expect(area(m, a)).toBeLessThan(AREA_MINIMA);
+  });
+
+  it('sem a área mínima as duas ficam; com ela saem, dentro da tolerância e sem lasca nova', () => {
+    const sem = limparLascas(malhaDoAparar(), { tolerancia: 1e-5 });
+    for (const a of fx.alvos) expect(sem.facesRemovidas.has(a)).toBe(false);
+    const m = malhaDoAparar();
+    const com = limparLascas(m, { tolerancia: 1e-5, areaMinima: AREA_MINIMA });
+    for (const a of fx.alvos) expect(com.facesRemovidas.has(a)).toBe(true);
+    expect(com.relatorio.desvioMaximo).toBeLessThan(1e-5);
+    for (const [f, vs] of com.faces) expect(area({ V: m.V, F: new Map([[f, { vs }]]) } as Malha, f)).toBeGreaterThan(0);
+  });
+
+  it('a área mínima negativa grita', () => {
+    expect(grito(() => limparLascas(malhaDoAparar(), { tolerancia: 1e-5, areaMinima: -1 }))).toMatch(/área mínima/);
+  });
+});
+

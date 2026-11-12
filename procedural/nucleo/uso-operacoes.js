@@ -283,6 +283,7 @@ const definicoes = {
       sel: ['selecao', "As faces a limpar, em geral { origem: { op: 'subtrair', id } } logo depois da booleana."],
       tolerancia: ['escalar', 'O quanto a superfície pode sair do lugar, na unidade da peça (0,00001 numa receita em metro).'],
       limite: ['escalar', 'Razão área / maior aresta² abaixo da qual a face é lasca; padrão 0,003.'],
+      areaMinima: ['escalar', 'Área, na unidade da peça ao quadrado, abaixo da qual a face é lasca mesmo bem proporcionada (a que a medida de contatos não triangula); padrão 4e-9 vezes o quadrado da meia diagonal da caixa da seleção.'],
     },
     obrigatorios: ['sel', 'tolerancia'],
     passos: [
@@ -306,6 +307,7 @@ const definicoes = {
       chapa: ['origem', "A subdivisão { op: 'subdivisao', id }, ou uma lista delas (o molde é a união); vale a superfície que o passo guardou, mesmo depois de uma booleana cortá-la."],
       folga: ['escalar', 'Distância, maior ou igual a zero, entre a pele de dentro da chapa e o sólido aparado, na unidade da peça.'],
       fecha: ['objeto', "{ eixo: 'x'|'y'|'z', em }, o plano da tampa que fecha a abertura maior da chapa; uma lista, um plano por chapa."],
+      limpar: ['escalar', 'true (o padrão), false ou a tolerância: as faces finas e de área nula que o corte deixa saem por limparLascas dentro do passo; true usa 6e-6 da diagonal do sólido.'],
     },
     obrigatorios: ['origemId', 'solido', 'chapa', 'folga', 'fecha'],
     passos: [

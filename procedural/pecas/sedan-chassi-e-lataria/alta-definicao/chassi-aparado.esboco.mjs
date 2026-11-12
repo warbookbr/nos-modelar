@@ -38,10 +38,8 @@ const trocar = (v) => {
   if (v.op === 'intersectar' && reaparos.has(v.id)) return { ...v, op: 'aparar' };
   return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, trocar(x)]));
 };
-/* o `aparar` deixa, como toda booleana, face de cantos alinhados e triângulo de área nula na costura com a pele nova, que o relato de contatos trata como
-   sólido inconclusivo (e dá travessia com a caixa); o `limparLascas` logo depois, como depois do `subtrair` da lataria, as desfaz */
-const PASSOS = passos.filter((p) => !(ehPrisma(p) && prismas.has(p[1].origemId))).map(trocar)
-  .flatMap((p) => (p[0] === 'aparar' ? [p, ['limparLascas', { sel: { origem: { op: 'aparar', id: p[1].origemId } }, tolerancia: 0.01 }]] : [p]));
+/* o `aparar` limpa, dentro do passo, as faces finas e de área nula que o corte deixa na costura com a pele nova, e não precisa do `limparLascas` depois dele */
+const PASSOS = passos.filter((p) => !(ehPrisma(p) && prismas.has(p[1].origemId))).map(trocar);
 
 /* os contatos da lataria com os membros aparados: o apoio é a folga de FOLGA mm, e a travessia rasa do carro-inteiro (a seção ficava até 2 mm dentro da
    chapa alisada) já não se declara; o relato diz o que a malha dá */

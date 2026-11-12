@@ -72,6 +72,7 @@
    passo inteiro aborta com 0 V/0 F. */
 import { areaDe, fundir, fundirCoplanares, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
 import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
+import { areaMinimaDe, limparNoEstado } from './limpar-lascas.js';
 
 /* Fusão dos pedaços coplanares da booleana comum: o quanto, em fração do tamanho da peça, o polígono fundido pode sair do
    próprio plano, e o seno da curva para dentro que ainda se aceita num canto dele. */
@@ -2284,6 +2285,9 @@ export function criarOperacoesBooleanas(servicos) {
     const folga = st.num(a.folga);
     if (!Number.isFinite(folga) || folga < 0) return grita(st, i, 'aparar', 'folga', `folga precisa ser um número maior ou igual a zero, na unidade da peça, e veio ${JSON.stringify(a.folga)}`);
     const planos = Array.isArray(a.fecha) ? a.fecha : [a.fecha];
+    /* limpar: as faces de área nula que o corte deixa na costura com a pele nova saem pelo `limparLascas`, dentro do passo; true (o padrão) usa a tolerância de 6e-6 da
+       diagonal do sólido, um número a dele, e false não limpa */
+    if (a.limpar != null && typeof a.limpar !== 'boolean' && !(Number.isFinite(st.num(a.limpar)) && st.num(a.limpar) > 0)) return grita(st, i, 'aparar', 'limpar', `limpar é true, false ou a tolerância, um número maior que zero na unidade da peça, e veio ${JSON.stringify(a.limpar)}`);
     const fechas = planos.map((f) => (f && typeof f === 'object' && !Array.isArray(f) ? { eixo: f.eixo, em: st.num(f.em), extra: Object.keys(f).some((k) => k !== 'eixo' && k !== 'em') } : null));
     if (fechas.length !== chapas.length || fechas.some((f) => !f || f.extra || !['x', 'y', 'z'].includes(f.eixo) || !Number.isFinite(f.em))) return grita(st, i, 'aparar', 'fecha', `fecha precisa ser { eixo: 'x' | 'y' | 'z', em: número }, o plano da tampa que fecha a abertura da chapa, um por chapa (${chapas.length} chapa(s), ${planos.length} plano(s))`);
     const guardadas = chapas.map((c) => (st.chapas ?? []).find((g) => g.origemId === c.id));
@@ -2314,6 +2318,9 @@ export function criarOperacoesBooleanas(servicos) {
     molde.triangulos.forEach((t, k) => addF(st, idsF[k], t.map((v) => idsV[v])));
     const usadas = (st.facesDeOperando ??= new Set());
     for (const f of faces) usadas.add(f);
+    const caixaDoSolido = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+    for (const f of faces) for (const v of st.F.get(f).vs) { const p = st.V.get(v); for (let k = 0; k < 3; k += 1) { caixaDoSolido[k] = Math.min(caixaDoSolido[k], p[k]); caixaDoSolido[k + 3] = Math.max(caixaDoSolido[k + 3], p[k]); } }
+    const diagonalDoSolido = Math.hypot(caixaDoSolido[3] - caixaDoSolido[0], caixaDoSolido[4] - caixaDoSolido[1], caixaDoSolido[5] - caixaDoSolido[2]);
     nucleoBooleano(st, i, 'aparar', wasm, a.origemId, [faces, idsF], null);
     /* o passo que gritou não deixa o molde no estado */
     if (st.orfaos.length > antes) {
@@ -2321,6 +2328,12 @@ export function criarOperacoesBooleanas(servicos) {
       const usados = new Set();
       for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
       for (const v of idsV) if (!usados.has(v)) st.V.delete(v);
+      return;
+    }
+    if (a.limpar !== false) {
+      const tolerancia = typeof a.limpar === 'boolean' || a.limpar == null ? 6e-6 * diagonalDoSolido : st.num(a.limpar);
+      const feitas = resolverSelecao(st, { origem: { op: 'aparar', id: a.origemId } }, 'aparar', i);
+      if (st.orfaos.length === antes && feitas.faces.size) limparNoEstado(st, feitas.faces, { tolerancia, areaMinima: areaMinimaDe(st, feitas.faces), i, op: 'aparar' });
     }
   }
 

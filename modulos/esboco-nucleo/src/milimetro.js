@@ -51,8 +51,8 @@ export const TABELA_DE_MEDIDAS = Object.freeze({
   aberturaPorContorno: ['contorno', 'recuoDaLente'],
   arredondarCostura: ['raio', 'raioMinimo', 'afinarPontas', 'regiao', 'aparar'],
   friso: ['perfil', 'fechamento', 'aba'],
-  limparLascas: ['tolerancia'],
-  aparar: ['folga', 'fecha'],
+  limparLascas: ['tolerancia', 'areaMinima'],
+  aparar: ['folga', 'fecha', 'limpar'],
 });
 
 const temNumero = (v) => (typeof v === 'number' ? true : Array.isArray(v) ? v.some(temNumero) : v && typeof v === 'object' ? Object.values(v).some(temNumero) : false);
