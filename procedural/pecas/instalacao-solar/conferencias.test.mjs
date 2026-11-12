@@ -38,22 +38,28 @@ describe('instalação solar: conferências da obra', () => {
     expect(m.folgaEntrePaineis[1]).toBeCloseTo(20, 1);
     expect(m.folgaEntrePaineis[2]).toBeCloseTo(20, 1);
     expect(m.fileiraDePaineis).toBeCloseTo(4372, 1);
-    /* O trilho a partir da ponta de cada painel: centrado, 411 no de 30 mm e 456 nos de 40 mm. */
+    /* O trilho (o eixo do canal) a partir da ponta de cada painel: centrado, 411 no de 30 mm e 456 nos de 40 mm. */
     expect(m.trilhoNaPonta[0].trilhoBAPontaDeCima).toBeCloseTo(411, 1);
     expect(m.trilhoNaPonta[0].trilhoAAPontaDeBaixo).toBeCloseTo(411, 1);
     for (const p of m.trilhoNaPonta.slice(1)) expect(p.trilhoBAPontaDeCima).toBeCloseTo(456, 1);
-    /* A cadeia haste, suporte, trilho, painel: o assento na crista, a perna do suporte a 42, o trilho de 64 a 104, o painel assentado nele e o vidro a 144 (134 no de 30). */
+    /* A cadeia haste, suporte, trilho, painel: o assento na crista, o pé do suporte a 38, o trilho de 90,5 a 135,5 (45 mm de seção), o painel assentado nele e o vidro a 175,5 (165,5 no de 30). */
     const a = m.alturasSobreACrista;
     expect(a.assentoDaHaste).toBeCloseTo(0, 1);
-    expect(a.pernaDoSuporte).toBeCloseTo(42, 1);
-    expect(a.fundoDoTrilho).toBeCloseTo(64, 1);
-    expect(a.topoDoTrilho).toBeCloseTo(104, 1);
+    expect(a.pernaDoSuporte).toBeCloseTo(38, 1);
+    expect(a.fundoDoTrilho).toBeCloseTo(90.5, 1);
+    expect(a.topoDoTrilho).toBeCloseTo(135.5, 1);
     for (const p of a.paineis) expect(p.fundoDoPainel).toBeCloseTo(a.topoDoTrilho, 1);
-    expect(a.paineis[0].vidro).toBeCloseTo(134, 1);
-    for (const p of a.paineis.slice(1)) expect(p.vidro).toBeCloseTo(144, 1);
+    expect(a.paineis[0].vidro).toBeCloseTo(165.5, 1);
+    for (const p of a.paineis.slice(1)) expect(p.vidro).toBeCloseTo(175.5, 1);
     /* A ponta de cima da haste fica abaixo do painel que está sobre ela. */
     expect(a.pontaDeCimaDaHaste).toBeLessThan(a.topoDoTrilho);
-    for (const h of m.hasteContraOPainel) expect(h.folgaAteOPainel).toBeCloseTo(31.5, 1);
+    for (const h of m.hasteContraOPainel) expect(h.folgaAteOPainel).toBeCloseTo(63, 1);
+    /* A ponta da haste passa 15 mm da porca de cima (de 15 a 20 nas fotos), o trilho passa 63 mm da ponta e o parafuso do L cai na metade de cima do rasgo. */
+    expect(m.cadeia.pontaDaHasteAcimaDaPorcaDeCima).toBeGreaterThanOrEqual(15);
+    expect(m.cadeia.pontaDaHasteAcimaDaPorcaDeCima).toBeLessThanOrEqual(20);
+    expect(m.cadeia.topoDoTrilhoAcimaDaPontaDaHaste).toBeCloseTo(63, 1);
+    expect(m.cadeia.parafusoDoLNoRasgo).toBeGreaterThan(0.5);
+    expect(m.cadeia.parafusoDoLNoRasgo).toBeLessThanOrEqual(1);
     expect(relato(m)).toContain('Alturas sobre o plano das cristas');
   }, 60000);
 });

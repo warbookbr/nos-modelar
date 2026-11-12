@@ -81,8 +81,26 @@ conferir, e entra na receita marcado assim.
   isso, e as saídas (madeira a mais entre as vigas, ou outra disposição dos trilhos) são da pessoa. A água é bem maior que a
   fileira de 4,45 m: 25 gomos (4,4 m) são só o trecho de uma das fotos, e a panorâmica mostra perto do dobro. A inclinação não
   muda as contas e entra como 15 graus, a confirmar.
+- Perfil (medida real, 2026-11-12): 1350 mm de comprimento, seção de 45 mm de altura por 30 mm de largura, paredes de uns 2 mm. Vista
+  de ponta: canal em T aberto em cima com as duas abas finas, uma face lateral inteira estriada em frisos horizontais (a que
+  encosta no suporte em L) com um rasgo lateral para a porca do parafuso do L, aba larga embaixo com a borda virada para cima e
+  uma parede inclinada por dentro; a seção é oca e assimétrica. A confirmar: o pescoço de 10 mm, a câmara do T de 10 mm de altura,
+  o rasgo de 10 por 4 mm a 21 mm do fundo, os frisos e a borda da aba.
+- Suporte em L (medida real): 85 mm de altura total (a perna sobe 80 mm acima do pé de 5 mm), 50 mm de largura, pé com furo
+  redondo para a haste e borracha preta fina por baixo, perna com rasgo oblongo vertical no alto e parafuso allen com placa-porca
+  quadrada que corre no rasgo lateral do perfil, as duas faces da perna estriadas. A confirmar: o pé de 45 mm, a borracha de 1,5 mm, o
+  oblongo de 8,5 por 30 mm.
+- Cadeia da fixação: a haste sobe pela crista, passa pelo furo do pé do L entre a porca de apoio e a arruela com porca de cima, e a
+  ponta sobra de 15 a 20 mm; a perna do L encosta na face estriada do perfil e o parafuso do rasgo, na metade de cima do oblongo (a
+  confirmar), prende o perfil, que fica ao lado da haste com o topo acima do topo dela. A altura do perfil sai dessa cadeia.
+- Grampos, em forma (a pessoa mandou fotos; tamanhos a confirmar): o de ponta (4 de 30 a 35 mm; os 8 de 40 mm são iguais, só mais
+  altos) é um Z de alumínio com a aba de cima sobre a moldura, a parede até o perfil e um pé no topo dele; o parafuso allen desce na
+  vertical pela parte de cima, junto da parede, pelo corpo, até uma porca no canal em T. O intermediário (6) é uma tampa estriada com
+  duas asas curtas sobre as molduras e um pescoço curto entre os painéis (cerca de 20 mm), com o parafuso allen pelo centro e uma porca
+  deslizante no canal em T. A emenda (6) é uma barra estriada de cerca de 150 mm (a confirmar) que entra no canal em T dos dois perfis,
+  com dois parafusos allen por cima, um de cada lado da junta.
 - Pendentes da pessoa: a distância, medida descendo o telhado, entre a fileira de parafusos da beirada e a da sobreposição, o
-  comprimento da água ao longo da beirada, e as medidas do perfil visto de ponta, do suporte em L e dos grampos.
+  comprimento da água ao longo da beirada, e as medidas finas dos grampos e da emenda.
 
 ## Gate de saída
 

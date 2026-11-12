@@ -1883,19 +1883,19 @@
 
 ## procedural/pecas/instalacao-solar/partes/emenda/
 
-- `receita.js` — instalacao-solar/emenda — a peça que entra dentro de dois perfis para uni-los, com dois parafusos.
+- `receita.js` — instalacao-solar/emenda — a barra estriada que entra no canal em T de dois perfis para uni-los, com dois parafusos allen.
 
 ## procedural/pecas/instalacao-solar/partes/grampo-intermediario/
 
-- `receita.js` — instalacao-solar/grampo-intermediario — o grampo em "ômega" que aperta as molduras de dois painéis vizinhos de 40 mm, com um parafuso.
+- `receita.js` — instalacao-solar/grampo-intermediario — a tampa estriada que aperta as molduras de dois painéis vizinhos de 40 mm, com parafuso allen e porca de canal.
 
 ## procedural/pecas/instalacao-solar/partes/grampo-ponta-30/
 
-- `receita.js` — instalacao-solar/grampo-ponta-30 — o grampo em "Z" de ponta para moldura de 30 a 35 mm, com um parafuso.
+- `receita.js` — instalacao-solar/grampo-ponta-30 — o grampo de ponta em "Z" para moldura de 30 a 35 mm, com parafuso allen e porca de canal.
 
 ## procedural/pecas/instalacao-solar/partes/grampo-ponta-40/
 
-- `receita.js` — instalacao-solar/grampo-ponta-40 — o grampo em "Z" de ponta para moldura de 40 mm, com um parafuso.
+- `receita.js` — instalacao-solar/grampo-ponta-40 — o grampo de ponta em "Z" para moldura de 40 mm, com parafuso allen e porca de canal.
 
 ## procedural/pecas/instalacao-solar/partes/haste/
 
@@ -1915,7 +1915,7 @@
 
 ## procedural/pecas/instalacao-solar/partes/suporte-l/
 
-- `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil.
+- `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil, com a borracha do pé e o parafuso do rasgo.
 
 ## procedural/pecas/instalacao-solar/partes/telhado/
 

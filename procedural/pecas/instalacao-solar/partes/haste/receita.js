@@ -10,8 +10,9 @@
  * em y = `profundidadeDoAssento`: a montagem a deriva da porta do telhado (da crista ao fundo da viga).
  *
  * MEDIDAS A CONFIRMAR (a pessoa só deu o comprimento de 250 mm e o diâmetro de 8 a 10 mm): o diâmetro de 10 mm, a profundidade do
- * assento (o valor da TABELA só vale para ver a peça sozinha), o cone da borracha, as arruelas, a porca de 17 mm de chave, o vão de 5 mm
- * até a porca de apoio e os 5 mm da perna do suporte em L entre a porca de apoio e a arruela de cima.
+ * assento (o valor da TABELA só vale para ver a peça sozinha), o cone da borracha, as arruelas, a porca de 17 mm de chave, o vão de 1 mm
+ * até a porca de apoio (que faz a ponta da haste sobrar uns 15 mm acima da porca de cima, como nas fotos de instalação: de 15 a 20 mm) e os
+ * 6,5 mm da perna do suporte em L entre a porca de apoio e a arruela de cima (a chapa de 5 mm mais a borracha de 1,5 mm sob o pé).
  *
  * Técnica: a haste é um `cilindro` em y; a borracha é um `lathe` com furo central e perfil em cone; as arruelas e as porcas são
  * `extrusao` em y de um contorno com furo circular de folga de 0,1 mm em volta da haste (a porca é um sextavado de seis lados).
@@ -36,8 +37,8 @@ export const TABELA = {
   chaveDaPorca: 17,
   alturaDaPorca: 10,
   /* A CONFIRMAR: o vão livre de rosca entre a porca de vedação e a porca de apoio, e a espessura da perna do suporte em L que assenta nela. */
-  vaoAteOApoio: 5,
-  espessuraDaPernaDoSuporte: 5,
+  vaoAteOApoio: 1,
+  espessuraDaPernaDoSuporte: 6.5,
   folgaDoFuro: 0.1,
   lados: 24,
 };
@@ -131,8 +132,8 @@ const receita = {
       { nome: 'borracha', forma: 'borracha de vedação preta em cone com aba larga embaixo (56 mm de diâmetro) e topo estreito de 18 mm, 14 mm de altura, com furo central onde a haste passa, no assento da crista', tecnica: 'revolução (lathe) de perfil fechado em torno do eixo da haste' },
       { nome: 'arruela', forma: 'arruela de inox de 30 mm de diâmetro e 3 mm de espessura, com furo central, assentada no topo da borracha', tecnica: 'extrusão em y de círculo com furo' },
       { nome: 'porcaBaixa', forma: 'porca de vedação sextavada de inox de 17 mm entre faces e 10 mm de altura, com furo central, sobre a arruela', tecnica: 'extrusão em y de hexágono com furo circular' },
-      { nome: 'porcaApoio', forma: 'porca sextavada igual à primeira, 5 mm acima dela, em cuja face de cima assenta a perna do suporte em L', tecnica: 'extrusão em y de hexágono com furo circular' },
-      { nome: 'arruelaCima', forma: 'arruela de 30 mm e 3 mm, 5 mm acima da porca de apoio (o vão da perna do suporte em L)', tecnica: 'extrusão em y de círculo com furo' },
+      { nome: 'porcaApoio', forma: 'porca sextavada igual à primeira, 1 mm acima dela, em cuja face de cima assenta a perna do suporte em L', tecnica: 'extrusão em y de hexágono com furo circular' },
+      { nome: 'arruelaCima', forma: 'arruela de 30 mm e 3 mm, 6,5 mm acima da porca de apoio (o vão do pé do suporte em L com a borracha)', tecnica: 'extrusão em y de círculo com furo' },
       { nome: 'porcaCima', forma: 'porca sextavada igual às outras, sobre a arruela de cima, que prende o suporte em L', tecnica: 'extrusão em y de hexágono com furo circular' },
     ],
     criteriosDeReprovacao: [
@@ -153,8 +154,8 @@ const receita = {
     { par: ['arruelaCima', 'porcaCima'], motivo: 'a porca de cima assenta na arruela de cima' },
   ],
   ilhas: [
-    { contem: 'porcaApoio', motivo: 'a porca de apoio fica 5 mm acima da porca de vedação, na rosca livre; o suporte em L assenta nela na montagem' },
-    { contem: 'arruelaCima', motivo: 'a arruela de cima fica 5 mm acima da porca de apoio, no vão da perna do suporte em L; a perna passa ali na montagem' },
+    { contem: 'porcaApoio', motivo: 'a porca de apoio fica 1 mm acima da porca de vedação, na rosca livre; o suporte em L assenta nela na montagem' },
+    { contem: 'arruelaCima', motivo: 'a arruela de cima fica 6,5 mm acima da porca de apoio, no vão do pé do suporte em L e da borracha; o pé passa ali na montagem' },
   ],
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };

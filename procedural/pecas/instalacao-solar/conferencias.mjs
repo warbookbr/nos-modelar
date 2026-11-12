@@ -17,6 +17,9 @@ import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montag
 import { carregadoresDeReceitas } from '../../../tools/modelar/peca-com-parametros.mjs';
 import { receitasDaMontagem } from '../../../tools/modelar/etapas-da-montagem.mjs';
 import telhado, { TABELA as T, derivar as derivarTelhado } from './partes/telhado/receita.js';
+import { TABELA as TH, derivar as derivarHaste } from './partes/haste/receita.js';
+import { TABELA as TL } from './partes/suporte-l/receita.js';
+import { TABELA as TP } from './partes/perfil/receita.js';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const mm = (x) => x * 1000;
@@ -95,9 +98,10 @@ export async function conferirInstalacaoSolar(resolvida = null) {
      lado da haste, deslocado pelo suporte em L). */
   const trilho = (linha) => {
     const pecas = [1, 2, 3, 4].map((k) => extensao(`perfil${linha}${k}`));
-    const s = pecas[0].s;
+    /* O eixo do trilho é o do canal de cima (porta `topo` do primeiro perfil): a seção é assimétrica (a aba de baixo abre para um lado só), e o centro da caixa dela não é o eixo. */
+    const eixoS = Q.deMundo(portaNoMundo(por[`perfil${linha}1`], 'topo')).s;
     return {
-      linha, centroS: arred((s[0] + s[1]) / 2),
+      linha, centroS: arred(eixoS),
       inicioE: arred(Math.min(...pecas.map((p) => p.e[0]))), fimE: arred(Math.max(...pecas.map((p) => p.e[1]))),
       pedacos: pecas.map((p) => arred(p.e[1] - p.e[0])),
     };
@@ -159,6 +163,18 @@ export async function conferirInstalacaoSolar(resolvida = null) {
     pontaDeCimaDaHaste: sobreACrista(extensao('hasteA1').n[1]),
     paineis: paineis.map((p) => ({ id: p.id, fundoDoPainel: sobreACrista(p.n[0]), vidro: sobreACrista(p.n[1]) })),
   };
+  /* A cadeia da fixação: quanto a haste passa da porca de cima (a pessoa viu de 15 a 20 mm), quanto o topo do trilho passa da ponta da haste, e onde o
+     parafuso do L cai no rasgo oblongo dele (0 embaixo, 1 em cima), medido nas poses: o centro do rasgo lateral do perfil menos o centro do oblongo. */
+  const H = derivarHaste(TH);
+  const a = medidas.alturasSobreACrista;
+  const yDoParafuso = a.fundoDoTrilho + TP.rasgoLateralCentro;
+  const fundoDoOblongo = a.pernaDoSuporte + TL.oblongoCentro - TL.oblongoComprimento / 2;
+  medidas.cadeia = {
+    pontaDaHasteAcimaDaPorcaDeCima: arred(TH.comprimento - H.yPorcaCima - TH.alturaDaPorca),
+    topoDoTrilhoAcimaDaPontaDaHaste: arred(a.topoDoTrilho - a.pontaDeCimaDaHaste),
+    parafusoDoLNoRasgo: arred((yDoParafuso - fundoDoOblongo) / TL.oblongoComprimento, 2),
+    parafusoDoLAcimaDoChaoDoSuporte: arred(yDoParafuso - a.pernaDoSuporte),
+  };
   medidas.hasteContraOPainel = medidas.hastes.map((h) => {
     const ext = extensao(h.id);
     const sobre = paineis.find((p) => h.e >= p.e[0] && h.e <= p.e[1] && h.s >= p.s[0] && h.s <= p.s[1]);
@@ -181,6 +197,8 @@ export function relato(m) {
   L.push('Trilho a partir da ponta de cada painel (cima / baixo): ' + m.trilhoNaPonta.map((p) => `${p.id} ${p.trilhoBAPontaDeCima} / ${p.trilhoAAPontaDeBaixo} de ${p.comprimento}`).join('; ') + '.');
   const a = m.alturasSobreACrista;
   L.push(`Alturas sobre o plano das cristas: assento da haste ${a.assentoDaHaste}; perna do suporte ${a.pernaDoSuporte}; fundo do trilho ${a.fundoDoTrilho}; topo do trilho ${a.topoDoTrilho}; ponta de cima da haste ${a.pontaDeCimaDaHaste}; ` + a.paineis.map((p) => `${p.id}: face de baixo ${p.fundoDoPainel}, vidro ${p.vidro}`).join('; ') + '.');
+  const c = m.cadeia;
+  L.push(`Cadeia da fixação: a ponta da haste passa ${c.pontaDaHasteAcimaDaPorcaDeCima} mm da porca de cima; o topo do trilho passa ${c.topoDoTrilhoAcimaDaPontaDaHaste} mm da ponta da haste; o parafuso do L fica a ${c.parafusoDoLAcimaDoChaoDoSuporte} mm acima da face de baixo da borracha, a ${c.parafusoDoLNoRasgo} do comprimento do oblongo (0 embaixo, 1 em cima).`);
   const sob = m.hasteContraOPainel.filter((h) => h.painel);
   L.push(`Haste contra o painel: ${sob.map((h) => `${h.id} sob ${h.painel}, folga de ${h.folgaAteOPainel}`).join('; ')}.`);
   return L.join('\n');
