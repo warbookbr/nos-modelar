@@ -17,6 +17,8 @@
  *   acessorios         os dois retrovisores e as quatro maçanetas. */
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { derivar, FRACAO_DO_CHANFRO, CHANFRO_MAXIMO_DO_OMBRO_MM, FRACAO_DO_CHANFRO_NA_LARGURA } from '../../../../familias/roda-pneu/derivar.js';
 import { T, ladoX, topoY } from '../../alta-definicao/alvo.mjs';
 import { recortar } from './recorte.mjs';
 
@@ -25,12 +27,27 @@ const { default: carro } = await import('../../alta-definicao/chassi-aparado.esb
 export const CONJUNTO = carro.opcoes[0];
 /* o que o esboço do carro inteiro e o rascunho facetado exportam e as receitas conferem em PONTOS (o módulo já está carregado: é o mesmo de `carro`) */
 export const { RETROVISOR } = await import('../../alta-definicao/carro-inteiro.esboco.mjs');
-export const { TABELA: FACETADO } = await import('../../referencias/sedan-chassi-e-lataria.esboco.mjs');
+export const { TABELA: FACETADO, PARAMETROS_DA_RODA, PERFIL_DA_RODA } = await import('../../referencias/sedan-chassi-e-lataria.esboco.mjs');
 export const { linhasDeVao } = await import('../../alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs');
 export const { CABINE, VIDROS, MOLDURAS } = await import('../../alta-definicao/andar-de-cima.esboco.mjs');
 export const { F, PAINEL_DA_FRENTE, PAINEL_DE_TRAS } = await import('../../alta-definicao/frente-e-traseira.esboco.mjs');
 export const PASTA = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
+/* As medidas das partes da roda, em mm, vêm de `derivar` da família roda-pneu com o perfil e os parâmetros da instância (o furo central e o ombro em arco), e não de conta à mão. */
+const RODA = (() => {
+  const perfil = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'familias', 'roda-pneu', 'familia.json'), 'utf8')).perfis[PERFIL_DA_RODA].parametros;
+  const p = { ...perfil, ...PARAMETROS_DA_RODA };
+  const a = derivar(p).argumentos; const mm = (v) => v * 1000;
+  const flanco = mm(a.raioDoFriso - a.raioDoAssento);
+  return {
+    pneu: { diametro: 2 * mm(a.raioDoFriso), banda: 2 * mm(a.meiaLargura), flanco, ombro: Math.min(FRACAO_DO_CHANFRO * flanco, CHANFRO_MAXIMO_DO_OMBRO_MM, FRACAO_DO_CHANFRO_NA_LARGURA * 2 * mm(a.meiaLargura)) },
+    aro: { diametro: 2 * mm(a.raioDoAssento), largura: 2 * mm(a.meiaLarguraDoAro), parede: mm(a.raioDoAssento - a.raioInternoDoAro) },
+    disco: { espessura: mm(a.fimDaChapa - a.inicioDaChapa), ventilacao: p.furosDeVentilacao ?? 0 },
+    cubo: { diametro: 2 * mm(a.raioDoCubo), largura: mm(a.fimDoCubo - a.inicioDoCubo), furos: a.furos, diametroDoFuro: mm(a.diametroDoFuro), circulo: 2 * mm(a.raioDoCirculoDeFuros), furoCentral: 2 * mm(a.raioDoFuroCentral) },
+  };
+})();
+const f1 = (v) => v.toFixed(1).replace('.', ',');
+const f0 = (v) => String(Math.round(v));
 const NOMES = CONJUNTO.passos.filter((p) => p[0] === 'parte').map((p) => p[1].nome);
 const SO_VIDROS = /^(vidro|vigia|paraBrisa$)/;
 const DA_FRENTE = /^(painel|lenteDoFarol|lanterna|paraChoque|tomadaDeAr$|laminaDaGrade)/;
@@ -84,6 +101,28 @@ export const FOLGAS_MEDIDAS = [
     motivo: 'a borda do painel de trás segue a da lateral por trechos retos entre as colunas, e a lateral tem o degrau do ombro (y 890) e a quina da cintura de raio 6: o vão sai de 2,03 a 4,63 mm (p05 e p95), com 1,39 mm no canto de cima (x 856, y 971) e 2,28 no ombro' },
   { pares: [['painelTraseiro', 'tampaDoPortaMalas']], folga: { esperada: 3.9, tolerancia: 0.2, degrau: 0.3 },
     motivo: 'o vão é de 4,00 a 4,05 mm em toda a borda de cima e cai a 3,26 mm só no canto com a lateral (x 757, y 971), onde a borda do painel de trás vira a quina da cintura; o p05 é de 3,73' },
+  /* Os 16 pares de apoio do chassi declarados em 0,5 ± 0,5 e medidos com p95 de 3 a 11 mm (rodada 2 de 2026-11-12), mais os dois do montante A com o teto, que a limpeza das lascas deixou de 0,50 a 0,80. A
+     declaração estava errada, e a forma não: o 0,5 do desenho é a distância 3D da pele de dentro da chapa ao membro (de 0,46 a 0,50 mm, na medida de cada linha), e o `vao:partes` mede o vão de borda a borda ao
+     longo da linha comum, que sobe onde o membro acaba antes da borda do painel. A malha do chassi é a mesma a menos de 1 nm (comparada com a do commit anterior, parte por parte), e por isso a faixa é a que a
+     medida acha, com 0,05 mm de margem, e não o que a forma deveria ter. */
+  { pares: [...DOIS_LADOS('montanteADir', 'portaDianteiraDir')], folga: { esperada: 5.87, tolerancia: 5.27 },
+    motivo: 'o montante A (z 600 a 696) assenta a 0,5 mm da borda da porta no pé da dobradiça, em z 688 (3D mínimo de 0,46 a 0,47); no resto da linha comum a borda do montante fica de 0,7 a 11 mm da da porta, onde ele acaba antes dela' },
+  { pares: [...DOIS_LADOS('paraLamaDir', 'paredeCortaFogo')], folga: { esperada: 9.21, tolerancia: 1.37 },
+    motivo: 'a parede corta-fogo (z 700 a 703) fica de 7,9 a 10,5 mm atrás da borda do para-lama (z 690); o apoio de 0,5 mm é a distância 3D de 0,48 mm entre as peles, em x 875' },
+  { pares: [...DOIS_LADOS('soleiraDir', 'soleiraDoChassiDir')], folga: { esperada: 5.47, tolerancia: 2.6 },
+    motivo: 'a soleira do chassi apoia a 0,5 mm da chapa da soleira (3D mínimo de 0,50), e a borda dela fica de 2,9 a 8,0 mm da borda da chapa ao longo dos 1.010 mm da linha' },
+  { pares: [...DOIS_LADOS('lateralTraseiraDir', 'montanteCDir')], folga: { esperada: 8.06, tolerancia: 0.11 },
+    motivo: 'o montante C apoia a 0,5 mm da pele de dentro da lateral (3D mínimo de 0,50), e o batente dele fica a 8,0 a 8,1 mm da borda da lateral' },
+  { pares: [['anteparoTraseiro', 'tampaDoPortaMalas']], folga: { esperada: 4.93, tolerancia: 2.79 },
+    motivo: 'a tampa assenta 2 mm acima do topo do anteparo, e a borda do anteparo (z -1360 a -1340) fica de 2,2 a 7,7 mm da da tampa ao longo dos 3 m da linha (3D mínimo de 1,77)' },
+  { pares: [['capo', 'suporteDoRadiador']], folga: { esperada: 3.89, tolerancia: 3.13 },
+    motivo: 'o capô assenta a 0,5 mm do topo do suporte do radiador (3D mínimo de 0,50), e a borda do suporte fica de 0,8 a 7,0 mm da do capô ao longo dos 3,1 m da linha' },
+  { pares: [...DOIS_LADOS('montanteBDir', 'portaDianteiraDir'), ...DOIS_LADOS('montanteBDir', 'portaTraseiraDir')], folga: { esperada: 3.23, tolerancia: 2.78 },
+    motivo: 'o montante B (z -75 a -15) fica a 0,5 mm da porta no pé da coluna (3D mínimo de 0,50), e a borda dele fica de 0,5 a 6,0 mm da da porta ao longo dos 1.184 mm da linha' },
+  { pares: [...DOIS_LADOS('anteparoTraseiro', 'lateralTraseiraDir')], folga: { esperada: 1.75, tolerancia: 1.3 },
+    motivo: 'o anteparo (z -1360 a -1340) assenta a 0,5 mm da pele de dentro da lateral (3D mínimo de 0,497) no pé, e a borda dele fica a 0,5 mm na metade da linha (mediana) e a 3,0 a 3,7 mm (p95 e máximo), na quina de cima' },
+  { pares: [...DOIS_LADOS('montanteADir', 'teto')], folga: { esperada: 0.66, tolerancia: 0.21 },
+    motivo: 'o montante A apoia a 0,5 mm do teto (3D mínimo de 0,499, mediana de 0,50) e a borda dele sobe a 0,8 mm (p95) e a 1,24 mm (máximo, em x 805 e z 696); a linha comum que a medida amostra passou de 88 a 241 mm depois da união das lascas da borda, com a malha igual a 1 nm' },
 ];
 const ajusteDe = ([a, b]) => FOLGAS_MEDIDAS.find((f) => f.pares.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
 /** A folga declarada de um contato `folga` do esboço, com o valor medido no lugar do 4,1 ± 0,1 onde `FOLGAS_MEDIDAS` o corrige. */
@@ -145,7 +184,7 @@ export function portasEmMetro(passos, portas) {
 const L = '(Dir|Esq)?$';
 const DESCRICOES = [
   [/^capo$/, 'chapa de 1 mm do capô, de x -760 a 760 até a borda da frente da chapa de baixo, a 4 mm do painel da frente e dos para-lamas', 'painel cortado da chapa de baixo por paineisPorVaos, com a linha de vão por curva da gaiola'],
-  [/^paraLama/, 'chapa do arco da roda da frente, alargada até a planta, do painel da frente à porta, com a faixa de cima ao lado do capô', 'painel cortado da chapa de baixo por paineisPorVaos'],
+  [/^paraLama/, 'chapa do arco da roda da frente, alargada até a planta, do painel da frente à porta, com a faixa de cima ao lado do capô e o canto da planta de 82 por 62 mm com que ela vira para a frente, que a curvatura mostra como faixa', 'painel cortado da chapa de baixo por paineisPorVaos'],
   [/^portaDianteira/, 'porta dianteira, do fim do para-lama ao entre-portas, a 4 mm dos vizinhos, com o vão da janela fechado pelo vidro', 'painel cortado da chapa de baixo por paineisPorVaos'],
   [/^portaTraseira/, 'porta traseira, do entre-portas ao fim da porta, a 4 mm dos vizinhos', 'painel cortado da chapa de baixo por paineisPorVaos'],
   [/^lateralTraseira/, 'chapa do arco de trás, do fim da porta traseira ao painel traseiro, com a faixa de cima ao lado da tampa', 'painel cortado da chapa de baixo por paineisPorVaos'],
@@ -153,10 +192,10 @@ const DESCRICOES = [
   [/^tampaDoPortaMalas$/, 'chapa da tampa do porta-malas, do pé do vidro traseiro à borda de trás da chapa de baixo, a 4 mm do painel de trás e do teto', 'painel cortado da chapa de baixo por paineisPorVaos'],
   [/^labio/, 'lábio de 14 mm que a chapa dobra para dentro em volta do arco de roda', 'friso com aba de 90 graus sobre a borda do arco da chapa de baixo'],
   [/^abaDoPainel/, 'aba de borda do painel de trás: a perna de 20 mm que dobra para dentro do carro, a 90 graus, em cada ponta do painel, atrás do vão de 4 mm com a lateral', 'friso com aba sobre a borda livre da última estação do painel, com a cópia espelhada pela simetria'],
-  [/^forro/, 'faixa fina por trás de um vão entre painéis, que fecha o fundo dele: a luz que passa pelo vão encontra o forro e não o outro lado do carro', 'gaiolaVarrida de seção retangular ao longo da linha do vão, a 0,5 mm atrás da pele de dentro'],
+  [/^forro/, 'trechos curtos de faixa (24 por 1 mm) por trás do vão entre painéis, só onde ele deixaria ver através do carro (capô, tampa, entre-portas, fim do para-lama), a plaquinha de 5,4 mm do canto de trás e a faixa em L do peitoril', 'faixa de seção retangular ao longo da linha do vão, a 0,5 mm atrás da pele de dentro, unida em uma parte só'],
   [/^teto$/, 'teto com as colunas A, B e C, a calha sobre as portas e os vãos do para-brisa, do vidro traseiro, das janelas das portas e das vigias', 'gaiolaPorEstacoes ao longo de z com simetria em x e raio pedido nas quinas'],
   [/^moldura/, 'moldura de borracha de 14 por 3,9 mm em volta do vão de um vidro, que desce 0,9 mm na chapa', 'friso com perfil retangular sobre a borda do vão, refinado em dois níveis'],
-  [/^vidro|^vigia|^paraBrisa$/, 'chapa de 4 mm do vidro, com a face de fora 0,8 mm para dentro da pele, que passa 12 mm da borda do vão por baixo da chapa', 'gaiolaPorEstacoes de chapa própria com espessura; o lado esquerdo é a cópia espelhada do direito'],
+  [/^vidro|^vigia|^paraBrisa$/, 'chapa de 4 mm do vidro, 0,8 mm para dentro da pele, por dentro da chapa do teto, encostada na face de dentro da borda do vão e 12 mm além dela; o anel escuro em volta é a moldura da carroceria', 'gaiolaPorEstacoes de chapa própria com espessura; o lado esquerdo é a cópia espelhada do direito'],
   [/^painelDianteiro$/, 'painel da frente de 1 mm no plano z 2118, com a grade até o eixo e os dois vãos de farol em rebaixo de 14 mm', 'gaiolaPorEstacoes ao longo de x com vãos e anéis de relevo'],
   [/^painelTraseiro$/, 'painel de trás de 1 mm no plano z -2083, com os dois vãos de lanterna em rebaixo de 14 mm', 'gaiolaPorEstacoes ao longo de x com vãos e anéis de relevo'],
   [/^lenteDoFarol|^lanterna(Dir|Esq)$/, 'lente de 4 mm atrás da abertura do rebaixo, 0,8 mm dentro dela e 6 mm maior de cada lado', 'lente do anel de relevo, devolvida pela gaiola; o lado esquerdo é a cópia espelhada'],
@@ -165,7 +204,10 @@ const DESCRICOES = [
   [/^laminaDaGrade/, 'lâmina horizontal de 7 mm de altura e 28 de fundo atrás do vão da grade', 'cubo que passa 17 mm da borda do vão por trás da chapa'],
   [/^retrovisor/, 'retrovisor de laços com raio 6 mm nas quatro quinas, o pé 11 mm dentro da porta dianteira', 'gaiolaPorLacos ao longo de x; o esquerdo é a cópia espelhada do direito'],
   [/^macaneta/, 'maçaneta de 110 por 22 mm que sai 11 mm da porta e entra 3 mm nela', 'cubo'],
-  [/^(pneu|aro|cubo|disco)/, 'parte da roda de pneu de 728 mm e 205 de banda, como a família roda-pneu a faz', 'família roda-pneu por instanciaDeFamilia, posta no eixo'],
+  [/^pneu/, `pneu de ${f0(RODA.pneu.diametro)} mm de diâmetro e ${f0(RODA.pneu.banda)} de banda, flanco de ${f0(RODA.pneu.flanco)} mm e ombro em arco de quarto de círculo de ${f0(RODA.pneu.ombro)} mm de raio`, 'família roda-pneu por instanciaDeFamilia, perfil carro com ombroRedondo; revolução do perfil do pneu'],
+  [/^aro/, `aro de ${f0(RODA.aro.diametro)} mm de diâmetro e ${f0(RODA.aro.largura)} de largura, de parede de ${f1(RODA.aro.parede)} mm, que o pneu abraça`, 'família roda-pneu por instanciaDeFamilia, perfil carro; revolução do perfil do aro'],
+  [/^disco/, `disco liso de ${f1(RODA.disco.espessura)} mm de espessura, sem ventilação, entre o aro e o cubo`, 'família roda-pneu por instanciaDeFamilia, perfil carro; chapa de revolução'],
+  [/^cubo/, `cubo de ${f0(RODA.cubo.diametro)} mm de diâmetro e ${f0(RODA.cubo.largura)} de largura, com ${RODA.cubo.furos} furos de ${f0(RODA.cubo.diametroDoFuro)} mm no círculo de ${f0(RODA.cubo.circulo)} e o furo central de ${f0(RODA.cubo.furoCentral)} mm, o diâmetro do eixo`, 'família roda-pneu por instanciaDeFamilia, com diametroFuroCentral do eixo; furos por subtrair, limparLascas'],
   [/^eixo/, 'eixo de Ø 60, de roda a roda, sob as longarinas', 'revolução em torno de x'],
   [/^(assoalho|tunel)/, 'assoalho e túnel da plataforma do chassi', 'extrusão e união de caixas'],
   [/^longarina|^travessa|^suporte|^parede|^anteparo|^caixaDeRoda|^soleiraDoChassi|^montante|^reforco/, 'membro do chassi, aparado pelo lado de dentro da lataria a 0,5 mm da pele de dentro onde ela o limita', 'extrusão ou caixa do rascunho facetado, cortada pela operação aparar com as duas chapas da lataria'],

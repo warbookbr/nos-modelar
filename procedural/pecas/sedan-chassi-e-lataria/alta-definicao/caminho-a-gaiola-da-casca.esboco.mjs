@@ -150,8 +150,8 @@ if (COM_PAINEIS) {
   const g = paineisPorVaos({ chapa: { passos: [chapa], origem: { op: 'subdivisao', id: 1 }, pontos }, vao: T.vao, linhas: linhasDeVao(), paineis: PAINEIS,
     conferir: CONFERIR, medirTempo: true,
     /* ciclo 5: a face de vértices quase alinhados que o corte deixa faz o relato de contatos chamar o painel de sólido inconclusivo e dar
-       travessias que não existem; `HD_LIMPAR` troca a tolerância da limpeza (0,01 mm é o padrão) */
-    ...(process.env.HD_LIMPAR ? { limpar: { tolerancia: Number(process.env.HD_LIMPAR) } } : {}) });
+       travessias que não existem; `HD_LIMPAR` troca a tolerância da limpeza (0,03 mm é o padrão: a 0,01 mm a porta dianteira esquerda ficava com 6 faces finas que a direita não tinha) */
+    limpar: { tolerancia: Number(process.env.HD_LIMPAR ?? 0.03) } });
   passos = [...g.passos];
   for (const p of PAINEIS) passos.push(['pincel', { modo: 'face', sel: { grupo: p.nome }, cor: CORES[p.nome] }]);
   MEDIDAS_DO_CORTE = g.medidas; avisosDoCorte = g.avisos; livre = g.proximoId;

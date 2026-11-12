@@ -154,8 +154,8 @@ suportes, que passam por furos nos painéis e saem das longarinas.
 No chassi, o assoalho assenta nas longarinas e nas travessas e entra nas
 soleiras; o túnel assenta no assoalho; os montantes nascem das soleiras; as
 caixas de roda da frente se prendem nas longarinas superiores, e as de trás, no
-assoalho e no anteparo. O cubo de cada roda gira no eixo com 8,6 mm de folga no
-raio, e o pneu fica a 40 mm da caixa de roda.
+assoalho e no anteparo. O cubo de cada roda é montado no eixo, com o furo central
+de 60 mm, o diâmetro do eixo (a folga radial de 8,6 mm do perfil `carro` da família foi tirada na rodada 2 de 2026-11-12), e o pneu fica a 40 mm da caixa de roda.
 
 ## Grau de realismo
 

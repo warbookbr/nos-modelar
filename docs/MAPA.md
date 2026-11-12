@@ -549,7 +549,6 @@
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
-- `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
 - `2026-11-10-nucleo-para-qualquer-mecanismo.md` — Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `2026-11-12-instalacao-solar-no-telhado.md` — Instalação solar no telhado: um caso prático de montagem real, do telhado de fibrocimento aos painéis presos nos trilhos
@@ -705,6 +704,7 @@
 - `2026-11-08-uniao-de-tubos-com-arredondamento.md` — União de dois tubos com arredondamento: o tubo em pé redondo até a base, cruzado por um tubo deitado afastado
 - `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` — Abertura na vizinhança de todo vão: o vão grande e o vão junto de outro também recortam só o trecho dele
 - `2026-11-09-empilhadeira.md` — Empilhadeira inteira, da carcaça aos garfos, por partes plugadas numa montagem
+- `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -1075,6 +1075,7 @@
 - `lamina-sobre-a-superficie.js` — lamina-sobre-a-superficie.js — a lâmina de vão varrida sobre a superfície de uma chapa, com a seção perpendicular a ela
 - `limpar-contorno.test.mjs` — limpar-contorno.test.mjs — `limparContorno`: tira ponto repetido e, se pedido, ponto colinear, sem mexer na entrada.
 - `limpar-lascas-escala.test.mjs` — limpar-lascas-escala.test.mjs — o piso de área da limpeza segue a escala da peça, e não a da seleção (atrito 11 do RECEITA.md do sedã).
+- `limpar-lascas-tiras.test.mjs` — limpar-lascas-tiras.test.mjs — `limparLascas` com a fileira de tiras paralelas.
 - `limpar-lascas.js` — limpar-lascas.js — o cálculo da limpeza de lascas depois de uma booleana: função pura sobre vértices e faces, sem passo, sem Manifold e sem domínio de objeto…
 - `limpar-lascas.test.ts` — limpar-lascas.test.ts — `limparLascas`: a limpeza das faces finas que uma booleana deixa. Mede, em fixtures sem domínio de objeto: (a) o cálculo puro, na pon…
 - `linha-de-base-do-furo.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
@@ -2105,6 +2106,7 @@
 ## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/rodadas/
 
 - `receita-01.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
+- `receita-02.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/
 
@@ -2113,6 +2115,7 @@
 ## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/rodadas/
 
 - `receita-01.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
+- `receita-02.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/
 
@@ -2121,6 +2124,7 @@
 ## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/rodadas/
 
 - `receita-01.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
+- `receita-02.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
 
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/
 
@@ -3109,6 +3113,7 @@
 - `descrever-partes-materiais.test.mjs` — descrever-partes-materiais.test.mjs — a revisão persiste os campos novos do material (verniz, transmissão, relevo e os demais) e as revisões já gravadas segu…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
+- `descrever-reguas-de-malha.test.mjs` — descrever-reguas-de-malha.test.mjs — as três réguas de malha no `descrever` como aviso (plano "costuras e furos limpos", fatia 3): cada defeito das peças de …
 - `descrever-sem-calar.test.mjs` — descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista): o órfão d…
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.

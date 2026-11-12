@@ -15,6 +15,9 @@ import { criarContextoDeSolidos, criarSolidosDoEsboco } from '../../src/autoria/
 import { normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
 import { receitaDoBloco } from '../fixtures/forma-do-esboco/suporte.js';
 
+/* os suportes têm triângulos finos, que a régua de malha avisa; o aviso não é desta conferência */
+const semAvisoDeMalha = (texto) => texto.replace(/\nAVISO: \d+ régua\(s\) de malha com achado[^\n]*\n/, '');
+
 const PASTA = 'tools/fixtures/forma-do-esboco';
 const ESBOCO = `${PASTA}/bloco.formas.json`;
 const medir = (variante) => descreverPecaReutilizavel({ peca: `${PASTA}/${variante}/receita.js` });
@@ -24,7 +27,7 @@ const lerJson = (caminho) => JSON.parse(readFileSync(caminho, 'utf8'));
 describe('o veredito da peça confere a forma contra o esboço', () => {
   it('a receita que reproduz o bloco furado e a viga inclinada passa, com razão acima de 0,99', async () => {
     const r = await medir('ok');
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     expect(r.ok).toBe(true);
     expect(r.resultado.formaDoEsboco).toMatchObject({ ok: true, arquivo: '../bloco.formas.json', minimo: 0.99, achados: [] });
     expect(razao(r, 'bloco')).toBeGreaterThan(0.99);
@@ -66,7 +69,7 @@ describe('o veredito da peça confere a forma contra o esboço', () => {
     expect(r.ok).toBe(true);
     expect(r.resultado.formaDoEsboco).toBeNull();
     expect(r.stdout).not.toContain('forma contra o esboço');
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     const sem = await descreverPecaReutilizavel({ peca: 'braco-robotico/anel-cintura' });
     expect(sem.resultado.formaDoEsboco).toBeNull();
   });
@@ -142,7 +145,7 @@ describe('a parte que se afasta do esboço de propósito declara o deslocamento'
 
   it('a razão é medida contra a forma transladada e o envelope contra o volume transladado: o bloco 20 mm adiante passa com o mínimo geral de 0,99', async () => {
     const r = await descreverPecaReutilizavel({ peca: `${PASTA}/deslocada-declarada/receita.js` });
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     expect(r.ok).toBe(true);
     expect(razao(r, 'bloco')).toBeGreaterThan(0.99);
     expect(r.resultado.formaDoEsboco.partes.find((p) => p.parte === 'bloco')).toMatchObject({ minimo: 0.99, ok: true, deslocamento: [20, 0, 0], motivo: MOTIVO });
@@ -203,7 +206,7 @@ describe('a parte que se afasta do esboço de propósito declara o deslocamento'
 
   it('a parte que passa do volume sem ser translação declara o alongamento: o envelope passa o lado declarado, e a razão fica com o mínimo próprio', async () => {
     const r = await medirModulo(deslocado({ formas: 'bloco', minimo: 0.7, alongamento: { '+x': 20 }, motivo: 'o bloco alonga 20 mm para +x' }));
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     expect(r.ok).toBe(true);
     expect(r.stdout).toContain('parte afastada do esboço de propósito: bloco passa do volume +x 20 mm; motivo: o bloco alonga 20 mm para +x');
     const curto = await medirModulo(deslocado({ formas: 'bloco', minimo: 0.7, alongamento: { '+x': 10 }, motivo: 'o bloco alonga 10 mm para +x' }));
@@ -337,7 +340,7 @@ describe('a linha de comando', () => {
 
   it('mede a peça fixa sem mudar a receita: o bloco furado passa e o deslocado reprova, com o tempo', async () => {
     const ok = await comoCLI([`${PASTA}/ok/receita.js`, `--esboco=${ESBOCO}`, '--mesmo-id', '--minimo=0.99']);
-    expect(ok.stderr).toBe('');
+    expect(semAvisoDeMalha(ok.stderr)).toBe('');
     expect(ok.codigo).toBe(0);
     expect(ok.stdout).toContain('forma de tools/fixtures/forma-do-esboco/ok/receita.js contra o esboço bloco.formas.json (opção Bloco e viga): aprovada');
     expect(ok.stdout).toMatch(/bloco\s+1,0000\s+ok/);
@@ -356,7 +359,7 @@ describe('a linha de comando', () => {
     expect(sem.codigo).toBe(1);
     expect(sem.stdout).not.toContain('afastadas do esboço');
     const feito = await comoCLI([...base, `--desloca=bloco:20,0,0:${motivo}`]);
-    expect(feito.stderr).toBe('');
+    expect(semAvisoDeMalha(feito.stderr)).toBe('');
     expect(feito.codigo).toBe(0);
     expect(feito.stdout).toContain('aprovada');
     expect(feito.stdout).toMatch(/bloco\s+1,0000\s+ok/);

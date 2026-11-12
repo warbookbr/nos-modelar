@@ -1,0 +1,146 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/vidros",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: a receita não refina esboço aprovado e o pedido não traz imagem de referência",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "vidroDianteiroDir",
+        "tipo": "superficie",
+        "onde": "canto inferior da ponta dianteira (extremidade externa do contorno)",
+        "sentido": "anguloso",
+        "evidencia": "Vista direita isolada: degrau quadrado de poucos mm no canto inferior esquerdo, enquanto o canto do anel no montado é arredondado. Mesmo degrau no vidroDianteiroEsq e nos vigias."
+      }
+    ],
+    "observacao": "Oito vidros com a forma prometida, esquerdos espelhando os direitos, sem costura no eixo e com o encosto de 0,00 mm dentro do declarado; um único achado de acabamento, e sem alvo a nota é só fidelidade ao objeto descrito."
+  },
+  "partes": [
+    {
+      "nome": "vidroDianteiroDir",
+      "confere": true,
+      "observacao": "promessa agora diz por dentro da chapa, 12 mm além da borda, anel escuro = moldura"
+    },
+    {
+      "nome": "vidroDianteiroEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroTraseiroDaPortaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroTraseiroDaPortaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vigiaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vigiaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroTraseiro",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "Escala de curvatura satura em 0,123 1/m; a faixa do para-brisa é variação de centésimos de milímetro (arquivo de outro plano, segue como recado).",
+    "vidroDianteiroDir superficie: do plano. O degrau é a ponta truncada da chapa do vidro, que é maior que o vão e fica sob a chapa e a moldura; a promessa não diz que o contorno do vidro não é o do vão. Corrige-se no texto, na rodada 3."
+  ],
+  "notaDePassagem": "Malha idêntica à da rodada 1; só o PLANO mudou: o vidro passa por dentro da chapa, encostado na face de dentro da borda, 12 mm além; o anel escuro em volta é a moldura de borracha da carroceria (14 por 3 mm). O critério de reprovação diz que encosto por dentro é o esperado.",
+  "receita": {
+    "sha256": "sha256:e4609871e167a043834bc501dfacb4f591882066b041180c88e8bd57d4a08b87",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 4,
+      "acrescentadas": 4,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": "    objeto: 'os vidros de um sedã de quatro portas de 4,4 m: o para-brisa e o vidro traseiro de um lado ao outro, e de cada lado o vidro da porta dianteira, o da traseira e a vigia, chapas de 4 mm por baixo da borda dos vãos',"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    objeto: 'os oito vidros de um sedã de 4,4 m, chapas de 4 mm por dentro da borda dos vãos; o anel escuro em volta de cada um é a moldura de borracha da carroceria (14 por 3 mm), e não parte do vidro',"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "      'um vidro que não passa por baixo da borda do vão, ou que a atravessa para fora',"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "      'um vidro que não passa por dentro da chapa, 12 mm além da borda do vão, ou que a atravessa para fora; o encosto na face de dentro da borda é o esperado',"
+        },
+        {
+          "tipo": "-",
+          "linha": 58,
+          "texto": "  ilhas: ETAPAS[ETAPA].filter((n) => n !== 'paraBrisa').map((contem) => ({ contem, motivo: 'o vidro passa 12 mm por baixo da borda do vão do teto e é colado nele, que é da peça carroceria; nesta peça ele fica solto' })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  ilhas: ETAPAS[ETAPA].filter((n) => n !== 'paraBrisa').map((contem) => ({ contem, motivo: 'o vidro passa por dentro da chapa, 12 mm além da borda do vão do teto, e é colado nele, que é da peça carroceria; nesta peça ele fica solto' })),"
+        },
+        {
+          "tipo": "-",
+          "linha": 62,
+          "texto": "  APOIA: Object.fromEntries(ETAPAS[ETAPA].map((n) => [n, 'o vidro passa 12 mm por baixo da borda do vão do teto e é colado nele, que é da peça carroceria; nesta peça ele fica solto'])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  APOIA: Object.fromEntries(ETAPAS[ETAPA].map((n) => [n, 'o vidro passa por dentro da chapa, 12 mm além da borda do vão do teto, e é colado nele, que é da peça carroceria; nesta peça ele fica solto'])),"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes paraBrisa, vidroDianteiroDir, vidroDianteiroEsq, vidroTraseiro, vidroTraseiroDaPortaDir, vidroTraseiroDaPortaEsq, vigiaDir, vigiaEsq",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az40.png",
+      "peca-el20-lado-rasante-az130.png",
+      "peca-topo-rasante-az0.png",
+      "peca-topo-rasante-az90.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az110.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-12T20:35:35.184Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
