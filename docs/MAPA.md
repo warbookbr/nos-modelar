@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1961 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1972 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -546,11 +546,11 @@
 - `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
-- `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` — Abertura na vizinhança de todo vão: o vão grande e o vão junto de outro também recortam só o trecho dele
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
 - `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
 - `2026-11-10-nucleo-para-qualquer-mecanismo.md` — Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
+- `2026-11-12-instalacao-solar-no-telhado.md` — Instalação solar no telhado: um caso prático de montagem real, do telhado de fibrocimento aos painéis presos nos trilhos
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -699,6 +699,7 @@
 - `2026-11-08-materiais-realistas.md` — Materiais realistas e exportação glTF
 - `2026-11-08-trecho-que-some-entre-lacos.md` — Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
 - `2026-11-08-uniao-de-tubos-com-arredondamento.md` — União de dois tubos com arredondamento: o tubo em pé redondo até a base, cruzado por um tubo deitado afastado
+- `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` — Abertura na vizinhança de todo vão: o vão grande e o vão junto de outro também recortam só o trecho dele
 - `2026-11-09-empilhadeira.md` — Empilhadeira inteira, da carcaça aos garfos, por partes plugadas numa montagem
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
@@ -1832,7 +1833,7 @@
 - `gaiola.js` — furgao-realista, receita/gaiola.js — a gaiola da chapa (`derivar`): os anéis com as colunas, as faces, a cobertura do teto, o espelho, as voltas das portas e…
 - `geometria.js` — furgao-realista, receita/geometria.js — as contas que os outros assuntos usam: a conversão para metro, as curvas 2D em milímetro (o contorno com raios, o com…
 - `interior.js` — furgao-realista, receita/interior.js — o interior (etapa 5), todo dentro da chapa: o piso, a divisória, os dois bancos e o painel, cada um com o perfil que o…
-- `janela.js` — furgao-realista, receita/janela.js — os contornos da janela da cabine (2026-11-09, pela referência da pessoa): um triângulo de vidro fixo na frente, na carro…
+- `janela.js` — furgao-realista, receita/janela.js — os contornos da janela da cabine (2026-11-12, pelo alvo aprovado pela pessoa): um vão de vidro só, com uma borracha cont…
 - `luzes.js` — furgao-realista, receita/luzes.js — por dentro das luzes da frente (etapa 8, `referencias/luzes.md`): o refletor de cada luz, uma capa única cuja borda segue…
 - `nomes.js` — furgao-realista, receita/nomes.js — os nomes das partes, que o PLANO, os PASSOS e os contatos citam: as listas por grupo (rodas, forros, abas, plástico, cris…
 - `plastico.js` — furgao-realista, receita/plastico.js — o plástico de baixo (etapa 3), por fora da chapa: a saia, as molduras e o alargamento dos arcos, o forro dos arcos e o…
@@ -1880,6 +1881,46 @@
 ## procedural/pecas/geladeira-compacta-branca/referencias/
 
 - `alvo.md` — Alvo: geladeira compacta branca
+
+## procedural/pecas/instalacao-solar/partes/emenda/
+
+- `receita.js` — instalacao-solar/emenda — a peça que entra dentro de dois perfis para uni-los, com dois parafusos.
+
+## procedural/pecas/instalacao-solar/partes/grampo-intermediario/
+
+- `receita.js` — instalacao-solar/grampo-intermediario — o grampo em "ômega" que aperta as molduras de dois painéis vizinhos de 40 mm, com um parafuso.
+
+## procedural/pecas/instalacao-solar/partes/grampo-ponta-30/
+
+- `receita.js` — instalacao-solar/grampo-ponta-30 — o grampo em "Z" de ponta para moldura de 30 a 35 mm, com um parafuso.
+
+## procedural/pecas/instalacao-solar/partes/grampo-ponta-40/
+
+- `receita.js` — instalacao-solar/grampo-ponta-40 — o grampo em "Z" de ponta para moldura de 40 mm, com um parafuso.
+
+## procedural/pecas/instalacao-solar/partes/haste/
+
+- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, a arruela e as porcas.
+
+## procedural/pecas/instalacao-solar/partes/painel-30/
+
+- `receita.js` — instalacao-solar/painel-30 — o painel solar de 1722 por 1134 mm com moldura de alumínio de 30 mm de altura.
+
+## procedural/pecas/instalacao-solar/partes/painel-40/
+
+- `receita.js` — instalacao-solar/painel-40 — o painel solar de 1812 por 1046 mm com moldura de alumínio de 40 mm de altura.
+
+## procedural/pecas/instalacao-solar/partes/perfil/
+
+- `receita.js` — instalacao-solar/perfil — o trilho de alumínio extrudado de 1,35 m que leva os grampos dos painéis.
+
+## procedural/pecas/instalacao-solar/partes/suporte-l/
+
+- `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil.
+
+## procedural/pecas/instalacao-solar/referencias/
+
+- `kit.md` — Instalação solar: o alvo de forma das peças do kit
 
 ## procedural/pecas/jipe-aberto/
 
@@ -2475,7 +2516,7 @@
 - `chapa-por-rede.js` — chapa-por-rede.js — peça de teste do plano da abertura em qualquer direção: a chapa feita por outra gaiola, a gaiola por rede.
 - `chapas.js` — chapas.js — os blocos das peças de teste neutras da bateria do plano da abertura em qualquer direção: a chapa por grade (uma gaiola de pontos a cada `passo` …
 - `contornos-de-forma.js` — contornos-de-forma.js — peça de teste do plano da abertura em qualquer direção: o contorno côncavo (em L e em estrela) e o de bico muito agudo.
-- `controle-do-recorte.test.ts` — controle-do-recorte.test.ts — a trava de `CONTROLE_DO_RECORTE` (plano `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`): o controle que desliga o recorte d…
+- `controle-do-recorte.test.ts` — controle-do-recorte.test.ts — a trava de `CONTROLE_DO_RECORTE` (plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`): o c…
 - `dois-vaos.js` — dois-vaos.js — peça de teste do plano da abertura em qualquer direção: dois vãos na mesma chapa e o vão dentro da lente de outro.
 - `dois-vaos.test.ts` — dois-vaos.test.ts — bateria do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`): dois vãos…
 - `dupla-curvatura.js` — dupla-curvatura.js — peça de teste do plano da abertura em qualquer direção: a superfície de dupla curvatura forte.
@@ -2485,8 +2526,8 @@
 - `tres-camadas.js` — tres-camadas.js — peça de teste do plano da abertura em qualquer direção: o corpo de várias camadas na mesma reta, com `sentido`.
 - `vao-da-quina.test.ts` — vao-da-quina.test.ts — fatia 1 do plano da abertura em qualquer direção (`docs/modelar/planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md`): o vão …
 - `vinco-e-borda.js` — vinco-e-borda.js — peça de teste do plano da abertura em qualquer direção: o contorno que cruza um vinco vivo e o que passa perto da borda da chapa.
-- `vizinhanca-de-todo-vao.js` — vizinhanca-de-todo-vao.js — as peças de prova do plano `docs/modelar/planos/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: cada uma reproduz, na cúpula d…
-- `vizinhanca-de-todo-vao.test.ts` — vizinhanca-de-todo-vao.test.ts — bateria do plano `docs/modelar/planos/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: o vão cuja vizinhança alcança o tub…
+- `vizinhanca-de-todo-vao.js` — vizinhanca-de-todo-vao.js — as peças de prova do plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: cada uma reproduz, …
+- `vizinhanca-de-todo-vao.test.ts` — vizinhanca-de-todo-vao.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: o vão cuja vizinhança al…
 - `vizinhanca.test.ts` — vizinhanca.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o trecho da chapa…
 
 ## tools/fixtures/acervo/materiais-de-prova/

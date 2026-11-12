@@ -1,4 +1,4 @@
-/* vizinhanca-de-todo-vao.js — as peças de prova do plano `docs/modelar/planos/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: cada uma
+/* vizinhanca-de-todo-vao.js — as peças de prova do plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: cada uma
  * reproduz, na cúpula de 800 por 800 mm (16 mil faces, 2 mm de espessura), um dos motivos pelos quais a booleana de um vão do furgão
  * realista via a chapa inteira em vez de só a vizinhança dele. Em todas o vão provado é um triângulo (o último passo), cuja caixa cobre o
  * canto livre da cúpula, e antes dele um ou dois retângulos pequenos já abertos ficam nesse canto, fora do triângulo e dentro da caixa:

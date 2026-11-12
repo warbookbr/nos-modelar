@@ -87,17 +87,17 @@ export function forma(T) {
   /* os arcos das rodas cortam a soleira onde o círculo de raio arco_raio, no centro da roda, cruza y = soleira */
   const dzArco = Math.sqrt(T.arco_raio ** 2 - (ys - rPneu) ** 2);
 
-  /* A fresta da frente da porta da cabine, vista de lado: paralela ao para-brisa e porta_fresta_coluna atrás dele, medida na
-     perpendicular à coluna, até o pé da coluna; dali desce vertical até o arco. */
+  /* A fresta da frente da porta da cabine, vista de lado: paralela ao para-brisa e porta_fresta_coluna atrás dele, medida na perpendicular à coluna, até a altura
+     `porta_frente_quebra_y`; dali ela cai de uma vez para a vertical em z `porta_frente_z`, que desce até o arco. O recuo entre as duas (a diagonal curta entre os dois
+     anéis da gaiola que ladeiam a quebra) fica debaixo da base do retrovisor (`receita/janela.js`). */
   const pb = T.para_brisa_angulo * grau;
   const zLinhaVidro = (y) => baseVidro[0] - (y - baseVidro[1]) / Math.tan(pb);
-  const pePorta = [baseVidro[0] - T.porta_fresta_coluna * Math.sin(pb), baseVidro[1] - T.porta_fresta_coluna * Math.cos(pb)];
-  const zFrestaFrente = (y) => (y <= pePorta[1] ? pePorta[0] : zLinhaVidro(y) - T.porta_fresta_coluna / Math.sin(pb));
+  const zFrestaFrente = (y) => (y <= T.porta_frente_quebra_y ? T.porta_frente_z : zLinhaVidro(y) - T.porta_fresta_coluna / Math.sin(pb));
   /* A mesma linha a quina_fresta_ref atrás do perfil, que ordena as colunas q1 a q3 e E da quina da frente (e com elas as pontas do vão do para-brisa): ela ficou onde a fresta da porta corria na etapa 2, e a fresta da porta recuou sem levar o para-brisa. */
   const pePortaQuina = [baseVidro[0] - T.quina_fresta_ref * Math.sin(pb), baseVidro[1] - T.quina_fresta_ref * Math.cos(pb)];
   const zFrestaQuina = (y) => (y <= pePortaQuina[1] ? pePortaQuina[0] : zLinhaVidro(y) - T.quina_fresta_ref / Math.sin(pb));
   return {
-    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, pePorta, pePortaQuina, zFrestaQuina, anguloCapo,
+    zFrente, zTras, xMax, ys, zD, zT, rPneu, dzArco, boca, baseVidro, topoVidro, testa, zLinhaVidro, pePortaQuina, zFrestaQuina, anguloCapo,
     perfilFrente, perfilTras, perfilLado, zTetoFrente, zTetoTras, xTetoLado, raioFrente, zFrestaFrente, xBordaTraseira,
     zF: (y) => uNaAltura(perfilFrente, y),
     zR: (y) => uNaAltura(perfilTras, y),
@@ -241,18 +241,4 @@ export function projetarNaSecao(sec, p) {
   let melhor = null; let dm = Infinity;
   for (const c of cand) { const d = Math.hypot(c.q[0] - x, c.q[1] - z); if (d < dm) { dm = d; melhor = c; } }
   return { p: [sx * melhor.q[0], p[1], melhor.q[1]], n: [sx * melhor.n[0], 0, melhor.n[1]] };
-}
-
-/* A coluna nova da janela da cabine (2026-11-09), vista de lado: o z dela por altura, do pé da frente da porta (`janela_sill_y`) ao topo da porta. No pé ela está em `coluna_nova_z_base`
-   e no topo `alcance_coluna_porta` atrás da fresta da frente antiga (a coluna D, que segue o para-brisa), onde a coluna S0 já ficava; entre os dois a linha é reta e quase vertical.
-   É a frente da porta na altura da janela, a borda de trás do triângulo fixo e a de frente do vidro da porta. */
-export function colunaDaJanela(T, f) {
-  const sec = secaoHorizontal(T, f, T.porta_cabine_topo_y);
-  const zLado = sec.zF - sec.rF;
-  const zD = f.zFrestaFrente(T.porta_cabine_topo_y);
-  const sQ = sec.rF * Math.PI / 2;
-  const sD = zD <= zLado ? sQ + (zLado - zD) : sec.rF * Math.acos(Math.min(1, Math.max(-1, 1 - (sec.zF - zD) / sec.rF)));
-  const sS0 = sD + Math.max(sQ - sD, T.alcance_coluna_porta);
-  const zTopo = zLado - (sS0 - sQ);
-  return (y) => lerp(T.coluna_nova_z_base, zTopo, (y - T.janela_sill_y) / (T.porta_cabine_topo_y - T.janela_sill_y));
 }
