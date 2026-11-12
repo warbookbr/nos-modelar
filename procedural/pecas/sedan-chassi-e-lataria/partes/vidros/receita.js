@@ -58,6 +58,8 @@ const receita = {
   ilhas: ETAPAS[ETAPA].filter((n) => n !== 'paraBrisa').map((contem) => ({ contem, motivo: 'o vidro passa 12 mm por baixo da borda do vão do teto e é colado nele, que é da peça carroceria; nesta peça ele fica solto' })),
   /* O centro do para-brisa e o do vidro traseiro, de um lado ao outro (x 0 pela simetria), na altura e no z que a TABELA do alvo dá ao meio de cada um:
      a caixa deles passa até a sobra de 12 mm da borda do vão, e a tolerância é essa sobra com 3 mm de margem. */
+  /* as partes soltas de propósito, para `vao:partes --soltas=recusar`: cada vidro se prende no teto, da peça carroceria */
+  APOIA: Object.fromEntries(ETAPAS[ETAPA].map((n) => [n, 'o vidro passa 12 mm por baixo da borda do vão do teto e é colado nele, que é da peça carroceria; nesta peça ele fica solto'])),
   get PONTOS() {
     const S = C.vidro.sobra + 3;
     const meio = (v, z) => [0, (v.y0 + v.y1) / 2, (z(v.y0) + z(v.y1)) / 2];

@@ -7,7 +7,8 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
-import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, comoCLI, criarDicas, olharBancada } from './olhar-bancada.mjs';
+import * as THREE from 'three';
+import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, olharBancada } from './olhar-bancada.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -458,5 +459,248 @@ describe('a ajuda da bancada', () => {
     const { AJUDA, OPCOES_DA_CLI, BANDEIRAS_DA_CLI } = await import('./olhar-bancada.mjs');
     const faltando = [...OPCOES_DA_CLI, ...BANDEIRAS_DA_CLI].filter((nome) => !AJUDA.includes(`--${nome}`));
     expect(faltando).toEqual([]);
+  });
+});
+
+describe('a câmera que mira um ponto e a isométrica de trás', () => {
+  const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
+
+  /* a bancada falsa, que guarda cada ajuste de câmera que a ferramenta mandou à página e o endereço que ela abriu */
+  function bancadaDosAjustes() {
+    const registro = { ajustes: [], urls: [], trocadas: [] };
+    const page = {
+      on() {}, off() {},
+      async goto(url) { if (url !== 'about:blank') registro.urls.push(url); },
+      async waitForFunction() {},
+      async waitForTimeout() {},
+      async evaluate(fn, argumento) {
+        const texto = String(fn);
+        if (Array.isArray(argumento) && argumento.length === 4 && typeof argumento[0] === 'number') { if (argumento[3]) registro.ajustes.push(argumento[3]); return true; }
+        if (texto.includes('__modelarAjustarCamera = ')) return undefined;
+        if (texto.includes('__modelarAjuste')) return { dentroDaPeca: false };
+        if (texto.includes('definirVista')) { registro.trocadas.push(argumento); return undefined; }
+        if (texto.includes('__modelarQuadros')) return undefined;
+        if (texto.includes('b.ready')) {
+          return { ready: true, erro: null, peca: 'Peça falsa', partes: ['a'], selecaoIgnorada: [], diagnosticos: { facesSemParte: [] }, estatisticas: { facesNeutras: 1, triangulos: 2 }, estado: null };
+        }
+        if (texto.includes('.enquadramento()')) return { url: 'http://127.0.0.1/harness.html', enquadramento: ENQUADRAMENTO };
+        if (/auditoria|selecionar|enquadrar|focar/.test(texto)) return null;
+        throw new Error(`pergunta inesperada à página: ${texto}`);
+      },
+      async screenshot() { const png = new PNG({ width: 64, height: 36 }); png.data.fill(200); return PNG.sync.write(png); },
+      async close() {},
+    };
+    const dependencias = {
+      createServer: async () => ({ httpServer: { address: () => ({ port: 43123 }) }, async listen() {}, async close() {} }),
+      carregarPlaywright: async () => ({ chromium: { launch: async () => ({ async newPage() { return page; }, async close() {} }) } }),
+    };
+    return { registro, dependencias };
+  }
+  const comum = { peca: 'fixture-visual', res: '640x360', auditoria: true, capturarEmMemoria: true };
+
+  it('recusa o pedido mal formado antes de abrir servidor ou navegador', async () => {
+    const casos = [
+      [{ mirar: '1200,900' }, /--mirar pede x,y,z em milímetros/],
+      [{ mirar: '1,2,x' }, /--mirar pede x,y,z em milímetros/],
+      [{ mirar: '1,2,3', distancia: '0' }, /--distancia pede milímetros maiores que zero/],
+      [{ distancia: '300' }, /--distancia só vale junto de --mirar/],
+      [{ mirar: '1,2,3', focar: true, selecionadas: 'a' }, /--mirar não se mistura com --focar/],
+      [{ mirar: '1,2,3', revisar: true }, /--mirar não se mistura com --revisar/],
+      [{ mirar: '1,2,3', par: 'a,b' }, /--mirar não se mistura com --par/],
+    ];
+    for (const [pedido, mensagem] of casos) {
+      let abriu = false;
+      const r = await olharBancada({ ...comum, ...pedido, dependencias: { createServer: async () => { abriu = true; throw new Error('não devia abrir'); } } });
+      expect(r.codigo).toBe(2);
+      expect(r.erro.mensagem).toMatch(mensagem);
+      expect(abriu).toBe(false);
+    }
+    const pelaCLI = await comoCLI(['fixture-visual', '--mirar=1,2,3', '--analise']);
+    expect(pelaCLI.codigo).toBe(2);
+    expect(pelaCLI.stderr).toContain('--mirar não se mistura com --analise');
+  });
+
+  it('manda à página o ponto em mm, a distância (600 mm por padrão) e a direção de cada vista, e a captura sai com o ponto no nome', async () => {
+    const { registro, dependencias } = bancadaDosAjustes();
+    const r = await olharBancada({ ...comum, mirar: '1200,900,-300', vistas: ['direita', 'isometrica-traseira'], dependencias });
+    expect(r.ok).toBe(true);
+    expect(registro.ajustes).toEqual([
+      { mirar: { mm: [1200, 900, -300], distanciaMm: 600, direcao: [1, 0, 0] } },
+      { mirar: { mm: [1200, 900, -300], distanciaMm: 600, direcao: [-1, 0.72, -1] } },
+    ]);
+    const comDistancia = await olharBancada({ ...comum, mirar: [10, 20, 30], distancia: 150, vistas: ['frontal'], dependencias: bancadaDosAjustes().dependencias });
+    expect(comDistancia.ok).toBe(true);
+    const emArquivo = await olharBancada({ peca: 'fixture-visual', res: '640x360', auditoria: true, mirar: '1200,-900.5,0', distancia: 250, vistas: ['direita'], saida: 'tools/bancadas/out/teste-da-mira', dependencias: bancadaDosAjustes().dependencias });
+    expect(emArquivo.resultado.arquivos[0]).toMatch(/bancada-fixture-visual-direita-mira-1200_m900p5_0-d250\.png$/);
+    rmSync(join(REPO, 'tools/bancadas/out/teste-da-mira'), { recursive: true, force: true });
+  });
+
+  it('a isométrica de trás abre a página na isométrica, gira a câmera na página e a segunda vista troca para a isométrica, sem pedir uma vista que a bancada não tem', async () => {
+    const { registro, dependencias } = bancadaDosAjustes();
+    const r = await olharBancada({ ...comum, vistas: ['isometrica-traseira', 'isometrica-traseira'], dependencias });
+    expect(r.ok).toBe(true);
+    expect(registro.urls).toHaveLength(1);
+    expect(registro.urls[0]).not.toMatch(/vista=/);
+    expect(registro.trocadas).toEqual(['isometrica']);
+    expect(registro.ajustes).toEqual([{ giro: true, fora: false }, { giro: true, fora: false }]);
+    const semAjuste = bancadaDosAjustes();
+    await olharBancada({ ...comum, vistas: ['isometrica', 'direita'], dependencias: semAjuste.dependencias });
+    expect(semAjuste.registro.ajustes).toEqual([]);
+  });
+
+  it('o foco de uma parte pede o recuo da câmera para fora da peça', async () => {
+    const { registro, dependencias } = bancadaDosAjustes();
+    await olharBancada({ ...comum, selecionadas: 'a', modo: 'contexto', focar: true, vistas: ['direita'], dependencias });
+    expect(registro.ajustes).toEqual([{ giro: false, fora: true }]);
+  });
+});
+
+describe('o ajuste da câmera na página', () => {
+  /* a página falsa: uma peça de 1,2 m de lado (em metro de receita) posta no estúdio com escala 2 e deslocada, a câmera de verdade do three */
+  function montar({ ortografica = false, posicao = [3, 1, 0], alvo = [0, 1, 0], aspecto = 2 } = {}) {
+    const raiz = new THREE.Group();
+    const malha = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2));
+    malha.userData.faces = [1];
+    raiz.add(malha);
+    raiz.scale.setScalar(2);
+    raiz.position.set(0, 1, 0);
+    const scene = new THREE.Scene();
+    scene.add(raiz);
+    raiz.updateMatrixWorld(true);
+    const camera = ortografica ? new THREE.OrthographicCamera(-1, 1, 1, -1, 0.025, 100) : new THREE.PerspectiveCamera(38, aspecto, 0.025, 100);
+    camera.position.set(...posicao);
+    const controls = { target: new THREE.Vector3(...alvo), minDistance: 0.25, maxDistance: 30, update() {} };
+    const chamadas = [];
+    const ambiente = {
+      scene, camera, controls,
+      renderer: { domElement: { clientWidth: 1280, clientHeight: 640 } },
+      olharComoReferencia(pedido) { chamadas.push(pedido); },
+    };
+    globalThis.window = { __mecanificaBancada: { ambiente: () => ambiente } };
+    return { camera, controls, chamadas };
+  }
+  const arredondar = (v) => v.toArray().map((n) => Math.round(n * 1e6) / 1e6);
+
+  it('mirar põe a câmera à distância pedida do ponto em mm, na direção da vista, olhando para ele, e diz o campo visível', () => {
+    const { camera, controls, chamadas } = montar();
+    const feito = ajustarCamera({ mirar: { mm: [300, 200, -300], distanciaMm: 500, direcao: [1, 0, 0] } });
+    /* o ponto em mm vira metro de receita e vai ao estúdio: escala 2 e deslocamento y 1 */
+    const ponto = [0.6, 1 + 0.4, -0.6];
+    expect(arredondar(controls.target)).toEqual(ponto);
+    expect(arredondar(camera.position)).toEqual([0.6 + 1, 1.4, -0.6]);
+    expect(chamadas).toHaveLength(1);
+    expect(chamadas[0]).toMatchObject({ centro: ponto, direcao: [1, 0, 0], vista: 'livre', instantaneo: true });
+    expect(chamadas[0].meiaAltura).toBeCloseTo(1 * Math.tan((19 * Math.PI) / 180), 6);
+    expect(chamadas[0].meiaLargura).toBeCloseTo(2 * chamadas[0].meiaAltura, 6);
+    /* a distância mínima dos controles cede só quando a câmera chega mais perto que ela: a 1 m do ponto ela fica em 0,25 */
+    expect(controls.minDistance).toBe(0.25);
+    expect(feito.mirou).toEqual({ ponto: [300, 200, -300], distanciaMm: 500, campoMm: Math.round(2 * 500 * Math.tan((19 * Math.PI) / 180)) });
+    expect(feito.dentroDaPeca).toBe(false);
+    ajustarCamera({ mirar: { mm: [300, 200, -300], distanciaMm: 100, direcao: [1, 0, 0] } });
+    expect(controls.minDistance).toBeCloseTo(0.1, 9);
+    expect(camera.position.distanceTo(controls.target)).toBeCloseTo(0.2, 9);
+  });
+
+  it('mirar de perto, dentro da caixa da peça, é dito e não é mudado', () => {
+    const { camera } = montar();
+    const feito = ajustarCamera({ mirar: { mm: [0, 0, 0], distanciaMm: 300, direcao: [1, 0, 0] } });
+    expect(feito.dentroDaPeca).toBe(true);
+    expect(feito.afastou).toBeUndefined();
+    expect(arredondar(camera.position)).toEqual([0.6, 1, 0]);
+  });
+
+  it('o giro leva a câmera para o lado oposto em torno do eixo vertical do alvo, na mesma altura e distância', () => {
+    const { camera, controls } = montar({ posicao: [3, 2.5, 4], alvo: [0, 1, 0] });
+    const antes = camera.position.distanceTo(controls.target);
+    const feito = ajustarCamera({ giro: true });
+    expect(feito.girou).toBe(true);
+    expect(arredondar(camera.position)).toEqual([-3, 2.5, -4]);
+    expect(camera.position.distanceTo(controls.target)).toBeCloseTo(antes, 9);
+  });
+
+  it('a câmera de um foco pequeno que caiu dentro da peça recua pelo mesmo raio até passar da caixa, e a perspectiva mantém o quadro pelo zoom', () => {
+    /* a caixa da peça vai de x = -1,2 a 1,2 no estúdio, e a câmera de 0,6 m do alvo está dentro */
+    const { camera, controls } = montar({ posicao: [0.6, 1, 0], alvo: [0, 1, 0] });
+    const feito = ajustarCamera({ fora: true });
+    expect(feito.afastou).toBeDefined();
+    expect(feito.dentroDaPeca).toBe(false);
+    expect(camera.position.x).toBeGreaterThan(1.2);
+    expect(camera.position.y).toBeCloseTo(1, 9);
+    expect(camera.position.distanceTo(controls.target) / 0.6).toBeCloseTo(camera.zoom, 9);
+    expect(feito.afastou.deMm).toBe(Math.round((0.6 / 2) * 1000));
+    expect(feito.afastou.paraMm).toBeGreaterThan(feito.afastou.deMm);
+  });
+
+  it('na ortográfica o recuo não mexe no zoom, e a câmera que já está fora não se move', () => {
+    const orto = montar({ ortografica: true, posicao: [0, 1, 0.6], alvo: [0, 1, 0] });
+    ajustarCamera({ fora: true });
+    expect(orto.camera.zoom).toBe(1);
+    expect(orto.camera.position.z).toBeGreaterThan(1.2);
+    const fora = montar({ posicao: [6, 1, 0], alvo: [0, 1, 0] });
+    const feito = ajustarCamera({ fora: true });
+    expect(feito.afastou).toBeUndefined();
+    expect(arredondar(fora.camera.position)).toEqual([6, 1, 0]);
+    expect(fora.camera.zoom).toBe(1);
+  });
+});
+
+describe('o andamento da captura e o fim do processo', () => {
+  it('diz cada etapa longa ao entrar nela e, a cada intervalo, onde está e quanto falta', async () => {
+    const linhas = [];
+    const resposta = await olharBancada({
+      peca: 'fixture-visual', vistas: ['isometrica'], capturarEmMemoria: true,
+      aoProgredir: (linha) => linhas.push(linha), intervaloDoProgressoMs: 25,
+      dependencias: {
+        createServer: async () => {
+          await new Promise((ok) => setTimeout(ok, 120));
+          return { httpServer: { address: () => ({ port: 43123 }) }, async listen() {}, async close() {} };
+        },
+        carregarPlaywright: async () => ({ chromium: { launch: async () => { throw new Error('Interrompido propositalmente.'); } } }),
+      },
+    });
+    expect(resposta.ok).toBe(false);
+    expect(linhas.some((l) => /^bancada: subir o servidor \(fixture-visual\), \d+ s desde o começo$/.test(l))).toBe(true);
+    expect(linhas.some((l) => /^bancada: abrir o navegador/.test(l))).toBe(true);
+    const batidas = linhas.filter((l) => l.startsWith("bancada: ainda em 'subir o servidor'"));
+    expect(batidas.length).toBeGreaterThanOrEqual(2);
+    expect(batidas[0]).toMatch(/\d+ s gastos, 0 de 1 imagens feitas|\d+ s gastos, 0 de 0 imagens feitas/);
+  });
+
+  it('sem quem escute, nada é dito, e a batida para quando a captura acaba', async () => {
+    const r = await olharBancada({
+      peca: 'fixture-visual', vistas: ['isometrica'], capturarEmMemoria: true,
+      dependencias: { createServer: async () => { throw new Error('parou'); } },
+    });
+    expect(r.ok).toBe(false);
+    const linhas = [];
+    await olharBancada({
+      peca: 'fixture-visual', vistas: ['isometrica'], capturarEmMemoria: true, aoProgredir: (l) => linhas.push(l), intervaloDoProgressoMs: 10,
+      dependencias: { createServer: async () => { throw new Error('parou'); } },
+    });
+    const quantas = linhas.length;
+    await new Promise((ok) => setTimeout(ok, 60));
+    expect(linhas).toHaveLength(quantas);
+  });
+
+  it('um sinal de parada fecha o navegador e o servidor da captura: o ouvinte existe durante a captura e sai ao fim', async () => {
+    const antes = ['SIGINT', 'SIGTERM', 'SIGHUP'].map((s) => process.listenerCount(s));
+    let durante = null;
+    await olharBancada({
+      peca: 'fixture-visual', vistas: ['isometrica'], capturarEmMemoria: true,
+      dependencias: {
+        createServer: async () => { durante = ['SIGINT', 'SIGTERM', 'SIGHUP'].map((s) => process.listenerCount(s)); throw new Error('parou'); },
+      },
+    });
+    expect(durante).toEqual(antes.map((n) => n + 1));
+    expect(['SIGINT', 'SIGTERM', 'SIGHUP'].map((s) => process.listenerCount(s))).toEqual(antes);
+  });
+
+  it('o encerramento forçado sai com o código da captura depois da espera, e o temporizador não segura o processo', async () => {
+    const saidas = []; const avisos = [];
+    const temporizador = agendarEncerramento(1, { esperaMs: 20, sair: (c) => saidas.push(c), escrever: (t) => avisos.push(t) });
+    expect(temporizador.hasRef()).toBe(false);
+    await new Promise((ok) => setTimeout(ok, 80));
+    expect(saidas).toEqual([1]);
+    expect(avisos[0]).toContain('encerrado à força');
   });
 });

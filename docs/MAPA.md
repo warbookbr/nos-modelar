@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1980 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1990 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2039,10 +2039,12 @@
 - `andar-de-cima.esboco.mjs` — andar-de-cima.esboco.mjs: o terceiro ciclo de alta definição do sedã. O andar de baixo do segundo ciclo (o corpo de baixo do lado direito e a metade direita …
 - `caminho-a-gaiola-da-casca.esboco.mjs` — caminho-a-gaiola-da-casca.esboco.mjs: o segundo ciclo de alta definição do sedã, pelo caminho A (a grade de estações por colunas). O trecho é o corpo de baix…
 - `carro-inteiro.esboco.mjs` — carro-inteiro.esboco.mjs: o quinto ciclo de alta definição do sedã, o carro inteiro. A lataria vem de `frente-e-traseira.esboco.mjs`, que encadeia o andar de…
+- `carro-pela-receita.mjs` — carro-pela-receita.mjs: o carro inteiro montado pelas cinco receitas de `../partes/` (carroceria, vidros, frente-e-traseira, rodas e acessórios), como uma re…
 - `chassi-aparado.esboco.mjs` — chassi-aparado.esboco.mjs: o carro inteiro do ciclo 5 com o chassi aparado pela operação `aparar`, e não pelas seções tiradas do alvo.
 - `espelho.mjs` — espelho.mjs: o lado esquerdo das peças soltas do sedã em alta definição (ciclo 5). A chapa que cruza o eixo (o corpo de baixo, a cabine, os painéis da frente…
 - `exportar-trecho.mjs` — exportar-trecho.mjs: grava em OBJ, em metro, as partes pedidas de um esboço ou de uma receita, para a vista de três quartos lado a lado deste ciclo. `npm run…
 - `frente-e-traseira.esboco.mjs` — frente-e-traseira.esboco.mjs: o quarto ciclo de alta definição do sedã, levado ao carro inteiro no quinto. No ciclo 5 cada gaiola por estações é a metade x >…
+- `relato-do-carro.mjs` — relato-do-carro.mjs: o relato de contatos no modo estrito sobre o carro montado pelas cinco receitas (`carro-pela-receita.mjs`), com os contatos que o esboço…
 
 ## procedural/pecas/sedan-chassi-e-lataria/alta-definicao/ciclo-1/
 
@@ -2053,8 +2055,25 @@
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/_comum/
 
+- `forro.mjs` — sedan-chassi-e-lataria/partes/_comum/forro.mjs: o forro de um vão entre painéis, a faixa fina por trás dele que o fecha.
 - `recorte.mjs` — sedan-chassi-e-lataria/partes/_comum/recorte.mjs: o recorte de uma etapa do sedã no conjunto que o esboço do carro inteiro monta.
 - `sedan.mjs` — sedan-chassi-e-lataria/partes/_comum/sedan.mjs: o módulo comum das etapas do sedã em alta definição (fatia 4c do plano do núcleo para qualquer mecanismo). El…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/acessorios/
+
+- `receita.js` — sedan-chassi-e-lataria/acessorios — os dois retrovisores e as quatro maçanetas do sedã, os acessórios simples que o ciclo 5 pôs sobre as portas.
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/carroceria/
+
+- `receita.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/
+
+- `receita.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/
+
+- `receita.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/
 
@@ -2953,6 +2972,8 @@
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs do Modelar, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, amb…
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
 - `articulacao-na-montagem.test.mjs` — articulacao-na-montagem.test.mjs — a articulação sobre uma montagem v5 real: a folha da porta não declara pose, a posição sai do encaixe da porta `eixo-da-do…
+- `assinatura-da-malha.mjs` — assinatura-da-malha.mjs — a assinatura de cada parte e da peça inteira, e a comparação de duas rodadas.
+- `assinatura-da-malha.test.mjs` — assinatura-da-malha.test.mjs — a assinatura da malha por parte e da peça, e a comparação de duas rodadas.
 - `ativar-bancada.mjs` — ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D.
 - `ativar-bancada.test.mjs` — ativar-bancada.test.mjs — grito do motor é RECUSA, e não decoração no rodapé.
 - `auditar-intersecoes-montagem.test.ts` — @ts-expect-error — serviço neutro JavaScript exercitado pelo contrato público.
@@ -3095,6 +3116,7 @@
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `objeto.mjs` — objeto.mjs — o estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir.
 - `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.
+- `olhar-bancada-antes.tmp.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.

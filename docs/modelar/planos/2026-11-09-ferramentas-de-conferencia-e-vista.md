@@ -110,6 +110,22 @@ pontas (`, de [x; y; z] a [x; y; z] mm`). Caso: `tools/fixtures/vinco-da-coluna/
 mm, 39 mm entre as pontas, onde está a ruga) saem como achado. O acervo acusou só declarações do furgão (regiões justas
 demais para a cadeia); a revisão delas é da sessão do furgão, com as caixas medidas no relato da fatia.
 
+Fatia 2 (2026-11-12): `olhar-bancada --mirar=x,y,z [--distancia=mm]` põe a câmera a `distancia` (padrão 600 mm) do ponto, em mm do
+referencial da peça, na direção da vista pedida, e a vista nova `isometrica-traseira` gira a isométrica meia volta; os dois
+ajustes correm na página pela ponte que já existe (`ajustarCamera`, exportada e testada com a câmera do three), sem tocar
+`src/bancada`. O `--focar` que deixava a câmera dentro da caixa da peça recua-a pelo mesmo raio até passar da caixa, com o zoom
+compensando na perspectiva, e a mira dentro da peça sai como dica. A CLI escreve na saída de erro cada etapa longa ao entrar nela e
+uma batida a cada 15 s, e os sinais de parada fecham o Chromium e o servidor; o processo vivo depois da captura é encerrado
+após 5 s. `tools/modelar/assinatura-da-malha.mjs` (`npm run malha:assinatura`) assina cada parte e a peça (sha256 das faces em
+nanômetro, sem depender da numeração) e confere uma rodada contra outra, parte por parte. Casos no furgão realista, com a máquina em
+carga 3 a 6: a assinatura leva 99 s e a conferida contra ela 107 s, as 115 partes idênticas (o script de hash de cada rodada
+deixa de existir); a janela da porta da cabine em perto sai de um comando de 7 min 14 s, que é a receita medida em Node mais
+a carga da página, sem recorte de captura de 3.200 px (4 a 15 min cada). Não reproduzi o processo preso na porta: o recuso de
+servidor era fechado pelo `finally`, e o que entrou é a rede de segurança (sinal e encerramento forçado). Testes:
+`olhar-bancada.test.mjs` e `assinatura-da-malha.test.mjs`. Vai para a fatia 3: a medida de contatos executa a receita em Node a
+cada captura (uns 100 s no furgão, inclusive na mira) e deve ser pulada ou guardada; para a fatia 4: o aviso de progresso do
+`descrever` e do `guarda:acervo`, que seguem dois minutos sem saída.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar.

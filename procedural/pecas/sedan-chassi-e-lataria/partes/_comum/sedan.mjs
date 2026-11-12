@@ -17,7 +17,7 @@
  *   acessorios         os dois retrovisores e as quatro maçanetas. */
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { T } from '../../alta-definicao/alvo.mjs';
+import { T, ladoX, topoY } from '../../alta-definicao/alvo.mjs';
 import { recortar } from './recorte.mjs';
 
 process.env.HD_CONFERIR ??= '0';
@@ -26,6 +26,8 @@ export const CONJUNTO = carro.opcoes[0];
 /* o que o esboço do carro inteiro e o rascunho facetado exportam e as receitas conferem em PONTOS (o módulo já está carregado: é o mesmo de `carro`) */
 export const { RETROVISOR } = await import('../../alta-definicao/carro-inteiro.esboco.mjs');
 export const { TABELA: FACETADO } = await import('../../referencias/sedan-chassi-e-lataria.esboco.mjs');
+export const { linhasDeVao } = await import('../../alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs');
+export const { CABINE, VIDROS, MOLDURAS } = await import('../../alta-definicao/andar-de-cima.esboco.mjs');
 export const { F, PAINEL_DA_FRENTE, PAINEL_DE_TRAS } = await import('../../alta-definicao/frente-e-traseira.esboco.mjs');
 export const PASTA = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -94,6 +96,18 @@ export const interfaceDoEncaixe = (filha, lado) => {
   return { forma: 'plano', papel: lado === 'pai' ? 'recebe' : 'apoia', ponto: e.ponto, normal: lado === 'pai' ? e.normal : neg(e.normal), extensao: e.extensao, referencia: e.referencia };
 };
 
+/** A normal da pele de fora da carroceria de baixo em p (mm), para fora, pelas funções do alvo: na lateral, x = ladoX(z, y); no topo, y = topoY(x, z). O ponto vale pela
+ *  superfície de que ele fica mais perto, e o lado esquerdo é a imagem do direito. */
+export function normalDaPele([x, y, z]) {
+  const s = x < 0 ? -1 : 1; const ax = Math.abs(x); const e = 0.5;
+  if (Math.abs(ax - ladoX(z, y)) <= Math.abs(y - topoY(ax, z))) {
+    const dxdy = (ladoX(z, y + e) - ladoX(z, y - e)) / (2 * e); const dxdz = (ladoX(z + e, y) - ladoX(z - e, y)) / (2 * e);
+    return [s, -dxdy, -dxdz];
+  }
+  const dydx = (topoY(ax + e, z) - topoY(ax - e, z)) / (2 * e); const dydz = (topoY(ax, z + e) - topoY(ax, z - e)) / (2 * e);
+  return [-s * dydx, 1, -dydz];
+}
+
 const m = (mm) => mm / 1000;
 /** Os passos `publicarPorta` de uma etapa, em metro: `portas` é { id: { parte, interface } }, com a interface em mm e a porta ancorada na origem da parte. */
 export function portasEmMetro(passos, portas) {
@@ -112,6 +126,7 @@ const DESCRICOES = [
   [/^soleira(Dir|Esq)$/, 'chapa que veste a soleira do chassi sob as portas', 'painel cortado da chapa de baixo por paineisPorVaos'],
   [/^tampaDoPortaMalas$/, 'chapa da tampa do porta-malas, do pé do vidro traseiro à borda de trás da chapa de baixo, a 4 mm do painel de trás e do teto', 'painel cortado da chapa de baixo por paineisPorVaos'],
   [/^labio/, 'lábio de 14 mm que a chapa dobra para dentro em volta do arco de roda', 'friso com aba de 90 graus sobre a borda do arco da chapa de baixo'],
+  [/^abaDoPainel/, 'aba de borda do painel de trás: a perna de 20 mm que dobra para dentro do carro, a 90 graus, em cada ponta do painel, atrás do vão de 4 mm com a lateral', 'friso com aba sobre a borda livre da última estação do painel, com a cópia espelhada pela simetria'],
   [/^forro/, 'faixa fina por trás de um vão entre painéis, que fecha o fundo dele: a luz que passa pelo vão encontra o forro e não o outro lado do carro', 'gaiolaVarrida de seção retangular ao longo da linha do vão, a 0,5 mm atrás da pele de dentro'],
   [/^teto$/, 'teto com as colunas A, B e C, a calha sobre as portas e os vãos do para-brisa, do vidro traseiro, das janelas das portas e das vigias', 'gaiolaPorEstacoes ao longo de z com simetria em x e raio pedido nas quinas'],
   [/^moldura/, 'moldura de borracha de 14 por 3,9 mm em volta do vão de um vidro, que desce 0,9 mm na chapa', 'friso com perfil retangular sobre a borda do vão, refinado em dois níveis'],

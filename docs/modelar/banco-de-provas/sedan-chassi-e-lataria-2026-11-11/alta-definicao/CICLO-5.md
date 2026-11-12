@@ -129,3 +129,5 @@ O que ainda falta, em ordem:
 8. A vista de trás em `vistas:superficie` e o cache que sobreviva a uma mudança de contato (atrito 14).
 
 Recomendo levar o carro à pessoa para o aceite de forma agora, porque a forma não depende do que falta, e corrigir os itens 1 e 3 no núcleo antes de outra junção com chassi.
+
+O carro foi levado do esboço ao formato de receita do acervo, em cinco etapas, na fatia 4c de 2026-11-12; o relato, com as medidas de cada etapa, os vãos fechados e os declarados e os atritos de ferramenta, está em [`RECEITA.md`](RECEITA.md).

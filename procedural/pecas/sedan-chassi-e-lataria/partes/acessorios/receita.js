@@ -54,6 +54,8 @@ const receita = {
   /* o pé do retrovisor e a maçaneta entram na chapa da porta, que é da peça carroceria; aqui cada um é um grupo solto */
   ilhas: ETAPAS[ETAPA].filter((n) => n !== 'retrovisorDir').map((contem) => ({ contem, motivo: 'o pé do retrovisor e a maçaneta entram na chapa da porta, que é da peça carroceria; nesta peça cada acessório é um grupo solto' })),
   /* Os extremos do retrovisor da direita são os dos pontos de controle da gaiola, e os do esquerdo são a imagem deles. */
+  /* as partes soltas de propósito, para `vao:partes --soltas=recusar` */
+  APOIA: Object.fromEntries(ETAPAS[ETAPA].map((n) => [n, 'o pé do retrovisor e a maçaneta entram na chapa da porta, que é da peça carroceria; nesta peça cada acessório fica solto'])),
   get PONTOS() {
     const pts = Object.values(RETROVISOR.pontosMm);
     const ext = (k, f) => f(...pts.map((p) => p[k]));

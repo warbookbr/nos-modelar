@@ -89,6 +89,7 @@
     "ativar:bancada": "node tools/modelar/ativar-bancada.mjs",
     "malha:conferir": "node tools/modelar/conferir-malha.mjs",
     "malha:lascas": "node tools/modelar/lasca.mjs",
+    "malha:assinatura": "node tools/modelar/assinatura-da-malha.mjs",
     "retrato:acervo": "node tools/modelar/retrato-do-acervo.mjs",
     "ondulacao": "node tools/modelar/ondulacao-da-superficie.mjs",
     "raio:aresta": "node tools/modelar/raio-da-aresta.mjs",

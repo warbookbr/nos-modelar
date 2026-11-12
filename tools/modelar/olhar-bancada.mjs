@@ -17,6 +17,7 @@ import { iniciarRegistro } from './diario.mjs';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
 import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/corte-de-plano.js';
+import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { analisarPeca } from './analise-da-peca.mjs';
@@ -30,7 +31,21 @@ const REPO = resolve(HERE, '../..');
 const OUT = join(REPO, 'tools/bancadas/out');
 /* Onde cada captura grava a sessão própria dela: dentro do que o servidor da captura serve, e numa pasta que o controle de versão ignora. */
 const SESSOES = join(OUT, 'sessoes');
-const VISTAS_VALIDAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
+const VISTAS_VALIDAS = ['isometrica', 'isometrica-traseira', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
+/* A isométrica de trás é a isométrica girada meia volta em torno do eixo vertical que passa pelo alvo da câmera: o mesmo quadro (a caixa é
+   simétrica nesse giro) visto do lado oposto. A bancada não a conhece; a ferramenta a faz na página, depois de a vista isométrica assentar. */
+const VISTA_ISO_TRASEIRA = 'isometrica-traseira';
+const DIRECAO_DAS_VISTAS = Object.freeze({
+  ...Object.fromEntries(Object.entries(VISTAS_BANCADA).map(([nome, v]) => [nome, v.direcao])),
+  [VISTA_ISO_TRASEIRA]: Object.freeze([-1, 0.72, -1]),
+});
+/* A DISTÂNCIA DA CÂMERA QUE MIRA UM PONTO, em mm, quando `--distancia` não vem: o campo visível no ponto tem então uns 410 mm de altura. */
+export const DISTANCIA_PADRAO_DA_MIRA_MM = 600;
+/* De quanto em quanto tempo a captura diz em que passo está, quando alguém escuta (`aoProgredir`). */
+export const INTERVALO_DO_PROGRESSO_MS = 15_000;
+/* Etapas que valem uma linha de aviso ao começar: as que levam de segundos a minutos numa peça pesada. */
+export const ESPERA_DO_ENCERRAMENTO_MS = 5000;
+const ETAPAS_LONGAS = new Set(['medir os contatos da peça', 'subir o servidor', 'abrir o navegador', 'abrir a página', 'esperar o modelo entrar na cena']);
 const MODOS = ['todas', 'contexto', 'isolar'];
 /* Teto de imagens de par por chamada. Uma peça de 24 partes tem 276 pares; sem
    teto, a primeira peça grande vira um despejo que ninguém abre. Três é o que
@@ -73,8 +88,9 @@ function instalarControleDeQuadros() {
   };
 }
 /* Espera a transição de câmera terminar (`controls.enabled` volta a ser verdadeiro no quadro em que ela acaba) e `quadros` quadros
-   depois, e então, se `parar`, para o laço. O limite evita ficar para sempre numa câmera que não termina. */
-function esperarCameraEPararQuadros([quadros, limite, parar]) {
+   depois, e então, se `parar`, para o laço. O limite evita ficar para sempre numa câmera que não termina. Com `ajuste`, a câmera
+   quieta recebe o ajuste da ferramenta (`ajustarCamera`, instalada na página) antes desses quadros, para que a foto saia dele. */
+function esperarCameraEPararQuadros([quadros, limite, parar, ajuste = null]) {
   const ponte = window.__mecanificaBancada;
   const inicio = performance.now();
   return new Promise((resolver) => {
@@ -82,13 +98,110 @@ function esperarCameraEPararQuadros([quadros, limite, parar]) {
       if (restantes <= 0) { if (parar) window.__modelarQuadros.pausar(); resolver(true); return; }
       requestAnimationFrame(() => depois(restantes - 1));
     };
+    const ajustar = () => { if (ajuste) window.__modelarAjuste = window.__modelarAjustarCamera(ajuste); };
     const passo = () => {
-      if (ponte.ambiente().controls.enabled === true) { depois(quadros); return; }
-      if (performance.now() - inicio > limite) { if (parar) window.__modelarQuadros.pausar(); resolver(false); return; }
+      if (ponte.ambiente().controls.enabled === true) { ajustar(); depois(quadros); return; }
+      if (performance.now() - inicio > limite) { ajustar(); if (parar) window.__modelarQuadros.pausar(); resolver(false); return; }
       requestAnimationFrame(passo);
     };
     requestAnimationFrame(passo);
   });
+}
+
+/* O AJUSTE DA CÂMERA FEITO NA PÁGINA, sobre a câmera já quieta, pela ponte e pelo ambiente que a bancada publica (nada de `src/bancada`
+   é tocado). Corre dentro do navegador e por isso é autossuficiente. `ajuste` traz:
+   - `mirar` ({ mm: [x, y, z], distanciaMm, direcao }): a câmera olha o ponto, dado em mm do referencial da peça (a receita, em metro,
+     vezes 1000), de `distanciaMm` e da direção da vista. O quadro é o do campo de 38 graus a essa distância, nas duas projeções, e a
+     distância mínima dos controles cede para a câmera poder chegar perto;
+   - `giro`: gira a câmera meia volta em torno do eixo vertical do alvo (a isométrica de trás);
+   - `fora`: se a câmera ficou dentro da caixa da peça inteira (o `--focar` de uma parte pequena a põe a 0,6 m do centro dela, que
+     em contexto é dentro da cabine), recua-a ao longo do mesmo raio até passar da caixa, e na perspectiva compensa o recuo com o zoom
+     da câmera, de modo que o quadro não muda.
+   Devolve o que fez, e a ferramenta escreve isso no relato. */
+export function ajustarCamera(ajuste) {
+  const amb = window.__mecanificaBancada.ambiente();
+  const cam = amb.camera;
+  const V3 = cam.position.constructor;
+  let raiz = null;
+  for (const filho of amb.scene.children) {
+    let tem = false;
+    filho.traverse((o) => { if (Array.isArray(o.userData?.faces)) tem = true; });
+    if (tem) { raiz = filho; break; }
+  }
+  if (!raiz) return { erro: 'a página não tem a peça na cena' };
+  raiz.updateMatrixWorld(true);
+  const escala = raiz.getWorldScale(new V3()).x || 1;
+  const caixaDaPeca = () => {
+    const min = new V3(Infinity, Infinity, Infinity); const max = new V3(-Infinity, -Infinity, -Infinity);
+    raiz.traverseVisible((o) => {
+      const g = o.geometry; if (!g) return;
+      if (!g.boundingBox) g.computeBoundingBox();
+      if (!g.boundingBox || g.boundingBox.isEmpty()) return;
+      for (const x of [g.boundingBox.min.x, g.boundingBox.max.x]) for (const y of [g.boundingBox.min.y, g.boundingBox.max.y]) for (const z of [g.boundingBox.min.z, g.boundingBox.max.z]) {
+        const p = new V3(x, y, z).applyMatrix4(o.matrixWorld);
+        min.min(p); max.max(p);
+      }
+    });
+    return { min, max };
+  };
+  const dentro = (p, caixa) => p.x > caixa.min.x && p.x < caixa.max.x && p.y > caixa.min.y && p.y < caixa.max.y && p.z > caixa.min.z && p.z < caixa.max.z;
+  const alvo = amb.controls.target;
+  const relato = {};
+  if (ajuste.mirar) {
+    const m = ajuste.mirar.mm;
+    const c = raiz.localToWorld(new V3(m[0] / 1000, m[1] / 1000, m[2] / 1000));
+    const d = (ajuste.mirar.distanciaMm / 1000) * escala;
+    const dir = new V3(...ajuste.mirar.direcao).normalize();
+    const acima = Math.abs(dir.y) > 0.99 ? [0, 0, dir.y > 0 ? -1 : 1] : [0, 1, 0];
+    const el = amb.renderer.domElement;
+    const aspecto = Math.max(0.001, el.clientWidth / Math.max(1, el.clientHeight));
+    const meiaAltura = d * Math.tan((19 * Math.PI) / 180);
+    amb.olharComoReferencia({ centro: [c.x, c.y, c.z], direcao: [dir.x, dir.y, dir.z], acima, meiaAltura, meiaLargura: meiaAltura * aspecto, vista: 'livre', instantaneo: true });
+    amb.controls.minDistance = Math.min(amb.controls.minDistance, d / 2);
+    cam.position.set(c.x + dir.x * d, c.y + dir.y * d, c.z + dir.z * d);
+    cam.up.set(...acima);
+    alvo.copy(c);
+    cam.zoom = 1;
+    cam.lookAt(c);
+    cam.updateProjectionMatrix();
+    relato.mirou = { ponto: m, distanciaMm: ajuste.mirar.distanciaMm, campoMm: Math.round(2 * meiaAltura / escala * 1000) };
+  } else if (ajuste.giro) {
+    const p = cam.position;
+    cam.position.set(2 * alvo.x - p.x, p.y, 2 * alvo.z - p.z);
+    cam.lookAt(alvo);
+    relato.girou = true;
+  }
+  amb.controls.update();
+  cam.updateMatrixWorld(true);
+  const caixa = caixaDaPeca();
+  const antes = cam.position.clone();
+  relato.dentroDaPeca = dentro(antes, caixa);
+  if (ajuste.fora && relato.dentroDaPeca) {
+    const raio = antes.clone().sub(alvo);
+    const d = raio.length();
+    const dir = raio.clone().divideScalar(d || 1);
+    let saida = Infinity;
+    for (const eixo of ['x', 'y', 'z']) {
+      if (Math.abs(dir[eixo]) < 1e-9) continue;
+      const t = ((dir[eixo] > 0 ? caixa.max[eixo] : caixa.min[eixo]) - alvo[eixo]) / dir[eixo];
+      if (t > 0) saida = Math.min(saida, t);
+    }
+    if (Number.isFinite(saida)) {
+      const d2 = saida * 1.05 + 0.02 * escala;
+      if (d2 > d) {
+        cam.position.copy(alvo).addScaledVector(dir, d2);
+        if (cam.isPerspectiveCamera) cam.zoom *= d2 / d;
+        cam.lookAt(alvo);
+        cam.updateProjectionMatrix();
+        amb.controls.maxDistance = Math.max(amb.controls.maxDistance, d2 * 1.5);
+        amb.controls.update();
+        cam.updateMatrixWorld(true);
+        relato.afastou = { deMm: Math.round((d / escala) * 1000), paraMm: Math.round((d2 / escala) * 1000) };
+        relato.dentroDaPeca = false;
+      }
+    }
+  }
+  return relato;
 }
 
 /* DICA APARECE UMA VEZ, E SÓ QUANDO SE APLICA.
@@ -327,6 +440,12 @@ export async function olharBancada({
   estrito = false,
   focar = false,
   revisar = false,
+  /* A câmera que mira um ponto: `mirar` em mm do referencial da peça (`[x, y, z]` ou `"x,y,z"`) e `distancia` da câmera a ele, em mm. */
+  mirar: mirarDeclarado = null,
+  distancia: distanciaDeclarada = null,
+  /* Quem escuta o andamento: recebe uma linha ao começar cada etapa longa e a cada `intervaloDoProgressoMs`. A CLI a liga na saída de erro. */
+  aoProgredir = null,
+  intervaloDoProgressoMs = INTERVALO_DO_PROGRESSO_MS,
   /* Imagem para LEITURA AUTOMÁTICA: sem cromo de interface, sem piso, sem grade
      e sem sombra. `coresPorParte` pinta uma cor por peça e devolve a legenda. */
   auditoria = false,
@@ -365,7 +484,31 @@ export async function olharBancada({
   let sessaoDaCaptura = null;
   let page = null;
   /* o que a captura estava fazendo, para o prazo vencido dizer onde parou */
-  const progresso = { peca, etapa: 'preparar a captura', vista: null, inicio: performance.now(), feitas: 0, total: 0 };
+  /* A etapa é uma propriedade com aviso: ao entrar numa etapa longa a captura diz qual é, antes de começá-la, porque a de medir os
+     contatos executa a receita na thread principal (uns 2 min no furgão) e nada mais pode falar enquanto ela corre. */
+  let etapaAtual = 'preparar a captura';
+  const progresso = {
+    peca, vista: null, inicio: performance.now(), feitas: 0, total: 0,
+    get etapa() { return etapaAtual; },
+    set etapa(nova) {
+      if (nova === etapaAtual) return;
+      etapaAtual = nova;
+      if (aoProgredir && ETAPAS_LONGAS.has(nova)) aoProgredir(`bancada: ${nova}${peca ? ` (${peca})` : ''}, ${Math.round((performance.now() - this.inicio) / 1000)} s desde o começo`);
+    },
+  };
+  const batida = aoProgredir && intervaloDoProgressoMs > 0
+    ? setInterval(() => aoProgredir(`bancada: ainda em '${progresso.etapa}'${progresso.vista ? ` (vista ${progresso.vista})` : ''}, ${Math.round((performance.now() - progresso.inicio) / 1000)} s gastos, ${progresso.feitas} de ${progresso.total} imagens feitas`), intervaloDoProgressoMs)
+    : null;
+  batida?.unref?.();
+  /* UM SINAL NÃO DEIXA O NAVEGADOR E O SERVIDOR PARA TRÁS. Uma captura interrompida (Ctrl-C, `kill`, o prazo de quem a chamou)
+     deixava o Chromium e o servidor do Vite vivos, e o processo antigo seguia segurando a porta até morrer por conta própria; agora
+     o sinal fecha os dois, com um limite, e sai. Só vale para recursos que esta chamada abriu. */
+  const aoSinal = (sinal) => {
+    const limite = new Promise((ok) => setTimeout(ok, 4000));
+    Promise.race([fecharRecursos({ browser, vite, pagina: page, proprios: !compartilhada }), limite]).finally(() => process.exit(sinal === 'SIGINT' ? 130 : 143));
+  };
+  const sinais = compartilhada ? [] : ['SIGINT', 'SIGTERM', 'SIGHUP'];
+  for (const sinal of sinais) process.once(sinal, aoSinal);
   try {
     if (capturarEmMemoria && (saidaDeclarada !== null || relatorioDeclarado !== null)) {
       erroDeUso('captura em memória não aceita --saida ou --relatorio.');
@@ -445,6 +588,19 @@ export async function olharBancada({
        quando a ponte existe — imagem com cromo é pior, não é rodada quebrada. */
     const auditoriaEfetiva = Boolean(auditoria || revisar);
     if (focar && !selecionadas.length) erroDeUso('--focar exige --selecionadas');
+    let mira = null;
+    if (mirarDeclarado !== null && mirarDeclarado !== undefined) {
+      const numeros = Array.isArray(mirarDeclarado) ? mirarDeclarado.map(Number) : String(mirarDeclarado).split(',').map((n) => Number(n.trim()));
+      if (numeros.length !== 3 || !numeros.every(Number.isFinite)) erroDeUso(`--mirar pede x,y,z em milímetros do referencial da peça, por exemplo --mirar=1200,900,-300; veio "${mirarDeclarado}".`);
+      const distancia = distanciaDeclarada === null || distanciaDeclarada === undefined ? DISTANCIA_PADRAO_DA_MIRA_MM : Number(distanciaDeclarada);
+      if (!(distancia > 0)) erroDeUso(`--distancia pede milímetros maiores que zero; veio "${distanciaDeclarada}".`);
+      if (par) erroDeUso('--mirar não se mistura com --par: o par escolhe a vista e o foco por conta própria.');
+      if (revisar) erroDeUso('--mirar não se mistura com --revisar: a revisão confere a silhueta inteira no quadro, e a mira a corta de propósito.');
+      if (focar) erroDeUso('--mirar não se mistura com --focar: os dois decidem o quadro; mire o ponto e escolha as partes com --selecionadas e --modo.');
+      mira = { mm: numeros, distanciaMm: distancia };
+    } else if (distanciaDeclarada !== null && distanciaDeclarada !== undefined) {
+      erroDeUso('--distancia só vale junto de --mirar.');
+    }
     let corte = null;
     if (corteDeclarado) {
       try { corte = normalizarCorte(corteDeclarado); } catch (erro) { erroDeUso(erro.message); }
@@ -508,6 +664,7 @@ export async function olharBancada({
       modo !== 'todas' ? modo : null,
       projecao === 'ortografica' ? 'orto' : null,
       explosao > 0 ? `exp${Math.round(explosao * 100)}` : null,
+      mira ? `mira-${mira.mm.map((n) => String(Math.round(n * 10) / 10).replace('-', 'm').replace('.', 'p')).join('_')}-d${Math.round(mira.distanciaMm)}` : null,
       par ? 'par' : null,
       focar ? 'focado' : null,
       arame === 'raio-x' ? 'raio-x' : (arame ? 'arame' : null),
@@ -662,10 +819,23 @@ export async function olharBancada({
     /* Só a imagem de auditoria para o laço: a interface da bancada (`--tela`) tem aviso e animação que andam por quadro, e parados
        a foto sairia sem o que ela mostraria. */
     const pararQuadros = async () => { if (auditoriaEfetiva) await page.evaluate(() => window.__modelarQuadros?.pausar()); };
-    const aguardarCameraQuieta = async () => {
+    const aguardarCameraQuieta = async (ajuste = null) => {
       progresso.etapa = 'esperar a câmera parar';
-      const terminou = await page.evaluate(esperarCameraEPararQuadros, [QUADROS_DEPOIS_DA_TRANSICAO, Math.max(espera, LIMITE_DA_TRANSICAO_MS), auditoriaEfetiva]);
+      const terminou = await page.evaluate(esperarCameraEPararQuadros, [QUADROS_DEPOIS_DA_TRANSICAO, Math.max(espera, LIMITE_DA_TRANSICAO_MS), auditoriaEfetiva, ajuste]);
       if (!terminou) await page.waitForTimeout(espera);
+    };
+    /* O ajuste da câmera desta vista (ver `ajustarCamera`), ou null quando a vista é a da bancada sem mais nada. */
+    const ajusteDaVista = (vista) => {
+      if (mira) return { mirar: { mm: mira.mm, distanciaMm: mira.distanciaMm, direcao: DIRECAO_DAS_VISTAS[vista] ?? DIRECAO_DAS_VISTAS.isometrica } };
+      const giro = vista === VISTA_ISO_TRASEIRA;
+      const fora = Boolean(focar || par);
+      return giro || fora ? { giro, fora } : null;
+    };
+    let ajusteInstalado = false;
+    const instalarAjuste = async () => {
+      if (ajusteInstalado) return;
+      await page.evaluate((fonte) => { window.__modelarAjustarCamera = (0, eval)(`(${fonte})`); }, ajustarCamera.toString());
+      ajusteInstalado = true;
     };
     const urlDa = (vista, sobrepor = {}) => {
       const alvos = sobrepor.selecionadas ?? selecionadas;
@@ -674,7 +844,7 @@ export async function olharBancada({
       if (ehFixtureHarness) params.set('peca', peca);
       if (sessaoDaCaptura) params.set('sessao', relative(REPO, sessaoDaCaptura).replaceAll('\\', '/'));
       if (alvos.length) params.set('selecionadas', [...alvos].sort().join(','));
-      if (VISTAS_VALIDAS.includes(vista) && vista !== 'isometrica') params.set('vista', vista);
+      if (VISTAS_VALIDAS.includes(vista) && vista !== 'isometrica' && vista !== VISTA_ISO_TRASEIRA) params.set('vista', vista);
       if (projecao === 'ortografica') params.set('projecao', 'ortografica');
       if (modoAlvo !== 'todas') params.set('modo', modoAlvo);
       if (explosao > 0) params.set('explosao', explosao.toFixed(2));
@@ -705,7 +875,7 @@ export async function olharBancada({
         await page.evaluate((alvo) => {
           window.__modelarQuadros?.retomar();
           window.__mecanificaBancada.ambiente().definirVista(alvo, { instantaneo: true });
-        }, vista);
+        }, vista === VISTA_ISO_TRASEIRA ? 'isometrica' : vista);
       }
       progresso.etapa = 'ler o estado da bancada';
       /* o que se lê da peça não muda de uma vista para a seguinte da mesma chamada */
@@ -848,14 +1018,24 @@ export async function olharBancada({
           await page.evaluate(() => window.__mecanificaBancada.enquadrar());
         }
       }
+      const ajuste = ajusteDaVista(vista);
+      if (ajuste) await instalarAjuste();
       if (primeiraDaPagina) {
         progresso.etapa = 'esperar a página assentar';
         await page.waitForTimeout(espera);
-        await pararQuadros();
+        if (ajuste) await aguardarCameraQuieta(ajuste);
+        else await pararQuadros();
       } else {
-        await aguardarCameraQuieta();
+        await aguardarCameraQuieta(ajuste);
       }
       garantirPrazo();
+      if (ajuste) {
+        const feito = await page.evaluate(() => window.__modelarAjuste ?? null);
+        if (feito?.erro) registrar(relato, logger, 'stderr', `  ajuste da câmera recusado: ${feito.erro}`);
+        if (feito?.mirou) registrar(relato, logger, 'stdout', `câmera mirando [${feito.mirou.ponto.join('; ')}] mm de ${feito.mirou.distanciaMm} mm (campo de ${feito.mirou.campoMm} mm de altura no ponto)`);
+        if (feito?.afastou) registrar(relato, logger, 'stdout', `a câmera de ${vista} estava dentro da peça; afastada de ${feito.afastou.deMm} para ${feito.afastou.paraMm} mm do alvo, com o mesmo quadro`);
+        if (feito?.mirou && feito.dentroDaPeca) anotarDica('mira-dentro', 'a câmera da mira está dentro da caixa da peça: o que a cerca (casca, cabine) fica atrás dela ou na frente do ponto; afaste com --distancia, ou isole as partes com --selecionadas --modo=isolar, ou corte com --corte.', vista);
+      }
       progresso.etapa = 'medir o enquadramento';
       const { url: urlReproduzivel, enquadramento } = await page.evaluate(() => {
         const b = window.__mecanificaBancada;
@@ -1052,6 +1232,8 @@ export async function olharBancada({
     }
   } finally {
     if (temporizador) clearTimeout(temporizador);
+    if (batida) clearInterval(batida);
+    for (const sinal of sinais) process.removeListener(sinal, aoSinal);
     await Promise.allSettled(gravacoes);
     const limpezaForcada = encerramentoForcado ? await encerramentoForcado : [];
     if (page && guardarErroDaPagina && typeof page.off === 'function') page.off('pageerror', guardarErroDaPagina);
@@ -1079,7 +1261,7 @@ export async function olharBancada({
 
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
-export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente'];
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia'];
 export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
@@ -1097,7 +1279,9 @@ Captura a peça ou montagem na bancada, sem interface.
   --ambiente=<estudio|ceu|nenhum>  o ambiente de reflexo da bancada; sem ele vale o padrão da página (a imagem de auditoria sai sem ambiente)
   --selecionadas=<a,b>   partes selecionadas; com --modo e --focar
   --modo=<${MODOS.join('|')}>  com --selecionadas: todas, a seleção no contexto, ou só ela
-  --focar                enquadra a câmera nas selecionadas
+  --focar                enquadra a câmera nas selecionadas; se a câmera cair dentro da peça (parte pequena, vista de lado), recua-a para fora com o mesmo quadro
+  --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
+  --distancia=<mm>       com --mirar: a distância da câmera ao ponto (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
   --par=<a,b>            inspeção dirigida de duas partes (isola e escolhe a vista legível)
   --explosao=<0..1>      afasta as partes da montagem
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par
@@ -1116,7 +1300,17 @@ Captura a peça ou montagem na bancada, sem interface.
 Detalhe e leitura das imagens: docs/modelar/usar/PARE-E-ANALISE.md
 `;
 
-export function comoCLI(argv) {
+/** Encerra o processo com `codigo` se, passados `esperaMs`, algo ainda o mantiver vivo; o temporizador não o mantém vivo por si. */
+export function agendarEncerramento(codigo, { esperaMs = ESPERA_DO_ENCERRAMENTO_MS, sair = (c) => process.exit(c), escrever = (t) => process.stderr.write(t) } = {}) {
+  const temporizador = setTimeout(() => {
+    escrever('olhar-bancada: algo mantinha o processo vivo depois da captura; encerrado à força.\n');
+    sair(codigo);
+  }, esperaMs);
+  temporizador.unref();
+  return temporizador;
+}
+
+export function comoCLI(argv, { aoProgredir = null } = {}) {
   if (argv.includes('--ajuda') || argv.includes('--help') || argv.includes('-h')) {
     return Promise.resolve({ ok: true, codigo: 0, stdout: AJUDA, stderr: '' });
   }
@@ -1156,11 +1350,15 @@ export function comoCLI(argv) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(`--prazo pede segundos maiores que zero; veio "${prazo}".`) }));
   }
   /* `--analise`: o passo "Pare e analise" (docs/modelar/usar/PARE-E-ANALISE.md). */
+  if (lido.bandeira('analise') && lido.opcao('mirar')) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--mirar não se mistura com --analise: a análise tira as próprias vistas.') }));
+  }
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
     return analisarPeca({
       peca, parte: lido.opcao('parte'), zoom: lido.opcao('zoom'), zoomAntes: lido.opcao('zoom-antes'),
-      saida: lido.opcao('saida'), res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), olhar: olharBancada,
+      saida: lido.opcao('saida'), res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'),
+      olhar: (opcoes) => olharBancada({ ...opcoes, aoProgredir }),
       ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
     }).then((r) => (r.ok
       ? { ok: true, codigo: 0, stdout: `análise de ${peca}:\n${r.arquivos.map((a) => `  ${a}`).join('\n')}\n`, stderr: '', resultado: { arquivos: r.arquivos } }
@@ -1180,6 +1378,7 @@ export function comoCLI(argv) {
     res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
+    mirar: lido.opcao('mirar') ?? null, distancia: lido.opcao('distancia') ?? null, aoProgredir,
     /* SEM INTERFACE POR PADRÃO desde 2026-09-23. Quem usa este comando é quase
        sempre a IA olhando a peça, e a imagem com painéis, cabeçalho, piso e
        grade deixava a peça numa faixa estreita no meio; a imagem limpa
@@ -1199,10 +1398,14 @@ if (executadoComoCLI) {
   const pedido = process.argv.slice(2).find((a) => a.startsWith('--peca='))?.slice('--peca='.length)
     ?? process.argv.slice(2).find((a) => !a.startsWith('-'));
   const fechar = iniciarRegistro('olhar-bancada', pedido);
-  const resultado = await comoCLI(process.argv.slice(2));
+  const resultado = await comoCLI(process.argv.slice(2), { aoProgredir: (linha) => process.stderr.write(`${linha}\n`) });
   process.stdout.write(resultado.stdout);
   process.stderr.write(resultado.stderr);
   process.exitCode = resultado.codigo;
+  /* O PROCESSO TERMINA QUANDO A CAPTURA TERMINA. Uma captura recusada deixava o processo vivo, com o servidor segurando a porta até o
+     prazo de quem o chamou; algo no Vite ou no navegador (uma conexão aberta, um filho) mantém o laço de eventos. Depois de fechar
+     os recursos, quem ainda estiver vivo espera um pouco e é encerrado com o código da captura. */
+  agendarEncerramento(resultado.codigo);
   /* `arquivos` aqui é a lista PLANEJADA, montada antes da captura. Vai como
      promessa; quem confere o disco é o diário. */
   fechar({
