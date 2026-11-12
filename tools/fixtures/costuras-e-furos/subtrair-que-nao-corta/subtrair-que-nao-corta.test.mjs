@@ -78,4 +78,29 @@ describe('semEfeito pela topologia', () => {
     const a = avisos([cubo(1, 1, [0, 0, 0]), cubo(2, 1, [0.5, 0, 0.5]), cubo(3, 1, [-5, 0, 0]), sub(sel('cubo', 1), sel('cubo', 3), sel('cubo', 2))]);
     expect(a.map((x) => x.ferramenta)).toEqual([1]);
   });
+  /* o L: o cubo 1 unido a uma barra que sai em +x embaixo; o vão do L fica em cima da barra */
+  const L = [cubo(1, 1, [0, 0, 0]), ['cubo', { origemId: 2, larg: 1, alt: 0.3, prof: 1, em: [1, 0, 0] }], ['unir', { origemId: 5, solidos: [sel('cubo', 1), sel('cubo', 2)] }]];
+  it('a ferramenta que fica no vão de um L sem tocá-lo avisa que não cruza a peça, e não que a grade comeu o corte', () => {
+    const [a] = avisos([...L, cubo(3, 0.2, [1, 0.6, 0]), sub(sel('unir', 5), sel('cubo', 3))]);
+    expect(a.motivo).toMatch(/não a cruza/);
+    expect(a.motivo).not.toMatch(/grade/);
+    expect(a.motivo).not.toMatch(/sólido 0/);
+  });
+  it('a ferramenta sem face avisa mesmo quando outra ferramenta cortou a peça', () => {
+    const a = avisos([...L, cubo(3, 0.2, [1, 0.6, 0]), cubo(4, 0.2, [0, 0.9, 0]), sub(sel('unir', 5), sel('cubo', 4), sel('cubo', 3))]);
+    expect(a.map((x) => x.ferramenta)).toEqual([2]);
+  });
+  it('a ferramenta encostada que vem com outra que corta avisa só por ela', () => {
+    const a = avisos([cubo(1, 1, [0, 0, 0]), cubo(2, 1, [1, 0, 0]), cubo(3, 0.2, [0, 0.9, 0]), sub(sel('cubo', 1), sel('cubo', 3), sel('cubo', 2))]);
+    expect(a.map((x) => x.ferramenta)).toEqual([2]);
+  });
+  it('o intersectar de um cubo cheio com uma casca oca cuja cavidade fica dentro dele muda o sólido (a cavidade fica no resultado) e não avisa', () => {
+    const casca = [cubo(1, 2, [0, -0.5, 0]), cubo(2, 0.2, [0, 0.4, 0]), ['subtrair', { origemId: 5, solidos: [sel('cubo', 1), sel('cubo', 2)] }]];
+    expect(avisos([...casca, cubo(3, 1, [0, 0, 0]), ['intersectar', { origemId: 9, solidos: [sel('cubo', 3), sel('subtrair', 5)] }]]).filter((a) => a.op === 'intersectar')).toEqual([]);
+  });
+  it('o intersectar com a peça inteira dentro dos outros avisa, também com três sólidos', () => {
+    const a = avisos([cubo(1, 0.4, [0, 0.3, 0]), cubo(2, 2, [0, -0.5, 0]), cubo(3, 3, [0, -1, 0]), ['intersectar', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2), sel('cubo', 3)] }]]);
+    expect(a).toHaveLength(1);
+    expect(a[0].motivo).toMatch(/inteira dentro dos outros/);
+  });
 });
