@@ -50,12 +50,23 @@ describe('troca de cantos coincidentes: a casca fecha onde o id antigo deixaria 
     expect(m.orfaos).toEqual([]);
     expect(m.arestasSoltas).toBe(0);
   });
-  it('sem fresta a face mantida fica com os ids de sempre: canto com canto não troca id nenhum', () => {
-    const n = executa([C(1, 1, [0, 0, 0]), C(2, 1, [1, 1, 1]), ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
+  it('sem fresta nada troca: a face de um cubo sobre a face menor de outro (tampas opostas desiguais) fecha com as faces mantidas nos ids de entrada', () => {
+    const n = executa([C(1, 1, [0, 0, 0]), ['cubo', { origemId: 2, larg: 1, alt: 0.5, prof: 0.5, em: [1, 0, 0] }], ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
     expect(topologia(n)).toEqual(fechada);
-    /* os dois cubos têm 8 cantos cada e o canto comum fica nos dois, com dois ids: nenhuma face mantida muda de id */
-    expect(n.V.size).toBe(16);
-    expect(n.F.size).toBe(12);
+    /* as quatro faces do segundo cubo que o passo não corta seguem com os vértices de entrada (ids de 8 a 15) */
+    for (const f of n.F.values()) if (f.id >= 6 && f.id < 12) for (const v of f.vs) expect(v < 1000).toBe(true);
+  });
+});
+
+describe('o portão de casca fechada confere os representantes e os ids escritos', () => {
+  const grita = (passos) => executa(passos).orfaos.filter((o) => o.op === 'unir').map((o) => o.motivo);
+  it('dois cubos que só se tocam num canto gritam no unir, com a conta de sempre (0 arestas sem par, 1 vértice com vínculo que não é um laço)', () => {
+    const [m] = grita([C(1, 1, [0, 0, 0]), C(2, 1, [1, 1, 1]), ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
+    expect(m).toMatch(/0 aresta\(s\) dirigida\(s\) sem par, 1 vértice\(s\) com vínculo que não é um laço só/);
+  });
+  it('dois cubos que só se tocam numa aresta gritam no unir, com a conta de sempre (2 arestas sem par, 2 vértices)', () => {
+    const [m] = grita([C(1, 1, [0, 0, 0]), C(2, 1, [1, 1, 0]), ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
+    expect(m).toMatch(/2 aresta\(s\) dirigida\(s\) sem par, 2 vértice\(s\) com vínculo que não é um laço só/);
   });
 });
 
@@ -75,5 +86,18 @@ describe('troca de cantos coincidentes: as quebras de sombra vão pelo mesmo map
     const n = executa([cone, sub, ['unir', { origemId: 9, solidos: [sel('lathe', 1), sel('subdivisao', 2)] }]], P);
     expect(topologia(n)).toEqual(fechada);
     expect(() => assinaturaDaForma(n)).not.toThrow();
+  });
+  it('uma caixa rente ao centro da tampa da gaiola (os cantos coincidem): a casca fecha, nenhuma quebra sai da face nem deixa de ser aresta dela, e o adaptador abre', async () => {
+    const { adaptarThree } = await import('../../../../src/autoria/adaptar-three.js');
+    const caixa = ['cubo', { origemId: 1, larg: 0.3, alt: 0.3, prof: 0.3, em: [0.15, 0.7, 0.15] }];
+    const n = executa([caixa, sub, ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('subdivisao', 2)] }]], P);
+    expect(topologia(n)).toEqual(fechada);
+    for (const f of n.F.values()) for (const [a, b] of f.quebras ?? []) {
+      const i = f.vs.indexOf(a), j = f.vs.indexOf(b);
+      expect(i).toBeGreaterThanOrEqual(0);
+      expect(j).toBeGreaterThanOrEqual(0);
+      expect([1, f.vs.length - 1]).toContain(Math.abs(i - j));
+    }
+    expect(() => adaptarThree(n)).not.toThrow();
   });
 });

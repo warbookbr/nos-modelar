@@ -1001,8 +1001,13 @@ export function criarOperacoesBooleanas(servicos) {
        (achado da revisão, 2026-09-29). Aqui a falha GRITA e o passo aborta
        com 0 V/0 F. */
     {
-      const casca = [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])].filter((P) => new Set(P).size >= 3);
-      const falha = cascaAberta(casca);
+      /* duas conferências: a dos cantos soldados (os representantes, como sempre), que acha o contato não-manifold geométrico (dois cubos que só se tocam num canto ou numa
+         aresta têm ids distintos no ponto de contato, e só o ciclo de representantes o vê), e a dos ids que o passo escreve, que acha a fresta que a solda escondia */
+      const depois = [...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])];
+      const porRepresentante = [...mantidas.map((fid) => cicloRep(st.F.get(fid).vs)), ...depois].filter((P) => new Set(P).size >= 3);
+      const porIdEscrito = [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...depois].filter((P) => new Set(P).size >= 3);
+      const casca = porRepresentante;
+      const falha = cascaAberta(porRepresentante) ?? cascaAberta(porIdEscrito);
       if (falha && extra?.tentativa) return { falhouCasca: falha };
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
