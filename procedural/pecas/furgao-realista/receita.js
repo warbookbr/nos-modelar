@@ -208,7 +208,8 @@ export const TABELA = {
   quina_fresta_ref: 30, // a linha que ordena as colunas da quina da frente, onde a fresta da porta corria antes de recuar (o para-brisa não mudou)
   p_inicio_y: 1330, // a partir daqui, e até o ombro, a quina ganha colunas entre E e D: p1 onde a D antiga ficava e as outras a passo_p
   passo_p: 30, // distância entre as colunas p
-  p_folga_d: 30, // 2026-11-09: a última coluna p fica a pelo menos isto da D, e as p ficam a passo_p da p1 (antes dividiam o vão até a D, e todas trocavam de lugar quando uma sumia): a p1 some com a D a 30 mm dela, e não a 15, e não sobra o nó de células de 12 mm que cortava a crista da coluna no canto do teto
+  p1_folga_d: 1, // 2026-11-12: a p1 (a crista da coluna) fica até a D chegar a 1 mm dela, e não some a 30: ao sumir de uma vez a crista dava um gancho no canto do teto
+  p_folga_d: 30, // 2026-11-09: a última coluna p fica a pelo menos isto da D, e as p ficam a passo_p da p1 (antes dividiam o vão até a D, e todas trocavam de lugar quando uma sumia): as p de 2 em diante somem com a D a 30 mm delas (a p1, que carrega a crista, tem `p1_folga_d`)
   retorno_d_y: 2216, // até onde a coluna D, acima do topo da porta, acaba de voltar para a quina (2280, o ombro, até 2026-11-09: o fim do retorno junto com a morte da p1 deixava o nó da crista em y 2200 a 2230, e agora o nó cai mais baixo, na lateral, onde não corta a crista); as colunas p somem uma por anel pelo caminho, e não de uma vez
   para_brisa_topo_y: 2075, // o anel do topo do vão do para-brisa, que era o do topo da porta antes de ela descer
   coluna_do_meio: 182, // 110 até 2026-11-11, quando a traseira da porta da cabine avançou 72 mm (`porta_cabine_tras_z`): a frente da porta de correr fica onde estava
@@ -1352,8 +1353,8 @@ const receita = {
       { parte: 'carroceria', tipos: ['vinco'], regiao: { min: [-60, 314, -2695], max: [60, 330, -2678] },
         motivo: 'raio de 40 mm do pé da traseira (raio_traseira_base) em toda a largura, visto de perto: a borda de baixo da traseira arredondada, pedida na tabela' },
       ...[1, -1].map((s) => ({
-        parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 906 : -930, 1815, 1458], max: [s > 0 ? 930 : -906, 1850, 1482] },
-        motivo: 'crista da borda da coroa ao longo da coluna do para-brisa (quina de raio 160: desenho da prancha); a caixa é o meio da cadeia, de uns 830 mm desde 2026-11-11; o pé e o canto do teto ficam fora dela',
+        parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 906 : -930, 1815, 1458], max: [s > 0 ? 930 : -906, 1850, 1496] },
+        motivo: 'crista da borda da coroa ao longo da coluna do para-brisa (quina de raio 160: desenho da prancha); a caixa é o meio da cadeia, de uns 810 mm desde 2026-11-12 (a cadeia acaba na p2 que desliza); o pé e o canto do teto ficam fora dela',
       })),
       ...[1, -1].map((s) => ({
         parte: 'carroceria', tipos: ['vinco'], regiao: { min: [s > 0 ? 866 : -916, 2217, 1146], max: [s > 0 ? 916 : -866, 2267, 1196] },

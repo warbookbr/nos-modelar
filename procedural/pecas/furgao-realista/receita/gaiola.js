@@ -197,10 +197,13 @@ export function derivar(T) {
        p_inicio_y até o ombro, que tem as mesmas colunas do teto, cuja cobertura conta as que vêm antes de D. */
     if (temD && an.horizontal && an.y >= T.p_inicio_y && an.y < T.ombro_y) {
       const sR = caminhoQuina(an);
-      if (sR > sE + 1 && sR <= sD - T.p_folga_d) {
+      if (sR > sE + 1 && sR <= sD - T.p1_folga_d) {
         g.push({ col: 'p1', s: sR });
         const n = contaP(an);
         for (let k = 1; k < n; k += 1) g.push({ col: `p${k + 1}`, s: sR + k * T.passo_p });
+        /* com só a p1, a p2 não some de uma vez a 30 mm da D: ela desliza para a p1 enquanto a D chega (fica a `p_folga_d` da D) e some só ao encostar na p1: sumindo de uma vez a crista dava um degrau no canto do teto */
+        const folgaP2 = sD - T.p_folga_d - sR;
+        if (n === 1 && folgaP2 > T.p1_folga_d) g.push({ col: 'p2', s: sR + Math.min(folgaP2, T.passo_p) });
       }
     }
     if (temD) g.push({ col: 'D', s: sD });
