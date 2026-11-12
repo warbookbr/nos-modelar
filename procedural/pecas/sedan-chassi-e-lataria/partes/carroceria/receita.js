@@ -18,8 +18,8 @@
  * rodas (y 364) para as rodas; cada filha publica o mesmo plano com a normal oposta, e a pose sai identidade.
  *
  * A cadeia: a TABELA em mm (os pontos dos encaixes); `derivar` calcula as interfaces das portas; `gerarPassos` põe o recorte, em metro, e as portas. */
-import { CONJUNTO, ETAPAS, ENCAIXES, FACETADO, CABINE, MOLDURAS, VIDROS, linhasDeVao, normalDaPele, contatosDaEtapa, apoiaDaEtapa, folgasDaEtapa, interfaceDoEncaixe, parteDoPlano, portasEmMetro, recorteDaEtapa } from '../_comum/sedan.mjs';
-import { C, yTopoDaCabine } from '../../alta-definicao/alvo.mjs';
+import { CONJUNTO, ETAPAS, ENCAIXES, FACETADO, CABINE, MOLDURAS, VIDROS, PAINEL_DE_TRAS, linhasDeVao, normalDaPele, contatosDaEtapa, apoiaDaEtapa, folgasDaEtapa, interfaceDoEncaixe, parteDoPlano, portasEmMetro, recorteDaEtapa } from '../_comum/sedan.mjs';
+import { C, T, topoY, yTopoDaCabine } from '../../alta-definicao/alvo.mjs';
 import { faixaPorTras } from '../_comum/forro.mjs';
 
 const ETAPA = 'carroceria';
@@ -33,16 +33,51 @@ export const TABELA = {
   /* O FORRO dos vãos entre painéis (`../_comum/forro.mjs`): a faixa de `largura` mm por trás de cada linha de vão listada, de `espessura` mm, com a face de cima `folga` mm
      abaixo da pele de dentro da chapa (que tem `chapa` mm), e um ponto a cada `passo` da curva. `eixos` dá, por linha, a direção do plano da chapa que atravessa o vão. */
   forro: { largura: 24, espessura: 1, folga: 0.5, chapa: 1, passo: 3,
-    eixos: { capo: 'x', tampa: 'x', fimDoParaLama: 'z', entrePortas: 'z', fimDaPortaTraseira: 'z' } },
+    eixos: { capo: 'x', tampa: 'x', fimDoParaLama: 'z', entrePortas: 'z', fimDaPortaTraseira: 'z' },
+    /* O forro do canto do para-choque de trás: a lateral traseira e o painel de trás se olham pela borda, num vão de 4 mm que corre pela lateral, e abaixo de y 550 a aba do painel
+       (que acaba em y 470) deixa passar o raio que desce pelo vão. O forro é uma plaquinha em pé, no plano do painel, 1,5 mm atrás da face de trás dele, que fecha o canal entre
+       a aba e a lateral: `deslocamento` é a distância da borda do painel ao centro da plaquinha (a aba tem a face de fora a 1,9 mm da borda, e a face de dentro da lateral fica
+       a 3,7 a 4,05 mm), `largura` vai de 0,3 mm para dentro da aba até 0,2 mm antes da face de fora da lateral; sobe `comprimento` mm pela borda a partir de y 470 e desce `abaixo`
+       mm, que é onde o raio mais baixo que passa pelo vão corta o plano dela. */
+    cantoDeTras: { deslocamento: 1.9, largura: 5.4, comprimento: 110, abaixo: 8, borda: ['fundo', 'alargado'] },
+    /* O forro do peitoril: o vão de 4 mm do para-lama com o pé do teto, que o forro do vão do para-lama (que acaba no pé da cabine) não cobre. A linha é um L no plano da pele,
+       pela metade do vão: em x = (borda da faixa) - vão/2, de z `de` até o pé do capô menos vão/2, e dali ao longo de x até `ate`, com a quina arredondada por `raio`. */
+    peitoril: { largura: 16, raio: 14, deZ: 698, ateX: 764 },
+  },
 };
 
-/** As faixas do forro, uma por linha de vão (nos dois lados): `{ nome, curva, gaiola }`, em mm. */
+/** As curvas do forro que não são uma linha de vão do esboço: o canto do para-lama com o pé do teto (o peitoril) e a borda do painel de trás, nos dois lados. */
+function linhasExtrasDoForro(Tab) {
+  const F = Tab.forro; const lados = [['Dir', 1], ['Esq', -1]];
+  const extras = [];
+  /* o peitoril: o L pela metade do vão entre a faixa do para-lama e o pé do teto */
+  const { raio, deZ, ateX, largura } = F.peitoril; const xm = T.xCapo + 60 - T.vao / 2; const zm = T.zPeDoCapo - T.vao / 2;
+  const L = [];
+  for (let z = deZ; z <= zm - raio; z += 1) L.push([xm, 0, z]);
+  for (let a = 0; a <= 90; a += 6) { const t = (a * Math.PI) / 180; L.push([xm - raio + raio * Math.cos(t), 0, zm - raio + raio * Math.sin(t)]); }
+  for (let x = xm - raio - 1; x >= ateX; x -= 1) L.push([x, 0, zm]);
+  for (const p of L) p[1] = topoY(p[0], p[2]);
+  for (const [lado, s] of lados) extras.push({ nome: `forroDoPeitoril${lado}`, linha: `peitoril${lado}`, curva: L.map(([x, y, z]) => [s * x, y, z]), across: 'x', largura, normalDaPele });
+  /* o canto de trás: a borda do painel de trás, de baixo para cima, esticada para baixo */
+  const { deslocamento, largura: lg, comprimento, abaixo, borda: [de, ate] } = F.cantoDeTras;
+  const P = (n) => PAINEL_DE_TRAS.pontos[`painelTraseiro_borda_${n}`].map((v) => v * 1000);
+  const a = P(de); const b = P(ate); const comp = Math.hypot(...b.map((v, k) => v - a[k]));
+  const t = b.map((v, k) => (v - a[k]) / comp);
+  const B = [];
+  for (let u = -abaixo; u <= comprimento; u += 1) B.push(a.map((v, k) => v + t[k] * u));
+  for (const [lado, s] of lados) extras.push({ nome: `forroDoCantoDeTras${lado}`, linha: `cantoDeTras${lado}`, curva: B.map(([x, y, z]) => [s * (x + deslocamento), y, z]), across: 'x', largura: lg, normalDaPele: () => [0, 0, -1] });
+  return extras;
+}
+
+/** As faixas do forro, uma por linha de vão (nos dois lados) e as duas do peitoril e do canto de trás: `{ nome, curva, gaiola }`, em mm. */
 export function forrosDosVaos(Tab = TABELA) {
   const F = Tab.forro;
-  return linhasDeVao().filter((l) => (F.eixos[l.nome.replace(/Esq$/, '')] !== undefined)).map((l) => {
+  const dasLinhas = linhasDeVao().filter((l) => (F.eixos[l.nome.replace(/Esq$/, '')] !== undefined)).map((l) => {
     const nome = `forro${l.nome[0].toUpperCase()}${l.nome.slice(1)}`;
-    return { nome, linha: l.nome, gaiola: faixaPorTras({ nome, curva: l.curva, across: F.eixos[l.nome.replace(/Esq$/, '')], largura: F.largura, espessura: F.espessura, fundo: F.chapa + F.folga, passo: F.passo, normalDaPele }) };
+    return { nome, linha: l.nome, curva: l.curva, gaiola: faixaPorTras({ nome, curva: l.curva, across: F.eixos[l.nome.replace(/Esq$/, '')], largura: F.largura, espessura: F.espessura, fundo: F.chapa + F.folga, passo: F.passo, normalDaPele }) };
   });
+  const dasExtras = linhasExtrasDoForro(Tab).map(({ nome, linha, curva, across, largura, normalDaPele: n }) => ({ nome, linha, curva, gaiola: faixaPorTras({ nome, curva, across, largura, espessura: F.espessura, fundo: F.chapa + F.folga, passo: F.passo, normalDaPele: n }) }));
+  return [...dasLinhas, ...dasExtras];
 }
 /* os números de origem do forro: depois do maior do carro inteiro e da aba do painel de trás */
 const ID_DO_FORRO = Math.max(...CONJUNTO.passos.map(([, a]) => a.origemId ?? 0)) + 10;
@@ -61,7 +96,8 @@ const passosDoForro = (Tab) => {
 const CONTATOS_DO_FORRO = [...['A', 'B', 'C'].flatMap((n) => ['Dir', 'Esq'].map((L) => [`montante${n}${L}`, `o forro do vão ao lado do montante ${n} é soldado nele: a faixa passa pelo montante, 0,5 mm abaixo da pele de dentro`])),
   ['paredeCortaFogo', 'o forro do vão do para-lama com a porta, em z 690, é soldado na parede corta-fogo, que fica em z 700, onde a faixa a atravessa'],
   ['suporteDoRadiador', 'o forro do vão do capô com o para-lama é soldado no suporte do radiador, onde a faixa a atravessa'],
-  ['travessaDoPainel', 'o forro do vão do para-lama com a porta, que cruza a faixa de cima em z 690, é soldado na travessa do painel, onde a faixa a atravessa']].map(([membro, motivo]) => ({ par: ['forroDosVaos', membro], motivo }));
+  ['travessaDoPainel', 'o forro do vão do para-lama com a porta, que cruza a faixa de cima em z 690, é soldado na travessa do painel, onde a faixa a atravessa'],
+  ...['Dir', 'Esq'].map((L) => [`lateralTraseira${L}`, 'a plaquinha do forro do canto de trás é soldada na parede da borda da lateral, em que entra 0,5 mm, e na aba do painel de trás, em que entra 0,3 mm'])].map(([membro, motivo]) => ({ par: ['forroDosVaos', membro], motivo }));
 
 /* Os painéis soltos de propósito, com o que os prende fora do esboço. */
 const SOLTAS = Object.fromEntries(['capo', 'portaDianteiraDir', 'portaDianteiraEsq', 'portaTraseiraDir', 'portaTraseiraEsq', 'soleiraDir', 'soleiraEsq', 'tampaDoPortaMalas'].map((contem) => [contem,

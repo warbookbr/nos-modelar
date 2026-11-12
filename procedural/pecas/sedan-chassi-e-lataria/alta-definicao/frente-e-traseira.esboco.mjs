@@ -42,7 +42,7 @@ export const F = {
      o recuo de cada lado, e o alto dele é a altura do ombro, que a coluna dele dá à borda do painel */
   lanterna: { x: [400, 830], y: [715, 890], recuo: { lanternaBaixo: 45, lanternaAlto: 45, lanternaIni: 45, lanternaFim: 43 }, voltas: 3, largura: 7, raio: 18, relevo: [-14, -9, -4] },
   lente: { recuo: 0.8, sobra: 6, espessura: 4 },
-  paraChoque: { frente: { y: [413, 745], fundo: 72, raio: 8, raioDeTras: 3, raioDaPonta: Number(process.env.HD_RAIO_PONTA ?? 6), ponta: 860 }, tras: { y: [457, 745], fundo: 72, raio: 8, raioDeTras: 3, raioDaPonta: Number(process.env.HD_RAIO_PONTA ?? 6), ponta: 856, chanfro: 800 } },
+  paraChoque: { frente: { y: [413, 745], fundo: 72, raio: 8, raioDeTras: 3, raioDaPonta: Number(process.env.HD_RAIO_PONTA ?? 6), ponta: 860, plano: 790 }, tras: { y: [457, 745], fundo: 72, raio: 8, raioDeTras: 3, raioDaPonta: Number(process.env.HD_RAIO_PONTA ?? 6), ponta: 856, chanfro: 800 } },
   tomada: { z: [790, 1760], zCheia: 880, altura: 70, meia: [230, 420], raio: 6 },
 };
 
@@ -119,7 +119,7 @@ function paraChoque(nome, lado) {
   const P = F.paraChoque[lado]; const sinal = lado === 'frente' ? 1 : -1; const [y0, y1] = P.y; const ym = (y0 + y1) / 2;
   /* ciclo 5: a barra vai de ponta a ponta, de -ponta a +ponta, e a ponta tem o vinco com raio no próprio laço (o núcleo cruza as quinas
      da barra com ele). O laço seguinte fica a 4 raios ou mais da ponta (32 mm), e os laços de apoio à mão a 4 e 10 mm do ciclo 4 saíram */
-  const meiaBarra = lado === 'frente' ? [0, 160, 320, 480, 620, 720, 780, 805, P.ponta - 32, P.ponta] : [0, 160, 320, 480, 620, 720, 780, P.chanfro, P.ponta - 32, P.ponta];
+  const meiaBarra = lado === 'frente' ? [0, 160, 320, 480, 620, 720, 780, ...(P.plano ? [P.plano] : []), 805, P.ponta - 32, P.ponta] : [0, 160, 320, 480, 620, 720, 780, P.chanfro, P.ponta - 32, P.ponta];
   const xs = [...meiaBarra.slice(1).reverse().map((x) => -x), ...meiaBarra];
   const lacos = xs.map((xx) => {
     const x = Math.abs(xx);
@@ -128,8 +128,16 @@ function paraChoque(nome, lado) {
     /* nos últimos 32 mm a face de trás não acompanha mais o canto do para-lama, que recua 0,75 mm por mm ali: enviesada, ela dobrava 123 graus
        com a tampa da ponta, e o raio da ponta não cabia na volta recuada da tampa */
     const xFundo = lado === 'frente' ? Math.min(x, P.ponta - 32) : x;
-    if (lado === 'frente') { zb = xFundo <= 780 ? T.zBico + V : Math.max(...[y0, ym - 80, ym, ym + 80, y1].map((y) => zDoCorpoNaFrente(xFundo - 6, y)), 1990) + V; zf = zb + P.fundo * Math.max(FUNDO_MINIMO, 1 - Math.max(0, x - 770) / 160); }
-    else { zb = T.zTraseira - V; const ch = Math.max(0, x - P.chanfro) / (P.ponta - P.chanfro); zf = zb - P.fundo * (1 - (1 - FUNDO_MINIMO) * ch); }
+    if (lado === 'frente') {
+      /* o fundo do para-choque na altura x, sem o plano: de 780 em diante ele acompanha o canto do para-lama */
+      const zbDe = (xf) => (xf <= 780 ? T.zBico + V : Math.max(...[y0, ym - 80, ym, ym + 80, y1].map((y) => zDoCorpoNaFrente(xf - 6, y)), 1990) + V);
+      const zfDe = (xv, xf) => zbDe(xf) + P.fundo * Math.max(FUNDO_MINIMO, 1 - Math.max(0, xv - 770) / 160);
+      zb = zbDe(xFundo); zf = zfDe(x, xFundo);
+      /* o laço do plano: o fundo fica em z do painel mais o vão, como em 780, até onde o painel acaba (x 776); sem ele a barra, que de 780 a 805 recua para abraçar o canto do
+         para-lama, já recua 2 mm na superfície de subdivisão em x 775, e o vão do painel com a barra cai de 4 para 2 mm na quina do painel. A face da frente
+         fica onde a barra a tinha: a frente do laço é a interpolada entre os de 780 e 805. */
+      if (P.plano && x === P.plano) { zb = T.zBico + V; const k = (x - 780) / (805 - 780); zf = zfDe(780, 780) + (zfDe(805, 805) - zfDe(780, 780)) * k; }
+    } else { zb = T.zTraseira - V; const ch = Math.max(0, x - P.chanfro) / (P.ponta - P.chanfro); zf = zb - P.fundo * (1 - (1 - FUNDO_MINIMO) * ch); }
     const [za, zc] = sinal > 0 ? [zb, zf] : [zf, zb];               /* za < zc */
     /* o ponto do meio de cima e de baixo fica a um terço do fundo a partir da quina de dentro (raio 3), para o apoio da quina de fora
        (raio 8, 11,8 mm) caber na metade da face até ele também na ponta, onde a barra tem 36 mm de fundo */

@@ -8,7 +8,7 @@
  * depois de fechá-los com a mesma lista de passos.
  *
  * `npm run vao:partes -- procedural/pecas/sedan-chassi-e-lataria/alta-definicao/carro-pela-receita.mjs --esperado=4 --tolerancia=0.2 --fundo=modelo` */
-import { CONJUNTO } from '../partes/_comum/sedan.mjs';
+import { CONJUNTO, folgasDoCarro } from '../partes/_comum/sedan.mjs';
 import { recortarPassos } from '../partes/_comum/recorte.mjs';
 import carroceria from '../partes/carroceria/receita.js';
 import vidros from '../partes/vidros/receita.js';
@@ -21,6 +21,7 @@ const pares = (lista) => lista.flatMap((r) => r.contatos ?? []);
 
 /** Os contatos do esboço do carro inteiro, com a aba do painel de trás, no vocabulário do esboço (`encosta`, `atravessa`, `folga`), para o relato de contatos. */
 export const CONTATOS_DO_CARRO = [...CONJUNTO.contatos, { par: ['abaDoPainelTraseiro', 'painelTraseiro'], relacao: 'encosta', motivo: 'a aba é a borda do painel dobrada para dentro: nasce na parede da borda da chapa' },
+  { par: ['abaDoPainelTraseiro', 'forroDosVaos'], relacao: 'atravessa', motivo: 'a plaquinha do forro do canto de trás é soldada na aba do painel de trás, em que entra 0,3 mm' },
   ...pares(ETAPAS).filter(({ par }) => par.includes('forroDosVaos')).map(({ par, motivo }) => ({ par, relacao: 'atravessa', motivo }))];
 
 export default {
@@ -34,6 +35,6 @@ export default {
   get TOPO() { return Object.assign({}, ...ETAPAS.map((r) => r.TOPO)); },
   get contatos() { return pares(ETAPAS); },
   /* as folgas de desenho do esboço, entre as partes de qualquer etapa, e as partes soltas de propósito */
-  FOLGAS: CONJUNTO.contatos.filter((c) => c.relacao === 'folga' && c.folga).map(({ par, folga }) => ({ par, esperada: folga.esperada, tolerancia: folga.tolerancia, ...(folga.degrau !== undefined ? { degrau: folga.degrau } : {}) })),
+  FOLGAS: folgasDoCarro(),
   APOIA: Object.fromEntries((CONJUNTO.apoia ?? []).map((a) => [a.parte, a.motivo])),
 };
