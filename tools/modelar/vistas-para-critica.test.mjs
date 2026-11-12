@@ -740,6 +740,45 @@ describe('a vista em corte nos encaixes', () => {
     expect(declarado.folga.folgaMm).toBeCloseTo(0.5, 6);
   });
 
+  it('o contato declarado na montagem chega ao encaixe com o motivo, e o par sem declaração sai sem contato', async () => {
+    const { encaixesDaPeca, contatosDeclaradosDaMontagem } = await import('./vistas-para-critica.mjs');
+    const dado = { auditoriaIntersecoes: { expectativas: [
+      { id: 'pinoEntra', a: { caminho: ['pino'] }, b: { caminho: ['bloco'] }, motivo: 'o pino entra 2 mm no bloco, onde é colado' },
+      { id: 'vigaComChao', a: { caminho: ['viga'] }, b: { caminho: ['chao'] }, motivo: 'a viga assenta no chão' },
+    ] } };
+    const contatos = contatosDeclaradosDaMontagem(dado, 'bloco');
+    expect([...contatos.entries()]).toEqual([['pino', [{ id: 'pinoEntra', motivo: 'o pino entra 2 mm no bloco, onde é colado' }]]]);
+    const encaixes = encaixesDaPeca({ folhas: [folha('bloco', bloco), folha('tampa', tampa), folha('pino', pino)], instancia: 'bloco', contatos });
+    expect(encaixes.find((e) => e.vizinha === 'pino').contatos).toEqual([{ id: 'pinoEntra', motivo: 'o pino entra 2 mm no bloco, onde é colado' }]);
+    expect(encaixes.find((e) => e.vizinha === 'tampa').contatos).toEqual([]);
+  });
+
+  it('o pedido diz, na linha do corte, o motivo do contato declarado e que o toque dele é o esperado; sem declaração, que todo cruzamento é achado', () => {
+    const base = { arquivo: '/p/c.png', origens: ['posição x'], folgaMm: 0, folgaNoCorteMm: 0, cruzam: true, plano: 'x = 1,0 mm, visto de +x', declarado: false };
+    const com = montarPedido({ peca: 'x/y', encaixes: [{ ...base, vizinha: 'carroceria', contatos: [{ id: 'a', motivo: 'o vidro encosta por dentro na borda do vão' }] }] });
+    expect(com).toContain('contato declarado, motivo escrito na declaração: «o vidro encosta por dentro na borda do vão»; o cruzamento ou o toque que esse motivo descreve é o esperado, e só é defeito o que passa do declarado');
+    expect(com).not.toContain('sem contato declarado');
+    const sem = montarPedido({ peca: 'x/y', encaixes: [{ ...base, vizinha: 'tampa' }] });
+    expect(sem).toContain('sem contato declarado para o par: todo cruzamento ou toque entre as duas é achado');
+  });
+
+  it('a caixa de cada parte sai em mm, x y z, da malha executada, e o pedido a põe junto da forma prometida', async () => {
+    const { caixasDasPartes } = await import('./vistas-para-critica.mjs');
+    const roda = caixaNeutra([0, 0, 0], [0.0116, 0.466, 0.466], 'disco');
+    const aro = caixaNeutra([0, 0, 0], [0.0044, 0.466, 0.466], 'aro');
+    const neutro = { V: new Map([...roda.V].map(([i, p]) => [i, p]).concat([...aro.V].map(([i, p]) => [i + 8, p]))), F: new Map([...roda.F.values()].map((f) => [f.id, f]).concat([...aro.F.values()].map((f) => [f.id + 6, { ...f, id: f.id + 6, vs: f.vs.map((v) => v + 8) }]))) };
+    const caixas = caixasDasPartes(neutro);
+    expect([...caixas.keys()]).toEqual(['disco', 'aro']);
+    expect(caixas.get('disco')[0]).toBeCloseTo(11.6, 6);
+    expect(caixas.get('disco')[1]).toBeCloseTo(466, 6);
+    expect(caixas.get('aro')[0]).toBeCloseTo(4.4, 6);
+    const pedido = montarPedido({ ...DADOS, partes: [{ nome: 'bloco', caixaMm: caixas.get('disco'), imagens: [{ arquivo: '/o/p.png', vista: 'direita' }] }, { nome: 'viga', imagens: [] }] });
+    const bloco = pedido.slice(pedido.indexOf('### bloco'), pedido.indexOf('### viga'));
+    expect(bloco).toContain('Forma prometida: caixa de 200 por 100 mm com um furo passante');
+    expect(bloco).toContain('Caixa da parte na malha executada: 11,6 por 466,0 por 466,0 mm (x, y, z)');
+    expect(pedido.slice(pedido.indexOf('### viga'))).not.toContain('Caixa da parte');
+  });
+
   it('a imagem do corte é um PNG com a peça e a vizinha em cores diferentes', async () => {
     const { encaixesDaPeca, imagemDoCorte, COR_DA_PECA, COR_DA_VIZINHA } = await import('./vistas-para-critica.mjs');
     const { dePng } = await import('./leitura-por-regioes.mjs');
@@ -756,15 +795,15 @@ describe('a vista em corte nos encaixes', () => {
   it('o pedido lista cada corte com a vizinha, de onde veio a declaração, a folga e o plano, e diz o que a imagem mostra', () => {
     const encaixes = [
       { arquivo: '/p/corte-bloco-tampa.png', vizinha: 'tampa', origens: ['posição tampaNoBloco'], folgaMm: 0.354, folgaNoCorteMm: 0.354, cruzam: false, plano: 'x = 50,0 mm, visto de +x (direita da imagem -z, cima +y)', declarado: false },
-      { arquivo: '/p/corte-bloco-pino.png', vizinha: 'pino', origens: ['contato declarado pinoEntra'], folgaMm: 0, folgaNoCorteMm: 0, cruzam: true, plano: 'z = 50,0 mm, visto de +z (direita da imagem +x, cima +y)', declarado: true },
+      { arquivo: '/p/corte-bloco-pino.png', vizinha: 'pino', origens: ['contato declarado pinoEntra'], folgaMm: 0, folgaNoCorteMm: 0, cruzam: true, plano: 'z = 50,0 mm, visto de +z (direita da imagem +x, cima +y)', declarado: true, contatos: [{ id: 'pinoEntra', motivo: 'o pino entra 2 mm no bloco' }] },
     ];
     const pedido = montarPedido({ ...DADOS, encaixes });
     expect(titulos(pedido)).toEqual(['Objeto', 'Alvo', 'Referências', 'Modelo', 'Montado', 'Encaixes em corte', 'Sobreposição', 'Partes', 'Critérios de reprovação', 'Perguntas', 'Veredito']);
     const secao = pedido.slice(pedido.indexOf('## Encaixes em corte'), pedido.indexOf('## Sobreposição'));
     expect(secao).toContain('As vistas montadas não decidem a profundidade de um encaixe');
     expect(secao).toContain('a peça em laranja, a vizinha em azul, roxo onde as duas se cruzam');
-    expect(secao).toContain('- com `tampa` (posição tampaNoBloco): folga de 0,35 mm no corte, 0,35 mm entre as malhas; plano x = 50,0 mm, visto de +x (direita da imagem -z, cima +y): /p/corte-bloco-tampa.png');
-    expect(secao).toContain('- com `pino` (contato declarado pinoEntra): as duas se cruzam ou se tocam no corte, 0,00 mm entre as malhas; plano z = 50,0 mm, visto de +z (direita da imagem +x, cima +y), declarado: /p/corte-bloco-pino.png');
+    expect(secao).toContain('- com `tampa` (posição tampaNoBloco): folga de 0,35 mm no corte, 0,35 mm entre as malhas; sem contato declarado para o par: todo cruzamento ou toque entre as duas é achado; plano x = 50,0 mm, visto de +x (direita da imagem -z, cima +y): /p/corte-bloco-tampa.png');
+    expect(secao).toContain('- com `pino` (contato declarado pinoEntra): as duas se cruzam ou se tocam no corte, 0,00 mm entre as malhas; contato declarado, motivo escrito na declaração: «o pino entra 2 mm no bloco»; o cruzamento ou o toque que esse motivo descreve é o esperado, e só é defeito o que passa do declarado; plano z = 50,0 mm, visto de +z (direita da imagem +x, cima +y), declarado: /p/corte-bloco-pino.png');
   });
 });
 

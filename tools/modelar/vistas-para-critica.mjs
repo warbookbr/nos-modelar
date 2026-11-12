@@ -339,7 +339,7 @@ export function contornosDasReferencias({ imagens = [], citadas = [], existe = e
  * `peca` é o nome da peça; `plano` o `PLANO` normalizado (ou null); `orientacao` a do esboço (ou null); `alvo` é
  * `{ imagem, unidade }` quando a receita refina um esboço (e null sem); `referencias` as imagens `{ caminho }`; `modelo` as imagens
  * do conjunto `{ arquivo, vista }` e `arame` as da malha `{ arquivo, vista, tipo }`; `montado` é `{ instancia, imagens: [{ arquivo,
- * vista }] }` ou null; `sobreposicao` é `{ arquivos, notas }` ou null; `partes` são `{ nome, imagens: [{ arquivo, vista }] }` na ordem do
+ * vista }] }` ou null; `sobreposicao` é `{ arquivos, notas }` ou null; `partes` são `{ nome, imagens: [{ arquivo, vista }], caixaMm? }` (a caixa em mm, x y z, da malha executada) na ordem do
  * plano; `perguntas` as perguntas específicas da peça; `superficie` é `{ rasante: [{ arquivo, vista, azimute, iluminada }], curvatura: [{ arquivo,
  * vista }] }` na peça de lataria, ou null; `contornos` os contornos em mm de um lado (`contornosDasReferencias`); `encaixes` os cortes nos
  * encaixes com as vizinhas (`cortesDosEncaixes`); `anteriores` os pontos de rodadas anteriores que quem conduz atribuiu ao plano, às
@@ -441,10 +441,11 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
 
   if (partes.length) {
     L.push('## Partes', '', 'Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência.', '');
-    for (const { nome, imagens } of partes) {
+    for (const { nome, imagens, caixaMm = null } of partes) {
       const prometida = plano?.partes.find((p) => p.nome === nome);
       L.push(`### ${nome}`, '');
       if (prometida) L.push(`Forma prometida: ${prometida.forma}`, '', `Técnica prometida: ${prometida.tecnica}`, '');
+      if (caixaMm) L.push(`Caixa da parte na malha executada: ${caixaMm.map((n) => mmTexto(n).replace(' mm', '')).join(' por ')} mm (x, y, z); a vista isolada não tem escala, e o tamanho de uma parede ou de um disco se julga por esta caixa.`, '');
       L.push(...lista(imagens.map(imagem)), '');
     }
   }
@@ -969,6 +970,24 @@ export function imagemDoCorte({ peca, vizinha, plano, daPeca, daVizinha, folga, 
   return paraPng(im);
 }
 
+/* ---------- a caixa de cada parte ---------- */
+
+/** A caixa de cada parte da malha executada (`neutro` em metro), em mm e na ordem x, y, z: `Map(parte → [dx, dy, dz])`. */
+export function caixasDasPartes(neutro) {
+  const caixas = new Map();
+  for (const face of neutro?.F?.values?.() ?? []) {
+    if (typeof face.parte !== 'string' || !face.parte) continue;
+    if (!caixas.has(face.parte)) caixas.set(face.parte, { min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] });
+    const c = caixas.get(face.parte);
+    for (const id of face.vs ?? []) {
+      const p = neutro.V.get(id);
+      if (!p) continue;
+      for (let k = 0; k < 3; k++) { if (p[k] < c.min[k]) c.min[k] = p[k]; if (p[k] > c.max[k]) c.max[k] = p[k]; }
+    }
+  }
+  return new Map([...caixas].filter(([, c]) => c.min.every(Number.isFinite)).map(([nome, c]) => [nome, c.max.map((x, k) => (x - c.min[k]) * MM_POR_METRO)]));
+}
+
 /* ---------- os encaixes da peça com as vizinhas ---------- */
 
 /** As vizinhas que a montagem (o JSON salvo) declara para a `instancia`: `Map(vizinha → [origem])`, pelas relações, posições, vínculos
@@ -985,6 +1004,20 @@ export function vizinhasDeclaradas(dado, instancia) {
   for (const p of dado.posicoes ?? []) juntar(p.instancia, p.em?.instancia, `posição ${p.id}`);
   for (const v of dado.vinculos ?? []) juntar(v.alvo?.instancia, v.de?.instancia, `vínculo ${v.id}`);
   for (const e of dado.auditoriaIntersecoes?.expectativas ?? []) juntar(e.a?.caminho?.[0], e.b?.caminho?.[0], `contato declarado ${e.id}`);
+  return mapa;
+}
+
+/** Os contatos que a montagem declara à auditoria entre a `instancia` e cada outra: `Map(vizinha → [{ id, motivo }])`. O formato salvo traz só o
+ *  par e o motivo (`auditoriaIntersecoes.expectativas`); a relação e o valor esperado, quando existirem, estão escritos no motivo. */
+export function contatosDeclaradosDaMontagem(dado, instancia) {
+  const mapa = new Map();
+  for (const e of dado.auditoriaIntersecoes?.expectativas ?? []) {
+    const a = e.a?.caminho?.[0]; const b = e.b?.caminho?.[0];
+    const outra = a === instancia ? b : b === instancia ? a : null;
+    if (!outra || outra === instancia) continue;
+    if (!mapa.has(outra)) mapa.set(outra, []);
+    mapa.get(outra).push({ id: e.id, motivo: e.motivo });
+  }
   return mapa;
 }
 
@@ -1018,9 +1051,9 @@ export function planoQueCorta(plano, A, B, raio) {
  * Os encaixes da peça com as vizinhas, medidos numa montagem já resolvida: para cada outra peça declarada como vizinha ou a até
  * `alcance` mm, os dois pontos mais próximos e o plano do corte; com um corte declarado na receita (`CRITICA.cortes`: `{ vizinha,
  * ponto, normal }` em mm no mundo da montagem), o plano é o dele. Devolve os `limite` de menor folga, cada um com os segmentos das
- * duas seções e a folga no corte: `[{ vizinha, origens, folgaMm, plano, daPeca, daVizinha, folga, declarado }]`.
+ * duas seções e a folga no corte: `[{ vizinha, origens, folgaMm, plano, daPeca, daVizinha, folga, declarado, contatos }]`, com `contatos` os `{ id, motivo }` da montagem para o par.
  */
-export function encaixesDaPeca({ folhas, instancia, declaradas = new Map(), cortesDeclarados = [], alcance = ALCANCE_DO_ENCAIXE_MM, limite = LIMITE_DE_CORTES }) {
+export function encaixesDaPeca({ folhas, instancia, declaradas = new Map(), contatos = new Map(), cortesDeclarados = [], alcance = ALCANCE_DO_ENCAIXE_MM, limite = LIMITE_DE_CORTES }) {
   const minha = folhas.filter((f) => f.caminho[0] === instancia);
   const A = minha.flatMap((f) => triangulosNoMundo(f.neutro, f.pose, f.caminho));
   const porVizinha = new Map();
@@ -1051,7 +1084,7 @@ export function encaixesDaPeca({ folhas, instancia, declaradas = new Map(), cort
     }
     const folgaMm = perto?.folgaMm ?? folga?.folgaMm ?? null;
     if (folgaMm === null) continue;
-    encaixes.push({ vizinha: nome, origens, folgaMm, plano, daPeca, daVizinha, folga, declarado: Boolean(declarado) });
+    encaixes.push({ vizinha: nome, origens, folgaMm, plano, daPeca, daVizinha, folga, declarado: Boolean(declarado), contatos: [...(contatos.get(topo) ?? [])] });
   }
   return encaixes.sort((a, b) => a.folgaMm - b.folgaMm || (a.vizinha < b.vizinha ? -1 : 1)).slice(0, limite);
 }
@@ -1075,20 +1108,28 @@ export async function cortesDosEncaixes({ montagem, pasta, cortesDeclarados = []
   }
   const resolvida = await resolverMontagemPersistida(parcial, carregadoresDeReceitas(receitas));
   const encaixes = encaixesDaPeca({
-    folhas: folhasDaMontagem(resolvida), instancia: montagem.instancia, declaradas: vizinhasDeclaradas(parcial, montagem.instancia), cortesDeclarados,
+    folhas: folhasDaMontagem(resolvida), instancia: montagem.instancia, declaradas: vizinhasDeclaradas(parcial, montagem.instancia), contatos: contatosDeclaradosDaMontagem(parcial, montagem.instancia), cortesDeclarados,
   });
   const cortes = encaixes.map((e) => {
     const arquivo = join(pasta, `corte-${montagem.instancia}-${e.vizinha.replace(/\//g, '-')}.png`);
     writeFileSync(arquivo, imagemDoCorte({ peca: montagem.instancia, vizinha: e.vizinha, plano: e.plano, daPeca: e.daPeca, daVizinha: e.daVizinha, folga: e.folga, folgaMm: e.folgaMm }));
     return {
       arquivo, vizinha: e.vizinha, origens: e.origens, folgaMm: e.folgaMm, folgaNoCorteMm: e.folga?.folgaMm ?? null, cruzam: e.folga?.cruzam ?? false,
-      plano: textoDoPlano(e.plano), declarado: e.declarado,
+      plano: textoDoPlano(e.plano), declarado: e.declarado, contatos: e.contatos,
     };
   });
   return { cortes, aviso: null };
 }
 
 const mmTexto = (n) => `${virgula(n, n < 10 ? 2 : 1)} mm`;
+
+/* O que a declaração do par diz sobre o cruzamento ou o toque do corte. O formato da declaração guarda só o motivo, e a relação (encosta, atravessa,
+   folga) e o valor esperado vão nele; sem declaração, todo cruzamento ou toque é achado. */
+function leituraDoContato(contatos = []) {
+  if (!contatos.length) return 'sem contato declarado para o par: todo cruzamento ou toque entre as duas é achado';
+  const motivos = contatos.map((c) => `«${c.motivo}»`).join('; ');
+  return `contato declarado, motivo escrito na declaração: ${motivos}; o cruzamento ou o toque que esse motivo descreve é o esperado, e só é defeito o que passa do declarado`;
+}
 
 function secaoDosEncaixes(encaixes) {
   return [
@@ -1101,7 +1142,7 @@ function secaoDosEncaixes(encaixes) {
     ...lista(encaixes.map((e) => {
       const corte = e.folgaNoCorteMm === null ? 'sem as duas peças no corte'
         : e.cruzam ? 'as duas se cruzam ou se tocam no corte' : `folga de ${mmTexto(e.folgaNoCorteMm)} no corte`;
-      return `com \`${e.vizinha}\` (${e.origens.join('; ')}): ${corte}, ${mmTexto(e.folgaMm)} entre as malhas; plano ${e.plano}${e.declarado ? ', declarado' : ''}: ${e.arquivo}`;
+      return `com \`${e.vizinha}\` (${e.origens.join('; ')}): ${corte}, ${mmTexto(e.folgaMm)} entre as malhas; ${leituraDoContato(e.contatos)}; plano ${e.plano}${e.declarado ? ', declarado' : ''}: ${e.arquivo}`;
     })), '',
   ];
 }
@@ -1305,6 +1346,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     sobreposicaoDeCortes: async (opcoes) => (await import('./sobreposicao-de-cortes.mjs')).sobreposicaoDeCortes(opcoes),
     cortesDosEncaixes,
     vistasDeSuperficie,
+    caixasDasPartes: async (arquivo, rec) => caixasDasPartes((await import('./entrada-de-medida.mjs')).executarReceitaGuardada(arquivo, rec).executada.neutro),
     ...dependencias,
   };
   const blender = Object.hasOwn(dependencias, 'blender') ? dependencias.blender : doAmbiente('BLENDER');
@@ -1460,6 +1502,11 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     montadaNoPedido = { instancia: montada.instancia, imagens: entram, ...(fora.length ? { fora } : {}) };
   }
 
+  /* a caixa de cada parte vem da malha que a receita executa, e a falta dela só tira a linha do pedido */
+  let caixas = new Map();
+  if (partes.length) {
+    try { caixas = await dep.caixasDasPartes(caminho, receita); } catch (erro) { avisos.push(`sem a caixa das partes no pedido: ${erro.message}`); }
+  }
   const orientacao = dados?.orientacao ?? null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);
   const pedido = montarPedido({
@@ -1482,7 +1529,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     ],
     montado: montadaNoPedido,
     sobreposicao: sobreposicao ? { arquivos: sobreposicao.arquivos, notas: sobreposicao.notas } : null,
-    partes: porParte.map(({ parte, resultado }) => ({ nome: parte, imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
+    partes: porParte.map(({ parte, resultado }) => ({ nome: parte, ...(caixas.get(parte) ? { caixaMm: caixas.get(parte) } : {}), imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
     perguntas: [...(perguntas.todas ?? []), ...(declarado ? [lerPergunta(PERGUNTA_DO_ALVO, 'a pergunta do alvo')] : [])],
     superficie,
   });
