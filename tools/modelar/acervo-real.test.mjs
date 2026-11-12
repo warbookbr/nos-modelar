@@ -42,9 +42,10 @@ const SEGUNDOS_POR_ALVO = 2;
    vão à booleana da chapa inteira, 140 dos 207 s de uma execução local, e o furgão foi a 506 s no CI. O teto vai a 860 s e o
    prazo a 1.000 s até o plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` fazer os oito recortarem. Com ele, os 19 vãos
    recortam, e uma execução local caiu de 207 s para 77 s; pela mesma razão da máquina local para o CI (207 s para 506 s nas
-   duas execuções), o furgão ficaria em cerca de 190 s no CI. Medido no CI em 2026-11-12, ele levou 104 s nas duas execuções, e o
-   teto fica em 180 s, 1,7 vez isso, com o prazo do teste em 600 s. */
-const PECAS_PESADAS = { 'furgao-realista': 180 };
+   duas execuções), o furgão ficaria em cerca de 190 s no CI. Medido no CI em 2026-11-12, levou 104 s numa execução da bateria e
+   188 s na seguinte, com a receita igual (a execução local foi de 83 s nas duas): a máquina do CI varia quase o dobro de uma
+   execução para outra, e o teto é 1,7 vez a maior medida, 320 s, com o prazo do teste em 600 s. */
+const PECAS_PESADAS = { 'furgao-realista': 320 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);

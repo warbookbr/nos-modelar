@@ -71,8 +71,16 @@ conferir, e entra na receita marcado assim.
   trilho teria 4,80 m. A montagem mostra as duas e a escolha é da pessoa.
 - Fileira: cerca de 4,33 m de painéis com folgas de 2 cm, e cerca de 4,45 m com os grampos de ponta lado a lado dos dois lados do
   painel de 30 mm; a conferir contra o trilho de 4,55 m.
-- Pendentes da pessoa: a inclinação do telhado, a distância entre as vigas e quantas são da beirada à cumeeira, e as medidas do
-  perfil visto de ponta, do suporte em L e dos grampos.
+- Telhado: telha ondulada de fibrocimento de 6 mm, no padrão da norma (gomo de 177 mm, telha de 1,10 m de largura e 1,05 m
+  útil, comprimentos de 1,22 a 3,66 m, sobreposição de 14 cm, ou 20 cm em pouca inclinação). A água tem duas fileiras de telhas
+  da beirada à cumeeira; as fotos da pessoa mostram uma fileira de parafusos junto da beirada e outra logo acima da sobreposição,
+  e nenhuma entre elas, o que dá uma viga na beirada, uma na sobreposição e uma na cumeeira, a cerca de um comprimento de telha
+  uma da outra. Com as vigas a mais de 90 cm, os dois trilhos não caem os dois sobre viga a 90 cm um do outro: a montagem mostra
+  isso, e as saídas (madeira a mais entre as vigas, ou outra disposição dos trilhos) são da pessoa. A água é bem maior que a
+  fileira de 4,45 m: 25 gomos (4,4 m) são só o trecho de uma das fotos, e a panorâmica mostra perto do dobro. A inclinação não
+  muda as contas e entra como 15 graus, a confirmar.
+- Pendentes da pessoa: a distância, medida descendo o telhado, entre a fileira de parafusos da beirada e a da sobreposição, o
+  comprimento da água ao longo da beirada, e as medidas do perfil visto de ponta, do suporte em L e dos grampos.
 
 ## Gate de saída
 
