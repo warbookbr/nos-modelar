@@ -233,7 +233,7 @@ const AJUDA = `npm run vista:rapida -- <esboço ou peça> --vista=<vista> --said
     [--cores=parte:#rrggbb,...] [--direcao=x,y,z] [--liso=${LISO_PADRAO}] [--recorte=x0,y0,z0,x1,y1,z1] [--ate-passo=N] [--composicoes=<módulo>]
 
 O alvo é um esboço (.esboco.json ou módulo) ou uma receita de peça, pelo nome (furgao-realista, braco-robotico/base) ou pelo caminho.
---recorte é uma caixa em mm do referencial da peça: a imagem enquadra a caixa e mostra só o que ela toca. --ate-passo=N executa a
+--recorte é uma caixa em mm do referencial da peça: a imagem enquadra a caixa (margem 0, salvo --margem) e mostra só o que ela toca. --ate-passo=N executa a
 receita só até o passo N, para a chapa de uma peça grande sem os passos que vêm depois.
 
 Desenha a opção sombreada numa câmera ortográfica, sem navegador, sobre o fundo do painel da folha do esboço: a imagem de trabalho
@@ -279,7 +279,7 @@ export function lerArgumentos(argv) {
   return {
     arquivo, saida: valor('saida'), vista, direcao, cores, recorte, atePasso, composicoes: valor('composicoes'),
     opcao: inteiro('opcao', 1, 1), largura: inteiro('largura', LARGURA_PADRAO, 8),
-    margem: numero('margem', MARGEM_PADRAO, (n) => n >= 0 && n < 2, 'um número entre 0 e 2'),
+    margem: numero('margem', recorte ? 0 : MARGEM_PADRAO, (n) => n >= 0 && n < 2, 'um número entre 0 e 2'),
     liso: numero('liso', LISO_PADRAO, (n) => n >= 0 && n < 180, 'graus entre 0 e 180'),
   };
 }
