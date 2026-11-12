@@ -381,12 +381,12 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     const pg = pontos(lg); const ng = newell(pg); const mg = norma(ng);
     if (!(mg > 0)) return no('fusão: a vizinha não tem área');
     const u = [ng[0] / mg, ng[1] / mg, ng[2] / mg];
-    /* o canto da lasca fora do plano da vizinha não recusa por si: a fusão deixa o polígono não plano, e quem diz se a superfície passou da tolerância é o desvio entre remendos, medido
-       abaixo nos cantos, nos pontos médios e no centro (um canto a 0,17 mm do plano que a face de 1,6 m tem de borda a borda dá desvio de 5 µm). Só o canto que sai do plano mais
-       que 8 vezes a tolerância recusa aqui, sem a conta do desvio */
+    /* o canto da lasca precisa estar no plano da vizinha dentro da tolerância: a face que sai da fusão é um polígono que a medida de contatos e a exportação triangulam cada uma a seu modo,
+       e um canto fora do plano pode virar um triângulo que sai da superfície por tanto quanto ele sai. O desvio entre remendos, abaixo, mede só os triângulos em leque, e por isso não
+       substitui esta conta (uma versão que deixava 8 vezes a tolerância moveu o vão de 0,5 mm do montante com o teto, de 0,50 para 0,80 mm no p95) */
     let fora = 0;
     for (const v of restoF) fora = Math.max(fora, Math.abs(dot(u, sub(pos(v), pg[0]))));
-    if (fora > 8 * tolerancia) return no('fusão: o canto da lasca sai do plano da vizinha além da tolerância');
+    if (fora > tolerancia) return no('fusão: o canto da lasca sai do plano da vizinha além da tolerância');
     const pj = pontos(junta);
     let concava = false;
     for (let i = 0; i < pj.length; i += 1) {

@@ -101,6 +101,28 @@ export const FOLGAS_MEDIDAS = [
     motivo: 'a borda do painel de trás segue a da lateral por trechos retos entre as colunas, e a lateral tem o degrau do ombro (y 890) e a quina da cintura de raio 6: o vão sai de 2,03 a 4,63 mm (p05 e p95), com 1,39 mm no canto de cima (x 856, y 971) e 2,28 no ombro' },
   { pares: [['painelTraseiro', 'tampaDoPortaMalas']], folga: { esperada: 3.9, tolerancia: 0.2, degrau: 0.3 },
     motivo: 'o vão é de 4,00 a 4,05 mm em toda a borda de cima e cai a 3,26 mm só no canto com a lateral (x 757, y 971), onde a borda do painel de trás vira a quina da cintura; o p05 é de 3,73' },
+  /* Os 16 pares de apoio do chassi declarados em 0,5 ± 0,5 e medidos com p95 de 3 a 11 mm (rodada 2 de 2026-11-12), mais os dois do montante A com o teto, que a limpeza das lascas deixou de 0,50 a 0,80. A
+     declaração estava errada, e a forma não: o 0,5 do desenho é a distância 3D da pele de dentro da chapa ao membro (de 0,46 a 0,50 mm, na medida de cada linha), e o `vao:partes` mede o vão de borda a borda ao
+     longo da linha comum, que sobe onde o membro acaba antes da borda do painel. A malha do chassi é a mesma a menos de 1 nm (comparada com a do commit anterior, parte por parte), e por isso a faixa é a que a
+     medida acha, com 0,05 mm de margem, e não o que a forma deveria ter. */
+  { pares: [...DOIS_LADOS('montanteADir', 'portaDianteiraDir')], folga: { esperada: 5.87, tolerancia: 5.27 },
+    motivo: 'o montante A (z 600 a 696) assenta a 0,5 mm da borda da porta no pé da dobradiça, em z 688 (3D mínimo de 0,46 a 0,47); no resto da linha comum a borda do montante fica de 0,7 a 11 mm da da porta, onde ele acaba antes dela' },
+  { pares: [...DOIS_LADOS('paraLamaDir', 'paredeCortaFogo')], folga: { esperada: 9.21, tolerancia: 1.37 },
+    motivo: 'a parede corta-fogo (z 700 a 703) fica de 7,9 a 10,5 mm atrás da borda do para-lama (z 690); o apoio de 0,5 mm é a distância 3D de 0,48 mm entre as peles, em x 875' },
+  { pares: [...DOIS_LADOS('soleiraDir', 'soleiraDoChassiDir')], folga: { esperada: 5.47, tolerancia: 2.6 },
+    motivo: 'a soleira do chassi apoia a 0,5 mm da chapa da soleira (3D mínimo de 0,50), e a borda dela fica de 2,9 a 8,0 mm da borda da chapa ao longo dos 1.010 mm da linha' },
+  { pares: [...DOIS_LADOS('lateralTraseiraDir', 'montanteCDir')], folga: { esperada: 8.06, tolerancia: 0.11 },
+    motivo: 'o montante C apoia a 0,5 mm da pele de dentro da lateral (3D mínimo de 0,50), e o batente dele fica a 8,0 a 8,1 mm da borda da lateral' },
+  { pares: [['anteparoTraseiro', 'tampaDoPortaMalas']], folga: { esperada: 4.93, tolerancia: 2.79 },
+    motivo: 'a tampa assenta 2 mm acima do topo do anteparo, e a borda do anteparo (z -1360 a -1340) fica de 2,2 a 7,7 mm da da tampa ao longo dos 3 m da linha (3D mínimo de 1,77)' },
+  { pares: [['capo', 'suporteDoRadiador']], folga: { esperada: 3.89, tolerancia: 3.13 },
+    motivo: 'o capô assenta a 0,5 mm do topo do suporte do radiador (3D mínimo de 0,50), e a borda do suporte fica de 0,8 a 7,0 mm da do capô ao longo dos 3,1 m da linha' },
+  { pares: [...DOIS_LADOS('montanteBDir', 'portaDianteiraDir'), ...DOIS_LADOS('montanteBDir', 'portaTraseiraDir')], folga: { esperada: 3.23, tolerancia: 2.78 },
+    motivo: 'o montante B (z -75 a -15) fica a 0,5 mm da porta no pé da coluna (3D mínimo de 0,50), e a borda dele fica de 0,5 a 6,0 mm da da porta ao longo dos 1.184 mm da linha' },
+  { pares: [...DOIS_LADOS('anteparoTraseiro', 'lateralTraseiraDir')], folga: { esperada: 1.75, tolerancia: 1.3 },
+    motivo: 'o anteparo (z -1360 a -1340) assenta a 0,5 mm da pele de dentro da lateral (3D mínimo de 0,497) no pé, e a borda dele fica a 0,5 mm na metade da linha (mediana) e a 3,0 a 3,7 mm (p95 e máximo), na quina de cima' },
+  { pares: [...DOIS_LADOS('montanteADir', 'teto')], folga: { esperada: 0.66, tolerancia: 0.21 },
+    motivo: 'o montante A apoia a 0,5 mm do teto (3D mínimo de 0,499, mediana de 0,50) e a borda dele sobe a 0,8 mm (p95) e a 1,24 mm (máximo, em x 805 e z 696); a linha comum que a medida amostra passou de 88 a 241 mm depois da união das lascas da borda, com a malha igual a 1 nm' },
 ];
 const ajusteDe = ([a, b]) => FOLGAS_MEDIDAS.find((f) => f.pares.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
 /** A folga declarada de um contato `folga` do esboço, com o valor medido no lugar do 4,1 ± 0,1 onde `FOLGAS_MEDIDAS` o corrige. */

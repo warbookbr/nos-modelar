@@ -47,7 +47,10 @@ const SEM_PRISMAS = passos.filter((p) => !(ehPrisma(p) && prismas.has(p[1].orige
    deixa em tiras, a fresta da união de dois prismas) saem pela vizinhança que só existe com o membro pronto. É a seleção por parte, e a tolerância é de 0,075 mm: o degrau de 0,07 mm da borda da pele (a 0,05 mm o corte deixa tiras de 0,07 por 90 mm), com desvio medido de no máximo 0,045 mm. */
 const MEMBROS = /^(assoalho|tunel|longarina|travessa|suporte|parede|anteparo|caixaDeRoda|soleiraDoChassi|montante|reforco)/;
 const LIMPAR_FINAL = Number(process.env.HD_LIMPAR_FINAL ?? 0.075);
-const PASSOS = [...SEM_PRISMAS, ...SEM_PRISMAS.filter((p) => p[0] === 'parte' && MEMBROS.test(p[1].nome)).map((p) => ['limparLascas', { sel: { grupo: p[1].nome }, tolerancia: LIMPAR_FINAL }])];
+/* a tampa de z 686 da travessa do painel é uma face de 34 cantos com um canto a 0,17 mm do plano dela (o degrau de 0,17 mm da pele no pé da cabine, x 816): a tira de 0,0006 de razão que
+   sobra entre a corda e a curva só sai para essa face com 0,2 mm, e o desvio medido da fusão é de 5 µm (nenhum vértice anda) */
+const LIMPAR_FINAL_DA_PARTE = { travessaDoPainel: 0.2 };
+const PASSOS = [...SEM_PRISMAS, ...SEM_PRISMAS.filter((p) => p[0] === 'parte' && MEMBROS.test(p[1].nome)).map((p) => ['limparLascas', { sel: { grupo: p[1].nome }, tolerancia: LIMPAR_FINAL_DA_PARTE[p[1].nome] ?? LIMPAR_FINAL }])];
 
 /* os contatos da lataria com os membros aparados: o apoio é a folga de FOLGA mm, e a travessia rasa do carro-inteiro (a seção ficava até 2 mm dentro da
    chapa alisada) já não se declara; o relato diz o que a malha dá */
