@@ -17,8 +17,9 @@
  *   por: 'p05' (o padrão) ou 'minimo': a faixa esperada vale para o percentil 5 e o 95 do vão, ou para o mínimo e o máximo.
  *   linhaMinima: o comprimento de linha, em mm, abaixo do qual um mínimo fora da faixa é um ponto isolado (10).
  *   folga3d: a menor distância 3D aceita entre os sólidos do par de folga, em mm.
- *   fundo: em mm, confere o fundo de cada vão: o segmento que sai do meio do vão, perpendicular à pele de fora, para dentro do modelo, por esse tanto; o par de folga
- *     cujo segmento não encontra outra parte em `linhaMinima` mm de linha ou mais sai em `fora` como vão sem fundo (de fora se vê o outro lado, o chão ou o vazio).
+ *   fundo: em mm (ou Infinity, o modelo todo), confere o fundo de cada vão: o vão é sem fundo quando, de alguma das 17 direções de olhar (de cima e de oito azimutes a 0 e a 35 graus), o
+ *     raio que chega à boca do vão sem parte no caminho segue por esse tanto para dentro sem atravessar parte nenhuma, e de fora se vê o chão, o vazio ou o outro lado do
+ *     modelo por ele; o par de folga com `linhaMinima` mm de linha ou mais assim sai em `fora`.
  *   semFundo: { 'a|b': motivo } o par cujo vão fica sem fundo de propósito.
  *   relacoes: [{ a, b, tipo }] com tipo toca, atravessa ou folga, vindo do relato de contatos; vale no lugar da regra própria.
  *   toque: até quantos mm duas partes se tocam, e um par assim sai como `toca`, sem vão (0,001, a tolerância do relato de contatos).
@@ -65,7 +66,7 @@
  * isolado sai marcado.
  *
  * Uso: npm run vao:partes -- <esboço|receita|montagem> [--opcao=1] [--esperado=4] [--tolerancia=0.2] [--degrau=1] [--par=a:b]...
- *        [--partes=porta,teto] [--vizinho=15] [--passo=2] [--toque=0.001] [--por=p05|minimo] [--folga3d=<mm>] [--fundo=<mm>] [--sem-fundo=a:b:motivo]... [--soltas=recusar] [--apoia=parte:motivo]... [--linhas=40] [--json] [--sem-cache]
+ *        [--partes=porta,teto] [--vizinho=15] [--passo=2] [--toque=0.001] [--por=p05|minimo] [--folga3d=<mm>] [--fundo=<mm>|modelo] [--sem-fundo=a:b:motivo]... [--soltas=recusar] [--apoia=parte:motivo]... [--linhas=40] [--json] [--sem-cache]
  * Sai 0 sem par fora da faixa, 1 com par fora da faixa ou, em `--soltas=recusar`, com parte solta, e 2 em argumento ruim. */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -207,24 +208,41 @@ export function segmentoAtravessa(parte, p0, p1) {
 }
 
 
-/** O fundo de um vão: o segmento que sai do meio do vão, perpendicular à pele de fora, para dentro do modelo, por `profundidade` mm. O vão tem fundo quando
- *  alguma outra parte (que não as duas dele) atravessa o segmento; sem isso, olhando de fora pelo vão se vê o outro lado do modelo, o chão ou o vazio. */
-export function amostrasSemFundo(amostras, A, B, partes, profundidade, centro) {
+/** As direções de olhar para o fundo do vão: de cima e de oito azimutes, a 0 e a 35 graus de elevação, como as câmeras das vistas do modelo. Cada uma é o vetor que
+ *  vai da câmera ao modelo. */
+export const OLHARES_DO_FUNDO = (() => {
+  const l = [[0, -1, 0]];
+  for (const elev of [0, 35]) for (let k = 0; k < 8; k += 1) { const az = (k * Math.PI) / 4; const c = Math.cos((elev * Math.PI) / 180); l.push([-Math.sin(az) * c, -Math.sin((elev * Math.PI) / 180), -Math.cos(az) * c]); }
+  return l;
+})();
+
+/** O fundo de um vão: o vão deixa ver o outro lado do modelo quando, de alguma das direções de olhar, o raio que chega ao meio do vão (a boca dele, na pele de fora) sem
+ *  parte nenhuma no caminho segue `profundidade` mm para dentro sem atravessar parte nenhuma (as duas do vão incluídas, que fecham o raio oblíquo na parede do corte): de
+ *  fora se vê o chão, o vazio ou o outro lado do carro por ele. `alcance` é até onde a câmera fica, em mm. Cada amostra é `{ p, ds }`. */
+export function amostrasSemFundo(amostras, partes, profundidade, alcance, centro, passoDeAmostras = 1) {
   const sem = [];
-  const outras = partes.filter((x) => x !== A && x !== B);
-  for (const x of amostras) {
+  const livre = (de, ate) => {
+    const caixa = [Math.min(de[0], ate[0]) - 0.01, Math.min(de[1], ate[1]) - 0.01, Math.min(de[2], ate[2]) - 0.01, Math.max(de[0], ate[0]) + 0.01, Math.max(de[1], ate[1]) + 0.01, Math.max(de[2], ate[2]) + 0.01];
+    for (const o of partes) {
+      if (folgaDeCaixas(o.caixa, caixa) > 0) continue;
+      if (segmentoAtravessa(o, de, ate)) return false;
+    }
+    return true;
+  };
+  for (let i = 0; i < amostras.length; i += passoDeAmostras) {
+    const x = amostras[i];
     if (!x.n || !x.e) continue;
     const m = meio(x.p, x.e);
     const paraFora = centro ? dot(x.n, sub(m, centro)) : 1;
-    const dentro = paraFora >= 0 ? [-x.n[0], -x.n[1], -x.n[2]] : x.n;
-    const fim = mais(m, dentro, profundidade);
-    const caixa = [Math.min(m[0], fim[0]) - 0.01, Math.min(m[1], fim[1]) - 0.01, Math.min(m[2], fim[2]) - 0.01, Math.max(m[0], fim[0]) + 0.01, Math.max(m[1], fim[1]) + 0.01, Math.max(m[2], fim[2]) + 0.01];
-    let fecha = false;
-    for (const o of outras) {
-      if (folgaDeCaixas(o.caixa, caixa) > 0) continue;
-      if (segmentoAtravessa(o, m, fim)) { fecha = true; break; }
+    const fora = paraFora >= 0 ? x.n : [-x.n[0], -x.n[1], -x.n[2]];
+    let passa = false;
+    for (const d of OLHARES_DO_FUNDO) {
+      if (dot(d, fora) > -0.2) continue;                            /* olha de dentro, ou de lado demais para ver a boca do vão */
+      const boca = mais(m, d, -0.05);
+      if (!livre(mais(m, d, -alcance), boca)) continue;
+      if (livre(mais(m, d, 0.05), mais(m, d, profundidade))) { passa = true; break; }
     }
-    if (!fecha) sem.push({ p: m, ds: x.ds });
+    if (passa) sem.push({ p: m, ds: x.ds * passoDeAmostras });
   }
   return sem;
 }
@@ -506,7 +524,7 @@ export function vaoEntrePartes(faces, o = {}) {
   const folga3d = o.folga3d ?? null;
   const fundo = o.fundo ?? null;
   const semFundo = o.semFundo ?? {};
-  if (fundo !== null && !(Number.isFinite(fundo) && fundo > 0)) throw new ErroDoVao('fundo espera um número de mm maior que zero');
+  if (fundo !== null && !(fundo > 0)) throw new ErroDoVao('fundo espera um número de mm maior que zero, ou o modelo todo');
   const dadas = new Map((o.relacoes ?? []).map((r) => [chaveDoPar(r.a, r.b), r.tipo]));
   for (const [nome, v] of Object.entries({ tolerancia, toque, passo, vizinho })) if (!(Number.isFinite(v) && v >= 0)) throw new ErroDoVao(`${nome} espera um número de mm a partir de zero`);
   if (esperado !== null && !(Number.isFinite(esperado) && esperado > 0)) throw new ErroDoVao('esperado espera um número de mm maior que zero');
@@ -514,6 +532,9 @@ export function vaoEntrePartes(faces, o = {}) {
   for (const f of faces) if (f.parte) { if (!porNome.has(f.parte)) porNome.set(f.parte, []); porNome.get(f.parte).push(f); }
   const partes = new Map([...porNome].map(([n, fs]) => [n, prepararParte(n, fs, { passo })]));
   const nomes = [...partes.keys()].sort();
+  const caixaDoModelo = [0, 1, 2].map((k) => Math.min(...[...partes.values()].map((x) => x.caixa[k]))).concat([0, 1, 2].map((k) => Math.max(...[...partes.values()].map((x) => x.caixa[k + 3]))));
+  const alcance = Math.hypot(caixaDoModelo[3] - caixaDoModelo[0], caixaDoModelo[4] - caixaDoModelo[1], caixaDoModelo[5] - caixaDoModelo[2]) + 100;
+  const profundidade = fundo === null ? 0 : Math.min(fundo, alcance);
   if (o.lado !== undefined && !['fora', 'todos'].includes(o.lado)) throw new ErroDoVao('lado espera fora ou todos');
   /* o lado de fora de uma chapa é o que olha para longe do centro da caixa do modelo; sem ele, valem as duas faces */
   let centro = null;
@@ -563,13 +584,13 @@ export function vaoEntrePartes(faces, o = {}) {
     const amostras = p.dasAmostras ?? []; const linhasParalelas = p.linhasParalelas ?? 1; delete p.dasAmostras; delete p.linhasParalelas;
     p.fora = [];
     if (fundo !== null && p.tipo === 'folga') {
-      const sem = amostrasSemFundo(amostras, partes.get(p.a), partes.get(p.b), [...partes.values()], fundo, centro);
+      const sem = amostrasSemFundo(amostras, [...partes.values()], profundidade, alcance, centro, Math.max(1, Math.round(amostras.length / 60)));
       if (sem.length) {
         const linha = arred(comprimentoDaLinha(sem, Math.max(6, 2 * (p.vao?.mediana ?? 4) + 4), linhasParalelas).total, 1);
         const lo = [0, 1, 2].map((k) => Math.min(...sem.map((x) => x.p[k]))); const hi = [0, 1, 2].map((k) => Math.max(...sem.map((x) => x.p[k])));
         const declarado = semFundo[chaveDoPar(p.a, p.b)] ?? semFundo[`${p.a}|${p.b}`] ?? null;
-        p.semFundo = { amostras: sem.length, de: amostras.length, linhaMm: linha, de3: pt(lo), ate3: pt(hi), profundidade: fundo, motivo: declarado };
-        if (linha >= linhaMinima && !declarado) p.fora.push({ motivo: `vão sem fundo: ${fundo} mm para dentro dele não há outra parte, e de fora se vê o outro lado (${linha} mm de linha)`, mm: null, em: pt(meio(lo, hi)) });
+        p.semFundo = { amostras: sem.length, de: amostras.length, linhaMm: linha, de3: pt(lo), ate3: pt(hi), profundidade: arred(profundidade, 0), motivo: declarado };
+        if (linha >= linhaMinima && !declarado) p.fora.push({ motivo: `vão sem fundo: de fora se vê, por ele, o outro lado do modelo, a ${arred(profundidade, 0)} mm ou mais para dentro, sem parte nenhuma no caminho (${linha} mm de linha)`, mm: null, em: pt(meio(lo, hi)) });
       }
     }
     if (esp !== null && esp !== undefined) {
@@ -705,7 +726,7 @@ export function linhaDoPar(p) {
 }
 
 const AJUDA = `npm run vao:partes -- <esboço|receita> [--opcao=1] [--esperado=<mm>] [--tolerancia=${TOLERANCIA_MM}] [--degrau=<mm>] [--par=a:b]...
-    [--partes=<prefixo|nome>,...] [--vizinho=<mm>] [--passo=${PASSO_MM}] [--toque=${TOQUE_MM}] [--lado=fora|todos] [--por=p05|minimo] [--linha-minima=10] [--folga3d=<mm>] [--fundo=<mm>] [--sem-fundo=<a>:<b>:<motivo>]... [--soltas=recusar] [--apoia=<parte>:<motivo>]...
+    [--partes=<prefixo|nome>,...] [--vizinho=<mm>] [--passo=${PASSO_MM}] [--toque=${TOQUE_MM}] [--lado=fora|todos] [--por=p05|minimo] [--linha-minima=10] [--folga3d=<mm>] [--fundo=<mm>|modelo] [--sem-fundo=<a>:<b>:<motivo>]... [--soltas=recusar] [--apoia=<parte>:<motivo>]...
     [--linhas=40] [--json] [--sem-cache]
 
 Mede, sobre a malha, o vão (da borda de uma parte à borda da outra, ao longo da linha comum: mínimo, mediana, p90, máximo, com o ponto do
@@ -716,7 +737,7 @@ que toca ou atravessa não tem vão. Lista sempre as partes soltas, as que não 
 uma, e --apoia declara a que é solta de propósito. A entrada é um esboço, uma receita ou uma montagem persistida (cada instância de peça é uma parte).
 --por=p05 (padrão) confere o percentil 5 e o 95 do vão contra a faixa; --por=minimo, o mínimo e o máximo. O mínimo ou o máximo fora da
 faixa por menos de --linha-minima mm de linha sai marcado como isolado (ponto de quina). --folga3d dá a menor distância 3D aceita entre os
-sólidos. --fundo=<mm> confere o fundo de cada vão (nenhuma outra parte a essa profundidade, para dentro, a partir do meio do vão: de fora se vê o outro lado) e --sem-fundo declara o par que é assim de propósito. A montagem do esboço fica em tmp/cache-de-medida/ e as outras medidas a reaproveitam (a saída diz "montagem do cache"); --sem-cache monta de novo. Esboço: contatos com folga: { esperada, tolerancia, degrau } e apoia: [{ parte, motivo }]; receita: FOLGAS e APOIA.`;
+sólidos. --fundo=<mm>|modelo confere o fundo de cada vão (de fora se vê, por ele, o outro lado do modelo, sem parte no caminho até essa profundidade) e --sem-fundo declara o par que é assim de propósito. A montagem do esboço fica em tmp/cache-de-medida/ e as outras medidas a reaproveitam (a saída diz "montagem do cache"); --sem-cache monta de novo. Esboço: contatos com folga: { esperada, tolerancia, degrau } e apoia: [{ parte, motivo }]; receita: FOLGAS e APOIA.`;
 
 export async function executar(argv) {
   const valores = (nome) => argv.filter((x) => x.startsWith(`--${nome}=`)).map((x) => x.slice(nome.length + 3));
@@ -736,7 +757,7 @@ export async function executar(argv) {
     const toque = numero('toque');
     const relacoes = entrada.neutro ? await relacoesDoNeutro(entrada.neutro, toque ?? TOQUE_MM) : undefined;
     const r = vaoEntrePartes(entrada.faces, {
-      relacoes, por: valor('por') ?? undefined, folga3d: numero('folga3d'), fundo: numero('fundo'), semFundo, linhaMinima: numero('linha-minima'),
+      relacoes, por: valor('por') ?? undefined, folga3d: numero('folga3d'), fundo: valor('fundo') === 'modelo' ? Infinity : numero('fundo'), semFundo, linhaMinima: numero('linha-minima'),
       esperado: numero('esperado'), tolerancia: numero('tolerancia'), degrau: numero('degrau'), vizinho: numero('vizinho'), passo: numero('passo'), toque, lado: valor('lado') ?? undefined,
       pares: pares.length ? pares : undefined, partes: valor('partes') ? valor('partes').split(',').map((s) => s.trim()).filter(Boolean) : undefined, folgas: entrada.folgas, apoia: { ...entrada.apoia, ...apoia },
     });

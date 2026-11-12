@@ -344,20 +344,21 @@ describe('o fundo do vão', () => {
   const quadro = (extra = []) => [...duasChapas(), ...ancora, ...extra];
   const linha = (faces, o = {}) => par(faces, { esperado: 4, fundo: 60, ...o });
 
-  it('o vão sem outra parte atrás é sem fundo: sai em fora, com a linha de 100 mm e a caixa dos pontos', () => {
+  it('o vão que deixa ver o outro lado é sem fundo: sai em fora, com a linha de 100 mm e a caixa dos pontos', () => {
     const p = linha(quadro());
     expect(p.semFundo).toMatchObject({ profundidade: 60, motivo: null });
     expect(p.semFundo.linhaMm).toBeGreaterThan(90); expect(p.semFundo.linhaMm).toBeLessThan(115);
     expect(p.semFundo.de3[0]).toBeCloseTo(102, 0); expect(p.semFundo.ate3[0]).toBeCloseTo(102, 0);
-    expect(p.fora.map((f) => f.motivo)).toEqual([expect.stringMatching(/^vão sem fundo: 60 mm/)]);
+    expect(p.fora.map((f) => f.motivo)).toEqual([expect.stringMatching(/^vão sem fundo: de fora se vê, por ele, o outro lado do modelo, a 60 mm/)]);
     expect(linhaDoPar(p)).toMatch(/\[sem fundo a 60 mm: /);
   });
 
-  it('com uma parte atrás do vão, dentro da profundidade, o vão tem fundo; além dela, não', () => {
+  it('com uma parte atrás do vão, dentro da profundidade, o vão tem fundo; além dela, não; e o modelo todo vale como profundidade', () => {
     const coberto = linha(quadro(forro(-12)));
     /* as pontas da linha, onde a aresta vira, escapam do forro por poucos mm, e menos que `linhaMinima` é ponto isolado */
     expect(coberto.semFundo?.linhaMm ?? 0).toBeLessThan(10);
     expect(coberto.fora).toEqual([]);
+    expect(linha(quadro(forro(-12)), { fundo: Infinity }).fora).toEqual([]);
     const curto = linha(quadro(forro(-12)), { fundo: 5 });
     expect(curto.semFundo.linhaMm).toBeGreaterThan(90);
     expect(curto.fora).toHaveLength(1);
