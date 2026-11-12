@@ -36,6 +36,16 @@ describe('plano de modelagem', () => {
     expect(invertido).toEqual(plano);
   });
 
+  it('o texto acima de 240 caracteres é recusado dizendo o campo, o tamanho e o limite', () => {
+    const longo = 'x'.repeat(253);
+    expect(() => com({ objeto: longo })).toThrow(/'objeto' excede 240 caracteres \(tem 253, 13 a mais/);
+    expect(() => com({ criteriosDeReprovacao: ['tubo do selim com angulo errado', longo] }))
+      .toThrow(/'criteriosDeReprovacao\[1\]' excede 240 caracteres \(tem 253/);
+    expect(() => com({ partes: [{ nome: 'tubo', forma: 'forma de prova da parte', tecnica: longo }] }))
+      .toThrow(/'partes\[0\]\.tecnica' excede 240 caracteres \(tem 253/);
+    expect(com({ objeto: 'y'.repeat(240) }).objeto).toHaveLength(240);
+  });
+
   it('as partes vão até 128 e as outras listas até 64', () => {
     const partes = (n) => Array.from({ length: n }, (_, k) => ({ nome: `parte${k}`, forma: 'forma de prova da parte', tecnica: 'caixa' }));
     expect(com({ partes: partes(128) }).partes).toHaveLength(128);

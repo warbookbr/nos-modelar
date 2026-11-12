@@ -1,14 +1,14 @@
 /* olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless. */
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
 import * as THREE from 'three';
-import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, olharBancada } from './olhar-bancada.mjs';
+import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, medirParesAcusados, olharBancada, projetarPontos } from './olhar-bancada.mjs';
+import { analisarPeca } from './analise-da-peca.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -306,6 +306,8 @@ describe('captura suavizada', () => {
 
 /* A CARGA DA PÁGINA É UMA POR CHAMADA, NÃO UMA POR VISTA. Cada vista abria a página de novo, e a perua levou 257 s numa máquina parada
    com 51 capturas; o contador da dependência injetada prova quantas cargas, páginas e navegadores uma ou várias chamadas pedem. */
+const REPO_DO_TESTE = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+
 describe('carga da página', () => {
   const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
 
@@ -326,6 +328,9 @@ describe('carga da página', () => {
       async waitForTimeout() {},
       async evaluate(fn, argumento) {
         const texto = String(fn);
+        if (texto.includes('getBoundingClientRect')) { contagem.projecoes = (contagem.projecoes ?? 0) + 1; return { pixels: argumento.map((_, i) => [10 + i, 20 + i]), quadro: [64, 36] }; }
+        if (texto.includes('__modelarAjustarCamera = ')) return undefined;
+        if (texto.includes('__modelarAjuste')) return { dentroDaPeca: false };
         if (texto.includes('.corte(')) { contagem.cortes.push(argumento); return argumento; }
         if (texto.includes('definirVista')) { contagem.vistasTrocadas += 1; return undefined; }
         if (texto.includes('__modelarQuadros')) return undefined;
@@ -393,6 +398,66 @@ describe('carga da página', () => {
     expect(contagem.paginasFechadas).toBe(2);
   });
 
+  it('a análise inteira (18 vistas e a parte isolada) carrega a página e a peça uma vez, num servidor e num navegador só', async () => {
+    const { contagem, dependencias } = bancadaContada();
+    const compartilhada = await abrirCapturaCompartilhada({ dependencias });
+    const pasta = join(REPO_DO_TESTE, 'tools/bancadas/out/analise-fixture-visual');
+    try {
+      const r = await analisarPeca({ peca: 'fixture-visual', parte: 'a', olhar: (o) => olharBancada({ ...o, compartilhada, dependencias }) });
+      expect(r.ok).toBe(true);
+      expect(r.manifesto.arquivos).toHaveLength(24);
+      expect(r.cargasDePagina).toBe(1);
+      expect(r.manifesto.cargasDePagina).toBe(1);
+    } finally {
+      await compartilhada.fechar();
+      rmSync(pasta, { recursive: true, force: true });
+    }
+    expect(contagem).toMatchObject({ servidores: 1, navegadores: 1, cargas: 1, paginas: 1 });
+    /* as 17 trocas de vista da análise (18 mais a da parte isolada, menos a que abre a página) correm na página já aberta */
+    expect(contagem.vistasTrocadas).toBeGreaterThanOrEqual(17);
+  });
+
+  it('o zoom em mm projeta os 8 cantos da caixa em cada vista, e o relato da vista traz o quadro e os pixels', async () => {
+    const { contagem, dependencias } = bancadaContada();
+    const cantos = [[0, 0, 0], [1, 1, 1], [2, 2, 2]];
+    const r = await olharBancada({ ...comum, vistas: ['frontal', 'direita'], projetar: cantos, dependencias });
+    expect(r.ok).toBe(true);
+    expect(r.resultado.vistas.map((v) => v.projecaoMm)).toEqual([
+      { pixels: [[10, 20], [11, 21], [12, 22]], quadro: [64, 36] }, { pixels: [[10, 20], [11, 21], [12, 22]], quadro: [64, 36] },
+    ]);
+    expect(contagem.projecoes).toBe(2);
+    const sem = await olharBancada({ ...comum, vistas: ['frontal'], dependencias });
+    expect(sem.resultado.vistas[0].projecaoMm).toBeUndefined();
+  });
+
+  it('a medida de contatos de uma receita diz no relato se foi medida agora, lida do cache ou pulada, e a pulada não chama a medida', async () => {
+    const { dependencias } = bancadaContada();
+    let medicoes = 0;
+    const medirParesAcusadosFalso = (origem) => async () => { medicoes += 1; return { pares: [['a', 'b']], origem, segundos: 1.234 }; };
+    const comReceita = { ...comum, peca: 'peca-de-prova', vistas: ['isometrica'] };
+    const ativar = async () => {};
+    const agora = await olharBancada({ ...comReceita, dependencias: { ...dependencias, ativarReceitaBancada: ativar, medirParesAcusados: medirParesAcusadosFalso('medidos') } });
+    expect(agora.resultado.contatos).toEqual({ estado: 'medidos', pares: 1, segundos: 1.2 });
+    expect(agora.resultado.paresAcusados).toEqual([['a', 'b']]);
+    expect(agora.stdout).toMatch(/contatos: medidos agora em 1\.2 s, 1 par/);
+    const cache = await olharBancada({ ...comReceita, dependencias: { ...dependencias, ativarReceitaBancada: ativar, medirParesAcusados: medirParesAcusadosFalso('do-cache') } });
+    expect(cache.resultado.contatos.estado).toBe('do-cache');
+    expect(cache.stdout).toMatch(/contatos: lidos do cache/);
+    expect(medicoes).toBe(2);
+    const pulada = await olharBancada({ ...comReceita, medirContatos: false, dependencias: { ...dependencias, ativarReceitaBancada: ativar, medirParesAcusados: medirParesAcusadosFalso('medidos') } });
+    expect(medicoes).toBe(2);
+    expect(pulada.resultado.contatos).toEqual({ estado: 'pulados' });
+    expect(pulada.resultado.paresAcusados).toBeNull();
+    expect(pulada.stdout).toMatch(/contatos: NÃO medidos \(--sem-contatos\).*falta de medida, não por falta de achado/);
+    const falha = await olharBancada({ ...comReceita, dependencias: { ...dependencias, ativarReceitaBancada: ativar, medirParesAcusados: async () => { throw new Error('a receita não executa\nresto'); } } });
+    expect(falha.resultado.contatos).toEqual({ estado: 'falhou', motivo: 'a receita não executa' });
+    expect(falha.resultado.paresAcusados).toBeNull();
+    expect(falha.stdout).toMatch(/falta de medida, não por falta de achado/);
+    /* peça sem receita (fixture do harness): nada a medir, e o relato diz isso */
+    const semReceita = await olharBancada({ ...comum, vistas: ['isometrica'], dependencias });
+    expect(semReceita.resultado.contatos).toEqual({ estado: 'sem-receita' });
+  });
+
   it('a vista de corte liga o plano uma vez, pela ponte, para todas as vistas da chamada', async () => {
     const { contagem, dependencias } = bancadaContada();
     const resposta = await olharBancada({
@@ -451,6 +516,17 @@ describe('a vista de corte', () => {
     expect(await recusa(['fixture-visual', '--corte=z:0', '--raio-x'])).toMatch(/não se mistura com --arame/);
     expect(await recusa(['fixture-visual', '--corte=z:0', '--par=a,b'])).toMatch(/não se mistura com --par/);
     expect(await recusa(['fixture-visual', '--corte=z:0', '--analise'])).toMatch(/não se mistura com --analise/);
+  });
+});
+
+describe('o zoom da análise pela linha de comando', () => {
+  it('recusa a caixa ambígua com o que escrever, antes de abrir servidor ou navegador', async () => {
+    const r = await comoCLI(['--analise', 'peca-de-prova', '--zoom=frontal:900,1200,-300,1100,1500,300']);
+    expect(r.ok).toBe(false);
+    expect(r.codigo).toBe(2);
+    expect(r.stderr).toMatch(/Escreva --zoom=frontal:mm:900,1200,-300,1100,1500,300/);
+    const curta = await comoCLI(['--analise', 'peca-de-prova', '--zoom=frontal:mm:1,2,3,4']);
+    expect(curta.stderr).toMatch(/escreva sem o mm/);
   });
 });
 
@@ -702,5 +778,73 @@ describe('o andamento da captura e o fim do processo', () => {
     await new Promise((ok) => setTimeout(ok, 80));
     expect(saidas).toEqual([1]);
     expect(avisos[0]).toContain('encerrado à força');
+  });
+});
+
+describe('a medida de contatos guardada por conteúdo da receita', () => {
+  function receitaTemporaria(conteudo) {
+    const pasta = mkdtempSync(join(tmpdir(), 'contatos-'));
+    const arquivo = join(pasta, 'receita.mjs');
+    writeFileSync(arquivo, conteudo);
+    return { pasta, arquivo };
+  }
+
+  it('mede uma vez, lê do cache enquanto o conteúdo não muda, mede de novo com --sem-cache ou com a receita mudada, e regrava só a última', async () => {
+    const { pasta, arquivo } = receitaTemporaria('export const PASSOS = [];\n');
+    const pastaDoCache = join(pasta, 'cache');
+    let medicoes = 0;
+    const medir = async () => { medicoes += 1; return [['a', 'b'], ['c', 'd']]; };
+    try {
+      const primeira = await medirParesAcusados(arquivo, { pastaDoCache, medir });
+      expect(primeira).toMatchObject({ origem: 'medidos', pares: [['a', 'b'], ['c', 'd']] });
+      const segunda = await medirParesAcusados(arquivo, { pastaDoCache, medir });
+      expect(segunda).toMatchObject({ origem: 'do-cache', pares: [['a', 'b'], ['c', 'd']] });
+      expect(medicoes).toBe(1);
+      expect((await medirParesAcusados(arquivo, { pastaDoCache, medir, cache: false })).origem).toBe('medidos');
+      expect(medicoes).toBe(2);
+      writeFileSync(arquivo, 'export const PASSOS = [1];\n');
+      expect((await medirParesAcusados(arquivo, { pastaDoCache, medir })).origem).toBe('medidos');
+      expect(medicoes).toBe(3);
+      expect(readdirSync(pastaDoCache).filter((f) => f.endsWith('.json'))).toHaveLength(1);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  });
+
+  it('a medida que falha não é guardada', async () => {
+    const { pasta, arquivo } = receitaTemporaria('export const PASSOS = [];\n');
+    const pastaDoCache = join(pasta, 'cache');
+    try {
+      await expect(medirParesAcusados(arquivo, { pastaDoCache, medir: async () => { throw new Error('quebrou'); } })).rejects.toThrow('quebrou');
+      expect(existsSync(pastaDoCache) ? readdirSync(pastaDoCache) : []).toEqual([]);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('os pontos em mm no quadro da foto', () => {
+  it('projeta o ponto da peça pela câmera da página, com a origem no canto de cima à esquerda', () => {
+    const raiz = new THREE.Group();
+    const malha = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2));
+    malha.userData.faces = [1];
+    raiz.add(malha);
+    raiz.scale.setScalar(2);
+    raiz.position.set(0, 1, 0);
+    const scene = new THREE.Scene();
+    scene.add(raiz);
+    const camera = new THREE.OrthographicCamera(-2, 2, 1, -1, 0.025, 100);
+    camera.position.set(3, 1, 0);
+    camera.lookAt(0, 1, 0);
+    camera.updateProjectionMatrix();
+    globalThis.window = { __mecanificaBancada: { ambiente: () => ({ scene, camera, renderer: { domElement: { clientWidth: 1280, clientHeight: 640 } } }) } };
+    const { pixels, quadro } = projetarPontos([[0, 0, 0], [0, 500, -500], [0, -500, 500]]);
+    const arredondar = (p) => p.map((n) => Math.round(n * 1e6) / 1e6);
+    /* a câmera olha para -x: a direita da imagem é -z, o alto é +y; 500 mm valem 1 m no estúdio (escala 2), meio campo vertical */
+    expect(arredondar(pixels[0])).toEqual([640, 320]);
+    expect(arredondar(pixels[1])).toEqual([960, 0]);
+    expect(arredondar(pixels[2])).toEqual([320, 640]);
+    expect(quadro).toEqual([1280, 640]);
+    delete globalThis.window;
   });
 });

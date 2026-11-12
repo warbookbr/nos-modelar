@@ -57,7 +57,7 @@ export function normalizarDobrasAceitas(valor, nomesDasPartes, { quem = 'PLANO' 
     }
     const motivo = typeof item.motivo === 'string' ? item.motivo.trim() : '';
     if (motivo.length < MINIMO_DO_MOTIVO) falhar(quem, `'${onde}.motivo' precisa dizer, em pelo menos ${MINIMO_DO_MOTIVO} caracteres, por que a feição é desenho.`);
-    if (motivo.length > LIMITE_TEXTO) falhar(quem, `'${onde}.motivo' excede ${LIMITE_TEXTO} caracteres.`);
+    if (motivo.length > LIMITE_TEXTO) falhar(quem, `'${onde}.motivo' excede ${LIMITE_TEXTO} caracteres (tem ${motivo.length}, ${motivo.length - LIMITE_TEXTO} a mais que o limite).`);
     if (UUID.test(motivo) || ABSOLUTO.test(motivo)) falhar(quem, `'${onde}.motivo' não pode conter UUID, caminho absoluto ou binário local.`);
     const aceita = { parte: item.parte.trim(), motivo };
     if (item.regiao === undefined) falhar(quem, `'${onde}.regiao' é obrigatória: a caixa { min: [x, y, z], max: [x, y, z] } em mm onde a feição é de propósito; aceitar a parte inteira esconderia o defeito que aparecesse nela depois.`);

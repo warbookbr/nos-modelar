@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1991 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1993 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3162,6 +3162,8 @@
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
 - `repositorio-revalidacao.mjs` — repositorio-revalidacao.mjs — persistência R01 sobre o repositório transacional existente.
 - `repositorio-revalidacao.test.ts` — Provas R01: persistência canônica, retomada, idempotência e conflito.
+- `resolucao-da-raiz.mjs` — resolucao-da-raiz.mjs — o pacote que a cópia isolada não tem vem da raiz do repositório principal.
+- `resolucao-da-raiz.test.mjs` — O pacote que a cópia isolada não tem vem da raiz do repositório principal (`resolucao-da-raiz.mjs`). O caso é o do atrito: um worktree sem `node_modules` rod…
 - `resolver-caminho-receita.mjs` — resolver-caminho-receita.mjs — localizador flexível de receitas com confinamento seguro
 - `resolver-caminho-receita.test.mjs` — resolver-caminho-receita.test.mjs — testes unitários para resolução flexível e segura de receitas procedurais.
 - `retrato-do-acervo.mjs` — retrato-do-acervo.mjs — mede cada peça do acervo e compara dois retratos, para saber o que uma mudança no núcleo fez com as peças que já estavam aprovadas.

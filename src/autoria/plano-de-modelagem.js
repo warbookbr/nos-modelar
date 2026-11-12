@@ -67,7 +67,7 @@ function texto(valor, quem, campo, minimo = 1) {
   if (typeof valor !== 'string' || valor.trim() === '') falhar(quem, `'${campo}' precisa ser texto não vazio.`);
   const limpo = valor.trim();
   if (limpo.length < minimo) falhar(quem, `'${campo}' precisa ter pelo menos ${minimo} caracteres; diga o que é.`);
-  if (limpo.length > LIMITE_TEXTO) falhar(quem, `'${campo}' excede ${LIMITE_TEXTO} caracteres.`);
+  if (limpo.length > LIMITE_TEXTO) falhar(quem, `'${campo}' excede ${LIMITE_TEXTO} caracteres (tem ${limpo.length}, ${limpo.length - LIMITE_TEXTO} a mais que o limite).`);
   if (UUID.test(limpo) || ABSOLUTO.test(limpo)) {
     falhar(quem, `'${campo}' não pode conter UUID, caminho absoluto ou binário local.`);
   }

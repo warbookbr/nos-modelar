@@ -40,10 +40,19 @@ import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { lerEsboco } from '../../modulos/esboco-nucleo/src/ler-esboco.js';
 import { receitaDaOpcao, RecusaDoEsboco, caixaDaMalha } from '../../modulos/esboco-nucleo/src/opcao.js';
 import { PERTO_MM, relatoDeContatos, textoDoRelato } from '../../modulos/esboco-nucleo/src/contatos.js';
+import { configuracaoViteDaRaiz } from './resolucao-da-raiz.mjs';
 import { abrirCapturaCompartilhada, PRAZO_DE_CARGA_MS } from './olhar-bancada.mjs';
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+/* Na cópia isolada sem `node_modules`, o servidor da captura e o Playwright acham os pacotes na raiz do repositório principal (`resolucao-da-raiz.mjs`). */
+const DEPENDENCIAS_DA_CAPTURA = {
+  carregarPlaywright: async () => (await import('playwright')).default,
+  createServer: async (config) => {
+    const extra = configuracaoViteDaRaiz(REPO);
+    return (await import('vite')).createServer({ ...config, plugins: extra.plugins, server: { ...config.server, ...extra.server } });
+  },
+};
 const SESSOES = join(REPO, 'tools/bancadas/out/sessoes');
 const MARGEM = 0.08;
 
@@ -235,7 +244,7 @@ export async function capturarLadoALado({ paineis, vista, vistas = null, saida, 
     };
     writeFileSync(arquivos[i], JSON.stringify(payload), 'utf8');
   });
-  const captura = await abrirCapturaCompartilhada({ logger: null });
+  const captura = await abrirCapturaCompartilhada({ logger: null, dependencias: DEPENDENCIAS_DA_CAPTURA });
   const telas = []; const blocos = [];
   try {
     const page = await captura.browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: FATOR_DE_AMOSTRAGEM });

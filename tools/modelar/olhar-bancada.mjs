@@ -6,9 +6,9 @@
  * devolve resultado estruturado. Importar este módulo não lê argv, não sobe
  * Vite/Playwright, não grava arquivos e não encerra o processo.
  */
-import { randomUUID } from 'node:crypto';
-import { existsSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { createHash, randomUUID } from 'node:crypto';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
@@ -20,8 +20,9 @@ import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/cor
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { analisarPeca } from './analise-da-peca.mjs';
+import { analisarPeca, lerZoom } from './analise-da-peca.mjs';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import { PASTA_DO_CACHE, assinaturaDaEntrada } from './entrada-de-medida.mjs';
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 import { reduzirEmParalelo } from './reduzir-em-paralelo.mjs';
 import { lancarChromium } from './navegador.mjs';
@@ -202,6 +203,76 @@ export function ajustarCamera(ajuste) {
     }
   }
   return relato;
+}
+
+/* OS PONTOS EM MM NO QUADRO DA FOTO, pela câmera que a página tem agora (corre dentro do navegador, sobre a câmera já quieta, e por
+   isso é autossuficiente). `pontosMm` são pontos do referencial da peça (a receita, em metro, vezes 1000); saem em pixels do quadro, com
+   a origem no canto de cima à esquerda, que é o tamanho da imagem gravada. É o que deixa o `--zoom` pedir uma região da peça e não de
+   uma imagem: a caixa em mm projeta-se em cada vista. */
+export function projetarPontos(pontosMm) {
+  const amb = window.__mecanificaBancada.ambiente();
+  const cam = amb.camera;
+  const V3 = cam.position.constructor;
+  let raiz = null;
+  for (const filho of amb.scene.children) {
+    let tem = false;
+    filho.traverse((o) => { if (Array.isArray(o.userData?.faces)) tem = true; });
+    if (tem) { raiz = filho; break; }
+  }
+  if (!raiz) return { erro: 'a página não tem a peça na cena' };
+  raiz.updateMatrixWorld(true);
+  cam.updateMatrixWorld(true);
+  const el = amb.renderer.domElement;
+  const r = el.getBoundingClientRect ? el.getBoundingClientRect() : { left: 0, top: 0 };
+  const pixels = pontosMm.map((m) => {
+    const p = raiz.localToWorld(new V3(m[0] / 1000, m[1] / 1000, m[2] / 1000)).project(cam);
+    return [r.left + ((p.x + 1) / 2) * el.clientWidth, r.top + ((1 - p.y) / 2) * el.clientHeight];
+  });
+  return { pixels, quadro: [Math.round(r.left * 2 + el.clientWidth), Math.round(r.top * 2 + el.clientHeight)] };
+}
+
+/* OS CONTATOS DA PEÇA NÃO SE MEDEM DE NOVO QUANDO A RECEITA NÃO MUDOU. A medida executa a receita em Node (uns 100 s no furgão) e mede
+   cada par de partes, e cada captura a pagava inteira, inclusive a que só queria uma imagem de perto. O resultado (só a lista dos pares
+   acusados) fica em `tmp/cache-de-medida/`, onde as outras ferramentas de medida já guardam o delas, com a chave que elas usam, a
+   assinatura do conteúdo da receita, do que ela importa e do núcleo (`assinaturaDaEntrada`), mais o código da própria medida de
+   contatos, que a assinatura delas não segue. `--sem-cache` mede de novo e regrava; `--sem-contatos` não mede. */
+const RAIZES_DA_MEDIDA_DE_CONTATOS = ['tools/modelar/entrada-de-medida.mjs', 'tools/modelar/importar-receita.mjs', 'src/autoria/executar-receita.js', 'src/autoria/contatos-da-peca.js', 'src/autoria/contato-de-solidos.js'];
+const VERSAO_DO_CACHE_DE_CONTATOS = 1;
+const rotuloDosContatos = (abs) => `contatos-${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_')}.${createHash('sha256').update(abs).digest('hex').slice(0, 6)}`;
+
+async function medirNoNode(caminho) {
+  const moduloDaPeca = await importarReceita(caminho);
+  const receitaDaPeca = receitaDoModulo(moduloDaPeca);
+  const { neutro } = executarReceita(receitaDaPeca);
+  return contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
+}
+
+/** `{ pares, origem: 'medidos' | 'do-cache', segundos, chave }`; falha se a receita não executa. */
+export async function medirParesAcusados(caminho, { cache = true, pastaDoCache = PASTA_DO_CACHE, medir = medirNoNode } = {}) {
+  const inicio = performance.now();
+  let chave = null;
+  if (cache) {
+    try { chave = assinaturaDaEntrada(caminho, RAIZES_DA_MEDIDA_DE_CONTATOS).chave; } catch { chave = null; }
+  }
+  const arquivo = chave ? join(pastaDoCache, `${rotuloDosContatos(caminho)}-${chave}.json`) : null;
+  if (arquivo && existsSync(arquivo)) {
+    try {
+      const lido = JSON.parse(readFileSync(arquivo, 'utf8'));
+      if (lido?.versao === VERSAO_DO_CACHE_DE_CONTATOS && Array.isArray(lido.pares)) return { pares: lido.pares, origem: 'do-cache', segundos: (performance.now() - inicio) / 1000, chave };
+    } catch { /* ilegível: mede de novo */ }
+  }
+  const pares = await medir(caminho);
+  if (arquivo) {
+    try {
+      mkdirSync(pastaDoCache, { recursive: true });
+      const parcial = `${arquivo}.${process.pid}.parcial`;
+      writeFileSync(parcial, JSON.stringify({ versao: VERSAO_DO_CACHE_DE_CONTATOS, pares }));
+      renameSync(parcial, arquivo);
+      /* uma receita guarda só a medida da última versão dela */
+      for (const f of readdirSync(pastaDoCache)) if (f.startsWith(`${rotuloDosContatos(caminho)}-`) && f.endsWith('.json') && f !== basename(arquivo)) { try { unlinkSync(join(pastaDoCache, f)); } catch { /* outra rodada pode tê-lo apagado */ } }
+    } catch { /* o cache é conveniência: sem disco, a medida segue sem ele */ }
+  }
+  return { pares, origem: 'medidos', segundos: (performance.now() - inicio) / 1000, chave };
 }
 
 /* DICA APARECE UMA VEZ, E SÓ QUANDO SE APLICA.
@@ -443,6 +514,11 @@ export async function olharBancada({
   /* A câmera que mira um ponto: `mirar` em mm do referencial da peça (`[x, y, z]` ou `"x,y,z"`) e `distancia` da câmera a ele, em mm. */
   mirar: mirarDeclarado = null,
   distancia: distanciaDeclarada = null,
+  /* Pontos em mm do referencial da peça a projetar no quadro de cada vista (o `--zoom` em mm da análise): cada vista relatada traz `projecaoMm`. */
+  projetar = null,
+  /* A medida de contatos: `medirContatos: false` não a faz (`--sem-contatos`), e `cacheDeContatos: false` a refaz ainda que a receita não tenha mudado (`--sem-cache`). */
+  medirContatos = true,
+  cacheDeContatos = true,
   /* Quem escuta o andamento: recebe uma linha ao começar cada etapa longa e a cada `intervaloDoProgressoMs`. A CLI a liga na saída de erro. */
   aoProgredir = null,
   intervaloDoProgressoMs = INTERVALO_DO_PROGRESSO_MS,
@@ -687,20 +763,33 @@ export async function olharBancada({
        silêncio é declarado em vez de virar lista vazia com cara de "está tudo
        certo". */
     let paresAcusados = [];
+    /* O QUE HOUVE COM A MEDIDA vai no relato: `medidos` (agora), `do-cache` (a receita não mudou desde que foi medida), `pulados`
+       (`--sem-contatos`), `falhou` ou `sem-receita` (peça da bancada ou da sessão, sem receita para executar). Só `medidos` e `do-cache`
+       dizem que a lista de pares é a verdade; nos outros, a lista vazia é falta de medida e não falta de achado. */
+    let contatos = { estado: 'sem-receita' };
     const sessaoDaPeca = peca && compartilhada ? compartilhada.sessoes.get(peca) ?? null : null;
-    if (sessaoDaPeca?.pares) {
+    if (peca && caminhoDaReceita && !medirContatos) {
+      contatos = { estado: 'pulados' };
+      registrar(relato, logger, 'stdout',
+        'contatos: NÃO medidos (--sem-contatos). A lista de pares acusados abaixo está vazia por falta de medida, não por falta de achado;'
+        + ' para saber se a peça tem contato não declarado, rode sem --sem-contatos ou use `descrever --estrito`.');
+    } else if (sessaoDaPeca?.pares) {
       paresAcusados = sessaoDaPeca.pares;
+      contatos = sessaoDaPeca.contatos ?? { estado: 'medidos' };
     } else if (peca && caminhoDaReceita) {
       progresso.etapa = 'medir os contatos da peça';
       try {
-        const moduloDaPeca = await importarReceita(caminhoDaReceita);
-        const receitaDaPeca = receitaDoModulo(moduloDaPeca);
-        const { neutro } = executarReceita(receitaDaPeca);
-        paresAcusados = contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
-        if (sessaoDaPeca) sessaoDaPeca.pares = paresAcusados;
+        const medida = await (dependencias.medirParesAcusados ?? medirParesAcusados)(caminhoDaReceita, { cache: cacheDeContatos, medir: dependencias.medirContatos });
+        paresAcusados = medida.pares;
+        contatos = { estado: medida.origem, pares: medida.pares.length, segundos: Math.round(medida.segundos * 10) / 10 };
+        if (sessaoDaPeca) { sessaoDaPeca.pares = paresAcusados; sessaoDaPeca.contatos = contatos; }
+        registrar(relato, logger, 'stdout', medida.origem === 'do-cache'
+          ? `contatos: lidos do cache (tmp/cache-de-medida/; a receita não mudou desde a última medida), ${medida.pares.length} par(es) acusado(s); --sem-cache mede de novo.`
+          : `contatos: medidos agora em ${contatos.segundos} s, ${medida.pares.length} par(es) acusado(s).`);
       } catch (erro) {
+        contatos = { estado: 'falhou', motivo: erro.message.split('\n')[0] };
         registrar(relato, logger, 'stdout',
-          `(não consegui medir os contatos desta peça: ${erro.message.split('\n')[0]})`);
+          `(não consegui medir os contatos desta peça: ${contatos.motivo}) A lista de pares acusados está vazia por falta de medida, não por falta de achado.`);
       }
     }
 
@@ -1064,8 +1153,11 @@ export async function olharBancada({
           falhou = true;
         } else registrar(relato, logger, 'stdout', `enquadramento ${vista}: ${medida}`);
       }
+      const projecaoMm = projetar ? await page.evaluate(projetarPontos, projetar) : null;
+      if (projecaoMm?.erro) erroDeUso(`não consegui projetar a caixa em mm: ${projecaoMm.erro}`);
       vistasRelatadas.push({
         nome: vistaRelatada,
+        ...(projecaoMm ? { projecaoMm } : {}),
         enquadramento: {
           valida: enquadramento.valida, area: enquadramento.area, largura: enquadramento.largura,
           altura: enquadramento.altura, cortado: enquadramento.cortado,
@@ -1215,7 +1307,7 @@ export async function olharBancada({
     }
     const resultado = {
       peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
-      paresAcusados, paresCapturados, cargasDePagina,
+      paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina,
       dicas: dicas.listar(),
       ...(capturarEmMemoria ? { capturas } : {}),
     };
@@ -1265,13 +1357,14 @@ export async function olharBancada({
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
 export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia'];
-export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'];
+export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
 
-  --analise              o passo "Pare e analise": 6 vistas ortográficas em sombreado, arame e raio X, em tools/bancadas/out/analise-<peça>/
+  --analise              o passo "Pare e analise": 6 vistas ortográficas em sombreado, arame e raio X, em tools/bancadas/out/analise-<peça>/, com a página e a peça carregadas uma vez só
   --parte=<nome>         com --analise, também a parte isolada e enquadrada nas 6 vistas
-  --zoom=<vista>:<x0,y0,x1,y1>   com --analise, recorta o retângulo em pixels e amplia 3 vezes
+  --zoom=<vista>:<x0,y0,x1,y1>   com --analise, recorta o retângulo em pixels da vista (4 inteiros) e amplia 3 vezes
+  --zoom=<vista>:mm:<x0,y0,z0,x1,y1,z1>   o mesmo recorte por uma caixa em mm do referencial da peça (dois cantos opostos), projetada na vista; o prefixo mm: é obrigatório, e 6 números sem ele são recusados
   --zoom-antes=<png>     com --zoom, põe o mesmo recorte de uma captura anterior ao lado
   --vistas=<a,b,...>     escolhe as vistas: ${VISTAS_VALIDAS.join(', ')}
   --arame | --wireframe  malha opaca sobre a peça (sem raio X e sem sombra da malha de trás)
@@ -1285,6 +1378,8 @@ Captura a peça ou montagem na bancada, sem interface.
   --focar                enquadra a câmera nas selecionadas; se a câmera cair dentro da peça (parte pequena, vista de lado), recua-a para fora com o mesmo quadro
   --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
   --distancia=<mm>       com --mirar: a distância da câmera ao ponto (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
+  --sem-contatos         não mede os contatos da peça (a medida executa a receita em Node, uns 100 s no furgão); o relato diz "NÃO medidos", e lista vazia de pares não quer dizer sem achado
+  --sem-cache            mede os contatos de novo; sem ele, a medida da mesma receita (mesmo conteúdo) vem de tmp/cache-de-medida/ e o relato diz "lidos do cache"
   --par=<a,b>            inspeção dirigida de duas partes (isola e escolhe a vista legível)
   --explosao=<0..1>      afasta as partes da montagem
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par
@@ -1358,14 +1453,8 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
   }
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
-    return analisarPeca({
-      peca, parte: lido.opcao('parte'), zoom: lido.opcao('zoom'), zoomAntes: lido.opcao('zoom-antes'),
-      saida: lido.opcao('saida'), res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'),
-      olhar: (opcoes) => olharBancada({ ...opcoes, aoProgredir }),
-      ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
-    }).then((r) => (r.ok
-      ? { ok: true, codigo: 0, stdout: `análise de ${peca}:\n${r.arquivos.map((a) => `  ${a}`).join('\n')}\n`, stderr: '', resultado: { arquivos: r.arquivos } }
-      : r), (erro) => erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
+    const contatos = { medirContatos: !lido.bandeira('sem-contatos'), cacheDeContatos: !lido.bandeira('sem-cache') };
+    return analisarNumaCarga({ peca, lido, prazo, contatos, aoProgredir });
   }
   if (tela && (lido.bandeira('cores') || arame || lido.bandeira('auditoria'))) {
     return Promise.resolve(erroEstruturado({
@@ -1392,7 +1481,53 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
     coresPorParte: lido.bandeira('cores'),
     arame,
     corte,
+    medirContatos: !lido.bandeira('sem-contatos'), cacheDeContatos: !lido.bandeira('sem-cache'),
   });
+}
+
+/* A `--analise` NUMA CARGA SÓ: o servidor, o navegador, a peça da sessão e a página abrem uma vez, e as 18 vistas (mais a parte
+   isolada) trocam a câmera e o modo nela, como a `vistas:critica` já fazia; a medida de contatos também é uma só. Antes cada vista
+   recarregava a peça, 31 a 33 min no furgão realista. Quem abre fecha, e um sinal de parada fecha o Chromium e o servidor. */
+async function analisarNumaCarga({ peca, lido, prazo, contatos, aoProgredir }) {
+  let compartilhada = null;
+  const aoSinal = (sinal) => {
+    const limite = new Promise((ok) => setTimeout(ok, 4000));
+    Promise.race([compartilhada ? compartilhada.fechar() : Promise.resolve(), limite]).finally(() => process.exit(sinal === 'SIGINT' ? 130 : 143));
+  };
+  const sinais = ['SIGINT', 'SIGTERM', 'SIGHUP'];
+  try {
+    /* a recusa de uso vem antes de abrir servidor e navegador: o zoom mal escrito não custa uma carga */
+    if (lido.opcao('zoom')) lerZoom(lido.opcao('zoom'));
+    for (const sinal of sinais) process.once(sinal, aoSinal);
+    compartilhada = await abrirCapturaCompartilhada();
+    const r = await analisarPeca({
+      peca, parte: lido.opcao('parte'), zoom: lido.opcao('zoom'), zoomAntes: lido.opcao('zoom-antes'),
+      saida: lido.opcao('saida'), res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'),
+      olhar: (opcoes) => olharBancada({ ...opcoes, aoProgredir, compartilhada }),
+      contatos,
+      ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
+    });
+    if (!r.ok) return r;
+    const estado = r.contatos?.estado ?? 'sem-receita';
+    const linhaDosContatos = {
+      medidos: `contatos: medidos agora em ${r.contatos?.segundos} s, ${r.contatos?.pares} par(es) acusado(s)`,
+      'do-cache': `contatos: lidos do cache, ${r.contatos?.pares} par(es) acusado(s) (--sem-cache mede de novo)`,
+      pulados: 'contatos: NÃO medidos (--sem-contatos); a análise não diz se há contato não declarado',
+      falhou: `contatos: NÃO medidos, a medida falhou (${r.contatos?.motivo}); a análise não diz se há contato não declarado`,
+      'sem-receita': 'contatos: sem receita para medir',
+    }[estado];
+    const zoom = r.zoomEmPixels ? `zoom em mm: caixa de ${r.zoomEmPixels.caixa.join(', ')} px na vista${r.zoomEmPixels.cortada ? ' (cortada pelo quadro: a caixa passa da borda da imagem)' : ''}\n` : '';
+    return {
+      ok: true, codigo: 0,
+      stdout: `análise de ${peca}: ${r.cargasDePagina} carga(s) de página\n${linhaDosContatos}\n${zoom}${r.arquivos.map((a) => `  ${a}`).join('\n')}\n`,
+      stderr: '', resultado: { arquivos: r.arquivos, cargasDePagina: r.cargasDePagina, contatos: r.contatos },
+    };
+  } catch (erro) {
+    return erroEstruturado({ relato: novoRelato(), erro: erro instanceof ErroDeUso ? erro : new ErroDeUso(erro.message) });
+  } finally {
+    for (const sinal of sinais) process.removeListener(sinal, aoSinal);
+    if (compartilhada) await compartilhada.fechar().catch(() => {});
+  }
 }
 
 const executadoComoCLI = process.argv[1]

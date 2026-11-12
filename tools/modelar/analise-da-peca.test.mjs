@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import { afterEach, describe, expect, it } from 'vitest';
-import { analisarPeca, estadoDaAnalise, lerZoom } from './analise-da-peca.mjs';
+import { analisarPeca, cantosDaCaixaMm, caixaEmPixelsDosCantos, estadoDaAnalise, lerZoom } from './analise-da-peca.mjs';
 
 const REPO = fileURLToPath(new URL('../..', import.meta.url));
 const PECA = 'peca-teste-analise';
@@ -70,6 +70,76 @@ describe('analisarPeca', () => {
   it('recusa zoom mal formado ou fora da imagem', async () => {
     expect(() => lerZoom('frontal:1,2,3')).toThrow(/--zoom/);
     await expect(analisarPeca({ peca: PECA, zoom: 'frontal:0,0,400,300', olhar: olharFalso([]) })).rejects.toThrow(/sai da imagem/);
+  });
+});
+
+describe('o zoom em pixels e o zoom em mm não se confundem', () => {
+  it('lê as duas formas, pelo prefixo mm:, e ordena os cantos da caixa em mm', () => {
+    expect(lerZoom('frontal:10,5,20,15')).toEqual({ vista: 'frontal', caixa: [10, 5, 20, 15] });
+    expect(lerZoom('direita:mm:1100,1700,-300,900,1500.5,300')).toEqual({ vista: 'direita', mm: [[900, 1500.5, -300], [1100, 1700, 300]] });
+  });
+
+  it('recusa o uso ambíguo dizendo o que escrever', () => {
+    expect(() => lerZoom('frontal:900,1200,-300,1100,1500,300')).toThrow(/caixa em mm leva o prefixo mm:\. Escreva --zoom=frontal:mm:900,1200,-300,1100,1500,300/);
+    expect(() => lerZoom('frontal:mm:10,5,20,15')).toThrow(/pede 6 números.*escreva sem o mm: --zoom=frontal:10,5,20,15/);
+    expect(() => lerZoom('frontal:mm:1,2,3')).toThrow(/pede 6 números/);
+    expect(() => lerZoom('frontal:10.5,5,20,15')).toThrow(/pixels pede 4 inteiros.*só vale em mm/);
+    expect(() => lerZoom('frontal:-1,5,20,15')).toThrow(/pixels pede 4 inteiros/);
+    expect(() => lerZoom('frontal:a,b,c,d')).toThrow(/não é número/);
+    expect(() => lerZoom('lateral:1,2,3,4')).toThrow(/vista 'lateral'/);
+    expect(() => lerZoom('frontal:20,5,10,15')).toThrow(/x1>x0/);
+    expect(() => lerZoom('semvista')).toThrow(/--zoom veio.*Escreva --zoom=<vista>:<x0,y0,x1,y1>.*mm:/);
+  });
+
+  it('os 8 cantos, e a caixa em pixels que os envolve, arredondada para fora e cortada ao quadro', () => {
+    expect(cantosDaCaixaMm([[0, 0, 0], [1, 2, 3]])).toHaveLength(8);
+    expect(new Set(cantosDaCaixaMm([[0, 0, 0], [1, 2, 3]]).map((c) => c.join()))).toEqual(new Set(['0,0,0', '0,0,3', '0,2,0', '0,2,3', '1,0,0', '1,0,3', '1,2,0', '1,2,3']));
+    expect(caixaEmPixelsDosCantos([[10.2, 5.9], [20.1, 15.5], [12, 8]], [40, 30])).toEqual({ caixa: [10, 5, 21, 16], livre: [10, 5, 21, 16], cortada: false });
+    expect(caixaEmPixelsDosCantos([[-5, 5], [20, 15]], [40, 30])).toMatchObject({ caixa: [0, 5, 20, 15], cortada: true });
+    expect(caixaEmPixelsDosCantos([[50, 5], [60, 15]], [40, 30]).caixa).toBeNull();
+  });
+});
+
+describe('o zoom por caixa em mm na análise', () => {
+  /* olhar falso com a projeção: cada vista projeta a caixa num retângulo de pixels conhecido */
+  function olharComProjecao(chamadas, pixels) {
+    const base = olharFalso(chamadas);
+    return async (o) => {
+      const r = await base(o);
+      return o.projetar ? { ...r, resultado: { ...r.resultado, vistas: o.vistas.map(() => ({ projecaoMm: { pixels, quadro: [40, 30] } })), contatos: { estado: 'medidos', pares: 0, segundos: 1 }, cargasDePagina: 1 } } : r;
+    };
+  }
+
+  it('pede a projeção dos 8 cantos só na primeira passada, recorta a caixa projetada nos três modos e grava a caixa em pixels no manifesto', async () => {
+    const chamadas = [];
+    const pixels = [[10, 5], [19.2, 14.1], [12, 8], [10, 14], [19, 5], [11, 6], [15, 9], [16, 10]];
+    const r = await analisarPeca({ peca: PECA, zoom: 'frontal:mm:900,1200,-300,1100,1500,300', olhar: olharComProjecao(chamadas, pixels) });
+    expect(chamadas.filter((c) => c.projetar)).toHaveLength(1);
+    expect(chamadas[0].projetar).toHaveLength(8);
+    const zoom = JSON.parse(readFileSync(join(REPO, PASTA, 'manifesto.json'), 'utf8')).zoom;
+    expect(zoom).toMatchObject({ vista: 'frontal', caixaEmPixels: [10, 5, 20, 15], cortadaPeloQuadro: false });
+    const recorte = PNG.sync.read(readFileSync(join(REPO, PASTA, 'zoom-frontal-sombreado.png')));
+    expect([recorte.width, recorte.height]).toEqual([30, 30]);
+    expect(r.arquivos.map((a) => a.replaceAll('\\', '/'))).toContain(`${PASTA}/zoom-frontal-raio-x.png`);
+    expect(r.zoomEmPixels.caixa).toEqual([10, 5, 20, 15]);
+  });
+
+  it('caixa fora do quadro da vista, ou captura sem projeção, é recusada com o que fazer', async () => {
+    await expect(analisarPeca({ peca: PECA, zoom: 'frontal:mm:0,0,0,1,1,1', olhar: olharComProjecao([], [[100, 100], [120, 120]]) })).rejects.toThrow(/cai fora do quadro da vista frontal.*use uma vista que a mostre/);
+    await expect(analisarPeca({ peca: PECA, zoom: 'frontal:mm:0,0,0,1,1,1', olhar: olharFalso([]) })).rejects.toThrow(/não devolveu a projeção/);
+  });
+
+  it('leva as opções de contatos a cada captura e põe a carga e o estado dos contatos no resultado e no manifesto', async () => {
+    const chamadas = [];
+    const olhar = async (o) => {
+      const r = await olharFalso(chamadas)(o);
+      return { ...r, resultado: { ...r.resultado, cargasDePagina: chamadas.length === 1 ? 1 : 0, contatos: chamadas.length === 1 ? { estado: 'pulados' } : undefined } };
+    };
+    const r = await analisarPeca({ peca: PECA, contatos: { medirContatos: false, cacheDeContatos: false }, olhar });
+    expect(chamadas.every((c) => c.medirContatos === false && c.cacheDeContatos === false)).toBe(true);
+    expect(r.cargasDePagina).toBe(1);
+    expect(r.contatos).toEqual({ estado: 'pulados' });
+    expect(r.manifesto).toMatchObject({ cargasDePagina: 1, contatos: { estado: 'pulados' } });
   });
 });
 

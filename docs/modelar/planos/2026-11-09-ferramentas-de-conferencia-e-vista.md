@@ -134,6 +134,24 @@ receita em Node a cada captura (uns 100 s no furgão, inclusive na mira) e deve 
 parte dos minutos da captura; para a fatia 4: o aviso de progresso do `descrever` e do `guarda:acervo`, que seguem dois minutos sem
 saída.
 
+Fatia 4 (2026-11-12): três dos quatro itens já estavam no código quando a fatia abriu, e a fatia os provou em vez de refazê-los. O
+registro de etapas (`24f673f4`) já grava os campos na mesma ordem e só quando o texto muda, com teste, e ler o estado das
+quatro montagens versionadas (aviao, braço, carrinho, empilhadeira) deixou os `montagem.etapas.json` intactos no git; a cor da forma
+(`a6d6ce49`) já vira material liso e já chega à captura da bancada, e o esboço do farol do furgão saiu com o azul, o laranja e o
+grafite das formas, igual nas três opções; o teste novo de `atalho.test.js` prova que a cor chega ao painel, à receita
+(`MATERIAIS`) e à cor que a `vista:rapida` desenha. O que faltava era o limite de texto e a cópia isolada. A recusa dos 240
+caracteres, que o `descrever` já dava antes de rodar a receita e que o `guarda:acervo` herda por ele, passa a dizer o campo, o
+tamanho e quantos caracteres passam (`'objeto' excede 240 caracteres (tem 253, 13 a mais que o limite)`), no normalizador do PLANO
+e no motivo das dobras aceitas; o acervo (43 receitas) normaliza sem recusa. O esboço numa cópia isolada sem `node_modules` morria
+no primeiro pacote (`pngjs`, depois `earcut` e `manifold-3d`) e, na captura, no `manifold-3d` que o Vite procura a partir da cópia
+(90 s de espera e erro); `tools/modelar/resolucao-da-raiz.mjs` resolve o pacote que falta pelas `node_modules` do repositório
+principal, que o `.git` do worktree aponta, para o Node (`npm run esboco:nucleo` agora entra com `--import`) e para o servidor da
+captura, sem copiar nem ligar pasta nenhuma. Caso refeito num worktree novo sem `node_modules`: o farol do furgão montou em 0,6 s e
+capturou a imagem inteira em 36 s, com a mesma câmera nas três opções. Testes: `resolucao-da-raiz.test.mjs`, o caso do limite em
+`plano-de-modelagem.test.js` e o da cor em `atalho.test.js`. A captura de `olhar-bancada` e das demais ferramentas que abrem a
+bancada fora do esboço segue exigindo `node_modules` na cópia, porque `olhar-bancada.mjs` importa o Playwright por um caminho fixo
+da raiz da cópia; isso fica para a fatia da bancada.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar.

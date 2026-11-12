@@ -17,6 +17,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 export const TESTES_LENTOS = [
   'tools/modelar/ondulacao-corte-e-quina.test.mjs',
   'tools/modelar/raio-da-aresta.test.mjs',
+  'modulos/esboco-nucleo/tests/leitor.test.js',
   'procedural/nucleo/paineis-por-vaos-curva.test.ts',
   'procedural/nucleo/paineis-por-vaos-superficie.test.ts',
   'procedural/nucleo/paineis-por-vaos-separa.test.ts',
