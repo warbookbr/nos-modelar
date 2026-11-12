@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:d55f49a35b4e524643085c7c06f49b8310eef6328a86ed86c34140f4c84b603e",
+  "assinatura": "sha256:be3e371d8227814ba7bc9f0f0b90922921d5a0e16f7342081df9de37a5d414d7",
   "total": 42,
   "operacoes": [
     {
@@ -386,6 +386,20 @@
             "fecha": {
               "type": "object",
               "description": "{ eixo: 'x'|'y'|'z', em }, o plano da tampa que fecha a abertura maior da chapa; uma lista, um plano por chapa."
+            },
+            "limpar": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "true (o padrão), false ou a tolerância: as faces finas e de área nula que o corte deixa saem por limparLascas dentro do passo; true usa 6e-6 da diagonal do sólido."
             }
           }
         },
@@ -3184,6 +3198,20 @@
                 }
               ],
               "description": "Razão área / maior aresta² abaixo da qual a face é lasca; padrão 0,003."
+            },
+            "areaMinima": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Área, na unidade da peça ao quadrado, abaixo da qual a face é lasca mesmo bem proporcionada (a que a medida de contatos não triangula); padrão 4e-9 vezes o quadrado da meia diagonal da caixa da seleção."
             }
           }
         },
