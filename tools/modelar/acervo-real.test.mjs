@@ -51,8 +51,10 @@ const SEGUNDOS_POR_ALVO = 2;
    ficou em 8,7, 9,1, 8,5, 9,1 e 8,9. O teto da peça pesada passa a ser essa razão, 15, cerca de 1,7 vez a medida, e a máquina
    lenta deixa de reprovar; o prazo do teste, 900 s, é o que resta de teto absoluto. A regressão da peça continua aparecendo,
    porque quem a deixa mais lenta não deixa as outras. Quando a receita da peça mudar de custo de propósito, a razão é medida
-   de novo no CI e anotada aqui. */
-const PECAS_PESADAS = { 'furgao-realista': 15 };
+   de novo no CI e anotada aqui. A razão é a do CI: na máquina local, com agentes modelando ao lado, o furgão mediu 16,7 e 17,9
+   vezes a soma das outras (254 e 250 s contra 15 e 14 s), porque a peça de 190 mil faces sofre com a memória disputada e as
+   pequenas não. Fora do CI o teto é o dobro, 30, que ainda pega a regressão grande; o CI cobra a razão justa. */
+const PECAS_PESADAS = { 'furgao-realista': process.env.CI ? 15 : 30 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);

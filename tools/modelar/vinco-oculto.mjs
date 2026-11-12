@@ -22,7 +22,7 @@
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
-import { aceitasDaReceita, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
+import { aceitasDaReceita, extensaoDaCadeia, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
 import { superficiesDaReceita } from './dobra-da-superficie.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -104,7 +104,7 @@ export function vincoOcultoDaSuperficie(sup, opcoes = {}) {
   }
   const resumo = (c, tipo, largura = null) => ({
     tipo, parte: c.parte, posicaoMm: c.centro.map((x) => arred(x * MM, 1)), comprimentoMm: arred(c.comprimento, 1), anguloMedioGraus: arred(c.anguloMedio, 1),
-    ...(largura === null ? {} : { larguraMm: arred(largura, 1) }), arestas: c.itens.length,
+    ...(largura === null ? {} : { larguraMm: arred(largura, 1) }), arestas: c.itens.length, ...extensaoDaCadeia(c.verts.map((v) => V[v])),
   });
   /* o chanfro: duas cadeias paralelas, de tamanho parecido e perto uma da outra */
   const emPar = new Set(); const chanfros = [];
@@ -119,7 +119,7 @@ export function vincoOcultoDaSuperficie(sup, opcoes = {}) {
     const w = Math.max(distanciaMediana(A, B), distanciaMediana(B, A));
     if (w > o.larguraMaximaMm || w < 1e-6) continue;
     emPar.add(i); emPar.add(j);
-    chanfros.push({ ...resumo({ ...A, comprimento: (A.comprimento + B.comprimento) / 2, anguloMedio: (A.anguloMedio + B.anguloMedio) / 2, centro: A.centro.map((x, k) => (x + B.centro[k]) / 2), parte: A.parte }, 'chanfro', w), cadeias: [i, j] });
+    chanfros.push({ ...resumo({ ...A, verts: [...A.verts, ...B.verts], comprimento: (A.comprimento + B.comprimento) / 2, anguloMedio: (A.anguloMedio + B.anguloMedio) / 2, centro: A.centro.map((x, k) => (x + B.centro[k]) / 2), parte: A.parte }, 'chanfro', w), cadeias: [i, j] });
   }
   const vincos = cadeias.map((c, i) => ({ c, i })).filter(({ i }) => !emPar.has(i)).map(({ c }) => resumo(c, 'vinco'));
   const ordem = (x, y) => y.comprimentoMm - x.comprimentoMm || x.posicaoMm[0] - y.posicaoMm[0] || x.posicaoMm[1] - y.posicaoMm[1] || x.posicaoMm[2] - y.posicaoMm[2];
@@ -149,7 +149,7 @@ export function vincoOcultoDaReceita(receita, opcoes = {}, executada = null) {
 
 export function textoDoAchado(a) {
   const n = (x) => String(x).replace('.', ',');
-  return `${a.tipo} não declarado na parte ${a.parte ?? 'sem parte'}, em [${a.posicaoMm.join('; ')}] mm: ${n(a.comprimentoMm)} mm de comprimento, ângulo médio de ${n(a.anguloMedioGraus)} graus${a.larguraMm === undefined ? '' : `, largura de ${n(a.larguraMm)} mm`}`;
+  return `${a.tipo} não declarado na parte ${a.parte ?? 'sem parte'}, em [${a.posicaoMm.join('; ')}] mm: ${n(a.comprimentoMm)} mm de comprimento, ângulo médio de ${n(a.anguloMedioGraus)} graus${a.larguraMm === undefined ? '' : `, largura de ${n(a.larguraMm)} mm`}${a.pontasMm ? `, de [${a.pontasMm[0].join('; ')}] a [${a.pontasMm[1].join('; ')}] mm` : ''}`;
 }
 
 /* ---------- a imagem: a malha em cinza e os achados em cor, numa vista ortográfica ---------- */

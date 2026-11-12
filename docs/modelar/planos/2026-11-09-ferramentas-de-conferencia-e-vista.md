@@ -4,14 +4,15 @@
 
 **Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/conferir-vistas.mjs`
 
-**Responsável:** a IA da sessão do furgão, com as decisões técnicas delegadas pela pessoa em 2026-11-09; a pessoa é a
-crítica por imagem, com um resumo curto do que olhar.
+**Responsável:** a IA da sessão do núcleo (ramo claude/relaxed-thompson-d0a7r4), por decisão da pessoa em 2026-11-12, com as
+decisões técnicas delegadas; a pessoa é a crítica por imagem, com um resumo curto do que olhar, e a forma de peça aceita
+continua sendo dela.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-09.
 
 Em 2026-11-09 a pessoa passou a este plano `etapas-da-montagem.mjs`, que era do plano do
-[braço](encerrados/2026-09-26-as-partes-do-braco.md), para o registro de etapas parar de se regravar; ele volta ao braço quando este
-fechar. A câmera por ponto e o nome curto da captura saem do rascunho da [ferramenta de material](2026-11-08-ferramenta-de-material.md).
+[braço](encerrados/2026-09-26-as-partes-do-braco.md), para o registro de etapas parar de se regravar; ele ficava de volta ao braço quando este
+fechasse; o braço fechou e o arquivo fica neste plano de vez (2026-11-12). A câmera por ponto e o nome curto da captura saem do rascunho da [ferramenta de material](2026-11-08-ferramenta-de-material.md).
 
 ## Problema observado
 
@@ -68,6 +69,9 @@ Cada ferramenta nasce de um atrito relatado, com o comando que o reproduz, e é 
   referência na mesma bateria, e não por número fixo; a mesma receita levou 104 s, 188 s e 368 s no CI em três baterias do
   mesmo dia, e o teto fixo reprovou ao acaso duas vezes.
 
+- pedido da sessão do furgão, já atendido (2026-11-12): o teste do acervo real compara a peça pesada com a soma das outras
+  peças na mesma máquina (`tools/modelar/acervo-real.test.mjs`), no lugar de um teto fixo em segundos.
+
 Caso de teste da régua da crista, pedido pela sessão do núcleo: a ruga no alto das duas colunas do para-brisa do furgão está
 presente no envio `fee4b88c` (main de 2026-11-12) e no envio seguinte, o dos retrovisores, que não toca a coluna; a correção da
 ruga vem num envio próprio depois deles.
@@ -96,6 +100,15 @@ ruga vem num envio próprio depois deles.
 
 Se a régua pela cadeia inteira acusar no acervo feições aprovadas pela pessoa, a declaração é revista com região justa e a
 mesma intenção; se a feição não couber em região nenhuma, ela vai à pessoa com a imagem antes de mudar a régua.
+
+## Andamento
+
+Fatia 1 (2026-11-12): a caixa de cada cadeia e as duas pontas mais distantes saem da `vinco-oculto` e da `dobra-da-superficie`
+(`caixaMm`, `pontasMm`), e `aceitacaoDe` só cobre o achado quando a caixa inteira cabe na região; o `descrever` imprime as
+pontas (`, de [x; y; z] a [x; y; z] mm`). Caso: `tools/fixtures/vinco-da-coluna/coluna-do-furgao.json` e
+`tools/modelar/dobra-aceita-pela-cadeia.test.mjs`; com as regiões de antes do furgão, as duas cadeias da coluna (830,6 e 272,8
+mm, 39 mm entre as pontas, onde está a ruga) saem como achado. O acervo acusou só declarações do furgão (regiões justas
+demais para a cadeia); a revisão delas é da sessão do furgão, com as caixas medidas no relato da fatia.
 
 ## Fechamento
 

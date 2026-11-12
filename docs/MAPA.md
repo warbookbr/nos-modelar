@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1976 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1980 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2051,6 +2051,15 @@
 - `caminho-b-rede-de-curvas.esboco.mjs` — caminho-b-rede-de-curvas.esboco.mjs: o caminho B do primeiro ciclo de alta definição do sedã. A gaiola sai de `gaiolaPorRede`, com as curvas de feição desenh…
 - `medir.mjs` — medir.mjs: o que o primeiro ciclo de alta definição mede e nenhuma ferramenta do repositório dá: o tempo de montagem, o número de faces por parte e o raio da…
 
+## procedural/pecas/sedan-chassi-e-lataria/partes/_comum/
+
+- `recorte.mjs` — sedan-chassi-e-lataria/partes/_comum/recorte.mjs: o recorte de uma etapa do sedã no conjunto que o esboço do carro inteiro monta.
+- `sedan.mjs` — sedan-chassi-e-lataria/partes/_comum/sedan.mjs: o módulo comum das etapas do sedã em alta definição (fatia 4c do plano do núcleo para qualquer mecanismo). El…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/
+
+- `receita.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
+
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/
 
 - `derivar-contornos.mjs` — derivar-contornos.mjs: escreve `sedan-chassi-e-lataria.contornos.json` (mecanifica.contornos@1) a partir das silhuetas em fatias de `procedural/pecas/carro-s…
@@ -3009,6 +3018,7 @@
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
+- `dobra-aceita-pela-cadeia.test.mjs` — dobra-aceita-pela-cadeia.test.mjs — a região de `PLANO.dobrasAceitas` vale pela cadeia inteira, e a ruga na ponta dela não some junto (plano de conferência, …
 - `dobra-da-superficie.mjs` — dobra-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita dobra com diedro agudo fora de vinco declarado, e diz a parte, o lugar e o ângulo.
 - `dobra-da-superficie.test.mjs` — dobra-da-superficie.test.mjs — a régua de dobra sobre superfícies pequenas feitas aqui: duas faces que se dobram num ângulo conhecido. O diedro é 180 graus m…
 - `dobras-aceitas-reguas.test.mjs` — dobras-aceitas-reguas.test.mjs — `PLANO.dobrasAceitas` nas duas réguas de superfície e no `descrever`: a aba da técnica de hoje (`tubos-hoje.js`) sai como 4 …
