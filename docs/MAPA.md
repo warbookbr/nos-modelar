@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1993 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1999 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2644,6 +2644,26 @@
 - `receita.js` — subtrair-que-nao-corta/receita.js — peça de prova do defeito "um `subtrair` que não corta nada passa calado" (plano "costuras e furos limpos"): um bloco de 1…
 - `subtrair-que-nao-corta.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte o número marcado.
 
+## tools/fixtures/descrever-sem-calar/
+
+- `plano.js` — plano.js — o PLANO mínimo das peças de prova de `descrever-sem-calar.test.mjs`: uma chapa de uma parte só.
+
+## tools/fixtures/descrever-sem-calar/chapa-inteira/
+
+- `receita.js` — receita.js — peça de prova do aviso do `descrever` para a abertura que cai na booleana da chapa inteira: uma chapa de 5.616 faces com um vão que toma mais da…
+
+## tools/fixtures/descrever-sem-calar/chapa-inteira/referencias/
+
+- `alvo.md` — Alvo
+
+## tools/fixtures/descrever-sem-calar/orfao/
+
+- `receita.js` — receita.js — peça de prova do `descrever` e da `guarda:acervo` que dizem o órfão: a abertura tem um contorno que sai da chapa, o núcleo recusa o passo e a pa…
+
+## tools/fixtures/descrever-sem-calar/orfao/referencias/
+
+- `alvo.md` — Alvo
+
 ## tools/fixtures/faces-finas/
 
 - `receita-de-prova.js` — receita-de-prova.js — a receita de prova da contagem de faces finas da medição da rodada.
@@ -3039,6 +3059,7 @@
 - `descrever-partes-materiais.test.mjs` — descrever-partes-materiais.test.mjs — a revisão persiste os campos novos do material (verniz, transmissão, relevo e os demais) e as revisões já gravadas segu…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
+- `descrever-sem-calar.test.mjs` — descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista): o órfão d…
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `dobra-aceita-pela-cadeia.test.mjs` — dobra-aceita-pela-cadeia.test.mjs — a região de `PLANO.dobrasAceitas` vale pela cadeia inteira, e a ruga na ponta dela não some junto (plano de conferência, …

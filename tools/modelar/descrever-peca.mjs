@@ -27,6 +27,8 @@ import {
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
+import { FACES_MINIMAS_PARA_RECORTAR } from '../../procedural/nucleo/operacoes/abertura-por-contorno.js';
 import { dobraDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
 import { textoDoAchado, vincoOcultoDaReceita } from './vinco-oculto.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
@@ -102,9 +104,65 @@ function falha(mensagem) {
   });
 }
 
-function amostraDeOrfaos(neutro) {
-  return neutro.orfaos.slice(0, 5)
-    .map((o) => `passo ${o.passo} (${o.op}): ${o.motivo}${o.ref === undefined ? '' : ` — ref ${JSON.stringify(o.ref)}`}`);
+/* OS ÓRFÃOS, UM POR LINHA, COM O PASSO E O MOTIVO. Um passo recusado deixa o que ele devia criar sem existir, e todo passo seguinte que o cita vira
+   órfão também (no furgão, em 2026-11-11, uma `aberturaPorContorno` cujo contorno cruzava a fresta de uma porta esvaziou a chapa e a cadeia
+   inteira). O eco de uma causa ("origem ... inexistente", "seleção vazia") vem depois das causas e some quando passa do corte, com a conta do que ficou de fora. */
+const ECO_DE_ORFAO = /inexistente ou ainda não criada|seleção vazia|nenhum alvo (de face )?válido/;
+const ORFAOS_LISTADOS = 12;
+
+export function linhasDeOrfaos(neutro, { limite = ORFAOS_LISTADOS } = {}) {
+  const orfaos = Array.isArray(neutro?.orfaos) ? neutro.orfaos : [];
+  const texto = (o) => `passo ${o.passo} (${o.op}): ${o.motivo}${o.ref == null ? '' : ` — ref ${JSON.stringify(o.ref)}`}`;
+  const causas = orfaos.filter((o) => !ECO_DE_ORFAO.test(String(o.motivo)));
+  const ecos = orfaos.filter((o) => ECO_DE_ORFAO.test(String(o.motivo)));
+  const ordem = [...causas, ...ecos];
+  const linhas = ordem.slice(0, limite).map(texto);
+  if (ordem.length > limite) linhas.push(`... e mais ${ordem.length - limite} órfão(s), quase todos o eco do que os de cima não criaram`);
+  if (causas.length && ecos.length && ordem.length <= limite) linhas.push(`(${causas.length} causa(s) e ${ecos.length} eco(s) que citam o que elas não criaram)`);
+  return linhas;
+}
+
+function amostraDeOrfaos(neutro) { return linhasDeOrfaos(neutro); }
+
+/* O REGISTRO QUE CRONOMETRA CADA PASSO. O núcleo não mede o tempo de um passo, e o `descrever` precisava dele para dizer qual vão custou (a janela da
+   cabine do furgão foi de 118 s a 207 s em 2026-11-09 sem nada acusar). Em vez de mudar o núcleo, o `descrever` entrega a ele um registro que
+   embrulha a operação e anota, por índice de passo, o tempo e a operação; a cada batida do intervalo, quando a receita ainda roda, diz onde está. */
+function registroCronometrado(base, { total, tempos, aoPasso }) {
+  return {
+    ...base,
+    resolver(...argumentos) {
+      const registrada = base.resolver(...argumentos);
+      if (!registrada || typeof registrada.executar !== 'function') return registrada;
+      const original = registrada.executar;
+      const embrulho = function executarCronometrada(...a) {
+        const i = original.nativaModelar ? null : a[2];
+        const t0 = performance.now();
+        try { return original.apply(this, a); } finally {
+          if (i != null) { tempos.set(i, { op: registrada.nome ?? argumentos[0], ms: performance.now() - t0 }); aoPasso?.(i, total, registrada.nome ?? argumentos[0]); }
+        }
+      };
+      if (original.nativaModelar) Object.defineProperty(embrulho, 'nativaModelar', { value: true });
+      const copia = Object.create(registrada);
+      Object.defineProperty(copia, 'executar', { value: embrulho, enumerable: true });
+      return copia;
+    },
+  };
+}
+
+const segundos = (ms) => String(Math.round(ms / 100) / 10).replace('.', ',');
+
+/* A ABERTURA QUE CAI NA BOOLEANA DA CHAPA INTEIRA, COMO AVISO. O recorte da vizinhança do vão deixa a booleana ver só o trecho em volta dele; quando ele não
+   recorta, a booleana vê a chapa inteira e o passo custa o tamanho dela. Só importa quando a chapa é grande (a de menos de FACES_MINIMAS_PARA_RECORTAR faces
+   não recorta de propósito). O motivo é o `vizinhanca.motivo` do registro, e o tempo o do passo. Devolve as linhas, ou lista vazia. */
+export function avisosDaChapaInteira(neutro, tempos = new Map()) {
+  const aberturas = Array.isArray(neutro?.aberturas) ? neutro.aberturas : [];
+  return aberturas
+    .filter((a) => a.vizinhanca && a.vizinhanca.recortada === false && a.vizinhanca.daChapa >= FACES_MINIMAS_PARA_RECORTAR)
+    .map((a) => {
+      const tempo = tempos.get(a.passo);
+      return `passo ${a.passo} (aberturaPorContorno): a booleana viu a chapa inteira, de ${a.vizinhanca.daChapa} faces`
+        + `${tempo ? `, e o passo levou ${segundos(tempo.ms)} s` : ''}: ${a.vizinhanca.motivo}`;
+    });
 }
 
 /**
@@ -212,7 +270,18 @@ export async function descreverPecaReutilizavel({
   /* Módulo que exporta o registro de composições (`--composicoes=<módulo>`);
      vale quando `registroComposicoes` não vem pronto. */
   composicoes = null,
+  /* `aoProgredir(linha)` recebe, em uma linha, a etapa em que a medida está ao entrar em cada etapa longa, e uma batida a cada `intervaloDoProgressoMs` enquanto os passos
+     da receita rodam (a execução é síncrona, então a batida sai entre um passo e o seguinte). A CLI a manda para a saída de erro: a saída padrão não muda. */
+  aoProgredir = null,
+  intervaloDoProgressoMs = 15000,
 } = {}) {
+  const inicio = performance.now();
+  let ultimaLinha = inicio;
+  const progresso = (linha) => {
+    if (!aoProgredir) return;
+    ultimaLinha = performance.now();
+    aoProgredir(`descrever: ${linha}, ${Math.round((ultimaLinha - inicio) / 1000)} s desde o começo`);
+  };
   if (listar) {
     const partesDeObjeto = listarPartesDeObjetos();
     const textoSoltas = DISPONIVEIS.length
@@ -270,6 +339,7 @@ export async function descreverPecaReutilizavel({
     return erroDeUso('modulo precisa ser uma receita já carregada.');
   }
   if (modulo === null) {
+    progresso(`carregando a receita de '${peca}'`);
     try {
       modulo = await importarReceita(caminhoReceita);
     } catch (erro) {
@@ -314,14 +384,34 @@ export async function descreverPecaReutilizavel({
   let entrada;
   let neutro;
   let expansao = null;
+  const tempos = new Map();
+  const totalDePassos = Array.isArray(receita.PASSOS) ? receita.PASSOS.length : null;
+  progresso(`executando a receita${totalDePassos == null ? '' : ` (${totalDePassos} passos)`}`);
+  execucao = {
+    ...execucao,
+    registroOperacoes: registroCronometrado(execucao.registroOperacoes ?? REGISTRO_OPERACOES, {
+      total: totalDePassos, tempos,
+      aoPasso: (i, total, op) => {
+        if (aoProgredir && intervaloDoProgressoMs > 0 && performance.now() - ultimaLinha >= intervaloDoProgressoMs) {
+          progresso(`ainda executando a receita, no passo ${i}${total == null ? '' : ` de ${total}`} (${op})`);
+        }
+      },
+    }),
+  };
   try {
     ({ entrada, neutro, expansao } = executarReceita(receita, execucao));
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }
+  /* Depois da execução, toda recusa de etapa seguinte carrega os órfãos: uma etapa que quebra por parte ausente (o contorno por parte, os vãos, os contatos)
+     dizia só que a peça não tinha a parte, e a causa, o passo recusado antes, ficava calada. */
+  const falhaDepois = (mensagem) => falha(neutro.orfaos.length
+    ? `${mensagem}\n\n${neutro.orfaos.length} ÓRFÃO(S), que costumam ser a causa:\n  ${linhasDeOrfaos(neutro).join('\n  ')}`
+    : mensagem);
 
   /* Uma memória por execução: o sólido de cada parte e a auditoria de cada par, feitos por `medirPeca` e reaproveitados por `contatosDaPeca`. */
   const memoria = criarMemoriaDeAuditoria(neutro);
+  progresso('medindo as partes');
   let descricao;
   let consultaDeSubarvore = null;
   try {
@@ -335,10 +425,8 @@ export async function descreverPecaReutilizavel({
       consultaDeSubarvore = { raiz, nomes };
     }
   } catch (erro) {
-    /* A medida que quebra por parte que não existe costuma ter a causa num passo recusado antes, que só os órfãos dizem: no furgão,
-       em 2026-11-05, a abertura recusada deixou a carroceria sem seleção e a mensagem só dizia que a parte não existia. */
-    const recusados = neutro.orfaos.length ? `\n\n${neutro.orfaos.length} ÓRFÃO(S), que costumam ser a causa:\n  ${amostraDeOrfaos(neutro).join('\n  ')}` : '';
-    return falha(`NÃO CONSEGUI MEDIR\n  ${erro.message}${recusados}`);
+    /* a medida que quebra por parte que não existe costuma ter a causa num passo recusado antes, que só os órfãos dizem; `falhaDepois` os junta */
+    return falhaDepois(`NÃO CONSEGUI MEDIR\n  ${erro.message}`);
   }
 
   let stdout = '';
@@ -361,6 +449,12 @@ export async function descreverPecaReutilizavel({
 
   let stderr = '';
   let falhou = false;
+  const chapaInteira = avisosDaChapaInteira(neutro, tempos);
+  if (chapaInteira.length) {
+    stdout += `\n${chapaInteira.length} ABERTURA(S) NA BOOLEANA DA CHAPA INTEIRA (aviso; não reprova)\n${chapaInteira.map((t) => `  ${t}`).join('\n')}\n`
+      + '  O recorte da vizinhança do vão não valeu, e a booleana refez a chapa toda: o tempo da receita cresce com o tamanho dela.\n';
+    stderr += `\nAVISO: ${chapaInteira.length} abertura(s) na booleana da chapa inteira; o motivo e o tempo de cada uma estão na seção ABERTURA(S) NA BOOLEANA DA CHAPA INTEIRA acima\n`;
+  }
   if (descricao.totais.orfaos) {
     stderr += `\n${descricao.totais.orfaos} ÓRFÃO(S): a peça tem referência inválida e as medidas acima`
       + ' descrevem uma peça incompleta.\n  ' + amostraDeOrfaos(neutro).join('\n  ') + '\n';
@@ -419,7 +513,7 @@ export async function descreverPecaReutilizavel({
     try {
       plano = normalizarPlanoDeModelagem(entrada.PLANO ?? receita.PLANO);
     } catch (erro) {
-      return falha(`PLANO DE MODELAGEM INVÁLIDO\n  ${erro.message}`);
+      return falhaDepois(`PLANO DE MODELAGEM INVÁLIDO\n  ${erro.message}`);
     }
     /* A DISPENSA DAS VISTAS DE SUPERFÍCIE APARECE. `PLANO.lataria: { dispensa }` tira a peça da luz rasante e da curvatura da
        lataria no pacote do crítico; sem aparecer aqui, ficava só na receita, onde ninguém a relê. É aviso e não reprova. */
@@ -428,6 +522,7 @@ export async function descreverPecaReutilizavel({
       stdout += `\nLATARIA DISPENSADA\n  ${avisoDaLataria}\n`;
       stderr += `\nAVISO: ${avisoDaLataria}\n`;
     }
+    progresso('rodando as réguas de dobra e vinco');
     const textoDasReguas = textoDasReguasDeSuperficie(receita, entrada, neutro, { resumo });
     if (textoDasReguas) {
       stdout += textoDasReguas;
@@ -458,7 +553,7 @@ export async function descreverPecaReutilizavel({
       if (!caminho) { try { caminho = resolverCaminhoReceita(peca, { raiz: REPO }); } catch { caminho = null; } }
       refinamento = conferirRefinamentoDaReceita({ receita, neutro, caminhoDaReceita: caminho });
     } catch (erro) {
-      return falha(`REFINAMENTO DA FORMA GLOBAL INVÁLIDO\n  ${erro.message}`);
+      return falhaDepois(`REFINAMENTO DA FORMA GLOBAL INVÁLIDO\n  ${erro.message}`);
     }
     if (refinamento && !refinamento.ok) {
       stderr += `\n${refinamento.achados.length} ACHADO(S) NO REFINAMENTO DO ANDAIME '${refinamento.andaime}'\n`
@@ -475,7 +570,7 @@ export async function descreverPecaReutilizavel({
       if (!caminho) { try { caminho = resolverCaminhoReceita(peca, { raiz: REPO }); } catch { caminho = null; } }
       formaDoEsboco = await conferirFormaDoEsbocoDaReceita({ receita, neutro, caminhoDaReceita: caminho });
     } catch (erro) {
-      return falha(`FORMA CONTRA O ESBOÇO INVÁLIDA\n  ${erro.message}`);
+      return falhaDepois(`FORMA CONTRA O ESBOÇO INVÁLIDA\n  ${erro.message}`);
     }
     if (formaDoEsboco && !formaDoEsboco.ok) {
       stderr += `\n${formaDoEsboco.achados.length} ACHADO(S) NA FORMA CONTRA O ESBOÇO '${formaDoEsboco.arquivo}'\n`
@@ -485,10 +580,11 @@ export async function descreverPecaReutilizavel({
         + '\n  ou o mínimo declarado em REFINA.esboco não é o que a parte pode cumprir.\n';
       falhou = true;
     }
+    progresso('medindo os contatos entre as partes');
     try {
       contatos = contatosDaPeca(neutro, receita, { memoria });
     } catch (erro) {
-      return falha(`NÃO CONSEGUI MEDIR OS CONTATOS\n  ${erro.message}`);
+      return falhaDepois(`NÃO CONSEGUI MEDIR OS CONTATOS\n  ${erro.message}`);
     }
     if (contatos.naoDeclarados.length) {
       stderr += `\n${contatos.naoDeclarados.length} CONTATO(S) NÃO DECLARADO(S)`
@@ -520,10 +616,11 @@ export async function descreverPecaReutilizavel({
        perfil: o trecho sem moldura, o degrau na emenda e o entalhe no canto reprovam, e a aba parcial de propósito passa só com
        `parcial: { motivo }`. Peça sem chapa e sem `vaos` não ganha seção. A medida é sobre a pegada dos frisos na chapa, em
        `src/autoria/molduras-do-vao.js`, e roda no `descrever` e por ele na `guarda:acervo`. */
+    progresso('conferindo os vãos e as molduras');
     try {
       molduras = conferirVaosDaPeca(neutro, receita);
     } catch (erro) {
-      return falha(`NÃO CONSEGUI CONFERIR OS VÃOS\n  ${erro.message}`);
+      return falhaDepois(`NÃO CONSEGUI CONFERIR OS VÃOS\n  ${erro.message}`);
     }
     if (molduras.declarados || molduras.aberturas.length) {
       stdout += formatarVaos(molduras, { resumo });
@@ -537,10 +634,11 @@ export async function descreverPecaReutilizavel({
        pneu sai maciço e aro, cubo e raios não chegam a ser modelados, não há
        segunda parte para acusar contato — a peça é um disco sólido e passa
        limpa. Mesma falha, forma mais simples, invisível para a medida acima. */
+    progresso('conferindo as formas prometidas');
     try {
       formas = formasDaPeca(neutro, receita);
     } catch (erro) {
-      return falha(`NÃO CONSEGUI CONFERIR AS FORMAS\n  ${erro.message}`);
+      return falhaDepois(`NÃO CONSEGUI CONFERIR AS FORMAS\n  ${erro.message}`);
     }
     if (formas.divergentes.length) {
       stderr += `\n${formas.divergentes.length} PARTE(S) COM FORMA DIFERENTE DA PROMETIDA\n`
@@ -602,10 +700,11 @@ export async function descreverPecaReutilizavel({
     let caminhoDaPeca = caminhoReceita;
     if (!caminhoDaPeca) { try { caminhoDaPeca = resolverCaminhoReceita(peca, { raiz: REPO }); } catch { caminhoDaPeca = null; } }
 
+    progresso('conferindo a malha contra a referência');
     try {
       g01 = conferirG01DaReceita({ receita, neutro, caminhoDaReceita: caminhoDaPeca });
     } catch (erro) {
-      return falha(`G01 DA PEÇA INVÁLIDO\n  ${erro.message}`);
+      return falhaDepois(`G01 DA PEÇA INVÁLIDO\n  ${erro.message}`);
     }
     if (g01 === null) {
       linhasDeReferencia.push('G01 sobre a malha: não conferido: sem referência (REFINA não declara alvo N2)');
@@ -636,7 +735,7 @@ export async function descreverPecaReutilizavel({
         try {
           contornos = conferirContornosDaPeca({ neutro, contornos: achados });
         } catch (erro) {
-          return falha(`CONTORNO POR PARTE INVÁLIDO\n  ${erro.message}`);
+          return falhaDepois(`CONTORNO POR PARTE INVÁLIDO\n  ${erro.message}`);
         }
         for (const c of contornos.conferencias) {
           linhasDeReferencia.push(`contorno por parte (${c.arquivo}, vista ${c.vista}): ${c.ok ? 'aprovado' : 'REPROVADO'}`
@@ -658,7 +757,7 @@ export async function descreverPecaReutilizavel({
       const declaradas = normalizarRazoesDaPeca(receita.RAZOES);
       if (declaradas) razoes = conferirRazoesDaPeca({ razoes: declaradas, neutro });
     } catch (erro) {
-      return falha(`RAZÕES DECLARADAS INVÁLIDAS\n  ${erro.message}`);
+      return falhaDepois(`RAZÕES DECLARADAS INVÁLIDAS\n  ${erro.message}`);
     }
     if (razoes === null) {
       linhasDeReferencia.push('razões: não conferido: sem referência (a receita não exporta RAZOES)');
@@ -724,7 +823,7 @@ Mede a peça pela malha e dá o veredito de contato, forma prometida e vãos. A 
 Para conferir um encaixe, peça as duas partes: --partes=a,b. O resumo já traz todo contato e as folgas menores.
 `;
 
-function comoCLI(argv) {
+function comoCLI(argv, { aoProgredir = null } = {}) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
@@ -758,6 +857,7 @@ function comoCLI(argv) {
     resumo: !lido.bandeira('completo'),
     listar: lido.bandeira('listar'),
     composicoes: lido.opcao(OPCAO_COMPOSICOES),
+    aoProgredir,
   });
 }
 
@@ -765,7 +865,8 @@ const executadoComoCLI = process.argv[1]
   && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
 if (executadoComoCLI) {
   const fechar = iniciarRegistro('descrever', process.argv[2]);
-  const resultado = await comoCLI(process.argv.slice(2));
+  /* o progresso vai para a saída de erro, uma linha por etapa longa: a saída padrão, que há quem leia por programa, não muda */
+  const resultado = await comoCLI(process.argv.slice(2), { aoProgredir: (linha) => process.stderr.write(`${linha}\n`) });
   process.stdout.write(resultado.stdout);
   process.stderr.write(resultado.stderr);
   process.exitCode = resultado.codigo;
