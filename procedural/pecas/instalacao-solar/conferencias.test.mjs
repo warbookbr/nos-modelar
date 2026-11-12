@@ -78,5 +78,7 @@ describe('instalação solar: conferências da obra', () => {
     expect(m.casa.telhadoNaPortaDaCasa.desvioDaOrigemEmRelacaoAPorta).toBeLessThan(0.01);
     expect(m.casa.telhadoNaPortaDaCasa.giroDoTelhado).toEqual([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
     expect(relato(m)).toContain('Alturas sobre o plano das cristas');
-  }, 60000);
+    /* Prazo: a montagem com a casa leva 27 s sozinha e passou de 60 s no CI, ao lado de outros testes pesados (80 s medidos em
+       2026-11-12); o prazo de 300 s deixa folga sobre a maior das duas medidas. */
+  }, 300000);
 });
