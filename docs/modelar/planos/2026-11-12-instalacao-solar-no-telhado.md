@@ -33,8 +33,9 @@ o caso achar faltando no núcleo vai ao backlog, salvo se bloquear o resultado.
 
 - o alinhamento: objeto, escala, partes, contatos e critérios, com as medidas e quantidades da instalação e sem marca, modelo,
   dados pessoais ou parte elétrica; as fotos da pessoa e a imagem do catálogo do kit ficam fora do repositório;
-- o telhado de fibrocimento de cima, sem a casa: as vigas de madeira e as telhas onduladas na inclinação medida, com a
-  sobreposição das fileiras;
+- a casa em volumes simples, por decisão da pessoa em 2026-11-12, para o planejamento ter onde se apoiar: as paredes da casa
+  maior, da extensão e da casa vizinha de telhado metálico, o madeiramento do telhado onde as hastes entram, e as telhas onduladas
+  de cada água na inclinação dela, com a sobreposição das fileiras; o que a pessoa não mediu entra pelas fotos, marcado a confirmar;
 - as peças do kit: haste rosca dupla de 250 mm com vedação, suporte em L, perfil de alumínio de 1,35 m, emenda, grampo
   intermediário e grampo de ponta de 30 a 35 mm e de 40 mm, com medidas típicas marcadas como a confirmar até a pessoa medir;
 - os quatro painéis em pé, lado a lado: três de 1812 × 1046 × 40 mm e um de 1722 × 1134 × 30 mm numa das pontas, preso dos dois
@@ -45,7 +46,7 @@ o caso achar faltando no núcleo vai ao backlog, salvo se bloquear o resultado.
 ## Excluído
 
 - a parte elétrica, o inversor, a bateria, os cabos e a tela antigranizo;
-- a casa abaixo do telhado e o telhado metálico de baixo;
+- o interior da casa, portas, janelas e acabamento, e a estrutura da casa vizinha;
 - sombra e geração de energia.
 
 ## Medidas e quantidades da obra
@@ -74,13 +75,15 @@ conferir, e entra na receita marcado assim.
 - Fileira: cerca de 4,33 m de painéis com folgas de 2 cm, e cerca de 4,39 m com a junção de grampos de ponta lado a lado; a
   conferir contra o trilho de 4,55 m.
 - Telhado: telha ondulada de fibrocimento de 6 mm, no padrão da norma (gomo de 177 mm, telha de 1,10 m de largura e 1,05 m
-  útil, comprimentos de 1,22 a 3,66 m, sobreposição de 14 cm, ou 20 cm em pouca inclinação). A água tem duas fileiras de telhas
-  da beirada à cumeeira; as fotos da pessoa mostram uma fileira de parafusos junto da beirada e outra logo acima da sobreposição,
-  e nenhuma entre elas, o que dá uma viga na beirada, uma na sobreposição e uma na cumeeira, a cerca de um comprimento de telha
-  uma da outra. Com as vigas a mais de 90 cm, os dois trilhos não caem os dois sobre viga a 90 cm um do outro: a montagem mostra
-  isso, e as saídas (madeira a mais entre as vigas, ou outra disposição dos trilhos) são da pessoa. A água é bem maior que a
-  fileira de 4,45 m: 25 gomos (4,4 m) são só o trecho de uma das fotos, e a panorâmica mostra perto do dobro. A inclinação não
-  muda as contas e entra como 15 graus, a confirmar.
+  útil, comprimentos de 1,22 a 3,66 m, sobreposição de 14 cm, ou 20 cm em pouca inclinação). Pelas fotos e pela medida da
+  pessoa (2026-11-12): a casa maior tem a cumeeira da frente ao fundo, com 11 m (cerca de dez telhas e meia por fileira), e uma
+  água para cada lado, cada uma com duas fileiras de telhas; do lado esquerdo de quem olha a frente, a casa vizinha de telhado
+  metálico ocupa a parte da frente, com uma calha entre as duas, e atrás dela a água esquerda continua, por baixo da beirada,
+  numa extensão menos inclinada, de duas fileiras, que cobre um corredor aberto e um cômodo até a calha da beirada. As fotos
+  mostram uma fileira de parafusos junto da ponta de baixo de cada fileira de telhas, cerca de um a cada quatro gomos, o que dá
+  uma peça de madeira sob cada sobreposição e sob a beirada. Com essas peças a mais de 90 cm uma da outra, os dois trilhos não
+  caem os dois sobre madeira: a montagem mostra isso, e as saídas (madeira a mais, ou outra disposição dos trilhos) são da
+  pessoa. A inclinação entra como 15 graus na casa maior e menos na extensão, a confirmar.
 - Perfil (medida real, 2026-11-12): 1350 mm de comprimento, seção de 45 mm de altura por 30 mm de largura, paredes de uns 2 mm. Vista
   de ponta: canal em T aberto em cima com as duas abas finas, uma face lateral inteira estriada em frisos horizontais (a que
   encosta no suporte em L) com um rasgo lateral para a porca do parafuso do L, aba larga embaixo com a borda virada para cima e
@@ -99,8 +102,8 @@ conferir, e entra na receita marcado assim.
   duas asas curtas sobre as molduras e um pescoço curto entre os painéis (cerca de 20 mm), com o parafuso allen pelo centro e uma porca
   deslizante no canal em T. A emenda (6) é uma barra estriada de cerca de 150 mm (a confirmar) que entra no canal em T dos dois perfis,
   com dois parafusos allen por cima, um de cada lado da junta.
-- Pendentes da pessoa: a distância, medida descendo o telhado, entre a fileira de parafusos da beirada e a da sobreposição, o
-  comprimento da água ao longo da beirada, e as medidas finas dos grampos e da emenda.
+- Pendentes da pessoa: em qual água vão os painéis, a largura da frente da casa maior e da extensão, a altura das paredes, o
+  madeiramento visto por dentro (foto ou medida da distância entre as peças), e as medidas finas dos grampos e da emenda.
 
 ## Gate de saída
 
@@ -111,14 +114,14 @@ conferir, e entra na receita marcado assim.
 
 ## Fatias
 
-1. O alinhamento e o telhado com as vigas, com a inclinação e o espaçamento das vigas medidos pela pessoa.
+1. O alinhamento, a casa em volumes simples e o telhado com o madeiramento, pelas fotos e pelas medidas da pessoa.
 2. As peças do kit e os painéis.
 3. A montagem na ordem da obra e as conferências de medida.
 4. Fechamento.
 
 ## Riscos e parada
 
-Sem a distância entre as vigas e a inclinação, o telhado não sai; a fatia 1 espera essas duas medidas. Se uma conferência
+A casa e o madeiramento saem das fotos enquanto a pessoa não mede, e cada medida estimada fica marcada a confirmar. Se uma conferência
 mostrar que a instalação como planejada não cabe (trilho fora das vigas, haste fora da crista, grampo fora da faixa permitida
 pelo fabricante do painel), o achado vai à pessoa antes de qualquer ajuste, porque a decisão é da obra dela.
 
