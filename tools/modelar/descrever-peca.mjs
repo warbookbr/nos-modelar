@@ -125,28 +125,35 @@ export function linhasDeOrfaos(neutro, { limite = ORFAOS_LISTADOS } = {}) {
 function amostraDeOrfaos(neutro) { return linhasDeOrfaos(neutro); }
 
 /* O REGISTRO QUE CRONOMETRA CADA PASSO. O núcleo não mede o tempo de um passo, e o `descrever` precisava dele para dizer qual vão custou (a janela da
-   cabine do furgão foi de 118 s a 207 s em 2026-11-09 sem nada acusar). Em vez de mudar o núcleo, o `descrever` entrega a ele um registro que
-   embrulha a operação e anota, por índice de passo, o tempo e a operação; a cada batida do intervalo, quando a receita ainda roda, diz onde está. */
-function registroCronometrado(base, { total, tempos, aoPasso }) {
-  return {
+   cabine do furgão foi de 118 s a 207 s em 2026-11-09 sem nada acusar). O núcleo consulta o registro uma vez por passo, na ordem e antes de executar
+   (`registro.resolver(op)` no laço dos `PASSOS`), e o cronômetro mede de uma consulta à seguinte: o passo `k` dura da consulta `k` à `k + 1`, e o último
+   fecha em `fechar`, depois da execução. A operação volta do registro como veio. Embrulhar o `executar` dela, como este cronômetro fazia, tirava o passo do
+   caminho rápido do núcleo, que só confia na declaração de escrita da operação quando a função é a original, e cada passo voltava a retratar a malha
+   inteira: o `descrever` do furgão foi de 180 s a 480 s (CI de 2026-11-12, `guarda:tempo`). `fechar(passos)` descarta os tempos quando o número de
+   consultas não é o de passos executados, porque aí o índice da consulta não é o do passo. */
+export function registroCronometrado(base, { total, tempos, aoPasso }) {
+  const voltas = [];
+  const fecharAnterior = (agora) => {
+    const k = voltas.length - 1;
+    if (k < 0 || voltas[k].ms != null) return;
+    voltas[k].ms = agora - voltas[k].t0;
+    tempos.set(k, { op: voltas[k].op, ms: voltas[k].ms });
+    aoPasso?.(k, total, voltas[k].op);
+  };
+  const registro = {
     ...base,
     resolver(...argumentos) {
+      fecharAnterior(performance.now());
       const registrada = base.resolver(...argumentos);
-      if (!registrada || typeof registrada.executar !== 'function') return registrada;
-      const original = registrada.executar;
-      const embrulho = function executarCronometrada(...a) {
-        const i = original.nativaModelar ? null : a[2];
-        const t0 = performance.now();
-        try { return original.apply(this, a); } finally {
-          if (i != null) { tempos.set(i, { op: registrada.nome ?? argumentos[0], ms: performance.now() - t0 }); aoPasso?.(i, total, registrada.nome ?? argumentos[0]); }
-        }
-      };
-      if (original.nativaModelar) Object.defineProperty(embrulho, 'nativaModelar', { value: true });
-      const copia = Object.create(registrada);
-      Object.defineProperty(copia, 'executar', { value: embrulho, enumerable: true });
-      return copia;
+      voltas.push({ op: registrada?.nome ?? argumentos[0], t0: performance.now(), ms: null });
+      return registrada;
     },
   };
+  const fechar = (passos) => {
+    fecharAnterior(performance.now());
+    if (!Array.isArray(passos) || passos.length !== voltas.length) tempos.clear();
+  };
+  return { registro, fechar };
 }
 
 const segundos = (ms) => String(Math.round(ms / 100) / 10).replace('.', ',');
@@ -387,19 +394,19 @@ export async function descreverPecaReutilizavel({
   const tempos = new Map();
   const totalDePassos = Array.isArray(receita.PASSOS) ? receita.PASSOS.length : null;
   progresso(`executando a receita${totalDePassos == null ? '' : ` (${totalDePassos} passos)`}`);
-  execucao = {
-    ...execucao,
-    registroOperacoes: registroCronometrado(execucao.registroOperacoes ?? REGISTRO_OPERACOES, {
-      total: totalDePassos, tempos,
-      aoPasso: (i, total, op) => {
-        if (aoProgredir && intervaloDoProgressoMs > 0 && performance.now() - ultimaLinha >= intervaloDoProgressoMs) {
-          progresso(`ainda executando a receita, no passo ${i}${total == null ? '' : ` de ${total}`} (${op})`);
-        }
-      },
-    }),
-  };
+  const cronometro = registroCronometrado(execucao.registroOperacoes ?? REGISTRO_OPERACOES, {
+    total: totalDePassos, tempos,
+    aoPasso: (i, total, op) => {
+      if (aoProgredir && intervaloDoProgressoMs > 0 && performance.now() - ultimaLinha >= intervaloDoProgressoMs) {
+        /* a batida chega quando o passo `i` fecha, isto é, quando o seguinte começa */
+        if (total == null || i + 1 < total) progresso(`ainda executando a receita, no passo ${i + 1}${total == null ? '' : ` de ${total}`}, depois de ${op}`);
+      }
+    },
+  });
+  execucao = { ...execucao, registroOperacoes: cronometro.registro };
   try {
     ({ entrada, neutro, expansao } = executarReceita(receita, execucao));
+    cronometro.fechar(entrada?.PASSOS);
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }

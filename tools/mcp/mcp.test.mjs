@@ -1238,6 +1238,9 @@ describe('servidor MCP local — perfil revisao', () => {
            reprova a mudança por não a ter previsto, e não por ela estar errada. */
         if (fonte.includes('.auditoria(')) return { auditoria: true, cores: false, arame: false, legenda: [] };
         if (fonte.includes('.enquadrar()')) return undefined;
+        /* AS QUATRO VISTAS SAEM DE UMA CARGA SÓ: da segunda em diante a ferramenta troca a vista na página aberta, e antes pergunta
+           se a ponte da bancada continua lá (a página que recarregou ou caiu não tem modelo a fotografar). */
+        if (fonte.includes("typeof window.__mecanificaBancada === 'object'")) return true;
         throw new Error(`evaluate inesperado: ${fonte}`);
       },
       async screenshot(opcoes) {

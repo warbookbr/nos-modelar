@@ -1,7 +1,8 @@
 /* descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista):
    o órfão de cada passo, a abertura que cai na booleana da chapa inteira com o motivo e o tempo, e o progresso na saída de erro. */
 import { describe, expect, it } from 'vitest';
-import { avisosDaChapaInteira, descreverPecaReutilizavel, linhasDeOrfaos } from './descrever-peca.mjs';
+import { avisosDaChapaInteira, descreverPecaReutilizavel, linhasDeOrfaos, registroCronometrado } from './descrever-peca.mjs';
+import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
 import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import orfao from '../fixtures/descrever-sem-calar/orfao/receita.js';
 import chapaInteira from '../fixtures/descrever-sem-calar/chapa-inteira/receita.js';
@@ -81,5 +82,34 @@ describe('o progresso', () => {
     const linhas = [];
     await descreverPecaReutilizavel({ peca: `${PASTA}/orfao/receita`, modulo: orfao, aoProgredir: (l) => linhas.push(l), intervaloDoProgressoMs: 1 });
     expect(linhas.some((l) => /ainda executando a receita, no passo \d+ de 3/.test(l))).toBe(true);
+  });
+});
+
+describe('o cronômetro dos passos não tira o passo do caminho rápido do núcleo', () => {
+  /* o núcleo só usa a declaração de escrita da operação quando a função dela é a original; o cronômetro que embrulhava o `executar` fazia cada passo
+     retratar a malha inteira, e o `descrever` do furgão foi de 180 s a 480 s no CI de 2026-11-12 */
+  it('devolve do registro a operação como veio, com a mesma função', () => {
+    const tempos = new Map();
+    const { registro } = registroCronometrado(REGISTRO_OPERACOES, { total: 2, tempos, aoPasso: null });
+    for (const op of ['cubo', 'parte', 'subdivisao']) {
+      const original = REGISTRO_OPERACOES.resolver(op);
+      expect(original, op).toBeTruthy();
+      const cronometrada = registro.resolver(op);
+      expect(cronometrada).toBe(original);
+      expect(cronometrada.executar).toBe(original.executar);
+    }
+  });
+
+  it('mede de uma consulta à seguinte, fecha o último passo no fim e descarta os tempos quando as consultas não são as dos passos', () => {
+    const tempos = new Map(); const batidas = [];
+    const { registro, fechar } = registroCronometrado(REGISTRO_OPERACOES, { total: 2, tempos, aoPasso: (i, total, op) => batidas.push([i, total, op]) });
+    registro.resolver('cubo'); registro.resolver('parte');
+    expect([...tempos.keys()]).toEqual([0]);
+    fechar([['cubo', {}], ['parte', {}]]);
+    expect([...tempos.keys()]).toEqual([0, 1]);
+    expect(tempos.get(0).op).toBe('cubo'); expect(tempos.get(1).op).toBe('parte');
+    expect(batidas).toEqual([[0, 2, 'cubo'], [1, 2, 'parte']]);
+    fechar([['cubo', {}]]);
+    expect(tempos.size).toBe(0);
   });
 });
