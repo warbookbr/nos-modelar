@@ -199,9 +199,9 @@
       "instancia": "braco",
       "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:489416bafeb3199e337eda62b61dfa502a23e3dbbb69a1bf876d179fa7079216",
+      "forma": "sha256:596f1439be5f3eb3f13223ff61fe23d4f2135e31e2b97008f4e4198fdabc569e",
       "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
+        "por": "Tiago",
         "defeitosAceitos": [
           "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
           "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
@@ -238,6 +238,20 @@
             "analise": "ausente"
           },
           "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:489416bafeb3199e337eda62b61dfa502a23e3dbbb69a1bf876d179fa7079216"
         }
       ]
     },
@@ -372,9 +386,9 @@
           }
         }
       ],
-      "forma": "sha256:5b92d53e321bc8e351e330ea29b0215a28fc9ec26cd6c70a113a6b46a2ac5bb7",
+      "forma": "sha256:4e32eacd1474009691f6430a8876b69877d373b70859c3c6381e6b483607c72e",
       "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o antebraço com a carcaça da junta 4, pé e carcaça de 190 mm e o tubo rente",
+        "por": "Tiago",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
@@ -406,6 +420,18 @@
             "analise": "ausente"
           },
           "forma": "sha256:6c62ea8ef4c04071f02c11166c12c267421fe1859aeb8421012cb75ee9555946"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou o antebraço com a carcaça da junta 4, pé e carcaça de 190 mm e o tubo rente",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:5b92d53e321bc8e351e330ea29b0215a28fc9ec26cd6c70a113a6b46a2ac5bb7"
         }
       ]
     },
@@ -512,14 +538,28 @@
           }
         }
       ],
-      "forma": "sha256:1dbdb6d83d668745f96805d978d9fd501f22b6a6efb8493b4d285c259ef31207",
+      "forma": "sha256:56d6d57e05a3c1ef84f52ed509da68486369e64b7a9289317222128269b4f9df",
       "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o anel e o elo da junta 4 do punho, com 135 mm",
+        "por": "Tiago",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
         "analise": "ausente"
-      }
+      },
+      "reaberturas": [
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou o anel e o elo da junta 4 do punho, com 135 mm",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:1dbdb6d83d668745f96805d978d9fd501f22b6a6efb8493b4d285c259ef31207"
+        }
+      ]
     },
     {
       "instancia": "anelPunho5",
@@ -624,14 +664,28 @@
           }
         }
       ],
-      "forma": "sha256:7655646e5cd30df1dd691122ee7e4dbb07aa635bef490796db37b3e85ed2afe3",
+      "forma": "sha256:534ef96aa5decbe3d08245b9c93788f8d7aca4fcbb3441a4da36f19c486ce59b",
       "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o elo da junta 5 do punho, com o pé e o tubo de 135 mm",
+        "por": "Tiago",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
         "analise": "ausente"
-      }
+      },
+      "reaberturas": [
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou o elo da junta 5 do punho, com o pé e o tubo de 135 mm",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:7655646e5cd30df1dd691122ee7e4dbb07aa635bef490796db37b3e85ed2afe3"
+        }
+      ]
     },
     {
       "instancia": "anelPunho6",
@@ -736,14 +790,28 @@
           }
         }
       ],
-      "forma": "sha256:dc5bb25a5fc59f514fa0b17ca34473b5290f8d743e854ae183e8789b2ac72229",
+      "forma": "sha256:41cf3febc4c1279e6df658d4b3f46b19eb0be9ed60d68e4c536ea537b3d02edd",
       "aceite": {
-        "por": "pessoa, 2026-11-09: aceitou o anel da junta 6 e o flange",
+        "por": "Tiago",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
         "analise": "ausente"
-      }
+      },
+      "reaberturas": [
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "pessoa, 2026-11-09: aceitou o anel da junta 6 e o flange",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:dc5bb25a5fc59f514fa0b17ca34473b5290f8d743e854ae183e8789b2ac72229"
+        }
+      ]
     }
   ]
 }
