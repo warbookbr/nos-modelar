@@ -24,6 +24,18 @@ import { construirArvore, visitarPorCaixa, visitarPorRaio } from './arvore-de-ca
 
 export const TOLERANCIA_CONTATO_SOLIDO = 1e-9;
 
+/**
+ * A tolerância de "encosta" do contato que a peça DECLARA (um micrômetro, em metro), a mesma no relato de contatos do esboço (`TOLERANCIA_DO_RELATO_M`) e nos contatos
+ * declarados que o `descrever` confirma. Eram três: 1 µm no relato, 1 nm no `descrever` e, para a declaração, no máximo 0,1 µm; o lábio do arco da frente do sedã assenta
+ * na caixa de roda a 0,315 µm, e o par passava como `encosta` no esboço e saía como "declarado que não acontece" na receita (atrito 5 do RECEITA.md do sedã).
+ * A razão do micrômetro: a malha que a booleana devolve é de Float32, e numa peça de 1 m a unidade de arredondamento é 0,12 µm, de modo que duas superfícies desenhadas
+ * para coincidir saem a algumas unidades dela uma da outra; abaixo de 1 µm não há folga de forma que o desenho possa ter querido. O contato NÃO declarado segue
+ * detectado a `TOLERANCIA_CONTATO_SOLIDO` (1 nm): subir a global para 2e-8 mudava 99 dos 2265 pares do acervo e criava dez contatos não declarados em peças prontas
+ * (plano de ajustes no núcleo dos veículos, decisão 3), e subi-la a 1 µm é decisão da pessoa, com as peças do acervo à mão. A auditoria de montagem, as articulações e o
+ * apoio no chão medem instâncias e também ficam em `TOLERANCIA_CONTATO_SOLIDO`.
+ */
+export const TOLERANCIA_DE_ENCOSTO_DA_PECA = 1e-6;
+
 const DIRECAO_RAIO = [1, 0.3713906763541037, 0.1932731453127433];
 const EPS = 1e-12;
 
@@ -811,6 +823,47 @@ function distancia2PontoTriangulo(p, [a, b, c]) {
   }
   const soma = 1 / (va + vb + vc);
   return comprimento2(sub(p, add(a, add(mult(ab, vb * soma), mult(ac, vc * soma)))));
+}
+
+const LIMITE_DE_PARES_DA_DISTANCIA = 4e8;
+
+/**
+ * A menor distância entre as malhas de dois sólidos preparados, em unidade de mundo, olhando só até `limite`: dos vértices de cada um aos triângulos do outro (o
+ * par de arestas que se afasta mais que os vértices não entra, e numa junta quase plana, que é o caso de quem pergunta, o vértice dá a distância). Só entram os triângulos que tocam
+ * a região comum das duas caixas, e o par de malhas com mais de 4e8 pares de triângulo nela fica sem medida. Devolve `null` quando nenhum par fica a menos de `limite`, e `undefined` quando não mediu (sólido inconclusivo ou pares demais). É a distância que a
+ * mensagem do contato declarado que não acontece diz.
+ */
+export function distanciaEntreSolidos(a, b, limite) {
+  if (a.inconclusivo || b.inconclusivo || !a.triangulos || !b.triangulos || !(limite > 0)) return undefined;
+  if (caixasSeparadas(a.caixa, b.caixa, limite)) return null;
+  /* só conta o triângulo que toca a região onde as duas caixas se sobrepõem, alargada de `limite`: o resto está longe do outro sólido */
+  const lo = [0, 1, 2].map((e) => Math.max(a.caixa.min[e], b.caixa.min[e]) - limite); const hi = [0, 1, 2].map((e) => Math.min(a.caixa.max[e], b.caixa.max[e]) + limite);
+  const naRegiao = (t) => [0, 1, 2].every((e) => Math.max(t[0][e], t[1][e], t[2][e]) >= lo[e] && Math.min(t[0][e], t[1][e], t[2][e]) <= hi[e]);
+  const ta = a.triangulos.filter(naRegiao); const tb = b.triangulos.filter(naRegiao);
+  if (ta.length * tb.length > LIMITE_DE_PARES_DA_DISTANCIA) return undefined;
+  const caixaDe = (t) => [0, 1, 2].map((e) => [Math.min(t[0][e], t[1][e], t[2][e]), Math.max(t[0][e], t[1][e], t[2][e])]);
+  const cb = tb.map(caixaDe);
+  let menor2 = limite * limite;
+  /* dos vértices de um aos triângulos do outro, com o triângulo descartado quando o vértice está a mais da menor distância achada da caixa dele */
+  const olha = (de, em, caixas) => {
+    const vistos = new Set();
+    for (const t of de) for (const p of t) {
+      const id = `${Math.round(p[0] / 1e-9)},${Math.round(p[1] / 1e-9)},${Math.round(p[2] / 1e-9)}`;
+      if (vistos.has(id)) continue;
+      vistos.add(id);
+      const r = Math.sqrt(menor2);
+      for (let k = 0; k < em.length; k += 1) {
+        const c = caixas[k];
+        if (p[0] < c[0][0] - r || p[0] > c[0][1] + r || p[1] < c[1][0] - r || p[1] > c[1][1] + r || p[2] < c[2][0] - r || p[2] > c[2][1] + r) continue;
+        const d2 = distancia2PontoTriangulo(p, em[k]);
+        if (d2 < menor2) menor2 = d2;
+      }
+    }
+  };
+  const antes = menor2;
+  olha(ta, tb, cb);
+  olha(tb, ta, ta.map(caixaDe));
+  return menor2 < antes ? Math.sqrt(menor2) : null;
 }
 
 /**

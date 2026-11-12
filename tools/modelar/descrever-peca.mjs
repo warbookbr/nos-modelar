@@ -666,12 +666,13 @@ export async function descreverPecaReutilizavel({
       stderr += `\n${contatos.declaradosSemContato.length} CONTATO(S) DECLARADO(S) QUE NÃO ACONTECEM`
         + '\n  A receita disse que estas partes se tocam, e elas não se tocam:\n'
         + contatos.declaradosSemContato
-          .map(({ par, motivo, fechaComTolerancia }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`
+          .map(({ par, motivo, fechaComTolerancia, distancia, maisLongeQue, toleranciaDoPar }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`
+            + (distancia !== undefined ? `\n      as malhas ficam a ${(distancia * 1000).toFixed(6).replace('.', ',')} mm uma da outra (a tolerância de encosto é ${String(Number((toleranciaDoPar * 1000).toPrecision(6))).replace('.', ',')} mm).` : maisLongeQue !== undefined ? `\n      as malhas ficam a mais de ${(maisLongeQue * 1000).toFixed(1).replace('.', ',')} mm uma da outra.` : '')
             + (fechaComTolerancia === undefined ? '' : `\n      fecharia com tolerância de ${fechaComTolerancia}: o vão é menor que isso, do tamanho da grade de 1e-8 do perfil (\`GRADE\` de perfil2d.js), e não uma folga de forma.`))
           .join('\n')
         + '\n  Ou a geometria não chegou onde deveria, ou a declaração está errada.\n'
         + (contatos.declaradosSemContato.some((d) => d.fechaComTolerancia !== undefined)
-          ? '  Se o par encosta de verdade (por exemplo, vidro sobre plano inclinado, onde o vértice novo volta a nanômetros do plano), declare `toleranciaNumerica` (de 1e-9 a 1e-7) no contato, com o motivo.\n'
+          ? '  Se o par encosta de verdade (por exemplo, vidro sobre plano inclinado, onde o vértice novo volta a nanômetros do plano), declare `toleranciaNumerica` (de 1e-9 a 1e-6) no contato, com o motivo.\n'
           : '');
       falhou = true;
     }

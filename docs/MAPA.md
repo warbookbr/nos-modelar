@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1999 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2002 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1071,6 +1071,7 @@
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
 - `lamina-sobre-a-superficie.js` — lamina-sobre-a-superficie.js — a lâmina de vão varrida sobre a superfície de uma chapa, com a seção perpendicular a ela
 - `limpar-contorno.test.mjs` — limpar-contorno.test.mjs — `limparContorno`: tira ponto repetido e, se pedido, ponto colinear, sem mexer na entrada.
+- `limpar-lascas-escala.test.mjs` — limpar-lascas-escala.test.mjs — o piso de área da limpeza segue a escala da peça, e não a da seleção (atrito 11 do RECEITA.md do sedã).
 - `limpar-lascas.js` — limpar-lascas.js — o cálculo da limpeza de lascas depois de uma booleana: função pura sobre vértices e faces, sem passo, sem Manifold e sem domínio de objeto…
 - `limpar-lascas.test.ts` — limpar-lascas.test.ts — `limparLascas`: a limpeza das faces finas que uma booleana deixa. Mede, em fixtures sem domínio de objeto: (a) o cálculo puro, na pon…
 - `linha-de-base-do-furo.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
@@ -2183,6 +2184,7 @@
 - `diferenca-de-texto.test.js` — diferenca-de-texto.test.js — a diferença por linha que o registro de rodada guarda: vazia sem mudança, toda acréscimo na primeira versão, cortada no teto.
 - `dobras-aceitas.js` — dobras-aceitas.js — a dobra, o vinco e o chanfro que a peça declara de propósito, com o motivo.
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
+- `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
@@ -2220,6 +2222,7 @@
 - `medidas-na-blocagem.test.js` — As medidas do plano lidas na blocagem do nível zero, sobre formas resolvidas escritas à mão (sem o módulo do esboço): a caixa de um eixo e a distância entre …
 - `medir-blocagem-nivel-zero.js` — Medida sobre a blocagem N2 de um andaime: compila com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por volume, o volum…
 - `molduras-do-vao-casos-reais.test.mjs` — molduras-do-vao-casos-reais.test.mjs — a conferência da moldura em volta do vão em dois casos reais (fatia 20 do plano de ajustes no núcleo dos veículos).
+- `molduras-do-vao-chapa-cortada.test.mjs` — molduras-do-vao-chapa-cortada.test.mjs — a abertura de uma chapa que um corte em painéis atravessou (atrito 2 do RECEITA.md do sedã).
 - `molduras-do-vao.js` — molduras-do-vao.js — os vãos das chapas da peça: cada abertura declarada, e a moldura em volta de cada uma medida sobre a malha.
 - `molduras-do-vao.test.mjs` — molduras-do-vao.test.mjs — a moldura em volta do vão, medida sobre a malha varrida de verdade (fatia 12 do plano de ajustes no núcleo).
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.

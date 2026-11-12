@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/conferir-vistas.mjs`
+**Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/descrever-sem-calar.test.mjs`, `tools/fixtures/descrever-sem-calar/`
 
 **Responsável:** a IA da sessão do núcleo (ramo claude/relaxed-thompson-d0a7r4), por decisão da pessoa em 2026-11-12, com as
 decisões técnicas delegadas; a pessoa é a crítica por imagem, com um resumo curto do que olhar, e a forma de peça aceita
@@ -151,6 +151,27 @@ capturou a imagem inteira em 36 s, com a mesma câmera nas três opções. Teste
 `plano-de-modelagem.test.js` e o da cor em `atalho.test.js`. A captura de `olhar-bancada` e das demais ferramentas que abrem a
 bancada fora do esboço segue exigindo `node_modules` na cópia, porque `olhar-bancada.mjs` importa o Playwright por um caminho fixo
 da raiz da cópia; isso fica para a fatia da bancada.
+
+Fatia 5 (2026-11-12): o `descrever` já imprimia os órfãos quando a medida das partes quebrava e quando a peça fechava com eles, de modo que a
+recusa calada do plano estava em outro lugar: toda recusa de uma etapa seguinte (o contorno por parte, os vãos, os contatos, as formas, as
+razões, o G01) saía só com a própria mensagem, e a causa, o passo recusado antes, se perdia; no furgão, o contorno por parte que cita a chapa
+esvaziada dizia só que a peça não tem a parte. Agora essas recusas levam o bloco `N ÓRFÃO(S), que costumam ser a causa` (`falhaDepois`), e a
+lista mostra a causa antes do eco, até 12 linhas, com a conta do que o corte deixou de fora (antes eram 5 linhas sem conta); a guarda do acervo
+já reprovava peça com órfão porque repassa o `stderr` do `descrever`, e o teste o prova numa peça mínima (`tools/fixtures/descrever-sem-calar/orfao`,
+uma abertura com contorno fora da chapa), sem depender do furgão. O aviso da abertura que cai na booleana da chapa inteira sai na saída padrão e
+numa linha `AVISO` na de erro, com o motivo de `vizinhanca.motivo` e o tempo do passo, e só para chapa de `FACES_MINIMAS_PARA_RECORTAR` faces ou
+mais, porque a menor não recorta de propósito. O núcleo não mede o tempo de um passo, e não o mudei: o `descrever` entrega ao núcleo um registro
+de operações que embrulha cada operação e anota o tempo por índice de passo (`registroCronometrado`, 543 passos do furgão sem diferença
+visível). A peça de prova é uma chapa de 5.616 faces com um vão que toma 4.232 delas (`chapa-inteira`). O furgão de hoje não dá o aviso, porque
+os oito vãos da janela passaram a recortar no plano da vizinhança de todo vão, e o caso de 2026-11-09 só se refaz na peça mínima. O progresso:
+`descreverPecaReutilizavel` aceita `aoProgredir(linha)` e a CLI o manda à saída de erro, uma linha ao entrar em cada etapa longa (carga, execução,
+partes, réguas, contatos, vãos, formas, referência) e uma batida a cada 15 s entre dois passos da receita, com o passo, o total e a operação; a
+execução é síncrona, então a batida sai entre passos e não dentro de um passo longo, e a medida de contatos segue sem batida própria. No furgão
+realista (543 passos, máquina com carga de 4 a 8, ou seja, ordem de grandeza) o `descrever --sem-veredito` levou 5 min 58 s e escreveu uma
+linha a cada 15 s na saída de erro, com a saída padrão intacta; a `guarda:acervo` do acervo de 101 peças passou, em 10 min 16 s também com a
+carga alta, e ficou 10 minutos sem saída, porque a guarda não passa `aoProgredir` ao `descrever`: `guarda-acervo.mjs` é do território do plano das costuras e
+furos limpos, e a mudança (passar `aoProgredir` em `conferirPeca`, com o nome da peça na linha, e mandar a linha do fio ao processo principal) fica
+com a sessão dele. Testes: `descrever-sem-calar.test.mjs` (9 casos, uns 4 s).
 
 ## Fechamento
 

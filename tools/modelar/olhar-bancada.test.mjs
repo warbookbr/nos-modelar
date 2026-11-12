@@ -311,7 +311,7 @@ const REPO_DO_TESTE = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 describe('carga da página', () => {
   const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
 
-  function bancadaContada({ falharPonte = false } = {}) {
+  function bancadaContada({ falharPonte = false, perderPonte = false } = {}) {
     const contagem = { servidores: 0, navegadores: 0, paginas: 0, cargas: 0, esperas: [], cortes: [], vistasTrocadas: 0, paginasFechadas: 0, navegadoresFechados: 0 };
     const page = {
       on() {},
@@ -328,6 +328,7 @@ describe('carga da página', () => {
       async waitForTimeout() {},
       async evaluate(fn, argumento) {
         const texto = String(fn);
+        if (texto.includes('typeof window.__mecanificaBancada')) return !perderPonte;
         if (texto.includes('getBoundingClientRect')) { contagem.projecoes = (contagem.projecoes ?? 0) + 1; return { pixels: argumento.map((_, i) => [10 + i, 20 + i]), quadro: [64, 36] }; }
         if (texto.includes('__modelarAjustarCamera = ')) return undefined;
         if (texto.includes('__modelarAjuste')) return { dentroDaPeca: false };
@@ -458,6 +459,13 @@ describe('carga da página', () => {
     expect(semReceita.resultado.contatos).toEqual({ estado: 'sem-receita' });
   });
 
+  it('a página que perdeu a ponte no meio da chamada (recarregou) falha dizendo isso, e não com um erro de página', async () => {
+    const { dependencias } = bancadaContada({ perderPonte: true });
+    const resposta = await olharBancada({ ...comum, vistas: ['isometrica', 'frontal'], dependencias });
+    expect(resposta.ok).toBe(false);
+    expect(resposta.erro.mensagem).toMatch(/perdeu a ponte antes da vista frontal.*repita a captura/);
+  });
+
   it('a vista de corte liga o plano uma vez, pela ponte, para todas as vistas da chamada', async () => {
     const { contagem, dependencias } = bancadaContada();
     const resposta = await olharBancada({
@@ -552,6 +560,7 @@ describe('a câmera que mira um ponto e a isométrica de trás', () => {
       async evaluate(fn, argumento) {
         const texto = String(fn);
         if (Array.isArray(argumento) && argumento.length === 4 && typeof argumento[0] === 'number') { if (argumento[3]) registro.ajustes.push(argumento[3]); return true; }
+        if (texto.includes('typeof window.__mecanificaBancada')) return true;
         if (texto.includes('__modelarAjustarCamera = ')) return undefined;
         if (texto.includes('__modelarAjuste')) return { dentroDaPeca: false };
         if (texto.includes('definirVista')) { registro.trocadas.push(argumento); return undefined; }

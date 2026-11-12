@@ -2,8 +2,10 @@
  * poucos nanômetros do plano (a grade de 1e-8 de `perfil2d.js`), do tamanho da tolerância global de 1e-9. O caso medido é o trator copiado com
  * `vidro_encaixe: 0`: o vértice do para-brisa fica a 3,35e-9 do plano do miolo, e os três contatos declarados do para-brisa deixam de acontecer.
  *
- * A saída é a tolerância declarada POR CONTATO (de 1e-9 a 1e-7, com o motivo), e a global continua em 1e-9. Estes testes provam as quatro pontas: sem a
- * tolerância reprova; com ela passa; o valor fora da faixa é recusado; e a mensagem do contato que não acontece diz que fecharia e aponta a grade. */
+ * A saída era a tolerância declarada POR CONTATO (de 1e-9 a 1e-7, com o motivo) sobre a global de 1e-9. Hoje o contato DECLARADO se confirma com a tolerância de
+ * encosto da peça, um micrômetro (`TOLERANCIA_DE_ENCOSTO_DA_PECA`, a mesma do relato do esboço; atrito 5 do RECEITA.md do sedã), e esse caso passa sem o campo; a detecção do
+ * contato não declarado segue em 1e-9. O campo por contato segue (de 1e-9 a 1e-6, o teto é a tolerância de encosto) e só estreita: estes testes o provam declarando 1e-9
+ * no par, que reproduz o caso de antes: reprova; com 2e-8 passa; o valor fora da faixa é recusado; e a mensagem do contato que não acontece diz que fecharia e aponta a grade. */
 import { describe, expect, it } from 'vitest';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -38,16 +40,28 @@ const comTolerancia = (receita, toleranciaNumerica) => ({
   contatos: receita.contatos.map((c) => (doParabrisa(c) ? { ...c, toleranciaNumerica } : c)),
 });
 
+/* o contato do para-brisa declarado com a tolerância antiga de 1e-9, a global, que o par declarado usava antes da tolerância de encosto da peça */
+const estreita = (receita) => comTolerancia(receita, 1e-9);
+
 describe('contato declarado em plano inclinado', () => {
-  it('sem tolerância própria os três contatos do para-brisa não acontecem, e o vão é de grade, não de forma', async () => {
+  it('com a tolerância de encosto da peça (1 µm) os três contatos do para-brisa declarados acontecem, sem tolerância própria', async () => {
     const { receita, neutro } = await tratorSemEncaixe();
     const r = contatosDaPeca(neutro, receita);
     expect(r.toleranciaNumerica).toBe(TOLERANCIA_CONTATO_DE_PECA);
     expect(r.toleranciaNumerica).toBe(1e-9);
+    expect(r.declaradosSemContato).toEqual([]);
+    expect(r.naoDeclarados).toEqual([]);
+    expect(r.paresEmContato.filter((p) => doParabrisa({ par: p.par }))).toHaveLength(3);
+  });
+
+  it('com a tolerância estreita de 1e-9 declarada no par, os três contatos do para-brisa não acontecem, e o vão é de grade, não de forma', async () => {
+    const { receita, neutro } = await tratorSemEncaixe();
+    const r = contatosDaPeca(neutro, estreita(receita));
+    expect(r.toleranciaNumerica).toBe(1e-9);
     expect(r.declaradosSemContato.map((d) => d.par.join(' ')).sort()).toEqual([
       'cabineAsaDir parabrisa', 'cabineAsaEsq parabrisa', 'cabineMiolo parabrisa',
     ]);
-    /* a causa fica na saída: com o teto de 1e-7 eles encostam. */
+    /* a causa fica na saída: com o teto eles encostam. */
     expect(r.declaradosSemContato.every((d) => d.fechaComTolerancia === TOLERANCIA_PROPRIA_MAXIMA)).toBe(true);
     expect(r.naoDeclarados).toEqual([]);
   });
@@ -63,33 +77,31 @@ describe('contato declarado em plano inclinado', () => {
       'cabineAsaDir parabrisa', 'cabineAsaEsq parabrisa', 'cabineMiolo parabrisa',
     ]);
     expect(proprios.every((p) => p.toleranciaNumerica === 2e-8 && p.declarado)).toBe(true);
-    /* nenhum outro par ganhou contato por isso: o mesmo conjunto de pares, só que agora com os três */
-    const semAjuste = contatosDaPeca(neutro, receita);
-    expect(r.paresEmContato).toHaveLength(semAjuste.paresEmContato.length + 3);
+    /* nenhum outro par ganhou contato por isso: o mesmo conjunto de pares do caso estreito mais os três */
+    const estreito = contatosDaPeca(neutro, estreita(receita));
+    expect(r.paresEmContato).toHaveLength(estreito.paresEmContato.length + 3);
   });
 
-  it('a tolerância própria só vale para o par que a declara: o mesmo valor em outro contato não o salva', async () => {
+  it('a tolerância própria só vale para o par que a declara: a estreita em outro contato não tira o para-brisa', async () => {
     const { receita, neutro } = await tratorSemEncaixe();
     const soOutro = {
       ...receita,
-      contatos: receita.contatos.map((c) => (c.par.includes('teto') && c.par.includes('cabineMiolo') ? { ...c, toleranciaNumerica: 2e-8 } : c)),
+      contatos: receita.contatos.map((c) => (c.par.includes('teto') && c.par.includes('cabineMiolo') ? { ...c, toleranciaNumerica: 1e-9 } : c)),
     };
-    expect(contatosDaPeca(neutro, soOutro).declaradosSemContato).toHaveLength(3);
+    const r = contatosDaPeca(neutro, soOutro);
+    expect(r.declaradosSemContato.filter((d) => doParabrisa(d))).toEqual([]);
+    expect(r.paresEmContato.filter((p) => doParabrisa({ par: p.par }))).toHaveLength(3);
   });
 
-  it('o descrever mostra a tolerância usada, e a do par que não acontece cita a grade de 1e-8', async () => {
+  it('o descrever passa o caso sem declaração, e mostra a tolerância usada quando um contato pede a sua', async () => {
     const { receita } = await tratorSemEncaixe();
     const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
     const sem = await descreverPecaReutilizavel({ peca: 'trator-sem-encaixe', modulo: receita });
-    expect(sem.resultado.contatos.declaradosSemContato).toHaveLength(3);
-    expect(sem.codigo).toBe(1);
-    expect(sem.stderr).toContain('CONTATO(S) DECLARADO(S) QUE NÃO ACONTECEM');
-    expect(sem.stderr).toContain('grade de 1e-8');
-    expect(sem.stderr).toContain('toleranciaNumerica');
+    expect(sem.resultado.contatos.declaradosSemContato).toEqual([]);
+    expect(sem.stderr).not.toContain('QUE NÃO ACONTECEM');
 
     const com = await descreverPecaReutilizavel({ peca: 'trator-sem-encaixe', modulo: comTolerancia(receita, 2e-8) });
     expect(com.resultado.contatos.declaradosSemContato).toEqual([]);
-    expect(com.stderr).not.toContain('QUE NÃO ACONTECEM');
     expect(com.stdout).toContain('TOLERÂNCIA DE CONTATO — global 1e-9; 3 contato(s) declarado(s) com tolerância própria');
     expect(com.stdout).toContain('parabrisa: 2e-8');
   });
@@ -101,15 +113,15 @@ describe('a faixa da tolerância declarada', () => {
   const unico = (mapa) => [...mapa.values()][0];
   const ler = (toleranciaNumerica) => lerContatosDeclarados({ contatos: [{ par: ['a', 'b'], motivo, toleranciaNumerica }] }, partes);
 
-  it('aceita de 1e-9 a 1e-7, inclusive', () => {
+  it('aceita de 1e-9 a 1e-6, inclusive', () => {
     expect(TOLERANCIA_PROPRIA_MINIMA).toBe(1e-9);
-    expect(TOLERANCIA_PROPRIA_MAXIMA).toBe(1e-7);
-    for (const valor of [1e-9, 2e-8, 1e-7]) expect(unico(ler(valor)).toleranciaNumerica).toBe(valor);
+    expect(TOLERANCIA_PROPRIA_MAXIMA).toBe(1e-6);
+    for (const valor of [1e-9, 2e-8, 1e-7, 1e-6]) expect(unico(ler(valor)).toleranciaNumerica).toBe(valor);
   });
 
-  it('recusa acima de 1e-7 e diz que a correção é na receita', () => {
-    expect(() => ler(1.01e-7)).toThrow(/de 1e-9 a 1e-7/);
-    expect(() => ler(1e-6)).toThrow(/a correção é na receita/);
+  it('recusa acima de 1e-6 e diz que a correção é na receita', () => {
+    expect(() => ler(1.01e-6)).toThrow(/de 1e-9 a 1e-6/);
+    expect(() => ler(1e-5)).toThrow(/a correção é na receita/);
   });
 
   it('recusa abaixo de 1e-9, zero, negativo e o que não é número finito', () => {

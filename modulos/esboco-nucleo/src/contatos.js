@@ -12,9 +12,11 @@
  * inclusive as de passos crus, que não têm onde declarar, e o motivo sai no relato. Uma travessia que nenhuma das duas declarou é "não declarada", e uma relação declarada
  * que a malha não dá é "esperada e não dada": as duas listas são o que o modo estrito recusa. Núcleo puro. */
 import { descreverPeca } from '../../../src/autoria/descrever-partes.js';
+import { TOLERANCIA_DE_ENCOSTO_DA_PECA } from '../../../src/autoria/contato-de-solidos.js';
 import { MM } from './milimetro.js';
 
-export const TOLERANCIA_DO_RELATO_M = 1e-6;
+/* a mesma tolerância de encosto do contato declarado que o `descrever` confirma (um micrômetro, com a razão em `contato-de-solidos.js`) */
+export const TOLERANCIA_DO_RELATO_M = TOLERANCIA_DE_ENCOSTO_DA_PECA;
 export const PERTO_MM = 20;
 const NOME_DA_RELACAO = { encosta: 'encosta', interpenetra: 'atravessa', folga: 'folga' };
 const fmt = (x) => (Math.round(x * 1000) / 1000).toFixed(3).replace('.', ',');

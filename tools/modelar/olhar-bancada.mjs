@@ -48,6 +48,11 @@ export const INTERVALO_DO_PROGRESSO_MS = 15_000;
 export const ESPERA_DO_ENCERRAMENTO_MS = 5000;
 const ETAPAS_LONGAS = new Set(['medir os contatos da peça', 'subir o servidor', 'abrir o navegador', 'abrir a página', 'esperar o modelo entrar na cena']);
 const MODOS = ['todas', 'contexto', 'isolar'];
+/* O SERVIDOR DE UMA CAPTURA NÃO RECARREGA A PÁGINA QUANDO UM ARQUIVO MUDA. Com a carga única da `--analise` a página fica aberta por
+   dezenas de minutos, e um arquivo do repositório editado nesse tempo (outro agente na mesma árvore) fazia o servidor mandar a página
+   recarregar: ela perdia a ponte da bancada e a análise caía no meio, na quinta vista do furgão realista. A captura mostra a peça como
+   estava ao abrir; sem o canal de recarga e sem o vigia de arquivos, o que muda depois só vale na captura seguinte. */
+const servidorDaCaptura = () => ({ host: '127.0.0.1', port: 0, hmr: false, watch: { ignored: ['**'] } });
 /* Teto de imagens de par por chamada. Uma peça de 24 partes tem 276 pares; sem
    teto, a primeira peça grande vira um despejo que ninguém abre. Três é o que
    cabe numa leitura sem rolar a tela, e o relato diz quantos ficaram de fora. */
@@ -458,7 +463,7 @@ export async function abrirCapturaCompartilhada({ dependencias = {}, logger = nu
     vite = await createServer({
       root: REPO,
       configFile: join(REPO, 'vite.config.js'),
-      server: { host: '127.0.0.1', port: 0 },
+      server: servidorDaCaptura(),
       logLevel: 'error',
     });
     await vite.listen();
@@ -805,7 +810,7 @@ export async function olharBancada({
       vite = await createServer({
         root: REPO,
         configFile: join(REPO, 'vite.config.js'),
-        server: { host: '127.0.0.1', port: 0 },
+        server: servidorDaCaptura(),
         logLevel: 'error',
       });
       await vite.listen();
@@ -961,6 +966,9 @@ export async function olharBancada({
         if (tentativaDeAbertura > 1) registrar(relato, logger, 'stdout', `ferramenta: ${vista} abriu após repetição automática`);
       } else {
         progresso.etapa = 'trocar a vista na página aberta';
+        if (!await page.evaluate(() => typeof window.__mecanificaBancada === 'object' && window.__mecanificaBancada !== null)) {
+          throw new Error(`a página da bancada perdeu a ponte antes da vista ${vista} (recarregou ou caiu); repita a captura.`);
+        }
         await page.evaluate((alvo) => {
           window.__modelarQuadros?.retomar();
           window.__mecanificaBancada.ambiente().definirVista(alvo, { instantaneo: true });

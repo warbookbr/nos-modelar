@@ -22,10 +22,14 @@ const OP = 'limparLascas';
 
 
 /** A área abaixo da qual uma face é lasca mesmo bem proporcionada: o piso de área da medida de contatos (`contato-de-solidos.js`, 1e-9 vezes o quadrado da meia
- *  diagonal da caixa do sólido) com margem de 4, sobre a caixa das faces da seleção. É a face que a medida não triangula. */
+ *  diagonal da caixa do sólido) com margem de 4. A caixa é a da PEÇA inteira no estado do passo (todo vértice que existe), e não a das faces da seleção: a medida que
+ *  audita uma montagem tria o sólido da instância, e o piso dela cresce com a diagonal da peça (4,8 m no sedã, contra 1,7 m da travessa que o `aparar` limpava), de modo
+ *  que a face de 4,9e-9 m² que a limpeza deixava (piso de 3,0e-9) era recusada pela auditoria (piso de 6e-9) e passava pelo relato por parte (atrito 11 do RECEITA.md do
+ *  sedã). `faces` fica na assinatura porque os dois chamadores a passam, e já não entra na conta. */
 export function areaMinimaDe(st, faces) {
+  void faces;
   const lo = [Infinity, Infinity, Infinity]; const hi = [-Infinity, -Infinity, -Infinity];
-  for (const fid of faces) { const f = st.F.get(fid); if (!f) continue; for (const v of f.vs) { const p = st.V.get(v); for (let k = 0; k < 3; k += 1) { if (p[k] < lo[k]) lo[k] = p[k]; if (p[k] > hi[k]) hi[k] = p[k]; } } }
+  for (const p of st.V.values()) for (let k = 0; k < 3; k += 1) { if (p[k] < lo[k]) lo[k] = p[k]; if (p[k] > hi[k]) hi[k] = p[k]; }
   if (!Number.isFinite(lo[0])) return 0;
   const meia = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / 2;
   return 4e-9 * meia * meia;

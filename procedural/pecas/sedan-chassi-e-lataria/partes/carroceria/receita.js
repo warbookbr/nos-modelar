@@ -56,10 +56,6 @@ const passosDoForro = (Tab) => {
     ['parte', { nome: 'forroDosVaos', sel }], ['pincel', { modo: 'face', sel, cor: '#4a5560' }], ['liso', { sel, angulo: 35 }]];
 };
 
-/* Os pares que o esboço declara `encosta` e o `descrever` não dá por encostados: o relato do esboço mede o toque a 1 µm (`TOLERANCIA_DO_RELATO_M`), o `descrever` a 1 nm e a declaração
-   de contato aceita no máximo 0,1 µm (atrito 5 do RECEITA.md). O lábio assenta na borda da caixa de roda, e o par fica sem declaração aqui e no relato do carro. */
-const SO_NO_RELATO = new Set(['caixaDeRodaDianteiraDir', 'caixaDeRodaDianteiraEsq'].map((c) => `${c}|labioDianteiro`));
-
 /* Os membros do chassi que passam atrás de uma linha de vão: o forro, que corre a 1,5 mm da pele de fora (0,5 mm da pele de dentro), entra neles, e a solda o prende. Medido no
    `descrever` da carroceria; as quatro portas e as soleiras, que o forro tocava onde a pele inclina, deixaram de ser tocadas com a normal da pele (e não a de um eixo fixo). */
 const CONTATOS_DO_FORRO = [...['A', 'B', 'C'].flatMap((n) => ['Dir', 'Esq'].map((L) => [`montante${n}${L}`, `o forro do vão ao lado do montante ${n} é soldado nele: a faixa passa pelo montante, 0,5 mm abaixo da pele de dentro`])),
@@ -110,17 +106,21 @@ const receita = {
     ],
     lataria: { partes: ['capo', 'paraLamaDir', 'paraLamaEsq', 'portaDianteiraDir', 'portaDianteiraEsq', 'portaTraseiraDir', 'portaTraseiraEsq', 'lateralTraseiraDir', 'lateralTraseiraEsq', 'soleiraDir', 'soleiraEsq', 'tampaDoPortaMalas', 'teto'] },
   },
-  contatos: [...contatosDaEtapa(ETAPA).filter(({ par }) => !SO_NO_RELATO.has(par.join('|'))), ...CONTATOS_DO_FORRO],
+  contatos: [...contatosDaEtapa(ETAPA), ...CONTATOS_DO_FORRO],
   FOLGAS: folgasDaEtapa(ETAPA),
   APOIA: { ...apoiaDaEtapa(ETAPA), ...SOLTAS },
   /* As partes soltas desta peça: os painéis que fecham os vãos entre os outros ficam a 4 mm deles e a 0,5 mm dos membros do chassi, presos por dobradiça e cola de estrutura que
      ficam fora do esboço; nenhum toca outra parte. O grupo principal é o do chassi com os para-lamas, as laterais e o teto. */
   ilhas: Object.entries(SOLTAS).map(([contem, motivo]) => ({ contem, motivo })),
   /* Os vãos do teto: as cinco janelas, cada uma com a moldura de borracha que a contorna. As janelas das portas e a vigia valem para os dois lados (a borda declarada é a da
-     metade). A abertura da chapa de baixo em que a cabine assenta NÃO está aqui, e o `descrever` a reprova por isso: o corte em painéis tira os vértices dela onde cada linha de vão
-     a atravessa, e `vaos` só aceita a borda cujos vértices todos existem na malha (atrito 2 do RECEITA.md). */
+     metade). A abertura da chapa de baixo em que a cabine assenta fica sem moldura, e o corte em painéis tira os vértices dela onde cada linha de vão a atravessa: a declaração
+     `semMoldura` aceita a borda cortada (atrito 2 do RECEITA.md). A borda é a metade da volta, de um ponto do plano de simetria ao outro: a coluna da faixa de cima de uma
+     estação a outra, e o contorno do capô nas duas pontas (`descrever` lista os pontos da volta inteira). */
   get vaos() {
-    return VIDROS.map(([, , vao], i) => ({ nome: vao, borda: CABINE.bordaDoVao(vao), frisos: [MOLDURAS[i]] }));
+    const daFaixa = ['peDaTampa', 'zm1291', 'arcoDeTrasTopo', 'zm1071', 'zm971', 'zm891', 'zm836', 'zm801', 'arcoDeTrasFim', 'fimDaPorta', 'zm739', 'zm700', 'zm630', 'zm520', 'zm380', 'zm220', 'entrePortas', 'z130', 'z290', 'z440', 'z560', 'z638', 'fimDoParaLama', 'peDoCapo'].map((e) => `${e}_faixa`);
+    const doCapo = (e) => ['vaoDoCapo', 'capoBorda', 'capoMeio', 'capoDentro', 'centro'].map((c) => `${e}_${c}`);
+    const abertura = { nome: 'aberturaDaCabine', borda: [...doCapo('peDaTampa').reverse(), ...daFaixa, ...doCapo('peDoCapo')], semMoldura: { motivo: 'a chapa de baixo se abre onde a cabine assenta: o teto, as molduras e os montantes fecham a abertura por cima, e a chapa não tem moldura própria em volta dela' } };
+    return [abertura, ...VIDROS.map(([, , vao], i) => ({ nome: vao, borda: CABINE.bordaDoVao(vao), frisos: [MOLDURAS[i]] }))];
   },
   /* Os extremos que a tabela do alvo e a do rascunho fixam: o eixo da frente (de x -870 a 870, raio 30, centro em y 364 e z 1249), o de trás, e o alto do teto (a borda do peitoril, em x 816, e o pé do para-brisa, em z 738). */
   get PONTOS() {
