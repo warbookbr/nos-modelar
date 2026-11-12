@@ -1,3 +1,4 @@
+/* aresta-solta.test.mjs — a régua de aresta solta, a recusa dela no `guarda:acervo` (com a dispensa `meta.casca: "aberta"`) e a face de menos de 3 cantos na régua de face degenerada. */
 import { describe, expect, it } from 'vitest';
 import { medirArestaSolta } from './aresta-solta.mjs';
 import { motivoDeFaceDegenerada, motivoDeArestaSolta } from '../guardas/guarda-acervo.mjs';
