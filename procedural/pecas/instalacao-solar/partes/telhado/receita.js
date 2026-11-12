@@ -20,10 +20,14 @@
  * é um cosseno cortado, com crista e vale de topo reto, para o parafuso e a viga terem onde assentar. A fileira de cima assenta na
  * de baixo em fase, 6,5 mm acima (a espessura mais uma folga de 0,5 mm), e a viga da cumeeira sobe esses 6,5 mm para tocar nela.
  *
- * Locação: a primeira linha de hastes (A) fica sobre a viga da sobreposição e a segunda (B) 900 mm acima, ao longo da água; em x, a
- * fileira começa em `inicioDoTrilho` e as quatro hastes de cada linha ficam a `primeiraHaste` da ponta e iguais entre si (a regra de
- * quatro hastes no trilho de 4,55 m; `espacamentoFixo` > 0 troca pela regra de 1,40 m). As hastes entram nas portas `hasteA1` a `hasteB4`,
- * no plano da crista de cima, e o primeiro painel na porta `painel1`, no mesmo plano, com o afastamento do topo do trilho na montagem. O plano de cada porta passa por vértices da crista de cima, que é a origem dela.
+ * Locação: a primeira linha de hastes (A) fica sobre a viga da sobreposição e a segunda (B) 900 mm acima, ao longo da água. Em x, o furo da
+ * haste tem de cair na crista de uma onda, e por isso o espaçamento é um número de gomos (`espacamentoEmGomos`, 8 por padrão, 1416 mm;
+ * `espacamentoFixo` em mm sobrepõe os gomos, para as regras do documento): as `quantidadeDeHastes` hastes ficam centradas no trilho de
+ * `comprimentoDoTrilho` (ou a `primeiraHasteFixa` da ponta), e a primeira cai na crista `cristaDaPrimeiraHaste`, o que dá o início do trilho.
+ * As hastes entram nas portas `hasteA1` a `hasteB4`, no plano das cristas de cima; a segunda medida de cada uma é a profundidade da
+ * crista ao fundo da viga, de onde a haste deriva o assento. As portas `marcaDoSuporte` e `marcaDoPainel` levam, como medida, a distância da
+ * ponta do trilho à primeira haste e ao primeiro painel, e `trilho` leva o comprimento do trilho. O plano de cada porta passa por vértices da
+ * crista de cima, que é a origem dela.
  */
 
 export const TABELA = {
@@ -49,25 +53,25 @@ export const TABELA = {
   larguraDaViga: 60,
   alturaDaViga: 120,
   posicaoDaPrimeiraViga: 80,
+  /* A CONFIRMAR: diâmetro do furo da haste na telha (a haste tem 10 mm).*/
+  diametroDoFuro: 11,
   /* A CONFIRMAR: parafuso de fixação visto de cima: raio da cabeça com arruela, altura, lados, e as cristas da telha que o recebem. */
   raioDoParafuso: 11,
   alturaDoParafuso: 5,
   ladosDoParafuso: 12,
   cristasDoParafuso: [2, 4],
-  /* A CONFIRMAR: locação da obra. */
-  inicioDoTrilho: 2000,
+  /* A CONFIRMAR: locação da obra. O espaçamento é um número de gomos, para o furo cair na crista; 0 em `espacamentoFixo` e `primeiraHasteFixa`
+     deixa os gomos e o centro do trilho decidirem. */
   comprimentoDoTrilho: 4550,
   quantidadeDeHastes: 4,
-  primeiraHaste: 300,
+  espacamentoEmGomos: 8,
   espacamentoFixo: 0,
+  primeiraHasteFixa: 0,
+  cristaDaPrimeiraHaste: 12,
   vigaDaLinhaA: 1,
   distanciaEntreTrilhos: 900,
-  /* A CONFIRMAR: o trilho fica ao lado da haste, no lado de baixo da água, com o centro a 58 mm dela (suporte-l: furo da haste a 38 mm
-     da perna, mais a meia seção de 20 mm do perfil). A altura do topo do trilho sobre o plano das cristas, 89 mm (haste: 27 mm do assento à
-     perna; suporte-l: oblongo a 42 mm; perfil: rasgo a 20 mm e 40 mm de altura), é o afastamento da posição do primeiro painel na montagem. */
-  afastamentoDoTrilho: 58,
-  /* A CONFIRMAR: onde a fileira de painéis começa, a partir da ponta do trilho. */
-  inicioDosPaineis: 90,
+  /* A CONFIRMAR: onde a fileira de painéis começa, a partir da ponta do trilho (a fileira de 4372 mm centrada no trilho de 4550). */
+  inicioDosPaineis: 89,
 };
 
 export const MATERIAIS = {
@@ -137,11 +141,11 @@ export function derivar(t = TABELA) {
       usadas.forEach((k) => parafusos.push({ x: i * passoDaTelha + k * t.gomo, y: yCrista[f], z, fileira: f, viga: v, telha: i }));
     }
   });
-  /* A locação: x das hastes, as duas linhas em z e a posição do trilho (ao lado de baixo da haste). */
-  const espacamento = t.espacamentoFixo > 0
-    ? t.espacamentoFixo
-    : (t.comprimentoDoTrilho - 2 * t.primeiraHaste) / (t.quantidadeDeHastes - 1);
-  const xHastes = Array.from({ length: t.quantidadeDeHastes }, (_, k) => t.inicioDoTrilho + t.primeiraHaste + k * espacamento);
+  /* A locação: x das hastes (na crista), as duas linhas em z e o início do trilho. */
+  const espacamento = t.espacamentoFixo > 0 ? t.espacamentoFixo : t.espacamentoEmGomos * t.gomo;
+  const primeiraHaste = t.primeiraHasteFixa > 0 ? t.primeiraHasteFixa : (t.comprimentoDoTrilho - (t.quantidadeDeHastes - 1) * espacamento) / 2;
+  const inicioDoTrilho = t.cristaDaPrimeiraHaste * t.gomo - primeiraHaste;
+  const xHastes = Array.from({ length: t.quantidadeDeHastes }, (_, k) => inicioDoTrilho + primeiraHaste + k * espacamento);
   const zLinhaA = zViga[t.vigaDaLinhaA];
   const zLinhaB = zLinhaA + t.distanciaEntreTrilhos;
   const yDoPlanoDasCristas = yCrista[1];
@@ -151,7 +155,9 @@ export function derivar(t = TABELA) {
     descida,
     passoDaTelha, nTelhas, larguraDaUltima, nanoPorTelha, entreVigas, zViga, folgaFileira, yVale, yCrista, yPeDaVigaDaCumeeira,
     poligono, parafusos, espacamento, xHastes, zLinhaA, zLinhaB, yDoPlanoDasCristas,
-    zTrilhoA: zLinhaA - t.afastamentoDoTrilho, zTrilhoB: zLinhaB - t.afastamentoDoTrilho,
+    primeiraHaste, inicioDoTrilho,
+    /* Da crista de cima ao fundo da viga: o quanto a haste entra. */
+    profundidadeDaHaste: yDoPlanoDasCristas,
     /* Início z de cada fileira de telhas no quadro plano. */
     zFileira: [0, entreVigas],
   };
@@ -167,31 +173,26 @@ export function direcoesDaAgua(t) {
   return { normal: [0, Math.cos(a), -Math.sin(a)], subida: [0, Math.sin(a), Math.cos(a)] };
 }
 
-/* As portas, em mm, no mundo. Cada haste vai ao plano das cristas de cima, na viga da linha; o primeiro painel, ao plano do topo do
-   trilho, no cruzamento do trilho de cima, na ponta de x da fileira. */
+/* As portas, em mm, no mundo. Cada haste vai ao plano das cristas de cima, na viga da linha, e leva a profundidade da crista ao fundo da
+   viga; as marcas e o trilho vão ao mesmo plano, na ponta do trilho, e levam as medidas que a montagem deriva. */
 export function portas(t = TABELA) {
   const D = derivar(t);
   const { normal, subida } = direcoesDaAgua(t);
-  const lado = 40;
   const saida = {};
   ['A', 'B'].forEach((linha) => {
     const z = linha === 'A' ? D.zLinhaA : D.zLinhaB;
     D.xHastes.forEach((x, k) => {
       saida[`haste${linha}${k + 1}`] = {
-        forma: 'plano', papel: 'recebe', ponto: paraOMundo(t, [x, D.yDoPlanoDasCristas, z], D.descida), normal, extensao: [lado, lado], referencia: subida,
+        forma: 'plano', papel: 'recebe', ponto: paraOMundo(t, [x, D.yDoPlanoDasCristas, z], D.descida), normal, extensao: [t.diametroDoFuro, D.profundidadeDaHaste], referencia: subida,
       };
     });
   });
-  saida.painel1 = {
-    forma: 'plano', papel: 'recebe',
-    ponto: paraOMundo(t, [t.inicioDoTrilho + t.inicioDosPaineis, D.yDoPlanoDasCristas, D.zTrilhoB], D.descida),
-    normal, extensao: [100, 100], referencia: subida.map((v) => -v),
-  };
-  /* O trilho, só pela medida: o comprimento que o último perfil de cada linha completa. */
-  saida.trilho = {
-    forma: 'plano', papel: 'apoia', ponto: paraOMundo(t, [t.inicioDoTrilho, D.yDoPlanoDasCristas, D.zTrilhoA], D.descida), normal, extensao: [40, t.comprimentoDoTrilho],
-    referencia: subida,
-  };
+  const naPontaDoTrilho = (comprimento) => ({
+    forma: 'plano', papel: 'apoia', ponto: paraOMundo(t, [D.inicioDoTrilho, D.yDoPlanoDasCristas, D.zLinhaA], D.descida), normal, extensao: [40, comprimento], referencia: subida,
+  });
+  saida.marcaDoSuporte = naPontaDoTrilho(D.primeiraHaste);
+  saida.marcaDoPainel = naPontaDoTrilho(t.inicioDosPaineis);
+  saida.trilho = naPontaDoTrilho(t.comprimentoDoTrilho);
   return saida;
 }
 

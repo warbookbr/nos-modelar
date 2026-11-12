@@ -1893,7 +1893,7 @@
 
 ## procedural/pecas/instalacao-solar/partes/haste/
 
-- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, a arruela e as porcas.
+- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, as arruelas e as porcas.
 
 ## procedural/pecas/instalacao-solar/partes/painel-30/
 

@@ -31,8 +31,10 @@ export const TABELA = {
   rasgoLateralCentro: 20,
   /* Acabamento: quina externa quebrada. */
   quina: 1.5,
-  /* A CONFIRMAR: onde o primeiro suporte em L encosta, a partir da ponta de x = 0 (a primeira haste fica a 300 mm da ponta do trilho). */
-  posicaoDoSuporte: 300,
+  /* A CONFIRMAR: onde o primeiro suporte em L encosta e onde o primeiro painel começa, a partir da ponta de x = 0. Na montagem os dois
+     valores vêm das portas do telhado (a primeira haste e o início dos painéis); o valor daqui só vale para ver a peça sozinha. */
+  posicaoDoSuporte: 151,
+  posicaoDoPrimeiroPainel: 89,
 };
 
 export const MATERIAIS = { aluminio: { cor: '#b9bec4', metalicidade: 0.85, aspereza: 0.35 } };
@@ -73,13 +75,15 @@ const publicar = (passos, portasEmMm, de) => {
 };
 
 /* As portas, em mm: a face de lado onde o suporte em L encosta, na altura do rasgo e a `posicaoDoSuporte` da ponta de x = 0; e as faces de ponta,
-   no centro do vazio, onde a emenda entra. A referência é +y, para cima. */
+   no centro do vazio, onde a emenda entra; e o topo, onde o primeiro painel assenta, a `posicaoDoPrimeiroPainel` da ponta (a referência dele é -z). A
+   referência das outras é +y, para cima. */
 export function portas(t = TABELA) {
   const yDoVazio = (t.parede + t.altura - t.espessuraDoLabio) / 2;
   return {
     lateral: { forma: 'plano', papel: 'apoia', ponto: [t.posicaoDoSuporte, t.rasgoLateralCentro, t.largura / 2], normal: [0, 0, 1], extensao: [t.altura, 50], referencia: [0, 1, 0] },
     fim: { forma: 'plano', papel: 'recebe', ponto: [t.comprimento, yDoVazio, 0], normal: [1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
     inicio: { forma: 'plano', papel: 'apoia', ponto: [0, yDoVazio, 0], normal: [-1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
+    topo: { forma: 'plano', papel: 'recebe', ponto: [t.posicaoDoPrimeiroPainel, t.altura, 0], normal: [0, 1, 0], extensao: [t.largura, 100], referencia: [0, 0, -1] },
   };
 }
 

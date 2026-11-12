@@ -1,10 +1,11 @@
 /* instalacao-solar/conferencias — as conferências de medida da obra, sobre a montagem resolvida `montagem.json`.
  *
  * Lê a montagem resolvida (poses de verdade, depois dos encaixes por porta) e mede, em milímetro no quadro da água (E ao longo da
- * beirada, S ao longo da água, subindo a partir da beirada da primeira telha, N normal à água): cada haste sobre uma viga e na crista de
- * uma onda; os dois trilhos sobre viga e a distância entre eles; o espaçamento das hastes pelas duas regras do plano; a folga entre
- * painéis; a distância do trilho à ponta de cada painel; o comprimento de trilho; e a haste que passa do plano do painel. Não decide
- * nada: o relato diz o número e a regra, e a escolha é da pessoa.
+ * beirada, S ao longo da água, subindo a partir da beirada da primeira telha, N normal à água): cada haste entra numa viga e cai na
+ * crista de uma onda; o espaçamento das hastes pelas regras do documento e pelas de 8 gomos; a folga entre painéis; a distância do trilho à
+ * ponta de cada painel; o comprimento de trilho e a distância entre os dois; as alturas da cadeia haste, suporte, trilho, painel e vidro
+ * sobre as cristas; e a folga entre a ponta da haste e o painel. O trilho fica ao lado da haste, deslocado pelo suporte em L, e isso não é
+ * conferência. Não decide nada: o relato diz o número e a regra, e a escolha é da pessoa.
  *
  * Uso: `node procedural/pecas/instalacao-solar/conferencias.mjs`, ou `conferirInstalacaoSolar()` importado.
  */
@@ -70,7 +71,8 @@ export async function conferirInstalacaoSolar(resolvida = null) {
   const meiaCrista = (Math.acos(1 / T.ganhoDaOnda) / (2 * Math.PI)) * T.gomo;
   const medidas = {};
 
-  /* 1. Hastes: sobre viga (distância da linha da haste ao centro da viga mais próxima) e na crista (distância ao centro da crista). */
+  /* 1. Hastes: cada uma entra numa viga? (distância da linha da haste ao centro da viga mais próxima, contra a meia viga) e cai na crista de
+     uma onda? (distância ao centro da crista mais próxima, contra a meia crista). */
   medidas.hastes = [];
   for (const linha of ['A', 'B']) {
     for (let k = 1; k <= T.quantidadeDeHastes; k++) {
@@ -81,7 +83,7 @@ export async function conferirInstalacaoSolar(resolvida = null) {
       const resto = q.e % T.gomo;
       const dCrista = Math.min(resto, T.gomo - resto);
       medidas.hastes.push({
-        id, e: arred(q.e), s: arred(q.s), viga: v + 1, distanciaAoCentroDaViga: arred(aoCentro[v]), sobreViga: aoCentro[v] <= meiaViga,
+        id, e: arred(q.e), s: arred(q.s), viga: v + 1, distanciaAoCentroDaViga: arred(aoCentro[v]), entraNaViga: aoCentro[v] <= meiaViga,
         distanciaAoCentroDaCrista: arred(dCrista), naCrista: dCrista <= meiaCrista,
       });
     }
@@ -89,18 +91,13 @@ export async function conferirInstalacaoSolar(resolvida = null) {
   medidas.meiaLarguraDaViga = meiaViga;
   medidas.meiaLarguraDaCrista = arred(meiaCrista);
 
-  /* 2. Trilhos: centro, sobreposição com a viga mais próxima e distância entre os dois. */
+  /* 2. Trilho: comprimento, pedaços, extremos e a distância entre os dois (a posição em relação à viga não é conferência: o trilho fica ao
+     lado da haste, deslocado pelo suporte em L). */
   const trilho = (linha) => {
     const pecas = [1, 2, 3, 4].map((k) => extensao(`perfil${linha}${k}`));
     const s = pecas[0].s;
-    const centro = (s[0] + s[1]) / 2;
-    const aoCentro = D.zViga.map((z) => Math.abs(centro - z));
-    const v = aoCentro.indexOf(Math.min(...aoCentro));
-    const baixo = Math.max(s[0], D.zViga[v] - meiaViga);
-    const cima = Math.min(s[1], D.zViga[v] + meiaViga);
     return {
-      linha, centroS: arred(centro), larguraS: arred(s[1] - s[0]), vigaMaisProxima: v + 1, distanciaAoCentroDaViga: arred(aoCentro[v]),
-      sobreposicaoComAViga: arred(Math.max(0, cima - baixo)), distanciaAoPeDaViga: arred(Math.min(Math.abs(s[0] - (D.zViga[v] + meiaViga)), Math.abs(s[1] - (D.zViga[v] - meiaViga)))),
+      linha, centroS: arred((s[0] + s[1]) / 2),
       inicioE: arred(Math.min(...pecas.map((p) => p.e[0]))), fimE: arred(Math.max(...pecas.map((p) => p.e[1]))),
       pedacos: pecas.map((p) => arred(p.e[1] - p.e[0])),
     };
@@ -110,20 +107,32 @@ export async function conferirInstalacaoSolar(resolvida = null) {
   medidas.comprimentoDeTrilho = arred(medidas.trilhos.A.fimE - medidas.trilhos.A.inicioE);
   medidas.sobraDePerfil = arred(8 * 1350 - 2 * medidas.comprimentoDeTrilho);
 
-  /* 3. Espaçamento das hastes: o da montagem (regra de quatro iguais no trilho) e a regra de 1,40 m do plano, pelas mesmas medidas. */
+  /* 3. Espaçamento das hastes. O da montagem, e as quatro regras, cada uma com a primeira haste na crista (o instalador desliza o trilho
+     até lá): as duas do documento (1,40 m e quatro iguais no trilho de 4,55 m) e as de 8 gomos (1416 mm), centradas no trilho de 4,55 m e
+     com a primeira a 30 cm da ponta, o trilho que isso pede. */
+  const n = T.quantidadeDeHastes;
   const xA = medidas.hastes.filter((h) => h.id.startsWith('hasteA')).map((h) => h.e);
-  const espacamentos = xA.slice(1).map((x, k) => arred(x - xA[k], 2));
-  const regraDe1400 = Array.from({ length: T.quantidadeDeHastes }, (_, k) => T.inicioDoTrilho + T.primeiraHaste + k * 1400);
-  medidas.espacamentoDasHastes = {
-    daMontagem: espacamentos,
-    regraDeQuatroIguais: arred((T.comprimentoDoTrilho - 2 * T.primeiraHaste) / (T.quantidadeDeHastes - 1), 2),
-    regraDe1400: {
-      trilhoNecessario: 2 * T.primeiraHaste + (T.quantidadeDeHastes - 1) * 1400,
-      hastes: regraDe1400.map((x) => {
-        const resto = x % T.gomo; const d = Math.min(resto, T.gomo - resto);
-        return { e: arred(x), distanciaAoCentroDaCrista: arred(d), naCrista: d <= meiaCrista };
+  const opcao = (nome, espacamento, primeira, trilhoPedido) => {
+    const x0 = T.cristaDaPrimeiraHaste * T.gomo - primeira;
+    return {
+      nome, espacamento: arred(espacamento, 2), gomosPorVao: arred(espacamento / T.gomo, 3), primeiraHaste: arred(primeira), trilhoPedido: arred(trilhoPedido),
+      hastes: Array.from({ length: n }, (_, k) => {
+        const x = x0 + primeira + k * espacamento;
+        const resto = ((x % T.gomo) + T.gomo) % T.gomo;
+        const d = Math.min(resto, T.gomo - resto);
+        return { xNoTrilho: arred(primeira + k * espacamento), distanciaAoCentroDaCrista: arred(d), naCrista: d <= meiaCrista };
       }),
-    },
+    };
+  };
+  const oitoGomos = 8 * T.gomo;
+  medidas.espacamentoDasHastes = {
+    daMontagem: xA.slice(1).map((x, k) => arred(x - xA[k], 2)),
+    opcoes: [
+      opcao('1,40 m do documento, primeira a 30 cm', 1400, 300, 600 + (n - 1) * 1400),
+      opcao('quatro iguais no trilho de 4,55 m, primeira a 30 cm', (4550 - 600) / (n - 1), 300, 4550),
+      opcao('8 gomos centradas no trilho de 4,55 m', oitoGomos, (4550 - (n - 1) * oitoGomos) / 2, 4550),
+      opcao('8 gomos, primeira a 30 cm da ponta', oitoGomos, 300, 600 + (n - 1) * oitoGomos),
+    ],
   };
 
   /* 4. Painéis: folga entre vizinhos, fileira, e a distância do trilho à ponta de cada um. */
@@ -138,13 +147,23 @@ export async function conferirInstalacaoSolar(resolvida = null) {
     trilhoAAPontaDeBaixo: arred(medidas.trilhos.A.centroS - p.s[0]),
   }));
 
-  /* 5. A haste contra o painel: quanto da haste passa do plano de baixo do painel que está sobre ela. */
+  /* 5. Alturas sobre o plano das cristas (ao longo da normal da água): o assento da haste, a perna do suporte, o trilho, a face de baixo do
+     painel e o vidro; e o que sobra entre a ponta de cima da haste e o painel que está sobre ela. */
+  const nDaCrista = D.yDoPlanoDasCristas - D.descida * Math.cos(rad(T.inclinacao));
+  const sobreACrista = (n) => arred(n - nDaCrista);
+  medidas.alturasSobreACrista = {
+    assentoDaHaste: sobreACrista(Q.deMundo(portaNoMundo(por.hasteA1, 'vedacao')).n),
+    pernaDoSuporte: sobreACrista(extensao('suporteA1').n[0]),
+    fundoDoTrilho: sobreACrista(extensao('perfilA1').n[0]),
+    topoDoTrilho: sobreACrista(extensao('perfilA1').n[1]),
+    pontaDeCimaDaHaste: sobreACrista(extensao('hasteA1').n[1]),
+    paineis: paineis.map((p) => ({ id: p.id, fundoDoPainel: sobreACrista(p.n[0]), vidro: sobreACrista(p.n[1]) })),
+  };
   medidas.hasteContraOPainel = medidas.hastes.map((h) => {
     const ext = extensao(h.id);
     const sobre = paineis.find((p) => h.e >= p.e[0] && h.e <= p.e[1] && h.s >= p.s[0] && h.s <= p.s[1]);
-    return { id: h.id, painel: sobre?.id ?? null, passaDoPainel: sobre ? arred(Math.max(0, ext.n[1] - sobre.n[0])) : 0 };
+    return { id: h.id, painel: sobre?.id ?? null, folgaAteOPainel: sobre ? arred(sobre.n[0] - ext.n[1]) : null };
   });
-  medidas.alturaDoTopoDoTrilhoSobreACrista = arred(extensao('perfilA1').n[1] - (D.yDoPlanoDasCristas - D.descida * Math.cos(rad(T.inclinacao))));
   return medidas;
 }
 
@@ -152,14 +171,18 @@ export function relato(m) {
   const L = [];
   const sim = (b) => (b ? 'sim' : 'não');
   L.push('Instalação solar: conferências da obra (valores provisórios do telhado e do kit; mm).');
-  L.push(`Trilho: ${m.comprimentoDeTrilho} mm por linha, de ${m.trilhos.A.inicioE} a ${m.trilhos.A.fimE} em E, em pedaços de ${m.trilhos.A.pedacos.join(' + ')} mm (o último cortado); sobra de perfil nas duas linhas: ${m.sobraDePerfil} mm.`);
-  L.push(`Hastes, por linha (viga mais próxima, distância ao centro dela, na crista?): ` + m.hastes.map((h) => `${h.id} E ${h.e} S ${h.s}: viga ${h.viga} a ${h.distanciaAoCentroDaViga} (meia viga ${m.meiaLarguraDaViga}) ${sim(h.sobreViga)}, crista a ${h.distanciaAoCentroDaCrista} (meia crista ${m.meiaLarguraDaCrista}) ${sim(h.naCrista)}`).join('; ') + '.');
-  L.push(`Trilhos sobre viga: A no centro S ${m.trilhos.A.centroS}, viga ${m.trilhos.A.vigaMaisProxima} a ${m.trilhos.A.distanciaAoCentroDaViga} do centro dela, sobrepondo ${m.trilhos.A.sobreposicaoComAViga} de ${m.trilhos.A.larguraS} mm (a borda do trilho fica a ${m.trilhos.A.distanciaAoPeDaViga} mm da borda da viga); B no centro S ${m.trilhos.B.centroS}, viga ${m.trilhos.B.vigaMaisProxima} a ${m.trilhos.B.distanciaAoCentroDaViga} do centro dela, sobrepondo ${m.trilhos.B.sobreposicaoComAViga} mm (a borda do trilho fica a ${m.trilhos.B.distanciaAoPeDaViga} mm da borda da viga). Distância entre os trilhos: ${m.distanciaEntreTrilhos} mm.`);
-  L.push(`Espaçamento das hastes: na montagem ${m.espacamentoDasHastes.daMontagem.join(' / ')} (regra de quatro iguais em ${m.comprimentoDeTrilho} mm: ${m.espacamentoDasHastes.regraDeQuatroIguais}); pela regra de 1400 o trilho teria ${m.espacamentoDasHastes.regraDe1400.trilhoNecessario} mm, com as hastes em ${m.espacamentoDasHastes.regraDe1400.hastes.map((h) => `E ${h.e} (crista a ${h.distanciaAoCentroDaCrista}, ${sim(h.naCrista)})`).join(', ')}.`);
+  L.push(`Trilho: ${m.comprimentoDeTrilho} mm por linha, de ${m.trilhos.A.inicioE} a ${m.trilhos.A.fimE} em E, em pedaços de ${m.trilhos.A.pedacos.join(' + ')} mm (o último cortado); sobra de perfil nas duas linhas: ${m.sobraDePerfil} mm. Distância entre os dois trilhos: ${m.distanciaEntreTrilhos} mm.`);
+  L.push(`Hastes (entra em viga? a quanto do centro dela; na crista? a quanto do centro dela; meia viga ${m.meiaLarguraDaViga}, meia crista ${m.meiaLarguraDaCrista}): ` + m.hastes.map((h) => `${h.id} E ${h.e} S ${h.s}: viga ${h.viga} a ${h.distanciaAoCentroDaViga} ${sim(h.entraNaViga)}, crista a ${h.distanciaAoCentroDaCrista} ${sim(h.naCrista)}`).join('; ') + '.');
+  L.push(`Espaçamento das hastes na montagem: ${m.espacamentoDasHastes.daMontagem.join(' / ')} mm. Opções, cada uma com a primeira haste na crista:`);
+  for (const o of m.espacamentoDasHastes.opcoes) {
+    L.push(`  ${o.nome}: espaçamento ${o.espacamento} (${o.gomosPorVao} gomos), primeira a ${o.primeiraHaste} da ponta, trilho de ${o.trilhoPedido}; hastes na crista: ${o.hastes.map((h) => `${h.xNoTrilho} a ${h.distanciaAoCentroDaCrista} (${sim(h.naCrista)})`).join(', ')}.`);
+  }
   L.push(`Painéis: folgas ${m.folgaEntrePaineis.join(' / ')} mm (30|40 com os dois grampos de ponta de frente, 40|40 com o intermediário); fileira de ${m.fileiraDePaineis} mm no trilho de ${m.comprimentoDeTrilho} (margens ${m.margemDaFileiraNoTrilho.join(' e ')}).`);
   L.push('Trilho a partir da ponta de cada painel (cima / baixo): ' + m.trilhoNaPonta.map((p) => `${p.id} ${p.trilhoBAPontaDeCima} / ${p.trilhoAAPontaDeBaixo} de ${p.comprimento}`).join('; ') + '.');
-  const passam = m.hasteContraOPainel.filter((h) => h.passaDoPainel > 0);
-  L.push(passam.length ? `Haste contra o painel: ${passam.map((h) => `${h.id} passa ${h.passaDoPainel} mm do plano de baixo de ${h.painel}`).join('; ')}.` : 'Haste contra o painel: nenhuma haste passa do plano de baixo do painel.');
+  const a = m.alturasSobreACrista;
+  L.push(`Alturas sobre o plano das cristas: assento da haste ${a.assentoDaHaste}; perna do suporte ${a.pernaDoSuporte}; fundo do trilho ${a.fundoDoTrilho}; topo do trilho ${a.topoDoTrilho}; ponta de cima da haste ${a.pontaDeCimaDaHaste}; ` + a.paineis.map((p) => `${p.id}: face de baixo ${p.fundoDoPainel}, vidro ${p.vidro}`).join('; ') + '.');
+  const sob = m.hasteContraOPainel.filter((h) => h.painel);
+  L.push(`Haste contra o painel: ${sob.map((h) => `${h.id} sob ${h.painel}, folga de ${h.folgaAteOPainel}`).join('; ')}.`);
   return L.join('\n');
 }
 

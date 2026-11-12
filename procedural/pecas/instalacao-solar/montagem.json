@@ -385,6 +385,132 @@
   ],
   "vinculos": [
     {
+      "id": "hasteA1AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteA1",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteA1",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "hasteA2AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteA2",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteA2",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "hasteA3AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteA3",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteA3",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "hasteA4AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteA4",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteA4",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "hasteB1AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteB1",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteB1",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "hasteB2AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteB2",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteB2",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "hasteB3AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteB3",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteB3",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "hasteB4AssentaNaCrista",
+      "alvo": {
+        "instancia": "hasteB4",
+        "param": "profundidadeDoAssento"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "hasteB4",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "perfilA1ComOSuporteNaPrimeiraHaste",
+      "alvo": {
+        "instancia": "perfilA1",
+        "param": "posicaoDoSuporte"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "marcaDoSuporte",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
       "id": "perfilA4CortadoNoTrilho",
       "alvo": {
         "instancia": "perfilA4",
@@ -399,6 +525,20 @@
       "acrescimo": -4050
     },
     {
+      "id": "perfilB1ComOSuporteNaPrimeiraHaste",
+      "alvo": {
+        "instancia": "perfilB1",
+        "param": "posicaoDoSuporte"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "marcaDoSuporte",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
       "id": "perfilB4CortadoNoTrilho",
       "alvo": {
         "instancia": "perfilB4",
@@ -411,6 +551,20 @@
       },
       "unidade": "mm",
       "acrescimo": -4050
+    },
+    {
+      "id": "perfilB1ComOPrimeiroPainel",
+      "alvo": {
+        "instancia": "perfilB1",
+        "param": "posicaoDoPrimeiroPainel"
+      },
+      "de": {
+        "instancia": "telhado",
+        "porta": "marcaDoPainel",
+        "medida": "comprimento"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
     }
   ],
   "posicoes": [
@@ -745,15 +899,15 @@
       "afastamento": -75
     },
     {
-      "id": "painel1SobreOTrilhoNaCrista",
+      "id": "painel1SobreOTrilhoB",
       "instancia": "painel1",
       "porta": "noTrilho",
       "em": {
-        "instancia": "telhado",
-        "porta": "painel1"
+        "instancia": "perfilB1",
+        "porta": "topo"
       },
       "unidade": "mm",
-      "afastamento": 89
+      "afastamento": 0
     },
     {
       "id": "pontaEsq30ANoPainel1",
@@ -920,5 +1074,1046 @@
       "unidade": "mm",
       "afastamento": 0
     }
-  ]
+  ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 0.000001,
+    "expectativas": [
+      {
+        "id": "hasteA1AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteA1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteA1PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteA1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteA1"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteA1EncostaNoperfilA1",
+        "a": {
+          "caminho": [
+            "suporteA1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "hasteA2AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteA2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteA2PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteA2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteA2"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteA2EncostaNoperfilA2",
+        "a": {
+          "caminho": [
+            "suporteA2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "hasteA3AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteA3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteA3PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteA3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteA3"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteA3EncostaNoperfilA3",
+        "a": {
+          "caminho": [
+            "suporteA3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "hasteA4AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteA4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteA4PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteA4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteA4"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteA4EncostaNoperfilA4",
+        "a": {
+          "caminho": [
+            "suporteA4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA4"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "hasteB1AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteB1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteB1PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteB1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteB1"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteB1EncostaNoperfilB1",
+        "a": {
+          "caminho": [
+            "suporteB1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "hasteB2AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteB2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteB2PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteB2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteB2"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteB2EncostaNoperfilB2",
+        "a": {
+          "caminho": [
+            "suporteB2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "hasteB3AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteB3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteB3PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteB3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteB3"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteB3EncostaNoperfilB3",
+        "a": {
+          "caminho": [
+            "suporteB3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "hasteB4AtravessaOTelhado",
+        "a": {
+          "caminho": [
+            "hasteB4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "a haste atravessa a telha pelo furo da crista e entra na viga, rosqueada nela; na linha de cima passa só pela telha"
+      },
+      {
+        "id": "hasteB4PrendeOSuporte",
+        "a": {
+          "caminho": [
+            "hasteB4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporteB4"
+          ]
+        },
+        "motivo": "a perna do suporte em L assenta na porca de apoio e a arruela e a porca de cima a prendem"
+      },
+      {
+        "id": "suporteB4EncostaNoperfilB4",
+        "a": {
+          "caminho": [
+            "suporteB4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB4"
+          ]
+        },
+        "motivo": "a perna vertical do suporte em L encosta na face de lado do perfil, onde o parafuso do rasgo o prende"
+      },
+      {
+        "id": "perfilA1Com2",
+        "a": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+      },
+      {
+        "id": "perfilA2Com3",
+        "a": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+      },
+      {
+        "id": "perfilA3Com4",
+        "a": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA4"
+          ]
+        },
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+      },
+      {
+        "id": "perfilB1Com2",
+        "a": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+      },
+      {
+        "id": "perfilB2Com3",
+        "a": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+      },
+      {
+        "id": "perfilB3Com4",
+        "a": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB4"
+          ]
+        },
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra nos dois"
+      },
+      {
+        "id": "pontaEsq30AAssentaNoperfilA1",
+        "a": {
+          "caminho": [
+            "pontaEsq30A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "ponta30J1AAssentaNoperfilA1",
+        "a": {
+          "caminho": [
+            "ponta30J1A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "ponta40J1AAssentaNoperfilA1",
+        "a": {
+          "caminho": [
+            "ponta40J1A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "pontaEsq30BAssentaNoperfilB1",
+        "a": {
+          "caminho": [
+            "pontaEsq30B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "ponta30J1BAssentaNoperfilB1",
+        "a": {
+          "caminho": [
+            "ponta30J1B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "ponta40J1BAssentaNoperfilB1",
+        "a": {
+          "caminho": [
+            "ponta40J1B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "interJ2AAssentaNoperfilA2",
+        "a": {
+          "caminho": [
+            "interJ2A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "interJ2BAssentaNoperfilB2",
+        "a": {
+          "caminho": [
+            "interJ2B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "interJ3AAssentaNoperfilA3",
+        "a": {
+          "caminho": [
+            "interJ3A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "interJ3BAssentaNoperfilB3",
+        "a": {
+          "caminho": [
+            "interJ3B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "ponta40DirAAssentaNoperfilA4",
+        "a": {
+          "caminho": [
+            "ponta40DirA"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA4"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "ponta40DirBAssentaNoperfilB4",
+        "a": {
+          "caminho": [
+            "ponta40DirB"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB4"
+          ]
+        },
+        "motivo": "a aba (ou o corpo) do grampo assenta no topo do perfil, e o parafuso entra no canal dele"
+      },
+      {
+        "id": "pontaEsq30AApertapainel1",
+        "a": {
+          "caminho": [
+            "pontaEsq30A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel1"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "pontaEsq30BApertapainel1",
+        "a": {
+          "caminho": [
+            "pontaEsq30B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel1"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "ponta30J1AApertapainel1",
+        "a": {
+          "caminho": [
+            "ponta30J1A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel1"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "ponta30J1BApertapainel1",
+        "a": {
+          "caminho": [
+            "ponta30J1B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel1"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "ponta40J1AApertapainel2",
+        "a": {
+          "caminho": [
+            "ponta40J1A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "ponta40J1BApertapainel2",
+        "a": {
+          "caminho": [
+            "ponta40J1B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ2AApertapainel2",
+        "a": {
+          "caminho": [
+            "interJ2A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ2AApertapainel3",
+        "a": {
+          "caminho": [
+            "interJ2A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ2BApertapainel2",
+        "a": {
+          "caminho": [
+            "interJ2B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ2BApertapainel3",
+        "a": {
+          "caminho": [
+            "interJ2B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ3AApertapainel3",
+        "a": {
+          "caminho": [
+            "interJ3A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ3AApertapainel4",
+        "a": {
+          "caminho": [
+            "interJ3A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ3BApertapainel3",
+        "a": {
+          "caminho": [
+            "interJ3B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "interJ3BApertapainel4",
+        "a": {
+          "caminho": [
+            "interJ3B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "ponta40DirAApertapainel4",
+        "a": {
+          "caminho": [
+            "ponta40DirA"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "ponta40DirBApertapainel4",
+        "a": {
+          "caminho": [
+            "ponta40DirB"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "motivo": "o grampo aperta a moldura do painel pelo lado, e o gancho ou a placa apoia no topo dela"
+      },
+      {
+        "id": "ponta30J1AEPonta40J1A",
+        "a": {
+          "caminho": [
+            "ponta30J1A"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "ponta40J1A"
+          ]
+        },
+        "motivo": "os dois grampos de ponta ficam de frente na junção, com as pontas das abas se tocando"
+      },
+      {
+        "id": "ponta30J1BEPonta40J1B",
+        "a": {
+          "caminho": [
+            "ponta30J1B"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "ponta40J1B"
+          ]
+        },
+        "motivo": "os dois grampos de ponta ficam de frente na junção, com as pontas das abas se tocando"
+      },
+      {
+        "id": "painel1AssentaNoperfilA1",
+        "a": {
+          "caminho": [
+            "painel1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel1AssentaNoperfilB1",
+        "a": {
+          "caminho": [
+            "painel1"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel2AssentaNoperfilA1",
+        "a": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel2AssentaNoperfilA2",
+        "a": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel2AssentaNoperfilB1",
+        "a": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel2AssentaNoperfilB2",
+        "a": {
+          "caminho": [
+            "painel2"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel3AssentaNoperfilA2",
+        "a": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel3AssentaNoperfilA3",
+        "a": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel3AssentaNoperfilB2",
+        "a": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel3AssentaNoperfilB3",
+        "a": {
+          "caminho": [
+            "painel3"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel4AssentaNoperfilA3",
+        "a": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel4AssentaNoperfilA4",
+        "a": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA4"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel4AssentaNoperfilB3",
+        "a": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      },
+      {
+        "id": "painel4AssentaNoperfilB4",
+        "a": {
+          "caminho": [
+            "painel4"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB4"
+          ]
+        },
+        "motivo": "o painel assenta com a face de baixo da moldura no topo do perfil"
+      }
+    ]
+  }
 }
