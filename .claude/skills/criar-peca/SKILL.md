@@ -46,7 +46,7 @@ Nomes semânticos sempre: `origemId`, `ALIASES`, `parte`, `publicarPorta`.
 Identidade persistida nunca é índice nem posição de passo. `sel:{alias:...}` é
 nome de seleção, não nome de parte.
 
-<!-- operacoes-com-origem: aberturaPorContorno, arranja, arredondarAresta, arredondarCostura, casca, chamferBox, chapaDobrada, cilindro, cone, cubo, esfera, espelha, extrusao, filete, friso, furo, inflate, intersectar, lathe, loft, plano, subdivisao, subtrair, unir -->
+<!-- operacoes-com-origem: aberturaPorContorno, aparar, arranja, arredondarAresta, arredondarCostura, casca, chamferBox, chapaDobrada, cilindro, cone, cubo, esfera, espelha, extrusao, filete, friso, furo, inflate, intersectar, lathe, loft, plano, subdivisao, subtrair, unir -->
 
 As operações que publicam `origem` aceitam endereçamento estrutural conforme
 [`references/operacoes-procedurais.md`](references/operacoes-procedurais.md),
