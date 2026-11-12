@@ -41,18 +41,22 @@
  * cem; a nota vai de zero a duzentos. As regiões saem em ordem decrescente de nota, e o empate fica na ordem da grade.
  *
  * USO
- *   npm run casamento:vista -- <esboço> --vista=<vista> --referencia=<png> --caixa-ref=x0,y0,x1,y1 --cores=nome:#rrggbb,...
+ *   npm run casamento:vista -- <esboço ou peça> --vista=<vista> --referencia=<png> --caixa-ref=x0,y0,x1,y1 --cores=nome:#rrggbb,...
  *     --partes=parte:classe,... [--opcao=1] [--fundo=#ffffff] [--ignorar=x0,y0,x1,y1;x0,y0,x1,y1] [--grade=4x3]
- *     [--tolerancia-mm=12] [--largura=1200] [--escala-vertical=1.25] [--saida=<pasta>]
+ *     [--tolerancia-mm=12] [--largura=1200] [--escala-vertical=1.25] [--saida=<pasta>] [--ate-passo=N] [--composicoes=<módulo>]
+ * O alvo é um esboço ou uma receita de peça (nome ou caminho, como o `descrever`); as partes de `--partes` são as da receita. Não há `--recorte`:
+ * a conta é a do objeto inteiro contra a `--caixa-ref` da referência inteira, e uma caixa em mm cortaria o contorno do modelo numa borda que a
+ * referência não tem; a região de perto é o que a leitura por regiões faz.
  * Grava `casamento.json` (`modelar.casamento-da-vista@1`) e `casamento.png`: a referência clareada, a troca em magenta translúcido,
  * as linhas de contorno e divisa do modelo em verde onde casam e em vermelho onde passam da tolerância, a borda da referência sem
  * linha em azul, os retângulos ignorados em cinza e a grade com o nome das regiões. */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GRADE_PADRAO, dePng, escrever, paraPng, reamostrar, regioesDaGrade } from './leitura-por-regioes.mjs';
 import { LINHA, facesDoNeutro, linhasDoRaster, rasterizar } from './linhas-do-modelo.mjs';
 import { FUNDO, FUNDO_PADRAO, classificarCaixa, lerClasses, lerCor } from './perfil-por-cor.mjs';
+import { ErroDoModelo, abrirModelo, painelDaOpcao, resumoDaAbertura } from './modelo-aberto.mjs';
 
 export const FORMATO = 'modelar.casamento-da-vista@1';
 export const TOLERANCIA_PADRAO_MM = 12;
@@ -296,10 +300,10 @@ export function relato(m) {
 }
 
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
-const AJUDA = `npm run casamento:vista -- <esboço> --vista=<vista> --referencia=<png> --caixa-ref=x0,y0,x1,y1 --cores=nome:#rrggbb,...
+const AJUDA = `npm run casamento:vista -- <esboço ou peça> --vista=<vista> --referencia=<png> --caixa-ref=x0,y0,x1,y1 --cores=nome:#rrggbb,...
     --partes=parte:classe,... [--opcao=1] [--fundo=#ffffff] [--ignorar=x0,y0,x1,y1;x0,y0,x1,y1] [--grade=4x3]
     [--tolerancia-mm=${TOLERANCIA_PADRAO_MM}] [--largura=${LARGURA_PADRAO}] [--escala-vertical=<mm por px da altura sobre os da largura>]
-    [--saida=<pasta>]
+    [--saida=<pasta>] [--ate-passo=N] [--composicoes=<módulo>]
 
 Mede, por região da grade, a fração de classe de material trocada entre o modelo (cor chapada pela parte, tirada da malha) e a
 referência (classificada por cor), e a distância de cada linha de contorno e divisa do modelo à divisa de classes da referência, e
@@ -342,11 +346,10 @@ export async function executar(argv) {
     const escalaVertical = valor('escala-vertical') === null ? null : Number(valor('escala-vertical'));
     if (escalaVertical !== null && !(Number.isFinite(escalaVertical) && escalaVertical > 0)) throw new ErroDoCasamento(`--escala-vertical espera um número maior que zero e veio "${valor('escala-vertical')}"`);
     const referencia = dePng(readFileSync(resolve(valor('referencia'))));
-    const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
-    const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo), relato: false });
-    if (montado.recusas?.length) return { codigo: 1, stdout: '', stderr: `casamento:vista: o esboço foi recusado:\n${montado.recusas.map((r) => `- ${r}`).join('\n')}\n` };
-    const opcao = Number(valor('opcao') ?? 1); const painel = montado.paineis[opcao - 1];
-    if (!painel) throw new ErroDoCasamento(`o esboço tem ${montado.paineis.length} opções e veio --opcao=${valor('opcao')}`);
+    const montado = await abrirModelo(arquivo, { ateOPasso: valor('ate-passo') === null ? null : Number(valor('ate-passo')), composicoes: valor('composicoes'), relato: false });
+    const opcao = Number(valor('opcao') ?? 1);
+    const { painel, erro } = painelDaOpcao(montado, opcao, 'casamento:vista');
+    if (erro) return erro;
     let m;
     try {
       m = medirCasamento({ faces: facesDoNeutro(painel.neutro, painel.partes), partes: painel.partes, classeDaParte, vista: valor('vista'), largura, referencia, caixaRef, classes, fundo, ignorar, grade, toleranciaMm, escalaVertical });
@@ -364,6 +367,7 @@ export async function executar(argv) {
     }
     const desvio = (m.proporcao.modelo / m.proporcao.referencia - 1) * 100;
     const cabeca = [
+      ...(resumoDaAbertura(montado) ? [resumoDaAbertura(montado)] : []),
       `casamento da vista ${valor('vista')}: o número ordena as regiões e confirma ou derruba uma diferença; não aprova forma, quem aprova é a pessoa.`,
       `${m.largura} x ${m.altura} px, ${m.mmPorPx.toFixed(2)} mm por px, tolerância ${m.toleranciaMm} mm; altura sobre largura: referência ${m.proporcao.referencia.toFixed(3)}, modelo ${m.proporcao.modelo.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)`,
       ...(m.escalaVertical !== null ? [`duas escalas: a altura da referência tem ${m.escalaVertical} vez os mm por px da largura (a caixa em px dá ${m.proporcao.caixaEmPx.toFixed(3)}), com a base na base do modelo`] : []),
@@ -371,7 +375,7 @@ export async function executar(argv) {
     ];
     return { codigo: 0, stdout: `${[...cabeca, ...relato(m), ...(gravados.length ? gravados : ['nada gravado: use --saida=<pasta>'])].join('\n')}\n`, stderr: '' };
   } catch (erro) {
-    if (erro instanceof ErroDoCasamento || erro?.name === 'ErroDoPerfil' || erro?.code === 'ENOENT') return { codigo: 2, stdout: '', stderr: `casamento:vista: ${erro.message}\n` };
+    if (erro instanceof ErroDoCasamento || erro instanceof ErroDoModelo || erro?.name === 'ErroDeConfiguracao' || erro?.name === 'ErroDoPerfil' || erro?.code === 'ENOENT') return { codigo: 2, stdout: '', stderr: `casamento:vista: ${erro.message}\n` };
     throw erro;
   }
 }

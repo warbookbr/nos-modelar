@@ -134,6 +134,36 @@ receita em Node a cada captura (uns 100 s no furgão, inclusive na mira) e deve 
 parte dos minutos da captura; para a fatia 4: o aviso de progresso do `descrever` e do `guarda:acervo`, que seguem dois minutos sem
 saída.
 
+Fatia 3 (2026-11-12): a `--analise` abre o servidor, o navegador, a peça e a página uma vez (`abrirCapturaCompartilhada`, que a
+`vistas:critica` já usava) e as 18 vistas mais as 6 da `--parte` trocam câmera, arame e seleção nessa página, com a medida de contatos
+também uma vez; antes cada chamada recarregava a peça. O `--zoom` ganhou a caixa em mm do referencial da peça,
+`--zoom=<vista>:mm:x0,y0,z0,x1,y1,z1` (dois cantos opostos), ao lado da caixa em pixels de sempre `--zoom=<vista>:x0,y0,x1,y1`: o
+prefixo `mm:` é obrigatório, e a recusa diz o que escrever quando vêm 6 números sem ele, 4 com ele, decimal ou negativo em pixel,
+ou vista inexistente, antes de abrir o navegador. A página projeta os 8 cantos pela câmera da vista (`projetarPontos`, que também sai
+em `projecaoMm` no relato de cada vista), a ferramenta recorta o retângulo que os envolve, cortado ao quadro, e o manifesto guarda a
+caixa em pixels e se o quadro a cortou; uma caixa toda fora do quadro é recusada. A medida de contatos agora é guardada em
+`tmp/cache-de-medida/` (`contatos-<receita>-<chave>.json`, só a lista de pares), com a chave do cache das outras ferramentas de
+medida (`assinaturaDaEntrada`: conteúdo da receita, do que ela importa, do núcleo e das variáveis de ambiente) mais o código da
+própria medida de contatos, e a receita mudada ou o `--sem-cache` medem de novo; `--sem-contatos` pula a medida. O relato diz o que
+houve: `contatos: medidos agora em N s`, `lidos do cache`, ou `NÃO medidos (--sem-contatos) ... falta de medida, não falta de achado`,
+e o mesmo vai em `resultado.contatos.estado` (`medidos`, `do-cache`, `pulados`, `falhou`, `sem-receita`), com `paresAcusados` nulo
+quando não houve medida; a `--analise` imprime a linha e as cargas de página. Achado no meio do caso real: com a página aberta por
+meia hora, outro agente editou `src/autoria/molduras-do-vao.js` e o servidor de desenvolvimento mandou a página recarregar, que perdeu
+a ponte e derrubou a análise na quinta vista; o servidor da captura agora sobe sem canal de recarga nem vigia de arquivos, e a
+página sem ponte falha dizendo isso. Casos no furgão realista, com a carga da máquina de 4 a 9: uma vista `direita` de captura simples
+levou 6 min 55 s, dos quais 124 s antes da medida (a ativação da peça na sessão, que também executa a receita em Node, em
+`ativar-bancada.mjs`, fora deste plano), 146 s de medida de contatos e uns 2 min 15 s da página até a imagem; a medida chamada de novo
+com a receita igual leu o cache em 0,086 s (as duas capturas seguintes mediram de novo, 128 s e 153 s, porque
+`molduras-do-vao.js` mudava entre elas, como a chave manda); a `--analise --parte=carroceria --zoom=direita:mm:900,1400,300,1300,1800,700`
+saiu num comando só, 1 carga de página, 19 min 7 s no total (a medida 131 s e a ativação 106 s inclusas), no lugar dos 31 a 33 min,
+e o zoom em mm caiu em 557,301 a 602,346 px na vista direita, sobre a costura traseira da porta da cabine, como a conta pela escala
+da imagem previa. Do que sobra dos 19 min, uns 15 são a carga da página e as 24 imagens em 500 mil triângulos no Chromium sem GPU. Testes:
+`olhar-bancada.test.mjs` (a análise inteira com uma carga, a projeção, os quatro estados da medida, o cache por conteúdo e por
+`--sem-cache`, a recusa do zoom ambíguo pela CLI, a página sem ponte e `projetarPontos` com a câmera do three) e
+`analise-da-peca.test.mjs` (as duas sintaxes, as recusas, o recorte por caixa em mm e as opções de contatos), cada arquivo em menos
+de 5 s. Fica para depois: a ativação da peça (`ativar-bancada.mjs`) executa a receita só para a bancada e pode ler o mesmo cache; e
+a `--mirar` e a `--analise` ainda pagam a carga da página (uns 2 min no furgão) a cada comando.
+
 Fatia 4 (2026-11-12): três dos quatro itens já estavam no código quando a fatia abriu, e a fatia os provou em vez de refazê-los. O
 registro de etapas (`24f673f4`) já grava os campos na mesma ordem e só quando o texto muda, com teste, e ler o estado das
 quatro montagens versionadas (aviao, braço, carrinho, empilhadeira) deixou os `montagem.etapas.json` intactos no git; a cor da forma

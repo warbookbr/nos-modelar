@@ -90,6 +90,7 @@ import { TOLERANCIA_MM as TOLERANCIA_DA_SOBRA, VISTAS_PADRAO as VISTAS_DA_SOBRA,
 import { FUNDO_PADRAO, lerClasses, lerCor } from './perfil-por-cor.mjs';
 import { rgbDoHex } from './vista-rapida.mjs';
 import { coresDasPartes, facesDaOpcao, rasterSombreado } from './vista-rapida.mjs';
+import { abrirModelo, acharReceita } from './modelo-aberto.mjs';
 
 export const FORMATO = 'modelar.conferir-vistas@1';
 export const TENTATIVAS_DE_CAPTURA = 2;
@@ -627,14 +628,15 @@ function frasesDaRegiao(r) {
  * A rodada. `deps` troca a leitura, a montagem e a captura (o teste conta as montagens e roda sem navegador).
  * @returns {Promise<{ resumo: object, gravados: string[], linhas: string[] }>}
  */
-export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: modo = 'rapida', rodadasDe = null }, deps = {}) {
+export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: modo = 'rapida', rodadasDe = null, atePasso = null, composicoes = null }, deps = {}) {
   if (!CAPTURAS.includes(modo)) throw new ErroDaConferencia(`--captura espera ${CAPTURAS.join(', ')} e veio "${modo}"`);
-  const nucleo = deps.lerArquivoDeEsboco && deps.montarOpcoes && (modo !== 'bancada' || deps.capturarLadoALado) ? null : await import('./esboco-nucleo.mjs');
-  const lerArquivo = deps.lerArquivoDeEsboco ?? nucleo.lerArquivoDeEsboco;
-  const montar = deps.montarOpcoes ?? nucleo.montarOpcoes;
-  const capturador = deps.capturarLadoALado ?? nucleo?.capturarLadoALado;
   const t0 = performance.now();
-  const montado = montar(await lerArquivo(resolve(arquivo)), { nome: basename(arquivo), relato: false });
+  /* `deps` troca a montagem nos testes; sem ela o alvo abre por `modelo-aberto.mjs`, que aceita o esboço e a receita de peça (nome ou caminho) */
+  const montado = deps.lerArquivoDeEsboco && deps.montarOpcoes
+    ? deps.montarOpcoes(await deps.lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo), relato: false })
+    : await abrirModelo(arquivo, { ateOPasso: atePasso, composicoes, relato: false });
+  if (montado.origem === 'receita' && modo === 'bancada') throw new ErroDaConferencia('--captura=bancada abre o esboço lado a lado na bancada e não abre receita de peça; use --captura=rapida (o padrão), ou tire a vista da peça com olhar:bancada');
+  const capturador = deps.capturarLadoALado ?? (modo === 'bancada' ? (await import('./esboco-nucleo.mjs')).capturarLadoALado : null);
   const tempoDaMontagem = (performance.now() - t0) / 1000;
   if (montado.recusas?.length) throw new ErroDaConferencia(`o esboço foi recusado:\n${montado.recusas.map((r) => `- ${r.motivo ?? r}`).join('\n')}`, 1);
   const painel = montado.paineis[opcao - 1];
@@ -780,10 +782,13 @@ export async function conferirVistas({ arquivo, cfg, saida, opcao = 1, captura: 
 }
 
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
-const AJUDA = `npm run conferir:vistas -- <esboço> --config=<json> --saida=<pasta> [--opcao=1] [--captura=rapida|bancada|nenhuma]
-    [--vistas=traseira,superior] [--rodadas-de=<pasta>]
+const AJUDA = `npm run conferir:vistas -- <esboço ou peça> --config=<json> --saida=<pasta> [--opcao=1] [--captura=rapida|bancada|nenhuma]
+    [--vistas=traseira,superior] [--rodadas-de=<pasta>] [--ate-passo=N] [--composicoes=<módulo>]
 npm run conferir:vistas -- --saida=<pasta> --registrar=<vista>:<respostas.json>
 
+O alvo é um esboço ou uma receita de peça (nome ou caminho, como o descrever); com receita, a captura é a rápida ou nenhuma (a bancada
+lado a lado é a do esboço), --ate-passo=N executa a receita só até o passo N, e não há recorte em mm: cada vista confere o objeto
+inteiro contra a referência inteira, e a região de perto é o que a leitura por regiões faz.
 Monta a opção do esboço uma vez e, para cada vista da config, grava em <saida>/<vista>/ as linhas do modelo, o casamento com a
 referência, a captura com luz e a leitura por regiões, com a ordem sugerida das regiões no fim do pedido; depois a opção em quatro
 vistas de três quartos em <saida>/tres-quartos/ (que "tresQuartos": false desliga) e a sobra entre as partes de "dentro". Grava
@@ -811,7 +816,7 @@ export async function executar(argv, deps = {}) {
     }
     const arquivo = argv.find((a) => !a.startsWith('--'));
     if (!arquivo) throw new ErroDaConferencia('falta o esboço');
-    if (!existsSync(resolve(arquivo))) throw new ErroDaConferencia(`o esboço ${arquivo} não existe`);
+    if (!existsSync(resolve(arquivo)) && !(await acharReceita(arquivo))) throw new ErroDaConferencia(`o esboço ou a peça ${arquivo} não existe`);
     if (!valor('config')) throw new ErroDaConferencia('falta --config=<json>');
     const caminhoDaConfig = resolve(valor('config'));
     if (!existsSync(caminhoDaConfig)) throw new ErroDaConferencia(`a config ${valor('config')} não existe`);
@@ -827,12 +832,13 @@ export async function executar(argv, deps = {}) {
     if (rodadasDe !== null && (!rodadasDe || !existsSync(resolve(rodadasDe)))) throw new ErroDaConferencia(`--rodadas-de: a pasta "${rodadasDe}" não existe`);
     const cfg = lerConfig(bruta, dirname(caminhoDaConfig), { vistasPedidas });
     const t0 = performance.now();
-    const r = await conferirVistas({ arquivo, cfg, saida, opcao, captura, rodadasDe }, deps);
+    const atePasso = valor('ate-passo') === null ? null : Number(valor('ate-passo'));
+    const r = await conferirVistas({ arquivo, cfg, saida, opcao, captura, rodadasDe, atePasso, composicoes: valor('composicoes') }, deps);
     const total = (performance.now() - t0) / 1000;
     return { codigo: 0, stdout: `${['conferência das vistas: o número ordena e informa; quem aprova forma é a pessoa.', ...r.linhas, `tempo: ${total.toFixed(1)} s, dos quais ${r.tempoDaMontagem.toFixed(1)} s de montagem`, 'gravado:', ...r.gravados.map((g) => `  ${g}`)].join('\n')}\n`, stderr: '' };
   } catch (erro) {
     if (erro instanceof ErroDaConferencia) return { codigo: erro.codigo, stdout: '', stderr: `conferir:vistas: ${erro.message}\n` };
-    if (['ErroDoCasamento', 'ErroDaSobra', 'ErroDaLeitura', 'ErroDoPerfil', 'ErroDaVista'].includes(erro?.name)) return { codigo: 2, stdout: '', stderr: `conferir:vistas: ${erro.message}\n` };
+    if (['ErroDoCasamento', 'ErroDaSobra', 'ErroDaLeitura', 'ErroDoPerfil', 'ErroDaVista', 'ErroDoModelo', 'ErroDeConfiguracao'].includes(erro?.name)) return { codigo: 2, stdout: '', stderr: `conferir:vistas: ${erro.message}\n` };
     throw erro;
   }
 }
