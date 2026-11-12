@@ -452,7 +452,52 @@ function classificarTriangulo(d, base, px, py, pz, tolerancia) {
   const v = inverso * (DIRECAO_RAIO[0] * q0 + DIRECAO_RAIO[1] * q1 + DIRECAO_RAIO[2] * q2);
   if (v < -tolerancia || u + v > 1 + tolerancia) return 0;
   const t = inverso * (d[base + 12] * q0 + d[base + 13] * q1 + d[base + 14] * q2);
-  return t > tolerancia ? 1 : 0;
+  if (!(t > tolerancia)) return 0;
+  /* o raio que acerta a aresta, ou o canto, que dois triângulos dividem passa pela tolerância nos dois e contava o cruzamento duas vezes: a paridade
+     virava e o ponto de fora saía dentro. O cruzamento junto da aresta é marcado (2), e quem conta o refaz noutra direção. */
+  return u < FAIXA_DA_ARESTA(tolerancia) || v < FAIXA_DA_ARESTA(tolerancia) || 1 - u - v < FAIXA_DA_ARESTA(tolerancia) ? 2 : 1;
+}
+
+/* a distância baricêntrica da aresta abaixo da qual o cruzamento do raio é ambíguo: a tolerância, e nunca menos que o ruído de arredondamento */
+const FAIXA_DA_ARESTA = (tolerancia) => Math.max(tolerancia, 1e-9);
+
+/* DIREÇÕES DE REPETIÇÃO. Quando o raio de `DIRECAO_RAIO` acerta uma aresta ou um canto, a contagem é refeita, por todos os triângulos e sem a
+   árvore, com estas direções, até uma que não acerte nenhuma aresta; se nenhuma escapar, vale a paridade que a maioria deu. Nenhuma é paralela a
+   um eixo nem a uma diagonal de face, onde as arestas de uma malha de quadras e prismas costumam estar. */
+const DIRECOES_DE_REPETICAO = [[0.2672612419124244, 0.5345224838248488, 0.8017837257372732], [-0.4082482904638631, 0.8164965809277261, 0.4082482904638631],
+  [0.6, -0.48, 0.64], [0.1, 0.3, -0.9486832980505138], [-0.7, -0.3, 0.6480740698407860], [0.3713906763541037, -0.1932731453127433, -0.9071173]].map((d) => {
+  const n = Math.hypot(...d); return d.map((x) => x / n);
+});
+
+function cruzamentosPorOutroRaio(ponto, triangulos, direcao, tolerancia) {
+  const faixa = FAIXA_DA_ARESTA(tolerancia);
+  let contagem = 0; let ambiguo = false;
+  for (const [a, b, c] of triangulos) {
+    const aresta1 = sub(b, a); const aresta2 = sub(c, a);
+    const h = cross(direcao, aresta2); const determinante = dot(aresta1, h);
+    if (Math.abs(determinante) <= 1e-12 * Math.sqrt(comprimento2(aresta1) * comprimento2(h))) continue;
+    const inverso = 1 / determinante; const s = sub(ponto, a);
+    const u = inverso * dot(s, h);
+    if (u < -faixa || u > 1 + faixa) continue;
+    const q = cross(s, aresta1); const v = inverso * dot(direcao, q);
+    if (v < -faixa || u + v > 1 + faixa) continue;
+    if (!(inverso * dot(aresta2, q) > tolerancia)) continue;
+    if (u < faixa || v < faixa || 1 - u - v < faixa) { ambiguo = true; continue; }
+    contagem += 1;
+  }
+  return { contagem, ambiguo };
+}
+
+/* a paridade do ponto contra a malha FECHADA pelas direções de repetição, quando o raio principal acertou uma aresta; a malha aberta não tem
+   paridade que valha, e o veredito dela segue o do raio principal */
+function dentroPorOutroRaio(ponto, malha, tolerancia) {
+  let pares = 0; let impares = 0;
+  for (const direcao of DIRECOES_DE_REPETICAO) {
+    const { contagem, ambiguo } = cruzamentosPorOutroRaio(ponto, malha.triangulos, direcao, tolerancia);
+    if (!ambiguo) return contagem % 2 === 1;
+    if (contagem % 2 === 1) impares += 1; else pares += 1;
+  }
+  return impares > pares;
 }
 
 /* O atalho da caixa de uma malha FECHADA, que não mudou: fora da caixa alargada pela folga do pior ângulo o ponto não está
@@ -467,13 +512,14 @@ function percorrerTodosOsTriangulos(ponto, malha, tolerancia) {
   const d = dadosDaMalha(malha);
   const quantidade = malha.triangulos.length;
   const px = ponto[0]; const py = ponto[1]; const pz = ponto[2];
-  let contagem = 0;
+  let contagem = 0; let naAresta = false;
   for (let indice = 0; indice < quantidade; indice += 1) {
     const r = classificarTriangulo(d, indice * CAMPOS, px, py, pz, tolerancia);
     if (r < 0) return null;
-    contagem += r;
+    if (r === 2) naAresta = true;
+    contagem += r === 2 ? 1 : r;
   }
-  return contagem % 2 === 1;
+  return naAresta && malha.fechada ? dentroPorOutroRaio(ponto, malha, tolerancia) : contagem % 2 === 1;
 }
 
 /* Percorre TODOS os triângulos, sem fase ampla (o atalho da caixa fica, porque ele é da definição da resposta). É a
@@ -492,21 +538,23 @@ export function pontoDentroMalha(ponto, malha, tolerancia) {
   if (!Number.isFinite(margem)) return percorrerTodosOsTriangulos(ponto, malha, tolerancia);
   const d = dadosDaMalha(malha);
   const px = ponto[0]; const py = ponto[1]; const pz = ponto[2];
-  let contagem = 0;
+  let contagem = 0; let naAresta = false;
   for (const i of indice.sempre) {
     const r = classificarTriangulo(d, i * CAMPOS, px, py, pz, tolerancia);
     if (r < 0) return null;
-    contagem += r;
+    if (r === 2) naAresta = true;
+    contagem += r === 2 ? 1 : r;
   }
   const naSuperficie = visitarPorRaio(indice.arvore, px, py, pz, DIRECAO_RAIO[0], DIRECAO_RAIO[1], DIRECAO_RAIO[2], margem, (i) => {
     if (indice.ehSempre[i] === 1) return false;
     const r = classificarTriangulo(d, i * CAMPOS, px, py, pz, tolerancia);
     if (r < 0) return true;
-    contagem += r;
+    if (r === 2) naAresta = true;
+    contagem += r === 2 ? 1 : r;
     return false;
   });
   if (naSuperficie) return null;
-  return contagem % 2 === 1;
+  return naAresta && malha.fechada ? dentroPorOutroRaio(ponto, malha, tolerancia) : contagem % 2 === 1;
 }
 
 /* OS EIXOS PRÓPRIOS DE CADA TRIÂNGULO TAMBÉM SAEM UMA VEZ. `sobreposicaoTriangulo` separa por até dezessete eixos, e os

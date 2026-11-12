@@ -1,0 +1,61 @@
+/* chassi-aparado.esboco.mjs: o carro inteiro do ciclo 5 com o chassi aparado pela operação `aparar`, e não pelas seções tiradas do alvo.
+ *
+ * O `carro-inteiro.esboco.mjs` apara os membros que encostam por dentro na lataria (montantes, soleiras, reforço da cintura, travessas, paredes) pela
+ * interseção com prismas da seção de dentro, tirada das funções do alvo, em estações a até 100 mm. Aqui cada uma dessas interseções vira um `aparar` do
+ * mesmo membro pelas duas chapas da lataria que o limitam, o andar de baixo (subdivisão 1) e a cabine (17), a `FOLGA` mm da pele de dentro delas: o
+ * molde é a pele de dentro deslocada, e não uma seção amostrada, de modo que o membro segue a chapa onde ela curva. O andar de baixo fecha pelo plano
+ * y = 300, abaixo de toda a borda de baixo dele, e a cabine por y = 950, abaixo da borda que a liga ao andar de baixo; o vão de cada janela fecha com uma
+ * tampa plana. O que o `carro-inteiro` declara fica como está, menos os contatos entre a lataria e os membros aparados, que são os deste arquivo, com o
+ * que a medida deu.
+ *
+ * `npm run esboco:nucleo -- <este arquivo> --so-montar --estrito` confere o conjunto, e `npm run vao:partes` mede os apoios. */
+import carro from './carro-inteiro.esboco.mjs';
+
+const FOLGA = Number(process.env.HD_FOLGA ?? 2);
+const original = carro.opcoes[0];
+const passos = structuredClone(original.passos);
+
+/* os prismas da seção: as extrusões em z com perfil longo que só o reaparo cria, e as interseções que os usam */
+const ehPrisma = (p) => p[0] === 'extrusao' && p[1].eixo === 'z' && Array.isArray(p[1].perfil) && p[1].perfil.length > 20;
+const prismas = new Set(passos.filter(ehPrisma).map((p) => p[1].origemId));
+const reaparos = new Set();
+for (const p of passos) {
+  if (p[0] !== 'intersectar') continue;
+  const ferramentas = p[1].solidos.slice(1);
+  if (ferramentas.length && ferramentas.every((s) => s.origem?.op === 'extrusao' && prismas.has(s.origem.id))) {
+    reaparos.add(p[1].origemId);
+    p[0] = 'aparar';
+    p[1] = { origemId: p[1].origemId, solido: p[1].solidos[0], chapa: [{ op: 'subdivisao', id: 1 }, { op: 'subdivisao', id: 17 }], folga: FOLGA,
+      fecha: [{ eixo: 'y', em: 300 }, { eixo: 'y', em: 950 }] };
+  }
+}
+if (!reaparos.size) throw new Error('chassi-aparado: nenhum reaparo por seção no carro-inteiro');
+/* as origens que citavam a interseção citam o `aparar`, e os prismas saem */
+const trocar = (v) => {
+  if (Array.isArray(v)) return v.map(trocar);
+  if (!v || typeof v !== 'object') return v;
+  if (v.op === 'intersectar' && reaparos.has(v.id)) return { ...v, op: 'aparar' };
+  return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, trocar(x)]));
+};
+const PASSOS = passos.filter((p) => !(ehPrisma(p) && prismas.has(p[1].origemId))).map(trocar);
+
+/* os contatos da lataria com os membros aparados: o apoio é a folga de FOLGA mm, e a travessia rasa do carro-inteiro (a seção ficava até 2 mm dentro da
+   chapa alisada) já não se declara; o relato diz o que a malha dá */
+const apoios = new Set(original.contatos.filter((c) => c.relacao === 'folga' && String(c.motivo).includes('apoio: o membro, reaparado')).map((c) => c.par.join('|')));
+const rasos = new Set(original.contatos.filter((c) => c.relacao === 'atravessa' && String(c.motivo).startsWith('o membro, reaparado pela seção')).map((c) => c.par.join('|')));
+const contatos = original.contatos.filter((c) => !rasos.has(c.par.join('|'))).map((c) => (apoios.has(c.par.join('|'))
+  ? { ...c, folga: { esperada: FOLGA, tolerancia: Number(process.env.HD_TOLERANCIA ?? 1) }, motivo: `apoio: o membro, aparado pelo lado de dentro da chapa a ${FOLGA} mm da pele de dentro, e a cola de estrutura entre os dois fica fora do esboço` }
+  : c));
+
+export { PASSOS };
+export default {
+  plano: 'Quinto ciclo de alta definição do sedã com o chassi aparado pela operação aparar, a folga da pele de dentro da lataria.',
+  vista: original.vista ?? carro.vista,
+  opcoes: [{
+    ...original,
+    titulo: 'caminho A, ciclo 5: o carro inteiro com o chassi aparado',
+    nota: 'lataria por gaiolas com simetria, para-choques por laços, chassi aparado pela pele de dentro e rodas do rascunho',
+    passos: PASSOS,
+    contatos,
+  }],
+};

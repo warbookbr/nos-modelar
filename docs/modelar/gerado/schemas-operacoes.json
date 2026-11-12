@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:935cf8ae779613c4e68c1d2e80b4acd8b0a67305fc5688fffde8ad1b5129aac4",
+  "assinatura": "sha256:9bd4f1600d33ab4f4fef2fd77d4590bd289ecd4d64bbb3bc4d0a368d3db39df0",
   "total": 42,
   "operacoes": [
     {
@@ -342,7 +342,7 @@
       "nome": "aparar",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Aparar um sólido pelo lado de dentro de uma chapa subdividida, deixando-o a uma folga da pele de dentro dela.",
+        "intencao": "Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.aparar@1",
@@ -367,7 +367,7 @@
             },
             "chapa": {
               "type": "object",
-              "description": "A subdivisão { op: 'subdivisao', id } cuja pele de dentro limita o sólido; vale a superfície que o passo guardou, mesmo depois de uma booleana cortá-la."
+              "description": "A subdivisão { op: 'subdivisao', id }, ou uma lista delas (o molde é a união); vale a superfície que o passo guardou, mesmo depois de uma booleana cortá-la."
             },
             "folga": {
               "anyOf": [
@@ -385,7 +385,7 @@
             },
             "fecha": {
               "type": "object",
-              "description": "{ eixo: 'x'|'y'|'z', em } o plano da tampa que fecha a única abertura da chapa."
+              "description": "{ eixo: 'x'|'y'|'z', em }, o plano da tampa que fecha a abertura maior da chapa; uma lista, um plano por chapa."
             }
           }
         },
@@ -516,11 +516,11 @@
           "ALIASES": []
         },
         "precondicoes": [
-          "A chapa tem uma borda só, e ela fica de um lado do plano de fecha; o sólido é fechado."
+          "O sólido é fechado; a chapa tem ao menos uma borda."
         ],
         "limites": [
-          "O molde é a pele de dentro deslocada por folga (a mesma esquadria da espessura), com paredes retas até o plano e uma tampa plana; o resultado é a interseção do sólido com ele, com a identidade da intersectar. A origem {op:'aparar', id} cita as faces do sólido e as da pele nova.",
-          "Recusa a chapa com mais de uma borda ou sem borda, a borda que atravessa o plano e a folga que passa do raio local."
+          "O molde é a pele de dentro deslocada por folga (a esquadria da espessura), com paredes retas até o plano da abertura de maior área e uma tampa plana em cada vão; o resultado é a interseção, com a identidade da intersectar. A origem {op:'aparar', id} cita as faces do sólido e as da pele nova.",
+          "Recusa a chapa sem borda, o plano que a borda passa de mais que o deslocamento e a folga que passa do raio local."
         ],
         "diagnosticos": []
       }

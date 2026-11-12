@@ -298,13 +298,13 @@ const definicoes = {
     diagnosticos: [{ quando: 'O aviso lascasRestantes diz que ficaram faces finas.', acao: 'Rode npm run malha:lascas na receita: a lista traz a parte e o passo de cada uma.' }],
   },
   aparar: {
-    intencao: 'Aparar um sólido pelo lado de dentro de uma chapa subdividida, deixando-o a uma folga da pele de dentro dela.',
+    intencao: 'Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.',
     campos: {
       origemId: ['origemId', 'Identidade obrigatória do resultado.'],
       solido: ['selecao', 'O sólido fechado a aparar.'],
-      chapa: ['origem', "A subdivisão { op: 'subdivisao', id } cuja pele de dentro limita o sólido; vale a superfície que o passo guardou, mesmo depois de uma booleana cortá-la."],
+      chapa: ['origem', "A subdivisão { op: 'subdivisao', id }, ou uma lista delas (o molde é a união); vale a superfície que o passo guardou, mesmo depois de uma booleana cortá-la."],
       folga: ['escalar', 'Distância, maior ou igual a zero, entre a pele de dentro da chapa e o sólido aparado, na unidade da peça.'],
-      fecha: ['objeto', "{ eixo: 'x'|'y'|'z', em } o plano da tampa que fecha a única abertura da chapa."],
+      fecha: ['objeto', "{ eixo: 'x'|'y'|'z', em }, o plano da tampa que fecha a abertura maior da chapa; uma lista, um plano por chapa."],
     },
     obrigatorios: ['origemId', 'solido', 'chapa', 'folga', 'fecha'],
     passos: [
@@ -312,10 +312,10 @@ const definicoes = {
       ['cubo', { origemId: 2, larg: 1.2, alt: 0.9, prof: 1.2, em: [0, -0.2, 0] }],
       ['aparar', { origemId: 3, solido: { origem: { op: 'cubo', id: 2 } }, chapa: { op: 'subdivisao', id: 1 }, folga: 0.05, fecha: { eixo: 'y', em: 0 } }],
     ],
-    precondicoes: ['A chapa tem uma borda só, e ela fica de um lado do plano de fecha; o sólido é fechado.'],
+    precondicoes: ['O sólido é fechado; a chapa tem ao menos uma borda.'],
     limites: [
-      'O molde é a pele de dentro deslocada por folga (a mesma esquadria da espessura), com paredes retas até o plano e uma tampa plana; o resultado é a interseção do sólido com ele, com a identidade da intersectar. A origem {op:\'aparar\', id} cita as faces do sólido e as da pele nova.',
-      'Recusa a chapa com mais de uma borda ou sem borda, a borda que atravessa o plano e a folga que passa do raio local.',
+      'O molde é a pele de dentro deslocada por folga (a esquadria da espessura), com paredes retas até o plano da abertura de maior área e uma tampa plana em cada vão; o resultado é a interseção, com a identidade da intersectar. A origem {op:\'aparar\', id} cita as faces do sólido e as da pele nova.',
+      'Recusa a chapa sem borda, o plano que a borda passa de mais que o deslocamento e a folga que passa do raio local.',
     ],
   },
   pesar: { intencao: 'Atribuir peso de osso a vértices, escolhidos por seleção ou por IDs posicionais.', campos: { osso: ['texto', 'Nome em ESQUELETO.'], peso: ['escalar', 'Peso acumulado.'], [selecao[0]]: ['selecao', 'Seleção de um ou mais vértices (os cantos de uma face ou aresta entram). Seleção vazia grita.'], vs: ['listaInteiros', 'Vértices afetados (legado); não misture com sel.'], faces: ['listaInteiros', 'Faces cujos vértices são afetados (legado); não misture com sel.'] }, obrigatorios: ['osso'], passos: cuboBase([['pesar', { osso: 'raiz', sel: { regiao: { min: [-0.6, -0.1, -0.6], max: [-0.4, 0.1, -0.4] } }, peso: 1 }]]), esqueleto: { ossos: [{ nome: 'raiz' }] }, precondicoes: ['Declare vs/faces ou sel, nunca os dois.'] },

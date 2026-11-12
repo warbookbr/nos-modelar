@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:935cf8ae779613c4e68c1d2e80b4acd8b0a67305fc5688fffde8ad1b5129aac4",
+  "assinatura": "sha256:9bd4f1600d33ab4f4fef2fd77d4590bd289ecd4d64bbb3bc4d0a368d3db39df0",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -94,7 +94,7 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Aparar um sólido pelo lado de dentro de uma chapa subdividida, deixando-o a uma folga da pele de dentro dela.",
+            "intencao": "Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.",
             "schema": "mecanifica.argumentos.aparar@1",
             "obrigatorios": [
               "origemId",
@@ -1361,7 +1361,7 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Aparar um sólido pelo lado de dentro de uma chapa subdividida, deixando-o a uma folga da pele de dentro dela.",
+        "intencao": "Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.",
         "schema": "mecanifica.argumentos.aparar@1",
         "obrigatorios": [
           "origemId",

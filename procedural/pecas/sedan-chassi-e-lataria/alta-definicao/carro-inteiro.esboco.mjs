@@ -169,7 +169,7 @@ const DA_ALTA_DEFINICAO = [
   par('reforcoDaCinturaDir', 'teto', 'atravessa', RASO), par('reforcoDaCinturaEsq', 'teto', 'atravessa', RASO),
   par('teto', 'travessaDaCabine', 'atravessa', RASO),
   ...['Dir', 'Esq'].flatMap((L) => [
-    par(`montanteC${L}`, `portaTraseira${L}`, 'atravessa', 'o batente do montante C, que o rascunho põe 4 mm por dentro da porta traseira, entra na borda dela na alta definição, nos 4 mm em que os dois se sobrepõem ao longo do carro'),
+    par(`montanteC${L}`, `portaTraseira${L}`, 'folga', 'as caixas dos dois se sobrepõem 4,1 mm ao longo do carro, mas os sólidos não se tocam: a borda de trás da porta passa por fora do batente do montante C (medido nos dois lados)'),
     par(`caixaDeRodaDianteira${L}`, 'labioDianteiro', 'encosta', 'o lábio do arco vira para dentro e assenta na borda da caixa de roda'),
     par(`caixaDeRodaDianteira${L}`, `paraLama${L}`, 'atravessa', 'a borda da caixa de roda, aparada pela casca do rascunho, entra na chapa do arco (a solda)'),
     par(`caixaDeRodaTraseira${L}`, `lateralTraseira${L}`, 'atravessa', 'a borda da caixa de roda, aparada pela casca do rascunho, entra na chapa do arco (a solda)'),

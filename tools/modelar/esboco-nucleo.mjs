@@ -317,10 +317,10 @@ async function principal(argv) {
     console.log(`  ${p.titulo}: ${p.partes.length} partes (${p.partes.join(', ')}), ${p.neutro.F.size} faces, ${p.facesSemParte} sem parte; ${caixaMm(p.neutro)} mm; neutro ${hashDoNeutro(p.neutro).slice(0, 16)}`);
     console.log(`  contatos de "${p.titulo}" (a medida do descrever, tolerância de ${String(p.contatos.tolerancia * 1000).replace(".", ",")} mm):`);
     console.log(textoDoRelato(p.contatos));
-    problemas += p.contatos.naoDeclaradas.length + p.contatos.faltam.length;
+    problemas += p.contatos.naoDeclaradas.length + p.contatos.faltam.length + (p.contatos.assimetricas?.length ?? 0);
   }
   if (argv.includes('--estrito') && problemas) {
-    console.error(`RECUSADO pelo modo estrito: ${problemas} travessia(s) não declarada(s) ou contato(s) esperado(s) que a malha não dá`);
+    console.error(`RECUSADO pelo modo estrito: ${problemas} travessia(s) não declarada(s), contato(s) esperado(s) que a malha não dá ou par(es) Dir/Esq que medem diferente`);
     return 1;
   }
   if (argv.includes('--so-montar')) return 0;
