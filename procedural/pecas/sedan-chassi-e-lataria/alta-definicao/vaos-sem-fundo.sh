@@ -11,6 +11,7 @@ RESTO='resto de 1 a 2 mm de linha no fim do forro do vão da porta traseira, em 
 npm run vao:partes -- $C --esperado=4 --tolerancia=0.2 --fundo=modelo --soltas=recusar --linhas=0 "$@" \
   --sem-fundo="cuboDianteiraDir:eixoDianteiro:$CUBO" --sem-fundo="cuboDianteiraEsq:eixoDianteiro:$CUBO" --sem-fundo="cuboTraseiraDir:eixoTraseiro:$CUBO" --sem-fundo="cuboTraseiraEsq:eixoTraseiro:$CUBO" \
   --sem-fundo="lateralTraseiraDir:tampaDoPortaMalas:resto de 13 mm de linha no pé da tampa, em z -2082, onde a tampa, a lateral e o painel de trás se encontram: o raio que desce para trás passa pelo vão antes do começo do forro da tampa, e esticar o forro para trás o poria para fora do painel de trás" \
+  --sem-fundo="forroDosVaos:teto:a ponta do forro do capô, em z 742, fica a 4 mm do pé do teto, na linha do pé do para-brisa: 8 mm de linha entre a ponta e o teto, que esticar a ponta em 3 mm não fecha (medido)" \
   --sem-fundo="forroDosVaos:painelDianteiro:a ponta do forro do capô, em z 2118, fica a 2,4 mm do painel da frente, na quina do capô com o painel: 4 mm de linha" \
   --sem-fundo="lateralTraseiraDir:travessaDaCabine:$RESTO" --sem-fundo="lateralTraseiraEsq:travessaDaCabine:$RESTO" \
   --sem-fundo="lateralTraseiraDir:soleiraDir:$RESTO" --sem-fundo="lateralTraseiraEsq:soleiraEsq:$RESTO" \
