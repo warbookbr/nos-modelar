@@ -74,7 +74,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md), [as partes do braço](docs/modelar/planos/2026-09-26-as-partes-do-braco.md), [costuras e furos limpos](docs/modelar/planos/2026-11-09-costuras-e-furos-limpos.md), [ferramentas de conferência e de vista](docs/modelar/planos/2026-11-09-ferramentas-de-conferencia-e-vista.md), [núcleo para qualquer mecanismo](docs/modelar/planos/2026-11-10-nucleo-para-qualquer-mecanismo.md) e [instalação solar no telhado](docs/modelar/planos/2026-11-12-instalacao-solar-no-telhado.md).
+Planos ativos: [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](docs/modelar/planos/2026-11-09-costuras-e-furos-limpos.md), [ferramentas de conferência e de vista](docs/modelar/planos/2026-11-09-ferramentas-de-conferencia-e-vista.md), [núcleo para qualquer mecanismo](docs/modelar/planos/2026-11-10-nucleo-para-qualquer-mecanismo.md) e [instalação solar no telhado](docs/modelar/planos/2026-11-12-instalacao-solar-no-telhado.md).
 
 Já fecharam [ajustes no núcleo dos veículos](docs/modelar/planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](docs/modelar/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos

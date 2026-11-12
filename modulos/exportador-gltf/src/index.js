@@ -28,6 +28,7 @@
  * tangente, verde para cima) e nos canais (G é a aspereza, B a metalicidade); o mapa de aspereza é um fator que multiplica o
  * `roughnessFactor`. Sem data e sem ordem de mapa instável, o arquivo é o mesmo byte a byte. */
 import { ErroExportacaoGltf, AMBIENTES, gerarGltf } from './gerar-gltf.js';
+import { gerarGltfDeMontagem } from './montagem.js';
 
 export { ErroExportacaoGltf, AMBIENTES };
 export { lerGlb } from './glb.js';
@@ -43,4 +44,12 @@ export function exportarGltf(opcoes) {
     mime: 'model/gltf-binary',
     diagnostico,
   };
+}
+
+/* A montagem: `instancias` é a lista do resolvedor, { nome, neutro, materiais, pose: { rotacao, deslocamento } } por instância.
+   Cada instância é um nó com o nome dela, a malha no referencial da peça e a pose na matriz do nó (uma pose só, a de repouso).
+   `npm run exportar:gltf -- braco-robotico` exporta o braço. */
+export function exportarMontagemGltf(opcoes) {
+  const { bytes, json, bin, diagnostico } = gerarGltfDeMontagem(opcoes);
+  return { formato: 'glTF 2.0 binário', bytes, json, bin, extensao: '.glb', mime: 'model/gltf-binary', diagnostico };
 }

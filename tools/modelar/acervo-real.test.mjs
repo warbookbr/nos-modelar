@@ -42,13 +42,13 @@ const SEGUNDOS_POR_ALVO = 2;
    vão à booleana da chapa inteira, 140 dos 207 s de uma execução local, e o furgão foi a 506 s no CI. O teto vai a 860 s e o
    prazo a 1.000 s até o plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` fazer os oito recortarem. Com ele, os 19 vãos
    recortam, e uma execução local caiu de 207 s para 77 s; pela mesma razão da máquina local para o CI (207 s para 506 s nas
-   duas execuções), o furgão ficaria em cerca de 190 s no CI. Medido no CI em 2026-11-12, levou 104 s numa execução da bateria e
-   188 s na seguinte, com a receita igual (a execução local foi de 83 s nas duas): a máquina do CI varia quase o dobro de uma
-   execução para outra, e o teto é 1,7 vez a maior medida, 320 s, com o prazo do teste em 600 s. 
-   TETO PELA RAZÃO, DESDE 2026-11-12. O teto em segundos reprovava ao acaso: no mesmo dia, com a receita igual, o furgão levou
-   no CI 119, 139, 154 e 184 s por execução, e a última passou dos 320 s das duas. Nessas quatro rodadas a soma das outras
-   peças, medida na mesma máquina e na mesma rodada, foi de 13,8, 15,3, 18,1 e 20,2 s, e a razão entre o furgão e essa soma
-   ficou em 8,7, 9,1, 8,5 e 9,1. O teto da peça pesada passa a ser essa razão, 15, cerca de 1,7 vez a medida, e a máquina
+   duas execuções), o furgão ficaria em cerca de 190 s no CI. Medido no CI em 2026-11-12, levou 104 s, 188 s e 368 s
+   nas duas execuções, em três baterias com a receita igual (a execução local foi de 83 s nas duas): a máquina do CI varia mais
+   de três vezes de uma bateria para outra. Os retrovisores (2026-11-12) somam uns 29% à execução (83 s para 107 s, local).
+   TETO PELA RAZÃO, DESDE 2026-11-12. O teto em segundos reprovava ao acaso, e subi-lo a 640 s só adiava o caso. Em cinco
+   rodadas do CI desse dia o furgão levou 119, 139, 154, 184 e, já com os retrovisores, 125 s por execução, e a soma das outras
+   peças, medida na mesma máquina e na mesma rodada, foi de 13,8, 15,3, 18,1, 20,2 e 14,0 s: a razão entre o furgão e essa soma
+   ficou em 8,7, 9,1, 8,5, 9,1 e 8,9. O teto da peça pesada passa a ser essa razão, 15, cerca de 1,7 vez a medida, e a máquina
    lenta deixa de reprovar; o prazo do teste, 900 s, é o que resta de teto absoluto. A regressão da peça continua aparecendo,
    porque quem a deixa mais lenta não deixa as outras. Quando a receita da peça mudar de custo de propósito, a razão é medida
    de novo no CI e anotada aqui. */

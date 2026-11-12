@@ -356,7 +356,7 @@ movimento. Os geradores novos das análises e da pesquisa: a divisão por regras
 do CityEngine, a distribuição com espaçamento mínimo, o Wave Function Collapse,
 os campos implícitos do libfive, o Tissue, o Plating Generator e o MAP-Elites
 para gerar variantes de uma família. [As partes do
-braço](../planos/2026-09-26-as-partes-do-braco.md) continuam congeladas.
+braço](../planos/encerrados/2026-09-26-as-partes-do-braco.md) continuam congeladas.
 
 O plano seguinte é [o que o avião pede](../planos/encerrados/2026-10-11-o-que-o-aviao-pede.md),
 que leva estes candidatos na lista de sucessão. Candidatos apontados pela pessoa em 2026-10-11: o carrinho de
