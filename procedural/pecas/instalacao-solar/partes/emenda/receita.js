@@ -59,6 +59,25 @@ export function derivar(t = TABELA) {
   };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, de) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de, interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: as duas pontas do corpo (o plano de cada uma passa por vértices dele). A montagem põe o meio da emenda na junta dos dois
+   perfis com um afastamento de menos meio comprimento ao longo da normal de cada ponta. */
+export function portas(t = TABELA) {
+  const base = { forma: 'plano', extensao: [t.largura, t.altura], referencia: [0, 1, 0] };
+  return {
+    pontaA: { ...base, papel: 'apoia', ponto: [0, t.altura / 2, 0], normal: [-1, 0, 0] },
+    pontaB: { ...base, papel: 'recebe', ponto: [t.comprimento, t.altura / 2, 0], normal: [1, 0, 0] },
+  };
+}
+
 export function gerarPassos(t = TABELA) {
   const D = derivar(t);
   const passos = [];
@@ -82,6 +101,7 @@ export function gerarPassos(t = TABELA) {
     const sel = { origem: { op: 'unir', id: parafuso } };
     passos.push(['parte', { nome: `parafuso${letra}`, sel }], ['material', { usa: 'inox', sel }]);
   });
+  publicar(passos, portas(t), { op: 'subtrair', id: ID.furado });
   return passos;
 }
 

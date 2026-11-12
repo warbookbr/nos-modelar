@@ -35,12 +35,14 @@ export const TABELA = {
   degrau: 6,
   espessuraDoDegrau: 3,
   quinaDaMoldura: 3,
+  /* A CONFIRMAR: distância entre os dois trilhos, que ficam centrados no lado comprido (cerca de 90 cm, do documento da pessoa). */
+  distanciaEntreTrilhos: 900,
   /* A CONFIRMAR: o laminado. */
   vidro: 3.2,
   camadaDeCelulas: 0.4,
   folhaDeTras: 0.4,
   /* A CONFIRMAR: folga entre o vidro e as células e entre as células e a folha de trás. */
-  folgaEntreCamadas: 0.5,
+  folgaEntreCamadas: 3,
   /* A CONFIRMAR: a grade de células (6 × 20), a margem delas até a moldura e a fresta entre elas. */
   celulasEmX: 20,
   celulasEmZ: 6,
@@ -101,6 +103,31 @@ export function derivar(t = TABELA) {
   };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, de) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de, interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: `noTrilho`, o cruzamento do trilho de cima com a borda de baixo, na ponta de z = 0, para o primeiro painel; e as bordas de
+   cada lado, nos dois trilhos (A, o de baixo na água, e B, o de cima), na metade da altura da moldura, onde os grampos encostam. O painel em pé tem
+   o lado comprido (x) descendo a água, com x = 0 no lado de cima. Os trilhos ficam `distanciaEntreTrilhos` um do outro, centrados no lado comprido. */
+export function portas(t = TABELA) {
+  const xA = (t.comprimento + t.distanciaEntreTrilhos) / 2;
+  const xB = (t.comprimento - t.distanciaEntreTrilhos) / 2;
+  const borda = (x, z, sentido) => ({ forma: 'plano', papel: sentido > 0 ? 'recebe' : 'apoia', ponto: [x, t.altura / 2, z], normal: [0, 0, sentido], extensao: [t.altura, 50], referencia: [0, 1, 0] });
+  return {
+    noTrilho: { forma: 'plano', papel: 'apoia', ponto: [xB, 0, 0], normal: [0, -1, 0], extensao: [100, 100], referencia: [1, 0, 0] },
+    bordaEsquerdaA: borda(xA, 0, -1),
+    bordaEsquerdaB: borda(xB, 0, -1),
+    bordaDireitaA: borda(xA, t.largura, 1),
+    bordaDireitaB: borda(xB, t.largura, 1),
+  };
+}
+
 export function gerarPassos(t = TABELA) {
   const D = derivar(t);
   const L = t.comprimento;
@@ -144,6 +171,7 @@ export function gerarPassos(t = TABELA) {
       passos.push(['parte', { nome: k === 0 ? 'caboA' : 'caboB', sel }], ['material', { usa: 'cabo', sel }]);
     }
   });
+  publicar(passos, portas(t), { op: 'unir', id: ID.moldura });
   return passos;
 }
 

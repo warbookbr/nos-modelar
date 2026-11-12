@@ -13,3 +13,5 @@ confirmar" nas receitas são valores típicos até a pessoa medir a peça real.
 - Suporte em L: chapa de alumínio dobrada em ângulo reto, uma perna com furo oblongo para o perfil e a outra com o furo da haste.
 - Grampo intermediário: peça em ômega que aperta a moldura de dois painéis vizinhos com um parafuso central.
 - Grampo de ponta: peça em Z que aperta a moldura de um painel só, com parafuso e porca de canal.
+- Telhado: água de telha ondulada de fibrocimento (seis gomos de 177 mm por telha, onda de 51 mm, crista e vale de topo reto) em duas
+  fileiras sobre três vigas de madeira paralelas à beirada, inclinada 15 graus, com os parafusos de fixação nas cristas sobre as vigas.

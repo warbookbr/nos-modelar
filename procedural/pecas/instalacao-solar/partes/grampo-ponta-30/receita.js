@@ -25,6 +25,8 @@ export const TABELA = {
   espessuraDaAba: 3,
   gancho: 10,
   comprimento: 50,
+  /* Altura da moldura do painel que o grampo aperta, para a porta na metade dela. */
+  molduraDoPainel: 30,
   /* A CONFIRMAR: a altura do topo do perfil, onde a aba assenta. */
   apoio: 10,
   /* A CONFIRMAR: parafuso M8, cabeça de 13 mm entre faces e 5 mm de altura, folga do furo da aba. */
@@ -63,6 +65,24 @@ export function derivar(t = TABELA) {
   return { contorno, y0, y1, y2, xFuro, R: t.chaveDaCabeca / Math.sqrt(3), topoDaAba: y0 + t.espessuraDaAba };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, de) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de, interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: a face de dentro da parede, que encosta na moldura do painel (na metade da altura dela), e a ponta da aba, onde o grampo
+   vizinho do outro painel encosta a dele quando os dois ficam lado a lado. */
+export function portas(t = TABELA) {
+  return {
+    noPainel: { forma: 'plano', papel: 'apoia', ponto: [0, t.apoio + t.molduraDoPainel / 2, 0], normal: [-1, 0, 0], extensao: [t.molduraDoPainel, t.comprimento], referencia: [0, 1, 0] },
+    pontaDaAba: { forma: 'plano', papel: 'recebe', ponto: [t.aba, t.apoio + t.espessuraDaAba / 2, 0], normal: [1, 0, 0], extensao: [t.espessuraDaAba, t.comprimento], referencia: [0, 1, 0] },
+  };
+}
+
 export function gerarPassos(t = TABELA) {
   const D = derivar(t);
   const passos = [];
@@ -81,6 +101,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['unir', { origemId: ID.parafuso, solidos: [alias(ID.haste), alias(ID.cabeca)] }]);
   const sel = { origem: { op: 'unir', id: ID.parafuso } };
   passos.push(['parte', { nome: 'parafuso', sel }], ['material', { usa: 'inox', sel }]);
+  publicar(passos, portas(t), { op: 'subtrair', id: ID.furado });
   return passos;
 }
 

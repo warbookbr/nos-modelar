@@ -35,12 +35,14 @@ export const TABELA = {
   degrau: 6,
   espessuraDoDegrau: 3,
   quinaDaMoldura: 3,
+  /* A CONFIRMAR: distância entre os dois trilhos, que ficam centrados no lado comprido (cerca de 90 cm, do documento da pessoa). */
+  distanciaEntreTrilhos: 900,
   /* A CONFIRMAR: o laminado. */
   vidro: 3.2,
   camadaDeCelulas: 0.4,
   folhaDeTras: 0.4,
   /* A CONFIRMAR: folga entre o vidro e as células e entre as células e a folha de trás. */
-  folgaEntreCamadas: 0.5,
+  folgaEntreCamadas: 3,
   /* A CONFIRMAR: a grade de células (6 × 18), a margem delas até a moldura e a fresta entre elas. */
   celulasEmX: 18,
   celulasEmZ: 6,
@@ -48,7 +50,7 @@ export const TABELA = {
   frestaEntreCelulas: 2,
   /* A CONFIRMAR: caixa de junção atrás (x, y e z), na altura da folha de trás, no meio do painel. */
   caixaX: 110,
-  caixaY: 22,
+  caixaY: 15,
   caixaZ: 65,
   /* A CONFIRMAR: dois cabos curtos que saem da caixa ao longo de +x: raio, comprimento e afastamento do meio em z. */
   raioDoCabo: 2.5,
@@ -101,6 +103,31 @@ export function derivar(t = TABELA) {
   };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, de) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de, interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: `noTrilho`, o cruzamento do trilho de cima com a borda de baixo, na ponta de z = 0, para o primeiro painel; e as bordas de
+   cada lado, nos dois trilhos (A, o de baixo na água, e B, o de cima), na metade da altura da moldura, onde os grampos encostam. O painel em pé tem
+   o lado comprido (x) descendo a água, com x = 0 no lado de cima. Os trilhos ficam `distanciaEntreTrilhos` um do outro, centrados no lado comprido. */
+export function portas(t = TABELA) {
+  const xA = (t.comprimento + t.distanciaEntreTrilhos) / 2;
+  const xB = (t.comprimento - t.distanciaEntreTrilhos) / 2;
+  const borda = (x, z, sentido) => ({ forma: 'plano', papel: sentido > 0 ? 'recebe' : 'apoia', ponto: [x, t.altura / 2, z], normal: [0, 0, sentido], extensao: [t.altura, 50], referencia: [0, 1, 0] });
+  return {
+    noTrilho: { forma: 'plano', papel: 'apoia', ponto: [xB, 0, 0], normal: [0, -1, 0], extensao: [100, 100], referencia: [1, 0, 0] },
+    bordaEsquerdaA: borda(xA, 0, -1),
+    bordaEsquerdaB: borda(xB, 0, -1),
+    bordaDireitaA: borda(xA, t.largura, 1),
+    bordaDireitaB: borda(xB, t.largura, 1),
+  };
+}
+
 export function gerarPassos(t = TABELA) {
   const D = derivar(t);
   const L = t.comprimento;
@@ -144,6 +171,7 @@ export function gerarPassos(t = TABELA) {
       passos.push(['parte', { nome: k === 0 ? 'caboA' : 'caboB', sel }], ['material', { usa: 'cabo', sel }]);
     }
   });
+  publicar(passos, portas(t), { op: 'unir', id: ID.moldura });
   return passos;
 }
 
@@ -161,7 +189,7 @@ const receita = {
       { nome: 'vidro', forma: 'placa de vidro de 3,2 mm, transparente, rente ao topo da moldura (y igual à altura da moldura), de parede a parede', tecnica: 'extrusão retangular em y' },
       { nome: 'celulas', forma: 'grade de 18 por 6 células azul-escuras de 0,4 mm sob o vidro, com folga clara acima e abaixo, separadas por fresta de 2 mm, as colunas estreitas ao longo do lado comprido', tecnica: 'um cubo por célula, posições da derivar' },
       { nome: 'fundo', forma: 'folha de trás clara de 0,4 mm sob as células, de parede a parede, assentada no degrau da moldura', tecnica: 'extrusão retangular em y' },
-      { nome: 'caixaJuncao', forma: 'caixa preta de 110 por 22 por 65 mm colada sob a folha de trás, no meio do painel, dentro do recesso da moldura', tecnica: 'cubo' },
+      { nome: 'caixaJuncao', forma: 'caixa preta de 110 por 15 por 65 mm colada sob a folha de trás, no meio do painel, dentro do recesso da moldura', tecnica: 'cubo' },
       { nome: 'caboA', forma: 'cabo preto curto, cilindro de 5 mm de diâmetro e 260 mm, saindo da caixa ao longo de +x, de um lado do meio', tecnica: 'cilindro de eixo x' },
       { nome: 'caboB', forma: 'segundo cabo preto curto, igual ao primeiro, do outro lado do meio da caixa', tecnica: 'cilindro de eixo x' },
     ],

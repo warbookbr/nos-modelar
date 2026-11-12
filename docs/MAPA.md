@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2015 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2022 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -348,6 +348,8 @@
 ## docs/modelar/banco-de-provas/furgao-realista-2026-10-30/detalhes/
 
 - `antena.esboco.mjs` — antena.esboco.mjs — duas formas da antena do teto do furgão, em mm, na bancada neutra. O apoio é um pedaço de teto curvo (360 mm de largura em x, 300 em z, 2…
+- `farol-opcoes.capturar.mjs` — farol-opcoes.capturar.mjs — captura as três opções de `farol-opcoes.esboco.mjs` com os materiais do furgão (vidro, cromo, plástico escuro), que o esboço do 2…
+- `farol-opcoes.esboco.mjs` — farol-opcoes.esboco.mjs — três opções para o que se vê por dentro do farol dianteiro do furgão realista (2026-11-12), numa chapa da frente de prova, em mm, p…
 - `macaneta.esboco.mjs` — macaneta.esboco.mjs — três formas da maçaneta de porta do furgão, em mm, na bancada neutra. O apoio é um pedaço plano de porta de 420 mm (z, a frente em +z) …
 - `ponteira.esboco.mjs` — ponteira.esboco.mjs — três formas da ponteira de escapamento do furgão, em mm, na bancada neutra. O apoio é um pedaço do para-choque traseiro (600 x 260 x 14…
 - `retrovisor.esboco.mjs` — retrovisor.esboco.mjs — o retrovisor externo do furgão (lado direito, +x), em mm, na bancada neutra, com a carcaça aprovada e os braços e a base refeitos pel…
@@ -1844,6 +1846,7 @@
 - `luzes.js` — furgao-realista, receita/luzes.js — por dentro das luzes da frente (etapa 8, `referencias/luzes.md`): o refletor de cada luz, uma capa única cuja borda segue…
 - `nomes.js` — furgao-realista, receita/nomes.js — os nomes das partes, que o PLANO, os PASSOS e os contatos citam: as listas por grupo (rodas, forros, abas, plástico, cris…
 - `plastico.js` — furgao-realista, receita/plastico.js — o plástico de baixo (etapa 3), por fora da chapa: a saia, as molduras e o alargamento dos arcos, o forro dos arcos e o…
+- `retrovisor.js` — furgao-realista, receita/retrovisor.js — os dois retrovisores externos (2026-11-12), traduzidos do esboço aprovado `docs/modelar/banco-de-provas/furgao-reali…
 - `rodas.js` — furgao-realista, receita/rodas.js — a roda da família `roda-pneu`: o registro das famílias, a chamada pelo perfil da TABELA e a soma da base aos ids locais d…
 
 ## procedural/pecas/furgao-realista/referencias/
@@ -1889,6 +1892,11 @@
 
 - `alvo.md` — Alvo: geladeira compacta branca
 
+## procedural/pecas/instalacao-solar/
+
+- `conferencias.mjs` — instalacao-solar/conferencias — as conferências de medida da obra, sobre a montagem resolvida `montagem.json`.
+- `conferencias.test.mjs` — instalacao-solar/conferencias.test — fixa, com os valores provisórios do telhado e do kit, o que a montagem da instalação solar mede.
+
 ## procedural/pecas/instalacao-solar/partes/emenda/
 
 - `receita.js` — instalacao-solar/emenda — a peça que entra dentro de dois perfis para uni-los, com dois parafusos.
@@ -1907,7 +1915,7 @@
 
 ## procedural/pecas/instalacao-solar/partes/haste/
 
-- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, a arruela e as porcas.
+- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, as arruelas e as porcas.
 
 ## procedural/pecas/instalacao-solar/partes/painel-30/
 
@@ -1924,6 +1932,10 @@
 ## procedural/pecas/instalacao-solar/partes/suporte-l/
 
 - `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil.
+
+## procedural/pecas/instalacao-solar/partes/telhado/
+
+- `receita.js` — instalacao-solar/telhado — um trecho de uma água de telhado de fibrocimento ondulado sobre as vigas de madeira, sem a casa, e a locação da obra nele (onde en…
 
 ## procedural/pecas/instalacao-solar/referencias/
 
@@ -2076,6 +2088,10 @@
 ## procedural/pecas/sedan-chassi-e-lataria/partes/carroceria/
 
 - `receita.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/carroceria/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/
 
