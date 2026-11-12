@@ -5,12 +5,13 @@ import receita from './receita.js';
 import { medirPeca } from '../medir.mjs';
 
 describe('dois braços chatos numa carcaça curva', () => {
-  it('o arredondamento não recusa hoje (0 órfãos, 0 arestas soltas) e deixa 1 face degenerada, no raio de 6 mm', () => {
+  it('o arredondamento não recusa (0 órfãos, 0 arestas soltas), no raio de 6 mm, e com a costura registrada inteira não deixa face degenerada (eram 1) e dá 10 pontas em vez de 32', () => {
     const m = medirPeca(receita);
     expect(m.orfaos).toEqual([]);
     expect(m.arestasSoltas).toBe(0);
-    expect(m.faces).toBe(1706);
-    expect(m.facesDeCostura).toBe(674);
-    expect(m.facesDegeneradas).toBe(1);
+    expect(m.faces).toBe(2030);
+    expect(m.facesDeCostura).toBe(933);
+    expect(m.facesDegeneradas).toBe(0);
+    expect(m.pontasDeSerra).toBe(10);
   });
 });

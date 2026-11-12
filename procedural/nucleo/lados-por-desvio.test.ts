@@ -113,7 +113,8 @@ describe('A-34 — cilindro, cone e furo aceitam lados:{desvio}', () => {
     const esperado = ladosPorDesvio(0.025, desvio);
     const n = nucleo(FURO({ desvio }, centros, null) as any, {}, {});
     expect(n.orfaos).toEqual([]);
-    expect(idsDoBloco(n.V, 1)).toHaveLength(2 * esperado * 5);
+    /* os 2·L·M primeiros vértices do bloco são os dos anéis; os que vêm depois são os polígonos de apoio e os pontos de reforço da face refeita em anéis */
+    expect(idsDoBloco(n.V, 1).filter((id) => id < BLOCO + 2 * esperado * 5)).toHaveLength(2 * esperado * 5);
     conferirMalha(n, { fechada: true, rotulo: 'furo por maior raio' });
   });
 

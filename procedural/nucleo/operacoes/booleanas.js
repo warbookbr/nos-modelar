@@ -706,6 +706,18 @@ export function criarOperacoesBooleanas(servicos) {
        no meio de uma aresta reta: tirá-lo das duas faces não abre fenda, e
        deixá-lo faz o adaptador cortar uma orelha sem área. Canto novo usado
        por três faces ou mais é quina de verdade e fica. */
+    /* O canto tirado pode estar no meio de uma aresta da costura (o diedro de 135° que a faceta de um tubo faz com a face do outro sai partido em
+       dois triângulos pela sopa da Manifold, com o canto do meio sobre a reta). As duas arestas que chegam nele estão em `costura`, e ao tirar o
+       canto elas viram uma só, entre os vizinhos: sem isto o laço de ids definitivos descarta as duas metades, o registro perde o trecho (9 trechos de uns 4 mm, 18 metades,
+       na peça de prova dos dentes; 50, 66, 40 e 72 arestas nas partes do braço) e o `arredondarCostura`, vendo o buraco entre arestas registradas de 0,1 mm,
+       faz de cada resto um tubo curto com tampa, que são os dentes no fim do arredondamento. */
+    const religaCostura = (v, donosDoCanto) => {
+      const vizinhos = donosDoCanto.map((P) => { const k = P.indexOf(v); return [P[(k + P.length - 1) % P.length], P[(k + 1) % P.length]]; });
+      const [a, c] = vizinhos[0];
+      if (!vizinhos.every(([x, y]) => (x === a && y === c) || (x === c && y === a))) return;
+      const k = (x, y) => (x < y ? `${x}_${y}` : `${y}_${x}`);
+      if (costura.has(k(a, v)) && costura.has(k(v, c))) costura.add(k(a, c));
+    };
     const poligonos = [...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])];
     for (let passada = 0; passada < 4; passada++) {
       const usos = new Map();
@@ -720,6 +732,7 @@ export function criarOperacoesBooleanas(servicos) {
           return tamanho(cruz(sub(pos(v), a), sub(c, a))) / 2 < piso;
         });
         if (!reto) continue;
+        religaCostura(v, donos);
         for (const P of donos) P.splice(P.indexOf(v), 1);
         tirou = true;
       }
@@ -741,6 +754,10 @@ export function criarOperacoesBooleanas(servicos) {
        saída da Manifold), para as arestas casarem com as dos pedaços */
     const cicloRepDasMantidas = (fid) => cicloRep(st.F.get(fid).vs);
     const areaTri = (a, b, c) => tamanho(cruz(sub(pos(b), pos(a)), sub(pos(c), pos(a)))) / 2;
+    /* a metade que a diagonal deixa só pode ter a área que o adaptador do visor aceita (`adaptarThree` recusa a face de dobro da área até 1e-12 m²), com o
+       dobro de folga, e não só o milésimo do piso, que em peça de menos de 0,7 m fica abaixo disso: o dente do elo do punho 5, três cantos de um anel de
+       0,02 a 0,05 mm em linha, saía como face de 9,9e-13 m² */
+    const semArea = Math.max(piso * 1e-3, 1e-12);
     const semColinear = (P) => {
       if (P.length <= 3) return [P];
       for (let k = 0; k < P.length; k++) {
@@ -759,7 +776,7 @@ export function criarOperacoesBooleanas(servicos) {
         /* a diagonal que deixa uma das metades sem área de verdade (a do portão de face degenerada; dois cantos de tubos a poucos micrômetros um do outro, onde a
            geratriz de um cilindro cruza a do outro) devolve o pedaço sem área que a fusão acabou de absorver, e o
            laço do acabamento oscila até desistir; o canto colinear fica, e `melhorInicio` põe o leque longe dele */
-        if (areaDe(pos, um) < piso * 1e-3 || areaDe(pos, dois) < piso * 1e-3) continue;
+        if (areaDe(pos, um) < semArea || areaDe(pos, dois) < semArea) continue;
         return [...semColinear(um), ...semColinear(dois)];
       }
       return [P];
@@ -832,6 +849,7 @@ export function criarOperacoesBooleanas(servicos) {
         if (donos.length !== 2) continue;
         const vizinhos = donos.map(([, P]) => { const k = P.indexOf(v); return new Set([P[(k + P.length - 1) % P.length], P[(k + 1) % P.length]]); });
         if (![...vizinhos[0]].every((w) => vizinhos[1].has(w))) continue;
+        religaCostura(v, donos.map((item) => item[1]));
         for (const item of donos) item[1] = item[1].filter((w) => w !== v);
         tirou = true;
       }
@@ -1085,7 +1103,7 @@ export function criarOperacoesBooleanas(servicos) {
      MODO POR FATIAS nas classes novas. O modo plano recusa quando a tangência
      sai da face; nas classes novas isso manda para o modo por fatias, que
      também é o único que aceita `regiao`. Nele a costura vira um grafo:
-     trechos entre vértices de valência diferente de dois, e laços. Onde o
+     trechos entre vértices de valência diferente de dois, e lacos. Onde o
      trecho dobra mais de 20° (uma quina do laço) ou termina, o anel da última
      estação da aresta é DESLIZADO ao longo dela até o plano de corte do
      vértice, o mesmo da meia-esquadria do modo plano (corte reto na ponta); os
@@ -1748,10 +1766,65 @@ export function criarOperacoesBooleanas(servicos) {
         const fechado = lista.length > 2 && (vizinhosDaCostura.get(lista[lista.length - 1]) ?? []).includes(lista[0]) && (vizinhosDaCostura.get(lista[0]) ?? []).length === 2;
         componentes.push({ lista, fechado });
       }
+      /* NÓ DE GRAU 4 NO MODO CURVO (o oito que dois tubos tangentes fazem: o elo do punho 5, com os nós nos dois pontos de tangência). O percurso acima parte do
+         menor id e volta pelo `sentido`, que num nó de grau 4 escolhe um vizinho qualquer: o tubo saía partido no meio de um laço, com tampa reta nas duas
+         pontas (um tubo de 3 estações e 8,3 mm só num quadrante da peça simétrica). Aqui cada nó de grau par é atravessado pelo par de arestas mais reto
+         (as duas que formam o maior ângulo entre si), os lacos são percorridos inteiros, e o laço que passa por um nó começa nele, que é onde a costura
+         chega à borda da tampa e o tubo termina de qualquer forma. Só vale quando todo nó tem grau 2 ou 4 e nenhum laço repete vértice; senão fica o percurso de cima. */
+      if (!restrito && [...vizinhosDaCostura.values()].some((v) => v.length > 2)) {
+        const viz = (v) => [...(vizinhosDaCostura.get(v) ?? [])].sort((x, y) => x - y);
+        const nos = [...vizinhosDaCostura.keys()].filter((v) => viz(v).length > 2).sort((x, y) => x - y);
+        const reto = new Map();   // `${nó}>${de onde chega}` → para onde segue
+        let valido = nos.every((v) => viz(v).length === 4) && [...vizinhosDaCostura.keys()].every((v) => viz(v).length === 2 || viz(v).length === 4);
+        if (valido) {
+          for (const v of nos) {
+            const P = pl(v), ds = viz(v).map((w) => { const d = sub(pl(w), P), l = tamanho(d) || 1; return d.map((c) => c / l); });
+            const pares = [[[0, 1], [2, 3]], [[0, 2], [1, 3]], [[0, 3], [1, 2]]];
+            let melhor = null, nota = Infinity;
+            for (const par of pares) { const n = par.reduce((t, [a, b]) => t + ponto(ds[a], ds[b]), 0); if (n < nota - 1e-12) { nota = n; melhor = par; } }
+            const w = viz(v);
+            for (const [a, b] of melhor) { reto.set(`${v}>${w[a]}`, w[b]); reto.set(`${v}>${w[b]}`, w[a]); }
+          }
+        }
+        const lacos = [];
+        if (valido) {
+          const feita = new Set();
+          const chaveA = (p0, p1) => (p0 < p1 ? `${p0}-${p1}` : `${p1}-${p0}`);
+          const chaves = [...vizinhosDaCostura.keys()].sort((x, y) => x - y);
+          const percorre = (v0, w0) => {
+            const lista = [v0];
+            let ant = v0, cur = w0;
+            feita.add(chaveA(v0, w0));
+            while (cur !== v0) {
+              lista.push(cur);
+              const vz = viz(cur);
+              const prox = vz.length === 2 ? vz.find((w) => w !== ant) : reto.get(`${cur}>${ant}`);
+              if (prox == null || lista.length > vizinhosDaCostura.size * 2 + 2) return null;
+              feita.add(chaveA(cur, prox));
+              ant = cur; cur = prox;
+            }
+            if (viz(v0).length > 2 && reto.get(`${v0}>${ant}`) !== w0) return null;   // voltou ao nó por outro par: o laço o repete
+            return lista;
+          };
+          for (const v of chaves) for (const w of viz(v)) {
+            if (feita.has(chaveA(v, w))) continue;
+            const lista = percorre(v, w);
+            if (!lista || new Set(lista).size !== lista.length) { valido = false; break; }
+            lacos.push(lista);
+          }
+        }
+        if (valido && lacos.length) {
+          componentes.length = 0;
+          for (const l of lacos) {
+            const k = l.findIndex((v) => viz(v).length > 2);
+            componentes.push({ lista: k > 0 ? [...l.slice(k), ...l.slice(0, k)] : l, fechado: true });
+          }
+        }
+      }
       /* Nas classes novas a costura é um GRAFO de arestas e não uma cadeia
          só: um canto de rebaixo tem três arestas do mesmo tipo. Os trechos
          são os caminhos entre vértices de valência diferente de dois (cada
-         aresta em um trecho só) e, sobrando aresta, os laços puros. */
+         aresta em um trecho só) e, sobrando aresta, os lacos puros. */
       if (restrito) {
         componentes.length = 0;
         const usada = new Set();

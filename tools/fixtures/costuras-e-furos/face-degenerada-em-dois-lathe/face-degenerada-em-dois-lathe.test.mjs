@@ -1,7 +1,9 @@
-/* Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados. */
+/* A fatia 1 do plano "costuras e furos limpos" fixou 1 face de três cantos colineares nesta peça (o deitado de 195 mm), e a fatia 3 ia buscar a origem dela. A origem
+   é a costura que o `unir` registrava incompleta (10 das 156 arestas, `tools/modelar/reguas-de-malha/costura-registrada.test.mjs`): o `arredondarCostura`
+   fazia tubo curto com tampa nos restos, e a tampa dava a face. Com o registro inteiro a face some, e o aviso `faceLimite` também. Com o `unir` antigo, 179 e 182 mm
+   davam a mesma face; com o novo, nenhum comprimento de 170 a 230 mm (passo de 3 mm) dá. */
 import { describe, expect, it } from 'vitest';
 import { adaptarThree } from '../../../../src/autoria/adaptar-three.js';
-import { medirFaceDegenerada } from '../../../modelar/reguas-de-malha/face-degenerada.mjs';
 import receita from './receita.js';
 import { medirPeca } from '../medir.mjs';
 import { gerarPassos } from '../tubos-em-t.js';
@@ -9,23 +11,20 @@ import { gerarPassos } from '../tubos-em-t.js';
 describe('face degenerada no unir com arredondarCostura de dois lathe', () => {
   const m = medirPeca(receita);
 
-  it('DEFEITO: com o deitado de 195 mm sobra 1 face de três cantos colineares, sem órfão nem aresta solta, que o descrever aceita', () => {
+  it('com o deitado de 195 mm a malha fecha sem face de três cantos colineares', () => {
     expect(m.orfaos).toEqual([]);
     expect(m.arestasSoltas).toBe(0);
-    expect(m.faces).toBe(3636);
-    expect(m.facesDegeneradas).toBe(1);
-    const { faces } = medirFaceDegenerada(m.neutro);
-    expect(faces[0].cantos).toBe(3);
-    expect(faces[0].normal).toBeLessThan(1e-12);
+    expect(m.faces).toBe(3504);
+    expect(m.facesDegeneradas).toBe(0);
+    expect(m.avisos).toEqual([]);
   });
 
-  it('o adaptador recusa justamente a face que a régua achou', () => {
-    const { faces } = medirFaceDegenerada(m.neutro);
-    expect(() => adaptarThree(m.neutro)).toThrow(new RegExp(`face ${faces[0].id} é degenerada`));
+  it('o adaptador aceita a malha', () => {
+    expect(() => adaptarThree(m.neutro)).not.toThrow();
   });
 
-  it('com 190 mm de comprimento a mesma peça sai sem face degenerada', () => {
-    const sem = medirPeca({ PASSOS: gerarPassos({ ...receita.PARAMS, comprimento: 190 }), PARAMS: {} });
+  it.each([179, 182, 190])('com %i mm de comprimento a mesma peça sai sem face degenerada (179 e 182 davam 1 antes)', (comprimento) => {
+    const sem = medirPeca({ PASSOS: gerarPassos({ ...receita.PARAMS, comprimento }), PARAMS: {} });
     expect(sem.facesDegeneradas).toBe(0);
   });
 });
