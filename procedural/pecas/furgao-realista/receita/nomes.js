@@ -19,8 +19,10 @@ export const PARACHOQUES = ['parachoqueDianteiro', 'parachoqueTraseiro'];
 export const PLASTICOS = [...SAIAS, ...MOLDURAS, ...PARACHOQUES];
 export const CRISTAIS = ['vidroParaBrisa', 'vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroPortaTraseiraEsquerda', 'vidroPortaTraseiraDireita', 'vidroTrianguloCabineEsquerda', 'vidroTrianguloCabineDireita'];
 export const BORRACHAS = ['borrachaParaBrisa', 'borrachaPortaCabineEsquerda', 'borrachaPortaCabineDireita', 'borrachaPortaTraseiraEsquerda', 'borrachaPortaTraseiraDireita', 'borrachaTrianguloCabineEsquerda', 'borrachaTrianguloCabineDireita'];
-/** Os quatro vidros da janela da cabine (o triângulo fixo e o vidro da porta, de cada lado), que são vãos pelo contorno, e não da gaiola. */
+/** Os quatro vidros da janela da cabine (o vidro grande da porta e o triângulo fixo, de cada lado), que são vãos pelo contorno, e não da gaiola. */
 export const JANELAS_DA_CABINE = ['vidroPortaCabineEsquerda', 'vidroPortaCabineDireita', 'vidroTrianguloCabineEsquerda', 'vidroTrianguloCabineDireita'];
+/** A peça preta da frente do triângulo, a base do retrovisor, de cada lado: um vão de lente preta no tamanho dele, e não vidro. */
+export const BASES_DO_RETROVISOR = ['baseRetrovisorEsquerda', 'baseRetrovisorDireita'];
 /** As quatro faixas da lente da lanterna de trás, de cima para baixo (freio, ré, pisca e neblina), e a lanterna de cada lado como a lista das suas partes de lente. */
 export const FAIXAS_DA_LANTERNA = ['Freio', 'Re', 'Pisca', 'Neblina'];
 export const LANTERNAS = ['Esquerda', 'Direita'].flatMap((lado) => FAIXAS_DA_LANTERNA.map((faixa) => `lanterna${faixa}${lado}`));

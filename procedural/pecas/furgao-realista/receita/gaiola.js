@@ -3,7 +3,8 @@
  */
 
 import { cruz, dot, entre, esc, grau, lerp, m, soma, sub, suave, unit } from './geometria.js';
-import { aneisDoOmbro, aneisHorizontais, colunaDaJanela, forma, pontoFrente, pontoLado, pontoNoCaminho, pontoQuinaTras, pontoTras, projetarNaSecao, secaoHorizontal } from './forma.js';
+import { derivarBasesDoRetrovisor } from './janela.js';
+import { aneisDoOmbro, aneisHorizontais, forma, pontoFrente, pontoLado, pontoNoCaminho, pontoQuinaTras, pontoTras, projetarNaSecao, secaoHorizontal } from './forma.js';
 import { derivarPlastico } from './plastico.js';
 import { derivarLuzesPorDentro } from './luzes.js';
 import { chamadaDaRoda } from './rodas.js';
@@ -96,12 +97,10 @@ export function derivar(T) {
   };
   const secTopoPorta = secaoHorizontal(T, f, T.porta_cabine_topo_y);
   const aTopoPorta = caminhoDeZ(secTopoPorta, f.zFrestaFrente(T.porta_cabine_topo_y)) / secTopoPorta.rF;
-  const yD = f.rPneu + Math.sqrt(rArcoPorta ** 2 - (f.pePorta[0] - f.zD) ** 2);
+  const yD = f.rPneu + Math.sqrt(rArcoPorta ** 2 - (T.porta_frente_z - f.zD) ** 2);
   const yDQuina = f.rPneu + Math.sqrt(rArcoPorta ** 2 - (f.pePortaQuina[0] - f.zD) ** 2);
   const secTopoQuina = secaoHorizontal(T, f, T.para_brisa_topo_y);
   const aTopoQuina = caminhoDeZ(secTopoQuina, f.zFrestaQuina(T.para_brisa_topo_y)) / secTopoQuina.rF;
-  const zColuna = colunaDaJanela(T, f);
-  const yPeJanela = horizontais.find((a) => a.y >= T.janela_sill_y - 3).y;
   const caminhoQuina = (an) => (an.horizontal && an.y <= T.para_brisa_topo_y ? caminhoDeZ(an.sec, f.zFrestaQuina(an.y)) : an.sec.rF * aTopoQuina);
   const caminhoD = (an) => {
     if (an.horizontal && an.y <= T.porta_cabine_topo_y) return caminhoDeZ(an.sec, f.zFrestaFrente(an.y));
@@ -124,7 +123,7 @@ export function derivar(T) {
         lista.push({ th, col: `${arco.id}_j${i}f`, tipo: 'juncao' }, { th: Math.PI - th, col: `${arco.id}_j${i}t`, tipo: 'juncao' });
       }
     });
-    if (arco.id === 'arcoD') lista.push({ th: Math.acos((f.pePorta[0] - arco.zc) / rArcoPorta), col: 'D', tipo: 'D' });
+    if (arco.id === 'arcoD') lista.push({ th: Math.acos((T.porta_frente_z - arco.zc) / rArcoPorta), col: 'D', tipo: 'D' });
     lista.sort((a, b) => a.th - b.th);
     const passo = T.passo_arco_graus * grau;
     const comFill = [lista[0]];
@@ -206,9 +205,7 @@ export function derivar(T) {
     }
     if (temD) g.push({ col: 'D', s: sD });
     if (temB) {
-      let L = Math.max(sq - sD, T.alcance_coluna_porta);
-      /* da altura do pé da frente da porta até o topo dela, a S0 é a coluna nova da janela (quase vertical), e não 90 mm atrás da D: ela é a frente da porta na altura da janela */
-      if (an.horizontal && an.y >= yPeJanela - 1e-6 && an.y <= T.porta_cabine_topo_y + 1e-6) L = Math.max(sec.zF - sec.rF - zColuna(an.y) + sq - sD, T.alcance_coluna_porta);
+      const L = Math.max(sq - sD, T.alcance_coluna_porta);
       [1, 2, 3].forEach((k) => g.push({ col: k === 3 ? 'S0' : `b${k}`, s: sD + (k * L) / 3 }));
     }
     return g;
@@ -392,14 +389,15 @@ export function derivar(T) {
     { rs: aneisEntre(T.para_brisa_base_y, T.para_brisa_topo_y), cMeio: 'f0', cantos: ['q3'] },
     { rs: aneisEntre(T.vidro_traseiro_base_y, T.vidro_traseiro_topo_y), cMeio: meioDoVidroTraseiro, cantos: ['r1', `r${iForaTraseiro}`] },
     { rs: aneisEntre(T.porta_traseira_base_y, T.porta_traseira_topo_y), cMeio: 'r0', cantos: [`r${nR - 1}`], soTopo: true },
+    { rs: aneisEntre(T.porta_cabine_topo_y - 120, T.porta_cabine_topo_y), cMeio: 'portaCabineTras', cantos: ['D'], soTopo: true, degraus: T.porta_cabine_canto_degraus },
   ];
   const diagonaisDosCantos = [];
   const arcosDosCantos = [];
-  for (const { rs, cMeio, cantos, soTopo } of cantosDosVaos) {
-    const k = T.vao_canto_degraus;
+  for (const { rs, cMeio, cantos, soTopo, degraus } of cantosDosVaos) {
+    const k = degraus ?? T.vao_canto_degraus;
     for (const cF of cantos) {
       for (const sub2 of soTopo ? [rs.slice(rs.length - k - 1).reverse()] : [rs.slice(0, k + 1), rs.slice(rs.length - k - 1).reverse()]) {
-        const cols = colunasDoCanto(sub2, cF, cMeio);
+        const cols = colunasDoCanto(sub2, cF, cMeio, k);
         const nome = (r, c) => r.lista.find((q) => q.col === c).nome;
         for (let j = 0; j < k; j += 1) diagonaisDosCantos.push([nome(sub2[j], cols[j]), nome(sub2[j + 1], cols[j + 1])]);
         arcosDosCantos.push({
@@ -539,14 +537,16 @@ export function derivar(T) {
   const portas = [];
   for (const s of ['e', 'd']) {
     const sufixo = s === 'e' ? 'Esquerda' : 'Direita';
-    const topo = anelEm(T.porta_cabine_topo_y);
-    /* a frente da porta: vertical (a coluna D) até o anel do pé da janela, para trás por esse anel até a coluna nova (a S0) e por ela até o topo da porta; o triângulo de vidro e a chapa
-       logo abaixo dele ficam na carroceria, à frente da coluna e acima desse anel, fora da porta */
-    const pe = anelEm(yPeJanela);
-    const colD = listas.filter((x) => x.horizontal && x.y > yD && x.y <= yPeJanela + 1e-6).map((x) => ponto(x, 'D', s));
+    /* a frente da porta: a coluna D de ponta a ponta, vertical até a quebra e daí paralela ao para-brisa (o recuo entre as duas é a aresta entre os dois anéis que ladeiam a quebra), e no alto
+       o canto cortado em diagonal, como os dos vãos dos vidros; a porta não tem mais degrau nem coluna própria na altura da janela */
+    const rsTopo = aneisEntre(T.porta_cabine_topo_y - 120, T.porta_cabine_topo_y).slice(-T.porta_cabine_canto_degraus - 1).reverse();
+    const colsTopo = colunasDoCanto(rsTopo, 'D', 'portaCabineTras', T.porta_cabine_canto_degraus);
+    const cadeiaTopo = rsTopo.map((r, j) => ponto(r, colsTopo[j], s));
+    const yFimD = rsTopo.at(-1).y;
+    const colD = listas.filter((x) => x.horizontal && x.y > yD && x.y <= yFimD + 1e-6).map((x) => ponto(x, 'D', s));
     portas.push({
       nome: `portaCabine${sufixo}`,
-      volta: fechar([...trecho(R380, 'D', 'D', s), ...colD, ...trecho(pe, 'D', 'S0', s), ...coluna('S0', yPeJanela, T.porta_cabine_topo_y, s), ...trecho(topo, 'S0', 'portaCabineTras', s),
+      volta: fechar([...trecho(R380, 'D', 'D', s), ...colD, ...[...cadeiaTopo].reverse().slice(1), ...trecho(rsTopo[0], colsTopo[0], 'portaCabineTras', s).slice(1),
         ...coluna('portaCabineTras', T.porta_cabine_topo_y, yBase, s), ...trecho(R380, 'portaCabineTras', 'D', s)]),
     });
     /* a porta traseira sobe pelos anéis horizontais e pelos do ombro até o anel do topo dela */
@@ -813,7 +813,7 @@ export function derivar(T) {
   const usados = new Set(faces.flat());
   const vertices = [...usados].sort();
   /* o plástico de baixo, por fora da chapa: os pontos dele entram no TOPO junto com os da gaiola */
-  const plastico = derivarPlastico(T, f);
+  const plastico = [...derivarPlastico(T, f), ...derivarBasesDoRetrovisor(T, f)];
   const { refletores, lampadas } = derivarLuzesPorDentro(T, f);
   const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes]), ...refletores.flatMap((r) => [...r.capa.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
