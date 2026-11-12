@@ -1033,7 +1033,10 @@ export async function olharBancada({
         const feito = await page.evaluate(() => window.__modelarAjuste ?? null);
         if (feito?.erro) registrar(relato, logger, 'stderr', `  ajuste da câmera recusado: ${feito.erro}`);
         if (feito?.mirou) registrar(relato, logger, 'stdout', `câmera mirando [${feito.mirou.ponto.join('; ')}] mm de ${feito.mirou.distanciaMm} mm (campo de ${feito.mirou.campoMm} mm de altura no ponto)`);
-        if (feito?.afastou) registrar(relato, logger, 'stdout', `a câmera de ${vista} estava dentro da peça; afastada de ${feito.afastou.deMm} para ${feito.afastou.paraMm} mm do alvo, com o mesmo quadro`);
+        if (feito?.afastou) {
+          registrar(relato, logger, 'stdout', `a câmera de ${vista} estava dentro da peça; afastada de ${feito.afastou.deMm} para ${feito.afastou.paraMm} mm do alvo, com o mesmo quadro`);
+          anotarDica('camera-recuada', 'a câmera recuou para fora da peça e o que fica entre ela e o alvo (a casca do lado oposto) pode escondê-lo: para ver a parte, use a vista do lado dela, --modo=isolar ou --corte.', vista);
+        }
         if (feito?.mirou && feito.dentroDaPeca) anotarDica('mira-dentro', 'a câmera da mira está dentro da caixa da peça: o que a cerca (casca, cabine) fica atrás dela ou na frente do ponto; afaste com --distancia, ou isole as partes com --selecionadas --modo=isolar, ou corte com --corte.', vista);
       }
       progresso.etapa = 'medir o enquadramento';

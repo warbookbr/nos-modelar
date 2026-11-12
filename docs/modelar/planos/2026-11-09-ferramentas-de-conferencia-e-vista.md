@@ -94,7 +94,10 @@ ruga vem num envio próprio depois deles.
 2. A câmera que mira um ponto, a isométrica de trás e a assinatura da malha.
 3. A análise numa carga só e o zoom em mm.
 4. O limite do PLANO na guarda, a cor e a cópia isolada no esboço, e o registro de etapas estável.
-5. Fechamento.
+5. O `descrever` e a guarda dizendo o que hoje calam: o órfão de cada passo, a abertura que cai na booleana da chapa inteira e
+   o progresso durante a carga.
+6. A régua da regularidade da crista e as ferramentas de vista da empilhadeira abrindo receita de peça.
+7. Fechamento.
 
 ## Riscos e parada
 
@@ -111,20 +114,25 @@ mm, 39 mm entre as pontas, onde está a ruga) saem como achado. O acervo acusou 
 demais para a cadeia); a revisão delas é da sessão do furgão, com as caixas medidas no relato da fatia.
 
 Fatia 2 (2026-11-12): `olhar-bancada --mirar=x,y,z [--distancia=mm]` põe a câmera a `distancia` (padrão 600 mm) do ponto, em mm do
-referencial da peça, na direção da vista pedida, e a vista nova `isometrica-traseira` gira a isométrica meia volta; os dois
-ajustes correm na página pela ponte que já existe (`ajustarCamera`, exportada e testada com a câmera do three), sem tocar
-`src/bancada`. O `--focar` que deixava a câmera dentro da caixa da peça recua-a pelo mesmo raio até passar da caixa, com o zoom
-compensando na perspectiva, e a mira dentro da peça sai como dica. A CLI escreve na saída de erro cada etapa longa ao entrar nela e
-uma batida a cada 15 s, e os sinais de parada fecham o Chromium e o servidor; o processo vivo depois da captura é encerrado
-após 5 s. `tools/modelar/assinatura-da-malha.mjs` (`npm run malha:assinatura`) assina cada parte e a peça (sha256 das faces em
-nanômetro, sem depender da numeração) e confere uma rodada contra outra, parte por parte. Casos no furgão realista, com a máquina em
-carga 3 a 6: a assinatura leva 99 s e a conferida contra ela 107 s, as 115 partes idênticas (o script de hash de cada rodada
-deixa de existir); a janela da porta da cabine em perto sai de um comando de 7 min 14 s, que é a receita medida em Node mais
-a carga da página, sem recorte de captura de 3.200 px (4 a 15 min cada). Não reproduzi o processo preso na porta: o recuso de
-servidor era fechado pelo `finally`, e o que entrou é a rede de segurança (sinal e encerramento forçado). Testes:
-`olhar-bancada.test.mjs` e `assinatura-da-malha.test.mjs`. Vai para a fatia 3: a medida de contatos executa a receita em Node a
-cada captura (uns 100 s no furgão, inclusive na mira) e deve ser pulada ou guardada; para a fatia 4: o aviso de progresso do
-`descrever` e do `guarda:acervo`, que seguem dois minutos sem saída.
+referencial da peça, na direção da vista pedida, e a vista `isometrica-traseira` gira a isométrica meia volta; os dois ajustes correm
+na página pela ponte que já existe (`ajustarCamera`, exportada e testada com a câmera do three), sem tocar `src/bancada`. O
+`--focar` que deixava a câmera dentro da caixa da peça recua-a pelo mesmo raio até passar da caixa, com o zoom compensando na
+perspectiva, e diz na dica que a casca do lado oposto pode esconder o alvo; a mira dentro da peça também sai como dica. A CLI escreve
+na saída de erro cada etapa longa ao entrar nela e uma batida a cada 15 s, o sinal de parada fecha o Chromium e o servidor, e o
+processo ainda vivo 5 s depois da captura é encerrado. `tools/modelar/assinatura-da-malha.mjs` (`npm run malha:assinatura`) assina
+cada parte e a peça (sha256 das faces em nanômetro, sem depender da numeração) e confere uma rodada contra outra, parte por parte.
+Casos no furgão realista, com a máquina em carga de 3 a 10, de modo que os tempos valem como ordem de grandeza: a assinatura leva
+99 s e a conferida contra ela 107 s, com as 115 partes idênticas, no lugar do script de hash de cada rodada; a janela da porta
+da cabine de perto, `--mirar=1000,1650,1130 --distancia=900 --vistas=direita,isometrica-traseira`, saiu em um comando de 7 min 14 s
+(a receita medida em Node, uns 100 s, mais a carga da página), sem recorte de captura de 3.200 px (4 a 15 min cada); o `--focar`
+na maçaneta da porta da cabine vista do lado oposto tinha a câmera a 0,018 do centro do furgão, dentro dele (a foto mostrava o
+forro da porta), e passa a ficar a 0,711 de fora, com o zoom em 2,2 (990 para 2.193 mm do alvo), 11 min contra 12 min com os dois
+em paralelo e outro agente na máquina; com a câmera já fora (banco do motorista) a câmera e a imagem não mudam. Não reproduzi o
+processo preso na porta: o servidor era fechado pelo `finally`, e o que entrou é a rede de segurança (sinal e encerramento
+forçado). Testes: `olhar-bancada.test.mjs` e `assinatura-da-malha.test.mjs`. Para a fatia 3: a medida de contatos executa a
+receita em Node a cada captura (uns 100 s no furgão, inclusive na mira) e deve ser pulada ou guardada, que é onde está a maior
+parte dos minutos da captura; para a fatia 4: o aviso de progresso do `descrever` e do `guarda:acervo`, que seguem dois minutos sem
+saída.
 
 ## Fechamento
 

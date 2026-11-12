@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1990 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1991 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -445,6 +445,7 @@
 - `CICLO-3.md` — Sedã em alta definição, ciclo 3: o andar de cima sobre o de baixo
 - `CICLO-4.md` — Sedã em alta definição, ciclo 4: a cabine sem contornos, e a frente e a traseira até o eixo
 - `CICLO-5.md` — Sedã em alta definição, ciclo 5: o carro inteiro
+- `RECEITA.md` — Sedã em alta definição: o carro em receitas
 
 ## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
 
@@ -2045,6 +2046,7 @@
 - `exportar-trecho.mjs` — exportar-trecho.mjs: grava em OBJ, em metro, as partes pedidas de um esboço ou de uma receita, para a vista de três quartos lado a lado deste ciclo. `npm run…
 - `frente-e-traseira.esboco.mjs` — frente-e-traseira.esboco.mjs: o quarto ciclo de alta definição do sedã, levado ao carro inteiro no quinto. No ciclo 5 cada gaiola por estações é a metade x >…
 - `relato-do-carro.mjs` — relato-do-carro.mjs: o relato de contatos no modo estrito sobre o carro montado pelas cinco receitas (`carro-pela-receita.mjs`), com os contatos que o esboço…
+- `tempo-das-etapas.mjs` — tempo-das-etapas.mjs: o tempo de montar cada etapa do sedã pela receita (só `executarReceita`, sem as medidas) e o do carro inteiro pelas cinco juntas, em se…
 
 ## procedural/pecas/sedan-chassi-e-lataria/alta-definicao/ciclo-1/
 
@@ -3116,7 +3118,6 @@
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `objeto.mjs` — objeto.mjs — o estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir.
 - `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.
-- `olhar-bancada-antes.tmp.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
