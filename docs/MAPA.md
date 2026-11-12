@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1948 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1958 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1872,6 +1872,46 @@
 ## procedural/pecas/geladeira-compacta-branca/referencias/
 
 - `alvo.md` — Alvo: geladeira compacta branca
+
+## procedural/pecas/instalacao-solar/partes/emenda/
+
+- `receita.js` — instalacao-solar/emenda — a peça que entra dentro de dois perfis para uni-los, com dois parafusos.
+
+## procedural/pecas/instalacao-solar/partes/grampo-intermediario/
+
+- `receita.js` — instalacao-solar/grampo-intermediario — o grampo em "ômega" que aperta as molduras de dois painéis vizinhos de 40 mm, com um parafuso.
+
+## procedural/pecas/instalacao-solar/partes/grampo-ponta-30/
+
+- `receita.js` — instalacao-solar/grampo-ponta-30 — o grampo em "Z" de ponta para moldura de 30 a 35 mm, com um parafuso.
+
+## procedural/pecas/instalacao-solar/partes/grampo-ponta-40/
+
+- `receita.js` — instalacao-solar/grampo-ponta-40 — o grampo em "Z" de ponta para moldura de 40 mm, com um parafuso.
+
+## procedural/pecas/instalacao-solar/partes/haste/
+
+- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, a arruela e as porcas.
+
+## procedural/pecas/instalacao-solar/partes/painel-30/
+
+- `receita.js` — instalacao-solar/painel-30 — o painel solar de 1722 por 1134 mm com moldura de alumínio de 30 mm de altura.
+
+## procedural/pecas/instalacao-solar/partes/painel-40/
+
+- `receita.js` — instalacao-solar/painel-40 — o painel solar de 1812 por 1046 mm com moldura de alumínio de 40 mm de altura.
+
+## procedural/pecas/instalacao-solar/partes/perfil/
+
+- `receita.js` — instalacao-solar/perfil — o trilho de alumínio extrudado de 1,35 m que leva os grampos dos painéis.
+
+## procedural/pecas/instalacao-solar/partes/suporte-l/
+
+- `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil.
+
+## procedural/pecas/instalacao-solar/referencias/
+
+- `kit.md` — Instalação solar: o alvo de forma das peças do kit
 
 ## procedural/pecas/jipe-aberto/
 
