@@ -22,7 +22,7 @@ encerrado vive em
 
 ## Estado atual
 
-- Planos ativos: [furgão realista](planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](planos/2026-11-09-costuras-e-furos-limpos.md), [ferramentas de conferência e de vista](planos/2026-11-09-ferramentas-de-conferencia-e-vista.md), [núcleo para qualquer mecanismo](planos/2026-11-10-nucleo-para-qualquer-mecanismo.md) e [instalação solar no telhado](planos/2026-11-12-instalacao-solar-no-telhado.md).
+- Planos ativos: [furgão realista](planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](planos/2026-11-09-costuras-e-furos-limpos.md), [núcleo para qualquer mecanismo](planos/2026-11-10-nucleo-para-qualquer-mecanismo.md) e [instalação solar no telhado](planos/2026-11-12-instalacao-solar-no-telhado.md).
 - Encerrados recentes: [abertura em qualquer direção](planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md), [limites do sólido por laços](planos/encerrados/2026-11-05-limites-do-solido-por-lacos.md), [esboço pelo núcleo](planos/encerrados/2026-11-05-esboco-pelo-nucleo.md) e [sólido por laços](planos/encerrados/2026-11-05-solido-por-lacos.md); os outros na [crônica](planos/encerrados/README.md).
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
