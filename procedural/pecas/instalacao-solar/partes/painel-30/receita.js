@@ -42,7 +42,7 @@ export const TABELA = {
   camadaDeCelulas: 0.4,
   folhaDeTras: 0.4,
   /* A CONFIRMAR: folga entre o vidro e as células e entre as células e a folha de trás. */
-  folgaEntreCamadas: 0.5,
+  folgaEntreCamadas: 3,
   /* A CONFIRMAR: a grade de células (6 × 18), a margem delas até a moldura e a fresta entre elas. */
   celulasEmX: 18,
   celulasEmZ: 6,
@@ -50,7 +50,7 @@ export const TABELA = {
   frestaEntreCelulas: 2,
   /* A CONFIRMAR: caixa de junção atrás (x, y e z), na altura da folha de trás, no meio do painel. */
   caixaX: 110,
-  caixaY: 22,
+  caixaY: 15,
   caixaZ: 65,
   /* A CONFIRMAR: dois cabos curtos que saem da caixa ao longo de +x: raio, comprimento e afastamento do meio em z. */
   raioDoCabo: 2.5,
@@ -189,7 +189,7 @@ const receita = {
       { nome: 'vidro', forma: 'placa de vidro de 3,2 mm, transparente, rente ao topo da moldura (y igual à altura da moldura), de parede a parede', tecnica: 'extrusão retangular em y' },
       { nome: 'celulas', forma: 'grade de 18 por 6 células azul-escuras de 0,4 mm sob o vidro, com folga clara acima e abaixo, separadas por fresta de 2 mm, as colunas estreitas ao longo do lado comprido', tecnica: 'um cubo por célula, posições da derivar' },
       { nome: 'fundo', forma: 'folha de trás clara de 0,4 mm sob as células, de parede a parede, assentada no degrau da moldura', tecnica: 'extrusão retangular em y' },
-      { nome: 'caixaJuncao', forma: 'caixa preta de 110 por 22 por 65 mm colada sob a folha de trás, no meio do painel, dentro do recesso da moldura', tecnica: 'cubo' },
+      { nome: 'caixaJuncao', forma: 'caixa preta de 110 por 15 por 65 mm colada sob a folha de trás, no meio do painel, dentro do recesso da moldura', tecnica: 'cubo' },
       { nome: 'caboA', forma: 'cabo preto curto, cilindro de 5 mm de diâmetro e 260 mm, saindo da caixa ao longo de +x, de um lado do meio', tecnica: 'cilindro de eixo x' },
       { nome: 'caboB', forma: 'segundo cabo preto curto, igual ao primeiro, do outro lado do meio da caixa', tecnica: 'cilindro de eixo x' },
     ],

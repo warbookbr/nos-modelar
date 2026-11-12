@@ -42,7 +42,7 @@ export const TABELA = {
   camadaDeCelulas: 0.4,
   folhaDeTras: 0.4,
   /* A CONFIRMAR: folga entre o vidro e as células e entre as células e a folha de trás. */
-  folgaEntreCamadas: 0.5,
+  folgaEntreCamadas: 3,
   /* A CONFIRMAR: a grade de células (6 × 20), a margem delas até a moldura e a fresta entre elas. */
   celulasEmX: 20,
   celulasEmZ: 6,
