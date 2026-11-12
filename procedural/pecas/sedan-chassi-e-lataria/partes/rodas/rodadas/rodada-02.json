@@ -1,0 +1,120 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/rodas",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência e a receita não refina um esboço aprovado",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Quatro rodas conferem com o que o plano prometeu e entre si, sem alvo para medir a forma; o talão do pneu, de banda reta sobre um aro sem aba, é só lido nas vistas, sem defeito apontado."
+  },
+  "partes": [
+    {
+      "nome": "pneuDianteiraDir",
+      "confere": true,
+      "observacao": "ombro em arco de 9 mm (ombroRedondo); promessa com diâmetro, banda e flanco"
+    },
+    {
+      "nome": "aroDianteiraDir",
+      "confere": true,
+      "observacao": "parede de 4,4 mm dita na promessa"
+    },
+    {
+      "nome": "cuboDianteiraDir",
+      "confere": true,
+      "observacao": "furo central de 60 mm no eixo, 5 furos de 16 mm; 12 faces finas tiradas"
+    },
+    {
+      "nome": "discoDianteiraDir",
+      "confere": true,
+      "observacao": "liso, 11,6 mm, sem ventilação"
+    },
+    {
+      "nome": "pneuTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "discoTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "A família corta os furos do cubo por subtrair e deixa 12 faces finas por cubo; a instância limpa com limparLascas, a família não foi mexida.",
+    "O pacote das rodas avisa que a vista montada superior mostra a peça em 0,0%."
+  ],
+  "notaDePassagem": "Furo central de 60 mm (diâmetro do eixo) e ombroRedondo na instância, família intocada. O contato cubo-eixo passou de folga de 8,65 mm a encosta, com a interseção carroceriaComRodas declarada na montagem (3 nm); a decisão de 2026-11-12 de declarar a folga está revista. Medidas das promessas vêm de derivar da família.",
+  "receita": {
+    "sha256": "sha256:62b4c01ae3acfaeded24363dd2874c985b07696179575cf9d96b8e4d93a40e26",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 0,
+      "linhas": [],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-12T20:35:26.795Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
