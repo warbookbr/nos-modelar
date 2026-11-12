@@ -350,10 +350,6 @@ export function criarOperacoesBooleanas(servicos) {
         : op === 'subtrair' ? 'a subtração não deixa nada da peça: o resultado é vazio e apagaria todas as faces das entradas'
           : 'a união saiu vazia');
     }
-    /* O subtrair (ou o intersectar) que não muda o sólido: o volume do resultado é o da peça (o primeiro sólido), a menos do erro de Float32. A ferramenta
-       não toca a peça, ou está inteira fora dela (no intersectar, a peça está inteira dentro das outras). O passo segue, e o aviso `semEfeito` diz qual. */
-    const volumeDaPeca = manifolds[0].volume();
-    const semEfeito = !extra && (op === 'subtrair' || op === 'intersectar') && Math.abs(volumeDaPeca - resultado.volume()) <= 1e-6 * Math.max(volumeDaPeca, 1e-30);
     const malha = resultado.getMesh();
     resultado.delete();
     const nP = malha.numProp, VP = malha.vertProperties, TV = malha.triVerts;
@@ -653,6 +649,26 @@ export function criarOperacoesBooleanas(servicos) {
       outros.delete(); comum.delete();
       if (Math.abs(vk - vc) > 1e-6 * Math.max(vk, 1e-30)) sumico = `o sólido ${k} não está contido nos outros e mesmo assim não deixou face nenhuma na união`;
     }
+    /* O subtrair (ou o intersectar) que não muda o sólido, pela topologia: nenhuma face da peça (sólido 0) foi cortada nem consumida e nenhum pedaço novo entrou (no
+       subtrair, por ferramenta: a que não deixou face nenhuma no resultado não tocou a peça). Não depende do volume, que se perderia num corte pequeno e real. Aqui
+       só se mede, com as Manifolds ainda vivas, se a ferramenta que não deixou face tem volume em comum com a peça (o corte que some na grade); o veredito vem depois
+       de classificadas as faces. */
+    const semVolumeComAPeca = new Map();   // ferramenta -> true se a caixa dela não se sobrepõe à da peça (longe ou só encostando); false se se sobrepõe e ela não deixou face
+    if (!extra && op === 'subtrair') {
+      /* a caixa em double, dos cantos originais: a da Manifold já passou pela grade e um corte mais fino que ela viria de espessura zero */
+      const caixaDe = (k) => {
+        const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+        for (const fid of operandos[k]) for (const v of st.F.get(fid).vs) { const p = st.V.get(v); for (let c = 0; c < 3; c++) { lo[c] = Math.min(lo[c], p[c]); hi[c] = Math.max(hi[c], p[c]); } }
+        return { lo, hi };
+      };
+      const caixa0 = caixaDe(0);
+      for (let k = 1; k < operandos.length; k++) {
+        const caixa = caixaDe(k);
+        if ([0, 1, 2].some((c) => Math.min(caixa0.hi[c], caixa.hi[c]) - Math.max(caixa0.lo[c], caixa.lo[c]) <= 1e-12 * Math.max(meiaCaixa, 1e-9))) { semVolumeComAPeca.set(k, true); continue; }
+        if (temFace[k]) continue;
+        semVolumeComAPeca.set(k, false);
+      }
+    }
     liberar();
     if (sumico) return grita(st, i, op, 'solidos', `${sumico}; erro numérico da Manifold, nada foi alterado`);
 
@@ -931,6 +947,17 @@ export function criarOperacoesBooleanas(servicos) {
       if (lasca.length) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${lasca.length} face(s) com triângulo sem área (lasca que cintila na tela), a primeira vinda da face ${lasca[0][0]}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
     }
 
+    const semEfeitos = [];
+    if (!extra && (op === 'subtrair' || op === 'intersectar')) {
+      const mantidasSet = new Set(mantidas);
+      const pecaIntacta = operandos[0].every((fid) => mantidasSet.has(fid) || (degeneradas.includes(fid) && !consumidas.includes(fid)));
+      if (op === 'intersectar') { if (pecaIntacta) semEfeitos.push({ ferramenta: null, naGrade: false }); }
+      else {
+        for (const [k, semVolume] of semVolumeComAPeca) {
+          if (semVolume || (pecaIntacta && !temFace[k])) semEfeitos.push({ ferramenta: operandos.length > 2 ? k : null, naGrade: !semVolume });
+        }
+      }
+    }
     /* ---- CANTOS COINCIDENTES DE OPERANDOS DIFERENTES ----
        Dois cantos que coincidem (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do outro) entram na Manifold como
        um só, o representante, e os pedaços cortados saem com ele. A face que o passo mantém inteira continua com o id que escreveu a entrada, e se um vizinho
@@ -1078,10 +1105,12 @@ export function criarOperacoesBooleanas(servicos) {
       return vs.some((v, k) => { const w = vs[(k + 1) % vs.length]; return costuraFinal.has(v < w ? `${v}-${w}` : `${w}-${v}`); });
     });
     if (extra?.aoAplicar) extra.aoAplicar({ pedacosDeEntrada, consumidas: [...consumidas] });
-    if (semEfeito) {
-      st.avisos.push({ passo: i, op, ref: 'semEfeito', origemId, motivo: op === 'subtrair'
-        ? 'a subtração não muda o sólido: o volume do resultado é o da peça (sólido 0), então a ferramenta não a toca (ou só encosta nela); confira a posição e o tamanho da ferramenta'
-        : 'a interseção não muda o sólido: o volume do resultado é o da peça (sólido 0), então ela está inteira dentro dos outros; confira a posição e o tamanho dos sólidos' });
+    for (const e of semEfeitos) {
+      const quem = e.ferramenta == null ? 'o sólido 0' : `a ferramenta ${e.ferramenta}`;
+      st.avisos.push({ passo: i, op, ref: 'semEfeito', origemId, ...(e.ferramenta == null ? {} : { ferramenta: e.ferramenta }), motivo: e.naGrade
+        ? `${op === 'subtrair' ? `a subtração com ${quem}` : 'a interseção'} não mudou nenhuma face da peça: as caixas dos sólidos se sobrepõem, mas o corte some na precisão da grade da Manifold (2^-20 do tamanho da caixa dos operandos), ou a ferramenta passa pela peça sem cruzá-la; aumente a ferramenta ou confira a posição`
+        : op === 'subtrair' ? `${quem} não toca a peça ou só encosta nela: nenhuma face da peça foi cortada nem consumida e nenhum pedaço novo entrou; confira a posição e o tamanho da ferramenta`
+          : 'a interseção não mudou nenhuma face da peça (sólido 0): ela está inteira dentro dos outros; confira a posição e o tamanho dos sólidos' });
     }
     registraOrigem(st, i, op, origemId, {
       faces: (extra ? facesAux : faces).sort((x, y) => x - y),
