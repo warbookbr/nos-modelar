@@ -1,4 +1,4 @@
-/* vizinhanca-de-todo-vao.test.ts — bateria do plano `docs/modelar/planos/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: o vão cuja
+/* vizinhanca-de-todo-vao.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: o vão cuja
    vizinhança alcança o tubo de parede de outro vão recorta, e sai igual ao que a booleana da chapa inteira dá.
      - cada uma das três peças de `vizinhanca-de-todo-vao.js` (o vão grande, o vão junto de outro e o vão rente à parede de outro) recorta
        uma fração pequena da chapa, e a malha sai fechada, com a borda a menos de 0,5 mm do desenho;

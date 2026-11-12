@@ -85,16 +85,15 @@ export function derivarMacanetas(T, f) {
   /* as bordas das portas que abrem: a traseira da porta da cabine e a frente da de correr, no meio da fresta e a meia fresta para dentro da chapa da porta */
   const zTrasCabine = T.porta_cabine_tras_z - meiaFresta;
   const zFrenteCorrer = T.porta_cabine_tras_z - T.coluna_do_meio + meiaFresta;
-  const xs = f.xs(yc);
   const zs = f.zTras + T.traseira_recuo;
   const lista = [
-    { id: 0, nome: 'CabineEsquerda', tipo: 'lateral', s: 1, c: zTrasCabine + T.macaneta_borda_porta + placaA / 2 },
-    { id: 1, nome: 'CabineDireita', tipo: 'lateral', s: -1, c: zTrasCabine + T.macaneta_borda_porta + placaA / 2 },
+    { id: 0, nome: 'CabineEsquerda', tipo: 'lateral', s: 1, c: zTrasCabine + T.macaneta_cabine_borda_porta + placaA / 2, yc: T.macaneta_cabine_y },
+    { id: 1, nome: 'CabineDireita', tipo: 'lateral', s: -1, c: zTrasCabine + T.macaneta_cabine_borda_porta + placaA / 2, yc: T.macaneta_cabine_y },
     { id: 2, nome: 'Correr', tipo: 'lateral', s: -1, c: zFrenteCorrer - T.macaneta_borda_porta - placaA / 2 },
     { id: 3, nome: 'TraseiraEsquerda', tipo: 'traseira', s: 1, c: meiaFresta + T.macaneta_borda_porta + placaB / 2 },
     { id: 4, nome: 'TraseiraDireita', tipo: 'traseira', s: -1, c: -(meiaFresta + T.macaneta_borda_porta + placaB / 2) },
   ];
-  return lista.map((h) => ({ ...h, yc, xs, zs, U, placaA, placaB, alturaDaAlca: T.macaneta_alca_altura, alcaFora: N, placaAltura: T.macaneta_placa_altura, embutir: e }));
+  return lista.map((h) => ({ ...h, yc: h.yc ?? yc, xs: f.xs(h.yc ?? yc), zs, U, placaA, placaB, alturaDaAlca: T.macaneta_alca_altura, alcaFora: N, placaAltura: T.macaneta_placa_altura, embutir: e }));
 }
 
 /** A ponteira: o tubo reto sob o para-choque traseiro, do lado esquerdo (+x), em milímetro. */

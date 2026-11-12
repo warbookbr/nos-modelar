@@ -40,10 +40,19 @@ const SEGUNDOS_POR_ALVO = 2;
    Em 2026-11-09 a janela da cabine em dois vidros trouxe quatro vãos grandes, e nenhum recorta (a banda liga vértices a 690 mm
    nos dois maiores, e a borda sai com quatro voltas nos dois que encostam no vão vizinho); com os quatro da lanterna, oito vãos
    vão à booleana da chapa inteira, 140 dos 207 s de uma execução local, e o furgão foi a 506 s no CI. O teto vai a 860 s e o
-   prazo a 1.000 s até o plano `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` fazer os oito recortarem. Com ele, os 19 vãos
+   prazo a 1.000 s até o plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` fazer os oito recortarem. Com ele, os 19 vãos
    recortam, e uma execução local caiu de 207 s para 77 s; pela mesma razão da máquina local para o CI (207 s para 506 s nas
-   duas execuções), o furgão fica em cerca de 190 s no CI, e o teto volta a 320 s, 1,7 vez isso, com o prazo do teste em 600 s. */
-const PECAS_PESADAS = { 'furgao-realista': 320 };
+   duas execuções), o furgão ficaria em cerca de 190 s no CI. Medido no CI em 2026-11-12, levou 104 s numa execução da bateria e
+   188 s na seguinte, com a receita igual (a execução local foi de 83 s nas duas): a máquina do CI varia quase o dobro de uma
+   execução para outra, e o teto é 1,7 vez a maior medida, 320 s, com o prazo do teste em 600 s. 
+   TETO PELA RAZÃO, DESDE 2026-11-12. O teto em segundos reprovava ao acaso: no mesmo dia, com a receita igual, o furgão levou
+   no CI 119, 139, 154 e 184 s por execução, e a última passou dos 320 s das duas. Nessas quatro rodadas a soma das outras
+   peças, medida na mesma máquina e na mesma rodada, foi de 13,8, 15,3, 18,1 e 20,2 s, e a razão entre o furgão e essa soma
+   ficou em 8,7, 9,1, 8,5 e 9,1. O teto da peça pesada passa a ser essa razão, 15, cerca de 1,7 vez a medida, e a máquina
+   lenta deixa de reprovar; o prazo do teste, 900 s, é o que resta de teto absoluto. A regressão da peça continua aparecendo,
+   porque quem a deixa mais lenta não deixa as outras. Quando a receita da peça mudar de custo de propósito, a razão é medida
+   de novo no CI e anotada aqui. */
+const PECAS_PESADAS = { 'furgao-realista': 15 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
@@ -70,8 +79,11 @@ describe('acervo real, inteiro', () => {
     expect(declarados).toBeGreaterThan(0);
     const comuns = custos.filter(([alvo]) => !(alvo in PECAS_PESADAS));
     expect(comuns.reduce((soma, [, s]) => soma + s, 0)).toBeLessThan(SEGUNDOS_POR_ALVO * comuns.length);
+    const somaDosComuns = comuns.reduce((soma, [, s]) => soma + s, 0);
     for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
-      expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
+      const razao = s / somaDosComuns;
+      console.log(`${alvo}: ${s.toFixed(0)} s nas duas execuções, ${razao.toFixed(1)} vez(es) a soma das outras peças (${somaDosComuns.toFixed(0)} s); teto ${PECAS_PESADAS[alvo]}`);
+      expect(razao, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, ${razao.toFixed(1)} vez(es) a soma das outras peças na mesma máquina (${somaDosComuns.toFixed(0)} s), acima da razão de ${PECAS_PESADAS[alvo]}`).toBeLessThan(PECAS_PESADAS[alvo]);
     }
-  }, 600_000);
+  }, 900_000);
 });
