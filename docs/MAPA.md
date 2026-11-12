@@ -540,7 +540,6 @@
 
 ## docs/modelar/planos/
 
-- `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
@@ -655,6 +654,7 @@
 - `2026-09-22-o-teste-carrega-o-que-ele-prova.md` — O teste carrega o que ele prova
 - `2026-09-23-o-laco-constroi-parte-por-parte.md` — O laço constrói parte por parte
 - `2026-09-25-o-braco-inteiro.md` — O braço inteiro
+- `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `2026-09-28-uniao-de-solidos.md` — União de sólidos — dois sólidos viram uma peça só
 - `2026-09-29-o-esboco-sem-conta-a-mao.md` — O esboço sem conta à mão
 - `2026-10-01-o-esboco-detalhado-coerente.md` — O esboço detalhado coerente

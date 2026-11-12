@@ -10,7 +10,7 @@ crítica por imagem, com um resumo curto do que olhar.
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-09.
 
 Em 2026-11-09 a pessoa passou a este plano `etapas-da-montagem.mjs`, que era do plano do
-[braço](2026-09-26-as-partes-do-braco.md), para o registro de etapas parar de se regravar; ele volta ao braço quando este
+[braço](encerrados/2026-09-26-as-partes-do-braco.md), para o registro de etapas parar de se regravar; ele volta ao braço quando este
 fechar. A câmera por ponto e o nome curto da captura saem do rascunho da [ferramenta de material](2026-11-08-ferramenta-de-material.md).
 
 ## Problema observado
