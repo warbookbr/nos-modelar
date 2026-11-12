@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1944 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1948 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -815,10 +815,13 @@
 - `gerar-gltf.js` — gerar-gltf.js — monta o JSON e o BIN do glTF 2.0 a partir da malha neutra e do catálogo de materiais da receita. Sem Three.js, sem disco, sem relógio nem aca…
 - `glb.js` — glb.js — o contêiner glTF binário (.glb): cabeçalho de 12 bytes, o pedaço JSON (preenchido com espaços até múltiplo de 4) e o pedaço BIN (preenchido com zero…
 - `index.js` — index.js — porta pública do exportador glTF 2.0 binário (.glb) da malha neutra.
+- `montagem.js` — montagem.js — junta as instâncias posicionadas de uma montagem num glTF só: um nó por instância, com o nome dela, a malha da peça no referencial da própria p…
 
 ## modulos/exportador-gltf/tests/
 
+- `caixas.js` — caixas.js — a conferência do glTF de montagem: a caixa de cada nó lida do ARQUIVO (bytes, com a matriz do nó aplicada) e a da mesma instância posicionada pel…
 - `exportador-gltf.test.js` — exportador-gltf.test.js — estrutura do glTF, extensões, TEXCOORD só com relevo, determinismo, unidade e o validador oficial.
+- `montagem.test.js` — montagem.test.js — o glTF de uma montagem pequena, de fixture: três instâncias (a peça de prova duas vezes, uma delas girada 90° em y e deslocada, e a peça d…
 
 ## modulos/exportador-obj/
 
@@ -2966,7 +2969,8 @@
 - `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": o registro de etapas, a junta medida quando a parte entra e a recusa de seguir com…
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exemplo-canonico.test.mjs` — exemplo-canonico.test.mjs — o exemplo de receita que a documentação ensina precisa passar pelo mesmo caminho que o acervo.
-- `exportar-gltf.mjs` — exportar-gltf.mjs — CLI que grava uma receita procedural como glTF 2.0 binário (.glb), com os materiais dela. Uso: npm run exportar:gltf -- <peça> [--saida <…
+- `exportar-gltf-braco.test.mjs` — exportar-gltf-braco.test.mjs — LENTO (está em `TESTES_LENTOS`: resolve o braço inteiro, uns 15 s). Plano as partes do braço, fatia 2, gate 4: o braço montado…
+- `exportar-gltf.mjs` — exportar-gltf.mjs — CLI que grava uma receita procedural como glTF 2.0 binário (.glb), com os materiais dela. Uso: npm run exportar:gltf -- <peça ou montagem…
 - `exportar-obj.mjs` — exportar-obj.mjs — CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj).
 - `exportar-obj.test.mjs` — exportar-obj.test.mjs — suíte de testes da CLI de exportação OBJ.
 - `exportar-peca.mjs` — exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto só lê.
