@@ -33,7 +33,7 @@ export const TABELA = {
 
 export const MATERIAIS = {
   aluminio: { cor: '#b9bec4', metalicidade: 0.85, aspereza: 0.35 },
-  inox: { cor: '#9ea3a8', metalicidade: 0.95, aspereza: 0.25 },
+  inox: { cor: '#cfd3d7', metalicidade: 0.55, aspereza: 0.35 },
 };
 
 const m = (mm) => mm / 1000;
