@@ -128,23 +128,23 @@ describe('o pacote do crítico de peça de lataria', () => {
     expect(JSON.parse(readFileSync(join(pasta, MANIFESTO_DO_PACOTE), 'utf8'))).toMatchObject({ peca: NAO_LATARIA, lataria: null, superficie: null });
   }, 60_000);
 
-  it('recusa a luz rasante quase toda escura, dizendo a imagem, a fração medida e o limiar, e não escreve o pedido', async () => {
+  it('a luz rasante quase toda escura não derruba o pacote: a imagem que a luz mais alta não salva sai do pedido, e sem nenhuma que passe ele é recusado', async () => {
     /* a vista de três quartos da carenagem de prova, com a luz de 30 graus, saía com 0,5 % da peça iluminada */
     const base = mkdtempSync(join(area, 'escura-'));
     const pasta = join(base, 'rodada');
     const superficie = superficieFalsa({ iluminada: (vista, azimute) => (vista === 'lado' && azimute === 30 ? 0.005 : 0.6) });
-    const gerar = () => vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar },
+    const tentadas = [];
+    const luzMaisAlta = async ({ vista, azimutes, graus }) => { tentadas.push(`${vista}@${graus}`); return azimutes.map((azimute) => ({ azimute, arquivo: 'x.png', iluminada: 0.01 })); };
+    const resultado = await vistasParaCritica(PECA, {
+      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar, luzMaisAlta },
     });
-    await expect(gerar()).rejects.toThrow(`a luz rasante de '${PECA}' saiu quase toda escura em uma imagem, e o pacote do crítico não leva imagem de superfície `
-      + `em que a luz não alcança a peça: ${join(pasta, 'superficie', 'peca-lado-rasante-az30.png')} (vista lado, luz a 30 graus) tem 0,5 % da peça iluminada, `
-      + 'abaixo do limiar de 25,0 %.');
-    expect(existsSync(join(pasta, 'pedido.md'))).toBe(false);
-    expect(existsSync(join(pasta, MANIFESTO_DO_PACOTE))).toBe(false);
-    /* a imagem sem a medida também não passa: o limiar não se confere sem ela */
+    expect(tentadas).toEqual(['lado@20', 'lado@30', 'lado@45']);
+    expect(resultado.superficie.rasante.map((i) => `${i.vista}-${i.azimute}`)).toEqual(['frente-30', 'frente-120', 'lado-120']);
+    expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain('Sem imagem: a vista lado ficou sem a luz rasante a 30 graus de azimute');
+    /* a imagem sem a medida também não passa: o limiar não se confere sem ela, e sem nenhuma imagem que passe o pacote é recusado */
     const semMedida = superficieFalsa({ iluminada: () => null });
     await expect(vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/b', vistasDeSuperficie: semMedida.gerar },
+      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/b', vistasDeSuperficie: semMedida.gerar, luzMaisAlta },
     })).rejects.toThrow(/saiu quase toda escura em 4 imagens.*peca-frente-rasante-az30\.png \(vista frente, luz a 30 graus\) não traz a fração iluminada medida, e o limiar é de 25,0 %/);
     expect(LIMIAR_DA_LUZ_RASANTE).toBe(0.25);
   }, 60_000);
@@ -364,6 +364,21 @@ print(json.dumps({'H': float(H[c]), 'fora': fora, 'dentro': dentro, 'croma_fora'
 });
 
 /* ---------- a dispensa de PLANO.lataria ---------- */
+
+describe('a quina por colunas de apoio na faixa dos vincos', () => {
+  it('o vinco de nitidez 0 entra só com comQuinasPorApoio, e sem a opção a lista é a de sempre', async () => {
+    const { executarReceita } = await import('../../src/autoria/executar-receita.js');
+    const { receitaDaDobra } = await import('./fixtures/dobra-por-apoio.mjs');
+    const { vincosDaMalha } = await import('../../src/autoria/vincos-da-malha.js');
+    const executada = executarReceita(receitaDaDobra({ angulo: 90, apoio: 6, vizinho: 40 }));
+    expect(vincosDaMalha(null, executada)).toEqual([]);
+    const quinas = vincosDaMalha(null, executada, { comQuinasPorApoio: true });
+    expect(quinas.map((v) => [v.nome, v.viva])).toEqual([['quina', false]]);
+    /* a faixa entre as duas colunas de apoio, nas 8 estações da chapa, a 6 mm da quina de cada lado e em todos os níveis do refino */
+    expect(quinas[0].segmentos.length).toBeGreaterThan(30);
+    for (const [p, q] of quinas[0].segmentos) for (const v of [p, q]) expect(Math.hypot(v[0], v[1]) * 1000).toBeLessThan(7);
+  });
+});
 
 describe('a dispensa de PLANO.lataria', () => {
   const MOTIVO = 'é um estofado de espuma, e não chapa de lataria';

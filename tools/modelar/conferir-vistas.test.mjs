@@ -299,6 +299,59 @@ describe('conferir vistas', () => {
     expect(ruim.codigo).toBe(2); expect(ruim.stderr).toContain('--rodadas-de: a pasta');
   });
 
+  it('a vista só de contornos dá a sobra e a falta, deixa a parte fora da conta de fora da silhueta e conta a fenda à parte', async () => {
+    /* quatro painéis em moldura com uma junta de 4 mm por 100 entre eles, e um fundo atrás que a referência não tem */
+    const quadro = join(pasta, 'junta.esboco.json');
+    writeFileSync(quadro, JSON.stringify({ opcoes: [{ titulo: 'junta', formas: [
+      { id: 'esq', op: 'cubo', args: { larg: 98, alt: 100, prof: 20 }, centro: [-51, 0, 0] },
+      { id: 'dir', op: 'cubo', args: { larg: 98, alt: 100, prof: 20 }, centro: [51, 0, 0] },
+      { id: 'tampaCima', op: 'cubo', args: { larg: 200, alt: 10, prof: 20 }, centro: [0, 55, 0] },
+      { id: 'tampaBaixo', op: 'cubo', args: { larg: 200, alt: 10, prof: 20 }, centro: [0, -55, 0] },
+      { id: 'fundo', op: 'cubo', args: { larg: 200, alt: 120, prof: 20 }, centro: [0, 0, -60] }] }] }));
+    writeFileSync(join(pasta, 'junta.contornos.json'), JSON.stringify({ formato: 'mecanifica.contornos@1', mmPorPx: 1, regioes: { tudo: { pedacos: [{ contornoMm: [[-100, -60], [100, -60], [100, 60], [-100, 60]] }] } } }));
+    const vista = { contornos: 'junta.contornos.json', escala: 1, ancora: { contorno: [0, 0], modelo: [0, 0, 0] }, partes: { tudo: ['esq', 'dir', 'tampaCima', 'tampaBaixo'] } };
+    const partes = { esq: 'laranja', dir: 'laranja', tampaCima: 'laranja', tampaBaixo: 'laranja', fundo: 'cinza' };
+    const medir = async (nome, extra) => {
+      const cfg = config(`${nome}.json`, { ...CONFIG, partes, dentro: {}, largura: 400, vistas: { frontal: { ...vista, ...extra } } });
+      const r = await executar([quadro, `--config=${cfg}`, `--saida=${join(pasta, nome)}`, '--sem-captura']);
+      return { r, v: r.codigo === 0 ? JSON.parse(readFileSync(join(pasta, nome, 'resumo.json'), 'utf8')).vistas.frontal : null };
+    };
+    /* com o fundo na conta, ele tapa a junta: nenhuma fenda, e nada sobra nem falta */
+    const com = await medir('junta-com', {});
+    expect(com.r.stderr).toBe(''); expect(com.r.codigo).toBe(0);
+    expect(com.v.conjunto.fendas.estreitas).toEqual([]);
+    expect(com.v.conjunto.sobraMm2).toBeLessThan(30); expect(com.v.conjunto.faltaMm2).toBeLessThan(30);
+    /* fora da conta, a junta aparece como furo: uma fenda de 4 mm por 100 no meio, e a falta de 400 mm² */
+    const fora = await medir('junta-fora', { foraDaConta: [{ partes: ['fundo'], motivo: 'o chassi não está na referência' }] });
+    expect(fora.r.stderr).toBe(''); expect(fora.r.codigo).toBe(0);
+    const c = fora.v.conjunto; const mm = fora.v.mmPorPx;
+    expect(c.fendas.estreitas).toHaveLength(1);
+    expect(c.fendas.estreitas[0].larguraMm).toBeGreaterThan(4 - 1.5 * mm); expect(c.fendas.estreitas[0].larguraMm).toBeLessThan(4 + 1.5 * mm);
+    expect(Math.abs(c.fendas.estreitas[0].comprimentoMm - 100)).toBeLessThanOrEqual(2 * mm);
+    expect(Math.abs(c.fendas.estreitas[0].em.x)).toBeLessThanOrEqual(2 * mm); expect(Math.abs(c.fendas.estreitas[0].em.y)).toBeLessThanOrEqual(2 * mm);
+    expect(Math.abs(c.faltaMm2 - 400)).toBeLessThan(80); expect(c.sobraMm2).toBeLessThan(30);
+    expect(Math.abs(c.faltaDaReferencia - 400 / 24000)).toBeLessThan(0.004);
+    /* o afastamento mede só o contorno de fora: o furo de 4 mm não conta, e o contorno de fora casa com a referência */
+    expect(c.afastamento.maior.mm).toBeLessThanOrEqual(2 * mm);
+    expect(fora.v.foraDaConta).toEqual([{ partes: ['fundo'], motivo: 'o chassi não está na referência' }]);
+    const md = readFileSync(join(pasta, 'junta-fora', 'resumo.md'), 'utf8');
+    expect(md).toContain('Fora da conta, sem entrar na silhueta do modelo: fundo (o chassi não está na referência).');
+    expect(md).toMatch(/sobra \d+ mm² \(\d+\.\d% da área da referência\) e falta \d+ mm² \(\d+\.\d% da área da referência\)/);
+    expect(md).toContain('1 fenda(s) de até 20 mm na silhueta do modelo, por onde se vê o outro lado');
+    expect(fora.r.stdout).toMatch(/sobra \d+\.\d% e falta \d+\.\d% da referência, 1 fenda\(s\)/);
+    /* as recusas */
+    for (const [nome, extra, trecho] of [
+      ['rf-parte', { foraDaConta: [{ partes: ['nada'], motivo: 'x' }] }, 'vistas.frontal.foraDaConta: a parte "nada" não existe na opção'],
+      ['rf-motivo', { foraDaConta: [{ partes: ['fundo'] }] }, 'vistas.frontal.foraDaConta[0].motivo'],
+      ['rf-forma', { foraDaConta: 'fundo' }, 'vistas.frontal.foraDaConta: espera uma lista'],
+      ['rf-dentro', { foraDaConta: [{ partes: ['esq'], motivo: 'x' }] }, 'a parte "esq" está em "partes" e fora da conta'],
+      ['rf-fenda', { fendaMm: 0 }, 'vistas.frontal.fendaMm'],
+    ]) {
+      const x = await medir(nome, extra);
+      expect(x.r.codigo, nome).toBe(2); expect(x.r.stderr, nome).toContain(trecho);
+    }
+  });
+
   it('a vista só de contornos mede a sobreposição, a caixa por lado e o maior afastamento por parte, sem casamento nem crítico', async () => {
     /* o arquivo de contornos na metade da escala do modelo: "a" é o cubo esq inteiro, "b" passa 20 mm do dir para a direita, e a
        sombra embaixo fica fora do conjunto */

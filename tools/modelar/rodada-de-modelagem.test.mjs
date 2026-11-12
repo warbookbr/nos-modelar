@@ -410,6 +410,8 @@ describe('a impressão da forma e os afastamentos declarados', () => {
 
 describe('o alvo do veredito fica no repositório', async () => {
   const { alvoDoRepositorio } = await import('./rodada-de-modelagem.mjs');
+  const { mkdtempSync, writeFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
   const raiz = '/repo';
   it('passa texto que não é caminho e torna relativo o caminho absoluto, inclusive o de pasta de trabalho de agente', () => {
     expect(alvoDoRepositorio('sem alvo: o plano não cita imagem', raiz)).toBe('sem alvo: o plano não cita imagem');
@@ -417,6 +419,12 @@ describe('o alvo do veredito fica no repositório', async () => {
   it('recusa o alvo em pasta que o CI não tem', () => {
     expect(() => alvoDoRepositorio('/repo/tools/bancadas/out/critica-x/vista.png', raiz)).toThrow(/não é um arquivo do repositório/);
     expect(() => alvoDoRepositorio('/fora/imagem.png', raiz)).toThrow(/não é um arquivo do repositório/);
+    /* em 2026-11-11 um crítico escreveu "sem referência; comparado com o pedido.md de .../tools/bancadas/out/...": o texto passou, e o CI reprovou o link */
+    expect(() => alvoDoRepositorio(`sem referência; comparado com o pedido de /repo/${['tools', 'bancadas', 'out'].join('/')}/critica-x/pedido.txt`, raiz)).toThrow(/pasta que o CI não tem/);
+    /* a imagem que existe fora do repositório é a referência externa, e só o nome dela é gravado */
+    const fora = mkdtempSync(`${tmpdir()}/alvo-externo-`);
+    writeFileSync(`${fora}/lado.png`, 'x');
+    expect(alvoDoRepositorio(`${fora}/lado.png`, raiz)).toBe('referência externa, fora do repositório: lado.png');
   });
 });
 
@@ -503,5 +511,114 @@ describe('a contradição e a repetição entre rodadas', () => {
       rodada(2, [defeito('base', 'uniao', 'afastado', 'borda de baixo da base'), defeito('pino', 'comprimento', 'menor', 'raiz junto ao furo')]),
     ])).toEqual([]);
     expect(resumoDoLaco('obj/peca', { rodadas: [], decisao: { acao: 'modelar', motivo: 'x', medicao: null } })).not.toContain('contradições');
+  });
+});
+
+/* AS FACES FINAS NA MEDIÇÃO. A caçamba do carrinho de mão teve 70 faces finas e `--acao` dizia que a medição passou; o crítico só
+   suspeitou, por uma mancha no mapa de curvatura. A contagem vira aviso, e reprova quando cresce ou quando a peça de lataria é nova. */
+describe('a medição conta as faces finas da malha', () => {
+  const fina = 'tools/fixtures/faces-finas/fina/receita.js';
+  const latariaFina = 'tools/fixtures/faces-finas/fina-de-lataria/receita.js';
+  const limpa = 'tools/fixtures/faces-finas/sem-fina/receita.js';
+  const rodadaCom = (total) => ({ numero: 1, facesFinas: { total, porParte: { chapa: total } } });
+
+  it('avisa quantas, em que parte e o comando para listá-las, sem reprovar a peça que já as tinha', async () => {
+    const medicao = await medirReceita(fina, { rodadas: [rodadaCom(4)] });
+    expect(medicao.passou).toBe(true);
+    expect(medicao.facesFinas).toEqual({ total: 4, porParte: { chapa: 4 } });
+    expect(medicao.avisos.join('\n')).toMatch(/4 face\(s\) fina\(s\) na malha \(chapa: 4\); liste-as com `npm run -s malha:lascas -- tools\/fixtures\/faces-finas\/fina\/receita\.js`/);
+    expect(medicao.relatorio).toBe('descrever (veredito), guarda:acervo, guarda:referencial: ok');
+    const resumo = resumoDoLaco(fina, { rodadas: [], decisao: { acao: 'revisar', motivo: 'x', medicao } });
+    expect(resumo).toContain('aviso: 4 face(s) fina(s) na malha (chapa: 4)');
+  });
+
+  it('a peça sem face fina não tem aviso nem contagem a gravar além de zero', async () => {
+    const medicao = await medirReceita(limpa, { rodadas: [] });
+    expect(medicao.passou).toBe(true);
+    expect(medicao.facesFinas.total).toBe(0);
+    expect(medicao.avisos).toEqual([]);
+  });
+
+  it('reprova quando a contagem cresce em relação à última rodada da peça', async () => {
+    const cresceu = await medirReceita(fina, { rodadas: [rodadaCom(2)] });
+    expect(cresceu.passou).toBe(false);
+    expect(cresceu.relatorio).toMatch(/faces finas cresceram: 4 agora contra 2 na última rodada \(chapa: 4\)/);
+    expect((await medirReceita(fina, { rodadas: [rodadaCom(9)] })).passou).toBe(true);
+  });
+
+  it('reprova a peça nova que declara chapa de lataria, e só ela', async () => {
+    const nova = await medirReceita(latariaFina, { rodadas: [] });
+    expect(nova.passou).toBe(false);
+    expect(nova.relatorio).toMatch(/peça nova de chapa de lataria com 4 face\(s\) fina\(s\)/);
+    expect((await medirReceita(fina, { rodadas: [] })).passou).toBe(true);
+    expect((await medirReceita(latariaFina, { rodadas: [rodadaCom(4)] })).passou).toBe(true);
+  });
+
+  it('a rodada gravada guarda a contagem, e a que não a tinha segue sem ela', async () => {
+    const pasta = join(area, PECA_DAS_FACES);
+    const { rodada } = await registrarMedida(PECA_DAS_FACES, { partes: CONFERIDAS }, { pasta, medir: () => medirReceita(fina, { rodadas: [] }) });
+    expect(rodada.facesFinas).toEqual({ total: 4, porParte: { chapa: 4 } });
+    expect(ler(PECA_DAS_FACES)[0].facesFinas.total).toBe(4);
+    const { rodada: antiga } = gravarRodada('peca-antiga', { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' } }, { pasta: join(area, 'peca-antiga') });
+    expect(antiga).not.toHaveProperty('facesFinas');
+  });
+});
+const PECA_DAS_FACES = 'peca-das-faces';
+
+/* TEXTO DE PLANO MUDOU, FORMA NÃO. O chassi do carrinho trocou só o `PLANO.lataria` por uma dispensa, com a malha idêntica, e a ação
+   passou de `parar-fechou` a `revisar`. Só o que o pedido do crítico lê (objeto, partes, critérios, referências) pede novo julgamento. */
+describe('a ação mantém o julgamento quando só o texto da receita mudou', () => {
+  const SUPORTE = resolve('tools/fixtures/refina-forma-global/suporte.js');
+  const PECA = 'peca-de-ensaio';
+  const receita = (corpo = '') => `import { receitaDoSuporte } from '${SUPORTE}';\nconst r = receitaDoSuporte();\n${corpo}\nexport default r;\n`;
+  const DISPENSA = "r.PLANO.lataria = { dispensa: 'a peça é suporte de chapa grossa, sem superfície livre a conferir com a luz rasante' };";
+  const gravarNaArea = (nome, texto) => { const arquivo = join(area, `${nome}.js`); writeFileSync(arquivo, texto); return arquivo; };
+
+  async function julgadaCom(texto) {
+    const pasta = join(area, PECA);
+    gravarRodada(PECA, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(0, 9) }, { pasta, receitaTexto: texto });
+    return pasta;
+  }
+  const medirTexto = (caminho, texto) => async () => ({
+    passou: true, sha256: `sha256:${'a'.repeat(64)}`, caminho, texto, relatorio: 'ok', avisos: [],
+  });
+
+  it('a impressão não muda com a dispensa da lataria e muda com o objeto, a forma da parte, o critério ou a referência', async () => {
+    const base = await impressaoDaForma(gravarNaArea('base', receita()));
+    expect(await impressaoDaForma(gravarNaArea('dispensa', receita(DISPENSA)))).toBe(base);
+    expect(await impressaoDaForma(gravarNaArea('dobras', receita("r.PLANO.dobrasAceitas = [{ parte: 'sapata', regiao: { min: [-100, 0, -100], max: [100, 20, 100] }, motivo: 'a sapata é uma caixa de quina viva por projeto, e a quina é desenho' }];")))).toBe(base);
+    for (const [nome, mudanca] of [
+      ['objeto', "r.PLANO.objeto += ', com o furo de fixação no meio';"],
+      ['forma', "r.PLANO.partes[0].forma += ' e cantos chanfrados';"],
+      ['criterio', "r.PLANO.criteriosDeReprovacao.push('a coluna fora do centro da sapata por mais de 2 mm');"],
+      ['referencia', "r.PLANO.referencias.push('../alvo.json');"],
+    ]) {
+      expect(await impressaoDaForma(gravarNaArea(nome, receita(mudanca)))).not.toBe(base);
+    }
+  });
+
+  it('só o texto da lataria mudou: mantém o fechamento e diz que só o texto mudou', async () => {
+    const pasta = await julgadaCom(receita());
+    const nova = gravarNaArea('nova', receita(DISPENSA));
+    const decisao = await acaoDaPeca(PECA, { rodadas: ler(PECA), pasta, medir: medirTexto(nova) });
+    expect(decisao.acao).toBe('parar-fechou');
+    expect(decisao.motivo).toContain('Só o texto mudou, e nada do que o crítico lê');
+  });
+
+  it('o que o crítico lê mudou: continua pedindo novo julgamento', async () => {
+    const pasta = await julgadaCom(receita());
+    const nova = gravarNaArea('nova', receita("r.PLANO.criteriosDeReprovacao.push('a coluna fora do centro da sapata por mais de 2 mm');"));
+    const decisao = await acaoDaPeca(PECA, { rodadas: ler(PECA), pasta, medir: medirTexto(nova) });
+    expect(decisao.acao).toBe('revisar');
+    expect(decisao.motivo).toContain('falta o crítico julgar esta');
+  });
+
+  it('o registro sem cópia da receita julgada segue como antes: pede novo julgamento', async () => {
+    const pasta = await julgadaCom(receita());
+    rmSync(join(pasta, 'receita-01.js'));
+    const nova = gravarNaArea('nova', receita(DISPENSA));
+    const decisao = await acaoDaPeca(PECA, { rodadas: ler(PECA), pasta, medir: medirTexto(nova) });
+    expect(decisao.acao).toBe('revisar');
+    expect(decisao.motivo).toContain('falta o crítico julgar esta');
   });
 });

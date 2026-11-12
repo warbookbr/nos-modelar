@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:b9956bd0c855e7da074f5a53791b326bdcdb2a43357235201a57625813728646",
+  "assinatura": "sha256:9ef2ae80d182473daa46fa783413782309a3a31b3f61981bbbc108739332270c",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -634,6 +634,38 @@
             "schema": "mecanifica.argumentos.lathe@1",
             "obrigatorios": [
               "perfil"
+            ]
+          }
+        },
+        {
+          "id": "mecanifica.operacao.limparLascas",
+          "nome": "limparLascas",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [
+              "mecanifica.malha-poligonal@1"
+            ],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "transforma-malha"
+          ],
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Tirar de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície além da tolerância.",
+            "schema": "mecanifica.argumentos.limparLascas@1",
+            "obrigatorios": [
+              "sel",
+              "tolerancia"
             ]
           }
         },
@@ -1834,6 +1866,38 @@
         "schema": "mecanifica.argumentos.lathe@1",
         "obrigatorios": [
           "perfil"
+        ]
+      }
+    },
+    {
+      "id": "mecanifica.operacao.limparLascas",
+      "nome": "limparLascas",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Tirar de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície além da tolerância.",
+        "schema": "mecanifica.argumentos.limparLascas@1",
+        "obrigatorios": [
+          "sel",
+          "tolerancia"
         ]
       }
     },

@@ -1,0 +1,1088 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/cacamba",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: lado.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "cacamba",
+        "tipo": "superficie",
+        "onde": "cantos arredondados da frente, parede entre a borda e o fundo",
+        "sentido": "facetado",
+        "evidencia": "tresquartos az200: painéis planos com arestas verticais no arco da frente; curvatura de topo: estrias radiais na parede da frente"
+      },
+      {
+        "parte": "cacamba",
+        "tipo": "superficie",
+        "onde": "fundo plano, faixas laterais a meio comprimento",
+        "sentido": "segmentado",
+        "evidencia": "arame isometrica: faixas paralelas no fundo; curvatura de topo: duas manchas cinza 'sem dado' nas laterais do fundo. Luz rasante não mostra o fundo; suspeita, não confirmada"
+      }
+    ],
+    "observacao": "Comparei com cima.png e lado.png pelas feições físicas, porque o rótulo de eixo de lado.png contradiz cima.png; a caçamba bate em planta, perfil e ligação com borda e tirantes, e os defeitos são só de superfície."
+  },
+  "partes": [
+    {
+      "nome": "cacamba",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tirantes",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "lacosPelasVistas recorta a planta na meia largura e deu quinas vivas ao laço do fundo; a receita reduz a volta da boca",
+    "cantoApertado recusou vinco e arcos de 10 a 30 mm com raio local acima da chapa; passou o de 35",
+    "vistas:critica recusa o pacote: a luz rasante de cima não entra na cuba",
+    "o pedido rotulou lado.png como vista de -x com +z à direita, e a foto tem a roda à esquerda; a referência externa sem vista recebe um rótulo de eixo que ninguém conferiu; atribuição: ferramenta",
+    "defeito 1 (facetado nos cantos da frente) é da receita: poucas estações na volta do laço nos cantos; atribuição: modelador",
+    "defeito 2 (manchas sem dado no fundo, nas laterais) pede medida de malha antes de corrigir; a luz rasante de topo não mostra o fundo; atribuição: modelador, a confirmar"
+  ],
+  "notaDePassagem": "Fundo plano de outubro: cada laço é a volta da boca reduzida, e a dobra é um arco tangente de raio 35 na silhueta e na meia largura, o menor aceito com 1,5 mm. Tirantes declarados em ilhas.",
+  "receita": {
+    "sha256": "sha256:32b0701604c4d3a18cdbd0b2088bb1e28a753528827518a3f299eec0cae54ce0",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 206,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * afinando arredondada para a frente, com a borda virada para fora em toda a volta da boca e os dois tirantes que descem da frente"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * dela até o laço do chassi, numa peça aparafusada nos braços."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Etapa 3 de 4 da montagem `../../montagem.json` (item 3 das partes do `../../ALINHAMENTO.md`). A planta da boca, a profundidade, a"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * chapa e a borda são as do rascunho que a pessoa aprovou por imagem em 2026-11-11 (`../../referencias/carrinho-de-mao.esboco.mjs`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * A seção não é a dele: a pessoa pediu em 2026-11-11 a caçamba do rascunho de outubro"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * (`docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/`), que lê como chapa estampada, e no lugar da cuba de curvatura contínua"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * a caçamba tem o fundo plano, de contorno próprio (a volta da boca reduzida, de cantos largos e mais estreito na frente), a dobra de"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * raio curto entre ele e as paredes e as paredes retas, sem barriga, até a boca, como as fotos de cima e de baixo mostram. Há ainda três"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * mudanças de construção: a boca sai aberta da própria gaiola (`aberta: 'fim'`, no rascunho as faces da tampa de cima eram tiradas"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * pelo nome), e a volta da boca para a borda vem de `bocas.fim`; a gaiola confere o raio dos cantos contra a espessura da chapa; e o"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * fundo da caçamba sai da face de cima dos braços do chassi mais o assento de 2,5 mm (no rascunho, o número 284,5 digitado). O tubo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * borda e o dos tirantes são os da `gaiolaVarrida` com o quadro que acompanha o trilho. O rascunho chama `montarCacamba` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * DE ONDE VEM CADA MEDIDA: a TABELA do `../../ALINHAMENTO.md` (linhas \"boca da caçamba\", \"planta da boca\", \"fundo da caçamba\","
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * \"parede da frente\", \"parede de trás\", \"chapa e borda\", \"volume\", \"tirantes\"), pelas silhuetas de lado e de cima de"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * `../../referencias/carrinho-de-mao.contornos.json`. A ponta de baixo dos tirantes fica no eixo do tubo do laço do chassi."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * O ENCAIXE. A origem é a do carrinho. A montagem põe a caçamba pela porta `noBraco` (o plano do fundo dela, com a normal para baixo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * no x e no z da porta do chassi) na porta `apoioDaCacamba` do chassi, com o afastamento do assento, e a pose sai identidade."
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula as vistas da caçamba, os tirantes e a porta em mm; `montarCacamba` escreve os passos em"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * mm num estado { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "import { TABELA as CHASSI, derivar as derivarChassi } from '../../chassi/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "import { dot, esc, ferramentas, norma, passosEmMetro, portaEmMetro, soma, sub, topoEmMetro, unit } from '../../chassi/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "import { gaiolaPorLacos } from '../../../../../nucleo/gaiola-por-lacos.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "import { lacosPelasVistas } from '../../../../../nucleo/lacos-pelas-vistas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  /* As cores do rascunho: o azul da caçamba e da borda e o escuro dos tirantes. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  cores: { azul: CHASSI.cores.azul, escuro: CHASSI.cores.escuro },"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  cacamba: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "    /* O FUNDO (linha \"fundo da caçamba\"): o painel plano da chapa estampada, de z -715 a -170, com 205 de meia largura atrás (a planta"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "       da boca reduzida a 0,65, e por isso mais estreito na frente), assentado 2,5 mm acima da face de cima dos braços, que correm sob"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "       ele (com 0,5 mm o relato de contatos do rascunho dava travessia que a malha não tem). A dobra entre o fundo e cada parede é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "       arco de raio curto de chapa estampada, tangente aos dois, na silhueta de lado e na meia largura, com os laços da dobra a estas"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "       alturas acima do fundo; o fundo e a meia largura são o encontro das retas, antes do arco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "    fundo: { z: [-715, -170], meiaLargura: 205, assento: 2.5, raioDaDobra: 35, pontosDaDobra: 8, lacosDaDobra: [2.5, 5, 8, 12] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "    /* A silhueta de lado em [z, y], sem os dois pontos do fundo: as paredes retas, sem barriga, do fundo à boca em y 462 (a boca de z"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "       -810 a 24): a da frente sobe do fundo em z -170 à boca em z 24, e a de trás, do fundo em z -715 à boca em z -810. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "    lado: [[24, 462], [-810, 462]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "    /* A meia largura por altura, acima do fundo: a parede do lado reta até 313 na boca. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "    perfil: [[462, 313]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    /* A meia planta da boca pela vista de cima: 313 de z -260 a -650, os cantos de trás arredondados e a frente afinando até a ponta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "    planta: [[0, 24], [80, 14], [116, 0], [158, -20], [203, -50], [234, -80], [266, -120], [288, -160], [303, -200], [313, -260],"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "      [313, -650], [306, -700], [290, -740], [262, -775], [225, -795], [180, -805], [0, -810]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "    estacoes: [330, 380, 430, 462],"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "    pontos: 33, pontosDoLado: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "    /* CHAPA E BORDA (linha \"chapa e borda\"): chapa de 1,5 mm; borda virada de Ø 16, 5 mm para fora da boca e 2 abaixo dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    espessura: 1.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    borda: { raio: 8, paraFora: 5, abaixo: 2, lados: 16 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* TIRANTES (linha \"tirantes\"): barra redonda de Ø 10, de cada lado, do eixo do tubo do laço do chassi em z 32 até a frente da caçamba"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "     em [110, 440, -60], cortada pela face de fora dela 0,3 mm antes (o assento). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  tirantes: { raio: 5, z: 32, para: [110, 440, -60], assento: 0.3, lados: 12, passo: 30 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "/** As três vistas da caçamba, os tirantes e a porta, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const C = T.cacamba;"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const apoio = derivarChassi(CHASSI).portas.apoioDaCacamba;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const yFundo = apoio.ponto[1] + C.fundo.assento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  /* a dobra: o arco de raio R tangente ao fundo e à parede, do canto P (u para fora, y para cima) à parede que sobe a Q */"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const F = C.fundo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const dobra = (P, Q) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    const a = Math.atan2(Q[1] - P[1], Q[0] - P[0]); const t = F.raioDaDobra * Math.tan(a / 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    const c = [P[0] - t, P[1] + F.raioDaDobra];"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    return Array.from({ length: F.pontosDaDobra + 1 }, (_, k) => { const f = a * k / F.pontosDaDobra; return [c[0] + F.raioDaDobra * Math.sin(f), c[1] - F.raioDaDobra * Math.cos(f)]; });"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const [frente, tras] = [C.lado[0], C.lado[C.lado.length - 1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const naFrente = dobra([F.z[1], yFundo], frente);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const atras = dobra([-F.z[0], yFundo], [-tras[0], tras[1]]).map(([u, y]) => [-u, y]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const noLado = dobra([F.meiaLargura, yFundo], [C.perfil[C.perfil.length - 1][1], C.perfil[C.perfil.length - 1][0]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const vistas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    lado: [atras[0], ...naFrente, ...C.lado, ...atras.slice(1).reverse()],"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    perfil: [...noLado.map(([u, y]) => [y, u]), ...C.perfil],"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    planta: [...C.planta, ...C.planta.slice(1, -1).reverse().map(([x, z]) => [-x, z])],"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    estacoes: [yFundo, ...F.lacosDaDobra.map((d) => yFundo + d), ...C.estacoes],"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    pontos: C.pontos, pontosDoLado: C.pontosDoLado,"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  /* a ponta de baixo dos tirantes, no eixo do tubo do laço reto (o último ponto da polilinha do chassi) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const laco = CHASSI.chassi.pontos[CHASSI.chassi.pontos.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  const TI = T.tirantes;"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  const tirantes = [1, -1].map((k) => ({ k, de: [k * laco[0], laco[1], TI.z], para: [k * TI.para[0], TI.para[1], TI.para[2]] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    noBraco: { forma: 'plano', papel: 'apoia', ponto: [apoio.ponto[0], yFundo, apoio.ponto[2]], normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  return { yFundo, vistas, tirantes, portas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "/* Os laços da caçamba: a estrutura (os trechos, a tampa do fundo e a volta da boca) é a de `lacosPelasVistas` pelas três vistas, e"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "   cada laço abaixo da boca é a volta da boca reduzida para a meia largura e o comprimento da silhueta naquela altura (a lateral pela"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "   razão das meias larguras, o comprimento levado da boca ao intervalo da silhueta). `lacosPelasVistas` recorta a planta na meia"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "   largura, o que dá ao fundo plano quinas vivas nos lados; reduzida, a planta dá ao fundo os cantos largos da boca, menores, e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "   frente mais estreita, como o fundo estampado das referências. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "function lacosDaCacamba(vistas) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  const { meiaPlanta, avisos, ...lacos } = lacosPelasVistas(vistas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  if (avisos.length) throw new Error(`caçamba: ${avisos.map((a) => JSON.stringify(a)).join('; ')}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const boca = lacos.lacos[lacos.lacos.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  const pontos = Object.values(boca.trechos).flat();"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  const bl = Math.max(...pontos.map((p) => Math.abs(p[0])));"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const [b0, b1] = [Math.min(...pontos.map((p) => p[1])), Math.max(...pontos.map((p) => p[1]))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const reduzidos = lacos.lacos.map((laco) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    const ps = Object.values(laco.trechos).flat();"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    const l = Math.max(...ps.map((p) => Math.abs(p[0])));"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    const [c0, c1] = [Math.min(...ps.map((p) => p[1])), Math.max(...ps.map((p) => p[1]))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    const leva = ([x, z]) => [x * l / bl, c0 + (z - b0) * (c1 - c0) / (b1 - b0)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    return { ...laco, trechos: Object.fromEntries(Object.entries(boca.trechos).map(([nome, pts]) => [nome, pts.map(leva)])) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  return { ...lacos, lacos: reduzidos };"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "/** A caçamba no estado { passos, topo, origem }, em mm: a casca aberta em cima, com a espessura da chapa, a borda virada em volta da"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": " *  boca e os tirantes da frente. Devolve a origem da casca, de onde sai a porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "export function montarCacamba(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const { nova, tubo, reta, booleana, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  const C = T.cacamba;"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  const lacos = lacosDaCacamba(D.vistas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const g = gaiolaPorLacos({ nome: 'cacamba', eixo: 'y', ...lacos, aberta: 'fim', espessura: C.espessura });"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const apertados = (g.avisos ?? []).filter((a) => a.ref === 'cantoApertado' || a.ref === 'espessuraRecusada');"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  if (apertados.length) throw new Error(`caçamba: ${apertados.map((a) => a.texto).join('; ')}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  Object.assign(estado.topo, g.pontosMm);"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  const cacamba = nova('subdivisao', { ...g.passo, niveis: 2, espessura: C.espessura });"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  parte('cacamba', cacamba, T.cores.azul);"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  /* a borda: a boca (o limite da subdivisão do último laço, (p0 + 4p1 + p2) / 6), para fora e abaixo; a volta começa no meio da boca"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "     de trás, onde a reta continua, para a emenda do tubo ficar sem quina */"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const volta = g.bocas.fim.pontos.slice(0, -1).map((p) => g.pontosMm[p]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const meioDeTras = Math.floor((C.pontos - 1) / 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const boca = [...volta.slice(meioDeTras), ...volta.slice(0, meioDeTras)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  const n = boca.length; const BO = C.borda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  const limite = boca.map((p, k) => esc(soma(soma(boca[(k + n - 1) % n], esc(p, 4)), boca[(k + 1) % n]), 1 / 6));"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  const cy = D.vistas.estacoes[D.vistas.estacoes.length - 1] - BO.abaixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  const meio = limite.reduce((a, p) => soma(a, esc(p, 1 / n)), [0, 0, 0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "  const fora = limite.map((p, k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    const t = sub(limite[(k + 1) % n], limite[(k + n - 1) % n]); let nn = unit([t[2], 0, -t[0]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    if (dot(nn, sub(p, meio)) < 0) nn = esc(nn, -1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    return [p[0] + nn[0] * BO.paraFora, cy, p[2] + nn[2] * BO.paraFora];"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  const pontos = [...fora, fora[0]]; const estacoes = [{ fracao: 0 }]; let s = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  for (let k = 1; k < pontos.length - 1; k += 1) { s += norma(sub(pontos[k], pontos[k - 1])); estacoes.push({ entre: 1 }, { em: s }); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  estacoes.push({ entre: 1 }, { fracao: 1 });"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  parte('borda', tubo('borda', { pontos }, BO.raio, { lados: BO.lados, estacoes, u: [0, 1, 0] }), T.cores.azul);"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  /* os tirantes: do laço do chassi para dentro da caçamba, menos o corpo fechado dela (a gaiola com a tampa, subdividida como a"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "     casca e descida o assento), que os corta na face de fora dela */"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  const TI = T.tirantes;"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  const barras = D.tirantes.map((t) => tubo(`tirante${t.k > 0 ? 'E' : 'D'}`, reta(t.de, t.para), TI.raio, { lados: TI.lados, estacoes: { passo: TI.passo } }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  const corpo = gaiolaPorLacos({ nome: `molde${estado.origem + 1}`, eixo: 'y', ...lacos });"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  Object.assign(estado.topo, corpo.pontosMm);"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  const molde = nova('subdivisao', { ...corpo.passo, niveis: 2 });"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  estado.passos.push(['transladar', { sel: molde, d: [0, -TI.assento, 0] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  parte('tirantes', booleana('subtrair', [booleana('unir', barras), molde]), T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  return { cacamba };"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  const { cacamba } = montarCacamba(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  return [...passosEmMetro(estado.passos), portaEmMetro('noBraco', cacamba.origem, derivar(T).portas.noBraco)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "/** Os pontos nomeados das gaiolas, em metro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "export function gerarTopo(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  montarCacamba(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "  return topoEmMetro(estado.topo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  { par: ['borda', 'cacamba'], motivo: 'a borda virada é a mesma chapa: o tubo da borda abraça a beira da boca em toda a volta' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  meta: { nome: 'carrinho-de-mao/cacamba', desc: 'caçamba do carrinho de mão de obra: casca de chapa estampada de 60 L aberta em cima, com a borda virada e os dois tirantes da frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  get TOPO() { return { origem: 'a do carrinho: o chão sob o centro do eixo da roda, no meio da largura; y para cima, x lateral e a frente (a roda) em +z', ...gerarTopo(this.PARAMS) }; },"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "    objeto: 'caçamba de chapa estampada de carrinho de mão de obra de 60 L: casca aberta em cima, mais larga atrás, afinando arredondada para a frente, com a borda virada para fora e dois tirantes até o laço do chassi',"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "    referencias: ['../../referencias/carrinho-de-mao.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "    escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "      { nome: 'cacamba', forma: 'casca azul de chapa de 1,5 mm aberta em cima, boca de 820 × 626 em y 462; fundo plano em y 284,5 de cantos largos, mais estreito na frente, dobra de raio 35 até paredes retas', tecnica: 'volta da boca reduzida em cada laço, dobra em arco na silhueta, numa gaiolaPorLacos com a boca aberta, passo subdivisao de 2 níveis com espessura' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "      { nome: 'borda', forma: 'a borda azul virada para fora em toda a volta da boca, um tubo de Ø 16, 5 mm para fora da boca e 2 abaixo dela', tecnica: 'gaiolaVarrida de seção redonda de 16 lados ao longo do limite da boca, fechada e tampada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "      { nome: 'tirantes', forma: 'duas barras escuras de Ø 10, de cada lado, do eixo do tubo do laço em z 32 à frente da caçamba, acabando 0,3 mm antes da face de fora dela', tecnica: 'gaiolaVarrida de seção redonda de 12 lados numa reta, unidas, menos o corpo fechado da caçamba descido 0,3 mm' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "      'a caçamba de cuba redonda sem o fundo plano marcado, de fundo em caixa de quina viva, ou mais estreita atrás que na frente',"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "      'a boca sem a borda virada, ou a borda solta da beira da boca',"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "      'a caçamba cruzando o chassi, ou solta acima dos braços além do assento de 2,5 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "      'os tirantes atravessando a chapa da caçamba ou soltos do laço',"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "      'amassado ou ondulação na chapa na luz rasante',"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "    lataria: { partes: ['cacamba'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "  /* Os tirantes acabam 0,3 mm antes da face de fora da caçamba (o parafuso que os prende nela fica fora do modelo) e se prendem no"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "     tubo do laço, que é de outra peça: nesta peça eles ficam soltos. */"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes cacamba",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-el20-topo-rasante-az30.png",
+      "peca-el20-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az200.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T03:47:09.736Z"
+}

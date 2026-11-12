@@ -1,0 +1,723 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/pes",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o plano não cita imagem de referência; comparação apenas com a forma prometida no pedido",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "pes",
+        "tipo": "comprimento",
+        "onde": "topo dos dois braços, acima da face das travessas",
+        "sentido": "maior",
+        "evidencia": "Direita e isométrica isoladas: tubos passam de 15 a 20 px acima das chapas, com tampa visível; no corte com o chassi a ponta entra no tubo do braço."
+      },
+      {
+        "parte": "pes",
+        "tipo": "posicao",
+        "onde": "braço em z -580 de cada V, trecho inteiro visto de cima",
+        "sentido": "externa",
+        "evidencia": "Vista superior: pontas do braço de trás em x 303 e 797 px contra 313 e 786 px no braço da frente; o V não fica num plano único."
+      },
+      {
+        "parte": "travessas",
+        "tipo": "comprimento",
+        "onde": "chapa do topo em z -580 em relação à chapa em z -305",
+        "sentido": "maior",
+        "evidencia": "Vista superior: chapa de trás de 286 a 814 px, chapa da frente de 296 a 804 px; as duas deviam ser iguais (40 x 6)."
+      }
+    ],
+    "observacao": "Sem alvo, só pude conferir a forma prometida e os critérios de reprovação: V redondo, fundos no chão em y 0, pés dentro dos braços e longe da caçamba (13,1 mm); resta a assimetria em x dos V e das chapas."
+  },
+  "partes": [
+    {
+      "nome": "pes",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessas",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "crítico sem alvo: a foto fica fora do repositório e o pedido não tem como citá-la; atribuição: ferramenta (opção de referência externa em vistas:critica)",
+    "defeitos 1 e 2 (V aberto em x e travessas de comprimento diferente) seguem os braços do chassi, que abrem para trás; atribuição: plano, que não diz isso ao crítico",
+    "defeito 3 (ponta do tubo acima da travessa) é o contato declarado com o braço, lido no corte; atribuição: crítico",
+    "vista superior montada com foco nos pés sai tapada pela caçamba; atribuição: ferramenta (a vista de foco não afasta a peça que cobre)"
+  ],
+  "notaDePassagem": "O raio do fundo sai em forma fechada do arco tangente (58,85, o mesmo da bisseção do rascunho); a face de cima das travessas e a porta vêm do apoio do chassi, sem 250 digitado.",
+  "receita": {
+    "sha256": "sha256:b0394a69fe7eee20c6488e6c3e0ab647728593614dd2f4bc3aae92189c93f555",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 127,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * duas travessas de chapa chata que ligam as pernas de um lado às do outro, numa peça aparafusada sob os braços do chassi."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa 2 de 4 da montagem `../../montagem.json` (item 2 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho que a pessoa"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * aprovou por imagem em 2026-11-11 (`../../referencias/carrinho-de-mao.esboco.mjs`), levada para cá sem mudança de medida, com três"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * mudanças de construção: o V é o trilho `{ pontos, raios }` da `gaiolaVarrida`, e o raio do fundo, que põe a face de baixo do tubo"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * no chão, sai da conta do arco tangente (no rascunho, de uma função própria de arcos e uma busca por bisseção); o quadro do tubo"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * acompanha o trilho; e as estações são as do trilho (40 mm nas retas, 7,5 graus no fundo). A face de cima das travessas sai da face"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * de baixo do braço do chassi (no rascunho, o número 250 digitado). O rascunho chama `montarPes` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * DE ONDE VEM CADA MEDIDA: a TABELA do `../../ALINHAMENTO.md` (linhas \"pés\" e \"travessas dos pés\"); o topo de cada perna fica no eixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * do braço do chassi (`../chassi/receita.js`, `noBraco`), em z -305 e -580, e entra na braçadeira sob ele."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * O ENCAIXE. A origem é a do carrinho. A montagem põe os pés pela porta `noBraco` (o plano da face de cima das travessas, com a normal"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * para cima, no x e no z da porta do chassi) na porta `apoioDosPes` do chassi, sem afastamento, e a pose sai identidade."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` calcula os pontos dos V, o raio do fundo, as travessas e a porta em mm; `montarPes` escreve os"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * passos em mm num estado { passos, topo, origem }; `gerarPassos` converte para metro com `m()`, num lugar só. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "import { TABELA as CHASSI, derivar as derivarChassi, noBraco } from '../../chassi/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "import { dot, ferramentas, norma, passosEmMetro, portaEmMetro, soma, sub, topoEmMetro, unit } from '../../chassi/receita/ferramentas.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  /* As cores do rascunho: o cinza dos pés e o escuro das travessas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  cores: { cinza: '#6b7178', escuro: CHASSI.cores.escuro },"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  /* PÉS (linha \"pés\"): tubo de Ø 22, 16 lados. De cada lado um V sob o braço, do eixo do braço em z -305 (a perna da frente) ao eixo"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "     dele em z -580 (a de trás, quase de pé), pelo ponto do fundo em z -551 e y -105 (o canto do V, abaixo do chão), com o fundo"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "     arredondado; o raio do fundo é o que põe a face de baixo do tubo em y 0. Estações a cada 40 mm nas retas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  pes: { raio: 11, lados: 16, topos: [-305, -580], fundoZ: -551, fundoY: -105, passo: 40 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* TRAVESSAS DOS PÉS (linha \"travessas\"): chapa chata de 40 × 6, de lado a lado, nos topos das pernas, passando 12 mm do eixo de cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "     perna para fora, com a face de cima na de baixo dos braços. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  travessas: { largura: 40, espessura: 6, alem: 12 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "/** O raio do arco tangente às duas retas do canto `P` (vindo de `A`, indo a `B`) cujo ponto mais baixo do eixo do tubo fica na altura"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": " *  `y`: o centro está na bissetriz do canto, a R / cos(θ/2) de P, e o ponto mais baixo do arco, R abaixo do centro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "function raioQuePoeNaAltura(A, P, B, y) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  const d1 = unit(sub(P, A)); const d2 = unit(sub(B, P));"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  const meio = Math.acos(Math.max(-1, Math.min(1, dot(d1, d2)))) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  const bissetriz = unit(sub(d2, d1));"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  return (y - P[1]) / (bissetriz[1] / Math.cos(meio) - 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "/** Os V, o raio do fundo, as travessas e a porta, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  const P = T.pes;"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  const [ta, tb] = P.topos.map((z) => noBraco(CHASSI, z));"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  const fundo = [(ta[0] + tb[0]) / 2, P.fundoY, P.fundoZ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  const raioDoFundo = raioQuePoeNaAltura(ta, fundo, tb, P.raio);"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  const vs = [1, -1].map((s) => ({ s, pontos: [ta, fundo, tb].map(([x, y, z]) => [s * x, y, z]) }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* a face de cima das travessas é a de baixo do braço, onde o chassi publica o apoio dos pés */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  const apoio = derivarChassi(CHASSI).portas.apoioDosPes;"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const topo = apoio.ponto[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  const TR = T.travessas;"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  const travessas = [ta, tb].map((t) => ({ x: [-t[0] - TR.alem, t[0] + TR.alem], y: [topo - TR.espessura, topo], z: [t[2] - TR.largura / 2, t[2] + TR.largura / 2] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  const portas = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    noBraco: { forma: 'plano', papel: 'apoia', ponto: apoio.ponto, normal: apoio.normal.map((v) => (v === 0 ? 0 : -v)), extensao: apoio.extensao, referencia: apoio.referencia },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  return { ta, tb, fundo, raioDoFundo, vs, travessas, portas, comprimento: norma(sub(ta, fundo)) + norma(sub(tb, fundo)) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "/** Os pés no estado { passos, topo, origem }, em mm: um V de cada lado e as duas travessas entre eles. Devolve a origem da travessa da"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": " *  frente, de onde sai a porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "export function montarPes(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const D = derivar(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const { tubo, bloco, parte } = ferramentas(estado);"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const P = T.pes;"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  for (const v of D.vs) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    parte('pes', tubo(`pe${v.s > 0 ? 'E' : 'D'}`, { pontos: v.pontos, raios: [D.raioDoFundo] }, P.raio, { lados: P.lados, estacoes: { passo: P.passo }, u: [1, 0, 0] }), T.cores.cinza);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const [frente, tras] = D.travessas.map((t) => bloco(t.x, t.y, t.z));"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  parte('travessas', frente, T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  parte('travessas', tras, T.cores.escuro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  return { travessa: frente };"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "/** Os PASSOS, em metro: a forma e, no fim, a porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  const { travessa } = montarPes(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  return [...passosEmMetro(estado.passos), portaEmMetro('noBraco', travessa.origem, derivar(T).portas.noBraco)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "/** Os pontos nomeados das gaiolas dos tubos, em metro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "export function gerarTopo(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  const estado = { passos: [], topo: {}, origem: 0 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  montarPes(estado, T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  return topoEmMetro(estado.topo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  { par: ['pes', 'travessas'], motivo: 'as travessas de chapa são presas nas pernas, de lado a lado, nos topos dos V' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  meta: { nome: 'carrinho-de-mao/pes', desc: 'pés do carrinho de mão: um V de tubo de Ø 22 de cada lado, com o fundo redondo no chão, e duas travessas de chapa chata' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  get TOPO() { return { origem: 'a do carrinho: o chão sob o centro do eixo da roda, no meio da largura; y para cima, x lateral e a frente (a roda) em +z', ...gerarTopo(this.PARAMS) }; },"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    objeto: 'pés de carrinho de mão de obra: dois V de tubo redondo fino, um sob cada braço do chassi, com o fundo arredondado no chão, ligados por duas travessas de chapa chata aparafusadas sob os braços',"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    referencias: ['../../referencias/carrinho-de-mao.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "      { nome: 'pes', forma: 'de cada lado um V de tubo redondo cinza de Ø 22, dos topos em z -305 e -580 no eixo do braço até o fundo arredondado em z -502, com a face de baixo no chão em y 0, a 166 do centro', tecnica: 'gaiolaVarrida de seção redonda de 16 lados num trilho de três pontos com o raio do fundo, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "      { nome: 'travessas', forma: 'duas chapas escuras de 40 × 6 de lado a lado, nos topos das pernas, com a face de cima em y 250, na face de baixo dos braços', tecnica: 'extrusão em y de um retângulo, uma em cada topo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "      'o fundo dos dois pés fora do chão em y 0, ou um pé mais alto que o outro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "      'o pé em trapézio ou de tubo quadrado, no lugar do V de tubo redondo com o fundo arredondado',"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "      'as travessas soltas das pernas, ou fora da face de baixo dos braços',"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "      'os pés por fora dos braços na vista de cima, ou cruzando a caçamba',"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    lataria: { partes: ['pes'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm, nas duas travessas juntas: a de trás é a mais larga (o braço abre para trás). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    const D = derivar(this.PARAMS); const [f, t] = D.travessas;"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "      { nome: 'travessas, em cima, na frente e à esquerda', parte: 'travessas', medida: 'maximo', em: [t.x[1], f.y[1], f.z[1]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "      { nome: 'travessa de trás, embaixo, atrás e à direita', parte: 'travessas', medida: 'minimo', em: [t.x[0], t.y[0], t.z[0]], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes pes",
+    "imagens": [
+      "peca-frente-rasante-az10.png",
+      "peca-frente-rasante-az100.png",
+      "peca-lado-rasante-az340.png",
+      "peca-lado-rasante-az70.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T03:30:57.064Z"
+}

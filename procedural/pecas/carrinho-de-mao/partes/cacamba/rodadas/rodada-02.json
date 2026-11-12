@@ -1,0 +1,120 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/cacamba",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: lado.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "cacamba",
+        "tipo": "superficie",
+        "onde": "contorno da boca: arco da frente e cantos traseiros",
+        "sentido": "facetado",
+        "evidencia": "Vista superior do modelo: arco da frente e cantos de trás leem como segmentos retos com quebras, enquanto cima.png mostra curva contínua."
+      },
+      {
+        "parte": "cacamba",
+        "tipo": "superficie",
+        "onde": "dobra entre fundo e paredes laterais, trechos retos esquerdo e direito",
+        "sentido": "segmentado",
+        "evidencia": "Curvatura do topo: anel azul da dobra do fundo com ondulação em escama nos lados esquerdo e direito, onde o painel devia correr liso."
+      }
+    ],
+    "observacao": "Forma, proporção, fundo plano, borda e encaixe dos tirantes batem com o alvo; restam só o contorno facetado da boca e a ondulação da dobra do fundo, mais uma faixa escura na rasante de frente que a imagem não explica."
+  },
+  "partes": [
+    {
+      "nome": "chassi",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "manoplas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancais",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixo",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a medição da rodada 1 passou com 70 faces finas na malha; a medição não conta lascas e o crítico só suspeitou; atribuição: ferramenta",
+    "lacosPelasVistas e gaiolaPorLacos não avisam quando os pontos do lado ficam mais densos que os laços da dobra, o que dá faces finas; atribuição: núcleo",
+    "modelador sem MODELAR_BLENDER não gera luz rasante nem curvatura para conferir a própria correção; atribuição: instrução de despacho"
+  ],
+  "notaDePassagem": "PLANO.lataria virou dispensa porque a peca e tubo redondo de aco com punhos e nao chapa; a rodada-de-modelagem avisa a dispensa e nao reprova. Malha identica (hash dos PASSOS igual antes e depois).",
+  "receita": {
+    "sha256": "sha256:291028a89766480b2ed73566e91d515bfc1e9afae81bdc9071d8858582512cb4",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 2,
+      "acrescentadas": 4,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "    /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    /* As alturas dos laços da parede, acima dos da dobra, e os pontos de cada laço: 49 no início e no fim (a frente e a trás, com os"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "       cantos), que tira o facetado dos cantos, e 9 em cada lado reto; com mais de 11 no lado a dobra do fundo dá lascas (medido: 25 deu"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "       70 faces finas em x ±186, 9 e 11 deram zero). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "    pontos: 33, pontosDoLado: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    pontos: 49, pontosDoLado: 9,"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes cacamba",
+    "imagens": [
+      "peca-frente-rasante-az40.png",
+      "peca-frente-rasante-az130.png",
+      "peca-lado-rasante-az40.png",
+      "peca-lado-rasante-az130.png",
+      "peca-el20-topo-rasante-az30.png",
+      "peca-el20-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az200.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T04:00:17.755Z"
+}

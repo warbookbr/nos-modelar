@@ -1,0 +1,223 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/chassi",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: lado.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Silhueta, laço em U, rampas, braços e manoplas batem com lado.png e cima.png; sem defeito estrutural visto, só detalhe de proporção nos mancais e na subida das manoplas. Lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "cacamba",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "borda",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tirantes",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "lacosPelasVistas amostra frente e traseira em 25 pontos uniformes na lateral: arco tangente ao lado reto dá facetas e estrias",
+    "gaiolaPorLacos com tampa esquerda/direita põe o primeiro degrau a 1 ou 2 mm do lado reto quando o contorno é de arcos tangentes: face de 11 pontos em lasca, origem da escama da dobra",
+    "49 pontos por trecho deram 2 faces finas nos tirantes por corte booleano; 41 dá zero; 57 a 65 dão lascas na própria casca",
+    "o defeito da rodada 2 (travessas faltando) fechou só com o texto do PLANO dizendo que elas são da peça pes; atribuição: plano"
+  ],
+  "notaDePassagem": "A boca é retas e arcos tangentes (traseira reta, cantos r 150, lados 313, frente em meia volta de raio 313), com o raio dos cantos em 150, e não uns 90: com 90 a sobreposição de cima caía de 91,7 para 89,9%, com 150 fica em 91,1%. A tampa do fundo é a escada entre inicio e fim, e não entre os lados, porque o primeiro degrau a 1 ou 2 mm do lado reto dava a lasca que parecia escama na dobra. 41 pontos por trecho e 9 por lado é o que dá zero lascas, incluindo os tirantes.",
+  "receita": {
+    "sha256": "sha256:6098a52120cf1b51c7e561db69977dcbbeb16f9dca57d5d22145ab4ea969bc9a",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 8,
+      "acrescentadas": 25,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "     z -1.300 (y 515, x 262), a dobra de cima da subida, o braço sob a caçamba (y 266, x 175 a 160, de z -770 a -170), a rampa, o laço"
+        },
+        {
+          "tipo": "-",
+          "linha": 34,
+          "texto": "     reto (y 195, x 95) e o canto da frente em z 210 (a ponta de fora do laço em z 226). O raio de cada canto, na mesma ordem; o da"
+        },
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": "     frente é quase a meia largura do laço, que fica com 2 mm de reta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "     z -1.300 (y 515), a dobra de cima da subida (y 475, z -1.080), o braço sob a caçamba (y 266, de z -770 a -170), a rampa, o laço"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     reto (y 195, x 95) e o canto da frente em z 210 (a ponta de fora do laço em z 226). O x dos quatro primeiros pontos é `null`: vem"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     da reta da planta (`abertura`), e não de um número digitado em cada ponto. O raio de cada canto, na mesma ordem; o da frente é"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "     quase a meia largura do laço, que fica com 2 mm de reta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "    pontos: [[262, 515, -1300], [250, 475, -1080], [175, 266, -770], [160, 266, -170], [95, 195, -45], [95, 195, 210]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "    pontos: [[null, 515, -1300], [null, 475, -1080], [null, 266, -770], [null, 266, -170], [95, 195, -45], [95, 195, 210]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "    /* A PLANTA DOS BRAÇOS (linha \"abertura dos braços\"): no desenho de linha do chassi em planta, a meia largura do eixo do tubo"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "       cresce em reta do fim da rampa à manopla (44,5 px em 180 e 69 px em 380 no desenho, de 400 px para os 1.532 mm do chassi,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "       3,83 mm/px; a reta lida dá 143,8 mm em z -170 e 282,3 mm em z -1.300). Os pontos do braço, a subida e a manopla ficam todos"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "       nessa reta, e os pés, as travessas e o apoio da caçamba seguem o x dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "    abertura: { z: [-170, -1300], x: [143.8, 282.3] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "/** O x do eixo do braço, do lado +x, em z: a reta da planta dos braços, da `abertura` da TABELA. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "export function xDoBraco(T, z) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  const { z: [z0, z1], x: [x0, x1] } = T.chassi.abertura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  return x0 + (x1 - x0) * (z - z0) / (z1 - z0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "/** Os pontos da polilinha do chassi, do lado +x, com o x dos que estão na reta da planta dos braços (os de x `null`) calculado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "export function pontosDoChassi(T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  return T.chassi.pontos.map(([x, y, z]) => [x ?? xDoBraco(T, z), y, z]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "  const [a, b] = [T.chassi.pontos[2], T.chassi.pontos[3]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const [a, b] = [pontosDoChassi(T)[2], pontosDoChassi(T)[3]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 58,
+          "texto": "  const CH = T.chassi;"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const CH = { ...T.chassi, pontos: pontosDoChassi(T) };"
+        },
+        {
+          "tipo": "-",
+          "linha": 132,
+          "texto": "    objeto: 'chassi de carrinho de mão de obra de 60 L: um tubo de aço redondo de Ø 32 dobrado, com o laço em U em volta da roda, os braços sob a caçamba e as manoplas com punho, mais os mancais e o eixo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    objeto: 'chassi de carrinho de mão de obra de 60 L: tubo de aço redondo de Ø 32 dobrado, com laço em U em volta da roda, braços sob a caçamba e manoplas com punho, mancais e eixo; as travessas entre os braços são a parte `travessas` da peça `pes`',"
+        },
+        {
+          "tipo": "-",
+          "linha": 136,
+          "texto": "      { nome: 'chassi', forma: 'um tubo redondo azul de Ø 32, de uma manopla à outra: laço em U em volta da roda com a ponta em z 226, rampas, braços retos em y 266 sob a caçamba, subida e manoplas abertas, dobras em curva', tecnica: 'gaiolaVarrida de seção redonda de 24 lados num trilho de pontos com raio por canto, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "      { nome: 'chassi', forma: 'um tubo redondo azul de Ø 32, de uma manopla à outra: laço em U em volta da roda (ponta em z 226), rampas, braços em y 266 sob a caçamba, subida e manoplas; em planta os braços abrem em reta, de 144 em z -170 a 282 em z -1.300', tecnica: 'gaiolaVarrida de seção redonda de 24 lados num trilho de pontos com raio por canto, quadro que acompanha o trilho, fechada e tampada, passo subdivisao sem nível' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-11T04:36:58.611Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

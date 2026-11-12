@@ -9,8 +9,8 @@ import { basename, join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
-  LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  unidadeDoAlvo, vistaDoArquivo, vistasParaCritica, vistasRepetidas,
+  ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
+  decidirLuzRasante, fracaoVisivelDaPeca, lerReferenciasExternas, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
 } from './vistas-para-critica.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
@@ -458,6 +458,7 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
           return { cortes: [{ arquivo, vizinha: 'fuselagem', origens: ['posição motorNaFuselagem'], folgaMm: 0.5, folgaNoCorteMm: 0.5, cruzam: false, plano: 'x = 1,0 mm, visto de +x (direita da imagem -z, cima +y)', declarado: false }], aviso: null };
         },
         rodadasAnteriores: () => [],
+        visibilidadeDoFoco: async () => ({}),
       },
     });
     return { pasta, resultado, pedidosDeEtapas, pedidosDeCortes, ids };
@@ -764,5 +765,111 @@ describe('a vista em corte nos encaixes', () => {
     expect(secao).toContain('a peça em laranja, a vizinha em azul, roxo onde as duas se cruzam');
     expect(secao).toContain('- com `tampa` (posição tampaNoBloco): folga de 0,35 mm no corte, 0,35 mm entre as malhas; plano x = 50,0 mm, visto de +x (direita da imagem -z, cima +y): /p/corte-bloco-tampa.png');
     expect(secao).toContain('- com `pino` (contato declarado pinoEntra): as duas se cruzam ou se tocam no corte, 0,00 mm entre as malhas; plano z = 50,0 mm, visto de +z (direita da imagem +x, cima +y), declarado: /p/corte-bloco-pino.png');
+  });
+});
+
+
+describe('a luz rasante que não alcança a peça', () => {
+  const img = (vista, azimute, iluminada) => ({ arquivo: `/p/${vista}-az${azimute}.png`, vista, azimute, iluminada });
+  const superficie = (rasante) => ({ obj: '/p/peca.obj', rasante, curvatura: [] });
+
+  it('decide pelas frações: a abaixo do limiar, ou sem medida, é escura, e a primeira elevação que passa fica', () => {
+    const rasante = [img('topo', 30, 0.172), img('topo', 120, 0.6), img('lado', 30, null)];
+    const { aceitas, escuras } = decidirLuzRasante(rasante, 0.25);
+    expect(aceitas).toEqual([rasante[1]]);
+    expect(escuras).toEqual([rasante[0], rasante[2]]);
+    expect(primeiraQuePassa([{ elevacao: 20, iluminada: 0.2 }, { elevacao: 30, iluminada: 0.31 }, { elevacao: 45, iluminada: 0.5 }], 0.25)).toEqual({ elevacao: 30, iluminada: 0.31 });
+    expect(primeiraQuePassa([{ elevacao: 20, iluminada: 0.2 }], 0.25)).toBeNull();
+  });
+
+  it('a vista escura é refeita com a luz mais alta e usa a primeira elevação que passa, dizendo o ângulo no pedido', async () => {
+    const chamadas = [];
+    const tentar = async ({ vista, azimutes, graus }) => {
+      chamadas.push({ vista, azimutes, graus });
+      return azimutes.map((azimute) => ({ azimute, arquivo: `/p/${vista}-el${graus}-az${azimute}.png`, iluminada: graus >= 30 ? 0.4 : 0.2 }));
+    };
+    const { superficie: nova, semLuz } = await luzRasanteDoPacote('x', superficie([img('topo', 30, 0.172), img('topo', 120, 0.6)]), { tentar });
+    expect(chamadas).toEqual([{ vista: 'topo', azimutes: [30], graus: 20 }, { vista: 'topo', azimutes: [30], graus: 30 }]);
+    expect(semLuz).toEqual([]);
+    expect(nova.rasante).toEqual([{ arquivo: '/p/topo-el30-az30.png', vista: 'topo', azimute: 30, iluminada: 0.4, elevacao: 30 }, img('topo', 120, 0.6)]);
+    const pedido = montarPedido({ peca: 'x', superficie: nova });
+    expect(pedido).toContain('com a luz a 30 graus do plano da imagem, mais alta que nas outras');
+  });
+
+  it('a que nenhuma elevação salva sai do pedido com a frase da vista, e o pacote fica com as demais', async () => {
+    const tentar = async ({ azimutes }) => azimutes.map((azimute) => ({ azimute, arquivo: '/p/x.png', iluminada: 0.2 }));
+    const { superficie: nova, semLuz } = await luzRasanteDoPacote('x', superficie([img('topo', 30, 0.172), img('lado', 30, 0.7)]), { tentar });
+    expect(nova.rasante).toEqual([img('lado', 30, 0.7)]);
+    expect(semLuz).toHaveLength(1);
+    expect(semLuz[0].texto).toMatch(/a vista topo ficou sem a luz rasante a 30 graus de azimute.*17,2 % da peça iluminada a 10 graus.*20,0 % no melhor de 20, 30, 45 graus.*limiar de 25,0 %.*saiu do pedido/);
+    expect(montarPedido({ peca: 'x', superficie: nova })).toContain('Sem imagem: a vista topo ficou sem a luz rasante');
+    expect(ELEVACOES_DA_LUZ_RASANTE).toEqual([20, 30, 45]);
+  });
+
+  it('sem nenhuma imagem de luz rasante que passe, o pacote continua recusado', async () => {
+    const tentar = async ({ azimutes }) => azimutes.map((azimute) => ({ azimute, arquivo: '/p/x.png', iluminada: 0.1 }));
+    await expect(luzRasanteDoPacote('x', superficie([img('topo', 30, 0.1), img('topo', 120, 0.1)]), { tentar })).rejects.toThrow(/a luz rasante de 'x' saiu quase toda escura em 2 imagens/);
+  });
+
+  it('o pacote que já passa não tenta nada', async () => {
+    const tentar = async () => { throw new Error('não devia tentar'); };
+    const original = superficie([img('topo', 30, 0.5)]);
+    expect((await luzRasanteDoPacote('x', original, { tentar })).superficie).toBe(original);
+  });
+});
+
+describe('a referência externa trazida por quem conduz', () => {
+  const existe = (c) => ['/fora/foto.png', '/fora/nota.txt'].includes(c);
+
+  it('lê o caminho com a vista opcional e marca a imagem como externa', () => {
+    expect(lerReferenciasExternas(['/fora/foto.png@lateral'.replace('lateral', 'direita'), '/fora/foto.png'.replace('foto', 'foto')].slice(0, 1), { existe }))
+      .toEqual([{ caminho: '/fora/foto.png', lado: 'direita', externa: true }]);
+    expect(lerReferenciasExternas(['/fora/foto.png'], { existe })).toEqual([{ caminho: '/fora/foto.png', externa: true }]);
+  });
+
+  it('recusa o caminho relativo, o inexistente, o que não é imagem, a vista desconhecida e a repetição', () => {
+    expect(() => lerReferenciasExternas(['foto.png'], { existe })).toThrow(/deve ser absoluto/);
+    expect(() => lerReferenciasExternas(['/fora/some.png'], { existe })).toThrow(/não existe/);
+    expect(() => lerReferenciasExternas(['/fora/nota.txt'], { existe })).toThrow(/não é imagem/);
+    expect(() => lerReferenciasExternas(['/fora/foto.png@diagonal'], { existe })).toThrow(/vista 'diagonal'.*frontal, direita/);
+    expect(() => lerReferenciasExternas(['/fora/foto.png', '/fora/foto.png@frontal'], { existe })).toThrow(/mais de uma vez/);
+  });
+
+  it('o pedido a põe na seção de referências, com a vista e a origem, e o alvo sem referência pede "sem alvo"', () => {
+    const referencias = lerReferenciasExternas(['/fora/foto.png@direita'], { existe });
+    const pedido = montarPedido({ peca: 'x', referencias });
+    const secao = pedido.slice(pedido.indexOf('## Referências'), pedido.indexOf('## Modelo'));
+    expect(secao).toContain('foto.png: /fora/foto.png (referência externa, trazida por quem conduz; vale para a vista direita)');
+    expect(secao).not.toContain('O plano não cita imagem de referência');
+    expect(pedido).toContain('A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte');
+    expect(montarPedido({ peca: 'x' })).toContain('`alvo` do veredito leva o texto `sem alvo: <motivo>`');
+  });
+});
+
+describe('a peça em foco tapada na vista montada', () => {
+  const caixa = ([x0, y0, z0], [x1, y1, z1]) => {
+    const p = (x, y, z) => [x, y, z];
+    const q = (a, b, c, d) => [[a, b, c], [a, c, d]];
+    const v = [p(x0, y0, z0), p(x1, y0, z0), p(x1, y1, z0), p(x0, y1, z0), p(x0, y0, z1), p(x1, y0, z1), p(x1, y1, z1), p(x0, y1, z1)];
+    return [q(v[0], v[1], v[2], v[3]), q(v[4], v[5], v[6], v[7]), q(v[0], v[1], v[5], v[4]), q(v[3], v[2], v[6], v[7]), q(v[0], v[3], v[7], v[4]), q(v[1], v[2], v[6], v[5])].flat();
+  };
+  const pe = caixa([0, 0, 0], [1, 1, 1]);
+  const cacamba = caixa([-1, 2, -1], [2, 3, 2]);
+
+  it('mede a fração dos pixels da peça que as outras deixam à vista', () => {
+    expect(fracaoVisivelDaPeca({ foco: pe, outras: [], olho: [0, 1, 0] }).visivel).toBe(1);
+    expect(fracaoVisivelDaPeca({ foco: pe, outras: cacamba, olho: [0, 1, 0] }).visivel).toBe(0);
+    expect(fracaoVisivelDaPeca({ foco: pe, outras: cacamba, olho: [0, -1, 0] }).visivel).toBe(1);
+    const metade = caixa([0.5, 2, -1], [2, 3, 2]);
+    expect(fracaoVisivelDaPeca({ foco: pe, outras: metade, olho: [0, 1, 0] }).visivel).toBeCloseTo(0.5, 1);
+  });
+
+  it('a vista tapada fica fora das imagens do pedido, dita nele, e a sem medida entra', () => {
+    const imagens = [{ arquivo: 'a.png', vista: 'superior' }, { arquivo: 'b.png', vista: 'frontal' }, { arquivo: 'c.png', vista: 'direita' }];
+    const { entram, fora } = vistasMontadasVisiveis(imagens, { superior: 0, frontal: 0.8 });
+    expect(entram.map((i) => i.vista)).toEqual(['frontal', 'direita']);
+    expect(fora).toEqual([{ vista: 'superior', visivel: 0 }]);
+    const pedido = montarPedido({ peca: 'x', montado: { instancia: 'pes', imagens: entram, fora } });
+    expect(pedido).toContain('Ficaram de fora, porque as outras peças tapam a peça em foco: superior (a peça aparece em 0 % da silhueta dela).');
   });
 });

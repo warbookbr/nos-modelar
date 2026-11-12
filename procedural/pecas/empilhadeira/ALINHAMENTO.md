@@ -84,7 +84,7 @@ vistas de IA. Divergência acima de 5% entre a tabela e a lateral vai à pessoa.
    `cilindrosInclinacao` (2).
 5. `protetor` do operador, com as luzes, o espelho e as lanternas altas.
 6. `banco`; `colunaDirecao` com o `volante`; `pedais`; `alavancas`.
-7. `berco` do GLP com o `cilindroGlp` e as `cintas`; `escape`.
+7. `glp`, com o berço, o `cilindroGlp` e as `cintas`; `escape`.
 
 Peça rígida entre juntas é uma peça só, como no braço: o que não gira em
 relação ao vizinho entra na mesma receita.

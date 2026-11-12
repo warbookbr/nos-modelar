@@ -15,6 +15,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const TESTES_LENTOS = [
+  'tools/modelar/ondulacao-corte-e-quina.test.mjs',
+  'procedural/nucleo/paineis-por-vaos-curva.test.ts',
+  'procedural/nucleo/paineis-por-vaos-superficie.test.ts',
+  'procedural/nucleo/paineis-por-vaos-separa.test.ts',
   'tools/modelar/guardas/etapas-do-acervo.test.mjs',
   'tools/fixtures/solido-por-lacos/solido-por-lacos.test.ts',
   'tools/fixtures/solido-por-lacos/tubos.test.ts',
@@ -37,6 +41,8 @@ export const TESTES_LENTOS = [
   'procedural/familias/roda-pneu/roda-pneu.test.js',
   'procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js',
   'procedural/nucleo/friso-contato.test.mjs',
+  'procedural/nucleo/paineis-por-vaos-grande.test.ts',
+  'procedural/nucleo/limpar-lascas.test.ts',
   'procedural/nucleo/gaiola-por-rede-contato.test.mjs',
   'procedural/nucleo/operacoes/arredondar-costura-convexa.test.ts',
   'procedural/nucleo/operacoes/arredondar-costura-tubos-altos.test.ts',

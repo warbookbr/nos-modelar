@@ -1,0 +1,75 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/chassi",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: lado.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "chassi",
+        "tipo": "ausencia",
+        "onde": "entre os dois braços, sob a caçamba",
+        "sentido": "faltando",
+        "evidencia": "chassi-tres-quartos.png mostra travessas e chapas transversais entre os braços; nas vistas superior e isométrica do modelo os braços ficam livres, sem travamento."
+      }
+    ],
+    "observacao": "Silhueta, proporções e simetria seguem o alvo, e o laço acomoda a roda. O único achado é a travessa que a referência mostra e o modelo não tem."
+  },
+  "partes": [
+    {
+      "nome": "chassi",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "manoplas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "mancais",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixo",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "defeito 1 (faltam travessas entre os braços) é a parte travessas da peça pes, que a divisão em peças pôs fora do chassi; atribuição: plano, que não diz ao crítico onde elas estão",
+    "a receita mudou só em texto do PLANO, com malha idêntica, e o registro exigiu novo julgamento; atribuição: ferramenta (a ação poderia comparar a forma, não o texto)"
+  ],
+  "notaDePassagem": "PLANO.lataria virou dispensa porque a peca e tubo redondo de aco com punhos e nao chapa; a rodada-de-modelagem avisa a dispensa e nao reprova. Malha identica (hash dos PASSOS igual antes e depois).",
+  "receita": {
+    "sha256": "sha256:df6cf3b492802524969b7b54cb614ff90ba502cfea085a66b9aadbdc2d35e1f3",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 1,
+      "acrescentadas": 1,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 148,
+          "texto": "    lataria: { partes: ['chassi', 'manoplas'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    lataria: { dispensa: 'a peça é tubo redondo de aço com punhos, e não chapa de lataria: a luz rasante e a curvatura de superfície de lataria não se aplicam' },"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-11T04:00:04.632Z"
+}

@@ -1,27 +1,36 @@
 /* gaiola-varrida.js — a gaiola de uma superfície varrida: uma seção dada ao longo de um trilho dado, com estações, alargamento e recortes
  *
  * FICHA gaiolaVarrida
- * serve: gaiola de uma faixa de chapa de seção constante, varrida por um trilho (reta, arco ou polilinha), com estações por altura ou raio.
+ * serve: gaiola de uma faixa de chapa ou de um tubo de seção constante, varrida por um trilho (reta, arco, ou polilinha com raio nos
+ *   cantos), com estações por altura ou raio.
  * quando: saia, borda, friso, régua, moldura ou arco, em que a seção é a mesma e o trilho é que anda; para uma chapa inteira com
  *   seções que mudam use gaiolaPorEstacoes, e para feições que cortam a chapa use gaiolaPorRede.
  * unidades: trilho, seção e estações entram em mm; `pontos` sai em metro, para pôr em TOPO.
  * campos:
  *   nome: prefixo dos pontos, que saem como `${nome}_${estacao}_${linha}`.
- *   trilho: [{ reta: { de, ate } }, { arco: { centro, eixo, de, graus } }, ...] contíguos, ou { pontos: [[x, y, z], ...] }.
- *   quadro: { u: [x, y, z] } ou { v: [x, y, z] }, com virar? para trocar o sinal do outro eixo; a seção vive no plano que a tangente atravessa.
+ *   trilho: [{ reta: { de, ate } }, { arco: { centro, eixo, de, graus } }, ...] contíguos, ou { pontos: [[x, y, z], ...], raios?, fechado? }:
+ *     raios é um raio por canto (os pontos de dentro; todos com fechado) ou um número para todos, 0 é canto vivo, e cada canto vira o
+ *     arco tangente às duas retas; o raio que não cabe no trecho é recusado com a medida. fechado: true volta do último ponto ao primeiro.
+ *   quadro: { u: [x, y, z] } ou { v: [x, y, z] }, com virar? para trocar o sinal do outro eixo, e modo?: 'fixo' (padrão), em que o eixo
+ *     fica na direção dada e a seção achata onde ela sai do plano normal ao trilho (a gaiola devolve o aviso), ou 'acompanha', em que a
+ *     seção fica no plano normal ao trilho, com o eixo levado sem torção desde o começo (o tubo redondo que sobe continua redondo).
  *   secao: [[u, v] | { u, v, nome? }, ...] as linhas da superfície, de pelo menos duas, cada uma um ponto da seção.
  *   fechada: true fecha a seção: faces também entre a última linha e a primeira (tubo); pede três linhas e recusa `fora`.
  *   tampas: true põe uma face plana em cada ponta (só com fechada), com vinco vivo no aro; 'redondas', sem o vinco. Normal pelo volume.
- *   estacoes: marcos { em } | { fracao } | { plano: { eixo, valor } } | { cilindro: { eixo, por, raio } }, com { entre: n } ou { passo: mm } entre eles.
+ *   estacoes: marcos { em } | { fracao } | { plano: { eixo, valor } } | { cilindro: { eixo, por, raio } }, com { entre: n } ou { passo: mm } entre eles;
+ *     ou { passo, graus?, flecha? }: um marco em cada emenda do trilho, passo nas retas e, nos arcos, a cada graus (7,5) e corda de flecha (0,15 mm).
  *   fora: [x, y, z] ou { centro, semEixo? }: o lado para onde a chapa olha, que decide a normal das faces (não vale com fechada).
  *   vincos: [{ linha, nitidez }] vinco ao longo de uma linha da seção.
  *   remover: [{ estacoes: [marcoA, marcoB], linhas: [linhaA, linhaB] }] tira as células entre os marcos e as linhas citados.
  *   alargamento: { campo: { cilindro }, perfil: [[d, u], ...], topoAberto?, rolada? } segunda superfície que alarga a seção em volta de um cilindro.
- * devolve: { nome, vertices, faces, vincos, cantos, pontos, posicoes, nomeDe(estacao, linha), estacoes, linhas, comprimento }.
+ * devolve: { nome, vertices, faces, vincos, cantos, pontos, posicoes, nomeDe(estacao, linha), estacoes, linhas, comprimento, avisos? },
+ *   avisos só quando há: [{ tipo: 'secao-achatada', eixo, de, ate, razao, tamanho, medida, mensagem }].
  * exemplo:
  *   gaiolaVarrida({ nome: 'regua', trilho: [{ reta: { de: [0, 0, 0], ate: [0, 0, 1000] } }], quadro: { u: [1, 0, 0] },
  *     secao: [{ u: 0, v: 0, nome: 'baixo' }, { u: 0, v: 100, nome: 'cima' }],
  *     estacoes: [{ fracao: 0 }, { passo: 100 }, { fracao: 1 }], fora: [1, 0, 0] })
+ *   gaiolaVarrida({ nome: 'tubo', trilho: { pontos: [[0, 0, 0], [0, 0, 400], [0, 150, 650]], raios: 60 }, quadro: { u: [0, 1, 0], modo: 'acompanha' },
+ *     secao: [[16, 0], [0, 16], [-16, 0], [0, -16]], fechada: true, tampas: true, estacoes: { passo: 40 } })
  * peça: procedural/pecas/furgao-realista/receita.js (saias e molduras dos arcos).
  * FIM DA FICHA
  *
@@ -33,26 +42,38 @@
  *
  *   gaiolaVarrida({
  *     nome,                      prefixo dos pontos: `${nome}_${estacao}_${linha}`
- *     trilho,                    [{ reta: { de, ate } }, { arco: { centro, eixo, de, graus } }, ...] contíguos, ou { pontos: [[x, y, z], ...] }
- *     quadro,                    { u: [x, y, z] } ou { v: [x, y, z] }, e virar?: true
+ *     trilho,                    [{ reta: { de, ate } }, { arco: { centro, eixo, de, graus } }, ...] contíguos, ou { pontos, raios?, fechado? }
+ *     quadro,                    { u: [x, y, z] } ou { v: [x, y, z] }, virar?: true, modo?: 'fixo' | 'acompanha'
  *     secao,                     [[u, v] | { u, v, nome? }, ...]  as linhas, de pelo menos duas
  *     fechada?, tampas?,         true: a seção volta da última linha à primeira; uma face em cada ponta (só com fechada)
- *     estacoes,                  [marco, { entre: n } | { passo: mm, linha? }, marco, ...]
+ *     estacoes,                  [marco, { entre: n } | { passo: mm, linha? }, marco, ...] ou { passo, graus?, flecha? }
  *     fora,                      [x, y, z] ou { centro: [x, y, z], semEixo?: 'x' | 'y' | 'z' }; sem ele com fechada
  *     vincos?,                   [{ linha: nome, nitidez: 0 a 1 | 'viva' }]
  *     remover?,                  [{ estacoes: [marcoA, marcoB], linhas: [linhaA, linhaB] }]
  *     alargamento?,              { campo: { cilindro }, perfil: [[d, u], ...], topoAberto?, rolada?: { abaixoDe, razao } } ou uma lista deles
  *   })
- *   -> { nome, vertices, faces, vincos, cantos, pontos, posicoes, nomeDe, estacoes, linhas, comprimento }
+ *   -> { nome, vertices, faces, vincos, cantos, pontos, posicoes, nomeDe, estacoes, linhas, comprimento, avisos? }
  *
  * O TRILHO. `reta` vai de um ponto a outro; `arco` gira o ponto `de` em torno da reta que passa por `centro` com a direção `eixo`, por
  * `graus` (com sinal, pela regra da mão direita em torno do eixo), e o raio é a distância de `de` ao eixo. Os segmentos se emendam
  * (cada um começa onde o anterior termina) e a posição no trilho é o comprimento de arco `s`, em mm, de 0 ao comprimento. A polilinha
- * `{ pontos }` são retas entre pontos seguidos; no canto o quadro salta de uma reta à outra.
+ * `{ pontos }` são retas entre pontos seguidos; no canto o quadro salta de uma reta à outra. Com `raios` cada canto de raio R e giro θ
+ * vira o arco tangente às duas retas, que tira R·tan(θ/2) de cada uma, e o trecho que não tem reta para os dois arcos que o cortam é
+ * recusado com o comprimento dele, o que os arcos pedem e o maior raio que cabe; o canto de raio 0 fica vivo. Com `fechado: true` a
+ * polilinha volta do último ponto ao primeiro, todo ponto é canto, o trilho começa e acaba no meio da reta que sobra entre o último
+ * ponto e o primeiro, a última estação é a primeira (as faces fecham o laço, e `tampas` é recusado) e as estações das pontas têm de
+ * estar no começo e no fim do trilho. Sem `raios` e sem `fechado` a polilinha é a de antes deles, byte a byte.
  *
  * O QUADRO. Em cada `s` o trilho tem a tangente T. A seção vive no plano que T atravessa: `{ u: dir }` fixa o eixo u da seção na direção
  * dir (por exemplo a saída de uma lateral) e o eixo v sai de T × u; `{ v: dir }` fixa o v (por exemplo a vertical de uma planta) e o u
  * sai de v × T. `virar: true` troca o sinal do eixo que sai do produto. Um ponto da seção [u, v] fica em trilho(s) + u·U + v·V.
+ * Esse é o `modo: 'fixo'`, o padrão: o eixo fixo não é projetado no plano normal a T, e onde o trilho sobe em relação a ele a seção
+ * achata naquele eixo, medida no corte reto do trilho, na razão |T × dir|. Quando a razão cai abaixo de 0,98 a gaiola devolve um aviso
+ * por trecho de estações seguidas, com o `s` de começo e fim, a razão e a medida em mm, e a malha fica a mesma. Com `modo: 'acompanha'`
+ * o eixo fixo é projetado no plano normal no começo do trilho e levado sem torção (transporte paralelo): parado nas retas, girando com
+ * a tangente em volta do eixo de cada arco e, no canto vivo, pelo menor giro de uma reta à outra; o outro eixo sai do produto como
+ * antes, e a seção fica sempre no plano normal ao trilho. No trilho fechado o eixo volta girado em volta da tangente (a torção do
+ * laço), e esse giro se reparte por igual ao longo do `s`. No trilho plano com o eixo fixo normal ao plano os dois modos coincidem.
  *
  * AS ESTAÇÕES. Uma estação é um corte que atravessa todas as linhas da seção, e cada linha cruza o corte no seu próprio `s`. O corte é
  * um marco:
@@ -67,7 +88,11 @@
  * cruza grita com o nome do marco e da linha. Entre dois marcos, `{ entre: n }` põe n - 1 estações por igual e `{ passo: mm }` põe as que
  * cabem em `passo` no trecho mais longo entre as linhas (ou no da `linha` citada), o mesmo número em todas. As estações têm de crescer em todas as linhas. A
  * `escala` é o fator de u da seção na estação, que anda em linha reta no `s` entre os marcos que a declaram (e fica constante fora deles),
- * e serve ao afunilamento de uma borda que sai menos numa ponta do que na outra.
+ * e serve ao afunilamento de uma borda que sai menos numa ponta do que na outra. `estacoes: { passo, graus?, flecha? }` tira as
+ * estações do trilho: um marco `{ em }` em cada emenda de segmento (começo e fim de cada arco, canto vivo), `{ passo }` nas retas e, em
+ * cada arco, o que der mais entre uma estação a cada `graus` (7,5) de giro e uma a cada corda de `flecha` (0,15 mm) de afastamento do
+ * arco. Os dois padrões são medidos: um tubo de Ø 32 e 24 lados, depois de niveis 2, fica de 31,2 a 32,0 mm em cantos de raio 30 a
+ * 300; só pelos graus o canto de raio 300 caía a 30,0 mm, e 10 graus no de raio 60 a 30,9.
  *
  * O ALARGAMENTO. É a segunda superfície, combinada com a da seção pelo máximo. `campo.cilindro` é a distância d de cada ponto (o pé na
  * linha da seção, com u = 0) à superfície do cilindro, positiva para fora dele; `perfil` dá a saída u em função de d, em linha reta entre
@@ -100,6 +125,10 @@ const MM = 1000;
 const AMOSTRA_MM = 1;
 const AMOSTRAS_MAXIMAS = 20000;
 const GRAUS = Math.PI / 180;
+const MODOS_DO_QUADRO = ['fixo', 'acompanha'];
+const ACHATAMENTO_TOLERADO = 0.02;
+const GRAUS_POR_ESTACAO = 7.5;
+const FLECHA_POR_ESTACAO = 0.15;
 const CAMPOS = ['nome', 'trilho', 'quadro', 'secao', 'fechada', 'tampas', 'estacoes', 'fora', 'vincos', 'remover', 'alargamento'];
 
 export class ErroGaiolaVarrida extends Error {
@@ -138,11 +167,23 @@ function numero(x, onde, { maiorQue = null, inteiro = false } = {}) {
 
 /* ------------------------------------------------------------------ o trilho */
 
+/* o giro de v em torno do eixo unitário k, por th radianos (Rodrigues) */
+function girar(v, k, th) {
+  const c = Math.cos(th); const s = Math.sin(th);
+  return soma(soma(esc(v, c), esc(cruz(k, v), s)), esc(k, dot(k, v) * (1 - c)));
+}
+/* o menor giro que leva a direção a à direção b, aplicado a v; sem giro quando a e b são a mesma direção ou opostas */
+function giroMinimo(v, a, b) {
+  const eixo = cruz(a, b); const sen = norma(eixo);
+  if (sen < 1e-12) return v;
+  return girar(v, esc(eixo, 1 / sen), Math.atan2(sen, dot(a, b)));
+}
+
 function segmentoReta(de, ate, onde) {
   const L = norma(sub(ate, de));
   if (!(L > EPS)) falha(`${onde} tem a ponta igual ao começo: o segmento precisa ter comprimento`);
   const t = unit(sub(ate, de));
-  return { comprimento: L, inicio: de, fim: ate, em: (s) => ({ p: soma(de, esc(t, s)), t }) };
+  return { tipo: 'reta', comprimento: L, inicio: de, fim: ate, tInicio: t, tFim: t, em: (s) => ({ p: soma(de, esc(t, s)), t }), levar: (s, w) => w };
 }
 function segmentoArco({ centro, eixo, de, graus }, onde) {
   vetor(centro, `${onde}.centro`); vetor(eixo, `${onde}.eixo`, { diferenteDeZero: true }); vetor(de, `${onde}.de`);
@@ -153,23 +194,79 @@ function segmentoArco({ centro, eixo, de, graus }, onde) {
   if (!(r > EPS)) falha(`${onde}.de está sobre o eixo do arco; o raio precisa ser maior que zero`);
   const total = Math.abs(graus) * GRAUS; const sinal = Math.sign(graus); const kr = cruz(k, radial);
   const ponto = (th) => soma(centro, soma(axial, soma(esc(radial, Math.cos(th)), esc(kr, Math.sin(th)))));
-  return {
-    comprimento: r * total, inicio: ponto(0), fim: ponto(sinal * total),
-    em: (s) => {
-      const th = sinal * s / r;
-      const tg = soma(esc(radial, -Math.sin(th)), esc(kr, Math.cos(th)));
-      return { p: ponto(th), t: unit(esc(tg, sinal)) };
-    },
+  const em = (s) => {
+    const th = sinal * s / r;
+    const tg = soma(esc(radial, -Math.sin(th)), esc(kr, Math.cos(th)));
+    return { p: ponto(th), t: unit(esc(tg, sinal)) };
   };
+  /* no arco a tangente gira em torno do eixo, e o quadro que não torce gira com ela */
+  return { tipo: 'arco', graus, comprimento: r * total, inicio: ponto(0), fim: ponto(sinal * total), tInicio: em(0).t, tFim: em(r * total).t, em, levar: (s, w) => girar(w, k, sinal * s / r) };
 }
+
+/* a polilinha com raio nos cantos: cada canto com raio vira um arco tangente às duas retas, que encurta cada uma de R·tan(giro/2);
+   raio 0 deixa o canto vivo. Com `fechado` a polilinha volta do último ponto ao primeiro, todo ponto é canto, e o trilho começa e
+   acaba no meio da reta que sobra entre o último ponto e o primeiro. */
+function trechosComRaios(trilho) {
+  const { pontos: p, raios } = trilho; const fechado = trilho.fechado === true;
+  if (trilho.fechado !== undefined && typeof trilho.fechado !== 'boolean') falha(`trilho.fechado precisa ser true ou false, e veio ${mostra(trilho.fechado)}`);
+  const n = p.length;
+  if (fechado && n < 3) falha(`trilho.pontos fechado precisa de pelo menos três pontos, e veio com ${n}`);
+  const cantos = fechado ? Array.from({ length: n }, (_, i) => i) : Array.from({ length: Math.max(0, n - 2) }, (_, i) => i + 1);
+  let rs;
+  if (raios === undefined) rs = cantos.map(() => 0);
+  else if (Array.isArray(raios)) {
+    if (raios.length !== cantos.length) falha(`trilho.raios tem ${raios.length} raios e o trilho tem ${cantos.length} cantos${fechado ? ' (fechado, todo ponto é canto)' : ' (os pontos de dentro, sem as pontas)'}; dê um raio por canto, ou um número só`);
+    rs = raios.map((r, k) => numero(r, `trilho.raios[${k}]`));
+  } else rs = cantos.map(() => numero(raios, 'trilho.raios'));
+  rs.forEach((r, k) => { if (r < 0) falha(`trilho.raios[${k}] é ${r}; o raio do canto é 0 (vivo) ou positivo`); });
+  const ponto = (i) => p[((i % n) + n) % n];
+  const corte = new Array(n).fill(0); const giro = new Array(n).fill(0); const raio = new Array(n).fill(0);
+  cantos.forEach((i, k) => {
+    const d1 = unit(sub(ponto(i), ponto(i - 1))); const d2 = unit(sub(ponto(i + 1), ponto(i)));
+    const th = Math.acos(Math.max(-1, Math.min(1, dot(d1, d2))));
+    if (rs[k] > 0 && th > Math.PI - 1e-6) falha(`o canto em trilho.pontos[${i}] volta para trás (giro de 180 graus): não há arco tangente que o faça`);
+    if (rs[k] > 0 && th > 1e-9) { corte[i] = rs[k] * Math.tan(th / 2); giro[i] = th; raio[i] = rs[k]; }
+  });
+  const ate = fechado ? n : n - 1;
+  for (let i = 0; i < ate; i++) {
+    const j = (i + 1) % n; const Lt = norma(sub(ponto(j), ponto(i)));
+    if (corte[i] + corte[j] > Lt + 1e-6) {
+      const parte = (q) => (raio[q] > 0 ? `o raio ${raio[q]} em pontos[${q}] corta ${+corte[q].toFixed(2)} mm dele, e o maior que cabe ali com o outro como está é ${+((Lt - corte[i] - corte[j] + corte[q]) / Math.tan(giro[q] / 2)).toFixed(2)} mm` : null);
+      falha(`o raio não cabe no trecho de trilho.pontos[${i}] a trilho.pontos[${j}]: o trecho mede ${+Lt.toFixed(2)} mm e os arcos pedem ${+(corte[i] + corte[j]).toFixed(2)} mm (${[parte(i), parte(j)].filter(Boolean).join('; ')})`);
+    }
+  }
+  const segs = [];
+  const reta = (de, para, onde) => { if (norma(sub(para, de)) > 1e-6) segs.push(segmentoReta(de, para, onde)); };
+  let inicio;
+  if (fechado) {
+    const a = ponto(n - 1); const d = unit(sub(ponto(0), a)); const Lt = norma(sub(ponto(0), a));
+    inicio = soma(a, esc(d, corte[n - 1] + (Lt - corte[n - 1] - corte[0]) / 2));
+  } else inicio = p[0];
+  let atual = inicio;
+  for (const i of cantos) {
+    const P = ponto(i); const d1 = unit(sub(P, ponto(i - 1))); const d2 = unit(sub(ponto(i + 1), P));
+    if (!(raio[i] > 0)) { reta(atual, P, `trilho.pontos[${i}]`); atual = P; continue; }
+    const T1 = sub(P, esc(d1, corte[i]));
+    reta(atual, T1, `trilho.pontos[${i}]`);
+    const eixo = unit(cruz(d1, d2)); const centro = soma(T1, esc(unit(cruz(eixo, d1)), raio[i]));
+    segs.push(segmentoArco({ centro, eixo, de: T1, graus: giro[i] / GRAUS }, `o arco em trilho.pontos[${i}]`));
+    atual = soma(P, esc(d2, corte[i]));
+  }
+  reta(atual, fechado ? inicio : p[n - 1], `trilho.pontos[${n - 1}]`);
+  if (!segs.length) falha('trilho.pontos não deixa comprimento: os pontos coincidem');
+  return { segs, fechado };
+}
+
 function lerTrilho(trilho) {
-  let segs = [];
+  let segs = []; let fechado = false;
   if (trilho && !Array.isArray(trilho) && typeof trilho === 'object') {
-    exigirCampos(trilho, ['pontos'], 'trilho');
+    exigirCampos(trilho, ['pontos', 'raios', 'fechado'], 'trilho');
     const p = trilho.pontos;
     if (!Array.isArray(p) || p.length < 2) falha(`trilho.pontos precisa ser lista de pelo menos dois pontos [x, y, z], e veio ${mostra(p)}`);
     p.forEach((q, k) => vetor(q, `trilho.pontos[${k}]`));
-    for (let k = 0; k + 1 < p.length; k++) segs.push(segmentoReta(p[k], p[k + 1], `trilho.pontos[${k}]-[${k + 1}]`));
+    if (trilho.raios === undefined && trilho.fechado === undefined) {
+      for (let k = 0; k + 1 < p.length; k++) segs.push(segmentoReta(p[k], p[k + 1], `trilho.pontos[${k}]-[${k + 1}]`));
+    } else ({ segs, fechado } = trechosComRaios(trilho));
   } else {
     if (!Array.isArray(trilho) || !trilho.length) falha(`trilho precisa ser lista de segmentos { reta } ou { arco }, ou { pontos }, e veio ${mostra(trilho)}`);
     trilho.forEach((seg, k) => {
@@ -190,28 +287,70 @@ function lerTrilho(trilho) {
   }
   const acum = []; let L = 0;
   for (const g of segs) { acum.push(L); L += g.comprimento; }
-  const em = (s) => {
+  const local = (s) => {
     const x = Math.min(Math.max(s, 0), L);
     let k = acum.length - 1;
     while (k > 0 && acum[k] > x) k--;
-    return segs[k].em(x - acum[k]);
+    return { k, x: x - acum[k] };
   };
-  return { comprimento: L, em };
+  const em = (s) => { const { k, x } = local(s); return segs[k].em(x); };
+  return { comprimento: L, em, local, segs, acum, fechado };
 }
 
 /* ------------------------------------------------------------------ leitura da definição */
 
-function lerQuadro(q) {
-  exigirCampos(q, ['u', 'v', 'virar'], 'quadro');
+function lerQuadro(q, trilho) {
+  exigirCampos(q, ['u', 'v', 'virar', 'modo'], 'quadro');
   if ((q.u === undefined) === (q.v === undefined)) falha('quadro precisa ter u ou v, um só dos dois: a direção fixa de um eixo da seção');
   if (q.virar !== undefined && typeof q.virar !== 'boolean') falha(`quadro.virar precisa ser true ou false, e veio ${mostra(q.virar)}`);
-  const fixo = unit(vetor(q.u ?? q.v, q.u !== undefined ? 'quadro.u' : 'quadro.v', { diferenteDeZero: true }));
+  if (q.modo !== undefined && !MODOS_DO_QUADRO.includes(q.modo)) falha(`quadro.modo precisa ser ${MODOS_DO_QUADRO.map(citar).join(' ou ')}, e veio ${mostra(q.modo)}`);
+  const eixoU = q.u !== undefined; const rotulo = eixoU ? 'u' : 'v';
+  const fixo = unit(vetor(q.u ?? q.v, `quadro.${rotulo}`, { diferenteDeZero: true }));
   const sinal = q.virar ? -1 : 1;
-  return (t, s) => {
-    const o = q.u !== undefined ? cruz(t, fixo) : cruz(fixo, t);
-    if (!(norma(o) > 1e-9)) falha(`o quadro é paralelo ao trilho em s = ${+s.toFixed(3)} mm: a direção fixa ${q.u !== undefined ? 'u' : 'v'} precisa cruzar a tangente`);
-    const outro = esc(unit(o), sinal);
-    return q.u !== undefined ? { U: fixo, V: outro } : { U: outro, V: fixo };
+  const montar = (W, t) => {
+    const outro = esc(unit(eixoU ? cruz(t, W) : cruz(W, t)), sinal);
+    return eixoU ? { U: W, V: outro } : { U: outro, V: W };
+  };
+  /* a fração do eixo fixo que fica no plano normal ao trilho: o tamanho da seção naquele eixo, medido no corte reto do trilho */
+  const fator = (t) => norma(cruz(t, fixo));
+  if (q.modo !== 'acompanha') {
+    return {
+      modo: 'fixo', rotulo, fator,
+      em: (t, s) => {
+        const o = eixoU ? cruz(t, fixo) : cruz(fixo, t);
+        if (!(norma(o) > 1e-9)) falha(`o quadro é paralelo ao trilho em s = ${+s.toFixed(3)} mm: a direção fixa ${rotulo} precisa cruzar a tangente`);
+        const outro = esc(unit(o), sinal);
+        return eixoU ? { U: fixo, V: outro } : { U: outro, V: fixo };
+      },
+    };
+  }
+  /* o quadro que acompanha: o eixo fixo projetado no plano normal ao começo do trilho e levado sem torção (transporte paralelo):
+     parado nas retas, girando com a tangente em volta do eixo de cada arco e, num canto vivo, pelo menor giro de uma reta à outra */
+  const { segs, comprimento: L } = trilho;
+  const projetar = (w, t, onde) => {
+    const r = sub(w, esc(t, dot(w, t)));
+    if (!(norma(r) > 1e-9)) falha(`o quadro é paralelo ao trilho ${onde}: a direção fixa ${rotulo} precisa cruzar a tangente`);
+    return unit(r);
+  };
+  const inicios = []; let w = projetar(fixo, segs[0].tInicio, 'no começo');
+  segs.forEach((g, k) => {
+    if (k > 0) w = projetar(giroMinimo(w, segs[k - 1].tFim, g.tInicio), g.tInicio, `em s = ${+trilho.acum[k].toFixed(3)} mm`);
+    inicios.push(w); w = g.levar(g.comprimento, w);
+  });
+  /* no trilho fechado o quadro volta girado em volta da tangente (a torção do laço); o giro se reparte por igual ao longo do trilho */
+  let torcao = 0;
+  if (trilho.fechado) {
+    const t0 = segs[0].tInicio; const w0 = inicios[0]; const wL = projetar(giroMinimo(w, segs.at(-1).tFim, t0), t0, 'no fim');
+    torcao = Math.atan2(dot(cruz(wL, w0), t0), dot(wL, w0));
+  }
+  return {
+    modo: 'acompanha', rotulo, fator,
+    em: (t, s) => {
+      const { k, x } = trilho.local(s);
+      let W = segs[k].levar(x, inicios[k]);
+      if (torcao) W = girar(W, t, torcao * Math.min(Math.max(s, 0), L) / L);
+      return montar(projetar(W, t, `em s = ${+s.toFixed(3)} mm`), t);
+    },
   };
 }
 
@@ -300,6 +439,26 @@ function lerEstacoes(estacoes) {
   return itens;
 }
 
+/* as estações tiradas do trilho: um marco em cada emenda de segmento (o começo e o fim de cada arco, o canto vivo), `passo` mm nas
+   retas e, nos arcos, uma estação a cada `graus` de giro da tangente e a cada corda de `flecha` mm, o que der mais */
+function estacoesDoTrilho(e, trilho) {
+  exigirCampos(e, ['passo', 'graus', 'flecha'], 'estacoes');
+  const passo = numero(e.passo, 'estacoes.passo', { maiorQue: 0 });
+  const graus = e.graus === undefined ? GRAUS_POR_ESTACAO : numero(e.graus, 'estacoes.graus', { maiorQue: 0 });
+  const flecha = e.flecha === undefined ? FLECHA_POR_ESTACAO : numero(e.flecha, 'estacoes.flecha', { maiorQue: 0 });
+  const partes = (g) => {
+    const giro = Math.abs(g.graus) * GRAUS; const R = g.comprimento / giro;
+    const pelaFlecha = flecha >= R ? Math.PI : 2 * Math.acos(1 - flecha / R);
+    return Math.max(1, Math.ceil(giro / (graus * GRAUS) - 1e-9), Math.ceil(giro / pelaFlecha - 1e-9));
+  };
+  const lista = [{ fracao: 0 }];
+  trilho.segs.forEach((g, k) => {
+    lista.push(g.tipo === 'arco' ? { entre: partes(g) } : { passo });
+    lista.push(k + 1 < trilho.segs.length ? { em: trilho.acum[k + 1] } : { fracao: 1 });
+  });
+  return lista;
+}
+
 function lerFora(fora) {
   if (Array.isArray(fora)) { vetor(fora, 'fora', { diferenteDeZero: true }); return () => fora; }
   exigirCampos(fora, ['centro', 'semEixo'], 'fora');
@@ -372,12 +531,13 @@ export function gaiolaVarrida(definicao) {
   if (fechada && definicao.fora !== undefined) falha('fora não vale com fechada: a seção fechada orienta as faces pelo volume, para fora');
   if (!fechada && definicao.fora === undefined) falha('fora é obrigatório: o lado da normal das faces, [x, y, z] ou { centro }');
   const trilho = lerTrilho(definicao.trilho);
-  const quadro = lerQuadro(definicao.quadro);
+  const quadro = lerQuadro(definicao.quadro, trilho);
   const linhas = lerSecao(definicao.secao);
-  const itens = lerEstacoes(definicao.estacoes);
+  const itens = lerEstacoes(Array.isArray(definicao.estacoes) ? definicao.estacoes : estacoesDoTrilho(definicao.estacoes, trilho));
   if (fechada && linhas.length < 3) falha(`a seção fechada precisa de pelo menos três linhas, e veio com ${linhas.length}`);
   if (fechada && Math.hypot(linhas.at(-1).u - linhas[0].u, linhas.at(-1).v - linhas[0].v) < EPS) falha(`secao[${linhas.length - 1}] repete o ponto de secao[0]: na seção fechada a volta da última linha à primeira já é feita, sem repetir o ponto`);
   const dicaDeFora = fechada ? null : lerFora(definicao.fora);
+  if (trilho.fechado && tampas) falha('tampas não vale com o trilho fechado: o laço não tem ponta, e a última estação é a primeira');
   const alarg = definicao.alargamento === undefined ? [] : (Array.isArray(definicao.alargamento) ? definicao.alargamento : [definicao.alargamento]).map((a, k) => lerAlargamento(a, linhas, Array.isArray(definicao.alargamento) ? `alargamento[${k}]` : 'alargamento'));
   const nLinhas = linhas.length; const L = trilho.comprimento;
 
@@ -396,7 +556,7 @@ export function gaiolaVarrida(definicao) {
       if (m.tipo === 'fracao') return m.fracao * L;
       const antes = marcos.at(-1)?.s[j] ?? 0;
       const achou = acharCruzamento((x) => {
-        const { p, t } = trilho.em(x); const { U, V } = quadro(t, x);
+        const { p, t } = trilho.em(x); const { U, V } = quadro.em(t, x);
         return m.medida(soma(p, soma(esc(U, l.u), esc(V, l.v))));
       }, m.alvo, m.cruzando, antes, L);
       if (achou === null) falha(`a linha ${rotuloLinha(j)} da seção não cruza o corte ${rotuloMarco(m, k)} depois de s = ${+antes.toFixed(3)} mm no trilho${m.cruzando ? ` (${m.cruzando})` : ''}`);
@@ -433,6 +593,39 @@ export function gaiolaVarrida(definicao) {
     m += 1;
   }
   const nEst = estacoes.length;
+  /* no trilho fechado a última estação é a primeira: as faces da última volta voltam aos pontos da estação 0 */
+  if (trilho.fechado) {
+    linhas.forEach((_, j) => {
+      if (estacoes[0].s[j] > 1e-6 || estacoes[nEst - 1].s[j] < L - 1e-6) falha(`no trilho fechado a primeira e a última estação são o começo e o fim do trilho em todas as linhas, e na linha ${rotuloLinha(j)} vão de s = ${+estacoes[0].s[j].toFixed(3)} a ${+estacoes[nEst - 1].s[j].toFixed(3)} mm (de 0 a ${+L.toFixed(3)})`);
+    });
+    if (nEst < 3) falha(`o trilho fechado precisa de pelo menos três estações, e veio com ${nEst}`);
+  }
+  const volta = (i) => (trilho.fechado && i === nEst - 1 ? 0 : i);
+
+  /* o aviso da seção achatada: com o quadro fixo, o eixo fixo que não fica no plano normal ao trilho encolhe a seção naquele eixo,
+     medida no corte reto do trilho; a malha não muda, e o aviso diz o trecho e a medida */
+  const avisos = [];
+  if (quadro.modo === 'fixo') {
+    const ext = linhas.map((l) => (quadro.rotulo === 'u' ? l.u : l.v));
+    const tamanho = Math.max(...ext) - Math.min(...ext);
+    let corrida = null;
+    const fechar = () => {
+      if (!corrida) return;
+      avisos.push({
+        tipo: 'secao-achatada', eixo: quadro.rotulo, de: corrida.de, ate: corrida.ate, razao: corrida.razao, tamanho, medida: tamanho * corrida.razao,
+        mensagem: `a seção achata no eixo ${quadro.rotulo} de s = ${+corrida.de.toFixed(1)} a ${+corrida.ate.toFixed(1)} mm: ${+tamanho.toFixed(2)} mm de seção medem ${+(tamanho * corrida.razao).toFixed(2)} mm no corte reto do trilho (${+corrida.razao.toFixed(3)}), porque a direção fixa ${quadro.rotulo} do quadro não fica no plano normal ao trilho ali; quadro.modo 'acompanha' mantém a seção nesse plano`,
+      });
+      corrida = null;
+    };
+    estacoes.forEach((e) => {
+      const razao = Math.min(...e.s.map((x) => quadro.fator(trilho.em(x).t)));
+      if (razao < 1 - ACHATAMENTO_TOLERADO) {
+        if (!corrida) corrida = { de: e.s[0], ate: e.s[0], razao };
+        corrida.ate = e.s[0]; corrida.razao = Math.min(corrida.razao, razao);
+      } else fechar();
+    });
+    fechar();
+  }
 
   /* a escala de u em cada estação e linha, em linha reta no `s` entre os marcos que a declaram */
   const comEscala = marcos.filter((x) => x.marco.escala !== null);
@@ -451,7 +644,7 @@ export function gaiolaVarrida(definicao) {
   for (let i = 0; i < nEst; i++) {
     for (let j = 0; j < nLinhas; j++) {
       const s = estacoes[i].s[j]; const l = linhas[j];
-      const { p, t } = trilho.em(s); const { U, V } = quadro(t, s);
+      const { p, t } = trilho.em(s); const { U, V } = quadro.em(t, s);
       const uProprio = l.u * escalaEm(j, s);
       let u = uProprio;
       for (const a of alarg) {
@@ -495,7 +688,7 @@ export function gaiolaVarrida(definicao) {
   for (let i = 0; i + 1 < nEst; i++) {
     for (let j = 0; j < celulas; j++) {
       const k = (j + 1) % nLinhas;
-      if (!removida(i, j)) faces.push([nomeDe(i, j), nomeDe(i + 1, j), nomeDe(i + 1, k), nomeDe(i, k)]);
+      if (!removida(i, j)) faces.push([nomeDe(i, j), nomeDe(volta(i + 1), j), nomeDe(volta(i + 1), k), nomeDe(i, k)]);
     }
   }
   if (!faces.length) falha('os recortes tiram todas as faces da superfície');
@@ -504,7 +697,7 @@ export function gaiolaVarrida(definicao) {
        (último, j + 1): cada tampa percorre a aresta no sentido contrário */
     const ponta = (i) => Array.from({ length: nLinhas }, (_, j) => nomeDe(i, j));
     const tampaDe = [ponta(0), ponta(nEst - 1).reverse()];
-    const volume = [...faces, ...tampaDe].reduce((v, f) => {
+    const volume = [...faces, ...(trilho.fechado ? [] : tampaDe)].reduce((v, f) => {
       const a = pos.get(f[0]);
       for (let k = 1; k + 1 < f.length; k++) v += dot(a, cruz(pos.get(f[k]), pos.get(f[k + 1]))) / 6;
       return v;
@@ -539,7 +732,7 @@ export function gaiolaVarrida(definicao) {
       if (typeof v.linha !== 'string' || !indiceDaLinha.has(v.linha)) falha(`${onde}.linha precisa ser o nome de uma linha da seção, e veio ${mostra(v.linha)}`);
       if (v.nitidez !== 'viva' && !(finito(v.nitidez) && v.nitidez >= 0 && v.nitidez <= 1)) falha(`${onde}.nitidez precisa ser de 0 a 1, ou 'viva', e veio ${mostra(v.nitidez)}`);
       const j = indiceDaLinha.get(v.linha);
-      const todos = Array.from({ length: nEst }, (_, i) => nomeDe(i, j));
+      const todos = Array.from({ length: nEst }, (_, i) => nomeDe(volta(i), j));
       let corrida = [todos[0]]; let q = 0;
       const fechar = () => { if (corrida.length > 1) { vincos.push({ nome: `${nome}_${v.linha}_${q}`, pontos: corrida, nitidez: v.nitidez }); q += 1; } };
       for (let i = 0; i + 1 < nEst; i++) {
@@ -561,5 +754,6 @@ export function gaiolaVarrida(definicao) {
   return {
     nome, vertices, faces, vincos, cantos: [], pontos, posicoes, nomeDe,
     estacoes: estacoes.map((e) => ({ nome: e.nome, s: e.s })), linhas: linhas.map((l) => l.nome), comprimento: L,
+    ...(avisos.length ? { avisos } : {}),
   };
 }

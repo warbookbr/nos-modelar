@@ -22,7 +22,7 @@ const SEMPRE_LIVRES = new Set(['origemId', 'id', 'faces', 'nome', 'pai', 'substi
   'solidos', 'usa', 'cor', 'vista', 'lente', 'niveis', 'borda', 'simetria', 'pesoPadrao', 'lado', 'liso', 'quebraNosVincos', 'lados', 'segmentos',
   'segmentosArco', 'segmentosSpline', 'segmentosCurva', 'aneis', 'seg', 'orientacao', 'direcao', 'de', 'saida', 'aresta', 'chapa', 'superficie',
   'tampa', 'linha', 'ponta', 'paineis', 'cadeia', 'vincos', 'cantos', 'medidas', 'v', 'f', 'face', 'a', 'b', 'para', 'interface', 'rotulo', 'angulo',
-  'divisoes', 'estacoes', 'expoenteSecao']);
+  'divisoes', 'estacoes', 'expoenteSecao', 'limite']);
 const SELECOES = new Set(['sel', 'referencia', 'selPara']);
 
 /** Os campos de medida de cada operação. */
@@ -51,6 +51,7 @@ export const TABELA_DE_MEDIDAS = Object.freeze({
   aberturaPorContorno: ['contorno', 'recuoDaLente'],
   arredondarCostura: ['raio', 'raioMinimo', 'afinarPontas', 'regiao', 'aparar'],
   friso: ['perfil', 'fechamento', 'aba'],
+  limparLascas: ['tolerancia'],
 });
 
 const temNumero = (v) => (typeof v === 'number' ? true : Array.isArray(v) ? v.some(temNumero) : v && typeof v === 'object' ? Object.values(v).some(temNumero) : false);
@@ -71,6 +72,15 @@ function selecao(v, onde) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
   return Object.fromEntries(Object.entries(v).map(([k, x]) => {
     if (k === 'regiao') return [k, medida(x, `${onde}.regiao`)];
+    if (k === 'onde' && x && typeof x === 'object' && x.conexo != null) {
+      /* conexo: `de` e `ate` são medidas e `dir` é só direção; o resto de `onde`, com número, segue recusado */
+      const { conexo, ...resto } = x;
+      if (temNumero(resto)) throw new RecusaDoEsboco('o filtro "onde" com número não é convertido para metro; selecione por grupo, origem ou região', `${onde}.onde`);
+      const c = { ...conexo };
+      if (c.de != null) c.de = medida(c.de, `${onde}.onde.conexo.de`);
+      if (c.ate != null) c.ate = medida(c.ate, `${onde}.onde.conexo.ate`);
+      return [k, { ...resto, conexo: c }];
+    }
     if (k === 'onde' && temNumero(x)) throw new RecusaDoEsboco('o filtro "onde" com número não é convertido para metro; selecione por grupo, origem ou região', `${onde}.onde`);
     return [k, x];
   }));
@@ -82,7 +92,9 @@ export function argsEmMetro(op, args, onde = `passo "${op}"`) {
   const medidas = TABELA_DE_MEDIDAS[op] ?? [];
   const saida = {};
   for (const [k, v] of Object.entries(args)) {
-    if (medidas.includes(k)) saida[k] = medida(v, `${onde}.${k}`);
+    /* o `raio` pedido de um vinco do passo `subdivisao` é medida; o resto do vinco (nome, pontos, nitidez) passa */
+    if (op === 'subdivisao' && k === 'vincos' && Array.isArray(v)) saida[k] = v.map((x) => (x && typeof x === 'object' && x.raio != null ? { ...x, raio: medida(x.raio, `${onde}.vincos.raio`) } : x));
+    else if (medidas.includes(k)) saida[k] = medida(v, `${onde}.${k}`);
     else if (SELECOES.has(k)) saida[k] = selecao(v, `${onde}.${k}`);
     else if (SEMPRE_LIVRES.has(k) || !temNumero(v)) saida[k] = v;
     else {

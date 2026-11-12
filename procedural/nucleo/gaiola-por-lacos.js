@@ -1,7 +1,8 @@
 /* gaiola-por-lacos.js — monta a gaiola fechada da operação `subdivisao` a partir de laços, um contorno por plano ao longo de um eixo
  *
  * FICHA gaiolaPorLacos
- * serve: gaiola de um sólido fechado dado por laços, o contorno da peça em cada plano ao longo de um eixo, com as pontas tampadas.
+ * serve: gaiola de um sólido fechado dado por laços, o contorno da peça em cada plano ao longo de um eixo, com as pontas tampadas, ou
+ *   de uma casca com a ponta aberta (a boca de uma cuba, de um recipiente, de uma carenagem), pronta para a chapa do passo subdivisao.
  * quando: corpos que se fundem numa malha só sem emenda (L, U, cotovelo, alça, cabo, disco com coluna, carcaça com cantos suaves),
  *   cortados em planos paralelos; para uma chapa aberta use gaiolaPorEstacoes, e para uma faixa de seção constante use gaiolaVarrida.
  * unidades: `em` e os pontos dos trechos entram em mm; `pontos` sai em metro, para pôr em TOPO; espalhe `passo` no passo subdivisao.
@@ -13,7 +14,7 @@
  *     menos; encolhe { de, ate, curva? } leva o trecho de inteiro, no laço de, a um ponto no laço ate, aos poucos (curva 'linear' ou 'entrada').
  *   lacos: [{ nome?, em, trechos: { [trecho]: [[u, v], ...] } }] em crescente; o trecho começa onde o anterior acaba.
  *   tampa: { de, ate } os trechos entre os quais a escada tampa as pontas; as duas cadeias entre eles têm os mesmos pontos.
- *   vincos: [{ nome, trecho | entre: [a, b] | laco, trechos?, lacos?: [de, ate], nitidez, esvai? }] borda da faixa de um trecho, linha ou
+ *   vincos: [{ nome, trecho | entre: [a, b] | laco, trechos?, lacos?: [de, ate], nitidez | raio, esvai? }] borda da faixa de um trecho, linha ou
  *     volta de laço; lacos limita o trecho ou o entre a uma faixa de laços; esvai { de, ate, curva? } faz a nitidez do entre cair a zero
  *     entre dois laços. Vinco 'viva' de laço inteiro em dois planos os libera do mínimo.
  *   une: [[trechoA, trechoB], ...] funde, em cada laço, os pontos dos dois trechos que coincidem, mesmo sem serem vizinhos na volta: a linha
@@ -25,7 +26,12 @@
  *     Onde a superfície entre os pontos de um laço sai do contorno mais de TOLERANCIA_DA_COMPENSACAO_MM além do que saía sem compensar (o
  *     canto sem vinco, a quina de uma planta em polígono), sai o aviso `compensacaoPassa` com o trecho, o laço e o desvio.
  *   grupos: [{ nome, lacos?: [de, ate], trechos? | unir: [{ lacos?, trechos? }] }] faces para parte; vai em passo.grupos, em pontos.
- * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe(laco, trecho, k), lacos, trechos, avisos, compensacao? }.
+ *   aberta: 'inicio' | 'fim' | 'ambas' a ponta sem tampa; o laço dela fica borda livre, e `bocas` dá os pontos dele em volta fechada
+ *     (para um vinco, um friso ou a borda virada). Com 'ambas', tampa é dispensada. Sem aberta, as duas pontas são tampadas.
+ *   espessura: mm, ou { valor, niveis?, lado? }, a chapa que o passo subdivisao vai pôr: só confere o raio local na malha refinada (de
+ *     NIVEIS_DA_CONFERENCIA_DA_ESPESSURA níveis), e cada laço com par de raio abaixo dela dá o aviso `cantoApertado` com o ponto, a
+ *     direção ('noLaco', o canto; 'entreLacos', a dobra para o vizinho ou a tampa), o raio e o que fazer. A malha não muda.
+ * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe(laco, trecho, k), lacos, trechos, avisos, compensacao?, bocas?, espessura? }.
  * exemplo:
  *   gaiolaPorLacos({ nome: 'barra', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' },
  *     trechos: [{ nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: 3 }, { nome: 'cima', pontos: 2 }, { nome: 'tras', pontos: 3 }],
@@ -134,8 +140,34 @@
  *
  * OS GRUPOS. `grupos` lista conjuntos de pontos por faixa de laços e por trecho (ou a união de vários, em `unir`) e `passo.grupos`
  * leva os nomes ao passo `subdivisao`, que toma por do grupo a face da gaiola com todos os pontos nele e publica as faces refinadas
- * como `parte` da origem: `parte` recorta o disco e o cilindro pela gaiola, e não por caixa. */
-import { limitesDaGaiola, nitidezDoVinco, refinarGaiola } from './subdivisao.js';
+ * como `parte` da origem: `parte` recorta o disco e o cilindro pela gaiola, e não por caixa.
+ *
+ * A BOCA. `aberta` tira a tampa da ponta pedida: as faces são as da gaiola fechada menos as da escada daquela ponta, na mesma ordem e com a
+ * mesma orientação, e as arestas do laço da boca ficam numa face só (o fechamento aceita só essas). O lado de fora da casca é o do sólido
+ * que a fecharia, medido com um leque de cada aresta da boca até o centro dela, que só entra na conta do volume. O laço de área zero não
+ * tem boca e é recusado. `bocas.inicio` e `bocas.fim` dão { laco, em, pontos }, a volta do laço com o primeiro ponto repetido no fim. A
+ * borda livre já é viva na subdivisão (fica no plano do laço, na curva dos pontos dele), e o vinco vivo nela só confirma isso: a malha
+ * sai a mesma. Com `espessura` no passo `subdivisao`, a chapa fecha a boca com a parede da borda e o sólido fica fechado.
+ *
+ * A CONFERÊNCIA DA ESPESSURA. Numa casca de uma peça de prova, a chapa foi recusada pelo passo porque um laço tinha cantos de raio local
+ * de 6,7 mm, e a saída se achou por tentativa. Com `espessura`, a gaiola é refinada como o passo a refina (os vincos e os cantos dela, os
+ * níveis pedidos) e a chapa é medida pela mesma conta do passo (`espessarSuperficie`); cada par de vértices em que a espessura chega ao
+ * raio local vai ao ponto da gaiola mais perto, e o pior de cada laço dá o aviso, com a direção pelo cosseno do par com a tangente do
+ * laço (COSSENO_DO_CANTO_NO_LACO). Na quina de um polígono o raio acompanha o passo entre os pontos: o quadrado de 60 mm com 3 pontos
+ * por lado dá 13,4 mm, com 5 dá 6,7. A dobra entre o laço da ponta e a tampa sai como 'entreLacos'. A superfície que se dobra sobre si
+ * (que nenhuma espessura acompanha) dá o aviso `espessuraRecusada` com o motivo do passo. A conta não muda a gaiola; a malha com
+ * `medidas` vai ao limite no passo e aqui não, e a diferença fica fora da conferência. */
+import { limitesDaGaiola, nitidezDoVinco, refinarGaiola, subdividirCatmullClark } from './subdivisao.js';
+import { ErroDaEspessura, espessarSuperficie } from './espessura.js';
+import { inserirApoiosNosVincos } from './apoio-do-vinco.js';
+
+/* As pontas que `aberta` deixa sem tampa, pela posição do laço: a primeira, a última ou as duas. */
+const PONTAS_ABERTAS = { inicio: ['inicio'], fim: ['fim'], ambas: ['inicio', 'fim'] };
+/* Níveis de subdivisão com que `espessura` confere o raio local, os do passo `subdivisao` quando ele não diz outros. */
+export const NIVEIS_DA_CONFERENCIA_DA_ESPESSURA = 2;
+/* O par de vértices da malha cuja direção faz com a tangente do laço um cosseno de pelo menos isto mede o canto do laço; os outros, a dobra
+   entre laços (ou entre o laço da ponta e a tampa). */
+const COSSENO_DO_CANTO_NO_LACO = 0.7;
 
 /* nitidezDoVinco('viva') */
 const NITIDEZ_INFINITA_DO_VINCO = nitidezDoVinco('viva');
@@ -152,6 +184,11 @@ export const PASSOS_DA_COMPENSACAO = 8;
 /* A gaiola avisa a face cuja área é menos que isto da maior aresta ao quadrado. O `analisarTopologia` reprova a lasca abaixo de 0,003 na
    malha final, e a subdivisão mantém a razão da gaiola até uns 70%, de modo que o aviso fica com folga. */
 export const LIMITE_DE_FACE_FINA_NA_GAIOLA = 0.005;
+/* A razão mínima entre o passo dos pontos ao longo de um trecho reto e a menor distância entre laços vizinhos nele. Abaixo dela, com a
+   gaiola subdividida, a dobra entre planos próximos deixa um leque de faces finas sem que a gaiola tenha uma face fina sequer. Medido na
+   caçamba do carrinho de mão (lados retos, laços a 5,2 mm na dobra do fundo): razão 5,7 e 3,8 deram zero faces finas, 2,9 deu 12, 2,3
+   deu 30 e 1,9 deu 68; com os laços da dobra a 7,7 mm, 3,9 e 2,6 deram zero, 1,9 deu 8 e 1,3 deu 40. */
+export const RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS = 3;
 export const INCLINACAO_MINIMA_DA_COMPENSACAO = 0.5;
 /* A compensação avisa quando leva a superfície, entre os pontos de um laço, mais que isto (em mm) além do pedido, descontado o que ela já
    passava sem compensar (A COMPENSAÇÃO). Nas peças de teste em que a compensação é a da casa o acréscimo maior é de 1,36 mm (o L de
@@ -567,6 +604,10 @@ export function gaiolaPorLacos(o = {}) {
     return Math.abs(area) <= TOLERANCIA_DE_FUSAO_MM * Math.max(perimetro, 1);
   };
   const lamina = uv.map((volta, r) => (r === 0 || r === R - 1) && medeAreaZero(volta));
+  /* as pontas sem tampa: a boca da casca, cujo laço fica como borda livre da gaiola */
+  if (o.aberta != null && !(o.aberta in PONTAS_ABERTAS)) falha(`aberta é ${Object.keys(PONTAS_ABERTAS).map(citar).join(', ')}, a ponta que fica sem tampa (a boca de uma casca), e veio ${JSON.stringify(o.aberta)}; sem aberta as duas pontas são tampadas`);
+  const abertos = new Set((o.aberta == null ? [] : PONTAS_ABERTAS[o.aberta]).map((p) => (p === 'inicio' ? 0 : R - 1)));
+  for (const r of abertos) if (lamina[r]) falha(`aberta deixa sem tampa o laço ${citar(lacos[r].nome)} (${o.eixo} = ${br(lacos[r].em)} mm), mas ele tem área zero (uma lâmina, um ponto) e não tem boca; abra a outra ponta ou dê área ao laço`);
   const rep = uv.map((volta, r) => {
     if (lamina[r]) {
       const donos = []; const dono = new Array(N);
@@ -623,8 +664,8 @@ export function gaiolaPorLacos(o = {}) {
     const x = [0, 0, 0]; x[e] = l.em; x[outros[0]] = p[0]; x[outros[1]] = p[1];
     pontosMm[nomeCru(r, q)] = x;
   }));
-  const nomes = Object.keys(pontosMm);
-  const indice = new Map(nomes.map((n, k) => [n, k]));
+  let nomes = Object.keys(pontosMm);
+  let indice = new Map(nomes.map((n, k) => [n, k]));
 
   const limpa = (f) => {
     const g = f.filter((v, k) => v !== f[(k + 1) % f.length]);
@@ -638,33 +679,36 @@ export function gaiolaPorLacos(o = {}) {
     }
   }
 
-  /* a tampa: escada entre as cadeias A (do fim de `de` para a frente) e B (do começo de `de` para trás) */
-  if (o.tampa == null || typeof o.tampa !== 'object') falha('tampa precisa ser { de, ate }, os trechos de onde parte e aonde chega a escada que tampa as pontas');
-  const iDe = exigeTrecho(o.tampa.de, 'tampa.de');
-  const iAte = exigeTrecho(o.tampa.ate, 'tampa.ate');
-  if (iDe === iAte) falha('tampa.de e tampa.ate precisam ser trechos diferentes');
-  const A = []; for (let q = fimDe(iDe); ; q = (q + 1) % N) { A.push(q); if (q === inicio[iAte]) break; }
-  const B = []; for (let q = inicio[iDe]; ; q = (q + N - 1) % N) { B.push(q); if (q === fimDe(iAte)) break; }
-  if (A.length !== B.length) {
-    const lado = (de, ate, passo) => { const l = []; for (let i = de; ; i = (i + passo + trechos.length) % trechos.length) { l.push(trechos[i].nome); if (i === ate) break; } return l; };
-    falha(`a tampa liga a cadeia ${lado((iDe + 1) % trechos.length, (iAte + trechos.length - 1) % trechos.length, 1).join('+')} (${A.length} pontos) à ${lado((iDe + trechos.length - 1) % trechos.length, (iAte + 1) % trechos.length, -1).join('+')} (${B.length} pontos); a escada pede o mesmo número de pontos nas duas, então mude os pontos de um trecho`);
+  /* a tampa: escada entre as cadeias A (do fim de `de` para a frente) e B (do começo de `de` para trás); com as duas pontas abertas, nenhuma */
+  const tampas = abertos.size === 2 ? [] : tampasDasPontas();
+  function tampasDasPontas() {
+    if (o.tampa == null || typeof o.tampa !== 'object') falha('tampa precisa ser { de, ate }, os trechos de onde parte e aonde chega a escada que tampa as pontas');
+    const iDe = exigeTrecho(o.tampa.de, 'tampa.de');
+    const iAte = exigeTrecho(o.tampa.ate, 'tampa.ate');
+    if (iDe === iAte) falha('tampa.de e tampa.ate precisam ser trechos diferentes');
+    const A = []; for (let q = fimDe(iDe); ; q = (q + 1) % N) { A.push(q); if (q === inicio[iAte]) break; }
+    const B = []; for (let q = inicio[iDe]; ; q = (q + N - 1) % N) { B.push(q); if (q === fimDe(iAte)) break; }
+    if (A.length !== B.length) {
+      const lado = (de, ate, passo) => { const l = []; for (let i = de; ; i = (i + passo + trechos.length) % trechos.length) { l.push(trechos[i].nome); if (i === ate) break; } return l; };
+      falha(`a tampa liga a cadeia ${lado((iDe + 1) % trechos.length, (iAte + trechos.length - 1) % trechos.length, 1).join('+')} (${A.length} pontos) à ${lado((iDe + trechos.length - 1) % trechos.length, (iAte + 1) % trechos.length, -1).join('+')} (${B.length} pontos); a escada pede o mesmo número de pontos nas duas, então mude os pontos de um trecho`);
+    }
+    if (A.length < 2) falha('a tampa precisa de pelo menos um degrau entre tampa.de e tampa.ate');
+    const n = A.length;
+    const tampa = (r) => {
+      if (lamina[r]) return [];
+      const fs = [];
+      const de = []; for (let q = inicio[iDe]; ; q = (q + 1) % N) { de.push(nm(r, q)); if (q === fimDe(iDe)) break; }
+      const ate = []; for (let q = inicio[iAte]; ; q = (q + 1) % N) { ate.push(nm(r, q)); if (q === fimDe(iAte)) break; }
+      /* o trecho `ate` com vários pontos alinhados: a face que o fecharia sozinha teria área zero, então os pontos entram na última
+         face da escada, entre o degrau e a ponta, como os de `de` entram na primeira */
+      const reta = ate.length > 2 && Math.hypot(...normalDaFace(ate, pontosMm)) / 2 <= TOLERANCIA_DE_FUSAO_MM * Math.max(...ate.map((v) => Math.hypot(...sub3(pontosMm[v], pontosMm[ate[0]]))), 1);
+      fs.push([...de, ...(reta && n === 2 ? ate : [nm(r, A[1]), nm(r, B[1])])]);
+      for (let j = 1; j + 1 < n; j++) fs.push([nm(r, A[j]), ...(j + 1 === n - 1 && reta ? ate : [nm(r, A[j + 1]), nm(r, B[j + 1])]), nm(r, B[j])]);
+      if (ate.length > 2 && !reta) fs.push(ate);
+      return fs.map(limpa).filter(Boolean);
+    };
+    return [0, R - 1].filter((r) => !abertos.has(r)).map((r) => ({ r, faces: tampa(r) }));
   }
-  if (A.length < 2) falha('a tampa precisa de pelo menos um degrau entre tampa.de e tampa.ate');
-  const n = A.length;
-  const tampa = (r) => {
-    if (lamina[r]) return [];
-    const fs = [];
-    const de = []; for (let q = inicio[iDe]; ; q = (q + 1) % N) { de.push(nm(r, q)); if (q === fimDe(iDe)) break; }
-    const ate = []; for (let q = inicio[iAte]; ; q = (q + 1) % N) { ate.push(nm(r, q)); if (q === fimDe(iAte)) break; }
-    /* o trecho `ate` com vários pontos alinhados: a face que o fecharia sozinha teria área zero, então os pontos entram na última
-       face da escada, entre o degrau e a ponta, como os de `de` entram na primeira */
-    const reta = ate.length > 2 && Math.hypot(...normalDaFace(ate, pontosMm)) / 2 <= TOLERANCIA_DE_FUSAO_MM * Math.max(...ate.map((v) => Math.hypot(...sub3(pontosMm[v], pontosMm[ate[0]]))), 1);
-    fs.push([...de, ...(reta && n === 2 ? ate : [nm(r, A[1]), nm(r, B[1])])]);
-    for (let j = 1; j + 1 < n; j++) fs.push([nm(r, A[j]), ...(j + 1 === n - 1 && reta ? ate : [nm(r, A[j + 1]), nm(r, B[j + 1])]), nm(r, B[j])]);
-    if (ate.length > 2 && !reta) fs.push(ate);
-    return fs.map(limpa).filter(Boolean);
-  };
-  const tampas = [0, R - 1].map((r) => ({ r, faces: tampa(r) }));
   const areaNula = (f) => {
     const [nx, ny, nz] = normalDaFace(f, pontosMm);
     const maior = Math.max(...f.map((v, k) => Math.hypot(...sub3(pontosMm[v], pontosMm[f[(k + 1) % f.length]]))));
@@ -723,7 +767,7 @@ export function gaiolaPorLacos(o = {}) {
     const trs = [...new Set(alt.preso.map((n) => trechoDoPonto(r, n)).filter(Boolean))];
     falha(`${onde} tem ${nulas.length} ${nulas.length === 1 ? 'face' : 'faces'} de área zero na escada, a primeira com os pontos ${nulas[0].map(citar).join(', ')}, e nenhuma orelha cabe no contorno que sobra (${alt.preso.length} pontos, dos trechos ${trs.map(citar).join(', ')}); reamostre esses trechos com outro número de pontos ou corte por outro eixo, em que o primeiro e o último laço sejam convexos`);
   }
-  faces.push(...tampas[0].faces.map((f) => [...f].reverse()), ...tampas[1].faces);
+  for (const t of tampas) faces.push(...(t.r === 0 ? t.faces.map((f) => [...f].reverse()) : t.faces));
   /* com costura, a linha dobrada sobre si deixa pares de faces sobre os mesmos pontos, uma em cada sentido: são a membrana de espessura zero
      dos dois lados da linha, sem volume, e saem juntas */
   if (costuras.length) {
@@ -738,18 +782,32 @@ export function gaiolaPorLacos(o = {}) {
     if (sai.size) { const ficam = faces.filter((_, k) => !sai.has(k)); faces.length = 0; faces.push(...ficam); }
   }
 
-  /* fechamento: cada aresta em duas faces, uma em cada sentido */
+  /* fechamento: cada aresta em duas faces, uma em cada sentido, menos a da boca de uma ponta aberta, que fica em uma face só */
+  const daBoca = new Set([...abertos].flatMap((r) => uv[r].map((_, q) => nm(r, q))));
   const sentido = new Map();
   for (const f of faces) f.forEach((a, k) => { const b = f[(k + 1) % f.length]; const c = `${a}|${b}`; sentido.set(c, (sentido.get(c) ?? 0) + 1); });
+  const bordaLivre = [];
   for (const [c, k] of sentido) {
     const [a, b] = c.split('|');
     if (k > 1) falha(`a aresta ${citar(a)}-${citar(b)} aparece ${k} vezes no mesmo sentido; os laços se cruzam ou a tampa não casa com eles`);
-    if (!sentido.has(`${b}|${a}`)) falha(`a gaiola não fecha na aresta ${citar(a)}-${citar(b)}; confira tampa.de e tampa.ate`);
+    if (sentido.has(`${b}|${a}`)) continue;
+    if (daBoca.has(a) && daBoca.has(b)) { bordaLivre.push([a, b]); continue; }
+    falha(`a gaiola não fecha na aresta ${citar(a)}-${citar(b)}; confira tampa.de e tampa.ate`);
   }
   const P = nomes.map((k) => pontosMm[k]);
-  const fIdx = faces.map((f) => f.map((v) => indice.get(v)));
+  let fIdx = faces.map((f) => f.map((v) => indice.get(v)));
   let orientadas = faces;
-  if (volumeComSinal(fIdx, P) < 0) { orientadas = faces.map((f) => [...f].reverse()); fIdx.forEach((f) => f.reverse()); }
+  /* o lado de fora da casca aberta é o do sólido que a fecharia: um leque de cada aresta da boca até o centro dela, que só entra na conta */
+  const leque = [];
+  for (const r of abertos) {
+    const daquela = new Set(uv[r].map((_, q) => nm(r, q)));
+    const centro = [...daquela].reduce((s, v) => s.map((x, a) => x + pontosMm[v][a] / daquela.size), [0, 0, 0]);
+    const c = P.length;
+    P.push(centro);
+    for (const [a, b] of bordaLivre) if (daquela.has(a)) leque.push([indice.get(b), indice.get(a), c]);
+  }
+  if (volumeComSinal([...fIdx, ...leque], P) < 0) { orientadas = faces.map((f) => [...f].reverse()); fIdx.forEach((f) => f.reverse()); }
+  P.length = nomes.length;
 
   /* uma faixa de laços [de, ate], inclusive; sem ela, todos */
   const faixaDeLacos = (decl, onde, podeSerUm = false) => {
@@ -791,7 +849,10 @@ export function gaiolaPorLacos(o = {}) {
   for (const [k, v] of (o.vincos ?? []).entries()) {
     const onde = `vincos[${k}]`;
     if (!v || typeof v.nome !== 'string') falha(`${onde} precisa de nome`);
-    if (v.nitidez == null) falha(`${onde} precisa de nitidez, 'viva' ou de 0 a 1`);
+    if (v.raio != null && v.nitidez != null) falha(`${onde} declara raio e nitidez; o raio em mm decide a nitidez (as colunas de apoio fazem o arredondamento), então declare só um dos dois`);
+    if (v.raio != null && v.esvai != null) falha(`${onde} declara raio e esvai; o raio por posição se declara como { de, ate } ou lista, e esvai é da nitidez`);
+    if (v.nitidez == null && v.raio == null) falha(`${onde} precisa de nitidez, 'viva' ou de 0 a 1, ou de raio em mm`);
+    const decl = v.raio != null ? { nitidez: 0, raio: v.raio } : { nitidez: v.nitidez };
     const formas = ['trecho', 'entre', 'laco'].filter((c) => v[c] != null);
     if (formas.length !== 1) falha(`${onde} declara o vinco por um de trecho, entre ou laco, e veio ${formas.length ? formas.join(' e ') : 'nenhum'}`);
     /* `lacos: [de, ate]` limita o vinco de trecho ou de entre a essa faixa de laços, inclusive: a linha de um chanfro que acaba onde o disco acaba */
@@ -803,24 +864,24 @@ export function gaiolaPorLacos(o = {}) {
       const ida = faixa.map((r) => nm(r, inicio[i]));
       const volta = [...faixa].reverse().map((r) => nm(r, fimDe(i)));
       const pontos = semRepetir([...ida, ...trechoNoLaco(faixa[faixa.length - 1], i).slice(1), ...volta.slice(1), ...trechoNoLaco(faixa[0], i).reverse().slice(1)]);
-      vincos.push({ nome: v.nome, pontos, nitidez: v.nitidez });
+      vincos.push({ nome: v.nome, pontos, ...decl });
     } else if (v.entre != null) {
       if (!Array.isArray(v.entre) || v.entre.length !== 2) falha(`${onde}.entre precisa ser [a, b], dois trechos seguidos`);
       const [a, b] = v.entre.map((t) => exigeTrecho(t, onde));
       if ((a + 1) % trechos.length !== b) falha(`${onde}.entre cita ${citar(v.entre[0])} e ${citar(v.entre[1])}, que não são seguidos na volta`);
       const linha = faixa.map((r) => nm(r, inicio[b]));
-      if (v.esvai == null) vincos.push({ nome: v.nome, pontos: semRepetir(linha), nitidez: v.nitidez });
+      if (v.esvai == null) vincos.push({ nome: v.nome, pontos: semRepetir(linha), ...decl });
       else vincos.push(...vincoQueEsvai(v, onde, faixa, linha, semRepetir));
     } else {
       if (v.esvai != null) falha(`${onde} traz esvai, que só vale no vinco de entre (a linha do ponto entre dois trechos, que corre pelos laços); o vinco ${v.trecho != null ? 'de trecho' : 'de laço'} não tem uma direção em que a nitidez possa cair`);
       const r = lacoDe(v.laco, onde);
       if (v.trechos == null) {
         const volta = semRepetir([...Array(N + 1).keys()].map((q) => nm(r, q)));
-        vincos.push({ nome: v.nome, pontos: volta, nitidez: v.nitidez });
+        vincos.push({ nome: v.nome, pontos: volta, ...decl });
       } else {
         for (const t of v.trechos) {
           const pontos = semRepetir(trechoNoLaco(r, exigeTrecho(t, onde)));
-          if (pontos.length >= 2) vincos.push({ nome: `${v.nome}_${t}`, pontos, nitidez: v.nitidez });
+          if (pontos.length >= 2) vincos.push({ nome: `${v.nome}_${t}`, pontos, ...decl });
         }
       }
     }
@@ -915,6 +976,43 @@ export function gaiolaPorLacos(o = {}) {
       });
     }
   }
+
+  /* o passo dos pontos num trecho reto da tampa contra a distância entre laços vizinhos: a subdivisão da gaiola deixa leque de faces
+     finas na dobra quando os pontos ao longo do trecho são muito mais densos que os laços empilhados (a gaiola em si não tem face fina, e o aviso de
+     faces finas abaixo não o vê) */
+  trechos.forEach((t, i) => {
+    /* o leque nasce nos degraus da tampa, que parte dos dois trechos `tampa.de` e `tampa.ate` */
+    if (abertos.size === 2 || o.tampa == null || (t.nome !== o.tampa.de && t.nome !== o.tampa.ate)) return;
+    const qs = []; for (let q = inicio[i]; ; q = (q + 1) % N) { qs.push(q); if (q === fimDe(i)) break; }
+    if (qs.length < 4 || R < 3) return;
+    const reto = uv.every((volta) => {
+      const a = volta[qs[0]]; const b = volta[qs[qs.length - 1]]; const comp = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      return comp > TOLERANCIA_DE_FUSAO_MM && qs.every((q) => Math.abs((b[0] - a[0]) * (volta[q][1] - a[1]) - (b[1] - a[1]) * (volta[q][0] - a[0])) / comp <= 1e-3 * comp);
+    });
+    if (!reto) return;
+    let passo = null; let perto = null; let longe = 0;
+    uv.forEach((volta, r) => {
+      const a = volta[qs[0]]; const b = volta[qs[qs.length - 1]];
+      const s = Math.hypot(b[0] - a[0], b[1] - a[1]) / (qs.length - 1);
+      if (s > TOLERANCIA_DE_FUSAO_MM && (passo === null || s < passo)) passo = s;
+      if (r + 1 >= R) return;
+      const meio = qs[qs.length >> 1]; const c = uv[r + 1][meio]; const m = volta[meio];
+      const d = Math.hypot(c[0] - m[0], c[1] - m[1], lacos[r + 1].em - lacos[r].em);
+      if (d > TOLERANCIA_DE_FUSAO_MM && (perto === null || d < perto.d)) perto = { d, de: lacos[r].nome, ate: lacos[r + 1].nome };
+      if (d > longe) longe = d;
+    });
+    if (passo === null || perto === null) return;
+    const razao = passo / perto.d;
+    /* laços a distâncias parecidas dão células de proporção comum e a subdivisão não deixa leque; o leque vem do degrau entre a pilha de
+       laços próximos e os laços afastados (a dobra e a parede), então só o degrau de RAZAO_MAXIMA_DE_AMOSTRAGEM vezes ou mais conta */
+    if (razao >= RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS || longe < RAZAO_MAXIMA_DE_AMOSTRAGEM * perto.d) return;
+    const comprimento = passo * (qs.length - 1);
+    const pontosCabem = Math.max(2, Math.floor(comprimento / (RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS * perto.d)) + 1);
+    avisos.push({
+      ref: 'passoDensoEntreLacos', trecho: t.nome, lacos: [perto.de, perto.ate], razao: Number(razao.toFixed(2)), passoMm: Number(passo.toFixed(2)), distanciaMm: Number(perto.d.toFixed(2)),
+      texto: `no trecho ${citar(t.nome)} os pontos ficam a ${br(passo, 1)} mm uns dos outros ao longo do laço e os laços ${citar(perto.de)} e ${citar(perto.ate)} a ${br(perto.d, 1)} mm, razão ${br(razao, 1)}, abaixo de ${RAZAO_MINIMA_DO_PASSO_PELA_DISTANCIA_ENTRE_LACOS}; a gaiola não tem face fina, mas a subdivisão deixa um leque delas na dobra entre os laços próximos (na caçamba do carrinho de mão, razão 3,8 deu zero, 2,9 deu 12 e 1,9 deu 68), então baixe os pontos desse trecho de ${t.pontos} para ${pontosCabem} ou menos, ou espace os laços`,
+    });
+  });
 
   /* faces finas: área / (maior aresta)^2, a razão que o `analisarTopologia` chama de lasca, abaixo do limite da gaiola; o trecho que
      some entre dois planos deixa um leque delas */
@@ -1047,9 +1145,101 @@ export function gaiolaPorLacos(o = {}) {
     }
   }
 
+  /* O RAIO EM MM: o vinco com `raio` ganha as colunas de apoio (apoio-do-vinco.js), depois da compensação e antes da conferência da espessura, que
+     refina a gaiola com elas. Os pontos de apoio entram nos grupos cujas duas pontas da aresta de saída já estão neles. */
+  let raios = null; const apoioDe = new Map();
+  const comRaio = vincos.filter((v) => v.raio != null);
+  if (comRaio.length) {
+    const ap = inserirApoiosNosVincos({ pontos: pontosMm, faces: orientadas, vincos: comRaio, unidade: 1 });
+    orientadas = ap.faces;
+    for (const [n, q] of Object.entries(ap.pontos)) { pontosMm[n] = q; alvosMm[n] = [...q]; apoioDe.set(n, ap.origens[n]); }
+    nomes = Object.keys(pontosMm); indice = new Map(nomes.map((n, k) => [n, k]));
+    fIdx = orientadas.map((f) => f.map((v) => indice.get(v)));
+    for (const g of grupos) {
+      const dentro = new Set(g.pontos);
+      for (const [n, org] of apoioDe) if (dentro.has(org.ponto) && dentro.has(org.vizinho)) g.pontos.push(n);
+    }
+    raios = ap.raios;
+    for (const a of ap.avisos) avisos.push({ ref: a.nome, texto: a.motivo, ...a });
+  }
+
+  /* A CONFERÊNCIA DA ESPESSURA: a gaiola refinada como o passo a refina e a chapa medida pela mesma conta do passo; cada par de vértices
+     da malha em que a espessura passa do raio local vai ao ponto da gaiola mais perto, e o pior de cada laço dá um aviso. A malha não muda. */
+  let conferenciaDaEspessura = null;
+  if (o.espessura != null) {
+    const ex = typeof o.espessura === 'number' ? { valor: o.espessura } : o.espessura;
+    const onde = 'espessura';
+    if (!ex || typeof ex !== 'object' || !(Number.isFinite(ex.valor) && ex.valor > 0)) falha(`${onde} é a espessura da chapa em mm, número maior que zero (ou { valor, niveis?, lado? }), e veio ${JSON.stringify(o.espessura)}; ela só confere o raio local, e a chapa continua sendo do passo subdivisao`);
+    const niveis = ex.niveis ?? NIVEIS_DA_CONFERENCIA_DA_ESPESSURA;
+    if (!Number.isInteger(niveis) || niveis < 1) falha(`${onde}.niveis é o número de níveis do passo subdivisao, inteiro de 1 para cima, e veio ${JSON.stringify(ex.niveis)}`);
+    const lado = ex.lado ?? 'contraNormal';
+    if (lado !== 'contraNormal' && lado !== 'normal') falha(`${onde}.lado é 'contraNormal' (o padrão do passo, a chapa para dentro) ou 'normal', e veio ${JSON.stringify(ex.lado)}`);
+    const t = ex.valor;
+    const vincosIdx = [];
+    for (const v of vincos) for (let k = 0; k + 1 < v.pontos.length; k++) vincosIdx.push([indice.get(v.pontos[k]), indice.get(v.pontos[k + 1]), nitidezDoVinco(v.nitidez)]);
+    const malha = subdividirCatmullClark({ vertices: nomes.map((k) => pontosMm[k]), faces: fIdx, vincos: vincosIdx, cantos: cantos.map((k) => indice.get(k)), niveis });
+    let lugares = []; let raioMinimo = Infinity;
+    try {
+      raioMinimo = espessarSuperficie({ vertices: malha.vertices, faces: malha.faces, espessura: t, lado }).raioMinimo;
+    } catch (err) {
+      if (!(err instanceof ErroDaEspessura)) throw err;
+      if (err.tipo === 'raio' && err.raio != null) { lugares = err.lugares; raioMinimo = err.raio; } else {
+        avisos.push({ ref: 'espessuraRecusada', espessuraMm: t, texto: `com a espessura de ${br(t)} mm o passo subdivisao recusaria a chapa: ${err.motivo}` });
+      }
+    }
+    /* o laço e o trecho de cada ponto da gaiola, e o ponto da gaiola mais perto de cada lugar (o refino mantém o índice dos pontos dela) */
+    const doPonto = new Map();
+    /* a tangente do laço no ponto, pelos vizinhos distintos dele na volta, separa o canto do laço (o par ao longo dela) da dobra entre laços */
+    const vizinhoDistinto = (r, q, passo) => { let j = q; do j = (j + passo + N) % N; while (j !== q && nm(r, j) === nm(r, q)); return uv[r][j]; };
+    lacos.forEach((_, r) => {
+      for (let q = 0; q < N; q++) {
+        const nome = nm(r, q);
+        if (doPonto.has(nome)) continue;
+        let i = trechos.length - 1; while (inicio[i] > rep[r][q]) i--;
+        const a = vizinhoDistinto(r, q, -1); const b = vizinhoDistinto(r, q, 1);
+        const tangente = [0, 0, 0]; tangente[outros[0]] = b[0] - a[0]; tangente[outros[1]] = b[1] - a[1];
+        doPonto.set(nome, { r, trecho: trechos[i].nome, tangente });
+      }
+    });
+    for (const [n, org] of apoioDe) if (doPonto.has(org.ponto)) doPonto.set(n, doPonto.get(org.ponto));
+    const porLaco = new Map();
+    for (const l of lugares) {
+      let melhor = 0; let dMelhor = Infinity;
+      for (let k = 0; k < nomes.length; k++) { const p = malha.vertices[k]; const d = Math.hypot(p[0] - l.ponto[0], p[1] - l.ponto[1], p[2] - l.ponto[2]); if (d < dMelhor) { dMelhor = d; melhor = k; } }
+      const { r, trecho, tangente } = doPonto.get(nomes[melhor]);
+      const ed = sub3(malha.vertices[l.vertices[1]], malha.vertices[l.vertices[0]]);
+      const aoLongo = Math.abs(ed[0] * tangente[0] + ed[1] * tangente[1] + ed[2] * tangente[2]) / (Math.hypot(...ed) * Math.hypot(...tangente) || 1);
+      const direcao = aoLongo >= COSSENO_DO_CANTO_NO_LACO ? 'noLaco' : 'entreLacos';
+      const x = porLaco.get(r) ?? { pares: 0 };
+      x.pares += 1;
+      if (!(x.raio <= l.raio)) Object.assign(x, { raio: l.raio, ponto: nomes[melhor], trecho, direcao });
+      porLaco.set(r, x);
+    }
+    for (const r of [...porLaco.keys()].sort((a, b) => a - b)) {
+      const x = porLaco.get(r); const l = lacos[r];
+      const ondeNoLaco = `do laço ${citar(l.nome)} (${o.eixo} = ${br(l.em)} mm), perto do ponto ${citar(x.ponto)} (trecho ${citar(x.trecho)})`;
+      const resolve = x.direcao === 'noLaco'
+        ? `faça o canto em arco no laço, de raio maior que a espessura e com pontos bastantes para a malha seguir o arco (numa quina do polígono o raio local acompanha o passo entre os pontos e cai quando eles se aproximam)`
+        : `afaste o laço vizinho, ou ponha um laço a mais que faça a curva da dobra com raio maior que a espessura`;
+      avisos.push({
+        ref: 'cantoApertado', laco: l.nome, ponto: x.ponto, trecho: x.trecho, direcao: x.direcao, raioMm: Number(x.raio.toFixed(2)), espessuraMm: t, pares: x.pares,
+        texto: `com a espessura de ${br(t)} mm, ${x.direcao === 'noLaco' ? 'o canto' : 'a dobra entre laços'} ${ondeNoLaco} tem raio local de ${br(x.raio)} mm, que não chega à espessura (${x.pares} ${x.pares === 1 ? 'par' : 'pares'} de vértices da malha de nível ${niveis} nesse laço), e o passo subdivisao recusaria a chapa; ${resolve}, ou use espessura menor que o raio`,
+      });
+    }
+    conferenciaDaEspessura = { espessuraMm: t, niveis, lado, raioMinimoMm: Number.isFinite(raioMinimo) ? Number(raioMinimo.toFixed(2)) : null };
+  }
+
   const pontos = {};
   for (const k of nomes) pontos[k] = pontosMm[k].map((x) => x / 1000);
-  const passo = { vertices: nomes, faces: orientadas, vincos };
+  /* o `raio` pedido segue no vinco do passo, em metro como o resto dele, junto da nitidez 0 */
+  const emMetro = (r) => (typeof r === 'number' ? r / 1000 : Array.isArray(r) ? r.map((x) => x / 1000) : { de: r.de / 1000, ate: r.ate / 1000 });
+  const passo = { vertices: nomes, faces: orientadas, vincos: vincos.map((v) => {
+    if (v.raio == null) return v;
+    /* o raio REALIZADO: o vinco que ficou sem apoio não leva raio, e o que não coube leva o que a malha tem */
+    const gravado = raios?.find((x) => x.vinco === v.nome)?.gravado;
+    if (gravado == null) { const { raio: _sem, ...resto } = v; return resto; }
+    return { ...v, raio: emMetro(gravado) };
+  }) };
   if (cantos.length) passo.cantos = cantos;
   if (medidas) passo.medidas = medidas;
   if (grupos.length) passo.grupos = grupos;
@@ -1060,5 +1250,10 @@ export function gaiolaPorLacos(o = {}) {
   };
   const saida = { pontos, pontosMm, alvosMm, passo, nomeDe, lacos: lacos.map((l) => ({ nome: l.nome, em: l.em, sumiram: l.sumiu })), trechos, avisos };
   if (compensacao) saida.compensacao = compensacao;
+  if (raios) saida.raios = raios;
+  if (abertos.size) {
+    saida.bocas = Object.fromEntries([...abertos].sort((a, b) => a - b).map((r) => [r === 0 ? 'inicio' : 'fim', { laco: lacos[r].nome, em: lacos[r].em, pontos: semRepetir([...Array(N + 1).keys()].map((q) => nm(r, q))) }]));
+  }
+  if (conferenciaDaEspessura) saida.espessura = conferenciaDaEspessura;
   return saida;
 }

@@ -1,0 +1,1051 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carrinho-de-mao/roda",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: sem referência de imagem; comparado com a forma prometida no pedido do crítico",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "disco",
+        "tipo": "uniao",
+        "onde": "furo central do disco, na coroa em volta do cubo",
+        "sentido": "atravessando",
+        "evidencia": "Corte x=0 painel direito: coroa vazia entre Ø37 e Ø51, e furos de fixação sobre a borda. Isométrica do disco: furo ~Ø37 menor que o cubo Ø52."
+      }
+    ],
+    "observacao": "Roda coerente com o que o plano prometeu: pneu liso de ombro redondo, aro, cubo furado e disco cheio, sem cruzar laço, caçamba ou mancais. Sem alvo de imagem, a comparação de fidelidade não foi possível."
+  },
+  "partes": [
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aro",
+      "confere": false,
+      "observacao": "a família roda-pneu não faz as abas do aro que o rascunho tinha; o aro saiu como barril reto"
+    },
+    {
+      "nome": "cubo",
+      "confere": false,
+      "observacao": "a família limita o cubo a 102 mm (o rascunho tinha 110) e sempre abre quatro furos de fixação, que o rascunho não tinha"
+    },
+    {
+      "nome": "disco",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "a família não publica porta cilindro do furo; a receita a publica da última faixa da revolução do cubo",
+    "família limita cubo a 102 e ombro a 25,5, sem abas no aro e com furos obrigatórios",
+    "crítico sem alvo: a foto fica fora do repositório e o pedido não tem como citá-la; atribuição: ferramenta",
+    "defeito 1 (furo do disco menor que o cubo, com coroa vazia no corte) vem da família roda-pneu, que monta disco e cubo assim; atribuição: família",
+    "o relato do modelador trazia confere falso sem observacao e o registro recusou; quem conduz copiou a diferença do relatório para o campo; atribuição: instrução do modelador"
+  ],
+  "notaDePassagem": "Pela família no máximo que ela aceita; o aro saiu como barril reto sem as abas do rascunho e o cubo com quatro furos de fixação que o rascunho não tinha. Raio do furo e largura do cubo vêm por vínculo do eixo do chassi, afastamento 0.",
+  "receita": {
+    "sha256": "sha256:64ab30ceeb7ac635c04e4fd841e704d9f9fddce129f46a63858a5dd3845f5f15",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 194,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* carrinho-de-mao/roda — a roda do carrinho de mão pela família `roda-pneu`, perfil `carrinho-de-mao`: o pneu 3.25-8 de Ø 340 e 85 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * de banda, com ombros redondos, no aro de chapa de 8 polegadas, com o disco e o cubo que gira no eixo do chassi."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Etapa 4 de 4 da montagem `../../montagem.json` (item 4 das partes do `../../ALINHAMENTO.md`), a única peça com junta: gira em torno"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * do eixo x, no centro do cubo, sem curso. O rascunho aprovado pela pessoa em 2026-11-11 (`../../referencias/carrinho-de-mao.esboco.mjs`)"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * desenhava a roda à mão por revolução; ela sai da família, como o alinhamento pede, com as medidas do rascunho passadas como"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * parâmetro (o perfil traz o pneu de 400, de um 4.00-8). O rascunho chama `montarRoda` daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * O QUE A FAMÍLIA NÃO COBRE DO RASCUNHO. O cubo do rascunho tem 110 mm de largura (o vão do laço), e a família vai até 0,3 do diâmetro"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * do pneu, 102 mm; a TABELA fica com 102, que a montagem tira do assento do eixo do chassi. O aro do rascunho tem as abas que seguram o talão (até o raio de 106, de 28 a 34 mm do meio),"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * e o da família é um barril reto. O ombro do rascunho tem 26,5 mm na largura, e a família recusa o ombro de mais de 30% da banda"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * (25,5 mm); a TABELA fica com 25,5. A família sempre fura o cubo (de 3 a 12 furos de fixação), que o rascunho não tinha: ficam os"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * quatro furos do perfil, pequenos, no cubo. O eixo, que o rascunho punha com a roda, é do chassi."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * DE ONDE VEM CADA MEDIDA: a TABELA do `../../ALINHAMENTO.md` (linhas \"pneu\", \"aro\" e \"eixo\") e o rascunho: o talão em Ø 203, o barril"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * do aro de 11,5 mm de parede (do raio 90 ao do talão) e 68 mm de largura (as abas do rascunho), o disco de chapa de 12 mm, o cubo de Ø"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * 52 com o furo do rolamento."
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * O ENCAIXE. A origem é o centro do pneu, com o eixo da roda em x. O furo do cubo é a porta `furoDoCubo`, um cilindro interno da face"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * de dentro do cubo (-x) à de fora; o raio dele é o do eixo do chassi mais a folga do rolamento de 4 mm, e a largura do cubo é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * assento do eixo, pelos vínculos da montagem, e a posição põe o furo no assento, com o giro pela `referencia` para cima. A família publica também `eixo`, `assento-do-pneu` e"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": " * `furos-de-fixacao`."
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": " * A cadeia: a TABELA em mm; `derivar` leva as medidas aos parâmetros da família (em proporção do diâmetro) e chama a família;"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": " * `gerarPassos` expande a chamada, que já sai em metro, e acrescenta o sombreamento de cada parte e a porta do furo do cubo."
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": " * `montarRoda` escreve a mesma roda em mm num estado { passos, topo, origem }, posta no centro, para o rascunho do carrinho. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "import { TABELA as CHASSI } from '../../chassi/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* o pneu 3.25-8: o diâmetro que fixa a escala e a banda */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  diametroDoPneu: 340,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  banda: 85,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  /* o aro de 8 polegadas: o talão em Ø 203, o barril de 11,5 mm de parede e 68 mm de largura */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  diametroDoAro: 203,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  larguraDoAro: 68,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  paredeDoAro: 11.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* a roda de chapa: o disco de 12 mm, o cubo de Ø 52 e 102 mm (o máximo da família; o rascunho tinha 110) com o furo do rolamento,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "     e os quatro furos de fixação de Ø 5,1 no círculo de 37,4 que a família exige */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  disco: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  diametroDoCubo: 52,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  larguraDoCubo: 102,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  raioDoFuroDoCubo: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  furos: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  circuloDosFuros: 37.4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  diametroDoFuro: 5.1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* a forma do pneu: o ombro redondo de 25,5 mm na largura (o máximo da família, 30% da banda) e 96 lados */"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  ombroRedondo: 1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  ombro: 25.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  ladosDoPneu: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  /* o sombreamento suave, com a quina acima deste ângulo nítida */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  anguloDoLiso: 35,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "export const MATERIAIS = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  borracha: { tipo: 'liso', cor: '#151617' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  aco: { tipo: 'liso', cor: '#4a4f55' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "/** A chamada da família `roda-pneu` com as medidas da TABELA, em proporção do diâmetro do pneu (o ombro em proporção do flanco). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "export function derivar(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const D = T.diametroDoPneu;"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  return chamar(familias().obter('roda-pneu'), 'roda', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    diametroPneu: D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    larguraPneu: T.banda / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    diametroAro: T.diametroDoAro / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    larguraAro: T.larguraDoAro / T.banda,"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    paredeDoAro: T.paredeDoAro / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    banda: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    tipo: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    espessuraDisco: T.disco / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    larguraCubo: T.larguraDoCubo / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    diametroCubo: T.diametroDoCubo / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    diametroFuroCentral: 2 * T.raioDoFuroDoCubo / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    furosDeFixacao: T.furos,"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    diametroCirculoFuros: T.circuloDosFuros / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    diametroFuro: T.diametroDoFuro / D,"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    desvio: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    ombroRedondo: T.ombroRedondo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    ombroDoPneu: T.ombro / ((D - T.diametroDoAro) / 2),"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    ladosDoPneu: T.ladosDoPneu,"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "/* As partes que a família nomeia. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "export const PARTES = ['pneu', 'aro', 'cubo', 'disco'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "/** Os passos da família, em metro, como ela os expande. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "function passosDaFamilia(T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  return expandirChamadasDeComposicao(familias().registroComposicoes, [derivar(T)]).passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "/** A porta do furo do cubo, em metro: o cilindro do furo central, da face de dentro do cubo à de fora, saindo da parede do furo (a"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": " *  última faixa da revolução do cubo, que a porta `eixo` da família cita pelo corte dos furos de fixação). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "function portaDoFuro(passos, T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  const eixoDaFamilia = passos.find(([op, a]) => op === 'publicarPorta' && a.id === 'eixo')[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const corte = passos.find(([op, a]) => op === eixoDaFamilia.de.op && a.origemId === eixoDaFamilia.de.id)[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  const revolucao = corte.solidos[0].origem;"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  const perfil = passos.find(([op, a]) => op === revolucao.op && a.origemId === revolucao.id)[1].perfil;"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const raio = T.raioDoFuroDoCubo / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const parede = perfil.findIndex((p, k) => k < perfil.length - 1 && Math.abs(p[0] - raio) < 1e-9 && Math.abs(perfil[k + 1][0] - raio) < 1e-9);"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const [x0, x1] = [perfil[parede][1], perfil[parede + 1][1]].sort((a, b) => a - b);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  return ['publicarPorta', { id: 'furoDoCubo', de: { ...revolucao, faixa: parede },"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    interface: { forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], centro: [x0, 0, 0], raio, inicio: 0, fim: x1 - x0, referencia: [0, 1, 0] } }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "/** Os PASSOS, em metro: a roda da família, o sombreamento de cada parte e a porta do furo do cubo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "export function gerarPassos(T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  const passos = passosDaFamilia(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  const lisos = passos.filter(([op]) => op === 'parte').map(([, { sel }]) => ['liso', { sel, angulo: T.anguloDoLiso }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  return [...passos, ...lisos, portaDoFuro(passos, T)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "/* Os campos de medida (metro, na saída da família) das operações que a roda usa; o rascunho os quer em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "const MEDIDAS = { lathe: ['perfil', 'em'], cubo: ['larg', 'alt', 'prof', 'em'], arranja: ['d', 'pivo'] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "const emMm = (v) => (typeof v === 'number' ? Math.round(v * 1e7) / 1e4 : Array.isArray(v) ? v.map(emMm) : v);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "/* os ids da família são locais: no estado do carrinho inteiro cada um soma a base do estado */"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "const comBase = (v, base) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  if (Array.isArray(v)) return v.map((x) => comBase(x, base));"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === 'origemId' || (k === 'id' && typeof v.op === 'string') ? x + base : comBase(x, base)]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  return v;"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "/** A roda no estado { passos, topo, origem } do carrinho inteiro, em mm, com o centro do pneu no eixo do chassi e a cor do material"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": " *  de cada parte pelo pincel, porque o rascunho não tem MATERIAIS. Sem as portas, que são da montagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "export function montarRoda(estado, T = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const E = CHASSI.eixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const centro = [0, E.y, E.z];"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  const base = estado.origem;"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  let maior = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  const nomeadas = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "  for (const passo of passosDaFamilia(T)) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    const [op, args] = comBase(passo, base);"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    if (op === 'publicarPorta') continue;"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    if (Number.isFinite(args.origemId)) maior = Math.max(maior, args.origemId);"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    if (op === 'material') { estado.passos.push(['pincel', { modo: 'face', sel: args.sel, cor: MATERIAIS[args.usa].cor }]); continue; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    if (op === 'parte') { nomeadas.push(args.sel); estado.passos.push(['parte', args]); continue; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    estado.passos.push([op, Object.fromEntries(Object.entries(args).map(([k, v]) => [k, (MEDIDAS[op] ?? []).includes(k) ? emMm(v) : v]))]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  estado.origem = Math.max(estado.origem, maior);"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  for (const sel of nomeadas) estado.passos.push(['transladar', { d: centro, sel }], ['liso', { sel, angulo: T.anguloDoLiso }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "/* Os pares que a família põe em contato por desenho. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "export const CONTATOS = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  { par: ['aro', 'pneu'], motivo: 'o talão do pneu assenta no barril do aro, no raio de 101,5 mm' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  { par: ['aro', 'disco'], motivo: 'a borda de fora do disco entra até o meio da parede do aro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  { par: ['cubo', 'disco'], motivo: 'a borda de dentro do disco entra até o meio da parede do cubo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  meta: { nome: 'carrinho-de-mao/roda', desc: 'roda do carrinho de mão pela família roda-pneu: pneu 3.25-8 de Ø 340 e banda de 85 no aro de chapa de 8 polegadas, com o cubo que gira no eixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  TOPO: { origem: 'centro do pneu; y para cima, o eixo da roda em x e a frente em +z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "    objeto: 'roda de carrinho de mão de obra: pneu 3.25-8 largo de ombros redondos num aro de chapa escuro de 8 polegadas, com o disco e o cubo que gira no eixo do chassi, dentro do laço',"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    referencias: ['../../referencias/carrinho-de-mao.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    escala: { medida: 'diâmetro do pneu 3.25-8, que fixa a escala das referências (TABELA do alinhamento)', milimetros: 340 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    familiaProcedural: 'roda-pneu',"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "      { nome: 'pneu', forma: 'pneu preto de Ø 340 e 85 mm de banda, banda lisa e ombros redondos de 25,5 mm na largura, do talão de Ø 203 à banda, sem quina', tecnica: 'família roda-pneu, banda 0 com ombro redondo e ombro largo: revolução em torno de x, 96 lados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "      { nome: 'aro', forma: 'barril escuro do aro de 8 polegadas, de 11,5 mm de parede e 68 mm de largura, que o talão do pneu abraça', tecnica: 'família roda-pneu: revolução em torno de x de um tubo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "      { nome: 'cubo', forma: 'anel escuro de Ø 52 e 102 mm de largura, centrado no pneu, com o furo do rolamento de Ø 24 e quatro furos de fixação pequenos', tecnica: 'família roda-pneu: revolução do anel menos os furos de fixação repetidos em volta do eixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "      { nome: 'disco', forma: 'chapa escura de 12 mm do cubo ao aro, no plano do meio do pneu', tecnica: 'família roda-pneu, tipo 0: revolução em torno de x de um anel' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "      'o pneu fora de Ø 340 por 85 mm de banda, ou de ombro em quina',"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "      'a roda fora do chão em y 0 sob o eixo, ou fora do eixo do chassi',"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "      'a roda cruzando a caçamba, o laço ou os mancais',"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "      'o cubo largo demais para o vão entre os mancais, ou o furo do cubo sem folga em volta do eixo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  contatos: CONTATOS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  /* o pneu, o aro e o disco são anéis; o cubo tem o furo central e os de fixação */"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "  formas: { pneu: 'anel', aro: 'anel', disco: 'anel', cubo: { furos: 1 + TABELA.furos } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "  /* Os extremos que a TABELA fixa, em mm: o pneu inteiro e as faces do cubo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "    const T = this.PARAMS; const R = T.diametroDoPneu / 2; const C = T.diametroDoCubo / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "      { nome: 'borda de fora e topo do pneu', parte: 'pneu', medida: 'maximo', em: [T.banda / 2, R, R], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "      { nome: 'borda de dentro e fundo do pneu', parte: 'pneu', medida: 'minimo', em: [-T.banda / 2, -R, -R], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "      { nome: 'face de dentro do cubo', parte: 'cubo', medida: 'minimo', em: [-T.larguraDoCubo / 2, -C, -C], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "sombreamento suave (liso em PASSOS[24]) sobre a emenda de uma fusão",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az100.png",
+      "peca-tresquartos-rasante-az190.png"
+    ]
+  },
+  "registradaEm": "2026-11-11T03:31:57.064Z"
+}

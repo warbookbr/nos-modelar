@@ -56,8 +56,17 @@ function vincosPorNome(lista, indiceDoNome, faces, st) {
     if (Array.isArray(v)) return { erro: `vinco por índice de aresta não é aceito, porque índice não é identidade; declare o vinco pelos pontos nomeados da gaiola, como ${EXEMPLO_DE_VINCO}, com nitidez de 0 a 1 ou 'viva'` };
     if (!v || typeof v !== 'object') return { erro: `cada vinco precisa ser objeto como ${EXEMPLO_DE_VINCO}` };
     if (typeof v.nome !== 'string' || !v.nome) return { erro: `cada vinco precisa de nome, como ${EXEMPLO_DE_VINCO}` };
-    const extra = Object.keys(v).filter((k) => !['nome', 'pontos', 'nitidez'].includes(k));
-    if (extra.length) return { erro: `o vinco ${citar(v.nome)} tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome, pontos e nitidez` };
+    const extra = Object.keys(v).filter((k) => !['nome', 'pontos', 'nitidez', 'raio'].includes(k));
+    if (extra.length) return { erro: `o vinco ${citar(v.nome)} tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome, pontos, nitidez e, opcional, raio` };
+    /* `raio` é a declaração do raio pedido (em metro, como as medidas do passo): um número, { de, ate } ou uma lista com um número por ponto da linha.
+       Não muda a geometria: quem o realiza são as colunas de apoio que o ajudante de gaiola pôs; ele fica no conteúdo salvo para a medida e a ondulação lerem. */
+    if (v.raio != null) {
+      const positivo = (x) => { try { const n = st.num(x); return Number.isFinite(n) && n > 0; } catch { return false; } };
+      const forma = v.raio;
+      const ok = typeof forma === 'object' && !Array.isArray(forma) ? positivo(forma.de) && positivo(forma.ate) && Object.keys(forma).every((k) => k === 'de' || k === 'ate')
+        : Array.isArray(forma) ? forma.length === v.pontos?.length - (v.pontos?.length > 2 && v.pontos[0] === v.pontos[v.pontos.length - 1] ? 1 : 0) && forma.every(positivo) : positivo(forma);
+      if (!ok) return { erro: `o vinco ${citar(v.nome)} tem raio ${JSON.stringify(forma)}; o raio é um número maior que zero, { de, ate } ou uma lista com um número por ponto da linha` };
+    }
     if (nomes.has(v.nome)) return { erro: `o nome de vinco ${citar(v.nome)} aparece mais de uma vez` };
     nomes.add(v.nome);
     if (!Array.isArray(v.pontos) || v.pontos.length < 2 || v.pontos.some((p) => typeof p !== 'string')) return { erro: `o vinco ${citar(v.nome)} precisa de pontos: lista de dois ou mais nomes de ponto da gaiola, em sequência ao longo das arestas` };
@@ -69,7 +78,10 @@ function vincosPorNome(lista, indiceDoNome, faces, st) {
       const x = st.num(v.nitidez);
       if (!Number.isFinite(x) || x < 0 || x > 1) return { erro: `o vinco ${citar(v.nome)} tem nitidez ${x}; a nitidez vai de 0 a 1, ou é 'viva'` };
       s = nitidezDoVinco(x);
+      /* o raio declarado é o do filete que as colunas de apoio fazem com a nitidez 0; com nitidez maior a quina fica viva (ou parcial) e o raio salvo diria o que a malha não tem */
+      if (v.raio != null && x !== 0) return { erro: `o vinco ${citar(v.nome)} declara raio e nitidez ${x}; o raio é o do filete que as colunas de apoio fazem com a nitidez 0, e com outra nitidez a quina da malha não tem esse raio: tire a nitidez do vinco, ou o raio` };
     }
+    if (v.raio != null && v.nitidez === 'viva') return { erro: `o vinco ${citar(v.nome)} declara raio e nitidez 'viva'; o raio é o do filete que as colunas de apoio fazem com a nitidez 0, e a quina viva não tem raio` };
     for (let k = 0; k + 1 < v.pontos.length; k++) {
       const p = v.pontos[k], q = v.pontos[k + 1];
       const a = indiceDoNome.get(p), b = indiceDoNome.get(q);
@@ -128,10 +140,29 @@ function donoDasFaces(faces, niveis) {
 const MAXIMO_DE_LUGARES = 5;
 const arredondar = (x) => Number(x.toPrecision(3));
 
+/* O vinco com `raio` declarado perto dos lugares da espessura: o raio pedido, o raio local que a malha mede ali (a curvatura mínima do filete, cerca de 0,63 do pedido) e o menor pedido que cabe com a espessura. */
+function notaDoRaioPedido(vincos, nomes, lugares, espessura, st) {
+  if (!Array.isArray(vincos) || !nomes.size || !lugares?.length) return '';
+  const medidos = lugares.map((l) => l.raio).filter(Number.isFinite);
+  if (!medidos.length) return '';
+  const pior = Math.min(...medidos);
+  const partes = [];
+  for (const v of vincos) {
+    if (!v || v.raio == null || !Array.isArray(v.pontos) || !v.pontos.some((p) => nomes.has(p))) continue;
+    let valores;
+    try { valores = typeof v.raio === 'object' && !Array.isArray(v.raio) ? [st.num(v.raio.de), st.num(v.raio.ate)] : Array.isArray(v.raio) ? v.raio.map((x) => st.num(x)) : [st.num(v.raio)]; } catch { continue; }
+    const pedido = Math.min(...valores);
+    if (!(pedido > 0) || !(pior > 0)) continue;
+    const razao = pior / pedido;
+    partes.push(`o vinco '${v.nome}' pede raio ${arredondar(pedido)} (na unidade em que o declarou) e a malha mede raio local ${arredondar(pior)} nele, com a espessura ${arredondar(espessura)}; o menor pedido que cabe com essa espessura é ${arredondar((pedido * espessura) / pior)}, na mesma unidade do pedido`);
+  }
+  return partes.length ? `; ${partes.join('; ')}` : '';
+}
+
 /* Os lugares em que a espessura passa do raio local, com o nome do ponto da gaiola mais perto de cada um. Os vértices
    da malha de índice menor que o número de pontos da gaiola são os pontos da gaiola refinados (o refino mantém o índice),
    e a imagem espelhada de um ponto declarado sai com o nome dele e a marca de espelhada. */
-function lugaresDaEspessura(lugares, malha, gaiola, declarados, tipo = 'raio') {
+function lugaresDaEspessura(lugares, malha, gaiola, declarados, tipo = 'raio', nomesDosLugares = null) {
   const nG = gaiola.vertices.length;
   const origem = gaiola.vertices.map((_, k) => k);
   const espelhado = new Set();
@@ -153,6 +184,7 @@ function lugaresDaEspessura(lugares, malha, gaiola, declarados, tipo = 'raio') {
     porPonto.get(j)[espelhado.has(melhor) ? 'imagem' : 'direto'] = true;
   }
   if (!porPonto.size) return '';
+  if (nomesDosLugares) for (const j of porPonto.keys()) if (typeof declarados[j] === 'string') nomesDosLugares.add(declarados[j]);
   const textos = [...porPonto].map(([j, { l, direto, imagem }]) => `${nome(j)}${imagem ? (direto ? ' e a imagem espelhada' : ' espelhado') : ''} (${tipo === 'dobra' ? '' : `raio ${arredondar(l.raio)} `}em [${l.ponto.map(arredondar).join(', ')}])`);
   if (tipo === 'dobra') return `, perto de ${textos.join(', ')} (${lugares.length} vértice(s) da malha ao todo); a superfície sem espessura já tem face virada ali, e nenhuma espessura a corrige: no canto declarado em que a borda faz ângulo côncavo, a face da gaiola com ângulo quase raso no canto se dobra na subdivisão, e um ponto novo da gaiola que parta essa face a desfaz; \`npm run ondulacao\` mostra a face virada`;
   return `, perto de ${textos.join(', ')} (${lugares.length} par(es) de vértices da malha ao todo); reduza a espessura abaixo do raio, abra a curva ali ou troque o lado; no vinco vivo o raio local é a largura da faixa de faces ao lado dele e cai pela metade a cada nível`;
@@ -337,7 +369,9 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
         r = s; partes = s.partes;
       } catch (e) {
         if (!(e instanceof ErroDaEspessura)) return grita(st, i, 'subdivisao', 'espessura', String(e.message));
-        return grita(st, i, 'subdivisao', 'espessura', `${e.motivo}${lugaresDaEspessura(e.lugares, r.vertices, gaiola, declarados, e.tipo)}`);
+        const nomesDosLugares = new Set();
+        const lugaresTexto = lugaresDaEspessura(e.lugares, r.vertices, gaiola, declarados, e.tipo, nomesDosLugares);
+        return grita(st, i, 'subdivisao', 'espessura', `${e.motivo}${lugaresTexto}${notaDoRaioPedido(a.vincos, nomesDosLugares, e.lugares, espessura, st)}`);
       }
     }
     const limite = BLOCO + FAIXA_ESTENDIDA;

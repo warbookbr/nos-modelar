@@ -80,4 +80,35 @@ describe('o contato declarado na opção', () => {
     expect(recusa({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'tampa'], relacao: 'atravessa', motivo: 'x', lado: '+x' }] })).toMatch(/campo "lado"/);
     expect(recusa({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'tampa'], relacao: 'atravessa', motivo: 'x' }, { par: ['tampa', 'capo'], relacao: 'folga', motivo: 'y' }] })).toMatch(/já foi declarado/);
   });
+
+  it('a relação folga aceita folga: { esperada, tolerancia }, que sai nos contatos da receita e não muda o relato', () => {
+    const folga = { esperada: 30, tolerancia: 0.2 };
+    const com = receitaDaOpcao({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto', folga }] });
+    expect(com.contatos).toEqual([{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto', folga }]);
+    const sem = receitaDaOpcao({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto' }] });
+    expect(sem.contatos).toEqual([{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão de projeto' }]);
+    expect(relatoDeContatos(com.neutro, com.formas, { contatos: com.contatos })).toEqual(relatoDeContatos(sem.neutro, sem.formas, { contatos: sem.contatos }));
+  });
+
+  it('recusa a folga fora do formato ou com outra relação', () => {
+    const com = (relacao, folga) => recusa({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'pino'], relacao, motivo: 'x', folga }] });
+    expect(com('encosta', { esperada: 4, tolerancia: 0.1 })).toMatch(/"folga" só vale com "relacao": "folga"/);
+    expect(com('folga', { esperada: 0, tolerancia: 0.1 })).toMatch(/"folga.esperada"/);
+    expect(com('folga', { esperada: 4, tolerancia: -1 })).toMatch(/"folga.tolerancia"/);
+    expect(com('folga', { esperada: 4, tolerancia: 0.1, lado: 1 })).toMatch(/"folga" é \{ esperada, tolerancia, degrau\? \}/);
+    expect(com('folga', { esperada: 4, tolerancia: 0.1, degrau: -1 })).toMatch(/"folga.degrau"/);
+    expect(com('folga', 4)).toMatch(/"folga" é \{ esperada, tolerancia, degrau\? \}/);
+  });
+
+  it('a folga aceita o degrau máximo do par, e a opção aceita apoia: [{ parte, motivo }] com a parte na malha', () => {
+    const folga = { esperada: 30, tolerancia: 0.2, degrau: 1.5 };
+    const r = receitaDaOpcao({ titulo: 't', passos: PASSOS, contatos: [{ par: ['capo', 'pino'], relacao: 'folga', motivo: 'vão', folga }], apoia: [{ parte: 'pino', motivo: 'preso por fora da malha' }] });
+    expect(r.contatos[0].folga).toEqual(folga);
+    expect(r.apoia).toEqual([{ parte: 'pino', motivo: 'preso por fora da malha' }]);
+    expect(receitaDaOpcao({ titulo: 't', passos: PASSOS }).apoia).toEqual([]);
+    expect(recusa({ titulo: 't', passos: PASSOS, apoia: [{ parte: 'nada', motivo: 'x' }] })).toMatch(/"apoia" cita a parte "nada"/);
+    expect(recusa({ titulo: 't', passos: PASSOS, apoia: [{ parte: 'pino' }] })).toMatch(/"motivo"/);
+    expect(recusa({ titulo: 't', passos: PASSOS, apoia: [{ parte: 'pino', motivo: 'x' }, { parte: 'pino', motivo: 'y' }] })).toMatch(/já foi declarada/);
+    expect(recusa({ titulo: 't', passos: PASSOS, apoia: 'pino' })).toMatch(/"apoia" é uma lista/);
+  });
 });

@@ -48,10 +48,21 @@
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
  *
- * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] */
+ * A luz rasante que não alcança a peça (cuba aberta em cima vista de cima) não derruba o pacote: a vista é refeita com a luz mais alta (20,
+ * 30 e 45 graus sobre o plano da imagem) e fica a primeira que passa do limiar, com o ângulo dito no pedido; a que nenhuma salva sai do
+ * pedido com uma frase, e só sem nenhuma imagem de luz rasante o pacote é recusado. A vista montada em que as outras peças tapam a peça em
+ * foco (menos de 5 % da silhueta dela visível, medido pela malha) também sai do pedido, dita nele.
+ *
+ * `--referencia=<caminho absoluto da imagem>[@<vista>]`, repetível, traz uma imagem de fora do repositório (foto de terceiro não entra nele)
+ * para a seção de referências do pedido, com a vista a que vale (frontal, direita, esquerda, traseira, superior, inferior, isometrica); o
+ * caminho não é gravado em arquivo versionado.
+ *
+ * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>]
+ *      [--referencia=<caminho absoluto da imagem>[@<vista>]]... */
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { linhaDaVista } from './lados-das-vistas.mjs';
 import { paraPng } from './leitura-por-regioes.mjs';
@@ -68,7 +79,7 @@ import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
-  LADO_DA_VISTA_DE_SUPERFICIE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, exigirLuzNaSuperficie, gravarManifesto, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
+  LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
   superficieDaPeca, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
@@ -363,7 +374,9 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       );
     }
   } else {
-    L.push('A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte: `alvo` do veredito leva o caminho da imagem de referência que você comparou.');
+    L.push(referencias.length
+      ? 'A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte: `alvo` do veredito leva o caminho da imagem de referência que você comparou.'
+      : 'A receita não refina um esboço aprovado e o pedido não traz imagem de referência: `alvo` do veredito leva o texto `sem alvo: <motivo>`, com o motivo em uma frase. Não ponha ali o caminho do pedido nem de qualquer imagem do pacote.');
   }
   L.push('');
 
@@ -376,7 +389,8 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       '',
       ...lista(referencias.map((referencia) => {
         const olho = olhoDaReferencia(referencia, orientacao);
-        return `${basename(referencia.caminho)}: ${referencia.caminho}${olho ? ` (o olho da imagem: ${olho})` : ''}`;
+        const externa = referencia.externa ? ` (referência externa, trazida por quem conduz${referencia.lado ? `; vale para a vista ${referencia.lado}` : ''})` : '';
+        return `${basename(referencia.caminho)}: ${referencia.caminho}${externa}${olho ? ` (o olho da imagem: ${olho})` : ''}`;
       })),
     );
   } else {
@@ -408,6 +422,7 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       '## Montado', '',
       `O objeto montado até aqui, com a peça \`${montado.instancia}\` no centro do quadro, grande, e as outras peças ao redor, só para dar o contexto e a posição dela. O quadro fecha na caixa da peça, com uma folga, e as vistas olham dos lados descritos em Modelo:`, '',
       ...lista(montado.imagens.map(imagem)), '',
+      ...(montado.fora?.length ? [`Ficaram de fora, porque as outras peças tapam a peça em foco: ${montado.fora.map((f) => `${f.vista} (a peça aparece em ${String(Math.round(f.visivel * 100))} % da silhueta dela)`).join(', ')}.`, ''] : []),
     );
   }
 
@@ -449,7 +464,7 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
 
 /* A seção da superfície da peça de lataria. As vistas do Blender têm nomes e lados próprios (`vistas_padrao` de `tools/blender/comum.py`),
    ditos aqui pelos eixos, e não pelos da bancada. */
-function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
+function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [] }) {
   const vistas = Object.keys(LADO_DA_VISTA_DE_SUPERFICIE).filter((v) => [...rasante, ...curvatura].some((i) => i.vista === v));
   const grau = (n) => `${String(n).replace('.', ',')} graus`;
   /* a faixa dos vincos que a forma desenha sai em ocre e fora da escala (`curvatura-da-lataria.py --vincos`): o crítico precisa saber
@@ -463,7 +478,8 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null }) {
     + 'escolhidas em cada vista para a luz cair no lado da peça que a câmera vê. O painel '
     + 'liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. '
     + 'A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.', '',
-    ...lista(rasante.map(({ arquivo, vista, azimute }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima): ${arquivo}`)), '',
+    ...lista(rasante.map(({ arquivo, vista, azimute, elevacao }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima)${elevacao ? `, com a luz a ${grau(elevacao)} do plano da imagem, mais alta que nas outras, porque a luz mais baixa não alcançava a peça nesta vista` : ''}: ${arquivo}`)), '',
+    ...semLuz.flatMap(({ texto }) => [`Sem imagem: ${texto}`, '']),
   ];
   /* A peça de emenda sombreada leva só a luz rasante: o que ela mostra é a sombra suave que sobe sobre o encontro de dois sólidos
      fundidos, com degrau, quina ou risco que o sombreamento esconde nas vistas de Modelo. */
@@ -1090,6 +1106,105 @@ function secaoDosEncaixes(encaixes) {
   ];
 }
 
+/* ---------- a peça em foco tapada nas vistas montadas ---------- */
+
+/** De onde o olho olha em cada vista montada, em eixos do mundo (as vistas da bancada: frontal de +z, direita de +x, superior de +y). */
+export const OLHO_DA_VISTA_MONTADA = Object.freeze({
+  frontal: [0, 0, 1], traseira: [0, 0, -1], direita: [1, 0, 0], esquerda: [-1, 0, 0], superior: [0, 1, 0], inferior: [0, -1, 0], isometrica: [1, 1, 1],
+});
+/** A fração visível da peça em foco abaixo da qual a vista montada não entra no pedido. */
+export const VISIVEL_MINIMO_DA_PECA_EM_FOCO = 0.05;
+
+/**
+ * A fração da peça em foco que a vista ortográfica enxerga: a silhueta dela é rasterizada com as outras peças num z-buffer, e a fração é
+ * a dos pixels dela em que nenhuma outra peça está entre a câmera e ela. Os triângulos são `[[x, y, z] x3]` em qualquer unidade comum;
+ * `olho` é o vetor do alvo para a câmera. Devolve `{ visivel, pixels }`, com `visivel` null quando a peça em foco não tem pixel.
+ */
+export function fracaoVisivelDaPeca({ foco, outras, olho, resolucao = 160 }) {
+  const d = unit3(olho);
+  const ref = Math.abs(d[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0];
+  const u = unit3(cross3(ref, d));
+  const v = cross3(d, u);
+  const proj = (t) => t.map((p) => [dot3(p, u), dot3(p, v), dot3(p, d)]);
+  const tf = foco.map(proj);
+  if (!tf.length) return { visivel: null, pixels: 0 };
+  const min = [Infinity, Infinity]; const max = [-Infinity, -Infinity];
+  for (const t of tf) for (const p of t) for (let k = 0; k < 2; k++) { min[k] = Math.min(min[k], p[k]); max[k] = Math.max(max[k], p[k]); }
+  const lado = Math.max(max[0] - min[0], max[1] - min[1]) || 1;
+  const n = resolucao;
+  const passo = lado / n;
+  const profundidade = new Float64Array(n * n).fill(-Infinity);
+  const dono = new Uint8Array(n * n); // 0 nada, 1 foco, 2 outra
+  const rasterizar = (t, quem) => {
+    const [a, b, c] = t;
+    const x0 = Math.max(0, Math.floor((Math.min(a[0], b[0], c[0]) - min[0]) / passo));
+    const x1 = Math.min(n - 1, Math.floor((Math.max(a[0], b[0], c[0]) - min[0]) / passo));
+    const y0 = Math.max(0, Math.floor((Math.min(a[1], b[1], c[1]) - min[1]) / passo));
+    const y1 = Math.min(n - 1, Math.floor((Math.max(a[1], b[1], c[1]) - min[1]) / passo));
+    if (x0 > x1 || y0 > y1) return;
+    const den = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1]);
+    if (Math.abs(den) < 1e-18) return;
+    for (let j = y0; j <= y1; j++) {
+      for (let i = x0; i <= x1; i++) {
+        const px = min[0] + (i + 0.5) * passo; const py = min[1] + (j + 0.5) * passo;
+        const l1 = ((b[1] - c[1]) * (px - c[0]) + (c[0] - b[0]) * (py - c[1])) / den;
+        const l2 = ((c[1] - a[1]) * (px - c[0]) + (a[0] - c[0]) * (py - c[1])) / den;
+        const l3 = 1 - l1 - l2;
+        if (l1 < 0 || l2 < 0 || l3 < 0) continue;
+        const z = l1 * a[2] + l2 * b[2] + l3 * c[2];
+        const k = j * n + i;
+        if (z > profundidade[k] + 1e-9 * lado) { profundidade[k] = z; dono[k] = quem; }
+      }
+    }
+  };
+  for (const t of outras) rasterizar(proj(t), 2);
+  /* a silhueta da peça em foco, sozinha, para dizer quantos pixels são dela: a mesma rasterização, com o z-buffer só dela */
+  const comOutras = { profundidade: profundidade.slice(), dono: dono.slice() };
+  profundidade.fill(-Infinity); dono.fill(0);
+  for (const t of tf) rasterizar(t, 1);
+  const silhueta = dono.map((x) => (x === 1 ? 1 : 0));
+  profundidade.set(comOutras.profundidade); dono.set(comOutras.dono);
+  for (const t of tf) rasterizar(t, 1);
+  let total = 0; let visiveis = 0;
+  for (let k = 0; k < n * n; k++) if (silhueta[k]) { total += 1; if (dono[k] === 1) visiveis += 1; }
+  return { visivel: total ? visiveis / total : null, pixels: total };
+}
+
+/**
+ * A fração visível da peça em foco em cada vista montada, medida pela malha: `{ [vista]: fração }`. A montagem é resolvida até as etapas
+ * já construídas, como nas outras medidas do pacote. As vistas que o pacote não conhece ficam de fora.
+ */
+export async function visibilidadeDoFocoNasVistas({ montagem, vistas }) {
+  const [{ receitasDaMontagem, montagemAteAGeometria }, { lerMontagemPersistida }, { resolverMontagemPersistida }, { carregadoresDeReceitas }] = await Promise.all([
+    import('./etapas-da-montagem.mjs'), import('../../src/autoria/ler-montagem-persistida.js'),
+    import('../../src/autoria/resolver-montagem-persistida.js'), import('./peca-com-parametros.mjs'),
+  ]);
+  const dado = JSON.parse(readFileSync(montagem.arquivo, 'utf8'));
+  const lida = lerMontagemPersistida(dado);
+  const receitas = await receitasDaMontagem(lida);
+  const { dado: parcial, construidas } = montagemAteAGeometria(dado, lida, receitas);
+  if (!construidas.includes(montagem.instancia)) return {};
+  const resolvida = await resolverMontagemPersistida(parcial, carregadoresDeReceitas(receitas));
+  const folhas = folhasDaMontagem(resolvida);
+  const doFoco = (f) => f.caminho?.[0] === montagem.instancia || f.caminho?.join('/') === montagem.instancia;
+  const triangulos = (f) => triangulosNoMundo(f.neutro, f.pose, f.caminho ?? 'peça');
+  const foco = folhas.filter(doFoco).flatMap(triangulos);
+  const outras = folhas.filter((f) => !doFoco(f)).flatMap(triangulos);
+  const medidas = {};
+  for (const vista of vistas) {
+    if (!OLHO_DA_VISTA_MONTADA[vista]) continue;
+    medidas[vista] = fracaoVisivelDaPeca({ foco, outras, olho: OLHO_DA_VISTA_MONTADA[vista] }).visivel;
+  }
+  return medidas;
+}
+
+/** Separa as imagens da vista montada pela fração visível da peça em foco: `{ entram, fora: [{ vista, visivel }] }`. Vista sem medida entra. */
+export function vistasMontadasVisiveis(imagens, visibilidade, minimo = VISIVEL_MINIMO_DA_PECA_EM_FOCO) {
+  const fora = imagens.filter((i) => typeof visibilidade?.[i.vista] === 'number' && visibilidade[i.vista] < minimo)
+    .map((i) => ({ vista: i.vista, visivel: visibilidade[i.vista] }));
+  return { entram: imagens.filter((i) => !fora.some((f) => f.vista === i.vista)), fora };
+}
+
 /* ---------- o alvo, a vista montada e a sobreposição ---------- */
 
 /* A chave da composta do esboço inteiro em `alvos`, quando nenhuma forma ligada declara unidade. */
@@ -1180,7 +1295,7 @@ function citadasQueNaoSaoImagem(plano, pastaDaReceita) {
 
    `saida` é a pasta da rodada, onde saem o pedido, o alvo, as vistas montadas e a sobreposição; as capturas da bancada continuam em
    `tools/bancadas/out`, com os nomes de sempre. `dependencias` troca o que o teste não quer pagar. */
-export async function vistasParaCritica(peca, { logger = null, saida = null, prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, dependencias = {} } = {}) {
+export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, dependencias = {} } = {}) {
   const dep = {
     olharBancada,
     abrirCaptura: abrirCapturaCompartilhada,
@@ -1206,6 +1321,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pra
   if (referencias.ausentes.length) {
     throw new Error(mensagemDeReferenciasAusentes(referencias.ausentes));
   }
+  const externas = lerReferenciasExternas(referenciasExternas, { existe: dependencias.existe ?? existsSync });
   /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem do Blender: sem ele, recusa antes de gastar captura */
   const lataria = superficieDaPeca(peca, receita, plano);
   if (lataria.luzRasante && !blender) throw new Error(mensagemSemBlender(peca, lataria));
@@ -1318,9 +1434,31 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pra
   }
 
   const sobreposicao = declarado ? await dep.sobreposicaoDeCortes({ peca, saida: pasta }) : null;
-  const superficie = lataria.luzRasante ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
-  /* a imagem de luz rasante quase toda escura não chega ao crítico: a luz que não alcança a chapa não mostra relevo nenhum */
-  if (superficie) exigirLuzNaSuperficie(peca, superficie);
+  const geradas = lataria.luzRasante ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
+  /* a imagem de luz rasante quase toda escura não chega ao crítico, mas não derruba o pacote: a vista é tentada de novo com a luz mais
+     alta, e a que nenhuma elevação salva sai do pedido com a frase que diz por quê; só sem nenhuma imagem de luz rasante o pacote é recusado */
+  let superficie = geradas;
+  if (geradas) {
+    const tentar = dep.luzMaisAlta ?? ((opcoes) => luzMaisAltaDaVista({ ...opcoes, obj: geradas.obj, pasta, blender }));
+    const decidida = await luzRasanteDoPacote(peca, geradas, { tentar });
+    superficie = decidida.superficie;
+    for (const { texto } of superficie.semLuz ?? []) avisos.push(texto);
+  }
+
+  /* a vista montada em que as outras peças tapam a peça em foco não entra: o crítico julgaria a caçamba onde devia ver o pé */
+  let montadaNoPedido = null;
+  if (montada) {
+    const imagens = montada.arquivos.map((arquivo, i) => ({ arquivo, vista: montada.enquadramentos[i].vista }));
+    let visibilidade = null;
+    try {
+      visibilidade = await (dep.visibilidadeDoFoco ?? visibilidadeDoFocoNasVistas)({ montagem, vistas: imagens.map((i) => i.vista) });
+    } catch (erro) {
+      avisos.push(`não medi quanto da peça em foco as outras tapam nas vistas montadas, e todas entraram no pedido: ${erro.message}`);
+    }
+    const { entram, fora } = vistasMontadasVisiveis(imagens, visibilidade);
+    for (const f of fora) avisos.push(`a vista montada ${f.vista} ficou fora do pedido: a peça em foco aparece em ${pct(f.visivel)} dela, tapada pelas outras.`);
+    montadaNoPedido = { instancia: montada.instancia, imagens: entram, ...(fora.length ? { fora } : {}) };
+  }
 
   const orientacao = dados?.orientacao ?? null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);
@@ -1330,7 +1468,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pra
     orientacao,
     alvo: alvo ? { imagem: alvo.imagem, unidade: alvo.unidade } : null,
     afastamentos: [...afastamentosDeclarados(declarado), ...novasDeclaradas(receita)].sort((a, b) => a.parte.localeCompare(b.parte)),
-    referencias: referencias.imagens.map((c) => ({ caminho: c, ...(critica.referencias[basename(c)] ? { lado: critica.referencias[basename(c)] } : {}) })),
+    referencias: [
+      ...referencias.imagens.map((c) => ({ caminho: c, ...(critica.referencias[basename(c)] ? { lado: critica.referencias[basename(c)] } : {}) })),
+      ...externas.filter((e) => !referencias.imagens.includes(e.caminho)),
+    ],
     contornos: contornosDasReferencias({ imagens: referencias.imagens, citadas: citadasQueNaoSaoImagem(plano, dirname(caminho)) }),
     encaixes,
     anteriores: pontosJaAtribuidos((dep.rodadasAnteriores ?? rodadasDaPasta)(pastaDasRodadas(peca, caminho))),
@@ -1339,7 +1480,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pra
       ...arquivosDe(arame).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista', tipo: 'arame' })),
       ...arquivosDe(raioX).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista', tipo: 'raio X' })),
     ],
-    montado: montada ? { instancia: montada.instancia, imagens: montada.arquivos.map((arquivo, i) => ({ arquivo, vista: montada.enquadramentos[i].vista })) } : null,
+    montado: montadaNoPedido,
     sobreposicao: sobreposicao ? { arquivos: sobreposicao.arquivos, notas: sobreposicao.notas } : null,
     partes: porParte.map(({ parte, resultado }) => ({ nome: parte, imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
     perguntas: [...(perguntas.todas ?? []), ...(declarado ? [lerPergunta(PERGUNTA_DO_ALVO, 'a pergunta do alvo')] : [])],
@@ -1352,6 +1493,108 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, pra
   return {
     peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos,
   };
+}
+
+/* ---------- a referência externa, trazida por quem conduz ---------- */
+
+/** As vistas que `--referencia=<caminho>@<vista>` aceita: as que o pedido já nomeia. */
+export const VISTAS_DA_REFERENCIA_EXTERNA = Object.freeze(['frontal', 'direita', 'esquerda', 'traseira', 'superior', 'inferior', 'isometrica']);
+
+/**
+ * Lê as `--referencia=<caminho absoluto da imagem>[@<vista>]` da linha de comando: `[{ caminho, lado?, externa: true }]`. A imagem é de
+ * fora do repositório (foto de terceiro não entra nele), por isso o caminho vem de quem conduz e não é gravado em arquivo versionado.
+ * Recusa o caminho que não é absoluto, que não existe, que não é imagem, e a vista que o pedido não nomeia.
+ */
+export function lerReferenciasExternas(valores, { existe = existsSync } = {}) {
+  const vistos = new Set();
+  return valores.map((bruto) => {
+    const texto = String(bruto);
+    const arroba = texto.lastIndexOf('@');
+    const temVista = arroba > 0 && !texto.slice(arroba).includes('/');
+    const caminho = temVista ? texto.slice(0, arroba) : texto;
+    const lado = temVista ? texto.slice(arroba + 1) : null;
+    if (!caminho || !isAbsolute(caminho)) throw new Error(`--referencia=${texto}: o caminho deve ser absoluto, da imagem de fora do repositório.`);
+    if (lado !== null && !VISTAS_DA_REFERENCIA_EXTERNA.includes(lado)) {
+      throw new Error(`--referencia=${texto}: a vista '${lado}' não é uma das que o pedido nomeia (${VISTAS_DA_REFERENCIA_EXTERNA.join(', ')}).`);
+    }
+    if (!existe(caminho)) throw new Error(`--referencia=${texto}: a imagem ${caminho} não existe.`);
+    if (!/\.(png|jpe?g|webp|gif)$/i.test(caminho)) throw new Error(`--referencia=${texto}: ${caminho} não é imagem (aceito png, jpg, jpeg, webp, gif).`);
+    if (vistos.has(caminho)) throw new Error(`--referencia: ${caminho} veio mais de uma vez.`);
+    vistos.add(caminho);
+    return { caminho, ...(lado ? { lado } : {}), externa: true };
+  });
+}
+
+/* ---------- a luz rasante que não alcança a peça ---------- */
+
+/** As elevações, em graus sobre o plano da imagem, que a vista escura tenta depois da padrão de 10; 45 é o máximo que o `luz-rasante.py` aceita. */
+export const ELEVACOES_DA_LUZ_RASANTE = Object.freeze([20, 30, 45]);
+export const ELEVACAO_PADRAO_DA_LUZ = 10;
+
+const pct = (f) => `${(100 * f).toFixed(1).replace('.', ',')} %`;
+
+/** Separa as imagens de luz rasante em `{ aceitas, escuras }` pelo limiar: a sem fração medida conta como escura. */
+export function decidirLuzRasante(rasante, limiar = LIMIAR_DA_LUZ_RASANTE) {
+  const escuras = imagensEscuras(rasante, limiar);
+  return { aceitas: rasante.filter((i) => !escuras.includes(i)), escuras };
+}
+
+/** A primeira das `candidatas` (`[{ elevacao, iluminada }]`, na ordem em que a luz sobe) com a peça iluminada no limiar, ou null. */
+export function primeiraQuePassa(candidatas, limiar = LIMIAR_DA_LUZ_RASANTE) {
+  return candidatas.find((c) => typeof c.iluminada === 'number' && c.iluminada >= limiar) ?? null;
+}
+
+/**
+ * Decide a luz rasante do pacote. Cada imagem abaixo do limiar é tentada de novo, na mesma vista e no mesmo azimute, com a luz em cada
+ * elevação de `ELEVACOES_DA_LUZ_RASANTE`, e fica a primeira que passa, com a elevação dita (`elevacao`). A que nenhuma elevação salva sai
+ * do pacote, e `semLuz` diz qual vista ficou sem ela e por quê. Com nenhuma imagem de luz rasante restante, recusa como antes
+ * (`exigirLuzNaSuperficie`). `tentar({ vista, azimutes, graus })` devolve `[{ azimute, arquivo, iluminada }]`; é injetável no teste.
+ * Devolve `{ superficie, semLuz }`, a superfície sem as imagens que caíram.
+ */
+export async function luzRasanteDoPacote(peca, superficie, { tentar, limiar = LIMIAR_DA_LUZ_RASANTE, elevacoes = ELEVACOES_DA_LUZ_RASANTE } = {}) {
+  const { escuras } = decidirLuzRasante(superficie.rasante, limiar);
+  if (!escuras.length) return { superficie, semLuz: [] };
+  const trocas = new Map();
+  const melhor = new Map();
+  for (const vista of new Set(escuras.map((i) => i.vista))) {
+    let faltam = escuras.filter((i) => i.vista === vista);
+    for (const graus of elevacoes) {
+      if (!faltam.length) break;
+      const feitas = await tentar({ vista, azimutes: faltam.map((i) => i.azimute), graus });
+      for (const original of faltam) {
+        const nova = feitas.find((f) => f.azimute === original.azimute);
+        if (!nova) continue;
+        if (typeof nova.iluminada === 'number') melhor.set(original, Math.max(melhor.get(original) ?? 0, nova.iluminada));
+        const passou = primeiraQuePassa([{ elevacao: graus, iluminada: nova.iluminada }], limiar);
+        if (passou) trocas.set(original, { ...original, arquivo: nova.arquivo, iluminada: nova.iluminada, elevacao: graus });
+      }
+      faltam = faltam.filter((i) => !trocas.has(i));
+    }
+  }
+  const semLuz = escuras.filter((i) => !trocas.has(i)).map((i) => {
+    const antes = typeof i.iluminada === 'number' ? `${pct(i.iluminada)} da peça iluminada a ${ELEVACAO_PADRAO_DA_LUZ} graus de elevação` : `sem fração iluminada medida a ${ELEVACAO_PADRAO_DA_LUZ} graus de elevação`;
+    const depois = melhor.has(i) ? `${pct(melhor.get(i))} no melhor de ${elevacoes.join(', ')} graus` : `sem medida em ${elevacoes.join(', ')} graus`;
+    return {
+      vista: i.vista,
+      azimute: i.azimute,
+      texto: `a vista ${i.vista} ficou sem a luz rasante a ${String(i.azimute).replace('.', ',')} graus de azimute: a luz não alcança a peça por esse lado (${antes}; ${depois}, abaixo do limiar de ${pct(limiar)}), o que é próprio de uma forma côncava ou aberta para a câmera, e a imagem saiu do pedido.`,
+    };
+  });
+  const rasante = superficie.rasante.filter((i) => !semLuz.some((s) => s.vista === i.vista && s.azimute === i.azimute)).map((i) => trocas.get(i) ?? i);
+  if (!rasante.length) exigirLuzNaSuperficie(peca, superficie, limiar);
+  return { superficie: { ...superficie, rasante, ...(semLuz.length ? { semLuz } : {}) }, semLuz };
+}
+
+/** Roda de novo o `luz-rasante.py` numa vista, nos azimutes dados e a `graus` de elevação, sobre a malha já exportada de `obj`. */
+export function luzMaisAltaDaVista({ obj, pasta, blender, vista, azimutes, graus, executar = spawnSync }) {
+  const prefixo = join(resolve(pasta), PASTA_DA_SUPERFICIE, `peca-el${graus}-`);
+  const r = executar(blender, ['-b', '--factory-startup', '--python', join(REPO, 'tools/blender/luz-rasante.py'), '--',
+    '--malha', obj, '--saida', prefixo, '--vista', vista, '--rasante-graus', String(graus), '--azimutes', azimutes.join(',')], { encoding: 'utf8', maxBuffer: 256 << 20 });
+  if (r.error || r.status !== 0) {
+    throw new Error(`o Blender (${blender}) não refez a luz rasante da vista ${vista} a ${graus} graus: ${r.error?.message ?? `${r.stdout ?? ''}\n${r.stderr ?? ''}`.trim().split('\n').slice(-8).join('\n')}`);
+  }
+  return JSON.parse(readFileSync(`${prefixo}rasante.json`, 'utf8')).imagens
+    .map((i) => ({ azimute: i.azimute, arquivo: i.arquivos.malha, iluminada: i.iluminacao?.fracao ?? null }));
 }
 
 /* Captura que não produziu arquivo recusa alto. A bancada devolve `ok:false` e
@@ -1475,16 +1718,19 @@ export function imprimir(resultado) {
 
 async function principal(argv) {
   let lido;
+  let externas = [];
   try {
-    lido = lerArgumentos(argv.slice(2), { opcoes: ['saida', 'prazo'], posicional: { nome: 'a peça', obrigatorio: true } });
+    /* `--referencia` repete, e o leitor de argumentos recusa a repetição: ela sai antes */
+    externas = argv.slice(2).filter((a) => a.startsWith('--referencia=')).map((a) => a.slice('--referencia='.length));
+    lido = lerArgumentos(argv.slice(2).filter((a) => !a.startsWith('--referencia=')), { opcoes: ['saida', 'prazo'], posicional: { nome: 'a peça', obrigatorio: true } });
     if (lido.opcao('prazo') !== null && !(Number(lido.opcao('prazo')) > 0)) throw new Error(`--prazo pede segundos maiores que zero; veio "${lido.opcao('prazo')}".`);
   } catch (erro) {
-    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>]\n${erro.message}\n`);
+    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--referencia=<caminho absoluto da imagem>[@<vista>]]...\n${erro.message}\n`);
     return 2;
   }
   /* --prazo: a peça pesada (o furgão realista, em 2026-11-06) não entra na cena nos 90 s de cada captura. */
   const prazo = lido.opcao('prazo');
-  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
+  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
   process.stdout.write(imprimir(resultado));
   return 0;
 }
