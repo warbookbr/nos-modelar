@@ -931,6 +931,41 @@ export function criarOperacoesBooleanas(servicos) {
       if (lasca.length) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${lasca.length} face(s) com triângulo sem área (lasca que cintila na tela), a primeira vinda da face ${lasca[0][0]}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
     }
 
+    /* ---- CANTOS COINCIDENTES DE OPERANDOS DIFERENTES ----
+       Dois cantos que coincidem (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do outro) entram na Manifold como
+       um só, o representante, e os pedaços cortados saem com ele. A face que o passo mantém inteira continua com o id que escreveu a entrada, e se um vizinho
+       cortado usa o representante a aresta entre os dois fica aberta (a peça de prova frente-rente-a-tampa media 4). A troca vale só onde o id antigo deixaria
+       aresta aberta, e então para todas as faces mantidas que o usam, com os cantos repetidos que ela causa fundidos e as quebras de sombra levadas pelo mesmo mapa:
+       onde nada fica aberto a face mantém os ids de sempre. O portão abaixo confere os ids que o passo escreve. */
+    const trocaDeCanto = new Map(), vsDaMantida = new Map();
+    {
+      const abertos = (listas) => {
+        const dirigidas = new Map();
+        for (const P of listas) for (let k = 0; k < P.length; k++) {
+          const x = P[k], y = P[(k + 1) % P.length];
+          if (x !== y) dirigidas.set(`${x}>${y}`, (dirigidas.get(`${x}>${y}`) ?? 0) + 1);
+        }
+        const vs = new Set();
+        for (const [chave, n] of dirigidas) {
+          const [x, y] = chave.split('>');
+          if (n !== 1 || dirigidas.get(`${y}>${x}`) !== 1) { vs.add(Number(x)); vs.add(Number(y)); }
+        }
+        return vs;
+      };
+      const escritas = () => [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])].filter((P) => new Set(P).size >= 3);
+      const abertas = abertos(escritas());
+      if (abertas.size) {
+        for (const [v, r] of repDe) if (v !== r && (abertas.has(v) || abertas.has(r))) trocaDeCanto.set(v, r);
+        for (const fid of mantidas) {
+          const vs = st.F.get(fid).vs;
+          if (!vs.some((v) => trocaDeCanto.has(v))) continue;
+          const c = [];
+          for (const v of vs) { const r = trocaDeCanto.get(v) ?? v; if (c[c.length - 1] !== r) c.push(r); }
+          while (c.length > 1 && c[0] === c[c.length - 1]) c.pop();
+          if (c.length >= 3) vsDaMantida.set(fid, c);
+        }
+      }
+    }
     /* ---- PORTÃO DE CASCA FECHADA ----
        O resultado (faces mantidas, cortadas e pedaços) tem de ser uma casca
        fechada e manifold: toda aresta dirigida com exatamente uma oposta, e o
@@ -939,7 +974,7 @@ export function criarOperacoesBooleanas(servicos) {
        (achado da revisão, 2026-09-29). Aqui a falha GRITA e o passo aborta
        com 0 V/0 F. */
     {
-      const casca = [...mantidas.map((fid) => cicloRep(st.F.get(fid).vs)), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])].filter((P) => new Set(P).size >= 3);
+      const casca = [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])].filter((P) => new Set(P).size >= 3);
       const falha = cascaAberta(casca);
       if (falha && extra?.tentativa) return { falhouCasca: falha };
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
@@ -961,13 +996,12 @@ export function criarOperacoesBooleanas(servicos) {
     // ---- daqui em diante nada pode falhar: aplica ----
     for (const v of provisorios) addV(st, definitivo.get(v), posNova.get(v));
     const faces = [...mantidas];
-    /* Dois cantos coincidentes de operandos diferentes (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do
-       outro) entraram na Manifold como um só, o representante, e os pedaços cortados saem com ele. A face mantida que ainda aponta o outro id deixava
-       um furo de quatro arestas soltas em volta: ela passa ao representante, sem mudar de número de cantos. O outro id sai com a limpeza abaixo. */
-    for (const fid of mantidas) {
+    /* a troca de cantos coincidentes, calculada antes do portão de casca fechada, vale só onde o id antigo deixaria aresta aberta */
+    for (const [fid, vs] of vsDaMantida) {
       const f = st.F.get(fid);
-      const rep = f.vs.map((v) => repDe.get(v) ?? v);
-      if (rep.some((v, k) => v !== f.vs[k]) && new Set(rep).size === f.vs.length) f.vs = rep;
+      if (f.quebras) f.quebras = f.quebras.map(([x, y]) => [trocaDeCanto.get(x) ?? x, trocaDeCanto.get(y) ?? y]).filter(([x, y]) => x !== y);
+      if (f.quebras && !f.quebras.length) delete f.quebras;
+      f.vs = vs;
     }
     /* a quebra de sombra (`face.quebras`, o vinco vivo da subdivisão) é uma aresta da face de entrada. O corte apaga ou
        reparte essa aresta, e o par de ids antigo ficava apontando vértice que não existe mais. Cada pedaço fica com os
