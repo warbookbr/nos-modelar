@@ -461,9 +461,9 @@
       "operacoes": [
         "aparar"
       ],
-      "hashCanonico": "8e1b6d85e1e43749219fb9fabf6ba401f8d1a56545821904c0f7c1416d8bddb7",
-      "vertices": 201,
-      "faces": 259,
+      "hashCanonico": "09f90bcb1e559d453d4ba9cd2c0e537e9fe6a27565c165c146caa54160b5741a",
+      "vertices": 197,
+      "faces": 251,
       "diagnosticos": 0
     }
   ]
