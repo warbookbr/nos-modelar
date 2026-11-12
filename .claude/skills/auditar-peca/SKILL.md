@@ -75,6 +75,11 @@ peça isolada e não inventa validade global de uma montagem.
    então `--focar` ali não aproxima nada, e a imagem volta igual à geral. Quem
    quer ver de perto pede `isolar`.
 
+   Para um ponto da peça, `--mirar=x,y,z --vistas=<vista>` e, para a análise inteira com a caixa em mm, `--analise --zoom=<vista>:mm:x0,y0,z0,x1,y1,z1`
+   (uma carga de página só); `--sem-contatos` quando só se quer a imagem. Provar que uma correção deixou a malha idêntica é
+   `npm run malha:assinatura -- <peça>`, e onde uma crista varia ao longo dela, `npm run crista:regularidade -- <peça>`
+   ([`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura)).
+
    | modo | pergunta | o que avaliar |
    |---|---|---|
    | `isolar` | a superfície está boa? | continuidade, vinco, transição, ondulação |

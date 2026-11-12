@@ -40,6 +40,9 @@ const BLENDER = doAmbiente('BLENDER');
 const area = mkdtempSync(join(tmpdir(), 'vistas-superficie-'));
 afterAll(() => rmSync(area, { recursive: true, force: true }));
 
+/* A medição da receita trocada por uma que passa: o pacote mede antes de capturar, e este arquivo não paga a medição real. */
+const medirPassa = async () => ({ passou: true, sha256: 'sha256:de-ensaio', relatorio: 'ok' });
+
 /* A bancada trocada por um gravador de arquivos, com o nome que ela dá a cada captura. */
 function bancadaFalsa(pasta, peca) {
   const chamadas = [];
@@ -79,7 +82,7 @@ describe('o pacote do crítico de peça de lataria', () => {
   it('sem o Blender, recusa antes de qualquer captura, dizendo que a peça é de lataria e o comando que gera as vistas', async () => {
     const base = mkdtempSync(join(area, 'sem-blender-'));
     const bancada = bancadaFalsa(base, PECA);
-    await expect(vistasParaCritica(PECA, { saida: join(base, 'rodada'), pastaDasCapturas: base, dependencias: { olharBancada: bancada.fazer, blender: null } }))
+    await expect(vistasParaCritica(PECA, { saida: join(base, 'rodada'), pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, blender: null } }))
       .rejects.toThrow(`a peça '${PECA}' é de lataria (a receita tem superfície livre por subdivisão (PASSOS[0])), e o pacote do crítico de peça de lataria `
         + `leva a luz rasante e a curvatura da lataria, que saem do Blender; MODELAR_BLENDER não aponta o executável. Rode \`${comandoDoPacote(PECA)}\``);
     expect(bancada.chamadas).toHaveLength(0);
@@ -92,7 +95,7 @@ describe('o pacote do crítico de peça de lataria', () => {
     const bancada = bancadaFalsa(base, PECA);
     const superficie = superficieFalsa();
     const resultado = await vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancada.fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar },
+      saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar },
     });
     expect(superficie.chamadas).toEqual([{ peca: PECA, pasta, lataria: { lataria: true, luzRasante: true, porque: 'a receita tem superfície livre por subdivisão (PASSOS[0])', partes: null } }]);
     const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
@@ -117,7 +120,7 @@ describe('o pacote do crítico de peça de lataria', () => {
     const superficie = superficieFalsa();
     await vistasParaCritica(NAO_LATARIA, {
       saida: pasta, pastaDasCapturas: base,
-      dependencias: {
+      dependencias: { medirReceita: medirPassa,
         olharBancada: bancadaFalsa(base, NAO_LATARIA).fazer, blender: null, vistasDeSuperficie: superficie.gerar,
         composta: async (arquivo) => { const destino = arquivo.replace(/\.esboco\.json$/, '-composta.png'); writeFileSync(destino, 'c'); return { destino }; },
         sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
@@ -136,7 +139,7 @@ describe('o pacote do crítico de peça de lataria', () => {
     const tentadas = [];
     const luzMaisAlta = async ({ vista, azimutes, graus }) => { tentadas.push(`${vista}@${graus}`); return azimutes.map((azimute) => ({ azimute, arquivo: 'x.png', iluminada: 0.01 })); };
     const resultado = await vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar, luzMaisAlta },
+      saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/blender/de/ensaio', vistasDeSuperficie: superficie.gerar, luzMaisAlta },
     });
     expect(tentadas).toEqual(['lado@20', 'lado@30', 'lado@45']);
     expect(resultado.superficie.rasante.map((i) => `${i.vista}-${i.azimute}`)).toEqual(['frente-30', 'frente-120', 'lado-120']);
@@ -144,7 +147,7 @@ describe('o pacote do crítico de peça de lataria', () => {
     /* a imagem sem a medida também não passa: o limiar não se confere sem ela, e sem nenhuma imagem que passe o pacote é recusado */
     const semMedida = superficieFalsa({ iluminada: () => null });
     await expect(vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/b', vistasDeSuperficie: semMedida.gerar, luzMaisAlta },
+      saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancadaFalsa(base, PECA).fazer, blender: '/b', vistasDeSuperficie: semMedida.gerar, luzMaisAlta },
     })).rejects.toThrow(/saiu quase toda escura em 4 imagens.*peca-frente-rasante-az30\.png \(vista frente, luz a 30 graus\) não traz a fração iluminada medida, e o limiar é de 25,0 %/);
     expect(LIMIAR_DA_LUZ_RASANTE).toBe(0.25);
   }, 60_000);

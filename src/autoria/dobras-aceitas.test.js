@@ -1,7 +1,7 @@
 /* dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a
  * aceitação cobre o achado pela parte, pela região e pelo tipo. */
 import { describe, expect, it } from 'vitest';
-import { aceitacaoDe, aceitasDaReceita, normalizarDobrasAceitas, separarAceitos } from './dobras-aceitas.js';
+import { aceitacaoDe, extensaoDaCadeia, aceitasDaReceita, normalizarDobrasAceitas, separarAceitos } from './dobras-aceitas.js';
 import { normalizarPlanoDeModelagem } from './plano-de-modelagem.js';
 
 const PARTES = ['refletor', 'carroceria'];
@@ -73,5 +73,24 @@ describe('PLANO.dobrasAceitas: o que a aceitação cobre', () => {
     expect(aceitasDaReceita({ PLANO })).toEqual([]);
     expect(aceitasDaReceita({})).toEqual([]);
     expect(aceitasDaReceita({ PLANO: { ...PLANO, dobrasAceitas: [aceita] } })).toEqual([aceita]);
+  });
+});
+
+describe('PLANO.dobrasAceitas: a região vale pela cadeia inteira', () => {
+  const lista = normalizarDobrasAceitas([{ parte: 'carroceria', tipos: ['vinco'], regiao: { min: [0, 0, 0], max: [100, 100, 100] }, motivo: MOTIVO }], ['carroceria']);
+  const achado = (min, max) => ({ tipo: 'vinco', parte: 'carroceria', posicaoMm: min.map((x, k) => (x + max[k]) / 2), caixaMm: { min, max } });
+
+  it('a extensão da cadeia dá as duas pontas mais distantes e a caixa dos vértices, arredondada para fora', () => {
+    const e = extensaoDaCadeia([[0.01, 0.02, 0.03], [0.05, 0.02, 0.03], [0.1234567, 0.02, 0.03]]);
+    expect(e.pontasMm).toEqual([[10, 20, 30], [123.5, 20, 30]]);
+    expect(e.caixaMm).toEqual({ min: [10, 20, 30], max: [123.5, 20, 30] });
+  });
+
+  it('o achado cuja cadeia cabe na região é coberto; o que tem a ponta fora dela, mesmo com o centro dentro, não é', () => {
+    expect(aceitacaoDe(lista, achado([10, 10, 10], [90, 90, 90]))).not.toBeNull();
+    const comPontaFora = achado([10, 10, 10], [90, 90, 130]);
+    expect(comPontaFora.posicaoMm.every((x) => x >= 0 && x <= 100)).toBe(true);
+    expect(aceitacaoDe(lista, comPontaFora)).toBeNull();
+    expect(aceitacaoDe(lista, { tipo: 'vinco', parte: 'carroceria', posicaoMm: [50, 50, 50] })).not.toBeNull();
   });
 });

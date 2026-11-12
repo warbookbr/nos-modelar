@@ -237,6 +237,8 @@ function curvaturas(c, escala) {
 const chaveDaAresta = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
 const operacaoDoPasso = (passo) => (Array.isArray(passo) ? passo[0] : passo?.op);
 
+const MOTIVO_DO_NIVEL_ZERO = 'gaiola sem subdivisão (niveis 0): a faceta é a forma, e não superfície a medir';
+
 /* A leitura da superfície de cada passo `subdivisao` sobre um estado já executado: `{ lista, faltou }`, com `faltou` a lista dos
    passos `subdivisao` cujo vértice o estado não tem mais (um passo posterior o tirou). `ate` limita os passos lidos aos de índice
    até ele. */
@@ -244,9 +246,12 @@ function lerSuperficiesDoEstado(entrada, neutro, gaiolas, { ate = Infinity } = {
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
   const { num } = criarResolverNumerico(dict);
   const vec = (a) => (typeof a === 'string' ? dict[a] : a).map(num);
-  const lista = []; const faltou = [];
+  const lista = []; const faltou = []; const niveisZero = [];
   entrada.PASSOS.forEach(([op, args = {}], i) => {
     if (op !== 'subdivisao' || i > ate) return;
+    /* O passo `subdivisao` com `niveis` 0 é a gaiola posta como está (a faixa do forro de um vão, a lâmina de um corte, o gabarito): a faceta é a forma, e não há superfície de
+       subdivisão a medir nela. Ela fica fora da leitura mesmo quando a malha entregue ainda tem os vértices dela (a união não os tira), e a saída diz qual. */
+    if (Math.trunc(num(args.niveis ?? 2)) === 0) { niveisZero.push({ passo: i }); return; }
     const resolvida = gaiolaDoPasso(args, { vec, num });
     if (resolvida.erro) throw new Error(`ondulacao: o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
     const { gaiola, declarados, declaradaCheia, medidas } = resolvida;
@@ -288,7 +293,7 @@ function lerSuperficiesDoEstado(entrada, neutro, gaiolas, { ate = Infinity } = {
       origem, nomeDe, origemDe, declarados, declaradaCheia, medidas, avisos: montada?.avisos ?? [],
     });
   });
-  return { lista, faltou };
+  return { lista, faltou, niveisZero };
 }
 
 /* A receita executada até o passo `ate` (de 0), com as gaiolas que o núcleo montou nela. */
@@ -314,24 +319,22 @@ export function superficiesDaReceita(receita, { passo = null, executada = null }
     return memoria.get(ate);
   };
   if (passo !== null) {
-    const { lista, faltou, entrada } = lerAte(passo);
+    const { lista, faltou, entrada, niveisZero } = lerAte(passo);
     if (faltou.length) throw new Error(`ondulacao: o vértice ${faltou[0].vertice} da superfície do passo ${faltou[0].passo} não está na malha depois do passo ${passo}; um passo até ele o tirou`);
     if (!lista.length) throw new Error(`ondulacao: nenhum passo subdivisao até o passo ${passo}`);
-    return lista.map((sup) => ({ ...sup, medidoNoPasso: passo, escolhaDoPasso: 'explícita', tiradoPeloPasso: null, passosDaReceita: entrada.PASSOS.length }));
+    const explicita = lista.map((sup) => ({ ...sup, medidoNoPasso: passo, escolhaDoPasso: 'explícita', tiradoPeloPasso: null, passosDaReceita: entrada.PASSOS.length }));
+    explicita.puladas = niveisZero.map((x) => ({ passo: x.passo, motivo: MOTIVO_DO_NIVEL_ZERO }));
+    return explicita;
   }
   const final = executada ? { entrada: executada.entrada, neutro: executada.neutro, gaiolas: [] } : (() => {
     const { resultado: { entrada, neutro }, gaiolas } = capturarGaiolas(() => executarReceita(receita));
     return { entrada, neutro, gaiolas };
   })();
-  const { lista, faltou } = lerSuperficiesDoEstado(final.entrada, final.neutro, final.gaiolas);
+  const { lista, faltou, niveisZero } = lerSuperficiesDoEstado(final.entrada, final.neutro, final.gaiolas);
   const total = final.entrada.PASSOS.length;
   const porPasso = new Map(lista.map((sup) => [sup.passo, { ...sup, medidoNoPasso: total - 1, escolhaDoPasso: 'final', tiradoPeloPasso: null, passosDaReceita: total }]));
-  const puladas = [];
+  const puladas = niveisZero.map((x) => ({ passo: x.passo, motivo: MOTIVO_DO_NIVEL_ZERO }));
   for (const i of [...new Set(faltou.map((f) => f.passo))]) {
-    /* o passo `subdivisao` com `niveis` 0 é a gaiola posta como está (a lâmina de um vão, o gabarito de um corte), e não superfície de
-       subdivisão: a que o corte consumiu não tem o que medir, e a leitura a deixa fora, dizendo qual */
-    const niveisDe = Math.trunc(Number(final.entrada.PASSOS[i][1]?.niveis ?? 2));
-    if (niveisDe === 0) { puladas.push({ passo: i, motivo: 'gaiola sem subdivisão (niveis 0) que um passo posterior consumiu' }); continue; }
     /* o último passo que ainda tem os vértices do passo `i`: salta de 1, 2, 4, ... passos e depois fecha o intervalo por bisseção */
     const tem = (k) => lerAte(k).lista.some((sup) => sup.passo === i);
     let bom = i; let ruim = null;

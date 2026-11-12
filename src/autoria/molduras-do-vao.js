@@ -131,7 +131,7 @@ function nomeadorDaGaiola(gaiola) {
  * arestas }], noPlano }, com `arestas` as chaves das arestas da gaiola cheia que a cadeia percorre e `noPlano` quando a borda toca o
  * plano de simetria (e então se confere contra os frisos das duas metades juntos).
  */
-export function bordasNaMalha(gaiola, nomes, neutro, onde) {
+export function bordasNaMalha(gaiola, nomes, neutro, onde, { toleraCortados = false } = {}) {
   const fechada = nomes.length > 2 && nomes[0] === nomes[nomes.length - 1];
   const indices = [];
   for (const n of nomes) {
@@ -154,14 +154,22 @@ export function bordasNaMalha(gaiola, nomes, neutro, onde) {
     cadeias: cadeias.map((c) => {
       const refinada = cadeiaRefinada(gaiola.faces, gaiola.nVertices, gaiola.niveis, c.cadeia);
       const ids = c.fechada ? refinada.cadeia.slice(0, -1) : refinada.cadeia;
-      const pontos = ids.map((v, k) => {
+      let cortados = 0;
+      const pontos = [];
+      ids.forEach((v, k) => {
         const p = neutro.V.get(idDoPasso(gaiola.passo, v));
-        if (!p) throw new Error(`${onde}: o vértice da chapa sob a borda perto de ${citar(nomeDe(c.cadeia[Math.min(c.cadeia.length - 1, Math.round(k / passoDaCadeia))]))} não existe mais na malha.`);
-        return { nome: k % passoDaCadeia === 0 ? nomeDe(c.cadeia[k / passoDaCadeia]) : null, p };
+        if (!p) {
+          /* A CHAPA CORTADA. O corte em painéis (`paineisPorVaos`) tira o vértice da chapa onde a lâmina de cada linha de vão atravessa a borda da abertura; a abertura
+             continua sendo a mesma volta da gaiola (as arestas dela é que são conferidas), e a declaração sem moldura mede o que restou dela. */
+          if (toleraCortados) { cortados += 1; return; }
+          throw new Error(`${onde}: o vértice da chapa sob a borda perto de ${citar(nomeDe(c.cadeia[Math.min(c.cadeia.length - 1, Math.round(k / passoDaCadeia))]))} não existe mais na malha; a chapa foi cortada por cima da borda (o corte em painéis, por exemplo), e só o vão declarado com \`semMoldura\` aceita a borda cortada.`);
+        }
+        pontos.push({ nome: k % passoDaCadeia === 0 ? nomeDe(c.cadeia[k / passoDaCadeia]) : null, p });
       });
+      if (pontos.length < 3) throw new Error(`${onde}: o corte da chapa deixou ${pontos.length} ponto(s) da borda na malha, poucos para medir o vão.`);
       const arestas = new Set();
       for (let k = 0; k + 1 < c.cadeia.length; k++) arestas.add(chaveDaAresta(c.cadeia[k], c.cadeia[k + 1]));
-      return { pontos, fechada: c.fechada, espelhada: c.espelhada, arestas };
+      return { pontos, fechada: c.fechada, espelhada: c.espelhada, arestas, cortados };
     }),
   };
 }
@@ -221,12 +229,13 @@ export function conferirVaosDaPeca(neutro, receita = {}) {
     }
     const chapa = chapaDoVao(d, dele, chapas, onde);
     const saida = { nome: d.nome, frisos: d.frisos, parcial: d.parcial, semMoldura: d.semMoldura, tolerancia: d.tolerancia, problemas: [], descobertos: [], emendas: [], comprimento: 0, amostras: 0, cobertas: 0 };
-    const { cadeias, noPlano } = bordasNaMalha(chapa, d.borda, neutro, onde);
+    const { cadeias, noPlano } = bordasNaMalha(chapa, d.borda, neutro, onde, { toleraCortados: Boolean(d.semMoldura) });
     if (!declaradasPorChapa.has(chapa.passo)) declaradasPorChapa.set(chapa.passo, new Map());
     const daChapa = declaradasPorChapa.get(chapa.passo);
     for (const c of cadeias) for (const k of c.arestas) if (!daChapa.has(k)) daChapa.set(k, d.nome);
     if (d.semMoldura) {
       saida.comprimento = cadeias.reduce((s, c) => s + comprimentoDa(c), 0);
+      saida.cortados = cadeias.reduce((s, c) => s + c.cortados, 0);
       saida.problemas = problemasDoVaoSemMoldura(d, cadeias, aberturasDaChapa(chapa), registros.filter((r) => r.gaiola?.passo === chapa.passo));
       vaos.push(saida);
       continue;
@@ -375,7 +384,7 @@ export function formatarVaos(resultado, { resumo = false } = {}) {
   }
   for (const v of resultado.vaos) {
     if (limpos.includes(v)) continue;
-    if (v.semMoldura) { linhas.push(`  ${v.nome}: sem moldura declarada (${v.semMoldura.motivo}); borda de ${mm(v.comprimento)} mm`); continue; }
+    if (v.semMoldura) { linhas.push(`  ${v.nome}: sem moldura declarada (${v.semMoldura.motivo}); borda de ${mm(v.comprimento)} mm${v.cortados ? `, ${v.cortados} ponto(s) dela cortado(s) pelas linhas de vão` : ''}`); continue; }
     const cobertura = v.amostras ? `${((100 * v.cobertas) / v.amostras).toFixed(1).replace('.', ',')}% da borda coberta` : 'sem medida';
     const emendas = v.emendas.length ? `${v.emendas.length} emenda(s) (${v.emendas.filter((e) => e.ok).length} ok)` : 'nenhuma emenda';
     const resto = v.parcial ? `parcial declarada: ${v.parcial.motivo}` : 'borda inteira';

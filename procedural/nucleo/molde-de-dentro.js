@@ -1,0 +1,226 @@
+/* molde-de-dentro.js — o volume que fica por dentro de uma chapa, a `folga` da pele de dentro dela: o molde com que `aparar` corta um sólido.
+ *
+ * Função pura sobre a superfície refinada da chapa (vértices e faces por índice, a da `subdivisao` antes da espessura), sem passo, sem Manifold
+ * e sem domínio de objeto. A chapa de espessura `espessura` tem a superfície declarada como pele de fora; a pele de dentro está a `espessura`
+ * dela, e o molde é o que sobra aquém de uma pele a `espessura + folga`. A pele do molde é a de dentro deslocada pelo MESMO `espessarSuperficie`
+ * que a chapa usa (a esquadria dos cantos e a dobra local são as da chapa, e a espessura que passa do raio local grita como lá). A abertura da
+ * chapa fecha por paredes retas, paralelas ao eixo de `fecha`, que descem de cada aresta da borda até o plano `{ eixo, em }`, e
+ * por uma tampa plana nele. O molde sai fechado, orientado para fora e em triângulos (a tampa por earcut), pronto para a booleana.
+ *
+ * Uma chapa com mais de uma borda fecha a de maior área vista do eixo pelas paredes e pela tampa do plano, e cada uma das outras (os vãos das
+ * janelas) por uma tampa plana no plano dela, sem parede.
+ *
+ * Quando a borda deslocada passa do plano (o deslocamento a tira dele), as paredes descem até o vértice mais fora e `corte` pede o semiespaço do plano.
+ *
+ * O QUE ELE RECUSA, antes de devolver malha: a chapa sem borda, a borda que se toca num vértice, o plano que a borda passa de mais que o deslocamento e a
+ * tampa que a borda projetada deixa sem área ou cruzada. */
+import earcut from 'earcut';
+import { espessarSuperficie, ErroDaEspessura } from './espessura.js';
+
+export class ErroDoMolde extends Error {
+  constructor(motivo, extra = {}) { super(`aparar: ${motivo}`); this.motivo = motivo; Object.assign(this, extra); }
+}
+
+const EIXOS = { x: 0, y: 1, z: 2 };
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+/** As bordas da superfície: o laço de vértices na ordem em que as faces percorrem a aresta de borda (a face fica à esquerda do laço). */
+function lacosDaBorda(faces) {
+  const dirigidas = new Set();
+  for (const f of faces) for (let k = 0; k < f.length; k += 1) dirigidas.add(`${f[k]}>${f[(k + 1) % f.length]}`);
+  const proximo = new Map();
+  for (const f of faces) {
+    for (let k = 0; k < f.length; k += 1) {
+      const a = f[k]; const b = f[(k + 1) % f.length];
+      if (dirigidas.has(`${b}>${a}`)) continue;
+      if (proximo.has(a)) return { erro: `a borda se toca no vértice ${a}` };
+      proximo.set(a, b);
+    }
+  }
+  const lacos = []; const vistos = new Set();
+  for (const inicio of proximo.keys()) {
+    if (vistos.has(inicio)) continue;
+    const laco = [];
+    let v = inicio;
+    while (v !== undefined && !vistos.has(v)) { vistos.add(v); laco.push(v); v = proximo.get(v); }
+    if (v !== inicio) return { erro: 'a borda não fecha um laço' };
+    lacos.push(laco);
+  }
+  return { lacos };
+}
+
+/* A tampa de um polígono, em triângulos que usam TODOS os vértices dele. O earcut descarta o vértice repetido ou colinear, e o triângulo passa então
+   por cima dele: a aresta da parede fica sem par e o molde aberto. Cada aresta de triângulo que pula vértices descartados é refeita em leque por eles.
+   `poligono` são índices de `V` na ordem da borda; `normal` é o sentido do polígono (a soma de Newell). */
+function tampaCompleta(poligono, V, normal) {
+  const maior = [0, 1, 2].reduce((m, c) => (Math.abs(normal[c]) > Math.abs(normal[m]) ? c : m), 0);
+  const duas = [0, 1, 2].filter((c) => c !== maior);
+  const n = poligono.length;
+  const ponto2 = (i) => [V[poligono[i]][duas[0]], V[poligono[i]][duas[1]]];
+  /* o ruído numa aresta reta (a borda dela vem de uma superfície alisada) deixa o polígono quase não simples, e o earcut então
+     perde triângulos: a tampa se faz com os vértices que saem da reta mais que `ruido`, e os outros voltam pelo leque abaixo */
+  const xs = poligono.map((_, i) => ponto2(i)); const largura = Math.max(...xs.map((p) => p[0])) - Math.min(...xs.map((p) => p[0])); const altura = Math.max(...xs.map((p) => p[1])) - Math.min(...xs.map((p) => p[1]));
+  const ruido = 1e-4 * Math.max(largura, altura, 1e-9);
+  const mantido = new Array(n).fill(false);
+  const marca = (i, j) => { /* o trecho aberto i..j (cíclico), o de maior desvio da corda dele */
+    const pilha = [[i, j]];
+    while (pilha.length) {
+      const [a, b] = pilha.pop();
+      const pa = xs[a]; const pb = xs[b]; const dx = pb[0] - pa[0]; const dy = pb[1] - pa[1]; const comp = Math.hypot(dx, dy);
+      let pior = -1; let desvio = 0;
+      for (let k = (a + 1) % n; k !== b; k = (k + 1) % n) {
+        const d = comp > 0 ? Math.abs(dx * (xs[k][1] - pa[1]) - dy * (xs[k][0] - pa[0])) / comp : Math.hypot(xs[k][0] - pa[0], xs[k][1] - pa[1]);
+        if (d > desvio) { desvio = d; pior = k; }
+      }
+      if (pior >= 0 && desvio > ruido) { mantido[pior] = true; pilha.push([a, pior], [pior, b]); }
+    }
+  };
+  /* as duas pontas do corte cíclico: o vértice 0 e o mais longe dele */
+  let longe = 0; for (let i = 1; i < n; i += 1) if (Math.hypot(xs[i][0] - xs[0][0], xs[i][1] - xs[0][1]) > Math.hypot(xs[longe][0] - xs[0][0], xs[longe][1] - xs[0][1])) longe = i;
+  mantido[0] = true; mantido[longe] = true;
+  if (longe > 0) { marca(0, longe); marca(longe, 0); }
+  const indices = mantido.map((m, i) => (m ? i : -1)).filter((i) => i >= 0);
+  const sorteados = indices.length >= 3 ? earcut(indices.flatMap((i) => xs[i])).map((k) => indices[k]) : [];
+  const usado = new Set(sorteados);
+  let tris = [];
+  for (let k = 0; k < sorteados.length; k += 3) {
+    let t = [sorteados[k], sorteados[k + 1], sorteados[k + 2]];
+    const [a, b, c] = t.map((i) => V[poligono[i]]);
+    if (dot(cruz(sub(b, a), sub(c, a)), normal) < 0) t = [t[0], t[2], t[1]];
+    tris.push(t);
+  }
+  /* a aresta p->q de um triângulo que é borda do polígono com vértices descartados entre os dois */
+  const salto = (p, q) => {
+    if (q === (p + 1) % n) return false;
+    for (let i = (p + 1) % n; i !== q; i = (i + 1) % n) if (usado.has(i)) return false;
+    return true;
+  };
+  for (let passada = 0; passada < n; passada += 1) {
+    let mudou = false;
+    const novos = [];
+    for (const t of tris) {
+      let refeito = false;
+      for (let e = 0; e < 3 && !refeito; e += 1) {
+        const p = t[e]; const q = t[(e + 1) % 3]; const x = t[(e + 2) % 3];
+        if (!salto(p, q)) continue;
+        for (let i = p; i !== q; i = (i + 1) % n) novos.push([i, (i + 1) % n, x]);
+        refeito = true;
+      }
+      if (refeito) mudou = true; else novos.push(t);
+    }
+    tris = novos;
+    if (!mudou) break;
+  }
+  return tris.map((t) => t.map((i) => poligono[i]));
+}
+
+/**
+ * moldeDeDentro({ vertices, faces, espessura, lado, folga, fecha }) -> { vertices, triangulos, folgaDaChapa }
+ *   vertices, faces: a superfície refinada da chapa (a pele de fora, antes da espessura);
+ *   espessura: a da chapa (0 ou nula quando ela é só uma superfície, que então é a própria pele de dentro);
+ *   lado: o da chapa, 'contraNormal' (o padrão: a normal aponta para fora do carro) ou 'normal' (aponta para dentro);
+ *   folga: a distância, maior ou igual a zero, entre a pele de dentro e a do molde;
+ *   fecha: { eixo: 'x'|'y'|'z', em: número }, o plano da tampa.
+ * `triangulos` são trios de índices de `vertices`, com a normal para fora do molde.
+ */
+export function moldeDeDentro({ vertices, faces, espessura = 0, lado = 'contraNormal', folga, fecha }) {
+  if (!Number.isFinite(folga) || folga < 0) throw new ErroDoMolde(`a folga é um número maior ou igual a zero, e veio ${folga}`);
+  if (!fecha || !(fecha.eixo in EIXOS) || !Number.isFinite(fecha.em)) throw new ErroDoMolde("fecha é { eixo: 'x' | 'y' | 'z', em: número }, o plano da tampa");
+  const e = EIXOS[fecha.eixo];
+  /* a pele cuja normal aponta para fora do volume: a declarada quando ela aponta para fora do carro, a invertida quando aponta para dentro */
+  const pele = lado === 'normal' ? faces.map((f) => [...f].reverse()) : faces.map((f) => [...f]);
+  const t = (espessura ?? 0) + folga;
+  let pontos = vertices.map((p) => [...p]);
+  if (t > 0) {
+    let s;
+    try { s = espessarSuperficie({ vertices, faces: pele, espessura: t, lado: 'contraNormal' }); } catch (erro) {
+      if (erro instanceof ErroDaEspessura) throw new ErroDoMolde(`a pele de dentro a ${t} da pele de fora se dobra sobre si: ${erro.motivo}`, { lugares: erro.lugares, raio: erro.raio });
+      throw erro;
+    }
+    pontos = s.vertices.slice(vertices.length).map((p) => [...p]);
+  }
+  const { lacos, erro } = lacosDaBorda(pele);
+  if (erro) throw new ErroDoMolde(`a chapa não tem uma borda que se feche: ${erro}`);
+  if (!lacos.length) throw new ErroDoMolde('a chapa não tem borda: ela já é fechada e não há abertura para a tampa fechar');
+  /* a abertura que as paredes e a tampa do plano fecham é a de maior área vista do eixo; as outras (os vãos das janelas) fecham por uma tampa plana
+     em cada uma, sem parede, no plano da própria borda */
+  const outros = [0, 1, 2].filter((c) => c !== e);
+  const areaVista = (l) => Math.abs(l.reduce((acc, v, k) => { const p = pontos[v]; const q = pontos[l[(k + 1) % l.length]]; return acc + p[outros[0]] * q[outros[1]] - q[outros[0]] * p[outros[1]]; }, 0)) / 2;
+  const ordem = lacos.map((l, k) => [areaVista(l), k]).sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+  const laco = lacos[ordem[0][1]];
+  const vaos = ordem.slice(1).map(([, k]) => lacos[k]);
+  /* o lado do volume: o da pele em relação à borda, ao longo do eixo da tampa; `fora(c)` é a coordenada vista de dentro para fora do volume */
+  const mediaDaBorda = laco.reduce((m, v) => m + pontos[v][e], 0) / laco.length;
+  const mediaDaPele = pontos.reduce((m, p) => m + p[e], 0) / pontos.length;
+  const sentido = mediaDaPele >= mediaDaBorda ? 1 : -1;
+  const alem = (c) => sentido * (fecha.em - c);
+  const passou = Math.max(...laco.map((v) => alem(pontos[v][e])));
+  /* o deslocamento move o vértice da borda até t, de modo que a borda sai um pouco do plano; mais que isso, o plano não é o da abertura */
+  if (passou > t + 1e-9) throw new ErroDoMolde(`a borda da chapa fica a ${passou} do plano da tampa (${fecha.eixo} = ${fecha.em}), mais que o deslocamento da pele (${t}): o plano não é o da abertura`);
+  /* a tampa fica no plano quando a borda cabe aquém dele; quando algum vértice da borda sai do plano para fora, as paredes descem até o mais fora
+     deles e o plano passa a ser a face de um semiespaço que a booleana intersecta (`corte`), porque a tampa no plano cruzaria a pele */
+  const maisFora = Math.min(...laco.map((v) => sentido * pontos[v][e])) * sentido;
+  const corte = passou > 1e-9;
+  const planoDaTampa = corte ? maisFora : fecha.em;
+
+  const V = pontos;
+  const T = [];
+  for (const f of pele) for (let k = 1; k + 1 < f.length; k += 1) T.push([f[0], f[k], f[k + 1]]);
+  /* a projeção de cada vértice da borda no plano; o que já está nele fica como está */
+  const projetado = new Map();
+  /* dois vértices da borda que se projetam a menos de `juntos` um do outro dividem o ponto da projeção: a borda sobe quase na vertical (a ponta do
+     capô, a beira do arco), e as arestas de micrômetros da tampa tirariam o molde da precisão da Manifold, que recusa aresta menor que 2^-20 da caixa */
+  const extensao = Math.max(...[0, 1, 2].map((c) => Math.max(...pontos.map((p) => p[c])) - Math.min(...pontos.map((p) => p[c]))));
+  const juntos = extensao * 2 ** -17;
+  let ultimo = null;
+  for (const v of laco) {
+    if (Math.abs(pontos[v][e] - planoDaTampa) <= 1e-9) { projetado.set(v, v); ultimo = null; continue; }
+    const p = [...pontos[v]]; p[e] = planoDaTampa;
+    if (ultimo !== null && Math.hypot(p[0] - V[ultimo][0], p[1] - V[ultimo][1], p[2] - V[ultimo][2]) < juntos) { projetado.set(v, ultimo); continue; }
+    projetado.set(v, V.length); V.push(p); ultimo = V.length - 1;
+  }
+  /* a volta fecha: o último vértice que se juntou ao primeiro projetado também */
+  const primeiro = projetado.get(laco[0]);
+  if (primeiro >= pontos.length) for (let k = laco.length - 1; k > 0; k -= 1) {
+    const q = projetado.get(laco[k]);
+    if (q < pontos.length && q !== primeiro && Math.hypot(...V[q].map((c, i) => c - V[primeiro][i])) < juntos) projetado.set(laco[k], primeiro); else break;
+  }
+  /* a parede sob cada aresta de borda a→b, percorrida de b para a, e a tampa percorre o laço ao contrário */
+  for (let k = 0; k < laco.length; k += 1) {
+    const a = laco[k]; const b = laco[(k + 1) % laco.length];
+    const quad = [b, a, projetado.get(a), projetado.get(b)].filter((v, j, l) => v !== l[(j + 1) % l.length]);
+    for (let j = 1; j + 1 < quad.length; j += 1) T.push([quad[0], quad[j], quad[j + 1]]);
+  }
+  const volta = [...laco].reverse().map((v) => projetado.get(v)).filter((v, k, l) => v !== l[(k + 1) % l.length]);
+  /* a tampa percorre o laço como a parede espera; cada triângulo segue o sentido do polígono, que é o da soma de Newell */
+  const normalDaTampa = [0, 0, 0];
+  volta.forEach((v, k) => { const p = V[v]; const q = V[volta[(k + 1) % volta.length]]; normalDaTampa[0] += (p[1] - q[1]) * (p[2] + q[2]); normalDaTampa[1] += (p[2] - q[2]) * (p[0] + q[0]); normalDaTampa[2] += (p[0] - q[0]) * (p[1] + q[1]); });
+  const tampa = tampaCompleta(volta, V, normalDaTampa);
+  if (!tampa.length) throw new ErroDoMolde('a borda projetada no plano da tampa não tem área: a tampa não fecha o molde');
+  T.push(...tampa);
+  /* os vãos: a tampa plana é o polígono da borda percorrida ao contrário, triangulado no plano de maior normal dele */
+  for (const vao of vaos) {
+    const volta2 = [...vao].reverse();
+    const n = [0, 0, 0];
+    volta2.forEach((v, k) => { const p = V[v]; const q = V[volta2[(k + 1) % volta2.length]]; n[0] += (p[1] - q[1]) * (p[2] + q[2]); n[1] += (p[2] - q[2]) * (p[0] + q[0]); n[2] += (p[0] - q[0]) * (p[1] + q[1]); });
+    const tris = tampaCompleta(volta2, V, n);
+    if (!tris.length) throw new ErroDoMolde('o vão da chapa não tem área vista do eixo da tampa: a tampa plana dele não se faz');
+    T.push(...tris);
+  }
+  /* o molde fechado: toda aresta dirigida tem a oposta, uma vez; senão a tampa ficou cruzada */
+  const dirigidas = new Map();
+  for (const tri of T) for (let k = 0; k < 3; k += 1) { const c = `${tri[k]}>${tri[(k + 1) % 3]}`; dirigidas.set(c, (dirigidas.get(c) ?? 0) + 1); }
+  let sem = 0; let primeira = null;
+  for (const [c, q] of dirigidas) {
+    const [a, b] = c.split('>');
+    if (q !== 1 || dirigidas.get(`${b}>${a}`) !== 1) { sem += 1; primeira ??= `${V[Number(a)].map((x) => +x.toFixed(5))} a ${V[Number(b)].map((x) => +x.toFixed(5))}${q !== 1 ? ` (${q} vezes)` : ''}`; }
+  }
+  if (sem) throw new ErroDoMolde(`o molde não fechou: ${sem} aresta(s) sem par oposto, a primeira de ${primeira}; a borda projetada no plano da tampa se cruza, ou a tampa saiu virada`);
+  /* a normal para fora: o volume com sinal positivo; negativo, a pele da chapa aponta para dentro do volume */
+  let volume = 0;
+  for (const [a, b, c] of T) volume += dot(V[a], cruz(V[b], V[c])) / 6;
+  if (!(volume > 0)) throw new ErroDoMolde(`o molde saiu com a normal para dentro (volume ${volume}): a normal da chapa aponta para o lado contrário do declarado em lado ('${lado}'), ou a tampa fica do lado errado da borda`);
+  return { vertices: V, triangulos: T, corte: corte ? { eixo: fecha.eixo, em: fecha.em, sentido } : null };
+}

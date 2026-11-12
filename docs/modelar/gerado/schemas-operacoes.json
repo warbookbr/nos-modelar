@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:9ef2ae80d182473daa46fa783413782309a3a31b3f61981bbbc108739332270c",
-  "total": 41,
+  "assinatura": "sha256:be3e371d8227814ba7bc9f0f0b90922921d5a0e16f7342081df9de37a5d414d7",
+  "total": 42,
   "operacoes": [
     {
       "id": "mecanifica.operacao.aberturaPorContorno",
@@ -334,6 +334,208 @@
           "A seleção precisa resolver exatamente uma face."
         ],
         "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.aparar",
+      "nome": "aparar",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.aparar@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "solido",
+            "chapa",
+            "folga",
+            "fecha"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade obrigatória do resultado."
+            },
+            "solido": {
+              "type": "object",
+              "description": "O sólido fechado a aparar."
+            },
+            "chapa": {
+              "type": "object",
+              "description": "A subdivisão { op: 'subdivisao', id }, ou uma lista delas (o molde é a união); vale a superfície que o passo guardou, mesmo depois de uma booleana cortá-la."
+            },
+            "folga": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Distância, maior ou igual a zero, entre a pele de dentro da chapa e o sólido aparado, na unidade da peça."
+            },
+            "fecha": {
+              "type": "object",
+              "description": "{ eixo: 'x'|'y'|'z', em }, o plano da tampa que fecha a abertura maior da chapa; uma lista, um plano por chapa."
+            },
+            "limpar": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "true (o padrão), false ou a tolerância: as faces finas e de área nula que o corte deixa saem por limparLascas dentro do passo; true usa 6e-6 da diagonal do sólido."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "subdivisao",
+              {
+                "origemId": 1,
+                "vertices": [
+                  [
+                    -0.5,
+                    0,
+                    -0.5
+                  ],
+                  [
+                    0.5,
+                    0,
+                    -0.5
+                  ],
+                  [
+                    0.5,
+                    0,
+                    0.5
+                  ],
+                  [
+                    -0.5,
+                    0,
+                    0.5
+                  ],
+                  [
+                    -0.4,
+                    1,
+                    -0.4
+                  ],
+                  [
+                    0.4,
+                    1,
+                    -0.4
+                  ],
+                  [
+                    0.4,
+                    1,
+                    0.4
+                  ],
+                  [
+                    -0.4,
+                    1,
+                    0.4
+                  ]
+                ],
+                "faces": [
+                  [
+                    0,
+                    4,
+                    5,
+                    1
+                  ],
+                  [
+                    1,
+                    5,
+                    6,
+                    2
+                  ],
+                  [
+                    2,
+                    6,
+                    7,
+                    3
+                  ],
+                  [
+                    3,
+                    7,
+                    4,
+                    0
+                  ],
+                  [
+                    4,
+                    7,
+                    6,
+                    5
+                  ]
+                ],
+                "niveis": 2
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "larg": 1.2,
+                "alt": 0.9,
+                "prof": 1.2,
+                "em": [
+                  0,
+                  -0.2,
+                  0
+                ]
+              }
+            ],
+            [
+              "aparar",
+              {
+                "origemId": 3,
+                "solido": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 2
+                  }
+                },
+                "chapa": {
+                  "op": "subdivisao",
+                  "id": 1
+                },
+                "folga": 0.05,
+                "fecha": {
+                  "eixo": "y",
+                  "em": 0
+                }
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "O sólido é fechado; a chapa tem ao menos uma borda."
+        ],
+        "limites": [
+          "O molde é a pele de dentro deslocada por folga (a esquadria da espessura), com paredes retas até o plano da abertura de maior área e uma tampa plana em cada vão; o resultado é a interseção, com a identidade da intersectar. A origem {op:'aparar', id} cita as faces do sólido e as da pele nova.",
+          "Recusa a chapa sem borda, o plano que a borda passa de mais que o deslocamento e a folga que passa do raio local."
+        ],
         "diagnosticos": []
       }
     },
@@ -2148,6 +2350,20 @@
               ],
               "description": "Perfil [u, v] em metros: v pela normal, com v = 0 na linha, e u para a esquerda de quem segue a linha; lista de pontos, {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno}. Na chapa com espessura, a parte de v negativo entra nela, menos que a espessura."
             },
+            "refinar": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Só sobre a superficie de um passo subdivisao: níveis a mais, de 0 (padrão) a 4, em que a linha segue a curva da borda livre da superfície limite. A linha de hoje passa pelos vértices da malha da chapa, e o canto arredondado de um vão sai em poucos segmentos retos (a 2 níveis, cerca de 25 graus entre trechos num canto de janela); com `refinar: 2` a linha é a B-spline da borda refinada mais 2 níveis, com os mesmos pontos e normais interpolados pela mesma regra (os cantos declarados e as pontas da linha aberta ficam fixos). Só serve à borda livre de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao), e a linha segue a malha que o passo entregou, pose incluída."
+            },
             "aba": {
               "type": "object",
               "description": "Em vez de perfil, só sobre a superficie: a aba que dobra a borda livre da chapa para dentro, {largura, angulo, raio} em metros e graus, os três obrigatórios. A linha é a borda de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao da gaiolaPorEstacoes dá a de um vão, e a abertura dele quando o vão tem anéis), em qualquer sentido: o passo acha o lado da chapa. largura é a perna reta depois da dobra, angulo quanto a chapa gira (90 deixa a aba perpendicular) e raio o da face de dentro da dobra, com raio + espessura na de fora; na chapa sem espessura a aba sai PELE, uma superfície aberta sem tampas e sem espessura própria, e raio é o da própria pele. A dobra começa na linha e se estende raio + espessura para o lado do vão. As faces saem lisas a 30 graus, e a dobra, a ponta e a espessura ficam vivas."
@@ -2982,6 +3198,20 @@
                 }
               ],
               "description": "Razão área / maior aresta² abaixo da qual a face é lasca; padrão 0,003."
+            },
+            "areaMinima": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Área, na unidade da peça ao quadrado, abaixo da qual a face é lasca mesmo bem proporcionada (a que a medida de contatos não triangula); padrão 4e-9 vezes o quadrado da meia diagonal da caixa da seleção."
             }
           }
         },
@@ -4426,6 +4656,14 @@
               "type": "string",
               "minLength": 1,
               "description": "'suave' (padrão) ou 'cantos'."
+            },
+            "compartilha": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Nomes de ponto que esta gaiola divide de propósito com a de um passo `subdivisao` anterior. Sem a declaração, o nome que já é vértice de outro passo recusa o passo, porque duas gaiolas com o mesmo nome de ponto leem a mesma posição."
             },
             "simetria": {
               "type": "string",

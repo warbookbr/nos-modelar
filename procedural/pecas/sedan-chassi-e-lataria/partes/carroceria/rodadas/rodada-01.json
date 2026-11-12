@@ -1,0 +1,1208 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/carroceria",
+  "numero": 1,
+  "medidas": {
+    "passou": false,
+    "relatorio": "peça nova de chapa de lataria com 337 face(s) fina(s) (travessaDaCabine: 63, travessaDoPainel: 36, montanteCEsq: 32, montanteADir: 30, montanteBDir: 23, montanteCDir: 23, reforcoDaCinturaEsq: 20, montanteBEsq: 19, reforcoDaCinturaDir: 19, caixaDeRodaDianteiraDir: 15, caixaDeRodaTraseiraDir: 15, montanteAEsq: 10, assoalho: 9, forroDosVaos: 6, portaDianteiraEsq: 6, caixaDeRodaDianteiraEsq: 4, caixaDeRodaTraseiraEsq: 4, paredeCortaFogo: 2, suporteDoRadiador: 1): lataria nova não tem face fina a aceitar; liste-as com `npm run -s malha:lascas -- sedan-chassi-e-lataria/carroceria` e tire-as."
+  },
+  "veredito": null,
+  "partes": [
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraLamaDir",
+      "confere": true,
+      "observacao": "vão com o painel dianteiro fora de 4,0 a 4,2 (p05 3,28, p95 4,67; canto de cima a 2,06): declarado pelo valor medido"
+    },
+    {
+      "nome": "portaDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lateralTraseiraDir",
+      "confere": true,
+      "observacao": "vão com o painel de trás fora de 4,0 a 4,2 (p05 2,03, p95 4,63; canto de cima a 1,39): declarado pelo valor medido"
+    },
+    {
+      "nome": "soleiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraLamaEsq",
+      "confere": true,
+      "observacao": "vão com o painel dianteiro fora de 4,0 a 4,2 (p05 3,28, p95 4,67; canto de cima a 2,06): declarado pelo valor medido"
+    },
+    {
+      "nome": "portaDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lateralTraseiraEsq",
+      "confere": true,
+      "observacao": "vão com o painel de trás fora de 4,0 a 4,2 (p05 2,03, p95 4,63; canto de cima a 1,39): declarado pelo valor medido"
+    },
+    {
+      "nome": "soleiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaDoPortaMalas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "labioTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "labioDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "teto",
+      "confere": true,
+      "observacao": "desnível de 1,0 a 1,1 mm com o capô, a tampa e os para-lamas no pé do para-brisa e do vidro traseiro: declarado"
+    },
+    {
+      "nome": "molduraVidroDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraVidroTraseiroDaPorta",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraVigia",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraVidroTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "assoalho",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tunel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDianteira",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaTraseira",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paredeCortaFogo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoRadiador",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "anteparoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDoPainel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDaCabine",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraDoChassiDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteADir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteBDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteCDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "reforcoDaCinturaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaSuperiorDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueDianteiroDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueTraseiroDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraDoChassiEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteAEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteBEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteCEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "reforcoDaCinturaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaSuperiorEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueDianteiroEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueTraseiroEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroDosVaos",
+      "confere": true,
+      "observacao": "faixas finas por trás dos vãos, mais a plaquinha do canto de trás e a faixa do peitoril; fecha o fundo dos vãos, e restos de 1 a 13 mm (9 pares, 33 mm) seguem declarados"
+    }
+  ],
+  "atrito": [
+    "vao:partes --esperado=4 compara com 4,0 a 4,2 todo par vizinho, inclusive 64 que não são vão de painel; nunca sai 0",
+    "cada edição em forro.mjs ou sedan.mjs refaz 5 min de montagem no cache; medir uma parte trocada exigiu sonda própria",
+    "FOLGAS da receita não guarda o motivo da declaração",
+    "crista:regularidade acusa 10 pontos do forro (niveis 0, arestas vivas de propósito)",
+    "medição: de quem conduz e da instrução. O pedido ao modelador listou descrever, guardas e auditoria, e não o --acao da rodada, que conta face fina; 337 faces finas chegaram ao crítico sem ninguém medir. O processo pegou só no registro.",
+    "veredito do crítico não registrado (nota 7; para-lama e forro): a faixa vermelha é o canto de raio do para-lama, e o forro é de trechos curtos; as duas promessas não dizem isso e passam a dizer na rodada 2."
+  ],
+  "notaDePassagem": "Forro: o canto de trás é plaquinha de 5,4 mm no plano do painel (a faixa de 24 mm entraria na lateral), o peitoril é faixa em L de 16 mm; as duas moram em TABELA.forro. Esticar pontas do forro não fechou resto sem entrar na porta traseira. Folgas de 14 pares declaradas pelo valor medido em FOLGAS_MEDIDAS (sedan.mjs). Canto de cima dos painéis (1,4 e 2,1 mm) não cedeu a coluna extra nem a quina solta.",
+  "receita": {
+    "sha256": "sha256:06fd36e25b795284430dd6edde55eacbe4dc2245fa6b2fa4105aa5c97d95f1d1",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 175,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * da chapa (capô, para-lamas, portas, laterais traseiras, soleiras, tampa do porta-malas e os lábios dos arcos), o teto com as colunas e as molduras"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * dos vãos, e o chassi aparado por essas duas chapas (34 membros e os dois eixos)."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * Etapa 1 de 5 da montagem `../../montagem.json` (item 1 das partes do `../../ALINHAMENTO.md`). A forma é a do esboço do carro inteiro com o chassi"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * aparado (`../../alta-definicao/chassi-aparado.esboco.mjs`, que encadeia `caminho-a-gaiola-da-casca`, `andar-de-cima` e o chassi do rascunho"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * facetado): os passos são os do esboço, recortados por `../_comum/recorte.mjs`, de modo que a malha de cada parte é a que ela tem no carro inteiro, e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * conversão para metro é a do esboço 2.0. A chapa de baixo e a do teto são gaiolas por estações com simetria em x, e o corte em painéis é um"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * `paineisPorVaos` com as linhas de vão tiradas da própria gaiola, em modo superfície, a 4 mm."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * POR QUE O CHASSI NÃO É UMA ETAPA À PARTE. O `aparar` corta cada membro pelo lado de dentro de uma chapa de `subdivisao` e lê a chapa que a própria"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * peça executou. A chapa fica na peça com as faces dela: se não for uma parte, são 141.704 faces sem identidade, e o núcleo não tem como pôr um"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * passo de ferramenta que não deixa faces. Na lataria de baixo e no teto a chapa já é parte (os painéis cortados dela e o teto), e por isso os membros"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * do chassi, que são aparados por essas duas chapas, moram na mesma peça."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * OS ENCAIXES. A carroceria é a base e a montagem a põe sem pose. Ela publica um plano para cada etapa filha, no referencial do carro: a quina do"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * ombro (y 890) para os vidros e para os acessórios, a borda da frente da chapa de baixo (z 2118) para a frente e a traseira, e a altura do centro das"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * rodas (y 364) para as rodas; cada filha publica o mesmo plano com a normal oposta, e a pose sai identidade."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * A cadeia: a TABELA em mm (os pontos dos encaixes); `derivar` calcula as interfaces das portas; `gerarPassos` põe o recorte, em metro, e as portas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "import { CONJUNTO, ETAPAS, ENCAIXES, FACETADO, CABINE, MOLDURAS, VIDROS, PAINEL_DE_TRAS, linhasDeVao, normalDaPele, contatosDaEtapa, apoiaDaEtapa, folgasDaEtapa, interfaceDoEncaixe, parteDoPlano, portasEmMetro, recorteDaEtapa } from '../../_comum/sedan.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "import { C, T, topoY, yTopoDaCabine } from '../../../alta-definicao/alvo.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "import { faixaPorTras } from '../../_comum/forro.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "const ETAPA = 'carroceria';"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "const FILHAS = ['vidros', 'frente-e-traseira', 'rodas', 'acessorios'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  /* os pontos dos encaixes das etapas filhas, do alvo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  encaixes: Object.fromEntries(FILHAS.map((f) => [f, ENCAIXES[f].ponto])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* O FORRO dos vãos entre painéis (`../_comum/forro.mjs`): a faixa de `largura` mm por trás de cada linha de vão listada, de `espessura` mm, com a face de cima `folga` mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "     abaixo da pele de dentro da chapa (que tem `chapa` mm), e um ponto a cada `passo` da curva. `eixos` dá, por linha, a direção do plano da chapa que atravessa o vão. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  forro: { largura: 24, espessura: 1, folga: 0.5, chapa: 1, passo: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "    eixos: { capo: 'x', tampa: 'x', fimDoParaLama: 'z', entrePortas: 'z', fimDaPortaTraseira: 'z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "    /* O forro do canto do para-choque de trás: a lateral traseira e o painel de trás se olham pela borda, num vão de 4 mm que corre pela lateral, e abaixo de y 550 a aba do painel"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "       (que acaba em y 470) deixa passar o raio que desce pelo vão. O forro é uma plaquinha em pé, no plano do painel, 1,5 mm atrás da face de trás dele, que fecha o canal entre"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "       a aba e a lateral: `deslocamento` é a distância da borda do painel ao centro da plaquinha (a aba tem a face de fora a 1,9 mm da borda, e a face de dentro da lateral fica"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "       a 3,7 a 4,05 mm), `largura` vai de 0,3 mm para dentro da aba até 0,2 mm antes da face de fora da lateral; sobe `comprimento` mm pela borda a partir de y 470 e desce `abaixo`"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "       mm, que é onde o raio mais baixo que passa pelo vão corta o plano dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "    cantoDeTras: { deslocamento: 1.9, largura: 5.4, comprimento: 110, abaixo: 8, borda: ['fundo', 'alargado'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "    /* O forro do peitoril: o vão de 4 mm do para-lama com o pé do teto, que o forro do vão do para-lama (que acaba no pé da cabine) não cobre. A linha é um L no plano da pele,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "       pela metade do vão: em x = (borda da faixa) - vão/2, de z `de` até o pé do capô menos vão/2, e dali ao longo de x até `ate`, com a quina arredondada por `raio`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    peitoril: { largura: 16, raio: 14, deZ: 698, ateX: 764 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "/** As curvas do forro que não são uma linha de vão do esboço: o canto do para-lama com o pé do teto (o peitoril) e a borda do painel de trás, nos dois lados. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "function linhasExtrasDoForro(Tab) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  const F = Tab.forro; const lados = [['Dir', 1], ['Esq', -1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const extras = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  /* o peitoril: o L pela metade do vão entre a faixa do para-lama e o pé do teto */"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  const { raio, deZ, ateX, largura } = F.peitoril; const xm = T.xCapo + 60 - T.vao / 2; const zm = T.zPeDoCapo - T.vao / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  const L = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  for (let z = deZ; z <= zm - raio; z += 1) L.push([xm, 0, z]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  for (let a = 0; a <= 90; a += 6) { const t = (a * Math.PI) / 180; L.push([xm - raio + raio * Math.cos(t), 0, zm - raio + raio * Math.sin(t)]); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  for (let x = xm - raio - 1; x >= ateX; x -= 1) L.push([x, 0, zm]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  for (const p of L) p[1] = topoY(p[0], p[2]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  for (const [lado, s] of lados) extras.push({ nome: `forroDoPeitoril${lado}`, linha: `peitoril${lado}`, curva: L.map(([x, y, z]) => [s * x, y, z]), across: 'x', largura, normalDaPele });"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  /* o canto de trás: a borda do painel de trás, de baixo para cima, esticada para baixo */"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const { deslocamento, largura: lg, comprimento, abaixo, borda: [de, ate] } = F.cantoDeTras;"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const P = (n) => PAINEL_DE_TRAS.pontos[`painelTraseiro_borda_${n}`].map((v) => v * 1000);"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const a = P(de); const b = P(ate); const comp = Math.hypot(...b.map((v, k) => v - a[k]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const t = b.map((v, k) => (v - a[k]) / comp);"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const B = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  for (let u = -abaixo; u <= comprimento; u += 1) B.push(a.map((v, k) => v + t[k] * u));"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  for (const [lado, s] of lados) extras.push({ nome: `forroDoCantoDeTras${lado}`, linha: `cantoDeTras${lado}`, curva: B.map(([x, y, z]) => [s * (x + deslocamento), y, z]), across: 'x', largura: lg, normalDaPele: () => [0, 0, -1] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  return extras;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "/** As faixas do forro, uma por linha de vão (nos dois lados) e as duas do peitoril e do canto de trás: `{ nome, curva, gaiola }`, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "export function forrosDosVaos(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const F = Tab.forro;"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const dasLinhas = linhasDeVao().filter((l) => (F.eixos[l.nome.replace(/Esq$/, '')] !== undefined)).map((l) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    const nome = `forro${l.nome[0].toUpperCase()}${l.nome.slice(1)}`;"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    return { nome, linha: l.nome, curva: l.curva, gaiola: faixaPorTras({ nome, curva: l.curva, across: F.eixos[l.nome.replace(/Esq$/, '')], largura: F.largura, espessura: F.espessura, fundo: F.chapa + F.folga, passo: F.passo, normalDaPele }) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  const dasExtras = linhasExtrasDoForro(Tab).map(({ nome, linha, curva, across, largura, normalDaPele: n }) => ({ nome, linha, curva, gaiola: faixaPorTras({ nome, curva, across, largura, espessura: F.espessura, fundo: F.chapa + F.folga, passo: F.passo, normalDaPele: n }) }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  return [...dasLinhas, ...dasExtras];"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "/* os números de origem do forro: depois do maior do carro inteiro e da aba do painel de trás */"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "const ID_DO_FORRO = Math.max(...CONJUNTO.passos.map(([, a]) => a.origemId ?? 0)) + 10;"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "const passosDoForro = (Tab) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  const faixas = forrosDosVaos(Tab);"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  if (!faixas.length) return [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const ids = faixas.map((_, k) => ID_DO_FORRO + k); const uniao = ID_DO_FORRO + faixas.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const sel = { origem: { op: 'unir', id: uniao } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  return [...faixas.map((f, k) => ['subdivisao', { origemId: ids[k], vertices: f.gaiola.vertices, faces: f.gaiola.faces, niveis: 0 }]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    ['unir', { origemId: uniao, solidos: ids.map((id) => ({ origem: { op: 'subdivisao', id } })) }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    ['parte', { nome: 'forroDosVaos', sel }], ['pincel', { modo: 'face', sel, cor: '#4a5560' }], ['liso', { sel, angulo: 35 }]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "/* Os membros do chassi que passam atrás de uma linha de vão: o forro, que corre a 1,5 mm da pele de fora (0,5 mm da pele de dentro), entra neles, e a solda o prende. Medido no"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "   `descrever` da carroceria; as quatro portas e as soleiras, que o forro tocava onde a pele inclina, deixaram de ser tocadas com a normal da pele (e não a de um eixo fixo). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "const CONTATOS_DO_FORRO = [...['A', 'B', 'C'].flatMap((n) => ['Dir', 'Esq'].map((L) => [`montante${n}${L}`, `o forro do vão ao lado do montante ${n} é soldado nele: a faixa passa pelo montante, 0,5 mm abaixo da pele de dentro`])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  ['paredeCortaFogo', 'o forro do vão do para-lama com a porta, em z 690, é soldado na parede corta-fogo, que fica em z 700, onde a faixa a atravessa'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  ['suporteDoRadiador', 'o forro do vão do capô com o para-lama é soldado no suporte do radiador, onde a faixa a atravessa'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  ['travessaDoPainel', 'o forro do vão do para-lama com a porta, que cruza a faixa de cima em z 690, é soldado na travessa do painel, onde a faixa a atravessa'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  ...['Dir', 'Esq'].map((L) => [`lateralTraseira${L}`, 'a plaquinha do forro do canto de trás é soldada na parede da borda da lateral, em que entra 0,5 mm, e na aba do painel de trás, em que entra 0,3 mm'])].map(([membro, motivo]) => ({ par: ['forroDosVaos', membro], motivo }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "/* Os painéis soltos de propósito, com o que os prende fora do esboço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "const SOLTAS = Object.fromEntries(['capo', 'portaDianteiraDir', 'portaDianteiraEsq', 'portaTraseiraDir', 'portaTraseiraEsq', 'soleiraDir', 'soleiraEsq', 'tampaDoPortaMalas'].map((contem) => [contem,"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  contem === 'capo' || contem === 'tampaDoPortaMalas' ? 'o painel é preso por dobradiça e fechadura, que ficam fora do esboço, e apoia 0,5 mm acima dos membros do chassi'"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    : contem.startsWith('soleira') ? 'a chapa da soleira é colada na soleira do chassi, 0,5 mm acima dela, pela cola de estrutura que fica fora do esboço'"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "      : 'a porta é presa por dobradiça no montante A ou B, que ficam fora do esboço, e fecha a 0,5 mm dos montantes do chassi']));"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "/** As interfaces das quatro portas que a carroceria publica, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "export function derivar(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  return { portas: Object.fromEntries(FILHAS.map((f) => [ENCAIXES[f].pai, { ...interfaceDoEncaixe(f, 'pai'), ponto: Tab.encaixes[f] }])) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "/** Os PASSOS, em metro: o recorte do esboço e as portas dos encaixes. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "export function gerarPassos(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  const { passos } = recorteDaEtapa(ETAPA);"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const { portas } = derivar(Tab);"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  return [...passos, ...passosDoForro(Tab), ...portasEmMetro(passos, Object.fromEntries(Object.entries(portas).map(([id, i]) => [id, { parte: 'capo', interface: i }])))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "/** Os pontos nomeados das gaiolas, em metro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "export function gerarTopo(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const topo = recorteDaEtapa(ETAPA).topo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  for (const f of forrosDosVaos(Tab)) for (const [n, p] of Object.entries(f.gaiola.pontos)) topo[n] = p.map(m);"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  return topo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  meta: { nome: 'sedan-chassi-e-lataria/carroceria', desc: 'a carroceria do sedã: lataria de baixo em painéis, teto com molduras e o chassi aparado por essas duas chapas' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  get TOPO() { return { origem: 'o centro do carro no chão: x lateral com a direita em +x, y para cima, a frente em +z', ...gerarTopo(this.PARAMS) }; },"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    objeto: 'a carroceria de um sedã de 4,4 m sem frente, traseira, vidros e rodas: painéis de chapa de 1 mm a 4 mm de vão, teto com colunas e molduras, e o chassi de plataforma aparado pela lataria',"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    referencias: ['../../referencias/sedan-chassi-e-lataria.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    escala: { medida: 'comprimento total do sedã, de z -2200 a 2200', milimetros: 4400 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    partes: [...ETAPAS[ETAPA], 'forroDosVaos'].map(parteDoPlano),"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "      'um vão entre painéis fora de 4,0 a 4,2 mm, ou os dois lados do carro com vãos diferentes',"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "      'o capô, a tampa ou o teto com costura ou degrau no eixo do carro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "      'um membro do chassi atravessando a pele de dentro da lataria, ou solto dela por mais de 0,5 mm onde o plano o apoia',"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "      'a quina do ombro, da cintura ou do teto em quina viva no lugar do raio pedido',"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "      'um vão entre painéis que deixa ver o outro lado do carro por trás dele',"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "    lataria: { partes: ['capo', 'paraLamaDir', 'paraLamaEsq', 'portaDianteiraDir', 'portaDianteiraEsq', 'portaTraseiraDir', 'portaTraseiraEsq', 'lateralTraseiraDir', 'lateralTraseiraEsq', 'soleiraDir', 'soleiraEsq', 'tampaDoPortaMalas', 'teto'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  contatos: [...contatosDaEtapa(ETAPA), ...CONTATOS_DO_FORRO],"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  FOLGAS: folgasDaEtapa(ETAPA),"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  APOIA: { ...apoiaDaEtapa(ETAPA), ...SOLTAS },"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  /* As partes soltas desta peça: os painéis que fecham os vãos entre os outros ficam a 4 mm deles e a 0,5 mm dos membros do chassi, presos por dobradiça e cola de estrutura que"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "     ficam fora do esboço; nenhum toca outra parte. O grupo principal é o do chassi com os para-lamas, as laterais e o teto. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  ilhas: Object.entries(SOLTAS).map(([contem, motivo]) => ({ contem, motivo })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  /* Os vãos do teto: as cinco janelas, cada uma com a moldura de borracha que a contorna. As janelas das portas e a vigia valem para os dois lados (a borda declarada é a da"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "     metade). A abertura da chapa de baixo em que a cabine assenta fica sem moldura, e o corte em painéis tira os vértices dela onde cada linha de vão a atravessa: a declaração"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "     `semMoldura` aceita a borda cortada (atrito 2 do RECEITA.md). A borda é a metade da volta, de um ponto do plano de simetria ao outro: a coluna da faixa de cima de uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "     estação a outra, e o contorno do capô nas duas pontas (`descrever` lista os pontos da volta inteira). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  get vaos() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "    const daFaixa = ['peDaTampa', 'zm1291', 'arcoDeTrasTopo', 'zm1071', 'zm971', 'zm891', 'zm836', 'zm801', 'arcoDeTrasFim', 'fimDaPorta', 'zm739', 'zm700', 'zm630', 'zm520', 'zm380', 'zm220', 'entrePortas', 'z130', 'z290', 'z440', 'z560', 'z638', 'fimDoParaLama', 'peDoCapo'].map((e) => `${e}_faixa`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "    const doCapo = (e) => ['vaoDoCapo', 'capoBorda', 'capoMeio', 'capoDentro', 'centro'].map((c) => `${e}_${c}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    const abertura = { nome: 'aberturaDaCabine', borda: [...doCapo('peDaTampa').reverse(), ...daFaixa, ...doCapo('peDoCapo')], semMoldura: { motivo: 'a chapa de baixo se abre onde a cabine assenta: o teto, as molduras e os montantes fecham a abertura por cima, e a chapa não tem moldura própria em volta dela' } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    return [abertura, ...VIDROS.map(([, , vao], i) => ({ nome: vao, borda: CABINE.bordaDoVao(vao), frisos: [MOLDURAS[i]] }))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  /* Os extremos que a tabela do alvo e a do rascunho fixam: o eixo da frente (de x -870 a 870, raio 30, centro em y 364 e z 1249), o de trás, e o alto do teto (a borda do peitoril, em x 816, e o pé do para-brisa, em z 738). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    const E = FACETADO.eixoRaio; const R = FACETADO.roda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    const zs = Array.from({ length: 401 }, (_, k) => C.zTras + ((C.zFrente - C.zTras) * k) / 400);"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "      { nome: 'eixo dianteiro, a ponta de fora, de cima e da frente', parte: 'eixoDianteiro', medida: 'maximo', em: [FACETADO.eixoMeia, R.raio + E, R.zFrente + E], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "      { nome: 'eixo traseiro, a ponta de fora, de baixo e de trás', parte: 'eixoTraseiro', medida: 'minimo', em: [-FACETADO.eixoMeia, R.raio - E, R.zTras - E], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "      { nome: 'teto, a borda do peitoril, o alto e o pé do para-brisa', parte: 'teto', medida: 'maximo', em: [C.xBase, Math.max(...zs.map((z) => yTopoDaCabine(0, z))), C.zFrente], toleranciaMm: 3 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-12T13:31:12.074Z",
+  "facesFinas": {
+    "total": 337,
+    "porParte": {
+      "paredeCortaFogo": 2,
+      "assoalho": 9,
+      "suporteDoRadiador": 1,
+      "travessaDoPainel": 36,
+      "travessaDaCabine": 63,
+      "montanteADir": 30,
+      "montanteBDir": 23,
+      "reforcoDaCinturaDir": 19,
+      "caixaDeRodaDianteiraDir": 15,
+      "caixaDeRodaTraseiraDir": 15,
+      "montanteAEsq": 10,
+      "montanteBEsq": 19,
+      "reforcoDaCinturaEsq": 20,
+      "caixaDeRodaDianteiraEsq": 4,
+      "caixaDeRodaTraseiraEsq": 4,
+      "forroDosVaos": 6,
+      "portaDianteiraEsq": 6,
+      "montanteCDir": 23,
+      "montanteCEsq": 32
+    }
+  }
+}

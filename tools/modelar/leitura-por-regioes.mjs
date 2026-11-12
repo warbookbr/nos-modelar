@@ -54,14 +54,25 @@
  * `--linhas=<png>`, o desenho de `npm run linhas:modelo` (o contorno, a divisa, a quina e a dobra, tirados da malha na mesma vista)
  * entra como terceiro painel de cada região, sobre a referência clareada, e o pedido pergunta de cada linha se ela existe lá.
  *
+ * O PAINEL DA VISTA RÁPIDA. A imagem da `vista:rapida` tem o fundo do painel em toda a imagem, e `acharPainel` (as linhas e colunas com um
+ * quarto de pixels no fundo) a encurtava quando a peça ocupava o quadro: a leitura só cortava certo com `--painel` à mão (furgão,
+ * 2026-11-11). Ao lado dela a `vista:rapida` grava `<png>.rapida.json` com o painel e o fundo, e esta leitura os usa quando `--painel` não vem.
+ *
+ * O MODELO. `--modelo=<esboço ou peça> --vista=<vista>` tira a captura (a vista rápida) e o desenho das linhas da própria malha, no mesmo
+ * quadro, e monta a leitura sobre elas num comando só; `--recorte=x0,y0,z0,x1,y1,z1` (mm do referencial da peça) enquadra a caixa e a
+ * `--caixa-ref` é a região da referência que corresponde a ela. Vale para a receita de peça (nome ou caminho) e para o esboço.
+ *
  * USO
  *   npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
  *     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="a traseira de uma máquina, vista de trás"]
  *     [--linhas=<png>] [--fora="o eixo e as rodas"]
+ *   npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --modelo=<esboço ou peça> --vista=<vista> --saida=<pasta>
+ *     [--recorte=x0,y0,z0,x1,y1,z1] [--ate-passo=N] [--opcao=1] [--largura=900] [--composicoes=<módulo>] [--grade=4x3] [--objeto=...] [--fora=...]
  *   npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
  *
  * `--caixa-ref` é a caixa do que é modelado, em px da referência (sem o que aparece nela e não é da peça). `--painel` é o retângulo
- * da captura que contém a peça; sem ele vale o painel da folha do `esboco:nucleo`, achado pela cor de fundo dele, ou a imagem inteira. */
+ * da captura que contém a peça; sem ele vale o da `<captura>.rapida.json`, se existir, ou o painel da folha do `esboco:nucleo`, achado pela cor de fundo
+ * dele, ou a imagem inteira. */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -434,9 +445,14 @@ export function acharContradicoes(respostas, anteriores) {
 const AJUDA = `npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="<o que é e de onde é visto>"]
     [--linhas=<png de linhas:modelo>] [--fora="<o que aparece na referência e não é da peça>"]
+npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --modelo=<esboço ou peça> --vista=<vista> --saida=<pasta>
+    [--recorte=x0,y0,z0,x1,y1,z1] [--ate-passo=N] [--opcao=1] [--largura=900] [--composicoes=<módulo>] [--grade=4x3] [--objeto=...] [--fora=...]
 npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
 
 Corta a referência e a captura do rascunho na mesma grade e grava indice.png, folha-NN.png, pedido.md e leitura.json.
+Com --modelo, a captura (a vista rápida) e as linhas saem da própria malha do esboço ou da receita de peça, no mesmo quadro, e
+--recorte (mm do referencial da peça) enquadra uma caixa: a --caixa-ref é então a região da referência que corresponde a ela.
+Sem --painel, vale o da <captura>.rapida.json que a vista:rapida grava ao lado da imagem.
 --registrar confere que toda região tem resposta, grava rodadas/rodada-NN.json e acusa o que a rodada diz da referência ao contrário
 de uma rodada anterior, na mesma região e sobre o mesmo atributo.`;
 
@@ -502,22 +518,71 @@ export function executar(argv) {
     const grade = valor('grade') ? valor('grade').split('x').map(Number) : GRADE_PADRAO;
     const cor = valor('fundo');
     if (cor && !/^#[0-9a-fA-F]{6}$/.test(cor)) throw new ErroDaLeitura('--fundo espera #rrggbb');
+    /* a vista rápida diz o painel e o fundo dela ao lado da imagem: sem isso o painel achado pelas linhas de fundo encurta quando a peça ocupa o quadro */
+    let lado = null;
+    const arquivoDoLado = `${resolve(valor('captura'))}.rapida.json`;
+    if (!valor('painel') && !cor && existsSync(arquivoDoLado)) { try { lado = JSON.parse(readFileSync(arquivoDoLado, 'utf8')); } catch { lado = null; } }
     const r = montarLeitura({
       referencia: dePng(readFileSync(resolve(valor('referencia')))), captura: dePng(readFileSync(resolve(valor('captura')))),
-      caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), painel: valor('painel') ? numeros(valor('painel'), 4, '--painel') : undefined,
-      fundo: cor ? [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16)) : undefined, grade, margem: valor('margem') ? Number(valor('margem')) : undefined,
+      caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), painel: valor('painel') ? numeros(valor('painel'), 4, '--painel') : lado?.painel,
+      fundo: cor ? [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16)) : lado?.fundo, grade, margem: valor('margem') ? Number(valor('margem')) : undefined,
       linhas: valor('linhas') ? dePng(readFileSync(resolve(valor('linhas')))) : undefined,
     });
     gravarLeitura(pasta, r, { referencia: valor('referencia'), captura: valor('captura'), caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), grade, objeto: valor('objeto'), fora: valor('fora') });
     const desvio = (r.proporcao.rascunho / r.proporcao.referencia - 1) * 100;
-    return { codigo: 0, stdout: `${r.regioes.length} regiões em ${r.folhas.length} folhas, em ${pasta}\naltura sobre largura: referência ${r.proporcao.referencia.toFixed(3)}, rascunho ${r.proporcao.rascunho.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)\npedido ao crítico: ${join(pasta, 'pedido.md')}\n`, stderr: '' };
+    return { codigo: 0, stdout: `${lado ? `painel e fundo da vista rápida, de ${arquivoDoLado}\n` : ''}${r.regioes.length} regiões em ${r.folhas.length} folhas, em ${pasta}\naltura sobre largura: referência ${r.proporcao.referencia.toFixed(3)}, rascunho ${r.proporcao.rascunho.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)\npedido ao crítico: ${join(pasta, 'pedido.md')}\n`, stderr: '' };
   } catch (erro) {
     if (erro instanceof ErroDaLeitura || erro?.code === 'ENOENT' || erro instanceof SyntaxError) return { codigo: 2, stdout: '', stderr: `leitura:regioes: ${erro.message}\n` };
     throw erro;
   }
 }
 
+/**
+ * `executar` com `--modelo`: tira da malha do esboço ou da receita de peça a captura (vista rápida) e as linhas, no mesmo quadro, grava
+ * `captura.png` e `linhas.png` na pasta da leitura e monta a leitura sobre elas. Sem `--modelo` é `executar`. As duas imagens saem com a
+ * mesma câmera e o mesmo quadro; as linhas são cortadas na caixa do objeto da captura, que é onde `montarLeitura` as espera.
+ */
+export async function executarComModelo(argv) {
+  const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };
+  if (valor('modelo') === null || valor('registrar')) return executar(argv);
+  try {
+    for (const n of ['vista', 'saida', 'referencia', 'caixa-ref']) if (!valor(n)) throw new ErroDaLeitura(`falta --${n}`);
+    if (valor('captura')) throw new ErroDaLeitura('--modelo e --captura se contradizem: a captura sai do modelo');
+    const { abrirModelo, painelDaOpcao, lerRecorte, recortarFaces, resumoDaAbertura, ErroDoModelo } = await import('./modelo-aberto.mjs');
+    const { facesDaOpcao, rasterSombreado, LARGURA_PADRAO, ErroDaVista } = await import('./vista-rapida.mjs');
+    const { desenharLinhas, facesDoNeutro, linhasDoRaster, rasterizar } = await import('./linhas-do-modelo.mjs');
+    const largura = valor('largura') === null ? LARGURA_PADRAO : Number(valor('largura'));
+    if (!Number.isInteger(largura) || largura < 8) throw new ErroDaLeitura('--largura espera um inteiro de pelo menos 8');
+    let montado; let recorte;
+    try {
+      recorte = lerRecorte(valor('recorte'));
+      montado = await abrirModelo(valor('modelo'), { ateOPasso: valor('ate-passo') === null ? null : Number(valor('ate-passo')), composicoes: valor('composicoes'), relato: false });
+    } catch (e) { if (e instanceof ErroDoModelo || e?.name === 'ErroDeConfiguracao') throw new ErroDaLeitura(e.message); throw e; }
+    const { painel, erro } = painelDaOpcao(montado, Number(valor('opcao') ?? 1), 'leitura:regioes');
+    if (erro) return erro;
+    let cap;
+    try { cap = rasterSombreado(facesDaOpcao(painel.neutro), { vista: valor('vista'), largura, margem: recorte ? 0 : undefined, recorte }); } catch (e) {
+      if (e instanceof ErroDaVista) throw new ErroDaLeitura(e.message);
+      throw e;
+    }
+    const raster = rasterizar(recortarFaces(facesDoNeutro(painel.neutro, painel.partes), recorte), valor('vista'), largura, cap.caixa);
+    const desenho = desenharLinhas(raster, linhasDoRaster(raster));
+    const caixa = caixaDoObjeto(cap.imagem, [0, 0, cap.largura, cap.altura], FUNDO_DO_PAINEL);
+    const alturaDoDesenho = desenho.altura;
+    const cortada = reamostrar(desenho, [caixa[0], caixa[1] * (alturaDoDesenho / cap.altura), caixa[2], caixa[3] * (alturaDoDesenho / cap.altura)], caixa[2] - caixa[0], caixa[3] - caixa[1]);
+    const pasta = resolve(valor('saida')); mkdirSync(pasta, { recursive: true });
+    writeFileSync(join(pasta, 'captura.png'), paraPng(cap.imagem)); writeFileSync(join(pasta, 'linhas.png'), paraPng(cortada));
+    const repasse = argv.filter((a) => !/^--(modelo|vista|recorte|ate-passo|opcao|largura|composicoes)=/.test(a));
+    const r = executar([...repasse, `--captura=${join(pasta, 'captura.png')}`, `--linhas=${join(pasta, 'linhas.png')}`, `--painel=0,0,${cap.largura},${cap.altura}`, `--fundo=#${FUNDO_DO_PAINEL.map((c) => c.toString(16).padStart(2, '0')).join('')}`]);
+    const abertura = resumoDaAbertura(montado);
+    return { ...r, stdout: `${abertura ? `${abertura}\n` : ''}captura e linhas da malha de ${valor('modelo')}, vista ${valor('vista')}${recorte ? `, recorte ${recorte.min.join(', ')} a ${recorte.max.join(', ')} mm` : ''}, ${cap.mmPorPx.toFixed(2)} mm por px\n${r.stdout}` };
+  } catch (erro) {
+    if (erro instanceof ErroDaLeitura) return { codigo: 2, stdout: '', stderr: `leitura:regioes: ${erro.message}\n` };
+    throw erro;
+  }
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const r = executar(process.argv.slice(2));
+  const r = await executarComModelo(process.argv.slice(2));
   process.stdout.write(r.stdout); process.stderr.write(r.stderr); process.exitCode = r.codigo;
 }

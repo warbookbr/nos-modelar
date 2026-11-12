@@ -1,0 +1,181 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "sedan-chassi-e-lataria",
+  "instancias": [
+    {
+      "id": "carroceria",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "sedan-chassi-e-lataria/carroceria"
+      }
+    },
+    {
+      "id": "vidros",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "sedan-chassi-e-lataria/vidros"
+      }
+    },
+    {
+      "id": "frente-e-traseira",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "sedan-chassi-e-lataria/frente-e-traseira"
+      }
+    },
+    {
+      "id": "rodas",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "sedan-chassi-e-lataria/rodas"
+      }
+    },
+    {
+      "id": "acessorios",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "sedan-chassi-e-lataria/acessorios"
+      }
+    }
+  ],
+  "relacoes": [],
+  "etapas": [
+    "carroceria",
+    "vidros",
+    "frente-e-traseira",
+    "rodas",
+    "acessorios"
+  ],
+  "vinculos": [],
+  "posicoes": [
+    {
+      "id": "vidrosNaOsVidros",
+      "instancia": "vidros",
+      "porta": "naCarroceria",
+      "em": {
+        "instancia": "carroceria",
+        "porta": "paraOsVidros"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "frenteETraseiraNaOPainelDianteiro",
+      "instancia": "frente-e-traseira",
+      "porta": "naBordaDaFrente",
+      "em": {
+        "instancia": "carroceria",
+        "porta": "paraOPainelDianteiro"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rodasNaAsRodas",
+      "instancia": "rodas",
+      "porta": "noEixo",
+      "em": {
+        "instancia": "carroceria",
+        "porta": "paraAsRodas"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "acessoriosNaOsAcessorios",
+      "instancia": "acessorios",
+      "porta": "naLinhaDoOmbro",
+      "em": {
+        "instancia": "carroceria",
+        "porta": "paraOsAcessorios"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    }
+  ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-09,
+    "expectativas": [
+      {
+        "id": "carroceriaComVidros",
+        "a": {
+          "caminho": [
+            "carroceria"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "vidros"
+          ]
+        },
+        "motivo": "o vidro passa 12 mm por baixo da borda do vão do teto e é colado nele (a face de fora fica 0,2 mm dentro da pele de dentro), e a moldura de borracha assenta no vidro: o pé dela desce 0,1 mm abaixo da face de fora do vidro"
+      },
+      {
+        "id": "carroceriaComFrenteETraseira",
+        "a": {
+          "caminho": [
+            "carroceria"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "frente-e-traseira"
+          ]
+        },
+        "motivo": "a tomada de ar assenta no capô com a borda 1 mm dentro da chapa, as pontas das longarinas, cortadas na face de dentro dos painéis, assentam neles, e os suportes do chassi entram nos painéis e nos para-choques, onde são parafusados (o parafuso e o furo ficam fora do esboço)"
+      },
+      {
+        "id": "acessoriosComCarroceria",
+        "a": {
+          "caminho": [
+            "acessorios"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "carroceria"
+          ]
+        },
+        "motivo": "o pé do retrovisor entra 11 mm na chapa da porta dianteira, onde é parafusado, e cada maçaneta entra 3 mm na chapa da porta; o rebaixo de fundo fechado atrás da maçaneta fica para o plano do rebaixo por contorno"
+      }
+    ]
+  },
+  "apoioNoChao": {
+    "plano": {
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "altura": 0
+    },
+    "toleranciaNumerica": 0.0005,
+    "apoiam": [
+      {
+        "caminho": [
+          "rodas"
+        ],
+        "parte": "pneuDianteiraDir"
+      },
+      {
+        "caminho": [
+          "rodas"
+        ],
+        "parte": "pneuDianteiraEsq"
+      },
+      {
+        "caminho": [
+          "rodas"
+        ],
+        "parte": "pneuTraseiraDir"
+      },
+      {
+        "caminho": [
+          "rodas"
+        ],
+        "parte": "pneuTraseiraEsq"
+      }
+    ]
+  }
+}

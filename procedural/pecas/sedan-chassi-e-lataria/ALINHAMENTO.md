@@ -106,40 +106,22 @@ acervo para os perfis, e o rascunho para o que a referência não tem.
 
 ## Partes e ordem de montagem
 
-Cada item é uma peça da etapa de receitas, com o nome da pasta dela, e reúne
-partes que o rascunho já separa e nomeia (`paraLamaDir`, `portaDianteiraEsq`,
-`vidroTraseiro` e as outras). Os painéis de chapa saem todos da mesma
-superfície de carroceria, que é definição comum deles e não peça.
+Cada item é uma peça da etapa de receitas, com o nome da pasta dela, e reúne partes que o rascunho já separa e nomeia (`paraLamaDir`,
+`portaDianteiraEsq`, `vidroTraseiro` e as outras). Os painéis de chapa saem todos da mesma superfície de carroceria, que é definição comum
+deles e não peça. A divisão é a da fatia 4c, de 2026-11-12, feita sobre o esboço em alta definição do carro inteiro
+(`alta-definicao/chassi-aparado.esboco.mjs`, relato em `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/RECEITA.md`),
+e substitui a lista de quatorze peças da proposta de 2026-11-11, que era a do rascunho facetado: o chassi aparado pela lataria só existe numa peça
+que tenha também as duas chapas que o aparam, e por isso o chassi, a lataria de baixo e o teto são uma peça só.
 
-1. `chassi`: o assoalho, o túnel, as duas longarinas, as três travessas, as
-   duas soleiras do chassi, os montantes A, B e C, a parede corta-fogo, o
-   suporte do radiador, o anteparo traseiro, as travessas do painel e de trás
-   da cabine, os reforços da cintura, as longarinas superiores, as quatro
-   caixas de roda, os quatro suportes dos para-choques e os dois eixos. São 34
-   partes nomeadas no rascunho.
-2. `rodas`: quatro rodas de pneu, aro, disco e cubo, pela família
-   `procedural/familias/roda-pneu/`, perfil `carro`, com o diâmetro de 728 e a
-   largura de 205 passados como parâmetro (o perfil traz 632, de um 205/55
-   R16), postas por `instanciaDeFamilia` numa chamada com as quatro poses. São
-   16 partes.
-3. `soleiras`: a chapa que veste a soleira do chassi sob as portas, uma de
-   cada lado.
-4. `laterais-traseiras`: de cada lado, a chapa do arco de trás, do fim da porta
-   traseira ao painel traseiro, com a faixa de cima ao lado da tampa.
-5. `teto`: o teto com as colunas A e C e a calha sobre as portas, numa peça,
-   com os vãos do para-brisa, do vidro traseiro e das duas vigias.
-6. `painel-dianteiro`: a frente, com os vãos dos faróis e da grade.
-7. `painel-traseiro`: a traseira, com os vãos das lanternas.
-8. `para-lamas`: de cada lado, a chapa do arco da frente, do painel dianteiro à
-   porta, com a faixa de cima ao lado do capô.
-9. `portas-dianteiras`: duas, cada uma com o quadro e o vão da janela.
-10. `portas-traseiras`: duas, cada uma com o quadro e o vão da janela.
-11. `capo`: a chapa do capô e a tomada de ar sobre ela.
-12. `tampa-do-porta-malas`: a chapa da tampa.
-13. `vidros`: o para-brisa, o vidro traseiro, os quatro vidros das portas e as
-    duas vigias.
-14. `acabamentos`: os dois faróis, a grade, as duas lanternas, os dois
-    para-choques e os dois retrovisores.
+1. `carroceria`: a lataria de baixo (o capô, os dois para-lamas, as quatro portas, as duas laterais traseiras, as duas soleiras, a tampa do
+   porta-malas e os dois lábios dos arcos), o teto com as colunas e as cinco molduras dos vãos, e o chassi aparado por essas duas chapas (as 34
+   partes de plataforma, longarinas, travessas, caixas de roda, montantes, reforços e eixos).
+2. `vidros`: o para-brisa, o vidro traseiro, os quatro vidros das portas e as duas vigias.
+3. `frente-e-traseira`: o painel dianteiro com a grade de cinco lâminas e os vãos de farol, o painel traseiro com os vãos de lanterna, as quatro
+   lentes, os dois para-choques de ponta a ponta e a tomada de ar do capô.
+4. `rodas`: quatro rodas de pneu, aro, disco e cubo, pela família `procedural/familias/roda-pneu/`, perfil `carro`, com o diâmetro de 728 e a
+   largura de 205 passados como parâmetro, postas por `instanciaDeFamilia` numa chamada com as quatro poses.
+5. `acessorios`: os dois retrovisores de laços e as quatro maçanetas.
 
 ## Contatos
 

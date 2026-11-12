@@ -9,6 +9,7 @@ import { enderecosPorIndice } from './operacoes/subdivisao.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 import { sha256Hex } from './sha256.js';
 import { distancias } from './fixtures/medidas-de-malha.js';
+import { analisarTopologia } from './topologia.js';
 
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const col = (nome, u, v, extra) => ({ nome, em: [u, v], ...extra });
@@ -270,5 +271,54 @@ describe('bordaDoVao', () => {
     const g = gaiolaPorEstacoes({ eixo: 'z', estacoes: plana([0, 1, 2, 3, 4], semC), vaos: [janela] });
     expect(() => g.bordaDoVao('porta')).toThrow("gaiola por estações: o vão 'porta' não existe; os vãos declarados são 'janela'");
     expect(() => gaiolaPorEstacoes({ eixo: 'z', estacoes: plana([0, 1, 2], () => tres) }).bordaDoVao('porta')).toThrow(/os vãos declarados são nenhum/);
+  });
+});
+
+/* A ponta em que a lateral some (atrito 5 do ciclo 3 do sedã): a lateral de uma cabine desce com o para-brisa até altura zero no pé da coluna A, onde a quina
+   encontra o peitoril. Com as estações de z constante, as colunas da lateral ficam todas no mesmo ponto da última estação, com faces degeneradas, e o passo recusa
+   a espessura. A opção que já existe, `de` com dois nomes, resolve: as colunas se fundem duas a duas nas duas últimas estações, e a última tem uma coluna só
+   no pé. Não é preciso opção nova no ajudante, e o guia (operacoes-procedurais.md) ensina o desenho. */
+describe('a ponta em que a lateral some: as colunas que se fundem', () => {
+  const X = 0.4; const alturas = [0.3, 0.3, 0.24, 0.18, 0.12, 0.06, 0.03, 0];
+  const n = alturas.length;
+  const lateral = (h, i, fundindo) => {
+    const c = [];
+    if (!fundindo || i < n - 2) c.push({ nome: 'pe', em: [X, 0] }, { nome: 'meio', em: [X, h / 2] }, { nome: 'quina', em: [X, h] });
+    else if (i === n - 2) c.push({ nome: 'pe', em: [X, 0] }, { nome: 'qm', de: ['meio', 'quina'], em: [X, h * 0.75] });
+    else c.push({ nome: 'p', de: ['pe', 'qm'], em: [X, 0] });
+    return [...c, { nome: 'topo', em: [0.2, h] }, { nome: 'centro', em: [0, h] }];
+  };
+  const montar = (fundindo, vinco) => gaiolaPorEstacoes({ eixo: 'z', niveis: 2, estacoes: alturas.map((h, i) => ({ nome: `e${i}`, em: i * 0.1, colunas: lateral(h, i, fundindo) })), vincos: vinco ? [{ nome: 'quina', coluna: 'quina', ...vinco }] : [] });
+  const passo = (g) => [['subdivisao', { origemId: 1, ...g.passo, niveis: 2, borda: 'cantos', espessura: 0.001 }]];
+  const achados = (st) => analisarTopologia({ vertices: st.V, faces: st.F }).achados.map((a) => a.codigo);
+
+  it('sem fundir, as três colunas coincidem na última estação e o passo recusa a chapa com espessura, citando os vértices', () => {
+    const g = montar(false);
+    const st = nucleo(passo(g), {}, g.pontos);
+    expect(st.F.size).toBe(0);
+    expect(st.orfaos[0].motivo).toMatch(/a superfície se dobra sobre si/);
+  });
+  it('fundindo quina e meio na penúltima estação e a coluna resultante com o pé na última, a chapa sai com espessura, sem face fina nem órfão', () => {
+    const g = montar(true);
+    expect(g.passo.vertices.filter((v) => v.startsWith('e7_'))).toEqual(['e7_p', 'e7_topo', 'e7_centro']);
+    expect(ladosDe(g.passo.faces)).toEqual({ 3: 2, 4: 25 });
+    const st = nucleo(passo(g), {}, g.pontos);
+    expect(st.orfaos).toEqual([]);
+    expect(st.F.size).toBeGreaterThan(900);
+    expect(achados(st).filter((c) => c === 'face-fina')).toEqual([]);
+  });
+  it('o vinco da quina, com nitidez ou com raio em mm, acompanha a fusão: a linha acaba na última estação em que a coluna existe (a quina funde na penúltima), e o aviso diz o apoio que passa da face', () => {
+    const comNitidez = montar(true, { nitidez: 0.5 });
+    expect(comNitidez.passo.vincos[0].pontos.at(-1)).toBe('e5_quina');
+    expect(nucleo(passo(comNitidez), {}, comNitidez.pontos).orfaos).toEqual([]);
+    const comRaio = montar(true, { raio: 8 });
+    expect(comRaio.passo.vincos[0].raio).toBeGreaterThan(0);
+    expect(comRaio.avisos.map((a) => a.ref)).toEqual(['apoioMaiorQueMetadeDaFace']);
+    const st = nucleo(passo(comRaio), {}, comRaio.pontos);
+    expect(st.orfaos).toEqual([]);
+    expect(achados(st).filter((c) => c === 'face-fina')).toEqual([]);
+  });
+  it('é determinística', () => {
+    expect(JSON.stringify(montar(true, { raio: 8 }))).toBe(JSON.stringify(montar(true, { raio: 8 })));
   });
 });

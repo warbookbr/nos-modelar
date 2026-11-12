@@ -8,12 +8,13 @@
  * o código de saída, o arquivo de sessão e a ordem da mensagem.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { PASTA_DO_CACHE } from './entrada-de-medida.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -94,6 +95,7 @@ const QUEBRADA = `export const receita = {
 afterAll(() => {
   for (const caminho of temporarias) rmSync(caminho, { force: true });
   rmSync(AREA, { recursive: true, force: true });
+  try { for (const f of readdirSync(PASTA_DO_CACHE)) if (f.startsWith('_teste-cache-')) rmSync(join(PASTA_DO_CACHE, f), { force: true }); } catch { /* sem pasta, nada a limpar */ }
   rmSync(AREA_SESSAO, { recursive: true, force: true });
 });
 
@@ -234,5 +236,29 @@ describe('a sessão própria de uma captura', () => {
     expect(r.arquivoDaSessao).toBeNull();
     expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
     expect(JSON.parse(readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8')).alvo.nome).toBe('Fixture Boa');
+  });
+});
+
+describe('ativar-bancada: a execução da receita vem do cache quando nada mudou', () => {
+  const sessao = join(AREA_SESSAO, 'sessoes', 'cache.json');
+  const ativarDe = (alvo, extra = {}) => ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, ...extra });
+
+  it('não executa a receita na segunda vez, executa quando ela muda, com --sem-cache e com perfil', async () => {
+    const alvo = receitaTemporaria('cache-a', BOA);
+    const primeira = await ativarDe(alvo);
+    const segunda = await ativarDe(alvo);
+    expect(primeira.doCache).toBe(false);
+    expect(segunda.doCache).toBe(true);
+    /* o que se grava na sessão é o mesmo, venha a execução do cache ou não */
+    expect(segunda.partesNomes).toEqual(primeira.partesNomes);
+    expect(segunda.payload.referencias.criterios).toEqual(primeira.payload.referencias.criterios);
+    expect((await ativarDe(alvo, { cache: false })).doCache).toBe(false);
+    expect((await ativarDe(alvo, { perfil: 'marcenaria' })).doCache).toBe(false);
+    /* a receita mudou: outra execução */
+    writeFileSync(resolve(REPO, alvo), BOA.replace('Fixture Boa', 'Fixture Mudada').replace('larg: 0.1', 'larg: 0.2'), 'utf8');
+    const mudada = await ativarDe(alvo);
+    expect(mudada.doCache).toBe(false);
+    expect(mudada.nomeAlvo).toBe('Fixture Mudada');
+    expect((await ativarDe(alvo)).doCache).toBe(true);
   });
 });

@@ -24,6 +24,18 @@ import { construirArvore, visitarPorCaixa, visitarPorRaio } from './arvore-de-ca
 
 export const TOLERANCIA_CONTATO_SOLIDO = 1e-9;
 
+/**
+ * A tolerância de "encosta" do contato que a peça DECLARA (um micrômetro, em metro), a mesma no relato de contatos do esboço (`TOLERANCIA_DO_RELATO_M`) e nos contatos
+ * declarados que o `descrever` confirma. Eram três: 1 µm no relato, 1 nm no `descrever` e, para a declaração, no máximo 0,1 µm; o lábio do arco da frente do sedã assenta
+ * na caixa de roda a 0,315 µm, e o par passava como `encosta` no esboço e saía como "declarado que não acontece" na receita (atrito 5 do RECEITA.md do sedã).
+ * A razão do micrômetro: a malha que a booleana devolve é de Float32, e numa peça de 1 m a unidade de arredondamento é 0,12 µm, de modo que duas superfícies desenhadas
+ * para coincidir saem a algumas unidades dela uma da outra; abaixo de 1 µm não há folga de forma que o desenho possa ter querido. O contato NÃO declarado segue
+ * detectado a `TOLERANCIA_CONTATO_SOLIDO` (1 nm): subir a global para 2e-8 mudava 99 dos 2265 pares do acervo e criava dez contatos não declarados em peças prontas
+ * (plano de ajustes no núcleo dos veículos, decisão 3), e subi-la a 1 µm é decisão da pessoa, com as peças do acervo à mão. A auditoria de montagem, as articulações e o
+ * apoio no chão medem instâncias e também ficam em `TOLERANCIA_CONTATO_SOLIDO`.
+ */
+export const TOLERANCIA_DE_ENCOSTO_DA_PECA = 1e-6;
+
 const DIRECAO_RAIO = [1, 0.3713906763541037, 0.1932731453127433];
 const EPS = 1e-12;
 
@@ -89,7 +101,11 @@ function triangulacaoDaFace(pontos, caminho, piso2 = EPS) {
   const eixo = normal.reduce((melhor, valor, indice) => (
     Math.abs(normal[indice]) > Math.abs(normal[melhor]) ? indice : melhor
   ), 0);
-  if (comprimento2(normal) <= piso2) throw new Error(`${caminho}: face degenerada não permite triangulação.`);
+  if (comprimento2(normal) <= piso2) {
+    /* o relato de contatos repete esta mensagem como motivo do sólido inconclusivo: a face, os cantos e a área dizem onde olhar */
+    const ponto = pontos[0].map((x) => Number(x.toPrecision(7)));
+    throw new Error(`${caminho}: face degenerada não permite triangulação (${pontos.length} cantos, área ${Number((Math.sqrt(comprimento2(normal)) / 2).toPrecision(3))} na unidade da peça, primeiro canto em ${JSON.stringify(ponto)}).`);
+  }
   const eixos = [[1, 2], [0, 2], [0, 1]][eixo];
   const plano = pontos.flatMap((ponto) => [ponto[eixos[0]], ponto[eixos[1]]]);
   /* Earcut já é dependência direta e neutra do projeto; esta é a mesma porta
@@ -156,6 +172,7 @@ export function prepararSolido(neutro, pose, rotulo) {
   const vizinhancaDosVertices = new Map();
   const verticesUsados = new Set();
   let invalida = null;
+  const donoDoTriangulo = new Map();
   const faces = [...neutro.F.values()].sort((a, b) => compararTexto(String(a.id), String(b.id)));
   for (const face of faces) {
     if (!Array.isArray(face.vs) || face.vs.length < 3) { invalida = 'face-sem-tres-vertices'; break; }
@@ -173,7 +190,7 @@ export function prepararSolido(neutro, pose, rotulo) {
       vizinhos.get(anterior).add(b);
       vizinhos.get(b).add(anterior);
     }
-    try { triangulos.push(...triangulacaoDaFace(pontos, `${nome}.F[${face.id}]`, piso2)); }
+    try { const novos = triangulacaoDaFace(pontos, `${nome}.F[${face.id}]`, piso2); for (const t of novos) donoDoTriangulo.set(t, { id: face.id, cantos: pontos.length }); triangulos.push(...novos); }
     catch (erro) { invalida = erro.message; break; }
   }
   if (invalida || triangulos.length === 0) return { rotulo, inconclusivo: invalida ?? 'malha-vazia' };
@@ -197,7 +214,12 @@ export function prepararSolido(neutro, pose, rotulo) {
     triangulos,
     caixa: caixaDosPontos([...vertices.values()]),
     fechada,
-    ...(degenerada ? { inconclusivo: 'triangulo-degenerado' } : {}),
+    ...(degenerada ? { inconclusivo: `triangulo-degenerado: ${(() => {
+      /* a face que deixou o triângulo sem área, para o relato dizer onde olhar */
+      const t = triangulos.find(([a, b, c]) => comprimento2(cross(sub(b, a), sub(c, a))) <= piso2);
+      const dono = donoDoTriangulo.get(t);
+      return dono ? `a face ${nome}.F[${dono.id}] tem ${dono.cantos} cantos e um triângulo de área nula (cantos alinhados ou repetidos)` : 'um triângulo de área nula';
+    })()}` } : {}),
     ...(fechada ? {} : { diagnosticoTopologia: 'malha-aberta-ou-nao-manifold' }),
   };
 }
@@ -354,6 +376,14 @@ export const LIMITE_PARA_ARVORE = 32;
 const FOLGA_DE_ARREDONDAMENTO = 1e-9;
 const FOLGA_RELATIVA_DE_PARES = 1e-5;
 const PARALELO_RELATIVO_PARA_ARVORE = 1e-6;
+/* O CANTO AGUDO TEM ÁRVORE PRÓPRIA. A folga do plano é `tolerância × (1 + 1 / sen(θ/2))` do canto mais agudo, e com o menor seno da malha INTEIRA uma lasca só
+   alargava a margem de todos os triângulos: no furgão, com o contato declarado a 1 µm no lugar de 1 nm, cada ponto passou a visitar oito vezes mais caixas, e o
+   `descrever` dele ganhou 50 s (CI de 2026-11-12, `guarda:tempo`). O triângulo de canto mais agudo que `SENO_DO_CANTO_AGUDO` (meio ângulo de 2,9 graus) vai para uma
+   segunda árvore, consultada com a margem do mais agudo dela, e a árvore dos outros usa o menor seno dos que ficaram nela, que nunca passa de vinte e uma
+   tolerâncias. O de canto nulo ou quase (abaixo de `SENO_DO_CANTO_NULO`, onde a margem não tem medida) passa sempre pela conta, como o quase paralelo ao raio. A
+   resposta é a mesma: as árvores só descartam, e todo triângulo está numa delas ou na lista dos que são sempre conferidos. */
+const SENO_DO_CANTO_AGUDO = 0.05;
+const SENO_DO_CANTO_NULO = 1e-6;
 const indicesDasMalhas = new WeakMap();
 
 function quantidadeDeEixosProprios([a, b, c]) {
@@ -380,6 +410,7 @@ function indiceDaMalha(malha) {
   const ehSempre = new Uint8Array(quantidade);
   const ehPobre = new Uint8Array(quantidade);
   const sempre = []; const pobres = [];
+  const senoDoTriangulo = new Float64Array(quantidade).fill(1);
   let menorSenoDaMetade = 1; let maiorSoma = 0; let maiorCoordenada = 0;
   const minimo = [Infinity, Infinity, Infinity]; const maximo = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i < quantidade; i += 1) {
@@ -389,6 +420,7 @@ function indiceDaMalha(malha) {
       const tamanhos = Math.sqrt(comprimento2(u) * comprimento2(v));
       const seno = tamanhos > 0 ? Math.sqrt(Math.max(0, (1 - dot(u, v) / tamanhos) / 2)) : 0;
       if (seno < menorSenoDaMetade) menorSenoDaMetade = seno;
+      if (seno < senoDoTriangulo[i]) senoDoTriangulo[i] = seno;
     }
     for (let e = 0; e < 3; e += 1) {
       const baixo = Math.min(a[e], b[e], c[e]); const alto = Math.max(a[e], b[e], c[e]);
@@ -404,10 +436,28 @@ function indiceDaMalha(malha) {
     if (quaseParalelo) { ehSempre[i] = 1; sempre.push(i); }
     if (quantidadeDeEixosProprios(triangulos[i]) < 4) { ehPobre[i] = 1; pobres.push(i); }
   }
+  /* os de canto agudo saem da árvore dos outros: o de canto nulo passa sempre pela conta, e os demais ganham a árvore deles, com a caixa de cada um */
+  const ehAgudo = new Uint8Array(quantidade);
+  const agudos = [];
+  let menorSenoDaArvore = 1; let menorSenoDosAgudos = 1;
+  for (let i = 0; i < quantidade; i += 1) {
+    if (ehSempre[i] === 1) continue;
+    const seno = senoDoTriangulo[i];
+    if (seno < SENO_DO_CANTO_NULO) { ehSempre[i] = 1; sempre.push(i); }
+    else if (seno < SENO_DO_CANTO_AGUDO) { ehAgudo[i] = 1; agudos.push(i); if (seno < menorSenoDosAgudos) menorSenoDosAgudos = seno; }
+    else if (seno < menorSenoDaArvore) menorSenoDaArvore = seno;
+  }
+  const caixasDosAgudos = new Float64Array(agudos.length * 6);
+  agudos.forEach((i, k) => { for (let e = 0; e < 6; e += 1) caixasDosAgudos[k * 6 + e] = caixas[i * 6 + e]; });
   const escala = quantidade > 0 ? Math.hypot(...[0, 1, 2].map((e) => maximo[e] - minimo[e])) : 0;
   const indice = {
     quantidade,
     menorSenoDaMetade,
+    menorSenoDaArvore,
+    menorSenoDosAgudos,
+    ehAgudo,
+    agudos,
+    arvoreDosAgudos: quantidade > LIMITE_PARA_ARVORE && agudos.length > LIMITE_PARA_ARVORE ? construirArvore(caixasDosAgudos, agudos.length) : null,
     maiorSoma,
     caixas,
     caixa: { min: minimo, max: maximo },
@@ -442,7 +492,52 @@ function classificarTriangulo(d, base, px, py, pz, tolerancia) {
   const v = inverso * (DIRECAO_RAIO[0] * q0 + DIRECAO_RAIO[1] * q1 + DIRECAO_RAIO[2] * q2);
   if (v < -tolerancia || u + v > 1 + tolerancia) return 0;
   const t = inverso * (d[base + 12] * q0 + d[base + 13] * q1 + d[base + 14] * q2);
-  return t > tolerancia ? 1 : 0;
+  if (!(t > tolerancia)) return 0;
+  /* o raio que acerta a aresta, ou o canto, que dois triângulos dividem passa pela tolerância nos dois e contava o cruzamento duas vezes: a paridade
+     virava e o ponto de fora saía dentro. O cruzamento junto da aresta é marcado (2), e quem conta o refaz noutra direção. */
+  return u < FAIXA_DA_ARESTA(tolerancia) || v < FAIXA_DA_ARESTA(tolerancia) || 1 - u - v < FAIXA_DA_ARESTA(tolerancia) ? 2 : 1;
+}
+
+/* a distância baricêntrica da aresta abaixo da qual o cruzamento do raio é ambíguo: a tolerância, e nunca menos que o ruído de arredondamento */
+const FAIXA_DA_ARESTA = (tolerancia) => Math.max(tolerancia, 1e-9);
+
+/* DIREÇÕES DE REPETIÇÃO. Quando o raio de `DIRECAO_RAIO` acerta uma aresta ou um canto, a contagem é refeita, por todos os triângulos e sem a
+   árvore, com estas direções, até uma que não acerte nenhuma aresta; se nenhuma escapar, vale a paridade que a maioria deu. Nenhuma é paralela a
+   um eixo nem a uma diagonal de face, onde as arestas de uma malha de quadras e prismas costumam estar. */
+const DIRECOES_DE_REPETICAO = [[0.2672612419124244, 0.5345224838248488, 0.8017837257372732], [-0.4082482904638631, 0.8164965809277261, 0.4082482904638631],
+  [0.6, -0.48, 0.64], [0.1, 0.3, -0.9486832980505138], [-0.7, -0.3, 0.6480740698407860], [0.3713906763541037, -0.1932731453127433, -0.9071173]].map((d) => {
+  const n = Math.hypot(...d); return d.map((x) => x / n);
+});
+
+function cruzamentosPorOutroRaio(ponto, triangulos, direcao, tolerancia) {
+  const faixa = FAIXA_DA_ARESTA(tolerancia);
+  let contagem = 0; let ambiguo = false;
+  for (const [a, b, c] of triangulos) {
+    const aresta1 = sub(b, a); const aresta2 = sub(c, a);
+    const h = cross(direcao, aresta2); const determinante = dot(aresta1, h);
+    if (Math.abs(determinante) <= 1e-12 * Math.sqrt(comprimento2(aresta1) * comprimento2(h))) continue;
+    const inverso = 1 / determinante; const s = sub(ponto, a);
+    const u = inverso * dot(s, h);
+    if (u < -faixa || u > 1 + faixa) continue;
+    const q = cross(s, aresta1); const v = inverso * dot(direcao, q);
+    if (v < -faixa || u + v > 1 + faixa) continue;
+    if (!(inverso * dot(aresta2, q) > tolerancia)) continue;
+    if (u < faixa || v < faixa || 1 - u - v < faixa) { ambiguo = true; continue; }
+    contagem += 1;
+  }
+  return { contagem, ambiguo };
+}
+
+/* a paridade do ponto contra a malha FECHADA pelas direções de repetição, quando o raio principal acertou uma aresta; a malha aberta não tem
+   paridade que valha, e o veredito dela segue o do raio principal */
+function dentroPorOutroRaio(ponto, malha, tolerancia) {
+  let pares = 0; let impares = 0;
+  for (const direcao of DIRECOES_DE_REPETICAO) {
+    const { contagem, ambiguo } = cruzamentosPorOutroRaio(ponto, malha.triangulos, direcao, tolerancia);
+    if (!ambiguo) return contagem % 2 === 1;
+    if (contagem % 2 === 1) impares += 1; else pares += 1;
+  }
+  return impares > pares;
 }
 
 /* O atalho da caixa de uma malha FECHADA, que não mudou: fora da caixa alargada pela folga do pior ângulo o ponto não está
@@ -457,13 +552,14 @@ function percorrerTodosOsTriangulos(ponto, malha, tolerancia) {
   const d = dadosDaMalha(malha);
   const quantidade = malha.triangulos.length;
   const px = ponto[0]; const py = ponto[1]; const pz = ponto[2];
-  let contagem = 0;
+  let contagem = 0; let naAresta = false;
   for (let indice = 0; indice < quantidade; indice += 1) {
     const r = classificarTriangulo(d, indice * CAMPOS, px, py, pz, tolerancia);
     if (r < 0) return null;
-    contagem += r;
+    if (r === 2) naAresta = true;
+    contagem += r === 2 ? 1 : r;
   }
-  return contagem % 2 === 1;
+  return naAresta && malha.fechada ? dentroPorOutroRaio(ponto, malha, tolerancia) : contagem % 2 === 1;
 }
 
 /* Percorre TODOS os triângulos, sem fase ampla (o atalho da caixa fica, porque ele é da definição da resposta). É a
@@ -477,26 +573,35 @@ export function pontoDentroMalha(ponto, malha, tolerancia) {
   if (atalho !== undefined) return atalho;
   const indice = indiceDaMalha(malha);
   if (indice.arvore === null) return percorrerTodosOsTriangulos(ponto, malha, tolerancia);
-  const folgaDoPlano = indice.menorSenoDaMetade > 0 ? tolerancia * (1 + 1 / indice.menorSenoDaMetade) : Infinity;
+  const folgaDoPlano = indice.menorSenoDaArvore > 0 ? tolerancia * (1 + 1 / indice.menorSenoDaArvore) : Infinity;
   const margem = Math.max(folgaDoPlano, 3 * tolerancia * indice.maiorSoma) + indice.folgaDeArredondamento;
   if (!Number.isFinite(margem)) return percorrerTodosOsTriangulos(ponto, malha, tolerancia);
   const d = dadosDaMalha(malha);
   const px = ponto[0]; const py = ponto[1]; const pz = ponto[2];
-  let contagem = 0;
+  let contagem = 0; let naAresta = false;
   for (const i of indice.sempre) {
     const r = classificarTriangulo(d, i * CAMPOS, px, py, pz, tolerancia);
     if (r < 0) return null;
-    contagem += r;
+    if (r === 2) naAresta = true;
+    contagem += r === 2 ? 1 : r;
   }
-  const naSuperficie = visitarPorRaio(indice.arvore, px, py, pz, DIRECAO_RAIO[0], DIRECAO_RAIO[1], DIRECAO_RAIO[2], margem, (i) => {
-    if (indice.ehSempre[i] === 1) return false;
+  const conferir = (i) => {
     const r = classificarTriangulo(d, i * CAMPOS, px, py, pz, tolerancia);
     if (r < 0) return true;
-    contagem += r;
+    if (r === 2) naAresta = true;
+    contagem += r === 2 ? 1 : r;
     return false;
-  });
+  };
+  /* os de canto agudo: pela árvore deles, com a margem do mais agudo, ou um a um quando são poucos */
+  if (indice.arvoreDosAgudos === null) { for (const i of indice.agudos) if (conferir(i)) return null; }
+  else {
+    const margemDosAgudos = Math.max(tolerancia * (1 + 1 / indice.menorSenoDosAgudos), 3 * tolerancia * indice.maiorSoma) + indice.folgaDeArredondamento;
+    if (visitarPorRaio(indice.arvoreDosAgudos, px, py, pz, DIRECAO_RAIO[0], DIRECAO_RAIO[1], DIRECAO_RAIO[2], margemDosAgudos, (k) => conferir(indice.agudos[k]))) return null;
+  }
+  const naSuperficie = visitarPorRaio(indice.arvore, px, py, pz, DIRECAO_RAIO[0], DIRECAO_RAIO[1], DIRECAO_RAIO[2], margem, (i) => (
+    indice.ehSempre[i] === 1 || indice.ehAgudo[i] === 1 ? false : conferir(i)));
   if (naSuperficie) return null;
-  return contagem % 2 === 1;
+  return naAresta && malha.fechada ? dentroPorOutroRaio(ponto, malha, tolerancia) : contagem % 2 === 1;
 }
 
 /* OS EIXOS PRÓPRIOS DE CADA TRIÂNGULO TAMBÉM SAEM UMA VEZ. `sobreposicaoTriangulo` separa por até dezessete eixos, e os
@@ -663,9 +768,20 @@ export function solidoEmMemoria(memoria, neutro, nome, preparar) {
    passou como livre. Ela também mostrou que refinar a malha não abre brecha: o
    cruzamento é testado triângulo contra triângulo, e só a contenção depende de
    amostragem. */
+/* A AMOSTRAGEM SAI UMA VEZ POR SÓLIDO, E CADA CANTO UMA VEZ. O sólido é auditado contra cada vizinho, e o par declarado duas vezes (na tolerância global e na de
+   encosto da peça); a lista era refeita a cada auditoria, com o mesmo canto repetido em cada triângulo que o divide, e cada repetição pagava a contenção de novo. O
+   canto repetido é o mesmo objeto (a posição do vértice no sólido preparado), então o conjunto por identidade tira só a repetição; quem lê a lista pergunta se
+   algum ponto está dentro ou na superfície e qual o maior afundamento, e nenhuma das três respostas depende de ordem nem de repetição. */
+const amostragens = new WeakMap();
 function pontosDeAmostragem(solido) {
+  const guardada = amostragens.get(solido.triangulos);
+  if (guardada && guardada.quantidade === solido.triangulos.length) return guardada.pontos;
   const centroide = (t) => [0, 1, 2].map((i) => (t[0][i] + t[1][i] + t[2][i]) / 3);
-  return [...solido.triangulos.flatMap((t) => t), ...solido.triangulos.map(centroide)];
+  const cantos = new Set();
+  for (const t of solido.triangulos) { cantos.add(t[0]); cantos.add(t[1]); cantos.add(t[2]); }
+  const pontos = [...cantos, ...solido.triangulos.map(centroide)];
+  amostragens.set(solido.triangulos, { quantidade: solido.triangulos.length, pontos });
+  return pontos;
 }
 
 /* O maior afundamento, na superfície de `malha`, dos pontos que a contenção já
@@ -753,6 +869,47 @@ function distancia2PontoTriangulo(p, [a, b, c]) {
   }
   const soma = 1 / (va + vb + vc);
   return comprimento2(sub(p, add(a, add(mult(ab, vb * soma), mult(ac, vc * soma)))));
+}
+
+const LIMITE_DE_PARES_DA_DISTANCIA = 4e8;
+
+/**
+ * A menor distância entre as malhas de dois sólidos preparados, em unidade de mundo, olhando só até `limite`: dos vértices de cada um aos triângulos do outro (o
+ * par de arestas que se afasta mais que os vértices não entra, e numa junta quase plana, que é o caso de quem pergunta, o vértice dá a distância). Só entram os triângulos que tocam
+ * a região comum das duas caixas, e o par de malhas com mais de 4e8 pares de triângulo nela fica sem medida. Devolve `null` quando nenhum par fica a menos de `limite`, e `undefined` quando não mediu (sólido inconclusivo ou pares demais). É a distância que a
+ * mensagem do contato declarado que não acontece diz.
+ */
+export function distanciaEntreSolidos(a, b, limite) {
+  if (a.inconclusivo || b.inconclusivo || !a.triangulos || !b.triangulos || !(limite > 0)) return undefined;
+  if (caixasSeparadas(a.caixa, b.caixa, limite)) return null;
+  /* só conta o triângulo que toca a região onde as duas caixas se sobrepõem, alargada de `limite`: o resto está longe do outro sólido */
+  const lo = [0, 1, 2].map((e) => Math.max(a.caixa.min[e], b.caixa.min[e]) - limite); const hi = [0, 1, 2].map((e) => Math.min(a.caixa.max[e], b.caixa.max[e]) + limite);
+  const naRegiao = (t) => [0, 1, 2].every((e) => Math.max(t[0][e], t[1][e], t[2][e]) >= lo[e] && Math.min(t[0][e], t[1][e], t[2][e]) <= hi[e]);
+  const ta = a.triangulos.filter(naRegiao); const tb = b.triangulos.filter(naRegiao);
+  if (ta.length * tb.length > LIMITE_DE_PARES_DA_DISTANCIA) return undefined;
+  const caixaDe = (t) => [0, 1, 2].map((e) => [Math.min(t[0][e], t[1][e], t[2][e]), Math.max(t[0][e], t[1][e], t[2][e])]);
+  const cb = tb.map(caixaDe);
+  let menor2 = limite * limite;
+  /* dos vértices de um aos triângulos do outro, com o triângulo descartado quando o vértice está a mais da menor distância achada da caixa dele */
+  const olha = (de, em, caixas) => {
+    const vistos = new Set();
+    for (const t of de) for (const p of t) {
+      const id = `${Math.round(p[0] / 1e-9)},${Math.round(p[1] / 1e-9)},${Math.round(p[2] / 1e-9)}`;
+      if (vistos.has(id)) continue;
+      vistos.add(id);
+      const r = Math.sqrt(menor2);
+      for (let k = 0; k < em.length; k += 1) {
+        const c = caixas[k];
+        if (p[0] < c[0][0] - r || p[0] > c[0][1] + r || p[1] < c[1][0] - r || p[1] > c[1][1] + r || p[2] < c[2][0] - r || p[2] > c[2][1] + r) continue;
+        const d2 = distancia2PontoTriangulo(p, em[k]);
+        if (d2 < menor2) menor2 = d2;
+      }
+    }
+  };
+  const antes = menor2;
+  olha(ta, tb, cb);
+  olha(tb, ta, ta.map(caixaDe));
+  return menor2 < antes ? Math.sqrt(menor2) : null;
 }
 
 /**

@@ -12,7 +12,7 @@ montagem que deriva medida e posição de cada parte das vizinhas. O porquê de
 cada regra abaixo está em [`references/por-que.md`](references/por-que.md), para
 consultar quando uma regra parecer arbitrária.
 
-Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de dar por pronto, faça o passo de
+Depois de mudar silhueta, encontro, corte, união ou arredondamento, faça o passo de
 [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`npm run bancada -- <peça> --analise`) e abra as imagens.
 
 
@@ -36,9 +36,7 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de 
    [catálogo gerado](../../../docs/modelar/gerado/CATALOGO-CAPACIDADES.md),
    lida por `descrever_capacidade` no MCP procedural. As receitas do acervo são
    aprovadas e provam capacidades do núcleo, mas não são molde de forma, que
-   vem da referência e do plano. A peça de prova em
-   `tools/fixtures/acervo/peca-de-prova/` é ferramenta de teste, não exemplo de
-   forma.
+   vem da referência e do plano.
 
 ## Identidade
 
@@ -46,7 +44,7 @@ Nomes semânticos sempre: `origemId`, `ALIASES`, `parte`, `publicarPorta`.
 Identidade persistida nunca é índice nem posição de passo. `sel:{alias:...}` é
 nome de seleção, não nome de parte.
 
-<!-- operacoes-com-origem: aberturaPorContorno, arranja, arredondarAresta, arredondarCostura, casca, chamferBox, chapaDobrada, cilindro, cone, cubo, esfera, espelha, extrusao, filete, friso, furo, inflate, intersectar, lathe, loft, plano, subdivisao, subtrair, unir -->
+<!-- operacoes-com-origem: aberturaPorContorno, aparar, arranja, arredondarAresta, arredondarCostura, casca, chamferBox, chapaDobrada, cilindro, cone, cubo, esfera, espelha, extrusao, filete, friso, furo, inflate, intersectar, lathe, loft, plano, subdivisao, subtrair, unir -->
 
 As operações que publicam `origem` aceitam endereçamento estrutural conforme
 [`references/operacoes-procedurais.md`](references/operacoes-procedurais.md),
@@ -106,14 +104,14 @@ npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
 
 Cada imagem responde uma pergunta: `--modo=isolar` para a superfície,
 `--modo=contexto` para caber e encaixar, `--par a,b` para uma junta, e todas as
-partes para a leitura geral, que você não decide sozinho. A bancada serve para
+partes para a leitura geral. A bancada serve para
 investigar; o pacote que vai ao crítico sai de `npm run vistas:critica`.
+
 `npm run malha:conferir -- <peça>` pega fechamento e face de área nula, e
 `npm run conferir:referencia` mede a borda da peça contra a foto quando não há
 prancha.
 
-Foto de produto de terceiro nunca entra no repositório; entra a prancha
-desenhada com `desenhar-prancha` ou as coordenadas derivadas dela.
+De perto, `--mirar=x,y,z` em vez de recortar captura de 3.200 px; só a chapa, com `npm run vista:rapida -- <peça> --vista=<vista> --saida=<png> --ate-passo=N`; `--sem-contatos` se só se quer a imagem; mais em [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura).
 
 `porteiro` permanece diagnóstico da bancada; não substitui a descrição nem as
 vistas da bancada.

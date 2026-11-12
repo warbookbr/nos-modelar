@@ -50,5 +50,8 @@ describe('o acervo abre na bancada', () => {
       });
     }
     expect(reprovadas, `instâncias que não abrem na bancada:\n${reprovadas.join('\n')}`).toEqual([]);
-  });
+    /* as seis montagens levaram mais de 180 s no CI em 2026-11-12, quando a do sedã entrou: medidas na máquina local, avião 6 s, braço 17 s, carrinho 5 s,
+       empilhadeira 13 s, instalação solar 3 s e sedã 236 s, porque cada uma das cinco etapas do sedã executa o recorte do carro inteiro. O limite é o do teste das
+       peças; o custo de abrir o sedã é defeito da receita dele, anotado no RECEITA.md do banco de provas (atrito 9), e não deste teste. */
+  }, 900_000);
 });

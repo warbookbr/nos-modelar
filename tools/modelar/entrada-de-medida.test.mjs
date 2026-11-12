@@ -113,6 +113,41 @@ describe('o cache da montagem', () => {
     } finally { limpar(); }
   });
 
+  it('a assinatura traz o valor de cada variável de ambiente que a entrada e o que ela importa leem, e só delas (a cabine sozinha não é a inteira)', async () => {
+    limpar(); mkdirSync(pasta, { recursive: true });
+    const guardadas = { HD_DE_PROVA: process.env.HD_DE_PROVA, HD_NO_MODULO: process.env.HD_NO_MODULO, HD_NAO_LIDA: process.env.HD_NAO_LIDA };
+    try {
+      writeFileSync(join(pasta, 'numero.mjs'), "export const LARG = process.env['HD_NO_MODULO'] === 'largo' ? 140 : 100;\n");
+      writeFileSync(join(pasta, 'x.esboco.mjs'), "import { LARG } from './numero.mjs';\nconst SO = process.env.HD_DE_PROVA === 'so';\nexport default { opcoes: [{ titulo: 'cubo', formas: [{ id: 'a', op: 'cubo', args: { larg: LARG, alt: SO ? 50 : 100, prof: 20 }, centro: [0, 0, 0] }] }] };\n");
+      writeFileSync(join(pasta, 'fora.mjs'), 'export const NAO = process.env.HD_NAO_LIDA;\n');
+      const alvo = join(pasta, 'x.esboco.mjs');
+      const chave = (ambiente) => assinaturaDaEntrada(alvo, undefined, ambiente);
+      const base = chave({});
+      expect(base.variaveis).toEqual(['HD_DE_PROVA', 'HD_NO_MODULO']);
+      expect(chave({}).chave).toBe(base.chave);
+      /* o valor da variável do esboço e o da variável do módulo importado mudam a chave, e o mesmo valor a repete */
+      expect(chave({ HD_DE_PROVA: 'so' }).chave).not.toBe(base.chave);
+      expect(chave({ HD_DE_PROVA: 'so' }).chave).toBe(chave({ HD_DE_PROVA: 'so' }).chave);
+      expect(chave({ HD_NO_MODULO: 'largo' }).chave).not.toBe(base.chave);
+      expect(chave({ HD_DE_PROVA: 'so' }).chave).not.toBe(chave({ HD_NO_MODULO: 'largo' }).chave);
+      /* variável vazia não é variável ausente; variável que nenhum arquivo da entrada lê não entra */
+      expect(chave({ HD_DE_PROVA: '' }).chave).not.toBe(base.chave);
+      expect(chave({ HD_NAO_LIDA: 'x', PATH: '/outro' }).chave).toBe(base.chave);
+      /* de ponta a ponta: depois de montar com a variável, a leitura sem ela não acha o guardado, e a com ela o acha */
+      delete process.env.HD_NO_MODULO; delete process.env.HD_DE_PROVA;
+      expect((await ler()).doCache).toBe(false);
+      expect((await ler()).doCache).toBe(true);
+      process.env.HD_DE_PROVA = 'so';
+      expect((await ler()).doCache).toBe(false);
+      expect((await ler()).doCache).toBe(true);
+      delete process.env.HD_DE_PROVA;
+      expect((await ler()).doCache).toBe(false);
+    } finally {
+      for (const [k, v] of Object.entries(guardadas)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+      limpar();
+    }
+  });
+
   it('a assinatura muda com o arquivo da entrada e com o que ele importa, e só com eles', () => {
     limpar(); mkdirSync(pasta, { recursive: true });
     try {

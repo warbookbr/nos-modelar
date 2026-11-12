@@ -31,7 +31,7 @@
  *   espessura: mm, ou { valor, niveis?, lado? }, a chapa que o passo subdivisao vai pôr: só confere o raio local na malha refinada (de
  *     NIVEIS_DA_CONFERENCIA_DA_ESPESSURA níveis), e cada laço com par de raio abaixo dela dá o aviso `cantoApertado` com o ponto, a
  *     direção ('noLaco', o canto; 'entreLacos', a dobra para o vizinho ou a tampa), o raio e o que fazer. A malha não muda.
- * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe(laco, trecho, k), lacos, trechos, avisos, compensacao?, bocas?, espessura? }.
+ * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe(laco, trecho, k), lacos, trechos, avisos, compensacao?, bocas?, espessura?, raios?, aneisDaTampa? }.
  * exemplo:
  *   gaiolaPorLacos({ nome: 'barra', eixo: 'x', tampa: { de: 'baixo', ate: 'cima' },
  *     trechos: [{ nome: 'baixo', pontos: 2 }, { nome: 'frente', pontos: 3 }, { nome: 'cima', pontos: 2 }, { nome: 'tras', pontos: 3 }],
@@ -92,6 +92,15 @@
  * pontos dentro da última face da escada, entre o degrau e a ponta, porque uma face só de pontos alinhados teria área zero. Um laço que
  * se funde num ponto só dispensa a tampa. Faixa fina na tampa: a primeira faixa (de `de` ao primeiro degrau) mede a largura do passo
  * do primeiro arco da cadeia, e uma faixa de 9 mm por 560 mm que a subdivisão com espessura rasga em lascas pede arcos de menos pontos.
+ *
+ * O VINCO COM RAIO NO LAÇO DA PONTA. `{ nome, laco: 'primeiro', raio }` (ou 'ultimo', ou um dos trechos dele) arredonda a aresta entre a tampa e a lateral. As
+ * duas quinas do canto passam a se cruzar: o vinco do laço da ponta e os `entre` de raio que chegam a ele dividem o ponto do canto, como as quinas de uma caixa, e
+ * o vinco de cada um segue os pontos que o outro pôs na linha dele. A tampa é uma escada de faces com várias arestas do laço cada, sem aresta de saída para o
+ * apoio; por isso a tampa com vinco de raio no contorno é refeita com uma volta de pontos recuada no plano do laço (`${ponto}_dentro`, em `aneisDaTampa`, com o recuo
+ * e o máximo que o contorno aguenta): faixa de quadriláteros entre o laço e a volta, onde o apoio fica, e a escada de antes sobre a volta. O recuo é 3,5 vezes o raio, no
+ * máximo 75% do que o contorno admite; a tampa fina demais dá `raioNaoCabe` com o raio que cabe, e a que não admite volta (côncava, cruzada) dá `tampaSemAnel`. No canto de 90
+ * graus do contorno a distância do apoio é medida perpendicular a cada aresta (`esquadro`, em apoio-do-vinco.js), e o raio sai o pedido até o canto: numa barra de 330 por
+ * 72 mm com raio 8 nos quatro `entre` e na ponta, 8,0 a 8,3 mm a 100, 40, 20, 10 e 5 mm do canto (pedido a 4%). O laço seguinte pede distância de 4 raios ou mais.
  *
  * A LÂMINA. O laço de ponta de área zero (uma linha, duas linhas em cruz, um ponto: o fundo de um disco tangente ao plano, ou a ponta
  * em que duas paredes se encostam) é uma lâmina: os pontos dele que coincidem se fundem, todos, e não leva tampa; as tiras dos dois
@@ -163,6 +172,10 @@ import { inserirApoiosNosVincos } from './apoio-do-vinco.js';
 
 /* As pontas que `aberta` deixa sem tampa, pela posição do laço: a primeira, a última ou as duas. */
 const PONTAS_ABERTAS = { inicio: ['inicio'], fim: ['fim'], ambas: ['inicio', 'fim'] };
+/* O anel da tampa: o recuo da volta de apoio, em raios do vinco, e a fração do recuo máximo (o que a volta aguenta sem se cruzar) que ele pode ocupar. */
+const chaveDaAresta = (a, b) => (a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`);
+const RECUO_DA_TAMPA_PELO_RAIO = 3.5;
+const RECUO_MAXIMO_DA_TAMPA = 0.75;
 /* Níveis de subdivisão com que `espessura` confere o raio local, os do passo `subdivisao` quando ele não diz outros. */
 export const NIVEIS_DA_CONFERENCIA_DA_ESPESSURA = 2;
 /* O par de vértices da malha cuja direção faz com a tangente do laço um cosseno de pelo menos isto mede o canto do laço; os outros, a dobra
@@ -680,6 +693,7 @@ export function gaiolaPorLacos(o = {}) {
   }
 
   /* a tampa: escada entre as cadeias A (do fim de `de` para a frente) e B (do começo de `de` para trás); com as duas pontas abertas, nenhuma */
+  let construirTampa = null;               /* a escada de um laço, com a função que nomeia o ponto: o anel da tampa a refaz sobre o contorno recuado */
   const tampas = abertos.size === 2 ? [] : tampasDasPontas();
   function tampasDasPontas() {
     if (o.tampa == null || typeof o.tampa !== 'object') falha('tampa precisa ser { de, ate }, os trechos de onde parte e aonde chega a escada que tampa as pontas');
@@ -694,19 +708,20 @@ export function gaiolaPorLacos(o = {}) {
     }
     if (A.length < 2) falha('a tampa precisa de pelo menos um degrau entre tampa.de e tampa.ate');
     const n = A.length;
-    const tampa = (r) => {
+    const tampa = (r, nmT = nm) => {
       if (lamina[r]) return [];
       const fs = [];
-      const de = []; for (let q = inicio[iDe]; ; q = (q + 1) % N) { de.push(nm(r, q)); if (q === fimDe(iDe)) break; }
-      const ate = []; for (let q = inicio[iAte]; ; q = (q + 1) % N) { ate.push(nm(r, q)); if (q === fimDe(iAte)) break; }
+      const de = []; for (let q = inicio[iDe]; ; q = (q + 1) % N) { de.push(nmT(r, q)); if (q === fimDe(iDe)) break; }
+      const ate = []; for (let q = inicio[iAte]; ; q = (q + 1) % N) { ate.push(nmT(r, q)); if (q === fimDe(iAte)) break; }
       /* o trecho `ate` com vários pontos alinhados: a face que o fecharia sozinha teria área zero, então os pontos entram na última
          face da escada, entre o degrau e a ponta, como os de `de` entram na primeira */
       const reta = ate.length > 2 && Math.hypot(...normalDaFace(ate, pontosMm)) / 2 <= TOLERANCIA_DE_FUSAO_MM * Math.max(...ate.map((v) => Math.hypot(...sub3(pontosMm[v], pontosMm[ate[0]]))), 1);
-      fs.push([...de, ...(reta && n === 2 ? ate : [nm(r, A[1]), nm(r, B[1])])]);
-      for (let j = 1; j + 1 < n; j++) fs.push([nm(r, A[j]), ...(j + 1 === n - 1 && reta ? ate : [nm(r, A[j + 1]), nm(r, B[j + 1])]), nm(r, B[j])]);
+      fs.push([...de, ...(reta && n === 2 ? ate : [nmT(r, A[1]), nmT(r, B[1])])]);
+      for (let j = 1; j + 1 < n; j++) fs.push([nmT(r, A[j]), ...(j + 1 === n - 1 && reta ? ate : [nmT(r, A[j + 1]), nmT(r, B[j + 1])]), nmT(r, B[j])]);
       if (ate.length > 2 && !reta) fs.push(ate);
       return fs.map(limpa).filter(Boolean);
     };
+    construirTampa = tampa;
     return [0, R - 1].filter((r) => !abertos.has(r)).map((r) => ({ r, faces: tampa(r) }));
   }
   const areaNula = (f) => {
@@ -1147,16 +1162,91 @@ export function gaiolaPorLacos(o = {}) {
 
   /* O RAIO EM MM: o vinco com `raio` ganha as colunas de apoio (apoio-do-vinco.js), depois da compensação e antes da conferência da espessura, que
      refina a gaiola com elas. Os pontos de apoio entram nos grupos cujas duas pontas da aresta de saída já estão neles. */
-  let raios = null; const apoioDe = new Map();
+  let raios = null; const apoioDe = new Map(); const aneisDaTampa = new Map(); const esquadrados = new Set(); const tampasComAnel = [];
+  /* o anel de uma tampa (ver adiante): os pontos recuados do contorno do laço r e as faces que substituem a tampa */
+  function anelDaTampa(r, raioMaximo) {
+    const volta = []; for (let q = 0; q < N; q++) { const n = nm(r, q); if (n !== volta[volta.length - 1]) volta.push(n); }
+    if (volta.length > 1 && volta[0] === volta[volta.length - 1]) volta.pop();
+    const m = volta.length;
+    if (m < 3) return { motivo: 'o contorno tem menos de três pontos' };
+    const P2 = volta.map((n) => [pontosMm[n][outros[0]], pontosMm[n][outros[1]]]);
+    let area2 = 0; P2.forEach((a, k) => { const b = P2[(k + 1) % m]; area2 += a[0] * b[1] - b[0] * a[1]; });
+    const sinal = Math.sign(area2) || 1;
+    const unit = (a, b) => { const l = Math.hypot(b[0] - a[0], b[1] - a[1]); return l > 0 ? [(b[0] - a[0]) / l, (b[1] - a[1]) / l] : [0, 0]; };
+    const recuar = (w) => {
+      const Q = P2.map((p, k) => {
+        const d1 = unit(P2[(k + m - 1) % m], p); const d2 = unit(p, P2[(k + 1) % m]);
+        const n1 = [-d1[1] * sinal, d1[0] * sinal]; const n2 = [-d2[1] * sinal, d2[0] * sinal];
+        const den = 1 + n1[0] * n2[0] + n1[1] * n2[1];
+        if (den < 0.1) return null;
+        return [p[0] + (w * (n1[0] + n2[0])) / den, p[1] + (w * (n1[1] + n2[1])) / den];
+      });
+      if (Q.some((x) => !x)) return null;
+      let a2 = 0; Q.forEach((a, k) => { const b = Q[(k + 1) % m]; a2 += a[0] * b[1] - b[0] * a[1]; });
+      if (!(a2 * sinal > 0)) return null;
+      for (let k = 0; k < m; k++) {
+        const d0 = unit(P2[k], P2[(k + 1) % m]); const d1 = unit(Q[k], Q[(k + 1) % m]);
+        if (d0[0] * d1[0] + d0[1] * d1[1] <= 0.5) return null;
+      }
+      const cruza = (a, b, c, d) => { const o = (p, q, t) => (q[0] - p[0]) * (t[1] - p[1]) - (q[1] - p[1]) * (t[0] - p[0]); return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0; };
+      for (let i = 0; i < m; i++) for (let j = i + 2; j < m; j++) if (!(i === 0 && j === m - 1) && cruza(Q[i], Q[(i + 1) % m], Q[j], Q[(j + 1) % m])) return null;
+      return Q;
+    };
+    const xs = P2.map((p) => p[0]); const ys = P2.map((p) => p[1]);
+    let lo = 0; let hi = Math.min(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    for (let i = 0; i < 30; i++) { const mid = (lo + hi) / 2; if (recuar(mid)) lo = mid; else hi = mid; }
+    const recuoMaximo = lo;
+    const recuo = Math.min(RECUO_DA_TAMPA_PELO_RAIO * raioMaximo, RECUO_MAXIMO_DA_TAMPA * recuoMaximo);
+    if (!(recuo > TOLERANCIA_DE_FUSAO_MM)) return { motivo: `o contorno não admite recuo (cabem ${br(recuoMaximo, 2)} mm)` };
+    const Q = recuar(recuo);
+    if (!Q) return { motivo: 'a volta recuada se cruza' };
+    const dentro = (n) => `${n}_dentro`;
+    const pontos = {};
+    volta.forEach((n, k) => { const x = [...pontosMm[n]]; x[outros[0]] = Q[k][0]; x[outros[1]] = Q[k][1]; pontos[dentro(n)] = x; });
+    for (const [n, q] of Object.entries(pontos)) pontosMm[n] = q;
+    const escada = construirTampa(r, (rr, q) => dentro(nm(rr, q)));
+    const ruim = escada.some(areaNula);
+    for (const n of Object.keys(pontos)) delete pontosMm[n];
+    if (ruim) return { motivo: 'a escada da tampa sobre a volta recuada tem face de área zero (o contorno é côncavo)' };
+    /* a ordem das faces da tampa antiga decide o sentido das novas: a escada vem na ordem da volta, e a tampa de uma ponta pode estar invertida */
+    const antiga = orientadas.find((f) => f.every((n) => volta.includes(n)));
+    let mesma = true;
+    for (let k = 0; k < antiga.length; k++) { const i = volta.indexOf(antiga[k]); const j = volta.indexOf(antiga[(k + 1) % antiga.length]); if ((i + 1) % m === j) { mesma = true; break; } if ((j + 1) % m === i) { mesma = false; break; } }
+    const faixa = volta.map((n, k) => { const b = volta[(k + 1) % m]; return [n, b, dentro(b), dentro(n)]; });
+    const faces = [...faixa, ...escada].map((f) => (mesma ? f : [...f].reverse()));
+    return { pontos, faces, recuo, recuoMaximo };
+  }
   const comRaio = vincos.filter((v) => v.raio != null);
   if (comRaio.length) {
-    const ap = inserirApoiosNosVincos({ pontos: pontosMm, faces: orientadas, vincos: comRaio, unidade: 1 });
+    /* O ANEL DA TAMPA: o vinco com raio ao longo do laço da ponta tem a tampa de um lado, e a tampa é uma escada de faces com várias arestas do laço cada
+       uma, sem aresta de saída para o apoio. Cada tampa com vinco de raio no contorno é refeita: uma volta de pontos recuados no plano do laço, a faixa de
+       quadriláteros entre o laço e a volta (onde o apoio fica) e a escada de antes sobre a volta. */
+    for (const r of [0, R - 1]) {
+      const tampa = tampas.find((t) => t.r === r);
+      if (!tampa || lamina[r]) continue;
+      const doLaco = new Set(uv[r].map((_, q) => nm(r, q)));
+      const arestasDaTampa = new Set(orientadas.filter((f) => f.every((n) => doLaco.has(n))).flatMap((f) => f.map((a, k) => chaveDaAresta(a, f[(k + 1) % f.length]))));
+      const noContorno = comRaio.filter((v) => v.pontos.some((a, k) => k > 0 && arestasDaTampa.has(chaveDaAresta(v.pontos[k - 1], a))));
+      if (!noContorno.length) continue;
+      const raioMaximo = Math.max(...noContorno.map((v) => (typeof v.raio === 'number' ? v.raio : Array.isArray(v.raio) ? Math.max(...v.raio) : Math.max(v.raio.de, v.raio.ate))));
+      const anel = anelDaTampa(r, raioMaximo);
+      if (anel.motivo) { avisos.push({ ref: 'tampaSemAnel', laco: lacos[r].nome, vincos: noContorno.map((v) => v.nome), texto: `o vinco com raio ${noContorno.map((v) => citar(v.nome)).join(', ')} corre pelo contorno da tampa do laço ${citar(lacos[r].nome)}, e o anel de apoio da tampa não foi feito: ${anel.motivo}; o vinco fica sem apoio nesse lado` }); continue; }
+      for (const [n, q] of Object.entries(anel.pontos)) { pontosMm[n] = q; alvosMm[n] = [...q]; }
+      orientadas = orientadas.filter((f) => !f.every((n) => doLaco.has(n))).concat(anel.faces);
+      aneisDaTampa.set(r, anel);
+      tampasComAnel.push({ laco: lacos[r].nome, em: lacos[r].em, recuoMm: Number(anel.recuo.toFixed(2)), recuoMaximoMm: Number(anel.recuoMaximo.toFixed(2)), vincos: noContorno.map((v) => v.nome) });
+      for (const v of noContorno) esquadrados.add(v.nome);
+    }
+    if (aneisDaTampa.size) { nomes = Object.keys(pontosMm); indice = new Map(nomes.map((n, k) => [n, k])); }
+    const ap = inserirApoiosNosVincos({ pontos: pontosMm, faces: orientadas, vincos: comRaio.map((v) => (esquadrados.has(v.nome) ? { ...v, esquadro: true } : v)), unidade: 1, prefixo: `${prefixo}_` });
     orientadas = ap.faces;
+    for (const v of vincos) if (ap.linhas[v.nome]) v.pontos = ap.linhas[v.nome];
     for (const [n, q] of Object.entries(ap.pontos)) { pontosMm[n] = q; alvosMm[n] = [...q]; apoioDe.set(n, ap.origens[n]); }
     nomes = Object.keys(pontosMm); indice = new Map(nomes.map((n, k) => [n, k]));
     fIdx = orientadas.map((f) => f.map((v) => indice.get(v)));
     for (const g of grupos) {
       const dentro = new Set(g.pontos);
+      for (const anel of aneisDaTampa.values()) for (const n of Object.keys(anel.pontos)) if (dentro.has(n.slice(0, -'_dentro'.length))) { g.pontos.push(n); dentro.add(n); }
       for (const [n, org] of apoioDe) if (dentro.has(org.ponto) && dentro.has(org.vizinho)) g.pontos.push(n);
     }
     raios = ap.raios;
@@ -1202,6 +1292,7 @@ export function gaiolaPorLacos(o = {}) {
       }
     });
     for (const [n, org] of apoioDe) if (doPonto.has(org.ponto)) doPonto.set(n, doPonto.get(org.ponto));
+    for (const anel of aneisDaTampa.values()) for (const n of Object.keys(anel.pontos)) { const dono = doPonto.get(n.slice(0, -'_dentro'.length)); if (dono) doPonto.set(n, dono); }
     const porLaco = new Map();
     for (const l of lugares) {
       let melhor = 0; let dMelhor = Infinity;
@@ -1251,6 +1342,7 @@ export function gaiolaPorLacos(o = {}) {
   const saida = { pontos, pontosMm, alvosMm, passo, nomeDe, lacos: lacos.map((l) => ({ nome: l.nome, em: l.em, sumiram: l.sumiu })), trechos, avisos };
   if (compensacao) saida.compensacao = compensacao;
   if (raios) saida.raios = raios;
+  if (tampasComAnel.length) saida.aneisDaTampa = tampasComAnel;
   if (abertos.size) {
     saida.bocas = Object.fromEntries([...abertos].sort((a, b) => a - b).map((r) => [r === 0 ? 'inicio' : 'fim', { laco: lacos[r].nome, em: lacos[r].em, pontos: semRepetir([...Array(N + 1).keys()].map((q) => nm(r, q))) }]));
   }

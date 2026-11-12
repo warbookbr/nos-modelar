@@ -13,6 +13,8 @@
  *   niveis: níveis da subdivisão, para o aviso de arco com poucos segmentos.
  *   colunas: colunas de apoio por lado (colunasDeApoio dá o número que mantém a razão entre colunas em 4).
  * devolve: { cabe, apoio, nitidez: 0, raio, colunas, razao, distancias, avisos }; raioDoFilete(perfil) mede um corte da malha.
+ *   inserirApoiosNosVincos(...) põe as colunas na gaiola: a distância é perpendicular ao vinco, sobre a face (a quina que corta as estações na diagonal realiza o
+ *   raio pedido), e dois vincos com raio podem se encontrar num ponto (o canto de uma caixa, o canto do teto), com a grade do canto entre as colunas deles.
  * exemplo:
  *   apoioDoVinco({ angulo: 90, raio: 6, vizinho: 100 })
  * peça: procedural/pecas/sedan-chassi-e-lataria/alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs
@@ -334,22 +336,52 @@ function raiosDoVinco(raio, nomes, pontos, fechada, nomeDoVinco) {
   throw new TypeError(`vinco ${nomeDoVinco}: raio é um número em mm, { de, ate } ou uma lista com um raio por ponto`);
 }
 
+/** A distância perpendicular ao vinco, sobre a face, é a distância ao longo da aresta vezes o seno do ângulo entre a aresta e a tangente do
+ *  vinco. Abaixo de `SENO_MINIMO` (aresta quase paralela ao vinco, que não pode ser a de uma face de apoio) o seno fica nele. */
+export const SENO_MINIMO = 0.05;
+const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const unit3 = (v) => { const n = Math.hypot(v[0], v[1], v[2]); return n > 0 ? [v[0] / n, v[1] / n, v[2] / n] : [0, 0, 0]; };
+function senoDaAresta(origem, vizinho, tangente) {
+  const u = unit3(sub3(vizinho, origem)); const t = tangente;
+  const c = [u[1] * t[2] - u[2] * t[1], u[2] * t[0] - u[0] * t[2], u[0] * t[1] - u[1] * t[0]];
+  return Math.max(Math.hypot(c[0], c[1], c[2]), SENO_MINIMO);
+}
+const TOLERANCIA_DE_FUSAO = 1e-5;
+
 /**
- * inserirApoiosNosVincos({ pontos, faces, vincos, unidade?, niveis? }) -> { pontos, faces, raios, avisos, origens, aplicados }
+ * inserirApoiosNosVincos({ pontos, faces, vincos, unidade?, niveis?, prefixo? }) -> { pontos, faces, raios, avisos, origens, aplicados, linhas }
  *
  * A gaiola tem `pontos` (nome -> [x, y, z], em `unidade` mm por unidade: 1000 se estão em metro), `faces` (listas de nomes, em ordem de
  * volta) e `vincos` `[{ nome, pontos: [nomes em sequência, fechada repetindo o primeiro], raio }]`, com `raio` em mm (número,
  * `{ de, ate }` ou um por ponto). Para cada ponto da linha, a dobra é o ângulo entre as duas arestas que saem dele, uma para cada
- * lado do vinco, e o apoio é posto a `apoioDoVinco(...).apoio` mm dele sobre essas duas arestas (a posição na face vizinha da gaiola,
- * por interpolação linear até a coluna seguinte). Cada face que tem uma aresta da linha se divide em uma faixa estreita, entre a linha e
- * o apoio, e o resto; a aresta de que o apoio sai, em outra face que não segue o vinco, ganha o ponto de apoio (a face vira um lado
- * maior). A saída traz só os pontos novos em `pontos` (`${vinco}_apoio_${ponto}_${vizinho}`), a lista nova de faces, o raio esperado por
- * vinco em `raios` (com `gravado`, o raio que o passo guarda: o pedido onde o apoio coube, o realizado onde não) e os `avisos`, cada um com `nome`: `raioNaoCabe`, `vincosDisputamApoio`, `anguloForaDaCalibragem`,
- * `filetePoucoSegmentado`, `niveisAbaixoDoRecomendado`, `apoioMaiorQueMetadeDaFace`, `vincoSemDuasFaces`, `apoioAmbiguo`, `vincoCruzaOutroComRaio`, `vincoSemDobra`.
+ * lado do vinco, e o apoio é posto sobre essas duas arestas (a posição na face vizinha da gaiola, por interpolação linear até a coluna
+ * seguinte). Cada face que tem uma aresta da linha se divide em faixas estreitas, entre a linha e as colunas de apoio, e o resto; a
+ * aresta de que o apoio sai, em outra face que não segue o vinco, ganha o ponto de apoio (a face vira um lado maior).
+ *
+ * A DISTÂNCIA É MEDIDA PERPENDICULAR AO VINCO, sobre a face. A aresta de saída de um ponto da linha corta o vinco na diagonal quando as
+ * estações o cortam na diagonal (a coluna de uma cabine inclinada), e a distância ao longo dela é a perpendicular dividida pelo seno do
+ * ângulo entre a aresta e o vinco: o apoio vai a essa distância ao longo da aresta, e o raio realizado bate com o pedido (com a distância
+ * medida no plano da estação, a quina a 65 graus saía com 50% do raio). A largura da face que limita o apoio é medida do mesmo modo.
+ *
+ * VINCOS QUE SE ENCONTRAM. Dois vincos com raio podem dividir um ponto da gaiola (o canto de uma caixa, onde as três quinas se encontram,
+ * ou o canto do teto, onde a quina do teto termina na quina da cabine): cada um põe os apoios dele sobre as arestas de saída, mesmo que
+ * sejam a linha do outro. Numa face que tem as duas linhas no mesmo vértice, o canto é uma grade de células entre as colunas de um vinco
+ * e as do outro (uma célula quando cada vinco tem uma coluna), com o ponto de dentro no cruzamento delas, e a superfície de subdivisão
+ * faz dela o canto arredondado das duas ou três quinas, como num cubo de quinas arredondadas. Dois apoios do mesmo ponto sobre a mesma
+ * aresta, à mesma distância (dois raios iguais), são um ponto só. Os vincos não podem dividir uma aresta: o segundo fica sem apoio
+ * (`vincoCruzaOutroComRaio`).
+ *
+ * A saída traz só os pontos novos em `pontos` (`${vinco}_apoio${coluna}_${ponto}_${vizinho}`, e `${prefixo}canto${face}_${vértice}_${i}_${j}`
+ * para a grade do canto e `${prefixo}${vinco}_f${face}_${aresta}_${coluna}_${i}` para a ponte da ponta, com o `prefixo` que a gaiola passa: sem ele, duas gaiolas no mesmo esboço dão o mesmo nome aos pontos do canto), a lista nova de faces, o raio esperado por vinco em `raios` (com `gravado`, o raio que o passo guarda: o pedido
+ * onde o apoio coube, o realizado onde não) e os `avisos`, cada um com `nome`: `raioNaoCabe`, `vincosDisputamApoio`,
+ * `anguloForaDaCalibragem`, `filetePoucoSegmentado`, `niveisAbaixoDoRecomendado`, `apoioMaiorQueMetadeDaFace`, `vincoSemDuasFaces`,
+ * `apoioAmbiguo`, `vincoCruzaOutroComRaio`, `vincoSemDobra`.
+ * `linhas` dá, por vinco aplicado, a linha com os pontos que outro vinco pôs sobre as arestas dela (o canto do teto divide a quina da cabine num
+ * ponto novo, e a linha da quina passa por ele): a linha que o passo guarda é essa, para ser sequência de arestas da gaiola nova.
  * O vinco que não dá para apoiar fica sem apoio e sai em `avisos`; os demais seguem. O vinco aplicado leva nitidez 0 (ver `apoioDoVinco`).
  */
-export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niveis }) {
-  const avisos = []; const aplicados = []; const dono = new Map();
+export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niveis, prefixo = '' }) {
+  const avisos = []; const aplicados = []; const donoDaAresta = new Map();
   const arestaFaces = new Map();
   faces.forEach((f, fi) => f.forEach((a, k) => { const c = chaveDaAresta(a, f[(k + 1) % f.length]); (arestaFaces.get(c) ?? arestaFaces.set(c, []).get(c)).push({ fi, k }); }));
   const lidos = [];
@@ -358,8 +390,8 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
     const nomes = fechada ? v.pontos.slice(0, -1) : [...v.pontos];
     const raios = raiosDoVinco(v.raio, nomes, pontos, fechada, v.nome);
     const arestas = nomes.slice(0, -1).map((u, k) => [u, nomes[k + 1]]); if (fechada) arestas.push([nomes[nomes.length - 1], nomes[0]]);
-    const cruzamento = nomes.find((n) => dono.has(n));
-    if (cruzamento) { avisos.push({ nome: 'vincoCruzaOutroComRaio', vinco: v.nome, outro: dono.get(cruzamento), ponto: cruzamento, motivo: `o vinco ${v.nome} passa pelo ponto ${cruzamento}, que o vinco ${dono.get(cruzamento)} já apoia: dois vincos com raio não dividem um ponto, e o ${v.nome} ficou sem apoio` }); continue; }
+    const repetida = arestas.find(([a, b]) => donoDaAresta.has(chaveDaAresta(a, b)));
+    if (repetida) { const outro = donoDaAresta.get(chaveDaAresta(repetida[0], repetida[1])); avisos.push({ nome: 'vincoCruzaOutroComRaio', vinco: v.nome, outro, ponto: repetida[0], motivo: `o vinco ${v.nome} corre sobre a aresta ${repetida[0]}-${repetida[1]}, que o vinco ${outro} já apoia: dois vincos com raio se encontram num ponto, mas não dividem uma aresta, e o ${v.nome} ficou sem apoio` }); continue; }
     /* as arestas que saem de cada ponto, uma por lado, e a face de cada lado */
     const lados = new Map(nomes.map((n) => [n, { e: new Set(), d: new Set() }]));
     let semFaces = null;
@@ -378,22 +410,40 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
     const noVinco = new Set(nomes);
     const ruim = nomes.find((n) => lados.get(n).e.size !== 1 || lados.get(n).d.size !== 1 || noVinco.has([...lados.get(n).e][0]) || noVinco.has([...lados.get(n).d][0]));
     if (ruim) { avisos.push({ nome: 'apoioAmbiguo', vinco: v.nome, ponto: ruim, motivo: `no ponto ${ruim} do vinco ${v.nome} a linha tem mais de uma aresta de saída de um lado, ou volta sobre si numa face; o apoio não tem onde ficar e o vinco ficou sem apoio` }); continue; }
-    nomes.forEach((n) => dono.set(n, v.nome));
+    for (const [a, b] of arestas) donoDaAresta.set(chaveDaAresta(a, b), v.nome);
     const pts = nomes.map((n, k) => {
       const e = [...lados.get(n).e][0], d = [...lados.get(n).d][0];
-      const angulo = anguloDaDobra(pontos[e], pontos[n], pontos[d]);
-      return { ponto: n, e, d, angulo, comprimentoE: dist3(pontos[e], pontos[n]) * unidade, comprimentoD: dist3(pontos[d], pontos[n]) * unidade, raioPedido: raios[k], apoio: 0, raio: 0 };
+      const antes = k > 0 ? nomes[k - 1] : fechada ? nomes[nomes.length - 1] : null;
+      const depois = k < nomes.length - 1 ? nomes[k + 1] : fechada ? nomes[0] : null;
+      const dirs = [];
+      if (antes) dirs.push(unit3(sub3(pontos[n], pontos[antes])));
+      if (depois) dirs.push(unit3(sub3(pontos[depois], pontos[n])));
+      const tangente = unit3(dirs.reduce((s, x) => [s[0] + x[0], s[1] + x[1], s[2] + x[2]], [0, 0, 0]));
+      /* a dobra é a do corte perpendicular ao vinco: as arestas de saída, sem a componente na tangente, são as direções das duas faces */
+      const noCorte = (viz) => { const w = sub3(pontos[viz], pontos[n]); const c = w[0] * tangente[0] + w[1] * tangente[1] + w[2] * tangente[2]; return [pontos[n][0] + w[0] - c * tangente[0], pontos[n][1] + w[1] - c * tangente[1], pontos[n][2] + w[2] - c * tangente[2]]; };
+      const angulo = anguloDaDobra(noCorte(e), pontos[n], noCorte(d));
+      /* com `esquadro` a distância é perpendicular a cada aresta da linha que toca o ponto, e não à tangente média: no canto de 90 graus do contorno de uma
+         tampa a aresta de saída é a diagonal, e o apoio vai a raiz de dois vezes mais longe ao longo dela para ficar à distância pedida das duas arestas */
+      const seno = (viz) => (v.esquadro ? Math.max(Math.min(...dirs.map((dir) => senoDaAresta(pontos[n], pontos[viz], dir))), SENO_MINIMO) : senoDaAresta(pontos[n], pontos[viz], tangente));
+      return { vinco: v.nome, ponto: n, e, d, angulo, tangente, senoE: seno(e), senoD: seno(d),
+        comprimentoE: dist3(pontos[e], pontos[n]) * unidade, comprimentoD: dist3(pontos[d], pontos[n]) * unidade, raioPedido: raios[k], apoio: 0, raio: 0 };
     });
     lidos.push({ vinco: v.nome, fechada, nomes, arestas, pts, pedido: v.raio });
   }
   /* a distância do apoio por ponto, com o número de colunas por vinco (a maior razão entre a face e o apoio decide) e três passadas, porque
-     o apoio do outro lado de uma mesma aresta encurta a face da vizinha */
+     o apoio do outro lado de uma mesma aresta encurta a face da vizinha. Tudo em distância PERPENDICULAR ao vinco, sobre a face. */
   const porPonto = new Map();
-  for (const L of lidos) for (const p of L.pts) porPonto.set(p.ponto, p);
-  const extensao = (p) => (p?.distancias ? p.distancias[p.distancias.length - 1] : 0);
+  for (const L of lidos) for (const p of L.pts) (porPonto.get(p.ponto) ?? porPonto.set(p.ponto, []).get(p.ponto)).push(p);
+  const lado = (p, viz) => (p.e === viz ? { comp: p.comprimentoE, seno: p.senoE } : p.d === viz ? { comp: p.comprimentoD, seno: p.senoD } : null);
+  /* a extensão (ao longo da aresta, em mm) que o apoio mais longo de `o` ocupa sobre a aresta o -> destino */
+  const extensaoNaAresta = (o, destino) => { const l = lado(o, destino); return l && o.distancias ? o.distancias[o.distancias.length - 1] / l.seno : 0; };
   const faceDoPonto = (p, passada) => {
-    const folga = (vizinho, comprimento) => { const o = porPonto.get(vizinho); return o && passada > 0 ? comprimento - extensao(o) : comprimento; };
-    return Math.max(Math.min(folga(p.e, p.comprimentoE), folga(p.d, p.comprimentoD)), 1e-6);
+    const folga = (viz, comprimento, seno) => {
+      let ext = 0;
+      if (passada > 0) for (const o of porPonto.get(viz) ?? []) ext = Math.max(ext, extensaoNaAresta(o, p.ponto));
+      return (comprimento - ext) * seno;
+    };
+    return Math.max(Math.min(folga(p.e, p.comprimentoE, p.senoE), folga(p.d, p.comprimentoD, p.senoD)), 1e-6);
   };
   for (const L of lidos) {
     L.colunas = 1;
@@ -405,15 +455,25 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
       p.apoio = r.apoio; p.cabe = r.cabe; p.raio = r.raio; p.avisosDoPonto = r.avisos; p.distancias = r.distancias; p.razao = r.razao;
     }
   }
-  /* a disputa: duas linhas cujos apoios, sobre a mesma aresta, passariam um do outro */
-  for (const L of lidos) for (const p of L.pts) for (const [viz, comp] of [[p.e, p.comprimentoE], [p.d, p.comprimentoD]]) {
-    const o = porPonto.get(viz); if (!o || p.ponto > o.ponto) continue;
-    const soma = extensao(p) + extensao(o);
-    if (soma > FRACAO_MAXIMA_DO_APOIO * comp) {
-      const f = (FRACAO_MAXIMA_DO_APOIO * comp) / soma; const [antesP, antesO] = [extensao(p), extensao(o)];
-      for (const x of [p, o]) { x.distancias = x.distancias.map((d) => d * f); x.apoio *= f; x.cabe = false; }
-      avisos.push({ nome: 'vincosDisputamApoio', vincos: [dono.get(p.ponto), dono.get(o.ponto)], aresta: [p.ponto, o.ponto], distancia: comp, soma,
-        motivo: `os vincos ${dono.get(p.ponto)} e ${dono.get(o.ponto)} pedem apoios que chegam a ${antesP.toFixed(2)} e ${antesO.toFixed(2)} mm sobre a mesma aresta ${p.ponto}-${o.ponto}, de ${comp.toFixed(2)} mm: eles passariam um do outro; os dois apoios foram encurtados na proporção e os raios saem menores que o pedido` });
+  /* a disputa: apoios de pontos vizinhos que, sobre a mesma aresta, passariam um do outro */
+  const arestasComApoio = new Map();
+  for (const L of lidos) for (const p of L.pts) for (const viz of [p.e, p.d]) {
+    const c = chaveDaAresta(p.ponto, viz);
+    const g = arestasComApoio.get(c) ?? arestasComApoio.set(c, { de: new Map(), comp: lado(p, viz).comp }).get(c);
+    (g.de.get(p.ponto) ?? g.de.set(p.ponto, []).get(p.ponto)).push(p);
+  }
+  for (const [, g] of arestasComApoio) {
+    if (g.de.size < 2) continue;
+    const pontasDaAresta = [...g.de.keys()].sort();
+    const extremo = (nome, outro) => Math.max(...g.de.get(nome).map((r) => extensaoNaAresta(r, outro)));
+    const [x, y] = pontasDaAresta;
+    const soma = extremo(x, y) + extremo(y, x);
+    if (soma > FRACAO_MAXIMA_DO_APOIO * g.comp) {
+      const f = (FRACAO_MAXIMA_DO_APOIO * g.comp) / soma; const antesX = extremo(x, y), antesY = extremo(y, x);
+      const vizX = g.de.get(x)[0], vizY = g.de.get(y)[0];
+      for (const r of [...g.de.get(x), ...g.de.get(y)]) { r.distancias = r.distancias.map((d) => d * f); r.apoio *= f; r.cabe = false; }
+      avisos.push({ nome: 'vincosDisputamApoio', vincos: [vizX.vinco, vizY.vinco], aresta: [x, y], distancia: g.comp, soma,
+        motivo: `os vincos ${vizX.vinco} e ${vizY.vinco} pedem apoios que chegam a ${antesX.toFixed(2)} e ${antesY.toFixed(2)} mm sobre a mesma aresta ${x}-${y}, de ${g.comp.toFixed(2)} mm: eles passariam um do outro; os dois apoios foram encurtados na proporção e os raios saem menores que o pedido` });
     }
   }
   /* o raio que sobra depois da disputa, e os avisos agregados por vinco */
@@ -434,53 +494,158 @@ export function inserirApoiosNosVincos({ pontos, faces, vincos, unidade = 1, niv
     if (baixos.length) avisos.push({ nome: 'vincoSemDobra', vinco: L.vinco, pontos: baixos.map((p) => p.ponto), motivo: `o vinco ${L.vinco} tem ${baixos.length} ponto(s) sem dobra (menos de 1 grau entre as faces); o apoio dele foi calculado para 1 grau e o raio ali não aparece na malha` });
     const rs = L.pts.map((p) => p.raio);
     /* o raio que o passo guarda no vinco: o pedido, quando o apoio coube em todos os pontos (a malha o realiza, dentro do erro da relação), e senão um por ponto, o pedido onde coube e o realizado onde não */
-    const porPonto = L.pts.map((p) => (p.cabe ? p.raioPedido : Math.round(p.raio * 1e6) / 1e6));
-    const gravado = L.pts.every((p) => p.cabe) ? L.pedido : porPonto.every((x) => x === porPonto[0]) ? porPonto[0] : porPonto;
+    const porPontoDoVinco = L.pts.map((p) => (p.cabe ? p.raioPedido : Math.round(p.raio * 1e6) / 1e6));
+    const gravado = L.pts.every((p) => p.cabe) ? L.pedido : porPontoDoVinco.every((x) => x === porPontoDoVinco[0]) ? porPontoDoVinco[0] : porPontoDoVinco;
     raios.push({ vinco: L.vinco, colunas: L.colunas, gravado, raioPedido: { minimo: Math.min(...L.pts.map((p) => p.raioPedido)), maximo: Math.max(...L.pts.map((p) => p.raioPedido)) },
       raioEsperado: { minimo: Math.min(...rs), maximo: Math.max(...rs) },
-      pontos: L.pts.map((p) => ({ ponto: p.ponto, angulo: p.angulo, apoio: p.apoio, distancias: p.distancias, raioPedido: p.raioPedido, raio: p.raio })) });
+      pontos: L.pts.map((p) => ({ ponto: p.ponto, angulo: p.angulo, apoio: p.apoio, distancias: p.distancias, raioPedido: p.raioPedido, raio: p.raio, seno: [p.senoE, p.senoD] })) });
     aplicados.push(L.vinco);
   }
-  /* os pontos de apoio e as faces novas: cada aresta de saída de um ponto da linha ganha as colunas, da mais perto à mais longe */
-  const novos = {}; const origens = {}; const apoioDe = new Map();
-  for (const L of lidos) for (const p of L.pts) for (const viz of [p.e, p.d]) {
-    const Q = pontos[p.ponto], A = pontos[viz]; const lista = [];
+  /* os pontos de apoio: cada aresta de saída de um ponto da linha ganha as colunas, da mais perto à mais longe, à distância ao longo da
+     aresta que dá a perpendicular pedida; dois apoios do mesmo ponto sobre a mesma aresta, à mesma distância, são um ponto só */
+  const novos = {}; const origens = {};
+  const uniao = new Map();                 /* `${ponto}\0${vizinho}` -> [{ nome, t }] da aresta, em fração do comprimento a partir do ponto */
+  const colunasDoRegistro = new Map();     /* `${vinco}\0${ponto}\0${vizinho}` -> [nomes das colunas], da mais perto à mais longe */
+  for (const L of lidos) for (const p of L.pts) for (const [viz, seno] of [[p.e, p.senoE], [p.d, p.senoD]]) {
+    const Q = pontos[p.ponto], A = pontos[viz]; const compMm = dist3(A, Q) * unidade;
+    const chave = `${p.ponto}\u0000${viz}`; const lista = uniao.get(chave) ?? uniao.set(chave, []).get(chave);
+    const nomesDaColuna = [];
     p.distancias.forEach((d, j) => {
-      const nome = `${L.vinco}_apoio${j + 1}_${p.ponto}_${viz}`; const t = d / (dist3(A, Q) * unidade);
+      const t = d / seno / compMm;
+      const igual = lista.find((x) => Math.abs(x.t - t) <= TOLERANCIA_DE_FUSAO * Math.max(t, 1e-9));
+      if (igual) { nomesDaColuna.push(igual.nome); return; }
+      const nome = `${L.vinco}_apoio${j + 1}_${p.ponto}_${viz}`;
       novos[nome] = [Q[0] + t * (A[0] - Q[0]), Q[1] + t * (A[1] - Q[1]), Q[2] + t * (A[2] - Q[2])];
-      origens[nome] = { tipo: 'apoio', vinco: L.vinco, ponto: p.ponto, vizinho: viz, coluna: j + 1, distancia: d };
-      lista.push(nome);
+      origens[nome] = { tipo: 'apoio', vinco: L.vinco, ponto: p.ponto, vizinho: viz, coluna: j + 1, distancia: d, distanciaNaAresta: d / seno };
+      lista.push({ nome, t }); nomesDaColuna.push(nome);
     });
-    apoioDe.set(`${p.ponto}\u0000${viz}`, lista);
+    colunasDoRegistro.set(`${L.vinco}\u0000${chave}`, nomesDaColuna);
   }
-  const daLinha = new Set(lidos.flatMap((L) => L.arestas.map(([a, b]) => chaveDaAresta(a, b))));
+  for (const l of uniao.values()) l.sort((a, b) => a.t - b.t);
+  const colunasDe = (vinco, ponto, viz) => colunasDoRegistro.get(`${vinco}\u0000${ponto}\u0000${viz}`) ?? [];
+  /* a aresta com todos os pontos que ela ganhou, de um extremo ao outro */
+  const cadeia = (u, w) => [u, ...(uniao.get(`${u}\u0000${w}`) ?? []).map((x) => x.nome), ...[...(uniao.get(`${w}\u0000${u}`) ?? [])].reverse().map((x) => x.nome), w];
+  const entre = (C, a, b) => { const i = C.indexOf(a), j = C.indexOf(b); return i >= 0 && j > i + 1 ? C.slice(i + 1, j) : []; };
+  const posicao = (nome) => novos[nome] ?? pontos[nome];
+  const colunasDoVinco = new Map(lidos.map((L) => [L.vinco, L.colunas]));
+  /* as faces: a de dentro (o que sobra), uma faixa por coluna ao longo de cada aresta da linha e, no vértice em que duas linhas se
+     encontram na mesma face, a grade de células do canto */
   const saida = [];
-  for (const P of faces) {
-    const n = P.length;
-    const emVinco = P.map((a, k) => daLinha.has(chaveDaAresta(a, P[(k + 1) % n])));
-    /* o ponto da linha que a face deixa por dentro troca de lugar com a última coluna de apoio dele nesta face */
-    const lista = (a, k) => {
-      if (emVinco[k]) return apoioDe.get(`${a}\u0000${P[(k + n - 1) % n]}`);
-      if (emVinco[(k + n - 1) % n]) return apoioDe.get(`${a}\u0000${P[(k + 1) % n]}`);
-      return undefined;
-    };
-    const apoiosDe = P.map((a, k) => lista(a, k));
-    const rep = P.map((a, k) => { const l = apoiosDe[k]; return l ? l[l.length - 1] : a; });
+  faces.forEach((P, fi) => {
+    const n = P.length; const ant = (k) => (k + n - 1) % n; const seg = (k) => (k + 1) % n;
+    const linha = P.map((a, k) => donoDaAresta.get(chaveDaAresta(a, P[seg(k)])) ?? null);
+    const info = P.map((a, k) => {
+      const Lp = linha[ant(k)], Ln = linha[k];
+      if (Lp && Ln) {
+        /* o canto: G[i][j] com i ao longo da aresta seguinte (colunas do vinco anterior) e j ao longo da anterior (colunas do vinco seguinte) */
+        const colP = colunasDe(Lp, a, P[seg(k)]), colN = colunasDe(Ln, a, P[ant(k)]);
+        const G = [[a, ...colN]];
+        for (let i = 1; i <= colP.length; i++) {
+          const linhaI = [colP[i - 1]];
+          for (let j = 1; j <= colN.length; j++) {
+            const nome = `${prefixo}canto${fi}_${k}_${i}_${j}`; const A = posicao(colP[i - 1]), B = posicao(colN[j - 1]), Q = posicao(a);
+            novos[nome] = [A[0] + B[0] - Q[0], A[1] + B[1] - Q[1], A[2] + B[2] - Q[2]];
+            origens[nome] = { tipo: 'canto', face: fi, ponto: a, vincos: [Lp, Ln] };
+            linhaI.push(nome);
+          }
+          G.push(linhaI);
+        }
+        return { tipo: 'canto', Lp, Ln, G, mp: colP.length, mn: colN.length, rep: G[colP.length][colN.length] };
+      }
+      if (Ln) { const col = colunasDe(Ln, a, P[ant(k)]); return { tipo: 'um', rep: col.length ? col[col.length - 1] : a }; }
+      if (Lp) { const col = colunasDe(Lp, a, P[seg(k)]); return { tipo: 'um', rep: col.length ? col[col.length - 1] : a }; }
+      return { tipo: 'nenhum', rep: a };
+    });
+    /* as faixas: uma por coluna ao longo de cada aresta da linha. Os pontos que outro vinco pôs sobre a aresta (os apoios dele) ganham um ponto
+       par em cada coluna, e a faixa se divide em quadriláteros entre eles, em vez de um polígono de muitos lados com os pontos num lado só:
+       o polígono comprido de seis lados que isso dava ao lado da quina se cisalhava quando a espessura era dada à chapa. Os pontos pares
+       da última coluna entram na face de dentro. */
+    const topoDaUltima = new Map();
+    for (let k = 0; k < n; k++) {
+      const L = linha[k]; if (!L) continue;
+      const m = colunasDoVinco.get(L);
+      const u = P[k], v = P[seg(k)];
+      /* a coluna j (de 0 a m) numa ponta da aresta: o próprio ponto e os apoios dele, ou a grade do canto quando a outra aresta da ponta também é linha */
+      const ponta = (q) => {
+        const outra = q === k ? ant(k) : q; const viz = q === k ? P[ant(k)] : P[seg(q)];
+        if (linha[outra]) {
+          const I = info[q];
+          return { canto: true, col: (j) => (q === k ? I.G[I.mp][j] : I.G[j][I.mn]), viz };
+        }
+        return { canto: false, col: (j) => (j === 0 ? P[q] : colunasDe(L, P[q], viz)[j - 1]), viz };
+      };
+      const pu = ponta(k), pv = ponta(seg(k));
+      const C = cadeia(u, v);
+      const lateral = (pt, ponto, j0, j1) => (pt.canto ? [] : entre(cadeia(ponto, pt.viz), pt.col(j0), pt.col(j1)));
+      const i0 = Math.max(C.indexOf(pu.col(0)), 0), i1 = C.indexOf(pv.col(0)) >= 0 ? C.indexOf(pv.col(0)) : C.length - 1;
+      let baixo = C.slice(i0, i1 + 1);
+      const A0 = posicao(baixo[0]), A1 = posicao(baixo[baixo.length - 1]); const tot = dist3(A0, A1);
+      const frac = baixo.map((c) => (tot > 0 ? dist3(A0, posicao(c)) / tot : 0));
+      for (let j = 1; j <= m; j++) {
+        const cu = pu.col(j), cv = pv.col(j); const Pu = posicao(cu), Pv = posicao(cv);
+        const cima = baixo.map((c, i) => {
+          if (i === 0) return cu;
+          if (i === baixo.length - 1) return cv;
+          const nome = `${prefixo}${L}_f${fi}_${k}_${j}_${i}`;
+          novos[nome] = [0, 1, 2].map((d) => Pu[d] + frac[i] * (Pv[d] - Pu[d]));
+          origens[nome] = { tipo: 'ponte', face: fi, vinco: L, coluna: j, aresta: [u, v] };
+          return nome;
+        });
+        const latV = lateral(pv, v, j - 1, j), latU = lateral(pu, u, j - 1, j).reverse();
+        for (let i = 0; i + 1 < baixo.length; i++) {
+          saida.push([baixo[i], baixo[i + 1], ...(i + 2 === baixo.length ? latV : []), cima[i + 1], cima[i], ...(i === 0 ? latU : [])]);
+        }
+        baixo = cima;
+      }
+      topoDaUltima.set(k, baixo.slice(1, -1));
+    }
     const dentro = [];
     for (let k = 0; k < n; k++) {
-      const a = P[k], b = P[(k + 1) % n];
-      dentro.push(rep[k]);
-      if (emVinco[k]) continue;
-      if (rep[k] === a) dentro.push(...(apoioDe.get(`${a}\u0000${b}`) ?? []));
-      if (rep[(k + 1) % n] === b) dentro.push(...[...(apoioDe.get(`${b}\u0000${a}`) ?? [])].reverse());
+      dentro.push(info[k].rep);
+      if (linha[k]) { dentro.push(...(topoDaUltima.get(k) ?? [])); continue; }
+      const C = cadeia(P[k], P[seg(k)]);
+      const s = info[k].tipo === 'um' ? Math.max(C.indexOf(info[k].rep), 0) : 0;
+      const e = info[seg(k)].tipo === 'um' ? (C.indexOf(info[seg(k)].rep) >= 0 ? C.indexOf(info[seg(k)].rep) : C.length - 1) : C.length - 1;
+      if (e > s + 1) dentro.push(...C.slice(s + 1, e));
     }
-    saida.push(dentro);
+    if (new Set(dentro).size >= 3) saida.push(dentro);
+    /* as células do canto */
     for (let k = 0; k < n; k++) {
-      if (!emVinco[k]) continue;
-      const u = P[k], v = P[(k + 1) % n]; const lu = apoiosDe[k], lv = apoiosDe[(k + 1) % n];
-      let antesU = u, antesV = v;
-      for (let j = 0; j < lu.length; j++) { saida.push([antesU, antesV, lv[j], lu[j]]); antesU = lu[j]; antesV = lv[j]; }
+      const I = info[k]; if (I.tipo !== 'canto') continue;
+      const a = P[k]; const Cn = cadeia(a, P[seg(k)]), Ca = cadeia(a, P[ant(k)]);
+      for (let i = 0; i < I.mp; i++) for (let j = 0; j < I.mn; j++) {
+        const ladoDeI = j === 0 ? entre(Cn, I.G[i][0], I.G[i + 1][0]) : [];
+        const ladoDeJ = i === 0 ? entre(Ca, I.G[0][j], I.G[0][j + 1]).reverse() : [];
+        saida.push([I.G[i][j + 1], ...ladoDeJ, I.G[i][j], ...ladoDeI, I.G[i + 1][j], I.G[i + 1][j + 1]]);
+      }
     }
+  });
+  /* a linha de cada vinco aplicado segue as arestas novas: o ponto que outro vinco pôs sobre uma aresta dela entra na sequência */
+  const linhas = {};
+  for (const L of lidos) {
+    const seq = [L.nomes[0]];
+    for (const [u, w] of L.arestas) seq.push(...cadeia(u, w).slice(1));
+    linhas[L.vinco] = seq;
   }
-  return { pontos: novos, faces: saida, raios, avisos, origens, aplicados };
+  /* O RAIO POR PONTO ACOMPANHA A LINHA. O raio guardado como lista tem um número por ponto da linha, e a linha de saída ganhou os pontos que o
+     outro vinco pôs nela (o cruzamento da ponta com as quinas): a lista fica com o do ponto de antes quando os dois vizinhos dela têm o mesmo
+     número, e com a interpolação pela distância ao longo da linha quando têm números diferentes, para o passo `subdivisao` ler um número por ponto. */
+  for (const r of raios) {
+    if (!Array.isArray(r.gravado)) continue;
+    const L = lidos.find((x) => x.vinco === r.vinco); const seq = linhas[r.vinco];
+    const lista = r.gravado; const indice = new Map(L.nomes.map((n, k) => [n, k]));
+    const fim = L.fechada ? seq.length - 1 : seq.length;
+    const saida = [];
+    for (let q = 0; q < fim; q++) {
+      if (indice.has(seq[q])) { saida.push(lista[indice.get(seq[q])]); continue; }
+      let a = q - 1; while (a >= 0 && !indice.has(seq[a])) a--;
+      let b = q + 1; while (b < seq.length && !indice.has(seq[b])) b++;
+      const va = lista[indice.get(seq[a])]; const vb = lista[indice.get(seq[b])];
+      let t = 0; let total = 0;
+      for (let k = a; k < b; k++) { const d = dist3(posicao(seq[k]), posicao(seq[k + 1])); total += d; if (k < q) t += d; }
+      saida.push(va === vb ? va : Math.round((va + (vb - va) * (total > 0 ? t / total : 0)) * 1e6) / 1e6);
+    }
+    r.gravado = saida;
+  }
+  return { pontos: novos, faces: saida, raios, avisos, origens, aplicados, linhas };
 }

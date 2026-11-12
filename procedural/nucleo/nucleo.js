@@ -1671,6 +1671,7 @@ function contratoBooleana(op) {
 CONTRATOS_ORIGEM.unir = contratoBooleana('unir');
 CONTRATOS_ORIGEM.subtrair = contratoBooleana('subtrair');
 CONTRATOS_ORIGEM.intersectar = contratoBooleana('intersectar');
+CONTRATOS_ORIGEM.aparar = contratoBooleana('aparar');
 /* arredondarCostura — as faces novas do arredondamento, sem sub-endereço:
    elas saem de uma bola poliédrica, e um índice pela ordem da saída seria
    identidade posicional. */
@@ -3005,7 +3006,7 @@ const NOMES_DAS_OPERACOES = [
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
   'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao', 'friso',
-  'aberturaPorContorno', 'limparLascas',
+  'aberturaPorContorno', 'limparLascas', 'aparar',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 

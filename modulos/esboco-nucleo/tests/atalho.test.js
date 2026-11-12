@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 import { neutroCanonico } from '../../../procedural/nucleo/nucleo.js';
 import { caixaDaMalha, receitaDaOpcao } from '../src/opcao.js';
+import { montarOpcoes } from '../../../tools/modelar/esboco-nucleo.mjs';
+import { coresDasPartes } from '../../../tools/modelar/vista-rapida.mjs';
 
 const mm = (v) => v.map((x) => Math.round(x * 100000) / 100 + 0);
 const caixaDe = (neutro, parte) => { const c = caixaDaMalha(neutro, parte); return { min: mm(c.min), max: mm(c.max), centro: mm(c.centro) }; };
@@ -90,5 +92,19 @@ describe('a cor da forma', () => {
     expect([...neutro.F.values()].filter((f) => f.parte === 'tampa').every((f) => !f.material)).toBe(true);
     expect(receitaDaOpcao({ formas: [{ id: 'corpo', op: 'cubo', args: { lado: 100 }, cor: 'preto' }] }).receita.MATERIAIS).toEqual({ 'cor-corpo': { cor: '#1c1d20' } });
     expect(() => receitaDaOpcao({ formas: [{ id: 'corpo', op: 'cubo', args: { lado: 100 }, cor: 'grafite' }] })).toThrow(/'cor' precisa ser '#rrggbb' ou um de cinza/);
+  });
+
+  it('chega ao que o esboço exporta: o painel, a receita e a cor que a imagem desenha', () => {
+    const esboco = { opcoes: [{ titulo: 'a', formas: [{ id: 'corpo', op: 'cubo', args: { lado: 100 }, cor: '#141416' }, { id: 'tampa', op: 'cubo', args: { lado: 50 }, sobre: 'corpo', cor: 'cinza' }, { id: 'miolo', op: 'cubo', args: { lado: 20 }, sobre: 'tampa' }] }] };
+    const { paineis, recusas } = montarOpcoes(esboco, { relato: false });
+    expect(recusas).toEqual([]);
+    const [painel] = paineis;
+    expect(painel.formas.map((f) => [f.id, f.cor])).toEqual([['corpo', '#141416'], ['tampa', 'cinza'], ['miolo', null]]);
+    expect(Object.keys(painel.receita.MATERIAIS)).toEqual(['cor-corpo', 'cor-tampa']);
+    const cores = coresDasPartes(painel.neutro, painel.partes);
+    expect(cores.corpo).toMatchObject({ cor: '#141416', origem: 'material' });
+    expect(cores.tampa.origem).toBe('material');
+    expect(cores.tampa.cor).not.toBe(cores.corpo.cor);
+    expect(cores.miolo.origem).toBe('cinza');
   });
 });

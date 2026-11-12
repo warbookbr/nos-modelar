@@ -1,0 +1,496 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/rodas",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência e a receita não refina esboço aprovado",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "aroDianteiraDir",
+        "tipo": "espessura",
+        "onde": "parede do barril em toda a volta",
+        "sentido": "menor",
+        "evidencia": "isométrica isolada: cilindro de parede como folha; corte em x=864,8: anel de linha dupla muito fino. O mesmo nas outras três rodas."
+      },
+      {
+        "parte": "cuboDianteiraDir",
+        "tipo": "uniao",
+        "onde": "furo central do cubo, contra a ponta de eixo da carroceria",
+        "sentido": "afastado",
+        "evidencia": "corte rodas-carroceria: folga uniforme de 8,58 mm entre o furo do cubo e a ponta azul, sem toque. A roda fica solta da carroceria."
+      },
+      {
+        "parte": "discoDianteiraDir",
+        "tipo": "espessura",
+        "onde": "chapa inteira, em toda a face",
+        "sentido": "menor",
+        "evidencia": "isométrica isolada: arruela plana com borda de papel, 466 mm de diâmetro, sem desvio nem relevo. O mesmo nas outras três rodas."
+      },
+      {
+        "parte": "pneuDianteiraDir",
+        "tipo": "superficie",
+        "onde": "seção da banda e dos flancos",
+        "sentido": "anguloso",
+        "evidencia": "isométrica e frontal montada: anel retangular de lados planos, só chanfro mínimo nos cantos, sem bojo nem ombro. Vale se a banda prometida for maciça."
+      }
+    ],
+    "observacao": "Medidas, centros e pares conferem e as quatro rodas são iguais; o que falha é a espessura de aro e disco, que leem como folhas, e a seção de pneu sem bojo nem ombro."
+  },
+  "partes": [
+    {
+      "nome": "pneuDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiraDir",
+      "confere": true,
+      "observacao": "folga radial de 8,7 mm do cubo no eixo, do desenho da família roda-pneu: declarada sem fundo"
+    },
+    {
+      "nome": "discoDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiraDir",
+      "confere": true,
+      "observacao": "idem: folga radial de 8,7 mm declarada sem fundo"
+    },
+    {
+      "nome": "discoTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboDianteiraEsq",
+      "confere": true,
+      "observacao": "idem: folga radial de 8,7 mm declarada sem fundo"
+    },
+    {
+      "nome": "discoDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneuTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "aroTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cuboTraseiraEsq",
+      "confere": true,
+      "observacao": "idem: folga radial de 8,7 mm declarada sem fundo"
+    },
+    {
+      "nome": "discoTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aro e disco espessura: da ferramenta. A parede do barril mede 4,4 mm e a chapa 11,6 mm, medidas de roda de aço; a vista isolada não traz escala nem a caixa da parte, e as duas leram como folha. O processo não pegaria.",
+    "cubo uniao: aceito, do plano. A folga radial de 8,6 mm vem do furo central da família (77 mm) contra o eixo de 60 mm; o furo passa a ter o diâmetro do eixo. A decisão de 2026-11-12 de declarar a folga fica revista.",
+    "pneu superficie: aceito, do plano. O perfil carro da família sai com chanfro mínimo no ombro; a opção ombroRedondo da família dá o ombro em arco e não estava pedida."
+  ],
+  "notaDePassagem": "Etapa não mudou nesta rodada: malha idêntica ao commit anterior. A família roda-pneu deixa folga radial de 8,7 mm entre cubo e eixo (108 mm de linha por roda sem fundo), declarada em vaos-sem-fundo.sh por decisão de 2026-11-12.",
+  "receita": {
+    "sha256": "sha256:62b4c01ae3acfaeded24363dd2874c985b07696179575cf9d96b8e4d93a40e26",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 68,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Etapa 4 de 5 da montagem `../../montagem.json` (item 4 das partes do `../../ALINHAMENTO.md`). A forma é a do rascunho facetado no modo"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * `chassi` (`../../referencias/sedan-chassi-e-lataria.esboco.mjs`, a chamada de `instanciaDeFamilia` com as quatro poses), como o esboço do carro"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * inteiro a carrega, recortada por `../_comum/recorte.mjs`; a conversão para metro é a do esboço 2.0."
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * O ENCAIXE. As rodas assentam no plano da altura do centro delas (a porta `noEixo`, normal para baixo, e a `paraAsRodas` da carroceria, normal"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * para cima), no mesmo ponto: a pose sai identidade, porque o esboço escreve o carro inteiro num referencial só. As portas de giro (o furo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * cubo no eixo) não são publicadas: a roda do sedã é parada, o eixo é do chassi na peça carroceria, e o cubo se prende nele sem junta modelada."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * A cadeia: a TABELA em mm (o ponto do encaixe); `derivar` calcula a interface; `gerarPassos` põe o recorte, em metro, e a porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": "import { ETAPAS, ENCAIXES, FACETADO, contatosDaEtapa, folgasDaEtapa, interfaceDoEncaixe, parteDoPlano, portasEmMetro, recorteDaEtapa } from '../../_comum/sedan.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": "const ETAPA = 'rodas';"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "  encaixe: { ponto: ENCAIXES[ETAPA].ponto },"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "/** A interface da porta, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "export function derivar(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  return { portas: { [ENCAIXES[ETAPA].filha]: { ...interfaceDoEncaixe(ETAPA, 'filha'), ponto: Tab.encaixe.ponto } } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "/** Os PASSOS, em metro: o recorte do esboço e a porta do encaixe. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "export function gerarPassos(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  const { passos } = recorteDaEtapa(ETAPA);"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  const { portas } = derivar(Tab);"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  return [...passos, ...portasEmMetro(passos, Object.fromEntries(Object.entries(portas).map(([id, i]) => [id, { parte: ETAPAS[ETAPA][0], interface: i }])))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "/** Os pontos nomeados, em metro: as rodas não têm gaiola. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "export function gerarTopo() { return recorteDaEtapa(ETAPA).topo; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  meta: { nome: 'sedan-chassi-e-lataria/rodas', desc: 'as quatro rodas do sedã pela família roda-pneu: pneu de 728 mm e 205 de banda, aro, disco e cubo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  get TOPO() { return { origem: 'o centro do carro no chão: x lateral com a direita em +x, y para cima, a frente em +z', ...gerarTopo() }; },"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "    objeto: 'as quatro rodas de um sedã de quatro portas de 4,4 m: pneu de 728 mm de diâmetro e 205 de banda, aro, disco e cubo, com os centros em x ±807,5 e z 1249 e -1181',"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "    referencias: ['../../referencias/sedan-chassi-e-lataria.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "    escala: { medida: 'comprimento total do sedã, de z -2200 a 2200', milimetros: 4400 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "    familiaProcedural: 'roda-pneu',"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "    partes: ETAPAS[ETAPA].map(parteDoPlano),"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "      'o pneu fora de 728 mm de diâmetro por 205 de banda, ou fora do chão em y 0',"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "      'a roda fora do centro do arco, ou o par de um eixo com um dos lados diferente do outro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "      'o pneu tocando a lataria ou a caixa de roda',"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "    lataria: { dispensa: 'as rodas são pneu e aro de revolução da família roda-pneu, e não chapa de lataria' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  contatos: contatosDaEtapa(ETAPA),"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  FOLGAS: folgasDaEtapa(ETAPA),"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  /* cada roda toca só as próprias partes: as quatro rodas são grupos separados, presos no eixo do chassi, que é da peça carroceria */"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  ilhas: ETAPAS[ETAPA].filter((n) => /^pneu/.test(n) && n !== 'pneuDianteiraDir').map((contem) => ({ contem, motivo: 'a roda gira no eixo do chassi, que é da peça carroceria; nesta peça cada roda é um grupo separado das outras três' })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  /* Os extremos que a tabela do rascunho fixa: o pneu da frente à direita (centro em x 807,5, banda de 205, raio de 364) e o de trás à esquerda. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    const R = FACETADO.roda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "      { nome: 'pneu dianteiro direito, o canto de fora e de cima', parte: 'pneuDianteiraDir', medida: 'maximo', em: [R.xCentro + R.largura / 2, 2 * R.raio, R.zFrente + R.raio], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "      { nome: 'pneu traseiro esquerdo, o canto de fora e de baixo', parte: 'pneuTraseiraEsq', medida: 'minimo', em: [-(R.xCentro + R.largura / 2), 0, R.zTras - R.raio], toleranciaMm: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-12T13:16:51.425Z",
+  "facesFinas": {
+    "total": 32,
+    "porParte": {
+      "cuboDianteiraDir": 8,
+      "cuboTraseiraDir": 8,
+      "cuboDianteiraEsq": 8,
+      "cuboTraseiraEsq": 8
+    }
+  }
+}

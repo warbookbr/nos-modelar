@@ -3,7 +3,7 @@ import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { caixasPorParte, portasPublicadas } from '../../src/autoria/descrever-partes.js';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { executarReceitaGuardada } from './entrada-de-medida.mjs';
 import { lerArgumentos } from './argumentos.mjs';
 import { importarReceita } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -39,6 +39,10 @@ export async function ativarReceitaBancada({
    * absoluto) a sessão é gravada só nele, e a página o lê pelo `?sessao=` da URL; `sessao-ativa.json` fica como está, e com ele a peça
    * de quem trabalha na bancada e a de qualquer outra captura. Sem ele nada muda. */
   arquivoDaSessao = null,
+  /* A execução da receita em Node é guardada em `tmp/cache-de-medida/` (a mesma das ferramentas de medida, pela assinatura do conteúdo), e a
+   * ativação não a refaz quando nada mudou; `cache: false` (`--sem-cache`) executa de novo e regrava. Com `perfil` a receita já não é a do
+   * arquivo, e a execução não passa pelo cache. */
+  cache = true,
 } = {}) {
   if (!alvo) {
     throw new Error('Informe a receita (ex.: peca-de-prova ou --arquivo=<caminho.js>)');
@@ -71,7 +75,10 @@ export async function ativarReceitaBancada({
     ? { ...original, PARAMS: { ...original.PARAMS, perfil } }
     : original;
 
-  const { neutro } = executarReceita(receita);
+  const { executada, doCache } = perfil
+    ? { executada: executarReceitaGuardada(caminhoAbsoluto, receita, { cache: false }).executada, doCache: false }
+    : executarReceitaGuardada(caminhoAbsoluto, receita, { cache });
+  const { neutro } = executada;
   const { caixas, facesSemParte } = caixasPorParte(neutro);
   const portas = portasPublicadas(neutro);
   const partesNomes = Array.from(caixas.keys());
@@ -194,6 +201,7 @@ export async function ativarReceitaBancada({
     url,
     payload,
     arquivoDaSessao,
+    doCache,
   };
 }
 

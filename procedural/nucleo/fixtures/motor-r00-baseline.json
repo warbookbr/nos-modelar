@@ -42,7 +42,8 @@
     "subdivisao",
     "friso",
     "aberturaPorContorno",
-    "limparLascas"
+    "limparLascas",
+    "aparar"
   ],
   "casos": [
     {
@@ -453,6 +454,16 @@
       "hashCanonico": "4e4176f1c5fd846853d39cca2733055d56feea7c8ab870c22e9b448b39ad643c",
       "vertices": 14,
       "faces": 12,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/aparar",
+      "operacoes": [
+        "aparar"
+      ],
+      "hashCanonico": "09f90bcb1e559d453d4ba9cd2c0e537e9fe6a27565c165c146caa54160b5741a",
+      "vertices": 197,
+      "faces": 251,
       "diagnosticos": 0
     }
   ]

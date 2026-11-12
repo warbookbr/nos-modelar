@@ -44,10 +44,17 @@ const SEGUNDOS_POR_ALVO = 2;
    recortam, e uma execução local caiu de 207 s para 77 s; pela mesma razão da máquina local para o CI (207 s para 506 s nas
    duas execuções), o furgão ficaria em cerca de 190 s no CI. Medido no CI em 2026-11-12, levou 104 s, 188 s e 368 s
    nas duas execuções, em três baterias com a receita igual (a execução local foi de 83 s nas duas): a máquina do CI varia mais
-   de três vezes de uma bateria para outra. Os retrovisores (2026-11-12) somam uns 29% à execução (83 s para 107 s, local). O teto
-   é 640 s, 1,7 vez a maior medida, com o prazo do teste em 900 s, até o teste comparar o furgão com uma peça de referência medida
-   na mesma bateria, em vez de um número fixo (pedido no plano das ferramentas de conferência). */
-const PECAS_PESADAS = { 'furgao-realista': 640 };
+   de três vezes de uma bateria para outra. Os retrovisores (2026-11-12) somam uns 29% à execução (83 s para 107 s, local).
+   TETO PELA RAZÃO, DESDE 2026-11-12. O teto em segundos reprovava ao acaso, e subi-lo a 640 s só adiava o caso. Em cinco
+   rodadas do CI desse dia o furgão levou 119, 139, 154, 184 e, já com os retrovisores, 125 s por execução, e a soma das outras
+   peças, medida na mesma máquina e na mesma rodada, foi de 13,8, 15,3, 18,1, 20,2 e 14,0 s: a razão entre o furgão e essa soma
+   ficou em 8,7, 9,1, 8,5, 9,1 e 8,9. O teto da peça pesada passa a ser essa razão, 15, cerca de 1,7 vez a medida, e a máquina
+   lenta deixa de reprovar; o prazo do teste, 900 s, é o que resta de teto absoluto. A regressão da peça continua aparecendo,
+   porque quem a deixa mais lenta não deixa as outras. Quando a receita da peça mudar de custo de propósito, a razão é medida
+   de novo no CI e anotada aqui. A razão é a do CI: na máquina local, com agentes modelando ao lado, o furgão mediu 16,7 e 17,9
+   vezes a soma das outras (254 e 250 s contra 15 e 14 s), porque a peça de 190 mil faces sofre com a memória disputada e as
+   pequenas não. Fora do CI o teto é o dobro, 30, que ainda pega a regressão grande; o CI cobra a razão justa. */
+const PECAS_PESADAS = { 'furgao-realista': process.env.CI ? 15 : 30 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
@@ -74,8 +81,11 @@ describe('acervo real, inteiro', () => {
     expect(declarados).toBeGreaterThan(0);
     const comuns = custos.filter(([alvo]) => !(alvo in PECAS_PESADAS));
     expect(comuns.reduce((soma, [, s]) => soma + s, 0)).toBeLessThan(SEGUNDOS_POR_ALVO * comuns.length);
+    const somaDosComuns = comuns.reduce((soma, [, s]) => soma + s, 0);
     for (const [alvo, s] of custos.filter(([a]) => a in PECAS_PESADAS)) {
-      expect(s, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, acima do teto próprio de ${PECAS_PESADAS[alvo]} s`).toBeLessThan(PECAS_PESADAS[alvo]);
+      const razao = s / somaDosComuns;
+      console.log(`${alvo}: ${s.toFixed(0)} s nas duas execuções, ${razao.toFixed(1)} vez(es) a soma das outras peças (${somaDosComuns.toFixed(0)} s); teto ${PECAS_PESADAS[alvo]}`);
+      expect(razao, `${alvo} levou ${s.toFixed(0)} s nas duas execuções, ${razao.toFixed(1)} vez(es) a soma das outras peças na mesma máquina (${somaDosComuns.toFixed(0)} s), acima da razão de ${PECAS_PESADAS[alvo]}`).toBeLessThan(PECAS_PESADAS[alvo]);
     }
   }, 900_000);
 });

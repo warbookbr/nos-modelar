@@ -31,6 +31,9 @@ describe('dobra e vinco aceitos pelo plano', () => {
     const b = descrever('tools/fixtures/solido-por-lacos/tubos-hoje-aceita.js');
     expect(b.stdout).toMatch(/5 DOBRA\(S\) E VINCO\(S\) ACEITO\(S\) PELO PLANO/);
     expect(b.stdout).toMatch(/\(aceita: aba da técnica de hoje/);
+    /* as pontas da cadeia saem no texto, para quem lê saber até onde a região aceita vai */
+    expect(b.stdout).toMatch(/, de \[[-\d.; ]+\] a \[[-\d.; ]+\] mm \(aceit/);
+    expect(a.stdout).toMatch(/, de \[[-\d.; ]+\] a \[[-\d.; ]+\] mm\n/);
     expect(b.stdout).not.toMatch(/NÃO DECLARADO\(S\)/);
     expect(b.status).toBe(a.status);
   }, LENTO);

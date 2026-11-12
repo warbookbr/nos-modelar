@@ -66,7 +66,7 @@ describe('a chapa depois do corte', () => {
   it('a lâmina de gaiola sem subdivisão que o corte consumiu fica fora da leitura, dita', () => {
     const r = ondulacaoDaReceita(comCorte({ lamina: true }));
     expect(r.superficies.map((s) => s.passo)).toEqual([0]);
-    expect(r.puladas).toEqual([{ passo: 1, motivo: 'gaiola sem subdivisão (niveis 0) que um passo posterior consumiu' }]);
+    expect(r.puladas).toEqual([{ passo: 1, motivo: 'gaiola sem subdivisão (niveis 0): a faceta é a forma, e não superfície a medir' }]);
     expect(r.leitura.join(' ')).toMatch(/fora da leitura: passo 1 \(gaiola sem subdivisão/);
     expect(r.superficies[0]).toMatchObject({ passo: 0, medidoNoPasso: 3, tiradoPeloPasso: { passo: 4, op: 'subtrair' } });
   });
@@ -81,5 +81,33 @@ describe('a chapa depois do corte', () => {
     const e = spawnSync(process.execPath, [join(AQUI, 'ondulacao-da-superficie.mjs'), arquivo, '--passo=1'], { encoding: 'utf8' });
     expect(JSON.parse(e.stdout).superficies[0].escolhaDoPasso).toBe('explícita');
     expect(spawnSync(process.execPath, [join(AQUI, 'ondulacao-da-superficie.mjs'), arquivo, '--passo=x'], { encoding: 'utf8' }).status).toBe(1);
+  });
+});
+
+describe('a gaiola de niveis 0 que a união consome', () => {
+  /* a faixa do forro de um vão: um prisma de faces planas e aresta viva, posto como está e unido a outro. A união não tira os vértices dela da malha, e a leitura as lia
+     como superfície (204 falhas nas arestas vivas das dez faixas do forro do sedã, atrito 10 do RECEITA.md). */
+  const prisma = (dx) => ({
+    vertices: Array.from({ length: 8 }, (_, k) => [dx + (k & 1 ? 0.1 : 0), k & 2 ? 0.05 : 0, k & 4 ? 0.01 : 0]),
+    faces: [[0, 2, 3, 1], [4, 5, 7, 6], [0, 1, 5, 4], [2, 6, 7, 3], [0, 4, 6, 2], [1, 3, 7, 5]],
+  });
+  const receita = () => {
+    const [a, b] = [prisma(0), prisma(0.3)];
+    const nome = (id, k) => `f${id}_${k}`;
+    const topo = {}; const passos = [];
+    [[1, a], [2, b]].forEach(([id, g]) => {
+      g.vertices.forEach((v, k) => { topo[nome(id, k)] = v; });
+      passos.push(['subdivisao', { origemId: id, vertices: g.vertices.map((_, k) => nome(id, k)), faces: g.faces.map((f) => f.map((k) => nome(id, k))), niveis: 0 }]);
+    });
+    passos.push(['unir', { origemId: 3, solidos: [{ origem: { op: 'subdivisao', id: 1 } }, { origem: { op: 'subdivisao', id: 2 } }] }]);
+    return { PARAMS: {}, TOPO: topo, PASSOS: passos };
+  };
+
+  it('fica fora da leitura mesmo com os vértices na malha final, dita, e a peça não ganha falha', () => {
+    const r = ondulacaoDaReceita(receita());
+    expect(r.superficies).toEqual([]);
+    expect(r.puladas.map((x) => x.passo)).toEqual([0, 1]);
+    expect(r.falhas).toBe(0);
+    expect(r.leitura.join(' ')).toMatch(/fora da leitura: passo 0 \(gaiola sem subdivisão \(niveis 0\)/);
   });
 });

@@ -1,0 +1,447 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/acessorios",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: a receita não refina esboço aprovado e o pedido não traz imagem de referência",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Lista vazia não é aprovação: as seis partes existem e o espelhamento confere, mas a ondulação dos retrovisores e a profundidade das maçanetas ficaram sem medida nas imagens."
+  },
+  "partes": [
+    {
+      "nome": "retrovisorDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "retrovisorEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "macanetaPortaDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "macanetaPortaDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "macanetaPortaTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "macanetaPortaTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "crista:regularidade acusa lacuna de 22,4 mm em ±[863,5; 961; 342,2] no retrovisor; imagem no pacote, sem correção"
+  ],
+  "notaDePassagem": "Etapa não mudou nesta rodada: malha idêntica ao commit anterior. O pé do retrovisor entra 11 mm na chapa da porta e cada maçaneta 3 mm, como declarado na montagem. A lacuna da crista do retrovisor segue para o crítico decidir.",
+  "receita": {
+    "sha256": "sha256:f485fdf24fc467a47cab4d67d471511024e7ea339bc1d40252ff0548ba85755c",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 72,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* sedan-chassi-e-lataria/acessorios — os dois retrovisores e as quatro maçanetas do sedã, os acessórios simples que o ciclo 5 pôs sobre as portas."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Etapa 5 de 5 da montagem `../../montagem.json` (item 5 das partes do `../../ALINHAMENTO.md`). A forma é a do esboço do carro inteiro"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * (`../../alta-definicao/carro-inteiro.esboco.mjs`): o retrovisor é uma barra de laços ao longo de x, com raio de 6 mm nas quatro quinas e 5"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * mm na ponta de fora, o pé 11 mm dentro da porta dianteira; a maçaneta é uma caixa de 110 por 22 mm que sai 11 mm da porta e entra 3 mm nela, sem o"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * rebaixo de fundo fechado atrás dela (que fica para a operação de rebaixo por contorno). Os passos são os do esboço, recortados por"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * `../_comum/recorte.mjs`."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * O ENCAIXE. Os acessórios assentam no plano da quina do ombro (a porta `naLinhaDoOmbro`, normal para baixo, e a `paraOsAcessorios` da carroceria,"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * normal para cima), no mesmo ponto: a pose sai identidade. A entrada do pé do retrovisor e da maçaneta na chapa da porta é medida na montagem."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * A cadeia: a TABELA em mm (o ponto do encaixe); `derivar` calcula a interface; `gerarPassos` põe o recorte, em metro, e a porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": "import { ETAPAS, ENCAIXES, RETROVISOR, interfaceDoEncaixe, parteDoPlano, portasEmMetro, recorteDaEtapa } from '../../_comum/sedan.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "const ETAPA = 'acessorios';"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  encaixe: { ponto: ENCAIXES[ETAPA].ponto },"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  /* a tolerância dos PONTOS: os extremos do retrovisor são pontos de controle em quina viva da gaiola, onde a superfície passa por eles (medido: desvio 0) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  folgaDaSubdivisao: 0.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "/** A interface da porta, em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "export function derivar(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  return { portas: { [ENCAIXES[ETAPA].filha]: { ...interfaceDoEncaixe(ETAPA, 'filha'), ponto: Tab.encaixe.ponto } } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "/** Os PASSOS, em metro: o recorte do esboço e a porta do encaixe. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "export function gerarPassos(Tab = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  const { passos } = recorteDaEtapa(ETAPA);"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  const { portas } = derivar(Tab);"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  return [...passos, ...portasEmMetro(passos, Object.fromEntries(Object.entries(portas).map(([id, i]) => [id, { parte: ETAPAS[ETAPA][0], interface: i }])))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "/** Os pontos nomeados das gaiolas do retrovisor, em metro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "export function gerarTopo() { return recorteDaEtapa(ETAPA).topo; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  meta: { nome: 'sedan-chassi-e-lataria/acessorios', desc: 'os dois retrovisores de laços e as quatro maçanetas do sedã' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  get TOPO() { return { origem: 'o centro do carro no chão: x lateral com a direita em +x, y para cima, a frente em +z', ...gerarTopo() }; },"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "    objeto: 'os acessórios de um sedã de quatro portas de 4,4 m: um retrovisor de cada lado, na porta dianteira, e uma maçaneta em cada uma das quatro portas',"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "    referencias: ['../../referencias/sedan-chassi-e-lataria.contornos.json'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    escala: { medida: 'comprimento total do sedã, de z -2200 a 2200', milimetros: 4400 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "    partes: ETAPAS[ETAPA].map(parteDoPlano),"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "      'o retrovisor que não é a imagem do outro, ou com quina viva no lugar do raio de 6 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "      'a maçaneta solta da porta, ou saindo mais de 11 mm dela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "    lataria: { partes: ['retrovisorDir', 'retrovisorEsq'] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  contatos: [],"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  /* o pé do retrovisor e a maçaneta entram na chapa da porta, que é da peça carroceria; aqui cada um é um grupo solto */"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  ilhas: ETAPAS[ETAPA].filter((n) => n !== 'retrovisorDir').map((contem) => ({ contem, motivo: 'o pé do retrovisor e a maçaneta entram na chapa da porta, que é da peça carroceria; nesta peça cada acessório é um grupo solto' })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  /* Os extremos do retrovisor da direita são os dos pontos de controle da gaiola, e os do esquerdo são a imagem deles. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  /* as partes soltas de propósito, para `vao:partes --soltas=recusar` */"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  APOIA: Object.fromEntries(ETAPAS[ETAPA].map((n) => [n, 'o pé do retrovisor e a maçaneta entram na chapa da porta, que é da peça carroceria; nesta peça cada acessório fica solto'])),"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  get PONTOS() {"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    const pts = Object.values(RETROVISOR.pontosMm);"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    const ext = (k, f) => f(...pts.map((p) => p[k]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    const tol = this.PARAMS.folgaDaSubdivisao;"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "      { nome: 'retrovisor direito, o canto de fora, de cima e da frente', parte: 'retrovisorDir', medida: 'maximo', em: [ext(0, Math.max), ext(1, Math.max), ext(2, Math.max)], toleranciaMm: tol },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "      { nome: 'retrovisor esquerdo, o canto de fora, de baixo e de trás', parte: 'retrovisorEsq', medida: 'minimo', em: [-ext(0, Math.max), ext(1, Math.min), ext(2, Math.min)], toleranciaMm: tol },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes retrovisorDir, retrovisorEsq",
+    "imagens": [
+      "peca-frente-rasante-az30.png",
+      "peca-frente-rasante-az120.png",
+      "peca-lado-rasante-az30.png",
+      "peca-lado-rasante-az120.png",
+      "peca-topo-rasante-az30.png",
+      "peca-topo-rasante-az120.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-12T13:00:09.278Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

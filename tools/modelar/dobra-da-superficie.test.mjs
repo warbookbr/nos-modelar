@@ -21,7 +21,8 @@ describe('dobra da superfície: o diedro agudo entre faces vizinhas fora de vinc
     expect(arestas).toBe(7);
     expect(dobras).toHaveLength(1);
     expect(dobras[0]).toMatchObject({ parte: 'chapa', posicaoMm: [1000, 500, 0], diedroGraus: 80, arestas: 1, extensaoMm: 1000, pertoDe: 'aresta' });
-    expect(textoDaDobra(dobras[0])).toBe('dobra na parte chapa, em [1000; 500; 0] mm, perto do ponto aresta da gaiola: diedro de 80 graus em 1 aresta(s), 1000 mm');
+    expect(textoDaDobra(dobras[0])).toBe('dobra na parte chapa, em [1000; 500; 0] mm, perto do ponto aresta da gaiola: diedro de 80 graus em 1 aresta(s), 1000 mm, de [1000; 0; 0] a [1000; 1000; 0] mm');
+    expect(dobras[0].caixaMm).toEqual({ min: [1000, 0, 0], max: [1000, 1000, 0] });
   });
 
   it('a folha lisa, ou dobrada pouco, não é dobra, e o limiar é do diedro (120 graus por padrão)', () => {

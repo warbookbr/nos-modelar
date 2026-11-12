@@ -12,9 +12,11 @@
  * inclusive as de passos crus, que não têm onde declarar, e o motivo sai no relato. Uma travessia que nenhuma das duas declarou é "não declarada", e uma relação declarada
  * que a malha não dá é "esperada e não dada": as duas listas são o que o modo estrito recusa. Núcleo puro. */
 import { descreverPeca } from '../../../src/autoria/descrever-partes.js';
+import { TOLERANCIA_DE_ENCOSTO_DA_PECA } from '../../../src/autoria/contato-de-solidos.js';
 import { MM } from './milimetro.js';
 
-export const TOLERANCIA_DO_RELATO_M = 1e-6;
+/* a mesma tolerância de encosto do contato declarado que o `descrever` confirma (um micrômetro, com a razão em `contato-de-solidos.js`) */
+export const TOLERANCIA_DO_RELATO_M = TOLERANCIA_DE_ENCOSTO_DA_PECA;
 export const PERTO_MM = 20;
 const NOME_DA_RELACAO = { encosta: 'encosta', interpenetra: 'atravessa', folga: 'folga' };
 const fmt = (x) => (Math.round(x * 1000) / 1000).toFixed(3).replace('.', ',');
@@ -25,7 +27,7 @@ const fmt = (x) => (Math.round(x * 1000) / 1000).toFixed(3).replace('.', ',');
  * @param {Array<{id, contato}>} formas  as formas da opção, com o contato esperado
  * @param {{ perto?: number, tolerancia?: number, contatos?: Array<{par, relacao, motivo}> }} [o]  `perto` em mm; `tolerancia` em
  *   metro; `contatos`, os declarados na opção (o `contatos` que `receitaDaOpcao` devolve)
- * @returns {{ pares: Array, encostam: Array, atravessam: Array, folgas: Array, longe: number, naoDeclaradas: Array, faltam: Array }}
+ * @returns {{ pares: Array, encostam: Array, atravessam: Array, folgas: Array, longe: number, naoDeclaradas: Array, faltam: Array, assimetricas: Array }}
  */
 export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolerancia = TOLERANCIA_DO_RELATO_M, contatos = [] } = {}) {
   const d = descreverPeca(neutro, { tolerancia });
@@ -45,6 +47,7 @@ export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolera
       a: r.a, b: r.b, tipo, eixo: r.eixo,
       mm: r.distancia === null || r.distancia === undefined ? null : r.distancia * MM,
       solido: r.solido ?? null,
+      ...(r.motivoDoSolido ? { motivoDoSolido: r.motivoDoSolido } : {}),
       esperado: e?.rel ?? null,
       confere: e ? e.rel === tipo : null,
       motivo: e?.motivo ?? null,
@@ -66,7 +69,29 @@ export function relatoDeContatos(neutro, formas = [], { perto = PERTO_MM, tolera
     if (e.rel === 'conflito') faltam.push({ a, b, esperado: 'conflito', dado: `${e.de[0].por} declara ${e.de[0].rel} e ${e.de[1].por}, ${e.de[1].rel}`, ...motivo });
     else if (p && p.tipo !== e.rel) faltam.push({ a, b, esperado: e.rel, dado: p.tipo, ...motivo });
   }
-  return { tolerancia, perto, pares, encostam, atravessam, folgas, longe, naoDeclaradas, faltam };
+  return { tolerancia, perto, pares, encostam, atravessam, folgas, longe, naoDeclaradas, faltam, assimetricas: paresEspelhadosQueDiferem(pares, chave) };
+}
+
+/* O ESPELHO. Parte que termina em Dir ou Esq é a imagem da outra: o par (a, b) e o par com cada lado trocado têm de medir igual. A medida do
+   contato lê o neutro com um raio que não é simétrico em x, e dois lados que são imagem um do outro já saíram com vereditos diferentes (o relato
+   dava travessia de 4,107 mm no esquerdo e folga no direito); com isto a diferença aparece como assimetria, e não como contato declarado errado
+   de um lado só. Só compara o tipo da relação, o estado do sólido e, entre duas folgas medidas, a distância (0,5 mm). */
+const DISTANCIA_DE_ESPELHO_MM = 0.5;
+const doOutroLado = (nome) => (nome.endsWith('Dir') ? `${nome.slice(0, -3)}Esq` : nome.endsWith('Esq') ? `${nome.slice(0, -3)}Dir` : nome);
+function paresEspelhadosQueDiferem(pares, chave) {
+  const porChave = new Map(pares.map((p) => [chave(p.a, p.b), p]));
+  const diferem = [];
+  for (const p of pares) {
+    const a = doOutroLado(p.a); const b = doOutroLado(p.b);
+    if (a === p.a && b === p.b) continue;
+    const k = chave(p.a, p.b); const k2 = chave(a, b);
+    const q = porChave.get(k2);
+    if (!q || k2 === k || k2 < k) continue;
+    const diferenca = p.tipo !== q.tipo || (p.solido ?? null) !== (q.solido ?? null)
+      || (p.tipo === 'folga' && p.mm !== null && q.mm !== null && Math.abs(p.mm - q.mm) > DISTANCIA_DE_ESPELHO_MM);
+    if (diferenca) diferem.push({ a: p.a, b: p.b, tipo: p.tipo, solido: p.solido ?? null, mm: p.mm, espelho: { a: q.a, b: q.b, tipo: q.tipo, solido: q.solido ?? null, mm: q.mm } });
+  }
+  return diferem;
 }
 
 /** O relato em linhas de texto, uma por relação que importa. */
@@ -77,10 +102,14 @@ export function textoDoRelato(r, { recuo = '    ' } = {}) {
   for (const p of r.encostam) linhas.push(`encosta    ${p.a} e ${p.b}${marca(p)}`);
   for (const p of r.atravessam) {
     const quanto = p.mm === null ? 'sem profundidade medida' : `${fmt(p.mm)} mm pelo eixo ${p.eixo}`;
-    const solido = p.solido && p.solido !== 'interpenetram' ? `, sólido ${p.solido}` : '';
+    const solido = p.solido && p.solido !== 'interpenetram' ? `, sólido ${p.solido}${p.motivoDoSolido ? ` (${p.motivoDoSolido.join('; ')})` : ''}` : '';
     linhas.push(`atravessa  ${p.a} e ${p.b}: ${quanto}${solido}${p.esperado === 'atravessa' ? ` (declarada${porque(p)})` : ' (NÃO DECLARADA)'}`);
   }
   for (const p of r.folgas) linhas.push(`folga      ${p.a} e ${p.b}: ${p.mm === null ? 'as caixas se sobrepõem e os sólidos não se tocam' : `${fmt(p.mm)} mm pelo eixo ${p.eixo}`}${marca(p)}`);
+  for (const d of r.assimetricas ?? []) {
+    const como = (x) => `${x.tipo}${x.solido ? ` (sólido ${x.solido})` : ''}${x.mm === null || x.mm === undefined ? '' : ` a ${fmt(x.mm)} mm`}`;
+    linhas.push(`ASSIMÉTRICO ${d.a} e ${d.b}: ${como(d)}; o par espelhado, ${d.espelho.a} e ${d.espelho.b}: ${como(d.espelho)}`);
+  }
   if (!r.atravessam.length) linhas.push('nenhuma travessia');
   if (r.longe) linhas.push(`${r.longe} par(es) a mais de ${r.perto} mm um do outro`);
   for (const f of r.faltam) {

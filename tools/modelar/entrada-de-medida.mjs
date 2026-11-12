@@ -49,29 +49,48 @@ function resolverImportacao(de, especificador) {
 /**
  * A assinatura do que define uma montagem: o conteúdo (sha256) do arquivo da entrada e de tudo o que ele importa, transitivamente, dentro do
  * repositório; do núcleo inteiro (`procedural/nucleo/`, sem os testes) e do que o resolvedor, o montador de esboço e o executor de receita importam;
- * dos arquivos de dados (json, csv, txt) da pasta da entrada, que o módulo pode ler sem importar; mais a versão do cache e do Node.
+ * dos arquivos de dados (json, csv, txt) da pasta da entrada, que o módulo pode ler sem importar; do valor de cada variável de ambiente que a entrada
+ * e o que ela importa dentro do repositório leem (`process.env.X`, ou `process.env['X']`; a variável não definida também entra), porque o esboço
+ * que muda de forma por variável monta outra coisa com ela; mais a versão do cache e do Node.
  * Importação com expressão no lugar do texto não é seguida, e o arquivo lido por `readFileSync` fora da pasta da entrada também não:
  * quem usa isso desliga o cache com `--sem-cache`.
  * @returns {{ chave: string, arquivos: number }}
  */
 const RAIZES_DA_MONTAGEM = ['tools/modelar/entrada-de-medida.mjs', 'tools/modelar/esboco-nucleo.mjs', 'tools/modelar/importar-receita.mjs', 'src/autoria/executar-receita.js'];
 
-export function assinaturaDaEntrada(abs, extras = RAIZES_DA_MONTAGEM) {
+/* as variáveis de ambiente que o texto lê: `process.env.X` e `process.env['X']` */
+const VARIAVEL_DE_AMBIENTE = /\bprocess\.env(?:\.([A-Za-z_][A-Za-z0-9_]*)|\[\s*(['"])([A-Za-z_][A-Za-z0-9_]*)\2\s*\])/g;
+export function variaveisDeAmbienteDoTexto(texto) {
+  const nomes = new Set();
+  for (const m of texto.matchAll(VARIAVEL_DE_AMBIENTE)) nomes.add(m[1] ?? m[3]);
+  return nomes;
+}
+
+export function assinaturaDaEntrada(abs, extras = RAIZES_DA_MONTAGEM, ambiente = process.env) {
   const vistos = new Set();
-  const pilha = [abs, ...extras.map((e) => resolve(RAIZ, e))];
-  for (const f of arquivosDe(join(RAIZ, 'procedural/nucleo'), { recursivo: true, filtro: (n) => CODIGO.test(n) && !/\.test\.[a-z]+$/.test(n) })) pilha.push(f);
-  while (pilha.length) {
-    const f = pilha.pop();
-    if (vistos.has(f) || !existsSync(f)) continue;
-    vistos.add(f);
-    if (!/\.(mjs|js|cjs|ts)$/.test(f) || !f.startsWith(RAIZ)) continue;
-    const texto = readFileSync(f, 'utf8');
-    for (const m of texto.matchAll(ESPECIFICADOR)) { const r = resolverImportacao(f, m[2]); if (r?.startsWith(RAIZ)) pilha.push(r); }
-  }
+  const doEsboco = new Set();
+  const seguir = (inicio, conjunto) => {
+    const pilha = [...inicio];
+    while (pilha.length) {
+      const f = pilha.pop();
+      if (conjunto.has(f) || !existsSync(f)) continue;
+      conjunto.add(f); vistos.add(f);
+      if (!/\.(mjs|js|cjs|ts)$/.test(f) || !f.startsWith(RAIZ)) continue;
+      const texto = readFileSync(f, 'utf8');
+      for (const m of texto.matchAll(ESPECIFICADOR)) { const r = resolverImportacao(f, m[2]); if (r?.startsWith(RAIZ)) pilha.push(r); }
+    }
+  };
+  /* o arquivo da entrada e o que ele importa, dentro do repositório: é onde o esboço lê as variáveis de ambiente que mudam a montagem */
+  seguir([abs], doEsboco);
+  seguir([...extras.map((e) => resolve(RAIZ, e)), ...arquivosDe(join(RAIZ, 'procedural/nucleo'), { recursivo: true, filtro: (n) => CODIGO.test(n) && !/\.test\.[a-z]+$/.test(n) })], new Set(vistos));
   for (const f of arquivosDe(dirname(abs), { recursivo: false, filtro: (n) => !CODIGO.test(n) && /\.(csv|txt|tsv|obj)$/.test(n) })) vistos.add(f);
+  const variaveis = new Set();
+  for (const f of doEsboco) if (/\.(mjs|js|cjs|ts)$/.test(f) && (f === abs || f.startsWith(RAIZ))) for (const nome of variaveisDeAmbienteDoTexto(readFileSync(f, 'utf8'))) variaveis.add(nome);
   const h = createHash('sha256').update(VERSAO_DO_CACHE);
   for (const f of [...vistos].sort()) h.update(`\n${relative(RAIZ, f)}\n`).update(readFileSync(f));
-  return { chave: h.digest('hex').slice(0, 32), arquivos: vistos.size };
+  /* o valor de cada variável lida (ou a falta dela): a cabine montada com HD_CABINE=so não é a montada sem ela */
+  for (const nome of [...variaveis].sort()) h.update(`\nambiente ${nome}=${ambiente[nome] === undefined ? '\u0000indefinida' : JSON.stringify(String(ambiente[nome]))}`);
+  return { chave: h.digest('hex').slice(0, 32), arquivos: vistos.size, variaveis: [...variaveis].sort() };
 }
 
 function lerDoCache(pasta, chave, rotulo) {
@@ -89,6 +108,23 @@ function gravarNoCache(pasta, chave, rotulo, dado) {
   } catch { /* o cache é conveniência: sem disco, a medida continua sem ele */ }
 }
 const rotuloDe = (abs, opcao) => `${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_')}.${createHash('sha256').update(abs).digest('hex').slice(0, 6)}.o${opcao}`;
+
+/**
+ * A execução da receita (`{ entrada, neutro }`) guardada por assinatura do conteúdo, a mesma de `lerEntradaDeMedida`: quem executa a receita em Node
+ * (a ativação da bancada, a medida de contatos, as ferramentas de medida) lê a execução da última rodada quando nada mudou e grava a sua quando mudou,
+ * de modo que a receita é executada uma vez só entre elas. `cache: false` executa de novo e regrava. Uma receita copiada com outro perfil, ou
+ * outros PARAMS, não é a do arquivo: quem a passa deve chamar com `cache: false`.
+ * @returns {{ executada: object, doCache: boolean }}
+ */
+export function executarReceitaGuardada(abs, receita, { cache = true, pastaDoCache = PASTA_DO_CACHE } = {}) {
+  let sig = null;
+  if (cache) { try { sig = assinaturaDaEntrada(abs); } catch { sig = null; } }
+  const guardada = sig ? lerDoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r')) : null;
+  if (guardada) return { executada: guardada, doCache: true };
+  const executada = executarReceita(receita);
+  if (sig) gravarNoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r'), executada);
+  return { executada, doCache: false };
+}
 
 export class ErroDeEntrada extends Error {
   constructor(mensagem) { super(mensagem); this.name = 'ErroDeEntrada'; }
@@ -134,11 +170,9 @@ export async function lerEntradaDeMedida(alvo, { opcao = 1, montagem = true, cac
     let executada = null;
     const lida = { tipo: 'receita', abs, nome, origem: `receita ${nome}`, doCache: false, receita, executar: () => {
       if (executada) return executada;
-      const guardada = sig ? lerDoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r')) : null;
-      if (guardada) { lida.doCache = true; return (executada = guardada); }
-      executada = executarReceita(receita);
-      if (sig) gravarNoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r'), executada);
-      return executada;
+      const r = executarReceitaGuardada(abs, receita, { cache: !!sig, pastaDoCache });
+      lida.doCache = r.doCache;
+      return (executada = r.executada);
     } };
     return lida;
   }

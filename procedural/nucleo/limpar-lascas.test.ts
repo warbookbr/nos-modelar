@@ -7,6 +7,7 @@
    0,2 mm da concordância, a tampa de 1 mm por 585 mm) e a limpeza não cria nenhuma nem acha como desfazer essas; (d) a operação no
    passo: recusas, o aviso das que ficam, a origem da booleana ainda resolvendo as duas partes depois, o par da costura que segue a
    fusão; e (e) o tempo numa chapa de 54 mil faces. */
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo em JavaScript.
 import { limparLascas, razaoDeFace } from './limpar-lascas.js';
@@ -367,3 +368,66 @@ describe('limparLascas no estado: pesos, fusões e consumo', () => {
     expect(rodar([S, L, ['liso', { sel: { origem: { op: 'subdivisao', id: 1 } } }]]).orfaos).toEqual([]);
   });
 });
+
+/* A face dobrada sobre si mesma. O corte de vão por curva que passa a 2 mm de uma estação deixa, na parede do vão, uma face de cinco cantos
+   na mesma reta até o ruído (a lateral traseira do sedã, no fim da porta, na quina da cintura): área de 1e-4 mm² e razão de 7e-5. A vizinha
+   que a absorve ganha os cantos e fica com eles a décimos de micrômetro fora da reta, e a limpeza recusava a fusão por "não é convexa" e por
+   "valência 2" (o canto que passa à vizinha era contado sem ela). Os pontos e as seis faces são os do carro, em mm, com a tolerância de
+   0,01 mm que o corte usa. */
+describe('limparLascas: a face de cantos alinhados até o ruído', () => {
+  const P: V3[] = [[-857.859375, 997.826263, -762.03129], [-858.582467, 996.67288, -765.19033], [-857.859375, 997.826263, -765.19033], [-858.582075, 996.674374, -762.03129], [-858.805335, 995.822842, -762.03129], [-859.028578, 994.971375, -765.19033], [-857.377851, 998.117947, -762.03129], [-856.695029, 998.531568, -765.19033], [-856.695029, 998.531568, -762.03129], [-859.510979, 997.074456, -762.03129], [-859.763485, 996.111376, -762.03129], [-859.046316, 997.815625, -762.03129], [-858.158689, 997.348836, -762.03129], [-858.813819, 998.186476, -762.03129], [-857.946412, 997.687433, -762.03129], [-857.911492, 997.743132, -762.03129], [-858.638279, 998.466474, -762.03129], [-857.83106, 999.012575, -762.03129], [-858.580535, 998.558579, -762.03129]];
+  /* a face 9 é a dobrada: [3, 0, 15, 14, 12] */
+  const FACES = [[0, 1, 2], [3, 4, 5, 1], [6, 0, 2, 7, 8], [9, 10, 4, 3], [11, 9, 3, 12], [13, 11, 12, 14], [15, 16, 13, 14], [6, 17, 18, 16, 0], [15, 0, 16], [3, 0, 15, 14, 12], [0, 3, 1]];
+  const malha = (): Malha => ({
+    V: new Map(P.map((p, k) => [k, p] as [number, V3])),
+    F: new Map(FACES.map((vs, k) => [k, { vs, parte: 'chapa' }] as [number, { vs: number[]; parte: string }])),
+  });
+
+  it('a face de área quase nula some, absorvida pela vizinha, e a superfície sai do lugar menos que a tolerância', () => {
+    const m = malha();
+    expect(razaoDeFace(m.F.get(9)!.vs.map((v) => m.V.get(v)))).toBeLessThan(1e-3);
+    const r = limparLascas(m, { selecao: null, tolerancia: 0.01 });
+    expect(r.relatorio.finasAntes).toBe(1);
+    expect(r.relatorio.finasDepois).toBe(0);
+    expect(r.facesRemovidas.has(9)).toBe(true);
+    expect(r.relatorio.desvioMaximo).toBeLessThan(0.01);
+    for (const [, vs] of r.faces) expect(razaoDeFace((vs as number[]).map((v) => m.V.get(v)))).toBeGreaterThanOrEqual(0.003);
+  });
+
+  it('sem a tolerância que cobre o ruído ela fica, com o motivo', () => {
+    const r = limparLascas(malha(), { selecao: null, tolerancia: 1e-9 });
+    expect(r.relatorio.finasDepois).toBe(1);
+    expect(r.relatorio.restantes[0].recusas.length).toBeGreaterThan(0);
+  });
+});
+
+/* (f) a face de área nula que o corte do `aparar` deixou no chassi do sedã (CICLO-5.md, atrito 4), com a vizinhança medida: a fita de 17 cantos alinhados,
+   de 4 mm por 0,00008 mm (área 3e-10 m²), e o triângulo de 0,015 mm de aresta, bem proporcionado e sem área para a medida de contatos triangular. A razão
+   área / maior aresta² não pega o segundo, e a fita só sai para a vizinha, também fina; com a área mínima, saem as duas. */
+describe('limparLascas: a face sem área para a medida de contatos', () => {
+  const fx = JSON.parse(readFileSync(new URL('./fixtures/lascas-do-aparar.json', import.meta.url), 'utf8'));
+  const malhaDoAparar = (): Malha => ({ V: new Map(fx.vertices.map((p: V3, i: number) => [i, p])), F: new Map(fx.faces.map((f: { vs: number[]; parte: string }, i: number) => [i, { vs: f.vs, parte: f.parte }])) });
+  const area = (m: Malha, f: number) => { const p = m.F.get(f)!.vs.map((v) => m.V.get(v)!); let nx = 0; let ny = 0; let nz = 0; for (let k = 0; k < p.length; k++) { const a = p[k]; const b = p[(k + 1) % p.length]; nx += (a[1] - b[1]) * (a[2] + b[2]); ny += (a[2] - b[2]) * (a[0] + b[0]); nz += (a[0] - b[0]) * (a[1] + b[1]); } return Math.hypot(nx, ny, nz) / 2; };
+  const AREA_MINIMA = 2.9e-9;
+
+  it('as duas faces da fixture têm área abaixo da mínima, e a fita tem 17 cantos', () => {
+    const m = malhaDoAparar();
+    expect(m.F.get(fx.alvos[0])!.vs.length).toBe(17);
+    for (const a of fx.alvos) expect(area(m, a)).toBeLessThan(AREA_MINIMA);
+  });
+
+  it('sem a área mínima as duas ficam; com ela saem, dentro da tolerância e sem lasca nova', () => {
+    const sem = limparLascas(malhaDoAparar(), { tolerancia: 1e-5 });
+    for (const a of fx.alvos) expect(sem.facesRemovidas.has(a)).toBe(false);
+    const m = malhaDoAparar();
+    const com = limparLascas(m, { tolerancia: 1e-5, areaMinima: AREA_MINIMA });
+    for (const a of fx.alvos) expect(com.facesRemovidas.has(a)).toBe(true);
+    expect(com.relatorio.desvioMaximo).toBeLessThan(1e-5);
+    for (const [f, vs] of com.faces) expect(area({ V: m.V, F: new Map([[f, { vs }]]) } as Malha, f)).toBeGreaterThan(0);
+  });
+
+  it('a área mínima negativa grita', () => {
+    expect(grito(() => limparLascas(malhaDoAparar(), { tolerancia: 1e-5, areaMinima: -1 }))).toMatch(/área mínima/);
+  });
+});
+

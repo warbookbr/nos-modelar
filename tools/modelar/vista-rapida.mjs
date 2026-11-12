@@ -19,19 +19,26 @@
  * O LIMITE. É a imagem de trabalho de quem conduz e do crítico. A luz e o material não são os da bancada, e a imagem que vai à pessoa
  * continua saindo da bancada.
  *
- * Uso: npm run vista:rapida -- <esboço> --vista=<vista> --saida=<png> [--opcao=1] [--largura=900] [--margem=0.08]
- *        [--cores=capo:#e2641e,tampa:#73797d] [--direcao=x,y,z] [--liso=35]
+ * A RECEITA E O RECORTE. O alvo é o esboço ou uma receita de peça (nome ou caminho, como o `descrever`), aberta por `modelo-aberto.mjs`.
+ * `--recorte=x0,y0,z0,x1,y1,z1` (mm do referencial da peça) enquadra a caixa e desenha só o que ela toca; `--ate-passo=N` executa a
+ * receita só até o passo N (a chapa de uma peça grande, sem os passos que vêm depois). Ao lado da imagem sai `<saida>.rapida.json`,
+ * com o quadro e o fundo, de modo que `leitura:regioes --captura=<png>` acha o painel sem `--painel`.
+ *
+ * Uso: npm run vista:rapida -- <esboço ou peça> --vista=<vista> --saida=<png> [--opcao=1] [--largura=900] [--margem=0.08]
+ *        [--cores=capo:#e2641e,tampa:#73797d] [--direcao=x,y,z] [--liso=35] [--recorte=x0,y0,z0,x1,y1,z1] [--ate-passo=N] [--composicoes=<módulo>]
  * Sem npm: node tools/modelar/vista-rapida.mjs <mesmos argumentos>. */
 import { writeFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { FUNDO_DO_PAINEL, imagem, paraPng } from './leitura-por-regioes.mjs';
+import { ErroDoModelo, abrirModelo, faceNoRecorte, lerRecorte, painelDaOpcao, quadroDoRecorte, resumoDaAbertura } from './modelo-aberto.mjs';
 
 export const LISO_PADRAO = 35;
 export const LARGURA_PADRAO = 900;
 export const MARGEM_PADRAO = 0.08;
 export const SUPERAMOSTRAGEM = 2;
+export const LEGENDA_MAXIMA = 12;
 export const CINZA = '#8c8c8c';
 /* a luz, no espaço da câmera: pesos sobre a direita, o cima e o "para o observador" */
 export const LUZ = Object.freeze({ direita: -0.45, cima: 0.75, frente: 0.5, difusa: 0.68, ambiente: 0.32 });
@@ -154,11 +161,15 @@ export function rasterSombreado(faces, o = {}) {
   if (!(margem >= 0 && margem < 2)) throw new ErroDaVista('a margem precisa estar entre 0 e 2');
   const { olhar, direita, cima } = base;
   let u0 = Infinity; let u1 = -Infinity; let v0 = Infinity; let v1 = -Infinity;
-  const proj = faces.map((f) => f.pts.map((p) => {
+  /* com `recorte`, só as faces que a caixa toca entram, e o quadro é o da caixa; a normal de cada canto sai de todas as faces, para a borda do recorte não mudar a luz */
+  const dentro = o.recorte ? faces.map((f) => faceNoRecorte(f.pts, o.recorte)) : null;
+  const proj = faces.map((f, i) => f.pts.map((p) => {
     const u = dot(p, direita); const v = dot(p, cima);
-    if (u < u0) u0 = u; if (u > u1) u1 = u; if (v < v0) v0 = v; if (v > v1) v1 = v;
+    if (!dentro || dentro[i]) { if (u < u0) u0 = u; if (u > u1) u1 = u; if (v < v0) v0 = v; if (v > v1) v1 = v; }
     return [u, v, dot(p, olhar)];
   }));
+  if (dentro && !dentro.some(Boolean)) throw new ErroDaVista('a malha não tem nada dentro do recorte');
+  if (o.recorte) ({ u0, u1, v0, v1 } = quadroDoRecorte(o.recorte, base));
   if (!faces.length || !(u1 > u0) || !(v1 > v0)) throw new ErroDaVista('a malha não tem área nesta vista');
   const folga = margem * Math.max(u1 - u0, v1 - v0);
   u0 -= folga; u1 += folga; v0 -= folga; v1 += folga;
@@ -171,6 +182,7 @@ export function rasterSombreado(faces, o = {}) {
   const nrm = new Float32Array(L * A * 3);
   const cantos = normaisDosCantos(faces, o.liso ?? LISO_PADRAO);
   faces.forEach((f, i) => {
+    if (dentro && !dentro[i]) return;
     const q = proj[i].map(([u, v, d]) => [(u - u0) / passo, (v1 - v) / passo, d]); const nc = cantos[i];
     for (let t = 1; t < q.length - 1; t += 1) {
       const [a, b, c] = [q[0], q[t], q[t + 1]]; const [na, nb, ncc] = [nc[0], nc[t], nc[t + 1]];
@@ -218,8 +230,12 @@ export function rasterSombreado(faces, o = {}) {
 }
 
 /* --- linha de comando ----------------------------------------------------------------------------------------------------------- */
-const AJUDA = `npm run vista:rapida -- <esboço> --vista=<vista> --saida=<png> [--opcao=1] [--largura=${LARGURA_PADRAO}] [--margem=${MARGEM_PADRAO}]
-    [--cores=parte:#rrggbb,...] [--direcao=x,y,z] [--liso=${LISO_PADRAO}]
+const AJUDA = `npm run vista:rapida -- <esboço ou peça> --vista=<vista> --saida=<png> [--opcao=1] [--largura=${LARGURA_PADRAO}] [--margem=${MARGEM_PADRAO}]
+    [--cores=parte:#rrggbb,...] [--direcao=x,y,z] [--liso=${LISO_PADRAO}] [--recorte=x0,y0,z0,x1,y1,z1] [--ate-passo=N] [--composicoes=<módulo>]
+
+O alvo é um esboço (.esboco.json ou módulo) ou uma receita de peça, pelo nome (furgao-realista, braco-robotico/base) ou pelo caminho.
+--recorte é uma caixa em mm do referencial da peça: a imagem enquadra a caixa (margem 0, salvo --margem) e mostra só o que ela toca. --ate-passo=N executa a
+receita só até o passo N, para a chapa de uma peça grande sem os passos que vêm depois.
 
 Desenha a opção sombreada numa câmera ortográfica, sem navegador, sobre o fundo do painel da folha do esboço: a imagem de trabalho
 de quem conduz e do crítico, que leitura:regioes --captura=<png> aceita sem --painel. A imagem que vai à pessoa sai da bancada.
@@ -257,10 +273,14 @@ export function lerArgumentos(argv) {
       cores[nome] = cor;
     }
   }
+  let recorte = null;
+  try { recorte = lerRecorte(valor('recorte')); } catch (e) { if (e instanceof ErroDoModelo) throw new ErroDaVista(e.message); throw e; }
+  const atePasso = valor('ate-passo') === null ? null : Number(valor('ate-passo'));
+  if (atePasso !== null && !(Number.isInteger(atePasso) && atePasso >= 0)) throw new ErroDaVista('--ate-passo espera um inteiro de 0 em diante');
   return {
-    arquivo, saida: valor('saida'), vista, direcao, cores,
+    arquivo, saida: valor('saida'), vista, direcao, cores, recorte, atePasso, composicoes: valor('composicoes'),
     opcao: inteiro('opcao', 1, 1), largura: inteiro('largura', LARGURA_PADRAO, 8),
-    margem: numero('margem', MARGEM_PADRAO, (n) => n >= 0 && n < 2, 'um número entre 0 e 2'),
+    margem: numero('margem', recorte ? 0 : MARGEM_PADRAO, (n) => n >= 0 && n < 2, 'um número entre 0 e 2'),
     liso: numero('liso', LISO_PADRAO, (n) => n >= 0 && n < 180, 'graus entre 0 e 180'),
   };
 }
@@ -272,32 +292,36 @@ export async function executar(argv) {
     if (e instanceof ErroDaVista) return { codigo: 2, stdout: '', stderr: `vista:rapida: ${e.message}\n` };
     throw e;
   }
-  const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
   const t0 = performance.now();
   let montado;
-  try { montado = montarOpcoes(await lerArquivoDeEsboco(resolve(a.arquivo)), { nome: basename(a.arquivo), relato: false }); } catch (e) {
+  try { montado = await abrirModelo(a.arquivo, { ateOPasso: a.atePasso, composicoes: a.composicoes, relato: false }); } catch (e) {
     if (e?.code === 'ENOENT' || e?.code === 'ERR_MODULE_NOT_FOUND') return { codigo: 2, stdout: '', stderr: `vista:rapida: não achei ${a.arquivo}\n` };
     if (e instanceof SyntaxError) return { codigo: 1, stdout: '', stderr: `vista:rapida: o esboço não se lê: ${e.message}\n` };
+    if (e instanceof ErroDoModelo || e?.name === 'ErroDeConfiguracao') return { codigo: 2, stdout: '', stderr: `vista:rapida: ${e.message}\n` };
     throw e;
   }
-  if (montado.recusas?.length) {
-    const texto = montado.recusas.map((r) => (typeof r === 'string' ? r : [r.opcao, r.forma, r.motivo].filter(Boolean).join(': '))).map((r) => `- ${r}`).join('\n');
-    return { codigo: 1, stdout: '', stderr: `vista:rapida: o esboço foi recusado:\n${texto}\n` };
-  }
-  const painel = montado.paineis[a.opcao - 1];
-  if (!painel) return { codigo: 2, stdout: '', stderr: `vista:rapida: o esboço tem ${montado.paineis.length} opções\n` };
+  const { painel, erro } = painelDaOpcao(montado, a.opcao, 'vista:rapida');
+  if (erro) return erro;
   const desconhecidas = Object.keys(a.cores).filter((n) => !painel.partes.includes(n));
   if (desconhecidas.length) return { codigo: 2, stdout: '', stderr: `vista:rapida: --cores cita parte que a opção não tem: ${desconhecidas.join(', ')} (tem ${painel.partes.join(', ')})\n` };
   const t1 = performance.now();
-  const r = rasterSombreado(facesDaOpcao(painel.neutro, a.cores), { vista: a.vista, direcao: a.direcao, largura: a.largura, margem: a.margem, liso: a.liso });
+  let r;
+  try { r = rasterSombreado(facesDaOpcao(painel.neutro, a.cores), { vista: a.vista, direcao: a.direcao, largura: a.largura, margem: a.margem, liso: a.liso, recorte: a.recorte }); } catch (e) {
+    if (e instanceof ErroDaVista) return { codigo: 1, stdout: '', stderr: `vista:rapida: ${e.message}\n` };
+    throw e;
+  }
   const saida = resolve(a.saida);
   writeFileSync(saida, paraPng(r.imagem));
+  /* o quadro da imagem, ao lado dela: o fundo é o do painel em toda a imagem, e `leitura:regioes` o usa no lugar de procurar o painel pelas linhas */
+  writeFileSync(`${saida}.rapida.json`, `${JSON.stringify({ formato: 'modelar.vista-rapida@1', alvo: a.arquivo, origem: montado.origem, vista: a.vista, direcao: a.direcao, recorteMm: a.recorte, atePasso: a.atePasso, largura: r.largura, altura: r.altura, painel: [0, 0, r.largura, r.altura], fundo: FUNDO_DO_PAINEL, mmPorPx: Number(r.mmPorPx.toFixed(4)), quadroMm: r.caixa }, null, 1)}\n`);
   const t2 = performance.now();
   const cores = coresDasPartes(painel.neutro, painel.partes, a.cores);
-  const legenda = Object.entries(cores).map(([n, c]) => `${n} ${c.cor} (${c.origem}${c.cores > 1 ? `, ${c.cores} cores` : ''})`).join(', ');
+  /* uma peça de receita tem uma centena de partes: a legenda mostra as primeiras e conta as outras */
+  const itens = Object.entries(cores).map(([n, c]) => `${n} ${c.cor} (${c.origem}${c.cores > 1 ? `, ${c.cores} cores` : ''})`);
+  const legenda = itens.length > LEGENDA_MAXIMA ? `${itens.slice(0, LEGENDA_MAXIMA).join(', ')}, e mais ${itens.length - LEGENDA_MAXIMA} partes` : itens.join(', ');
   return {
     codigo: 0,
-    stdout: `${r.largura} x ${r.altura} px, ${r.mmPorPx.toFixed(2)} mm por px\ncores: ${legenda}\nmontagem ${((t1 - t0) / 1000).toFixed(1)} s, desenho ${((t2 - t1) / 1000).toFixed(1)} s\n${saida}\n`,
+    stdout: `${resumoDaAbertura(montado) ? `${resumoDaAbertura(montado)}\n` : ''}${r.largura} x ${r.altura} px, ${r.mmPorPx.toFixed(2)} mm por px${a.recorte ? ` (recorte ${a.recorte.min.join(', ')} a ${a.recorte.max.join(', ')} mm)` : ''}\ncores: ${legenda}\nmontagem ${((t1 - t0) / 1000).toFixed(1)} s, desenho ${((t2 - t1) / 1000).toFixed(1)} s\n${saida}\n`,
     stderr: '',
   };
 }

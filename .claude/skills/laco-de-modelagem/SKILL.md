@@ -47,7 +47,9 @@ basta: a pessoa não julga a altura de um anel sem vê-lo sobre a base. As vista
 montadas, em ortográfica, saem de
 `npm run etapas -- <montagem.json> --olhar` (com `--foco <instância>` o quadro fecha na caixa dela), e entram também
 no pacote do crítico, que `vistas:critica` já monta com o quadro na peça. A etapa só fica fixa com o aceite dela, e só
-depois disso a próxima começa. Etapa fixa que uma mudança anterior quebrou
+depois disso a próxima começa. Antes de mostrar, o modelador vê a chapa da etapa em segundos com `npm run vista:rapida -- <peça> --ate-passo=N`
+e um ponto de perto com `bancada --mirar=x,y,z`
+([`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura)). Etapa fixa que uma mudança anterior quebrou
 volta na frente de todas. O estado e a próxima etapa saem de:
 
 ```bash
@@ -101,7 +103,7 @@ com as folhas de divisa. `npm run objeto -- <objeto>` lista o caminho de cada
 uma, e `docs/modelar/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
 crítico sem contar como a peça foi feita.
 
-**revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que grava as
+**revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que mede a receita antes de capturar e recusa a que reprova (`--sem-medir` só para quem quer as imagens sem o crítico), e grava as
 imagens e, na pasta da rodada (`tools/bancadas/out/critica-<peça>/`, ou a de `--saida=<pasta>`), o `pedido.md` pronto, tirado
 da receita: o texto do despacho do `critico-visual`. Não escreva o pedido à mão, nem copie caminho, promessa de parte ou critério
 do `PLANO`; mande o texto do `pedido.md` como está. Foto de terceiro não entra no repositório, e quem conduz a traz ao pedido com `--referencia=<caminho absoluto da imagem>[@<vista>]` (repetível, o caminho não é gravado). Ele traz, nesta ordem, o objeto, o alvo, as referências, o modelo (as vistas

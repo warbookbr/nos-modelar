@@ -337,6 +337,51 @@ describe('a pele de fora e a parede do corte', () => {
   });
 });
 
+describe('o fundo do vão', () => {
+  /* a e b a 4 mm uma da outra, com a pele de fora em +z; `ancora` fica longe, em z -100, só para o centro do modelo ficar abaixo das chapas (a pele de fora olha para longe dele) */
+  const ancora = chapa('ancora', [500, 0, -100], X, Y, Z, [10, 10, 10]);
+  const forro = (z) => chapa('forro', [-10, -10, z], X, Y, Z, [130, 120, 2]);
+  const quadro = (extra = []) => [...duasChapas(), ...ancora, ...extra];
+  const linha = (faces, o = {}) => par(faces, { esperado: 4, fundo: 60, ...o });
+
+  it('o vão que deixa ver o outro lado é sem fundo: sai em fora, com a linha de 100 mm e a caixa dos pontos', () => {
+    const p = linha(quadro());
+    expect(p.semFundo).toMatchObject({ profundidade: 60, motivo: null });
+    expect(p.semFundo.linhaMm).toBeGreaterThan(90); expect(p.semFundo.linhaMm).toBeLessThan(115);
+    expect(p.semFundo.de3[0]).toBeCloseTo(102, 0); expect(p.semFundo.ate3[0]).toBeCloseTo(102, 0);
+    expect(p.fora.map((f) => f.motivo)).toEqual([expect.stringMatching(/^vão sem fundo: de fora se vê, por ele, o outro lado do modelo, a 60 mm/)]);
+    expect(linhaDoPar(p)).toMatch(/\[sem fundo a 60 mm: /);
+  });
+
+  it('com uma parte atrás do vão, dentro da profundidade, o vão tem fundo; além dela, não; e o modelo todo vale como profundidade', () => {
+    const coberto = linha(quadro(forro(-12)));
+    /* as pontas da linha, onde a aresta vira, escapam do forro por poucos mm, e menos que `linhaMinima` é ponto isolado */
+    expect(coberto.semFundo?.linhaMm ?? 0).toBeLessThan(10);
+    expect(coberto.fora).toEqual([]);
+    expect(linha(quadro(forro(-12)), { fundo: Infinity }).fora).toEqual([]);
+    const curto = linha(quadro(forro(-12)), { fundo: 5 });
+    expect(curto.semFundo.linhaMm).toBeGreaterThan(90);
+    expect(curto.fora).toHaveLength(1);
+  });
+
+  it('o par declarado sem fundo guarda o motivo e não sai em fora', () => {
+    const p = linha(quadro(), { semFundo: { 'a|b': 'vão aberto de propósito, a lanterna cobre por dentro' } });
+    expect(p.semFundo.motivo).toMatch(/lanterna/);
+    expect(p.fora).toEqual([]);
+  });
+
+  it('sem `fundo` a medida não existe, e o resultado é o de antes', () => {
+    const p = par(quadro(), { esperado: 4 });
+    expect(p.semFundo).toBeUndefined();
+    expect(p.fora).toEqual([]);
+  });
+
+  it('fundo que não é número maior que zero é recusado, e a linha de comando traz --fundo e --sem-fundo', () => {
+    expect(() => vaoEntrePartes(quadro(), { fundo: 0 })).toThrow(ErroDoVao);
+    expect(() => vaoEntrePartes(quadro(), { fundo: -3 })).toThrow(/fundo espera/);
+  });
+});
+
 describe('a ficha', () => {
   it('a capacidade vaoEntrePartes se acha por vão, folga, degrau, painel e parte solta', () => {
     expect(CAPACIDADES.vaoEntrePartes).toBeDefined();

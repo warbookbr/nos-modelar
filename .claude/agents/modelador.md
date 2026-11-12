@@ -77,7 +77,12 @@ npm run descrever -- <peça>
 node tools/modelar/conferir-pontos.mjs <peça>
 npm run guarda:acervo -- <peça>
 npm run guarda:referencial -- <peça>
+node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
 ```
+
+O último é a medição que o registro da rodada cobra, e conta a face fina que
+os outros não contam: enquanto ele responder `modelar` por medição reprovada,
+a peça não vai ao crítico.
 
 Com o nome da peça, as guardas conferem só ela; o acervo inteiro fica para os
 gates. A saída do `descrever` é o resumo, e `--partes=a,b` mede um encaixe.

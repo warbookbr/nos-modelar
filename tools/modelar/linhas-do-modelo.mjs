@@ -23,6 +23,7 @@ import { basename, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { imagem, paraPng } from './leitura-por-regioes.mjs';
+import { ErroDoModelo, abrirModelo, lerRecorte, painelDaOpcao, quadroDoRecorte, recortarFaces, resumoDaAbertura } from './modelo-aberto.mjs';
 
 export const DEGRAU_MM = 12;
 export const QUINA_GRAUS = 38;
@@ -136,26 +137,39 @@ export function facesDoNeutro(neutro, partes) {
   return [...neutro.F.values()].sort((a, b) => a.id - b.id).map((f) => ({ pts: f.vs.map((v) => neutro.V.get(v).map((c) => c * 1000)), parte: indice.get(f.parte) ?? partes.length + 1 }));
 }
 
-const AJUDA = `npm run linhas:modelo -- <esboço> --vista=<vista> --saida=<png> [--opcao=1] [--largura=1200]
+const AJUDA = `npm run linhas:modelo -- <esboço ou peça> --vista=<vista> --saida=<png> [--opcao=1] [--largura=1200]
+    [--recorte=x0,y0,z0,x1,y1,z1] [--ate-passo=N] [--composicoes=<módulo>]
 
 Desenha as linhas que o modelo tem na vista, tiradas da malha: contorno e divisa de partes em vermelho, quina e degrau em azul,
-dobra fechada em verde. A imagem tem a caixa do objeto inteira e é a que leitura:regioes --linhas=<png> espera.`;
+dobra fechada em verde. A imagem tem a caixa do objeto inteira e é a que leitura:regioes --linhas=<png> espera.
+O alvo é um esboço ou uma receita de peça (nome ou caminho). --recorte, uma caixa em mm do referencial da peça, enquadra a caixa e
+desenha só o que ela toca (o mesmo quadro da vista:rapida com o mesmo --recorte e --margem=0, a menos de meio pixel na altura); --ate-passo=N executa a receita só até o passo N.`;
 
 export async function executar(argv) {
   const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };
   const arquivo = argv.find((a) => !a.startsWith('--'));
   if (argv.includes('--ajuda') || argv.includes('--help') || !arquivo) return { codigo: arquivo ? 0 : (argv.length ? 2 : 0), stdout: `${AJUDA}\n`, stderr: '' };
   if (!valor('vista') || !valor('saida')) return { codigo: 2, stdout: '', stderr: 'linhas:modelo: faltam --vista e --saida\n' };
-  const { lerArquivoDeEsboco, montarOpcoes } = await import('./esboco-nucleo.mjs');
-  const montado = montarOpcoes(await lerArquivoDeEsboco(resolve(arquivo)), { nome: basename(arquivo), relato: false });
-  if (montado.recusas?.length) return { codigo: 1, stdout: '', stderr: `linhas:modelo: o esboço foi recusado:\n${montado.recusas.map((r) => `- ${r}`).join('\n')}\n` };
-  const painel = montado.paineis[Number(valor('opcao') ?? 1) - 1];
-  if (!painel) return { codigo: 2, stdout: '', stderr: `linhas:modelo: o esboço tem ${montado.paineis.length} opções\n` };
-  const r = rasterizar(facesDoNeutro(painel.neutro, painel.partes), valor('vista'), Number(valor('largura') ?? 1200));
+  let montado; let recorte;
+  try {
+    recorte = lerRecorte(valor('recorte'));
+    const ate = valor('ate-passo') === null ? null : Number(valor('ate-passo'));
+    montado = await abrirModelo(arquivo, { ateOPasso: ate, composicoes: valor('composicoes'), relato: false });
+  } catch (e) {
+    if (e instanceof ErroDoModelo || e?.name === 'ErroDeConfiguracao') return { codigo: 2, stdout: '', stderr: `linhas:modelo: ${e.message}\n` };
+    throw e;
+  }
+  const { painel, erro } = painelDaOpcao(montado, Number(valor('opcao') ?? 1), 'linhas:modelo');
+  if (erro) return erro;
+  const todas = facesDoNeutro(painel.neutro, painel.partes);
+  const faces = recortarFaces(todas, recorte);
+  if (!faces.length) return { codigo: 1, stdout: '', stderr: 'linhas:modelo: a malha não tem nada dentro do recorte\n' };
+  const r = rasterizar(faces, valor('vista'), Number(valor('largura') ?? 1200), recorte ? quadroDoRecorte(recorte, baseDaVista(valor('vista'))) : null);
   const linhas = linhasDoRaster(r);
   writeFileSync(resolve(valor('saida')), paraPng(desenharLinhas(r, linhas)));
   const conta = [0, 0, 0, 0, 0]; for (const v of linhas) conta[v] += 1;
-  return { codigo: 0, stdout: `${r.largura} x ${r.altura} px, ${r.mmPorPx.toFixed(2)} mm por px; contorno ${conta[4]}, divisa ${conta[3]}, quina ${conta[2]}, dobra ${conta[1]} px\n${resolve(valor('saida'))}\n`, stderr: '' };
+  const abertura = resumoDaAbertura(montado);
+  return { codigo: 0, stdout: `${abertura ? `${abertura}\n` : ''}${r.largura} x ${r.altura} px, ${r.mmPorPx.toFixed(2)} mm por px; contorno ${conta[4]}, divisa ${conta[3]}, quina ${conta[2]}, dobra ${conta[1]} px\n${resolve(valor('saida'))}\n`, stderr: '' };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

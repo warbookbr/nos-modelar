@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:9ef2ae80d182473daa46fa783413782309a3a31b3f61981bbbc108739332270c",
+  "assinatura": "sha256:be3e371d8227814ba7bc9f0f0b90922921d5a0e16f7342081df9de37a5d414d7",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -68,6 +68,41 @@
             "intencao": "Remover exatamente uma face, preferencialmente por seleção semântica.",
             "schema": "mecanifica.argumentos.apagaFace@1",
             "obrigatorios": []
+          }
+        },
+        {
+          "id": "mecanifica.operacao.aparar",
+          "nome": "aparar",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [
+              "mecanifica.malha-poligonal@1"
+            ],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "transforma-malha"
+          ],
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.",
+            "schema": "mecanifica.argumentos.aparar@1",
+            "obrigatorios": [
+              "origemId",
+              "solido",
+              "chapa",
+              "folga",
+              "fecha"
+            ]
           }
         },
         {
@@ -1300,6 +1335,41 @@
         "intencao": "Remover exatamente uma face, preferencialmente por seleção semântica.",
         "schema": "mecanifica.argumentos.apagaFace@1",
         "obrigatorios": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.aparar",
+      "nome": "aparar",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.",
+        "schema": "mecanifica.argumentos.aparar@1",
+        "obrigatorios": [
+          "origemId",
+          "solido",
+          "chapa",
+          "folga",
+          "fecha"
+        ]
       }
     },
     {

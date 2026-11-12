@@ -8,8 +8,8 @@
  * O CAMPO. `PLANO.dobrasAceitas: [{ parte, motivo, regiao, tipos? }]`:
  *  - `parte`: o nome de uma parte do plano. O achado vale quando a parte dele é essa (ou uma das que ele junta, `a+b`).
  *  - `motivo`: por que a feição é desenho, em pelo menos 15 caracteres, como o motivo de contato. Campo livre que aceita "ok" é campo que some.
- *  - `regiao`: `{ min: [x, y, z], max: [x, y, z] }`, obrigatória, em milímetro, no referencial da peça. O achado vale quando a posição dele cai dentro
- *    da caixa. Aceitar a parte inteira esconderia também o defeito que aparecesse nela depois (decisão da pessoa, 2026-11-08).
+ *  - `regiao`: `{ min: [x, y, z], max: [x, y, z] }`, obrigatória, em milímetro, no referencial da peça. O achado vale quando a cadeia inteira dele (a caixa
+ *    dos vértices, `caixaMm`) cabe na caixa; a ponta que sai dela, onde havia nó ou ruga, volta a ser achado (2026-11-12). Aceitar a parte inteira esconderia também o defeito que aparecesse nela depois (decisão da pessoa, 2026-11-08).
  *  - `tipos`: subconjunto de 'dobra', 'vinco' e 'chanfro'; sem ele, os três.
  * O normalizador recusa: lista vazia ou com mais de 64 itens; parte que não está em `partes` do plano; motivo curto, longo, ou com UUID ou caminho
  * absoluto; região com os dois cantos iguais ou invertidos, ou com número que não é finito; tipo desconhecido ou repetido; chave que não é uma
@@ -57,7 +57,7 @@ export function normalizarDobrasAceitas(valor, nomesDasPartes, { quem = 'PLANO' 
     }
     const motivo = typeof item.motivo === 'string' ? item.motivo.trim() : '';
     if (motivo.length < MINIMO_DO_MOTIVO) falhar(quem, `'${onde}.motivo' precisa dizer, em pelo menos ${MINIMO_DO_MOTIVO} caracteres, por que a feição é desenho.`);
-    if (motivo.length > LIMITE_TEXTO) falhar(quem, `'${onde}.motivo' excede ${LIMITE_TEXTO} caracteres.`);
+    if (motivo.length > LIMITE_TEXTO) falhar(quem, `'${onde}.motivo' excede ${LIMITE_TEXTO} caracteres (tem ${motivo.length}, ${motivo.length - LIMITE_TEXTO} a mais que o limite).`);
     if (UUID.test(motivo) || ABSOLUTO.test(motivo)) falhar(quem, `'${onde}.motivo' não pode conter UUID, caminho absoluto ou binário local.`);
     const aceita = { parte: item.parte.trim(), motivo };
     if (item.regiao === undefined) falhar(quem, `'${onde}.regiao' é obrigatória: a caixa { min: [x, y, z], max: [x, y, z] } em mm onde a feição é de propósito; aceitar a parte inteira esconderia o defeito que aparecesse nela depois.`);
@@ -83,13 +83,33 @@ export function normalizarDobrasAceitas(valor, nomesDasPartes, { quem = 'PLANO' 
   return itens.sort((a, b) => (a.parte < b.parte ? -1 : a.parte > b.parte ? 1 : a.motivo < b.motivo ? -1 : a.motivo > b.motivo ? 1 : 0));
 }
 
-/** A aceitação que cobre o achado `{ tipo, parte, posicaoMm }`, ou null. */
+/**
+ * A extensão de uma cadeia de arestas: `pontasMm` são os dois vértices mais distantes entre si (o mais longe do centro, e o mais longe dele) e `caixaMm` é a
+ * caixa dos vértices, arredondada para fora na casa de 0,1 mm, para a borda de uma região justa não cair por arredondamento. `pontos` são em metro.
+ */
+export function extensaoDaCadeia(pontos) {
+  const mm = pontos.map((p) => p.map((x) => x * 1000));
+  const centro = [0, 1, 2].map((j) => mm.reduce((s, p) => s + p[j], 0) / mm.length);
+  const maisLonge = (de) => mm.reduce((m, p) => (Math.hypot(p[0] - de[0], p[1] - de[1], p[2] - de[2]) > Math.hypot(m[0] - de[0], m[1] - de[1], m[2] - de[2]) ? p : m), mm[0]);
+  const a = maisLonge(centro); const b = maisLonge(a);
+  const lim = (f, k) => f(...mm.map((p) => p[k]));
+  const fora = (x, f) => { const r = f(x * 10) / 10; return Object.is(r, -0) ? 0 : r; };
+  const um = (x) => { const r = Math.round(x * 10) / 10; return Object.is(r, -0) ? 0 : r; };
+  return {
+    pontasMm: [a, b].sort((p, q) => p[0] - q[0] || p[1] - q[1] || p[2] - q[2]).map((p) => p.map(um)),
+    caixaMm: { min: [0, 1, 2].map((k) => fora(lim(Math.min, k), Math.floor)), max: [0, 1, 2].map((k) => fora(lim(Math.max, k), Math.ceil)) },
+  };
+}
+
+/** A aceitação que cobre o achado `{ tipo, parte, posicaoMm, caixaMm? }`, ou null. Com `caixaMm` (a caixa da cadeia inteira), a região vale quando contém a caixa
+ *  toda, e a ponta da cadeia que sai dela é achado; sem `caixaMm`, vale a posição, como antes. */
 export function aceitacaoDe(aceitas, achado) {
   const partes = String(achado.parte ?? '').split('+');
   for (const a of aceitas ?? []) {
     if (!partes.includes(a.parte)) continue;
     if (a.tipos && !a.tipos.includes(achado.tipo)) continue;
-    if (a.regiao && !achado.posicaoMm.every((x, k) => x >= a.regiao.min[k] && x <= a.regiao.max[k])) continue;
+    const pontos = achado.caixaMm ? [achado.caixaMm.min, achado.caixaMm.max] : [achado.posicaoMm];
+    if (a.regiao && !pontos.every((p) => p.every((x, k) => x >= a.regiao.min[k] && x <= a.regiao.max[k]))) continue;
     return a;
   }
   return null;

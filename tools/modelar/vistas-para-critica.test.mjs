@@ -10,10 +10,12 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  decidirLuzRasante, fracaoVisivelDaPeca, lerReferenciasExternas, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
+  MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
 } from './vistas-para-critica.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
+/* A medição da receita trocada por uma que passa: o pacote mede antes de capturar, e os testes do pacote não pagam a medição real. */
+const medirPassa = async () => ({ passou: true, sha256: 'sha256:de-ensaio', relatorio: 'ok' });
 afterAll(() => rmSync(area, { recursive: true, force: true }));
 
 describe('imagens antigas da peça', () => {
@@ -289,7 +291,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const resultado = await vistasParaCritica(PECA, {
       saida: pasta,
       pastaDasCapturas: base,
-      dependencias: {
+      dependencias: { medirReceita: medirPassa,
         olharBancada: bancada.fazer,
         sobreposicaoDeCortes: async ({ saida }) => {
           const arquivos = ['x', 'y', 'z'].map((e) => { const a = join(saida, `sobreposicao-${e}.png`); writeFileSync(a, e); return a; });
@@ -343,7 +345,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const bancada = bancadaFalsa(base, PECA);
     await vistasParaCritica(PECA, {
       saida: pasta, pastaDasCapturas: base,
-      dependencias: {
+      dependencias: { medirReceita: medirPassa,
         olharBancada: bancada.fazer,
         sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
       },
@@ -360,7 +362,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const pasta = join(base, 'rodada');
     await expect(vistasParaCritica(PECA, {
       saida: pasta, pastaDasCapturas: base,
-      dependencias: { olharBancada: async () => ({ ok: false, erro: { mensagem: 'a bancada caiu' }, resultado: { arquivos: [] } }) },
+      dependencias: { medirReceita: medirPassa, olharBancada: async () => ({ ok: false, erro: { mensagem: 'a bancada caiu' }, resultado: { arquivos: [] } }) },
     })).rejects.toThrow(/a captura do conjunto não produziu imagem: a bancada caiu/);
     expect(existsSync(join(pasta, 'pedido.md'))).toBe(false);
   }, 60_000);
@@ -372,7 +374,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const registro = { aberturas: 0, fechamentos: 0, recebidas: [] };
     const compartilhada = { async fechar() { registro.fechamentos += 1; } };
     let chamada = 0;
-    const dependencias = {
+    const dependencias = { medirReceita: medirPassa,
       abrirCaptura: async () => { registro.aberturas += 1; return compartilhada; },
       olharBancada: async (opcoes) => {
         registro.recebidas.push(opcoes.compartilhada);
@@ -394,7 +396,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const base = mkdtempSync(join(area, 'prazo-'));
     const bancada = bancadaFalsa(base, PECA);
     const prazos = [];
-    const dependencias = { olharBancada: async (opcoes) => { prazos.push(opcoes.prazoDeCargaMs); return bancada.fazer(opcoes); } };
+    const dependencias = { medirReceita: medirPassa, olharBancada: async (opcoes) => { prazos.push(opcoes.prazoDeCargaMs); return bancada.fazer(opcoes); } };
     await vistasParaCritica(PECA, { saida: join(base, 'rodada'), pastaDasCapturas: base, prazoDeCargaMs: 300_000, dependencias });
     expect(prazos.length).toBeGreaterThan(3);
     expect(prazos.every((p) => p === 300_000)).toBe(true);
@@ -405,7 +407,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     let capturou = false;
     await expect(vistasParaCritica(PECA, {
       saida: join(base, 'rodada'), pastaDasCapturas: base,
-      dependencias: {
+      dependencias: { medirReceita: medirPassa,
         olharBancada: async () => { capturou = true; },
         esbocoDeclarado: async () => ({
           esboco: join(process.cwd(), 'tools/fixtures/forma-do-esboco/bloco.formas.json'), opcao: 2, minimo: 0.9, ligadas: { bloco: ['bloco'] },
@@ -423,7 +425,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     let capturou = false;
     await expect(vistasParaCritica(PECA, {
       saida: join(base, 'rodada'), pastaDasCapturas: base,
-      dependencias: {
+      dependencias: { medirReceita: medirPassa,
         olharBancada: async () => { capturou = true; },
         esbocoDeclarado: async () => ({ esboco: sem, opcao: 1, minimo: 0.9, ligadas: { bloco: ['bloco'] } }),
       },
@@ -446,7 +448,7 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     const ids = Object.values(declarado.ligadas).flatMap((v) => (Array.isArray(v) ? v : v.formas));
     const resultado = await vistasParaCritica(PECA, {
       saida: pasta, pastaDasCapturas: base,
-      dependencias: {
+      dependencias: { medirReceita: medirPassa,
         olharBancada: bancada.fazer,
         sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
         olharEtapas: async (arquivo, opcoes) => { pedidosDeEtapas.push({ arquivo, opcoes }); return olharEtapas(arquivo, opcoes); },
@@ -483,7 +485,7 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     expect(pedidosDeCortes[0]).toMatchObject({ pasta, montagem: { instancia: 'motor' }, cortesDeclarados: [] });
     expect(titulos(pedido)).toContain('Encaixes em corte');
     expect(titulos(pedido).indexOf('Encaixes em corte')).toBe(titulos(pedido).indexOf('Montado') + 1);
-    expect(pedido).toContain(`- com \`fuselagem\` (posição motorNaFuselagem): folga de 0,50 mm no corte, 0,50 mm entre as malhas; plano x = 1,0 mm, visto de +x (direita da imagem -z, cima +y): ${join(pasta, 'corte-motor-fuselagem.png')}`);
+    expect(pedido).toContain(`- com \`fuselagem\` (posição motorNaFuselagem): folga de 0,50 mm no corte, 0,50 mm entre as malhas; sem contato declarado para o par: todo cruzamento ou toque entre as duas é achado; plano x = 1,0 mm, visto de +x (direita da imagem -z, cima +y): ${join(pasta, 'corte-motor-fuselagem.png')}`);
     expect(resultado.encaixes).toHaveLength(1);
   }, 60_000);
 
@@ -740,6 +742,45 @@ describe('a vista em corte nos encaixes', () => {
     expect(declarado.folga.folgaMm).toBeCloseTo(0.5, 6);
   });
 
+  it('o contato declarado na montagem chega ao encaixe com o motivo, e o par sem declaração sai sem contato', async () => {
+    const { encaixesDaPeca, contatosDeclaradosDaMontagem } = await import('./vistas-para-critica.mjs');
+    const dado = { auditoriaIntersecoes: { expectativas: [
+      { id: 'pinoEntra', a: { caminho: ['pino'] }, b: { caminho: ['bloco'] }, motivo: 'o pino entra 2 mm no bloco, onde é colado' },
+      { id: 'vigaComChao', a: { caminho: ['viga'] }, b: { caminho: ['chao'] }, motivo: 'a viga assenta no chão' },
+    ] } };
+    const contatos = contatosDeclaradosDaMontagem(dado, 'bloco');
+    expect([...contatos.entries()]).toEqual([['pino', [{ id: 'pinoEntra', motivo: 'o pino entra 2 mm no bloco, onde é colado' }]]]);
+    const encaixes = encaixesDaPeca({ folhas: [folha('bloco', bloco), folha('tampa', tampa), folha('pino', pino)], instancia: 'bloco', contatos });
+    expect(encaixes.find((e) => e.vizinha === 'pino').contatos).toEqual([{ id: 'pinoEntra', motivo: 'o pino entra 2 mm no bloco, onde é colado' }]);
+    expect(encaixes.find((e) => e.vizinha === 'tampa').contatos).toEqual([]);
+  });
+
+  it('o pedido diz, na linha do corte, o motivo do contato declarado e que o toque dele é o esperado; sem declaração, que todo cruzamento é achado', () => {
+    const base = { arquivo: '/p/c.png', origens: ['posição x'], folgaMm: 0, folgaNoCorteMm: 0, cruzam: true, plano: 'x = 1,0 mm, visto de +x', declarado: false };
+    const com = montarPedido({ peca: 'x/y', encaixes: [{ ...base, vizinha: 'carroceria', contatos: [{ id: 'a', motivo: 'o vidro encosta por dentro na borda do vão' }] }] });
+    expect(com).toContain('contato declarado, motivo escrito na declaração: «o vidro encosta por dentro na borda do vão»; o cruzamento ou o toque que esse motivo descreve é o esperado, e só é defeito o que passa do declarado');
+    expect(com).not.toContain('sem contato declarado');
+    const sem = montarPedido({ peca: 'x/y', encaixes: [{ ...base, vizinha: 'tampa' }] });
+    expect(sem).toContain('sem contato declarado para o par: todo cruzamento ou toque entre as duas é achado');
+  });
+
+  it('a caixa de cada parte sai em mm, x y z, da malha executada, e o pedido a põe junto da forma prometida', async () => {
+    const { caixasDasPartes } = await import('./vistas-para-critica.mjs');
+    const roda = caixaNeutra([0, 0, 0], [0.0116, 0.466, 0.466], 'disco');
+    const aro = caixaNeutra([0, 0, 0], [0.0044, 0.466, 0.466], 'aro');
+    const neutro = { V: new Map([...roda.V].map(([i, p]) => [i, p]).concat([...aro.V].map(([i, p]) => [i + 8, p]))), F: new Map([...roda.F.values()].map((f) => [f.id, f]).concat([...aro.F.values()].map((f) => [f.id + 6, { ...f, id: f.id + 6, vs: f.vs.map((v) => v + 8) }]))) };
+    const caixas = caixasDasPartes(neutro);
+    expect([...caixas.keys()]).toEqual(['disco', 'aro']);
+    expect(caixas.get('disco')[0]).toBeCloseTo(11.6, 6);
+    expect(caixas.get('disco')[1]).toBeCloseTo(466, 6);
+    expect(caixas.get('aro')[0]).toBeCloseTo(4.4, 6);
+    const pedido = montarPedido({ ...DADOS, partes: [{ nome: 'bloco', caixaMm: caixas.get('disco'), imagens: [{ arquivo: '/o/p.png', vista: 'direita' }] }, { nome: 'viga', imagens: [] }] });
+    const bloco = pedido.slice(pedido.indexOf('### bloco'), pedido.indexOf('### viga'));
+    expect(bloco).toContain('Forma prometida: caixa de 200 por 100 mm com um furo passante');
+    expect(bloco).toContain('Caixa da parte na malha executada: 11,6 por 466,0 por 466,0 mm (x, y, z)');
+    expect(pedido.slice(pedido.indexOf('### viga'))).not.toContain('Caixa da parte');
+  });
+
   it('a imagem do corte é um PNG com a peça e a vizinha em cores diferentes', async () => {
     const { encaixesDaPeca, imagemDoCorte, COR_DA_PECA, COR_DA_VIZINHA } = await import('./vistas-para-critica.mjs');
     const { dePng } = await import('./leitura-por-regioes.mjs');
@@ -756,15 +797,15 @@ describe('a vista em corte nos encaixes', () => {
   it('o pedido lista cada corte com a vizinha, de onde veio a declaração, a folga e o plano, e diz o que a imagem mostra', () => {
     const encaixes = [
       { arquivo: '/p/corte-bloco-tampa.png', vizinha: 'tampa', origens: ['posição tampaNoBloco'], folgaMm: 0.354, folgaNoCorteMm: 0.354, cruzam: false, plano: 'x = 50,0 mm, visto de +x (direita da imagem -z, cima +y)', declarado: false },
-      { arquivo: '/p/corte-bloco-pino.png', vizinha: 'pino', origens: ['contato declarado pinoEntra'], folgaMm: 0, folgaNoCorteMm: 0, cruzam: true, plano: 'z = 50,0 mm, visto de +z (direita da imagem +x, cima +y)', declarado: true },
+      { arquivo: '/p/corte-bloco-pino.png', vizinha: 'pino', origens: ['contato declarado pinoEntra'], folgaMm: 0, folgaNoCorteMm: 0, cruzam: true, plano: 'z = 50,0 mm, visto de +z (direita da imagem +x, cima +y)', declarado: true, contatos: [{ id: 'pinoEntra', motivo: 'o pino entra 2 mm no bloco' }] },
     ];
     const pedido = montarPedido({ ...DADOS, encaixes });
     expect(titulos(pedido)).toEqual(['Objeto', 'Alvo', 'Referências', 'Modelo', 'Montado', 'Encaixes em corte', 'Sobreposição', 'Partes', 'Critérios de reprovação', 'Perguntas', 'Veredito']);
     const secao = pedido.slice(pedido.indexOf('## Encaixes em corte'), pedido.indexOf('## Sobreposição'));
     expect(secao).toContain('As vistas montadas não decidem a profundidade de um encaixe');
     expect(secao).toContain('a peça em laranja, a vizinha em azul, roxo onde as duas se cruzam');
-    expect(secao).toContain('- com `tampa` (posição tampaNoBloco): folga de 0,35 mm no corte, 0,35 mm entre as malhas; plano x = 50,0 mm, visto de +x (direita da imagem -z, cima +y): /p/corte-bloco-tampa.png');
-    expect(secao).toContain('- com `pino` (contato declarado pinoEntra): as duas se cruzam ou se tocam no corte, 0,00 mm entre as malhas; plano z = 50,0 mm, visto de +z (direita da imagem +x, cima +y), declarado: /p/corte-bloco-pino.png');
+    expect(secao).toContain('- com `tampa` (posição tampaNoBloco): folga de 0,35 mm no corte, 0,35 mm entre as malhas; sem contato declarado para o par: todo cruzamento ou toque entre as duas é achado; plano x = 50,0 mm, visto de +x (direita da imagem -z, cima +y): /p/corte-bloco-tampa.png');
+    expect(secao).toContain('- com `pino` (contato declarado pinoEntra): as duas se cruzam ou se tocam no corte, 0,00 mm entre as malhas; contato declarado, motivo escrito na declaração: «o pino entra 2 mm no bloco»; o cruzamento ou o toque que esse motivo descreve é o esperado, e só é defeito o que passa do declarado; plano z = 50,0 mm, visto de +z (direita da imagem +x, cima +y), declarado: /p/corte-bloco-pino.png');
   });
 });
 
@@ -872,4 +913,48 @@ describe('a peça em foco tapada na vista montada', () => {
     const pedido = montarPedido({ peca: 'x', montado: { instancia: 'pes', imagens: entram, fora } });
     expect(pedido).toContain('Ficaram de fora, porque as outras peças tapam a peça em foco: superior (a peça aparece em 0 % da silhueta dela).');
   });
+});
+
+describe('a medição da receita antes do pacote', () => {
+  const PECA = 'tools/fixtures/forma-do-esboco/ok/receita.js';
+  const sobreposicaoDeCortes = async () => ({ arquivos: [], paineis: [], notas: [] });
+
+  it('a receita que reprova não captura nada, não grava pedido e devolve o relatório e o comando que repete a medição', async () => {
+    const base = mkdtempSync(join(area, 'reprova-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, PECA);
+    const medidas = [];
+    const medirReprova = async (p) => { medidas.push(p); return { passou: false, sha256: 'sha256:x', relatorio: 'peça nova de chapa de lataria com 337 face(s) fina(s)' }; };
+    const erro = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancada.fazer, sobreposicaoDeCortes, medirReceita: medirReprova } }).catch((e) => e);
+    expect(erro).toBeInstanceOf(ReceitaReprovada);
+    expect(erro.message).toContain('337 face(s) fina(s)');
+    expect(erro.message).toContain('O crítico só julga receita que passa nas medidas');
+    expect(erro.message).toContain(`node tools/modelar/rodada-de-modelagem.mjs ${PECA} --acao`);
+    expect(medidas).toEqual([PECA]);
+    expect(bancada.chamadas).toHaveLength(0);
+    expect(existsSync(join(pasta, 'pedido.md'))).toBe(false);
+  });
+
+  it('a receita que passa segue como antes, e o relatório e o pedido dizem a medição e o hash medido', async () => {
+    const base = mkdtempSync(join(area, 'passa-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, PECA);
+    const resultado = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, dependencias: { olharBancada: bancada.fazer, sobreposicaoDeCortes, medirReceita: medirPassa } });
+    expect(bancada.chamadas.length).toBeGreaterThan(0);
+    expect(resultado.medicao).toEqual({ passou: true, sha256: 'sha256:de-ensaio' });
+    expect(imprimir(resultado)).toContain('MEDIÇÃO DA RECEITA: passou (sha256:de-ensaio)');
+    expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain('Medição da receita: passou (sha256:de-ensaio).');
+  }, 60_000);
+
+  it('--sem-medir monta o pacote sem medir, e o relatório e o pedido dizem que saiu sem medição', async () => {
+    const base = mkdtempSync(join(area, 'sem-medir-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, PECA);
+    const medirProibida = async () => { throw new Error('não devia medir'); };
+    const resultado = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, semMedir: true, dependencias: { olharBancada: bancada.fazer, sobreposicaoDeCortes, medirReceita: medirProibida } });
+    expect(bancada.chamadas.length).toBeGreaterThan(0);
+    expect(resultado.medicao).toEqual({ passou: false, motivo: MOTIVO_SEM_MEDIR });
+    expect(imprimir(resultado)).toContain('MEDIÇÃO DA RECEITA: NÃO FEITA');
+    expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain(`Medição da receita: NÃO FEITA: ${MOTIVO_SEM_MEDIR}.`);
+  }, 60_000);
 });

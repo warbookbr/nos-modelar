@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1966 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2024 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -444,6 +444,10 @@
 
 - `CICLO-1.md` — Sedã em alta definição, ciclo 1: o corpo de baixo e o capô por dois caminhos
 - `CICLO-2.md` — Sedã em alta definição, ciclo 2: o corpo de baixo e o capô pelo caminho A, com as ferramentas novas
+- `CICLO-3.md` — Sedã em alta definição, ciclo 3: o andar de cima sobre o de baixo
+- `CICLO-4.md` — Sedã em alta definição, ciclo 4: a cabine sem contornos, e a frente e a traseira até o eixo
+- `CICLO-5.md` — Sedã em alta definição, ciclo 5: o carro inteiro
+- `RECEITA.md` — Sedã em alta definição: o carro em receitas
 
 ## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
 
@@ -787,9 +791,11 @@
 - `atalho.test.js` — atalho.test.js — o atalho de posição do esboço 2.0, em mm: centro, sobre, ponta, desloca e rotacao resolvidos pela caixa da malha que o núcleo gerou, as form…
 - `conexo-em-metro.test.js` — conexo-em-metro.test.js — o conversor de mm para metro do esboço e os passos `parte` com `onde.conexo` que `paineisPorVaos` devolve: `de` e `ate` são medidas…
 - `contatos-declarados.test.js` — contatos-declarados.test.js — a opção só de passos crus executada uma vez, com o mesmo neutro do caminho de antes, e o contato declarado na opção (`contatos`…
+- `espelhados.test.js` — espelhados.test.js — o par de partes Dir e Esq que medem diferente aparece como assimetria no relato de contatos. O sedã de alta definição chegou ao modo est…
 - `leitor.test.js` — leitor.test.js — o leitor dos esboços antigos: cada `.esboco.json` versionado abre no esboço 2.0 ou é recusado com o motivo, as treze opções de forma de peça…
 - `montar-sem-relato.test.js` — montar-sem-relato.test.js — `montarOpcoes` com `relato: false` não calcula o relato de contatos e devolve o mesmo neutro, as mesmas partes e o resto do paine…
 - `posicao.test.js` — posicao.test.js — a fatia 5 do esboço 2.0: a posição sem conta (âncora, encosta até a malha tocar, alinha, pivô do giro), a cópia pelo arranja e pelo espelha…
+- `solido-inconclusivo.test.js` — solido-inconclusivo.test.js — o relato de contatos diz por que a parte ficou inconclusiva. A face de cantos alinhados que o corte deixa fazia o relato escrev…
 - `variantes.test.js` — variantes.test.js — o gate 2 do plano esboço pelo núcleo: a cópia de prova da mesa com três variantes declaradas dá, na variante com o valor aceito, a mesma …
 
 ## modulos/exportador-cad/src/
@@ -998,6 +1004,7 @@
 
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
+- `aparar.test.ts` — aparar.test.ts — `aparar`: o sólido cortado pelo lado de dentro de uma chapa subdividida, a `folga` da pele de dentro dela. Mede, numa calota de gaiola de ci…
 - `apoio-do-vinco.js` — apoio-do-vinco.js — o raio de uma aresta de caráter, em milímetro, convertido na distância das colunas de apoio.
 - `apoio-do-vinco.test.ts` — apoio-do-vinco.test.ts — o raio em milímetro de uma aresta de caráter, convertido em colunas de apoio (apoio-do-vinco.js) e ligado ao vinco de `gaiolaPorEsta…
 - `arcos-do-contorno.js` — arcos-do-contorno.js — o anel de pontos 2D simplificado, com os trechos curvos declarados trocados pelo círculo ajustado
@@ -1034,9 +1041,11 @@
 - `friso-aba.test.mjs` — friso-aba.test.mjs — a aba que dobra a borda livre de um vão (fatia 25, item 6 do plano da carroceria por subdivisão). A chapa de referência dobra uns 90 gra…
 - `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão (e o da aba da fatia 25): na chapa curva com vão de `f…
 - `friso-largura-variavel.test.mjs` — friso-largura-variavel.test.mjs — o friso com a largura (e o ângulo da aba) como função da posição ao longo da linha, por pontos nomeados, e o canto vivo em …
+- `friso-refinar.test.mjs` — friso-refinar.test.mjs — a moldura que segue a curva da borda do vão na superfície limite (fatia 4c do plano do núcleo para qualquer mecanismo, atrito 4 do c…
 - `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
 - `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
 - `gaiola-aneis-gota.test.mjs` — gaiola-aneis-gota.test.mjs — os anéis de gaiola no vão real de uma carroceria: a gota estreita, o recuo por lado e a abertura que é a própria borda
+- `gaiola-aneis-rebaixo.test.mjs` — gaiola-aneis-rebaixo.test.mjs — o rebaixo por relevo de anel: a faixa de recuo que monta numa chapa plana de grade uniforme (os números do guia), o aviso de …
 - `gaiola-aneis.js` — gaiola-aneis.js — anéis de gaiola em volta de um vão, opção da gaiola por estações
 - `gaiola-aneis.test.mjs` — gaiola-aneis.test.mjs — os anéis de gaiola em volta de um vão e de um arco, na chapa curva desenhada por código
 - `gaiola-captura.js` — gaiola-captura.js — a captura das gaiolas montadas durante uma chamada
@@ -1065,6 +1074,7 @@
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
 - `lamina-sobre-a-superficie.js` — lamina-sobre-a-superficie.js — a lâmina de vão varrida sobre a superfície de uma chapa, com a seção perpendicular a ela
 - `limpar-contorno.test.mjs` — limpar-contorno.test.mjs — `limparContorno`: tira ponto repetido e, se pedido, ponto colinear, sem mexer na entrada.
+- `limpar-lascas-escala.test.mjs` — limpar-lascas-escala.test.mjs — o piso de área da limpeza segue a escala da peça, e não a da seleção (atrito 11 do RECEITA.md do sedã).
 - `limpar-lascas.js` — limpar-lascas.js — o cálculo da limpeza de lascas depois de uma booleana: função pura sobre vértices e faces, sem passo, sem Manifold e sem domínio de objeto…
 - `limpar-lascas.test.ts` — limpar-lascas.test.ts — `limparLascas`: a limpeza das faces finas que uma booleana deixa. Mede, em fixtures sem domínio de objeto: (a) o cálculo puro, na pon…
 - `linha-de-base-do-furo.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
@@ -1077,11 +1087,15 @@
 - `medidas-com-peso.test.mjs` — medidas-com-peso.test.mjs — a medida com peso da subdivisão (fatia 11 do plano de carroceria por subdivisão).
 - `memoria-de-pura.js` — memoria-de-pura.js — guarda o resultado das últimas chamadas de uma função pura, para a mesma chamada não ser refeita.
 - `memoria-de-pura.test.mjs` — memoria-de-pura.test.mjs — a memória das últimas chamadas de uma função pura devolve o que a função devolveria, sem refazer a conta.
+- `molde-de-dentro.js` — molde-de-dentro.js — o volume que fica por dentro de uma chapa, a `folga` da pele de dentro dela: o molde com que `aparar` corta um sólido.
 - `moldura-do-vao.js` — moldura-do-vao.js — a conferência geral da moldura em volta de um vão de uma chapa.
 - `moldura-do-vao.test.mjs` — moldura-do-vao.test.mjs — a conferência geral da moldura em volta de um vão, sobre faixas desenhadas à mão no plano.
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
+- `normal-da-gaiola.js` — normal-da-gaiola.js — confere para onde olha a normal das faces de uma gaiola, e avisa quando ela olha para dentro
+- `normal-da-gaiola.test.ts` — normal-da-gaiola.test.ts — o aviso de normal ao contrário: `fora` declarado em gaiolaPorEstacoes e o volume da gaiola fechada. Fixtures sem domínio: um paine…
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
 - `operador-das-medidas.test.mjs` — operador-das-medidas.test.mjs — a gaiola ajustada pelas medidas vista como transformação linear da declarada.
+- `paineis-por-vaos-aba.test.mjs` — paineis-por-vaos-aba.test.mjs — a opção `aba` de `paineisPorVaos`: a borda de cada painel cortado dobra para dentro com uma perna, e o vão entre dois painéis…
 - `paineis-por-vaos-curva.test.ts` — paineis-por-vaos-curva.test.ts — a linha de vão dada como curva 3D sobre a chapa (`linhas[i].curva`), que sobe a quina arredondada. A chapa é a de `fixtures/…
 - `paineis-por-vaos-grande.test.ts` — paineis-por-vaos-grande.test.ts — o ajudante numa chapa de mais de 130 mil faces (lento: está em tools/testes-lentos.mjs). O que ele prova: a caixa da chapa …
 - `paineis-por-vaos-separa.test.ts` — paineis-por-vaos-separa.test.ts — a prova de separação de cada linha, a curva que corre sobre a borda, o fundo da lâmina contra a pele de dentro e as mensage…
@@ -1092,6 +1106,7 @@
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
 - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
 - `ponto-na-malha.js` — ponto-na-malha.js — o ponto mais próximo de uma malha de triângulos, com grade espacial
+- `ponto-na-malha.test.mjs` — ponto-na-malha.test.mjs — o ponto mais próximo de uma malha, com a grade, dá o mesmo que a varredura de todos os triângulos.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `rastreio-do-retrato.test.ts` — rastreio-do-retrato.test.ts — o atalho do retrato da procedência devolve exatamente a procedência da conta completa.
@@ -1106,6 +1121,7 @@
 - `selecao-nas-edicoes.test.mjs` — selecao-nas-edicoes.test.mjs — `sel` no lugar do id em moveV, moveF, moveA, vira, mescla, pesar e filete.
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
 - `subdivisao-grupos.test.ts` — subdivisao-grupos.test.ts — os grupos de faces da gaiola do passo `subdivisao` (campo `grupos`): cada grupo é uma lista de nomes de ponto, as faces dele são …
+- `subdivisao-ponto-repetido.test.mjs` — subdivisao-ponto-repetido.test.mjs — a recusa geral do ponto que dois passos `subdivisao` gravam sem declaração (ciclo 5 do sedã, atrito 2). O nome de ponto …
 - `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
 - `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação,…
 - `topologia.js` — topologia.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve. Até 2026-10-27 morava em `modulos/topologia/`; …
@@ -2040,9 +2056,18 @@
 
 ## procedural/pecas/sedan-chassi-e-lataria/alta-definicao/
 
+- `aba-no-sedan.rascunho.mjs` — aba-no-sedan.rascunho.mjs — RASCUNHO da opção `aba` do `paineisPorVaos` sobre a lataria de baixo do sedã (atrito 3 do RECEITA.md), sem trocar o forro da rece…
 - `alvo.mjs` — alvo.mjs: o alvo do segundo ciclo de alta definição do sedã (fatia 4c do plano do núcleo para qualquer mecanismo). O trecho é o do primeiro ciclo: o corpo de…
+- `andar-de-cima.esboco.mjs` — andar-de-cima.esboco.mjs: o terceiro ciclo de alta definição do sedã. O andar de baixo do segundo ciclo (o corpo de baixo do lado direito e a metade direita …
 - `caminho-a-gaiola-da-casca.esboco.mjs` — caminho-a-gaiola-da-casca.esboco.mjs: o segundo ciclo de alta definição do sedã, pelo caminho A (a grade de estações por colunas). O trecho é o corpo de baix…
+- `carro-inteiro.esboco.mjs` — carro-inteiro.esboco.mjs: o quinto ciclo de alta definição do sedã, o carro inteiro. A lataria vem de `frente-e-traseira.esboco.mjs`, que encadeia o andar de…
+- `carro-pela-receita.mjs` — carro-pela-receita.mjs: o carro inteiro montado pelas cinco receitas de `../partes/` (carroceria, vidros, frente-e-traseira, rodas e acessórios), como uma re…
+- `chassi-aparado.esboco.mjs` — chassi-aparado.esboco.mjs: o carro inteiro do ciclo 5 com o chassi aparado pela operação `aparar`, e não pelas seções tiradas do alvo.
+- `espelho.mjs` — espelho.mjs: o lado esquerdo das peças soltas do sedã em alta definição (ciclo 5). A chapa que cruza o eixo (o corpo de baixo, a cabine, os painéis da frente…
 - `exportar-trecho.mjs` — exportar-trecho.mjs: grava em OBJ, em metro, as partes pedidas de um esboço ou de uma receita, para a vista de três quartos lado a lado deste ciclo. `npm run…
+- `frente-e-traseira.esboco.mjs` — frente-e-traseira.esboco.mjs: o quarto ciclo de alta definição do sedã, levado ao carro inteiro no quinto. No ciclo 5 cada gaiola por estações é a metade x >…
+- `relato-do-carro.mjs` — relato-do-carro.mjs: o relato de contatos no modo estrito sobre o carro montado pelas cinco receitas (`carro-pela-receita.mjs`), com os contatos que o esboço…
+- `tempo-das-etapas.mjs` — tempo-das-etapas.mjs: o tempo de montar cada etapa do sedã pela receita (só `executarReceita`, sem as medidas) e o do carro inteiro pelas cinco juntas, em se…
 
 ## procedural/pecas/sedan-chassi-e-lataria/alta-definicao/ciclo-1/
 
@@ -2050,6 +2075,52 @@
 - `caminho-a-gaiola-da-casca.esboco.mjs` — caminho-a-gaiola-da-casca.esboco.mjs: o caminho A do primeiro ciclo de alta definição do sedã. A casca facetada vira gaiola de subdivisão: as estações são os…
 - `caminho-b-rede-de-curvas.esboco.mjs` — caminho-b-rede-de-curvas.esboco.mjs: o caminho B do primeiro ciclo de alta definição do sedã. A gaiola sai de `gaiolaPorRede`, com as curvas de feição desenh…
 - `medir.mjs` — medir.mjs: o que o primeiro ciclo de alta definição mede e nenhuma ferramenta do repositório dá: o tempo de montagem, o número de faces por parte e o raio da…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/_comum/
+
+- `forro.mjs` — sedan-chassi-e-lataria/partes/_comum/forro.mjs: o forro de um vão entre painéis, a faixa fina por trás dele que o fecha.
+- `recorte.mjs` — sedan-chassi-e-lataria/partes/_comum/recorte.mjs: o recorte de uma etapa do sedã no conjunto que o esboço do carro inteiro monta.
+- `sedan.mjs` — sedan-chassi-e-lataria/partes/_comum/sedan.mjs: o módulo comum das etapas do sedã em alta definição (fatia 4c do plano do núcleo para qualquer mecanismo). El…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/acessorios/
+
+- `receita.js` — sedan-chassi-e-lataria/acessorios — os dois retrovisores e as quatro maçanetas do sedã, os acessórios simples que o ciclo 5 pôs sobre as portas.
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/acessorios/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/acessorios — os dois retrovisores e as quatro maçanetas do sedã, os acessórios simples que o ciclo 5 pôs sobre as portas.
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/carroceria/
+
+- `receita.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/carroceria/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/
+
+- `receita.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/
+
+- `receita.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/
+
+- `receita.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
 
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/
 
@@ -2128,6 +2199,7 @@
 - `contato-de-solidos-em-milimetro.test.mjs` — contato-de-solidos-em-milimetro.test.mjs — o contato de sólidos numa peça de milímetros (a metro por unidade). Três tolerâncias absolutas do módulo deixavam …
 - `contato-de-solidos-equivalencia.test.mjs` — contato-de-solidos-equivalencia.test.mjs — a contenção de ponto e o cruzamento de malhas, depois de os dados de cada triângulo passarem a ser calculados uma …
 - `contato-de-solidos-memoria.test.mjs` — contato-de-solidos-memoria.test.mjs — a memória de auditoria de uma execução do `descrever` reaproveita sólidos e pares sem mudar nenhuma resposta e sem depe…
+- `contato-de-solidos-raio-na-aresta.test.mjs` — contato-de-solidos-raio-na-aresta.test.mjs — o ponto fora do sólido não vira "dentro" porque o raio da contagem passa por uma aresta. A contagem de cruzament…
 - `contato-de-solidos.js` — contato-de-solidos — o núcleo geométrico que decide se dois sólidos se separam, se encostam ou se invadem. Serviço neutro, sem Three.js.
 - `contato-em-plano-inclinado.test.mjs` — contato-em-plano-inclinado.test.mjs — o vidro sobre face inclinada fecha por vértice novo de booleana ou de interseção de perfis, e esse vértice volta a pouc…
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
@@ -2152,6 +2224,7 @@
 - `diferenca-de-texto.test.js` — diferenca-de-texto.test.js — a diferença por linha que o registro de rodada guarda: vazia sem mudança, toda acréscimo na primeira versão, cortada no teto.
 - `dobras-aceitas.js` — dobras-aceitas.js — a dobra, o vinco e o chanfro que a peça declara de propósito, com o motivo.
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
+- `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
@@ -2189,6 +2262,7 @@
 - `medidas-na-blocagem.test.js` — As medidas do plano lidas na blocagem do nível zero, sobre formas resolvidas escritas à mão (sem o módulo do esboço): a caixa de um eixo e a distância entre …
 - `medir-blocagem-nivel-zero.js` — Medida sobre a blocagem N2 de um andaime: compila com um alvo largo (que só serve para o orçamento e o contexto não atrapalharem) e mede, por volume, o volum…
 - `molduras-do-vao-casos-reais.test.mjs` — molduras-do-vao-casos-reais.test.mjs — a conferência da moldura em volta do vão em dois casos reais (fatia 20 do plano de ajustes no núcleo dos veículos).
+- `molduras-do-vao-chapa-cortada.test.mjs` — molduras-do-vao-chapa-cortada.test.mjs — a abertura de uma chapa que um corte em painéis atravessou (atrito 2 do RECEITA.md do sedã).
 - `molduras-do-vao.js` — molduras-do-vao.js — os vãos das chapas da peça: cada abertura declarada, e a moldura em volta de cada uma medida sobre a malha.
 - `molduras-do-vao.test.mjs` — molduras-do-vao.test.mjs — a moldura em volta do vão, medida sobre a malha varrida de verdade (fatia 12 do plano de ajustes no núcleo).
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
@@ -2613,6 +2687,26 @@
 - `receita.js` — subtrair-que-nao-corta/receita.js — peça de prova do defeito "um `subtrair` que não corta nada passa calado" (plano "costuras e furos limpos"): um bloco de 1…
 - `subtrair-que-nao-corta.test.mjs` — Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte o número marcado.
 
+## tools/fixtures/descrever-sem-calar/
+
+- `plano.js` — plano.js — o PLANO mínimo das peças de prova de `descrever-sem-calar.test.mjs`: uma chapa de uma parte só.
+
+## tools/fixtures/descrever-sem-calar/chapa-inteira/
+
+- `receita.js` — receita.js — peça de prova do aviso do `descrever` para a abertura que cai na booleana da chapa inteira: uma chapa de 5.616 faces com um vão que toma mais da…
+
+## tools/fixtures/descrever-sem-calar/chapa-inteira/referencias/
+
+- `alvo.md` — Alvo
+
+## tools/fixtures/descrever-sem-calar/orfao/
+
+- `receita.js` — receita.js — peça de prova do `descrever` e da `guarda:acervo` que dizem o órfão: a abertura tem um contorno que sai da chapa, o núcleo recusa o passo e a pa…
+
+## tools/fixtures/descrever-sem-calar/orfao/referencias/
+
+- `alvo.md` — Alvo
+
 ## tools/fixtures/faces-finas/
 
 - `receita-de-prova.js` — receita-de-prova.js — a receita de prova da contagem de faces finas da medição da rodada.
@@ -2943,6 +3037,8 @@
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs do Modelar, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, amb…
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
 - `articulacao-na-montagem.test.mjs` — articulacao-na-montagem.test.mjs — a articulação sobre uma montagem v5 real: a folha da porta não declara pose, a posição sai do encaixe da porta `eixo-da-do…
+- `assinatura-da-malha.mjs` — assinatura-da-malha.mjs — a assinatura de cada parte e da peça inteira, e a comparação de duas rodadas.
+- `assinatura-da-malha.test.mjs` — assinatura-da-malha.test.mjs — a assinatura da malha por parte e da peça, e a comparação de duas rodadas.
 - `ativar-bancada.mjs` — ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D.
 - `ativar-bancada.test.mjs` — ativar-bancada.test.mjs — grito do motor é RECUSA, e não decoração no rodapé.
 - `auditar-intersecoes-montagem.test.ts` — @ts-expect-error — serviço neutro JavaScript exercitado pelo contrato público.
@@ -2992,6 +3088,7 @@
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `contorno-da-peca.mjs` — contorno-da-peca.mjs — o contorno por parte no veredito da peça.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
+- `custo-de-importar-receita.test.mjs` — custo-de-importar-receita.test.mjs — nenhuma receita do acervo leva mais que o teto para ser importada e ter os passos gerados.
 - `custo-por-peca.mjs` — custo-por-peca.mjs — a tabela de custo de cada peça de um objeto, lida dos registros de rodada e do registro das etapas.
 - `custo-por-peca.test.mjs` — custo-por-peca.test.mjs — os números da tabela de custo numa fixture de duas peças, a rodada incompleta e a saída estável.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
@@ -3006,8 +3103,10 @@
 - `descrever-partes-materiais.test.mjs` — descrever-partes-materiais.test.mjs — a revisão persiste os campos novos do material (verniz, transmissão, relevo e os demais) e as revisões já gravadas segu…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
+- `descrever-sem-calar.test.mjs` — descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista): o órfão d…
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
+- `dobra-aceita-pela-cadeia.test.mjs` — dobra-aceita-pela-cadeia.test.mjs — a região de `PLANO.dobrasAceitas` vale pela cadeia inteira, e a ruga na ponta dela não some junto (plano de conferência, …
 - `dobra-da-superficie.mjs` — dobra-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita dobra com diedro agudo fora de vinco declarado, e diz a parte, o lugar e o ângulo.
 - `dobra-da-superficie.test.mjs` — dobra-da-superficie.test.mjs — a régua de dobra sobre superfícies pequenas feitas aqui: duas faces que se dobram num ângulo conhecido. O diedro é 180 graus m…
 - `dobras-aceitas-reguas.test.mjs` — dobras-aceitas-reguas.test.mjs — `PLANO.dobrasAceitas` nas duas réguas de superfície e no `descrever`: a aba da técnica de hoje (`tubos-hoje.js`) sai como 4 …
@@ -3075,8 +3174,11 @@
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `medidas-da-fonte.mjs` — medidas-da-fonte.mjs — tira de `fonte-partes.json`, em milímetro, o ponto de partida das três vistas da carroceria: o perfil lateral, a planta, a seção front…
 - `medidas-da-fonte.test.mjs` — Testes de medidas-da-fonte.mjs sobre a fonte sintética da fixture de caixas: perfil, seção, planta, rodas, o trecho de receita que o núcleo executa e a recus…
+- `medir-importar-receita.mjs` — medir-importar-receita.mjs — o tempo de importar cada receita e gerar os passos dela, num processo novo.
 - `medir-transcricao.mjs` — medir-transcricao.mjs — onde vão os tokens de um agente: `npm run medir:transcricao -- <transcrição.jsonl> [...]`.
 - `medir-transcricao.test.mjs` — medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem), cada resultado de ferramenta na etapa…
+- `modelo-aberto.mjs` — modelo-aberto.mjs — a entrada comum das ferramentas de vista: abre um esboço OU uma receita de peça e devolve a mesma estrutura.
+- `modelo-aberto.test.mjs` — modelo-aberto.test.mjs — as ferramentas de vista da empilhadeira abrindo receita de peça, e não só esboço (plano de conferência, fatia 6).
 - `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.
 - `montagem-da-familia.mjs` — montagem-da-familia.mjs — a montagem v5 que uma família de objeto gera, conferida pela aprovação mecânica.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
@@ -3124,10 +3226,14 @@
 - `referencias-do-plano.mjs` — referencias-do-plano.mjs — o que `PLANO.referencias` cita, resolvido em disco.
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
+- `regularidade-da-crista.mjs` — regularidade-da-crista.mjs — percorre cada crista da superfície de subdivisão e acusa onde o que ela mede varia de repente, com a posição em mm.
+- `regularidade-da-crista.test.mjs` — regularidade-da-crista.test.mjs — a régua da regularidade de uma crista ao longo dela (plano de conferência, fatia 6).
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
 - `repositorio-revalidacao.mjs` — repositorio-revalidacao.mjs — persistência R01 sobre o repositório transacional existente.
 - `repositorio-revalidacao.test.ts` — Provas R01: persistência canônica, retomada, idempotência e conflito.
+- `resolucao-da-raiz.mjs` — resolucao-da-raiz.mjs — o pacote que a cópia isolada não tem vem da raiz do repositório principal.
+- `resolucao-da-raiz.test.mjs` — O pacote que a cópia isolada não tem vem da raiz do repositório principal (`resolucao-da-raiz.mjs`). O caso é o do atrito: um worktree sem `node_modules` rod…
 - `resolver-caminho-receita.mjs` — resolver-caminho-receita.mjs — localizador flexível de receitas com confinamento seguro
 - `resolver-caminho-receita.test.mjs` — resolver-caminho-receita.test.mjs — testes unitários para resolução flexível e segura de receitas procedurais.
 - `retrato-do-acervo.mjs` — retrato-do-acervo.mjs — mede cada peça do acervo e compara dois retratos, para saber o que uma mudança no núcleo fez com as peças que já estavam aprovadas.

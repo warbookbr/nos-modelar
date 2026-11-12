@@ -24,7 +24,9 @@ describe('vinco e chanfro não declarados', () => {
     expect(r.vincos[0].anguloMedioGraus).toBeGreaterThan(30);
     expect(r.vincos[0].anguloMedioGraus).toBeLessThan(40);
     expect(r.vincos[0].posicaoMm[0]).toBeCloseTo(50, 0);
-    expect(textoDoAchado(r.vincos[0])).toMatch(/^vinco não declarado na parte chapa, em \[50; /);
+    expect(textoDoAchado(r.vincos[0])).toMatch(/^vinco não declarado na parte chapa, em \[50; .*, de \[50; 0; \d+\] a \[50; 100; \d+\] mm$/);
+    expect(r.vincos[0].pontasMm.map((p) => p[1])).toEqual([0, 100]);
+    expect(r.vincos[0].caixaMm.min[1]).toBe(0); expect(r.vincos[0].caixaMm.max[1]).toBe(100);
   });
 
   it('duas dobras paralelas, com a faixa inclinada de 20 graus entre elas, são um chanfro não declarado, com a largura', () => {

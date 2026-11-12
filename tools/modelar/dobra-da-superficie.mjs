@@ -24,7 +24,7 @@ import { criarResolverNumerico } from '../../procedural/nucleo/expressoes.js';
 import { idDoPasso } from '../../procedural/nucleo/nucleo.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
 import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
-import { aceitasDaReceita, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
+import { aceitasDaReceita, extensaoDaCadeia, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -77,7 +77,7 @@ export function superficiesDaReceita(receita, executada = null) {
     const origem = gaiola.vertices.map((_, k) => k);
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
     const nomeDe = (j) => { const d = declarados[origem[j]]; return typeof d === 'string' ? d : null; };
-    lista.push({ passo: i, vertices, faces, facesTiradas: r.faces.length - faces.length, vincos: r.vincos, partes, gaiola, nomeDe });
+    lista.push({ passo: i, niveis, vertices, faces, facesTiradas: r.faces.length - faces.length, vincos: r.vincos, partes, gaiola, nomeDe });
   });
   return lista;
 }
@@ -127,6 +127,7 @@ export function dobraDaSuperficie(sup, opcoes = {}) {
       arestas: fila.length,
       extensaoMm: arred(fila.reduce((s, k) => s + dist(V[achadas[k].e.a], V[achadas[k].e.b]), 0) * MM, 1),
       pertoDe: perto,
+      ...extensaoDaCadeia([...new Set(fila.flatMap((k) => [achadas[k].e.a, achadas[k].e.b]))].map((v) => V[v])),
     });
   }
   dobras.sort((x, y) => x.diedroGraus - y.diedroGraus || x.posicaoMm[0] - y.posicaoMm[0] || x.posicaoMm[1] - y.posicaoMm[1] || x.posicaoMm[2] - y.posicaoMm[2]);
@@ -149,7 +150,7 @@ export function dobraDaReceita(receita, opcoes = {}, executada = null) {
 
 /** A frase de cada dobra, para o relato de quem chama. */
 export function textoDaDobra(d) {
-  return `dobra na parte ${d.parte ?? 'sem parte'}, em [${d.posicaoMm.join('; ')}] mm, perto do ponto ${d.pertoDe ?? 'sem nome'} da gaiola: diedro de ${String(d.diedroGraus).replace('.', ',')} graus em ${d.arestas} aresta(s), ${String(d.extensaoMm).replace('.', ',')} mm`;
+  return `dobra na parte ${d.parte ?? 'sem parte'}, em [${d.posicaoMm.join('; ')}] mm, perto do ponto ${d.pertoDe ?? 'sem nome'} da gaiola: diedro de ${String(d.diedroGraus).replace('.', ',')} graus em ${d.arestas} aresta(s), ${String(d.extensaoMm).replace('.', ',')} mm${d.pontasMm ? `, de [${d.pontasMm[0].join('; ')}] a [${d.pontasMm[1].join('; ')}] mm` : ''}`;
 }
 
 function lerOpcoes(args) {

@@ -14,7 +14,15 @@ export class ErroComposicaoProcedural extends Error {
 
 function comparar(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
 function plano(valor) { return valor && typeof valor === 'object' && !Array.isArray(valor); }
-function copia(valor) { return JSON.parse(JSON.stringify(valor)); }
+/* a cópia profunda de dado declarativo, com a mesma semântica da ida e volta por JSON (chave indefinida some, elemento indefinido vira null, -0 vira 0) sem montar o texto: o registro das
+   famílias do produto tem 32 MB de composições e a ida e volta por JSON era um terço do custo de montá-lo */
+function copia(valor) {
+  if (valor === null || typeof valor !== 'object') return typeof valor === 'number' && valor === 0 ? 0 : valor;
+  if (Array.isArray(valor)) { const r = new Array(valor.length); for (let i = 0; i < valor.length; i += 1) { const x = valor[i]; r[i] = x === undefined ? null : copia(x); } return r; }
+  const r = {};
+  for (const chave of Object.keys(valor)) { const x = valor[chave]; if (x !== undefined) r[chave] = copia(x); }
+  return r;
+}
 function texto(valor, onde, padrao = ID) {
   if (typeof valor !== 'string' || !padrao.test(valor)) throw new ErroComposicaoProcedural(`${onde} exige identificador semântico`);
   return valor;
@@ -136,12 +144,14 @@ export function criarRegistroComposicoes({ composicoes, resolverOperacao } = {})
     const naoProduzidos = composicao.artefatos.sai.filter((tipo) => !disponiveis.has(tipo));
     if (naoProduzidos.length) throw new ErroComposicaoProcedural(`composição '${composicao.id}' declara saída não produzida: ${naoProduzidos.join(', ')}`);
   }
-  const manifesto = [...porId.values()].map((composicao) => copia(composicao)).sort((a, b) => comparar(a.id, b.id));
-  /* as composições guardadas só se leem daqui para a frente (`resolver` e `listar` devolvem cópia, `resolverParaLeitura` a própria): congeladas, a leitura sem cópia não tem como alterar o registro */
+  /* as composições guardadas só se leem daqui para a frente (`resolver` e `listar` devolvem cópia, `resolverParaLeitura` a própria): congeladas, a leitura sem cópia não tem como alterar o registro.
+     O manifesto é a mesma lista, ordenada por id, das mesmas composições congeladas: copiá-las de novo dobrava o custo do registro, e a assinatura só se calcula quando alguém a lê */
   const congelar = (valor) => { if (valor && typeof valor === 'object' && !Object.isFrozen(valor)) { Object.values(valor).forEach(congelar); Object.freeze(valor); } return valor; };
   for (const composicao of porId.values()) congelar(composicao);
+  const manifesto = [...porId.values()].sort((a, b) => comparar(a.id, b.id));
+  let assinatura = null;
   return Object.freeze({
-    formato: FORMATO_COMPOSICAO_PROCEDURAL, assinatura: assinaturaDas(manifesto), manifesto: Object.freeze(manifesto),
+    formato: FORMATO_COMPOSICAO_PROCEDURAL, get assinatura() { assinatura ??= assinaturaDas(manifesto); return assinatura; }, manifesto: Object.freeze(manifesto),
     resolver(id, versaoDesejada = null) { const encontrada = porId.get(id) ?? null; return encontrada && (versaoDesejada == null || encontrada.versao === versaoDesejada) ? copia(encontrada) : null; },
     /* a mesma composição, sem a cópia: para quem só a lê (a expansão), que não a altera */
     resolverParaLeitura(id) { return porId.get(id) ?? null; },
