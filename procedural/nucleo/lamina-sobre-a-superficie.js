@@ -504,18 +504,23 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
       }
       return { M, L };
     };
-    const uteis = est.map((s, i) => i).filter((i) => !est[i].alongada);
+    const uteis = est.map((s, i) => i).filter((i) => !est[i].alongada && !(aba.perto && aba.perto(est[i].c)));
     const volta = fechada && uteis.length === N;
-    if (uteis.length < 2) erro(`a aba da linha '${nome}' ficou com menos de duas estações sobre a chapa`);
+    /* os trechos contíguos de estações com perna: cada um é um sólido, e a perna não passa pelas estações que ficaram de fora */
+    const corridas = [];
+    /* o trecho entre duas estações também não pode passar perto: a corda de 40 mm cruza o vão da outra linha entre duas estações que ficam a mais que o alcance dela */
+    const trechoLivre = (i, j) => !aba.perto || [0.25, 0.5, 0.75].every((u) => !aba.perto(soma(mul(est[i].c, 1 - u), mul(est[j % N].c, u))));
+    for (const i of uteis) { const ultima = corridas[corridas.length - 1]; if (ultima && ultima[ultima.length - 1] === i - 1 && trechoLivre(i - 1, i)) ultima.push(i); else corridas.push([i]); }
+    const validas = volta && corridas.length === 1 && uteis.every((i, k) => k === 0 || trechoLivre(uteis[k - 1], i)) && trechoLivre(uteis[uteis.length - 1], uteis[0]) ? [uteis] : corridas.filter((c) => c.length >= 2);
     const perfil = perfilDaAba({ espessura: aba.espessura, largura: aba.largura, angulo: aba.angulo, raio: aba.raio ?? 0, recuo: RECUO_DA_ABA * largura });
-    abas = [1, -1].map((sinal) => {
+    abas = validas.flatMap((corrida) => [1, -1].map((sinal) => {
       const vs = []; const fs = [];
       const nP = perfil.length;
-      uteis.forEach((i) => {
+      corrida.forEach((i) => {
         const { M, L } = quina(i, sinal);
         for (const [u, w] of perfil) vs.push(soma(soma(est[i].c, mul(M, h + u)), mul(L, w)));
       });
-      const nE = uteis.length;
+      const nE = corrida.length;
       const trechos = volta ? nE : nE - 1;
       for (let e = 0; e < trechos; e += 1) {
         const f = e; const g2 = (e + 1) % nE;
@@ -527,8 +532,10 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
       if (!volta) {
         fs.push(Array.from({ length: nP }, (_, m) => nP - 1 - m), Array.from({ length: nP }, (_, m) => (nE - 1) * nP + m));
       }
-      return { lado: sinal, vertices: vs.map((q) => q.map(r5)), faces: orientar(vs, fs) };
-    });
+      return { lado: sinal, estacoes: corrida.length, vertices: vs.map((q) => q.map(r5)), faces: orientar(vs, fs) };
+    }));
+    const reais = est.filter((q) => !q.alongada).length;
+    abas.trechosSemPerna = (volta ? reais : reais - 1) - validas.reduce((t, c) => t + (volta && c === uteis ? c.length : c.length - 1), 0);
   }
   return { vertices: vertices.map((p) => p.map(r5)), faces: saida, dentro: null, estacoes: est, abas };
 }

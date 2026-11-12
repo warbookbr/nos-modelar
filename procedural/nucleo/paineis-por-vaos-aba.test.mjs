@@ -35,7 +35,7 @@ describe('a aba do painel cortado', () => {
   it('com aba de 12 mm a 90 graus o vão tem fundo, os painéis seguem dois, e a perna é do painel', () => {
     const g = cortar({ aba: { largura: 12, angulo: 90, raio: 0.5 } });
     const st = executa(comPiso(g));
-    expect(g.passos.filter((p) => p[0] === 'unir')).toHaveLength(2); /* as duas pernas entre si, e o corte com elas */
+    expect(g.passos.filter((p) => p[0] === 'unir')).toHaveLength(1);
     expect(g.partes.every((p) => p.origem.op === 'unir')).toBe(true);
     const par = fundoDoVao(st);
     expect(semFundo(par)).toEqual([]);
@@ -64,7 +64,7 @@ describe('a aba do painel cortado', () => {
     const g = cortar({ aba: { largura: 12 }, linhas: [{ ...LINHAS[0], aba: false }] });
     expect(g.passos.some((p) => p[0] === 'unir')).toBe(false);
     const h = cortar({ linhas: [{ ...LINHAS[0], aba: { largura: 8, angulo: 90 } }] });
-    expect(h.passos.filter((p) => p[0] === 'unir')).toHaveLength(2);
+    expect(h.passos.filter((p) => p[0] === 'unir')).toHaveLength(1);
   });
 
   it('as recusas dizem o campo: largura, angulo fora de 45 a 90, campo desconhecido e linha de vista', () => {
@@ -76,16 +76,18 @@ describe('a aba do painel cortado', () => {
     expect(grito({ modo: 'vista', aba: { largura: 10 } })).toMatch(/só vale no modo 'superficie'/);
     });
 
-  it('na emenda em T a perna é cortada pela lâmina da outra linha: três painéis, nenhuma perna liga dois deles', () => {
+  it('na emenda em T a perna acaba antes da outra linha: três painéis, as pernas não se encostam, e o aviso diz quantos trechos ficaram sem perna', () => {
     const linhas = [{ nome: 'A', eixo: 'y', pontos: [[-300, 200], [300, 200]] }, { nome: 'B', eixo: 'y', pontos: [[0, 200], [0, 500]] }];
     const paineis = [{ nome: 'a', eixo: 'y', ponto: [0, 100] }, { nome: 'b', eixo: 'y', ponto: [-100, 300] }, { nome: 'c', eixo: 'y', ponto: [100, 300] }];
     const g = cortar({ linhas, paineis, aba: { largura: 12, angulo: 90 } });
     const st = executa(g.passos);
     expect(new Set(faces(st).map((f) => f.parte))).toEqual(new Set(['a', 'b', 'c']));
-    expect(g.passos.some((p) => p[0] === 'subtrair' && p[1].solidos.length > 2 && p[1].origemId !== g.origemDoCorte.id)).toBe(true);
-    /* sem ponte: as folgas entre os três pares seguem no vão, e nenhuma face sobra sem parte */
-    const sem = cortar({ linhas, paineis });
-    expect(executa(sem.passos).F.size).toBeLessThan(st.F.size);
+    expect(g.avisos.some((x) => x.ref === 'abaCortadaNaEmenda')).toBe(true);
+    expect(g.medidas.aba.trechosSemPerna).toBeGreaterThan(0);
     expect([...st.F.values()].filter((f) => !f.parte)).toEqual([]);
+    /* as pernas dos três painéis existem, e a de A acaba antes de B: nenhum vértice de perna (abaixo da chapa) de x entre -16 e 16 na faixa de A */
+    const baixo = faces(st).flatMap((f) => f.pts).filter((q) => q[1] < -T - 1);
+    expect(baixo.length).toBeGreaterThan(0);
+    expect(baixo.some((q) => Math.abs(q[0]) < 16 && Math.abs(q[2] - 200) > 3 && Math.abs(q[2] - 200) < 10 && Math.abs(q[0]) > 3)).toBe(false);
   });
 });

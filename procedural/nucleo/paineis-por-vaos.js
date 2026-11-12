@@ -13,7 +13,7 @@
  *   paineis: [{ nome, eixo, ponto, lado? }] o painel é o pedaço que contém o ponto [a, b] visto daquela vista (o primeiro que o raio vindo do `lado`, padrão '+', toca); nomes e pontos distintos. O passo `parte` sai com `onde.conexo` { de, dir, ate }: `ate` é a distância lida mais uma folga, e o núcleo recusa a receita salva cuja semente passou a cair num vão.
  *   modo: 'vista' (padrão: a lâmina é a extrusão da linha ao longo do eixo da vista, a que corta toda camada do raio, com o vão compensado pela inclinação) ou 'superficie' (a linha é projetada na chapa e a lâmina é varrida sobre ela, de paredes normais à chapa: a folga 3D é o vão em qualquer inclinação, a linha atravessa dobras, a ponta que sai da borda não alarga e duas pontas que se encontram fecham em esquadria; corta só a primeira camada lida do `lado`, até `profundidade` mm abaixo da pele, padrão a espessura lida mais meio vão); vale por linha em `linhas[i].modo`.
  *   limpar: as faces finas do corte saem por `limparLascas` depois do `subtrair` (true: 0,01 mm; { tolerancia } em mm; false: não emite); padrão ligado nas linhas por superfície e por curva, desligado no modo vista; `medidas.lascasAntes` e `lascasRestantes` contam as faces finas.
- *   aba: { largura, angulo?, raio?, espessura? } (mm; na chamada ou em `linhas[i].aba`, `false` desliga a linha; só nas linhas por superfície ou curva; padrão desligado, e então a saída não muda) a borda de cada painel cortado dobra para dentro com uma perna reta de `largura`, a `angulo` graus de giro da chapa (de 45 a 90, padrão 90: reta para baixo), com `raio` de filete no canto de dentro e a espessura lida na linha (ou `espessura`): o vão entre dois painéis ganha fundo sem o forro. A perna é um sólido varrido ao longo da linha, com a esquadria dos cantos, que recua um centésimo do vão da parede do corte e entra meia espessura na chapa; os passos acrescentam um `unir` depois do corte, e as partes saem dele (`origem` de cada parte, e `origemDoCorte` segue sendo o `subtrair`). Onde outra linha de vão passa (a emenda em T) a perna é cortada pela lâmina dela, para não ligar dois painéis. Mede-se com `npm run vao:partes -- <peça> --fundo=modelo`.
+ *   aba: { largura, angulo?, raio?, espessura? } (mm; na chamada ou em `linhas[i].aba`, `false` desliga a linha; só nas linhas por superfície ou curva; padrão desligado, e então a saída não muda) a borda de cada painel cortado dobra para dentro com uma perna reta de `largura`, a `angulo` graus de giro da chapa (de 45 a 90, padrão 90: reta para baixo), com `raio` de filete no canto de dentro e a espessura lida na linha (ou `espessura`): o vão entre dois painéis ganha fundo sem o forro. A perna é um sólido varrido ao longo da linha, com a esquadria dos cantos, que recua um centésimo do vão da parede do corte e entra meia espessura na chapa; os passos acrescentam um `unir` depois do corte, e as partes saem dele (`origem` de cada parte, e `origemDoCorte` segue sendo o `subtrair`). A perna acaba a `largura` mais o vão de qualquer outra linha (a emenda em T, o canto): ali o vão fica sem perna, para ela não passar pelo vão da outra nem encostar na perna dela, e `avisos` e `medidas.aba` dizem quantos trechos ficaram assim. Mede-se com `npm run vao:partes -- <peça> --fundo=modelo`.
  *   origemId: o primeiro origemId livre (padrão: o maior dos passos da chapa mais um); o ajudante usa dali em diante e devolve `proximoId`.
  *   normal: (ponto3d, eixo) => [nx, ny, nz] troca a leitura da chapa; amostragem: o passo da leitura ao longo da linha (padrão 40 mm); areaMinima: área em mm² abaixo da qual o pedaço é lasca e avisa (padrão 100); sementesPerdidas: 'recusa' (padrão) ou 'avisa'; margem: a fração a mais da lâmina (padrão 0,02), para a curvatura e o Float32 da Manifold nunca deixarem o vão abaixo do pedido; folgaAbaixoDe: o aviso `folgaEstreita` quando a lâmina fica abaixo disso, em mm (padrão metade do vão); saida: 'mm' ou 'metro'; conferir: false não executa o corte (só a chapa, uma vez; o `ate` sai da chapa de antes) e avisa `naoConferiu`; medirTempo: true põe em medidas.tempos o tempo de cada etapa; medirFolga: true mede a folga 3D também no modo vista (no modo superfície ela é sempre medida).
  * devolve: { passos, partes, origemDoCorte, proximoId, medidas, avisos } com medidas { vaoPedido, inclinacaoMaxima, fatorMinimo, folgaMinima, paineis, paineisAchados, sementesSemPainel, pedacosSemNome, pedacos, execucoes } e avisos { ref, texto }; o resultado é memorizado pela entrada (memoria-de-pura), então a receita que o chama a cada leitura paga a conta uma vez.
@@ -401,7 +401,7 @@ function paineisPorVaosBruto(o) {
   const pendentes = [];
   const curvas = [];
   const linhasDeVista = [];
-  let passosDasAbas = []; let origensDasAbas = []; let origensFundas = []; let gerarSuperficie = null; let conferirLaminas = null; let lidasDeSuperficie = []; let naPeleDaCurva = null; let larguraDaSuperficie = 0; let inicioDaSuperficie = 0; let inicioDasFerramentas = 0;
+  let passosDasAbas = []; let origensDasAbas = []; let trechosSemPerna = 0; let gerarSuperficie = null; let conferirLaminas = null; let lidasDeSuperficie = []; let naPeleDaCurva = null; let larguraDaSuperficie = 0; let inicioDaSuperficie = 0; let inicioDasFerramentas = 0;
   for (let li = 0; li < o.linhas.length; li += 1) {
     const l = o.linhas[li];
     const nome = l.nome ?? `linha${li}`;
@@ -750,49 +750,40 @@ function paineisPorVaosBruto(o) {
     const idBase = proximo;
     gerarSuperficie = (larguraDe) => {
       const passos = []; const ferr = []; let id = idBase;
-      const abasDe = [];
+      const abasDe = []; let semPerna = 0;
       for (const ln of lidas) {
         const { l, nome, segmentos, fechadaInteira } = ln;
         const abaDela = abaDaLinha(l);
+        /* a perna acaba antes de outra linha: a estação a menos de `largura` mais o vão de qualquer estação de outra linha (a emenda em T, o canto) não leva perna, e as pernas das duas linhas não se encostam nem passam pelo vão uma da outra */
+        const deOutras = abaDela ? lidas.filter((x) => x !== ln).flatMap((x) => x.segmentos.flat().map((q) => q.c)) : [];
+        const alcanceDaAba = abaDela ? abaDela.largura + o.vao : 0;
+        const perto = (c) => deOutras.some((q2) => Math.hypot(c[0] - q2[0], c[1] - q2[1], c[2] - q2[2]) < alcanceDaAba);
         const espessuraDaAba = (estacoes) => { const lidas2 = estacoes.filter((q) => !q.alongada && q.esp != null).map((q) => q.esp).sort((a, b) => a - b); return abaDela?.espessura ?? (lidas2.length ? lidas2[Math.floor(lidas2.length / 2)] : null); };
         for (const estacoes of segmentos) {
           const espessuraDela = abaDela ? espessuraDaAba(estacoes) : null;
           if (abaDela && !(espessuraDela > 0)) erro(`a aba da linha '${nome}' precisa da espessura da chapa: ela não pôde ser lida na linha, e \`aba.espessura\` (mm) não foi dada`);
-          const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, aba: abaDela ? { ...abaDela, espessura: espessuraDela } : null, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima, areaPorNorma: !!ln.curva, alemDaPele: foraDoMaterial ? (q) => foraDoMaterial(q) : null });
+          const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, aba: abaDela ? { ...abaDela, espessura: espessuraDela, perto } : null, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima, areaPorNorma: !!ln.curva, alemDaPele: foraDoMaterial ? (q) => foraDoMaterial(q) : null });
           passos.push(['subdivisao', { origemId: id, vertices: varrido.vertices, faces: varrido.faces, niveis: 0 }]);
           ferr.push({ op: 'subdivisao', id });
           id += 1;
-          for (const shell of varrido.abas ?? []) abasDe.push({ ...shell, nome, fundo: (espessuraDela ?? 0) + abaDela.largura });
+          for (const shell of varrido.abas ?? []) abasDe.push({ ...shell, nome });
+          semPerna += varrido.abas?.trechosSemPerna ?? 0;
         }
       }
       /* as pernas das abas: os ids vêm depois dos das lâminas, e o número de pernas não muda com a largura da lâmina */
-      const abasPassos = []; const abasOrigens = []; const fundasOrigens = [];
+      const abasPassos = []; const abasOrigens = [];
       for (const shell of abasDe) {
         abasPassos.push(['subdivisao', { origemId: id, vertices: shell.vertices, faces: shell.faces, niveis: 0 }]);
         abasOrigens.push({ op: 'subdivisao', id });
         id += 1;
       }
-      /* A PERNA PARA ONDE OUTRA LINHA PASSA. Com mais de uma linha, a perna de uma desce pela borda do corte e passaria pelo vão da outra (a emenda em T): as lâminas de todas as linhas,
-         refeitas até abaixo da ponta da perna, são tiradas das pernas, e a perna acaba na parede do vão vizinho em vez de ligar os dois painéis. */
-      if (abasDe.length && lidas.length > 1) {
-        const funda = Math.max(...abasDe.map((a2) => a2.fundo)) + 2 * o.vao;
-        for (const ln of lidas) {
-          const { l, nome, segmentos, fechadaInteira } = ln;
-          for (const estacoes of segmentos) {
-            const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, profundidade: funda, descarta: l.dentro === 'descarta', nome, cima: ln.cima, areaPorNorma: !!ln.curva, alemDaPele: null });
-            abasPassos.push(['subdivisao', { origemId: id, vertices: varrido.vertices, faces: varrido.faces, niveis: 0 }]);
-            fundasOrigens.push({ op: 'subdivisao', id });
-            id += 1;
-          }
-        }
-      }
-      return { passos, ferr, fim: id, abasPassos, abasOrigens, fundasOrigens };
+      return { passos, ferr, fim: id, abasPassos, abasOrigens, semPerna };
     };
     larguraDaSuperficie = largura;
     const g0 = gerarSuperficie(largura);
     inicioDaSuperficie = passosDeCorte.length; inicioDasFerramentas = ferramentas.length;
     passosDeCorte.push(...g0.passos); ferramentas.push(...g0.ferr);
-    passosDasAbas = g0.abasPassos; origensDasAbas = g0.abasOrigens; origensFundas = g0.fundasOrigens;
+    passosDasAbas = g0.abasPassos; origensDasAbas = g0.abasOrigens; trechosSemPerna = g0.semPerna;
     proximo = g0.fim;
     folgaMinima = Math.min(folgaMinima, largura);
   }
@@ -800,15 +791,8 @@ function paineisPorVaosBruto(o) {
   let corte = ['subtrair', { origemId: idDoCorte, solidos: [{ origem: chapa.origem }, ...ferramentas.map((origem) => ({ origem }))] }];
   const origemDoCorte = { op: 'subtrair', id: idDoCorte };
   /* a união das pernas com os painéis cortados: o `unir` de depois do corte e da limpeza; as partes saem dela */
-  const idDasPernas = origensDasAbas.length > 1 ? proximo : null; if (idDasPernas != null) proximo += 1;
-  const idDasAparadas = origensDasAbas.length && origensFundas.length ? proximo : null; if (idDasAparadas != null) proximo += 1;
   const idDaUniao = origensDasAbas.length ? proximo : null; if (idDaUniao != null) proximo += 1;
-  const origemDasPernas = idDasPernas != null ? { op: 'unir', id: idDasPernas } : origensDasAbas[0];
-  const origemDasAparadas = idDasAparadas != null ? { op: 'subtrair', id: idDasAparadas } : origemDasPernas;
-  const uniaoDasAbas = idDaUniao == null ? [] : [
-    ...(idDasPernas != null ? [['unir', { origemId: idDasPernas, solidos: origensDasAbas.map((origem) => ({ origem })) }]] : []),
-    ...(idDasAparadas != null ? [['subtrair', { origemId: idDasAparadas, solidos: [{ origem: origemDasPernas }, ...origensFundas.map((origem) => ({ origem }))] }]] : []),
-    ['unir', { origemId: idDaUniao, solidos: [{ origem: origemDoCorte }, { origem: origemDasAparadas }] }]];
+  const uniaoDasAbas = idDaUniao == null ? [] : [['unir', { origemId: idDaUniao, solidos: [{ origem: origemDoCorte }, ...origensDasAbas.map((origem) => ({ origem }))] }]];
   const origemDasPartes = idDaUniao == null ? origemDoCorte : { op: 'unir', id: idDaUniao };
   const toleranciaDaLimpeza = o.limpar === false ? null : o.limpar != null && typeof o.limpar === 'object' ? o.limpar.tolerancia : o.limpar === true || pendentes.length ? 0.01 : null;
   const limpa = toleranciaDaLimpeza == null ? [] : [['limparLascas', { sel: { origem: origemDoCorte }, tolerancia: toleranciaDaLimpeza }]];
@@ -836,6 +820,10 @@ function paineisPorVaosBruto(o) {
     vaoPedido: o.vao, inclinacaoMaxima: r3(inclinacaoMaxima), fatorMinimo: r3(fatorMinimo), folgaMinima: r3(folgaMinima), paineis: [], paineisAchados: 0,
     sementesSemPainel: [], pedacosSemNome: [], pedacos: 0, execucoes: leitura ? 2 : 0,
   };
+  if (origensDasAbas.length) {
+    medidas.aba = { pernas: origensDasAbas.length, trechosSemPerna };
+    if (trechosSemPerna) aviso('abaCortadaNaEmenda', `${trechosSemPerna} trecho(s) entre estações das linhas com aba ficam sem perna, a menos da perna mais o vão de outra linha (a emenda em T, o canto): ali o vão não tem fundo pela aba`);
+  }
   const saida = { passos, partes: partes.map((p) => ({ nome: p.nome, origem: origemDasPartes, de: p.de, dir: p.dir })), origemDoCorte, proximoId: proximo, primeiroId, medidas, avisos };
   if (!leitura) {
     if (folgaMinima < folgaAbaixoDe) aviso('folgaEstreita', `a folga entre as paredes do corte cai a ${br(folgaMinima)} mm (a lâmina, e não o vão da pele)`);
@@ -890,7 +878,7 @@ function paineisPorVaosBruto(o) {
       conferirLaminas(larguraDaSuperficie, `depois de corrigir a largura da lâmina de ${br(larguraDaSuperficie / fator)} para ${br(larguraDaSuperficie)} mm pela folga medida de ${br(folgaMedida)} mm`);
       const g = gerarSuperficie(larguraDaSuperficie);
       passosDeCorte.splice(inicioDaSuperficie, g.passos.length, ...g.passos);
-      passosDasAbas = g.abasPassos;
+      passosDasAbas = g.abasPassos; trechosSemPerna = g.semPerna;
       executado = executar();
       if (executado.orfaos.length) erro(`o corte foi recusado pelo núcleo depois de corrigir a largura da lâmina para ${br(larguraDaSuperficie)} mm: ${causasDoCorte(executado.orfaos).slice(0, 2).join('; ')}`);
       folgaMedida = medirFolga() ?? folgaMedida;
