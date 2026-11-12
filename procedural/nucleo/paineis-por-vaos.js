@@ -256,6 +256,22 @@ function paineisPorVaosBruto(o) {
   /* limpar: as faces finas que o corte deixa saem pela operação `limparLascas`, depois do `subtrair` e antes dos `parte`. Padrão: ligado onde há lâmina por superfície ou por curva, desligado no modo vista
      (para os passos de quem já usa o modo vista não mudarem); `true` usa a tolerância de 0,01 mm, `{ tolerancia }` (mm) escolhe e `false` não emite */
   if (o.limpar != null && typeof o.limpar !== 'boolean' && !(typeof o.limpar === 'object' && Number.isFinite(o.limpar.tolerancia) && o.limpar.tolerancia > 0)) erro(`limpar é true, false ou { tolerancia } em mm maior que zero (recebido ${JSON.stringify(o.limpar)})`);
+  /* aba: a perna que cada painel cortado dobra para dentro na borda do corte, de modo que o vão entre dois painéis tenha fundo sem o forro. Desligada por padrão; `aba` na chamada vale
+     para toda linha por superfície ou por curva, e `linhas[i].aba` (ou `false`) a escolhe por linha. */
+  const lerAba = (v, quem) => {
+    if (v == null || v === false) return null;
+    if (typeof v !== 'object' || Array.isArray(v)) erro(`aba ${quem} é { largura, angulo?, raio?, espessura? } (largura da perna em mm) ou false, recebi ${JSON.stringify(v)}`);
+    const extra = Object.keys(v).filter((k) => !['largura', 'angulo', 'raio', 'espessura'].includes(k));
+    if (extra.length) erro(`aba ${quem} tem campo desconhecido '${extra[0]}'; os campos são largura, angulo, raio e espessura`);
+    const { largura, angulo = 90, raio = 0, espessura = null } = v;
+    if (!(Number.isFinite(largura) && largura > 0)) erro(`aba ${quem}: largura é o comprimento da perna em mm, maior que zero (recebi ${JSON.stringify(largura)})`);
+    if (!(Number.isFinite(angulo) && angulo >= 45 && angulo <= 90)) erro(`aba ${quem}: angulo é o giro da chapa na dobra, de 45 a 90 graus (recebi ${JSON.stringify(angulo)}); acima de 90 a perna passaria por baixo do vão e cruzaria a do painel vizinho, e abaixo de 45 ela sairia pela pele de fora`);
+    if (!(Number.isFinite(raio) && raio >= 0)) erro(`aba ${quem}: raio é o do canto de dentro da dobra, em mm a partir de zero (recebi ${JSON.stringify(raio)})`);
+    if (espessura != null && !(Number.isFinite(espessura) && espessura > 0)) erro(`aba ${quem}: espessura é a da chapa em mm, maior que zero, quando a chapa não a dá para ser lida (recebi ${JSON.stringify(espessura)})`);
+    return { largura, angulo, raio, espessura };
+  };
+  const abaGeral = lerAba(o.aba, 'da chamada');
+  const abaDaLinha = (l) => (l?.aba !== undefined ? lerAba(l.aba, `da linha '${l?.nome ?? ''}'`) : abaGeral);
   const sementesPerdidas = o.sementesPerdidas ?? 'recusa';
   if (sementesPerdidas !== 'recusa' && sementesPerdidas !== 'avisa') erro("sementesPerdidas é 'recusa' ou 'avisa'");
   const passosDaChapa = chapa.passos ?? null;
@@ -301,6 +317,8 @@ function paineisPorVaosBruto(o) {
     if (l.dentro === 'descarta' && !l.fechada) erro(`dentro: 'descarta' só vale para linha fechada ('${nome}' é aberta)`);
     if (nomesDeLinha.has(nome)) erro(`duas linhas se chamam '${nome}'`);
     nomesDeLinha.add(nome);
+    if (l.aba != null && l.aba !== false && l.dentro === 'descarta') erro(`a linha '${nome}' dá \`aba\` e \`dentro: 'descarta'\`: o pedaço de dentro some, e não há painel cuja borda dobrar`);
+    if (l.aba != null && l.aba !== false && !(porCurva(l) || (l.modo ?? modoGeral) === 'superficie')) erro(`a linha '${nome}' dá \`aba\`, que só vale no modo 'superficie' (a perna é varrida sobre a chapa, ao longo da linha)`);
   });
   const nomesDePainel = new Map();
   o.paineis.forEach((p, i) => {
@@ -381,7 +399,7 @@ function paineisPorVaosBruto(o) {
   const pendentes = [];
   const curvas = [];
   const linhasDeVista = [];
-  let gerarSuperficie = null; let conferirLaminas = null; let lidasDeSuperficie = []; let naPeleDaCurva = null; let larguraDaSuperficie = 0; let inicioDaSuperficie = 0; let inicioDasFerramentas = 0;
+  let passosDasAbas = []; let origensDasAbas = []; let gerarSuperficie = null; let conferirLaminas = null; let lidasDeSuperficie = []; let naPeleDaCurva = null; let larguraDaSuperficie = 0; let inicioDaSuperficie = 0; let inicioDasFerramentas = 0;
   for (let li = 0; li < o.linhas.length; li += 1) {
     const l = o.linhas[li];
     const nome = l.nome ?? `linha${li}`;
@@ -730,27 +748,45 @@ function paineisPorVaosBruto(o) {
     const idBase = proximo;
     gerarSuperficie = (larguraDe) => {
       const passos = []; const ferr = []; let id = idBase;
+      const abasDe = [];
       for (const ln of lidas) {
         const { l, nome, segmentos, fechadaInteira } = ln;
+        const abaDela = abaDaLinha(l);
+        const espessuraDaAba = (estacoes) => { const lidas2 = estacoes.filter((q) => !q.alongada && q.esp != null).map((q) => q.esp).sort((a, b) => a - b); return abaDela?.espessura ?? (lidas2.length ? lidas2[Math.floor(lidas2.length / 2)] : null); };
         for (const estacoes of segmentos) {
-          const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima, areaPorNorma: !!ln.curva, alemDaPele: foraDoMaterial ? (q) => foraDoMaterial(q) : null });
+          const espessuraDela = abaDela ? espessuraDaAba(estacoes) : null;
+          if (abaDela && !(espessuraDela > 0)) erro(`a aba da linha '${nome}' precisa da espessura da chapa: ela não pôde ser lida na linha, e \`aba.espessura\` (mm) não foi dada`);
+          const varrido = varrer({ estacoes, fechada: !!l.fechada && fechadaInteira, largura: larguraDe, aba: abaDela ? { ...abaDela, espessura: espessuraDela } : null, profundidade: l.profundidade ?? o.profundidade ?? null, descarta: l.dentro === 'descarta', nome, cima: ln.cima, areaPorNorma: !!ln.curva, alemDaPele: foraDoMaterial ? (q) => foraDoMaterial(q) : null });
           passos.push(['subdivisao', { origemId: id, vertices: varrido.vertices, faces: varrido.faces, niveis: 0 }]);
           ferr.push({ op: 'subdivisao', id });
           id += 1;
+          for (const shell of varrido.abas ?? []) abasDe.push({ ...shell, nome });
         }
       }
-      return { passos, ferr, fim: id };
+      /* as pernas das abas: os ids vêm depois dos das lâminas, e o número de pernas não muda com a largura da lâmina */
+      const abasPassos = []; const abasOrigens = [];
+      for (const shell of abasDe) {
+        abasPassos.push(['subdivisao', { origemId: id, vertices: shell.vertices, faces: shell.faces, niveis: 0 }]);
+        abasOrigens.push({ op: 'subdivisao', id });
+        id += 1;
+      }
+      return { passos, ferr, fim: id, abasPassos, abasOrigens };
     };
     larguraDaSuperficie = largura;
     const g0 = gerarSuperficie(largura);
     inicioDaSuperficie = passosDeCorte.length; inicioDasFerramentas = ferramentas.length;
     passosDeCorte.push(...g0.passos); ferramentas.push(...g0.ferr);
+    passosDasAbas = g0.abasPassos; origensDasAbas = g0.abasOrigens;
     proximo = g0.fim;
     folgaMinima = Math.min(folgaMinima, largura);
   }
   const idDoCorte = proximo; proximo += 1;
   let corte = ['subtrair', { origemId: idDoCorte, solidos: [{ origem: chapa.origem }, ...ferramentas.map((origem) => ({ origem }))] }];
   const origemDoCorte = { op: 'subtrair', id: idDoCorte };
+  /* a união das pernas com os painéis cortados: o `unir` de depois do corte e da limpeza; as partes saem dela */
+  const idDaUniao = origensDasAbas.length ? proximo : null; if (idDaUniao != null) proximo += 1;
+  const uniaoDasAbas = idDaUniao == null ? [] : [['unir', { origemId: idDaUniao, solidos: [{ origem: origemDoCorte }, ...origensDasAbas.map((origem) => ({ origem }))] }]];
+  const origemDasPartes = idDaUniao == null ? origemDoCorte : { op: 'unir', id: idDaUniao };
   const toleranciaDaLimpeza = o.limpar === false ? null : o.limpar != null && typeof o.limpar === 'object' ? o.limpar.tolerancia : o.limpar === true || pendentes.length ? 0.01 : null;
   const limpa = toleranciaDaLimpeza == null ? [] : [['limparLascas', { sel: { origem: origemDoCorte }, tolerancia: toleranciaDaLimpeza }]];
 

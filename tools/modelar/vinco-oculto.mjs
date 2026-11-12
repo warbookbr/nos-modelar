@@ -124,7 +124,7 @@ export function vincoOcultoDaSuperficie(sup, opcoes = {}) {
   const vincos = cadeias.map((c, i) => ({ c, i })).filter(({ i }) => !emPar.has(i)).map(({ c }) => resumo(c, 'vinco'));
   const ordem = (x, y) => y.comprimentoMm - x.comprimentoMm || x.posicaoMm[0] - y.posicaoMm[0] || x.posicaoMm[1] - y.posicaoMm[1] || x.posicaoMm[2] - y.posicaoMm[2];
   vincos.sort(ordem); chanfros.sort(ordem);
-  return { vincos, chanfros, arestasCrista: cristas.length, segmentos: { vinco: cadeias.filter((_, i) => !emPar.has(i)).flatMap((c) => c.itens.map((x) => [V[x.e.a], V[x.e.b]])), chanfro: cadeias.filter((_, i) => emPar.has(i)).flatMap((c) => c.itens.map((x) => [V[x.e.a], V[x.e.b]])) } };
+  return { vincos, chanfros, arestasCrista: cristas.length, _cadeias: cadeias, segmentos: { vinco: cadeias.filter((_, i) => !emPar.has(i)).flatMap((c) => c.itens.map((x) => [V[x.e.a], V[x.e.b]])), chanfro: cadeias.filter((_, i) => emPar.has(i)).flatMap((c) => c.itens.map((x) => [V[x.e.a], V[x.e.b]])) } };
 }
 
 /** vincoOcultoDaReceita(receita, opcoes, executada?) -> { opcoes, superficies, vincos, chanfros, aceitos }; o achado que `PLANO.dobrasAceitas` cobre sai de `vincos` e `chanfros`
@@ -133,7 +133,7 @@ export function vincoOcultoDaReceita(receita, opcoes = {}, executada = null) {
   const o = { ...PADROES, ...opcoes };
   const aceitas = aceitasDaReceita(receita);
   const superficies = superficiesDaReceita(receita, executada).map((sup) => {
-    const { segmentos, ...r } = vincoOcultoDaSuperficie(sup, o);
+    const { segmentos, _cadeias, ...r } = vincoOcultoDaSuperficie(sup, o);
     const v = separarAceitos(aceitas, r.vincos); const c = separarAceitos(aceitas, r.chanfros);
     return { passo: sup.passo, ...r, vincos: v.restantes, chanfros: c.restantes, aceitos: [...v.aceitos, ...c.aceitos], _sup: sup, _segmentos: segmentos };
   });

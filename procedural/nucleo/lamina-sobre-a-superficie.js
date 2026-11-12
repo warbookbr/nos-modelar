@@ -276,11 +276,56 @@ export function bordasSeCruzamNaCurva(estacoes, fechada, largura) {
   return null;
 }
 
+/** Folga entre a parede do corte e a perna da aba, em fração do vão: a perna nunca fica rente à parede (a face coplanar da união é a lasca que a booleana deixa). */
+const RECUO_DA_ABA = 0.01;
+const SEGMENTOS_DO_FILETE = 4;
+
+/**
+ * O perfil da perna da aba, em (u, w): u para dentro do painel a partir da parede do corte, w para cima a partir da pele de fora (a chapa ocupa w de -espessura a 0).
+ * A perna é um retângulo de `largura` (comprimento) e `espessura`, que sai da quina de baixo da parede (u = recuo, w = -espessura) na direção do giro de `angulo` graus
+ * da chapa (90: reto para baixo; menos: inclinada para debaixo do próprio painel), com o começo embutido na chapa para a união pegar; `raio` enche o canto de dentro da dobra
+ * (a pele de baixo do painel com a face de dentro da perna) com um filete. Devolve o polígono, de u não menor que o recuo, que a varredura leva ao longo da linha.
+ */
+export function perfilDaAba({ espessura: t, largura: L, angulo, raio = 0, recuo }) {
+  const th = (angulo * Math.PI) / 180;
+  const d = [Math.cos(th), -Math.sin(th)];
+  const p = [Math.sin(th), Math.cos(th)];
+  /* o embutimento: meia espessura, e menos quando a perna inclinada sairia acima da pele (a ponta de cima fica a um quarto da espessura abaixo dela, no mais) */
+  const embute = Math.max(0, Math.min(0.5 * t, (0.75 * t - t * Math.cos(th)) / Math.sin(th)));
+  const Q0 = [recuo + embute * -d[0], -t + embute * -d[1]];
+  const Q1 = [Q0[0] + t * p[0], Q0[1] + t * p[1]];
+  const Q2 = [Q1[0] + L * d[0], Q1[1] + L * d[1]];
+  const Q3 = [Q0[0] + L * d[0], Q0[1] + L * d[1]];
+  let poligono = [Q0, Q1, Q2, Q3];
+  if (raio > 0) {
+    /* o canto de dentro: a face de fora da perna (a reta de Q1 a Q2) cruza a pele de baixo do painel (w = -t) em C, e o filete de raio `raio` fica entre as duas semirretas que
+       saem de C, uma para +u (a pele de baixo) e outra para baixo pela perna, com `angulo` entre elas; o contorno sobe depois por dentro da chapa até a ponta mais alta do retângulo */
+    const C = (() => { const s = (Q1[1] + t) / Math.sin(th); return [Q1[0] + s * d[0], Q1[1] + s * d[1]]; })();
+    const metade = th / 2;
+    const dist = raio / Math.tan(metade);
+    const T1 = [C[0] + dist, C[1]];
+    const Tf = [C[0] + dist * d[0], C[1] + dist * d[1]];
+    const bis = [1 + d[0], d[1]]; const nb = Math.hypot(bis[0], bis[1]);
+    const centro = [C[0] + (bis[0] / nb) * (raio / Math.sin(metade)), C[1] + (bis[1] / nb) * (raio / Math.sin(metade))];
+    const a0 = Math.atan2(Tf[1] - centro[1], Tf[0] - centro[0]);
+    let varre = Math.atan2(T1[1] - centro[1], T1[0] - centro[0]) - a0;
+    while (varre > Math.PI) varre -= 2 * Math.PI;
+    while (varre <= -Math.PI) varre += 2 * Math.PI;
+    const arco = Array.from({ length: SEGMENTOS_DO_FILETE + 1 }, (_, k) => { const a = a0 + (varre * k) / SEGMENTOS_DO_FILETE; return [centro[0] + raio * Math.cos(a), centro[1] + raio * Math.sin(a)]; });
+    const wTopo = Math.max(Q0[1], Q1[1]);
+    const sTopo = (Q0[1] - wTopo) / Math.sin(th);
+    poligono = [[Q0[0] + sTopo * d[0], Q0[1] + sTopo * d[1]], Q3, Q2, ...arco, [T1[0], wTopo]];
+  }
+  const menor = Math.min(...poligono.map((q) => q[0]));
+  const deslocamento = menor < recuo ? recuo - menor : 0;
+  return poligono.map(([u, w]) => [u + deslocamento, w]);
+}
+
 /**
  * O sólido da lâmina: vértices e triângulos de um passo `subdivisao` de niveis 0.
  * @returns {{ vertices: number[][], faces: number[][], pontosDeDentro: number[][] | null }}
  */
-export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome, cima, areaPorNorma = false, alemDaPele = null }) {
+export function varrer({ estacoes, fechada, largura, profundidade, descarta, nome, cima, areaPorNorma = false, alemDaPele = null, aba = null }) {
   const est = estacoes.filter((s, i) => i === 0 || norma(sub(s.c, estacoes[i - 1].c)) > 1e-6);
   if (fechada && est.length > 1 && norma(sub(est[0].c, est[est.length - 1].c)) <= 1e-6) est.pop();
   if (est.length < 2) erro(`a linha '${nome}' ficou com menos de duas estações sobre a chapa`);
@@ -426,11 +471,66 @@ export function varrer({ estacoes, fechada, largura, profundidade, descarta, nom
     if (!fechada) faces.push([3, 2, 1, 0], [4 * (N - 1), 4 * (N - 1) + 1, 4 * (N - 1) + 2, 4 * (N - 1) + 3]);
   }
   /* de fora: o volume com sinal manda no sentido das faces */
-  let volume = 0;
-  for (const f of faces) for (let k = 1; k + 1 < f.length; k += 1) volume += dot(vertices[f[0]], cruz(vertices[f[k]], vertices[f[k + 1]])) / 6;
-  const saida = volume < 0 ? faces.map((f) => [...f].reverse()) : faces;
+  const orientar = (vs, fs) => {
+    let vol = 0;
+    for (const f of fs) for (let k = 1; k + 1 < f.length; k += 1) vol += dot(vs[f[0]], cruz(vs[f[k]], vs[f[k + 1]])) / 6;
+    return vol < 0 ? fs.map((f) => [...f].reverse()) : fs;
+  };
+  const saida = orientar(vertices, faces);
   const r5 = (v) => Math.round(v * 1e5) / 1e5;
-  return { vertices: vertices.map((p) => p.map(r5)), faces: saida, dentro: null, estacoes: est };
+  /* A ABA: a perna dobrada de cada lado da lâmina, um sólido fechado por lado (vértices e faces de um passo `subdivisao` de niveis 0), varrido ao longo das mesmas estações, com a
+     mesma esquadria nos cantos. O ponto do perfil (u, w) fica em c + M (h + u) + L w: M é o vetor lateral da estação (com a esquadria) que dá a parede do corte a `h`, e L a direção
+     da seção, para cima. As estações alongadas (as que passam da borda da chapa) ficam de fora, e a perna acaba na última estação sobre a chapa. */
+  let abas = null;
+  if (aba && !descarta) {
+    const quina = (i, sinal) => {
+      const antes = fechada ? seg[(i + N - 1) % N] : seg[i - 1];
+      const depois = fechada ? seg[i % N] : seg[i];
+      const A = antes ?? depois; const B = depois ?? antes;
+      const sA = mul(A.s, sinal); const sB = mul(B.s, sinal);
+      const g = dot(sA, sB);
+      const nm = unit(soma(A.n, B.n)) ?? A.n;
+      const cimaDe = est[i].cima ?? cima;
+      let M; let L;
+      if (g > 0.9999) {
+        M = sB;
+        L = unit(sub(cimaDe, mul(sB, dot(cimaDe, sB)))) ?? nm;
+      } else {
+        M = mul(soma(sA, sB), 1 / (1 + g));
+        const soma2 = unit(soma(sA, sB));
+        L = unit(cruz(sA, sB));
+        if (L && dot(L, cimaDe) < 0) L = mul(L, -1);
+        if (!L || est[i].cima || dot(L, nm) < 0.17) L = soma2 ? unit(sub(cimaDe, mul(soma2, dot(cimaDe, soma2)))) ?? nm : nm;
+      }
+      return { M, L };
+    };
+    const uteis = est.map((s, i) => i).filter((i) => !est[i].alongada);
+    const volta = fechada && uteis.length === N;
+    if (uteis.length < 2) erro(`a aba da linha '${nome}' ficou com menos de duas estações sobre a chapa`);
+    const perfil = perfilDaAba({ espessura: aba.espessura, largura: aba.largura, angulo: aba.angulo, raio: aba.raio ?? 0, recuo: RECUO_DA_ABA * largura });
+    abas = [1, -1].map((sinal) => {
+      const vs = []; const fs = [];
+      const nP = perfil.length;
+      uteis.forEach((i) => {
+        const { M, L } = quina(i, sinal);
+        for (const [u, w] of perfil) vs.push(soma(soma(est[i].c, mul(M, h + u)), mul(L, w)));
+      });
+      const nE = uteis.length;
+      const trechos = volta ? nE : nE - 1;
+      for (let e = 0; e < trechos; e += 1) {
+        const f = e; const g2 = (e + 1) % nE;
+        for (let m = 0; m < nP; m += 1) {
+          const m2 = (m + 1) % nP;
+          fs.push([f * nP + m, f * nP + m2, g2 * nP + m2], [f * nP + m, g2 * nP + m2, g2 * nP + m]);
+        }
+      }
+      if (!volta) {
+        fs.push(Array.from({ length: nP }, (_, m) => nP - 1 - m), Array.from({ length: nP }, (_, m) => (nE - 1) * nP + m));
+      }
+      return { lado: sinal, vertices: vs.map((q) => q.map(r5)), faces: orientar(vs, fs) };
+    });
+  }
+  return { vertices: vertices.map((p) => p.map(r5)), faces: saida, dentro: null, estacoes: est, abas };
 }
 
 /**
