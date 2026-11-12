@@ -481,7 +481,10 @@ function chassi() {
   const iDegrau = A.perfil.findIndex(([z]) => z < A.zDegrau);
   const daCabine = [...A.perfil.slice(0, iDegrau + 1)];
   const deTras = [[A.zDegrau, A.perfil[iDegrau][1]], ...A.perfil.slice(iDegrau + 1)];
-  parte('assoalho', bool('unir', [placaPorEstacoes(faixa(repartir(daCabine, 350), A.esp), -A.meia, A.meia, 4), placaPorEstacoes(faixa(repartir(deTras, 350), A.esp), -A.meiaTras, A.meiaTras, 4)]), CLARO);
+  /* as estações caem fora do x de 380 a 460 das longarinas (cinco na cabine, em x ±481,6 e ±160,8, e três atrás, em ±212,8): o degrau do assoalho (z -740 a -775, de y 400 a 490) corta a rampa
+     da longarina (z -720 a -850, de y 398 a 488; a ponta do degrau entra até 21 mm nela), e a medida de contatos só vê a entrada pelos vértices; uma estação em x ±401 a mostrava e dava
+     `atravessa` onde o par se declara `encosta`. O defeito é do rascunho (ATRITOS), e não da estação */
+  parte('assoalho', bool('unir', [placaPorEstacoes(faixa(repartir(daCabine, 350), A.esp), -A.meia, A.meia, 5), placaPorEstacoes(faixa(repartir(deTras, 350), A.esp), -A.meiaTras, A.meiaTras, 3)]), CLARO);
   parte('tunel', prisma('z', T.tunel, -740, 620), CINZA);
 
   /* longarinas: dois perfis fechados de 80 por 100, com o rebaixo sob a cabine, da face de dentro do painel dianteiro à do traseiro */
