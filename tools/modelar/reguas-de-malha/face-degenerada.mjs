@@ -24,7 +24,8 @@ export function normalDeNewell(pontos) {
 export function medirFaceDegenerada(neutro) {
   const faces = [];
   for (const face of neutro.F.values()) {
-    if (!Array.isArray(face.vs) || face.vs.length < 3) continue;
+    /* com menos de 3 cantos (ou sem lista) o adaptador também recusa ("precisa de pelo menos 3 vértices"): entra na régua, com a normal indefinida */
+    if (!Array.isArray(face.vs) || face.vs.length < 3) { faces.push({ id: face.id, cantos: Array.isArray(face.vs) ? face.vs.length : 0, normal: null, parte: face.parte ?? null }); continue; }
     const modulo = normalDeNewell(face.vs.map((v) => neutro.V.get(v)));
     if (modulo == null || !(modulo > LIMITE_DA_NORMAL)) faces.push({ id: face.id, cantos: face.vs.length, normal: modulo, parte: face.parte ?? null });
   }

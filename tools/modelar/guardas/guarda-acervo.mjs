@@ -30,6 +30,7 @@ import { ocorrenciasPosicionais, rotularOcorrencias } from '../../../procedural/
 import { nucleo } from '../../../procedural/nucleo/nucleo.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { medirFaceDegenerada } from '../reguas-de-malha/face-degenerada.mjs';
+import { medirArestaSolta } from '../reguas-de-malha/aresta-solta.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const ACERVO = join(REPO, 'procedural/pecas');
@@ -171,8 +172,6 @@ async function receitaSemPasso(peca) {
   return receita && Array.isArray(receita.PASSOS) && receita.PASSOS.length === 0 ? receita : null;
 }
 
-/* Confere UMA peça e devolve o que ela reprovou e se ela espera a etapa. Cada peça é independente das outras (lê o próprio
-   arquivo e não escreve nada), e é essa independência que deixa a varredura repartir as peças entre processadores. */
 /** O motivo da recusa quando a forma tem face que o `adaptarThree` recusaria como degenerada, ou null. */
 export function motivoDeFaceDegenerada(forma) {
   const degenerada = medirFaceDegenerada(forma);
@@ -181,6 +180,18 @@ export function motivoDeFaceDegenerada(forma) {
     + '\n  O `adaptarThree` recusa a face cujos cantos não definem plano, e a bancada não abre a peça; o defeito é da operação que a gerou, e não da receita.';
 }
 
+/** O motivo da recusa quando a casca da forma tem aresta que só uma face usa (a fresta que uma união deixava calada), ou null. A peça que escolhe a casca aberta declara
+    `meta.casca: 'aberta'` na receita; o acervo de hoje mede 0 arestas soltas. */
+export function motivoDeArestaSolta(forma, receita = null) {
+  if (receita?.meta?.casca === 'aberta') return null;
+  const solta = medirArestaSolta(forma);
+  if (!solta.total) return null;
+  return `${solta.total} ARESTA(S) SOLTA(S)\n${solta.exemplos.map((e) => `  aresta ${e.a}-${e.b} (só a face ${e.face} a usa)`).join('\n')}`
+    + "\n  A casca da peça não fecha: o passo que a gerou deixou fresta. Corrija a operação; só a peça que quer a casca aberta declara `meta: { casca: 'aberta' }`.";
+}
+
+/* Confere UMA peça e devolve o que ela reprovou e se ela espera a etapa. Cada peça é independente das outras (lê o próprio
+   arquivo e não escreve nada), e é essa independência que deixa a varredura repartir as peças entre processadores. */
 export async function conferirPeca(peca) {
   const reprovadas = [];
   const esperando = [];
@@ -264,6 +275,8 @@ export async function conferirPeca(peca) {
      exportação; a régua de malha usa o mesmo critério dele e a lista aqui, com a parte e os cantos de cada uma. */
   const degenerada = motivoDeFaceDegenerada(forma);
   if (degenerada) reprovadas.push({ peca, motivo: degenerada });
+  const solta = motivoDeArestaSolta(forma, receita);
+  if (solta) reprovadas.push({ peca, motivo: solta });
   return { reprovadas, esperando };
 }
 
