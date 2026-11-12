@@ -51,9 +51,10 @@ const Z = [
   2 * T.zCapo - T.zPeDoCapo, T.zCapo, T.zPeDoCapo, ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[0] - d).reverse(), ...doArco(ARCO_FRENTE),
   ...FORA_DO_ARCO.map((d) => ARCO_FRENTE[2] + d), 1765, 1860, T.zFrente, 2032, 2070, 2098, T.zBico,
 ];
-/* a estação do pé da tampa e uma 15 mm antes dela: a linha de vão ao longo de uma coluna não chega à estação em que a coluna termina no
-   meio da grade (CICLO-4.md), e vai até a anterior, 33 mm antes, com a ponta passando 7 mm da borda; a 15 mm, a gradação das estações
-   (59, 15, 26 mm) deixava um calombo de 9,6 mm junto do ombro */
+/* a estação do pé da tampa e uma 33 mm antes dela. No ciclo 4 a linha de vão ao longo de uma coluna não chegava à estação em que a coluna
+   termina, e ia até a de antes; no ciclo 5 `curvaDaGaiola` chega ao pé, e a linha vai até ele (acabando na de antes, ela deixava duas faces
+   de área nula em cada lateral traseira). A estação de antes fica pela gradação: sem ela o pé ficava a 74 e 26 mm das vizinhas, e o flanco
+   da lateral traseira saía com uma ondulação de 12,6 mm em z -1292 */
 Z.push(C_TRAS - T.vao, C_TRAS - T.vao - 33); Z.sort((a, b) => a - b);
 const nomeDaEstacao = (z) => NOMEADAS.get(z) ?? `z${z < 0 ? 'm' : ''}${Math.abs(Math.round(z))}`;
 
@@ -129,9 +130,9 @@ export function linhasDeVao() {
   const direitas = [
     /* o para-lama com a porta: sobe a lateral, passa a quina da cintura, cruza a faixa de cima e sai pela borda de dentro dela */
     { nome: 'fimDoParaLama', curva: curva({ estacao: 'fimDoParaLama', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
-    /* a ponta da frente passa só 6 mm da borda: com 30 mm a prova de separação acusa ponte num ponto da própria ponta, fora da chapa (CICLO-4.md) */
-    { nome: 'capo', curva: curva({ coluna: 'vaoDoCapo', de: 'peDoCapo', ate: 'bico' }), alem: [30, Number(process.env.HD_ALEM_CAPO ?? 6)] },
-    { nome: 'tampa', curva: curva({ coluna: 'vaoDoCapo', de: 'traseira', ate: 'antesDaTampa' }), alem: [6, 40] },
+    /* ciclo 5: a prova de separação ignora os pares fora da chapa na ponta alongada, e as pontas voltam a passar 30 mm da borda */
+    { nome: 'capo', curva: curva({ coluna: 'vaoDoCapo', de: 'peDoCapo', ate: 'bico' }), alem: [30, Number(process.env.HD_ALEM_CAPO ?? 30)] },
+    { nome: 'tampa', curva: curva({ coluna: 'vaoDoCapo', de: 'traseira', ate: 'peDaTampa' }), alem: [30, 30] },
     { nome: 'entrePortas', curva: curva({ estacao: 'entrePortas', de: 'soleira', ate: 'faixa' }), alem: [0, 30] },
     { nome: 'fimDaPortaTraseira', curva: curva({ estacao: 'fimDaPorta', de: 'fundo', ate: 'faixa' }), alem: [30, 30] },
     { nome: 'soleira', curva: curva({ coluna: 'soleira', de: 'fimDaPorta', ate: 'fimDoParaLama' }) },
@@ -147,7 +148,10 @@ let avisosDoCorte = [];
 let livre = 2;
 if (COM_PAINEIS) {
   const g = paineisPorVaos({ chapa: { passos: [chapa], origem: { op: 'subdivisao', id: 1 }, pontos }, vao: T.vao, linhas: linhasDeVao(), paineis: PAINEIS,
-    conferir: CONFERIR, medirTempo: true });
+    conferir: CONFERIR, medirTempo: true,
+    /* ciclo 5: a face de vértices quase alinhados que o corte deixa faz o relato de contatos chamar o painel de sólido inconclusivo e dar
+       travessias que não existem; `HD_LIMPAR` troca a tolerância da limpeza (0,01 mm é o padrão) */
+    ...(process.env.HD_LIMPAR ? { limpar: { tolerancia: Number(process.env.HD_LIMPAR) } } : {}) });
   passos = [...g.passos];
   for (const p of PAINEIS) passos.push(['pincel', { modo: 'face', sel: { grupo: p.nome }, cor: CORES[p.nome] }]);
   MEDIDAS_DO_CORTE = g.medidas; avisosDoCorte = g.avisos; livre = g.proximoId;

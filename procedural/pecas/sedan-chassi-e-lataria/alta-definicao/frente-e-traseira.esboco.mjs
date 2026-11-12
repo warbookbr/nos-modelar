@@ -1,4 +1,8 @@
-/* frente-e-traseira.esboco.mjs: o quarto ciclo de alta definição do sedã. O lado direito inteiro, até o eixo de simetria: os dois andares de
+/* frente-e-traseira.esboco.mjs: o quarto ciclo de alta definição do sedã, levado ao carro inteiro no quinto. No ciclo 5 cada gaiola por
+ * estações é a metade x >= 0 com `simetria: 'x'`, os para-choques vão de ponta a ponta com o raio no laço da ponta, e o farol e a lanterna
+ * são rebaixos por relevo com a lente que o anel devolve; o texto abaixo é o do ciclo 4.
+ *
+ * O lado direito inteiro, até o eixo de simetria: os dois andares de
  * `andar-de-cima.esboco.mjs` (que já trazem o capô até a borda da frente e a tampa do porta-malas) mais o painel da frente com a grade e o
  * farol, o painel de trás com a lanterna, os dois para-choques e a tomada de ar do capô.
  *
@@ -19,6 +23,8 @@ import { gaiolaPorLacos } from '../../../nucleo/gaiola-por-lacos.js';
 import doisAndares from './andar-de-cima.esboco.mjs';
 import { GAIOLA as BAIXO } from './caminho-a-gaiola-da-casca.esboco.mjs';
 import { curvaDaGaiola } from '../../../nucleo/curva-da-gaiola.js';
+import { SIMETRIA } from './caminho-a-gaiola-da-casca.esboco.mjs';
+import { espelharGaiola } from './espelho.mjs';
 import { T, topoY, ladoX, meia } from './alvo.mjs';
 
 const SO = process.env.HD_SO === 'frente';
@@ -32,14 +38,16 @@ export const F = {
   /* o recuo de cada lado é o que o anel aceita para a transição das voltas até a grade (ele diz a faixa que fecha em cada lado) */
   farol: { x: [310, 750], y: [715, 935], recuo: { farolBaixo: 42, farolAlto: 39, farolIni: 36, farolFim: 34 }, voltas: 3, largura: 7, raio: 18, relevo: [-14, -9, -4] },
   grade: { x: 283, y: [760, 930], laminas: 5, espessura: 7, fundo: 28 },
-  lanterna: { x: [440, 840], y: [745, 865] },   /* abaixo do ombro (no facetado, de y 815 a 925) */
+  /* ciclo 5: a lanterna também é rebaixo por relevo, com a lente do anel; o vão é o da abertura (no facetado, x 440 a 840 e y 815 a 925) mais
+     o recuo de cada lado, e o alto dele é a altura do ombro, que a coluna dele dá à borda do painel */
+  lanterna: { x: [400, 830], y: [715, 890], recuo: { lanternaBaixo: 45, lanternaAlto: 45, lanternaIni: 45, lanternaFim: 43 }, voltas: 3, largura: 7, raio: 18, relevo: [-14, -9, -4] },
   lente: { recuo: 0.8, sobra: 6, espessura: 4 },
-  paraChoque: { frente: { y: [413, 745], fundo: 72, raio: 8, raioDeTras: 3, ponta: 860 }, tras: { y: [457, 745], fundo: 72, raio: 8, raioDeTras: 3, ponta: 856, chanfro: 800 } },
+  paraChoque: { frente: { y: [413, 745], fundo: 72, raio: 8, raioDeTras: 3, raioDaPonta: Number(process.env.HD_RAIO_PONTA ?? 6), ponta: 860 }, tras: { y: [457, 745], fundo: 72, raio: 8, raioDeTras: 3, raioDaPonta: Number(process.env.HD_RAIO_PONTA ?? 6), ponta: 856, chanfro: 800 } },
   tomada: { z: [790, 1760], zCheia: 880, altura: 70, meia: [230, 420], raio: 6 },
 };
 
 /* ---- os painéis: a chapa vertical no plano z, de x 0 à borda do para-lama menos o vão ---- */
-function painel({ nome, z, sinal, yFundo, colunasY, estacoesX, vaos, aneis, cantos, estacao, meioDoLado, ajuste = 0 }) {
+function painel({ nome, z, sinal, yFundo, colunasY, estacoesX, vaos, aneis, cantos, estacao, meioDoLado, soNaBorda = [], ajuste = 0 }) {
   /* a borda da chapa de baixo na estação da ponta, tirada da superfície dela (`curvaDaGaiola`), e não da fórmula do alvo: a subdivisão
      encolhe a chapa e arredonda o ombro, e o painel feito pela fórmula ficava de 0,1 a 5,7 mm do para-lama. O lado da borda vai do fundo à
      cintura, o alto da cintura ao eixo; o painel acaba 4 mm para dentro da pele de dentro dela */
@@ -55,7 +63,9 @@ function painel({ nome, z, sinal, yFundo, colunasY, estacoesX, vaos, aneis, cant
     const ultima = i === estacoesX.length - 1;
     /* na última estação, uma coluna a mais no meio do vão do farol ou da lanterna, para o lado do painel seguir a borda curva do
        para-lama ali (ela só existe na borda, e a face antes dela fecha um pentágono) */
-    const lista = ultima && meioDoLado ? [...colunasY.slice(0, meioDoLado[0]), ['meioDoLado', meioDoLado[1], { comeca: true }], ...colunasY.slice(meioDoLado[0])] : colunasY;
+    let lista = ultima && meioDoLado ? [...colunasY.slice(0, meioDoLado[0]), ['meioDoLado', meioDoLado[1], { comeca: true }], ...colunasY.slice(meioDoLado[0])] : colunasY;
+    /* a coluna que só a borda tem (o ombro atrás, que o vão da lanterna cruza por dentro) */
+    lista = ultima ? lista.map(([c, y, extra]) => (soNaBorda.includes(c) ? [c, y, { ...extra, comeca: true }] : [c, y, extra])) : lista.filter(([c]) => !soNaBorda.includes(c));
     const colunas = lista.map(([c, y, extra = {}]) => {
       const yy = c === 'topo' ? yTopo(ultima ? xFim(y) : x) : c === 'fundo' ? yFundo : y;
       const xx = ultima ? xFim(yy) : x;
@@ -64,7 +74,7 @@ function painel({ nome, z, sinal, yFundo, colunasY, estacoesX, vaos, aneis, cant
     return { nome: n, em: mm(x), colunas };
   });
   /* com as estações ao longo de +x e as colunas de baixo para cima, a normal sai para -z: a frente vira, a traseira não */
-  return gaiolaPorEstacoes({ eixo: 'x', estacoes: est, vaos, aneis, cantos, prefixo: `${nome}_`, virar: sinal > 0 });
+  return gaiolaPorEstacoes({ eixo: 'x', estacoes: est, vaos, aneis, cantos, prefixo: `${nome}_`, virar: sinal > 0, fora: [0, 0, sinal], ...SIMETRIA });
 }
 const fa = F.farol; const gr = F.grade; const la = F.lanterna;
 export const PAINEL_DA_FRENTE = painel({
@@ -77,26 +87,22 @@ export const PAINEL_DA_FRENTE = painel({
   cantos: [{ estacao: 'eixo', coluna: 'fundo' }, { estacao: 'borda', coluna: 'fundo' }, { estacao: 'eixo', coluna: 'topo' }, { estacao: 'borda', coluna: 'topo' },
     { estacao: 'gradeFim', coluna: 'farolBaixo' }, { estacao: 'gradeFim', coluna: 'farolAlto' }],
 });
+const LX = Array.from({ length: 8 }, (_, k) => la.x[0] + ((la.x[1] - la.x[0]) * (k + 1)) / 9);
 export const PAINEL_DE_TRAS = painel({
-  nome: 'painelTraseiro', z: T.zTraseira, sinal: -1, yFundo: 470, estacao: 'traseira', meioDoLado: [4, 805], ajuste: 0.3,
-  /* colunas no alargado e no ombro, para o lado do painel seguir o degrau de 20 mm do ombro da lateral */
-  colunasY: [['fundo', 470], ['alargado', T.yAlargado], ['faixa', 700], ['lanternaBaixo', la.y[0]], ['lanternaAlto', la.y[1]], ['ombro', T.yOmbro], ['acima', 930], ['topo', 0]],
-  estacoesX: [['eixo', 0], ['t1', 150], ['t2', 300], ['lanternaIni', la.x[0]], ['l1', 570], ['l2', 710], ['lanternaFim', la.x[1]], ['borda', 870]],
+  nome: 'painelTraseiro', z: T.zTraseira, sinal: -1, yFundo: 470, estacao: 'traseira', meioDoLado: [4, 802], ajuste: 0.3,
+  /* colunas no alargado e no ombro, para o lado do painel seguir o degrau de 20 mm do ombro da lateral; em volta do vão, a 45 mm dele */
+  colunasY: [['fundo', 470], ['alargado', T.yAlargado], ['faixa', la.y[0] - 45], ['lanternaBaixo', la.y[0]], ['lanternaAlto', la.y[1]], ['acima', la.y[1] + 45], ['topo', 0]],
+  estacoesX: [['eixo', 0], ['t1', 120], ['t2', 240], ['t3', la.x[0] - 50], ['lanternaIni', la.x[0]], ...LX.map((x, k) => [`l${k + 1}`, x]), ['lanternaFim', la.x[1]], ['borda', 870]],
   vaos: [{ nome: 'lanterna', estacoes: ['lanternaIni', 'lanternaFim'], colunas: ['lanternaBaixo', 'lanternaAlto'] }],
-  cantos: [{ estacao: 'eixo', coluna: 'fundo' }, { estacao: 'borda', coluna: 'fundo' }, { estacao: 'eixo', coluna: 'topo' }, { estacao: 'borda', coluna: 'topo' },
-    ...['lanternaIni', 'lanternaFim'].flatMap((estacao) => ['lanternaBaixo', 'lanternaAlto'].map((coluna) => ({ estacao, coluna })))],
+  aneis: [{ nome: 'lanterna', vao: 'lanterna', recuo: la.recuo, voltas: la.voltas, largura: la.largura, raio: la.raio, relevo: la.relevo, lente: { folga: F.lente.recuo, sobra: F.lente.sobra, espessura: F.lente.espessura } }],
+  cantos: [{ estacao: 'eixo', coluna: 'fundo' }, { estacao: 'borda', coluna: 'fundo' }, { estacao: 'eixo', coluna: 'topo' }, { estacao: 'borda', coluna: 'topo' }],
 });
 
-/* ---- as lentes: chapas de 4 mm atrás da abertura, com a face de fora 0,8 mm dentro da pele da abertura ---- */
-function lente(nome, z, sinal, x, y, recuoTotal) {
-  const zf = z - sinal * recuoTotal; const S = F.lente.sobra;
-  const xs = [x[0] - S, (x[0] + x[1]) / 2, x[1] + S]; const ys = [y[0] - S, (y[0] + y[1]) / 2, y[1] + S];
-  const est = xs.map((xx, i) => ({ nome: `s${i}`, em: mm(xx), colunas: ys.map((yy, k) => ({ nome: `c${k}`, em: [mm(yy), mm(zf)] })) }));
-  return gaiolaPorEstacoes({ eixo: 'x', estacoes: est, cantos: [{ estacao: 's0' }, { estacao: 's2' }], prefixo: `${nome}_`, virar: sinal > 0 });
-}
-/* a abertura do farol fica `recuo` mm para dentro da borda do vão e 14 mm para dentro da pele (o relevo da volta 1) */
-export const LENTE_DO_FAROL = lente('lenteDoFarol', T.zBico, 1, [fa.x[0] + fa.recuo.farolIni, fa.x[1] - fa.recuo.farolFim], [fa.y[0] + fa.recuo.farolBaixo, fa.y[1] - fa.recuo.farolAlto], -fa.relevo[0] + F.lente.recuo);
-export const LENTE_DA_LANTERNA = lente('lenteDaLanterna', T.zTraseira, -1, la.x, la.y, F.lente.recuo);
+/* ---- as lentes: a chapa de 4 mm que o anel devolve (`lente`), 0,8 mm atrás da abertura do rebaixo e 6 mm maior que ela de cada lado;
+   a do lado esquerdo é a cópia espelhada ---- */
+const daLente = (g, anel) => { const l = g.aneis[anel].lente; return { pontosMm: emMm(l.pontos), passo: l.passo, espessura: l.espessuraMm }; };
+export const LENTE_DO_FAROL = daLente(PAINEL_DA_FRENTE, 'farol');
+export const LENTE_DA_LANTERNA = daLente(PAINEL_DE_TRAS, 'lanterna');
 
 /* ---- os para-choques ---- */
 /* o contorno da frente do corpo em planta, na altura y: o painel em z 2118 até a borda dele, e dali o canto do para-lama pela planta */
@@ -106,34 +112,52 @@ function zDoCorpoNaFrente(x, y) {
   for (let k = 0; k < 40; k++) { const m = (a + b) / 2; if (ladoX(m, y) > x) a = m; else b = m; }
   return (a + b) / 2;
 }
+/* o fundo da barra na ponta, em fração do fundo: com 0,45 (32 mm) o ponto do meio ficava a 16 mm das quinas e o raio de 8 mm não cabia
+   (`raioNaoCabe`), e a lista de raios que o aviso deixa não acompanha os pontos que o cruzamento da ponta põe na linha (CICLO-5.md) */
+const FUNDO_MINIMO = 0.5;
 function paraChoque(nome, lado) {
   const P = F.paraChoque[lado]; const sinal = lado === 'frente' ? 1 : -1; const [y0, y1] = P.y; const ym = (y0 + y1) / 2;
-  /* dois laços de apoio a 4 e 10 mm de cada ponta dão quina à tampa: o vinco ao longo do laço da ponta não passa pelos apoios das quinas
-     da barra (CICLO-4.md) */
-  const xs = lado === 'frente' ? [0, 4, 10, 160, 320, 480, 620, 720, 780, 805, 828, 846, P.ponta - 10, P.ponta - 4, P.ponta] : [0, 4, 10, 160, 320, 480, 620, 720, 780, P.chanfro, 830, P.ponta - 10, P.ponta - 4, P.ponta];
-  const lacos = xs.map((x) => {
+  /* ciclo 5: a barra vai de ponta a ponta, de -ponta a +ponta, e a ponta tem o vinco com raio no próprio laço (o núcleo cruza as quinas
+     da barra com ele). O laço seguinte fica a 4 raios ou mais da ponta (32 mm), e os laços de apoio à mão a 4 e 10 mm do ciclo 4 saíram */
+  const meiaBarra = lado === 'frente' ? [0, 160, 320, 480, 620, 720, 780, 805, P.ponta - 32, P.ponta] : [0, 160, 320, 480, 620, 720, 780, P.chanfro, P.ponta - 32, P.ponta];
+  const xs = [...meiaBarra.slice(1).reverse().map((x) => -x), ...meiaBarra];
+  const lacos = xs.map((xx) => {
+    const x = Math.abs(xx);
     let zb; let zf;
     /* no canto, o fundo do para-choque fica onde o para-lama já é 6 mm mais estreito que ele, em toda a altura da barra */
-    if (lado === 'frente') { zb = x <= 780 ? T.zBico + V : Math.max(...[y0, ym - 80, ym, ym + 80, y1].map((y) => zDoCorpoNaFrente(x - 6, y)), 1990) + V; zf = zb + P.fundo * Math.max(0.45, 1 - Math.max(0, x - 770) / 160); }
-    else { zb = T.zTraseira - V; const ch = Math.max(0, x - P.chanfro) / (P.ponta - P.chanfro); zf = zb - P.fundo * (1 - 0.6 * ch); }
+    /* nos últimos 32 mm a face de trás não acompanha mais o canto do para-lama, que recua 0,75 mm por mm ali: enviesada, ela dobrava 123 graus
+       com a tampa da ponta, e o raio da ponta não cabia na volta recuada da tampa */
+    const xFundo = lado === 'frente' ? Math.min(x, P.ponta - 32) : x;
+    if (lado === 'frente') { zb = xFundo <= 780 ? T.zBico + V : Math.max(...[y0, ym - 80, ym, ym + 80, y1].map((y) => zDoCorpoNaFrente(xFundo - 6, y)), 1990) + V; zf = zb + P.fundo * Math.max(FUNDO_MINIMO, 1 - Math.max(0, x - 770) / 160); }
+    else { zb = T.zTraseira - V; const ch = Math.max(0, x - P.chanfro) / (P.ponta - P.chanfro); zf = zb - P.fundo * (1 - (1 - FUNDO_MINIMO) * ch); }
     const [za, zc] = sinal > 0 ? [zb, zf] : [zf, zb];               /* za < zc */
-    const zm = (za + zc) / 2;
-    return { em: x, trechos: {
+    /* o ponto do meio de cima e de baixo fica a um terço do fundo a partir da quina de dentro (raio 3), para o apoio da quina de fora
+       (raio 8, 11,8 mm) caber na metade da face até ele também na ponta, onde a barra tem 36 mm de fundo */
+    const zm = sinal > 0 ? za + 0.33 * (zc - za) : zc - 0.33 * (zc - za);
+    return { em: xx, trechos: {
       baixo: [[y0, za], [y0, zm], [y0, zc]], frente: [[y0, zc], [ym - 60, zc], [ym + 60, zc], [y1, zc]],
       cima: [[y1, zc], [y1, zm], [y1, za]], tras: [[y1, za], [ym + 60, za], [ym - 60, za], [y0, za]] } };
   });
   /* a face de fora é a de z maior na frente e a de z menor atrás: o raio grande vai nas quinas dela */
   const fora = sinal > 0 ? 'frente' : 'tras'; const dentro = sinal > 0 ? 'tras' : 'frente';
-  /* fechado também no eixo: aberto ali, o sólido deixa o relato de contatos inconclusivo; ao espelhar o carro, a tampa do eixo sai */
   return gaiolaPorLacos({ nome, eixo: 'x', tampa: { de: 'baixo', ate: 'cima' },
     trechos: [{ nome: 'baixo', pontos: 3 }, { nome: 'frente', pontos: 4 }, { nome: 'cima', pontos: 3 }, { nome: 'tras', pontos: 4 }], lacos,
     vincos: [{ nome: `${nome}QuinaDeCima`, entre: [fora === 'frente' ? 'frente' : 'cima', fora === 'frente' ? 'cima' : 'tras'], raio: P.raio },
       { nome: `${nome}QuinaDeBaixo`, entre: [fora === 'frente' ? 'baixo' : 'tras', fora === 'frente' ? 'frente' : 'baixo'], raio: P.raio },
       { nome: `${nome}QuinaDeTrasCima`, entre: [dentro === 'tras' ? 'cima' : 'frente', dentro === 'tras' ? 'tras' : 'cima'], raio: P.raioDeTras },
-      { nome: `${nome}QuinaDeTrasBaixo`, entre: [dentro === 'tras' ? 'tras' : 'baixo', dentro === 'tras' ? 'baixo' : 'frente'], raio: P.raioDeTras }] });
+      { nome: `${nome}QuinaDeTrasBaixo`, entre: [dentro === 'tras' ? 'tras' : 'baixo', dentro === 'tras' ? 'baixo' : 'frente'], raio: P.raioDeTras },
+      { nome: `${nome}PontaEsq`, laco: 'primeiro', raio: P.raioDaPonta }, { nome: `${nome}PontaDir`, laco: 'ultimo', raio: P.raioDaPonta }] });
 }
-export const PARA_CHOQUE_DA_FRENTE = paraChoque('paraChoqueDianteiro', 'frente');
-export const PARA_CHOQUE_DE_TRAS = paraChoque('paraChoqueTraseiro', 'tras');
+/* o cruzamento das quinas na ponta põe pontos sem o nome da gaiola (`canto5_3_1_1`), e os do para-choque de trás sobrescreviam os da frente
+   no topo comum, que ganhava um espinho até z 99 (CICLO-5.md); cada ponto sem o prefixo da peça o recebe aqui */
+export function comPrefixo(g, nome) {
+  const r = (n) => (n.startsWith(`${nome}_`) ? n : `${nome}_${n}`);
+  const passo = { ...g.passo, vertices: g.passo.vertices.map(r), faces: g.passo.faces.map((f) => f.map(r)),
+    ...(g.passo.vincos ? { vincos: g.passo.vincos.map((v) => ({ ...v, pontos: v.pontos.map(r) })) } : {}), ...(g.passo.cantos ? { cantos: g.passo.cantos.map(r) } : {}) };
+  return { ...g, passo, pontosMm: Object.fromEntries(Object.entries(g.pontosMm).map(([n, q]) => [r(n), q])) };
+}
+export const PARA_CHOQUE_DA_FRENTE = comPrefixo(paraChoque('paraChoqueDianteiro', 'frente'), 'paraChoqueDianteiro');
+export const PARA_CHOQUE_DE_TRAS = comPrefixo(paraChoque('paraChoqueTraseiro', 'tras'), 'paraChoqueTraseiro');
 
 /* ---- a tomada de ar: a chapa sobre o capô, de z 790 a 1760, aberta na frente e fundida no capô atrás ---- */
 function tomada() {
@@ -149,7 +173,7 @@ function tomada() {
     const topo = [['topoBorda', w - 40], ['topoMeio', w / 2], ['centro', 0]].map(([n, x]) => ({ nome: n, em: [mm(x), mm(topoY(x, z) + h - (topoY(w - 12, z) - topoY(x, z)) * 0)] }));
     return { nome: `t${i}`, em: mm(z), colunas: [...nomeDaColuna.map((c) => ({ ...c, em: [c.em[0], c.em[1]] })), ...topo] };
   });
-  return gaiolaPorEstacoes({ eixo: 'z', estacoes: est, prefixo: 'tomada_', vincos: [{ nome: 'quinaDaTomada', coluna: 'quina', raio: t.raio }],
+  return gaiolaPorEstacoes({ eixo: 'z', estacoes: est, prefixo: 'tomada_', fora: [0, 1, 0], ...SIMETRIA, vincos: [{ nome: 'quinaDaTomada', coluna: 'quina', raio: t.raio }],
     cantos: [{ estacao: `t${zs.length - 1}`, coluna: 'base' }, { estacao: `t${zs.length - 1}`, coluna: 'centro' }, { estacao: 't0', coluna: 'centro' }] });
 }
 export const TOMADA = tomada();
@@ -171,8 +195,16 @@ function chapa(nome, g, { espessura = T.chapa, niveis = 2, cor, lacos = false })
 }
 const ID_DA_FRENTE = chapa('painelDianteiro', PAINEL_DA_FRENTE, { cor: COR.painelDianteiro });
 chapa('painelTraseiro', PAINEL_DE_TRAS, { cor: COR.painelTraseiro });
-chapa('lenteDoFarolDir', LENTE_DO_FAROL, { espessura: F.lente.espessura, niveis: 1, cor: COR.lente });
-chapa('lanternaDir', LENTE_DA_LANTERNA, { espessura: F.lente.espessura, niveis: 1, cor: COR.lanterna });
+/* cada lente nos dois lados: a do anel à direita e a cópia espelhada à esquerda */
+for (const [nome, L, cor] of [['lenteDoFarol', LENTE_DO_FAROL, COR.lente], ['lanterna', LENTE_DA_LANTERNA, COR.lanterna]]) {
+  const lados = [['Dir', L], ...(SIMETRIA.simetria ? [['Esq', espelharGaiola(L, (n) => `${n}_esq`)]] : [])];
+  for (const [lado, g] of lados) {
+    Object.assign(topo, g.pontosMm ?? g.pontos);
+    const i = id++;
+    passos.push(['subdivisao', { origemId: i, ...g.passo, niveis: 1, borda: 'cantos', espessura: L.espessura }],
+      ['parte', { nome: `${nome}${lado}`, sel: { origem: { op: 'subdivisao', id: i } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'subdivisao', id: i } }, cor }]);
+  }
+}
 chapa('paraChoqueDianteiro', PARA_CHOQUE_DA_FRENTE, { espessura: null, cor: COR.paraChoque, lacos: true });
 chapa('paraChoqueTraseiro', PARA_CHOQUE_DE_TRAS, { espessura: null, cor: COR.paraChoque, lacos: true });
 chapa('tomadaDeAr', TOMADA, { cor: COR.tomadaDeAr });
@@ -181,7 +213,7 @@ chapa('tomadaDeAr', TOMADA, { cor: COR.tomadaDeAr });
 const laminas = [];
 for (let k = 0; k < gr.laminas; k++) {
   const y = gr.y[0] + ((gr.y[1] - gr.y[0]) * (k + 0.5)) / gr.laminas; const i = id++; const nome = `laminaDaGrade${k + 1}`;
-  passos.push(['cubo', { origemId: i, larg: gr.x + 17, alt: gr.espessura, prof: gr.fundo, em: [(gr.x + 17) / 2, y - gr.espessura / 2, T.zBico - T.chapa - gr.fundo / 2 + 0.2] }],
+  passos.push(['cubo', { origemId: i, larg: 2 * (gr.x + 17), alt: gr.espessura, prof: gr.fundo, em: [0, y - gr.espessura / 2, T.zBico - T.chapa - gr.fundo / 2 + 0.2] }],
     ['parte', { nome, sel: { origem: { op: 'cubo', id: i } } }], ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: i } }, cor: COR.grade }]);
   laminas.push(nome);
 }
@@ -190,27 +222,28 @@ void ID_DA_FRENTE;
 /* ---- os contatos e os vãos ---- */
 const folga = (par, motivo) => ({ par, relacao: 'folga', motivo, folga: { esperada: 4.1, tolerancia: 0.1, degrau: 0.3 } });
 const atravessa = (par, motivo) => ({ par, relacao: 'atravessa', motivo });
+const LADOS = SIMETRIA.simetria ? ['Dir', 'Esq'] : ['Dir'];
 if (!SO) {
   contatos.push(folga(['capo', 'painelDianteiro'], 'vão de 4 mm entre a borda da frente do capô e o alto do painel'),
-    folga(['paraLamaDir', 'painelDianteiro'], 'vão de 4 mm entre a borda da frente do para-lama e o lado do painel'),
+    ...LADOS.flatMap((L) => [folga([`paraLama${L}`, 'painelDianteiro'], 'vão de 4 mm entre a borda da frente do para-lama e o lado do painel'),
+      folga([`lateralTraseira${L}`, 'painelTraseiro'], 'vão de 4 mm entre a borda de trás da lateral e o lado do painel')]),
     folga(['tampaDoPortaMalas', 'painelTraseiro'], 'vão de 4 mm entre a borda de trás da tampa e o alto do painel'),
-    folga(['lateralTraseiraDir', 'painelTraseiro'], 'vão de 4 mm entre a borda de trás da lateral e o lado do painel'),
     folga(['capo', 'teto'], 'vão de 4 mm entre o pé do capô e o do para-brisa, no mesmo plano'),
     folga(['tampaDoPortaMalas', 'teto'], 'vão de 4 mm entre o pé da tampa e o do vidro traseiro, no mesmo plano'),
     atravessa(['tomadaDeAr', 'capo'], 'a tomada de ar assenta no capô, com a borda 1 mm dentro da chapa'));
 }
-contatos.push(atravessa(['lenteDoFarolDir', 'painelDianteiro'], 'a lente fica atrás da abertura do rebaixo e encosta na borda dele'),
-  atravessa(['lanternaDir', 'painelTraseiro'], 'a lente da lanterna fica atrás do vão, rente, colada na chapa'),
+contatos.push(...LADOS.flatMap((L) => [atravessa([`lenteDoFarol${L}`, 'painelDianteiro'], 'a lente do anel fica 0,8 mm atrás da abertura do rebaixo, e a sobra de 6 mm dela passa por trás da parede dele'),
+  atravessa([`lanterna${L}`, 'painelTraseiro'], 'a lente do anel fica 0,8 mm atrás da abertura do rebaixo, e a sobra de 6 mm dela passa por trás da parede dele')]),
   ...laminas.map((n) => atravessa([n, 'painelDianteiro'], 'a lâmina passa por trás da borda do vão da grade e encosta na face de dentro do painel')),
   folga(['paraChoqueDianteiro', 'painelDianteiro'], 'o para-choque fica 4 mm à frente do painel; o suporte fica fora do esboço'),
   folga(['paraChoqueTraseiro', 'painelTraseiro'], 'o para-choque fica 4 mm atrás do painel; o suporte fica fora do esboço'));
 
 export const AVISOS = Object.fromEntries([['painelDianteiro', PAINEL_DA_FRENTE], ['painelTraseiro', PAINEL_DE_TRAS], ['paraChoqueDianteiro', PARA_CHOQUE_DA_FRENTE], ['paraChoqueTraseiro', PARA_CHOQUE_DE_TRAS], ['tomadaDeAr', TOMADA]].map(([n, g]) => [n, g.avisos ?? []]));
 export default {
-  plano: 'Quarto ciclo de alta definição do sedã: o lado direito inteiro até o eixo, com a cabine fechada nas pontas, o capô com a tomada de ar, os painéis da frente e de trás com grade, farol e lanterna, e os para-choques.',
+  plano: 'Quinto ciclo de alta definição do sedã: a lataria inteira pela simetria das gaiolas, com a cabine, o capô com a tomada de ar, os painéis da frente e de trás com grade, farol e lanterna em rebaixo, e os para-choques de ponta a ponta.',
   vista: 'isometrica',
   opcoes: [{
-    titulo: 'caminho A, ciclo 4: o lado inteiro',
+    titulo: 'caminho A, ciclo 5: a lataria inteira',
     nota: 'dois andares por gaiola de estações com raio no vinco; painéis, lentes e tomada por gaiola de estações; para-choques por laços',
     passos, topo, contatos,
   }],
