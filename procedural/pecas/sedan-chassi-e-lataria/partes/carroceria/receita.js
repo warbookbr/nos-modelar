@@ -122,14 +122,14 @@ const receita = {
   get vaos() {
     return VIDROS.map(([, , vao], i) => ({ nome: vao, borda: CABINE.bordaDoVao(vao), frisos: [MOLDURAS[i]] }));
   },
-  /* Os extremos que a tabela do alvo e a do rascunho fixam: o eixo da frente (de x -870 a 870, raio 30, centro em y 364 e z 1249), o de trás, e o alto e o pé do teto. */
+  /* Os extremos que a tabela do alvo e a do rascunho fixam: o eixo da frente (de x -870 a 870, raio 30, centro em y 364 e z 1249), o de trás, e o alto do teto (a borda do peitoril, em x 816, e o pé do para-brisa, em z 738). */
   get PONTOS() {
     const E = FACETADO.eixoRaio; const R = FACETADO.roda;
     const zs = Array.from({ length: 401 }, (_, k) => C.zTras + ((C.zFrente - C.zTras) * k) / 400);
     return [
       { nome: 'eixo dianteiro, a ponta de fora, de cima e da frente', parte: 'eixoDianteiro', medida: 'maximo', em: [FACETADO.eixoMeia, R.raio + E, R.zFrente + E], toleranciaMm: 1 },
       { nome: 'eixo traseiro, a ponta de fora, de baixo e de trás', parte: 'eixoTraseiro', medida: 'minimo', em: [-FACETADO.eixoMeia, R.raio - E, R.zTras - E], toleranciaMm: 1 },
-      { nome: 'teto, a quina do pé do para-brisa e o alto', parte: 'teto', medida: 'maximo', em: [C.xPe, Math.max(...zs.map((z) => yTopoDaCabine(0, z))), C.zFrente], toleranciaMm: 3 },
+      { nome: 'teto, a borda do peitoril, o alto e o pé do para-brisa', parte: 'teto', medida: 'maximo', em: [C.xBase, Math.max(...zs.map((z) => yTopoDaCabine(0, z))), C.zFrente], toleranciaMm: 3 },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },

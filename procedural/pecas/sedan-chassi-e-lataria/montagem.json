@@ -47,6 +47,7 @@
     "rodas",
     "acessorios"
   ],
+  "vinculos": [],
   "posicoes": [
     {
       "id": "vidrosNaOsVidros",
@@ -94,7 +95,7 @@
     }
   ],
   "auditoriaIntersecoes": {
-    "toleranciaNumerica": 1e-9,
+    "toleranciaNumerica": 1e-09,
     "expectativas": [
       {
         "id": "carroceriaComVidros",

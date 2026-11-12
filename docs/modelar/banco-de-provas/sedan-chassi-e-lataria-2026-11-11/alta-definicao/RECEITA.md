@@ -10,13 +10,13 @@ Cada etapa é escrita no referencial do carro, e as poses da montagem saem ident
 
 ## As medidas de cada etapa
 
-As medidas são as de 2026-11-12, com a máquina em uso por outras sessões. Todas as receitas passam em `guarda:acervo` (as quatro menores) e em `conferir-pontos`, e `descrever` sai com 0 nas quatro menores. A carroceria sai com 1 pelo atrito 2: todo o resto do `descrever` dela passa, com 55 partes, 174.437 faces, nenhuma sem parte e nenhum órfão, e o único problema é a abertura da chapa de baixo em que a cabine assenta, que `vaos` não consegue declarar.
+As medidas são as de 2026-11-12, com a máquina em uso por outras sessões. As cinco receitas passam em `guarda:referencial` e em `conferir-pontos`; as quatro menores passam em `guarda:acervo` e saem do `descrever` com 0. A carroceria reprova em `guarda:acervo` e sai do `descrever` com 1, pelo atrito 2: todo o resto do `descrever` dela passa, com 55 partes, 174.437 faces, nenhuma sem parte e nenhum órfão, e o único problema é a abertura da chapa de baixo em que a cabine assenta, que `vaos` não consegue declarar. `npm run docs:links:check` passa com o `RECEITA.md` e o link dele no `CICLO-5.md`; `npm run mapa:check` falha só porque `docs/MAPA.md` pede `npm run mapa` depois dos arquivos novos.
 
 | Etapa | Partes | Faces | Pontos declarados | Ondulação, fora das feições / junto delas | Raio pedido, dentro dos 20% |
 |---|---|---|---|---|---|
-| carroceria | 55 | 174.437 | 3 de 3, desvios medidos na saída de `conferir-pontos` | ver abaixo (do carro inteiro) | ver abaixo (do carro inteiro) |
+| carroceria | 55 | 174.437 | 3 de 3, desvios de 0, 0 e 0,25 mm | ver abaixo (do carro inteiro) | ver abaixo (do carro inteiro) |
 | vidros | 8 | 1.880 | 2 de 2, a 2,5 e 3,2 mm | 0 / 0 | sem vinco nomeado |
-| frente-e-traseira | 15 | 51.474 | 2 de 2, desvio 0 | 6 / 57 | 11 de 13; fora as duas pontas do para-choque de trás (1 de 12 cortes cada) |
+| frente-e-traseira | 15 | 51.738 | 2 de 2, desvio 0 | 6 / 57 | 11 de 13; fora as duas pontas do para-choque de trás (1 de 12 cortes cada) |
 | rodas | 16 | 10.024 | 2 de 2, desvio 0 | 0 / 0 | sem vinco nomeado |
 | acessorios | 6 | 3.640 | 2 de 2, desvio 0 | 0 / 30 | sem vinco nomeado |
 
@@ -28,7 +28,7 @@ O carro inteiro montado pelas cinco etapas está em [`carro-pela-receita.mjs`](.
 
 `npm run raio:aresta -- procedural/pecas/sedan-chassi-e-lataria/alta-definicao/carro-pela-receita.mjs` dá 25 de 29 arestas com pedido dentro de 20%; fora ficam o ombro (11 de 84 cortes, onde a quina morre), a quina da cabine (2 de 49) e a ponta do para-choque de trás (1 de 12 de cada lado), como no ciclo 5. Leva 5,7 min.
 
-`npm run ondulacao -- procedural/pecas/sedan-chassi-e-lataria/alta-definicao/carro-pela-receita.mjs`: ONDULACAO_DO_CARRO
+`npm run ondulacao -- procedural/pecas/sedan-chassi-e-lataria/alta-definicao/carro-pela-receita.mjs`: dá 213 falhas fora das feições e 129 junto delas, em 6,4 min. As 129 junto das feições são o número do ciclo 5. Das 213, 9 estão nas superfícies de chapa (3 na chapa de baixo e 6 nas peças da frente e da traseira), o mesmo número que o ciclo 5 achou, sem que eu as tenha comparado uma a uma; as outras 204 estão nas dez gaiolas do forro (passos 254 a 263), que são faces planas de aresta viva sem subdivisão e que a leitura dá como falhas nas arestas delas (atrito 10). O teto e as molduras dão 0 falhas e 25 junto das feições.
 
 ## Os vãos sem fundo
 
@@ -46,7 +46,7 @@ Ficam declarados, com `--sem-fundo=<a>:<b>:<motivo>` e o motivo escrito no coman
 
 ## O tempo
 
-TEMPOS_DE_MONTAGEM
+Os tempos são de `node procedural/pecas/sedan-chassi-e-lataria/alta-definicao/tempo-das-etapas.mjs`, que monta cada etapa com `executarReceita`, num processo só e na ordem da montagem, sem as medidas e sem a importação do esboço (cerca de 10 s, uma vez por processo), com a máquina a carga média de 11 por outras sessões: carroceria 241,7 s, vidros 0,1 s, frente e traseira 2,1 s, rodas 1,1 s, acessórios 0,1 s e o carro inteiro, pelas cinco juntas, 315,5 s. As quatro etapas pequenas rodaram depois da carroceria no mesmo processo, e o `descrever` dos vidros sozinho leva 11 s com a importação. O `descrever` da carroceria leva 275 s, o relato de contatos do carro 17 min, e cada medida de vãos sobre o carro (`vao:partes`, com a montagem) 12 a 16 min; a ondulação do carro leva 6,4 min e o raio 5,7 min com a montagem em cache. No ciclo 5 a montagem do carro levava 210 a 220 s sem o corte de conferência dos painéis e 415 com ele: a da carroceria, que traz a lataria e o chassi, leva 242 s.
 
 ## As imagens
 
@@ -73,6 +73,8 @@ O recorte do canto do para-choque de trás está em [`recorte-do-canto-de-tras-a
 8. O limite de 240 caracteres do `objeto` do `PLANO` só aparece na execução do `descrever`: a primeira receita da frente e traseira saiu com 252 e foi recusada, sem nada que avisasse antes. O processo pegou, no primeiro `descrever`; é atrito pequeno.
 
 9. Os gates que dependem do `descrever` da carroceria são lentos: 275 s só para a descrição, 242 s da montagem, e o cache de `tmp/cache-de-medida/` guarda uma montagem só por arquivo, de modo que medir o carro antes e depois de fechar os vãos, com a mesma lista de passos e variáveis diferentes, desfaz o cache a cada troca. O processo pega o tempo, porque quem mede espera; não há gate, e o custo por rodada fica como no atrito 14 do ciclo 5.
+
+10. O `ondulacao` lê as dez gaiolas do forro, de `niveis` 0 e consumidas por `unir`, como superfície e dá 204 falhas nas arestas vivas delas (a faixa é um sólido de faces planas, sem curvatura a medir), enquanto a mesma leitura pulou 12 gaiolas sem subdivisão consumidas por um passo posterior; não achei o que separa as dez das doze. O processo pegou a falha, que é falso positivo, e o número de falhas do carro fora das feições passa de 9 para 213 sem que a lataria tenha mudado. Falta a leitura pular a gaiola de `niveis` 0, ou aceitar a declaração de que a parte é facetada de propósito.
 
 ## O que depende de decisão
 
