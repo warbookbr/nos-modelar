@@ -81,13 +81,13 @@ import { forma } from './receita/forma.js';
 import { derivar } from './receita/gaiola.js';
 import { contornoPorRetos, derivarFarois, derivarGrade, derivarLanternas, derivarLuzesDeCanto, derivarPiscasLaterais, raiosDoContorno } from './receita/farol.js';
 import { derivarInterior } from './receita/interior.js';
-import { derivarJanelas, pontasDaBase } from './receita/janela.js';
+import { cantosDaColuna, derivarJanelas, pontasDaBase } from './receita/janela.js';
 import { derivarLuzesPorDentro } from './receita/luzes.js';
 import { derivarDetalhes, passosDosDetalhes } from './receita/detalhes.js';
 import { BASE_DAS_RODAS, comBase, familias, materiaisDoPneu } from './receita/rodas.js';
 import {
   ANTENA, MACANETAS, PLACAS_DAS_MACANETAS, PONTEIRA,
-  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BASES_DO_RETROVISOR, BORRACHAS, AROS, CRISTAIS, JANELAS_DA_CABINE, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
+  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BASES_DO_RETROVISOR, BORRACHAS, COLUNAS_DA_JANELA, AROS, CRISTAIS, JANELAS_DA_CABINE, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
 } from './receita/nomes.js';
 
@@ -230,9 +230,9 @@ export const TABELA = {
   vidro_cabine_base_y: 1490, // do vão antigo da gaiola: só ordena os anéis, que a janela nova (abaixo) não usa
   vidro_cabine_topo_y: 1960,
   moldura_vidro_cabine: 70,
-  // a janela da cabine (2026-11-11, pelo alvo que a pessoa aprovou; as cotas são do desenho, a ±30 mm, em z (a frente é o maior) e y vistas de lado, e `receita/janela.js` as lê): um vão de
-  // vidro só, dividido pela coluninha de chapa, com o vidro grande atrás dela, o triângulo fixo na frente e, na metade da frente do triângulo, a peça preta da base do retrovisor. Os vidros são vãos
-  // abertos na chapa pronta pelo contorno visto de lado. As cotas são as da moldura de borracha: a borda de fora dela nos lados de baixo, de cima e de trás e na borda da frente do triângulo, e a borda do vidro que se vê junto da coluninha
+  // a janela da cabine (2026-11-12, pelo alvo que a pessoa aprovou; as cotas são do desenho, a ±30 mm, em z (a frente é o maior) e y vistas de lado, e `receita/janela.js` as lê): um vão de
+  // vidro só, com uma borracha contínua em volta, a coluninha como barra preta da moldura sobre o vidro, o vidro grande atrás dela, o triângulo fixo na frente e, na metade da frente do triângulo, a peça
+  // preta da base do retrovisor. O vão é aberto na chapa pronta pelo contorno visto de lado. As cotas são as da moldura de borracha: a borda de fora dela nos lados de baixo, de cima e de trás e na borda da frente do triângulo, e a borda do vidro que se vê junto da coluninha
   // e da peça preta; o vão sai delas recuado `janela_borracha_fora` onde a cota é a borda de fora e aberto `janela_borracha_dentro` onde é a do vidro
   janela_borracha_fora: 12, // quanto a borracha da janela passa sobre a chapa: com os 8 abaixo, a moldura preta tem 20 mm (a dos outros vãos tem `borracha_fora`)
   janela_borracha_dentro: 8, // quanto passa sobre o vidro: cobre a tira de 7,5 mm entre a borda do vão e a do cristal (`vidro_folga_borda`)
@@ -240,7 +240,7 @@ export const TABELA = {
   janela_coluna_y_topo: 1931,
   janela_coluna_z_pe: 1268, // e no pé em z 1268, em y 1349: o alto mais para trás que o pé, 51 mm em toda a altura
   janela_coluna_y_pe: 1349,
-  janela_coluna_largura: 25, // a coluninha tem 25 mm de preto de um vidro ao outro; a chapa entre os dois vãos tem esta largura menos duas vezes `janela_borracha_dentro`
+  janela_coluna_largura: 25, // a coluninha é uma barra preta de 25 mm sobre o vidro, de cima a baixo
   janela_topo_tras_y: 1966, // o alto do vidro grande: em y 1966 atrás e em 1948 na coluninha (desce para a frente)
   janela_topo_frente_y: 1948,
   janela_tras_z_topo: 747, // a borda de trás do vidro grande: o pé mais à frente que o alto
@@ -249,7 +249,10 @@ export const TABELA = {
   janela_pe_coluna_y: 1338, // a base do vidro grande é uma reta própria, do pé de trás até a coluninha, que desce para a frente e chega nela a esta altura
   janela_frente_recuo: 150, // a borda da frente do triângulo é paralela ao para-brisa e fica 150 mm atrás dele, medidos na perpendicular
   janela_ponta_y: 1324, // a ponta do triângulo: onde a base dele encontra a borda da frente, abaixo e um pouco atrás do pé do para-brisa
-  janela_triangulo_pe_y: 1346, // a base do triângulo, mais deitada que a do vidro grande, sai do pé da coluninha a esta altura
+  janela_triangulo_pe_y: 1346, // a base do triângulo, mais deitada que a do vidro grande, sai do pé da coluninha a esta altura (o contorno da moldura tem um degrau de 8 mm na coluninha)
+  janela_coluna_pe_folga: 4, // a barra da coluninha começa 4 mm acima do pé do vidro grande e acaba 2 mm abaixo do alto dele: as pontas ficam dentro da borracha
+  janela_coluna_topo_folga: 2,
+  janela_coluna_espessura: 4, // a barra é uma placa de borracha na altura da borracha da moldura (`borracha_altura`), engrossada 4 mm para dentro, que atravessa o vidro
   janela_retrovisor_tras_z: 1486, // a vertical que fecha o triângulo na frente e a de trás da peça preta
   janela_retrovisor_sobreposicao: 6, // a peça preta começa 6 mm antes do fim da borracha do triângulo, que ela cobre
   janela_retrovisor_saida: 3, // a peça preta é uma placa 3 mm para fora da lateral, acima da borracha (2,2 mm), engrossada `janela_retrovisor_espessura` para dentro: entra 1 mm na chapa
@@ -261,7 +264,7 @@ export const TABELA = {
   janela_raio: 8,
   janela_raio_pe_tras: 120, // o canto de baixo de trás do vidro grande, bem aberto
   janela_raio_topo_tras: 35,
-  janela_raio_curva: 24, // o canto do alto do triângulo, onde a coluninha encontra a borda paralela ao para-brisa (uns 30 graus): o alto vira para a descida ali, sem trecho reto; o arredondamento o encurta uns 65 mm; com menos de uns 20 mm a aba dobra em quadrilátero torcido
+  janela_raio_curva: 100, // o canto onde o alto da moldura vira para a descida paralela ao para-brisa, uma curva aberta só (não há mais canto próprio do triângulo)
   janela_raio_frente: 20,
   janela_raio_minimo: 4,
   vidro_traseiro_base_y: 1700,
@@ -551,7 +554,7 @@ export function gerarPassos(T) {
     const sel = { origem: { op: 'subdivisao', id: 50 + k } };
     passos.push(['subdivisao', { origemId: 50 + k, vertices: pl.vertices, faces: pl.faces, vincos: pl.vincos, cantos: pl.cantos, borda: 'cantos', niveis: T.niveis, espessura: m(pl.espessura ?? T.plastico_espessura) }]);
     passos.push(['parte', { nome: pl.nome, sel }]);
-    passos.push(['material', { sel, usa: FORROS.includes(pl.nome) ? 'forro' : 'plastico' }]);
+    passos.push(['material', { sel, usa: pl.material ?? (FORROS.includes(pl.nome) ? 'forro' : 'plastico') }]);
   });
   vidros.forEach((v, k) => {
     const sel = { origem: { op: 'friso', id: 20 + k } };
@@ -616,7 +619,7 @@ export function gerarPassos(T) {
     passos.push(['parte', { nome, sel: lente }]);
     passos.push(['material', { sel: lente, usa: materialDaLente }]);
   };
-  /* a janela da cabine (2026-11-11): o vidro grande e o triângulo, de cada lado, são os primeiros vãos da cadeia; cada um tem a aba e a borracha dos outros vãos de vidro (a borracha da janela
+  /* a janela da cabine (2026-11-11): o vidro grande e o triângulo, de cada lado, é o primeiro vão da cadeia; cada um tem a aba e a borracha dos outros vãos de vidro (a borracha da janela
      é a de `janela_borracha_fora` e `janela_borracha_dentro`, de 20 mm de moldura), no mesmo material, e o vidro é a lente recuada `vidro_folga_borda` da borda, sob a borracha. A peça
      preta da frente do triângulo não é vão: é uma das peças de plástico, sobre a chapa, porque a fresta da porta passa por baixo dela e um vão não pode cruzar a fresta */
   const janelas = derivarJanelas(T, f);
@@ -629,7 +632,7 @@ export function gerarPassos(T) {
       aba: { largura: m(T.aba_vao_largura), angulo: T.aba_vao_angulo, raio: m(T.aba_vao_raio) },
     }]);
     passos.push(['parte', { nome: j.aba, sel: aba }]);
-    passos.push(['material', { sel: aba, usa: 'azul' }]);
+    passos.push(['material', { sel: aba, usa: 'borracha' }]); /* a aba da janela é preta: vista através do vidro, ou por uma fresta, não aparece como tira azul dentro da moldura */
     const vidro = { origem: { op: 'aberturaPorContorno', id: ID_JANELA(k), parte: 'lente' } };
     passos.push(['parte', { nome: j.cristal, sel: vidro }]);
     passos.push(['material', { sel: vidro, usa: 'vidro' }]);
@@ -802,14 +805,14 @@ export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
   ...ABAS_DOS_ARCOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba do arco assenta na lateral em volta do arco da roda e entra meia espessura na chapa, que é o contato dela' })),
   ...PLASTICOS.map((pl) => ({ par: ['carroceria', pl], motivo: 'o plástico se soma por fora da chapa e a borda dele que encosta entra 1 mm na parede, sem vão e sem fresta' })),
-  /* a coluninha da janela tem 25 mm de preto de um vidro ao outro, e a chapa entre os dois vãos só tem 9: a borracha de cada vão passa sobre ela inteira e se encontra com a do outro, e cada uma chega à aba do vão vizinho */
-  ...['Esquerda', 'Direita'].flatMap((lado) => [
-    { par: [`borrachaPortaCabine${lado}`, `borrachaTrianguloCabine${lado}`], motivo: 'sobre a coluninha as duas borrachas, de 12 mm sobre a chapa, passam a tira de 9 mm entre os vãos e se sobrepõem' },
-    { par: [`abaVaoPortaCabine${lado}`, `borrachaTrianguloCabine${lado}`], motivo: 'a borracha do triângulo passa sobre a coluninha e 3 mm da borda do vão do vidro grande, onde a aba dele dobra' },
-    { par: [`abaVaoTrianguloCabine${lado}`, `borrachaPortaCabine${lado}`], motivo: 'a borracha do vidro grande passa sobre a coluninha e 3 mm da borda do vão do triângulo, onde a aba dele dobra' },
-  ]),
   ...BASES_DO_RETROVISOR.map((b) => ({ par: ['carroceria', b], motivo: 'a base do retrovisor é uma placa de plástico preto sobre a lateral, 3 mm para fora, que entra 1 mm na chapa e cobre a fresta da porta onde ela passa por baixo' })),
-  ...BASES_DO_RETROVISOR.map((b, k) => ({ par: [b, BORRACHAS[5 + k]], motivo: 'a base cobre 6 mm da borracha do triângulo, na vertical de trás dela' })),
+  ...BASES_DO_RETROVISOR.map((b, k) => ({ par: [b, BORRACHAS[1 + k]], motivo: 'a base cobre 6 mm da borracha da janela, na vertical de trás dela, e o preto continua da moldura para a base sem chapa no meio' })),
+  ...COLUNAS_DA_JANELA.flatMap((c, k) => [
+    { par: [c, BORRACHAS[1 + k]], motivo: 'a barra da coluninha acaba dentro da borracha da moldura, na mesma altura dela' },
+    { par: [c, CRISTAIS[1 + k]], motivo: 'a barra passa sobre o cristal de cima a baixo e entra nele, e os dois vidros encostam nela' },
+    { par: [c, ABAS_DOS_VAOS[1 + k]], motivo: 'a barra acaba sobre a aba do vão, nas duas pontas' },
+    { par: ['carroceria', c], motivo: 'as pontas da barra entram na chapa, sob a borracha' },
+  ]),
   ...[['Dianteiro', 'Esquerda', 'Esquerdo'], ['Dianteiro', 'Direita', 'Direito'], ['Traseiro', 'Esquerda', 'Esquerdo'], ['Traseiro', 'Direita', 'Direito']].flatMap(([eixo, lado, lad]) => [
     { par: [`saiaPresa${lado}`, `molduraArco${eixo}${lad}`], motivo: 'a ponta horizontal da moldura assenta no topo da saia, a 463, do lado da saia, e a medida a dá por menos de 1 mm de sobreposição' },
     { par: [`parachoque${eixo}`, `molduraArco${eixo}${lad}`], motivo: 'a ponta horizontal da moldura assenta no topo do para-choque (580 atrás, 724 na frente), e a medida a dá por menos de 1 mm de sobreposição' },
@@ -913,7 +916,7 @@ export function pontosDeclarados(T = TABELA) {
   const detalhes = derivarDetalhes(T, f);
   const { antena, ponteira } = detalhes;
   const cabine = detalhes.macanetas[0];
-  const janela = { ...derivarJanelas(T, f).moldura, peca: pontasDaBase(T, f) };
+  const janela = { ...derivarJanelas(T, f).moldura, peca: pontasDaBase(T, f), coluna: cantosDaColuna(T, f) };
   const rad = antena.haste.inclinacao * grau;
   return [
     { nome: 'canto de cima da caixa da carroceria: a lateral, o teto e o nariz', parte: 'carroceria', medida: 'maximo', em: [f.xMax, T.altura, f.zFrente], toleranciaMm: tol },
@@ -931,9 +934,10 @@ export function pontosDeclarados(T = TABELA) {
     { nome: `ponta da haste da antena, em cima e à frente: ${T.antena_haste_comprimento} mm de haste acima do pé e a ponta de ${2 * T.antena_haste_raio_ponta} mm, inclinada ${T.antena_haste_inclinacao} graus para trás`, parte: 'antenaHaste', medida: 'maximo', em: [antena.haste.raioBase, antena.base[0] + antena.comprimento * Math.cos(rad) + antena.haste.raioPonta * Math.sin(rad), antena.base[1] + antena.haste.raioBase * Math.cos(rad)], toleranciaMm: tol },
     { nome: 'alça da maçaneta da porta da cabine esquerda, por fora, em cima e na frente: 15 mm além da chapa, 20 mm acima do centro e 90 mm à frente do centro da alça', parte: 'macanetaCabineEsquerda', medida: 'maximo', em: [cabine.xs + cabine.alcaFora, cabine.yc + cabine.alturaDaAlca / 2, cabine.c + T.macaneta_alca_comprimento / 2], toleranciaMm: tol },
     /* a janela da cabine (2026-11-11): as extremidades da borracha de cada vão, que é a moldura de 20 mm do desenho, e as da peça preta; as cotas do desenho valem ±30 mm, e aqui a tolerância é a do arredondamento dos cantos */
-    { nome: 'borracha do vidro grande, atrás e embaixo: a borda de trás da moldura em z 747, o pé dela na coluninha em y 1338', parte: 'borrachaPortaCabineEsquerda', medida: 'minimo', em: [f.xs(janela.grande[2][1]) - 2, janela.grande[0][1], janela.grande[2][0]], toleranciaMm: 8 },
-    { nome: 'borracha do vidro grande, em cima e à frente: o alto da moldura em y 1966 e o fim dela sobre a coluninha, 12 mm além da borda do vão', parte: 'borrachaPortaCabineEsquerda', medida: 'maximo', em: [f.xs(janela.grande[0][1]) + 3, janela.grande[2][1], janela.grande[0][0] + T.janela_borracha_dentro + T.janela_borracha_fora], toleranciaMm: 8 },
-    { nome: 'borracha do triângulo, na frente: o fim dela sobre a tira da peça preta, na vertical de z 1486 mais 20 mm, e o alto na coluninha, a uns 1905 (a ponta de 30 graus arredondada de raio 24)', parte: 'borrachaTrianguloCabineEsquerda', medida: 'maximo', em: [f.xs(janela.triangulo[0][1]) + 3, janela.triangulo[2][1] - 57, T.janela_retrovisor_tras_z + T.janela_borracha_dentro + T.janela_borracha_fora], toleranciaMm: 8 },
+    { nome: 'borracha do vidro grande, atrás e embaixo: a borda de trás da moldura em z 747, o pé dela na coluninha em y 1338', parte: 'borrachaPortaCabineEsquerda', medida: 'minimo', em: [f.xs(janela.contorno[4][1]) - 2, janela.contorno[2][1], janela.contorno[4][0]], toleranciaMm: 8 },
+    { nome: 'borracha do vidro grande, em cima e à frente: o alto da moldura em y 1966 e a frente dela na vertical de z 1486 mais 20 mm', parte: 'borrachaPortaCabineEsquerda', medida: 'maximo', em: [f.xs(janela.contorno[2][1]) + 3, janela.contorno[4][1], T.janela_retrovisor_tras_z + T.janela_borracha_dentro + T.janela_borracha_fora], toleranciaMm: 8 },
+    { nome: 'barra da coluninha, atrás e embaixo: o pé dela, a 4 mm do pé do vidro grande, e a borda de trás do alto (z 1217)', parte: 'colunaJanelaEsquerda', medida: 'minimo', em: [f.xs(janela.coluna[3][1]) + T.borracha_altura - T.janela_coluna_espessura, janela.coluna[0][1], janela.coluna[3][0]], toleranciaMm: 1 },
+    { nome: 'barra da coluninha, em cima e na frente: o alto dela e a borda da frente do pé (z 1293)', parte: 'colunaJanelaEsquerda', medida: 'maximo', em: [f.xs(janela.coluna[0][1]) + T.borracha_altura, janela.coluna[2][1], janela.coluna[1][0]], toleranciaMm: 1 },
     { nome: 'peça preta da base do retrovisor, atrás e embaixo: a vertical de trás (z 1500) na base em y 1313, 3 mm para fora da lateral e 4 mm de espessura', parte: 'baseRetrovisorEsquerda', medida: 'minimo', em: [f.xs(janela.peca[2][1]) + T.janela_retrovisor_saida - T.janela_retrovisor_espessura, T.janela_retrovisor_base_y, janela.peca[1][0]], toleranciaMm: 1 },
     { nome: 'peça preta da base do retrovisor, em cima e na frente: a ponta em z 1767 na base, e o alto da vertical de trás em y 1590', parte: 'baseRetrovisorEsquerda', medida: 'maximo', em: [f.xs(T.janela_retrovisor_base_y) + T.janela_retrovisor_saida, janela.peca[2][1], T.janela_retrovisor_ponta_z], toleranciaMm: 1 },
     { nome: 'boca da ponteira, embaixo, por dentro e atrás: o tubo de 55 mm a 180 mm do meio, com o topo no fundo do para-choque e a boca 50 mm atrás da face dele', parte: 'ponteiraEscapamento', medida: 'minimo', em: [ponteira.x - ponteira.raio, ponteira.y - ponteira.raio, ponteira.zBoca], toleranciaMm: tol },
@@ -1020,7 +1024,7 @@ const receita = {
       ...ABAS_DOS_VAOS.map((nome) => ({
         nome,
         forma: `aba da borda do vão ${nome.replace('abaVao', '')}, dobrada para dentro a 90 graus com raio de 3 mm e perna de 20 mm, em volta do vão inteiro, cantos arredondados incluídos`,
-        tecnica: nome.includes('Triangulo') || nome.includes('PortaCabine') ? 'friso com aba sobre a borda do vão aberto pelo contorno (superficie aberturaPorContorno)' : 'friso com aba sobre a borda do vão, pelos nomes da gaiola',
+        tecnica: nome.includes('PortaCabine') ? 'friso com aba sobre a borda do vão aberto pelo contorno (superficie aberturaPorContorno)' : 'friso com aba sobre a borda do vão, pelos nomes da gaiola',
       })),
       ...ABAS_DOS_ARCOS.map((nome) => ({
         nome,
@@ -1060,20 +1064,25 @@ const receita = {
       ...CRISTAIS.map((nome) => ({
         nome,
         forma: JANELAS_DA_CABINE.includes(nome)
-          ? `${nome.includes('Triangulo') ? 'triângulo fixo, metade de trás: trás na coluninha, alto virando sem reta para a descida paralela ao para-brisa, frente 150 mm atrás dele, base mais deitada, ponta em z 1692 y 1324' : 'vidro grande atrás da coluninha, z 747 a 1217, quase tão largo quanto alto, borda de trás inclinada (pé z 820), pé de trás redondo, base própria descendo para a frente até y 1338'}, lado ${nome.endsWith('Esquerda') ? 'esquerdo' : 'direito'}`
+          ? `vidro único da janela do lado ${nome.endsWith('Esquerda') ? 'esquerdo' : 'direito'}: o grande atrás (quase tão largo quanto alto, borda de trás inclinada, pé redondo, base própria) e o triângulo na frente (a 150 mm do para-brisa), encostados na barra`
           : `cristal ${nome.includes('PortaTraseira') ? 'escurecido' : 'claro, de leve tom verde,'} do vão ${nome === 'vidroParaBrisa' ? 'do para-brisa' : `da porta traseira ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}`}: a mesma superfície do vão, rente à lataria, com a volta recuada 7,5 mm da borda e 4 mm de espessura para dentro`,
         tecnica: JANELAS_DA_CABINE.includes(nome)
-          ? 'aberturaPorContorno na vista pelo eixo x, com lente recuada 7,5 mm e a coluninha de chapa entre este vão e o do outro vidro: o vidro é a lente, no material do vidro claro com tom verde'
+          ? 'aberturaPorContorno na vista pelo eixo x num vão só, com lente recuada 7,5 mm: o vidro é a lente, no material do vidro claro com tom verde'
           : 'subdivisao das faces que o vão tirou da chapa, com a volta recuada pela superfície, vidro por transmissão (claro com tom verde no para-brisa, escurecido nas portas traseiras)',
       })),
       ...BORRACHAS.map((nome, k) => ({
         nome,
-        forma: JANELAS_DA_CABINE.includes(CRISTAIS[k]) ? `borracha escura em volta do ${CRISTAIS[k]}: moldura de 20 mm (12 sobre a chapa, 8 sobre o cristal), 2,2 mm de altura; sobre a coluninha as duas dão uns 25 mm de preto` : `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 2,2 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,
-        tecnica: nome.includes('Triangulo') || nome.includes('PortaCabine') ? 'friso de perfil desenhado sobre a borda do vão aberto pelo contorno, o mesmo perfil dos outros vãos de vidro, declarado com a aba na moldura do vão' : 'friso de perfil desenhado sobre a volta do vão, nos nomes da gaiola, declarado com a aba na moldura do vão',
+        forma: JANELAS_DA_CABINE.includes(CRISTAIS[k]) ? `borracha escura contínua em volta do ${CRISTAIS[k]} inteiro, vidro grande e triângulo: moldura de 20 mm (12 sobre a chapa, 8 sobre o cristal), 2,2 mm de altura` : `borracha escura de vão em volta do ${CRISTAIS[k]}: seção de 25 mm (15 sobre a chapa e 10 sobre o cristal) e 2,2 mm de altura, entrando 1,5 mm na chapa e no cristal, cobrindo a junta e a aba`,
+        tecnica: nome.includes('PortaCabine') ? 'friso de perfil desenhado sobre a borda do vão aberto pelo contorno, o mesmo perfil dos outros vãos de vidro, declarado com a aba na moldura do vão' : 'friso de perfil desenhado sobre a volta do vão, nos nomes da gaiola, declarado com a aba na moldura do vão',
+      })),
+      ...COLUNAS_DA_JANELA.map((nome) => ({
+        nome,
+        forma: `barra preta da coluninha, lado ${nome.endsWith('Esquerda') ? 'esquerdo' : 'direito'}, da moldura: 25 mm de largura, de z 1217 no alto e 1268 no pé (inclinada para trás no alto), de cima a baixo do vão sobre o vidro, na altura da borracha`,
+        tecnica: 'subdivisao de uma malha sobre a lateral, 2,2 mm para fora e engrossada 4 mm para dentro, no material da borracha; acaba dentro da borracha nas duas pontas',
       })),
       ...BASES_DO_RETROVISOR.map((nome) => ({
         nome,
-        forma: `base do retrovisor ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}, peça preta rente à chapa na metade da frente do triângulo: trás vertical em z 1486, frente que segue o vidro e abre embaixo até a ponta em z 1767, base reta em y 1313`,
+        forma: `base do retrovisor ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}, peça preta rente à chapa, emendada na frente da moldura, na metade da frente do triângulo: trás vertical em z 1486, frente que segue o vidro e abre embaixo até a ponta em z 1767, base reta em y 1313`,
         tecnica: 'subdivisao de um triângulo plano sobre a lateral, 3 mm para fora e engrossado 4 mm para dentro, em plástico preto, sem vão nem aba; a fresta da porta entra por baixo dela',
       })),
       {
@@ -1254,7 +1263,7 @@ const receita = {
       'a fresta da porta da cabine não corre na borda de fora do alargamento (raio 570, 150 mm da boca) ou corta o alargamento',
       'a porta da cabine não tem a borda de trás em z 622, o topo em y 2035 e a frente descendo paralela ao para-brisa, 90 mm atrás dele, até y 1335 e dali vertical em z 1660 até a costura do arco (±30), ou tem degrau na frente',
       'o canto de cima da frente da porta da cabine é vivo, e não uma curva aberta de uns 70 mm, ou o topo dela não deixa 75 mm de faixa de teto acima, em 2035',
-      'a janela da cabine não é um vão só com coluninha de uns 25 mm entre o vidro grande e o triângulo, inclinada para trás no alto (z 1217 no alto, 1268 no pé), com moldura preta de uns 20 mm, ou são duas janelas com faixa larga de chapa',
+      'a janela da cabine não é um vão só com borracha contínua de uns 20 mm em volta e a coluninha de uns 25 mm como barra preta dela (z 1217 no alto, 1268 no pé), ou há chapa ou tira azul entre a borracha e o vidro ou a base preta',
       'o vidro grande não tem largura sobre altura de 0,85 (±0,1), ou a borda de trás dele não é inclinada com o pé mais à frente (z 820 e 747), ou o canto de baixo de trás é vivo, ou a base dele não é reta e desce para a frente até y 1338',
       'o alto do triângulo tem trecho reto, em vez de virar logo em cima da coluninha para a descida paralela ao para-brisa, ou a frente não fica 150 mm atrás, ou a base não é mais deitada que a do vidro grande, ou a ponta sai de z 1692 e y 1324',
       'a metade da frente do triângulo é vidro, e não a peça preta, ou a borda de trás dela não é vertical em z 1486 (±30), ou a de frente não abre embaixo, ou a fresta da porta não entra por baixo dela e sai pela base',

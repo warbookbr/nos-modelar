@@ -3,7 +3,7 @@
  */
 
 import { cruz, dot, entre, esc, grau, lerp, m, soma, sub, suave, unit } from './geometria.js';
-import { derivarBasesDoRetrovisor } from './janela.js';
+import { derivarBasesDoRetrovisor, derivarColunasDaJanela } from './janela.js';
 import { aneisDoOmbro, aneisHorizontais, forma, pontoFrente, pontoLado, pontoNoCaminho, pontoQuinaTras, pontoTras, projetarNaSecao, secaoHorizontal } from './forma.js';
 import { derivarPlastico } from './plastico.js';
 import { derivarLuzesPorDentro } from './luzes.js';
@@ -813,7 +813,7 @@ export function derivar(T) {
   const usados = new Set(faces.flat());
   const vertices = [...usados].sort();
   /* o plástico de baixo, por fora da chapa: os pontos dele entram no TOPO junto com os da gaiola */
-  const plastico = [...derivarPlastico(T, f), ...derivarBasesDoRetrovisor(T, f)];
+  const plastico = [...derivarPlastico(T, f), ...derivarBasesDoRetrovisor(T, f), ...derivarColunasDaJanela(T, f)];
   const { refletores, lampadas } = derivarLuzesPorDentro(T, f);
   const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes]), ...refletores.flatMap((r) => [...r.capa.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
