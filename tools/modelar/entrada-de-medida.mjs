@@ -109,6 +109,23 @@ function gravarNoCache(pasta, chave, rotulo, dado) {
 }
 const rotuloDe = (abs, opcao) => `${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_')}.${createHash('sha256').update(abs).digest('hex').slice(0, 6)}.o${opcao}`;
 
+/**
+ * A execução da receita (`{ entrada, neutro }`) guardada por assinatura do conteúdo, a mesma de `lerEntradaDeMedida`: quem executa a receita em Node
+ * (a ativação da bancada, a medida de contatos, as ferramentas de medida) lê a execução da última rodada quando nada mudou e grava a sua quando mudou,
+ * de modo que a receita é executada uma vez só entre elas. `cache: false` executa de novo e regrava. Uma receita copiada com outro perfil, ou
+ * outros PARAMS, não é a do arquivo: quem a passa deve chamar com `cache: false`.
+ * @returns {{ executada: object, doCache: boolean }}
+ */
+export function executarReceitaGuardada(abs, receita, { cache = true, pastaDoCache = PASTA_DO_CACHE } = {}) {
+  let sig = null;
+  if (cache) { try { sig = assinaturaDaEntrada(abs); } catch { sig = null; } }
+  const guardada = sig ? lerDoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r')) : null;
+  if (guardada) return { executada: guardada, doCache: true };
+  const executada = executarReceita(receita);
+  if (sig) gravarNoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r'), executada);
+  return { executada, doCache: false };
+}
+
 export class ErroDeEntrada extends Error {
   constructor(mensagem) { super(mensagem); this.name = 'ErroDeEntrada'; }
 }
@@ -153,11 +170,9 @@ export async function lerEntradaDeMedida(alvo, { opcao = 1, montagem = true, cac
     let executada = null;
     const lida = { tipo: 'receita', abs, nome, origem: `receita ${nome}`, doCache: false, receita, executar: () => {
       if (executada) return executada;
-      const guardada = sig ? lerDoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r')) : null;
-      if (guardada) { lida.doCache = true; return (executada = guardada); }
-      executada = executarReceita(receita);
-      if (sig) gravarNoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r'), executada);
-      return executada;
+      const r = executarReceitaGuardada(abs, receita, { cache: !!sig, pastaDoCache });
+      lida.doCache = r.doCache;
+      return (executada = r.executada);
     } };
     return lida;
   }

@@ -19,10 +19,9 @@ import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/corte-de-plano.js';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { analisarPeca, lerZoom } from './analise-da-peca.mjs';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
-import { PASTA_DO_CACHE, assinaturaDaEntrada } from './entrada-de-medida.mjs';
+import { PASTA_DO_CACHE, assinaturaDaEntrada, executarReceitaGuardada } from './entrada-de-medida.mjs';
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 import { reduzirEmParalelo } from './reduzir-em-paralelo.mjs';
 import { lancarChromium } from './navegador.mjs';
@@ -245,10 +244,11 @@ const RAIZES_DA_MEDIDA_DE_CONTATOS = ['tools/modelar/entrada-de-medida.mjs', 'to
 const VERSAO_DO_CACHE_DE_CONTATOS = 1;
 const rotuloDosContatos = (abs) => `contatos-${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_')}.${createHash('sha256').update(abs).digest('hex').slice(0, 6)}`;
 
-async function medirNoNode(caminho) {
+async function medirNoNode(caminho, { cache = true } = {}) {
   const moduloDaPeca = await importarReceita(caminho);
   const receitaDaPeca = receitaDoModulo(moduloDaPeca);
-  const { neutro } = executarReceita(receitaDaPeca);
+  /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura */
+  const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache }).executada;
   return contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
 }
 
@@ -266,7 +266,7 @@ export async function medirParesAcusados(caminho, { cache = true, pastaDoCache =
       if (lido?.versao === VERSAO_DO_CACHE_DE_CONTATOS && Array.isArray(lido.pares)) return { pares: lido.pares, origem: 'do-cache', segundos: (performance.now() - inicio) / 1000, chave };
     } catch { /* ilegível: mede de novo */ }
   }
-  const pares = await medir(caminho);
+  const pares = await medir(caminho, { cache });
   if (arquivo) {
     try {
       mkdirSync(pastaDoCache, { recursive: true });
@@ -728,9 +728,14 @@ export async function olharBancada({
                a peça num arquivo seu, único por processo e por chamada, e aponta a página para ele pela URL (`?sessao=`). Com
                `compartilhada` o arquivo é um por peça e por conjunto de chamadas, e as chamadas seguintes da mesma peça o reusam. */
             sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
-            await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura });
+            const inicioDaAtivacao = performance.now();
+            const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos });
             if (compartilhada) compartilhada.sessoes.set(peca, { arquivo: sessaoDaCaptura, pares: null });
             if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
+            const segundosDaAtivacao = Math.round((performance.now() - inicioDaAtivacao) / 100) / 10;
+            registrar(relato, logger, 'stdout', ativada?.doCache
+              ? `ativação: execução da receita lida do cache (tmp/cache-de-medida/; a receita não mudou desde a última execução), em ${segundosDaAtivacao} s; --sem-cache executa de novo.`
+              : `ativação: receita executada agora, em ${segundosDaAtivacao} s.`);
           } catch (erro) {
             erroDeUso(`Falha ao ativar peça '${peca}' na bancada: ${erro.message}`);
           }
@@ -1387,7 +1392,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
   --distancia=<mm>       com --mirar: a distância da câmera ao ponto (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
   --sem-contatos         não mede os contatos da peça (a medida executa a receita em Node, uns 100 s no furgão); o relato diz "NÃO medidos", e lista vazia de pares não quer dizer sem achado
-  --sem-cache            mede os contatos de novo; sem ele, a medida da mesma receita (mesmo conteúdo) vem de tmp/cache-de-medida/ e o relato diz "lidos do cache"
+  --sem-cache            executa a receita e mede os contatos de novo; sem ele, a execução e a medida da mesma receita (mesmo conteúdo) vêm de tmp/cache-de-medida/ e o relato diz "lidos do cache"
   --par=<a,b>            inspeção dirigida de duas partes (isola e escolhe a vista legível)
   --explosao=<0..1>      afasta as partes da montagem
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par

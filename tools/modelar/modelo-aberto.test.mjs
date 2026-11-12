@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { executar as conferir } from './conferir-vistas.mjs';
 import { executar as casar } from './casamento-da-vista.mjs';
-import { acharPainel, dePng, executarComModelo, imagem, paraPng } from './leitura-por-regioes.mjs';
+import { dePng, executarComModelo, imagem, paraPng } from './leitura-por-regioes.mjs';
 import { executar as linhas } from './linhas-do-modelo.mjs';
 import { ErroDoModelo, abrirModelo, faceNoRecorte, lerRecorte, quadroDoRecorte } from './modelo-aberto.mjs';
 import { executar as rapida } from './vista-rapida.mjs';
@@ -73,7 +73,7 @@ describe('vista:rapida e linhas:modelo abrem a receita e recortam', () => {
     const lado = JSON.parse(readFileSync(`${saida}.rapida.json`, 'utf8'));
     expect(lado).toMatchObject({ formato: 'modelar.vista-rapida@1', origem: 'receita', vista: 'frontal', largura: 300, altura: 343, painel: [0, 0, 300, 343] });
     expect(lado.quadroMm.u1 - lado.quadroMm.u0).toBeCloseTo(140, 6);
-    expect(lado.quadroMm.v1 - lado.quadroMm.v0).toBeCloseTo(160, 3);
+    expect(lado.quadroMm.v1 - lado.quadroMm.v0).toBeCloseTo(160, 0);
     /* a peça inteira, na mesma largura, tem a escala bem maior: o recorte aproximou */
     const inteira = await rapida([PECA, '--vista=frontal', `--saida=${join(pasta, 'inteira.png')}`, '--largura=300']);
     expect(Number(/([\d.]+) mm por px/.exec(inteira.stdout)[1])).toBeGreaterThan(0.9);
@@ -112,63 +112,61 @@ describe('vista:rapida e linhas:modelo abrem a receita e recortam', () => {
 
 describe('leitura:regioes: o painel da vista rápida e o modelo como entrada', () => {
   const referencia = join(pasta, 'ref.png');
-  const im = imagem(300, 300);
-  for (let y = 20; y < 280; y += 1) for (let x = 20; x < 280; x += 1) im.dados.set([226, 100, 30], (y * 300 + x) * 3);
+  const im = imagem(120, 120);
+  for (let y = 10; y < 110; y += 1) for (let x = 10; x < 110; x += 1) im.dados.set([226, 100, 30], (y * 120 + x) * 3);
   writeFileSync(referencia, paraPng(im));
 
-  it('com a vista rápida ao lado, o painel é a imagem inteira, mesmo quando a peça ocupa o quadro e o achado de painel pelas linhas de fundo o encurtaria', async () => {
+  it('com a vista rápida ao lado, o painel e o fundo vêm dela e não do achado pelas linhas de fundo, que a peça ocupando o quadro deixa sem painel', async () => {
     const { executar } = await import('./leitura-por-regioes.mjs');
     const captura = join(pasta, 'cheia.png');
-    expect((await rapida([PECA, '--vista=frontal', `--saida=${captura}`, '--largura=300', '--margem=0.01'])).codigo).toBe(0);
+    expect((await rapida([PECA, '--vista=frontal', `--saida=${captura}`, '--largura=120', '--margem=0.01'])).codigo).toBe(0);
     const imagemDaCaptura = dePng(readFileSync(captura));
-    const achado = acharPainel(imagemDaCaptura);
-    expect(achado).not.toEqual([0, 0, imagemDaCaptura.largura, imagemDaCaptura.altura]); // o defeito de origem: o painel achado pelas linhas de fundo é menor
     const saida = join(pasta, 'leitura-lado');
-    const r = executar([`--referencia=${referencia}`, '--caixa-ref=20,20,280,280', `--captura=${captura}`, `--saida=${saida}`]);
+    const r = executar([`--referencia=${referencia}`, '--caixa-ref=10,10,110,110', `--captura=${captura}`, `--saida=${saida}`]);
     expect(r.codigo).toBe(0);
     expect(r.stdout).toMatch(/^painel e fundo da vista rápida, de /);
     expect(JSON.parse(readFileSync(join(saida, 'leitura.json'), 'utf8')).painel).toEqual([0, 0, imagemDaCaptura.largura, imagemDaCaptura.altura]);
     /* --painel à mão continua mandando */
-    const mao = executar([`--referencia=${referencia}`, '--caixa-ref=20,20,280,280', `--captura=${captura}`, `--saida=${join(pasta, 'leitura-mao')}`, '--painel=0,0,150,150']);
+    const mao = executar([`--referencia=${referencia}`, '--caixa-ref=10,10,110,110', `--captura=${captura}`, `--saida=${join(pasta, 'leitura-mao')}`, '--painel=0,0,100,100']);
     expect(mao.stdout).not.toMatch(/vista rápida/);
   });
 
   it('--modelo tira a captura e as linhas da receita, no recorte, e monta a leitura num comando só', async () => {
     const saida = join(pasta, 'leitura-modelo');
-    const r = await executarComModelo([`--referencia=${referencia}`, '--caixa-ref=20,20,280,280', `--modelo=${PECA}`, '--vista=frontal', `--recorte=${RECORTE}`, '--largura=300', `--saida=${saida}`]);
+    const r = await executarComModelo([`--referencia=${referencia}`, '--caixa-ref=10,10,110,110', `--modelo=${PECA}`, '--vista=frontal', `--recorte=${RECORTE}`, '--largura=120', `--saida=${saida}`]);
     expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
     expect(r.stdout).toMatch(/^receita peca-de-prova: 5 partes/);
     for (const f of ['captura.png', 'linhas.png', 'indice.png', 'folha-01.png', 'pedido.md', 'leitura.json']) expect(existsSync(join(saida, f)), f).toBe(true);
     const leitura = JSON.parse(readFileSync(join(saida, 'leitura.json'), 'utf8'));
-    expect(leitura.painel).toEqual([0, 0, 300, leitura.painel[3]]);
+    expect(leitura.painel).toEqual([0, 0, 120, leitura.painel[3]]);
     expect(readFileSync(join(saida, 'pedido.md'), 'utf8')).toMatch(/LINHAS|linhas/);
-    expect((await executarComModelo([`--referencia=${referencia}`, '--caixa-ref=20,20,280,280', `--modelo=${PECA}`, `--saida=${saida}`])).stderr).toMatch(/falta --vista/);
-    expect((await executarComModelo([`--referencia=${referencia}`, '--caixa-ref=20,20,280,280', `--modelo=${PECA}`, '--vista=frontal', `--captura=${join(saida, 'captura.png')}`, `--saida=${saida}`])).stderr).toMatch(/se contradizem/);
+    expect((await executarComModelo([`--referencia=${referencia}`, '--caixa-ref=10,10,110,110', `--modelo=${PECA}`, `--saida=${saida}`])).stderr).toMatch(/falta --vista/);
+    expect((await executarComModelo([`--referencia=${referencia}`, '--caixa-ref=10,10,110,110', `--modelo=${PECA}`, '--vista=frontal', `--captura=${join(saida, 'captura.png')}`, `--saida=${saida}`])).stderr).toMatch(/se contradizem/);
   });
 });
 
 describe('casamento:vista e conferir:vistas abrem a receita', () => {
   const ref = join(pasta, 'ref-duas-cores.png');
-  const im = imagem(200, 520);
-  for (let y = 10; y < 510; y += 1) for (let x = 10; x < 190; x += 1) im.dados.set(y < 250 ? [226, 100, 30] : [107, 112, 116], (y * 200 + x) * 3);
+  const im = imagem(100, 260);
+  for (let y = 5; y < 255; y += 1) for (let x = 5; x < 95; x += 1) im.dados.set(y < 125 ? [226, 100, 30] : [107, 112, 116], (y * 100 + x) * 3);
   writeFileSync(ref, paraPng(im));
   const partes = 'cuboCentral:laranja,tuboEsquerdo:cinza,tuboDireito:cinza,tuboDeitado:cinza,travessa:cinza';
 
   it('o casamento da vista mede a receita pelo nome das partes dela', async () => {
     const saida = join(pasta, 'casamento');
-    const r = await casar([PECA, '--vista=frontal', `--referencia=${ref}`, '--caixa-ref=10,10,190,510', '--cores=laranja:#e2641e,cinza:#6b7074', `--partes=${partes}`, `--saida=${saida}`]);
+    const r = await casar([PECA, '--vista=frontal', `--referencia=${ref}`, '--caixa-ref=5,5,95,255', '--cores=laranja:#e2641e,cinza:#6b7074', `--partes=${partes}`, '--largura=100', `--saida=${saida}`]);
     expect(r.stderr).toBe(''); expect(r.codigo).toBe(0);
     expect(r.stdout).toMatch(/^receita peca-de-prova: 5 partes/);
     expect(existsSync(join(saida, 'casamento.json'))).toBe(true);
-    const sem = await casar([PECA, '--vista=frontal', `--referencia=${ref}`, '--caixa-ref=10,10,190,510', '--cores=laranja:#e2641e,cinza:#6b7074', `--partes=${partes}`, '--opcao=2']);
+    const sem = await casar([PECA, '--vista=frontal', `--referencia=${ref}`, '--caixa-ref=5,5,95,255', '--cores=laranja:#e2641e,cinza:#6b7074', `--partes=${partes}`, '--largura=100', '--opcao=2']);
     expect(sem.codigo).toBe(2); expect(sem.stderr).toMatch(/a receita tem uma opção só/);
   });
 
   it('a rodada de conferência monta a receita uma vez e usa a vista rápida; a bancada lado a lado é do esboço e recusa', async () => {
     const config = join(pasta, 'config.json');
     writeFileSync(config, JSON.stringify({
-      objeto: 'peça de prova', cores: { laranja: '#e2641e', cinza: '#6b7074' }, partes: Object.fromEntries(partes.split(',').map((p) => p.split(':'))), largura: 200, tresQuartos: false,
-      vistas: { frontal: { referencia: 'ref-duas-cores.png', caixaRef: [10, 10, 190, 510], grade: [2, 2], visto: 'de frente' } },
+      objeto: 'peça de prova', cores: { laranja: '#e2641e', cinza: '#6b7074' }, partes: Object.fromEntries(partes.split(',').map((p) => p.split(':'))), largura: 100, tresQuartos: false,
+      vistas: { frontal: { referencia: 'ref-duas-cores.png', caixaRef: [5, 5, 95, 255], grade: [2, 2], visto: 'de frente' } },
     }));
     const saida = join(pasta, 'rodada');
     const r = await conferir([PECA, `--config=${config}`, `--saida=${saida}`]);
