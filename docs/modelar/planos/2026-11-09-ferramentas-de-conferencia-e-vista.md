@@ -64,6 +64,13 @@ Cada ferramenta nasce de um atrito relatado, com o comando que o reproduz, e é 
 - a bancada: o `--focar` com vista de lado põe a câmera dentro da peça quando as partes escolhidas são pequenas (a cabine do
   furgão, 2026-11-12), a captura não diz em que passo está durante os minutos de carga, e uma captura recusada deixa o processo
   antigo segurando a porta do servidor até o prazo dele; o `descrever` e o `guarda:acervo` também passam de dois minutos sem saída.
+- pedido da sessão do furgão (2026-11-12): o teto de tempo do furgão no `acervo-real.test.mjs` medido contra uma peça de
+  referência na mesma bateria, e não por número fixo; a mesma receita levou 104 s, 188 s e 368 s no CI em três baterias do
+  mesmo dia, e o teto fixo reprovou ao acaso duas vezes.
+
+Caso de teste da régua da crista, pedido pela sessão do núcleo: a ruga no alto das duas colunas do para-brisa do furgão está
+presente no envio `fee4b88c` (main de 2026-11-12) e no envio seguinte, o dos retrovisores, que não toca a coluna; a correção da
+ruga vem num envio próprio depois deles.
 
 ## Excluído
 

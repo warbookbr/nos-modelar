@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1958 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1959 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1828,6 +1828,7 @@
 - `luzes.js` — furgao-realista, receita/luzes.js — por dentro das luzes da frente (etapa 8, `referencias/luzes.md`): o refletor de cada luz, uma capa única cuja borda segue…
 - `nomes.js` — furgao-realista, receita/nomes.js — os nomes das partes, que o PLANO, os PASSOS e os contatos citam: as listas por grupo (rodas, forros, abas, plástico, cris…
 - `plastico.js` — furgao-realista, receita/plastico.js — o plástico de baixo (etapa 3), por fora da chapa: a saia, as molduras e o alargamento dos arcos, o forro dos arcos e o…
+- `retrovisor.js` — furgao-realista, receita/retrovisor.js — os dois retrovisores externos (2026-11-12), traduzidos do esboço aprovado `docs/modelar/banco-de-provas/furgao-reali…
 - `rodas.js` — furgao-realista, receita/rodas.js — a roda da família `roda-pneu`: o registro das famílias, a chamada pelo perfil da TABELA e a soma da base aos ids locais d…
 
 ## procedural/pecas/furgao-realista/referencias/
