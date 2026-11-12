@@ -817,7 +817,7 @@ export function derivar(T) {
   const vertices = [...usados].sort();
   /* o plástico de baixo, por fora da chapa: os pontos dele entram no TOPO junto com os da gaiola */
   const plastico = [...derivarPlastico(T, f), ...derivarBasesDoRetrovisor(T, f), ...derivarColunasDaJanela(T, f)];
-  const { refletores, lampadas } = derivarLuzesPorDentro(T, f);
+  const { refletores, lampadas, farol, carcacaDoFarol } = derivarLuzesPorDentro(T, f);
   const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes]), ...refletores.flatMap((r) => [...r.capa.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
 
@@ -833,7 +833,7 @@ export function derivar(T) {
     passo: { vertices, faces, vincos, cantos }, plastico, cristais,
     portas: portas.map((v) => ({ nome: v.nome, volta: v.volta })),
     vidros: vidros.map((v) => ({ nome: v.nome, linha: v.linha, volta: v.volta })),
-    luzes: luzes.map((v) => ({ nome: v.nome, linha: v.linha, material: v.material, volta: v.volta })), lentes, refletores, lampadas,
+    luzes: luzes.map((v) => ({ nome: v.nome, linha: v.linha, material: v.material, volta: v.volta })), lentes, refletores, lampadas, farol, carcacaDoFarol,
     abasDosArcos, rodas,
     bordaDeBaixo: [...sol.lista.map((p) => p.nome), ...sol.lista.slice(1, -1).reverse().map((p) => espelho(p.nome))],
   };
