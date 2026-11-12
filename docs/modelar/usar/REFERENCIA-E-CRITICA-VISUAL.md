@@ -22,7 +22,7 @@ mesma.
 O crítico é o agente `critico-visual`, despachado sem contexto em marco: antes de
 levar uma forma à pessoa, de fechar uma etapa ou de propor publicação, e depois
 que descrição, medidas e gates estão limpos. Ele recebe o pedido que
-`npm run vistas:critica` monta na pasta da rodada: as vistas da peça e de cada
+`npm run vistas:critica` (que antes mede a receita e recusa a que reprova) monta na pasta da rodada: as vistas da peça e de cada
 parte em arquivos separados, o alvo ou a referência quando existem, as partes
 que o plano promete com a forma, a técnica e a caixa em mm da malha executada,
 os encaixes em corte com o contato declarado na montagem (o motivo dele, e o

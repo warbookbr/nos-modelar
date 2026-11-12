@@ -57,7 +57,12 @@
  * para a seção de referências do pedido, com a vista a que vale (frontal, direita, esquerda, traseira, superior, inferior, isometrica); o
  * caminho não é gravado em arquivo versionado.
  *
- * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>]
+ * A MEDIÇÃO VEM ANTES DA CAPTURA (2026-11-12): `medirReceita`, a mesma medição que `rodada-de-modelagem.mjs --registrar` e `--acao` usam, roda
+ * primeiro, e a receita que reprova não monta pacote: sai com erro, o relatório da medição e o comando `--acao`. O pacote de receita que passa
+ * diz isso, com o hash medido, no relatório e no `pedido.md`. `--sem-medir` monta o pacote mesmo assim, para quem só quer as imagens, e o
+ * diz nos dois. A medição entra em `dependencias.medirReceita`.
+ *
+ * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] [--sem-medir]
  *      [--referencia=<caminho absoluto da imagem>[@<vista>]]... */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -345,13 +350,15 @@ export function contornosDasReferencias({ imagens = [], citadas = [], existe = e
  * encaixes com as vizinhas (`cortesDosEncaixes`); `anteriores` os pontos de rodadas anteriores que quem conduz atribuiu ao plano, às
  * ferramentas ou ao crítico (`pontosJaAtribuidos`).
  */
-export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, contornos = [], encaixes = [], anteriores = [] }) {
+export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, contornos = [], encaixes = [], anteriores = [], medicao = null }) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
   const usadas = new Set([...modelo, ...arame, ...(montado?.imagens ?? []), ...partes.flatMap((p) => p.imagens)].map((i) => i.vista));
   const vistasDoPedido = Object.keys(VISTA_DO_ESBOCO).filter((vista) => usadas.has(vista));
   const L = [`# Pedido ao crítico visual: ${peca}`, '', 'Abra com `Read` cada imagem citada abaixo e olhe; não leia nenhum outro arquivo. Todos os caminhos são absolutos.', ''];
+
+  if (medicao) L.push(`Medição da receita: ${medicao.passou ? `passou (${medicao.sha256})` : `NÃO FEITA: ${medicao.motivo}`}.`, '');
 
   if (plano) {
     L.push('## Objeto', '', plano.objeto, '', `Escala: ${plano.escala.medida}, ${mm(plano.escala.milimetros)} mm.`, '');
@@ -1326,6 +1333,20 @@ function citadasQueNaoSaoImagem(plano, pastaDaReceita) {
 
 /* ---------- o pacote ---------- */
 
+export const MOTIVO_SEM_MEDIR = 'o pacote saiu sem medição, por --sem-medir; o crítico só julga receita que passa nas medidas, e o registro da rodada mede de novo';
+export const comandoDaMedicao = (peca) => `node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao`;
+
+/** A medição reprovou a receita: o pacote não é montado. `medicao` é o que `medirReceita` devolveu. */
+export class ReceitaReprovada extends Error {
+  constructor(peca, medicao) {
+    super(`a medição da receita de '${peca}' reprovou, e nenhuma imagem foi capturada:\n${medicao.relatorio}\n\n`
+      + `O crítico só julga receita que passa nas medidas. Corrija a receita e repita a medição com \`${comandoDaMedicao(peca)}\`; `
+      + 'só quem quer as imagens sem o crítico monta o pacote mesmo assim, com `--sem-medir`.');
+    this.name = 'ReceitaReprovada';
+    this.medicao = medicao;
+  }
+}
+
 /* A SAÍDA NÃO É DECLARADA, e isso é decisão e não esquecimento. Quando `saida`
    vem preenchida, a bancada recusa a captura se já houver imagem daquela
    rodada ali, para não sobrescrever artefato de revisão. Este comando é feito
@@ -1336,8 +1357,10 @@ function citadasQueNaoSaoImagem(plano, pastaDaReceita) {
 
    `saida` é a pasta da rodada, onde saem o pedido, o alvo, as vistas montadas e a sobreposição; as capturas da bancada continuam em
    `tools/bancadas/out`, com os nomes de sempre. `dependencias` troca o que o teste não quer pagar. */
-export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, dependencias = {} } = {}) {
+export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, dependencias = {} } = {}) {
   const dep = {
+    /* a medição é a de `rodada-de-modelagem.mjs` (a que o registro e `--acao` usam), importada na hora para não criar ciclo de carga */
+    medirReceita: async (p) => (await import('./rodada-de-modelagem.mjs')).medirReceita(p),
     olharBancada,
     abrirCaptura: abrirCapturaCompartilhada,
     esbocoDeclarado: async (p) => (await import('./forma-do-esboco.mjs')).esbocoDeclarado(p),
@@ -1351,6 +1374,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   };
   const blender = Object.hasOwn(dependencias, 'blender') ? dependencias.blender : doAmbiente('BLENDER');
   const caminho = resolverCaminhoReceita(peca);
+  /* O CRÍTICO SÓ JULGA RECEITA QUE PASSA NAS MEDIDAS: a medição roda antes de qualquer captura, e a que reprova recusa o pacote
+     (na rodada 1 do sedã, 12 a 28 minutos de captura e o crítico foram gastos numa receita que o registro depois recusou). */
+  const medicao = semMedir ? null : await dep.medirReceita(peca);
+  if (medicao && !medicao.passou) throw new ReceitaReprovada(peca, medicao);
   /* a impressão do texto que o pacote mostra, a mesma que a medição da rodada grava */
   const impressao = impressaoDoTexto(readFileSync(caminho, 'utf8'));
   const modulo = await importarReceita(caminho);
@@ -1507,6 +1534,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   if (partes.length) {
     try { caixas = await dep.caixasDasPartes(caminho, receita); } catch (erro) { avisos.push(`sem a caixa das partes no pedido: ${erro.message}`); }
   }
+  const medicaoDoPacote = medicao ? { passou: true, sha256: medicao.sha256 } : { passou: false, motivo: MOTIVO_SEM_MEDIR };
   const orientacao = dados?.orientacao ?? null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);
   const pedido = montarPedido({
@@ -1532,13 +1560,14 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     partes: porParte.map(({ parte, resultado }) => ({ nome: parte, ...(caixas.get(parte) ? { caixaMm: caixas.get(parte) } : {}), imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
     perguntas: [...(perguntas.todas ?? []), ...(declarado ? [lerPergunta(PERGUNTA_DO_ALVO, 'a pergunta do alvo')] : [])],
     superficie,
+    medicao: medicaoDoPacote,
   });
   const arquivoDoPedido = join(pasta, 'pedido.md');
   writeFileSync(arquivoDoPedido, pedido, 'utf8');
   const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie });
 
   return {
-    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos,
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
 }
 
@@ -1692,7 +1721,9 @@ function arquivosDe(resposta) {
 const porcento = (fracao) => `${Math.round(fracao * 100)}%`;
 
 export function imprimir(resultado) {
-  const linhas = [`vistas:critica — ${resultado.peca}`, '', 'CONJUNTO (proporção e silhueta):'];
+  const linhas = [`vistas:critica — ${resultado.peca}`, '',
+    resultado.medicao?.passou ? `MEDIÇÃO DA RECEITA: passou (${resultado.medicao.sha256})` : `MEDIÇÃO DA RECEITA: NÃO FEITA (${resultado.medicao?.motivo ?? MOTIVO_SEM_MEDIR})`,
+    '', 'CONJUNTO (proporção e silhueta):'];
   for (const arquivo of arquivosDe(resultado.conjunto)) linhas.push(`  ${arquivo}`);
   for (const arquivo of arquivosDe(resultado.traseira)) linhas.push(`  ${arquivo}`);
   for (const arquivo of arquivosDe(resultado.esquerda)) linhas.push(`  ${arquivo}`);
@@ -1769,15 +1800,15 @@ async function principal(argv) {
   try {
     /* `--referencia` repete, e o leitor de argumentos recusa a repetição: ela sai antes */
     externas = argv.slice(2).filter((a) => a.startsWith('--referencia=')).map((a) => a.slice('--referencia='.length));
-    lido = lerArgumentos(argv.slice(2).filter((a) => !a.startsWith('--referencia=')), { opcoes: ['saida', 'prazo'], posicional: { nome: 'a peça', obrigatorio: true } });
+    lido = lerArgumentos(argv.slice(2).filter((a) => !a.startsWith('--referencia=')), { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir'], posicional: { nome: 'a peça', obrigatorio: true } });
     if (lido.opcao('prazo') !== null && !(Number(lido.opcao('prazo')) > 0)) throw new Error(`--prazo pede segundos maiores que zero; veio "${lido.opcao('prazo')}".`);
   } catch (erro) {
-    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--referencia=<caminho absoluto da imagem>[@<vista>]]...\n${erro.message}\n`);
+    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--referencia=<caminho absoluto da imagem>[@<vista>]]...\n${erro.message}\n`);
     return 2;
   }
   /* --prazo: a peça pesada (o furgão realista, em 2026-11-06) não entra na cena nos 90 s de cada captura. */
   const prazo = lido.opcao('prazo');
-  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
+  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, semMedir: lido.bandeira('sem-medir'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
   process.stdout.write(imprimir(resultado));
   return 0;
 }

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2012 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2015 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2081,13 +2081,25 @@
 
 - `receita.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 
+## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
+
 ## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/
 
 - `receita.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
 
+## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
+
 ## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/
 
 - `receita.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
 
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/
 
