@@ -49,6 +49,12 @@ sai; cada mudança aprovada vira plano próprio ou correção pontual.
    mensagens de erro e a coerência dos nomes e argumentos.
 6. Trabalho entre sessões e agentes. O limite de planos ativos, os territórios, os atritos que os agentes relatam e quantos
    deles viraram correção.
+7. Para quem o projeto serve. A pessoa deu quatro usos de exemplo (arquitetura, peças automotivas, manuais de instalação e
+   filme animado), todos com o objeto 3D como saída. Para cada uso: o que o projeto já entrega, o que falta e onde a falta
+   mora. A leitura de partida, a conferir com medida: peça padrão reaproveitável por medida (ferragem, perfil, telha, parede)
+   é família, fora do núcleo; saída além do objeto (passo a passo com lista de peças, desenho com cotas e corte, poses na
+   exportação) é módulo, ao lado dos exportadores; repetição barata (uma peça modelada e muitas posicionadas) e função geral
+   de reuso são do núcleo, quando um caso real pedir. Desta pergunta sai a decisão sobre um roadmap de famílias.
 
 ## Perguntas à pessoa antes de ativar
 
@@ -61,11 +67,11 @@ explicar.
 
 USAR DIRETO: o histórico do CI, a saída da bateria de gates, os roteiros do `comecar`, o catálogo de capacidades, o registro
 de custo e os atritos já registrados; a análise mede com o que existe. ADIAR: qualquer ferramenta nova de medição, salvo se
-uma das seis perguntas não puder ser respondida sem ela.
+uma das sete perguntas não puder ser respondida sem ela.
 
 ## Incluído
 
-- o inventário medido das seis perguntas, com o comando que reproduz cada número;
+- o inventário medido das sete perguntas, com o comando que reproduz cada número;
 - a classificação de cada item e a recomendação por grupo;
 - a revisão cruzada: cada sessão levanta uma metade e tenta derrubar os achados da outra;
 - a decisão da pessoa registrada por grupo, e a abertura dos planos ou correções que ela aprovar.
@@ -85,7 +91,8 @@ uma das seis perguntas não puder ser respondida sem ela.
 
 ## Fatias
 
-1. O inventário medido, dividido entre as duas sessões: processo, documentos e agentes numa; pastas, módulos e núcleo na outra.
+1. O inventário medido, dividido entre as duas sessões: regras, documentos e agentes com a sessão do furgão; pastas, módulos e
+   núcleo com a sessão do núcleo, que aceitou a divisão em 2026-11-12; a pergunta 7 é das duas.
 2. A revisão cruzada e a classificação, com a recomendação por grupo.
 3. A decisão da pessoa.
 4. A abertura dos planos de execução e o fechamento.
@@ -94,7 +101,7 @@ uma das seis perguntas não puder ser respondida sem ela.
 
 Tirar uma regra que pega um defeito raro e caro: por isso nada sai sem a lista do que já pegou. A análise virar mais uma camada
 de documentos: o relatório tem tamanho limitado e é o único documento novo. As duas sessões mexerem nas mesmas áreas: a análise
-não muda código, e a execução sai em planos com território. Se o inventário mostrar que uma das seis perguntas pede semanas de
+não muda código, e a execução sai em planos com território. Se o inventário mostrar que uma das sete perguntas pede semanas de
 medição, ela sai deste plano e vira plano próprio.
 
 ## Fechamento
