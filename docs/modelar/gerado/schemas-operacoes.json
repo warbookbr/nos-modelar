@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:aa1466626e9573e7bec0b75f89ff61bbfe9f17d747687c06bfb7bd4f4ef249cc",
+  "assinatura": "sha256:b53e7767622505e74488d005889b8b782becfe1bdfb2a82ab924cf18127841aa",
   "total": 42,
   "operacoes": [
     {
@@ -2990,7 +2990,7 @@
           "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
           "Cite a costura com {op:'intersectar', id, costura:true}.",
           "Resultado vazio grita.",
-          "Interseção que não muda o sólido (nenhuma face do primeiro foi cortada ou consumida: ele está inteiro dentro dos outros) segue com o aviso semEfeito em neutro.avisos; a que corta o primeiro não avisa."
+          "Interseção que não muda o sólido (nenhuma face do primeiro foi cortada ou consumida e nenhuma face dos outros ficou no resultado: ele está inteiro dentro dos outros; a cavidade de uma casca oca que entra no resultado é mudança e não avisa) segue com o aviso semEfeito em neutro.avisos; a que corta o primeiro não avisa."
         ],
         "diagnosticos": []
       }
@@ -4882,7 +4882,7 @@
           "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
           "Cite a costura com {op:'subtrair', id, costura:true}.",
           "Resultado vazio grita.",
-          "Subtração que não muda o sólido segue, e o passo põe em neutro.avisos um aviso semEfeito com o motivo, por ferramenta quando há mais de uma (campo ferramenta): o critério é a topologia (a ferramenta não deixou face no resultado e nenhuma face da peça foi cortada ou consumida), e não o volume, então o furo de 0,1 mm num cubo de 1 m não avisa. A mensagem diz se a ferramenta não toca a peça ou só encosta (as caixas não se sobrepõem) ou se o corte some na precisão da grade; o descrever lista o aviso em AVISOS DO NÚCLEO."
+          "Subtração que não muda o sólido segue, e o passo põe em neutro.avisos um aviso semEfeito com o motivo, por ferramenta quando há mais de uma (campo ferramenta): o critério é a topologia (a ferramenta não deixou face no resultado), e não o volume, então o furo de 0,1 mm num cubo de 1 m não avisa; a ferramenta sem face avisa mesmo quando outra cortou a peça. A mensagem diz se a ferramenta não toca a peça ou só encosta (as caixas não se sobrepõem), se passa por um vão dela sem cruzá-la, se está dentro do corte de outra, ou se o corte some na precisão da grade (só quando há volume em comum medido sem a grade); o descrever lista o aviso em AVISOS DO NÚCLEO."
         ],
         "diagnosticos": []
       }
@@ -5044,7 +5044,7 @@
           "Cite a costura com {op:'unir', id, costura:true}.",
           "Resultado vazio grita.",
           "O registro da costura (as arestas que o arredondarCostura lê) tem todas as arestas entre faces de sólidos diferentes, também onde a sopa de triângulos da Manifold parte um diedro em dois e o canto do meio é tirado por quase colinear: a aresta que o atravessa continua registrada, ligando os dois vizinhos. Sem isso o registro perdia esses trechos e o arredondarCostura fazia tubo curto com tampa nos restos (dentes no fim do arredondamento, face degenerada). A régua tools/modelar/reguas-de-malha/costura-registrada.mjs compara o registro com a costura geométrica.",
-          "Dois cantos coincidentes de sólidos diferentes (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do outro, sem folga) entram na Manifold como um só: a face que o passo mantém inteira passa a apontar o canto de menor id, o mesmo dos pedaços cortados, mas só onde o id antigo deixaria aresta aberta (a peça de prova frente-rente-a-tampa media 4); sem fresta ela mantém os ids de sempre. A troca leva as quebras de sombra pelo mesmo mapa, funde os cantos que ela repete e vale para as quatro operações que passam pelo caminho comum (unir, subtrair, intersectar e arredondarCostura). O portão de casca fechada confere os ids que o passo escreve: se a casca ainda ficar aberta o passo grita. O outro id sai da malha."
+          "Dois cantos coincidentes de sólidos diferentes (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do outro, sem folga) entram na Manifold como um só: a face que o passo mantém inteira passa a apontar o canto de menor id, o mesmo dos pedaços cortados, mas só onde o id antigo deixaria aresta aberta (a peça de prova frente-rente-a-tampa media 4); sem fresta ela mantém os ids de sempre. A troca leva as quebras de sombra pelo mesmo mapa, funde os cantos que ela repete e vale para as quatro operações que passam pelo caminho comum (unir, subtrair, intersectar e arredondarCostura). O portão de casca fechada confere os dois: o ciclo de representantes soldados (que acha o contato não-manifold de dois cubos que só se tocam num canto ou numa aresta) e os ids que o passo escreve; se qualquer um deixar a casca aberta o passo grita. O outro id sai da malha."
         ],
         "diagnosticos": []
       }
