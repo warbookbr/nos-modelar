@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { acimaDoTeto, ARQUIVO_DOS_PESOS, argumentosDoVitest, comParte, maquinaOcupada, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS } from './testes-lentos.mjs';
+import { acimaDoTeto, ARQUIVO_DOS_PESOS, argumentosDoVitest, comParte, maquinaOcupada, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS, tetosDaBateria } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -36,6 +36,15 @@ describe('a lista dos testes lentos', () => {
     const lentos = [{ arquivo: 'a.test.mjs', ms: 35_000 }, { arquivo: 'b.test.mjs', ms: 40_000 }];
     const sozinho = { 'a.test.mjs': 5_000, 'b.test.mjs': TETO_SOZINHO_MS + 1 };
     expect(pesadosSozinhos(lentos, (f) => sozinho[f]).map((d) => [d.arquivo, d.sozinhoMs])).toEqual([['b.test.mjs', TETO_SOZINHO_MS + 1]]);
+  });
+
+  it('fora do CI a bateria mede sozinho o arquivo de 12 s e cobra o teto sozinho com margem, como o que reprovou no CI em 2026-11-12', () => {
+    const local = tetosDaBateria();
+    expect(tetosDaBateria({ ci: true })).toEqual({ bateria: TETO_DO_RAPIDO_MS, sozinho: TETO_SOZINHO_MS });
+    const lentos = acimaDoTeto([{ arquivo: 'apoio.test.ts', ms: 22_800 }, { arquivo: 'raio.test.mjs', ms: 14_300 }, { arquivo: 'leve.test.mjs', ms: 9_000 }], local.bateria);
+    expect(lentos.map((d) => d.arquivo)).toEqual(['apoio.test.ts', 'raio.test.mjs']);
+    const sozinho = { 'apoio.test.ts': 18_400, 'raio.test.mjs': 10_900 };
+    expect(pesadosSozinhos(lentos, (f) => sozinho[f], local.sozinho).map((d) => d.arquivo)).toEqual(['apoio.test.ts', 'raio.test.mjs']);
   });
 
   it('com a carga acima dos processadores a medida sozinha não vale, salvo no CI, que cobra sempre', () => {

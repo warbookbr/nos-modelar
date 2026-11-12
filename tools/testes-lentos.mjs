@@ -119,6 +119,19 @@ export function maquinaOcupada({ carga, processadores, ci = false }) {
   return !ci && carga > processadores;
 }
 
+/* Fora do CI a bateria roda em mais processadores, e em 2026-11-12 levou 22,8 s no arquivo que o CI mediu em 65,6 s (o mesmo
+ * arquivo levou 18,4 s sozinho aqui e 16,3 s lá). Com o teto de 30 s da bateria, a conferência local nunca o media sozinho, e
+ * dois envios seguidos reprovaram no CI por tempo. Fora do CI, todo arquivo acima de 12 s na bateria é medido sozinho, e o teto
+ * sozinho tem margem: o segundo arquivo mediu 10,9 s aqui e 12,2 s no CI. */
+export const TETO_LOCAL_DA_BATERIA_MS = 12_000;
+export const TETO_LOCAL_SOZINHO_MS = 10_000;
+
+export function tetosDaBateria({ ci = false } = {}) {
+  return ci
+    ? { bateria: TETO_DO_RAPIDO_MS, sozinho: TETO_SOZINHO_MS }
+    : { bateria: TETO_LOCAL_DA_BATERIA_MS, sozinho: TETO_LOCAL_SOZINHO_MS };
+}
+
 export function pesadosSozinhos(lentos, medir, teto = TETO_SOZINHO_MS) {
   return lentos.map((d) => ({ ...d, sozinhoMs: medir(d.arquivo) })).filter((d) => d.sozinhoMs > teto);
 }
@@ -230,22 +243,23 @@ function rodar(modo) {
   if (modo === 'lentos') { avisarAcimaDoTetoDosLentos(caminho, inicio); return; }
   const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
   if (Date.parse(gravado) < inicio) return;
-  const lentos = acimaDoTeto(duracoes);
+  const tetos = tetosDaBateria({ ci: Boolean(process.env.CI) });
+  const lentos = acimaDoTeto(duracoes, tetos.bateria);
   if (!lentos.length) return;
   const cargaAntes = loadavg()[0];
-  const pesados = pesadosSozinhos(lentos, medirSozinho(raiz));
+  const pesados = pesadosSozinhos(lentos, medirSozinho(raiz), tetos.sozinho);
   const carga = Math.max(cargaAntes, loadavg()[0]);
   const processadores = availableParallelism();
   const s1 = (ms) => `${Math.round(ms / 100) / 10} s`;
   for (const d of lentos.filter((l) => !pesados.some((p) => p.arquivo === l.arquivo))) {
-    console.log(`test:rapidos — ${d.arquivo} levou ${s1(d.ms)} na bateria, mas roda sozinho abaixo de ${TETO_SOZINHO_MS / 1000} s: carga da máquina, não reprova.`);
+    console.log(`test:rapidos — ${d.arquivo} levou ${s1(d.ms)} na bateria, mas roda sozinho abaixo de ${tetos.sozinho / 1000} s: carga da máquina, não reprova.`);
   }
   if (!pesados.length) return;
   if (maquinaOcupada({ carga, processadores, ci: Boolean(process.env.CI) })) {
     console.log(`test:rapidos — aviso: ${pesados.map(({ arquivo, sozinhoMs }) => `${arquivo} (${s1(sozinhoMs)} sozinho)`).join(', ')} passaram do teto, mas a máquina está ocupada (carga ${carga.toFixed(1)} em ${processadores} processadores) e a medida não separa o arquivo da carga; o CI cobra o teto em máquina limpa.`);
     return;
   }
-  console.error(`test:rapidos — ${pesados.length} arquivo(s) passaram do teto de ${TETO_DO_RAPIDO_MS / 1000} s da bateria rápida e de ${TETO_SOZINHO_MS / 1000} s sozinhos:`);
+  console.error(`test:rapidos — ${pesados.length} arquivo(s) passaram do teto de ${tetos.bateria / 1000} s da bateria rápida e de ${tetos.sozinho / 1000} s sozinhos${process.env.CI ? '' : ' (tetos locais, com margem para o CI)'}:`);
   for (const { arquivo, ms, sozinhoMs } of pesados) console.error(`  ${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho  ${arquivo}`);
   console.error('Ponha cada um em TESTES_LENTOS, em tools/testes-lentos.mjs, ou deixe-o mais leve.');
   process.exitCode = 1;
