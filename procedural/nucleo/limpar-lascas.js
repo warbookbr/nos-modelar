@@ -65,6 +65,32 @@ function distanciaEntreRetas(a, b, c, d) {
   return Math.abs(dot(sub(c, a), n)) / nn;
 }
 
+/** O polígono (cantos 3D no plano de normal `u`) é simples: nenhuma aresta cruza outra nem toca um canto que não é dela, dentro de `eps`. Quadrático, e recusa o de mais de 128 cantos. */
+function poligonoSimples(pts, u, eps) {
+  const n = pts.length;
+  if (n > 128) return false;
+  const eixo = [0, 1, 2].sort((a, b) => Math.abs(u[b]) - Math.abs(u[a]))[0];
+  const [i0, i1] = [0, 1, 2].filter((k) => k !== eixo);
+  const q = pts.map((p) => [p[i0], p[i1]]);
+  const orient = (a, b, c) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+  const noSegmento = (p, a, b) => {
+    const ab = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (!(ab > 0)) return false;
+    const t = ((p[0] - a[0]) * (b[0] - a[0]) + (p[1] - a[1]) * (b[1] - a[1])) / (ab * ab);
+    return t > 1e-9 && t < 1 - 1e-9 && Math.abs(orient(a, b, p)) / ab <= eps * 1e-3;
+  };
+  for (let i = 0; i < n; i += 1) {
+    const a = q[i]; const b = q[(i + 1) % n];
+    for (let j = i + 1; j < n; j += 1) {
+      if (j === i || (j + 1) % n === i || (i + 1) % n === j) continue;
+      const c = q[j]; const d = q[(j + 1) % n];
+      if (orient(a, b, c) * orient(a, b, d) < 0 && orient(c, d, a) * orient(c, d, b) < 0) return false;
+      if (noSegmento(c, a, b) || noSegmento(d, a, b) || noSegmento(a, c, d) || noSegmento(b, c, d)) return false;
+    }
+  }
+  return true;
+}
+
 const mesmoLiso = (x, y) => (x ?? null) === (y ?? null);
 /** A distância de um ponto ao triângulo (o ponto mais próximo, de Ericson); no triângulo sem área, ao menor dos três lados. */
 function distanciaAoTriangulo(p, A, B, C) {
@@ -122,7 +148,7 @@ const igualAtributos = (f, g) => (f.parte ?? null) === (g.parte ?? null) && (f.m
  * @returns {{ vertices: Map<number, number[]>, verticesRemovidos: Set<number>, fusoes: Map<number, number>, faces: Map<number, number[]>, facesRemovidas: Set<number>,
  *   relatorio: { selecionadas: number, finasAntes: number, finasDepois: number, colapsos: number, trocas: number, desvioMaximo: number, restantes: { face: number, razao: number, arestaCurta: number, recusas: string[] }[] } }}
  */
-export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMITE_DE_FACE_FINA, passadas = 16, trilha = null, maxOperacoes = Infinity, areaMinima = 0 } = {}) {
+export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMITE_DE_FACE_FINA, passadas = 64, trilha = null, maxOperacoes = Infinity, areaMinima = 0 } = {}) {
   if (!(Number.isFinite(tolerancia) && tolerancia > 0)) throw new Error('limparLascas: a tolerância é um número positivo, na unidade da malha');
   if (!(Number.isFinite(limite) && limite > 0 && limite < 0.5)) throw new Error('limparLascas: o limite de lasca é um número entre 0 e 0,5');
   if (!(Number.isFinite(areaMinima) && areaMinima >= 0)) throw new Error('limparLascas: a área mínima é um número a partir de zero, na unidade da malha ao quadrado');
@@ -324,6 +350,16 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     return true;
   }
 
+  /** O canto `v` da face (lista de vértices) está alinhado com os dois vizinhos dele dentro da tolerância: o recuo dele sobre a corda é no máximo `tolerancia`. */
+  function cantoDePassagem(lista, v) {
+    const n = lista.length; const i = lista.indexOf(v);
+    if (i < 0) return false;
+    const p = pos(v); const a = pos(lista[(i + n - 1) % n]); const b = pos(lista[(i + 1) % n]);
+    const corda = dist(a, b);
+    if (!(corda > 0)) return false;
+    return norma(cruz(sub(p, a), sub(b, p))) / corda <= tolerancia;
+  }
+
   /* ---- a fusão com a vizinha ---- */
   /* a lasca de apice quase sobre a aresta da vizinha entra nela: a vizinha ganha o apice como canto e a lasca some; vale quando a
      vizinha é qualquer polígono, o resultado continua convexo e plano dentro da tolerância e deixa de ser lasca */
@@ -345,10 +381,14 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     const pg = pontos(lg); const ng = newell(pg); const mg = norma(ng);
     if (!(mg > 0)) return no('fusão: a vizinha não tem área');
     const u = [ng[0] / mg, ng[1] / mg, ng[2] / mg];
+    /* o canto da lasca fora do plano da vizinha não recusa por si: a fusão deixa o polígono não plano, e quem diz se a superfície passou da tolerância é o desvio entre remendos, medido
+       abaixo nos cantos, nos pontos médios e no centro (um canto a 0,17 mm do plano que a face de 1,6 m tem de borda a borda dá desvio de 5 µm). Só o canto que sai do plano mais
+       que 8 vezes a tolerância recusa aqui, sem a conta do desvio */
     let fora = 0;
     for (const v of restoF) fora = Math.max(fora, Math.abs(dot(u, sub(pos(v), pg[0]))));
-    if (fora > tolerancia) return no('fusão: o canto da lasca sai do plano da vizinha além da tolerância');
+    if (fora > 8 * tolerancia) return no('fusão: o canto da lasca sai do plano da vizinha além da tolerância');
     const pj = pontos(junta);
+    let concava = false;
     for (let i = 0; i < pj.length; i += 1) {
       const e1 = sub(pj[i], pj[(i + pj.length - 1) % pj.length]); const e2 = sub(pj[(i + 1) % pj.length], pj[i]);
       if (dot(cruz(e1, e2), u) < -1e-9 * norma(e1) * norma(e2)) {
@@ -357,16 +397,36 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
            conferida abaixo pelo desvio entre remendos */
         const corda = norma(sub(pj[(i + 1) % pj.length], pj[(i + pj.length - 1) % pj.length]));
         const recuo = corda > 0 ? norma(cruz(e1, e2)) / corda : Infinity;
-        if (!(recuo <= tolerancia)) return no('fusão: a face resultante não é convexa');
+        if (!(recuo <= tolerancia)) concava = true;
       }
     }
+    /* a face côncava vale quando é um polígono simples (nenhuma aresta cruza outra) e a lasca e a vizinha são planas no mesmo plano dentro da tolerância: as faces da tampa de um
+       corte (os remendos de uma tampa plana que a pele curva deixa em tiras) viram o polígono único que a tampa é, sem mover canto, e o triangulador de face dá conta da côncava */
+    if (concava && !poligonoSimples(pj, u, tolerancia)) return no('fusão: a face resultante não é convexa');
     /* a face de área abaixo da mínima pode ir para a vizinha mesmo que o resultado siga fino, desde que não fique pior que a vizinha era: o corte
        deixa a fita de cantos alinhados que só a vizinha, também estreita, pode receber */
     const aMinima = areaMinima > 0 && norma(newell(pontos(l))) / 2 < areaMinima;
-    if (!(razao(pj) >= limite) && !(aMinima && razao(pj) >= razao(pg) * 0.8)) return no('fusão: a face resultante continua lasca');
+    /* a tira de uma fileira de tiras paralelas (a pele de uma chapa muito subdividida, cortada por dois planos): a fusão de duas lascas que deixa uma lasca mais larga que as
+       duas vale como passo, porque a fileira inteira acaba numa face de proporção boa; cada fusão tira uma face, e por isso a conta termina */
+    const rPg = razao(pg); const rL = razao(pontos(l)); const rJ = razao(pj);
+    const passoDeTira = rPg < limite && rJ > Math.max(rPg, rL) * 1.25 + EPS;
+    if (!(rJ >= limite) && !(aMinima && rJ >= rPg * 0.8) && !passoDeTira) return no('fusão: a face resultante continua lasca');
     for (const v of l) if (!junta.includes(v)) return no('fusão: canto perdido');
-    /* o canto da lasca que a vizinha não tinha passa a ser dela: ela conta entre as faces que ficam em volta dele */
-    for (const v of l) { const restam = new Set([...(vf.get(v) ?? [])].filter((x) => x !== fid)); restam.add(g); if (restam.size < 3) return no('fusão: deixaria vértice de valência 2'); }
+    /* o canto da lasca que a vizinha não tinha passa a ser dela: ela conta entre as faces que ficam em volta dele. O canto que ficaria com duas faces só é um ponto de passagem da
+       borda comum (o ponto da fileira que a parede vizinha já tinha, sobre a aresta que as duas passam a dividir): se está alinhado com os dois vizinhos dentro da tolerância, as duas
+       faces têm quatro cantos ou mais e as duas são da seleção, ele sai das duas e a aresta delas fica uma só. Um vértice de valência 2 que ficasse na malha seria recusado pela medida
+       de contatos (o elo do vértice precisa de três vizinhos), por isso ele sai em vez de ficar. */
+    const dissolver = [];
+    for (const v of l) {
+      const restam = new Set([...(vf.get(v) ?? [])].filter((x) => x !== fid)); restam.add(g);
+      if (restam.size >= 3) continue;
+      const listas = [...restam].map((x) => (x === g ? junta : vs.get(x)));
+      const vizinhosDe = (lista) => { const n = lista.length; const k = lista.indexOf(v); return [lista[(k + n - 1) % n], lista[(k + 1) % n]].sort((p, q) => p - q).join(); };
+      const pode = restam.size === 2 && [...restam].every((x, k) => selecionadas.has(x) && !bloqueada(x) && !F.get(x).quebras?.length && listas[k].length >= 4 && cantoDePassagem(listas[k], v))
+        && vizinhosDe(listas[0]) === vizinhosDe(listas[1]);
+      if (!pode) return no('fusão: deixaria vértice de valência 2');
+      dissolver.push(v);
+    }
     const desvioDaFusao = desvioEntreRemendos([pontos(l), pg], [pj]);
     if (desvioDaFusao > tolerancia) return no('fusão: a superfície passaria da tolerância');
     for (const v of l) tirarDe(v, fid);
@@ -374,6 +434,14 @@ export function limparLascas(malha, { selecao = null, tolerancia, limite = LIMIT
     const pt = F.get(fid).parte; if (pt != null) contagemDeParte.set(pt, contagemDeParte.get(pt) - 1);
     vs.set(g, junta); facesMudadas.add(g);
     for (const v of junta) poeEm(v, g);
+    for (const v of dissolver) {
+      /* o ponto de passagem sai das duas faces; o peso e as citações dele vão para o vizinho mais próximo */
+      const faces2 = [...(vf.get(v) ?? [])];
+      const k0 = vs.get(faces2[0]).indexOf(v); const n0 = vs.get(faces2[0]).length;
+      const vizinho = [vs.get(faces2[0])[(k0 + n0 - 1) % n0], vs.get(faces2[0])[(k0 + 1) % n0]].sort((p, q) => dist(pos(p), pos(v)) - dist(pos(q), pos(v)) || p - q)[0];
+      for (const x of faces2) { vs.set(x, vs.get(x).filter((w) => w !== v)); facesMudadas.add(x); }
+      vf.delete(v); verticesRemovidos.add(v); fusoes.set(v, vizinho); moveu.delete(v);
+    }
     desvioMaximo = Math.max(desvioMaximo, desvioDaFusao);
     absorcoes += 1;
     trilha?.push({ tipo: 'absorcao', faces: [fid, g], vertices: [...l], desvio: desvioDaFusao });

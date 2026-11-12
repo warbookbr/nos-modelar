@@ -162,6 +162,91 @@ function bool(op, origens) {
   estado.passos.push([op, { origemId: id, solidos: origens.map((origem) => ({ origem })) }]);
   return { op, id };
 }
+/** A placa de seção em anel (z, y) varrida ao longo de x de `a0` a `a1` com `n + 1` estações, como gaiola literal (`subdivisao` com `niveis: 0`): as faces são as quadriláteras entre
+ *  estações vizinhas, e não a tira única de ponta a ponta que a extrusão dá. Uma chapa de 2 a 3 mm em 1,6 a 2 m tem a borda de 0,0015 de razão de aspecto (face fina), e a
+ *  corte por uma booleana também (a tampa de 3 por 1.400 mm que a pele deixa no alto da parede corta-fogo); com as estações, a borda e a tampa saem em `n` pedaços e o corte leva
+ *  um vértice a cada estação. `anel` é o contorno fechado, de m cantos pares: os primeiros m/2 são a linha de cima e os outros a de baixo, na ordem inversa (a saída de `faixa`).
+ *  As tampas são os quadriláteros entre as duas linhas. A união de sólidos que só se tocam pela face (as fatias) deixava arestas abertas, e a gaiola não tem esse problema. */
+function placaPorEstacoes(anel, a0, a1, n) {
+  const id = ++estado.origem;
+  const m = anel.length; const meio = m / 2;
+  const vertices = [];
+  for (let k = 0; k <= n; k += 1) for (const [z, y] of anel) vertices.push([r3(a0 + ((a1 - a0) * k) / n), y, z]);
+  const v = (k, i) => k * m + (((i % m) + m) % m);
+  const faces = [];
+  for (let k = 0; k < n; k += 1) for (let i = 0; i < m; i += 1) faces.push([v(k, i), v(k, i + 1), v(k + 1, i + 1), v(k + 1, i)]);
+  for (let i = 0; i + 1 < meio; i += 1) {
+    faces.push([v(0, m - 1 - i), v(0, m - 2 - i), v(0, i + 1), v(0, i)]);
+    faces.push([v(n, i), v(n, i + 1), v(n, m - 2 - i), v(n, m - 1 - i)]);
+  }
+  /* a normal para fora: o volume com sinal tem de ser positivo, senão inverte a ordem de todas as faces */
+  let volume = 0;
+  for (const f of faces) { const q = f.map((c) => vertices[c]); for (let t = 1; t + 1 < q.length; t += 1) volume += (q[0][0] * (q[t][1] * q[t + 1][2] - q[t][2] * q[t + 1][1]) + q[0][1] * (q[t][2] * q[t + 1][0] - q[t][0] * q[t + 1][2]) + q[0][2] * (q[t][0] * q[t + 1][1] - q[t][1] * q[t + 1][0])) / 6; }
+  estado.passos.push(['subdivisao', { origemId: id, vertices, faces: volume < 0 ? faces.map((f) => [...f].reverse()) : faces, niveis: 0 }]);
+  return { op: 'subdivisao', id };
+}
+/** Orienta as faces de uma gaiola fechada: as que dividem uma aresta a percorrem em sentidos opostos, e o volume com sinal sai positivo (a normal para fora). */
+function orientarGaiola(vertices, faces) {
+  const saida = faces.map((f) => [...f]);
+  const porAresta = new Map();
+  saida.forEach((f, k) => f.forEach((a, i) => { const b = f[(i + 1) % f.length]; const c = Math.min(a, b) + '_' + Math.max(a, b); (porAresta.get(c) ?? porAresta.set(c, []).get(c)).push(k); }));
+  const visto = new Set([0]); const fila = [0];
+  const sentido = (f, a, b) => { const i = f.indexOf(a); return f[(i + 1) % f.length] === b ? 1 : f[(i + f.length - 1) % f.length] === b ? -1 : 0; };
+  while (fila.length) {
+    const k = fila.shift(); const f = saida[k];
+    f.forEach((a, i) => {
+      const b = f[(i + 1) % f.length];
+      for (const q of porAresta.get(Math.min(a, b) + '_' + Math.max(a, b))) {
+        if (q === k || visto.has(q)) continue;
+        if (sentido(saida[q], a, b) === 1) saida[q].reverse();
+        visto.add(q); fila.push(q);
+      }
+    });
+  }
+  if (visto.size !== saida.length) throw new Error('orientarGaiola: a gaiola tem faces desconexas');
+  let volume = 0;
+  for (const f of saida) { const q = f.map((c) => vertices[c]); for (let t = 1; t + 1 < q.length; t += 1) volume += (q[0][0] * (q[t][1] * q[t + 1][2] - q[t][2] * q[t + 1][1]) + q[0][1] * (q[t][2] * q[t + 1][0] - q[t][0] * q[t + 1][2]) + q[0][2] * (q[t][0] * q[t + 1][1] - q[t][1] * q[t + 1][0])) / 6; }
+  return volume < 0 ? saida.map((f) => [...f].reverse()) : saida;
+}
+/** A caixa de roda como gaiola literal (`subdivisao` com `niveis: 0`): a aba em anel (a coroa do arco, de x `xf0` a `xf1`) e a chapa do domo (o segmento de disco de x `xp0` a `xp1`, com `xp1`
+ *  igual a `xf0`) no mesmo sólido, sem a união de dois prismas. A união deixava, nas faces do arco que as duas dividiam (a chapa e a aba coplanares em x 638,5 a 640), 12 a 15 tiras de 0,2 mm
+ *  por 300 mm; a de dois sólidos que só se tocam pela face deixava 52 arestas abertas (o núcleo reconstrói a face da chapa sem as arestas do anel). `O` e `I` são o arco de fora e o de dentro
+ *  (z, y), `xs` o sinal do lado. */
+function caixaDeRodaLiteral(O, I, [xp0, xp1, xf1], xs) {
+  const id = ++estado.origem;
+  const vertices = []; const indice = new Map();
+  const v = (camada, nome, k) => {
+    const chave = `${camada}${nome}${k}`;
+    if (!indice.has(chave)) { const [z, y] = nome === 'O' ? O[k] : I[k]; indice.set(chave, vertices.push([r3(xs * { a: xp0, b: xp1, c: xf1 }[camada]), y, z]) - 1); }
+    return indice.get(chave);
+  };
+  const n = O.length - 1; const faces = [];
+  /* as quatro pontas da corda em y = yb, na ordem de z crescente: O[n], I[0], I[n], O[0] */
+  const corda = (camada) => [v(camada, 'O', n), v(camada, 'I', 0), v(camada, 'I', n), v(camada, 'O', 0)];
+  faces.push([...Array.from({ length: n + 1 }, (_, k) => v('a', 'O', k)), v('a', 'I', 0), v('a', 'I', n)].reverse().slice().reverse()); /* a tampa da chapa em x xp0 */
+  for (let k = 0; k < n; k += 1) {
+    faces.push([v('a', 'O', k), v('a', 'O', k + 1), v('b', 'O', k + 1), v('b', 'O', k)]); /* o arco de fora da chapa */
+    faces.push([v('b', 'O', k), v('b', 'O', k + 1), v('c', 'O', k + 1), v('c', 'O', k)]); /* o arco de fora da aba */
+    faces.push([v('b', 'I', k), v('b', 'I', k + 1), v('c', 'I', k + 1), v('c', 'I', k)]); /* o arco de dentro da aba */
+    faces.push([v('c', 'O', k), v('c', 'O', k + 1), v('c', 'I', n - k - 1), v('c', 'I', n - k)]); /* a tampa da aba em x xf1 */
+  }
+  const ca = corda('a'); const cb = corda('b');
+  for (let k = 0; k < 3; k += 1) faces.push([ca[k], ca[k + 1], cb[k + 1], cb[k]]); /* o fundo da chapa, em y = yb */
+  faces.push([v('b', 'I', 0), ...Array.from({ length: n }, (_, k) => v('b', 'I', k + 1))]); /* o vão da chapa em x xp1, dentro do arco de dentro da aba */
+  const cc = corda('c');
+  faces.push([cb[0], cb[1], cc[1], cc[0]], [cb[2], cb[3], cc[3], cc[2]]); /* o fundo da aba: as duas pontas da coroa */
+  estado.passos.push(['subdivisao', { origemId: id, vertices, faces: orientarGaiola(vertices, faces), niveis: 0 }]);
+  return { op: 'subdivisao', id };
+}
+/** A polilinha com pontos alinhados a cada `passo` mm no máximo: a tampa de uma chapa comprida sai em quadriláteros de `passo` por espessura. */
+function repartir(linha, passo) {
+  const saida = [linha[0]];
+  for (let i = 1; i < linha.length; i += 1) {
+    const [a, b] = [linha[i - 1], linha[i]]; const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / passo));
+    for (let k = 1; k <= n; k += 1) saida.push([r3(a[0] + ((b[0] - a[0]) * k) / n), r3(a[1] + ((b[1] - a[1]) * k) / n)]);
+  }
+  return saida;
+}
 /* a cor do objeto real, por nome de parte, para o lado a lado com as vistas do acervo (`SEDAN_CORES=reais`) */
 const corReal = (n) => (/^pneu/.test(n) ? '#151617' : /^(aro|cubo|disco)/.test(n) ? '#8a8f94' : /^(paraBrisa|vidro|vigia)/.test(n) ? '#20262d'
   : /^farol/.test(n) ? '#c9c4a6' : /^grade/.test(n) ? '#2c2f33' : /^lanterna/.test(n) ? '#5a1f1a'
@@ -396,7 +481,7 @@ function chassi() {
   const iDegrau = A.perfil.findIndex(([z]) => z < A.zDegrau);
   const daCabine = [...A.perfil.slice(0, iDegrau + 1)];
   const deTras = [[A.zDegrau, A.perfil[iDegrau][1]], ...A.perfil.slice(iDegrau + 1)];
-  parte('assoalho', bool('unir', [prisma('x', faixa(daCabine, A.esp), -A.meia, A.meia), prisma('x', faixa(deTras, A.esp), -A.meiaTras, A.meiaTras)]), CLARO);
+  parte('assoalho', bool('unir', [placaPorEstacoes(faixa(repartir(daCabine, 350), A.esp), -A.meia, A.meia, 4), placaPorEstacoes(faixa(repartir(deTras, 350), A.esp), -A.meiaTras, A.meiaTras, 4)]), CLARO);
   parte('tunel', prisma('z', T.tunel, -740, 620), CINZA);
 
   /* longarinas: dois perfis fechados de 80 por 100, com o rebaixo sob a cabine, da face de dentro do painel dianteiro à do traseiro */
@@ -408,7 +493,7 @@ function chassi() {
   parte('travessaTraseira', caixa(-L.x1 - 2, L.x1 + 2, 388, 488, -1960, -1900), AZUL);
 
   /* os membros que encostam por dentro na lataria, aparados pelo interior da chapa */
-  parte('paredeCortaFogo', aparar(caixa(-1000, 1000, 630, 1100, 700, 703)), CINZA);
+  parte('paredeCortaFogo', aparar(placaPorEstacoes([[703, 1100], [703, 630], [700, 630], [700, 1100]], -1000, 1000, 5)), CINZA);
   parte('suporteDoRadiador', aparar(caixa(-1000, 1000, 486, 1100, 1840, 1870)), CINZA);
   /* o anteparo fecha o porta-malas atrás do banco: uma parede entre as caixas de roda e uma faixa de lado a lado acima delas */
   parte('anteparoTraseiro', aparar(bool('unir', [caixa(-C.xParede - 1.5, C.xParede + 1.5, 490, 1100, -1360, -1340), caixa(-1000, 1000, 800, 1100, -1360, -1340)])), CINZA);
@@ -437,11 +522,9 @@ function chassi() {
     for (const [zc, ponta] of [[T.roda.zFrente, 'Dianteira'], [T.roda.zTras, 'Traseira']]) {
       const R = R_ARCO; const yb = T.lado.at(-1)[1]; const yc = T.roda.raio;
       const a1 = Math.asin((yb - yc) / (R + C.esp)); const a0 = Math.asin((yb - yc) / R);
-      const anel = [...arco(zc, yc, R + C.esp, a1, Math.PI - a1, 24), ...arco(zc, yc, R, Math.PI - a0, a0, 24)];
-      const parede = arco(zc, yc, R + C.esp, a1, Math.PI - a1, 24);
       /* a borda da caixa de roda entra meia espessura na chapa do arco (a solda): faces só encostadas em plano inclinado saíam ora
          como encosta, ora como travessia, pelo ruído da booleana */
-      parte(`caixaDeRoda${ponta}${lado}`, aparar(bool('unir', [prismaDoLado(s, anel, C.xParede + 1.5, 1000), prismaDoLado(s, parede, C.xParede, C.xParede + C.esp)]), T.chapa - C.solda), CINZA);
+      parte(`caixaDeRoda${ponta}${lado}`, aparar(caixaDeRodaLiteral(arco(zc, yc, R + C.esp, a1, Math.PI - a1, 24), arco(zc, yc, R, Math.PI - a0, a0, 24), [C.xParede, C.xParede + C.esp, 1000], s), T.chapa - C.solda), CINZA);
     }
     parte(`suporteDoParaChoqueDianteiro${lado}`, caixa(...x(SUPORTE.x0, SUPORTE.x1), ...SUPORTE.frente, 2050, T.paraChoqueFrente.z0 + 2), CINZA);
     parte(`suporteDoParaChoqueTraseiro${lado}`, caixa(...x(...SUPORTE.xTras), ...SUPORTE.tras, T.paraChoqueTras.z0 - 2, -2050), CINZA);
@@ -456,9 +539,12 @@ function chassi() {
 
 /* ---- as rodas, pela família roda-pneu ---- */
 export const PERFIL_DA_RODA = 'carro';
+/* o perfil `carro` é um 205/55 R16 de 632 mm; a fonte tem o pneu de 728 por 205, e o resto do perfil vai em proporção. O furo central do cubo tem o diâmetro do eixo do chassi (o do perfil
+   `carro` é 0,106 do diâmetro, 77 mm, e deixava 8,6 mm de folga radial no eixo de 60), e o ombro do pneu é o arco de quarto de círculo da família (`ombroRedondo`), e não o chanfro mínimo do perfil.
+   Os parâmetros são os da instância (a família não muda); `partes/_comum/sedan.mjs` os passa a `derivar` da família para escrever as medidas das partes no PLANO. */
+export const PARAMETROS_DA_RODA = { diametroPneu: 2 * T.roda.raio, larguraPneu: T.roda.largura / (2 * T.roda.raio), diametroFuroCentral: (2 * T.eixoRaio) / (2 * T.roda.raio), ombroRedondo: 1 };
 function rodas() {
-  /* o perfil `carro` é um 205/55 R16 de 632 mm; a fonte tem o pneu de 728 por 205, e o resto do perfil vai em proporção */
-  const parametros = { diametroPneu: 2 * T.roda.raio, larguraPneu: T.roda.largura / (2 * T.roda.raio) };
+  const parametros = PARAMETROS_DA_RODA;
   const COR = { pneu: '#151617', aro: '#9aa0a6', cubo: '#7d8389', disco: '#b4b9be' };
   const cores = Object.fromEntries(Object.entries(COR).map(([nome, cor]) => [nome, corDe(nome, cor)]));
   const poses = [];
@@ -469,6 +555,9 @@ function rodas() {
   estado.passos.push(...r.passos);
   estado.origem = r.origem;
   for (const { nome, nomeNaFamilia, sel } of r.partes) { PARTES.set(nome, sel); CORES[nome] = cores[nomeNaFamilia]; }
+  /* os cinco furos de fixação e o furo central, que a família corta do cubo por `subtrair`, deixam em cada cubo 12 faces finas (tiras de 0,17 mm entre o vértice do círculo e a aresta da
+     face): a limpeza as une às vizinhas sem mover a superfície (desvio de 3e-14 mm). Os parâmetros da instância não as evitam; a família é a que corta. */
+  for (const { nome, nomeNaFamilia } of r.partes) if (nomeNaFamilia === 'cubo') estado.passos.push(['limparLascas', { sel: { grupo: nome }, tolerancia: 0.01 }]);
 }
 
 chassi();
@@ -593,7 +682,7 @@ for (const L of ['Dir', 'Esq']) {
       par(`aro${P}${L}`, `pneu${P}${L}`, 'encosta', 'o talão do pneu assenta no aro (família roda-pneu)'),
       par(`aro${P}${L}`, `disco${P}${L}`, 'atravessa', 'a borda do disco entra na parede do aro (família roda-pneu)'),
       par(`cubo${P}${L}`, `disco${P}${L}`, 'atravessa', 'a borda de dentro do disco entra no cubo (família roda-pneu)'),
-      folga(`cubo${P}${L}`, P === 'Dianteira' ? 'eixoDianteiro' : 'eixoTraseiro', 8.65, 0.15, 'o cubo gira no eixo, com 8,6 mm de folga no raio'),
+      par(`cubo${P}${L}`, P === 'Dianteira' ? 'eixoDianteiro' : 'eixoTraseiro', 'encosta', 'o cubo é montado no eixo: o furo central tem o diâmetro do eixo (60 mm), e a roda é parada, sem junta modelada'),
       folga(`disco${P}${L}`, `pneu${P}${L}`, 2.2, 0.1, 'a borda do disco fica a 2,2 mm do talão do pneu (família roda-pneu)'),
     );
   }

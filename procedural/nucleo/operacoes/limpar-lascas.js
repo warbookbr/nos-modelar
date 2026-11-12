@@ -50,6 +50,7 @@ export function limparNoEstado(st, faces, { tolerancia, limite = LIMITE_DE_FACE_
   if (op === 'aparar') tolerancia = Math.max(tolerancia, TOLERANCIA_RELATIVA_DO_APARAR * diagonalDaPeca(st));
   const res = limparLascas({ V: st.V, F: st.F }, { selecao: faces, tolerancia, limite, areaMinima });
   const { relatorio } = res;
+  if (process.env.DBG_LL) console.error('LL', op, 'sel', faces.size ?? faces.length, 'tol', tolerancia, JSON.stringify({...relatorio, restantes: relatorio.restantes.length}), JSON.stringify(relatorio.restantes.slice(0,3).map(r=>r.recusas.join('/'))));
   if (relatorio.finasAntes === 0) return undefined;
 
   for (const [v, p] of res.vertices) st.V.set(v, p);

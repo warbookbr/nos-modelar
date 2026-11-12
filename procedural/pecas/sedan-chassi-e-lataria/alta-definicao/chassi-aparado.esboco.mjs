@@ -13,6 +13,9 @@
 import carro from './carro-inteiro.esboco.mjs';
 
 const FOLGA = Number(process.env.HD_FOLGA ?? 0.5);
+/* a tolerância, em mm, com que o `aparar` desfaz as faces finas do corte (a pele de uma chapa subdividida, cortada pelas paredes do membro, deixa fileiras de tiras de 0,02 a 0,4 mm
+   por 80 mm): 0,075 mm, a mesma da limpeza final */
+const LIMPAR_DO_APARAR = Number(process.env.HD_LIMPAR_APARAR ?? 0.075);
 const original = carro.opcoes[0];
 const passos = structuredClone(original.passos);
 
@@ -27,7 +30,7 @@ for (const p of passos) {
     reaparos.add(p[1].origemId);
     p[0] = 'aparar';
     p[1] = { origemId: p[1].origemId, solido: p[1].solidos[0], chapa: [{ op: 'subdivisao', id: 1 }, { op: 'subdivisao', id: 17 }], folga: FOLGA,
-      fecha: [{ eixo: 'y', em: 300 }, { eixo: 'y', em: 950 }] };
+      fecha: [{ eixo: 'y', em: 300 }, { eixo: 'y', em: 950 }], limpar: LIMPAR_DO_APARAR };
   }
 }
 if (!reaparos.size) throw new Error('chassi-aparado: nenhum reaparo por seção no carro-inteiro');
@@ -39,7 +42,12 @@ const trocar = (v) => {
   return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, trocar(x)]));
 };
 /* o `aparar` limpa, dentro do passo, as faces finas e de área nula que o corte deixa na costura com a pele nova, e não precisa do `limparLascas` depois dele */
-const PASSOS = passos.filter((p) => !(ehPrisma(p) && prismas.has(p[1].origemId))).map(trocar);
+const SEM_PRISMAS = passos.filter((p) => !(ehPrisma(p) && prismas.has(p[1].origemId))).map(trocar);
+/* a limpeza final de cada membro do chassi, depois de todas as booleanas e dos `parte`: as faces finas que o `aparar` não desfez dentro do passo (a tampa plana do corte que a pele curva
+   deixa em tiras, a fresta da união de dois prismas) saem pela vizinhança que só existe com o membro pronto. É a seleção por parte, e a tolerância é de 0,075 mm: o degrau de 0,07 mm da borda da pele (a 0,05 mm o corte deixa tiras de 0,07 por 90 mm), com desvio medido de no máximo 0,045 mm. */
+const MEMBROS = /^(assoalho|tunel|longarina|travessa|suporte|parede|anteparo|caixaDeRoda|soleiraDoChassi|montante|reforco)/;
+const LIMPAR_FINAL = Number(process.env.HD_LIMPAR_FINAL ?? 0.075);
+const PASSOS = [...SEM_PRISMAS, ...SEM_PRISMAS.filter((p) => p[0] === 'parte' && MEMBROS.test(p[1].nome)).map((p) => ['limparLascas', { sel: { grupo: p[1].nome }, tolerancia: LIMPAR_FINAL }])];
 
 /* os contatos da lataria com os membros aparados: o apoio é a folga de FOLGA mm, e a travessia rasa do carro-inteiro (a seção ficava até 2 mm dentro da
    chapa alisada) já não se declara; o relato diz o que a malha dá */
