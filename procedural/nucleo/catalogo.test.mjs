@@ -38,8 +38,10 @@ describe('catálogo de capacidades — R05', () => {
        aberturaPorContorno levou o catálogo a 37 358 bytes, e o teto passou a
        38 000, de novo com folga para uma operação do tamanho da maior. Em
        2026-11-11 a limparLascas (569 bytes por lista, a ficha já enxuta) levou
-       o catálogo a 38 498 bytes, e o teto passou a 39 000. */
-    expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(39_000);
+       o catálogo a 38 498 bytes, e o teto passou a 39 000. Em 2026-11-12 a
+       aparar (1 098 bytes, com o exemplo da calota) levou o catálogo a 39 596 bytes,
+       e o teto passou a 40 000. */
+    expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(40_000);
   });
 
   it('busca por efeito, artefato e identidade sem executar receita', () => {
@@ -63,7 +65,7 @@ describe('catálogo de capacidades — R05', () => {
     expect(buscarCapacidades(catalogo, { texto: 'revolucionar' }).operacoes.map(({ nome }) => nome)).toContain('lathe');
     const primeira = buscarCapacidades(catalogo, { limite: 3 });
     const segunda = buscarCapacidades(catalogo, { limite: 3, cursor: primeira.proximoCursor });
-    expect(primeira).toMatchObject({ total: 41, retornadas: 3, truncado: true, omitidas: 38 });
+    expect(primeira).toMatchObject({ total: 42, retornadas: 3, truncado: true, omitidas: 39 });
     expect(segunda.operacoes.map(({ id }) => id)).not.toEqual(expect.arrayContaining(primeira.operacoes.map(({ id }) => id)));
   });
 });

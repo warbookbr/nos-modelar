@@ -374,6 +374,8 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     }
     /* as arestas da superfície em que a sombra se divide; com espessura, a face interna repete cada uma a nS vértices */
     const nS = r.vertices.length;
+    /* a superfície refinada, antes da espessura: `aparar` (booleanas.js) a lê para deslocar a pele de dentro, mesmo depois de uma booleana ter cortado a chapa */
+    const pele = { vertices: r.vertices, faces: r.faces };
     const quebras = liso === false || quebra === 'nenhum' ? [] : r.vincos.filter(([, , viva]) => quebra === 'todos' || viva).map(([p, q]) => [p, q]);
     let partes = null;
     if (espessura !== null) {
@@ -423,6 +425,7 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       passo: i, origemId: a.origemId ?? null, declarados: declarados.map((v) => (typeof v === 'string' ? v : null)), indiceDoNome,
       faces: gaiola.faces.map((f) => [...f]), vertices: gaiola.vertices.map((p) => [...p]), nVertices: gaiola.vertices.length,
       niveis: Math.trunc(st.num(a.niveis ?? 2)), simetria: a.simetria ?? null, imagem: gaiola.imagem ?? null,
+      pele, espessura, lado: a.lado ?? 'contraNormal',
     });
   },
   };

@@ -2,14 +2,15 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:c192bd11a16896d7ca4ad18989e8eb3abca86ea39c16594878dbe88a2decb54e`.
+Assinatura do registro: `sha256:935cf8ae779613c4e68c1d2e80b4acd8b0a67305fc5688fffde8ad1b5129aac4`.
 
-Há 41 operações em 1 módulo(s).
+Há 42 operações em 1 módulo(s).
 
 | operação | intenção | entra/sai | interfaces | custo | schema |
 |---|---|---|---|---:|---|
 | `aberturaPorContorno` | Abrir na chapa um vão pelo contorno desenhado numa vista, sem depender da gaiola, com a borda para o friso e o pedaço retirado. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.aberturaPorContorno@1` |
 | `apagaFace` | Remover exatamente uma face, preferencialmente por seleção semântica. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.apagaFace@1` |
+| `aparar` | Aparar um sólido pelo lado de dentro de uma chapa subdividida, deixando-o a uma folga da pele de dentro dela. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.aparar@1` |
 | `arranja` | Criar cópias lineares ou radiais com identidade estrutural. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.arranja@1` |
 | `arredondarAresta` | Substituir uma aresta convexa por múltiplos painéis de raio geométrico. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.arredondarAresta@1` |
 | `arredondarCostura` | Arredondar com raio declarado as arestas de uma booleana: o encontro côncavo, a borda convexa e as arestas internas da ferramenta. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.arredondarCostura@1` |

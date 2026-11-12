@@ -71,6 +71,7 @@
    seleções que dividem face, resultado vazio e estouro do bloco GRITAM, e o
    passo inteiro aborta com 0 V/0 F. */
 import { areaDe, fundir, fundirCoplanares, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
+import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
 
 /* Fusão dos pedaços coplanares da booleana comum: o quanto, em fração do tamanho da peça, o polígono fundido pode sair do
    próprio plano, e o seno da curva para dentro que ainda se aceita num canto dele. */
@@ -2193,12 +2194,74 @@ export function criarOperacoesBooleanas(servicos) {
     }
   }
 
+  /* aparar — o sólido que fica por dentro de uma chapa subdividida, a `folga` da pele de dentro dela. O molde (`molde-de-dentro.js`) é o volume
+     aquém da pele deslocada, fechado por paredes e uma tampa plana no plano `fecha`; ele entra no estado com ids da faixa estendida do passo,
+     longe dos que a booleana dá aos pedaços novos, e a interseção do sólido com ele é a do `intersectar`, com a mesma lei de identidade: as
+     faces do molde que sobram na peça são as de dentro dela, e as que ficam fora do sólido somem. A chapa é lida do que a `subdivisao` guardou
+     (`st.chapas[].pele`), e não das faces vivas, porque uma booleana já pode tê-la cortado (as portas, os vãos). */
+  const DESLOCAMENTO_DO_MOLDE = BLOCO + (FAIXA_ESTENDIDA >> 1);
+  function aparar(st, a, i) {
+    const wasm = abertura(st, a, i, 'aparar');
+    if (!wasm) return;
+    if (a.solido == null) return grita(st, i, 'aparar', 'solido', 'aparar exige solido: a seleção do sólido fechado a aparar');
+    const chapa = a.chapa;
+    if (!chapa || typeof chapa !== 'object' || chapa.op !== 'subdivisao' || !Number.isSafeInteger(chapa.id) || Object.keys(chapa).some((k) => k !== 'op' && k !== 'id')) return grita(st, i, 'aparar', 'chapa', "chapa precisa ser a origem de uma subdivisão: { op: 'subdivisao', id }");
+    const folga = st.num(a.folga);
+    if (!Number.isFinite(folga) || folga < 0) return grita(st, i, 'aparar', 'folga', `folga precisa ser um número maior ou igual a zero, na unidade da peça, e veio ${JSON.stringify(a.folga)}`);
+    const fecha = a.fecha && typeof a.fecha === 'object' && !Array.isArray(a.fecha) ? { eixo: a.fecha.eixo, em: st.num(a.fecha.em) } : null;
+    if (!fecha || !['x', 'y', 'z'].includes(fecha.eixo) || !Number.isFinite(fecha.em) || Object.keys(a.fecha).some((k) => k !== 'eixo' && k !== 'em')) return grita(st, i, 'aparar', 'fecha', "fecha precisa ser { eixo: 'x' | 'y' | 'z', em: número }, o plano da tampa que fecha a abertura da chapa");
+    const guardada = (st.chapas ?? []).find((c) => c.origemId === chapa.id);
+    if (!guardada) return grita(st, i, 'aparar', 'chapa', `a origem subdivisao:${chapa.id} não existe antes deste passo; aparar usa a superfície que a subdivisão guardou`);
+    const antes = st.orfaos.length;
+    const r = resolverSelecao(st, a.solido, 'aparar', i);
+    if (st.orfaos.length > antes) return;
+    const faces = [...r.faces].sort((x, y) => x - y);
+    if (!faces.length) return grita(st, i, 'aparar', 'solido', 'a seleção do sólido não tem face nenhuma');
+    let molde;
+    try { molde = moldeDeDentro({ vertices: guardada.pele.vertices, faces: guardada.pele.faces, espessura: guardada.espessura ?? 0, lado: guardada.lado, folga, fecha }); } catch (e) {
+      if (e instanceof ErroDoMolde) return grita(st, i, 'aparar', 'chapa', e.message.replace(/^aparar: /, ''));
+      throw e;
+    }
+    if (molde.vertices.length >= FAIXA_ESTENDIDA >> 1 || molde.triangulos.length >= FAIXA_ESTENDIDA >> 1) return grita(st, i, 'aparar', 'chapa', `o molde tem ${molde.vertices.length} vértices e ${molde.triangulos.length} faces, acima do que o passo comporta (${FAIXA_ESTENDIDA >> 1})`);
+    /* o plano que a borda deslocada passou: o semiespaço do lado do volume é um terceiro operando, uma caixa grande com uma face no plano */
+    let semiespaco = null;
+    if (molde.corte) {
+      const e = { x: 0, y: 1, z: 2 }[molde.corte.eixo];
+      const lo = [0, 1, 2].map((c) => Math.min(...molde.vertices.map((p) => p[c]))); const hi = [0, 1, 2].map((c) => Math.max(...molde.vertices.map((p) => p[c])));
+      const folgaDaCaixa = Math.max(...[0, 1, 2].map((c) => hi[c] - lo[c])) + 1;
+      const min = lo.map((c) => c - folgaDaCaixa); const max = hi.map((c) => c + folgaDaCaixa);
+      if (molde.corte.sentido > 0) min[e] = molde.corte.em; else max[e] = molde.corte.em;
+      const [x0, y0, z0] = min; const [x1, y1, z1] = max;
+      semiespaco = { vertices: [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0], [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]],
+        faces: [[0, 1, 5, 4], [3, 7, 6, 2], [0, 3, 2, 1], [4, 5, 6, 7], [0, 4, 7, 3], [1, 2, 6, 5]] };
+    }
+    const nV = molde.vertices.length + (semiespaco?.vertices.length ?? 0); const nF = molde.triangulos.length + (semiespaco?.faces.length ?? 0);
+    const idsV = Array.from({ length: nV }, (_, k) => idDoPasso(i, DESLOCAMENTO_DO_MOLDE + k));
+    const idsF = Array.from({ length: nF }, (_, k) => idDoPasso(i, DESLOCAMENTO_DO_MOLDE + k));
+    const vertices = [...molde.vertices, ...(semiespaco?.vertices ?? [])];
+    const triangulos = [...molde.triangulos, ...(semiespaco ? semiespaco.faces.map((f) => f.map((v) => v + molde.vertices.length)) : [])];
+    vertices.forEach((p, k) => addV(st, idsV[k], p));
+    triangulos.forEach((t, k) => addF(st, idsF[k], t.map((v) => idsV[v])));
+    const usadas = (st.facesDeOperando ??= new Set());
+    for (const f of faces) usadas.add(f);
+    const doMolde = idsF.slice(0, molde.triangulos.length); const doSemiespaco = idsF.slice(molde.triangulos.length);
+    nucleoBooleano(st, i, 'aparar', wasm, a.origemId, semiespaco ? [faces, doMolde, doSemiespaco] : [faces, doMolde], null);
+    /* o passo que gritou não deixa o molde no estado */
+    if (st.orfaos.length > antes) {
+      for (const f of idsF) st.F.delete(f);
+      const usados = new Set();
+      for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
+      for (const v of idsV) if (!usados.has(v)) st.V.delete(v);
+    }
+  }
+
   /* a forma `nome(st, a, i)` é a que o mapa estático do motor
      (tools/arquitetura/mapear-motor-procedural.mjs) reconhece como operação. */
   return {
   unir(st, a, i) { return booleana(st, a, i, 'unir'); },
   subtrair(st, a, i) { return booleana(st, a, i, 'subtrair'); },
   intersectar(st, a, i) { return booleana(st, a, i, 'intersectar'); },
+  aparar(st, a, i) { return aparar(st, a, i); },
   arredondarCostura(st, a, i) { return arredondarCostura(st, a, i); },
   };
 }

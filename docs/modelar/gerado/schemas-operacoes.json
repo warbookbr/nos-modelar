@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:c192bd11a16896d7ca4ad18989e8eb3abca86ea39c16594878dbe88a2decb54e",
-  "total": 41,
+  "assinatura": "sha256:935cf8ae779613c4e68c1d2e80b4acd8b0a67305fc5688fffde8ad1b5129aac4",
+  "total": 42,
   "operacoes": [
     {
       "id": "mecanifica.operacao.aberturaPorContorno",
@@ -334,6 +334,194 @@
           "A seleção precisa resolver exatamente uma face."
         ],
         "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.aparar",
+      "nome": "aparar",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Aparar um sólido pelo lado de dentro de uma chapa subdividida, deixando-o a uma folga da pele de dentro dela.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.aparar@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "solido",
+            "chapa",
+            "folga",
+            "fecha"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade obrigatória do resultado."
+            },
+            "solido": {
+              "type": "object",
+              "description": "O sólido fechado a aparar."
+            },
+            "chapa": {
+              "type": "object",
+              "description": "A subdivisão { op: 'subdivisao', id } cuja pele de dentro limita o sólido; vale a superfície que o passo guardou, mesmo depois de uma booleana cortá-la."
+            },
+            "folga": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Distância, maior ou igual a zero, entre a pele de dentro da chapa e o sólido aparado, na unidade da peça."
+            },
+            "fecha": {
+              "type": "object",
+              "description": "{ eixo: 'x'|'y'|'z', em } o plano da tampa que fecha a única abertura da chapa."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "subdivisao",
+              {
+                "origemId": 1,
+                "vertices": [
+                  [
+                    -0.5,
+                    0,
+                    -0.5
+                  ],
+                  [
+                    0.5,
+                    0,
+                    -0.5
+                  ],
+                  [
+                    0.5,
+                    0,
+                    0.5
+                  ],
+                  [
+                    -0.5,
+                    0,
+                    0.5
+                  ],
+                  [
+                    -0.4,
+                    1,
+                    -0.4
+                  ],
+                  [
+                    0.4,
+                    1,
+                    -0.4
+                  ],
+                  [
+                    0.4,
+                    1,
+                    0.4
+                  ],
+                  [
+                    -0.4,
+                    1,
+                    0.4
+                  ]
+                ],
+                "faces": [
+                  [
+                    0,
+                    4,
+                    5,
+                    1
+                  ],
+                  [
+                    1,
+                    5,
+                    6,
+                    2
+                  ],
+                  [
+                    2,
+                    6,
+                    7,
+                    3
+                  ],
+                  [
+                    3,
+                    7,
+                    4,
+                    0
+                  ],
+                  [
+                    4,
+                    7,
+                    6,
+                    5
+                  ]
+                ],
+                "niveis": 2
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "larg": 1.2,
+                "alt": 0.9,
+                "prof": 1.2,
+                "em": [
+                  0,
+                  -0.2,
+                  0
+                ]
+              }
+            ],
+            [
+              "aparar",
+              {
+                "origemId": 3,
+                "solido": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 2
+                  }
+                },
+                "chapa": {
+                  "op": "subdivisao",
+                  "id": 1
+                },
+                "folga": 0.05,
+                "fecha": {
+                  "eixo": "y",
+                  "em": 0
+                }
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "A chapa tem uma borda só, e ela fica de um lado do plano de fecha; o sólido é fechado."
+        ],
+        "limites": [
+          "O molde é a pele de dentro deslocada por folga (a mesma esquadria da espessura), com paredes retas até o plano e uma tampa plana; o resultado é a interseção do sólido com ele, com a identidade da intersectar. A origem {op:'aparar', id} cita as faces do sólido e as da pele nova.",
+          "Recusa a chapa com mais de uma borda ou sem borda, a borda que atravessa o plano e a folga que passa do raio local."
+        ],
         "diagnosticos": []
       }
     },
