@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1965 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1966 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -549,6 +549,7 @@
 - `2026-11-10-nucleo-para-qualquer-mecanismo.md` — Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `2026-11-12-instalacao-solar-no-telhado.md` — Instalação solar no telhado: um caso prático de montagem real, do telhado de fibrocimento aos painéis presos nos trilhos
+- `2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md` — Revisão do projeto para o trabalho da IA: o que protege, o que só custa, e se a organização e o núcleo servem a quem desenvolve
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
