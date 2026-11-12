@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1959 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1962 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1874,6 +1874,11 @@
 
 - `alvo.md` — Alvo: geladeira compacta branca
 
+## procedural/pecas/instalacao-solar/
+
+- `conferencias.mjs` — instalacao-solar/conferencias — as conferências de medida da obra, sobre a montagem resolvida `montagem.json`.
+- `conferencias.test.mjs` — instalacao-solar/conferencias.test — fixa, com os valores provisórios do telhado e do kit, o que a montagem da instalação solar mede.
+
 ## procedural/pecas/instalacao-solar/partes/emenda/
 
 - `receita.js` — instalacao-solar/emenda — a peça que entra dentro de dois perfis para uni-los, com dois parafusos.
@@ -1892,7 +1897,7 @@
 
 ## procedural/pecas/instalacao-solar/partes/haste/
 
-- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, a arruela e as porcas.
+- `receita.js` — instalacao-solar/haste — a haste rosca dupla de inox de 250 mm, com a borracha de vedação, as arruelas e as porcas.
 
 ## procedural/pecas/instalacao-solar/partes/painel-30/
 
@@ -1909,6 +1914,10 @@
 ## procedural/pecas/instalacao-solar/partes/suporte-l/
 
 - `receita.js` — instalacao-solar/suporte-l — o suporte em L de alumínio que liga a haste ao perfil.
+
+## procedural/pecas/instalacao-solar/partes/telhado/
+
+- `receita.js` — instalacao-solar/telhado — um trecho de uma água de telhado de fibrocimento ondulado sobre as vigas de madeira, sem a casa, e a locação da obra nele (onde en…
 
 ## procedural/pecas/instalacao-solar/referencias/
 

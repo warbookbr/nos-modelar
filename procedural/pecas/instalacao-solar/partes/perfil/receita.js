@@ -31,6 +31,10 @@ export const TABELA = {
   rasgoLateralCentro: 20,
   /* Acabamento: quina externa quebrada. */
   quina: 1.5,
+  /* A CONFIRMAR: onde o primeiro suporte em L encosta e onde o primeiro painel começa, a partir da ponta de x = 0. Na montagem os dois
+     valores vêm das portas do telhado (a primeira haste e o início dos painéis); o valor daqui só vale para ver a peça sozinha. */
+  posicaoDoSuporte: 151,
+  posicaoDoPrimeiroPainel: 89,
 };
 
 export const MATERIAIS = { aluminio: { cor: '#b9bec4', metalicidade: 0.85, aspereza: 0.35 } };
@@ -61,6 +65,28 @@ export function derivar(t = TABELA) {
   return { L: t.comprimento, zy };
 }
 
+
+const MEDIDAS_DA_PORTA = ['ponto', 'extensao'];
+const emMetro = (v) => (typeof v === 'number' ? m(v) : Array.isArray(v) ? v.map(emMetro) : v);
+const publicar = (passos, portasEmMm, de) => {
+  for (const [nome, porta] of Object.entries(portasEmMm)) {
+    passos.push(['publicarPorta', { nome, de, interface: Object.fromEntries(Object.entries(porta).map(([k, v]) => [k, MEDIDAS_DA_PORTA.includes(k) ? emMetro(v) : v])) }]);
+  }
+};
+
+/* As portas, em mm: a face de lado onde o suporte em L encosta, na altura do rasgo e a `posicaoDoSuporte` da ponta de x = 0; e as faces de ponta,
+   no centro do vazio, onde a emenda entra; e o topo, onde o primeiro painel assenta, a `posicaoDoPrimeiroPainel` da ponta (a referência dele é -z). A
+   referência das outras é +y, para cima. */
+export function portas(t = TABELA) {
+  const yDoVazio = (t.parede + t.altura - t.espessuraDoLabio) / 2;
+  return {
+    lateral: { forma: 'plano', papel: 'apoia', ponto: [t.posicaoDoSuporte, t.rasgoLateralCentro, t.largura / 2], normal: [0, 0, 1], extensao: [t.altura, 50], referencia: [0, 1, 0] },
+    fim: { forma: 'plano', papel: 'recebe', ponto: [t.comprimento, yDoVazio, 0], normal: [1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
+    inicio: { forma: 'plano', papel: 'apoia', ponto: [0, yDoVazio, 0], normal: [-1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
+    topo: { forma: 'plano', papel: 'recebe', ponto: [t.posicaoDoPrimeiroPainel, t.altura, 0], normal: [0, 1, 0], extensao: [t.largura, 100], referencia: [0, 0, -1] },
+  };
+}
+
 export function gerarPassos(t = TABELA) {
   const { L, zy } = derivar(t);
   const passos = [];
@@ -68,6 +94,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['extrusao', { origemId: ID.corpo, eixo: 'x', altura: m(L), perfil: zy.map(([z, y]) => [m(-y), m(z)]) }]);
   passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'extrusao', id: ID.corpo } } }]);
   passos.push(['material', { usa: 'aluminio', sel: { origem: { op: 'extrusao', id: ID.corpo } } }]);
+  publicar(passos, portas(t), { op: 'extrusao', id: ID.corpo });
   return passos;
 }
 
