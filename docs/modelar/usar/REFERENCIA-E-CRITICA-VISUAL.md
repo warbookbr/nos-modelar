@@ -24,7 +24,9 @@ levar uma forma à pessoa, de fechar uma etapa ou de propor publicação, e depo
 que descrição, medidas e gates estão limpos. Ele recebe o pedido que
 `npm run vistas:critica` monta na pasta da rodada: as vistas da peça e de cada
 parte em arquivos separados, o alvo ou a referência quando existem, as partes
-que o plano promete com a forma e a técnica, os critérios de reprovação e as
+que o plano promete com a forma, a técnica e a caixa em mm da malha executada,
+os encaixes em corte com o contato declarado na montagem (o motivo dele, e o
+toque que ele descreve como esperado) ou a nota de que não há declaração, os critérios de reprovação e as
 perguntas, e, na peça de lataria (passo `subdivisao` ou `PLANO.lataria`), a luz
 rasante e a curvatura da lataria, sem as quais a rodada dela não fecha (ver
 [`LACO-VISUAL.md`](LACO-VISUAL.md)). Ele não recebe receita, código, passos, medidas, o raciocínio de quem

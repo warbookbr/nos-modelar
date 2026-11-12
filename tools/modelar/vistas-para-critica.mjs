@@ -445,7 +445,7 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       const prometida = plano?.partes.find((p) => p.nome === nome);
       L.push(`### ${nome}`, '');
       if (prometida) L.push(`Forma prometida: ${prometida.forma}`, '', `Técnica prometida: ${prometida.tecnica}`, '');
-      if (caixaMm) L.push(`Caixa da parte na malha executada: ${caixaMm.map((n) => mmTexto(n).replace(' mm', '')).join(' por ')} mm (x, y, z); a vista isolada não tem escala, e o tamanho de uma parede ou de um disco se julga por esta caixa.`, '');
+      if (caixaMm) L.push(`Caixa da parte na malha executada: ${caixaMm.map((n) => mmTexto(n).replace(' mm', '')).join(' por ')} mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.`, '');
       L.push(...lista(imagens.map(imagem)), '');
     }
   }

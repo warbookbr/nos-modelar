@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2011 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2012 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2068,6 +2068,10 @@
 ## procedural/pecas/sedan-chassi-e-lataria/partes/acessorios/
 
 - `receita.js` — sedan-chassi-e-lataria/acessorios — os dois retrovisores e as quatro maçanetas do sedã, os acessórios simples que o ciclo 5 pôs sobre as portas.
+
+## procedural/pecas/sedan-chassi-e-lataria/partes/acessorios/rodadas/
+
+- `receita-01.js` — sedan-chassi-e-lataria/acessorios — os dois retrovisores e as quatro maçanetas do sedã, os acessórios simples que o ciclo 5 pôs sobre as portas.
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/carroceria/
 
