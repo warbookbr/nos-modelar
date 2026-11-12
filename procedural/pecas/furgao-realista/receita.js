@@ -281,8 +281,9 @@ export const TABELA = {
   retrovisor_x_corpo: 58, // onde o perfil do colchete entra no relevo
   retrovisor_x_vao: 104, // o fundo do vão
   retrovisor_relevo: 22, // a altura do relevo abaulado
-  retrovisor_secoes_costas: 10, // as seções das costas em concha da carcaça (16 no esboço)
-  retrovisor_secoes_relevo: 5, // as seções do relevo abaulado (8 no esboço)
+  retrovisor_secoes_costas: 16, // as seções das costas em concha da carcaça, as do esboço (com 10 as faixas da concha apareciam de perto)
+  retrovisor_secoes_relevo: 8, // as seções do relevo abaulado, as do esboço
+  retrovisor_liso_angulo: 40, // o ângulo do sombreamento liso da estrutura: a concha das costas sai lisa, sem as faixas entre as seções
   retrovisor_giro: 10, // graus em torno do eixo vertical da dobra
   retrovisor_dobradica_larg: 40,
   retrovisor_dobradica_alt: 90,
@@ -824,6 +825,7 @@ export function gerarPassos(T) {
     [[r.estrutura, 'plastico'], [r.pisca, 'lenteAmbar'], [r.plano, 'refletor'], [r.convexo, 'refletor']].forEach(([nome, material], i) => {
       passos.push(['parte', { nome, sel: finais[i] }]);
       passos.push(['material', { sel: finais[i], usa: material }]);
+      if (i === 0) passos.push(['liso', { angulo: T.retrovisor_liso_angulo, sel: finais[i] }]); /* só o sombreamento: a concha de costas não mostra as faixas das seções */
     });
   });
   return passos;
