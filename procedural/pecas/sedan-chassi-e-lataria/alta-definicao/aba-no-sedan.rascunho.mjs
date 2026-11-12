@@ -3,9 +3,10 @@
  * Corta a chapa do esboço do ciclo 2 (as seis linhas por lado, sem o corpo, o teto nem o chassi) duas vezes, sem e com a aba em todas as linhas, executa o corte e mede o
  * fundo dos vãos entre os painéis pelo mesmo `vaoEntrePartes` do `npm run vao:partes -- --fundo=modelo`. A chapa sozinha não tem chão: o que a medida diz é quanto do vão a
  * perna fecha para o raio oblíquo; o raio que desce em linha reta passa pela chapa aberta embaixo (o chassi e o forro da carroceria é que o fecham). Saída: uma linha por caso.
- *   node procedural/pecas/sedan-chassi-e-lataria/alta-definicao/aba-no-sedan.rascunho.mjs [largura=20] [angulo=90] [raio=0.5] */
+ *   node procedural/pecas/sedan-chassi-e-lataria/alta-definicao/aba-no-sedan.rascunho.mjs [largura=20] [angulo=90] [raio=0.5] [--so-com-aba] */
 process.env.HD_PAINEIS = '0';
-const [largura = 20, angulo = 90, raio = 0.5] = process.argv.slice(2).map(Number);
+const soComAba = process.argv.includes('--so-com-aba');
+const [largura = 20, angulo = 90, raio = 0.5] = process.argv.slice(2).filter((a) => !a.startsWith('--')).map(Number);
 const { default: esboco, linhasDeVao } = await import('./caminho-a-gaiola-da-casca.esboco.mjs');
 const { PAINEIS, T } = await import('./alvo.mjs');
 const { paineisPorVaos } = await import('../../../nucleo/paineis-por-vaos.js');
@@ -26,5 +27,5 @@ const medir = (rotulo, aba) => {
   console.log(`${rotulo}: ${g.passos.length} passos, ${faces.length} faces, corte e execução ${Math.round((t1 - t0) / 1000)} s, medida ${Math.round((Date.now() - t1) / 1000)} s; ${r.pares.length} pares, ${sem.length} sem fundo, ${Math.round(sem.reduce((s, p) => s + p.semFundo.linhaMm, 0))} mm de linha; folga medida ${g.medidas.folgaMedida ?? 'n/d'}`);
   return sem;
 };
-medir('sem aba', null);
+if (!soComAba) medir('sem aba', null);
 medir(`aba de ${largura} mm a ${angulo} graus, raio ${raio}`, { largura, angulo, raio });

@@ -14,6 +14,16 @@
  *   lacuna   a ponta de uma cadeia a no máximo `lacunaMaximaMm` da ponta de OUTRA cadeia, com a segunda adiante da primeira (a até
  *            `anguloMaximoGraus` da direção com que a primeira chega): a crista que acaba e recomeça ao lado, que é o nó da coluna que morre. Diz a
  *            distância, o desvio de lado e o ângulo entre as direções das duas cadeias; a vizinhança é o comprimento médio das arestas da ponta.
+ * REBAIXAMENTOS. Um achado que cumpre uma destas regras gerais (nenhuma olha o nome de peça ou de parte) sai da lista dos acusados e vai para a dos
+ * "prováveis desenho", com o motivo, e nada some em silêncio; só os acusados contam no resumo:
+ *   canto            virada de `cantoMinimoGraus` ou mais com a direção reta (menos de `retaMaximaGraus` de virada mediana) dos lados que têm crista adiante: canto de propósito;
+ *   dobra na ponta   virada de `dobraNaPontaGraus` ou mais a no máximo duas janelas da ponta do caminho: a cadeia volta sobre si, artefato do percurso;
+ *   ponta curta      virada a menos de um terço de janela da ponta do caminho, onde a crista afina e a aresta é curta demais para dar uma direção;
+ *   curva suave      o ângulo (virada ou diedro) se reparte por vários vértices ou arestas: a virada de uma aresta só chega a `curvaFracao` da virada em janela, ou o diedro
+ *                    das duas arestas vizinhas guarda de `inchacoMinimo` a `inchacoMaximo` do desvio (um inchaço, e não um degrau nem um patamar);
+ *   repetição        outra variação do mesmo tipo e de valor parecido (`repeticaoTolerancia`) na mesma cadeia, as duas longe das pontas: faceta regular repetida;
+ *   lacuna colinear  menos de `lacunaColinearLadoMm` de lado e `lacunaColinearGraus` entre as direções: a crista continua na mesma linha, interrompida por um vão;
+ *   lacuna curta     a menor das duas cadeias tem menos de `lacunaCurtaFator` vezes a folga: duas feições pequenas, e não uma crista interrompida.
  * Cada achado leva a parte, a posição em mm do referencial da peça, a distância ao começo da cadeia, o valor e o da vizinhança.
  *
  * O LIMITE. A régua aponta onde olhar; ela não diz se o que achou é defeito. Uma crista que faz a volta de um canto, ou que acaba onde uma abertura a
@@ -34,6 +44,9 @@ import { paraPng } from './leitura-por-regioes.mjs';
 
 export const PADROES = Object.freeze({
   janelaMm: 15, vizinhosDoDiedro: 3, saltoDiedroGraus: 4, viradaMinimaGraus: 30, lacunaMaximaMm: 60, anguloMaximoGraus: 60,
+  /* o que rebaixa um achado a "provável desenho" (ver REBAIXAMENTOS no cabeçalho) */
+  cantoMinimoGraus: 80, retaMaximaGraus: 10, dobraNaPontaGraus: 150, lacunaColinearLadoMm: 2, lacunaColinearGraus: 10, lacunaCurtaFator: 3,
+  repeticaoTolerancia: 0.15, curvaFracao: 0.6, inchacoMinimo: 0.5, inchacoMaximo: 0.9,
 });
 const MM = 1000;
 const arred = (x, casas = 1) => { const f = 10 ** casas; const r = Math.round(x * f) / f; return Object.is(r, -0) ? 0 : r; };
@@ -93,9 +106,14 @@ function saltosDoDiedro(c, o) {
   return trechos.map((t) => {
     const pior = t.reduce((a, b) => (Math.abs(b.desvio) > Math.abs(a.desvio) ? b : a));
     const meio = [0, 1, 2].map((k) => (c.pontos[pior.i][k] + c.pontos[pior.i + 1][k]) / 2);
+    const sMeio = (c.s[pior.i] + c.s[pior.i + 1]) / 2;
+    /* quanto do desvio as duas arestas vizinhas guardam: perto de 0 é um degrau, perto de 1 um patamar, no meio um inchaço (uma curva de várias arestas) */
+    const guarda = [-1, 1].map((d) => ((c.diedros[pior.i + d] - pior.vizinhanca) * Math.sign(pior.desvio)) / Math.abs(pior.desvio));
+    const inchaco = guarda.every((g) => g >= o.inchacoMinimo && g <= o.inchacoMaximo);
     return {
-      tipo: 'diedro', posicaoMm: meio.map((x) => arred(x)), sMm: arred((c.s[pior.i] + c.s[pior.i + 1]) / 2), valor: arred(c.diedros[pior.i]), vizinhanca: arred(pior.vizinhanca),
+      tipo: 'diedro', posicaoMm: meio.map((x) => arred(x)), sMm: arred(sMeio), distanciaAoFimMm: arred(c.s[c.s.length - 1] - sMeio), valor: arred(c.diedros[pior.i]), vizinhanca: arred(pior.vizinhanca),
       desvio: arred(pior.desvio), arestas: t.length, nota: `a aresta tem ${n1(c.diedros[pior.i])} graus de diedro contra ${n1(pior.vizinhanca)} nas vizinhas`,
+      ...(inchaco ? { regra: 'curva-suave', motivo: `um inchaço do diedro, e não um salto: as duas arestas vizinhas guardam ${guarda.map((g) => `${Math.round(g * 100)}%`).join(' e ')} do desvio` } : {}),
     };
   });
 }
@@ -123,9 +141,22 @@ function viradasDoCaminho(c, o) {
       if (d < -o.janelaMm && d >= -5 * o.janelaMm) antes.push(viradas[k]); else if (d > o.janelaMm && d <= 5 * o.janelaMm) depois.push(viradas[k]);
     }
     const viz = mediana([...antes, ...depois]);
+    const aoFim = c.s[n - 1] - c.s[pior];
+    const umaAresta = angulo(sub(c.pontos[pior], c.pontos[pior - 1]), sub(c.pontos[pior + 1], c.pontos[pior]));
+    const reta = (lado) => !lado.length || mediana(lado) < o.retaMaximaGraus;
+    let rebaixo = null;
+    if (viradas[pior] >= o.dobraNaPontaGraus && Math.min(c.s[pior], aoFim) <= 2 * o.janelaMm) {
+      rebaixo = ['dobra-na-ponta', `a cadeia dobra sobre si ${n1(viradas[pior])} graus a ${n1(Math.min(c.s[pior], aoFim))} mm da ponta do caminho, artefato do percurso e não crista`];
+    } else if (viradas[pior] >= o.cantoMinimoGraus && (antes.length || depois.length) && reta(antes) && reta(depois)) {
+      rebaixo = ['canto', `canto de ${n1(viradas[pior])} graus com a crista reta dos lados que a têm (virada mediana de ${n1(antes.length ? mediana(antes) : 0)} antes e ${n1(depois.length ? mediana(depois) : 0)} depois)`];
+    } else if (Math.min(c.s[pior], aoFim) < o.janelaMm / 3) {
+      rebaixo = ['ponta-curta', `o vértice está a ${n1(Math.min(c.s[pior], aoFim))} mm da ponta do caminho, onde a crista afina até sumir e a direção de uma aresta tão curta não vale`];
+    } else if (umaAresta <= o.curvaFracao * viradas[pior]) {
+      rebaixo = ['curva-suave', `a mudança de direção se reparte por vários vértices: ${n1(umaAresta)} graus numa aresta contra ${n1(viradas[pior])} em ${o.janelaMm} mm`];
+    }
     return {
-      tipo: 'virada', posicaoMm: c.pontos[pior].map((x) => arred(x)), sMm: arred(c.s[pior]), valor: arred(viradas[pior]), vizinhanca: arred(viz), vertices: t.length,
-      nota: `a direção da crista muda ${n1(viradas[pior])} graus em ${o.janelaMm} mm de cada lado, contra ${n1(viz)} nas vizinhas`,
+      tipo: 'virada', posicaoMm: c.pontos[pior].map((x) => arred(x)), sMm: arred(c.s[pior]), distanciaAoFimMm: arred(aoFim), valor: arred(viradas[pior]), vizinhanca: arred(viz), vertices: t.length,
+      nota: `a direção da crista muda ${n1(viradas[pior])} graus em ${o.janelaMm} mm de cada lado, contra ${n1(viz)} nas vizinhas`, ...(rebaixo ? { regra: rebaixo[0], motivo: rebaixo[1] } : {}),
     };
   });
 }
@@ -158,10 +189,17 @@ function lacunas(medidas, o) {
       /* o ângulo entre as duas cadeias: 0 quando uma continua a outra (as direções de saída são opostas) */
       const entre = angulo(A.saindo, B.saindo.map((x) => -x));
       const media = (A.aresta + B.aresta) / 2;
+      const menor = Math.min(medidas[i].c.s[medidas[i].c.s.length - 1], medidas[j].c.s[medidas[j].c.s.length - 1]);
+      let rebaixo = null;
+      if (lado < o.lacunaColinearLadoMm && entre < o.lacunaColinearGraus) {
+        rebaixo = ['lacuna-colinear', `a crista continua na mesma linha depois do vão (${n1(lado)} mm de lado, ${n1(entre)} graus entre as direções)`];
+      } else if (menor < o.lacunaCurtaFator * folga) {
+        rebaixo = ['lacuna-curta', `a menor das duas cadeias tem ${n1(menor)} mm contra a folga de ${n1(folga)} mm: duas feições pequenas, e não uma crista interrompida`];
+      }
       achadas.push({
         tipo: 'lacuna', parte: medidas[i].cadeia.parte, posicaoMm: A.ponto.map((x, k) => arred((x + B.ponto[k]) / 2)), sMm: arred(A.s), valor: arred(folga), vizinhanca: arred(media),
         desvioDeLadoMm: arred(lado), anguloEntreCadeiasGraus: arred(entre), pontaMm: A.ponto.map((x) => arred(x)), outraPontaMm: B.ponto.map((x) => arred(x)),
-        cadeias: [i, j],
+        cadeias: [i, j], ...(rebaixo ? { regra: rebaixo[0], motivo: rebaixo[1] } : {}),
         nota: `a crista acaba a ${n1(folga)} mm de outra cadeia (${n1(lado)} mm de lado, ${n1(entre)} graus entre as direções), contra arestas de ${n1(media)} mm`,
       });
     }
@@ -169,8 +207,18 @@ function lacunas(medidas, o) {
   return achadas;
 }
 
+/** A repetição: um achado de virada ou de diedro (do mesmo sinal) com outro de valor parecido na mesma cadeia, os dois a mais de duas janelas das pontas, é faceta regular. */
+function marcarRepeticoes(c, o) {
+  const longe = (a) => a.sMm > 2 * o.janelaMm && a.distanciaAoFimMm > 2 * o.janelaMm;
+  const candidatos = c.achados.filter((a) => !a.regra && (a.tipo === 'virada' || a.tipo === 'diedro') && longe(a));
+  for (const a of candidatos) {
+    const par = candidatos.find((b) => b !== a && b.tipo === a.tipo && Math.sign(b.desvio ?? 1) === Math.sign(a.desvio ?? 1) && Math.abs(b.valor - a.valor) <= o.repeticaoTolerancia * Math.max(a.valor, b.valor));
+    if (par) { a.regra = 'repeticao'; a.motivo = `faceta repetida: outra variação do mesmo tipo e de valor parecido (${n1(par.valor)} graus) na mesma cadeia, a ${n1(Math.abs(par.sMm - a.sMm))} mm`; }
+  }
+}
+
 /**
- * regularidadeDaSuperficie(sup, opcoes) -> { cadeias, achados }
+ * regularidadeDaSuperficie(sup, opcoes) -> { cadeias, achados (os acusados), rebaixados (os prováveis desenho, com `regra` e `motivo`) }
  * `opcoes` leva as de `vinco-oculto` (que cristas contam) e as de `PADROES` (o que a régua acusa).
  */
 export function regularidadeDaSuperficie(sup, opcoes = {}) {
@@ -185,22 +233,31 @@ export function regularidadeDaSuperficie(sup, opcoes = {}) {
       diedroGraus: { min: arred(Math.min(...c.diedros)), max: arred(Math.max(...c.diedros)) }, foraDoCaminho: c.foraDoCaminho, achados, _caminho: c,
     };
   });
-  const achados = [
+  for (const c of cadeias) marcarRepeticoes(c, o);
+  const todos = [
     ...lacunas(medidas, o),
     ...cadeias.flatMap((c) => c.achados.map((a) => ({ ...a, cadeia: c.indice }))),
-  ];
+  ].map((a) => (a.regra ? { ...a, classe: 'provável desenho' } : { ...a, classe: 'acusado' }));
+  /* cada cadeia guarda os seus acusados em `achados` e os rebaixados em `rebaixados`, e a superfície, os dois juntos, acusados primeiro */
+  for (const c of cadeias) { c.rebaixados = c.achados.filter((a) => a.regra); c.achados = c.achados.filter((a) => !a.regra); }
+  const achados = todos.filter((a) => a.classe === 'acusado');
+  const rebaixados = todos.filter((a) => a.classe !== 'acusado');
   /* o pior primeiro: a lacuna, depois a virada, depois o diedro; dentro de cada tipo o valor maior, e a posição desempata */
   const ordemDoTipo = { lacuna: 0, virada: 1, diedro: 2 };
-  achados.sort((a, b) => ordemDoTipo[a.tipo] - ordemDoTipo[b.tipo] || (b.tipo === 'lacuna' ? a.valor - b.valor : (b.desvio ?? b.valor) - (a.desvio ?? a.valor)) || a.posicaoMm[0] - b.posicaoMm[0] || a.posicaoMm[1] - b.posicaoMm[1] || a.posicaoMm[2] - b.posicaoMm[2]);
-  return { opcoes: o, cadeias, achados };
+  const ordem = (a, b) => ordemDoTipo[a.tipo] - ordemDoTipo[b.tipo] || (b.tipo === 'lacuna' ? a.valor - b.valor : (b.desvio ?? b.valor) - (a.desvio ?? a.valor)) || a.posicaoMm[0] - b.posicaoMm[0] || a.posicaoMm[1] - b.posicaoMm[1] || a.posicaoMm[2] - b.posicaoMm[2];
+  achados.sort(ordem); rebaixados.sort(ordem);
+  return { opcoes: o, cadeias, achados, rebaixados };
 }
-
 /** A superfície de cada passo `subdivisao` da receita, com a régua rodada nela: `{ passo, cadeias, achados, _sup }`. `executada` é `{ entrada, neutro }`. */
 export function regularidadeDaReceita(receita, opcoes = {}, executada = null) {
   return superficiesDaReceita(receita, executada).map((sup) => ({ passo: sup.passo, ...regularidadeDaSuperficie(sup, opcoes), _sup: sup }));
 }
 
 export function textoDoAchado(a) {
+  if (a.motivo) return `${textoBase(a)} [provável desenho (${a.regra}): ${a.motivo}]`;
+  return textoBase(a);
+}
+function textoBase(a) {
   const pos = `[${a.posicaoMm.join('; ')}] mm`;
   const parte = `na parte ${a.parte ?? 'sem parte'}, em ${pos}, a ${n1(a.sMm)} mm do começo da cadeia`;
   if (a.tipo === 'lacuna') return `crista interrompida ${parte}: ${a.nota}; olhe a imagem, a régua só aponta o lugar`;
@@ -320,16 +377,25 @@ export async function executar(argv) {
     const linhas = [];
     const abertura = resumoDaAbertura(m); if (abertura) linhas.push(abertura);
     linhas.push('regularidade da crista: a régua aponta onde olhar; quem diz se é defeito é a pessoa, pela imagem.');
-    const todos = [];
+    const todos = []; const rebaixados = [];
     for (const r of resultados) {
-      linhas.push(`passo ${r.passo} (subdivisao): ${r.cadeias.length} cadeia(s) de crista, ${r.achados.length} ponto(s) de variação brusca`);
+      linhas.push(`passo ${r.passo} (subdivisao): ${r.cadeias.length} cadeia(s) de crista, ${r.achados.length} ponto(s) de variação brusca acusado(s)${r.rebaixados.length ? `, ${r.rebaixados.length} rebaixado(s) a provável desenho` : ''}`);
       for (const c of r.cadeias) linhas.push(`  cadeia ${c.indice + 1} da parte ${c.parte ?? 'sem parte'}: ${n1(c.comprimentoMm)} mm, ${c.arestas} arestas, de [${c.pontasMm[0].join('; ')}] a [${c.pontasMm[1].join('; ')}] mm, diedro de ${n1(c.diedroGraus.min)} a ${n1(c.diedroGraus.max)} graus`);
       r.achados.forEach((x) => todos.push({ passo: r.passo, achado: x, r }));
+      r.rebaixados.forEach((x) => rebaixados.push({ passo: r.passo, achado: x, r }));
     }
     const corte = a.completo ? Infinity : 20;
     todos.slice(0, corte).forEach((t, i) => linhas.push(`${i + 1}. ${textoDoAchado(t.achado)}`));
     if (todos.length > corte) linhas.push(`... e mais ${todos.length - corte} (--completo lista todos)`);
-    if (!todos.length) linhas.push('nenhuma variação brusca acima dos limiares.');
+    if (!todos.length) linhas.push('nenhuma variação brusca acusada acima dos limiares.');
+    if (rebaixados.length) {
+      const porRegra = {}; for (const t of rebaixados) porRegra[t.achado.regra] = (porRegra[t.achado.regra] ?? 0) + 1;
+      linhas.push(`provável desenho (${rebaixados.length}, rebaixados por regra geral, a pessoa confere se quiser): ${Object.entries(porRegra).map(([k, v]) => `${k} ${v}`).join(', ')}`);
+      if (a.completo) rebaixados.forEach((t, i) => linhas.push(`${todos.length + i + 1}. ${textoDoAchado(t.achado)}`));
+      else linhas.push('(--completo lista cada um, com o motivo; --achado=N numera os acusados e depois os rebaixados)');
+    }
+    linhas.push(`resumo: ${todos.length} acusado(s), ${rebaixados.length} provável(is) desenho`);
+    todos.push(...rebaixados);
     if (a.imagem) {
       const escolhido = todos[a.achado - 1];
       if (!escolhido) throw new ErroDoModelo(`--achado=${a.achado}: a régua achou ${todos.length}`);

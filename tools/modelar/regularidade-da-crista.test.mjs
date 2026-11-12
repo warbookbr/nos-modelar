@@ -21,10 +21,11 @@ const fixture = (nome) => {
 /* uma crista sintética: N estações a 10 mm uma da outra ao longo de z, cada uma com três vértices (esquerda, cume, direita), e as faces entre estações
    vizinhas em dois quadriláteros; a aresta do cume tem o diedro `diedro` graus. `gancho` desvia o cume das últimas estações de lado, `salto` muda o diedro da
    estação indicada. Em metro, como a superfície de verdade. */
-function cristaSintetica({ estacoes = 30, diedro = 20, gancho = null, salto = null } = {}) {
+function cristaSintetica({ estacoes = 30, diedro = 20, gancho = null, salto = null, saltos = [] } = {}) {
   const vertices = []; const faces = [];
   const meia = Math.tan(((diedro / 2) * Math.PI) / 180);
-  const alturaDe = (i) => (salto && i === salto.estacao ? Math.tan(((salto.diedro / 2) * Math.PI) / 180) : meia);
+  const todosOsSaltos = [...(salto ? [salto] : []), ...saltos];
+  const alturaDe = (i) => { const s = todosOsSaltos.find((x) => x.estacao === i); return s ? Math.tan(((s.diedro / 2) * Math.PI) / 180) : meia; };
   for (let i = 0; i < estacoes; i += 1) {
     const z = i * 0.01;
     const lado = gancho && i >= gancho.de ? (i - gancho.de + 1) * gancho.passo : 0;
@@ -165,5 +166,111 @@ describe('a linha de comando', () => {
     writeFileSync(esb, JSON.stringify({ opcoes: [{ titulo: 'x', formas: [{ id: 'b', op: 'cubo', args: { larg: 10, alt: 10, prof: 10 }, centro: [0, 0, 0] }] }] }));
     const e = await executar([esb]);
     expect(e.codigo).toBe(2); expect(e.stderr).toMatch(/receita de peça/);
+  });
+});
+
+/* uma crista sintética por um caminho no plano xz: `centros` são as estações em metro (x, z), com o cume de 20 graus de diedro e a lateral perpendicular à direção
+   local; cada trecho (lista de índices contíguos) vira uma cadeia própria, sem vértice em comum com os outros, e o vão entre trechos fica sem face. */
+function cristaPorCaminho(trechos) {
+  const vertices = []; const faces = [];
+  const h = Math.tan((10 * Math.PI) / 180) * 0.03;
+  for (const centros of trechos) {
+    const base = vertices.length;
+    centros.forEach(([x, z], i) => {
+      const a = centros[Math.max(0, i - 1)]; const b = centros[Math.min(centros.length - 1, i + 1)];
+      const d = [b[0] - a[0], b[1] - a[1]]; const n = Math.hypot(...d) || 1; const lat = [d[1] / n, -d[0] / n];
+      vertices.push([x - lat[0] * 0.03, 0, z - lat[1] * 0.03], [x, h, z], [x + lat[0] * 0.03, 0, z + lat[1] * 0.03]);
+    });
+    for (let i = 0; i + 1 < centros.length; i += 1) { const a = base + 3 * i; const b = base + 3 * (i + 1); faces.push([a, a + 1, b + 1, b], [a + 1, a + 2, b + 2, b + 1]); }
+  }
+  return { vertices, faces, vincos: [], partes: vertices.map(() => new Set(['chapa'])), gaiola: { vertices: [] }, nomeDe: () => null };
+}
+const reta = (n, de, passo) => Array.from({ length: n }, (_, i) => [de[0] + passo[0] * i, de[1] + passo[1] * i]); // `n` estações de 10 mm
+
+describe('os rebaixamentos a provável desenho: cada regra geral, e o caso parecido que segue acusado', () => {
+  const classes = (r) => ({ acusados: r.achados.map((a) => a.tipo), rebaixados: r.rebaixados.map((a) => `${a.regra}:${a.tipo}`) });
+
+  it('canto de propósito: virada de 90 graus com a crista reta dos dois lados vai para provável desenho; uma virada de 60 graus no mesmo lugar segue acusada', () => {
+    const volta = (graus) => { const r = (graus * Math.PI) / 180; const pe = reta(16, [0, 0], [0, 0.01]); const u = [Math.sin(r), Math.cos(r)]; return [...pe, ...reta(15, [pe[15][0] + u[0] * 0.01, pe[15][1] + u[1] * 0.01], [u[0] * 0.01, u[1] * 0.01])]; };
+    const canto = regularidadeDaSuperficie(cristaPorCaminho([volta(90)]));
+    expect(canto.cadeias).toHaveLength(1);
+    expect(classes(canto).rebaixados).toEqual(['canto:virada']);
+    expect(canto.achados.filter((a) => a.tipo === 'virada')).toEqual([]); // o diedro do canto, de geometria sintética, não é o assunto
+    expect(canto.rebaixados[0].valor).toBeGreaterThanOrEqual(80);
+    expect(canto.rebaixados[0].classe).toBe('provável desenho'); expect(canto.rebaixados[0].motivo).toMatch(/canto de .* graus/);
+    const gancho = regularidadeDaSuperficie(cristaPorCaminho([volta(60)]));
+    expect(gancho.achados.map((a) => a.tipo)).toContain('virada');
+    expect(gancho.rebaixados.filter((a) => a.tipo === 'virada')).toEqual([]);
+    expect(gancho.achados.find((a) => a.tipo === 'virada').classe).toBe('acusado');
+  });
+
+  it('lacuna colinear: uma crista interrompida por um vão e que continua na mesma linha é provável desenho; com 10 mm de lado a mesma lacuna segue acusada', () => {
+    const colinear = regularidadeDaSuperficie(cristaPorCaminho([reta(15, [0, 0], [0, 0.01]), reta(15, [0, 0.17], [0, 0.01])]));
+    expect(colinear.cadeias).toHaveLength(2);
+    expect(classes(colinear)).toEqual({ acusados: [], rebaixados: ['lacuna-colinear:lacuna'] });
+    expect(colinear.rebaixados[0]).toMatchObject({ valor: 30, desvioDeLadoMm: 0, anguloEntreCadeiasGraus: 0 });
+    const torta = regularidadeDaSuperficie(cristaPorCaminho([reta(15, [0, 0], [0, 0.01]), reta(15, [0.01, 0.17], [0, 0.01])]));
+    expect(torta.achados.map((a) => a.tipo)).toEqual(['lacuna']);
+    expect(torta.achados[0].desvioDeLadoMm).toBeGreaterThan(9);
+    expect(torta.rebaixados).toEqual([]);
+  });
+
+  it('dobra na ponta: a cadeia que volta sobre si a menos de duas janelas da ponta é provável desenho por esse motivo; com a perna de volta comprida a mesma virada é um canto', () => {
+    const ida = reta(25, [0, 0], [0, 0.01]); // até z = 240 mm
+    const curta = regularidadeDaSuperficie(cristaPorCaminho([[...ida, [0.004, 0.235], [0.004, 0.23], [0.004, 0.225]]]), { janelaMm: 20 }); // a volta, a 4 mm de lado, com estações a 5 mm; a ponta do caminho sintético é a aresta lateral, 30 mm antes do vértice
+    const dobras = curta.rebaixados.filter((a) => a.regra === 'dobra-na-ponta');
+    expect(dobras).toHaveLength(1);
+    expect(dobras[0].valor).toBeGreaterThanOrEqual(150); expect(Math.min(dobras[0].sMm, dobras[0].distanciaAoFimMm)).toBeLessThanOrEqual(40);
+    expect(curta.achados.filter((a) => a.tipo === 'virada')).toEqual([]); // o diedro da volta sintética não é o assunto
+    const longa = regularidadeDaSuperficie(cristaPorCaminho([[...ida, ...reta(12, [0.004, 0.235], [0, -0.005])]]), { janelaMm: 20 });
+    expect(longa.rebaixados.filter((a) => a.regra === 'dobra-na-ponta')).toEqual([]);
+    expect(longa.rebaixados.filter((a) => a.tipo === 'virada').map((a) => a.regra)).toEqual(['canto']);
+  });
+
+  it('ponta curta: a virada a menos de um terço de janela da ponta do caminho é provável desenho; a mesma crista com a ponta a mais de um terço de janela segue acusada', () => {
+    const crista = cristaPorCaminho([[...reta(20, [0, 0], [0, 0.01]), [0.0064, 0.1975]]]); // a última aresta, de 10 mm, vira 40 graus
+    const normal = regularidadeDaSuperficie(crista);
+    expect(normal.achados.filter((a) => a.tipo === 'virada').map((a) => [a.valor > 30, a.sMm > 5 || a.distanciaAoFimMm > 5])).toEqual([[true, true]]);
+    expect(normal.rebaixados).toEqual([]);
+    const janelaLarga = regularidadeDaSuperficie(crista, { janelaMm: 40 }); // a ponta, a 10 mm, passa a estar a menos de 40/3 mm
+    expect(janelaLarga.rebaixados.map((a) => `${a.regra}:${a.tipo}`)).toEqual(['ponta-curta:virada']);
+    expect(janelaLarga.achados.filter((a) => a.tipo === 'virada')).toEqual([]);
+  });
+
+  it('faceta periódica: o mesmo salto de diedro duas vezes na mesma cadeia, longe das pontas, é provável desenho; um só segue acusado', () => {
+    const dois = regularidadeDaSuperficie(cristaSintetica({ saltos: [{ estacao: 9, diedro: 32 }, { estacao: 21, diedro: 32 }] }));
+    expect(classes(dois)).toEqual({ acusados: [], rebaixados: ['repeticao:diedro', 'repeticao:diedro'] });
+    expect(dois.rebaixados[0].motivo).toMatch(/faceta repetida/);
+    const um = regularidadeDaSuperficie(cristaSintetica({ saltos: [{ estacao: 9, diedro: 32 }] }));
+    expect(classes(um)).toEqual({ acusados: ['diedro'], rebaixados: [] });
+    /* dois saltos de valores diferentes (32 e 44) não são a mesma faceta */
+    const diferentes = regularidadeDaSuperficie(cristaSintetica({ saltos: [{ estacao: 9, diedro: 32 }, { estacao: 21, diedro: 44 }] }));
+    expect(diferentes.achados.filter((a) => a.tipo === 'diedro')).toHaveLength(2);
+    expect(diferentes.rebaixados).toEqual([]);
+  });
+
+  it('curva suave: o diedro que incha por três arestas é provável desenho, e o salto de uma aresta só segue acusado', () => {
+    /* estações com 28, 38, 42, 24, 24 e 16 graus dão arestas de 24, 32, 40, 33 e 24: um pico de oito graus acima das vizinhas que decai dos dois lados */
+    const inchaco = regularidadeDaSuperficie(cristaSintetica({ saltos: [[14, 28], [15, 38], [16, 42], [17, 24], [18, 24], [19, 16]].map(([estacao, diedro]) => ({ estacao, diedro })) }));
+    expect(inchaco.achados).toEqual([]);
+    expect(inchaco.rebaixados.map((a) => `${a.regra}:${a.tipo}`)).toEqual(['curva-suave:diedro']);
+    expect(regularidadeDaSuperficie(cristaSintetica({ saltos: [{ estacao: 15, diedro: 32 }] })).achados.map((a) => a.tipo)).toEqual(['diedro']);
+  });
+
+  it('lacuna curta: duas cadeias curtas perto da folga são provável desenho; a ruga da coluna, de 273 mm contra 39 mm, segue acusada inteira', () => {
+    const curtas = regularidadeDaSuperficie(cristaPorCaminho([reta(15, [0, 0], [0, 0.01]), reta(15, [0.005, 0.19], [0, 0.01])])); // 140 mm cada, 5 mm de lado, folga de 50 mm
+    expect(classes(curtas).rebaixados).toEqual(['lacuna-curta:lacuna']);
+    const longas = regularidadeDaSuperficie(cristaPorCaminho([reta(30, [0, 0], [0, 0.01]), reta(30, [0.008, 0.34], [0, 0.01])]));
+    expect(longas.achados.map((a) => a.tipo)).toEqual(['lacuna']);
+    const coluna = regularidadeDaSuperficie(fixture('coluna-do-furgao.json'));
+    expect(coluna.rebaixados).toEqual([]);
+    expect(coluna.achados.map((a) => [a.tipo, a.valor])).toEqual([['lacuna', 39.1], ['virada', 64.1], ['diedro', 31.5]]);
+    expect(coluna.achados.every((a) => a.classe === 'acusado')).toBe(true);
+  });
+
+  it('o texto do rebaixado diz a regra e o motivo; o do acusado fica como era', () => {
+    const r = regularidadeDaSuperficie(cristaSintetica({ saltos: [{ estacao: 9, diedro: 32 }, { estacao: 21, diedro: 32 }] }));
+    expect(textoDoAchado(r.rebaixados[0])).toContain('provável desenho (repeticao)');
+    expect(textoDoAchado(r.rebaixados[0])).toContain('a régua só aponta o lugar');
   });
 });
