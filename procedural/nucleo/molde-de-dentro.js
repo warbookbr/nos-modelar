@@ -170,10 +170,22 @@ export function moldeDeDentro({ vertices, faces, espessura = 0, lado = 'contraNo
   for (const f of pele) for (let k = 1; k + 1 < f.length; k += 1) T.push([f[0], f[k], f[k + 1]]);
   /* a projeção de cada vértice da borda no plano; o que já está nele fica como está */
   const projetado = new Map();
+  /* dois vértices da borda que se projetam a menos de `juntos` um do outro dividem o ponto da projeção: a borda sobe quase na vertical (a ponta do
+     capô, a beira do arco), e as arestas de micrômetros da tampa tirariam o molde da precisão da Manifold, que recusa aresta menor que 2^-20 da caixa */
+  const extensao = Math.max(...[0, 1, 2].map((c) => Math.max(...pontos.map((p) => p[c])) - Math.min(...pontos.map((p) => p[c]))));
+  const juntos = extensao * 2 ** -17;
+  let ultimo = null;
   for (const v of laco) {
-    if (Math.abs(pontos[v][e] - planoDaTampa) <= 1e-9) { projetado.set(v, v); continue; }
+    if (Math.abs(pontos[v][e] - planoDaTampa) <= 1e-9) { projetado.set(v, v); ultimo = null; continue; }
     const p = [...pontos[v]]; p[e] = planoDaTampa;
-    projetado.set(v, V.length); V.push(p);
+    if (ultimo !== null && Math.hypot(p[0] - V[ultimo][0], p[1] - V[ultimo][1], p[2] - V[ultimo][2]) < juntos) { projetado.set(v, ultimo); continue; }
+    projetado.set(v, V.length); V.push(p); ultimo = V.length - 1;
+  }
+  /* a volta fecha: o último vértice que se juntou ao primeiro projetado também */
+  const primeiro = projetado.get(laco[0]);
+  if (primeiro >= pontos.length) for (let k = laco.length - 1; k > 0; k -= 1) {
+    const q = projetado.get(laco[k]);
+    if (q < pontos.length && q !== primeiro && Math.hypot(...V[q].map((c, i) => c - V[primeiro][i])) < juntos) projetado.set(laco[k], primeiro); else break;
   }
   /* a parede sob cada aresta de borda a→b, percorrida de b para a, e a tampa percorre o laço ao contrário */
   for (let k = 0; k < laco.length; k += 1) {
@@ -181,7 +193,7 @@ export function moldeDeDentro({ vertices, faces, espessura = 0, lado = 'contraNo
     const quad = [b, a, projetado.get(a), projetado.get(b)].filter((v, j, l) => v !== l[(j + 1) % l.length]);
     for (let j = 1; j + 1 < quad.length; j += 1) T.push([quad[0], quad[j], quad[j + 1]]);
   }
-  const volta = [...laco].reverse().map((v) => projetado.get(v));
+  const volta = [...laco].reverse().map((v) => projetado.get(v)).filter((v, k, l) => v !== l[(k + 1) % l.length]);
   /* a tampa percorre o laço como a parede espera; cada triângulo segue o sentido do polígono, que é o da soma de Newell */
   const normalDaTampa = [0, 0, 0];
   volta.forEach((v, k) => { const p = V[v]; const q = V[volta[(k + 1) % volta.length]]; normalDaTampa[0] += (p[1] - q[1]) * (p[2] + q[2]); normalDaTampa[1] += (p[2] - q[2]) * (p[0] + q[0]); normalDaTampa[2] += (p[0] - q[0]) * (p[1] + q[1]); });
