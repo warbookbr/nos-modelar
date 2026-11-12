@@ -48,6 +48,32 @@ o caso achar faltando no núcleo vai ao backlog, salvo se bloquear o resultado.
 - a casa abaixo do telhado e o telhado metálico de baixo;
 - sombra e geração de energia.
 
+## Medidas e quantidades da obra
+
+Do documento da pessoa (2026-11-11), sem marca nem modelo; o que está "a confirmar" é medida ou regra que a pessoa ainda vai
+conferir, e entra na receita marcado assim.
+
+- Painéis: quatro, em pé, lado a lado numa fileira só, sobre duas linhas de trilho horizontais. Três de 1812 × 1046 mm com
+  moldura de 40 mm; um de 1722 × 1134 mm com moldura de 30 mm, numa das posições do meio, com um de 40 mm em cada ponta da fileira:
+  `[40] [40] [30] [40]`.
+- Grampos: entre os dois painéis de 40 mm vizinhos, um grampo intermediário em cada trilho; dos dois lados do painel de 30 mm,
+  grampos de ponta de 30 a 35 mm nele (os 4 do kit) e grampos de ponta de 40 mm nos vizinhos de 40 mm (4 dos 8 comprados); nas
+  duas pontas da fileira, grampos de ponta de 40 mm (os outros 4). Folga de cerca de 2 cm onde fica o grampo intermediário; onde
+  dois grampos de ponta ficam lado a lado, a folga é a dos dois, a medir na peça.
+- Trilhos: cada um a cerca de 45 cm das pontas dos painéis de 1812 mm, os dois a cerca de 90 cm um do outro; com os painéis
+  centrados na fileira, no painel de 1722 mm eles ficam a cerca de 41 cm das pontas, a conferir na faixa de grampo permitida
+  pelo fabricante dele. Os trilhos passam sobre as vigas de madeira, onde as hastes entram.
+- Kit: 8 perfis de alumínio de 1,35 m, 4 por linha (5,40 m), cortados para cerca de 4,55 m; 6 emendas, 3 por linha; 8 hastes
+  rosca dupla de 250 mm com borracha de vedação, 4 por linha; 8 suportes em L, um por haste; 6 grampos intermediários; 4 grampos
+  de ponta de 30 a 35 mm; 8 grampos de ponta de 40 mm.
+- Hastes: a cada 1,40 m, com a primeira e a última a 30 cm das pontas do trilho, furadas na parte alta da onda da telha e
+  rosqueadas na viga. A conta não fecha: com o trilho em 4,55 m e quatro hastes, o espaçamento é de 1,32 m; com 1,40 m, o
+  trilho teria 4,80 m. A montagem mostra as duas e a escolha é da pessoa.
+- Fileira: cerca de 4,33 m de painéis com folgas de 2 cm, e cerca de 4,45 m com os grampos de ponta lado a lado dos dois lados do
+  painel de 30 mm; a conferir contra o trilho de 4,55 m.
+- Pendentes da pessoa: a inclinação do telhado, a distância entre as vigas e quantas são da beirada à cumeeira, e as medidas do
+  perfil visto de ponta, do suporte em L e dos grampos.
+
 ## Gate de saída
 
 1. A montagem passa nas conferências de medida, e o relato dela diz o comprimento de trilho, a posição de cada haste e de cada
