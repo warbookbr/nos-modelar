@@ -16,6 +16,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const TESTES_LENTOS = [
   'tools/modelar/ondulacao-corte-e-quina.test.mjs',
+  'procedural/pecas/instalacao-solar/conferencias.test.mjs',
   'procedural/nucleo/paineis-por-vaos-curva.test.ts',
   'procedural/nucleo/paineis-por-vaos-superficie.test.ts',
   'procedural/nucleo/paineis-por-vaos-separa.test.ts',

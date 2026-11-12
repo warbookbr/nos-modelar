@@ -4,6 +4,13 @@
   "id": "instalacao-solar",
   "instancias": [
     {
+      "id": "casa",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "instalacao-solar/casa"
+      }
+    },
+    {
       "id": "telhado",
       "alvo": {
         "tipo": "peca",
@@ -335,6 +342,7 @@
   ],
   "relacoes": [],
   "etapas": [
+    "casa",
     "telhado",
     "hasteA1",
     "hasteA2",
@@ -384,6 +392,20 @@
     "ponta40DirB"
   ],
   "vinculos": [
+    {
+      "id": "telhadoNaCumeeiraDaCasa",
+      "alvo": {
+        "instancia": "telhado",
+        "param": "agua"
+      },
+      "de": {
+        "instancia": "casa",
+        "porta": "aguaEsquerda",
+        "medida": "largura"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
     {
       "id": "hasteA1AssentaNaCrista",
       "alvo": {
@@ -568,6 +590,17 @@
     }
   ],
   "posicoes": [
+    {
+      "id": "telhadoNaCasa",
+      "instancia": "telhado",
+      "porta": "assento",
+      "em": {
+        "instancia": "casa",
+        "porta": "aguaEsquerda"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
     {
       "id": "hasteA1NoTelhado",
       "instancia": "hasteA1",
@@ -1076,8 +1109,22 @@
     }
   ],
   "auditoriaIntersecoes": {
-    "toleranciaNumerica": 0.000001,
+    "toleranciaNumerica": 1e-06,
     "expectativas": [
+      {
+        "id": "telhadoAssentaNaCasa",
+        "a": {
+          "caminho": [
+            "casa"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "telhado"
+          ]
+        },
+        "motivo": "as terças do telhado assentam no plano da água esquerda da casa, que é o topo das empenas da frente e do fundo: faces coplanares que só se tocam, sem caibros nem tesouras entre elas (as peças verticais não aparecem nas fotos e não estão modelados)"
+      },
       {
         "id": "hasteA1AtravessaOTelhado",
         "a": {
@@ -2113,6 +2160,24 @@
           ]
         },
         "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+      }
+    ]
+  },
+  "apoioNoChao": {
+    "plano": {
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "altura": 0
+    },
+    "toleranciaNumerica": 0.001,
+    "apoiam": [
+      {
+        "caminho": [
+          "casa"
+        ]
       }
     ]
   }

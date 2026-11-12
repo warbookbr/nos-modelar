@@ -17,6 +17,7 @@ import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montag
 import { carregadoresDeReceitas } from '../../../tools/modelar/peca-com-parametros.mjs';
 import { receitasDaMontagem } from '../../../tools/modelar/etapas-da-montagem.mjs';
 import telhado, { TABELA as T, derivar as derivarTelhado } from './partes/telhado/receita.js';
+import { TABELA as TC, derivar as derivarCasa, portas as portasDaCasa } from './partes/casa/receita.js';
 import { TABELA as TH, derivar as derivarHaste } from './partes/haste/receita.js';
 import { TABELA as TL } from './partes/suporte-l/receita.js';
 import { TABELA as TP } from './partes/perfil/receita.js';
@@ -32,16 +33,26 @@ export async function resolverInstalacaoSolar(arquivo = join(AQUI, 'montagem.jso
   return resolverMontagemPersistida(dado, carregadoresDeReceitas(receitas));
 }
 
-/* O mundo para o quadro da água: E = x; S = distância ao longo da água, no quadro plano das telhas (z plano); N = ao longo da normal. */
-function quadroDaAgua() {
+/* O mundo para o quadro da água: E = x; S = distância ao longo da água, no quadro plano das telhas (z plano); N = ao longo da normal. O telhado assenta na
+   casa, e por isso o mundo é primeiro levado ao quadro do telhado, pela pose dele (`poseTelhado`, em metro, que a montagem resolveu). */
+function quadroDaAgua(poseTelhado = null) {
   const a = rad(T.inclinacao);
   const D = derivarTelhado(T);
   const subida = [0, Math.sin(a), Math.cos(a)];
   const normal = [0, Math.cos(a), -Math.sin(a)];
   const dot = (p, d) => p[0] * d[0] + p[1] * d[1] + p[2] * d[2];
+  const noTelhado = (p) => {
+    if (!poseTelhado) return p;
+    const { rotacao: R, deslocamento: d } = poseTelhado;
+    const q = [p[0] - mm(d[0]), p[1] - mm(d[1]), p[2] - mm(d[2])];
+    return [0, 1, 2].map((j) => R[0][j] * q[0] + R[1][j] * q[1] + R[2][j] * q[2]);
+  };
   return {
     D,
-    deMundo: (p) => ({ e: p[0], s: dot(p, subida) + Math.sin(a) * D.descida, n: dot(p, normal) }),
+    deMundo: (pMundo) => {
+      const p = noTelhado(pMundo);
+      return { e: p[0], s: dot(p, subida) + Math.sin(a) * D.descida, n: dot(p, normal) };
+    },
   };
 }
 
@@ -61,9 +72,11 @@ function portaNoMundo(i, nome) {
 
 const faixa = (valores) => [Math.min(...valores), Math.max(...valores)];
 
+const por_telhado_pose = (montagem) => montagem.instancias.find((i) => i.id === 'telhado').poseMundo;
+
 export async function conferirInstalacaoSolar(resolvida = null) {
   const montagem = resolvida ?? await resolverInstalacaoSolar();
-  const Q = quadroDaAgua();
+  const Q = quadroDaAgua(por_telhado_pose(montagem));
   const D = Q.D;
   const por = Object.fromEntries(montagem.instancias.map((i) => [i.id, i]));
   const extensao = (id) => {
@@ -180,6 +193,45 @@ export async function conferirInstalacaoSolar(resolvida = null) {
     const sobre = paineis.find((p) => h.e >= p.e[0] && h.e <= p.e[1] && h.s >= p.s[0] && h.s <= p.s[1]);
     return { id: h.id, painel: sobre?.id ?? null, folgaAteOPainel: sobre ? arred(sobre.n[0] - ext.n[1]) : null };
   });
+
+  /* 6. O madeiramento: as terças (S ao longo da água), a distância entre elas, onde as duas linhas de hastes caem em relação a elas, e a alternativa das duas
+     linhas de trilho uma sobre cada terça vizinha, com a distância dos trilhos às pontas de cada painel (só número de conferência: a montagem não muda). */
+  const zT = D.zViga;
+  const linhas = { A: medidas.hastes.find((h) => h.id === 'hasteA1').s, B: medidas.hastes.find((h) => h.id === 'hasteB1').s };
+  const maisPerto = (z) => { const d = zT.map((v) => Math.abs(v - z)); const i = d.indexOf(Math.min(...d)); return { terca: i + 1, papel: D.vigas[i].papel, z: arred(zT[i]), distancia: arred(d[i]) }; };
+  const alturasDosPaineis = paineis.map((p) => ({ id: p.id, comprimento: arred(p.s[1] - p.s[0]) }));
+  medidas.madeiramento = {
+    tercas: D.vigas.map((v, i) => ({ n: i + 1, papel: v.papel, s: arred(v.z) })),
+    entreTercas: zT.slice(1).map((z, i) => arred(z - zT[i])),
+    linhasDeHastes: { A: { s: arred(linhas.A), ...maisPerto(linhas.A) }, B: { s: arred(linhas.B), ...maisPerto(linhas.B) } },
+    alternativaUmaLinhaEmCadaTerca: zT.slice(1).map((z, i) => ({
+      entre: [i + 1, i + 2], distanciaEntreTrilhos: arred(z - zT[i]),
+      trilhoAPontaDoPainel: alturasDosPaineis.map((p) => ({ id: p.id, ate: arred((p.comprimento - (z - zT[i])) / 2) })),
+    })),
+  };
+
+  /* 7. A casa: a largura que sai das duas fileiras, a extensão por baixo da beirada, a cumeeira ao longo de x e o telhado assentado na porta da água. */
+  const C = derivarCasa(TC);
+  const pc = portasDaCasa(TC)[`agua${TC.aguaDosPaineis === 'extensao' ? 'Extensao' : TC.aguaDosPaineis === 'direita' ? 'Direita' : 'Esquerda'}`];
+  const { rotacao: Rt, deslocamento: dt } = por.telhado.poseMundo;
+  const origemDoTelhado = [0, 1, 2].map((k) => Rt[k][1] * -D.descida + mm(dt[k]));
+  medidas.casa = {
+    larguraDaCasaMaior: arred(C.principal.largura),
+    comprimentoDaAguaAoLongoDaInclinacao: arred(C.principal.comprimentoDaAgua),
+    beiral: TC.beiral,
+    alturaDaCumeeira: arred(C.principal.yCumeeira),
+    extensao: {
+      larguraDoVao: arred(C.extensao.vao),
+      pontaDeCimaPassaDaBeiradaDaCasaMaior: arred(C.extensao.xTopo + C.principal.xBeirada),
+      inclinacao: TC.inclinacaoDaExtensao,
+      alturaDaBeirada: arred(C.extensao.yBeirada),
+    },
+    vizinha: { largura: TC.larguraDaVizinha, profundidade: TC.profundidadeDaVizinha },
+    telhadoNaPortaDaCasa: {
+      desvioDaOrigemEmRelacaoAPorta: arred(Math.hypot(...origemDoTelhado.map((v, k) => v - pc.ponto[k]))),
+      giroDoTelhado: Rt.map((l) => l.map((v) => arred(v, 3))),
+    },
+  };
   return medidas;
 }
 
@@ -201,6 +253,12 @@ export function relato(m) {
   L.push(`Cadeia da fixação: a ponta da haste passa ${c.pontaDaHasteAcimaDaPorcaDeCima} mm da porca de cima; o topo do trilho passa ${c.topoDoTrilhoAcimaDaPontaDaHaste} mm da ponta da haste; o parafuso do L fica a ${c.parafusoDoLAcimaDoChaoDoSuporte} mm acima da face de baixo da borracha, a ${c.parafusoDoLNoRasgo} do comprimento do oblongo (0 embaixo, 1 em cima).`);
   const sob = m.hasteContraOPainel.filter((h) => h.painel);
   L.push(`Haste contra o painel: ${sob.map((h) => `${h.id} sob ${h.painel}, folga de ${h.folgaAteOPainel}`).join('; ')}.`);
+  L.push('Madeiramento (S ao longo da água, a partir da beirada): ' + m.madeiramento.tercas.map((t) => `terça ${t.n} (${t.papel}) a ${t.s}`).join('; ') + `. Entre terças: ${m.madeiramento.entreTercas.join(' / ')} mm.`);
+  const lh = m.madeiramento.linhasDeHastes;
+  L.push(`Linhas de hastes: A em S ${lh.A.s}, a ${lh.A.distancia} da terça ${lh.A.terca} (${lh.A.papel}); B em S ${lh.B.s}, a ${lh.B.distancia} da terça ${lh.B.terca} (${lh.B.papel}).`);
+  L.push('Alternativa, uma linha de trilho sobre cada terça vizinha (só conferência): ' + m.madeiramento.alternativaUmaLinhaEmCadaTerca.map((alt) => `terças ${alt.entre.join('-')}: trilhos a ${alt.distanciaEntreTrilhos} um do outro, a ${alt.trilhoAPontaDoPainel.map((p) => `${p.ate} da ponta do ${p.id}`).join(', ')}`).join('; ') + '.');
+  const cs = m.casa;
+  L.push(`Casa: maior com ${cs.larguraDaCasaMaior} mm de largura (sai das duas fileiras: água de ${cs.comprimentoDaAguaAoLongoDaInclinacao} mm ao longo da inclinação, beiral de ${cs.beiral}), cumeeira a ${cs.alturaDaCumeeira}; extensão a ${cs.extensao.inclinacao} graus, beirada a ${cs.extensao.alturaDaBeirada}, vão de ${cs.extensao.larguraDoVao}, ponta de cima ${cs.extensao.pontaDeCimaPassaDaBeiradaDaCasaMaior} mm além da beirada da casa maior (por baixo dela); vizinha de ${cs.vizinha.largura} por ${cs.vizinha.profundidade}; origem do telhado a ${cs.telhadoNaPortaDaCasa.desvioDaOrigemEmRelacaoAPorta} mm da porta da água.`);
   return L.join('\n');
 }
 
