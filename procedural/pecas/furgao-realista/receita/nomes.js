@@ -56,3 +56,7 @@ export const MACANETAS = LOCAIS_DAS_MACANETAS.map((l) => `macaneta${l}`);
 export const PLACAS_DAS_MACANETAS = LOCAIS_DAS_MACANETAS.map((l) => `placaMacaneta${l}`);
 export const PONTEIRA = 'ponteiraEscapamento';
 export const DETALHES = [...ANTENA, ...MACANETAS, ...PLACAS_DAS_MACANETAS, PONTEIRA];
+
+/** As quatro partes de cada retrovisor, por lado: a estrutura (carcaça, braços e relevo), a lente do pisca e os dois espelhos. */
+export const RETROVISORES = ['Esquerdo', 'Direito'].map((l) => ({ lado: l, estrutura: `retrovisor${l}`, pisca: `piscaRetrovisor${l}`, plano: `espelhoPlano${l}`, convexo: `espelhoConvexo${l}` }));
+export const PARTES_DOS_RETROVISORES = RETROVISORES.flatMap((r) => [r.estrutura, r.pisca, r.plano, r.convexo]);

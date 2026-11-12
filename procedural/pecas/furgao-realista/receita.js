@@ -84,10 +84,11 @@ import { derivarInterior } from './receita/interior.js';
 import { cantosDaColuna, derivarJanelas, pontasDaBase } from './receita/janela.js';
 import { derivarLuzesPorDentro } from './receita/luzes.js';
 import { derivarDetalhes, passosDosDetalhes } from './receita/detalhes.js';
+import { passosDoRetrovisor } from './receita/retrovisor.js';
 import { BASE_DAS_RODAS, comBase, familias, materiaisDoPneu } from './receita/rodas.js';
 import {
   ANTENA, MACANETAS, PLACAS_DAS_MACANETAS, PONTEIRA,
-  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BASES_DO_RETROVISOR, BORRACHAS, COLUNAS_DA_JANELA, AROS, CRISTAIS, JANELAS_DA_CABINE, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
+  ABAS_DOS_ARCOS, ABAS_DOS_VAOS, BANCOS, BASES_DO_RETROVISOR, PARTES_DOS_RETROVISORES, RETROVISORES, BORRACHAS, COLUNAS_DA_JANELA, AROS, CRISTAIS, JANELAS_DA_CABINE, FAROIS, FORROS, LUZES, LANTERNAS_POR_DENTRO, LUZES_DE_CANTO, LUZES_POR_DENTRO, PISCAS_LATERAIS, MOLDURAS, REFLETORES, PLASTICOS, RODAS, SUFIXOS_DAS_RODAS,
   nomeDaAbaDoArco, nomeDaBorracha, nomeDoCristal,
 } from './receita/nomes.js';
 
@@ -260,6 +261,31 @@ export const TABELA = {
   janela_retrovisor_malha: 10, // a placa é uma malha de 10 por 10 partes por lado, para seguir a lateral e a quina
   janela_retrovisor_ponta_z: 1767, // a ponta da peça preta, na base dela: a borda da frente sai da borda do vidro e abre para a frente embaixo
   janela_retrovisor_base_y: 1313, // a base da peça: continua a base do triângulo, 25 mm abaixo dela, e é por onde a fresta da porta sai
+  // os retrovisores (2026-11-12), do esboço aprovado `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/detalhes/retrovisor.esboco.mjs` (as medidas dele, em mm): a carcaça em concha de 200 por 350, os braços em
+  // colchete girados 10 graus e o relevo abaulado que assenta na base preta; a base em vela do esboço não entra. O relevo e o colchete são reduzidos por `retrovisor_escala_apoio` para caber na base preta (277 mm de altura)
+  retrovisor_y: 1405, // onde o centro do relevo assenta na base preta (y e z), na parte de baixo e de trás dela
+  retrovisor_z: 1566, // 11 mm mais à frente que o centro da base: o relevo fica fora da borracha da janela, que acaba em z 1506
+  retrovisor_escala_apoio: 0.6, // o relevo e o colchete, em y e z, em torno do centro deles: 190 por 280 mm viram 114 por 168
+  retrovisor_dist: 235, // a face de dentro da carcaça, em cima, a esta distância da face do relevo
+  retrovisor_prof: 110, // a profundidade da carcaça, com as costas em concha
+  retrovisor_alt: 350,
+  retrovisor_larg_alta: 204, // a largura em cima do contorno; com os cantos redondos a caixa mede 200
+  retrovisor_larg_baixa: 172,
+  retrovisor_borda: 12, // a borda fina da frente
+  retrovisor_frente_reta: 20, // o trecho reto da lateral antes de as costas fecharem
+  retrovisor_braco_alt: 52,
+  retrovisor_vao: 76, // o vão entre os dois braços
+  retrovisor_braco_prof: 56,
+  retrovisor_raio_vao: 10,
+  retrovisor_raio_curva: 30, // a curva dos braços até o corpo de apoio
+  retrovisor_x_corpo: 58, // onde o perfil do colchete entra no relevo
+  retrovisor_x_vao: 104, // o fundo do vão
+  retrovisor_relevo: 22, // a altura do relevo abaulado
+  retrovisor_secoes_costas: 10, // as seções das costas em concha da carcaça (16 no esboço)
+  retrovisor_secoes_relevo: 5, // as seções do relevo abaulado (8 no esboço)
+  retrovisor_giro: 10, // graus em torno do eixo vertical da dobra
+  retrovisor_dobradica_larg: 40,
+  retrovisor_dobradica_alt: 90,
   janela_segmentos_arco: 8, // por quarto de volta nos cantos dos vidros, para a borracha e a aba contornarem o canto sem facetas
   janela_raio: 8,
   janela_raio_pe_tras: 120, // o canto de baixo de trás do vidro grande, bem aberto
@@ -789,6 +815,17 @@ export function gerarPassos(T) {
   });
   /* os detalhes pequenos (2026-11-09): a antena, as maçanetas e a ponteira, depois de tudo, com ids a partir de 2000: nenhuma parte anterior muda */
   passos.push(...passosDosDetalhes(T, f));
+  /* os retrovisores (2026-11-12): ids de 3000 a 3199, depois dos detalhes */
+  RETROVISORES.forEach((r, k) => {
+    const s = k === 0 ? 1 : -1; const y0 = T.retrovisor_y;
+    const inclinacao = (Math.atan((f.xs(y0 - 100) - f.xs(y0 + 100)) / 200) * 180) / Math.PI;
+    const { passos: dele, finais } = passosDoRetrovisor(T, s, [s * (f.xs(y0) + T.janela_retrovisor_saida), y0, T.retrovisor_z], inclinacao, 3000 + 100 * k);
+    passos.push(...dele);
+    [[r.estrutura, 'plastico'], [r.pisca, 'lenteAmbar'], [r.plano, 'refletor'], [r.convexo, 'refletor']].forEach(([nome, material], i) => {
+      passos.push(['parte', { nome, sel: finais[i] }]);
+      passos.push(['material', { sel: finais[i], usa: material }]);
+    });
+  });
   return passos;
 }
 
@@ -807,6 +844,13 @@ export const CONTATOS = [
   ...PLASTICOS.map((pl) => ({ par: ['carroceria', pl], motivo: 'o plástico se soma por fora da chapa e a borda dele que encosta entra 1 mm na parede, sem vão e sem fresta' })),
   ...BASES_DO_RETROVISOR.map((b) => ({ par: ['carroceria', b], motivo: 'a base do retrovisor é uma placa de plástico preto sobre a lateral, 3 mm para fora, que entra 1 mm na chapa e cobre a fresta da porta onde ela passa por baixo' })),
   ...BASES_DO_RETROVISOR.map((b, k) => ({ par: [b, BORRACHAS[1 + k]], motivo: 'a base cobre 6 mm da borracha da janela, na vertical de trás dela, e o preto continua da moldura para a base sem chapa no meio' })),
+  ...RETROVISORES.flatMap((r, k) => [
+    { par: [r.estrutura, BASES_DO_RETROVISOR[k]], motivo: 'o relevo abaulado da estrutura assenta na face de fora da base preta e entra 4 mm nela, sem fresta' },
+    { par: ['carroceria', r.estrutura], motivo: 'o relevo da estrutura passa da base preta (3 mm de altura) e entra 1 mm na chapa, sem fresta, onde ela é mais estreita' },
+    { par: [r.estrutura, r.pisca], motivo: 'a lente do pisca é o pedaço da carcaça cortado no canto de baixo de fora, e a estrutura a envolve' },
+    { par: [r.estrutura, r.plano], motivo: 'o espelho plano assenta no rebaixo da frente da carcaça, 5 mm abaixo da borda' },
+    { par: [r.estrutura, r.convexo], motivo: 'o espelho convexo assenta no rebaixo da frente da carcaça, 5 mm abaixo da borda' },
+  ]),
   ...COLUNAS_DA_JANELA.flatMap((c, k) => [
     { par: [c, BORRACHAS[1 + k]], motivo: 'a barra da coluninha acaba dentro da borracha da moldura, na mesma altura dela' },
     { par: [c, CRISTAIS[1 + k]], motivo: 'a barra passa sobre o cristal de cima a baixo e entra nele, e os dois vidros encostam nela' },
@@ -940,6 +984,9 @@ export function pontosDeclarados(T = TABELA) {
     { nome: 'barra da coluninha, em cima e na frente: o alto dela e a borda da frente do pé (z 1293)', parte: 'colunaJanelaEsquerda', medida: 'maximo', em: [f.xs(janela.coluna[0][1]) + T.borracha_altura, janela.coluna[2][1], janela.coluna[1][0]], toleranciaMm: 1 },
     { nome: 'peça preta da base do retrovisor, atrás e embaixo: a vertical de trás (z 1500) na base em y 1313, 3 mm para fora da lateral e 4 mm de espessura', parte: 'baseRetrovisorEsquerda', medida: 'minimo', em: [f.xs(janela.peca[2][1]) + T.janela_retrovisor_saida - T.janela_retrovisor_espessura, T.janela_retrovisor_base_y, janela.peca[1][0]], toleranciaMm: 1 },
     { nome: 'peça preta da base do retrovisor, em cima e na frente: a ponta em z 1767 na base, e o alto da vertical de trás em y 1590', parte: 'baseRetrovisorEsquerda', medida: 'maximo', em: [f.xs(T.janela_retrovisor_base_y) + T.janela_retrovisor_saida, janela.peca[2][1], T.janela_retrovisor_ponta_z], toleranciaMm: 1 },
+    /* o retrovisor esquerdo (2026-11-12): a caixa da estrutura (carcaça, braços e relevo), medida na malha; fora a largura de 2040 mm da carroceria (o ponto do canto de cima dela, acima, segue em 1020), só a carcaça e os braços passam dela */
+    { nome: 'retrovisor esquerdo, embaixo, por dentro e atrás: o relevo entra 4 mm na base preta (x 994) e a carcaça desce a y 1252 e começa em z 1461', parte: 'retrovisorEsquerdo', medida: 'minimo', em: [994, 1252, 1461], toleranciaMm: 4 },
+    { nome: 'retrovisor esquerdo, em cima, por fora e à frente: a carcaça passa 371 mm da lateral (x 1391), sobe a y 1608 e as costas em concha chegam a z 1623', parte: 'retrovisorEsquerdo', medida: 'maximo', em: [1391, 1608, 1623], toleranciaMm: 4 },
     { nome: 'boca da ponteira, embaixo, por dentro e atrás: o tubo de 55 mm a 180 mm do meio, com o topo no fundo do para-choque e a boca 50 mm atrás da face dele', parte: 'ponteiraEscapamento', medida: 'minimo', em: [ponteira.x - ponteira.raio, ponteira.y - ponteira.raio, ponteira.zBoca], toleranciaMm: tol },
   ];
 }
@@ -1085,6 +1132,15 @@ const receita = {
         forma: `base do retrovisor ${nome.endsWith('Esquerda') ? 'esquerda' : 'direita'}, peça preta rente à chapa, emendada na frente da moldura, na metade da frente do triângulo: trás vertical em z 1486, frente que segue o vidro e abre embaixo até a ponta em z 1767, base reta em y 1313`,
         tecnica: 'subdivisao de um triângulo plano sobre a lateral, 3 mm para fora e engrossado 4 mm para dentro, em plástico preto, sem vão nem aba; a fresta da porta entra por baixo dela',
       })),
+      ...RETROVISORES.flatMap((r) => {
+        const lado = r.lado === 'Esquerdo' ? 'esquerdo' : 'direito';
+        return [
+          { nome: r.estrutura, forma: `retrovisor ${lado}, preto: carcaça em concha de 200 por 350, frente plana de borda de 12, a 235 do relevo; braços em colchete girados 10 graus, dobradiça e corpo de apoio sobre o relevo que assenta na base preta`, tecnica: 'loft da carcaça, extrusão do colchete em z, relevo em loft, unir e subtrair, giro de 10 graus na dobra, inclinação da lateral; plástico preto' },
+          { nome: r.pisca, forma: `lente âmbar do pisca do retrovisor ${lado}, cortada no canto de baixo de fora da carcaça`, tecnica: 'intersecção da carcaça com uma caixa, na mesma pose da carcaça; lente âmbar translúcida' },
+          { nome: r.plano, forma: `espelho plano do retrovisor ${lado}: o vidro maior de cima, rebaixado 8 mm na frente da carcaça, 3 mm de espessura`, tecnica: 'extrusão em z do contorno de cantos redondos; material refletor' },
+          { nome: r.convexo, forma: `espelho convexo do retrovisor ${lado}: o vidro menor de baixo, rebaixado 8 mm, 8 mm de faixa do plano`, tecnica: 'extrusão em z do contorno de cantos redondos; material refletor' },
+        ];
+      }),
       {
         nome: 'grade',
         forma: 'grade escura e fosca entre os faróis, sem marca, de x -420 a 420 e de y 724 (topo do para-choque) a 1060, cantos de cima de raio 45 e os de baixo vivos; lente recuada 18 mm, aba em volta e três barras retas de 760 mm em y 850, 928 e 1006',
@@ -1272,6 +1328,9 @@ const receita = {
       'o plástico ou a moldura toca ou atravessa o pneu, a saia ou o para-choque toca a aba do arco, ou a silhueta com eles passa de 5560 por 2100 mm',
       'a antena flutua sobre o teto, atravessa a chapa por dentro, fica fora do meio do teto ou longe da borda do para-brisa, ou a haste não é fina e quase em pé, inclinada para trás',
       'falta uma maçaneta nas portas da cabine, na de correr ou nas duas traseiras, ou uma fica longe da borda da porta que abre, fora da altura dela (1060 mm, ou 1293 na porta da cabine), flutua ou atravessa a porta',
+      'um retrovisor não é a carcaça de 200 por 350 com frente plana de borda de 12, dois espelhos rebaixados e a lente do pisca no canto de baixo de fora, ou a carcaça fica solta: os braços em colchete não a prendem ao relevo',
+      'os braços ou o relevo de um retrovisor saem da base preta triangular, ou há fresta entre o relevo e a superfície dela, ou o retrovisor atravessa a porta, a janela, a base ou o para-brisa',
+      'os retrovisores não são espelhados nos dois lados, ou só a carcaça e os braços passam da largura de 2040 mm da carroceria (que é sem retrovisores), ou a carroceria passa dela',
       'a ponteira não sai sob o para-choque traseiro do lado esquerdo, não encosta no fundo dele, fica na frente da face dele ou flutua',
     ],
     /* As feições que as réguas de superfície acham e que são desenho, cada uma na caixa justa em volta dela (2026-11-09). A régua dá a posição de uma cadeia de vincos pelo centro
