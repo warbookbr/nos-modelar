@@ -2,7 +2,8 @@
  *
  * Corta a chapa do esboço do ciclo 2 (as seis linhas por lado, sem o corpo, o teto nem o chassi) duas vezes, sem e com a aba em todas as linhas, executa o corte e mede o
  * fundo dos vãos entre os painéis pelo mesmo `vaoEntrePartes` do `npm run vao:partes -- --fundo=modelo`. A chapa sozinha não tem chão: o que a medida diz é quanto do vão a
- * perna fecha para o raio oblíquo; o raio que desce em linha reta passa pela chapa aberta embaixo (o chassi e o forro da carroceria é que o fecham). Saída: uma linha por caso.
+ * perna fecha para o raio oblíquo; em 2026-11-12 o caso com aba para na guarda do núcleo (face degenerada na união, face 13968 do corte), e a medida com a aba não saiu; o raio que desce em linha reta passa pela chapa aberta embaixo (o chassi e o forro da carroceria é que o fecham). Saída: uma linha por caso.
+ *   `HD_LIMPAR=<mm>` troca a tolerância da limpeza do corte (a união da perna com o corte recusa a face degenerada que sobra de uma lasca do corte).
  *   node procedural/pecas/sedan-chassi-e-lataria/alta-definicao/aba-no-sedan.rascunho.mjs [largura=20] [angulo=90] [raio=0.5] [--so-com-aba] */
 process.env.HD_PAINEIS = '0';
 const soComAba = process.argv.includes('--so-com-aba');
@@ -17,7 +18,7 @@ const [chapa] = esboco.opcoes[0].passos;
 const pontos = esboco.opcoes[0].topo;
 const medir = (rotulo, aba) => {
   const t0 = Date.now();
-  const g = paineisPorVaos({ chapa: { passos: [chapa], origem: { op: 'subdivisao', id: 1 }, pontos }, vao: T.vao, linhas: linhasDeVao(), paineis: PAINEIS, conferir: false, ...(aba ? { aba } : {}) });
+  const g = paineisPorVaos({ chapa: { passos: [chapa], origem: { op: 'subdivisao', id: 1 }, pontos }, vao: T.vao, linhas: linhasDeVao(), paineis: PAINEIS, conferir: false, ...(process.env.HD_LIMPAR ? { limpar: { tolerancia: Number(process.env.HD_LIMPAR) } } : {}), ...(aba ? { aba } : {}) });
   const st = nucleo(g.passos, {}, pontos);
   if (st.orfaos.length) throw new Error(`${rotulo}: o núcleo recusou: ${st.orfaos.slice(0, 2).map((x) => x.motivo).join('; ')}`);
   const faces = [...st.F.values()].filter((f) => f.parte && f.parte !== 'chapa').map((f) => ({ pts: f.vs.map((v) => st.V.get(v)), parte: f.parte }));
