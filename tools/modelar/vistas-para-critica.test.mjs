@@ -3,6 +3,7 @@
    limite do veredito, e o pacote inteiro, com as capturas trocadas por gravadores de arquivo, junta o alvo, o montado e a sobreposição.
    O pedido de uma receita de prova (o bloco furado, que refina um esboço) e o de uma peça de montagem (o motor do avião) são lidos de
    verdade, e só o que custa navegador é trocado. */
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
@@ -10,7 +11,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
+  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, mensagemDaLatariaSemBlender, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
 } from './vistas-para-critica.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
@@ -886,6 +887,75 @@ describe('a referência externa trazida por quem conduz', () => {
     expect(pedido).toContain('A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte');
     expect(montarPedido({ peca: 'x' })).toContain('`alvo` do veredito leva o texto `sem alvo: <motivo>`');
   });
+  it('sem orientação dita, o pedido avisa que a referência externa pode estar girada e que os lados não foram declarados', () => {
+    const referencias = lerReferenciasExternas(['/fora/foto.png'], { existe });
+    const pedido = montarPedido({ peca: 'x', referencias });
+    expect(pedido).toContain('pode estar girada ou espelhada');
+    expect(pedido).toContain('a correspondência de lados não foi declarada');
+    expect(pedido).not.toContain('orientação da imagem, dita por quem conduz');
+  });
+
+  it('a orientação dita casa com a referência pela posição, entra no pedido no lugar da frase dos eixos e manda girar a imagem', () => {
+    const existem = (c) => ['/fora/foto.png', '/fora/outra.png'].includes(c);
+    const referencias = lerReferenciasExternas(['/fora/foto.png@direita', '/fora/outra.png'], { existe: existem, orientacoes: ['foto em diagonal, a ponta para cima e à direita, o dorso para a esquerda', null] });
+    expect(referencias[0].orientacaoDita).toBe('foto em diagonal, a ponta para cima e à direita, o dorso para a esquerda');
+    expect(referencias[1].orientacaoDita).toBeUndefined();
+    const secao = montarPedido({ peca: 'x', referencias }).split('\n').filter((l) => l.includes('/fora/'));
+    expect(secao[0]).toContain('orientação da imagem, dita por quem conduz: foto em diagonal, a ponta para cima e à direita, o dorso para a esquerda');
+    expect(secao[0]).toContain('Gire a imagem mentalmente');
+    expect(secao[0]).not.toContain('o olho da imagem');
+    expect(secao[0]).not.toContain('pode estar girada');
+    expect(secao[1]).toContain('pode estar girada ou espelhada');
+  });
+
+  it('recusa a orientação vazia, de várias linhas ou acima do limite, dizendo o que veio e o que se espera', () => {
+    expect(() => lerOrientacaoDaReferencia('   ')).toThrow(/veio vazia/);
+    expect(() => lerOrientacaoDaReferencia('a\nb')).toThrow(/uma linha/);
+    expect(() => lerOrientacaoDaReferencia('x'.repeat(LIMITE_DA_ORIENTACAO + 1))).toThrow(new RegExp(`${LIMITE_DA_ORIENTACAO + 1} caracteres, e o limite é ${LIMITE_DA_ORIENTACAO}`));
+    expect(lerOrientacaoDaReferencia('x'.repeat(LIMITE_DA_ORIENTACAO))).toHaveLength(LIMITE_DA_ORIENTACAO);
+    expect(() => lerReferenciasExternas(['/fora/foto.png'], { existe, orientacoes: [''] })).toThrow(/imagem \/fora\/foto.png.*veio vazia/);
+  });
+});
+
+describe('a linha de comando', () => {
+  const rodar = (...args) => spawnSync(process.execPath, [join(import.meta.dirname, 'vistas-para-critica.mjs'), ...args], { encoding: 'utf8', timeout: 20_000 });
+
+  it('--ajuda imprime o uso, com as opções de referência e orientação, e sai com 0', () => {
+    const r = rodar('--ajuda');
+    expect(r.status).toBe(0);
+    expect(r.stdout).toBe(AJUDA);
+    for (const opcao of ['--referencia=', '--orientacao-da-referencia=', '--sem-medir', '--saida=', '--prazo=', '--ajuda']) expect(r.stdout).toContain(opcao);
+  });
+
+  it('a orientação sem referência anterior, ou repetida para a mesma referência, é recusada com o uso', () => {
+    const antes = rodar('x/y', '--orientacao-da-referencia=em diagonal');
+    expect(antes.status).toBe(2);
+    expect(antes.stderr).toContain('veio antes de qualquer --referencia');
+    const duas = rodar('x/y', '--referencia=/fora/foto.png', '--orientacao-da-referencia=a', '--orientacao-da-referencia=b');
+    expect(duas.status).toBe(2);
+    expect(duas.stderr).toContain('duas vezes para a mesma referência');
+  });
+});
+
+describe('a recusa da lataria sem o Blender', () => {
+  it('diz também o caminho da dispensa: PLANO.lataria com dispensa, que a pessoa dá, e o comando seguinte', () => {
+    const texto = mensagemDaLatariaSemBlender('p/q', { lataria: true, porque: 'a receita tem superfície livre por subdivisão (PASSOS[0])', luzRasante: true });
+    expect(texto).toContain("a peça 'p/q' é de lataria");
+    expect(texto).toContain("PLANO.lataria = { dispensa: '<motivo, com ao menos 15 caracteres>' }");
+    expect(texto).toContain('não é chapa de superfície livre');
+    expect(texto).toContain('decisão da pessoa');
+    expect(texto).toContain('npm run vistas:critica -- p/q');
+  });
+
+  it('a peça de emenda, que não é lataria, mantém a mensagem de antes, sem a dispensa', () => {
+    const texto = mensagemDaLatariaSemBlender('p/q', { lataria: false, porque: 'emenda sombreada', luzRasante: true });
+    expect(texto).not.toContain('dispensa');
+  });
+
+  it('o pacote de uma peça de lataria sem Blender recusa antes de capturar, com o caminho da dispensa', async () => {
+    await expect(vistasParaCritica('tools/fixtures/lataria-com-vinco/receita.js', { saida: join(area, 'sem-blender'), pastaDasCapturas: area, dependencias: { medirReceita: medirPassa, blender: null } }))
+      .rejects.toThrow(/PLANO\.lataria = \{ dispensa:/);
+  }, 60_000);
 });
 
 describe('a peça em foco tapada na vista montada', () => {

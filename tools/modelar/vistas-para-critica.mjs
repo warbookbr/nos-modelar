@@ -63,7 +63,11 @@
  * diz nos dois. A medição entra em `dependencias.medirReceita`.
  *
  * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] [--sem-medir]
- *      [--referencia=<caminho absoluto da imagem>[@<vista>]]... */
+ *      [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... [--ajuda]
+ *
+ * `--orientacao-da-referencia=<texto>` diz em palavras como a imagem da `--referencia` anterior está girada ou espelhada (foto em
+ * diagonal, por exemplo); o pedido a escreve no lugar da frase dos eixos. Sem ela, o pedido avisa que a referência externa pode estar
+ * girada ou espelhada e que a correspondência de lados não foi declarada. */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -78,6 +82,7 @@ import { vistaDoMesmoOlho } from './comparar-contornos.mjs';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
+import { MINIMO_DO_MOTIVO_DA_DISPENSA } from '../../src/autoria/lataria.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { abrirCapturaCompartilhada, olharBancada } from './olhar-bancada.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
@@ -406,7 +411,17 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       ...lista(referencias.map((referencia) => {
         const olho = olhoDaReferencia(referencia, orientacao);
         const externa = referencia.externa ? ` (referência externa, trazida por quem conduz${referencia.lado ? `; vale para a vista ${referencia.lado}` : ''})` : '';
-        return `${basename(referencia.caminho)}: ${referencia.caminho}${externa}${olho ? ` (o olho da imagem: ${olho})` : ''}`;
+        /* a orientação dita por quem conduz vale no lugar da frase dos eixos, que supõe a imagem olhando reto pela vista */
+        const dita = referencia.orientacaoDita;
+        const lado = dita
+          ? ` (orientação da imagem, dita por quem conduz: ${dita}. Gire a imagem mentalmente para essa orientação antes de comparar com o modelo, e confira dorso, gume, frente e fundo por ela, e não pela posição na imagem)`
+          : olho
+            ? ` (o olho da imagem: ${olho})`
+            : '';
+        const aviso = referencia.externa && !dita
+          ? ' (aviso: esta referência externa pode estar girada ou espelhada em relação à vista, e a correspondência de lados não foi declarada; não conclua inversão de lados só pela posição na imagem, e diga no veredito o que você presumiu)'
+          : '';
+        return `${basename(referencia.caminho)}: ${referencia.caminho}${externa}${lado}${aviso}`;
       })),
     );
   } else {
@@ -1370,7 +1385,7 @@ export class ReceitaReprovada extends Error {
 
    `saida` é a pasta da rodada, onde saem o pedido, o alvo, as vistas montadas e a sobreposição; as capturas da bancada continuam em
    `tools/bancadas/out`, com os nomes de sempre. `dependencias` troca o que o teste não quer pagar. */
-export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, dependencias = {} } = {}) {
+export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], orientacoesDasReferencias = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, dependencias = {} } = {}) {
   const dep = {
     /* a medição é a de `rodada-de-modelagem.mjs` (a que o registro e `--acao` usam), importada na hora para não criar ciclo de carga */
     medirReceita: async (p) => (await import('./rodada-de-modelagem.mjs')).medirReceita(p),
@@ -1403,10 +1418,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   if (referencias.ausentes.length) {
     throw new Error(mensagemDeReferenciasAusentes(referencias.ausentes));
   }
-  const externas = lerReferenciasExternas(referenciasExternas, { existe: dependencias.existe ?? existsSync });
+  const externas = lerReferenciasExternas(referenciasExternas, { existe: dependencias.existe ?? existsSync, orientacoes: orientacoesDasReferencias });
   /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem do Blender: sem ele, recusa antes de gastar captura */
   const lataria = superficieDaPeca(peca, receita, plano);
-  if (lataria.luzRasante && !blender) throw new Error(mensagemSemBlender(peca, lataria));
+  if (lataria.luzRasante && !blender) throw new Error(mensagemDaLatariaSemBlender(peca, lataria));
   const declarado = await dep.esbocoDeclarado(peca);
   /* as formas do esboço que a receita refina e o alvo guardado com elas, conferidos antes de gastar captura */
   let dados = null;
@@ -1600,6 +1615,15 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   };
 }
 
+/** A recusa de lataria sem Blender, com o caminho da dispensa para a peça que tem subdivisão e não é chapa. */
+export function mensagemDaLatariaSemBlender(peca, lataria) {
+  const base = mensagemSemBlender(peca, lataria);
+  if (!lataria.lataria) return base;
+  return `${base} Se a peça tem passo \`subdivisao\` e não é chapa de superfície livre (um cabo maciço, um estofado, uma peça orgânica), a receita pode declarar `
+    + `\`PLANO.lataria = { dispensa: '<motivo, com ao menos ${MINIMO_DO_MOTIVO_DA_DISPENSA} caracteres>' }\`; a dispensa é decisão da pessoa, e quem conduz não a escreve sozinho. `
+    + `Com ela gravada, rode de novo \`npm run vistas:critica -- ${peca}\`, que passa a montar o pacote sem o Blender.`;
+}
+
 /* ---------- a referência externa, trazida por quem conduz ---------- */
 
 /** As vistas que `--referencia=<caminho>@<vista>` aceita: as que o pedido já nomeia. */
@@ -1610,9 +1634,20 @@ export const VISTAS_DA_REFERENCIA_EXTERNA = Object.freeze(['frontal', 'direita',
  * fora do repositório (foto de terceiro não entra nele), por isso o caminho vem de quem conduz e não é gravado em arquivo versionado.
  * Recusa o caminho que não é absoluto, que não existe, que não é imagem, e a vista que o pedido não nomeia.
  */
-export function lerReferenciasExternas(valores, { existe = existsSync } = {}) {
+export const LIMITE_DA_ORIENTACAO = 400;
+
+/** Valida o texto de `--orientacao-da-referencia=<texto>`: não vazio, em uma linha e com no máximo `LIMITE_DA_ORIENTACAO` caracteres. */
+export function lerOrientacaoDaReferencia(texto, quem = '--orientacao-da-referencia') {
+  const t = String(texto).trim();
+  if (!t) throw new Error(`${quem}: veio vazia; escreva em palavras como a imagem está girada, por exemplo "foto em diagonal, a ponta para cima e à direita, o dorso para a esquerda".`);
+  if (/[\r\n]/.test(t)) throw new Error(`${quem}: a orientação deve caber em uma linha.`);
+  if (t.length > LIMITE_DA_ORIENTACAO) throw new Error(`${quem}: ${t.length} caracteres, e o limite é ${LIMITE_DA_ORIENTACAO}; resuma a orientação em palavras.`);
+  return t;
+}
+
+export function lerReferenciasExternas(valores, { existe = existsSync, orientacoes = [] } = {}) {
   const vistos = new Set();
-  return valores.map((bruto) => {
+  return valores.map((bruto, i) => {
     const texto = String(bruto);
     const arroba = texto.lastIndexOf('@');
     const temVista = arroba > 0 && !texto.slice(arroba).includes('/');
@@ -1626,7 +1661,8 @@ export function lerReferenciasExternas(valores, { existe = existsSync } = {}) {
     if (!/\.(png|jpe?g|webp|gif)$/i.test(caminho)) throw new Error(`--referencia=${texto}: ${caminho} não é imagem (aceito png, jpg, jpeg, webp, gif).`);
     if (vistos.has(caminho)) throw new Error(`--referencia: ${caminho} veio mais de uma vez.`);
     vistos.add(caminho);
-    return { caminho, ...(lado ? { lado } : {}), externa: true };
+    const dita = orientacoes[i] === undefined || orientacoes[i] === null ? null : lerOrientacaoDaReferencia(orientacoes[i], `--orientacao-da-referencia da imagem ${caminho}`);
+    return { caminho, ...(lado ? { lado } : {}), ...(dita ? { orientacaoDita: dita } : {}), externa: true };
   });
 }
 
@@ -1827,21 +1863,48 @@ export function imprimir(resultado) {
   return `${linhas.join('\n')}\n`;
 }
 
+export const AJUDA = `uso: node tools/modelar/vistas-para-critica.mjs <peça> [opções]
+
+Monta o pacote do crítico visual da peça: mede a receita, captura as vistas e grava o pedido.md.
+
+  <peça>                                    a receita, como nas outras ferramentas (por exemplo aviao/motor)
+  --saida=<pasta da rodada>                 onde o pacote é gravado
+  --prazo=<segundos>                        prazo de carga de cada captura, para peça pesada
+  --sem-medir                               monta o pacote sem medir a receita (o pedido diz que saiu sem medição)
+  --referencia=<caminho absoluto>[@<vista>] imagem de fora do repositório (frontal, direita, esquerda, traseira, superior, inferior, isometrica); repetível
+  --orientacao-da-referencia=<texto>        como a imagem da --referencia anterior está girada ou espelhada, em palavras (até ${LIMITE_DA_ORIENTACAO} caracteres);
+                                            vale para a última --referencia dada antes dela, e o pedido a escreve no lugar da frase dos eixos
+  --ajuda                                   esta mensagem
+
+Código de saída: 0 pacote montado, 1 recusa (receita reprovada, Blender ausente, captura sem imagem), 2 uso errado.
+`;
+
 async function principal(argv) {
   let lido;
   let externas = [];
+  const orientacoes = [];
+  if (argv.slice(2).includes('--ajuda')) { process.stdout.write(AJUDA); return 0; }
   try {
-    /* `--referencia` repete, e o leitor de argumentos recusa a repetição: ela sai antes */
-    externas = argv.slice(2).filter((a) => a.startsWith('--referencia=')).map((a) => a.slice('--referencia='.length));
-    lido = lerArgumentos(argv.slice(2).filter((a) => !a.startsWith('--referencia=')), { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir'], posicional: { nome: 'a peça', obrigatorio: true } });
+    /* `--referencia` e `--orientacao-da-referencia` repetem, e o leitor de argumentos recusa a repetição: saem antes. A orientação vale
+       para a última referência dada antes dela. */
+    const resto = [];
+    for (const a of argv.slice(2)) {
+      if (a.startsWith('--referencia=')) { externas.push(a.slice('--referencia='.length)); orientacoes.push(null); } else if (a.startsWith('--orientacao-da-referencia=')) {
+        const texto = a.slice('--orientacao-da-referencia='.length);
+        if (!externas.length) throw new Error('--orientacao-da-referencia veio antes de qualquer --referencia; dê a orientação depois da referência a que ela vale.');
+        if (orientacoes[externas.length - 1] !== null) throw new Error(`--orientacao-da-referencia veio duas vezes para a mesma referência (${externas[externas.length - 1]}); dê uma só.`);
+        orientacoes[externas.length - 1] = lerOrientacaoDaReferencia(texto);
+      } else resto.push(a);
+    }
+    lido = lerArgumentos(resto, { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir'], posicional: { nome: 'a peça', obrigatorio: true } });
     if (lido.opcao('prazo') !== null && !(Number(lido.opcao('prazo')) > 0)) throw new Error(`--prazo pede segundos maiores que zero; veio "${lido.opcao('prazo')}".`);
   } catch (erro) {
-    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--referencia=<caminho absoluto da imagem>[@<vista>]]...\n${erro.message}\n`);
+    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... (--ajuda diz mais)\n${erro.message}\n`);
     return 2;
   }
   /* --prazo: a peça pesada (o furgão realista, em 2026-11-06) não entra na cena nos 90 s de cada captura. */
   const prazo = lido.opcao('prazo');
-  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, semMedir: lido.bandeira('sem-medir'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
+  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, orientacoesDasReferencias: orientacoes, semMedir: lido.bandeira('sem-medir'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
   process.stdout.write(imprimir(resultado));
   return 0;
 }
