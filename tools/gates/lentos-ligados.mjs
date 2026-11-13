@@ -43,8 +43,18 @@ export function lentosLigados({ lentos, alterados, estruturais = [], foto, leitu
   return ligados;
 }
 
+/* Os lentos que entram sempre que estão ligados, antes do corte e fora do teto de tempo: em 2026-11-13 a correção da agulha na
+   costura mudou a malha de quatro etapas fixas, o teste das etapas estava entre os 60 ligados ao núcleo, ficou para o CI pelo
+   teto e o envio reprovou lá. A forma que a pessoa aceitou é o que um envio de núcleo mais arrisca mudar sem ninguém ver. */
+export const SEMPRE_QUE_LIGADOS = Object.freeze(['tools/modelar/guardas/etapas-do-acervo.test.mjs']);
+
 /* Corta pelo teto: do mais barato ao mais caro, entra enquanto couber em arquivos e em tempo. O que passa do teto fica para o CI. */
 export function aplicarTeto(ligados, duracoes, { tetoMs = TETO_DE_MS, tetoArquivos = TETO_DE_ARQUIVOS } = {}) {
+  const sempre = [...ligados].filter((a) => SEMPRE_QUE_LIGADOS.includes(a));
+  if (sempre.length) {
+    const resto = aplicarTeto([...ligados].filter((a) => !SEMPRE_QUE_LIGADOS.includes(a)), duracoes, { tetoMs, tetoArquivos: Math.max(0, tetoArquivos - sempre.length) });
+    return { ...resto, rodam: [...sempre, ...resto.rodam].sort(), somaMs: resto.somaMs + sempre.reduce((t, a) => t + duracoes(a), 0) };
+  }
   const arquivos = [...ligados];
   const total = arquivos.reduce((s, a) => s + duracoes(a), 0);
   if (arquivos.length <= tetoArquivos && total <= tetoMs) return { rodam: arquivos.sort(), ficam: [], somaMs: total, cortado: false };

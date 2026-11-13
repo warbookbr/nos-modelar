@@ -63,4 +63,15 @@ describe('o teto da bateria local', () => {
     const r = aplicarTeto(['grande', 'a'], dur({ grande: 400_000, a: 10_000 }));
     expect(r).toMatchObject({ rodam: ['a'], ficam: ['grande'] });
   });
+
+  it('o teste das etapas fixas roda sempre que ligado, mesmo acima do teto de tempo, e ocupa uma vaga', () => {
+    const etapas = 'tools/modelar/guardas/etapas-do-acervo.test.mjs';
+    const r = aplicarTeto(['grande', etapas, 'a'], dur({ grande: 400_000, [etapas]: 350_000, a: 10_000 }));
+    expect(r.rodam).toEqual(['a', etapas].sort());
+    expect(r.ficam).toEqual(['grande']);
+    expect(r.somaMs).toBe(360_000);
+    const cheio = aplicarTeto([etapas, ...Array.from({ length: 10 }, (_, i) => `t${i}`)], () => 1000);
+    expect(cheio.rodam).toContain(etapas);
+    expect(cheio.rodam.length).toBe(8);
+  });
 });

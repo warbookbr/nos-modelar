@@ -7,11 +7,23 @@
       "instancia": "carroceria",
       "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:02dd291d4fb7763a8c190590b1fdda49969e997c9422b5eb9dc954a212bbee3b",
+      "forma": "sha256:160d3c2ec9060e0a292a2574c20d0a8f55a131034abd7044815aee990eede709",
+      "motivo": "a receita mudou depois do aceite",
       "aceite": {
-        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou na rodada 3 com nota 8 e sem defeito; cobertura das 55 partes feita em passadas",
+        "por": "Tiago, 2026-11-13: aceitou travar de novo depois da correção da agulha na costura, que muda duas faces em 174 mil",
         "analise": "ausente"
-      }
+      },
+      "reaberturas": [
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou na rodada 3 com nota 8 e sem defeito; cobertura das 55 partes feita em passadas",
+            "analise": "ausente"
+          },
+          "forma": "sha256:02dd291d4fb7763a8c190590b1fdda49969e997c9422b5eb9dc954a212bbee3b"
+        }
+      ]
     },
     {
       "instancia": "vidros",

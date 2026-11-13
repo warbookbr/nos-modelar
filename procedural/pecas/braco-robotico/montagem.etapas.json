@@ -199,9 +199,9 @@
       "instancia": "braco",
       "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:596f1439be5f3eb3f13223ff61fe23d4f2135e31e2b97008f4e4198fdabc569e",
+      "forma": "sha256:57e94e28db97957798c38d8efae544bbf4df10ed65c2716d605648cdeb0fc21a",
       "aceite": {
-        "por": "Tiago",
+        "por": "Tiago, 2026-11-13, pela imagem de antes e depois da correção da agulha na costura",
         "defeitosAceitos": [
           "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
           "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
@@ -252,6 +252,20 @@
             "analise": "ausente"
           },
           "forma": "sha256:489416bafeb3199e337eda62b61dfa502a23e3dbbb69a1bf876d179fa7079216"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "Tiago",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
+              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
+              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:596f1439be5f3eb3f13223ff61fe23d4f2135e31e2b97008f4e4198fdabc569e"
         }
       ]
     },
@@ -386,9 +400,9 @@
           }
         }
       ],
-      "forma": "sha256:4e32eacd1474009691f6430a8876b69877d373b70859c3c6381e6b483607c72e",
+      "forma": "sha256:720685f37d74bf619278906e3bf9eab4d3c0defb03d7989cd00e3c33c6d94f73",
       "aceite": {
-        "por": "Tiago",
+        "por": "Tiago, 2026-11-13, pela imagem de antes e depois da correção da agulha na costura",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
@@ -432,6 +446,18 @@
             "analise": "ausente"
           },
           "forma": "sha256:5b92d53e321bc8e351e330ea29b0215a28fc9ec26cd6c70a113a6b46a2ac5bb7"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "Tiago",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:4e32eacd1474009691f6430a8876b69877d373b70859c3c6381e6b483607c72e"
         }
       ]
     },
@@ -664,9 +690,9 @@
           }
         }
       ],
-      "forma": "sha256:534ef96aa5decbe3d08245b9c93788f8d7aca4fcbb3441a4da36f19c486ce59b",
+      "forma": "sha256:4e910977bd7d0d3748f00b8d91107976ecb3bdf0b3b6da062019ac28c38f8da2",
       "aceite": {
-        "por": "Tiago",
+        "por": "Tiago, 2026-11-13, pela imagem de antes e depois da correção da agulha na costura",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
@@ -684,6 +710,18 @@
             "analise": "ausente"
           },
           "forma": "sha256:7655646e5cd30df1dd691122ee7e4dbb07aa635bef490796db37b3e85ed2afe3"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "Tiago",
+            "defeitosAceitos": [
+              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+            ],
+            "analise": "ausente"
+          },
+          "forma": "sha256:534ef96aa5decbe3d08245b9c93788f8d7aca4fcbb3441a4da36f19c486ce59b"
         }
       ]
     },
