@@ -1,6 +1,6 @@
 /* corpo-por-fatias.test.mjs — o corpo por fatias de contorno livre: volumes de casos de conta fechada, posições de vértice, as réguas de malha e cada recusa. */
 import { describe, expect, it } from 'vitest';
-import { corpoPorFatias, SEGMENTO_MEDIO_MINIMO_MM } from './corpo-por-fatias.js';
+import { corpoPorFatias, SEGMENTO_MEDIO_MINIMO_MM, TOLERANCIA_DA_REAMOSTRAGEM_MM } from './corpo-por-fatias.js';
 import { medirPeca } from '../../tools/fixtures/costuras-e-furos/medir.mjs';
 import { lascasDoNeutro } from '../../tools/modelar/lasca.mjs';
 
@@ -364,6 +364,67 @@ describe('corpoPorFatias: o que a gaiola diz, nos termos da operação', () => {
     expect(Number.isInteger(a.indice)).toBe(true);
     expect(a.texto).toMatch(/^amostragem desigual no ponto \d+ da volta do laço '[fx][\w]*': o segmento antes dele e o depois diferem na razão [\d,]+, acima de 4, .*nomeie esse ponto como marco/);
     expect(a.texto).not.toMatch(/trecho|'p\d+_'/);
+  });
+});
+
+describe('corpoPorFatias: o que os estragos mostraram', () => {
+  const dist = (p, a, b) => {
+    const dx = b[0] - a[0]; const dy = b[1] - a[1]; const q = dx * dx + dy * dy;
+    const t = q > 0 ? Math.min(1, Math.max(0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / q)) : 0;
+    return Math.hypot(p[0] - a[0] - dx * t, p[1] - a[1] - dy * t);
+  };
+  const voltaDe = (g, r = 0) => Array.from({ length: g.corpo.pontosPorVolta }, (_, i) => g.pontosMm[g.pontoDe(r, i)].slice(1));
+
+  it('a fração do perímetro de cada volta é normalizada pelo perímetro da própria fatia: duas escalas, o marco a meia volta e a um quarto, dá 0,375 de 16 = 6', () => {
+    const oct = (k, e) => marcado(circ(10 * e, 8), circ(8, 8).map((_, i) => (i === k ? 'B' : null)));
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, passo: 100, fatias: [{ em: 0, contorno: oct(4, 1) }, { em: 30, contorno: oct(2, 3) }] });
+    expect(g.corpo.marcos.B).toBe(6);
+  });
+
+  it('o ponto dado sobre um segmento da volta, longe dos pontos dela, não é perdido: a distância é ao segmento, e não ao ponto mais perto', () => {
+    const c = [[0, 0], [20, 0], [40, 0], [40, 10], [0, 10]];
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 8, fatias: [{ em: 0, contorno: c }, { em: 30, contorno: c }] });
+    expect(voltaDe(g).some((p) => Math.hypot(p[0] - 20, p[1]) < 1)).toBe(false);
+    expect(g.avisos.filter((a) => a.ref === 'pontoPerdido')).toEqual([]);
+  });
+
+  it('o aviso traz o pior ponto perdido (a maior distância e o primeiro índice dela), medida ao polígono da volta', () => {
+    const c = circ(30, 40);
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, tolerancia: 0.001, fatias: [{ em: 0, contorno: c }, { em: 30, contorno: c }] });
+    const volta = voltaDe(g);
+    const d = c.map((p) => Math.min(...volta.map((q, i) => dist(p, q, volta[(i + 1) % volta.length]))));
+    const pior = Math.max(...d);
+    const aviso = g.avisos.find((a) => a.ref === 'pontoPerdido' && a.fatia === 'f0');
+    expect(aviso.distanciaMm).toBeCloseTo(pior, 3);
+    expect(aviso.indice).toBe(d.findIndex((x) => Math.abs(x - pior) < 1e-9));
+    expect(g.corpo.perdas[0].pior.distanciaMm).toBeCloseTo(pior, 3);
+    expect(aviso.quantos).toBe(d.filter((x) => x > 0.001).length);
+  });
+
+  it('a tolerância padrão é 0,1 mm: um ponto a 0,3 mm da volta avisa, sem declarar a tolerância', () => {
+    expect(TOLERANCIA_DA_REAMOSTRAGEM_MM).toBe(0.1);
+    const c = circ(30, 40);
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: c }, { em: 30, contorno: c }] });
+    expect(g.corpo.perdas[0].pior.distanciaMm).toBeGreaterThan(0.1);
+    expect(g.corpo.perdas[0].pior.distanciaMm).toBeLessThan(1);
+    expect(g.avisos.some((a) => a.ref === 'pontoPerdido')).toBe(true);
+  });
+
+  it('corpo.fatias[i].laco é a posição do laço da fatia entre todos os planos, e nao o índice da fatia', () => {
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', passo: 10, pontos: 8, fatias: [0, 20, 40].map((em) => ({ em, contorno: circ(5, 8) })) });
+    expect(g.corpo.planos).toEqual([0, 10, 20, 30, 40]);
+    expect(g.corpo.fatias.map((f) => f.laco)).toEqual([0, 2, 4]);
+    expect(g.lacos.map((l) => l.nome)).toEqual(['f0', 'x10', 'f1', 'x30', 'f2']);
+  });
+
+  it('um degrau da escada que sai do contorno por 0,05 mm, bem menos que 1% da área, ainda é recusado', () => {
+    const c = [[15, 29.95], [0, 30], [0, 0], [30, 0], [30, 30]];
+    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: c }, { em: 20, contorno: c }] })).toThrow(/o degrau 0 da escada, que liga o ponto 1 ao 0 e o 2 ao 15, sai do contorno/);
+  });
+
+  it('o ponto repetido a 0,5 µm do anterior é recusado: o limite é 1 µm, e não um décimo dele', () => {
+    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: [[0, 0], [4, 0], [4, 0.0005], [4, 4], [0, 4]] }, { em: 20, contorno: quadrado(4) }] })).toThrow(/o ponto 2 repete o ponto 1/);
+    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: [[0, 0], [4, 0], [4, 0.002], [4, 4], [0, 4]] }, { em: 20, contorno: [[0, 0], [4, 0], [4, 0.002], [4, 4], [0, 4]] }] })).not.toThrow(/repete/);
   });
 });
 
