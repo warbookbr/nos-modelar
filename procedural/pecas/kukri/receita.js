@@ -13,7 +13,7 @@ import { gaiolaPorLacos } from '../../nucleo/gaiola-por-lacos.js';
 
 export const TABELA = {
   /* o meio da chapa e do cabo, a altura do eixo sobre o chão */
-  eixo_y: 13.5,
+  eixo_y: 14.5,
   /* LÂMINA: de x = lamina_base (a face que encosta no cabo) à ponta em x = comprimento */
   comprimento: 430,
   lamina_base: 140,
@@ -24,28 +24,30 @@ export const TABELA = {
   /* o chanfro do gume: largura máxima em z, fração da largura da lâmina que ele pode ocupar, e o degrau onde o gume começa */
   chanfro_largura: 16,
   chanfro_fracao: 0.42,
-  degrau_x: 168.5,
-  degrau_rampa: 3.5,
+  degrau_x: 152,
+  degrau_rampa: 2.5,
+  /* a lâmina afina de espessura do dorso ao fio da ponta: a partir de afina_de ela vai a afina_ponta de meia espessura */
+  afina_de: 340, afina_ponta: 0.3,
   passo_x: 5,
   /* contornos levantados da foto, [x, z] em mm: do dorso, em duas metades que se encontram na quebra, e do gume */
-  dorso_base_quebra: [[140, 35.8], [150, 37.1], [160, 38.8], [170, 40.7], [180, 42.7], [190, 44.9], [200, 47.3], [210, 49.3], [220, 51], [230, 52.5], [240, 53.8], [250, 55.1], [260, 55.9], [270, 56.8], [280, 57.2]],
-  dorso_quebra_ponta: [[280, 57.2], [290, 56.2], [300, 54.6], [310, 52.7], [320, 50.4], [330, 48.1], [340, 45.2], [350, 41.7], [360, 38.1], [370, 34], [380, 29.7], [390, 24.5], [400, 19], [410, 13.3], [420, 6.8], [430, 1.2]],
-  gume: [[140, 1.6], [168.5, 1.6], [170, 3.6], [180, 6], [190, 7.2], [200, 7.2], [210, 6.2], [220, 4.6], [230, 2.5], [240, 0.2], [250, -2.8], [260, -5.8], [270, -9], [280, -12.1], [290, -14.9], [300, -17.2], [310, -18.8], [320, -20], [330, -20.7], [340, -21], [350, -20.6], [360, -20], [370, -18.7], [380, -17], [390, -14.8], [400, -11.7], [410, -8.4], [420, -4.4], [430, 1.2]],
+  dorso_base_quebra: [[140, 34.5], [280, 57.2]],
+  dorso_quebra_ponta: [[280, 57.2], [355, 32.2], [430, 1.2]],
+  gume: [[140, 0.6], [152, 0.6], [154.5, 2.2], [160, 2.9], [170, 3.6], [180, 6], [190, 7.2], [200, 7.2], [210, 6.2], [220, 4.6], [230, 2.5], [240, 0.2], [250, -2.8], [260, -5.8], [270, -9], [280, -12.1], [290, -14.9], [300, -17.2], [310, -18.8], [320, -20], [330, -20.7], [340, -21], [350, -20.6], [360, -20], [370, -18.7], [380, -17], [390, -14.8], [400, -11.7], [410, -8.4], [420, -4.4], [430, 1.2]],
   /* CABO: de x = 0 (a ponta do bico) a x = lamina_base (a frente, que faz de guarda) */
-  gomo_passo: 12.5, gomo_sulco: 3, gomo_sulco_meia_largura: 5,
+  gomo_passo: 12.5, gomo_sulco: 5, gomo_sulco_meia_largura: 3.75, cabo_frente: 140.0755,
   /* o centro do cabo reto, em z, é uma reta; os semieixos de cada gomo, e o primeiro sulco, a 15 mm da frente */
-  cabo_z_em_140: 21, cabo_z_inclinacao: 0.146,
-  cabo_meio_z_cresta_60: 15, cabo_meio_z_cresta_126: 16.5, cabo_meio_y: 12.5,
+  cabo_z_em_140: 21, cabo_z_inclinacao: 0.12,
+  cabo_meio_z_cresta_60: 16.5, cabo_meio_z_cresta_126: 17, cabo_meio_y: 14,
   /* a guarda: a frente é achatada em y, alarga em z e volta à seção dos gomos em x = guarda_ate */
-  guarda_meio_z_frente: 19, guarda_meio_y_frente: 9.5, guarda_meio_y_pico: 13.4, guarda_ate: 128,
+  guarda_meio_z_frente: 20, guarda_meio_y_frente: 3.4, guarda_meio_y_pico: 14.4, guarda_ate: 130,
   oval_expoente: 2.4,
   /* o bico, em x < 58: z do lado do dorso (hi), z do lado do gume (lo) e meia altura em y (hy) */
   bico_hi: [[1, 2.5], [4, 5.5], [10, 9], [18, 15.5], [24, 17.5], [30, 19], [40, 20.8], [50, 22.5], [58, 23]],
-  bico_lo: [[1, -2.5], [4, -9], [10, -18.7], [18, -26], [24, -28.5], [27, -27.5], [30, -19], [33, -11.5], [40, -9.5], [50, -7.8], [58, -7]],
-  bico_hy: [[1, 3], [4, 7], [10, 10.5], [20, 12], [30, 12.5], [40, 13], [58, 13.4]],
+  bico_lo: [[1, -3], [4, -10], [10, -21], [18, -29], [24, -33], [27, -32.5], [30, -22], [33, -11], [40, -8], [50, -7.8], [58, -7.5]],
+  bico_hy: [[1, 3], [4, 7], [10, 11], [20, 13], [30, 13.5], [40, 14], [58, 14]],
   bico_planos: [57.5, 53, 48, 43, 38, 34, 31, 28.5, 26, 23, 19, 15, 11, 7.5, 4.5, 2],
   furo_x: 17, furo_z: -1, furo_raio: 2.6,
-  niveis_cabo: 1,
+  niveis_cabo: 2,
 };
 
 /* ---------- ajudantes de curva ---------- */
@@ -70,13 +72,14 @@ function interpola(tab, x) {
   return h00 * y0 + h10 * h * tang(i) + h01 * y1 + h11 * h * tang(i + 1);
 }
 
+const m = (mm) => mm / 1000;
 const entre = (a, b, t) => Math.min(b, Math.max(a, t));
 
 /* ---------- lâmina ---------- */
 
 /** As estações em x do contorno da lâmina, da base à ponta. */
 export function estacoes(T) {
-  const xs = new Set([T.lamina_base, T.degrau_x, 280, T.comprimento]);
+  const xs = new Set([T.lamina_base, T.degrau_x, T.degrau_x + T.degrau_rampa, 280, T.comprimento]);
   for (let x = T.lamina_base; x < T.comprimento; x += T.passo_x) xs.add(x);
   return [...xs].sort((a, b) => a - b);
 }
@@ -93,10 +96,18 @@ export function larguraDoChanfro(T, x) {
 /** O contorno da lâmina no plano s (distância do meio da chapa, em mm): { gume, dorsoPonta, dorsoBase, base } em [x, z]. */
 export function lacoDaLamina(T, s) {
   const xs = estacoes(T);
-  const f = Math.abs(s) / (T.espessura_dorso / 2);
-  const recuoDoDorso = (x) => (Math.abs(s) > T.quina_dorso_ate ? Math.min(T.quina_dorso_recuo, 0.15 * (zDorso(T, x) - zGume(T, x))) : 0);
-  const gume = xs.map((x) => [x, zGume(T, x) + larguraDoChanfro(T, x) * f]);
-  const dorso = xs.map((x) => [x, zDorso(T, x) - recuoDoDorso(x)]);
+  const meia = T.espessura_dorso / 2;
+  const ponto = (x) => {
+    const a = Math.abs(s);
+    const larg = zDorso(T, x) - zGume(T, x);
+    const rec = a > T.quina_dorso_ate ? Math.min(T.quina_dorso_recuo, 0.15 * larg) : 0;
+    const zd = zDorso(T, x) - rec;
+    const ze = zGume(T, x) + larguraDoChanfro(T, x) * (a / meia);
+    return { d: [x, zd], e: [x, ze] };
+  };
+  const pts = xs.map(ponto);
+  const gume = pts.map((p) => p.e);
+  const dorso = pts.map((p) => p.d);
   const ponta = gume[gume.length - 1];
   const iQuebra = xs.indexOf(280);
   const dorsoPonta = dorso.slice(iQuebra).reverse();
@@ -131,7 +142,7 @@ const centroZ = (T, x) => T.cabo_z_em_140 - T.cabo_z_inclinacao * (T.lamina_base
 function sulco(T, x) {
   let d = 0;
   for (let k = 0; k < 6; k++) {
-    const xc = T.lamina_base - 15 - k * T.gomo_passo;
+    const xc = T.cabo_frente - 15 - k * T.gomo_passo;
     const u = Math.abs(x - xc);
     if (u < T.gomo_sulco_meia_largura) d = Math.max(d, T.gomo_sulco * (0.5 + 0.5 * Math.cos((Math.PI * u) / T.gomo_sulco_meia_largura)));
   }
@@ -150,17 +161,18 @@ export function secaoDoCabo(T, x) {
   const d = sulco(T, x);
   sz -= d; sy -= d;
   if (x > T.guarda_ate) {
-    const g = (x - T.guarda_ate) / (T.lamina_base - T.guarda_ate);
+    const g = (x - T.guarda_ate) / (T.cabo_frente - T.guarda_ate);
     const alarga = g * g * (3 - 2 * g);
     sz = crista + (T.guarda_meio_z_frente - crista) * alarga;
     sy = T.guarda_meio_y_pico + (T.guarda_meio_y_frente - T.guarda_meio_y_pico) * g ** 2;
+    sz -= d; sy -= Math.min(d, 0);
   }
   return { zc: centroZ(T, x), sz, sy };
 }
 
 export function planosDoCabo(T) {
   const guarda = [];
-  for (let k = 0; ; k++) { const x = T.lamina_base - 2.5 * k; if (x < 60) break; guarda.push(x); }
+  for (let k = 0; ; k++) { const x = T.cabo_frente - 2.5 * k; if (x < 60) break; guarda.push(x); }
   return [...[...T.bico_planos].sort((a, b) => a - b), ...guarda.reverse()];
 }
 
@@ -188,11 +200,25 @@ export function argumentosDoCabo(T) {
 
 /* ---------- derivar, passos ---------- */
 
-export function derivar(T = TABELA) {
-  return { lamina: gaiolaPorLacos(argumentosDaLamina(T)), cabo: gaiolaPorLacos(argumentosDoCabo(T)) };
+/** Fator de espessura da lâmina em x: 1 até afina_de e, dali à ponta, desce a afina_ponta / meia espessura. */
+export function fatorDeEspessura(T, x) {
+  const meia = T.espessura_dorso / 2;
+  return 1 - (1 - T.afina_ponta / meia) * entre(0, 1, (x - T.afina_de) / (T.comprimento - T.afina_de));
 }
 
-const m = (mm) => mm / 1000;
+/** A lâmina sai da gaiola em planos de y fixos; a espessura afina para a ponta aproximando cada ponto do meio da chapa, em metro. */
+function lamina(T) {
+  const g = gaiolaPorLacos(argumentosDaLamina(T));
+  for (const nome of Object.keys(g.pontos)) {
+    const p = g.pontos[nome];
+    p[1] = m(T.eixo_y) + (p[1] - m(T.eixo_y)) * fatorDeEspessura(T, p[0] * 1000);
+  }
+  return g;
+}
+
+export function derivar(T = TABELA) {
+  return { lamina: lamina(T), cabo: gaiolaPorLacos(argumentosDoCabo(T)) };
+}
 
 export function gerarPassos(T = TABELA) {
   const { lamina, cabo } = derivar(T);
@@ -222,9 +248,9 @@ const receita = {
   PARAMS: TABELA,
   ALIASES,
   MATERIAIS: {
-    laminaFosca: { tipo: 'liso', cor: '#17181a', aspereza: 0.8, metalicidade: 0.25 },
+    laminaFosca: { tipo: 'liso', cor: '#111113', aspereza: 0.92, metalicidade: 0.04 },
     fio: { tipo: 'metal', cor: '#a9adb2', aspereza: 0.25, metalicidade: 0.9, brilho: 0.8 },
-    caboGranulado: { tipo: 'liso', cor: '#0e0e0f', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.6, intensidade: 0.5 } },
+    caboGranulado: { tipo: 'liso', cor: '#060607', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.6, intensidade: 0.5 } },
   },
   get TOPO() { return { origem: 'ponta do cabo em x = 0; x para a ponta da lâmina, y para cima com o chão em 0, o gume para -z', ...derivar(this.PARAMS).lamina.pontos, ...derivar(this.PARAMS).cabo.pontos }; },
   PLANO: {
