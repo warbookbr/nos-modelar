@@ -1,6 +1,6 @@
 # Forma exata antes da malha, vocabulário alto e retorno em milímetro
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/forma-exata/`, `procedural/nucleo/chapa-de-contorno.js`, `procedural/nucleo/corpo-de-secao-variavel.js`, `procedural/nucleo/furo-passante.js`, `procedural/nucleo/corpo-por-fatias.js`, `tools/modelar/avisos-de-composicao.mjs`, `tools/modelar/referencia-de-silhueta.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/silhueta-contra-referencia.mjs`, `tools/modelar/silhueta-contra-referencia.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/usar/GUIA-AUTORIA-IA.md`, `docs/modelar/banco-de-provas/forma-exata-2026-11-13/`
 
@@ -63,4 +63,4 @@ O método novo virar um segundo núcleo pela metade: por isso a fatia 3 é um es
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-13. Entregou o desvio da silhueta em milímetro contra uma referência, com ajuste rígido e aviso de referência não conferida; o contorno de referência tirado da foto pela ferramenta e conferido pela pessoa; a chapa de contorno, o corpo de seção variável, o furo passante e o corpo por fatias, com fichas e a porta dos avisos de composição; o pedido do crítico com a orientação da referência; e a kukri reescrita com essas operações (297 para 152 linhas, sem face fina), aprovada pela pessoa. O estudo do método novo foi escrito com os três casos, e a pessoa decidiu não seguir com ele (fatia 4 cancelada). A pessoa decidiu deixar a kukri como está, sem aproximá-la do contorno da foto nos quatro pontos medidos.
