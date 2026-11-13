@@ -4,36 +4,39 @@
  * serve: gaiola de um corpo sólido dado por fatias: em cada posição ao longo de um eixo, um contorno fechado qualquer em mm (polígono simples, convexo
  *   ou não, com o número de pontos que a receita quiser, diferente de uma fatia a outra), ligados numa superfície que a `subdivisao` deixa lisa, com
  *   as duas pontas tampadas. A operação reamostra cada contorno no mesmo número de pontos, interpola as fatias (suave ou linear) e entrega a gaiola.
- * quando: casco, asa, fuselagem, frasco, carenagem, pá, qualquer corpo cuja seção muda de forma e de número de pontos ao longo do comprimento, e que o
- *   `loft` (24 seções, 1000 pontos, seção convexa, polo digitado) não cabe. Para a seção que é uma superelipse use corpoDeSecaoVariavel; para uma
- *   chapa de espessura constante, chapaDeContorno; para o sólido de seção constante que passa por um caminho, gaiolaVarrida.
+ * quando: corpo liso cuja seção muda de forma e de número de pontos ao longo de um eixo, com a seção côncava no meio, e em que um ponto nomeado (uma quina)
+ *   deve correr viva de uma ponta à outra. Para a seção que é uma superelipse use corpoDeSecaoVariavel; para uma chapa de espessura constante, chapaDeContorno;
+ *   para o sólido de seção constante que passa por um caminho, gaiolaVarrida. Dá: contorno côncavo no meio sem polo, número de pontos diferente por fatia,
+ *   marco exato com quina viva ao longo do corpo, tampa plana nas duas pontas. Não dá: ponta que fecha em ponto, quina viva na borda da tampa, fatias a menos de 2,5 mm.
  * unidades: `em` e os pontos dos contornos em mm; `pontos` sai em metro, para pôr em TOPO; espalhe `passo` no passo subdivisao.
  * campos:
  *   nome: prefixo dos pontos (texto), como em gaiolaPorLacos.
  *   eixo: 'x', 'y' ou 'z', o eixo do corpo; o ponto [u, v] do contorno são os outros dois eixos na ordem x, y, z.
  *   fatias: [{ nome?, em, contorno }] em crescente e a ao menos 2,5 mm uma da outra (padrão do nome: `f0`, `f1`, ...). O contorno é a lista dos pontos da
  *     volta, no sentido anti-horário em [u, v] (o ponto seguinte a 90 graus à esquerda; o horário é recusado com a área recebida), sem repetir o primeiro
- *     no fim; cada ponto é [u, v] ou { nome, ponto: [u, v] }. O PRIMEIRO PONTO é a âncora: todas as fatias começam no mesmo detalhe (o bordo de
- *     fuga, o fundo), senão o corpo torce. Um ponto com nome é um MARCO: o nome e a ordem dos marcos são os mesmos em todas as fatias, o ponto fica
+ *     no fim; cada ponto é [u, v] ou { nome, ponto: [u, v] }. O PRIMEIRO PONTO é a âncora: todas as fatias começam no mesmo detalhe (a quina ou o fundo),
+ *     senão o corpo torce. Um ponto com nome é um MARCO: o nome e a ordem dos marcos são os mesmos em todas as fatias, o ponto fica
  *     exato em todas elas, e a volta entre dois marcos é reamostrada com o mesmo número de pontos em toda fatia.
  *   pontos: quantos pontos tem a volta de cada plano, inteiro par de 8 para cima (padrão: o maior número de pontos de uma fatia, arredondado para par,
- *     entre 16 e 64). Tem de comportar os marcos e a âncora, um ponto cada ao menos.
+ *     entre 16 e 64). Tem de comportar os marcos, a âncora e os cantos, um ponto cada ao menos.
+ *   anguloDeCanto: o giro, em graus, a partir do qual um vértice dado é um canto e fica como ponto da volta (padrão 20); sem pontos bastantes sai `cantoPerdido`.
+ *   areaMinimaDoMeio: a fração da menor área das duas fatias vizinhas abaixo da qual sai o aviso `corpoAfina` (padrão 0,9; 0 desliga).
  *   interpolacao: 'suave' (padrão, Hermite monótono por ponto, sem passar dos valores das fatias) ou 'linear'.
  *   passo: a distância entre planos, em mm (padrão: o maior entre 2,5 e um quadragésimo do comprimento do corpo); os planos das fatias entram sempre.
  *   tolerancia: quanto a volta reamostrada pode ficar do ponto dado, em mm (padrão 0,1); o ponto dado, sem nome, que fica mais longe sai em `avisos`.
- *   vivos: nomes de marcos ('inicio' é a âncora sem nome) cuja linha ao longo do corpo fica viva, sem arredondar: o bordo de fuga de uma asa.
+ *   vivos: nomes de marcos ('inicio' é a âncora sem nome) cuja linha ao longo do corpo fica viva, sem arredondar: uma quina que não arredonda.
  * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe, lacos, trechos, avisos, corpo, pontoDe }: o de gaiolaPorLacos, mais `corpo`
  *   { planos, pontosPorVolta, fatias: [{ nome, em, laco, pontosDados, perdidos }], marcos: { nome: indice }, perdas } e `pontoDe(laco, i)`, o nome do
  *   ponto de índice i (ou de um marco) na volta do laço (nome ou posição). O passo leva os grupos `tampaInicio`, `tampaFim` e, para cada par de fatias
  *   seguidas, `entre_<a>_<b>` (que inclui a tampa, quando o par é o primeiro ou o último), citáveis por `parte` como origem do passo.
  * exemplo:
- *   corpoPorFatias({ nome: 'casco', eixo: 'x', passo: 10,
+ *   corpoPorFatias({ nome: 'corpo', eixo: 'x', passo: 10,
  *     fatias: [
- *       { em: 0, contorno: [{ nome: 'quilha', ponto: [0, -4] }, [5, -3], [6, 0], [4, 4], [0, 5], [-4, 4], [-6, 0], [-5, -3]] },
- *       { em: 80, contorno: [{ nome: 'quilha', ponto: [0, -12] }, [14, -8], [18, 0], [14, 10], [0, 14], [-14, 10], [-18, 0], [-14, -8]] },
- *       { em: 140, contorno: [{ nome: 'quilha', ponto: [0, -7] }, [8, -5], [10, 0], [7, 6], [0, 8], [-7, 6], [-10, 0], [-8, -5]] }],
- *     vivos: ['quilha'] })
- * peça: procedural/nucleo/corpo-por-fatias.test.mjs (o exemplo, o casco com quilha viva, medido pelas réguas de malha; a prova em peças reais está na fatia 7 do plano da forma exata).
+ *       { em: 0, contorno: [{ nome: 'borda', ponto: [0, -4] }, [5, -3], [6, 0], [4, 4], [0, 5], [-4, 4], [-6, 0], [-5, -3]] },
+ *       { em: 80, contorno: [{ nome: 'borda', ponto: [0, -12] }, [14, -8], [18, 0], [14, 10], [0, 14], [-14, 10], [-18, 0], [-14, -8]] },
+ *       { em: 140, contorno: [{ nome: 'borda', ponto: [0, -7] }, [8, -5], [10, 0], [7, 6], [0, 8], [-7, 6], [-10, 0], [-8, -5]] }],
+ *     vivos: ['borda'] })
+ * peça: procedural/nucleo/corpo-por-fatias.test.mjs (o exemplo, o corpo com borda viva, medido pelas réguas de malha; a prova em peças reais está na fatia 7 do plano da forma exata).
  * FIM DA FICHA
  *
  * Função pura, sem Three.js e sem domínio. Cada contorno é partido nos marcos (a âncora, o primeiro ponto, é sempre um) em voltas, e cada volta é
@@ -44,11 +47,12 @@
  * iguais, e só o de dois pontos deixa os pontos desta operação onde estão; a tampa em escada liga o ponto de índice 1 + j ao de N - j (N = pontos).
  * O ponto de índice i de um laço se chama `${nome}_${laço}_p<i>_0`, que `pontoDe` devolve. O laço de um plano que não é fatia se chama `<eixo><em>` (o ponto decimal vira `_`).
  *
- * O QUE ESTA OPERAÇÃO TIRA. O `loft` tem 24 seções e mil pontos por forma, seção convexa e polo digitado para fechar a ponta: aqui as fatias são
- * quantas a receita der, o contorno tem os pontos que quiser e pode ser côncavo no meio do corpo (na ponta, só se a escada da tampa o cobre, o que a âncora decide e a recusa confere), a tampa sai do contorno e a
- * volta, de fatia a fatia, é reamostrada sem a receita escrever o contorno inteiro de novo em cada seção. O que fica: a gaiola pede 2,5 mm entre
- * planos, e o corpo não fecha em ponta de um ponto só (a última fatia é um contorno pequeno, de segmento médio de ao menos 0,05 mm; a razão entre os tamanhos de duas fatias não limita nada, medida de 2 a 400);
- * a superfície é lisa por subdivisão, e a quina só fica viva onde um marco está em `vivos`.
+ * O QUE DÁ E O QUE NÃO DÁ. Dá: as fatias são quantas a receita der (o `loft` do núcleo aceita 40 seções e o contorno côncavo com polo, medido), o contorno tem os
+ * pontos que quiser, diferentes de uma fatia a outra, e pode ser côncavo no meio do corpo (na ponta, só se a escada da tampa o cobre, o que a âncora decide
+ * e a recusa confere); a tampa sai plana do próprio contorno, sem polo, e a volta é reamostrada de fatia a fatia sem a receita escrever o contorno de novo em
+ * cada seção. Não dá: a gaiola pede 2,5 mm entre planos; o corpo não fecha em ponta de um ponto só (a última fatia é um contorno pequeno, de segmento médio de ao
+ * menos 0,05 mm; a razão entre os tamanhos de duas fatias não limita nada, medida de 2 a 400); a quina viva só corre ao longo do corpo, e a borda da tampa
+ * sai arredondada pela subdivisão; a superfície é lisa por subdivisão e a quina só fica viva onde um marco está em `vivos`.
  *
  * AS RECUSAS. Cada uma diz a fatia, o valor recebido, o que se espera e o conserto. Menos de duas fatias; fatia sem `em` finito ou sem contorno de três pontos
  * ou mais; ponto que não é [u, v] finito; nome de ponto repetido; fatias fora de ordem, na mesma posição ou a menos de 2,5 mm uma da outra; ponto repetido

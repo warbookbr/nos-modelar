@@ -23,18 +23,18 @@ function volumeDaGaiola(g) {
   }
   return Math.abs(v / 6);
 }
-const casco = (extra = {}) => corpoPorFatias({
-  nome: 'casco', eixo: 'x', passo: 10,
+const corpo = (extra = {}) => corpoPorFatias({
+  nome: 'corpo', eixo: 'x', passo: 10,
   fatias: [
-    { em: 0, contorno: [{ nome: 'quilha', ponto: [0, -4] }, [5, -3], [6, 0], [4, 4], [0, 5], [-4, 4], [-6, 0], [-5, -3]] },
-    { em: 80, contorno: [{ nome: 'quilha', ponto: [0, -12] }, [14, -8], [18, 0], [14, 10], [0, 14], [-14, 10], [-18, 0], [-14, -8]] },
-    { em: 140, contorno: [{ nome: 'quilha', ponto: [0, -7] }, [8, -5], [10, 0], [7, 6], [0, 8], [-7, 6], [-10, 0], [-8, -5]] }],
-  vivos: ['quilha'], ...extra,
+    { em: 0, contorno: [{ nome: 'borda', ponto: [0, -4] }, [5, -3], [6, 0], [4, 4], [0, 5], [-4, 4], [-6, 0], [-5, -3]] },
+    { em: 80, contorno: [{ nome: 'borda', ponto: [0, -12] }, [14, -8], [18, 0], [14, 10], [0, 14], [-14, 10], [-18, 0], [-14, -8]] },
+    { em: 140, contorno: [{ nome: 'borda', ponto: [0, -7] }, [8, -5], [10, 0], [7, 6], [0, 8], [-7, 6], [-10, 0], [-8, -5]] }],
+  vivos: ['borda'], ...extra,
 });
 const duas = (c0, c1, extra = {}) => corpoPorFatias({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: c0 }, { em: 40, contorno: c1 }], ...extra });
 
 describe('corpoPorFatias: a malha', () => {
-  const g = casco();
+  const g = corpo();
   const m = medirPeca(receitaDe(g, 2));
 
   it('o exemplo da ficha fecha, sem órfão, aresta solta, face degenerada nem face fina, sem aviso, e o corpo vai de uma ponta à outra', () => {
@@ -81,8 +81,8 @@ describe('corpoPorFatias: a malha', () => {
   });
 
   it('é determinístico, bit a bit', () => {
-    expect(JSON.stringify(casco().pontos)).toBe(JSON.stringify(g.pontos));
-    expect(JSON.stringify(casco().passo)).toBe(JSON.stringify(g.passo));
+    expect(JSON.stringify(corpo().pontos)).toBe(JSON.stringify(g.pontos));
+    expect(JSON.stringify(corpo().passo)).toBe(JSON.stringify(g.passo));
   });
 });
 
@@ -143,17 +143,17 @@ describe('corpoPorFatias: posições e nomes', () => {
   });
 
   it('pontoDe devolve o nome do ponto de cada índice, que existe na gaiola, e o marco é o do índice dele; a âncora sem nome é inicio', () => {
-    const g = casco();
+    const g = corpo();
     const N = g.corpo.pontosPorVolta;
     const todos = new Set(Object.keys(g.pontos));
     for (let i = 0; i < N; i++) expect(todos.has(g.pontoDe('f1', i)), `índice ${i}`).toBe(true);
     expect(new Set(Array.from({ length: N }, (_, i) => g.pontoDe('f1', i))).size).toBe(N);
-    expect(g.pontoDe('f1', 'quilha')).toBe(g.pontoDe('f1', g.corpo.marcos.quilha));
-    expect(g.corpo.marcos.quilha).toBe(0);
-    expect(g.pontosMm[g.pontoDe('f1', 'quilha')]).toEqual([80, 0, -12]);
+    expect(g.pontoDe('f1', 'borda')).toBe(g.pontoDe('f1', g.corpo.marcos.borda));
+    expect(g.corpo.marcos.borda).toBe(0);
+    expect(g.pontosMm[g.pontoDe('f1', 'borda')]).toEqual([80, 0, -12]);
     expect(corpoPorFatias({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: circ(5, 8) }, { em: 20, contorno: circ(5, 8) }] }).corpo.marcos).toEqual({ inicio: 0 });
     expect(g.pontoDe(0, 0)).toBe(g.pontoDe('f0', 0));
-    expect(g.pontoDe('x10', 3)).toMatch(/^casco_x10_p3_0$/);
+    expect(g.pontoDe('x10', 3)).toMatch(/^corpo_x10_p3_0$/);
   });
 
   it('os marcos recebem os pontos pela fração do perímetro de cada volta, em média nas fatias, no mínimo um cada, e o total é o pedido', () => {
@@ -203,21 +203,21 @@ describe('corpoPorFatias: posições e nomes', () => {
   });
 
   it('os grupos tampaInicio, tampaFim e entre_<a>_<b> vão no passo, e as tampas têm as faces da escada', () => {
-    const g = casco();
+    const g = corpo();
     expect(g.passo.grupos.map((x) => x.nome)).toEqual(['tampaInicio', 'tampaFim', 'entre_f0_f1', 'entre_f1_f2']);
     const ini = g.passo.grupos[0].pontos;
     expect(ini.length).toBe(g.corpo.pontosPorVolta);
-    expect(ini.every((n) => n.startsWith('casco_f0_'))).toBe(true);
-    expect(g.passo.grupos[1].pontos.every((n) => n.startsWith('casco_f2_'))).toBe(true);
-    expect(g.passo.grupos[2].pontos.every((n) => /^casco_(f0|f1|x\d+)_/.test(n))).toBe(true);
+    expect(ini.every((n) => n.startsWith('corpo_f0_'))).toBe(true);
+    expect(g.passo.grupos[1].pontos.every((n) => n.startsWith('corpo_f2_'))).toBe(true);
+    expect(g.passo.grupos[2].pontos.every((n) => /^corpo_(f0|f1|x\d+)_/.test(n))).toBe(true);
     const m = medirPeca({ ...receitaDe(g, 1), PASSOS: [['subdivisao', { origemId: 1, ...g.passo, niveis: 1 }], ['parte', { nome: 'ponta', sel: { origem: { op: 'subdivisao', id: 1, grupo: 'tampaFim' } } }]] });
     expect(m.arestasSoltas).toBe(0);
   });
 
   it('com vivos, o passo traz o vinco vivo entre os trechos do marco, e sem vivos não traz nenhum', () => {
-    const g = casco();
-    expect(g.passo.vincos.map((v) => [v.nome, v.nitidez])).toEqual([['vivo_quilha', 'viva']]);
-    expect(casco({ vivos: undefined }).passo.vincos ?? []).toEqual([]);
+    const g = corpo();
+    expect(g.passo.vincos.map((v) => [v.nome, v.nitidez])).toEqual([['vivo_borda', 'viva']]);
+    expect(corpo({ vivos: undefined }).passo.vincos ?? []).toEqual([]);
     const inicio = corpoPorFatias({ nome: 'c', eixo: 'x', vivos: ['inicio'], fatias: [{ em: 0, contorno: circ(5, 8) }, { em: 20, contorno: circ(5, 8) }] });
     expect(inicio.passo.vincos.length).toBe(1);
     expect(medirPeca(receitaDe(inicio, 1)).arestasSoltas).toBe(0);
@@ -381,7 +381,7 @@ describe('corpoPorFatias: as recusas', () => {
     recusa(ok({ interpolacao: 'cubica' }), /'suave' ou 'linear', e veio "cubica"/);
     recusa(ok({ tolerancia: 0 }), /tolerancia é número positivo/);
     recusa(ok({ passo: 1 }), /passo é número em mm de 2,5 para cima.*veio 1/);
-    recusa(ok({ vivos: 'quilha' }), /vivos é a lista de nomes de marco/);
+    recusa(ok({ vivos: 'borda' }), /vivos é a lista de nomes de marco/);
     recusa(ok({ vivos: ['inicio', 'inicio'] }), /vivos cita o marco 'inicio' mais de uma vez/);
     recusa(ok({ vivos: ['nada'] }), /vivos cita o marco 'nada'.*'inicio'/);
   });
