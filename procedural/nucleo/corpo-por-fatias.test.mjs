@@ -309,6 +309,38 @@ describe('corpoPorFatias: os cantos', () => {
   });
 });
 
+describe('corpoPorFatias: o corpo que afina', () => {
+  const circ16 = circ(10, 16);
+  const girar = (c, g) => { const a = (g * Math.PI) / 180; return c.map(([u, v]) => [u * Math.cos(a) - v * Math.sin(a), u * Math.sin(a) + v * Math.cos(a)]); };
+  const com = (g, extra = {}) => corpoPorFatias({ nome: 'c', eixo: 'x', passo: 20, pontos: 16, ...extra, fatias: [{ em: 0, contorno: circ16 }, { em: 40, contorno: girar(circ16, g) }] });
+
+  it('a âncora girada avisa quando a área do meio cai abaixo da fração, com as fatias, a área e o conserto; sem giro não avisa', () => {
+    expect(com(0).avisos.filter((a) => a.ref === 'corpoAfina')).toEqual([]);
+    expect(com(10).avisos.filter((a) => a.ref === 'corpoAfina')).toEqual([]);
+    const a = com(45).avisos.find((x) => x.ref === 'corpoAfina');
+    expect(a).toMatchObject({ fatias: ['f0', 'f1'], em: 20, areaMenorDasFatiasMm2: 306.1 });
+    expect(a.areaMm2).toBeCloseTo(261.3, 1);
+    expect(a.razao).toBeCloseTo(0.854, 2);
+    expect(a.texto).toMatch(/entre as fatias 'f0' e 'f1', o plano em 20 mm tem área 261,3 mm², 85% da menor das duas fatias \(306,1 mm²\), abaixo de 90%.*nomeie os marcos que correspondem/);
+    expect(com(90).avisos.find((x) => x.ref === 'corpoAfina').areaMm2).toBeCloseTo(153.1, 1);
+  });
+
+  it('areaMinimaDoMeio declara a fração: 0 desliga, 0,8 deixa passar os 85%, e fora de 0 a 1 é recusado', () => {
+    expect(com(45, { areaMinimaDoMeio: 0 }).avisos.filter((x) => x.ref === 'corpoAfina')).toEqual([]);
+    expect(com(45, { areaMinimaDoMeio: 0.8 }).avisos.filter((x) => x.ref === 'corpoAfina')).toEqual([]);
+    expect(com(45, { areaMinimaDoMeio: 0.86 }).avisos.filter((x) => x.ref === 'corpoAfina').length).toBe(1);
+    for (const v of [-0.1, 1.5, 'a']) expect(() => com(0, { areaMinimaDoMeio: v })).toThrow(/areaMinimaDoMeio é a fração, de 0 a 1/);
+  });
+
+  it('o aviso é um por par de fatias, o do plano de menor área, e só conta o par que afina', () => {
+    const tres = corpoPorFatias({ nome: 'c', eixo: 'x', passo: 10, pontos: 16, fatias: [{ em: 0, contorno: circ16 }, { em: 40, contorno: girar(circ16, 90) }, { em: 80, contorno: girar(circ16, 90) }] });
+    const avisos = tres.avisos.filter((x) => x.ref === 'corpoAfina');
+    expect(avisos.length).toBe(1);
+    expect(avisos[0].fatias).toEqual(['f0', 'f1']);
+    expect(avisos[0].em).toBe(20);
+  });
+});
+
 describe('corpoPorFatias: as recusas', () => {
   const ok = (f = {}) => ({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: circ(5, 8) }, { em: 20, contorno: circ(5, 8) }], ...f });
   const com = (i, mudanca) => { const o = ok(); o.fatias[i] = { ...o.fatias[i], ...mudanca }; return o; };

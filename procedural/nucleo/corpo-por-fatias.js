@@ -78,6 +78,8 @@ export const SEGMENTO_MEDIO_MINIMO_MM = 0.05;
 const TOLERANCIA_DO_DEGRAU = 1e-9;
 /* o giro, em graus, de um vértice dado a partir do qual ele é um canto: a reamostragem o guarda como ponto da volta, quando houver pontos bastantes */
 export const ANGULO_DE_CANTO_PADRAO = 20;
+/* a área de um plano entre duas fatias, em fração da menor das duas, abaixo da qual sai o aviso `corpoAfina` (fatias com a âncora girada afinam o meio) */
+export const AREA_MINIMA_DO_MEIO_PADRAO = 0.9;
 export const PONTOS_MINIMOS_DA_VOLTA = 8;
 export const PONTOS_PADRAO_MINIMO = 16;
 export const PONTOS_PADRAO_MAXIMO = 64;
@@ -266,6 +268,8 @@ export function corpoPorFatias(o = {}) {
   if (!['suave', 'linear'].includes(interpolacao)) falha(`interpolacao é 'suave' ou 'linear', e veio ${JSON.stringify(o.interpolacao)}`);
   const tolerancia = o.tolerancia ?? TOLERANCIA_DA_REAMOSTRAGEM_MM;
   if (!(numero(tolerancia) && tolerancia > 0)) falha(`tolerancia é número positivo em mm, e veio ${JSON.stringify(o.tolerancia)}`);
+  const areaMinimaDoMeio = o.areaMinimaDoMeio ?? AREA_MINIMA_DO_MEIO_PADRAO;
+  if (!(numero(areaMinimaDoMeio) && areaMinimaDoMeio >= 0 && areaMinimaDoMeio <= 1)) falha(`areaMinimaDoMeio é a fração, de 0 a 1, da menor área das duas fatias vizinhas abaixo da qual o aviso corpoAfina sai (0 desliga), e veio ${JSON.stringify(o.areaMinimaDoMeio)}`);
   const anguloDeCanto = o.anguloDeCanto ?? ANGULO_DE_CANTO_PADRAO;
   if (!(numero(anguloDeCanto) && anguloDeCanto > 0 && anguloDeCanto < 180)) falha(`anguloDeCanto é o giro em graus, de 0 a 180 (exclusive), a partir do qual um vértice dado é um canto que a volta guarda, e veio ${JSON.stringify(o.anguloDeCanto)}`);
   if (o.vivos != null && !(Array.isArray(o.vivos) && o.vivos.every((v) => typeof v === 'string' && v))) falha(`vivos é a lista de nomes de marco, e veio ${JSON.stringify(o.vivos)}`);
@@ -413,6 +417,24 @@ export function corpoPorFatias(o = {}) {
       falha(`${quem} ${toque ? `se cruza (o lado ${toque[0]} e o ${toque[1]} se tocam)` : `fica com área ${br(area)} mm²`}; ${l.fatia != null ? `a volta tem pontos de menos para o contorno: suba pontos, ou nomeie o canto como marco` : 'o ponto de mesmo índice liga as fatias e o contorno torce no caminho: comece todas as fatias no mesmo detalhe (a âncora), nomeie os marcos que correspondem, ou ponha uma fatia entre elas'}`);
     }
   });
+
+  /* o meio que afina: a volta interpolada com área bem menor que a das duas fatias vizinhas (a âncora girada, marcos trocados) */
+  for (let i = 0; i + 1 < F.length; i++) {
+    const areaDe = (fi) => areaComSinal(loops[fi]);
+    const menor = Math.min(areaDe(i), areaDe(i + 1));
+    let pior = null;
+    lacosDados.forEach((l, r) => {
+      if (l.fatia != null || l.em <= ems[i] || l.em >= ems[i + 1]) return;
+      const razao = areaComSinal(voltas[r]) / menor;
+      if (!pior || razao < pior.razao) pior = { razao, em: l.em, area: areaComSinal(voltas[r]) };
+    });
+    if (pior && pior.razao < areaMinimaDoMeio) {
+      avisos.push({
+        ref: 'corpoAfina', fatias: [F[i].nome, F[i + 1].nome], em: pior.em, areaMm2: Number(pior.area.toFixed(1)), areaMenorDasFatiasMm2: Number(menor.toFixed(1)), razao: Number(pior.razao.toFixed(3)),
+        texto: `entre as fatias ${citar(F[i].nome)} e ${citar(F[i + 1].nome)}, o plano em ${br(pior.em)} mm tem área ${br(pior.area, 1)} mm², ${br(pior.razao * 100, 0)}% da menor das duas fatias (${br(menor, 1)} mm²), abaixo de ${br(areaMinimaDoMeio * 100, 0)}%: o corpo afina no meio, em geral porque a âncora (o primeiro ponto) ou os marcos não correspondem de uma fatia à outra; comece as duas no mesmo detalhe, ou nomeie os marcos que correspondem`,
+      });
+    }
+  }
 
   /* os trechos da gaiola: um por segmento da volta, de dois pontos. A gaiola reamostra cada trecho com pontos a distâncias iguais, e só o trecho
      de dois pontos deixa os pontos desta operação (os marcos, os vértices que ficaram) onde estão; a tampa em escada liga 1 + j a N - j */
