@@ -46,7 +46,7 @@ Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no moment
 
 Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia de um dos planos ativos.
 
-Ler antes de começar, num orçamento de 29.700 bytes (linha de base de 59.061 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 23.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/modelar/INDEX.md`
