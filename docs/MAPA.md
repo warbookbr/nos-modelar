@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1819 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1821 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -428,6 +428,10 @@
 - `pergunta-7-para-quem-o-projeto-serve.md` — Pergunta 7: para quem o projeto serve (primeiro levantamento)
 - `proposta-de-organizacao-dos-documentos.md` — Proposta de organização dos documentos, para a decisão da pessoa
 
+## docs/modelar/banco-de-provas/saida-de-manual-2026-11-13/
+
+- `README.md` — Saída de manual: pesquisa e medidas
+
 ## docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/
 
 - `ATRITOS.md` — Sedã em chassi e lataria: atritos do alinhamento e do rascunho
@@ -549,6 +553,7 @@
 - `2026-11-13-nucleo-para-quem-escreve-receita.md` — Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
 - `2026-11-13-organizacao-dos-documentos.md` — Organização dos documentos: uma finalidade por pasta e nada encerrado na área de trabalho
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
+- `2026-11-13-saida-de-manual-a-partir-da-montagem.md` — Saída de manual a partir da montagem: lista de peças e passo a passo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar

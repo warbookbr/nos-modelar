@@ -42,3 +42,4 @@ Evidência não governa trabalho novo. Cada linha abaixo é o documento de entra
 - [Organização dos documentos: o levantamento das decisões em vigor](organizacao-dos-documentos-2026-11-13/README.md) — `organizacao-dos-documentos-2026-11-13`
 - [Revisão das verificações e dos testes: medidas e veredito](revisao-das-verificacoes-2026-11-13/README.md) — `revisao-das-verificacoes-2026-11-13`
 - [Revisão do projeto para o trabalho da IA: medidas e relatório](revisao-do-projeto-2026-11-13/README.md) — `revisao-do-projeto-2026-11-13`
+- [Saída de manual: pesquisa e medidas](saida-de-manual-2026-11-13/README.md) — `saida-de-manual-2026-11-13`
