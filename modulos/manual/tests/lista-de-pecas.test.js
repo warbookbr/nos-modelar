@@ -1,3 +1,4 @@
+/* lista-de-pecas.test.js — a lista de peças sobre uma montagem sintética: agrupamento, caixa em milímetro, determinismo e ausência de nome de peça no módulo. */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

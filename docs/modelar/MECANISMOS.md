@@ -21,7 +21,7 @@ O que existe no projeto além do código que constrói formas, o que cada coisa 
 | Guardas e réguas | Conferem cada peça do acervo: fechada, sem lasca, sem interseção | Nos gates e à mão por peça | `tools/modelar/guardas/`, `tools/modelar/reguas-de-malha/` |
 | Famílias | Peças que nascem de medidas, como roda e dobradiça | Ao modelar peça padrão | `procedural/familias/` |
 | Extensões | Operações a mais do núcleo, fora do registro base | Ao escrever receita | `procedural/extensoes/` |
-| Módulos | Exportadores, esboço, textura, contorno da imagem | Conforme a saída pedida | `modulos/` |
+| Módulos | Exportadores, esboço, textura, contorno da imagem, manual (lista de peças e passo a passo de uma montagem) | Conforme a saída pedida | `modulos/` |
 | Servidor de ferramentas | A porta por onde a IA chama as ferramentas sem digitar comando | Em sessão com MCP | `tools/mcp/` |
 | Banco de provas | As medidas, imagens e atritos de cada objeto modelado | Ao pesquisar o que já se tentou | `docs/modelar/banco-de-provas/` |
 | Mapa e índices | As listas geradas de tudo que existe | Para achar um arquivo | [`MAPA.md`](../MAPA.md), [`INDEX.md`](INDEX.md) |
