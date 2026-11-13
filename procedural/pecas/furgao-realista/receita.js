@@ -333,9 +333,15 @@ export const TABELA = {
   farol_alto_raio: 78,
   farol_concha_fundura: 58, // da borda ao fundo das duas conchas grandes
   farol_concha_encosto: 1, // a borda de cada concha entra 1 mm na lente de 2 mm, no ponto dela mais à frente do plano de ajuste: a lente fica a 1 mm da borda por trás e 1 mm pela frente, e a margem cobre o erro do modelo da lente abaixo
-  farol_lente_x_curva: 705, // a lente do farol (a malha da chapa, medida em 2026-11-12) acompanha a frente analítica até x 705 e dali cai como um arco: z = (x - 705)² / (2 · 350) abaixo do plano, de modo que a lente de x 808 fica 15 mm atrás da de x 640
-  farol_lente_raio_curva: 350,
-  farol_carcaca_recuo: 10, // a carcaça escura atrás das conchas é o contorno do farol encolhido 10 mm, sem a parede do esboço
+  farol_lente_queda_x: [[700, 0], [720, 1.1], [740, 2.4], [760, 5.2], [780, 8.5], [800, 12.6], [820, 18.6], [840, 24.7], [855, 31.9], [870, 38]], // a frente da lente do farol (a malha da chapa, medida em 2026-11-12, igual em todo y) acompanha o plano até x 700 e dali cai: [x, queda em mm abaixo do plano]; a superfície analítica só começa a cair em x 740
+  farol_lente_y_curva: 1032, // acima dele a malha da lente cai 0,043 mm por mm (medida na malha: 0,34 mm em y 1040, 1,3 em 1065, 1,9 em 1075), junto da boca do capô
+  farol_lente_y_queda: 0.043,
+  farol_carcaca_recuo: 8.1, // a carcaça escura atrás das conchas é uma caixa: o fundo e as paredes no contorno do farol encolhido 8,1 mm: o aro desce 6 mm sobre a lente e a perna da aba tem a face de dentro a 7,94 mm da borda (medido: com 8 a parede tocava a perna e com 9 sobrava uma fresta de 1 mm por onde se via o fundo da bancada)
+  farol_carcaca_entra: 0.5, // o topo das paredes entra 0,5 mm na lente de 2 mm, pela face de trás
+  farol_carcaca_aba_largura: 4, // a aba da caixa sai 4 mm para fora da parede (com 5 chegava a 0,07 mm da perna da aba do vão)
+  farol_carcaca_aba_fundura: 24, // e fica 24 mm atrás da lente, 4 mm abaixo do fim da perna da aba do vão (20 mm), para fechar a fresta entre a parede e a perna
+  farol_carcaca_parede: 2, // a espessura das paredes, para dentro do contorno
+  farol_carcaca_passo: 14, // os trechos das paredes em volta do contorno, em mm
   farol_carcaca_espessura: 6,
   farol_concha_lados: 60, // os lados da revolução das conchas
   farol_concha_espessura: 2.5, // a parede de metal das conchas e do copinho
@@ -752,6 +758,14 @@ export function gerarPassos(T) {
     passos.push(['rotaciona', { eixo: 'x', graus: c.grausX, pivo: [sinal * c.pivo[0], c.pivo[1], c.pivo[2]].map(mm), sel }]);
     passos.push(['parte', { nome: `carcacaFarol${lado}`, sel }]);
     passos.push(['material', { sel, usa: 'plasticoLiso' }]);
+    const pa = c.paredes[k]; const idParede = id + 1; const selParede = { origem: { op: 'subdivisao', id: idParede } };
+    passos.push(['subdivisao', { origemId: idParede, vertices: pa.vertices, faces: pa.faces, borda: 'cantos', niveis: 0, espessura: mm(T.farol_carcaca_parede) }]);
+    passos.push(['parte', { nome: `carcacaFarol${lado}`, sel: selParede }]);
+    passos.push(['material', { sel: selParede, usa: 'plasticoLiso' }]);
+    const idAba = id + 2; const selAba = { origem: { op: 'subdivisao', id: idAba } };
+    passos.push(['subdivisao', { origemId: idAba, vertices: pa.aba.vertices, faces: pa.aba.faces, borda: 'cantos', niveis: 0, espessura: mm(T.farol_carcaca_parede) }]);
+    passos.push(['parte', { nome: `carcacaFarol${lado}`, sel: selAba }]);
+    passos.push(['material', { sel: selAba, usa: 'plasticoLiso' }]);
   });
   /* a grade (2026-11-05): um terceiro vão pelo contorno, sobre a chapa do último farol; a lente escura recua `grade_recuo` para dentro do
      vão, dentro da perna da aba, e as três barras são extrusões retas que nascem na lente e ficam atrás da superfície da chapa; a aba, a
@@ -925,6 +939,7 @@ export const CONTATOS = [
     ...conchas.map((concha) => ({ par: [luz, concha], motivo: 'a borda da concha entra 1 mm na lente de 2 mm, no ponto dela mais à frente do plano de ajuste; o resto da borda fica a até uns 6 mm atrás da lente, que cai como um arco na quina' })),
     { par: [luz, copo], motivo: 'a borda do copinho da lâmpada de posição entra 1 mm na lente, como a das conchas' },
     ...conchas.map((concha) => ({ par: [concha, lampadas], motivo: 'o soquete da lâmpada sai 6 mm atrás do fundo da concha, passa por ele e leva o bulbo 12 mm à frente do fundo' })),
+    { par: [luz, carcaca], motivo: 'o topo das paredes da carcaça entra 0,5 mm na lente de 2 mm, pela face de trás, em toda a volta do contorno encolhido 8,1 mm: a caixa fecha o farol por trás da lente' },
     { par: [carcaca, lampadas], motivo: 'o topo da carcaça entra 1 mm na ponta de trás do soquete que mais fundo vai: é onde a placa se apoia nas lâmpadas' },
   ].filter((c) => c.par[0] !== c.par[1])),
   ...LUZES_POR_DENTRO.flatMap(([luz, refletor, lampadas]) => [
@@ -1233,8 +1248,8 @@ const receita = {
         },
         {
           nome: `carcacaFarol${lado}`,
-          forma: `fundo escuro atrás das conchas do farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: placa de 6 mm no contorno do farol encolhido 10 mm, com a inclinação em y da frente, tocando a ponta de trás dos soquetes; fecha o oco do furgão que se veria entre as conchas`,
-          tecnica: 'extrusão em z do contorno do farol encolhido (cantos de raio 35), girada em x para a inclinação das conchas; material plástico escuro',
+          forma: `caixa escura atrás das conchas do farol ${lado === 'Esquerdo' ? 'esquerdo' : 'direito'}: fundo de 6 mm inclinado como a frente e paredes de 2 mm em toda a volta, do fundo à lente, no contorno encolhido 8,1 mm, com aba de 4 mm`,
+          tecnica: 'extrusão em z do contorno encolhido, girada em x para a inclinação das conchas, e subdivisão sem níveis de uma faixa de quadriláteros em volta dele, com o topo na lente medida e a parede para dentro; plástico escuro',
         },
       ]),
       ...['Esquerda', 'Direita'].map((lado) => ({

@@ -818,7 +818,7 @@ export function derivar(T) {
   /* o plástico de baixo, por fora da chapa: os pontos dele entram no TOPO junto com os da gaiola */
   const plastico = [...derivarPlastico(T, f), ...derivarBasesDoRetrovisor(T, f), ...derivarColunasDaJanela(T, f)];
   const { refletores, lampadas, farol, carcacaDoFarol } = derivarLuzesPorDentro(T, f);
-  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes]), ...refletores.flatMap((r) => [...r.capa.posicoes])]);
+  const pontosMm = new Map([...vertices.map((n) => [n, posicoes.get(n)]), ...plastico.flatMap((pl) => [...pl.posicoes]), ...cristais.flatMap((c) => [...c.posicoes]), ...lentes.flatMap((c) => [...c.posicoes]), ...refletores.flatMap((r) => [...r.capa.posicoes]), ...carcacaDoFarol.paredes.flatMap((pa) => [...pa.posicoes, ...pa.aba.posicoes])]);
   const pontos = Object.fromEntries([...pontosMm].map(([n, p]) => [n, p.map(m)]));
 
   /* as quatro rodas da família `roda-pneu`, no pneu da prancha, na bitola e no entre-eixos, apoiadas no chão: a chamada da família e o centro de cada uma */
