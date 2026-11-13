@@ -45,3 +45,9 @@ Primeiro D2 e B1, que evitam rodadas perdidas todo dia. Depois B2, C1 e C2, que 
 ## O que este relatório não cobre
 
 As quatro reprovações do CI de 2026-11-09 e duas de 2026-11-12 não foram lidas. Quantas vezes cada gate local parou um envio não tem registro. O uso real da leitura por sessão não foi medido. A frente de validação por objetos de prova, fatia 4 do plano, não começou.
+
+## Decisão da pessoa, em 2026-11-13
+
+A pessoa aprovou todas as recomendações de mudança dos grupos B, C, D, E e F, com a ordem recomendada acima. O item C4 (documentos só alcançados por índice) fica sem ação até a medida do que as sessões abrem de fato, que ela também aprovou fazer, junto com trazer para este relatório a comparação com projetos comparáveis. Ela tirou deste plano a validação por objetos de prova: "a modelagem eu vejo depois".
+
+Ela pediu um plano próprio para a revisão das verificações e dos testes, uma por uma, com a medida de estragar o código de propósito e ver quais testes percebem. E pediu que a análise cubra os mecanismos que ficaram de fora: as skills, a bancada com o crítico visual, o servidor de ferramentas, o backlog, o `comecar` e a ficha de capacidade. Para esses, a pergunta é dela: "se melhorássemos isso de alguma maneira, o que aconteceria?". O módulo de pesquisa não entra como mecanismo; é documentação e cai na medida de leitura.
