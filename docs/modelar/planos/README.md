@@ -8,6 +8,7 @@
 2. [costuras e furos limpos](2026-11-09-costuras-e-furos-limpos.md). Território: `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`. Em aberto: a fresta junto da tampa, o aviso do `subtrair` que não corta, a régua da costura num gate e o fechamento.
 3. [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md). Território: `docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/`. Em aberto: tudo.
 4. [saída de manual a partir da montagem](2026-11-13-saida-de-manual-a-partir-da-montagem.md). Território: `modulos/manual/` e `docs/modelar/banco-de-provas/saida-de-manual-2026-11-13/`. Em aberto: tudo.
+5. [kukri](2026-11-13-kukri.md). Território: `procedural/pecas/kukri/` e `docs/modelar/banco-de-provas/kukri-2026-11-13/`. Em aberto: o alinhamento com a pessoa.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

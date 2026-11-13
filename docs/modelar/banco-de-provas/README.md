@@ -39,6 +39,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Furgão realista: alinhamento](furgao-realista-2026-10-30/ALINHAMENTO.md) — `furgao-realista-2026-10-30`
   - [Furgão realista: atritos](furgao-realista-2026-10-30/ATRITOS.md) — `furgao-realista-2026-10-30`
 - [Fonte do objeto-prova da importação de código](importar-objeto-2026-10-15/FONTE.md) — `importar-objeto-2026-10-15`
+- [Kukri: o custo de modelar um objeto simples](kukri-2026-11-13/README.md) — `kukri-2026-11-13`
 - [Resultado da medida de leitura](leitura-por-demanda-2026-10/RESULTADO.md) — `leitura-por-demanda-2026-10`
 - [Limites do sólido por laços — provas das fatias 1 a 3](limites-do-solido-por-lacos-2026-11-05/README.md) — `limites-do-solido-por-lacos-2026-11-05`
 - [Navegação de receitas, 2026-11-05](navegacao-de-receitas-2026-11-05/README.md) — `navegacao-de-receitas-2026-11-05`
