@@ -471,8 +471,17 @@ describe('corpoPorFatias: as recusas', () => {
     const U = [[0, 0], [30, 0], [30, 20], [20, 20], [20, 5], [10, 5], [10, 20], [0, 20]];
     const Q = [[0, 0], [30, 0], [30, 20], [0, 20]];
     recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: U }, { em: 20, contorno: Q }] }, /tampa da primeira fatia \('f0', em 0 mm\) não cobre o contorno.*sai do contorno/);
-    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: Q }, { em: 20, contorno: U }] }, /tampa da última fatia \('f1', em 20 mm\) não cobre o contorno.*comece o contorno em outro ponto/);
+    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: Q }, { em: 20, contorno: U }] }, /tampa da última fatia \('f1', em 20 mm\) não cobre o contorno.*comece o contorno em outro vértice, em todas as fatias: o ponto \d+ \(/);
     expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: Q }, { em: 20, contorno: U }, { em: 40, contorno: Q }] })).not.toThrow();
+  });
+
+  it('a tampa recusada diz qual vértice serve de âncora (e com ele passa) ou que nenhum serve e a ponta tem de ser convexa', () => {
+    const L = [[0, 0], [20, 0], [20, 10], [10, 10], [10, 20], [0, 20]];
+    recusa({ nome: 'c', eixo: 'x', pontos: 12, fatias: [{ em: 0, contorno: L }, { em: 20, contorno: L }] }, /o ponto 1 \(20; 0\), 2 \(20; 10\), 4 \(10; 20\) servem nesta fatia/);
+    const girado = L.slice(1).concat(L.slice(0, 1));
+    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 12, fatias: [{ em: 0, contorno: girado }, { em: 20, contorno: girado }] })).not.toThrow();
+    const estrela = Array.from({ length: 10 }, (_, i) => { const raio = i % 2 ? 3 : 10; const a = (Math.PI * 2 * i) / 10; return [raio * Math.cos(a), raio * Math.sin(a)]; });
+    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: estrela }, { em: 20, contorno: estrela }] }, /nenhum ponto de partida da volta de 16 pontos serve: a ponta côncava demais não cabe em escada, então a fatia da ponta tem de ser convexa/);
   });
 
   it('recusa o nome de fatia que colide com o de um plano gerado, e pontoDe com laço ou índice que não existe', () => {

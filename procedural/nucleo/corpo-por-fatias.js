@@ -446,17 +446,32 @@ export function corpoPorFatias(o = {}) {
      positiva ou nula (nula é o degrau sobre um lado reto, que a gaiola resolve), nunca negativa. A soma
      das áreas com sinal dos degraus é a do contorno por identidade (a escada é uma telescópica da fórmula do cadarço), e por isso com nenhum
      negativo eles o cobrem uma vez, sem sobrar para fora */
-  for (const [r, quem] of [[0, 'primeira'], [voltas.length - 1, 'última']]) {
-    const v = voltas[r];
+  const degrauRuim = (v) => {
     const A = []; for (let q = 1; q <= h; q++) A.push(q);
     const B = [0]; for (let q = N - 1; q >= h + 1; q--) B.push(q);
-    let ruim = null;
-    for (let j = 0; j + 1 < A.length && ruim == null; j++) {
-      if (areaComSinal([v[A[j]], v[A[j + 1]], v[B[j + 1]], v[B[j]]]) < -TOLERANCIA_DO_DEGRAU * Math.abs(areaComSinal(v))) ruim = j;
+    for (let j = 0; j + 1 < A.length; j++) {
+      if (areaComSinal([v[A[j]], v[A[j + 1]], v[B[j + 1]], v[B[j]]]) < -TOLERANCIA_DO_DEGRAU * Math.abs(areaComSinal(v))) return j;
     }
-    if (ruim != null) {
-      falha(`a tampa da ${quem} fatia (${citar(lacosDados[r].nome)}, em ${br(lacosDados[r].em)} mm) não cobre o contorno: o degrau ${ruim} da escada, que liga o ponto ${1 + ruim} ao ${(N - ruim) % N} e o ${2 + ruim} ao ${N - ruim - 1}, sai do contorno; a ponta côncava demais não cabe em escada, então faça a fatia da ponta convexa ou mais simples, ou comece o contorno em outro ponto (a âncora decide onde a escada corta)`);
+    return null;
+  };
+  for (const [r, quem, fi] of [[0, 'primeira', 0], [voltas.length - 1, 'última', F.length - 1]]) {
+    const v = voltas[r];
+    const ruim = degrauRuim(v);
+    if (ruim == null) continue;
+    /* a âncora decide onde a escada corta: testa cada ponto da volta como primeiro e diz qual vértice dado serve */
+    const servem = [];
+    for (let q = 1; q < N; q++) {
+      if (degrauRuim(v.slice(q).concat(v.slice(0, q))) != null) continue;
+      const k = F[fi].pts.findIndex((p) => Math.hypot(p[0] - v[q][0], p[1] - v[q][1]) < 1e-6);
+      servem.push({ q, k, ponto: v[q] });
     }
+    const dados = servem.filter((x) => x.k >= 0);
+    const conserto = dados.length
+      ? `comece o contorno em outro vértice, em todas as fatias: o ponto ${dados.slice(0, 3).map((x) => `${x.k} (${br(x.ponto[0])}; ${br(x.ponto[1])})`).join(', ')} serve${dados.length > 1 ? 'm' : ''} nesta fatia`
+      : servem.length
+        ? `nenhum vértice dado serve de primeiro ponto, mas a volta de ${N} pontos fecha com a âncora em ${servem.slice(0, 3).map((x) => `(${br(x.ponto[0])}; ${br(x.ponto[1])})`).join(', ')}: nomeie um ponto ali, ou suba pontos`
+        : `nenhum ponto de partida da volta de ${N} pontos serve: a ponta côncava demais não cabe em escada, então a fatia da ponta tem de ser convexa ou mais simples (ponha a forma côncava numa fatia de dentro)`;
+    falha(`a tampa da ${quem} fatia (${citar(lacosDados[r].nome)}, em ${br(lacosDados[r].em)} mm) não cobre o contorno: o degrau ${ruim} da escada, que liga o ponto ${1 + ruim} ao ${(N - ruim) % N} e o ${2 + ruim} ao ${N - ruim - 1}, sai do contorno; ${conserto}`);
   }
 
   /* a gaiola */
