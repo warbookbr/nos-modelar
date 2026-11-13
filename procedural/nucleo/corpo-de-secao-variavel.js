@@ -12,12 +12,12 @@
  *   eixo: 'x', 'y' ou 'z', o eixo do corpo; o ponto [u, v] da seção são os outros dois eixos na ordem x, y, z.
  *   estacoes: [{ em, centro: [u, v], semieixos: [a, b], expoente? }] em crescente; a seção em `em`: a é o semieixo em u e b em v. Entre
  *     duas estações cada número é interpolado; o corpo vai da primeira à última, e as duas são as tampas.
- *   expoente: o expoente da superelipse (padrão 2, a elipse); 4 dá a seção quase retangular de cantos redondos.
+ *   expoente: o expoente da superelipse, de 1 para cima (padrão 2, a elipse; 4 dá a seção quase retangular de cantos redondos).
  *   interpolacao: 'suave' (padrão, Hermite monótono, sem passar dos valores das estações) ou 'linear'.
  *   passo: a distância entre planos, em mm (padrão 2,5, o mínimo de gaiolaPorLacos); os planos das estações e dos sulcos entram sempre.
  *   sulcos: [{ em, largura, profundidade, perfil? }] a posição do centro do sulco, a largura total e quanto os dois semieixos recuam no
  *     centro. perfil 'arredondado' (padrão): recuo em meio cosseno, 0 nas bordas; 'fundoPlano': recuo pleno na metade central da
- *     largura e meio cosseno nas duas bordas. Os planos entram em passos a partir do centro, dentro da largura.
+ *     largura e meio cosseno nas duas bordas. O plano do centro é obrigatório (a mais de 2,5 mm de qualquer estação ou outro sulco, ou no mesmo plano dela); os dos passos para os lados entram onde cabem.
  *   pontosPorQuarto: pontos de cada um dos quatro trechos da seção, com as duas pontas (padrão 5, uma seção de 16 pontos).
  * devolve: { pontos, pontosMm, alvosMm, passo, nomeDe, lacos, trechos, avisos, corpo }, o de gaiolaPorLacos mais `corpo`: { planos } com a
  *   posição, em mm, de cada plano gerado, e os trechos 'a', 'b', 'c' e 'd', a volta da seção a partir do semieixo em +v.
@@ -34,8 +34,8 @@
  * mesmo valor dos dois semieixos. Os planos são o conjunto das estações, dos sulcos (o centro e os passos para os dois lados, dentro da
  * largura) e da grade de `passo` a partir da primeira estação, e a grade perde o ponto que cai a menos de `passo` de outro plano.
  *
- * AS RECUSAS. Menos de duas estações, estações fora de ordem ou a menos do mínimo entre planos (2,5 mm) uma da outra, semieixo ou
- * expoente não positivo, passo menor que o mínimo, sulco fora do corpo, largura ou profundidade não positiva e sulco que leva um semieixo a
+ * AS RECUSAS. Menos de duas estações, estações fora de ordem ou a menos do mínimo entre planos (2,5 mm) uma da outra, semieixo não positivo,
+ * expoente abaixo de 1, centro de sulco a menos de 2,5 mm de uma estação ou de outro sulco (a recusa diz qual e a distância), passo menor que o mínimo, sulco fora do corpo, largura ou profundidade não positiva e sulco que leva um semieixo a
  * zero ou menos (a recusa diz o plano e o semieixo que sobra) são recusados com o valor recebido e o limite. */
 import { gaiolaPorLacos, DISTANCIA_MINIMA_ENTRE_PLANOS_MM } from './gaiola-por-lacos.js';
 
@@ -45,6 +45,8 @@ const br = (x, casas = 2) => String(Number(Number(x).toFixed(casas))).replace('.
 const numero = (x) => typeof x === 'number' && Number.isFinite(x);
 const positivo = (x) => numero(x) && x > 0;
 const par = (p) => Array.isArray(p) && p.length === 2 && numero(p[0]) && numero(p[1]);
+/* abaixo de 1 a superelipse deixa de ser convexa: vira estrela de pontas finas, que a gaiola de laços não segura */
+export const EXPOENTE_MINIMO = 1;
 const arredonda = (x) => Math.round(x * 1e4) / 1e4;
 
 /* Hermite monótono por partes: sem passar dos valores das estações, tangente nula nos extremos locais */
@@ -90,7 +92,7 @@ export function corpoDeSecaoVariavel(o = {}) {
   const passo = o.passo ?? minimo;
   if (!numero(passo) || passo < minimo) falha(`passo é número em mm de ${br(minimo)} para cima (o mínimo entre planos de gaiolaPorLacos), e veio ${JSON.stringify(o.passo)}`);
   const expoentePadrao = o.expoente ?? 2;
-  if (!positivo(expoentePadrao)) falha(`expoente é número positivo, e veio ${JSON.stringify(o.expoente)}`);
+  if (!(numero(expoentePadrao) && expoentePadrao >= EXPOENTE_MINIMO)) falha(`expoente é número de ${EXPOENTE_MINIMO} para cima (abaixo disso a seção vira estrela de pontas finas), e veio ${JSON.stringify(o.expoente)}`);
   const interpolacao = o.interpolacao ?? 'suave';
   if (!['suave', 'linear'].includes(interpolacao)) falha(`interpolacao é 'suave' ou 'linear', e veio ${JSON.stringify(o.interpolacao)}`);
   const q = o.pontosPorQuarto ?? 5;
@@ -100,7 +102,7 @@ export function corpoDeSecaoVariavel(o = {}) {
   E.forEach((e, i) => {
     const onde = `estacoes[${i}]`;
     if (!e || !numero(e.em) || !par(e.centro) || !par(e.semieixos) || !(e.semieixos[0] > 0 && e.semieixos[1] > 0)) falha(`${onde} é { em, centro: [u, v], semieixos: [a, b] } com semieixos positivos, e veio ${JSON.stringify(e)}`);
-    if (e.expoente != null && !positivo(e.expoente)) falha(`${onde}.expoente é número positivo, e veio ${JSON.stringify(e.expoente)}`);
+    if (e.expoente != null && !(numero(e.expoente) && e.expoente >= EXPOENTE_MINIMO)) falha(`${onde}.expoente é número de ${EXPOENTE_MINIMO} para cima, e veio ${JSON.stringify(e.expoente)}`);
     if (i > 0 && e.em - E[i - 1].em < minimo - 1e-9) falha(`${onde}.em = ${br(e.em)} fica a ${br(e.em - E[i - 1].em)} mm da estação anterior, e o mínimo entre planos é ${br(minimo)} mm, em ordem crescente`);
   });
   const sulcos = (o.sulcos ?? []).map((s, i) => {
@@ -115,10 +117,20 @@ export function corpoDeSecaoVariavel(o = {}) {
   /* os planos: estações, sulcos, grade */
   const planos = E.map((e) => arredonda(e.em));
   const longe = (x) => planos.every((p) => Math.abs(p - x) >= minimo - 1e-9);
+  /* o plano do centro de cada sulco é obrigatório: sem ele o sulco perde profundidade em silêncio */
+  const centros = [];
+  sulcos.forEach((s, i) => {
+    const x = arredonda(s.em);
+    const choque = [...E.map((e, j) => ({ x: arredonda(e.em), quem: `a estação estacoes[${j}] (em ${br(e.em)})` })), ...centros].find((c) => Math.abs(c.x - x) > 1e-9 && Math.abs(c.x - x) < minimo - 1e-9);
+    if (choque) falha(`sulcos[${i}].em = ${br(s.em)}: o plano do centro do sulco cai a ${br(Math.abs(choque.x - x), 3)} mm d${choque.quem.startsWith('a') ? choque.quem : `o ${choque.quem}`}, menos que o mínimo de ${br(minimo)} mm entre planos; mova o sulco ou a estação para ao menos ${br(minimo)} mm um do outro, ou ponha os dois no mesmo plano`);
+    if (!planos.some((p) => Math.abs(p - x) <= 1e-9)) planos.push(x);
+    centros.push({ x, quem: `sulco sulcos[${i}] (em ${br(s.em)})` });
+  });
+  /* os planos de cada lado do centro, dentro da largura, melhoram o perfil e só entram onde cabem */
   for (const s of sulcos) {
     for (let k = -Math.floor((s.largura / 2 - 1e-9) / passo); k * passo < s.largura / 2 - 1e-9; k++) {
       const x = arredonda(s.em + k * passo);
-      if (x > E[0].em && x < E[E.length - 1].em && longe(x)) planos.push(x);
+      if (k !== 0 && x > E[0].em && x < E[E.length - 1].em && longe(x)) planos.push(x);
     }
   }
   for (let x = arredonda(E[0].em + passo); x < E[E.length - 1].em - 1e-9; x = arredonda(x + passo)) {
