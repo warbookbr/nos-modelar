@@ -83,6 +83,18 @@ describe('furoPassante', () => {
     expect(f.avisos.join(' ')).toMatch(/não deixou parede/);
   });
 
+  it('diz a causa certa: ranhura na lateral, furo cego, cavidade fechada sem a mensagem de sólido partido, parte inexistente', () => {
+    const avisos = (opcoes, extra) => { const r = receitaCom(opcoes); return conferirFuroPassante(medirPeca(r.receita).neutro, r.furo, extra).avisos.join(' | '); };
+    expect(avisos({ posicao: [60, 33, 3], direcao: 'z' })).toMatch(/só raspa o sólido: uma ranhura aberta na lateral/);
+    expect(avisos({ posicao: [60, 33, 3], direcao: 'z' })).not.toMatch(/cego/);
+    expect(avisos({ posicao: [0, 20, 0], direcao: 'x', comprimento: 30 })).toMatch(/furo cego: a ponta do cilindro ficou dentro/);
+    const cavidade = avisos({ posicao: [17, 20, -1], direcao: 'y', comprimento: 12 });
+    expect(cavidade).toMatch(/cavidade fechada/);
+    expect(cavidade).not.toMatch(/corpos/);
+    expect(avisos({ posicao: [17, 20, -1], direcao: 'y' }, { parte: 'nao-existe' })).toMatch(/a parte "nao-existe" não tem face nenhuma/);
+    expect(avisos({ posicao: [17, 20, -1], direcao: 'y' }, { parte: 'corpo' })).toBe('');
+  });
+
   it('avisa o furo que parte o sólido em mais corpos do que ele tinha', () => {
     const parte = receitaCom({ posicao: [60, 20, 0], direcao: 'z', raio: 30, comprimento: 120, lados: 16 });
     const c = conferirFuroPassante(medirPeca(parte.receita).neutro, parte.furo);

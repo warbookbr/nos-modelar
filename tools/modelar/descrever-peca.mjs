@@ -29,6 +29,7 @@ import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
 import { FACES_MINIMAS_PARA_RECORTAR } from '../../procedural/nucleo/operacoes/abertura-por-contorno.js';
+import { conferirFuroPassante } from '../../procedural/nucleo/furo-passante.js';
 import { medirFaceDegenerada, medirTrianguloFino, medirSerrilhadoDaCostura } from './reguas-de-malha/reguas-de-malha.mjs';
 import { dobraDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
 import { textoDoAchado, vincoOcultoDaReceita } from './vinco-oculto.mjs';
@@ -514,6 +515,12 @@ export async function descreverPecaReutilizavel({
   }
   /* as réguas de malha rodam sobre a peça já executada, depois da medida das partes: o que acham é aviso e não reprova */
   progresso('rodando as réguas de malha');
+  /* a receita que usa `furoPassante` exporta `FUROS_PASSANTES` (os resultados dele): o furo que não atravessa ou parte o sólido é aviso */
+  const furos = (Array.isArray(receita.FUROS_PASSANTES) ? receita.FUROS_PASSANTES : []).flatMap((f) => conferirFuroPassante(neutro, f.furo ?? f, { parte: f.parte ?? null, componentesAntes: f.componentesAntes ?? 1 }).avisos);
+  if (furos.length) {
+    stdout += `\n${furos.length} AVISO(S) DE FURO PASSANTE (aviso; não reprova)\n${furos.map((t) => `  ${t}`).join('\n')}\n`;
+    stderr += `\nAVISO: ${furos.length} furo(s) passante(s) com achado; o texto está na seção AVISO(S) DE FURO PASSANTE acima\n`;
+  }
   const malha = avisosDasReguasDeMalha(neutro);
   if (malha.linhas.length) {
     stdout += `\n${malha.linhas.length} RÉGUA(S) DE MALHA COM ACHADO (aviso; não reprova)\n${malha.linhas.map((t) => `  ${t}`).join('\n')}\n`

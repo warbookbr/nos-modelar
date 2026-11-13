@@ -218,4 +218,66 @@ describe('chapaDeContorno', () => {
     for (const f of folga(inclinada('normal'))) expect(f).toBeCloseTo(-10 * Math.sqrt(1.04), 6);
     expect(() => inclinada('w')).toThrow(/recuoEm é 'normal'/);
   });
+
+  it('recuoEm numa borda paralela ao eixo é recusado: a largura efetiva some, e o trecho, o eixo e o conserto vêm na mensagem', () => {
+    const r = (recuoEm) => () => chapaDeContorno({ nome: 'r', espessura: 6, passo: 10, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [100, 40]] }, { nome: 'c', pontos: [[100, 40], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]], chanfro: { largura: 10, recuoEm } }] });
+    expect(r('u')).toThrow(/trechos\[3\] \('d'\).*recuoEm 'u'.*paralelo ao eixo 'u'.*use recuoEm 'normal' ou o outro eixo/);
+    expect(r('v')).not.toThrow();
+    expect(r('normal')).not.toThrow();
+  });
+
+  /* o volume da malha, em mm³, pela soma dos tetraedros com sinal */
+  const volume = (neutro) => {
+    let v = 0;
+    for (const f of neutro.F.values()) {
+      const P = f.vs.map((i) => neutro.V.get(i));
+      for (let k = 1; k + 1 < P.length; k++) {
+        const [a, b, c] = [P[0], P[k], P[k + 1]];
+        v += (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6;
+      }
+    }
+    return Math.abs(v) * 1e9;
+  };
+
+  it('o chanfro que passa do primeiro ponto do vizinho liso junta os pontos ultrapassados no vértice da interseção, e o volume fecha', () => {
+    const caso = (largura, passoDoVizinho) => chapaDeContorno({ nome: 'c', espessura: 6, passo: 10, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [100, 40]] }, { nome: 'c', pontos: [[100, 40], [100, 20]] }, { nome: 'e', pontos: [[100, 20], [100, 0]], passo: passoDoVizinho }, { nome: 'd', pontos: [[100, 0], [0, 0]], chanfro: { largura } }] });
+    const g = caso(15, 2);
+    expect(volume(medirPeca(receitaDe(g)).neutro)).toBeCloseTo(19500, 0);
+    const e = Object.entries(g.pontosMm).filter(([n]) => n.startsWith('c_l2_e_')).map(([, q]) => q).sort((p, q) => q[2] - p[2]);
+    expect(e.length).toBe(10);
+    e.forEach((q, i) => { expect(q[0]).toBeCloseTo(100, 6); expect(q[2]).toBeCloseTo(20 - 0.5 * i, 6); });
+    expect(volume(medirPeca(receitaDe(caso(15, 5))).neutro)).toBeCloseTo(19500, 0);
+    expect(volume(medirPeca(receitaDe(caso(9, 2))).neutro)).toBeCloseTo(21300, 0);
+    expect(volume(medirPeca(receitaDe(caso(30, 2))).neutro)).toBeCloseTo(15000, 0);
+    /* o vizinho inclinado a 120 graus, em que a junção precisa de mais de uma volta */
+    const r = (120 * Math.PI) / 180; const q = [100 + 20 * Math.cos(r), 20 * Math.sin(r)];
+    const inclinado = chapaDeContorno({ nome: 'c', espessura: 6, passo: 10, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [100, 40]] }, { nome: 'c', pontos: [[100, 40], q] }, { nome: 'e', pontos: [q, [100, 0]], passo: 2 }, { nome: 'd', pontos: [[100, 0], [0, 0]], chanfro: { largura: 15 } }] });
+    expect(volume(medirPeca(receitaDe(inclinado)).neutro)).toBeCloseTo(18429.9, 0);
+  });
+
+  it('recusa resta e altura fora da espessura, pontosNoTrecho curto, e chanfro com quina no mesmo trecho', () => {
+    const t = (b, extra = {}) => () => chapaDeContorno({ nome: 'r', espessura: 6, passo: 10, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [30, 45], [60, 40], [100, 40]], ...b }, { nome: 'c', pontos: [[100, 40], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]], passo: 40 }], ...extra });
+    expect(t({ chanfro: { largura: 2, resta: 6 } })).toThrow(/a borda precisa ficar entre 0 e a espessura 6 mm/);
+    expect(t({ quinaQuebrada: { largura: 1, altura: 7 } })).toThrow(/a borda precisa ficar entre 0 e a espessura 6 mm/);
+    expect(t({ pontosNoTrecho: 3 })).toThrow(/pontosNoTrecho = 3 não cobre os 3 segmentos do trecho \(pede ao menos 4\)/);
+    expect(t({ pontosNoTrecho: 4 })).not.toThrow();
+    expect(t({ chanfro: { largura: 2 }, quinaQuebrada: { largura: 1 } })).toThrow(/tem chanfro e quinaQuebrada: escolha um por trecho/);
+  });
+
+  it('a entrada que cairia a menos de um décimo do passo de um vértice não ganha ponto novo', () => {
+    const e = (vertice) => chapaDeContorno({ nome: 'e', espessura: 6, passo: 20, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 60]] }, { nome: 'b', pontos: [[0, 60], [vertice, 60], [100, 60]], chanfro: { largura: 10, entrada: 3 } }, { nome: 'c', pontos: [[100, 60], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]] }] });
+    const xs = (r) => Object.values(r.pontosMm).filter((p) => Math.abs(p[2] - 60) < 1e-9 && p[0] < 6).map((p) => p[0]);
+    expect(xs(e(3.5)).some((x) => Math.abs(x - 3) < 1e-6)).toBe(false);
+    expect(xs(e(8)).some((x) => Math.abs(x - 3) < 1e-6)).toBe(true);
+  });
+
+  it('o nome de trecho que termina em _número_ é reservado aos segmentos gerados, e o ponto repetido num trecho vale um só', () => {
+    const t = (nomeB, pontosB) => () => chapaDeContorno({ nome: 'n', espessura: 6, passo: 10, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: nomeB, pontos: pontosB }, { nome: 'c', pontos: [[100, 40], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]] }] });
+    expect(t('b_0_', [[0, 40], [100, 40]])).toThrow(/o nome 'b_0_' do trecho trechos\[1\] termina em _número_, que é reservado/);
+    expect(t('b_12_', [[0, 40], [100, 40]])).toThrow(/reservado/);
+    expect(t('b_0', [[0, 40], [100, 40]])).not.toThrow();
+    const sem = t('b', [[0, 40], [50, 40], [100, 40]])();
+    const com = t('b', [[0, 40], [50, 40], [50, 40], [100, 40]])();
+    expect(JSON.stringify(com.pontosMm)).toBe(JSON.stringify(sem.pontosMm));
+  });
 });

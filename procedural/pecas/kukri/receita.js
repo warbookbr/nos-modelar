@@ -110,6 +110,8 @@ const receita = {
   meta: { nome: 'kukri', desc: 'kukri de desenho moderno, 430 mm, lâmina curva com chanfro e cabo de cinco gomos com bico furado' },
   PARAMS: TABELA,
   ALIASES,
+  /* o `descrever` confere se o furo do cordão atravessa o cabo sem parti-lo */
+  get FUROS_PASSANTES() { return [{ furo: furo(this.PARAMS), parte: 'cabo' }]; },
   MATERIAIS: {
     laminaFosca: { tipo: 'liso', cor: '#111113', aspereza: 0.92, metalicidade: 0.04 },
     fio: { tipo: 'metal', cor: '#a9adb2', aspereza: 0.25, metalicidade: 0.9, brilho: 0.8 },

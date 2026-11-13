@@ -105,10 +105,11 @@ export function furoPassante(o = {}) {
  * `componentes` o número de corpos conexos e `avisos` os textos do que não bate: sem parede, furo que não atravessa, mais corpos que `componentesAntes` (padrão 1).
  */
 export function conferirFuroPassante(neutro, furo, { parte = null, componentesAntes = 1 } = {}) {
-  const { posicao, direcao, raio, lados } = furo.geometria;
+  const { posicao, direcao, raio, lados, comprimento } = furo.geometria;
   /* os vértices da parede estão na circunferência ou, onde a malha corta a faceta, entre ela e a corda: de raio·cos(π/lados) a raio */
   const interno = raio * Math.cos(Math.PI / lados) - 1e-3;
   const faces = [...neutro.F.values()].filter((f) => parte == null || f.parte === parte);
+  if (parte != null && !faces.length) return { paredes: 0, bocas: 0, componentes: 0, avisos: [`furoPassante: a parte ${JSON.stringify(parte)} não tem face nenhuma no estado executado; confira o nome em \`parte\``] };
   const aoEixo = (id) => {
     const p = neutro.V.get(id).map((x, k) => x * 1000 - posicao[k]);
     const t = p[0] * direcao[0] + p[1] * direcao[1] + p[2] * direcao[2];
@@ -117,6 +118,9 @@ export function conferirFuroPassante(neutro, furo, { parte = null, componentesAn
   const naParede = new Map();
   const noEixo = (id) => { if (!naParede.has(id)) naParede.set(id, aoEixo(id) >= interno && aoEixo(id) <= raio + 1e-3); return naParede.get(id); };
   const parede = faces.filter((f) => f.vs.every(noEixo));
+  const axial = (id) => { const p = neutro.V.get(id).map((x, k) => x * 1000 - posicao[k]); return p[0] * direcao[0] + p[1] * direcao[1] + p[2] * direcao[2]; };
+  /* o fundo do cilindro, uma face inteira num dos planos das pontas dele, sobrevive no resultado quando a ponta ficou dentro do sólido */
+  const fundos = faces.filter((f) => [-comprimento / 2, comprimento / 2].some((a) => f.vs.every((id) => Math.abs(axial(id) - a) <= 1e-3 && aoEixo(id) <= raio + 1e-3))).length;
   const ehParede = new Set(parede);
   /* as bordas entre uma face da parede e uma que não é dela */
   const arestas = new Map();
@@ -139,8 +143,12 @@ export function conferirFuroPassante(neutro, furo, { parte = null, componentesAn
   for (const f of faces) for (let i = 1; i < f.vs.length; i++) unir(f.vs[0], f.vs[i]);
   const componentes = new Set([...raiz.keys()].map(achar)).size;
   const avisos = [];
+  const cavidade = parede.length > 0 && bocas === 0;
   if (!parede.length) avisos.push('furoPassante: o cilindro não deixou parede no sólido (fora dele, ou tangente): confira posicao, direcao, raio e comprimento');
-  else if (bocas < 2) avisos.push(`furoPassante: o furo tem ${bocas} boca(s) e não atravessa o sólido (${bocas === 0 ? 'cavidade fechada: a ferramenta ficou toda dentro' : 'furo cego'}): aumente o comprimento ou mova a posicao para o cilindro passar dos dois lados`);
-  if (componentes > componentesAntes) avisos.push(`furoPassante: o sólido ficou com ${componentes} corpos e tinha ${componentesAntes}: o furo o partiu ou soltou um pedaço; reduza o raio ou mova a posicao`);
+  else if (cavidade) avisos.push('furoPassante: o furo tem 0 boca(s): cavidade fechada, a ferramenta ficou toda dentro; aumente o comprimento ou mova a posicao para o cilindro passar dos dois lados');
+  else if (bocas === 1) avisos.push(fundos > 0
+    ? 'furoPassante: o furo tem 1 boca e não atravessa o sólido (furo cego: a ponta do cilindro ficou dentro); aumente o comprimento ou mova a posicao para o cilindro passar dos dois lados'
+    : 'furoPassante: o cilindro só raspa o sólido: uma ranhura aberta na lateral, com 1 boca e sem fundo, em vez de um furo; mova a posicao para o eixo ficar dentro do sólido');
+  if (componentes > componentesAntes && !cavidade) avisos.push(`furoPassante: o sólido ficou com ${componentes} corpos e tinha ${componentesAntes}: o furo o partiu ou soltou um pedaço; reduza o raio ou mova a posicao`);
   return { paredes: parede.length, bocas, componentes, avisos };
 }

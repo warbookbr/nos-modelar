@@ -53,7 +53,8 @@
  * segmento de maior passo de cada cadeia. Onde um chanfro encontra um trecho sem borda e a largura passa do vizinho, os pontos do vizinho
  * que o recuo ultrapassa se juntam no ponto da interseção das retas recuadas.
  *
- * AS RECUSAS. Contorno aberto, trecho que não continua o anterior, contorno que se cruza, se toca num vértice ou volta sobre si, espessura ou
+ * AS RECUSAS. Nome de trecho que termina em _número_ (reservado), borda com recuoEm cujo segmento é paralelo ao eixo (a largura efetiva cai abaixo
+ * do limite de face fina), contorno aberto, trecho que não continua o anterior, contorno que se cruza, se toca num vértice ou volta sobre si, espessura ou
  * largura não positiva, `resta` ou `altura` fora de (0, espessura) e alturas de borda que deixam entre dois laços menos que o limite de face
  * fina vezes o passo (a recusa diz o campo e o trecho), canto num encontro de trechos ou perto demais do vizinho ou de outro canto para o
  * raio (a recusa diz o raio que cabe), trecho citado que não existe e laço recuado que se cruza ou muda de sentido (a recusa diz os dois
@@ -136,6 +137,11 @@ function seAutoCruza(poli) {
   }
   return null;
 }
+/* o ponto repetido dentro de um trecho vira um só (o de um trecho de um ponto, ou de pontos todos iguais, fica como está) */
+const semRepetidosNoTrecho = (poli) => {
+  const r = poli.filter((p, i) => i === 0 || dist(p, poli[i - 1]) > TOL);
+  return r.length ? r : [poli[0]];
+};
 const semRepetidos = (poli) => {
   const r = [];
   poli.forEach((p, i) => { if (i === 0 || dist(p, r[r.length - 1]) > 1e-6) r.push(p); });
@@ -233,6 +239,7 @@ export function chapaDeContorno(o = {}) {
   const nomes = new Set();
   for (const [i, t] of o.trechos.entries()) {
     if (!t || typeof t.nome !== 'string' || !t.nome) falha(`trechos[${i}] precisa de nome (texto)`);
+    if (/_\d+_$/.test(t.nome)) falha(`o nome ${citar(t.nome)} do trecho trechos[${i}] termina em _número_, que é reservado aos segmentos que a chapa gera (${citar(`${t.nome.replace(/_\d+_$/, '')}_0_`)} e parecidos); renomeie o trecho`);
     if (nomes.has(t.nome)) falha(`o trecho ${citar(t.nome)} aparece duas vezes`);
     nomes.add(t.nome);
   }
@@ -246,7 +253,7 @@ export function chapaDeContorno(o = {}) {
     if (!Array.isArray(t.pontos) || !t.pontos.length || !t.pontos.every(ponto2)) falha(`${onde}.pontos é a lista de pontos [u, v] em mm, e veio ${JSON.stringify(t.pontos)}`);
     if (t.passo != null && !positivo(t.passo)) falha(`${onde}.passo é número positivo em mm, e veio ${JSON.stringify(t.passo)}`);
     if (t.pontosNoTrecho != null && !(Number.isInteger(t.pontosNoTrecho) && t.pontosNoTrecho >= 2)) falha(`${onde}.pontosNoTrecho é inteiro de 2 em diante, e veio ${JSON.stringify(t.pontosNoTrecho)}`);
-    return { nome: t.nome, onde, pontos: t.pontos.map((p) => [...p]), borda: lerBorda(t, onde, nomes), grupo: t.grupo ?? null, passo: t.passo ?? passoPadrao, fixos: t.pontosNoTrecho ?? null, uniforme: i === iDe || i === iAte };
+    return { nome: t.nome, onde, pontos: semRepetidosNoTrecho(t.pontos.map((p) => [...p])), borda: lerBorda(t, onde, nomes), grupo: t.grupo ?? null, passo: t.passo ?? passoPadrao, fixos: t.pontosNoTrecho ?? null, uniforme: i === iDe || i === iAte };
   });
   T.forEach((t, i) => {
     const ant = T[(i + T.length - 1) % T.length];
@@ -421,6 +428,12 @@ export function chapaDeContorno(o = {}) {
     if (!eixoDoRecuo || eixoDoRecuo === 'normal') return 1;
     return Math.abs(normal(seg[k])[eixoDoRecuo === 'u' ? 0 : 1]);
   };
+  for (let k = 0; k < N; k++) {
+    const t = T[donoDe[k].i];
+    if (!t.borda || t.borda.recuoEm === 'normal') continue;
+    const efetiva = t.borda.largura * fatorDoRecuo(donoDe[k].i, k);
+    if (efetiva < minimo) falha(`${t.onde}: com recuoEm '${t.borda.recuoEm}' a largura ${br(t.borda.largura)} mm vira ${br(efetiva, 6)} mm perpendiculares ao segmento que sai de ${pt(V[k])}, menos que ${br(minimo, 6)} mm (o limite de face fina vezes o passo): o segmento é paralelo ao eixo '${t.borda.recuoEm}' e o chanfro sumiria; use recuoEm 'normal' ou o outro eixo`);
+  }
   const lacos = niveis.map((h) => {
     const P = V.map((v, k) => {
       const antes = seg[(k + N - 1) % N]; const depois = seg[k];
