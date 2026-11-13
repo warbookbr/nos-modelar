@@ -81,7 +81,7 @@ const receita = {
       return p;
     }),
     criteriosDeReprovacao: [
-      'o para-choque que não vai de ponta a ponta, com costura no eixo, ou com a ponta em quina viva no lugar do raio de 6 mm',
+      'o para-choque que não vai de ponta a ponta, com costura no eixo, ou com a ponta em quina viva ou chanfro reto no lugar do raio de 6 mm (o afunilamento em planta do fundo, de 72 a 36 mm, é o prometido)',
       'a lente do farol ou da lanterna fora da abertura do rebaixo, ou atravessando a chapa do painel',
       'o painel da frente ou o de trás a mais de 4,2 mm do capô, da tampa, dos para-lamas ou das laterais',
       'a grade sem as cinco lâminas, ou com as lâminas soltas atrás do vão',
