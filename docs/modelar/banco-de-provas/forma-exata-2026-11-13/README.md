@@ -1,6 +1,6 @@
 # Forma exata antes da malha: medidas e estudo
 
-Pasta do plano [forma exata antes da malha](../../planos/2026-11-13-forma-exata-antes-da-malha.md), ativo desde 2026-11-13. Aqui entram a medida de partida, o estudo do método com o protótipo, e o custo de cada fatia.
+Pasta do plano [forma exata antes da malha](../../decisoes/PLANOS-ENCERRADOS.md), ativo desde 2026-11-13. Aqui entram a medida de partida, o estudo do método com o protótipo, e o custo de cada fatia.
 
 ## A medida de partida: a primeira forma da kukri
 

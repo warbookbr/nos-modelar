@@ -1,6 +1,6 @@
 # Estudo do método: a forma exata antes da malha, medida em três casos
 
-Estudo da fatia 3 do plano [forma exata antes da malha](../../planos/2026-11-13-forma-exata-antes-da-malha.md), feito em 2026-11-13. O protótipo está em `procedural/nucleo/forma-exata/` e não muda nenhuma operação nem nenhuma peça do acervo.
+Estudo da fatia 3 do plano [forma exata antes da malha](../../decisoes/PLANOS-ENCERRADOS.md), feito em 2026-11-13. O protótipo está em `procedural/nucleo/forma-exata/` e não muda nenhuma operação nem nenhuma peça do acervo.
 
 ## Resumo para decidir
 
