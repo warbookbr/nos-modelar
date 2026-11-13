@@ -295,6 +295,13 @@ describe('corpoPorFatias: os cantos', () => {
     for (const [u, v] of estrela) expect(tem(noLaco(rica), u, v)).toBe(true);
   });
 
+  it('com cantos demais ficam os de maior giro: os bicos da estrela, e não os vales', () => {
+    const estrela = Array.from({ length: 10 }, (_, i) => { const raio = i % 2 ? 6 : 10; const a = (Math.PI * 2 * i) / 10; return [raio * Math.cos(a), raio * Math.sin(a)]; });
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 8, fatias: [{ em: 0, contorno: estrela }, { em: 30, contorno: estrela }] });
+    const pts = noLaco(g);
+    for (const i of [2, 4, 6, 8]) expect(tem(pts, estrela[i][0], estrela[i][1]), `bico ${i}`).toBe(true);
+  });
+
   it('anguloDeCanto declara o giro: com 100 graus o canto de 90 deixa de ser ponto e o retângulo perde cantos com aviso', () => {
     const r = [[0, 0], [100, 0], [100, 5], [0, 5]];
     const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, anguloDeCanto: 100, fatias: [{ em: 0, contorno: r }, { em: 30, contorno: r }] });
@@ -364,6 +371,10 @@ describe('corpoPorFatias: o que a gaiola diz, nos termos da operação', () => {
     expect(Number.isInteger(a.indice)).toBe(true);
     expect(a.texto).toMatch(/^amostragem desigual no ponto \d+ da volta do laço '[fx][\w]*': o segmento antes dele e o depois diferem na razão [\d,]+, acima de 4, .*nomeie esse ponto como marco/);
     expect(a.texto).not.toMatch(/trecho|'p\d+_'/);
+    const mista = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: [[0, 0], [15, 0.5], [30, 0], [30, 20], [0, 20]] }, { em: 20, contorno: U }, { em: 40, contorno: Q }] });
+    const refs = mista.avisos.map((x) => x.ref);
+    expect(refs.indexOf('amostragemDesigual')).toBeGreaterThanOrEqual(0);
+    expect(refs.indexOf('pontoPerdido')).toBeGreaterThan(refs.lastIndexOf('amostragemDesigual'));
   });
 });
 
@@ -379,6 +390,12 @@ describe('corpoPorFatias: o que os estragos mostraram', () => {
     const oct = (k, e) => marcado(circ(10 * e, 8), circ(8, 8).map((_, i) => (i === k ? 'B' : null)));
     const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, passo: 100, fatias: [{ em: 0, contorno: oct(4, 1) }, { em: 30, contorno: oct(2, 3) }] });
     expect(g.corpo.marcos.B).toBe(6);
+  });
+
+  it('três voltas iguais em 16 pontos empatam no resto, e o ponto que sobra vai para a primeira: marcos em 0, 6 e 11', () => {
+    const c = marcado(circ(10, 36), circ(10, 36).map((_, i) => ({ 12: 'a', 24: 'b' })[i] ?? null));
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: c }, { em: 30, contorno: c }] });
+    expect(g.corpo.marcos).toEqual({ inicio: 0, a: 6, b: 11 });
   });
 
   it('o ponto dado sobre um segmento da volta, longe dos pontos dela, não é perdido: a distância é ao segmento, e não ao ponto mais perto', () => {

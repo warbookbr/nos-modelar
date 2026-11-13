@@ -100,18 +100,12 @@ function tangentes(xs, ys) {
   });
 }
 function suave(xs, ys, tg, x) {
-  const n = xs.length;
-  if (x <= xs[0]) return ys[0];
-  if (x >= xs[n - 1]) return ys[n - 1];
   let i = 0;
   while (xs[i + 1] < x) i++;
   const h = xs[i + 1] - xs[i]; const t = (x - xs[i]) / h;
   return (2 * t ** 3 - 3 * t ** 2 + 1) * ys[i] + (t ** 3 - 2 * t ** 2 + t) * h * tg[i] + (-2 * t ** 3 + 3 * t ** 2) * ys[i + 1] + (t ** 3 - t ** 2) * h * tg[i + 1];
 }
 function linear(xs, ys, _tg, x) {
-  const n = xs.length;
-  if (x <= xs[0]) return ys[0];
-  if (x >= xs[n - 1]) return ys[n - 1];
   let i = 0;
   while (xs[i + 1] < x) i++;
   return ys[i] + ((ys[i + 1] - ys[i]) * (x - xs[i])) / (xs[i + 1] - xs[i]);
@@ -335,11 +329,9 @@ export function corpoPorFatias(o = {}) {
   const avisos = [];
   const perdas = [];
   F.forEach((f, i) => {
-    const nomeados = new Set(f.nomes.map((n) => n.k)); nomeados.add(0);
     const L = loops[i];
     const longe = [];
     f.pts.forEach((p, k) => {
-      if (nomeados.has(k)) return;
       let d = Infinity;
       for (let q = 0; q < N; q++) d = Math.min(d, distanciaPontoSegmento(p, L[q], L[(q + 1) % N]));
       if (d > tolerancia) longe.push({ indice: k, ponto: p, distanciaMm: Number(d.toFixed(3)) });
