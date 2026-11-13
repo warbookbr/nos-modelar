@@ -4,6 +4,7 @@ Pasta do plano [revisão do projeto para o trabalho da IA](../../planos/2026-11-
 
 ## Inventário, por pergunta do plano
 
+- Perguntas 1, 2, 3 e 6: [processo, documentos e agentes](pergunta-1-2-3-6-processo-documentos-e-agentes.md), o primeiro levantamento da metade da sessão do furgão: as reprovações do CI e o que cada uma era, a folga do teto de leitura, o que se repete à mão e o que os agentes custaram e pegaram.
 - Pergunta 4: [projetos comparáveis](pergunta-4-projetos-comparaveis.md), pesquisa externa com a fonte de cada afirmação.
 - Pergunta 4: [pastas e módulos](pergunta-4-pastas-e-modulos.md), o mapa de quem importa quem, as subidas de camada e a composição de `tools/`.
 - Pergunta 5: [operações e verbosidade](pergunta-5-operacoes-e-verbosidade.md), o uso real de cada operação nas receitas vigentes e o tamanho das receitas.
