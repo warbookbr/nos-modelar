@@ -263,6 +263,24 @@ export function pontosDeclarados(t = TABELA) {
   ];
 }
 
+/* As cotas do desenho técnico (`npm run manual -- --desenho suporte-tubo`), em milímetro, saem da mesma tabela que a malha. */
+export function cotasDeclaradas(t = TABELA) {
+  const meiaParede = t.larguraAbaParede / 2;
+  const xFuro = -t.furoEntreCentros / 2;
+  const meioLargura = t.furoLargura / 2;
+  const meioComprimento = t.furoComprimento / 2;
+  const zRecorte = t.saidaAbaTubo - t.eixoDoTuboAteBorda;
+  return [
+    { vista: 'frente', de: [-meiaParede, 0, t.espessura], ate: [-meiaParede, t.alturaAbaParede, t.espessura], lado: 'esquerda' },
+    { vista: 'frente', de: [-meiaParede, 0, t.espessura], ate: [meiaParede, 0, t.espessura], lado: 'baixo' },
+    { vista: 'frente', de: [xFuro - meioLargura, t.furoAlturaDoCentro, t.espessura], ate: [xFuro + meioLargura, t.furoAlturaDoCentro, t.espessura], lado: 'cima' },
+    { vista: 'frente', de: [xFuro, t.furoAlturaDoCentro - meioComprimento, t.espessura], ate: [xFuro, t.furoAlturaDoCentro + meioComprimento, t.espessura], lado: 'esquerda' },
+    { vista: 'lado', de: [0, 0, 0], ate: [0, 0, t.espessura], lado: 'baixo', texto: `${t.espessura} (chapa)` },
+    { vista: 'lado', de: [0, 0, t.espessura], ate: [0, 0, t.saidaAbaTubo], lado: 'baixo' },
+    { tipo: 'diametro', vista: 'cima', centro: [0, t.espessura, zRecorte], diametro: t.diametroDoTubo, lado: 'direita' },
+  ];
+}
+
 const receita = {
   meta: { nome: 'suporte-tubo', desc: 'suporte em L de chapa grossa que prende um tubo de 30 mm a uma parede' },
   PARAMS: TABELA,
@@ -301,6 +319,7 @@ const receita = {
     { par: ['abaParede', 'abaTubo'], motivo: 'a aba do tubo nasce na face da frente da aba de parede, rente à base' },
   ],
   get PONTOS() { return pontosDeclarados(this.PARAMS); },
+  get COTAS() { return cotasDeclaradas(this.PARAMS); },
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 

@@ -148,6 +148,16 @@ const receita = {
       { nome: 'caixa da lâmina: gume mais fundo em z', parte: 'lamina', medida: 'minimo', em: [T.lamina_base, T.eixo_y - T.espessura_dorso / 2, -21], toleranciaMm: 1 },
     ];
   },
+  /* as cotas do desenho técnico (`npm run manual -- --desenho kukri`), em milímetro; a ponta do cabo fica em x = 2,1 */
+  get COTAS() {
+    const T = this.PARAMS;
+    return [
+      { vista: 'cima', de: [2.1, T.eixo_y, 0], ate: [T.comprimento, T.eixo_y, 0], lado: 'baixo', afastamentoMm: 40 },
+      { vista: 'cima', de: [T.lamina_base, T.eixo_y, 0], ate: [T.comprimento, T.eixo_y, 0], lado: 'baixo', texto: `lâmina ${T.comprimento - T.lamina_base}` },
+      { vista: 'cima', de: [2.1, T.eixo_y, 0], ate: [T.furo_x, T.eixo_y, 0], lado: 'cima', afastamentoMm: 14 },
+      { tipo: 'diametro', vista: 'cima', centro: [T.furo_x, T.eixo_y, T.furo_z], diametro: 2 * T.furo_raio, lado: 'baixo' },
+    ];
+  },
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 

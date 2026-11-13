@@ -10,4 +10,8 @@ O módulo não conhece peça pelo nome. O texto vem do campo opcional `manual` d
 
 A imagem de cada passo enquadra o que entra nele com `--folga` (padrão 1,5) e deixa o resto da montagem montada ao redor.
 
+## Desenho técnico
+
+`npm run manual -- --desenho <peça>` executa a receita e grava `desenho.svg`, `desenho.png` e `desenho.json` (padrão `tools/bancadas/out/desenho-<peça>/`). `src/projecao.js` projeta a malha neutra em três vistas em terceiro diedro (cima sobre a frente, lado direito à direita), desenha as arestas de silhueta e as vivas (ângulo entre faces acima de `--limiar`, padrão 30°, nunca as diagonais da triangulação) e separa cada uma em trecho visível (cheio) e escondido (tracejado) por z-buffer em grade. `src/cotas.js` valida o export opcional `COTAS` da receita (cota linear com `vista`, `de`, `ate`, `lado`; cota de diâmetro com `centro` e `diametro`; pontos em mm ou nome de um ponto de `PONTOS`) e recusa a cota mal declarada; o programa não escolhe cotas. `npm run manual -- --desenho --ajuda` mostra o formato.
+
 Testes: `npx vitest run modulos/manual`.
