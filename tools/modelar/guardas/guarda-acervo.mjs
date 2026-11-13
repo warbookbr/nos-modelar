@@ -177,7 +177,7 @@ export function motivoDeFaceDegenerada(forma) {
   const degenerada = medirFaceDegenerada(forma);
   if (!degenerada.total) return null;
   return `${degenerada.total} FACE(S) DEGENERADA(S)\n${degenerada.faces.slice(0, 8).map((f) => `  face ${f.id} (${f.parte ?? 'sem parte'}, ${f.cantos} cantos, dobro da área ${f.normal == null ? 'indefinido' : f.normal.toExponential(2)} m²)`).join('\n')}`
-    + '\n  Face degenerada é a que o `adaptarThree` recusa (cantos que não definem plano) ou cujo triângulo a auditoria de interseções acha sem área, pelo piso relativo à diagonal da parte; deixa a auditoria inconclusiva. O defeito é da operação que a gerou, e não da receita.';
+    + '\n  Face degenerada é a que o `adaptarThree` recusa (cantos que não definem plano) ou cujo triângulo a auditoria de interseções acha sem área, pelo piso relativo ao tamanho, que é o mais alto entre o da parte da face e o da peça inteira (2e-9 vezes o quadrado da meia diagonal da caixa, no máximo 1e-6); a face assim deixa a auditoria da montagem inconclusiva. O defeito é da operação que a gerou, e não da receita.';
 }
 
 /** O motivo da recusa quando a casca da forma não fecha (aresta que uma face só usa, ou que mais de duas usam), pelo mesmo critério do `npm run malha:conferir` e da aprovação da
@@ -354,6 +354,13 @@ if (!isMainThread && workerData?.fioDaGuarda) {
 }
 
 if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
+  if (process.argv.slice(2).includes('--ajuda')) {
+    console.log('Uso: npm run guarda:acervo [-- <peça>...]   (node tools/modelar/guardas/guarda-acervo.mjs [<peça>...] [--ajuda])\n'
+      + '  Sem nome, mede o acervo inteiro de procedural/pecas/ e sai com código 1 se alguma peça reprovar (os gates rodam assim).\n'
+      + "  Com nomes, confere só essas peças, pelo nome da pasta, como 'furgao-realista' ou 'braco-robotico/ombro'.\n"
+      + '  Cada recusa sai no stderr com a peça e o motivo; peça planejada sem geometria sai no stdout como esperando a etapa.');
+    process.exit(0);
+  }
   /* Com nomes de peça, a guarda confere só elas. Quem modela uma peça pagava a varredura do acervo inteiro (110 s, 56 peças)
      a cada medida, para saber da sua (achado de 2026-11-05). Sem nome, é a varredura inteira, que os gates rodam. */
   const pedidas = process.argv.slice(2).filter((a) => !a.startsWith('-'));
