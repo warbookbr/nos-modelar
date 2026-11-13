@@ -1,6 +1,6 @@
 # Análises de 2026-10
 
-Duas análises feitas em 2026-10-07 por subagentes, a partir da [pesquisa aberta](PESQUISA-ABERTA-2026-10.md), da [lista de ferramentas por objeto](../FERRAMENTAS-POR-OBJETO.md) e do repositório. A primeira responde que conjunto a mais seria bom para modelar em 3D; a segunda avalia o Modelar como projeto, frente ao objetivo de uma IA modelar em 3D melhor, mais barato e com mais confiança, com as premissas fixas de que a IA é a usuária, confere o resultado também por imagem e o conteúdo é determinístico e reexecutável. As duas aguardam a leitura da pessoa e não autorizam implementação.
+Duas análises feitas em 2026-10-07 por subagentes, a partir da [pesquisa aberta](PESQUISA-ABERTA-2026-10.md), da [lista de ferramentas por objeto](FERRAMENTAS-POR-OBJETO.md) e do repositório. A primeira responde que conjunto a mais seria bom para modelar em 3D; a segunda avalia o Modelar como projeto, frente ao objetivo de uma IA modelar em 3D melhor, mais barato e com mais confiança, com as premissas fixas de que a IA é a usuária, confere o resultado também por imagem e o conteúdo é determinístico e reexecutável. As duas aguardam a leitura da pessoa e não autorizam implementação.
 
 
 ## Conjunto a mais para modelar em 3D

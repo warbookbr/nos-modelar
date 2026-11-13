@@ -47,7 +47,7 @@ passaram pelas verificações automáticas. Nenhuma peça é um modelo final par
 fora do projeto: cada uma existe para provar uma capacidade do núcleo e pode
 mudar ou sair sem aviso.
 
-Há 7 [famílias](modelar/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
+Há 7 [famílias](modelar/decisoes/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
 gera objetos parecidos a partir de poucos números: roda com pneu, dobradiça,
 cilindro hidráulico, móvel de caixa, superfície aerodinâmica, aparelho de caixa
 e cadeira. A família de aparelho de caixa, por exemplo, gera o forno elétrico,
@@ -202,7 +202,7 @@ serve para mostrar o caráter da forma e nunca como fonte de medida.
 - Crítico cego: o agente que recebe só as imagens da peça e da referência e
   devolve nota e defeitos ([o laço do crítico](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico)).
 - Família: um código que gera objetos parecidos a partir de poucos números
-  ([famílias de objetos](modelar/FAMILIAS-DE-OBJETOS.md)).
+  ([famílias de objetos](modelar/decisoes/FAMILIAS-DE-OBJETOS.md)).
 - Gate: uma verificação automática que recusa a mudança que fere uma regra,
   rodada por `npm run gates` ([lista](modelar/INDEX.md#gates-completos)).
 - Montagem: o objeto feito de várias peças encaixadas

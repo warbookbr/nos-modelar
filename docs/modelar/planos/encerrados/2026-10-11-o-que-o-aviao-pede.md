@@ -11,7 +11,7 @@
 [As ferramentas de modelagem](2026-10-07-as-ferramentas-de-modelagem.md)
 deixou casca, chapa, articulações, barras e quatro famílias, provadas em carrinho
 de mão, guarda-roupa, cadeira e cadeira de rodas, que são objetos de peças retas
-ou de revolução. A [contagem por objeto](../../FERRAMENTAS-POR-OBJETO.md) aponta o
+ou de revolução. A [contagem por objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md) aponta o
 que esses objetos não exercitam: o perfil aerodinâmico e as pás (`aerofolio`), que
 não existe e serve a 17 objetos, e a superfície suave por seções (`loftSuave`),
 parcial e pedida por 46. Sem modelar um objeto que dependa delas, não se sabe o
@@ -167,7 +167,7 @@ milhões de tokens contra 3,93 milhões, 8% a menos, com 11 esbocistas contra 12
 12 críticas contra 19; os trens recolhem dentro do capô e da asa sem atravessar, o
 que a primeira rodada não fazia. Fora dessa conta ficaram 1,39 milhão de tokens de
 cinco implementadores que corrigiram a blocagem, o brief e o desenho durante a
-rodada. A contagem de [ferramentas por objeto](../../FERRAMENTAS-POR-OBJETO.md) passou
+rodada. A contagem de [ferramentas por objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md) passou
 o perfil aerodinâmico a parcial e o recorte do esboço a existente, e a bateria
 completa passa em 14 minutos, depois de ter subido a 22 com os esboços do avião
 no teste da blocagem; o resumo dos gates passou a listar os arquivos de teste

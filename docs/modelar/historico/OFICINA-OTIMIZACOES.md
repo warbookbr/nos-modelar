@@ -11,7 +11,7 @@ documentos é:
 
 - [`ATRITOS-AUTORIA.md`](../pesquisas/ATRITOS-AUTORIA.md) registra a **dor observada** (A-1 a
   A-17) — é a evidência;
-- [`UPSTREAM-NOS.md`](../UPSTREAM-NOS.md) registra a **candidatura ao NÓS** (UP-008
+- [`UPSTREAM-NOS.md`](../decisoes/UPSTREAM-NOS.md) registra a **candidatura ao NÓS** (UP-008
   a UP-016) — é a portabilidade;
 - este documento registra **dependências, custo e provas candidatas** — é a
   análise que alimenta o backlog.

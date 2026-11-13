@@ -57,8 +57,8 @@ família não alcança, ela ganha um parâmetro, e ninguém recria a peça do ze
   superfície não desce a nota abaixo de 8), com os defeitos da rodada anterior
   e com nome nas peças vizinhas, porque a homologação depende dele e a medição
   anterior mostrou que sem isso a nota não sai de 6 ou 7;
-- a cobertura: a [lista das famílias de objetos](../../FAMILIAS-DE-OBJETOS.md) que o
-  Mecanifica deve modelar e as [ferramentas por objeto](../../FERRAMENTAS-POR-OBJETO.md),
+- a cobertura: a [lista das famílias de objetos](../../decisoes/FAMILIAS-DE-OBJETOS.md) que o
+  Mecanifica deve modelar e as [ferramentas por objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md),
   de onde saem as ferramentas a criar, ordenadas pelos objetos que atendem;
 - as primeiras ferramentas e famílias, construídas juntas: cada família
   homologada é o teste das ferramentas que ela usa, e uma ferramenta que não dá
@@ -127,7 +127,7 @@ geradores por família fixariam a duplicação entre esboço e núcleo em vez de
 removê-la, e que as ferramentas e a verificação vêm antes das famílias. Deste
 plano ficaram feitos o crítico com escala ancorada, defeitos da rodada anterior e
 nome nas vizinhas (T012), a [lista de ferramentas por
-objeto](../../FERRAMENTAS-POR-OBJETO.md) com o gate `ferramentas:check`, e a
+objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md) com o gate `ferramentas:check`, e a
 [pesquisa aberta](../../pesquisas/PESQUISA-ABERTA-2026-10.md). O formato da entrada do
 catálogo, o comando de consulta e as famílias não foram começados e voltam
 depois do plano novo.

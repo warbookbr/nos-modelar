@@ -4,7 +4,7 @@ Nota sobre as datas: os planos deste lote não registram o dia do fechamento; a 
 
 ## 2026-08-04-mcp-para-agentes.md
 Estado: concluído, em 2026-08-04. Crônica: não tem linha.
-- [B] O servidor MCP é adaptador fino sobre serviços do núcleo, com CLI e MCP como consumidores de contratos e sem regra de negócio própria. Porquê: evita duas implementações divergentes da mesma regra. Lugar: `docs/modelar/CONTINUIDADE-ARQUITETURAL.md` (seção sobre portas consumidoras) e `docs/modelar/planos/mcp/INDEX.md`.
+- [B] O servidor MCP é adaptador fino sobre serviços do núcleo, com CLI e MCP como consumidores de contratos e sem regra de negócio própria. Porquê: evita duas implementações divergentes da mesma regra. Lugar: `docs/modelar/decisoes/CONTINUIDADE-ARQUITETURAL.md` (seção sobre portas consumidoras) e `docs/modelar/planos/mcp/INDEX.md`.
 - [C] Teto de 6 ferramentas por perfil, perfis `revisao`/`autoria`/`materiais`/`coordenacao` e linha-base de bytes do piloto. Porquê: era limite do piloto da Fatia 1A; os perfis atuais em `tools/mcp/perfis/` já passaram dele e o catálogo exato é conferido por `tools/mcp/mcp.test.mjs`.
 
 ## 2026-08-05-mcp-autoria-controlada.md
@@ -25,7 +25,7 @@ Estado: concluído, em 2026-08-05. Crônica: tem linha.
 
 ## 2026-08-06-diagnostico-motor-procedural.md
 Estado: concluído, em 2026-08-06. Crônica: tem linha.
-- [B] O motor resolve uma peça em coordenadas locais; montagem instancia, transforma e mantém relações; a bancada só observa; carro e motor são montagens e o núcleo não ganha caso especial de domínio. Porquê: o diagnóstico concluiu "motor adequado" para a montagem v1. Lugar: `docs/modelar/CONTINUIDADE-ARQUITETURAL.md`, `docs/modelar/MONTAGEM-PERSISTIDA-V1.md` e a primeira regra de `CLAUDE.md`.
+- [B] O motor resolve uma peça em coordenadas locais; montagem instancia, transforma e mantém relações; a bancada só observa; carro e motor são montagens e o núcleo não ganha caso especial de domínio. Porquê: o diagnóstico concluiu "motor adequado" para a montagem v1. Lugar: `docs/modelar/decisoes/CONTINUIDADE-ARQUITETURAL.md`, `docs/modelar/MONTAGEM-PERSISTIDA-V1.md` e a primeira regra de `CLAUDE.md`.
 
 ## 2026-08-07-montagem-minima-persistida-v1.md
 Estado: concluído, em 2026-08-07. Crônica: tem linha.
@@ -132,13 +132,13 @@ Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
 
 ## 2026-08-18-chassi-realista-kernel-geometrico.md
 Estado: cancelado, em 2026-11-05 (encerramento escrito no plano). Crônica: tem linha.
-- [B] A pele exterior de carroceria é malha de controle de quads com vincos avaliada por subdivisão Catmull-Clark no núcleo, sem dependência externa, com a malha compilada sem identidade persistida (persistem a cage e o nome semântico). Porquê: foi o que o plano decidiu e o núcleo depois construiu. Lugar: `docs/modelar/UPSTREAM-NOS.md` (subdivisão entregue), `docs/modelar/modelar-carroceria.md` e `procedural/nucleo/` (subdivisão e gaiolas).
+- [B] A pele exterior de carroceria é malha de controle de quads com vincos avaliada por subdivisão Catmull-Clark no núcleo, sem dependência externa, com a malha compilada sem identidade persistida (persistem a cage e o nome semântico). Porquê: foi o que o plano decidiu e o núcleo depois construiu. Lugar: `docs/modelar/decisoes/UPSTREAM-NOS.md` (subdivisão entregue), `docs/modelar/modelar-carroceria.md` e `procedural/nucleo/` (subdivisão e gaiolas).
 - [B] OCCT/B-rep não serve à autoria sem camada que leve id, origem e nome de cada face pelo histórico (índice de face não é identidade), e Blender headless não é backend porque quebra determinismo. Porquê: o conteúdo salvo precisa ser determinístico e reexecutável. Lugar: `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md` (item OpenCASCADE), `docs/modelar/pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md` e `docs/modelar/blender/README.md`.
 - [A] A pele exterior não nasce de `loft` nem de envelope varrido (não abre para-brisa, vidro nem vão de porta sem booleana, acopla capô, para-lama e túnel, converge para tubo), SDF/implícito não serve a painel fino, vinco e vão, e um kernel B-rep próprio tem risco desproporcional; `loft` segue válido em peça genuinamente varrida. Porquê: guarda quem for propor outra representação de pele ou de carroceria. Procurei: "loft", "SDF", "implícit", "kernel", "pele", "envelope varrido", "Catmull" em `docs/modelar/*.md`, `docs/modelar/usar/`, `.claude/`, `procedural/nucleo/`, `tools/`; só achei `alinhar-modelagem/SKILL.md` linha 138 (loft de carroceria precisa declarar `lataria`) e `ANALISES-DE-2026-10.md` propondo SDF para outros usos, nada que diga por que a pele não é loft nem SDF. Rascunho do registro: A pele exterior de carroceria é autorada por subdivisão de malha de quads com vincos, e não por `loft`, envelope varrido, campo implícito (SDF) nem kernel B-rep próprio. O `loft` não abre para-brisa, vidro nem vão de porta sem booleana e acopla capô, para-lama e túnel; o SDF é ruim em painel fino, vinco e vão; um kernel próprio custa risco desproporcional. O `loft` continua válido para peças genuinamente varridas, e a decisão reabre se aparecer forma orgânica sem requisito de painel ou requisito real de fabricação. (Confiança média: o dossiê em `docs/modelar/historico/` carrega o mesmo motivo e sai junto; cabe à pessoa decidir se isto vale um registro ou se a subdivisão entregue basta.)
 
 ## 2026-08-18-ensaio-ponta-a-ponta-dobradica.md
 Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
-- [B] Ganho real se julga em praticidade, assertividade e elevação do teto, medidos no ciclo descobrir, planejar, criar, inspecionar, diagnosticar, corrigir e revalidar; abstração, documentação ou ferramenta a mais não contam como ganho por si. Porquê: evitar medir progresso por superfície de contrato. Lugar: `docs/modelar/planos/2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md` (critério da pessoa) e `docs/modelar/AGENT-FIRST.md`.
+- [B] Ganho real se julga em praticidade, assertividade e elevação do teto, medidos no ciclo descobrir, planejar, criar, inspecionar, diagnosticar, corrigir e revalidar; abstração, documentação ou ferramenta a mais não contam como ganho por si. Porquê: evitar medir progresso por superfície de contrato. Lugar: `docs/modelar/planos/2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md` (critério da pessoa) e `docs/modelar/decisoes/AGENT-FIRST.md`.
 
 ## 2026-08-18-plataforma-procedural-extensivel.md
 Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.

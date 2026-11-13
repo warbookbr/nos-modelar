@@ -48,7 +48,7 @@ A pessoa pediu o fluxo com tudo o que o projeto oferece e serve a este objeto. C
 
 ## Incluído
 
-A cópia `procedural/pecas/furgao-realista/` com receita, `referencias/alvo.md`, a prancha cotada e as medidas; o PLANO da receita fechado no alinhamento; a lataria, os vidros, as rodas, os para-choques, a grade, os faróis, as lanternas, os retrovisores, as maçanetas e as linhas de porta que o alinhamento listar; o registro de atritos do fluxo, num ATRITOS.md que a fatia 2 cria na pasta do furgão realista em `docs/modelar/banco-de-provas/`, com cada atrito classificado em corrigido no plano, gate ou instrução nova, ou devolvido ao backlog; as correções gerais que um atrito bloqueante pedir, cada uma com teste e nota em `docs/modelar/UPSTREAM-NOS.md`.
+A cópia `procedural/pecas/furgao-realista/` com receita, `referencias/alvo.md`, a prancha cotada e as medidas; o PLANO da receita fechado no alinhamento; a lataria, os vidros, as rodas, os para-choques, a grade, os faróis, as lanternas, os retrovisores, as maçanetas e as linhas de porta que o alinhamento listar; o registro de atritos do fluxo, num ATRITOS.md que a fatia 2 cria na pasta do furgão realista em `docs/modelar/banco-de-provas/`, com cada atrito classificado em corrigido no plano, gate ou instrução nova, ou devolvido ao backlog; as correções gerais que um atrito bloqueante pedir, cada uma com teste e nota em `docs/modelar/decisoes/UPSTREAM-NOS.md`.
 
 ## Excluído
 

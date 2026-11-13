@@ -27,7 +27,7 @@ tem formato, a [composição procedural](../COMPOSICAO-PROCEDURAL-V1.md) em
 declaradas. A conferência contra foto (`npm run conferir:referencia`), o
 contorno por parte em milímetro (`modulos/contorno-da-imagem/`), o [fluxo do
 objeto](../usar/FLUXO-DO-OBJETO.md), o [aceite visual](../CONTRATO-ACEITE-VISUAL.md)
-e o [filtro agent-first](../AGENT-FIRST.md) já existem e governam como uma
+e o [filtro agent-first](../decisoes/AGENT-FIRST.md) já existem e governam como uma
 capacidade nova é aceita. O plano estende essas peças em vez de criar outras.
 
 ## Referências por fatia

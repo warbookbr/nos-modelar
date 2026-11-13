@@ -131,7 +131,7 @@ O teste sintético mostrou um defeito do módulo atual: a abertura e o fechament
 
 ### 4.1 O módulo
 
-`modulos/desenho-por-restricoes/`, com `package.json` próprio como os outros módulos, sem importar Three.js, o núcleo de autoria nem outro módulo, e com a dependência `@salusoft89/planegcs` fixada em 1.3.0 no `package.json` da raiz, como o `@techstark/opencv-js` do contorno da imagem. A porta de linha de comando fica em `tools/modelar/desenho.mjs`, com `npm run desenho`, e o teste `nucleo-sem-three` não muda. O núcleo puro recebe o JSON da descrição e devolve o relatório e os contornos; quem lê e grava arquivo é a porta. O módulo entra em `docs/modelar/UPSTREAM-NOS.md` como capacidade candidata, isolado.
+`modulos/desenho-por-restricoes/`, com `package.json` próprio como os outros módulos, sem importar Three.js, o núcleo de autoria nem outro módulo, e com a dependência `@salusoft89/planegcs` fixada em 1.3.0 no `package.json` da raiz, como o `@techstark/opencv-js` do contorno da imagem. A porta de linha de comando fica em `tools/modelar/desenho.mjs`, com `npm run desenho`, e o teste `nucleo-sem-three` não muda. O núcleo puro recebe o JSON da descrição e devolve o relatório e os contornos; quem lê e grava arquivo é a porta. O módulo entra em `docs/modelar/decisoes/UPSTREAM-NOS.md` como capacidade candidata, isolado.
 
 ### 4.2 O formato salvo
 

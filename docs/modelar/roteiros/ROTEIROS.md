@@ -56,7 +56,7 @@ Abrir só quando a condição aparecer:
 
 - `comunicacao.md`, quando o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção.
 - `docs/modelar/ARQUITETURA.md`, quando a mudança atravessa camadas.
-- `docs/modelar/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.
+- `docs/modelar/decisoes/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.
 - `docs/modelar/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
 Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.
@@ -120,7 +120,7 @@ Abrir só quando a condição aparecer:
 
 - `docs/modelar/planos/encerrados/README.md`, quando a pergunta é sobre um plano concluído ou cancelado.
 - `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md`, quando a pergunta é sobre ferramentas de outros projetos.
-- `docs/modelar/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
+- `docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
 - `docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md`, quando a pergunta é quanto custou modelar um objeto.
 - `docs/modelar/pesquisas/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
 - `docs/modelar/historico/CHEGADA-2026-09-11.md`, quando a pergunta é por que um documento saiu da raiz de docs/modelar/ ou onde foi parar.

@@ -32,7 +32,7 @@ Uma receita descreve uma carroceria de chapa como gaiola nomeada com vincos nome
 
 ## Incluído
 
-A operação `subdivisao` promovida ao núcleo com catálogo, skill e fixture do oráculo; a interpolação; os vincos nomeados com nitidez fracionária para raio de borda; o ajudante de gaiola por estações; o passo de espessura; `tools/blender/regua.py` e `tools/blender/pacote-cego.py` com instrução de uso em `docs/modelar/blender/`; uma peça de prova desenhada por código, sem referência externa, que exercite vinco, arco e vão; uma instrução nova de modelar carroceria em `docs/modelar/`, ao lado da de veículos; o gate de vazamento; a nota em `docs/modelar/UPSTREAM-NOS.md`.
+A operação `subdivisao` promovida ao núcleo com catálogo, skill e fixture do oráculo; a interpolação; os vincos nomeados com nitidez fracionária para raio de borda; o ajudante de gaiola por estações; o passo de espessura; `tools/blender/regua.py` e `tools/blender/pacote-cego.py` com instrução de uso em `docs/modelar/blender/`; uma peça de prova desenhada por código, sem referência externa, que exercite vinco, arco e vão; uma instrução nova de modelar carroceria em `docs/modelar/`, ao lado da de veículos; o gate de vazamento; a nota em `docs/modelar/decisoes/UPSTREAM-NOS.md`.
 
 ## Excluído
 

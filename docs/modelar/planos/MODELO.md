@@ -19,7 +19,7 @@ Uma frase verificável dizendo o que passa a ser possível.
 
 ## Filtro Agent-First
 
-Aplique `docs/modelar/AGENT-FIRST.md` ao recorte. Para cada interface ou
+Aplique `docs/modelar/decisoes/AGENT-FIRST.md` ao recorte. Para cada interface ou
 capacidade relevante, registre a decisão **USAR DIRETO**, **ENVOLVER**,
 **REFATORAR** ou **ADIAR**, com justificativa curta baseada em intenção, custo de
 contexto, determinismo/verificabilidade, diagnóstico, composição e identidade.

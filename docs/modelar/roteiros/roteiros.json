@@ -132,7 +132,7 @@
           "quando": "a mudança atravessa camadas"
         },
         {
-          "arquivo": "docs/modelar/UPSTREAM-NOS.md",
+          "arquivo": "docs/modelar/decisoes/UPSTREAM-NOS.md",
           "quando": "a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele"
         },
         {
@@ -245,7 +245,7 @@
           "quando": "a pergunta é sobre ferramentas de outros projetos"
         },
         {
-          "arquivo": "docs/modelar/FERRAMENTAS-POR-OBJETO.md",
+          "arquivo": "docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md",
           "quando": "a pergunta é que ferramenta cada objeto pede"
         },
         {

@@ -64,7 +64,7 @@ Estado: concluído, em 2026-10-06. Crônica: tem linha.
 
 ## 2026-10-06-o-catalogo-de-familias.md
 Estado: cancelado, em 2026-10-07. Crônica: tem linha.
-- [B] Ferramenta nova só entra porque uma família homologada precisa dela, e toda ferramenta é determinística. Porquê: evitar catálogo de terceiros e operação não reproduzível. Lugar: `CLAUDE.md` (conteúdo determinístico; opção declarada sobre a ferramenta geral), `docs/modelar/FERRAMENTAS-POR-OBJETO.md` com `ferramentas:check`.
+- [B] Ferramenta nova só entra porque uma família homologada precisa dela, e toda ferramenta é determinística. Porquê: evitar catálogo de terceiros e operação não reproduzível. Lugar: `CLAUDE.md` (conteúdo determinístico; opção declarada sobre a ferramenta geral), `docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md` com `ferramentas:check`.
 
 ## 2026-10-07-as-ferramentas-de-modelagem.md
 Estado: concluído, em 2026-10-11. Crônica: tem linha.
