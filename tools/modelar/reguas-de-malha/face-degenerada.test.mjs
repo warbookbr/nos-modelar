@@ -1,6 +1,7 @@
 /* face-degenerada.test.mjs — a régua acha tudo o que o `adaptarThree` recusa como "é degenerada" e o que a auditoria de interseções acha sem área (piso relativo ao tamanho da peça). */
 import { describe, expect, it } from 'vitest';
 import { adaptarThree } from '../../../src/autoria/adaptar-three.js';
+import { prepararSolido } from '../../../src/autoria/contato-de-solidos.js';
 import { LIMITE_DA_NORMAL, limiteRelativo, medirFaceDegenerada, normalDeNewell } from './face-degenerada.mjs';
 
 const neutroDe = (pontos, faces) => ({
@@ -91,14 +92,46 @@ describe('régua de face degenerada', () => {
     expect(m.faces.every((f) => f.normal === null)).toBe(true);
   });
 
-  it('a escala é a da parte da face, e não a da peça inteira: o mesmo triângulo passa na parte pequena e é recusado na grande', () => {
+  it('o piso de cada face é o mais alto entre o da parte e o da peça inteira: o triângulo que passa no piso da parte pequena é recusado quando a peça inteira é grande', () => {
     /* triângulo de catetos 3e-6 e 1e-3 (módulo de 3e-9) e, na outra parte, um triângulo de catetos 3 e 4 (meia diagonal de 2,5, piso de 1,25e-8) */
     const neutro = neutroDe([[0, 0, 0], [3e-6, 0, 0], [0, 1e-3, 0], [0, 0, 0], [3, 0, 0], [0, 4, 0]], [[0, 1, 2], [3, 4, 5]]);
     neutro.F.get(0).parte = 'pequena'; neutro.F.get(1).parte = 'grande';
     expect(limiteRelativo(neutro, 'pequena')).toBeLessThan(3e-9);
     expect(limiteRelativo(neutro, 'grande')).toBeCloseTo(1.25e-8, 15);
-    expect(medirFaceDegenerada(neutro).total).toBe(0);
+    expect(limiteRelativo(neutro)).toBeCloseTo(1.25e-8, 15);
+    expect(medirFaceDegenerada(neutro).faces.map((f) => f.id)).toEqual([0]);
     neutro.F.get(0).parte = 'grande';
     expect(medirFaceDegenerada(neutro).faces.map((f) => f.id)).toEqual([0]);
+  });
+
+  it('a parte de nome vazio conta como face sem parte', () => {
+    const neutro = neutroDe([[0, 0, 0], [3e-6, 0, 0], [0, 1e-3, 0], [0, 0, 0], [3, 0, 0], [0, 4, 0]], [[0, 1, 2], [3, 4, 5]]);
+    neutro.F.get(0).parte = ''; neutro.F.get(1).parte = 'grande';
+    expect(limiteRelativo(neutro, null)).toBeLessThan(3e-9);
+    expect(medirFaceDegenerada(neutro).faces.map((f) => [f.id, f.parte])).toEqual([[0, null]]);
+  });
+
+  /* o que a régua aprova a auditoria da montagem (a peça inteira) e a dos contatos (cada parte) não acham sem área: duas partes de escalas muito diferentes, a pequena com um triângulo de dobro de área 3e-11 */
+  const tetra = (V, F, base, pontos, parte, id0) => {
+    pontos.forEach((p, i) => V.set(base + i, p));
+    [[0, 2, 1], [0, 1, 3], [1, 2, 3], [0, 3, 2]].forEach((f, i) => F.set(id0 + i, { id: id0 + i, vs: f.map((x) => base + x), parte }));
+  };
+  const pecaDeDuasEscalas = (parteDaPequena) => {
+    const V = new Map(), F = new Map();
+    const e = 3e-11 / 0.01;
+    tetra(V, F, 0, [[0, 0, 0], [0.01, 0, 0], [0.005, e, 0], [0.005, e / 2, 0.005]], parteDaPequena, 0);
+    tetra(V, F, 10, [[2, 0, 0], [3, 0, 0], [2, 1, 0], [2, 0, 1]], 'grande', 10);
+    return { V, F };
+  };
+  it.each([['com parte', 'pequena'], ['sem parte', undefined], ['parte vazia', '']])('a régua concorda com a auditoria da montagem na peça de duas escalas (%s)', (_, parte) => {
+    const neutro = pecaDeDuasEscalas(parte);
+    const montagem = prepararSolido(neutro, undefined, 'peca');
+    expect(montagem.inconclusivo).toMatch(/triangulo-degenerado/);
+    expect(medirFaceDegenerada(neutro).total).toBeGreaterThan(0);
+    /* e a peça sem a face fina, ou com a face engrossada, passa nas duas */
+    const grossa = pecaDeDuasEscalas(parte);
+    grossa.V.set(2, [0.005, 0.005, 0]);
+    expect(medirFaceDegenerada(grossa).total).toBe(0);
+    expect(prepararSolido(grossa, undefined, 'peca').inconclusivo ?? null).toBe(null);
   });
 });
