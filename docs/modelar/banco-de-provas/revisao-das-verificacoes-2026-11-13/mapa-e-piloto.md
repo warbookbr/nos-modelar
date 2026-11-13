@@ -47,6 +47,28 @@ Os oito não percebidos. Em `curva2d.js`, linha 284, o estrago caiu no texto de 
 
 Leitura minha. Três arquivos de matemática do núcleo têm a bateria rápida percebendo quase tudo, e quem percebe é o teste do próprio arquivo, em segundos. As recusas do `espelha` não têm teste que as exercite: quatro condições de erro trocadas e nenhum teste rápido notou. E a régua da face degenerada não tem teste na fronteira do limite, que é justamente o número em disputa no plano das costuras. O custo também é dado: um arquivo do núcleo liga-se a mais de 250 arquivos de teste, de modo que um estrago que ninguém percebe custa de dois a três minutos de máquina, e é por isso que a medida é por amostra.
 
+## A amostra maior
+
+Fato medido, 64 estragos em 8 arquivos, pelo mesmo método, com a máquina dividida com outras cargas:
+
+| Arquivo | Estragos | Percebidos | Testes ligados |
+|---|---|---|---|
+| `tools/modelar/reguas-de-malha/triangulo-fino.mjs` | 8 | 7 | 71 arquivos |
+| `tools/modelar/reguas-de-malha/face-torcida.mjs` | 8 | 3 | 71 |
+| `src/autoria/auditar-intersecoes-montagem.js` | 8 | 5 | 30 |
+| `src/autoria/contatos-da-peca.js` | 8 | 2 | 68 |
+| `procedural/nucleo/operacoes/limpar-lascas.js` | 8 | 3 | 254 |
+| `procedural/nucleo/operacoes/edicao-direta.js` | 8 | 6 | 253 |
+| `procedural/nucleo/operacoes/subdivisao.js` | 8 | 4 | 256 |
+| `procedural/nucleo/operacoes/friso.js` | 8 | 5 | 253 |
+| total | 64 | 35 | |
+
+Somado ao piloto: 94 estragos em 13 arquivos, 57 percebidos (61%).
+
+Os 29 não percebidos da amostra, lidos um a um pela linha estragada. Dezesseis são recusa ou guarda de entrada que nunca é exercitada: a condição de erro foi trocada por falso, ou o limite dela mudou, e nenhum teste rápido passou uma entrada ruim (`subdivisao.js` linhas 344, 372 e 396; `friso.js` 435 e 521; `edicao-direta.js` 174 e 183; `contatos-da-peca.js` 123, 149 e 158; `limpar-lascas.js` 72 e 128; `face-torcida.mjs` 55 e 58; `auditar-intersecoes-montagem.js` 113; `triangulo-fino.mjs` 53). Quatro estão em comparador de ordenação e provavelmente não mudam o resultado, de modo que não contam contra os testes (`auditar-intersecoes-montagem.js` 45; `contatos-da-peca.js` 59 e 238; `limpar-lascas.js` 79). Nove são conta ou laço que mudou e ninguém notou (`face-torcida.mjs` 40, 42 e 47; `auditar-intersecoes-montagem.js` 77; `contatos-da-peca.js` 151; `limpar-lascas.js` 61 e 104; `subdivisao.js` 153; `friso.js` 144).
+
+Leitura minha. O padrão do piloto se repete com amostra três vezes maior. A bateria rápida percebe a conta principal de cada operação e não percebe as recusas: mais da metade do que passou sem ninguém notar é validação de entrada sem teste de entrada ruim. É o mesmo lugar que o inventário de erros da revisão do projeto apontou pelo outro lado, com valores degenerados aceitos em silêncio. Duas réguas de malha saem mal: a da face torcida, com 3 de 8, e os contatos da peça, com 2 de 8, e as duas são conferências em que a guarda do acervo confia.
+
 ## O que falta
 
-A amostra maior está rodando (oito arquivos, oito estragos cada). Os oito não percebidos do piloto ainda não foram conferidos contra os testes lentos, que só rodam no CI. Nenhum teste recebeu veredito ainda.
+Os 37 não percebidos ainda não foram conferidos contra os testes lentos, que só rodam no CI, nem contra a guarda do acervo. Os nove de conta ou laço pedem leitura do código para separar o estrago que não muda nada do que muda e ninguém vê. A medida diz onde falta proteção; qual teste não percebe nada, que é a outra metade da pergunta, pede cruzar cada teste com os estragos do arquivo que ele testa, e ainda não foi feito. Nenhum teste recebeu veredito ainda.
