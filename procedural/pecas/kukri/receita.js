@@ -59,9 +59,9 @@ export function lamina(T = TABELA) {
     trechos: [
       { nome: 'base', pontos: [T.dorso[T.dorso.length - 1], T.gume[0]], pontosNoTrecho: 3 },
       { nome: 'gumeLiso', pontos: T.gume.slice(0, i + 1) },
-      { nome: 'gume', pontos: T.gume.slice(i), grupo: 'fio', chanfro: { largura: T.chanfro_largura, entrada: T.degrau_rampa, limite: { fracao: T.chanfro_fracao, contra: ['dorso'] } } },
+      { nome: 'gume', pontos: T.gume.slice(i), grupo: 'fio', chanfro: { recuoEm: 'v', largura: T.chanfro_largura, entrada: T.degrau_rampa, limite: { fracao: T.chanfro_fracao, contra: ['dorso'] } } },
       { nome: 'ponta', pontos: [ponta] },
-      { nome: 'dorso', pontos: T.dorso, quinaQuebrada: { largura: T.quina_dorso_recuo, altura: T.quina_dorso_altura, limite: { fracao: T.quina_dorso_fracao, contra: ['gumeLiso', 'gume'] } } },
+      { nome: 'dorso', pontos: T.dorso, quinaQuebrada: { recuoEm: 'v', largura: T.quina_dorso_recuo, altura: T.quina_dorso_altura, limite: { fracao: T.quina_dorso_fracao, contra: ['gumeLiso', 'gume'] } } },
     ],
     raioDoCanto: [{ em: T.quebra, raio: T.quebra_raio }, { em: T.dorso_meio, raio: T.dorso_meio_raio }],
     afinar: { coordenada: 'u', de: T.afina_de, ate: T.comprimento, espessuraFinal: T.afina_ponta },

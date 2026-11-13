@@ -45,20 +45,28 @@ describe('chapaDeContorno', () => {
     expect(Math.max(...ys)).toBeCloseTo(13, 6);
   });
 
+  /* os pontos do trecho num laço, em mm, na ordem do eixo u */
+  const doTrecho = (r, laco, trecho) => Object.entries(r.pontosMm).filter(([n]) => n.startsWith(`c_l${laco}_${trecho}`)).map(([, p]) => p).sort((p, q) => p[0] - q[0]);
+
   it('o chanfro recua o gume nas faces e o deixa afiado: a face de cima no recuo e o fio no meio', () => {
-    const z = (laco, k) => g.pontosMm[`c_l${laco}_gume${k}`][2];
-    expect(z(2, 3)).toBeCloseTo(0, 6);
-    expect(z(4, 3)).toBeGreaterThan(5);
-    expect(z(4, 3)).toBeCloseTo(z(0, 3), 6);
+    const meio = doTrecho(g, 2, 'gume_'); const cima = doTrecho(g, 4, 'gume_'); const baixo = doTrecho(g, 0, 'gume_');
+    expect(Math.max(...meio.map((p) => p[2]))).toBeCloseTo(0, 6);
+    const i = Math.floor(cima.length / 2);
+    expect(cima[i][2]).toBeGreaterThan(5);
+    expect(cima[i][2]).toBeCloseTo(baixo[i][2], 6);
   });
 
   it('o canto de raio troca o vértice do dorso por um arco e é determinístico', () => {
     const sem = cunha({ raioDoCanto: [] });
-    expect(Object.keys(g.pontos).length).toBe(Object.keys(sem.pontos).length);
     expect(JSON.stringify(cunha().pontos)).toBe(JSON.stringify(g.pontos));
-    const z = (r, k) => r.pontosMm[`c_l2_dorso${k}`];
-    const desvio = Math.max(...[1, 2, 3, 4, 5, 6].map((k) => Math.hypot(z(g, k)[0] - z(sem, k)[0], z(g, k)[2] - z(sem, k)[2])));
-    expect(desvio).toBeGreaterThan(0.05);
+    const arco = doTrecho(g, 2, 'dorso_');
+    const reto = doTrecho(sem, 2, 'dorso_');
+    /* o vértice [60, 24] some, e o arco o contorna por dentro a mais de 0,25 mm */
+    expect(reto.some((p) => Math.hypot(p[0] - 60, p[2] - 24) < 1e-6)).toBe(true);
+    expect(arco.some((p) => Math.hypot(p[0] - 60, p[2] - 24) < 1e-6)).toBe(false);
+    const dentro = Math.min(...arco.map((p) => Math.hypot(p[0] - 60, p[2] - 24)));
+    expect(dentro).toBeGreaterThan(0.25);
+    expect(arco.length).toBeGreaterThan(reto.length);
   });
 
   it('o grupo do trecho vira grupo de faces do passo', () => {
