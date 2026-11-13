@@ -95,7 +95,7 @@ O disco é o da peça de prova `furo-em-face-plana`: 154 mm de diâmetro, 43 mm 
 
 Todas as malhas fecham. Os triângulos de razão acima de 10 são, nos dois métodos, as paredes dos furos e a lateral do disco, quadros de 43 mm de altura por 1 a 5 mm de largura.
 
-Neste caso o método atual já está limpo: a fatia 4 do plano das [costuras e furos limpos](../../planos/2026-11-09-costuras-e-furos-limpos.md) refez a face furada em anéis, e os 52 triângulos finos que sobram na peça de prova estão na tampa de trás, que o furo não toca. Com a boca viva os dois métodos dão o mesmo volume até o décimo algarismo. O protótipo não melhora a qualidade aqui e gasta de 35% a 49% mais faces. O ganho é de vocabulário: a boca arredondada entra na mesma operação do furo, e a boca chanfrada, que o `filete` recusa ("o raio não cabe: a face ficaria côncava"), sai.
+Neste caso o método atual já está limpo: a fatia 4 do plano das [costuras e furos limpos](../../decisoes/PLANOS-ENCERRADOS.md) refez a face furada em anéis, e os 52 triângulos finos que sobram na peça de prova estão na tampa de trás, que o furo não toca. Com a boca viva os dois métodos dão o mesmo volume até o décimo algarismo. O protótipo não melhora a qualidade aqui e gasta de 35% a 49% mais faces. O ganho é de vocabulário: a boca arredondada entra na mesma operação do furo, e a boca chanfrada, que o `filete` recusa ("o raio não cabe: a face ficaria côncava"), sai.
 
 O volume exato do disco com as nove bocas arredondadas é 760.763,0 mm³. A malha fica 0,07% acima porque os furos de 18 lados são polígonos inscritos no círculo.
 

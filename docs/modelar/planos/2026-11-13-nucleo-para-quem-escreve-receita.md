@@ -18,7 +18,7 @@ A IA que escreve uma receita recebe a recusa no passo errado, com o valor e o li
 
 ## Por que espera
 
-Os arquivos `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/estruturais.js` e `procedural/nucleo/operacoes/booleanas.js` são território do [plano das costuras](2026-11-09-costuras-e-furos-limpos.md), que tem prioridade e espera a aprovação de imagem da pessoa para fechar. Este plano ativa quando o das costuras fechar ou a pessoa passar os arquivos.
+Os arquivos `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/estruturais.js` e `procedural/nucleo/operacoes/booleanas.js` são território do [plano das costuras](../decisoes/PLANOS-ENCERRADOS.md), que tem prioridade e espera a aprovação de imagem da pessoa para fechar. Este plano ativa quando o das costuras fechar ou a pessoa passar os arquivos.
 
 ## Incluído, em fatias pela ordem de execução
 
