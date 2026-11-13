@@ -1,0 +1,1071 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "kukri",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "referência externa, fora do repositório: 1.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "cabo",
+        "tipo": "espessura",
+        "onde": "frente do cabo junto à lâmina (guarda)",
+        "sentido": "menor",
+        "evidencia": "Vista superior, x≈455 px: a frente é pouco mais larga que os gomos. Na foto o colar de guarda é bem mais largo que o primeiro gomo."
+      },
+      {
+        "parte": "lamina",
+        "tipo": "posicao",
+        "onde": "ponto de maior largura da barriga, lado do gume (-z), entre a quebra do dorso e a ponta",
+        "sentido": "interna",
+        "evidencia": "Vista superior: a barriga sobe pouco acima da linha da ponta, largura máxima cerca de 18% do comprimento. Na foto girada a barriga avança mais para o gume, cerca de 23%."
+      }
+    ],
+    "observacao": "Conjunto fiel em silhueta, partes e feições (quebra, chanfro, cinco gomos, bico, furo). Os dois achados são de proporção fina: barriga um pouco estreita e guarda discreta."
+  },
+  "partes": [
+    {
+      "nome": "lamina",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "cabo",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o ponto de conferencia 'maximo' do dorso passou de desvio 0 para 0,74 mm ao arredondar o canto: o ponto declarado fica no canto vivo que deixou de existir",
+    "um raio de 4 a 6 mm numa quebra de 13 graus quase nao altera a silhueta; a medida util e o meio comprimento em x, e a ferramenta nao tem opcao de raio de canto no contorno da chapa",
+    "a faca foi tratada como lataria por ter subdivisão e o pacote do crítico exigiu o Blender; a pessoa deu a dispensa",
+    "o crítico atribuiu a lâmina estreita ao gume; o contorno de referência levantado a olho dava o dorso curvo, e a pessoa viu na foto que ele é reto",
+    "o pedido descreve a foto girada em diagonal como vista reta; a orientação foi dita à mão"
+  ],
+  "notaDePassagem": "Canto da quebra do dorso (x 280) arredondado com Bezier quadratica de 6 mm de meio comprimento, parametro quebra_suave. Raio circular de 5 mm daria 0,6 mm de tangente, invisivel nessa deflexao de uns 13 graus; os dois retos do dorso, o gume, a ponta e o cabo nao mudaram. O pico do dorso baixou 0,8 mm.",
+  "receita": {
+    "sha256": "sha256:f69b375d6228581d4be3720210393777b2e312c8c094c927bae1e215fbcc0b26",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 298,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. Cada parte é uma gaiola de"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * `gaiolaPorLacos`: a lâmina em laços paralelos ao plano da chapa (corte em y, o contorno em x e z), e o cabo em laços"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * perpendiculares ao comprimento (corte em x, a seção ovalada em y e z)."
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * REFERENCIAL. x é o comprimento, de 0 na ponta do cabo a 430 na ponta da lâmina; y é a espessura e para cima, com o chão em"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * y = 0; z é a largura da lâmina, com o dorso para +z e o gume para -z. O cabo e a lâmina compartilham o eixo y do meio da chapa."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * Medidas em milímetro; a malha sai em metro por `gerarPassos`."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * ORIGEM DOS NÚMEROS. Os contornos do dorso, do gume e da silhueta do cabo foram levantados de uma foto de estudo fora do"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * repositório (resumo em `referencias/alvo.md` e `referencias/contorno-derivado.json`). Nada da foto entra aqui, só as"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * coordenadas derivadas, e a gravação da foto não é modelada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": "import { gaiolaPorLacos } from '../../../nucleo/gaiola-por-lacos.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "  /* o meio da chapa e do cabo, a altura do eixo sobre o chão */"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": "  eixo_y: 14.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "  /* LÂMINA: de x = lamina_base (a face que encosta no cabo) à ponta em x = comprimento */"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  comprimento: 430,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  lamina_base: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  espessura_dorso: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  /* meia espessura onde o dorso para e o chanfro começa a quebrar a quina do dorso, e o recuo dessa quina em z */"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  quina_dorso_ate: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  quina_dorso_recuo: 0.8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  /* o chanfro do gume: largura máxima em z, fração da largura da lâmina que ele pode ocupar, e o degrau onde o gume começa */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  chanfro_largura: 16,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  chanfro_fracao: 0.42,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  degrau_x: 152,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  degrau_rampa: 2.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* a lâmina afina de espessura do dorso ao fio da ponta: a partir de afina_de ela vai a afina_ponta de meia espessura */"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* meio comprimento, em x, do arredondamento da quebra do dorso: uma Bézier quadrática com o canto como controle, da ordem de 4 a 6 mm */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  quebra_suave: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  afina_de: 340, afina_ponta: 0.3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  passo_x: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  /* contornos levantados da foto, [x, z] em mm: do dorso, em duas metades que se encontram na quebra, e do gume */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  dorso_base_quebra: [[140, 34.5], [280, 57.2]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  dorso_quebra_ponta: [[280, 57.2], [355, 32.2], [430, 1.2]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  gume: [[140, 0.6], [152, 0.6], [154.5, 2.2], [160, 2.9], [170, 3.6], [180, 6], [190, 7.2], [200, 7.2], [210, 6.2], [220, 4.6], [230, 2.5], [240, 0.2], [250, -2.8], [260, -5.8], [270, -9], [280, -12.1], [290, -14.9], [300, -17.2], [310, -18.8], [320, -20], [330, -20.7], [340, -21], [350, -20.6], [360, -20], [370, -18.7], [380, -17], [390, -14.8], [400, -11.7], [410, -8.4], [420, -4.4], [430, 1.2]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  /* CABO: de x = 0 (a ponta do bico) a x = lamina_base (a frente, que faz de guarda) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  gomo_passo: 12.5, gomo_sulco: 5, gomo_sulco_meia_largura: 3.75, cabo_frente: 140.0755,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  /* o centro do cabo reto, em z, é uma reta; os semieixos de cada gomo, e o primeiro sulco, a 15 mm da frente */"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  cabo_z_em_140: 21, cabo_z_inclinacao: 0.12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  cabo_meio_z_cresta_60: 16.5, cabo_meio_z_cresta_126: 17, cabo_meio_y: 14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  /* a guarda: a frente é achatada em y, alarga em z e volta à seção dos gomos em x = guarda_ate */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  guarda_meio_z_frente: 20, guarda_meio_y_frente: 3.4, guarda_meio_y_pico: 14.4, guarda_ate: 130,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  oval_expoente: 2.4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* o bico, em x < 58: z do lado do dorso (hi), z do lado do gume (lo) e meia altura em y (hy) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  bico_hi: [[1, 2.5], [4, 5.5], [10, 9], [18, 15.5], [24, 17.5], [30, 19], [40, 20.8], [50, 22.5], [58, 23]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  bico_lo: [[1, -3], [4, -10], [10, -21], [18, -29], [24, -33], [27, -32.5], [30, -22], [33, -11], [40, -8], [50, -7.8], [58, -7.5]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  bico_hy: [[1, 3], [4, 7], [10, 11], [20, 13], [30, 13.5], [40, 14], [58, 14]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  bico_planos: [57.5, 53, 48, 43, 38, 34, 31, 28.5, 26, 23, 19, 15, 11, 7.5, 4.5, 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  furo_x: 17, furo_z: -1, furo_raio: 2.6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  niveis_cabo: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "/* ---------- ajudantes de curva ---------- */"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "/** Interpola `tab` ([x, v] com x crescente) em x por Hermite monótono: sem overshoot, tangente nula nos extremos locais. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "function interpola(tab, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  const n = tab.length;"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  if (x <= tab[0][0]) return tab[0][1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  if (x >= tab[n - 1][0]) return tab[n - 1][1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  let i = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  while (tab[i + 1][0] < x) i++;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const sec = (k) => (tab[k + 1][1] - tab[k][1]) / (tab[k + 1][0] - tab[k][0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const tang = (k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    if (k === 0) return sec(0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    if (k === n - 1) return sec(n - 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    const a = sec(k - 1); const b = sec(k);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    return a * b <= 0 ? 0 : (2 * a * b) / (a + b);"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const [x0, y0] = tab[i]; const [x1, y1] = tab[i + 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const h = x1 - x0; const t = (x - x0) / h;"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const h00 = 2 * t ** 3 - 3 * t ** 2 + 1; const h10 = t ** 3 - 2 * t ** 2 + t; const h01 = -2 * t ** 3 + 3 * t ** 2; const h11 = t ** 3 - t ** 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  return h00 * y0 + h10 * h * tang(i) + h01 * y1 + h11 * h * tang(i + 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "const entre = (a, b, t) => Math.min(b, Math.max(a, t));"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "/* ---------- lâmina ---------- */"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "/** As estações em x do contorno da lâmina, da base à ponta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "export function estacoes(T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const xs = new Set([T.lamina_base, T.degrau_x, T.degrau_x + T.degrau_rampa, 280, 280 - T.quebra_suave / 2, 280 + T.quebra_suave / 2, T.comprimento]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  for (let x = T.lamina_base; x < T.comprimento; x += T.passo_x) xs.add(x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  return [...xs].sort((a, b) => a - b);"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "const zRetoDorso = (T, x) => (x <= 280 ? interpola(T.dorso_base_quebra, x) : interpola(T.dorso_quebra_ponta, x));"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "function zDorso(T, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const r = T.quebra_suave;"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  if (!(Math.abs(x - 280) < r)) return zRetoDorso(T, x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const t = (x - 280 + r) / (2 * r);"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  return (1 - t) ** 2 * zRetoDorso(T, 280 - r) + 2 * t * (1 - t) * zRetoDorso(T, 280) + t * t * zRetoDorso(T, 280 + r);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "const zGume = (T, x) => interpola(T.gume, x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "/** Largura em z do chanfro do gume na estação x: nula no trecho sem fio, sobe no degrau e cede perto da ponta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "export function larguraDoChanfro(T, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  const rampa = entre(0, 1, (x - T.degrau_x) / T.degrau_rampa);"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  return Math.min(T.chanfro_largura * rampa, T.chanfro_fracao * (zDorso(T, x) - zGume(T, x)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "/** O contorno da lâmina no plano s (distância do meio da chapa, em mm): { gume, dorsoPonta, dorsoBase, base } em [x, z]. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "export function lacoDaLamina(T, s) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const xs = estacoes(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  const meia = T.espessura_dorso / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  const ponto = (x) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    const a = Math.abs(s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    const larg = zDorso(T, x) - zGume(T, x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    const rec = a > T.quina_dorso_ate ? Math.min(T.quina_dorso_recuo, 0.15 * larg) : 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    const zd = zDorso(T, x) - rec;"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    const ze = zGume(T, x) + larguraDoChanfro(T, x) * (a / meia);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    return { d: [x, zd], e: [x, ze] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const pts = xs.map(ponto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  const gume = pts.map((p) => p.e);"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const dorso = pts.map((p) => p.d);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  const ponta = gume[gume.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  const iQuebra = xs.indexOf(280);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  const dorsoPonta = dorso.slice(iQuebra).reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  const dorsoBase = dorso.slice(0, iQuebra + 1).reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  const base = [dorso[0], [(dorso[0][0] + gume[0][0]) / 2, (dorso[0][1] + gume[0][1]) / 2], gume[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  return { gume, ponta: [ponta, ponta], dorsoPonta, dorsoBase, base };"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "export function argumentosDaLamina(T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  const niv = [-T.espessura_dorso / 2, -T.quina_dorso_ate, 0, T.quina_dorso_ate, T.espessura_dorso / 2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  const l0 = lacoDaLamina(T, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    nome: 'l', eixo: 'y', tampa: { de: 'base', ate: 'ponta' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    trechos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "      { nome: 'base', pontos: l0.base.length }, { nome: 'gume', pontos: l0.gume.length }, { nome: 'ponta', pontos: 2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "      { nome: 'dorsoPonta', pontos: l0.dorsoPonta.length }, { nome: 'dorsoBase', pontos: l0.dorsoBase.length },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    lacos: niv.map((s) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "      const l = lacoDaLamina(T, s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "      return { em: T.eixo_y + s, trechos: { base: l.base, gume: l.gume, ponta: l.ponta, dorsoPonta: l.dorsoPonta, dorsoBase: l.dorsoBase } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    }),"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    vincos: niv.map((_, i) => ({ nome: `plano${i}`, laco: `l${i}`, nitidez: 'viva' })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    grupos: [{ nome: 'fio', trechos: ['gume'] }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "/* ---------- cabo ---------- */"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "const centroZ = (T, x) => T.cabo_z_em_140 - T.cabo_z_inclinacao * (T.lamina_base - x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "/** Quanto o sulco entre gomos tira dos semieixos em x. Os sulcos ficam em lamina_base - 15 - k * gomo_passo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "function sulco(T, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  let d = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  for (let k = 0; k < 6; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    const xc = T.cabo_frente - 15 - k * T.gomo_passo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "    const u = Math.abs(x - xc);"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "    if (u < T.gomo_sulco_meia_largura) d = Math.max(d, T.gomo_sulco * (0.5 + 0.5 * Math.cos((Math.PI * u) / T.gomo_sulco_meia_largura)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  return d;"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "/** A seção do cabo em x: centro e semieixos em z e y. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "export function secaoDoCabo(T, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  if (x < 58) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    const hi = interpola(T.bico_hi, x); const lo = interpola(T.bico_lo, x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    return { zc: (hi + lo) / 2, sz: (hi - lo) / 2, sy: interpola(T.bico_hy, x) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  const t = entre(0, 1, (x - 60) / (126 - 60));"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  const crista = T.cabo_meio_z_cresta_60 + (T.cabo_meio_z_cresta_126 - T.cabo_meio_z_cresta_60) * t;"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  let sz = crista; let sy = T.cabo_meio_y;"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "  const d = sulco(T, x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  sz -= d; sy -= d;"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  if (x > T.guarda_ate) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "    const g = (x - T.guarda_ate) / (T.cabo_frente - T.guarda_ate);"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "    const alarga = g * g * (3 - 2 * g);"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "    sz = crista + (T.guarda_meio_z_frente - crista) * alarga;"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "    sy = T.guarda_meio_y_pico + (T.guarda_meio_y_frente - T.guarda_meio_y_pico) * g ** 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "    sz -= d; sy -= Math.min(d, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  return { zc: centroZ(T, x), sz, sy };"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "export function planosDoCabo(T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "  const guarda = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  for (let k = 0; ; k++) { const x = T.cabo_frente - 2.5 * k; if (x < 60) break; guarda.push(x); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "  return [...[...T.bico_planos].sort((a, b) => a - b), ...guarda.reverse()];"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "function anel(T, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "  const { zc, sz, sy } = secaoDoCabo(T, x);"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "  const p = T.oval_expoente;"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  const pt = (k) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "    const th = (k * Math.PI) / 8;"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "    const c = Math.cos(th); const sn = Math.sin(th);"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "    const v = zc + sz * Math.sign(c) * Math.abs(c) ** (2 / p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "    const u = T.eixo_y + sy * Math.sign(sn) * Math.abs(sn) ** (2 / p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "    return [u, v];"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  const trecho = (k0) => Array.from({ length: 5 }, (_, i) => pt((k0 + i) % 16));"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  return { a: trecho(0), b: trecho(4), c: trecho(8), d: trecho(12) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": ""
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "registradaEm": "2026-11-13T18:26:31.590Z",
+  "facesFinas": {
+    "total": 12,
+    "porParte": {
+      "cabo": 12
+    }
+  }
+}
