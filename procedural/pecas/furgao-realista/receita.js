@@ -985,7 +985,13 @@ export function vaosDeclarados(T) {
   derivarFarois(T).forEach((fa, k) => vaos.push({ nome: `farol${fa.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_FAROL(k) }, frisos: [`abaVaoFarol${fa.lado}`, `aroFarol${fa.lado}`] }));
   derivarLuzesDeCanto(T, forma(T)).forEach((lc, k) => vaos.push({ nome: `luzDeCanto${lc.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_LUZ_CANTO(k) }, frisos: [`abaVaoLuzDeCanto${lc.lado}`] }));
   derivarPiscasLaterais(T).forEach((pl, k) => vaos.push({ nome: `piscaLateral${pl.lado}`, superficie: { op: 'aberturaPorContorno', id: ID_PISCA_LATERAL(k) }, frisos: [`abaVaoPiscaLateral${pl.lado}`] }));
-  const { refletores } = derivarLuzesPorDentro(T, forma(T));
+  const { refletores, carcacaDoFarol } = derivarLuzesPorDentro(T, forma(T));
+  /* a aba da caixa escura do farol é uma faixa em volta das paredes: a volta de dentro dela fica aberta de propósito, e a guarda a lê como um furo da faixa */
+  carcacaDoFarol.paredes.forEach((pa, k) => {
+    const lado = k === 0 ? 'Esquerdo' : 'Direito'; const J = pa.aba.vertices.length / 2;
+    const volta = Array.from({ length: J }, (_, j) => `abaParedeFarol${lado}_i${j}`);
+    vaos.push({ nome: `abaDaCaixaDoFarol${lado}`, borda: [...volta, volta[0]], semMoldura: { motivo: 'é a volta de dentro da aba da caixa escura do farol, uma faixa de 4 mm atrás da perna da aba do vão, que nenhuma vista alcança: o meio dela é a própria caixa, e não leva moldura' } });
+  });
   for (const [, refletor] of LUZES_POR_DENTRO) {
     const capa = refletores.find((r) => r.nome === refletor).capa;
     vaos.push({ nome: `furo${refletor.replace(/^refletor/, 'DoRefletor')}`, borda: [...capa.furo, capa.furo[0]], semMoldura: { motivo: 'é o furo do soquete no fundo do refletor, por onde passa o bulbo da lâmpada: a flange dela o fecha por trás, e a borda dele não leva moldura' } });
