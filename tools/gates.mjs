@@ -26,6 +26,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { availableParallelism } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { pecasMudadas, rodarGuardaLocal } from './gates/guarda-local.mjs';
 import { decidir, diretorioDasLeituras, fotografar, gravarVerdes, lerLeiturasDoGate, lerVerdes, registroVerde, rodouInteiro } from './gates/seletor.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -369,6 +370,17 @@ export function rodarGate(gate, { silencioso, testes = null, sinal = null }) {
   });
 }
 
+async function rodarGateDaGuardaLocal(pecas, silencioso) {
+  const inicio = Date.now();
+  const { codigo, saida, paraOCi, medidas } = await rodarGuardaLocal(pecas, { raiz: RAIZ });
+  const arquivo = guardarSaidaDoGate('guarda:acervo', saida, codigo);
+  if (!silencioso || codigo !== 0 || paraOCi.length) {
+    process.stdout.write(codigo === 0 ? '▶ guarda:acervo — ok\n' : `${linhaDeFalha('guarda:acervo', arquivo)}\n`);
+    process.stdout.write(saida);
+  }
+  return { gate: 'guarda:acervo', codigo, duracao: Date.now() - inicio, arquivo, lentos: null, guardaLocal: true, pecasMedidas: medidas, pecasParaOCi: paraOCi };
+}
+
 async function executar() {
   const pararNoPrimeiro = process.argv.includes('--parar-no-primeiro');
   const silencioso = process.argv.includes('--silencioso');
@@ -402,14 +414,23 @@ async function executar() {
   }
 
   const comPesados = completo || Boolean(process.env.CI) || process.argv.includes('--com-pesados');
-  const paraOCi = comPesados ? [] : bateria.filter((g) => PESADOS_PARA_O_CI.includes(g) && !guardados.includes(g));
+  /* A guarda do acervo roda aqui só nas peças que o envio mudou (tools/gates/guarda-local.mjs). Sem saber o que mudou, fica para o CI. */
+  let guardaLocal = null;
+  if (!comPesados && alterados && bateria.includes('guarda:acervo') && !guardados.includes('guarda:acervo')) {
+    const { pecasDoAcervo } = await import('./modelar/guardas/guarda-acervo.mjs');
+    guardaLocal = pecasMudadas(alterados, pecasDoAcervo());
+  }
+  const paraOCi = comPesados ? [] : bateria.filter((g) => PESADOS_PARA_O_CI.includes(g) && !guardados.includes(g) && !(g === 'guarda:acervo' && guardaLocal));
+  if (guardaLocal && !guardaLocal.length) console.log('gates — guarda:acervo: nenhuma peça de procedural/pecas/ mudou, nada roda aqui; o CI roda o acervo inteiro.');
+  else if (guardaLocal) console.log(`gates — guarda:acervo: só as peças mudadas (${guardaLocal.join(', ')}); o CI roda o acervo inteiro.`);
   if (paraOCi.length) console.log(`gates — ficam para o CI, que roda tudo antes de a main andar: ${paraOCi.join(', ')} (--com-pesados os roda aqui).`);
 
   const porGate = new Map();
   for (const gate of guardados) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, guardado: true });
+  if (guardaLocal && !guardaLocal.length) porGate.set('guarda:acervo', { gate: 'guarda:acervo', codigo: 0, duracao: 0, arquivo: null, lentos: null, semPeca: true });
   for (const gate of paraOCi) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, paraOCi: true });
   const duracoesDosGates = lerDuracoesDosGates();
-  const estagios = separarEstagios(bateria.filter((g) => !guardados.includes(g) && !paraOCi.includes(g)), duracoesDosGates);
+  const estagios = separarEstagios(bateria.filter((g) => !guardados.includes(g) && !paraOCi.includes(g) && !porGate.has(g)), duracoesDosGates);
   let fila = [];
   const ocupados = new Set();
   let pesoEmUso = 0;
@@ -437,10 +458,11 @@ async function executar() {
       for (const recurso of recursos) ocupados.add(recurso);
       pesoEmUso += pesoDe(gate);
       try {
-        const resultado = await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
+        const resultado = gate === 'guarda:acervo' && guardaLocal ? await rodarGateDaGuardaLocal(guardaLocal, silencioso) : await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
         porGate.set(gate, resultado);
         duracoesDosGates[gate] = resultado.duracao;
-        if (gravaVerdes && resultado.codigo === 0 && rodouInteiro(gate, decisoes.get(gate)?.testes ?? null, completo)) {
+        /* o verde do gate é o do acervo inteiro; a rodada só das peças mudadas não o grava */
+        if (gravaVerdes && !resultado.guardaLocal && resultado.codigo === 0 && rodouInteiro(gate, decisoes.get(gate)?.testes ?? null, completo)) {
           const r = registroVerde(gate, foto, { testes: decisoes.get(gate)?.testes ?? null, anterior: verdes[gate] });
           if (r) verdes[gate] = r;
         }
@@ -474,6 +496,7 @@ async function executar() {
   console.log(`\n${'─'.repeat(52)}`);
   for (const { gate, codigo, duracao, arquivo, guardado } of resultados) {
     if (guardado) { console.log(`= ${gate.padEnd(24)}  guardado`); continue; }
+    if (porGate.get(gate).semPeca) { console.log(`= ${gate.padEnd(24)}  nenhuma peça mudou; o CI roda o acervo inteiro`); continue; }
     if (porGate.get(gate).paraOCi) { console.log(`→ ${gate.padEnd(24)}  fica para o CI`); continue; }
     const marca = codigo === 0 ? '✓' : '✗';
     console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s${arquivo ? `  saída: ${arquivo}` : ''}`);

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2058 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2060 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2963,6 +2963,8 @@
 
 ## tools/gates/
 
+- `guarda-local.mjs` — guarda-local.mjs — a guarda do acervo, só das peças que o envio mudou, dentro da bateria local.
+- `guarda-local.test.mjs` — guarda-local.test.mjs — a bateria local roda a guarda do acervo só das peças que o envio mudou.
 - `leituras-do-teste.mjs` — leituras-do-teste.mjs — setupFile do vitest: abre o registro do arquivo de teste deste processo e liga a anotação de tools/gates/leituras.mjs. Só entra na co…
 - `leituras.mjs` — leituras.mjs — anota o que cada arquivo de teste lê do repositório enquanto roda, para o seletor saber que testes uma mudança fora do grafo de imports afeta.
 - `leituras.test.mjs` — leituras.test.mjs — o registro do que cada arquivo de teste lê, observado pelo fs e pelos processos filhos.
