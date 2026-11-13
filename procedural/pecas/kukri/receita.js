@@ -260,6 +260,8 @@ const receita = {
       'referencias/contorno-derivado.json',
     ],
     escala: { medida: 'comprimento total, da ponta do cabo à ponta da lâmina', milimetros: 430 },
+    /* dispensa dada pela pessoa em 2026-11-13: a faca usa subdivisão no cabo e não tem chapa de carroceria */
+    lataria: { dispensa: 'faca de mão: lâmina de chapa plana e cabo maciço, sem chapa de superfície livre em que amassado largo e raso possa aparecer; dispensa dada pela pessoa em 2026-11-13' },
     partes: [
       { nome: 'lamina', forma: 'chapa de 290 mm (x 140 a 430), 5 mm no dorso: quebra em ângulo do dorso em x 280, dorso até a ponta aguda, barriga larga perto da ponta, chanfro largo no gume, trecho sem fio e degrau junto ao cabo, quinas do dorso quebradas', tecnica: 'gaiola por laços em cinco planos de y, contorno levantado da foto, sem subdivisão para o chanfro ficar plano; o fio é um grupo de faces com material próprio' },
       { nome: 'cabo', forma: 'peça única de 140 mm (x 0 a 140), seção ovalada: frente alargada de guarda, cinco gomos com sulcos, bico curvado para o lado do gume e furo passante em y para cordão', tecnica: 'gaiola por laços em cortes de x com subdivisão de um nível, sulcos como estreitamento dos semieixos, furo por subtração de um cilindro' },
