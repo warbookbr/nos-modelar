@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2042 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2047 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -439,6 +439,11 @@
 ## docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/
 
 - `README.md` — Revisão do projeto para o trabalho da IA: medidas e relatório
+- `pergunta-4-pastas-e-modulos.md` — Pergunta 4: pastas e módulos (inventário medido, sem a comparação externa)
+- `pergunta-4-projetos-comparaveis.md` — Pergunta 4: como projetos comparáveis organizam núcleo, peças, ferramentas e documentação
+- `pergunta-5-erros-nomes-e-argumentos.md` — Pergunta 5, segunda metade: mensagens de erro, nomes e argumentos das operações
+- `pergunta-5-operacoes-e-verbosidade.md` — Pergunta 5 (primeira metade): operações contra uso real e verbosidade das receitas
+- `pergunta-5-tempo-por-operacao.md` — Pergunta 5: tempo por operação nas peças mais pesadas
 
 ## docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/
 
