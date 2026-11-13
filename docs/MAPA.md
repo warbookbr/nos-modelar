@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1820 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1821 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -411,6 +411,7 @@
 ## docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/
 
 - `README.md` — Revisão das verificações e dos testes: medidas e veredito
+- `mapa-e-piloto.md` — O mapa dos testes e o piloto da medida por estrago
 
 ## docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/
 
