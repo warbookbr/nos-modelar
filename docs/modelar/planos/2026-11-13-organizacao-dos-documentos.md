@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `docs/modelar/usar/`, `docs/modelar/guias/`, `docs/modelar/contratos/README.md`, `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`, `docs/modelar/decisoes/`, `docs/modelar/pesquisas/`, `docs/modelar/historico/`, `docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/`, `tools/modelar/comecar.mjs`, `procedural/nucleo/CLAUDE.md`, `procedural/pecas/CLAUDE.md`, `tools/CLAUDE.md`. Entram também os 41 documentos soltos de `docs/modelar/` que a proposta lista com destino, a pasta `docs/modelar/planos/encerrados/`, que é caminho compartilhado, e, em cada arquivo que cita um documento movido, só a linha do link.
+**Território:** `docs/modelar/usar/`, `docs/modelar/guias/`, `docs/modelar/contratos/README.md`, `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`, `docs/modelar/decisoes/`, `docs/modelar/pesquisas/`, `docs/modelar/historico/`, `docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/`, `procedural/nucleo/CLAUDE.md`, `procedural/pecas/CLAUDE.md`, `tools/CLAUDE.md`. Entram também os 41 documentos soltos de `docs/modelar/` que a proposta lista com destino, a pasta `docs/modelar/planos/encerrados/`, que é caminho compartilhado, e, em cada arquivo que cita um documento movido, só a linha do link.
 
 **Responsável:** a IA da sessão do furgão orquestra, com agentes; a pessoa aprovou a organização por imagem em 2026-11-13.
 
