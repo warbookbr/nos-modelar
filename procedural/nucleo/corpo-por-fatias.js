@@ -56,7 +56,7 @@
  * horário; contorno que se cruza ou se toca; marcos diferentes de uma fatia a outra; `pontos` ímpar, abaixo de 8 ou sem lugar para os marcos; fatia cuja volta tem segmento médio
  * menor que SEGMENTO_MEDIO_MINIMO_MM (a ponta de um ponto só e a fatia minúscula); uma volta reamostrada ou interpolada que se cruza (pontos de menos, ou
  * fatias torcidas); a tampa em escada que não cobre o contorno (côncavo demais na ponta); a gaiola com face fina; `vivos` com marco que não existe. */
-import { gaiolaPorLacos, DISTANCIA_MINIMA_ENTRE_PLANOS_MM } from './gaiola-por-lacos.js';
+import { gaiolaPorLacos, DISTANCIA_MINIMA_ENTRE_PLANOS_MM, LIMITE_DE_FACE_FINA_NA_GAIOLA, RAZAO_MAXIMA_DE_AMOSTRAGEM } from './gaiola-por-lacos.js';
 
 const EIXOS = { x: 0, y: 1, z: 2 };
 const falha = (texto) => { throw new RangeError(`corpoPorFatias: ${texto}`); };
@@ -484,8 +484,22 @@ export function corpoPorFatias(o = {}) {
     grupos,
     ...(vincos.length ? { vincos } : {}),
   });
+  /* o que a gaiola diz, nos termos desta operação: o trecho dela é o segmento da volta de índice q (`p<q>_`) */
+  const indiceDe = (trecho) => Number(/^p(\d+)_$/.exec(trecho)?.[1]);
   const finas = g.avisos.filter((a) => a.ref === 'facesFinas');
-  if (finas.length) falha(`a gaiola sai com ${finas[0].quantidade} ${finas[0].quantidade === 1 ? 'face fina' : 'faces finas'} (${finas[0].texto}); ponha uma fatia entre as de contorno muito diferente, afaste as fatias ou use menos pontos`);
+  if (finas.length) {
+    const f = finas[0];
+    const onde = [...new Set(f.pontos.map((n) => /_p(\d+)_0$/.exec(n)?.[1]).filter((x) => x != null))].join(', ');
+    falha(`a gaiola sai com ${f.quantidade} ${f.quantidade === 1 ? 'face fina' : 'faces finas'}, a pior com área de ${br(f.razao, 4)} vezes o quadrado da maior aresta (o limite é ${br(LIMITE_DE_FACE_FINA_NA_GAIOLA, 3)}), perto dos pontos de índice ${onde} da volta de ${N} pontos; um contorno de poucos lados com pontos demais sobre eles deixa a tampa em degraus finos: use menos pontos (o contorno dado tem até ${maiorDado}), ou ponha uma fatia intermediária entre as de contorno muito diferente`);
+  }
+  const avisosDaGaiola = g.avisos.map((a) => {
+    if (a.ref !== 'amostragemDesigual') return a;
+    const q = indiceDe(a.trechos[1]);
+    return {
+      ref: 'amostragemDesigual', laco: a.laco, indice: q, razao: a.razao,
+      texto: `amostragem desigual no ponto ${q} da volta do laço ${citar(a.laco)}: o segmento antes dele e o depois diferem na razão ${br(a.razao, 1)}, acima de ${RAZAO_MAXIMA_DE_AMOSTRAGEM}, e a subdivisão deixa calombo ali; ponha mais pontos na volta, ou nomeie esse ponto como marco para o canto ficar onde está`,
+    };
+  });
 
   const pontoDe = (laco, i) => {
     const r = typeof laco === 'number' ? laco : lacosDados.findIndex((l) => l.nome === laco);
@@ -497,7 +511,7 @@ export function corpoPorFatias(o = {}) {
   };
   return {
     ...g,
-    avisos: [...g.avisos, ...avisos],
+    avisos: [...avisosDaGaiola, ...avisos],
     pontoDe,
     corpo: {
       planos, pontosPorVolta: N, marcos, perdas,

@@ -341,6 +341,32 @@ describe('corpoPorFatias: o corpo que afina', () => {
   });
 });
 
+describe('corpoPorFatias: o que a gaiola diz, nos termos da operação', () => {
+  const tri = circ(10, 3);
+  const prisma = (n) => ({ nome: 'c', eixo: 'x', pontos: n, fatias: [{ em: 0, contorno: tri }, { em: 40, contorno: tri }] });
+
+  it('recusa a gaiola com face fina em entradas reais, sem a palavra `some` e com os pontos e o remédio desta operação', () => {
+    for (const o of [prisma(32), prisma(48), { nome: 'c', eixo: 'x', pontos: 32, fatias: [{ em: 0, contorno: tri }, { em: 40, contorno: circ(10, 200) }] }]) {
+      let msg;
+      try { corpoPorFatias(o); } catch (e) { msg = e.message; }
+      expect(msg, JSON.stringify(o.pontos)).toMatch(/^corpoPorFatias: a gaiola sai com \d+ faces? finas?, a pior com área de 0,00\d+ vezes o quadrado da maior aresta \(o limite é 0,005\), perto dos pontos de índice [\d, ]+ da volta de \d+ pontos; .*use menos pontos \(o contorno dado tem até \d+\)/);
+      expect(msg).not.toMatch(/some|trecho|gaiolaPorLacos/);
+    }
+    expect(() => corpoPorFatias(prisma(24))).not.toThrow();
+  });
+
+  it('o aviso amostragemDesigual sai com o índice do ponto, sem falar de trecho', () => {
+    const U = [[0, 0], [30, 0], [30, 20], [20, 20], [20, 5], [10, 5], [10, 20], [0, 20]];
+    const Q = [[0, 0], [30, 0], [30, 20], [0, 20]];
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: Q }, { em: 20, contorno: U }, { em: 40, contorno: Q }] });
+    const a = g.avisos.find((x) => x.ref === 'amostragemDesigual');
+    expect(a).toBeTruthy();
+    expect(Number.isInteger(a.indice)).toBe(true);
+    expect(a.texto).toMatch(/^amostragem desigual no ponto \d+ da volta do laço '[fx][\w]*': o segmento antes dele e o depois diferem na razão [\d,]+, acima de 4, .*nomeie esse ponto como marco/);
+    expect(a.texto).not.toMatch(/trecho|'p\d+_'/);
+  });
+});
+
 describe('corpoPorFatias: as recusas', () => {
   const ok = (f = {}) => ({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: circ(5, 8) }, { em: 20, contorno: circ(5, 8) }], ...f });
   const com = (i, mudanca) => { const o = ok(); o.fatias[i] = { ...o.fatias[i], ...mudanca }; return o; };
