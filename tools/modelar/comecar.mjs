@@ -8,12 +8,14 @@
  * gerada na hora (famílias, peças do acervo ou operações) e o passo seguinte lido do estado: os planos ativos e a tarefa de
  * `comunicacao.md` para quem muda o projeto. Um nome que não é nó busca o tópico nos títulos dos documentos de uso, das skills e
  * de `docs/modelar/`, e `arquivo#âncora` entrega a seção. Até 2026-11-05 o `--arquivo` lia o Condutor de um esboço detalhado; o
- * esboço antigo saiu, e com ele o Condutor.
+ * esboço antigo saiu, e com ele o Condutor. Antes dos títulos, um nome que é de ficha de capacidade, de operação do núcleo, de extensão ou de
+ * script do `package.json` recebe o comando que o explica (`capacidade`, ou o próprio comando com a opção de ajuda).
  *
  * O comando só lê. A ferramenta MCP `comecar` chama a mesma função `comecar`, e as duas respondem igual. */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { classificarNome } from './capacidade.mjs';
 import { ancoraDe, carregarRoteiros, filhosDoNo, medirRoteiro, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
 import { ativosDoIndice } from '../mapa/planos.mjs';
 import { registrarUso } from './uso.mjs';
@@ -181,6 +183,33 @@ export function buscarTopico(consulta, raiz = RAIZ, limite = 8) {
   return achados.sort((a, b) => b.pontos - a.pontos || a.bytes - b.bytes || a.item.localeCompare(b.item)).slice(0, limite);
 }
 
+/* Um script de `package.json` responde a `--ajuda` quando o arquivo que ele roda traz a opção de ajuda entre aspas; com comando composto ou arquivo que não achamos, não se sabe. */
+function respondeAjuda(comando, raiz) {
+  if (/&&|\|\||;|\|/.test(comando)) return false;
+  const arquivo = /(?:^|\s)([\w./-]+\.(?:mjs|js))(?:\s|$)/.exec(comando)?.[1];
+  return Boolean(arquivo) && existsSync(join(raiz, arquivo)) && /['"`]--ajuda['"`]/.test(readFileSync(join(raiz, arquivo), 'utf8'));
+}
+
+/* O nome que não é roteiro mas é de uma ficha, operação, extensão ou comando: { tipo, nome, frase, comando } ou null. */
+export function buscarNome(consulta, raiz = RAIZ) {
+  const nome = String(consulta).trim();
+  if (raiz === RAIZ) {
+    const achado = classificarNome(nome);
+    if (achado) {
+      const comando = `npm run capacidade -- ${achado.nome}`;
+      const frase = { ficha: `é uma ficha de capacidade: rode \`${comando}\``, operacao: `é uma operação do núcleo: rode \`${comando}\``, extensao: `é uma extensão (só existe no registro com extensões): rode \`${comando}\`` }[achado.tipo];
+      return { tipo: achado.tipo, nome: achado.nome, frase, comando };
+    }
+  }
+  const caminho = join(raiz, 'package.json');
+  const scripts = existsSync(caminho) ? JSON.parse(readFileSync(caminho, 'utf8')).scripts ?? {} : {};
+  const script = Object.keys(scripts).find((n) => n.toLowerCase() === nome.toLowerCase());
+  if (!script) return null;
+  const ajuda = respondeAjuda(scripts[script], raiz);
+  const comando = ajuda ? `npm run ${script} -- --ajuda` : `npm run ${script}`;
+  return { tipo: 'comando', nome: script, frase: ajuda ? `é um comando: rode \`${comando}\`` : `é um comando: \`${comando}\``, comando };
+}
+
 /* A resposta da entrada: { ok, codigo, texto, resultado }. */
 export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
   const dados = carregarRoteiros(raiz);
@@ -197,7 +226,8 @@ export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
     if (secao !== null) return { ok: true, codigo: 0, texto: `${secao}\n`, resultado: { secao: q, bytes: Buffer.byteLength(secao) } };
   }
   const achado = resolverRoteiro(dados.roteiros, q);
-  registrarUso({ evento: 'comecar', roteiro: q.toLowerCase(), achado: achado.desconhecido !== true });
+  const porNome = achado.desconhecido ? buscarNome(q, raiz) : null;
+  registrarUso({ evento: 'comecar', roteiro: q.toLowerCase(), achado: achado.desconhecido !== true || porNome !== null });
   if (achado.grupo) {
     const pergunta = dados.perguntas?.[achado.grupo] ?? `Qual destes ramos de "${achado.grupo}"?`;
     const passo = 'Escolha o ramo e rode npm run comecar -- <ramo>.';
@@ -209,14 +239,16 @@ export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
   }
   if (achado.desconhecido) {
     const topicos = buscarTopico(q, raiz);
-    const linhas = topicos.length > 0
-      ? [`"${q}" não é um ramo; os títulos mais perto (npm run comecar -- '<arquivo#âncora>' entrega a seção):`, ...topicos.map((t) => `  ${t.item} (${milhar(t.bytes)} bytes)`)]
-      : [`"${q}" não é um ramo nem um título de documento.`];
+    const ok = topicos.length > 0 || porNome !== null;
+    const linhas = [];
+    if (porNome) linhas.push(`"${q}" ${porNome.frase}.`);
+    if (topicos.length > 0) linhas.push(`${porNome ? '\n' : ''}"${q}" não é um ramo; os títulos mais perto (npm run comecar -- '<arquivo#âncora>' entrega a seção):`, ...topicos.map((t) => `  ${t.item} (${milhar(t.bytes)} bytes)`));
+    if (!ok) linhas.push(`"${q}" não é um ramo nem um título de documento, nem o nome de uma operação, extensão, ficha de capacidade ou comando.`);
     return {
-      ok: topicos.length > 0, codigo: topicos.length > 0 ? 0 : 1,
+      ok, codigo: ok ? 0 : 1,
       texto: `${linhas.join('\n')}\n\n${textoDaLista(dados.roteiros, 'Ramos')}\n`,
-      resultado: { roteiros: dados.roteiros.map(({ id }) => id), topicos },
-      ...(topicos.length > 0 ? {} : { erro: { codigo: 'roteiro_desconhecido', mensagem: `"${q}" não é um ramo nem um título de documento.`, acao: 'Use um dos ramos listados, ou chame sem argumento para a pergunta inicial.' } }),
+      resultado: { roteiros: dados.roteiros.map(({ id }) => id), topicos, ...(porNome ? { nome: { tipo: porNome.tipo, nome: porNome.nome, comando: porNome.comando } } : {}) },
+      ...(ok ? {} : { erro: { codigo: 'roteiro_desconhecido', mensagem: `"${q}" não é um ramo nem um título de documento, nem o nome de uma operação, extensão, ficha de capacidade ou comando.`, acao: 'Use um dos ramos listados, ou chame sem argumento para a pergunta inicial.' } }),
     };
   }
 
@@ -256,8 +288,14 @@ export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
   };
 }
 
+const AJUDA = `npm run comecar [-- <roteiro | tópico | nome>]  (node tools/modelar/comecar.mjs)
+Sem argumento, a pergunta inicial e o estado do trabalho. Com um roteiro ou grupo, a leitura ou os ramos. Com outro nome: o título de documento mais perto, ou, se for
+nome de operação, de extensão, de ficha de capacidade ou de script de package.json, o comando que o explica. arquivo#âncora entrega a seção.
+`;
+
 function executar(argv) {
   const args = [...argv];
+  if (args.includes('--ajuda')) { process.stdout.write(AJUDA); return; }
   const r = comecar({ roteiro: args[0] ?? null });
   (r.ok ? process.stdout : process.stderr).write(r.texto);
   process.exitCode = r.codigo;
