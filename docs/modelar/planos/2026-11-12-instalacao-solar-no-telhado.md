@@ -1,6 +1,6 @@
 # Instalação solar no telhado: um caso prático de montagem real, do telhado de fibrocimento aos painéis presos nos trilhos
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/pecas/instalacao-solar/`, `docs/modelar/banco-de-provas/instalacao-solar-2026-11-12/`
 
@@ -133,4 +133,6 @@ pelo fabricante do painel), o achado vai à pessoa antes de qualquer ajuste, por
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-13, por decisão da pessoa: "Instalação solar damos por concluído". Está no acervo a instalação em onze receitas de parte e a montagem, com o grampo final, a emenda e o perfil corrigidos pelas fotos das peças reais, e a auditoria de interseções sem par não declarado. O manual da pessoa foi feito com as imagens do modelo, numa página fora do repositório.
+
+Não foi feito, e não segue como pendência deste plano: o lugar definitivo dos painéis e a distância entre trilhos, as medidas da casa, a medida real da emenda (o modelo usa 180 mm por estimativa) e a foto do madeiramento, que dependiam da pessoa. O que este plano mostrou que falta à ferramenta, a lista de peças e o passo a passo saírem da montagem, está no backlog como saída de manual.
