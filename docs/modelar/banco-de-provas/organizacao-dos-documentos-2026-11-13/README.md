@@ -1,6 +1,6 @@
 # Organização dos documentos: o levantamento das decisões em vigor
 
-Pasta do plano [organização dos documentos](../../planos/2026-11-13-organizacao-dos-documentos.md). Guarda a resposta da fatia 2 para cada plano encerrado e cada arquivo de histórico, antes de as duas pastas saírem da árvore. Levantado em 2026-11-13 por três agentes de leitura, um lote cada, e não conferido linha a linha por quem conduz: os agentes dizem que leram as seções de decisão, invariantes e fechamento de cada arquivo, e não o corpo inteiro dos maiores.
+Pasta do plano [organização dos documentos](../../decisoes/PLANOS-ENCERRADOS.md). Guarda a resposta da fatia 2 para cada plano encerrado e cada arquivo de histórico, antes de as duas pastas saírem da árvore. Levantado em 2026-11-13 por três agentes de leitura, um lote cada, e não conferido linha a linha por quem conduz: os agentes dizem que leram as seções de decisão, invariantes e fechamento de cada arquivo, e não o corpo inteiro dos maiores.
 
 - [Planos encerrados, lote 1](decisoes-planos-encerrados-1.md): 59 planos, 84 decisões, 2 sem lugar vivo.
 - [Planos encerrados, lote 2](decisoes-planos-encerrados-2.md): 58 planos, 76 decisões, 3 sem lugar vivo.

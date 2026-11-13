@@ -52,7 +52,7 @@ A pessoa aprovou todas as recomendações de mudança dos grupos B, C, D, E e F,
 
 Ela pediu um plano próprio para a revisão das verificações e dos testes, uma por uma, com a medida de estragar o código de propósito e ver quais testes percebem. E pediu que a análise cubra os mecanismos que ficaram de fora: as skills, a bancada com o crítico visual, o servidor de ferramentas, o backlog, o `comecar` e a ficha de capacidade. Para esses, a pergunta é dela: "se melhorássemos isso de alguma maneira, o que aconteceria?". O módulo de pesquisa não entra como mecanismo; é documentação e cai na medida de leitura.
 
-Na mesma conversa, a pessoa aprovou por imagem a [proposta de organização dos documentos](proposta-de-organizacao-dos-documentos.md), que virou o [plano de organização dos documentos](../../planos/2026-11-13-organizacao-dos-documentos.md), e pediu que o trabalho seja organizado com agentes; a orquestração está no plano de revisão.
+Na mesma conversa, a pessoa aprovou por imagem a [proposta de organização dos documentos](proposta-de-organizacao-dos-documentos.md), que virou o [plano de organização dos documentos](../../decisoes/PLANOS-ENCERRADOS.md), e pediu que o trabalho seja organizado com agentes; a orquestração está no plano de revisão.
 
 ## O que foi feito e o que ficou, no fechamento do plano em 2026-11-13
 
