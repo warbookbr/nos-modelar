@@ -111,6 +111,23 @@ USAR DIRETO: o histórico do CI, a saída da bateria de gates, os roteiros do `c
 4. O desenho da organização da documentação, e a decisão da pessoa sobre ele.
 5. A abertura dos planos de execução e o fechamento. Já abertos: as [melhorias de processo](2026-11-13-melhorias-de-processo-da-revisao.md), o [núcleo para quem escreve receita](2026-11-13-nucleo-para-quem-escreve-receita.md) e a [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md). Faltam o da saída de manual, que espera a pessoa retomar a instalação solar, e o da reorganização da documentação, que espera a fatia 4.
 
+## Orquestração
+
+A pessoa pediu em 2026-11-13 que o trabalho, que é grande, seja organizado com agentes. Esta sessão conduz, confere e envia; os agentes fazem. Vale para este plano e para os de execução que ele abriu.
+
+| Frente | Plano | Quem faz | Em paralelo com |
+|---|---|---|---|
+| A. Guarda local e teto de tempo relativo | melhorias de processo, fatias 1 e 2 | um implementador | B, C, D |
+| B. Mapa sem conflito, lista de planos gerada, régua da fronteira e extensões no catálogo | melhorias de processo, fatias 4 e 5 | um implementador | A, C, D |
+| C. Os seis mecanismos e o que as sessões abrem de fato | este plano, fatia 3 | agentes de leitura | todas |
+| D. Levantamento das decisões em vigor nos planos encerrados e no histórico | organização dos documentos, fatia 2 | quatro agentes de leitura, um lote cada | todas |
+| E. Mover os documentos soltos e corrigir os links | organização dos documentos, fatia 1 | um agente, sozinho na pasta de documentos | A, B |
+| F. Mapa dos testes por área | revisão dos testes, método 1 | agentes de leitura | todas |
+| G. Medida por estrago | revisão dos testes, método 2 | um agente por vez | nenhuma carga pesada |
+| H. Núcleo | núcleo para quem escreve receita | implementador e revisor adversarial | espera o plano das costuras |
+
+As regras de todo agente estão em `.claude/REGRAS-DOS-AGENTES.md`. Cada agente que escreve trabalha numa cópia isolada, num ramo próprio, e grava commit a cada etapa. Quem conduz confere o trabalho contra a prova do plano, junta os ramos um de cada vez, roda `npm run gates` e envia; agente não envia. No máximo três agentes que escrevem ao mesmo tempo e uma carga pesada por vez, porque a máquina tem quatro núcleos e a conta tem limite de uso. As fatias pequenas de documento (folga dos roteiros, regras dos agentes, formato do diário, página dos mecanismos) são de quem conduz. A ordem: A, B, C e D primeiro; E depois de B, porque as duas mexem nos índices; F e G quando A e B tiverem entrado; H quando o plano das costuras fechar.
+
 ## Riscos e parada
 
 Tirar uma regra que pega um defeito raro e caro: por isso nada sai sem a lista do que já pegou. A análise virar mais uma camada de documentos: o relatório tem tamanho limitado, e o que se mede a mais entra nos arquivos de pergunta. Uma sessão só levantou e conferiu: o que não foi refeito por amostra está dito no relatório como não conferido.

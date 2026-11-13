@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2056 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2058 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -17,6 +17,10 @@
 - `comunicacao.md` — Comunicação entre IAs
 - `vite.config.js` — vite.config.js — build estático da BANCADA de autoria, publicada em warbookbr/nos-modelar no GitHub Pages. O produto que o cliente abre vive em warbookbr/mec…
 - `vitest.config.ts` — Config do Vitest: cobre os contratos do Modelar e os núcleos herdados em tools/**.
+
+## .claude/
+
+- `REGRAS-DOS-AGENTES.md` — Regras comuns a todo agente despachado
 
 ## .claude/agents/
 
@@ -569,6 +573,7 @@
 - `2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md` — Revisão do projeto para o trabalho da IA: o que protege, o que só custa, e se a organização e o núcleo servem a quem desenvolve
 - `2026-11-13-melhorias-de-processo-da-revisao.md` — Melhorias de processo da revisão: menos reenvio sem defeito e menos coisa escrita à mão
 - `2026-11-13-nucleo-para-quem-escreve-receita.md` — Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
+- `2026-11-13-organizacao-dos-documentos.md` — Organização dos documentos: uma finalidade por pasta e nada encerrado na área de trabalho
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto

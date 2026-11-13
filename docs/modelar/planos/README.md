@@ -9,6 +9,7 @@
 3. [costuras e furos limpos](2026-11-09-costuras-e-furos-limpos.md). Território: `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`. Em aberto: a fresta junto da tampa, o aviso do `subtrair` que não corta, a régua da costura num gate e o fechamento.
 4. [instalação solar no telhado](2026-11-12-instalacao-solar-no-telhado.md). Território: `procedural/pecas/instalacao-solar/`, `docs/modelar/banco-de-provas/instalacao-solar-2026-11-12/`. Em aberto: a fatia 1, à espera da inclinação e das vigas.
 5. [melhorias de processo da revisão](2026-11-13-melhorias-de-processo-da-revisao.md). Território: o que a linha de território do plano lista, em `tools/gates/`, `tools/mapa/`, roteiros e agentes. Em aberto: tudo.
+6. [organização dos documentos](2026-11-13-organizacao-dos-documentos.md). Território: `docs/modelar/usar/`, `contratos/`, `decisoes/`, `pesquisas/`, `historico/` e os documentos soltos. Em aberto: tudo.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

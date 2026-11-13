@@ -46,7 +46,7 @@ Valem em toda intenção e saem do `CLAUDE.md` porque o gate as recusa no moment
 
 Mudar núcleo, gate, arquitetura, ferramenta ou plano, pela fatia de um dos planos ativos.
 
-Ler antes de começar, num orçamento de 27.000 bytes (linha de base de 59.061 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 29.700 bytes (linha de base de 59.061 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/modelar/INDEX.md`
@@ -89,7 +89,7 @@ Conferido no fim: O teste do defeito passando e npm run gates -- --completo.
 
 Escrever, mover ou cortar documento, fora de um plano.
 
-Ler antes de começar, num orçamento de 13.000 bytes (linha de base de 13.635 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 13.600 bytes (linha de base de 13.635 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/modelar/INDEX.md`
@@ -111,7 +111,7 @@ Conferido no fim: npm run gates, que roda os gates de documentação (links, sum
 
 Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
 
-Ler antes de começar, num orçamento de 6.000 bytes (linha de base de 8.948 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 6.600 bytes (linha de base de 8.948 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `docs/modelar/historico/README.md`
@@ -133,7 +133,7 @@ Conferido no fim: Nada a conferir: pesquisa não muda o repositório, e o que de
 
 A peça é um caso de uma família que já existe, como aparelho, móvel, cadeira ou roda.
 
-Ler antes de começar, num orçamento de 15.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 16.500 bytes (linha de base de 62.482 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `.claude/skills/criar-peca/SKILL.md`
@@ -181,7 +181,7 @@ Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem con
 
 Nenhuma família serve, e a receita nova se escreve com as operações do motor.
 
-Ler antes de começar, num orçamento de 15.000 bytes (linha de base de 62.482 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 16.500 bytes (linha de base de 62.482 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `.claude/skills/criar-peca/SKILL.md`

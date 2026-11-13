@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/agents/regras-comuns.md`, `docs/modelar/MECANISMOS.md`, `.claude/skills/laco-de-modelagem/SKILL.md`, `README.md`, `docs/modelar/INDEX.md`
+**Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/REGRAS-DOS-AGENTES.md`, `docs/modelar/MECANISMOS.md`, `.claude/skills/laco-de-modelagem/SKILL.md`, `README.md`, `docs/modelar/INDEX.md`
 
 **Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13.
 
@@ -27,7 +27,7 @@ USAR DIRETO: a bateria `tools/gates.mjs` com o seletor do que mudou, o registro 
 3. Os cinco roteiros a menos de 500 bytes do teto ganham 10% de folga, com a linha de base mantida.
 4. O mapa gerado deixa de conflitar na junção, por regra de junção que o regenera ou por sair do versionamento, o que a medida mostrar mais simples; a lista de planos ativos do `README.md` e do `docs/modelar/INDEX.md` passa a ser gerada do índice de planos.
 5. A régua da fronteira do núcleo cobre arquivos `.mjs` e `.ts` e reprova import de `src/`, `tools/` e `modulos/`. As cinco extensões entram no catálogo gerado.
-6. As proibições comuns aos agentes moram em `.claude/agents/regras-comuns.md`, citado por cada definição de agente, e cada agente grava commit parcial na worktree ao fim de cada etapa. O `critico-visual.md` não muda.
+6. As proibições comuns aos agentes moram em `.claude/REGRAS-DOS-AGENTES.md`, citado por cada definição de agente, e cada agente grava commit parcial na worktree ao fim de cada etapa. O `critico-visual.md` não muda.
 7. O diário de atritos ganha um formato com quatro campos (o que aconteceu com o comando, o custo, se o processo pegou e o destino), escrito na skill que manda registrar o atrito; os diários antigos não são reescritos.
 8. A página `docs/modelar/MECANISMOS.md`, de uma tela, com cada mecanismo, o que faz, quando é usado e onde mora, e a conferência que acusa mecanismo novo fora da lista.
 
