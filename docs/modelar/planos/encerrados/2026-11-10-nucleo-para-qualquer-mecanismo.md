@@ -287,9 +287,8 @@ da fatia 4b, como a prova da chapa lisa de carroceria que a 4b deixou de fora.
 
 ## Fechamento
 
-Concluído em 2026-11-13, por decisão da pessoa. As fatias 0, 1, 4a, 4b e 4c estão entregues e na main: a tabela de custo por
-peça, o fluxo único com o carrinho de mão como peça de prova, o tubo dobrado e a chapa fina, a lataria em painéis e o sedã em
-cinco etapas fixas. Os itens 1 a 3 do gate de saída ficaram cumpridos por essas fatias.
+Concluído em 2026-11-13, por decisão da pessoa. As fatias 0, 1, 4a, 4b e 4c estão na main: o custo por peça, o fluxo único
+com o carrinho de mão, o tubo dobrado, a chapa fina, a lataria em painéis e o sedã em cinco etapas fixas. Cumprem os itens 1 a 3 do gate.
 
 O item 4 do gate fecha pela razão de não abrir plano próprio para as fatias 2 a 6. A sessão que conduzia recomendou que o plano
 de [revisão do projeto para o trabalho da IA](../2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md) absorvesse o que
