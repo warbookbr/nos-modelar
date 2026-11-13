@@ -53,6 +53,40 @@ describe('corpoDeSecaoVariavel', () => {
     for (const x of dentro) expect(largura(secaoEm(livre, x), 1) - largura(secaoEm(g, x), 1)).toBeCloseTo(4, 3);
   });
 
+  it('o perfil de fundo plano recua a profundidade inteira a meia largura do centro e o arredondado só a metade', () => {
+    const doisPerfis = (perfil) => corpoDeSecaoVariavel({ nome: 'h', eixo: 'x', passo: 2.5, estacoes: [{ em: 0, centro: [0, 0], semieixos: [10, 10] }, { em: 100, centro: [0, 0], semieixos: [10, 10] }], sulcos: [{ em: 50, largura: 10, profundidade: 4, perfil }] });
+    const plano = doisPerfis('fundoPlano'); const redondo = doisPerfis('arredondado');
+    expect(plano.corpo.planos).toContain(52.5);
+    expect(largura(secaoEm(plano, 52.5), 1)).toBeCloseTo(2 * (10 - 4), 3);
+    expect(largura(secaoEm(redondo, 52.5), 1)).toBeCloseTo(2 * (10 - 2), 3);
+  });
+
+  it('o centro do sulco e os planos de cada lado dele entram mesmo fora da grade das estações', () => {
+    const r = corpoDeSecaoVariavel({ nome: 'h', eixo: 'x', passo: 2.5, estacoes: [{ em: 0, centro: [0, 0], semieixos: [10, 10] }, { em: 100, centro: [0, 0], semieixos: [10, 10] }], sulcos: [{ em: 51.3, largura: 10, profundidade: 4 }] });
+    expect(r.corpo.planos).toContain(51.3);
+    expect(r.corpo.planos).toContain(48.8);
+    expect(r.corpo.planos).toContain(53.8);
+    expect(r.corpo.planos).not.toContain(50);
+  });
+
+  it('a interpolação suave não passa dos valores das estações e difere da linear no meio do vão', () => {
+    const livre = haste({ sulcos: [], passo: 2.5 });
+    for (const x of livre.corpo.planos.filter((q) => q > 0 && q < 60)) {
+      const b = largura(secaoEm(livre, x), 2) / 2;
+      expect(b).toBeGreaterThanOrEqual(14 - 1e-9);
+      expect(b).toBeLessThanOrEqual(16 + 1e-9);
+    }
+    const suave = largura(secaoEm(haste({ sulcos: [] }), 30), 2) / 2;
+    expect(Math.abs(suave - 15)).toBeGreaterThan(0.05);
+  });
+
+  it('a seção tem o expoente da superelipse: o ponto a 45 graus fica em a vezes 0,5 elevado a 1/expoente', () => {
+    const r = corpoDeSecaoVariavel({ nome: 'h', eixo: 'x', expoente: 4, estacoes: [{ em: 0, centro: [0, 0], semieixos: [10, 10] }, { em: 20, centro: [0, 0], semieixos: [10, 10] }] });
+    const p = r.pontosMm.h_l0_a2;
+    expect(p[1]).toBeCloseTo(10 * Math.SQRT1_2 ** (2 / 4), 6);
+    expect(p[2]).toBeCloseTo(10 * Math.SQRT1_2 ** (2 / 4), 6);
+  });
+
   it('os planos entram no centro do sulco e a mais de 2,5 mm um do outro', () => {
     expect(g.corpo.planos).toContain(30);
     for (let i = 1; i < g.corpo.planos.length; i++) expect(g.corpo.planos[i] - g.corpo.planos[i - 1]).toBeGreaterThanOrEqual(2.5 - 1e-6);
@@ -72,11 +106,20 @@ describe('corpoDeSecaoVariavel', () => {
     }
   });
 
+  it('recusa o sulco cujo centro cai a menos de 2,5 mm de uma estação ou de outro sulco, com a distância', () => {
+    expect(() => haste({ sulcos: [{ em: 61, largura: 8, profundidade: 3 }] })).toThrow(/cai a 1 mm da estação estacoes\[1\] \(em 60\)/);
+    expect(() => haste({ sulcos: [{ em: 30, largura: 8, profundidade: 3 }, { em: 32, largura: 8, profundidade: 3 }] })).toThrow(/cai a 2 mm do sulco sulcos\[0\]/);
+    const preso = haste({ sulcos: [{ em: 60, largura: 8, profundidade: 3 }] });
+    expect(largura(secaoEm(haste({ sulcos: [] }), 60), 1) - largura(secaoEm(preso, 60), 1)).toBeCloseTo(6, 4);
+  });
+
   it('recusa estação perto demais, sulco que come a seção e sulco fora do corpo, com o valor', () => {
     expect(() => haste({ estacoes: [{ em: 0, centro: [0, 0], semieixos: [5, 5] }, { em: 1, centro: [0, 0], semieixos: [5, 5] }] })).toThrow(/mínimo entre planos/);
     expect(() => haste({ sulcos: [{ em: 30, largura: 8, profundidade: 20 }] })).toThrow(/não sobra/);
     expect(() => haste({ sulcos: [{ em: 300, largura: 8, profundidade: 1 }] })).toThrow(/fora do corpo/);
     expect(() => haste({ passo: 1 })).toThrow(/passo é número em mm/);
     expect(() => haste({ estacoes: [{ em: 0, centro: [0, 0], semieixos: [5, 5] }] })).toThrow(/ao menos duas/);
+    expect(() => haste({ expoente: 0.5 })).toThrow(/de 1 para cima/);
+    expect(() => haste({ estacoes: [{ em: 0, centro: [0, 0], semieixos: [5, 5], expoente: 0.2 }, { em: 20, centro: [0, 0], semieixos: [5, 5] }] })).toThrow(/expoente é número de 1/);
   });
 });

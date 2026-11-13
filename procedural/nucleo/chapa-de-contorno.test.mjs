@@ -104,4 +104,118 @@ describe('chapaDeContorno', () => {
     });
     expect(largo).toThrow(/laço a/);
   });
+
+  it('a face do chanfro é um plano: a meia altura entre o fio e a face o recuo é proporcional', () => {
+    const perto = (laco) => doTrecho(g, laco, 'gume_').reduce((m, p) => (Math.abs(p[0] - 10) < Math.abs(m[0] - 10) ? p : m));
+    expect(perto(3)[2]).toBeCloseTo((perto(4)[2] * 2) / 3, 6);
+    expect(perto(4)[2]).toBeCloseTo(12, 6);
+  });
+
+  it('o arco do canto fica dentro do contorno: o ponto dele mais perto do vértice está a uma sagita do vértice, do lado da chapa', () => {
+    const arco = doTrecho(g, 2, 'dorso_');
+    const perto = arco.reduce((m, p) => (Math.hypot(p[0] - 60, p[2] - 24) < Math.hypot(m[0] - 60, m[2] - 24) ? p : m));
+    const centro = [40, 20];
+    expect(Math.hypot(perto[0] - centro[0], perto[2] - centro[1])).toBeLessThan(Math.hypot(60 - centro[0], 24 - centro[1]));
+    const giro = Math.atan2(24, 40) - Math.atan2(16, 60);
+    const sagita = 30 * (1 / Math.cos(giro / 2) - 1);
+    expect(Math.hypot(perto[0] - 60, perto[2] - 24)).toBeGreaterThan(sagita * 0.8);
+    expect(Math.hypot(perto[0] - 60, perto[2] - 24)).toBeLessThan(sagita * 1.2);
+  });
+
+  it('a esquadria de uma ponta aguda é limitada a 3 vezes a largura do chanfro', () => {
+    const r = (30 * Math.PI) / 180;
+    const p = [100 * Math.cos(r), 100 * Math.sin(r)];
+    const meio = [(100 + p[0]) / 2, p[1] / 2];
+    const cunha30 = chapaDeContorno({
+      nome: 'c', espessura: 6, passo: 10, tampa: { de: 'f1', ate: 'v' },
+      trechos: [{ nome: 'v', pontos: [[0, 0]] }, { nome: 'a', pontos: [[0, 0], [100, 0]], chanfro: { largura: 2 } }, { nome: 'f1', pontos: [[100, 0], meio] }, { nome: 'f2', pontos: [meio, p] }, { nome: 'b', pontos: [p, [0, 0]], chanfro: { largura: 2 } }],
+    });
+    const nafaceDeCima = Object.entries(cunha30.pontosMm).filter(([n]) => n.startsWith('c_l2_')).map(([, q]) => Math.hypot(q[0], q[2]));
+    expect(Math.min(...nafaceDeCima)).toBeCloseTo(6, 3);
+  });
+
+  it('afinar leva a espessura aos pontos em metro, aos alvos e aos laços', () => {
+    const f = cunha({ afinar: { coordenada: 'u', de: 50, ate: 100, espessuraFinal: 1 } });
+    const ysM = Object.entries(f.pontos).filter(([n]) => Math.abs(f.pontosMm[n][0] - 100) < 1e-6).map(([, q]) => q[1]);
+    expect((Math.max(...ysM) - Math.min(...ysM)) * 1000).toBeCloseTo(1, 6);
+    const ysA = Object.entries(f.alvosMm).filter(([, q]) => Math.abs(q[0] - 100) < 1e-6).map(([, q]) => q[1]);
+    expect(Math.max(...ysA) - Math.min(...ysA)).toBeCloseTo(1, 6);
+    expect(f.lacos.every((l) => l.afinada.espessuraFinal === 1)).toBe(true);
+    expect(cunha().lacos[0].afinada).toBeUndefined();
+  });
+
+  it('a altura da quina quebrada vem de `altura`, e o padrão é a largura', () => {
+    const q = (extra) => chapaDeContorno({ nome: 'q', espessura: 6, passo: 20, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [100, 40]], quinaQuebrada: { largura: 1, ...extra } }, { nome: 'c', pontos: [[100, 40], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]] }] }).chapa.niveis;
+    expect(q({})).toEqual([-3, -2, 2, 3]);
+    expect(q({ altura: 0.5 })).toEqual([-3, -2.5, 2.5, 3]);
+  });
+
+  it('entrada e saída fazem a largura crescer de 0 e voltar a 0, com ponto na distância dita mesmo menor que o passo', () => {
+    const e = chapaDeContorno({ nome: 'e', espessura: 6, passo: 3.5, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 60]] }, { nome: 'b', pontos: [[0, 60], [100, 60]], chanfro: { largura: 10, entrada: 3, saida: 7 } }, { nome: 'c', pontos: [[100, 60], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]] }] });
+    const topo = Object.entries(e.pontosMm).filter(([n]) => n.startsWith('e_l2_b')).map(([, q]) => q).sort((p, q) => p[0] - q[0]);
+    const face = Object.entries(e.pontosMm).filter(([n]) => n.startsWith('e_l1_b')).map(([, q]) => q).sort((p, q) => p[0] - q[0]);
+    const recuo = (x) => { const k = topo.findIndex((p) => Math.abs(p[0] - x) < 1e-6); expect(k, `ponto em x=${x}`).toBeGreaterThanOrEqual(0); return topo[k][2] - face[k][2]; };
+    expect(recuo(0)).toBeCloseTo(0, 6);
+    expect(recuo(3)).toBeCloseTo(-10, 6);
+    expect(recuo(93)).toBeCloseTo(-10, 6);
+    expect(recuo(96.5)).toBeCloseTo(-5, 6);
+    expect(recuo(0)).toBeCloseTo(0, 6);
+    expect(recuo(3)).toBeCloseTo(-10, 6);
+    expect(recuo(93)).toBeCloseTo(-10, 6);
+    const ultimo = topo.filter((p) => p[0] > 93).reduce((m, p) => (p[0] > m[0] ? p : m));
+    expect(Math.abs(topo.indexOf(ultimo) >= 0 ? ultimo[2] - face[topo.indexOf(ultimo)][2] : 10)).toBeLessThan(9);
+  });
+
+  it('os vértices dados dentro de um trecho ficam onde estão, qualquer que seja o passo', () => {
+    for (const passo of [5, 10, 20]) {
+      const v = chapaDeContorno({ nome: 'v', espessura: 4, passo, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [47, 52], [100, 40]] }, { nome: 'c', pontos: [[100, 40], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]] }] });
+      expect(Object.values(v.pontosMm).some((p) => Math.abs(p[0] - 47) < 1e-6 && Math.abs(p[2] - 52) < 1e-6), `passo ${passo}`).toBe(true);
+    }
+  });
+
+  it('o exemplo da ficha fecha em qualquer passo, e o chanfro que passa do primeiro ponto do vizinho junta os pontos dele', () => {
+    for (const passo of [5, 8, 10, 12, 20]) {
+      const ficha = chapaDeContorno({ nome: 'p', eixo: 'y', espessura: 6, tampa: { de: 'base', ate: 'topo' }, passo, trechos: [{ nome: 'base', pontos: [[0, 0], [0, 60]] }, { nome: 'esq', pontos: [[0, 60], [100, 60]], chanfro: { largura: 10 } }, { nome: 'topo', pontos: [[100, 60], [100, 0]] }, { nome: 'dir', pontos: [[100, 0], [0, 0]], quinaQuebrada: { largura: 1.5 } }] });
+      const r = medirPeca(receitaDe(ficha));
+      expect(r.arestasSoltas, `passo ${passo}`).toBe(0);
+      expect(r.facesDegeneradas, `passo ${passo}`).toBe(0);
+      expect(r.orfaos, `passo ${passo}`).toEqual([]);
+    }
+  });
+
+  it('recusa o contorno que se toca ou volta sobre si, citando o trecho e o vértice', () => {
+    const aleta = () => chapaDeContorno({ nome: 'a', espessura: 4, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [50, 40], [20, 40]] }, { nome: 'c', pontos: [[20, 40], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]] }] });
+    expect(aleta).toThrow(/o contorno se toca ou se cruza: o trecho 'b' no vértice \[/);
+    const gravata = () => chapaDeContorno({ nome: 'g', espessura: 4, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [100, 40]] }, { nome: 'b', pontos: [[100, 40], [100, 0]] }, { nome: 'c', pontos: [[100, 0], [0, 40]] }, { nome: 'd', pontos: [[0, 40], [0, 0]] }] });
+    expect(gravata).toThrow(/o contorno se toca ou se cruza/);
+  });
+
+  it('o laço recuado que se cruza é recusado com os dois trechos e os vértices', () => {
+    const r = (largura) => () => chapaDeContorno({ nome: 'l', espessura: 6, passo: 10, tampa: { de: 'f1', ate: 'v' }, trechos: [{ nome: 'v', pontos: [[0, 0]] }, { nome: 'a', pontos: [[0, 0], [100, 0]], chanfro: { largura } }, { nome: 'f1', pontos: [[100, 0], [93.3, 25]] }, { nome: 'f2', pontos: [[93.3, 25], [86.6, 50]] }, { nome: 'b', pontos: [[86.6, 50], [0, 0]], chanfro: { largura } }] });
+    expect(r(6)).toThrow(/se cruza depois do recuo das bordas, entre o trecho '[ab]' no vértice \[[^\]]+\] e o trecho '[ab]' no vértice/);
+  });
+
+  it('recusa altura de borda que deixa menos que o limite de face fina entre laços, dizendo o campo', () => {
+    const q = (chanfro, quina) => () => chapaDeContorno({ nome: 'q', espessura: 6, passo: 10, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [100, 40]], chanfro }, { nome: 'c', pontos: [[100, 40], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]], quinaQuebrada: quina }] });
+    expect(q({ largura: 5, resta: 2e-6 })).toThrow(/trecho 'b', chanfro\.resta = 0,000002 mm/);
+    expect(q({ largura: 5, resta: 2 }, { largura: 1, altura: 2.0000001 })).toThrow(/fica a 0,0000001 mm de o trecho '[bd]'/);
+    expect(q({ largura: 5, resta: 2 }, { largura: 1, altura: 3 - 1e-7 })).toThrow(/quinaQuebrada\.altura/);
+    expect(q({ largura: 5, resta: 2 }, { largura: 1, altura: 1.9 })).not.toThrow();
+  });
+
+  it('dois cantos vizinhos somam as tangentes: a recusa diz a medida e os raios que cabem', () => {
+        const lados = () => chapaDeContorno({ nome: 'c', espessura: 4, passo: 5, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [30, 10], [50, 10], [80, 40]] }, { nome: 'c', pontos: [[80, 40], [80, 0]] }, { nome: 'd', pontos: [[80, 0], [0, 0]] }], raioDoCanto: [{ em: [30, 10], raio: 30 }, { em: [50, 10], raio: 30 }] });
+    expect(lados).toThrow(/ficam a 20 mm um do outro e pedem .* = .* mm de tangente juntos; os raios que cabem/);
+  });
+
+  it('recuoEm mede a largura ao longo do eixo pedido: num segmento inclinado a perpendicular é a largura vezes o cosseno', () => {
+    const inclinada = (recuoEm) => chapaDeContorno({ nome: 'i', espessura: 6, passo: 20, tampa: { de: 'a', ate: 'c' }, trechos: [{ nome: 'a', pontos: [[0, 0], [0, 40]] }, { nome: 'b', pontos: [[0, 40], [100, 60]], chanfro: { largura: 10, recuoEm } }, { nome: 'c', pontos: [[100, 60], [100, 0]] }, { nome: 'd', pontos: [[100, 0], [0, 0]] }] });
+    const folga = (r) => {
+      const meio = Object.entries(r.pontosMm).filter(([n]) => n.startsWith('i_l2_b')).map(([, q]) => q).filter((q) => q[0] > 10 && q[0] < 90);
+      return meio.map((q) => q[2] - (40 + 0.2 * q[0]));
+    };
+    for (const f of folga(inclinada('v'))) expect(f).toBeCloseTo(-10, 6);
+    for (const f of folga(inclinada('normal'))) expect(f).toBeCloseTo(-10 * Math.sqrt(1.04), 6);
+    expect(() => inclinada('w')).toThrow(/recuoEm é 'normal'/);
+  });
 });

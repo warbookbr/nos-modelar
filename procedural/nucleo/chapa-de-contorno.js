@@ -67,7 +67,7 @@ const TOL = 1e-3;
 const LIMITE_DA_ESQUADRIA = 3;
 const PASSO_DO_ARCO_GRAUS = 10;
 const falha = (texto) => { throw new RangeError(`chapaDeContorno: ${texto}`); };
-const br = (x, casas = 2) => String(Number(Number(x).toFixed(casas))).replace('.', ',');
+const br = (x, casas = 2) => Number(x).toFixed(casas).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '').replace('.', ',');
 const citar = (x) => `'${x}'`;
 const pt = (p) => `[${br(p[0])}, ${br(p[1])}]`;
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
@@ -391,19 +391,19 @@ export function chapaDeContorno(o = {}) {
     const hr = b.tipo === 'chanfro' ? b.resta / 2 : meia - b.altura;
     if (!(hr >= 0 && hr < meia)) falha(`${t.onde}.${b.tipo === 'chanfro' ? `resta ${br(b.resta)} mm` : `altura ${br(b.altura)} mm`}: a borda precisa ficar entre 0 e a espessura ${br(o.espessura)} mm`);
     t.hr = hr;
-    t.campoDaAltura = b.tipo === 'chanfro' ? `chanfro.resta = ${br(b.resta, 6)} mm (altura ${br(hr, 6)} mm)` : `quinaQuebrada.altura = ${br(b.altura, 6)} mm (altura ${br(hr, 6)} mm)`;
+    t.campoDaAltura = b.tipo === 'chanfro' ? `chanfro.resta = ${br(b.resta, 9)} mm (altura ${br(hr, 9)} mm)` : `quinaQuebrada.altura = ${br(b.altura, 9)} mm (altura ${br(hr, 9)} mm)`;
   }
 
   /* 6. as alturas dos laços: as duas faces e a altura da borda de cada trecho, a mais que o limite de face fina uma da outra */
   const maiorPasso = Math.max(...T.map((t) => t.passo));
   const minimo = LIMITE_DE_FACE_FINA * maiorPasso;
-  const origens = [{ h: meia, quem: `a face da chapa (espessura ${br(o.espessura, 6)} mm, altura ${br(meia, 6)} mm)` }];
+  const origens = [{ h: meia, quem: `a face da chapa (espessura ${br(o.espessura, 9)} mm, altura ${br(meia, 9)} mm)` }];
   for (const t of T) if (t.borda) origens.push({ h: Math.round(t.hr * 1e9) / 1e9, quem: `o trecho ${citar(t.nome)}, ${t.campoDaAltura}` });
   const ordenadas = [...origens].sort((a, b) => a.h - b.h);
   for (let k = 0; k < ordenadas.length; k++) {
     const x = ordenadas[k];
-    if (x.h > 0 && 2 * x.h < minimo) falha(`${x.quem}: as duas alturas simétricas ficam a ${br(2 * x.h, 6)} mm uma da outra, menos que ${br(minimo, 6)} mm (o limite de face fina, ${LIMITE_DE_FACE_FINA}, vezes o passo ${br(maiorPasso)}); aumente a espessura que resta ou use 0 para o gume`);
-    if (k > 0 && x.h - ordenadas[k - 1].h > 0 && x.h - ordenadas[k - 1].h < minimo) falha(`${x.quem} fica a ${br(x.h - ordenadas[k - 1].h, 6)} mm de ${ordenadas[k - 1].quem}, menos que ${br(minimo, 6)} mm (o limite de face fina, ${LIMITE_DE_FACE_FINA}, vezes o passo ${br(maiorPasso)}): a faixa entre os laços sairia com face fina; afaste as alturas ou iguale-as`);
+    if (x.h > 0 && 2 * x.h < minimo) falha(`${x.quem}: as duas alturas simétricas ficam a ${br(2 * x.h, 9)} mm uma da outra, menos que ${br(minimo, 9)} mm (o limite de face fina, ${LIMITE_DE_FACE_FINA}, vezes o passo ${br(maiorPasso)}); aumente a espessura que resta ou use 0 para o gume`);
+    if (k > 0 && x.h - ordenadas[k - 1].h > 0 && x.h - ordenadas[k - 1].h < minimo) falha(`${x.quem} fica a ${br(x.h - ordenadas[k - 1].h, 9)} mm de ${ordenadas[k - 1].quem}, menos que ${br(minimo, 9)} mm (o limite de face fina, ${LIMITE_DE_FACE_FINA}, vezes o passo ${br(maiorPasso)}): a faixa entre os laços sairia com face fina; afaste as alturas ou iguale-as`);
   }
   const alturas = new Set(origens.map((x) => x.h));
   const niveis = [...alturas].sort((a, b) => a - b).flatMap((a) => (a === 0 ? [0] : [-a, a])).sort((a, b) => a - b);
