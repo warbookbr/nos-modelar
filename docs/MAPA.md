@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2068 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2081 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -489,6 +489,20 @@
 - `README.md` — Decisões
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão do Modelar
+
+## docs/modelar/decisoes/registros/
+
+- `2026-08-19-pele-da-carroceria-por-subdivisao.md` — A pele exterior da carroceria nasce de subdivisão com vincos, e não de loft, envelope varrido, campo implícito nem kernel próprio
+- `2026-08-20-potrace-e-inkscape-fora-do-caminho-critico.md` — Potrace e o traçador do Inkscape ficam fora do caminho crítico da prancha por licença e por semântica
+- `2026-09-03-ciencia-de-materiais-no-repositorio-irmao.md` — A ciência de materiais mora no repositório irmão, sem import nos dois sentidos
+- `2026-10-07-occt-so-na-exportacao-step.md` — O OCCT é kernel só da exportação STEP e não da autoria
+- `2026-10-14-borda-subpixel-e-resolvedor-de-restricoes.md` — Potrace e VectorCraft não substituem a borda subpixel do contorno da imagem
+- `2026-10-25-importadores-fora-com-o-desenho-guardado.md` — Os importadores de .csg, STEP e STL saíram, e o desenho deles fica guardado para quem os recriar
+- `2026-10-27-grafo-de-capacidades-fora.md` — O grafo de capacidades saiu e só volta se o motor ganhar tipos intermediários de artefato
+- `2026-10-30-sem-glossario-separado.md` — Não há glossário separado: o termo é definido no documento que o governa
+- `2026-11-05-esboco-antigo-fora.md` — O esboço 2D antigo só se recria se voltar a haver objeto sem forma de referência
+- `2026-11-08-material-gerado-de-numeros.md` — Textura, relevo e ambiente são gerados de números, sem imagem de fora
+- `2026-11-13-hipoteses-de-forma-reprovadas-e-regras-de-processo.md` — As hipóteses de forma reprovadas em 38 falhas de autoria não voltam como base, e duas regras de processo valem antes de abrir experimento
 
 ## docs/modelar/gerado/
 
@@ -3000,6 +3014,8 @@
 
 - `citacoes.mjs` — citacoes.mjs — documento de leitura obrigatória não pode mandar abrir arquivo que não existe.
 - `citacoes.test.mjs` — citacoes.test.mjs — o nome do que saiu só aparece em documento vivo numa frase que diz que saiu, e o repositório passa.
+- `decisoes.mjs` — decisoes.mjs — os registros de decisão e a lista gerada das que estão em vigor.
+- `decisoes.test.mjs` — decisoes.test.mjs — o gate dos registros de decisão: a pasta do repositório passa, a lista gerada está em dia, e cada defeito que o gate deve pegar (formato …
 - `descricoes.test.mjs` — descricoes.test.mjs — a descrição do cabeçalho entra em toda sessão.
 - `estrutura-docs.mjs` — estrutura-docs.mjs — sustenta a separação da documentação por quem a lê.
 - `estrutura-docs.test.mjs` — estrutura-docs.test.mjs — cada gate é visto REPROVANDO antes de ser aceito.
