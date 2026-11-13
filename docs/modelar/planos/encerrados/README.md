@@ -268,7 +268,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
 - O único plano **ativo** é o [modelador inverso com priors por família](../congelados/2026-08-25-modelador-inverso-priors-familia.md). O plano por
   seleção foi cancelado: sua capacidade de comparação não tinha calibração
   repetida, o gerador restringia o espaço alcançável e o alvo N6 é direção
-  estética sem câmeras/correspondências geométricas. O [novo dossiê vinculante](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
+  estética sem câmeras/correspondências geométricas. O [novo dossiê vinculante](../../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
   preserva o núcleo
   procedural, identidade, montagem, revisão, impacto, bancada, câmeras e MCP;
   separa priors de veículo, humanoide e peça; e introduz qualificação de alvo,
@@ -286,7 +286,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   [contrato N2](../../CONTRATO-FORMA-GLOBAL-N2.md), [relatório N2](../../historico/RELATORIO-N2-FORMA-GLOBAL.md),
   [relatório N3](../../historico/RELATORIO-N3-CANAL-PERCEPCAO.md),
   [relatório N4](../../historico/RELATORIO-N4-RESTRICOES.md) e [relatório N5](../../historico/RELATORIO-N5-BUSCA.md).
-  Caminhos alcançáveis: `docs/modelar/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`,
+  Caminhos alcançáveis: `docs/modelar/pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`,
   `docs/modelar/planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`,
   `docs/modelar/historico/DOSSIE-MODELADOR-POR-SELECAO.md`,
   `docs/modelar/historico/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
@@ -717,7 +717,7 @@ limite da forma alcançável; e o alvo N6 não contém calibração para represe
 um objeto 3D exato. A hipótese permanece no histórico, sem autorização.
 
 O mecanismo vigente é [modelagem inversa com priors por
-família](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md). Veículos partem de
+família](../../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md). Veículos partem de
 arquétipos automotivos semanticamente alinhados e deformáveis; humanoides usam
 esqueleto, volumes e juntas; peças usam features e interfaces funcionais. As
 famílias compartilham receitas, identidade, montagem, revisão, câmeras,

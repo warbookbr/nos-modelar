@@ -29,7 +29,7 @@ encerrado vive em
   `npm run exportar:step` e `npm run exportar:obj`. O STEP sai por
   `occt-wasm@4.3.2`, MIT/Apache-2.0 com `.wasm` LGPL-2.1 consumido como pacote
   separado, o que não muda a licença deste repositório. Detalhe em
-  [`DOSSIE-EXPORTACAO-CAD-STEP.md`](DOSSIE-EXPORTACAO-CAD-STEP.md) e prova em
+  [`DOSSIE-EXPORTACAO-CAD-STEP.md`](pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md) e prova em
   [`RELATORIO-EXPORTACAO-CAD-STEP-R00.md`](./historico/RELATORIO-EXPORTACAO-CAD-STEP-R00.md).
 - `npm run ativar:bancada` carrega peça ou montagem na bancada e sincroniza a
   sessão; o estado é local e não versionado. Procedimento em

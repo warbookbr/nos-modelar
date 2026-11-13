@@ -3,7 +3,7 @@
 **Estado:** congelado
 **Congelado em:** 2026-08-26, por decisão do usuário · **Base:** `bb2e79a`
 **Responsável original:** Codex
-**Dossiê vinculante:** [`../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
+**Dossiê vinculante:** [`../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](../../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
 **Execução detalhada:** [`2026-08-25-modelador-inverso-priors-familia-p0.md`](2026-08-25-modelador-inverso-priors-familia-p0.md)
 **Substituído por:** o plano de modelagem dirigida pelo usuário, que hoje vive
 na branch `claude/revisar-plano-ativo-cyj8c3` e ainda não chegou à `main`. O

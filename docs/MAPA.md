@@ -85,10 +85,8 @@
 ## docs/modelar/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
-- `ANALISES-DE-2026-10.md` — Análises de 2026-10
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
-- `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
@@ -99,15 +97,12 @@
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Modelar
-- `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
-- `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Modelar deve cobrir
 - `FERRAMENTAS-POR-OBJETO.md` — Ferramentas por objeto
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
-- `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Modelar — entrada atual
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
@@ -120,7 +115,6 @@
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
 - `MONTAGEM-PERSISTIDA-V4.md` — Montagem persistida v4 e expectativas de interseção
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
-- `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão do Modelar
@@ -580,6 +574,12 @@
 
 ## docs/modelar/pesquisas/
 
+- `ANALISES-DE-2026-10.md` — Análises de 2026-10
+- `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
+- `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
+- `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
+- `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
+- `PESQUISA-ABERTA-2026-10.md` — Pesquisa aberta de 2026-10
 - `README.md` — Pesquisas
 
 ## docs/modelar/planos/

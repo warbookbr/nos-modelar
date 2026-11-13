@@ -29,7 +29,7 @@ articulações em 93, estrutura de barras em 72 e chapa dobrada em 62, e a casca
 a chapa não existem. E a verificação já tem peças que medem contra referência
 externa, mas elas não estão no caminho de toda peça: na prática a régua compara a
 peça contra a declaração dela, e o crítico visual é o único juiz da semelhança.
-As [análises de 2026-10](../../ANALISES-DE-2026-10.md) detalham cada ponto.
+As [análises de 2026-10](../../pesquisas/ANALISES-DE-2026-10.md) detalham cada ponto.
 
 Em 2026-10-08, a caçamba do carrinho de mão pediu uma bacia oca de parede
 inclinada e contorno em D, que o `loft` do esboço (só seção convexa) e a

@@ -9,7 +9,7 @@
 
 ## Problema observado
 
-Atrito **A-4** de [`../ATRITOS-AUTORIA.md`](../../ATRITOS-AUTORIA.md): "primitivas
+Atrito **A-4** de [`../ATRITOS-AUTORIA.md`](../../pesquisas/ATRITOS-AUTORIA.md): "primitivas
 ainda nascem presas à origem". A otimização **O-7** já havia medido a
 consequência no freio: *"16 dos 52 passos do freio não descrevem o freio,
 descrevem transporte"*.

@@ -241,7 +241,7 @@
           "quando": "a pergunta é sobre um plano concluído ou cancelado"
         },
         {
-          "arquivo": "docs/modelar/PESQUISA-ABERTA-2026-10.md",
+          "arquivo": "docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md",
           "quando": "a pergunta é sobre ferramentas de outros projetos"
         },
         {
@@ -253,7 +253,7 @@
           "quando": "a pergunta é quanto custou modelar um objeto"
         },
         {
-          "arquivo": "docs/modelar/ANALISES-DE-2026-10.md",
+          "arquivo": "docs/modelar/pesquisas/ANALISES-DE-2026-10.md",
           "quando": "a pergunta é sobre a avaliação da estrutura do projeto"
         },
         {

@@ -50,7 +50,7 @@ FreeCAD, o SolveSpace, o LibreCAD, o Inkscape, o OpenSCAD) e bibliotecas. O que 
 versão fixada e a instalação reproduzível, e o desenho salvo fica no formato do
 repositório, com a mesma entrada dando o mesmo arquivo; código trazido de fora
 leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 na
-[pesquisa](../../PESQUISA-ABERTA-2026-10.md) permite.
+[pesquisa](../../pesquisas/PESQUISA-ABERTA-2026-10.md) permite.
 
 ## Incluído
 
@@ -58,7 +58,7 @@ leva a licença de origem e o aviso de autoria, como o combinado de 2026-10-13 n
   que existe fora, feito para IA ou para gente, que a IA consiga comandar aqui,
   com a recomendação; o ponto de partida é a pesquisa de
   2026-10-13 em [IA que desenha e resolvedores de restrições
-  2D](../../PESQUISA-ABERTA-2026-10.md), que recomenda portar a JS o resolvedor
+  2D](../../pesquisas/PESQUISA-ABERTA-2026-10.md), que recomenda portar a JS o resolvedor
   `cadcraft-constraints` (MIT ou Apache-2.0, pré-alfa), usar o planegcs como
   oráculo nos testes, devolver à IA o relatório do resolvedor (graus de liberdade,
   conflito, restrição redundante) e adotar do AIDL as restrições duras e leves;

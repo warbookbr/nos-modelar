@@ -5,7 +5,7 @@
 > forma com confiabilidade não foi calibrada por pares repetidos e embaralhados;
 > o gerador manual também restringia o que poderia ser encontrado. A decisão
 > vigente está no
-> [`DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
+> [`DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
 
 ## Papel
 

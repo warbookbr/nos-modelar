@@ -103,12 +103,12 @@ Estado: concluído (decisão corrigir), em 2026-08-17. Crônica: tem linha.
 ## 2026-08-17-historico-de-revisao.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: tem linha.
 - [B] Restaurar uma revisão antiga publica uma revisão nova com aquele conteúdo, por plano que segue os gates, e nunca move o estado ativo nem reescreve a história; a diferença sai na língua da alteração, e mudança estrutural sai separada. Porquê: o agente não pode crer que toda diferença se desfaz trocando um campo. Lugar: `tools/mcp/perfis/autoria-montagens.mjs` (comentário de `planejarRestauracao`, com teste em `tools/mcp/mcp.test.mjs`).
-- [C] Retirada do Caso 3 da homologação do fluxo. Porquê: evidência mais forte veio dos experimentos posteriores; a decisão está em `docs/modelar/HOMOLOGACAO-FLUXO-IA.md`.
+- [C] Retirada do Caso 3 da homologação do fluxo. Porquê: evidência mais forte veio dos experimentos posteriores; a decisão está em `docs/modelar/pesquisas/HOMOLOGACAO-FLUXO-IA.md`.
 
 ## 2026-08-17-lathe-fechado.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
 - [B] O `lathe` fecha o laço só quando o último ponto é coincidente exato com o primeiro, nunca por limiar; a prova é topológica (toda aresta com duas faces). Porquê: um limiar mudaria a topologia em silêncio. Lugar: `procedural/nucleo/operacoes/geradores-avancados.js` (comentário "A comparação é EXATA de propósito").
-- [B] O encaixe oco (A-16) foi retirado porque o assento intencional se declara na montagem por `assentaAnular` e `encaixaCilindrico`, sem segundo vocabulário dentro da peça; materiais genéricos continuam travados. Porquê: evitar duplicação de conceito. Lugar: `docs/modelar/ATRITOS-AUTORIA.md` (linha A-16), `docs/modelar/usar/MONTAGENS-SEMANTICAS.md` e `CLAUDE.md` (regra de material).
+- [B] O encaixe oco (A-16) foi retirado porque o assento intencional se declara na montagem por `assentaAnular` e `encaixaCilindrico`, sem segundo vocabulário dentro da peça; materiais genéricos continuam travados. Porquê: evitar duplicação de conceito. Lugar: `docs/modelar/pesquisas/ATRITOS-AUTORIA.md` (linha A-16), `docs/modelar/usar/MONTAGENS-SEMANTICAS.md` e `CLAUDE.md` (regra de material).
 
 ## 2026-08-17-migracao-fps-para-procedural.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: tem linha.
@@ -120,7 +120,7 @@ Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
 
 ## 2026-08-17-ponto-nomeado.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
-- [B] Um nome guarda o ponto inteiro em qualquer campo que aceita ponto (corrigido na rede central `vec`); seletores relacionais (`toca`, `oposta`, `normal`, `maisProxima`) foram retirados e só reabrem com evidência nova; `alinhar` é candidato sem plano; peça de exemplo não vira pendência da oficina. Porquê: sem caso de campo que exija o que não se declara por direção. Lugar: `docs/modelar/planos/BACKLOG.md` (tabela de candidatos recusados, `alinhar` recusado), `docs/modelar/ATRITOS-AUTORIA.md` (A-7, A-8, A-29, A-32) e `README.md` ("Peças são exemplos").
+- [B] Um nome guarda o ponto inteiro em qualquer campo que aceita ponto (corrigido na rede central `vec`); seletores relacionais (`toca`, `oposta`, `normal`, `maisProxima`) foram retirados e só reabrem com evidência nova; `alinhar` é candidato sem plano; peça de exemplo não vira pendência da oficina. Porquê: sem caso de campo que exija o que não se declara por direção. Lugar: `docs/modelar/planos/BACKLOG.md` (tabela de candidatos recusados, `alinhar` recusado), `docs/modelar/pesquisas/ATRITOS-AUTORIA.md` (A-7, A-8, A-29, A-32) e `README.md` ("Peças são exemplos").
 
 ## 2026-08-17-pose-de-criacao.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
@@ -133,7 +133,7 @@ Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
 ## 2026-08-18-chassi-realista-kernel-geometrico.md
 Estado: cancelado, em 2026-11-05 (encerramento escrito no plano). Crônica: tem linha.
 - [B] A pele exterior de carroceria é malha de controle de quads com vincos avaliada por subdivisão Catmull-Clark no núcleo, sem dependência externa, com a malha compilada sem identidade persistida (persistem a cage e o nome semântico). Porquê: foi o que o plano decidiu e o núcleo depois construiu. Lugar: `docs/modelar/UPSTREAM-NOS.md` (subdivisão entregue), `docs/modelar/modelar-carroceria.md` e `procedural/nucleo/` (subdivisão e gaiolas).
-- [B] OCCT/B-rep não serve à autoria sem camada que leve id, origem e nome de cada face pelo histórico (índice de face não é identidade), e Blender headless não é backend porque quebra determinismo. Porquê: o conteúdo salvo precisa ser determinístico e reexecutável. Lugar: `docs/modelar/PESQUISA-ABERTA-2026-10.md` (item OpenCASCADE), `docs/modelar/DOSSIE-EXPORTACAO-CAD-STEP.md` e `docs/modelar/blender/README.md`.
+- [B] OCCT/B-rep não serve à autoria sem camada que leve id, origem e nome de cada face pelo histórico (índice de face não é identidade), e Blender headless não é backend porque quebra determinismo. Porquê: o conteúdo salvo precisa ser determinístico e reexecutável. Lugar: `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md` (item OpenCASCADE), `docs/modelar/pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md` e `docs/modelar/blender/README.md`.
 - [A] A pele exterior não nasce de `loft` nem de envelope varrido (não abre para-brisa, vidro nem vão de porta sem booleana, acopla capô, para-lama e túnel, converge para tubo), SDF/implícito não serve a painel fino, vinco e vão, e um kernel B-rep próprio tem risco desproporcional; `loft` segue válido em peça genuinamente varrida. Porquê: guarda quem for propor outra representação de pele ou de carroceria. Procurei: "loft", "SDF", "implícit", "kernel", "pele", "envelope varrido", "Catmull" em `docs/modelar/*.md`, `docs/modelar/usar/`, `.claude/`, `procedural/nucleo/`, `tools/`; só achei `alinhar-modelagem/SKILL.md` linha 138 (loft de carroceria precisa declarar `lataria`) e `ANALISES-DE-2026-10.md` propondo SDF para outros usos, nada que diga por que a pele não é loft nem SDF. Rascunho do registro: A pele exterior de carroceria é autorada por subdivisão de malha de quads com vincos, e não por `loft`, envelope varrido, campo implícito (SDF) nem kernel B-rep próprio. O `loft` não abre para-brisa, vidro nem vão de porta sem booleana e acopla capô, para-lama e túnel; o SDF é ruim em painel fino, vinco e vão; um kernel próprio custa risco desproporcional. O `loft` continua válido para peças genuinamente varridas, e a decisão reabre se aparecer forma orgânica sem requisito de painel ou requisito real de fabricação. (Confiança média: o dossiê em `docs/modelar/historico/` carrega o mesmo motivo e sai junto; cabe à pessoa decidir se isto vale um registro ou se a subdivisão entregue basta.)
 
 ## 2026-08-18-ensaio-ponta-a-ponta-dobradica.md
@@ -193,7 +193,7 @@ Estado: cancelado, em 2026-11-05 (encerramento escrito no plano). Crônica: tem 
 
 ## 2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md
 Estado: cancelado, em 2026-08-23 (substituído pelo modelador inverso com priors por família). Crônica: tem linha.
-- [B] A IA não digita coordenada nem parâmetro de forma (seis tentativas, seis reprovações), alvo inventado pela IA não vale como referência vinculante, mosaico/painel/métrica não aprovam, detector fora do escopo devolve não avaliável e nunca `passa`, e forma ruim não se conserta depois de pronta. Porquê: práticas proibidas por evidência de seis rotas automotivas reprovadas. Lugar: `docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md`, `docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, `docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md` (mosaico é só índice), `docs/modelar/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` e `CLAUDE.md` (imagem de IA vale como caráter, nunca como medida).
+- [B] A IA não digita coordenada nem parâmetro de forma (seis tentativas, seis reprovações), alvo inventado pela IA não vale como referência vinculante, mosaico/painel/métrica não aprovam, detector fora do escopo devolve não avaliável e nunca `passa`, e forma ruim não se conserta depois de pronta. Porquê: práticas proibidas por evidência de seis rotas automotivas reprovadas. Lugar: `docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md`, `docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, `docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md` (mosaico é só índice), `docs/modelar/pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` e `CLAUDE.md` (imagem de IA vale como caráter, nunca como medida).
 - [C] O mecanismo cancelado (gerador de linhas de caráter, costurador, julgador aprendido, condições S0 a S5). Porquê: cancelado por falta de teste repetido; a hipótese de ordenar candidatos está no dossiê do modelador inverso.
 
 ## 2026-08-23-redesenho-cage-r2b-controle-vertical.md
@@ -202,7 +202,7 @@ Estado: concluído (decisão interromper), em 2026-08-23. Crônica: tem linha.
 
 ## 2026-08-28-exportacao-cad-step.md
 Estado: concluído (decisão aprovar), em 2026-08-28. Crônica: tem linha.
-- [B] A exportação STEP é capacidade derivada da malha neutra, isolada em `modulos/exportador-cad/` atrás de adaptador substituível: unidade e tolerância nunca presumidas, borda aberta e não-manifold recusadas sem reparo silencioso, sem arquivo parcial, STEP facetado nunca anunciado como paramétrico, sem fallback silencioso. Porquê: manter o núcleo sem CAD e a saída honesta. Lugar: `docs/modelar/DOSSIE-EXPORTACAO-CAD-STEP.md` e o gate `tools/arquitetura/nucleo-sem-three.mjs`.
+- [B] A exportação STEP é capacidade derivada da malha neutra, isolada em `modulos/exportador-cad/` atrás de adaptador substituível: unidade e tolerância nunca presumidas, borda aberta e não-manifold recusadas sem reparo silencioso, sem arquivo parcial, STEP facetado nunca anunciado como paramétrico, sem fallback silencioso. Porquê: manter o núcleo sem CAD e a saída honesta. Lugar: `docs/modelar/pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md` e o gate `tools/arquitetura/nucleo-sem-three.mjs`.
 
 ## 2026-08-31-malha-otimizada-e-prova-por-objeto.md
 Estado: concluído (H0 a H5 entregues, H6 parcial), em 2026-09-01. Crônica: tem linha.

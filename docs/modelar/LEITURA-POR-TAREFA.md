@@ -21,7 +21,7 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
   método: decidir forma, proporção e caráter não é problema diagnóstico, e
   eliminação ali rende consertos certos num objeto que continua ruim.
-- **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
+- **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
   O antigo [modelador por seleção](./historico/DOSSIE-MODELADOR-POR-SELECAO.md) é só histórico.
 - **Antes de abrir experimento novo:**
   [`GOTCHAS-AUTORIA-VISUAL.md`](./usar/GOTCHAS-AUTORIA-VISUAL.md)

@@ -1,7 +1,7 @@
 # Sondas de importação de 2026-10-16
 
 Plano [Importar objeto de código](../../../planos/encerrados/2026-10-15-importar-objeto-de-codigo.md). Três sondas baratas mediram o que se consegue
-tirar de objetos reais sem desenhá-los, e o resultado está resumido na [pesquisa aberta](../../../PESQUISA-ABERTA-2026-10.md#sondas-de-importação-de-2026-10-16).
+tirar de objetos reais sem desenhá-los, e o resultado está resumido na [pesquisa aberta](../../../pesquisas/PESQUISA-ABERTA-2026-10.md#sondas-de-importação-de-2026-10-16).
 Os arquivos de origem não estão aqui, e os scripts guardados refazem a medida com qualquer arquivo do mesmo tipo.
 
 ## Picape em STL, por fatias

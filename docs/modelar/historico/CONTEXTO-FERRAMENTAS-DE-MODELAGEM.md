@@ -32,8 +32,8 @@ capacidade nova é aceita. O plano estende essas peças em vez de criar outras.
 
 ## Referências por fatia
 
-As referências de cada fatia estão na [pesquisa aberta](../PESQUISA-ABERTA-2026-10.md)
-e nas [análises](../ANALISES-DE-2026-10.md), e a fatia confere o link de cada uma
+As referências de cada fatia estão na [pesquisa aberta](../pesquisas/PESQUISA-ABERTA-2026-10.md)
+e nas [análises](../pesquisas/ANALISES-DE-2026-10.md), e a fatia confere o link de cada uma
 antes de usá-la, porque a maior parte não foi aberta na pesquisa. Para o contorno e
 a casca, o Solidify do Blender e o deslocamento de contorno do CAD Sketcher e do
 SolveSpace; para a verificação, o desvio contra referência do CloudCompare e o

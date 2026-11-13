@@ -28,7 +28,7 @@ Estado: concluído, em 2026-11-05. Crônica: tem linha.
 
 ## 2026-09-22-a-peca-nasce-encaixada.md
 Estado: concluído, em 2026-09-23. Crônica: tem linha.
-- [B] O vínculo entre peças é derivação direta de medida de porta mais acréscimo, sem solver de restrições geral. Porquê: manter o mecanismo pequeno e conferível. Lugar: `docs/modelar/PESQUISA-ABERTA-2026-10.md`, código da montagem em `procedural/nucleo/`.
+- [B] O vínculo entre peças é derivação direta de medida de porta mais acréscimo, sem solver de restrições geral. Porquê: manter o mecanismo pequeno e conferível. Lugar: `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md`, código da montagem em `procedural/nucleo/`.
 
 ## 2026-09-22-o-motor-mora-num-lugar-so.md
 Estado: concluído, em 2026-09-22. Crônica: tem linha.
@@ -69,7 +69,7 @@ Estado: cancelado, em 2026-10-07. Crônica: tem linha.
 ## 2026-10-07-as-ferramentas-de-modelagem.md
 Estado: concluído, em 2026-10-11. Crônica: tem linha.
 - [A] O OCCT é kernel só da exportação STEP e não é kernel de autoria; a camada de features sobre a malha é o caminho, e a hipótese de usá-lo para modelar só reabre se surgir requisito de fabricação ou tolerância de peça mecânica, ou se a camada de features não der arredondamento ou casca aceitáveis. Porquê: a análise de agosto o rejeitou para ativo visual, e `ANALISES-DE-2026-10.md` e `PESQUISA-ABERTA-2026-10.md` ainda o tratam como hipótese aberta, sem dizer que foi decidido. Procurei: "OCCT", "OpenCascade", "kernel" em `tools/`, `procedural/`, `src/`, `.claude/`, `docs/modelar/*.md`, `docs/modelar/usar/`, `CLAUDE.md`; só acho o OCCT como dependência da exportação (`DOSSIE-EXPORTACAO-CAD-STEP.md`, `INDEX.md`) e como hipótese em `ANALISES-DE-2026-10.md` e `PESQUISA-ABERTA-2026-10.md`. Rascunho do registro: O OCCT fica só na exportação STEP. A autoria usa a camada de features sobre a malha da Manifold, porque a análise de agosto rejeitou o kernel B-Rep para ativo visual (nomeação topológica contra identidade posicional, peso do wasm). A decisão reabre se um requisito de fabricação ou de tolerância de peça mecânica aparecer, ou se a camada de features não der arredondamento e casca aceitáveis.
-- [B] O `loft` fica fora da pele exterior de carroceria. Porquê: decisão herdada da análise de agosto. Lugar: `docs/modelar/CONTRATO-DA-FAMILIA.md`, `docs/modelar/ANALISES-DE-2026-10.md`.
+- [B] O `loft` fica fora da pele exterior de carroceria. Porquê: decisão herdada da análise de agosto. Lugar: `docs/modelar/CONTRATO-DA-FAMILIA.md`, `docs/modelar/pesquisas/ANALISES-DE-2026-10.md`.
 - [B] O crítico reprova só depois da medida e o conjunto de calibração fica fora do repositório rastreado. Porquê: medida antes do olhar. Lugar: `docs/modelar/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md`, `CLAUDE.md` (nenhuma métrica aprova forma sozinha).
 
 ## 2026-10-07-o-caminho-curto-da-ia.md
@@ -86,7 +86,7 @@ Estado: concluído, em 2026-10-13. Crônica: tem linha.
 
 ## 2026-10-13-desenho-sem-referencia.md
 Estado: concluído, em 2026-10-14. Crônica: tem linha.
-- [B] Potrace e VectorCraft não deram ganho sobre a borda subpixel do contorno; trocar o contorno é decisão da pessoa. Porquê: medido no levantamento. Lugar: `docs/modelar/PESQUISA-ABERTA-2026-10.md` (seção do VectorCraft).
+- [B] Potrace e VectorCraft não deram ganho sobre a borda subpixel do contorno; trocar o contorno é decisão da pessoa. Porquê: medido no levantamento. Lugar: `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md` (seção do VectorCraft).
 - [C] O módulo de desenho por restrições empatou com coordenadas no primeiro traço e ganhou na correção; o limite foi a descrição. Porquê: o módulo não existe mais em `modulos/` e a medida é datada.
 
 ## 2026-10-14-familias-de-desenho.md
@@ -95,8 +95,8 @@ Estado: concluído, em 2026-10-14. Crônica: tem linha.
 
 ## 2026-10-15-importar-objeto-de-codigo.md
 Estado: concluído, em 2026-10-16. Crônica: tem linha.
-- [B] Código aberto trazido para o repositório leva a licença de origem e o aviso de autoria, e corpus de terceiros com licença que exige crédito não fica na árvore. Porquê: a pessoa tirou o corpus e o objeto copyleft do repositório. Lugar: `docs/modelar/PESQUISA-ABERTA-2026-10.md` (combinado de 2026-10-13 e seção dos acervos com licença aberta).
-- [B] Importação de objeto de código não é o caminho principal; STL de malha única colada não se traduz. Porquê: medido nas sondas. Lugar: `docs/modelar/PESQUISA-ABERTA-2026-10.md`, `tools/modelar/malha-para-esboco.mjs`.
+- [B] Código aberto trazido para o repositório leva a licença de origem e o aviso de autoria, e corpus de terceiros com licença que exige crédito não fica na árvore. Porquê: a pessoa tirou o corpus e o objeto copyleft do repositório. Lugar: `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md` (combinado de 2026-10-13 e seção dos acervos com licença aberta).
+- [B] Importação de objeto de código não é o caminho principal; STL de malha única colada não se traduz. Porquê: medido nas sondas. Lugar: `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md`, `tools/modelar/malha-para-esboco.mjs`.
 
 ## 2026-10-15-o-aviao-do-esboco-a-receita.md
 Estado: concluído, em 2026-10-16. Crônica: tem linha.

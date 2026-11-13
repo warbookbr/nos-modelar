@@ -6,15 +6,15 @@ Do que trata: pacote do alvo visual do cupê N6 (direção estética aprovada em
 
 ## ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md
 Do que trata: dossiê de agosto de 2026 que escolheu cage de quads com Catmull-Clark para a pele exterior e rejeitou OCCT/B-rep, Blender headless, SDF, kernel próprio e loft como base. Citado por (vivos): nenhum.
-- [B] pele exterior com aberturas não parte de loft nem de booleana, e a chapa lisa se faz por subdivisão de gaiola por estações; B-rep só volta com requisito CAD. Porquê: o loft não abre vão envidraçado sem booleana e acopla capô, ombro e teto. Lugar: docs/modelar/modelar-carroceria.md (gaiola por estações, 'subdivisao'), docs/modelar/DOSSIE-EXPORTACAO-CAD-STEP.md e ANALISES-DE-2026-10.md (B-rep); a recusa do loft como base está em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair), V-02
+- [B] pele exterior com aberturas não parte de loft nem de booleana, e a chapa lisa se faz por subdivisão de gaiola por estações; B-rep só volta com requisito CAD. Porquê: o loft não abre vão envidraçado sem booleana e acopla capô, ombro e teto. Lugar: docs/modelar/modelar-carroceria.md (gaiola por estações, 'subdivisao'), docs/modelar/pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md e ANALISES-DE-2026-10.md (B-rep); a recusa do loft como base está em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair), V-02
 
 ## BASELINE-MOTOR-R00.md
 Do que trata: retrato do motor procedural antes da modularização (2.683 linhas, 32 operações, 48 exportações) e comandos de baseline. Citado por (vivos): nenhum.
 - [B] atualizar a baseline do motor é decisão explícita de contrato, nunca modo de esconder regressão; tempo e memória não têm teto entre máquinas. Porquê: o corpus mede compatibilidade funcional, não desempenho. Lugar: gates `baseline:motor` e `baseline:motor:medir` (package.json) com tools/oficina/fixtures/motor-r00-baseline.json
 
 ## BICICLETA-REALISTA-ATRITOS.md
-Do que trata: diário de atritos da modelagem da bicicleta realista, escrito durante a rodada, com a lição de 'procurei e não achei' virar 'não existe'. Citado por (vivos): docs/modelar/ATRITOS-AUTORIA.md.
-- [B] atrito se anota na hora, com comando, mensagem e contorno; imagem gerada por IA não é fonte dimensional (a tabela publicada cede só por procedência); contato declarado nasce DENTRO da peça vizinha, não por tolerância de milímetro; anexo da conversa existe no .jsonl da sessão. Porquê: atrito lembrado depois vira opinião, e a medida contradisse a tabela sem decidir quem cede. Lugar: docs/modelar/ATRITOS-AUTORIA.md, CLAUDE.md (imagem de IA vale como caráter, nunca como medida), tools/modelar/medir-transcricao.mjs, .claude/skills/criar-peca
+Do que trata: diário de atritos da modelagem da bicicleta realista, escrito durante a rodada, com a lição de 'procurei e não achei' virar 'não existe'. Citado por (vivos): docs/modelar/pesquisas/ATRITOS-AUTORIA.md.
+- [B] atrito se anota na hora, com comando, mensagem e contorno; imagem gerada por IA não é fonte dimensional (a tabela publicada cede só por procedência); contato declarado nasce DENTRO da peça vizinha, não por tolerância de milímetro; anexo da conversa existe no .jsonl da sessão. Porquê: atrito lembrado depois vira opinião, e a medida contradisse a tabela sem decidir quem cede. Lugar: docs/modelar/pesquisas/ATRITOS-AUTORIA.md, CLAUDE.md (imagem de IA vale como caráter, nunca como medida), tools/modelar/medir-transcricao.mjs, .claude/skills/criar-peca
 
 ## CADEIRA-REALISTA-NOTAS.md
 Do que trata: diário da cadeira realista contra foto, com limites do motor (afunilamento, rebaixo anatômico, veios) e três rodadas de crítico visual. Citado por (vivos): nenhum.
@@ -54,7 +54,7 @@ Do que trata: especificação do laboratório computacional para IA, incubado e 
 
 ## DOSSIE-MODELADOR-POR-SELECAO.md
 Do que trata: proposta de modelador de carroceria em que a IA ordena candidatos gerados por linhas de caráter, superada em 2026-08-25. Citado por (vivos): docs/modelar/LEITURA-POR-TAREFA.md.
-- [B] a premissa 'a IA compara melhor do que cria' não foi calibrada; o gerador manual limitava o espaço. Porquê: a seleção não cria o que o gerador não representa. Lugar: docs/modelar/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md e V-36 em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair)
+- [B] a premissa 'a IA compara melhor do que cria' não foi calibrada; o gerador manual limitava o espaço. Porquê: a seleção não cria o que o gerador não representa. Lugar: docs/modelar/pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md e V-36 em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair)
 
 ## DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md
 Do que trata: dossiê do teto da capacidade de superfície semântica (superficie-semantica@1, níveis blocagem a detalhe). Citado por (vivos): nenhum.
@@ -93,12 +93,12 @@ Do que trata: relato por fatia do laboratório computacional (R0 a R5) e do pilo
 - [C] lições do laboratório e de seleção de material. Porquê: pertencem ao repositório nos-ciencia; nenhum trabalho de modelagem daqui as usa.
 
 ## LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md
-Do que trata: levantamento da fatia 1 do plano desenho sem referência: resolvedores de restrições 2D (planegcs, SolveSpace, FreeCAD, CADCraft) e Potrace/VectorCraft contra a borda subpixel do contorno da imagem. Citado por (vivos): docs/modelar/PESQUISA-ABERTA-2026-10.md, docs/modelar/planos/BACKLOG.md.
+Do que trata: levantamento da fatia 1 do plano desenho sem referência: resolvedores de restrições 2D (planegcs, SolveSpace, FreeCAD, CADCraft) e Potrace/VectorCraft contra a borda subpixel do contorno da imagem. Citado por (vivos): docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md, docs/modelar/planos/BACKLOG.md.
 - [A] (1) não substituir nem complementar a borda subpixel por Potrace ou VectorCraft (medido: o limiar 225 põe a borda 0,4 a 0,55 px para fora em qualquer ferramenta); (2) o planegcs devolve sucesso, grau de liberdade zero e geometria espelhada quando o chute inicial cai do lado errado, porque a distância ponto-reta não tem sinal; (3) o `denteMaximo` do contorno corta ponta aguda e falta teste com imagem sintética de verdade conhecida no gate do módulo. Porquê: o módulo desenho-por-restricoes saiu do repositório e o BACKLOG ainda aponta para a medida deste arquivo (linha 'Pontas agudas cortadas pelo alisamento'). Procurei: planegcs, 'lado errado', Potrace, VectorCraft e denteMaximo em tools/, modulos/, procedural/, .claude/, docs/modelar/*.md e usar/ (só PESQUISA-ABERTA-2026-10.md lista os candidatos, sem as medidas; modulos/contorno-da-imagem/src/regioes.js tem um comentário com razão diferente); Rascunho do registro: Medidas de 2026-10-14 sobre imagem sintética de verdade conhecida (asa de 21 graus, círculo, placa de 7 graus, barra de 4 px): borda subpixel a 0,09 px; Potrace e VectorCraft só igualam com meio-tom e falham no avião (silhueta em 3 a 31 pedaços); não trocar. Resolvedor de restrições: planegcs 1.3.0 ganhou por rodar no Node em 83 a 110 ms, mas aceita a solução espelhada com dof 0 quando o chute está do lado errado; qualquer módulo futuro precisa declarar o lado de cada relação. `denteMaximo` 9 px² corta 5 px numa ponta de 21 graus e 102 a 138 mm nas pontas de hélice do avião; falta o teste sintético no gate de modulos/contorno-da-imagem.
 
 ## LEVANTAMENTO-IA-3D-2026-10.md
 Do que trata: levantamento de IAs que geram 3D (AssemCAD, SNAP3D, CAD-Coder, preços) e o lugar da Mecanifica, com correções de citação. Citado por (vivos): nenhum.
-- [B] modelos gerais compilam mas não montam (APR 0 a 0,83%); só modelo com partes tipadas, portas e encaixes chega a 87,5%. Porquê: respaldo externo da tese de portas e relações explícitas. Lugar: docs/modelar/PESQUISA-ABERTA-2026-10.md (AssemBench, AssemCAD, SNAP3D)
+- [B] modelos gerais compilam mas não montam (APR 0 a 0,83%); só modelo com partes tipadas, portas e encaixes chega a 87,5%. Porquê: respaldo externo da tese de portas e relações explícitas. Lugar: docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md (AssemBench, AssemCAD, SNAP3D)
 
 ## MALHA-OTIMIZADA-PROGRESSO.md
 Do que trata: relato das fatias H1 a H5 da malha otimizada (cadeira, redução de vértice sem ganho, organizador de topologia, armas melee). Citado por (vivos): nenhum.
@@ -166,7 +166,7 @@ Do que trata: relatório de 2026-08-14 do experimento de autoria do zero: aprova
 
 ## RELATORIO-EXPORTACAO-CAD-STEP-R00.md
 Do que trata: prova R00 da exportação STEP: occt-wasm 4.3.2 aprovado, opencascade.js recusado. Citado por (vivos): docs/modelar/INDEX.md.
-- [B] occt-wasm@4.3.2 é o backend do STEP facetado; não atualizar nem trocar sem prova equivalente; o STEP facetado não vira cilindro analítico. Porquê: opencascade.js falhou no Node 24 e a licença LGPL fica registrada. Lugar: docs/modelar/DOSSIE-EXPORTACAO-CAD-STEP.md e modulos/exportador-cad/
+- [B] occt-wasm@4.3.2 é o backend do STEP facetado; não atualizar nem trocar sem prova equivalente; o STEP facetado não vira cilindro analítico. Porquê: opencascade.js falhou no Node 24 e a licença LGPL fica registrada. Lugar: docs/modelar/pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md e modulos/exportador-cad/
 
 ## RELATORIO-MODELADOR-INVERSO-P0.md
 Do que trata: relatório P0 do modelador inverso (linha de base, alvo, calibração do crítico), bloqueado por execução independente. Citado por (vivos): docs/modelar/planos/congelados/2026-08-25-modelador-inverso-priors-familia-p0.md.
@@ -272,14 +272,14 @@ Observação sobre B: 7 dos B (ANALISE-CHASSI, N3, N4, N6, CHASSI-P2, DOSSIE-MOD
 
 Arquivos com citante vivo (24; tmp/gates/verdes.json foi desconsiderado por ser saída gerada):
 - ALVO-N6-CUPE-ESPORTIVO.md: docs/modelar/planos/congelados/2026-08-25-modelador-inverso-priors-familia-p0.md
-- BICICLETA-REALISTA-ATRITOS.md: docs/modelar/ATRITOS-AUTORIA.md
+- BICICLETA-REALISTA-ATRITOS.md: docs/modelar/pesquisas/ATRITOS-AUTORIA.md
 - CHEGADA-2026-09-11.md: docs/modelar/roteiros/roteiros.json, docs/modelar/roteiros/ROTEIROS.md
 - CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md: docs/modelar/INVENTARIO.md
 - CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md: modulos/pesquisa/bibliotecas/BIBLIOTECAS.md, modulos/pesquisa/README.md, docs/modelar/CONTRATO-DA-FAMILIA.md
 - DOSSIE-MODELADOR-POR-SELECAO.md: docs/modelar/LEITURA-POR-TAREFA.md
 - EXPERIMENTO-AB-FLUXO-IA.md: docs/modelar/INVENTARIO.md
 - EXPERIMENTO-RODA-REALISTA.md: docs/modelar/PERFIS-DE-AUTORIA.md, docs/modelar/INVENTARIO.md
-- LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md: docs/modelar/PESQUISA-ABERTA-2026-10.md, docs/modelar/planos/BACKLOG.md
+- LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md: docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md, docs/modelar/planos/BACKLOG.md
 - OFICINA-OTIMIZACOES.md: procedural/nucleo/operacoes/atributos.js, procedural/nucleo/nucleo.js, tools/oficina/oficina.test.ts, docs/modelar/INVENTARIO.md
 - PLANO.md: docs/modelar/INVENTARIO.md, docs/oficina.md
 - PROTOCOLO-DIAGNOSTICO-MOTOR.md: docs/modelar/INVENTARIO.md

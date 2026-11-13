@@ -44,7 +44,7 @@ export const ALLOWLIST_G1 = new Map([
     + 'usar cilindro não tinha como chegar nelas',
   ],
   [
-    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/ATRITOS-AUTORIA.md',
+    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/pesquisas/ATRITOS-AUTORIA.md',
     'aponta a lista detalhada e a evidência de cada atrito; a regra continua sendo a tabela local',
   ],
   [

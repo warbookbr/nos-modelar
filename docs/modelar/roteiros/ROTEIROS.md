@@ -119,10 +119,10 @@ Ler antes de começar, num orçamento de 6.600 bytes (linha de base de 8.948 byt
 Abrir só quando a condição aparecer:
 
 - `docs/modelar/planos/encerrados/README.md`, quando a pergunta é sobre um plano concluído ou cancelado.
-- `docs/modelar/PESQUISA-ABERTA-2026-10.md`, quando a pergunta é sobre ferramentas de outros projetos.
+- `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md`, quando a pergunta é sobre ferramentas de outros projetos.
 - `docs/modelar/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
 - `docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md`, quando a pergunta é quanto custou modelar um objeto.
-- `docs/modelar/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
+- `docs/modelar/pesquisas/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
 - `docs/modelar/historico/CHEGADA-2026-09-11.md`, quando a pergunta é por que um documento saiu da raiz de docs/modelar/ ou onde foi parar.
 
 Passo seguinte, sem estado lido: Abra docs/modelar/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.
