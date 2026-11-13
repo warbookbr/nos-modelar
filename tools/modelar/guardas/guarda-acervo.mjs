@@ -177,7 +177,7 @@ export function motivoDeFaceDegenerada(forma) {
   const degenerada = medirFaceDegenerada(forma);
   if (!degenerada.total) return null;
   return `${degenerada.total} FACE(S) DEGENERADA(S)\n${degenerada.faces.slice(0, 8).map((f) => `  face ${f.id} (${f.parte ?? 'sem parte'}, ${f.cantos} cantos, dobro da área ${f.normal == null ? 'indefinido' : f.normal.toExponential(2)} m²)`).join('\n')}`
-    + '\n  O `adaptarThree` recusa a face cujos cantos não definem plano, e a bancada não abre a peça; o defeito é da operação que a gerou, e não da receita.';
+    + '\n  Face degenerada é a que o `adaptarThree` recusa (cantos que não definem plano) ou cujo triângulo a auditoria de interseções acha sem área, pelo piso relativo à diagonal da parte; deixa a auditoria inconclusiva. O defeito é da operação que a gerou, e não da receita.';
 }
 
 /** O motivo da recusa quando a casca da forma não fecha (aresta que uma face só usa, ou que mais de duas usam), pelo mesmo critério do `npm run malha:conferir` e da aprovação da

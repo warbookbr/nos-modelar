@@ -46,12 +46,13 @@ describe('régua de face degenerada', () => {
   });
 
   /* o piso relativo da auditoria: a caixa fixa por dois vértices sem face (diagonal de raiz de 3, limite de 1,5e-9), e o triângulo de catetos 2m e 0,5 tem módulo m */
-  const ancoras = [[-0.5, -0.5, -0.5], [0.5, 0.5, 0.5]];
-  const comAncoras = (pontos, faces) => neutroDe([...pontos, ...ancoras], faces);
+  const ancoras = [[-0.5, -0.5, -0.5], [0.5, 0.5, 0.5], [0.5, -0.5, -0.5]];
+  /* os três âncoras formam uma face boa da mesma parte, para a caixa da parte (a escala da auditoria) ser a fixa */
+  const comAncoras = (pontos, faces) => neutroDe([...pontos, ...ancoras], [...faces, [pontos.length, pontos.length + 1, pontos.length + 2]]);
   const triangulo = (modulo) => comAncoras([[0, 0, 0], [2 * modulo, 0, 0], [0, 0.5, 0]], [[0, 1, 2]]);
 
   it('na fronteira do piso relativo: o triângulo de módulo igual ao limite é recusado, e o logo acima passa', () => {
-    const limite = limiteRelativo(triangulo(1e-9));
+    const limite = limiteRelativo(triangulo(1e-9), 'p');
     expect(limite).toBeCloseTo(1.5e-9, 20);
     const logoAcima = limite * (1 + 1e-9);
     expect(medirFaceDegenerada(triangulo(limite)).total).toBe(1);
@@ -75,7 +76,7 @@ describe('régua de face degenerada', () => {
     expect(medirFaceDegenerada(comColinear).total).toBe(0);
     /* o retângulo de 1 por e: a normal de Newell dele tem módulo 2e e cada triângulo da triangulação, e; a face é recusada quando e passa da normal e não passa do triângulo */
     const fino = (e) => comAncoras([[0, 0, 0], [1, 0, 0], [1, e, 0], [0, e, 0]], [[0, 1, 2, 3]]);
-    const limite = limiteRelativo(fino(1e-9));   // a caixa agora vai a x = 1
+    const limite = limiteRelativo(fino(1e-9), 'p');   // a caixa agora vai a x = 1
     expect(medirFaceDegenerada(fino(limite / 2 * (1 - 1e-6))).total).toBe(1);   // a normal já não passa
     expect(medirFaceDegenerada(fino(limite)).total).toBe(1);                    // o triângulo de módulo igual ao piso é recusado
     expect(medirFaceDegenerada(fino(limite * (1 - 1e-6))).total).toBe(1);       // a normal passa e nenhum triângulo passa
@@ -88,5 +89,16 @@ describe('régua de face degenerada', () => {
     const m = medirFaceDegenerada(neutro);
     expect(m.faces.map((f) => f.id)).toEqual([0, 1, 2, 9]);
     expect(m.faces.every((f) => f.normal === null)).toBe(true);
+  });
+
+  it('a escala é a da parte da face, e não a da peça inteira: o mesmo triângulo passa na parte pequena e é recusado na grande', () => {
+    /* triângulo de catetos 3e-6 e 1e-3 (módulo de 3e-9) e, na outra parte, um triângulo de catetos 3 e 4 (meia diagonal de 2,5, piso de 1,25e-8) */
+    const neutro = neutroDe([[0, 0, 0], [3e-6, 0, 0], [0, 1e-3, 0], [0, 0, 0], [3, 0, 0], [0, 4, 0]], [[0, 1, 2], [3, 4, 5]]);
+    neutro.F.get(0).parte = 'pequena'; neutro.F.get(1).parte = 'grande';
+    expect(limiteRelativo(neutro, 'pequena')).toBeLessThan(3e-9);
+    expect(limiteRelativo(neutro, 'grande')).toBeCloseTo(1.25e-8, 15);
+    expect(medirFaceDegenerada(neutro).total).toBe(0);
+    neutro.F.get(0).parte = 'grande';
+    expect(medirFaceDegenerada(neutro).faces.map((f) => f.id)).toEqual([0]);
   });
 });

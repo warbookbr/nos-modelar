@@ -2,8 +2,8 @@
 
    Dois critérios, e a face que falhar em qualquer um entra. O do `adaptarThree` (`src/autoria/adaptar-three.js`, `prepararFaces`), que recusa a face com "é
    degenerada": a normal de Newell do polígono, sem normalizar, tem módulo (o dobro da área, em m²) de no máximo 1e-12, ou algum canto não existe. E o da
-   auditoria de interseções (`prepararSolido`, `src/autoria/contato-de-solidos.js`), que mede cada triângulo da triangulação com piso relativo ao tamanho da
-   peça: módulo do produto vetorial de no máximo min(1e-6, 2e-9 vezes o quadrado da meia diagonal da caixa dos vértices). Face de três cantos é o próprio
+   auditoria de interseções (`prepararSolido`, `src/autoria/contato-de-solidos.js`), que mede cada triângulo da triangulação com piso relativo ao tamanho do
+   sólido (a parte da face, ou a peça inteira se a face não tem parte): módulo do produto vetorial de no máximo min(1e-6, 2e-9 vezes o quadrado da meia diagonal da caixa dos vértices). Face de três cantos é o próprio
    triângulo; face de mais cantos é recusada se a normal de Newell passa desse piso a menos, ou se, depois de tirar da triangulação do earcut os triângulos
    que não passam do piso (o canto colinear que a união deixa no meio de uma aresta), não sobra nenhum. A régua devolve toda face recusada, na ordem em que
    o adaptador as visita, e não só a primeira. Lê só `neutro.V` e `neutro.F`. */
@@ -12,11 +12,14 @@ import earcut from 'earcut';
 /** O limite do `adaptarThree` para o módulo da normal de Newell (dobro da área, m²). */
 export const LIMITE_DA_NORMAL = 1e-12;
 
-/** O limite relativo da auditoria de interseções para o módulo do produto vetorial de um triângulo, com a escala medida pela meia diagonal da caixa dos vértices do `neutro`. */
-export function limiteRelativo(neutro) {
+/** O limite relativo da auditoria de interseções para o módulo do produto vetorial de um triângulo, com a escala medida pela meia diagonal da caixa dos vértices do `neutro` (ou, com `parte`, das faces dela). */
+export function limiteRelativo(neutro, parte) {
   const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
-  for (const p of neutro.V.values()) for (let k = 0; k < 3; k++) { if (p[k] < min[k]) min[k] = p[k]; if (p[k] > max[k]) max[k] = p[k]; }
-  const meia = neutro.V.size ? Math.hypot(max[0] - min[0], max[1] - min[1], max[2] - min[2]) / 2 : 0;
+  /* com `parte`, só os vértices das faces dela: a auditoria mede cada sólido (a parte) pela diagonal dele */
+  const pontos = parte === undefined ? neutro.V.values()
+    : [...neutro.F.values()].filter((f) => (f.parte ?? null) === parte && Array.isArray(f.vs)).flatMap((f) => f.vs.map((v) => neutro.V.get(v)).filter(Boolean));
+  for (const p of pontos) for (let k = 0; k < 3; k++) { if (p[k] < min[k]) min[k] = p[k]; if (p[k] > max[k]) max[k] = p[k]; }
+  const meia = Number.isFinite(min[0]) ? Math.hypot(max[0] - min[0], max[1] - min[1], max[2] - min[2]) / 2 : 0;
   return Math.min(1e-6, 2e-9 * meia * meia);
 }
 
@@ -55,10 +58,15 @@ function maiorTriangulo(pontos, normal, limite) {
 /** { total, faces: [{ id, cantos, normal, parte }] } com cada face que o `adaptarThree` recusaria como degenerada ou que a auditoria de interseções acharia sem área. */
 export function medirFaceDegenerada(neutro) {
   const faces = [];
-  const limite = Math.max(LIMITE_DA_NORMAL, limiteRelativo(neutro));
+  const limites = new Map();
+  const limiteDa = (parte) => {
+    if (!limites.has(parte)) limites.set(parte, Math.max(LIMITE_DA_NORMAL, limiteRelativo(neutro, parte)));
+    return limites.get(parte);
+  };
   for (const face of neutro.F.values()) {
     /* com menos de 3 cantos (ou sem lista) o adaptador também recusa ("precisa de pelo menos 3 vértices"): entra na régua, com a normal indefinida */
     if (!Array.isArray(face.vs) || face.vs.length < 3) { faces.push({ id: face.id, cantos: Array.isArray(face.vs) ? face.vs.length : 0, normal: null, parte: face.parte ?? null }); continue; }
+    const limite = limiteDa(face.parte ?? null);
     const pontos = face.vs.map((v) => neutro.V.get(v));
     const modulo = normalDeNewell(pontos);
     if (modulo == null || !(modulo > limite)) { faces.push({ id: face.id, cantos: face.vs.length, normal: modulo, parte: face.parte ?? null }); continue; }
