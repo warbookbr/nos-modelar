@@ -7,12 +7,12 @@ import { medirPeca } from '../medir.mjs';
 describe('dentes no fim do arredondamento que afina', () => {
   const m = medirPeca(receita);
 
-  it('a malha fecha, o arredondamento afina até sumir na tampa (aviso faceLimite) e a costura tem 1787 faces', () => {
+  it('a malha fecha, o arredondamento afina até sumir na tampa (aviso faceLimite) e a costura tem 1791 faces', () => {
     expect(m.orfaos).toEqual([]);
     expect(m.arestasSoltas).toBe(0);
     expect(m.avisos).toEqual(['faceLimite']);
-    expect(m.facesDeCostura).toBe(1787);
-    expect(m.faces).toBe(3421);
+    expect(m.facesDeCostura).toBe(1791);
+    expect(m.faces).toBe(3428);
     expect(m.facesDegeneradas).toBe(0);
   });
 

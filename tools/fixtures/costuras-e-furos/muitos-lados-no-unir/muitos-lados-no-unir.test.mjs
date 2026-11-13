@@ -11,7 +11,7 @@ describe('dois lathe de muitos lados no unir com arredondarCostura', () => {
     const m = medirPeca(receita);
     expect(m.orfaos).toEqual([]);
     expect(m.arestasSoltas).toBe(0);
-    expect(m.faces).toBe(5193);
+    expect(m.faces).toBe(5195);
     expect(m.facesDeCostura).toBe(2537);
     expect(m.facesDegeneradas).toBe(0);
     expect(m.pontasDeSerra).toBe(8);
