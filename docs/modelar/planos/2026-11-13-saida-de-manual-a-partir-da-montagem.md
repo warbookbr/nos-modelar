@@ -1,6 +1,6 @@
 # Saída de manual a partir da montagem: lista de peças e passo a passo
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `modulos/manual/`, `src/autoria/ler-montagem-persistida.js`, `src/autoria/texto-do-manual.test.mjs`, `docs/modelar/banco-de-provas/saida-de-manual-2026-11-13/`
 
@@ -50,4 +50,4 @@ A captura de uma imagem por etapa ser lenta numa montagem grande: mede-se o temp
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-13, com as páginas e o desenho aprovados pela pessoa por imagem. Entregou a lista de peças e o passo a passo por etapa da montagem v5, com nomes, instruções e avisos no campo opcional `manual`, e o desenho técnico de uma peça (`npm run manual -- --desenho <peça>`): três vistas no terceiro diedro, aresta visível cheia e escondida tracejada por teste de profundidade, poda das pontas de remendo de canto e as cotas que a receita declara em `COTAS`, com recusa de cota mal declarada e texto do diâmetro posto fora dos traços. Provado no suporte-tubo e na kukri, sem mudar a malha delas. Fica como está, por decisão da pessoa, a silhueta escondida dos gomos do cabo na vista de ponta, que é o que a projeção dá. O programa não confere se a cota cai sobre uma feição real.
