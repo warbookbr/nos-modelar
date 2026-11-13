@@ -30,23 +30,17 @@ export default defineConfig({
     ...(MODO === 'lentos' ? { include: TESTES_LENTOS } : {}),
     watch: false,
 
-    /* 20 s por teste, não os 5 s do padrão do Vitest.
+    /* 900 s por teste: guarda contra teste TRAVADO, e não medida de lentidão. A lentidão é julgada pelo teto relativo à mediana
+     * das durações guardadas (`tools/testes-lentos.mjs`, `avaliarTeto`), que só reprova com três execuções seguidas acima do teto;
+     * um prazo do vitest abaixo disso aborta o teste antes de o teto opinar, e foi o que reprovou o CI com a peça certa.
      *
-     * Três testes desta suíte já falharam por este motivo, e nenhum tinha
-     * defeito: o estudo de campo da cascata persistida (1,2 s isolado), a sonda
-     * da armadura humanoide (0,7 s isolada) e a exportação STEP com occt-wasm
-     * (4 s isolada). Todos passam sozinhos e estouram quando os arquivos rodam
-     * em paralelo e disputam CPU e disco.
-     *
-     * Teste que passa isolado e falha junto é pior que teste vermelho: ensina
-     * quem roda — pessoa ou agente — a desconfiar da suíte inteira e a repetir
-     * "só para ver se passa desta vez". Corrigir um a um virou caça sem fim; o
-     * orçamento tem de caber no trabalho que a suíte de fato faz, com malha,
-     * WASM e navegador dentro dela.
-     *
-     * Isto NÃO esconde teste travado: travado passa de 20 s igual. O que some é
-     * a falha por contenção, que nunca foi sinal de nada. */
-    testTimeout: 180_000,
+     * Medido: `abre-na-bancada` levou 266 s no CI em 2026-11-12 e estourou os 180 s que valiam aqui, e a máquina do CI varia de duas a
+     * três vezes de uma execução para outra (as conferências solares, 27 s sozinhas e 80 s no CI; o furgão, 104, 188 e 368 s em três
+     * baterias). Três vezes a maior medida (266 s) dá uns 800 s, e 900 s é o prazo que os testes mais pesados já declaravam
+     * (`abre-na-bancada`, `acervo-real`). Teste travado passa de 900 s igual; o que some é a falha por contenção, que nunca foi
+     * sinal de nada (a cascata persistida a 1,2 s, a sonda da armadura a 0,7 s e a exportação STEP a 4 s, isoladas, já estouraram os
+     * 5 s do padrão do Vitest quando os arquivos rodaram em paralelo). Quem precisar de prazo menor ou maior declara no `it`. */
+    testTimeout: 900_000,
 
     /* A máquina local expõe mais núcleos lógicos do que esta suíte pesada
        sustenta ao mesmo tempo. Com o padrão do Vitest, a oficina e o estudo
