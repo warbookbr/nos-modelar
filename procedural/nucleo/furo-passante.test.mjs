@@ -1,6 +1,6 @@
 /* furo-passante.test.mjs — o furo passante num corpo de superfície curva subdividida, reto e oblíquo, medido pelas réguas de malha e pela distância da parede ao eixo. */
 import { describe, expect, it } from 'vitest';
-import { furoPassante } from './furo-passante.js';
+import { furoPassante, conferirFuroPassante } from './furo-passante.js';
 import { corpoDeSecaoVariavel } from './corpo-de-secao-variavel.js';
 import { medirPeca } from '../../tools/fixtures/costuras-e-furos/medir.mjs';
 import { lascasDoNeutro } from '../../tools/modelar/lasca.mjs';
@@ -61,6 +61,41 @@ describe('furoPassante', () => {
     const z = receitaCom({ posicao: [17, 20, -1], direcao: [0, 0, -2] }).passos[1];
     expect(z[0]).toBe('cilindro');
     expect(z[1]).toMatchObject({ eixo: 'z', em: [0.017, 0.02, -0.041] });
+  });
+
+  it('o furo que atravessa tem duas bocas e um corpo, sem aviso; o oblíquo também', () => {
+    const c = conferirFuroPassante(m.neutro, eixo.furo);
+    expect(c).toMatchObject({ bocas: 2, componentes: 1, avisos: [] });
+    expect(c.paredes).toBeGreaterThanOrEqual(16);
+    const d = [0.3, 1, 0.4];
+    const r = receitaCom({ posicao: [17, 20, -1], direcao: d, lados: 16 });
+    expect(conferirFuroPassante(medirPeca(r.receita).neutro, r.furo)).toMatchObject({ bocas: 2, componentes: 1, avisos: [] });
+  });
+
+  it('avisa o furo que não atravessa (ferramenta toda dentro) e o que não toca o sólido', () => {
+    const dentro = receitaCom({ posicao: [17, 20, -1], direcao: 'y', comprimento: 12 });
+    const c = conferirFuroPassante(medirPeca(dentro.receita).neutro, dentro.furo);
+    expect(c.bocas).toBe(0);
+    expect(c.avisos.join(' ')).toMatch(/cavidade fechada|não deixou parede/);
+    const fora = receitaCom({ posicao: [17, 20, 200], direcao: 'y' });
+    const f = conferirFuroPassante(medirPeca(fora.receita).neutro, fora.furo);
+    expect(f.paredes).toBe(0);
+    expect(f.avisos.join(' ')).toMatch(/não deixou parede/);
+  });
+
+  it('avisa o furo que parte o sólido em mais corpos do que ele tinha', () => {
+    const parte = receitaCom({ posicao: [60, 20, 0], direcao: 'z', raio: 30, comprimento: 120, lados: 16 });
+    const c = conferirFuroPassante(medirPeca(parte.receita).neutro, parte.furo);
+    expect(c.componentes).toBeGreaterThan(1);
+    expect(c.avisos.join(' ')).toMatch(/corpos/);
+  });
+
+  it('recusa a tolerância maior que o limite de cima, dizendo qual é', () => {
+    const base = { solido: { origem: { op: 'subdivisao', id: 1 } }, posicao: [0, 0, 0], direcao: 'y', raio: 3, comprimento: 80, ids: { cilindro: 2, subtrair: 3 } };
+    expect(() => furoPassante({ ...base, tolerancia: 5 })).toThrow(/no máximo 0,5/);
+    expect(() => furoPassante({ ...base, tolerancia: 0.6 })).toThrow(/no máximo 0,5/);
+    expect(() => furoPassante({ ...base, raio: 1, tolerancia: 0.3 })).toThrow(/no máximo 0,2/);
+    expect(furoPassante({ ...base, tolerancia: 0.5 }).passos.at(-1)[1].tolerancia).toBe(0.0005);
   });
 
   it('recusa o que não define um furo, com o valor', () => {

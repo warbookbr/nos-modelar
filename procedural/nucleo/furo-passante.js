@@ -16,8 +16,9 @@
  *   lados: os lados do cilindro (padrão 16, de 3 para cima).
  *   ids: { cilindro, subtrair } os `origemId` dos dois passos; o do sólido furado, citável por `parte` e `material`, é o de subtrair.
  *   nome: o prefixo do alias do cilindro, `${nome}Inteiro` (padrão 'furo').
- *   tolerancia: quanto a limpeza das faces finas pode mover a superfície, em mm (padrão 0,01).
- * devolve: { passos, aliases, origem } com `passos` para espalhar na receita, `aliases` para juntar a ALIASES e `origem` { op: 'subtrair', id }.
+ *   tolerancia: quanto a limpeza das faces finas pode mover a superfície, em mm (padrão 0,01; no máximo 0,5 e um quinto do raio).
+ * devolve: { passos, aliases, origem, geometria } com `passos` para espalhar na receita, `aliases` para juntar a ALIASES, `origem` { op: 'subtrair', id } e
+ *   `geometria` (posicao, direcao unitária, raio e comprimento). `conferirFuroPassante(neutro, furo)` confere depois de executar: bocas (2 atravessa), corpos e avisos.
  * exemplo:
  *   furoPassante({ solido: { origem: { op: 'cubo', id: 1 } }, posicao: [50, 50, 50], direcao: 'y', raio: 5, comprimento: 200, ids: { cilindro: 2, subtrair: 3 } })
  * peça: procedural/pecas/kukri/receita.js (o furo do cordão, em y, através do cabo de superfície subdividida).
@@ -31,12 +32,16 @@
  * 12 587 faces da peça do exemplo, 0 depois, com 10 µm). Fica de fora o que a tolerância não alcança: a recusa de `limparLascas` fica nos avisos do passo.
  *
  * AS RECUSAS. Seleção de sólido que não é objeto, posição ou direção que não são vetores finitos (a direção não nula), raio, comprimento ou tolerância não positivos,
- * lados abaixo de 3 e ids que faltam ou se repetem são recusados com o valor recebido e o limite. */
+ * lados abaixo de 3 e ids que faltam ou se repetem são recusados com o valor recebido e o limite. O que só a malha executada sabe (o cilindro que não
+ * atravessa, a ferramenta toda dentro, o sólido partido em dois) fica a cargo de `conferirFuroPassante`, que devolve avisos. */
 const falha = (texto) => { throw new RangeError(`furoPassante: ${texto}`); };
 const numero = (x) => typeof x === 'number' && Number.isFinite(x);
 const positivo = (x) => numero(x) && x > 0;
 const vetor = (v) => Array.isArray(v) && v.length === 3 && v.every(numero);
 const m = (mm) => mm / 1000;
+const br = (x) => String(Number(Number(x).toFixed(3))).replace('.', ',');
+/* a limpeza de lascas move a superfície até a tolerância: acima disso ela deixa de ser limpeza e passa a ser forma */
+export const TOLERANCIA_MAXIMA_MM = 0.5;
 const arredonda = (x) => Math.round(x * 1e9) / 1e9;
 
 export function furoPassante(o = {}) {
@@ -47,7 +52,8 @@ export function furoPassante(o = {}) {
   const lados = o.lados ?? 16;
   if (!(Number.isInteger(lados) && lados >= 3)) falha(`lados é inteiro de 3 para cima, e veio ${JSON.stringify(o.lados)}`);
   const tolerancia = o.tolerancia ?? 0.01;
-  if (!positivo(tolerancia)) falha(`tolerancia é número positivo em mm, e veio ${JSON.stringify(o.tolerancia)}`);
+  const maxima = Math.min(TOLERANCIA_MAXIMA_MM, o.raio / 5);
+  if (!positivo(tolerancia) || tolerancia > maxima) falha(`tolerancia é número positivo em mm, de no máximo ${br(maxima)} (o menor entre ${TOLERANCIA_MAXIMA_MM} mm e um quinto do raio), e veio ${JSON.stringify(o.tolerancia)}`);
   const ids = o.ids;
   if (!ids || !Number.isInteger(ids.cilindro) || !Number.isInteger(ids.subtrair) || ids.cilindro === ids.subtrair) falha(`ids é { cilindro, subtrair } com dois inteiros diferentes, e veio ${JSON.stringify(ids)}`);
   const nome = o.nome ?? 'furo';
@@ -82,9 +88,59 @@ export function furoPassante(o = {}) {
   }
   passos.push(['subtrair', { origemId: ids.subtrair, solidos: [o.solido, { alias }] }]);
   passos.push(['limparLascas', { sel: { origem: { op: 'subtrair', id: ids.subtrair } }, tolerancia: arredonda(m(tolerancia)) }]);
+  const direcaoUnitaria = unit ?? ['x', 'y', 'z'].map((k) => (k === eixo ? 1 : 0));
   return {
     passos,
+    geometria: { posicao: [...o.posicao], direcao: direcaoUnitaria, raio: o.raio, comprimento: o.comprimento, lados },
     aliases: [[alias, { unir: [{ origem: cil }, { origem: { ...cil, tampa: 'fundo' } }, { origem: { ...cil, tampa: 'topo' } }] }]],
     origem: { op: 'subtrair', id: ids.subtrair },
   };
+}
+
+/**
+ * Confere, no estado executado, o que a composição não sabe antes de rodar: se o cilindro atravessou o sólido, e se a boca do furo partiu o sólido.
+ * `neutro` é o estado de `executarReceita` (V em metro, F com `vs` e `parte`), `furo` o devolvido por furoPassante e `parte` (opcional) restringe às faces dela.
+ * Devolve { paredes, bocas, componentes, avisos }: `paredes` é o número de faces da parede do furo (todos os vértices a `raio` do eixo), `bocas` o
+ * número de bordas fechadas em que a parede encontra o resto da superfície (2 num furo passante, 1 num cego, 0 numa cavidade fechada ou ferramenta toda dentro),
+ * `componentes` o número de corpos conexos e `avisos` os textos do que não bate: sem parede, furo que não atravessa, mais corpos que `componentesAntes` (padrão 1).
+ */
+export function conferirFuroPassante(neutro, furo, { parte = null, componentesAntes = 1 } = {}) {
+  const { posicao, direcao, raio, lados } = furo.geometria;
+  /* os vértices da parede estão na circunferência ou, onde a malha corta a faceta, entre ela e a corda: de raio·cos(π/lados) a raio */
+  const interno = raio * Math.cos(Math.PI / lados) - 1e-3;
+  const faces = [...neutro.F.values()].filter((f) => parte == null || f.parte === parte);
+  const aoEixo = (id) => {
+    const p = neutro.V.get(id).map((x, k) => x * 1000 - posicao[k]);
+    const t = p[0] * direcao[0] + p[1] * direcao[1] + p[2] * direcao[2];
+    return Math.hypot(...p.map((x, k) => x - t * direcao[k]));
+  };
+  const naParede = new Map();
+  const noEixo = (id) => { if (!naParede.has(id)) naParede.set(id, aoEixo(id) >= interno && aoEixo(id) <= raio + 1e-3); return naParede.get(id); };
+  const parede = faces.filter((f) => f.vs.every(noEixo));
+  const ehParede = new Set(parede);
+  /* as bordas entre uma face da parede e uma que não é dela */
+  const arestas = new Map();
+  for (const f of faces) {
+    for (let i = 0; i < f.vs.length; i++) {
+      const a = f.vs[i]; const b = f.vs[(i + 1) % f.vs.length];
+      const chave = a < b ? `${a}|${b}` : `${b}|${a}`;
+      if (!arestas.has(chave)) arestas.set(chave, []);
+      arestas.get(chave).push({ f, a, b });
+    }
+  }
+  const raiz = new Map();
+  const achar = (x) => { while (raiz.get(x) !== x) { raiz.set(x, raiz.get(raiz.get(x))); x = raiz.get(x); } return x; };
+  const unir = (a, b) => { for (const x of [a, b]) if (!raiz.has(x)) raiz.set(x, x); raiz.set(achar(a), achar(b)); };
+  for (const usos of arestas.values()) {
+    if (usos.length === 2 && ehParede.has(usos[0].f) !== ehParede.has(usos[1].f)) unir(usos[0].a, usos[0].b);
+  }
+  const bocas = new Set([...raiz.keys()].map(achar)).size;
+  raiz.clear();
+  for (const f of faces) for (let i = 1; i < f.vs.length; i++) unir(f.vs[0], f.vs[i]);
+  const componentes = new Set([...raiz.keys()].map(achar)).size;
+  const avisos = [];
+  if (!parede.length) avisos.push('furoPassante: o cilindro não deixou parede no sólido (fora dele, ou tangente): confira posicao, direcao, raio e comprimento');
+  else if (bocas < 2) avisos.push(`furoPassante: o furo tem ${bocas} boca(s) e não atravessa o sólido (${bocas === 0 ? 'cavidade fechada: a ferramenta ficou toda dentro' : 'furo cego'}): aumente o comprimento ou mova a posicao para o cilindro passar dos dois lados`);
+  if (componentes > componentesAntes) avisos.push(`furoPassante: o sólido ficou com ${componentes} corpos e tinha ${componentesAntes}: o furo o partiu ou soltou um pedaço; reduza o raio ou mova a posicao`);
+  return { paredes: parede.length, bocas, componentes, avisos };
 }
