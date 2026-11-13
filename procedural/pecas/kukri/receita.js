@@ -27,6 +27,8 @@ export const TABELA = {
   degrau_x: 152,
   degrau_rampa: 2.5,
   /* a lâmina afina de espessura do dorso ao fio da ponta: a partir de afina_de ela vai a afina_ponta de meia espessura */
+  /* meio comprimento, em x, do arredondamento da quebra do dorso: uma Bézier quadrática com o canto como controle, da ordem de 4 a 6 mm */
+  quebra_suave: 6,
   afina_de: 340, afina_ponta: 0.3,
   passo_x: 5,
   /* contornos levantados da foto, [x, z] em mm: do dorso, em duas metades que se encontram na quebra, e do gume */
@@ -79,12 +81,18 @@ const entre = (a, b, t) => Math.min(b, Math.max(a, t));
 
 /** As estações em x do contorno da lâmina, da base à ponta. */
 export function estacoes(T) {
-  const xs = new Set([T.lamina_base, T.degrau_x, T.degrau_x + T.degrau_rampa, 280, T.comprimento]);
+  const xs = new Set([T.lamina_base, T.degrau_x, T.degrau_x + T.degrau_rampa, 280, 280 - T.quebra_suave / 2, 280 + T.quebra_suave / 2, T.comprimento]);
   for (let x = T.lamina_base; x < T.comprimento; x += T.passo_x) xs.add(x);
   return [...xs].sort((a, b) => a - b);
 }
 
-const zDorso = (T, x) => (x <= 280 ? interpola(T.dorso_base_quebra, x) : interpola(T.dorso_quebra_ponta, x));
+const zRetoDorso = (T, x) => (x <= 280 ? interpola(T.dorso_base_quebra, x) : interpola(T.dorso_quebra_ponta, x));
+function zDorso(T, x) {
+  const r = T.quebra_suave;
+  if (!(Math.abs(x - 280) < r)) return zRetoDorso(T, x);
+  const t = (x - 280 + r) / (2 * r);
+  return (1 - t) ** 2 * zRetoDorso(T, 280 - r) + 2 * t * (1 - t) * zRetoDorso(T, 280) + t * t * zRetoDorso(T, 280 + r);
+}
 const zGume = (T, x) => interpola(T.gume, x);
 
 /** Largura em z do chanfro do gume na estação x: nula no trecho sem fio, sobe no degrau e cede perto da ponta. */
