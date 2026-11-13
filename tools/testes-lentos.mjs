@@ -13,6 +13,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { availableParallelism, loadavg } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
   /* 2026-11-12: roda as 101 receitas do acervo num processo só, 7,7 s com a máquina livre, e no CI de 2 a 3 vezes isso */
@@ -110,8 +111,61 @@ export const TESTES_LENTOS = [
  * sozinho já passa dele na bateria, que foi como o teste do importador de STEP, de 18 a 50 s, entrou sem ninguém notar. */
 export const TETO_DO_RAPIDO_MS = 30_000;
 
-export function acimaDoTeto(duracoes, teto = TETO_DO_RAPIDO_MS) {
-  return duracoes.filter(({ arquivo, ms }) => ms > teto && !TESTES_LENTOS.includes(arquivo));
+/* O TETO RELATIVO À MEDIANA, E TRÊS SEGUIDAS PARA REPROVAR.
+ *
+ * Três reprovações do CI numa semana (2026-11-12) foram arquivo com a peça certa que passou de um teto posto com uma medida só:
+ * as conferências da instalação solar a 80 s no CI e 27 s sozinhas, o `acervo-real.test` a 337 s contra 320 s, e o
+ * `abre-na-bancada.test` a 180 s. A máquina do CI varia de duas a três vezes (apoio-do-vinco: 65,6 s no CI, 18,4 s sozinho, 22,8 s
+ * na bateria local; as conferências solares: 80/27, 3,0 vezes), e essa variação é de uma execução, não do arquivo. O que o teto quer
+ * pegar é o arquivo que ficou mais lento e continua assim.
+ *
+ * Por isso, com histórico (tools/vitest-duracoes.mjs guarda as últimas execuções de cada arquivo), o teto é FATOR_DO_TETO vezes a
+ * mediana das execuções de referência, que são todas menos as `SEGUIDAS_QUE_REPROVAM` últimas (a que se avalia e as duas de antes), para que uma regressão que se
+ * repete não entre na própria referência. O fator é 2: abaixo das 3 vezes de uma execução ruim do CI, que por isso só avisa, e
+ * abaixo do dobro de tempo que o plano quer ver reprovado quando se mantém. Uma execução acima do teto é aviso; a última e as duas
+ * anteriores acima do teto, três seguidas, reprovam. Com menos de `MINIMO_DE_REFERENCIA` execuções de referência vale o teto fixo
+ * do arquivo, e a ação é a de antes: o rápido reprova, o lento só avisa. O piso evita teto de poucos segundos para arquivo que
+ * leva um. */
+export const FATOR_DO_TETO = 2;
+export const SEGUIDAS_QUE_REPROVAM = 3;
+export const MINIMO_DE_REFERENCIA = 3;
+export const PISO_DO_TETO_RELATIVO_MS = 10_000;
+
+export function mediana(valores) {
+  const ordenados = [...valores].sort((a, b) => a - b);
+  const meio = Math.floor(ordenados.length / 2);
+  return ordenados.length % 2 ? ordenados[meio] : (ordenados[meio - 1] + ordenados[meio]) / 2;
+}
+
+/* `historico`: as durações do arquivo, da mais antiga para a mais nova, com a execução que se avalia no fim.
+   Devolve { teto, relativo, ms, acima, seguidas, veredito } com veredito 'ok', 'aviso' ou 'reprova'. */
+export function avaliarTeto(historico, { fixo, piso = PISO_DO_TETO_RELATIVO_MS, semHistorico = 'reprova' }) {
+  const ms = historico.at(-1);
+  const referencia = historico.slice(0, -SEGUIDAS_QUE_REPROVAM);
+  const relativo = referencia.length >= MINIMO_DE_REFERENCIA;
+  const teto = relativo ? Math.max(FATOR_DO_TETO * mediana(referencia), piso) : fixo;
+  const acima = ms > teto;
+  let seguidas = 0;
+  for (let i = historico.length - 1; i >= 0 && historico[i] > teto; i -= 1) seguidas += 1;
+  const veredito = !acima ? 'ok' : !relativo ? semHistorico : seguidas >= SEGUIDAS_QUE_REPROVAM ? 'reprova' : 'aviso';
+  return { teto, relativo, ms, acima, seguidas, veredito };
+}
+
+/* O teto de cada arquivo desta execução, com o histórico lido do disco; sem histórico do arquivo, o fixo. */
+export function avaliarDuracoes(duracoes, historicos, opcoes) {
+  return duracoes.map(({ arquivo, ms }) => {
+    const anteriores = historicos[arquivo] ?? [];
+    /* o histórico já traz esta execução, gravada pelo repórter; se não trouxer (outro modo de rodar), entra aqui */
+    const historico = anteriores.at(-1) === ms ? anteriores : [...anteriores, ms];
+    return { arquivo, ...avaliarTeto(historico, opcoes) };
+  });
+}
+
+/* Os arquivos fora da lista dos lentos acima do teto. `historicos` (opcional) dá o teto relativo de cada arquivo, sem piso abaixo
+   do teto fixo, porque um rápido que passa do fixo deve ir para a lista dos lentos; sem ele, o teto fixo para todos, como sempre foi. */
+export function acimaDoTeto(duracoes, teto = TETO_DO_RAPIDO_MS, historicos = {}) {
+  const rapidos = duracoes.filter(({ arquivo }) => !TESTES_LENTOS.includes(arquivo));
+  return avaliarDuracoes(rapidos, historicos, { fixo: teto, piso: teto, semHistorico: 'reprova' }).filter((a) => a.acima);
 }
 
 /* O arquivo que passou do teto dentro da bateria roda de novo sozinho, e só reprova se ainda passar de TETO_SOZINHO_MS. Entre
@@ -226,17 +280,34 @@ function gravarPesos(raiz) {
   console.log(`testes-lentos — ${Object.keys(segundos).length} pesos gravados em ${ARQUIVO_DOS_PESOS}.`);
 }
 
-/* Os lentos também têm teto, mas de aviso: o plano da bateria rápida (fatia 5) pede cada arquivo abaixo de 60 s, e a parte do
-   CI que segura a rodada é a do arquivo mais longo. A lista sai no fim da saída, onde quem lê o registro do CI a encontra. */
+/* Os lentos também têm teto: o plano da bateria rápida (fatia 5) pede cada arquivo abaixo de 60 s, e a parte do CI que segura a
+   rodada é a do arquivo mais longo. Sem histórico o teto é o fixo e só avisa, como sempre foi; com histórico vale o teto relativo
+   à mediana (`avaliarTeto`), uma execução acima avisa e três seguidas reprovam. A lista sai no fim da saída, onde quem lê o
+   registro do CI a encontra. */
 export const TETO_DO_LENTO_MS = 60_000;
+
+export function relatarLentos(duracoes, historicos) {
+  const avaliados = avaliarDuracoes(duracoes, historicos, { fixo: TETO_DO_LENTO_MS, semHistorico: 'aviso' }).filter((a) => a.acima).sort((a, b) => b.ms - a.ms);
+  const s = (ms) => `${Math.round(ms / 1000)} s`;
+  const linha = (a) => `${a.arquivo} ${s(a.ms)} (teto ${s(a.teto)}${a.relativo ? `, ${FATOR_DO_TETO} vezes a mediana; ${a.seguidas} seguida(s)` : ', fixo, sem histórico'})`;
+  const avisos = avaliados.filter((a) => a.veredito === 'aviso');
+  const reprovados = avaliados.filter((a) => a.veredito === 'reprova');
+  return {
+    reprovados,
+    linhas: [
+      ...(avisos.length ? [`test:lentos — aviso, ${avisos.length} arquivo(s) acima do teto numa execução só: ${avisos.map(linha).join(', ')}.`] : []),
+      ...(reprovados.length ? [`test:lentos — ${reprovados.length} arquivo(s) acima do teto em ${SEGUIDAS_QUE_REPROVAM} execuções seguidas: ${reprovados.map(linha).join(', ')}. Meça por etapa antes de dividir, ou suba o teto com a medida.`] : []),
+      ...(avaliados.length ? [] : [`test:lentos — nenhum arquivo acima do teto.`]),
+    ],
+  };
+}
 
 function avisarAcimaDoTetoDosLentos(caminho, inicio) {
   const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
   if (Date.parse(gravado) < inicio) return;
-  const acima = duracoes.filter(({ ms }) => ms > TETO_DO_LENTO_MS).sort((a, b) => b.ms - a.ms);
-  console.log(acima.length
-    ? `test:lentos — ${acima.length} arquivo(s) acima de ${TETO_DO_LENTO_MS / 1000} s: ${acima.map(({ arquivo, ms }) => `${arquivo} ${Math.round(ms / 1000)} s`).join(', ')}.`
-    : `test:lentos — nenhum arquivo acima de ${TETO_DO_LENTO_MS / 1000} s.`);
+  const { linhas, reprovados } = relatarLentos(duracoes, lerHistorico('lentos'));
+  for (const linha of linhas) (reprovados.length ? console.error : console.log)(linha);
+  if (reprovados.length) process.exitCode = 1;
 }
 
 function rodar(modo) {
@@ -253,7 +324,7 @@ function rodar(modo) {
   const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
   if (Date.parse(gravado) < inicio) return;
   const tetos = tetosDaBateria({ ci: Boolean(process.env.CI) });
-  const lentos = acimaDoTeto(duracoes, tetos.bateria);
+  const lentos = acimaDoTeto(duracoes, tetos.bateria, lerHistorico('rapidos'));
   if (!lentos.length) return;
   const cargaAntes = loadavg()[0];
   const pesados = pesadosSozinhos(lentos, medirSozinho(raiz), tetos.sozinho);
@@ -268,8 +339,13 @@ function rodar(modo) {
     console.log(`test:rapidos — aviso: ${pesados.map(({ arquivo, sozinhoMs }) => `${arquivo} (${s1(sozinhoMs)} sozinho)`).join(', ')} passaram do teto, mas a máquina está ocupada (carga ${carga.toFixed(1)} em ${processadores} processadores) e a medida não separa o arquivo da carga; o CI cobra o teto em máquina limpa.`);
     return;
   }
-  console.error(`test:rapidos — ${pesados.length} arquivo(s) passaram do teto de ${tetos.bateria / 1000} s da bateria rápida e de ${tetos.sozinho / 1000} s sozinhos${process.env.CI ? '' : ' (tetos locais, com margem para o CI)'}:`);
-  for (const { arquivo, ms, sozinhoMs } of pesados) console.error(`  ${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho  ${arquivo}`);
+  /* com histórico, o estouro isolado é aviso e só três seguidas reprovam; sem histórico vale o teto fixo, que reprova */
+  const avisos = pesados.filter((d) => d.veredito !== 'reprova');
+  const reprovados = pesados.filter((d) => d.veredito === 'reprova');
+  if (avisos.length) console.log(`test:rapidos — aviso, ${avisos.map(({ arquivo, ms, sozinhoMs, teto, seguidas }) => `${arquivo} (${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho, teto ${s1(teto)}, ${seguidas} seguida(s) de ${SEGUIDAS_QUE_REPROVAM})`).join(', ')}: acima do teto numa execução só, reprova com ${SEGUIDAS_QUE_REPROVAM} seguidas.`);
+  if (!reprovados.length) return;
+  console.error(`test:rapidos — ${reprovados.length} arquivo(s) passaram do teto da bateria rápida (${tetos.bateria / 1000} s, ou ${FATOR_DO_TETO} vezes a mediana das execuções guardadas) e de ${tetos.sozinho / 1000} s sozinhos${process.env.CI ? '' : ' (tetos locais, com margem para o CI)'}:`);
+  for (const { arquivo, ms, sozinhoMs } of reprovados) console.error(`  ${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho  ${arquivo}`);
   console.error('Ponha cada um em TESTES_LENTOS, em tools/testes-lentos.mjs, ou deixe-o mais leve.');
   process.exitCode = 1;
 }

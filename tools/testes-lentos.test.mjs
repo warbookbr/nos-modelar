@@ -4,7 +4,8 @@ import { dirname, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { acimaDoTeto, ARQUIVO_DOS_PESOS, argumentosDoVitest, comParte, maquinaOcupada, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS, tetosDaBateria } from './testes-lentos.mjs';
+import { anexarAoHistorico } from './vitest-duracoes.mjs';
+import { acimaDoTeto, ARQUIVO_DOS_PESOS, avaliarTeto, FATOR_DO_TETO, relatarLentos, TETO_DO_LENTO_MS, argumentosDoVitest, comParte, maquinaOcupada, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS, tetosDaBateria } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -101,5 +102,57 @@ describe('a variável que escolhe a bateria (MODELAR_TESTES)', () => {
     const antigo = arquivoDasDuracoes({ MECANIFICA_TESTES: 'lentos' });
     expect(antigo.stdout.trim()).toBe(join('tmp', 'gates', 'duracoes-dos-testes-lentos.json'));
     expect(antigo.stderr).toContain('use MODELAR_TESTES');
+  });
+});
+
+describe('o teto relativo à mediana das durações guardadas', () => {
+  const NORMAL = [27_000, 26_000, 28_000, 27_000, 29_000, 27_000, 28_000];
+  const opcoes = { fixo: TETO_DO_LENTO_MS, semHistorico: 'aviso' };
+
+  it('o estouro isolado avisa: 80 s no CI de um arquivo que leva 27 s não reprova', () => {
+    const r = avaliarTeto([...NORMAL, 80_000], opcoes);
+    expect(r.relativo).toBe(true);
+    expect(r.teto).toBe(FATOR_DO_TETO * 27_000);
+    expect(r.acima).toBe(true);
+    expect(r.seguidas).toBe(1);
+    expect(r.veredito).toBe('aviso');
+  });
+
+  it('três execuções seguidas acima do teto reprovam, e a regressão não entra na própria referência', () => {
+    expect(avaliarTeto([...NORMAL, 60_000, 61_000], opcoes).veredito).toBe('aviso');
+    const r = avaliarTeto([...NORMAL, 60_000, 61_000, 62_000], opcoes);
+    expect(r.teto).toBe(FATOR_DO_TETO * 27_000);
+    expect(r.seguidas).toBe(3);
+    expect(r.veredito).toBe('reprova');
+    /* uma execução boa no meio zera a conta */
+    expect(avaliarTeto([...NORMAL, 60_000, 27_000, 62_000], opcoes).veredito).toBe('aviso');
+  });
+
+  it('sem histórico vale o teto fixo: o rápido reprova como sempre e o lento só avisa', () => {
+    const poucas = [20_000, 21_000, 22_000, 21_000];
+    expect(avaliarTeto([...poucas, 70_000], opcoes)).toMatchObject({ relativo: false, teto: TETO_DO_LENTO_MS, veredito: 'aviso' });
+    expect(avaliarTeto([70_000], { fixo: TETO_DO_LENTO_MS })).toMatchObject({ relativo: false, veredito: 'reprova' });
+    expect(avaliarTeto([50_000], opcoes)).toMatchObject({ acima: false, veredito: 'ok' });
+  });
+
+  it('o arquivo que sempre foi lento ganha teto maior que o fixo', () => {
+    expect(avaliarTeto([300_000, 310_000, 305_000, 300_000, 305_000, 337_000], opcoes)).toMatchObject({ teto: 610_000, veredito: 'ok' });
+  });
+
+  it('os lentos relatam o aviso e a reprovação, e o histórico dos rápidos só relaxa o teto fixo', () => {
+    const historicos = { 'a.test.mjs': [...NORMAL, 80_000], 'b.test.mjs': [...NORMAL, 60_000, 61_000, 62_000] };
+    const { linhas, reprovados } = relatarLentos([{ arquivo: 'a.test.mjs', ms: 80_000 }, { arquivo: 'b.test.mjs', ms: 62_000 }], historicos);
+    expect(reprovados.map((r) => r.arquivo)).toEqual(['b.test.mjs']);
+    expect(linhas.join('\n')).toMatch(/aviso, 1 arquivo.*a\.test\.mjs/);
+    expect(relatarLentos([{ arquivo: 'c.test.mjs', ms: 10_000 }], {}).linhas).toEqual(['test:lentos — nenhum arquivo acima do teto.']);
+    const rapidos = { 'x.test.mjs': [14_000, 15_000, 14_500, 15_000, 15_500, 15_000, 16_000] };
+    expect(acimaDoTeto([{ arquivo: 'x.test.mjs', ms: 16_000 }], 12_000, rapidos)).toEqual([]);
+    expect(acimaDoTeto([{ arquivo: 'x.test.mjs', ms: 16_000 }], 12_000).map((d) => d.arquivo)).toEqual(['x.test.mjs']);
+  });
+
+  it('o histórico guarda as últimas execuções de cada arquivo', () => {
+    let h = {};
+    for (let i = 1; i <= 12; i += 1) h = anexarAoHistorico(h, [{ arquivo: 'a', ms: i }]);
+    expect(h.a).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
 });
