@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1845 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1851 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -925,11 +925,15 @@
 - `casca.test.mjs` — casca.test.mjs — a extensão `casca` medida sobre a malha que ela devolve, não sobre a conta que a produz. A espessura é conferida por uma medida independente…
 - `catalogo.js` — catálogo.js — projeções puras e determinísticas do registro de operações. Não executa receita, não lê arquivos e não conhece visor, MCP ou domínio.
 - `catalogo.test.mjs` — catálogo-capacidades.test.mjs — R05: descoberta deriva do registro, sem tabela paralela.
+- `chapa-de-contorno.js` — chapa-de-contorno.js — a chapa de espessura dada por um contorno 2D fechado, com chanfro, quina quebrada e canto arredondado por trecho
+- `chapa-de-contorno.test.mjs` — chapa-de-contorno.test.mjs — a chapa de contorno em cunha, medida pelas réguas de malha (face degenerada e face fina), com a ponta fechada, o chanfro, a quin…
 - `composicoes.js` — composicoes.js — subgrafos procedurais declarativos, sem estado global ou I/O.
 - `composicoes.test.mjs` — composicoes-procedurais.test.mjs — R06: subgrafos declarativos e reutilizáveis.
 - `concordancia-por-ponto.test.ts` — concordancia-por-ponto.test.ts — A-35: cada curva de um mesmo passo pode declarar seu próprio custo sem obrigar todas as outras a usarem o maior.
 - `contorno.js` — contorno.js — contorno 2D puro: retângulo de cantos arredondados, recuo por meia-esquadria, área com sinal e convexidade.
 - `contorno.test.mjs` — contorno.test.mjs — retângulo arredondado, recuo por meia-esquadria, área e convexidade do contorno 2D.
+- `corpo-de-secao-variavel.js` — corpo-de-secao-variavel.js — o corpo fechado cuja seção (superelipse) muda ao longo de um eixo, com sulcos e tampas
+- `corpo-de-secao-variavel.test.mjs` — corpo-de-secao-variavel.test.mjs — o corpo de seção variável com sulcos, medido pelas réguas de malha (face degenerada e face fina) e pelas seções dos planos.
 - `curva-da-gaiola.js` — curva-da-gaiola.js — a curva sobre a superfície de uma gaiola, tirada dela sem digitar coordenada
 - `curva-da-gaiola.test.ts` — curva-da-gaiola.test.ts — a curva sobre a superfície da gaiola, tirada de `gaiolaPorEstacoes` e de `gaiolaPorLacos` sem digitar coordenada. A chapa em L de `…
 - `curva2d.js` — curva2d.js — contorno 2D escrito por trechos (reto, arco, arco tangente, concordância e spline), puro.
@@ -953,6 +957,8 @@
 - `friso-refinar.test.mjs` — friso-refinar.test.mjs — a moldura que segue a curva da borda do vão na superfície limite (fatia 4c do plano do núcleo para qualquer mecanismo, atrito 4 do c…
 - `friso.js` — friso.js — varredura de um perfil 2D ao longo de uma linha 3D, e a linha de uma gaiola de subdivisão refinada.
 - `friso.test.mjs` — friso.test.mjs — o friso ao longo de curva: a varredura pura (volume, sólido fechado, esquadria, ponta fechada e grito da curva fechada demais), a cadeia na …
+- `furo-passante.js` — furo-passante.js — os passos de um furo redondo que atravessa um sólido qualquer, com a boca sem face fina
+- `furo-passante.test.mjs` — furo-passante.test.mjs — o furo passante num corpo de superfície curva subdividida, reto e oblíquo, medido pelas réguas de malha e pela distância da parede a…
 - `gaiola-aneis-gota.test.mjs` — gaiola-aneis-gota.test.mjs — os anéis de gaiola no vão real de uma carroceria: a gota estreita, o recuo por lado e a abertura que é a própria borda
 - `gaiola-aneis-rebaixo.test.mjs` — gaiola-aneis-rebaixo.test.mjs — o rebaixo por relevo de anel: a faixa de recuo que monta numa chapa plana de grade uniforme (os números do guia), o aviso de …
 - `gaiola-aneis.js` — gaiola-aneis.js — anéis de gaiola em volta de um vão, opção da gaiola por estações
@@ -1791,7 +1797,7 @@
 
 ## procedural/pecas/kukri/
 
-- `receita.js` — kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. Cada parte é uma gaiola de `gaiolaPorLacos`: a lâmina em laços p…
+- `receita.js` — kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. A lâmina é uma `chapaDeContorno` (o contorno da foto, o chanfro …
 
 ## procedural/pecas/kukri/referencias/
 

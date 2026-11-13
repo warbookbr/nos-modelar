@@ -80,26 +80,27 @@ export function derivar(T = TABELA) {
   return { lamina: lamina(T), cabo: cabo(T) };
 }
 
+/** O furo do cordão, em y, através do cabo (o passo 2) com o cilindro no passo 3 e a subtração no 4. */
+export const furo = (T = TABELA) => furoPassante({
+  solido: { origem: { op: 'subdivisao', id: 2 } }, posicao: [T.furo_x, T.eixo_y, T.furo_z], direcao: 'y', raio: T.furo_raio, comprimento: 40, ids: { cilindro: 3, subtrair: 4 },
+});
+
 export function gerarPassos(T = TABELA) {
   const { lamina, cabo } = derivar(T);
-  const furo = furoPassante({
-    solido: { origem: { op: 'subdivisao', id: 2 } }, posicao: [T.furo_x, T.eixo_y, T.furo_z], direcao: 'y', raio: T.furo_raio, comprimento: 40, ids: { cilindro: 3, subtrair: 4 },
-  });
+  const furoDoCabo = furo(T);
   return [
     ['subdivisao', { origemId: 1, ...lamina.passo, niveis: 0 }],
     ['parte', { nome: 'lamina', sel: { origem: { op: 'subdivisao', id: 1 } } }],
     ['subdivisao', { origemId: 2, ...cabo.passo, niveis: T.niveis_cabo }],
-    ...furo.passos,
-    ['parte', { nome: 'cabo', sel: { origem: furo.origem } }],
+    ...furoDoCabo.passos,
+    ['parte', { nome: 'cabo', sel: { origem: furoDoCabo.origem } }],
     ['material', { sel: { origem: { op: 'subdivisao', id: 1 } }, usa: 'laminaFosca' }],
     ['material', { sel: { origem: { op: 'subdivisao', id: 1, parte: 'fio' } }, usa: 'fio' }],
-    ['material', { sel: { origem: furo.origem }, usa: 'caboGranulado' }],
+    ['material', { sel: { origem: furoDoCabo.origem }, usa: 'caboGranulado' }],
   ];
 }
 
-export const ALIASES = [
-  ['furoInteiro', { unir: [{ origem: { op: 'cilindro', id: 3 } }, { origem: { op: 'cilindro', id: 3, tampa: 'fundo' } }, { origem: { op: 'cilindro', id: 3, tampa: 'topo' } }] }],
-];
+export const ALIASES = furo().aliases;
 
 export const CONTATOS = [
   { par: ['lamina', 'cabo'], motivo: 'a base da lâmina, em x = 140, encosta na face da frente do cabo, que faz de guarda, sem vão nem degrau solto' },
@@ -125,8 +126,8 @@ const receita = {
     /* dispensa dada pela pessoa em 2026-11-13: a faca usa subdivisão no cabo e não tem chapa de carroceria */
     lataria: { dispensa: 'faca de mão: lâmina de chapa plana e cabo maciço, sem chapa de superfície livre em que amassado largo e raso possa aparecer; dispensa dada pela pessoa em 2026-11-13' },
     partes: [
-      { nome: 'lamina', forma: 'chapa de 290 mm (x 140 a 430), 5 mm no dorso: quebra em ângulo do dorso em x 280, dorso até a ponta aguda, barriga larga perto da ponta, chanfro largo no gume, trecho sem fio e degrau junto ao cabo, quinas do dorso quebradas', tecnica: 'gaiola por laços em cinco planos de y, contorno levantado da foto, sem subdivisão para o chanfro ficar plano; o fio é um grupo de faces com material próprio' },
-      { nome: 'cabo', forma: 'peça única de 140 mm (x 0 a 140), seção ovalada: frente alargada de guarda, cinco gomos com sulcos, bico curvado para o lado do gume e furo passante em y para cordão', tecnica: 'gaiola por laços em cortes de x com subdivisão de um nível, sulcos como estreitamento dos semieixos, furo por subtração de um cilindro' },
+      { nome: 'lamina', forma: 'chapa de 290 mm (x 140 a 430), 5 mm no dorso: quebra em ângulo do dorso em x 280, dorso até a ponta aguda, barriga larga perto da ponta, chanfro largo no gume, trecho sem fio e degrau junto ao cabo, quinas do dorso quebradas', tecnica: 'chapaDeContorno em cinco planos de y, contorno levantado da foto, com chanfro do gume, quina quebrada e raio da quebra do dorso, sem subdivisão para o chanfro ficar plano; o fio é um grupo de faces com material próprio' },
+      { nome: 'cabo', forma: 'peça única de 140 mm (x 0 a 140), seção ovalada: frente alargada de guarda, cinco gomos com sulcos, bico curvado para o lado do gume e furo passante em y para cordão', tecnica: 'corpoDeSecaoVariavel em cortes de x com subdivisão de dois níveis, sulcos como estreitamento dos semieixos, furo por furoPassante (subtração de um cilindro e limpeza das lascas)' },
     ],
     criteriosDeReprovacao: [
       'a lâmina não tem a quebra em ângulo no dorso, ou a barriga não é mais larga perto da ponta do que junto ao cabo',

@@ -1,3 +1,4 @@
+/* chapa-de-contorno.test.mjs — a chapa de contorno em cunha, medida pelas réguas de malha (face degenerada e face fina), com a ponta fechada, o chanfro, a quina e o raio de canto. */
 import { describe, expect, it } from 'vitest';
 import { chapaDeContorno } from './chapa-de-contorno.js';
 import { medirPeca } from '../../tools/fixtures/costuras-e-furos/medir.mjs';
