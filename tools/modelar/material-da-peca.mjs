@@ -41,7 +41,7 @@ export function porConvencao(peca, { raiz = REPO } = {}) {
     if (existsSync(foto)) achados.push({ papel: 'sobreposicao', caminho: rel(foto) });
   }
 
-  const rodadas = join(raiz, 'docs/modelar/historico/rodadas', peca);
+  const rodadas = join(raiz, 'tmp/rodadas', peca);
   for (const arquivo of arquivosDe(rodadas)) achados.push({ papel: 'rodada', caminho: rel(arquivo) });
 
   /* A ferramenta específica da peça: `prancha-<algo>.mjs` cujo nome comece pelo

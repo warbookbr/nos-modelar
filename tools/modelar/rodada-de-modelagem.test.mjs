@@ -108,11 +108,10 @@ describe('registro de rodadas', () => {
     expect(pastaDeRodadas(peca).replaceAll('\\', '/')).toMatch(/procedural\/pecas\//);
   });
 
-  it('peça que não existe, ou que é arquivo solto, grava no lugar antigo', () => {
-    /* Registro de peça anterior à pasta não muda de lugar: evidência não se
-       move para caber numa arrumação nova. */
+  it('peça que não existe, ou que é arquivo solto, grava na pasta de trabalho fora do git', () => {
+    /* Era `docs/modelar/historico/rodadas`, nunca rastreada, até a pasta de histórico sair em 2026-11-13. */
     expect(pastaDeRodadas('peca-que-nunca-existiu').replaceAll('\\', '/'))
-      .toMatch(/docs\/modelar\/historico\/rodadas\/peca-que-nunca-existiu$/);
+      .toMatch(/tmp\/rodadas\/peca-que-nunca-existiu$/);
   });
 });
 

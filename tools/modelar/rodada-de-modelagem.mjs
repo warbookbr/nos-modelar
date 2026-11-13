@@ -64,11 +64,9 @@ import { lascasDaReceita } from './lasca.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
-/* Onde as rodadas moravam antes da pasta da peça, e onde continuam morando
-   enquanto existir peça em arquivo solto. Registro de peça migrada não é movido:
-   ele é evidência do que aconteceu, e evidência não muda de lugar para caber
-   numa arrumação nova. */
-export const PASTA_RODADAS = join(REPO, 'docs/modelar/historico/rodadas');
+/* Onde grava a rodada da peça que ainda não tem pasta própria com `receita.js`: uma pasta de trabalho fora do git. Até
+   2026-11-13 era `docs/modelar/historico/rodadas`, que nunca foi rastreada e saiu com a pasta de histórico. */
+export const PASTA_RODADAS = join(REPO, 'tmp/rodadas');
 
 /* Uma barra só, para a parte de um objeto (`braco-robotico/base`); `..` e
    segunda barra continuam recusados. */
@@ -91,7 +89,7 @@ export function pastaDeRodadas(peca, { raiz = REPO } = {}) {
     const receita = resolverCaminhoReceita(peca, { raiz });
     if (receita.endsWith(`${sep}receita.js`)) return join(dirname(receita), 'rodadas');
   } catch { /* peça que ainda não existe grava no lugar antigo */ }
-  return join(raiz, 'docs/modelar/historico/rodadas', peca);
+  return join(raiz, 'tmp/rodadas', peca);
 }
 
 export function lerRodadas(peca, { pasta = pastaDeRodadas(peca) } = {}) {

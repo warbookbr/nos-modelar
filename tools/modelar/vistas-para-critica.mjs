@@ -565,7 +565,7 @@ export function rodadasDaPasta(pasta) {
 
 /* a pasta das rodadas da peça: ao lado da receita em `receita.js`, ou no histórico antigo */
 function pastaDasRodadas(peca, caminho) {
-  return caminho.endsWith('receita.js') ? join(dirname(caminho), 'rodadas') : join(REPO, 'docs/modelar/historico/rodadas', peca);
+  return caminho.endsWith('receita.js') ? join(dirname(caminho), 'rodadas') : join(REPO, 'tmp/rodadas', peca);
 }
 
 function secaoDosAnteriores(pontos) {
