@@ -33,7 +33,7 @@ USAR DIRETO: os contornos exatos de reta e arco que o núcleo já tem (`contorno
 
 Andamento de 2026-11-13. A fatia 1 está feita: `npm run silhueta:desvio` mede a silhueta contra um contorno em milímetro, por trecho, e entrou no roteiro de peça nova. A fatia 2 está feita, com revisão adversarial em duas passadas: `chapaDeContorno`, `corpoDeSecaoVariavel` e `furoPassante`, e a kukri reescrita com elas foi de 297 para 152 linhas e de 12 faces finas para nenhuma; a pessoa aceitou por imagem a faca reescrita, com um ponto de 1,55 mm no começo do gume em que a versão nova segue a tabela. A fatia 3 está feita: o estudo está em `docs/modelar/banco-de-provas/forma-exata-2026-11-13/ESTUDO-DO-METODO.md`. O método cobre chapa, bloco e torno, não cobre o encontro geral de dois corpos curvos nem a peça de prova da agulha, e custa de 35% a 90% mais faces na chapa.
 
-Decisão da pessoa em 2026-11-13, sobre a fatia 3: a fatia 4 segue só com a chapa de contorno com bordas e furos pelo método novo, cada operação ao lado da antiga, e o torno se decide depois de ver a chapa numa peça real. A união geral e o arredondamento de costura geral não entram.
+Sobre a fatia 3: a pessoa aprovou em 2026-11-13 seguir só com a chapa com bordas e furos, com base numa estimativa de 11 dias que o revisor adversarial mostrou estar baixa. A estimativa corrigida é de 17 a 20 dias para uma lâmina como a da kukri, que o protótipo recusa com chanfro acima de 2 mm, e a `chapaDeContorno` da fatia 2 já a faz pelo método atual. A recomendação passou a ser só a triangulação do protótipo nas tampas das operações de hoje (3,5 dias), e a decisão voltou à pessoa com o número certo; a fatia 4 não começa antes dela.
 
 ## Excluído
 
