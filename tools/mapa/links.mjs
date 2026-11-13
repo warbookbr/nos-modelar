@@ -21,6 +21,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { caminhoRetirado, motivoRecusa } from './retirados.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const EXTS = new Set(['.md', '.js', '.mjs', '.ts', '.html', '.json']);
@@ -114,6 +115,14 @@ for (const arquivo of rastreados) {
 
       const resolveExato = existsSync(path.join(REPO, citado));
       if (resolveExato) continue;
+
+      /* pasta que saiu da árvore: vale se a crônica guarda o nome do arquivo (o texto está no git); senão é recusado */
+      const retirado = caminhoRetirado(citado, REPO);
+      if (retirado) {
+        if (retirado.consta) continue;
+        falhas.push({ arquivo, linha: i + 1, citado, zona: 'retirada', retirado });
+        continue;
+      }
 
       if (ehZonaHistorica(arquivo)) {
         const nome = path.basename(citado);
@@ -222,10 +231,12 @@ const check = process.argv.includes('--check');
 
 if (falhas.length) {
   console.error(`docs:links — ${falhas.length} referência(s) quebrada(s):`);
-  for (const { arquivo, linha, citado, zona } of falhas) {
+  for (const { arquivo, linha, citado, zona, retirado } of falhas) {
     /* a mensagem diz o que DE FATO foi tentado: na zona viva só existe a
        resolução exata, então dizer "nem por nome" ali seria mentira. */
-    const motivo = zona === 'historica'
+    const motivo = zona === 'retirada'
+      ? motivoRecusa(retirado)
+      : zona === 'historica'
       ? 'não resolve exato nem por nome sob docs/'
       : zona === 'relativa'
         ? 'link relativo não resolve a partir da pasta do arquivo'

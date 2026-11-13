@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2083 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2085 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3034,6 +3034,8 @@
 - `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de seis planos ativos,…
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
+- `retirados.mjs` — retirados.mjs — caminho sob uma pasta que saiu da árvore e que a crônica guarda no git. As pastas docs/modelar/planos/encerrados/ e docs/modelar/historico/ s…
+- `retirados.test.mjs` — retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, e reprova quando não registra.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
 - `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…

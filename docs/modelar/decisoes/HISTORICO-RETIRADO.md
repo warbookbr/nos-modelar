@@ -28,17 +28,17 @@ Histórico não governa trabalho novo: é registro do que se fez e se mediu. As 
 - `IMPORTADORES-COMO-RECRIAR.md`: desenho dos importadores de OpenSCAD (.csg), STEP e STL para .esboco.json, que saíram em 2026-10-25, e o commit que guarda o código.
 - `LABORATORIO-IA-PROGRESSO.md`: relato por fatia do laboratório computacional (R0 a R5) e do piloto do cabo de pá, com a lição de que soma ponderada deixa critério compensar requisito estrutural.
 - `LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md`: levantamento da fatia 1 do plano desenho sem referência: resolvedores de restrições 2D (planegcs, SolveSpace, FreeCAD, CADCraft) e Potrace/VectorCraft contra a borda subpixel do contorno da imagem.
-- `LEVANTAMENTO-IA-3D-2026-10.md`: levantamento de IAs que geram 3D (AssemCAD, SNAP3D, CAD-Coder, preços) e o lugar da Mecanifica, com correções de citação.
+- `LEVANTAMENTO-IA-3D-2026-10.md`: levantamento de IAs que geram 3D (AssemCAD, SNAP3D, CAD-Coder, preços) e o lugar da Modelar, com correções de citação.
 - `MALHA-OTIMIZADA-PROGRESSO.md`: relato das fatias H1 a H5 da malha otimizada (cadeira, redução de vértice sem ganho, organizador de topologia, armas melee).
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`: matriz RT-01 a RT-xx que ligava objetivo, capacidade, teste e gate do plano mestre da arquitetura híbrida.
 - `OFICINA-OTIMIZACOES.md`: análise de dependências e backlog R1 a R9 (O-0 a O-14) da linguagem de autoria da Oficina, com a lista 'o que deliberadamente não fazer'.
 - `PLANO-ESTADO-DA-ARTE-ESBOCO.md`: plano de 2026-09-28 para de/para, âncoras, polígono e espelho no esboço antigo, substituído por 'o esboço sem conta à mão'.
-- `PLANO.md`: plano mestre da Mecanifica aposentado em 2026-08-02, que só remete ao commit 41f0c50 e ao encerramento.
+- `PLANO.md`: plano mestre da Modelar aposentado em 2026-08-02, que só remete ao commit 41f0c50 e ao encerramento.
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md`: protocolo de método do diagnóstico do motor procedural (distinções capacidade implementada, contratada, provada).
 - `README.md`: índice de historico/ (tabela do que cada arquivo prova) e remissão para CHEGADA-2026-09-11.
 - `REGISTRO-FALHAS-AUTORIA-V.md`: registro das 38 falhas medidas da autoria (V-01 a V-38), a maioria do programa de carroceria N6 congelado.
 - `RELATO-RODA-REALISTA.md`: relato do experimento da roda realista (rodadas de pneu, raios, arranja), concluído sem integração.
-- `RELATORIO-ANALISE-GRANDES-MELHORIAS.md`: análise de 2026-08-14 do estado da Mecanifica e da melhoria de catálogo único com revisão ativa (MCP v4).
+- `RELATORIO-ANALISE-GRANDES-MELHORIAS.md`: análise de 2026-08-14 do estado da Modelar e da melhoria de catálogo único com revisão ativa (MCP v4).
 - `RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md`: auditoria de 2026-08-20 das práticas de autoria 3D, com a decisão 'corrigir': medida estrutural não encerra decisão de forma.
 - `RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md`: prova privada da cage do quarto dianteiro, reprovada pela pessoa no aceite apesar de gates verdes.
 - `RELATORIO-DIAGNOSTICO-MOTOR.md`: relatório do diagnóstico do motor: 'motor adequado, abrir Montagem Mínima Persistida v1'.
