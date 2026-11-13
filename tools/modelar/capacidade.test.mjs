@@ -79,7 +79,7 @@ describe('capacidade: a ficha é recortada do cabeçalho do código', () => {
   for (const nome of nomes) {
     describe(nome, () => {
       const fonte = readFileSync(resolve(REPO, CAPACIDADES[nome].arquivo), 'utf8');
-      const ficha = lerFicha(fonte);
+      const ficha = lerFicha(fonte, nome);
 
       it('tem ficha com o nome da capacidade e todas as partes', () => {
         expect(ficha).not.toBeNull();

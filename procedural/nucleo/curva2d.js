@@ -34,7 +34,29 @@
 
    `recortarArcoNoPerfil` (no fim do arquivo) é outra função pura, sobre um contorno já pronto: recorta no perfil o arco poligonal
    de uma roda ou de um vão redondo na borda de baixo, fundindo o corte que cai perto de um vértice, para a extrusão não ganhar
-   lateral de lasca. */
+   lateral de lasca.
+
+   FICHA recortarArcoNoPerfil
+   serve: tira de um perfil 2D fechado o arco poligonal de um vão redondo (arco de roda, passa-roda, boca de um túnel) na aresta horizontal
+     de baixo, e devolve o perfil anti-horário com o arco entre os dois pontos de corte; o vértice do arco que cai junto do corte é fundido.
+   quando: o perfil lateral de um corpo (carroceria, calço, casca) tem a borda de baixo reta e o vão redondo sai dela; no lugar de escrever o
+     círculo, a ordem e a fusão do corte em cada receita. Para o contorno que já vem de trechos com arco declarado use contornoComArcos, e
+     para o furo no meio do perfil, e não na borda, a extrusão com furo; para dois arcos na mesma borda, chame a função duas vezes.
+   unidades: as de quem chama (mm ou m), as mesmas em todos os campos; o polígono do arco tem a face plana em cima, como o cilindro de eixo horizontal.
+   campos:
+     perfil: lista de pontos [x, y] do contorno, 3 ou mais, em qualquer sentido; precisa ter uma aresta horizontal em y = base que contenha o corte.
+     centro: [x, y] do centro do arco.
+     raio: o raio do polígono do arco, maior que zero.
+     lados: o número de lados do polígono inteiro, inteiro de 3 para cima (16 a 32 numa roda); o arco tem os que ficam acima da base.
+     base: o y da aresta de baixo; o arco precisa cruzá-la (parte acima, parte abaixo), ou a função recusa e diz o intervalo de y do arco.
+     fundirAbaixoDe: o corte ou o vértice do arco que cai a menos disso do vizinho funde com ele (padrão 0, só o que coincide); a forma muda no máximo isso.
+   limites: o resultado precisa ser polígono simples, e a função recusa com o diagnóstico de diagnosticarContorno se o arco atravessa outra parte do
+     contorno; recusa também a aresta de base que não contém o trecho cortado, dizendo as que existem.
+   devolve: a lista de pontos [x, y] anti-horária, começando onde o perfil começava, com o arco entre os dois cortes.
+   exemplo:
+     recortarArcoNoPerfil([[0, 0], [100, 0], [100, 40], [0, 40]], { centro: [50, 0], raio: 15, lados: 16, base: 0 })
+   peça: procedural/pecas/carro-taxi/receita.js (escreve o mesmo recorte à mão; nenhuma receita chama a função hoje).
+   FIM DA FICHA */
 
 import { diagnosticarContorno } from './contorno.js';
 
