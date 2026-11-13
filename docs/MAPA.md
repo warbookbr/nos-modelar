@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1820 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1819 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -545,7 +545,6 @@
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
-- `2026-11-12-instalacao-solar-no-telhado.md` — Instalação solar no telhado: um caso prático de montagem real, do telhado de fibrocimento aos painéis presos nos trilhos
 - `2026-11-13-melhorias-de-processo-da-revisao.md` — Melhorias de processo da revisão: menos reenvio sem defeito e menos coisa escrita à mão
 - `2026-11-13-nucleo-para-quem-escreve-receita.md` — Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
 - `2026-11-13-organizacao-dos-documentos.md` — Organização dos documentos: uma finalidade por pasta e nada encerrado na área de trabalho
