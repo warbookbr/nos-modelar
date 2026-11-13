@@ -23,7 +23,7 @@ O que existe no projeto além do código que constrói formas, o que cada coisa 
 | Guardas e réguas | Conferem cada peça do acervo: fechada, sem lasca, sem interseção | Nos gates e à mão por peça | `tools/modelar/guardas/`, `tools/modelar/reguas-de-malha/`, critérios em `procedural/criterios/` |
 | Famílias | Peças que nascem de medidas, como roda e dobradiça | Ao modelar peça padrão | `procedural/familias/` |
 | Extensões | Operações a mais do núcleo, fora do registro base | Ao escrever receita | `procedural/extensoes/` |
-| Módulos | Exportadores, esboço, textura, contorno da imagem | Conforme a saída pedida | `modulos/exportador-obj/`, `modulos/exportador-gltf/`, `modulos/exportador-cad/`, `modulos/esboco-nucleo/`, `modulos/textura/`, `modulos/contorno-da-imagem/` |
+| Módulos | Exportadores, esboço, textura, contorno da imagem, e o manual de uma montagem (lista de peças e passo a passo, `npm run manual`) | Conforme a saída pedida | `modulos/manual/`, `modulos/exportador-obj/`, `modulos/exportador-gltf/`, `modulos/exportador-cad/`, `modulos/esboco-nucleo/`, `modulos/textura/`, `modulos/contorno-da-imagem/` |
 | Pesquisa de bibliotecas | Avalia biblioteca de terceiros antes de adotá-la | Ao propor dependência | `modulos/pesquisa/` |
 | Ponte com o Blender | Converte a peça e confere a malha fora do núcleo, opcional | Quando a conferência pede o Blender | `tools/blender/`, `docs/modelar/blender/` |
 | Servidor de ferramentas | A porta por onde a IA chama as ferramentas sem digitar comando | Em sessão com MCP | `tools/mcp/` |

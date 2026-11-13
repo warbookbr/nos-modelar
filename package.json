@@ -43,6 +43,7 @@
     "bancada": "node tools/modelar/olhar-bancada.mjs",
     "bancada:tela": "node tools/modelar/olhar-bancada.mjs --tela",
     "etapas": "node tools/modelar/etapas-da-montagem.mjs",
+    "manual": "node modulos/manual/src/manual.mjs",
     "revisar": "node tools/modelar/olhar-bancada.mjs --revisar",
     "preparar:modelagem": "node tools/modelagem/preparar-pacote.mjs",
     "validar:modelagem": "node tools/modelagem/validar-pacote.mjs",

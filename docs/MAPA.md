@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1827 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1835 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -731,6 +731,23 @@
 - `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
 - `textura.test.js` — textura.test.js — material por parte, arquivo .mtl, usemtl, coordenadas vt em mapeamento planar e recusas.
 - `tolerancia.test.js` — tolerancia.test.js — tolerância de triângulo degenerado e regressão de saída sem texturas.
+
+## modulos/manual/
+
+- `README.md` — Manual
+
+## modulos/manual/src/
+
+- `capturador.mjs` — capturador.mjs — a captura de vistas de várias montagens com UM servidor e UM navegador. `capturarMontagem` abre e fecha o servidor e o Chromium a cada chama…
+- `lista-de-pecas.js` — lista-de-pecas.js — a lista de peças de uma montagem resolvida. Função pura: não lê arquivo, não abre navegador e não conhece peça nenhuma pelo nome; roda so…
+- `manual.mjs` — manual.mjs — `npm run manual -- <montagem.json>`: a lista de peças e o passo a passo de uma montagem persistida.
+- `pagina.js` — pagina.js — a página única do manual: HTML com o CSS embutido, sem script e sem recurso de rede. As imagens entram embutidas (data URI de PNG) quando o passo…
+- `passos.js` — passos.js — o que entra em cada etapa de uma montagem resolvida, e a montagem pintada de cada passo. Núcleo do passo a passo, sem navegador: recebe a montage…
+
+## modulos/manual/tests/
+
+- `lista-de-pecas.test.js` — lista-de-pecas.test.js — a lista de peças sobre uma montagem sintética: agrupamento, caixa em milímetro, determinismo e ausência de nome de peça no módulo.
+- `manual-real.test.mjs` — manual-real.test.mjs — o manual sobre uma montagem do acervo: a lista confere com a contagem independente das instâncias, a saída é igual byte a byte e a opç…
 
 ## modulos/pesquisa/
 

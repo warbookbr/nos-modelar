@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Saída de manual a partir de uma montagem resolvida: lista de peças e passo a passo.",
+  "name": "@modelar/manual",
+  "version": "0.1.0",
+  "type": "module"
+}

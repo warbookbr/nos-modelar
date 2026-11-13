@@ -27,6 +27,8 @@ USAR DIRETO: a montagem v5 com `etapas` e instâncias, o resolvedor da montagem,
 3. O texto de cada passo. A etapa da montagem pode declarar uma instrução curta e os avisos (ferramenta, aperto, o que conferir); o módulo só a dispõe, e não inventa instrução. Prova: a etapa sem instrução sai com a lista e a imagem, sem texto inventado.
 4. O desenho de uma peça com cotas declaradas: as três vistas ortográficas com linha visível e escondida e as cotas que a receita declarar. Só começa depois de a pessoa aprovar as fatias 1 e 2, e pode virar plano próprio se a projeção pedir trabalho no núcleo.
 
+Estado em 2026-11-13: as fatias 1 e 2 foram feitas por um agente, em `modulos/manual/`, reaproveitando o resolvedor da montagem e a captura sem mudar nada fora do módulo. A instalação solar sai com 48 instâncias em 14 linhas de peça e 48 passos, em 113 s (94 s de imagens, cerca de 2 s cada); o avião, em 15 s. Cada imagem enquadra a peça nova, porque numa vista da casa inteira o grampo e a emenda não aparecem. Dois atritos viraram candidatos de ferramenta: a captura sobe o servidor e o navegador a cada chamada, e o visor da montagem não tem destaque por instância, de modo que o módulo pinta uma cópia da malha. A página foi mostrada à pessoa, que ainda não a julgou. As fatias 3 e 4 não começaram.
+
 ## Excluído
 
 Escolher cotas sozinho; desenho de conjunto com balões; exportar para formato de editor de texto; dado elétrico, marca ou modelo de produto, que não entram no repositório.
