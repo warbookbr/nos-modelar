@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1837 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1838 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -333,6 +333,7 @@
 
 ## docs/modelar/banco-de-provas/kukri-2026-11-13/
 
+- `ALINHAMENTO.md` — Kukri: o alinhamento com a pessoa
 - `README.md` — Kukri: o custo de modelar um objeto simples
 
 ## docs/modelar/banco-de-provas/leitura-por-demanda-2026-10/
