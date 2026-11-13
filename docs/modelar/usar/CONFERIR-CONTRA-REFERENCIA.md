@@ -108,3 +108,5 @@ Contra uma foto ou um desenho, no lugar do `conferir:referencia`, as ferramentas
 O laço lê o mesmo veredito: `rodada-de-modelagem.mjs <peça> --acao` mede a receita atual (veredito, `guarda:acervo`,
 `guarda:referencial` e `conferir-pontos` quando há `PONTOS`) e devolve `modelar` enquanto a medição não passar; `--registrar` mede
 de novo e recusa o veredito do crítico quando ela reprovou.
+
+Quando a referência já é um contorno em milímetro nos eixos do modelo (as polilinhas que o módulo de contorno da imagem entrega, ou as coordenadas derivadas de uma prancha), `npm run silhueta:desvio -- <peça> --referencia=<contorno.json> --plano=<xy|xz|yz> [--imagem=<arquivo.svg>]` mede a silhueta exata da peça contra cada trecho: o desvio máximo para fora e para dentro com a posição, a média do módulo, o p90 e os subtrechos acima de `--tolerancia` (1 mm), mais a sobreposição em SVG. O arquivo declara `"escala": "mm"` e `"alinhamento"` com dois pontos que coincidem com o modelo, e sem eles o comando recusa; o sinal é positivo onde o modelo passa para fora da referência.
