@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2054 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2056 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -444,10 +444,12 @@
 - `pergunta-1-2-3-6-processo-documentos-e-agentes.md` — Perguntas 1, 2, 3 e 6: gates e regras, leitura, gerado e manual, sessões e agentes (primeiro levantamento)
 - `pergunta-4-pastas-e-modulos.md` — Pergunta 4: pastas e módulos (inventário medido, sem a comparação externa)
 - `pergunta-4-projetos-comparaveis.md` — Pergunta 4: como projetos comparáveis organizam núcleo, peças, ferramentas e documentação
+- `pergunta-4-projetos-operados-por-ia.md` — Pergunta 4: como se organiza a documentação de um projeto operado por IA
 - `pergunta-5-erros-nomes-e-argumentos.md` — Pergunta 5, segunda metade: mensagens de erro, nomes e argumentos das operações
 - `pergunta-5-operacoes-e-verbosidade.md` — Pergunta 5 (primeira metade): operações contra uso real e verbosidade das receitas
 - `pergunta-5-tempo-por-operacao.md` — Pergunta 5: tempo por operação nas peças mais pesadas
 - `pergunta-7-para-quem-o-projeto-serve.md` — Pergunta 7: para quem o projeto serve (primeiro levantamento)
+- `proposta-de-organizacao-dos-documentos.md` — Proposta de organização dos documentos, para a decisão da pessoa
 
 ## docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/
 
