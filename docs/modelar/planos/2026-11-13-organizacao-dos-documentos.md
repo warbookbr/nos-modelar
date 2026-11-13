@@ -1,6 +1,6 @@
 # Organização dos documentos: uma finalidade por pasta e nada encerrado na área de trabalho
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `docs/modelar/usar/`, `docs/modelar/guias/`, `docs/modelar/contratos/README.md`, `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`, `docs/modelar/decisoes/`, `docs/modelar/pesquisas/`, `docs/modelar/historico/`, `docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/`, `procedural/nucleo/CLAUDE.md`, `procedural/pecas/CLAUDE.md`, `tools/CLAUDE.md`. Entram também os 41 documentos soltos de `docs/modelar/` que a proposta lista com destino, a pasta `docs/modelar/planos/encerrados/`, que é caminho compartilhado, e, em cada arquivo que cita um documento movido, só a linha do link.
 
@@ -51,4 +51,6 @@ Tirar um plano cuja lição ainda é consultada: por isso a fatia 4 só roda dep
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-13. A pessoa viu a árvore final por imagem e respondeu "está boa sim, pode seguir", o que fecha o item 4 do gate. `docs/modelar/` tem dois documentos soltos e cada pasta tem o `README.md` com a finalidade (item 1); os 181 arquivos de planos encerrados e de histórico têm a resposta do levantamento, e as onze decisões em vigor têm registro (item 2); `planos/encerrados/` e `historico/` não existem na árvore, e o roteiro `pesquisar` lê `decisoes/README.md` (item 3).
+
+Diferente da proposta aprovada: os sete guias ficaram em `guias/`, pasta nova, porque as regras de `usar/` os recusam; dois documentos mudaram de gaveta depois de lidos; e o índice do banco de provas nasceu, porque noventa documentos dele só eram alcançados pelos planos que saíram. Ficou sem conserto um link de `docs/nos-herdado/README.md`, zona que não se edita. O levantamento das decisões foi feito por agentes e conferido por amostra: seis dos onze rascunhos diziam mais do que a origem sustentava e foram corrigidos na escrita dos registros, e as 133 respostas de "já coberta" tiveram os caminhos conferidos por máquina e cinco lidas à mão.
