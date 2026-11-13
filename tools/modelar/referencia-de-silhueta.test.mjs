@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
-import { comoCLI, dividirAnel, lerAlinhar, lerCortes, lerEscala, ErroDeSilhueta, transformacao } from './referencia-de-silhueta.mjs';
+import { alisarTrecho, lerAlisar, comoCLI, dividirAnel, lerAlinhar, lerCortes, lerEscala, ErroDeSilhueta, transformacao } from './referencia-de-silhueta.mjs';
 import { lerReferencia, medirSilhueta } from './silhueta-contra-referencia.mjs';
 
 /* Um corte cai no vértice do contorno mais perto do pedido, e a ponta de uma quina sai arredondada pelo alisamento do módulo, daí os 3 px nos cortes. A forma conhecida: um L em mm, nos eixos do modelo. A imagem sintética a desenha girada em 25 graus e a 0,4 mm/px, com y para baixo. */
@@ -139,4 +139,45 @@ describe('as recusas dizem o recebido, o esperado e o conserto', () => {
     expect(r.codigo).toBe(0);
     expect(r.out).toContain('--escala=');
   });
+});
+
+describe('o alisamento do trecho, o limiar e os recortes de perto', () => {
+  const onda = Array.from({ length: 201 }, (_, i) => [i, 0.3 * Math.sin(i * 1.7)]);
+
+  it('troca a ondulação por uma curva suave, com as pontas fixas, e mede o desvio do bruto', () => {
+    const r = alisarTrecho(onda, 4);
+    expect(r.curva[0]).toEqual(onda[0]);
+    expect(r.curva[r.curva.length - 1]).toEqual(onda[200]);
+    expect(Math.max(...r.curva.slice(40, -40).map((p) => Math.abs(p[1])))).toBeLessThan(0.05);
+    expect(r.desvioMaxMm).toBeGreaterThan(0.25);
+    expect(r.desvioMaxMm).toBeLessThan(0.45);
+    const reta = alisarTrecho(Array.from({ length: 101 }, (_, i) => [i, 2 * i]), 5);
+    expect(reta.desvioMaxMm).toBeLessThan(1e-6);
+  });
+
+  it('lê --alisar e recusa o formato, o mm e o trecho que não existe', () => {
+    expect(lerAlisar('gume:3,dorso:2', ['gume', 'dorso'])).toEqual([{ trecho: 'gume', sigmaMm: 3 }, { trecho: 'dorso', sigmaMm: 2 }]);
+    expect(lerAlisar(null, ['a'])).toEqual([]);
+    expect(() => lerAlisar('gume', ['gume'])).toThrow(/recebeu "gume".*Esperado: <trecho>:<mm>/);
+    expect(() => lerAlisar('xis:3', ['gume'])).toThrow(/trecho 'xis', que não existe/);
+  });
+
+  it('grava em origem o alisamento e o limiar, recusa acima de --alisar-max e grava os recortes de perto', async () => {
+    const saida = join(pasta, 'lisa.json');
+    const r = await capturar([...base, '--limiar=100', '--alisar=fundo:1', '--alisar-max=3', `--saida=${saida}`, `--sobreposicao=${join(pasta, 'lisa.png')}`, '--sobreposicao-de-perto=fundo']);
+    expect(r.err).toBe('');
+    const ref = JSON.parse(readFileSync(saida, 'utf8'));
+    expect(ref.origem.segmentacao.limiar).toBe(100);
+    expect(ref.origem.segmentacao.limiarDe).toBe('--limiar');
+    expect(ref.origem.alisados).toHaveLength(1);
+    expect(ref.origem.alisados[0]).toMatchObject({ trecho: 'fundo', sigmaMm: 1 });
+    expect(ref.origem.alisados[0].desvioMaxMm).toBeLessThanOrEqual(ref.origem.alisarMaxMm);
+    const recorte = PNG.sync.read(readFileSync(join(pasta, 'lisa-de-perto-fundo-01.png')));
+    expect(recorte.width).toBe(600);
+    const recusa = await capturar([...base, '--alisar=esquerda:30', '--alisar-max=0.1', `--saida=${join(pasta, 'x.json')}`]);
+    expect(recusa.codigo).toBe(2);
+    expect(recusa.err).toMatch(/alisar 'esquerda' com 30 mm afasta a curva até .* mm.*limite é 0\.1 mm.*Esperado/);
+    const semRegioes = await capturar([`--imagem=${imagem}`, '--contorno=nenhum.json', '--limiar=100', ...base.slice(2), `--saida=${join(pasta, 'x.json')}`]);
+    expect(semRegioes.codigo).toBe(2);
+  }, 60000);
 });
