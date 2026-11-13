@@ -1,15 +1,15 @@
-/* Fixa o defeito de hoje (fatia 1 do plano "costuras e furos limpos"); a fatia 3 inverte os números marcados. */
+/* A fatia 3 do plano "costuras e furos limpos" inverteu o defeito: o canto do aro de um tubo e o polo da tampa do outro coincidem, a face mantida passa ao canto representante e a união fecha. */
 import { describe, expect, it } from 'vitest';
 import receita from './receita.js';
 import { medirPeca } from '../medir.mjs';
 import { gerarPassos } from '../tubos-em-t.js';
 
 describe('frente de um tubo rente à tampa de outro, no unir', () => {
-  it('DEFEITO: com a frente rente (avanço 0) a união deixa 4 arestas soltas, sem órfão nem aviso', () => {
+  it('com a frente rente (avanço 0) a união fecha, sem aresta solta, órfão nem aviso', () => {
     const m = medirPeca(receita);
     expect(m.orfaos).toEqual([]);
     expect(m.avisos).toEqual([]);
-    expect(m.arestasSoltas).toBe(4);
+    expect(m.arestasSoltas).toBe(0);
     expect(m.faces).toBe(1750);
   });
 

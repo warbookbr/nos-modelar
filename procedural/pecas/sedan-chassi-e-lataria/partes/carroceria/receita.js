@@ -88,6 +88,7 @@ const passosDoForro = (Tab) => {
   const sel = { origem: { op: 'unir', id: uniao } };
   return [...faixas.map((f, k) => ['subdivisao', { origemId: ids[k], vertices: f.gaiola.vertices, faces: f.gaiola.faces, niveis: 0 }]),
     ['unir', { origemId: uniao, solidos: ids.map((id) => ({ origem: { op: 'subdivisao', id } })) }],
+    ['limparLascas', { sel, tolerancia: m(0.03) }],
     ['parte', { nome: 'forroDosVaos', sel }], ['pincel', { modo: 'face', sel, cor: '#4a5560' }], ['liso', { sel, angulo: 35 }]];
 };
 

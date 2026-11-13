@@ -138,6 +138,20 @@
           ]
         },
         "motivo": "o pé do retrovisor entra 11 mm na chapa da porta dianteira, onde é parafusado, e cada maçaneta entra 3 mm na chapa da porta; o rebaixo de fundo fechado atrás da maçaneta fica para o plano do rebaixo por contorno"
+      },
+      {
+        "id": "carroceriaComRodas",
+        "a": {
+          "caminho": [
+            "carroceria"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "rodas"
+          ]
+        },
+        "motivo": "o cubo é montado no eixo do chassi: o furo central da instância tem 60 mm, o diâmetro do eixo, e a roda é parada, sem junta modelada; a parede do furo e a do eixo, dois polígonos de raio 30, se tocam e uma entra na outra 3 nm, abaixo de qualquer folga de montagem"
       }
     ]
   },

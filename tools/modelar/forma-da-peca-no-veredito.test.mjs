@@ -12,11 +12,14 @@ const SEM_G01 = 'G01 sobre a malha: não conferido: sem referência (REFINA não
 const SEM_CONTORNO = 'contorno por parte: não conferido: sem referência (nenhum *.contornos.json na pasta da peça)';
 const SEM_RAZAO = 'razões: não conferido: sem referência (a receita não exporta RAZOES)';
 
+/* o suporte tem triângulos finos, que a régua de malha avisa; o aviso não é desta conferência */
+const semAvisoDeMalha = (texto) => texto.replace(/\nAVISO: \d+ régua\(s\) de malha com achado[^\n]*\n/, '');
+
 describe('sem referência nenhuma o veredito diz que não conferiu, e não aprova nem barra', () => {
   it('a peça sem alvo, sem contorno e sem razão passa como passava, e os três itens ficam "não conferido"', async () => {
     const r = await medir('ok');
     expect(r.ok).toBe(true);
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     for (const linha of [SEM_G01, SEM_CONTORNO, SEM_RAZAO]) expect(r.stdout).toContain(`  ${linha}`);
     expect(r.stdout).toContain('REFERÊNCIA DA FORMA');
     expect(r.resultado).toMatchObject({ g01: null, contornos: null, razoes: null });
@@ -40,7 +43,7 @@ describe('sem referência nenhuma o veredito diz que não conferiu, e não aprov
 describe('G01 sobre a malha da peça, com o alvo N2 que REFINA.alvo declara', () => {
   it('a malha que confere com o alvo nas três silhuetas passa, e o G00 do alvo fica bloqueado sem a crítica dele', async () => {
     const r = await medir('g01-ok');
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     expect(r.ok).toBe(true);
     expect(r.resultado.g01).toMatchObject({ rodou: true, alvo: 'alvo-suporte', medidasAprovadas: true, estado: 'bloqueado' });
     expect(r.resultado.g01.avaliacaoAlvo).toEqual({ estado: 'bloqueado', motivo: 'critica-independente-ausente' });
@@ -87,7 +90,7 @@ describe('G01 sobre a malha da peça, com o alvo N2 que REFINA.alvo declara', ()
 describe('contorno por parte, com o *.contornos.json da pasta da peça', () => {
   it('as partes que casam com as regiões e a silhueta inteira passam, com o limiar que o comparador já tem', async () => {
     const r = await medir('contorno-ok');
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     expect(r.ok).toBe(true);
     const [c] = r.resultado.contornos.conferencias;
     expect(c).toMatchObject({ vista: 'frontal', ok: true });
@@ -125,7 +128,7 @@ describe('contorno por parte, com o *.contornos.json da pasta da peça', () => {
 describe('razões declaradas em RAZOES', () => {
   it('as razões dentro da faixa passam', async () => {
     const r = await medir('razao-ok');
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     expect(r.ok).toBe(true);
     expect(r.resultado.razoes.medidas.map((m) => [m.nome, m.medido])).toEqual([['colunaPelaSapata', 0.9], ['alturaPelaLargura', 1]]);
     expect(r.stdout).toContain('razões: todas dentro da faixa (2 declaradas, 2 lidas, 0 fora da faixa)');

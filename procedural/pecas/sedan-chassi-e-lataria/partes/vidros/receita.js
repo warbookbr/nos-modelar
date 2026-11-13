@@ -42,12 +42,12 @@ const receita = {
   PARAMS: TABELA,
   get TOPO() { return { origem: 'o centro do carro no chão: x lateral com a direita em +x, y para cima, a frente em +z', ...gerarTopo() }; },
   PLANO: {
-    objeto: 'os vidros de um sedã de quatro portas de 4,4 m: o para-brisa e o vidro traseiro de um lado ao outro, e de cada lado o vidro da porta dianteira, o da traseira e a vigia, chapas de 4 mm por baixo da borda dos vãos',
+    objeto: 'os oito vidros de um sedã de 4,4 m, chapas de 4 mm por dentro da borda dos vãos; o anel escuro em volta de cada um é a moldura de borracha da carroceria (14 por 3 mm), e não parte do vidro',
     referencias: ['../../referencias/sedan-chassi-e-lataria.contornos.json'],
     escala: { medida: 'comprimento total do sedã, de z -2200 a 2200', milimetros: 4400 },
     partes: ETAPAS[ETAPA].map(parteDoPlano),
     criteriosDeReprovacao: [
-      'um vidro que não passa por baixo da borda do vão, ou que a atravessa para fora',
+      'um vidro que não passa por dentro da chapa, 12 mm além da borda do vão, ou que a atravessa para fora; o encosto na face de dentro da borda é o esperado',
       'o vidro do lado esquerdo que não é a imagem do direito',
       'o para-brisa ou o vidro traseiro com costura no eixo do carro',
     ],
@@ -55,11 +55,11 @@ const receita = {
   },
   contatos: [],
   /* cada vidro se prende no teto, outra peça da montagem (a moldura e a chapa do vão o tocam por cima), e nesta peça fica solto de propósito */
-  ilhas: ETAPAS[ETAPA].filter((n) => n !== 'paraBrisa').map((contem) => ({ contem, motivo: 'o vidro passa 12 mm por baixo da borda do vão do teto e é colado nele, que é da peça carroceria; nesta peça ele fica solto' })),
+  ilhas: ETAPAS[ETAPA].filter((n) => n !== 'paraBrisa').map((contem) => ({ contem, motivo: 'o vidro passa por dentro da chapa, 12 mm além da borda do vão do teto, e é colado nele, que é da peça carroceria; nesta peça ele fica solto' })),
   /* O centro do para-brisa e o do vidro traseiro, de um lado ao outro (x 0 pela simetria), na altura e no z que a TABELA do alvo dá ao meio de cada um:
      a caixa deles passa até a sobra de 12 mm da borda do vão, e a tolerância é essa sobra com 3 mm de margem. */
   /* as partes soltas de propósito, para `vao:partes --soltas=recusar`: cada vidro se prende no teto, da peça carroceria */
-  APOIA: Object.fromEntries(ETAPAS[ETAPA].map((n) => [n, 'o vidro passa 12 mm por baixo da borda do vão do teto e é colado nele, que é da peça carroceria; nesta peça ele fica solto'])),
+  APOIA: Object.fromEntries(ETAPAS[ETAPA].map((n) => [n, 'o vidro passa por dentro da chapa, 12 mm além da borda do vão do teto, e é colado nele, que é da peça carroceria; nesta peça ele fica solto'])),
   get PONTOS() {
     const S = C.vidro.sobra + 3;
     const meio = (v, z) => [0, (v.y0 + v.y1) / 2, (z(v.y0) + z(v.y1)) / 2];

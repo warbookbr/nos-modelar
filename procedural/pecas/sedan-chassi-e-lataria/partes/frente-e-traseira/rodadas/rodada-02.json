@@ -1,0 +1,147 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/frente-e-traseira",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência nem refina esboço aprovado",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "painelDianteiro",
+        "tipo": "superficie",
+        "onde": "pontas laterais do painel, ao lado dos rebaixos de farol, junto ao topo do para-choque",
+        "sentido": "segmentado",
+        "evidencia": "Curvatura de frente: manchas azuis (afundado) cercadas de vermelho nas duas pontas, junto aos retângulos pequenos. Afundamento leve, na borda do painel."
+      },
+      {
+        "parte": "painelTraseiro",
+        "tipo": "posicao",
+        "onde": "bordas laterais, na altura dos rebaixos de lanterna",
+        "sentido": "externa",
+        "evidencia": "Vistas frontal e traseira: o contorno do painel sai cerca de 6 px (~25 mm) para fora das pontas do para-choque, com ombro; a promessa é só um painel de 1 mm."
+      }
+    ],
+    "observacao": "Sem alvo: todas as partes mostram a forma prometida e há só dois detalhes de acabamento; a distância do painel às peças vizinhas não pôde ser conferida nas vistas abertas."
+  },
+  "partes": [
+    {
+      "nome": "painelDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painelTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lenteDoFarolDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lenteDoFarolEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraChoqueDianteiro",
+      "confere": true,
+      "observacao": "cruzamento de 1 a 2 mm no corte é o contato carroceriaComFrenteETraseira declarado"
+    },
+    {
+      "nome": "paraChoqueTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tomadaDeAr",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade1",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade2",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade3",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade4",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade5",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaDoPainelTraseiro",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "painelTraseiro posicao: do plano. O contorno do painel segue a lateral do carro na cintura, mais larga que o para-choque; a promessa diz só painel de 1 mm, e passa a dizer o ombro na rodada 3.",
+    "painelDianteiro superficie: a conferir pelo modelador na rodada 3, com a medida de ondulação e a luz rasante: mancha azul nas duas pontas do painel, entre o rebaixo do farol e o canto, com a escala em 9,17 1/m."
+  ],
+  "notaDePassagem": "Sem mudança de forma: malha idêntica (15 partes). Pacote refeito; o pedido já traz o contato declarado com o motivo e a caixa de cada parte.",
+  "receita": {
+    "sha256": "sha256:8ec802d0d667a33a027e93e48c6ead13921ee0317043429a831eb87cc7728585",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 0,
+      "linhas": [],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes abaDoPainelTraseiro, painelDianteiro, painelTraseiro, paraChoqueDianteiro, paraChoqueTraseiro, tomadaDeAr",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az90.png",
+      "peca-lado-rasante-az180.png",
+      "peca-topo-rasante-az280.png",
+      "peca-topo-rasante-az10.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-12T20:35:56.508Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

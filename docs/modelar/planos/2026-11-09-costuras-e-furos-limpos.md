@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`
+**Território:** `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`
 
 **Responsável:** a IA da sessão do furgão, com as decisões técnicas delegadas pela pessoa em 2026-11-09 ("é basicamente uma
 frente autônoma sua"); a pessoa é a crítica por imagem: recebe, com um resumo curto do que olhar, as peças do acervo que mudarem, e a forma de
@@ -22,6 +22,8 @@ hoje, e a peça usa 224); `subtrair` sem corte, nenhum aviso; `furo` na tampa do
 esboço inteiro, e saem do plano. No acervo, 0 faces degeneradas em 66 peças, pontas de serra só nas 5 peças do braço com
 costura, e 17.098 triângulos finos, a maior parte de leques em tampas e contornos; o plano corrige os do `furo`, e os outros
 ficam medidos como aviso.
+
+Andamento da fatia 3 (2026-11-12, medido a partir da main de hoje): as peças de prova de dentes no fim do arredondamento (3 pontas em 3 trechos, eram 24 em 18), da face degenerada em dois `lathe` (0 faces, eram 1) e de muitos lados no `unir` (0 órfãos, 0 faces degeneradas; 224 lados fecham) já mediam o esperado antes desta rodada, e o `furo` na tampa do `lathe` sai com 0 arestas soltas e 0 faces degeneradas. A frente rente à tampa passou de 4 arestas soltas a 0: o canto do aro de um tubo e o polo da tampa de outro coincidem, e a face que o `unir` mantém inteira ficava com o id que os pedaços cortados não usavam; ela passa ao canto representante (no acervo só mudam os ids de vértice do antebraço, com as mesmas 6.540 faces). O `subtrair` e o `intersectar` que não mudam o sólido avisam `semEfeito`, e o `guarda:acervo` recusa face degenerada (103 peças passam) e mostra o progresso de cada peça no stderr. Ficou fora: as réguas de serrilhado, costura registrada, triângulo fino e face torcida no `descrever` (o arquivo é do plano das ferramentas de conferência); as duas faces sem área do braço têm origem achada, uma agulha de 430 mm por 0,015 mm que o `arredondarCostura` deixa na faceta do tubo (peça de prova `agulha-na-faceta-do-tubo`: 1 agulha e 40 faces de menos de 1e-9 m²), e a correção que a remove (recusar na partição por colinear a metade abaixo do piso de lasca) mudou 4 partes do braço e a carroceria do sedã (de 174.936 a 173.701 faces), longe do defeito, e não entrou; a união da aba do `paineisPorVaos` com a chapa do sedã não foi reproduzida (o rascunho passou de 6 min).
 
 ## Problema observado
 

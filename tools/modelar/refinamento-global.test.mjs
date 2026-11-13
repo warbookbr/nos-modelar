@@ -6,13 +6,16 @@ import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 import { receitaDoSuporte } from '../fixtures/refina-forma-global/suporte.js';
 
+/* os suportes têm triângulos finos, que a régua de malha avisa; o aviso não é desta conferência */
+const semAvisoDeMalha = (texto) => texto.replace(/\nAVISO: \d+ régua\(s\) de malha com achado[^\n]*\n/, '');
+
 const PASTA = 'tools/fixtures/refina-forma-global';
 const medir = (variante) => descreverPecaReutilizavel({ peca: `${PASTA}/${variante}/receita.js` });
 
 describe('o veredito da peça confere o refinamento do andaime', () => {
   it('a receita que refina dentro do envelope e das portas passa', async () => {
     const r = await medir('ok');
-    expect(r.stderr).toBe('');
+    expect(semAvisoDeMalha(r.stderr)).toBe('');
     expect(r.ok).toBe(true);
     expect(r.resultado.refinamento).toMatchObject({ ok: true, andaime: 'suporte-andaime', achados: [] });
   });

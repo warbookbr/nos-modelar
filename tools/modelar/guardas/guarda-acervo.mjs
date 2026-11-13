@@ -29,6 +29,8 @@ import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 import { ocorrenciasPosicionais, rotularOcorrencias } from '../../../procedural/nucleo/referencia-posicional.js';
 import { nucleo } from '../../../procedural/nucleo/nucleo.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
+import { medirFaceDegenerada } from '../reguas-de-malha/face-degenerada.mjs';
+import { analisarTopologia } from '../../../procedural/nucleo/topologia.js';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const ACERVO = join(REPO, 'procedural/pecas');
@@ -170,6 +172,35 @@ async function receitaSemPasso(peca) {
   return receita && Array.isArray(receita.PASSOS) && receita.PASSOS.length === 0 ? receita : null;
 }
 
+/** O motivo da recusa quando a forma tem face que o `adaptarThree` recusaria como degenerada, ou null. */
+export function motivoDeFaceDegenerada(forma) {
+  const degenerada = medirFaceDegenerada(forma);
+  if (!degenerada.total) return null;
+  return `${degenerada.total} FACE(S) DEGENERADA(S)\n${degenerada.faces.slice(0, 8).map((f) => `  face ${f.id} (${f.parte ?? 'sem parte'}, ${f.cantos} cantos, dobro da área ${f.normal == null ? 'indefinido' : f.normal.toExponential(2)} m²)`).join('\n')}`
+    + '\n  O `adaptarThree` recusa a face cujos cantos não definem plano, e a bancada não abre a peça; o defeito é da operação que a gerou, e não da receita.';
+}
+
+/** O motivo da recusa quando a casca da forma não fecha (aresta que uma face só usa, ou que mais de duas usam), pelo mesmo critério do `npm run malha:conferir` e da aprovação da
+    família (`analisarTopologia`: `casca-aberta` e `aresta-nao-manifold`), ou null. Dispensa só a aresta que já era borda livre na saída do próprio passo que declarou
+    superfície aberta (`lathe` com `superficie: true`, `subdivisao` sem `espessura`), medida no estado logo depois daquele passo (`executar` roda o prefixo dos passos): a fresta
+    que um passo posterior abre, ou a de uma gaiola fechada que perde uma face, não é dispensada, e a `subdivisao` de gaiola fechada não tem borda nenhuma. A receita não leva campo novo. */
+export function motivoDeCascaAberta(forma, passos = [], executar = (prefixo) => nucleo(prefixo, {}, {}, {}, null, [])) {
+  const CODIGOS = ['casca-aberta', 'aresta-nao-manifold'];
+  const achadosDe = (f) => analisarTopologia({ vertices: f.V, faces: f.F }).achados.filter((a) => CODIGOS.includes(a.codigo));
+  const finais = achadosDe(forma);
+  if (!finais.length) return null;
+  const livres = new Set();
+  passos.forEach((p, i) => {
+    const [op, a] = p ?? [];
+    if (!((op === 'lathe' && a?.superficie === true) || (op === 'subdivisao' && a?.espessura == null))) return;
+    for (const x of achadosDe(executar(passos.slice(0, i + 1)))) if (x.onde?.aresta != null) livres.add(x.onde.aresta);
+  });
+  const achados = finais.filter((a) => !livres.has(a.onde?.aresta));
+  if (!achados.length) return null;
+  return `${achados.length} ARESTA(S) DE CASCA ABERTA OU NÃO-MANIFOLD\n${achados.slice(0, 8).map((a) => `  ${a.mensagem}`).join('\n')}`
+    + '\n  A casca da peça não fecha: o passo que a gerou deixou fresta. Corrija a operação; só a borda livre que o próprio passo que declara superfície aberta (`lathe` com `superficie: true`, `subdivisao` sem `espessura`) deixou fica dispensada.';
+}
+
 /* Confere UMA peça e devolve o que ela reprovou e se ela espera a etapa. Cada peça é independente das outras (lê o próprio
    arquivo e não escreve nada), e é essa independência que deixa a varredura repartir as peças entre processadores. */
 export async function conferirPeca(peca) {
@@ -200,7 +231,8 @@ export async function conferirPeca(peca) {
     });
     return { reprovadas, esperando };
   }
-  const medida = await descreverPecaReutilizavel({ peca });
+  /* o progresso vai ao stderr, uma linha por etapa longa: a guarda roda minutos e não mostrava nada; o stdout e o veredito não mudam */
+  const medida = await descreverPecaReutilizavel({ peca, aoProgredir: (linha) => process.stderr.write(`${peca}: ${linha}\n`) });
   if (!medida.ok) { reprovadas.push({ peca, motivo: medida.stderr.trim() }); return { reprovadas, esperando }; }
   /* A medida já validou e canonicalizou o plano, e devolve `null` quando a
      receita não exporta nenhum. Revalidar aqui rejeitaria o próprio resultado
@@ -245,10 +277,17 @@ export async function conferirPeca(peca) {
   }
   /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
      porta e nunca olha a malha. */
-  const portas = conferirPortasNaForma(nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, []));
+  const forma = nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, []);
+  const portas = conferirPortasNaForma(forma);
   if (portas.length) {
     reprovadas.push({ peca, motivo: `PORTA FORA DA FORMA\n${portas.map((a) => `  ${a.mensagem}`).join('\n')}` });
   }
+  /* FACE DEGENERADA. A face que o adaptador do visor recusa (os cantos não definem plano) passava pelo `descrever` e só aparecia na bancada ou na
+     exportação; a régua de malha usa o mesmo critério dele e a lista aqui, com a parte e os cantos de cada uma. */
+  const degenerada = motivoDeFaceDegenerada(forma);
+  if (degenerada) reprovadas.push({ peca, motivo: degenerada });
+  const aberta = motivoDeCascaAberta(forma, receita.PASSOS, (prefixo) => nucleo(prefixo, receita.PARAMS ?? {}, {}, {}, null, []));
+  if (aberta) reprovadas.push({ peca, motivo: aberta });
   return { reprovadas, esperando };
 }
 

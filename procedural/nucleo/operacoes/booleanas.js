@@ -649,6 +649,52 @@ export function criarOperacoesBooleanas(servicos) {
       outros.delete(); comum.delete();
       if (Math.abs(vk - vc) > 1e-6 * Math.max(vk, 1e-30)) sumico = `o sólido ${k} não está contido nos outros e mesmo assim não deixou face nenhuma na união`;
     }
+    /* O subtrair (ou o intersectar) que não muda o sólido, pela topologia: nenhuma face da peça (sólido 0) foi cortada nem consumida e nenhum pedaço novo entrou (no
+       subtrair, por ferramenta: a que não deixou face nenhuma no resultado não tocou a peça). Não depende do volume, que se perderia num corte pequeno e real. Aqui
+       só se mede, com as Manifolds ainda vivas, se a ferramenta que não deixou face tem volume em comum com a peça (o corte que some na grade); o veredito vem depois
+       de classificadas as faces. */
+    const sobreposicao = new Map();   // ferramenta que não deixou face -> { caixa: as caixas se sobrepõem, fino: há volume em comum medido sem a grade }
+    if (!extra && op === 'subtrair') {
+      /* a caixa em double, dos cantos originais: a da Manifold já passou pela grade e um corte mais fino que ela viria de espessura zero */
+      const caixaDe = (k) => {
+        const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+        for (const fid of operandos[k]) for (const v of st.F.get(fid).vs) { const p = st.V.get(v); for (let c = 0; c < 3; c++) { lo[c] = Math.min(lo[c], p[c]); hi[c] = Math.max(hi[c], p[c]); } }
+        return { lo, hi };
+      };
+      /* o volume em comum de duas seleções, em Manifolds refeitas sem a grade e centradas na caixa comum (só no caso raro do aviso): o corte que a grade come de fato
+         tem volume aqui, e a ferramenta que passa por um vão da peça não tem */
+      const volumeSemGrade = (k, centro) => {
+        const feitas = [];
+        try {
+          const duas = [0, k].map((q) => {
+            const indice = new Map(), props = [], tris = [];
+            for (const fid of operandos[q]) {
+              const c = cicloRep(st.F.get(fid).vs);
+              if (new Set(c).size < 3) continue;
+              for (let t = 1; t < c.length - 1; t++) for (const v of [c[0], c[t], c[t + 1]]) {
+                if (!indice.has(v)) { indice.set(v, indice.size); props.push(...sub(st.V.get(v), centro)); }
+                tris.push(indice.get(v));
+              }
+            }
+            const m = new wasm.Manifold(new wasm.Mesh({ numProp: 3, vertProperties: Float32Array.from(props), triVerts: Uint32Array.from(tris) }));
+            feitas.push(m);
+            return m;
+          });
+          const comum = M.intersection(duas);
+          feitas.push(comum);
+          return comum.isEmpty() ? 0 : comum.volume();
+        } catch { return 0; } finally { for (const m of feitas) m.delete(); }
+      };
+      const caixa0 = caixaDe(0);
+      for (let k = 1; k < operandos.length; k++) {
+        const caixa = caixaDe(k);
+        const sobrepoe = [0, 1, 2].every((c) => Math.min(caixa0.hi[c], caixa.hi[c]) - Math.max(caixa0.lo[c], caixa.lo[c]) > 1e-12 * Math.max(meiaCaixa, 1e-9));
+        if (!sobrepoe) { sobreposicao.set(k, { caixa: false, fino: false }); continue; }
+        if (temFace[k]) continue;
+        const centro = [0, 1, 2].map((c) => (Math.max(caixa0.lo[c], caixa.lo[c]) + Math.min(caixa0.hi[c], caixa.hi[c])) / 2);
+        sobreposicao.set(k, { caixa: true, fino: volumeSemGrade(k, centro) > 0 });
+      }
+    }
     liberar();
     if (sumico) return grita(st, i, op, 'solidos', `${sumico}; erro numérico da Manifold, nada foi alterado`);
 
@@ -927,6 +973,54 @@ export function criarOperacoesBooleanas(servicos) {
       if (lasca.length) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${lasca.length} face(s) com triângulo sem área (lasca que cintila na tela), a primeira vinda da face ${lasca[0][0]}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
     }
 
+    const semEfeitos = [];
+    if (!extra && (op === 'subtrair' || op === 'intersectar')) {
+      const mantidasSet = new Set(mantidas);
+      const pecaIntacta = operandos[0].every((fid) => mantidasSet.has(fid) || (degeneradas.includes(fid) && !consumidas.includes(fid)));
+      /* no intersectar a peça inteira dentro dos outros não deixa face deles no resultado: a face de outro sólido que sobra (a cavidade de uma casca oca) é mudança */
+      if (op === 'intersectar') { if (pecaIntacta && !temFace.slice(1).some(Boolean)) semEfeitos.push({ ferramenta: null, tipo: 'dentro' }); }
+      else {
+        for (const [k, sob] of sobreposicao) {
+          const tipo = !sob.caixa ? 'longe' : !sob.fino ? 'vao' : pecaIntacta ? 'grade' : 'dentroDeOutra';
+          semEfeitos.push({ ferramenta: operandos.length > 2 ? k : null, tipo });
+        }
+      }
+    }
+    /* ---- CANTOS COINCIDENTES DE OPERANDOS DIFERENTES ----
+       Dois cantos que coincidem (o canto do aro de um tubo e o polo da tampa de outro, quando a frente de um fica rente à tampa do outro) entram na Manifold como
+       um só, o representante, e os pedaços cortados saem com ele. A face que o passo mantém inteira continua com o id que escreveu a entrada, e se um vizinho
+       cortado usa o representante a aresta entre os dois fica aberta (a peça de prova frente-rente-a-tampa media 4). A troca vale só onde o id antigo deixaria
+       aresta aberta, e então para todas as faces mantidas que o usam, com os cantos repetidos que ela causa fundidos e as quebras de sombra levadas pelo mesmo mapa:
+       onde nada fica aberto a face mantém os ids de sempre. O portão abaixo confere os ids que o passo escreve. */
+    const trocaDeCanto = new Map(), vsDaMantida = new Map();
+    {
+      const abertos = (listas) => {
+        const dirigidas = new Map();
+        for (const P of listas) for (let k = 0; k < P.length; k++) {
+          const x = P[k], y = P[(k + 1) % P.length];
+          if (x !== y) dirigidas.set(`${x}>${y}`, (dirigidas.get(`${x}>${y}`) ?? 0) + 1);
+        }
+        const vs = new Set();
+        for (const [chave, n] of dirigidas) {
+          const [x, y] = chave.split('>');
+          if (n !== 1 || dirigidas.get(`${y}>${x}`) !== 1) { vs.add(Number(x)); vs.add(Number(y)); }
+        }
+        return vs;
+      };
+      const escritas = () => [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])].filter((P) => new Set(P).size >= 3);
+      const abertas = abertos(escritas());
+      if (abertas.size) {
+        for (const [v, r] of repDe) if (v !== r && (abertas.has(v) || abertas.has(r))) trocaDeCanto.set(v, r);
+        for (const fid of mantidas) {
+          const vs = st.F.get(fid).vs;
+          if (!vs.some((v) => trocaDeCanto.has(v))) continue;
+          const c = [];
+          for (const v of vs) { const r = trocaDeCanto.get(v) ?? v; if (c[c.length - 1] !== r) c.push(r); }
+          while (c.length > 1 && c[0] === c[c.length - 1]) c.pop();
+          if (c.length >= 3) vsDaMantida.set(fid, c);
+        }
+      }
+    }
     /* ---- PORTÃO DE CASCA FECHADA ----
        O resultado (faces mantidas, cortadas e pedaços) tem de ser uma casca
        fechada e manifold: toda aresta dirigida com exatamente uma oposta, e o
@@ -935,8 +1029,13 @@ export function criarOperacoesBooleanas(servicos) {
        (achado da revisão, 2026-09-29). Aqui a falha GRITA e o passo aborta
        com 0 V/0 F. */
     {
-      const casca = [...mantidas.map((fid) => cicloRep(st.F.get(fid).vs)), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])].filter((P) => new Set(P).size >= 3);
-      const falha = cascaAberta(casca);
+      /* duas conferências: a dos cantos soldados (os representantes, como sempre), que acha o contato não-manifold geométrico (dois cubos que só se tocam num canto ou numa
+         aresta têm ids distintos no ponto de contato, e só o ciclo de representantes o vê), e a dos ids que o passo escreve, que acha a fresta que a solda escondia */
+      const depois = [...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])];
+      const porRepresentante = [...mantidas.map((fid) => cicloRep(st.F.get(fid).vs)), ...depois].filter((P) => new Set(P).size >= 3);
+      const porIdEscrito = [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...depois].filter((P) => new Set(P).size >= 3);
+      const casca = porRepresentante;
+      const falha = cascaAberta(porRepresentante) ?? cascaAberta(porIdEscrito);
       if (falha && extra?.tentativa) return { falhouCasca: falha };
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
@@ -957,6 +1056,13 @@ export function criarOperacoesBooleanas(servicos) {
     // ---- daqui em diante nada pode falhar: aplica ----
     for (const v of provisorios) addV(st, definitivo.get(v), posNova.get(v));
     const faces = [...mantidas];
+    /* a troca de cantos coincidentes, calculada antes do portão de casca fechada, vale só onde o id antigo deixaria aresta aberta */
+    for (const [fid, vs] of vsDaMantida) {
+      const f = st.F.get(fid);
+      if (f.quebras) f.quebras = f.quebras.map(([x, y]) => [trocaDeCanto.get(x) ?? x, trocaDeCanto.get(y) ?? y]).filter(([x, y]) => x !== y);
+      if (f.quebras && !f.quebras.length) delete f.quebras;
+      f.vs = vs;
+    }
     /* a quebra de sombra (`face.quebras`, o vinco vivo da subdivisão) é uma aresta da face de entrada. O corte apaga ou
        reparte essa aresta, e o par de ids antigo ficava apontando vértice que não existe mais. Cada pedaço fica com os
        trechos da aresta original que continuam na borda dele, com os vértices dele; as posições das pontas são lidas
@@ -1032,6 +1138,17 @@ export function criarOperacoesBooleanas(servicos) {
       return vs.some((v, k) => { const w = vs[(k + 1) % vs.length]; return costuraFinal.has(v < w ? `${v}-${w}` : `${w}-${v}`); });
     });
     if (extra?.aoAplicar) extra.aoAplicar({ pedacosDeEntrada, consumidas: [...consumidas] });
+    const MOTIVOS_DO_SEM_EFEITO = {
+      longe: (q) => `${q} não toca a peça ou só encosta nela: nenhuma face da peça foi cortada nem consumida e nenhum pedaço novo entrou; confira a posição e o tamanho da ferramenta`,
+      vao: (q) => `${q} fica dentro da caixa da peça mas não a cruza (passa por um vão dela): nenhuma face da peça foi cortada; confira a posição da ferramenta`,
+      grade: (q) => `${q} cruza a peça, mas o corte some na precisão da grade da Manifold (2^-20 do tamanho da caixa dos operandos) e nenhuma face da peça mudou; aumente a ferramenta ou confira a escala`,
+      dentroDeOutra: (q) => `${q} não deixou face no resultado: está inteira dentro do corte de outra ferramenta e não muda mais nada`,
+      dentro: () => 'a interseção não mudou nenhuma face da peça (sólido 0) e nenhuma face dos outros sólidos ficou no resultado: a peça está inteira dentro dos outros; confira a posição e o tamanho dos sólidos',
+    };
+    for (const e of semEfeitos) {
+      const quem = e.ferramenta == null ? 'a ferramenta' : `a ferramenta ${e.ferramenta}`;
+      st.avisos.push({ passo: i, op, ref: 'semEfeito', origemId, ...(e.ferramenta == null ? {} : { ferramenta: e.ferramenta }), motivo: MOTIVOS_DO_SEM_EFEITO[e.tipo](quem) });
+    }
     registraOrigem(st, i, op, origemId, {
       faces: (extra ? facesAux : faces).sort((x, y) => x - y),
       costura: facesDaCostura.sort((x, y) => x - y),

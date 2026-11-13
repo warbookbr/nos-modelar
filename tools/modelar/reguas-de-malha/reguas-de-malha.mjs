@@ -1,6 +1,7 @@
 /* reguas-de-malha.mjs — as réguas de malha juntas (plano "costuras e furos limpos", fatia 1; a de face torcida é exportada à parte, fora do conjunto medido): a face degenerada, o triângulo fino em região plana e o
-   serrilhado da costura. Cada uma lê só o estado neutro (`V`, `F`, e `procedencia` para achar as faces do arredondamento). Ainda não rodam no `descrever` nem no
-   `guarda:acervo`: isso é da fatia 3. */
+   serrilhado da costura. Cada uma lê só o estado neutro (`V`, `F`, e `procedencia` para achar as faces do arredondamento). O `descrever` as roda como aviso
+   que não reprova (`avisosDasReguasDeMalha`, em `tools/modelar/descrever-peca.mjs`; o triângulo fino só em peça de até 50 mil faces), e o `guarda:acervo`
+   recusa a face degenerada e a casca aberta. */
 import { medirFaceDegenerada } from './face-degenerada.mjs';
 import { medirTrianguloFino } from './triangulo-fino.mjs';
 import { medirSerrilhadoDaCostura } from './serrilhado-da-costura.mjs';

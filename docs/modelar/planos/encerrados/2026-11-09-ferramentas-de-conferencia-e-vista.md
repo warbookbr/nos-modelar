@@ -1,6 +1,6 @@
 # Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `src/autoria/dobras-aceitas.js`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/ativar-bancada.mjs`, `tools/modelar/ativar-bancada.test.mjs`, `tools/modelar/olhar-bancada.mjs`, `tools/modelar/olhar-bancada.test.mjs`, `tools/modelar/analise-da-peca.mjs`, `tools/modelar/assinatura-da-malha.mjs`, `tools/modelar/etapas-da-montagem.mjs`, `src/autoria/plano-de-modelagem.js`, `src/autoria/plano-de-modelagem.test.js`, `modulos/esboco-nucleo/`, `tools/modelar/esboco-nucleo.mjs`, `tools/modelar/linhas-do-modelo.mjs`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/casamento-da-vista.mjs`, `tools/modelar/conferir-vistas.mjs`, `tools/modelar/descrever-sem-calar.test.mjs`, `tools/fixtures/descrever-sem-calar/`, `tools/modelar/regularidade-da-crista.mjs`, `tools/modelar/regularidade-da-crista.test.mjs`, `tools/modelar/modelo-aberto.mjs`, `tools/modelar/modelo-aberto.test.mjs`, `tools/fixtures/vinco-da-coluna/`
 
@@ -11,8 +11,8 @@ continua sendo dela.
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-09.
 
 Em 2026-11-09 a pessoa passou a este plano `etapas-da-montagem.mjs`, que era do plano do
-[braço](encerrados/2026-09-26-as-partes-do-braco.md), para o registro de etapas parar de se regravar; ele ficava de volta ao braço quando este
-fechasse; o braço fechou e o arquivo fica neste plano de vez (2026-11-12). A câmera por ponto e o nome curto da captura saem do rascunho da [ferramenta de material](2026-11-08-ferramenta-de-material.md).
+[braço](2026-09-26-as-partes-do-braco.md), para o registro de etapas parar de se regravar; ele ficava de volta ao braço quando este
+fechasse; o braço fechou e o arquivo fica neste plano de vez (2026-11-12). A câmera por ponto e o nome curto da captura saem do rascunho da [ferramenta de material](../2026-11-08-ferramenta-de-material.md).
 
 ## Problema observado
 
@@ -214,4 +214,23 @@ Régua no acervo e documentos de uso (2026-11-12): a `crista:regularidade` rodou
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-12, por decisão da IA da sessão do núcleo, a quem a pessoa delegou as decisões técnicas deste plano. As seis
+fatias de trabalho estão na main desde o commit `7bfe8e48`, juntado pelo CI com as catorze tarefas verdes.
+
+O gate de saída ficou cumprido. A ruga do canto da coluna do furgão, no estado de antes da correção dela, é acusada pela dobra
+aceita pela cadeia e pela régua da crista, com os números na fixture `tools/fixtures/vinco-da-coluna/`. Cada ferramenta tem teste
+e refaz o caso que a motivou: a análise completa do furgão foi de 31 a 33 min para 19, a ativação pelo cache de 94 a 134 s para
+10,6 s, e a régua da crista rodou no acervo inteiro, com 36 pontos acusados. Ler o estado das etapas não regrava o
+`montagem.etapas.json`. O acervo inteiro passa na `guarda:acervo` com a régua nova.
+
+O primeiro envio à main reprovou no CI por custo: o cronômetro por passo do `descrever` embrulhava a operação e tirava o passo do
+caminho rápido do núcleo, e o `descrever` do furgão foi de 180 s a 480 s. O cronômetro passou a medir de uma consulta do registro
+à seguinte, com teste que prende a operação devolvida à original, e o tempo voltou a 170 s.
+
+Ficam para outros planos, por estarem no território deles. As declarações de dobra e vinco do furgão, com regiões justas demais
+para a cadeia inteira, saem hoje como 29 avisos de dobra não declarada, e a revisão é do plano do furgão. O progresso durante a
+`guarda:acervo` pede uma linha em `guarda-acervo.mjs`, do plano das costuras. A escala da curvatura sem piso, que num vidro quase
+plano satura em 0,123 1/m, e a curvatura pedida que não é vinco nomeado e sai como defeito, as duas achadas na rodada 1 do sedã,
+são de `vistas-de-superficie.mjs`, do plano do furgão.
+
+Os arquivos do território ficam sem plano. Defeito pontual neles segue o roteiro `mudar/defeito`, e capacidade nova pede plano.

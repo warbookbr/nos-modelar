@@ -29,6 +29,7 @@ import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
 import { FACES_MINIMAS_PARA_RECORTAR } from '../../procedural/nucleo/operacoes/abertura-por-contorno.js';
+import { medirFaceDegenerada, medirTrianguloFino, medirSerrilhadoDaCostura } from './reguas-de-malha/reguas-de-malha.mjs';
 import { dobraDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
 import { textoDoAchado, vincoOcultoDaReceita } from './vinco-oculto.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
@@ -207,6 +208,55 @@ export function ilhasDaPeca(contatos, receita = {}) {
       + ' encoste as partes, ou declare a ilha em `ilhas` da receita com { contem: <uma parte dela>, motivo }.');
   }
   return { grupos, problemas };
+}
+
+/* AS RÉGUAS DE MALHA, COMO AVISO. A face degenerada (que o `adaptarThree` recusa), o triângulo fino e longo numa região plana e o serrilhado da linha de uma
+   costura de `arredondarCostura` lêem só o estado neutro (`tools/modelar/reguas-de-malha/`). Achar algo não reprova: a pessoa decide o limiar, e a `guarda:acervo` é
+   que recusa a face degenerada. Devolve os números das três (`reguasDeMalha` do resultado) e as linhas do aviso, vazias quando nenhuma acha nada. A face degenerada
+   sai com a parte e a posição em mm (o centro dos cantos); as outras duas só dizem quantas, porque as réguas não guardam onde. */
+const REGUAS_LISTADAS = 8;
+/* O triângulo fino triangula a peça inteira pelo adaptador e agrupa as regiões planas: no furgão (254 mil faces) levou 12,7 s, dos quais 8,2 do adaptador e 3,3 das
+   regiões, uns 50 µs por face, e o `guarda:tempo` não tem essa folga. Acima deste número de faces a régua não roda, e `trianguloFinoPulado` diz quantas faces a peça tem. */
+export const FACES_MAXIMAS_DO_TRIANGULO_FINO = 50000;
+
+export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, facesMaximasDoFino = FACES_MAXIMAS_DO_TRIANGULO_FINO } = {}) {
+  const degenerada = medirFaceDegenerada(neutro);
+  let pulado = neutro.F.size > facesMaximasDoFino ? `a peça tem ${neutro.F.size} faces, acima de ${facesMaximasDoFino}` : null;
+  let fino = { finos: 0, regioes: 0, pior: 0 };
+  if (!pulado) {
+    /* o adaptador recusa a face que não fecha em orelhas, e a régua que o chama não pode derrubar a descrição */
+    try { fino = medirTrianguloFino(neutro); } catch (erro) { pulado = `a régua não rodou: ${String(erro.message).split('\n')[0]}`; }
+  }
+  const serrilhado = medirSerrilhadoDaCostura(neutro);
+  const mm = (n) => String(Math.round(n * 10000) / 10).replace('.', ',');
+  const onde = (f) => {
+    const cantos = (neutro.F.get(f.id)?.vs ?? []).map((v) => neutro.V.get(v)).filter(Boolean);
+    const centro = cantos.length ? [0, 1, 2].map((k) => mm(cantos.reduce((a, c) => a + c[k], 0) / cantos.length)).join(', ') : null;
+    return `face ${f.id}${f.parte ? ` (parte ${f.parte})` : ''}${centro ? ` em [${centro}] mm` : ''}`;
+  };
+  const medidas = {
+    facesDegeneradas: degenerada.total,
+    triangulosFinos: pulado ? null : fino.finos,
+    regioesComFinos: pulado ? null : fino.regioes,
+    piorRazao: pulado ? null : fino.pior,
+    trianguloFinoPulado: pulado,
+    facesDeCostura: serrilhado.faces,
+    pontasDeSerra: serrilhado.pontas,
+    trechosDeSerrilhado: serrilhado.trechos,
+    facesDegeneradasListadas: degenerada.faces.map((f) => ({ id: f.id, parte: f.parte, cantos: f.cantos })),
+  };
+  const linhas = [];
+  if (degenerada.total) {
+    const lista = degenerada.faces.slice(0, limite).map(onde).join('; ');
+    linhas.push(`${degenerada.total} face(s) degenerada(s), sem plano definido (o adaptador da bancada as recusa): ${lista}${degenerada.total > limite ? `; e mais ${degenerada.total - limite}` : ''}`);
+  }
+  if (fino.finos) {
+    linhas.push(`${fino.finos} triângulo(s) fino(s) e longo(s) em ${fino.regioes} região(ões) plana(s), o pior com razão ${String(Math.round(fino.pior * 10) / 10).replace('.', ',')}`);
+  }
+  if (serrilhado.pontas) {
+    linhas.push(`${serrilhado.pontas} ponta(s) de serra em ${serrilhado.trechos} trecho(s) da linha da costura do arredondamento (${serrilhado.faces} faces de costura)`);
+  }
+  return { medidas, linhas };
 }
 
 /* A DOBRA E O VINCO QUE NINGUÉM DECLAROU, COMO AVISO. As réguas `dobra-da-superficie` (diedro abaixo de 120 graus fora de vinco declarado) e `vinco-oculto`
@@ -461,6 +511,14 @@ export async function descreverPecaReutilizavel({
     stdout += `\n${chapaInteira.length} ABERTURA(S) NA BOOLEANA DA CHAPA INTEIRA (aviso; não reprova)\n${chapaInteira.map((t) => `  ${t}`).join('\n')}\n`
       + '  O recorte da vizinhança do vão não valeu, e a booleana refez a chapa toda: o tempo da receita cresce com o tamanho dela.\n';
     stderr += `\nAVISO: ${chapaInteira.length} abertura(s) na booleana da chapa inteira; o motivo e o tempo de cada uma estão na seção ABERTURA(S) NA BOOLEANA DA CHAPA INTEIRA acima\n`;
+  }
+  /* as réguas de malha rodam sobre a peça já executada, depois da medida das partes: o que acham é aviso e não reprova */
+  progresso('rodando as réguas de malha');
+  const malha = avisosDasReguasDeMalha(neutro);
+  if (malha.linhas.length) {
+    stdout += `\n${malha.linhas.length} RÉGUA(S) DE MALHA COM ACHADO (aviso; não reprova)\n${malha.linhas.map((t) => `  ${t}`).join('\n')}\n`
+      + '  Defeito de malha da operação que fez a costura ou o furo, e não da receita: a correção vai para a operação.\n';
+    stderr += `\nAVISO: ${malha.linhas.length} régua(s) de malha com achado; o número e onde olhar estão na seção RÉGUA(S) DE MALHA COM ACHADO acima\n`;
   }
   if (descricao.totais.orfaos) {
     stderr += `\n${descricao.totais.orfaos} ÓRFÃO(S): a peça tem referência inválida e as medidas acima`
@@ -801,6 +859,7 @@ export async function descreverPecaReutilizavel({
       descricao: { ...descricao, intencao: entrada.INTENCAO ?? null },
       intencao: entrada.INTENCAO ?? null,
       avisos,
+      reguasDeMalha: malha.medidas,
       contatos,
       molduras,
       formas,
