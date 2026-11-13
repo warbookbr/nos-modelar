@@ -249,9 +249,7 @@ describe('corpoPorFatias: nada some em silêncio', () => {
     const comMarco = marcado(pico, [null, null, 'pico']);
     const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 8, fatias: [{ em: 0, contorno: comMarco }, { em: 30, contorno: comMarco }] });
     expect(g.pontosMm[g.pontoDe(0, 'pico')]).toEqual([0, 10.3, 7.7]);
-    const perdidos = g.avisos.filter((a) => a.ref === 'pontoPerdido');
-    expect(perdidos.length).toBe(2);
-    for (const a of perdidos) expect(a.indice).not.toBe(2);
+    expect(g.avisos.filter((a) => a.ref === 'pontoPerdido')).toEqual([]);
   });
 
   it('dois vértices a um milímetro um do outro disputam um ponto só: o primeiro fica, e o segundo não o rouba', () => {
@@ -268,6 +266,46 @@ describe('corpoPorFatias: nada some em silêncio', () => {
     const cantos = [[0, 0], [10, 0], [10, 10], [0, 10]];
     const pts = Array.from({ length: 16 }, (_, i) => g.pontosMm[g.pontoDe(0, i)]);
     for (const [u, v] of cantos) expect(pts.some((p) => Math.abs(p[1] - u) < 1e-9 && Math.abs(p[2] - v) < 1e-9)).toBe(true);
+  });
+});
+
+describe('corpoPorFatias: os cantos', () => {
+  const noLaco = (g, r = 0) => Array.from({ length: g.corpo.pontosPorVolta }, (_, i) => g.pontosMm[g.pontoDe(r, i)]);
+  const tem = (pts, u, v) => pts.some((p) => Math.abs(p[1] - u) < 1e-9 && Math.abs(p[2] - v) < 1e-9);
+
+  it('todo vértice em que o contorno gira mais que o ângulo de canto é ponto da volta, sem aviso: o retângulo fino e a engrenagem de 12 cantos', () => {
+    const r = [[0, 0], [100, 0], [100, 5], [0, 5]];
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: r }, { em: 30, contorno: r }] });
+    for (const [u, v] of r) expect(tem(noLaco(g), u, v), `${u},${v}`).toBe(true);
+    expect(g.avisos.filter((a) => ['pontoPerdido', 'cantoPerdido'].includes(a.ref))).toEqual([]);
+    const estrela = Array.from({ length: 12 }, (_, i) => { const raio = i % 2 ? 6 : 10; const a = (Math.PI * 2 * i) / 12; return [raio * Math.cos(a), raio * Math.sin(a)]; });
+    const e = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: estrela }, { em: 30, contorno: estrela }] });
+    for (const [u, v] of estrela) expect(tem(noLaco(e), u, v), `${u},${v}`).toBe(true);
+    expect(e.avisos.filter((a) => a.ref === 'cantoPerdido')).toEqual([]);
+  });
+
+  it('com cantos demais para as amostras o aviso cantoPerdido diz quantos faltam e quantos pontos bastam, e com esse número o aviso some', () => {
+    const estrela = Array.from({ length: 10 }, (_, i) => { const raio = i % 2 ? 4 : 10; const a = (Math.PI * 2 * i) / 10; return [raio * Math.cos(a), raio * Math.sin(a)]; });
+    const pobre = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 8, fatias: [{ em: 0, contorno: estrela }, { em: 30, contorno: estrela }] });
+    const aviso = pobre.avisos.find((a) => a.ref === 'cantoPerdido' && a.fatia === 'f0');
+    expect(aviso).toMatchObject({ quantos: 2, pontosQueBastam: 10 });
+    expect(aviso.texto).toMatch(/2 cantos \(giro acima de 20 graus\) ficam sem ponto na volta de 8 pontos; com pontos de 10 para cima todos cabem/);
+    const rica = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 10, fatias: [{ em: 0, contorno: estrela }, { em: 30, contorno: estrela }] });
+    expect(rica.avisos.filter((a) => a.ref === 'cantoPerdido')).toEqual([]);
+    for (const [u, v] of estrela) expect(tem(noLaco(rica), u, v)).toBe(true);
+  });
+
+  it('anguloDeCanto declara o giro: com 100 graus o canto de 90 deixa de ser ponto e o retângulo perde cantos com aviso', () => {
+    const r = [[0, 0], [100, 0], [100, 5], [0, 5]];
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, anguloDeCanto: 100, fatias: [{ em: 0, contorno: r }, { em: 30, contorno: r }] });
+    expect(g.avisos.filter((a) => a.ref === 'pontoPerdido').length).toBe(2);
+    for (const v of [0, 180, 'a', -5]) expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', anguloDeCanto: v, fatias: [{ em: 0, contorno: r }, { em: 30, contorno: r }] })).toThrow(/anguloDeCanto é o giro em graus, de 0 a 180/);
+  });
+
+  it('a volta entre marcos reserva ao menos um ponto por canto dela, mesmo com pouca fração do perímetro', () => {
+    const c = [[0, 0], [100, 0], [100, 10], [60, 10], [60, 12], [58, 12], [58, 10], [0, 10]];
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: c }, { em: 30, contorno: c }] });
+    for (const [u, v] of c) expect(tem(noLaco(g), u, v), `${u},${v}`).toBe(true);
   });
 });
 
@@ -357,8 +395,10 @@ describe('corpoPorFatias: as recusas', () => {
   });
 
   it('recusa a volta reamostrada que se cruza e o plano interpolado que se cruza (fatias torcidas), com onde', () => {
-    const fino = [[0, 0], [100, 0], [100, 1], [51, 1], [50, 30], [49, 1], [0, 1]];
-    recusa({ nome: 'c', eixo: 'x', pontos: 8, fatias: [{ em: 0, contorno: fino }, { em: 20, contorno: fino }] }, /a fatia 'f0' \(em 0 mm\) reamostrada em 8 pontos se cruza|cobre o contorno/);
+    const arco = (r, a0, a1) => Array.from({ length: 100 }, (_, i) => [r * Math.cos(a0 + ((a1 - a0) * i) / 99), r * Math.sin(a0 + ((a1 - a0) * i) / 99)]);
+    const aro = [...arco(30, 0.03, 2 * Math.PI - 0.03), ...arco(27, 2 * Math.PI - 0.03, 0.03)];
+    recusa({ nome: 'c', eixo: 'x', pontos: 12, fatias: [{ em: 0, contorno: aro }, { em: 20, contorno: aro }] }, /a fatia 'f0' \(em 0 mm\) reamostrada em 12 pontos se cruza \(o lado 1 e o 9 se tocam\).*suba pontos, ou nomeie o canto como marco/);
+    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: aro }, { em: 20, contorno: aro }] })).not.toThrow();
     const Q = quadrado(10);
     const girado = Q.map(([u, v]) => [10 - u, 10 - v]);
     recusa({ nome: 'c', eixo: 'x', pontos: 8, passo: 5, fatias: [{ em: 0, contorno: Q }, { em: 40, contorno: girado }] }, /o plano em 20 mm, entre as fatias 'f0' e 'f1' se cruza \(o lado .* se tocam\).*comece todas as fatias no mesmo detalhe/);
@@ -371,9 +411,10 @@ describe('corpoPorFatias: as recusas', () => {
 
   it('recusa a tampa em escada que não cobre o contorno côncavo da ponta, na primeira e na última, e aceita o mesmo contorno no meio', () => {
     const U = [[0, 0], [30, 0], [30, 20], [20, 20], [20, 5], [10, 5], [10, 20], [0, 20]];
-    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: U }, { em: 20, contorno: quadrado(30) }] }, /tampa da primeira fatia \('f0', em 0 mm\) não cobre o contorno.*sai do contorno/);
-    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: quadrado(30) }, { em: 20, contorno: U }] }, /tampa da última fatia \('f1', em 20 mm\) não cobre o contorno.*comece o contorno em outro ponto/);
-    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: quadrado(30) }, { em: 20, contorno: U }, { em: 40, contorno: quadrado(30) }] })).not.toThrow();
+    const Q = [[0, 0], [30, 0], [30, 20], [0, 20]];
+    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: U }, { em: 20, contorno: Q }] }, /tampa da primeira fatia \('f0', em 0 mm\) não cobre o contorno.*sai do contorno/);
+    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: Q }, { em: 20, contorno: U }] }, /tampa da última fatia \('f1', em 20 mm\) não cobre o contorno.*comece o contorno em outro ponto/);
+    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: Q }, { em: 20, contorno: U }, { em: 40, contorno: Q }] })).not.toThrow();
   });
 
   it('recusa o nome de fatia que colide com o de um plano gerado, e pontoDe com laço ou índice que não existe', () => {

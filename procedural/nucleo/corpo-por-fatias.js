@@ -76,6 +76,8 @@ export const TOLERANCIA_DA_REAMOSTRAGEM_MM = 0.1;
 export const SEGMENTO_MEDIO_MINIMO_MM = 0.05;
 /* um degrau da tampa de área negativa abaixo disto, em fração da área do contorno, é recusado: o ruído de ponto flutuante fica de fora */
 const TOLERANCIA_DO_DEGRAU = 1e-9;
+/* o giro, em graus, de um vértice dado a partir do qual ele é um canto: a reamostragem o guarda como ponto da volta, quando houver pontos bastantes */
+export const ANGULO_DE_CANTO_PADRAO = 20;
 export const PONTOS_MINIMOS_DA_VOLTA = 8;
 export const PONTOS_PADRAO_MINIMO = 16;
 export const PONTOS_PADRAO_MAXIMO = 64;
@@ -190,20 +192,38 @@ function conferirContorno(F) {
   if (toque) falha(`${F.onde}: o lado ${toque[0]} (do ponto ${toque[0]} ao ${(toque[0] + 1) % n}) e o lado ${toque[1]} (do ponto ${toque[1]} ao ${(toque[1] + 1) % n}) se cruzam ou se tocam; o contorno é uma volta simples, sem cruzar nem encostar em si`);
 }
 
-/* reamostra a polilinha aberta `poli` em `s` segmentos: devolve s pontos (sem o último, que é o marco seguinte). Os pontos caem a distâncias
-   iguais ao longo dela, e o vértice dado que está a menos de 0,45 do passo de um ponto ainda livre toma o lugar dele, para o canto não se
-   perder; os que ficam mais longe saem no aviso `pontoPerdido` */
-function reamostrarVolta(poli, s) {
+/* o giro, em graus, do contorno no vértice k da polilinha (0 numa reta, 180 na ponta que volta) */
+function giroEm(poli, k) {
+  const a = Math.atan2(poli[k][1] - poli[k - 1][1], poli[k][0] - poli[k - 1][0]);
+  const b = Math.atan2(poli[k + 1][1] - poli[k][1], poli[k + 1][0] - poli[k][0]);
+  let d = Math.abs(b - a) * (180 / Math.PI);
+  if (d > 180) d = 360 - d;
+  return d;
+}
+/* os vértices interiores de uma volta em que o contorno gira mais que `limite` graus: { k, giro } */
+const cantosDaVolta = (poli, limite) => poli.slice(1, -1).map((_, i) => ({ k: i + 1, giro: giroEm(poli, i + 1) })).filter((c) => c.giro > limite);
+
+/* reamostra a polilinha aberta `poli` em `s` segmentos: devolve s pontos (sem o último, que é o marco seguinte). Os pontos caem a distâncias iguais
+   ao longo dela, menos os cantos (giro acima de `limite` graus): cada canto é um ponto da volta, no índice mais perto do que a distância igual daria,
+   e as amostras entre dois cantos ficam a distâncias iguais entre eles. Com mais cantos que amostras (s - 1), ficam os de maior giro. */
+function reamostrarVolta(poli, s, limite) {
   const acc = [0];
   for (let k = 1; k < poli.length; k++) acc.push(acc[k - 1] + Math.hypot(poli[k][0] - poli[k - 1][0], poli[k][1] - poli[k - 1][1]));
   const total = acc[acc.length - 1];
   const passo = total / s;
-  const alvo = Array.from({ length: s }, (_, i) => passo * i);
-  let anterior = 0;
-  for (let k = 1; k + 1 < poli.length; k++) {
-    let melhor = -1;
-    for (let i = anterior + 1; i < s; i++) if (melhor < 0 || Math.abs(alvo[i] - acc[k]) < Math.abs(alvo[melhor] - acc[k])) melhor = i;
-    if (melhor > 0 && Math.abs(alvo[melhor] - acc[k]) <= 0.45 * passo) { alvo[melhor] = acc[k]; anterior = melhor; }
+  let cantos = cantosDaVolta(poli, limite);
+  if (cantos.length > s - 1) cantos = [...cantos].sort((x, y) => y.giro - x.giro || x.k - y.k).slice(0, s - 1).sort((x, y) => x.k - y.k);
+  const ancoras = [{ i: 0, a: 0 }];
+  cantos.forEach((c, j) => {
+    const ideal = Math.round(acc[c.k] / passo);
+    const i = Math.min(Math.max(ideal, ancoras.at(-1).i + 1), s - (cantos.length - j));
+    ancoras.push({ i, a: acc[c.k] });
+  });
+  ancoras.push({ i: s, a: total });
+  const alvo = new Array(s).fill(0);
+  for (let t = 0; t + 1 < ancoras.length; t++) {
+    const p = ancoras[t]; const q = ancoras[t + 1];
+    for (let i = p.i; i < q.i && i < s; i++) alvo[i] = p.a + ((q.a - p.a) * (i - p.i)) / (q.i - p.i);
   }
   const saida = [[...poli[0]]];
   let j = 0;
@@ -216,10 +236,11 @@ function reamostrarVolta(poli, s) {
   return saida;
 }
 
-/* quantos segmentos cada volta recebe: o inteiro de cada uma, de no mínimo 1, que soma N, pela fração média do perímetro (maior resto) */
-function repartir(fracoes, N) {
+/* quantos segmentos cada volta recebe: o inteiro de cada uma, de no mínimo `minimos[k]` (1 se não couber), que soma N, pela fração média do perímetro (maior resto) */
+function repartir(fracoes, N, minimos = fracoes.map(() => 1)) {
   const K = fracoes.length;
-  const base = fracoes.map((f) => Math.max(1, Math.floor(f * N)));
+  const pisos = minimos.reduce((a, b) => a + b, 0) <= N ? minimos : fracoes.map(() => 1);
+  const base = fracoes.map((f, k) => Math.max(pisos[k], Math.floor(f * N)));
   const resto = fracoes.map((f, k) => f * N - Math.floor(f * N) + k * 1e-12 * -1);
   let soma = base.reduce((a, b) => a + b, 0);
   while (soma < N) {
@@ -229,7 +250,7 @@ function repartir(fracoes, N) {
   }
   while (soma > N) {
     let m = -1;
-    for (let k = 0; k < K; k++) if (base[k] > 1 && (m < 0 || resto[k] < resto[m])) m = k;
+    for (let k = 0; k < K; k++) if (base[k] > pisos[k] && (m < 0 || resto[k] < resto[m])) m = k;
     base[m] -= 1; resto[m] = 2; soma -= 1;
   }
   return base;
@@ -245,6 +266,8 @@ export function corpoPorFatias(o = {}) {
   if (!['suave', 'linear'].includes(interpolacao)) falha(`interpolacao é 'suave' ou 'linear', e veio ${JSON.stringify(o.interpolacao)}`);
   const tolerancia = o.tolerancia ?? TOLERANCIA_DA_REAMOSTRAGEM_MM;
   if (!(numero(tolerancia) && tolerancia > 0)) falha(`tolerancia é número positivo em mm, e veio ${JSON.stringify(o.tolerancia)}`);
+  const anguloDeCanto = o.anguloDeCanto ?? ANGULO_DE_CANTO_PADRAO;
+  if (!(numero(anguloDeCanto) && anguloDeCanto > 0 && anguloDeCanto < 180)) falha(`anguloDeCanto é o giro em graus, de 0 a 180 (exclusive), a partir do qual um vértice dado é um canto que a volta guarda, e veio ${JSON.stringify(o.anguloDeCanto)}`);
   if (o.vivos != null && !(Array.isArray(o.vivos) && o.vivos.every((v) => typeof v === 'string' && v))) falha(`vivos é a lista de nomes de marco, e veio ${JSON.stringify(o.vivos)}`);
 
   /* as fatias, na ordem e na distância */
@@ -293,10 +316,12 @@ export function corpoPorFatias(o = {}) {
   });
   const compr = (poli) => poli.slice(1).reduce((s, p, k) => s + Math.hypot(p[0] - poli[k][0], p[1] - poli[k][1]), 0);
   const fracoes = Array.from({ length: K }, (_, a) => F.reduce((s, _f, i) => s + compr(voltasDe[i][a]) / perimetro(F[i].pts), 0) / F.length);
-  const segmentos = repartir(fracoes, N);
+  const cantosPorVolta = voltasDe.map((voltas) => voltas.map((poli) => cantosDaVolta(poli, anguloDeCanto).length));
+  const minimos = Array.from({ length: K }, (_, a) => 1 + Math.max(...cantosPorVolta.map((c) => c[a])));
+  const segmentos = repartir(fracoes, N, minimos);
   const inicioDe = []; segmentos.reduce((s, x) => { inicioDe.push(s); return s + x; }, 0);
   const marcos = Object.fromEntries(M0.map((nome, a) => [nome, inicioDe[a]]));
-  const loops = voltasDe.map((voltas) => voltas.flatMap((poli, a) => reamostrarVolta(poli, segmentos[a])));
+  const loops = voltasDe.map((voltas) => voltas.flatMap((poli, a) => reamostrarVolta(poli, segmentos[a], anguloDeCanto)));
 
   /* o ponto dado que a volta reamostrada deixa longe: o aviso, e nunca o silêncio */
   const avisos = [];
@@ -319,6 +344,25 @@ export function corpoPorFatias(o = {}) {
         texto: `na fatia ${citar(f.nome)} (em ${br(f.em)} mm), ${longe.length} de ${f.pts.length} pontos dados ficam a mais de ${br(tolerancia)} mm da volta reamostrada em ${N} pontos, o pior o ponto ${pior.indice} (${br(pior.distanciaMm)} mm); suba pontos, ou nomeie esse ponto no contorno (um marco fica exato em todas as fatias)`,
       });
     }
+  });
+
+  /* o canto (giro acima de anguloDeCanto) que a volta não tem amostras para guardar: o aviso diz quantos pontos bastam */
+  const bastam = () => {
+    for (let n = N + 2; n <= 4096; n += 2) {
+      const seg = repartir(fracoes, n, minimos);
+      if (seg.every((x, a) => x >= minimos[a])) return n;
+    }
+    return null;
+  };
+  let pontosQueBastam;
+  F.forEach((f, i) => {
+    const faltam = cantosPorVolta[i].reduce((t, c, a) => t + Math.max(0, c - (segmentos[a] - 1)), 0);
+    if (!faltam) return;
+    pontosQueBastam ??= bastam();
+    avisos.push({
+      ref: 'cantoPerdido', fatia: f.nome, quantos: faltam, pontosQueBastam,
+      texto: `na fatia ${citar(f.nome)} (em ${br(f.em)} mm), ${faltam} ${faltam === 1 ? 'canto' : 'cantos'} (giro acima de ${br(anguloDeCanto)} graus) ficam sem ponto na volta de ${N} pontos; ${pontosQueBastam ? `com pontos de ${pontosQueBastam} para cima todos cabem` : 'nenhum número de pontos até 4096 os guarda, então divida a volta com marcos nos cantos'}`,
+    });
   });
 
   /* o tamanho: a volta com segmentos curtos demais não tem tampa que a gaiola feche */
