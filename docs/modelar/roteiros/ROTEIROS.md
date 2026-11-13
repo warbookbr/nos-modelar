@@ -218,7 +218,7 @@ Abrir só quando a condição aparecer:
 
 Skill: `criar-peca`.
 
-Comandos: `node tools/modelar/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`, `npm run silhueta:desvio -- <peça> --referencia=<contorno.json> --plano=<xy|xz|yz>`.
+Comandos: `node tools/modelar/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`, `npm run silhueta:referencia -- --imagem=<foto.png> --regioes=<regioes.json> --escala=<x1,y1,x2,y2,mm> --alinhar=<8 números> --cortes=<x,y;...> --trechos=<nomes> --saida=<trechos.json>`, `npm run silhueta:desvio -- <peça> --referencia=<contorno.json> --plano=<xy|xz|yz>`.
 
 Passo seguinte, sem estado lido: Com peça nova, parta da forma de referência ou da medida (conversão, modelo de referência, imagem, prancha), combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.
 

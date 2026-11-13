@@ -502,6 +502,7 @@
         "node tools/modelar/olhar-bancada.mjs --analise --peca=<nome>",
         "npm run parametros",
         "npm run conferir:referencia",
+        "npm run silhueta:referencia -- --imagem=<foto.png> --regioes=<regioes.json> --escala=<x1,y1,x2,y2,mm> --alinhar=<8 números> --cortes=<x,y;...> --trechos=<nomes> --saida=<trechos.json>",
         "npm run silhueta:desvio -- <peça> --referencia=<contorno.json> --plano=<xy|xz|yz>"
       ],
       "lista": "operacoes",

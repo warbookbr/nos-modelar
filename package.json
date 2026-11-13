@@ -129,6 +129,7 @@
     "linhas:modelo": "node tools/modelar/linhas-do-modelo.mjs",
     "perfil:cor": "node tools/modelar/perfil-por-cor.mjs",
     "silhueta:desvio": "node tools/modelar/silhueta-contra-referencia.mjs",
+    "silhueta:referencia": "node tools/modelar/referencia-de-silhueta.mjs",
     "silhueta:pedida": "node tools/modelar/silhueta-pedida.mjs",
     "sobra:partes": "node tools/modelar/sobra-entre-partes.mjs",
     "vao:partes": "node tools/modelar/vao-entre-partes.mjs",
