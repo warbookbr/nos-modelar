@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/REGRAS-DOS-AGENTES.md`, `docs/modelar/MECANISMOS.md`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `README.md`, `docs/modelar/INDEX.md`
+**Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/REGRAS-DOS-AGENTES.md`, `docs/modelar/MECANISMOS.md`, `docs/modelar/banco-de-provas/README.md`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `README.md`, `docs/modelar/INDEX.md`
 
 **Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13.
 
@@ -10,7 +10,7 @@
 
 ## Problema observado
 
-A [revisão do projeto](2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md) mediu, no [relatório](../banco-de-provas/revisao-do-projeto-2026-11-13/RELATORIO.md), que de sete reprovações lidas do CI uma era defeito de peça, três eram teto de tempo e uma era corrida de junção; que o único defeito real seria pego em 2 minutos por uma guarda que só roda no CI; que o mapa gerado conflita em toda junção; que a lista de planos ativos é escrita à mão em três arquivos; que a mesma lista de proibições foi copiada no pedido a cinco agentes; e que o projeto não tem uma página com a visão dos mecanismos.
+A [revisão do projeto](../decisoes/PLANOS-ENCERRADOS.md) mediu, no [relatório](../banco-de-provas/revisao-do-projeto-2026-11-13/RELATORIO.md), que de sete reprovações lidas do CI uma era defeito de peça, três eram teto de tempo e uma era corrida de junção; que o único defeito real seria pego em 2 minutos por uma guarda que só roda no CI; que o mapa gerado conflita em toda junção; que a lista de planos ativos é escrita à mão em três arquivos; que a mesma lista de proibições foi copiada no pedido a cinco agentes; e que o projeto não tem uma página com a visão dos mecanismos.
 
 ## Resultado
 
@@ -32,6 +32,8 @@ USAR DIRETO: a bateria `tools/gates.mjs` com o seletor do que mudou, o registro 
 8. A página `docs/modelar/MECANISMOS.md`, de uma tela, com cada mecanismo, o que faz, quando é usado e onde mora, e a conferência que acusa mecanismo novo fora da lista.
 
 9. A ferramenta de rodadas guarda só a cópia da receita da última rodada, e as cópias antigas saem do acervo; em cada pasta de peça este plano tira só esses arquivos. Entrou no lugar de tirar as rodadas do furgão à mão, que a revisão recomendava: a correção foi para a ferramenta. Feita em 2026-11-13: 87 cópias e 51.159 linhas a menos em 42 pastas, com a diferença de cada rodada mantida no registro.
+
+10. O índice `docs/modelar/banco-de-provas/README.md` passa a ser gerado das pastas, com o documento de entrada e o título de cada uma, e conferido. Nasceu escrito à mão em 2026-11-13, quando os planos que alcançavam essas pastas saíram da árvore, e já lista só parte delas.
 
 Estado em 2026-11-13. Feitas por três agentes e conferidas por quem conduz: a fatia 1 (`tools/gates/guarda-local.mjs`, com a guarda de cada peça mudada e o limite de 60 s); a fatia 4 (regra `merge=union` para o mapa no `.gitattributes`, com `npm run mapa` depois de toda junção, e `npm run planos:gerar` para as linhas do `README.md` e do `INDEX.md`); a fatia 5 (a régua da fronteira em `independencia-catalogo.mjs`, com 67 arquivos e 113 imports conferidos, e as cinco extensões no catálogo). Feita por quem conduz: a fatia 3. A fatia 2 fechou em duas rodadas: o teto relativo, e depois o histórico de durações circulando no CI pelo cache, por modo, parte e ramo, o prazo padrão do vitest de 180 s para 900 s como guarda contra travamento, e a razão do furgão no `acervo-real` como aviso; o cache só se prova no CI, e a main não alimenta o histórico porque o avanço dela não dispara a bateria. Feita em parte: a fatia 8, com a página escrita e a conferência por fazer. As fatias 6 e 7 foram fechadas por quem conduz: as cinco definições de agente citam o arquivo de regras, e o formato do diário de atritos está nele.
 

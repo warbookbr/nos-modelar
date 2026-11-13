@@ -10,7 +10,7 @@
 
 ## Problema observado
 
-A [revisão do projeto](2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md) mediu 43 documentos soltos em `docs/modelar/`, com contrato, guia, visão e pesquisa lado a lado e quatro versões da montagem persistida; 118 planos encerrados inteiros na árvore (1,4 MB) e 88 arquivos de histórico; nenhuma instrução por pasta de código. A [pesquisa](../banco-de-provas/revisao-do-projeto-2026-11-13/pergunta-4-projetos-operados-por-ia.md) mostrou a prática de quem opera repositório com agente: uma finalidade por página, decisão curta e imutável no lugar do plano entregue, e documento substituído fora do índice, porque o agente lê documento velho como instrução.
+A [revisão do projeto](../decisoes/PLANOS-ENCERRADOS.md) mediu 43 documentos soltos em `docs/modelar/`, com contrato, guia, visão e pesquisa lado a lado e quatro versões da montagem persistida; 118 planos encerrados inteiros na árvore (1,4 MB) e 88 arquivos de histórico; nenhuma instrução por pasta de código. A [pesquisa](../banco-de-provas/revisao-do-projeto-2026-11-13/pergunta-4-projetos-operados-por-ia.md) mostrou a prática de quem opera repositório com agente: uma finalidade por página, decisão curta e imutável no lugar do plano entregue, e documento substituído fora do índice, porque o agente lê documento velho como instrução.
 
 ## Resultado
 

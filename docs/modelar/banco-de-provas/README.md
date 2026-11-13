@@ -39,3 +39,6 @@ Evidência não governa trabalho novo. Cada linha abaixo é o documento de entra
 - [Sedã em alta definição, ciclo 4: a cabine sem contornos, e a frente e a traseira até o eixo](sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-4.md) — `sedan-chassi-e-lataria-2026-11-11/alta-definicao`
 - [Sedã em alta definição, ciclo 5: o carro inteiro](sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-5.md) — `sedan-chassi-e-lataria-2026-11-11/alta-definicao`
 - [Sedã em alta definição: o carro em receitas](sedan-chassi-e-lataria-2026-11-11/alta-definicao/RECEITA.md) — `sedan-chassi-e-lataria-2026-11-11/alta-definicao`
+- [Organização dos documentos: o levantamento das decisões em vigor](organizacao-dos-documentos-2026-11-13/README.md) — `organizacao-dos-documentos-2026-11-13`
+- [Revisão das verificações e dos testes: medidas e veredito](revisao-das-verificacoes-2026-11-13/README.md) — `revisao-das-verificacoes-2026-11-13`
+- [Revisão do projeto para o trabalho da IA: medidas e relatório](revisao-do-projeto-2026-11-13/README.md) — `revisao-do-projeto-2026-11-13`
