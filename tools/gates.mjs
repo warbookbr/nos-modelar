@@ -260,9 +260,14 @@ export function filtrarPorCaminho(bateria, alterados) {
 
 function arquivosAlterados() {
   const git = (args) => spawnSync('git', args, { encoding: 'utf8' });
-  const base = git(['rev-parse', '--abbrev-ref', '@{u}']);
-  if (base.status !== 0) return null;
-  const commitados = git(['diff', '--name-only', `${base.stdout.trim()}...HEAD`]);
+  /* SEM RAMO REMOTO CONFIGURADO, A BASE É A MAIN. O ramo de trabalho que envia para um ramo de outro nome não tem `@{u}`, e a bateria
+     caía em "não deu para saber o que mudou": rodava tudo e deixava a guarda das peças mudadas para o CI, sem dizer por quê. Medido em
+     2026-11-13, com 42 peças mudadas e nenhuma guarda rodada aqui. O que o envio muda em relação à main é a resposta que serve. */
+  const remoto = git(['rev-parse', '--abbrev-ref', '@{u}']);
+  const base = remoto.status === 0 ? remoto.stdout.trim()
+    : git(['rev-parse', '--verify', '--quiet', 'origin/main']).status === 0 ? 'origin/main' : null;
+  if (!base) return null;
+  const commitados = git(['diff', '--name-only', `${base}...HEAD`]);
   const soltos = git(['status', '--porcelain', '--untracked-files=all']);
   if (commitados.status !== 0 || soltos.status !== 0) return null;
   const lista = [
