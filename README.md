@@ -22,7 +22,7 @@ reduzido, observa os componentes que escolhe, mantém as dependências e
 revalida as montagens afetadas depois de cada alteração. Composição, relações e
 dependências são dado estruturado do sistema, e MCP, CLI e API são portas para
 ele. A definição completa está em
-[`docs/modelar/AUTORIA-IA.md`](docs/modelar/AUTORIA-IA.md).
+[`docs/modelar/contratos/AUTORIA-IA.md`](docs/modelar/contratos/AUTORIA-IA.md).
 
 ## Ferramentas
 
@@ -64,7 +64,7 @@ subdividida existe no núcleo (`subdivisao`), e o resto do vocabulário poligona
 bancada (bisel, corte em anel) está num
 [plano congelado](docs/modelar/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md).
 Intenção que o catálogo não resolve vira registro de lacuna pelo formato de
-[`LACUNAS-DE-CAPACIDADE-V1.md`](docs/modelar/LACUNAS-DE-CAPACIDADE-V1.md),
+[`LACUNAS-DE-CAPACIDADE-V1.md`](docs/modelar/contratos/LACUNAS-DE-CAPACIDADE-V1.md),
 e não operação inventada dentro da receita.
 
 Além da peça existem a montagem persistida, o mapa canônico de dependências, a

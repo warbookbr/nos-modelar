@@ -17,7 +17,7 @@ R00–R07 estão implementados na `main` até `c78961f`: execução pura, firewa
 catálogo vazio, bancada sem fallback, harness privado, consumidor externo com
 manifesto vazio e remoção do acervo não homologado. Os gates de dívida foram
 retirados e as provas de capacidade foram reduzidas a fixtures neutras. A matriz está em
-[`MATRIZ-TESTES-ACOPLADOS.md`](../../MATRIZ-TESTES-ACOPLADOS.md).
+[`MATRIZ-TESTES-ACOPLADOS.md`](../../contratos/MATRIZ-TESTES-ACOPLADOS.md).
 O consumidor está integrado na `main` por `c794633`; o escritório publicou o
 harness e o manifesto vazio. A suíte completa e os gates de documentação,
 arquitetura, exportação, build e bancada passaram após a remoção.

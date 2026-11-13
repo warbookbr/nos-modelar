@@ -69,7 +69,7 @@ Um objeto descrito em OpenSCAD, de licença aberta e sem marca, chega a um `.esb
 ## Achados de 2026-10-16 e propostas à espera da pessoa
 
 As [sondas de 2026-10-16](../../banco-de-provas/importar-objeto-2026-10-15/sondas-2026-10-16/SONDAS.md) e as pesquisas registradas na
-[pesquisa aberta](../../PESQUISA-ABERTA-2026-10.md) mostraram que o código aberto se concentra em elementos de máquina e em bibliotecas
+[pesquisa aberta](../../pesquisas/PESQUISA-ABERTA-2026-10.md) mostraram que o código aberto se concentra em elementos de máquina e em bibliotecas
 paramétricas, que objetos inteiros da lista quase não existem com licença aberta, e que o importador de `.csg` recusa construções comuns em
 `.scad` reais. Três propostas esperam a decisão da pessoa antes de entrar no Incluído: corrigir o importador para `offset`, diferença 2D com
 furo e `linear_extrude` com `scale`, consertar o `--conferir` que lança exceção, e provar o importador num conjunto pequeno de `.scad` reais
@@ -100,7 +100,7 @@ O que se mediu, antes de o corpus sair do repositório: um quadro de drone saiu 
 scripts, a menos de 1 ms cada, e acerta 41 de 60 numa amostra conferida contra o Blender; uma mesa do Infinigen virou família com as
 medidas da original por 250 a 300 mil tokens; o STEP e o STL de peças impressas saem exatos em peças limpas e só aproximados em peças com
 chanfro, cavidade ou detalhe interno; e STL de malha única colada não se traduz. As pesquisas, em [pesquisa
-aberta](../../PESQUISA-ABERTA-2026-10.md), mostraram que o código aberto se concentra em elementos de máquina, mecanismos e móveis
+aberta](../../pesquisas/PESQUISA-ABERTA-2026-10.md), mostraram que o código aberto se concentra em elementos de máquina, mecanismos e móveis
 simples, e que os objetos grandes da lista (picape, empilhadeira, carrinho de mão, máquinas) não existem prontos com licença aberta.
 
 Ficou de fora: a fatia 2, do esboço importado à receita aprovada, e a medida do custo de nomear partes; a família da mesa do Infinigen,

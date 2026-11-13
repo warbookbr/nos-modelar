@@ -57,7 +57,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/planos/encerrados/2026-08-17-historico-de-revisao.md`.
 - A Montagem Mínima Persistida v1 foi concluída em
   `docs/modelar/planos/encerrados/2026-08-07-montagem-minima-persistida-v1.md`, com o
-  contrato atual em `docs/modelar/MONTAGEM-PERSISTIDA-V1.md`. O plano
+  contrato atual em `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`. O plano
   [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](./2026-08-09-montagem-persistida-v2-relacoes-locais.md) foi concluído
   no R06: provas A–F, fixtures persistidas v2, contrato v2 e continuidade
   arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. O contexto de
@@ -261,14 +261,14 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/historico/RELATORIO-R2-CAGE-DIRETA-R3.md` e
   `docs/modelar/planos/encerrados/2026-08-23-redesenho-cage-r2b-controle-vertical.md`.
   A R0 já isolou o contrato `mecanifica.aceite-visual` v1 em
-  [`CONTRATO-ACEITE-VISUAL.md`](../../CONTRATO-ACEITE-VISUAL.md): alvo, sobreposição,
+  [`CONTRATO-ACEITE-VISUAL.md`](../../contratos/CONTRATO-ACEITE-VISUAL.md): alvo, sobreposição,
   quatro vistas, rejeições e crítica tornam-se dados verificáveis antes de R1
   ligar o porteiro à revisão privada.
-  Registro: `docs/modelar/CONTRATO-ACEITE-VISUAL.md`.
+  Registro: `docs/modelar/contratos/CONTRATO-ACEITE-VISUAL.md`.
 - O único plano **ativo** é o [modelador inverso com priors por família](../congelados/2026-08-25-modelador-inverso-priors-familia.md). O plano por
   seleção foi cancelado: sua capacidade de comparação não tinha calibração
   repetida, o gerador restringia o espaço alcançável e o alvo N6 é direção
-  estética sem câmeras/correspondências geométricas. O [novo dossiê vinculante](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
+  estética sem câmeras/correspondências geométricas. O [novo dossiê vinculante](../../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
   preserva o núcleo
   procedural, identidade, montagem, revisão, impacto, bancada, câmeras e MCP;
   separa priors de veículo, humanoide e peça; e introduz qualificação de alvo,
@@ -283,10 +283,10 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   [fluxo multifamília](../../historico/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md),
   [matriz de rastreabilidade](../../historico/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
   [contrato N1](../../historico/FLUXO-AUTORIA-N1.md), [relatório N1](../../historico/RELATORIO-N1-FLUXO-AUTORIA.md),
-  [contrato N2](../../CONTRATO-FORMA-GLOBAL-N2.md), [relatório N2](../../historico/RELATORIO-N2-FORMA-GLOBAL.md),
+  [contrato N2](../../contratos/CONTRATO-FORMA-GLOBAL-N2.md), [relatório N2](../../historico/RELATORIO-N2-FORMA-GLOBAL.md),
   [relatório N3](../../historico/RELATORIO-N3-CANAL-PERCEPCAO.md),
   [relatório N4](../../historico/RELATORIO-N4-RESTRICOES.md) e [relatório N5](../../historico/RELATORIO-N5-BUSCA.md).
-  Caminhos alcançáveis: `docs/modelar/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`,
+  Caminhos alcançáveis: `docs/modelar/pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`,
   `docs/modelar/planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`,
   `docs/modelar/historico/DOSSIE-MODELADOR-POR-SELECAO.md`,
   `docs/modelar/historico/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
@@ -295,7 +295,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/historico/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`,
   `docs/modelar/historico/FLUXO-AUTORIA-N1.md`,
   `docs/modelar/historico/RELATORIO-N1-FLUXO-AUTORIA.md`,
-  `docs/modelar/CONTRATO-FORMA-GLOBAL-N2.md`,
+  `docs/modelar/contratos/CONTRATO-FORMA-GLOBAL-N2.md`,
   `docs/modelar/historico/RELATORIO-N2-FORMA-GLOBAL.md`,
   `docs/modelar/historico/RELATORIO-N3-CANAL-PERCEPCAO.md`,
   `docs/modelar/historico/RELATORIO-N4-RESTRICOES.md` e
@@ -309,11 +309,11 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   explicitamente não verificado. Evidências e limites estão em
   [`RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`](../../historico/RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md)
   (`docs/modelar/historico/RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`).
-- O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](../../MONTAGEM-PERSISTIDA-V4.md)
+- O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA.md`](../../contratos/MONTAGEM-PERSISTIDA.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
   transporta a auditoria; `descrever_montagem` continua sem executá-la.
-- A [matriz de testes acoplados ao acervo](../../MATRIZ-TESTES-ACOPLADOS.md)
-  (`docs/modelar/MATRIZ-TESTES-ACOPLADOS.md`) registra o
+- A [matriz de testes acoplados ao acervo](../../contratos/MATRIZ-TESTES-ACOPLADOS.md)
+  (`docs/modelar/contratos/MATRIZ-TESTES-ACOPLADOS.md`) registra o
   que é contrato genérico, integração, publicação ou conteúdo específico após
   a remoção das receitas.
 - O plano de [autoria segura de receitas declarativas](./2026-08-14-autoria-segura-receitas.md)
@@ -717,7 +717,7 @@ limite da forma alcançável; e o alvo N6 não contém calibração para represe
 um objeto 3D exato. A hipótese permanece no histórico, sem autorização.
 
 O mecanismo vigente é [modelagem inversa com priors por
-família](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md). Veículos partem de
+família](../../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md). Veículos partem de
 arquétipos automotivos semanticamente alinhados e deformáveis; humanoides usam
 esqueleto, volumes e juntas; peças usam features e interfaces funcionais. As
 famílias compartilham receitas, identidade, montagem, revisão, câmeras,

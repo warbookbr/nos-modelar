@@ -10,7 +10,7 @@
 ## Problema observado
 
 Pendência "dar endereço único a um grupo linear" de [`../INDEX.md`](../../INDEX.md)
-e limite registrado em [`../UPSTREAM-NOS.md`](../../UPSTREAM-NOS.md).
+e limite registrado em [`../UPSTREAM-NOS.md`](../../decisoes/UPSTREAM-NOS.md).
 
 A única forma de citar uma cópia do `arranja` era `copia: 2`, uma POSIÇÃO. O
 `CLAUDE.md` diz que "índices de arrays e posições de passos nunca são identidade

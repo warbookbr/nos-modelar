@@ -29,13 +29,13 @@ encerrado vive em
   `npm run exportar:step` e `npm run exportar:obj`. O STEP sai por
   `occt-wasm@4.3.2`, MIT/Apache-2.0 com `.wasm` LGPL-2.1 consumido como pacote
   separado, o que não muda a licença deste repositório. Detalhe em
-  [`DOSSIE-EXPORTACAO-CAD-STEP.md`](DOSSIE-EXPORTACAO-CAD-STEP.md) e prova em
+  [`DOSSIE-EXPORTACAO-CAD-STEP.md`](pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md) e prova em
   [`RELATORIO-EXPORTACAO-CAD-STEP-R00.md`](./historico/RELATORIO-EXPORTACAO-CAD-STEP-R00.md).
 - `npm run ativar:bancada` carrega peça ou montagem na bancada e sincroniza a
   sessão; o estado é local e não versionado. Procedimento em
   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](./usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md);
   hospedagem estática e isolamento de rede em
-  [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](ARQUITETURA-SESSAO-E-SEGURANCA.md).
+  [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](contratos/ARQUITETURA-SESSAO-E-SEGURANCA.md).
 - Os invariantes e os roteiros de leitura por intenção são dados em
   [`roteiros/roteiros.json`](roteiros/roteiros.json). Dele saem as regras e a
   lista de roteiros do `CLAUDE.md` (entre marcadores) e a página
@@ -91,14 +91,14 @@ tem contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços em `src/autoria/`. N
 invente uma localização por implicação.
 
 Qual documento manda em cada assunto está na lista de fontes de verdade, em
-[`INVENTARIO.md`](INVENTARIO.md) (`docs/modelar/INVENTARIO.md`): listar 21
+[`INVENTARIO.md`](contratos/INVENTARIO.md) (`docs/modelar/contratos/INVENTARIO.md`): listar 21
 fontes é inventário, não porta de entrada.
 
 ## Leitura por tarefa
 
-A leitura por assunto saiu desta página para [`LEITURA-POR-TAREFA.md`](LEITURA-POR-TAREFA.md). Cada roteiro de [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) já diz o que ler antes de começar; a página nova serve quando nenhum deles cobre a pergunta.
+A leitura por assunto saiu desta página para [`LEITURA-POR-TAREFA.md`](contratos/LEITURA-POR-TAREFA.md). Cada roteiro de [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) já diz o que ler antes de começar; a página nova serve quando nenhum deles cobre a pergunta.
 
-Carroceria: [`modelar-veiculos.md`](modelar-veiculos.md), [`modelar-carroceria.md`](modelar-carroceria.md) e, para chassi com lataria em painéis, [`modelar-veiculo-em-chassi-e-lataria.md`](modelar-veiculo-em-chassi-e-lataria.md).
+Carroceria: [`modelar-veiculos.md`](contratos/modelar-veiculos.md), [`modelar-carroceria.md`](contratos/modelar-carroceria.md) e, para chassi com lataria em painéis, [`modelar-veiculo-em-chassi-e-lataria.md`](contratos/modelar-veiculo-em-chassi-e-lataria.md).
 
 ## Comandos principais
 
@@ -179,5 +179,5 @@ planos fechados em [`planos/encerrados/README.md`](planos/encerrados/README.md) 
 as decisões do NÓS em `docs/nos-herdado/`. Nenhuma delas autoriza trabalho novo.
 
 A lista comentada de documentos e as fontes de verdade estão em
-[`INVENTARIO.md`](INVENTARIO.md); o inventário mecânico é gerado em
+[`INVENTARIO.md`](contratos/INVENTARIO.md); o inventário mecânico é gerado em
 [`../MAPA.md`](../MAPA.md), nunca à mão.

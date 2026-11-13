@@ -69,7 +69,7 @@ aresta viva no lugar deles é defeito visível.
 - a prova numa fixture neutra, com dois cubos que se cruzam, conferindo que a
   malha sai fechada, sem face interna e com o volume esperado;
 - a prova no ombro, com a coluna e o braço reto unidos;
-- o registro em `docs/modelar/UPSTREAM-NOS.md`, porque a operação é geral.
+- o registro em `docs/modelar/decisoes/UPSTREAM-NOS.md`, porque a operação é geral.
 
 ## Excluído
 

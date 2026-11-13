@@ -1,6 +1,6 @@
 # Veículos de referência livre: o diagnóstico da primeira leva
 
-Evidência encerrada do plano [veículos de referência livre](../planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md), de 2026-10-20, tirada de [`modelar-veiculos.md`](../modelar-veiculos.md) em 2026-10-25: o diagnóstico das nove peças da primeira leva, a decisão por peça, as lacunas do núcleo e das ferramentas naquele dia, o experimento da perua pelas três vistas e o que virou gate. As seções citadas no texto são as do documento original, em que a 4 eram as instruções e a 5 os grupos, hoje as seções 1 e 2 de `modelar-veiculos.md`. Não governa trabalho novo; as lacunas que ficaram abertas estão no plano de ajustes no núcleo dos veículos.
+Evidência encerrada do plano [veículos de referência livre](../planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md), de 2026-10-20, tirada de [`modelar-veiculos.md`](../contratos/modelar-veiculos.md) em 2026-10-25: o diagnóstico das nove peças da primeira leva, a decisão por peça, as lacunas do núcleo e das ferramentas naquele dia, o experimento da perua pelas três vistas e o que virou gate. As seções citadas no texto são as do documento original, em que a 4 eram as instruções e a 5 os grupos, hoje as seções 1 e 2 de `modelar-veiculos.md`. Não governa trabalho novo; as lacunas que ficaram abertas estão no plano de ajustes no núcleo dos veículos.
 
 ## Diagnóstico da primeira leva
 
@@ -43,7 +43,7 @@ O processo não teria pego sozinho nenhum destes três defeitos (seção constan
 
 ## Lacunas do núcleo e das ferramentas
 
-A análise inicial listou doze lacunas. As seis primeiras eram ferramentas pequenas, que não tocam o núcleo, e foram fechadas antes da leva de Sonnet. As seis últimas tinham contorno testado e ficaram como instrução; os achados de núcleo entre elas estão registrados em 'Ajustes no núcleo' do plano encerrado e são tratados no plano [ajustes no núcleo dos veículos](../planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md), que os reproduziu e corrigiu o diagnóstico de vários deles; até cada fatia fechar, valem os contornos abaixo. As mudanças gerais que possam voltar ao NÓS vão registradas em `docs/modelar/UPSTREAM-NOS.md`.
+A análise inicial listou doze lacunas. As seis primeiras eram ferramentas pequenas, que não tocam o núcleo, e foram fechadas antes da leva de Sonnet. As seis últimas tinham contorno testado e ficaram como instrução; os achados de núcleo entre elas estão registrados em 'Ajustes no núcleo' do plano encerrado e são tratados no plano [ajustes no núcleo dos veículos](../planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md), que os reproduziu e corrigiu o diagnóstico de vários deles; até cada fatia fechar, valem os contornos abaixo. As mudanças gerais que possam voltar ao NÓS vão registradas em `docs/modelar/decisoes/UPSTREAM-NOS.md`.
 
 | Lacuna | Sintoma nas nove peças | Estado |
 |---|---|---|

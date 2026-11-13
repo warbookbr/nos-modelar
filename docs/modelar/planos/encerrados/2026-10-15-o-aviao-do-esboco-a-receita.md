@@ -19,7 +19,7 @@ receita.
 
 O caminho existe em pedaços e nunca foi percorrido por um objeto real. O tradutor do
 nível zero (`src/autoria/tradutor-nivel-zero.js`) traduz o esboço para o andaime da
-[forma global N2](../../CONTRATO-FORMA-GLOBAL-N2.md); a receita declara `REFINA` e o
+[forma global N2](../../contratos/CONTRATO-FORMA-GLOBAL-N2.md); a receita declara `REFINA` e o
 verificador do refinamento confere cada parte dentro do envelope do volume que ela
 refina e as portas do andaime; e `npm run esboco -- --envelope <unidade> <receita.js>`
 confere a receita contra a unidade do esboço. Nenhuma receita do acervo declara
@@ -151,8 +151,8 @@ Combinado com a pessoa em 2026-10-15: com o avião completo, seguem a picape, o 
 robótico, o carrinho de mão e a empilhadeira, cujos esboços ela ainda não aprovou,
 cada um pelo esboço a partir dos desenhos e pela receita no núcleo, com as primitivas
 2.0 que pedirem; e, mais adiante, os objetos da [lista de
-famílias](../../FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
-objeto](../../FERRAMENTAS-POR-OBJETO.md). A ordem entre os quatro fica com a pessoa.
+famílias](../../decisoes/FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
+objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md). A ordem entre os quatro fica com a pessoa.
 
 ## Fechamento
 

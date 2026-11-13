@@ -145,8 +145,8 @@ desenhos e a tradução do esboço para receita no núcleo, com o avião como pr
 objeto, porque já tem esboço aprovado e é o elo que mais falta na esteira; depois a
 picape, como primeiro objeto a passar pela esteira inteira do zero, com as
 primitivas 2.0 que ela pedir; e, mais adiante, os objetos da [lista de
-famílias](../../FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
-objeto](../../FERRAMENTAS-POR-OBJETO.md). O [backlog](../BACKLOG.md) entra onde cada plano
+famílias](../../decisoes/FAMILIAS-DE-OBJETOS.md), na ordem da [contagem de ferramentas por
+objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md). O [backlog](../BACKLOG.md) entra onde cada plano
 precisar: os atritos da segunda rodada do avião, a geometria exata e a visão
 (OpenCASCADE, Manifold no esboço e Segment Anything), as pontas cortadas e a paleta
 do mapa de partes.

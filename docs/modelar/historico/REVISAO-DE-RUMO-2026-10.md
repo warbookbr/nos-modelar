@@ -34,7 +34,7 @@ fabricação ou tolerância dimensional de peça mecânica; nesse caso, B-rep en
 como backend de peças mecânicas". Hoje o escopo é modelagem mecânica geral, a
 exportação STEP existe com `occt-wasm`, e sete técnicas que faltam (casca com
 espessura, hélice, nervura, chapa dobrada, flange, dobra ao longo de caminho e
-torção, na análise de técnicas de forma, removida em 2026-10-06 e substituída por [`../FERRAMENTAS-POR-OBJETO.md`](../FERRAMENTAS-POR-OBJETO.md)) são o forte de um
+torção, na análise de técnicas de forma, removida em 2026-10-06 e substituída por [`../FERRAMENTAS-POR-OBJETO.md`](../pesquisas/FERRAMENTAS-POR-OBJETO.md)) são o forte de um
 kernel B-Rep. A condição de reabertura está cumprida.
 
 O caminho proposto é usar um kernel maduro como motor e pôr o valor do projeto na
@@ -65,17 +65,17 @@ Permitir que uma IA modele, inspecione, componha e mantenha objetos e máquinas 
   - Motor de booleanas volumétricas exatas `manifold-3d@3.5.4` integrado ao núcleo (`procedural/nucleo/manifold.js`).
   - Módulo de esboço com 9 formas primitivas (`caixa`, `cilindro`, `anel`, `cone`, `esfera`, `extrusao`, `loft`, `revolucao`, `tubo`), forma geradora `envolve` e 10 componentes de biblioteca (`modulos/esboco/README.md`, seções `Formas`, `A faixa \`envolve\`` e `Componentes`).
   - Condutor de evolução de esboços em 5 estágios (Maquete, Conferência, Plano de detalhe, Detalhe por unidade, Montagem) com marcos e notas de crítico visual (`modulos/esboco/README.md`, seção `O Condutor`).
-  - Formato persistido de montagem recursiva v1/v2/v3 e mapa canônico de relações (`docs/modelar/AUTORIA-IA.md`, seções `Estado atual` e `Síntese canônica`).
+  - Formato persistido de montagem recursiva v1/v2/v3 e mapa canônico de relações (`docs/modelar/contratos/AUTORIA-IA.md`, seções `Estado atual` e `Síntese canônica`).
   - Exportação CAD/STEP funcional via pacote `occt-wasm@4.3.2` (`docs/modelar/INDEX.md`, seção `Estado atual`).
   - 32 de 32 gates aprovados no CI em `npm run gates --completo` (`docs/modelar/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`).
-  - Mapeamento de 28 famílias em `docs/modelar/FAMILIAS-DE-OBJETOS.md` e auditoria de 53 elementos canônicos em a análise de elementos (removida em 2026-10-06).
+  - Mapeamento de 28 famílias em `docs/modelar/decisoes/FAMILIAS-DE-OBJETOS.md` e auditoria de 53 elementos canônicos em a análise de elementos (removida em 2026-10-06).
 - **O que foi medido e o que falhou:**
   - *Consumo desproporcional de tokens:* A moto demandou ~700k tokens para apenas 4 de 18 unidades (71k a 95k/unidade), e a escavadeira consumiu ~260k tokens em 6 rodadas para concluir apenas 1 de 8 unidades (`docs/modelar/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`; `docs/modelar/planos/encerrados/2026-10-06-o-catalogo-de-familias.md`, seção `Problema observado`).
   - *Estagnação do crítico visual:* Notas permaneceram entre 6 e 7 ao longo de 9 rodadas consecutivas; a cada correção estrutural, surgia novo detalhe de superfície (`docs/modelar/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`).
   - *Causa raiz identificada:* A maior parcela do custo decorreu de a IA reconstruir mecanismos comuns a partir de primitivas elementares (`docs/modelar/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`).
   - *Déficit geométrico estrutural:* Das 22 técnicas de forma, apenas 6 são plenamente suportadas; 9 são parciais e 7 inexistem (incluindo casca com espessura, hélice, nervuras e chapa dobrada) (a análise de técnicas de forma (removida em 2026-10-06), seções `Visão geral` e `O que falta, por peso`).
   - *Zero elementos completos:* Dos 53 elementos mecânicos, 0 têm suporte completo (`já temos: 0`); 22 são parciais, 15 dependem de conversão e 16 de criação do zero (a análise de elementos (removida em 2026-10-06), seção `Metodologia e Decisões Técnicas (T015)`).
-  - *Limites formais:* Inexistência de solver geral de encaixe, validação de movimento/espaço varrido e modelo de materiais (`docs/modelar/VISAO.md`, seção `Limites atuais`; `docs/modelar/ARQUITETURA.md`, seção `Limites que permanecem`).
+  - *Limites formais:* Inexistência de solver geral de encaixe, validação de movimento/espaço varrido e modelo de materiais (`docs/modelar/decisoes/VISAO.md`, seção `Limites atuais`; `docs/modelar/contratos/ARQUITETURA.md`, seção `Limites que permanecem`).
 
 #### 4. Plano atual e suposições implícitas
 - **O que está planejado:** O plano ativo (`docs/modelar/planos/encerrados/2026-10-06-o-catalogo-de-familias.md`) propõe construir um catálogo de famílias paramétricas homologadas em duas camadas (ferramentas inferiores e famílias superiores, iniciando por `pneu`, `roda` e `cilindroHidraulico`), mantendo dois geradores sincronizados (esboço e receita detalhada de malha).

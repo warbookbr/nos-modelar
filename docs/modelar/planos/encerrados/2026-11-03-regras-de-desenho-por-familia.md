@@ -35,7 +35,7 @@ As regras de desenho de veículo ficam num catálogo em dados que o alinhamento,
 - **Conferências da prancha (USAR DIRETO):** a distância mínima entre linhas (`divisoes`) e o corte da saia pelas portas já existem no motor e na especificação; as regras que têm medida apontam para elas.
 - **Operação de varredura (REFATORAR):** a seção varrida ao longo da lataria e o alargamento de arco saem da receita do furgão para uma operação geral do núcleo que varre uma seção dada ao longo de um caminho dado, com estações, borda rolada e pontas cortadas numa altura; a fresta que contorna o arco vira parâmetro da lataria. O modelador mostrou em 2026-11-03 que o [contrato da família](../../CONTRATO-DA-FAMILIA.md) não carrega essas malhas (parâmetro sem lista, receita sem como chamar família no meio dos passos, continuação do alargamento na malha da saia), e a pessoa escolheu a operação geral no mesmo dia.
 - **Registro de pedidos (ENVOLVER):** a ferramenta de rodada ganha o campo dos pedidos da pessoa, com o pedido, a regra que faltou e onde ela passou a morar, e conta os pedidos por etapa.
-- **Priors de proporção (ADIAR):** as faixas medidas em veículos reais entram como valores das regras quando houver; o [dossiê de priors por família](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md) segue como direção, fora deste plano.
+- **Priors de proporção (ADIAR):** as faixas medidas em veículos reais entram como valores das regras quando houver; o [dossiê de priors por família](../../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md) segue como direção, fora deste plano.
 
 ## Incluído
 

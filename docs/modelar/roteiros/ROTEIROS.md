@@ -55,9 +55,9 @@ Ler antes de começar, num orçamento de 29.700 bytes (linha de base de 59.061 b
 Abrir só quando a condição aparecer:
 
 - `comunicacao.md`, quando o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção.
-- `docs/modelar/ARQUITETURA.md`, quando a mudança atravessa camadas.
-- `docs/modelar/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.
-- `docs/modelar/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
+- `docs/modelar/contratos/ARQUITETURA.md`, quando a mudança atravessa camadas.
+- `docs/modelar/decisoes/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.
+- `docs/modelar/contratos/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
 Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.
 
@@ -76,7 +76,7 @@ Ler antes de começar, num orçamento de 6.000 bytes (linha de base de 17.443 by
 
 Abrir só quando a condição aparecer:
 
-- `docs/modelar/ARQUITETURA.md`, quando a correção atravessa camadas.
+- `docs/modelar/contratos/ARQUITETURA.md`, quando a correção atravessa camadas.
 - `docs/modelar/planos/README.md`, quando a correção vira plano.
 
 Comandos: `npm run test -- <arquivo de teste>`, `npm run gates -- --completo`.
@@ -99,7 +99,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/planos/README.md`, quando o documento é um plano.
 - `docs/modelar/usar/README.md`, quando o documento é de uso, em docs/modelar/usar/.
 - `docs/modelar/historico/README.md`, quando o documento vai para o histórico.
-- `docs/modelar/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
+- `docs/modelar/contratos/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
 Comandos: `npm run mapa`, `npm run gates`.
 
@@ -119,10 +119,10 @@ Ler antes de começar, num orçamento de 6.600 bytes (linha de base de 8.948 byt
 Abrir só quando a condição aparecer:
 
 - `docs/modelar/planos/encerrados/README.md`, quando a pergunta é sobre um plano concluído ou cancelado.
-- `docs/modelar/PESQUISA-ABERTA-2026-10.md`, quando a pergunta é sobre ferramentas de outros projetos.
-- `docs/modelar/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
+- `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md`, quando a pergunta é sobre ferramentas de outros projetos.
+- `docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
 - `docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md`, quando a pergunta é quanto custou modelar um objeto.
-- `docs/modelar/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
+- `docs/modelar/pesquisas/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
 - `docs/modelar/historico/CHEGADA-2026-09-11.md`, quando a pergunta é por que um documento saiu da raiz de docs/modelar/ ou onde foi parar.
 
 Passo seguinte, sem estado lido: Abra docs/modelar/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.
@@ -165,8 +165,8 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/modelar/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
-- `docs/modelar/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
-- `docs/modelar/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
+- `docs/modelar/contratos/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
+- `docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
 - `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 
 Skill: `criar-peca`.
@@ -212,8 +212,8 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/modelar/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
-- `docs/modelar/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
-- `docs/modelar/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
+- `docs/modelar/contratos/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
+- `docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
 - `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 
 Skill: `criar-peca`.
@@ -259,8 +259,8 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/modelar/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
-- `docs/modelar/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
-- `docs/modelar/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
+- `docs/modelar/contratos/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
+- `docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
 - `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 - `docs/modelar/usar/AJUSTE-DA-BANCADA.md`, quando a pessoa salvou um ajuste na bancada que precisa voltar à receita.
 

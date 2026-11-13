@@ -5,7 +5,7 @@ Cada atrito da [referência e da prancha](ATRITOS.md) (R1 a R8) e do
 [esboço](esboco/ATRITOS.md) (E1 a E43) entra numa de quatro classes: ferramenta
 nova ou primitiva 2.0, correção de ferramenta que já existe, correção do processo
 do crítico, ou nada. A contagem de objetos vem da
-[contagem por objeto](../../FERRAMENTAS-POR-OBJETO.md). R2 a R5 já foram
+[contagem por objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md). R2 a R5 já foram
 corrigidos durante a fatia 2 e não entram.
 
 ## Ferramentas novas e primitivas 2.0

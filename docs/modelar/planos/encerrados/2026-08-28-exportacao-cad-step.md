@@ -10,7 +10,7 @@
 `bb2e79ab565e4b4d1851dadaf247b0062ac2aa8c`
 
 **Dossiê técnico:**
-[`../DOSSIE-EXPORTACAO-CAD-STEP.md`](../../DOSSIE-EXPORTACAO-CAD-STEP.md)
+[`../DOSSIE-EXPORTACAO-CAD-STEP.md`](../../pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md)
 
 ## Problema observado
 

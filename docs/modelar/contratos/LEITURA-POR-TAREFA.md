@@ -5,11 +5,11 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
 
 - Estado, objetivo e horizonte: `VISAO.md`, `INDEX.md` e `planos/README.md`.
 - **O que já existe, antes de propor ferramenta ou capacidade:** as operações do
-  núcleo no catálogo gerado, [`gerado/CATALOGO-CAPACIDADES.md`](gerado/CATALOGO-CAPACIDADES.md);
+  núcleo no catálogo gerado, [`gerado/CATALOGO-CAPACIDADES.md`](../gerado/CATALOGO-CAPACIDADES.md);
   as opções de forma pelo núcleo em
-  [`modulos/esboco-nucleo/README.md`](../../modulos/esboco-nucleo/README.md), e os outros
+  [`modulos/esboco-nucleo/README.md`](../../../modulos/esboco-nucleo/README.md), e os outros
   módulos no README de cada um; o que faz cada arquivo de `tools/` e `src/`
-  em [`../MAPA.md`](../MAPA.md).
+  em [`../MAPA.md`](../../MAPA.md).
 - Autoria de peça: contrato em `usar/AUTORIA-DE-PECA.md`, razões em `AUTORIA-IA.md`.
 - Carroceria e chapa contínua: a forma facetada pelas três vistas em
   [`modelar-veiculos.md`](modelar-veiculos.md), e a superfície lisa por
@@ -21,19 +21,19 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
   método: decidir forma, proporção e caráter não é problema diagnóstico, e
   eliminação ali rende consertos certos num objeto que continua ruim.
-- **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
-  O antigo [modelador por seleção](./historico/DOSSIE-MODELADOR-POR-SELECAO.md) é só histórico.
+- **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
+  O antigo [modelador por seleção](../historico/DOSSIE-MODELADOR-POR-SELECAO.md) é só histórico.
 - **Antes de abrir experimento novo:**
-  [`GOTCHAS-AUTORIA-VISUAL.md`](./usar/GOTCHAS-AUTORIA-VISUAL.md)
+  [`GOTCHAS-AUTORIA-VISUAL.md`](../usar/GOTCHAS-AUTORIA-VISUAL.md)
   (`docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md`), registro único e vivo do
   que já falhou — o de modelagem procedural foi fundido nele, e o
-  [canário de casco](./historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md), a
+  [canário de casco](../historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md), a
   evidência negativa mais recente. Rodada gasta redescobrindo algo já medido é
   falha V-31.
 - Peças versus montagens, composição e dependências:
   `MONTAGENS-SEMANTICAS.md` e `ARQUITETURA.md`.
-- Montagem persistida e contexto para IA: `MONTAGEM-PERSISTIDA-V1.md` a
-  `MONTAGEM-PERSISTIDA-V3.md` e `CONTEXTO-MONTAGEM-IA.md`.
+- Montagem persistida e contexto para IA: `MONTAGEM-PERSISTIDA.md` e
+  `CONTEXTO-MONTAGEM-IA.md`.
 - Programa MCP: `docs/modelar/planos/mcp/INDEX.md` e os planos datados
   encerrados. O programa MCP não é o roteiro mestre da autoria.
 - Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e

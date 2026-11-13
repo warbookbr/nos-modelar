@@ -8,7 +8,7 @@
 
 ## Problema observado
 
-A classe "construído e equipamento" da [lista de famílias](../../FAMILIAS-DE-OBJETOS.md) tem uns vinte grupos, e modelar cada objeto pelo
+A classe "construído e equipamento" da [lista de famílias](../../decisoes/FAMILIAS-DE-OBJETOS.md) tem uns vinte grupos, e modelar cada objeto pelo
 caminho do avião custa caro: cada peça dele levou de 400 mil a 1,5 milhão de tokens até o aceite
 ([plano do avião](2026-10-15-o-aviao-do-esboco-a-receita.md)), porque passou por alinhamento, esboço com crítico unidade por
 unidade, receita e várias rodadas de crítico visual. Um forninho elétrico pelo mesmo caminho custaria uma fração disso só por ser mais

@@ -44,7 +44,7 @@ export const ALLOWLIST_G1 = new Map([
     + 'usar cilindro não tinha como chegar nelas',
   ],
   [
-    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/ATRITOS-AUTORIA.md',
+    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/pesquisas/ATRITOS-AUTORIA.md',
     'aponta a lista detalhada e a evidência de cada atrito; a regra continua sendo a tabela local',
   ],
   [
@@ -63,7 +63,7 @@ export const ALLOWLIST_G1 = new Map([
     'a porta manda quem vai DESENVOLVER sair daqui; apontar a saída é o oposto de depender dela',
   ],
   [
-    'docs/modelar/usar/MONTAGENS-SEMANTICAS.md:docs/modelar/MONTAGEM-PERSISTIDA-V1.md',
+    'docs/modelar/usar/MONTAGENS-SEMANTICAS.md:docs/modelar/contratos/MONTAGEM-PERSISTIDA.md',
     'aponta o recorte executável do contrato; candidato a vir para usar/ quando alguma skill precisar dele',
   ],
   [

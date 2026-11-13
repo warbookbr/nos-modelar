@@ -13,7 +13,7 @@ A tese central é:
 
 Este arquivo registra como interpretar decisões, trade-offs, evidências e
 heurísticas. Ele não substitui [`VISAO.md`](VISAO.md),
-[`ARQUITETURA.md`](ARQUITETURA.md), [`AGENT-FIRST.md`](AGENT-FIRST.md), planos,
+[`ARQUITETURA.md`](../contratos/ARQUITETURA.md), [`AGENT-FIRST.md`](AGENT-FIRST.md), planos,
 issues ou o estado executável do repositório.
 
 Deliberadamente, este documento **não registra rodada atual, branch ativa,
@@ -24,7 +24,7 @@ devem permanecer nas fontes de estado e planejamento.
 
 Ao retomar uma decisão arquitetural importante:
 
-1. leia o estado atual no [`INDEX.md`](INDEX.md) e no plano ou issue canônica;
+1. leia o estado atual no [`INDEX.md`](../INDEX.md) e no plano ou issue canônica;
 2. use [`AGENT-FIRST.md`](AGENT-FIRST.md) como filtro normativo;
 3. use este documento para recuperar a calibração de julgamento e as lições já
    aprendidas;

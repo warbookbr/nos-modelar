@@ -61,7 +61,7 @@ const ALLOWLIST = new Map([
   /* O README do esboço antigo saiu com o módulo em 2026-11-05 (docs/modelar/historico/esboco-2d.md diz o commit que o guarda). As
      análises, a medição de tokens, a revisão de rumo e o plano encerrado que o citam são registro da época, e a medição de
      transcrição reconhece a leitura dele nas transcrições antigas. */
-  ['docs/modelar/ANALISES-DE-2026-10.md:modulos/esboco/README.md', 'análise de 2026-10 sobre o esboço antigo, que saiu em 2026-11-05'],
+  ['docs/modelar/pesquisas/ANALISES-DE-2026-10.md:modulos/esboco/README.md', 'análise de 2026-10 sobre o esboço antigo, que saiu em 2026-11-05'],
   ['docs/modelar/banco-de-provas/MEDICAO-DE-TOKENS-2026-10.md:modulos/esboco/README.md', 'medição encerrada de 2026-10; o README do esboço antigo saiu em 2026-11-05'],
   ['docs/modelar/historico/REVISAO-DE-RUMO-2026-10.md:modulos/esboco/README.md', 'revisão de rumo de 2026-10; o README do esboço antigo saiu em 2026-11-05'],
   ['docs/modelar/planos/encerrados/2026-10-07-o-caminho-curto-da-ia.md:modulos/esboco/README.md', 'plano encerrado; o README do esboço antigo saiu em 2026-11-05'],

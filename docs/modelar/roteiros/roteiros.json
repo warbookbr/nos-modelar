@@ -128,15 +128,15 @@
           "quando": "o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção"
         },
         {
-          "arquivo": "docs/modelar/ARQUITETURA.md",
+          "arquivo": "docs/modelar/contratos/ARQUITETURA.md",
           "quando": "a mudança atravessa camadas"
         },
         {
-          "arquivo": "docs/modelar/UPSTREAM-NOS.md",
+          "arquivo": "docs/modelar/decisoes/UPSTREAM-NOS.md",
           "quando": "a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele"
         },
         {
-          "arquivo": "docs/modelar/LEITURA-POR-TAREFA.md",
+          "arquivo": "docs/modelar/contratos/LEITURA-POR-TAREFA.md",
           "quando": "a pergunta é por assunto e nenhum roteiro a responde"
         }
       ],
@@ -165,7 +165,7 @@
       ],
       "sobDemanda": [
         {
-          "arquivo": "docs/modelar/ARQUITETURA.md",
+          "arquivo": "docs/modelar/contratos/ARQUITETURA.md",
           "quando": "a correção atravessa camadas"
         },
         {
@@ -209,7 +209,7 @@
           "quando": "o documento vai para o histórico"
         },
         {
-          "arquivo": "docs/modelar/LEITURA-POR-TAREFA.md",
+          "arquivo": "docs/modelar/contratos/LEITURA-POR-TAREFA.md",
           "quando": "a pergunta é por assunto e nenhum roteiro a responde"
         }
       ],
@@ -241,11 +241,11 @@
           "quando": "a pergunta é sobre um plano concluído ou cancelado"
         },
         {
-          "arquivo": "docs/modelar/PESQUISA-ABERTA-2026-10.md",
+          "arquivo": "docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md",
           "quando": "a pergunta é sobre ferramentas de outros projetos"
         },
         {
-          "arquivo": "docs/modelar/FERRAMENTAS-POR-OBJETO.md",
+          "arquivo": "docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md",
           "quando": "a pergunta é que ferramenta cada objeto pede"
         },
         {
@@ -253,7 +253,7 @@
           "quando": "a pergunta é quanto custou modelar um objeto"
         },
         {
-          "arquivo": "docs/modelar/ANALISES-DE-2026-10.md",
+          "arquivo": "docs/modelar/pesquisas/ANALISES-DE-2026-10.md",
           "quando": "a pergunta é sobre a avaliação da estrutura do projeto"
         },
         {
@@ -365,11 +365,11 @@
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
         {
-          "arquivo": "docs/modelar/modelar-carroceria.md",
+          "arquivo": "docs/modelar/contratos/modelar-carroceria.md",
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
-          "arquivo": "docs/modelar/modelar-veiculo-em-chassi-e-lataria.md",
+          "arquivo": "docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md",
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
@@ -485,11 +485,11 @@
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
         {
-          "arquivo": "docs/modelar/modelar-carroceria.md",
+          "arquivo": "docs/modelar/contratos/modelar-carroceria.md",
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
-          "arquivo": "docs/modelar/modelar-veiculo-em-chassi-e-lataria.md",
+          "arquivo": "docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md",
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
@@ -605,11 +605,11 @@
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
         {
-          "arquivo": "docs/modelar/modelar-carroceria.md",
+          "arquivo": "docs/modelar/contratos/modelar-carroceria.md",
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
-          "arquivo": "docs/modelar/modelar-veiculo-em-chassi-e-lataria.md",
+          "arquivo": "docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md",
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {

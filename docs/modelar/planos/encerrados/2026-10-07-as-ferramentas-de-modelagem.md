@@ -15,7 +15,7 @@ crítico calibrado.
 ## Problema observado
 
 O Mecanifica deve deixar uma IA modelar os objetos da [lista de
-famílias](../../FAMILIAS-DE-OBJETOS.md) melhor, mais barato e com mais confiança,
+famílias](../../decisoes/FAMILIAS-DE-OBJETOS.md) melhor, mais barato e com mais confiança,
 e hoje quatro coisas impedem isso. O esboço e o núcleo são dois motores, com
 unidades, formas, encaixe e gate próprios, e o que o esboço decide é refeito na
 modelagem; o esboço, que deveria ser leve e barato, saiu mais caro que o núcleo
@@ -24,12 +24,12 @@ por grupo, região, origem, porta e alias, mas várias operações ainda pedem
 identificador de vértice ou face, e não há seleção por propriedade geométrica,
 perfil 2D com furo nem curva com arco, de modo que a IA escreve contas e números
 à mão na receita. Faltam as ferramentas que cobrem a lista: a [contagem por
-objeto](../../FERRAMENTAS-POR-OBJETO.md) põe casca com espessura em 125 objetos,
+objeto](../../pesquisas/FERRAMENTAS-POR-OBJETO.md) põe casca com espessura em 125 objetos,
 articulações em 93, estrutura de barras em 72 e chapa dobrada em 62, e a casca e
 a chapa não existem. E a verificação já tem peças que medem contra referência
 externa, mas elas não estão no caminho de toda peça: na prática a régua compara a
 peça contra a declaração dela, e o crítico visual é o único juiz da semelhança.
-As [análises de 2026-10](../../ANALISES-DE-2026-10.md) detalham cada ponto.
+As [análises de 2026-10](../../pesquisas/ANALISES-DE-2026-10.md) detalham cada ponto.
 
 Em 2026-10-08, a caçamba do carrinho de mão pediu uma bacia oca de parede
 inclinada e contorno em D, que o `loft` do esboço (só seção convexa) e a

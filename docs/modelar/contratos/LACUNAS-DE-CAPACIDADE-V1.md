@@ -8,7 +8,7 @@ receita. A borda que consulta o motor decide onde guardar o JSON produzido por
 `criarLacunaCapacidade`.
 
 O formato é `mecanifica.lacuna-capacidade@1`; seu schema gerado está em
-[`gerado/lacuna-capacidade.schema.json`](gerado/lacuna-capacidade.schema.json).
+[`gerado/lacuna-capacidade.schema.json`](../gerado/lacuna-capacidade.schema.json).
 
 ## Dados exigidos
 

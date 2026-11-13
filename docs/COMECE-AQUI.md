@@ -20,7 +20,7 @@ constrói, e rodar o mesmo arquivo dá sempre o mesmo resultado. Esse arquivo é
 
 O repositório reúne o núcleo geométrico, que executa as operações de construção
 sem saber que objeto está construindo, as receitas do acervo, a
-[bancada](modelar/BANCADA-E-APRESENTACAO.md), que é a página 3D onde a peça é
+[bancada](modelar/contratos/BANCADA-E-APRESENTACAO.md), que é a página 3D onde a peça é
 inspecionada, e as ferramentas que medem e validam o resultado. Os agentes
 escrevem as receitas e conferem o que saiu com números e imagens. A pessoa
 decide o que modelar, escolhe entre opções de forma e aprova a forma olhando as
@@ -47,7 +47,7 @@ passaram pelas verificações automáticas. Nenhuma peça é um modelo final par
 fora do projeto: cada uma existe para provar uma capacidade do núcleo e pode
 mudar ou sair sem aviso.
 
-Há 7 [famílias](modelar/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
+Há 7 [famílias](modelar/decisoes/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
 gera objetos parecidos a partir de poucos números: roda com pneu, dobradiça,
 cilindro hidráulico, móvel de caixa, superfície aerodinâmica, aparelho de caixa
 e cadeira. A família de aparelho de caixa, por exemplo, gera o forno elétrico,
@@ -198,11 +198,11 @@ serve para mostrar o caráter da forma e nunca como fonte de medida.
 - Backlog: a lista de ideias candidatas em
   [`BACKLOG.md`](modelar/planos/BACKLOG.md), que não autoriza trabalho sozinha.
 - Bancada: a página 3D onde a peça é inspecionada, medida e ajustada à mão
-  ([arquitetura](modelar/BANCADA-E-APRESENTACAO.md)).
+  ([arquitetura](modelar/contratos/BANCADA-E-APRESENTACAO.md)).
 - Crítico cego: o agente que recebe só as imagens da peça e da referência e
   devolve nota e defeitos ([o laço do crítico](modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico)).
 - Família: um código que gera objetos parecidos a partir de poucos números
-  ([famílias de objetos](modelar/FAMILIAS-DE-OBJETOS.md)).
+  ([famílias de objetos](modelar/decisoes/FAMILIAS-DE-OBJETOS.md)).
 - Gate: uma verificação automática que recusa a mudança que fere uma regra,
   rodada por `npm run gates` ([lista](modelar/INDEX.md#gates-completos)).
 - Montagem: o objeto feito de várias peças encaixadas

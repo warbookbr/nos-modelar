@@ -4075,7 +4075,7 @@ describe('as mensagens de seleção ensinam os OITO seletores', () => {
 });
 
 /* ---------------------------------------------------------------------------
-   Endereços semânticos v1 — A-18, A-19 e A-20 de docs/modelar/ATRITOS-AUTORIA.md.
+   Endereços semânticos v1 — A-18, A-19 e A-20 de docs/modelar/pesquisas/ATRITOS-AUTORIA.md.
    Cada bloco abaixo falha no código anterior a esta rodada: os três geradores
    só sabiam citar a primitiva inteira (A-18), o eixo só aceitava inteiro
    literal (A-19) e `nucleo` não devolvia as portas (A-20).

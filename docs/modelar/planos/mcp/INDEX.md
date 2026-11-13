@@ -18,7 +18,7 @@ MCP é uma porta de acesso para agentes. Ele não é:
 - a arquitetura completa de autoria.
 
 As capacidades e invariantes da autoria são definidas em
-[`AUTORIA-IA.md`](../../AUTORIA-IA.md) e
+[`AUTORIA-IA.md`](../../contratos/AUTORIA-IA.md) e
 [`MONTAGENS-SEMANTICAS.md`](../../usar/MONTAGENS-SEMANTICAS.md). O programa MCP só
 pode expor essas capacidades depois que elas existirem como serviços com
 contratos próprios.
