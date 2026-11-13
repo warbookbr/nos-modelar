@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2081 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1994 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1277,8 +1277,6 @@
 
 ## procedural/pecas/aviao/partes/asas/rodadas/
 
-- `receita-01.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada, os flaps, os ailerons, os eixos deles e os suportes, na pose de pouso, …
-- `receita-02.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada e arredondada, os flaps, os ailerons, os eixos deles, os suportes e a ca…
 - `receita-03.js` — aviao/asas — as duas metades da asa do avião de pequeno porte, com a ponta levantada e arredondada, os flaps, os ailerons, os eixos deles, os suportes e a ca…
 
 ## procedural/pecas/aviao/partes/empenagem-horizontal/
@@ -1287,9 +1285,6 @@
 
 ## procedural/pecas/aviao/partes/empenagem-horizontal/rodadas/
 
-- `receita-01.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
-- `receita-02.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
-- `receita-03.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
 - `receita-04.js` — aviao/empenagem-horizontal — as duas metades do estabilizador do avião de pequeno porte, com os profundores, os eixos deles e os suportes, na pose de pouso, …
 
 ## procedural/pecas/aviao/partes/empenagem-vertical/
@@ -1298,9 +1293,6 @@
 
 ## procedural/pecas/aviao/partes/empenagem-vertical/rodadas/
 
-- `receita-01.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
-- `receita-02.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
-- `receita-03.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
 - `receita-04.js` — aviao/empenagem-vertical — a deriva do avião de pequeno porte, com a dorsal, o leme, o eixo dele e as dobradiças, na pose de pouso, com o leme neutro.
 
 ## procedural/pecas/aviao/partes/fuselagem/
@@ -1309,8 +1301,6 @@
 
 ## procedural/pecas/aviao/partes/fuselagem/rodadas/
 
-- `receita-01.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral.
-- `receita-02.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa e o montante, as oito janelas, a porta traseira e a barbatana ventral.
 - `receita-03.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa rente e o montante dele, as oito janelas, a porta traseira e a barbatana ventral.
 
 ## procedural/pecas/aviao/partes/helice/
@@ -1327,7 +1317,6 @@
 
 ## procedural/pecas/aviao/partes/motor/rodadas/
 
-- `receita-01.js` — aviao/motor — o capô do motor do avião de pequeno porte, com a entrada de ar sob ele e os dois escapes laterais.
 - `receita-02.js` — aviao/motor — o capô do motor do avião de pequeno porte, com a entrada de ar sob ele e os dois escapes laterais.
 
 ## procedural/pecas/aviao/partes/trem-do-nariz/
@@ -1336,8 +1325,6 @@
 
 ## procedural/pecas/aviao/partes/trem-do-nariz/rodadas/
 
-- `receita-01.js` — aviao/trem-do-nariz — o trem do nariz do avião de pequeno porte baixado, na pose de pouso: a carenagem, o pivô e os mancais, a alavanca e o atuador, o compas…
-- `receita-02.js` — aviao/trem-do-nariz — o trem do nariz do avião de pequeno porte baixado, na pose de pouso: a carenagem, o pivô e os mancais, a alavanca e o atuador, o compas…
 - `receita-03.js` — aviao/trem-do-nariz — o trem do nariz do avião de pequeno porte baixado, na pose de pouso: a carenagem, o pivô e os mancais, a alavanca e o atuador, o compas…
 
 ## procedural/pecas/aviao/partes/trens-principais/
@@ -1346,7 +1333,6 @@
 
 ## procedural/pecas/aviao/partes/trens-principais/rodadas/
 
-- `receita-01.js` — aviao/trens-principais — os dois trens principais do avião de pequeno porte baixados, na pose de pouso: em cada um a perna, o pino do pivô, a coroa, o garfo …
 - `receita-02.js` — aviao/trens-principais — os dois trens principais do avião de pequeno porte baixados, na pose de pouso: em cada um a perna, o pino do pivô, a coroa, o garfo …
 
 ## procedural/pecas/balcao-de-bar/
@@ -1395,7 +1381,6 @@
 
 ## procedural/pecas/braco-robotico/partes/anel-cintura/rodadas/
 
-- `receita-01.js` — braco-robotico/anel-cintura — o anel escuro da cintura, sobre a base.
 - `receita-02.js` — braco-robotico/anel-cintura — o anel escuro da cintura, sobre a base.
 
 ## procedural/pecas/braco-robotico/partes/anel-punho-4/
@@ -1420,9 +1405,6 @@
 
 ## procedural/pecas/braco-robotico/partes/base/rodadas/
 
-- `receita-01.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
-- `receita-02.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
-- `receita-03.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
 - `receita-04.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
 
 ## procedural/pecas/braco-robotico/partes/braco/
@@ -1431,10 +1413,6 @@
 
 ## procedural/pecas/braco-robotico/partes/braco/rodadas/
 
-- `receita-01.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
-- `receita-02.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
-- `receita-03.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
-- `receita-04.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
 - `receita-05.js` — braco-robotico/braco — a coluna redonda e reta, à frente do ombro.
 
 ## procedural/pecas/braco-robotico/partes/elo-punho-4/
@@ -1459,27 +1437,10 @@
 
 ## procedural/pecas/braco-robotico/partes/ombro-tambor/rodadas/
 
-- `receita-01.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
-- `receita-02.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
-- `receita-03.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-04.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-05.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-06.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-07.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 - `receita-08.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 
 ## procedural/pecas/braco-robotico/partes/ombro/rodadas/
 
-- `receita-01.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
-- `receita-02.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
-- `receita-03.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-04.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-05.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-06.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-07.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-08.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
-- `receita-09.js` — braco-robotico/ombro — ombro escolhido pela pessoa em 2026-09-28 (L de ponta-cabeça sobre o anel da cintura) e redimensionado em 2026-11-03, opção B: seção d…
-- `receita-10.js` — braco-robotico/ombro — volta ao desenho aceito pela pessoa em 2026-09-29 (receita do commit ec06c461) no tamanho da opção B de 2026-11-03: 190 mm de largura,…
 - `receita-11.js` — braco-robotico/ombro — volta ao desenho aceito pela pessoa em 2026-09-29 (receita do commit ec06c461) no tamanho da opção B de 2026-11-03: 190 mm de largura,…
 
 ## procedural/pecas/braco-robotico/referencias/frontal.pacote/
@@ -1553,10 +1514,6 @@
 
 ## procedural/pecas/carrinho-de-mao/partes/cacamba/rodadas/
 
-- `receita-01.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
-- `receita-02.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
-- `receita-03.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
-- `receita-04.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 - `receita-05.js` — carrinho-de-mao/cacamba — a caçamba do carrinho de mão: a casca de chapa estampada de 1,5 mm, aberta em cima, mais larga atrás e afinando arredondada para a …
 
 ## procedural/pecas/carrinho-de-mao/partes/chassi/
@@ -1569,8 +1526,6 @@
 
 ## procedural/pecas/carrinho-de-mao/partes/chassi/rodadas/
 
-- `receita-01.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
-- `receita-02.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
 - `receita-03.js` — carrinho-de-mao/chassi — o chassi do carrinho de mão de obra: o tubo de aço redondo único, dobrado, com os punhos de borracha nas manoplas, os dois mancais s…
 
 ## procedural/pecas/carrinho-de-mao/partes/pes/
@@ -1579,8 +1534,6 @@
 
 ## procedural/pecas/carrinho-de-mao/partes/pes/rodadas/
 
-- `receita-01.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
-- `receita-02.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
 - `receita-03.js` — carrinho-de-mao/pes — os pés do carrinho de mão: de cada lado um V de tubo de Ø 22 sob o braço, com o fundo arredondado no chão, e as duas travessas de chapa…
 
 ## procedural/pecas/carrinho-de-mao/partes/roda/
@@ -1701,7 +1654,6 @@
 
 ## procedural/pecas/empilhadeira/partes/alca/rodadas/
 
-- `receita-01.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
 - `receita-02.js` — empilhadeira/alca — as duas alças de acesso da empilhadeira, uma atrás de cada coluna da frente do protetor, numa peça rígida presa ao protetor.
 
 ## procedural/pecas/empilhadeira/partes/banco/
@@ -1710,8 +1662,6 @@
 
 ## procedural/pecas/empilhadeira/partes/banco/rodadas/
 
-- `receita-01.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
-- `receita-02.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
 - `receita-03.js` — empilhadeira/banco — o banco do operador da empilhadeira: o assento e o encosto, numa peça rígida sobre a tampa do motor.
 
 ## procedural/pecas/empilhadeira/partes/canal-interno/
@@ -1735,8 +1685,6 @@
 
 ## procedural/pecas/empilhadeira/partes/carcaca/rodadas/
 
-- `receita-01.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
-- `receita-02.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
 - `receita-03.js` — empilhadeira/carcaca — a carcaça da empilhadeira de contrapeso de 2,5 t: chassi, laterais, paralamas, piso com o tapete e os degraus, painel, tampa do motor,…
 
 ## procedural/pecas/empilhadeira/partes/carro/
@@ -1785,7 +1733,6 @@
 
 ## procedural/pecas/empilhadeira/partes/eixo-dianteiro/rodadas/
 
-- `receita-01.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
 - `receita-02.js` — empilhadeira/eixo-dianteiro — o eixo dianteiro motriz da empilhadeira: o tubo de Ø 150 de flange a flange com o bojo do diferencial no meio e os dois assento…
 
 ## procedural/pecas/empilhadeira/partes/eixo-traseiro/
@@ -1802,7 +1749,6 @@
 
 ## procedural/pecas/empilhadeira/partes/escape/rodadas/
 
-- `receita-01.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
 - `receita-02.js` — empilhadeira/escape — o tubo de escape da empilhadeira: o tubo de pé na tampa do capô, atrás da coluna de trás do lado direito do protetor, com a ponta curva…
 
 ## procedural/pecas/empilhadeira/partes/garfo/
@@ -1819,7 +1765,6 @@
 
 ## procedural/pecas/empilhadeira/partes/glp/rodadas/
 
-- `receita-01.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
 - `receita-02.js` — empilhadeira/glp — o cilindro de GLP da empilhadeira, deitado de través sobre a tampa do capô, com o berço e as duas cintas, numa peça rígida sobre o contrap…
 
 ## procedural/pecas/empilhadeira/partes/protetor/
@@ -1828,7 +1773,6 @@
 
 ## procedural/pecas/empilhadeira/partes/protetor/rodadas/
 
-- `receita-01.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
 - `receita-02.js` — empilhadeira/protetor — o protetor do operador da empilhadeira: as quatro colunas, o quadro do teto com as travessas, a grade do teto, as luzes de trabalho, …
 
 ## procedural/pecas/empilhadeira/partes/roda-dianteira/
@@ -1837,7 +1781,6 @@
 
 ## procedural/pecas/empilhadeira/partes/roda-dianteira/rodadas/
 
-- `receita-01.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
 - `receita-02.js` — empilhadeira/roda-dianteira — a roda dianteira da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 705 e banda de 250 mm (o 7.00-12 d…
 
 ## procedural/pecas/empilhadeira/partes/roda-traseira/
@@ -1846,7 +1789,6 @@
 
 ## procedural/pecas/empilhadeira/partes/roda-traseira/rodadas/
 
-- `receita-01.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
 - `receita-02.js` — empilhadeira/roda-traseira — a roda traseira direcional da empilhadeira pela família `roda-pneu`: o pneu pneumático industrial de Ø 568 e banda de 208 mm no …
 
 ## procedural/pecas/empilhadeira/partes/torre/
@@ -1917,27 +1859,6 @@
 
 ## procedural/pecas/furgao-realista/rodadas/
 
-- `receita-01.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 1 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-02.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-03.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-04.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-05.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 2 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-06.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-07.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-08.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-09.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-10.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-11.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-12.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-13.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-14.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 3 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-15.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-16.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-17.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-18.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-19.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-20.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
-- `receita-21.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 - `receita-22.js` — furgao-realista — furgão médio de teto alto com cabine de bico curto, na etapa 5 de 7 da modelagem (plano docs/modelar/planos/2026-10-30-furgao-realista.md, …
 
 ## procedural/pecas/furgao/referencias/
@@ -2155,8 +2076,6 @@
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/carroceria/rodadas/
 
-- `receita-01.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
-- `receita-02.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
 - `receita-03.js` — sedan-chassi-e-lataria/carroceria — a carroceria do sedã sem frente, traseira, vidros, rodas e acessórios: os painéis da lataria de baixo cortados da chapa (…
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/
@@ -2165,9 +2084,6 @@
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/frente-e-traseira/rodadas/
 
-- `receita-01.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
-- `receita-02.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
-- `receita-03.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 - `receita-04.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/
@@ -2176,7 +2092,6 @@
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/rodadas/
 
-- `receita-01.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
 - `receita-02.js` — sedan-chassi-e-lataria/rodas — as quatro rodas do sedã, cada uma de pneu, aro, disco e cubo, pela família roda-pneu: pneu de 728 mm de diâmetro e 205 de banda.
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/
@@ -2185,8 +2100,6 @@
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/vidros/rodadas/
 
-- `receita-01.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
-- `receita-02.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
 - `receita-03.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
 
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/

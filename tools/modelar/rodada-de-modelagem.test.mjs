@@ -136,6 +136,18 @@ describe('diferença da receita e nota de passagem', () => {
     ]);
   });
 
+  it('só a cópia da última rodada fica na pasta, e a diferença de cada rodada continua no registro', () => {
+    const pasta = join(area, 'peca-de-ensaio');
+    gravarCom('const a = 1;\n');
+    gravarCom('const a = 2;\n');
+    const terceira = gravarCom('const a = 3;\n').rodada;
+    expect(existsSync(join(pasta, 'receita-01.js'))).toBe(false);
+    expect(existsSync(join(pasta, 'receita-02.js'))).toBe(false);
+    expect(readFileSync(join(pasta, 'receita-03.js'), 'utf8')).toBe('const a = 3;\n');
+    expect(terceira.receita.diferenca).toMatchObject({ primeira: false, removidas: 1, acrescentadas: 1 });
+    expect(existsSync(join(pasta, 'rodada-01.json'))).toBe(true);
+  });
+
   it('guarda a nota de passagem e recusa nota vazia', () => {
     const { rodada } = gravarCom('x', { notaDePassagem: '  folga de 0,2 porque o pino é retificado  ' });
     expect(rodada.notaDePassagem).toBe('folga de 0,2 porque o pino é retificado');

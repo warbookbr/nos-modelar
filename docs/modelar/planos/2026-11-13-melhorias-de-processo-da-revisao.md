@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/REGRAS-DOS-AGENTES.md`, `docs/modelar/MECANISMOS.md`, `README.md`, `docs/modelar/INDEX.md`
+**Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/REGRAS-DOS-AGENTES.md`, `docs/modelar/MECANISMOS.md`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `README.md`, `docs/modelar/INDEX.md`
 
 **Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13.
 
@@ -31,6 +31,8 @@ USAR DIRETO: a bateria `tools/gates.mjs` com o seletor do que mudou, o registro 
 7. O diário de atritos ganha um formato com quatro campos (o que aconteceu com o comando, o custo, se o processo pegou e o destino), escrito em `.claude/REGRAS-DOS-AGENTES.md`, porque nenhuma skill manda registrar o diário do objeto; os diários antigos não são reescritos.
 8. A página `docs/modelar/MECANISMOS.md`, de uma tela, com cada mecanismo, o que faz, quando é usado e onde mora, e a conferência que acusa mecanismo novo fora da lista.
 
+9. A ferramenta de rodadas guarda só a cópia da receita da última rodada, e as cópias antigas saem do acervo; em cada pasta de peça este plano tira só esses arquivos. Entrou no lugar de tirar as rodadas do furgão à mão, que a revisão recomendava: a correção foi para a ferramenta. Feita em 2026-11-13: 87 cópias e 51.159 linhas a menos em 42 pastas, com a diferença de cada rodada mantida no registro.
+
 Estado em 2026-11-13. Feitas por três agentes e conferidas por quem conduz: a fatia 1 (`tools/gates/guarda-local.mjs`, com a guarda de cada peça mudada e o limite de 60 s); a fatia 4 (regra `merge=union` para o mapa no `.gitattributes`, com `npm run mapa` depois de toda junção, e `npm run planos:gerar` para as linhas do `README.md` e do `INDEX.md`); a fatia 5 (a régua da fronteira em `independencia-catalogo.mjs`, com 67 arquivos e 113 imports conferidos, e as cinco extensões no catálogo). Feita por quem conduz: a fatia 3. A fatia 2 fechou em duas rodadas: o teto relativo, e depois o histórico de durações circulando no CI pelo cache, por modo, parte e ramo, o prazo padrão do vitest de 180 s para 900 s como guarda contra travamento, e a razão do furgão no `acervo-real` como aviso; o cache só se prova no CI, e a main não alimenta o histórico porque o avanço dela não dispara a bateria. Feita em parte: a fatia 8, com a página escrita e a conferência por fazer. As fatias 6 e 7 foram fechadas por quem conduz: as cinco definições de agente citam o arquivo de regras, e o formato do diário de atritos está nele.
 
 ## Excluído
@@ -38,7 +40,6 @@ Estado em 2026-11-13. Feitas por três agentes e conferidas por quem conduz: a f
 - as mudanças de núcleo, que são do [plano do núcleo para quem escreve receita](2026-11-13-nucleo-para-quem-escreve-receita.md);
 - a avaliação de cada gate e teste, que é do [plano das verificações](2026-11-13-revisao-das-verificacoes-e-dos-testes.md);
 - a régua única de face degenerada, que é do [plano das costuras](2026-11-09-costuras-e-furos-limpos.md);
-- tirar as rodadas antigas do furgão, que é correção pontual dentro do [plano do furgão](2026-10-30-furgao-realista.md);
 - a reorganização das pastas de documento e a saída de manual, que terão plano próprio.
 
 ## Invariantes

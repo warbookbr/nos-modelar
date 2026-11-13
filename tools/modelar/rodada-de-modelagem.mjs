@@ -44,7 +44,7 @@
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]   os pedidos de alteração da pessoa, contados por etapa
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LIMITE_DE_RODADAS, acaoDaReceita, defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
@@ -154,7 +154,13 @@ export function gravarRodada(
      assim. */
   if (existsSync(arquivo)) throw new Error(`a rodada ${rodada.numero} de '${peca}' já foi gravada.`);
   writeFileSync(arquivo, `${JSON.stringify(rodada, null, 2)}\n`, 'utf8');
-  if (receitaTexto !== null) writeFileSync(copiaDaReceita(pasta, numero), ajustarImportsDaCopia(receitaTexto), 'utf8');
+  if (receitaTexto !== null) {
+    writeFileSync(copiaDaReceita(pasta, numero), ajustarImportsDaCopia(receitaTexto), 'utf8');
+    /* SÓ A ÚLTIMA CÓPIA FICA. A cópia da rodada N serve à diferença da rodada N+1 e à comparação da forma julgada com a atual; a das
+       rodadas anteriores não é lida por nada, e a diferença de cada uma já está no registro. Em 2026-11-13 o acervo guardava 129 cópias
+       e 62 mil linhas delas, um terço do código das peças, que a busca por texto e o build atravessavam. */
+    for (let n = 1; n < numero; n += 1) rmSync(copiaDaReceita(pasta, n), { force: true });
+  }
   return { rodada, arquivo };
 }
 
