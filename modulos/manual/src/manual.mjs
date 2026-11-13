@@ -16,7 +16,7 @@ import { carregadoresDeReceitas } from '../../../tools/modelar/peca-com-parametr
 import { REPO } from '../../../tools/modelar/resolver-caminho-receita.mjs';
 import { comNomesExibidos, listaEmJson, listaEmMarkdown, listarPecas, nomeDeExibicao } from './lista-de-pecas.js';
 import { paginaDoManual } from './pagina.js';
-import { montagemDoPasso, passosDaMontagem } from './passos.js';
+import { FOCO_DO_PASSO, montagemDoPasso, passosDaMontagem } from './passos.js';
 
 export const SAIDA_PADRAO = join(REPO, 'tools/bancadas/out');
 export const VISTAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
@@ -98,7 +98,7 @@ export async function gerarManual(arquivo, opcoes = {}) {
       for (let i = 0; i < passos.length; i += 1) {
         const t0 = performance.now();
         const captura = await capturador.capturar({
-          montagem: montagemDoPasso(resolvida, passos, i, cache), vistas: [vista], projecao: 'ortografica', largura, folga, foco: passos[i].etapas,
+          montagem: montagemDoPasso(resolvida, passos, i, cache), vistas: [vista], projecao: 'ortografica', largura, folga, foco: [FOCO_DO_PASSO],
         });
         if (!captura.ok) throw new Error(`a imagem do passo ${i + 1} ('${passos[i].etapas.join(', ')}') falhou: ${captura.erro.mensagem}`);
         imagemDe.set(i, captura.resultado.capturas[0].dados);

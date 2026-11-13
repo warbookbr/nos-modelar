@@ -6,6 +6,8 @@ import { chaveDaPeca, instanciasDePeca, listarPecas } from './lista-de-pecas.js'
 
 export const COR_DO_DESTAQUE = '#e8590c';
 export const COR_DO_FUNDO = '#dce2df';
+/** O caminho que a captura usa como foco para enquadrar todas as instâncias do passo (as do destaque). */
+export const FOCO_DO_PASSO = 'passo-em-destaque';
 const COR_SEM_DECLARACAO = '#9aa3a0';
 const FRACAO_DO_ESMAECIDO = 0.72;
 
@@ -91,9 +93,12 @@ export function montagemDoPasso(montagem, passos, indice, cache = new Map()) {
   const pintada = (instancia, modo, corDe) => {
     const chave = `${instancia.id}\u0000${modo}`;
     if (cache.has(chave)) return cache.get(chave);
+    /* As instâncias do destaque ganham o prefixo FOCO_DO_PASSO no caminho (que só identifica a instância; a pose é a de
+       mundo), para a captura, que enquadra um caminho só, enquadrar o grupo inteiro. */
+    const prefixo = modo === 'destaque' ? [FOCO_DO_PASSO] : [];
     const pinta = (item) => (item.alvo.tipo === 'montagem'
-      ? { ...item, montagem: { ...item.montagem, instancias: item.montagem.instancias.map(pinta) } }
-      : { ...item, definicao: { ...item.definicao, neutro: neutroPintado(item.definicao.neutro, corDe) } });
+      ? { ...item, caminho: [...prefixo, ...item.caminho], montagem: { ...item.montagem, instancias: item.montagem.instancias.map(pinta) } }
+      : { ...item, caminho: [...prefixo, ...item.caminho], definicao: { ...item.definicao, neutro: neutroPintado(item.definicao.neutro, corDe) } });
     const resultado = pinta(instancia);
     cache.set(chave, resultado);
     return resultado;
