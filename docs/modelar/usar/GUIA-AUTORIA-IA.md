@@ -72,6 +72,7 @@ Dois limites que só aparecem quando a peça roda. Cada texto do `PLANO` (o `obj
 
 A parte do `PLANO` que promete feição de poucos milímetros (raio, rebaixo, friso) declara `dePerto: [{ ponto: [x, y, z], oQue, distancia? }]`, até quatro entradas com o ponto em mm do referencial da peça; o pedido ao crítico ganha uma vista de perto de cada uma, e sem ela a feição não se julga.
 
+A receita que usa uma operação de composição (`furoPassante`, `corpoPorFatias`, `chapaDeContorno`, ...) exporta `COMPOSICOES`, a lista de `{ operacao, resultado, parte? }` do que ela devolveu, e o `descrever` mostra os avisos de cada uma (`resultado.avisos` e a conferência da operação) sem reprovar.
 
 ## 3. Regras críticas de seleção e sintaxe
 

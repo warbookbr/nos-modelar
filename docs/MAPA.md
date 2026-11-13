@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1866 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1869 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2514,6 +2514,10 @@
 - `materializar-catalogo.mjs` — Materializa o conjunto do eixo como catálogo MCP descartável, na pasta passada como argumento. O destino é obrigatório: gravar dentro do repositório por omis…
 - `suporte-de-eixo.js` — suporte-de-eixo.js — suporte com alojamento, piloto e assento anular, do conjunto de prova descrito em `eixo-guia.js`.
 
+## tools/fixtures/corpo-por-fatias/ponto-perdido/
+
+- `receita.js` — ponto-perdido/receita.js — peça de prova da porta de avisos das operações de composição: um cilindro de 40 pontos por fatia feito por `corpoPorFatias` com a …
+
 ## tools/fixtures/costuras-e-furos/
 
 - `medir.mjs` — medir.mjs — executa uma peça de prova de `tools/fixtures/costuras-e-furos/` e devolve os números das três réguas de malha mais a contagem de arestas soltas, …
@@ -2950,6 +2954,7 @@
 - `autoria-montagem.test.ts` — Provas R02: planejar, confirmar, validar e materializar montagem persistida.
 - `autoria-receita.mjs` — autoria-receita.mjs — autoria declarativa de receitas, sem avaliar JavaScript.
 - `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
+- `avisos-de-composicao.mjs` — avisos-de-composicao.mjs — a porta pela qual os avisos das operações de composição do núcleo chegam a quem escreve a receita.
 - `banco-de-provas.mjs` — Catálogo e registro de custo do banco de provas de modelagem. Compara autonomia, rodadas, notas e tokens consumidos entre o início e o fim do plano de ferram…
 - `banco-de-provas.test.mjs` — Testes do catálogo do banco de provas e registro de custo de modelagem. Valida esquema de medições, agregação de custo por objeto e cobertura de ferramentas …
 - `booleana-colinear.test.mjs` — booleana-colinear.test.mjs — caso 1 do plano de ajustes no núcleo, fatia 10: o perfil da perua menos dois cilindros de 8 lados. A faceta de cada cilindro den…
@@ -2998,6 +3003,7 @@
 - `derivar-catalogo-montagens.test.ts` — Prova catálogo global confinado às raízes explicitamente resolvidas.
 - `derivar-impacto-montagem.test.ts` — Prova mapa de impacto local, direto, indireto e determinístico.
 - `derivar-roteiro-revalidacao.test.ts` — Prova roteiro de revalidação assistida, sem correção ou veredito global.
+- `descrever-composicoes.test.mjs` — descrever-composicoes.test.mjs — a porta de avisos das operações de composição no `descrever`: o que o resultado da operação traz e o que a conferência dela …
 - `descrever-gesto.mjs` — descrever-gesto.mjs — ler a edição da bancada em palavras, antes de reescrever.
 - `descrever-montagem-persistida.mjs` — descrever-montagem-persistida.mjs — CLI confinada do contexto JSON para IA.
 - `descrever-montagem-persistida.test.ts` — Prova a CLI confinada que descreve montagem persistida arbitrária em JSON.
