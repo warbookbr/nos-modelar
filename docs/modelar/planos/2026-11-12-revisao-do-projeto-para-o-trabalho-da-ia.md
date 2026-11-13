@@ -1,10 +1,10 @@
 # Revisão do projeto para o trabalho da IA: o que protege, o que só custa, e se a organização e o núcleo servem a quem desenvolve
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar o plano. A análise não muda código nem regra; só o relatório dela entra no repositório.
+**Território:** `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/`. A análise não muda código nem regra: só o relatório e as medidas dela entram no repositório, nessa pasta; a execução sai em planos próprios, com território.
 
-**Responsável:** a definir entre as duas sessões que trabalham no repositório, com a decisão de cada grupo de achados com a pessoa.
+**Responsável:** a IA da sessão do núcleo planeja e orquestra, com agentes em paralelo, por decisão da pessoa em 2026-11-13; a sessão do furgão levanta a metade dela e revisa a outra; a decisão de cada grupo de achados é da pessoa.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-12.
 
@@ -56,12 +56,16 @@ sai; cada mudança aprovada vira plano próprio ou correção pontual.
    exportação) é módulo, ao lado dos exportadores; repetição barata (uma peça modelada e muitas posicionadas) e função geral
    de reuso são do núcleo, quando um caso real pedir. Desta pergunta sai a decisão sobre um roadmap de famílias.
 
-## Perguntas à pessoa antes de ativar
+## Ativação e norte
 
-O que mais incomoda hoje, em termos concretos: demora, retrabalho, perguntas demais, custo, ou o projeto difícil de entender.
-Se entre rapidez e segurança contra regressão há uma preferência. Se a bancada e o produto entram na análise ou só o que
-serve à modelagem. E se outras pessoas ou outras IAs vão trabalhar no repositório, o que muda o que a documentação precisa
-explicar.
+Ativo desde 2026-11-13, com prioridade máxima, quando a pessoa disse "pode ativar o plano de análise" e tirou as quatro
+perguntas que este rascunho fazia antes de ativar. O norte é dela: o projeto existe para a IA modelar o que o usuário pedir,
+e por isso "praticidade, controle e organização para IA é o foco", e não a preferência de quem olha de fora. Ela acrescentou
+que medir o que já aconteceu (dificuldades, tempos) "tecnicamente não basta para evoluir o projeto, e organizar melhor ele,
+assim como elevar o teto", e pediu objetivos de validação: "fazer testes, como por exemplo modelar certas coisas para ir
+melhorando o núcleo, ir melhorando a organização". O plano passa a ter duas frentes, o inventário do que existe e a validação
+por objetos de prova, e conta com "vários agentes trabalhando em paralelo", com a sessão do núcleo planejando e orquestrando. As
+medidas e o relatório ficam em [`revisao-do-projeto-2026-11-13`](../banco-de-provas/revisao-do-projeto-2026-11-13/README.md).
 
 ## Filtro Agent-First
 
@@ -74,12 +78,14 @@ uma das sete perguntas não puder ser respondida sem ela.
 - o inventário medido das sete perguntas, com o comando que reproduz cada número;
 - a classificação de cada item e a recomendação por grupo;
 - a revisão cruzada: cada sessão levanta uma metade e tenta derrubar os achados da outra;
-- a decisão da pessoa registrada por grupo, e a abertura dos planos ou correções que ela aprovar.
+- a decisão da pessoa registrada por grupo, e a abertura dos planos ou correções que ela aprovar;
+- a validação por modelagem: objetos de prova escolhidos pelo que ainda não foi provado, cada um medido pela tabela de custo
+  por peça (`npm run custo:peca`), com a melhoria geral que ele pedir entrando na ferramenta e a mesma parte refeita.
 
 ## Excluído
 
-- executar as mudanças dentro deste plano;
-- modelagem de peças e os planos de objeto em curso;
+- executar dentro deste plano as mudanças de regra, de gate e de organização que o inventário recomendar;
+- os planos de objeto em curso; a modelagem que entra aqui é a dos objetos de prova da frente de validação;
 - reescrever documentação antes da decisão sobre o que fica.
 
 ## Gate de saída
@@ -88,6 +94,7 @@ uma das sete perguntas não puder ser respondida sem ela.
 2. Nenhuma regra ou gate é recomendado para sair sem a lista do que ele já pegou.
 3. A decisão da pessoa está registrada por grupo.
 4. Cada mudança aprovada tem plano, item de backlog ou correção apontada, e as recusadas têm o motivo.
+5. Cada objeto de prova tem o custo medido, a lista do que melhorou na ferramenta geral e o que ficou para plano próprio.
 
 ## Fatias
 
@@ -95,14 +102,18 @@ uma das sete perguntas não puder ser respondida sem ela.
    núcleo com a sessão do núcleo, que aceitou a divisão em 2026-11-12; a pergunta 7 é das duas.
 2. A revisão cruzada e a classificação, com a recomendação por grupo.
 3. A decisão da pessoa.
-4. A abertura dos planos de execução e o fechamento.
+4. A validação por objetos de prova, em ciclos curtos de escolher o objeto pelo que falta provar, modelar, medir, melhorar a
+   ferramenta geral e refazer. Corre ao lado das fatias 1 a 3. A escolha dos objetos e a relação desta frente com as fatias
+   2 a 6 do plano do núcleo saem da recomendação de quem orquestra, a confirmar com a pessoa.
+5. A abertura dos planos de execução e o fechamento.
 
 ## Riscos e parada
 
 Tirar uma regra que pega um defeito raro e caro: por isso nada sai sem a lista do que já pegou. A análise virar mais uma camada
 de documentos: o relatório tem tamanho limitado e é o único documento novo. As duas sessões mexerem nas mesmas áreas: a análise
 não muda código, e a execução sai em planos com território. Se o inventário mostrar que uma das sete perguntas pede semanas de
-medição, ela sai deste plano e vira plano próprio.
+medição, ela sai deste plano e vira plano próprio. A máquina tem quatro núcleos e a conta tem limite de uso: agente de leitura
+roda em paralelo, e medida pesada de modelagem roda uma de cada vez.
 
 ## Fechamento
 
