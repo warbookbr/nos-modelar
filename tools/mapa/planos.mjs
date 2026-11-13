@@ -1,6 +1,6 @@
 /* planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem
    sobreposição, e que nenhum plano executivo ultrapassa o limite curto acordado. */
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -238,9 +238,85 @@ export function conferirPlanoAtivoNosIndices({
   return { problemas, declarados };
 }
 
+/* As linhas "Planos ativos" do README.md da raiz e do docs/modelar/INDEX.md são geradas da lista do índice de planos
+   (a fonte, com a ordem de prioridade): o que está entre os marcadores é regravado por `npm run planos:gerar`. */
+export const MARCADORES_ATIVOS = ['<!-- planos-ativos:inicio -->', '<!-- planos-ativos:fim -->'];
+const COMANDO_GERAR = 'npm run planos:gerar';
+
+/* Os planos da lista "**Planos ativos:**" do índice, na ordem: [{ nome, arquivo }], ou undefined sem a declaração. */
+export function ativosDaFonte(texto) {
+  const achado = /^\*\*Planos ativos:\*\*(.*)$/mi.exec(texto);
+  if (!achado) return undefined;
+  const itens = [];
+  let comecou = false;
+  for (const linha of texto.slice(achado.index + achado[0].length).split('\n')) {
+    const item = /^\d+\.\s*\[([^\]]+)\]\(([^)#]+\.md)\)/.exec(linha);
+    if (item) { comecou = true; itens.push({ nome: item[1], arquivo: item[2] }); } else if (comecou && !linha.trim()) break;
+  }
+  return itens;
+}
+
+/* "[a](x), [b](y) e [c](z)." com o prefixo de pasta de cada destino; "nenhum." sem planos. */
+export function gerarLinksDosAtivos(itens, prefixo) {
+  const links = itens.map(({ nome, arquivo }) => `[${nome}](${prefixo}${arquivo})`);
+  if (links.length === 0) return 'nenhum.';
+  return `${links.length === 1 ? links[0] : `${links.slice(0, -1).join(', ')} e ${links.at(-1)}`}.`;
+}
+
+/* O texto com o que está entre os marcadores trocado por `bloco`; null quando os marcadores faltam ou estão fora de ordem. */
+export function trocarAtivosEntreMarcadores(texto, bloco) {
+  const [inicio, fim] = MARCADORES_ATIVOS;
+  const i = texto.indexOf(inicio);
+  const f = texto.indexOf(fim);
+  if (i < 0 || f < i) return null;
+  return `${texto.slice(0, i + inicio.length)}${bloco}${texto.slice(f)}`;
+}
+
+const DESTINOS_GERADOS = [
+  ['README.md', 'README.md', 'docs/modelar/planos/'],
+  ['docs/modelar/INDEX.md', 'docs/modelar/INDEX.md', 'planos/'],
+];
+
+function lerGerados(raiz, caminhoFonte) {
+  const fonte = ativosDaFonte(readFileSync(join(raiz, caminhoFonte), 'utf8'));
+  return DESTINOS_GERADOS.map(([nome, relativo, prefixo]) => {
+    const atual = readFileSync(join(raiz, relativo), 'utf8');
+    return { nome, relativo, atual, esperado: fonte === undefined ? null : trocarAtivosEntreMarcadores(atual, gerarLinksDosAtivos(fonte, prefixo)), fonte };
+  });
+}
+
+/* Confere que as linhas geradas estão em dia com a lista do índice de planos. */
+export function conferirLinhasGeradas({ raiz = RAIZ, fonte = 'docs/modelar/planos/README.md' } = {}) {
+  const problemas = [];
+  for (const { nome, atual, esperado, fonte: lista } of lerGerados(raiz, fonte)) {
+    if (lista === undefined) { problemas.push(`${fonte}: declaração "Planos ativos" ausente; não há de onde gerar`); break; }
+    if (esperado === null) problemas.push(`${nome} perdeu um marcador (${MARCADORES_ATIVOS.join(', ')}): ponha de volta na linha "Planos ativos" e rode \`${COMANDO_GERAR}\``);
+    else if (esperado !== atual) problemas.push(`${nome}: a linha "Planos ativos" está desatualizada em relação a ${fonte}; rode \`${COMANDO_GERAR}\``);
+  }
+  return problemas;
+}
+
+/* Regrava as linhas geradas; devolve os problemas (marcador perdido) sem gravar o arquivo que os tem. */
+export function gerarLinhas({ raiz = RAIZ, fonte = 'docs/modelar/planos/README.md' } = {}) {
+  const problemas = [];
+  for (const { nome, relativo, atual, esperado, fonte: lista } of lerGerados(raiz, fonte)) {
+    if (lista === undefined) { problemas.push(`${fonte}: declaração "Planos ativos" ausente`); break; }
+    if (esperado === null) problemas.push(`${nome} perdeu um marcador (${MARCADORES_ATIVOS.join(', ')}): ponha de volta onde a lista deve ficar`);
+    else if (esperado !== atual) writeFileSync(join(raiz, relativo), esperado);
+  }
+  return problemas;
+}
+
 function executar() {
+  if (process.argv.includes('--gerar')) {
+    const problemas = gerarLinhas();
+    for (const problema of problemas) console.error(problema);
+    if (problemas.length > 0) process.exitCode = 1;
+    else console.log('planos:gerar ok — linhas "Planos ativos" do README.md e do INDEX.md regravadas da fonte');
+    return;
+  }
   const resultado = conferirPlanos();
-  resultado.problemas.push(...conferirPlanoAtivoNosIndices().problemas);
+  resultado.problemas.push(...conferirPlanoAtivoNosIndices().problemas, ...conferirLinhasGeradas());
   if (resultado.problemas.length > 0) {
     console.error(`planos:check FALHOU — ${resultado.problemas.length} problema(s):`);
     for (const problema of resultado.problemas) console.error(`  - ${problema}`);

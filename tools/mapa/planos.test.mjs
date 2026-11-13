@@ -1,10 +1,10 @@
 /* planos.test.mjs — prova que o gate recusa plano grande, estados inválidos,
    índice divergente, plano parado que o índice não liga, mais de seis planos ativos, ativo sem território e territórios sobrepostos. */
 import { afterEach, describe, expect, it } from 'vitest';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { CAMINHOS_COMPARTILHADOS, conferirPlanoAtivoNosIndices, conferirPlanos, territorioDe } from './planos.mjs';
+import { CAMINHOS_COMPARTILHADOS, conferirLinhasGeradas, conferirPlanoAtivoNosIndices, conferirPlanos, gerarLinhas, territorioDe } from './planos.mjs';
 
 const temporarias = [];
 
@@ -186,5 +186,46 @@ describe('gate dos planos ativos nos três índices', () => {
 
   it('os arquivos reais concordam', () => {
     expect(conferirPlanoAtivoNosIndices().problemas).toEqual([]);
+  });
+});
+
+describe('linhas "Planos ativos" geradas da fonte', () => {
+  const fonte = '# Planos\n\n**Planos ativos:**\n\n1. [um plano](a.md). Território: x.\n2. [outro plano](b.md). Território: y.\n\nfim\n';
+  const P = ['docs', 'modelar', 'planos'].join('/') + '/';
+  const linha = (miolo, prefixo = '') => `Planos ativos: <!-- planos-ativos:inicio -->${miolo}<!-- planos-ativos:fim -->\n${prefixo}`;
+  const raiz = (readme, indice) => {
+    const pasta = mkdtempSync(join(tmpdir(), 'modelar-gerado-'));
+    temporarias.push(pasta);
+    mkdirSync(join(pasta, 'docs/modelar/planos'), { recursive: true });
+    writeFileSync(join(pasta, 'docs/modelar/planos/README.md'), fonte);
+    writeFileSync(join(pasta, 'README.md'), readme);
+    writeFileSync(join(pasta, 'docs/modelar/INDEX.md'), `- ${indice}`);
+    return pasta;
+  };
+  const certaRaiz = linha(`[um plano](${P}a.md) e [outro plano](${P}b.md).`);
+  const certaIndice = linha('[um plano](planos/a.md) e [outro plano](planos/b.md).');
+
+  it('aceita as linhas em dia com a fonte', () => {
+    expect(conferirLinhasGeradas({ raiz: raiz(certaRaiz, certaIndice) })).toEqual([]);
+  });
+
+  it('acusa linha desatualizada e diz o comando que conserta', () => {
+    const velha = linha(`[um plano](${P}a.md).`);
+    const problemas = conferirLinhasGeradas({ raiz: raiz(velha, certaIndice) });
+    expect(problemas).toHaveLength(1);
+    expect(problemas[0]).toContain('README.md');
+    expect(problemas[0]).toContain('npm run planos:gerar');
+  });
+
+  it('acusa marcador perdido', () => {
+    const problemas = conferirLinhasGeradas({ raiz: raiz(certaRaiz, 'Planos ativos: [um plano](planos/a.md).\n') });
+    expect(problemas.join('\n')).toMatch(/INDEX\.md perdeu um marcador/);
+  });
+
+  it('gerar regrava a linha velha e deixa o resto do texto', () => {
+    const pasta = raiz(`antes\n${linha('velho.')}depois\n`, certaIndice);
+    expect(gerarLinhas({ raiz: pasta })).toEqual([]);
+    expect(readFileSync(join(pasta, 'README.md'), 'utf8')).toBe(`antes\n${certaRaiz}depois\n`);
+    expect(conferirLinhasGeradas({ raiz: pasta })).toEqual([]);
   });
 });
