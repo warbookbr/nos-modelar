@@ -2456,7 +2456,7 @@
 
 ## tools/fixtures/costuras-e-furos/agulha-na-faceta-do-tubo/
 
-- `agulha-na-faceta-do-tubo.test.mjs` — Fixa o defeito de hoje (fatia 3 do plano "costuras e furos limpos"): origem das faces sem área que a exportação do braço pulou.
+- `agulha-na-faceta-do-tubo.test.mjs` — Peça de prova das faces sem área que a exportação do braço pulou (fatia 3 do plano "costuras e furos limpos"): mede 0 agulhas e 0 faces abaixo do piso da aud…
 - `receita.js` — agulha-na-faceta-do-tubo/receita.js — peça de prova do defeito "faces sem área que a exportação pulou" (plano "costuras e furos limpos"): três cilindros de 1…
 
 ## tools/fixtures/costuras-e-furos/dentes-no-fim-do-arredondamento/

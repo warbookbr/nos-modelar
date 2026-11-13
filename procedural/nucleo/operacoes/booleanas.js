@@ -801,10 +801,11 @@ export function criarOperacoesBooleanas(servicos) {
        saída da Manifold), para as arestas casarem com as dos pedaços */
     const cicloRepDasMantidas = (fid) => cicloRep(st.F.get(fid).vs);
     const areaTri = (a, b, c) => tamanho(cruz(sub(pos(b), pos(a)), sub(pos(c), pos(a)))) / 2;
-    /* a metade que a diagonal deixa só pode ter a área que o adaptador do visor aceita (`adaptarThree` recusa a face de dobro da área até 1e-12 m²), com o
-       dobro de folga, e não só o milésimo do piso, que em peça de menos de 0,7 m fica abaixo disso: o dente do elo do punho 5, três cantos de um anel de
-       0,02 a 0,05 mm em linha, saía como face de 9,9e-13 m² */
-    const semArea = Math.max(piso * 1e-3, 1e-12);
+    /* a metade que a diagonal deixa só pode ter a área do piso de lasca (e no mínimo a que o adaptador do visor aceita: `adaptarThree` recusa a face de dobro da área até
+       1e-12 m²). O milésimo do piso deixava passar a metade de 1e-10 m² que vira, no polígono da faceta do tubo, uma agulha de 430 mm por 0,015 mm (três cantos quase em linha,
+       com a diagonal do canto colinear até o canto mais afastado): a auditoria de interseções a recusa como triângulo sem área, e o dente do elo do punho 5, três cantos de um
+       anel de 0,02 a 0,05 mm em linha, saía como face de 6,2e-12 m² */
+    const semArea = Math.max(piso, 1e-12);
     const semColinear = (P) => {
       if (P.length <= 3) return [P];
       for (let k = 0; k < P.length; k++) {
