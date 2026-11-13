@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1823 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1825 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2772,6 +2772,8 @@
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho com…
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `marcadores-de-conflito.test.mjs` — marcadores-de-conflito.test.mjs — nenhum arquivo rastreado guarda marcador de conflito de junção. Em 2026-10-28 uma junção deixou o plano ativo com os marcad…
+- `mecanismos.mjs` — mecanismos.mjs — a página `docs/modelar/MECANISMOS.md` cita todo mecanismo do projeto.
+- `mecanismos.test.mjs` — mecanismos.test.mjs — a página dos mecanismos cita toda pasta de primeiro nível, ou ela consta nas dispensas com motivo.
 - `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem sobreposição, e que nenhum plano executivo ultrapassa o…
 - `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de seis planos ativos,…
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.

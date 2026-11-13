@@ -158,6 +158,13 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run docs:citacoes:check
 
+      # `docs/modelar/MECANISMOS.md` é a lista de uma tela do que existe e de onde mora. Pasta nova de `.claude/`, `modulos/`,
+      # `procedural/`, `tools/` ou `docs/modelar/` que não esteja citada lá pelo caminho, ou dispensada com motivo em
+      # `tools/mapa/mecanismos.mjs`, reprova: sem isso a página envelhece no primeiro mecanismo novo.
+      - name: Página dos mecanismos cita toda pasta
+        if: ${{ !cancelled() }}
+        run: npm run mecanismos:check
+
       # O caminho que uma sessão lê antes de escrever a primeira linha de receita
       # tinha 119,8 KB e ninguém media. Documento é barato de escrever e caro de
       # ler, e o custo não aparece: cada sessão nova paga o acervo inteiro de
