@@ -160,7 +160,7 @@ if (process.argv.includes('--check')) {
   try { atual = readFileSync(SAIDA, 'utf8'); } catch { /* nunca gerado */ }
   if (atual !== texto) {
     falhou = true;
-    console.error('mapa:check FALHOU — docs/MAPA.md está desatualizado. Rode `npm run mapa` e commite junto.');
+    console.error('mapa:check FALHOU — docs/MAPA.md está desatualizado. Rode `npm run mapa` e commite junto (depois de juntar a main, também: .gitattributes junta o mapa sem conflito, mas o resultado é velho).');
     const atuais = atual.split('\n');
     const esperadas = texto.split('\n');
     const limite = Math.max(atuais.length, esperadas.length);

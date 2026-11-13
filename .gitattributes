@@ -19,3 +19,8 @@
 *.gltf binary
 *.woff binary
 *.woff2 binary
+
+# O mapa gerado conflita em toda junção em que os dois lados criaram arquivos. A regra "union" junta as linhas dos dois
+# lados sem pedir resolução; o resultado pode ter linha velha (contagem, trecho repetido), e `npm run mapa` o refaz por inteiro.
+# Depois de toda junção rode `npm run mapa`; `npm run mapa:check` (CI) reprova o mapa que ficou velho.
+docs/MAPA.md merge=union
