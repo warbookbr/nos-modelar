@@ -1,6 +1,6 @@
 # Mecanismos do Modelar: a visão em uma tela
 
-O que existe no projeto além do código que constrói formas, o que cada coisa faz e onde mora. Esta página é a lista; o detalhe de cada mecanismo está no lugar indicado. Escrita em 2026-11-13, pelo [plano das melhorias de processo](planos/2026-11-13-melhorias-de-processo-da-revisao.md). `npm run mecanismos:check` reprova pasta nova de `.claude/`, `modulos/`, `procedural/`, `tools/` ou `docs/modelar/` que não esteja citada aqui pelo caminho, e a página não passa de 45 linhas.
+O que existe no projeto além do código que constrói formas, o que cada coisa faz e onde mora. Esta página é a lista; o detalhe de cada mecanismo está no lugar indicado. Escrita em 2026-11-13, pelo [plano das melhorias de processo](decisoes/PLANOS-ENCERRADOS.md). `npm run mecanismos:check` reprova pasta nova de `.claude/`, `modulos/`, `procedural/`, `tools/` ou `docs/modelar/` que não esteja citada aqui pelo caminho, e a página não passa de 45 linhas.
 
 | Mecanismo | O que faz | Quando é usado | Onde mora |
 |---|---|---|---|

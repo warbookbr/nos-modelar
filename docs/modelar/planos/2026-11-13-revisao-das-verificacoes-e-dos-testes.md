@@ -33,7 +33,7 @@ O mapa, a medida por estrago na amostra, os sinais de fragilidade, o veredito po
 
 ## Excluído
 
-Apagar ou reescrever teste dentro deste plano; a execução sai em plano ou correção pontual depois da decisão. Mudar os tetos de tempo, que é do [plano das melhorias de processo](2026-11-13-melhorias-de-processo-da-revisao.md).
+Apagar ou reescrever teste dentro deste plano; a execução sai em plano ou correção pontual depois da decisão. Mudar os tetos de tempo, que é do [plano das melhorias de processo](../decisoes/PLANOS-ENCERRADOS.md).
 
 ## Invariantes
 
