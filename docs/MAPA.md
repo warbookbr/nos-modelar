@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2066 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2067 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -452,6 +452,7 @@
 
 - `README.md` — Revisão do projeto para o trabalho da IA: medidas e relatório
 - `RELATORIO.md` — Relatório da revisão do projeto: o que protege, o que só custa e o que decidir
+- `mecanismos-que-ficaram-de-fora.md` — Os seis mecanismos que ficaram de fora: o que uma melhoria mudaria no trabalho da IA
 - `pergunta-1-2-3-6-processo-documentos-e-agentes.md` — Perguntas 1, 2, 3 e 6: gates e regras, leitura, gerado e manual, sessões e agentes (primeiro levantamento)
 - `pergunta-4-pastas-e-modulos.md` — Pergunta 4: pastas e módulos (inventário medido, sem a comparação externa)
 - `pergunta-4-projetos-comparaveis.md` — Pergunta 4: como projetos comparáveis organizam núcleo, peças, ferramentas e documentação

@@ -17,4 +17,5 @@ Pasta do plano [revisão do projeto para o trabalho da IA](../../planos/2026-11-
 - Pergunta 5: [operações e verbosidade](pergunta-5-operacoes-e-verbosidade.md), o uso real de cada operação nas receitas vigentes e o tamanho das receitas.
 - Pergunta 5: [erros, nomes e argumentos](pergunta-5-erros-nomes-e-argumentos.md), a classificação das mensagens de erro, os casos errados executados e as incoerências de nome.
 - Pergunta 5: [tempo por operação](pergunta-5-tempo-por-operacao.md), a execução das três peças mais pesadas medida passo a passo.
+- Os seis mecanismos que ficaram de fora: [o que uma melhoria mudaria](mecanismos-que-ficaram-de-fora.md), com 221 atritos de diário classificados por causa, levantado por um agente de leitura e não conferido item a item.
 - Pergunta 7: [para quem o projeto serve](pergunta-7-para-quem-o-projeto-serve.md), o primeiro levantamento dos quatro usos, com o caso real do manual de instalação.
