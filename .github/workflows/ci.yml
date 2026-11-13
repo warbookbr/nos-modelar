@@ -11,6 +11,12 @@ name: CI
 # falha dizendo isso, e quem enviou junta a main ao ramo e envia de novo. O avanço feito pelo próprio CI não roda a bateria
 # outra vez, porque o commit é o mesmo que acabou de passar.
 #
+# O HISTÓRICO DAS DURAÇÕES CIRCULA PELO CACHE. O teto de tempo dos testes é relativo à mediana das últimas execuções de cada
+# arquivo (`tools/testes-lentos.mjs`), e o histórico mora em `tmp/gates/historico-das-duracoes-<modo>.json`; como cada máquina
+# do CI começa limpa, os trabalhos que rodam testes restauram o arquivo do cache antes e o guardam depois, com `if: always()`,
+# para a execução que falha também deixar a medida dela. A chave leva o modo, a parte e o ramo; na falta do ramo, vale o da main.
+# Sem cache a execução segue com o teto fixo, e a falta dele nunca é erro.
+#
 # Cada passo de gate tem `if: !cancelled()`: sem isso a primeira falha de uma máquina pulava os passos seguintes dela, e o
 # relatório escondia o estado dos outros gates, o defeito que `tools/gates.mjs` existe para evitar.
 on:
@@ -43,6 +49,16 @@ jobs:
       - name: Node, dependências e navegador
         uses: ./.github/actions/preparar
 
+      # O histórico das durações desta bateria: o do ramo, e na falta dele o da main. Sem cache, o teto fixo vale.
+      - name: Restaura o histórico das durações dos testes
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp/gates/historico-das-duracoes-rapidos.json
+          key: historico-rapidos-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            historico-rapidos-${{ github.ref_name }}-
+            historico-rapidos-main-
+
       - name: TypeScript Typecheck
         if: ${{ !cancelled() }}
         run: npm run typecheck
@@ -55,6 +71,15 @@ jobs:
         run: npm run test:rapidos
         env:
           MODELAR_CHAVE_TERMOS: ${{ secrets.MODELAR_CHAVE_TERMOS }}
+
+      # Roda mesmo com a bateria reprovada: a duração da execução que falhou também entra no histórico. O `run_id` na chave dá uma
+      # entrada nova a cada execução, porque o cache não se reescreve; o mais recente do ramo é o que a restauração acha.
+      - name: Guarda o histórico das durações dos testes
+        if: ${{ always() }}
+        uses: actions/cache/save@v4
+        with:
+          path: tmp/gates/historico-das-duracoes-rapidos.json
+          key: historico-rapidos-${{ github.ref_name }}-${{ github.run_id }}
 
       - name: Firewall entre núcleo e catálogo
         if: ${{ !cancelled() }}
@@ -190,11 +215,30 @@ jobs:
       - name: Node, dependências e navegador
         uses: ./.github/actions/preparar
 
+      # O histórico das durações desta bateria e desta parte: o do ramo, e na falta dele o da main. Sem cache, o teto fixo vale.
+      - name: Restaura o histórico das durações dos testes
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp/gates/historico-das-duracoes-lentos.json
+          key: historico-lentos-${{ matrix.parte }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            historico-lentos-${{ matrix.parte }}-${{ github.ref_name }}-
+            historico-lentos-${{ matrix.parte }}-main-
+
       - name: Testes lentos, a parte desta máquina
         if: ${{ !cancelled() }}
         run: npm run test:lentos
         env:
           GATES_PARTE: ${{ matrix.parte }}
+
+      # Roda mesmo com a bateria reprovada: a duração da execução que falhou também entra no histórico. O `run_id` na chave dá uma
+      # entrada nova a cada execução, porque o cache não se reescreve; o mais recente do ramo é o que a restauração acha.
+      - name: Guarda o histórico das durações dos testes
+        if: ${{ always() }}
+        uses: actions/cache/save@v4
+        with:
+          path: tmp/gates/historico-das-duracoes-lentos.json
+          key: historico-lentos-${{ matrix.parte }}-${{ github.ref_name }}-${{ github.run_id }}
 
   bancada:
     name: Gates da bancada
