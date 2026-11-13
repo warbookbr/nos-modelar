@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1854 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1855 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2656,6 +2656,10 @@
 ## tools/fixtures/forma-do-esboco/viga-reta/
 
 - `receita.js` — A viga sem a inclinação de 30 graus do esboço.
+
+## tools/fixtures/forma-exata/
+
+- `chapa-por-lacos.js` — chapa-por-lacos.js — a peça de comparação do caso A do estudo do método (plano "forma exata antes da malha", fatia 3): uma chapa de contorno curvo de 290 por…
 
 ## tools/fixtures/lataria-com-vinco/
 

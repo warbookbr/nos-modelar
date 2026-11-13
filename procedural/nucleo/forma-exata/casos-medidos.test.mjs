@@ -7,8 +7,8 @@
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { medirFaceDegenerada } from '../../../tools/modelar/reguas-de-malha/face-degenerada.mjs';
-import { medirTrianguloFino } from '../../../tools/modelar/reguas-de-malha/triangulo-fino.mjs';
-import receitaDaLamina from '../../pecas/kukri/receita.js';
+import { medirTrianguloFino, razaoDoTriangulo } from '../../../tools/modelar/reguas-de-malha/triangulo-fino.mjs';
+import receitaDaChapaPorLacos from '../../../tools/fixtures/forma-exata/chapa-por-lacos.js';
 import receitaDaAgulha from '../../../tools/fixtures/costuras-e-furos/agulha-na-faceta-do-tubo/receita.js';
 import receitaDoFuro, { TABELA as FURO } from '../../../tools/fixtures/costuras-e-furos/furo-em-face-plana/receita.js';
 import { chanfrarAresta, facesExatas, furoPassante, malhaDaForma, prismaExato, volumeExato } from './forma-exata.js';
@@ -24,9 +24,12 @@ function medir(caso, metodo, malha, ms, extra = {}) {
   const fino = medirTrianguloFino(neutro);
   let pequenas = 0;
   for (const f of malha.F) if (menorAreaDeFace({ V: malha.V, F: [f] }) < 1e-9) pequenas++;
+  /* a razão de todo triângulo da malha, com cada face cortada em leque: a régua só marca o fino de região plana, e esta conta não escolhe */
+  let acimaDe10 = 0, piorDaMalha = 0;
+  for (const f of malha.F) for (let k = 1; k + 1 < f.length; k++) { const r = razaoDoTriangulo(malha.V[f[0]], malha.V[f[k]], malha.V[f[k + 1]]); if (r > 10) acimaDe10++; piorDaMalha = Math.max(piorDaMalha, r); }
   const e = estanqueidade(malha);
   const linha = {
-    caso, metodo, faces: malha.F.length, triangulos: fino.triangulos, degeneradas: medirFaceDegenerada(neutro).total, finos: fino.finos, piorRazao: Math.round(fino.pior),
+    caso, metodo, faces: malha.F.length, triangulos: fino.triangulos, degeneradas: medirFaceDegenerada(neutro).total, finos: fino.finos, piorRazaoDosFinos: Math.round(fino.pior), razaoAcimaDe10: acimaDe10, piorRazaoDaMalha: Math.round(piorDaMalha),
     abaixoDe1e9: pequenas, menorAreaMm2: Number((menorAreaDeFace(malha) * 1e6).toPrecision(3)), volumeMm3: Math.round(volumeDaMalha(malha) * 1e9 * 10) / 10,
     fechada: e.fechada, ms: Math.round(ms), ...extra,
   };
@@ -64,12 +67,12 @@ function chapa() {
 const EXTRUSAO = ['extrusao', { origemId: 1, perfil: { contorno: CONTORNO }, altura: m(5), segmentosArco: 64 }];
 
 describe('caso A: chapa de contorno curvo com gume e quinas quebradas', () => {
-  it('método atual: a lâmina do acervo, feita por cinco laços empilhados, fecha com 47 triângulos finos nas duas faces largas', () => {
-    expect(atual('A', 'atual: lâmina do acervo (gaiola de 5 laços)', receitaDaLamina, 'lamina')).toMatchObject({ faces: 628, degeneradas: 0, finos: 47, piorRazao: 866, fechada: true });
+  it('método atual: a chapa por cinco laços empilhados (a forma de uma peça do acervo em 2026-11-13, guardada em fixture) fecha com 47 triângulos finos', () => {
+    expect(atual('A', 'atual: chapa por 5 laços empilhados (fixture)', receitaDaChapaPorLacos)).toMatchObject({ faces: 628, degeneradas: 0, finos: 47, piorRazaoDosFinos: 866, fechada: true });
   });
 
   it('método atual: a extrusão do mesmo contorno sai sem borda, com 38 triângulos finos, e a operação de aresta recusa a tampa', () => {
-    expect(atual('A', 'atual: extrusão do contorno, sem borda', receita([EXTRUSAO, ['parte', { nome: 'chapa', sel: { tudo: true } }]]))).toMatchObject({ faces: 110, degeneradas: 0, finos: 38, piorRazao: 27537, fechada: true });
+    expect(atual('A', 'atual: extrusão do contorno, sem borda', receita([EXTRUSAO, ['parte', { nome: 'chapa', sel: { tudo: true } }]]))).toMatchObject({ faces: 110, degeneradas: 0, finos: 38, piorRazaoDosFinos: 27537, fechada: true });
     const recusa = recusaDoAtual([EXTRUSAO, ['arredondarAresta', { origemId: 2, de: { op: 'extrusao', id: 1, tampa: 'topo' }, aresta: 0, raio: m(0.8), paineis: 2, cadeia: true }]]);
     expect(recusa).toMatch(/de precisa resolver para EXATAMENTE uma face: .* resolveu para 22/);
   });
@@ -103,7 +106,7 @@ describe('caso B: tubo que encontra tubo, com arredondamento na costura', () => 
     expect(atual('B', 'atual: peça de prova da agulha (3 tubos rentes)', receitaDaAgulha)).toMatchObject({ faces: 6540, degeneradas: 0, abaixoDe1e9: 40, fechada: true });
   });
 
-  it('protótipo, peça de prova da agulha: NÃO COBRE, e recusa o tubo rente às duas faces do outro', () => {
+  it('protótipo, substituto da peça de prova da agulha (só o T 95/95 sobre um tronco de 190 mm, sem a carcaça nem o chanfro de 2 mm): NÃO COBRE, e recusa', () => {
     expect(() => T_EXATO(95, 190)).toThrow(/o arredondamento alcança 0.105 .* veio 0.19 \(o ramo na ponta do tronco fica fora do protótipo\)/);
   });
 
