@@ -7,8 +7,10 @@ const MARGEM = 90;
 const VAO = 130;
 const TITULO = 100;
 const ALTURA_MAXIMA = 1100;
+const LADOS_DA_COTA = ['cima', 'baixo', 'esquerda', 'direita'];
 const PASSO_ENTRE_COTAS = 26;
 const AFASTAMENTO_PADRAO_PX = 30;
+const LARGURA_DO_CARACTERE = 9;
 const SEGURO = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const f1 = (n) => (Math.round(n * 10) / 10).toString();
 
@@ -51,12 +53,22 @@ export function paginaDoDesenho({ titulo, projecoes, cotas = [], limiarGraus }) 
     const [ox, oy] = origens[vista];
     return `<text class="rotulo" x="${f1(ox)}" y="${f1(oy - 62)}">${SEGURO(VISTAS_DO_DESENHO[vista].rotulo)}</text>`;
   });
+  const obstaculos = { segmentos: [], retangulos: [] };
+  for (const vista of ['cima', 'frente', 'lado']) {
+    for (const [a, b, c, d] of [...projecoes[vista].visiveis, ...projecoes[vista].escondidos]) {
+      const [x1, y1] = paraPagina(vista, a, b); const [x2, y2] = paraPagina(vista, c, d);
+      obstaculos.segmentos.push([x1, y1, x2, y2]);
+    }
+  }
   const pilhas = new Map();
   const cotasSvg = cotas.map((cota) => {
     const chave = `${cota.vista}|${cota.lado}`;
     const n = pilhas.get(chave) ?? 0;
     pilhas.set(chave, cota.afastamentoMm ? n : n + 1);
-    return cota.tipo === 'diametro' ? cotaDeDiametro(cota, paraPagina, escala) : cotaLinear(cota, paraPagina, escala, n);
+    if (cota.tipo === 'diametro') return cotaDeDiametro(cota, paraPagina, escala, obstaculos, altura);
+    const linear = cotaLinear(cota, paraPagina, escala, n);
+    obstaculos.retangulos.push(...linear.retangulos);
+    return linear.svg;
   });
   const corpo = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${LARGURA_DA_PAGINA}" height="${altura}" viewBox="0 0 ${LARGURA_DA_PAGINA} ${altura}" font-family="DejaVu Sans, Arial, sans-serif">`,
@@ -87,6 +99,8 @@ function cotaLinear(cota, paraPagina, escala, empilhada) {
   const texto = cota.texto ?? `${medidaEmTexto(cota.medidaMm)}`;
   const base = cota.afastamentoMm ? cota.afastamentoMm * escala : AFASTAMENTO_PADRAO_PX + empilhada * PASSO_ENTRE_COTAS;
   const saida = [];
+  const retangulos = [];
+  const larguraDoTexto = texto.length * LARGURA_DO_CARACTERE;
   if (cota.lado === 'cima' || cota.lado === 'baixo') {
     const sinal = cota.lado === 'cima' ? -1 : 1;
     const yl = (sinal < 0 ? Math.min(y1, y2) : Math.max(y1, y2)) + sinal * base;
@@ -94,6 +108,8 @@ function cotaLinear(cota, paraPagina, escala, empilhada) {
     const [xa, xb] = x1 <= x2 ? [x1, x2] : [x2, x1];
     saida.push(`<line class="cota" x1="${f1(xa)}" y1="${f1(yl)}" x2="${f1(xb)}" y2="${f1(yl)}"/>`, seta(xa, yl, 1, 0), seta(xb, yl, -1, 0));
     saida.push(`<text class="valor" x="${f1((xa + xb) / 2)}" y="${f1(yl - 5)}">${SEGURO(texto)}</text>`);
+    retangulos.push([xa, yl - 2, xb, yl + 2]);
+    retangulos.push([(xa + xb) / 2 - larguraDoTexto / 2, yl - 19, (xa + xb) / 2 + larguraDoTexto / 2, yl]);
   } else {
     const sinal = cota.lado === 'esquerda' ? -1 : 1;
     const xl = (sinal < 0 ? Math.min(x1, x2) : Math.max(x1, x2)) + sinal * base;
@@ -102,27 +118,72 @@ function cotaLinear(cota, paraPagina, escala, empilhada) {
     saida.push(`<line class="cota" x1="${f1(xl)}" y1="${f1(ya)}" x2="${f1(xl)}" y2="${f1(yb)}"/>`, seta(xl, ya, 0, 1), seta(xl, yb, 0, -1));
     const xt = xl + sinal * -5;
     saida.push(`<text class="valor" text-anchor="middle" transform="translate(${f1(xt)} ${f1((ya + yb) / 2)}) rotate(-90)">${SEGURO(texto)}</text>`);
+    retangulos.push([xl - 2, ya, xl + 2, yb]);
+    retangulos.push([xt - 16, (ya + yb) / 2 - larguraDoTexto / 2, xt + 3, (ya + yb) / 2 + larguraDoTexto / 2]);
   }
-  return `<g class="cota-linear" data-vista="${cota.vista}" data-medida="${cota.medidaMm}">${saida.join('')}</g>`;
+  return { svg: `<g class="cota-linear" data-vista="${cota.vista}" data-medida="${cota.medidaMm}">${saida.join('')}</g>`, retangulos };
 }
 
 const ANGULO_DO_LADO = { cima: 60, baixo: -60, esquerda: 150, direita: 30 };
+const COMPRIMENTO_BASE_DO_TIRANTE = 40;
+const PASSO_DO_TIRANTE = 25;
+const TENTATIVAS_DE_TIRANTE = 10;
+const BORDA_DA_PAGINA = 12;
 
-function cotaDeDiametro(cota, paraPagina, escala) {
+/** O segmento (x1,y1)-(x2,y2) cruza o retângulo [x0,y0,x1,y1]? (Liang-Barsky) */
+export function segmentoCruzaRetangulo([ax, ay, bx, by], [x0, y0, x1, y1]) {
+  let t0 = 0; let t1 = 1;
+  const dx = bx - ax; const dy = by - ay;
+  for (const [p, q] of [[-dx, ax - x0], [dx, x1 - ax], [-dy, ay - y0], [dy, y1 - ay]]) {
+    if (p === 0) { if (q < 0) return false; continue; }
+    const r = q / p;
+    if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; }
+  }
+  return true;
+}
+const retangulosSeCruzam = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+
+/**
+ * A cota de diâmetro: círculo e cruz de centro finos, tirante saindo do círculo no lado declarado e o texto numa prateleira. Se o
+ * texto declarado cruzaria uma aresta do desenho, outro texto de cota ou a borda da página, o tirante cresce em passos e, esgotados
+ * os passos, tenta os outros lados, e fica com a primeira posição livre (a declarada se nenhuma for).
+ */
+function cotaDeDiametro(cota, paraPagina, escala, obstaculos, alturaDaPagina) {
   const uv = VISTAS_DO_DESENHO[cota.vista].uv;
   const [u, v] = uv(cota.centro);
   const [cx, cy] = paraPagina(cota.vista, u, v);
   const r = (cota.diametro / 2) * escala;
-  const ang = (ANGULO_DO_LADO[cota.lado] * Math.PI) / 180;
-  const dx = Math.cos(ang); const dy = -Math.sin(ang);
-  const px = cx + dx * r; const py = cy + dy * r;
-  const fx = cx + dx * (r + 40); const fy = cy + dy * (r + 40);
-  const prateleira = dx >= 0 ? 36 : -36;
   const texto = cota.texto ?? `Ø${medidaEmTexto(cota.diametro)}`;
-  const lado = dx >= 0 ? 'start' : 'end';
-  return `<g class="cota-diametro" data-vista="${cota.vista}" data-diametro="${cota.diametro}">`
+  const larguraDoTexto = texto.length * LARGURA_DO_CARACTERE;
+  const proposta = (lado, k) => {
+    const ang = (ANGULO_DO_LADO[lado] * Math.PI) / 180;
+    const dx = Math.cos(ang); const dy = -Math.sin(ang);
+    const fx = cx + dx * (r + COMPRIMENTO_BASE_DO_TIRANTE + k * PASSO_DO_TIRANTE); const fy = cy + dy * (r + COMPRIMENTO_BASE_DO_TIRANTE + k * PASSO_DO_TIRANTE);
+    const sentido = dx >= 0 ? 1 : -1;
+    const prateleira = sentido * 36;
+    const texto0 = fx + prateleira + sentido * 4;
+    const caixa = [Math.min(fx, texto0, texto0 + sentido * larguraDoTexto), fy - 17, Math.max(fx, texto0, texto0 + sentido * larguraDoTexto), fy + 6];
+    return { lado, dx, dy, fx, fy, sentido, prateleira, texto0, caixa };
+  };
+  const livre = (p) => {
+    if (p.caixa[0] < BORDA_DA_PAGINA || p.caixa[2] > LARGURA_DA_PAGINA - BORDA_DA_PAGINA || p.caixa[1] < 100 || p.caixa[3] > alturaDaPagina - BORDA_DA_PAGINA) return false;
+    if (obstaculos.retangulos.some((rect) => retangulosSeCruzam(rect, p.caixa))) return false;
+    return !obstaculos.segmentos.some((seg) => segmentoCruzaRetangulo(seg, p.caixa));
+  };
+  const ordem = [cota.lado, ...LADOS_DA_COTA.filter((l) => l !== cota.lado)];
+  let escolhida = proposta(cota.lado, 0);
+  procura: for (const lado of ordem) {
+    for (let k = 0; k < TENTATIVAS_DE_TIRANTE; k += 1) {
+      const candidata = proposta(lado, k);
+      if (livre(candidata)) { escolhida = candidata; break procura; }
+    }
+  }
+  obstaculos.retangulos.push(escolhida.caixa);
+  const { dx, dy, fx, fy, prateleira, texto0, sentido } = escolhida;
+  const px = cx + dx * r; const py = cy + dy * r;
+  return `<g class="cota-diametro" data-vista="${cota.vista}" data-diametro="${cota.diametro}" data-lado="${escolhida.lado}" data-texto="${f1(escolhida.caixa[0])},${f1(escolhida.caixa[1])},${f1(escolhida.caixa[2])},${f1(escolhida.caixa[3])}">`
     + `<circle class="eixo" cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(r)}"/>`
     + `<line class="eixo" x1="${f1(cx - r - 6)}" y1="${f1(cy)}" x2="${f1(cx + r + 6)}" y2="${f1(cy)}"/><line class="eixo" x1="${f1(cx)}" y1="${f1(cy - r - 6)}" x2="${f1(cx)}" y2="${f1(cy + r + 6)}"/>`
     + `<polyline class="cota" points="${f1(px)},${f1(py)} ${f1(fx)},${f1(fy)} ${f1(fx + prateleira)},${f1(fy)}"/>${seta(px, py, -dx, -dy)}`
-    + `<text class="valor solto" style="text-anchor:${lado}" x="${f1(fx + prateleira + (dx >= 0 ? 4 : -4))}" y="${f1(fy + 5)}">${SEGURO(texto)}</text></g>`;
+    + `<text class="valor solto" style="text-anchor:${sentido > 0 ? 'start' : 'end'}" x="${f1(texto0)}" y="${f1(fy + 5)}">${SEGURO(texto)}</text></g>`;
 }

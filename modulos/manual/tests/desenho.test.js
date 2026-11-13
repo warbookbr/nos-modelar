@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 import { entradaDaReceita } from '../../../src/autoria/executar-receita.js';
 import { validarCotas } from '../src/cotas.js';
 import { desenharReceita } from '../src/desenho.mjs';
-import { comprimentoDosSegmentos, prepararMalha, projetarVista } from '../src/projecao.js';
+import { segmentoCruzaRetangulo } from '../src/desenho-svg.js';
+import { arestasVivas, comprimentoDosSegmentos, prepararMalha, projetarVista } from '../src/projecao.js';
+import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import kukri from '../../../procedural/pecas/kukri/receita.js';
 import suporte from '../../../procedural/pecas/suporte-tubo/receita.js';
 
@@ -123,5 +125,55 @@ describe('cotas declaradas em peças do acervo', () => {
     const sem = Object.defineProperties({}, Object.getOwnPropertyDescriptors(receita));
     delete sem.COTAS;
     expect(JSON.stringify(entradaDaReceita(receita))).toBe(JSON.stringify(entradaDaReceita(sem)));
+  });
+});
+
+describe('arestas vivas sem as pontas de remendo de canto', () => {
+  const grauDe = (vivas) => { const g = new Map(); for (const e of vivas) for (const v of [e.va, e.vb]) g.set(v, (g.get(v) ?? 0) + 1); return g; };
+
+  it('o bloco de quinas de 90 graus não perde nenhuma aresta viva', () => {
+    const malha = prepararMalha(blocoComFuro());
+    expect(arestasVivas(malha, 30).length).toBe(malha.arestas.filter((e) => e.normais.length !== 2 || e.graus >= 30).length);
+  });
+
+  it.each([['suporte-tubo', 429, 401, suporte], ['kukri', 795, 670, kukri]])('%s: de %i arestas acima do limiar ficam %i, sem ponta solta de ângulo franco', (_n, antes, depois, receita) => {
+    const malha = prepararMalha(executarReceita(receita).neutro);
+    expect(malha.arestas.filter((e) => e.normais.length !== 2 || e.graus >= 30).length).toBe(antes);
+    const vivas = arestasVivas(malha, 30);
+    expect(vivas.length).toBe(depois);
+    const grau = grauDe(vivas);
+    const soltas = vivas.filter((e) => e.normais.length === 2 && e.graus < 60 && (grau.get(e.va) === 1 || grau.get(e.vb) === 1));
+    expect(soltas).toHaveLength(0);
+  });
+
+  it('o suporte-tubo perde os tracinhos: nenhuma aresta de remendo (31 a 51 graus) fica na vista da frente', () => {
+    const malha = prepararMalha(executarReceita(suporte).neutro);
+    const remendos = arestasVivas(malha, 30).filter((e) => e.graus < 60);
+    expect(remendos).toHaveLength(0);
+    const frente = projetarVista(malha, 'frente', { escala: 6 });
+    expect(frente.visiveis.length).toBe(401);
+    expect(frente.escondidos.length).toBe(0);
+  });
+});
+
+describe('texto da cota de diâmetro fora das arestas', () => {
+  const retangulosDoTexto = (svg) => [...svg.matchAll(/data-texto="([-\d.]+),([-\d.]+),([-\d.]+),([-\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  const segmentosDoSvg = (svg) => [...svg.matchAll(/class="(?:visivel|escondida)" d="([^"]+)"/g)].flatMap((m) => [...m[1].matchAll(/M([-\d.]+) ([-\d.]+)L([-\d.]+) ([-\d.]+)/g)].map((n) => n.slice(1).map(Number)));
+
+  it.each([['kukri', kukri], ['suporte-tubo', suporte]])('%s: a caixa do texto do diâmetro não cruza nenhum traço do desenho', (_n, receita) => {
+    const { svg } = desenharReceita(receita);
+    const caixas = retangulosDoTexto(svg);
+    expect(caixas).toHaveLength(1);
+    const segmentos = segmentosDoSvg(svg);
+    expect(segmentos.length).toBeGreaterThan(300);
+    expect(segmentos.filter((seg) => segmentoCruzaRetangulo(seg, caixas[0]))).toHaveLength(0);
+  });
+
+  it('o kukri, cujo lado declarado cruzava o contorno do cabo, sai com o texto em outra posição livre', () => {
+    const { svg } = desenharReceita(kukri);
+    expect(svg).toMatch(/class="cota-diametro"[^>]*data-lado="baixo"/);
+    const [x0, y0, x1, y1] = retangulosDoTexto(svg)[0];
+    expect(x0).toBeGreaterThan(12);
+    expect(y1 - y0).toBeLessThan(30);
   });
 });

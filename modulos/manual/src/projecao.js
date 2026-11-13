@@ -74,7 +74,7 @@ function triangular(pontos, normal) {
   return triangulos;
 }
 
-/** A malha em milímetro: triângulos, e as arestas das faces com as normais das faces vizinhas. */
+/** A malha em milímetro: triângulos, e as arestas das faces com as normais das faces vizinhas e o ângulo entre elas. */
 export function prepararMalha(neutro) {
   const posicao = new Map();
   for (const [id, p] of neutro.V) posicao.set(id, [p[0] * 1000, p[1] * 1000, p[2] * 1000]);
@@ -92,34 +92,54 @@ export function prepararMalha(neutro) {
       const a = ids[i]; const b = ids[(i + 1) % ids.length];
       if (a === b) continue;
       const chave = a < b ? `${a}|${b}` : `${b}|${a}`;
-      const registro = arestas.get(chave) ?? { pa: posicao.get(a), pb: posicao.get(b), normais: [] };
+      const registro = arestas.get(chave) ?? { chave, va: a < b ? a : b, vb: a < b ? b : a, pa: posicao.get(a < b ? a : b), pb: posicao.get(a < b ? b : a), normais: [] };
       registro.normais.push(normal);
       arestas.set(chave, registro);
     }
   }
+  const lista = [...arestas.values()];
+  for (const e of lista) {
+    if (e.normais.length !== 2) continue;
+    const [nA, nB] = e.normais;
+    e.graus = (Math.acos(Math.max(-1, Math.min(1, dot(nA, nB)))) * 180) / Math.PI;
+  }
   const caixa = { min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
   for (const p of posicao.values()) for (let k = 0; k < 3; k += 1) { caixa.min[k] = Math.min(caixa.min[k], p[k]); caixa.max[k] = Math.max(caixa.max[k], p[k]); }
-  return { triangulos, arestas: [...arestas.values()], caixa };
+  return { triangulos, arestas: lista, caixa };
 }
 
-/** As arestas a desenhar numa vista: contorno da silhueta e vivas (acima do limiar). */
-function arestasDaVista(malha, para, limiarGraus) {
-  const cosLimiar = Math.cos((limiarGraus * Math.PI) / 180);
-  const eps = 1e-6;
-  const escolhidas = [];
-  for (const { pa, pb, normais } of malha.arestas) {
-    let desenha = normais.length !== 2;
-    if (!desenha) {
-      const [n1, n2] = normais;
-      if (dot(n1, n2) < cosLimiar) desenha = true;
-      else {
-        const d1 = dot(n1, para); const d2 = dot(n2, para);
-        desenha = (d1 > eps && d2 < -eps) || (d1 < -eps && d2 > eps);
-      }
-    }
-    if (desenha) escolhidas.push([pa, pb]);
+const GRAUS_DE_QUINA_FRANCA = 60;
+
+/**
+ * As arestas vivas da malha acima do limiar, menos as pontas soltas: uma quina de ângulo franco (abaixo de 60 graus) que termina no
+ * meio da superfície, sem encontrar outra aresta viva, é o desvanecer de uma curva facetada (junta de remendo de canto, onde o
+ * ângulo entre facetas passa de 30 graus só num trecho curto) e não uma aresta de desenho. Ela some, e a aresta que ficou com a
+ * ponta solta some em seguida, até não restar ponta solta. Quina de 90 graus ou aresta de contorno aberto nunca é podada.
+ */
+export function arestasVivas(malha, limiarGraus) {
+  if (malha.vivas?.limiar === limiarGraus) return malha.vivas.lista;
+  let vivas = malha.arestas.filter((e) => e.normais.length !== 2 || e.graus >= limiarGraus);
+  for (;;) {
+    const grau = new Map();
+    for (const e of vivas) for (const v of [e.va, e.vb]) grau.set(v, (grau.get(v) ?? 0) + 1);
+    const restantes = vivas.filter((e) => e.normais.length !== 2 || e.graus >= GRAUS_DE_QUINA_FRANCA || (grau.get(e.va) > 1 && grau.get(e.vb) > 1));
+    if (restantes.length === vivas.length) break;
+    vivas = restantes;
   }
-  return escolhidas;
+  malha.vivas = { limiar: limiarGraus, lista: vivas };
+  return vivas;
+}
+
+/** As arestas a desenhar numa vista: as vivas e o contorno da silhueta (uma face de frente e outra de costas, ou aresta de uma face só). */
+function arestasDaVista(malha, para, limiarGraus) {
+  const eps = 1e-6;
+  const escolhidas = new Set(arestasVivas(malha, limiarGraus));
+  for (const e of malha.arestas) {
+    if (e.normais.length !== 2 || escolhidas.has(e)) continue;
+    const d1 = dot(e.normais[0], para); const d2 = dot(e.normais[1], para);
+    if ((d1 > eps && d2 < -eps) || (d1 < -eps && d2 > eps)) escolhidas.add(e);
+  }
+  return [...escolhidas].map((e) => [e.pa, e.pb]);
 }
 
 /**
