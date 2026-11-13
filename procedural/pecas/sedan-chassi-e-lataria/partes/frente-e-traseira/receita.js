@@ -21,6 +21,7 @@ import { CONJUNTO, ETAPAS, ENCAIXES, F, PAINEL_DA_FRENTE, PAINEL_DE_TRAS, contat
 import { T } from '../../alta-definicao/alvo.mjs';
 
 const ETAPA = 'frente-e-traseira';
+const { PARA_CHOQUE_DA_FRENTE, PARA_CHOQUE_DE_TRAS } = await import('../../alta-definicao/frente-e-traseira.esboco.mjs');
 
 export const TABELA = {
   encaixe: { ponto: ENCAIXES[ETAPA].ponto },
@@ -29,10 +30,20 @@ export const TABELA = {
   /* a aba de borda do painel de trás: a perna de 90 graus dobra para dentro, com raio de 0,5 mm na face de dentro. A dobra come `raio` + `chapa` (1,5 mm) do vão de 4 mm do lado da lateral:
      com 2 mm de raio (3 mm de dobra) a aba entrava 1 mm na lateral onde o vão é menor, a 850 de altura (relato de contatos). A largura é a que fecha o vão (medida: --fundo=modelo) */
   aba: { largura: 20, angulo: 90, raio: 0.5 },
+  /* a vista de perto do raio da ponta (6 mm) e da quina (8 mm) dos para-choques: a 90 mm a imagem cobre uns 62 mm, e o raio de 6 mm ocupa uns 87 pontos, e não os 2 da vista isolada */
+  dePerto: { distancia: 90 },
 };
 const m = (mm) => mm / 1000;
 /* os pontos da última estação do painel de trás, de baixo para cima: a borda livre que a aba dobra */
 const bordaDoPainelDeTras = () => Object.entries(PAINEL_DE_TRAS.pontos).filter(([n]) => n.startsWith('painelTraseiro_borda_')).sort((a, b) => a[1][1] - b[1][1]).map(([n]) => n);
+
+/** As vistas de perto de um para-choque, em mm do referencial da peça, tiradas dos pontos do esboço na ponta de +x (o último laço, o de maior x): o meio da aresta de cima da ponta,
+ * onde o raio de 6 mm da ponta se vê entre a tampa e o topo, e a quina de cima da face de fora, onde se vê o de 8 mm. A câmera da vista de perto é a isométrica de +x, +y e +z. */
+function dePertoDoParaChoque(g, nome, fora, ponta, quina, distancia) {
+  const xMax = Math.max(...Object.values(g.pontosMm).map((q) => q[0]));
+  const ponto = (sufixo) => g.pontosMm[Object.keys(g.pontosMm).find((n) => n.startsWith(`${nome}_l`) && n.endsWith(`_${sufixo}`) && g.pontosMm[n][0] === xMax)];
+  return [{ ponto: ponto('cima1'), oQue: ponta, distancia }, { ponto: ponto(fora), oQue: quina, distancia }];
+}
 
 /** A interface da porta, em mm. */
 export function derivar(Tab = TABELA) {
@@ -63,7 +74,12 @@ const receita = {
     objeto: 'a frente e a traseira de um sedã de 4,4 m: painéis de 1 mm com grade e rebaixos de farol e lanterna, lentes, para-choques de ponta a ponta e tomada de ar do capô',
     referencias: ['../../referencias/sedan-chassi-e-lataria.contornos.json'],
     escala: { medida: 'comprimento total do sedã, de z -2200 a 2200', milimetros: 4400 },
-    partes: [...ETAPAS[ETAPA], 'abaDoPainelTraseiro'].map(parteDoPlano),
+    partes: [...ETAPAS[ETAPA], 'abaDoPainelTraseiro'].map(parteDoPlano).map((p) => {
+      const d = TABELA.dePerto.distancia;
+      if (p.nome === 'paraChoqueDianteiro') return { ...p, dePerto: dePertoDoParaChoque(PARA_CHOQUE_DA_FRENTE, p.nome, 'cima0', 'a ponta de +x, no topo: raio de 6 mm entre a tampa da ponta e a face de cima', 'a quina de cima da face da frente, na ponta de +x: raio de 8 mm', d) };
+      if (p.nome === 'paraChoqueTraseiro') return { ...p, dePerto: dePertoDoParaChoque(PARA_CHOQUE_DE_TRAS, p.nome, 'tras0', 'a ponta de +x, no topo: raio de 6 mm entre a tampa da ponta e a face de cima', 'a quina de cima da face de trás (de costas para a câmera, fica no contorno), na ponta de +x: raio de 8 mm', d) };
+      return p;
+    }),
     criteriosDeReprovacao: [
       'o para-choque que não vai de ponta a ponta, com costura no eixo, ou com a ponta em quina viva no lugar do raio de 6 mm',
       'a lente do farol ou da lanterna fora da abertura do rebaixo, ou atravessando a chapa do painel',
