@@ -187,20 +187,24 @@ export function executar(args) {
   const nome = args.find((a) => !a.startsWith('--'));
   if (!nome) return { codigo: 0, stdout: `${listarTudo()}\n`, stderr: '' };
   const publicada = classificarNome(nome);
+  /* a palavra: as capacidades cuja ficha a cita em `serve` ou `quando` (painel, vão, linha de vão, porta, capô) */
+  const palavras = semAcento(args.filter((x) => !x.startsWith('--')).join(' ')).split(/\s+/).filter((w) => w.length >= 3);
+  const citam = Object.keys(CAPACIDADES).filter((n) => {
+    const f = fichaDe(n);
+    const texto = semAcento((f?.linhas ?? []).filter((l) => l.startsWith('serve: ') || l.startsWith('quando: ')).join(' '));
+    return palavras.length > 0 && palavras.every((w) => texto.includes(w));
+  });
   if (publicada && publicada.tipo !== 'ficha') {
     const { operacoes, extensoes } = operacoesPublicadas();
     const extensao = publicada.tipo === 'extensao' ? extensoes.get(publicada.nome) : null;
-    return { codigo: 0, stdout: fichaDaOperacao(extensao ? extensao.item : operacoes.get(publicada.nome), { extensao }), stderr: '' };
+    /* O nome de operação também pode ser a palavra que leva a um ajudante: `filete` é operação, e é por ela que se acha o
+       `raioDaAresta`. A ficha da operação sai primeiro, e as fichas de ajudante que citam a palavra vêm depois. */
+    const ficha = fichaDaOperacao(extensao ? extensao.item : operacoes.get(publicada.nome), { extensao });
+    const tambem = citam.length ? `\nfichas de ajudante que citam '${nome}':\n${citam.map((n) => `${n.padEnd(20)} ${fichaDe(n).serve}`).join('\n')}\n` : '';
+    return { codigo: 0, stdout: `${ficha}${tambem}`, stderr: '' };
   }
   const achado = publicada?.nome;
   if (!achado) {
-    /* a palavra que não é nome: as capacidades cuja ficha a cita em `serve` ou `quando` (painel, vão, linha de vão, porta, capô) */
-    const palavras = semAcento(args.filter((a) => !a.startsWith('--')).join(' ')).split(/\s+/).filter((w) => w.length >= 3);
-    const citam = Object.keys(CAPACIDADES).filter((n) => {
-      const f = fichaDe(n);
-      const texto = semAcento((f?.linhas ?? []).filter((l) => l.startsWith('serve: ') || l.startsWith('quando: ')).join(' '));
-      return palavras.length > 0 && palavras.every((w) => texto.includes(w));
-    });
     if (citam.length) return { codigo: 0, stdout: `'${nome}' não é o nome de uma capacidade; as que a citam:\n${citam.map((n) => `${n.padEnd(20)} ${fichaDe(n).serve}`).join('\n')}\n`, stderr: '' };
   }
   if (!achado) {
