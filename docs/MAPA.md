@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2040 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2041 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2110,6 +2110,7 @@
 - `receita-01.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 - `receita-02.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 - `receita-03.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
+- `receita-04.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/
 

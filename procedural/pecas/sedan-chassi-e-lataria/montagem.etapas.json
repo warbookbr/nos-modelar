@@ -45,9 +45,13 @@
     },
     {
       "instancia": "acessorios",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:2f62717eb8ec61ebbe626efa2ca77301bfabd148af04a8c5ded72377c91edcf7"
+      "forma": "sha256:2f62717eb8ec61ebbe626efa2ca77301bfabd148af04a8c5ded72377c91edcf7",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
+        "analise": "ausente"
+      }
     }
   ]
 }

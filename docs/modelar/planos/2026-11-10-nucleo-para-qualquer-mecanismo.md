@@ -183,50 +183,40 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    [atritos](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/ATRITOS.md):
    a linha de superfície que atravessa uma dobra viva pede três linhas, e o
    corte com lâminas de superfície leva de 10 a 14 s.
-4c. **Sedã em alta definição, neste plano, pedido pela pessoa em 2026-11-11; entra quando a 4b fechar.**
+4c. **Sedã em alta definição, neste plano, pedido pela pessoa em 2026-11-11 e fechada em 2026-11-13.**
    Pergunta: partindo do sedã facetado em painéis, o projeto leva uma IA a uma
    carroceria de superfície dura em alta definição, e o que falta para isso?
-   O sedã é um carro de caixa: os painéis são quase planos, com pouca flecha, e
-   a qualidade está na aresta com raio controlado, no vão com borda virada, no
-   lábio do arco de roda e nos rebaixos de farol, maçaneta e grade. O que o
-   projeto já mediu: a chapa lisa por rede de curvas chegou a nota 7 no trecho
-   inteiro e 5 nos detalhes de borda, o raio de dobra só se controla pela
-   nitidez do vinco, que depende do tamanho da face, o painel sai sem aba, e o
-   rebaixo não existe. Método, em ciclos curtos: uma tentativa de um agente
-   sobre uma parte do carro com o que existe, a medida do que saiu, a melhoria
-   geral que a tentativa pedir, e a mesma parte refeita. Primeiro ciclo: o
-   corpo de baixo e o capô, pelos dois caminhos em disputa, que são a casca
-   facetada usada como gaiola de subdivisão com vinco por aresta, e a gaiola
-   por rede de curvas sobre as linhas do carro facetado. Critérios medidos de
-   cada ciclo: nenhuma falha de `npm run ondulacao` fora das junções
-   declaradas, nenhuma face fina, raio das arestas de caráter dentro de 20% do
-   pedido, vão de 4,0 a 4,2 mm e degrau até 0,3 mm por `npm run vao:partes`, e
-   a nota do crítico sem contexto com luz rasante e curvatura. Saída: o sedã
-   inteiro em alta definição com as etapas fixas, e a lista do que foi
-   melhorado e do que ficou para plano próprio.
-   Ciclo 1, de 2026-11-11, sobre o corpo de baixo de um lado e o capô
-   ([`CICLO-1.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-1.md)):
-   a grade de estações com colunas de apoio junto das quinas ganhou da rede de
-   curvas, com um terço das faces e do tempo, a luz rasante limpa e o raio da
-   cintura a 9% do pedido; a rede ondulou de 1,9 a 3,5 mm em volta dos arcos.
-   Nenhum dos dois caminhos cumpriu os critérios. O ciclo pediu, e entram
-   agora: o raio em milímetro no vinco, convertido em colunas de apoio e
-   conferido na saída; o comando que mede o raio de uma aresta nomeada, com a
-   definição escrita; as medidas de superfície lendo o esboço 2.0 e a chapa já
-   cortada; a linha de vão dada por uma curva sobre a chapa, que sobe a quina
-   arredondada onde a linha de vista é recusada; e a borda do painel com aba.
-   Ficam para o ciclo seguinte de modelagem o lábio do arco de roda, e para
-   plano próprio o rebaixo de farol, maçaneta e grade.
-   O ciclo 2
-   ([`CICLO-2.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-2.md)),
-   com essas ferramentas, levou o mesmo trecho a nenhuma falha de ondulação
-   (máximo de 0,29 mm, eram 3,61), à cintura com 5,8 mm para 6 pedidos e ao
-   vão entre 4,04 e 4,16 mm, com o lábio do arco de roda.
-   Depois, as medidas do ciclo 2 foram corrigidas: `vao:partes` não toma mais
-   a parede do corte por pele (os dois pares que ele reprovava saem com degrau
-   de 0,05 e 0,03 mm), `raio:aresta` tira a janela do raio pedido de cada
-   corte, e a montagem do esboço fica em cache, o que leva uma rodada de
-   medidas de 4 minutos a 42 s. Os atritos de núcleo dos ciclos 3 ([`CICLO-3.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-3.md)) e 4 ([`CICLO-4.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-4.md)) fecharam em 2026-11-11 sem mudar o acervo: raio em quina oblíqua, quinas que se cruzam (estações e laços), `friso.refinar`, colunas que se fundem, o cache, a prova de separação na ponta alongada, a curva até a coluna que termina, o aviso de normal ao contrário (`fora`) e o rebaixo por relevo de anel (aviso de grade larga e lente). O ciclo 5 ([`CICLO-5.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-5.md)) fechou o carro inteiro sobre o chassi, e seus atritos de núcleo fecharam em 2026-11-12: face degenerada no corte, ponto repetido entre passos recusado e lista de raios no cruzamento.
+   Método: ciclos curtos de tentar com o que existe, medir, fazer a melhoria
+   geral que a tentativa pede e refazer. Os ciclos estão no banco de provas
+   ([1](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-1.md), [2](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-2.md), [3](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-3.md),
+   [4](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-4.md) e a passagem a receita em [`RECEITA.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/RECEITA.md)).
+   Do ciclo 1 ao 4 a grade de estações com colunas de apoio junto das quinas
+   ganhou da rede de curvas, e entraram no núcleo e nas ferramentas o raio em
+   milímetro no vinco, `raio:aresta`, as medidas de superfície lendo o esboço
+   2.0 e a chapa cortada, a linha de vão por curva sobre a chapa, a aba do
+   painel, o lábio do arco de roda e a medida de vão que não toma a parede do
+   corte por pele. O trecho de prova chegou a nenhuma falha de ondulação
+   (0,29 mm de máximo, eram 3,61), à cintura com 5,8 mm para 6 pedidos e ao
+   vão entre 4,04 e 4,16 mm.
+   Fechamento: o sedã está em receita de cinco etapas (carroceria com o
+   chassi, vidros, frente e traseira, rodas e acessórios), todas fixas em
+   2026-11-13 pela IA da sessão, por delegação da pessoa, com o crítico sem
+   contexto dando nota 8 e nenhum defeito em cada uma (carroceria e vidros na
+   rodada 3, frente e traseira na 4, rodas na 2, acessórios na 1). Medidas: 0
+   face fina (eram 337 no chassi aparado), auditoria da montagem com 10 de 10
+   pares, e `vaos-sem-fundo.sh` saindo 0 em 278 pares. As rodadas deixaram na
+   ferramenta geral: a limpeza de lascas que funde tira e dissolve o ponto de
+   passagem; o pedido do crítico com o contato declarado e o motivo em cada
+   corte, a caixa de cada parte em milímetro, a medição antes da captura e a
+   vista de perto (`PLANO.partes[].dePerto`); a medição da rodada na lista do
+   modelador; e a árvore de caixas do contato com o canto agudo à parte.
+   Ficam para plano próprio ou para a ferramenta: o `aparar` entrega a face do
+   molde, facetada (a cunha no topo dos montantes e os degraus na travessa da
+   cabine); a montagem do sedã leva 4 minutos para abrir, porque cada etapa
+   executa o recorte do carro inteiro; a aba do `paineisPorVaos` não fecha a
+   união na chapa do sedã; o pedido de uma peça de 55 partes não cabe num
+   crítico e pede repartição por grupos; a vista de perto tem uma câmera só;
+   e o rebaixo de farol, maçaneta e grade.
 4. **Forma por classe** (um plano por classe). Tubo e chapa dobrada, com a
    varredura de seção variável; e dupla curvatura com rebaixo, vão e costura,
    que depende dos planos de rebaixo por contorno, de aberturas e de costuras.

@@ -163,3 +163,7 @@ O raio medido na malha (`raio:aresta`, cortes a cada 50 mm): ponta de 5,8 a 7,0 
 A vista de perto da ponta do de trás, isométrica de +x, +y e +z, mostra o raio entre a tampa da ponta e o topo; a quina de cima da face de fora, de costas para a câmera, só aparece no contorno.
 
 A promessa dos dois para-choques saiu de uma linha só de `_comum/sedan.mjs` e agora é uma para cada: o de trás diz que a face de fora afunila em planta de x 800 a 856, com o fundo de 72 a 36 mm, e que a ponta é de raio 6 mm e não chanfro; o da frente diz que de x 780 a 805 a face de trás recua para abraçar o canto do para-lama e que o fundo cai de 72 a 36 mm até a ponta. O critério de reprovação da ponta passou a dizer que o afunilamento é o prometido e que o chanfro reto reprova. A malha segue idêntica e as etapas carroceria e vidros seguem fixas.
+
+## Etapas fixas em 2026-11-13
+
+As cinco etapas da montagem estão fixas, pela IA da sessão por delegação da pessoa, cada uma com o crítico sem contexto dando nota 8 e nenhum defeito: carroceria e vidros na rodada 3, frente e traseira na rodada 4, rodas na rodada 2 e acessórios na rodada 1. O registro de cada rodada, com o veredito, a atribuição de cada apontamento e a nota de passagem, está em `procedural/pecas/sedan-chassi-e-lataria/partes/<etapa>/rodadas/`. O que ficou para a ferramenta ou para plano próprio está no fechamento da fatia 4c do plano do núcleo.
