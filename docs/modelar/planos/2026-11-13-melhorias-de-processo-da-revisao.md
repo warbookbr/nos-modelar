@@ -31,6 +31,8 @@ USAR DIRETO: a bateria `tools/gates.mjs` com o seletor do que mudou, o registro 
 7. O diário de atritos ganha um formato com quatro campos (o que aconteceu com o comando, o custo, se o processo pegou e o destino), escrito na skill que manda registrar o atrito; os diários antigos não são reescritos.
 8. A página `docs/modelar/MECANISMOS.md`, de uma tela, com cada mecanismo, o que faz, quando é usado e onde mora, e a conferência que acusa mecanismo novo fora da lista.
 
+Estado em 2026-11-13. Feitas por três agentes e conferidas por quem conduz: a fatia 1 (`tools/gates/guarda-local.mjs`, com a guarda de cada peça mudada e o limite de 60 s); a fatia 4 (regra `merge=union` para o mapa no `.gitattributes`, com `npm run mapa` depois de toda junção, e `npm run planos:gerar` para as linhas do `README.md` e do `INDEX.md`); a fatia 5 (a régua da fronteira em `independencia-catalogo.mjs`, com 67 arquivos e 113 imports conferidos, e as cinco extensões no catálogo). Feita por quem conduz: a fatia 3. Feitas em parte: a fatia 2, em que o teto relativo vale na máquina local e não no CI, porque o histórico de durações mora em `tmp/` e o CI começa limpo, e porque as três reprovações medidas eram prazos escritos nos testes e em `vitest.config.ts`, fora do território do agente, que os listou; a fatia 6, com o arquivo de regras escrito e as definições de agente ainda sem a citação; a fatia 8, com a página escrita e a conferência por fazer. A fatia 7 não começou.
+
 ## Excluído
 
 - as mudanças de núcleo, que são do [plano do núcleo para quem escreve receita](2026-11-13-nucleo-para-quem-escreve-receita.md);

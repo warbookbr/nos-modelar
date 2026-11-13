@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2060 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2066 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -386,6 +386,13 @@
 
 - `README.md` — Navegação de receitas, 2026-11-05
 - `hash-da-malha.mjs` — hash-da-malha.mjs — o hash da malha canônica de uma receita, para provar que a divisão em arquivos não muda nada.
+
+## docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/
+
+- `README.md` — Organização dos documentos: o levantamento das decisões em vigor
+- `decisoes-historico.md` — Decisões em vigor, lote 3 de historico/
+- `decisoes-planos-encerrados-1.md` — Decisões em vigor, lote 1
+- `decisoes-planos-encerrados-2.md` — Decisões em vigor, lote 2
 
 ## docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/
 

@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `docs/modelar/usar/`, `docs/modelar/contratos/`, `docs/modelar/decisoes/`, `docs/modelar/pesquisas/`, `docs/modelar/historico/`, `tools/modelar/comecar.mjs`. Entram também os 41 documentos soltos de `docs/modelar/` que a proposta lista com destino, a pasta `docs/modelar/planos/encerrados/`, que é caminho compartilhado, e, em cada arquivo que cita um documento movido, só a linha do link. Os três arquivos de instrução por pasta entram no território quando a fatia 5 começar.
+**Território:** `docs/modelar/usar/`, `docs/modelar/contratos/`, `docs/modelar/decisoes/`, `docs/modelar/pesquisas/`, `docs/modelar/historico/`, `docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/`, `tools/modelar/comecar.mjs`. Entram também os 41 documentos soltos de `docs/modelar/` que a proposta lista com destino, a pasta `docs/modelar/planos/encerrados/`, que é caminho compartilhado, e, em cada arquivo que cita um documento movido, só a linha do link. Os três arquivos de instrução por pasta entram no território quando a fatia 5 começar.
 
 **Responsável:** a IA da sessão do furgão orquestra, com agentes; a pessoa aprovou a organização por imagem em 2026-11-13.
 
@@ -27,6 +27,8 @@ USAR DIRETO: o gate de links, que acusa cada link quebrado por um arquivo movido
 3. O registro de decisão: um arquivo curto por decisão em vigor, com a data, o que ficou decidido, o porquê, o que ela substitui e o commit e o caminho do plano de origem. Depois de entrar, o registro não é editado; uma decisão nova o substitui e ele sai do índice. O índice de `decisoes/` é gerado e conferido.
 4. `planos/encerrados/` e `historico/` saem da árvore, depois de as fatias 2 e 3 fecharem. A crônica de uma linha por plano vai para `decisoes/`, com o commit em que o texto inteiro está. O roteiro `pesquisar` passa a apontar para `decisoes/`.
 5. `procedural/nucleo/`, `procedural/pecas/` e `tools/` ganham cada uma um arquivo de instrução com o que só vale nela, tirado do que hoje está em documento geral, sem repetir o contrato da raiz.
+
+Estado em 2026-11-13: a fatia 2 está feita, em [`organizacao-dos-documentos-2026-11-13`](../banco-de-provas/organizacao-dos-documentos-2026-11-13/README.md): 181 arquivos lidos por três agentes, 11 decisões sem lugar vivo, abaixo do limite de 40 que mandaria parar. As outras fatias não começaram.
 
 ## Excluído
 
