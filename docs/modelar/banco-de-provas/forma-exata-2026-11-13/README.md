@@ -11,3 +11,7 @@ Um modelador fez a primeira forma da kukri em 8 minutos e 36 chamadas de ferrame
 - levantou o contorno da foto com um script próprio de pixels, sem usar o módulo de contorno da imagem;
 - comparou o resultado com a foto a olho, sem sobreposição nem medida de desvio, e entregou sabendo de seis diferenças;
 - a vista que mostra o perfil da faca saiu espelhada em relação à referência.
+
+## O estudo do método
+
+- [Estudo do método: a forma exata antes da malha, medida em três casos](ESTUDO-DO-METODO.md): o protótipo de `procedural/nucleo/forma-exata/`, os três casos com os números do método atual e do protótipo, o que o método cobre e não cobre, e o custo de levar cada operação.

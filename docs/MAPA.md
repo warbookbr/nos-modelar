@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1845 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1854 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -303,6 +303,7 @@
 
 ## docs/modelar/banco-de-provas/forma-exata-2026-11-13/
 
+- `ESTUDO-DO-METODO.md` — Estudo do método: a forma exata antes da malha, medida em três casos
 - `README.md` — Forma exata antes da malha: medidas e estudo
 
 ## docs/modelar/banco-de-provas/furgao-realista-2026-10-30/
@@ -1055,6 +1056,17 @@
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 - `moldura-prova.js` — moldura-prova.js — a chapa curva com vão de `friso-prova.js` e as molduras em volta da borda dele, desenhadas por código para a conferência da moldura (`mold…
 - `varredura-prova.js` — varredura-prova.js — as três peças varridas de prova da `gaiolaVarrida`, desenhadas por código
+
+## procedural/nucleo/forma-exata/
+
+- `casos-medidos.test.mjs` — casos-medidos.test.mjs — os três casos do estudo do método (plano "forma exata antes da malha", fatia 3), cada um medido no método atual do núcleo e no protó…
+- `contorno-exato.js` — contorno-exato.js — o contorno 2D guardado como retas e arcos, e não como pontos (protótipo do estudo do método, plano "forma exata antes da malha", fatia 3).
+- `forma-exata.js` — forma-exata.js — a peça de aresta dura guardada como forma exata, com a malha gerada só no fim (protótipo do estudo do método, plano "forma exata antes da ma…
+- `forma-exata.test.mjs` — forma-exata.test.mjs — o protótipo da forma exata antes da malha: o contorno de retas e arcos e o recuo dele, a triangulação da região plana, as operações de…
+- `juncao-de-tubos.js` — juncao-de-tubos.js — o encontro em T de dois cilindros com arredondamento na costura, por construção direta a partir das curvas exatas (protótipo do estudo d…
+- `juncao-de-tubos.test.mjs` — juncao-de-tubos.test.mjs — o encontro em T de dois cilindros com arredondamento, construído das curvas exatas: a malha fecha, o volume confere com a conta do…
+- `medir-malha.js` — medir-malha.js — as medidas de uma malha {V, F} que o estudo do método compara: volume, estanqueidade e a menor área de face (protótipo do plano "forma exata…
+- `triangular-regiao.js` — triangular-regiao.js — a triangulação de uma região plana delimitada por laços de pontos, com pontos novos por dentro (protótipo do estudo do método, plano "…
 
 ## procedural/nucleo/operacoes/
 
