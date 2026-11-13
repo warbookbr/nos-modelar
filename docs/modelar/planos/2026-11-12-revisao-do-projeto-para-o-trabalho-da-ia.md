@@ -67,6 +67,19 @@ melhorando o núcleo, ir melhorando a organização". O plano passa a ter duas f
 por objetos de prova, e conta com "vários agentes trabalhando em paralelo", com a sessão do núcleo planejando e orquestrando. As
 medidas e o relatório ficam em [`revisao-do-projeto-2026-11-13`](../banco-de-provas/revisao-do-projeto-2026-11-13/README.md).
 
+## Estado em 2026-11-13, para quem retomar
+
+A pessoa encerrou a sessão que orquestrava e abre outra; esta seção é a passagem. Da fatia 1, a metade de pastas, módulos e
+núcleo está levantada em cinco arquivos na pasta do território, ligados no README dela: pastas e módulos, projetos comparáveis,
+operações e verbosidade, erros, nomes e argumentos, e tempo por operação. Três números foram conferidos por amostra contra o
+código; o resto ainda não passou pela revisão cruzada. A metade de regras, documentos e agentes é da sessão do furgão (ramo
+`claude/revisar-plano-ativo-cyj8c3`), avisada da ativação; ela não tem como enviar recado e responde pelo repositório ou pela
+pessoa. Falta: a pergunta 7, que é das duas; a fatia 2 inteira; e duas decisões pedidas à pessoa e ainda sem resposta, com a
+recomendação de quem orquestrava: este plano absorver as fatias 2 a 6 do plano do núcleo para qualquer mecanismo, e o primeiro
+objeto de prova ser um mecanismo com juntas que se movem, que é o que o sedã não provou. A modelagem dos objetos de prova é
+pesada para a máquina da nuvem, de quatro núcleos; a pessoa tentou ligar o computador dela à sessão e o recurso não estava
+disponível, então a saída é uma sessão aberta direto no computador dela para essa parte.
+
 ## Filtro Agent-First
 
 USAR DIRETO: o histórico do CI, a saída da bateria de gates, os roteiros do `comecar`, o catálogo de capacidades, o registro
