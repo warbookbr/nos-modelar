@@ -340,9 +340,47 @@ function lerV4(dado) {
   };
 }
 
+/* `manual`: texto opcional que só o módulo de manual lê. `nomes` dá o nome de exibição por referência de alvo (a `ref` de
+   uma instância); `etapas` dá, por id de instância, uma instrução curta e avisos. Nenhum campo muda a geometria. */
+function lerManual(valor, instancias) {
+  const caminho = 'manual';
+  if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
+  chavesExatas(valor, ['nomes', 'etapas'], caminho);
+  const refs = new Set(instancias.map((instancia) => instancia.alvo.ref));
+  const ids = new Set(instancias.map((instancia) => instancia.id));
+  const saida = {};
+  if (valor.nomes !== undefined) {
+    if (!ehObjetoSimples(valor.nomes)) falhar('estrutura-invalida', `${caminho}.nomes`, 'precisa ser objeto simples.');
+    saida.nomes = {};
+    for (const ref of Object.keys(valor.nomes).sort(compararTexto)) {
+      if (!refs.has(ref)) falhar('manual-invalido', `${caminho}.nomes.${ref}`, `'${ref}' não é o alvo de nenhuma instância da montagem.`);
+      saida.nomes[ref] = textoNaoVazio(valor.nomes[ref], 'manual-invalido', `${caminho}.nomes.${ref}`);
+    }
+  }
+  if (valor.etapas !== undefined) {
+    if (!ehObjetoSimples(valor.etapas)) falhar('estrutura-invalida', `${caminho}.etapas`, 'precisa ser objeto simples.');
+    saida.etapas = {};
+    for (const id of Object.keys(valor.etapas)) {
+      const onde = `${caminho}.etapas.${id}`;
+      if (!ids.has(id)) falhar('manual-invalido', onde, `instância '${id}' não existe na montagem.`);
+      const texto = valor.etapas[id];
+      if (!ehObjetoSimples(texto)) falhar('estrutura-invalida', onde, 'precisa ser objeto simples.');
+      chavesExatas(texto, ['instrucao', 'avisos'], onde);
+      saida.etapas[id] = {
+        ...(texto.instrucao === undefined ? {} : { instrucao: textoNaoVazio(texto.instrucao, 'manual-invalido', `${onde}.instrucao`) }),
+        ...(texto.avisos === undefined ? {} : {
+          avisos: (Array.isArray(texto.avisos) ? texto.avisos : falhar('manual-invalido', `${onde}.avisos`, 'precisa ser lista de textos.'))
+            .map((aviso, i) => textoNaoVazio(aviso, 'manual-invalido', `${onde}.avisos[${i}]`)),
+        }),
+      };
+    }
+  }
+  return saida;
+}
+
 function lerV5(dado) {
-  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'posicoes', 'auditoriaIntersecoes', 'apoioNoChao'], '$');
-  const { etapas: etapasBrutas, vinculos: vinculosBrutos, posicoes: posicoesBrutas, auditoriaIntersecoes, apoioNoChao, ...base } = dado;
+  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'posicoes', 'auditoriaIntersecoes', 'apoioNoChao', 'manual'], '$');
+  const { etapas: etapasBrutas, vinculos: vinculosBrutos, posicoes: posicoesBrutas, auditoriaIntersecoes, apoioNoChao, manual, ...base } = dado;
   const lida = lerV3({ ...base, versao: VERSAO_ATUAL });
   const posesDeclaradas = new Set(dado.instancias
     .filter((instancia) => ehObjetoSimples(instancia) && instancia.pose !== undefined)
@@ -369,6 +407,7 @@ function lerV5(dado) {
     posicoes,
     ...(auditoriaIntersecoes !== undefined ? { auditoriaIntersecoes: lerAuditoriaIntersecoes(auditoriaIntersecoes) } : {}),
     ...(apoioNoChao !== undefined ? { apoioNoChao: lerApoioNoChao(apoioNoChao, new Set(lida.instancias.map((instancia) => instancia.id))) } : {}),
+    ...(manual !== undefined ? { manual: lerManual(manual, lida.instancias) } : {}),
   };
 }
 
