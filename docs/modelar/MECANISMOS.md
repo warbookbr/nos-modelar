@@ -5,6 +5,7 @@ O que existe no projeto além do código que constrói formas, o que cada coisa 
 | Mecanismo | O que faz | Quando é usado | Onde mora |
 |---|---|---|---|
 | Contrato | As regras que nenhuma ferramenta confere | No começo de toda sessão | `CLAUDE.md` |
+| Instrução por pasta | O que só vale no núcleo, nas peças e nas ferramentas | Ao mexer num arquivo da pasta | `procedural/nucleo/CLAUDE.md`, `procedural/pecas/CLAUDE.md`, `tools/CLAUDE.md` |
 | Começar | Diz o que ler, a skill e o primeiro passo de cada tipo de tarefa | Antes de qualquer tarefa | `npm run comecar`, `docs/modelar/roteiros/` |
 | Roteiros de leitura | A lista do que se lê por tipo de tarefa, com teto de tamanho | Pelo começar | `docs/modelar/roteiros/roteiros.json` |
 | Planos | Autorizam um trabalho e dizem em que arquivos ele mexe | Antes de implementar | `docs/modelar/planos/` |

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1817 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1820 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -875,6 +875,7 @@
 
 ## procedural/nucleo/
 
+- `CLAUDE.md` — Núcleo: o que só vale nesta pasta
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
 - `aparar.test.ts` — aparar.test.ts — `aparar`: o sólido cortado pelo lado de dentro de uma chapa subdividida, a `folga` da pele de dentro dela. Mede, numa calota de gaiola de ci…
@@ -1073,6 +1074,10 @@
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `triangulacao-sem-leque.test.ts` — triangulacao-sem-leque.test.ts — face plana grande (tampa de superelipse, pedaço de união) não sai em leque: grau máximo por canto e ângulo mínimo dos triâng…
 - `uniao-lateral-rente.test.ts` — uniao-lateral-rente.test.ts — `unir` com laterais coplanares (rentes). Caso do ombro do braço robótico: coluna e braço com a MESMA meia largura. A saída tem …
+
+## procedural/pecas/
+
+- `CLAUDE.md` — Peças: o que só vale nesta pasta
 
 ## procedural/pecas/ambulancia/
 
@@ -2276,6 +2281,7 @@
 
 ## tools/
 
+- `CLAUDE.md` — Ferramentas: o que só vale nesta pasta
 - `README.md` — tools/ — ferramentas do Modelar e do núcleo herdado
 - `ambiente.mjs` — ambiente.mjs — lê uma variável de ambiente pelo nome novo (`MODELAR_*`) e aceita o antigo (`MECANIFICA_*`) com aviso.
 - `ambiente.test.mjs` — ambiente.test.mjs — o nome novo vale, o antigo vale com um aviso só por nome, e o vazio conta como ausente.
