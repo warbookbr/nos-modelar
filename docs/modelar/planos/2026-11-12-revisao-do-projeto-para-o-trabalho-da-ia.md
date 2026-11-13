@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/`. A análise não muda código nem regra: só o relatório e as medidas dela entram no repositório, nessa pasta; a execução sai em planos próprios, com território.
+**Território:** `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/`, `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`, `procedural/nucleo/paineis-por-vaos.js`, `procedural/nucleo/paineis-por-vaos.test.ts`, `tools/modelar/vao-entre-partes.mjs`, `tools/modelar/vao-entre-partes.test.mjs`, `procedural/nucleo/lamina-sobre-a-superficie.js`, `procedural/nucleo/paineis-por-vaos-superficie.test.ts`, `tools/modelar/instancia-de-familia.mjs`, `tools/modelar/instancia-de-familia.test.mjs`, `procedural/nucleo/apoio-do-vinco.js`, `procedural/nucleo/apoio-do-vinco.test.ts`, `procedural/nucleo/gaiola-por-estacoes.js` (o campo `raio` do vinco), `tools/modelar/raio-da-aresta.mjs`, `tools/modelar/raio-da-aresta.test.mjs`, `tools/modelar/entrada-de-medida.mjs`, `tools/modelar/entrada-de-medida.test.mjs` (o cache da montagem; a bandeira `--sem-cache` entra em `lasca.mjs`, `ondulacao-da-superficie.mjs`, `vistas-de-superficie.mjs` e `exportar-obj.mjs`, só nela), `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/friso-refinar.test.mjs`, `procedural/nucleo/gaiola-por-estacoes.test.mjs`, `.claude/skills/criar-peca/references/operacoes-procedurais.md`, `docs/modelar/modelar-carroceria.md`, `procedural/nucleo/gaiola-aneis.js`, `procedural/nucleo/normal-da-gaiola.js`, `procedural/nucleo/normal-da-gaiola.test.ts`, `procedural/nucleo/gaiola-aneis-rebaixo.test.mjs`, `procedural/nucleo/aparar.test.ts`, `procedural/nucleo/molde-de-dentro.js`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/catalogo.test.mjs`, `procedural/nucleo/fixtures/motor-r00-baseline.json`, `tools/mcp/procedural.test.mjs`, `src/autoria/contato-de-solidos.js`, `src/autoria/contato-de-solidos-raio-na-aresta.test.mjs`, `src/autoria/contatos-da-peca.js`, `src/autoria/descrever-partes.js`, `src/autoria/encosto-da-peca.test.mjs`, `src/autoria/contato-em-plano-inclinado.test.mjs`, `src/autoria/molduras-do-vao.js`, `src/autoria/molduras-do-vao-chapa-cortada.test.mjs`, `procedural/nucleo/operacoes/limpar-lascas.js`, `procedural/nucleo/limpar-lascas-escala.test.mjs`, `procedural/nucleo/fixtures/lasca-na-escala-da-peca.json`, `procedural/nucleo/fixtures/lasca-na-tolerancia-da-peca.json`, `procedural/nucleo/paineis-por-vaos-aba.test.mjs`, `procedural/nucleo/ponto-na-malha.js`, `procedural/nucleo/ponto-na-malha.test.mjs`, `procedural/nucleo/composicoes.js`, `procedural/nucleo/composicoes.test.mjs`, `procedural/nucleo/triangulacao-face.js`, `tools/modelar/custo-de-importar-receita.test.mjs`, `tools/modelar/medir-importar-receita.mjs`, `tools/testes-lentos.mjs`, `tools/modelar/ondulacao-da-superficie.mjs`, `tools/modelar/ondulacao-corte-e-quina.test.mjs` (a operação `aparar` e a contagem de cruzamentos do contato, da fatia 4c, e os atritos de ferramenta que o sedã em receita revelou, no `RECEITA.md` dele; o par espelhado do relato e a tabela em mm ficam no território do plano de conferência). A primeira pasta é do inventário, que não muda código nem regra. Os demais caminhos vieram do plano do núcleo para qualquer mecanismo, fechado em 2026-11-13, e servem à frente de validação; a pasta de cada objeto de prova entra aqui quando ele for escolhido. A execução do que o inventário recomendar sai em planos próprios, com território.
 
 **Responsável:** a IA da sessão do núcleo planeja e orquestra, com agentes em paralelo, por decisão da pessoa em 2026-11-13; a sessão do furgão levanta a metade dela e revisa a outra; a decisão de cada grupo de achados é da pessoa.
 
@@ -74,9 +74,8 @@ núcleo está levantada em cinco arquivos na pasta do território, ligados no RE
 operações e verbosidade, erros, nomes e argumentos, e tempo por operação. Três números foram conferidos por amostra contra o
 código; o resto ainda não passou pela revisão cruzada. A metade de regras, documentos e agentes é da sessão do furgão (ramo
 `claude/revisar-plano-ativo-cyj8c3`), avisada da ativação; ela não tem como enviar recado e responde pelo repositório ou pela
-pessoa. Falta: a pergunta 7, que é das duas; a fatia 2 inteira; e duas decisões pedidas à pessoa e ainda sem resposta, com a
-recomendação de quem orquestrava: este plano absorver as fatias 2 a 6 do plano do núcleo para qualquer mecanismo, e o primeiro
-objeto de prova ser um mecanismo com juntas que se movem, que é o que o sedã não provou. A modelagem dos objetos de prova é
+pessoa. Falta: a pergunta 7, que é das duas; a fatia 2 inteira; e o primeiro ciclo da fatia 4, já decidido pela pessoa e
+descrito nela. A modelagem dos objetos de prova é
 pesada para a máquina da nuvem, de quatro núcleos; a pessoa tentou ligar o computador dela à sessão e o recurso não estava
 disponível, então a saída é uma sessão aberta direto no computador dela para essa parte.
 
@@ -116,8 +115,15 @@ uma das sete perguntas não puder ser respondida sem ela.
 2. A revisão cruzada e a classificação, com a recomendação por grupo.
 3. A decisão da pessoa.
 4. A validação por objetos de prova, em ciclos curtos de escolher o objeto pelo que falta provar, modelar, medir, melhorar a
-   ferramenta geral e refazer. Corre ao lado das fatias 1 a 3. A escolha dos objetos e a relação desta frente com as fatias
-   2 a 6 do plano do núcleo saem da recomendação de quem orquestra, a confirmar com a pessoa.
+   ferramenta geral e refazer. Corre ao lado das fatias 1 a 3. Em 2026-11-13 a pessoa respondeu "sim para as duas" às duas
+   recomendações de quem orquestrava. A primeira: esta frente absorve o que restava do
+   [plano do núcleo para qualquer mecanismo](encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md), fechado por isso, a
+   saber as juntas na montagem, a leitura de referência, a forma por classe, as famílias e os objetos de prova, com as saídas
+   que ele descreve em cada uma. A segunda: o primeiro objeto de prova é um mecanismo com juntas que se movem, porque o sedã
+   provou chapa e superfície dura e junta ainda não foi provada. A proposta para o primeiro ciclo, a ajustar por quem retomar:
+   medir assento, guia prismática e articulação com eixo e curso na empilhadeira, que já está no acervo e não pede modelagem
+   pesada, e em seguida modelar um mecanismo pequeno de cadeia fechada, como um macaco do tipo tesoura. O robô humanoide, a
+   moto e o carro esportivo do plano fechado ficam para os ciclos seguintes, cada um depois da capacidade que ele prova.
 5. A abertura dos planos de execução e o fechamento.
 
 ## Riscos e parada

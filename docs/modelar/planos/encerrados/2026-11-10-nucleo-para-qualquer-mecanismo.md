@@ -1,6 +1,6 @@
 # Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`, `procedural/nucleo/paineis-por-vaos.js`, `procedural/nucleo/paineis-por-vaos.test.ts`, `tools/modelar/vao-entre-partes.mjs`, `tools/modelar/vao-entre-partes.test.mjs`, `procedural/nucleo/lamina-sobre-a-superficie.js`, `procedural/nucleo/paineis-por-vaos-superficie.test.ts`, `tools/modelar/instancia-de-familia.mjs`, `tools/modelar/instancia-de-familia.test.mjs`, `procedural/nucleo/apoio-do-vinco.js`, `procedural/nucleo/apoio-do-vinco.test.ts`, `procedural/nucleo/gaiola-por-estacoes.js` (o campo `raio` do vinco), `tools/modelar/raio-da-aresta.mjs`, `tools/modelar/raio-da-aresta.test.mjs`, `tools/modelar/entrada-de-medida.mjs`, `tools/modelar/entrada-de-medida.test.mjs` (o cache da montagem; a bandeira `--sem-cache` entra em `lasca.mjs`, `ondulacao-da-superficie.mjs`, `vistas-de-superficie.mjs` e `exportar-obj.mjs`, só nela), `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/friso-refinar.test.mjs`, `procedural/nucleo/gaiola-por-estacoes.test.mjs`, `.claude/skills/criar-peca/references/operacoes-procedurais.md`, `docs/modelar/modelar-carroceria.md`, `procedural/nucleo/gaiola-aneis.js`, `procedural/nucleo/normal-da-gaiola.js`, `procedural/nucleo/normal-da-gaiola.test.ts`, `procedural/nucleo/gaiola-aneis-rebaixo.test.mjs`, `procedural/nucleo/aparar.test.ts`, `procedural/nucleo/molde-de-dentro.js`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/catalogo.test.mjs`, `procedural/nucleo/fixtures/motor-r00-baseline.json`, `tools/mcp/procedural.test.mjs`, `src/autoria/contato-de-solidos.js`, `src/autoria/contato-de-solidos-raio-na-aresta.test.mjs`, `src/autoria/contatos-da-peca.js`, `src/autoria/descrever-partes.js`, `src/autoria/encosto-da-peca.test.mjs`, `src/autoria/contato-em-plano-inclinado.test.mjs`, `src/autoria/molduras-do-vao.js`, `src/autoria/molduras-do-vao-chapa-cortada.test.mjs`, `procedural/nucleo/operacoes/limpar-lascas.js`, `procedural/nucleo/limpar-lascas-escala.test.mjs`, `procedural/nucleo/fixtures/lasca-na-escala-da-peca.json`, `procedural/nucleo/fixtures/lasca-na-tolerancia-da-peca.json`, `procedural/nucleo/paineis-por-vaos-aba.test.mjs`, `procedural/nucleo/ponto-na-malha.js`, `procedural/nucleo/ponto-na-malha.test.mjs`, `procedural/nucleo/composicoes.js`, `procedural/nucleo/composicoes.test.mjs`, `procedural/nucleo/triangulacao-face.js`, `tools/modelar/custo-de-importar-receita.test.mjs`, `tools/modelar/medir-importar-receita.mjs`, `tools/testes-lentos.mjs`, `tools/modelar/ondulacao-da-superficie.mjs`, `tools/modelar/ondulacao-corte-e-quina.test.mjs` (a operação `aparar` e a contagem de cruzamentos do contato, da fatia 4c, e os atritos de ferramenta que o sedã em receita revelou, no `RECEITA.md` dele; o par espelhado do relato e a tabela em mm ficam no território do plano de conferência)
 
@@ -15,7 +15,7 @@ empilhadeira em receita até a torre.
 A empilhadeira foi do rascunho à receita em dezenove peças num dia, e nenhuma
 dificuldade registrada veio de faltar primitiva. Vieram de faltar medida,
 leitura ou junta, e estão nos itens 14 a 21 de
-[`ATRITOS.md`](../banco-de-provas/empilhadeira-2026-11-09/ATRITOS.md) e nos
+[`ATRITOS.md`](../../banco-de-provas/empilhadeira-2026-11-09/ATRITOS.md) e nos
 registros de rodada em `procedural/pecas/empilhadeira/partes/*/rodadas/`.
 
 A montagem só mede encaixe cilíndrico e assento anular. O suporte do eixo
@@ -94,7 +94,7 @@ roteiro que diz a ordem e o critério de saída de cada uma.
 0. **Linha de base, entregue em 2026-11-10.** Um comando (`npm run custo:peca`) lê os registros de rodada de um objeto e dá,
    por peça, as rodadas, as notas, os defeitos por atribuição e o que ficou
    aberto. Saída: a tabela da empilhadeira no banco de provas, em
-   [`CUSTO-POR-PECA.md`](../banco-de-provas/empilhadeira-2026-11-09/CUSTO-POR-PECA.md).
+   [`CUSTO-POR-PECA.md`](../../banco-de-provas/empilhadeira-2026-11-09/CUSTO-POR-PECA.md).
    A empilhadeira deu 19 peças em 30 rodadas, média de 1,58 por peça, 6 fechadas
    na primeira rodada e 12 fixas por aceite com 28 defeitos abertos; das
    atribuições, 19 foram ao plano, 10 ao modelador, 8 à ferramenta e 2 ao
@@ -110,16 +110,16 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    ou ao crítico. Prova: o eixo dianteiro da empilhadeira, que dois críticos
    leram com nota 6 e o assento como defeito, recebeu nota 8 sem defeito de um
    crítico sem contexto com o pacote novo, que leu no
-   [corte](../banco-de-provas/empilhadeira-2026-11-09/corte-do-assento-do-eixo-dianteiro.png)
+   [corte](../../banco-de-provas/empilhadeira-2026-11-09/corte-do-assento-do-eixo-dianteiro.png)
    a folga de 0,35 mm sob o teto do entalhe. A peça de prova é o carrinho de mão:
    quatro peças da referência à etapa fixa pelo comando de fluxo, em 12
    rodadas, as quatro com nota 8, três fechadas pelo crítico sem defeito e a
    roda por aceite, com um defeito que vem da família. O custo foi de 3
    rodadas por peça contra 1,58 da empilhadeira, e a
-   [tabela](../banco-de-provas/carrinho-de-mao-2026-11-11/CUSTO-POR-PECA.md)
+   [tabela](../../banco-de-provas/carrinho-de-mao-2026-11-11/CUSTO-POR-PECA.md)
    explica a diferença: o crítico passou a ter a foto como referência e achou
    erro de fidelidade que antes ficava aberto por aceite. As dificuldades estão
-   em [`ATRITOS.md`](../banco-de-provas/carrinho-de-mao-2026-11-11/ATRITOS.md)
+   em [`ATRITOS.md`](../../banco-de-provas/carrinho-de-mao-2026-11-11/ATRITOS.md)
    e nos registros de rodada, e viraram no mesmo dia: a referência externa no
    pedido do crítico, a peça côncava e a vista tapada no pacote, a contagem de
    faces finas na medição, o julgamento que vale quando só o texto muda, e o
@@ -159,7 +159,7 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    uma casca só, com vão de 4,00 mm, mas a casca foi montada 23 vezes (1.171
    passos), o vão cresce a 5,07 mm no para-brisa inclinado, e o vão foi medido
    por um script fora do repositório
-   ([`ATRITOS.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/ATRITOS.md)).
+   ([`ATRITOS.md`](../../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/ATRITOS.md)).
    Entram, nesta ordem: o ajudante que parte uma chapa em painéis por linhas de
    vão desenhadas numa vista, com a largura do vão medida ao longo da chapa e
    cada painel nomeado, sem remontar a chapa; o comando que mede o vão e o
@@ -180,7 +180,7 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    limpeza das faces finas depois do corte e a cópia de sólido no lugar; a
    instância de família saiu por uma chamada, e o fluxo do objeto ganhou o
    aceite e o módulo comum. O que ainda custa está na terceira etapa dos
-   [atritos](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/ATRITOS.md):
+   [atritos](../../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/ATRITOS.md):
    a linha de superfície que atravessa uma dobra viva pede três linhas, e o
    corte com lâminas de superfície leva de 10 a 14 s.
 4c. **Sedã em alta definição, neste plano, pedido pela pessoa em 2026-11-11 e fechada em 2026-11-13.**
@@ -188,8 +188,8 @@ roteiro que diz a ordem e o critério de saída de cada uma.
    carroceria de superfície dura em alta definição, e o que falta para isso?
    Método: ciclos curtos de tentar com o que existe, medir, fazer a melhoria
    geral que a tentativa pede e refazer. Os ciclos estão no banco de provas
-   ([1](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-1.md), [2](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-2.md), [3](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-3.md),
-   [4](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-4.md) e a passagem a receita em [`RECEITA.md`](../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/RECEITA.md)).
+   ([1](../../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-1.md), [2](../../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-2.md), [3](../../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-3.md),
+   [4](../../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-4.md) e a passagem a receita em [`RECEITA.md`](../../banco-de-provas/sedan-chassi-e-lataria-2026-11-11/alta-definicao/RECEITA.md)).
    Do ciclo 1 ao 4 a grade de estações com colunas de apoio junto das quinas
    ganhou da rede de curvas, e entraram no núcleo e nas ferramentas o raio em
    milímetro no vinco, `raio:aresta`, as medidas de superfície lendo o esboço
@@ -287,4 +287,15 @@ da fatia 4b, como a prova da chapa lisa de carroceria que a 4b deixou de fora.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-13, por decisão da pessoa. As fatias 0, 1, 4a, 4b e 4c estão entregues e na main: a tabela de custo por
+peça, o fluxo único com o carrinho de mão como peça de prova, o tubo dobrado e a chapa fina, a lataria em painéis e o sedã em
+cinco etapas fixas. Os itens 1 a 3 do gate de saída ficaram cumpridos por essas fatias.
+
+O item 4 do gate fecha pela razão de não abrir plano próprio para as fatias 2 a 6. A sessão que conduzia recomendou que o plano
+de [revisão do projeto para o trabalho da IA](../2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md) absorvesse o que
+restava aqui, porque a frente de validação dele é o mesmo trabalho e dois planos disputariam as mesmas decisões. A pessoa
+respondeu "sim para as duas" em 2026-11-13, aceitando também um mecanismo com juntas como primeiro objeto de prova.
+
+O território deste plano passa ao plano de revisão, para a frente de validação. As pendências registradas no fecho da fatia 4c
+(a face facetada do `aparar`, a abertura lenta da montagem do sedã, a aba do `paineisPorVaos`, o pedido de peça com muitas
+partes, a segunda câmera da vista de perto, o rebaixo e a promessa por vidro) seguem com ele.

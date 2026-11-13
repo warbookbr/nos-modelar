@@ -211,7 +211,7 @@ processo o teria pego sozinho e o destino.
    degenerada do berço do gás passou por todas as medições da peça e só foi recusada na exportação das vistas de
    superfície. Três famílias ou ajudantes ficaram estreitos para a máquina: a roda, o cilindro hidráulico e a varredura
    de seção constante. O relato de um modelador com várias peças precisou ser repartido à mão para o registro. Tudo
-   isso está no roteiro do plano [núcleo para qualquer mecanismo](../../planos/2026-11-10-nucleo-para-qualquer-mecanismo.md),
+   isso está no roteiro do plano [núcleo para qualquer mecanismo](../../planos/encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md),
    nas fatias 1, 4 e 5. O processo pegou a face degenerada e os defeitos de forma pelo crítico; não pegou sozinho as
    leituras erradas de encaixe, que só a medida de quem conduz desfez.
 23. **A opção nova da família de roda custou tempo a dois testes que os gates locais não rodam.** O envio do fechamento

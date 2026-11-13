@@ -291,7 +291,7 @@ correções da captura da montagem e do registro da rodada. Voltam ao backlog ou
 seguem em plano próprio: as juntas na montagem, a vista em corte e a referência
 por vista no pacote do crítico, a varredura de seção variável, a família de
 cilindro hidráulico e a leitura de referência, todas no roteiro do plano
-[núcleo para qualquer mecanismo](../2026-11-10-nucleo-para-qualquer-mecanismo.md);
+[núcleo para qualquer mecanismo](2026-11-10-nucleo-para-qualquer-mecanismo.md);
 o [rebaixo por contorno](../2026-11-10-rebaixo-por-contorno.md), em rascunho; e
 as três questões de forma que a pessoa decidiu manter (colunas de trás do
 protetor em chapa, assento sem abas, grade de carga e volante em aresta viva).

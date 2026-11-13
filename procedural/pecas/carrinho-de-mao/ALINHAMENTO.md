@@ -1,6 +1,6 @@
 # Carrinho de mão: alinhamento
 
-Plano: [`docs/modelar/planos/2026-11-10-nucleo-para-qualquer-mecanismo.md`](../../../docs/modelar/planos/2026-11-10-nucleo-para-qualquer-mecanismo.md),
+Plano: [`docs/modelar/planos/encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md`](../../../docs/modelar/planos/encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md),
 fatia 1, item 2 do gate de saída: uma peça nova e simples levada da referência
 à etapa fixa pelo caminho da empilhadeira, para provar que o caminho anda e
 medir o custo. A pessoa escolheu o carrinho de mão em 2026-11-11 e mandou as

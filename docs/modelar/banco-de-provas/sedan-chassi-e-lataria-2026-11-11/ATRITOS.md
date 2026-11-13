@@ -355,7 +355,7 @@ por um plano.
 ## Segunda etapa: o rascunho refeito com paineisPorVaos
 
 Registro de 2026-11-11, depois de o diagnóstico acima virar a fatia 4b do plano
-`docs/modelar/planos/2026-11-10-nucleo-para-qualquer-mecanismo.md`. O esboço
+`docs/modelar/planos/encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md`. O esboço
 foi reescrito para tirar os quinze painéis e os oito vidros de `paineisPorVaos`
 (`procedural/nucleo/paineis-por-vaos.js`), com a casca montada uma vez, e as
 quatro rodas passaram a `instanciaDeFamilia`
