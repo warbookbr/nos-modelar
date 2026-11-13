@@ -1789,6 +1789,14 @@
 
 - `alvo.md` — Alvo do jipe-aberto
 
+## procedural/pecas/kukri/
+
+- `receita.js` — kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. Cada parte é uma gaiola de `gaiolaPorLacos`: a lâmina em laços p…
+
+## procedural/pecas/kukri/referencias/
+
+- `alvo.md` — Alvo da kukri
+
 ## procedural/pecas/lava-loucas-compacta-branca/
 
 - `receita.js` — lava-loucas-compacta-branca — lava-louças compacta branca de embutir sob bancada, com caixa branca, painel de controle na faixa de cima da frente, porta, pux…
