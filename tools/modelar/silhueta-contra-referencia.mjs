@@ -18,7 +18,8 @@
  * A REFERÊNCIA é um JSON com `escala: "mm"`, `alinhamento` (dois pontos `[a, b]` da referência que, nos eixos do modelo, caem sobre o contorno da
  * silhueta; o comando mede a que distância caem e recusa acima de `--alinhamento-max`) e os trechos: ou em `trechos: { nome: [[a, b], ...] }`, ou
  * como chaves do próprio objeto cujo valor é uma lista de pares (as demais, como `origem`, são ignoradas). Referência sem escala e sem os dois
- * pontos é recusada, porque o desvio de uma referência mal alinhada engana.
+ * pontos é recusada, porque o desvio de uma referência mal alinhada engana. O campo `conferidoPelaPessoa` diz quem conferiu a referência sobre a imagem e quando
+ * (`npm run silhueta:referencia` o grava com `--conferido`); sem ele o comando mede, mas avisa que a referência ainda não vale como medida.
  *
  * COMO MEDE. A malha de todas as partes (ou das de `--partes`) é projetada no plano e a silhueta é a união 2D dos triângulos projetados, feita pela
  * `CrossSection` da Manifold (o mesmo motor das booleanas do núcleo); buracos menores que 0,01 mm² (resto de arredondamento entre triângulos
@@ -67,7 +68,8 @@ export function lerReferencia(dado, nomeDoArquivo = 'a referência') {
     trechos[nome] = v;
   }
   if (!Object.keys(trechos).length) throw new ErroDeReferencia(`${nomeDoArquivo} não tem trecho nenhum. Esperado: ${exemplo}.`);
-  return { trechos, alinhamento: al };
+  const conferido = typeof dado.conferidoPelaPessoa === 'string' && dado.conferidoPelaPessoa.trim() ? dado.conferidoPelaPessoa.trim() : null;
+  return { trechos, alinhamento: al, conferidoPelaPessoa: conferido };
 }
 
 /** Os triângulos do neutro executado, em mm, com a parte: `[{ p: [[x,y,z]*3], parte }]`. */
@@ -313,6 +315,8 @@ plano (o primeiro eixo é a abscissa); o desvio é a distância com sinal ao con
   --sem-cache                monta a peça de novo
   --ajuda                    esta mensagem
 
+Referência sem "conferidoPelaPessoa" (quem a conferiu sobre a imagem, e quando) mede, mas avisa em stderr; \`npm run silhueta:referencia\` gera o arquivo.
+
 Código de saída: 0 mediu, 2 uso errado ou referência recusada. Mede forma; quem aprova é a pessoa.
 `;
 
@@ -378,6 +382,9 @@ export async function comoCLI(argv) {
     throw erro;
   }
   const { aneis, alinhamento, resultado } = medida;
+  if (!referencia.conferidoPelaPessoa) {
+    process.stderr.write(`AVISO: a referência ${caminhoRef} não tem "conferidoPelaPessoa" (quem conferiu o contorno sobre a imagem e quando); o desvio abaixo mede contra um contorno que ninguém confirmou. Gere a referência com \`npm run silhueta:referencia\`, confira a sobreposição e grave --conferido="<quem, data>".\n`);
+  }
   const imagem = lido.opcao('imagem');
   if (imagem) {
     mkdirSync(dirname(resolve(imagem)), { recursive: true });
@@ -386,7 +393,7 @@ export async function comoCLI(argv) {
   const pior = piorTrecho(resultado);
   if (lido.bandeira('json')) {
     const limpo = resultado.map((r) => ({ ...r, acimaDaTolerancia: r.acimaDaTolerancia.map(({ pontos, ...s }) => s) }));
-    process.stdout.write(`${JSON.stringify({ peca: lido.posicional, plano, partes: partes ?? 'todas', passoMm: passo, toleranciaMm: tolerancia, alinhamento, trechos: limpo, piorTrecho: { trecho: pior.trecho, maximoDoModuloMm: pior.maximoDoModuloMm }, ...(imagem ? { imagem } : {}) }, null, 2)}\n`);
+    process.stdout.write(`${JSON.stringify({ peca: lido.posicional, plano, partes: partes ?? 'todas', passoMm: passo, toleranciaMm: tolerancia, referenciaConferidaPor: referencia.conferidoPelaPessoa, alinhamento, trechos: limpo, piorTrecho: { trecho: pior.trecho, maximoDoModuloMm: pior.maximoDoModuloMm }, ...(imagem ? { imagem } : {}) }, null, 2)}\n`);
   } else {
     process.stdout.write(`${formatarRelatorio({ nome: lido.posicional, plano, passo, tolerancia, alinhamento, resultado })}\n`);
     if (imagem) process.stdout.write(`imagem: ${imagem}\n`);
