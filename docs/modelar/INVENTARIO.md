@@ -172,3 +172,7 @@ em [historico/README](historico/README.md).
     (`docs/modelar/usar/INTENCAO-PECA-V1.md`).
 20. `docs/MAPA.md` para o inventário gerado.
 21. `docs/modelar/historico/` e `docs/nos-herdado/` somente como evidência.
+
+As pastas de contratos, decisões e pesquisas dizem cada uma a sua finalidade em
+[`contratos/README.md`](contratos/README.md), [`decisoes/README.md`](decisoes/README.md)
+e [`pesquisas/README.md`](pesquisas/README.md).

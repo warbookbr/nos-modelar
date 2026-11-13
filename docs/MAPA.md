@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2066 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2069 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -498,6 +498,14 @@
 - `REGUA-E-PACOTE-CEGO.md` — Régua, pacote cego e oráculo da subdivisão
 - `USOS-E-LIMITES.md` — Usos do Blender, limites e regras
 
+## docs/modelar/contratos/
+
+- `README.md` — Contratos
+
+## docs/modelar/decisoes/
+
+- `README.md` — Decisões
+
 ## docs/modelar/gerado/
 
 - `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
@@ -569,6 +577,10 @@
 - `REVISAO-DE-RUMO-2026-10.md` — Revisão de rumo do Mecanifica (2026-10-06)
 - `VEICULOS-PRIMEIRA-LEVA-2026-10.md` — Veículos de referência livre: o diagnóstico da primeira leva
 - `esboco-2d.md` — Esboço 2D: o que era, o que ensinou e como recriar
+
+## docs/modelar/pesquisas/
+
+- `README.md` — Pesquisas
 
 ## docs/modelar/planos/
 
