@@ -1,6 +1,6 @@
 # Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`
 
@@ -97,4 +97,4 @@ malha mudou, a imagem do antes e do depois vai à pessoa com a medida, e a etapa
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-13, medido nas peças de prova a partir da main de hoje. A fresta da frente rente à tampa mede 0 arestas soltas, o `subtrair` que não corta avisa `semEfeito`, os dentes no fim do arredondamento caíram de 24 pontas em 18 trechos para 3 em 3, o `unir` com muitos lados fecha sem órfão, o `furo` na tampa do `lathe` sai sem aresta solta e o `furo` em face plana caiu de 341 triângulos finos para 52. A agulha na faceta do tubo saiu, e a auditoria do braço montado mede os 66 pares, todos conclusivos. As réguas de face degenerada, triângulo fino e serrilhado rodam no `descrever`, e o `guarda:acervo` recusa face degenerada abaixo do piso da parte e avisa entre o piso da parte e o da peça inteira. As peças que mudaram (braço, antebraço, elo do punho e carroceria do sedã) voltaram a etapa fixa com o aceite da pessoa. Ficam abertos, no backlog, a face degenerada que resta na peça de prova de dois `lathe` e as 2 de 8 variantes do encontro de tubos que ainda deixam face abaixo do piso; os dois braços numa carcaça curva não reproduziram e saíram do plano.

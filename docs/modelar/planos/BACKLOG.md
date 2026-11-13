@@ -259,3 +259,5 @@ Um gate que exija, de toda função `conferir*` que uma capacidade do núcleo ex
 a conferência do furo passante e a do sólido por vistas nasceram sem ninguém que as chamasse, e só o revisor adversarial viu.
 Junto, a interseção do núcleo fundir o vértice colinear que deixa no meio de uma aresta, causa de triângulos finos a mais quando
 os operandos são maiores (medido no chassi de três receitas de veículo).
+
+- Face abaixo do piso que o `unir`/`arredondarCostura` ainda deixa: 1 face na peça de prova `face-degenerada-em-dois-lathe` e 2 de 8 variantes do encontro de tubos medidas pelo revisor em 2026-11-13 (o fator 0,2 da partição por colinear não fecha a classe). Veio do fechamento do plano das costuras.
