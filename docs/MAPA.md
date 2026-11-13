@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2058 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2059 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2529,6 +2529,7 @@
 - `historico-limpo.test.mjs` — historico-limpo.test.mjs — o que saiu da pasta e ficou num commit antigo é achado, e o histórico limpo passa.
 - `imagem-pesada-no-git.test.mjs` — imagem-pesada-no-git.test.mjs — nenhuma imagem rastreada passa de 3 MB: o git guarda para sempre o que entra, e agentes despachados já deixaram 26 MB de amos…
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
+- `independencia-catalogo.test.mjs` — independencia-catalogo.test.mjs — a fronteira do núcleo: import de src/, tools/, modulos/ e das camadas de procedural/ acima dele reprova, .mjs e .ts entram …
 - `malha-fora-do-git.test.mjs` — malha-fora-do-git.test.mjs — nenhuma malha importada (.obj ou .mtl) entra no versionamento: o `.gitignore` as cobre, e nenhuma está rastreada.
 - `mapear-motor-procedural.mjs` — Mapa estático da fachada procedural. É uma evidência de arquitetura: não é importado pelo motor e não participa da execução de receitas.
 - `mapear-motor-procedural.test.mjs` — Guarda que o mapa R00 continue descrevendo a fachada procedural real.
