@@ -16,6 +16,7 @@
  * Continua conferindo o que conferia: o veredito de contato nas duas faces, o plano, as referências, a cadeia da receita, o id
  * posicional, as portas e que o acervo de hoje passa inteiro, com a mesma recusa e a mesma mensagem. O resultado da medida de cada peça
  * (a saída de `descreverPecaReutilizavel`) é idêntico ao de antes nas 54 peças do acervo, verificado com um hash do resultado. */
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -274,5 +275,15 @@ export default { meta: { nome: 'ensaio' }, PARAMS: TABELA, MATERIAIS: { a: { tip
     /* O acervo de verdade: ou tem peça e não declara vazio, ou está sem peça e
        declara. Os dois ao mesmo tempo é a declaração mentindo. */
     expect(tinha).toBe(pecasDoAcervo().length === 0);
+  });
+});
+
+describe('guarda-acervo --ajuda', () => {
+  it('descreve o uso e sai com código 0 sem medir o acervo', () => {
+    const r = spawnSync(process.execPath, [fileURLToPath(new URL('./guarda-acervo.mjs', import.meta.url)), '--ajuda'], { encoding: 'utf8', timeout: 20000 });
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain('npm run guarda:acervo');
+    expect(r.stdout).toContain('--ajuda');
+    expect(r.stderr).toBe('');
   });
 });

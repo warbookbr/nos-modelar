@@ -12,7 +12,7 @@ describe('dentes no fim do arredondamento que afina', () => {
     expect(m.arestasSoltas).toBe(0);
     expect(m.avisos).toEqual(['faceLimite']);
     expect(m.facesDeCostura).toBe(1791);
-    expect(m.faces).toBe(3433);
+    expect(m.faces).toBe(3428);
     expect(m.facesDegeneradas).toBe(0);
   });
 

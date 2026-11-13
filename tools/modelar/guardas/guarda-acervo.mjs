@@ -29,7 +29,7 @@ import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 import { ocorrenciasPosicionais, rotularOcorrencias } from '../../../procedural/nucleo/referencia-posicional.js';
 import { nucleo } from '../../../procedural/nucleo/nucleo.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
-import { medirFaceDegenerada } from '../reguas-de-malha/face-degenerada.mjs';
+import { limiteRelativo, medirFaceDegenerada } from '../reguas-de-malha/face-degenerada.mjs';
 import { analisarTopologia } from '../../../procedural/nucleo/topologia.js';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
@@ -177,7 +177,15 @@ export function motivoDeFaceDegenerada(forma) {
   const degenerada = medirFaceDegenerada(forma);
   if (!degenerada.total) return null;
   return `${degenerada.total} FACE(S) DEGENERADA(S)\n${degenerada.faces.slice(0, 8).map((f) => `  face ${f.id} (${f.parte ?? 'sem parte'}, ${f.cantos} cantos, dobro da área ${f.normal == null ? 'indefinido' : f.normal.toExponential(2)} m²)`).join('\n')}`
-    + '\n  O `adaptarThree` recusa a face cujos cantos não definem plano, e a bancada não abre a peça; o defeito é da operação que a gerou, e não da receita.';
+    + '\n  Face degenerada é a que o `adaptarThree` recusa (cantos que não definem plano) ou cujo triângulo a auditoria dos contatos acha sem área, pelo piso relativo ao tamanho da própria parte da face (2e-9 vezes o quadrado da meia diagonal da caixa dela, no máximo 1e-6). O defeito é da operação que a gerou, e não da receita. A face que só fica abaixo do piso da peça inteira não reprova: é aviso (`avisoDeFaceSoNaPecaInteira`).';
+}
+
+/** O aviso quando a forma tem face que passa no piso da própria parte e fica abaixo do da peça inteira, ou null. */
+export function avisoDeFaceSoNaPecaInteira(forma) {
+  const { soNaPecaInteira } = medirFaceDegenerada(forma);
+  if (!soNaPecaInteira.length) return null;
+  return `${soNaPecaInteira.length} FACE(S) ABAIXO DO PISO DA PEÇA INTEIRA\n${soNaPecaInteira.slice(0, 8).map((f) => `  face ${f.id} (${f.parte ?? 'sem parte'}, ${f.cantos} cantos, dobro da área ${f.normal == null ? 'indefinido' : f.normal.toExponential(2)} m², piso da peça inteira ${f.piso.toExponential(2)}, piso da parte ${limiteRelativo(forma, f.parte).toExponential(2)})`).join('\n')}`
+    + '\n  A peça passa sozinha, mas sairia inconclusiva ("triangulo-degenerado") na auditoria de interseções se entrar inteira numa montagem.';
 }
 
 /** O motivo da recusa quando a casca da forma não fecha (aresta que uma face só usa, ou que mais de duas usam), pelo mesmo critério do `npm run malha:conferir` e da aprovação da
@@ -286,9 +294,10 @@ export async function conferirPeca(peca) {
      exportação; a régua de malha usa o mesmo critério dele e a lista aqui, com a parte e os cantos de cada uma. */
   const degenerada = motivoDeFaceDegenerada(forma);
   if (degenerada) reprovadas.push({ peca, motivo: degenerada });
+  const aviso = avisoDeFaceSoNaPecaInteira(forma);
   const aberta = motivoDeCascaAberta(forma, receita.PASSOS, (prefixo) => nucleo(prefixo, receita.PARAMS ?? {}, {}, {}, null, []));
   if (aberta) reprovadas.push({ peca, motivo: aberta });
-  return { reprovadas, esperando };
+  return { reprovadas, esperando, avisos: aviso ? [{ peca, motivo: aviso }] : [] };
 }
 
 /* A VARREDURA REPARTE AS PEÇAS ENTRE OS PROCESSADORES. As peças do acervo não dependem umas das outras e a conta de cada
@@ -305,6 +314,7 @@ export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = Math.min(
     pecas,
     reprovadas: porPeca.flatMap((r) => r.reprovadas),
     esperando: porPeca.flatMap((r) => r.esperando),
+    avisos: porPeca.flatMap((r) => r.avisos ?? []),
   };
 }
 
@@ -354,6 +364,13 @@ if (!isMainThread && workerData?.fioDaGuarda) {
 }
 
 if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
+  if (process.argv.slice(2).includes('--ajuda')) {
+    console.log('Uso: npm run guarda:acervo [-- <peça>...]   (node tools/modelar/guardas/guarda-acervo.mjs [<peça>...] [--ajuda])\n'
+      + '  Sem nome, mede o acervo inteiro de procedural/pecas/ e sai com código 1 se alguma peça reprovar (os gates rodam assim).\n'
+      + "  Com nomes, confere só essas peças, pelo nome da pasta, como 'furgao-realista' ou 'braco-robotico/ombro'.\n"
+      + '  Cada recusa sai no stderr com a peça e o motivo; peça planejada sem geometria sai no stdout como esperando a etapa.');
+    process.exit(0);
+  }
   /* Com nomes de peça, a guarda confere só elas. Quem modela uma peça pagava a varredura do acervo inteiro (110 s, 56 peças)
      a cada medida, para saber da sua (achado de 2026-11-05). Sem nome, é a varredura inteira, que os gates rodam. */
   const pedidas = process.argv.slice(2).filter((a) => !a.startsWith('-'));
@@ -364,14 +381,15 @@ if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.m
       console.error(`guarda:acervo — não conheço ${desconhecidas.join(', ')}. As peças têm o nome da pasta em procedural/pecas/, como furgao-realista ou braco-robotico/ombro.`);
       process.exit(1);
     }
-    const { reprovadas, esperando } = await conferirAcervo(pedidas);
+    const { reprovadas, esperando, avisos } = await conferirAcervo(pedidas);
+    for (const { peca, motivo } of avisos) console.log(`guarda:acervo — ${peca} AVISO\n${motivo}\n`);
     for (const { peca, motivo } of reprovadas) console.error(`guarda:acervo — ${peca} REPROVOU\n${motivo}\n`);
     for (const { peca, montagem, instancia } of esperando) console.log(`guarda:acervo — ${peca} planejada, sem geometria: espera a etapa '${instancia}' de ${montagem}.`);
     if (reprovadas.length) process.exit(1);
     console.log(`guarda:acervo ok — ${pedidas.join(', ')} (só as pedidas; o acervo inteiro roda sem nome, nos gates).`);
     process.exit(0);
   }
-  const { pecas, reprovadas, esperando } = await conferirAcervo();
+  const { pecas, reprovadas, esperando, avisos } = await conferirAcervo();
   if (pecas.length === 0) {
     if (!vazioDeclarado()) {
       console.error(`guarda:acervo — o acervo está vazio e nada foi medido.\n`
@@ -392,6 +410,7 @@ if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.m
   for (const { peca, motivo } of reprovadas) {
     console.error(`guarda:acervo — ${peca} REPROVOU\n${motivo}\n`);
   }
+  for (const { peca, motivo } of avisos) console.log(`guarda:acervo — ${peca} AVISO\n${motivo}\n`);
   for (const { peca, montagem, instancia } of esperando) {
     console.log(`guarda:acervo — ${peca} planejada, sem geometria: espera a etapa '${instancia}' de ${montagem}.`);
   }

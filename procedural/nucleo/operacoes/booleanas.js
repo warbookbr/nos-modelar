@@ -801,10 +801,13 @@ export function criarOperacoesBooleanas(servicos) {
        saída da Manifold), para as arestas casarem com as dos pedaços */
     const cicloRepDasMantidas = (fid) => cicloRep(st.F.get(fid).vs);
     const areaTri = (a, b, c) => tamanho(cruz(sub(pos(b), pos(a)), sub(pos(c), pos(a)))) / 2;
-    /* a metade que a diagonal deixa só pode ter a área que o adaptador do visor aceita (`adaptarThree` recusa a face de dobro da área até 1e-12 m²), com o
-       dobro de folga, e não só o milésimo do piso, que em peça de menos de 0,7 m fica abaixo disso: o dente do elo do punho 5, três cantos de um anel de
-       0,02 a 0,05 mm em linha, saía como face de 9,9e-13 m² */
-    const semArea = Math.max(piso * 1e-3, 1e-12);
+    /* a metade que a diagonal deixa só pode ter a área de um quinto do piso de lasca (e no mínimo a que o adaptador do visor aceita: `adaptarThree` recusa a face de dobro da
+       área até 1e-12 m²). O milésimo do piso deixava passar a metade de 1e-10 m² que vira, no polígono da faceta do tubo, uma agulha de 430 mm por 4,5e-10 m de altura, que a
+       auditoria de interseções recusa como triângulo sem área; o dente do elo do punho 5, três cantos de um anel de 0,02 a 0,05 mm em linha, saía como face de 6,2e-12 m².
+       O fator foi medido: de 0,2 a 0,25 do piso a peça de prova da agulha sai limpa, os 66 pares do braço montado são medidos, o braço a 10 e 20 graus de
+       `arredondar-costura.test.ts` mantém a face fina legítima partida e a carroceria do sedã não perde parte; com 0,15 ainda sobram 11 pares inconclusivos, com 0,3 o braço a 20
+       graus deixa um triângulo de 4,8e-10 m², e com o piso inteiro a carroceria do sedã perde a parte da travessa da cabine (o `aparar` recusa o resultado com um vértice de vínculo partido) */
+    const semArea = Math.max(piso * 0.2, 1e-12);
     const semColinear = (P) => {
       if (P.length <= 3) return [P];
       for (let k = 0; k < P.length; k++) {
