@@ -254,3 +254,8 @@ costura, os dois ramos foram juntados no mesmo envio, o teste ficou para o CI pe
 Um teste geral de que todo comando de `package.json` responde a `--ajuda` com saída 0 e o uso, com lista de exceções declaradas:
 a sonda de 2026-11-13 rodou 97 comandos e só 19 respondem assim; 19 recusam a opção, 24 mostram o uso como erro e o resto a
 ignora e executa. A regra está em `tools/CLAUDE.md` e nenhum gate a cobra.
+
+Um gate que exija, de toda função `conferir*` que uma capacidade do núcleo exporta, um chamador fora dos testes: em 2026-11-13
+a conferência do furo passante e a do sólido por vistas nasceram sem ninguém que as chamasse, e só o revisor adversarial viu.
+Junto, a interseção do núcleo fundir o vértice colinear que deixa no meio de uma aresta, causa de triângulos finos a mais quando
+os operandos são maiores (medido no chassi de três receitas de veículo).
