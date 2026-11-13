@@ -283,7 +283,7 @@ export function corpoPorFatias(o = {}) {
     if (i > 0) {
       const d = f.em - F[i - 1].em;
       if (!(d > 0)) falha(`${f.onde} vem depois de ${F[i - 1].onde} e não está à frente dela (${br(d)} mm); as fatias vêm em ordem crescente de em, sem repetir a posição`);
-      if (d < minimo - 1e-9) falha(`${f.onde} fica a ${br(d)} mm da fatia anterior (${F[i - 1].onde}), abaixo do mínimo de ${br(minimo)} mm entre planos da gaiola, que ondula a superfície; afaste as fatias para ao menos ${br(minimo)} mm`);
+      if (d < minimo - 1e-9) falha(`${f.onde} fica a ${br(d)} mm da fatia anterior (${F[i - 1].onde}), abaixo do mínimo de ${br(minimo)} mm entre planos da gaiola, que ondula a superfície; afaste as fatias para ao menos ${br(minimo)} mm${F.at(-1).em - F[0].em < minimo - 1e-9 ? `; um corpo de ${br(F.at(-1).em - F[0].em)} mm de comprimento é uma chapa, e chapaDeContorno (espessura constante, sem esse mínimo) o faz` : ''}`);
     }
   });
   F.forEach(conferirContorno);
@@ -481,6 +481,8 @@ export function corpoPorFatias(o = {}) {
     ...F.slice(1).map((f, i) => ({ nome: `entre_${F[i].nome}_${f.nome}`, lacos: [F[i].nome, f.nome] })),
   ];
   const vincos = [];
+  const repetido = (o.vivos ?? []).find((v, i, l) => l.indexOf(v) !== i);
+  if (repetido) falha(`vivos cita o marco ${citar(repetido)} mais de uma vez; cada marco entra uma vez`);
   for (const nomeDoMarco of o.vivos ?? []) {
     if (!(nomeDoMarco in marcos)) falha(`vivos cita o marco ${citar(nomeDoMarco)}, que o contorno não tem (os marcos são ${M0.map(citar).join(', ')}); o primeiro ponto é 'inicio' quando não tem nome`);
     const q = marcos[nomeDoMarco];

@@ -382,6 +382,7 @@ describe('corpoPorFatias: as recusas', () => {
     recusa(ok({ tolerancia: 0 }), /tolerancia é número positivo/);
     recusa(ok({ passo: 1 }), /passo é número em mm de 2,5 para cima.*veio 1/);
     recusa(ok({ vivos: 'quilha' }), /vivos é a lista de nomes de marco/);
+    recusa(ok({ vivos: ['inicio', 'inicio'] }), /vivos cita o marco 'inicio' mais de uma vez/);
     recusa(ok({ vivos: ['nada'] }), /vivos cita o marco 'nada'.*'inicio'/);
   });
 
@@ -404,6 +405,8 @@ describe('corpoPorFatias: as recusas', () => {
     recusa(com(1, { em: 0 }), /não está à frente dela \(0 mm\)/);
     recusa(com(1, { em: 2 }), /fica a 2 mm da fatia anterior.*mínimo de 2,5 mm/);
     expect(() => corpoPorFatias(com(1, { em: 2.5 }))).not.toThrow();
+    recusa(com(1, { em: 1 }), /fica a 1 mm da fatia anterior.*um corpo de 1 mm de comprimento é uma chapa, e chapaDeContorno/);
+    expect(() => corpoPorFatias({ ...ok(), fatias: [ok().fatias[0], { em: 2, contorno: circ(5, 8) }, { em: 10, contorno: circ(5, 8) }] })).toThrow(/^(?!.*chapaDeContorno)/);
   });
 
   it('recusa o ponto repetido, o último igual ao primeiro, a ponta que volta sobre si e a área zero, nomeando o ponto', () => {
