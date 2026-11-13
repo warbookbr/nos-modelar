@@ -35,9 +35,11 @@ export const PISCAS = ['piscaEsquerdo', 'piscaDireito'];
 export const AROS =['aroFarolEsquerdo', 'aroFarolDireito'];
 export const LUZES_DE_CANTO = ['luzDeCantoEsquerda', 'luzDeCantoDireita'];
 export const PISCAS_LATERAIS = ['piscaLateralEsquerdo', 'piscaLateralDireito'];
-/** Cada luz da frente com o seu refletor e a sua lâmpada: [luz, refletor, lâmpadas]. */
+/** O interior de cada farol (a opção B do esboço de 2026-11-12): as conchas do farol baixo e do alto, as duas lâmpadas na mesma parte, o copinho da lâmpada de posição, que leva
+ *  a própria lâmpada na mesma parte, e a carcaça escura atrás: [farol, conchas, [lâmpadas, copinho, carcaça]]. */
+export const FAROL_POR_DENTRO = ['Esquerdo', 'Direito'].map((l) => [`farol${l}`, [`refletorFarolBaixo${l}`, `refletorFarolAlto${l}`], [`lampadasFarol${l}`, `copoPosicaoFarol${l}`, `carcacaFarol${l}`]]);
+/** Cada luz da frente (fora o farol, que tem o seu interior acima) com o seu refletor e a sua lâmpada: [luz, refletor, lâmpadas]. */
 export const LUZES_POR_DENTRO = [
-  ...['Esquerdo', 'Direito'].map((l) => [`farol${l}`, `refletorFarol${l}`, [`lampadaFarol${l}`, `lampadaPosicaoFarol${l}`]]),
   ...['Esquerda', 'Direita'].map((l) => [`luzDeCanto${l}`, `refletorLuzDeCanto${l}`, [`lampadaLuzDeCanto${l}`]]),
   ...['Esquerdo', 'Direito'].map((l) => [`piscaLateral${l}`, `refletorPiscaLateral${l}`, [`lampadaPiscaLateral${l}`]]),
 ];
@@ -45,8 +47,8 @@ export const LUZES_POR_DENTRO = [
 export const LANTERNAS_POR_DENTRO = ['Esquerda', 'Direita'].map((l) => [
   FAIXAS_DA_LANTERNA.map((faixa) => `lanterna${faixa}${l}`), `refletorLanterna${l}`, FAIXAS_DA_LANTERNA.map((faixa) => `lampadaLanterna${faixa}${l}`),
 ]);
-export const REFLETORES = LUZES_POR_DENTRO.map(([, r]) => r);
-export const LAMPADAS = LUZES_POR_DENTRO.flatMap(([, , l]) => l);
+export const REFLETORES = [...FAROL_POR_DENTRO.flatMap(([, c]) => c), ...LUZES_POR_DENTRO.map(([, r]) => r)];
+export const LAMPADAS = [...FAROL_POR_DENTRO.flatMap(([, , l]) => l), ...LUZES_POR_DENTRO.flatMap(([, , l]) => l)];
 export const BANCOS = ['bancoMotorista', 'bancoPassageiro'];
 export const INTERIOR = ['pisoInterior', 'divisoria', ...BANCOS, 'painel'];
 /** Os detalhes pequenos da etapa 8 (2026-11-09): a antena do teto (o pé em gota e a haste), as cinco maçanetas (a alça e a placa rasa em anel de cada uma) e a ponteira do escapamento. */

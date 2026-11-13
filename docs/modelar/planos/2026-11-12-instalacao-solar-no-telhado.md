@@ -101,11 +101,13 @@ conferir, e entra na receita marcado assim.
   ponta sobra de 15 a 20 mm; a perna do L encosta na face estriada do perfil e o parafuso do rasgo, na metade de cima do oblongo (a
   confirmar), prende o perfil, que fica ao lado da haste com o topo acima do topo dela. A altura do perfil sai dessa cadeia.
 - Grampos, em forma (a pessoa mandou fotos; tamanhos a confirmar): o de ponta (4 de 30 a 35 mm; os 8 de 40 mm são iguais, só mais
-  altos) é um Z de alumínio com a aba de cima sobre a moldura, a parede até o perfil e um pé no topo dele; o parafuso allen desce na
-  vertical pela parte de cima, junto da parede, pelo corpo, até uma porca no canal em T. O intermediário (6) é uma tampa estriada com
+  altos) é um Z de chapa de alumínio com a aba de cima sobre a moldura, a parede até o perfil com um furo redondo e um pé sobre o topo
+  dele, apoiado na ponta dobrada; o parafuso allen, com arruela de pressão e arruela lisa, atravessa o pé até uma porca trapezoidal no
+  canal de cima (corrigido em 2026-11-13 pela foto da peça real: o modelo tinha o parafuso no alto, junto da parede). O intermediário (6) é uma tampa estriada com
   duas asas curtas sobre as molduras e um pescoço curto entre os painéis (cerca de 20 mm), com o parafuso allen pelo centro e uma porca
-  deslizante no canal em T. A emenda (6) é uma barra estriada de cerca de 150 mm (a confirmar) que entra no canal em T dos dois perfis,
-  com dois parafusos allen por cima, um de cada lado da junta.
+  deslizante no canal em T. A emenda (6), pelas fotos da peça real (2026-11-13), é uma barra estriada que
+  entra em pé na câmara atrás do rasgo lateral dos dois perfis, sem furo; um parafuso allen perto de cada ponta passa de fora pelo
+  rasgo, rosca na barra e empurra o fundo da câmara, travando cada perfil. O comprimento (180 mm no modelo) e a seção estão a confirmar.
 - Pendentes da pessoa: em qual água vão os painéis, a largura da frente da casa maior (8 a 9 m, aproximada) e a da extensão, a altura das paredes, o
   madeiramento visto por dentro (foto ou medida da distância entre as peças), e as medidas finas dos grampos e da emenda.
 

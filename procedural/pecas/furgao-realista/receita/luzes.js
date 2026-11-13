@@ -1,4 +1,4 @@
-/* furgao-realista, receita/luzes.js — por dentro das luzes da frente (etapa 8, `referencias/luzes.md`): o refletor de cada luz, uma capa única cuja borda segue o
+/* furgao-realista, receita/luzes.js — por dentro das luzes da frente (etapa 8, `referencias/luzes.md`): o interior do farol (duas conchas de revolução e o copinho, opção B de 2026-11-12, em `farol`) e o refletor de cada outra luz, uma capa única cuja borda segue o
  * contorno da lente por dentro do aro e que se curva para trás até um furo no fundo (o soquete da lâmpada), e a lâmpada, uma revolução com o soquete atrás.
  *
  * A capa é uma malha polar: a borda é o contorno do vão encolhido (as quinas concordadas com o raio menos o encolhimento), cada anel é a borda reduzida em direção
@@ -144,38 +144,89 @@ export function derivarLuzesPorDentro(T, f) {
   const refletores = []; const lampadas = [];
   const encosto = T.refletor_encosto;
 
-  /* ---- os faróis ---- */
-  const [esq] = derivarFarois(T);
+  /* ---- os faróis: duas conchas e o copinho, paraboloides de revolução em torno de z, cada um com a borda no plano `encosto` atrás da superfície da chapa no centro dele ---- */
+  const farol = []; let carcacaDoFarol = null;
   {
-    const [p0, p1, p2, p3] = esq.farol;
-    const raiosDentro = esq.raios.map((r) => Math.max(0, r - T.farol_aro_meia_largura - 2));
-    const inset = T.farol_aro_meia_largura + 2;
-    const borda = concordar(encolher(esq.farol, inset), raiosDentro, 36);
-    const yMeio = (T.farol_y_base + T.farol_y_topo) / 2; const altura = T.farol_y_topo - T.farol_y_base;
-    const larguraMeio = (p1[0] - p0[0]) - ((p1[0] - p2[0]) * (yMeio - T.farol_y_base)) / altura;
-    const centro = [p0[0] + T.farol_lampada_x * larguraMeio, yMeio];
-    const q = [p0[0] + T.farol_posicao_x * larguraMeio, T.farol_y_base + T.farol_posicao_y * altura];
-    const rhoDoPonto = (p) => { const v = sub(p, centro); return norma(v) / alcance(centro, unit(v), borda); };
-    const profundidade = (rho, p) => {
-      const dq = norma(sub(p, q));
-      const poco = T.farol_posicao_profundidade * Math.exp(-((dq / T.farol_posicao_raio) ** 2)) * (1 - rho ** 2) ** 2 * 2;
-      /* as facetas: entre dois vincos a capa é uma calha, funda no meio e rasa no vinco, de modo que a luz rasante e o metal claro leem os 12 painéis */
-      const fase = ((Math.atan2(p[1] - centro[1], p[0] - centro[0]) + Math.PI) / (2 * Math.PI)) * T.refletor_facetas;
-      const calha = 0.5 - Math.abs(fase - Math.floor(fase) - 0.5);
-      return T.farol_refletor_profundidade * (1 - rho ** 2) + poco + T.refletor_faceta_relevo * (calha - 0.25) * Math.max(0, Math.min(1, (rho - 0.3) / 0.4)) ** 2 * (1 - rho ** 2) ** 2 * 2;
+    const yMeio = (T.farol_y_base + T.farol_y_topo) / 2;
+    const e = T.farol_concha_espessura;
+    const N = 16;
+    /* o perfil [raio, ao longo de z] da casca, com o vértice em 0 e a borda em `fundura`: o fundo (atrás) de 0 a `raio` e a frente de volta, fechados no eixo */
+    const casca = (raio, fundura) => {
+      const ks = Array.from({ length: N + 1 }, (_, k) => k);
+      return [...ks.map((k) => [raio * (k / N), fundura * (k / N) ** 2 - e]), ...[...ks].reverse().map((k) => [raio * (k / N), fundura * (k / N) ** 2])];
     };
-    const posicao = (p, prof) => [p[0], p[1], S.zS(p[0], p[1]) - encosto - prof];
-    const capa = capaPolar({ prefixo: 'refletorFarolEsquerdo', borda, centro, raioFuro: T.refletor_furo, profundidade, posicao, fora: [0, 0, 1], facetas: T.refletor_facetas });
-    refletores.push({ nome: 'refletorFarolEsquerdo', capa, espessura: T.refletor_espessura });
-    refletores.push({ nome: 'refletorFarolDireito', capa: espelhar(capa, 'Esquerdo', 'Direito'), espessura: T.refletor_espessura });
-    /* a lâmpada principal assenta no furo; a de posição, no fundo da segunda concavidade (a capa passa por ela) */
-    const zFuro = S.zS(centro[0], centro[1]) - encosto - profundidade(T.refletor_furo / alcance(centro, [1, 0], borda), centro);
-    const zQ = S.zS(q[0], q[1]) - encosto - profundidade(rhoDoPonto(q), q);
-    const gran = perfilDaLampada(11, 52, 19); const peq = perfilDaLampada(5.5, 24, 9);
-    for (const [lado, s] of [['Esquerdo', 1], ['Direito', -1]]) {
-      lampadas.push({ nome: `lampadaFarol${lado}`, base: [s * centro[0], centro[1], zFuro], eixo: 'z', graus: 0, ...gran });
-      lampadas.push({ nome: `lampadaPosicaoFarol${lado}`, base: [s * q[0], q[1], zQ + 1], eixo: 'z', graus: 0, ...peq });
+    /** O bulbo de revolução de raio `r` e comprimento `c` (a base em 0), como o do esboço: base estreita, ventre e cúpula. */
+    const bulbo = (r, c) => [[0, 0], [r * 0.55, 0], [r * 0.55, c * 0.16], [r, c * 0.34], [r, c * 0.78], [r * 0.7, c * 0.94], [0, c]];
+    /** A tampinha, com a base 6 mm dentro da cúpula do bulbo e a ponta `h` mm além da ponta dele. */
+    const tampinha = (r, h) => [[0, -6], [r * 0.62, -6], [r * 0.62, -1], [r * 0.36, h * 0.6], [0, h]];
+    const cilindro = (r, de, ate) => [[0, de], [r, de], [r, ate], [0, ate]];
+    const conchas = [
+      { id: 'Baixo', x: T.farol_baixo_x, y: yMeio, raio: T.farol_baixo_raio, fundura: T.farol_concha_fundura, soquete: T.farol_soquete_raio, atras: T.farol_soquete_atras, frente: T.farol_soquete_frente, lampada: [T.farol_lampada_raio, T.farol_lampada_comprimento] },
+      { id: 'Alto', x: T.farol_alto_x, y: yMeio, raio: T.farol_alto_raio, fundura: T.farol_concha_fundura, soquete: T.farol_soquete_raio, atras: T.farol_soquete_atras, frente: T.farol_soquete_frente, lampada: [T.farol_lampada_raio, T.farol_lampada_comprimento] },
+      { id: 'Posicao', x: T.farol_copo_x, y: T.farol_copo_y, raio: T.farol_copo_raio, fundura: T.farol_copo_fundura, soquete: T.farol_soquete_posicao_raio, atras: T.farol_soquete_atras, frente: 2, lampada: [T.farol_lampada_posicao_raio, T.farol_lampada_posicao_comprimento] },
+    ];
+    /* a frente da lente: o plano da frente do farol em y (a coroa inclina a frente 6,7 graus) menos a queda da curva da quina em x (a tabela `farol_lente_queda_x`), que a malha da chapa começa em
+       x 700 e que a superfície analítica só começa em x 740 (medido na malha da lente em 2026-11-12: 1,1 mm de diferença em x 720, 5 em 760, 12 em 800), e a malha da lente cai também junto da boca do capô, acima de y `farol_lente_y_curva` (0,34 mm em y 1040, 1,3 em 1065 e 1,9 em 1075) */
+    const quedaX = (x) => { const t = T.farol_lente_queda_x; if (x <= t[0][0]) return 0; for (let k = 1; k < t.length; k += 1) if (x <= t[k][0]) return t[k - 1][1] + ((t[k][1] - t[k - 1][1]) * (x - t[k - 1][0])) / (t[k][0] - t[k - 1][0]); return t.at(-1)[1]; };
+    const zLente = (x, y) => S.zS(T.farol_x_dentro, y) - quedaX(x) - (y > T.farol_lente_y_curva ? T.farol_lente_y_queda * (y - T.farol_lente_y_curva) : 0);
+    for (const c of conchas) {
+      /* o plano da borda é o que melhor se ajusta à frente da lente no círculo da borda (mínimos quadrados em 72 pontos), e a concha inteira gira para ele, para a borda ficar
+         junto da lente em toda a volta e não só no centro. Depois o plano desce o quanto a borda passaria da lente menos o encosto no ponto mais à frente, para nenhum
+         ponto da borda furar a lente. */
+      const dados = Array.from({ length: 72 }, (_, k) => {
+        const t = (2 * Math.PI * k) / 72; const dx = c.raio * Math.cos(t); const dy = c.raio * Math.sin(t);
+        return { dx, dy, z: zLente(c.x + dx, c.y + dy) };
+      });
+      const a = dados.reduce((q, d) => q + d.z, 0) / dados.length;
+      const bx = dados.reduce((q, d) => q + d.z * d.dx, 0) / dados.reduce((q, d) => q + d.dx * d.dx, 0);
+      const by = dados.reduce((q, d) => q + d.z * d.dy, 0) / dados.reduce((q, d) => q + d.dy * d.dy, 0);
+      const sobra = Math.max(0, ...dados.map((d) => a + bx * d.dx + by * d.dy - d.z));
+      const zBorda = a - T.farol_concha_encosto - sobra; const zV = zBorda - c.fundura;
+      const giroY = Math.atan(-bx); const giroX = Math.atan(by * Math.cos(giroY));
+      const graus = [(giroX * 180) / Math.PI, (giroY * 180) / Math.PI];
+      const lamp = { soquete: cilindro(c.soquete, -c.atras, c.frente), bulbo: bulbo(...c.lampada).map(([r, h]) => [r, h + c.frente - 1]), base: [c.x, c.y, zV], pivo: [c.x, c.y, zBorda], graus };
+      if (c.id !== 'Posicao') lamp.tampinha = tampinha(c.lampada[0], T.farol_tampinha_altura).map(([r, h]) => [r, h + c.frente + c.lampada[1] - 1]);
+      farol.push({ id: c.id, x: c.x, y: c.y, raio: c.raio, fundura: c.fundura, zBorda, zV, perfil: casca(c.raio, c.fundura), ...lamp });
     }
+    /* o fundo escuro atrás das conchas (a carcaça do esboço, sem a parede): uma placa do contorno do farol encolhido `farol_carcaca_recuo`, com a mesma inclinação em y das conchas,
+       cujo topo toca em 1 mm a ponta de trás do soquete que mais fundo vai, e que fecha o oco do furgão que se veria por entre as conchas */
+    const gira = (p, pv, ax, g) => { const c = Math.cos((g * Math.PI) / 180); const sn = Math.sin((g * Math.PI) / 180); const d = p.map((v, i) => v - pv[i]); return ax === 0 ? [pv[0] + d[0], pv[1] + d[1] * c - d[2] * sn, pv[2] + d[1] * sn + d[2] * c] : [pv[0] + d[0] * c + d[2] * sn, pv[1] + d[1], pv[2] - d[0] * sn + d[2] * c]; };
+    const giroX = farol[0].graus[0]; const tg = Math.tan((giroX * Math.PI) / 180);
+    const yc = farol[0].y; const xc = (T.farol_x_dentro + T.farol_x_fora_base) / 2;
+    const traseiras = farol.map((c) => { let q = gira([c.x, c.y, c.zV - T.farol_soquete_atras], c.pivo, 0, c.graus[0]); q = gira(q, c.pivo, 1, c.graus[1]); return q[2] - (q[1] - yc) * tg; });
+    const zTopo = Math.min(...traseiras) + 1;
+    const [esq, dir] = derivarFarois(T);
+    const recuo = T.farol_carcaca_recuo;
+    /* as paredes: uma faixa de quadriláteros em volta do contorno encolhido, com o topo na face de trás da lente (a frente da lente menos os 2 mm dela, mais `farol_carcaca_entra`)
+       e a base 2 mm dentro da placa, para a caixa fechar o farol por trás da lente em toda a volta; a malha leva a espessura da parede para dentro */
+    const planoDaPlaca = (y) => zTopo + (y - yc) * tg;
+    const paredes = [esq, dir].map((fa, k) => {
+      const nomeDoLado = k === 0 ? 'Esquerdo' : 'Direito';
+      const volta = concordar(encolher(fa.farol, recuo), fa.raios.map((r) => Math.max(0, r - recuo)), T.farol_carcaca_passo);
+      const posicoes = new Map(); const J = volta.length;
+      volta.forEach(([x, y], j) => {
+        posicoes.set(`paredeFarol${nomeDoLado}_t${j}`, [x, y, zLente(Math.abs(x), y) - 2 + T.farol_carcaca_entra]);
+        posicoes.set(`paredeFarol${nomeDoLado}_b${j}`, [x, y, planoDaPlaca(y) - 2]);
+      });
+      const nome = (a, j) => `paredeFarol${nomeDoLado}_${a}${j % J}`;
+      const faces = volta.map((_, j) => [nome('t', j), nome('b', j), nome('b', j + 1), nome('t', j + 1)]);
+      /* a aba da caixa: uma faixa de `farol_carcaca_aba_largura` mm para fora da parede, `farol_carcaca_aba_fundura` mm atrás da lente (abaixo do fim da perna da aba de 20 mm do vão),
+         que fecha por baixo a fresta entre a parede e a perna da aba, por onde se via o fundo da bancada; a espessura vai para baixo */
+      const abaPos = new Map();
+      volta.forEach((_, j) => {
+        const a = volta[(j - 1 + J) % J]; const b = volta[(j + 1) % J]; const t = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(...t); const nx = t[1] / l; const ny = -t[0] / l;
+        const [x, y] = volta[j]; const xf = x + nx * T.farol_carcaca_aba_largura; const yf = y + ny * T.farol_carcaca_aba_largura;
+        abaPos.set(`abaParedeFarol${nomeDoLado}_i${j}`, [x, y, zLente(Math.abs(x), y) - T.farol_carcaca_aba_fundura]);
+        abaPos.set(`abaParedeFarol${nomeDoLado}_f${j}`, [xf, yf, zLente(Math.abs(xf), yf) - T.farol_carcaca_aba_fundura]);
+      });
+      const nomeA = (a, j) => `abaParedeFarol${nomeDoLado}_${a}${j % J}`;
+      const abaFaces = volta.map((_, j) => [nomeA('i', j), nomeA('f', j), nomeA('f', j + 1), nomeA('i', j + 1)]);
+      return { vertices: [...posicoes.keys()].sort(), faces, posicoes, aba: { vertices: [...abaPos.keys()].sort(), faces: abaFaces, posicoes: abaPos } };
+    });
+    carcacaDoFarol = {
+      zTopo, altura: T.farol_carcaca_espessura, pivo: [xc, yc, zTopo], grausX: giroX, paredes,
+      lados: [esq, dir].map((fa) => ({ contorno: encolher(fa.farol, recuo), raio: Math.max(0, T.farol_raio - recuo) })),
+    };
   }
 
   /* ---- as luzes de canto: a capa é o vão visto pela diagonal, com a profundidade ao longo dela ---- */
@@ -263,5 +314,5 @@ export function derivarLuzesPorDentro(T, f) {
       lampadas.push({ nome: `lampadaLanterna${fa.fx.base}Direita`, base: [-b[0], b[1], b[2]], eixo: 'z', graus: -135, ...perfil });
     }
   }
-  return { refletores, lampadas };
+  return { refletores, lampadas, farol, carcacaDoFarol };
 }
