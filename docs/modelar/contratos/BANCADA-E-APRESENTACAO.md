@@ -312,7 +312,7 @@ ponta presa, dobra ou nenhum desses, e aponta o passo da receita que constrói
 aquela parte. `npm run absorver` mede se a receita reescrita chega onde a pessoa
 deixou a peça, com tolerância de meio milímetro. A skill que conduz a tradução é
 `absorver-ajuste-da-bancada`, e o procedimento está em
-[`AJUSTE-DA-BANCADA.md`](./usar/AJUSTE-DA-BANCADA.md).
+[`AJUSTE-DA-BANCADA.md`](../usar/AJUSTE-DA-BANCADA.md).
 
 A bancada nunca escreve receita. Ela salva medida, e quem escreve receita é quem
 escreve receita.
@@ -435,7 +435,7 @@ revalidação das relações e dos dependentes afetados. Essa capacidade ainda n
 está implementada.
 
 A definição ampla está em [`AUTORIA-IA.md`](AUTORIA-IA.md), e a direção das
-montagens em [`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md).
+montagens em [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).
 
 `--arame` desenha a malha por cima da peça sólida, e as arestas que ficam atrás
 somem; `--raio-x` desenha a malha transparente, com as arestas de trás à vista.

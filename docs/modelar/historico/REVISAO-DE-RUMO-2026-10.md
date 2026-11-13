@@ -65,7 +65,7 @@ Permitir que uma IA modele, inspecione, componha e mantenha objetos e máquinas 
   - Motor de booleanas volumétricas exatas `manifold-3d@3.5.4` integrado ao núcleo (`procedural/nucleo/manifold.js`).
   - Módulo de esboço com 9 formas primitivas (`caixa`, `cilindro`, `anel`, `cone`, `esfera`, `extrusao`, `loft`, `revolucao`, `tubo`), forma geradora `envolve` e 10 componentes de biblioteca (`modulos/esboco/README.md`, seções `Formas`, `A faixa \`envolve\`` e `Componentes`).
   - Condutor de evolução de esboços em 5 estágios (Maquete, Conferência, Plano de detalhe, Detalhe por unidade, Montagem) com marcos e notas de crítico visual (`modulos/esboco/README.md`, seção `O Condutor`).
-  - Formato persistido de montagem recursiva v1/v2/v3 e mapa canônico de relações (`docs/modelar/AUTORIA-IA.md`, seções `Estado atual` e `Síntese canônica`).
+  - Formato persistido de montagem recursiva v1/v2/v3 e mapa canônico de relações (`docs/modelar/contratos/AUTORIA-IA.md`, seções `Estado atual` e `Síntese canônica`).
   - Exportação CAD/STEP funcional via pacote `occt-wasm@4.3.2` (`docs/modelar/INDEX.md`, seção `Estado atual`).
   - 32 de 32 gates aprovados no CI em `npm run gates --completo` (`docs/modelar/planos/encerrados/2026-10-01-o-esboco-detalhado-coerente.md`, seção `Fechamento`).
   - Mapeamento de 28 famílias em `docs/modelar/decisoes/FAMILIAS-DE-OBJETOS.md` e auditoria de 53 elementos canônicos em a análise de elementos (removida em 2026-10-06).

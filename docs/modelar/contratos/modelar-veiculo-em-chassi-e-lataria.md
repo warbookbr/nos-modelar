@@ -1,6 +1,6 @@
 # Modelar um veículo em chassi e lataria
 
-Guia curto para o veículo que a referência mostra como chassi por baixo e lataria em painéis separados por frestas, como o sedã de [`procedural/pecas/sedan-chassi-e-lataria/`](../../procedural/pecas/sedan-chassi-e-lataria/ALINHAMENTO.md). Para o veículo de volumes facetados sem painéis vale [`modelar-veiculos.md`](modelar-veiculos.md), e para a chapa contínua de superfície lisa vale [`modelar-carroceria.md`](modelar-carroceria.md). Tudo o que está aqui é receita de uso das ferramentas gerais: o núcleo não conhece veículo, e a lista de painéis, os vãos e os membros do chassi são dado do objeto.
+Guia curto para o veículo que a referência mostra como chassi por baixo e lataria em painéis separados por frestas, como o sedã de [`procedural/pecas/sedan-chassi-e-lataria/`](../../../procedural/pecas/sedan-chassi-e-lataria/ALINHAMENTO.md). Para o veículo de volumes facetados sem painéis vale [`modelar-veiculos.md`](modelar-veiculos.md), e para a chapa contínua de superfície lisa vale [`modelar-carroceria.md`](modelar-carroceria.md). Tudo o que está aqui é receita de uso das ferramentas gerais: o núcleo não conhece veículo, e a lista de painéis, os vãos e os membros do chassi são dado do objeto.
 
 ## A casca, uma vez
 
@@ -8,7 +8,7 @@ A carroceria inteira se constrói uma vez, como uma chapa fechada de poucos mil�
 
 ## Os painéis, pelas linhas de vão
 
-`paineisPorVaos` (`npm run capacidade -- painel` dá a ficha, e a seção correspondente de [`operacoes-procedurais.md`](../../.claude/skills/criar-peca/references/operacoes-procedurais.md) tem o exemplo) recebe a chapa pronta, as linhas de vão desenhadas cada uma numa vista ortogonal, a largura do vão e o nome de cada painel por um ponto visto da vista dele. Ele devolve uma lâmina por linha, um só `subtrair` e uma parte por painel, com o vão medido ao longo da chapa e não no plano da vista. A linha de um lado do carro leva `alcance` para não cortar o outro lado, e a linha fechada dentro de um painel dá o pedaço de dentro como painel próprio ou o descarta. As linhas moram num módulo comum do objeto (`partes/_comum/`), porque todas as peças de painel dependem delas, e o fluxo do objeto avisa quando esse módulo muda depois da última rodada de uma peça.
+`paineisPorVaos` (`npm run capacidade -- painel` dá a ficha, e a seção correspondente de [`operacoes-procedurais.md`](../../../.claude/skills/criar-peca/references/operacoes-procedurais.md) tem o exemplo) recebe a chapa pronta, as linhas de vão desenhadas cada uma numa vista ortogonal, a largura do vão e o nome de cada painel por um ponto visto da vista dele. Ele devolve uma lâmina por linha, um só `subtrair` e uma parte por painel, com o vão medido ao longo da chapa e não no plano da vista. A linha de um lado do carro leva `alcance` para não cortar o outro lado, e a linha fechada dentro de um painel dá o pedaço de dentro como painel próprio ou o descarta. As linhas moram num módulo comum do objeto (`partes/_comum/`), porque todas as peças de painel dependem delas, e o fluxo do objeto avisa quando esse módulo muda depois da última rodada de uma peça.
 
 ## O chassi, desenhado passando e aparado
 

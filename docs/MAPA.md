@@ -84,20 +84,13 @@
 
 ## docs/modelar/
 
-- `AUTORIA-IA.md` — Autoria assistida por IA
-- `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
-- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `INDEX.md` — Modelar — entrada atual
-- `LEITURA-POR-TAREFA.md` — Leitura por tarefa
 - `MECANISMOS.md` — Mecanismos do Modelar: a visão em uma tela
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
 - `MONTAGEM-PERSISTIDA-V4.md` — Montagem persistida v4 e expectativas de interseção
-- `modelar-carroceria.md` — Modelar carroceria de chapa contínua
-- `modelar-veiculo-em-chassi-e-lataria.md` — Modelar um veículo em chassi e lataria
-- `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
 ## docs/modelar/banco-de-provas/
 
@@ -473,6 +466,8 @@
 
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
+- `AUTORIA-IA.md` — Autoria assistida por IA
+- `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
@@ -482,13 +477,18 @@
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
+- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
+- `LEITURA-POR-TAREFA.md` — Leitura por tarefa
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `README.md` — Contratos
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
+- `modelar-carroceria.md` — Modelar carroceria de chapa contínua
+- `modelar-veiculo-em-chassi-e-lataria.md` — Modelar um veículo em chassi e lataria
+- `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
 ## docs/modelar/decisoes/
 

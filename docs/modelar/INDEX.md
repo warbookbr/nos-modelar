@@ -96,9 +96,9 @@ fontes é inventário, não porta de entrada.
 
 ## Leitura por tarefa
 
-A leitura por assunto saiu desta página para [`LEITURA-POR-TAREFA.md`](LEITURA-POR-TAREFA.md). Cada roteiro de [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) já diz o que ler antes de começar; a página nova serve quando nenhum deles cobre a pergunta.
+A leitura por assunto saiu desta página para [`LEITURA-POR-TAREFA.md`](contratos/LEITURA-POR-TAREFA.md). Cada roteiro de [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) já diz o que ler antes de começar; a página nova serve quando nenhum deles cobre a pergunta.
 
-Carroceria: [`modelar-veiculos.md`](modelar-veiculos.md), [`modelar-carroceria.md`](modelar-carroceria.md) e, para chassi com lataria em painéis, [`modelar-veiculo-em-chassi-e-lataria.md`](modelar-veiculo-em-chassi-e-lataria.md).
+Carroceria: [`modelar-veiculos.md`](contratos/modelar-veiculos.md), [`modelar-carroceria.md`](contratos/modelar-carroceria.md) e, para chassi com lataria em painéis, [`modelar-veiculo-em-chassi-e-lataria.md`](contratos/modelar-veiculo-em-chassi-e-lataria.md).
 
 ## Comandos principais
 

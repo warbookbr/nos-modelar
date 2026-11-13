@@ -289,12 +289,12 @@ exata dessas ferramentas ainda não estão decididos.
 
 ## Relação com os demais documentos
 
-- [`ARQUITETURA.md`](contratos/ARQUITETURA.md) descreve as fronteiras técnicas atuais.
-- [`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md) registra o estado atual e
+- [`ARQUITETURA.md`](ARQUITETURA.md) descreve as fronteiras técnicas atuais.
+- [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) registra o estado atual e
   os níveis de maturidade das montagens.
 - [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) define a superfície
   de inspeção visual.
-- [`docs/nos-herdado/oficina-contrato.md`](../nos-herdado/oficina-contrato.md) registra o
+- [`docs/nos-herdado/oficina-contrato.md`](../../nos-herdado/oficina-contrato.md) registra o
   vocabulário procedural vigente.
 - `docs/modelar/planos/` contém planos executivos; este arquivo não substitui
   um plano nem autoriza implementação automática.
@@ -320,7 +320,7 @@ MCP pode expor essas capacidades, mas não as define.
 O que uma IA precisa **obedecer** ao autorar uma peça — distinção entre peça e
 montagem, identidade estável, isolamento, limites, propagação de alteração,
 validação em camadas, fluxo esperado, invariantes e desvios a evitar — está em
-[`usar/AUTORIA-DE-PECA.md`](usar/AUTORIA-DE-PECA.md)
+[`usar/AUTORIA-DE-PECA.md`](../usar/AUTORIA-DE-PECA.md)
 (`docs/modelar/usar/AUTORIA-DE-PECA.md`).
 
 Este documento ficou com o que explica **por que** o modelo é assim: objetivo,

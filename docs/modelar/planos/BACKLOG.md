@@ -2,7 +2,7 @@
 
 Este arquivo lista candidatos. Nenhum item é autorização de implementação.
 Candidatos ligados à direção de autoria precisam respeitar as invariantes de
-[`AUTORIA-IA.md`](../AUTORIA-IA.md) e
+[`AUTORIA-IA.md`](../contratos/AUTORIA-IA.md) e
 [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).
 
 | Candidato | Próximo recorte |
@@ -184,7 +184,7 @@ direção não decide antecipadamente:
 
 Resolvem-se por planos pequenos e provas, dentro das invariantes de
 [`../usar/MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) e
-[`../AUTORIA-IA.md`](../AUTORIA-IA.md).
+[`../AUTORIA-IA.md`](../contratos/AUTORIA-IA.md).
 
 ## Questões ainda abertas da autoria
 

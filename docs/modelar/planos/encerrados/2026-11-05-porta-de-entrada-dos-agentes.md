@@ -2,7 +2,7 @@
 
 **Estado:** concluído
 
-**Território:** `tools/modelar/capacidade.mjs`, `tools/modelar/capacidade.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/modelar-carroceria.md`, `.claude/skills/criar-peca/references/operacoes-procedurais.md`, `procedural/nucleo/gaiola-por-estacoes.js`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-interpolada.js`, `procedural/nucleo/gaiola-aneis.js`, `tools/modelar/vistas-de-passos.mjs`, `tools/modelar/comparar-silhueta.mjs`, `tools/modelar/conferir-pontos.mjs`, `docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/`
+**Território:** `tools/modelar/capacidade.mjs`, `tools/modelar/capacidade.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/contratos/modelar-carroceria.md`, `.claude/skills/criar-peca/references/operacoes-procedurais.md`, `procedural/nucleo/gaiola-por-estacoes.js`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-interpolada.js`, `procedural/nucleo/gaiola-aneis.js`, `tools/modelar/vistas-de-passos.mjs`, `tools/modelar/comparar-silhueta.mjs`, `tools/modelar/conferir-pontos.mjs`, `docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/`
 
 **Responsável:** sessão de trabalho do furgão, a pedido da pessoa em 2026-11-05
 
