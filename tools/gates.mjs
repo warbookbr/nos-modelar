@@ -101,7 +101,7 @@ export const GATES = [
   /* As onze guardas que abrem a bancada (porteiro, bancada:vazia:check, guarda:portas, :camera, :temas, :par, :referencia, :escolha,
      :junta, :edicao e :gesto) rodam aqui dentro, num Chromium e num servidor do Vite só (tools/modelar/guardas/rodar-guardas.mjs). Cada
      uma continua sendo um script que roda sozinho, e o relatório do gate diz o nome e o veredito de cada uma. */
-  'bancada:guardas', 'exportar:check',
+  'bancada:guardas',
   'guarda:acervo', 'guarda:tempo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'decisoes:check', 'docs:estrutura:check',
@@ -221,7 +221,7 @@ const ORCAMENTO_DA_MAQUINA = Math.max(2, availableParallelism());
 export const PASTAS_LEVES = [/^procedural\/pecas\//, /^docs\//, /^[^/]+\.md$/];
 
 export const GATES_CURTOS = [
-  'typecheck', 'test:rapidos', 'test:lentos', 'build', 'exportar:check',
+  'typecheck', 'test:rapidos', 'test:lentos', 'build',
   'guarda:acervo', 'guarda:tempo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'decisoes:check', 'docs:estrutura:check',

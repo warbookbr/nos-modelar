@@ -47,7 +47,7 @@ saída é tirá-lo de lá, e não abrir exceção. Detalhe em
    comporta o gesto no instante do arrasto.
 6. **Medição e revisão**: serviços em `tools/` descrevem peças, renderizam
    vistas, validam pacotes, preservam revisões e comparam resultados.
-7. **Exportação resolvida**: `tools/modelar/exportar.mjs` valida e produz uma
+7. **Exportação resolvida**: `tools/modelar/exportar-peca.mjs` valida e produz uma
    representação derivada da receita, útil para provas e consumidores sem
    carregar o núcleo procedural.
 8. **Acesso MCP atual**: o perfil padrão expõe leitura, auditoria, comparação e

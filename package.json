@@ -85,8 +85,6 @@
     "decisoes:gerar": "node tools/mapa/decisoes.mjs --gerar",
     "docs:estrutura": "node tools/mapa/estrutura-docs.mjs",
     "docs:estrutura:check": "node tools/mapa/estrutura-docs.mjs --check",
-    "exportar": "node tools/modelar/exportar.mjs",
-    "exportar:check": "node tools/modelar/exportar.mjs --check",
     "exportar:step": "node tools/modelar/exportar-step.mjs",
     "exportar:obj": "node tools/modelar/exportar-obj.mjs",
     "exportar:gltf": "node tools/modelar/exportar-gltf.mjs",

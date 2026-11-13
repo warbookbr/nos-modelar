@@ -114,7 +114,6 @@ npm test
 npm run typecheck
 npm run build
 npm run porteiro
-npm run exportar:check
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 npm run descrever:gesto -- <ajuste.json>   # e npm run absorver -- <ajuste.json>
 npm run diario

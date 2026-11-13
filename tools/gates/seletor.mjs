@@ -43,7 +43,6 @@ export const LE_O_GATE = {
   build: CODIGO,
   typecheck: [...CODIGO, /^tsconfig\.json$/, /\.d\.ts$/],
   'bancada:guardas': CODIGO,
-  'exportar:check': CODIGO,
   'arquitetura:motor:check': CODIGO,
   'calibracao:check': [],
 };

@@ -94,10 +94,6 @@ isso, e pode mudar ou sair sem aviso nem migração. O contrato do repositório 
 o núcleo e as capacidades provadas, e uma mudança boa no núcleo que quebre uma
 peça de exemplo se resolve refazendo a peça.
 
-Peças exportadas para `pecas-resolvidas/` são lidas pelo repositório do
-produto, mas ele não tem veto aqui: quando uma mudança alterar o dado exportado,
-registre no PR o que mudou e siga. Hoje nenhuma peça é exportada, e nenhum gate
-impõe essa regra.
 
 ## Desenvolvimento
 

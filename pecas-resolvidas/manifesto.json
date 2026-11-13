@@ -1,9 +1,0 @@
-{
-  "formato": "mecanifica.peca-resolvida",
-  "versao": 1,
-  "leitor": {
-    "arquivo": "src/autoria/ler-peca-resolvida.js",
-    "sha256": "927c14ff1748dab4e3564d517e9322a1be173624f5d2ba6c7681806971be390c"
-  },
-  "pecas": []
-}

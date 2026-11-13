@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1821 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1820 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2961,7 +2961,6 @@
 - `exportar-peca.test.ts` — Exportação: contrato do artefato e estado sem catálogo publicado.
 - `exportar-step.mjs` — exportar-step.mjs — CLI para exportação atômica e segura de receitas procedurais em formato STEP.
 - `exportar-step.test.mjs` — exportar-step.test.js — suíte de testes da CLI de exportação STEP e escrita segura.
-- `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
 - `familia-com-esboco.mjs` — familia-com-esboco.mjs — o adaptador da conferência entre a família e o componente do esboço de mesmo nome.
 - `familia-com-esboco.test.mjs` — familia-com-esboco.test.mjs — a conferência da família com o componente do esboço de mesmo nome, ponta a ponta: o andaime do componente `roda` nos parâmetros…
 - `familia.mjs` — familia.mjs — a aprovação mecânica das famílias e o gate que a confere.

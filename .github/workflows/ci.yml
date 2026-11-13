@@ -108,16 +108,6 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run nome:check
 
-      # A-60. Sem este passo o gate existiria e nunca rodaria, que é a mesma
-      # armadilha que o comentário de `vitest.config.ts` já descreve: o arquivo
-      # está lá, ninguém o executa, e a cobertura é impressão. Ele é o ÚNICO
-      # ponto que percebe a peça ter mudado sem `pecas-resolvidas/` ser gerado
-      # de novo — e o produto que consome esses arquivos vive em outro
-      # repositório, então o defeito não aparece em nenhum teste daqui.
-      - name: Peças publicadas em dia com a receita
-        if: ${{ !cancelled() }}
-        run: npm run exportar:check
-
       # A rodada de absorção acerta o desenho da pessoa reescrevendo a receita,
       # e acertaria mais fácil inventando termos até a conta fechar. Quem
       # declara de onde vieram os números, declara todos.
