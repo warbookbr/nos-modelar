@@ -1,0 +1,141 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/frente-e-traseira",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência e a receita não refina um esboço aprovado",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "paraChoqueTraseiro",
+        "tipo": "superficie",
+        "onde": "pontas, aresta superior",
+        "sentido": "anguloso",
+        "evidencia": "Vista isométrica isolada: as duas pontas fecham com chanfro reto no topo, e não com o raio de 6 mm prometido; não aparece arredondado."
+      }
+    ],
+    "observacao": "Sem alvo. Seis peças coerentes com a forma prometida, sem lâmina solta, sem lente fora do rebaixo, sem ausência e sem ondulação nos painéis; só a ponta do para-choque traseiro lê como quina viva."
+  },
+  "partes": [
+    {
+      "nome": "painelDianteiro",
+      "confere": true,
+      "observacao": "mancha azul = subida de 32 mm do rebaixo do farol, a 10 mm da borda; face em z 2118,0; promessa atualizada"
+    },
+    {
+      "nome": "painelTraseiro",
+      "confere": true,
+      "observacao": "contorno segue a lateral: 881 mm em y 670, 25 mm além da ponta do para-choque; promessa atualizada"
+    },
+    {
+      "nome": "abaDoPainelTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lenteDoFarolDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lenteDoFarolEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraChoqueDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraChoqueTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tomadaDeAr",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade1",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade2",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade3",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade4",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade5",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "os campos forma e técnica do PLANO têm limite de 240 caracteres, só conferido na execução",
+    "paraChoqueTraseiro superficie: da ferramenta. O raio de 6 mm da ponta ocupa menos de 2 pontos na vista isolada (1712 mm em 470 pontos), e o pedido não tem vista de perto da feição pequena que o plano promete. O processo não pega nem aprova.",
+    "três rodadas, três apontamentos diferentes em geometria que não mudou (corte declarado, ombro do painel, ponta do para-choque): o crítico acha a cada vez um detalhe no limite da imagem. A rodada 4 leva vista de perto, sem mexer na forma."
+  ],
+  "notaDePassagem": "Malha idêntica; só as promessas dos dois painéis mudaram. O painel de trás segue a lateral (877 a 881 mm de meia largura contra 856 do para-choque). A mancha azul do painel dianteiro é a subida do rebaixo do farol, forma pedida, sem afundamento abaixo do plano z 2118.",
+  "receita": {
+    "sha256": "sha256:8ec802d0d667a33a027e93e48c6ead13921ee0317043429a831eb87cc7728585",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 0,
+      "linhas": [],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes abaDoPainelTraseiro, painelDianteiro, painelTraseiro, paraChoqueDianteiro, paraChoqueTraseiro, tomadaDeAr",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az90.png",
+      "peca-lado-rasante-az180.png",
+      "peca-topo-rasante-az280.png",
+      "peca-topo-rasante-az10.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-13T00:17:10.240Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

@@ -1,0 +1,238 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/frente-e-traseira",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: a receita não refina um esboço aprovado e o pedido não traz imagem de referência",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Sem alvo, só julguei a forma prometida; nenhuma parte falta ou atravessa a vizinha, mas a perna da aba traseira e a quinta lâmina da grade não se confirmaram nas vistas, e lista vazia não é aprovação."
+  },
+  "partes": [
+    {
+      "nome": "painelDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "painelTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaDoPainelTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lenteDoFarolDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lenteDoFarolEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lanternaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraChoqueDianteiro",
+      "confere": true,
+      "observacao": "ponta medida a 5,8-7,0 mm (pedido 6) e quinas a 7,3-7,5 mm (pedido 8); vistas de perto mostram raio, sem aresta viva"
+    },
+    {
+      "nome": "paraChoqueTraseiro",
+      "confere": true,
+      "observacao": "ponta de raio, mediana 5,8 mm; um corte no cruzamento com a quina dá 4,3. A reta inclinada é o afunilamento em planta de x 800 a 856, agora dito na promessa"
+    },
+    {
+      "nome": "tomadaDeAr",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade1",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade2",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade3",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade4",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "laminaDaGrade5",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "capacidade raio nao acha raioDaAresta pelo nome, e raio-da-aresta.mjs recusa --ajuda",
+    "raio:aresta conta como ponta fora do pedido o corte de dobra de 57 graus no cruzamento da ponta com a quina (4,3 mm), embora o resto meça 5,8",
+    "dePerto so tem a camera isometrica de +x,+y,+z: a quina de fora do para-choque de tras fica de costas e so aparece no contorno",
+    "nao ha como nomear o ponto da ponta a partir do esboco: a receita busca o ultimo laco pelo nome dos pontos",
+    "vistas:critica passa de 580 s e, sob timeout externo, deixa o processo orfao rodando",
+    "a rodada não mexeu na forma: o pedido ganhou a vista de perto das pontas dos para-choques e a promessa passou a dizer o afunilamento em planta, que o crítico da rodada 3 tinha lido como chanfro. Com isso o veredito saiu sem defeito.",
+    "observações do crítico, sem defeito: a perna de 20 mm da aba do painel traseiro e a contagem das cinco lâminas não se confirmam nas vistas; ficam como candidatas a vista de perto."
+  ],
+  "notaDePassagem": "Forma intacta (assinatura identica). A ponta mede 5,8 a 7,0 mm contra 6 pedidos nos dois para-choques: e raio, e nao chanfro. O que o critico leu como chanfro no traseiro e o afunilamento da face de fora de x 800 a 856 (fundo de 72 a 36), agora dito na promessa de cada para-choque e no criterio de reprovacao. Pontos do dePerto vem do ultimo laco do esboco, distancia 90 mm na TABELA. A quina de fora do traseiro fica de costas: a imagem mostra so a ponta; a quina de 8 mm esta medida em 7,7-7,8.",
+  "receita": {
+    "sha256": "sha256:0002c1efacc462ac19c32e81c458505364e2962163b09609d981444f40737e16",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 2,
+      "acrescentadas": 18,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "const { PARA_CHOQUE_DA_FRENTE, PARA_CHOQUE_DE_TRAS } = await import('../../../alta-definicao/frente-e-traseira.esboco.mjs');"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* a vista de perto do raio da ponta (6 mm) e da quina (8 mm) dos para-choques: a 90 mm a imagem cobre uns 62 mm, e o raio de 6 mm ocupa uns 87 pontos, e não os 2 da vista isolada */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  dePerto: { distancia: 90 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "/** As vistas de perto de um para-choque, em mm do referencial da peça, tiradas dos pontos do esboço na ponta de +x (o último laço, o de maior x): o meio da aresta de cima da ponta,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": " * onde o raio de 6 mm da ponta se vê entre a tampa e o topo, e a quina de cima da face de fora, onde se vê o de 8 mm. A câmera da vista de perto é a isométrica de +x, +y e +z. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "function dePertoDoParaChoque(g, nome, fora, ponta, quina, distancia) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  const xMax = Math.max(...Object.values(g.pontosMm).map((q) => q[0]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  const ponto = (sufixo) => g.pontosMm[Object.keys(g.pontosMm).find((n) => n.startsWith(`${nome}_l`) && n.endsWith(`_${sufixo}`) && g.pontosMm[n][0] === xMax)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  return [{ ponto: ponto('cima1'), oQue: ponta, distancia }, { ponto: ponto(fora), oQue: quina, distancia }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 66,
+          "texto": "    partes: [...ETAPAS[ETAPA], 'abaDoPainelTraseiro'].map(parteDoPlano),"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    partes: [...ETAPAS[ETAPA], 'abaDoPainelTraseiro'].map(parteDoPlano).map((p) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "      const d = TABELA.dePerto.distancia;"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "      if (p.nome === 'paraChoqueDianteiro') return { ...p, dePerto: dePertoDoParaChoque(PARA_CHOQUE_DA_FRENTE, p.nome, 'cima0', 'a ponta de +x, no topo: raio de 6 mm entre a tampa da ponta e a face de cima', 'a quina de cima da face da frente, na ponta de +x: raio de 8 mm', d) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "      if (p.nome === 'paraChoqueTraseiro') return { ...p, dePerto: dePertoDoParaChoque(PARA_CHOQUE_DE_TRAS, p.nome, 'tras0', 'a ponta de +x, no topo: raio de 6 mm entre a tampa da ponta e a face de cima', 'a quina de cima da face de trás (de costas para a câmera, fica no contorno), na ponta de +x: raio de 8 mm', d) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "      return p;"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    }),"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "      'o para-choque que não vai de ponta a ponta, com costura no eixo, ou com a ponta em quina viva no lugar do raio de 6 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "      'o para-choque que não vai de ponta a ponta, com costura no eixo, ou com a ponta em quina viva ou chanfro reto no lugar do raio de 6 mm (o afunilamento em planta do fundo, de 72 a 36 mm, é o prometido)',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes abaDoPainelTraseiro, painelDianteiro, painelTraseiro, paraChoqueDianteiro, paraChoqueTraseiro, tomadaDeAr",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az90.png",
+      "peca-lado-rasante-az180.png",
+      "peca-topo-rasante-az280.png",
+      "peca-topo-rasante-az10.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-13T01:05:38.395Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "formato": "mecanifica.registro-de-etapas",
+  "versao": 2,
+  "montagem": "sedan-chassi-e-lataria",
+  "etapas": [
+    {
+      "instancia": "carroceria",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:02dd291d4fb7763a8c190590b1fdda49969e997c9422b5eb9dc954a212bbee3b",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou na rodada 3 com nota 8 e sem defeito; cobertura das 55 partes feita em passadas",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "vidros",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:cbbf4ee2a801d6c0d2825100d23f9802bb5903fd35ca433de2ceff9fffbf4c9e",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou na rodada 3 com nota 8 e sem defeito",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "frente-e-traseira",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:da94972e13c030159dcb2bce8660c808db9913df20e7476fbb56e9e51522632a",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "rodas",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:938a939f448ccf0e354666a20d2ef567484d19a314d04d8868d79b9a8ae56873",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
+        "analise": "ausente"
+      }
+    },
+    {
+      "instancia": "acessorios",
+      "estado": "fixa",
+      "juntas": [],
+      "forma": "sha256:2f62717eb8ec61ebbe626efa2ca77301bfabd148af04a8c5ded72377c91edcf7",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
+        "analise": "ausente"
+      }
+    }
+  ]
+}

@@ -1,0 +1,229 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/carroceria",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência e a receita não refina um esboço aprovado",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Sem alvo e com parte das imagens não abertas, a lista vazia é só ausência de achado nas imagens que abri; o lábio e o forro dos vãos não dá para julgar nas vistas que abri."
+  },
+  "partes": [
+    {
+      "nome": "anteparoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "assoalho",
+      "confere": true,
+      "observacao": "agora gaiola literal por estações (5 na cabine, 3 atrás); forma e espessura de 2 mm iguais"
+    },
+    {
+      "nome": "caixaDeRodaDianteiraDir",
+      "confere": true,
+      "observacao": "gaiola literal em vez da união de prismas; mesmo volume"
+    },
+    {
+      "nome": "caixaDeRodaDianteiraEsq",
+      "confere": true,
+      "observacao": "idem"
+    },
+    {
+      "nome": "caixaDeRodaTraseiraDir",
+      "confere": true,
+      "observacao": "idem"
+    },
+    {
+      "nome": "caixaDeRodaTraseiraEsq",
+      "confere": true,
+      "observacao": "idem"
+    },
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraLamaDir",
+      "confere": true,
+      "observacao": "o canto da planta de 82 por 62 mm agora está na promessa"
+    },
+    {
+      "nome": "paraLamaEsq",
+      "confere": true,
+      "observacao": "idem"
+    },
+    {
+      "nome": "portaDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaDianteiraEsq",
+      "confere": true,
+      "observacao": "6 faces finas tiradas (limpeza 0,03 mm)"
+    },
+    {
+      "nome": "portaTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lateralTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lateralTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaDoPortaMalas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "teto",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroDosVaos",
+      "confere": true,
+      "observacao": "promessa agora diz trechos curtos só onde o vão deixaria ver através, plaquinha e faixa em L"
+    },
+    {
+      "nome": "longarinaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDianteira",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaTraseira",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDoPainel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDaCabine",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paredeCortaFogo",
+      "confere": true,
+      "observacao": "gaiola literal por estações; forma igual"
+    },
+    {
+      "nome": "suporteDoRadiador",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tunel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoTraseiro",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "O pedido ao modelador não listava o --acao, que conta face fina; a rodada 1 chegou ao crítico com 337 e o processo só pegou no registro.",
+    "limparLascas não confere valência >= 3 da medida de contatos; só o descrever (6 min) pega.",
+    "Falta comando de desvio entre duas malhas por parte; malha:assinatura só diz igual ou diferente.",
+    "vao:partes muda de resultado com a estrutura da malha, com a geometria igual a 1 nm.",
+    "--acao da carroceria leva cerca de 18 min e cada edição no esboço refaz 4 min de montagem.",
+    "Degrau do assoalho entra até 21 mm na rampa da longarina: defeito do rascunho que a medida só vê por vértice; estações postas fora de x 380-460.",
+    "veredito parcial: o crítico abriu 10 das 55 partes e parte das imagens. Três passadas de cobertura foram despachadas para as outras 45. O pedido de uma peça de 55 partes não cabe num crítico: falta repartir o pedido por grupos de partes.",
+    "a etapa não se dá por fechada com esta nota: o degrau do assoalho entra até 21 mm na rampa da longarina, por dentro do chassi, o que nenhuma imagem do pacote mostra e a medida só vê por vértice. Vai à rodada 3, antes de fixar."
+  ],
+  "notaDePassagem": "Faces finas: o núcleo ganhou fusão de tira e dissolução de ponto de passagem (valência 3 exigida pela medida de contatos), e o esboço limpa por membro a 0,075 mm. Assoalho, parede e caixas de roda viraram gaiolas literais: a união por face só deixava 52 arestas abertas. Maior desvio da malha: 0,073 mm. Vãos de apoio declarados pelo valor medido. Decisão pendente: rampa da longarina contra degrau do assoalho.",
+  "receita": {
+    "sha256": "sha256:0b6143b600fb1c8457d161081082503c534581e126c876c12031e5501f20300c",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 1,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    ['limparLascas', { sel, tolerancia: m(0.03) }],"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes capo, lateralTraseiraDir, lateralTraseiraEsq, paraLamaDir, paraLamaEsq, portaDianteiraDir, portaDianteiraEsq, portaTraseiraDir, portaTraseiraEsq, soleiraDir, soleiraEsq, tampaDoPortaMalas, teto",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az90.png",
+      "peca-lado-rasante-az290.png",
+      "peca-lado-rasante-az20.png",
+      "peca-topo-rasante-az20.png",
+      "peca-topo-rasante-az110.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-12T20:49:20.560Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

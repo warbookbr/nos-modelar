@@ -10,7 +10,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
+  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
 } from './vistas-para-critica.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
@@ -270,6 +270,7 @@ function bancadaFalsa(pasta, peca) {
     const sufixo = [
       opcoes.selecionadas ? `sel-${opcoes.selecionadas}` : null, opcoes.modo ?? null, 'orto', opcoes.focar ? 'focado' : null,
       opcoes.arame === 'raio-x' ? 'raio-x' : (opcoes.arame ? 'arame' : null),
+      opcoes.mirar ? `mira-${opcoes.mirar.join('_')}-d${opcoes.distancia}` : null,
     ].filter(Boolean).join('-');
     const arquivos = vistas.map((vista) => {
       const arquivo = join(pasta, `${prefixoDaPeca(peca)}${vista}-${sufixo}.png`);
@@ -957,4 +958,49 @@ describe('a medição da receita antes do pacote', () => {
     expect(imprimir(resultado)).toContain('MEDIÇÃO DA RECEITA: NÃO FEITA');
     expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain(`Medição da receita: NÃO FEITA: ${MOTIVO_SEM_MEDIR}.`);
   }, 60_000);
+});
+
+describe('a vista de perto da feição pequena (dePerto da parte no PLANO)', () => {
+  async function pacote(peca) {
+    const base = mkdtempSync(join(area, 'de-perto-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, peca);
+    const resultado = await vistasParaCritica(peca, { saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [] } });
+    return { resultado, pasta, chamadas: bancada.chamadas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
+  }
+
+  it('o quadro de perto é o do campo de 38 graus: 220 mm de distância enquadram uns 150 mm', () => {
+    expect(DISTANCIA_DE_PERTO_MM).toBe(220);
+    expect(campoDePertoMm(DISTANCIA_DE_PERTO_MM)).toBe(152);
+    expect(campoDePertoMm(120)).toBe(83);
+  });
+
+  it('sem o campo, o pacote não tem captura de perto, linha de perto nem dado no pacote.json', async () => {
+    const { chamadas, pedido, manifesto, resultado } = await pacote('tools/fixtures/referencia-do-plano/presente/receita.js');
+    expect(chamadas.filter((c) => c.mirar)).toEqual([]);
+    expect(resultado.dePerto).toEqual([]);
+    expect(pedido).not.toContain('- de perto,');
+    expect(pedido).not.toContain('Vistas de perto');
+    expect(Object.hasOwn(manifesto, 'dePerto')).toBe(false);
+  });
+
+  it('com o campo, captura cada entrada mirando o ponto com a parte e as vizinhas, e o pedido e o pacote.json dizem o que olhar, o ponto, a escala e o caminho', async () => {
+    const { chamadas, pedido, manifesto, resultado } = await pacote('tools/fixtures/de-perto/receita.js');
+    const perto = chamadas.filter((c) => c.mirar);
+    expect(perto.map((c) => ({ mirar: c.mirar, distancia: c.distancia, selecionadas: c.selecionadas, modo: c.modo, focar: c.focar ?? false }))).toEqual([
+      { mirar: [100, 300, 200], distancia: 120, selecionadas: 'bloco', modo: 'contexto', focar: false },
+      { mirar: [-100, 0, -200], distancia: 220, selecionadas: 'bloco', modo: 'contexto', focar: false },
+    ]);
+    expect(resultado.dePerto.map((d) => [d.campoMm, basename(d.arquivo)])).toEqual([
+      [83, expect.stringContaining('mira-100_300_200-d120')], [152, expect.stringContaining('mira--100_0_-200-d220')],
+    ]);
+    const partes = pedido.slice(pedido.indexOf('## Partes'), pedido.indexOf('## Critérios'));
+    expect(partes).toContain('Feição menor que uns 10 mm só se julga pela vista de perto');
+    expect(partes.indexOf('Vistas de perto')).toBeGreaterThan(partes.indexOf('-isolar-orto-focado.png'));
+    expect(partes).toContain(`- de perto, a quina de cima: aresta viva de caixa: ponto [100; 300; 200] mm (x, y, z da peça), a imagem cobre 83 mm de largura: ${resultado.dePerto[0].arquivo}`);
+    expect(partes).toContain(`- de perto, a quina de baixo, do outro lado: ponto [-100; 0; -200] mm (x, y, z da peça), a imagem cobre 152 mm de largura: ${resultado.dePerto[1].arquivo}`);
+    expect(manifesto.dePerto).toEqual(resultado.dePerto);
+    expect(manifesto.dePerto[0]).toMatchObject({ parte: 'bloco', ponto: [100, 300, 200], distanciaMm: 120, campoMm: 83 });
+    expect(imprimir(resultado)).toContain('DE PERTO');
+  });
 });

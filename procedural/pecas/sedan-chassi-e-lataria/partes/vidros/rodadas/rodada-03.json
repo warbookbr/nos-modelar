@@ -1,0 +1,98 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/vidros",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência nem esboço aprovado, só a promessa de forma do plano",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Sem alvo, vale só a promessa do plano: as oito chapas têm a forma prometida e o corte mostra o toque declarado, ficando em dúvida a linha escura na borda das colunas nas vistas montadas e o degrau ausente nos vidros de porta."
+  },
+  "partes": [
+    {
+      "nome": "paraBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "vidroDianteiroDir",
+      "confere": true,
+      "observacao": "promessa passa a dizer: chapa maior que o vão, contorno não é o do vão, ponta truncada sob a lataria"
+    },
+    {
+      "nome": "vidroDianteiroEsq",
+      "confere": true,
+      "observacao": "idem, espelho do direito"
+    },
+    {
+      "nome": "vidroTraseiroDaPortaDir",
+      "confere": true,
+      "observacao": "idem"
+    },
+    {
+      "nome": "vidroTraseiroDaPortaEsq",
+      "confere": true,
+      "observacao": "idem"
+    },
+    {
+      "nome": "vigiaDir",
+      "confere": true,
+      "observacao": "idem"
+    },
+    {
+      "nome": "vigiaEsq",
+      "confere": true,
+      "observacao": "idem"
+    }
+  ],
+  "atrito": [
+    "o contorno retangular do vidro lateral vem das estações da gaiola; truncar em arco é refazer a gaiola, então só o texto mudou",
+    "observações do crítico, sem defeito: os dois vidros de porta são retângulos sem degrau e a promessa comum aos seis laterais cita o degrau; a linha escura nas colunas é a moldura da carroceria. A promessa por vidro fica como melhoria.",
+    "o arquivo do modelador desta rodada é a transcrição dos blocos do relato dele, feita por quem conduz, porque o bloco da carroceria veio com nomes de parte escritos de memória e ele pediu a lista do PLANO."
+  ],
+  "notaDePassagem": "Malha idêntica à da rodada 2; só a promessa dos seis vidros laterais mudou, dizendo que a chapa é maior que o vão, que o contorno não é o do vão e que a ponta truncada fica sob a chapa e a moldura (o degrau do canto de baixo).",
+  "receita": {
+    "sha256": "sha256:e4609871e167a043834bc501dfacb4f591882066b041180c88e8bd57d4a08b87",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 0,
+      "linhas": [],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes paraBrisa, vidroDianteiroDir, vidroDianteiroEsq, vidroTraseiro, vidroTraseiroDaPortaDir, vidroTraseiroDaPortaEsq, vigiaDir, vigiaEsq",
+    "imagens": [
+      "peca-frente-rasante-az280.png",
+      "peca-frente-rasante-az10.png",
+      "peca-lado-rasante-az40.png",
+      "peca-el20-lado-rasante-az130.png",
+      "peca-topo-rasante-az0.png",
+      "peca-topo-rasante-az90.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az110.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-13T00:16:54.582Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
