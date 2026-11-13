@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1838 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1840 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1783,6 +1783,14 @@
 ## procedural/pecas/jipe-aberto/referencias/
 
 - `alvo.md` — Alvo do jipe-aberto
+
+## procedural/pecas/kukri/
+
+- `receita.js` — kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. Cada parte é uma gaiola de `gaiolaPorLacos`: a lâmina em laços p…
+
+## procedural/pecas/kukri/referencias/
+
+- `alvo.md` — Alvo da kukri
 
 ## procedural/pecas/lava-loucas-compacta-branca/
 

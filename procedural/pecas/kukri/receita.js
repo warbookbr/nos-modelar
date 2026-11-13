@@ -44,7 +44,7 @@ export const TABELA = {
   bico_lo: [[1, -2.5], [4, -9], [10, -18.7], [18, -26], [24, -28.5], [27, -27.5], [30, -19], [33, -11.5], [40, -9.5], [50, -7.8], [58, -7]],
   bico_hy: [[1, 3], [4, 7], [10, 10.5], [20, 12], [30, 12.5], [40, 13], [58, 13.4]],
   bico_planos: [57.5, 53, 48, 43, 38, 34, 31, 28.5, 26, 23, 19, 15, 11, 7.5, 4.5, 2],
-  furo_x: 11, furo_z: 2, furo_raio: 2.4,
+  furo_x: 17, furo_z: -1, furo_raio: 2.6,
   niveis_cabo: 1,
 };
 
@@ -251,7 +251,8 @@ const receita = {
   get PONTOS() {
     const T = this.PARAMS;
     return [
-      { nome: 'ponta da lâmina', parte: 'lamina', medida: 'maximo', em: [T.comprimento, T.eixo_y, T.dorso_quebra_ponta[T.dorso_quebra_ponta.length - 1][1]], toleranciaMm: 2 },
+      { nome: 'caixa da lâmina: ponta em x, face de cima em y e dorso na quebra em z', parte: 'lamina', medida: 'maximo', em: [T.comprimento, T.eixo_y + T.espessura_dorso / 2, T.dorso_quebra_ponta[0][1]], toleranciaMm: 1 },
+      { nome: 'caixa da lâmina: gume mais fundo em z', parte: 'lamina', medida: 'minimo', em: [T.lamina_base, T.eixo_y - T.espessura_dorso / 2, -21], toleranciaMm: 1 },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },
