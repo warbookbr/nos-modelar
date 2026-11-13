@@ -42,6 +42,15 @@ export const CAMPOS_PLANO = Object.freeze([
 export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria', 'dobrasAceitas']);
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
+/* `dePerto` da parte: onde o pedido ao crítico mostra a feição pequena que o plano promete (raio de 6 mm, rebaixo, friso), numa vista
+   de perto com a câmera mirando o ponto. A vista isolada da parte enquadra a parte inteira, e uma feição de poucos milímetros ocupa
+   menos de dois pontos de imagem nela: o crítico não a vê e não pode apontá-la nem aprová-la. Até quatro entradas por parte. */
+export const CAMPOS_OPCIONAIS_DA_PARTE = Object.freeze(['dePerto']);
+export const CAMPOS_DE_PERTO = Object.freeze(['ponto', 'oQue']);
+export const LIMITE_DE_PERTO = 4;
+export const LIMITE_O_QUE_DE_PERTO = 120;
+const LIMITE_DO_PONTO_MM = 100000;
+const LIMITE_DA_DISTANCIA_MM = 10000;
 
 const UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i;
 const CAMPO_RUNTIME = /^(uuid|indice|index|passo|timestamp|createdat|updatedat|host)$/i;
@@ -93,9 +102,30 @@ function listaDeTextos(valor, quem, campo, minimo = 1) {
   return itens;
 }
 
+function umaEntradaDePerto(valor, quem, campo) {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, `'${campo}' precisa ser objeto { ponto, oQue, distancia? }.`);
+  chavesExatas(valor, CAMPOS_DE_PERTO, quem, campo, ['distancia']);
+  const { ponto } = valor;
+  if (!Array.isArray(ponto) || ponto.length !== 3 || !ponto.every((n) => typeof n === 'number' && Number.isFinite(n) && Math.abs(n) <= LIMITE_DO_PONTO_MM)) {
+    falhar(quem, `'${campo}.ponto' precisa ser [x, y, z], três números finitos em milímetros do referencial da peça (até ${LIMITE_DO_PONTO_MM} em módulo), para a câmera ter onde mirar.`);
+  }
+  const oQue = texto(valor.oQue, quem, `${campo}.oQue`, 10);
+  if (oQue.length > LIMITE_O_QUE_DE_PERTO) {
+    falhar(quem, `'${campo}.oQue' excede ${LIMITE_O_QUE_DE_PERTO} caracteres (tem ${oQue.length}): diga em uma frase curta o que o crítico olha naquele ponto.`);
+  }
+  const saida = { ponto: [...ponto], oQue };
+  if (valor.distancia !== undefined) {
+    if (typeof valor.distancia !== 'number' || !Number.isFinite(valor.distancia) || valor.distancia <= 0 || valor.distancia > LIMITE_DA_DISTANCIA_MM) {
+      falhar(quem, `'${campo}.distancia' precisa ser número em milímetros maior que zero e até ${LIMITE_DA_DISTANCIA_MM}: é a distância da câmera ao ponto.`);
+    }
+    saida.distancia = valor.distancia;
+  }
+  return saida;
+}
+
 function umaParte(valor, quem, campo) {
   if (!valor || typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, `'${campo}' precisa ser objeto.`);
-  chavesExatas(valor, CAMPOS_PARTE, quem, campo);
+  chavesExatas(valor, CAMPOS_PARTE, quem, campo, CAMPOS_OPCIONAIS_DA_PARTE);
   const nome = texto(valor.nome, quem, `${campo}.nome`);
   /* O nome da parte é o mesmo endereço que a receita usa no passo `parte` e que
      a medida de contato devolve. Nome com espaço ou acento aqui e outro lá
@@ -103,10 +133,18 @@ function umaParte(valor, quem, campo) {
   if (!NOME_DE_PARTE.test(nome)) {
     falhar(quem, `'${campo}.nome' precisa ser o mesmo identificador usado no passo 'parte': letras e dígitos, sem espaço.`);
   }
+  let dePerto;
+  if (valor.dePerto !== undefined) {
+    if (!Array.isArray(valor.dePerto) || valor.dePerto.length === 0 || valor.dePerto.length > LIMITE_DE_PERTO) {
+      falhar(quem, `'${campo}.dePerto' precisa ser lista de 1 a ${LIMITE_DE_PERTO} entradas { ponto, oQue, distancia? }: cada uma vira uma vista de perto da feição pequena que o plano promete; sem feição pequena, tire o campo.`);
+    }
+    dePerto = valor.dePerto.map((entrada, i) => umaEntradaDePerto(entrada, quem, `${campo}.dePerto[${i}]`));
+  }
   return {
     nome,
     forma: texto(valor.forma, quem, `${campo}.forma`, MINIMO_DO_CRITERIO),
     tecnica: texto(valor.tecnica, quem, `${campo}.tecnica`),
+    ...(dePerto ? { dePerto } : {}),
   };
 }
 

@@ -97,6 +97,15 @@ export const RES_CONJUNTO = '1100x1450';
 export const RES_PARTE = '900x900';
 export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,superior';
 export const VISTAS_DA_PARTE = 'direita,isometrica';
+/* A VISTA DE PERTO (`dePerto` da parte no PLANO): a feição de poucos milímetros que o plano promete (o raio de 6 mm numa barra de
+   1,7 m) ocupa menos de dois pontos de imagem na vista isolada da parte, e o crítico não a vê. Cada entrada vira uma captura com a
+   câmera mirando o ponto, ortográfica e quadrada, com a parte selecionada e as vizinhas visíveis (`--modo=contexto`). Sem `distancia`
+   no plano, a câmera fica a 220 mm: o campo de 38 graus tem então uns 150 mm de lado em volta do ponto. */
+export const RES_DE_PERTO = '900x900';
+export const VISTA_DE_PERTO = 'isometrica';
+export const DISTANCIA_DE_PERTO_MM = 220;
+/** O lado, em mm, do quadro quadrado de uma vista de perto à `distanciaMm` (o campo de 38 graus de `olhar-bancada.mjs`). */
+export const campoDePertoMm = (distanciaMm) => Math.round(2 * distanciaMm * Math.tan((19 * Math.PI) / 180));
 export const VISTAS_DO_ARAME = 'isometrica,traseira';
 /* As vistas do conjunto montado, com o quadro na peça: as seis que o conjunto da peça sozinha tem, mais a de baixo, em quadro mais
    quadrado que o da bancada, porque o quadro fecha na caixa da peça e a folga da forma dela é que decide o que sobra. A de baixo
@@ -447,13 +456,17 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
   }
 
   if (partes.length) {
-    L.push('## Partes', '', 'Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência.', '');
-    for (const { nome, imagens, caixaMm = null } of partes) {
+    L.push('## Partes', '', 'Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência. Feição menor que uns 10 mm só se julga pela vista de perto, quando a parte a traz; sem ela, a imagem isolada não a mostra e você não aponta defeito nem aprova a feição.', '');
+    for (const { nome, imagens, caixaMm = null, dePerto = [] } of partes) {
       const prometida = plano?.partes.find((p) => p.nome === nome);
       L.push(`### ${nome}`, '');
       if (prometida) L.push(`Forma prometida: ${prometida.forma}`, '', `Técnica prometida: ${prometida.tecnica}`, '');
       if (caixaMm) L.push(`Caixa da parte na malha executada: ${caixaMm.map((n) => mmTexto(n).replace(' mm', '')).join(' por ')} mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.`, '');
       L.push(...lista(imagens.map(imagem)), '');
+      if (dePerto.length) {
+        L.push('Vistas de perto, com a câmera mirando o ponto, a parte e as vizinhas visíveis, em projeção ortográfica:', '',
+          ...lista(dePerto.map((d) => `de perto, ${d.oQue}: ponto [${d.ponto.map((n) => String(Math.round(n * 100) / 100).replace('.', ',')).join('; ')}] mm (x, y, z da peça), a imagem cobre ${d.campoMm} mm de largura: ${d.arquivo}`)), '');
+      }
     }
   }
 
@@ -1423,7 +1436,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const compartilhada = dependencias.olharBancada && !dependencias.abrirCaptura ? null : await dep.abrirCaptura({ logger });
   /* QUANTAS IMAGENS O PACOTE TEM E QUANTAS JÁ SAÍRAM, para a recusa de uma captura dizer o que faltava. */
   const total = VISTAS_DO_CONJUNTO.split(',').length + 1 + 1 + VISTAS_DO_ARAME.split(',').length + 1
-    + VISTAS_DA_PARTE.split(',').length * partes.length;
+    + VISTAS_DA_PARTE.split(',').length * partes.length
+    + (plano?.partes ?? []).reduce((soma, p) => soma + (p.dePerto?.length ?? 0), 0);
   let feitas = 0;
   const capturar = async (quem, opcoes) => {
     const resposta = await dep.olharBancada({ ...opcoes, logger, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...(compartilhada ? { compartilhada } : {}) });
@@ -1438,6 +1452,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   let arame;
   let raioX;
   const porParte = [];
+  const dePerto = [];
   try {
     conjunto = await capturar('conjunto', { peca, revisar: true, res: RES_CONJUNTO });
     exigirVistasDiferentes(conjunto, 'do conjunto');
@@ -1473,6 +1488,15 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
       });
       exigirVistasDiferentes(resultado, `da parte '${parte}'`);
       porParte.push({ parte, resultado });
+      /* as vistas de perto saem na mesma página da parte (a bancada reaproveita a carga quando a projeção e a resolução repetem) */
+      for (const entrada of plano?.partes.find((p) => p.nome === parte)?.dePerto ?? []) {
+        const distanciaMm = entrada.distancia ?? DISTANCIA_DE_PERTO_MM;
+        const feita = await capturar(`vista de perto da parte '${parte}' em [${entrada.ponto.join(', ')}]`, {
+          peca, selecionadas: parte, modo: 'contexto', auditoria: true, projecao: 'ortografica', vistas: VISTA_DE_PERTO,
+          res: RES_DE_PERTO, mirar: entrada.ponto, distancia: distanciaMm,
+        });
+        dePerto.push({ parte, ponto: entrada.ponto, oQue: entrada.oQue, distanciaMm, campoMm: campoDePertoMm(distanciaMm), arquivo: arquivosDe(feita)[0] });
+      }
     }
   } finally {
     await compartilhada?.fechar();
@@ -1557,7 +1581,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     ],
     montado: montadaNoPedido,
     sobreposicao: sobreposicao ? { arquivos: sobreposicao.arquivos, notas: sobreposicao.notas } : null,
-    partes: porParte.map(({ parte, resultado }) => ({ nome: parte, ...(caixas.get(parte) ? { caixaMm: caixas.get(parte) } : {}), imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
+    partes: porParte.map(({ parte, resultado }) => ({ nome: parte, ...(caixas.get(parte) ? { caixaMm: caixas.get(parte) } : {}), ...(dePerto.some((d) => d.parte === parte) ? { dePerto: dePerto.filter((d) => d.parte === parte) } : {}), imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
     perguntas: [...(perguntas.todas ?? []), ...(declarado ? [lerPergunta(PERGUNTA_DO_ALVO, 'a pergunta do alvo')] : [])],
     superficie,
     medicao: medicaoDoPacote,
@@ -1565,9 +1589,14 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const arquivoDoPedido = join(pasta, 'pedido.md');
   writeFileSync(arquivoDoPedido, pedido, 'utf8');
   const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie });
+  if (dePerto.length) {
+    /* aditivo: sem `dePerto` o pacote.json sai como sempre saiu */
+    const dado = JSON.parse(readFileSync(manifesto, 'utf8'));
+    writeFileSync(manifesto, `${JSON.stringify({ ...dado, dePerto }, null, 2)}\n`, 'utf8');
+  }
 
   return {
-    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
 }
 
@@ -1750,6 +1779,10 @@ export function imprimir(resultado) {
       linhas.push(`  ${parte}:`);
       for (const arquivo of arquivos) linhas.push(`    ${arquivo}`);
     }
+  }
+  if (resultado.dePerto?.length) {
+    linhas.push('', 'DE PERTO (a câmera mirando a feição pequena que o plano promete):');
+    for (const d of resultado.dePerto) linhas.push(`  ${d.parte}, ${d.oQue}: [${d.ponto.join('; ')}] mm, ${d.campoMm} mm de largura: ${d.arquivo}`);
   }
   if (resultado.alvo) {
     const { alvo } = resultado;

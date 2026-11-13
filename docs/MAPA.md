@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2035 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2039 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2108,6 +2108,7 @@
 
 - `receita-01.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 - `receita-02.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
+- `receita-03.js` — sedan-chassi-e-lataria/frente-e-traseira — o painel da frente com a grade e os vãos de farol, o painel de trás com os vãos de lanterna e a aba de borda dele,…
 
 ## procedural/pecas/sedan-chassi-e-lataria/partes/rodas/
 
@@ -2126,6 +2127,7 @@
 
 - `receita-01.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
 - `receita-02.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
+- `receita-03.js` — sedan-chassi-e-lataria/vidros — os oito vidros do sedã: o para-brisa e o vidro traseiro, que vão de um lado ao outro, e o vidro da porta dianteira, o da port…
 
 ## procedural/pecas/sedan-chassi-e-lataria/referencias/
 
@@ -2697,6 +2699,14 @@
 
 - `receita.js` — subtrair-que-nao-corta/receita.js — peça de prova do defeito "um `subtrair` que não corta nada passa calado" (plano "costuras e furos limpos"): um bloco de 1…
 - `subtrair-que-nao-corta.test.mjs` — A fatia 3 do plano "costuras e furos limpos" inverteu o defeito: o subtrair (e o intersectar) que não muda o sólido avisa (`semEfeito`), e o que muda não avisa.
+
+## tools/fixtures/de-perto/
+
+- `receita.js` — Peça de ensaio da vista de perto: o plano pede duas vistas de perto da parte, uma com a distância do plano e outra com a padrão.
+
+## tools/fixtures/de-perto/referencias/
+
+- `alvo.md` — Alvo de ensaio
 
 ## tools/fixtures/descrever-sem-calar/
 

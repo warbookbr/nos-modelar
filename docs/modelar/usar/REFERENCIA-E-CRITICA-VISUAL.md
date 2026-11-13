@@ -33,6 +33,8 @@ rasante e a curvatura da lataria, sem as quais a rodada dela não fecha (ver
 modelou nem o histórico da construção. Sempre que a forma vai à pessoa, a
 legibilidade cega (só a imagem e "o que é isto?") roda antes.
 
+A feição de poucos milímetros que o plano promete (o raio de 6 mm da ponta de uma barra de 1,7 m) ocupa menos de dois pontos de imagem na vista isolada da parte, e só se julga numa vista de perto: a parte do `PLANO` declara `dePerto`, até quatro entradas `{ ponto: [x, y, z], oQue, distancia? }` com o ponto em mm do referencial da peça, e o pedido traz, depois das vistas isoladas dela, uma vista com a câmera mirando o ponto (a 220 mm, que enquadram uns 150 mm, ou a `distancia`), o que olhar e quantos mm a imagem cobre de largura; sem ela o crítico não aponta nem aprova a feição.
+
 Dois laços usam outro pacote, sem receita, código nem medidas e com o mesmo
 veredito: o refino de carroceria, com o pacote cego e as rodadas além da
 primeira com a pessoa; e o processo leve, com a prancha dos perfis (skill
