@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/forma-exata/`, `tools/modelar/silhueta-contra-referencia.mjs`, `tools/modelar/silhueta-contra-referencia.test.mjs`, `docs/modelar/banco-de-provas/forma-exata-2026-11-13/`
+**Território:** `procedural/nucleo/forma-exata/`, `tools/modelar/silhueta-contra-referencia.mjs`, `tools/modelar/silhueta-contra-referencia.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/usar/GUIA-AUTORIA-IA.md`, `docs/modelar/banco-de-provas/forma-exata-2026-11-13/`
 
 **Responsável:** a IA da sessão do furgão conduz, com agentes e o revisor adversarial nas fatias de núcleo; a pessoa decidiu o rumo em 2026-11-13 e decide de novo depois do estudo da fatia 3.
 
@@ -28,6 +28,8 @@ USAR DIRETO: os contornos exatos de reta e arco que o núcleo já tem (`contorno
 2. O vocabulário alto, como composição sobre o que existe, sem mudar o método: a chapa de contorno com chanfro de borda num trecho do contorno, o corpo de seção variável ao longo de um eixo com sulcos, e o furo passante num sólido qualquer. Cada uma com ficha de capacidade e exemplo. Prova: a kukri reescrita com elas, em menos passos e menos linhas, com a mesma forma ou melhor.
 3. O estudo do método, antes de qualquer mudança larga: um protótipo, na pasta nova, que representa uma peça de aresta dura como contornos e superfícies exatas com as operações de borda (chanfro, arredondamento, furo) resolvidas nesse nível, e só então gera a malha. Medido em três casos: a kukri, a peça de prova da agulha na faceta do tubo e a do furo em face plana. O estudo diz o que o método cobre, o que não cobre (superfície livre, costura entre dois corpos curvos) e quanto custaria levar cada operação. A pessoa decide com esse número.
 4. As operações de aresta dura pelo método novo, na ordem que o estudo indicar, cada uma ao lado da antiga, que continua valendo para o acervo. Só começa com a decisão da pessoa sobre a fatia 3, e pode virar plano próprio.
+
+5. As instruções pequenas que a kukri mostrou faltar, aprovadas pela pessoa em 2026-11-13 e feitas por quem conduz: o modelador corrige antes de entregar a parte que não confere com um critério de reprovação; o guia de autoria diz o limite de 240 caracteres dos textos do `PLANO` e o que a `medida` de um ponto devolve; e a guarda do acervo responde a `--ajuda`, esta última junto da integração do plano das costuras, que é dono do arquivo. O pedido ao crítico visual passa a dizer, em palavras, de que lado ficam o dorso e o gume no alvo e no modelo, porque na primeira rodada da kukri ele leu a foto invertida em dois achados.
 
 ## Excluído
 

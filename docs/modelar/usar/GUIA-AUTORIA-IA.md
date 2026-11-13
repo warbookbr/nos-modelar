@@ -67,6 +67,9 @@ const receita = {
 export default receita;
 ```
 
+Dois limites que só aparecem quando a peça roda. Cada texto do `PLANO` (o `objeto`, a `forma` e a `tecnica` de cada parte, cada critério) tem até 240 caracteres, e o `descrever` recusa o que passar. E a `medida` de um ponto é sobre a caixa da parte: `'maximo'` e `'minimo'` devolvem o canto da caixa nos três eixos, e não o ponto mais alto ou mais baixo da forma; para um ponto da forma que não é canto da caixa, como a ponta de uma lâmina curva, use `'centro'` com a tolerância que a caixa pede ou um ponto entre duas partes.
+
+
 A parte do `PLANO` que promete feição de poucos milímetros (raio, rebaixo, friso) declara `dePerto: [{ ponto: [x, y, z], oQue, distancia? }]`, até quatro entradas com o ponto em mm do referencial da peça; o pedido ao crítico ganha uma vista de perto de cada uma, e sem ela a feição não se julga.
 
 

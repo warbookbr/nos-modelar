@@ -118,6 +118,8 @@ declarada, e a rodada não fecha sem ela. Até 2026-09-22 a instrução existia 
 nada conferia que alguém tinha olhado: entregar sem olhar produzia uma rodada
 idêntica à de quem olhou. Parte que não confere precisa dizer onde difere.
 
+A parte que não confere com um critério de reprovação do `PLANO` você corrige antes de entregar, em até três voltas, e só entrega com ela aberta se a correção pedir o que o núcleo não faz, dizendo qual operação faltou. Na primeira forma da kukri, em 2026-11-13, o modelador entregou sabendo que o dorso não tinha a quebra em ângulo, que era o primeiro critério do plano, com uma volta usada de três; o defeito custou uma rodada do crítico e da pessoa.
+
 Essa é a fronteira, e ela é estreita de propósito. Você olha a referência de
 forma e olha as suas partes contra o texto do plano. Você não julga se o
 conjunto ficou parecido, se a proporção convence ou se a peça lê como o objeto
