@@ -8,3 +8,4 @@ Pasta do plano [revisão do projeto para o trabalho da IA](../../planos/2026-11-
 - Pergunta 4: [pastas e módulos](pergunta-4-pastas-e-modulos.md), o mapa de quem importa quem, as subidas de camada e a composição de `tools/`.
 - Pergunta 5: [operações e verbosidade](pergunta-5-operacoes-e-verbosidade.md), o uso real de cada operação nas receitas vigentes e o tamanho das receitas.
 - Pergunta 5: [erros, nomes e argumentos](pergunta-5-erros-nomes-e-argumentos.md), a classificação das mensagens de erro, os casos errados executados e as incoerências de nome.
+- Pergunta 5: [tempo por operação](pergunta-5-tempo-por-operacao.md), a execução das três peças mais pesadas medida passo a passo.
