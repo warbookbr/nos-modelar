@@ -37,15 +37,15 @@
  * FIM DA FICHA
  *
  * Função pura, sem Three.js e sem domínio. Cada contorno é partido nos marcos (a âncora, o primeiro ponto, é sempre um) em voltas, e cada volta é
- * reamostrada com pontos a distâncias iguais ao longo dela, no mesmo número em todas as fatias: o número de segmentos de cada volta é a parte
+ * reamostrada com pontos a distâncias iguais ao longo dela (e o vértice dado a menos de 0,45 do passo de um deles toma o lugar dele), no mesmo número em todas as fatias: o número de segmentos de cada volta é a parte
  * do perímetro que ela toma, em média nas fatias, do total `pontos` (o maior resto, no mínimo um). O ponto de mesmo índice liga as fatias. Os planos
  * são as fatias e a grade de `passo` a partir da primeira, sem os pontos da grade a menos de `passo` de outro plano; em cada plano a volta é a
- * interpolação ponto a ponto. A gaiolaPorLacos recebe a volta em trechos que começam nos marcos e nos índices 1, h e h + 1 (h = pontos / 2),
- * de modo que a tampa em escada liga o ponto de índice 1 + j ao de N - j. Os trechos se chamam `p<índice do primeiro ponto>_`, e o ponto de índice i
- * de um laço `${nome}_${laço}_p<início>_<k>`, que `pontoDe` devolve. O laço de um plano que não é fatia se chama `<eixo><em>` (o ponto decimal vira `_`).
+ * interpolação ponto a ponto. A gaiolaPorLacos recebe a volta em N trechos de dois pontos, porque ela reamostra cada trecho com pontos a distâncias
+ * iguais, e só o de dois pontos deixa os pontos desta operação onde estão; a tampa em escada liga o ponto de índice 1 + j ao de N - j (N = pontos).
+ * O ponto de índice i de um laço se chama `${nome}_${laço}_p<i>_0`, que `pontoDe` devolve. O laço de um plano que não é fatia se chama `<eixo><em>` (o ponto decimal vira `_`).
  *
  * O QUE ESTA OPERAÇÃO TIRA. O `loft` tem 24 seções e mil pontos por forma, seção convexa e polo digitado para fechar a ponta: aqui as fatias são
- * quantas a receita der, o contorno tem os pontos que quiser e pode ser côncavo (a escada da tampa é conferida), a tampa sai do contorno e a
+ * quantas a receita der, o contorno tem os pontos que quiser e pode ser côncavo no meio do corpo (na ponta, só se a escada da tampa o cobre, o que a âncora decide e a recusa confere), a tampa sai do contorno e a
  * volta, de fatia a fatia, é reamostrada sem a receita escrever o contorno inteiro de novo em cada seção. O que fica: a gaiola pede 2,5 mm entre
  * planos, e o corpo não fecha em ponta de um ponto só (a última fatia é um contorno pequeno, de segmento médio de ao menos 0,05 mm; a razão entre os tamanhos de duas fatias não limita nada, medida de 2 a 400);
  * a superfície é lisa por subdivisão, e a quina só fica viva onde um marco está em `vivos`.
@@ -74,11 +74,11 @@ export const TOLERANCIA_DA_REAMOSTRAGEM_MM = 0.1;
    pontos: raio 0,2 mm em 24 pontos (segmento 0,052 mm) fecha, e raio 0,3 em 64 (0,029), 0,1 em 24 (0,026) e 0,2 em 64 (0,020) não. A razão entre os
    tamanhos de duas fatias, por si, não deixou face fina: de 2 a 400, de 2,5 a 100 mm entre planos, concêntricas ou deslocadas, com 1 e 2 níveis. */
 export const SEGMENTO_MEDIO_MINIMO_MM = 0.05;
+/* um degrau da tampa de área negativa abaixo disto, em fração da área do contorno, é recusado: o ruído de ponto flutuante fica de fora */
+const TOLERANCIA_DO_DEGRAU = 1e-9;
 export const PONTOS_MINIMOS_DA_VOLTA = 8;
 export const PONTOS_PADRAO_MINIMO = 16;
 export const PONTOS_PADRAO_MAXIMO = 64;
-/* a soma das áreas dos degraus da tampa pode diferir da área do contorno, em fração, até isto */
-const TOLERANCIA_DA_ESCADA = 1e-6;
 
 /* Hermite monótono por partes (cópia do de corpoDeSecaoVariavel, que não o exporta) */
 function tangentes(xs, ys) {
@@ -371,27 +371,26 @@ export function corpoPorFatias(o = {}) {
     }
   });
 
-  /* os trechos da gaiola: começam nos marcos e nos índices 1, h e h + 1, de modo que a tampa em escada liga 1 + j a N - j */
+  /* os trechos da gaiola: um por segmento da volta, de dois pontos. A gaiola reamostra cada trecho com pontos a distâncias iguais, e só o trecho
+     de dois pontos deixa os pontos desta operação (os marcos, os vértices que ficaram) onde estão; a tampa em escada liga 1 + j a N - j */
   const h = N / 2;
-  const cortes = [...new Set([...inicioDe, 1, h, h + 1])].filter((q) => q < N).sort((a, b) => a - b);
-  const trechos = cortes.map((q, i) => ({ nome: `p${q}_`, de: q, ate: i + 1 < cortes.length ? cortes[i + 1] : N, pontos: (i + 1 < cortes.length ? cortes[i + 1] : N) - q + 1 }));
-  const trechoDe = (q) => { let i = trechos.length - 1; while (trechos[i].de > q) i--; return i; };
+  const trechos = Array.from({ length: N }, (_, q) => ({ nome: `p${q}_`, de: q, ate: (q + 1) % N, pontos: 2 }));
+  const trechoDe = (q) => q;
 
-  /* a tampa em escada tem de cobrir o contorno nas duas pontas: os degraus são positivos e somam a área */
+  /* a tampa em escada tem de cobrir o contorno nas duas pontas: cada degrau (o quadrilátero entre dois degraus seguidos) tem área
+     positiva ou nula (nula é o degrau sobre um lado reto, que a gaiola resolve), nunca negativa. A soma
+     das áreas com sinal dos degraus é a do contorno por identidade (a escada é uma telescópica da fórmula do cadarço), e por isso com nenhum
+     negativo eles o cobrem uma vez, sem sobrar para fora */
   for (const [r, quem] of [[0, 'primeira'], [voltas.length - 1, 'última']]) {
     const v = voltas[r];
     const A = []; for (let q = 1; q <= h; q++) A.push(q);
     const B = [0]; for (let q = N - 1; q >= h + 1; q--) B.push(q);
-    let soma = 0; let ruim = null;
-    for (let j = 0; j + 1 < A.length; j++) {
-      const quad = [v[A[j]], v[A[j + 1]], v[B[j + 1]], v[B[j]]];
-      const a = areaComSinal(quad);
-      soma += a;
-      if (!(a > 0) && ruim == null) ruim = j;
+    let ruim = null;
+    for (let j = 0; j + 1 < A.length && ruim == null; j++) {
+      if (areaComSinal([v[A[j]], v[A[j + 1]], v[B[j + 1]], v[B[j]]]) < -TOLERANCIA_DO_DEGRAU * Math.abs(areaComSinal(v))) ruim = j;
     }
-    const total = areaComSinal(v);
-    if (ruim != null || Math.abs(soma - total) > TOLERANCIA_DA_ESCADA * Math.abs(total)) {
-      falha(`a tampa da ${quem} fatia (${citar(lacosDados[r].nome)}, em ${br(lacosDados[r].em)} mm) não cobre o contorno: os degraus que ligam o ponto 1 + j ao ${N} - j ${ruim != null ? `saem do contorno no degrau ${ruim}` : `somam ${br(soma)} mm² e o contorno tem ${br(total)} mm²`}; a ponta côncava demais não cabe em escada, então faça a fatia da ponta convexa ou mais simples, ou comece o contorno em outro ponto (a âncora decide onde a escada corta)`);
+    if (ruim != null) {
+      falha(`a tampa da ${quem} fatia (${citar(lacosDados[r].nome)}, em ${br(lacosDados[r].em)} mm) não cobre o contorno: o degrau ${ruim} da escada, que liga o ponto ${1 + ruim} ao ${(N - ruim) % N} e o ${2 + ruim} ao ${N - ruim - 1}, sai do contorno; a ponta côncava demais não cabe em escada, então faça a fatia da ponta convexa ou mais simples, ou comece o contorno em outro ponto (a âncora decide onde a escada corta)`);
     }
   }
 
@@ -415,7 +414,7 @@ export function corpoPorFatias(o = {}) {
     trechos: trechos.map((t) => ({ nome: t.nome, pontos: t.pontos })),
     lacos: lacosDados.map((l, r) => ({
       nome: l.nome, em: l.em,
-      trechos: Object.fromEntries(trechos.map((t) => [t.nome, Array.from({ length: t.pontos }, (_, k) => voltas[r][(t.de + k) % N])])),
+      trechos: Object.fromEntries(trechos.map((t) => [t.nome, [voltas[r][t.de], voltas[r][t.ate]]])),
     })),
     grupos,
     ...(vincos.length ? { vincos } : {}),
@@ -429,7 +428,7 @@ export function corpoPorFatias(o = {}) {
     const q = typeof i === 'string' ? marcos[i] : i;
     if (!Number.isInteger(q) || q < 0 || q >= N) falha(`pontoDe: o ponto é um índice de 0 a ${N - 1} ou um marco (${M0.map(citar).join(', ')}), e veio ${JSON.stringify(i)}`);
     const t = trechos[trechoDe(q)];
-    return `${prefixo}_${lacosDados[r].nome}_${t.nome}${q - t.de}`;
+    return `${prefixo}_${lacosDados[r].nome}_${t.nome}0`;
   };
   return {
     ...g,

@@ -63,6 +63,15 @@ describe('corpoPorFatias: a malha', () => {
     }
   });
 
+  it('a tampa de um contorno de lados retos com pontos de sobra sobre eles (o heptágono em 40 pontos, o retângulo em 24) fecha sem face fina', () => {
+    for (const [c, n] of [[circ(30, 7), 40], [quadrado(30), 24]]) {
+      const r = medirPeca(receitaDe(corpoPorFatias({ nome: 'c', eixo: 'x', pontos: n, fatias: [{ em: 0, contorno: c }, { em: 20, contorno: c }] }), 2));
+      expect(r.arestasSoltas).toBe(0);
+      expect(r.facesDegeneradas).toBe(0);
+      expect(lascasDoNeutro(r.neutro)).toEqual([]);
+    }
+  });
+
   it('o corpo com os eixos y e z também fecha', () => {
     for (const eixo of ['y', 'z']) {
       const r = medirPeca(receitaDe(corpoPorFatias({ nome: 'c', eixo, fatias: [{ em: 0, contorno: circ(5, 12) }, { em: 20, contorno: circ(7, 12, 1, 0) }] }), 1));
@@ -144,7 +153,20 @@ describe('corpoPorFatias: posições e nomes', () => {
     expect(g.pontosMm[g.pontoDe('f1', 'quilha')]).toEqual([80, 0, -12]);
     expect(corpoPorFatias({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: circ(5, 8) }, { em: 20, contorno: circ(5, 8) }] }).corpo.marcos).toEqual({ inicio: 0 });
     expect(g.pontoDe(0, 0)).toBe(g.pontoDe('f0', 0));
-    expect(g.pontoDe('x10', 3)).toMatch(/^casco_x10_p\d+_\d+$/);
+    expect(g.pontoDe('x10', 3)).toMatch(/^casco_x10_p3_0$/);
+  });
+
+  it('os marcos recebem os pontos pela fração do perímetro de cada volta, em média nas fatias, no mínimo um cada, e o total é o pedido', () => {
+    const oct = (k) => marcado(circ(10, 8), circ(10, 8).map((_, i) => (i === k ? 'B' : null)));
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, passo: 100, fatias: [{ em: 0, contorno: oct(4) }, { em: 30, contorno: oct(2) }] });
+    expect(g.corpo.marcos).toEqual({ inicio: 0, B: 6 });
+    const miudos = (n) => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: n, passo: 100, fatias: [0, 30].map((em) => ({ em, contorno: marcado(circ(60, 120), circ(60, 120).map((_, i) => ({ 10: 'a', 11: 'b', 12: 'c', 13: 'd' })[i] ?? null)) })) });
+    const m16 = miudos(16);
+    expect(Object.values(m16.corpo.marcos)).toEqual([0, 1, 2, 3, 4]);
+    expect(Object.keys(m16.pontosMm).filter((k) => k.startsWith('c_f0_')).length).toBe(16);
+    const m8 = miudos(8);
+    expect(Object.values(m8.corpo.marcos)).toEqual([0, 1, 2, 3, 4]);
+    expect(Object.keys(m8.pontosMm).filter((k) => k.startsWith('c_f0_')).length).toBe(8);
   });
 
   it('a grade de planos tem as fatias e os pontos do passo, sem nenhum a menos de um passo de outro, e as fatias a menos de um passo entram', () => {
@@ -152,6 +174,11 @@ describe('corpoPorFatias: posições e nomes', () => {
     expect(g.corpo.planos).toEqual([0, 14, 30, 40]);
     const padrao = corpoPorFatias({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: circ(5, 8) }, { em: 400, contorno: circ(5, 8) }] });
     expect(padrao.corpo.planos[1] - padrao.corpo.planos[0]).toBe(10);
+  });
+
+  it('o laço de um plano que não é fatia se chama pelo eixo e a posição, com o ponto decimal em _ e o sinal de menos em m', () => {
+    const g = corpoPorFatias({ nome: 'c', eixo: 'y', passo: 12.5, fatias: [{ em: -30, contorno: circ(5, 8) }, { em: 10, contorno: circ(5, 8) }] });
+    expect(g.lacos.map((l) => l.nome)).toEqual(['f0', 'ym17_5', 'ym5', 'f1']);
   });
 
   it('o ponto de índice 0 é a âncora e os marcos de ordem trocada recebem os índices na ordem da volta', () => {
@@ -162,12 +189,22 @@ describe('corpoPorFatias: posições e nomes', () => {
     expect(g.pontosMm[g.pontoDe(0, 'cima')]).toEqual([0, ...circ(10, 16)[2]]);
   });
 
+  it('os pontos da volta, por padrão, são os do maior contorno em par, no mínimo 16 e no máximo 64', () => {
+    const com = (n) => corpoPorFatias({ nome: 'c', eixo: 'x', fatias: [{ em: 0, contorno: circ(30, n) }, { em: 20, contorno: circ(30, n) }] }).corpo.pontosPorVolta;
+    expect(com(5)).toBe(16);
+    expect(com(40)).toBe(40);
+    expect(com(41)).toBe(42);
+    expect(com(100)).toBe(64);
+  });
+
   it('os grupos tampaInicio, tampaFim e entre_<a>_<b> vão no passo, e as tampas têm as faces da escada', () => {
     const g = casco();
     expect(g.passo.grupos.map((x) => x.nome)).toEqual(['tampaInicio', 'tampaFim', 'entre_f0_f1', 'entre_f1_f2']);
     const ini = g.passo.grupos[0].pontos;
     expect(ini.length).toBe(g.corpo.pontosPorVolta);
     expect(ini.every((n) => n.startsWith('casco_f0_'))).toBe(true);
+    expect(g.passo.grupos[1].pontos.every((n) => n.startsWith('casco_f2_'))).toBe(true);
+    expect(g.passo.grupos[2].pontos.every((n) => /^casco_(f0|f1|x\d+)_/.test(n))).toBe(true);
     const m = medirPeca({ ...receitaDe(g, 1), PASSOS: [['subdivisao', { origemId: 1, ...g.passo, niveis: 1 }], ['parte', { nome: 'ponta', sel: { origem: { op: 'subdivisao', id: 1, grupo: 'tampaFim' } } }]] });
     expect(m.arestasSoltas).toBe(0);
   });
@@ -212,6 +249,14 @@ describe('corpoPorFatias: nada some em silêncio', () => {
     for (const a of perdidos) expect(a.indice).not.toBe(2);
   });
 
+  it('dois vértices a um milímetro um do outro disputam um ponto só: o primeiro fica, e o segundo não o rouba', () => {
+    const c = [[0, 0], [50, 0], [50, 1], [100, 3], [100, 10], [0, 10]];
+    expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: c }, { em: 30, contorno: c }] })).not.toThrow();
+    const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: c }, { em: 30, contorno: c }] });
+    const pts = Array.from({ length: 16 }, (_, i) => g.pontosMm[g.pontoDe(0, i)]);
+    expect(pts.some((p) => Math.abs(p[1] - 50) < 1e-9 && Math.abs(p[2]) < 1e-9)).toBe(true);
+  });
+
   it('o vértice dado cai no lugar de um ponto da volta quando cabe: o quadrado de 4 pontos em 16 não perde um canto', () => {
     const g = corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: quadrado(10) }, { em: 30, contorno: quadrado(10) }] });
     expect(g.avisos.filter((a) => a.ref === 'pontoPerdido')).toEqual([]);
@@ -228,7 +273,8 @@ describe('corpoPorFatias: as recusas', () => {
 
   it('recusa o que não é opção: nome, eixo, fatias, interpolacao, tolerancia, passo e vivos, dizendo o recebido', () => {
     recusa(ok({ nome: '' }), /nome é o prefixo/);
-    recusa(ok({ eixo: 'w' }), /eixo é 'x', 'y' ou 'z', e veio "w"/);
+    recusa(ok({ eixo: 'w' }), /^corpoPorFatias: eixo é 'x', 'y' ou 'z', e veio "w"/);
+    recusa(ok({ eixo: undefined }), /^corpoPorFatias: eixo é/);
     recusa(ok({ fatias: [ok().fatias[0]] }), /ao menos duas.*1 fatia/);
     recusa(ok({ fatias: undefined }), /ao menos duas/);
     recusa(ok({ interpolacao: 'cubica' }), /'suave' ou 'linear', e veio "cubica"/);
@@ -310,14 +356,17 @@ describe('corpoPorFatias: as recusas', () => {
     recusa({ nome: 'c', eixo: 'x', pontos: 8, fatias: [{ em: 0, contorno: fino }, { em: 20, contorno: fino }] }, /a fatia 'f0' \(em 0 mm\) reamostrada em 8 pontos se cruza|cobre o contorno/);
     const Q = quadrado(10);
     const girado = Q.map(([u, v]) => [10 - u, 10 - v]);
-    recusa({ nome: 'c', eixo: 'x', pontos: 8, passo: 5, fatias: [{ em: 0, contorno: Q }, { em: 40, contorno: girado }] }, /o plano em 20 mm, entre as fatias 'f0' e 'f1' se cruza.*comece todas as fatias no mesmo detalhe/);
+    recusa({ nome: 'c', eixo: 'x', pontos: 8, passo: 5, fatias: [{ em: 0, contorno: Q }, { em: 40, contorno: girado }] }, /o plano em 20 mm, entre as fatias 'f0' e 'f1' se cruza \(o lado .* se tocam\).*comece todas as fatias no mesmo detalhe/);
     const meio = Q.slice(2).concat(Q.slice(0, 2));
     recusa({ nome: 'c', eixo: 'x', pontos: 8, passo: 5, fatias: [{ em: 0, contorno: Q }, { em: 40, contorno: meio }] }, /se cruza|fica com área/);
+    const U = [[0, 0], [30, 0], [30, 20], [20, 20], [20, 5], [10, 5], [10, 20], [0, 20]];
+    const Ur = U.slice(4).concat(U.slice(0, 4));
+    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: Ur }, { em: 20, contorno: quadrado(30) }] }, /o plano em 5 mm, entre as fatias 'f0' e 'f1' se cruza \(o lado 1 e o 7 se tocam\)/);
   });
 
   it('recusa a tampa em escada que não cobre o contorno côncavo da ponta, na primeira e na última, e aceita o mesmo contorno no meio', () => {
     const U = [[0, 0], [30, 0], [30, 20], [20, 20], [20, 5], [10, 5], [10, 20], [0, 20]];
-    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: U }, { em: 20, contorno: quadrado(30) }] }, /tampa da primeira fatia \('f0', em 0 mm\) não cobre o contorno.*saem do contorno no degrau/);
+    recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: U }, { em: 20, contorno: quadrado(30) }] }, /tampa da primeira fatia \('f0', em 0 mm\) não cobre o contorno.*sai do contorno/);
     recusa({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: quadrado(30) }, { em: 20, contorno: U }] }, /tampa da última fatia \('f1', em 20 mm\) não cobre o contorno.*comece o contorno em outro ponto/);
     expect(() => corpoPorFatias({ nome: 'c', eixo: 'x', pontos: 16, fatias: [{ em: 0, contorno: quadrado(30) }, { em: 20, contorno: U }, { em: 40, contorno: quadrado(30) }] })).not.toThrow();
   });
