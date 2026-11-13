@@ -30,6 +30,9 @@ describe('as etapas fixas do acervo seguem fixas na releitura', () => {
       const mensagem = quebradas.map((r) => `etapa '${r.instancia}' da montagem '${nome}' estava fixa e a releitura a devolve ${r.estado} (${r.motivo ?? 'sem motivo'}): `
         + 'a receita dela ou de uma parte anterior mudou depois do aceite. Reabra a etapa com a pessoa (`npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`) ou desfaça a mudança.').join('\n');
       expect(quebradas.map((r) => r.instancia), mensagem).toEqual([]);
-    }, 120_000);
+      /* reler a montagem do sedã leva 199 s na máquina local (2026-11-13), contra 3 a 11 s das outras: só a carroceria dele, de 174 mil faces com o
+         chassi aparado pela lataria, executa em mais de 3 minutos. O limite é o dos outros testes que percorrem o acervo; o custo é da receita do
+         sedã, anotado no fechamento da fatia 4c do plano do núcleo, e não deste teste. */
+    }, 900_000);
   }
 });
