@@ -147,6 +147,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run planos:check
 
+      - name: Registros de decisão em formato e lista em dia
+        if: ${{ !cancelled() }}
+        run: npm run decisoes:check
+
       # A separação da documentação por quem a lê não se mantém sozinha: basta
       # uma citação nova para a fronteira vazar. Este gate segura a fronteira,
       # cobra dono para cada documento de uso e impede a porta de crescer.

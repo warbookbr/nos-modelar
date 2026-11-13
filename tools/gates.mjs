@@ -104,7 +104,7 @@ export const GATES = [
   'bancada:guardas', 'exportar:check',
   'guarda:acervo', 'guarda:tempo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
-  'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
+  'docs:toc:check', 'docs:links:check', 'planos:check', 'decisoes:check', 'docs:estrutura:check',
   'docs:citacoes:check',
   'leitura:obrigatoria',
   /* O catálogo é derivado do registro do motor e assinado por hash, e é a
@@ -224,7 +224,7 @@ export const GATES_CURTOS = [
   'typecheck', 'test:rapidos', 'test:lentos', 'build', 'exportar:check',
   'guarda:acervo', 'guarda:tempo', 'guarda:referencial', 'origens:check',
   'mapa:check', 'reguas:check',
-  'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
+  'docs:toc:check', 'docs:links:check', 'planos:check', 'decisoes:check', 'docs:estrutura:check',
   'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check', 'ferramentas:check',
   'banco-de-provas:check', 'calibracao:check',
 ];
