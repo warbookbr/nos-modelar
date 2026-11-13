@@ -164,6 +164,11 @@ describe('corpoPorFatias: posições e nomes', () => {
     const m16 = miudos(16);
     expect(Object.values(m16.corpo.marcos)).toEqual([0, 1, 2, 3, 4]);
     expect(Object.keys(m16.pontosMm).filter((k) => k.startsWith('c_f0_')).length).toBe(16);
+    /* a volta grande ficou com 12 segmentos (14 menos os 2 que o mínimo de um por volta pequena tomou), e o último ponto cai a 11/12 dela, perto de 333 graus; com 14 cairia a 291 */
+    const ultimo = m16.pontosMm[m16.pontoDe(0, 15)];
+    const graus = ((Math.atan2(ultimo[2], ultimo[1]) * 180) / Math.PI + 360) % 360;
+    expect(graus).toBeGreaterThan(320);
+    expect(graus).toBeLessThan(335);
     const m8 = miudos(8);
     expect(Object.values(m8.corpo.marcos)).toEqual([0, 1, 2, 3, 4]);
     expect(Object.keys(m8.pontosMm).filter((k) => k.startsWith('c_f0_')).length).toBe(8);

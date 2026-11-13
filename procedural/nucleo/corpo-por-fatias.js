@@ -199,12 +199,11 @@ function reamostrarVolta(poli, s) {
   const total = acc[acc.length - 1];
   const passo = total / s;
   const alvo = Array.from({ length: s }, (_, i) => passo * i);
-  const livre = new Array(s).fill(true); livre[0] = false;
   let anterior = 0;
   for (let k = 1; k + 1 < poli.length; k++) {
     let melhor = -1;
-    for (let i = anterior + 1; i < s; i++) if (livre[i] && (melhor < 0 || Math.abs(alvo[i] - acc[k]) < Math.abs(alvo[melhor] - acc[k]))) melhor = i;
-    if (melhor > 0 && Math.abs(alvo[melhor] - acc[k]) <= 0.45 * passo) { alvo[melhor] = acc[k]; livre[melhor] = false; anterior = melhor; }
+    for (let i = anterior + 1; i < s; i++) if (melhor < 0 || Math.abs(alvo[i] - acc[k]) < Math.abs(alvo[melhor] - acc[k])) melhor = i;
+    if (melhor > 0 && Math.abs(alvo[melhor] - acc[k]) <= 0.45 * passo) { alvo[melhor] = acc[k]; anterior = melhor; }
   }
   const saida = [[...poli[0]]];
   let j = 0;
