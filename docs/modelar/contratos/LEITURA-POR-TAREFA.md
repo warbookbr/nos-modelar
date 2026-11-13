@@ -32,8 +32,8 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   falha V-31.
 - Peças versus montagens, composição e dependências:
   `MONTAGENS-SEMANTICAS.md` e `ARQUITETURA.md`.
-- Montagem persistida e contexto para IA: `MONTAGEM-PERSISTIDA-V1.md` a
-  `MONTAGEM-PERSISTIDA-V3.md` e `CONTEXTO-MONTAGEM-IA.md`.
+- Montagem persistida e contexto para IA: `MONTAGEM-PERSISTIDA.md` e
+  `CONTEXTO-MONTAGEM-IA.md`.
 - Programa MCP: `docs/modelar/planos/mcp/INDEX.md` e os planos datados
   encerrados. O programa MCP não é o roteiro mestre da autoria.
 - Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e

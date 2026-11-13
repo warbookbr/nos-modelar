@@ -25,15 +25,15 @@ Estado: concluído, em 2026-08-05. Crônica: tem linha.
 
 ## 2026-08-06-diagnostico-motor-procedural.md
 Estado: concluído, em 2026-08-06. Crônica: tem linha.
-- [B] O motor resolve uma peça em coordenadas locais; montagem instancia, transforma e mantém relações; a bancada só observa; carro e motor são montagens e o núcleo não ganha caso especial de domínio. Porquê: o diagnóstico concluiu "motor adequado" para a montagem v1. Lugar: `docs/modelar/decisoes/CONTINUIDADE-ARQUITETURAL.md`, `docs/modelar/MONTAGEM-PERSISTIDA-V1.md` e a primeira regra de `CLAUDE.md`.
+- [B] O motor resolve uma peça em coordenadas locais; montagem instancia, transforma e mantém relações; a bancada só observa; carro e motor são montagens e o núcleo não ganha caso especial de domínio. Porquê: o diagnóstico concluiu "motor adequado" para a montagem v1. Lugar: `docs/modelar/decisoes/CONTINUIDADE-ARQUITETURAL.md`, `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md` e a primeira regra de `CLAUDE.md`.
 
 ## 2026-08-07-montagem-minima-persistida-v1.md
 Estado: concluído, em 2026-08-07. Crônica: tem linha.
-- [B] Montagem referencia peças por identidade semântica, com pose por instância, sem copiar `PASSOS` nem geometria, e a resolução falha fechado em ciclo, duplicidade, referência ausente ou pose inválida. Porquê: manter a peça como única fonte da geometria. Lugar: `docs/modelar/MONTAGEM-PERSISTIDA-V1.md`, `src/autoria/ler-montagem-persistida.js`.
+- [B] Montagem referencia peças por identidade semântica, com pose por instância, sem copiar `PASSOS` nem geometria, e a resolução falha fechado em ciclo, duplicidade, referência ausente ou pose inválida. Porquê: manter a peça como única fonte da geometria. Lugar: `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`, `src/autoria/ler-montagem-persistida.js`.
 
 ## 2026-08-09-montagem-persistida-v2-relacoes-locais.md
 Estado: concluído, em 2026-08-09. Crônica: tem linha.
-- [B] A v1 é fechada e não muda em silêncio; a v2 acrescenta `relacoes` por caminho semântico, e relação não satisfeita é resultado (`satisfeita:false`), não erro estrutural. Porquê: separa autoria inválida de mecânica reprovada. Lugar: `docs/modelar/MONTAGEM-PERSISTIDA-V2.md`.
+- [B] A v1 é fechada e não muda em silêncio; a v2 acrescenta `relacoes` por caminho semântico, e relação não satisfeita é resultado (`satisfeita:false`), não erro estrutural. Porquê: separa autoria inválida de mecânica reprovada. Lugar: `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`.
 
 ## 2026-08-14-autoria-segura-receitas.md
 Estado: concluído (decisão `aprovar`), em 2026-08-14. Crônica: tem linha.
@@ -73,7 +73,7 @@ Estado: concluído (decisão aprovar), em 2026-08-14. Crônica: tem linha.
 
 ## 2026-08-14-separacao-direcional-e-impacto-local.md
 Estado: concluído, em 2026-08-14. Crônica: não tem linha.
-- [B] A separação direcional medida por projeção não é colisão nem folga euclidiana, e o impacto local separa direto, indireto e limitação global sem inferir dependência por proximidade. Porquê: não alegar colisão geral. Lugar: `docs/modelar/contratos/CONTEXTO-MONTAGEM-IA.md` e `docs/modelar/MONTAGEM-PERSISTIDA-V3.md`.
+- [B] A separação direcional medida por projeção não é colisão nem folga euclidiana, e o impacto local separa direto, indireto e limitação global sem inferir dependência por proximidade. Porquê: não alegar colisão geral. Lugar: `docs/modelar/contratos/CONTEXTO-MONTAGEM-IA.md` e `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`.
 
 ## 2026-08-17-abertura-oblonga.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: tem linha.
@@ -128,7 +128,7 @@ Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
 
 ## 2026-08-18-auditoria-intersecoes-montagem.md
 Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
-- [B] Caixa alinhada aos eixos nunca é veredito de colisão; malha aberta ou ambígua fica `inconclusivo` e não "sem colisão"; interseção esperada é anotação explícita com motivo (montagem v4) e nunca suprime o achado; timeout não vira "sem colisão". Porquê: honestidade da cobertura da auditoria. Lugar: `docs/modelar/MONTAGEM-PERSISTIDA-V4.md` e `src/autoria/` (auditoria de interseções, com testes).
+- [B] Caixa alinhada aos eixos nunca é veredito de colisão; malha aberta ou ambígua fica `inconclusivo` e não "sem colisão"; interseção esperada é anotação explícita com motivo (montagem v4) e nunca suprime o achado; timeout não vira "sem colisão". Porquê: honestidade da cobertura da auditoria. Lugar: `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md` e `src/autoria/` (auditoria de interseções, com testes).
 
 ## 2026-08-18-chassi-realista-kernel-geometrico.md
 Estado: cancelado, em 2026-11-05 (encerramento escrito no plano). Crônica: tem linha.

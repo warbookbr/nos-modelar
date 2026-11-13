@@ -14,7 +14,7 @@ Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.m
 (`docs/modelar/contratos/MAPA-CANONICO-DEPENDENCIAS.md`),
 [CONTEXTO-MONTAGEM-IA](CONTEXTO-MONTAGEM-IA.md),
 [BANCADA-E-APRESENTACAO](BANCADA-E-APRESENTACAO.md), [CONTINUIDADE-ARQUITETURAL](../decisoes/CONTINUIDADE-ARQUITETURAL.md),
-[MONTAGEM-PERSISTIDA-V2](../MONTAGEM-PERSISTIDA-V2.md), [MONTAGEM-PERSISTIDA-V3](../MONTAGEM-PERSISTIDA-V3.md),
+[MONTAGEM-PERSISTIDA](MONTAGEM-PERSISTIDA.md),
 [ESCRITA-TRANSACIONAL-MONTAGEM](ESCRITA-TRANSACIONAL-MONTAGEM.md),
 [CONTEXTO-VISUAL-REVALIDACAO](CONTEXTO-VISUAL-REVALIDACAO.md),
 [FLUXO-MODELAGEM-IA](FLUXO-MODELAGEM-IA.md),
@@ -106,9 +106,7 @@ em [historico/README](../historico/README.md).
 
 <!-- Contrato de contexto alcançável: docs/modelar/contratos/CONTEXTO-MONTAGEM-IA.md -->
 
-<!-- Contrato v3 alcançável: docs/modelar/MONTAGEM-PERSISTIDA-V3.md -->
-
-<!-- Contrato v4 alcançável: docs/modelar/MONTAGEM-PERSISTIDA-V4.md -->
+<!-- Contrato de montagem persistida (v4 vigente) alcançável: docs/modelar/contratos/MONTAGEM-PERSISTIDA.md -->
 
 <!-- Contrato de escrita alcançável: docs/modelar/contratos/ESCRITA-TRANSACIONAL-MONTAGEM.md -->
 
@@ -126,7 +124,7 @@ em [historico/README](../historico/README.md).
 
 <!-- Contrato R09 alcançável: docs/modelar/contratos/SERVICOS-PROCEDURAL-V1.md -->
 
-<!-- Inventário explícito para o gate de alcançabilidade: docs/modelar/decisoes/AGENT-FIRST.md docs/modelar/contratos/ARQUITETURA.md docs/modelar/pesquisas/ATRITOS-AUTORIA.md docs/modelar/contratos/AUTORIA-IA.md docs/modelar/contratos/BANCADA-E-APRESENTACAO.md docs/modelar/contratos/COORDENACAO-REPOS.md docs/modelar/contratos/FILETE-V2.md docs/modelar/contratos/FLUXO-MODELAGEM-IA.md docs/modelar/pesquisas/HOMOLOGACAO-FLUXO-IA.md docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md docs/modelar/usar/MONTAGENS-SEMANTICAS.md docs/modelar/MONTAGEM-PERSISTIDA-V2.md docs/modelar/contratos/PERFIS-DE-AUTORIA.md docs/modelar/historico/PLANO.md docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md docs/modelar/decisoes/UPSTREAM-NOS.md docs/modelar/decisoes/VISAO.md docs/modelar/historico/README.md docs/modelar/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/modelar/historico/EXPERIMENTO-RODA-REALISTA.md docs/modelar/historico/OFICINA-OTIMIZACOES.md docs/modelar/historico/RELATO-RODA-REALISTA.md docs/modelar/historico/RELATORIO-PONTE-THREE.md docs/modelar/historico/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/modelar/planos/README.md docs/modelar/planos/encerrados/2026-08-06-diagnostico-motor-procedural.md docs/modelar/planos/BACKLOG.md docs/modelar/planos/MODELO.md docs/modelar/planos/encerrados/2026-08-04-mcp-para-agentes.md docs/modelar/planos/encerrados/2026-08-05-mcp-fatia-1b-visual.md docs/modelar/planos/encerrados/2026-08-05-mcp-avaliacao-consolidada.md docs/modelar/planos/encerrados/2026-08-05-mcp-correcao-descoberta.md docs/modelar/planos/encerrados/2026-08-05-mcp-autoria-controlada.md docs/modelar/planos/mcp/INDEX.md docs/modelar/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/modelar/planos/concluidos/2026-08-02-assentamento-anular.md docs/modelar/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/modelar/planos/concluidos/2026-08-02-canto-composto.md docs/modelar/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/modelar/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/modelar/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/modelar/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/modelar/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/modelar/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/modelar/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/modelar/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/modelar/planos/concluidos/2026-08-02-pose-em-referencial.md docs/modelar/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/modelar/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/modelar/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/modelar/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/modelar/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/modelar/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/modelar/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/modelar/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/nos-herdado/TETO.md docs/nos-herdado/oficina-projeto.md docs/nos-herdado/playground.md docs/MAPA.md docs/RECURSOS.md docs/nos-herdado/oficina-contrato.md docs/nos-herdado/oficina-referencia.md docs/oficina.md -->
+<!-- Inventário explícito para o gate de alcançabilidade: docs/modelar/decisoes/AGENT-FIRST.md docs/modelar/contratos/ARQUITETURA.md docs/modelar/pesquisas/ATRITOS-AUTORIA.md docs/modelar/contratos/AUTORIA-IA.md docs/modelar/contratos/BANCADA-E-APRESENTACAO.md docs/modelar/contratos/COORDENACAO-REPOS.md docs/modelar/contratos/FILETE-V2.md docs/modelar/contratos/FLUXO-MODELAGEM-IA.md docs/modelar/pesquisas/HOMOLOGACAO-FLUXO-IA.md docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md docs/modelar/usar/MONTAGENS-SEMANTICAS.md docs/modelar/contratos/MONTAGEM-PERSISTIDA.md docs/modelar/contratos/PERFIS-DE-AUTORIA.md docs/modelar/historico/PLANO.md docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md docs/modelar/decisoes/UPSTREAM-NOS.md docs/modelar/decisoes/VISAO.md docs/modelar/historico/README.md docs/modelar/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/modelar/historico/EXPERIMENTO-RODA-REALISTA.md docs/modelar/historico/OFICINA-OTIMIZACOES.md docs/modelar/historico/RELATO-RODA-REALISTA.md docs/modelar/historico/RELATORIO-PONTE-THREE.md docs/modelar/historico/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/modelar/planos/README.md docs/modelar/planos/encerrados/2026-08-06-diagnostico-motor-procedural.md docs/modelar/planos/BACKLOG.md docs/modelar/planos/MODELO.md docs/modelar/planos/encerrados/2026-08-04-mcp-para-agentes.md docs/modelar/planos/encerrados/2026-08-05-mcp-fatia-1b-visual.md docs/modelar/planos/encerrados/2026-08-05-mcp-avaliacao-consolidada.md docs/modelar/planos/encerrados/2026-08-05-mcp-correcao-descoberta.md docs/modelar/planos/encerrados/2026-08-05-mcp-autoria-controlada.md docs/modelar/planos/mcp/INDEX.md docs/modelar/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/modelar/planos/concluidos/2026-08-02-assentamento-anular.md docs/modelar/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/modelar/planos/concluidos/2026-08-02-canto-composto.md docs/modelar/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/modelar/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/modelar/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/modelar/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/modelar/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/modelar/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/modelar/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/modelar/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/modelar/planos/concluidos/2026-08-02-pose-em-referencial.md docs/modelar/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/modelar/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/modelar/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/modelar/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/modelar/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/modelar/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/modelar/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/modelar/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/nos-herdado/TETO.md docs/nos-herdado/oficina-projeto.md docs/nos-herdado/playground.md docs/MAPA.md docs/RECURSOS.md docs/nos-herdado/oficina-contrato.md docs/nos-herdado/oficina-referencia.md docs/oficina.md -->
 
 ## Fontes de verdade
 
@@ -141,13 +139,10 @@ em [historico/README](../historico/README.md).
    arquitetural.
 6. [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) para composição
   recursiva, relações, dependências e níveis de maturidade.
-7. [`MONTAGEM-PERSISTIDA-V1.md`](../MONTAGEM-PERSISTIDA-V1.md) para o contrato
-   executável de montagem persistida v1.
-8. [`MONTAGEM-PERSISTIDA-V2.md`](../MONTAGEM-PERSISTIDA-V2.md),
-   [`MONTAGEM-PERSISTIDA-V3.md`](../MONTAGEM-PERSISTIDA-V3.md),
-   [`MONTAGEM-PERSISTIDA-V4.md`](../MONTAGEM-PERSISTIDA-V4.md) e
-   [`CONTEXTO-MONTAGEM-IA.md`](CONTEXTO-MONTAGEM-IA.md) para relações locais e
-   sua descrição compacta e consultável.
+7. [`MONTAGEM-PERSISTIDA.md`](MONTAGEM-PERSISTIDA.md) para o contrato
+   executável de montagem persistida, na versão vigente (v4).
+8. [`CONTEXTO-MONTAGEM-IA.md`](CONTEXTO-MONTAGEM-IA.md) para a descrição
+   compacta e consultável da montagem.
 9. [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) para inspeção visual
   e contexto de trabalho da IA.
 10. [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) para o fluxo operacional

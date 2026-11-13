@@ -63,7 +63,7 @@ export const ALLOWLIST_G1 = new Map([
     'a porta manda quem vai DESENVOLVER sair daqui; apontar a saída é o oposto de depender dela',
   ],
   [
-    'docs/modelar/usar/MONTAGENS-SEMANTICAS.md:docs/modelar/MONTAGEM-PERSISTIDA-V1.md',
+    'docs/modelar/usar/MONTAGENS-SEMANTICAS.md:docs/modelar/contratos/MONTAGEM-PERSISTIDA.md',
     'aponta o recorte executável do contrato; candidato a vir para usar/ quando alguma skill precisar dele',
   ],
   [

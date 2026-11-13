@@ -155,7 +155,7 @@ endpoints, introduzir solver ou exigir mapa global para localizar relação loca
 ## Fechamento
 - **Estado final:** concluído no R06.
 - **Versão e contrato:** `mecanifica.montagem` v2, documentado em
-  `docs/modelar/MONTAGEM-PERSISTIDA-V2.md`, preservando a compatibilidade v1.
+  `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`, preservando a compatibilidade v1.
 - **Fixtures:** `ciclo-a.json`, `ciclo-b.json`,
   `v2-relacoes-reais.json` e `v2-relacoes-isolamento.json` em
   `tools/modelar/fixtures/montagens-persistidas/`.

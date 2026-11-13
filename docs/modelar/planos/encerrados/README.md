@@ -57,7 +57,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/planos/encerrados/2026-08-17-historico-de-revisao.md`.
 - A Montagem Mínima Persistida v1 foi concluída em
   `docs/modelar/planos/encerrados/2026-08-07-montagem-minima-persistida-v1.md`, com o
-  contrato atual em `docs/modelar/MONTAGEM-PERSISTIDA-V1.md`. O plano
+  contrato atual em `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`. O plano
   [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](./2026-08-09-montagem-persistida-v2-relacoes-locais.md) foi concluído
   no R06: provas A–F, fixtures persistidas v2, contrato v2 e continuidade
   arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. O contexto de
@@ -309,7 +309,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   explicitamente não verificado. Evidências e limites estão em
   [`RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`](../../historico/RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md)
   (`docs/modelar/historico/RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`).
-- O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](../../MONTAGEM-PERSISTIDA-V4.md)
+- O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA.md`](../../contratos/MONTAGEM-PERSISTIDA.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
   transporta a auditoria; `descrever_montagem` continua sem executá-la.
 - A [matriz de testes acoplados ao acervo](../../contratos/MATRIZ-TESTES-ACOPLADOS.md)

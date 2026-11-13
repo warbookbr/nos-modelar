@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2069 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2066 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -87,10 +87,6 @@
 - `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `INDEX.md` — Modelar — entrada atual
 - `MECANISMOS.md` — Mecanismos do Modelar: a visão em uma tela
-- `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
-- `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
-- `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
-- `MONTAGEM-PERSISTIDA-V4.md` — Montagem persistida v4 e expectativas de interseção
 
 ## docs/modelar/banco-de-provas/
 
@@ -483,6 +479,7 @@
 - `LEITURA-POR-TAREFA.md` — Leitura por tarefa
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
+- `MONTAGEM-PERSISTIDA.md` — Montagem persistida
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `README.md` — Contratos
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
