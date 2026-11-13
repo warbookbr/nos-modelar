@@ -15,6 +15,7 @@ import { receitasDaMontagem } from '../../../tools/modelar/etapas-da-montagem.mj
 import { carregadoresDeReceitas } from '../../../tools/modelar/peca-com-parametros.mjs';
 import { REPO } from '../../../tools/modelar/resolver-caminho-receita.mjs';
 import { comNomesExibidos, listaEmJson, listaEmMarkdown, listarPecas, nomeDeExibicao } from './lista-de-pecas.js';
+import { comoCLIDoDesenho } from './desenho.mjs';
 import { paginaDoManual } from './pagina.js';
 import { FOCO_DO_PASSO, montagemDoPasso, passosDaMontagem } from './passos.js';
 
@@ -34,6 +35,7 @@ opções (todas com =):
   --largura=<pixels>  largura da imagem, de 640 a 2560 (padrão: 960)
   --sem-imagens       só a lista e a página, sem abrir o navegador
   --sem-agrupar       um passo por etapa, em vez de um passo para etapas seguidas da mesma peça
+  --desenho <peça>    em vez do manual, o desenho técnico da peça em três vistas com as cotas da receita (veja --desenho --ajuda)
   --ajuda             este texto
 
 saída: manual.html, manual.json, lista-de-pecas.json, lista-de-pecas.md, passo-NN.png e, nos passos agrupados, passo-NN-detalhe.png.`;
@@ -149,6 +151,7 @@ export async function gerarManual(arquivo, opcoes = {}) {
 }
 
 export async function comoCLI(argv) {
+  if (argv.some((a) => a === '--desenho' || a.startsWith('--desenho='))) return comoCLIDoDesenho(argv);
   const opcoes = opcoesDe(argv);
   if (opcoes.ajuda) return { codigo: 0, texto: AJUDA };
   if (!opcoes.arquivo) return { codigo: 1, texto: `diga a montagem.\n${AJUDA}` };

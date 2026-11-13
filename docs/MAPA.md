@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1866 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1871 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -747,13 +747,18 @@
 ## modulos/manual/src/
 
 - `capturador.mjs` — capturador.mjs — a captura de vistas de várias montagens com UM servidor e UM navegador. `capturarMontagem` abre e fecha o servidor e o Chromium a cada chama…
+- `cotas.js` — cotas.js — valida as cotas que uma receita declara no export opcional `COTAS`. O programa não escolhe cotas: só confere e normaliza as declaradas.
+- `desenho-svg.js` — desenho-svg.js — a página do desenho técnico: três vistas em terceiro diedro (cima sobre a frente, lado direito à direita da frente), linha visível cheia, es…
+- `desenho.mjs` — desenho.mjs — `npm run manual -- --desenho <peça>`: o desenho técnico de uma peça, três vistas com linha visível e escondida e as cotas que a receita declara…
 - `lista-de-pecas.js` — lista-de-pecas.js — a lista de peças de uma montagem resolvida. Função pura: não lê arquivo, não abre navegador e não conhece peça nenhuma pelo nome; roda so…
 - `manual.mjs` — manual.mjs — `npm run manual -- <montagem.json>`: a lista de peças e o passo a passo de uma montagem persistida.
 - `pagina.js` — pagina.js — a página única do manual: HTML com o CSS embutido, sem script e sem recurso de rede. As imagens entram embutidas (data URI de PNG) quando o passo…
 - `passos.js` — passos.js — o que entra em cada etapa de uma montagem resolvida, e a montagem pintada de cada passo. Núcleo do passo a passo, sem navegador: recebe a montage…
+- `projecao.js` — projecao.js — projeção ortográfica de uma malha neutra em vistas, com linha visível e escondida. Função pura, sem navegador.
 
 ## modulos/manual/tests/
 
+- `desenho.test.js` — desenho.test.js — o desenho técnico: projeção com linha visível e escondida num bloco com furo passante medido, recusa de cota mal declarada, cotas de duas p…
 - `lista-de-pecas.test.js` — lista-de-pecas.test.js — a lista de peças sobre uma montagem sintética: agrupamento, caixa em milímetro, determinismo e ausência de nome de peça no módulo.
 - `manual-real.test.mjs` — manual-real.test.mjs — o manual sobre uma montagem do acervo: a lista confere com a contagem independente das instâncias, a saída é igual byte a byte e a opç…
 - `passos.test.js` — passos.test.js — o agrupamento de etapas seguidas, o texto por passo e os nomes de exibição, sobre montagens mínimas.
