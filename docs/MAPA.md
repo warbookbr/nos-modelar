@@ -1905,7 +1905,7 @@
 
 ## procedural/pecas/instalacao-solar/partes/emenda/
 
-- `receita.js` — instalacao-solar/emenda — a barra estriada que entra no canal em T de dois perfis para uni-los, com dois parafusos allen.
+- `receita.js` — instalacao-solar/emenda — a barra estriada que entra em pé na câmara do rasgo lateral de dois perfis para uni-los, com dois parafusos allen.
 
 ## procedural/pecas/instalacao-solar/partes/grampo-intermediario/
 

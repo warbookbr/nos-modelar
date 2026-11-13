@@ -797,7 +797,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -67
+      "afastamento": -90
     },
     {
       "id": "perfilA2NoMeioDaEmenda",
@@ -808,7 +808,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -83
+      "afastamento": -90
     },
     {
       "id": "emendaA23MetadeDentroDoPerfil2",
@@ -819,7 +819,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "perfilA3NoMeioDaEmenda",
@@ -830,7 +830,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "emendaA34MetadeDentroDoPerfil3",
@@ -841,7 +841,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "perfilA4NoMeioDaEmenda",
@@ -852,7 +852,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "perfilB1NoSuporte",
@@ -874,7 +874,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -67
+      "afastamento": -90
     },
     {
       "id": "perfilB2NoMeioDaEmenda",
@@ -885,7 +885,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -83
+      "afastamento": -90
     },
     {
       "id": "emendaB23MetadeDentroDoPerfil2",
@@ -896,7 +896,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "perfilB3NoMeioDaEmenda",
@@ -907,7 +907,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "emendaB34MetadeDentroDoPerfil3",
@@ -918,7 +918,7 @@
         "porta": "fim"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "perfilB4NoMeioDaEmenda",
@@ -929,7 +929,7 @@
         "porta": "pontaB"
       },
       "unidade": "mm",
-      "afastamento": -75
+      "afastamento": -90
     },
     {
       "id": "painel1SobreOTrilhoB",
@@ -1473,7 +1473,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra em pé na câmara do rasgo lateral dos dois"
       },
       {
         "id": "perfilA2Com3",
@@ -1487,7 +1487,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra em pé na câmara do rasgo lateral dos dois"
       },
       {
         "id": "perfilA3Com4",
@@ -1501,7 +1501,7 @@
             "perfilA4"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra em pé na câmara do rasgo lateral dos dois"
       },
       {
         "id": "perfilB1Com2",
@@ -1515,7 +1515,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra em pé na câmara do rasgo lateral dos dois"
       },
       {
         "id": "perfilB2Com3",
@@ -1529,7 +1529,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra em pé na câmara do rasgo lateral dos dois"
       },
       {
         "id": "perfilB3Com4",
@@ -1543,7 +1543,7 @@
             "perfilB4"
           ]
         },
-        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra no canal em T dos dois"
+        "motivo": "os dois perfis ficam ponta com ponta na junta, unidos pela emenda que entra em pé na câmara do rasgo lateral dos dois"
       },
       {
         "id": "pontaEsq30AAssentaNoperfilA1",
@@ -1557,7 +1557,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "ponta30J1AAssentaNoperfilA1",
@@ -1571,7 +1571,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "ponta40J1AAssentaNoperfilA1",
@@ -1585,7 +1585,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "pontaEsq30BAssentaNoperfilB1",
@@ -1599,7 +1599,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "ponta30J1BAssentaNoperfilB1",
@@ -1613,7 +1613,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "ponta40J1BAssentaNoperfilB1",
@@ -1627,7 +1627,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "interJ2AAssentaNoperfilA2",
@@ -1697,7 +1697,7 @@
             "perfilA4"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "ponta40DirBAssentaNoperfilB4",
@@ -1711,7 +1711,7 @@
             "perfilB4"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "pontaEsq30AApertapainel1",
@@ -1977,7 +1977,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel1AssentaNoperfilB1",
@@ -1991,7 +1991,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel2AssentaNoperfilA1",
@@ -2005,7 +2005,7 @@
             "perfilA1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel2AssentaNoperfilA2",
@@ -2019,7 +2019,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel2AssentaNoperfilB1",
@@ -2033,7 +2033,7 @@
             "perfilB1"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel2AssentaNoperfilB2",
@@ -2047,7 +2047,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel3AssentaNoperfilA2",
@@ -2061,7 +2061,7 @@
             "perfilA2"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel3AssentaNoperfilA3",
@@ -2075,7 +2075,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel3AssentaNoperfilB2",
@@ -2089,7 +2089,7 @@
             "perfilB2"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel3AssentaNoperfilB3",
@@ -2103,7 +2103,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel4AssentaNoperfilA3",
@@ -2117,7 +2117,7 @@
             "perfilA3"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel4AssentaNoperfilA4",
@@ -2131,7 +2131,7 @@
             "perfilA4"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel4AssentaNoperfilB3",
@@ -2145,7 +2145,7 @@
             "perfilB3"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
       },
       {
         "id": "painel4AssentaNoperfilB4",
@@ -2159,7 +2159,175 @@
             "perfilB4"
           ]
         },
-        "motivo": "o pé do grampo assenta no topo do perfil, e o parafuso desce pelo corpo e pelo pé até a porca de canal, dentro do canal em T"
+        "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
+      },
+      {
+        "id": "emendaA12NoPerfilA1",
+        "a": {
+          "caminho": [
+            "emendaA12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA12NoPerfilA2",
+        "a": {
+          "caminho": [
+            "emendaA12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA23NoPerfilA2",
+        "a": {
+          "caminho": [
+            "emendaA23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA23NoPerfilA3",
+        "a": {
+          "caminho": [
+            "emendaA23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA34NoPerfilA3",
+        "a": {
+          "caminho": [
+            "emendaA34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA34NoPerfilA4",
+        "a": {
+          "caminho": [
+            "emendaA34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA4"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB12NoPerfilB1",
+        "a": {
+          "caminho": [
+            "emendaB12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB12NoPerfilB2",
+        "a": {
+          "caminho": [
+            "emendaB12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB23NoPerfilB2",
+        "a": {
+          "caminho": [
+            "emendaB23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB23NoPerfilB3",
+        "a": {
+          "caminho": [
+            "emendaB23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB34NoPerfilB3",
+        "a": {
+          "caminho": [
+            "emendaB34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB34NoPerfilB4",
+        "a": {
+          "caminho": [
+            "emendaB34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB4"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
       }
     ]
   },

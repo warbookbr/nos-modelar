@@ -7,11 +7,12 @@
  * o eixo do canal de cima em z = 0. A seção é a mesma em todo o comprimento, vista de ponta com +z para a face estriada: 45 mm de altura
  * por 30 de largura, oca e assimétrica. Em cima, um canal em T aberto para cima (a cabeça ou a porca do parafuso dos grampos entra
  * por baixo das duas abas finas de cima, o pescoço fica livre); o lado de +z é uma face inteira estriada ao longo do comprimento,
- * com um rasgo lateral para a porca do parafuso do suporte em L; embaixo, uma aba que abre para o lado de -z com a borda virada
+ * com um rasgo lateral que abre para uma câmara por dentro, onde entram a porca do parafuso do suporte em L e, na junta entre dois
+ * perfis, a barra da emenda, em pé (fotos da pessoa, 2026-11-12, fora do repositório); embaixo, uma aba que abre para o lado de -z com a borda virada
  * para cima; por dentro, uma parede inclinada liga o fundo ao piso do canal de cima e parte o vazio em dois.
  *
  * MEDIDAS REAIS (a pessoa mediu): comprimento de 1350 mm, altura de 45 mm, largura de 30 mm, paredes de uns 2 mm. A CONFIRMAR: o
- * pescoço de 10 mm do canal, a altura de 10 mm da câmara do T, o rasgo lateral de 10 por 4 mm a 21 mm do fundo, o friso de 0,6 mm a
+ * pescoço de 10 mm do canal, a altura de 10 mm da câmara do T, o rasgo lateral de 10 mm a 21 mm do fundo e a câmara de 14 por 6 mm atrás dele, o friso de 0,6 mm a
  * cada 3 mm, a borda de 7 mm da aba de baixo e o corte da parede inclinada: valores lidos das fotos, sem a pessoa ter medido.
  *
  * Técnica: uma `extrusao` de eixo x do contorno externo da seção (com o T do canal, o rasgo lateral, os frisos e a aba de baixo) e dois
@@ -31,10 +32,12 @@ export const TABELA = {
   canalDeCima: 10,
   espessuraDaAba: 2,
   alturaDoT: 10,
-  /* A CONFIRMAR: rasgo lateral da face estriada, para a porca do parafuso do suporte em L: altura, fundura e altura do centro dele. */
+  /* A CONFIRMAR: rasgo lateral da face estriada (a abertura e a altura do centro dele) e a câmara atrás dele, mais alta que o rasgo e com as
+     bordas da parede por cima e por baixo da abertura, onde a barra da emenda fica em pé e a porca do parafuso do L encosta. */
   rasgoLateralAltura: 10,
-  rasgoLateralFundura: 4,
   rasgoLateralCentro: 21,
+  camaraAltura: 14,
+  camaraLargura: 6,
   /* A CONFIRMAR: frisos horizontais da face de +z: crista, vale, fundura. */
   frisoCrista: 1.5,
   frisoVale: 1.5,
@@ -42,7 +45,7 @@ export const TABELA = {
   /* A CONFIRMAR: a altura da borda virada para cima na ponta da aba de baixo. */
   bordaDaAba: 7,
   /* A CONFIRMAR: a parede inclinada, de onde sai no fundo (z do centro dela) a onde chega no piso do T. */
-  almaNoFundo: 7,
+  almaNoFundo: 5,
   almaNoPiso: -5,
   /* Acabamento: quina externa quebrada. */
   quina: 1,
@@ -80,16 +83,18 @@ export function derivar(t = TABELA) {
   const Ti = W - e;
   const yDoPiso = H - t.espessuraDaAba - t.alturaDoT;
   const yDoForro = yDoPiso - e;
-  const d = t.rasgoLateralFundura;
   const ya = t.rasgoLateralCentro + t.rasgoLateralAltura / 2;
   const yb = t.rasgoLateralCentro - t.rasgoLateralAltura / 2;
+  const yca = t.rasgoLateralCentro + t.camaraAltura / 2;
+  const ycb = t.rasgoLateralCentro - t.camaraAltura / 2;
+  const zc = Ti - t.camaraLargura;
   const fr = (a, b) => frisos(a, b, [-1, 0], t.frisoCrista, t.frisoVale, t.frisoFundura);
   /* Contorno externo em (z, y), do pescoço de +z para baixo pela face estriada: o T do canal, a face com o rasgo, a aba de baixo (que abre
      para -z, com a borda para cima), a parede de -z e de novo o T. */
   const zy = [
     [s, H], [W - q, H], [W, H - q],
     ...fr([W, H - q], [W, ya]).slice(1),
-    [W - d, ya], [W - d, yb],
+    [Ti, ya], [Ti, yca], [zc, yca], [zc, ycb], [Ti, ycb], [Ti, yb],
     ...fr([W, yb], [W, q]),
     [W - q, 0], [-W - aba + q, 0], [-W - aba, q], [-W - aba, t.bordaDaAba], [-W - aba + e, t.bordaDaAba], [-W - aba + e, e], [-W, e],
     [-W, H - q], [-W + q, H], [-s, H],
@@ -98,12 +103,12 @@ export function derivar(t = TABELA) {
   /* A parede inclinada: eixo do fundo (almaNoFundo) ao piso (almaNoPiso), com `parede` de largura medida na horizontal. */
   const meia = e * 0.55;
   const xAlma = (y, lado) => t.almaNoFundo + ((t.almaNoPiso - t.almaNoFundo) * (y - e)) / (yDoForro - e) + lado * meia;
-  /* O vazio em dois: à esquerda (lado de -z) da parede inclinada, e à direita, com o recorte que contorna o rasgo lateral a uma parede dele. */
+  /* O vazio em dois: à esquerda (lado de -z) da parede inclinada, e à direita, abaixo da câmara do rasgo e ao lado dela, a uma parede dela. */
   const vazioEsq = [[-Ti, e], [xAlma(e, -1), e], [xAlma(yDoForro, -1), yDoForro], [-Ti, yDoForro]];
   const vazioDir = [
-    [xAlma(e, 1), e], [Ti, e], [Ti, yb - e], [W - d - e, yb - e], [W - d - e, ya + e], [Ti, ya + e], [Ti, yDoForro], [xAlma(yDoForro, 1), yDoForro],
+    [xAlma(e, 1), e], [Ti, e], [Ti, ycb - e], [zc - e, ycb - e], [zc - e, yDoForro], [xAlma(yDoForro, 1), yDoForro],
   ];
-  return { L: t.comprimento, zy, furos: [vazioEsq, vazioDir], yDoT: (yDoPiso + H - t.espessuraDaAba) / 2, zFace: W };
+  return { L: t.comprimento, zy, furos: [vazioEsq, vazioDir], yDoT: (yDoPiso + H - t.espessuraDaAba) / 2, zFace: W, zDaCamara: zc + t.camaraLargura / 2 };
 }
 
 
@@ -116,15 +121,14 @@ const publicar = (passos, portasEmMm, de) => {
 };
 
 /* As portas, em mm: a face de lado onde o suporte em L encosta, na altura do rasgo e a `posicaoDoSuporte` da ponta de x = 0; e as faces de ponta,
-   no centro do vazio, onde a emenda entra; e o topo, onde o primeiro painel assenta, a `posicaoDoPrimeiroPainel` da ponta (a referência dele é -z). A
+   no centro da câmara do rasgo lateral, onde a emenda entra; e o topo, onde o primeiro painel assenta, a `posicaoDoPrimeiroPainel` da ponta (a referência dele é -z). A
    referência das outras é +y, para cima. */
 export function portas(t = TABELA) {
-  const { yDoT, zFace } = derivar(t);
-  const yDoVazio = yDoT;
+  const { zFace, zDaCamara } = derivar(t);
   return {
     lateral: { forma: 'plano', papel: 'apoia', ponto: [t.posicaoDoSuporte, t.rasgoLateralCentro, zFace], normal: [0, 0, 1], extensao: [t.altura, 50], referencia: [0, 1, 0] },
-    fim: { forma: 'plano', papel: 'recebe', ponto: [t.comprimento, yDoVazio, 0], normal: [1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
-    inicio: { forma: 'plano', papel: 'apoia', ponto: [0, yDoVazio, 0], normal: [-1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
+    fim: { forma: 'plano', papel: 'recebe', ponto: [t.comprimento, t.rasgoLateralCentro, zDaCamara], normal: [1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
+    inicio: { forma: 'plano', papel: 'apoia', ponto: [0, t.rasgoLateralCentro, zDaCamara], normal: [-1, 0, 0], extensao: [t.largura, t.altura], referencia: [0, 1, 0] },
     topo: { forma: 'plano', papel: 'recebe', ponto: [t.posicaoDoPrimeiroPainel, t.altura, 0], normal: [0, 1, 0], extensao: [t.largura, 100], referencia: [0, 0, -1] },
   };
 }
@@ -150,13 +154,13 @@ const receita = {
     referencias: ['../../referencias/kit.md'],
     escala: { medida: 'comprimento do perfil do kit', milimetros: 1350 },
     partes: [
-      { nome: 'corpo', forma: 'tubo de alumínio de 45 por 30 mm, paredes de 2 mm, 1350 mm em x, oco: canal em T aberto em cima com abas finas; face de +z estriada com rasgo lateral; aba de baixo aberta para -z com borda para cima; parede inclinada por dentro', tecnica: 'extrusão de eixo x do contorno externo (T, rasgo, frisos e aba escritos em derivar) com dois furos para o vazio dos dois lados da parede inclinada' },
+      { nome: 'corpo', forma: 'tubo de alumínio de 45 por 30 mm, paredes de 2 mm, 1350 mm em x, oco: canal em T aberto em cima com abas finas; face de +z estriada com rasgo para uma câmara; aba de baixo aberta para -z com borda para cima; parede inclinada por dentro', tecnica: 'extrusão de eixo x do contorno externo (T, rasgo, frisos e aba escritos em derivar) com dois furos para o vazio dos dois lados da parede inclinada' },
     ],
     criteriosDeReprovacao: [
       'comprimento diferente de 1350 mm, altura diferente de 45 mm ou largura diferente de 30 mm',
       'seção maciça, sem o vazio por dentro, ou sem a parede inclinada dividindo o vazio',
       'sem o canal em T aberto no topo, ou canal fechado por tampa, ou sem as duas abas de cima sobre a câmara do T',
-      'face lateral lisa, sem os frisos horizontais, ou sem o rasgo lateral para a porca do parafuso do L',
+      'face lateral lisa, sem os frisos horizontais, ou sem o rasgo lateral com a câmara atrás dele, para a porca do parafuso do L e a barra da emenda',
       'aba de baixo simétrica ou sem a borda virada para cima',
       'parte do perfil abaixo do chão (y negativo) ou deitado de lado',
       'quinas externas vivas, sem a quebra de 1 mm',
