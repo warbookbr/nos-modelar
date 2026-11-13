@@ -71,6 +71,12 @@ describe('silhueta contra a referência', () => {
     expect(Object.keys(lerReferencia(refDoRetangulo).trechos)).toEqual(['base', 'topo', 'direita']);
   });
 
+  it('lê quem conferiu a referência, e o campo ausente ou vazio vale null', () => {
+    expect(lerReferencia(refDoRetangulo).conferidoPelaPessoa).toBeNull();
+    expect(lerReferencia({ ...refDoRetangulo, conferidoPelaPessoa: '  ' }).conferidoPelaPessoa).toBeNull();
+    expect(lerReferencia({ ...refDoRetangulo, conferidoPelaPessoa: 'Ana, 2026-11-13' }).conferidoPelaPessoa).toBe('Ana, 2026-11-13');
+  });
+
   it('recusa o alinhamento longe do contorno', () => {
     const referencia = lerReferencia({ ...refDoRetangulo, alinhamento: [[0, 0], [500, 500]] });
     expect(() => medirSilhueta({ tris: retangulo(0, 0, 100, 50), referencia, plano: 'xz' })).toThrow(/500.*mm do contorno/);

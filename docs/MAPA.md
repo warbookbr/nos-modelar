@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1861 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1863 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3121,6 +3121,8 @@
 - `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Modelar, e o ca…
 - `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `reduzir-em-paralelo.mjs` — reduzir-em-paralelo.mjs — `reduzirPorMedia` numa thread à parte, para a captura seguinte não esperar a redução da anterior.
+- `referencia-de-silhueta.mjs` — referencia-de-silhueta.mjs — do contorno de uma imagem ao arquivo de trechos que `silhueta:desvio` lê, em milímetro e nos eixos do modelo.
+- `referencia-de-silhueta.test.mjs` — Um corte cai no vértice do contorno mais perto do pedido, e a ponta de uma quina sai arredondada pelo alisamento do módulo, daí os 3 px nos cortes. A forma c…
 - `referencia-do-plano.test.mjs` — referencia-do-plano.test.mjs — `descrever-peca` confere logo no começo que cada caminho de `PLANO.referencias` existe.
 - `referencias-do-plano.mjs` — referencias-do-plano.mjs — o que `PLANO.referencias` cita, resolvido em disco.
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
