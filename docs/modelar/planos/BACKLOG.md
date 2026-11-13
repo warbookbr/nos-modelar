@@ -250,3 +250,7 @@ no `PLANO` de cada parte foi a usada.
 A bateria local rodar os testes lentos que o envio acrescenta ou que leem uma fixture mudada por outro ramo juntado no mesmo
 envio: em 2026-11-13 o teste do estudo da forma exata fixava os números da peça de prova da agulha de antes da correção da
 costura, os dois ramos foram juntados no mesmo envio, o teste ficou para o CI pelo teto dos lentos e reprovou lá.
+
+Um teste geral de que todo comando de `package.json` responde a `--ajuda` com saída 0 e o uso, com lista de exceções declaradas:
+a sonda de 2026-11-13 rodou 97 comandos e só 19 respondem assim; 19 recusam a opção, 24 mostram o uso como erro e o resto a
+ignora e executa. A regra está em `tools/CLAUDE.md` e nenhum gate a cobra.
