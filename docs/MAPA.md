@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1863 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1866 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -935,6 +935,9 @@
 - `contorno.test.mjs` — contorno.test.mjs — retângulo arredondado, recuo por meia-esquadria, área e convexidade do contorno 2D.
 - `corpo-de-secao-variavel.js` — corpo-de-secao-variavel.js — o corpo fechado cuja seção (superelipse) muda ao longo de um eixo, com sulcos e tampas
 - `corpo-de-secao-variavel.test.mjs` — corpo-de-secao-variavel.test.mjs — o corpo de seção variável com sulcos, medido pelas réguas de malha (face degenerada e face fina) e pelas seções dos planos.
+- `corpo-por-fatias-gaiola.test.mjs` — corpo-por-fatias-gaiola.test.mjs — o que corpoPorFatias faz com o que a gaiolaPorLacos devolve: a recusa pela face fina e a passagem dos avisos dela.
+- `corpo-por-fatias.js` — corpo-por-fatias.js — o corpo liso que passa por contornos fechados livres dados em posições ao longo de um eixo, com as pontas tampadas
+- `corpo-por-fatias.test.mjs` — corpo-por-fatias.test.mjs — o corpo por fatias de contorno livre: volumes de casos de conta fechada, posições de vértice, as réguas de malha e cada recusa.
 - `curva-da-gaiola.js` — curva-da-gaiola.js — a curva sobre a superfície de uma gaiola, tirada dela sem digitar coordenada
 - `curva-da-gaiola.test.ts` — curva-da-gaiola.test.ts — a curva sobre a superfície da gaiola, tirada de `gaiolaPorEstacoes` e de `gaiolaPorLacos` sem digitar coordenada. A chapa em L de `…
 - `curva2d.js` — curva2d.js — contorno 2D escrito por trechos (reto, arco, arco tangente, concordância e spline), puro.
