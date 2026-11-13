@@ -2160,6 +2160,174 @@
           ]
         },
         "motivo": "o pé do grampo fica sobre o topo do perfil, apoiado na ponta dobrada e no pé da parede, e o parafuso atravessa o pé até a porca trapezoidal, dentro do canal de cima"
+      },
+      {
+        "id": "emendaA12NoPerfilA1",
+        "a": {
+          "caminho": [
+            "emendaA12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA1"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA12NoPerfilA2",
+        "a": {
+          "caminho": [
+            "emendaA12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA23NoPerfilA2",
+        "a": {
+          "caminho": [
+            "emendaA23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA23NoPerfilA3",
+        "a": {
+          "caminho": [
+            "emendaA23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA34NoPerfilA3",
+        "a": {
+          "caminho": [
+            "emendaA34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaA34NoPerfilA4",
+        "a": {
+          "caminho": [
+            "emendaA34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilA4"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB12NoPerfilB1",
+        "a": {
+          "caminho": [
+            "emendaB12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB1"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB12NoPerfilB2",
+        "a": {
+          "caminho": [
+            "emendaB12"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB23NoPerfilB2",
+        "a": {
+          "caminho": [
+            "emendaB23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB2"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB23NoPerfilB3",
+        "a": {
+          "caminho": [
+            "emendaB23"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB34NoPerfilB3",
+        "a": {
+          "caminho": [
+            "emendaB34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB3"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
+      },
+      {
+        "id": "emendaB34NoPerfilB4",
+        "a": {
+          "caminho": [
+            "emendaB34"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "perfilB4"
+          ]
+        },
+        "motivo": "a barra da emenda fica em pé na câmara do rasgo lateral do perfil, e a ponta do parafuso dela encosta na parede do fundo da câmara"
       }
     ]
   },
