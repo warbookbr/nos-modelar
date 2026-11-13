@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1820 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1821 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -407,6 +407,10 @@
 
 - `RESULTADO.md` — Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)
 - `sonda-passos.mjs` — sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha execut…
+
+## docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/
+
+- `README.md` — Revisão das verificações e dos testes: medidas e veredito
 
 ## docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/
 

@@ -29,6 +29,14 @@ describe('caminho de pasta retirada', () => {
     expect(caminhoRetirado('docs/modelar/historico/evidencias-n2-forma-global/alvo.json', raiz)?.consta).toBe(false);
   });
 
+  it('o plano que saiu da raiz de planos depois vale pelo nome na crônica, e o que ainda existe não é tratado como retirado', () => {
+    expect(caminhoRetirado('docs/modelar/planos/2026-11-05-solido-por-lacos' + '.md', raiz)?.consta).toBe(true);
+    expect(caminhoRetirado('docs/modelar/planos/2026-01-01-nunca-existiu' + '.md', raiz)?.consta).toBe(false);
+    mkdirSync(path.join(raiz, 'docs/modelar/planos'), { recursive: true });
+    writeFileSync(path.join(raiz, 'docs/modelar/planos/2026-12-01-em-jogo' + '.md'), '**Estado:** ativo\n');
+    expect(caminhoRetirado('docs/modelar/planos/2026-12-01-em-jogo' + '.md', raiz)).toBeNull();
+  });
+
   it('não mexe em caminho fora das pastas retiradas', () => {
     expect(caminhoRetirado('docs/modelar/planos/concluidos/x' + '.md', raiz)).toBeNull();
     expect(caminhoRetirado('docs/modelar/decisoes/PLANOS-ENCERRADOS' + '.md', raiz)).toBeNull();

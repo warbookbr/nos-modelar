@@ -80,6 +80,7 @@
     "docs:links:check": "node tools/mapa/links.mjs --check",
     "planos:check": "node tools/mapa/planos.mjs --check",
     "planos:gerar": "node tools/mapa/planos.mjs --gerar",
+    "planos:encerrar": "node tools/mapa/planos.mjs --encerrar",
     "decisoes:check": "node tools/mapa/decisoes.mjs --check",
     "decisoes:gerar": "node tools/mapa/decisoes.mjs --gerar",
     "docs:estrutura": "node tools/mapa/estrutura-docs.mjs",

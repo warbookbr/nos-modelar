@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { CAMINHOS_COMPARTILHADOS, conferirLinhasGeradas, conferirPlanoAtivoNosIndices, conferirPlanos, gerarLinhas, territorioDe } from './planos.mjs';
+import { acrescentarNaCronica, trocarLinksDoPlano, CAMINHOS_COMPARTILHADOS, conferirLinhasGeradas, conferirPlanoAtivoNosIndices, conferirPlanos, gerarLinhas, territorioDe } from './planos.mjs';
 
 const temporarias = [];
 
@@ -227,5 +227,27 @@ describe('linhas "Planos ativos" geradas da fonte', () => {
     expect(gerarLinhas({ raiz: pasta })).toEqual([]);
     expect(readFileSync(join(pasta, 'README.md'), 'utf8')).toBe(`antes\n${certaRaiz}depois\n`);
     expect(conferirLinhasGeradas({ raiz: pasta })).toEqual([]);
+  });
+});
+
+describe('encerrar um plano', () => {
+  const PLANO = ['docs', 'modelar', 'planos', '2026-12-01-exemplo.md'].join('/');
+  const CRONICA = ['docs', 'modelar', 'decisoes', 'PLANOS-ENCERRADOS.md'].join('/');
+
+  it('a linha nova entra antes da primeira linha de plano, com o commit e o caminho do texto', () => {
+    const cronica = '# Planos encerrados\n\nCabeçalho.\n\n- `2026-11-10-antigo.md`: concluído.\n';
+    const nova = acrescentarNaCronica(cronica, '2026-12-01-exemplo.md', 'concluído em 2026-12-02: entregou o exemplo.', 'abc1234');
+    const linhas = nova.split('\n');
+    expect(linhas[4]).toBe(`- \`2026-12-01-exemplo.md\`: concluído em 2026-12-02: entregou o exemplo. O texto está no commit \`abc1234\`, em \`${PLANO}\`.`);
+    expect(linhas[5]).toBe('- `2026-11-10-antigo.md`: concluído.');
+    expect(() => acrescentarNaCronica('# vazia\n', 'x.md', 'y', 'z')).toThrow('nenhuma linha de plano');
+  });
+
+  it('o link de documento para o plano passa a apontar para a crônica, com o texto mantido e os outros links intactos', () => {
+    const texto = 'Ver [o exemplo](2026-12-01-exemplo.md), [outro](2026-12-02-outro.md) e [fora](https://exemplo.invalid/2026-12-01-exemplo.md).';
+    expect(trocarLinksDoPlano(texto, ['docs', 'modelar', 'planos', 'README.md'].join('/'), PLANO, CRONICA))
+      .toBe('Ver [o exemplo](../decisoes/PLANOS-ENCERRADOS.md), [outro](2026-12-02-outro.md) e [fora](https://exemplo.invalid/2026-12-01-exemplo.md).');
+    expect(trocarLinksDoPlano('[p](../../planos/2026-12-01-exemplo.md#fatias)', ['docs', 'modelar', 'banco-de-provas', 'x', 'README.md'].join('/'), PLANO, CRONICA))
+      .toBe('[p](../../decisoes/PLANOS-ENCERRADOS.md)');
   });
 });

@@ -1,10 +1,10 @@
 # Revisão das verificações e dos testes: o que cada um pega, medido
 
-**Estado:** pronto
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação)
+**Território:** `docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/`
 
-**Responsável:** a IA da sessão do furgão; a pessoa pediu o plano em 2026-11-13 e decide o que sai.
+**Responsável:** a IA da sessão do furgão; a pessoa pediu o plano em 2026-11-13 e decide o que sai. Ativo desde 2026-11-13, na vaga que o plano de revisão do projeto deixou ao fechar; as medidas ficam em [`revisao-das-verificacoes-2026-11-13`](../banco-de-provas/revisao-das-verificacoes-2026-11-13/README.md).
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-13.
 

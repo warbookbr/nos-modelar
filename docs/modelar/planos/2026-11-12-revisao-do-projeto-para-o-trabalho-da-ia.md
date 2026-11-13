@@ -1,6 +1,6 @@
 # Revisão do projeto para o trabalho da IA: o que protege, o que só custa, e se a organização e o núcleo servem a quem desenvolve
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/`. É a pasta do inventário e do relatório, que não mudam código nem regra. Os caminhos de ferramenta e de núcleo que esta linha listava serviam à validação por objetos de prova, que saiu do plano em 2026-11-13; a lista está no histórico deste arquivo, no commit `bed7a128`.
 
@@ -134,4 +134,6 @@ Tirar uma regra que pega um defeito raro e caro: por isso nada sai sem a lista d
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-13. O gate de saída: o relatório cabe numa sentada e cada classificação cita o número e o arquivo (item 1); nada foi recomendado para sair sem a lista do que pegou, e a única retirada, a dos planos encerrados e do histórico, teve cada arquivo lido antes (item 2); a decisão da pessoa está no relatório, por grupo (item 3); cada mudança aprovada tem plano, item de backlog ou correção, na última seção do relatório (item 4); os seis mecanismos têm a resposta com a contagem de 221 atritos (item 5); e o desenho da organização foi aprovado por imagem e executado (item 6).
+
+O que este plano deixou aberto, com dono: as mudanças de núcleo, no plano pronto do núcleo para quem escreve receita; a avaliação de cada gate e teste, no plano da revisão das verificações; a saída de manual e duas recomendações sem resposta da pessoa, no backlog. A revisão cruzada entre duas sessões não aconteceu, e o levantamento dos agentes foi conferido por amostra, não item a item.

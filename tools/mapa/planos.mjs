@@ -1,7 +1,8 @@
 /* planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem
    sobreposição, e que nenhum plano executivo ultrapassa o limite curto acordado. */
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -307,7 +308,63 @@ export function gerarLinhas({ raiz = RAIZ, fonte = 'docs/modelar/planos/README.m
   return problemas;
 }
 
+/* ENCERRAR UM PLANO. Desde 2026-11-13 o plano concluído ou cancelado não fica na árvore: ganha uma linha na crônica, com o commit em
+   que o texto inteiro está, os links de documento para ele passam a apontar para a crônica, e o arquivo sai. Citação em código e em
+   receita não muda: os gates de links e de citações a aceitam quando o nome consta na crônica (`retirados.mjs`). */
+export const CRONICA_DOS_ENCERRADOS = 'docs/modelar/decisoes/PLANOS-ENCERRADOS.md';
+
+/* A linha nova entra antes da primeira linha de plano da crônica, que está em ordem de data decrescente. */
+export function acrescentarNaCronica(cronica, nome, linha, commit) {
+  const entrada = `- \`${nome}\`: ${linha.trim().replace(/\.$/, '')}. O texto está no commit \`${commit}\`, em \`docs/modelar/planos/${nome}\`.`;
+  const linhas = cronica.split('\n');
+  const primeira = linhas.findIndex((l) => l.startsWith('- `'));
+  if (primeira < 0) throw new Error('a crônica não tem nenhuma linha de plano');
+  linhas.splice(primeira, 0, entrada);
+  return linhas.join('\n');
+}
+
+/* Troca, num documento, todo link markdown que resolve para o plano pelo link para a crônica, mantendo o texto do link. */
+export function trocarLinksDoPlano(texto, arquivo, plano, cronica) {
+  const pasta = dirname(arquivo);
+  return texto.replace(/(\]\()([^)#\s]+)(#[^)\s]*)?\)/g, (tudo, abre, alvo) => {
+    if (alvo.includes('://') || join(pasta, alvo) !== plano) return tudo;
+    return `${abre}${relative(pasta, cronica).replace(/\\/g, '/') || cronica.split('/').pop()})`;
+  });
+}
+
+export function encerrarPlano(nome, linha, { raiz = RAIZ } = {}) {
+  const git = (...args) => execFileSync('git', args, { cwd: raiz, encoding: 'utf8' }).trim();
+  const plano = `docs/modelar/planos/${nome}`;
+  if (!existsSync(join(raiz, plano))) throw new Error(`${plano} não existe na raiz de planos/`);
+  if (!linha || !linha.trim()) throw new Error('falta --linha "<o que o plano entregou ou decidiu>"');
+  const texto = readFileSync(join(raiz, plano), 'utf8');
+  const estado = texto.match(/^\*\*Estado:\*\*\s*(.+?)\s*$/mi)?.[1]?.toLowerCase();
+  if (estado !== 'concluído' && estado !== 'cancelado') throw new Error(`${nome}: o Estado é '${estado}'; encerra-se plano concluído ou cancelado`);
+  if (/## Fechamento\s+Preencher ao concluir ou cancelar/.test(texto)) throw new Error(`${nome}: o Fechamento não foi preenchido`);
+  if (git('status', '--porcelain', '--', plano) !== '') throw new Error(`${nome}: grave o commit do plano fechado antes de encerrar; a crônica cita esse commit`);
+  const commit = git('log', '-1', '--format=%h', '--', plano);
+  const cronica = join(raiz, CRONICA_DOS_ENCERRADOS);
+  writeFileSync(cronica, acrescentarNaCronica(readFileSync(cronica, 'utf8'), nome, linha, commit));
+  let trocados = 0;
+  for (const arquivo of git('ls-files', '*.md').split('\n').filter((f) => f && f !== plano)) {
+    const antes = readFileSync(join(raiz, arquivo), 'utf8');
+    const depois = trocarLinksDoPlano(antes, arquivo, plano, CRONICA_DOS_ENCERRADOS);
+    if (depois !== antes) { writeFileSync(join(raiz, arquivo), depois); trocados += 1; }
+  }
+  git('rm', '-q', '--', plano);
+  return { commit, trocados };
+}
+
 function executar() {
+  const iEncerrar = process.argv.indexOf('--encerrar');
+  if (iEncerrar >= 0) {
+    const iLinha = process.argv.indexOf('--linha');
+    try {
+      const { commit, trocados } = encerrarPlano(process.argv[iEncerrar + 1], iLinha >= 0 ? process.argv[iLinha + 1] : '');
+      console.log(`planos:encerrar ok — texto no commit ${commit}, ${trocados} documento(s) com link trocado; tire o plano da lista de ativos do índice se ele estava lá, e rode npm run planos:gerar e npm run mapa`);
+    } catch (erro) { console.error(`planos:encerrar FALHOU — ${erro.message}`); process.exitCode = 1; }
+    return;
+  }
   if (process.argv.includes('--gerar')) {
     const problemas = gerarLinhas();
     for (const problema of problemas) console.error(problema);
