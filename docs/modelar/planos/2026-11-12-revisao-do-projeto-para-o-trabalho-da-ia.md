@@ -80,6 +80,8 @@ estas decisões; quem retomar confere primeiro se o CI dele fechou verde e se a 
 pesada para a máquina da nuvem, de quatro núcleos; a pessoa tentou ligar o computador dela à sessão e o recurso não estava
 disponível, então a saída é uma sessão aberta direto no computador dela para essa parte.
 
+Em 2026-11-13, mais tarde, a pessoa avisou que a sessão do núcleo não volta e que a sessão do furgão fica com o plano inteiro. Ela levantou a metade de regras, documentos e agentes e a pergunta 7, refez por amostra cinco números da outra metade, e escreveu o [relatório](../banco-de-provas/revisao-do-projeto-2026-11-13/RELATORIO.md) com a recomendação por grupo, que espera a decisão da pessoa (fatia 3). A revisão cruzada entre duas sessões não aconteceu. A fatia 4 não começou.
+
 ## Filtro Agent-First
 
 USAR DIRETO: o histórico do CI, a saída da bateria de gates, os roteiros do `comecar`, o catálogo de capacidades, o registro
