@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/forma-exata/`, `tools/modelar/silhueta-contra-referencia.mjs`, `tools/modelar/silhueta-contra-referencia.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/usar/GUIA-AUTORIA-IA.md`, `docs/modelar/banco-de-provas/forma-exata-2026-11-13/`
+**Território:** `procedural/nucleo/forma-exata/`, `procedural/nucleo/chapa-de-contorno.js`, `procedural/nucleo/corpo-de-secao-variavel.js`, `procedural/nucleo/furo-passante.js`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/silhueta-contra-referencia.mjs`, `tools/modelar/silhueta-contra-referencia.test.mjs`, `.claude/agents/modelador.md`, `docs/modelar/usar/GUIA-AUTORIA-IA.md`, `docs/modelar/banco-de-provas/forma-exata-2026-11-13/`
 
 **Responsável:** a IA da sessão do furgão conduz, com agentes e o revisor adversarial nas fatias de núcleo; a pessoa decidiu o rumo em 2026-11-13 e decide de novo depois do estudo da fatia 3.
 
@@ -33,7 +33,10 @@ USAR DIRETO: os contornos exatos de reta e arco que o núcleo já tem (`contorno
 
 Andamento de 2026-11-13. A fatia 1 está feita: `npm run silhueta:desvio` mede a silhueta contra um contorno em milímetro, por trecho, e entrou no roteiro de peça nova. A fatia 2 está feita, com revisão adversarial em duas passadas: `chapaDeContorno`, `corpoDeSecaoVariavel` e `furoPassante`, e a kukri reescrita com elas foi de 297 para 152 linhas e de 12 faces finas para nenhuma; a pessoa aceitou por imagem a faca reescrita, com um ponto de 1,55 mm no começo do gume em que a versão nova segue a tabela. A fatia 3 está feita: o estudo está em `docs/modelar/banco-de-provas/forma-exata-2026-11-13/ESTUDO-DO-METODO.md`. O método cobre chapa, bloco e torno, não cobre o encontro geral de dois corpos curvos nem a peça de prova da agulha, e custa de 35% a 90% mais faces na chapa.
 
-Sobre a fatia 3: a pessoa aprovou em 2026-11-13 seguir só com a chapa com bordas e furos, com base numa estimativa de 11 dias que o revisor adversarial mostrou estar baixa. A estimativa corrigida é de 17 a 20 dias para uma lâmina como a da kukri, que o protótipo recusa com chanfro acima de 2 mm, e a `chapaDeContorno` da fatia 2 já a faz pelo método atual. A recomendação passou a ser só a triangulação do protótipo nas tampas das operações de hoje (3,5 dias), e a decisão voltou à pessoa com o número certo; a fatia 4 não começa antes dela.
+Decisão da pessoa em 2026-11-13, sobre a fatia 3, com a estimativa corrigida pelo revisor adversarial (o protótipo recusa a lâmina da kukri com chanfro acima de 2 mm e não cobre o encontro de dois corpos curvos; as estimativas em dias do estudo não têm medida por trás): o método novo não segue agora, nem o pedaço das tampas. A fatia 4 está cancelada e o estudo fica guardado, com o protótipo fora do registro de operações, para a peça que precisar dele. O esforço vai para o que a kukri mostrou que ajuda a modelar, nas fatias 6 e 7.
+
+6. O contorno de referência sai da imagem pela ferramenta, e não a olho: do módulo de contorno da imagem ao arquivo de trechos que `silhueta:desvio` lê, com uma imagem de sobreposição do contorno sobre a foto que a pessoa confere antes de ele valer como medida. Prova: o contorno da kukri refeito assim, com o dorso reto que a pessoa viu na foto.
+7. Mais operações de alto nível, escolhidas pela contagem dos atritos dos diários do banco de provas: um levantamento diz quais capacidades faltaram mais vezes e a quais peças serviriam, a pessoa vê a lista, e cada operação entra como as da fatia 2, com ficha, exemplo, teste que discrimina e revisão adversarial.
 
 ## Excluído
 
