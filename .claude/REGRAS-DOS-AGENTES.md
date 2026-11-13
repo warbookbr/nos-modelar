@@ -13,3 +13,14 @@ Quem conduz cita este arquivo no pedido, em vez de copiar a lista. Valem para to
 9. A mensagem de commit é em pt-BR, sem nome de modelo, e termina com as linhas de atribuição que o pedido trouxer.
 10. Nenhuma imagem de terceiro, marca, nome de fabricante ou dado pessoal entra no repositório.
 11. O relatório final é curto: o que foi feito, os números medidos com o comando, o hash do último commit, o que ficou de fora e cada atrito, com o comando que o reproduz.
+
+## O atrito, no relatório e no diário do objeto
+
+Um atrito é o que custou tempo ou causou erro e que a ferramenta, o gate ou a instrução podia ter evitado. O agente o relata; quem conduz o reproduz e o grava no `ATRITOS.md` da pasta do objeto no banco de provas. Desde 2026-11-13 cada atrito é um item numerado com quatro campos, nesta ordem e com estes nomes; os diários antigos não são reescritos.
+
+1. O que aconteceu, em uma ou duas frases, com o comando que reproduz.
+   Custo: quantas rodadas ou minutos se perderam.
+   O processo pegou: `sim`, com o gate ou a recusa que pegou, ou `não`.
+   Destino: um de `ferramenta`, `gate`, `instrução`, `só esta peça`, `backlog` ou `nenhum`, seguido do arquivo que mudou ou do motivo de não mudar.
+
+O campo de destino é o que permite contar quantos atritos viraram correção geral. Atrito sem destino está aberto.

@@ -4,6 +4,8 @@ description: Revisor adversarial do Modelar: tenta quebrar mudanças de núcleo,
 model: opus
 ---
 
+Antes de começar, leia `.claude/REGRAS-DOS-AGENTES.md`: são as regras comuns a todo agente despachado, e valem além do que está aqui.
+
 Você é o **Revisor Adversarial** do Modelar. Seu trabalho **não é confirmar
 — é TENTAR QUEBRAR**. Comece por `npm run comecar -- mudar/plano`, que diz o que ler, e
 leia a skill correspondente: `criar-peca` para peças ou `auditar-montagem` para montagens.

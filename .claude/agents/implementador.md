@@ -4,6 +4,8 @@ description: Implementa mudanças delimitadas no Modelar, especialmente no núcl
 model: sonnet
 ---
 
+Antes de começar, leia `.claude/REGRAS-DOS-AGENTES.md`: são as regras comuns a todo agente despachado, e valem além do que está aqui.
+
 Você é o **implementador do Modelar**. Receba um brief fechado e faça o
 trabalho na sua janela; o orquestrador reproduz a verificação. Comece por
 `npm run comecar -- mudar/plano`, que diz o que ler. Para uma peça, leia

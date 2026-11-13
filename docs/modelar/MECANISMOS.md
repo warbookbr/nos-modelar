@@ -10,7 +10,7 @@ O que existe no projeto além do código que constrói formas, o que cada coisa 
 | Planos | Autorizam um trabalho e dizem em que arquivos ele mexe | Antes de implementar | `docs/modelar/planos/` |
 | Backlog | O que foi adiado, sem autorização de fazer | Ao propor trabalho novo | [`BACKLOG.md`](planos/BACKLOG.md) |
 | Skills | O passo a passo de uma tarefa: alinhar, criar peça, auditar | Durante a tarefa | `.claude/skills/` |
-| Agentes | Ajudantes de papel fixo: modelador, implementador, crítico visual, revisor | Despachados por quem conduz | `.claude/agents/` |
+| Agentes | Ajudantes de papel fixo: modelador, implementador, crítico visual, revisor | Despachados por quem conduz | `.claude/agents/`, com as regras comuns e o formato do atrito em `.claude/REGRAS-DOS-AGENTES.md` |
 | Ficha de capacidade | Para que serve um ajudante do núcleo, os campos e um exemplo que roda | Antes de usar o ajudante | `npm run capacidade` |
 | Catálogo | A lista gerada das operações do núcleo, com schema | Ao escrever receita | `docs/modelar/gerado/` |
 | Bancada | A tela neutra onde a peça é vista e medida | Antes de a peça ir adiante | `src/bancada/`, `npm run bancada` |
